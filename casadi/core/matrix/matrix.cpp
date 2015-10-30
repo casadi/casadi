@@ -39,12 +39,12 @@ namespace casadi {
 
   template<>
   bool Matrix<int>::isSlice(bool ind1) const {
-    return isscalar() || (iscolumn() && isdense() && Slice::isSlice(data(), ind1));
+    return is_scalar() || (is_column() && is_dense() && Slice::isSlice(data(), ind1));
   }
 
   template<>
   Slice Matrix<int>::toSlice(bool ind1) const {
-    return isscalar() ? Slice(toScalar(), ind1) : Slice(data(), ind1);
+    return is_scalar() ? Slice(toScalar(), ind1) : Slice(data(), ind1);
   }
 
   template<>
@@ -118,7 +118,7 @@ namespace casadi {
         if (!iss.fail())
           retv.push_back(SXElement::sym(varname));
       }
-    } else if (sp.isscalar(true)) {
+    } else if (sp.is_scalar(true)) {
       retv.push_back(SXElement::sym(name));
     } else {
       // Scalar
@@ -131,7 +131,7 @@ namespace casadi {
     }
 
     // Determine dimensions automatically if empty
-    if (sp.isscalar(true)) {
+    if (sp.is_scalar(true)) {
       return SX(retv);
     } else {
       return SX(sp, retv, false);
@@ -181,7 +181,7 @@ namespace casadi {
 
   template<>
   bool SX::is_symbolic() const {
-    if (isdense()) {
+    if (is_dense()) {
       return is_valid_input();
     } else {
       return false;
@@ -262,7 +262,7 @@ namespace casadi {
   template<>
   void SX::zz_expand(SX &ww, SX& tt) const {
     const SX& ex2 = *this;
-    casadi_assert(ex2.isscalar());
+    casadi_assert(ex2.is_scalar());
     SXElement ex = ex2.toScalar();
 
     // Terms, weights and indices of the nodes that are already expanded
@@ -396,7 +396,7 @@ namespace casadi {
     // number of intervals
     int n = val.numel();
 
-    casadi_assert_message(t.isscalar(), "t must be a scalar");
+    casadi_assert_message(t.is_scalar(), "t must be a scalar");
     casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
 
     SX ret = val.at(0);
@@ -446,7 +446,7 @@ namespace casadi {
                              const SX& w) const {
     const SX &f = *this;
     casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
-    casadi_assert_message(w.isempty(), "gauss_quadrature: empty weights");
+    casadi_assert_message(w.is_empty(), "gauss_quadrature: empty weights");
 
     // Change variables to [-1, 1]
     if (!is_equal(a.toScalar(), -1) || !is_equal(b.toScalar(), 1)) {
@@ -526,7 +526,7 @@ namespace casadi {
     for (int k=0; k<v.size(); ++k) {
       if (v[k].sparsity()!=vdef[k].sparsity()) {
         // Expand vdef to sparsity of v if vdef is scalar
-        if (vdef[k].isscalar() && vdef[k].nnz()==1) {
+        if (vdef[k].is_scalar() && vdef[k].nnz()==1) {
           vector<SX> vdef_mod = vdef;
           vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0), false);
           return substitute(ex, v, vdef_mod);
@@ -682,8 +682,8 @@ namespace casadi {
 
     // Make sure well-posed
     casadi_assert(vv.size() >= 1);
-    casadi_assert(iscolumn());
-    casadi_assert(arg.iscolumn());
+    casadi_assert(is_column());
+    casadi_assert(arg.is_column());
     if (transpose_jacobian) {
       casadi_assert(v.size1()==size1());
     } else {
@@ -725,7 +725,7 @@ namespace casadi {
   template<>
   SX SX::zz_taylor(const SX& x,
                    const SX& a, int order) const {
-    casadi_assert(x.isscalar() && a.isscalar());
+    casadi_assert(x.is_scalar() && a.is_scalar());
     if (nnz()!=numel())
       throw CasadiException("taylor: not implemented for sparse matrices");
     SX ff = vec(T());
@@ -937,8 +937,8 @@ namespace casadi {
 
   template<>
   SX SX::zz_poly_coeff(const SX& x) const {
-    casadi_assert(isscalar());
-    casadi_assert(x.isscalar());
+    casadi_assert(is_scalar());
+    casadi_assert(x.is_scalar());
     casadi_assert(x.is_symbolic());
 
     vector<SXElement> r;
@@ -970,7 +970,7 @@ namespace casadi {
     casadi_assert_message(p.size2()==1,
                           "poly_root(): supplied parameter must be column vector but got "
                           << p.dim() << ".");
-    casadi_assert(p.isdense());
+    casadi_assert(p.is_dense());
     if (p.size1()==2) { // a*x + b
       SX a = p(0);
       SX b = p(1);

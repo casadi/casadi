@@ -582,7 +582,7 @@ import_array();
       {
         IMatrix *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
-            && m2->isscalar()) {
+            && m2->is_scalar()) {
           if (m) **m = m2->getIntValue();
           return true;
         }
@@ -617,7 +617,7 @@ import_array();
       {
         DMatrix *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
-            && m2->isscalar()) {
+            && m2->is_scalar()) {
           if (m) **m = m2->getValue();
           return true;
         }
@@ -627,7 +627,7 @@ import_array();
       {
         IMatrix *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
-            && m2->isscalar()) {
+            && m2->is_scalar()) {
           if (m) **m = m2->getValue();
           return true;
         }
@@ -1203,7 +1203,7 @@ import_array();
 
       // Convert to DMatrix
       DMatrix tmp, *tmp_ptr=&tmp;
-      if (to_ptr(p, &tmp_ptr) && tmp_ptr->iscolumn()) {
+      if (to_ptr(p, &tmp_ptr) && tmp_ptr->is_column()) {
         if (m) tmp_ptr->get(**m);
         return true;
       }
@@ -1301,7 +1301,7 @@ import_array();
         while (it->index < it->size) {
           pe = *((PyObject**) PyArray_ITER_DATA(it));
           tmp2=&tmp;
-          if (!to_ptr(pe, &tmp2) || !tmp2->isscalar()) {
+          if (!to_ptr(pe, &tmp2) || !tmp2->is_scalar()) {
             Py_DECREF(it);
             return false;
           }

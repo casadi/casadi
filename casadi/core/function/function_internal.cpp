@@ -207,7 +207,7 @@ namespace casadi {
 
   Function FunctionInternal::gradient(int iind, int oind) {
     // Assert scalar
-    casadi_assert_message(output(oind).isscalar(),
+    casadi_assert_message(output(oind).is_scalar(),
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Give it a suitable name
@@ -233,7 +233,7 @@ namespace casadi {
 
   Function FunctionInternal::tangent(int iind, int oind) {
     // Assert scalar
-    casadi_assert_message(input(iind).isscalar(),
+    casadi_assert_message(input(iind).is_scalar(),
                           "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
     // Give it a suitable name
@@ -261,7 +261,7 @@ namespace casadi {
     log("FunctionInternal::hessian");
 
     // Assert scalar
-    casadi_assert_message(output(oind).isscalar(), "Only hessians of scalar functions allowed.");
+    casadi_assert_message(output(oind).is_scalar(), "Only hessians of scalar functions allowed.");
 
     // Generate gradient function
     return getHessian(iind, oind);
@@ -1378,7 +1378,7 @@ namespace casadi {
     // Loop over inputs
     for (int iind = 0; iind < n_in(); ++iind) {
       // Skip if no seeds
-      if (fwd && input(iind).isempty())
+      if (fwd && input(iind).is_empty())
         continue;
 
       // Get data array for input
@@ -1388,7 +1388,7 @@ namespace casadi {
       for (int oind = 0; oind < n_out(); ++oind) {
 
         // Skip if no seeds
-        if (!fwd && output(oind).isempty())
+        if (!fwd && output(oind).is_empty())
           continue;
 
 
@@ -1783,7 +1783,7 @@ namespace casadi {
 
       // Assumes initialized
       for (int i=0; i<arg.size(); ++i) {
-        if (arg[i].isNull() || arg[i].isempty() || input(i).isempty()) continue;
+        if (arg[i].isNull() || arg[i].is_empty() || input(i).is_empty()) continue;
         casadi_assert_message(
           arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
           "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function."
@@ -2702,7 +2702,7 @@ namespace casadi {
         asens[d].resize(n_in);
         vector<MX> a = vertsplit(v[d], offset);
         for (int i=0; i<n_in; ++i) {
-          if (asens[d][i].isempty(true)) {
+          if (asens[d][i].is_empty(true)) {
             asens[d][i] = reshape(a[i], input(i).size());
           } else {
             asens[d][i] += reshape(a[i], input(i).size());
@@ -2732,7 +2732,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(n_in);
       for (int i=0; i<n_in; ++i) {
-        if (asens[d][i].isempty(true)) {
+        if (asens[d][i].is_empty(true)) {
           asens[d][i] = *x_it++;
         } else {
           asens[d][i] += *x_it++;

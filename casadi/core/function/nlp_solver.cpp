@@ -199,7 +199,7 @@ namespace casadi {
       casadi_assert(fcallback_.n_in()==NLP_SOLVER_NUM_OUT);
       casadi_assert(fcallback_.n_out()==1);
       casadi_assert(fcallback_.input(NLP_SOLVER_X).size()==x_sparsity.size());
-      casadi_assert(fcallback_.input(NLP_SOLVER_F).isscalar());
+      casadi_assert(fcallback_.input(NLP_SOLVER_F).is_scalar());
       casadi_assert(fcallback_.input(NLP_SOLVER_LAM_X).size()==x_sparsity.size());
       casadi_assert(fcallback_.input(NLP_SOLVER_LAM_G).size()==g_sparsity.size());
       casadi_assert(fcallback_.input(NLP_SOLVER_LAM_P).size()==p_sparsity.size());

@@ -155,7 +155,7 @@ namespace casadi {
     }
 
     // Create data for H if not dense
-    if (!input(QP_SOLVER_H).sparsity().isdense()) h_data_.resize(n_*n_);
+    if (!input(QP_SOLVER_H).sparsity().is_dense()) h_data_.resize(n_*n_);
 
     // Create data for A
     a_data_.resize(n_*nc_);

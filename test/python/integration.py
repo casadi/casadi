@@ -259,7 +259,7 @@ class Integrationtests(casadiTestCase):
                 integrator = Function.integrator("integrator", Integrator, dae, opts)
                 for ff in [fs,integrator]:
                   for k,v in point.items():
-                    if not ff.sparsity_in(k).isempty():
+                    if not ff.sparsity_in(k).is_empty():
                       ff.setInput(v,k)
 
                 integrator.evaluate()
@@ -372,7 +372,7 @@ class Integrationtests(casadiTestCase):
               
               for ff in [fs,integrator]:
                 for k,v in point.items():
-                  if not ff.sparsity_in(k).isempty():
+                  if not ff.sparsity_in(k).is_empty():
                     ff.setInput(v,k)
 
               integrator.evaluate()
@@ -520,7 +520,7 @@ class Integrationtests(casadiTestCase):
 
             for ff in [fs,integrator]:
               for k,v in point.items():
-                if not ff.sparsity_in(k).isempty():
+                if not ff.sparsity_in(k).is_empty():
                   ff.setInput(v,k)
             integrator.evaluate()
             
@@ -1089,11 +1089,11 @@ class Integrationtests(casadiTestCase):
     integrator = Function.integrator("integrator", "idas", dae, {'calc_ic': True, 'tf': 2.3, 'reltol': 1e-10, 'augmented_options': {'reltol': 1e-09, 'abstol': 1e-09 }, 'calc_icB': True, 'abstol': 1e-10, 't0': 0.2})
 
     integrator.setInput(7.1,"x0")
-    if not integrator.getInput("p").isempty():
+    if not integrator.getInput("p").is_empty():
       integrator.setInput(2,"p")
-    if not integrator.getInput("rx0").isempty():
+    if not integrator.getInput("rx0").is_empty():
       integrator.setInput(0.13,"rx0")
-    if not integrator.getInput("rp").isempty():
+    if not integrator.getInput("rp").is_empty():
       integrator.setInput(0.127,"rp")
 
     integrator.evaluate()

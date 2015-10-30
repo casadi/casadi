@@ -257,41 +257,41 @@ namespace casadi {
     std::pair<int, int> size() const;
 
     /// Is scalar?
-    bool isscalar(bool scalar_and_dense) const;
+    bool is_scalar(bool scalar_and_dense) const;
 
     /** \brief Check if the sparsity is empty
      *
      * A sparsity is considered empty if one of the dimensions is zero
      * (or optionally both dimensions)
      */
-    bool isempty(bool both=false) const;
+    bool is_empty(bool both=false) const;
 
     /// Is dense?
-    bool isdense() const;
+    bool is_dense() const;
 
     /** \brief  Check if the pattern is a row vector (i.e. size1()==1) */
-    bool isrow() const;
+    bool is_row() const;
 
     /** \brief  Check if the pattern is a column vector (i.e. size2()==1) */
-    bool iscolumn() const;
+    bool is_column() const;
 
     /** \brief  Check if the pattern is a row or column vector */
-    bool isvector() const;
+    bool is_vector() const;
 
     /// Is diagonal?
-    bool isdiag() const;
+    bool is_diag() const;
 
     /// Is square?
-    bool issquare() const;
+    bool is_square() const;
 
     /// Is symmetric?
-    bool issymmetric() const;
+    bool is_symmetric() const;
 
     /// Is lower triangular?
-    bool istril() const;
+    bool is_tril() const;
 
     /// is upper triangular?
-    bool istriu() const;
+    bool is_triu() const;
 
     /// Get upper triangular part
     Sparsity zz_triu(bool includeDiagonal) const;

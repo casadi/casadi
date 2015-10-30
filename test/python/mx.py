@@ -1118,10 +1118,10 @@ class MXtests(casadiTestCase):
     f.evaluate()
     
     r = f([x,MX()])
-    self.assertTrue(r[1].isempty(True))
+    self.assertTrue(r[1].is_empty(True))
 
     r = f([MX(),MX()])
-    self.assertTrue(r[1].isempty(True))
+    self.assertTrue(r[1].is_empty(True))
     
     #self.assertRaises(Exception,lambda : f([x,x],True))
     #self.assertRaises(Exception,lambda : f([[],[]],True))
@@ -1813,7 +1813,7 @@ class MXtests(casadiTestCase):
           x=MX(sp,v)
           
           for (casadiop, numpyop,name, flags) in self.pool.zip():
-            if 'nozero' in flags and (v==0 or not sp.isdense()): continue
+            if 'nozero' in flags and (v==0 or not sp.is_dense()): continue
             r = casadiop([x])
             print r
             self.assertTrue(r.is_constant())

@@ -595,7 +595,7 @@ namespace casadi {
     // Find out which intermediates depends on which other
     Function f("tmp", {vertcat(this->d)}, {vertcat(this->d) - vertcat(this->ddef)});
     Sparsity sp = f.sparsity_jac();
-    casadi_assert(sp.issquare());
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -670,7 +670,7 @@ namespace casadi {
     // Find out which differential equation depends on which differential state
     Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
     Sparsity sp = f.sparsity_jac();
-    casadi_assert(sp.issquare());
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -698,7 +698,7 @@ namespace casadi {
     // Find out which algebraic equation depends on which algebraic state
     Function f("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
     Sparsity sp = f.sparsity_jac();
-    casadi_assert(sp.issquare());
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -733,7 +733,7 @@ namespace casadi {
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
     Sparsity sp = f.sparsity_jac();
-    casadi_assert(sp.issquare());
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -817,7 +817,7 @@ namespace casadi {
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
     Sparsity sp = f.sparsity_jac();
-    casadi_assert(sp.issquare());
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -1049,7 +1049,7 @@ namespace casadi {
   void DaeBuilder::sanity_check() const {
     // Time
     casadi_assert_message(this->t.is_symbolic(), "Non-symbolic time t");
-    casadi_assert_message(this->t.isscalar(), "Non-scalar time t");
+    casadi_assert_message(this->t.is_scalar(), "Non-scalar time t");
 
     // Differential states
     casadi_assert_message(this->x.size()==this->ode.size(),
@@ -1152,7 +1152,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::der(const MX& var) const {
-    casadi_assert(var.iscolumn() && var.is_symbolic());
+    casadi_assert(var.is_column() && var.is_symbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
       ret[i] = der(var.at(i).getName());
@@ -1237,9 +1237,9 @@ namespace casadi {
   }
 
   std::string DaeBuilder::unit(const MX& var) const {
-    casadi_assert_message(!var.iscolumn() && var.is_valid_input(),
+    casadi_assert_message(!var.is_column() && var.is_valid_input(),
                           "DaeBuilder::unit: Argument must be a symbolic vector");
-    if (var.isempty()) {
+    if (var.is_empty()) {
       return "n/a";
     } else {
       std::vector<MX> prim = var.primitives();
@@ -1265,7 +1265,7 @@ namespace casadi {
   }
 
   std::vector<double> DaeBuilder::nominal(const MX& var) const {
-    casadi_assert_message(var.iscolumn() && var.is_valid_input(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.primitives();
@@ -1277,7 +1277,7 @@ namespace casadi {
   }
 
   void DaeBuilder::setNominal(const MX& var, const std::vector<double>& val) {
-    casadi_assert_message(var.iscolumn() && var.is_valid_input(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
     casadi_assert_message(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
     std::vector<MX> prim = var.primitives();
@@ -1288,7 +1288,7 @@ namespace casadi {
   }
 
   std::vector<double> DaeBuilder::attribute(getAtt f, const MX& var, bool normalized) const {
-    casadi_assert_message(var.iscolumn() && var.is_valid_input(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::attribute: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.primitives();
@@ -1300,7 +1300,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::attribute(getAttS f, const MX& var) const {
-    casadi_assert_message(var.iscolumn() && var.is_valid_input(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::attribute: Argument must be a symbolic vector");
     MX ret = MX::zeros(var.sparsity());
     std::vector<MX> prim = var.primitives();
@@ -1313,7 +1313,7 @@ namespace casadi {
 
   void DaeBuilder::setAttribute(setAtt f, const MX& var, const std::vector<double>& val,
                                  bool normalized) {
-    casadi_assert_message(var.iscolumn() && var.is_valid_input(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.nnz()==val.size(), "DaeBuilder::setAttribute: Dimension mismatch");
     std::vector<MX> prim = var.primitives();
@@ -1324,7 +1324,7 @@ namespace casadi {
   }
 
   void DaeBuilder::setAttribute(setAttS f, const MX& var, const MX& val) {
-    casadi_assert_message(var.iscolumn() && var.is_valid_input(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.sparsity()==val.sparsity(),
                           "DaeBuilder::setAttribute: Sparsity mismatch");
@@ -1622,7 +1622,7 @@ namespace casadi {
 
     // Get a reference to the expression
     MX& ret = lin_comb_[name];
-    casadi_assert_warning(ret.isempty(), "DaeBuilder::add_lc: Overwriting " << name);
+    casadi_assert_warning(ret.is_empty(), "DaeBuilder::add_lc: Overwriting " << name);
     ret = 0;
 
     // Get indices of outputs

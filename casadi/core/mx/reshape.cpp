@@ -59,12 +59,12 @@ namespace casadi {
 
   std::string Reshape::print(const std::vector<std::string>& arg) const {
     // For vectors, reshape is also a transpose
-    if (dep().isvector() && sparsity().isvector()) {
+    if (dep().is_vector() && sparsity().is_vector()) {
       // Print as transpose: X'
       return arg.at(0) + "'";
     } else {
       // Print as reshape(X) or vec(X)
-      if (sparsity().iscolumn()) {
+      if (sparsity().is_column()) {
         return "vec(" + arg.at(0) + ")";
       } else {
         return "reshape(" + arg.at(0) + ")";
@@ -103,7 +103,7 @@ namespace casadi {
 
   MX Reshape::getTranspose() const {
     // For vectors, reshape is also a transpose
-    if (dep().isvector() && sparsity().isvector()) {
+    if (dep().is_vector() && sparsity().is_vector()) {
       return dep();
     } else {
       return MXNode::getTranspose();

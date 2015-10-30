@@ -112,31 +112,31 @@ namespace casadi {
 
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
-    bool isempty(bool both=false) const { return sparsity().isempty(both);}
+    bool is_empty(bool both=false) const { return sparsity().is_empty(both);}
 
     /** \brief  Check if the matrix expression is dense */
-    bool isdense() const { return sparsity().isdense();}
+    bool is_dense() const { return sparsity().is_dense();}
 
     /** \brief  Check if the matrix expression is scalar */
-    bool isscalar(bool scalar_and_dense=false) const;
+    bool is_scalar(bool scalar_and_dense=false) const;
 
     /** \brief  Check if the matrix expression is square */
-    bool issquare() const { return sparsity().issquare();}
+    bool is_square() const { return sparsity().is_square();}
 
     /** \brief  Check if the matrix is a row or column vector */
-    bool isvector() const { return sparsity().isvector();}
+    bool is_vector() const { return sparsity().is_vector();}
 
     /** \brief  Check if the matrix is a row vector (i.e. size1()==1) */
-    bool isrow() const { return sparsity().isrow();}
+    bool is_row() const { return sparsity().is_row();}
 
     /** \brief  Check if the matrix is a column vector (i.e. size2()==1) */
-    bool iscolumn() const { return sparsity().iscolumn();}
+    bool is_column() const { return sparsity().is_column();}
 
     /** \brief Check if the matrix is upper triangular */
-    bool istriu() const { return sparsity().istriu();}
+    bool is_triu() const { return sparsity().is_triu();}
 
     /** \brief Check if the matrix is lower triangular */
-    bool istril() const { return sparsity().istril();}
+    bool is_tril() const { return sparsity().is_tril();}
 
     ///@{
     /** \brief Get the sparsity pattern. See the Sparsity class for details. */
@@ -181,12 +181,12 @@ namespace casadi {
       return project(self(), triu(sparsity(), includeDiagonal));
     }
     MatType zz_quad_form(const MatType &A) const {
-      casadi_assert(isvector());
-      if (!iscolumn()) return quad_form(self().T(), A);
+      casadi_assert(is_vector());
+      if (!is_column()) return quad_form(self().T(), A);
       return inner_prod(self(), mul(A, self()));
     }
     MatType zz_quad_form() const {
-      casadi_assert(isvector());
+      casadi_assert(is_vector());
       return inner_prod(self(), self());
     }
     MatType zz_sum_square() const { return inner_prod(self(), self());}
@@ -700,8 +700,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::isscalar(bool scalar_and_dense) const {
-    return sparsity().isscalar(scalar_and_dense);
+  bool GenericMatrix<MatType>::is_scalar(bool scalar_and_dense) const {
+    return sparsity().is_scalar(scalar_and_dense);
   }
 
 #endif // SWIG
@@ -787,7 +787,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::zz_tril2symm() const {
-    casadi_assert_message(self().issquare(),
+    casadi_assert_message(self().is_square(),
                           "Shape error in tril2symm. Expecting square shape but got "
                           << self().dim());
     casadi_assert_message(self().nnz_upper()-self().nnz_diag()==0,
@@ -813,7 +813,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::zz_triu2symm() const {
-    casadi_assert_message(self().issquare(),
+    casadi_assert_message(self().is_square(),
                           "Shape error in triu2symm. Expecting square shape but got "
                           << self().dim());
     casadi_assert_message(self().nnz_lower()-self().nnz_diag()==0,

@@ -35,10 +35,10 @@ namespace casadi {
                                        const DMatrix& grid)
     : FunctionInternal(name), integrator_(integrator), grid_(grid.data()) {
 
-    casadi_assert_message(grid.iscolumn(),
+    casadi_assert_message(grid.is_column(),
                           "Simulator::Simulator: grid must be a column vector, but got "
                           << grid.dim());
-    casadi_assert_message(grid.isdense(),
+    casadi_assert_message(grid.is_dense(),
                           "Simulator::Simulator: grid must be dense, but got "
                           << grid.dim());
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);

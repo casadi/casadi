@@ -532,16 +532,16 @@ namespace casadi {
           if (!fcallback_.isNull()) {
             double time1 = clock();
             // Copy outputs
-            if (!output(NLP_SOLVER_X).isempty()) {
+            if (!output(NLP_SOLVER_X).is_empty()) {
               output(NLP_SOLVER_X).setNZ(worhp_o_.X);
             }
-            if (!output(NLP_SOLVER_F).isempty())
+            if (!output(NLP_SOLVER_F).is_empty())
               output(NLP_SOLVER_F).set(worhp_o_.F);
-            if (!output(NLP_SOLVER_G).isempty())
+            if (!output(NLP_SOLVER_G).is_empty())
               output(NLP_SOLVER_G).setNZ(worhp_o_.G);
-            if (!output(NLP_SOLVER_LAM_X).isempty())
+            if (!output(NLP_SOLVER_LAM_X).is_empty())
               output(NLP_SOLVER_LAM_X).setNZ(worhp_o_.Lambda);
-            if (!output(NLP_SOLVER_LAM_G).isempty())
+            if (!output(NLP_SOLVER_LAM_G).is_empty())
               output(NLP_SOLVER_LAM_G).setNZ(worhp_o_.Mu);
 
             Dict iteration;

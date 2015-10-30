@@ -14,7 +14,7 @@ int DSDPSetSchurMatOps(DSDP,struct DSDPSchurMat_Ops*,void*);
 typedef struct {
   chfac *M;
   int m;
-  int isdense;
+  int is_dense;
   int *rnnz;
   int *colnnz;
   int nnz;
@@ -101,7 +101,7 @@ static int DSDPCreateM(MCholSolverALL *ABA, chfac **M, int rrnnz[],int tnnz[], i
   printf("Trying Sparse M: Total nonzeros: %d of %d \n",totalnnz,m*(m-1)/2 );
   /* Create sparse dual matrix structure */
   SymbProc(rnnz+1,snnz,n,&sfptr);
-  ABA->isdense=0;
+  ABA->is_dense=0;
   ABA->M=sfptr;
   ABA->nnz=totalnnz;
   ABA->rnnz=rnnz;
@@ -172,7 +172,7 @@ static int DSDPGramMatRowNonzeros(void*M, int row, double cols[], int *ncols, in
   MCholSolverALL *AMA = (MCholSolverALL *)M; 
   int i;
   DSDPFunctionBegin;
-  if (AMA->isdense){
+  if (AMA->is_dense){
     *ncols = nrows-row;
     for (i=row;i<nrows;i++){
       cols[i]=1.0;
@@ -205,7 +205,7 @@ static int Tdestroy(void*M){
   DSDPFunctionBegin;
   CfcFree(&AMA->M);
   info = DSDPVecDestroy(&AMA->D1); DSDPCHKERR(info);
-  if (AMA->isdense==0 && AMA->rnnz ){
+  if (AMA->is_dense==0 && AMA->rnnz ){
     DSDPFREE(&AMA->rnnz,&info);DSDPCHKERR(info);
     DSDPFREE(&AMA->colnnz,&info);DSDPCHKERR(info);
   }
@@ -341,7 +341,7 @@ static int DSDPCreateSchurMatrix(void *ctx, int m){
     info=DSDPVecCreateSeq(m,&AMA->D1); DSDPCHKERR(info);
     if (totalnnz*2+m > m*m * 0.11 ){
       info=MchlSetup2(m,&sf); DSDPCHKERR(info);
-      AMA->M=sf;      AMA->isdense=1;
+      AMA->M=sf;      AMA->is_dense=1;
       AMA->rnnz=0;    AMA->colnnz=0;
       DSDPLogInfo(0,8,"Creating Dense Full non LAPACK Schur Matrix\n");
     } else {

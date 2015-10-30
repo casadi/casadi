@@ -67,9 +67,9 @@ namespace casadi {
   MX::MX(const Sparsity& sp, const MX& val) {
     if (sp.isReshape(val.sparsity())) {
       *this = reshape(val, sp);
-    } else if (val.isscalar()) {
+    } else if (val.is_scalar()) {
       // Dense matrix if val dense
-      if (val.isdense()) {
+      if (val.is_dense()) {
         if (val.is_constant()) {
           assignNode(ConstantMX::create(sp, val.getValue()));
         } else {
@@ -80,7 +80,7 @@ namespace casadi {
         assignNode(ConstantMX::create(Sparsity(sp.size()), 0));
       }
     } else {
-      casadi_assert(val.iscolumn() && sp.nnz()==val.size1());
+      casadi_assert(val.is_column() && sp.nnz()==val.size1());
       *this = densify(val)->getGetNonzeros(sp, range(sp.nnz()));
     }
   }
@@ -111,7 +111,7 @@ namespace casadi {
     std::vector<MX> ret(x->nout());
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = MX::create(new OutputNode(x, i));
-      if (ret[i].isempty(true)) {
+      if (ret[i].is_empty(true)) {
         ret[i] = MX(0, 0);
       } else if (ret[i].nnz()==0) {
         ret[i] = MX(ret[i].size());
@@ -141,9 +141,9 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Make sure dense vectors
-    casadi_assert_message(rr.isdense() && rr.isvector(),
+    casadi_assert_message(rr.is_dense() && rr.is_vector(),
                           "Marix::get: First index must be a dense vector");
-    casadi_assert_message(cc.isdense() && cc.isvector(),
+    casadi_assert_message(cc.is_dense() && cc.is_vector(),
                           "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
@@ -161,12 +161,12 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
-    if (isdense()) {
+    if (is_dense()) {
       return getNZ(m, ind1, rr);
     }
 
     // If indexed matrix was a row/column vector, make sure that the result is too
-    bool tr = (iscolumn() && rr.isrow()) || (isrow() && rr.iscolumn());
+    bool tr = (is_column() && rr.is_row()) || (is_row() && rr.is_column());
 
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
@@ -212,14 +212,14 @@ namespace casadi {
     }
 
     // Make sure rr and cc are dense vectors
-    casadi_assert_message(rr.isdense() && rr.iscolumn(),
+    casadi_assert_message(rr.is_dense() && rr.is_column(),
                           "MX::set: First index not dense vector");
-    casadi_assert_message(cc.isdense() && cc.iscolumn(),
+    casadi_assert_message(cc.is_dense() && cc.is_column(),
                           "MX::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
     if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
-      if (m.isscalar()) {
+      if (m.is_scalar()) {
         // m scalar means "set all"
         return set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
       } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
@@ -251,7 +251,7 @@ namespace casadi {
     }
 
     // If we are assigning with something sparse, first remove existing entries
-    if (!m.isdense()) {
+    if (!m.is_dense()) {
       erase(rr.data(), cc.data(), ind1);
     }
 
@@ -287,9 +287,9 @@ namespace casadi {
 
         // Project both matrices to this sparsity
         return set(project(m, sp), ind1, project(rr, sp));
-      } else if (m.isscalar()) {
+      } else if (m.is_scalar()) {
         // m scalar means "set all"
-        if (m.isdense()) {
+        if (m.is_dense()) {
           return set(MX(rr.sparsity(), m), ind1, rr);
         } else {
           return set(MX(rr.size()), ind1, rr);
@@ -320,7 +320,7 @@ namespace casadi {
     }
 
     // Dense mode
-    if (isdense() && m.isdense()) {
+    if (is_dense() && m.is_dense()) {
       return setNZ(m, ind1, rr);
     }
 
@@ -353,7 +353,7 @@ namespace casadi {
                           << size() << ", but supplied sparsity index has shape "
                           << sp.size() << ".");
     std::vector<int> ii = sp.find();
-    if (m.isscalar()) {
+    if (m.is_scalar()) {
       (*this)(ii) = densify(m);
     } else {
       (*this)(ii) = densify(m(ii));
@@ -367,7 +367,7 @@ namespace casadi {
 
   void MX::getNZ(MX& m, bool ind1, const Matrix<int>& kk) const {
     // If indexed matrix was a row/column vector, make sure that the result is too
-    bool tr = (iscolumn() && kk.isrow()) || (isrow() && kk.iscolumn());
+    bool tr = (is_column() && kk.is_row()) || (is_row() && kk.is_column());
 
     // Quick return if no entries
     if (kk.nnz()==0) {
@@ -415,9 +415,9 @@ namespace casadi {
 
     // Assert dimensions of assigning matrix
     if (kk.sparsity() != m.sparsity()) {
-      if (m.isscalar()) {
+      if (m.is_scalar()) {
         // m scalar means "set all"
-        if (!m.isdense()) return; // Nothing to set
+        if (!m.is_dense()) return; // Nothing to set
         return setNZ(MX(kk.sparsity(), m), ind1, kk);
       } else if (kk.size() == m.size()) {
         // Project sparsity if needed
@@ -577,7 +577,7 @@ namespace casadi {
   }
 
   MX MX::zz_mtimes(const MX& y) const {
-    if (isscalar() || y.isscalar()) {
+    if (is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return *this*y;
     } else {
@@ -587,7 +587,7 @@ namespace casadi {
   }
 
   MX MX::zz_mac(const MX& y, const MX& z) const {
-    if (isscalar() || y.isscalar()) {
+    if (is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + *this*y;
     }
@@ -650,7 +650,7 @@ namespace casadi {
   }
 
   MX MX::attachAssert(const MX& y, const std::string &fail_message) const {
-    casadi_assert_message(y.isscalar(),
+    casadi_assert_message(y.is_scalar(),
                           "Error in attachAssert: assertion expression y must be scalar, "
                           "but got " << y.dim());
     return(*this)->getAssertion(y, fail_message);
@@ -806,17 +806,17 @@ namespace casadi {
   }
 
   MX MX::zz_mrdivide(const MX& b) const {
-    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    casadi_assert_message(is_scalar() || b.is_scalar(), "Not implemented");
     return *this/b;
   }
 
   MX MX::zz_mldivide(const MX& b) const {
-    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    casadi_assert_message(is_scalar() || b.is_scalar(), "Not implemented");
     return b/ *this;
   }
 
   MX MX::zz_mpower(const MX& b) const {
-    casadi_assert_message(isscalar() || b.isscalar(), "Not implemented");
+    casadi_assert_message(is_scalar() || b.is_scalar(), "Not implemented");
     return pow(*this, b);
   }
 
@@ -895,7 +895,7 @@ namespace casadi {
   }
 
   MX MX::zz_project(const Sparsity& sp, bool intersect) const {
-    if (isempty() || (sp==sparsity())) {
+    if (is_empty() || (sp==sparsity())) {
       return *this;
     } else {
       if (intersect) {
@@ -907,8 +907,8 @@ namespace casadi {
   }
 
   MX MX::zz_densify(const MX& val) const {
-    casadi_assert(val.isscalar());
-    if (isdense()) {
+    casadi_assert(val.is_scalar());
+    if (is_dense()) {
       return *this; // Already ok
     } else if (val->is_zero()) {
       return project(*this, Sparsity::dense(size()));
@@ -1018,7 +1018,7 @@ namespace casadi {
   // Helper function
   bool has_empty(const vector<MX>& x, bool both=false) {
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (i->isempty(both)) return true;
+      if (i->is_empty(both)) return true;
     }
     return false;
   }
@@ -1026,7 +1026,7 @@ namespace casadi {
   vector<MX> trim_empty(const vector<MX>& x, bool both=false) {
     vector<MX> ret;
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
-      if (!i->isempty(both)) ret.push_back(*i);
+      if (!i->is_empty(both)) ret.push_back(*i);
     }
     return ret;
   }
@@ -1119,7 +1119,7 @@ namespace casadi {
       } else {
         return vertcat(ret);
       }
-    } else if (!x.front().iscolumn()) {
+    } else if (!x.front().is_column()) {
       // Vertcat operation only supports vectors, rewrite using horzcat
       vector<MX> xT = x;
       for (vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
@@ -1164,7 +1164,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::zz_vertsplit(const std::vector<int>& offset) const {
-    if (iscolumn()) {
+    if (is_column()) {
       // Consistency check
       casadi_assert(offset.size()>=1);
       casadi_assert(offset.front()==0);
@@ -1208,7 +1208,7 @@ namespace casadi {
   }
 
   MX MX::zz_norm_2() const {
-    if (iscolumn()) {
+    if (is_column()) {
       return norm_F(*this);
     } else {
       return (*this)->getNorm2();
@@ -1229,7 +1229,7 @@ namespace casadi {
 
   MX MX::zz_simplify() const {
     MX ret = *this;
-    if (!isempty(true)) ret->simplifyMe(ret);
+    if (!is_empty(true)) ret->simplifyMe(ret);
     return ret;
   }
 
@@ -1245,7 +1245,7 @@ namespace casadi {
   }
 
   MX MX::zz_vecNZ() const {
-    if (isdense()) {
+    if (is_dense()) {
       return vec(*this);
     } else {
       return (*this)->getGetNonzeros(Sparsity::dense(nnz(), 1), range(nnz()));
@@ -1367,8 +1367,8 @@ namespace casadi {
   }
 
   MX MX::zz_polyval(const MX& x) const {
-    casadi_assert_message(isdense(), "polynomial coefficients vector must be a vector");
-    casadi_assert_message(iscolumn() && nnz()>0, "polynomial coefficients must be a vector");
+    casadi_assert_message(is_dense(), "polynomial coefficients vector must be a vector");
+    casadi_assert_message(is_column() && nnz()>0, "polynomial coefficients must be a vector");
     MX ret = (*this)[0];
     for (int i=1; i<nnz(); ++i) {
       ret = ret*x + (*this)[i];

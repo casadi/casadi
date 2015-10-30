@@ -804,7 +804,7 @@ class Functiontests(casadiTestCase):
 
     nlp = Function("nlp", [V, P], [obj, MX()], ['x', 'p'], ['f', 'g'])
 
-    self.assertTrue(nlp.hessian(0,0).sparsity_out(0).issymmetric())
+    self.assertTrue(nlp.hessian(0,0).sparsity_out(0).is_symmetric())
 
     V = MX.sym("X",6)
 

@@ -257,7 +257,7 @@ namespace casadi {
     * A sparsity is considered empty if one of the dimensions is zero
     * (or optionally both dimensions)
     */
-    bool isempty(bool both=false) const;
+    bool is_empty(bool both=false) const;
 
     /** \brief Get the number of (structural) non-zeros
         \see numel() */
@@ -511,37 +511,37 @@ namespace casadi {
     void appendColumns(const Sparsity& sp);
 
     /// Is scalar?
-    bool isscalar(bool scalar_and_dense=false) const;
+    bool is_scalar(bool scalar_and_dense=false) const;
 
     /// Is dense?
-    bool isdense() const;
+    bool is_dense() const;
 
     /** \brief  Check if the pattern is a row vector (i.e. size1()==1) */
-    bool isrow() const;
+    bool is_row() const;
 
     /** \brief  Check if the pattern is a column vector (i.e. size2()==1) */
-    bool iscolumn() const;
+    bool is_column() const;
 
     /** \brief  Check if the pattern is a row or column vector */
-    bool isvector() const;
+    bool is_vector() const;
 
     /// Is diagonal?
-    bool isdiag() const;
+    bool is_diag() const;
 
     /// Is square?
-    bool issquare() const;
+    bool is_square() const;
 
     /// Is symmetric?
-    bool issymmetric() const;
+    bool is_symmetric() const;
 
     /// Is upper triangular?
-    bool istriu() const;
+    bool is_triu() const;
 
     /// Is lower triangular?
-    bool istril() const;
+    bool is_tril() const;
 
     /// Check whether the sparsity-pattern indicates structural singularity
-    bool issingular() const;
+    bool is_singular() const;
 
     /** \brief Do the rows appear sequentially on each column
     *
@@ -780,10 +780,10 @@ namespace casadi {
     // Check if sparsity matches
     if (val_sp==*this) {
       std::copy(val_data, val_data+sz, data);
-    } else if (this->isempty()) {
+    } else if (this->is_empty()) {
       // Quick return
       return;
-    } else if (val_sp.isempty()) {
+    } else if (val_sp.is_empty()) {
       // Quick return
       return;
     } else if (val_nel==1) { // if scalar
@@ -874,10 +874,10 @@ namespace casadi {
       for (int k=0; k<sz; ++k) {
         data[k] += val_data[k];
       }
-    } else if (this->isempty()) {
+    } else if (this->is_empty()) {
       // Quick return
       return;
-    } else if (val_sp.isempty()) {
+    } else if (val_sp.is_empty()) {
       // Quick return
       return;
     }  else if (val_nel==1) { // if scalar
@@ -955,10 +955,10 @@ namespace casadi {
       for (int k=0; k<sz; ++k) {
         data[k] |= val_data[k];
       }
-    } else if (this->isempty()) {
+    } else if (this->is_empty()) {
       // Quick return
       return;
-    } else if (val_sp.isempty()) {
+    } else if (val_sp.is_empty()) {
       // Quick return
       return;
     }  else if (val_nel==1) { // if scalar

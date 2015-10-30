@@ -310,7 +310,7 @@ static int VechMatComputeEigs(vechmat*,double[],int,double[],int,double[],int,in
 
 static int VechMatFactor(void*AA, double dmatp[], int nn0, double dwork[], int n, double ddwork[], int n1, int iptr[], int n2){
   vechmat*  A=(vechmat*)AA;
-  int i,j,k,ishift=A->ishift,isdiag,nonzeros=A->nnzeros,info;
+  int i,j,k,ishift=A->ishift,is_diag,nonzeros=A->nnzeros,info;
   int nn1=0,nn2=0;
   double *ss1=0,*ss2=0;
   const int *ind=A->ind;
@@ -318,13 +318,13 @@ static int VechMatFactor(void*AA, double dmatp[], int nn0, double dwork[], int n
   if (A->factored) return 0;
   memset((void*)iptr,0,3*n*sizeof(int));  
   /* Find number of nonzeros in each row */
-  for (isdiag=1,k=0; k<nonzeros; k++){
+  for (is_diag=1,k=0; k<nonzeros; k++){
     getij(ind[k]-ishift,&i,&j);
     iptr[i]++;
-    if (i!=j) {isdiag=0;iptr[j]++;}
+    if (i!=j) {is_diag=0;iptr[j]++;}
   }
   
-  if (isdiag){ A->factored=1; return 0;}
+  if (is_diag){ A->factored=1; return 0;}
   /* Find most nonzeros per row */
   for (j=0,i=0; i<n; i++){ if (iptr[i]>j) j=iptr[i]; }
   if (j<2){ A->factored=2; return 0; }

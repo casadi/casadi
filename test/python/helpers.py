@@ -317,7 +317,7 @@ class casadiTestCase(unittest.TestCase):
       digits_sens = digits
      
     for i in range(trial.n_in()):
-      if (allow_empty and (trial.sparsity_in(i).isempty() or solution.sparsity_in(i).isempty() )): continue
+      if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
       message = "input(%d)" % i
       self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
@@ -340,7 +340,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.n_out()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.sparsity_out(i).isempty() or solution.sparsity_out(i).isempty() )): continue
+      if (allow_empty and (trial.sparsity_out(i).is_empty() or solution.sparsity_out(i).is_empty() )): continue
       if (allow_nondiff and (trial.getOutput(i).nnz()==0 or solution.getOutput(i).nnz()==0 )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
@@ -360,7 +360,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.n_out()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.sparsity_out(i).isempty() or solution.sparsity_out(i).isempty() )): continue
+      if (allow_empty and (trial.sparsity_out(i).is_empty() or solution.sparsity_out(i).is_empty() )): continue
       if (allow_nondiff and (trial.getOutput(i).nnz()==0 or solution.getOutput(i).nnz()==0 )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
@@ -371,7 +371,7 @@ class casadiTestCase(unittest.TestCase):
     
     if jacobian:
       for i in range(trial.n_in()):
-        if (allow_empty and (trial.sparsity_in(i).isempty() or solution.sparsity_in(i).isempty() )): continue
+        if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
         for j in range(trial.n_out()):
           trialjac = trial.jacobian(i,j)
           self.assertEqual(trialjac.n_in(),trial.n_in())
@@ -386,9 +386,9 @@ class casadiTestCase(unittest.TestCase):
 
     if gradient:
       for i in range(trial.n_in()):
-        if (allow_empty and (trial.sparsity_in(i).isempty() or solution.sparsity_in(i).isempty() )): continue
+        if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
         for j in range(trial.n_out()):
-          if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
+          if trial.getOutput(j).is_scalar() and solution.getOutput(j).is_scalar():
             trialgrad = trial.gradient(i,j)
             self.assertEqual(trialgrad.n_in(),trial.n_in())
             self.assertEqual(trialgrad.n_out(),trial.n_out()+1)
@@ -401,9 +401,9 @@ class casadiTestCase(unittest.TestCase):
 
     if hessian:
       for i in range(trial.n_in()):
-        if (allow_empty and (trial.sparsity_in(i).isempty() or solution.sparsity_in(i).isempty() )): continue
+        if (allow_empty and (trial.sparsity_in(i).is_empty() or solution.sparsity_in(i).is_empty() )): continue
         for j in range(trial.n_out()):
-          if trial.getOutput(j).isscalar() and solution.getOutput(j).isscalar():
+          if trial.getOutput(j).is_scalar() and solution.getOutput(j).is_scalar():
             trialhess = trial.hessian(i,j)
             self.assertEqual(trialhess.n_in(),trial.n_in())
             self.assertEqual(trialhess.n_out(),trial.n_out()+2)

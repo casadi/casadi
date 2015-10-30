@@ -391,11 +391,11 @@ namespace casadi {
   }
 
   MX MXNode::getTranspose() const {
-    if (sparsity().isscalar()) {
+    if (sparsity().is_scalar()) {
       return shared_from_this<MX>();
-    } else if (sparsity().isvector()) {
+    } else if (sparsity().is_vector()) {
       return getReshape(sparsity().T());
-    } else if (sparsity().isdense()) {
+    } else if (sparsity().is_dense()) {
       return MX::create(new DenseTranspose(shared_from_this<MX>()));
     } else {
       return MX::create(new Transpose(shared_from_this<MX>()));
@@ -422,7 +422,7 @@ namespace casadi {
                           << x.dim() << " and z=" << z.dim() << ".");
     casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got y=" << y.size1()
                           << " and x" << x.dim() << ".");
-    if (x.isdense() && y.isdense() && z.isdense()) {
+    if (x.is_dense() && y.is_dense() && z.is_dense()) {
       return MX::create(new DenseMultiplication(z, x, y));
     } else {
       return MX::create(new Multiplication(z, x, y));
@@ -530,18 +530,18 @@ namespace casadi {
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const {
     // Make sure that dimensions match
-    casadi_assert_message(sparsity().isscalar() || y.isscalar() || sparsity().size()==y.size(),
+    casadi_assert_message(sparsity().is_scalar() || y.is_scalar() || sparsity().size()==y.size(),
                           "Dimension mismatch." << "lhs is " << sparsity().dim()
                           << ", while rhs is " << y.dim());
 
     // Create binary node
-    if (sparsity().isscalar(false)) {
+    if (sparsity().is_scalar(false)) {
       if (nnz()==0) {
         return toMatrix(MX(0)->getBinary(op, y, true, false), y.sparsity());
       } else {
         return toMatrix(getBinary(op, y, true, false), y.sparsity());
       }
-    } else if (y.isscalar()) {
+    } else if (y.is_scalar()) {
       if (y.nnz()==0) {
         return toMatrix(getBinary(op, MX(0), false, true), sparsity());
       } else {
@@ -657,7 +657,7 @@ namespace casadi {
 
     if (scX) {
       // Check if it is ok to loop over nonzeros only
-      if (y.isdense() || operation_checker<Function0Checker>(op)) {
+      if (y.is_dense() || operation_checker<Function0Checker>(op)) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<true, false>(Operation(op), shared_from_this<MX>(), y));
       } else {
@@ -666,7 +666,7 @@ namespace casadi {
       }
     } else if (scY) {
       // Check if it is ok to loop over nonzeros only
-      if (sparsity().isdense() || operation_checker<F0XChecker>(op)) {
+      if (sparsity().is_dense() || operation_checker<F0XChecker>(op)) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<false, true>(Operation(op), shared_from_this<MX>(), y));
       } else {
@@ -678,7 +678,7 @@ namespace casadi {
       MX rr = MX::create(new BinaryMX<false, false>(Operation(op), shared_from_this<MX>(), y));
 
       // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
-      if (!rr.isdense() && !operation_checker<F00Checker>(op)) {
+      if (!rr.is_dense() && !operation_checker<F00Checker>(op)) {
         // Get the value for the structural zeros
         double fcn_0(0);
         casadi_math<double>::fun(op, 0, 0, fcn_0);
@@ -737,7 +737,7 @@ namespace casadi {
     if (sparsity()==y.sparsity()) {
       if (sparsity().nnz()==0) {
         return 0;
-      } else if (sparsity().isscalar()) {
+      } else if (sparsity().is_scalar()) {
         return getBinarySwitch(OP_MUL, y);
       } else {
         return MX::create(new InnerProd(shared_from_this<MX>(), y));

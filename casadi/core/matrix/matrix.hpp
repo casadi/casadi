@@ -160,14 +160,14 @@ namespace casadi {
     using B::size1;
     using B::size2;
     using B::size;
-    using B::isempty;
-    using B::isscalar;
-    using B::isdense;
-    using B::isvector;
-    using B::isrow;
-    using B::iscolumn;
-    using B::istril;
-    using B::istriu;
+    using B::is_empty;
+    using B::is_scalar;
+    using B::is_dense;
+    using B::is_vector;
+    using B::is_row;
+    using B::is_column;
+    using B::is_tril;
+    using B::is_triu;
     using B::colind;
     using B::row;
     using B::dim;
@@ -951,11 +951,11 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Get a pointer to the data
-    DataType* ptr() { return isempty() ? static_cast<DataType*>(0) : &front();}
+    DataType* ptr() { return is_empty() ? static_cast<DataType*>(0) : &front();}
     friend inline DataType* getPtr(Matrix<DataType>& v) { return v.ptr();}
 
     /// Get a const pointer to the data
-    const DataType* ptr() const { return isempty() ? static_cast<const DataType*>(0) : &front();}
+    const DataType* ptr() const { return is_empty() ? static_cast<const DataType*>(0) : &front();}
     friend inline const DataType* getPtr(const Matrix<DataType>& v) { return v.ptr();}
     /// \endcond
 

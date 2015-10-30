@@ -113,8 +113,8 @@ namespace casadi {
     return (*this)->numel();
   }
 
-  bool Sparsity::isempty(bool both) const {
-    return (*this)->isempty(both);
+  bool Sparsity::is_empty(bool both) const {
+    return (*this)->is_empty(both);
   }
 
   int Sparsity::nnz() const {
@@ -171,7 +171,7 @@ namespace casadi {
     casadi_assert_message(cc>=0 && cc<size2(), "Column index out of bounds");
 
     // Quick return if matrix is dense
-    if (isdense()) return rr+cc*size1();
+    if (is_dense()) return rr+cc*size1();
 
     // Get sparsity pattern
     int size1=this->size1(), size2=this->size2(), nnz=this->nnz();
@@ -228,44 +228,44 @@ namespace casadi {
     return (*this)->getNZ(rr, cc);
   }
 
-  bool Sparsity::isscalar(bool scalar_and_dense) const {
-    return (*this)->isscalar(scalar_and_dense);
+  bool Sparsity::is_scalar(bool scalar_and_dense) const {
+    return (*this)->is_scalar(scalar_and_dense);
   }
 
-  bool Sparsity::isdense() const {
-    return (*this)->isdense();
+  bool Sparsity::is_dense() const {
+    return (*this)->is_dense();
   }
 
-  bool Sparsity::isdiag() const {
-    return (*this)->isdiag();
+  bool Sparsity::is_diag() const {
+    return (*this)->is_diag();
   }
 
-  bool Sparsity::isrow() const {
-    return (*this)->isrow();
+  bool Sparsity::is_row() const {
+    return (*this)->is_row();
   }
 
-  bool Sparsity::iscolumn() const {
-    return (*this)->iscolumn();
+  bool Sparsity::is_column() const {
+    return (*this)->is_column();
   }
 
-  bool Sparsity::isvector() const {
-    return (*this)->isvector();
+  bool Sparsity::is_vector() const {
+    return (*this)->is_vector();
   }
 
-  bool Sparsity::issquare() const {
-    return (*this)->issquare();
+  bool Sparsity::is_square() const {
+    return (*this)->is_square();
   }
 
-  bool Sparsity::issymmetric() const {
-    return (*this)->issymmetric();
+  bool Sparsity::is_symmetric() const {
+    return (*this)->is_symmetric();
   }
 
-  bool Sparsity::istril() const {
-    return (*this)->istril();
+  bool Sparsity::is_tril() const {
+    return (*this)->is_tril();
   }
 
-  bool Sparsity::istriu() const {
-    return (*this)->istriu();
+  bool Sparsity::is_triu() const {
+    return (*this)->is_triu();
   }
 
   Sparsity Sparsity::sub(const std::vector<int>& rr, const Sparsity& sp,
@@ -414,7 +414,7 @@ namespace casadi {
       } else if (size1()==0) {
         // No rows before
         *this = sp;
-      } else if (iscolumn()) {
+      } else if (is_column()) {
         // Append to vector (inefficient)
         *this = (*this)->zz_appendVector(*sp);
       } else {
@@ -1052,8 +1052,8 @@ namespace casadi {
     return Sparsity::triplet(nrow, ncol, row, col, mapping, false);
   }
 
-  bool Sparsity::issingular() const {
-    casadi_assert_message(issquare(), "issingular: only defined for square matrices, but got "
+  bool Sparsity::is_singular() const {
+    casadi_assert_message(is_square(), "is_singular: only defined for square matrices, but got "
                           << dim());
     return sprank(*this)!=size2();
   }

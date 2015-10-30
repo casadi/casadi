@@ -40,7 +40,7 @@ namespace casadi {
     casadi_assert_message(sparsity.size2()==sparsity.size1(),
                           "LinearSolverInternal::init: the matrix must be square but got "
                           << sparsity.dim());
-    casadi_assert_message(!sparsity.issingular(),
+    casadi_assert_message(!sparsity.is_singular(),
                           "LinearSolverInternal::init: singularity - the matrix is structurally "
                           "rank-deficient. sprank(J)=" << sprank(sparsity)
                           << " (in stead of "<< sparsity.size2() << ")");
@@ -196,14 +196,14 @@ namespace casadi {
       } else {
         a = -mac(X, rhs[d].T(), MX::zeros(A.sparsity()));
       }
-      if (asens[d][1].isempty(true)) {
+      if (asens[d][1].is_empty(true)) {
         asens[d][1] = a;
       } else {
         asens[d][1] += a;
       }
 
       // Propagate to B
-      if (asens[d][0].isempty(true)) {
+      if (asens[d][0].is_empty(true)) {
         asens[d][0] = rhs[d];
       } else {
         asens[d][0] += rhs[d];

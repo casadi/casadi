@@ -121,7 +121,7 @@ namespace casadi {
     bool isInt() const;
     bool isDouble() const;
     bool isString() const;
-    bool isemptyVector() const;
+    bool is_emptyVector() const;
     bool isIntVector() const;
     bool isIntVectorVector() const;
     bool isDoubleVector() const;

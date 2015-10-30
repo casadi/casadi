@@ -164,7 +164,7 @@ namespace casadi {
 
     // Make sure that inputs are symbolic
     for (int i=0; i<inputv.size(); ++i) {
-      if (inputv[i].isempty()) {
+      if (inputv[i].is_empty()) {
         // That's okay
       } else if (!inputv[i].is_valid_input()) {
         casadi_error("XFunction::XFunction: Xfunction input arguments must be"
@@ -547,7 +547,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   MatType XFunction<DerivedType, MatType, NodeType>::grad(int iind, int oind) {
-    casadi_assert_message(output(oind).isscalar(),
+    casadi_assert_message(output(oind).is_scalar(),
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Quick return if trivially empty
@@ -588,7 +588,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   MatType XFunction<DerivedType, MatType, NodeType>::tang(int iind, int oind) {
-    casadi_assert_message(input(iind).isscalar(),
+    casadi_assert_message(input(iind).is_scalar(),
                           "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
     // Forward seeds
@@ -629,7 +629,7 @@ namespace casadi {
     }
 
     if (symmetric) {
-      casadi_assert(output(oind).isdense());
+      casadi_assert(output(oind).is_dense());
     }
 
     // Create return object

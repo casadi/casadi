@@ -280,7 +280,7 @@ namespace casadi {
     /** \brief  Check if a particular integer value */
     virtual bool is_zero() const { return v_.value==0;}
     virtual bool is_one() const { return v_.value==1;}
-    virtual bool is_identity() const { return v_.value==1 && sparsity().isdiag();}
+    virtual bool is_identity() const { return v_.value==1 && sparsity().is_diag();}
     virtual bool isValue(double val) const { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
@@ -375,7 +375,7 @@ namespace casadi {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, v_.value, 0.0, ret);
-    if (operation_checker<F0XChecker>(op) || sparsity().isdense()) {
+    if (operation_checker<F0XChecker>(op) || sparsity().is_dense()) {
       return MX(sparsity(), ret);
     } else {
       if (v_.value==0) {
@@ -509,7 +509,7 @@ namespace casadi {
   MX Constant<Value>::getProject(const Sparsity& sp) const {
     if (is_zero()) {
       return MX::create(new Constant<Value>(sp, v_));
-    } else if (sp.isdense()) {
+    } else if (sp.is_dense()) {
       return densify(getMatrixValue());
     } else {
       return MXNode::getProject(sp);
@@ -520,14 +520,14 @@ namespace casadi {
   std::string
   Constant<Value>::print(const std::vector<std::string>& arg) const {
     std::stringstream ss;
-    if (sparsity().isscalar()) {
+    if (sparsity().is_scalar()) {
       // Print scalar
       if (sparsity().nnz()==0) {
         ss << "00";
       } else {
         ss << v_.value;
       }
-    } else if (sparsity().isempty()) {
+    } else if (sparsity().is_empty()) {
       // Print empty
       sparsity().print_compact(ss);
     } else {

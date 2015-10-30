@@ -87,7 +87,7 @@ namespace casadi {
     if (ret.size()==size()) {
       return ret;
     } else {
-      casadi_assert(ret.isempty(true));
+      casadi_assert(ret.is_empty(true));
       return MX(size());
     }
   }

@@ -1130,9 +1130,9 @@ namespace casadi {
   }
 
   inline bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false) {
-    return arg.size()==inp.size() || arg.isempty() || arg.isscalar() ||
+    return arg.size()==inp.size() || arg.is_empty() || arg.is_scalar() ||
       (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-       && (arg.iscolumn() || inp.iscolumn())) ||
+       && (arg.is_column() || inp.is_column())) ||
       (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
   }
 
@@ -1244,16 +1244,16 @@ namespace casadi {
                     && arg.size2() >=0) {
       // Matching horzcat dimensions
       return arg;
-    } else if (arg.isempty()) {
+    } else if (arg.is_empty()) {
       // Empty matrix means set zero
       return M(inp.size());
-    } else if (arg.isscalar()) {
+    } else if (arg.is_scalar()) {
       // Scalar assign means set all
       return M(inp, arg);
     } else {
       // Assign vector with transposing
       casadi_assert(arg.size1()==inp.size2() && arg.size2()==inp.size1()
-                    && (arg.iscolumn() || inp.iscolumn()));
+                    && (arg.is_column() || inp.is_column()));
       return arg.T();
     }
   }

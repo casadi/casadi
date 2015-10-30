@@ -115,8 +115,8 @@ diary OFF
 
 logged = fileread('diary');
 
-assert(~isempty(strfind(logged,'1')))
-assert(~isempty(strfind(logged,'::init')))
+assert(~is_empty(strfind(logged,'1')))
+assert(~is_empty(strfind(logged,'::init')))
 
 
 clear
@@ -137,8 +137,8 @@ catch err
 end
 
 % See issue #1483
-%assert(~isempty(strfind(msg,'  Function(char,{SX} ,{SX} ,Dict)')))
-%assert(~isempty(strfind(msg,'You have: char, SX')))
+%assert(~is_empty(strfind(msg,'  Function(char,{SX} ,{SX} ,Dict)')))
+%assert(~is_empty(strfind(msg,'You have: char, SX')))
 
 % Check mixing DMatrix and MX
 res = (DMatrix(1)+MX(1)) - (MX(1)+DMatrix(1))

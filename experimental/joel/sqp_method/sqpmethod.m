@@ -86,19 +86,19 @@ while true
     cvx_quiet(true); % Suppress output
     cvx_begin
     variable p(n)
-    if ~isempty(gfun) dual variable lambda_hat;  end
-    if ~isempty(hfun) dual variable mu_hat;      end
+    if ~is_empty(gfun) dual variable lambda_hat;  end
+    if ~is_empty(hfun) dual variable mu_hat;      end
 
     minimize( 1/2*quad_form(p,Bk) + Jfk*p);
     subject to
-    if ~isempty(gfun) lambda_hat : Jgk*p + gk == 0; end
-    if ~isempty(hfun) mu_hat :     Jhk*p + hk >= 0; end
+    if ~is_empty(gfun) lambda_hat : Jgk*p + gk == 0; end
+    if ~is_empty(hfun) mu_hat :     Jhk*p + hk >= 0; end
     cvx_end
         
     % Get the gradient of the Lagrangian
     gradL = Jfk';
-    if ~isempty(gfun) gradL = gradL - Jgk'*lambda_hat; end
-    if ~isempty(hfun) gradL = gradL - Jhk'*mu_hat;     end
+    if ~is_empty(gfun) gradL = gradL - Jgk'*lambda_hat; end
+    if ~is_empty(hfun) gradL = gradL - Jhk'*mu_hat;     end
 
     % Do a line search along p
     [tk,merit_mu,nlinsearch] = linesearch(ffun,gfun,hfun,x,...
@@ -107,8 +107,8 @@ while true
     % Calculate the new step
     dx = p*tk;
     x = x + dx;
-    if ~isempty(gfun) lambda_k = tk*lambda_hat + (1-tk)*lambda_k; end
-    if ~isempty(hfun) mu_k     = tk*mu_hat + (1-tk)*mu_k;         end
+    if ~is_empty(gfun) lambda_k = tk*lambda_hat + (1-tk)*lambda_k; end
+    if ~is_empty(hfun) mu_k     = tk*mu_hat + (1-tk)*mu_k;         end
     k = k+1;
 
     % Gather and print iteration information
@@ -142,10 +142,10 @@ while true
 
     % Complete the damped BFGS update (Procedure 18.2 in Nocedal)
     gradL_new = Jfk';
-    if ~isempty(gfun) % Equality constraints
+    if ~is_empty(gfun) % Equality constraints
         gradL_new = gradL_new - Jgk'*lambda_k;
     end
-    if ~isempty(hfun) % Inequality constraints
+    if ~is_empty(hfun) % Inequality constraints
         gradL_new = gradL_new - Jhk'*mu_k;
     end
 
@@ -194,10 +194,10 @@ T1 = fk + mu*feasviol;
 
 % Calculate the directional derivative of T1 at x (cf. 18.29 in Nocedal)
 DT1 = Jfk*p;
-if ~isempty(gfun)
+if ~is_empty(gfun)
     DT1 = DT1 - mu*sum(abs(gk));
 end
-if ~isempty(hfun)
+if ~is_empty(hfun)
     DT1 = DT1  + mu*(hk < 0)'*Jhk*p;
 end
 
@@ -210,11 +210,11 @@ while true
 
     % Evaluate gk, hk and get 1-norm of the feasability violations
     feasviol_new = 0;
-    if ~isempty(gfun)
+    if ~is_empty(gfun)
         gk_new = feval(gfun,x_new);
         feasviol_new = feasviol_new + sum(abs(gk_new));
     end
-    if ~isempty(hfun)
+    if ~is_empty(hfun)
         hk_new = feval(hfun,x_new);
         feasviol_new = feasviol_new + sum(max(0,-hk_new));
     end
@@ -246,7 +246,7 @@ function [J,f] = itrick(fun,x)
 % written by Joel Andersson, 31/10-2008, joel.andersson@esat.kuleuven.be
 
 % quick return if empty
-if isempty(fun)
+if is_empty(fun)
     J = [];
     f = [];
     return;

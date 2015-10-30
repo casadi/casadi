@@ -134,7 +134,7 @@ namespace casadi {
     return getType()==OT_STRING;
   }
 
-  bool GenericType::isemptyVector() const {
+  bool GenericType::is_emptyVector() const {
     return (isIntVector() && toIntVector().size()==0) ||
       (isIntVectorVector() && toIntVectorVector().size()==0) ||
       (isDoubleVector() && toDoubleVector().size()==0) ||

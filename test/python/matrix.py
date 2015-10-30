@@ -1004,7 +1004,7 @@ class Matrixtests(casadiTestCase):
       
       R = chol(H)
       
-      assert R.istriu()
+      assert R.is_triu()
       self.checkarray(mul(R.T,R),H)
     
 if __name__ == '__main__':

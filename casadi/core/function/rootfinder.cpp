@@ -70,9 +70,9 @@ namespace casadi {
                           "Implicit input not in range");
     casadi_assert_message(iout_>=0 && iout_<f_.n_out() && f_.n_out()>0,
                           "Implicit output not in range");
-    casadi_assert_message(f_.output(iout_).isdense() && f_.output(iout_).iscolumn(),
+    casadi_assert_message(f_.output(iout_).is_dense() && f_.output(iout_).is_column(),
                           "Residual must be a dense vector");
-    casadi_assert_message(f_.input(iin_).isdense() && f_.input(iin_).iscolumn(),
+    casadi_assert_message(f_.input(iin_).is_dense() && f_.input(iin_).is_column(),
                           "Unknown must be a dense vector");
     n_ = f_.output(iout_).nnz();
     casadi_assert_message(n_ == f_.input(iin_).nnz(),
@@ -111,7 +111,7 @@ namespace casadi {
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
-      !jac_.sparsity_out(0).issingular(),
+      !jac_.sparsity_out(0).is_singular(),
       "Rootfinder::init: singularity - the jacobian is structurally rank-deficient. "
       "sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.size1_out(0) << ")");
 
@@ -376,7 +376,7 @@ namespace casadi {
     vector<MX> tmp(nadj);
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(num_in);
-      tmp[d] = asens[d][iin_].isempty(true) ? MX(input(iin_).size()) : asens[d][iin_];
+      tmp[d] = asens[d][iin_].is_empty(true) ? MX(input(iin_).size()) : asens[d][iin_];
     }
 
     // Propagate through f_

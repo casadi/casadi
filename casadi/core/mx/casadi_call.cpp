@@ -37,13 +37,13 @@ namespace casadi {
       return project(x, sp);
     } else {
       // Different dimensions
-      if (x.isempty() || sp.isempty()) { // NOTE: To permissive?
+      if (x.is_empty() || sp.is_empty()) { // NOTE: To permissive?
         // Replace nulls with zeros of the right dimension
         return MX::zeros(sp);
-      } else if (x.isscalar()) {
+      } else if (x.is_scalar()) {
         // Scalar argument means set all
         return MX(sp, x);
-      } else if (x.size1()==sp.size2() && x.size2()==sp.size1() && sp.isvector()) {
+      } else if (x.size1()==sp.size2() && x.size2()==sp.size1() && sp.is_vector()) {
         // Transposed vector
         return projectArg(x.T(), sp, i);
       } else {
@@ -129,7 +129,7 @@ namespace casadi {
     fcn_.reverse(arg, res, aseed, v);
     for (int i=0; i<v.size(); ++i) {
       for (int j=0; j<v[i].size(); ++j) {
-        if (!v[i][j].isempty()) { // TODO(@jaeandersson): Hack
+        if (!v[i][j].is_empty()) { // TODO(@jaeandersson): Hack
           asens[i][j] += v[i][j];
         }
       }

@@ -30,7 +30,7 @@ using namespace std;
 namespace casadi {
 
   Find::Find(const MX& x) {
-    casadi_assert(x.iscolumn());
+    casadi_assert(x.is_column());
     setDependencies(x);
     setSparsity(Sparsity::scalar());
   }
@@ -76,7 +76,7 @@ namespace casadi {
     g.body << "  for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
            << " && *cr++==0; ++i) {}" << endl
            << "  " << g.workel(res[0]) << " = ";
-    if (dep(0).isdense()) {
+    if (dep(0).is_dense()) {
       g.body << "i" << ";" << endl;
     } else {
       // The row is in position 1+1+2+i (colind has length 2)

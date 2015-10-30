@@ -51,7 +51,7 @@ namespace casadi {
     L_ = 0;
     S_ = 0;
 
-    casadi_assert_message(sparsity.issymmetric(),
+    casadi_assert_message(sparsity.is_symmetric(),
                           "CSparseCholeskyInternal: supplied sparsity must be symmetric, got "
                           << sparsity.dim() << ".");
   }
@@ -160,7 +160,7 @@ namespace casadi {
     L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization
     if (L_==0) {
       DMatrix temp = sparsify(input());
-      if (temp.sparsity().issingular()) {
+      if (temp.sparsity().is_singular()) {
         stringstream ss;
         ss << "CSparseCholeskyInternal::prepare: factorization failed due "
           "to matrix being singular. Matrix contains numerical zeros which are"
