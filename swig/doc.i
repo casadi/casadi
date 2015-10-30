@@ -138,13 +138,6 @@ required length of arg field.
 
 ";
 
-%feature("docstring")  casadi::Function::generateLiftingFunctions(Function
-&output_vdef_fcn, Function &output_vinit_fcn) "
-
-Extract the functions needed for the Lifted Newton method.
-
-";
-
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -2095,6 +2088,13 @@ adheres to SCHEME_NLPINput
 
 ";
 
+%feature("docstring")  casadi::Function::generate_lifted(Function
+&output_vdef_fcn, Function &output_vinit_fcn) "
+
+Extract the functions needed for the Lifted Newton method.
+
+";
+
 %feature("docstring")  casadi::Function::sparsity_out(int ind) const  "
 
 Get sparsity of a given output.
@@ -2886,6 +2886,13 @@ Return a string with a description (for SWIG)
 
 ";
 
+%feature("docstring")  casadi::DaeBuilder::add_lc(const std::string &name,
+const std::vector< std::string > &f_out) "
+
+Add a named linear combination of output expressions.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::makeSemiExplicit() "
 
 Transform the implicit DAE to a semi-explicit DAE.
@@ -3127,13 +3134,6 @@ Add a new dependent parameter.
 %feature("docstring")  casadi::DaeBuilder::split_dae() "
 
 Identify and separate the algebraic variables and equations in the DAE.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::addLinearCombination(const
-std::string &name, const std::vector< std::string > &f_out) "
-
-Add a named linear combination of output expressions.
 
 ";
 
@@ -5404,6 +5404,13 @@ Get output dimension.
 
 ";
 
+%feature("docstring")  casadi::Function::generate_lifted(Function
+&output_vdef_fcn, Function &output_vinit_fcn) "
+
+Extract the functions needed for the Lifted Newton method.
+
+";
+
 %feature("docstring")  casadi::Function::sparsity_in(int ind) const  "
 
 Get sparsity of a given input.
@@ -5414,13 +5421,6 @@ Get sparsity of a given input.
 &iname) const  "
 
 Get sparsity of a given input.
-
-";
-
-%feature("docstring")  casadi::Function::generateLiftingFunctions(Function
-&output_vdef_fcn, Function &output_vinit_fcn) "
-
-Extract the functions needed for the Lifted Newton method.
 
 ";
 
@@ -5946,13 +5946,6 @@ Given a repeated matrix, computes the sum of repeated parts.
 
 ";
 
-%feature("docstring")  getOperatorRepresentation(const MatType &xb, const
-std::vector< std::string > &args) "
-
-Get a string representation for a binary MatType, using custom arguments.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::colind(int col)
 const  "
 
@@ -6114,6 +6107,13 @@ Get the sparsity pattern. See the Sparsity class for details.
 %feature("docstring")  gradient(const MatType &ex, const MatType &arg) "
 
 Matrix power x^n.
+
+";
+
+%feature("docstring")  print_operator(const MatType &xb, const std::vector<
+std::string > &args) "
+
+Get a string representation for a binary MatType, using custom arguments.
 
 ";
 
@@ -7097,6 +7097,13 @@ Get the dictionary.
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::Function::generate_lifted(Function
+&output_vdef_fcn, Function &output_vinit_fcn) "
+
+Extract the functions needed for the Lifted Newton method.
 
 ";
 
@@ -8750,13 +8757,6 @@ internally
 
 ";
 
-%feature("docstring")  casadi::Function::generateLiftingFunctions(Function
-&output_vdef_fcn, Function &output_vinit_fcn) "
-
-Extract the functions needed for the Lifted Newton method.
-
-";
-
 %feature("docstring")  casadi::Function::setFullJacobian(const Function
 &jac) "
 
@@ -9226,13 +9226,6 @@ Set a submatrix, two arguments
 DataType > &val) "
 
 Set all the entries without changing sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::hasNonStructuralZeros()
-const  "
-
-Check if the matrix has any zero entries which are not structural zeros.
 
 ";
 
@@ -9771,19 +9764,6 @@ one.
 
 ";
 
-%feature("docstring")  jacobianTimesVector(const Matrix< DataType > &ex,
-const Matrix< DataType > &arg, const Matrix< DataType > &v, bool
-transpose_jacobian=false) "
-
-Calculate the Jacobian and multiply by a vector from the right This is
-equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
-transpose_jacobian set to false and true respectively. If contrast to these
-expressions, it will use directional derivatives which is typically (but not
-necessarily) more efficient if the complete Jacobian is not needed and v has
-few rows.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::addSub(const Matrix<
 DataType > &m, RR rr, CC cc, bool ind1) "
 
@@ -10188,6 +10168,19 @@ open ticket #1212 to make it sparse.
 
 ";
 
+%feature("docstring")  jmtimes(const Matrix< DataType > &ex, const Matrix<
+DataType > &arg, const Matrix< DataType > &v, bool transpose_jacobian=false)
+"
+
+Calculate the Jacobian and multiply by a vector from the right This is
+equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
+transpose_jacobian set to false and true respectively. If contrast to these
+expressions, it will use directional derivatives which is typically (but not
+necessarily) more efficient if the complete Jacobian is not needed and v has
+few rows.
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::getName() const  "
 
 Get name (only if symbolic scalar)
@@ -10448,6 +10441,12 @@ nodes by their ID.
 
 Check if the matrix is integer-valued (note that false negative answers are
 possible)
+
+";
+
+%feature("docstring")  casadi::Matrix< DataType >::has_zeros() const  "
+
+Check if the matrix has any zero entries which are not structural zeros.
 
 ";
 
@@ -12806,10 +12805,37 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring")  casadi::Function::generateLiftingFunctions(Function
+%feature("docstring")  casadi::Function::generate_lifted(Function
 &output_vdef_fcn, Function &output_vinit_fcn) "
 
 Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring")  casadi::Function::kernel_sum(const std::string &name,
+const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
+const  "
+
+kernel_sum Consider a dense matrix V.
+
+KernelSum computes
+
+F(V,X) = sum_i sum_j f ( [i;j], V(i,j), X)
+
+with X: [x;y]
+
+where the summation is taken for all entries (i,j) that are a distance r
+away from X.
+
+This function assumes that V is fixed: sensitivities with respect to it are
+not computed.
+
+This allows for improved speed of evaluation.
+
+Having V fixed is a common use case: V may be a large bitmap (observation),
+onto which a kernel is fitted.
+
+Joris Gillis
 
 ";
 
@@ -12878,33 +12904,6 @@ Get symbolic primitives equivalent to the output expressions.
 %feature("docstring")  casadi::Function::sx_out() const  "
 
 Get symbolic primitives equivalent to the output expressions.
-
-";
-
-%feature("docstring")  casadi::Function::kernel_sum(const std::string &name,
-const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
-const  "
-
-kernel_sum Consider a dense matrix V.
-
-KernelSum computes
-
-F(V,X) = sum_i sum_j f ( [i;j], V(i,j), X)
-
-with X: [x;y]
-
-where the summation is taken for all entries (i,j) that are a distance r
-away from X.
-
-This function assumes that V is fixed: sensitivities with respect to it are
-not computed.
-
-This allows for improved speed of evaluation.
-
-Having V fixed is a common use case: V may be a large bitmap (observation),
-onto which a kernel is fitted.
-
-Joris Gillis
 
 ";
 
@@ -14731,6 +14730,27 @@ Is diagonal?
 
 ";
 
+%feature("docstring")  casadi::Sparsity::btf(std::vector< int >
+&output_rowperm, std::vector< int > &output_colperm, std::vector< int >
+&output_rowblock, std::vector< int > &output_colblock, std::vector< int >
+&output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
+seed=0) const  "
+
+Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
+Linear Systems by Davis (2006).
+
+Dulmage-Mendelsohn will try to bring your matrix into lower block-
+triangular (LBT) form. It will not care about the distance of off- diagonal
+elements to the diagonal: there is no guarantee you will get a block-
+diagonal matrix if you supply a randomly permuted block- diagonal matrix.
+
+If your matrix is symmetrical, this method is of limited use; permutation
+can make it non-symmetric.
+
+See:   scc
+
+";
+
 %feature("docstring")  casadi::Sparsity::enlargeColumns(int ncol, const
 std::vector< int > &cc, bool ind1=false) "
 
@@ -14846,16 +14866,6 @@ Check if the sparsity is the transpose of another.
 %feature("docstring")  casadi::Sparsity::colind(int cc) const  "
 
 Get a reference to the colindex of column cc (see class description)
-
-";
-
-%feature("docstring")  casadi::Sparsity::elimination_tree(bool ata=false)
-const  "
-
-Calculate the elimination tree See Direct Methods for Sparse Linear Systems
-by Davis (2006). If the parameter ata is false, the algorithm is equivalent
-to Matlab's etree(A), except that the indices are zero- based. If ata is
-true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
@@ -15040,15 +15050,6 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Sparsity::depth_first_search(int j, int top,
-std::vector< int > &xi, std::vector< int > &pstack, const std::vector< int >
-&pinv, std::vector< bool > &marked) const  "
-
-Depth-first search on the adjacency graph of the sparsity See Direct Methods
-for Sparse Linear Systems by Davis (2006).
-
-";
-
 %feature("docstring")  casadi::Sparsity::combine(const Sparsity &y, bool
 f0x_is_zero, bool fx0_is_zero) const  "
 
@@ -15133,15 +15134,9 @@ Get the shape.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::star_coloring(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  "
+%feature("docstring")  casadi::SharedObject::isNull() const  "
 
-Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring
-algorithm Algorithm 4.1 in What Color Is Your Jacobian? Graph Coloring for
-Computing Derivatives A. H. GEBREMEDHIN, F. MANNE, A. POTHEN SIAM Rev.,
-47(4), 629705 (2006)
-
-Ordering options: None (0), largest first (1)
+Is a null pointer?
 
 ";
 
@@ -15190,9 +15185,15 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
+%feature("docstring")  casadi::Sparsity::star_coloring(int ordering=1, int
+cutoff=std::numeric_limits< int >::max()) const  "
 
-Is a null pointer?
+Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring
+algorithm Algorithm 4.1 in What Color Is Your Jacobian? Graph Coloring for
+Computing Derivatives A. H. GEBREMEDHIN, F. MANNE, A. POTHEN SIAM Rev.,
+47(4), 629705 (2006)
+
+Ordering options: None (0), largest first (1)
 
 ";
 
@@ -15216,6 +15217,28 @@ Compress a sparsity pattern.
 
 ";
 
+%feature("docstring")  casadi::Sparsity::scc(std::vector< int >
+&output_index, std::vector< int > &output_offset) const  "
+
+Find the strongly connected components of the bigraph defined by the
+sparsity pattern of a square matrix.
+
+See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
+Number of components
+
+Offset for each components (length: 1 + number of components)
+
+Indices for each components, component i has indices index[offset[i]], ...,
+index[offset[i+1]]
+
+In the case that the matrix is symmetric, the result has a particular
+interpretation: Given a symmetric matrix A and n = A.scc(p, r)
+
+=> A[p, p] will appear block-diagonal with n blocks and with the indices of
+the block boundaries to be found in r.
+
+";
+
 %feature("docstring")  casadi::Sparsity::istriu() const  "
 
 Is upper triangular?
@@ -15231,6 +15254,15 @@ internal class
 %feature("docstring")  casadi::Sparsity::isvector() const  "
 
 Check if the pattern is a row or column vector.
+
+";
+
+%feature("docstring")  casadi::Sparsity::dfs(int j, int top, std::vector<
+int > &xi, std::vector< int > &pstack, const std::vector< int > &pinv,
+std::vector< bool > &marked) const  "
+
+Depth-first search on the adjacency graph of the sparsity See Direct Methods
+for Sparse Linear Systems by Davis (2006).
 
 ";
 
@@ -15289,27 +15321,6 @@ Ordering options: None (0), largest first (1)
 
 ";
 
-%feature("docstring")  casadi::Sparsity::dulmage_mendelsohn(std::vector< int
-> &output_rowperm, std::vector< int > &output_colperm, std::vector< int >
-&output_rowblock, std::vector< int > &output_colblock, std::vector< int >
-&output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
-seed=0) const  "
-
-Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
-Linear Systems by Davis (2006).
-
-Dulmage-Mendelsohn will try to bring your matrix into lower block-
-triangular (LBT) form. It will not care about the distance of off- diagonal
-elements to the diagonal: there is no guarantee you will get a block-
-diagonal matrix if you supply a randomly permuted block- diagonal matrix.
-
-If your matrix is symmetrical, this method is of limited use; permutation
-can make it non-symmetric.
-
-See:   scc
-
-";
-
 %feature("docstring")  casadi::Sparsity::istril() const  "
 
 Is lower triangular?
@@ -15330,30 +15341,6 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")
-casadi::Sparsity::scc(std::vector< int >
-&output_index, std::vector< int > &output_offset) const  "
-
-Find the strongly connected components of the bigraph defined by the
-sparsity pattern of a square matrix.
-
-See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
-Number of components
-
-Offset for each components (length: 1 + number of components)
-
-Indices for each components, component i has indices index[offset[i]], ...,
-index[offset[i+1]]
-
-In the case that the matrix is symmetric, the result has a particular
-interpretation: Given a symmetric matrix A and n =
-A.scc(p, r)
-
-=> A[p, p] will appear block-diagonal with n blocks and with the indices of
-the block boundaries to be found in r.
-
-";
-
 %feature("docstring")  casadi::Sparsity::pmult(const std::vector< int > &p,
 bool permute_rows=true, bool permute_columns=true, bool
 invert_permutation=false) const  "
@@ -15362,6 +15349,15 @@ Permute rows and/or columns Multiply the sparsity with a permutation matrix
 from the left and/or from the right P * A * trans(P), A * trans(P) or A *
 trans(P) with P defined by an index vector containing the row for each col.
 As an alternative, P can be transposed (inverted).
+
+";
+
+%feature("docstring")  casadi::Sparsity::etree(bool ata=false) const  "
+
+Calculate the elimination tree See Direct Methods for Sparse Linear Systems
+by Davis (2006). If the parameter ata is false, the algorithm is equivalent
+to Matlab's etree(A), except that the indices are zero- based. If ata is
+true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
