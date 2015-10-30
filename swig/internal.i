@@ -202,18 +202,6 @@
 %exception  casadi::getTimerTime(void) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::hash_combine(std::size_t &seed, T v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::hash_combine(std::size_t &seed, const std::vector< int > &v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::hash_sparsity(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::hash_value(T v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::iszero(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

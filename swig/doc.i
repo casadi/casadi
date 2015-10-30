@@ -14738,13 +14738,16 @@ with it.
 &output_coarse_rowblock, std::vector< int > &output_coarse_colblock, int
 seed=0) const  "
 
-Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
+Calculate the block triangular form (BTF) See Direct Methods for Sparse
 Linear Systems by Davis (2006).
 
-Dulmage-Mendelsohn will try to bring your matrix into lower block-
-triangular (LBT) form. It will not care about the distance of off- diagonal
-elements to the diagonal: there is no guarantee you will get a block-
-diagonal matrix if you supply a randomly permuted block- diagonal matrix.
+The function computes the Dulmage-Mendelsohn decomposition, which allows you
+to reorder the rows and columns of a matrix to bring it into block
+triangular form (BTF).
+
+It will not consider the distance of off-diagonal elements to the diagonal:
+there is no guarantee you will get a block-diagonal matrix if you supply a
+randomly permuted block-diagonal matrix.
 
 If your matrix is symmetrical, this method is of limited use; permutation
 can make it non-symmetric.
@@ -14786,18 +14789,6 @@ Resize.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getLowerNZ() const  "
-
-Get nonzeros in lower triangular part.
-
-";
-
-%feature("docstring")  casadi::Sparsity::is_row() const  "
-
-Check if the pattern is a row vector (i.e. size1()==1)
-
-";
-
 %feature("docstring")  casadi::Sparsity::find(bool ind1=false) const  "
 
 Get the location of all non-zero elements as they would appear in a Dense
@@ -14805,12 +14796,6 @@ matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
 zeros.
 
 k = A.find() A[k] will contain the elements of A that are non-zero in B
-
-";
-
-%feature("docstring")  casadi::Sparsity::getUpperNZ() const  "
-
-Get nonzeros in upper triangular part.
 
 ";
 
@@ -14874,10 +14859,9 @@ Get a reference to the colindex of column cc (see class description)
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getCCS(std::vector< int >
-&output_colind, std::vector< int > &output_row) const  "
+%feature("docstring")  casadi::Sparsity::is_row() const  "
 
-Get the sparsity in compressed column storage (CCS) format.
+Check if the pattern is a row vector (i.e. size1()==1)
 
 ";
 
@@ -14887,13 +14871,6 @@ The total number of elements, including structural zeros, i.e.
 size2()*size1()
 
 See:   nnz()
-
-";
-
-%feature("docstring")  casadi::Sparsity::getCRS(std::vector< int >
-&output_rowind, std::vector< int > &output_col) const  "
-
-Get the sparsity in compressed row storage (CRS) format.
 
 ";
 
@@ -14916,6 +14893,13 @@ elements (i, j) with j<=i.
 
 ";
 
+%feature("docstring")  casadi::Sparsity::get_ccs(std::vector< int >
+&output_colind, std::vector< int > &output_row) const  "
+
+Get the sparsity in compressed column storage (CCS) format.
+
+";
+
 %feature("docstring")  casadi::Sparsity::is_transpose(const Sparsity &y)
 const  "
 
@@ -14923,16 +14907,16 @@ Check if the sparsity is the transpose of another.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::is_square() const  "
-
-Is square?
-
-";
-
-%feature("docstring")  casadi::Sparsity::getTriplet(std::vector< int >
+%feature("docstring")  casadi::Sparsity::get_triplet(std::vector< int >
 &output_row, std::vector< int > &output_col) const  "
 
 Get the sparsity in sparse triplet format.
+
+";
+
+%feature("docstring")  casadi::Sparsity::is_square() const  "
+
+Is square?
 
 ";
 
@@ -15017,6 +15001,13 @@ Create diagonal sparsity pattern.
 &rc) "
 
 Create diagonal sparsity pattern.
+
+";
+
+%feature("docstring")  casadi::Sparsity::get_crs(std::vector< int >
+&output_rowind, std::vector< int > &output_col) const  "
+
+Get the sparsity in compressed row storage (CRS) format.
 
 ";
 
@@ -15169,6 +15160,12 @@ Is a null pointer?
 
 ";
 
+%feature("docstring")  casadi::Sparsity::get_lower() const  "
+
+Get nonzeros in lower triangular part.
+
+";
+
 %feature("docstring")  casadi::Sparsity::is_singular() const  "
 
 Check whether the sparsity-pattern indicates structural singularity.
@@ -15274,6 +15271,12 @@ the block boundaries to be found in r.
 
 ";
 
+%feature("docstring")  casadi::Sparsity::get_upper() const  "
+
+Get nonzeros in upper triangular part.
+
+";
+
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
@@ -15345,8 +15348,8 @@ Get the shape.
 
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
 by Davis (2006). If the parameter ata is false, the algorithm is equivalent
-to Matlab's etree(A), except that the indices are zero- based. If ata is
-true, the algorithm is equivalent to Matlab's etree(A, 'row').
+to MATLAB's etree(A), except that the indices are zero- based. If ata is
+true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
 ";
 
@@ -16300,13 +16303,14 @@ int *sp_x, real2_t *yt) " [INTERNAL]  Convert sparse to transposed dense.
 ";
 
 %feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const
-std::vector< int > &colind, const std::vector< int > &row) " [INTERNAL]
+std::vector< int > &colind, const std::vector< int > &row) "
+
 Hash a sparsity pattern.
 
 ";
 
 %feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const int
-*colind, const int *row) " [INTERNAL] ";
+*colind, const int *row) " ";
 
 %feature("docstring")  casadi::profileWriteEntry(std::ofstream &f, T *a) "
 [INTERNAL] ";
@@ -16423,8 +16427,9 @@ dense matrix (lapack)
 
 ";
 
-%feature("docstring")  casadi::hash_value(T v) " [INTERNAL]  Hash value of
-an integer.
+%feature("docstring")  casadi::hash_value(T v) "
+
+Hash value of an integer.
 
 ";
 
@@ -16600,18 +16605,22 @@ Get typename.
 ";
 
 %feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
-[INTERNAL]  Generate a hash value incrementally (function taken from boost)
+
+Generate a hash value incrementally (function taken from boost)
 
 ";
 
 %feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
-int sz) " [INTERNAL]  Generate a hash value incrementally, array.
+int sz) "
+
+Generate a hash value incrementally, array.
 
 ";
 
 %feature("docstring")  casadi::hash_combine(std::size_t &seed, const
-std::vector< int > &v) " [INTERNAL]  Generate a hash value incrementally
-(function taken from boost)
+std::vector< int > &v) "
+
+Generate a hash value incrementally (function taken from boost)
 
 ";
 

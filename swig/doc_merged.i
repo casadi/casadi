@@ -10773,13 +10773,16 @@ with it.
 
 %feature("docstring") casadi::Sparsity::btf "
 
-Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
+Calculate the block triangular form (BTF) See Direct Methods for Sparse
 Linear Systems by Davis (2006).
 
-Dulmage-Mendelsohn will try to bring your matrix into lower block-
-triangular (LBT) form. It will not care about the distance of off- diagonal
-elements to the diagonal: there is no guarantee you will get a block-
-diagonal matrix if you supply a randomly permuted block- diagonal matrix.
+The function computes the Dulmage-Mendelsohn decomposition, which allows you
+to reorder the rows and columns of a matrix to bring it into block
+triangular form (BTF).
+
+It will not consider the distance of off-diagonal elements to the diagonal:
+there is no guarantee you will get a block-diagonal matrix if you supply a
+randomly permuted block-diagonal matrix.
 
 If your matrix is symmetrical, this method is of limited use; permutation
 can make it non-symmetric.
@@ -10819,18 +10822,6 @@ Resize.
 
 ";
 
-%feature("docstring") casadi::Sparsity::getLowerNZ "
-
-Get nonzeros in lower triangular part.
-
-";
-
-%feature("docstring") casadi::Sparsity::is_row "
-
-Check if the pattern is a row vector (i.e. size1()==1)
-
-";
-
 %feature("docstring") casadi::Sparsity::find "
 
 Get the location of all non-zero elements as they would appear in a Dense
@@ -10838,12 +10829,6 @@ matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
 zeros.
 
 k = A.find() A[k] will contain the elements of A that are non-zero in B
-
-";
-
-%feature("docstring") casadi::Sparsity::getUpperNZ "
-
-Get nonzeros in upper triangular part.
 
 ";
 
@@ -10905,9 +10890,9 @@ Get a reference to the colindex of column cc (see class description)
 
 ";
 
-%feature("docstring") casadi::Sparsity::getCCS "
+%feature("docstring") casadi::Sparsity::is_row "
 
-Get the sparsity in compressed column storage (CCS) format.
+Check if the pattern is a row vector (i.e. size1()==1)
 
 ";
 
@@ -10917,12 +10902,6 @@ The total number of elements, including structural zeros, i.e.
 size2()*size1()
 
 See:   nnz()
-
-";
-
-%feature("docstring") casadi::Sparsity::getCRS "
-
-Get the sparsity in compressed row storage (CRS) format.
 
 ";
 
@@ -10945,21 +10924,27 @@ elements (i, j) with j<=i.
 
 ";
 
+%feature("docstring") casadi::Sparsity::get_ccs "
+
+Get the sparsity in compressed column storage (CCS) format.
+
+";
+
 %feature("docstring") casadi::Sparsity::is_transpose "
 
 Check if the sparsity is the transpose of another.
 
 ";
 
-%feature("docstring") casadi::Sparsity::is_square "
+%feature("docstring") casadi::Sparsity::get_triplet "
 
-Is square?
+Get the sparsity in sparse triplet format.
 
 ";
 
-%feature("docstring") casadi::Sparsity::getTriplet "
+%feature("docstring") casadi::Sparsity::is_square "
 
-Get the sparsity in sparse triplet format.
+Is square?
 
 ";
 
@@ -11020,6 +11005,12 @@ Create a dense rectangular sparsity pattern.
 %feature("docstring") casadi::Sparsity::diag "
 
 Create diagonal sparsity pattern.
+
+";
+
+%feature("docstring") casadi::Sparsity::get_crs "
+
+Get the sparsity in compressed row storage (CRS) format.
 
 ";
 
@@ -11163,6 +11154,12 @@ Is a null pointer?
 
 ";
 
+%feature("docstring") casadi::Sparsity::get_lower "
+
+Get nonzeros in lower triangular part.
+
+";
+
 %feature("docstring") casadi::Sparsity::is_singular "
 
 Check whether the sparsity-pattern indicates structural singularity.
@@ -11261,6 +11258,12 @@ the block boundaries to be found in r.
 
 ";
 
+%feature("docstring") casadi::Sparsity::get_upper "
+
+Get nonzeros in upper triangular part.
+
+";
+
 %feature("docstring") casadi::Sparsity::printPtr "[INTERNAL]  Print the
 pointer to the internal class
 
@@ -11328,8 +11331,8 @@ Get the shape.
 
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
 by Davis (2006). If the parameter ata is false, the algorithm is equivalent
-to Matlab's etree(A), except that the indices are zero- based. If ata is
-true, the algorithm is equivalent to Matlab's etree(A, 'row').
+to MATLAB's etree(A), except that the indices are zero- based. If ata is
+true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
 ";
 
@@ -12219,12 +12222,9 @@ sparse to transposed dense.
 
 >  std.size_t hash_sparsity(int nrow, int ncol, [int ] colind, [int ] row)
 ------------------------------------------------------------------------
-[INTERNAL] 
+
 Hash a sparsity pattern.
 
->  std.size_t hash_sparsity(int nrow, int ncol, const int *colind, const int *row)
-------------------------------------------------------------------------
-[INTERNAL] 
 ";
 
 %feature("docstring") casadi::profileWriteEntry "[INTERNAL] ";
@@ -12327,8 +12327,9 @@ matrix (lapack)
 
 ";
 
-%feature("docstring") casadi::hash_value "[INTERNAL]  Hash value of an
-integer.
+%feature("docstring") casadi::hash_value "
+
+Hash value of an integer.
 
 ";
 
@@ -12490,12 +12491,12 @@ Get typename.
 
 >  void hash_combine(std.size_t &seed, [int ] v)
 ------------------------------------------------------------------------
-[INTERNAL] 
+
 Generate a hash value incrementally (function taken from boost)
 
 >  void hash_combine(std.size_t &seed, const int *v, int sz)
 ------------------------------------------------------------------------
-[INTERNAL] 
+
 Generate a hash value incrementally, array.
 
 ";
