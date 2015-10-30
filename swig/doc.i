@@ -5807,6 +5807,12 @@ matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 
 ";
 
+%feature("docstring")  repsum(const MatType &A, int n, int m=1) "
+
+Given a repeated matrix, computes the sum of repeated parts.
+
+";
+
 %feature("docstring")  countNodes(const MatType &A) "
 
 Count number of nodes
@@ -5843,6 +5849,13 @@ Inner product of two matrices with x and y matrices of the same dimension.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_vector() const
+"
+
+Check if the matrix is a row or column vector.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::get_colind() const
 "
 
@@ -5870,12 +5883,6 @@ reverse=false) "
 Inplace substitution with piggyback expressions Substitute variables v out
 of the expressions vdef sequentially, as well as out of a number of other
 expressions piggyback.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::issquare() const  "
-
-Check if the matrix expression is square.
 
 ";
 
@@ -5909,6 +5916,20 @@ Get the second dimension (i.e. number of columns)
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_triu() const  "
+
+Check if the matrix is upper triangular.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_empty(bool
+both=false) const  "
+
+Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
+optionally both dimensions)
+
+";
+
 %feature("docstring")  dependsOn(const MatType &f, const MatType &arg) "
 
 Check if expression depends on the argument The argument must be symbolic.
@@ -5927,15 +5948,21 @@ Get the number of (structural) non-zero elements.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_dense() const  "
+
+Check if the matrix expression is dense.
+
+";
+
 %feature("docstring")  norm_F(const MatType &x) "
 
 Frobenius norm.
 
 ";
 
-%feature("docstring")  repsum(const MatType &A, int n, int m=1) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_tril() const  "
 
-Given a repeated matrix, computes the sum of repeated parts.
+Check if the matrix is lower triangular.
 
 ";
 
@@ -5952,14 +5979,6 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::isempty(bool
-both=false) const  "
-
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::size() const  "
 
 Get the shape.
@@ -5970,12 +5989,6 @@ Get the shape.
 const  "
 
 Get the size along a particular dimensions.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::iscolumn() const  "
-
-Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
@@ -6013,6 +6026,13 @@ matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
 zeros.
 
 k = A.find() A[k] will contain the elements of A that are non-zero in B
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_square() const
+"
+
+Check if the matrix expression is square.
 
 ";
 
@@ -6116,22 +6136,27 @@ Return a col-wise summation of elements.
 
 ";
 
+%feature("docstring")  extractShared(std::vector< MatType > &ex,
+std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
+&v_prefix="v_", const std::string &v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
+
+";
+
+%feature("docstring")  extractShared(const std::vector< MatType > &ex,
+std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
+MatType > &vdef, const std::string &v_prefix="v_", const std::string
+&v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper() const
 "
 
 Get the number of non-zeros in the upper triangular half.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::isvector() const  "
-
-Check if the matrix is a row or column vector.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::isrow() const  "
-
-Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
@@ -6233,16 +6258,9 @@ diagonal matrix is constructed with it.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::isdense() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_row() const  "
 
-Check if the matrix expression is dense.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::isscalar(bool
-scalar_and_dense=false) const  "
-
-Check if the matrix expression is scalar.
+Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
@@ -6250,6 +6268,13 @@ Check if the matrix expression is scalar.
 nsteps) "
 
 Matlab's linspace command.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_scalar(bool
+scalar_and_dense=false) const  "
+
+Check if the matrix expression is scalar.
 
 ";
 
@@ -6330,12 +6355,6 @@ symbolic primitives.
 %feature("docstring")  casadi::GenericMatrix< MX >::sym(const std::string
 &name, const Sparsity &sp) " ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::istril() const  "
-
-Check if the matrix is lower triangular.
-
-";
-
 %feature("docstring")  project(const MatType &A, const Sparsity &sp, bool
 intersect=false) "
 
@@ -6351,20 +6370,10 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  extractShared(std::vector< MatType > &ex,
-std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
-&v_prefix="v_", const std::string &v_suffix="") "
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_column() const
+"
 
-Extract shared subexpressions from an set of expressions.
-
-";
-
-%feature("docstring")  extractShared(const std::vector< MatType > &ex,
-std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
-MatType > &vdef, const std::string &v_prefix="v_", const std::string
-&v_suffix="") "
-
-Extract shared subexpressions from an set of expressions.
+Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
@@ -6389,12 +6398,6 @@ std::pair< int, int > &rc) "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 one.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::istriu() const  "
-
-Check if the matrix is upper triangular.
 
 ";
 
@@ -9411,6 +9414,13 @@ Matrix< DataType > &x) " [INTERNAL]  Create nodes by their ID.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_tril() const "
+
+Check if the matrix is lower triangular.
+
+";
+
 %feature("docstring")  norm_inf_mul(const Matrix< DataType > &x, const
 Matrix< DataType > &y) "
 
@@ -9436,6 +9446,13 @@ Get the number of elements.
 >::numel(int i) const "
 
 Get the number of elements in slice (cf. MATLAB)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_triu() const "
+
+Check if the matrix is upper triangular.
 
 ";
 
@@ -9485,13 +9502,6 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::isvector() const "
-
-Check if the matrix is a row or column vector.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::isSlice(bool ind1=false)
 const  "
 
@@ -9500,14 +9510,6 @@ Is the Matrix a Slice (only for IMatrix)
 ";
 
 %feature("docstring")  casadi::Matrix< int >::isSlice(bool ind1) const " ";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::isempty(bool both=false) const "
-
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
-
-";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::dim()
 const "
@@ -9573,13 +9575,6 @@ streams.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::isrow()
-const "
-
-Check if the matrix is a row vector (i.e. size1()==1)
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::hess(const Function &f,
 int iind=0, int oind=0) "
 
@@ -9617,6 +9612,13 @@ Get double value (only if constant)
 %feature("docstring")  casadi::Matrix< DataType >::getValue(int k) const  "
 
 Get double value (particular nonzero)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_dense() const "
+
+Check if the matrix expression is dense.
 
 ";
 
@@ -9729,13 +9731,6 @@ Also called: slope function
 ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::istril() const "
-
-Check if the matrix is lower triangular.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
 >::ones(int nrow=1, int ncol=1) "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
@@ -9763,6 +9758,13 @@ one.
 DataType > &m, RR rr, CC cc, bool ind1) "
 
 Add a submatrix to an existing matrix (TODO: remove memory allocation)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_column() const "
+
+Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
@@ -9952,13 +9954,6 @@ Jacobian expression.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::istriu() const "
-
-Check if the matrix is upper triangular.
-
-";
-
 %feature("docstring")  sparsify(const Matrix< DataType > &A, double tol=0) "
 
 Make a matrix sparse by removing numerical zeros.
@@ -9981,20 +9976,6 @@ Get the (i,j) cofactor matrix.
 >::colind(int col) const "
 
 Get the sparsity pattern. See the Sparsity class for details.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::issquare() const "
-
-Check if the matrix expression is square.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::isdense() const "
-
-Check if the matrix expression is dense.
 
 ";
 
@@ -10103,6 +10084,13 @@ check if the matrix is 1 (note that false negative answers are possible)
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_row() const "
+
+Check if the matrix is a row vector (i.e. size1()==1)
+
+";
+
 %feature("docstring")  poly_coeff(const Matrix< DataType > &ex, const
 Matrix< DataType > &x) "
 
@@ -10174,10 +10162,25 @@ Get the second dimension (i.e. number of columns)
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_square() const "
+
+Check if the matrix expression is square.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::size1()
 const "
 
 Get the first dimension (i.e. number of rows)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_empty(bool both=false) const "
+
+Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
+optionally both dimensions)
 
 ";
 
@@ -10269,20 +10272,6 @@ ind1=false) "
 
 Enlarge matrix Make the matrix larger by inserting empty rows and columns,
 keeping the existing non-zeros.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::isscalar(bool scalar_and_dense=false) const "
-
-Check if the matrix expression is scalar.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
->::iscolumn() const "
-
-Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
@@ -10414,6 +10403,13 @@ check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_vector() const "
+
+Check if the matrix is a row or column vector.
+
+";
+
 %feature("docstring")  casadi::Matrix< DataType >::matrix_matrix(int op,
 const Matrix< DataType > &x, const Matrix< DataType > &y) " [INTERNAL]
 Create nodes by their ID.
@@ -10438,6 +10434,13 @@ call resetInput() after usage.
 %feature("docstring")  casadi::Matrix< DataType >::has_zeros() const  "
 
 Check if the matrix has any zero entries which are not structural zeros.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::is_scalar(bool scalar_and_dense=false) const "
+
+Check if the matrix expression is scalar.
 
 ";
 
@@ -10550,6 +10553,13 @@ Gradient expression.
 &iname, const std::string &oname) "
 
 Gradient expression.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_scalar(bool
+scalar_and_dense=false) const "
+
+Check if the matrix expression is scalar.
 
 ";
 
@@ -10666,6 +10676,12 @@ Lift the expression Experimental feature.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_tril() const "
+
+Check if the matrix is lower triangular.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MX  >::size2() const "
 
 Get the second dimension (i.e. number of columns)
@@ -10678,26 +10694,19 @@ Get the first dimension (i.e. number of rows)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::iscolumn() const "
-
-Check if the matrix is a column vector (i.e. size2()==1)
-
-";
-
 %feature("docstring")  casadi::MX::is_op(int op) const  "
 
 Is it a certain operation.
 
 ";
 
-%feature("docstring") casadi::MX::~MX "[INTERNAL]  Destructor.
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_triu() const "
+
+Check if the matrix is upper triangular.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::isscalar(bool
-scalar_and_dense=false) const "
-
-Check if the matrix expression is scalar.
+%feature("docstring") casadi::MX::~MX "[INTERNAL]  Destructor.
 
 ";
 
@@ -10714,12 +10723,6 @@ Number of outputs.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::isrow() const "
-
-Check if the matrix is a row vector (i.e. size1()==1)
-
-";
-
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -10730,6 +10733,14 @@ Print a description of the object.
 %feature("docstring")  casadi::MX::is_one() const  "
 
 check if zero (note that false negative answers are possible)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_empty(bool
+both=false) const "
+
+Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
+optionally both dimensions)
 
 ";
 
@@ -10772,12 +10783,6 @@ Is binary operation.
 %feature("docstring")  casadi::MX::getSparsity() const  "
 
 Get an owning reference to the sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::isdense() const "
-
-Check if the matrix expression is dense.
 
 ";
 
@@ -10860,12 +10865,6 @@ Get the nth dependency as MX.
 %feature("docstring")  casadi::MX::is_multiplication() const  "
 
 Check if multiplication.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::isvector() const "
-
-Check if the matrix is a row or column vector.
 
 ";
 
@@ -11059,6 +11058,12 @@ Transpose the matrix.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_vector() const "
+
+Check if the matrix is a row or column vector.
+
+";
+
 %feature("docstring")  casadi::MX::printme(const MX &y) const  " ";
 
 %feature("docstring")  casadi::MX::nan(const Sparsity &sp) "
@@ -11185,6 +11190,12 @@ Set a set of nonzeros
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_square() const "
+
+Check if the matrix expression is square.
+
+";
+
 %feature("docstring")  casadi::MX::get(MX &output_m, bool ind1, const Slice
 &rr) const  "
 
@@ -11253,6 +11264,12 @@ Number of functions.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_column() const "
+
+Check if the matrix is a column vector (i.e. size2()==1)
+
+";
+
 %feature("docstring") casadi::MX::__nonzero__ "
 
 Returns the truth value of an MX expression.
@@ -11292,30 +11309,10 @@ Tangent expression.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MX  >::istril() const "
-
-Check if the matrix is lower triangular.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::isempty(bool
-both=false) const "
-
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
-
-";
-
 %feature("docstring")  casadi::MX::zz_project(const Sparsity &sp, bool
 intersect=false) const  "
 
 Set sparse.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::istriu() const "
-
-Check if the matrix is upper triangular.
 
 ";
 
@@ -11416,6 +11413,12 @@ Get the number of dependencies of a binary SXElement.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_dense() const "
+
+Check if the matrix expression is dense.
+
+";
+
 %feature("docstring")  casadi::MX::op() const  "
 
 Get operation type.
@@ -11425,12 +11428,6 @@ Get operation type.
 %feature("docstring")  casadi::MX::n_primitives() const  "
 
 Get the number of symbolic primitive Assumes is_valid_input() returns true.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MX  >::issquare() const "
-
-Check if the matrix expression is square.
 
 ";
 
@@ -11455,6 +11452,12 @@ Create nodes by their ID.
 %feature("docstring")  casadi::MX::is_regular() const  "
 
 Checks if expression does not contain NaN or Inf.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::is_row() const "
+
+Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
@@ -14145,7 +14148,7 @@ Expand a function to SX.
 
 
 // File: classcasadi_1_1Slice.xml
-%feature("docstring")  casadi::Slice::isscalar(int len) const  "
+%feature("docstring")  casadi::Slice::is_scalar(int len) const  "
 
 Is the slice a scalar.
 
@@ -14183,7 +14186,7 @@ C++ includes: slice.hpp ";
 
 %feature("docstring")  casadi::Slice::toScalar(int len) const  "
 
-Get scalar (if isscalar)
+Get scalar (if is_scalar)
 
 ";
 
@@ -14670,15 +14673,33 @@ Order the columns by decreasing degree.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::dim() const  "
+%feature("docstring")  casadi::Sparsity::getNZ(int rr, int cc) const  "
 
-Get the dimension as a string.
+Get the index of an existing non-zero element return -1 if the element does
+not exist.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::issymmetric() const  "
+%feature("docstring")  casadi::Sparsity::getNZ(const std::vector< int > &rr,
+const std::vector< int > &cc) const  "
 
-Is symmetric?
+Get a set of non-zero element return -1 if the element does not exist.
+
+";
+
+%feature("docstring")  casadi::Sparsity::getNZ(std::vector< int > &INOUT)
+const  "
+
+Get the nonzero index for a set of elements The index vector is used both
+for input and outputs and must be sorted by increasing nonzero index, i.e.
+column-wise. Elements not found in the sparsity pattern are set to -1.
+
+";
+
+%feature("docstring")  casadi::Sparsity::is_scalar(bool
+scalar_and_dense=false) const  "
+
+Is scalar?
 
 ";
 
@@ -14711,12 +14732,6 @@ with it.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::isdiag() const  "
-
-Is diagonal?
-
-";
-
 %feature("docstring")  casadi::Sparsity::btf(std::vector< int >
 &output_rowperm, std::vector< int > &output_colperm, std::vector< int >
 &output_rowblock, std::vector< int > &output_colblock, std::vector< int >
@@ -14738,6 +14753,18 @@ See:   scc
 
 ";
 
+%feature("docstring")  casadi::Sparsity::star_coloring2(int ordering=1, int
+cutoff=std::numeric_limits< int >::max()) const  "
+
+Perform a star coloring of a symmetric matrix: A new greedy distance-2
+coloring algorithm Algorithm 4.1 in NEW ACYCLIC AND STAR COLORING ALGORITHMS
+WITH APPLICATION TO COMPUTING HESSIANS A. H. GEBREMEDHIN, A. TARAFDAR, F.
+MANNE, A. POTHEN SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 10421072 (2007)
+
+Ordering options: None (0), largest first (1)
+
+";
+
 %feature("docstring")  casadi::Sparsity::enlargeColumns(int ncol, const
 std::vector< int > &cc, bool ind1=false) "
 
@@ -14745,18 +14772,29 @@ Enlarge the matrix along the second dimension (i.e. insert columns)
 
 ";
 
+%feature("docstring")  casadi::Sparsity::is_vector() const  "
+
+Check if the pattern is a row or column vector.
+
+";
+
 %feature("docstring")  casadi::Sparsity::hash() const  " ";
 
-%feature("docstring")  casadi::Sparsity::nnz_upper() const  "
+%feature("docstring")  casadi::Sparsity::resize(int nrow, int ncol) "
 
-Number of non-zeros in the upper triangular half, i.e. the number of
-elements (i, j) with j>=i.
+Resize.
 
 ";
 
 %feature("docstring")  casadi::Sparsity::getLowerNZ() const  "
 
 Get nonzeros in lower triangular part.
+
+";
+
+%feature("docstring")  casadi::Sparsity::is_row() const  "
+
+Check if the pattern is a row vector (i.e. size1()==1)
 
 ";
 
@@ -14781,19 +14819,6 @@ Get nonzeros in upper triangular part.
 
 Generate a script for Matlab or Octave which visualizes the sparsity using
 the spy command.
-
-";
-
-%feature("docstring")  casadi::Sparsity::isdense() const  "
-
-Is dense?
-
-";
-
-%feature("docstring")  casadi::Sparsity::isscalar(bool
-scalar_and_dense=false) const  "
-
-Is scalar?
 
 ";
 
@@ -14872,12 +14897,9 @@ Get the sparsity in compressed row storage (CRS) format.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::isempty(bool both=false) const  "
+%feature("docstring")  casadi::Sparsity::dim() const  "
 
-Check if the sparsity is empty.
-
-A sparsity is considered empty if one of the dimensions is zero (or
-optionally both dimensions)
+Get the dimension as a string.
 
 ";
 
@@ -14894,6 +14916,19 @@ elements (i, j) with j<=i.
 
 ";
 
+%feature("docstring")  casadi::Sparsity::is_transpose(const Sparsity &y)
+const  "
+
+Check if the sparsity is the transpose of another.
+
+";
+
+%feature("docstring")  casadi::Sparsity::is_square() const  "
+
+Is square?
+
+";
+
 %feature("docstring")  casadi::Sparsity::getTriplet(std::vector< int >
 &output_row, std::vector< int > &output_col) const  "
 
@@ -14904,12 +14939,6 @@ Get the sparsity in sparse triplet format.
 %feature("docstring")  casadi::Sparsity::appendColumns(const Sparsity &sp) "
 
 Append another sparsity patten horizontally.
-
-";
-
-%feature("docstring")  casadi::Sparsity::issingular() const  "
-
-Check whether the sparsity-pattern indicates structural singularity.
 
 ";
 
@@ -14930,6 +14959,15 @@ the same length as the number of nonzeros
 
 ";
 
+%feature("docstring")  casadi::Sparsity::is_empty(bool both=false) const  "
+
+Check if the sparsity is empty.
+
+A sparsity is considered empty if one of the dimensions is zero (or
+optionally both dimensions)
+
+";
+
 %feature("docstring")  casadi::Sparsity::makeDense(std::vector< int >
 &mapping) const  "
 
@@ -14947,12 +14985,6 @@ Take the inverse of a sparsity pattern; flip zeros and non-zeros.
 >::getDescription() const "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Sparsity::iscolumn() const  "
-
-Check if the pattern is a column vector (i.e. size2()==1)
 
 ";
 
@@ -15073,10 +15105,9 @@ Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::is_transpose(const Sparsity &y)
-const  "
+%feature("docstring")  casadi::Sparsity::is_column() const  "
 
-Check if the sparsity is the transpose of another.
+Check if the pattern is a column vector (i.e. size2()==1)
 
 ";
 
@@ -15096,9 +15127,9 @@ compressed format.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::issquare() const  "
+%feature("docstring")  casadi::Sparsity::is_symmetric() const  "
 
-Is square?
+Is symmetric?
 
 ";
 
@@ -15115,9 +15146,20 @@ matrix
 
 ";
 
-%feature("docstring")  casadi::Sparsity::size() const  "
+%feature("docstring")  casadi::Sparsity::pmult(const std::vector< int > &p,
+bool permute_rows=true, bool permute_columns=true, bool
+invert_permutation=false) const  "
 
-Get the shape.
+Permute rows and/or columns Multiply the sparsity with a permutation matrix
+from the left and/or from the right P * A * trans(P), A * trans(P) or A *
+trans(P) with P defined by an index vector containing the row for each col.
+As an alternative, P can be transposed (inverted).
+
+";
+
+%feature("docstring")  casadi::Sparsity::is_diag() const  "
+
+Is diagonal?
 
 ";
 
@@ -15127,9 +15169,9 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Sparsity::hasNZ(int rr, int cc) const  "
+%feature("docstring")  casadi::Sparsity::is_singular() const  "
 
-Returns true if the pattern has a non-zero at location rr, cc.
+Check whether the sparsity-pattern indicates structural singularity.
 
 ";
 
@@ -15137,6 +15179,12 @@ Returns true if the pattern has a non-zero at location rr, cc.
 &stream=casadi::userOut()) const  "
 
 Print a compact description of the sparsity pattern.
+
+";
+
+%feature("docstring")  casadi::Sparsity::is_dense() const  "
+
+Is dense?
 
 ";
 
@@ -15226,21 +15274,9 @@ the block boundaries to be found in r.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::istriu() const  "
-
-Is upper triangular?
-
-";
-
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
-
-";
-
-%feature("docstring")  casadi::Sparsity::isvector() const  "
-
-Check if the pattern is a row or column vector.
 
 ";
 
@@ -15253,26 +15289,9 @@ for Sparse Linear Systems by Davis (2006).
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getNZ(int rr, int cc) const  "
+%feature("docstring")  casadi::Sparsity::is_tril() const  "
 
-Get the index of an existing non-zero element return -1 if the element does
-not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(const std::vector< int > &rr,
-const std::vector< int > &cc) const  "
-
-Get a set of non-zero element return -1 if the element does not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(std::vector< int > &INOUT)
-const  "
-
-Get the nonzero index for a set of elements The index vector is used both
-for input and outputs and must be sorted by increasing nonzero index, i.e.
-column-wise. Elements not found in the sparsity pattern are set to -1.
+Is lower triangular?
 
 ";
 
@@ -15296,21 +15315,9 @@ Get the number of rows.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::star_coloring2(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  "
+%feature("docstring")  casadi::Sparsity::is_triu() const  "
 
-Perform a star coloring of a symmetric matrix: A new greedy distance-2
-coloring algorithm Algorithm 4.1 in NEW ACYCLIC AND STAR COLORING ALGORITHMS
-WITH APPLICATION TO COMPUTING HESSIANS A. H. GEBREMEDHIN, A. TARAFDAR, F.
-MANNE, A. POTHEN SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 10421072 (2007)
-
-Ordering options: None (0), largest first (1)
-
-";
-
-%feature("docstring")  casadi::Sparsity::istril() const  "
-
-Is lower triangular?
+Is upper triangular?
 
 ";
 
@@ -15328,14 +15335,9 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::pmult(const std::vector< int > &p,
-bool permute_rows=true, bool permute_columns=true, bool
-invert_permutation=false) const  "
+%feature("docstring")  casadi::Sparsity::size() const  "
 
-Permute rows and/or columns Multiply the sparsity with a permutation matrix
-from the left and/or from the right P * A * trans(P), A * trans(P) or A *
-trans(P) with P defined by an index vector containing the row for each col.
-As an alternative, P can be transposed (inverted).
+Get the shape.
 
 ";
 
@@ -15348,9 +15350,9 @@ true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
-%feature("docstring")  casadi::Sparsity::isrow() const  "
+%feature("docstring")  casadi::Sparsity::hasNZ(int rr, int cc) const  "
 
-Check if the pattern is a row vector (i.e. size1()==1)
+Returns true if the pattern has a non-zero at location rr, cc.
 
 ";
 
@@ -15386,9 +15388,10 @@ Create a scalar sparsity pattern.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::resize(int nrow, int ncol) "
+%feature("docstring")  casadi::Sparsity::nnz_upper() const  "
 
-Resize.
+Number of non-zeros in the upper triangular half, i.e. the number of
+elements (i, j) with j>=i.
 
 ";
 
