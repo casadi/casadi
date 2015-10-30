@@ -11202,7 +11202,7 @@ diagonal matrix if you supply a randomly permuted block- diagonal matrix.
 If your matrix is symmetrical, this method is of limited use; permutation
 can make it non-symmetric.
 
-See:   strongly_connected_components
+See:   scc
 
 ";
 
@@ -11225,7 +11225,7 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring") casadi::Sparsity::strongly_connected_components "
+%feature("docstring") casadi::Sparsity::scc "
 
 Find the strongly connected components of the bigraph defined by the
 sparsity pattern of a square matrix.
@@ -11240,7 +11240,7 @@ index[offset[i+1]]
 
 In the case that the matrix is symmetric, the result has a particular
 interpretation: Given a symmetric matrix A and n =
-A.strongly_connected_components(p, r)
+A.scc(p, r)
 
 => A[p, p] will appear block-diagonal with n blocks and with the indices of
 the block boundaries to be found in r.

@@ -38,8 +38,8 @@ AP = A[perm,perm]
 print AP
 AP.sparsity().spy()
 
-# And use strongly_connected_components to recover the blocks
-n,p,r = AP.sparsity().strongly_connected_components()
+# And use scc to recover the blocks
+n,p,r = AP.sparsity().scc()
 
 APrestored = AP[p,p]
 

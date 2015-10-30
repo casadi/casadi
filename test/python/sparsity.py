@@ -376,7 +376,7 @@ class Sparsitytests(casadiTestCase):
       self.checkarray(truth,tryme)
 
   def test_scc_diagcat_sparse(self):
-    self.message("strongly_connected_components")
+    self.message("scc")
     random.seed(0)
     numpy.random.seed(0)
     for k in range(20):
@@ -389,7 +389,7 @@ class Sparsitytests(casadiTestCase):
       AP = A[perm,perm]
       #AP.sparsity().spy()
 
-      n,p,r = AP.sparsity().strongly_connected_components()
+      n,p,r = AP.sparsity().scc()
       
       Ar = AP[p,p]
       

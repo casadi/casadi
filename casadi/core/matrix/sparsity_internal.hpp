@@ -87,7 +87,7 @@ namespace casadi {
                          const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
     /// Find the strongly connected components of a square matrix: See cs_scc in CSparse
-    int strongly_connected_components(std::vector<int>& p, std::vector<int>& r) const;
+    int scc(std::vector<int>& p, std::vector<int>& r) const;
 
     /// Transpose the matrix
     Sparsity T() const;

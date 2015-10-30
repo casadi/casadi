@@ -530,8 +530,8 @@ namespace casadi {
     return (*this)->depth_first_search(j, top, xi, pstack, pinv, marked);
   }
 
-  int Sparsity::strongly_connected_components(std::vector<int>& p, std::vector<int>& r) const {
-    return (*this)->strongly_connected_components(p, r);
+  int Sparsity::scc(std::vector<int>& p, std::vector<int>& r) const {
+    return (*this)->scc(p, r);
   }
 
   int Sparsity::btf(std::vector<int>& rowperm, std::vector<int>& colperm,

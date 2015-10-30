@@ -1061,7 +1061,7 @@ namespace casadi {
     /// Bring m in block diagonal form, calculating eigenvalues of each block separately
     vector<int> offset;
     vector<int> index;
-    int nb = m.sparsity().strongly_connected_components(offset, index);
+    int nb = m.sparsity().scc(offset, index);
 
     SX m_perm = m(offset, offset);
 

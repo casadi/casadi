@@ -601,13 +601,13 @@ namespace casadi {
 
         In the case that the matrix is symmetric, the result has a particular interpretation:
         Given a symmetric matrix A and
-        n = A.strongly_connected_components(p, r)
+        n = A.scc(p, r)
 
         => A[p, p] will appear block-diagonal with n blocks and
         with the indices of the block boundaries to be found in r.
 
     */
-    int strongly_connected_components(std::vector<int>& SWIG_OUTPUT(index),
+    int scc(std::vector<int>& SWIG_OUTPUT(index),
                                     std::vector<int>& SWIG_OUTPUT(offset)) const;
 
     /** \brief Compute the Dulmage-Mendelsohn decomposition
@@ -621,7 +621,7 @@ namespace casadi {
         If your matrix is symmetrical, this method is of limited use; permutation can make it
         non-symmetric.
 
-        \sa strongly_connected_components
+        \sa scc
 
     */
     int btf(

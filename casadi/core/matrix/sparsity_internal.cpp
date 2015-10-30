@@ -241,7 +241,7 @@ namespace casadi {
     return (top) ;
   }
 
-  int SparsityInternal::strongly_connected_components(std::vector<int>& p,
+  int SparsityInternal::scc(std::vector<int>& p,
                                                     std::vector<int>& r) const {
     // NOTE: This implementation has been copied from CSparse and then modified,
     // it needs cleaning up to be proper C++
@@ -676,7 +676,7 @@ namespace casadi {
 
     // find strongly connected components of C
     vector<int> scc_p, scc_r;
-    int scc_nb = C.strongly_connected_components(scc_p, scc_r);
+    int scc_nb = C.scc(scc_p, scc_r);
 
     // --- Combine coarse and fine decompositions ---------------------------
 
