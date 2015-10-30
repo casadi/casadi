@@ -104,7 +104,7 @@ namespace casadi {
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */
-    void generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn);
+    void generate_lifted(Function& vdef_fcn, Function& vinit_fcn);
 
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual Function getNumericJacobian(const std::string& name, int iind, int oind,

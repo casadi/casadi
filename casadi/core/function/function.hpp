@@ -889,7 +889,7 @@ namespace casadi {
     std::vector<MX> free_mx() const;
 
     /** \brief Extract the functions needed for the Lifted Newton method */
-    void generateLiftingFunctions(Function& SWIG_OUTPUT(vdef_fcn),
+    void generate_lifted(Function& SWIG_OUTPUT(vdef_fcn),
                                   Function& SWIG_OUTPUT(vinit_fcn));
 
     /** \brief Get the number of atomic operations */

@@ -1348,8 +1348,8 @@ namespace casadi {
     return (*this)->free_mx();
   }
 
-  void Function::generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn) {
-    (*this)->generateLiftingFunctions(vdef_fcn, vinit_fcn);
+  void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) {
+    (*this)->generate_lifted(vdef_fcn, vinit_fcn);
   }
 
   int Function::getAlgorithmSize() const {

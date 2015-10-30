@@ -2994,9 +2994,9 @@ namespace casadi {
     casadi_error("'free_sx' only defined for 'sxfunction'");
   }
 
-  void FunctionInternal::generateLiftingFunctions(Function& vdef_fcn,
+  void FunctionInternal::generate_lifted(Function& vdef_fcn,
                                                   Function& vinit_fcn) {
-    casadi_error("'generateLiftingFunctions' only defined for 'mxfunction'");
+    casadi_error("'generate_lifted' only defined for 'mxfunction'");
   }
 
   int FunctionInternal::getAlgorithmSize() const {

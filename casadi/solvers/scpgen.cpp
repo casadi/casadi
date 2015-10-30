@@ -166,7 +166,7 @@ namespace casadi {
 
     // Generate lifting functions
     Function vdef_fcn, vinit_fcn;
-    fg.generateLiftingFunctions(vdef_fcn, vinit_fcn);
+    fg.generate_lifted(vdef_fcn, vinit_fcn);
     vinit_fcn_ = vinit_fcn;
 
     // Extract the expressions

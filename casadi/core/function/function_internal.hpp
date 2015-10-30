@@ -291,7 +291,7 @@ namespace casadi {
     virtual SX free_sx() const;
 
     /** \brief Extract the functions needed for the Lifted Newton method */
-    virtual void generateLiftingFunctions(Function& vdef_fcn, Function& vinit_fcn);
+    virtual void generate_lifted(Function& vdef_fcn, Function& vinit_fcn);
 
     /** \brief Get the number of atomic operations */
     virtual int getAlgorithmSize() const;
