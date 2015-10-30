@@ -2675,8 +2675,8 @@ namespace casadi {
 
   template<typename DataType>
   std::string
-  Matrix<DataType>::zz_getOperatorRepresentation(const std::vector<std::string>& args) const {
-    throw CasadiException("\"getOperatorRepresentation\" not defined for instantiation");
+  Matrix<DataType>::zz_print_operator(const std::vector<std::string>& args) const {
+    throw CasadiException("\"print_operator\" not defined for instantiation");
     return std::string();
   }
 
@@ -3100,7 +3100,7 @@ namespace casadi {
                                const std::vector<int>& order_contributions) const;
   template<> int SX::zz_countNodes() const;
   template<> std::string
-  SX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+  SX::zz_print_operator(const std::vector<std::string>& args) const;
   template<> void SX::zz_extractShared(std::vector<SX >& ex,
                                        std::vector<SX >& v,
                                        std::vector<SX >& vdef,

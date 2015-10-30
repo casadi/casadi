@@ -449,7 +449,7 @@ namespace casadi {
     Matrix<DataType> zz_solve(const Matrix<DataType>& b,
                               const std::string& lsolver, const Dict& opts) const;
     int zz_countNodes() const;
-    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+    std::string zz_print_operator(const std::vector<std::string>& args) const;
     static void zz_extractShared(std::vector<Matrix<DataType> >& ex,
                                  std::vector<Matrix<DataType> >& v,
                                  std::vector<Matrix<DataType> >& vdef,

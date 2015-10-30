@@ -541,8 +541,8 @@ namespace casadi {
 
     /** \brief Get a string representation for a binary MatType, using custom arguments */
     inline friend std::string
-      getOperatorRepresentation(const MatType& xb, const std::vector<std::string>& args) {
-      return xb.zz_getOperatorRepresentation(args);
+      print_operator(const MatType& xb, const std::vector<std::string>& args) {
+      return xb.zz_print_operator(args);
     }
 
     /** \brief Extract shared subexpressions from an set of expressions */

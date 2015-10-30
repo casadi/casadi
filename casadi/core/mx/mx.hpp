@@ -421,7 +421,7 @@ namespace casadi {
     MX zz_pinv(const std::string& lsolver="symbolicqr",
                const Dict& dict = Dict()) const;
     int zz_countNodes() const;
-    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+    std::string zz_print_operator(const std::vector<std::string>& args) const;
     static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v,
                                  std::vector<MX>& vdef, const std::string& v_prefix,
                                  const std::string& v_suffix);

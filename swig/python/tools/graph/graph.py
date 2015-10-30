@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import SX, MX, getOperatorRepresentation
+from casadi import SX, MX, print_operator
 import casadi as C
 
 try:
@@ -291,7 +291,7 @@ class MXGenericArtist(DotArtist):
     if len(dep)>1:
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = getOperatorRepresentation(self.s,["| <f%d> | " %i for i in range(len(dep))])
+      s = print_operator(self.s,["| <f%d> | " %i for i in range(len(dep))])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
       
@@ -299,7 +299,7 @@ class MXGenericArtist(DotArtist):
       for i,n in enumerate(dep):
         graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
     else:
-      s = getOperatorRepresentation(k,["."])
+      s = print_operator(k,["."])
       self.graph.add_node(pydot.Node(op + str(k.__hash__()),label=s,shape='oval'))
       for i,n in enumerate(dep):
         self.graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())))
@@ -448,7 +448,7 @@ class MXOperationArtist(DotArtist):
     if not(k.isCommutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = getOperatorRepresentation(self.s,["| <f0> | ", " | <f1> |"])
+      s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
       
@@ -457,7 +457,7 @@ class MXOperationArtist(DotArtist):
         graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
     else: 
      # Commutative operators can be represented more compactly as 'oval' shapes.
-      s = getOperatorRepresentation(k,[".", "."])
+      s = print_operator(k,[".", "."])
       if s.startswith("(.") and s.endswith(".)"):
         s=s[2:-2]
       if s.startswith("(") and s.endswith(")"):
@@ -494,7 +494,7 @@ class MXNormArtist(DotArtist):
     k = self.s
     graph = self.graph
     dep = getDeps(k)
-    s = getOperatorRepresentation(k,[".", "."])
+    s = print_operator(k,[".", "."])
     self.graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='oval'))
     self.graph.add_edge(pydot.Edge(str(dep[0].__hash__()),str(k.__hash__())))
         
@@ -568,7 +568,7 @@ class SXNonLeafArtist(DotArtist):
     if not(k.isCommutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = getOperatorRepresentation(self.s,["| <f0> | ", " | <f1> |"])
+      s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
       
@@ -577,7 +577,7 @@ class SXNonLeafArtist(DotArtist):
         graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())+":f%d" % i))
     else: 
      # Commutative operators can be represented more compactly as 'oval' shapes.
-      s = getOperatorRepresentation(k,[".", "."])
+      s = print_operator(k,[".", "."])
       if s.startswith("(.") and s.endswith(".)"):
         s=s[2:-2]
       if s.startswith("(") and s.endswith(")"):

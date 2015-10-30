@@ -790,12 +790,12 @@ namespace casadi {
 
   template<>
   string
-  SX::zz_getOperatorRepresentation(const vector<string>& args) const {
+  SX::zz_print_operator(const vector<string>& args) const {
     SXElement x = toScalar();
     if (!x.hasDep())
-        throw CasadiException("getOperatorRepresentation: SXElement must be binary operator");
+        throw CasadiException("print_operator: SXElement must be binary operator");
     if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2))
-        throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
+        throw CasadiException("print_operator: not enough arguments supplied");
     stringstream s;
     casadi_math<double>::print(x.getOp(), s, args[0], args[1]);
     return s.str();

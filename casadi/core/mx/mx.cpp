@@ -1376,7 +1376,7 @@ namespace casadi {
     return ret;
   }
 
-  std::string MX::zz_getOperatorRepresentation(const std::vector<std::string>& args) const {
+  std::string MX::zz_print_operator(const std::vector<std::string>& args) const {
     return (*this)->print(args);
   }
 
