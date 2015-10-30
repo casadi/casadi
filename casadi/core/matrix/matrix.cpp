@@ -673,7 +673,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_jacobianTimesVector(const SX &arg, const SX &v, bool transpose_jacobian) const {
+  SX SX::zz_jmtimes(const SX &arg, const SX &v, bool transpose_jacobian) const {
     Function f("tmp", {arg}, {*this});
 
     // Split up v

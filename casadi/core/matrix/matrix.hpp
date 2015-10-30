@@ -521,7 +521,7 @@ namespace casadi {
     Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
                                          const Matrix<DataType> &b, int order,
                                          const Matrix<DataType>& w) const;
-    Matrix<DataType> zz_jacobianTimesVector(const Matrix<DataType> &arg, const Matrix<DataType> &v,
+    Matrix<DataType> zz_jmtimes(const Matrix<DataType> &arg, const Matrix<DataType> &v,
                                             bool transpose_jacobian=false) const;
     Matrix<DataType> zz_taylor(const Matrix<DataType>& x,
                                const Matrix<DataType>& a, int order) const;
@@ -741,11 +741,11 @@ namespace casadi {
         expressions, it will use directional derivatives which is typically (but
         not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
     */
-    friend inline Matrix<DataType> jacobianTimesVector(const Matrix<DataType> &ex,
+    friend inline Matrix<DataType> jmtimes(const Matrix<DataType> &ex,
                                                        const Matrix<DataType> &arg,
                                                        const Matrix<DataType> &v,
                                                        bool transpose_jacobian=false) {
-      return ex.zz_jacobianTimesVector(arg, v, transpose_jacobian);
+      return ex.zz_jmtimes(arg, v, transpose_jacobian);
     }
 
     ///@{

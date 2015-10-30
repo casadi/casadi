@@ -2920,9 +2920,9 @@ DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
   return gauss_quadrature(f, x, a, b, order, w);
 }
 
-DECL M %SHOW(jacobianTimesVector)(const M& ex, const M& arg, const M& v,
+DECL M %SHOW(jmtimes)(const M& ex, const M& arg, const M& v,
                                   bool transpose_jacobian=false) {
-  return jacobianTimesVector(ex, arg, v, transpose_jacobian);
+  return jmtimes(ex, arg, v, transpose_jacobian);
 }
 
 DECL M %SHOW(taylor)(const M& ex, const M& x, const M& a=0, int order=1) {
