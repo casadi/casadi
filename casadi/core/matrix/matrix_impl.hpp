@@ -1731,7 +1731,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::hasNonStructuralZeros() const {
+  bool Matrix<DataType>::has_zeros() const {
     // Check if the structural nonzero is known to be zero
     for (int el=0; el<nnz(); ++el) {
       if (casadi_limits<DataType>::isZero(at(el)))
@@ -2321,7 +2321,7 @@ namespace casadi {
         }
       }
       return x;
-    } else if (hasNonStructuralZeros()) {
+    } else if (has_zeros()) {
 
       // If there are structurally nonzero entries that are known to be zero,
       // remove these and rerun the algorithm

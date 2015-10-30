@@ -1096,7 +1096,7 @@ namespace casadi {
     bool isIdentity() const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
-    bool hasNonStructuralZeros() const;
+    bool has_zeros() const;
 
     /** \brief Get double value (only if constant) */
     double getValue() const;
