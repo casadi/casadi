@@ -912,11 +912,11 @@ Some commonly used properties for a matrix \emph{A} are:
   \item[\emph{A}.iscolumn()] Is the matrix a vector, i.e. having dimensions $n$-by-1?
   \item[\emph{A}.issquare()] Is the matrix square?
   \item[\emph{A}.istriu()] Is the matrix upper triangular?
-  \item[\emph{A}.is_constant()] Are the matrix entries all constant?
-  \item[\emph{A}.is_integer()] Are the matrix entries all integer-valued?
+  \item[\emph{A}.is\_constant()] Are the matrix entries all constant?
+  \item[\emph{A}.is\_integer()] Are the matrix entries all integer-valued?
 \end{description}
 
-The last queries are examples of queries for which \emph{false negative} returns are allowed. A matrix for which \emph{A}.is_constant() is \emph{true} is guaranteed to be constant, but is \emph{not} guaranteed to be non-constant if \emph{A}.is_constant() is \emph{false}. We recommend you to check the API documentation for a particular function before using it for the first time.
+The last queries are examples of queries for which \emph{false negative} returns are allowed. A matrix for which \emph{A}.is\_constant() is \emph{true} is guaranteed to be constant, but is \emph{not} guaranteed to be non-constant if \emph{A}.is\_constant() is \emph{false}. We recommend you to check the API documentation for a particular function before using it for the first time.
 
 \section{Linear algebra}
 \CasADi supports a limited number of linear algebra operations, e.g. for solution of linear systems of equations:
