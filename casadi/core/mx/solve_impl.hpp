@@ -84,7 +84,7 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Call the cached functions
-    linear_solver_->callForwardLinsol(arg, res, fseed, fsens, Tr);
+    linear_solver_->forwardLinsol(arg, res, fseed, fsens, Tr);
   }
 
   template<bool Tr>
@@ -97,7 +97,7 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Call the cached functions
-    linear_solver_->callReverseLinsol(arg, res, aseed, asens, Tr);
+    linear_solver_->reverseLinsol(arg, res, aseed, asens, Tr);
   }
 
   template<bool Tr>

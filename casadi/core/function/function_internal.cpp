@@ -1072,7 +1072,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact) {
+  void FunctionInternal::set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact) {
     if (compact) {
       jac_sparsity_compact_.elem(oind, iind) = sp;
     } else {
@@ -1080,7 +1080,7 @@ namespace casadi {
     }
   }
 
-  Sparsity& FunctionInternal::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
+  Sparsity& FunctionInternal::sparsity_jac(int iind, int oind, bool compact, bool symmetric) {
     // Get an owning reference to the block
     Sparsity jsp = compact ? jac_sparsity_compact_.elem(oind, iind)
         : jac_sparsity_.elem(oind, iind);
@@ -1095,7 +1095,7 @@ namespace casadi {
       } else {
 
         // Get the compact sparsity pattern
-        Sparsity sp = jacSparsity(iind, oind, true, symmetric);
+        Sparsity sp = sparsity_jac(iind, oind, true, symmetric);
 
         // Enlarge if sparse output
         if (output(oind).numel()!=sp.size1()) {
@@ -1141,12 +1141,12 @@ namespace casadi {
     log("FunctionInternal::getPartition begin");
 
     // Sparsity pattern with transpose
-    Sparsity &AT = jacSparsity(iind, oind, compact, symmetric);
+    Sparsity &AT = sparsity_jac(iind, oind, compact, symmetric);
     Sparsity A = symmetric ? AT : AT.T();
 
     // Get seed matrices by graph coloring
     if (symmetric) {
-      casadi_assert(numDerForward()>0);
+      casadi_assert(get_n_forward()>0);
 
       // Star coloring if symmetric
       log("FunctionInternal::getPartition star_coloring");
@@ -1155,7 +1155,7 @@ namespace casadi {
                  << A.size1() << " without coloring).");
 
     } else {
-      casadi_assert(numDerForward()>0 || numDerReverse()>0);
+      casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
       // Get weighting factor
       double w = adWeight();
 
@@ -1412,7 +1412,7 @@ namespace casadi {
 
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = jacSparsity(iind, oind, true, false);
+        Sparsity sp = sparsity_jac(iind, oind, true, false);
         if (sp.isNull() || sp.nnz() == 0)
           continue; // Skip if zero
 
@@ -1514,7 +1514,7 @@ namespace casadi {
     return getNumericJacobian(name, iind, oind, compact, symmetric, opts);
   }
 
-  Function FunctionInternal::derForward(int nfwd) {
+  Function FunctionInternal::forward(int nfwd) {
     casadi_assert(nfwd>=0);
 
     // Check if there are enough forward directions allocated
@@ -1580,8 +1580,8 @@ namespace casadi {
                  {"jit_options", jit_options_}};
 
     // Return value
-    casadi_assert(numDerForward()>0);
-    Function ret = getDerForward(name, nfwd, opts);
+    casadi_assert(get_n_forward()>0);
+    Function ret = get_forward(name, nfwd, opts);
 
     // Consistency check for inputs
     for (int i=0; i<ret.n_in(); ++i) {
@@ -1610,7 +1610,7 @@ namespace casadi {
     return ret;
   }
 
-  Function FunctionInternal::derReverse(int nadj) {
+  Function FunctionInternal::reverse(int nadj) {
     casadi_assert(nadj>=0);
 
     // Check if there are enough adjoint directions allocated
@@ -1676,8 +1676,8 @@ namespace casadi {
                  {"jit_options", jit_options_}};
 
     // Return value
-    casadi_assert(numDerReverse()>0);
-    Function ret = getDerReverse(name, nadj, opts);
+    casadi_assert(get_n_reverse()>0);
+    Function ret = get_reverse(name, nadj, opts);
 
     // Consistency check for inputs
     for (int i=0; i<ret.n_in(); ++i) {
@@ -1706,7 +1706,7 @@ namespace casadi {
     return ret;
   }
 
-  void FunctionInternal::setDerForward(const Function& fcn, int nfwd) {
+  void FunctionInternal::set_forward(const Function& fcn, int nfwd) {
 
     // Check if there are enough forward directions allocated
     if (nfwd>=derivative_fwd_.size()) {
@@ -1717,7 +1717,7 @@ namespace casadi {
     derivative_fwd_[nfwd] = fcn;
   }
 
-  void FunctionInternal::setDerReverse(const Function& fcn, int nadj) {
+  void FunctionInternal::set_reverse(const Function& fcn, int nadj) {
 
     // Check if there are enough adjoint directions allocated
     if (nadj>=derivative_adj_.size()) {
@@ -1728,13 +1728,13 @@ namespace casadi {
     derivative_adj_[nadj] = fcn;
   }
 
-  Function FunctionInternal::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  Function FunctionInternal::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // TODO(@jaeandersson): Fallback on finite differences
-    casadi_error("'getDerForward' not defined for " + type_name());
+    casadi_error("'get_forward' not defined for " + type_name());
   }
 
-  Function FunctionInternal::getDerReverse(const std::string& name, int nadj, Dict& opts) {
-    casadi_error("'getDerReverse' not defined for " + type_name());
+  Function FunctionInternal::get_reverse(const std::string& name, int nadj, Dict& opts) {
+    casadi_error("'get_reverse' not defined for " + type_name());
   }
 
   int FunctionInternal::nnz_in() const {
@@ -1849,7 +1849,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::getFullJacobian(const std::string& name, const Dict& opts) {
-    casadi_assert(numDerForward()>0 || numDerReverse()>0);
+    casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
 
     // Number inputs and outputs
     int n_in = this->n_in();
@@ -2540,11 +2540,11 @@ namespace casadi {
   }
 
   bool FunctionInternal::hasDerivative() const {
-    return numDerForward()>0 || numDerReverse()>0 || hasFullJacobian();
+    return get_n_forward()>0 || get_n_reverse()>0 || hasFullJacobian();
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) {
-    if (numDerForward()==0) return true;
+    if (get_n_forward()==0) return true;
 
     // Jacobian calculation penalty factor
     const double jac_penalty = option("jac_penalty");
@@ -2556,14 +2556,14 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = adWeight();
-    if (numDerReverse()>0 && jac_penalty*(1-w)*nnz_out()<w*nfwd)
+    if (get_n_reverse()>0 && jac_penalty*(1-w)*nnz_out()<w*nfwd)
       return true;
 
     return false;
   }
 
   bool FunctionInternal::adjViaJac(int nadj) {
-    if (numDerReverse()==0) return true;
+    if (get_n_reverse()==0) return true;
 
     // Jacobian calculation penalty factor
     const double jac_penalty = option("jac_penalty");
@@ -2575,13 +2575,13 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = adWeight();
-    if (numDerForward()>0 && jac_penalty*w*nnz_in()<(1-w)*nadj)
+    if (get_n_forward()>0 && jac_penalty*w*nnz_in()<(1-w)*nadj)
       return true;
 
     return false;
   }
 
-  void FunctionInternal::callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
+  void FunctionInternal::forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                                  const std::vector<std::vector<MX> >& fseed,
                                  std::vector<std::vector<MX> >& fsens,
                                  bool always_inline, bool never_inline) {
@@ -2641,7 +2641,7 @@ namespace casadi {
     }
 
     // Create derivative function
-    Function dfcn = derForward(nfwd);
+    Function dfcn = forward(nfwd);
 
     // Create the evaluation node
     vector<MX> x = Call::create(dfcn, darg);
@@ -2657,7 +2657,7 @@ namespace casadi {
     casadi_assert(x_it==x.end());
   }
 
-  void FunctionInternal::callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+  void FunctionInternal::reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                                  const std::vector<std::vector<MX> >& aseed,
                                  std::vector<std::vector<MX> >& asens,
                                  bool always_inline, bool never_inline) {
@@ -2722,7 +2722,7 @@ namespace casadi {
     }
 
     // Create derivative function
-    Function dfcn = derReverse(nadj);
+    Function dfcn = reverse(nadj);
 
     // Create the evaluation node
     vector<MX> x = Call::create(dfcn, darg);
@@ -2742,7 +2742,7 @@ namespace casadi {
     casadi_assert(x_it==x.end());
   }
 
-  void FunctionInternal::callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void FunctionInternal::forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                                  const std::vector<std::vector<SX> >& fseed,
                                  std::vector<std::vector<SX> >& fsens,
                                  bool always_inline, bool never_inline) {
@@ -2751,10 +2751,10 @@ namespace casadi {
       fsens.clear();
       return;
     }
-    casadi_error("'callForward' (SX) not defined for " + type_name());
+    casadi_error("'forward' (SX) not defined for " + type_name());
   }
 
-  void FunctionInternal::callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void FunctionInternal::reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                                  const std::vector<std::vector<SX> >& aseed,
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
@@ -2763,11 +2763,11 @@ namespace casadi {
       asens.clear();
       return;
     }
-    casadi_error("'callReverse' (SX) not defined for " + type_name());
+    casadi_error("'reverse' (SX) not defined for " + type_name());
   }
 
   void FunctionInternal::
-  callForward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+  forward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
           const std::vector<std::vector<DMatrix> >& fseed,
           std::vector<std::vector<DMatrix> >& fsens,
           bool always_inline, bool never_inline) {
@@ -2778,7 +2778,7 @@ namespace casadi {
 
     // Retrieve derivative function
     int nfwd = fseed.size();
-    Function dfcn = derForward(nfwd);
+    Function dfcn = forward(nfwd);
 
     // Pass inputs
     int n_in = this->n_in();
@@ -2820,7 +2820,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  callReverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+  reverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
           const std::vector<std::vector<DMatrix> >& aseed,
           std::vector<std::vector<DMatrix> >& asens,
           bool always_inline, bool never_inline) {
@@ -2831,7 +2831,7 @@ namespace casadi {
 
     // Retrieve derivative function
     int nadj = aseed.size();
-    Function dfcn = derReverse(nadj);
+    Function dfcn = reverse(nadj);
 
     // Pass inputs
     int n_in = this->n_in();
@@ -2874,10 +2874,10 @@ namespace casadi {
 
   double FunctionInternal::adWeight() {
     // If reverse mode derivatives unavailable, use forward
-    if (numDerReverse()==0) return 0;
+    if (get_n_reverse()==0) return 0;
 
     // If forward mode derivatives unavailable, use reverse
-    if (numDerForward()==0) return 1;
+    if (get_n_forward()==0) return 1;
 
     // A user-provided option overrides default value
     if (hasSetOption("ad_weight")) return option("ad_weight");

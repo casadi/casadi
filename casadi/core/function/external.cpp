@@ -346,18 +346,18 @@ namespace casadi {
 
   template<typename LibType>
   Function CommonExternal<LibType>
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nfwd) n*=2;
-    if (n!=nfwd || nfwd>numDerForward()) {
+    if (n!=nfwd || nfwd>get_n_forward()) {
       casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
     return Function::external(name, li_, opts);
   }
 
   template<typename LibType>
-  int CommonExternal<LibType>::numDerForward() const {
+  int CommonExternal<LibType>::get_n_forward() const {
     // Will try 64, 32, 16, 8, 4, 2, 1 directions
     initPtr fwd_init;
     for (int i=64; i>0; i/=2) {
@@ -371,18 +371,18 @@ namespace casadi {
 
   template<typename LibType>
   Function CommonExternal<LibType>
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Consistency check
     int n=1;
     while (n<nadj) n*=2;
-    if (n!=nadj || nadj>numDerReverse()) {
+    if (n!=nadj || nadj>get_n_reverse()) {
       casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
     return Function::external(name, li_, opts);
   }
 
   template<typename LibType>
-  int CommonExternal<LibType>::numDerReverse() const {
+  int CommonExternal<LibType>::get_n_reverse() const {
     // Will try 64, 32, 16, 8, 4, 2, 1 directions
     initPtr adj_init;
     for (int i=64; i>0; i/=2) {

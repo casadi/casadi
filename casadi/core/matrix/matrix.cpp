@@ -709,7 +709,7 @@ namespace casadi {
     }
 
     // Evaluate with directional derivatives, output is the same as the funciton inputs
-    f.callDerivative(argv, resv, fseed, fsens, aseed, asens);
+    f.derivative(argv, resv, fseed, fsens, aseed, asens);
 
     // Get the results
     for (int dir=0; dir<vv.size(); ++dir) {

@@ -160,8 +160,8 @@ class ADtests(casadiTestCase):
             fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
             res = f([y])
-            fwdsens = f.callForward([y], res, map(lambda x: [x],fseeds))
-            adjsens = f.callReverse([y], res, map(lambda x: [x],aseeds))
+            fwdsens = f.forward([y], res, map(lambda x: [x],fseeds))
+            adjsens = f.reverse([y], res, map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -200,8 +200,8 @@ class ADtests(casadiTestCase):
             fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
             res = f([y])
-            fwdsens = f.callForward([y],res,map(lambda x: [x],fseeds))
-            adjsens = f.callReverse([y],res,map(lambda x: [x],aseeds))
+            fwdsens = f.forward([y],res,map(lambda x: [x],fseeds))
+            adjsens = f.reverse([y],res,map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -242,8 +242,8 @@ class ADtests(casadiTestCase):
             fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
             res = f([y])
-            fwdsens = f.callForward([y],res,map(lambda x: [x],fseeds))
-            adjsens = f.callReverse([y],res,map(lambda x: [x],aseeds))
+            fwdsens = f.forward([y],res,map(lambda x: [x],fseeds))
+            adjsens = f.reverse([y],res,map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -280,8 +280,8 @@ class ADtests(casadiTestCase):
             y = SX.sym("y",f.sparsity_in(0))
             
             res = f([y])
-            fwdsens = f.callForward([y],res,[])
-            adjsens = f.callReverse([y],res,[])
+            fwdsens = f.forward([y],res,[])
+            adjsens = f.reverse([y],res,[])
             
             fe = Function("fe", [y],res)
             
@@ -337,7 +337,7 @@ class ADtests(casadiTestCase):
             self.message("jacsparsity on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             J = self.jacobians[inputtype][outputtype](*n)
-            self.checkarray(DMatrix.ones(f.jacSparsity()),array(J!=0,int),"jacsparsity")
+            self.checkarray(DMatrix.ones(f.sparsity_jac()),array(J!=0,int),"jacsparsity")
               
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
@@ -374,7 +374,7 @@ class ADtests(casadiTestCase):
               [J_out,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(J_out),J,"jacobian")
-              self.checkarray(array(DMatrix.ones(f.jacSparsity())),array(J!=0,int),"jacsparsity")
+              self.checkarray(array(DMatrix.ones(f.sparsity_jac())),array(J!=0,int),"jacsparsity")
               
      
               
@@ -613,8 +613,8 @@ class ADtests(casadiTestCase):
       vf_mx = None
               
       for f in [fun, fun.expand('expand_'+fun.name())]:
-        d1 = f.derForward(ndir)
-        d2 = f.derReverse(ndir)
+        d1 = f.forward(ndir)
+        d2 = f.reverse(ndir)
         
         num_in = f.n_in()
         num_out = f.n_out()
@@ -631,8 +631,8 @@ class ADtests(casadiTestCase):
             inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
         
             res = f(inputss,True)
-            fwdsens = f.callForward(inputss,res,fseeds,True)
-            adjsens = f.callReverse(inputss,res,aseeds,True)
+            fwdsens = f.forward(inputss,res,fseeds,True)
+            adjsens = f.reverse(inputss,res,aseeds,True)
             
             fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
             aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
@@ -702,8 +702,8 @@ class ADtests(casadiTestCase):
               inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
            
               res2 = vf(inputss2,True)
-              fwdsens2 = vf.callForward(inputss2,res2,fseeds2,True)
-              adjsens2 = vf.callReverse(inputss2,res2,aseeds2,True)
+              fwdsens2 = vf.forward(inputss2,res2,fseeds2,True)
+              adjsens2 = vf.reverse(inputss2,res2,aseeds2,True)
 
               vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
                 
@@ -741,7 +741,7 @@ class ADtests(casadiTestCase):
           self.check_codegen(Jf)
           self.checkarray(Jf.getOutput(),J_)
           self.checkarray(DMatrix.ones(Jf.sparsity_out(0)),DMatrix.ones(J_.sparsity()),str(out)+str(mode))
-          self.checkarray(DMatrix.ones(f.jacSparsity()),DMatrix.ones(J_.sparsity()))
+          self.checkarray(DMatrix.ones(f.sparsity_jac()),DMatrix.ones(J_.sparsity()))
                 
       # Scalarized
       if out.isempty(): continue

@@ -217,7 +217,7 @@ namespace casadi {
   }
 
   Function Mapaccum
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
 
     // Obtain forward mode of the primitive function
     /*  
@@ -231,7 +231,7 @@ namespace casadi {
 
     */
 
-    Function df = f_.derForward(nfwd);
+    Function df = f_.forward(nfwd);
 
     /*
       Reverse mode of F looks like:
@@ -343,7 +343,7 @@ namespace casadi {
   }
 
   Function Mapaccum
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
 
     // Obtain Reverse mode of the primitive function
     /*  
@@ -356,7 +356,7 @@ namespace casadi {
         fb:    x, u, xp, y, xp_bar, y_bar -> x_bar, u_bar
 
     */
-    Function fb = f_.derReverse(nadj);
+    Function fb = f_.reverse(nadj);
 
     /*
       Reverse mode of F looks like:

@@ -69,14 +69,14 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates forward derivatives */
-    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
-    virtual int numDerForward() const;
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual int get_n_forward() const;
     ///@}
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives */
-    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
-    virtual int numDerReverse() const;
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual int get_n_reverse() const;
     ///@}
 
     /** \brief Pointer to the public class */

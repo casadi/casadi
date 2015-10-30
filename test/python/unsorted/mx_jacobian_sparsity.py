@@ -29,13 +29,13 @@ x2 = SX.sym("x",5)
 y2 = SX.sym("y")
 
 fcn = Function('fcn', [x,y],[4*vertcat((x[2:5],x[0:2])) + y*x])
-js = IMatrix.ones(fcn.jacSparsity())
+js = IMatrix.ones(fcn.sparsity_jac())
 js.printDense()
 
 fcn2 = Function('fcn2', [x2,y2],[4*vertcat((x2[2:5],x2[0:2])) + y2*x2])
-js2 = IMatrix.ones(fcn2.jacSparsity())
+js2 = IMatrix.ones(fcn2.sparsity_jac())
 js2.printDense()
 
 fcn3 = Function('fcn3', [x,y],fcn2([x,y]))
-js3 = IMatrix.ones(fcn3.jacSparsity())
+js3 = IMatrix.ones(fcn3.sparsity_jac())
 js3.printDense()

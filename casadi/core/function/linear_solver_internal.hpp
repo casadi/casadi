@@ -94,12 +94,12 @@ namespace casadi {
     }
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void callForwardLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void forwardLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
                                const std::vector<std::vector<MX> >& fseed,
                                std::vector<std::vector<MX> >& fsens, bool tr);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void callReverseLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void reverseLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
                                const std::vector<std::vector<MX> >& aseed,
                                std::vector<std::vector<MX> >& asens, bool tr);
 

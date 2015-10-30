@@ -163,8 +163,8 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates forward derivatives
-     *    derForward(nfwd) returns a cached instance if available,
-     *    and calls <tt>Function getDerForward(int nfwd)</tt>
+     *    forward(nfwd) returns a cached instance if available,
+     *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
     virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
@@ -173,8 +173,8 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives
-     *    derReverse(nadj) returns a cached instance if available,
-     *    and calls <tt>Function getDerReverse(int nadj)</tt>
+     *    reverse(nadj) returns a cached instance if available,
+     *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
     virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);

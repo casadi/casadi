@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-#! jacSparsity
+#! sparsity_jac
 #!======================
 from casadi import *
 from numpy import *
@@ -39,7 +39,7 @@ print y[:5]
 f = Function("f", [x],[y])
 
 #! And we visualize the sparsity of the jacobian
-spy(f.jacSparsity())
+spy(f.sparsity_jac())
 
 show()
 

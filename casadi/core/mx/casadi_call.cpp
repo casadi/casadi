@@ -113,7 +113,7 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Call the cached functions
-    fcn_.callForward(arg, res, fseed, fsens);
+    fcn_.forward(arg, res, fseed, fsens);
   }
 
   void Call::evalAdj(const vector<vector<MX> >& aseed,
@@ -126,7 +126,7 @@ namespace casadi {
 
     // Call the cached functions
     vector<vector<MX> > v;
-    fcn_.callReverse(arg, res, aseed, v);
+    fcn_.reverse(arg, res, aseed, v);
     for (int i=0; i<v.size(); ++i) {
       for (int j=0; j<v[i].size(); ++j) {
         if (!v[i][j].isempty()) { // TODO(@jaeandersson): Hack

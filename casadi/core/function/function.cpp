@@ -646,12 +646,12 @@ namespace casadi {
     return (*this)->getStat(name);
   }
 
-  const Sparsity Function::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
-    return (*this)->jacSparsity(iind, oind, compact, symmetric);
+  const Sparsity Function::sparsity_jac(int iind, int oind, bool compact, bool symmetric) {
+    return (*this)->sparsity_jac(iind, oind, compact, symmetric);
   }
 
-  void Function::setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact) {
-    (*this)->setJacSparsity(sp, iind, oind, compact);
+  void Function::set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact) {
+    (*this)->set_jac_sparsity(sp, iind, oind, compact);
   }
 
   vector<string> Function::name_in() const {
@@ -781,7 +781,7 @@ namespace casadi {
 
     // Forward sensitivities
     if (nfwd>0) {
-      Function dfcn = derForward(nfwd);
+      Function dfcn = forward(nfwd);
       arg = dfcn.mx_in();
       copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
       copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
@@ -796,7 +796,7 @@ namespace casadi {
 
     // Adjoint sensitivities
     if (nadj>0) {
-      Function dfcn = derReverse(nadj);
+      Function dfcn = reverse(nadj);
       arg = dfcn.mx_in();
       copy(ret_in.begin(), ret_in.begin()+num_in, arg.begin());
       copy(ret_out.begin(), ret_out.begin()+num_out, arg.begin()+num_in);
@@ -917,20 +917,20 @@ namespace casadi {
     return ret;
   }
 
-  Function Function::derForward(int nfwd) {
-    return (*this)->derForward(nfwd);
+  Function Function::forward(int nfwd) {
+    return (*this)->forward(nfwd);
   }
 
-  Function Function::derReverse(int nadj) {
-    return (*this)->derReverse(nadj);
+  Function Function::reverse(int nadj) {
+    return (*this)->reverse(nadj);
   }
 
-  void Function::setDerForward(const Function& fcn, int nfwd) {
-    (*this)->setDerForward(fcn, nfwd);
+  void Function::set_forward(const Function& fcn, int nfwd) {
+    (*this)->set_forward(fcn, nfwd);
   }
 
-  void Function::setDerReverse(const Function& fcn, int nadj) {
-    (*this)->setDerReverse(fcn, nadj);
+  void Function::set_reverse(const Function& fcn, int nadj) {
+    (*this)->set_reverse(fcn, nadj);
   }
 
   void Function::printDimensions(ostream &stream) const {
@@ -951,31 +951,31 @@ namespace casadi {
     return (*this)->checkInputs();
   }
 
-  void Function::callDerivative(const DMatrixVector& arg, DMatrixVector& res,
+  void Function::derivative(const DMatrixVector& arg, DMatrixVector& res,
                           const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens,
                           const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
                           bool always_inline, bool never_inline) {
     call(arg, res, always_inline, never_inline);
-    callForward(arg, res, fseed, fsens, always_inline, never_inline);
-    callReverse(arg, res, aseed, asens, always_inline, never_inline);
+    forward(arg, res, fseed, fsens, always_inline, never_inline);
+    reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
-  void Function::callDerivative(const SXVector& arg, SXVector& res,
+  void Function::derivative(const SXVector& arg, SXVector& res,
                           const SXVectorVector& fseed, SXVectorVector& fsens,
                           const SXVectorVector& aseed, SXVectorVector& asens,
                           bool always_inline, bool never_inline) {
     call(arg, res, always_inline, never_inline);
-    callForward(arg, res, fseed, fsens, always_inline, never_inline);
-    callReverse(arg, res, aseed, asens, always_inline, never_inline);
+    forward(arg, res, fseed, fsens, always_inline, never_inline);
+    reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
-  void Function::callDerivative(const MXVector& arg, MXVector& res,
+  void Function::derivative(const MXVector& arg, MXVector& res,
                           const MXVectorVector& fseed, MXVectorVector& fsens,
                           const MXVectorVector& aseed, MXVectorVector& asens,
                           bool always_inline, bool never_inline) {
     call(arg, res, always_inline, never_inline);
-    callForward(arg, res, fseed, fsens, always_inline, never_inline);
-    callReverse(arg, res, aseed, asens, always_inline, never_inline);
+    forward(arg, res, fseed, fsens, always_inline, never_inline);
+    reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   string Function::name() const {
@@ -990,82 +990,82 @@ namespace casadi {
     return FunctionInternal::sanitizeName(name);
   }
 
-  void Function::callForward(const vector<MX>& arg, const vector<MX>& res,
+  void Function::forward(const vector<MX>& arg, const vector<MX>& res,
                          const vector<vector<MX> >& fseed,
                          vector<vector<MX> >& fsens,
                          bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingFwdSeed(fseed)) {
-      return callForward(arg, res, replaceFwdSeed(fseed), fsens,
+      return forward(arg, res, replaceFwdSeed(fseed), fsens,
                      always_inline, never_inline);
     }
-    (*this)->callForward(arg, res, fseed, fsens, always_inline, never_inline);
+    (*this)->forward(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
-  void Function::callReverse(const vector<MX>& arg, const vector<MX>& res,
+  void Function::reverse(const vector<MX>& arg, const vector<MX>& res,
                          const vector<vector<MX> >& aseed,
                          vector<vector<MX> >& asens,
                          bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingAdjSeed(aseed)) {
-      return callReverse(arg, res, replaceAdjSeed(aseed), asens,
+      return reverse(arg, res, replaceAdjSeed(aseed), asens,
                      always_inline, never_inline);
     }
-    (*this)->callReverse(arg, res, aseed, asens, always_inline, never_inline);
+    (*this)->reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
-  void Function::callForward(const vector<SX>& arg, const vector<SX>& res,
+  void Function::forward(const vector<SX>& arg, const vector<SX>& res,
                          const vector<vector<SX> >& fseed,
                          vector<vector<SX> >& fsens,
                          bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingFwdSeed(fseed)) {
-      return callForward(arg, res, replaceFwdSeed(fseed), fsens,
+      return forward(arg, res, replaceFwdSeed(fseed), fsens,
                      always_inline, never_inline);
     }
-    (*this)->callForward(arg, res, fseed, fsens, always_inline, never_inline);
+    (*this)->forward(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
-  void Function::callReverse(const vector<SX>& arg, const vector<SX>& res,
+  void Function::reverse(const vector<SX>& arg, const vector<SX>& res,
                          const vector<vector<SX> >& aseed,
                          vector<vector<SX> >& asens,
                          bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingAdjSeed(aseed)) {
-      return callReverse(arg, res, replaceAdjSeed(aseed), asens,
+      return reverse(arg, res, replaceAdjSeed(aseed), asens,
                      always_inline, never_inline);
     }
-    (*this)->callReverse(arg, res, aseed, asens, always_inline, never_inline);
+    (*this)->reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
-  void Function::callForward(const vector<DMatrix>& arg, const vector<DMatrix>& res,
+  void Function::forward(const vector<DMatrix>& arg, const vector<DMatrix>& res,
                          const vector<vector<DMatrix> >& fseed,
                          vector<vector<DMatrix> >& fsens,
                          bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingFwdSeed(fseed)) {
-      return callForward(arg, res, replaceFwdSeed(fseed), fsens,
+      return forward(arg, res, replaceFwdSeed(fseed), fsens,
                      always_inline, never_inline);
     }
-    (*this)->callForward(arg, res, fseed, fsens, always_inline, never_inline);
+    (*this)->forward(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
-  void Function::callReverse(const vector<DMatrix>& arg, const vector<DMatrix>& res,
+  void Function::reverse(const vector<DMatrix>& arg, const vector<DMatrix>& res,
                          const vector<vector<DMatrix> >& aseed,
                          vector<vector<DMatrix> >& asens,
                          bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingAdjSeed(aseed)) {
-      return callReverse(arg, res, replaceAdjSeed(aseed), asens,
+      return reverse(arg, res, replaceAdjSeed(aseed), asens,
                      always_inline, never_inline);
     }
-    (*this)->callReverse(arg, res, aseed, asens, always_inline, never_inline);
+    (*this)->reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   vector<DMatrix> Function::operator()(const vector<DMatrix>& arg,

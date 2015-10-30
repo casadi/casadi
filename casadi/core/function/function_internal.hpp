@@ -146,37 +146,37 @@ namespace casadi {
     virtual std::vector<MX> create_call(const std::vector<MX>& arg);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
+    virtual void forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                          const std::vector<std::vector<SX> >& fseed,
                          std::vector<std::vector<SX> >& fsens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+    virtual void reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                          const std::vector<std::vector<SX> >& aseed,
                          std::vector<std::vector<SX> >& asens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void callForward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+    virtual void forward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
                          const std::vector<std::vector<DMatrix> >& fseed,
                          std::vector<std::vector<DMatrix> >& fsens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void callReverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+    virtual void reverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
                          const std::vector<std::vector<DMatrix> >& aseed,
                          std::vector<std::vector<DMatrix> >& asens,
                          bool always_inline, bool never_inline);
@@ -217,26 +217,26 @@ namespace casadi {
 
     ///@{
     /** \brief Return function that calculates forward derivatives
-     *    derForward(nfwd) returns a cached instance if available,
-     *    and calls <tt>Function getDerForward(int nfwd)</tt>
+     *    forward(nfwd) returns a cached instance if available,
+     *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
-    Function derForward(int nfwd);
-    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
-    virtual int numDerForward() const { return 0;}
-    void setDerForward(const Function& fcn, int nfwd);
+    Function forward(int nfwd);
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual int get_n_forward() const { return 0;}
+    void set_forward(const Function& fcn, int nfwd);
     ///@}
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives
-     *    derReverse(nadj) returns a cached instance if available,
-     *    and calls <tt>Function getDerReverse(int nadj)</tt>
+     *    reverse(nadj) returns a cached instance if available,
+     *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
-    Function derReverse(int nadj);
-    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
-    virtual int numDerReverse() const { return 0;}
-    void setDerReverse(const Function& fcn, int nadj);
+    Function reverse(int nadj);
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual int get_n_reverse() const { return 0;}
+    void set_reverse(const Function& fcn, int nadj);
     ///@}
 
     /** \brief Can derivatives be calculated in any way? */
@@ -433,10 +433,10 @@ namespace casadi {
     Sparsity getJacSparsityHierarchicalSymm(int iind, int oind);
 
     /// Generate the sparsity of a Jacobian block
-    void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact);
+    void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact);
 
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    Sparsity& jacSparsity(int iind, int oind, bool compact, bool symmetric);
+    Sparsity& sparsity_jac(int iind, int oind, bool compact, bool symmetric);
 
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);

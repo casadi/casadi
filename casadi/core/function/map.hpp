@@ -129,14 +129,14 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
-    virtual int numDerForward() const { return 64;}
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual int get_n_forward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
-    virtual int numDerReverse() const { return 64;}
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual int get_n_reverse() const { return 64;}
     ///@}
 
   };
@@ -218,14 +218,14 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
-    virtual int numDerForward() const { return 64;}
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual int get_n_forward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
-    virtual int numDerReverse() const { return 64;}
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual int get_n_reverse() const { return 64;}
     ///@}
 
     /** \brief  Print description */

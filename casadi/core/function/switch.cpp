@@ -176,16 +176,16 @@ namespace casadi {
   }
 
   Function Switch
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].isNull()) der[k] = f_[k].derForward(nfwd);
+      if (!f_[k].isNull()) der[k] = f_[k].forward(nfwd);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.isNull()) der_def = f_def_.derForward(nfwd);
+    if (!f_def_.isNull()) der_def = f_def_.forward(nfwd);
 
     // New Switch for derivatives
     stringstream ss;
@@ -218,16 +218,16 @@ namespace casadi {
   }
 
   Function Switch
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].isNull()) der[k] = f_[k].derReverse(nadj);
+      if (!f_[k].isNull()) der[k] = f_[k].reverse(nadj);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.isNull()) der_def = f_def_.derReverse(nadj);
+    if (!f_def_.isNull()) der_def = f_def_.reverse(nadj);
 
     // New Switch for derivatives
     stringstream ss;

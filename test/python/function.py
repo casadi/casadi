@@ -389,7 +389,7 @@ class Functiontests(casadiTestCase):
     self.assertEqual(J.nnz_out(0),4)
     
     f = Function("f", [x],[x])
-    f.setJacSparsity(Sparsity.dense(4,4),0,0,True)
+    f.set_jac_sparsity(Sparsity.dense(4,4),0,0,True)
     
     J = f.jacobian()
     J.evaluate()
@@ -520,11 +520,11 @@ class Functiontests(casadiTestCase):
       for i in range(2):
         f = XFunction("nlp",[V],[vertcat(g)],{"ad_weight_sp":i})
 
-        assert f.jacSparsity().nnz()==162
+        assert f.sparsity_jac().nnz()==162
 
         f2 = XFunction("nlp",[V],[vertcat(g2)],{"ad_weight_sp":i})
 
-        assert f2.jacSparsity().nnz()==162
+        assert f2.sparsity_jac().nnz()==162
 
   def test_callback(self):
     class mycallback(Callback):

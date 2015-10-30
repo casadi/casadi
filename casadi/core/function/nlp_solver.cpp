@@ -458,7 +458,7 @@ namespace casadi {
       if (verbose_init)
         userOut() << "Generating Hessian of the Lagrangian sparsity pattern...";
       const timer time0 = getTimerTime();
-      spHessLag = gradLag.jacSparsity(NL_X, NL_NUM_OUT+NL_X, false, true);
+      spHessLag = gradLag.sparsity_jac(NL_X, NL_NUM_OUT+NL_X, false, true);
       const diffTime diff = diffTimers(getTimerTime(), time0);
       stats_["hess lag sparsity time"] = diffToDict(diff);
       if (verbose_init)

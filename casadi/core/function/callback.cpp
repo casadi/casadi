@@ -100,19 +100,19 @@ namespace casadi {
   }
 
   Function Callback::get_forward(const std::string& name, int nfwd, Dict& opts) {
-    return (*this)->FunctionInternal::getDerForward(name, nfwd, opts);
+    return (*this)->FunctionInternal::get_forward(name, nfwd, opts);
   }
 
   int Callback::get_n_forward() const {
-    return (*this)->FunctionInternal::numDerForward();
+    return (*this)->FunctionInternal::get_n_forward();
   }
 
   Function Callback::get_reverse(const std::string& name, int nadj, Dict& opts) {
-    return (*this)->FunctionInternal::getDerReverse(name, nadj, opts);
+    return (*this)->FunctionInternal::get_reverse(name, nadj, opts);
   }
 
   int Callback::get_n_reverse() const {
-    return (*this)->FunctionInternal::numDerReverse();
+    return (*this)->FunctionInternal::get_n_reverse();
   }
 
   void Callback::transfer_ownership() {

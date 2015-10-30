@@ -31,7 +31,7 @@ for jac_for_sens in (True,False):
   f = SXFunction([a,b],[sqrt(b-sin(a)),inner_prod(a,b),outer_prod(a,b)])
   f.setOption("jac_for_sens",jac_for_sens)
   f.init()
-  #print f.jacSparsity(0,0)
+  #print f.sparsity_jac(0,0)
 
   f.setInput([1,2,3,4,5],0)
   f.setInput([10,20,30,40,50],1)

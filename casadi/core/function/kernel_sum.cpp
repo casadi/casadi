@@ -217,7 +217,7 @@ namespace casadi {
   }
 
   Function KernelSum
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
 
     /* Write KernelSum2D in linear form:
     *  
@@ -240,7 +240,7 @@ namespace casadi {
     *     f_forward ( P_i, v_i, X, X_dot)
     *
     */
-    Function fd = f_.derForward(nfwd);
+    Function fd = f_.forward(nfwd);
 
     vector<MX> f_inputs(f_.n_in());
     for (int i=0; i<f_inputs.size(); ++i) {
@@ -296,7 +296,7 @@ namespace casadi {
   }
 
   Function KernelSum
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     /* Write KernelSum2D in linear form:
     *  
     *    S = F(V, X)  = sum_i  f ( P_i, v_i, X)
@@ -322,7 +322,7 @@ namespace casadi {
     *
     *
     */
-    Function fd = f_.derReverse(nadj);
+    Function fd = f_.reverse(nadj);
 
     // NOTE(@jaeandersson): Flawed design
     std::vector<MX> f_inputs   = f_->FunctionInternal::mx_in();

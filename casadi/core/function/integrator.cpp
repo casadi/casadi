@@ -931,8 +931,8 @@ namespace casadi {
     return ret;
   }
 
-  Function Integrator::getDerForward(const std::string& name, int nfwd, Dict& opts) {
-    log("Integrator::getDerForward", "begin");
+  Function Integrator::get_forward(const std::string& name, int nfwd, Dict& opts) {
+    log("Integrator::get_forward", "begin");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
@@ -1072,14 +1072,14 @@ namespace casadi {
       if (dir>=0) // Nondifferentiated output ignored
         ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    log("Integrator::getDerForward", "end");
+    log("Integrator::get_forward", "end");
 
     // Create derivative function and return
     return Function(name, ret_in, ret_out, opts);
   }
 
-  Function Integrator::getDerReverse(const std::string& name, int nadj, Dict& opts) {
-    log("Integrator::getDerReverse", "begin");
+  Function Integrator::get_reverse(const std::string& name, int nadj, Dict& opts) {
+    log("Integrator::get_reverse", "begin");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(false);
@@ -1300,7 +1300,7 @@ namespace casadi {
 
   Sparsity Integrator::spJacF() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity jac_ode_x = f_.jacSparsity(DAE_X, DAE_ODE);
+    Sparsity jac_ode_x = f_.sparsity_jac(DAE_X, DAE_ODE);
 
     // Add diagonal to get interdependencies
     jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
@@ -1309,16 +1309,16 @@ namespace casadi {
     if (nz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z, DAE_ODE);
-    Sparsity jac_alg_x = f_.jacSparsity(DAE_X, DAE_ALG);
-    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z, DAE_ALG);
+    Sparsity jac_ode_z = f_.sparsity_jac(DAE_Z, DAE_ODE);
+    Sparsity jac_alg_x = f_.sparsity_jac(DAE_X, DAE_ALG);
+    Sparsity jac_alg_z = f_.sparsity_jac(DAE_Z, DAE_ALG);
     return blockcat(jac_ode_x, jac_ode_z,
                     jac_alg_x, jac_alg_z);
   }
 
   Sparsity Integrator::spJacG() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity jac_ode_x = g_.jacSparsity(RDAE_RX, RDAE_ODE);
+    Sparsity jac_ode_x = g_.sparsity_jac(RDAE_RX, RDAE_ODE);
 
     // Add diagonal to get interdependencies
     jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
@@ -1327,9 +1327,9 @@ namespace casadi {
     if (nrz_==0) return jac_ode_x;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ, RDAE_ODE);
-    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX, RDAE_ALG);
-    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ, RDAE_ALG);
+    Sparsity jac_ode_z = g_.sparsity_jac(RDAE_RZ, RDAE_ODE);
+    Sparsity jac_alg_x = g_.sparsity_jac(RDAE_RX, RDAE_ALG);
+    Sparsity jac_alg_z = g_.sparsity_jac(RDAE_RZ, RDAE_ALG);
     return blockcat(jac_ode_x, jac_ode_z,
                     jac_alg_x, jac_alg_z);
   }

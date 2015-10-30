@@ -99,14 +99,14 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
-    virtual int numDerForward() const { return 64;}
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual int get_n_forward() const { return 64;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
-    virtual int numDerReverse() const { return 64;}
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual int get_n_reverse() const { return 64;}
     ///@}
 
     /** \brief Generate code for the declarations of the C function */
@@ -119,13 +119,13 @@ namespace casadi {
     virtual bool isInput(const std::vector<MatType>& arg) const;
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void callForward(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+    virtual void forward(const std::vector<MatType>& arg, const std::vector<MatType>& res,
                          const std::vector<std::vector<MatType> >& fseed,
                          std::vector<std::vector<MatType> >& fsens,
                          bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void callReverse(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+    virtual void reverse(const std::vector<MatType>& arg, const std::vector<MatType>& res,
                          const std::vector<std::vector<MatType> >& aseed,
                          std::vector<std::vector<MatType> >& asens,
                          bool always_inline, bool never_inline);
@@ -552,7 +552,7 @@ namespace casadi {
 
     // Quick return if trivially empty
     if (input(iind).nnz()==0 || output(oind).nnz()==0 ||
-       jacSparsity(iind, oind, true, false).nnz()==0) {
+       sparsity_jac(iind, oind, true, false).nnz()==0) {
       return MatType(input(iind).size());
     }
 
@@ -573,7 +573,7 @@ namespace casadi {
     }
 
     // Calculate with adjoint mode AD
-    static_cast<DerivedType*>(this)->callReverse(inputv_, outputv_, aseed, asens, true, false);
+    static_cast<DerivedType*>(this)->reverse(inputv_, outputv_, aseed, asens, true, false);
 
     int dir = 0;
     for (int i=0; i<n_in(); ++i) { // Correct sparsities #1025
@@ -608,7 +608,7 @@ namespace casadi {
     }
 
     // Calculate with forward mode AD
-    static_cast<DerivedType*>(this)->callForward(inputv_, outputv_, fseed, fsens, true, false);
+    static_cast<DerivedType*>(this)->forward(inputv_, outputv_, fseed, fsens, true, false);
 
     // Return adjoint directional derivative
     return fsens[0].at(oind);
@@ -633,7 +633,7 @@ namespace casadi {
     }
 
     // Create return object
-    MatType ret = MatType::zeros(jacSparsity(iind, oind, compact, symmetric).T());
+    MatType ret = MatType::zeros(sparsity_jac(iind, oind, compact, symmetric).T());
     if (verbose()) userOut() << "XFunction::jac allocated return value" << std::endl;
 
     // Quick return if empty
@@ -664,7 +664,7 @@ namespace casadi {
     std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
 
     // Get the sparsity of the Jacobian block
-    Sparsity jsp = jacSparsity(iind, oind, true, symmetric).T();
+    Sparsity jsp = sparsity_jac(iind, oind, true, symmetric).T();
     const int* jsp_colind = jsp.colind();
     const int* jsp_row = jsp.row();
 
@@ -809,11 +809,11 @@ namespace casadi {
       if (verbose()) userOut() << "XFunction::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
-        static_cast<DerivedType*>(this)->callForward(inputv_, outputv_,
+        static_cast<DerivedType*>(this)->forward(inputv_, outputv_,
                                                  fseed, fsens, always_inline, never_inline);
       } else if (aseed.size()>0) {
         casadi_assert(fseed.size()==0);
-        static_cast<DerivedType*>(this)->callReverse(inputv_, outputv_,
+        static_cast<DerivedType*>(this)->reverse(inputv_, outputv_,
                                                  aseed, asens, always_inline, never_inline);
       }
 
@@ -1005,7 +1005,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfwd, inputv_), fsens;
 
@@ -1042,7 +1042,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Seeds
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadj, outputv_), asens;
 
@@ -1092,7 +1092,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::
-  callForward(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+  forward(const std::vector<MatType>& arg, const std::vector<MatType>& res,
           const std::vector<std::vector<MatType> >& fseed,
           std::vector<std::vector<MatType> >& fsens,
           bool always_inline, bool never_inline) {
@@ -1107,7 +1107,7 @@ namespace casadi {
 
     // The non-inlining version is implemented in the base class
     if (!inline_function) {
-      return FunctionInternal::callForward(arg, res, fseed, fsens, always_inline, never_inline);
+      return FunctionInternal::forward(arg, res, fseed, fsens, always_inline, never_inline);
     }
 
     if (isInput(arg)) {
@@ -1122,7 +1122,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::
-  callReverse(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+  reverse(const std::vector<MatType>& arg, const std::vector<MatType>& res,
           const std::vector<std::vector<MatType> >& aseed,
           std::vector<std::vector<MatType> >& asens,
           bool always_inline, bool never_inline) {
@@ -1137,7 +1137,7 @@ namespace casadi {
 
     // The non-inlining version is implemented in the base class
     if (!inline_function) {
-      return FunctionInternal::callReverse(arg, res, aseed, asens, always_inline, never_inline);
+      return FunctionInternal::reverse(arg, res, aseed, asens, always_inline, never_inline);
     }
 
     if (isInput(arg)) {

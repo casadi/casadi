@@ -557,37 +557,37 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
+    void forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& fseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+    void reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& aseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
+    void forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& fseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+    void reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& aseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callForward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+    void forward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
                  const std::vector<std::vector<DMatrix> >& fseed,
                  std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callReverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+    void reverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
                  const std::vector<std::vector<DMatrix> >& aseed,
                  std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
@@ -601,20 +601,20 @@ namespace casadi {
      * The next two arguments are a set of adjoint directional seeds and the resulting adjoint
      * directional derivatives, the length of the vector being the number of adjoint directions.
      */
-    void callDerivative(const DMatrixVector& arg, DMatrixVector& SWIG_OUTPUT(res),
-                        const DMatrixVectorVector& fseed, DMatrixVectorVector& SWIG_OUTPUT(fsens),
-                        const DMatrixVectorVector& aseed, DMatrixVectorVector& SWIG_OUTPUT(asens),
-                        bool always_inline=false, bool never_inline=false);
+    void derivative(const DMatrixVector& arg, DMatrixVector& SWIG_OUTPUT(res),
+                    const DMatrixVectorVector& fseed, DMatrixVectorVector& SWIG_OUTPUT(fsens),
+                    const DMatrixVectorVector& aseed, DMatrixVectorVector& SWIG_OUTPUT(asens),
+                    bool always_inline=false, bool never_inline=false);
 
-    void callDerivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res),
-                        const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens),
-                        const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
-                        bool always_inline=false, bool never_inline=false);
+    void derivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res),
+                    const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens),
+                    const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
+                    bool always_inline=false, bool never_inline=false);
 
-    void callDerivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res),
-                        const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens),
-                        const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
-                        bool always_inline=false, bool never_inline=false);
+    void derivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res),
+                    const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens),
+                    const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
+                    bool always_inline=false, bool never_inline=false);
     ///@}
     /// \endcond
 
@@ -742,7 +742,7 @@ namespace casadi {
                         const Dict& opts=Dict()) const;
 
     /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
-     *         Legacy function: Use derForward and derReverse instead.
+     *         Legacy function: Use forward and reverse instead.
      *
      *         Returns a function with <tt>(1+nfwd)*n_in+nadj*n_out</tt> inputs
      *         and <tt>(1+nfwd)*n_out + nadj*n_in</tt> outputs.
@@ -776,7 +776,7 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function derForward(int nfwd);
+    Function forward(int nfwd);
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
@@ -795,40 +795,48 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function derReverse(int nadj);
+    Function reverse(int nadj);
 
     /** \brief Set a function that calculates \a nfwd forward derivatives
         NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void setDerForward(const Function& fcn, int nfwd);
+    void set_forward(const Function& fcn, int nfwd);
 
     /** \brief Set a function that calculates \a nadj adjoint derivatives
         NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void setDerReverse(const Function& fcn, int nadj);
+    void set_reverse(const Function& fcn, int nadj);
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    const Sparsity jacSparsity(const std::string &iind, int oind=0, bool compact=false,
-                          bool symmetric=false) {
-        return jacSparsity(index_in(iind), oind, compact, symmetric); }
-    const Sparsity jacSparsity(int iind, const std::string &oind, bool compact=false,
-                          bool symmetric=false) {
-        return jacSparsity(iind, index_out(oind), compact, symmetric); }
-    const Sparsity jacSparsity(const std::string &iind, const std::string &oind,
+    const Sparsity sparsity_jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    const Sparsity sparsity_jac(const std::string &iind, int oind=0, bool compact=false,
+                                bool symmetric=false) {
+      return sparsity_jac(index_in(iind), oind, compact, symmetric);
+    }
+    const Sparsity sparsity_jac(int iind, const std::string &oind, bool compact=false,
+                                bool symmetric=false) {
+      return sparsity_jac(iind, index_out(oind), compact, symmetric);
+    }
+    const Sparsity sparsity_jac(const std::string &iind, const std::string &oind,
                           bool compact=false, bool symmetric=false) {
-        return jacSparsity(index_in(iind), index_out(oind), compact, symmetric); }
+      return sparsity_jac(index_in(iind), index_out(oind), compact, symmetric);
+    }
     ///@}
 
     ///@{
     /// Generate the sparsity of a Jacobian block
-    void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
-    void setJacSparsity(const Sparsity& sp, const std::string &iind, int oind, bool compact=false) {
-        setJacSparsity(sp, index_in(iind), oind, compact); }
-    void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) {
-        setJacSparsity(sp, iind, index_out(oind), compact); }
-    void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
-                        bool compact=false) {
-        setJacSparsity(sp, index_in(iind), index_out(oind), compact); }
+    void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
+    void set_jac_sparsity(const Sparsity& sp, const std::string &iind, int oind,
+                          bool compact=false) {
+      set_jac_sparsity(sp, index_in(iind), oind, compact);
+    }
+    void set_jac_sparsity(const Sparsity& sp, int iind, const std::string &oind,
+                          bool compact=false) {
+      set_jac_sparsity(sp, iind, index_out(oind), compact);
+    }
+    void set_jac_sparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
+                          bool compact=false) {
+      set_jac_sparsity(sp, index_in(iind), index_out(oind), compact);
+    }
     ///@}
 
     /** \brief Export / Generate C code for the function */

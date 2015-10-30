@@ -173,14 +173,14 @@ namespace casadi {
   }
 
   Function Rootfinder
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
-    callForward(arg, res, fseed, fsens, false, false);
+    forward(arg, res, fseed, fsens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -191,14 +191,14 @@ namespace casadi {
   }
 
   Function Rootfinder
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
-    callReverse(arg, res, aseed, asens, false, false);
+    reverse(arg, res, aseed, asens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
@@ -280,7 +280,7 @@ namespace casadi {
   const std::string Rootfinder::infix_ = "rootfinder";
 
   void Rootfinder::
-  callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
+  forward(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& fseed,
           std::vector<std::vector<MX> >& fsens,
           bool always_inline, bool never_inline) {
@@ -300,7 +300,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       f_fseed[d].at(iin_) = MX(input(iin_).size()); // ignore seeds for guess
     }
-    f_.callForward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+    f_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
 
     // Get expression of Jacobian
     MX J = jac_(f_arg).front();
@@ -315,13 +315,13 @@ namespace casadi {
     int num_out = n_out();
     if (num_out>1) {
       for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
-      f_.callForward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
+      f_.forward(f_arg, f_res, f_fseed, fsens, always_inline, never_inline);
       for (int d=0; d<nfwd; ++d) fsens[d][iout_] = f_fseed[d][iin_]; // Otherwise overwritten
     }
   }
 
   void Rootfinder::
-  callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+  reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) {
@@ -353,7 +353,7 @@ namespace casadi {
     vector<MX> rhs(nadj);
     vector<vector<MX> > asens_aux;
     if (num_out>1) {
-      f_.callReverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
+      f_.reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
       for (int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
     } else {
       for (int d=0; d<nadj; ++d) rhs[d] = vec(aseed[d][iout_]);
@@ -380,7 +380,7 @@ namespace casadi {
     }
 
     // Propagate through f_
-    f_.callReverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
+    f_.reverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
     // No dependency on guess (2)
     for (int d=0; d<nadj; ++d) {

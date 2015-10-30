@@ -189,18 +189,18 @@ namespace casadi {
   }
 
   Function MapSerial
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Differentiate mapped function
-    Function df = f_.derForward(nfwd);
+    Function df = f_.forward(nfwd);
 
     // Construct and return
     return df.map(name, n_, opts);
   }
 
   Function MapSerial
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
-    Function df = f_.derReverse(nadj);
+    Function df = f_.reverse(nadj);
 
     // Construct and return
     return df.map(name, n_, opts);
@@ -468,10 +468,10 @@ namespace casadi {
   */
 
   Function MapReduce
-  ::getDerForward(const std::string& name, int nfwd, Dict& opts) {
+  ::get_forward(const std::string& name, int nfwd, Dict& opts) {
 
     // Differentiate mapped function
-    Function df = f_.derForward(nfwd);
+    Function df = f_.forward(nfwd);
 
     // Propagate options (if not set already)
     if (opts.find("parallelization")==opts.end()) {
@@ -498,9 +498,9 @@ namespace casadi {
   }
 
   Function MapReduce
-  ::getDerReverse(const std::string& name, int nadj, Dict& opts) {
+  ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
-    Function df = f_.derReverse(nadj);
+    Function df = f_.reverse(nadj);
 
     // Propagate options (if not set already)
     if (opts.find("parallelization")==opts.end()) {
