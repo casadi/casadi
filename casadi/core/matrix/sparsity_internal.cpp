@@ -1157,7 +1157,7 @@ namespace casadi {
 
 #define CS_FLIP(i) (-(i)-2)
 
-  std::vector<int> SparsityInternal::approximateMinimumDegree(int order) const {
+  std::vector<int> SparsityInternal::amd(int order) const {
 
     int *Cp, *Ci, *last, *len, *nv, *next, *head, *elen, *degree, *w;
     int *hhead, d, dk, dext, lemax = 0, e, elenk, eln, i, j, k, k1;
@@ -1794,7 +1794,7 @@ namespace casadi {
 
     // fill-reducing ordering
     if (order!=0) {
-      S_q = approximateMinimumDegree(order);
+      S_q = amd(order);
     }
 
     // QR symbolic analysis
