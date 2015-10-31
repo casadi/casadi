@@ -272,10 +272,10 @@ namespace casadi {
     }
 
     // Flip the sign of the multipliers
-    for (vector<double>::iterator it=output(QP_SOLVER_LAM_A).begin();
-        it!=output(QP_SOLVER_LAM_A).end(); ++it) *it = -*it;
-    for (vector<double>::iterator it=output(QP_SOLVER_LAM_X).begin();
-        it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
+    for (auto it=output(QP_SOLVER_LAM_A)->begin();
+         it!=output(QP_SOLVER_LAM_A)->end(); ++it) *it = -*it;
+    for (auto it=output(QP_SOLVER_LAM_X)->begin();
+         it!=output(QP_SOLVER_LAM_X)->end(); ++it) *it = -*it;
 
     int solnstat = CPXgetstat(env_, lp_);
     stringstream errormsg;

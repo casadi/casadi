@@ -219,8 +219,7 @@ namespace casadi {
     }
 
     // Set user set options
-    for (std::map<std::string, double>::iterator it=double_param_.begin();
-        it!=double_param_.end(); ++it) {
+    for (auto it=double_param_.begin(); it!=double_param_.end(); ++it) {
       status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
       if (status!=0) {
         throw CasadiException("KnitroInterface::evaluate: cannot set " + it->first);
@@ -251,17 +250,13 @@ namespace casadi {
     }
 
     // "Correct" upper and lower bounds
-    for (vector<double>::iterator it=input(NLP_SOLVER_LBX).begin();
-        it!=input(NLP_SOLVER_LBX).end(); ++it)
+    for (auto it=input(NLP_SOLVER_LBX)->begin(); it!=input(NLP_SOLVER_LBX)->end(); ++it)
       if (isinf(*it)) *it = -KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_UBX).begin();
-        it!=input(NLP_SOLVER_UBX).end(); ++it)
+    for (auto it=input(NLP_SOLVER_UBX)->begin(); it!=input(NLP_SOLVER_UBX)->end(); ++it)
       if (isinf(*it)) *it =  KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_LBG).begin();
-        it!=input(NLP_SOLVER_LBG).end(); ++it)
+    for (auto it=input(NLP_SOLVER_LBG)->begin(); it!=input(NLP_SOLVER_LBG)->end(); ++it)
       if (isinf(*it)) *it = -KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_UBG).begin();
-        it!=input(NLP_SOLVER_UBG).end(); ++it)
+    for (auto it=input(NLP_SOLVER_UBG)->begin(); it!=input(NLP_SOLVER_UBG)->end(); ++it)
       if (isinf(*it)) *it =  KTR_INFBOUND;
 
     // Initialize KNITRO
