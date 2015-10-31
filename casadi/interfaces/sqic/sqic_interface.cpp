@@ -60,18 +60,18 @@ namespace casadi {
   void SqicInterface::evaluate() {
     if (inputs_check_) checkInputs();
 
-    std::copy(input(QP_SOLVER_X0).begin(), input(QP_SOLVER_X0).end(), x_.begin());
+    std::copy(input(QP_SOLVER_X0)->begin(), input(QP_SOLVER_X0)->end(), x_.begin());
     std::fill(x_.begin()+n_, x_.end(), 0);
 
-    std::transform(input(QP_SOLVER_LAM_X0).begin(), input(QP_SOLVER_LAM_X0).end(), rc_.begin(),
-                   negate<double>());
+    std::transform(input(QP_SOLVER_LAM_X0)->begin(), input(QP_SOLVER_LAM_X0)->end(),
+                   rc_.begin(), negate<double>());
     std::fill(rc_.begin()+n_, rc_.end(), 0);
 
-    std::copy(input(QP_SOLVER_LBX).begin(), input(QP_SOLVER_LBX).end(), bl_.begin());
-    std::copy(input(QP_SOLVER_UBX).begin(), input(QP_SOLVER_UBX).end(), bu_.begin());
+    std::copy(input(QP_SOLVER_LBX)->begin(), input(QP_SOLVER_LBX)->end(), bl_.begin());
+    std::copy(input(QP_SOLVER_UBX)->begin(), input(QP_SOLVER_UBX)->end(), bu_.begin());
 
-    std::copy(input(QP_SOLVER_LBA).begin(), input(QP_SOLVER_LBA).end(), bl_.begin()+n_);
-    std::copy(input(QP_SOLVER_UBA).begin(), input(QP_SOLVER_UBA).end(), bu_.begin()+n_);
+    std::copy(input(QP_SOLVER_LBA)->begin(), input(QP_SOLVER_LBA)->end(), bl_.begin()+n_);
+    std::copy(input(QP_SOLVER_UBA)->begin(), input(QP_SOLVER_UBA)->end(), bu_.begin()+n_);
 
     for (int i=0;i<n_+nc_+1;++i) {
       if (bl_[i]==-std::numeric_limits<double>::infinity()) bl_[i]=-inf_;
@@ -84,9 +84,10 @@ namespace casadi {
 
     sqicSolve(&output(QP_SOLVER_COST).data()[0]);
 
-    std::copy(x_.begin(), x_.begin()+n_, output(QP_SOLVER_X).begin());
-    std::transform(rc_.begin(), rc_.begin()+n_, output(QP_SOLVER_LAM_X).begin(), negate<double>());
-    std::transform(rc_.begin()+n_, rc_.begin()+n_+nc_, output(QP_SOLVER_LAM_A).begin(),
+    std::copy(x_.begin(), x_.begin()+n_, output(QP_SOLVER_X)->begin());
+    std::transform(rc_.begin(), rc_.begin()+n_, output(QP_SOLVER_LAM_X)->begin(),
+                   negate<double>());
+    std::transform(rc_.begin()+n_, rc_.begin()+n_+nc_, output(QP_SOLVER_LAM_A)->begin(),
                    negate<double>());
 
     output(QP_SOLVER_COST)[0]+= x_[n_+nc_];
