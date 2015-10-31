@@ -102,6 +102,12 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Create a sparse matrix with all structural zeros */
     explicit Matrix(const std::pair<int, int>& rc);
+
+    /** \brief  Access functions of the node */
+    std::vector<DataType>* operator->() { return &data_;}
+
+    /** \brief  Const access functions of the node */
+    const std::vector<DataType>* operator->() const { return &data_;}
 #endif // SWIG
 
     /** \brief Create a sparse matrix from a sparsity pattern.
@@ -129,14 +135,14 @@ namespace casadi {
      */
     template<typename A>
     Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.nnz())) {
-      copy(x.begin(), x.end(), begin());
+      copy(x->begin(), x->end(), data_.begin());
     }
 
     /** \brief  Create an expression from a vector  */
     template<typename A>
     Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
-        data_(std::vector<DataType>(x.size())) {
-      copy(x.begin(), x.end(), begin());
+      data_(std::vector<DataType>(x.size())) {
+        copy(x.begin(), x.end(), data_.begin());
     }
 
 #ifndef SWIG
@@ -179,28 +185,6 @@ namespace casadi {
     using B::zz_horzsplit;
     using B::zz_vertsplit;
     using B::zz_diagsplit;
-
-    /// \cond INTERNAL
-    /// Expose iterators
-    typedef typename std::vector<DataType>::iterator iterator;
-    typedef typename std::vector<DataType>::const_iterator const_iterator;
-
-    /// References
-    typedef DataType& reference;
-    typedef const DataType& const_reference;
-
-    /// Get iterators to beginning and end
-    iterator begin() { return data().begin();}
-    const_iterator begin() const { return data().begin();}
-    iterator end() { return data().end();}
-    const_iterator end() const { return data().end();}
-
-    /// Get references to beginning and end
-    reference front() { return data().front();}
-    const_reference front() const { return data().front();}
-    reference back() { return data().back();}
-    const_reference back() const { return data().back();}
-    /// \endcond
 
     /// Get a non-zero element
     inline const DataType& at(int k) const {
@@ -951,12 +935,20 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Get a pointer to the data
-    DataType* ptr() { return is_empty() ? static_cast<DataType*>(0) : &front();}
-    friend inline DataType* getPtr(Matrix<DataType>& v) { return v.ptr();}
+    DataType* ptr() {
+      return is_empty() ? static_cast<DataType*>(0) : &data_.front();
+    }
+    friend inline DataType* getPtr(Matrix<DataType>& v) {
+      return v.ptr();
+    }
 
     /// Get a const pointer to the data
-    const DataType* ptr() const { return is_empty() ? static_cast<const DataType*>(0) : &front();}
-    friend inline const DataType* getPtr(const Matrix<DataType>& v) { return v.ptr();}
+    const DataType* ptr() const {
+      return is_empty() ? static_cast<const DataType*>(0) : &data_.front();
+    }
+    friend inline const DataType* getPtr(const Matrix<DataType>& v) {
+      return v.ptr();
+    }
     /// \endcond
 
     /// Const access the sparsity - reference to data member

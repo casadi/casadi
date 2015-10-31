@@ -257,8 +257,8 @@ namespace casadi {
     copy(x_init.begin(), x_init.end(), x_.begin());
 
     // Initialize Lagrange multipliers of the NLP
-    copy(input(NLP_SOLVER_LAM_G0).begin(), input(NLP_SOLVER_LAM_G0).end(), mu_.begin());
-    copy(input(NLP_SOLVER_LAM_X0).begin(), input(NLP_SOLVER_LAM_X0).end(), mu_x_.begin());
+    copy(input(NLP_SOLVER_LAM_G0)->begin(), input(NLP_SOLVER_LAM_G0)->end(), mu_.begin());
+    copy(input(NLP_SOLVER_LAM_X0)->begin(), input(NLP_SOLVER_LAM_X0)->end(), mu_x_.begin());
 
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ =
         t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;

@@ -239,14 +239,14 @@ namespace casadi {
     // Report out-of-bounds
     if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
       casadi_error("set[., rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
+                   << *std::min_element(rr->begin(), rr->end()) << " up to "
+                   << *std::max_element(rr->begin(), rr->end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
     if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
       casadi_error("set [., rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
+                   << *std::min_element(cc->begin(), cc->end()) << " up to "
+                   << *std::max_element(cc->begin(), cc->end())
                    << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
     }
 
@@ -314,8 +314,8 @@ namespace casadi {
     // Check bounds
     if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
       casadi_error("set[rr] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
+                   << *std::min_element(rr->begin(), rr->end()) << " up to "
+                   << *std::max_element(rr->begin(), rr->end())
                    << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
     }
 
@@ -379,21 +379,21 @@ namespace casadi {
     int sz = nnz();
     if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
       casadi_error("getNZ[kk] out of bounds. Your kk contains "
-                   << *std::min_element(kk.begin(), kk.end()) << " up to "
-                   << *std::max_element(kk.begin(), kk.end())
+                   << *std::min_element(kk->begin(), kk->end()) << " up to "
+                   << *std::max_element(kk->begin(), kk->end())
                    << ", which is outside the range [" << -sz+ind1 << "," << sz+ind1 <<  ").");
     }
 
     // Handle index-1, negative indices
-    if (ind1 || *std::min_element(kk.begin(), kk.end())<0) {
+    if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
       Matrix<int> kk_mod = kk;
-      for (vector<int>::iterator i=kk_mod.begin(); i!=kk_mod.end(); ++i) {
-        casadi_assert_message(!(ind1 && (*i)<=0), "Matlab is 1-based, but requested index " <<
-                                                (*i) <<  ". Note that negative slices are" <<
-                                                " disabled in the Matlab interface. " <<
-                                                "Possibly you may want to use 'end'.");
-        if (ind1) (*i)--;
-        if (*i<0) *i += sz;
+      for (auto&& i : kk_mod.data()) {
+        casadi_assert_message(!(ind1 && i<=0), "Matlab is 1-based, but requested index " <<
+                              i <<  ". Note that negative slices are" <<
+                              " disabled in the Matlab interface. " <<
+                              "Possibly you may want to use 'end'.");
+        if (ind1) i--;
+        if (i<0) i += sz;
       }
       getNZ(m, false, kk_mod); // Call recursively
       return;
@@ -443,8 +443,8 @@ namespace casadi {
     int sz = nnz();
     if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
       casadi_error("setNZ[kk] out of bounds. Your kk contains "
-                   << *std::min_element(kk.begin(), kk.end()) << " up to "
-                   << *std::max_element(kk.begin(), kk.end())
+                   << *std::min_element(kk->begin(), kk->end()) << " up to "
+                   << *std::max_element(kk->begin(), kk->end())
                    << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
     }
 
@@ -452,15 +452,15 @@ namespace casadi {
     if (kk.nnz()==0) return;
 
     // Handle index-1, negative indices
-    if (ind1 || *std::min_element(kk.begin(), kk.end())<0) {
+    if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
       Matrix<int> kk_mod = kk;
-      for (vector<int>::iterator i=kk_mod.begin(); i!=kk_mod.end(); ++i) {
-        casadi_assert_message(!(ind1 && (*i)<=0), "Matlab is 1-based, but requested index " <<
-                                                (*i) <<  ". Note that negative slices are" <<
-                                                " disabled in the Matlab interface. " <<
-                                                "Possibly you may want to use 'end'.");
-        if (ind1) (*i)--;
-        if (*i<0) *i += sz;
+      for (auto&& i : kk_mod.data()) {
+        casadi_assert_message(!(ind1 && i<=0), "Matlab is 1-based, but requested index " <<
+                              i <<  ". Note that negative slices are" <<
+                              " disabled in the Matlab interface. " <<
+                              "Possibly you may want to use 'end'.");
+        if (ind1) i--;
+        if (i<0) i += sz;
       }
       return setNZ(m, false, kk_mod); // Call recursively
     }

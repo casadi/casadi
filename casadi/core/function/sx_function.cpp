@@ -277,9 +277,9 @@ namespace casadi {
 
     // Add the list of nodes
     int ind=0;
-    for (vector<SX >::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind) {
+    for (auto it = outputv_.begin(); it != outputv_.end(); ++it, ++ind) {
       int nz=0;
-      for (vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc, ++nz) {
+      for (auto itc = (*it)->begin(); itc != (*it)->end(); ++itc, ++nz) {
         // Add outputs to the list
         s.push(itc->get());
         sort_depth_first(s, nodes);
@@ -456,17 +456,14 @@ namespace casadi {
     }
 
     // Now mark each input's place in the algorithm
-    for (vector<pair<int, SXNode*> >::const_iterator it=symb_loc.begin();
-         it!=symb_loc.end(); ++it) {
+    for (auto it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
       it->second->temp = it->first+1;
     }
 
     // Add input instructions
     for (int ind=0; ind<inputv_.size(); ++ind) {
       int nz=0;
-      for (vector<SXElement>::iterator itc = inputv_[ind].begin();
-          itc != inputv_[ind].end();
-          ++itc, ++nz) {
+      for (auto itc = inputv_[ind]->begin(); itc != inputv_[ind]->end(); ++itc, ++nz) {
         int i = itc->getTemp()-1;
         if (i>=0) {
           // Mark as input
@@ -733,7 +730,7 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       casadi_assert(aseed[d].size()==num_out);
       for (int i=0; matching_sparsity && i<num_out; ++i)
-        matching_sparsity = aseed[d][i].sparsity()==output(i).sparsity();
+        matching_sparsity = aseed[d][i].sparsity()==sparsity_out(i);
     }
 
     // Correct sparsity if needed
@@ -741,8 +738,8 @@ namespace casadi {
       vector<vector<SX> > aseed2(aseed);
       for (int d=0; d<nadj; ++d)
         for (int i=0; i<num_out; ++i)
-          if (aseed2[d][i].sparsity()!=output(i).sparsity())
-            aseed2[d][i] = project(aseed2[d][i], output(i).sparsity());
+          if (aseed2[d][i].sparsity()!=sparsity_out(i))
+            aseed2[d][i] = project(aseed2[d][i], sparsity_out(i));
       return evalAdj(aseed2, asens);
     }
 
@@ -750,10 +747,10 @@ namespace casadi {
     for (int d=0; d<nadj; ++d) {
       asens[d].resize(num_in);
       for (int i=0; i<asens[d].size(); ++i) {
-        if (asens[d][i].sparsity()!=input(i).sparsity()) {
-          asens[d][i] = SX::zeros(input(i).sparsity());
+        if (asens[d][i].sparsity()!=sparsity_in(i)) {
+          asens[d][i] = SX::zeros(sparsity_in(i));
         } else {
-          fill(asens[d][i].begin(), asens[d][i].end(), 0);
+          fill(asens[d][i]->begin(), asens[d][i]->end(), 0);
         }
       }
     }

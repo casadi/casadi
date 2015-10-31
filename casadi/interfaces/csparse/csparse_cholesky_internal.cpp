@@ -71,7 +71,7 @@ namespace casadi {
     AT_.p = const_cast<int*>(input().colind()); // row pointers (size n+1)
                                                          // or row indices (size nzmax)
     AT_.i = const_cast<int*>(input().row()); // col indices, size nzmax
-    AT_.x = &input().front(); // col indices, size nzmax
+    AT_.x = &input()->front(); // col indices, size nzmax
     AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
     // Temporary

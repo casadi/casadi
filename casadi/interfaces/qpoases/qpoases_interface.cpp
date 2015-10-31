@@ -279,14 +279,14 @@ namespace casadi {
     output(QP_SOLVER_COST).set(qp_->getObjVal());
 
     // Get the primal solution
-    qp_->getPrimalSolution(&output(QP_SOLVER_X).front());
+    qp_->getPrimalSolution(&output(QP_SOLVER_X)->front());
 
     // Get the dual solution
     qp_->getDualSolution(&dual_.front());
 
     // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-    transform(dual_.begin(),   dual_.begin()+n_, output(QP_SOLVER_LAM_X).begin(), negate<double>());
-    transform(dual_.begin()+n_, dual_.end(),     output(QP_SOLVER_LAM_A).begin(), negate<double>());
+    transform(dual_.begin(),   dual_.begin()+n_, output(QP_SOLVER_LAM_X)->begin(), negate<double>());
+    transform(dual_.begin()+n_, dual_.end(),     output(QP_SOLVER_LAM_A)->begin(), negate<double>());
   }
 
   std::string QpoasesInterface::getErrorMessage(int flag) {

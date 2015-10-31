@@ -118,12 +118,12 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     virtual void evalD(const double** arg, double** res, int* iw, double* w) {
-      std::copy(x_.begin(), x_.end(), res[0]);
+      std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-      std::copy(x_.begin(), x_.end(), res[0]);
+      std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief Generate code for the operation */

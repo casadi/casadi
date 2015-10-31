@@ -1497,7 +1497,7 @@ import_array();
         }
         if (m) {
           **m = casadi::Matrix<double>::zeros(nrow, ncol);
-          casadi::Matrix<double>::iterator it=(*m)->begin();
+          auto it=(**m)->begin();
           double* d = reinterpret_cast<double*>(array_data(array));
           for (int cc=0; cc<ncol; ++cc) {
             for (int rr=0; rr<nrow; ++rr) {
@@ -1722,7 +1722,7 @@ import_array();
         }
         if (m) {
           **m = casadi::Matrix<int>::zeros(nrow, ncol);
-          casadi::Matrix<int>::iterator it=(*m)->begin();
+          auto it=(**m)->begin();
           if (is_long) {
             long* d = reinterpret_cast<long*>(array_data(array));
             for (int cc=0; cc<ncol; ++cc) {

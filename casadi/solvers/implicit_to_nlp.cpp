@@ -80,10 +80,10 @@ namespace casadi {
     solver_.input(NLP_SOLVER_X0).set(output(iout_));
 
     // Add auxiliary inputs
-    vector<double>::iterator nlp_p = solver_.input(NLP_SOLVER_P).begin();
+    auto nlp_p = solver_.input(NLP_SOLVER_P)->begin();
     for (int i=0; i<n_in(); ++i) {
       if (i!=iin_) {
-        std::copy(input(i).begin(), input(i).end(), nlp_p);
+        std::copy(input(i)->begin(), input(i)->end(), nlp_p);
         nlp_p += input(i).nnz();
       }
     }

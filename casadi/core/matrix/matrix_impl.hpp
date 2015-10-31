@@ -56,7 +56,7 @@ namespace casadi {
     int oldsize = sparsity().nnz();
     int ind = sparsity_.addNZ(rr, cc);
     if (oldsize != sparsity().nnz())
-      data().insert(begin()+ind, DataType(0));
+      data().insert(data_.begin()+ind, DataType(0));
     return at(ind);
   }
 
@@ -258,14 +258,14 @@ namespace casadi {
     // Report out-of-bounds
     if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
       casadi_error("set[., r, c] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
+                   << *std::min_element(rr->begin(), rr->end()) << " up to "
+                   << *std::max_element(rr->begin(), rr->end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
     if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
       casadi_error("set [., r, c] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
+                   << *std::min_element(cc->begin(), cc->end()) << " up to "
+                   << *std::max_element(cc->begin(), cc->end())
                    << ", which is outside the range [" << -sz2+ind1 << ","<< sz2+ind1 <<  ").");
     }
 
@@ -347,8 +347,8 @@ namespace casadi {
     // Check bounds
     if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
       casadi_error("set[rr] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
+                   << *std::min_element(rr->begin(), rr->end()) << " up to "
+                   << *std::max_element(rr->begin(), rr->end())
                    << ", which is outside the range [" << -nel+ind1 << ","<< nel+ind1 <<  ").");
     }
 
@@ -810,7 +810,7 @@ namespace casadi {
     // Form matrix
     sparsity_ = Sparsity::dense(nrow, ncol);
     data().resize(nrow*ncol);
-    typename std::vector<DataType>::iterator it=begin();
+    typename std::vector<DataType>::iterator it=data_.begin();
     for (int cc=0; cc<ncol; ++cc) {
       for (int rr=0; rr<nrow; ++rr) {
         *it++ = d[rr][cc];
@@ -861,7 +861,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::setAll(const DataType& val) {
-    std::fill(begin(), end(), val);
+    std::fill(data_.begin(), data_.end(), val);
   }
 
   template<typename DataType>
@@ -1407,7 +1407,7 @@ namespace casadi {
     // Nonzeros
     std::vector<DataType>& ret_data = ret.data();
     const std::vector<DataType>& x_data = x.data();
-    const DataType& x_val = x_data.empty() ? casadi_limits<DataType>::zero : x.front();
+    const DataType& x_val = x_data.empty() ? casadi_limits<DataType>::zero : x->front();
     const std::vector<DataType>& y_data = y.data();
 
     // Do the operation on all non-zero elements
@@ -1439,7 +1439,7 @@ namespace casadi {
     std::vector<DataType>& ret_data = ret.data();
     const std::vector<DataType>& x_data = x.data();
     const std::vector<DataType>& y_data = y.data();
-    const DataType& y_val = y_data.empty() ? casadi_limits<DataType>::zero : y.front();
+    const DataType& y_val = y_data.empty() ? casadi_limits<DataType>::zero : y->front();
 
     // Do the operation on all non-zero elements
     for (int el=0; el<x.nnz(); ++el) {
@@ -1698,13 +1698,11 @@ namespace casadi {
   bool Matrix<DataType>::is_identity() const {
 
     // Make sure that the matrix is diagonal
-    if (!sparsity().is_diag())
-      return false;
+    if (!sparsity().is_diag()) return false;
 
     // Make sure that all entries are one
-    for (typename Matrix<DataType>::const_iterator it=begin(); it!=end(); ++it) {
-      if (!casadi_limits<DataType>::is_one(*it))
-        return false;
+    for (auto&& i : data_) {
+      if (!casadi_limits<DataType>::is_one(i)) return false;
     }
 
     return true;
@@ -1778,14 +1776,14 @@ namespace casadi {
   template<typename DataType>
   std::vector<double> Matrix<DataType>::nonzeros() const {
     std::vector<double> ret(nnz());
-    std::copy(begin(), end(), ret.begin());
+    std::copy(data_.begin(), data_.end(), ret.begin());
     return ret;
   }
 
   template<typename DataType>
   std::vector<int> Matrix<DataType>::nonzeros_int() const {
     std::vector<int> ret(nnz());
-    std::copy(begin(), end(), ret.begin());
+    std::copy(data_.begin(), data_.end(), ret.begin());
     return ret;
   }
 
@@ -2016,11 +2014,10 @@ namespace casadi {
     Matrix<DataType> ret = zeros(horzcat(sp));
 
     // Copy nonzeros
-    typename Matrix<DataType>::iterator i=ret.begin();
-    for (typename std::vector<Matrix<DataType> >::const_iterator j=v.begin();
-         j!=v.end(); ++j) {
+    auto i=ret->begin();
+    for (auto&& j : v) {
       std::copy(j->begin(), j->end(), i);
-      i += j->nnz();
+      i += j.nnz();
     }
     return ret;
   }
@@ -2036,7 +2033,7 @@ namespace casadi {
     ret.reserve(sp.size());
 
     // Copy data
-    auto i=begin();
+    auto i=data_.begin();
     for (auto&& j : sp) {
       auto i_next = i + j.nnz();
       ret.push_back(Matrix<DataType>(j, std::vector<DataType>(i, i_next), false));
@@ -2044,7 +2041,7 @@ namespace casadi {
     }
 
     // Return the assembled matrix
-    casadi_assert(i==end());
+    casadi_assert(i==data_.end());
     return ret;
   }
 
@@ -2159,7 +2156,7 @@ namespace casadi {
   Matrix<DataType> Matrix<DataType>::zz_norm_inf() const {
     // Get largest element by absolute value
     Matrix<DataType> s = 0;
-    for (typename std::vector<DataType>::const_iterator i=begin(); i!=end(); ++i) {
+    for (typename std::vector<DataType>::const_iterator i=data_.begin(); i!=data_.end(); ++i) {
       s = fmax(s, fabs(Matrix<DataType>(*i)));
     }
     return s;
@@ -2714,7 +2711,7 @@ namespace casadi {
   Matrix<DataType> Matrix<DataType>::zz_sparsify(double tol) const {
     // Quick return if there are no entries to be removed
     bool remove_nothing = true;
-    for (auto it=begin(); it!=end() && remove_nothing; ++it) {
+    for (auto it=data_.begin(); it!=data_.end() && remove_nothing; ++it) {
       remove_nothing = !casadi_limits<DataType>::isAlmostZero(*it, tol);
     }
     if (remove_nothing) return *this;
@@ -2766,7 +2763,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::set(double val) {
-    std::fill(this->begin(), this->end(), val);
+    std::fill((*this)->begin(), (*this)->end(), val);
   }
 
   template<typename DataType>
@@ -2815,7 +2812,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::setNZ(double val) {
-    std::fill(this->begin(), this->end(), val);
+    std::fill((*this)->begin(), (*this)->end(), val);
   }
 
   template<typename DataType>

@@ -281,29 +281,29 @@ namespace casadi {
   }
 
   void CollocationIntegrator::calculateInitialConditions() {
-    vector<double>::const_iterator x0_it = input(INTEGRATOR_X0).begin();
-    vector<double>::const_iterator z_it = input(INTEGRATOR_Z0).begin();
-    vector<double>::iterator Z_it = Z_.begin();
+    auto x0_it = input(INTEGRATOR_X0)->begin();
+    auto z_it = input(INTEGRATOR_Z0)->begin();
+    auto Z_it = Z_->begin();
     for (int d=0; d<deg_; ++d) {
       copy(x0_it, x0_it+nx_, Z_it);
       Z_it += nx_;
       copy(z_it, z_it+nz_, Z_it);
       Z_it += nz_;
     }
-    casadi_assert(Z_it==Z_.end());
+    casadi_assert(Z_it==Z_->end());
   }
 
   void CollocationIntegrator::calculateInitialConditionsB() {
-    vector<double>::const_iterator rx0_it = input(INTEGRATOR_RX0).begin();
-    vector<double>::const_iterator rz_it = input(INTEGRATOR_RZ0).begin();
-    vector<double>::iterator RZ_it = RZ_.begin();
+    auto rx0_it = input(INTEGRATOR_RX0)->begin();
+    auto rz_it = input(INTEGRATOR_RZ0)->begin();
+    auto RZ_it = RZ_->begin();
     for (int d=0; d<deg_; ++d) {
       copy(rx0_it, rx0_it+nrx_, RZ_it);
       RZ_it += nrx_;
       copy(rz_it, rz_it+nrz_, RZ_it);
       RZ_it += nrz_;
     }
-    casadi_assert(RZ_it==RZ_.end());
+    casadi_assert(RZ_it==RZ_->end());
   }
 
 } // namespace casadi

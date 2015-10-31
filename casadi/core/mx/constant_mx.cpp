@@ -174,7 +174,7 @@ namespace casadi {
     if (this->sparsity()!=node->sparsity()) return false;
 
     // Check indices
-    if (!std::equal(x_.begin(), x_.end(), n->x_.begin())) return false;
+    if (!std::equal(x_->begin(), x_->end(), n->x_->begin())) return false;
 
     return true;
   }

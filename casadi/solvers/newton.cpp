@@ -133,7 +133,7 @@ namespace casadi {
       // Prepare the linear solver with J
       linsol_.setInput(J, LINSOL_A);
       linsol_.prepare();
-      linsol_.solve(&F.front(), 1, false);
+      linsol_.solve(&F->front(), 1, false);
 
       double abstolStep=0;
       if (numeric_limits<double>::infinity() != abstolStep_) {
@@ -158,7 +158,7 @@ namespace casadi {
       }
 
       // Update Xk+1 = Xk - J^(-1) F
-      std::transform(z_.begin(), z_.end(), F.begin(), z_.begin(), std::minus<double>());
+      std::transform(z_.begin(), z_.end(), F->begin(), z_.begin(), std::minus<double>());
     }
 
     // Get the solution

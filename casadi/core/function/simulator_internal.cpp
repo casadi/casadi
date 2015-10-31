@@ -126,7 +126,7 @@ namespace casadi {
       // Save the outputs of the function
       for (int i=0; i<n_out(); ++i) {
         const Matrix<double> &res = integrator_.output(i);
-        copy(res.begin(), res.end(), output(i).begin() + k*res.nnz());
+        copy(res->begin(), res->end(), output(i)->begin() + k*res.nnz());
       }
     }
   }

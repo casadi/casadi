@@ -1272,7 +1272,7 @@ namespace casadi {
     for (int i=0; i<num_in; ++i) {
       argv[i] = SX::zeros(input(i).sparsity());
       if (arg[i] != 0) {
-        std::copy(arg[i], arg[i]+argv[i].nnz(), argv[i].begin());
+        std::copy(arg[i], arg[i]+argv[i].nnz(), argv[i]->begin());
       }
     }
 
@@ -1283,7 +1283,7 @@ namespace casadi {
     // Collect the result
     for (int i = 0; i < num_out; ++i) {
       if (res[i] != 0) {
-        std::copy(resv[i].begin(), resv[i].end(), res[i]);
+        std::copy(resv[i]->begin(), resv[i]->end(), res[i]);
       }
     }
   }

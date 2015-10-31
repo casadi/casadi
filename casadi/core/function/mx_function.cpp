@@ -1047,14 +1047,14 @@ namespace casadi {
         arg[i] = SX::zeros(inputv_[i].sparsity());
 
         // Divide input into primitives and create corresponding SX
-        vector<SXElement>::iterator ait = arg[i].begin();
+        auto ait = arg[i]->begin();
         vector<MX> prim = inputv_[i].primitives();
-        for (vector<MX>::const_iterator pit=prim.begin(); pit!=prim.end(); ++pit) {
+        for (auto pit=prim.begin(); pit!=prim.end(); ++pit) {
           SX t = SX::sym(pit->getName(), pit->sparsity());
-          copy(t.begin(), t.end(), ait);
+          copy(t->begin(), t->end(), ait);
           ait += t.nnz();
         }
-        casadi_assert(ait==arg[i].end());
+        casadi_assert(ait==arg[i]->end());
       }
     } else { // Use provided symbolic input
       // Make sure number of inputs matches

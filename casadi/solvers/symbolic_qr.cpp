@@ -201,7 +201,7 @@ namespace casadi {
 
     // Get A and factorize it
     SX A = SX::zeros(input(LINSOL_A).sparsity());
-    copy(arg[1], arg[1]+A.nnz(), A.begin());
+    copy(arg[1], arg[1]+A.nnz(), A->begin());
     vector<SX> v = fact_fcn_(A);
 
     // Select solve function
@@ -212,9 +212,9 @@ namespace casadi {
     const SXElement* a=arg[0];
     SXElement* r=res[0];
     for (int i=0; i<nrhs; ++i) {
-      copy(a, a+v[2].nnz(), v[2].begin());
+      copy(a, a+v[2].nnz(), v[2]->begin());
       SX rr = solv(v).at(0);
-      copy(rr.begin(), rr.end(), r);
+      copy(rr->begin(), rr->end(), r);
       r += rr.nnz();
     }
   }

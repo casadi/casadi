@@ -940,7 +940,7 @@ namespace casadi {
     if (gauss_newton_) {
       // Gauss-Newton Hessian
       const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
-      fill(qpH_.begin(), qpH_.end(), 0);
+      fill(qpH_->begin(), qpH_->end(), 0);
       casadi_mm_sparse_t(B_obj.ptr(), B_obj.sparsity(), B_obj.ptr(), B_obj.sparsity(),
                          qpH_.ptr(), qpH_.sparsity(), getPtr(work_));
 
@@ -1046,15 +1046,15 @@ namespace casadi {
     vec_fcn_.evaluate();
 
     // Linear offset in the reduced QP
-    transform(g_.begin(), g_.end(), vec_fcn_.output(vec_g_).begin(),
+    transform(g_.begin(), g_.end(), vec_fcn_.output(vec_g_)->begin(),
               qpB_.begin(), std::minus<double>());
 
     // Gradient of the objective in the reduced QP
     if (gauss_newton_) {
-      transform(b_gn_.begin(), b_gn_.end(), vec_fcn_.output(vec_gf_).begin(),
+      transform(b_gn_.begin(), b_gn_.end(), vec_fcn_.output(vec_gf_)->begin(),
                 b_gn_.begin(), std::minus<double>());
     } else {
-      transform(gf_.begin(), gf_.end(), vec_fcn_.output(vec_gf_).begin(),
+      transform(gf_.begin(), gf_.end(), vec_fcn_.output(vec_gf_)->begin(),
                 gf_.begin(), std::minus<double>());
     }
 
@@ -1101,29 +1101,29 @@ namespace casadi {
     qp_solver_.setInputNZ(gf_, QP_SOLVER_G);
     qp_solver_.setInput(qpA_, QP_SOLVER_A);
     std::transform(x_lb_.begin(), x_lb_.end(), x_opt_.begin(),
-                   qp_solver_.input(QP_SOLVER_LBX).begin(), std::minus<double>());
+                   qp_solver_.input(QP_SOLVER_LBX)->begin(), std::minus<double>());
     std::transform(x_ub_.begin(), x_ub_.end(), x_opt_.begin(),
-                   qp_solver_.input(QP_SOLVER_UBX).begin(), std::minus<double>());
+                   qp_solver_.input(QP_SOLVER_UBX)->begin(), std::minus<double>());
     std::transform(g_lb_.begin(), g_lb_.end(), qpB_.begin(),
-                   qp_solver_.input(QP_SOLVER_LBA).begin(), std::minus<double>());
+                   qp_solver_.input(QP_SOLVER_LBA)->begin(), std::minus<double>());
     std::transform(g_ub_.begin(), g_ub_.end(), qpB_.begin(),
-                   qp_solver_.input(QP_SOLVER_UBA).begin(), std::minus<double>());
+                   qp_solver_.input(QP_SOLVER_UBA)->begin(), std::minus<double>());
 
     qp_solver_.evaluate();
 
     // Condensed primal step
     const DMatrix& du = qp_solver_.output(QP_SOLVER_X);
-    copy(du.begin(), du.end(), x_step_.begin());
+    copy(du->begin(), du->end(), x_step_.begin());
 
     // Condensed dual step (simple bounds)
     const DMatrix& lam_x_new = qp_solver_.output(QP_SOLVER_LAM_X);
-    copy(lam_x_new.begin(), lam_x_new.end(), x_dlam_.begin());
+    copy(lam_x_new->begin(), lam_x_new->end(), x_dlam_.begin());
     std::transform(x_dlam_.begin(), x_dlam_.end(), x_lam_.begin(), x_dlam_.begin(),
                    std::minus<double>());
 
     // Condensed dual step (nonlinear bounds)
     const DMatrix& lam_g_new = qp_solver_.output(QP_SOLVER_LAM_A);
-    copy(lam_g_new.begin(), lam_g_new.end(), g_dlam_.begin());
+    copy(lam_g_new->begin(), lam_g_new->end(), g_dlam_.begin());
     std::transform(g_dlam_.begin(), g_dlam_.end(), g_lam_.begin(), g_dlam_.begin(),
                    std::minus<double>());
 
@@ -1274,14 +1274,14 @@ namespace casadi {
     // Expanded primal step
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       const DMatrix& dv = exp_fcn_.output(it->exp_def);
-      copy(dv.begin(), dv.end(), it->step.begin());
+      copy(dv->begin(), dv->end(), it->step.begin());
     }
 
     // Expanded dual step
     if (!gauss_newton_) {
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
-        copy(dlam_v.begin(), dlam_v.end(), it->dlam.begin());
+        copy(dlam_v->begin(), dlam_v->end(), it->dlam.begin());
       }
     }
 

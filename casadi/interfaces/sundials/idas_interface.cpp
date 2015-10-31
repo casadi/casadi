@@ -239,7 +239,7 @@ namespace casadi {
     if (nq_>0) {
 
       // Allocate n-vectors for quadratures
-      q_ = N_VMake_Serial(nq_, &output(INTEGRATOR_QF).front());
+      q_ = N_VMake_Serial(nq_, &output(INTEGRATOR_QF)->front());
 
       // Initialize quadratures in IDAS
       N_VConst(0.0, q_);
@@ -792,9 +792,9 @@ namespace casadi {
 
     // Copy to N_Vectors
     const Matrix<double>& x = output(INTEGRATOR_XF);
-    copy(x.begin(), x.begin()+nx_, NV_DATA_S(xz_));
+    copy(x->begin(), x->begin()+nx_, NV_DATA_S(xz_));
     const Matrix<double>& z = output(INTEGRATOR_ZF);
-    copy(z.begin(), z.end(), NV_DATA_S(xz_)+nx_);
+    copy(z->begin(), z->end(), NV_DATA_S(xz_)+nx_);
     copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(xzdot_));
 
     // Re-initialize
@@ -951,7 +951,7 @@ namespace casadi {
     }
 
     // Save the final state
-    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, output(INTEGRATOR_XF).begin());
+    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, output(INTEGRATOR_XF)->begin());
     // if (nsens_>0) {
     //   for (int i=0; i<nfdir_; ++i) {
     //     copy(NV_DATA_S(xzF_[i]), NV_DATA_S(xzF_[i])+nx_, fwdSens(INTEGRATOR_XF, i).begin());
@@ -959,7 +959,7 @@ namespace casadi {
     // }
 
     // Save the final algebraic variable
-    copy(NV_DATA_S(xz_)+nx_, NV_DATA_S(xz_)+nx_+nz_, output(INTEGRATOR_ZF).begin());
+    copy(NV_DATA_S(xz_)+nx_, NV_DATA_S(xz_)+nx_+nz_, output(INTEGRATOR_ZF)->begin());
 
     // Print statistics
     if (option("print_stats")) printStats(userOut());
@@ -991,7 +991,7 @@ namespace casadi {
 
     // Get the backward state
     const Matrix<double> &rx0 = input(INTEGRATOR_RX0);
-    copy(rx0.begin(), rx0.end(), NV_DATA_S(rxz_));
+    copy(rx0->begin(), rx0->end(), NV_DATA_S(rxz_));
 
     if (isInitAdj_) {
       flag = IDAReInitB(mem_, whichB_, grid_.back(), rxz_, rxzdot_);
@@ -1045,8 +1045,8 @@ namespace casadi {
 
     // Save the backward state and algebraic variable
     const double *rxz = NV_DATA_S(rxz_);
-    copy(rxz, rxz+nrx_, output(INTEGRATOR_RXF).begin());
-    copy(rxz+nrx_, rxz+nrx_+nrz_, output(INTEGRATOR_RZF).begin());
+    copy(rxz, rxz+nrx_, output(INTEGRATOR_RXF)->begin());
+    copy(rxz+nrx_, rxz+nrx_+nrz_, output(INTEGRATOR_RZF)->begin());
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;
