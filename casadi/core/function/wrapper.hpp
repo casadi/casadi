@@ -80,7 +80,7 @@ void Wrapper<Derived>::evaluate() {
 
   // Copy the inputs from external to internal
   for (int i=0;i< d->n_in();++i) {
-    std::copy(d->input(i).begin(), d->input(i).end(), f_.input(i).begin());
+    std::copy(d->input(i)->begin(), d->input(i)->end(), f_.input(i)->begin());
   }
 
   // Evaluate the internal function
@@ -88,7 +88,7 @@ void Wrapper<Derived>::evaluate() {
 
   // Copy the outputs from internal to external
   for (int i=0;i< d->n_out();++i) {
-    std::copy(f_.output(i).begin(), f_.output(i).end(), d->output(i).begin());
+    std::copy(f_.output(i)->begin(), f_.output(i)->end(), d->output(i)->begin());
   }
 }
 #endif
