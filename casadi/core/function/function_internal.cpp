@@ -2116,7 +2116,7 @@ namespace casadi {
       for (int i=0; i<n_in; ++i) {
         std::string p = "argv[" + g.to_string(i) + "]";
         s << "  if (--argc>=0) arg[" << i << "] = "
-               << g.from_mex(p, "w", offset, input(i).sparsity(), fw) << endl;
+          << g.from_mex(p, "w", offset, input(i).sparsity(), fw) << endl;
         offset += input(i).nnz();
       }
 
@@ -2160,15 +2160,15 @@ namespace casadi {
       // Work vectors and input and output buffers
       size_t nr = sz_w() + nnz_in() + nnz_out();
       s << "  int iw[" << sz_iw() << "];" << endl
-             << "  real_t w[" << nr << "];" << endl;
+        << "  real_t w[" << nr << "];" << endl;
 
       // Input buffers
       s << "  const real_t* arg[" << n_in << "] = {";
       int off=0;
       for (int i=0; i<n_in; ++i) {
         if (i!=0) s << ", ";
-        s << g.work(off, input(i).nnz());
-        off += input(i).nnz();
+        s << "w+" << off;
+        off += nnz_in(i);
       }
       s << "};" << endl;
 
@@ -2176,25 +2176,26 @@ namespace casadi {
       s << "  real_t* res[" << n_out << "] = {";
       for (int i=0; i<n_out; ++i) {
         if (i!=0) s << ", ";
-        s << g.work(off, output(i).nnz());
-        off += output(i).nnz();
+        s << "w+" << off;
+        off += nnz_out(i);
       }
       s << "};" << endl;
 
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
       s << "  int j;" << endl
-             << "  real_t* a = w;" << endl
-             << "  for (j=0; j<" << nnz_in() << "; ++j) "
-             << "scanf(\"%lf\", a++);" << endl;
+        << "  real_t* a = w;" << endl
+        << "  for (j=0; j<" << nnz_in() << "; ++j) "
+        << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
-      s << "  int flag = eval(arg, res, iw, w+" << off << ");" << endl
-             << "  if (flag) return flag;" << endl;
+      s << "  int flag = " << fname << "(arg, res, iw, w+" << off << ");" << endl
+        << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
       s << "  const real_t* r = w+" << nnz_in() << ";" << endl
-             << "  for (j=0; j<" << nnz_out() << "; ++j) "
-             << g.printf("%g ", "*r++") << endl;
+        << "  for (j=0; j<" << nnz_out() << "; ++j) "
+        << g.printf("%g ", "*r++") << endl;
+
       // End with newline
       s << "  " << g.printf("\\n") << endl;
 

@@ -66,9 +66,13 @@ namespace casadi {
     // Includes needed
     if (this->main) addInclude("stdio.h");
 
+    // Mex and main needs string.h
+    if (this->mex || this->main) {
+      addInclude("string.h");
+    }
+
     // Mex file?
     if (this->mex) {
-      addInclude("string.h");
       addInclude("mex.h", false, "MATLAB_MEX_FILE");
       // Define printf (note file should be compilable both with and without mex)
       this->auxiliaries
@@ -216,9 +220,27 @@ namespace casadi {
 
     // Generate main
     if (this->main) {
-      s[0] << "int main(int argc, char* argv[]) {" << endl
-           << "  return main_eval(argc, argv);" << endl
-           << "}" << endl << endl;
+      s[0] << "int main(int argc, char* argv[]) {" << endl;
+
+      // Create switch
+      s[0] << "  if (argc<2) {" << endl
+           << "    /* name error */" << endl;
+      for (int i=0; i<exposed_fname.size(); ++i) {
+        s[0] << "  } else if (strcmp(argv[1], \"" << exposed_fname[i] << "\")==0) {" << endl
+             << "    return main_" << exposed_fname[i] << "(argc-2, argv+2);" << endl;
+      }
+      s[0] << "  }" << endl;
+
+      // Error
+      s[0] << "  fprintf(stderr, \"First input should be a command string. Possible values:";
+      for (int i=0; i<exposed_fname.size(); ++i) {
+        s[0] << " '" << exposed_fname[i] << "'";
+      }
+      s[0] << "\\n\");" << endl;
+
+      // End main
+      s[0] << "  return 1;" << endl
+           << "}" << endl;
     }
 
     // Finalize file(s)
