@@ -38,7 +38,7 @@
 /// \cond INTERNAL
 
 namespace casadi {
-  /** \brief  An atomic operation for the SXElement virtual machine */
+  /** \brief  An atomic operation for the SXElem virtual machine */
   struct ScalarAtomic {
     int op;     /// Operator index
     int i0;
@@ -84,25 +84,25 @@ namespace casadi {
     \date 2010-2015
 */
 class CASADI_EXPORT SXFunction :
-        public XFunction<SXFunction, Matrix<SXElement>, SXNode>{
+        public XFunction<SXFunction, Matrix<SXElem>, SXNode>{
   public:
     /** \brief Constructor */
     SXFunction(const std::string& name,
-                       const std::vector<Matrix<SXElement> >& inputv,
-                       const std::vector<Matrix<SXElement> >& outputv);
+                       const std::vector<Matrix<SXElem> >& inputv,
+                       const std::vector<Matrix<SXElem> >& outputv);
 
   /** \brief  Destructor */
   virtual ~SXFunction();
 
   /** \brief  Evaluate numerically, work vectors given */
-  virtual void evalD(const double** arg, double** res, int* iw, double* w);
+  virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
   /** \brief Quickfix to avoid segfault, #1552 */
   virtual bool canEvalSX() const {return true;}
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSX(const SXElement** arg, SXElement** res,
-                      int* iw, SXElement* w);
+  virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
+                      int* iw, SXElem* w);
 
   /** \brief Calculate forward mode directional derivatives */
   virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,
@@ -203,14 +203,14 @@ class CASADI_EXPORT SXFunction :
   std::vector<AlgEl> algorithm_;
 
   /// work vector for symbolic calculations (allocated first time)
-  std::vector<SXElement> s_work_;
-  std::vector<SXElement> free_vars_;
+  std::vector<SXElem> s_work_;
+  std::vector<SXElem> free_vars_;
 
   /// The expressions corresponding to each binary operation
-  std::vector<SXElement> operations_;
+  std::vector<SXElem> operations_;
 
   /// The expressions corresponding to each constant
-  std::vector<SXElement> constants_;
+  std::vector<SXElem> constants_;
 
   /** \brief  Initialize */
   virtual void init();
@@ -222,10 +222,10 @@ class CASADI_EXPORT SXFunction :
   virtual void generateBody(CodeGenerator& g) const;
 
   /** \brief  Propagate sparsity forward */
-  virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+  virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
   /** \brief  Propagate sparsity backwards */
-  virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+  virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
   /// Is the class able to propagate seeds through the algorithm?
   virtual bool spCanEvaluate(bool fwd) { return true;}

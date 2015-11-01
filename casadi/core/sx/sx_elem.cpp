@@ -23,7 +23,7 @@
  */
 
 
-#include "sx_element.hpp"
+#include "sx_elem.hpp"
 #include "../matrix/matrix.hpp"
 #include <stack>
 #include <cassert>
@@ -42,51 +42,51 @@ namespace casadi {
   CACHING_MAP<int, IntegerSX*> IntegerSX::cached_constants_;
   CACHING_MAP<double, RealtypeSX*> RealtypeSX::cached_constants_;
 
-  SXElement::SXElement() {
-    node = casadi_limits<SXElement>::nan.node;
+  SXElem::SXElem() {
+    node = casadi_limits<SXElem>::nan.node;
     node->count++;
   }
 
-  SXElement::SXElement(SXNode* node_, bool dummy) : node(node_) {
+  SXElem::SXElem(SXNode* node_, bool dummy) : node(node_) {
     node->count++;
   }
 
-  SXElement SXElement::create(SXNode* node) {
-    return SXElement(node, false);
+  SXElem SXElem::create(SXNode* node) {
+    return SXElem(node, false);
   }
 
-  SXElement::SXElement(const SXElement& scalar) {
+  SXElem::SXElem(const SXElem& scalar) {
     node = scalar.node;
     node->count++;
   }
 
-  SXElement::SXElement(double val) {
+  SXElem::SXElem(double val) {
     int intval = static_cast<int>(val);
     if (val-intval == 0) { // check if integer
-      if (intval == 0)             node = casadi_limits<SXElement>::zero.node;
-      else if (intval == 1)        node = casadi_limits<SXElement>::one.node;
-      else if (intval == 2)        node = casadi_limits<SXElement>::two.node;
-      else if (intval == -1)       node = casadi_limits<SXElement>::minus_one.node;
+      if (intval == 0)             node = casadi_limits<SXElem>::zero.node;
+      else if (intval == 1)        node = casadi_limits<SXElem>::one.node;
+      else if (intval == 2)        node = casadi_limits<SXElem>::two.node;
+      else if (intval == -1)       node = casadi_limits<SXElem>::minus_one.node;
       else                        node = IntegerSX::create(intval);
       node->count++;
     } else {
-      if (isnan(val))              node = casadi_limits<SXElement>::nan.node;
-      else if (isinf(val))         node = val > 0 ? casadi_limits<SXElement>::inf.node :
-                                      casadi_limits<SXElement>::minus_inf.node;
+      if (isnan(val))              node = casadi_limits<SXElem>::nan.node;
+      else if (isinf(val))         node = val > 0 ? casadi_limits<SXElem>::inf.node :
+                                      casadi_limits<SXElem>::minus_inf.node;
       else                        node = RealtypeSX::create(val);
       node->count++;
     }
   }
 
-  SXElement SXElement::sym(const std::string& name) {
+  SXElem SXElem::sym(const std::string& name) {
     return create(new SymbolicSX(name));
   }
 
-  SXElement::~SXElement() {
+  SXElem::~SXElem() {
     if (--node->count == 0) delete node;
   }
 
-  SXElement& SXElement::operator=(const SXElement &scalar) {
+  SXElem& SXElem::operator=(const SXElem &scalar) {
     // quick return if the old and new pointers point to the same object
     if (node == scalar.node) return *this;
 
@@ -99,14 +99,14 @@ namespace casadi {
     return *this;
   }
 
-  void SXElement::assignIfDuplicate(const SXElement& scalar, int depth) {
+  void SXElem::assignIfDuplicate(const SXElem& scalar, int depth) {
     casadi_assert(depth>=1);
     if (!is_equal(*this, scalar, 0) && is_equal(*this, scalar, depth)) {
       *this = scalar;
     }
   }
 
-  SXNode* SXElement::assignNoDelete(const SXElement& scalar) {
+  SXNode* SXElem::assignNoDelete(const SXElem& scalar) {
     // Return value
     SXNode* ret = node;
 
@@ -124,20 +124,20 @@ namespace casadi {
     return ret;
   }
 
-  SXElement& SXElement::operator=(double scalar) {
-    return *this = SXElement(scalar);
+  SXElem& SXElem::operator=(double scalar) {
+    return *this = SXElem(scalar);
   }
 
-  void SXElement::repr(std::ostream &stream, bool trailing_newline) const {
+  void SXElem::repr(std::ostream &stream, bool trailing_newline) const {
     print(stream, trailing_newline);
   }
 
-  void SXElement::print(std::ostream &stream, bool trailing_newline) const {
+  void SXElem::print(std::ostream &stream, bool trailing_newline) const {
     node->print(stream);
     if (trailing_newline) stream << std::endl;
   }
 
-  SXElement SXElement::operator-() const {
+  SXElem SXElem::operator-() const {
     if (isOp(OP_NEG))
       return getDep();
     else if (is_zero())
@@ -150,24 +150,24 @@ namespace casadi {
       return UnarySX::create(OP_NEG, *this);
   }
 
-  SXElement SXElement::zz_sign() const {
+  SXElem SXElem::zz_sign() const {
     return UnarySX::create(OP_SIGN, *this);
   }
 
-  SXElement SXElement::zz_copysign(const SXElement &y) const {
+  SXElem SXElem::zz_copysign(const SXElem &y) const {
     return BinarySX::create(OP_COPYSIGN, *this, y);
   }
 
-  SXElement SXElement::zz_erfinv() const {
+  SXElem SXElem::zz_erfinv() const {
     return UnarySX::create(OP_ERFINV, *this);
   }
 
-  bool SXElement::__nonzero__() const {
+  bool SXElem::__nonzero__() const {
     if (is_constant()) return !is_zero();
-    casadi_error("Cannot compute the truth value of a CasADi SXElement symbolic expression.")
+    casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.")
   }
 
-  SXElement SXElement::zz_plus(const SXElement& y) const {
+  SXElem SXElem::zz_plus(const SXElem& y) const {
     // NOTE: Only simplifications that do not result in extra nodes area allowed
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_ADD, *this, y);
@@ -203,7 +203,7 @@ namespace casadi {
       return BinarySX::create(OP_ADD, *this, y);
   }
 
-  SXElement SXElement::zz_minus(const SXElement& y) const {
+  SXElem SXElem::zz_minus(const SXElem& y) const {
     // Only simplifications that do not result in extra nodes area allowed
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_SUB, *this, y);
@@ -230,7 +230,7 @@ namespace casadi {
       return BinarySX::create(OP_SUB, *this, y);
   }
 
-  SXElement SXElement::zz_times(const SXElement& y) const {
+  SXElem SXElem::zz_times(const SXElem& y) const {
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_MUL, *this, y);
 
@@ -273,17 +273,17 @@ namespace casadi {
   }
 
 
-  bool SXElement::isDoubled() const {
+  bool SXElem::isDoubled() const {
     return isOp(OP_ADD) && is_equal(getDep(0), getDep(1), SXNode::eq_depth_);
   }
 
-  SXElement SXElement::zz_rdivide(const SXElement& y) const {
+  SXElem SXElem::zz_rdivide(const SXElem& y) const {
     // Only simplifications that do not result in extra nodes area allowed
 
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_DIV, *this, y);
 
     if (y->is_zero()) // term2 is zero
-      return casadi_limits<SXElement>::nan;
+      return casadi_limits<SXElem>::nan;
     else if (is_zero()) // term1 is zero
       return 0;
     else if (y->is_one()) // term2 is one
@@ -329,7 +329,7 @@ namespace casadi {
       return BinarySX::create(OP_DIV, *this, y);
   }
 
-  SXElement SXElement::inv() const {
+  SXElem SXElem::inv() const {
     if (isOp(OP_INV)) {
       return getDep(0);
     } else {
@@ -337,143 +337,143 @@ namespace casadi {
     }
   }
 
-  SX SXElement::zz_min(const SX& b) const {
+  SX SXElem::zz_min(const SX& b) const {
     return fmin(SX(*this), b);
   }
-  SX SXElement::zz_max(const SX& b) const {
+  SX SXElem::zz_max(const SX& b) const {
     return fmax(SX(*this), b);
   }
-  SX SXElement::zz_constpow(const SX& n) const {
+  SX SXElem::zz_constpow(const SX& n) const {
     return SX(*this).zz_constpow(n);
   }
-  SX SXElement::zz_copysign(const SX& n) const {
+  SX SXElem::zz_copysign(const SX& n) const {
     return SX(*this).zz_copysign(n);
   }
 
-  SX SXElement::zz_atan2(const SX& b) const {
+  SX SXElem::zz_atan2(const SX& b) const {
     return atan2(SX(*this), b);
   }
 
-  SXElement SXElement::zz_le(const SXElement& y) const {
+  SXElem SXElem::zz_le(const SXElem& y) const {
     if ((y-(*this)).isNonNegative())
       return 1;
     else
       return BinarySX::create(OP_LE, *this, y);
   }
 
-  SXElement SXElement::zz_lt(const SXElement& y) const {
+  SXElem SXElem::zz_lt(const SXElem& y) const {
     if (((*this)-y).isNonNegative())
       return 0;
     else
       return BinarySX::create(OP_LT, *this, y);
   }
 
-  SXElement SXElement::zz_eq(const SXElement& y) const {
+  SXElem SXElem::zz_eq(const SXElem& y) const {
     if (is_equal(*this, y))
       return 1;
     else
       return BinarySX::create(OP_EQ, *this, y);
   }
 
-  SXElement SXElement::zz_ne(const SXElement& y) const {
+  SXElem SXElem::zz_ne(const SXElem& y) const {
     if (is_equal(*this, y))
       return 0;
     else
       return BinarySX::create(OP_NE, *this, y);
   }
 
-  SXNode* SXElement::get() const {
+  SXNode* SXElem::get() const {
     return node;
   }
 
-  const SXNode* SXElement::operator->() const {
+  const SXNode* SXElem::operator->() const {
     return node;
   }
 
-  SXNode* SXElement::operator->() {
+  SXNode* SXElem::operator->() {
     return node;
   }
 
-  SXElement if_else(const SXElement& cond, const SXElement& if_true,
-                    const SXElement& if_false, bool short_circuit) {
+  SXElem if_else(const SXElem& cond, const SXElem& if_true,
+                    const SXElem& if_false, bool short_circuit) {
     return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
   }
 
-  SXElement SXElement::binary(int op, const SXElement& x, const SXElement& y) {
+  SXElem SXElem::binary(int op, const SXElem& x, const SXElem& y) {
     return BinarySX::create(Operation(op), x, y);
   }
 
-  SXElement SXElement::unary(int op, const SXElement& x) {
+  SXElem SXElem::unary(int op, const SXElem& x) {
     return UnarySX::create(Operation(op), x);
   }
 
-  bool SXElement::is_leaf() const {
+  bool SXElem::is_leaf() const {
     if (!node) return true;
     return is_constant() || is_symbolic();
   }
 
-  bool SXElement::is_commutative() const {
+  bool SXElem::is_commutative() const {
     if (!hasDep()) throw CasadiException("SX::is_commutative: must be binary");
     return operation_checker<CommChecker>(op());
   }
 
-  bool SXElement::is_constant() const {
+  bool SXElem::is_constant() const {
     return node->is_constant();
   }
 
-  bool SXElement::is_integer() const {
+  bool SXElem::is_integer() const {
     return node->is_integer();
   }
 
-  bool SXElement::is_symbolic() const {
+  bool SXElem::is_symbolic() const {
     return node->is_symbolic();
   }
 
-  bool SXElement::hasDep() const {
+  bool SXElem::hasDep() const {
     return node->hasDep();
   }
 
-  bool SXElement::is_zero() const {
+  bool SXElem::is_zero() const {
     return node->is_zero();
   }
 
-  bool SXElement::isAlmostZero(double tol) const {
+  bool SXElem::isAlmostZero(double tol) const {
     return node->isAlmostZero(tol);
   }
 
-  bool SXElement::is_one() const {
+  bool SXElem::is_one() const {
     return node->is_one();
   }
 
-  bool SXElement::is_minus_one() const {
+  bool SXElem::is_minus_one() const {
     return node->is_minus_one();
   }
 
-  bool SXElement::isNan() const {
+  bool SXElem::isNan() const {
     return node->isNan();
   }
 
-  bool SXElement::isInf() const {
+  bool SXElem::isInf() const {
     return node->isInf();
   }
 
-  bool SXElement::isMinusInf() const {
+  bool SXElem::isMinusInf() const {
     return node->isMinusInf();
   }
 
-  const std::string& SXElement::getName() const {
+  const std::string& SXElem::getName() const {
     return node->getName();
   }
 
-  int SXElement::op() const {
+  int SXElem::op() const {
     return node->op();
   }
 
-  bool SXElement::isOp(int op) const {
+  bool SXElem::isOp(int op) const {
     return hasDep() && op==this->op();
   }
 
-  bool SXElement::zz_is_equal(const SXElement& ex, int depth) const {
+  bool SXElem::zz_is_equal(const SXElem& ex, int depth) const {
     if (node==ex.get())
       return true;
     else if (depth>0)
@@ -482,7 +482,7 @@ namespace casadi {
       return false;
   }
 
-  bool SXElement::isNonNegative() const {
+  bool SXElem::isNonNegative() const {
     if (is_constant())
       return getValue()>=0;
     else if (isOp(OP_SQ) || isOp(OP_FABS))
@@ -491,96 +491,96 @@ namespace casadi {
       return false;
   }
 
-  double SXElement::getValue() const {
+  double SXElem::getValue() const {
     return node->getValue();
   }
 
-  int SXElement::getIntValue() const {
+  int SXElem::getIntValue() const {
     return node->getIntValue();
   }
 
-  SXElement SXElement::getDep(int ch) const {
+  SXElem SXElem::getDep(int ch) const {
     casadi_assert(ch==0 || ch==1;)
       return node->dep(ch);
   }
 
-  int SXElement::getNdeps() const {
+  int SXElem::getNdeps() const {
     if (!hasDep()) throw CasadiException("SX::getNdeps: must be binary");
     return casadi_math<double>::ndeps(op());
   }
 
-  size_t SXElement::__hash__() const {
+  size_t SXElem::__hash__() const {
     return reinterpret_cast<size_t>(node);
   }
 
   // node corresponding to a constant 0
-  const SXElement casadi_limits<SXElement>::zero(new ZeroSX(), false);
+  const SXElem casadi_limits<SXElem>::zero(new ZeroSX(), false);
   // node corresponding to a constant 1
-  const SXElement casadi_limits<SXElement>::one(new OneSX(), false);
+  const SXElem casadi_limits<SXElem>::one(new OneSX(), false);
   // node corresponding to a constant 2
-  const SXElement casadi_limits<SXElement>::two(IntegerSX::create(2), false);
+  const SXElem casadi_limits<SXElem>::two(IntegerSX::create(2), false);
   // node corresponding to a constant -1
-  const SXElement casadi_limits<SXElement>::minus_one(new MinusOneSX(), false);
-  const SXElement casadi_limits<SXElement>::nan(new NanSX(), false);
-  const SXElement casadi_limits<SXElement>::inf(new InfSX(), false);
-  const SXElement casadi_limits<SXElement>::minus_inf(new MinusInfSX(), false);
+  const SXElem casadi_limits<SXElem>::minus_one(new MinusOneSX(), false);
+  const SXElem casadi_limits<SXElem>::nan(new NanSX(), false);
+  const SXElem casadi_limits<SXElem>::inf(new InfSX(), false);
+  const SXElem casadi_limits<SXElem>::minus_inf(new MinusInfSX(), false);
 
-  bool casadi_limits<SXElement>::is_zero(const SXElement& val) {
+  bool casadi_limits<SXElem>::is_zero(const SXElem& val) {
     return val.is_zero();
   }
 
-  bool casadi_limits<SXElement>::isAlmostZero(const SXElement& val, double tol) {
+  bool casadi_limits<SXElem>::isAlmostZero(const SXElem& val, double tol) {
     return val.isAlmostZero(tol);
   }
 
-  bool casadi_limits<SXElement>::is_one(const SXElement& val) {
+  bool casadi_limits<SXElem>::is_one(const SXElem& val) {
     return val.is_one();
   }
 
-  bool casadi_limits<SXElement>::is_minus_one(const SXElement& val) {
+  bool casadi_limits<SXElem>::is_minus_one(const SXElem& val) {
     return val.is_minus_one();
   }
 
-  bool casadi_limits<SXElement>::is_constant(const SXElement& val) {
+  bool casadi_limits<SXElem>::is_constant(const SXElem& val) {
     return val.is_constant();
   }
 
-  bool casadi_limits<SXElement>::is_integer(const SXElement& val) {
+  bool casadi_limits<SXElem>::is_integer(const SXElem& val) {
     return val.is_integer();
   }
 
-  bool casadi_limits<SXElement>::isInf(const SXElement& val) {
+  bool casadi_limits<SXElem>::isInf(const SXElem& val) {
     return val.isInf();
   }
 
-  bool casadi_limits<SXElement>::isMinusInf(const SXElement& val) {
+  bool casadi_limits<SXElem>::isMinusInf(const SXElem& val) {
     return val.isMinusInf();
   }
 
-  bool casadi_limits<SXElement>::isNaN(const SXElement& val) {
+  bool casadi_limits<SXElem>::isNaN(const SXElem& val) {
     return val.isNan();
   }
 
-  SXElement SXElement::zz_exp() const {
+  SXElem SXElem::zz_exp() const {
     return UnarySX::create(OP_EXP, *this);
   }
 
-  SXElement SXElement::zz_log() const {
+  SXElem SXElem::zz_log() const {
     return UnarySX::create(OP_LOG, *this);
   }
 
-  SXElement SXElement::zz_log10() const {
+  SXElem SXElem::zz_log10() const {
     return log(*this)*(1/std::log(10.));
   }
 
-  SXElement SXElement::zz_sqrt() const {
+  SXElem SXElem::zz_sqrt() const {
     if (isOp(OP_SQ))
       return fabs(getDep());
     else
       return UnarySX::create(OP_SQRT, *this);
   }
 
-  SXElement SXElement::sq() const {
+  SXElem SXElem::sq() const {
     if (isOp(OP_SQRT))
       return getDep();
     else if (isOp(OP_NEG))
@@ -589,116 +589,116 @@ namespace casadi {
       return UnarySX::create(OP_SQ, *this);
   }
 
-  SXElement SXElement::zz_sin() const {
+  SXElem SXElem::zz_sin() const {
     return UnarySX::create(OP_SIN, *this);
   }
 
-  SXElement SXElement::zz_cos() const {
+  SXElem SXElem::zz_cos() const {
     return UnarySX::create(OP_COS, *this);
   }
 
-  SXElement SXElement::zz_tan() const {
+  SXElem SXElem::zz_tan() const {
     return UnarySX::create(OP_TAN, *this);
   }
 
-  SXElement SXElement::zz_asin() const {
+  SXElem SXElem::zz_asin() const {
     return UnarySX::create(OP_ASIN, *this);
   }
 
-  SXElement SXElement::zz_acos() const {
+  SXElem SXElem::zz_acos() const {
     return UnarySX::create(OP_ACOS, *this);
   }
 
-  SXElement SXElement::zz_atan() const {
+  SXElem SXElem::zz_atan() const {
     return UnarySX::create(OP_ATAN, *this);
   }
 
-  SXElement SXElement::zz_sinh() const {
+  SXElem SXElem::zz_sinh() const {
     if (is_zero())
       return 0;
     else
       return UnarySX::create(OP_SINH, *this);
   }
 
-  SXElement SXElement::zz_cosh() const {
+  SXElem SXElem::zz_cosh() const {
     if (is_zero())
       return 1;
     else
       return UnarySX::create(OP_COSH, *this);
   }
 
-  SXElement SXElement::zz_tanh() const {
+  SXElem SXElem::zz_tanh() const {
     if (is_zero())
       return 0;
     else
       return UnarySX::create(OP_TANH, *this);
   }
 
-  SXElement SXElement::zz_atanh() const {
+  SXElem SXElem::zz_atanh() const {
     if (is_zero())
       return 0;
     else
       return UnarySX::create(OP_ATANH, *this);
   }
 
-  SXElement SXElement::zz_acosh() const {
+  SXElem SXElem::zz_acosh() const {
     if (is_one())
       return 0;
     else
       return UnarySX::create(OP_ACOSH, *this);
   }
 
-  SXElement SXElement::zz_asinh() const {
+  SXElem SXElem::zz_asinh() const {
     if (is_zero())
       return 0;
     else
       return UnarySX::create(OP_ASINH, *this);
   }
 
-  SXElement SXElement::zz_floor() const {
+  SXElem SXElem::zz_floor() const {
     return UnarySX::create(OP_FLOOR, *this);
   }
 
-  SXElement SXElement::zz_ceil() const {
+  SXElem SXElem::zz_ceil() const {
     return UnarySX::create(OP_CEIL, *this);
   }
 
-  SXElement SXElement::zz_mod(const SXElement &b) const {
+  SXElem SXElem::zz_mod(const SXElem &b) const {
     return BinarySX::create(OP_FMOD, *this, b);
   }
 
-  SXElement SXElement::zz_erf() const {
+  SXElem SXElem::zz_erf() const {
     return UnarySX::create(OP_ERF, *this);
   }
 
-  SXElement SXElement::zz_abs() const {
+  SXElem SXElem::zz_abs() const {
     if (isOp(OP_FABS) || isOp(OP_SQ))
       return *this;
     else
       return UnarySX::create(OP_FABS, *this);
   }
 
-  SXElement::operator SX() const {
+  SXElem::operator SX() const {
     return SX(Sparsity::scalar(), *this, false);
   }
 
-  SXElement SXElement::zz_min(const SXElement &b) const {
+  SXElem SXElem::zz_min(const SXElem &b) const {
     return BinarySX::create(OP_FMIN, *this, b);
   }
 
-  SXElement SXElement::zz_max(const SXElement &b) const {
+  SXElem SXElem::zz_max(const SXElem &b) const {
     return BinarySX::create(OP_FMAX, *this, b);
   }
 
-  SXElement SXElement::zz_atan2(const SXElement &b) const {
+  SXElem SXElem::zz_atan2(const SXElem &b) const {
     return BinarySX::create(OP_ATAN2, *this, b);
   }
 
-  SXElement SXElement::printme(const SXElement &b) const {
+  SXElem SXElem::printme(const SXElem &b) const {
     return BinarySX::create(OP_PRINTME, *this, b);
   }
 
-  SXElement SXElement::zz_power(const SXElement& n) const {
+  SXElem SXElem::zz_power(const SXElem& n) const {
     if (n->is_constant()) {
       if (n->is_integer()) {
         int nn = n->getIntValue();
@@ -711,7 +711,7 @@ namespace casadi {
         } else if (nn%2 == 1) { // odd power
           return *this*pow(*this, nn-1);
         } else { // even power
-          SXElement rt = pow(*this, nn/2);
+          SXElem rt = pow(*this, nn/2);
           return rt*rt;
         }
       } else if (n->getValue()==0.5) {
@@ -724,11 +724,11 @@ namespace casadi {
     }
   }
 
-  SXElement SXElement::zz_constpow(const SXElement& n) const {
+  SXElem SXElem::zz_constpow(const SXElem& n) const {
     return BinarySX::create(OP_CONSTPOW, *this, n);
   }
 
-  SXElement SXElement::zz_not() const {
+  SXElem SXElem::zz_not() const {
     if (isOp(OP_NOT)) {
       return getDep();
     } else {
@@ -736,15 +736,15 @@ namespace casadi {
     }
   }
 
-  SXElement SXElement::zz_and(const SXElement& y) const {
+  SXElem SXElem::zz_and(const SXElem& y) const {
     return BinarySX::create(OP_AND, *this, y);
   }
 
-  SXElement SXElement::zz_or(const SXElement& y) const {
+  SXElem SXElem::zz_or(const SXElem& y) const {
     return BinarySX::create(OP_OR, *this, y);
   }
 
-  SXElement SXElement::zz_if_else_zero(const SXElement& y) const {
+  SXElem SXElem::zz_if_else_zero(const SXElem& y) const {
     if (y->is_zero()) {
       return y;
     } else if (is_constant()) {
@@ -755,27 +755,27 @@ namespace casadi {
     }
   }
 
-  int SXElement::getTemp() const {
+  int SXElem::getTemp() const {
     return (*this)->temp;
   }
 
-  void SXElement::setTemp(int t) {
+  void SXElem::setTemp(int t) {
     (*this)->temp = t;
   }
 
-  bool SXElement::marked() const {
+  bool SXElem::marked() const {
     return (*this)->marked();
   }
 
-  void SXElement::mark() {
+  void SXElem::mark() {
     (*this)->mark();
   }
 
-  bool SXElement::is_regular() const {
+  bool SXElem::is_regular() const {
     if (is_constant()) {
       return !(isNan() || isInf() || isMinusInf());
     } else {
-      casadi_error("Cannot check regularity for symbolic SXElement");
+      casadi_error("Cannot check regularity for symbolic SXElem");
     }
   }
 
@@ -784,54 +784,54 @@ namespace casadi {
 using namespace casadi;
 namespace std {
 /**
-  const bool numeric_limits<casadi::SXElement>::is_specialized = true;
-  const int  numeric_limits<casadi::SXElement>::digits = 0;
-  const int  numeric_limits<casadi::SXElement>::digits10 = 0;
-  const bool numeric_limits<casadi::SXElement>::is_signed = false;
-  const bool numeric_limits<casadi::SXElement>::is_integer = false;
-  const bool numeric_limits<casadi::SXElement>::is_exact = false;
-  const int numeric_limits<casadi::SXElement>::radix = 0;
-  const int  numeric_limits<casadi::SXElement>::min_exponent = 0;
-  const int  numeric_limits<casadi::SXElement>::min_exponent10 = 0;
-  const int  numeric_limits<casadi::SXElement>::max_exponent = 0;
-  const int  numeric_limits<casadi::SXElement>::max_exponent10 = 0;
+  const bool numeric_limits<casadi::SXElem>::is_specialized = true;
+  const int  numeric_limits<casadi::SXElem>::digits = 0;
+  const int  numeric_limits<casadi::SXElem>::digits10 = 0;
+  const bool numeric_limits<casadi::SXElem>::is_signed = false;
+  const bool numeric_limits<casadi::SXElem>::is_integer = false;
+  const bool numeric_limits<casadi::SXElem>::is_exact = false;
+  const int numeric_limits<casadi::SXElem>::radix = 0;
+  const int  numeric_limits<casadi::SXElem>::min_exponent = 0;
+  const int  numeric_limits<casadi::SXElem>::min_exponent10 = 0;
+  const int  numeric_limits<casadi::SXElem>::max_exponent = 0;
+  const int  numeric_limits<casadi::SXElem>::max_exponent10 = 0;
 
-  const bool numeric_limits<casadi::SXElement>::has_infinity = true;
-  const bool numeric_limits<casadi::SXElement>::has_quiet_NaN = true;
-  const bool numeric_limits<casadi::SXElement>::has_signaling_NaN = false;
+  const bool numeric_limits<casadi::SXElem>::has_infinity = true;
+  const bool numeric_limits<casadi::SXElem>::has_quiet_NaN = true;
+  const bool numeric_limits<casadi::SXElem>::has_signaling_NaN = false;
   const float_denorm_style has_denorm = denorm absent;
-  const bool numeric_limits<casadi::SXElement>::has_denorm_loss = false;
+  const bool numeric_limits<casadi::SXElem>::has_denorm_loss = false;
 
-  const bool numeric_limits<casadi::SXElement>::is_iec559 = false;
-  const bool numeric_limits<casadi::SXElement>::is_bounded = false;
-  const bool numeric_limits<casadi::SXElement>::is_modulo = false;
+  const bool numeric_limits<casadi::SXElem>::is_iec559 = false;
+  const bool numeric_limits<casadi::SXElem>::is_bounded = false;
+  const bool numeric_limits<casadi::SXElem>::is_modulo = false;
 
-  const bool numeric_limits<casadi::SXElement>::traps = false;
-  const bool numeric_limits<casadi::SXElement>::tinyness_before = false;
-  const float_round_style numeric_limits<casadi::SXElement>::round_style = round_toward_zero;
+  const bool numeric_limits<casadi::SXElem>::traps = false;
+  const bool numeric_limits<casadi::SXElem>::tinyness_before = false;
+  const float_round_style numeric_limits<casadi::SXElem>::round_style = round_toward_zero;
 */
-  SXElement numeric_limits<SXElement>::infinity() throw() {
-    return casadi::casadi_limits<SXElement>::inf;
+  SXElem numeric_limits<SXElem>::infinity() throw() {
+    return casadi::casadi_limits<SXElem>::inf;
   }
 
-  SXElement numeric_limits<SXElement>::quiet_NaN() throw() {
-    return casadi::casadi_limits<SXElement>::nan;
+  SXElem numeric_limits<SXElem>::quiet_NaN() throw() {
+    return casadi::casadi_limits<SXElem>::nan;
   }
 
-  SXElement numeric_limits<SXElement>::min() throw() {
-    return SXElement(numeric_limits<double>::min());
+  SXElem numeric_limits<SXElem>::min() throw() {
+    return SXElem(numeric_limits<double>::min());
   }
 
-  SXElement numeric_limits<SXElement>::max() throw() {
-    return SXElement(numeric_limits<double>::max());
+  SXElem numeric_limits<SXElem>::max() throw() {
+    return SXElem(numeric_limits<double>::max());
   }
 
-  SXElement numeric_limits<SXElement>::epsilon() throw() {
-    return SXElement(numeric_limits<double>::epsilon());
+  SXElem numeric_limits<SXElem>::epsilon() throw() {
+    return SXElem(numeric_limits<double>::epsilon());
   }
 
-  SXElement numeric_limits<SXElement>::round_error() throw() {
-    return SXElement(numeric_limits<double>::round_error());
+  SXElem numeric_limits<SXElem>::round_error() throw() {
+    return SXElem(numeric_limits<double>::round_error());
   }
 
 } // namespace std

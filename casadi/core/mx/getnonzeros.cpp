@@ -35,14 +35,14 @@ namespace casadi {
     setDependencies(y);
   }
 
-  void GetNonzerosVector::evalD(const double** arg, double** res,
+  void GetNonzerosVector::evalD(void* mem, const double** arg, double** res,
                                 int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void GetNonzerosVector::evalSX(const SXElement** arg, SXElement** res,
-                                 int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void GetNonzerosVector::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                 int* iw, SXElem* w) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
@@ -55,14 +55,14 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice::evalD(const double** arg, double** res,
+  void GetNonzerosSlice::evalD(void* mem, const double** arg, double** res,
                                int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void GetNonzerosSlice::evalSX(const SXElement** arg, SXElement** res,
-                                int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void GetNonzerosSlice::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                int* iw, SXElem* w) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
@@ -76,14 +76,14 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice2::evalD(const double** arg, double** res,
+  void GetNonzerosSlice2::evalD(void* mem, const double** arg, double** res,
                                 int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void GetNonzerosSlice2::evalSX(const SXElement** arg, SXElement** res,
-                                 int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void GetNonzerosSlice2::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                 int* iw, SXElem* w) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
@@ -102,7 +102,7 @@ namespace casadi {
   }
 
   void GetNonzerosVector::
-  spFwd(const bvec_t** arg,
+  spFwd(void* mem, const bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
@@ -112,7 +112,7 @@ namespace casadi {
   }
 
   void GetNonzerosVector::
-  spAdj(bvec_t** arg,
+  spAdj(void* mem, bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
@@ -123,7 +123,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  spFwd(const bvec_t** arg,
+  spFwd(void* mem, const bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
@@ -133,7 +133,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  spAdj(bvec_t** arg,
+  spAdj(void* mem, bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
@@ -143,7 +143,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice2::spFwd(const bvec_t** arg,
+  void GetNonzerosSlice2::spFwd(void* mem, const bvec_t** arg,
                                 bvec_t** res, int* iw, bvec_t* w) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
@@ -154,7 +154,7 @@ namespace casadi {
     }
   }
 
-  void GetNonzerosSlice2::spAdj(bvec_t** arg,
+  void GetNonzerosSlice2::spAdj(void* mem, bvec_t** arg,
                                 bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
@@ -439,8 +439,8 @@ namespace casadi {
     return true;
   }
 
-  void GetNonzerosVector::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                   CodeGenerator& g) const {
+  void GetNonzerosVector::generate(CodeGenerator& g, const std::string& mem,
+                                   const std::vector<int>& arg, const std::vector<int>& res) const {
     // Codegen the indices
     int ind = g.getConstant(nz_, true);
 
@@ -471,8 +471,8 @@ namespace casadi {
     return dep()->getGetNonzeros(sp, nz_new);
   }
 
-  void GetNonzerosSlice::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                  CodeGenerator& g) const {
+  void GetNonzerosSlice::generate(CodeGenerator& g, const std::string& mem,
+                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
            << g.work(arg[0], dep(0).nnz()) << "+" << s_.start_
            << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop_
@@ -480,8 +480,8 @@ namespace casadi {
            << "*rr++ = *ss;" << endl;
   }
 
-  void GetNonzerosSlice2::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                   CodeGenerator& g) const {
+  void GetNonzerosSlice2::generate(CodeGenerator& g, const std::string& mem,
+                                   const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
            << g.work(arg[0], dep(0).nnz()) << "+" << outer_.start_
            << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << outer_.stop_ << "; ss+="

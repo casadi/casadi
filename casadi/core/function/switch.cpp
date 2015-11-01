@@ -152,7 +152,7 @@ namespace casadi {
     }
   }
 
-  void Switch::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Switch::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     // Get conditional
     int k = static_cast<int>(*arg[0]);
 
@@ -172,7 +172,7 @@ namespace casadi {
     }
 
     // Evaluate the corresponding function
-    fk->eval(arg+1, res, iw, w);
+    fk->eval(0, arg+1, res, iw, w);
   }
 
   Function Switch
@@ -333,7 +333,7 @@ namespace casadi {
         if (g.simplifiedCall(fk)) {
           casadi_error("Not implemented.");
         } else {
-          g.body << "    if (" << g.call(fk, "arg+1", "res", "iw", "w") << ") return 1;" << endl;
+          g.body << "    if (" << g(fk, "0", "arg+1", "res", "iw", "w") << ") return 1;" << endl;
           if (!if_else)
             g.body << "    break;" << endl;
         }

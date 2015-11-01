@@ -55,18 +55,18 @@ namespace casadi {
                            std::vector<std::vector<MX> >& asens) {
   }
 
-  void ConstantMX::spFwd(const bvec_t** arg,
+  void ConstantMX::spFwd(void* mem, const bvec_t** arg,
                          bvec_t** res, int* iw, bvec_t* w) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantMX::spAdj(bvec_t** arg,
+  void ConstantMX::spAdj(void* mem, bvec_t** arg,
                          bvec_t** res, int* iw, bvec_t* w) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantDMatrix::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                 CodeGenerator& g) const {
+  void ConstantDMatrix::generate(CodeGenerator& g, const std::string& mem,
+                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print the constant
     int ind = g.getConstant(x_.data(), true);
 

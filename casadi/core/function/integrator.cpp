@@ -679,7 +679,7 @@ namespace casadi {
     return ret;
   }
 
-  void Integrator::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Integrator::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     log("Integrator::spFwd", "begin");
 
     // Work vectors
@@ -697,7 +697,7 @@ namespace casadi {
     fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
     res1[DAE_ODE] = tmp_x;
     res1[DAE_ALG] = tmp_z;
-    f_.spFwd(arg1, res1, iw, w);
+    f_(0, arg1, res1, iw, w);
     if (arg[INTEGRATOR_X0]) {
       const bvec_t *tmp = arg[INTEGRATOR_X0];
       for (int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
@@ -721,7 +721,7 @@ namespace casadi {
       arg1[DAE_Z] = tmp_z;
       res1[DAE_ODE] = res1[DAE_ALG] = 0;
       res1[DAE_QUAD] = res[INTEGRATOR_QF];
-      f_.spFwd(arg1, res1, iw, w);
+      f_(0, arg1, res1, iw, w);
     }
 
     if (!g_.isNull()) {
@@ -736,7 +736,7 @@ namespace casadi {
       fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
       res1[RDAE_ODE] = tmp_rx;
       res1[RDAE_ALG] = tmp_rz;
-      g_.spFwd(arg1, res1, iw, w);
+      g_(0, arg1, res1, iw, w);
       if (arg[INTEGRATOR_RX0]) {
         const bvec_t *tmp = arg[INTEGRATOR_RX0];
         for (int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
@@ -760,13 +760,13 @@ namespace casadi {
         arg1[RDAE_RZ] = tmp_rz;
         res1[RDAE_ODE] = res1[RDAE_ALG] = 0;
         res1[RDAE_QUAD] = res[INTEGRATOR_RQF];
-        g_.spFwd(arg1, res1, iw, w);
+        g_(0, arg1, res1, iw, w);
       }
     }
     log("Integrator::spFwd", "end");
   }
 
-  void Integrator::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Integrator::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     log("Integrator::spAdj", "begin");
 
     // Work vectors
@@ -832,7 +832,7 @@ namespace casadi {
       arg1[RDAE_RX] = tmp_rx;
       arg1[RDAE_RZ] = tmp_rz;
       arg1[RDAE_RP] = rp;
-      g_.spAdj(arg1, res1, iw, w);
+      g_.rev(0, arg1, res1, iw, w);
 
       // Propagate interdependencies
       casadi_assert(!linsol_g_.isNull());
@@ -849,7 +849,7 @@ namespace casadi {
       res1[RDAE_QUAD] = 0;
       arg1[RDAE_RX] = rx0;
       arg1[RDAE_RZ] = 0; // arg[INTEGRATOR_RZ0] is a guess, no dependency
-      g_.spAdj(arg1, res1, iw, w);
+      g_.rev(0, arg1, res1, iw, w);
     }
 
     // Get dependencies from forward quadratures
@@ -859,7 +859,7 @@ namespace casadi {
     arg1[DAE_X] = tmp_x;
     arg1[DAE_Z] = tmp_z;
     arg1[DAE_P] = p;
-    if (qf && nq_>0) f_.spAdj(arg1, res1, iw, w);
+    if (qf && nq_>0) f_.rev(0, arg1, res1, iw, w);
 
     // Propagate interdependencies
     casadi_assert(!linsol_f_.isNull());
@@ -876,7 +876,7 @@ namespace casadi {
     res1[DAE_QUAD] = 0;
     arg1[DAE_X] = x0;
     arg1[DAE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
-    f_.spAdj(arg1, res1, iw, w);
+    f_.rev(0, arg1, res1, iw, w);
 
     log("Integrator::spAdj", "end");
   }

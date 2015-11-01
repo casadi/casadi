@@ -35,7 +35,7 @@ set(CASADI_SRCS
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
-  matrix/generic_expression.hpp                         # Base class for SXElement MX and Matrix<>
+  matrix/generic_expression.hpp                         # Base class for SXElem MX and Matrix<>
   matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
   matrix/matrix.hpp           matrix/matrix_impl.hpp   matrix/matrix.cpp    # The Matrix template class
   matrix/sparse_storage.hpp   matrix/sparse_storage_impl.hpp
@@ -46,10 +46,10 @@ set(CASADI_SRCS
   matrix/nonzeros.hpp                                   # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
 
   # Directed, acyclic graph representation with scalar expressions
-  sx/sx_element.hpp          sx/sx_element.cpp          # Symbolic expression class (scalar-valued atomics)
+  sx/sx_elem.hpp             sx/sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)
   sx/sx_node.hpp             sx/sx_node.cpp             # Base class for all the nodes
-  sx/symbolic_sx.hpp                                    # A symbolic SXElement variable
-  sx/constant_sx.hpp                                    # A constant SXElement node
+  sx/symbolic_sx.hpp                                    # A symbolic SXElem variable
+  sx/constant_sx.hpp                                    # A constant SXElem node
   sx/unary_sx.hpp                                       # A unary operation
   sx/binary_sx.hpp                                      # A binary operation
 

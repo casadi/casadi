@@ -60,20 +60,20 @@ namespace casadi {
     }
   }
 
-  void InnerProd::evalD(const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void InnerProd::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(mem, arg, res, iw, w);
   }
 
-  void InnerProd::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void InnerProd::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+    evalGen<SXElem>(mem, arg, res, iw, w);
   }
 
   template<typename T>
-  void InnerProd::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void InnerProd::evalGen(void* mem, const T** arg, T** res, int* iw, T* w) {
     *res[0] = casadi_inner_prod(dep(0).nnz(), arg[0], arg[1]);
   }
 
-  void InnerProd::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void InnerProd::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t* r = res[0];
     const int n = dep(0).nnz();
@@ -83,7 +83,7 @@ namespace casadi {
     }
   }
 
-  void InnerProd::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void InnerProd::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
     const int n = dep(0).nnz();
     for (int i=0; i<n; ++i) {
@@ -93,8 +93,8 @@ namespace casadi {
     *r = 0;
   }
 
-  void InnerProd::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                           CodeGenerator& g) const {
+  void InnerProd::generate(CodeGenerator& g, const std::string& mem,
+                           const std::vector<int>& arg, const std::vector<int>& res) const {
     g.assign(g.body, g.workel(res[0]),
                g.inner_prod(dep().nnz(), g.work(arg[0], dep(0).nnz()),
                               g.work(arg[1], dep(1).nnz())));

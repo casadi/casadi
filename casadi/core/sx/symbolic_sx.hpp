@@ -23,8 +23,8 @@
  */
 
 
-#ifndef SYMBOLIC_SXElement_HPP
-#define SYMBOLIC_SXElement_HPP
+#ifndef SYMBOLIC_SXElem_HPP
+#define SYMBOLIC_SXElem_HPP
 
 #include "sx_node.hpp"
 /// \cond INTERNAL
@@ -62,4 +62,4 @@ protected:
 
 } // namespace casadi
 /// \endcond
-#endif // SYMBOLIC_SXElement_HPP
+#endif // SYMBOLIC_SXElem_HPP

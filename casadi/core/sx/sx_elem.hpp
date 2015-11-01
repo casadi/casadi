@@ -46,66 +46,66 @@ namespace casadi {
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
 
-  /** SXElement is exposed only as an empty struct to SWIG */
+  /** SXElem is exposed only as an empty struct to SWIG */
 #ifdef SWIG
-  struct SXElement {};
+  struct SXElem {};
 #else // SWIG
 
   /** \brief The basic scalar symbolic class of CasADi
       \author Joel Andersson
       \date 2010-2014
   */
-  class CASADI_EXPORT SXElement : public GenericExpression<SXElement>,
-                                  public PrintableObject<SXElement> {
+  class CASADI_EXPORT SXElem : public GenericExpression<SXElem>,
+                                  public PrintableObject<SXElem> {
     friend class SXNode;
     friend class BinarySXNode;
-    friend class Matrix<SXElement>;
+    friend class Matrix<SXElem>;
   public:
 
     /// \cond CLUTTER
     /** \brief Default constructor (not-a-number)
         Object is initialized as not-a-number.
     */
-    SXElement();
+    SXElem();
     /// \endcond
 
     /** \brief Numerical constant constructor
         \param val Numerical value
     */
-    SXElement(double val);
+    SXElem(double val);
 
     /** \brief Create a symbolic primitive
          \param name Name of the symbolic primitive
 
         This is the name that will be used by the "operator<<" and "toString" methods.
         The name is not used as identifier; you may construct distinct
-        SXElement objects with non-unique names.
+        SXElem objects with non-unique names.
     */
-    static SXElement sym(const std::string& name);
+    static SXElem sym(const std::string& name);
 
     /// \cond INTERNAL
     /// Create an expression from a node: extra dummy argument to avoid ambiguity for 0/NULL
-    SXElement(SXNode* node, bool dummy);
+    SXElem(SXNode* node, bool dummy);
     /// \endcond
 
     /** \brief Copy constructor */
-    SXElement(const SXElement& scalar); // copy constructor
+    SXElem(const SXElem& scalar); // copy constructor
 
     /// Destructor
-    ~SXElement();
+    ~SXElem();
 
     /// \cond INTERNAL
     /// Create an object given a node
-    static SXElement create(SXNode* node);
+    static SXElem create(SXNode* node);
     /// \endcond
 
     /// Assignment
-    SXElement& operator=(const SXElement& scalar);
-    SXElement& operator=(double scalar); // needed since otherwise both a = SXElement(double)
+    SXElem& operator=(const SXElem& scalar);
+    SXElem& operator=(double scalar); // needed since otherwise both a = SXElem(double)
                                          // and a = Matrix(double) would be ok
 
     /// Convert to a 1-by-1 Matrix
-    operator Matrix<SXElement>() const;
+    operator Matrix<SXElem>() const;
 
     /// Print a representation of the object
     void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
@@ -124,24 +124,24 @@ namespace casadi {
     /// \endcond
 
     /** \brief  Perform operations by ID */
-    static SXElement binary(int op, const SXElement& x, const SXElement& y);
-    static SXElement unary(int op, const SXElement& x);
+    static SXElem binary(int op, const SXElem& x, const SXElem& y);
+    static SXElem unary(int op, const SXElem& x);
 
     /** \brief Check the truth value of this node
      * Introduced to catch bool(x) situations in python
      */
     bool __nonzero__() const;
 
-    /** \brief check if this SXElement is a leaf of the SX graph
+    /** \brief check if this SXElem is a leaf of the SX graph
      *
-     * An SXElement qualifies as leaf when it has no dependencies.
+     * An SXElem qualifies as leaf when it has no dependencies.
      */
     bool is_leaf() const;
     bool is_constant() const;
     bool is_integer() const;
     bool is_symbolic() const;
     bool hasDep() const;
-    /** \brief Check whether a binary SXElement is commutative*/
+    /** \brief Check whether a binary SXElem is commutative*/
     bool is_commutative() const;
     bool is_zero() const;
     bool isAlmostZero(double tol) const;
@@ -162,7 +162,7 @@ namespace casadi {
 
     double getValue() const;
     int getIntValue() const;
-    SXElement getDep(int ch=0) const;
+    SXElem getDep(int ch=0) const;
 
     /// Type conversion to double
     inline explicit operator double() const { return getValue();}
@@ -173,77 +173,77 @@ namespace casadi {
     /** \brief Check if the node is the sum of two equal expressions */
     bool isDoubled() const;
 
-    /** \brief Get the number of dependencies of a binary SXElement */
+    /** \brief Get the number of dependencies of a binary SXElem */
     int getNdeps() const;
 
     /** \brief Returns a number that is unique for a given SXNode.
-     * If the SXElement does not point to any node, 0 is returned.
+     * If the SXElem does not point to any node, 0 is returned.
      */
     size_t __hash__() const;
 
     /** \brief  Negation */
-    SXElement operator-() const;
+    SXElem operator-() const;
 
     //  all binary operations
-    SXElement zz_plus(const SXElement& y) const;
-    SXElement zz_minus(const SXElement& y) const;
-    SXElement zz_times(const SXElement& y) const;
-    SXElement zz_rdivide(const SXElement& y) const;
-    SXElement zz_lt(const SXElement& y) const;
-    SXElement zz_le(const SXElement& y) const;
-    SXElement zz_eq(const SXElement& y) const;
-    SXElement zz_ne(const SXElement& y) const;
-    SXElement zz_power(const SXElement& b) const;
-    SXElement zz_constpow(const SXElement& b) const;
+    SXElem zz_plus(const SXElem& y) const;
+    SXElem zz_minus(const SXElem& y) const;
+    SXElem zz_times(const SXElem& y) const;
+    SXElem zz_rdivide(const SXElem& y) const;
+    SXElem zz_lt(const SXElem& y) const;
+    SXElem zz_le(const SXElem& y) const;
+    SXElem zz_eq(const SXElem& y) const;
+    SXElem zz_ne(const SXElem& y) const;
+    SXElem zz_power(const SXElem& b) const;
+    SXElem zz_constpow(const SXElem& b) const;
 
-    SXElement __mrdivide__(const SXElement& b) const {  return *this / b;}
-    SXElement zz_mpower(const SXElement& b) const {return pow(*this, b);}
+    SXElem __mrdivide__(const SXElem& b) const {  return *this / b;}
+    SXElem zz_mpower(const SXElem& b) const {return pow(*this, b);}
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
-    SXElement zz_mul(const SXElement& y) const { return zz_times(y);}
-    SXElement zz_exp() const;
-    SXElement zz_log() const;
-    SXElement zz_sqrt() const;
-    SXElement sq() const;
-    SXElement zz_sin() const;
-    SXElement zz_cos() const;
-    SXElement zz_tan() const;
-    SXElement zz_asin() const;
-    SXElement zz_acos() const;
-    SXElement zz_atan() const;
-    SXElement zz_floor() const;
-    SXElement zz_ceil() const;
-    SXElement zz_mod(const SXElement &y) const;
-    SXElement zz_erf() const;
-    SXElement zz_erfinv() const;
-    SXElement zz_abs() const;
-    SXElement zz_min(const SXElement &y) const;
-    SXElement zz_max(const SXElement &y) const;
-    SXElement inv() const;
-    SXElement zz_sinh() const;
-    SXElement zz_cosh() const;
-    SXElement zz_tanh() const;
-    SXElement zz_asinh() const;
-    SXElement zz_acosh() const;
-    SXElement zz_atanh() const;
-    SXElement zz_atan2(const SXElement &y) const;
-    SXElement zz_log10() const;
-    SXElement printme(const SXElement &y) const;
-    SXElement zz_sign() const;
-    SXElement zz_copysign(const SXElement &y) const;
-    SXElement zz_not() const;
-    SXElement zz_and(const SXElement& y) const;
-    SXElement zz_or(const SXElement& y) const;
-    SXElement zz_if_else_zero(const SXElement& y) const;
+    SXElem zz_mul(const SXElem& y) const { return zz_times(y);}
+    SXElem zz_exp() const;
+    SXElem zz_log() const;
+    SXElem zz_sqrt() const;
+    SXElem sq() const;
+    SXElem zz_sin() const;
+    SXElem zz_cos() const;
+    SXElem zz_tan() const;
+    SXElem zz_asin() const;
+    SXElem zz_acos() const;
+    SXElem zz_atan() const;
+    SXElem zz_floor() const;
+    SXElem zz_ceil() const;
+    SXElem zz_mod(const SXElem &y) const;
+    SXElem zz_erf() const;
+    SXElem zz_erfinv() const;
+    SXElem zz_abs() const;
+    SXElem zz_min(const SXElem &y) const;
+    SXElem zz_max(const SXElem &y) const;
+    SXElem inv() const;
+    SXElem zz_sinh() const;
+    SXElem zz_cosh() const;
+    SXElem zz_tanh() const;
+    SXElem zz_asinh() const;
+    SXElem zz_acosh() const;
+    SXElem zz_atanh() const;
+    SXElem zz_atan2(const SXElem &y) const;
+    SXElem zz_log10() const;
+    SXElem printme(const SXElem &y) const;
+    SXElem zz_sign() const;
+    SXElem zz_copysign(const SXElem &y) const;
+    SXElem zz_not() const;
+    SXElem zz_and(const SXElem& y) const;
+    SXElem zz_or(const SXElem& y) const;
+    SXElem zz_if_else_zero(const SXElem& y) const;
 
-    Matrix<SXElement> zz_min(const Matrix<SXElement>& b) const;
-    Matrix<SXElement> zz_max(const Matrix<SXElement>& b) const;
-    Matrix<SXElement> zz_constpow(const Matrix<SXElement>& n) const;
-    Matrix<SXElement> zz_copysign(const Matrix<SXElement>& n) const;
-    Matrix<SXElement> zz_atan2(const Matrix<SXElement>& b) const;
-    bool zz_is_equal(const SXElement& scalar, int depth=0) const;
-    SXElement zz_simplify() const;
+    Matrix<SXElem> zz_min(const Matrix<SXElem>& b) const;
+    Matrix<SXElem> zz_max(const Matrix<SXElem>& b) const;
+    Matrix<SXElem> zz_constpow(const Matrix<SXElem>& n) const;
+    Matrix<SXElem> zz_copysign(const Matrix<SXElem>& n) const;
+    Matrix<SXElem> zz_atan2(const Matrix<SXElem>& b) const;
+    bool zz_is_equal(const SXElem& scalar, int depth=0) const;
+    SXElem zz_simplify() const;
 
     /// \cond INTERNAL
     /// Get the temporary variable
@@ -260,18 +260,18 @@ namespace casadi {
 
     /** \brief Assign to another expression, if a duplicate.
      * Check for equality up to a given depth */
-    void assignIfDuplicate(const SXElement& scalar, int depth=1);
+    void assignIfDuplicate(const SXElem& scalar, int depth=1);
 
     /** \brief Assign the node to something, without invoking the deletion of the node,
      * if the count reaches 0 */
-    SXNode* assignNoDelete(const SXElement& scalar);
+    SXNode* assignNoDelete(const SXElem& scalar);
     /// \endcond
 
-    /** \brief SXElement nodes are not allowed to be null */
+    /** \brief SXElem nodes are not allowed to be null */
     inline bool isNull() {return false;}
 
   private:
-    /// Pointer to node (SXElement is only a reference class)
+    /// Pointer to node (SXElem is only a reference class)
     SXNode* node;
 
     /**
@@ -280,31 +280,31 @@ namespace casadi {
     */
     /** \brief inline if-test */
     /// replaces the ternary conditional operator "?:", which cannot be overloaded
-    friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
-                             const SXElement& if_false, bool short_circuit);
+    friend SXElem if_else(const SXElem& cond, const SXElem& if_true,
+                             const SXElem& if_false, bool short_circuit);
     /** @} */
   };
 
   template<>
-  class CASADI_EXPORT casadi_limits<SXElement>{
+  class CASADI_EXPORT casadi_limits<SXElem>{
   public:
-    static bool is_zero(const SXElement& val);
-    static bool isAlmostZero(const SXElement& val, double tol);
-    static bool is_one(const SXElement& val);
-    static bool is_minus_one(const SXElement& val);
-    static bool is_constant(const SXElement& val);
-    static bool is_integer(const SXElement& val);
-    static bool isInf(const SXElement& val);
-    static bool isMinusInf(const SXElement& val);
-    static bool isNaN(const SXElement& val);
+    static bool is_zero(const SXElem& val);
+    static bool isAlmostZero(const SXElem& val, double tol);
+    static bool is_one(const SXElem& val);
+    static bool is_minus_one(const SXElem& val);
+    static bool is_constant(const SXElem& val);
+    static bool is_integer(const SXElem& val);
+    static bool isInf(const SXElem& val);
+    static bool isMinusInf(const SXElem& val);
+    static bool isNaN(const SXElem& val);
 
-    static const SXElement zero;
-    static const SXElement one;
-    static const SXElement two;
-    static const SXElement minus_one;
-    static const SXElement nan;
-    static const SXElement inf;
-    static const SXElement minus_inf;
+    static const SXElem zero;
+    static const SXElem one;
+    static const SXElem two;
+    static const SXElem minus_one;
+    static const SXElem nan;
+    static const SXElem inf;
+    static const SXElem minus_inf;
   };
 
 #endif // SWIG
@@ -312,7 +312,7 @@ namespace casadi {
 
   ///@{
   /// Readability typedefs
-  typedef Matrix<SXElement> SX;
+  typedef Matrix<SXElem> SX;
   typedef std::vector<SX> SXVector;
   typedef std::initializer_list<SX> SXIList;
   typedef std::vector<SXVector> SXVectorVector;
@@ -326,19 +326,19 @@ namespace casadi {
 
 namespace std {
   template<>
-  class CASADI_EXPORT numeric_limits<casadi::SXElement>{
+  class CASADI_EXPORT numeric_limits<casadi::SXElem>{
   public:
     static const bool is_specialized = true;
-    static casadi::SXElement min() throw();
-    static casadi::SXElement max() throw();
+    static casadi::SXElem min() throw();
+    static casadi::SXElem max() throw();
     static const int  digits = 0;
     static const int  digits10 = 0;
     static const bool is_signed = false;
     static const bool is_integer = false;
     static const bool is_exact = false;
     static const int radix = 0;
-    static casadi::SXElement epsilon() throw();
-    static casadi::SXElement round_error() throw();
+    static casadi::SXElem epsilon() throw();
+    static casadi::SXElem round_error() throw();
     static const int  min_exponent = 0;
     static const int  min_exponent10 = 0;
     static const int  max_exponent = 0;
@@ -349,10 +349,10 @@ namespace std {
     static const bool has_signaling_NaN = false;
     //    static const float_denorm_style has_denorm = denorm absent;
     static const bool has_denorm_loss = false;
-    static casadi::SXElement infinity() throw();
-    static casadi::SXElement quiet_NaN() throw();
-    //    static SXElement signaling_NaN() throw();
-    //    static SXElement denorm_min() throw();
+    static casadi::SXElem infinity() throw();
+    static casadi::SXElem quiet_NaN() throw();
+    //    static SXElem signaling_NaN() throw();
+    //    static SXElem denorm_min() throw();
     static const bool is_iec559 = false;
     static const bool is_bounded = false;
     static const bool is_modulo = false;

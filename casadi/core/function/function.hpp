@@ -535,25 +535,19 @@ namespace casadi {
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
-    void operator()(const double** arg, double** res, int* iw, double* w);
+    void operator()(void* mem, const double** arg, double** res, int* iw, double* w);
 
-    /** \brief Evaluate memory-less SXElement
+    /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
      */
-    void operator()(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    void operator()(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w);
 
     /** \brief  Propagate sparsity forward */
-    void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    void operator()(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
-    /** \brief  Propagate sparsity backwards */
-    void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    /** \brief  Propagate sparsity backward */
+    void rev(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
-    /** \brief Alias for spFwd
-        Same syntax as the double and SXElement versions, allowing use in templated code
-    */
-    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-      spFwd(arg, res, iw, w);
-    }
 #endif // SWIG
 
     /** \brief Create call to (cached) derivative function, forward mode  */

@@ -39,7 +39,7 @@ namespace casadi {
     return "find(" + arg.at(0) + ")";
   }
 
-  void Find::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Find::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     const double* x = arg[0];
     int nnz = dep(0).nnz();
     int k=0;
@@ -62,16 +62,16 @@ namespace casadi {
                      std::vector<std::vector<MX> >& asens) {
   }
 
-  void Find::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Find::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     res[0][0] = 0; // pw constant
   }
 
-  void Find::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Find::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     res[0][0] = 0; // pw constant
   }
 
-  void Find::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                      CodeGenerator& g) const {
+  void Find::generate(CodeGenerator& g, const std::string& mem,
+                      const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
     g.body << "  for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
            << " && *cr++==0; ++i) {}" << endl

@@ -23,8 +23,8 @@
  */
 
 
-#ifndef UNARY_SXElement_HPP
-#define UNARY_SXElement_HPP
+#ifndef UNARY_SXElem_HPP
+#define UNARY_SXElem_HPP
 
 #include "sx_node.hpp"
 #include <stack>
@@ -33,7 +33,7 @@
 
 namespace casadi {
 
-/** \brief Represents a basic unary operation on an SXElement node
+/** \brief Represents a basic unary operation on an SXElem node
   \author Joel Andersson
   \date 2012
 */
@@ -41,12 +41,12 @@ class CASADI_EXPORT UnarySX : public SXNode {
   private:
 
     /** \brief  Constructor is private, use "create" below */
-    UnarySX(unsigned char op, const SXElement& dep) : op_(op), dep_(dep) {}
+    UnarySX(unsigned char op, const SXElem& dep) : op_(op), dep_(dep) {}
 
   public:
 
     /** \brief  Create a unary expression */
-    inline static SXElement create(unsigned char op, const SXElement& dep) {
+    inline static SXElem create(unsigned char op, const SXElem& dep) {
       if (dep.is_constant()) {
         // Evaluate constant
         double dep_val = dep.getValue();
@@ -55,7 +55,7 @@ class CASADI_EXPORT UnarySX : public SXNode {
         return ret_val;
       } else {
         // Expression containing free variables
-        return SXElement::create(new UnarySX(op, dep));
+        return SXElem::create(new UnarySX(op, dep));
       }
     }
 
@@ -76,8 +76,8 @@ class CASADI_EXPORT UnarySX : public SXNode {
     virtual int ndep() const { return 1;}
 
     /** \brief  get the reference of a dependency */
-    virtual const SXElement& dep(int i) const { return dep_; }
-    virtual SXElement& dep(int i) { return dep_; }
+    virtual const SXElem& dep(int i) const { return dep_; }
+    virtual SXElem& dep(int i) { return dep_; }
 
     /** \brief  Get the operation */
     virtual int op() const { return op_;}
@@ -102,10 +102,10 @@ class CASADI_EXPORT UnarySX : public SXNode {
     unsigned char op_;
 
     /** \brief  The dependencies of the node */
-    SXElement dep_;
+    SXElem dep_;
 };
 
 } // namespace casadi
 
 /// \endcond
-#endif // UNARY_SXElement_HPP
+#endif // UNARY_SXElem_HPP

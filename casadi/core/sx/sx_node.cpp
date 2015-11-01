@@ -106,11 +106,11 @@ namespace casadi {
     throw CasadiException("SXNode::getName failed, the node must be symbolic");
   }
 
-  const SXElement& SXNode::dep(int i) const {
+  const SXElem& SXNode::dep(int i) const {
     casadi_error("child() not defined for class " << typeid(*this).name());
   }
 
-  SXElement& SXNode::dep(int i) {
+  SXElem& SXNode::dep(int i) {
     casadi_error("child() not defined for class " << typeid(*this).name());
   }
 

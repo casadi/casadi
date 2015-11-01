@@ -66,7 +66,7 @@ namespace casadi {
   Newton::~Newton() {
   }
 
-  void Newton::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Newton::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     casadi_msg("Newton::solveNonLinear:begin");
 
     // Set up timers for profiling

@@ -35,7 +35,7 @@ namespace casadi {
   // Instantiate templates
   template class Matrix<double>;
   template class Matrix<int>;
-  template class Matrix< SXElement >;
+  template class Matrix< SXElem >;
 
   template<>
   bool Matrix<int>::isSlice(bool ind1) const {
@@ -74,7 +74,7 @@ namespace casadi {
   }
 
   template<>
-  bool Matrix<SXElement>::__nonzero__() const {
+  bool Matrix<SXElem>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
                                   "provided a shape" << dim());}
     return at(0).__nonzero__();
@@ -93,7 +93,7 @@ namespace casadi {
   template<>
   SX GenericMatrix<SX>::sym(const string& name, const Sparsity& sp) {
     // Create a dense n-by-m matrix
-    vector<SXElement> retv;
+    vector<SXElem> retv;
 
     // Check if individial names have been provided
     if (name[0]=='[') {
@@ -116,17 +116,17 @@ namespace casadi {
 
         // Append to the return vector
         if (!iss.fail())
-          retv.push_back(SXElement::sym(varname));
+          retv.push_back(SXElem::sym(varname));
       }
     } else if (sp.is_scalar(true)) {
-      retv.push_back(SXElement::sym(name));
+      retv.push_back(SXElem::sym(name));
     } else {
       // Scalar
       stringstream ss;
       for (int k=0; k<sp.nnz(); ++k) {
         ss.str("");
         ss << name << "_" << k;
-        retv.push_back(SXElement::sym(ss.str()));
+        retv.push_back(SXElem::sym(ss.str()));
       }
     }
 
@@ -142,7 +142,7 @@ namespace casadi {
   bool SX::is_regular() const {
     // First pass: ignore symbolics
     for (int i=0; i<nnz(); ++i) {
-      const SXElement& x = at(i);
+      const SXElem& x = at(i);
       if (x.is_constant()) {
         if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
       }
@@ -263,7 +263,7 @@ namespace casadi {
   void SX::zz_expand(SX &ww, SX& tt) const {
     const SX& ex2 = *this;
     casadi_assert(ex2.is_scalar());
-    SXElement ex = ex2.toScalar();
+    SXElem ex = ex2.toScalar();
 
     // Terms, weights and indices of the nodes that are already expanded
     vector<vector<SXNode*> > terms;
@@ -289,7 +289,7 @@ namespace casadi {
 
       if (to_be_expanded.top()->is_constant()) { // constant nodes are seen as multiples of one
         w.push_back(to_be_expanded.top()->getValue());
-        f.push_back(casadi_limits<SXElement>::one.get());
+        f.push_back(casadi_limits<SXElem>::one.get());
       } else if (to_be_expanded.top()->is_symbolic()) {
         // symbolic nodes have weight one and itself as factor
         w.push_back(1);
@@ -383,9 +383,9 @@ namespace casadi {
     int thisind = indices[ex.get()];
     ww = SX(weights[thisind]);
 
-    vector<SXElement> termsv(terms[thisind].size());
+    vector<SXElem> termsv(terms[thisind].size());
     for (int i=0; i<termsv.size(); ++i)
-      termsv[i] = SXElement::create(terms[thisind][i]);
+      termsv[i] = SXElem::create(terms[thisind][i]);
     tt = SX(termsv);
   }
 
@@ -476,12 +476,12 @@ namespace casadi {
 
     // Evaluate at the Gauss points
     Function fcn("gauss_quadrature", {x}, {f});
-    vector<SXElement> f_val(5);
+    vector<SXElem> f_val(5);
     for (int i=0; i<5; ++i)
       f_val[i] = fcn(SX(xi[i])).at(0).toScalar();
 
     // Weighted sum
-    SXElement sum;
+    SXElem sum;
     for (int i=0; i<5; ++i)
       sum += wi[i]*f_val[i];
 
@@ -573,16 +573,16 @@ namespace casadi {
     // Get references to the internal data structures
     auto *ff = dynamic_cast<SXFunction *>(f.get());
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
-    vector<SXElement> work(f.getWorkSize());
+    vector<SXElem> work(f.getWorkSize());
 
     // Iterator to the binary operations
-    vector<SXElement>::const_iterator b_it=ff->operations_.begin();
+    vector<SXElem>::const_iterator b_it=ff->operations_.begin();
 
     // Iterator to stack of constants
-    vector<SXElement>::const_iterator c_it = ff->constants_.begin();
+    vector<SXElem>::const_iterator c_it = ff->constants_.begin();
 
     // Iterator to free variables
-    vector<SXElement>::const_iterator p_it = ff->free_vars_.begin();
+    vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
 
     // Evaluate the algorithm
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
@@ -750,7 +750,7 @@ namespace casadi {
 
   SX mtaylor_recursive(const SX& ex, const SX& x, const SX& a, int order,
                        const vector<int>&order_contributions,
-                       const SXElement & current_dx=casadi_limits<SXElement>::one,
+                       const SXElem & current_dx=casadi_limits<SXElem>::one,
                        double current_denom=1, int current_order=1) {
     SX result = substitute(ex, x, a)*current_dx/current_denom;
     for (int i=0;i<x.nnz();i++) {
@@ -792,9 +792,9 @@ namespace casadi {
   template<>
   string
   SX::zz_print_operator(const vector<string>& args) const {
-    SXElement x = toScalar();
+    SXElem x = toScalar();
     if (!x.hasDep())
-        throw CasadiException("print_operator: SXElement must be binary operator");
+        throw CasadiException("print_operator: SXElem must be binary operator");
     if (args.size() == 0 || (casadi_math<double>::ndeps(x.op())==2 && args.size() < 2))
         throw CasadiException("print_operator: not enough arguments supplied");
     stringstream s;
@@ -805,7 +805,7 @@ namespace casadi {
   template<>
   vector<SX> SX::zz_symvar() const {
     Function f("tmp", vector<SX>{}, {*this});
-    vector<SXElement> ret1 = f.free_sx().data();
+    vector<SXElem> ret1 = f.free_sx().data();
     vector<SX> ret(ret1.size());
     copy(ret1.begin(), ret1.end(), ret.begin());
     return ret;
@@ -824,23 +824,23 @@ namespace casadi {
 
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
-    vector<SXElement> work(f.getWorkSize());
-    vector<SXElement> work2 = work;
+    vector<SXElem> work(f.getWorkSize());
+    vector<SXElem> work2 = work;
 
     // Iterator to the binary operations
-    vector<SXElement>::const_iterator b_it=ff->operations_.begin();
+    vector<SXElem>::const_iterator b_it=ff->operations_.begin();
 
     // Iterator to stack of constants
-    vector<SXElement>::const_iterator c_it = ff->constants_.begin();
+    vector<SXElem>::const_iterator c_it = ff->constants_.begin();
 
     // Iterator to free variables
-    vector<SXElement>::const_iterator p_it = ff->free_vars_.begin();
+    vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
 
     // Count how many times an expression has been used
     vector<int> usecount(work.size(), 0);
 
     // Evaluate the algorithm
-    vector<SXElement> v, vdef;
+    vector<SXElem> v, vdef;
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       // Increase usage counters
       switch (it->op) {
@@ -886,7 +886,7 @@ namespace casadi {
     for (int i=0; i<vdef.size(); ++i) {
       v_name.str(string());
       v_name << v_prefix << i << v_suffix;
-      v.push_back(SXElement::sym(v_name.str()));
+      v.push_back(SXElem::sym(v_name.str()));
     }
 
     // Mark the above expressions
@@ -895,7 +895,7 @@ namespace casadi {
     }
 
     // Save the marked nodes for later cleanup
-    vector<SXElement> marked = vdef;
+    vector<SXElem> marked = vdef;
 
     // Reset iterator
     b_it=ff->operations_.begin();
@@ -924,7 +924,7 @@ namespace casadi {
     }
 
     // Unmark the expressions
-    for (vector<SXElement>::iterator it=marked.begin(); it!=marked.end(); ++it) {
+    for (vector<SXElem>::iterator it=marked.begin(); it!=marked.end(); ++it) {
       it->setTemp(0);
     }
 
@@ -941,7 +941,7 @@ namespace casadi {
     casadi_assert(x.is_scalar());
     casadi_assert(x.is_symbolic());
 
-    vector<SXElement> r;
+    vector<SXElem> r;
 
     Function f("tmp", {x}, {*this});
     int mult = 1;
@@ -1077,7 +1077,7 @@ namespace casadi {
     return vertcat(ret);
   }
 
-  SXElement SXElement::zz_simplify() const {
+  SXElem SXElem::zz_simplify() const {
     // Start by expanding the node to a weighted sum
     SX terms, weights;
     expand(*this, weights, terms);

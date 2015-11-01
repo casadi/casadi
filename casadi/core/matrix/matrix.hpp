@@ -1058,7 +1058,7 @@ namespace casadi {
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
         true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
-        Note: Will mark the node using SXElement::setTemp.
+        Note: Will mark the node using SXElem::setTemp.
         Make sure to call resetInput() after usage.
     */
     bool has_duplicates();
@@ -1129,11 +1129,11 @@ namespace casadi {
 
     /** \brief Get expressions of the children of the expression 
         Only defined if symbolic scalar. 
-        Wraps SXElement SXElement::getDep(int ch=0) const.
+        Wraps SXElem SXElem::getDep(int ch=0) const.
      */
     Matrix<DataType> getDep(int ch=0) const;
 
-    /** \brief Get the number of dependencies of a binary SXElement
+    /** \brief Get the number of dependencies of a binary SXElem
         Only defined if symbolic scalar. 
     */
     int getNdeps() const;

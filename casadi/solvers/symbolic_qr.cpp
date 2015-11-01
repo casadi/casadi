@@ -193,8 +193,8 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::evalSXLinsol(const SXElement** arg, SXElement** res,
-                                int* iw, SXElement* w, bool tr, int nrhs) {
+  void SymbolicQr::evalSXLinsol(void* mem, const SXElem** arg, SXElem** res,
+                                int* iw, SXElem* w, bool tr, int nrhs) {
     casadi_assert(arg[0]!=0);
     casadi_assert(arg[1]!=0);
     casadi_assert(res[0]!=0);
@@ -209,8 +209,8 @@ namespace casadi {
 
     // Solve for every right hand side
     v.push_back(SX::zeros(A.size1()));
-    const SXElement* a=arg[0];
-    SXElement* r=res[0];
+    const SXElem* a=arg[0];
+    SXElem* r=res[0];
     for (int i=0; i<nrhs; ++i) {
       copy(a, a+v[2].nnz(), v[2]->begin());
       SX rr = solv(v).at(0);

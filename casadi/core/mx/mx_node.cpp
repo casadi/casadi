@@ -301,12 +301,12 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evalD(const double** arg, double** res, int* iw, double* w) {
+  void MXNode::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     throw CasadiException(string("MXNode::evalD not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+  void MXNode::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
     throw CasadiException(string("MXNode::evalSX not defined for class ")
                           + typeid(*this).name());
   }
@@ -328,7 +328,7 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MXNode::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -349,7 +349,7 @@ namespace casadi {
     }
   }
 
-  void MXNode::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MXNode::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -376,8 +376,8 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  void MXNode::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                        CodeGenerator& g) const {
+  void MXNode::generate(CodeGenerator& g, const std::string& mem,
+                        const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }
 

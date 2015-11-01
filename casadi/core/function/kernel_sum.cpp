@@ -92,7 +92,7 @@ namespace casadi {
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void KernelSum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void KernelSum::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     // First input is non-differentiable
 
     int num_in = f_.n_in(), num_out = f_.n_out();
@@ -136,7 +136,7 @@ namespace casadi {
     value[0] = 0;
 
     // Evaluate the function
-    f_->spFwd(arg1, res1, iw, w);
+    f_->spFwd(0, arg1, res1, iw, w);
 
     // Sum results from temporary storage to accumulator
     for (int k=0;k<num_out;++k) {
@@ -145,7 +145,7 @@ namespace casadi {
     }
   }
 
-  void KernelSum::evalD(const double** arg, double** res,
+  void KernelSum::evalD(void* mem, const double** arg, double** res,
                                 int* iw, double* w) {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -205,7 +205,7 @@ namespace casadi {
         value[0] = V[I+J*size_.first];
 
         // Evaluate the function
-        f_->eval(arg1, res1, iw, w);
+        f_->eval(0, arg1, res1, iw, w);
 
         // Sum results from temporary storage to accumulator
         for (int k=0;k<num_out;++k) {
@@ -467,7 +467,7 @@ namespace casadi {
     g.body << "      value[0] = V[I+J*" << size_.first << "];" << std::endl;
 
     // Evaluate the function
-    g.body << "      " << g.call(f_, "arg1", "res1", "iw", "w") << ";" << endl;
+    g.body << "      " << g(f_, "0", "arg1", "res1", "iw", "w") << ";" << endl;
 
     // Sum results from temporary storage to accumulator
     for (int k=0;k<num_out;++k) {

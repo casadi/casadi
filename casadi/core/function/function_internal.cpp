@@ -171,16 +171,16 @@ namespace casadi {
       gen.add(shared_from_this<Function>(), "jit_tmp");
       gen.generate("jit_tmp");
       compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
-      evalD_ = (evalPtr)compiler_.getFunction("jit_tmp");
+      evalD_ = (eval_t)compiler_.getFunction("jit_tmp");
       casadi_assert_message(evalD_!=0, "Cannot load JIT'ed function.");
     }
   }
 
-  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w) {
+  void FunctionInternal::eval(void* mem, const double** arg, double** res, int* iw, double* w) {
     if (evalD_) {
-      evalD_(arg, res, iw, w);
+      evalD_(mem, arg, res, iw, w);
     } else {
-      evalD(arg, res, iw, w);
+      evalD(mem, arg, res, iw, w);
     }
   }
 
@@ -1232,10 +1232,10 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
-    eval(getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
+    eval(0, getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
   }
 
-  void FunctionInternal::evalD(const double** arg,
+  void FunctionInternal::evalD(void* mem, const double** arg,
                                double** res, int* iw, double* w) {
     // Number of inputs and outputs
     int num_in = n_in();
@@ -1259,8 +1259,8 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::evalSX(const SXElement** arg, SXElement** res,
-                                int* iw, SXElement* w) {
+  void FunctionInternal::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                int* iw, SXElem* w) {
     casadi_assert(canEvalSX());
 
     // Number of inputs and outputs
@@ -1318,18 +1318,18 @@ namespace casadi {
 
     // Allocate temporary memory if needed
     iw_tmp_.resize(sz_iw());
-    vector<SXElement> w_tmp(sz_w());
+    vector<SXElem> w_tmp(sz_w());
 
     // Get pointers to input arguments
-    vector<const SXElement*> argp(sz_arg());
+    vector<const SXElem*> argp(sz_arg());
     for (int i=0; i<arg.size(); ++i) argp[i]=getPtr(arg[i]);
 
     // Get pointers to output arguments
-    vector<SXElement*> resp(sz_res());
+    vector<SXElem*> resp(sz_res());
     for (int i=0; i<n_out(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
-    evalSX(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp));
+    evalSX(0, getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp));
   }
 
   void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -1354,14 +1354,14 @@ namespace casadi {
       for (int i=0; i<n_in(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
 
       // Call memory-less
-      spFwd(getPtr(arg), getPtr(res), iw, w);
+      spFwd(0, getPtr(arg), getPtr(res), iw, w);
     } else {
       // Get pointers to input arguments
       vector<bvec_t*> arg(sz_arg());
       for (int i=0; i<n_in(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
 
       // Call memory-less
-      spAdj(getPtr(arg), getPtr(res), iw, w);
+      spAdj(0, getPtr(arg), getPtr(res), iw, w);
     }
   }
 
@@ -1928,8 +1928,9 @@ namespace casadi {
     } else if (g.cpp) {
       g.body << "extern \"C\" ";
     }
-    g.body << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w) {"
-      << endl;
+    g.body
+      << "int " << fname
+      << "(void *mem, const real_t** arg, real_t** res, int* iw, real_t* w) {" << endl;
 
     // Insert the function body
     generateBody(g);
@@ -1941,7 +1942,7 @@ namespace casadi {
       << endl;
   }
 
-  void FunctionInternal::generate(CodeGenerator& g,
+  void FunctionInternal::generate(CodeGenerator& g, const std::string& mem,
                                   const vector<int>& arg, const vector<int>& res) const {
     if (simplifiedCall()) {
 
@@ -1951,7 +1952,7 @@ namespace casadi {
       }
 
       // Call function
-      g.body << "  " << generateCall(g, "w", "w+"+g.to_string(arg.size())) << ";" << endl;
+      g.body << "  " << simple_call(g, "w", "w+"+g.to_string(arg.size())) << ";" << endl;
 
       // Collect output arguments
       for (int i=0; i<res.size(); ++i) {
@@ -1963,16 +1964,17 @@ namespace casadi {
 
       // Collect input arguments
       for (int i=0; i<arg.size(); ++i) {
-        g.body << "  arg1[" << i << "]=" << g.work(arg[i], input(i).nnz()) << ";" << endl;
+        g.body << "  arg1[" << i << "]=" << g.work(arg[i], nnz_in(i)) << ";" << endl;
       }
 
       // Collect output arguments
       for (int i=0; i<res.size(); ++i) {
-        g.body << "  res1[" << i << "]=" << g.work(res[i], output(i).nnz()) << ";" << endl;
+        g.body << "  res1[" << i << "]=" << g.work(res[i], nnz_out(i)) << ";" << endl;
       }
 
       // Call function
-      g.body << "  if (" << generateCall(g, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+      g.body << "  if (" << generic_call(g, "0", "arg1", "res1",
+                                         "iw", "w") << ") return 1;" << endl;
     }
   }
 
@@ -1982,9 +1984,8 @@ namespace casadi {
     int n_out = this->n_out();
     stringstream &s = g.body;
 
-    // Function that returns the number of inputs and outputs
-    string tmp = "int " + fname + "_init(int *f_type, int *n_in, int *n_out, "
-      "int *sz_arg, int* sz_res)";
+    // Function that returns type and number of processes
+    string tmp = "int " + fname + "_info(int *f_type, int *n_proc)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1992,11 +1993,39 @@ namespace casadi {
       g.header << tmp << ";" << endl;
     }
     s << tmp << " {" << endl
-      << "  *f_type = 1;" << endl
-      << "  *n_in = " << n_in << ";" << endl
-      << "  *n_out = " << n_out << ";" << endl
-      << "  *sz_arg = " << sz_arg() << ";" << endl
-      << "  *sz_res = " << sz_res() << ";" << endl
+      << "  if (f_type) *f_type = 1;" << endl
+      << "  if (n_proc) *n_proc = 1;" << endl
+      << "  return 0;" << endl
+      << "}" << endl
+      << endl;
+
+    // Function that returns the number of inputs and outputs
+    tmp = "int " + fname + "_init(void **mem, int *n_in, int *n_out, void *data)";
+    if (g.cpp) {
+      tmp = "extern \"C\" " + tmp;  // C linkage
+    }
+    if (g.with_header) {
+      g.header << tmp << ";" << endl;
+    }
+    s << tmp << " {" << endl
+      << "  (void)data;" << endl
+      << "  if (mem) *mem = 0;" << endl
+      << "  if (n_in) *n_in = " << n_in << ";" << endl
+      << "  if (n_out) *n_out = " << n_out << ";" << endl
+      << "  return 0;" << endl
+      << "}" << endl
+      << endl;
+
+    // Function for freeing memory allocated in init
+    tmp = "int " + fname + "_free(void *mem)";
+    if (g.cpp) {
+      tmp = "extern \"C\" " + tmp;  // C linkage
+    }
+    if (g.with_header) {
+      g.header << tmp << ";" << endl;
+    }
+    s << tmp << " {" << endl
+      << "  (void)mem;" << endl
       << "  return 0;" << endl
       << "}" << endl
       << endl;
@@ -2022,7 +2051,7 @@ namespace casadi {
 
     // Function that returns the sparsity pattern
     tmp = "int " + fname + "_sparsity"
-      "(int i, int *nrow, int *ncol, const int **colind, const int **row)";
+      "(void *mem, int i, int *nrow, int *ncol, const int **colind, const int **row)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -2056,15 +2085,16 @@ namespace casadi {
     s << "  }" << endl << endl;
 
     // Decompress the sparsity pattern
-    s << "  *nrow = s[0];" << endl;
-    s << "  *ncol = s[1];" << endl;
-    s << "  *colind = s + 2;" << endl;
-    s << "  *row = s + 2 + (*ncol + 1);" << endl;
+    s << "  if (nrow) *nrow = s[0];" << endl;
+    s << "  if (ncol) *ncol = s[1];" << endl;
+    s << "  if (colind) *colind = s + 2;" << endl;
+    s << "  if (row) *row = s + 3 + s[1];" << endl;
     s << "  return 0;" << endl;
     s << "}" << endl << endl;
 
     // Function that returns work vector lengths
-    tmp = "int " + fname + "_work(int *sz_iw, int *sz_w)";
+    tmp = "int " + fname
+      + "_work(void *mem, int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -2072,6 +2102,8 @@ namespace casadi {
       g.header << tmp << ";" << endl;
     }
     s << tmp << " {" << endl;
+    s << "  if (sz_arg) *sz_arg = " << sz_arg() << ";" << endl;
+    s << "  if (sz_res) *sz_res = " << sz_res() << ";" << endl;
     s << "  if (sz_iw) *sz_iw = " << sz_iw() << ";" << endl;
     s << "  if (sz_w) *sz_w = " << sz_w() << ";" << endl;
     s << "  return 0;" << endl;
@@ -2137,7 +2169,7 @@ namespace casadi {
       }
 
       // Call the function
-      s << "  i = " << fname << "(arg, res, iw, " << fw << ");" << endl;
+      s << "  i = " << fname << "(0, arg, res, iw, " << fw << ");" << endl;
       s << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
              << "\\\" failed.\");" << endl;
 
@@ -2188,7 +2220,7 @@ namespace casadi {
         << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
-      s << "  int flag = " << fname << "(arg, res, iw, w+" << off << ");" << endl
+      s << "  int flag = " << fname << "(0, arg, res, iw, w+" << off << ");" << endl
         << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
@@ -2205,7 +2237,7 @@ namespace casadi {
     }
   }
 
-  std::string FunctionInternal::generateCall(const CodeGenerator& g,
+  std::string FunctionInternal::generic_call(const CodeGenerator& g, const std::string& proc,
                                              const std::string& arg, const std::string& res,
                                              const std::string& iw, const std::string& w) const {
     // Get the index of the function
@@ -2215,14 +2247,15 @@ namespace casadi {
 
     // Create a function call
     stringstream ss;
-    ss << "f" << f << "(" << arg << ", " << res << ", " << iw << ", " << w << ")";
+    ss << "f" << f << "(" << proc << " , " << arg << ", " << res << ", "
+       << iw << ", " << w << ")";
     return ss.str();
   }
 
-  std::string FunctionInternal::generateCall(const CodeGenerator& g,
+  std::string FunctionInternal::simple_call(const CodeGenerator& g,
                                              const std::string& arg,
                                              const std::string& res) const {
-    casadi_error("'generateCall' (simplified) not defined for " + type_name());
+    casadi_error("'simple_call' not defined for " + type_name());
   }
 
 
@@ -2246,8 +2279,8 @@ namespace casadi {
 
       // Shorthand
       g.body
-        << "#define " << name << "(arg, res, iw, w) "
-        << "CASADI_PREFIX(" << name << ")(arg, res, iw, w)" << endl << endl;
+        << "#define " << name << "(mem, arg, res, iw, w) "
+        << "CASADI_PREFIX(" << name << ")(mem, arg, res, iw, w)" << endl << endl;
     }
   }
 
@@ -2270,13 +2303,13 @@ namespace casadi {
     return Function::external(fname, dlname);
   }
 
-  void FunctionInternal::spFwdSwitch(const bvec_t** arg, bvec_t** res,
+  void FunctionInternal::spFwdSwitch(void* mem, const bvec_t** arg, bvec_t** res,
                                      int* iw, bvec_t* w) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
-    spFwd(arg, res, iw, w);
+    spFwd(0, arg, res, iw, w);
   }
 
-  void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res,
+  void FunctionInternal::spFwd(void* mem, const bvec_t** arg, bvec_t** res,
                                int* iw, bvec_t* w) {
     // Number inputs and outputs
     int n_in = this->n_in();
@@ -2327,13 +2360,13 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::spAdjSwitch(bvec_t** arg, bvec_t** res,
+  void FunctionInternal::spAdjSwitch(void* mem, bvec_t** arg, bvec_t** res,
                                      int* iw, bvec_t* w) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
-    spAdj(arg, res, iw, w);
+    spAdj(mem, arg, res, iw, w);
   }
 
-  void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res,
+  void FunctionInternal::spAdj(void* mem, bvec_t** arg, bvec_t** res,
                                int* iw, bvec_t* w) {
     // Number inputs and outputs
     int n_in = this->n_in();

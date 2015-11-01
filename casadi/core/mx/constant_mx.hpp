@@ -60,10 +60,10 @@ namespace casadi {
     static ConstantMX* create(const Matrix<double>& val);
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w) = 0;
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w) = 0;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) = 0;
+    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) = 0;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -77,10 +77,10 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get the operation */
     virtual int op() const { return OP_CONST;}
@@ -117,18 +117,18 @@ namespace casadi {
     }
 
     /** \brief  Evaluate the function numerically */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w) {
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
       std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
       std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool is_zero() const;
@@ -174,14 +174,14 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w) {}
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w) {}
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {}
+    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const {}
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const {}
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const { return 0;}
@@ -268,14 +268,14 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w);
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool is_zero() const { return v_.value==0;}
@@ -458,19 +458,19 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Constant<Value>::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     std::fill(res[0], res[0]+nnz(), static_cast<double>(v_.value));
   }
 
   template<typename Value>
-  void Constant<Value>::evalSX(const SXElement** arg, SXElement** res,
-                               int* iw, SXElement* w) {
-    std::fill(res[0], res[0]+nnz(), SXElement(v_.value));
+  void Constant<Value>::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                               int* iw, SXElem* w) {
+    std::fill(res[0], res[0]+nnz(), SXElem(v_.value));
   }
 
   template<typename Value>
-  void Constant<Value>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                 CodeGenerator& g) const {
+  void Constant<Value>::generate(CodeGenerator& g, const std::string& mem,
+                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     if (nnz()==0) {
       // Quick return
     } else if (nnz()==1) {

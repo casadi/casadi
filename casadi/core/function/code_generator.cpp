@@ -96,7 +96,8 @@ namespace casadi {
     if (this->with_header) {
       if (this->cpp) this->header << "extern \"C\" " ; // C linkage
       this->header
-        << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w);" << endl;
+        << "int " << fname
+        << "(void *mem, const real_t** arg, real_t** res, int* iw, real_t* w);" << endl;
     }
     f->generateMeta(*this, fname);
     this->exposed_fname.push_back(fname);
@@ -359,14 +360,15 @@ namespace casadi {
     return f->simplifiedCall();
   }
 
-  std::string CodeGenerator::call(const Function& f, const std::string& arg, const std::string& res,
-                                  const std::string& iw, const std::string& w) const {
-    return f->generateCall(*this, arg, res, iw, w);
+  std::string CodeGenerator::operator()(const Function& f, const std::string& mem,
+                                        const std::string& arg, const std::string& res,
+                                        const std::string& iw, const std::string& w) const {
+    return f->generic_call(*this, mem, arg, res, iw, w);
   }
 
-  std::string CodeGenerator::call(const Function& f,
-                                  const std::string& arg, const std::string& res) const {
-    return f->generateCall(*this, arg, res);
+  std::string CodeGenerator::operator()(const Function& f,
+                                        const std::string& arg, const std::string& res) const {
+    return f->simple_call(*this, arg, res);
   }
 
   void CodeGenerator::addExternal(const std::string& new_external) {

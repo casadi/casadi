@@ -193,7 +193,7 @@ namespace casadi {
     return Function(name, arg, res, opts);
   }
 
-  void Rootfinder::spFwd(const bvec_t** arg, bvec_t** res,
+  void Rootfinder::spFwd(void* mem, const bvec_t** arg, bvec_t** res,
                                        int* iw, bvec_t* w) {
     int num_out = n_out();
     int num_in = n_in();
@@ -207,7 +207,7 @@ namespace casadi {
     bvec_t** res1 = res+n_out();
     fill_n(res1, num_out, static_cast<bvec_t*>(0));
     res1[iout_] = tmp1;
-    f_.spFwd(arg1, res1, iw, w);
+    f_(0, arg1, res1, iw, w);
 
     // "Solve" in order to propagate to z
     fill_n(tmp2, n_, 0);
@@ -219,11 +219,11 @@ namespace casadi {
       arg1[iin_] = tmp2;
       copy(res, res+num_out, res1);
       res1[iout_] = 0;
-      f_.spFwd(arg1, res1, iw, w);
+      f_(0, arg1, res1, iw, w);
     }
   }
 
-  void Rootfinder::spAdj(bvec_t** arg, bvec_t** res,
+  void Rootfinder::spAdj(void* mem, bvec_t** arg, bvec_t** res,
                                        int* iw, bvec_t* w) {
     int num_out = n_out();
     int num_in = n_in();
@@ -246,7 +246,7 @@ namespace casadi {
     copy(arg, arg+num_in, arg1);
     arg1[iin_] = tmp1;
     if (num_out>1) {
-      f_.spAdj(arg1, res1, iw, w);
+      f_.rev(0, arg1, res1, iw, w);
     }
 
     // "Solve" in order to get seed
@@ -257,7 +257,7 @@ namespace casadi {
     for (int i=0; i<num_out; ++i) res1[i] = 0;
     res1[iout_] = tmp2;
     arg1[iin_] = 0; // just a guess
-    f_.spAdj(arg1, res1, iw, w);
+    f_.rev(0, arg1, res1, iw, w);
   }
 
   std::map<std::string, Rootfinder::Plugin> Rootfinder::solvers_;

@@ -73,7 +73,7 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunction::evalD(const double** arg, double** res,
+  void SXFunction::evalD(void* mem, const double** arg, double** res,
                                  int* iw, double* w) {
     double time_start=0;
     double time_stop=0;
@@ -173,7 +173,7 @@ namespace casadi {
     FunctionInternal::print(stream);
 
     // Iterator to free variables
-    vector<SXElement>::const_iterator p_it = free_vars_.begin();
+    vector<SXElem>::const_iterator p_it = free_vars_.begin();
 
     // Normal, interpreted output
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -303,9 +303,9 @@ namespace casadi {
       SXNode* t = *it;
       if (t) {
         if (t->is_constant())
-          constants_.push_back(SXElement::create(t));
+          constants_.push_back(SXElem::create(t));
         else if (!t->is_symbolic())
-          operations_.push_back(SXElement::create(t));
+          operations_.push_back(SXElem::create(t));
       }
     }
 
@@ -485,7 +485,7 @@ namespace casadi {
          it!=symb_loc.end(); ++it) {
       if (it->second->temp!=0) {
         // Save to list of free parameters
-        free_vars_.push_back(SXElement::create(it->second));
+        free_vars_.push_back(SXElem::create(it->second));
 
         // Remove marker
         it->second->temp=0;
@@ -523,7 +523,7 @@ namespace casadi {
       int alg_counter = 0;
 
       // Iterator to free variables
-      vector<SXElement>::const_iterator p_it = free_vars_.begin();
+      vector<SXElem>::const_iterator p_it = free_vars_.begin();
 
       std::stringstream stream;
       for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -568,18 +568,18 @@ namespace casadi {
     }
   }
 
-  void SXFunction::evalSX(const SXElement** arg, SXElement** res,
-                                  int* iw, SXElement* w) {
+  void SXFunction::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                  int* iw, SXElem* w) {
     if (verbose()) userOut() << "SXFunction::evalSXsparse begin" << endl;
 
     // Iterator to the binary operations
-    vector<SXElement>::const_iterator b_it=operations_.begin();
+    vector<SXElem>::const_iterator b_it=operations_.begin();
 
     // Iterator to stack of constants
-    vector<SXElement>::const_iterator c_it = constants_.begin();
+    vector<SXElem>::const_iterator c_it = constants_.begin();
 
     // Iterator to free variables
-    vector<SXElement>::const_iterator p_it = free_vars_.begin();
+    vector<SXElem>::const_iterator p_it = free_vars_.begin();
 
     // Evaluate algorithm
     if (verbose()) {
@@ -602,7 +602,7 @@ namespace casadi {
         {
           // Evaluate the function to a temporary value
           // (as it might overwrite the children in the work vector)
-          SXElement f;
+          SXElem f;
           switch (it->op) {
             CASADI_MATH_FUN_BUILTIN(w[it->i1], w[it->i2], f)
           }
@@ -661,11 +661,11 @@ namespace casadi {
     }
 
     // Iterator to the binary operations
-    vector<SXElement>::const_iterator b_it=operations_.begin();
+    vector<SXElem>::const_iterator b_it=operations_.begin();
 
     // Tape
-    vector<TapeEl<SXElement> > s_pdwork(operations_.size());
-    vector<TapeEl<SXElement> >::iterator it1 = s_pdwork.begin();
+    vector<TapeEl<SXElem> > s_pdwork(operations_.size());
+    vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
     if (verbose()) userOut() << "SXFunction::evalFwd evaluating algorithm forward" << endl;
@@ -678,7 +678,7 @@ namespace casadi {
         break;
       default:
         {
-          const SXElement& f=*b_it++;
+          const SXElem& f=*b_it++;
           switch (it->op) {
             CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, it1++->d)
           }
@@ -690,7 +690,7 @@ namespace casadi {
     if (verbose())
       userOut() << "SXFunction::evalFwd calculating forward derivatives" << endl;
     for (int dir=0; dir<nfwd; ++dir) {
-      vector<TapeEl<SXElement> >::const_iterator it2 = s_pdwork.begin();
+      vector<TapeEl<SXElem> >::const_iterator it2 = s_pdwork.begin();
       for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
         switch (it->op) {
         case OP_INPUT:
@@ -756,11 +756,11 @@ namespace casadi {
     }
 
     // Iterator to the binary operations
-    vector<SXElement>::const_iterator b_it=operations_.begin();
+    vector<SXElem>::const_iterator b_it=operations_.begin();
 
     // Tape
-    vector<TapeEl<SXElement> > s_pdwork(operations_.size());
-    vector<TapeEl<SXElement> >::iterator it1 = s_pdwork.begin();
+    vector<TapeEl<SXElem> > s_pdwork(operations_.size());
+    vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
     if (verbose()) userOut() << "SXFunction::evalFwd evaluating algorithm forward" << endl;
@@ -773,7 +773,7 @@ namespace casadi {
         break;
       default:
         {
-          const SXElement& f=*b_it++;
+          const SXElem& f=*b_it++;
           switch (it->op) {
             CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, it1++->d)
           }
@@ -786,10 +786,10 @@ namespace casadi {
                        << endl;
     fill(s_work_.begin(), s_work_.end(), 0);
     for (int dir=0; dir<nadj; ++dir) {
-      vector<TapeEl<SXElement> >::const_reverse_iterator it2 = s_pdwork.rbegin();
+      vector<TapeEl<SXElem> >::const_reverse_iterator it2 = s_pdwork.rbegin();
       for (vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin();
            it!=algorithm_.rend(); ++it) {
-        SXElement seed;
+        SXElem seed;
         switch (it->op) {
         case OP_INPUT:
           asens[dir][it->i1].data()[it->i2] = s_work_[it->i0];
@@ -837,7 +837,7 @@ namespace casadi {
     if (!fwd) fill_n(iwork, sz_w(), bvec_t(0));
   }
 
-  void SXFunction::spFwd(const bvec_t** arg, bvec_t** res,
+  void SXFunction::spFwd(void* mem, const bvec_t** arg, bvec_t** res,
                                  int* iw, bvec_t* w) {
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
@@ -855,7 +855,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::spAdj(bvec_t** arg, bvec_t** res,
+  void SXFunction::spAdj(void* mem, bvec_t** arg, bvec_t** res,
                                  int* iw, bvec_t* w) {
     fill_n(w, sz_w(), 0);
 

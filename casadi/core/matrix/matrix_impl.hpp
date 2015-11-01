@@ -3042,10 +3042,10 @@ namespace casadi {
   zz_pinv(const std::string& lsolver, const Dict& dict) const;
 
   template<>
-  CASADI_EXPORT bool Matrix<SXElement>::__nonzero__() const;
+  CASADI_EXPORT bool Matrix<SXElem>::__nonzero__() const;
 
   // Specialize functions in GenericMatrix<SX> and SX
-  template<> inline std::string matrixName<SXElement>() { return "SX"; }
+  template<> inline std::string matrixName<SXElem>() { return "SX"; }
   template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
   template<> bool SX::is_regular() const;
   template<> bool SX::is_smooth() const;
@@ -3139,7 +3139,7 @@ namespace casadi {
   // Templates instantiated in matrix.cpp
   extern template class Matrix<double>;
   extern template class Matrix<int>;
-  extern template class Matrix<SXElement>;
+  extern template class Matrix<SXElem>;
 #endif // CASADI_MATRIX_CPP
 
 } // namespace casadi

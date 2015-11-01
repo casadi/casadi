@@ -25,7 +25,7 @@
 
 #include "function/function.hpp"
 
-#include "sx/sx_element.hpp"
+#include "sx/sx_elem.hpp"
 #include "matrix/matrix.hpp"
 #include "matrix/sparse_storage.hpp"
 #include "mx/mx.hpp"
@@ -62,7 +62,7 @@ namespace casadi {
 
 namespace std {
   #ifndef _MSC_VER
-  template class std::numeric_limits<casadi::SXElement>;
+  template class std::numeric_limits<casadi::SXElem>;
   #endif
 
 } // namespace std

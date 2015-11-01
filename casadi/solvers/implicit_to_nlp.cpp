@@ -53,7 +53,7 @@ namespace casadi {
   QpToImplicit::~QpToImplicit() {
   }
 
-  void QpToImplicit::evalD(const double** arg, double** res, int* iw, double* w) {
+  void QpToImplicit::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     // Copy to buffers
     for (int i=0; i<n_in(); ++i) {
       if (arg[i]) {

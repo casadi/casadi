@@ -46,7 +46,7 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(void* mem, const T** arg, T** res, int* iw, T* w);
 
     /// Destructor
     virtual ~HorzRepmat() {}
@@ -55,19 +55,19 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -78,8 +78,8 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                  CodeGenerator& g) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Get the operation */
     virtual int op() const { return OP_HORZREPMAT;}
@@ -99,8 +99,7 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T, typename R>
-    void evalGen(const T** arg, T** res, int* iw, T* w,
-      R reduction);
+    void evalGen(void* mem, const T** arg, T** res, int* iw, T* w, R reduction);
 
     /// Destructor
     virtual ~HorzRepsum() {}
@@ -109,19 +108,19 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -132,8 +131,8 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                  CodeGenerator& g) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Get the operation */
     virtual int op() const { return OP_HORZREPSUM;}

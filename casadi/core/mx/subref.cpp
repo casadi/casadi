@@ -33,12 +33,12 @@ namespace casadi {
     setDependencies(x);
   }
 
-  void SubRef::evalD(const double** arg, double** res, int* iw, double* w) {
+  void SubRef::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void SubRef::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void SubRef::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
@@ -46,11 +46,11 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void SubRef::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     casadi_error("not ready");
   }
 
-  void SubRef::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void SubRef::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     casadi_error("not ready");
   }
 
@@ -74,8 +74,8 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                        CodeGenerator& g) const {
+  void SubRef::generate(CodeGenerator& g, const std::string& mem,
+                        const std::vector<int>& arg, const std::vector<int>& res) const {
     casadi_error("not ready");
   }
 

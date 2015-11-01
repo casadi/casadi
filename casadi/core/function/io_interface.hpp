@@ -26,7 +26,7 @@
 #ifndef CASADI_IO_INTERFACE_HPP
 #define CASADI_IO_INTERFACE_HPP
 
-#include "../sx/sx_element.hpp"
+#include "../sx/sx_elem.hpp"
 #include "../mx/mx.hpp"
 #include "../options_functionality.hpp"
 

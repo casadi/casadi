@@ -271,7 +271,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::evalD(const double** arg, double** res, int* iw, double* w) {
+  void KinsolInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     // Reset the counters
     t_func_ = 0;
     t_jac_ = 0;

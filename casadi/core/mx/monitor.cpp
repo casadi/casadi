@@ -61,13 +61,13 @@ namespace casadi {
     }
   }
 
-  void Monitor::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
+  void Monitor::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Monitor::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Monitor::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     // Print comment
     userOut() << comment_ << ":" << endl;
     userOut() << "[";
@@ -84,13 +84,13 @@ namespace casadi {
     }
   }
 
-  void Monitor::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Monitor::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Monitor::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Monitor::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();
@@ -102,8 +102,8 @@ namespace casadi {
     }
   }
 
-  void Monitor::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                         CodeGenerator& g) const {
+  void Monitor::generate(CodeGenerator& g, const std::string& mem,
+                         const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print comment
     g.body << "  " << g.printf(comment_ + "\\n[") << endl
            << "  for (i=0, rr=" << g.work(arg[0], dep(0).nnz())

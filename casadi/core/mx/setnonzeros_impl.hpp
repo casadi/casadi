@@ -436,20 +436,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalD(const double** arg, double** res,
+  void SetNonzerosVector<Add>::evalD(void* mem, const double** arg, double** res,
                                      int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+    evalGen<double>(mem, arg, res, iw, w);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalSX(const SXElement** arg, SXElement** res,
-                                      int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void SetNonzerosVector<Add>::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                      int* iw, SXElem* w) {
+    evalGen<SXElem>(mem, arg, res, iw, w);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosVector<Add>::evalGen(const T** arg, T** res,
+  void SetNonzerosVector<Add>::evalGen(void* mem, const T** arg, T** res,
                                        int* iw, T* w) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
@@ -467,20 +467,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalD(const double** arg, double** res,
+  void SetNonzerosSlice<Add>::evalD(void* mem, const double** arg, double** res,
                                     int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+    evalGen<double>(mem, arg, res, iw, w);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalSX(const SXElement** arg, SXElement** res,
-                                     int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void SetNonzerosSlice<Add>::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                     int* iw, SXElem* w) {
+    evalGen<SXElem>(mem, arg, res, iw, w);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice<Add>::evalGen(const T** arg, T** res,
+  void SetNonzerosSlice<Add>::evalGen(void* mem, const T** arg, T** res,
                                       int* iw, T* w) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
@@ -499,20 +499,20 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalD(const double** arg, double** res,
+  void SetNonzerosSlice2<Add>::evalD(void* mem, const double** arg, double** res,
                                      int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+    evalGen<double>(mem, arg, res, iw, w);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalSX(const SXElement** arg, SXElement** res,
-                                      int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void SetNonzerosSlice2<Add>::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                      int* iw, SXElem* w) {
+    evalGen<SXElem>(mem, arg, res, iw, w);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice2<Add>::evalGen(const T** arg, T** res,
+  void SetNonzerosSlice2<Add>::evalGen(void* mem, const T** arg, T** res,
                                        int* iw, T* w) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
@@ -537,7 +537,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spFwd(const bvec_t** arg,
+  spFwd(void* mem, const bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
@@ -557,7 +557,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spAdj(bvec_t** arg,
+  spAdj(void* mem, bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -574,7 +574,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spFwd(const bvec_t** arg,
+  spFwd(void* mem, const bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
@@ -594,7 +594,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spAdj(bvec_t** arg,
+  spAdj(void* mem, bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -609,7 +609,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spFwd(const bvec_t** arg,
+  spFwd(void* mem, const bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
@@ -631,7 +631,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spAdj(bvec_t** arg,
+  spAdj(void* mem, bvec_t** arg,
         bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -745,8 +745,9 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                        CodeGenerator& g) const {
+  void SetNonzerosVector<Add>::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
@@ -764,8 +765,9 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                       CodeGenerator& g) const {
+  void SetNonzerosSlice<Add>::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
@@ -781,8 +783,9 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                        CodeGenerator& g) const {
+  void SetNonzerosSlice2<Add>::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),

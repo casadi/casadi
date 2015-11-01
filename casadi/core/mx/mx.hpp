@@ -47,7 +47,7 @@ namespace casadi {
       The MX class is designed to have identical syntax with the Matrix<> template class,
       and uses Matrix<double> as its internal representation of the values at a node. By keeping
       the syntaxes identical, it is possible to switch from one class to the other,
-      as well as inlining MX functions to SXElement functions.
+      as well as inlining MX functions to SXElem functions.
 
       Note that an operation is always "lazy", making a matrix multiplication will create a
       matrix multiplication node, not perform the actual multiplication.
@@ -171,7 +171,7 @@ namespace casadi {
     /** \brief  Get an output */
     MX getOutput(int oind=0) const;
 
-    /** \brief Get the number of dependencies of a binary SXElement */
+    /** \brief Get the number of dependencies of a binary SXElem */
     int getNdeps() const;
 
     /// Get the name.

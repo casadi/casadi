@@ -1222,7 +1222,7 @@ import_array();
 
       // SX already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
-                                    $descriptor(casadi::Matrix<casadi::SXElement>*), 0))) {
+                                    $descriptor(casadi::Matrix<casadi::SXElem>*), 0))) {
         return true;
       }
 
@@ -1328,7 +1328,7 @@ import_array();
     }
 
     GUESTOBJECT* from_ptr(const SX *a) {
-      return SWIG_NewPointerObj(new SX(*a), $descriptor(casadi::Matrix<casadi::SXElement> *), SWIG_POINTER_OWN);
+      return SWIG_NewPointerObj(new SX(*a), $descriptor(casadi::Matrix<casadi::SXElem> *), SWIG_POINTER_OWN);
     }
   } // namespace casadi
  }
@@ -1971,10 +1971,10 @@ import_array();
 %casadi_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
 %casadi_template("[double]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
 %casadi_template("[[double]]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
-%casadi_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElement>)
-%casadi_template("[SX]", PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElement> >)
-%casadi_template("[[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElement> > >)
-%casadi_template("str:SX", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElement> >)
+%casadi_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
+%casadi_template("[SX]", PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElem> >)
+%casadi_template("[[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
+%casadi_template("str:SX", PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElem> >)
 %casadi_typemaps("MX", PREC_MX, casadi::MX)
 %casadi_template("[MX]", PREC_MXVector, std::vector<casadi::MX>)
 %casadi_template("[[MX]]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
@@ -2338,7 +2338,7 @@ class NZproxy:
 %template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
 %template(PrintIMatrix)      casadi::PrintableObject<casadi::Matrix<int> >;
 %template(PrintDMatrix)      casadi::PrintableObject<casadi::Matrix<double> >;
-//%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
+//%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElem> >;
 %template(PrintNlpBuilder)     casadi::PrintableObject<casadi::NlpBuilder>;
 %template(PrintVariable)        casadi::PrintableObject<casadi::Variable>;
 %template(PrintDaeBuilder)     casadi::PrintableObject<casadi::DaeBuilder>;
@@ -2397,21 +2397,21 @@ namespace casadi{
 
 %template(SpIMatrix)        casadi::SparsityInterface<casadi::Matrix<int> >;
 %template(SpDMatrix)        casadi::SparsityInterface<casadi::Matrix<double> >;
-%template(SpSX)             casadi::SparsityInterface<casadi::Matrix<casadi::SXElement> >;
+%template(SpSX)             casadi::SparsityInterface<casadi::Matrix<casadi::SXElem> >;
 %template(SpMX)             casadi::SparsityInterface<casadi::MX>;
 
 %include <casadi/core/matrix/generic_matrix.hpp>
 
 %template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;
 %template(GenDMatrix)        casadi::GenericMatrix<casadi::Matrix<double> >;
-%template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElement> >;
+%template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElem> >;
 %template(GenMX)             casadi::GenericMatrix<casadi::MX>;
 
 %include <casadi/core/matrix/generic_expression.hpp>
 
 %template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
 %template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
-%template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElement> >;
+%template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElem> >;
 %template(ExpMX)             casadi::GenericExpression<casadi::MX>;
 
 // Prefix symbols
@@ -2552,7 +2552,7 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SPARSITY), Sparsity)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_MX), MX)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
 SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
-SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
+SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 %enddef
 
 #ifdef SWIGMATLAB
@@ -2781,7 +2781,7 @@ DECL void %SHOW(extractShared)(const std::vector< M >& ex,
 GENERIC_MATRIX_FUN(DECL, (FLAG | IS_MX), MX)
 GENERIC_MATRIX_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
 GENERIC_MATRIX_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
-GENERIC_MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
+GENERIC_MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 %enddef
 
 %define GENERIC_EXPRESSION_FUN(DECL, FLAG, M) 
@@ -2839,7 +2839,7 @@ DECL M %HIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_MX), MX)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
-GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
+GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 %enddef
 
 %define MATRIX_FUN(DECL, FLAG, M)
@@ -2957,7 +2957,7 @@ DECL M %SHOW(eig_symbolic)(const M& m) {
 %define MATRIX_ALL(DECL, FLAG)
 MATRIX_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
 MATRIX_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
-MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElement>)
+MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 %enddef
 
 %define MX_FUN(DECL, FLAG, M)
@@ -3000,7 +3000,7 @@ DECL std::vector< M >
 MX_FUN(DECL, (FLAG | IS_MX), MX)
 %enddef
 
-%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElement> >;
+%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElem> >;
 
 %include <casadi/core/matrix/matrix.hpp>
 
@@ -3177,7 +3177,7 @@ namespace casadi{
 } // namespace casadi
 #endif // SWIGPYTHON
 
-%include <casadi/core/sx/sx_element.hpp>
+%include <casadi/core/sx/sx_elem.hpp>
 
 #ifdef SWIGPYTHON
 %extend casadi::Sparsity{
@@ -3242,10 +3242,10 @@ except:
 #endif // SWIGPYTHON
 
 namespace casadi {
-%extend Matrix<SXElement>{
+%extend Matrix<SXElem>{
 
     %matrix_convertors
-    %matrix_helpers(casadi::Matrix<casadi::SXElement>)
+    %matrix_helpers(casadi::Matrix<casadi::SXElem>)
 
     #ifdef SWIGPYTHON
     %pythoncode %{
@@ -3272,8 +3272,8 @@ namespace casadi {
 %template()    std::vector<PyObject*>;
 #endif // SWIGPYTHON
 
-%template(SX) casadi::Matrix<casadi::SXElement>;
-%extend casadi::Matrix<casadi::SXElement> {
+%template(SX) casadi::Matrix<casadi::SXElem>;
+%extend casadi::Matrix<casadi::SXElem> {
    %template(SX) Matrix<int>;
    %template(SX) Matrix<double>;
 };
@@ -3520,7 +3520,7 @@ def swig_typename_convertor_cpp2python(s):
   s = s.replace(" const &","")
   s = s.replace("friendwrap_","")
   s = re.sub(r"\b((\w+)(< \w+ >)?)::\2\b",r"\1",s)
-  s = re.sub("(const )?Matrix< ?SXElement *>( &)?",r"SX",s)
+  s = re.sub("(const )?Matrix< ?SXElem *>( &)?",r"SX",s)
   s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
   s = re.sub("(const )?Matrix< ?int *>( ?&)?",r"IMatrix ",s)
   s = re.sub("(const )?Matrix< ?double *>( ?&)?",r"DMatrix ",s)

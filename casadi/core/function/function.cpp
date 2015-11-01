@@ -355,7 +355,7 @@ namespace casadi {
     vector<double> buf_w(sz_w());
 
     // Evaluate memoryless
-    (*this)(getPtr(arg), getPtr(res), getPtr(buf_iw), getPtr(buf_w));
+    (*this)(0, getPtr(arg), getPtr(res), getPtr(buf_iw), getPtr(buf_w));
   }
 
   Function Function::mapaccum(const string& name, int N, const Dict& opts) const {
@@ -750,12 +750,12 @@ namespace casadi {
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
-  void Function::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    (*this)->spFwdSwitch(arg, res, iw, w);
+  void Function::operator()(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    (*this)->spFwdSwitch(mem, arg, res, iw, w);
   }
 
-  void Function::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    (*this)->spAdjSwitch(arg, res, iw, w);
+  void Function::rev(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    (*this)->spAdjSwitch(mem, arg, res, iw, w);
   }
 
   bool Function::spCanEvaluate(bool fwd) {
@@ -1292,12 +1292,12 @@ namespace casadi {
     return (*this)->default_in(ind);
   }
 
-  void Function::operator()(const double** arg, double** res, int* iw, double* w) {
-    (*this)->eval(arg, res, iw, w);
+  void Function::operator()(void* mem, const double** arg, double** res, int* iw, double* w) {
+    (*this)->eval(mem, arg, res, iw, w);
   }
 
-  void Function::operator()(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    (*this)->evalSX(arg, res, iw, w);
+  void Function::operator()(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+    (*this)->evalSX(mem, arg, res, iw, w);
   }
 
   const SX Function::sx_in(int ind) const {

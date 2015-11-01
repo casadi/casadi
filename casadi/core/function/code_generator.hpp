@@ -85,11 +85,12 @@ namespace casadi {
     static bool simplifiedCall(const Function& f);
 
     /** \brief Generate a call to a function (generic signature) */
-    std::string call(const Function& f, const std::string& arg, const std::string& res,
-                     const std::string& iw, const std::string& w) const;
+    std::string operator()(const Function& f, const std::string& mem,
+                           const std::string& arg, const std::string& res,
+                           const std::string& iw, const std::string& w) const;
 
     /** \brief Generate a call to a function (simplified signature) */
-    std::string call(const Function& f, const std::string& arg, const std::string& res) const;
+    std::string operator()(const Function& f, const std::string& arg, const std::string& res) const;
 
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);

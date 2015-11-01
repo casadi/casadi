@@ -38,16 +38,16 @@ namespace casadi {
     return "||" + arg.at(0) + "||_F";
   }
 
-  void NormF::evalD(const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void NormF::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(mem, arg, res, iw, w);
   }
 
-  void NormF::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void NormF::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+    evalGen<SXElem>(mem, arg, res, iw, w);
   }
 
   template<typename T>
-  void NormF::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void NormF::evalGen(void* mem, const T** arg, T** res, int* iw, T* w) {
     *res[0] = sqrt(casadi_inner_prod(dep().nnz(), arg[0], arg[0]));
   }
 
@@ -71,8 +71,8 @@ namespace casadi {
     }
   }
 
-  void NormF::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                       CodeGenerator& g) const {
+  void NormF::generate(CodeGenerator& g, const std::string& mem,
+                       const std::vector<int>& arg, const std::vector<int>& res) const {
     g.assign(g.body, g.workel(res[0]),
              "sqrt(" + g.inner_prod(dep().nnz(), g.work(arg[0], dep(0).nnz()),
                                       g.work(arg[0], dep(0).nnz())) + ")");

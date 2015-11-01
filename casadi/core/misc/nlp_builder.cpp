@@ -93,7 +93,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   lambda_init = DMatrix::zeros(g.sparsity());
 
   // All variables, including dependent
-  vector<SXElement> v = x.data();
+  vector<SXElem> v = x.data();
 
   // Process segments
   while (true) {
@@ -419,7 +419,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   nlfile.close();
 }
 
-SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXElement>& v) {
+SXElem NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXElem>& v) {
   // Read the instruction
   char inst;
   stream >> inst;
@@ -465,7 +465,7 @@ SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<S
         case 51:  case 52:  case 53:
         {
           // Read dependency
-          SXElement x = readExpressionNL(stream, v);
+          SXElem x = readExpressionNL(stream, v);
 
           // Perform operation
           switch (i) {
@@ -503,8 +503,8 @@ SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<S
         case 57:  case 58:  case 73:
         {
           // Read dependencies
-          SXElement x = readExpressionNL(stream, v);
-          SXElement y = readExpressionNL(stream, v);
+          SXElem x = readExpressionNL(stream, v);
+          SXElem y = readExpressionNL(stream, v);
 
           // Perform operation
           switch (i) {
@@ -545,7 +545,7 @@ SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<S
           stream >> n;
 
           // Collect the arguments
-          vector<SXElement> args(n);
+          vector<SXElem> args(n);
           for (int k=0; k<n; ++k) {
             args[k] = readExpressionNL(stream, v);
           }
@@ -563,8 +563,8 @@ SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<S
             // case 74: return alldiff(args).toScalar(); FIXME // rename?
             case 54:
             {
-              SXElement r = 0;
-              for (vector<SXElement>::const_iterator it=args.begin();
+              SXElem r = 0;
+              for (vector<SXElem>::const_iterator it=args.begin();
                    it!=args.end(); ++it) r += *it;
               return r;
             }

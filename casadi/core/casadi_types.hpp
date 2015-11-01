@@ -52,7 +52,7 @@
 namespace casadi {
 
   /// Forward declarations
-  class SXElement;
+  class SXElem;
   class MX;
   template<class T> class Matrix;
   class Function;

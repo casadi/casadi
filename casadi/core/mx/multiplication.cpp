@@ -49,17 +49,17 @@ namespace casadi {
     return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
-  void Multiplication::evalD(const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void Multiplication::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    evalGen<double>(mem, arg, res, iw, w);
   }
 
-  void Multiplication::evalSX(const SXElement** arg, SXElement** res,
-                              int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void Multiplication::evalSX(void* mem, const SXElem** arg, SXElem** res,
+                              int* iw, SXElem* w) {
+    evalGen<SXElem>(mem, arg, res, iw, w);
   }
 
   template<typename T>
-  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void Multiplication::evalGen(void* mem, const T** arg, T** res, int* iw, T* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     casadi_mm_sparse(arg[1], dep(1).sparsity(),
                      arg[2], dep(2).sparsity(),
@@ -88,7 +88,7 @@ namespace casadi {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw,
+  void Multiplication::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw,
                              bvec_t* w) {
     copyFwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
@@ -96,7 +96,7 @@ namespace casadi {
                             res[0], sparsity(), w);
   }
 
-  void Multiplication::spAdj(bvec_t** arg, bvec_t** res,
+  void Multiplication::spAdj(void* mem, bvec_t** arg, bvec_t** res,
                              int* iw, bvec_t* w) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
@@ -104,8 +104,8 @@ namespace casadi {
     copyAdj(arg[0], res[0], nnz());
   }
 
-  void Multiplication::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                CodeGenerator& g) const {
+  void Multiplication::generate(CodeGenerator& g, const std::string& mem,
+                                const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
@@ -119,8 +119,9 @@ namespace casadi {
     g.body << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", w);" << endl;
   }
 
-  void DenseMultiplication::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                     CodeGenerator& g) const {
+  void DenseMultiplication::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),

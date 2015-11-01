@@ -98,7 +98,7 @@ namespace casadi {
 
 #ifndef SWIG
     /** \brief Evaluate numerically, work vectors given */
-    virtual void eval(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w);
 #endif // SWIG
 
     /** \brief Number of input arguments

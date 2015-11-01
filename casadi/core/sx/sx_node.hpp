@@ -32,7 +32,7 @@
 #include <math.h>
 
 /** \brief  Scalar expression (which also works as a smart pointer class to this class) */
-#include "sx_element.hpp"
+#include "sx_elem.hpp"
 
 
 /// \cond INTERNAL
@@ -43,8 +43,8 @@ namespace casadi {
       \date 2010
   */
   class SXNode {
-    friend class SXElement;
-    friend class Matrix<SXElement>;
+    friend class SXElem;
+    friend class Matrix<SXElem>;
 
   public:
 
@@ -87,10 +87,10 @@ namespace casadi {
     virtual int ndep() const { return 0;}
 
     /** \brief  get the reference of a child */
-    virtual const SXElement& dep(int i) const;
+    virtual const SXElem& dep(int i) const;
 
     /** \brief  get the reference of a child */
-    virtual SXElement& dep(int i);
+    virtual SXElem& dep(int i);
 
     /** \brief  Check if smooth */
     virtual bool is_smooth() const;

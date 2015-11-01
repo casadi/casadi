@@ -53,12 +53,13 @@ namespace casadi {
 
   ///@{
   /** \brief  Function pointer types */
-  typedef int (*sparsityPtr)(int i, int *n_row, int *n_col,
-                             const int **colind, const int **row);
-  typedef int (*workPtr)(int *n_iw, int *n_w);
-  typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
-  typedef void (*simplifiedPtr)(const double* arg, double* res);
-  typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
+  typedef int (*init_t)(void **mem, int *n_in, int *n_out, void *data);
+  typedef int (*freemem_t)(void* mem);
+  typedef int (*work_t)(void* mem, int *sz_arg, int* sz_res, int *sz_iw, int *sz_w);
+  typedef int (*sparsity_t)(void* mem, int i, int *n_row, int *n_col,
+                            const int **colind, const int **row);
+  typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
+  typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
   /** \brief Internal class for Function
@@ -112,19 +113,19 @@ namespace casadi {
     virtual void spInit(bool fwd) {}
 
     /** \brief  Evaluate numerically, possibly using just-in-time compilation */
-    void eval(const double** arg, double** res, int* iw, double* w);
+    void eval(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return false;}
 
-    /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(const SXElement** arg, SXElement** res,
-                        int* iw, SXElement* w);
+    /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
+    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
+                        int* iw, SXElem* w);
 
-    /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
+    /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
 
     /** \brief  Evaluate symbolically, MX type */
@@ -326,8 +327,8 @@ namespace casadi {
     Function wrapMXFunction();
 
     /** \brief Generate function call */
-    virtual void generate(CodeGenerator& g, const std::vector<int>& arg,
-                          const std::vector<int>& res) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Generate code the function */
     virtual void generateFunction(CodeGenerator& g, const std::string& fname,
@@ -340,13 +341,13 @@ namespace casadi {
     virtual bool simplifiedCall() const { return false;}
 
     /** \brief Generate a call to a function (generic signature) */
-    virtual std::string generateCall(const CodeGenerator& g,
+    virtual std::string generic_call(const CodeGenerator& g, const std::string& mem,
                                      const std::string& arg, const std::string& res,
                                      const std::string& iw, const std::string& w) const;
 
     /** \brief Generate a call to a function (simplified signature) */
-    virtual std::string generateCall(const CodeGenerator& g,
-                                     const std::string& arg, const std::string& res) const;
+    virtual std::string simple_call(const CodeGenerator& g,
+                                    const std::string& arg, const std::string& res) const;
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
@@ -600,16 +601,16 @@ namespace casadi {
     /// For documentation, see the MXNode class
     ///@{
     /** \brief  Propagate sparsity forward */
-    virtual void spFwdSwitch(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwdSwitch(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdjSwitch(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdjSwitch(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
@@ -681,7 +682,7 @@ namespace casadi {
 
     /** \brief  Use just-in-time compiler */
     bool jit_;
-    evalPtr evalD_;
+    eval_t evalD_;
 
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;

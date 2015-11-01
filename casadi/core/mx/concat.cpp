@@ -37,12 +37,12 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Concat::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void Concat::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void Concat::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
@@ -56,7 +56,7 @@ namespace casadi {
     }
   }
 
-  void Concat::spFwd(const bvec_t** arg,
+  void Concat::spFwd(void* mem, const bvec_t** arg,
                      bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
@@ -67,7 +67,7 @@ namespace casadi {
     }
   }
 
-  void Concat::spAdj(bvec_t** arg,
+  void Concat::spAdj(void* mem, bvec_t** arg,
                      bvec_t** res, int* iw, bvec_t* w) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
@@ -80,8 +80,8 @@ namespace casadi {
     }
   }
 
-  void Concat::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                        CodeGenerator& g) const {
+  void Concat::generate(CodeGenerator& g, const std::string& mem,
+                        const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "  rr=" << g.work(res[0], nnz()) << ";" << endl;
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();

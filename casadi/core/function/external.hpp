@@ -64,8 +64,6 @@ namespace casadi {
     handle_t handle_;
 
   public:
-    int n_in, n_out, sz_arg, sz_res;
-
     // Default constructor
     LibInfo() : handle_(0) {}
 
@@ -90,8 +88,6 @@ namespace casadi {
     Compiler compiler_;
 
   public:
-    int n_in, n_out, sz_arg, sz_res;
-
     // Default constructor
     LibInfo() {}
 
@@ -129,11 +125,8 @@ namespace casadi {
     /** \brief Sparsities of function inputs and outputs */
     virtual Sparsity get_sparsity_in(int ind) const;
     virtual Sparsity get_sparsity_out(int ind) const;
-    Sparsity get_sparsity(int ind) const;
+    virtual Sparsity get_sparsity(int ind) const = 0;
     /// @}
-
-    /** \brief Retreive sparsities */
-    sparsityPtr sparsity_;
 
   private:
     /** \brief Creator function, use this for creating instances of the class */
@@ -149,6 +142,21 @@ namespace casadi {
     /** \brief Information about the library */
     LibInfo<LibType> li_;
 
+    /** \brief Function */
+    void *mem_;
+
+    /** \brief Number of inputs and outputs */
+    int n_in_, n_out_;
+
+    /// @{
+    /** \brief Retreive sparsities */
+    sparsity_t sparsity_;
+    virtual Sparsity get_sparsity(int ind) const;
+    /// @}
+
+    /** \brief Free memory */
+    freemem_t freemem_;
+
     /** \brief  constructor is protected */
     CommonExternal(const std::string& name, const LibInfo<LibType>& li);
   public:
@@ -157,8 +165,8 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return li_.n_in;}
-    virtual size_t get_n_out() const { return li_.n_out;}
+    virtual size_t get_n_in() const { return n_in_;}
+    virtual size_t get_n_out() const { return n_out_;}
     ///@}
 
     ///@{
@@ -193,20 +201,20 @@ namespace casadi {
     virtual ~SimplifiedExternal() {}
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
 
     /** \brief Generate a call to a function (simplified signature) */
-    virtual std::string generateCall(const CodeGenerator& g,
-                                     const std::string& arg, const std::string& res) const;
+    virtual std::string simple_call(const CodeGenerator& g,
+                                    const std::string& arg, const std::string& res) const;
 
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return true;}
   protected:
     /** \brief  Function pointers */
-    simplifiedPtr eval_;
+    simple_t eval_;
   };
 
   template<typename LibType>
@@ -222,22 +230,22 @@ namespace casadi {
     virtual ~GenericExternal() {}
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
 
     /** \brief Generate a call to a function (generic signature) */
-    virtual std::string generateCall(const CodeGenerator& g,
+    virtual std::string generic_call(const CodeGenerator& g, const std::string& mem,
                                      const std::string& arg, const std::string& res,
                                      const std::string& iw, const std::string& w) const;
 
     /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
-    static int scalarSparsity(int i, int *n_row, int *n_col,
+    static int scalarSparsity(void* mem, int i, int *n_row, int *n_col,
                               const int **colind, const int **row);
 
     /** \brief  Function pointers */
-    evalPtr eval_;
+    eval_t eval_;
   };
 
 

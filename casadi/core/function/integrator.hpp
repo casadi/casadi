@@ -83,10 +83,10 @@ namespace casadi {
     virtual void evaluate();
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd) { return true;}

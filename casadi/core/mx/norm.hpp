@@ -61,13 +61,13 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(void* mem, const T** arg, T** res, int* iw, T* w);
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -81,8 +81,8 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                  CodeGenerator& g) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;

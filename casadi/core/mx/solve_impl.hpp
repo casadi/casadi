@@ -52,7 +52,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalD(const double** arg, double** res,
+  void Solve<Tr>::evalD(void* mem, const double** arg, double** res,
                         int* iw, double* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     linear_solver_.setInputNZ(arg[1], LINSOL_A);
@@ -61,8 +61,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    linear_solver_->evalSXLinsol(arg, res, iw, w, Tr, dep(0).size2());
+  void Solve<Tr>::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+    linear_solver_->evalSXLinsol(mem, arg, res, iw, w, Tr, dep(0).size2());
   }
 
   template<bool Tr>
@@ -101,13 +101,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    linear_solver_->spFwdLinsol(arg, res, iw, w, Tr, dep(0).size2());
+  void Solve<Tr>::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    linear_solver_->spFwdLinsol(mem, arg, res, iw, w, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    linear_solver_->spAdjLinsol(arg, res, iw, w, Tr, dep(0).size2());
+  void Solve<Tr>::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+    linear_solver_->spAdjLinsol(mem, arg, res, iw, w, Tr, dep(0).size2());
   }
 
 } // namespace casadi
