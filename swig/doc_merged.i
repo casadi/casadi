@@ -6688,7 +6688,7 @@ Remove columns and rows Remove/delete rows and/or columns of a matrix.
 %feature("docstring") casadi::Matrix::getDep "
 
 Get expressions of the children of the expression Only defined if symbolic
-scalar. Wraps SXElement SXElement::getDep(int ch=0) const.
+scalar. Wraps SXElem SXElem::getDep(int ch=0) const.
 
 ";
 
@@ -7088,8 +7088,8 @@ zero.
 
 %feature("docstring") casadi::Matrix::getNdeps "
 
-Get the number of dependencies of a binary SXElement Only defined if
-symbolic scalar.
+Get the number of dependencies of a binary SXElem Only defined if symbolic
+scalar.
 
 ";
 
@@ -7586,7 +7586,7 @@ their ID.
 duplicate symbolic expressions If there are symbolic primitives appearing
 more than once, the function will return true and the names of the duplicate
 expressions will be printed to userOut<true, PL_WARN>(). Note: Will mark the
-node using SXElement::setTemp. Make sure to call resetInput() after usage.
+node using SXElem::setTemp. Make sure to call resetInput() after usage.
 
 ";
 
@@ -7672,7 +7672,7 @@ calls to arbitrary differentiable functions.
 The MX class is designed to have identical syntax with the Matrix<> template
 class, and uses Matrix<double> as its internal representation of the values
 at a node. By keeping the syntaxes identical, it is possible to switch from
-one class to the other, as well as inlining MX functions to SXElement
+one class to the other, as well as inlining MX functions to SXElem
 functions.
 
 Note that an operation is always \"lazy\", making a matrix multiplication
@@ -8343,7 +8343,7 @@ Get a set of nonzeros
 
 %feature("docstring") casadi::MX::getNdeps "
 
-Get the number of dependencies of a binary SXElement.
+Get the number of dependencies of a binary SXElem.
 
 ";
 
@@ -12100,9 +12100,6 @@ with Q-transpose (lapack)
 
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
 
-%feature("docstring") casadi::ProfilingType< ProfilingData_SOURCE > "
-[INTERNAL] ";
-
 %feature("docstring") casadi::isStrictlyMonotone "
 
 Check if the vector is strictly monotone.
@@ -12187,8 +12184,6 @@ equation using an LU-factorized matrix (lapack)
 
 ";
 
-%feature("docstring") casadi::diffToDict "[INTERNAL] ";
-
 %feature("docstring") casadi::isMonotone "
 
 Check if the vector is monotone.
@@ -12213,8 +12208,9 @@ matrix multiplication: z <- z + x*y.
 
 ";
 
-%feature("docstring") casadi::casadi_to_dense_tr "[INTERNAL]  Convert
-sparse to transposed dense.
+%feature("docstring") casadi::matrixName "
+
+Get typename.
 
 ";
 
@@ -12257,11 +12253,8 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring") casadi::matrixName "
-
-Get typename.
-
-";
+%feature("docstring") casadi::ProfilingType< ProfilingData_SOURCE > "
+[INTERNAL] ";
 
 %feature("docstring") casadi::profileWriteExit "[INTERNAL] ";
 
@@ -12411,6 +12404,10 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
+%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
+
+";
+
 %feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
 
 ";
@@ -12446,6 +12443,11 @@ system (lapack)
 %feature("docstring") casadi::isNonDecreasing "
 
 Check if the vector is non-decreasing.
+
+";
+
+%feature("docstring") casadi::casadi_to_dense_tr "[INTERNAL]  Convert
+sparse to transposed dense.
 
 ";
 
@@ -12506,11 +12508,9 @@ multiplication, first factor transposed: z <- z + trans(x)*y.
 
 ";
 
-%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
+%feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
 
-";
-
-%feature("docstring") casadi::matrixName< SXElement > " [INTERNAL] ";
+%feature("docstring") casadi::diffToDict "[INTERNAL] ";
 
 
 // File: namespaceIpopt.xml

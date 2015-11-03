@@ -9247,7 +9247,7 @@ Remove columns and rows Remove/delete rows and/or columns of a matrix.
 %feature("docstring")  casadi::Matrix< DataType >::getDep(int ch=0) const  "
 
 Get expressions of the children of the expression Only defined if symbolic
-scalar. Wraps SXElement SXElement::getDep(int ch=0) const.
+scalar. Wraps SXElem SXElem::getDep(int ch=0) const.
 
 ";
 
@@ -9814,8 +9814,8 @@ zero.
 
 %feature("docstring")  casadi::Matrix< DataType >::getNdeps() const  "
 
-Get the number of dependencies of a binary SXElement Only defined if
-symbolic scalar.
+Get the number of dependencies of a binary SXElem Only defined if symbolic
+scalar.
 
 ";
 
@@ -10426,7 +10426,7 @@ nodes by their ID.
 [INTERNAL]  Detect duplicate symbolic expressions If there are symbolic
 primitives appearing more than once, the function will return true and the
 names of the duplicate expressions will be printed to userOut<true,
-PL_WARN>(). Note: Will mark the node using SXElement::setTemp. Make sure to
+PL_WARN>(). Note: Will mark the node using SXElem::setTemp. Make sure to
 call resetInput() after usage.
 
 ";
@@ -10517,7 +10517,7 @@ calls to arbitrary differentiable functions.
 The MX class is designed to have identical syntax with the Matrix<> template
 class, and uses Matrix<double> as its internal representation of the values
 at a node. By keeping the syntaxes identical, it is possible to switch from
-one class to the other, as well as inlining MX functions to SXElement
+one class to the other, as well as inlining MX functions to SXElem
 functions.
 
 Note that an operation is always \"lazy\", making a matrix multiplication
@@ -11409,7 +11409,7 @@ Get a set of nonzeros
 
 %feature("docstring")  casadi::MX::getNdeps() const  "
 
-Get the number of dependencies of a binary SXElement.
+Get the number of dependencies of a binary SXElem.
 
 ";
 
@@ -16171,9 +16171,6 @@ line_number, double local) " [INTERNAL] ";
 
 %feature("docstring")  casadi::check_exposed(T t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::ProfilingType< ProfilingData_SOURCE >() "
-[INTERNAL] ";
-
 %feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
 "
 
@@ -16268,9 +16265,6 @@ Solve a system of equation using an LU-factorized matrix (lapack)
 
 ";
 
-%feature("docstring")  casadi::diffToDict(const diffTime &diff) " [INTERNAL]
-";
-
 %feature("docstring")  casadi::isMonotone(const std::vector< T > &v) "
 
 Check if the vector is monotone.
@@ -16297,8 +16291,9 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
-%feature("docstring")  casadi::casadi_to_dense_tr(const real1_t *x, const
-int *sp_x, real2_t *yt) " [INTERNAL]  Convert sparse to transposed dense.
+%feature("docstring")  casadi::matrixName() "
+
+Get typename.
 
 ";
 
@@ -16345,11 +16340,8 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring")  casadi::matrixName() "
-
-Get typename.
-
-";
+%feature("docstring")  casadi::ProfilingType< ProfilingData_SOURCE >() "
+[INTERNAL] ";
 
 %feature("docstring")  casadi::profileWriteExit(std::ofstream &f, T *a,
 double total) " [INTERNAL] ";
@@ -16522,6 +16514,11 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
+%feature("docstring")  casadi::casadi_swap(int n, real_t *x, int inc_x,
+real_t *y, int inc_y) " [INTERNAL]  SWAP: x <-> y.
+
+";
+
 %feature("docstring")  casadi::casadi_scal(int n, real_t alpha, real_t *x,
 int inc_x) " [INTERNAL]  SCAL: x <- alpha*x.
 
@@ -16561,6 +16558,11 @@ int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
 %feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
 
 Check if the vector is non-decreasing.
+
+";
+
+%feature("docstring")  casadi::casadi_to_dense_tr(const real1_t *x, const
+int *sp_x, real2_t *yt) " [INTERNAL]  Convert sparse to transposed dense.
 
 ";
 
@@ -16630,12 +16632,10 @@ multiplication, first factor transposed: z <- z + trans(x)*y.
 
 ";
 
-%feature("docstring")  casadi::casadi_swap(int n, real_t *x, int inc_x,
-real_t *y, int inc_y) " [INTERNAL]  SWAP: x <-> y.
+%feature("docstring")  casadi::matrixName< SXElem >() " [INTERNAL] ";
 
+%feature("docstring")  casadi::diffToDict(const diffTime &diff) " [INTERNAL]
 ";
-
-%feature("docstring")  casadi::matrixName< SXElement >() " [INTERNAL] ";
 
 
 // File: namespaceIpopt.xml

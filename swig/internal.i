@@ -205,7 +205,7 @@
 %exception  casadi::iszero(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::matrixName< SXElement >() {
+%exception  casadi::matrixName< SXElem >() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::operation_checker(unsigned int op) {
