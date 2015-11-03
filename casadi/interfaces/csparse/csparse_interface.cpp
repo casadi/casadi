@@ -102,7 +102,6 @@ namespace casadi {
       S_ = cs_sqr(order, &A_, 0) ;
     }
 
-    prepared_ = false;
     called_once_ = true;
 
     // Get a referebce to the nonzeros of the linear system
@@ -151,8 +150,6 @@ namespace casadi {
     }
     casadi_assert(N_!=0);
 
-    prepared_ = true;
-
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
       profileWriteTime(CasadiOptions::profilingLog, this, 0,
@@ -169,8 +166,6 @@ namespace casadi {
       profileWriteEntry(CasadiOptions::profilingLog, this);
     }
 
-
-    casadi_assert(prepared_);
     casadi_assert(N_!=0);
 
     double *t = &temp_.front();

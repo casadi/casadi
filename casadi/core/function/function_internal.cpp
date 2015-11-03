@@ -2427,20 +2427,36 @@ namespace casadi {
     sz_w = sz_w_;
   }
 
-  void FunctionInternal::alloc_arg(size_t sz_arg) {
-    sz_arg_ = max(sz_arg + n_in(), sz_arg_);
+  void FunctionInternal::alloc_arg(size_t sz_arg, bool add) {
+    if (add) {
+      sz_arg_ += sz_arg;
+    } else {
+      sz_arg_ = max(sz_arg + n_in(), sz_arg_);
+    }
   }
 
-  void FunctionInternal::alloc_res(size_t sz_res) {
-    sz_res_ = max(sz_res + n_out(), sz_res_);
+  void FunctionInternal::alloc_res(size_t sz_res, bool add) {
+    if (add) {
+      sz_res_ += sz_res;
+    } else {
+      sz_res_ = max(sz_res + n_out(), sz_res_);
+    }
   }
 
-  void FunctionInternal::alloc_iw(size_t sz_iw) {
-    sz_iw_ = max(sz_iw, sz_iw_);
+  void FunctionInternal::alloc_iw(size_t sz_iw, bool add) {
+    if (add) {
+      sz_iw_ += sz_iw;
+    } else {
+      sz_iw_ = max(sz_iw, sz_iw_);
+    }
   }
 
-  void FunctionInternal::alloc_w(size_t sz_w) {
-    sz_w_ = max(sz_w, sz_w_);
+  void FunctionInternal::alloc_w(size_t sz_w, bool add) {
+    if (add) {
+      sz_w_ += sz_w;
+    } else {
+      sz_w_ = max(sz_w, sz_w_);
+    }
   }
 
   void FunctionInternal::alloc(const Function& f) {

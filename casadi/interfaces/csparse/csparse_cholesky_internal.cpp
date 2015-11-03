@@ -138,9 +138,6 @@ namespace casadi {
   }
 
   void CSparseCholeskyInternal::prepare() {
-
-    prepared_ = false;
-
     // Get a reference to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();
 
@@ -184,12 +181,9 @@ namespace casadi {
       }
     }
     casadi_assert(L_!=0);
-
-    prepared_ = true;
   }
 
   void CSparseCholeskyInternal::solve(double* x, int nrhs, bool transpose) {
-    casadi_assert(prepared_);
     casadi_assert(L_!=0);
 
     double *t = &temp_.front();
@@ -210,7 +204,6 @@ namespace casadi {
   }
 
   void CSparseCholeskyInternal::solveL(double* x, int nrhs, bool transpose) {
-    casadi_assert(prepared_);
     casadi_assert(L_!=0);
 
     double *t = getPtr(temp_);

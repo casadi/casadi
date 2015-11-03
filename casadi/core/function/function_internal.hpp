@@ -631,16 +631,16 @@ namespace casadi {
     size_t sz_w() const { return sz_w_;}
 
     /** \brief Ensure required length of arg field */
-    void alloc_arg(size_t sz_arg);
+    void alloc_arg(size_t sz_arg, bool add=false);
 
     /** \brief Ensure required length of res field */
-    void alloc_res(size_t sz_res);
+    void alloc_res(size_t sz_res, bool add=false);
 
     /** \brief Ensure required length of iw field */
-    void alloc_iw(size_t sz_iw);
+    void alloc_iw(size_t sz_iw, bool add=false);
 
     /** \brief Ensure required length of w field */
-    void alloc_w(size_t sz_w);
+    void alloc_w(size_t sz_w, bool add=false);
 
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f);

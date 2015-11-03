@@ -96,6 +96,7 @@ namespace casadi {
   }
 
   void KinsolInterface::init() {
+    // Initialize the base classes
     Rootfinder::init();
 
     // Read options
@@ -145,10 +146,18 @@ namespace casadi {
     // Type of linear solver
     if (option("linear_solver_type")=="dense") {
       linear_solver_type_ = DENSE;
+      if (exact_jacobian_) {
+        // For storing Jacobian nonzeros
+        alloc_w(jac_.nnz_out(0), true);
+      }
     } else if (option("linear_solver_type")=="banded") {
       linear_solver_type_ = BANDED;
       upper_bandwidth_ = option("upper_bandwidth");
       lower_bandwidth_ = option("lower_bandwidth");
+      if (exact_jacobian_) {
+        // For storing Jacobian nonzeros
+        alloc_w(jac_.nnz_out(0), true);
+      }
     } else if (option("linear_solver_type")=="iterative") {
       linear_solver_type_ = ITERATIVE;
       maxl_ = option("max_krylov").toInt();
@@ -164,6 +173,7 @@ namespace casadi {
       if (exact_jacobian_) {
         // Form the Jacobian-times-vector function
         f_fwd_ = f_.derivative(1, 0);
+        alloc(f_fwd_);
       }
       use_preconditioner_ = option("use_preconditioner");
       if (use_preconditioner_) {
@@ -180,6 +190,13 @@ namespace casadi {
 
       // Make sure that a linear solver has been provided
       casadi_assert(!linsol_.isNull());
+
+      // Form the Jacobian-times-vector function
+      f_fwd_ = f_.derivative(1, 0);
+      alloc(f_fwd_);
+
+      // Allocate space for Jacobian
+      alloc_w(jac_.nnz_out(0), true);
     } else {
       casadi_error("Unknown linear solver");
     }
@@ -204,18 +221,15 @@ namespace casadi {
     // Get memory block
     auto m = static_cast<Memory*>(mem);
 
+    // Update IO references
+    m->arg_ = arg;
+    m->res_ = res;
+    m->iw_ = iw;
+    m->w_ = w;
+
     // Reset the counters
     m->t_func_ = 0;
     m->t_jac_ = 0;
-
-    // Copy to buffers
-    for (int i=0; i<n_in(); ++i) {
-      if (arg[i]) {
-        setInputNZ(arg[i], i);
-      } else {
-        setInputNZ(0, i);
-      }
-    }
 
     // Get the initial guess
     if (arg[iin_]) {
@@ -240,22 +254,16 @@ namespace casadi {
 
     // Evaluate auxiliary outputs
     if (n_out()>0) {
-      f_.setInputNZ(NV_DATA_S(m->u_), iin_);
-      for (int i=0; i<n_in(); ++i) {
-        if (i!=iin_) {
-          if (arg[i]) {
-            f_.setInputNZ(arg[i], i);
-          } else {
-            f_.setInputNZ(0, i);
-          }
-        }
-      }
-      f_.evaluate();
-      for (int i=0; i<n_out(); ++i) {
-        if (i!=iout_ && res[i]) {
-          copy_n(f_.output(i).ptr(), nnz_out(i), res[i]);
-        }
-      }
+      // Temporary memory
+      const double** arg1 = arg + n_in();
+      double** res1 = res + n_out();
+
+      // Evaluate f_
+      copy_n(arg, n_in(), arg1);
+      arg1[iin_] = NV_DATA_S(m->u_);
+      copy_n(res, n_out(), res1);
+      res1[iout_] = 0;
+      f_(0, arg1, res1, iw, w);
     }
   }
 
@@ -263,26 +271,26 @@ namespace casadi {
     // Get time
     time1_ = clock();
 
-    // Pass inputs
-    self.f_.setInputNZ(NV_DATA_S(u), self.iin_);
-    for (int i=0; i<self.n_in(); ++i)
-      if (i!=self.iin_) self.f_.setInput(self.input(i), i);
+    // Temporary memory
+    const double** arg1 = arg_ + self.n_in();
+    double** res1 = res_ + self.n_out();
 
-    // Evaluate
-    self.f_.evaluate();
+    // Evaluate f_
+    copy(arg_, arg_ + self.n_in(), arg1);
+    arg1[self.iin_] = NV_DATA_S(u);
+    fill_n(res1, self.n_out(), static_cast<double*>(0));
+    res1[self.iout_] = NV_DATA_S(fval);
+    self.f_(0, arg1, res1, iw_, w_);
 
+    // Print it, if requested
     if (self.monitored("eval_f")) {
-      userOut() << "f = " << self.f_.output(self.iout_) << endl;
+      userOut() << "f = ";
+      N_VPrint_Serial(fval);
     }
 
-    // Get results
-    self.f_.getOutputNZ(NV_DATA_S(fval), self.iout_);
-
-    // Get a referebce to the nonzeros of the function
-    const vector<double>& fdata = self.f_.output(self.iout_).data();
-
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<fdata.size(); ++k) {
+    double *fdata = res1[self.iout_];
+    for (int k=0; k<self.n_; ++k) {
       try {
         casadi_assert_message(!isnan(fdata[k]), "Nonzero " << k << " is not-a-number");
         casadi_assert_message(!isinf(fdata[k]), "Nonzero " << k << " is infinite");
@@ -290,7 +298,8 @@ namespace casadi {
         stringstream ss;
         ss << ex.what() << endl;
         if (self.verbose()) {
-          ss << "u = " << self.f_.input(self.iin_) << endl;
+          userOut() << "u = ";
+          N_VPrint_Serial(u);
 
           // Print the expression for f[Jcol] if f is an SXFunction instance
           if (self.f_.is_a("sxfunction")) {
@@ -339,23 +348,22 @@ namespace casadi {
     // Get time
     time1_ = clock();
 
-    // Pass inputs to the Jacobian function
-    self.jac_.setInputNZ(NV_DATA_S(u), self.iin_);
-    for (int i=0; i<self.n_in(); ++i)
-      if (i!=self.iin_) self.jac_.setInput(self.input(i), i);
+    // Temporary memory
+    const double** arg1 = arg_ + self.n_in();
+    double** res1 = res_ + self.n_out();
+    double* jac = w_ + self.jac_.sz_w();
 
-    // Evaluate
-    self.jac_.evaluate();
-
-    if (self.monitored("eval_djac")) {
-      userOut() << "djac = " << self.jac_.output() << endl;
-    }
+    // Evaluate jac_
+    copy(arg_, arg_ + self.n_in(), arg1);
+    arg1[self.iin_] = NV_DATA_S(u);
+    fill_n(res1, self.jac_.n_out(), static_cast<double*>(0));
+    res1[0] = jac;
+    self.jac_(0, arg1, res1, iw_, w_);
 
     // Get sparsity and non-zero elements
     const int* colind = self.jac_.sparsity_out(0).colind();
     int ncol = self.jac_.size2_out(0);
     const int* row = self.jac_.sparsity_out(0).row();
-    const vector<double>& val = self.jac_.output().data();
 
     // Loop over columns
     for (int cc=0; cc<ncol; ++cc) {
@@ -365,7 +373,7 @@ namespace casadi {
         int rr = row[el];
 
         // Set the element
-        DENSE_ELEM(J, rr, cc) = val[el];
+        DENSE_ELEM(J, rr, cc) = jac[el];
       }
     }
 
@@ -398,19 +406,22 @@ namespace casadi {
     // Get time
     time1_ = clock();
 
-    // Pass inputs to the Jacobian function
-    self.jac_.setInputNZ(NV_DATA_S(u), self.iin_);
-    for (int i=0; i<self.n_in(); ++i)
-      if (i!=self.iin_) self.jac_.setInput(self.input(i), i);
+    // Temporary memory
+    const double** arg1 = arg_ + self.n_in();
+    double** res1 = res_ + self.n_out();
+    double* jac = w_ + self.jac_.sz_w();
 
-    // Evaluate
-    self.jac_.evaluate();
+    // Evaluate jac_
+    copy(arg_, arg_ + self.jac_.n_in(), arg1);
+    arg1[self.iin_] = NV_DATA_S(u);
+    fill_n(res1, self.jac_.n_out(), static_cast<double*>(0));
+    res1[0] = jac;
+    self.jac_(0, arg1, res1, iw_, w_);
 
     // Get sparsity and non-zero elements
     const int* colind = self.jac_.sparsity_out(0).colind();
     int ncol = self.jac_.size2_out(0);
     const int* row = self.jac_.sparsity_out(0).row();
-    const vector<double>& val = self.jac_.output().data();
 
     // Loop over cols
     for (int cc=0; cc<ncol; ++cc) {
@@ -420,8 +431,9 @@ namespace casadi {
         int rr = row[el];
 
         // Set the element
-        if (rr-cc>=-mupper && rr-cc<=mlower)
-          BAND_ELEM(J, rr, cc) = val[el];
+        if (rr-cc>=-mupper && rr-cc<=mlower) {
+          BAND_ELEM(J, rr, cc) = jac[el];
+        }
       }
     }
 
@@ -447,21 +459,18 @@ namespace casadi {
     // Get time
     time1_ = clock();
 
-    // Pass inputs
-    self.f_fwd_.setInputNZ(NV_DATA_S(u), self.iin_);
-    for (int i=0; i<self.n_in(); ++i)
-      if (i!=self.iin_) self.f_fwd_.setInput(self.input(i), i);
+    // Temporary memory
+    const double** arg1 = arg_ + self.n_in();
+    double** res1 = res_ + self.n_out();
 
-    // Pass input seeds
-    self.f_fwd_.setInputNZ(NV_DATA_S(v), self.n_in()+self.iin_);
-    for (int i=0; i<self.n_in(); ++i)
-      if (i!=self.iin_) self.f_fwd_.setInput(0.0, self.n_in()+i);
-
-    // Evaluate
-    self.f_fwd_.evaluate();
-
-    // Get the output seeds
-    self.f_fwd_.getOutputNZ(NV_DATA_S(Jv), self.n_out());
+    // Evaluate f_fwd_
+    copy(arg_, arg_ + self.n_in(), arg1);
+    arg1[self.iin_] = NV_DATA_S(u);
+    fill_n(arg1 + self.n_in(), self.n_in(), static_cast<const double*>(0));
+    arg1[self.n_in()+self.iin_] = NV_DATA_S(v);
+    fill_n(res1, self.f_fwd_.n_out(), static_cast<double*>(0));
+    res1[self.n_out()] = NV_DATA_S(Jv);
+    self.f_fwd_(0, arg1, res1, iw_, w_);
 
     // Log time duration
     time2_ = clock();
@@ -488,68 +497,31 @@ namespace casadi {
     // Get time
     time1_ = clock();
 
-    // Pass inputs
-    self.jac_.setInputNZ(NV_DATA_S(u), self.iin_);
-    for (int i=0; i<self.n_in(); ++i)
-      if (i!=self.iin_) self.jac_.setInput(self.input(i), i);
+    // Temporary memory
+    const double** arg1 = arg_ + self.n_in();
+    double** res1 = res_ + self.n_out();
+    double* jac = w_ + self.jac_.sz_w();
 
-    // Evaluate Jacobian
-    self.jac_.evaluate();
+    // Evaluate jac_
+    copy(arg_, arg_ + self.jac_.n_in(), arg1);
+    arg1[self.iin_] = NV_DATA_S(u);
+    fill_n(res1, self.jac_.n_out(), static_cast<double*>(0));
+    res1[0] = jac;
+    self.jac_(0, arg1, res1, iw_, w_);
 
-    // Get a reference to the nonzeros of Jacobian
-    const vector<double>& Jdata = self.jac_.output().data();
-
-    // Make sure that all entries of the linear system are valid
-    for (int k=0; k<Jdata.size(); ++k) {
-      try {
-        casadi_assert_message(!isnan(Jdata[k]), "Nonzero " << k << " is not-a-number");
-        casadi_assert_message(!isinf(Jdata[k]), "Nonzero " << k << " is infinite");
-      } catch(exception& ex) {
-        stringstream ss;
-        ss << ex.what() << endl;
-
-        if (self.verbose()) {
-
-          // Print inputs
-          ss << "Input vector is " << self.jac_.input().data() << endl;
-
-          // Get the column
-          int Jcol = self.jac_.sparsity_out(0).get_col().at(k);
-
-          // Get the row
-          int Jrow = self.jac_.sparsity_out(0).row(k);
-
-          // Which equation
-          ss << "This corresponds to the derivative of equation " << Jrow
-             << " with respect to the variable " << Jcol << "." << endl;
-
-          // Print the expression for f[Jrow] if f is an SXFunction instance
-          if (self.f_.is_a("sxfunction")) {
-            vector<SX> arg = self.f_.sx_in(), res = self.f_(arg);
-            ss << "Variable " << Jcol << " = " << arg.at(0).at(Jcol) << endl;
-            ss << "Equation " << Jrow << " = " << res.at(0).at(Jrow) << endl;
-          }
-
-          // Print the expression for J[k] if J is an SXFunction instance
-          if (self.jac_.is_a("sxfunction")) {
-            vector<SX> res = self.jac_(self.jac_.sx_in());
-            ss << "J[" << Jrow << ", " << Jcol << "] = " << res.at(0).at(k) << endl;
-          }
-        }
-
-        throw CasadiException(ss.str());
-      }
-    }
+    // Get sparsity and non-zero elements
+    const int* colind = self.jac_.sparsity_out(0).colind();
+    int ncol = self.jac_.size2_out(0);
+    const int* row = self.jac_.sparsity_out(0).row();
 
     // Log time duration
     time2_ = clock();
     t_lsetup_jac_ += static_cast<double>(time2_ - time1_)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements, scaled by -gamma, to the linear solver
-    self.linsol_.setInput(self.jac_.output(), LINSOL_A);
+    self.linsol_.setInputNZ(jac, LINSOL_A);
 
     // Prepare the solution of the linear system (e.g. factorize)
-    // -- only if the linear solver inherits from LinearSolver
     self.linsol_.prepare();
 
     // Log time duration
@@ -867,6 +839,7 @@ namespace casadi {
         flag = KINSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
         casadi_assert(flag==KIN_SUCCESS);
       }
+      break;
     case USER_DEFINED:
       // Set fields in the IDA memory
       KINMem kin_mem = KINMem(mem_);

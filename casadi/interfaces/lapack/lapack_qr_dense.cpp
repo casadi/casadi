@@ -71,8 +71,6 @@ namespace casadi {
   }
 
   void LapackQrDense::prepare() {
-    prepared_ = false;
-
     // Get the elements of the matrix, dense format
     input(0).get(mat_);
 
@@ -82,9 +80,6 @@ namespace casadi {
     dgeqrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(tau_), getPtr(work_), &lwork, &info);
     if (info != 0) throw CasadiException("LapackQrDense::prepare: dgeqrf_ "
                                          "failed to factorize the Jacobian");
-
-    // Success if reached this point
-    prepared_ = true;
   }
 
   void LapackQrDense::solve(double* x, int nrhs, bool transpose) {

@@ -114,9 +114,6 @@ namespace casadi {
     /// Create a solve node
     MX solve(const MX& A, const MX& B, bool transpose=false);
 
-    /// Check if prepared
-    bool prepared() const;
-
 #ifndef SWIG
     /** \brief Solve the system of equations <tt>Lx = b</tt>
         Only when a Cholesky factorization is available

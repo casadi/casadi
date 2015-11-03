@@ -86,9 +86,6 @@ namespace casadi {
   void LinearSolverInternal::init() {
     // Call the base class initializer
     FunctionInternal::init();
-
-    // Not prepared
-    prepared_ = false;
   }
 
   LinearSolverInternal::~LinearSolverInternal() {
@@ -116,10 +113,6 @@ namespace casadi {
 
     // Call the solve routine
     prepare();
-
-    // Make sure preparation successful
-    if (!prepared_)
-      throw CasadiException("LinearSolverInternal::evaluate: Preparation failed");
 
     // Solve the factorized system
     solve(false);

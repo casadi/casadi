@@ -133,6 +133,12 @@ namespace casadi {
       /// KINSOL memory block
       void* mem_;
 
+      /// Function arguments
+      const double** arg_;
+      double** res_;
+      int* iw_;
+      double* w_;
+
       /// Variable
       N_Vector u_;
 

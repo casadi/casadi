@@ -173,7 +173,6 @@ namespace casadi {
     fact_fcn_.evaluate();
     fact_fcn_.getOutput(Q_, 0);
     fact_fcn_.getOutput(R_, 1);
-    prepared_ = true;
   }
 
   void SymbolicQr::solve(double* x, int nrhs, bool transpose) {

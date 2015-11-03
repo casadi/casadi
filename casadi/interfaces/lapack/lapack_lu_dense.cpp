@@ -101,7 +101,6 @@ namespace casadi {
       time_start = getRealTime(); // Start timer
       profileWriteEntry(CasadiOptions::profilingLog, this);
     }
-    prepared_ = false;
 
     // Get the elements of the matrix, dense format
     input(0).get(mat_);
@@ -143,9 +142,6 @@ namespace casadi {
     dgetrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(ipiv_), &info);
     if (info != 0) throw CasadiException("LapackLuDense::prepare: "
                                          "dgetrf_ failed to factorize the Jacobian");
-
-    // Success if reached this point
-    prepared_ = true;
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer

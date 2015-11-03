@@ -55,10 +55,6 @@ namespace casadi {
     return (*this)->solve(A, B, transpose);
   }
 
-  bool LinearSolver::prepared() const {
-    return (*this)->prepared_;
-  }
-
   bool LinearSolver::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const LinearSolverInternal*>(ptr)!=0;
   }

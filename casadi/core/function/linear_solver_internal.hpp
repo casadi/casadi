@@ -130,9 +130,6 @@ namespace casadi {
     /// Dulmage-Mendelsohn decomposition
     std::vector<int> rowperm_, colperm_, rowblock_, colblock_;
 
-    /// Is prepared
-    bool prepared_;
-
     /// Get sparsity pattern
     int nrow() const { return input(LINSOL_A).size1();}
     int ncol() const { return input(LINSOL_A).size2();}
