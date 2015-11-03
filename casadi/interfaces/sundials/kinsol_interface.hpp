@@ -48,8 +48,6 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  typedef std::pair< std::string, std::string> Message;
-
   /** \brief \pluginbrief{Rootfinder,kinsol}
   *
   * @copydoc Rootfinder_doc
@@ -77,54 +75,8 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "kinsol";}
 
-    /** \brief Residual */
-    void func(N_Vector u, N_Vector fval);
-    void djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
-    void bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
-              N_Vector tmp1, N_Vector tmp2);
-    void jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u);
-    void psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
-                N_Vector tmp1, N_Vector tmp2);
-    void psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v,
-                N_Vector tmp);
-    void lsetup(KINMem kin_mem);
-    void lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
-    void ehfun(int error_code, const char *module, const char *function, char *msg);
-
-    /** \brief Wrappers */
-    static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
-    static int djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data,
-                            N_Vector tmp1, N_Vector tmp2);
-    static int bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
-                            void *user_data, N_Vector tmp1, N_Vector tmp2);
-    static int jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u, void *user_data);
-    static int psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
-                              void* user_data, N_Vector tmp1, N_Vector tmp2);
-    static int psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
-                              N_Vector v, void* user_data, N_Vector tmp);
-    static int lsetup_wrapper(KINMem kin_mem);
-    static int lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
-    static void ehfun_wrapper(int error_code, const char *module, const char *function,
-                              char *msg, void *eh_data);
-
-    /// KINSOL memory block
-    void* mem_;
-
-    /// Variable
-    N_Vector u_;
-
     // Scaling
     N_Vector u_scale_, f_scale_;
-
-    /// For timings
-    clock_t time1_, time2_;
-
-    /// Accumulated time since last reset:
-    double t_func_; // time spent in the residual function
-    double t_jac_; // time spent in the Jacobian function
-    double t_lsolve_; // preconditioner/linear solver solve function
-    double t_lsetup_jac_; // preconditioner/linear solver setup function, generate Jacobian
-    double t_lsetup_fac_; // preconditioner setup function, factorize Jacobian
 
     /// Globalization strategy
     int strategy_;
@@ -132,15 +84,34 @@ namespace casadi {
     // Should KINSOL internal warning messages be ignored
     bool disable_internal_warnings_;
 
+    // Maximum number of iterations
+    int max_iter_;
+
+    // Use exact Jacobian?
+    bool exact_jacobian_;
+
+    // Type of linear solver
+    enum LinearSolverType { DENSE, BANDED, ITERATIVE, USER_DEFINED};
+    LinearSolverType linear_solver_type_;
+
+    // Bandwidth (for banded solvers)
+    int upper_bandwidth_, lower_bandwidth_;
+
+    // Krylov subspace size (for iterative solvers)
+    int maxl_;
+
+    // Iterative solver
+    enum IterativeSolver { GMRES, BCGSTAB, TFQMR};
+    IterativeSolver iterative_solver_;
+
+    // Should a preconditioner be used
+    bool use_preconditioner_;
+
+    // Absolute tolerance
+    double abstol_;
+
     // Jacobian times vector function
     Function f_fwd_;
-
-    // Calculate the error message map
-    static std::map<int, Message > calc_flagmap();
-
-    // Error message map
-    static std::map<int, Message> flagmap;
-
 
     // Raise an error specific to KinSol
     void kinsol_error(const std::string& module, int flag, bool fatal=true);
@@ -148,6 +119,64 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Memory
+    struct Memory {
+      /// Shared memory
+      KinsolInterface& self;
+
+      /// Constructor
+      Memory(KinsolInterface& s);
+
+      /// Destructor
+      ~Memory();
+
+      /// KINSOL memory block
+      void* mem_;
+
+      /// Variable
+      N_Vector u_;
+
+      /// For timings
+      clock_t time1_, time2_;
+
+      /// Accumulated time since last reset:
+      double t_func_; // time spent in the residual function
+      double t_jac_; // time spent in the Jacobian function
+      double t_lsolve_; // preconditioner/linear solver solve function
+      double t_lsetup_jac_; // preconditioner/linear solver setup function, generate Jacobian
+      double t_lsetup_fac_; // preconditioner setup function, factorize Jacobian
+
+      /** \brief Callback functions */
+      void func(N_Vector u, N_Vector fval);
+      void djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
+      void bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
+                N_Vector tmp1, N_Vector tmp2);
+      void jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u);
+      void psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                  N_Vector tmp1, N_Vector tmp2);
+      void psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v,
+                  N_Vector tmp);
+      void lsetup(KINMem kin_mem);
+      void lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
+      void ehfun(int error_code, const char *module, const char *function, char *msg);
+
+      /** \brief Wrappers to callback functions*/
+      static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
+      static int djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data,
+                              N_Vector tmp1, N_Vector tmp2);
+      static int bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
+                              void *user_data, N_Vector tmp1, N_Vector tmp2);
+      static int jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u, void *user_data);
+      static int psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                                void* user_data, N_Vector tmp1, N_Vector tmp2);
+      static int psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                                N_Vector v, void* user_data, N_Vector tmp);
+      static int lsetup_wrapper(KINMem kin_mem);
+      static int lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
+      static void ehfun_wrapper(int error_code, const char *module, const char *function,
+                                char *msg, void *eh_data);
+    };
+    Memory *m_;
   };
 
 } // namespace casadi
