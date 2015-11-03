@@ -7468,12 +7468,6 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring")  casadi::LinearSolver::prepared() const  "
-
-Check if prepared.
-
-";
-
 %feature("docstring")  casadi::Function::kernel_sum(const std::string &name,
 const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
 const  "

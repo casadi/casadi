@@ -5451,12 +5451,6 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::LinearSolver::prepared "
-
-Check if prepared.
-
-";
-
 %feature("docstring") casadi::LinearSolver::kernel_sum "
 
 kernel_sum Consider a dense matrix V.
