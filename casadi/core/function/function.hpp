@@ -72,6 +72,9 @@ namespace casadi {
   /** Forward declaration of internal class */
   class FunctionInternal;
 
+  /** Forward declaration of memory block class */
+  class MemBlock;
+
   /** \brief General function
 
       A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
@@ -944,6 +947,15 @@ namespace casadi {
     size_t sz_w() const;
 
 #ifndef SWIG
+    /** \brief Allocate memory block */
+    MemBlock alloc() const;
+
+    /** \brief Allocate memory block */
+    void* alloc_mem();
+
+    /** \brief Free allocated memory block */
+    void free_mem(void* mem);
+
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 #endif // SWIG
@@ -1391,6 +1403,32 @@ namespace casadi {
     ///@}
 #endif // SWIG
   };
+
+
+#ifndef SWIG
+    /** \brief Helper class - keeps track of ownership of evaluation memory  */
+    class MemBlock {
+  public:
+      /// Default constructor -- null pointer
+      MemBlock();
+
+      /// Allocate memory block
+      MemBlock(const Function& f);
+
+      /// Copy constructor -- deep copy
+      MemBlock(const MemBlock& obj);
+
+      /// Copy constructor -- deep copy
+      MemBlock& operator=(const MemBlock& obj);
+
+      /// Free memory
+      ~MemBlock();
+
+    private:
+      Function f_;
+      void *mem_;
+    };
+#endif // SWIG
 
 } // namespace casadi
 

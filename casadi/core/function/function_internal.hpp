@@ -379,6 +379,9 @@ namespace casadi {
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
 
+
+
+
     ///@{
     /** \brief Number of function inputs and outputs */
     inline int n_in() const { return ibuf_.size();}
@@ -748,6 +751,12 @@ namespace casadi {
     template<typename MatType>
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
 
+    /** \brief Allocate memory block */
+    virtual void* alloc_mem() {return 0;}
+
+    /** \brief Free allocated memory block */
+    virtual void free_mem(void* mem) {}
+
   protected:
     /** \brief  Temporary vector needed for the evaluation (integer) */
     std::vector<int> iw_tmp_;
@@ -756,7 +765,7 @@ namespace casadi {
     std::vector<double> w_tmp_;
 
   private:
-    /** \brief Sizes of input and output buffers */
+    /** \brief Sizes of input and output buffers and number of memory blocks */
     size_t sz_arg_, sz_res_, sz_iw_, sz_w_;
   };
 

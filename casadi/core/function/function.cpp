@@ -750,6 +750,16 @@ namespace casadi {
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
+  void* Function::alloc_mem() { return (*this)->alloc_mem();}
+
+  void Function::free_mem(void* mem) { (*this)->free_mem(mem);}
+
+  MemBlock Function::alloc() const {
+    casadi_assert(!isNull());
+    const Function& f = *this;
+    return MemBlock(f);
+  }
+
   void Function::operator()(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
     (*this)->spFwdSwitch(mem, arg, res, iw, w);
   }
@@ -1808,6 +1818,28 @@ namespace casadi {
   XProblem::operator const MXProblem&() const {
     casadi_assert(!is_sx);
     return *mx_p;
+  }
+
+  MemBlock::MemBlock() : mem_(0) {
+  }
+
+  MemBlock::MemBlock(const Function& f) : f_(f), mem_(0) {
+    mem_ = f_.alloc_mem();
+  }
+
+  MemBlock::MemBlock(const MemBlock& obj) : f_(obj.f_), mem_(0) {
+    mem_ = f_.alloc_mem();
+  }
+
+  MemBlock& MemBlock::operator=(const MemBlock& obj) {
+    if (mem_) f_.free_mem(mem_);
+    f_ = obj.f_;
+    mem_ = f_.alloc_mem();
+    return *this;
+  }
+
+  MemBlock::~MemBlock() {
+    if (mem_) f_.free_mem(mem_);
   }
 
 } // namespace casadi

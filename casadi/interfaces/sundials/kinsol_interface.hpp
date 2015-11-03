@@ -176,7 +176,12 @@ namespace casadi {
       static void ehfun_wrapper(int error_code, const char *module, const char *function,
                                 char *msg, void *eh_data);
     };
-    Memory *m_;
+
+    /** \brief Allocate memory block */
+    virtual void* alloc_mem();
+
+    /** \brief Free allocated memory block */
+    virtual void free_mem(void* mem);
   };
 
 } // namespace casadi

@@ -88,13 +88,11 @@ namespace casadi {
     u_scale_ = 0;
     f_scale_ = 0;
     disable_internal_warnings_ = false;
-    m_ = 0;
   }
 
   KinsolInterface::~KinsolInterface() {
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
-    if (m_) delete m_;
   }
 
   void KinsolInterface::init() {
@@ -188,20 +186,27 @@ namespace casadi {
 
     // Stop criterion
     abstol_ = option("abstol");
-
-    casadi_assert(m_==0);
-    try {
-      m_ = new Memory(*this);
-    } catch (exception &e) {
-      m_ = 0;
-      casadi_error(string("Failed to create a Memory object: ") + e.what());
-    }
   }
 
   void KinsolInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    if (mem==0) {
+      mem = alloc_mem();
+      try {
+        evalD(mem, arg, res, iw, w);
+      } catch (...) {
+        free_mem(mem);
+        throw;
+      }
+      free_mem(mem);
+      return;
+    }
+
+    // Get memory block
+    auto m = static_cast<Memory*>(mem);
+
     // Reset the counters
-    m_->t_func_ = 0;
-    m_->t_jac_ = 0;
+    m->t_func_ = 0;
+    m->t_jac_ = 0;
 
     // Copy to buffers
     for (int i=0; i<n_in(); ++i) {
@@ -214,13 +219,13 @@ namespace casadi {
 
     // Get the initial guess
     if (arg[iin_]) {
-      copy(arg[iin_], arg[iin_]+nnz_in(iin_), NV_DATA_S(m_->u_));
+      copy(arg[iin_], arg[iin_]+nnz_in(iin_), NV_DATA_S(m->u_));
     } else {
-      N_VConst(0.0, m_->u_);
+      N_VConst(0.0, m->u_);
     }
 
     // Solve the nonlinear system of equations
-    int flag = KINSol(m_->mem_, m_->u_, strategy_, u_scale_, f_scale_);
+    int flag = KINSol(m->mem_, m->u_, strategy_, u_scale_, f_scale_);
     if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag);
 
     // Warn if not successful return
@@ -230,12 +235,12 @@ namespace casadi {
 
     // Get the solution
     if (res[iout_]) {
-      copy_n(NV_DATA_S(m_->u_), nnz_out(iout_), res[iout_]);
+      copy_n(NV_DATA_S(m->u_), nnz_out(iout_), res[iout_]);
     }
 
     // Evaluate auxiliary outputs
     if (n_out()>0) {
-      f_.setInputNZ(NV_DATA_S(m_->u_), iin_);
+      f_.setInputNZ(NV_DATA_S(m->u_), iin_);
       for (int i=0; i<n_in(); ++i) {
         if (i!=iin_) {
           if (arg[i]) {
@@ -880,6 +885,14 @@ namespace casadi {
   KinsolInterface::Memory::~Memory() {
     if (u_) N_VDestroy_Serial(u_);
     if (mem_) KINFree(&mem_);
+  }
+
+  void* KinsolInterface::alloc_mem() {
+    return new Memory(*this);
+  }
+
+  void KinsolInterface::free_mem(void* mem) {
+    delete static_cast<Memory*>(mem);
   }
 
 } // namespace casadi
