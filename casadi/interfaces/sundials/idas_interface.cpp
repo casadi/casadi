@@ -399,8 +399,7 @@ namespace casadi {
     f_(0, arg1_, res1_, iw_, w_);
 
     // Subtract state derivative to get residual
-    transform(NV_DATA_S(rr), NV_DATA_S(rr)+nx_, NV_DATA_S(xzdot),
-              NV_DATA_S(rr), std::minus<double>());
+    casadi_axpy(nx_, -1., NV_DATA_S(xzdot), 1, NV_DATA_S(rr), 1);
 
     // Debug output
     if (monitored("res")) {
@@ -446,34 +445,32 @@ namespace casadi {
     userOut<true, PL_WARN>() << msg << endl;
   }
 
-  void IdasInterface::jtimes(double t, const double *xz, const double *xzdot, const double *rr,
-                            const double *v, double *Jv, double cj,
-                            double *tmp1, double *tmp2) {
+  void IdasInterface::jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
+                             N_Vector v, N_Vector Jv, double cj,
+                             N_Vector tmp1, N_Vector tmp2) {
     log("IdasInterface::jtimes", "begin");
     // Get time
     time1 = clock();
 
-    // Pass input
-    f_fwd_.setInputNZ(&t,                  DAE_T);
-    f_fwd_.setInputNZ(xz,                  DAE_X);
-    f_fwd_.setInputNZ(xz+nx_,              DAE_Z);
-    f_fwd_.setInput(p(), DAE_P);
-
-    // Pass seeds of the state vectors
-    f_fwd_.setInputNZ(v,      DAE_NUM_IN + DAE_X);
-    f_fwd_.setInputNZ(v+nx_,  DAE_NUM_IN + DAE_Z);
-
-    // Evaluate the AD forward algorithm
-    f_fwd_.evaluate();
-
-    // Get the output seeds
-    f_fwd_.getOutputNZ(Jv,    DAE_NUM_OUT + DAE_ODE);
-    f_fwd_.getOutputNZ(Jv+nx_, DAE_NUM_OUT + DAE_ALG);
+    // Evaluate f_fwd_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(xz);
+    arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[DAE_P] = p_;
+    arg1_[DAE_NUM_IN + DAE_T] = 0;
+    arg1_[DAE_NUM_IN + DAE_X] = NV_DATA_S(v);
+    arg1_[DAE_NUM_IN + DAE_Z] = NV_DATA_S(v)+nx_;
+    arg1_[DAE_NUM_IN + DAE_P] = 0;
+    res1_[DAE_ODE] = 0;
+    res1_[DAE_ALG] = 0;
+    res1_[DAE_QUAD] = 0;
+    res1_[DAE_NUM_OUT + DAE_ODE] = NV_DATA_S(Jv);
+    res1_[DAE_NUM_OUT + DAE_ALG] = NV_DATA_S(Jv) + nx_;
+    res1_[DAE_NUM_OUT + DAE_QUAD] = 0;
+    f_fwd_(0, arg1_, res1_, iw_, w_);
 
     // Subtract state derivative to get residual
-    for (int i=0; i<nx_; ++i) {
-      Jv[i] -= cj*v[i];
-    }
+    casadi_axpy(nx_, -cj, NV_DATA_S(v), 1, NV_DATA_S(Jv), 1);
 
     // Log time duration
     time2 = clock();
@@ -486,8 +483,7 @@ namespace casadi {
                                    N_Vector tmp1, N_Vector tmp2) {
     try {
       IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
-      this_->jtimes(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(rr), NV_DATA_S(v),
-                    NV_DATA_S(Jv), cj, NV_DATA_S(tmp1), NV_DATA_S(tmp2));
+      this_->jtimes(t, xz, xzdot, rr, v, Jv, cj, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;
@@ -1873,6 +1869,7 @@ namespace casadi {
     if (exact_jacobian_) {
       // Form the Jacobian-times-vector function
       f_fwd_ = f_.derivative(1, 0);
+      alloc(f_fwd_);
 
       flag = IDASpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
       if (flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFn", flag);
@@ -2059,6 +2056,7 @@ namespace casadi {
     if (exact_jacobianB_) {
       // Form the Jacobian-times-vector function
       g_fwd_ = g_.derivative(1, 0);
+      alloc(g_fwd_);
 
 #ifdef WITH_SYSTEM_SUNDIALS
       flag = IDASpilsSetJacTimesVecFnBPatched(mem_, whichB_, jtimesB_wrapper);

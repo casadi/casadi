@@ -142,8 +142,8 @@ namespace casadi {
     // Sundials callback functions
     void res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr);
     void ehfun(int error_code, const char *module, const char *function, char *msg);
-    void jtimes(double t, const double *xz, const double *xzdot, const double *rr,
-                const double *v, double *Jv, double cj, double *tmp1, double *tmp2);
+    void jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
+                N_Vector v, N_Vector Jv, double cj, N_Vector tmp1, N_Vector tmp2);
     void jtimesB(double t, const double *xz, const double *xzdot, const double *xzB,
                  const double *xzdotB, const double *resvalB, const double *vB, double *JvB,
                  double cjB, double * tmp1B, double * tmp2B);
