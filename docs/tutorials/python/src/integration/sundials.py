@@ -92,7 +92,13 @@ print "%d -> %d" % (integrator.n_in(),integrator.n_out())
 #! To obtain the whole trajectory of states, use Simulator:
 ts=numpy.linspace(0,tend,100)
 x0 = 0; y0 = 1
-sim=Simulator("sim", integrator, ts)
+opts = {}
+opts["fsens_err_con"] = True
+opts["quad_err_con"] = True
+opts["abstol"] = 1e-6
+opts["reltol"] = 1e-6
+opts["grid"] = ts
+sim = Simulator("sim", "cvodes", dae, opts)
 sim.setInput([x0,y0],"x0")
 sim.setInput(0,"p")
 sim.evaluate()
