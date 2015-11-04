@@ -116,6 +116,7 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -127,6 +128,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
@@ -303,6 +305,7 @@
 <tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Scaling factor for the components if finite differences is used</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Specifies which components will be used when estimating the sensitivity equations</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>casadi::SundialsInterface</td></tr>
@@ -327,6 +330,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(res|resB|resQB|reset|psetupB|djacB)</td><td>casadi::FunctionInternal<br />casadi::CvodesInterface</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>"newton"</td><td>(newton|functional)</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>pretypeB</td><td>OT_STRING</td><td>GenericType()</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -435,6 +439,7 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
@@ -443,6 +448,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
@@ -556,6 +562,7 @@
 <tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Scaling factor for the components if finite differences is used</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Specifies which components will be used when estimating the sensitivity equations</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>init_xdot</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Initial values for the state derivatives</td><td>casadi::IdasInterface</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -580,6 +587,7 @@
 <tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>Maximim step size</td><td>casadi::IdasInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB|psetup)</td><td>casadi::FunctionInternal<br />casadi::IdasInterface</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>pretypeB</td><td>OT_STRING</td><td>GenericType()</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -671,6 +679,7 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -681,6 +690,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
@@ -703,6 +713,7 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
@@ -710,6 +721,7 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
@@ -1865,6 +1877,7 @@
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>hotstart</td><td>OT_BOOLEAN</td><td>true</td><td>Initialize the trajectory at the previous solution</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>implicit_solver</td><td>OT_STRING</td><td>GenericType()</td><td>An implicit function solver</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>implicit_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the implicit solver</td><td>casadi::OldCollocationIntegrator</td></tr>
@@ -1877,6 +1890,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>startup_integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td><td>casadi::OldCollocationIntegrator</td></tr>
@@ -2170,6 +2184,7 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
@@ -2178,6 +2193,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
@@ -2414,7 +2430,7 @@
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit</td><td>OT_BOOLEAN</td><td>false</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(initial|step)</td><td>casadi::FunctionInternal<br />casadi::SimulatorInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2438,7 +2454,7 @@
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit</td><td>OT_BOOLEAN</td><td>false</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(initial|step)</td><td>casadi::FunctionInternal<br />casadi::SimulatorInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2761,6 +2777,7 @@
 <tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Scaling factor for the components if finite differences is used</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Specifies which components will be used when estimating the sensitivity equations</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>casadi::SundialsInterface</td></tr>
@@ -2783,6 +2800,7 @@
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOLEAN</td><td>false</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>pretypeB</td><td>OT_STRING</td><td>GenericType()</td><td>(none|left|right|both)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>

@@ -277,32 +277,6 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::SimulatorInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>initial</td><td>casadi::SimulatorInternal</td></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>step</td><td>casadi::SimulatorInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class casadi::Simulator
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>initial</td><td>casadi::SimulatorInternal</td></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>step</td><td>casadi::SimulatorInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::SnoptInterface
 \n
 \par

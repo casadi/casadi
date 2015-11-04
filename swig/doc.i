@@ -12479,9 +12479,8 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
-|              |              |              | (inputs|outp | casadi::Simu |
-|              |              |              | uts)  (initi | latorInterna |
-|              |              |              | al|step)     | l            |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
@@ -12509,20 +12508,6 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-
-+---------+---------------------------+
-|   Id    |          Used in          |
-+=========+===========================+
-| initial | casadi::SimulatorInternal |
-+---------+---------------------------+
-| inputs  | casadi::FunctionInternal  |
-+---------+---------------------------+
-| outputs | casadi::FunctionInternal  |
-+---------+---------------------------+
-| step    | casadi::SimulatorInternal |
-+---------+---------------------------+
 
 Diagrams
 --------
@@ -13368,17 +13353,23 @@ Print dimensions of inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Simulator::Simulator() "
+%feature("docstring") casadi::Simulator::Simulator(const std::string &name,
+const std::string &solver, const SXDict &dae, const Dict &opts=Dict()) "
 
-Default constructor.
+Constructor
 
 ";
 
 %feature("docstring") casadi::Simulator::Simulator(const std::string &name,
-const Function &integrator, const Matrix< double > &grid, const Dict
-&opts=Dict()) "
+const std::string &solver, const MXDict &dae, const Dict &opts=Dict()) "
 
-Constructor.
+Constructor
+
+";
+
+%feature("docstring") casadi::Simulator::Simulator() "
+
+Default constructor.
 
 ";
 
