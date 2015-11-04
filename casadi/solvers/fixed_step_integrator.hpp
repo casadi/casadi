@@ -48,11 +48,11 @@ namespace casadi {
     /// Setup F and G
     virtual void setupFG() = 0;
 
-    ///  Integrate until a specified time point
-    virtual void integrate(double t_out);
+    /** \brief  Advance solution in time */
+    virtual void advance(int k);
 
-    /// Integrate backward in time until a specified time point
-    virtual void integrateB(double t_out);
+    /** \brief  Retreat solution in time */
+    virtual void retreat(int k);
 
     /// Reset the forward problem and bring the time back to t0
     virtual void reset();

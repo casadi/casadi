@@ -130,9 +130,6 @@ namespace casadi {
     // Call the base class method
     Integrator::init();
 
-    // Reset checkpoints counter
-    ncheck_ = 0;
-
     // Read options
     abstol_ = option("abstol");
     reltol_ = option("reltol");

@@ -45,7 +45,7 @@ namespace casadi {
     // Number of finite elements and time steps
     nk_ = option("number_of_finite_elements");
     casadi_assert(nk_>0);
-    h_ = (grid_.back() - t0_)/nk_;
+    h_ = (grid_.back() - grid_.front())/nk_;
 
     // Setup discrete time dynamics
     setupFG();
@@ -63,9 +63,9 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegrator::integrate(double t_out) {
+  void FixedStepIntegrator::advance(int k) {
     // Get discrete time sought
-    int k_out = std::ceil((t_out-t0_)/h_);
+    int k_out = std::ceil((grid_.at(k) - grid_.front())/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
     casadi_assert(k_out>=0);
 
@@ -97,13 +97,13 @@ namespace casadi {
 
       // Advance time
       k_++;
-      t_ = t0_ + k_*h_;
+      t_ = grid_.front() + k_*h_;
     }
   }
 
-  void FixedStepIntegrator::integrateB(double t_out) {
+  void FixedStepIntegrator::retreat(int k) {
     // Get discrete time sought
-    int k_out = std::floor((t_out-t0_)/h_);
+    int k_out = std::floor((grid_.at(k) - grid_.front())/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
     casadi_assert(k_out<=nk_);
 
@@ -114,7 +114,7 @@ namespace casadi {
     while (k_>k_out) {
       // Advance time
       k_--;
-      t_ = t0_ + k_*h_;
+      t_ = grid_.front() + k_*h_;
 
       // Take step
       G.input(RDAE_T).set(t_);

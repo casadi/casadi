@@ -33,9 +33,6 @@ namespace casadi {
 
   SimulatorInternal::SimulatorInternal(const std::string& name, const Function& integrator)
     : FunctionInternal(name), integrator_(integrator) {
-
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
-
     grid_ = dynamic_cast<Integrator*>(integrator_.get())->grid_;
   }
 
@@ -69,33 +66,13 @@ namespace casadi {
     integrator_.setInput(input(INTEGRATOR_Z0), INTEGRATOR_Z0);
     integrator_.setInput(input(INTEGRATOR_P), INTEGRATOR_P);
 
-    if (monitored("initial")) {
-      userOut() << "SimulatorInternal::evaluate: initial condition:" << std::endl;
-      userOut() << " x0     = "  << input(INTEGRATOR_X0) << std::endl;
-      userOut() << " z0     = "  << input(INTEGRATOR_Z0) << std::endl;
-      userOut() << " p      = "   << input(INTEGRATOR_P) << std::endl;
-    }
-
     // Reset the integrator_
     dynamic_cast<Integrator*>(integrator_.get())->reset();
 
     // Advance solution in time
     for (int k=0; k<grid_.size(); ++k) {
-
-      if (monitored("step")) {
-        userOut() << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
-        userOut() << " x0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
-        userOut() << " z0       = "  << integrator_.input(INTEGRATOR_Z0) << std::endl;
-        userOut() << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
-      }
-
       // Integrate to the output time
-      dynamic_cast<Integrator*>(integrator_.get())->integrate(grid_[k]);
-
-      if (monitored("step")) {
-        userOut() << " xf  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
-        userOut() << " zf  = "  << integrator_.output(INTEGRATOR_ZF) << std::endl;
-      }
+      dynamic_cast<Integrator*>(integrator_.get())->advance(k);
 
       // Save the outputs of the function
       for (int i=0; i<n_out(); ++i) {

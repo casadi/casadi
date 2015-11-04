@@ -37,82 +37,79 @@
 /// \cond INTERNAL
 namespace casadi {
 
-class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
-public:
-  /** \brief  Constructor */
-  SundialsInterface(const std::string& name, const XProblem& dae);
+  class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
+  public:
+    /** \brief  Constructor */
+    SundialsInterface(const std::string& name, const XProblem& dae);
 
-  /** \brief  Destructor */
-  virtual ~SundialsInterface()=0;
+    /** \brief  Destructor */
+    virtual ~SundialsInterface()=0;
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
 
-  /** \brief  Reset the forward problem and bring the time back to t0 */
-  virtual void reset() = 0;
+    /** \brief  Reset the forward problem and bring the time back to t0 */
+    virtual void reset() = 0;
 
-  /** \brief  Set stop time for the integration */
-  virtual void setStopTime(double tf) = 0;
+    /** \brief  Set stop time for the integration */
+    virtual void setStopTime(double tf) = 0;
 
-  /// Linear solver forward, backward
-  LinearSolver linsol_, linsolB_;
+    /// Linear solver forward, backward
+    LinearSolver linsol_, linsolB_;
 
-  ///@{
-  /// options
-  bool exact_jacobian_, exact_jacobianB_;
-  double abstol_, reltol_;
-  double fsens_abstol_, fsens_reltol_;
-  double abstolB_, reltolB_;
-  int max_num_steps_;
-  bool finite_difference_fsens_;
-  bool stop_at_end_;
-  ///@}
+    ///@{
+    /// options
+    bool exact_jacobian_, exact_jacobianB_;
+    double abstol_, reltol_;
+    double fsens_abstol_, fsens_reltol_;
+    double abstolB_, reltolB_;
+    int max_num_steps_;
+    bool finite_difference_fsens_;
+    bool stop_at_end_;
+    ///@}
 
-  /// number of checkpoints stored so far
-  int ncheck_;
+    /// Supported linear solvers in Sundials
+    enum LinearSolverType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
 
-  /// Supported linear solvers in Sundials
-  enum LinearSolverType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
+    /// Supported iterative solvers in Sundials
+    enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR};
 
-  /// Supported iterative solvers in Sundials
-  enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR};
+    /// Linear solver data (dense)
+    struct LinSolDataDense {};
 
-  /// Linear solver data (dense)
-  struct LinSolDataDense {};
+    /// Linear solver
+    LinearSolverType linsol_f_, linsol_g_;
 
-  /// Linear solver
-  LinearSolverType linsol_f_, linsol_g_;
+    /// Iterative solver
+    IterativeSolverType itsol_f_, itsol_g_;
 
-  /// Iterative solver
-  IterativeSolverType itsol_f_, itsol_g_;
+    /// Preconditioning
+    int pretype_f_, pretype_g_;
 
-  /// Preconditioning
-  int pretype_f_, pretype_g_;
+    /// Max Krylov size
+    int max_krylov_, max_krylovB_;
 
-  /// Max Krylov size
-  int max_krylov_, max_krylovB_;
+    /// Use preconditioning
+    bool use_preconditioner_, use_preconditionerB_;
 
-  /// Use preconditioning
-  bool use_preconditioner_, use_preconditionerB_;
+    // Jacobian of the DAE with respect to the state and state derivatives
+    Function jac_, jacB_;
 
-  // Jacobian of the DAE with respect to the state and state derivatives
-  Function jac_, jacB_;
+    // Jacobian times vector functions
+    Function f_fwd_, g_fwd_;
 
-  // Jacobian times vector functions
-  Function f_fwd_, g_fwd_;
+    /** \brief  Get the integrator Jacobian for the forward problem */
+    virtual Function getJac()=0;
 
-  /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual Function getJac()=0;
+    /** \brief  Get the integrator Jacobian for the backward problem */
+    virtual Function getJacB()=0;
 
-  /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual Function getJacB()=0;
+    // Get bandwidth for forward problem
+    std::pair<int, int> getBandwidth() const;
 
-  // Get bandwidth for forward problem
-  std::pair<int, int> getBandwidth() const;
-
-  // Get bandwidth for backward problem
-  std::pair<int, int> getBandwidthB() const;
-};
+    // Get bandwidth for backward problem
+    std::pair<int, int> getBandwidthB() const;
+  };
 
 } // namespace casadi
 

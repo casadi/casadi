@@ -98,7 +98,7 @@ namespace casadi {
     std::vector<double> tau_root = collocationPoints(deg, option("collocation_scheme"));
 
     // Size of the finite elements
-    double h = (grid_.back()-t0_)/nk;
+    double h = (grid_.back()-grid_.front())/nk;
 
     // MX version of the same
     MX h_mx = h;
@@ -205,7 +205,7 @@ namespace casadi {
         offset += nrx_;
 
         // Get the local time
-        coll_time_[k][j] = t0_ + h*(k + tau_root[j]);
+        coll_time_[k][j] = grid_.front() + h*(k + tau_root[j]);
 
         // Get expressions for the algebraic variables
         if (j>0) {
@@ -376,9 +376,16 @@ namespace casadi {
       if (hasSetOption("startup_integrator_options")) {
         startup_integrator_options = option("startup_integrator_options");
       }
+      // Time grid
+      vector<double> grid;
+      for (int k=0; k<coll_time_.size(); ++k) {
+        for (int j=0; j<coll_time_[k].size(); ++j) {
+          grid.push_back(coll_time_[k][j]);
+        }
+      }
+
       // Pass options
-      startup_integrator_options["t0"] = coll_time_.front().front();
-      startup_integrator_options["tf"] = coll_time_.back().back();
+      startup_integrator_options["grid"] = grid;
 
       // Allocate a root-finding solver
       startup_integrator_ =
@@ -428,13 +435,13 @@ namespace casadi {
 
       // Integrate, stopping at all time points
       int offs=0;
+      int k_startup = 0;
       for (int k=0; k<coll_time_.size(); ++k) {
         for (int j=0; j<coll_time_[k].size(); ++j) {
 
           if (has_startup_integrator) {
             // Integrate to the time point
-            dynamic_cast<Integrator*>(startup_integrator_.get())
-              ->integrate(coll_time_[k][j]);
+            dynamic_cast<Integrator*>(startup_integrator_.get())->advance(k_startup++);
           }
 
           // Save the differential states
@@ -503,13 +510,13 @@ namespace casadi {
     integrated_once_ = true;
   }
 
-  void OldCollocationIntegrator::integrate(double t_out) {
+  void OldCollocationIntegrator::advance(int k) {
     for (int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind) {
       output(oind).set(implicit_solver_.output(1+oind));
     }
   }
 
-  void OldCollocationIntegrator::integrateB(double t_out) {
+  void OldCollocationIntegrator::retreat(int k) {
   }
 
 } // namespace casadi

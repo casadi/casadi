@@ -80,11 +80,11 @@ namespace casadi {
     /// Reset the backward problem and take time to tf
     virtual void resetB() {}
 
-    ///  Integrate until a specified time point
-    virtual void integrate(double t_out);
+    /** \brief  Advance solution in time */
+    virtual void advance(int k);
 
-    /// Integrate backwards in time until a specified time point
-    virtual void integrateB(double t_out);
+    /** \brief  Retreat solution in time */
+    virtual void retreat(int k);
 
     // Startup integrator (generates an initial trajectory guess)
     Function startup_integrator_;

@@ -39,6 +39,7 @@ namespace casadi {
     addOption("grid", OT_REALVECTOR, GenericType(), "Time grid");
     addOption("augmented_options", OT_DICT, GenericType(),
               "Options to be passed down to the augmented integrator, if one is constructed.");
+    addOption("output_t0", OT_BOOLEAN, false, "Output the state at the initial time");
 
     if (dae.is_sx) {
       f_ = get_f<SX>();
@@ -127,12 +128,21 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Integrator::evaluate() {
+  void Integrator::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     // Reset solver, take time to t0
     reset();
 
     // Integrate forward
-    integrate(grid_.back());
+    advance(ngrid_-1);
 
     // If backwards integration is needed
     if (nrx_>0) {
@@ -141,11 +151,16 @@ namespace casadi {
       resetB();
 
       // Proceed to t0
-      integrateB(t0_);
+      retreat(0);
     }
 
     // Print statistics
     if (print_stats_) printStats(userOut());
+
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
   void Integrator::init() {
@@ -234,13 +249,14 @@ namespace casadi {
     }
 
     // read options
-    t0_ = option("t0");
     if (hasSetOption("grid")) {
       grid_ = option("grid");
     } else {
-      grid_ = vector<double>{option("tf")};
+      grid_ = vector<double>{option("t0"), option("tf")};
     }
+    ngrid_ = grid_.size();
     print_stats_ = option("print_stats");
+    output_t0_ = option("output_t0");
 
     // Form a linear solver for the sparsity propagation
     linsol_f_ = LinearSolver("linsol_f", "none", spJacF());
@@ -1263,7 +1279,7 @@ namespace casadi {
     log("Integrator::reset", "begin");
 
     // Go to the start time
-    t_ = t0_;
+    t_ = grid_.front();
 
     // Initialize output
     xf().set(x0());

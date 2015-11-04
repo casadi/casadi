@@ -105,6 +105,9 @@ namespace casadi {
     // Initialize the base classes
     SundialsInterface::init();
 
+    // Reset checkpoints counter
+    ncheck_ = 0;
+
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
                           "CVODES does not support algebraic variables");
@@ -426,7 +429,7 @@ namespace casadi {
     t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
 
     // Re-initialize
-    int flag = CVodeReInit(mem_, t0_, x0_);
+    int flag = CVodeReInit(mem_, grid_.front(), x0_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeReInit", flag);
 
     // Re-initialize quadratures
@@ -463,13 +466,15 @@ namespace casadi {
     casadi_msg("CvodesInterface::reset end");
   }
 
-  void CvodesInterface::integrate(double t_out) {
+  void CvodesInterface::advance(int k) {
+    double t_out = grid_.at(k);
+
     casadi_msg("CvodesInterface::integrate(" << t_out << ") begin");
 
-    casadi_assert_message(t_out>=t0_,
+    casadi_assert_message(t_out>=grid_.front(),
                           "CvodesInterface::integrate(" << t_out << "): "
                           "Cannot integrate to a time earlier than t0 ("
-                          << t0_ << ")");
+                          << grid_.front() << ")");
     casadi_assert_message(t_out<=grid_.back() || !stop_at_end_, "CvodesInterface::integrate("
                           << t_out << "):"
                           " Cannot integrate past a time later than tf (" << grid_.back() << ") "
@@ -552,8 +557,10 @@ namespace casadi {
     casadi_msg("CvodesInterface::resetB end");
   }
 
-  void CvodesInterface::integrateB(double t_out) {
-    casadi_msg("CvodesInterface::integrateB(" << t_out << ") begin");
+  void CvodesInterface::retreat(int k) {
+    double t_out = grid_.at(k);
+
+    casadi_msg("CvodesInterface::retreat(" << t_out << ") begin");
     int flag;
 
     // Integrate backward to t_out
@@ -586,7 +593,7 @@ namespace casadi {
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
 
     }
-    casadi_msg("CvodesInterface::integrateB(" << t_out << ") end");
+    casadi_msg("CvodesInterface::retreat(" << t_out << ") end");
   }
 
   void CvodesInterface::printStats(std::ostream &stream) const {
@@ -1951,5 +1958,13 @@ namespace casadi {
       throw CasadiException("CvodesInterface::getJac(): Not an SXFunction or MXFunction");
     }
   }
+
+  CvodesInterface::Memory::Memory(CvodesInterface& s) : self(s) {
+  }
+
+  CvodesInterface::Memory::~Memory() {
+  }
+
+
 
 } // namespace casadi

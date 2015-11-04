@@ -98,11 +98,11 @@ namespace casadi {
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB();
 
-    /** \brief  Integrate forward until a specified time point */
-    virtual void integrate(double t_out);
+    /** \brief  Advance solution in time */
+    virtual void advance(int k);
 
-    /** \brief  Integrate backward until a specified time point */
-    virtual void integrateB(double t_out);
+    /** \brief  Retreat solution in time */
+    virtual void retreat(int k);
 
     /** \brief  Set the stop time of the forward integration */
     virtual void setStopTime(double tf);
@@ -301,6 +301,20 @@ namespace casadi {
 
     bool disable_internal_warnings_;
 
+    /// number of checkpoints stored so far
+    int ncheck_;
+
+    // Memory
+    struct Memory {
+      /// Shared memory
+      CvodesInterface& self;
+
+      /// Constructor
+      Memory(CvodesInterface& s);
+
+      /// Destructor
+      ~Memory();
+    };
   };
 
 } // namespace casadi

@@ -73,14 +73,14 @@ namespace casadi {
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB();
 
-    /** \brief  Integrate forward until a specified time point */
-    virtual void integrate(double t_out) = 0;
+    /** \brief  Advance solution in time */
+    virtual void advance(int k) = 0;
 
-    /** \brief  Integrate backward until a specified time point */
-    virtual void integrateB(double t_out) = 0;
+    /** \brief  Retreat solution in time */
+    virtual void retreat(int k) = 0;
 
     /** \brief  evaluate */
-    virtual void evaluate();
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
@@ -163,17 +163,18 @@ namespace casadi {
     /// Number of forward and backward parameters
     int np_, nrp_;
 
-    /// Initial time
-    double t0_;
-
     // Time grid
     std::vector<double> grid_;
+    int ngrid_;
 
     // Current time
     double t_;
 
     // Dae
     XProblem dae_;
+
+    /// One step
+    Function onestep_;
 
     /// ODE/DAE forward integration function
     Function f_;
@@ -187,9 +188,11 @@ namespace casadi {
     /// Options
     bool print_stats_;
 
+    /// Output the state at the initial time
+    bool output_t0_;
+
     // Creator function for internal class
-    typedef Integrator* (*Creator)(const std::string& name,
-                                           const XProblem& dae);
+    typedef Integrator* (*Creator)(const std::string& name, const XProblem& dae);
 
     // No static functions exposed
     struct Exposed{ };

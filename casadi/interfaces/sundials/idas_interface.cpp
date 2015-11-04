@@ -128,6 +128,9 @@ namespace casadi {
     // Call the base class init
     SundialsInterface::init();
 
+    // Reset checkpoints counter
+    ncheck_ = 0;
+
     // Get initial conditions for the state derivatives
     if (hasSetOption("init_xdot") && !option("init_xdot").isNull()) {
       init_xdot_ = option("init_xdot").toDoubleVector();
@@ -798,7 +801,7 @@ namespace casadi {
     copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(xzdot_));
 
     // Re-initialize
-    flag = IDAReInit(mem_, t0_, xz_, xzdot_);
+    flag = IDAReInit(mem_, grid_.front(), xz_, xzdot_);
     if (flag != IDA_SUCCESS) idas_error("IDAReInit", flag);
     log("IdasInterface::reset", "re-initialized IVP solution");
 
@@ -897,11 +900,13 @@ namespace casadi {
     log("IdasInterface::correctInitialConditions", "end");
   }
 
-  void IdasInterface::integrate(double t_out) {
+  void IdasInterface::advance(int k) {
+    double t_out = grid_.at(k);
+
     casadi_msg("IdasInterface::integrate(" << t_out << ") begin");
 
-    casadi_assert_message(t_out>=t0_, "IdasInterface::integrate(" << t_out << "): "
-                          "Cannot integrate to a time earlier than t0 (" << t0_ << ")");
+    casadi_assert_message(t_out>=grid_.front(), "IdasInterface::integrate(" << t_out << "): "
+                          "Cannot integrate to a time earlier than t0 (" << grid_.front() << ")");
     casadi_assert_message(t_out<=grid_.back() || !stop_at_end_, "IdasInterface::integrate("
                           << t_out << "): "
                           "Cannot integrate past a time later than tf (" << grid_.back() << ") "
@@ -1012,7 +1017,7 @@ namespace casadi {
     // Correct initial values for the integration if necessary
     if (calc_icB_) {
       log("IdasInterface::resetB", "IDACalcICB begin");
-      flag = IDACalcICB(mem_, whichB_, t0_, xz_, xzdot_);
+      flag = IDACalcICB(mem_, whichB_, grid_.front(), xz_, xzdot_);
       if (flag != IDA_SUCCESS) idas_error("IDACalcICB", flag);
       log("IdasInterface::resetB", "IDACalcICB end");
 
@@ -1026,8 +1031,10 @@ namespace casadi {
 
   }
 
-  void IdasInterface::integrateB(double t_out) {
-    casadi_msg("IdasInterface::integrateB(" << t_out << ") begin");
+  void IdasInterface::retreat(int k) {
+    double t_out = grid_.at(k);
+
+    casadi_msg("IdasInterface::retreat(" << t_out << ") begin");
     int flag;
     // Integrate backwards to t_out
     flag = IDASolveB(mem_, t_out, IDA_NORMAL);
@@ -1064,7 +1071,7 @@ namespace casadi {
       stats_["nstepsB"] = 1.0*nsteps;
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
     }
-    casadi_msg("IdasInterface::integrateB(" << t_out << ") end");
+    casadi_msg("IdasInterface::retreat(" << t_out << ") end");
   }
 
   void IdasInterface::printStats(std::ostream &stream) const {
@@ -2389,6 +2396,11 @@ namespace casadi {
     }
   }
 
+  IdasInterface::Memory::Memory(IdasInterface& s) : self(s) {
+  }
+
+  IdasInterface::Memory::~Memory() {
+  }
 
 } // namespace casadi
 
