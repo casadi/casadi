@@ -33,13 +33,11 @@ namespace casadi {
     : FunctionInternal(name), dae_(dae) {
 
     // Additional options
-    addOption("print_stats",              OT_BOOLEAN,     false,
-              "Print out statistics after integration");
-    addOption("t0",                       OT_REAL,        0.0,
-              "Beginning of the time horizon");
-    addOption("tf",                       OT_REAL,        1.0,
-              "End of the time horizon");
-    addOption("augmented_options",        OT_DICT,  GenericType(),
+    addOption("print_stats", OT_BOOLEAN, false, "Print out statistics after integration");
+    addOption("t0", OT_REAL, 0.0, "Beginning of the time horizon");
+    addOption("tf", OT_REAL, 1.0, "End of the time horizon");
+    addOption("grid", OT_REALVECTOR, GenericType(), "Time grid");
+    addOption("augmented_options", OT_DICT, GenericType(),
               "Options to be passed down to the augmented integrator, if one is constructed.");
 
     if (dae.is_sx) {
@@ -133,18 +131,14 @@ namespace casadi {
     // Reset solver, take time to t0
     reset();
 
-    // Integrate forward stopping at the grid points
-    for (auto k=grid_.begin(); k!=grid_.end(); ++k) {
-      integrate(*k);
-    }
+    // Integrate forward
+    integrate(grid_.back());
 
     // If backwards integration is needed
     if (nrx_>0) {
 
-      // Integrate backward stopping at the grid points
-      for (auto k=grid_.rbegin(); k!=grid_.rend(); ++k) {
-        resetB();
-      }
+      // Integrate backward
+      resetB();
 
       // Proceed to t0
       integrateB(t0_);
@@ -241,7 +235,11 @@ namespace casadi {
 
     // read options
     t0_ = option("t0");
-    grid_ = vector<double>{option("tf")};
+    if (hasSetOption("grid")) {
+      grid_ = option("grid");
+    } else {
+      grid_ = vector<double>{option("tf")};
+    }
     print_stats_ = option("print_stats");
 
     // Form a linear solver for the sparsity propagation

@@ -31,37 +31,32 @@ from pylab import *
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
-t = SX.sym("t")
+t = SX.sym('t')
 
-u = SX.sym("u") 
-v = SX.sym("v") 
+u = SX.sym('u') 
+v = SX.sym('v') 
 states = vertcat([u,v])
 
-eps   = SX.sym("eps")
-mu    = SX.sym("mu")
-alpha = SX.sym("alpha")
-k     = SX.sym("k")
-sigma = SX.sym("sigma")
+eps   = SX.sym('eps')
+mu    = SX.sym('mu')
+alpha = SX.sym('alpha')
+k     = SX.sym('k')
+sigma = SX.sym('sigma')
 Omega = 2 + eps*sigma
 
 params = vertcat([eps,mu,alpha,k,sigma])
 rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
 
-dae={'x':states, 'p':params, 't':t, 'ode':rhs}
-
-integrator = Function.integrator("integrator", "cvodes", dae)
-
 #! We will simulate over 50 seconds, 1000 timesteps.
-ts = linspace(0,50,1000)
+dae={'x':states, 'p':params, 't':t, 'ode':rhs}
+ts = linspace(0, 50, 1000)
+integrator = Simulator('integrator', 'cvodes', dae, {'grid':ts})
 
-sim=Simulator("sim", integrator,ts)
-sim.setInput([1,0],"x0")
-sim.setInput([0.1,0.1,0.1,0.3,0.1],"p")
-sim.evaluate()
+sol = integrator({'x0':[1,0], 'p':[0.1,0.1,0.1,0.3,0.1]})
 
 #! Plot the solution
-plot(array(sim.getOutput())[0,:],array(sim.getOutput())[1,:])
-xlabel("u")
-ylabel("u_dot")
+plot(array(sol['xf'])[0,:], array(sol['xf'])[1,:])
+xlabel('u')
+ylabel('u_dot')
 show()
 

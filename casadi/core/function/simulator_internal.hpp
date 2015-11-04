@@ -41,8 +41,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    SimulatorInternal(const std::string& name, const Function& integrator,
-                      const DMatrix& grid);
+    SimulatorInternal(const std::string& name, const Function& integrator);
 
     /** \brief  Destructor */
     virtual ~SimulatorInternal();

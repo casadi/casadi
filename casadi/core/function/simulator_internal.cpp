@@ -31,44 +31,18 @@ using namespace std;
 namespace casadi {
 
 
-  SimulatorInternal::SimulatorInternal(const std::string& name, const Function& integrator,
-                                       const DMatrix& grid)
-    : FunctionInternal(name), integrator_(integrator), grid_(grid.data()) {
+  SimulatorInternal::SimulatorInternal(const std::string& name, const Function& integrator)
+    : FunctionInternal(name), integrator_(integrator) {
 
-    casadi_assert_message(grid.is_column(),
-                          "Simulator::Simulator: grid must be a column vector, but got "
-                          << grid.dim());
-    casadi_assert_message(grid.is_dense(),
-                          "Simulator::Simulator: grid must be dense, but got "
-                          << grid.dim());
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
+
+    grid_ = dynamic_cast<Integrator*>(integrator_.get())->grid_;
   }
 
   SimulatorInternal::~SimulatorInternal() {
   }
 
   void SimulatorInternal::init() {
-    if (!grid_.empty()) {
-      casadi_assert_message(isNonDecreasing(grid_),
-                            "The supplied time grid must be non-decreasing.");
-
-      // Create new integrator object
-      auto dae = make_pair(dynamic_cast<Integrator*>(integrator_.get())->f_,
-                           dynamic_cast<Integrator*>(integrator_.get())->g_);
-      string solver = dynamic_cast<Integrator*>(integrator_.get())->plugin_name();
-      Function I = Function::integrator(integrator_.name(), solver,
-                                        dae, integrator_.dictionary());
-
-      // Let the integration time start from the first point of the time grid.
-      I.setOption("t0", grid_[0]);
-      // Let the integration time stop at the last point of the time grid.
-      I.setOption("tf", grid_[grid_.size()-1]);
-      I.init();
-
-      // Overwrite
-      integrator_ = I;
-    }
-
     ischeme_ = Function::integrator_in();
     oscheme_ = Function::integrator_out();
 

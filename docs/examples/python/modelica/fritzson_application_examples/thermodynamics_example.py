@@ -72,15 +72,12 @@ ivp.makeExplicit()
 
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': vertcat(ivp.ode)}
-integrator = Function.integrator("integrator", "cvodes", dae)
-
-# Create a simulator
 grid = NP.linspace(0,1,100)
-simulator = Simulator("simulator", integrator, grid)
+integrator = Simulator('integrator', 'cvodes', dae, {'grid':grid})
 
-# Simulate
+# Integrate
 x0 = ivp.start(vertcat(ivp.x))
-res = simulator({"x0":x0})
+res = integrator({"x0":x0})
 
 # Output function
 output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.d, ivp.ddef)
@@ -116,15 +113,12 @@ ivp.makeExplicit()
 
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': vertcat(ivp.ode)}
-integrator = Function.integrator("integrator", "cvodes", dae)
-
-# Create a simulator
 grid = NP.linspace(0,10,100)
-simulator = Simulator("simulator", integrator, grid)
+integrator = Simulator('integrator', 'cvodes', dae, {'grid':grid})
 
-# Simulate
+# Integrate
 x0 = ivp.start(vertcat(ivp.x))
-res = simulator({"x0":x0})
+res = integrator({"x0":x0})
 
 # Output function
 output_fcn_out = substitute([ivp("T")], ivp.d, ivp.ddef)
@@ -153,15 +147,12 @@ ivp.makeExplicit()
 
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': densify(vertcat(ivp.ode))}
-integrator = Function.integrator("integrator", "cvodes", dae)
-
-# Create a simulator
 grid = NP.linspace(0,2,100)
-simulator = Simulator("simulator", integrator, grid)
+integrator = Simulator('integrator', 'cvodes', dae, {'grid':grid})
 
-# Simulate
+# Integrate
 x0 = ivp.start(vertcat(ivp.x))
-res = simulator({"x0":x0})
+res = integrator({"x0":x0})
 
 # Output function
 output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.d, ivp.ddef)

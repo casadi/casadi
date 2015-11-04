@@ -23,7 +23,7 @@
  */
 
 /** 
-* This example looks at a use for the Simulator class
+* This example looks at a use of rootfinders
 *
 *
 * \pythonexample{solvers/NLPImplicitSolver}

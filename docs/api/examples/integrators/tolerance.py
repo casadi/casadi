@@ -41,9 +41,9 @@ tolerances = [-10,-5,-4,-3,-2,-1]
 figure()
 
 for tol in tolerances:
-  integrator = Function.integrator('integrator', 'cvodes', dae, {'reltol':10.0**tol, 'abstol':10.0**tol})
-  sim=Simulator('sim', integrator, ts)
-  res = sim({'x0':[1,0]})
+  opts = {'reltol':10.0**tol, 'abstol':10.0**tol, 'grid':ts}
+  integrator = Simulator('integrator', 'cvodes', dae, opts)
+  res = integrator({'x0':[1,0]})
 
   plot(ts,array(res['xf'])[0,:].T,label='tol = 1e%d' % tol)
 

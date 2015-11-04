@@ -56,9 +56,13 @@ public:
   /// Default constructor
   Simulator();
 
+  ///@{
   /// Constructor
-  Simulator(const std::string& name, const Function& integrator,
-            const Matrix<double>& grid, const Dict& opts=Dict());
+  Simulator(const std::string& name, const std::string& solver,
+            const SXDict& dae, const Dict& opts=Dict());
+  Simulator(const std::string& name, const std::string& solver,
+            const MXDict& dae, const Dict& opts=Dict());
+  ///@}
 
   /// Access functions of the node.
   SimulatorInternal* operator->();

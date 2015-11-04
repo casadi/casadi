@@ -27,11 +27,11 @@ import matplotlib.pyplot as plt
 
 
 # Declare variables (use simple, efficient DAG)
-x0=SX.sym("x0"); x1=SX.sym("x1")
+x0=SX.sym('x0'); x1=SX.sym('x1')
 x = vertcat((x0,x1))
 
 # Control
-u = SX.sym("u")
+u = SX.sym('u')
 
 # ODE right hand side
 xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
@@ -40,7 +40,7 @@ xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
 L = x0*x0 + x1*x1 + u*u
 
 # Costate
-lam = SX.sym("lam",2)
+lam = SX.sym('lam',2)
 
 # Hamiltonian function
 H = inner_prod(lam,xdot) + L
@@ -49,7 +49,7 @@ H = inner_prod(lam,xdot) + L
 ldot = -gradient(H,x)
 
 ## The control must minimize the Hamiltonian, which is:
-print "Hamiltonian: ", H
+print 'Hamiltonian: ', H
 
 # H is of a convex quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
 p = gradient(H,u)    # this gives us 2*u + p
@@ -61,37 +61,37 @@ u_opt = -p/2
 # We must constrain u to the interval [-0.75, 1.0], convexity of H ensures that the optimum is obtain at the bound when u_opt is outside the interval
 u_opt = min(u_opt, 1.0)
 u_opt = max(u_opt, -0.75)
-print "optimal control: ", u_opt
+print 'optimal control: ', u_opt
 
 # Augment f with lam_dot and substitute in the value for the optimal control
 f = vertcat((xdot,ldot))
 f = substitute(f,u,u_opt)
 
 # Function for obtaining the optimal control from the augmented state
-u_fcn = Function("ufcn", [vertcat((x,lam))], [u_opt])
+u_fcn = Function('ufcn', [vertcat((x,lam))], [u_opt])
 
 # Formulate the DAE
 dae = {'x':vertcat((x,lam)), 'ode':f}
 
 # Create an integrator (CVodes)
 opts = {}
-opts["abstol"] = 1e-8 # abs. tolerance
-opts["reltol"] = 1e-8 # rel. tolerance
-opts["t0"] = 0.0
-opts["tf"] = 10.0
-I = Function.integrator("I", "cvodes", dae, opts)
+opts['abstol'] = 1e-8 # abs. tolerance
+opts['reltol'] = 1e-8 # rel. tolerance
+opts['t0'] = 0.0
+opts['tf'] = 10.0
+I = Function.integrator('I', 'cvodes', dae, opts)
 
 # The initial state
 x_init = NP.array([0.,1.])
 
 # The initial costate
-l_init = MX.sym("l_init",2)
+l_init = MX.sym('l_init',2)
 
 # The initial condition for the shooting
 X = vertcat((x_init, l_init))
 
 # Call the integrator
-X = I({'x0':X})["xf"]
+X = I({'x0':X})['xf']
 
 # Costate at the final time should be zero (cf. Bryson and Ho)
 lam_f = X[2:4]
@@ -101,22 +101,22 @@ g = lam_f
 rfp = Function('rfp', [l_init], [g])
 
 # Select a solver for the root-finding problem
-Solver = "nlp"
-#Solver = "newton"
-#Solver = "kinsol"
+Solver = 'nlp'
+#Solver = 'newton'
+#Solver = 'kinsol'
 
 # Allocate an implict solver
 opts = {}
-if Solver=="nlp":
-    opts["nlp_solver"] = "ipopt"
-    opts["nlp_solver_options"] = {"hessian_approximation":"limited-memory"}
-elif Solver=="newton":
-    opts["linear_solver"] = 'csparse'
-elif Solver=="kinsol":
-    opts["linear_solver_type"] = "user_defined"
-    opts["linear_solver"] = 'csparse'
-    opts["max_iter"] = 1000
-solver = rfp.rootfinder("solver", Solver, opts)
+if Solver=='nlp':
+    opts['nlp_solver'] = 'ipopt'
+    opts['nlp_solver_options'] = {'hessian_approximation':'limited-memory'}
+elif Solver=='newton':
+    opts['linear_solver'] = 'csparse'
+elif Solver=='kinsol':
+    opts['linear_solver_type'] = 'user_defined'
+    opts['linear_solver'] = 'csparse'
+    opts['max_iter'] = 1000
+solver = rfp.rootfinder('solver', Solver, opts)
 
 # Solve the problem
 l_init_opt, = solver([0])
@@ -126,13 +126,13 @@ l_init_opt = NP.array(l_init_opt.nonzeros())
 tgrid = NP.linspace(0, 10, 100)
 
 # Simulator to get optimal state and control trajectories
-simulator = Simulator('simulator', I, tgrid)
+simulator = Simulator('simulator', 'cvodes', dae, {'grid':tgrid})
 
 # Simulate to get the state trajectory
-sol = simulator({"x0" : NP.concatenate((x_init, l_init_opt))})["xf"]
+sol = simulator({'x0' : NP.concatenate((x_init, l_init_opt))})['xf']
 
 # Calculate the optimal control
-ufcn_all = u_fcn.map("ufcn_all", len(tgrid))
+ufcn_all = u_fcn.map('ufcn_all', len(tgrid))
 [u_opt] = ufcn_all([sol])
 
 # Plot the results
@@ -141,7 +141,7 @@ plt.clf()
 plt.plot(tgrid, sol[0, :].T, '--')
 plt.plot(tgrid, sol[1, :].T, '-')
 plt.plot(tgrid, u_opt.T, '-.')
-plt.title("Van der Pol optimization - indirect single shooting")
+plt.title('Van der Pol optimization - indirect single shooting')
 plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])
 plt.grid()
