@@ -135,8 +135,8 @@ namespace casadi {
     if (mem_==0) throw CasadiException("CVodeCreate: Creation failed");
 
     // Allocate n-vectors for ivp
-    x0_ = N_VMake_Serial(nx_, input(INTEGRATOR_X0).ptr());
-    x_ = N_VMake_Serial(nx_, output(INTEGRATOR_XF).ptr());
+    x0_ = N_VMake_Serial(nx_, x0().ptr());
+    x_ = N_VMake_Serial(nx_, xf().ptr());
 
     // Disable internal warning messages?
     disable_internal_warnings_ = option("disable_internal_warnings");
@@ -181,7 +181,7 @@ namespace casadi {
     // Quadrature equations
     if (nq_>0) {
       // Allocate n-vectors for quadratures
-      q_ = N_VMake_Serial(nq_, output(INTEGRATOR_QF).ptr());
+      q_ = N_VMake_Serial(nq_, qf().ptr());
 
       // Initialize quadratures in CVodes
       N_VConst(0.0, q_);
@@ -200,96 +200,13 @@ namespace casadi {
       }
     }
 
-    // Forward sensitivity problem
-    // if (nfdir_>0) {
-    //   // Allocate n-vectors
-    //   xF0_.resize(nfdir_, 0);
-    //   xF_.resize(nfdir_, 0);
-    //   for (int i=0; i<nfdir_; ++i) {
-    //     xF0_[i] = N_VMake_Serial(nx_, fwdSeed(INTEGRATOR_X0, i).ptr());
-    //     xF_[i] = N_VMake_Serial(nx_, fwdSens(INTEGRATOR_XF, i).ptr());
-    //   }
-
-    //   // Allocate n-vectors for quadratures
-    //   if (nq_>0) {
-    //     qF_.resize(nfdir_, 0);
-    //     for (int i=0; i<nfdir_; ++i) {
-    //       qF_[i] = N_VMake_Serial(nq_, fwdSens(INTEGRATOR_QF, i).ptr());
-    //     }
-    //   }
-
-    //   // Calculate all forward sensitivity right hand sides at once?
-    //   bool all_at_once = option("fsens_all_at_once");
-
-    //   // Get the sensitivity method
-    //   if (option("sensitivity_method")=="simultaneous") ism_ = CV_SIMULTANEOUS;
-    //   else if (option("sensitivity_method")=="staggered")
-    //             ism_ = all_at_once ? CV_STAGGERED : CV_STAGGERED1;
-    //   else throw CasadiException("CVodes: Unknown sensitivity method");
-
-    //   // Initialize forward sensitivities
-    //   if (finite_difference_fsens_) {
-    //     // Use finite differences to calculate the residual in the forward sensitivity equations
-    //     if (all_at_once) {
-    //       flag = CVodeSensInit(mem_, nfdir_, ism_, 0, getPtr(xF0_));
-    //       if (flag != CV_SUCCESS) cvodes_error("CVodeSensInit", flag);
-    //     } else {
-    //       flag = CVodeSensInit1(mem_, nfdir_, ism_, 0, getPtr(xF0_));
-    //       if (flag != CV_SUCCESS) cvodes_error("CVodeSensInit1", flag);
-    //     }
-
-    //     // Pass pointer to parameters
-    //     flag = CVodeSetSensParams(mem_, input(INTEGRATOR_P).ptr(), 0, 0);
-    //     if (flag != CV_SUCCESS) cvodes_error("CVodeSetSensParams", flag);
-
-    //     //  CVodeSetSensDQMethod
-
-    //   } else {
-    //     if (all_at_once) {
-    //       // Use AD to calculate the residual in the forward sensitivity equations
-    //       flag = CVodeSensInit(mem_, nfdir_, ism_, rhsS_wrapper, getPtr(xF0_));
-    //       if (flag != CV_SUCCESS) cvodes_error("CVodeSensInit", flag);
-    //     } else {
-    //       flag = CVodeSensInit1(mem_, nfdir_, ism_, rhsS1_wrapper, getPtr(xF0_));
-    //       if (flag != CV_SUCCESS) cvodes_error("CVodeSensInit", flag);
-    //     }
-    //   }
-
-    //   // Set tolerances
-    //   vector<double> fsens_abstol(nfdir_, fsens_abstol_);
-
-    //   flag = CVodeSensSStolerances(mem_, fsens_reltol_, getPtr(fsens_abstol));
-    //   if (flag != CV_SUCCESS) cvodes_error("CVodeSensSStolerances", flag);
-
-    //   // Set optional inputs
-    //   bool errconS = option("fsens_err_con");
-    //   flag = CVodeSetSensErrCon(mem_, errconS);
-    //   if (flag != CV_SUCCESS) cvodes_error("CVodeSetSensErrCon", flag);
-
-    //   // Quadrature equations
-    //   if (nq_>0) {
-    //     for (vector<N_Vector>::iterator it=qF_.begin(); it!=qF_.end(); ++it) N_VConst(0.0, *it);
-    //     flag = CVodeQuadSensInit(mem_, rhsQS_wrapper, getPtr(qF_));
-    //     if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSensInit", flag);
-
-    //     // Set tolerances
-    //     flag = CVodeQuadSensSStolerances(mem_, fsens_reltol_, getPtr(fsens_abstol));
-    //     if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSensSStolerances", flag);
-    //   }
-    // } // enable fsens
-
     // Adjoint sensitivity problem
     if (!g_.isNull()) {
 
       // Allocate n-vectors for backward integration
-      //     if (nfdir_>0) {
-      //       rx_ = N_VNew_Serial((1+nfdir_)*nrx_);
-      //       rq_ = N_VNew_Serial((1+nfdir_)*nrq_);
-      //     } else {
-      rx0_ = N_VMake_Serial(nrx_, input(INTEGRATOR_RX0).ptr());
-      rx_ = N_VMake_Serial(nrx_, output(INTEGRATOR_RXF).ptr());
-      rq_ = N_VMake_Serial(nrq_, output(INTEGRATOR_RQF).ptr());
-      //     }
+      rx0_ = N_VMake_Serial(nrx_, rx0().ptr());
+      rx_ = N_VMake_Serial(nrx_, rxf().ptr());
+      rq_ = N_VMake_Serial(nrq_, rqf().ptr());
 
       // Get the number of steos per checkpoint
       int Nd = option("steps_per_checkpoint");
@@ -322,9 +239,6 @@ namespace casadi {
     double tB0 = grid_.back();
     flag = CVodeInitB(mem_, whichB_, rhsB_wrapper, tB0, rx0_);
     if (flag != CV_SUCCESS) cvodes_error("CVodeInitB", flag);
-    //// NOTE: Would be needed for forward sensitivities of the backward problem
-    //   flag = CVodeInitBS(mem_, whichB_, rhsBS_wrapper, tB0, rx0_);
-    //   if (flag != CV_SUCCESS) cvodes_error("CVodeInitBS", flag);
 
     // Set tolerances
     flag = CVodeSStolerancesB(mem_, whichB_, reltolB_, abstolB_);
@@ -376,7 +290,7 @@ namespace casadi {
     // Pass input
     f_.setInputNZ(&t, DAE_T);
     f_.setInputNZ(x, DAE_X);
-    f_.setInput(input(INTEGRATOR_P), DAE_P);
+    f_.setInput(p(), DAE_P);
 
     if (monitor_rhs_) {
       userOut() << "t       = " << t << endl;
@@ -421,8 +335,8 @@ namespace casadi {
 
     if (monitored("reset")) {
       userOut() << "initial state: " << endl;
-      userOut() << "p = " << input(INTEGRATOR_P) << endl;
-      userOut() << "x0 = " << input(INTEGRATOR_X0) << endl;
+      userOut() << "p = " << p() << endl;
+      userOut() << "x0 = " << x0() << endl;
     }
 
     // Reset timers
@@ -439,21 +353,9 @@ namespace casadi {
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadReInit", flag);
     }
 
-    // Re-initialize sensitivities
-    // if (nsens>0) {
-    //   flag = CVodeSensReInit(mem_, ism_, getPtr(xF0_));
-    //   if (flag != CV_SUCCESS) cvodes_error("CVodeSensReInit", flag);
-
-    //   if (nq_>0) {
-    //     for (vector<N_Vector>::iterator it=qF_.begin(); it!=qF_.end(); ++it) N_VConst(0.0, *it);
-    //     flag = CVodeQuadSensReInit(mem_, getPtr(qF_));
-    //     if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSensReInit", flag);
-    //   }
-    // } else {
-    // Turn of sensitivities
+    // Turn off sensitivities
     flag = CVodeSensToggleOff(mem_);
     if (flag != CV_SUCCESS) cvodes_error("CVodeSensToggleOff", flag);
-    // }
 
     // Re-initialize backward integration
     if (nrx_>0) {
@@ -501,19 +403,6 @@ namespace casadi {
       flag = CVodeGetQuad(mem_, &tret, q_);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad", flag);
     }
-
-    // if (nsens_>0) {
-    //   // Get the sensitivities
-    //   flag = CVodeGetSens(mem_, &t_, getPtr(xF_));
-    //   if (flag != CV_SUCCESS) cvodes_error("CVodeGetSens", flag);
-
-    //   if (nq_>0) {
-    //     double tret;
-    //     flag = CVodeGetQuadSens(mem_, &tret, getPtr(qF_));
-    //     if (flag != CV_SUCCESS) cvodes_error("CVodeGetQuadSens", flag);
-    //   }
-    // }
-
 
     // Print statistics
     if (option("print_stats")) printStats(userOut());
@@ -649,22 +538,6 @@ namespace casadi {
     stream << "Time spent to factorize the jacobian in the linear solver setup function: "
            << t_lsetup_fac << " s." << endl;
     stream << std::endl;
-
-#if 0
-    // Quadrature
-    if (ops.quadrature && ocp.hasFunction(LTERM)) {
-      long nfQevals, nQetfails;
-      flag = CVodeGetQuadStats(cvode_mem_[k], &nfQevals, &nQetfails);
-      if (flag != CV_SUCCESS) throw "Error in CVodeGetQuadStats";
-
-      stream << "Quadrature: " << std::endl;
-      stream << "number of calls made to the user's quadrature right-hand side function: "
-             << nfQevals << std::endl;
-      stream << "number of local error test failures due to quadrature variables: "
-             <<  nQetfails << std::endl;
-      stream << std::endl;
-    }
-#endif
   }
 
   map<int, string> CvodesInterface::calc_flagmap() {
@@ -744,29 +617,6 @@ namespace casadi {
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
 
-    //   // Pass input
-    // f_.setInputNZ(&t, DAE_T);
-    // f_.setInputNZ(NV_DATA_S(x), DAE_X);
-    // f_.setInput(input(INTEGRATOR_P), DAE_P);
-
-    //  // Calculate the forward sensitivities, nfdir_f_ directions at a time
-    //  for (int j=0; j<nfdir_; j += nfdir_f_) {
-    //    for (int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir) {
-    //      // Pass forward seeds
-    //      f_.fwdSeed(DAE_T, dir).setZero();
-    //      f_.setFwdSeed(NV_DATA_S(xF[j+dir]), DAE_X, dir);
-    //      f_.setFwdSeed(fwdSeed(INTEGRATOR_P, j+dir), DAE_P, dir);
-    //    }
-
-    //    // Evaluate the AD forward algorithm
-    //    f_.evaluateOld(nfdir_f_, 0);
-
-    //    // Get the output seeds
-    //    for (int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir) {
-    //      f_.getFwdSens(NV_DATA_S(xdotF[j+dir]), DAE_ODE, dir);
-    //    }
-    //  }
-
     // Record timings
     time2 = clock();
     t_fres += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
@@ -787,26 +637,9 @@ namespace casadi {
 
   void CvodesInterface::rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF,
                              N_Vector xdotF, N_Vector tmp1, N_Vector tmp2) {
-    //    casadi_assert(Ns==nfdir_);
 
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
-
-    // // Pass input
-    // f_.setInputNZ(&t, DAE_T);
-    // f_.setInputNZ(NV_DATA_S(x), DAE_X);
-    // f_.setInput(input(INTEGRATOR_P), DAE_P);
-
-    // // Pass forward seeds
-    // f_.fwdSeed(DAE_T).setZero();
-    // f_.setFwdSeed(NV_DATA_S(xF), DAE_X);
-    // f_.setFwdSeed(fwdSeed(INTEGRATOR_P, iS), DAE_P);
-
-    // // Evaluate the AD forward algorithm
-    // f_.evaluateOld(1, 0);
-
-    // // Get the fwd sensitivities
-    // f_.getFwdSens(NV_DATA_S(xdotF));
   }
 
   int CvodesInterface::rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS,
@@ -839,7 +672,7 @@ namespace casadi {
     // Pass input
     f_.setInputNZ(&t, DAE_T);
     f_.setInputNZ(x, DAE_X);
-    f_.setInput(input(INTEGRATOR_P), DAE_P);
+    f_.setInput(p(), DAE_P);
 
     // Evaluate
     f_.evaluate();
@@ -854,24 +687,6 @@ namespace casadi {
 
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
-
-    // // Pass input
-    // f_.setInputNZ(&t, DAE_T);
-    // f_.setInputNZ(NV_DATA_S(x), DAE_X);
-    // f_.setInput(input(INTEGRATOR_P), DAE_P);
-
-    // for (int i=0; i<nfdir_; ++i) {
-    //   // Pass forward seeds
-    //   f_.fwdSeed(DAE_T).setZero();
-    //   f_.setFwdSeed(NV_DATA_S(xF[i]), DAE_X);
-    //   f_.setFwdSeed(fwdSeed(INTEGRATOR_P, i), DAE_P);
-
-    //   // Evaluate the AD forward algorithm
-    //   f_.evaluateOld(1, 0);
-
-    //   // Get the forward sensitivities
-    //   f_.getFwdSens(NV_DATA_S(qdotF[i]), DAE_QUAD);
-    // }
   }
 
   int CvodesInterface::rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
@@ -899,8 +714,8 @@ namespace casadi {
     // Pass inputs
     g_.setInputNZ(&t, RDAE_T);
     g_.setInputNZ(x, RDAE_X);
-    g_.setInput(input(INTEGRATOR_P), RDAE_P);
-    g_.setInput(input(INTEGRATOR_RP), RDAE_RP);
+    g_.setInput(p(), RDAE_P);
+    g_.setInput(rp(), RDAE_RP);
     g_.setInputNZ(rx, RDAE_RX);
 
     if (monitor_rhsB_) {
@@ -932,41 +747,6 @@ namespace casadi {
 
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
-
-    // // Pass input
-    // g_.setInputNZ(&t, RDAE_T);
-    // g_.setInputNZ(NV_DATA_S(x), RDAE_X);
-    // g_.setInput(input(INTEGRATOR_P), RDAE_P);
-    // g_.setInput(input(INTEGRATOR_RP), RDAE_RP);
-
-    // // Pass backward state
-    // const double *rx_data = NV_DATA_S(rx);
-
-    // // Pass backward state
-    // g_.setInputNZ(rx_data, RDAE_RX); rx_data += nrx_;
-
-    // // Pass forward seeds
-    // for (int dir=0; dir<nfdir_; ++dir) {
-    //   g_.fwdSeed(RDAE_T, dir).setZero();
-    //   g_.setFwdSeed(rx_data, RDAE_RX, dir); rx_data += nrx_;
-    //   g_.setFwdSeed(fwdSeed(INTEGRATOR_P, dir), RDAE_P, dir);
-    //   g_.setFwdSeed(fwdSeed(INTEGRATOR_RP, dir), RDAE_RP, dir);
-    //   g_.setFwdSeed(NV_DATA_S(xF[dir]), RDAE_X, dir);
-    // }
-
-    // // Evaluate the AD forward algorithm
-    // g_.evaluateOld(nfdir_, 0);
-
-    // // Right hand side
-    // double *rxdot_data = NV_DATA_S(rxdot);
-
-    // // Get the backward right hand side
-    // g_.getOutputNZ(rxdot_data, RDAE_ODE); rxdot_data += nrx_;
-
-    // // Get forward sensitivities
-    // for (int dir=0; dir<nfdir_; ++dir) {
-    //   g_.getFwdSens(rxdot_data, RDAE_ODE, dir); rxdot_data += nrx_;
-    // }
   }
 
   int CvodesInterface::rhsB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
@@ -1016,8 +796,8 @@ namespace casadi {
     // Pass inputs
     g_.setInputNZ(&t, RDAE_T);
     g_.setInputNZ(x, RDAE_X);
-    g_.setInput(input(INTEGRATOR_P), RDAE_P);
-    g_.setInput(input(INTEGRATOR_RP), RDAE_RP);
+    g_.setInput(p(), RDAE_P);
+    g_.setInput(rp(), RDAE_RP);
     g_.setInputNZ(rx, RDAE_RX);
 
     if (monitor_rhsB_) {
@@ -1083,7 +863,7 @@ namespace casadi {
     // Pass input
     f_fwd_.setInputNZ(&t,                 DAE_T);
     f_fwd_.setInputNZ(NV_DATA_S(x),       DAE_X);
-    f_fwd_.setInput(input(INTEGRATOR_P), DAE_P);
+    f_fwd_.setInput(p(), DAE_P);
 
     // Pass input seeds
     f_fwd_.setInput(0.0,          DAE_NUM_IN + DAE_T);
@@ -1112,9 +892,9 @@ namespace casadi {
     // Pass input
     g_fwd_.setInputNZ(&t,                  RDAE_T);
     g_fwd_.setInputNZ(NV_DATA_S(x),        RDAE_X);
-    g_fwd_.setInput(input(INTEGRATOR_P), RDAE_P);
+    g_fwd_.setInput(p(), RDAE_P);
     g_fwd_.setInputNZ(NV_DATA_S(xB),       RDAE_RX);
-    g_fwd_.setInput(input(INTEGRATOR_RP), RDAE_RP);
+    g_fwd_.setInput(rp(), RDAE_RP);
 
     // Pass input seeds
     g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_T);
@@ -1226,9 +1006,9 @@ namespace casadi {
     // Pass inputs to the jacobian function
     jacB_.setInputNZ(&t, RDAE_T);
     jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
-    jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
+    jacB_.setInput(p(), RDAE_P);
     jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
-    jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
+    jacB_.setInput(rp(), RDAE_RP);
     jacB_.setInput(-1.0, RDAE_NUM_IN); // validated
     jacB_.setInput(0.0, RDAE_NUM_IN+1);
 
@@ -1356,9 +1136,9 @@ namespace casadi {
     // Pass inputs to the jacobian function
     jacB_.setInputNZ(&t, RDAE_T);
     jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
-    jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
+    jacB_.setInput(p(), RDAE_P);
     jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
-    jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
+    jacB_.setInput(rp(), RDAE_RP);
     jacB_.setInput(-1.0, RDAE_NUM_IN);
     jacB_.setInput(0.0, RDAE_NUM_IN+1);
 
@@ -1517,7 +1297,7 @@ namespace casadi {
     // Pass input to the jacobian function
     jac_.setInputNZ(&t, DAE_T);
     jac_.setInputNZ(NV_DATA_S(x), DAE_X);
-    jac_.setInput(input(INTEGRATOR_P), DAE_P);
+    jac_.setInput(p(), DAE_P);
     jac_.setInput(-gamma, DAE_NUM_IN);
     jac_.setInput(1.0, DAE_NUM_IN+1);
 
@@ -1552,9 +1332,9 @@ namespace casadi {
     // Pass inputs to the jacobian function
     jacB_.setInputNZ(&t, RDAE_T);
     jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
-    jacB_.setInput(input(INTEGRATOR_P), RDAE_P);
+    jacB_.setInput(p(), RDAE_P);
     jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
-    jacB_.setInput(input(INTEGRATOR_RP), RDAE_RP);
+    jacB_.setInput(rp(), RDAE_RP);
     jacB_.setInput(gammaB, RDAE_NUM_IN); // validated
     jacB_.setInput(1.0, RDAE_NUM_IN+1); // validated
 
