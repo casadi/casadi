@@ -388,6 +388,12 @@ namespace casadi {
     // Get time
     time1 = clock();
 
+    // Debug output
+    if (monitored("res")) {
+      printvar("t", t);
+      printvar("xz", xz);
+    }
+
     // Evaluate f_
     arg1_[DAE_T] = &t;
     arg1_[DAE_X] = NV_DATA_S(xz);
@@ -403,8 +409,6 @@ namespace casadi {
 
     // Debug output
     if (monitored("res")) {
-      printvar("t", t);
-      printvar("xz", xz);
       printvar("res", rr);
     }
 
@@ -491,76 +495,62 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::jtimesB(double t, const double *xz, const double *xzdot, const double *xzB,
-                             const double *xzdotB, const double *resvalB, const double *vB,
-                             double *JvB, double cjB, double * tmp1B, double * tmp2B) {
+  void IdasInterface::jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
+                             N_Vector xzdotB, N_Vector resvalB, N_Vector vB,
+                             N_Vector JvB, double cjB, N_Vector tmp1B, N_Vector tmp2B) {
     log("IdasInterface::jtimesB", "begin");
     // Get time
     time1 = clock();
 
-    // Pass input
-    g_fwd_.setInputNZ(&t,                  RDAE_T);
-    g_fwd_.setInputNZ(xz,                  RDAE_X);
-    g_fwd_.setInputNZ(xz+nx_,              RDAE_Z);
-    g_fwd_.setInput(p(), RDAE_P);
-
-    g_fwd_.setInputNZ(xzB,                 RDAE_RX);
-    g_fwd_.setInputNZ(xzB+nrx_,            RDAE_RZ);
-    g_fwd_.setInput(rp(), RDAE_RP);
-
-    // Pass seeds of the state vectors
-    g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_T);
-    g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_X);
-    g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_Z);
-    g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_P);
-    g_fwd_.setInputNZ(vB,     RDAE_NUM_IN + RDAE_RX);
-    g_fwd_.setInputNZ(vB+nx_, RDAE_NUM_IN + RDAE_RZ);
-    g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_RP);
-
+    // Debug output
     if (monitored("jtimesB")) {
-      userOut() << "RDAE_T    = " << t << endl;
-      userOut() << "RDAE_X    = " << g_fwd_.input(RDAE_X) << endl;
-      userOut() << "RDAE_Z    = " << g_fwd_.input(RDAE_Z) << endl;
-      userOut() << "RDAE_P    = " << g_fwd_.input(RDAE_P) << endl;
-      userOut() << "RDAE_XDOT  = ";
-      for (int k=0;k<nx_;++k) {
-        userOut() << xzdot[k] << " " ;
-      }
-      userOut() << endl;
-      userOut() << "RDAE_RX    = " << g_fwd_.input(RDAE_RX) << endl;
-      userOut() << "RDAE_RZ    = " << g_fwd_.input(RDAE_RZ) << endl;
-      userOut() << "RDAE_RP    = " << g_fwd_.input(RDAE_RP) << endl;
-      userOut() << "RDAE_RXDOT  = ";
-      for (int k=0;k<nrx_;++k) {
-        userOut() << xzdotB[k] << " " ;
-      }
-      userOut() << endl;
-      userOut() << "fwdSeed(RDAE_RX) = " << g_fwd_.input(RDAE_NUM_IN + RDAE_RX) << endl;
-      userOut() << "fwdSeed(RDAE_RZ) = " << g_fwd_.input(RDAE_NUM_IN + RDAE_RZ) << endl;
+      printvar("t", t);
+      printvar("xz", xz);
+      printvar("xzdot", xzdot);
+      printvar("xzB", xzB);
+      printvar("xzdotB", xzdotB);
+      printvar("vB", vB);
     }
 
-    // Evaluate the AD forward algorithm
-    g_fwd_.evaluate();
+    // Hack:
+    vector<const double*> arg1(g_fwd_.sz_arg());
+    const double** arg1_ = getPtr(arg1);
+    vector<double*> res1(g_fwd_.sz_res());
+    double** res1_ = getPtr(res1);
+    vector<int> iw(g_fwd_.sz_iw());
+    int* iw_ = getPtr(iw);
+    vector<double> w(g_fwd_.sz_w());
+    double* w_ = getPtr(w);
 
-    if (monitored("jtimesB")) {
-      userOut() << "fwdSens(RDAE_ODE) = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ODE) << endl;
-      userOut() << "fwdSens(RDAE_ALG) = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ALG) << endl;
-    }
-
-    // Get the output seeds
-    g_fwd_.getOutputNZ(JvB,     RDAE_NUM_OUT + RDAE_ODE);
-    g_fwd_.getOutputNZ(JvB+nx_, RDAE_NUM_OUT + RDAE_ALG);
+    // Evaluate f_fwd_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(xz);
+    arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(xzB);
+    arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
+    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_NUM_IN + RDAE_T] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_X] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_Z] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_P] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_RX] = NV_DATA_S(vB);
+    arg1_[RDAE_NUM_IN + RDAE_RZ] = NV_DATA_S(vB)+nrx_;
+    arg1_[RDAE_NUM_IN + RDAE_RP] = 0;
+    res1_[RDAE_ODE] = 0;
+    res1_[RDAE_ALG] = 0;
+    res1_[RDAE_QUAD] = 0;
+    res1_[RDAE_NUM_OUT + RDAE_ODE] = NV_DATA_S(JvB);
+    res1_[RDAE_NUM_OUT + RDAE_ALG] = NV_DATA_S(JvB) + nrx_;
+    res1_[RDAE_NUM_OUT + RDAE_QUAD] = 0;
+    g_fwd_(0, arg1_, res1_, iw_, w_);
 
     // Subtract state derivative to get residual
-    for (int i=0; i<nrx_; ++i) {
-      JvB[i] += cjB*vB[i];
-    }
+    casadi_axpy(nrx_, cjB, NV_DATA_S(vB), 1, NV_DATA_S(JvB), 1);
 
+    // Debug output
     if (monitored("jtimesB")) {
-      g_fwd_.setOutputNZ(JvB,     RDAE_NUM_OUT + RDAE_ODE);
-      g_fwd_.setOutputNZ(JvB+nx_, RDAE_NUM_OUT + RDAE_ALG);
-      userOut() << "res fwdSens(RDAE_ODE)    = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ODE) << endl;
-      userOut() << "res fwdSens(RDAE_ALG)    = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ALG) << endl;
+      printvar("JvB", JvB);
     }
 
     // Log time duration
@@ -575,9 +565,7 @@ namespace casadi {
                                     N_Vector tmp1B, N_Vector tmp2B) {
     try {
       IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
-      this_->jtimesB(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(xzB),
-                     NV_DATA_S(xzdotB), NV_DATA_S(resvalB), NV_DATA_S(vB),
-                     NV_DATA_S(JvB), cjB, NV_DATA_S(tmp1B), NV_DATA_S(tmp2B));
+      this_->jtimesB(t, xz, xzdot, xzB, xzdotB, resvalB, vB, JvB, cjB, tmp1B, tmp2B);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimesB failed: " << e.what() << endl;

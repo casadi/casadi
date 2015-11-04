@@ -144,9 +144,9 @@ namespace casadi {
     void ehfun(int error_code, const char *module, const char *function, char *msg);
     void jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
                 N_Vector v, N_Vector Jv, double cj, N_Vector tmp1, N_Vector tmp2);
-    void jtimesB(double t, const double *xz, const double *xzdot, const double *xzB,
-                 const double *xzdotB, const double *resvalB, const double *vB, double *JvB,
-                 double cjB, double * tmp1B, double * tmp2B);
+    void jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
+                 N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
+                 double cjB, N_Vector tmp1B, N_Vector tmp2B);
     void resS(int Ns, double t, const double* xz, const double* xzdot, const double *resval,
               N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
               double *tmp1, double *tmp2, double *tmp3);
