@@ -129,17 +129,8 @@ namespace casadi {
   }
 
   void Integrator::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
-      } else {
-        setInput(0., i);
-      }
-    }
-
     // Reset solver, take time to t0
-    reset();
+    reset(arg, res, iw, w);
 
     // Integrate forward
     advance(ngrid_-1);
@@ -1275,8 +1266,17 @@ namespace casadi {
     return Function(name, ret_in, ret_out, opts);
   }
 
-  void Integrator::reset() {
+  void Integrator::reset(const double** arg, double** res, int* iw, double* w) {
     log("Integrator::reset", "begin");
+
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
 
     // Go to the start time
     t_ = grid_.front();
@@ -1287,6 +1287,28 @@ namespace casadi {
 
     // Reset summation states
     qf().set(0.0);
+
+    // Read inputs
+    x0_ = arg[INTEGRATOR_X0];
+    p_ = arg[INTEGRATOR_P];
+    z0_ = arg[INTEGRATOR_Z0];
+    rx0_ = arg[INTEGRATOR_RX0];
+    rp_ = arg[INTEGRATOR_RP];
+    rz0_ = arg[INTEGRATOR_RZ0];
+
+    // Read outputs
+    xf_ = res[INTEGRATOR_XF];
+    qf_ = res[INTEGRATOR_QF];
+    zf_ = res[INTEGRATOR_ZF];
+    rxf_ = res[INTEGRATOR_RXF];
+    rqf_ = res[INTEGRATOR_RQF];
+    rzf_ = res[INTEGRATOR_RZF];
+
+    // Work vectors
+    arg1_ = arg + INTEGRATOR_NUM_IN;
+    res1_ = res + INTEGRATOR_NUM_OUT;
+    iw_ = iw;
+    w_ = w;
 
     log("Integrator::reset", "end");
   }

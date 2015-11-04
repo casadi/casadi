@@ -398,7 +398,7 @@ namespace casadi {
     integrated_once_ = false;
   }
 
-  void OldCollocationIntegrator::reset() {
+  void OldCollocationIntegrator::reset(const double** arg, double** res, int* iw, double* w) {
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -409,7 +409,7 @@ namespace casadi {
     }
 
     // Call the base class method
-    Integrator::reset();
+    Integrator::reset(arg, res, iw, w);
 
     // Pass the inputs
     for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
@@ -423,14 +423,33 @@ namespace casadi {
       // Check if an integrator for the startup trajectory has been supplied
       bool has_startup_integrator = !startup_integrator_.isNull();
 
+      // Get pointers to input arguments
+      vector<const double*> arg;
+      vector<double*> res;
+      vector<int> iw;
+      vector<double> w;
+
       // Use supplied integrator, if any
       if (has_startup_integrator) {
         for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
           startup_integrator_.input(iind).set(input(iind));
         }
 
+        // Get pointers to input arguments
+        arg = vector<const double*>(startup_integrator_.sz_arg());
+        for (int i=0; i<n_in(); ++i) arg[i]=startup_integrator_.input(i).ptr();
+
+        // Get pointers to output arguments
+        res = vector<double*>(startup_integrator_.sz_res());
+        for (int i=0; i<n_out(); ++i) res[i]=startup_integrator_.output(i).ptr();
+
+        // Work vectors
+        iw = vector<int>(startup_integrator_.sz_iw());
+        w = vector<double>(startup_integrator_.sz_w());
+
         // Reset the integrator
-        dynamic_cast<Integrator*>(startup_integrator_.get())->reset();
+        dynamic_cast<Integrator*>(startup_integrator_.get())
+          ->reset(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w));
       }
 
       // Integrate, stopping at all time points

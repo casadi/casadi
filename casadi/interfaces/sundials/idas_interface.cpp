@@ -382,48 +382,36 @@ namespace casadi {
   }
 
 
-  void IdasInterface::res(double t, const double* xz, const double* xzdot, double* r) {
+  void IdasInterface::res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr) {
     log("IdasInterface::res", "begin");
 
     // Get time
     time1 = clock();
 
-    // Pass input
-    f_.setInputNZ(&t, DAE_T);
-    f_.setInputNZ(xz, DAE_X);
-    f_.setInputNZ(xz+nx_, DAE_Z);
-    f_.setInput(p(), DAE_P);
-
-    if (monitored("res")) {
-      userOut() << "DAE_T    = " << t << endl;
-      userOut() << "DAE_X    = " << f_.input(DAE_X) << endl;
-      userOut() << "DAE_Z    = " << f_.input(DAE_Z) << endl;
-      userOut() << "DAE_P    = " << f_.input(DAE_P) << endl;
-    }
-
-    // Evaluate
-    f_.evaluate();
-
-    // Get results
-    f_.getOutputNZ(r, DAE_ODE);
-    f_.getOutputNZ(r+nx_, DAE_ALG);
-
-    if (monitored("res")) {
-      userOut() << "ODE rhs  = " << f_.output(DAE_ODE) << endl;
-      userOut() << "ALG rhs  = " << f_.output(DAE_ALG) << endl;
-    }
-
-    if (regularity_check_) {
-      casadi_assert_message(is_regular(f_.output(DAE_ODE).data()),
-                            "IdasInterface::res: f.output(DAE_ODE) is not regular.");
-      casadi_assert_message(is_regular(f_.output(DAE_ALG).data()),
-                            "IdasInterface::res: f.output(DAE_ALG) is not regular.");
-    }
+    // Evaluate f_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(xz);
+    arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[DAE_P] = p_;
+    res1_[DAE_ODE] = NV_DATA_S(rr);
+    res1_[DAE_ALG] = NV_DATA_S(rr)+nx_;
+    res1_[DAE_QUAD] = 0;
+    f_(0, arg1_, res1_, iw_, w_);
 
     // Subtract state derivative to get residual
-    for (int i=0; i<nx_; ++i) {
-      r[i] -= xzdot[i];
+    transform(NV_DATA_S(rr), NV_DATA_S(rr)+nx_, NV_DATA_S(xzdot),
+              NV_DATA_S(rr), std::minus<double>());
+
+    // Debug output
+    if (monitored("res")) {
+      printvar("t", t);
+      printvar("xz", xz);
+      printvar("res", rr);
     }
+
+    // Regularity check
+    casadi_assert_message(!regularity_check_ || is_regular(rr),
+                          "IdasInterface::res: not regular.");
 
     time2 = clock();
     t_res += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
@@ -434,7 +422,7 @@ namespace casadi {
                                 N_Vector rr, void *user_data) {
     try {
       IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
-      this_->res(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(rr));
+      this_->res(t, xz, xzdot, rr);
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
@@ -632,11 +620,11 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::reset() {
+  void IdasInterface::reset(const double** arg, double** res, int* iw, double* w) {
     log("IdasInterface::reset", "begin");
 
     // Reset the base classes
-    SundialsInterface::reset();
+    SundialsInterface::reset(arg, res, iw, w);
 
     if (nrx_>0 && !isInitTaping_)
       initTaping();

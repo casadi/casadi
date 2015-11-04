@@ -136,9 +136,9 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegrator::reset() {
+  void FixedStepIntegrator::reset(const double** arg, double** res, int* iw, double* w) {
     // Reset the base classes
-    Integrator::reset();
+    Integrator::reset(arg, res, iw, w);
 
     // Bring discrete time to the beginning
     k_ = 0;

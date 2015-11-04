@@ -68,7 +68,7 @@ namespace casadi {
     virtual void printStats(std::ostream &stream) const {}
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset();
+    virtual void reset(const double** arg, double** res, int* iw, double* w);
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB();
@@ -137,6 +137,16 @@ namespace casadi {
 
     /// Get the (legacy) dae backward function
     template<typename MatType> Function get_g() const;
+
+    // Pointers to inputs and outputs
+    const double *x0_, *p_, *z0_, *rx0_, *rp_, *rz0_;
+    double *xf_, *qf_, *zf_, *rxf_, *rqf_, *rzf_;
+
+    // Work vectors
+    const double **arg1_;
+    double **res1_;
+    int *iw_;
+    double *w_;
 
     ///@{
     // Shorthands

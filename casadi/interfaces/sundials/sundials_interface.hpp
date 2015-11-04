@@ -49,7 +49,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset() = 0;
+    virtual void reset(const double** arg, double** res, int* iw, double* w) = 0;
 
     /** \brief  Set stop time for the integration */
     virtual void setStopTime(double tf) = 0;
@@ -109,7 +109,23 @@ namespace casadi {
 
     // Get bandwidth for backward problem
     std::pair<int, int> getBandwidthB() const;
+
+    // Print a variable
+    static void printvar(const std::string& id, double v) {
+      userOut() << id << " = " << v << std::endl;
+    }
+    // Print an N_Vector
+    static void printvar(const std::string& id, N_Vector v) {
+      std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
+      userOut() << id << " = " << tmp << std::endl;
+    }
   };
+
+  // Check if N_Vector is regular
+  inline bool is_regular(N_Vector v) {
+    std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
+    return is_regular(tmp);
+  }
 
 } // namespace casadi
 

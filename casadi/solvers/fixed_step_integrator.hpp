@@ -55,7 +55,7 @@ namespace casadi {
     virtual void retreat(int k);
 
     /// Reset the forward problem and bring the time back to t0
-    virtual void reset();
+    virtual void reset(const double** arg, double** res, int* iw, double* w);
 
     /// Reset the backward problem and take time to tf
     virtual void resetB();

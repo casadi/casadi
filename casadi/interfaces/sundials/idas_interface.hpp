@@ -95,7 +95,7 @@ namespace casadi {
     virtual void initAdj();
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset();
+    virtual void reset(const double** arg, double** res, int* iw, double* w);
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB();
@@ -140,7 +140,7 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void res(double t, const double* xz, const double* xzdot, double* rr);
+    void res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr);
     void ehfun(int error_code, const char *module, const char *function, char *msg);
     void jtimes(double t, const double *xz, const double *xzdot, const double *rr,
                 const double *v, double *Jv, double cj, double *tmp1, double *tmp2);

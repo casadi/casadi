@@ -61,13 +61,21 @@ namespace casadi {
 
   void SimulatorInternal::evaluate() {
 
-    // Pass the parameters and initial state
-    integrator_.setInput(input(INTEGRATOR_X0), INTEGRATOR_X0);
-    integrator_.setInput(input(INTEGRATOR_Z0), INTEGRATOR_Z0);
-    integrator_.setInput(input(INTEGRATOR_P), INTEGRATOR_P);
+    // Get pointers to input arguments
+    vector<const double*> arg(integrator_.sz_arg());
+    for (int i=0; i<n_in(); ++i) arg[i]=input(i).ptr();
+
+    // Get pointers to output arguments
+    vector<double*> res(integrator_.sz_res());
+    for (int i=0; i<n_out(); ++i) res[i]=output(i).ptr();
+
+    // Work vectors
+    vector<int> iw(integrator_.sz_iw());
+    vector<double> w(integrator_.sz_w());
 
     // Reset the integrator_
-    dynamic_cast<Integrator*>(integrator_.get())->reset();
+    dynamic_cast<Integrator*>(integrator_.get())
+      ->reset(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w));
 
     // Advance solution in time
     for (int k=0; k<grid_.size(); ++k) {
