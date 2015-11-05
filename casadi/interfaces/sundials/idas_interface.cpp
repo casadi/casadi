@@ -1512,11 +1512,6 @@ namespace casadi {
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
     jacB_(0, arg1_, res1_, iw_, w_);
-
-    // Get sparsity and non-zero elements
-    const int* colind = jacB_.sparsity_out(0).colind();
-    int ncol = jacB_.size2_out(0);
-    const int* row = jacB_.sparsity_out(0).row();
     double *val = res1_[0];
 
     // Log time duration

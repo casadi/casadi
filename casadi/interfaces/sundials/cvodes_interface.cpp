@@ -966,38 +966,26 @@ namespace casadi {
     // Get time
     time1 = clock();
 
-    // Pass inputs to the jacobian function
-    jacB_.setInputNZ(&t, RDAE_T);
-    jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
-    jacB_.setInput(p(), RDAE_P);
-    jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
-    jacB_.setInput(rp(), RDAE_RP);
-    jacB_.setInput(-1.0, RDAE_NUM_IN); // validated
-    jacB_.setInput(0.0, RDAE_NUM_IN+1);
-
-
-    if (monitored("djacB")) {
-      userOut() << "RDAE_T    = " << t << endl;
-      userOut() << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
-      userOut() << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
-      userOut() << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
-      userOut() << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
-      userOut() << "c_x = " << jacB_.input(RDAE_NUM_IN) << endl;
-      userOut() << "c_xdot = " << jacB_.input(RDAE_NUM_IN+1) << endl;
-    }
-
-    // Evaluate
-    jacB_.evaluate();
-
-    if (monitored("djacB")) {
-      userOut() << "jacB = " << jacB_.output() << endl;
-    }
+    // Evaluate jacB_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(x);
+    arg1_[RDAE_Z] = 0;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(xB);
+    arg1_[RDAE_RZ] = 0;
+    arg1_[RDAE_RP] = rp_;
+    double minus_one = -1;
+    arg1_[RDAE_NUM_IN] = &minus_one;
+    arg1_[RDAE_NUM_IN+1] = 0;
+    fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
+    res1_[0] = w_ + jacB_.sz_w();
+    jacB_(0, arg1_, res1_, iw_, w_);
 
     // Get sparsity and non-zero elements
     const int* colind = jacB_.sparsity_out(0).colind();
     int ncol = jacB_.size2_out(0);
     const int* row = jacB_.sparsity_out(0).row();
-    const vector<double>& val = jacB_.output().data();
+    double *val = res1_[0];
 
     // Loop over columns
     for (int cc=0; cc<ncol; ++cc) {
@@ -1098,37 +1086,26 @@ namespace casadi {
     // Get time
     time1 = clock();
 
-    // Pass inputs to the jacobian function
-    jacB_.setInputNZ(&t, RDAE_T);
-    jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
-    jacB_.setInput(p(), RDAE_P);
-    jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
-    jacB_.setInput(rp(), RDAE_RP);
-    jacB_.setInput(-1.0, RDAE_NUM_IN);
-    jacB_.setInput(0.0, RDAE_NUM_IN+1);
-
-    if (monitored("bjacB")) {
-      userOut() << "RDAE_T    = " << t << endl;
-      userOut() << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
-      userOut() << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
-      userOut() << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
-      userOut() << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
-      userOut() << "c_x = " << jacB_.input(RDAE_NUM_IN) << endl;
-      userOut() << "c_xdot = " << jacB_.input(RDAE_NUM_IN+1) << endl;
-    }
-
-    // Evaluate
-    jacB_.evaluate();
-
-    if (monitored("bjacB")) {
-      userOut() << "jacB = " << jacB_.output() << endl;
-    }
+    // Evaluate jacB_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(x);
+    arg1_[RDAE_Z] = 0;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(xB);
+    arg1_[RDAE_RZ] = 0;
+    arg1_[RDAE_RP] = rp_;
+    double minus_one = -1;
+    arg1_[RDAE_NUM_IN] = &minus_one;
+    arg1_[RDAE_NUM_IN+1] = 0;
+    fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
+    res1_[0] = w_ + jacB_.sz_w();
+    jacB_(0, arg1_, res1_, iw_, w_);
 
     // Get sparsity and non-zero elements
     const int* colind = jacB_.sparsity_out(0).colind();
     int ncol = jacB_.size2_out(0);
     const int* row = jacB_.sparsity_out(0).row();
-    const vector<double>& val = jacB_.output().data();
+    double *val = res1_[0];
 
     // Loop over columns
     for (int cc=0; cc<ncol; ++cc) {
@@ -1297,37 +1274,28 @@ namespace casadi {
     // Get time
     time1 = clock();
 
-    // Pass inputs to the jacobian function
-    jacB_.setInputNZ(&t, RDAE_T);
-    jacB_.setInputNZ(NV_DATA_S(x), RDAE_X);
-    jacB_.setInput(p(), RDAE_P);
-    jacB_.setInputNZ(NV_DATA_S(xB), RDAE_RX);
-    jacB_.setInput(rp(), RDAE_RP);
-    jacB_.setInput(gammaB, RDAE_NUM_IN); // validated
-    jacB_.setInput(1.0, RDAE_NUM_IN+1); // validated
-
-    if (monitored("psetupB")) {
-      userOut() << "RDAE_T    = " << t << endl;
-      userOut() << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
-      userOut() << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
-      userOut() << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
-      userOut() << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
-      userOut() << "gamma = " << gammaB << endl;
-    }
-
-    // Evaluate jacobian
-    jacB_.evaluate();
-
-    if (monitored("psetupB")) {
-      userOut() << "psetupB = " << jacB_.output() << endl;
-    }
+    // Evaluate jacB_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(x);
+    arg1_[RDAE_Z] = 0;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(xB);
+    arg1_[RDAE_RZ] = 0;
+    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_NUM_IN] = &gammaB;
+    double one=1;
+    arg1_[RDAE_NUM_IN+1] = &one;
+    fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
+    res1_[0] = w_ + jacB_.sz_w();
+    jacB_(0, arg1_, res1_, iw_, w_);
+    double *val = res1_[0];
 
     // Log time duration
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements, scaled by -gamma, to the linear solver
-    linsolB_.setInput(jacB_.output(), 0);
+    linsolB_.setInputNZ(val, 0);
 
     // Prepare the solution of the linear system (e.g. factorize)
     // -- only if the linear solver inherits from LinearSolver
