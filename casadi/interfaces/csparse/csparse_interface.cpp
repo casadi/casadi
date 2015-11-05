@@ -32,7 +32,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINEARSOLVER_CSPARSE_EXPORT
-  casadi_register_linearsolver_csparse(LinearSolverInternal::Plugin* plugin) {
+  casadi_register_linearsolver_csparse(Linsol::Plugin* plugin) {
     plugin->creator = CsparseInterface::creator;
     plugin->name = "csparse";
     plugin->doc = CsparseInterface::meta_doc.c_str();
@@ -42,12 +42,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINEARSOLVER_CSPARSE_EXPORT casadi_load_linearsolver_csparse() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparse);
+    Linsol::registerPlugin(casadi_register_linearsolver_csparse);
   }
 
   CsparseInterface::CsparseInterface(const std::string& name,
                                      const Sparsity& sparsity, int nrhs)
-    : LinearSolverInternal(name, sparsity, nrhs) {
+    : Linsol(name, sparsity, nrhs) {
     N_ = 0;
     S_ = 0;
   }
@@ -59,7 +59,7 @@ namespace casadi {
 
   void CsparseInterface::init() {
     // Call the init method of the base class
-    LinearSolverInternal::init();
+    Linsol::init();
 
     A_.nzmax = input().nnz();  // maximum number of entries
     A_.m = input().size1(); // number of rows

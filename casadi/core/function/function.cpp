@@ -36,7 +36,7 @@
 #include "qp_solver.hpp"
 #include "nlp_solver.hpp"
 #include "rootfinder.hpp"
-#include "linear_solver_internal.hpp"
+#include "linsol.hpp"
 
 
 #include <typeinfo>
@@ -1472,15 +1472,15 @@ namespace casadi {
   }
 
   bool Function::has_linsol(const string& name) {
-    return LinearSolverInternal::hasPlugin(name);
+    return Linsol::hasPlugin(name);
   }
 
   void Function::load_linsol(const string& name) {
-    LinearSolverInternal::loadPlugin(name);
+    Linsol::loadPlugin(name);
   }
 
   string Function::doc_linsol(const string& name) {
-    return LinearSolverInternal::getPlugin(name).doc;
+    return Linsol::getPlugin(name).doc;
   }
 
   Function Function::rootfinder_fun() {
@@ -1778,9 +1778,9 @@ namespace casadi {
                             const Sparsity& sp, int nrhs, const Dict& opts) {
     Function ret;
     if (solver=="none") {
-      ret.assignNode(new LinearSolverInternal(name, sp, nrhs));
+      ret.assignNode(new Linsol(name, sp, nrhs));
     } else {
-      ret.assignNode(LinearSolverInternal::getPlugin(solver).creator(name, sp, nrhs));
+      ret.assignNode(Linsol::getPlugin(solver).creator(name, sp, nrhs));
     }
     ret.setOption(opts);
     ret.init();

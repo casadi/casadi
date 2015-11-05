@@ -34,7 +34,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT
-  casadi_register_linearsolver_symbolicqr(LinearSolverInternal::Plugin* plugin) {
+  casadi_register_linearsolver_symbolicqr(Linsol::Plugin* plugin) {
     plugin->creator = SymbolicQr::creator;
     plugin->name = "symbolicqr";
     plugin->doc = SymbolicQr::meta_doc.c_str();
@@ -44,11 +44,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT casadi_load_linearsolver_symbolicqr() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_symbolicqr);
+    Linsol::registerPlugin(casadi_register_linearsolver_symbolicqr);
   }
 
   SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs) :
-    LinearSolverInternal(name, sparsity, nrhs) {
+    Linsol(name, sparsity, nrhs) {
     addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");
     addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",
               "Compiler command to be used for compiling generated code");
@@ -59,7 +59,7 @@ namespace casadi {
 
   void SymbolicQr::init() {
     // Call the base class initializer
-    LinearSolverInternal::init();
+    Linsol::init();
 
     // Read options
     bool codegen = option("codegen");

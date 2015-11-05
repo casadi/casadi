@@ -31,7 +31,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINEARSOLVER_LAPACKQR_EXPORT
-  casadi_register_linearsolver_lapackqr(LinearSolverInternal::Plugin* plugin) {
+  casadi_register_linearsolver_lapackqr(Linsol::Plugin* plugin) {
     plugin->creator = LapackQrDense::creator;
     plugin->name = "lapackqr";
     plugin->doc = LapackQrDense::meta_doc.c_str();;
@@ -41,12 +41,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINEARSOLVER_LAPACKQR_EXPORT casadi_load_linearsolver_lapackqr() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapackqr);
+    Linsol::registerPlugin(casadi_register_linearsolver_lapackqr);
   }
 
   LapackQrDense::LapackQrDense(const std::string& name,
                                const Sparsity& sparsity, int nrhs) :
-    LinearSolverInternal(name, sparsity, nrhs) {
+    Linsol(name, sparsity, nrhs) {
   }
 
   LapackQrDense::~LapackQrDense() {
@@ -54,7 +54,7 @@ namespace casadi {
 
   void LapackQrDense::init() {
     // Call the base class initializer
-    LinearSolverInternal::init();
+    Linsol::init();
 
     // Get dimensions
     ncol_ = ncol();

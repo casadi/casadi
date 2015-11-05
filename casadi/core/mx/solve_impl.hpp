@@ -27,8 +27,7 @@
 #define CASADI_SOLVE_IMPL_HPP
 
 #include "solve.hpp"
-#include "../function/linear_solver_internal.hpp"
-/// \cond INTERNAL
+#include "../function/function_internal.hpp"
 
 using namespace std;
 
@@ -112,7 +111,4 @@ namespace casadi {
 
 } // namespace casadi
 
-/// \endcond
-
 #endif // CASADI_SOLVE_IMPL_HPP
-

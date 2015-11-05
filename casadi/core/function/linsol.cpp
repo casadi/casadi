@@ -23,7 +23,7 @@
  */
 
 
-#include "linear_solver_internal.hpp"
+#include "linsol.hpp"
 #include "../std_vector_tools.hpp"
 #include "../mx/mx_node.hpp"
 #include <typeinfo>
@@ -31,17 +31,16 @@
 using namespace std;
 namespace casadi {
 
-  LinearSolverInternal::LinearSolverInternal(const std::string& name,
-                                             const Sparsity& sparsity, int nrhs)
-  : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
+  Linsol::Linsol(const std::string& name, const Sparsity& sparsity, int nrhs)
+    : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
 
     // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
     casadi_assert_message(sparsity.size2()==sparsity.size1(),
-                          "LinearSolverInternal::init: the matrix must be square but got "
+                          "Linsol::init: the matrix must be square but got "
                           << sparsity.dim());
     casadi_assert_message(!sparsity.is_singular(),
-                          "LinearSolverInternal::init: singularity - the matrix is structurally "
+                          "Linsol::init: singularity - the matrix is structurally "
                           "rank-deficient. sprank(J)=" << sprank(sparsity)
                           << " (in stead of "<< sparsity.size2() << ")");
 
@@ -63,7 +62,7 @@ namespace casadi {
     oscheme_ = {"X"};
   }
 
-  Sparsity LinearSolverInternal::get_sparsity_in(int ind) const {
+  Sparsity Linsol::get_sparsity_in(int ind) const {
     switch (static_cast<LinsolInput>(ind)) {
     case LINSOL_A:
       return sparsity_;
@@ -74,7 +73,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity LinearSolverInternal::get_sparsity_out(int ind) const {
+  Sparsity Linsol::get_sparsity_out(int ind) const {
     switch (static_cast<LinsolOutput>(ind)) {
     case LINSOL_X:
       return sparsity_;
@@ -83,15 +82,15 @@ namespace casadi {
     return Sparsity();
   }
 
-  void LinearSolverInternal::init() {
+  void Linsol::init() {
     // Call the base class initializer
     FunctionInternal::init();
   }
 
-  LinearSolverInternal::~LinearSolverInternal() {
+  Linsol::~Linsol() {
   }
 
-  void LinearSolverInternal::evaluate() {
+  void Linsol::evaluate() {
     // Call the solve routine
     linsol_prepare();
 
@@ -99,7 +98,7 @@ namespace casadi {
     linsol_solve(false);
   }
 
-  void LinearSolverInternal::linsol_solve(bool transpose) {
+  void Linsol::linsol_solve(bool tr) {
     // Get input and output vector
     const vector<double>& b = input(LINSOL_B).data();
     vector<double>& x = output(LINSOL_X).data();
@@ -109,10 +108,10 @@ namespace casadi {
     copy(b.begin(), b.end(), x.begin());
 
     // Solve the factorized system in-place
-    linsol_solve(getPtr(x), nrhs, transpose);
+    linsol_solve(getPtr(x), nrhs, tr);
   }
 
-  void LinearSolverInternal::
+  void Linsol::
   linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& fseed,
                  std::vector<std::vector<MX> >& fsens, bool tr) {
@@ -140,7 +139,7 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::
+  void Linsol::
   linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& aseed,
                  std::vector<std::vector<MX> >& asens, bool tr) {
@@ -185,7 +184,7 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::
+  void Linsol::
   linsol_spFwd(void* mem, const bvec_t** arg, bvec_t** res,
                int* iw, bvec_t* w, bool tr, int nrhs) {
     // Sparsities
@@ -222,7 +221,7 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::
+  void Linsol::
   linsol_spAdj(void* mem, bvec_t** arg, bvec_t** res,
                int* iw, bvec_t* w, bool tr, int nrhs) {
     // Sparsities
@@ -261,21 +260,21 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::
-  linsol_spsolve(DMatrix& X, const DMatrix& B, bool transpose) const {
+  void Linsol::
+  linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const {
     bvec_t* X_bvec = reinterpret_cast<bvec_t*>(X.ptr());
     const bvec_t* B_bvec = reinterpret_cast<const bvec_t*>(B.ptr());
-    linsol_spsolve(X_bvec, B_bvec, transpose);
+    linsol_spsolve(X_bvec, B_bvec, tr);
   }
 
-  void LinearSolverInternal::linsol_spsolve(bvec_t* X, const bvec_t* B, bool transpose) const {
+  void Linsol::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
 
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
     int nb = rowblock_.size()-1; // number of blocks
 
-    if (!transpose) {
+    if (!tr) {
       for (int b=0; b<nb; ++b) { // loop over the blocks forward
 
         // Get dependencies from all right-hand-sides in the block ...
@@ -333,23 +332,23 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
+  void Linsol::linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
                                            int* iw, SXElem* w, bool tr, int nrhs) {
-    casadi_error("LinearSolverInternal::evalSXLinsol not defined for class "
+    casadi_error("Linsol::evalSXLinsol not defined for class "
                  << typeid(*this).name());
   }
 
-  MX LinearSolverInternal::linsol_solve(const MX& A, const MX& B, bool transpose) {
-    return A->getSolve(B, transpose, shared_from_this<Function>());
+  MX Linsol::linsol_solve(const MX& A, const MX& B, bool tr) {
+    return A->getSolve(B, tr, shared_from_this<Function>());
   }
 
-  void LinearSolverInternal::linsol_solve(double* x, int nrhs, bool transpose) {
-    casadi_error("LinearSolverInternal::solve not defined for class " << typeid(*this).name());
+  void Linsol::linsol_solve(double* x, int nrhs, bool tr) {
+    casadi_error("Linsol::solve not defined for class " << typeid(*this).name());
   }
 
-  std::map<std::string, LinearSolverInternal::Plugin> LinearSolverInternal::solvers_;
+  std::map<std::string, Linsol::Plugin> Linsol::solvers_;
 
-  const std::string LinearSolverInternal::infix_ = "linearsolver";
+  const std::string Linsol::infix_ = "linearsolver";
 
 } // namespace casadi
 

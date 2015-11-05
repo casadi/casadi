@@ -26,7 +26,7 @@
 #ifndef CASADI_SYMBOLIC_QR_HPP
 #define CASADI_SYMBOLIC_QR_HPP
 
-#include "casadi/core/function/linear_solver_internal.hpp"
+#include "casadi/core/function/linsol.hpp"
 #include <casadi/solvers/casadi_linearsolver_symbolicqr_export.h>
 
 /** \defgroup plugin_LinearSolver_symbolicqr
@@ -50,8 +50,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQr
-    : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQr : public Linsol {
   public:
     // Constructor
     SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs);
@@ -63,7 +62,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "symbolicqr";}
 
     /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const std::string& name,
+    static Linsol* creator(const std::string& name,
                                          const Sparsity& sp, int nrhs) {
       return new SymbolicQr(name, sp, nrhs);
     }

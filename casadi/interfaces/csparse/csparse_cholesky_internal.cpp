@@ -32,7 +32,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
-  casadi_register_linearsolver_csparsecholesky(LinearSolverInternal::Plugin* plugin) {
+  casadi_register_linearsolver_csparsecholesky(Linsol::Plugin* plugin) {
     plugin->creator = CSparseCholeskyInternal::creator;
     plugin->name = "csparsecholesky";
     plugin->doc = CSparseCholeskyInternal::meta_doc.c_str();
@@ -42,12 +42,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT casadi_load_linearsolver_csparsecholesky() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparsecholesky);
+    Linsol::registerPlugin(casadi_register_linearsolver_csparsecholesky);
   }
 
   CSparseCholeskyInternal::CSparseCholeskyInternal(const std::string& name,
                                                    const Sparsity& sparsity, int nrhs) :
-    LinearSolverInternal(name, sparsity, nrhs) {
+    Linsol(name, sparsity, nrhs) {
     L_ = 0;
     S_ = 0;
 
@@ -63,7 +63,7 @@ namespace casadi {
 
   void CSparseCholeskyInternal::init() {
     // Call the init method of the base class
-    LinearSolverInternal::init();
+    Linsol::init();
 
     AT_.nzmax = input().nnz();  // maximum number of entries
     AT_.m = input().size1(); // number of cols

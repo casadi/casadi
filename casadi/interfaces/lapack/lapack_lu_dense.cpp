@@ -34,7 +34,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_LINEARSOLVER_LAPACKLU_EXPORT
-  casadi_register_linearsolver_lapacklu(LinearSolverInternal::Plugin* plugin) {
+  casadi_register_linearsolver_lapacklu(Linsol::Plugin* plugin) {
     plugin->creator = LapackLuDense::creator;
     plugin->name = "lapacklu";
     plugin->doc = LapackLuDense::meta_doc.c_str();
@@ -44,12 +44,12 @@ namespace casadi {
 
   extern "C"
   void CASADI_LINEARSOLVER_LAPACKLU_EXPORT casadi_load_linearsolver_lapacklu() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapacklu);
+    Linsol::registerPlugin(casadi_register_linearsolver_lapacklu);
   }
 
   LapackLuDense::LapackLuDense(const std::string& name,
                                const Sparsity& sparsity, int nrhs)
-    : LinearSolverInternal(name, sparsity, nrhs) {
+    : Linsol(name, sparsity, nrhs) {
 
     // Equilibrate the matrix
     addOption("equilibration", OT_BOOLEAN, true);
@@ -61,7 +61,7 @@ namespace casadi {
 
   void LapackLuDense::init() {
     // Call the base class initializer
-    LinearSolverInternal::init();
+    Linsol::init();
 
     // Get dimensions
     ncol_ = ncol();

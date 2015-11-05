@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_LINEAR_SOLVER_INTERNAL_HPP
-#define CASADI_LINEAR_SOLVER_INTERNAL_HPP
+#ifndef CASADI_LINSOL_HPP
+#define CASADI_LINSOL_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -37,17 +37,16 @@ namespace casadi {
       @copydoc LinearSolver_doc
   */
   class CASADI_EXPORT
-  LinearSolverInternal : public FunctionInternal,
-                         public PluginInterface<LinearSolverInternal> {
+  Linsol : public FunctionInternal, public PluginInterface<Linsol> {
   private:
     Sparsity sparsity_;
     int nrhs_;
   public:
     /// Constructor
-    LinearSolverInternal(const std::string& name, const Sparsity& sparsity, int nrhs);
+    Linsol(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /// Destructor
-    virtual ~LinearSolverInternal();
+    virtual ~Linsol();
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -71,13 +70,13 @@ namespace casadi {
     virtual void linsol_prepare() {}
 
     /// Solve the system of equations, using internal vector
-    virtual void linsol_solve(bool transpose);
+    virtual void linsol_solve(bool tr);
 
     /// Solve the system of equations
-    virtual void linsol_solve(double* x, int nrhs, bool transpose);
+    virtual void linsol_solve(double* x, int nrhs, bool tr);
 
     /// Create a solve node
-    virtual MX linsol_solve(const MX& A, const MX& B, bool transpose);
+    virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
 
     /// Evaluate SX, possibly transposed
     virtual void linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
@@ -127,7 +126,7 @@ namespace casadi {
     const int* colind() const { return input(LINSOL_A).colind();}
 
     // Creator function for internal class
-    typedef LinearSolverInternal* (*Creator)(const std::string& name,
+    typedef Linsol* (*Creator)(const std::string& name,
                                              const Sparsity& sp, int nrhs);
 
     // No static functions exposed
@@ -147,5 +146,5 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_LINEAR_SOLVER_INTERNAL_HPP
+#endif // CASADI_LINSOL_HPP
 
