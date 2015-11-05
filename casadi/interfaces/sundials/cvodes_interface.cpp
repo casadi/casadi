@@ -293,12 +293,6 @@ namespace casadi {
       printvar("x", x);
     }
 
-    // Hack hack
-    f_.setInputNZ(&t, DAE_T);
-    f_.setInputNZ(NV_DATA_S(x), DAE_X);
-    f_.setInputNZ(p_, DAE_P);
-    f_.evaluate();
-
     // Evaluate f_
     arg1_[DAE_T] = &t;
     arg1_[DAE_X] = NV_DATA_S(x);
