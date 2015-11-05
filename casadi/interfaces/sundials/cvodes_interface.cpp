@@ -820,21 +820,22 @@ namespace casadi {
     // Get time
     time1 = clock();
 
-    // Pass input
-    f_fwd_.setInputNZ(&t,                 DAE_T);
-    f_fwd_.setInputNZ(NV_DATA_S(x),       DAE_X);
-    f_fwd_.setInput(p(), DAE_P);
-
-    // Pass input seeds
-    f_fwd_.setInput(0.0,          DAE_NUM_IN + DAE_T);
-    f_fwd_.setInputNZ(NV_DATA_S(v), DAE_NUM_IN + DAE_X);
-    f_fwd_.setInput(0.0,          DAE_NUM_IN + DAE_P);
-
-    // Evaluate
-    f_fwd_.evaluate();
-
-    // Get the output seeds
-    f_fwd_.getOutputNZ(NV_DATA_S(Jv), DAE_NUM_OUT + DAE_ODE);
+    // Evaluate f_fwd_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(x);
+    arg1_[DAE_Z] = 0;
+    arg1_[DAE_P] = p_;
+    arg1_[DAE_NUM_IN + DAE_T] = 0;
+    arg1_[DAE_NUM_IN + DAE_X] = NV_DATA_S(v);
+    arg1_[DAE_NUM_IN + DAE_Z] = 0;
+    arg1_[DAE_NUM_IN + DAE_P] = 0;
+    res1_[DAE_ODE] = 0;
+    res1_[DAE_ALG] = 0;
+    res1_[DAE_QUAD] = 0;
+    res1_[DAE_NUM_OUT + DAE_ODE] = NV_DATA_S(Jv);
+    res1_[DAE_NUM_OUT + DAE_ALG] = 0;
+    res1_[DAE_NUM_OUT + DAE_QUAD] = 0;
+    f_fwd_(0, arg1_, res1_, iw_, w_);
 
     // Log time duration
     time2 = clock();
