@@ -167,7 +167,7 @@ namespace casadi {
     R_ = DMatrix::zeros(R.sparsity());
   }
 
-  void SymbolicQr::prepare() {
+  void SymbolicQr::linsol_prepare() {
     // Factorize
     fact_fcn_.setInput(input(LINSOL_A));
     fact_fcn_.evaluate();
@@ -175,7 +175,7 @@ namespace casadi {
     fact_fcn_.getOutput(R_, 1);
   }
 
-  void SymbolicQr::solve(double* x, int nrhs, bool transpose) {
+  void SymbolicQr::linsol_solve(double* x, int nrhs, bool transpose) {
     // Select solve function
     Function& solv = transpose ? solv_fcn_T_ : solv_fcn_N_;
 
@@ -192,8 +192,8 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::evalSXLinsol(void* mem, const SXElem** arg, SXElem** res,
-                                int* iw, SXElem* w, bool tr, int nrhs) {
+  void SymbolicQr::linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
+                                 int* iw, SXElem* w, bool tr, int nrhs) {
     casadi_assert(arg[0]!=0);
     casadi_assert(arg[1]!=0);
     casadi_assert(res[0]!=0);

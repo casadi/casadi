@@ -95,7 +95,7 @@ namespace casadi {
     }
   }
 
-  void LapackLuDense::prepare() {
+  void LapackLuDense::linsol_prepare() {
     double time_start=0;
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
@@ -151,7 +151,7 @@ namespace casadi {
     }
   }
 
-  void LapackLuDense::solve(double* x, int nrhs, bool transpose) {
+  void LapackLuDense::linsol_solve(double* x, int nrhs, bool transpose) {
     double time_start=0;
     if (CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer

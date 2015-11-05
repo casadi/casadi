@@ -1151,6 +1151,67 @@ namespace casadi {
     static std::string doc_nlp_solver(const std::string& name);
 
     ///@{
+    /** Create a solver for linear systems of equations
+     * Solves the linear system A*X = B or A^T*X = B for X
+     * with A square and non-singular
+     *
+     *  If A is structurally singular, an error will be thrown during init.
+     *  If A is numerically singular, the prepare step will fail.
+     *
+     *  The usual procedure to use LinearSolver is: \n
+     *  -# init()
+     *  -# set the first input (A)
+     *  -# prepare()
+     *  -# set the second input (b)
+     *  -# solve()
+     *  -# Repeat steps 4 and 5 to work with other b vectors.
+     *
+     * The standard evaluation combines the prepare() and solve() step and may
+     * therefore more expensive if A is invariant.
+     *
+     * \author Joel Andersson
+     * \date 2011-2015
+     */
+    static Function linsol(const std::string& name, const std::string& solver,
+                           const Sparsity& sp, int nrhs, const Dict& opts=Dict());
+    ///@}
+
+    /// Factorize the matrix
+    void linsol_prepare();
+
+    /// Solve the system of equations, internal vector
+    void linsol_solve(bool tr=false);
+
+    /// Create a solve node
+    MX linsol_solve(const MX& A, const MX& B, bool tr=false);
+
+#ifndef SWIG
+    /// Solve the factorized system of equations
+    void linsol_solve(double* x, int nrhs=1, bool tr=false);
+
+    ///@{
+    /// Propagate sparsity through a linear solve
+    void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr=false) const;
+    void linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr=false) const;
+    ///@}
+
+    /** \brief Solve the system of equations <tt>Lx = b</tt>
+        Only when a Cholesky factorization is available
+    */
+    void linsol_solveL(double* x, int nrhs, bool tr);
+#endif // SWIG
+
+    /** \brief Obtain a symbolic Cholesky factorization
+        Only for Cholesky solvers
+    */
+    Sparsity linsol_cholesky_sparsity(bool tr=false) const;
+
+    /** \brief Obtain a numeric Cholesky factorization
+        Only for Cholesky solvers
+     */
+    DMatrix linsol_cholesky(bool tr=false) const;
+
+    ///@{
     /** Create a solver for rootfinding problems
      * Takes a function where one of the inputs is unknown and one of the outputs
      * is a residual function that is always zero, defines a new function where

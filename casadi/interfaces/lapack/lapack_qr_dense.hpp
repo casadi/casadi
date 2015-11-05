@@ -77,10 +77,10 @@ namespace casadi {
     virtual void init();
 
     // Prepare the solution of the linear system
-    virtual void prepare();
+    virtual void linsol_prepare();
 
     // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    virtual void linsol_solve(double* x, int nrhs, bool transpose);
 
     /// A documentation string
     static const std::string meta_doc;

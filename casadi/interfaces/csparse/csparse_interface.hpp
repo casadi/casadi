@@ -61,10 +61,10 @@ namespace casadi {
     virtual void init();
 
     // Factorize the matrix
-    virtual void prepare();
+    virtual void linsol_prepare();
 
     // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    virtual void linsol_solve(double* x, int nrhs, bool transpose);
 
     // Has the solve function been called once
     bool called_once_;

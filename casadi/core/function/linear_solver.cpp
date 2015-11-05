@@ -40,19 +40,19 @@ namespace casadi {
   }
 
   void LinearSolver::prepare() {
-    (*this)->prepare();
+    (*this)->linsol_prepare();
   }
 
   void LinearSolver::solve(double* x, int nrhs, bool transpose) {
-    (*this)->solve(x, nrhs, transpose);
+    (*this)->linsol_solve(x, nrhs, transpose);
   }
 
   void LinearSolver::solve(bool transpose) {
-    (*this)->solve(transpose);
+    (*this)->linsol_solve(transpose);
   }
 
   MX LinearSolver::solve(const MX& A, const MX& B, bool transpose) {
-    return (*this)->solve(A, B, transpose);
+    return (*this)->linsol_solve(A, B, transpose);
   }
 
   bool LinearSolver::test_cast(const SharedObjectNode* ptr) {
@@ -60,11 +60,11 @@ namespace casadi {
   }
 
   void LinearSolver::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const {
-    (*this)->spSolve(X, B, transpose);
+    (*this)->linsol_spsolve(X, B, transpose);
   }
 
   void LinearSolver::spSolve(DMatrix& X, const DMatrix& B, bool transpose) const {
-    (*this)->spSolve(X, B, transpose);
+    (*this)->linsol_spsolve(X, B, transpose);
   }
 
   LinearSolver::LinearSolver(const std::string& name, const std::string& solver,
@@ -102,15 +102,15 @@ namespace casadi {
   }
 
   Sparsity LinearSolver::getFactorizationSparsity(bool transpose) const {
-    return (*this)->getFactorizationSparsity(transpose);
+    return (*this)->linsol_cholesky_sparsity(transpose);
   }
 
   DMatrix LinearSolver::getFactorization(bool transpose) const {
-    return (*this)->getFactorization(transpose);
+    return (*this)->linsol_cholesky(transpose);
   }
 
   void LinearSolver::solveL(double* x, int nrhs, bool transpose) {
-    return (*this)->solveL(x, nrhs, transpose);
+    return (*this)->linsol_solveL(x, nrhs, transpose);
   }
 
 } // namespace casadi

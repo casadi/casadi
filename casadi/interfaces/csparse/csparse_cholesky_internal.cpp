@@ -88,7 +88,7 @@ namespace casadi {
   }
 
 
-  Sparsity CSparseCholeskyInternal::getFactorizationSparsity(bool transpose) const {
+  Sparsity CSparseCholeskyInternal::linsol_cholesky_sparsity(bool tr) const {
     casadi_assert(S_);
     int n = AT_.n;
     int nzmax = S_->cp[n];
@@ -116,11 +116,11 @@ namespace casadi {
     Lp[n] = S_->cp[n] ;
     Sparsity ret(n, n, row, colind); // BUG?
 
-    return transpose? ret.T() : ret;
+    return tr ? ret.T() : ret;
 
   }
 
-  DMatrix CSparseCholeskyInternal::getFactorization(bool transpose) const {
+  DMatrix CSparseCholeskyInternal::linsol_cholesky(bool tr) const {
     casadi_assert(L_);
     cs *L = L_->L;
     int nz = L->nzmax;
@@ -134,10 +134,10 @@ namespace casadi {
     std::copy(L->x, L->x+nz, data.begin());
     DMatrix ret(Sparsity(n, m, colind, row), data, false);
 
-    return transpose? ret.T() : ret;
+    return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInternal::prepare() {
+  void CSparseCholeskyInternal::linsol_prepare() {
     // Get a reference to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();
 
@@ -183,7 +183,7 @@ namespace casadi {
     casadi_assert(L_!=0);
   }
 
-  void CSparseCholeskyInternal::solve(double* x, int nrhs, bool transpose) {
+  void CSparseCholeskyInternal::linsol_solve(double* x, int nrhs, bool transpose) {
     casadi_assert(L_!=0);
 
     double *t = &temp_.front();
@@ -203,7 +203,7 @@ namespace casadi {
     }
   }
 
-  void CSparseCholeskyInternal::solveL(double* x, int nrhs, bool transpose) {
+  void CSparseCholeskyInternal::linsol_solveL(double* x, int nrhs, bool transpose) {
     casadi_assert(L_!=0);
 
     double *t = getPtr(temp_);

@@ -64,19 +64,19 @@ namespace casadi {
     virtual void init();
 
     // Factorize the matrix
-    virtual void prepare();
+    virtual void linsol_prepare();
 
     // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    virtual void linsol_solve(double* x, int nrhs, bool tr);
 
     // Solve the system of equations <tt>Lx = b</tt>
-    virtual void solveL(double* x, int nrhs, bool transpose);
+    virtual void linsol_solveL(double* x, int nrhs, bool tr);
 
     /// Obtain a symbolic Cholesky factorization
-    virtual Sparsity getFactorizationSparsity(bool transpose) const;
+    virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
 
     /// Obtain a numeric Cholesky factorization
-    virtual DMatrix getFactorization(bool transpose) const;
+    virtual DMatrix linsol_cholesky(bool tr) const;
 
     // The transpose of linear system in form (CCS)
     cs AT_;

@@ -70,7 +70,7 @@ namespace casadi {
     work_.resize(10*ncol_);
   }
 
-  void LapackQrDense::prepare() {
+  void LapackQrDense::linsol_prepare() {
     // Get the elements of the matrix, dense format
     input(0).get(mat_);
 
@@ -82,7 +82,7 @@ namespace casadi {
                                          "failed to factorize the Jacobian");
   }
 
-  void LapackQrDense::solve(double* x, int nrhs, bool transpose) {
+  void LapackQrDense::linsol_solve(double* x, int nrhs, bool transpose) {
     // Properties of R
     char uploR = 'U';
     char diagR = 'N';

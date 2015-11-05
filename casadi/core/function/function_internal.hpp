@@ -757,6 +757,19 @@ namespace casadi {
     /** \brief Free allocated memory block */
     virtual void free_mem(void* mem) {}
 
+    ///@{
+    /// Linear solver specific (cf. LinearSolver class)
+    virtual void linsol_prepare();
+    virtual void linsol_solve(bool tr);
+    virtual void linsol_solve(double* x, int nrhs, bool tr);
+    virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
+    virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
+    virtual void linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const;
+    virtual void linsol_solveL(double* x, int nrhs, bool tr);
+    virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
+    virtual DMatrix linsol_cholesky(bool tr) const;
+    ///@}
+
   protected:
     /** \brief  Temporary vector needed for the evaluation (integer) */
     std::vector<int> iw_tmp_;

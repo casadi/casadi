@@ -92,33 +92,14 @@ namespace casadi {
   }
 
   void LinearSolverInternal::evaluate() {
-    /*  Factorization fact;
-        if (called_once) {
-        // Check if any element has changed
-        bool any_change = false;
-        const vector<double>& val = input(0).data();
-        for (int i=0; i<val.size(); ++i) {
-        if (val[i] != a[i]) {
-        any_change = true;
-        break;
-        }
-        }
-
-        // Reuse factored matrix if matrix hasn't changed
-        fact = any_change ? SAMEPATTERN : FACTORED;
-        } else {
-        fact = DOFACT;
-        called_once = true;
-        }*/
-
     // Call the solve routine
-    prepare();
+    linsol_prepare();
 
     // Solve the factorized system
-    solve(false);
+    linsol_solve(false);
   }
 
-  void LinearSolverInternal::solve(bool transpose) {
+  void LinearSolverInternal::linsol_solve(bool transpose) {
     // Get input and output vector
     const vector<double>& b = input(LINSOL_B).data();
     vector<double>& x = output(LINSOL_X).data();
@@ -128,13 +109,13 @@ namespace casadi {
     copy(b.begin(), b.end(), x.begin());
 
     // Solve the factorized system in-place
-    solve(getPtr(x), nrhs, transpose);
+    linsol_solve(getPtr(x), nrhs, transpose);
   }
 
   void LinearSolverInternal::
-  forwardLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
-                const std::vector<std::vector<MX> >& fseed,
-                std::vector<std::vector<MX> >& fsens, bool tr) {
+  linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+                 const std::vector<std::vector<MX> >& fseed,
+                 std::vector<std::vector<MX> >& fsens, bool tr) {
     // Number of derivatives
     int nfwd = fseed.size();
     const MX& A = arg[1];
@@ -149,7 +130,7 @@ namespace casadi {
       rhs[d] = tr ? B_hat - mul(A_hat.T(), X) : B_hat - mul(A_hat, X);
       col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
-    rhs = horzsplit(solve(A, horzcat(rhs), tr), col_offset);
+    rhs = horzsplit(linsol_solve(A, horzcat(rhs), tr), col_offset);
 
     // Fetch result
     fsens.resize(nfwd);
@@ -160,9 +141,9 @@ namespace casadi {
   }
 
   void LinearSolverInternal::
-  reverseLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
-                const std::vector<std::vector<MX> >& aseed,
-                std::vector<std::vector<MX> >& asens, bool tr) {
+  linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+                 const std::vector<std::vector<MX> >& aseed,
+                 std::vector<std::vector<MX> >& asens, bool tr) {
     // Number of derivatives
     int nadj = aseed.size();
     const MX& A = arg[1];
@@ -175,7 +156,7 @@ namespace casadi {
       rhs[d] = aseed[d][0];
       col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
-    rhs = horzsplit(solve(A, horzcat(rhs), !tr), col_offset);
+    rhs = horzsplit(linsol_solve(A, horzcat(rhs), !tr), col_offset);
 
     // Collect sensitivities
     asens.resize(nadj);
@@ -205,8 +186,8 @@ namespace casadi {
   }
 
   void LinearSolverInternal::
-  spFwdLinsol(void* mem, const bvec_t** arg, bvec_t** res,
-              int* iw, bvec_t* w, bool tr, int nrhs) {
+  linsol_spFwd(void* mem, const bvec_t** arg, bvec_t** res,
+               int* iw, bvec_t* w, bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -233,7 +214,7 @@ namespace casadi {
 
       // Propagate to X
       std::fill(X, X+n, 0);
-      spSolve(X, tmp, tr);
+      linsol_spsolve(X, tmp, tr);
 
       // Continue to the next right-hand-side
       B += n;
@@ -242,8 +223,8 @@ namespace casadi {
   }
 
   void LinearSolverInternal::
-  spAdjLinsol(void* mem, bvec_t** arg, bvec_t** res,
-              int* iw, bvec_t* w, bool tr, int nrhs) {
+  linsol_spAdj(void* mem, bvec_t** arg, bvec_t** res,
+               int* iw, bvec_t* w, bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -258,7 +239,7 @@ namespace casadi {
     for (int r=0; r<nrhs; ++r) {
       // Solve transposed
       std::fill(tmp, tmp+n, 0);
-      spSolve(tmp, X, !tr);
+      linsol_spsolve(tmp, X, !tr);
 
       // Clear seeds
       std::fill(X, X+n, 0);
@@ -280,13 +261,14 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::spSolve(DMatrix& X, const DMatrix& B, bool transpose) const {
+  void LinearSolverInternal::
+  linsol_spsolve(DMatrix& X, const DMatrix& B, bool transpose) const {
     bvec_t* X_bvec = reinterpret_cast<bvec_t*>(X.ptr());
     const bvec_t* B_bvec = reinterpret_cast<const bvec_t*>(B.ptr());
-    spSolve(X_bvec, B_bvec, transpose);
+    linsol_spsolve(X_bvec, B_bvec, transpose);
   }
 
-  void LinearSolverInternal::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const {
+  void LinearSolverInternal::linsol_spsolve(bvec_t* X, const bvec_t* B, bool transpose) const {
 
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -351,40 +333,23 @@ namespace casadi {
     }
   }
 
-  void LinearSolverInternal::evalSXLinsol(void* mem, const SXElem** arg, SXElem** res,
+  void LinearSolverInternal::linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
                                            int* iw, SXElem* w, bool tr, int nrhs) {
     casadi_error("LinearSolverInternal::evalSXLinsol not defined for class "
                  << typeid(*this).name());
   }
 
-  MX LinearSolverInternal::solve(const MX& A, const MX& B, bool transpose) {
+  MX LinearSolverInternal::linsol_solve(const MX& A, const MX& B, bool transpose) {
     return A->getSolve(B, transpose, shared_from_this<LinearSolver>());
   }
 
-  void LinearSolverInternal::solve(double* x, int nrhs, bool transpose) {
+  void LinearSolverInternal::linsol_solve(double* x, int nrhs, bool transpose) {
     casadi_error("LinearSolverInternal::solve not defined for class " << typeid(*this).name());
   }
 
   std::map<std::string, LinearSolverInternal::Plugin> LinearSolverInternal::solvers_;
 
   const std::string LinearSolverInternal::infix_ = "linearsolver";
-
-  void LinearSolverInternal::solveL(double* x, int nrhs, bool transpose) {
-    casadi_error("LinearSolverInternal::solveL not defined for class "
-                 << typeid(*this).name());
-  }
-
-  Sparsity LinearSolverInternal::getFactorizationSparsity(bool transpose) const {
-    casadi_error("LinearSolverInternal::getFactorizationSparsity not defined for class "
-                 << typeid(*this).name());
-    return Sparsity();
-  }
-
-  DMatrix LinearSolverInternal::getFactorization(bool transpose) const {
-    casadi_error("LinearSolverInternal::getFactorization not defined for class "
-                 << typeid(*this).name());
-    return DMatrix();
-  }
 
 } // namespace casadi
 

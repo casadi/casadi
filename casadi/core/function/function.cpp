@@ -36,6 +36,8 @@
 #include "qp_solver.hpp"
 #include "nlp_solver.hpp"
 #include "rootfinder.hpp"
+#include "linear_solver_internal.hpp"
+
 
 #include <typeinfo>
 
@@ -1758,6 +1760,47 @@ namespace casadi {
 
   int Function::qp_solver_n_out() {
     return QP_SOLVER_NUM_OUT;
+  }
+
+  Function Function::linsol(const std::string& name, const std::string& solver,
+                            const Sparsity& sp, int nrhs, const Dict& opts) {
+    return LinearSolver(name, solver, sp, nrhs, opts);
+  }
+
+  void Function::linsol_prepare() {
+    (*this)->linsol_prepare();
+  }
+
+  void Function::linsol_solve(double* x, int nrhs, bool tr) {
+    (*this)->linsol_solve(x, nrhs, tr);
+  }
+
+  void Function::linsol_solve(bool tr) {
+    (*this)->linsol_solve(tr);
+  }
+
+  MX Function::linsol_solve(const MX& A, const MX& B, bool tr) {
+    return (*this)->linsol_solve(A, B, tr);
+  }
+
+  void Function::linsol_solveL(double* x, int nrhs, bool tr) {
+    (*this)->linsol_solveL(x, nrhs, tr);
+  }
+
+  Sparsity Function::linsol_cholesky_sparsity(bool tr) const {
+    return (*this)->linsol_cholesky_sparsity(tr);
+  }
+
+  DMatrix Function::linsol_cholesky(bool tr) const {
+    return (*this)->linsol_cholesky(tr);
+  }
+
+  void Function::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+    (*this)->linsol_spsolve(X, B, tr);
+  }
+
+  void Function::linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const {
+    (*this)->linsol_spsolve(X, B, tr);
   }
 
   Function Function::rootfinder(const string& name, const string& solver,

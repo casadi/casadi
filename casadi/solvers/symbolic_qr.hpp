@@ -72,10 +72,10 @@ namespace casadi {
     virtual void init();
 
     // Prepare the factorization
-    virtual void prepare();
+    virtual void linsol_prepare();
 
     // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    virtual void linsol_solve(double* x, int nrhs, bool transpose);
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -84,8 +84,8 @@ namespace casadi {
     virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Evaluate symbolically (SX) */
-    virtual void evalSXLinsol(void* mem, const SXElem** arg, SXElem** res,
-                              int* iw, SXElem* w, bool tr, int nrhs);
+    virtual void linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
+                               int* iw, SXElem* w, bool tr, int nrhs);
 
     // Factorization function
     Function fact_fcn_;

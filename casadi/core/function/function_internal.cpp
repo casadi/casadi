@@ -3092,4 +3092,40 @@ namespace casadi {
     return v;
   }
 
+  void FunctionInternal::linsol_prepare() {
+    casadi_error("'linsol_prepare' not defined for " + type_name());
+  }
+
+  void FunctionInternal::linsol_solve(bool tr) {
+    casadi_error("'linsol_solve' not defined for " + type_name());
+  }
+
+  void FunctionInternal::linsol_solve(double* x, int nrhs, bool tr) {
+    casadi_error("'linsol_solve' not defined for " + type_name());
+  }
+
+  MX FunctionInternal::linsol_solve(const MX& A, const MX& B, bool tr) {
+    casadi_error("'linsol_solve' not defined for " + type_name());
+  }
+
+  void FunctionInternal::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+    casadi_error("'linsol_spsolve' not defined for " + type_name());
+  }
+
+  void FunctionInternal::linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const {
+    casadi_error("'linsol_spsolve' not defined for " + type_name());
+  }
+
+  void FunctionInternal::linsol_solveL(double* x, int nrhs, bool tr) {
+    casadi_error("'linsol_solveL' not defined for " + type_name());
+  }
+
+  Sparsity FunctionInternal::linsol_cholesky_sparsity(bool tr) const {
+    casadi_error("'linsol_cholesky_sparsity' not defined for " + type_name());
+  }
+
+  DMatrix FunctionInternal::linsol_cholesky(bool tr) const {
+    casadi_error("'linsol_cholesky' not defined for " + type_name());
+  }
+
 } // namespace casadi

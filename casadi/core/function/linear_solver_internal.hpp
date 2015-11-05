@@ -69,19 +69,19 @@ namespace casadi {
     virtual void evaluate();
 
     /// Prepare the factorization
-    virtual void prepare() {}
+    virtual void linsol_prepare() {}
 
     /// Solve the system of equations, using internal vector
-    virtual void solve(bool transpose);
+    virtual void linsol_solve(bool transpose);
 
     /// Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    virtual void linsol_solve(double* x, int nrhs, bool transpose);
 
     /// Create a solve node
-    MX solve(const MX& A, const MX& B, bool transpose);
+    virtual MX linsol_solve(const MX& A, const MX& B, bool transpose);
 
     /// Evaluate SX, possibly transposed
-    virtual void evalSXLinsol(void* mem, const SXElem** arg, SXElem** res,
+    virtual void linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
                               int* iw, SXElem* w, bool tr, int nrhs);
 
     /** \brief Quickfix to avoid segfault, #1552 */
@@ -90,42 +90,32 @@ namespace casadi {
     /// Evaluate SX
     virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
                         int* iw, SXElem* w) {
-      evalSXLinsol(0, arg, res, iw, w, false, output(LINSOL_X).size2());
+      linsol_evalSX(0, arg, res, iw, w, false, output(LINSOL_X).size2());
     }
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void forwardLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
-                               const std::vector<std::vector<MX> >& fseed,
-                               std::vector<std::vector<MX> >& fsens, bool tr);
+    virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+                                const std::vector<std::vector<MX> >& fseed,
+                                std::vector<std::vector<MX> >& fsens, bool tr);
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void reverseLinsol(const std::vector<MX>& arg, const std::vector<MX>& res,
-                               const std::vector<std::vector<MX> >& aseed,
-                               std::vector<std::vector<MX> >& asens, bool tr);
+    virtual void linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+                                const std::vector<std::vector<MX> >& aseed,
+                                std::vector<std::vector<MX> >& asens, bool tr);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwdLinsol(void* mem, const bvec_t** arg, bvec_t** res,
-                             int* iw, bvec_t* w, bool tr, int nrhs);
+    virtual void linsol_spFwd(void* mem, const bvec_t** arg, bvec_t** res,
+                              int* iw, bvec_t* w, bool tr, int nrhs);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdjLinsol(void* mem, bvec_t** arg, bvec_t** res,
-                             int* iw, bvec_t* w, bool tr, int nrhs);
+    virtual void linsol_spAdj(void* mem, bvec_t** arg, bvec_t** res,
+                              int* iw, bvec_t* w, bool tr, int nrhs);
 
     ///@{
     /// Propagate sparsity through a linear solve
-    void spSolve(bvec_t* X, const bvec_t* B, bool transpose) const;
-    void spSolve(DMatrix& X, const DMatrix& B, bool transpose) const;
+    virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
+    virtual void linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const;
     ///@}
-
-
-    /// Solve the system of equations <tt>Lx = b</tt>
-    virtual void solveL(double* x, int nrhs, bool transpose);
-
-    /// Obtain a symbolic Cholesky factorization
-    virtual Sparsity getFactorizationSparsity(bool transpose) const;
-
-    /// Obtain a numeric Cholesky factorization
-    virtual DMatrix getFactorization(bool transpose) const;
 
     /// Dulmage-Mendelsohn decomposition
     std::vector<int> rowperm_, colperm_, rowblock_, colblock_;
