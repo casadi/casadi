@@ -66,7 +66,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief  Integrate */
-    virtual void evaluate();
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     // Integrator instance
     Function integrator_;

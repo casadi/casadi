@@ -57,25 +57,18 @@ namespace casadi {
 
     // Call base class method
     FunctionInternal::init();
+
+    alloc(integrator_);
   }
 
-  void SimulatorInternal::evaluate() {
-
-    // Get pointers to input arguments
-    vector<const double*> arg(integrator_.sz_arg());
-    for (int i=0; i<n_in(); ++i) arg[i]=input(i).ptr();
-
-    // Get pointers to output arguments
-    vector<double*> res(integrator_.sz_res());
-    for (int i=0; i<n_out(); ++i) res[i]=output(i).ptr();
-
-    // Work vectors
-    vector<int> iw(integrator_.sz_iw());
-    vector<double> w(integrator_.sz_w());
+  void SimulatorInternal::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Arguments when calling the integrator
+    double** res1 = res+n_out();
+    copy_n(res, n_out(), res1);
 
     // Reset the integrator_
     dynamic_cast<Integrator*>(integrator_.get())
-      ->reset(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w));
+      ->reset(arg, res1, iw, w);
 
     // Advance solution in time
     for (int k=0; k<grid_.size(); ++k) {
@@ -85,7 +78,8 @@ namespace casadi {
       // Save the outputs of the function
       for (int i=0; i<n_out(); ++i) {
         const Matrix<double> &res = integrator_.output(i);
-        copy(res->begin(), res->end(), output(i)->begin() + k*res.nnz());
+        if (res1[i]) copy(res->begin(), res->end(), res1[i]);
+        res1[i] += res.nnz();
       }
     }
   }
