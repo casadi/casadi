@@ -23,45 +23,45 @@
  */
 
 
-#ifndef CASADI_RK_INTEGRATOR_HPP
-#define CASADI_RK_INTEGRATOR_HPP
+#ifndef CASADI_RK_IVPSOL_HPP
+#define CASADI_RK_IVPSOL_HPP
 
 #include "fixed_step_integrator.hpp"
-#include <casadi/solvers/casadi_integrator_rk_export.h>
+#include <casadi/solvers/casadi_ivpsol_rk_export.h>
 
-/** \defgroup plugin_Integrator_rk
+/** \defgroup plugin_Ivpsol_rk
       Fixed-step explicit Runge-Kutta integrator for ODEs
       Currently implements RK4.
 
       The method is still under development
 */
-/** \pluginsection{Integrator,rk} */
+/** \pluginsection{Ivpsol,rk} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{Integrator,rk}
+  /** \brief \pluginbrief{Ivpsol,rk}
 
 
       @copydoc DAE_doc
-      @copydoc plugin_Integrator_rk
+      @copydoc plugin_Ivpsol_rk
 
       \author Joel Andersson
       \date 2011-2014
   */
-  class CASADI_INTEGRATOR_RK_EXPORT RkIntegrator : public FixedStepIntegrator {
+  class CASADI_IVPSOL_RK_EXPORT RkIvpsol : public FixedStepIvpsol {
   public:
 
     /// Constructor
-    explicit RkIntegrator(const std::string& name, const XProblem& dae);
+    explicit RkIvpsol(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const XProblem& dae) {
-      return new RkIntegrator(name, dae);
+    static Ivpsol* creator(const std::string& name, const XProblem& dae) {
+      return new RkIvpsol(name, dae);
     }
 
     /// Destructor
-    virtual ~RkIntegrator();
+    virtual ~RkIvpsol();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "rk";}
@@ -80,4 +80,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_RK_INTEGRATOR_HPP
+#endif // CASADI_RK_IVPSOL_HPP

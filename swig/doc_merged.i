@@ -711,7 +711,7 @@ matches one of the base classes (default true)
 
 ";
 
-%feature("docstring") casadi::Callback::integrator_dae "
+%feature("docstring") casadi::Callback::ivpsol_dae "
 
 Get the DAE for an integrator.
 
@@ -2612,7 +2612,7 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::Function::integrator_dae "
+%feature("docstring") casadi::Function::ivpsol_dae "
 
 Get the DAE for an integrator.
 
@@ -6156,7 +6156,7 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::LinearSolver::integrator_dae "
+%feature("docstring") casadi::LinearSolver::ivpsol_dae "
 
 Get the DAE for an integrator.
 
@@ -9752,7 +9752,7 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::Simulator::integrator_dae "
+%feature("docstring") casadi::Simulator::ivpsol_dae "
 
 Get the DAE for an integrator.
 

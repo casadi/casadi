@@ -26,7 +26,7 @@
 #ifndef CASADI_CVODES_INTERFACE_HPP
 #define CASADI_CVODES_INTERFACE_HPP
 
-#include <casadi/interfaces/sundials/casadi_integrator_cvodes_export.h>
+#include <casadi/interfaces/sundials/casadi_ivpsol_cvodes_export.h>
 #include "sundials_interface.hpp"
 #include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
 #include <cvodes/cvodes_dense.h>
@@ -37,7 +37,7 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_Integrator_cvodes
+/** \defgroup plugin_Ivpsol_cvodes
 
       Interface to CVodes from the Sundials suite.
 
@@ -55,24 +55,24 @@
       \endverbatim
 */
 
-/** \pluginsection{Integrator,cvodes} */
+/** \pluginsection{Ivpsol,cvodes} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{Integrator,cvodes}
+  /** \brief \pluginbrief{Ivpsol,cvodes}
 
       @copydoc DAE_doc
-      @copydoc plugin_Integrator_cvodes
+      @copydoc plugin_Ivpsol_cvodes
 
   */
-  class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface {
+  class CASADI_IVPSOL_CVODES_EXPORT CvodesInterface : public SundialsInterface {
   public:
     /** \brief  Constructor */
     explicit CvodesInterface(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const XProblem& dae) {
+    static Ivpsol* creator(const std::string& name, const XProblem& dae) {
       return new CvodesInterface(name, dae);
     }
 

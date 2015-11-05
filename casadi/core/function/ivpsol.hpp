@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_INTEGRATOR_HPP
-#define CASADI_INTEGRATOR_HPP
+#ifndef CASADI_IVPSOL_HPP
+#define CASADI_IVPSOL_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -40,18 +40,18 @@ namespace casadi {
       \date 2010
   */
   class CASADI_EXPORT
-  Integrator : public FunctionInternal, public PluginInterface<Integrator> {
+  Ivpsol : public FunctionInternal, public PluginInterface<Ivpsol> {
   public:
     /** \brief  Constructor */
-    Integrator(const std::string& name, const XProblem& dae);
+    Ivpsol(const std::string& name, const XProblem& dae);
 
     /** \brief  Destructor */
-    virtual ~Integrator()=0;
+    virtual ~Ivpsol()=0;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return INTEGRATOR_NUM_IN;}
-    virtual size_t get_n_out() const { return INTEGRATOR_NUM_OUT;}
+    virtual size_t get_n_in() const { return IVPSOL_NUM_IN;}
+    virtual size_t get_n_out() const { return IVPSOL_NUM_OUT;}
     ///@}
 
    /// @{
@@ -149,18 +149,18 @@ namespace casadi {
 
     ///@{
     // Shorthands
-    DMatrix&  x0() { return input(INTEGRATOR_X0);}
-    DMatrix&   p() { return input(INTEGRATOR_P );}
-    DMatrix&  z0() { return input(INTEGRATOR_Z0);}
-    DMatrix& rx0() { return input(INTEGRATOR_RX0);}
-    DMatrix&  rp() { return input(INTEGRATOR_RP);}
-    DMatrix& rz0() { return input(INTEGRATOR_RZ0);}
-    DMatrix&  xf() { return output(INTEGRATOR_XF);}
-    DMatrix&  qf() { return output(INTEGRATOR_QF);}
-    DMatrix&  zf() { return output(INTEGRATOR_ZF);}
-    DMatrix& rxf() { return output(INTEGRATOR_RXF);}
-    DMatrix& rqf() { return output(INTEGRATOR_RQF);}
-    DMatrix& rzf() { return output(INTEGRATOR_RZF);}
+    DMatrix&  x0() { return input(IVPSOL_X0);}
+    DMatrix&   p() { return input(IVPSOL_P );}
+    DMatrix&  z0() { return input(IVPSOL_Z0);}
+    DMatrix& rx0() { return input(IVPSOL_RX0);}
+    DMatrix&  rp() { return input(IVPSOL_RP);}
+    DMatrix& rz0() { return input(IVPSOL_RZ0);}
+    DMatrix&  xf() { return output(IVPSOL_XF);}
+    DMatrix&  qf() { return output(IVPSOL_QF);}
+    DMatrix&  zf() { return output(IVPSOL_ZF);}
+    DMatrix& rxf() { return output(IVPSOL_RXF);}
+    DMatrix& rqf() { return output(IVPSOL_RQF);}
+    DMatrix& rzf() { return output(IVPSOL_RZF);}
     ///@}
 
     /// Number of states for the forward integration
@@ -191,7 +191,7 @@ namespace casadi {
     /// ODE/DAE backward integration function, if any
     Function g_;
 
-    /// Integrator for sparsity pattern propagation
+    /// Ivpsol for sparsity pattern propagation
     Function linsol_f_, linsol_g_;
 
     /// Options
@@ -201,7 +201,7 @@ namespace casadi {
     bool output_t0_;
 
     // Creator function for internal class
-    typedef Integrator* (*Creator)(const std::string& name, const XProblem& dae);
+    typedef Ivpsol* (*Creator)(const std::string& name, const XProblem& dae);
 
     // No static functions exposed
     struct Exposed{ };
@@ -227,7 +227,7 @@ namespace casadi {
 
 
   template<typename XType>
-  Problem<XType> Integrator::map2problem(const std::map<std::string, XType>& d) {
+  Problem<XType> Ivpsol::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="t") {
@@ -264,7 +264,7 @@ namespace casadi {
   }
 
   template<typename XType>
-  std::map<std::string, XType> Integrator::problem2map(const Problem<XType>& d) {
+  std::map<std::string, XType> Ivpsol::problem2map(const Problem<XType>& d) {
     return {
         {"t", d.in[DE_T]},
         {"x", d.in[DE_X]},
@@ -283,7 +283,7 @@ namespace casadi {
   }
 
   template<typename XType>
-  Problem<XType> Integrator::fun2problem(Function f, Function g) {
+  Problem<XType> Ivpsol::fun2problem(Function f, Function g) {
     Problem<XType> dae;
     dae.in.resize(DE_NUM_IN);
     dae.out.resize(DE_NUM_OUT);
@@ -316,4 +316,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_INTEGRATOR_HPP
+#endif // CASADI_IVPSOL_HPP

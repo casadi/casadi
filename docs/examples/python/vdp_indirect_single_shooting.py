@@ -79,7 +79,7 @@ opts['abstol'] = 1e-8 # abs. tolerance
 opts['reltol'] = 1e-8 # rel. tolerance
 opts['t0'] = 0.0
 opts['tf'] = 10.0
-I = Function.integrator('I', 'cvodes', dae, opts)
+I = Function.ivpsol('I', 'cvodes', dae, opts)
 
 # The initial state
 x_init = NP.array([0.,1.])

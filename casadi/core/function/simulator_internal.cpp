@@ -24,7 +24,7 @@
 
 
 #include "simulator_internal.hpp"
-#include "integrator.hpp"
+#include "ivpsol.hpp"
 #include "../std_vector_tools.hpp"
 
 using namespace std;
@@ -33,15 +33,15 @@ namespace casadi {
 
   SimulatorInternal::SimulatorInternal(const std::string& name, const Function& integrator)
     : FunctionInternal(name), integrator_(integrator) {
-    grid_ = dynamic_cast<Integrator*>(integrator_.get())->grid_;
+    grid_ = dynamic_cast<Ivpsol*>(integrator_.get())->grid_;
   }
 
   SimulatorInternal::~SimulatorInternal() {
   }
 
   void SimulatorInternal::init() {
-    ischeme_ = Function::integrator_in();
-    oscheme_ = Function::integrator_out();
+    ischeme_ = Function::ivpsol_in();
+    oscheme_ = Function::ivpsol_out();
 
     // Allocate inputs
     ibuf_.resize(get_n_in());
@@ -67,13 +67,13 @@ namespace casadi {
     copy_n(res, n_out(), res1);
 
     // Reset the integrator_
-    dynamic_cast<Integrator*>(integrator_.get())
+    dynamic_cast<Ivpsol*>(integrator_.get())
       ->reset(arg, res1, iw, w);
 
     // Advance solution in time
     for (int k=0; k<grid_.size(); ++k) {
       // Integrate to the output time
-      dynamic_cast<Integrator*>(integrator_.get())->advance(k);
+      dynamic_cast<Ivpsol*>(integrator_.get())->advance(k);
 
       // Save the outputs of the function
       for (int i=0; i<n_out(); ++i) {

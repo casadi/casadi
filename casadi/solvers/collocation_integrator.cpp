@@ -31,22 +31,22 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_INTEGRATOR_COLLOCATION_EXPORT
-      casadi_register_integrator_collocation(Integrator::Plugin* plugin) {
-    plugin->creator = CollocationIntegrator::creator;
+  int CASADI_IVPSOL_COLLOCATION_EXPORT
+      casadi_register_ivpsol_collocation(Ivpsol::Plugin* plugin) {
+    plugin->creator = CollocationIvpsol::creator;
     plugin->name = "collocation";
-    plugin->doc = CollocationIntegrator::meta_doc.c_str();
+    plugin->doc = CollocationIvpsol::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
 
   extern "C"
-  void CASADI_INTEGRATOR_COLLOCATION_EXPORT casadi_load_integrator_collocation() {
-    Integrator::registerPlugin(casadi_register_integrator_collocation);
+  void CASADI_IVPSOL_COLLOCATION_EXPORT casadi_load_ivpsol_collocation() {
+    Ivpsol::registerPlugin(casadi_register_ivpsol_collocation);
   }
 
-  CollocationIntegrator::CollocationIntegrator(const std::string& name, const XProblem& dae)
-    : ImplicitFixedStepIntegrator(name, dae) {
+  CollocationIvpsol::CollocationIvpsol(const std::string& name, const XProblem& dae)
+    : ImplicitFixedStepIvpsol(name, dae) {
 
     addOption("interpolation_order",           OT_INTEGER,  3,
               "Order of the interpolating polynomials");
@@ -54,17 +54,17 @@ namespace casadi {
               "Collocation scheme", "radau|legendre");
   }
 
-  CollocationIntegrator::~CollocationIntegrator() {
+  CollocationIvpsol::~CollocationIvpsol() {
   }
 
-  void CollocationIntegrator::init() {
+  void CollocationIvpsol::init() {
 
     // Call the base class init
-    ImplicitFixedStepIntegrator::init();
+    ImplicitFixedStepIvpsol::init();
 
   }
 
-  void CollocationIntegrator::setupFG() {
+  void CollocationIvpsol::setupFG() {
 
     // Interpolation order
     deg_ = option("interpolation_order");
@@ -276,13 +276,13 @@ namespace casadi {
   }
 
 
-  double CollocationIntegrator::zeroIfSmall(double x) {
+  double CollocationIvpsol::zeroIfSmall(double x) {
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
-  void CollocationIntegrator::calculateInitialConditions() {
-    auto x0_it = input(INTEGRATOR_X0)->begin();
-    auto z_it = input(INTEGRATOR_Z0)->begin();
+  void CollocationIvpsol::calculateInitialConditions() {
+    auto x0_it = input(IVPSOL_X0)->begin();
+    auto z_it = input(IVPSOL_Z0)->begin();
     auto Z_it = Z_->begin();
     for (int d=0; d<deg_; ++d) {
       copy(x0_it, x0_it+nx_, Z_it);
@@ -293,9 +293,9 @@ namespace casadi {
     casadi_assert(Z_it==Z_->end());
   }
 
-  void CollocationIntegrator::calculateInitialConditionsB() {
-    auto rx0_it = input(INTEGRATOR_RX0)->begin();
-    auto rz_it = input(INTEGRATOR_RZ0)->begin();
+  void CollocationIvpsol::calculateInitialConditionsB() {
+    auto rx0_it = input(IVPSOL_RX0)->begin();
+    auto rz_it = input(IVPSOL_RZ0)->begin();
     auto RZ_it = RZ_->begin();
     for (int d=0; d<deg_; ++d) {
       copy(rx0_it, rx0_it+nrx_, RZ_it);

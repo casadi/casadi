@@ -57,7 +57,7 @@ dae={'x':x, 'p':params, 'ode':rhs}
 # opts["reltol"] = 1e-10
 # opts["abstol"] = 1e-10
 # opts["fsens_err_con"] = True
-# integrator = Function.integrator("integrator", "cvodes", dae, opts)
+# integrator = Function.ivpsol("integrator", "cvodes", dae, opts)
 
 # N = 500
 

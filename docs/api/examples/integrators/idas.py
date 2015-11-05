@@ -82,7 +82,7 @@ print j
 #! It is impossible to lambda from the last element of the residual.
 
 #! We create a DAE system solver
-I = Function.integrator('I', 'idas', dae, {'calc_ic':False, 'init_xdot':XDOT_})
+I = Function.ivpsol('I', 'idas', dae, {'calc_ic':False, 'init_xdot':XDOT_})
 
 #! This system is not solvable with idas, because it is of DAE-index 3.
 #! It is impossible obtain lambda from the last element of the residual.
@@ -118,7 +118,7 @@ print array(res["jac"])
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
-I = Function.integrator('I', 'idas', dae, {'t0':0, 'tf':1, 'init_xdot':XDOT_})
+I = Function.ivpsol('I', 'idas', dae, {'t0':0, 'tf':1, 'init_xdot':XDOT_})
 res = I({'p':P_, 'x0':X_, 'z0':Z_})
 print res['xf']
 

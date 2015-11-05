@@ -26,7 +26,7 @@
       #include "rk_integrator.hpp"
       #include <string>
 
-      const std::string casadi::RkIntegrator::meta_doc=
+      const std::string casadi::RkIvpsol::meta_doc=
       "\n"
 "Fixed-step explicit Runge-Kutta integrator for ODEs Currently\n"
 "implements RK4.\n"

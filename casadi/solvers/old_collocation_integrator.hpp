@@ -23,14 +23,14 @@
  */
 
 
-#ifndef CASADI_OLD_COLLOCATION_INTEGRATOR_HPP
-#define CASADI_OLD_COLLOCATION_INTEGRATOR_HPP
+#ifndef CASADI_OLD_COLLOCATION_IVPSOL_HPP
+#define CASADI_OLD_COLLOCATION_IVPSOL_HPP
 
-#include "casadi/core/function/integrator.hpp"
+#include "casadi/core/function/ivpsol.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
-#include <casadi/solvers/casadi_integrator_oldcollocation_export.h>
+#include <casadi/solvers/casadi_ivpsol_oldcollocation_export.h>
 
-/** \defgroup plugin_Integrator_oldcollocation
+/** \defgroup plugin_Ivpsol_oldcollocation
 
      Collocation integrator
      ODE/DAE integrator based on collocation
@@ -38,35 +38,35 @@
      The method is still under development
 
 */
-/** \pluginsection{Integrator,oldcollocation} */
+/** \pluginsection{Ivpsol,oldcollocation} */
 
 /// \cond INTERNAL
 namespace casadi {
 
   /**
-     \brief \pluginbrief{Integrator,oldcollocation}
+     \brief \pluginbrief{Ivpsol,oldcollocation}
 
      @copydoc DAE_doc
-     @copydoc plugin_Integrator_oldcollocation
+     @copydoc plugin_Ivpsol_oldcollocation
 
      \author Joel Andersson
      \date 2011
   */
-  class CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT
-  OldCollocationIntegrator : public Integrator {
+  class CASADI_IVPSOL_OLDCOLLOCATION_EXPORT
+  OldCollocationIvpsol : public Ivpsol {
 
   public:
 
     /// Constructor
-    explicit OldCollocationIntegrator(const std::string& name, const XProblem& dae);
+    explicit OldCollocationIvpsol(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const XProblem& dae) {
-      return new OldCollocationIntegrator(name, dae);
+    static Ivpsol* creator(const std::string& name, const XProblem& dae) {
+      return new OldCollocationIvpsol(name, dae);
     }
 
     /// Destructor
-    virtual ~OldCollocationIntegrator();
+    virtual ~OldCollocationIvpsol();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "oldcollocation";}
@@ -108,4 +108,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_OLD_COLLOCATION_INTEGRATOR_HPP
+#endif // CASADI_OLD_COLLOCATION_IVPSOL_HPP

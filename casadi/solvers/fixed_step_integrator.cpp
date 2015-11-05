@@ -29,18 +29,18 @@
 using namespace std;
 namespace casadi {
 
-  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
-      : Integrator(name, dae) {
+  FixedStepIvpsol::FixedStepIvpsol(const std::string& name, const XProblem& dae)
+      : Ivpsol(name, dae) {
 
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
-  FixedStepIntegrator::~FixedStepIntegrator() {
+  FixedStepIvpsol::~FixedStepIvpsol() {
   }
 
-  void FixedStepIntegrator::init() {
+  void FixedStepIvpsol::init() {
     // Call the base class init
-    Integrator::init();
+    Ivpsol::init();
 
     // Number of finite elements and time steps
     nk_ = option("number_of_finite_elements");
@@ -63,7 +63,7 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegrator::advance(int k) {
+  void FixedStepIvpsol::advance(int k) {
     // Get discrete time sought
     int k_out = std::ceil((grid_.at(k) - grid_.front())/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
@@ -76,22 +76,22 @@ namespace casadi {
     while (k_<k_out) {
       // Take step
       F.input(DAE_T).set(t_);
-      F.input(DAE_X).set(output(INTEGRATOR_XF));
+      F.input(DAE_X).set(output(IVPSOL_XF));
       F.input(DAE_Z).set(Z_);
-      F.input(DAE_P).set(input(INTEGRATOR_P));
+      F.input(DAE_P).set(input(IVPSOL_P));
       F.evaluate();
-      F.output(DAE_ODE).get(output(INTEGRATOR_XF));
+      F.output(DAE_ODE).get(output(IVPSOL_XF));
       F.output(DAE_ALG).get(Z_);
-      copy(Z_->end()-nz_, Z_->end(), output(INTEGRATOR_ZF)->begin());
+      copy(Z_->end()-nz_, Z_->end(), output(IVPSOL_ZF)->begin());
       transform(F.output(DAE_QUAD)->begin(),
                 F.output(DAE_QUAD)->end(),
-                output(INTEGRATOR_QF)->begin(),
-                output(INTEGRATOR_QF)->begin(),
+                output(IVPSOL_QF)->begin(),
+                output(IVPSOL_QF)->begin(),
                 std::plus<double>());
 
       // Tape
       if (nrx_>0) {
-        output(INTEGRATOR_XF).getNZ(x_tape_.at(k_+1));
+        output(IVPSOL_XF).getNZ(x_tape_.at(k_+1));
         Z_.getNZ(Z_tape_.at(k_));
       }
 
@@ -101,7 +101,7 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegrator::retreat(int k) {
+  void FixedStepIvpsol::retreat(int k) {
     // Get discrete time sought
     int k_out = std::floor((grid_.at(k) - grid_.front())/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
@@ -120,25 +120,25 @@ namespace casadi {
       G.input(RDAE_T).set(t_);
       G.input(RDAE_X).setNZ(x_tape_.at(k_));
       G.input(RDAE_Z).setNZ(Z_tape_.at(k_));
-      G.input(RDAE_P).set(input(INTEGRATOR_P));
-      G.input(RDAE_RX).set(output(INTEGRATOR_RXF));
+      G.input(RDAE_P).set(input(IVPSOL_P));
+      G.input(RDAE_RX).set(output(IVPSOL_RXF));
       G.input(RDAE_RZ).set(RZ_);
-      G.input(RDAE_RP).set(input(INTEGRATOR_RP));
+      G.input(RDAE_RP).set(input(IVPSOL_RP));
       G.evaluate();
-      G.output(RDAE_ODE).get(output(INTEGRATOR_RXF));
+      G.output(RDAE_ODE).get(output(IVPSOL_RXF));
       G.output(RDAE_ALG).get(RZ_);
-      copy(RZ_->end()-nrz_, RZ_->end(), output(INTEGRATOR_RZF)->begin());
+      copy(RZ_->end()-nrz_, RZ_->end(), output(IVPSOL_RZF)->begin());
       transform(G.output(RDAE_QUAD)->begin(),
                 G.output(RDAE_QUAD)->end(),
-                output(INTEGRATOR_RQF)->begin(),
-                output(INTEGRATOR_RQF)->begin(),
+                output(IVPSOL_RQF)->begin(),
+                output(IVPSOL_RQF)->begin(),
                 std::plus<double>());
     }
   }
 
-  void FixedStepIntegrator::reset(const double** arg, double** res, int* iw, double* w) {
+  void FixedStepIvpsol::reset(const double** arg, double** res, int* iw, double* w) {
     // Reset the base classes
-    Integrator::reset(arg, res, iw, w);
+    Ivpsol::reset(arg, res, iw, w);
 
     // Bring discrete time to the beginning
     k_ = 0;
@@ -148,13 +148,13 @@ namespace casadi {
 
     // Add the first element in the tape
     if (nrx_>0) {
-      output(INTEGRATOR_XF).getNZ(x_tape_.at(0));
+      output(IVPSOL_XF).getNZ(x_tape_.at(0));
     }
   }
 
-  void FixedStepIntegrator::resetB() {
+  void FixedStepIvpsol::resetB() {
     // Reset the base classes
-    Integrator::resetB();
+    Ivpsol::resetB();
 
     // Bring discrete time to the end
     k_ = nk_;
@@ -163,11 +163,11 @@ namespace casadi {
     calculateInitialConditionsB();
   }
 
-  void FixedStepIntegrator::calculateInitialConditions() {
+  void FixedStepIvpsol::calculateInitialConditions() {
     Z_.set(numeric_limits<double>::quiet_NaN());
   }
 
-  void FixedStepIntegrator::calculateInitialConditionsB() {
+  void FixedStepIvpsol::calculateInitialConditionsB() {
     RZ_.set(numeric_limits<double>::quiet_NaN());
   }
 

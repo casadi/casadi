@@ -1,28 +1,28 @@
 cmake_minimum_required(VERSION 2.8.6)
 
 # Base classes for fixed-step integrators
-casadi_library(casadi_integrators
+casadi_library(casadi_ivpsols
   fixed_step_integrator.hpp
   fixed_step_integrator.cpp
   implicit_fixed_step_integrator.hpp
   implicit_fixed_step_integrator.cpp)
 
 # Explicit Runge-Kutta integrator
-casadi_plugin(Integrator rk
+casadi_plugin(Ivpsol rk
   rk_integrator.hpp
   rk_integrator.cpp
   rk_integrator_meta.cpp)
-target_link_libraries(casadi_integrator_rk casadi_integrators)
+target_link_libraries(casadi_ivpsol_rk casadi_ivpsols)
 
 # Collocation integrator
-casadi_plugin(Integrator collocation
+casadi_plugin(Ivpsol collocation
   collocation_integrator.hpp
   collocation_integrator.cpp
   collocation_integrator_meta.cpp)
-target_link_libraries(casadi_integrator_collocation casadi_integrators)
+target_link_libraries(casadi_ivpsol_collocation casadi_ivpsols)
 
 # Old (all-at-once) collocation integrator
-casadi_plugin(Integrator oldcollocation
+casadi_plugin(Ivpsol oldcollocation
   old_collocation_integrator.hpp
   old_collocation_integrator.cpp
   old_collocation_integrator_meta.cpp)

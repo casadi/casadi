@@ -380,7 +380,7 @@ class Misctests(casadiTestCase):
       except:
         pass
     
-    assert "casadi_nlpsolver_foo" in result[1]
+    assert "casadi_nlpsol_foo" in result[1]
     
 
 pickle.dump(Sparsity(),file("temp.txt","w"))

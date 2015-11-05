@@ -34,23 +34,23 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT
-  casadi_register_integrator_oldcollocation(Integrator::Plugin* plugin) {
-    plugin->creator = OldCollocationIntegrator::creator;
+  int CASADI_IVPSOL_OLDCOLLOCATION_EXPORT
+  casadi_register_ivpsol_oldcollocation(Ivpsol::Plugin* plugin) {
+    plugin->creator = OldCollocationIvpsol::creator;
     plugin->name = "oldcollocation";
-    plugin->doc = OldCollocationIntegrator::meta_doc.c_str();
+    plugin->doc = OldCollocationIvpsol::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
 
   extern "C"
-  void CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT casadi_load_integrator_oldcollocation() {
-    Integrator::registerPlugin(casadi_register_integrator_oldcollocation);
+  void CASADI_IVPSOL_OLDCOLLOCATION_EXPORT casadi_load_ivpsol_oldcollocation() {
+    Ivpsol::registerPlugin(casadi_register_ivpsol_oldcollocation);
   }
 
-  OldCollocationIntegrator::
-  OldCollocationIntegrator(const std::string& name, const XProblem& dae)
-    : Integrator(name, dae) {
+  OldCollocationIvpsol::
+  OldCollocationIvpsol(const std::string& name, const XProblem& dae)
+    : Ivpsol(name, dae) {
 
     addOption("number_of_finite_elements",     OT_INTEGER,  20,
               "Number of finite elements");
@@ -74,13 +74,13 @@ namespace casadi {
               "Options to be passed to the startup integrator");
   }
 
-  OldCollocationIntegrator::~OldCollocationIntegrator() {
+  OldCollocationIvpsol::~OldCollocationIvpsol() {
   }
 
-  void OldCollocationIntegrator::init() {
+  void OldCollocationIvpsol::init() {
 
     // Call the base class init
-    Integrator::init();
+    Ivpsol::init();
 
     // Read options
     bool expand_f = option("expand_f");
@@ -341,18 +341,18 @@ namespace casadi {
                           "Implicit function unknowns and equations do not match");
 
     // Implicit function
-    vector<MX> ifcn_in(1+INTEGRATOR_NUM_IN);
+    vector<MX> ifcn_in(1+IVPSOL_NUM_IN);
     ifcn_in[0] = V;
-    ifcn_in[1+INTEGRATOR_X0] = X0;
-    ifcn_in[1+INTEGRATOR_P] = P;
-    ifcn_in[1+INTEGRATOR_RX0] = RX0;
-    ifcn_in[1+INTEGRATOR_RP] = RP;
-    vector<MX> ifcn_out(1+INTEGRATOR_NUM_OUT);
+    ifcn_in[1+IVPSOL_X0] = X0;
+    ifcn_in[1+IVPSOL_P] = P;
+    ifcn_in[1+IVPSOL_RX0] = RX0;
+    ifcn_in[1+IVPSOL_RP] = RP;
+    vector<MX> ifcn_out(1+IVPSOL_NUM_OUT);
     ifcn_out[0] = gv;
-    ifcn_out[1+INTEGRATOR_XF] = X[nk][0];
-    ifcn_out[1+INTEGRATOR_QF] = QF;
-    ifcn_out[1+INTEGRATOR_RXF] = RX[0][0];
-    ifcn_out[1+INTEGRATOR_RQF] = RQF;
+    ifcn_out[1+IVPSOL_XF] = X[nk][0];
+    ifcn_out[1+IVPSOL_QF] = QF;
+    ifcn_out[1+IVPSOL_RXF] = RX[0][0];
+    ifcn_out[1+IVPSOL_RQF] = RQF;
     std::stringstream ss_ifcn;
     ss_ifcn << "collocation_implicit_residual_" << name_;
     Function ifcn(ss_ifcn.str(), ifcn_in, ifcn_out);
@@ -389,7 +389,7 @@ namespace casadi {
 
       // Allocate a root-finding solver
       startup_integrator_ =
-        Function::integrator("collocation_startup_" + name_,
+        Function::ivpsol("collocation_startup_" + name_,
                              option("startup_integrator"),
                              dae_, startup_integrator_options);
     }
@@ -398,7 +398,7 @@ namespace casadi {
     integrated_once_ = false;
   }
 
-  void OldCollocationIntegrator::reset(const double** arg, double** res, int* iw, double* w) {
+  void OldCollocationIvpsol::reset(const double** arg, double** res, int* iw, double* w) {
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -409,10 +409,10 @@ namespace casadi {
     }
 
     // Call the base class method
-    Integrator::reset(arg, res, iw, w);
+    Ivpsol::reset(arg, res, iw, w);
 
     // Pass the inputs
-    for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
+    for (int iind=0; iind<IVPSOL_NUM_IN; ++iind) {
       implicit_solver_.input(1+iind).set(input(iind));
     }
 
@@ -431,7 +431,7 @@ namespace casadi {
 
       // Use supplied integrator, if any
       if (has_startup_integrator) {
-        for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
+        for (int iind=0; iind<IVPSOL_NUM_IN; ++iind) {
           startup_integrator_.input(iind).set(input(iind));
         }
 
@@ -448,7 +448,7 @@ namespace casadi {
         w = vector<double>(startup_integrator_.sz_w());
 
         // Reset the integrator
-        dynamic_cast<Integrator*>(startup_integrator_.get())
+        dynamic_cast<Ivpsol*>(startup_integrator_.get())
           ->reset(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w));
       }
 
@@ -460,12 +460,12 @@ namespace casadi {
 
           if (has_startup_integrator) {
             // Integrate to the time point
-            dynamic_cast<Integrator*>(startup_integrator_.get())->advance(k_startup++);
+            dynamic_cast<Ivpsol*>(startup_integrator_.get())->advance(k_startup++);
           }
 
           // Save the differential states
-          const DMatrix& x = has_startup_integrator ? startup_integrator_.output(INTEGRATOR_XF) :
-              input(INTEGRATOR_X0);
+          const DMatrix& x = has_startup_integrator ? startup_integrator_.output(IVPSOL_XF) :
+              input(IVPSOL_X0);
           for (int i=0; i<nx_; ++i) {
             v.at(offs++) = x.at(i);
           }
@@ -483,7 +483,7 @@ namespace casadi {
           }
 
           // Skip backward states // FIXME
-          const DMatrix& rx = input(INTEGRATOR_RX0);
+          const DMatrix& rx = input(IVPSOL_RX0);
           for (int i=0; i<nrx_; ++i) {
             v.at(offs++) = rx.at(i);
           }
@@ -498,7 +498,7 @@ namespace casadi {
       // Print
       if (has_startup_integrator && verbose()) {
         userOut() << "startup trajectory generated, statistics:" << endl;
-        dynamic_cast<Integrator*>(startup_integrator_.get())
+        dynamic_cast<Ivpsol*>(startup_integrator_.get())
           ->printStats(casadi::userOut());
       }
     }
@@ -529,13 +529,13 @@ namespace casadi {
     integrated_once_ = true;
   }
 
-  void OldCollocationIntegrator::advance(int k) {
-    for (int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind) {
+  void OldCollocationIvpsol::advance(int k) {
+    for (int oind=0; oind<IVPSOL_NUM_OUT; ++oind) {
       output(oind).set(implicit_solver_.output(1+oind));
     }
   }
 
-  void OldCollocationIntegrator::retreat(int k) {
+  void OldCollocationIvpsol::retreat(int k) {
   }
 
 } // namespace casadi

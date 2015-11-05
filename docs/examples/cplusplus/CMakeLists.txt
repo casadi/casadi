@@ -61,10 +61,10 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting
-    casadi_integrator_cvodes
-    casadi_integrator_idas
+    casadi_ivpsol_cvodes
+    casadi_ivpsol_idas
     casadi_nlpsol_ipopt
-    casadi_integrator_rk
+    casadi_ivpsol_rk
     casadi_nlpsol_scpgen)
 endif()
 

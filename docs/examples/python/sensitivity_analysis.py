@@ -119,7 +119,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
       if MyIntegrator=="oldcollocation": opts["expand_f"] = True
 
     # Integrator
-    I = Function.integrator("I", MyIntegrator, dae, opts)
+    I = Function.ivpsol("I", MyIntegrator, dae, opts)
 
     # Integrate to get results
     arg = {"x0":x0, "p":u0}

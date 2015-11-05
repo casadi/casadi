@@ -38,7 +38,7 @@ def loadAllCompiledPlugins():
     cls, name = k.split("::")
     print "Testing: ", cls, name
     if cls=='Integrator':
-      casadi.Function.load_integrator(name)
+      casadi.Function.load_ivpsol(name)
     elif cls=='NlpSolver':
       casadi.Function.load_nlpsol(name)
     elif cls=='Qpsol':

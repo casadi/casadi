@@ -29,21 +29,21 @@
 using namespace std;
 namespace casadi {
 
-  ImplicitFixedStepIntegrator::
-  ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae)
-    : FixedStepIntegrator(name, dae) {
+  ImplicitFixedStepIvpsol::
+  ImplicitFixedStepIvpsol(const std::string& name, const XProblem& dae)
+    : FixedStepIvpsol(name, dae) {
     addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the NLP Solver");
   }
 
-  ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {
+  ImplicitFixedStepIvpsol::~ImplicitFixedStepIvpsol() {
   }
 
-  void ImplicitFixedStepIntegrator::init() {
+  void ImplicitFixedStepIvpsol::init() {
     // Call the base class init
-    FixedStepIntegrator::init();
+    FixedStepIvpsol::init();
 
     // Get the NLP creator function
     std::string implicit_function_name = option("implicit_solver");

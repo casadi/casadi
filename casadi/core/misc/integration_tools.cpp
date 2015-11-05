@@ -340,7 +340,7 @@ namespace casadi {
     Dict integrator_options2 = integrator_options;
     integrator_options2["t0"] = 0; // Normalized time
     integrator_options2["tf"] = 1; // Normalized time
-    Function ifcn = Function::integrator("integrator", integrator, dae, integrator_options2);
+    Function ifcn = Function::ivpsol("integrator", integrator, dae, integrator_options2);
 
     // Inputs of constructed function
     MX x0 = MX::sym("x0", x_sp);

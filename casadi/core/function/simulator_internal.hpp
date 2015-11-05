@@ -26,7 +26,6 @@
 #ifndef CASADI_SIMULATOR_INTERNAL_HPP
 #define CASADI_SIMULATOR_INTERNAL_HPP
 
-#include "simulator.hpp"
 #include "function_internal.hpp"
 
 /// \cond INTERNAL
@@ -48,8 +47,8 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return INTEGRATOR_NUM_IN;}
-    virtual size_t get_n_out() const { return INTEGRATOR_NUM_OUT;}
+    virtual size_t get_n_in() const { return IVPSOL_NUM_IN;}
+    virtual size_t get_n_out() const { return IVPSOL_NUM_OUT;}
     ///@}
 
     /// @{
@@ -68,7 +67,7 @@ namespace casadi {
     /** \brief  Integrate */
     virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
-    // Integrator instance
+    // Ivpsol instance
     Function integrator_;
 
     // Time grid

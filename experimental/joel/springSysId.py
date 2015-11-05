@@ -66,18 +66,18 @@ def create_integrator_rk4():
     x =  [s,v]
   
     # Input to the integrator function being created
-    integrator_in = C.INTEGRATOR_NUM_IN * [[]]
-    integrator_in[C.INTEGRATOR_T0] = [t0]
-    integrator_in[C.INTEGRATOR_TF] = [tf]
-    integrator_in[C.INTEGRATOR_X0] =  x0
-    integrator_in[C.INTEGRATOR_P]  =  [u,k,b]
+    ivpsol_in = C.INTEGRATOR_NUM_IN * [[]]
+    ivpsol_in[C.INTEGRATOR_T0] = [t0]
+    ivpsol_in[C.INTEGRATOR_TF] = [tf]
+    ivpsol_in[C.INTEGRATOR_X0] =  x0
+    ivpsol_in[C.INTEGRATOR_P]  =  [u,k,b]
   
     # Create a dummy state derivative vector
     xp0 = C.ssym("x",len(x)).data()
-    integrator_in[C.INTEGRATOR_XP0] = xp0
+    ivpsol_in[C.INTEGRATOR_XP0] = xp0
   
     # Create the explicit rk4 integrator
-    integrator = C.SXFunction(integrator_in,[x])
+    integrator = C.SXFunction(ivpsol_in,[x])
     return integrator
 
 

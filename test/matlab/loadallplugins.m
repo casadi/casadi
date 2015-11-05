@@ -5,7 +5,7 @@ for pl = strsplit(CasadiMeta.getPlugins(),';')
   cls  = out{1};
   name = out{2};
   if strcmp(cls, 'Integrator')
-    eval(['Function.load_integrator(''' name ''')'])
+    eval(['Function.load_ivpsol(''' name ''')'])
   elseif strcmp(cls, 'NlpSolver')
     eval(['Function.load_nlpsol(''' name ''')'])
   elseif strcmp(cls, 'Qpsol')

@@ -54,7 +54,7 @@ class Simulatortests(casadiTestCase):
     #opts['verbose'] = True
     opts['t0'] = 0
     opts['tf'] = 2.3
-    integrator = Function.integrator('integrator', 'cvodes', f, opts)
+    integrator = Function.ivpsol('integrator', 'cvodes', f, opts)
     q0   = MX.sym('q0')
     par  = MX.sym('p')
     qend = integrator({'x0':q0,'p':par})['xf']
@@ -90,7 +90,7 @@ class Simulatortests(casadiTestCase):
     integrator = Simulator('integrator', 'cvodes', f, opts)
 
     solution = Function('solution', {'x0':q, 'p':p, 'xf':horzcat([q*exp(t**3/(3*p)) for t in tc])},
-                        Function.integrator_in(), Function.integrator_out())
+                        Function.ivpsol_in(), Function.ivpsol_out())
     
     for f in [integrator,solution]:
       f.setInput(0.3,'x0')

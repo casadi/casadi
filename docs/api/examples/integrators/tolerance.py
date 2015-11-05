@@ -61,7 +61,7 @@ for tol in tolerances:
   opts['reltol'] = tol
   opts['abstol'] = tol
   opts['tf'] = tend
-  integrator = Function.integrator('integrator', 'cvodes', dae, opts)
+  integrator = Function.ivpsol('integrator', 'cvodes', dae, opts)
   res = integrator({'x0':[1,0]})
   endresult.append(res['xf'][0])
   

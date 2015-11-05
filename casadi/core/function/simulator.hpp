@@ -33,14 +33,14 @@ namespace casadi {
 // Forward declaration of internal class
 class SimulatorInternal;
 
-/** \brief Integrator class
+/** \brief Ivpsol class
 
   An "simulator" integrates an IVP, stopping at a (fixed) number of grid points and
   evaluates a set of output functions at these points.
   The internal stepsizes of the integrator need not coincide with the gridpoints.
 
 
-  Simulator is an casadi::Function mapping from casadi::IntegratorInput to n. \\
+  Simulator is an casadi::Function mapping from casadi::IvpsolInput to n. \\
 
   The output function needs to be a mapping from casadi::DAEInput to n.
   The default output has n=1 and the output is the (vectorized) differential

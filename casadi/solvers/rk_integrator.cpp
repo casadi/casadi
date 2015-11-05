@@ -29,37 +29,37 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_INTEGRATOR_RK_EXPORT
-      casadi_register_integrator_rk(Integrator::Plugin* plugin) {
-    plugin->creator = RkIntegrator::creator;
+  int CASADI_IVPSOL_RK_EXPORT
+      casadi_register_ivpsol_rk(Ivpsol::Plugin* plugin) {
+    plugin->creator = RkIvpsol::creator;
     plugin->name = "rk";
-    plugin->doc = RkIntegrator::meta_doc.c_str();
+    plugin->doc = RkIvpsol::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
 
   extern "C"
-  void CASADI_INTEGRATOR_RK_EXPORT casadi_load_integrator_rk() {
-    Integrator::registerPlugin(casadi_register_integrator_rk);
+  void CASADI_IVPSOL_RK_EXPORT casadi_load_ivpsol_rk() {
+    Ivpsol::registerPlugin(casadi_register_ivpsol_rk);
   }
 
-  RkIntegrator::RkIntegrator(const std::string& name, const XProblem& dae)
-    : FixedStepIntegrator(name, dae) {
+  RkIvpsol::RkIvpsol(const std::string& name, const XProblem& dae)
+    : FixedStepIvpsol(name, dae) {
   }
 
-  RkIntegrator::~RkIntegrator() {
+  RkIvpsol::~RkIvpsol() {
   }
 
-  void RkIntegrator::init() {
+  void RkIvpsol::init() {
     // Call the base class init
-    FixedStepIntegrator::init();
+    FixedStepIvpsol::init();
 
     // Algebraic variables not (yet?) supported
     casadi_assert_message(nz_==0 && nrz_==0,
                           "Explicit Runge-Kutta integrators do not support algebraic variables");
   }
 
-  void RkIntegrator::setupFG() {
+  void RkIvpsol::setupFG() {
 
     // Symbolic inputs
     MX x0 = MX::sym("x0", f_.input(DAE_X).sparsity());

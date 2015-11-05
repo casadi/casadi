@@ -27,7 +27,7 @@
 #define CASADI_SUNDIALS_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_sundials_common_export.h>
-#include "casadi/core/function/integrator.hpp"
+#include "casadi/core/function/ivpsol.hpp"
 
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_dense.h>
@@ -37,7 +37,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
+  class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Ivpsol {
   public:
     /** \brief  Constructor */
     SundialsInterface(const std::string& name, const XProblem& dae);

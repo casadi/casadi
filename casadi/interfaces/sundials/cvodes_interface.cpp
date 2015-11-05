@@ -32,8 +32,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_INTEGRATOR_CVODES_EXPORT
-      casadi_register_integrator_cvodes(Integrator::Plugin* plugin) {
+  int CASADI_IVPSOL_CVODES_EXPORT
+      casadi_register_ivpsol_cvodes(Ivpsol::Plugin* plugin) {
     plugin->creator = CvodesInterface::creator;
     plugin->name = "cvodes";
     plugin->doc = CvodesInterface::meta_doc.c_str();;
@@ -42,15 +42,15 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_INTEGRATOR_CVODES_EXPORT casadi_load_integrator_cvodes() {
-    Integrator::registerPlugin(casadi_register_integrator_cvodes);
+  void CASADI_IVPSOL_CVODES_EXPORT casadi_load_ivpsol_cvodes() {
+    Ivpsol::registerPlugin(casadi_register_ivpsol_cvodes);
   }
 
   CvodesInterface::CvodesInterface(const std::string& name, const XProblem& dae)
     : SundialsInterface(name, dae) {
 
     addOption("linear_multistep_method",          OT_STRING,              "bdf",
-              "Integrator scheme", "bdf|adams");
+              "Ivpsol scheme", "bdf|adams");
     addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",
               "", "newton|functional");
     addOption("fsens_all_at_once",                OT_BOOLEAN,             true,

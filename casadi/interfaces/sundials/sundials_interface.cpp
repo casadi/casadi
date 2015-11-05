@@ -27,14 +27,14 @@
 
 #include "casadi/core/std_vector_tools.hpp"
 
-INPUTSCHEME(IntegratorInput)
-OUTPUTSCHEME(IntegratorOutput)
+INPUTSCHEME(IvpsolInput)
+OUTPUTSCHEME(IvpsolOutput)
 
 using namespace std;
 namespace casadi {
 
   SundialsInterface::SundialsInterface(const std::string& name, const XProblem& dae)
-    : Integrator(name, dae) {
+    : Ivpsol(name, dae) {
     addOption("max_num_steps",               OT_INTEGER,          10000,
               "Maximum number of integrator steps");
     addOption("reltol",                      OT_REAL,             1e-6,
@@ -128,7 +128,7 @@ namespace casadi {
 
   void SundialsInterface::init() {
     // Call the base class method
-    Integrator::init();
+    Ivpsol::init();
 
     // Read options
     abstol_ = option("abstol");
@@ -294,7 +294,7 @@ namespace casadi {
 
   void SundialsInterface::reset(const double** arg, double** res, int* iw, double* w) {
     // Reset the base classes
-    Integrator::reset(arg, res, iw, w);
+    Ivpsol::reset(arg, res, iw, w);
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {

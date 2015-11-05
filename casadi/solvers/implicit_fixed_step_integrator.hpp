@@ -23,24 +23,24 @@
  */
 
 
-#ifndef CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_HPP
-#define CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_HPP
+#ifndef CASADI_IMPLICIT_FIXED_STEP_IVPSOL_HPP
+#define CASADI_IMPLICIT_FIXED_STEP_IVPSOL_HPP
 
 #include "fixed_step_integrator.hpp"
-#include <casadi/solvers/casadi_integrators_export.h>
+#include <casadi/solvers/casadi_ivpsols_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_INTEGRATORS_EXPORT ImplicitFixedStepIntegrator
-      : public FixedStepIntegrator {
+  class CASADI_IVPSOLS_EXPORT ImplicitFixedStepIvpsol
+      : public FixedStepIvpsol {
   public:
 
     /// Constructor
-    explicit ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae);
+    explicit ImplicitFixedStepIvpsol(const std::string& name, const XProblem& dae);
 
     /// Destructor
-    virtual ~ImplicitFixedStepIntegrator();
+    virtual ~ImplicitFixedStepIvpsol();
 
     /// Initialize stage
     virtual void init();
@@ -58,4 +58,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_HPP
+#endif // CASADI_IMPLICIT_FIXED_STEP_IVPSOL_HPP

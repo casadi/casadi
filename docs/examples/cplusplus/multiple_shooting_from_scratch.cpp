@@ -87,7 +87,7 @@ int main(){
   SXDict dae = {{"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}};
 
   // Create an integrator (CVodes)
-  Function integrator = Function::integrator("integrator", "cvodes",
+  Function integrator = Function::ivpsol("integrator", "cvodes",
                                              dae, {{"t0", 0}, {"tf", tf/ns}});
   
   // Total number of NLP variables

@@ -47,7 +47,7 @@ rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
 
 dae = {'x':states, 'p':params, 't':t, 'ode':rhs}
 
-integrator = Function.integrator('integrator', 'cvodes', dae)
+integrator = Function.ivpsol('integrator', 'cvodes', dae)
 
 #! First argument is input index, secpnd argument is output index
 jac = integrator.jacobian('p', 'xf')

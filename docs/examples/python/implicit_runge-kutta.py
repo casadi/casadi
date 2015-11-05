@@ -136,10 +136,10 @@ for i in range(n):
 
 # Fixed-step integrator
 irk_integrator = Function("irk_integrator", {"x0":X0, "p":P, "xf":X},
-                          Function.integrator_in(), Function.integrator_out())
+                          Function.ivpsol_in(), Function.ivpsol_out())
 
 # Create a convensional integrator for reference
-ref_integrator = Function.integrator("ref_integrator", "cvodes", dae, {"tf":tf})
+ref_integrator = Function.ivpsol("ref_integrator", "cvodes", dae, {"tf":tf})
 
 # Test values
 x0_val  = N.array([0,1,0])

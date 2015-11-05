@@ -30,7 +30,7 @@
 *
 * \sa
 * \code
-* casadi::Function::integrator();
+* casadi::Function::ivpsol();
 * \endcode
 *
 */

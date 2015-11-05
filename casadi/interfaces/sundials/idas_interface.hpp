@@ -26,7 +26,7 @@
 #ifndef CASADI_IDAS_INTERFACE_HPP
 #define CASADI_IDAS_INTERFACE_HPP
 
-#include <casadi/interfaces/sundials/casadi_integrator_idas_export.h>
+#include <casadi/interfaces/sundials/casadi_ivpsol_idas_export.h>
 #include "sundials_interface.hpp"
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
@@ -37,7 +37,7 @@
 #include <idas/idas_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_Integrator_idas
+/** \defgroup plugin_Ivpsol_idas
       Interface to IDAS from the Sundials suite.
 
       Note: depending on the dimension and structure of your problem,
@@ -49,21 +49,21 @@
       \endverbatim
 */
 
-/** \pluginsection{Integrator,idas} */
+/** \pluginsection{Ivpsol,idas} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief \pluginbrief{Integrator,idas}
+  /** \brief \pluginbrief{Ivpsol,idas}
 
-      @copydoc IdasIntegrator_doc
-      @copydoc plugin_Integrator_idas
+      @copydoc IdasIvpsol_doc
+      @copydoc plugin_Ivpsol_idas
 
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
+  class CASADI_IVPSOL_IDAS_EXPORT IdasInterface : public SundialsInterface {
 
   public:
 
@@ -71,7 +71,7 @@ namespace casadi {
     explicit IdasInterface(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const XProblem& dae) {
+    static Ivpsol* creator(const std::string& name, const XProblem& dae) {
       return new IdasInterface(name, dae);
     }
 

@@ -12,18 +12,18 @@ casadi_library(casadi_sundials_common sundials_interface.hpp sundials_interface.
 target_link_libraries(casadi_sundials_common ${SUNDIALS_LIBRARIES})
 
 # CVODES
-casadi_plugin(Integrator cvodes
+casadi_plugin(Ivpsol cvodes
   cvodes_interface.hpp    cvodes_interface.cpp
   cvodes_interface_meta.cpp
   )
-casadi_plugin_link_libraries(Integrator cvodes casadi_sundials_common)
+casadi_plugin_link_libraries(Ivpsol cvodes casadi_sundials_common)
 
 # IDAS
-casadi_plugin(Integrator idas
+casadi_plugin(Ivpsol idas
   idas_interface.hpp      idas_interface.cpp
   idas_interface_meta.cpp
   )
-casadi_plugin_link_libraries(Integrator idas casadi_sundials_common)
+casadi_plugin_link_libraries(Ivpsol idas casadi_sundials_common)
 
 # KINSOL
 casadi_plugin(Nlsol kinsol 

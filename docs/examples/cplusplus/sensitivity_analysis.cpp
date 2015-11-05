@@ -138,7 +138,7 @@ int main(){
       // Get integrator
       Dict opts = solver.opts;
       opts["tf"] = test.tf;
-      Function I = Function::integrator("I", solver.plugin, test.dae, opts);
+      Function I = Function::ivpsol("I", solver.plugin, test.dae, opts);
 
       // Buffers for evaluation
       std::map<std::string, DMatrix> arg, res;

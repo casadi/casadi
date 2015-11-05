@@ -109,7 +109,7 @@ ode = struct('x', x, 'ode', x)
 opts = struct
 opts.verbose = true
 
-intg = Function.integrator('integrator', 'rk', ode, opts);
+intg = Function.ivpsol('integrator', 'rk', ode, opts);
 intg.evaluate();
 diary OFF
 

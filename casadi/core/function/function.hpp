@@ -1125,25 +1125,28 @@ namespace casadi {
 
     ///@{
     /// Check if a particular plugin is available
-    static bool has_integrator(const std::string& name);
+    static bool has_ivpsol(const std::string& name);
     static bool has_qpsol(const std::string& name);
     static bool has_nlpsol(const std::string& name);
+    static bool has_nlsol(const std::string& name);
     static bool has_linsol(const std::string& name);
     ///@}
 
     ///@{
     /// Explicitly load a plugin dynamically
     static void load_qpsol(const std::string& name);
-    static void load_integrator(const std::string& name);
+    static void load_ivpsol(const std::string& name);
     static void load_nlpsol(const std::string& name);
+    static void load_nlsol(const std::string& name);
     static void load_linsol(const std::string& name);
     ///@}
 
     ///@{
     /// Get the documentation string for a plugin
-    static std::string doc_integrator(const std::string& name);
+    static std::string doc_ivpsol(const std::string& name);
     static std::string doc_qpsol(const std::string& name);
     static std::string doc_nlpsol(const std::string& name);
+    static std::string doc_nlsol(const std::string& name);
     static std::string doc_linsol(const std::string& name);
     ///@}
 
@@ -1231,15 +1234,6 @@ namespace casadi {
                         const Dict& opts=Dict()) const;
     ///@}
 
-    /// Check if a nlsol plugin is available
-    static bool has_nlsol(const std::string& name);
-
-    /// Explicitly load a nlsol plugin dynamically
-    static void load_nlsol(const std::string& name);
-
-    /// Get documentation for a nlsol
-    static std::string doc_nlsol(const std::string& name);
-
     /// Access rhs function for a nlsol
     Function nlsol_fun();
 
@@ -1282,41 +1276,41 @@ namespace casadi {
         \author Joel Andersson
         \date 2011-2015
      */
-    static Function integrator(const std::string& name, const std::string& solver,
-                               const SXDict& dae, const Dict& opts=Dict());
-    static Function integrator(const std::string& name, const std::string& solver,
-                               const MXDict& dae, const Dict& opts=Dict());
-    static Function integrator(const std::string& name, const std::string& solver,
-                               const Function& dae, const Dict& opts=Dict());
-    static Function integrator(const std::string& name, const std::string& solver,
-                               const std::pair<Function, Function>& dae,
-                               const Dict& opts=Dict());
+    static Function ivpsol(const std::string& name, const std::string& solver,
+                           const SXDict& dae, const Dict& opts=Dict());
+    static Function ivpsol(const std::string& name, const std::string& solver,
+                           const MXDict& dae, const Dict& opts=Dict());
+    static Function ivpsol(const std::string& name, const std::string& solver,
+                           const Function& dae, const Dict& opts=Dict());
+    static Function ivpsol(const std::string& name, const std::string& solver,
+                           const std::pair<Function, Function>& dae,
+                           const Dict& opts=Dict());
 #ifndef SWIG
-    static Function integrator(const std::string& name, const std::string& solver,
-                               const XProblem& dae, const Dict& opts=Dict());
+    static Function ivpsol(const std::string& name, const std::string& solver,
+                           const XProblem& dae, const Dict& opts=Dict());
 #endif // SWIG
     ///@}
 
     /// Get the DAE for an integrator
-    Function integrator_dae();
+    Function ivpsol_dae();
 
     /** \brief Get input scheme of integrators */
-    static std::vector<std::string> integrator_in();
+    static std::vector<std::string> ivpsol_in();
 
     /** \brief Get integrator output scheme of integrators */
-    static std::vector<std::string> integrator_out();
+    static std::vector<std::string> ivpsol_out();
 
     /** \brief Get integrator input scheme name by index */
-    static std::string integrator_in(int ind);
+    static std::string ivpsol_in(int ind);
 
     /** \brief Get output scheme name by index */
-    static std::string integrator_out(int ind);
+    static std::string ivpsol_out(int ind);
 
     /** \brief Get the number of integrator inputs */
-    static int integrator_n_in();
+    static int ivpsol_n_in();
 
     /** \brief Get the number of integrator outputs */
-    static int integrator_n_out();
+    static int ivpsol_n_out();
 
     ///@{
     /** Create an NLP solver
