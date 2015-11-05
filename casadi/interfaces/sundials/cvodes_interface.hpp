@@ -134,7 +134,7 @@ namespace casadi {
               N_Vector tmp1, N_Vector tmp2);
     void rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF,
                N_Vector tmp1, N_Vector tmp2);
-    void rhsQ(double t, const double* x, double* qdot);
+    void rhsQ(double t, N_Vector x, N_Vector qdot);
     void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot,
                N_Vector tmp1, N_Vector tmp2);
     void rhsB(double t, const double* x, const double *rx, double* rxdot);
@@ -255,12 +255,6 @@ namespace casadi {
     bool isInitAdj_;
 
     int ism_;
-
-    // Calculate the error message map
-    static std::map<int, std::string> calc_flagmap();
-
-    // Error message map
-    static std::map<int, std::string> flagmap;
 
     // Throw error
     static void cvodes_error(const std::string& module, int flag);

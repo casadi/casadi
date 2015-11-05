@@ -547,52 +547,10 @@ namespace casadi {
     stream << std::endl;
   }
 
-  map<int, string> CvodesInterface::calc_flagmap() {
-    map<int, string> f;
-    f[CV_SUCCESS] = "CV_SUCCESS";
-    f[CV_TSTOP_RETURN] = "CV_TSTOP_RETURN";
-    f[CV_ROOT_RETURN] = "CV_ROOT_RETURN";
-    f[CV_WARNING] = "CV_WARNING";
-    f[CV_WARNING] = "CV_WARNING";
-    f[CV_TOO_MUCH_WORK] = "CV_TOO_MUCH_WORK";
-    f[CV_TOO_MUCH_ACC] = "CV_TOO_MUCH_ACC";
-    f[CV_ERR_FAILURE] = "CV_ERR_FAILURE";
-    f[CV_CONV_FAILURE] = "CV_CONV_FAILURE";
-    f[CV_LINIT_FAIL] = "CV_LINIT_FAIL";
-    f[CV_LSETUP_FAIL] = "CV_LSETUP_FAIL";
-    f[CV_LSOLVE_FAIL] = "CV_LSOLVE_FAIL";
-    f[CV_RHSFUNC_FAIL] = "CV_RHSFUNC_FAIL";
-    f[CV_FIRST_RHSFUNC_ERR] = "CV_FIRST_RHSFUNC_ERR";
-    f[CV_UNREC_RHSFUNC_ERR] = "CV_UNREC_RHSFUNC_ERR";
-    f[CV_RTFUNC_FAIL] = "CV_RTFUNC_FAIL";
-    f[CV_MEM_FAIL] = "CV_MEM_FAIL";
-    f[CV_ILL_INPUT] = "CV_ILL_INPUT";
-    f[CV_NO_MALLOC] = "CV_NO_MALLOC";
-    f[CV_BAD_K] = "CV_BAD_K";
-    f[CV_BAD_T] = "CV_BAD_T";
-    f[CV_BAD_DKY] = "CV_BAD_DKY";
-    f[CV_TOO_CLOSE] = "CV_TOO_CLOSE";
-    f[CV_QRHSFUNC_FAIL] = "CV_QRHSFUNC_FAIL";
-    f[CV_FIRST_QRHSFUNC_ERR] = "CV_FIRST_QRHSFUNC_ERR";
-    f[CV_REPTD_QRHSFUNC_ERR] = "CV_REPTD_QRHSFUNC_ERR";
-    f[CV_UNREC_QRHSFUNC_ERR] = "CV_UNREC_QRHSFUNC_ERR";
-    f[CV_NO_SENS ] = "CV_NO_SENS ";
-    f[CV_SRHSFUNC_FAIL] = "CV_SRHSFUNC_FAIL";
-    return f;
-  }
-
-  map<int, string> CvodesInterface::flagmap = CvodesInterface::calc_flagmap();
 
   void CvodesInterface::cvodes_error(const string& module, int flag) {
-    // Find the error
-    map<int, string>::const_iterator it = flagmap.find(flag);
-
     stringstream ss;
-    if (it == flagmap.end()) {
-      ss << "Unknown error (" << flag << ") from module \"" << module << "\".";
-    } else {
-      ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";
-    }
+    ss << "Module \"" << module << "\" returned \"" << CVodeGetReturnFlagName(flag) << "\".";
     ss << " Consult Cvodes documentation.";
     casadi_error(ss.str());
   }
@@ -630,7 +588,7 @@ namespace casadi {
   }
 
   int CvodesInterface::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
-                                   N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2) {
+                                    N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
       CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
@@ -667,7 +625,7 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsQ(t, NV_DATA_S(x), NV_DATA_S(qdot));
+      this_->rhsQ(t, x, qdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;;
@@ -675,23 +633,20 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsQ(double t, const double* x, double* qdot) {
-    // Pass input
-    f_.setInputNZ(&t, DAE_T);
-    f_.setInputNZ(x, DAE_X);
-    f_.setInput(p(), DAE_P);
-
-    // Evaluate
-    f_.evaluate();
-
-    // Get results
-    f_.getOutputNZ(qdot, DAE_QUAD);
+  void CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot) {
+    // Evaluate f_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(x);
+    arg1_[DAE_Z] = 0;
+    arg1_[DAE_P] = p_;
+    res1_[DAE_ODE] = 0;
+    res1_[DAE_ALG] = 0;
+    res1_[DAE_QUAD] = NV_DATA_S(qdot);
+    f_(0, arg1_, res1_, iw_, w_);
   }
 
   void CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
                              N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2) {
-    //    casadi_assert(Ns==nfdir_);
-
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
   }
@@ -700,7 +655,6 @@ namespace casadi {
                                     N_Vector *qdotF, void *user_data,
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
-      //    casadi_assert(user_data);
       CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
       if (!this_) {
         // SUNDIALS BUG!!!
