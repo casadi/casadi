@@ -12243,8 +12243,14 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 %feature("docstring") casadi::is_regular "
 
+>  bool is_regular([T ] v)
+------------------------------------------------------------------------
+
 Checks if vector does not contain NaN or Inf.
 
+>  bool is_regular([N_] v)
+------------------------------------------------------------------------
+[INTERNAL] 
 ";
 
 %feature("docstring") casadi::casadi_to_sparse_tr "[INTERNAL]  Convert

@@ -16344,6 +16344,8 @@ Checks if vector does not contain NaN or Inf.
 
 ";
 
+%feature("docstring")  casadi::is_regular(N_Vector v) " [INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_to_sparse_tr(const real1_t *xt,
 real2_t *y, const int *sp_y) " [INTERNAL]  Convert transposed dense to
 sparse.

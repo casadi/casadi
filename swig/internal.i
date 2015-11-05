@@ -202,6 +202,9 @@
 %exception  casadi::getTimerTime(void) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::is_regular(N_Vector v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::iszero(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
