@@ -26,35 +26,35 @@
 #ifndef CASADI_OOQP_INTERFACE_HPP
 #define CASADI_OOQP_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver.hpp"
-#include <casadi/interfaces/ooqp/casadi_qpsolver_ooqp_export.h>
+#include "casadi/core/function/qpsol.hpp"
+#include <casadi/interfaces/ooqp/casadi_qpsol_ooqp_export.h>
 
-/** \defgroup plugin_QpSolver_ooqp
+/** \defgroup plugin_Qpsol_ooqp
  Interface to the OOQP Solver for quadratic programming
   The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.
 
   NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
 */
 
-/** \pluginsection{QpSolver,ooqp} */
+/** \pluginsection{Qpsol,ooqp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{QpSolver,ooqp}
+  /** \brief \pluginbrief{Qpsol,ooqp}
 
-      @copydoc QpSolver_doc
-      @copydoc plugin_QpSolver_ooqp
+      @copydoc Qpsol_doc
+      @copydoc plugin_Qpsol_ooqp
 
   */
-  class CASADI_QPSOLVER_OOQP_EXPORT OoqpInterface : public QpSolver {
+  class CASADI_QPSOL_OOQP_EXPORT OoqpInterface : public Qpsol {
   public:
     /** \brief  Create a new Solver */
     explicit OoqpInterface(const std::string& name,
                            const std::map<std::string, Sparsity>& st);
 
     /** \brief  Create a new QP Solver */
-    static QpSolver* creator(const std::string& name,
+    static Qpsol* creator(const std::string& name,
                                      const std::map<std::string, Sparsity>& st) {
       return new OoqpInterface(name, st);
     }

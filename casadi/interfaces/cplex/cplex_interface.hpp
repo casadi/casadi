@@ -25,35 +25,35 @@
 #ifndef CASADI_CPLEX_INTERFACE_HPP
 #define CASADI_CPLEX_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver.hpp"
-#include <casadi/interfaces/cplex/casadi_qpsolver_cplex_export.h>
+#include "casadi/core/function/qpsol.hpp"
+#include <casadi/interfaces/cplex/casadi_qpsol_cplex_export.h>
 #include "ilcplex/cplex.h"
 
 #include <string>
 
-/** \defgroup plugin_QpSolver_cplex
+/** \defgroup plugin_Qpsol_cplex
 
       Interface to Cplex solver for sparse Quadratic Programs
 */
 
-/** \pluginsection{QpSolver,cplex} */
+/** \pluginsection{Qpsol,cplex} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief \pluginbrief{QpSolver,cplex}
+  /** \brief \pluginbrief{Qpsol,cplex}
 
-      @copydoc QpSolver_doc
-      @copydoc plugin_QpSolver_cplex
+      @copydoc Qpsol_doc
+      @copydoc plugin_Qpsol_cplex
 
       \author Attila Kozma, Joel Andersson
       \date 2012
   */
-  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInterface : public QpSolver {
+  class CASADI_QPSOL_CPLEX_EXPORT CplexInterface : public Qpsol {
   public:
     /** \brief  Create a new QP Solver */
-    static QpSolver* creator(const std::string& name,
+    static Qpsol* creator(const std::string& name,
                                      const std::map<std::string, Sparsity>& st) {
       return new CplexInterface(name, st);
     }

@@ -24,7 +24,7 @@
 
 
 #include "core/casadi.hpp"
-#include "interfaces/ooqp/ooqp_solver.hpp"
+#include "interfaces/ooqp/ooqpsol.hpp"
 #include <ctime>
 
 using namespace std;
@@ -58,18 +58,18 @@ int main() {
   ubA(0) = 2.0;
   
   for(int rep=0; rep<2; ++rep){
-    OOQpSolver qp_solver(H.sparsity(), A.sparsity());
-    qp_solver.init();
-    qp_solver.setInput(A,"a");
-    qp_solver.setInput(H,"h");
-    qp_solver.setInput(g,"g");
-    qp_solver.setInput(lb,"lbx");
-    qp_solver.setInput(ub,"ubx");
-    qp_solver.setInput(lbA,"lba");
-    qp_solver.setInput(ubA,"uba");
-    qp_solver.evaluate();
-    qp_solver.evaluate();
-    qp_solver.evaluate();
+    OOQpsol qpsol(H.sparsity(), A.sparsity());
+    qpsol.init();
+    qpsol.setInput(A,"a");
+    qpsol.setInput(H,"h");
+    qpsol.setInput(g,"g");
+    qpsol.setInput(lb,"lbx");
+    qpsol.setInput(ub,"ubx");
+    qpsol.setInput(lbA,"lba");
+    qpsol.setInput(ubA,"uba");
+    qpsol.evaluate();
+    qpsol.evaluate();
+    qpsol.evaluate();
   }
     
   return 0;

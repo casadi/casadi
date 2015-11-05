@@ -43,7 +43,7 @@ public:
   void simulate(double drag_true, double depth_true);
 
   // Transscribe as an NLP
-  void transcribe(bool single_shooting, bool gauss_newton, bool codegen, bool ipopt_as_qp_solver, bool regularize, double reg_threshold);
+  void transcribe(bool single_shooting, bool gauss_newton, bool codegen, bool ipopt_as_qpsol, bool regularize, double reg_threshold);
   
   // Solve the NLP
   void optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est);
@@ -265,7 +265,7 @@ void Tester::simulate(double drag_true, double depth_true){
 }
 
 
-void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, bool ipopt_as_qp_solver, bool regularize, double reg_threshold){
+void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, bool ipopt_as_qpsol, bool regularize, double reg_threshold){
   
   // NLP variables
   MX P = MX::sym("P",2);
@@ -342,13 +342,13 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   opts["name_x"] = vector<string>{"drag", "depth"};
   opts["print_x"] = range(2);
 
-  if(ipopt_as_qp_solver){
-    opts["qp_solver"] = "nlp";
+  if(ipopt_as_qpsol){
+    opts["qpsol"] = "nlp";
     Dict nlp_opts = {{"tol", 1e-12}, {"print_level", 0}, {"print_time", false}};
-    opts["qp_solver_options"] = Dict{{"nlp_solver", "ipopt"}, {"nlp_solver_options", nlp_opts}};
+    opts["qpsol_options"] = Dict{{"nlp_solver", "ipopt"}, {"nlp_solver_options", nlp_opts}};
   } else {
-    opts["qp_solver"] = "qpoases";
-    opts["qp_solver_options"] = Dict{{"printLevel", "none"}};
+    opts["qpsol"] = "qpoases";
+    opts["qpsol_options"] = Dict{{"printLevel", "none"}};
   }
 
   // Create NLP solver instance
@@ -396,7 +396,7 @@ int main(){
   double drag_true = 2.0, depth_true = 0.01;
   
   // Use IPOPT as QP solver (can handle non-convex QPs)
-  bool ipopt_as_qp_solver = false;
+  bool ipopt_as_qpsol = false;
 
   // Use Gauss-Newton method
   bool gauss_newton = true;
@@ -462,7 +462,7 @@ int main(){
 
     // Transcribe as an NLP
     bool single_shooting = sol==0;
-    t.transcribe(single_shooting, gauss_newton, codegen, ipopt_as_qp_solver, regularize, reg_threshold);
+    t.transcribe(single_shooting, gauss_newton, codegen, ipopt_as_qpsol, regularize, reg_threshold);
   
     // Run tests
     for(int test=0; test<n_tests; ++test){

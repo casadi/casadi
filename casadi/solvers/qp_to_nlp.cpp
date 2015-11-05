@@ -29,8 +29,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_NLP_EXPORT
-  casadi_register_qpsolver_nlpsol(QpSolver::Plugin* plugin) {
+  int CASADI_QPSOL_NLPSOL_EXPORT
+  casadi_register_qpsol_nlpsol(Qpsol::Plugin* plugin) {
     plugin->creator = QpToNlp::creator;
     plugin->name = "nlpsol";
     plugin->doc = QpToNlp::meta_doc.c_str();
@@ -40,12 +40,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_NLP_EXPORT casadi_load_qpsolver_nlpsol() {
-    QpSolver::registerPlugin(casadi_register_qpsolver_nlpsol);
+  void CASADI_QPSOL_NLPSOL_EXPORT casadi_load_qpsol_nlpsol() {
+    Qpsol::registerPlugin(casadi_register_qpsol_nlpsol);
   }
 
   QpToNlp::QpToNlp(const std::string& name, const std::map<std::string, Sparsity> &st)
-    : QpSolver(name, st) {
+    : Qpsol(name, st) {
 
     Adaptor<QpToNlp, Nlpsol>::addOptions();
   }
@@ -60,22 +60,22 @@ namespace casadi {
 
     // Pass inputs of QP to NLP form
 
-    std::copy(input(QP_SOLVER_H).data().begin(),
-              input(QP_SOLVER_H).data().end(),
-              solver_.input(NLPSOL_P).data().begin()+k); k+= input(QP_SOLVER_H).nnz();
-    std::copy(input(QP_SOLVER_G).data().begin(),
-              input(QP_SOLVER_G).data().end(),
-              solver_.input(NLPSOL_P).data().begin()+k); k+= input(QP_SOLVER_G).nnz();
-    std::copy(input(QP_SOLVER_A).data().begin(),
-              input(QP_SOLVER_A).data().end(),
+    std::copy(input(QPSOL_H).data().begin(),
+              input(QPSOL_H).data().end(),
+              solver_.input(NLPSOL_P).data().begin()+k); k+= input(QPSOL_H).nnz();
+    std::copy(input(QPSOL_G).data().begin(),
+              input(QPSOL_G).data().end(),
+              solver_.input(NLPSOL_P).data().begin()+k); k+= input(QPSOL_G).nnz();
+    std::copy(input(QPSOL_A).data().begin(),
+              input(QPSOL_A).data().end(),
               solver_.input(NLPSOL_P).data().begin()+k);
 
 
-    solver_.input(NLPSOL_LBX).set(input(QP_SOLVER_LBX));
-    solver_.input(NLPSOL_UBX).set(input(QP_SOLVER_UBX));
+    solver_.input(NLPSOL_LBX).set(input(QPSOL_LBX));
+    solver_.input(NLPSOL_UBX).set(input(QPSOL_UBX));
 
-    solver_.input(NLPSOL_LBG).set(input(QP_SOLVER_LBA));
-    solver_.input(NLPSOL_UBG).set(input(QP_SOLVER_UBA));
+    solver_.input(NLPSOL_LBG).set(input(QPSOL_LBA));
+    solver_.input(NLPSOL_UBG).set(input(QPSOL_UBA));
 
     // Delegate computation to NLP Solver
     solver_.evaluate();
@@ -84,23 +84,23 @@ namespace casadi {
     stats_["nlpsol_stats"] = solver_.getStats();
 
     // Read the outputs from Ipopt
-    output(QP_SOLVER_X).set(solver_.output(NLPSOL_X));
-    output(QP_SOLVER_COST).set(solver_.output(NLPSOL_F));
-    output(QP_SOLVER_LAM_A).set(solver_.output(NLPSOL_LAM_G));
-    output(QP_SOLVER_LAM_X).set(solver_.output(NLPSOL_LAM_X));
+    output(QPSOL_X).set(solver_.output(NLPSOL_X));
+    output(QPSOL_COST).set(solver_.output(NLPSOL_F));
+    output(QPSOL_LAM_A).set(solver_.output(NLPSOL_LAM_G));
+    output(QPSOL_LAM_X).set(solver_.output(NLPSOL_LAM_X));
   }
 
   void QpToNlp::init() {
     // Initialize the base classes
-    QpSolver::init();
+    Qpsol::init();
 
     // Create a symbolic matrix for the decision variables
     SX X = SX::sym("X", n_, 1);
 
     // Parameters to the problem
-    SX H = SX::sym("H", input(QP_SOLVER_H).sparsity());
-    SX G = SX::sym("G", input(QP_SOLVER_G).sparsity());
-    SX A = SX::sym("A", input(QP_SOLVER_A).sparsity());
+    SX H = SX::sym("H", input(QPSOL_H).sparsity());
+    SX G = SX::sym("G", input(QPSOL_G).sparsity());
+    SX A = SX::sym("A", input(QPSOL_A).sparsity());
 
     // Put parameters in a vector
     std::vector< SX > par;

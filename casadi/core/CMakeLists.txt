@@ -93,9 +93,9 @@ set(CASADI_SRCS
   function/linsol.hpp              function/linsol.cpp
   function/rootfinder.hpp          function/rootfinder.cpp
   function/integrator.hpp          function/integrator.cpp
-  function/nlpsol.hpp          function/nlpsol.cpp
+  function/nlpsol.hpp              function/nlpsol.cpp
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
-  function/qp_solver.hpp           function/qp_solver.cpp
+  function/qpsol.hpp               function/qpsol.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/wrapper.hpp             function/adaptor.hpp
   function/switch.hpp              function/switch.cpp

@@ -1126,14 +1126,14 @@ namespace casadi {
     ///@{
     /// Check if a particular plugin is available
     static bool has_integrator(const std::string& name);
-    static bool has_qp_solver(const std::string& name);
+    static bool has_qpsol(const std::string& name);
     static bool has_nlpsol(const std::string& name);
     static bool has_linsol(const std::string& name);
     ///@}
 
     ///@{
     /// Explicitly load a plugin dynamically
-    static void load_qp_solver(const std::string& name);
+    static void load_qpsol(const std::string& name);
     static void load_integrator(const std::string& name);
     static void load_nlpsol(const std::string& name);
     static void load_linsol(const std::string& name);
@@ -1142,7 +1142,7 @@ namespace casadi {
     ///@{
     /// Get the documentation string for a plugin
     static std::string doc_integrator(const std::string& name);
-    static std::string doc_qp_solver(const std::string& name);
+    static std::string doc_qpsol(const std::string& name);
     static std::string doc_nlpsol(const std::string& name);
     static std::string doc_linsol(const std::string& name);
     ///@}
@@ -1410,33 +1410,33 @@ namespace casadi {
         \author Joel Andersson
         \date 2011-2015
     */
-    static Function qp_solver(const std::string& name, const std::string& solver,
+    static Function qpsol(const std::string& name, const std::string& solver,
                               const SpDict& qp, const Dict& opts=Dict());
     ///@}
 
     /** Generate native code in the interfaced language for debugging */
-    void qp_solver_debug(const std::string &filename) const;
+    void qpsol_debug(const std::string &filename) const;
 
     /** Generate native code in the interfaced language for debugging */
-    void qp_solver_debug(std::ostream &file) const;
+    void qpsol_debug(std::ostream &file) const;
 
     /** \brief Get input scheme of QP solvers */
-    static std::vector<std::string> qp_solver_in();
+    static std::vector<std::string> qpsol_in();
 
     /** \brief Get QP solver output scheme of QP solvers */
-    static std::vector<std::string> qp_solver_out();
+    static std::vector<std::string> qpsol_out();
 
     /** \brief Get QP solver input scheme name by index */
-    static std::string qp_solver_in(int ind);
+    static std::string qpsol_in(int ind);
 
     /** \brief Get output scheme name by index */
-    static std::string qp_solver_out(int ind);
+    static std::string qpsol_out(int ind);
 
     /** \brief Get the number of QP solver inputs */
-    static int qp_solver_n_in();
+    static int qpsol_n_in();
 
     /** \brief Get the number of QP solver outputs */
-    static int qp_solver_n_out();
+    static int qpsol_n_out();
 
 #ifndef SWIG
     protected:

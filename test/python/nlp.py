@@ -45,9 +45,9 @@ if Function.has_nlpsol("snopt"):
   solvers.append(("snopt",{"Verify level": 3,"detect_linear": True,"Major optimality tolerance":1e-12,"Minor feasibility tolerance":1e-12,"Major feasibility tolerance":1e-12}))
 
 if Function.has_nlpsol("ipopt") and Function.has_nlpsol("sqpmethod"):
-  qp_solver_options = {"nlpsol": "ipopt", "nlpsol_options": {"tol": 1e-12} }
-  solvers.append(("sqpmethod",{"qp_solver": "nlpsol","qp_solver_options": qp_solver_options}))
-  solvers.append(("sqpmethod",{"qp_solver": "nlpsol","qp_solver_options": qp_solver_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
+  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"tol": 1e-12} }
+  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
+  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
 
 print solvers
 """

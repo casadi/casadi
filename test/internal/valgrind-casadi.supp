@@ -216,7 +216,7 @@
    fun:_dl_catch_error
    fun:_dlerror_run
    fun:dlopen@@GLIBC_2.2.5
-   fun:_ZN6casadi15PluginInterfaceINS_16QpSolverInternalEE10loadPluginERKSs
+   fun:_ZN6casadi15PluginInterfaceINS_16QpsolInternalEE10loadPluginERKSs
 }
 
 {

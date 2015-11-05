@@ -25,7 +25,7 @@
 #include <core/casadi.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <nonlinear_programming/nlp_qp_solver.hpp>
+#include <nonlinear_programming/nlp_qpsol.hpp>
 #include <nonlinear_programming/scpgen.hpp>
 
 #include <iomanip>
@@ -121,21 +121,21 @@ int main(){
   // Print the variables
   solver.setOption("print_x",range(0,n,5));
 
-  Dictionary qp_solver_options;
+  Dictionary qpsol_options;
   if(false){
-    solver.setOption("qp_solver",NLPQpSolver::creator);
-    qp_solver_options["nlp_solver"] = IpoptSolver::creator;
+    solver.setOption("qpsol",NLPQpsol::creator);
+    qpsol_options["nlp_solver"] = IpoptSolver::creator;
     Dictionary nlp_solver_options;
     nlp_solver_options["tol"] = 1e-12;
     nlp_solver_options["print_level"] = 0;
     nlp_solver_options["print_time"] = false;
-    qp_solver_options["nlp_solver_options"] = nlp_solver_options;
+    qpsol_options["nlp_solver_options"] = nlp_solver_options;
       
   } else {
-    solver.setOption("qp_solver",QPOasesSolver::creator);
-    qp_solver_options["printLevel"] = "none";
+    solver.setOption("qpsol",QPOasesSolver::creator);
+    qpsol_options["printLevel"] = "none";
   }
-  solver.setOption("qp_solver_options",qp_solver_options);
+  solver.setOption("qpsol_options",qpsol_options);
 
   solver.init();
     

@@ -41,8 +41,8 @@ def loadAllCompiledPlugins():
       casadi.Function.load_integrator(name)
     elif cls=='NlpSolver':
       casadi.Function.load_nlpsol(name)
-    elif cls=='QpSolver':
-      casadi.Function.load_qp_solver(name)
+    elif cls=='Qpsol':
+      casadi.Function.load_qpsol(name)
     elif cls=='Rootfinder':
       casadi.Function.load_rootfinder(name)
     else:

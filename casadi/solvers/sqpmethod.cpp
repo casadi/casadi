@@ -56,9 +56,9 @@ namespace casadi {
     : Nlpsol(name, nlp) {
 
     casadi_warning("The SQP method is under development");
-    addOption("qp_solver",         OT_STRING,   GenericType(),
+    addOption("qpsol",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
-    addOption("qp_solver_options", OT_DICT, GenericType(),
+    addOption("qpsol_options", OT_DICT, GenericType(),
               "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "limited-memory|exact");
@@ -128,15 +128,15 @@ namespace casadi {
         : jacG().sparsity_out(0);
 
     // QP solver options
-    Dict qp_solver_options;
-    if (hasSetOption("qp_solver_options")) {
-      qp_solver_options = option("qp_solver_options");
+    Dict qpsol_options;
+    if (hasSetOption("qpsol_options")) {
+      qpsol_options = option("qpsol_options");
     }
 
     // Allocate a QP solver
-    qp_solver_ = Function::qp_solver("qp_solver", option("qp_solver"),
+    qpsol_ = Function::qpsol("qpsol", option("qpsol"),
                                      {{"h", H_sparsity}, {"a", A_sparsity}},
-                                     qp_solver_options);
+                                     qpsol_options);
 
     // Lagrange multipliers of the NLP
     mu_.resize(ng_);
@@ -916,24 +916,24 @@ namespace casadi {
                              std::vector<double>& lambda_A_opt) {
 
     // Pass data to QP solver
-    qp_solver_.setInput(H, QP_SOLVER_H);
-    qp_solver_.setInputNZ(g, QP_SOLVER_G);
+    qpsol_.setInput(H, QPSOL_H);
+    qpsol_.setInputNZ(g, QPSOL_G);
 
     // Hot-starting if possible
-    qp_solver_.setInputNZ(x_opt, QP_SOLVER_X0);
+    qpsol_.setInputNZ(x_opt, QPSOL_X0);
 
     //TODO(Joel): Fix hot-starting of dual variables
-    //qp_solver_.setInput(lambda_A_opt, QP_SOLVER_LAMBDA_INIT);
+    //qpsol_.setInput(lambda_A_opt, QPSOL_LAMBDA_INIT);
 
     // Pass simple bounds
-    qp_solver_.setInputNZ(lbx, QP_SOLVER_LBX);
-    qp_solver_.setInputNZ(ubx, QP_SOLVER_UBX);
+    qpsol_.setInputNZ(lbx, QPSOL_LBX);
+    qpsol_.setInputNZ(ubx, QPSOL_UBX);
 
     // Pass linear bounds
     if (ng_>0) {
-      qp_solver_.setInput(A, QP_SOLVER_A);
-      qp_solver_.setInputNZ(lbA, QP_SOLVER_LBA);
-      qp_solver_.setInputNZ(ubA, QP_SOLVER_UBA);
+      qpsol_.setInput(A, QPSOL_A);
+      qpsol_.setInputNZ(lbA, QPSOL_LBA);
+      qpsol_.setInputNZ(ubA, QPSOL_UBA);
     }
 
     if (monitored("qp")) {
@@ -949,12 +949,12 @@ namespace casadi {
     }
 
     // Solve the QP
-    qp_solver_.evaluate();
+    qpsol_.evaluate();
 
     // Get the optimal solution
-    qp_solver_.getOutputNZ(x_opt, QP_SOLVER_X);
-    qp_solver_.getOutputNZ(lambda_x_opt, QP_SOLVER_LAM_X);
-    qp_solver_.getOutputNZ(lambda_A_opt, QP_SOLVER_LAM_A);
+    qpsol_.getOutputNZ(x_opt, QPSOL_X);
+    qpsol_.getOutputNZ(lambda_x_opt, QPSOL_LAM_X);
+    qpsol_.getOutputNZ(lambda_A_opt, QPSOL_LAM_A);
     if (monitored("dx")) {
       userOut() << "dx = " << x_opt << endl;
     }

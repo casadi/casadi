@@ -56,9 +56,9 @@ namespace casadi {
   Scpgen::Scpgen(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
     casadi_warning("SCPgen is under development");
-    addOption("qp_solver",         OT_STRING,   GenericType(),
+    addOption("qpsol",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
-    addOption("qp_solver_options", OT_DICT, GenericType(),
+    addOption("qpsol_options", OT_DICT, GenericType(),
               "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "gauss-newton|exact");
@@ -581,15 +581,15 @@ namespace casadi {
     qpB_.resize(ng_);
 
     // QP solver options
-    Dict qp_solver_options;
-    if (hasSetOption("qp_solver_options")) {
-      qp_solver_options = option("qp_solver_options");
+    Dict qpsol_options;
+    if (hasSetOption("qpsol_options")) {
+      qpsol_options = option("qpsol_options");
     }
 
     // Allocate a QP solver
-    qp_solver_ = Function::qp_solver("qp_solver", option("qp_solver"),
+    qpsol_ = Function::qpsol("qpsol", option("qpsol"),
                                      {{"h", qpH_.sparsity()}, {"a", qpA_.sparsity()}},
-                                     qp_solver_options);
+                                     qpsol_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
     }
@@ -1097,32 +1097,32 @@ namespace casadi {
     double time1 = clock();
 
     // Solve the QP
-    qp_solver_.setInput(qpH_, QP_SOLVER_H);
-    qp_solver_.setInputNZ(gf_, QP_SOLVER_G);
-    qp_solver_.setInput(qpA_, QP_SOLVER_A);
+    qpsol_.setInput(qpH_, QPSOL_H);
+    qpsol_.setInputNZ(gf_, QPSOL_G);
+    qpsol_.setInput(qpA_, QPSOL_A);
     std::transform(x_lb_.begin(), x_lb_.end(), x_opt_.begin(),
-                   qp_solver_.input(QP_SOLVER_LBX)->begin(), std::minus<double>());
+                   qpsol_.input(QPSOL_LBX)->begin(), std::minus<double>());
     std::transform(x_ub_.begin(), x_ub_.end(), x_opt_.begin(),
-                   qp_solver_.input(QP_SOLVER_UBX)->begin(), std::minus<double>());
+                   qpsol_.input(QPSOL_UBX)->begin(), std::minus<double>());
     std::transform(g_lb_.begin(), g_lb_.end(), qpB_.begin(),
-                   qp_solver_.input(QP_SOLVER_LBA)->begin(), std::minus<double>());
+                   qpsol_.input(QPSOL_LBA)->begin(), std::minus<double>());
     std::transform(g_ub_.begin(), g_ub_.end(), qpB_.begin(),
-                   qp_solver_.input(QP_SOLVER_UBA)->begin(), std::minus<double>());
+                   qpsol_.input(QPSOL_UBA)->begin(), std::minus<double>());
 
-    qp_solver_.evaluate();
+    qpsol_.evaluate();
 
     // Condensed primal step
-    const DMatrix& du = qp_solver_.output(QP_SOLVER_X);
+    const DMatrix& du = qpsol_.output(QPSOL_X);
     copy(du->begin(), du->end(), x_step_.begin());
 
     // Condensed dual step (simple bounds)
-    const DMatrix& lam_x_new = qp_solver_.output(QP_SOLVER_LAM_X);
+    const DMatrix& lam_x_new = qpsol_.output(QPSOL_LAM_X);
     copy(lam_x_new->begin(), lam_x_new->end(), x_dlam_.begin());
     std::transform(x_dlam_.begin(), x_dlam_.end(), x_lam_.begin(), x_dlam_.begin(),
                    std::minus<double>());
 
     // Condensed dual step (nonlinear bounds)
-    const DMatrix& lam_g_new = qp_solver_.output(QP_SOLVER_LAM_A);
+    const DMatrix& lam_g_new = qpsol_.output(QPSOL_LAM_A);
     copy(lam_g_new->begin(), lam_g_new->end(), g_dlam_.begin());
     std::transform(g_dlam_.begin(), g_dlam_.end(), g_lam_.begin(), g_dlam_.begin(),
                    std::minus<double>());
@@ -1143,8 +1143,8 @@ namespace casadi {
 
     // Calculate penalty parameter of merit function
     sigma_ = merit_start_;
-    sigma_ = std::max(sigma_, 1.01*norm_inf(qp_solver_.output(QP_SOLVER_LAM_X).data()));
-    sigma_ = std::max(sigma_, 1.01*norm_inf(qp_solver_.output(QP_SOLVER_LAM_A).data()));
+    sigma_ = std::max(sigma_, 1.01*norm_inf(qpsol_.output(QPSOL_LAM_X).data()));
+    sigma_ = std::max(sigma_, 1.01*norm_inf(qpsol_.output(QPSOL_LAM_A).data()));
 
     // Calculate L1-merit function in the actual iterate
     double l1_infeas = primalInfeasibility();

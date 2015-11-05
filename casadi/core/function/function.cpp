@@ -33,7 +33,7 @@
 #include "switch.hpp"
 #include "kernel_sum.hpp"
 #include "integrator.hpp"
-#include "qp_solver.hpp"
+#include "qpsol.hpp"
 #include "nlpsol.hpp"
 #include "rootfinder.hpp"
 #include "linsol.hpp"
@@ -1435,16 +1435,16 @@ namespace casadi {
     return Integrator::getPlugin(name).doc;
   }
 
-  bool Function::has_qp_solver(const string& name) {
-    return QpSolver::hasPlugin(name);
+  bool Function::has_qpsol(const string& name) {
+    return Qpsol::hasPlugin(name);
   }
 
-  void Function::load_qp_solver(const string& name) {
-    QpSolver::loadPlugin(name);
+  void Function::load_qpsol(const string& name) {
+    Qpsol::loadPlugin(name);
   }
 
-  string Function::doc_qp_solver(const string& name) {
-    return QpSolver::getPlugin(name).doc;
+  string Function::doc_qpsol(const string& name) {
+    return Qpsol::getPlugin(name).doc;
   }
 
   bool Function::has_nlpsol(const string& name) {
@@ -1705,73 +1705,73 @@ namespace casadi {
     return NLPSOL_NUM_OUT;
   }
 
-  Function Function::qp_solver(const string& name, const string& solver,
+  Function Function::qpsol(const string& name, const string& solver,
                                const SpDict& qp, const Dict& opts) {
     Function ret;
-    ret.assignNode(QpSolver::instantiatePlugin(name, solver, qp));
+    ret.assignNode(Qpsol::instantiatePlugin(name, solver, qp));
     ret.setOption(opts);
     ret.init();
     return ret;
   }
 
-  void Function::qp_solver_debug(const string &filename) const {
+  void Function::qpsol_debug(const string &filename) const {
     ofstream file;
     file.open(filename.c_str());
-    qp_solver_debug(file);
+    qpsol_debug(file);
   }
 
-  void Function::qp_solver_debug(ostream &file) const {
+  void Function::qpsol_debug(ostream &file) const {
     casadi_assert(!isNull());
-    const QpSolver* n = dynamic_cast<const QpSolver*>(get());
+    const Qpsol* n = dynamic_cast<const Qpsol*>(get());
     casadi_assert_message(n!=0, "Not a QP solver");
     return n->generateNativeCode(file);
   }
 
-  vector<string> Function::qp_solver_in() {
-    vector<string> ret(qp_solver_n_in());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=qp_solver_in(i);
+  vector<string> Function::qpsol_in() {
+    vector<string> ret(qpsol_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=qpsol_in(i);
     return ret;
   }
 
-  vector<string> Function::qp_solver_out() {
-    vector<string> ret(qp_solver_n_out());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=qp_solver_out(i);
+  vector<string> Function::qpsol_out() {
+    vector<string> ret(qpsol_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=qpsol_out(i);
     return ret;
   }
 
-  string Function::qp_solver_in(int ind) {
-    switch (static_cast<QpSolverInput>(ind)) {
-    case QP_SOLVER_H:      return "h";
-    case QP_SOLVER_G:      return "g";
-    case QP_SOLVER_A:      return "a";
-    case QP_SOLVER_LBA:    return "lba";
-    case QP_SOLVER_UBA:    return "uba";
-    case QP_SOLVER_LBX:    return "lbx";
-    case QP_SOLVER_UBX:    return "ubx";
-    case QP_SOLVER_X0:     return "x0";
-    case QP_SOLVER_LAM_X0: return "lam_x0";
-    case QP_SOLVER_NUM_IN: break;
+  string Function::qpsol_in(int ind) {
+    switch (static_cast<QpsolInput>(ind)) {
+    case QPSOL_H:      return "h";
+    case QPSOL_G:      return "g";
+    case QPSOL_A:      return "a";
+    case QPSOL_LBA:    return "lba";
+    case QPSOL_UBA:    return "uba";
+    case QPSOL_LBX:    return "lbx";
+    case QPSOL_UBX:    return "ubx";
+    case QPSOL_X0:     return "x0";
+    case QPSOL_LAM_X0: return "lam_x0";
+    case QPSOL_NUM_IN: break;
     }
     return string();
   }
 
-  string Function::qp_solver_out(int ind) {
-    switch (static_cast<QpSolverOutput>(ind)) {
-    case QP_SOLVER_X:     return "x";
-    case QP_SOLVER_COST:  return "cost";
-    case QP_SOLVER_LAM_A: return "lam_a";
-    case QP_SOLVER_LAM_X: return "lam_x";
-    case QP_SOLVER_NUM_OUT: break;
+  string Function::qpsol_out(int ind) {
+    switch (static_cast<QpsolOutput>(ind)) {
+    case QPSOL_X:     return "x";
+    case QPSOL_COST:  return "cost";
+    case QPSOL_LAM_A: return "lam_a";
+    case QPSOL_LAM_X: return "lam_x";
+    case QPSOL_NUM_OUT: break;
     }
     return string();
   }
 
-  int Function::qp_solver_n_in() {
-    return QP_SOLVER_NUM_IN;
+  int Function::qpsol_n_in() {
+    return QPSOL_NUM_IN;
   }
 
-  int Function::qp_solver_n_out() {
-    return QP_SOLVER_NUM_OUT;
+  int Function::qpsol_n_out() {
+    return QPSOL_NUM_OUT;
   }
 
   Function Function::linsol(const std::string& name, const std::string& solver,

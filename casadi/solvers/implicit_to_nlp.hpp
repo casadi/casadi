@@ -29,7 +29,7 @@
 #include "casadi/core/function/rootfinder.hpp"
 #include "casadi/core/function/nlpsol.hpp"
 
-#include <casadi/solvers/casadi_rootfinder_nlp_export.h>
+#include <casadi/solvers/casadi_rootfinder_nlpsol_export.h>
 
 /** \defgroup plugin_Rootfinder_nlp
   Use an Nlpsol as Rootfinder solver
@@ -47,7 +47,7 @@ namespace casadi {
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_ROOTFINDER_NLP_EXPORT QpToImplicit : public Rootfinder,
+  class CASADI_ROOTFINDER_NLPSOL_EXPORT QpToImplicit : public Rootfinder,
     public Adaptor<QpToImplicit, Nlpsol> {
   public:
     /** \brief  Constructor */
@@ -62,7 +62,7 @@ namespace casadi {
     }
 
     // Get name of the plugin
-    virtual const char* plugin_name() const { return "nlp";}
+    virtual const char* plugin_name() const { return "nlpsol";}
 
     /** \brief  Initialize */
     virtual void init();

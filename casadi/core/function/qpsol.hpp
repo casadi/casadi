@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_QP_SOLVER_HPP
-#define CASADI_QP_SOLVER_HPP
+#ifndef CASADI_QPSOL_HPP
+#define CASADI_QPSOL_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -42,20 +42,20 @@ namespace casadi {
 
   /// Internal class
   class CASADI_EXPORT
-  QpSolver : public FunctionInternal,
-                     public PluginInterface<QpSolver> {
+  Qpsol : public FunctionInternal,
+                     public PluginInterface<Qpsol> {
   public:
 
     // Constructor
-    QpSolver(const std::string& name, const std::map<std::string, Sparsity> &st);
+    Qpsol(const std::string& name, const std::map<std::string, Sparsity> &st);
 
     // Destructor
-    virtual ~QpSolver() = 0;
+    virtual ~Qpsol() = 0;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return QP_SOLVER_NUM_IN;}
-    virtual size_t get_n_out() const { return QP_SOLVER_NUM_OUT;}
+    virtual size_t get_n_in() const { return QPSOL_NUM_IN;}
+    virtual size_t get_n_out() const { return QPSOL_NUM_OUT;}
     ///@}
 
     /// @{
@@ -80,7 +80,7 @@ namespace casadi {
     virtual void generateNativeCode(std::ostream& file) const;
 
     // Creator function for internal class
-    typedef QpSolver* (*Creator)(const std::string& name,
+    typedef Qpsol* (*Creator)(const std::string& name,
                                          const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
@@ -113,5 +113,5 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_QP_SOLVER_HPP
+#endif // CASADI_QPSOL_HPP
 

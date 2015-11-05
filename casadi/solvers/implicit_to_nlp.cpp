@@ -29,7 +29,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_ROOTFINDER_NLP_EXPORT
+  int CASADI_ROOTFINDER_NLPSOL_EXPORT
   casadi_register_rootfinder_nlpsol(Rootfinder::Plugin* plugin) {
     plugin->creator = QpToImplicit::creator;
     plugin->name = "nlpsol";
@@ -40,7 +40,7 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_ROOTFINDER_NLP_EXPORT casadi_load_rootfinder_nlpsol() {
+  void CASADI_ROOTFINDER_NLPSOL_EXPORT casadi_load_rootfinder_nlpsol() {
     Rootfinder::registerPlugin(casadi_register_rootfinder_nlpsol);
   }
 

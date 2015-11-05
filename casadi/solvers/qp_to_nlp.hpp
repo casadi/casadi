@@ -26,30 +26,30 @@
 #ifndef CASADI_QP_TO_NLP_HPP
 #define CASADI_QP_TO_NLP_HPP
 
-#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/function/qpsol.hpp"
 #include "casadi/core/function/nlpsol.hpp"
 
-#include <casadi/solvers/casadi_qpsolver_nlp_export.h>
+#include <casadi/solvers/casadi_qpsol_nlpsol_export.h>
 
 
-/** \defgroup plugin_QpSolver_nlp
+/** \defgroup plugin_Qpsol_nlp
    Solve QPs using an Nlpsol
 */
 
-/** \pluginsection{QpSolver,nlp} */
+/** \pluginsection{Qpsol,nlp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{QpSolver,nlp}
+  /** \brief \pluginbrief{Qpsol,nlp}
 
-   @copydoc QpSolver_doc
-   @copydoc plugin_QpSolver_nlp
+   @copydoc Qpsol_doc
+   @copydoc plugin_Qpsol_nlp
 
    \author Joris Gillis
    \date 2011
   */
-class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolver,
+class CASADI_QPSOL_NLPSOL_EXPORT QpToNlp : public Qpsol,
   public Adaptor<QpToNlp, Nlpsol> {
 public:
   /** \brief  Create a new Solver */
@@ -57,7 +57,7 @@ public:
                    const std::map<std::string, Sparsity> &st);
 
   /** \brief  Create a new QP Solver */
-  static QpSolver* creator(const std::string& name,
+  static Qpsol* creator(const std::string& name,
                                    const std::map<std::string, Sparsity>& st) {
     return new QpToNlp(name, st);
   }
@@ -66,7 +66,7 @@ public:
   virtual ~QpToNlp();
 
   // Get name of the plugin
-  virtual const char* plugin_name() const { return "nlp";}
+  virtual const char* plugin_name() const { return "nlpsol";}
 
   /** \brief  Initialize */
   virtual void init();

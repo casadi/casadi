@@ -28,34 +28,34 @@ import unittest
 from types import *
 from helpers import *
 
-qpsolvers = []
+qpsols = []
 if Function.has_nlpsol("ipopt"):
-  qpsolvers.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options": {"tol": 1e-12}},{}))
+  qpsols.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options": {"tol": 1e-12}},{}))
 
 if Function.has_nlpsol("ipopt"):
-  qpsolvers.append(("nlpsol.ipopt",{"nlpsol_options": {"tol": 1e-12}},{}))
+  qpsols.append(("nlpsol.ipopt",{"nlpsol_options": {"tol": 1e-12}},{}))
 
 # if Function.has_nlpsol("worhp") and not args.ignore_memory_heavy:
-#   qpsolvers.append(("nlpsol",{"nlpsol": "worhp", "nlpsol_options": {"TolOpti": 1e-12}},{}))
+#   qpsols.append(("nlpsol",{"nlpsol": "worhp", "nlpsol_options": {"TolOpti": 1e-12}},{}))
 
 # if Function.has_nlpsol("worhp") and not args.ignore_memory_heavy:
-#   qpsolvers.append(("nlpsol.worhp",{"nlpsol_options": {"TolOpti": 1e-12}},{}))
+#   qpsols.append(("nlpsol.worhp",{"nlpsol_options": {"TolOpti": 1e-12}},{}))
 
-# if Function.has_qp_solver("ooqp"):
-#   qpsolvers.append(("ooqp",{},{}))
+# if Function.has_qpsol("ooqp"):
+#   qpsols.append(("ooqp",{},{}))
 
-# if Function.has_qp_solver("qpoases"):
-#   qpsolvers.append(("qpoases",{},{}))
+# if Function.has_qpsol("qpoases"):
+#   qpsols.append(("qpoases",{},{}))
 
-# if Function.has_qp_solver("cplex"):
-#   qpsolvers.append(("cplex",{},{}))
+# if Function.has_qpsol("cplex"):
+#   qpsols.append(("cplex",{},{}))
 
-# if Function.has_qp_solver("sqic"):
-#   qpsolvers.append(("sqic",{},{}))
+# if Function.has_qpsol("sqic"):
+#   qpsols.append(("sqic",{},{}))
 
-print qpsolvers
+print qpsols
 
-class QpSolverTests(casadiTestCase):
+class QpsolTests(casadiTestCase):
 
   def testboundsviol(self):
   
@@ -70,10 +70,10 @@ class QpSolverTests(casadiTestCase):
     UBX = DMatrix([inf,-inf])
 
 
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("general_convex: " + str(qpsolver))
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -103,10 +103,10 @@ class QpSolverTests(casadiTestCase):
 
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("general_convex: " + str(qpsolver))
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -139,10 +139,10 @@ class QpSolverTests(casadiTestCase):
     
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("general_convex: " + str(qpsolver))
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -159,16 +159,16 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],-1,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput()[0],-1,max(1,6-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([0]),str(qpsolver),digits=max(1,6-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5,max(1,6-less_digits),str(qpsol))
 
   def test_general_convex_dense(self):
-    self.message("Convex dense QP with solvers: " + str([qpsolver for qpsolver,options,aux_options in qpsolvers]))
+    self.message("Convex dense QP with solvers: " + str([qpsol for qpsol,options,aux_options in qpsols]))
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
     A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
@@ -181,10 +181,10 @@ class QpSolverTests(casadiTestCase):
 
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("general_convex: " + str(qpsolver))
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -201,42 +201,42 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,max(1,6-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([3+1.0/9,4.0/9,0]),str(qpsolver),digits=max(1,6-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3+1.0/9,4.0/9,0]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-8-2.0/9,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-8-2.0/9,max(1,6-less_digits),str(qpsol))
       
       solver.setInput(H*4,"h")
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],1,max(1,3-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],1,max(1,3-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("cost"),-6,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput()[0],1,max(1,3-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput()[1],1,max(1,3-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("cost"),-6,max(1,6-less_digits),str(qpsol))
       
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(qpsolver),digits=max(1,2-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(qpsol),digits=max(1,2-less_digits))
       
       solver.setInput(0,"h")
       
-      if 'qcqp' in str(qpsolver): continue # Singular hessian
+      if 'qcqp' in str(qpsol): continue # Singular hessian
 
       solver.evaluate()
-      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("cost"),-9-1.0/3,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("cost"),-9-1.0/3,max(1,6-less_digits),str(qpsol))
       
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([10.0/3,4.0/3,0]),str(qpsolver),digits=max(1,4-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([10.0/3,4.0/3,0]),str(qpsol),digits=max(1,4-less_digits))
 
       solver.setInput([-inf]*3,"lba") #  Upper _and_ lower 
       solver.setInput([inf]*3,"uba")  #  bounds infinite?
@@ -249,18 +249,18 @@ class QpSolverTests(casadiTestCase):
         return
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],5,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],5,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("cost"),-40,max(1,5-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput()[0],5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput()[1],5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("cost"),-40,max(1,5-less_digits),str(qpsol))
       
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],2,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],6,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],2,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],6,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,0,0]),str(qpsolver),digits=max(1,4-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,0,0]),str(qpsol),digits=max(1,4-less_digits))
 
   @memory_heavy()
   def test_general_convex_sparse(self):
-    self.message("Convex sparse QP with solvers: " + str([qpsolver for qpsolver,options,aux_options in qpsolvers]))
+    self.message("Convex sparse QP with solvers: " + str([qpsol for qpsol,options,aux_options in qpsols]))
     H = c.diag([2,1,0.2,0.7,1.3])
 
     H[1,2]=0.1
@@ -277,10 +277,10 @@ class QpSolverTests(casadiTestCase):
     UBX = DMatrix([inf]*5)
 
   
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("general_convex: " + str(qpsolver))
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -297,16 +297,16 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),DMatrix([0.873908,0.95630465,0,0,0]),str(qpsolver),digits=max(1,6-less_digits))
+      self.checkarray(solver.getOutput(),DMatrix([0.873908,0.95630465,0,0,0]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,-0.339076,-10.0873907,-0.252185]),6,str(qpsolver),digits=max(1,6-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,-0.339076,-10.0873907,-0.252185]),6,str(qpsol),digits=max(1,6-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,2.52184767]),str(qpsolver),digits=max(1,6-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,2.52184767]),str(qpsol),digits=max(1,6-less_digits))
 
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-6.264669320767,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-6.264669320767,max(1,6-less_digits),str(qpsol))
 
   def test_general_nonconvex_dense(self):
-    self.message("Non convex dense QP with solvers: " + str([qpsolver for qpsolver,options,aux_options in qpsolvers]))
+    self.message("Non convex dense QP with solvers: " + str([qpsol for qpsol,options,aux_options in qpsols]))
     H = DMatrix([[1,-1],[-1,-2]])
     G = DMatrix([-2,-6])
     A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
@@ -317,11 +317,11 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
 
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("general_nonconvex: " + str(qpsolver))
-      if not("cplex" in str(qpsolver)):
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("general_nonconvex: " + str(qpsol))
+      if not("cplex" in str(qpsol)):
         continue
-      solver = Function.qp_solver("mysolver",qpsolver, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qpsol("mysolver",qpsol, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       solver.setInput(H,"h")
       solver.setInput(G,"g")
@@ -340,11 +340,11 @@ class QpSolverTests(casadiTestCase):
 
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("equality: " + str(qpsolver))
-      if "ooqp" in str(qpsolver):
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("equality: " + str(qpsol))
+      if "ooqp" in str(qpsol):
         continue
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]      
@@ -373,15 +373,15 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],0.5,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],1.25,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput()[0],0.5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput()[1],1.25,max(1,6-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,2,0]),str(qpsolver),digits=max(1,6-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,2,0]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-7.4375,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-7.4375,max(1,6-less_digits),str(qpsol))
     
       A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
       LBA = DMatrix([2,-inf,-inf])
@@ -401,15 +401,15 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],0.4,max(1,4-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],1.6,max(1,4-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput()[0],0.4,max(1,4-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput()[1],1.6,max(1,4-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,5-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,5-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,5-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.2,0,0]),str(qpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.2,0,0]),str(qpsol),digits=max(1,5-less_digits))
        
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-8.4,max(1,5-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-8.4,max(1,5-less_digits),str(qpsol))
 
   @memory_heavy()
   def test_degenerate_hessian(self):
@@ -429,10 +429,10 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([-10])
     UBX = DMatrix([10])
 
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("degenerate hessian: " + str(qpsolver))
-      if 'qcqp' in str(qpsolver): continue
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("degenerate hessian: " + str(qpsol))
+      if 'qcqp' in str(qpsol): continue
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -449,13 +449,13 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),DMatrix([5.5,5,-10]),str(qpsolver),digits=max(1,4-less_digits)) 
+      self.checkarray(solver.getOutput(),DMatrix([5.5,5,-10]),str(qpsol),digits=max(1,4-less_digits)) 
       
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,-2.5]),str(qpsolver),digits=max(1,4-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,-2.5]),str(qpsol),digits=max(1,4-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([1.5]),str(qpsolver),digits=max(1,4-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([1.5]),str(qpsol),digits=max(1,4-less_digits))
        
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-38.375,max(1,5-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-38.375,max(1,5-less_digits),str(qpsol))
         
     
   def test_no_inequality(self):
@@ -474,9 +474,9 @@ class QpSolverTests(casadiTestCase):
     UBX = DMatrix([10])
 
 
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      self.message("no inequality: " + str(qpsolver))
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for qpsol, qp_options, aux_options in qpsols:
+      self.message("no inequality: " + str(qpsol))
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -493,16 +493,16 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.assertAlmostEqual(solver.getOutput()[0],-0.5,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],1,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput()[0],-0.5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput()[1],1,max(1,6-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
 
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.5]),str(qpsolver),digits=max(1,6-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.5]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-3.375,max(1,6-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-3.375,max(1,6-less_digits),str(qpsol))
 
   def test_no_A(self):
     self.message("No A present")
@@ -518,11 +518,11 @@ class QpSolverTests(casadiTestCase):
 
 
  
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      if "cplex" in str(qpsolver):
+    for qpsol, qp_options, aux_options in qpsols:
+      if "cplex" in str(qpsol):
         continue
-      self.message("no A: " + str(qpsolver))
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      self.message("no A: " + str(qpsol))
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -539,13 +539,13 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),DMatrix([10,8]),str(qpsolver),digits=max(1,3-less_digits))
+      self.checkarray(solver.getOutput(),DMatrix([10,8]),str(qpsol),digits=max(1,3-less_digits))
       
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsolver),digits=max(1,4-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsol),digits=max(1,4-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qpsol),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-34,max(1,5-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-34,max(1,5-less_digits),str(qpsol))
       
   def test_standard_form(self):
     H = DMatrix([[1,-1],[-1,2]])
@@ -558,8 +558,8 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([-10])
     UBX = DMatrix([10])
 
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for qpsol, qp_options, aux_options in qpsols:
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       
       try:
@@ -577,13 +577,13 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),DMatrix([-0.2,1.2]),str(qpsolver),digits=max(1,3-less_digits))
+      self.checkarray(solver.getOutput(),DMatrix([-0.2,1.2]),str(qpsol),digits=max(1,3-less_digits))
       
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsolver),digits=max(1,4-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsol),digits=max(1,4-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.4]),str(qpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.4]),str(qpsol),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-5.1,max(1,5-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-5.1,max(1,5-less_digits),str(qpsol))
   
   @memory_heavy()
   def test_badscaling(self):
@@ -600,12 +600,12 @@ class QpSolverTests(casadiTestCase):
     LBX = DMatrix([-1000]*N)
     UBX = DMatrix([1000]*N)
 
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      if 'cplex' in str(qpsolver):
+    for qpsol, qp_options, aux_options in qpsols:
+      if 'cplex' in str(qpsol):
         continue
-      if 'worhp' in str(qpsolver): # works but occasionaly throws segfaults, ulimit on travis?
+      if 'worhp' in str(qpsol): # works but occasionaly throws segfaults, ulimit on travis?
         continue
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -620,9 +620,9 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),x0,str(qpsolver)+str(qp_options),digits=max(1,2-less_digits))
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5*mul([x0.T,H,x0]),max(1,3-less_digits),str(qpsolver))
-      self.checkarray(solver.getOutput("lam_x"),DMatrix.zeros(N,1),str(qpsolver),digits=max(1,4-less_digits))
+      self.checkarray(solver.getOutput(),x0,str(qpsol)+str(qp_options),digits=max(1,2-less_digits))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5*mul([x0.T,H,x0]),max(1,3-less_digits),str(qpsol))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix.zeros(N,1),str(qpsol),digits=max(1,4-less_digits))
       
   def test_redundant(self):
     self.message("Redundant constraints")
@@ -644,9 +644,9 @@ class QpSolverTests(casadiTestCase):
       
       options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
         
-      for qpsolver, qp_options, aux_options in qpsolvers:
-        if 'qcqp' in str(qpsolver): continue
-        solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      for qpsol, qp_options, aux_options in qpsols:
+        if 'qcqp' in str(qpsol): continue
+        solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
           less_digits=aux_options["less_digits"]
@@ -662,10 +662,10 @@ class QpSolverTests(casadiTestCase):
         solver.setInput(UBA,"uba")
         solver.evaluate()
 
-        self.checkarray(solver.getOutput(),DMatrix([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsolver),digits=max(1,6-less_digits))
-        self.assertAlmostEqual(solver.getOutput("cost")[0],-5.850384678537,max(1,5-less_digits),str(qpsolver))
-        self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,0]),str(qpsolver),digits=max(1,6-less_digits))
-        self.checkarray(mul(A.T,solver.getOutput("lam_a")),DMatrix([3.876923073076,2.4384615365384965,-1]),str(qpsolver),digits=max(1,6-less_digits))
+        self.checkarray(solver.getOutput(),DMatrix([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsol),digits=max(1,6-less_digits))
+        self.assertAlmostEqual(solver.getOutput("cost")[0],-5.850384678537,max(1,5-less_digits),str(qpsol))
+        self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,0]),str(qpsol),digits=max(1,6-less_digits))
+        self.checkarray(mul(A.T,solver.getOutput("lam_a")),DMatrix([3.876923073076,2.4384615365384965,-1]),str(qpsol),digits=max(1,6-less_digits))
         
   def test_linear(self):
     H = DMatrix(2,2)
@@ -677,9 +677,9 @@ class QpSolverTests(casadiTestCase):
     G = DMatrix([ 2, 1 ])
 
 
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      if 'qcqp' in str(qpsolver): continue
-      solver = Function.qp_solver("mysolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for qpsol, qp_options, aux_options in qpsols:
+      if 'qcqp' in str(qpsol): continue
+      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -696,12 +696,12 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),DMatrix([0.5,1.5]),str(qpsolver),digits=max(1,5-less_digits))
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput(),DMatrix([0.5,1.5]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsol),digits=max(1,5-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([0.5,-1.5,0]),str(qpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0.5,-1.5,0]),str(qpsol),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],2.5,max(1,5-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],2.5,max(1,5-less_digits),str(qpsol))
       
   def test_linear2(self):
     H = DMatrix(2,2)
@@ -713,10 +713,10 @@ class QpSolverTests(casadiTestCase):
     G = DMatrix([ 2.0, 1.0 ])
 
 
-    for qpsolver, qp_options, aux_options in qpsolvers:
-      if 'qcqp' in str(qpsolver): continue
-      if 'nlp' in str(qpsolver): continue
-      solver = Function.qp_solver("msyolver",qpsolver,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+    for qpsol, qp_options, aux_options in qpsols:
+      if 'qcqp' in str(qpsol): continue
+      if 'nlp' in str(qpsol): continue
+      solver = Function.qpsol("msyolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -733,12 +733,12 @@ class QpSolverTests(casadiTestCase):
 
       solver.evaluate()
 
-      self.checkarray(solver.getOutput(),DMatrix([2,3]),str(qpsolver),digits=max(1,5-less_digits))
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-3]),str(qpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput(),DMatrix([2,3]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-3]),str(qpsol),digits=max(1,5-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(qpsolver),digits=max(1,5-less_digits))
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(qpsol),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],7,max(1,5-less_digits),str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],7,max(1,5-less_digits),str(qpsol))
       
 if __name__ == '__main__':
     unittest.main()

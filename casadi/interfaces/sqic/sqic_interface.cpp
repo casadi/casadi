@@ -24,7 +24,7 @@
 
 
 #include "sqic_interface.hpp"
-#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/function/qpsol.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 
@@ -35,8 +35,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_SQIC_EXPORT
-  casadi_register_qpsolver_sqic(QpSolver::Plugin* plugin) {
+  int CASADI_QPSOL_SQIC_EXPORT
+  casadi_register_qpsol_sqic(Qpsol::Plugin* plugin) {
     plugin->creator = SqicInterface::creator;
     plugin->name = "sqic";
     plugin->doc = SqicInterface::meta_doc.c_str();
@@ -45,11 +45,11 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_SQIC_EXPORT casadi_load_qpsolver_sqic() {
-    QpSolver::registerPlugin(casadi_register_qpsolver_sqic);
+  void CASADI_QPSOL_SQIC_EXPORT casadi_load_qpsol_sqic() {
+    Qpsol::registerPlugin(casadi_register_qpsol_sqic);
   }
 
-  SqicInterface::SqicInterface(const std::map<std::string, Sparsity>& st) : QpSolver(st) {
+  SqicInterface::SqicInterface(const std::map<std::string, Sparsity>& st) : Qpsol(st) {
     is_init_ = false;
   }
 
@@ -60,42 +60,42 @@ namespace casadi {
   void SqicInterface::evaluate() {
     if (inputs_check_) checkInputs();
 
-    std::copy(input(QP_SOLVER_X0)->begin(), input(QP_SOLVER_X0)->end(), x_.begin());
+    std::copy(input(QPSOL_X0)->begin(), input(QPSOL_X0)->end(), x_.begin());
     std::fill(x_.begin()+n_, x_.end(), 0);
 
-    std::transform(input(QP_SOLVER_LAM_X0)->begin(), input(QP_SOLVER_LAM_X0)->end(),
+    std::transform(input(QPSOL_LAM_X0)->begin(), input(QPSOL_LAM_X0)->end(),
                    rc_.begin(), negate<double>());
     std::fill(rc_.begin()+n_, rc_.end(), 0);
 
-    std::copy(input(QP_SOLVER_LBX)->begin(), input(QP_SOLVER_LBX)->end(), bl_.begin());
-    std::copy(input(QP_SOLVER_UBX)->begin(), input(QP_SOLVER_UBX)->end(), bu_.begin());
+    std::copy(input(QPSOL_LBX)->begin(), input(QPSOL_LBX)->end(), bl_.begin());
+    std::copy(input(QPSOL_UBX)->begin(), input(QPSOL_UBX)->end(), bu_.begin());
 
-    std::copy(input(QP_SOLVER_LBA)->begin(), input(QP_SOLVER_LBA)->end(), bl_.begin()+n_);
-    std::copy(input(QP_SOLVER_UBA)->begin(), input(QP_SOLVER_UBA)->end(), bu_.begin()+n_);
+    std::copy(input(QPSOL_LBA)->begin(), input(QPSOL_LBA)->end(), bl_.begin()+n_);
+    std::copy(input(QPSOL_UBA)->begin(), input(QPSOL_UBA)->end(), bu_.begin()+n_);
 
     for (int i=0;i<n_+nc_+1;++i) {
       if (bl_[i]==-std::numeric_limits<double>::infinity()) bl_[i]=-inf_;
       if (bu_[i]==std::numeric_limits<double>::infinity()) bu_[i]=inf_;
     }
 
-    formatA_.setInput(input(QP_SOLVER_A), 0);
-    formatA_.setInput(input(QP_SOLVER_G), 1);
+    formatA_.setInput(input(QPSOL_A), 0);
+    formatA_.setInput(input(QPSOL_G), 1);
     formatA_.evaluate();
 
-    sqicSolve(&output(QP_SOLVER_COST).data()[0]);
+    sqicSolve(&output(QPSOL_COST).data()[0]);
 
-    std::copy(x_.begin(), x_.begin()+n_, output(QP_SOLVER_X)->begin());
-    std::transform(rc_.begin(), rc_.begin()+n_, output(QP_SOLVER_LAM_X)->begin(),
+    std::copy(x_.begin(), x_.begin()+n_, output(QPSOL_X)->begin());
+    std::transform(rc_.begin(), rc_.begin()+n_, output(QPSOL_LAM_X)->begin(),
                    negate<double>());
-    std::transform(rc_.begin()+n_, rc_.begin()+n_+nc_, output(QP_SOLVER_LAM_A)->begin(),
+    std::transform(rc_.begin()+n_, rc_.begin()+n_+nc_, output(QPSOL_LAM_A)->begin(),
                    negate<double>());
 
-    output(QP_SOLVER_COST)[0]+= x_[n_+nc_];
+    output(QPSOL_COST)[0]+= x_[n_+nc_];
   }
 
   void SqicInterface::init() {
     // Call the init method of the base class
-    QpSolver::init();
+    Qpsol::init();
 
     if (is_init_) sqicDestroy();
 
@@ -144,13 +144,13 @@ namespace casadi {
     int m = nc_+1;
 
     int nnzA=formatA_.size_out(0);
-    int nnzH=input(QP_SOLVER_H).size();
+    int nnzH=input(QPSOL_H).size();
 
     std::fill(hEtype_.begin()+n_, hEtype_.end(), 3);
 
     sqic(&m , &n, &nnzA, &indA_[0], &locA_[0], &formatA_.output().data()[0], &bl_[0], &bu_[0],
          &hEtype_[0], &hs_[0], &x_[0], &pi_[0], &rc_[0], &nnzH, &indH_[0], &locH_[0],
-         &input(QP_SOLVER_H).data()[0]);
+         &input(QPSOL_H).data()[0]);
 
   }
 
@@ -210,7 +210,7 @@ namespace casadi {
     int n = n_;
     int m = nc_+1;
     int nnzA=formatA_.size_out(0);
-    int nnzH=input(QP_SOLVER_H).size();
+    int nnzH=input(QPSOL_H).size();
 
     file << "  n = " << n << std::endl;
     file << "  m = " << m << std::endl;
@@ -249,48 +249,48 @@ namespace casadi {
     for (int i=0;i<locH_.size();++i) {
       file << "  locH(" << i +1 << ") = " << locH_[i] << std::endl;
     }
-    for (int i=0;i<input(QP_SOLVER_H).size();++i) {
-      file << "  valH(" << i +1 << ") = " << input(QP_SOLVER_H).at(i) << std::endl;
+    for (int i=0;i<input(QPSOL_H).size();++i) {
+      file << "  valH(" << i +1 << ") = " << input(QPSOL_H).at(i) << std::endl;
     }
-    for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
-      file << "  x(" << i +1 << ") = " << input(QP_SOLVER_X0).at(i) << std::endl;
+    for (int i=0;i<input(QPSOL_X0).size();++i) {
+      file << "  x(" << i +1 << ") = " << input(QPSOL_X0).at(i) << std::endl;
     }
     for (int i=0;i<pi_.size();++i) {
       file << "  pi(" << i +1 << ") = " <<  0 << std::endl; //pi_[i] << std::endl;
     }
-    userOut() << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+    userOut() << "lam_x0:::" << input(QPSOL_LAM_X0) << std::endl;
     for (int i=0;i<rc_.size();++i) {
       file << "  rc(" << i +1 << ") = "
-           << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
+           << ((i<input(QPSOL_LAM_X0).size()) ? -input(QPSOL_LAM_X0).at(i) : 0.0)
            << std::endl;
     }
 
     file << "  call wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, "
          << "hs, x, pi, rc, nnzH, indH, locH, valH)" << std::endl;
-    /**for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
-       file << "  x(" << i +1 << ") = " << input(QP_SOLVER_X0).at(i) << std::endl;
+    /**for (int i=0;i<input(QPSOL_X0).size();++i) {
+       file << "  x(" << i +1 << ") = " << input(QPSOL_X0).at(i) << std::endl;
        }
        for (int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
-       userOut() << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+       userOut() << "lam_x0:::" << input(QPSOL_LAM_X0) << std::endl;
        for (int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
-       << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
+       << ((i<input(QPSOL_LAM_X0).size()) ? -input(QPSOL_LAM_X0).at(i) : 0.0)
        << std::endl;
        }*/
     /**
        file << "  call sqicSolve(Obj)" << std::endl;
-       for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
-       file << "  x(" << i +1 << ") = " << input(QP_SOLVER_X0).at(i) << std::endl;
+       for (int i=0;i<input(QPSOL_X0).size();++i) {
+       file << "  x(" << i +1 << ") = " << input(QPSOL_X0).at(i) << std::endl;
        }
        for (int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
-       userOut() << "lam_x0:::" << input(QP_SOLVER_LAM_X0) << std::endl;
+       userOut() << "lam_x0:::" << input(QPSOL_LAM_X0) << std::endl;
        for (int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
-       << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
+       << ((i<input(QPSOL_LAM_X0).size()) ? -input(QPSOL_LAM_X0).at(i) : 0.0)
        << std::endl;
        }
     */

@@ -112,25 +112,25 @@ tgrid = linspace(0,10,10)
 x = u0
 
 # Create SQP method
-sqp_solver = SQPMethod(ffcn,gfcn)
+sqpsol = SQPMethod(ffcn,gfcn)
 
 # qpOASES
-sqp_solver.setOption("qp_solver",QPOasesSolver)
-sqp_solver.setOption("qp_solver_options",{"printLevel" : "low"})
+sqpsol.setOption("qpsol",QPOasesSolver)
+sqpsol.setOption("qpsol_options",{"printLevel" : "low"})
 
 # OOQP
-#sqp_solver.setOption("qp_solver",OOQpSolver)
+#sqpsol.setOption("qpsol",OOQpsol)
 
-sqp_solver.init()
-sqp_solver.setInput(umin,     "lbx")
-sqp_solver.setInput(umax,     "ubx")
-sqp_solver.setInput(u0,       "x0")
-sqp_solver.setInput(zeros(2), "lbg")
-sqp_solver.setInput(zeros(2), "ubg")
-sqp_solver.evaluate()
+sqpsol.init()
+sqpsol.setInput(umin,     "lbx")
+sqpsol.setInput(umax,     "ubx")
+sqpsol.setInput(u0,       "x0")
+sqpsol.setInput(zeros(2), "lbg")
+sqpsol.setInput(zeros(2), "ubg")
+sqpsol.evaluate()
 
 # Retrieve the solution
-u_opt2 = array(sqp_solver.getOutput("x"))
+u_opt2 = array(sqpsol.getOutput("x"))
 
 # Plot the results
 plt.figure(1)
@@ -178,21 +178,21 @@ G_sparsity = sp_dense(n)
 A_sparsity = jfcn.output().sparsity()
 
 # qpOASES
-qp_solver = QPOasesSolver(H_sparsity,A_sparsity)
-qp_solver.setOption("printLevel","low")
+qpsol = QPOasesSolver(H_sparsity,A_sparsity)
+qpsol.setOption("printLevel","low")
 
 # IPOPT
-#qp_solver =  NLPQpSolver(H_sparsity,A_sparsity)
-#qp_solver.setOption("nlp_solver", IpoptSolver)
+#qpsol =  NLPQpsol(H_sparsity,A_sparsity)
+#qpsol.setOption("nlp_solver", IpoptSolver)
 
 # OOQP
-#qp_solver = OOQpSolver(H_sparsity,A_sparsity)
+#qpsol = OOQpsol(H_sparsity,A_sparsity)
 
-qp_solver.init()
+qpsol.init()
 
 # No bounds on the control
-qp_solver.setInput(-inf,"lbx")
-qp_solver.setInput( inf,"ubx")
+qpsol.setInput(-inf,"lbx")
+qpsol.setInput( inf,"ubx")
 
 # Header
 print ' k  nls | dx         gradL      eq viol    ineq viol'
@@ -217,23 +217,23 @@ while True:
   gfk = DMatrix(ffcn.getAdjSens())
   
   # Pass data to QP solver
-  qp_solver.setInput(Bk,"h")
-  qp_solver.setInput(Jgk,"a")
-  qp_solver.setInput(gfk,"g")
-  qp_solver.setInput(-gk,"lba")
-  qp_solver.setInput(-gk,"uba")
+  qpsol.setInput(Bk,"h")
+  qpsol.setInput(Jgk,"a")
+  qpsol.setInput(gfk,"g")
+  qpsol.setInput(-gk,"lba")
+  qpsol.setInput(-gk,"uba")
 
   # Solve the QP subproblem
-  qp_solver.evaluate()
+  qpsol.evaluate()
 
   # Get the optimal solution
-  p = qp_solver.getOutput("primal")
+  p = qpsol.getOutput("primal")
   
   # Get the dual solution for the inequalities
-  lambda_hat = -qp_solver.getOutput("lambda_a")
+  lambda_hat = -qpsol.getOutput("lambda_a")
   
   # Get the dual solution for the bounds
-  lambda_x_hat = -qp_solver.getOutput("lambda_x")
+  lambda_x_hat = -qpsol.getOutput("lambda_x")
   
   # Get the gradient of the Lagrangian
   gradL = ffcn.getAdjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat

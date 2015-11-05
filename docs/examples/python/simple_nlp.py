@@ -40,8 +40,8 @@ MySolver = "ipopt"
 # Solver options
 opts = {}
 if MySolver=="sqpmethod":
-  opts["qp_solver"] = "qpoases"
-  opts["qp_solver_options"] = {"printLevel":"none"}
+  opts["qpsol"] = "qpoases"
+  opts["qpsol_options"] = {"printLevel":"none"}
 
 # Allocate a solver
 solver = Function.nlpsol("solver", MySolver, nlp, opts)

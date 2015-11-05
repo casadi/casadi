@@ -28,7 +28,7 @@
 
 #include "lifted_sqp.hpp"
 #include "core/function/nlp_solver_internal.hpp"
-#include "core/function/qp_solver.hpp"
+#include "core/function/qpsol.hpp"
 
 namespace casadi{
     
@@ -43,7 +43,7 @@ public:
   virtual void evaluate(int nfdir, int nadir);
   
   /// QP solver for the subproblems
-  QpSolver qp_solver_;
+  Qpsol qpsol_;
 
   /// maximum number of sqp iterations
   int max_iter_; 

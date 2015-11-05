@@ -50,24 +50,24 @@ class OnlineQPBenchMark:
 
 qp = OnlineQPBenchMark('diesel')
 
-qpsolvers = []
+qpsols = []
 try:
-  qpsolvers.append(IpoptQpSolver)
+  qpsols.append(IpoptQpsol)
 except:
   pass
 try:
-  qpsolvers.append(OOQpSolver)
+  qpsols.append(OOQpsol)
 except:
   pass
 try:
-  qpsolvers.append(QPOasesSolver)
+  qpsols.append(QPOasesSolver)
 except:
   pass
 
-for qpsolver in qpsolvers:
-  print qpsolver
+for qpsol in qpsols:
+  print qpsol
 
-  solver = qpsolver(qp.H.sparsity(),qp.A.sparsity())
+  solver = qpsol(qp.H.sparsity(),qp.A.sparsity())
   solver.init()
   solver.setInput(qp.H,"h")
   solver.setInput(qp.A,"a")

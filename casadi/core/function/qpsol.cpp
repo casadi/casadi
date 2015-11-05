@@ -23,14 +23,14 @@
  */
 
 
-#include "qp_solver.hpp"
+#include "qpsol.hpp"
 #include <typeinfo>
 
 using namespace std;
 namespace casadi {
 
   // Constructor
-  QpSolver::QpSolver(const std::string& name,
+  Qpsol::Qpsol(const std::string& name,
                                      const std::map<std::string, Sparsity> &st)
   : FunctionInternal(name) {
 
@@ -72,110 +72,110 @@ namespace casadi {
     Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
 
     // Input arguments
-    ibuf_.resize(QP_SOLVER_NUM_IN);
-    input(QP_SOLVER_X0) = DMatrix::zeros(x_sparsity);
-    input(QP_SOLVER_H) = DMatrix::zeros(H);
-    input(QP_SOLVER_G) = DMatrix::zeros(x_sparsity);
-    input(QP_SOLVER_A) = DMatrix::zeros(A);
-    input(QP_SOLVER_LBA) = -DMatrix::inf(bounds_sparsity);
-    input(QP_SOLVER_UBA) =  DMatrix::inf(bounds_sparsity);
-    input(QP_SOLVER_LBX) = -DMatrix::inf(x_sparsity);
-    input(QP_SOLVER_UBX) =  DMatrix::inf(x_sparsity);
-    input(QP_SOLVER_LAM_X0) = DMatrix::zeros(x_sparsity);
-    //input(QP_SOLVER_LAM_A0) = DMatrix::zeros(x_sparsity);
+    ibuf_.resize(QPSOL_NUM_IN);
+    input(QPSOL_X0) = DMatrix::zeros(x_sparsity);
+    input(QPSOL_H) = DMatrix::zeros(H);
+    input(QPSOL_G) = DMatrix::zeros(x_sparsity);
+    input(QPSOL_A) = DMatrix::zeros(A);
+    input(QPSOL_LBA) = -DMatrix::inf(bounds_sparsity);
+    input(QPSOL_UBA) =  DMatrix::inf(bounds_sparsity);
+    input(QPSOL_LBX) = -DMatrix::inf(x_sparsity);
+    input(QPSOL_UBX) =  DMatrix::inf(x_sparsity);
+    input(QPSOL_LAM_X0) = DMatrix::zeros(x_sparsity);
+    //input(QPSOL_LAM_A0) = DMatrix::zeros(x_sparsity);
 
     // Output arguments
-    obuf_.resize(QP_SOLVER_NUM_OUT);
-    output(QP_SOLVER_X) = DMatrix::zeros(x_sparsity);
-    output(QP_SOLVER_COST) = 0.0;
-    output(QP_SOLVER_LAM_X) = DMatrix::zeros(x_sparsity);
-    output(QP_SOLVER_LAM_A) = DMatrix::zeros(bounds_sparsity);
+    obuf_.resize(QPSOL_NUM_OUT);
+    output(QPSOL_X) = DMatrix::zeros(x_sparsity);
+    output(QPSOL_COST) = 0.0;
+    output(QPSOL_LAM_X) = DMatrix::zeros(x_sparsity);
+    output(QPSOL_LAM_A) = DMatrix::zeros(bounds_sparsity);
 
-    ischeme_ = Function::qp_solver_in();
-    oscheme_ = Function::qp_solver_out();
+    ischeme_ = Function::qpsol_in();
+    oscheme_ = Function::qpsol_out();
   }
 
-  Sparsity QpSolver::get_sparsity_in(int ind) const {
-    switch (static_cast<QpSolverInput>(ind)) {
-    case QP_SOLVER_X0:
-    case QP_SOLVER_G:
-    case QP_SOLVER_LBX:
-    case QP_SOLVER_UBX:
-    case QP_SOLVER_LAM_X0:
-      return get_sparsity_out(QP_SOLVER_X);
-    case QP_SOLVER_LBA:
-    case QP_SOLVER_UBA:
-      return get_sparsity_out(QP_SOLVER_LAM_A);
-    case QP_SOLVER_A:
+  Sparsity Qpsol::get_sparsity_in(int ind) const {
+    switch (static_cast<QpsolInput>(ind)) {
+    case QPSOL_X0:
+    case QPSOL_G:
+    case QPSOL_LBX:
+    case QPSOL_UBX:
+    case QPSOL_LAM_X0:
+      return get_sparsity_out(QPSOL_X);
+    case QPSOL_LBA:
+    case QPSOL_UBA:
+      return get_sparsity_out(QPSOL_LAM_A);
+    case QPSOL_A:
       return st_[QP_STRUCT_A];
-    case QP_SOLVER_H:
+    case QPSOL_H:
       return st_[QP_STRUCT_H];
-    case QP_SOLVER_NUM_IN: break;
+    case QPSOL_NUM_IN: break;
     }
     return Sparsity();
   }
 
-  Sparsity QpSolver::get_sparsity_out(int ind) const {
-    switch (static_cast<QpSolverOutput>(ind)) {
-    case QP_SOLVER_COST:
+  Sparsity Qpsol::get_sparsity_out(int ind) const {
+    switch (static_cast<QpsolOutput>(ind)) {
+    case QPSOL_COST:
       return Sparsity::scalar();
-    case QP_SOLVER_X:
-    case QP_SOLVER_LAM_X:
+    case QPSOL_X:
+    case QPSOL_LAM_X:
       return Sparsity::dense(n_, 1);
-    case QP_SOLVER_LAM_A:
+    case QPSOL_LAM_A:
       return Sparsity::dense(nc_, 1);
-    case QP_SOLVER_NUM_OUT: break;
+    case QPSOL_NUM_OUT: break;
     }
     return Sparsity();
   }
 
-  void QpSolver::init() {
+  void Qpsol::init() {
     // Call the init method of the base class
     FunctionInternal::init();
   }
 
-  QpSolver::~QpSolver() {
+  Qpsol::~Qpsol() {
   }
 
-  void QpSolver::evaluate() {
-    throw CasadiException("QpSolver::evaluate: Not implemented");
+  void Qpsol::evaluate() {
+    throw CasadiException("Qpsol::evaluate: Not implemented");
   }
 
-  void QpSolver::solve() {
-    throw CasadiException("QpSolver::solve: Not implemented");
+  void Qpsol::solve() {
+    throw CasadiException("Qpsol::solve: Not implemented");
   }
 
-  void QpSolver::checkInputs() const {
-    for (int i=0;i<input(QP_SOLVER_LBX).nnz();++i) {
-      casadi_assert_message(input(QP_SOLVER_LBX).at(i)<=input(QP_SOLVER_UBX).at(i),
+  void Qpsol::checkInputs() const {
+    for (int i=0;i<input(QPSOL_LBX).nnz();++i) {
+      casadi_assert_message(input(QPSOL_LBX).at(i)<=input(QPSOL_UBX).at(i),
                             "LBX[i] <= UBX[i] was violated for i=" << i
-                            << ". Got LBX[i]=" << input(QP_SOLVER_LBX).at(i)
-                            << " and UBX[i]=" << input(QP_SOLVER_UBX).at(i));
+                            << ". Got LBX[i]=" << input(QPSOL_LBX).at(i)
+                            << " and UBX[i]=" << input(QPSOL_UBX).at(i));
     }
-    for (int i=0;i<input(QP_SOLVER_LBA).nnz();++i) {
-      casadi_assert_message(input(QP_SOLVER_LBA).at(i)<=input(QP_SOLVER_UBA).at(i),
+    for (int i=0;i<input(QPSOL_LBA).nnz();++i) {
+      casadi_assert_message(input(QPSOL_LBA).at(i)<=input(QPSOL_UBA).at(i),
                             "LBA[i] <= UBA[i] was violated for i=" << i
-                            << ". Got LBA[i]=" << input(QP_SOLVER_LBA).at(i)
-                            << " and UBA[i]=" << input(QP_SOLVER_UBA).at(i));
+                            << ". Got LBA[i]=" << input(QPSOL_LBA).at(i)
+                            << " and UBA[i]=" << input(QPSOL_UBA).at(i));
     }
   }
 
-  void QpSolver::generateNativeCode(std::ostream& file) const {
-    casadi_error("QpSolver::generateNativeCode not defined for class "
+  void Qpsol::generateNativeCode(std::ostream& file) const {
+    casadi_error("Qpsol::generateNativeCode not defined for class "
                  << typeid(*this).name());
   }
 
-  std::map<std::string, QpSolver::Plugin> QpSolver::solvers_;
+  std::map<std::string, Qpsol::Plugin> Qpsol::solvers_;
 
-  const std::string QpSolver::infix_ = "qpsolver";
+  const std::string Qpsol::infix_ = "qpsol";
 
-  const double& QpSolver::default_in(int ind) const {
+  const double& Qpsol::default_in(int ind) const {
     switch (ind) {
-    case QP_SOLVER_LBX:
-    case QP_SOLVER_LBA:
+    case QPSOL_LBX:
+    case QPSOL_LBA:
       return default_minf();
-    case QP_SOLVER_UBX:
-    case QP_SOLVER_UBA:
+    case QPSOL_UBX:
+    case QPSOL_UBA:
       return default_inf();
     default:
       return default_zero();

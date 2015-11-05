@@ -160,12 +160,12 @@ int main(){
     solver_opts["regularize"] = false;
     solver_opts["max_iter_ls"] = 1;
     solver_opts["max_iter"] = 100;
-    solver_opts["qp_solver"] = "nlp"; // Use IPOPT as QP solver
+    solver_opts["qpsol"] = "nlp"; // Use IPOPT as QP solver
     Dict ipopt_options;
     ipopt_options["tol"] = 1e-12;
     ipopt_options["print_level"] = 0;
     ipopt_options["print_time"] = false;
-    solver_opts["qp_solver_options"] =
+    solver_opts["qpsol_options"] =
       Dict{{"nlpsol_options", Dict{{"nlpsol", "ipopt"}}}};
   } else {
     solver_name = "ipopt";

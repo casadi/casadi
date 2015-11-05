@@ -56,8 +56,8 @@ int main(int argc, char **argv){
   // opts["derivative_test"] = "second-order";
 
   // Specify QP solver
-  opts["qp_solver"]  = "nlp";
-  opts["qp_solver_options"] =
+  opts["qpsol"]  = "nlp";
+  opts["qpsol_options"] =
     Dict{{"nlpsol", "ipopt"},
          {"nlpsol_options", Dict{{"print_level", 0},
                                      {"print_time", 0}}}};

@@ -333,39 +333,39 @@ namespace casadi {
   };
 
   /// Input arguments of a QP problem
-  enum QpSolverInput {
+  enum QpsolInput {
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
     /// The matrix is assumed to be symmetrical.
-    QP_SOLVER_H,
+    QPSOL_H,
     /// The vector g: dense,  (n x 1)
-    QP_SOLVER_G,
+    QPSOL_G,
     /// The matrix A: sparse, (nc x n) - product with x must be dense.
-    QP_SOLVER_A,
+    QPSOL_A,
     /// dense, (nc x 1)
-    QP_SOLVER_LBA,
+    QPSOL_LBA,
     /// dense, (nc x 1)
-    QP_SOLVER_UBA,
+    QPSOL_UBA,
     /// dense, (n x 1)
-    QP_SOLVER_LBX,
+    QPSOL_LBX,
     /// dense, (n x 1)
-    QP_SOLVER_UBX,
+    QPSOL_UBX,
     /// dense, (n x 1)
-    QP_SOLVER_X0,
+    QPSOL_X0,
     /// dense
-    QP_SOLVER_LAM_X0,
-    QP_SOLVER_NUM_IN};
+    QPSOL_LAM_X0,
+    QPSOL_NUM_IN};
 
   /// Output arguments of an QP Solver
-  enum QpSolverOutput {
+  enum QpsolOutput {
     /// The primal solution
-    QP_SOLVER_X,
+    QPSOL_X,
     /// The optimal cost
-    QP_SOLVER_COST,
+    QPSOL_COST,
     /// The dual solution corresponding to linear bounds
-    QP_SOLVER_LAM_A,
+    QPSOL_LAM_A,
     /// The dual solution corresponding to simple bounds
-    QP_SOLVER_LAM_X,
-    QP_SOLVER_NUM_OUT};
+    QPSOL_LAM_X,
+    QPSOL_NUM_OUT};
 
   /// Input arguments of a linear solver
   enum LinsolInput {

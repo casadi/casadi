@@ -33,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_QPOASES_EXPORT
-  casadi_register_qpsolver_qpoases(QpSolver::Plugin* plugin) {
+  int CASADI_QPSOL_QPOASES_EXPORT
+  casadi_register_qpsol_qpoases(Qpsol::Plugin* plugin) {
     plugin->creator = QpoasesInterface::creator;
     plugin->name = "qpoases";
     plugin->doc = QpoasesInterface::meta_doc.c_str();
@@ -43,13 +43,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_QPOASES_EXPORT casadi_load_qpsolver_qpoases() {
-    QpSolver::registerPlugin(casadi_register_qpsolver_qpoases);
+  void CASADI_QPSOL_QPOASES_EXPORT casadi_load_qpsol_qpoases() {
+    Qpsol::registerPlugin(casadi_register_qpsol_qpoases);
   }
 
   QpoasesInterface::QpoasesInterface(const std::string& name,
                                      const std::map<std::string, Sparsity>& st)
-    : QpSolver(name, st) {
+    : Qpsol(name, st) {
 
     addOption("nWSR",                   OT_INTEGER,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
@@ -137,7 +137,7 @@ namespace casadi {
   }
 
   void QpoasesInterface::init() {
-    QpSolver::init();
+    Qpsol::init();
 
     // Read options
     if (hasSetOption("nWSR")) {
@@ -155,7 +155,7 @@ namespace casadi {
     }
 
     // Create data for H if not dense
-    if (!input(QP_SOLVER_H).sparsity().is_dense()) h_data_.resize(n_*n_);
+    if (!input(QPSOL_H).sparsity().is_dense()) h_data_.resize(n_*n_);
 
     // Create data for A
     a_data_.resize(n_*nc_);
@@ -213,22 +213,22 @@ namespace casadi {
     if (inputs_check_) checkInputs();
 
     if (verbose()) {
-      //     userOut() << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;
-      //     userOut() << "LAMBDA_INIT = " << input(QP_SOLVER_LAMBDA_INIT) << endl;
-      userOut() << "LBX = " << input(QP_SOLVER_LBX) << endl;
-      userOut() << "UBX = " << input(QP_SOLVER_UBX) << endl;
-      userOut() << "LBA = " << input(QP_SOLVER_LBA) << endl;
-      userOut() << "UBA = " << input(QP_SOLVER_UBA) << endl;
+      //     userOut() << "X_INIT = " << input(QPSOL_X_INIT) << endl;
+      //     userOut() << "LAMBDA_INIT = " << input(QPSOL_LAMBDA_INIT) << endl;
+      userOut() << "LBX = " << input(QPSOL_LBX) << endl;
+      userOut() << "UBX = " << input(QPSOL_UBX) << endl;
+      userOut() << "LBA = " << input(QPSOL_LBA) << endl;
+      userOut() << "UBA = " << input(QPSOL_UBA) << endl;
     }
 
     // Get pointer to H
     const double* h=0;
     if (h_data_.empty()) {
       // No copying needed
-      h = getPtr(input(QP_SOLVER_H));
+      h = getPtr(input(QPSOL_H));
     } else {
       // First copy to dense array
-      input(QP_SOLVER_H).get(h_data_);
+      input(QPSOL_H).get(h_data_);
       h = getPtr(h_data_);
     }
 
@@ -236,7 +236,7 @@ namespace casadi {
     const double* a = 0;
     if (nc_>0) {
       double* a_mutable = getPtr(a_data_);
-      input(QP_SOLVER_A).get(a_mutable, true);
+      input(QPSOL_A).get(a_mutable, true);
       a = getPtr(a_data_);
     }
 
@@ -246,11 +246,11 @@ namespace casadi {
     double *cputime_ptr = cputime<=0 ? 0 : &cputime;
 
     // Get the arguments to call qpOASES with
-    const double* g = getPtr(input(QP_SOLVER_G));
-    const double* lb = getPtr(input(QP_SOLVER_LBX));
-    const double* ub = getPtr(input(QP_SOLVER_UBX));
-    const double* lbA = getPtr(input(QP_SOLVER_LBA));
-    const double* ubA = getPtr(input(QP_SOLVER_UBA));
+    const double* g = getPtr(input(QPSOL_G));
+    const double* lb = getPtr(input(QPSOL_LBX));
+    const double* ub = getPtr(input(QPSOL_UBX));
+    const double* lbA = getPtr(input(QPSOL_LBA));
+    const double* ubA = getPtr(input(QPSOL_UBA));
 
     int flag;
     if (!called_once_) {
@@ -276,18 +276,18 @@ namespace casadi {
     }
 
     // Get optimal cost
-    output(QP_SOLVER_COST).set(qp_->getObjVal());
+    output(QPSOL_COST).set(qp_->getObjVal());
 
     // Get the primal solution
-    qp_->getPrimalSolution(&output(QP_SOLVER_X)->front());
+    qp_->getPrimalSolution(&output(QPSOL_X)->front());
 
     // Get the dual solution
     qp_->getDualSolution(&dual_.front());
 
     // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-    transform(dual_.begin(),   dual_.begin()+n_, output(QP_SOLVER_LAM_X)->begin(),
+    transform(dual_.begin(),   dual_.begin()+n_, output(QPSOL_LAM_X)->begin(),
               negate<double>());
-    transform(dual_.begin()+n_, dual_.end(),     output(QP_SOLVER_LAM_A)->begin(),
+    transform(dual_.begin()+n_, dual_.end(),     output(QPSOL_LAM_A)->begin(),
               negate<double>());
   }
 
