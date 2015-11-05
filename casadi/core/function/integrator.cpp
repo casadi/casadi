@@ -708,7 +708,7 @@ namespace casadi {
       for (int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
     }
 
-    // "Solve" in order to resolve interdependencies (cf. Rootfinder)
+    // "Solve" in order to resolve interdependencies (cf. Nlsol)
     copy(tmp_x, tmp_x+nx_+nz_, w);
     fill_n(tmp_x, nx_+nz_, 0);
     casadi_assert(!linsol_f_.isNull());
@@ -747,7 +747,7 @@ namespace casadi {
         for (int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
       }
 
-      // "Solve" in order to resolve interdependencies (cf. Rootfinder)
+      // "Solve" in order to resolve interdependencies (cf. Nlsol)
       copy(tmp_rx, tmp_rx+nrx_+nrz_, w);
       fill_n(tmp_rx, nrx_+nrz_, 0);
       casadi_assert(!linsol_g_.isNull());

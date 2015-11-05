@@ -1227,27 +1227,27 @@ namespace casadi {
      * \author Joel Andersson
      * \date 2011-2015
      */
-    Function rootfinder(const std::string& name, const std::string& solver,
+    Function nlsol(const std::string& name, const std::string& solver,
                         const Dict& opts=Dict()) const;
     ///@}
 
-    /// Check if a rootfinder plugin is available
-    static bool has_rootfinder(const std::string& name);
+    /// Check if a nlsol plugin is available
+    static bool has_nlsol(const std::string& name);
 
-    /// Explicitly load a rootfinder plugin dynamically
-    static void load_rootfinder(const std::string& name);
+    /// Explicitly load a nlsol plugin dynamically
+    static void load_nlsol(const std::string& name);
 
-    /// Get documentation for a rootfinder
-    static std::string doc_rootfinder(const std::string& name);
+    /// Get documentation for a nlsol
+    static std::string doc_nlsol(const std::string& name);
 
-    /// Access rhs function for a rootfinder
-    Function rootfinder_fun();
+    /// Access rhs function for a nlsol
+    Function nlsol_fun();
 
-    /// Access Jacobian of the ths function for a rootfinder
-    Function rootfinder_jac();
+    /// Access Jacobian of the ths function for a nlsol
+    Function nlsol_jac();
 
-    /// Access linear solver of a rootfinder
-    Function rootfinder_linsol();
+    /// Access linear solver of a nlsol
+    Function nlsol_linsol();
 
     ///@{
     /** Create an ODE/DAE integrator

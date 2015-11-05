@@ -44,6 +44,6 @@ def loadAllCompiledPlugins():
     elif cls=='Qpsol':
       casadi.Function.load_qpsol(name)
     elif cls=='Rootfinder':
-      casadi.Function.load_rootfinder(name)
+      casadi.Function.load_nlsol(name)
     else:
       getattr(casadi,cls).loadPlugin(name)

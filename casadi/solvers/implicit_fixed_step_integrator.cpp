@@ -58,7 +58,7 @@ namespace casadi {
 
     // Allocate a solver
     implicit_solver_ =
-      F_.rootfinder(name_ + "_implicit_solver", implicit_function_name,
+      F_.nlsol(name_ + "_implicit_solver", implicit_function_name,
                     implicit_solver_options);
 
     // Allocate a root-finding solver for the backward problem
@@ -77,7 +77,7 @@ namespace casadi {
 
       // Allocate an NLP solver
       backward_implicit_solver_ =
-        G_.rootfinder(name_+ "_backward_implicit_solver", backward_implicit_function_name,
+        G_.nlsol(name_+ "_backward_implicit_solver", backward_implicit_function_name,
                       backward_implicit_solver_options);
     }
   }

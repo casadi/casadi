@@ -127,7 +127,7 @@ int main(){
   Function vfcn_sx = vfcn.expand("vfcn");
 
   // Create a implicit function instance to solve the system of equations
-  Function ifcn = vfcn_sx.rootfinder("ifcn", "newton", {{"linear_solver", "csparse"}});
+  Function ifcn = vfcn_sx.nlsol("ifcn", "newton", {{"linear_solver", "csparse"}});
   vector<MX> ifcn_arg = {MX(), X0, P};
   V = ifcn(ifcn_arg).front();
   X.resize(1);

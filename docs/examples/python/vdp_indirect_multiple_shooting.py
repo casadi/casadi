@@ -129,7 +129,7 @@ elif Solver=="kinsol":
     opts["max_iter"] = 1000
 
 # Allocate a solver
-solver = rfp.rootfinder('solver', Solver, opts)
+solver = rfp.nlsol('solver', Solver, opts)
 
 # Solve the problem
 V_sol, = solver([0])

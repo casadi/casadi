@@ -91,7 +91,7 @@ set(CASADI_SRCS
   function/mx_function.hpp         function/mx_function.cpp
   function/external.hpp            function/external.cpp
   function/linsol.hpp              function/linsol.cpp
-  function/rootfinder.hpp          function/rootfinder.cpp
+  function/nlsol.hpp          function/nlsol.cpp
   function/integrator.hpp          function/integrator.cpp
   function/nlpsol.hpp              function/nlpsol.cpp
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp

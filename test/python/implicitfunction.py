@@ -31,7 +31,7 @@ from helpers import *
 solvers= []
 try:
   LinearSolver.loadPlugin("csparse")
-  Function.load_rootfinder("kinsol")
+  Function.load_nlsol("kinsol")
   solvers.append(("kinsol",{"linear_solver": "csparse","abstol":1e-10}))
 except:
   pass
@@ -58,7 +58,7 @@ class ImplicitFunctiontests(casadiTestCase):
       C_ = DMatrix([[1.6,2.1],[1,1.3]])
       b_ = DMatrix([0.7,0.6])
       f=Function("f", [x],[mul(A_,x)-b_, mul(C_,x)])
-      solver=f.rootfinder("solver", Solver, options)
+      solver=f.nlsol("solver", Solver, options)
       solver.evaluate()
       
       refsol = Function("refsol", [x],[solve(A_,b_), mul(C_,solve(A_,b_))])
@@ -67,7 +67,7 @@ class ImplicitFunctiontests(casadiTestCase):
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
       f=Function("f", [x,A,b],[mul(A,x)-b])
-      solver=f.rootfinder("solver", Solver, options)
+      solver=f.nlsol("solver", Solver, options)
       solver.setInput(A_,1)
       solver.setInput(b_,2)
       solver.evaluate()
@@ -87,7 +87,7 @@ class ImplicitFunctiontests(casadiTestCase):
           options2 = dict(options)
           options2["ad_weight_sp"] = ad_weight_sp
           options2["ad_weight"] = ad_weight
-          solver=f.rootfinder("solver", Solver, options2)
+          solver=f.nlsol("solver", Solver, options2)
           solver.setInput(0,0)
           solver.setInput(A_,1)
           solver.setInput(b_,2)
@@ -104,7 +104,7 @@ class ImplicitFunctiontests(casadiTestCase):
       self.message(Solver)
       x=SX.sym("x")
       f=Function("f", [x], [sin(x)])
-      solver=f.rootfinder("solver", Solver, options)
+      solver=f.nlsol("solver", Solver, options)
       solver.setInput(6)
       solver.evaluate()
       
@@ -121,7 +121,7 @@ class ImplicitFunctiontests(casadiTestCase):
       y=SX.sym("y")
       n=0.2
       f=Function("f", [y,x], [x-arcsin(y)])
-      solver=f.rootfinder("solver", Solver, options)
+      solver=f.nlsol("solver", Solver, options)
       solver.setInput(n,1)
 
       refsol = Function("refsol", [y,x], [sin(x)])
@@ -136,7 +136,7 @@ class ImplicitFunctiontests(casadiTestCase):
       y=SX.sym("y")
       n=0.2
       f=Function("f", [y,x], [x-arcsin(y)])
-      solver=f.rootfinder("solver", Solver, options)
+      solver=f.nlsol("solver", Solver, options)
       
       X = MX.sym("X")
       [R] = solver([MX(),X])
@@ -164,7 +164,7 @@ class ImplicitFunctiontests(casadiTestCase):
       f=Function("f", [vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
       options2 = dict(options)
       options2["constraints"] = [1]*s.nnz()
-      solver=f.rootfinder("options2", Solver, options2)
+      solver=f.nlsol("options2", Solver, options2)
       
       X = MX.sym("X",x.sparsity())
       [R] = solver([MX(),vecNZ(X)])
@@ -198,7 +198,7 @@ class ImplicitFunctiontests(casadiTestCase):
       yy = y + y0
       n=0.2
       f=Function("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
-      solver=f.rootfinder("solver", Solver, options)
+      solver=f.nlsol("solver", Solver, options)
       solver.setInput(n)
       solver.evaluate()
       
@@ -210,7 +210,7 @@ class ImplicitFunctiontests(casadiTestCase):
     self.message("Scalar KINSol problem, n=0, constraint")
     x=SX.sym("x")
     f=Function("f", [x],[sin(x)])
-    solver=f.rootfinder("solver", "kinsol", {"constraints":[-1]})
+    solver=f.nlsol("solver", "kinsol", {"constraints":[-1]})
     solver.setInput(-6)
     solver.evaluate()
     self.assertAlmostEqual(solver.getOutput()[0],-2*pi,5)
@@ -223,7 +223,7 @@ class ImplicitFunctiontests(casadiTestCase):
       f=Function("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [-1,0]
-      solver=f.rootfinder("solver", Solver, options2)
+      solver=f.nlsol("solver", Solver, options2)
       solver.evaluate()
       
       self.checkarray(solver.getOutput(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
@@ -231,7 +231,7 @@ class ImplicitFunctiontests(casadiTestCase):
       f=Function("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [1,0]
-      solver=f.rootfinder("solver", Solver, options2)
+      solver=f.nlsol("solver", Solver, options2)
       solver.evaluate()
       
       self.checkarray(solver.getOutput(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
@@ -250,7 +250,7 @@ class ImplicitFunctiontests(casadiTestCase):
     vfcn_sx = vfcn.expand('vfcn_sx', {"ad_weight":0, "ad_weight_sp":1})
 
     # Create a implicit function instance to solve the system of equations
-    ifcn = vfcn_sx.rootfinder("ifcn", "newton", {"linear_solver":"csparse"})
+    ifcn = vfcn_sx.nlsol("ifcn", "newton", {"linear_solver":"csparse"})
 
     #ifcn = Function('I', [X0],[vertcat([X0])])
     [V] = ifcn([0,X0],True)
@@ -284,7 +284,7 @@ class ImplicitFunctiontests(casadiTestCase):
     for Solver, options in solvers:
       options2 = dict(options)
       options2["ad_weight_sp"] = 1
-      solver=f.rootfinder("solver", Solver, options2)
+      solver=f.nlsol("solver", Solver, options2)
       solver.setInput(0.3,1)
       solver.setInput(0.1,0)
       solver.evaluate()

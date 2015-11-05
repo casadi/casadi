@@ -29,8 +29,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_ROOTFINDER_NLPSOL_EXPORT
-  casadi_register_rootfinder_nlpsol(Rootfinder::Plugin* plugin) {
+  int CASADI_NLSOL_NLPSOL_EXPORT
+  casadi_register_nlsol_nlpsol(Nlsol::Plugin* plugin) {
     plugin->creator = QpToImplicit::creator;
     plugin->name = "nlpsol";
     plugin->doc = QpToImplicit::meta_doc.c_str();
@@ -40,12 +40,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_ROOTFINDER_NLPSOL_EXPORT casadi_load_rootfinder_nlpsol() {
-    Rootfinder::registerPlugin(casadi_register_rootfinder_nlpsol);
+  void CASADI_NLSOL_NLPSOL_EXPORT casadi_load_nlsol_nlpsol() {
+    Nlsol::registerPlugin(casadi_register_nlsol_nlpsol);
   }
 
   QpToImplicit::QpToImplicit(const std::string& name, const Function& f)
-    : Rootfinder(name, f) {
+    : Nlsol(name, f) {
 
     Adaptor<QpToImplicit, Nlpsol>::addOptions();
   }
@@ -116,7 +116,7 @@ namespace casadi {
 
   void QpToImplicit::init() {
     // Call the base class initializer
-    Rootfinder::init();
+    Nlsol::init();
 
     // Free variable in the NLP
     MX u = MX::sym("u", input(iin_).sparsity());

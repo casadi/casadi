@@ -408,7 +408,7 @@ typedef struct IDAMemRec {
   int *ida_rootdir;      /* array specifying direction of zero-crossing       */
   realtype ida_tlo;      /* nearest endpoint of interval in root search       */
   realtype ida_thi;      /* farthest endpoint of interval in root search      */
-  realtype ida_trout;    /* t return value from rootfinder routine            */
+  realtype ida_trout;    /* t return value from nlsol routine            */
   realtype *ida_glo;     /* saved array of g values at t = tlo                */
   realtype *ida_ghi;     /* saved array of g values at t = thi                */
   realtype *ida_grout;   /* array of g values at t = trout                    */
