@@ -1034,39 +1034,39 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::rhsQB(double t, const double* xz, const double* xzdot, const double* xzA,
-                           const double* xzdotA, double *qdotA) {
+  void IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA,
+                            N_Vector xzdotA, N_Vector qdotA) {
     log("IdasInterface::rhsQB", "begin");
 
-    // Pass inputs
-    g_.setInputNZ(&t, RDAE_T);
-    g_.setInputNZ(xz, RDAE_X);
-    g_.setInputNZ(xz+nx_, RDAE_Z);
-    g_.setInput(p(), RDAE_P);
-    g_.setInput(rp(), RDAE_RP);
-    g_.setInputNZ(xzA, RDAE_RX);
-    g_.setInputNZ(xzA+nrx_, RDAE_RZ);
-
-    // Evaluate
-    g_.evaluate();
-
-    // Save to output
-    g_.getOutputNZ(qdotA, RDAE_QUAD);
-
+    // Debug output
     if (monitored("rhsQB")) {
-      userOut() << "RDAE_T    = " << t << endl;
-      userOut() << "RDAE_X    = " << g_.input(RDAE_X) << endl;
-      userOut() << "RDAE_Z    = " << g_.input(RDAE_Z) << endl;
-      userOut() << "RDAE_P    = " << g_.input(RDAE_P) << endl;
-      userOut() << "RDAE_RX    = " << g_.input(RDAE_RX) << endl;
-      userOut() << "RDAE_RZ    = " << g_.input(RDAE_RZ) << endl;
-      userOut() << "RDAE_RP    = " << g_.input(RDAE_RP) << endl;
-      userOut() << "rhs = " << g_.output(RDAE_QUAD) << endl;
+      printvar("t", t);
+      printvar("xz", xz);
+      printvar("xzdot", xzdot);
+      printvar("xzA", xzA);
+      printvar("xzdotA", xzdotA);
+    }
+
+    // Evaluate g_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(xz);
+    arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(xzA);
+    arg1_[RDAE_RZ] = NV_DATA_S(xzA)+nrx_;
+    arg1_[RDAE_RP] = rp_;
+    res1_[RDAE_ODE] = 0;
+    res1_[RDAE_ALG] = 0;
+    res1_[RDAE_QUAD] = NV_DATA_S(qdotA);
+    g_(0, arg1_, res1_, iw_, w_);
+
+    // Debug output
+    if (monitored("rhsQB")) {
+      printvar("qdotA", qdotA);
     }
 
     // Negate (note definition of g)
-    for (int i=0; i<nrq_; ++i)
-      qdotA[i] *= -1;
+    casadi_scal(nrq_, -1., NV_DATA_S(qdotA), 1);
 
     log("IdasInterface::rhsQB", "end");
   }
@@ -1075,8 +1075,7 @@ namespace casadi {
                                   N_Vector xzdotA, N_Vector qdotA, void *user_data) {
     try {
       IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
-      this_->rhsQB(t, NV_DATA_S(y), NV_DATA_S(xzdot), NV_DATA_S(xzA),
-                   NV_DATA_S(xzdotA), NV_DATA_S(qdotA));
+      this_->rhsQB(t, y, xzdot, xzA, xzdotA, qdotA);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;

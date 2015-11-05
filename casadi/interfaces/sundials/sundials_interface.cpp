@@ -224,7 +224,11 @@ namespace casadi {
     }
 
     // Create a Jacobian if requested
-    if (exact_jacobian_) jac_ = getJac();
+    if (exact_jacobian_) {
+      jac_ = getJac();
+      alloc(jac_);
+      alloc_w(jac_.sz_w() + jac_.nnz_out(0));
+    }
 
     if (!jac_.isNull()) {
       casadi_assert_message(
@@ -244,6 +248,8 @@ namespace casadi {
     if (exact_jacobianB_ && !g_.isNull()) jacB_ = getJacB();
 
     if (!jacB_.isNull()) {
+      alloc(jacB_);
+      alloc_w(jacB_.sz_w() + jacB_.nnz_out(0));
       casadi_assert_message(
                             jacB_.size2_out(0)==jacB_.size1_out(0),
                             "SundialsInterface::init: the jacobian of the backward problem must be "
