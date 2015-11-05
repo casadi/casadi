@@ -1123,32 +1123,29 @@ namespace casadi {
                              const Dict& opts=Dict());
 
 
-    /// Check if an integrator plugin is available
+    ///@{
+    /// Check if a particular plugin is available
     static bool has_integrator(const std::string& name);
-
-    /// Explicitly load an integrator plugin dynamically
-    static void load_integrator(const std::string& name);
-
-    /// Get documentation for an integrator plugin
-    static std::string doc_integrator(const std::string& name);
-
-    /// Check if a QP solver plugin is available
     static bool has_qp_solver(const std::string& name);
-
-    /// Explicitly load a QP solver plugin dynamically
-    static void load_qp_solver(const std::string& name);
-
-    /// Get documentation for a QP solver plugin
-    static std::string doc_qp_solver(const std::string& name);
-
-    /// Check if an NLP solver plugin is available
     static bool has_nlp_solver(const std::string& name);
+    static bool has_linsol(const std::string& name);
+    ///@}
 
-    /// Explicitly load an NLP solver plugin dynamically
+    ///@{
+    /// Explicitly load a plugin dynamically
+    static void load_qp_solver(const std::string& name);
+    static void load_integrator(const std::string& name);
     static void load_nlp_solver(const std::string& name);
+    static void load_linsol(const std::string& name);
+    ///@}
 
-    /// Get documentation for an NLP solver plugin
+    ///@{
+    /// Get the documentation string for a plugin
+    static std::string doc_integrator(const std::string& name);
+    static std::string doc_qp_solver(const std::string& name);
     static std::string doc_nlp_solver(const std::string& name);
+    static std::string doc_linsol(const std::string& name);
+    ///@}
 
     ///@{
     /** Create a solver for linear systems of equations
@@ -1250,7 +1247,7 @@ namespace casadi {
     Function rootfinder_jac();
 
     /// Access linear solver of a rootfinder
-    LinearSolver rootfinder_linsol();
+    Function rootfinder_linsol();
 
     ///@{
     /** Create an ODE/DAE integrator

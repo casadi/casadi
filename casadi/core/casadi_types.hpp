@@ -58,7 +58,6 @@ namespace casadi {
   class Function;
   class Sparsity;
   class CodeGenerator;
-  class LinearSolver;
   class NlpBuilder;
   class Variable;
   class DaeBuilder;

@@ -27,7 +27,6 @@
 #define CASADI_ROOTFINDER_HPP
 
 #include "function_internal.hpp"
-#include "linear_solver.hpp"
 #include "plugin_interface.hpp"
 
 
@@ -108,7 +107,7 @@ namespace casadi {
     Function jac_;
 
     /// Linear solver
-    LinearSolver linsol_;
+    Function linsol_;
 
     /// Constraints on decision variables
     std::vector<int> u_c_;

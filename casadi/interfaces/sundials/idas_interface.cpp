@@ -1397,7 +1397,7 @@ namespace casadi {
     // Solve the (possibly factorized) system
     casadi_assert_message(linsol_.nnz_out(0) == NV_LENGTH_S(zvec), "Assertion error: "
                           << linsol_.nnz_out(0) << " == " << NV_LENGTH_S(zvec));
-    linsol_.solve(NV_DATA_S(zvec), 1, false);
+    linsol_.linsol_solve(NV_DATA_S(zvec), 1, false);
 
     // Log time duration
     time2 = clock();
@@ -1433,7 +1433,7 @@ namespace casadi {
       userOut() << endl;
     }
 
-    linsolB_.solve(NV_DATA_S(zvecB), 1, false);
+    linsolB_.linsol_solve(NV_DATA_S(zvecB), 1, false);
 
     if (monitored("psolveB")) {
       userOut() << "zvecB sol = " << std::endl;
@@ -1481,7 +1481,7 @@ namespace casadi {
 
     // Prepare the solution of the linear system (e.g. factorize)
     // -- only if the linear solver inherits from LinearSolver
-    linsol_.prepare();
+    linsol_.linsol_prepare();
 
     // Log time duration
     time1 = clock();
@@ -1523,7 +1523,7 @@ namespace casadi {
 
     // Prepare the solution of the linear system (e.g. factorize)
     // -- only if the linear solver inherits from LinearSolver
-    linsolB_.prepare();
+    linsolB_.linsol_prepare();
 
     // Log time duration
     time1 = clock();

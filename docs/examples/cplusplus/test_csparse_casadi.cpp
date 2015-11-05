@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
   Sparsity spA(nrow,ncol,colind,row);
   
   // Create a solver instance
-  LinearSolver linear_solver("linear_solver", "csparse", spA);
+  Function linear_solver = Function::linsol("linear_solver", "csparse", spA, 1);
     
   // Pass Non-zero elements
   double   s, u, p, e, r, l;
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
   // Solve
   linear_solver.setInputNZ(val,"A");
   linear_solver.setInputNZ(rhs,"B");
-  linear_solver.prepare();
-  linear_solver.solve(tr);
+  linear_solver.linsol_prepare();
+  linear_solver.linsol_solve(tr);
   
   // Print the solution
   cout << "solution = " << linear_solver.output("X") << endl;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
   // Embed in an MX graph
   MX A = MX::sym("A",spA);
   MX B = MX::sym("B",ncol,1);
-  MX X = linear_solver.solve(A,B,tr);
+  MX X = linear_solver.linsol_solve(A,B,tr);
   Function F("F", {A, B}, {X}, {"A", "B"}, {"X"});
 
   // Solve

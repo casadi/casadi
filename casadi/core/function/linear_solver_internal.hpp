@@ -26,7 +26,6 @@
 #ifndef CASADI_LINEAR_SOLVER_INTERNAL_HPP
 #define CASADI_LINEAR_SOLVER_INTERNAL_HPP
 
-#include "linear_solver.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 

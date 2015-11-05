@@ -55,7 +55,7 @@ namespace casadi {
     virtual void setStopTime(double tf) = 0;
 
     /// Linear solver forward, backward
-    LinearSolver linsol_, linsolB_;
+    Function linsol_, linsolB_;
 
     ///@{
     /// options

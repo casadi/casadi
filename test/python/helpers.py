@@ -626,6 +626,18 @@ class requires_rootfinder(object):
       print "Not available RFP plugin %s, skipping unittests" % self.n
       return None
 
+class requires_linsol(object):
+  def __init__(self,n):
+    self.n = n
+  
+  def __call__(self,c):
+    try:
+      Function.load_linsol(self.n)
+      return c
+    except:
+      print "Not available linear solver plugin %s, skipping unittests" % self.n
+      return None
+
 class requiresPlugin(object):
   def __init__(self,att,n):
     self.att = att

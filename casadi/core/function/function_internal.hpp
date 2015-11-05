@@ -768,6 +768,18 @@ namespace casadi {
     virtual void linsol_solveL(double* x, int nrhs, bool tr);
     virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
     virtual DMatrix linsol_cholesky(bool tr) const;
+    virtual void linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
+                               int* iw, SXElem* w, bool tr, int nrhs);
+    virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+                                const std::vector<std::vector<MX> >& fseed,
+                                std::vector<std::vector<MX> >& fsens, bool tr);
+    virtual void linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+                                const std::vector<std::vector<MX> >& aseed,
+                                std::vector<std::vector<MX> >& asens, bool tr);
+    virtual void linsol_spFwd(void* mem, const bvec_t** arg, bvec_t** res,
+                              int* iw, bvec_t* w, bool tr, int nrhs);
+    virtual void linsol_spAdj(void* mem, bvec_t** arg, bvec_t** res,
+                              int* iw, bvec_t* w, bool tr, int nrhs);
     ///@}
 
   protected:

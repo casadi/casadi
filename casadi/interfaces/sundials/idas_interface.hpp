@@ -28,7 +28,6 @@
 
 #include <casadi/interfaces/sundials/casadi_integrator_idas_export.h>
 #include "sundials_interface.hpp"
-#include "casadi/core/function/linear_solver.hpp"
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
 #include <idas/idas_band.h>

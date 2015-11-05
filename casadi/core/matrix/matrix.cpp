@@ -24,7 +24,6 @@
 
 #define CASADI_MATRIX_CPP
 #include "matrix_impl.hpp"
-#include "../function/linear_solver.hpp"
 #include "../function/sx_function.hpp"
 #include "../sx/sx_node.hpp"
 
@@ -52,11 +51,11 @@ namespace casadi {
   zz_solve(const Matrix<double>& b,
            const string& lsolver, const Dict& dict) const {
     const Matrix<double>& A = *this;
-    LinearSolver mysolver("tmp", lsolver, A.sparsity(), b.size2(), dict);
+    Function mysolver = Function::linsol("tmp", lsolver, A.sparsity(), b.size2(), dict);
     mysolver.setInput(A, LINSOL_A);
     mysolver.setInput(b, LINSOL_B);
-    mysolver.prepare();
-    mysolver.solve(false);
+    mysolver.linsol_prepare();
+    mysolver.linsol_solve(false);
 
     return mysolver.output(LINSOL_X);
   }

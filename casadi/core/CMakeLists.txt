@@ -90,7 +90,7 @@ set(CASADI_SRCS
   function/sx_function.hpp         function/sx_function.cpp
   function/mx_function.hpp         function/mx_function.cpp
   function/external.hpp            function/external.cpp
-  function/linear_solver.hpp       function/linear_solver.cpp       function/linear_solver_internal.hpp       function/linear_solver_internal.cpp
+  function/linear_solver_internal.hpp       function/linear_solver_internal.cpp
   function/rootfinder.hpp          function/rootfinder.cpp
   function/integrator.hpp          function/integrator.cpp
   function/nlp_solver.hpp          function/nlp_solver.cpp

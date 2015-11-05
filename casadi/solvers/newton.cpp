@@ -132,8 +132,8 @@ namespace casadi {
 
       // Prepare the linear solver with J
       linsol_.setInput(J, LINSOL_A);
-      linsol_.prepare();
-      linsol_.solve(&F->front(), 1, false);
+      linsol_.linsol_prepare();
+      linsol_.linsol_solve(&F->front(), 1, false);
 
       double abstolStep=0;
       if (numeric_limits<double>::infinity() != abstolStep_) {

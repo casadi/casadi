@@ -12,6 +12,8 @@ for pl = strsplit(CasadiMeta.getPlugins(),';')
     eval(['Function.load_qp_solver(''' name ''')'])
   elseif strcmp(cls, 'Rootfinder')
     eval(['Function.load_rootfinder(''' name ''')'])
+  elseif strcmp(cls, 'LinearSolver')
+    eval(['Function.load_linsol(''' name ''')'])
   else
     eval([cls '.loadPlugin(''' name ''')'])
   end

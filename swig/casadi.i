@@ -3496,7 +3496,6 @@ namespace casadi {
 %feature("director") casadi::Callback;
 
 %include <casadi/core/function/compiler.hpp>
-%include <casadi/core/function/linear_solver.hpp>
 %include <casadi/core/function/simulator.hpp>
 %include <casadi/core/function/callback.hpp>
 %include <casadi/core/casadi_options.hpp>

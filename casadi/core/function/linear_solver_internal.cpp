@@ -340,7 +340,7 @@ namespace casadi {
   }
 
   MX LinearSolverInternal::linsol_solve(const MX& A, const MX& B, bool transpose) {
-    return A->getSolve(B, transpose, shared_from_this<LinearSolver>());
+    return A->getSolve(B, transpose, shared_from_this<Function>());
   }
 
   void LinearSolverInternal::linsol_solve(double* x, int nrhs, bool transpose) {

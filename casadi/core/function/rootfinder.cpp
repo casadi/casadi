@@ -118,8 +118,8 @@ namespace casadi {
         }
 
         // Allocate an NLP solver
-        linsol_ = LinearSolver("linsol", option("linear_solver"),
-                               jac_.sparsity_out(0), 1, linear_solver_options);
+        linsol_ = Function::linsol("linsol", option("linear_solver"),
+                                   jac_.sparsity_out(0), 1, linear_solver_options);
       }
     } else {
       casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));
@@ -196,7 +196,7 @@ namespace casadi {
 
     // "Solve" in order to propagate to z
     fill_n(tmp2, n_, 0);
-    linsol_.spSolve(tmp2, tmp1, false);
+    linsol_.linsol_spsolve(tmp2, tmp1, false);
     if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
 
     // Propagate to auxiliary outputs
@@ -236,7 +236,7 @@ namespace casadi {
 
     // "Solve" in order to get seed
     fill_n(tmp2, n_, 0);
-    linsol_.spSolve(tmp2, tmp1, true);
+    linsol_.linsol_spsolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
     for (int i=0; i<num_out; ++i) res1[i] = 0;

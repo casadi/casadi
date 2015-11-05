@@ -1196,7 +1196,7 @@ namespace casadi {
 
     // Solve the (possibly factorized) system
     casadi_assert(linsol_.nnz_out(0) == NV_LENGTH_S(z));
-    linsol_.solve(NV_DATA_S(z), 1, false);
+    linsol_.linsol_solve(NV_DATA_S(z), 1, false);
 
     // Log time duration
     time2 = clock();
@@ -1216,7 +1216,7 @@ namespace casadi {
 
     // Solve the (possibly factorized) system
     casadi_assert(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
-    linsolB_.solve(NV_DATA_S(zvecB), 1, false);
+    linsolB_.linsol_solve(NV_DATA_S(zvecB), 1, false);
 
     // Log time duration
     time2 = clock();
@@ -1252,7 +1252,7 @@ namespace casadi {
 
     // Prepare the solution of the linear system (e.g. factorize)
     // -- only if the linear solver inherits from LinearSolver
-    linsol_.prepare();
+    linsol_.linsol_prepare();
 
     // Log time duration
     time1 = clock();
@@ -1293,7 +1293,7 @@ namespace casadi {
 
     // Prepare the solution of the linear system (e.g. factorize)
     // -- only if the linear solver inherits from LinearSolver
-    linsolB_.prepare();
+    linsolB_.linsol_prepare();
 
     // Log time duration
     time1 = clock();

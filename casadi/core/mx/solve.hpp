@@ -28,8 +28,6 @@
 
 #include "mx_node.hpp"
 #include "casadi_call.hpp"
-#include "../function/linear_solver.hpp"
-/// \cond INTERNAL
 
 namespace casadi {
   /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T
@@ -49,7 +47,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    Solve(const MX& r, const MX& A, const LinearSolver& linear_solver);
+    Solve(const MX& r, const MX& A, const Function& linear_solver);
 
     /** \brief  Destructor */
     virtual ~Solve() {}
@@ -96,12 +94,10 @@ namespace casadi {
     virtual size_t sz_w() const { return sparsity().size1();}
 
     /// Linear Solver (may be shared between multiple nodes)
-    LinearSolver linear_solver_;
+    Function linear_solver_;
   };
 
 
 } // namespace casadi
-
-/// \endcond
 
 #endif // CASADI_SOLVE_HPP

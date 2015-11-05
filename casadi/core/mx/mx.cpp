@@ -1804,8 +1804,8 @@ namespace casadi {
   }
 
   MX MX::zz_solve(const MX& b, const std::string& lsolver, const Dict& dict) const {
-    LinearSolver mysolver("tmp", lsolver, sparsity(), b.size2(), dict);
-    return mysolver.solve(*this, b, false);
+    Function mysolver = Function::linsol("tmp", lsolver, sparsity(), b.size2(), dict);
+    return mysolver.linsol_solve(*this, b, false);
   }
 
   MX MX::zz_pinv(const std::string& lsolver, const Dict& dict) const {

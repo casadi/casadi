@@ -429,7 +429,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const {
+  MX MXNode::getSolve(const MX& r, bool tr, const Function& linear_solver) const {
     if (tr) {
       return MX::create(new Solve<true>(densify(r), shared_from_this<MX>(), linear_solver));
     } else {

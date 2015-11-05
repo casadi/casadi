@@ -1471,6 +1471,18 @@ namespace casadi {
     return Rootfinder::getPlugin(name).doc;
   }
 
+  bool Function::has_linsol(const string& name) {
+    return LinearSolverInternal::hasPlugin(name);
+  }
+
+  void Function::load_linsol(const string& name) {
+    LinearSolverInternal::loadPlugin(name);
+  }
+
+  string Function::doc_linsol(const string& name) {
+    return LinearSolverInternal::getPlugin(name).doc;
+  }
+
   Function Function::rootfinder_fun() {
     casadi_assert(!isNull());
     Rootfinder* n = dynamic_cast<Rootfinder*>(get());
@@ -1485,7 +1497,7 @@ namespace casadi {
     return n->jac_;
   }
 
-  LinearSolver Function::rootfinder_linsol() {
+  Function Function::rootfinder_linsol() {
     casadi_assert(!isNull());
     Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
@@ -1764,7 +1776,15 @@ namespace casadi {
 
   Function Function::linsol(const std::string& name, const std::string& solver,
                             const Sparsity& sp, int nrhs, const Dict& opts) {
-    return LinearSolver(name, solver, sp, nrhs, opts);
+    Function ret;
+    if (solver=="none") {
+      ret.assignNode(new LinearSolverInternal(name, sp, nrhs));
+    } else {
+      ret.assignNode(LinearSolverInternal::getPlugin(solver).creator(name, sp, nrhs));
+    }
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
   void Function::linsol_prepare() {

@@ -522,7 +522,7 @@ namespace casadi {
     self.linsol_.setInputNZ(jac, LINSOL_A);
 
     // Prepare the solution of the linear system (e.g. factorize)
-    self.linsol_.prepare();
+    self.linsol_.linsol_prepare();
 
     // Log time duration
     time1_ = clock();
@@ -548,7 +548,7 @@ namespace casadi {
     time1_ = clock();
 
     // Solve the factorized system
-    self.linsol_.solve(NV_DATA_S(v), 1, false);
+    self.linsol_.linsol_solve(NV_DATA_S(v), 1, false);
 
     // Log time duration
     time2_ = clock();

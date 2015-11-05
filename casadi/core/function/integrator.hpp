@@ -28,7 +28,6 @@
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
-#include "linear_solver.hpp"
 
 /// \cond INTERNAL
 
@@ -193,7 +192,7 @@ namespace casadi {
     Function g_;
 
     /// Integrator for sparsity pattern propagation
-    LinearSolver linsol_f_, linsol_g_;
+    Function linsol_f_, linsol_g_;
 
     /// Options
     bool print_stats_;

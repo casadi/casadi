@@ -250,9 +250,9 @@ namespace casadi {
     output_t0_ = option("output_t0");
 
     // Form a linear solver for the sparsity propagation
-    linsol_f_ = LinearSolver("linsol_f", "none", spJacF());
+    linsol_f_ = Function::linsol("linsol_f", "none", spJacF(), 1);
     if (!g_.isNull()) {
-      linsol_g_ = LinearSolver("linsol_g", "none", spJacG());
+      linsol_g_ = Function::linsol("linsol_g", "none", spJacG(), 1);
     }
 
     // Allocate sufficiently large work vectors
@@ -712,7 +712,7 @@ namespace casadi {
     copy(tmp_x, tmp_x+nx_+nz_, w);
     fill_n(tmp_x, nx_+nz_, 0);
     casadi_assert(!linsol_f_.isNull());
-    linsol_f_.spSolve(tmp_x, w, false);
+    linsol_f_.linsol_spsolve(tmp_x, w, false);
 
     // Get xf and zf
     if (res[INTEGRATOR_XF])
@@ -751,7 +751,7 @@ namespace casadi {
       copy(tmp_rx, tmp_rx+nrx_+nrz_, w);
       fill_n(tmp_rx, nrx_+nrz_, 0);
       casadi_assert(!linsol_g_.isNull());
-      linsol_g_.spSolve(tmp_rx, w, false);
+      linsol_g_.linsol_spsolve(tmp_rx, w, false);
 
       // Get rxf and rzf
       if (res[INTEGRATOR_RXF])
@@ -842,7 +842,7 @@ namespace casadi {
       // Propagate interdependencies
       casadi_assert(!linsol_g_.isNull());
       fill_n(w, nrx_+nrz_, 0);
-      linsol_g_.spSolve(w, tmp_rx, true);
+      linsol_g_.linsol_spsolve(w, tmp_rx, true);
       copy(w, w+nrx_+nrz_, tmp_rx);
 
       // Direct dependency rx0 -> rxf
@@ -869,7 +869,7 @@ namespace casadi {
     // Propagate interdependencies
     casadi_assert(!linsol_f_.isNull());
     fill_n(w, nx_+nz_, 0);
-    linsol_f_.spSolve(w, tmp_x, true);
+    linsol_f_.linsol_spsolve(w, tmp_x, true);
     copy(w, w+nx_+nz_, tmp_x);
 
     // Direct dependency x0 -> xf

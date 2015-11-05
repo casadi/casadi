@@ -35,7 +35,7 @@ using namespace std;
 namespace casadi {
 
   template<bool Tr>
-  Solve<Tr>::Solve(const MX& r, const MX& A, const LinearSolver& linear_solver) :
+  Solve<Tr>::Solve(const MX& r, const MX& A, const Function& linear_solver) :
       linear_solver_(linear_solver) {
     casadi_assert_message(r.size1() == A.size2(), "Solve::Solve: dimension mismatch.");
     setDependencies(r, A);
@@ -56,8 +56,8 @@ namespace casadi {
                         int* iw, double* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     linear_solver_.setInputNZ(arg[1], LINSOL_A);
-    linear_solver_.prepare();
-    linear_solver_.solve(res[0], dep(0).size2(), Tr);
+    linear_solver_.linsol_prepare();
+    linear_solver_.linsol_solve(res[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>
