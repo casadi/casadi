@@ -78,7 +78,7 @@ int main(){
   SXDict nlp = {{"x", u}, {"f", f}, {"g", g}};
 
   // Create an NLP solver and buffers
-  Function solver = Function::nlp_solver("solver", "snopt", nlp);
+  Function solver = Function::nlpsol("solver", "snopt", nlp);
   std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition

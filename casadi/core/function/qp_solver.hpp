@@ -93,7 +93,7 @@ namespace casadi {
     static const std::string infix_;
 
     /// Short name
-    static std::string shortname() { return "qp";}
+    static std::string shortname() { return "qpsol";}
 
     /** \brief Get default input value */
     virtual const double& default_in(int ind) const;

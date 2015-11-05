@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_NLP_SOLVER_HPP
-#define CASADI_NLP_SOLVER_HPP
+#ifndef CASADI_NLPSOL_HPP
+#define CASADI_NLPSOL_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -35,25 +35,24 @@ namespace casadi {
 
 /** \brief NLP solver storage class
 
-  @copydoc NlpSolver_doc
+  @copydoc Nlpsol_doc
   \author Joel Andersson
   \date 2010-2013
 */
   class CASADI_EXPORT
-  NlpSolver : public FunctionInternal,
-                      public PluginInterface<NlpSolver> {
+  Nlpsol : public FunctionInternal, public PluginInterface<Nlpsol> {
 
   public:
     /// Constructor
-    NlpSolver(const std::string& name, const XProblem& nlp);
+    Nlpsol(const std::string& name, const XProblem& nlp);
 
     /// Destructor
-    virtual ~NlpSolver() = 0;
+    virtual ~Nlpsol() = 0;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return NLP_SOLVER_NUM_IN;}
-    virtual size_t get_n_out() const { return NLP_SOLVER_NUM_OUT;}
+    virtual size_t get_n_in() const { return NLPSOL_NUM_IN;}
+    virtual size_t get_n_out() const { return NLPSOL_NUM_OUT;}
     ///@}
 
     /// @{
@@ -160,7 +159,7 @@ namespace casadi {
     Function ref_;
 
     // Creator function for internal class
-    typedef NlpSolver* (*Creator)(const std::string& name, const XProblem& nlp);
+    typedef Nlpsol* (*Creator)(const std::string& name, const XProblem& nlp);
 
     // No static functions exposed
     struct Exposed{ };
@@ -172,7 +171,7 @@ namespace casadi {
     static const std::string infix_;
 
     /// Short name
-    static std::string shortname() { return "nlp";}
+    static std::string shortname() { return "nlpsol";}
 
     // Get reduced Hessian
     virtual DMatrix getReducedHessian();
@@ -205,7 +204,7 @@ namespace casadi {
   };
 
   template<typename XType>
-  Problem<XType> NlpSolver::map2problem(const std::map<std::string, XType>& d) {
+  Problem<XType> Nlpsol::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> nl_in(NL_NUM_IN), nl_out(NL_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="x") {
@@ -224,7 +223,7 @@ namespace casadi {
   }
 
   template<typename XType>
-  std::map<std::string, XType> NlpSolver::problem2map(const Problem<XType>& d) {
+  std::map<std::string, XType> Nlpsol::problem2map(const Problem<XType>& d) {
     return {
         {"x", d.in[NL_X]},
         {"p", d.in[NL_P]},
@@ -234,12 +233,12 @@ namespace casadi {
   }
 
   template<typename XType>
-  Function NlpSolver::problem2fun(const Problem<XType>& d) {
+  Function Nlpsol::problem2fun(const Problem<XType>& d) {
     return Function("nlp", d.in, d.out, {"x", "p"}, {"f", "g"});
   }
 
   template<typename XType>
-  Problem<XType> NlpSolver::fun2problem(Function nlp) {
+  Problem<XType> Nlpsol::fun2problem(Function nlp) {
     Problem<XType> p;
     p.in = XType::get_input(nlp);
     casadi_assert(p.in.size()==NL_NUM_IN);
@@ -250,4 +249,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_NLP_SOLVER_HPP
+#endif // CASADI_NLPSOL_HPP

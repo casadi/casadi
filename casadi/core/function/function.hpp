@@ -307,14 +307,14 @@ namespace casadi {
 
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * example:  schemeEntry("x_opt")  -> returns  NLPSOL_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
     int index_in(const std::string &name) const;
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * example:  schemeEntry("x_opt")  -> returns  NLPSOL_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
     int index_out(const std::string &name) const;
@@ -1127,7 +1127,7 @@ namespace casadi {
     /// Check if a particular plugin is available
     static bool has_integrator(const std::string& name);
     static bool has_qp_solver(const std::string& name);
-    static bool has_nlp_solver(const std::string& name);
+    static bool has_nlpsol(const std::string& name);
     static bool has_linsol(const std::string& name);
     ///@}
 
@@ -1135,7 +1135,7 @@ namespace casadi {
     /// Explicitly load a plugin dynamically
     static void load_qp_solver(const std::string& name);
     static void load_integrator(const std::string& name);
-    static void load_nlp_solver(const std::string& name);
+    static void load_nlpsol(const std::string& name);
     static void load_linsol(const std::string& name);
     ///@}
 
@@ -1143,7 +1143,7 @@ namespace casadi {
     /// Get the documentation string for a plugin
     static std::string doc_integrator(const std::string& name);
     static std::string doc_qp_solver(const std::string& name);
-    static std::string doc_nlp_solver(const std::string& name);
+    static std::string doc_nlpsol(const std::string& name);
     static std::string doc_linsol(const std::string& name);
     ///@}
 
@@ -1339,14 +1339,14 @@ namespace casadi {
       \author Joel Andersson
       \date 2011-2015
     */
-    static Function nlp_solver(const std::string& name, const std::string& solver,
+    static Function nlpsol(const std::string& name, const std::string& solver,
                                const SXDict& nlp, const Dict& opts=Dict());
-    static Function nlp_solver(const std::string& name, const std::string& solver,
+    static Function nlpsol(const std::string& name, const std::string& solver,
                                const MXDict& nlp, const Dict& opts=Dict());
-    static Function nlp_solver(const std::string& name, const std::string& solver,
+    static Function nlpsol(const std::string& name, const std::string& solver,
                                const Function& nlp, const Dict& opts=Dict());
 #ifndef SWIG
-    static Function nlp_solver(const std::string& name, const std::string& solver,
+    static Function nlpsol(const std::string& name, const std::string& solver,
                                const XProblem& nlp, const Dict& opts=Dict());
 #endif // SWIG
 
@@ -1354,34 +1354,34 @@ namespace casadi {
     ///@}
 
     /** \brief Access the NLP for an NLP solver */
-    Function nlp_solver_nlp();
+    Function nlpsol_nlp();
 
     /** Access the objective gradient function for an NLP solver */
-    Function nlp_solver_gradf();
+    Function nlpsol_gradf();
 
     /** \brief Access the Hessian of the Lagrangian function for an NLP solver */
-    Function nlp_solver_jacg();
+    Function nlpsol_jacg();
 
     /** \brief Access the Jacobian of the constraint function for an NLP solver */
-    Function nlp_solver_hesslag();
+    Function nlpsol_hesslag();
 
     /** \brief Get input scheme of NLP solvers */
-    static std::vector<std::string> nlp_solver_in();
+    static std::vector<std::string> nlpsol_in();
 
     /** \brief Get NLP solver output scheme of NLP solvers */
-    static std::vector<std::string> nlp_solver_out();
+    static std::vector<std::string> nlpsol_out();
 
     /** \brief Get NLP solver input scheme name by index */
-    static std::string nlp_solver_in(int ind);
+    static std::string nlpsol_in(int ind);
 
     /** \brief Get output scheme name by index */
-    static std::string nlp_solver_out(int ind);
+    static std::string nlpsol_out(int ind);
 
     /** \brief Get the number of NLP solver inputs */
-    static int nlp_solver_n_in();
+    static int nlpsol_n_in();
 
     /** \brief Get the number of NLP solver outputs */
-    static int nlp_solver_n_out();
+    static int nlpsol_n_out();
 
     ///@{
     /** Create a QP solver

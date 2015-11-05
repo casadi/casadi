@@ -98,7 +98,7 @@ int main(){
 
   // Create an NLP solver passing derivative information
   Function solver =
-    Function::nlp_solver("solver", "ipopt", nlp,
+    Function::nlpsol("solver", "ipopt", nlp,
                          {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}});
 
   // Bounds and initial guess

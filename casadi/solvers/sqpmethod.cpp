@@ -38,8 +38,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_SQPMETHOD_EXPORT
-      casadi_register_nlpsolver_sqpmethod(NlpSolver::Plugin* plugin) {
+  int CASADI_NLPSOL_SQPMETHOD_EXPORT
+      casadi_register_nlpsol_sqpmethod(Nlpsol::Plugin* plugin) {
     plugin->creator = Sqpmethod::creator;
     plugin->name = "sqpmethod";
     plugin->doc = Sqpmethod::meta_doc.c_str();
@@ -48,12 +48,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_SQPMETHOD_EXPORT casadi_load_nlpsolver_sqpmethod() {
-    NlpSolver::registerPlugin(casadi_register_nlpsolver_sqpmethod);
+  void CASADI_NLPSOL_SQPMETHOD_EXPORT casadi_load_nlpsol_sqpmethod() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_sqpmethod);
   }
 
   Sqpmethod::Sqpmethod(const std::string& name, const XProblem& nlp)
-    : NlpSolver(name, nlp) {
+    : Nlpsol(name, nlp) {
 
     casadi_warning("The SQP method is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
@@ -98,7 +98,7 @@ namespace casadi {
 
   void Sqpmethod::init() {
     // Call the init method of the base class
-    NlpSolver::init();
+    Nlpsol::init();
 
     // Read options
     max_iter_ = option("max_iter");
@@ -179,7 +179,7 @@ namespace casadi {
     if (!exact_hessian_) {
       // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
       SX Bk = SX::sym("Bk", H_sparsity);
-      SX x = SX::sym("x", input(NLP_SOLVER_X0).sparsity());
+      SX x = SX::sym("x", input(NLPSOL_X0).sparsity());
       SX x_old = SX::sym("x", x.sparsity());
       SX gLag = SX::sym("gLag", x.sparsity());
       SX gLag_old = SX::sym("gLag_old", x.sparsity());
@@ -247,18 +247,18 @@ namespace casadi {
 
 
     // Get problem data
-    const vector<double>& x_init = input(NLP_SOLVER_X0).data();
-    const vector<double>& lbx = input(NLP_SOLVER_LBX).data();
-    const vector<double>& ubx = input(NLP_SOLVER_UBX).data();
-    const vector<double>& lbg = input(NLP_SOLVER_LBG).data();
-    const vector<double>& ubg = input(NLP_SOLVER_UBG).data();
+    const vector<double>& x_init = input(NLPSOL_X0).data();
+    const vector<double>& lbx = input(NLPSOL_LBX).data();
+    const vector<double>& ubx = input(NLPSOL_UBX).data();
+    const vector<double>& lbg = input(NLPSOL_LBG).data();
+    const vector<double>& ubg = input(NLPSOL_UBG).data();
 
     // Set linearization point to initial guess
     copy(x_init.begin(), x_init.end(), x_.begin());
 
     // Initialize Lagrange multipliers of the NLP
-    copy(input(NLP_SOLVER_LAM_G0)->begin(), input(NLP_SOLVER_LAM_G0)->end(), mu_.begin());
-    copy(input(NLP_SOLVER_LAM_X0)->begin(), input(NLP_SOLVER_LAM_X0)->end(), mu_x_.begin());
+    copy(input(NLPSOL_LAM_G0)->begin(), input(NLPSOL_LAM_G0)->end(), mu_.begin());
+    copy(input(NLPSOL_LAM_X0)->begin(), input(NLPSOL_LAM_X0)->end(), mu_x_.begin());
 
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ =
         t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
@@ -351,11 +351,11 @@ namespace casadi {
       if (!fcallback_.isNull()) {
         double time1 = clock();
 
-        if (!output(NLP_SOLVER_F).is_empty()) output(NLP_SOLVER_F).set(fk_);
-        if (!output(NLP_SOLVER_X).is_empty()) output(NLP_SOLVER_X).setNZ(x_);
-        if (!output(NLP_SOLVER_LAM_G).is_empty()) output(NLP_SOLVER_LAM_G).setNZ(mu_);
-        if (!output(NLP_SOLVER_LAM_X).is_empty()) output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
-        if (!output(NLP_SOLVER_G).is_empty()) output(NLP_SOLVER_G).setNZ(gk_);
+        if (!output(NLPSOL_F).is_empty()) output(NLPSOL_F).set(fk_);
+        if (!output(NLPSOL_X).is_empty()) output(NLPSOL_X).setNZ(x_);
+        if (!output(NLPSOL_LAM_G).is_empty()) output(NLPSOL_LAM_G).setNZ(mu_);
+        if (!output(NLPSOL_LAM_X).is_empty()) output(NLPSOL_LAM_X).setNZ(mu_x_);
+        if (!output(NLPSOL_G).is_empty()) output(NLPSOL_G).setNZ(gk_);
 
         Dict iteration;
         iteration["iter"] = iter;
@@ -370,7 +370,7 @@ namespace casadi {
         t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
         time1 = clock();
 
-        for (int i=0; i<NLP_SOLVER_NUM_OUT; ++i) {
+        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
           fcallback_.setInput(output(i), i);
         }
         fcallback_.evaluate();
@@ -591,11 +591,11 @@ namespace casadi {
     t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Save results to outputs
-    output(NLP_SOLVER_F).set(fk_);
-    output(NLP_SOLVER_X).setNZ(x_);
-    output(NLP_SOLVER_LAM_G).setNZ(mu_);
-    output(NLP_SOLVER_LAM_X).setNZ(mu_x_);
-    output(NLP_SOLVER_G).setNZ(gk_);
+    output(NLPSOL_F).set(fk_);
+    output(NLPSOL_X).setNZ(x_);
+    output(NLPSOL_LAM_G).setNZ(mu_);
+    output(NLPSOL_LAM_X).setNZ(mu_x_);
+    output(NLPSOL_G).setNZ(gk_);
 
     if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       // Write timings
@@ -738,7 +738,7 @@ namespace casadi {
 
       // Pass the argument to the function
       hessLag.setInputNZ(x, HESSLAG_X);
-      hessLag.setInput(input(NLP_SOLVER_P), HESSLAG_P);
+      hessLag.setInput(input(NLPSOL_P), HESSLAG_P);
       hessLag.setInput(sigma, HESSLAG_LAM_F);
       hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
 
@@ -777,7 +777,7 @@ namespace casadi {
 
       // Pass the argument to the function
       nlp_.setInputNZ(x, NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+      nlp_.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate the function and tape
       nlp_.evaluate();
@@ -813,7 +813,7 @@ namespace casadi {
 
       // Pass the argument to the function
       jacG.setInputNZ(x, NL_X);
-      jacG.setInput(input(NLP_SOLVER_P), NL_P);
+      jacG.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate the function
       jacG.evaluate();
@@ -849,7 +849,7 @@ namespace casadi {
 
       // Pass the argument to the function
       gradF.setInputNZ(x, NL_X);
-      gradF.setInput(input(NLP_SOLVER_P), NL_P);
+      gradF.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate, adjoint mode
       gradF.evaluate();
@@ -885,7 +885,7 @@ namespace casadi {
 
       // Pass the argument to the function
       nlp_.setInputNZ(x, NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+      nlp_.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate the function
       nlp_.evaluate();

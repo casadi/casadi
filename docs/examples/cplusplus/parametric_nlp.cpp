@@ -84,7 +84,7 @@ int main(){
   SXDict nlp = {{"x", x}, {"p", p}, {"f", f}, {"g", g}};
 
   // Create NLP solver and buffers
-  Function solver = Function::nlp_solver("solver", "ipopt", nlp);
+  Function solver = Function::nlpsol("solver", "ipopt", nlp);
   std::map<std::string, DMatrix> arg, res;
 
   // Solve the NLP

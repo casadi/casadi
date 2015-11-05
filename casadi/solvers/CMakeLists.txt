@@ -31,17 +31,17 @@ casadi_plugin(Rootfinder newton
   newton.hpp newton.cpp newton_meta.cpp)
 
 # SQPMethod -  A basic SQP method
-casadi_plugin(NlpSolver sqpmethod
+casadi_plugin(Nlpsol sqpmethod
   sqpmethod.hpp sqpmethod.cpp sqpmethod_meta.cpp)
 
 # SCPgen -  An implementation of Lifted Newton SQP
-casadi_plugin(NlpSolver scpgen
+casadi_plugin(Nlpsol scpgen
   scpgen.hpp scpgen.cpp scpgen_meta.cpp)
 
 # Reformulations
-casadi_plugin(QpSolver nlp
+casadi_plugin(QpSolver nlpsol
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
-casadi_plugin(Rootfinder nlp
+casadi_plugin(Rootfinder nlpsol
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)
 casadi_plugin(LinearSolver symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp

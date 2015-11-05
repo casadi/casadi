@@ -27,13 +27,13 @@
 #define CASADI_QP_TO_NLP_HPP
 
 #include "casadi/core/function/qp_solver.hpp"
-#include "casadi/core/function/nlp_solver.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 
 #include <casadi/solvers/casadi_qpsolver_nlp_export.h>
 
 
 /** \defgroup plugin_QpSolver_nlp
-   Solve QPs using an NlpSolver
+   Solve QPs using an Nlpsol
 */
 
 /** \pluginsection{QpSolver,nlp} */
@@ -50,7 +50,7 @@ namespace casadi {
    \date 2011
   */
 class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolver,
-  public Adaptor<QpToNlp, NlpSolver> {
+  public Adaptor<QpToNlp, Nlpsol> {
 public:
   /** \brief  Create a new Solver */
   explicit QpToNlp(const std::string& name,

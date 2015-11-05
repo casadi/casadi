@@ -26,16 +26,16 @@
 #ifndef CASADI_IPOPT_INTERFACE_HPP
 #define CASADI_IPOPT_INTERFACE_HPP
 
-#include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
-#include "casadi/core/function/nlp_solver.hpp"
+#include <casadi/interfaces/ipopt/casadi_nlpsol_ipopt_export.h>
+#include "casadi/core/function/nlpsol.hpp"
 #include "casadi/core/timing.hpp"
 
-/** \defgroup plugin_NlpSolver_ipopt
+/** \defgroup plugin_Nlpsol_ipopt
 *
-* When in warmstart mode, output NLP_SOLVER_LAM_X may be used as input
+* When in warmstart mode, output NLPSOL_LAM_X may be used as input
 *
 * NOTE: Even when max_iter == 0, it is not guaranteed that
-* input(NLP_SOLVER_X0) == output(NLP_SOLVER_X).
+* input(NLPSOL_X0) == output(NLPSOL_X).
 * Indeed if bounds on X or constraints are unmet, they will differ.
 *
 * For a good tutorial on IPOPT, see
@@ -54,17 +54,17 @@
 *
 */
 
-/** \pluginsection{NlpSolver,ipopt} **/
+/** \pluginsection{Nlpsol,ipopt} **/
 
 /// \cond INTERNAL
 namespace casadi {
 
-/** \brief \pluginbrief{NlpSolver,ipopt}
+/** \brief \pluginbrief{Nlpsol,ipopt}
 
-@copydoc NlpSolver_doc
-@copydoc plugin_NlpSolver_ipopt
+@copydoc Nlpsol_doc
+@copydoc plugin_Nlpsol_ipopt
 */
-class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInterface : public NlpSolver {
+class CASADI_NLPSOL_IPOPT_EXPORT IpoptInterface : public Nlpsol {
 friend class IpoptUserClass;
 
 public:
@@ -75,7 +75,7 @@ public:
   virtual const char* plugin_name() const { return "ipopt";}
 
   /** \brief  Create a new NLP Solver */
-  static NlpSolver* creator(const std::string& name, const XProblem& nlp) {
+  static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
     return new IpoptInterface(name, nlp);
   }
 

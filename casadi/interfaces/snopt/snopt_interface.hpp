@@ -26,25 +26,25 @@
 #ifndef CASADI_SNOPT_INTERFACE_HPP
 #define CASADI_SNOPT_INTERFACE_HPP
 
-#include "casadi/core/function/nlp_solver.hpp"
-#include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
+#include "casadi/core/function/nlpsol.hpp"
+#include "casadi/interfaces/snopt/casadi_nlpsol_snopt_export.h"
 #include "casadi/interfaces/snopt/snopt.h"
 #include "snoptProblem.hpp"
 
-/** \defgroup plugin_NlpSolver_snopt
+/** \defgroup plugin_Nlpsol_snopt
   SNOPT interface
 */
 
-/** \pluginsection{NlpSolver,snopt} */
+/** \pluginsection{Nlpsol,snopt} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{NlpSolver,snopt}
-     @copydoc NlpSolver_doc
-     @copydoc plugin_NlpSolver_snopt
+  /** \brief \pluginbrief{Nlpsol,snopt}
+     @copydoc Nlpsol_doc
+     @copydoc plugin_Nlpsol_snopt
   */
-  class CASADI_NLPSOLVER_SNOPT_EXPORT SnoptInterface : public NlpSolver {
+  class CASADI_NLPSOL_SNOPT_EXPORT SnoptInterface : public Nlpsol {
 
   public:
     // Constructor
@@ -57,7 +57,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "snopt";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolver* creator(const std::string& name, const XProblem& nlp) {
+    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
       return new SnoptInterface(name, nlp);
     }
 

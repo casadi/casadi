@@ -59,7 +59,7 @@ G = X+X
 #! NLP
 nlp = {'x':X, 'f':F, 'g':G}
 
-solver = Function.nlp_solver("nlp","ipopt", nlp)
+solver = Function.nlpsol("nlp","ipopt", nlp)
 solver.printOptions()
 
 #! The default lower an upper bound on the optimizations variables is zero.

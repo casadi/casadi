@@ -34,7 +34,7 @@
 #include "kernel_sum.hpp"
 #include "integrator.hpp"
 #include "qp_solver.hpp"
-#include "nlp_solver.hpp"
+#include "nlpsol.hpp"
 #include "rootfinder.hpp"
 #include "linsol.hpp"
 
@@ -1447,16 +1447,16 @@ namespace casadi {
     return QpSolver::getPlugin(name).doc;
   }
 
-  bool Function::has_nlp_solver(const string& name) {
-    return NlpSolver::hasPlugin(name);
+  bool Function::has_nlpsol(const string& name) {
+    return Nlpsol::hasPlugin(name);
   }
 
-  void Function::load_nlp_solver(const string& name) {
-    NlpSolver::loadPlugin(name);
+  void Function::load_nlpsol(const string& name) {
+    Nlpsol::loadPlugin(name);
   }
 
-  string Function::doc_nlp_solver(const string& name) {
-    return NlpSolver::getPlugin(name).doc;
+  string Function::doc_nlpsol(const string& name) {
+    return Nlpsol::getPlugin(name).doc;
   }
 
   bool Function::has_rootfinder(const string& name) {
@@ -1599,110 +1599,110 @@ namespace casadi {
     return INTEGRATOR_NUM_OUT;
   }
 
-  Function Function::nlp_solver(const string& name, const string& solver,
+  Function Function::nlpsol(const string& name, const string& solver,
                                 const SXDict& nlp, const Dict& opts) {
-    return nlp_solver(name, solver, NlpSolver::map2problem(nlp), opts);
+    return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
   }
 
-  Function Function::nlp_solver(const string& name, const string& solver,
+  Function Function::nlpsol(const string& name, const string& solver,
                                 const MXDict& nlp, const Dict& opts) {
-    return nlp_solver(name, solver, NlpSolver::map2problem(nlp), opts);
+    return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
   }
 
-  Function Function::nlp_solver(const string& name, const string& solver,
+  Function Function::nlpsol(const string& name, const string& solver,
                                 const Function& nlp, const Dict& opts) {
     if (nlp.is_a("sxfunction")) {
-      return Function::nlp_solver(name, solver,
-                                  NlpSolver::fun2problem<SX>(nlp), opts);
+      return Function::nlpsol(name, solver,
+                                  Nlpsol::fun2problem<SX>(nlp), opts);
     } else {
-      return Function::nlp_solver(name, solver,
-                                  NlpSolver::fun2problem<MX>(nlp), opts);
+      return Function::nlpsol(name, solver,
+                                  Nlpsol::fun2problem<MX>(nlp), opts);
     }
   }
 
-  Function Function::nlp_solver(const string& name, const string& solver,
+  Function Function::nlpsol(const string& name, const string& solver,
                                 const XProblem& nlp, const Dict& opts) {
     Function ret;
-    ret.assignNode(NlpSolver::instantiatePlugin(name, solver, nlp));
+    ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
     ret.setOption(opts);
     ret.init();
     return ret;
   }
 
-  Function Function::nlp_solver_nlp() {
+  Function Function::nlpsol_nlp() {
     casadi_assert(!isNull());
-    NlpSolver* n = dynamic_cast<NlpSolver*>(get());
+    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
     casadi_assert_message(n!=0, "Not an NLP solver");
     return n->nlp_;
   }
 
-  Function Function::nlp_solver_gradf() {
+  Function Function::nlpsol_gradf() {
     casadi_assert(!isNull());
-    NlpSolver* n = dynamic_cast<NlpSolver*>(get());
+    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
     casadi_assert_message(n!=0, "Not an NLP solver");
     return n->gradF();
   }
 
-  Function Function::nlp_solver_jacg() {
+  Function Function::nlpsol_jacg() {
     casadi_assert(!isNull());
-    NlpSolver* n = dynamic_cast<NlpSolver*>(get());
+    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
     casadi_assert_message(n!=0, "Not an NLP solver");
     return n->jacG();
   }
 
-  Function Function::nlp_solver_hesslag() {
+  Function Function::nlpsol_hesslag() {
     casadi_assert(!isNull());
-    NlpSolver* n = dynamic_cast<NlpSolver*>(get());
+    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
     casadi_assert_message(n!=0, "Not an NLP solver");
     return n->hessLag();
   }
 
-  vector<string> Function::nlp_solver_in() {
-    vector<string> ret(nlp_solver_n_in());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlp_solver_in(i);
+  vector<string> Function::nlpsol_in() {
+    vector<string> ret(nlpsol_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_in(i);
     return ret;
   }
 
-  vector<string> Function::nlp_solver_out() {
-    vector<string> ret(nlp_solver_n_out());
-    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlp_solver_out(i);
+  vector<string> Function::nlpsol_out() {
+    vector<string> ret(nlpsol_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_out(i);
     return ret;
   }
 
-  string Function::nlp_solver_in(int ind) {
-    switch (static_cast<NlpSolverInput>(ind)) {
-    case NLP_SOLVER_X0:     return "x0";
-    case NLP_SOLVER_P:      return "p";
-    case NLP_SOLVER_LBX:    return "lbx";
-    case NLP_SOLVER_UBX:    return "ubx";
-    case NLP_SOLVER_LBG:    return "lbg";
-    case NLP_SOLVER_UBG:    return "ubg";
-    case NLP_SOLVER_LAM_X0: return "lam_x0";
-    case NLP_SOLVER_LAM_G0: return "lam_g0";
-    case NLP_SOLVER_NUM_IN: break;
+  string Function::nlpsol_in(int ind) {
+    switch (static_cast<NlpsolInput>(ind)) {
+    case NLPSOL_X0:     return "x0";
+    case NLPSOL_P:      return "p";
+    case NLPSOL_LBX:    return "lbx";
+    case NLPSOL_UBX:    return "ubx";
+    case NLPSOL_LBG:    return "lbg";
+    case NLPSOL_UBG:    return "ubg";
+    case NLPSOL_LAM_X0: return "lam_x0";
+    case NLPSOL_LAM_G0: return "lam_g0";
+    case NLPSOL_NUM_IN: break;
     }
     return string();
   }
 
-  string Function::nlp_solver_out(int ind) {
-    switch (static_cast<NlpSolverOutput>(ind)) {
-    case NLP_SOLVER_X:     return "x";
-    case NLP_SOLVER_F:     return "f";
-    case NLP_SOLVER_G:     return "g";
-    case NLP_SOLVER_LAM_X: return "lam_x";
-    case NLP_SOLVER_LAM_G: return "lam_g";
-    case NLP_SOLVER_LAM_P: return "lam_p";
-    case NLP_SOLVER_NUM_OUT: break;
+  string Function::nlpsol_out(int ind) {
+    switch (static_cast<NlpsolOutput>(ind)) {
+    case NLPSOL_X:     return "x";
+    case NLPSOL_F:     return "f";
+    case NLPSOL_G:     return "g";
+    case NLPSOL_LAM_X: return "lam_x";
+    case NLPSOL_LAM_G: return "lam_g";
+    case NLPSOL_LAM_P: return "lam_p";
+    case NLPSOL_NUM_OUT: break;
     }
     return string();
   }
 
-  int Function::nlp_solver_n_in() {
-    return NLP_SOLVER_NUM_IN;
+  int Function::nlpsol_n_in() {
+    return NLPSOL_NUM_IN;
   }
 
-  int Function::nlp_solver_n_out() {
-    return NLP_SOLVER_NUM_OUT;
+  int Function::nlpsol_n_out() {
+    return NLPSOL_NUM_OUT;
   }
 
   Function Function::qp_solver(const string& name, const string& solver,

@@ -37,8 +37,8 @@ except:
   pass
 try:
   LinearSolver.loadPlugin("csparse")
-  Function.load_nlp_solver("ipopt")
-  solvers.append(("nlp",{"linear_solver": "csparse", "nlp_solver": "ipopt"}))
+  Function.load_nlpsol("ipopt")
+  solvers.append(("nlp",{"linear_solver": "csparse", "nlpsol": "ipopt"}))
 except:
   pass
 try:

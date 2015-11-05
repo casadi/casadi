@@ -245,12 +245,12 @@ class LinearSolverTests(casadiTestCase):
       solver = Function.linsol("solver", Solver, A.sparsity(), 1, options)
       solver.setInput(A,"A")
 
-      solver.prepare()
+      solver.linsol_prepare()
       
       b = DMatrix([1,0.5])
       solver.setInput(b,"B")
       
-      solver.solve(True)
+      solver.linsol_solve(True)
       
       res = DMatrix([1.5,-0.5])
       self.checkarray(solver.getOutput("X"),res)
@@ -263,12 +263,12 @@ class LinearSolverTests(casadiTestCase):
       solver = Function.linsol("solver", Solver, A.sparsity(), 1, options)
       solver.setInput(A,"A")
 
-      solver.prepare()
+      solver.linsol_prepare()
       
       b = DMatrix([1,0.5])
       solver.setInput(b,"B")
       
-      solver.solve()
+      solver.linsol_solve()
       
       res = DMatrix([-1.5,5.5])
       self.checkarray(solver.getOutput("X"),res)
@@ -351,7 +351,7 @@ class LinearSolverTests(casadiTestCase):
         print Solver
         solver = Function.linsol("solver", Solver, A.sparsity(), 1, options)
         for tr in [True, False]:
-          x = solver.solve(A,b,tr)
+          x = solver.linsol_solve(A,b,tr)
           f = Function("f", [A,b],[x])
           f.setInput(A_,0)
           f.setInput(b_,1)
@@ -402,17 +402,17 @@ class LinearSolverTests(casadiTestCase):
 
     S = Function.linsol("S", "csparsecholesky", M.sparsity(), 1)
     S.setInput(M)
-    S.prepare()
+    S.linsol_prepare()
     
     self.checkarray(M,M.T)
     
-    C = S.getFactorization()
+    C = S.linsol_cholesky()
     self.checkarray(mul(C,C.T),M)
     self.checkarray(C,L)
     
     print C
     
-    S.getFactorizationSparsity().spy()
+    S.linsol_cholesky_sparsity().spy()
 
     C = solve(M,b,"csparsecholesky")
     self.checkarray(mul(M,C),b)
@@ -428,11 +428,11 @@ class LinearSolverTests(casadiTestCase):
     print L
     S = Function.linsol("S", "csparsecholesky", M.sparsity(), 1)
     
-    S.getFactorizationSparsity().spy()
+    S.linsol_cholesky_sparsity().spy()
     S.setInput(M)
-    S.prepare()
+    S.linsol_prepare()
 
-    C = S.getFactorization()
+    C = S.linsol_cholesky()
     self.checkarray(mul(C,C.T),M)
     
   def test_large_sparse(self):

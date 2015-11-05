@@ -295,41 +295,41 @@ namespace casadi {
   };
 
   /// Input arguments of an NLP Solver
-  enum NlpSolverInput {
+  enum NlpsolInput {
     /// Decision variables, initial guess (nx x 1)
-    NLP_SOLVER_X0,
+    NLPSOL_X0,
     /// Value of fixed parameters (np x 1)
-    NLP_SOLVER_P,
+    NLPSOL_P,
     /// Decision variables lower bound (nx x 1), default -inf
-    NLP_SOLVER_LBX,
+    NLPSOL_LBX,
     /// Decision variables upper bound (nx x 1), default +inf
-    NLP_SOLVER_UBX,
+    NLPSOL_UBX,
     /// Constraints lower bound (ng x 1), default -inf
-    NLP_SOLVER_LBG,
+    NLPSOL_LBG,
     /// Constraints upper bound (ng x 1), default +inf
-    NLP_SOLVER_UBG,
+    NLPSOL_UBG,
     /// Lagrange multipliers for bounds on X, initial guess (nx x 1)
-    NLP_SOLVER_LAM_X0,
+    NLPSOL_LAM_X0,
     /// Lagrange multipliers for bounds on G, initial guess (ng x 1)
-    NLP_SOLVER_LAM_G0,
-    NLP_SOLVER_NUM_IN
+    NLPSOL_LAM_G0,
+    NLPSOL_NUM_IN
   };
 
   /// Output arguments of an NLP Solver
-  enum NlpSolverOutput {
+  enum NlpsolOutput {
     /// Decision variables at the optimal solution (nx x 1)
-    NLP_SOLVER_X,
+    NLPSOL_X,
     /// Cost function value at the optimal solution (1 x 1)
-    NLP_SOLVER_F,
+    NLPSOL_F,
     /// Constraints function at the optimal solution (ng x 1)
-    NLP_SOLVER_G,
+    NLPSOL_G,
     /// Lagrange multipliers for bounds on X at the solution (nx x 1)
-    NLP_SOLVER_LAM_X,
+    NLPSOL_LAM_X,
     /// Lagrange multipliers for bounds on G at the solution (ng x 1)
-    NLP_SOLVER_LAM_G,
+    NLPSOL_LAM_G,
     /// Lagrange multipliers for bounds on P at the solution (np x 1)
-    NLP_SOLVER_LAM_P,
-    NLP_SOLVER_NUM_OUT
+    NLPSOL_LAM_P,
+    NLPSOL_NUM_OUT
   };
 
   /// Input arguments of a QP problem

@@ -29,17 +29,17 @@ from types import *
 from helpers import *
 
 qpsolvers = []
-if Function.has_nlp_solver("ipopt"):
-  qpsolvers.append(("nlp",{"nlp_solver":"ipopt", "nlp_solver_options": {"tol": 1e-12}},{}))
+if Function.has_nlpsol("ipopt"):
+  qpsolvers.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options": {"tol": 1e-12}},{}))
 
-if Function.has_nlp_solver("ipopt"):
-  qpsolvers.append(("nlp.ipopt",{"nlp_solver_options": {"tol": 1e-12}},{}))
+if Function.has_nlpsol("ipopt"):
+  qpsolvers.append(("nlpsol.ipopt",{"nlpsol_options": {"tol": 1e-12}},{}))
 
-# if Function.has_nlp_solver("worhp") and not args.ignore_memory_heavy:
-#   qpsolvers.append(("nlp",{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}},{}))
+# if Function.has_nlpsol("worhp") and not args.ignore_memory_heavy:
+#   qpsolvers.append(("nlpsol",{"nlpsol": "worhp", "nlpsol_options": {"TolOpti": 1e-12}},{}))
 
-# if Function.has_nlp_solver("worhp") and not args.ignore_memory_heavy:
-#   qpsolvers.append(("nlp.worhp",{"nlp_solver_options": {"TolOpti": 1e-12}},{}))
+# if Function.has_nlpsol("worhp") and not args.ignore_memory_heavy:
+#   qpsolvers.append(("nlpsol.worhp",{"nlpsol_options": {"TolOpti": 1e-12}},{}))
 
 # if Function.has_qp_solver("ooqp"):
 #   qpsolvers.append(("ooqp",{},{}))

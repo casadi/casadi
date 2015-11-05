@@ -18,27 +18,27 @@ for d in data[:1]:
   log = []
   dists = []
   
-  nlpsolver = SnoptSolver(nlp)
-  #nlpsolver.setOption("tol",1e-12)
-  nlpsolver.setOption("gather_stats",True)
-  nlpsolver.setOption("_feasibility_tolerance",1e-12)
-  nlpsolver.setOption("_optimality_tolerance",1e-12)
-  nlpsolver.setOption("_major_iteration_limit",3000)
-  nlpsolver.setOption("detect_linear",True)
-  #nlpsolver.setOption("max_iter",3000)
-  nlpsolver.init()
+  nlpsol = SnoptSolver(nlp)
+  #nlpsol.setOption("tol",1e-12)
+  nlpsol.setOption("gather_stats",True)
+  nlpsol.setOption("_feasibility_tolerance",1e-12)
+  nlpsol.setOption("_optimality_tolerance",1e-12)
+  nlpsol.setOption("_major_iteration_limit",3000)
+  nlpsol.setOption("detect_linear",True)
+  #nlpsol.setOption("max_iter",3000)
+  nlpsol.init()
   
-  nlpsolver.setInput(1e-5,"x0")
+  nlpsol.setInput(1e-5,"x0")
   
   bs_ = mul(d["problem"]["Bs"][0],1e-5*DMatrix.ones(2,2))
-  nlpsolver.input("x0")[-bs_.size():] = vec(bs_)
+  nlpsol.input("x0")[-bs_.size():] = vec(bs_)
   
-  nlpsolver.setInput(0,"lbg")
-  nlpsolver.setInput(0,"ubg")
+  nlpsol.setInput(0,"lbg")
+  nlpsol.setInput(0,"ubg")
   
-  nlpsolver.evaluate()
+  nlpsol.evaluate()
   
-  print nlpsolver.getStats()
+  print nlpsol.getStats()
   
-  alldata.append({"f": nlpsolver.output("f"),"x":nlpsolver.output("x"), "stats": nlpsolver.getStats()})
+  alldata.append({"f": nlpsol.output("f"),"x":nlpsol.output("x"), "stats": nlpsol.getStats()})
   

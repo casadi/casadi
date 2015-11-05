@@ -27,12 +27,12 @@
 #define CASADI_IMPLICIT_TO_NLP_HPP
 
 #include "casadi/core/function/rootfinder.hpp"
-#include "casadi/core/function/nlp_solver.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 
 #include <casadi/solvers/casadi_rootfinder_nlp_export.h>
 
 /** \defgroup plugin_Rootfinder_nlp
-  Use an NlpSolver as Rootfinder solver
+  Use an Nlpsol as Rootfinder solver
 */
 /** \pluginsection{Rootfinder,nlp} */
 
@@ -48,7 +48,7 @@ namespace casadi {
    \date 2012
   */
   class CASADI_ROOTFINDER_NLP_EXPORT QpToImplicit : public Rootfinder,
-    public Adaptor<QpToImplicit, NlpSolver> {
+    public Adaptor<QpToImplicit, Nlpsol> {
   public:
     /** \brief  Constructor */
     explicit QpToImplicit(const std::string& name, const Function& f);

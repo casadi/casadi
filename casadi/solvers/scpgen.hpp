@@ -26,32 +26,32 @@
 #ifndef CASADI_SCPGEN_HPP
 #define CASADI_SCPGEN_HPP
 
-#include "casadi/core/function/nlp_solver.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 
-#include <casadi/solvers/casadi_nlpsolver_scpgen_export.h>
+#include <casadi/solvers/casadi_nlpsol_scpgen_export.h>
 
 #include <deque>
 
-/** \defgroup plugin_NlpSolver_scpgen
+/** \defgroup plugin_Nlpsol_scpgen
    A structure-exploiting sequential quadratic programming
      (to be come sequential convex programming) method for nonlinear programming.
 */
 
-/** \pluginsection{NlpSolver,scpgen} */
+/** \pluginsection{Nlpsol,scpgen} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /**  \brief \pluginbrief{NlpSolver,scpgen}
+  /**  \brief \pluginbrief{Nlpsol,scpgen}
 
      @copydoc NLPSolver_doc
-     @copydoc plugin_NlpSolver_scpgen
+     @copydoc plugin_Nlpsol_scpgen
 
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */
-  class CASADI_NLPSOLVER_SCPGEN_EXPORT Scpgen : public NlpSolver {
+  class CASADI_NLPSOL_SCPGEN_EXPORT Scpgen : public Nlpsol {
   public:
     explicit Scpgen(const std::string& name, const XProblem& nlp);
     virtual ~Scpgen();
@@ -60,7 +60,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "scpgen";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolver* creator(const std::string& name, const XProblem& nlp)
+    static Nlpsol* creator(const std::string& name, const XProblem& nlp)
     { return new Scpgen(name, nlp);}
 
     virtual void init();

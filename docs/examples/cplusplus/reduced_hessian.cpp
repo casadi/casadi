@@ -81,7 +81,7 @@ int main(){
   opts["compute_red_hessian"] = "yes";
   
   // Create NLP solver and buffers
-  Function solver = Function::nlp_solver("solver", "ipopt", nlp, opts);
+  Function solver = Function::nlpsol("solver", "ipopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
 
   // Solve NLP

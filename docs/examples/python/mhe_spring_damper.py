@@ -148,11 +148,11 @@ P = sigma_x0**2*DMatrix.eye(Nstates)
 x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
 opts = {"print_level":0, "print_time": False, 'max_iter':100}
-nlp_solver = Function.nlp_solver("nlp_solver", "ipopt", nlp, opts)
+nlpsol = Function.nlpsol("nlpsol", "ipopt", nlp, opts)
 
 # Set the bounds for the constraints: we only have the multiple shooting constraints, so all constraints have upper and lower bound of zero
-nlp_solver.setInput(0,"lbg")
-nlp_solver.setInput(0,"ubg")
+nlpsol.setInput(0,"lbg")
+nlpsol.setInput(0,"ubg")
 
 # Create a holder for the estimated states and disturbances
 estimated_X= DMatrix.zeros(Nstates,Nsimulation)
@@ -166,12 +166,12 @@ current_parameters["x0"] = x0
 initialisation_state = shooting(0)
 initialisation_state["X",horzcat] = simulated_X[:,0:N]
 
-nlp_solver.setInput(current_parameters,"p")
-nlp_solver.setInput(initialisation_state,"x0")
+nlpsol.setInput(current_parameters,"p")
+nlpsol.setInput(initialisation_state,"x0")
 
-nlp_solver.evaluate()
+nlpsol.evaluate()
 # Get the solution
-solution = shooting(nlp_solver.getOutput("x"))
+solution = shooting(nlpsol.getOutput("x"))
 estimated_X[:,0:N] = solution["X",horzcat]
 estimated_W[:,0:N-1] = solution["W",horzcat]
 
@@ -179,7 +179,7 @@ estimated_W[:,0:N-1] = solution["W",horzcat]
 for i in range(1,Nsimulation-N+1):
 
   # Update the arrival cost, using linearisations around the estimate of MHE at the beginning of the horizon (according to the 'Smoothed EKF Update'): first update the state and covariance with the measurement that will be deleted, and next propagate the state and covariance because of the shifting of the horizon
-  print "step %d/%d (%s)" % (i, Nsimulation-N , nlp_solver.getStat("return_status"))
+  print "step %d/%d (%s)" % (i, Nsimulation-N , nlpsol.getStat("return_status"))
   H.setInput(solution["X",0],0)
   H.evaluate()
   H0 = H.getOutput(0)
@@ -216,11 +216,11 @@ for i in range(1,Nsimulation-N+1):
   phi.evaluate()
   initialisation_state["X",N-1] = phi.getOutput(0)
   # And now initialize the solver and solve the problem
-  nlp_solver.setInput(current_parameters,"p")
-  nlp_solver.setInput(initialisation_state,"x0")
-  nlp_solver.evaluate()
+  nlpsol.setInput(current_parameters,"p")
+  nlpsol.setInput(initialisation_state,"x0")
+  nlpsol.evaluate()
 
-  solution = shooting(nlp_solver.getOutput("x"))
+  solution = shooting(nlpsol.getOutput("x"))
 
   # Now get the state estimate. Note that we are only interested in the last node of the horizon
   estimated_X[:,N-1+i] = solution["X",N-1]

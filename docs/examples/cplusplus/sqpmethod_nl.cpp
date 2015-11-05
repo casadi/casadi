@@ -58,12 +58,12 @@ int main(int argc, char **argv){
   // Specify QP solver
   opts["qp_solver"]  = "nlp";
   opts["qp_solver_options"] =
-    Dict{{"nlp_solver", "ipopt"},
-         {"nlp_solver_options", Dict{{"print_level", 0},
+    Dict{{"nlpsol", "ipopt"},
+         {"nlpsol_options", Dict{{"print_level", 0},
                                      {"print_time", 0}}}};
 
   // Allocate NLP solver and buffers
-  Function nlp_solver = Function::nlp_solver("nlp_solver", "sqpmethod", nlp, opts);
+  Function nlpsol = Function::nlpsol("nlpsol", "sqpmethod", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
 
   // Solve NLP
@@ -72,7 +72,7 @@ int main(int argc, char **argv){
   arg["lbg"] = nl.g_lb;
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
-  res = nlp_solver(arg);
+  res = nlpsol(arg);
 
   return 0;
 }

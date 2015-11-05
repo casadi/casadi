@@ -39,8 +39,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_SCPGEN_EXPORT
-      casadi_register_nlpsolver_scpgen(NlpSolver::Plugin* plugin) {
+  int CASADI_NLPSOL_SCPGEN_EXPORT
+      casadi_register_nlpsol_scpgen(Nlpsol::Plugin* plugin) {
     plugin->creator = Scpgen::creator;
     plugin->name = "scpgen";
     plugin->doc = Scpgen::meta_doc.c_str();
@@ -49,12 +49,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_SCPGEN_EXPORT casadi_load_nlpsolver_scpgen() {
-    NlpSolver::registerPlugin(casadi_register_nlpsolver_scpgen);
+  void CASADI_NLPSOL_SCPGEN_EXPORT casadi_load_nlpsol_scpgen() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_scpgen);
   }
 
   Scpgen::Scpgen(const std::string& name, const XProblem& nlp)
-    : NlpSolver(name, nlp) {
+    : Nlpsol(name, nlp) {
     casadi_warning("SCPgen is under development");
     addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
@@ -110,7 +110,7 @@ namespace casadi {
 
   void Scpgen::init() {
     // Call the init method of the base class
-    NlpSolver::init();
+    Nlpsol::init();
 
     // Read options
     max_iter_ = option("max_iter");
@@ -658,11 +658,11 @@ namespace casadi {
     checkInitialBounds();
 
     // Get problem data
-    const vector<double>& x_init = input(NLP_SOLVER_X0).data();
-    const vector<double>& lbx = input(NLP_SOLVER_LBX).data();
-    const vector<double>& ubx = input(NLP_SOLVER_UBX).data();
-    const vector<double>& lbg = input(NLP_SOLVER_LBG).data();
-    const vector<double>& ubg = input(NLP_SOLVER_UBG).data();
+    const vector<double>& x_init = input(NLPSOL_X0).data();
+    const vector<double>& lbx = input(NLPSOL_LBX).data();
+    const vector<double>& ubx = input(NLPSOL_UBX).data();
+    const vector<double>& lbg = input(NLPSOL_LBG).data();
+    const vector<double>& ubg = input(NLPSOL_UBG).data();
 
     copy(x_init.begin(), x_init.end(), x_init_.begin());
     copy(lbx.begin(), lbx.end(), x_lb_.begin());
@@ -673,7 +673,7 @@ namespace casadi {
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function
       vinit_fcn_.setInputNZ(x_init_, 0);
-      vinit_fcn_.setInput(input(NLP_SOLVER_P), 1);
+      vinit_fcn_.setInput(input(NLPSOL_P), 1);
       vinit_fcn_.evaluate();
       for (int i=0; i<v_.size(); ++i) {
         vinit_fcn_.getOutputNZ(v_[i].init, i);
@@ -800,11 +800,11 @@ namespace casadi {
     userOut() << "optimal cost = " << f_ << endl;
 
     // Save results to outputs
-    output(NLP_SOLVER_F).set(f_);
-    output(NLP_SOLVER_X).setNZ(x_opt_);
-    output(NLP_SOLVER_LAM_G).setNZ(g_lam_);
-    output(NLP_SOLVER_LAM_X).setNZ(x_lam_);
-    output(NLP_SOLVER_G).setNZ(g_);
+    output(NLPSOL_F).set(f_);
+    output(NLPSOL_X).setNZ(x_opt_);
+    output(NLPSOL_LAM_G).setNZ(g_lam_);
+    output(NLPSOL_LAM_X).setNZ(x_lam_);
+    output(NLPSOL_G).setNZ(g_);
 
     // Write timers
     if (print_time_) {
@@ -915,7 +915,7 @@ namespace casadi {
     double time1 = clock();
 
     // Pass parameters
-    mat_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
+    mat_fcn_.setInput(input(NLPSOL_P), mod_p_);
 
     // Pass primal step/variables
     mat_fcn_.setInputNZ(x_opt_, mod_x_);
@@ -974,7 +974,7 @@ namespace casadi {
     double time1 = clock();
 
     // Pass parameters
-    res_fcn_.setInput(input(NLP_SOLVER_P), res_p_);
+    res_fcn_.setInput(input(NLPSOL_P), res_p_);
 
     // Pass primal variables to the residual function for initial evaluation
     res_fcn_.setInputNZ(x_opt_, res_x_);
@@ -1015,7 +1015,7 @@ namespace casadi {
     }
 
     // Parameter sensitivities
-    res_fcn_.getOutput(output(NLP_SOLVER_LAM_P), res_p_d_);
+    res_fcn_.getOutput(output(NLPSOL_LAM_P), res_p_d_);
 
     double time2 = clock();
     t_eval_res_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -1026,7 +1026,7 @@ namespace casadi {
     double time1 = clock();
 
     // Pass current parameter guess
-    vec_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
+    vec_fcn_.setInput(input(NLPSOL_P), mod_p_);
 
     // Pass primal step/variables
     vec_fcn_.setInputNZ(x_opt_, mod_x_);
@@ -1250,7 +1250,7 @@ namespace casadi {
     double time1 = clock();
 
     // Pass current parameter guess
-    exp_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
+    exp_fcn_.setInput(input(NLPSOL_P), mod_p_);
 
     // Pass primal step/variables
     exp_fcn_.setInputNZ(x_step_, mod_du_);

@@ -138,8 +138,8 @@ namespace casadi {
   }
 
   extern "C"
-  int CASADI_NLPSOLVER_IPOPT_EXPORT
-  casadi_register_nlpsolver_ipopt(NlpSolver::Plugin* plugin) {
+  int CASADI_NLPSOL_IPOPT_EXPORT
+  casadi_register_nlpsol_ipopt(Nlpsol::Plugin* plugin) {
     plugin->creator = IpoptInterface::creator;
     plugin->name = "ipopt";
     plugin->doc = IpoptInterface::meta_doc.c_str();
@@ -148,12 +148,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_IPOPT_EXPORT casadi_load_nlpsolver_ipopt() {
-    NlpSolver::registerPlugin(casadi_register_nlpsolver_ipopt);
+  void CASADI_NLPSOL_IPOPT_EXPORT casadi_load_nlpsol_ipopt() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_ipopt);
   }
 
   IpoptInterface::IpoptInterface(const std::string& name, const XProblem& nlp)
-    : NlpSolver(name, nlp) {
+    : Nlpsol(name, nlp) {
 
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true,
@@ -280,7 +280,7 @@ namespace casadi {
     freeIpopt();
 
     // Call the init method of the base class
-    NlpSolver::init();
+    Nlpsol::init();
 
     // Read user options
     exact_hessian_ = !hasSetOption("hessian_approximation") ||
@@ -601,15 +601,15 @@ namespace casadi {
       const timer time0 = getTimerTime();
       if (!fcallback_.isNull()) {
         if (full_callback) {
-          if (!output(NLP_SOLVER_X).is_empty()) copy(x, x+nx_, output(NLP_SOLVER_X)->begin());
+          if (!output(NLPSOL_X).is_empty()) copy(x, x+nx_, output(NLPSOL_X)->begin());
 
-          vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
+          vector<double>& lambda_x = output(NLPSOL_LAM_X).data();
           for (int i=0; i<lambda_x.size(); ++i) {
             lambda_x[i] = z_U[i]-z_L[i];
           }
-          if (!output(NLP_SOLVER_LAM_G).is_empty())
-            copy(lambda, lambda+ng_, output(NLP_SOLVER_LAM_G)->begin());
-          if (!output(NLP_SOLVER_G).is_empty()) copy(g, g+ng_, output(NLP_SOLVER_G)->begin());
+          if (!output(NLPSOL_LAM_G).is_empty())
+            copy(lambda, lambda+ng_, output(NLPSOL_LAM_G)->begin());
+          if (!output(NLPSOL_G).is_empty()) copy(g, g+ng_, output(NLPSOL_G)->begin());
         } else {
           if (iter==0) {
             userOut<true, PL_WARN>()
@@ -633,10 +633,10 @@ namespace casadi {
         iteration["obj"] = obj_value;
         stats_["iteration"] = iteration;
 
-        output(NLP_SOLVER_F).at(0) = obj_value;
+        output(NLPSOL_F).at(0) = obj_value;
 
         n_eval_callback_ += 1;
-        for (int i=0; i<NLP_SOLVER_NUM_OUT; ++i) {
+        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
           fcallback_.setInput(output(i), i);
         }
         fcallback_.evaluate();
@@ -664,22 +664,22 @@ namespace casadi {
                                         int iter_count) {
     try {
       // Get primal solution
-      copy(x, x+nx_, output(NLP_SOLVER_X)->begin());
+      copy(x, x+nx_, output(NLPSOL_X)->begin());
 
       // Get optimal cost
-      output(NLP_SOLVER_F).at(0) = obj_value;
+      output(NLPSOL_F).at(0) = obj_value;
 
       // Get dual solution (simple bounds)
-      vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
+      vector<double>& lambda_x = output(NLPSOL_LAM_X).data();
       for (int i=0; i<lambda_x.size(); ++i) {
         lambda_x[i] = z_U[i]-z_L[i];
       }
 
       // Get dual solution (nonlinear bounds)
-      copy(lambda, lambda+ng_, output(NLP_SOLVER_LAM_G)->begin());
+      copy(lambda, lambda+ng_, output(NLPSOL_LAM_G)->begin());
 
       // Get the constraints
-      copy(g, g+ng_, output(NLP_SOLVER_G)->begin());
+      copy(g, g+ng_, output(NLPSOL_G)->begin());
 
       // Get statistics
       stats_["iter_count"] = iter_count;
@@ -709,7 +709,7 @@ namespace casadi {
       } else {
         // Pass the argument to the function
         hessLag_.setInputNZ(x, NL_X);
-        hessLag_.setInput(input(NLP_SOLVER_P), NL_P);
+        hessLag_.setInput(input(NLPSOL_P), NL_P);
         hessLag_.setInput(obj_factor, NL_NUM_IN+NL_F);
         hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
 
@@ -774,7 +774,7 @@ namespace casadi {
       } else {
         // Pass the argument to the function
         jacG.setInputNZ(x, NL_X);
-        jacG.setInput(input(NLP_SOLVER_P), NL_P);
+        jacG.setInput(input(NLPSOL_P), NL_P);
 
         // Evaluate the function
         jacG.evaluate();
@@ -821,7 +821,7 @@ namespace casadi {
 
       // Pass the argument to the function
       nlp_.setInputNZ(x, NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+      nlp_.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate the function
       nlp_.evaluate();
@@ -862,7 +862,7 @@ namespace casadi {
       if (m>0) {
         // Pass the argument to the function
         nlp_.setInputNZ(x, NL_X);
-        nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+        nlp_.setInput(input(NLPSOL_P), NL_P);
 
         // Evaluate the function and tape
         nlp_.evaluate();
@@ -903,7 +903,7 @@ namespace casadi {
 
       // Pass the argument to the function
       gradF_.setInputNZ(x, NL_X);
-      gradF_.setInput(input(NLP_SOLVER_P), NL_P);
+      gradF_.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate, adjoint mode
       gradF_.evaluate();
@@ -940,10 +940,10 @@ namespace casadi {
     try {
       casadi_assert(n == nx_);
       casadi_assert(m == ng_);
-      input(NLP_SOLVER_LBX).getNZ(x_l);
-      input(NLP_SOLVER_UBX).getNZ(x_u);
-      input(NLP_SOLVER_LBG).getNZ(g_l);
-      input(NLP_SOLVER_UBG).getNZ(g_u);
+      input(NLPSOL_LBX).getNZ(x_l);
+      input(NLPSOL_UBX).getNZ(x_u);
+      input(NLPSOL_LBG).getNZ(g_l);
+      input(NLPSOL_UBG).getNZ(g_u);
       return true;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_bounds_info failed: " << ex.what() << endl;
@@ -965,12 +965,12 @@ namespace casadi {
       }
 
       if (init_x) {
-        input(NLP_SOLVER_X0).getNZ(x);
+        input(NLPSOL_X0).getNZ(x);
       }
 
       if (init_z) {
         // Get dual solution (simple bounds)
-        vector<double>& lambda_x = input(NLP_SOLVER_LAM_X0).data();
+        vector<double>& lambda_x = input(NLPSOL_LAM_X0).data();
         for (int i=0; i<lambda_x.size(); ++i) {
           z_L[i] = max(0., -lambda_x[i]);
           z_U[i] = max(0., lambda_x[i]);
@@ -978,7 +978,7 @@ namespace casadi {
       }
 
       if (init_lambda) {
-        input(NLP_SOLVER_LAM_G0).getNZ(lambda);
+        input(NLPSOL_LAM_G0).getNZ(lambda);
       }
 
       return true;

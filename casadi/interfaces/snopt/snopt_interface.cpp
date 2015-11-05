@@ -35,8 +35,8 @@
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_SNOPT_EXPORT
-  casadi_register_nlpsolver_snopt(NlpSolver::Plugin* plugin) {
+  int CASADI_NLPSOL_SNOPT_EXPORT
+  casadi_register_nlpsol_snopt(Nlpsol::Plugin* plugin) {
     plugin->creator = SnoptInterface::creator;
     plugin->name = "snopt";
     plugin->doc = SnoptInterface::meta_doc.c_str();
@@ -45,12 +45,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_SNOPT_EXPORT casadi_load_nlpsolver_snopt() {
-    NlpSolver::registerPlugin(casadi_register_nlpsolver_snopt);
+  void CASADI_NLPSOL_SNOPT_EXPORT casadi_load_nlpsol_snopt() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_snopt);
   }
 
   SnoptInterface::SnoptInterface(const std::string& name, const XProblem& nlp)
-    : NlpSolver(name, nlp) {
+    : Nlpsol(name, nlp) {
 
     addOption("detect_linear", OT_BOOLEAN, true,
               "Make an effort to treat linear constraints and linear variables specially.");
@@ -210,7 +210,7 @@ namespace casadi {
     detect_linear_ = option("detect_linear");
 
     // Call the init method of the base class
-    NlpSolver::init();
+    Nlpsol::init();
 
     // Get/generate required functions
     jacF();
@@ -505,12 +505,12 @@ namespace casadi {
 
     // Evaluate gradF and jacG at initial value
     if (!jacG_.isNull()) {
-      jacG_.setInput(input(NLP_SOLVER_X0), JACG_X);
-      jacG_.setInput(input(NLP_SOLVER_P), JACG_P);
+      jacG_.setInput(input(NLPSOL_X0), JACG_X);
+      jacG_.setInput(input(NLPSOL_P), JACG_P);
       jacG_.evaluate();
     }
-    jacF_.setInput(input(NLP_SOLVER_X0), GRADF_X);
-    jacF_.setInput(input(NLP_SOLVER_P), GRADF_P);
+    jacF_.setInput(input(NLPSOL_X0), GRADF_X);
+    jacF_.setInput(input(NLPSOL_P), GRADF_P);
 
     jacF_.evaluate();
 
@@ -532,7 +532,7 @@ namespace casadi {
     if (detect_linear_) {
       nlp_.setInput(0.0, NL_X);
       // Setting the zero might actually be problematic
-      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+      nlp_.setInput(input(NLPSOL_P), NL_P);
       nlp_.evaluate();
     }
 
@@ -550,21 +550,21 @@ namespace casadi {
     // Obtain initial guess and bounds through the mapping
     for (int k = 0; k < nx_; ++k) {
       int kk = x_order_[k];
-      bl_[k] = input(NLP_SOLVER_LBX).data()[kk];
-      bu_[k] = input(NLP_SOLVER_UBX).data()[kk];
-      x_[k] = input(NLP_SOLVER_X0).data()[kk];
+      bl_[k] = input(NLPSOL_LBX).data()[kk];
+      bu_[k] = input(NLPSOL_UBX).data()[kk];
+      x_[k] = input(NLPSOL_X0).data()[kk];
     }
     for (int k = 0; k < ng_; ++k) {
       int kk = g_order_[k];
       if (g_type_[kk] < 2) {
         // casadi_error("woops");
-        bl_[nx_+k] = input(NLP_SOLVER_LBG).data()[kk]-nlp_.output(NL_G).data()[kk];
-        bu_[nx_+k] = input(NLP_SOLVER_UBG).data()[kk]-nlp_.output(NL_G).data()[kk];
+        bl_[nx_+k] = input(NLPSOL_LBG).data()[kk]-nlp_.output(NL_G).data()[kk];
+        bu_[nx_+k] = input(NLPSOL_UBG).data()[kk]-nlp_.output(NL_G).data()[kk];
       } else {
-        bl_[nx_+k] = input(NLP_SOLVER_LBG).data()[kk];
-        bu_[nx_+k] = input(NLP_SOLVER_UBG).data()[kk];
+        bl_[nx_+k] = input(NLPSOL_LBG).data()[kk];
+        bu_[nx_+k] = input(NLPSOL_UBG).data()[kk];
       }
-      x_[nx_+k] = input(NLP_SOLVER_LAM_G0).data()[kk];
+      x_[nx_+k] = input(NLPSOL_LAM_G0).data()[kk];
     }
 
     // Objective row / dummy row should be unbounded
@@ -650,27 +650,27 @@ namespace casadi {
     // Store results into output
     for (int k = 0; k < nx_; ++k) {
       int kk =  x_order_[k];
-      output(NLP_SOLVER_X).data()[kk] = x_[k];
-      output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
+      output(NLPSOL_X).data()[kk] = x_[k];
+      output(NLPSOL_LAM_X).data()[kk] = -rc_[k];
     }
 
-    setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLP_SOLVER_F);
+    setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLPSOL_F);
 
     for (int k = 0; k < ng_; ++k) {
       int kk = g_order_[k];
-      output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];
-      output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];  // TODO(Joris): this is not quite right
+      output(NLPSOL_LAM_G).data()[kk] = -rc_[nx_+k];
+      output(NLPSOL_G).data()[kk] = x_[nx_+k];  // TODO(Joris): this is not quite right
       // mul_no_alloc
     }
 
     // todo(Greg): get these from snopt
     // we overwrite F and G for now because the current snopt interface
     // doesn't provide F, and the above comment suggests that G is wrong
-    nlp_.setInput(output(NLP_SOLVER_X), NL_X);
-    nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+    nlp_.setInput(output(NLPSOL_X), NL_X);
+    nlp_.setInput(input(NLPSOL_P), NL_P);
     nlp_.evaluate();
-    setOutput(nlp_.output(NL_F), NLP_SOLVER_F);
-    setOutput(nlp_.output(NL_G), NLP_SOLVER_G);
+    setOutput(nlp_.output(NL_F), NLPSOL_F);
+    setOutput(nlp_.output(NL_G), NLPSOL_G);
 
     // print timing information
     // save state
@@ -749,7 +749,7 @@ namespace casadi {
 
       // Evaluate gradF with the linear variables put to zero
       jacF_.setInput(0.0, NL_X);
-      jacF_.setInput(input(NLP_SOLVER_P), NL_P);
+      jacF_.setInput(input(NLPSOL_P), NL_P);
       for (int k = 0; k < nnObj; ++k) {
         if (x_type_f_[x_order_[k]] == 2) {
           jacF_.input(NL_X)[x_order_[k]] = x[k];
@@ -813,7 +813,7 @@ namespace casadi {
           userOut() << "x (con - original indices - linear elements zero):"
                     << jacG_.input(JACG_X) << std::endl;
         }
-        jacG_.setInput(input(NLP_SOLVER_P), JACG_P);
+        jacG_.setInput(input(NLPSOL_P), JACG_P);
 
         // Evaluate the function
         jacG_.evaluate();
@@ -888,18 +888,18 @@ namespace casadi {
         double time0 = clock();
         for (int k = 0; k < nx_; ++k) {
           int kk = x_order_[k];
-          output(NLP_SOLVER_X).data()[kk] = x_[k];
-          // output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
+          output(NLPSOL_X).data()[kk] = x_[k];
+          // output(NLPSOL_LAM_X).data()[kk] = -rc_[k];
         }
 
-        // setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLP_SOLVER_F);
+        // setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLPSOL_F);
         for (int k = 0; k < ng_; ++k) {
           int kk =  g_order_[k];
-          // output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];
-          output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];
+          // output(NLPSOL_LAM_G).data()[kk] = -rc_[nx_+k];
+          output(NLPSOL_G).data()[kk] = x_[nx_+k];
         }
 
-        for (int i=0; i<NLP_SOLVER_NUM_OUT; ++i) {
+        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
           fcallback_.setInput(output(i), i);
         }
         fcallback_.evaluate();

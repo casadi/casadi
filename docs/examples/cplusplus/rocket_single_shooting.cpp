@@ -33,8 +33,8 @@ using namespace std;
 extern "C" void casadi_load_integrator_cvodes();
 extern "C" void casadi_load_integrator_idas();
 extern "C" void casadi_load_integrator_rk();
-extern "C" void casadi_load_nlpsolver_ipopt();
-extern "C" void casadi_load_nlpsolver_scpgen();
+extern "C" void casadi_load_nlpsol_ipopt();
+extern "C" void casadi_load_nlpsol_scpgen();
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
@@ -45,8 +45,8 @@ int main(){
   casadi_load_integrator_cvodes();
   casadi_load_integrator_idas();
   casadi_load_integrator_rk();
-  casadi_load_nlpsolver_ipopt();
-  casadi_load_nlpsolver_scpgen();
+  casadi_load_nlpsol_ipopt();
+  casadi_load_nlpsol_scpgen();
   
   // Time length
   double T = 10.0;
@@ -166,7 +166,7 @@ int main(){
     ipopt_options["print_level"] = 0;
     ipopt_options["print_time"] = false;
     solver_opts["qp_solver_options"] =
-      Dict{{"nlp_solver_options", Dict{{"nlp_solver", "ipopt"}}}};
+      Dict{{"nlpsol_options", Dict{{"nlpsol", "ipopt"}}}};
   } else {
     solver_name = "ipopt";
     solver_opts["tol"] = 1e-10;
@@ -174,7 +174,7 @@ int main(){
   }
 
   // Create NLP solver
-  Function solver = Function::nlp_solver("nlp_solver", solver_name, nlp, solver_opts);
+  Function solver = Function::nlpsol("nlpsol", solver_name, nlp, solver_opts);
 
   // Bounds on u and initial condition
   vector<double> umin(nu, -10), umax(nu, 10), u0(nu, 0.4);

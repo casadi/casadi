@@ -197,7 +197,7 @@ opts["expand"] = True
 opts["linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
+solver = Function.nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Initial condition

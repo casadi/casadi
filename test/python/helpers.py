@@ -590,13 +590,13 @@ class requires_qp_solver(object):
       print "Not available QP plugin %s, skipping unittests" % self.n
       return None
 
-class requires_nlp_solver(object):
+class requires_nlpsol(object):
   def __init__(self,n):
     self.n = n
   
   def __call__(self,c):
     try:
-      Function.load_nlp_solver(self.n)
+      Function.load_nlpsol(self.n)
       return c
     except:
       print "Not available NLP plugin %s, skipping unittests" % self.n

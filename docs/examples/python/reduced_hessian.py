@@ -70,7 +70,7 @@ opts["var_integer_md"] = var_integer_md
 opts["compute_red_hessian"] = "yes"
 
 # Create an NLP solver
-solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
+solver = Function.nlpsol("solver", "ipopt", nlp, opts)
 
 # Solve NLP
 res = solver({"x0" : x0,

@@ -53,7 +53,7 @@ int main(int argc, char **argv){
   //  opts["verbose"] = true;
 
   // Allocate NLP solver and buffers
-  Function nlp_solver = Function::nlp_solver("nlp_solver", "worhp", nlp, opts);
+  Function nlpsol = Function::nlpsol("nlpsol", "worhp", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
 
   // Solve NLP
@@ -62,7 +62,7 @@ int main(int argc, char **argv){
   arg["lbg"] = nl.g_lb;
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
-  res = nlp_solver(arg);
+  res = nlpsol(arg);
 
   return 0;
 }

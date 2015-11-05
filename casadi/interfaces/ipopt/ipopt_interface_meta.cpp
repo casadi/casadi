@@ -28,10 +28,10 @@
 
       const std::string casadi::IpoptInterface::meta_doc=
       "\n"
-"When in warmstart mode, output NLP_SOLVER_LAM_X may be used as input\n"
+"When in warmstart mode, output NLPSOL_LAM_X may be used as input\n"
 "\n"
 "NOTE: Even when max_iter == 0, it is not guaranteed that\n"
-"input(NLP_SOLVER_X0) == output(NLP_SOLVER_X). Indeed if bounds on X or\n"
+"input(NLPSOL_X0) == output(NLPSOL_X). Indeed if bounds on X or\n"
 "constraints are unmet, they will differ.\n"
 "\n"
 "For a good tutorial on IPOPT, seehttp://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf\n"

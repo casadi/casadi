@@ -102,7 +102,7 @@ int main(){
   // Allocate an NLP solver and buffers
   Dict opts = {{"tol", 1e-10},
                {"hessian_approximation", "limited-memory"}};
-  Function solver = Function::nlp_solver("solver", "ipopt", nlp, opts);
+  Function solver = Function::nlpsol("solver", "ipopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
 
   // Bounds on u and initial condition

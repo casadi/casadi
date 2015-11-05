@@ -34,8 +34,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_WORHP_EXPORT
-  casadi_register_nlpsolver_worhp(NlpSolver::Plugin* plugin) {
+  int CASADI_NLPSOL_WORHP_EXPORT
+  casadi_register_nlpsol_worhp(Nlpsol::Plugin* plugin) {
     plugin->creator = WorhpInterface::creator;
     plugin->name = "worhp";
     plugin->doc = WorhpInterface::meta_doc.c_str();
@@ -44,12 +44,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_WORHP_EXPORT casadi_load_nlpsolver_worhp() {
-    NlpSolver::registerPlugin(casadi_register_nlpsolver_worhp);
+  void CASADI_NLPSOL_WORHP_EXPORT casadi_load_nlpsol_worhp() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_worhp);
   }
 
   WorhpInterface::WorhpInterface(const std::string& name, const XProblem& nlp)
-    : NlpSolver(name, nlp) {
+    : Nlpsol(name, nlp) {
 
     // Monitors
     addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions",
@@ -189,7 +189,7 @@ namespace casadi {
   void WorhpInterface::init() {
 
     // Call the init method of the base class
-    NlpSolver::init();
+    Nlpsol::init();
 
     if (hasSetOption("Ares")) {
       std::vector<int> ares = option("Ares");
@@ -454,13 +454,13 @@ namespace casadi {
 
     // Get inputs
     log("WorhpInterface::evaluate: Reading user inputs");
-    const DMatrix& x0 = input(NLP_SOLVER_X0);
-    const DMatrix& lbx = input(NLP_SOLVER_LBX);
-    const DMatrix& ubx = input(NLP_SOLVER_UBX);
-    const DMatrix& lam_x0 = input(NLP_SOLVER_LAM_X0);
-    const DMatrix& lbg = input(NLP_SOLVER_LBG);
-    const DMatrix& ubg = input(NLP_SOLVER_UBG);
-    const DMatrix& lam_g0 = input(NLP_SOLVER_LAM_G0);
+    const DMatrix& x0 = input(NLPSOL_X0);
+    const DMatrix& lbx = input(NLPSOL_LBX);
+    const DMatrix& ubx = input(NLPSOL_UBX);
+    const DMatrix& lam_x0 = input(NLPSOL_LAM_X0);
+    const DMatrix& lbg = input(NLPSOL_LBG);
+    const DMatrix& ubg = input(NLPSOL_UBG);
+    const DMatrix& lam_g0 = input(NLPSOL_LAM_G0);
 
     double inf = numeric_limits<double>::infinity();
 
@@ -532,17 +532,17 @@ namespace casadi {
           if (!fcallback_.isNull()) {
             double time1 = clock();
             // Copy outputs
-            if (!output(NLP_SOLVER_X).is_empty()) {
-              output(NLP_SOLVER_X).setNZ(worhp_o_.X);
+            if (!output(NLPSOL_X).is_empty()) {
+              output(NLPSOL_X).setNZ(worhp_o_.X);
             }
-            if (!output(NLP_SOLVER_F).is_empty())
-              output(NLP_SOLVER_F).set(worhp_o_.F);
-            if (!output(NLP_SOLVER_G).is_empty())
-              output(NLP_SOLVER_G).setNZ(worhp_o_.G);
-            if (!output(NLP_SOLVER_LAM_X).is_empty())
-              output(NLP_SOLVER_LAM_X).setNZ(worhp_o_.Lambda);
-            if (!output(NLP_SOLVER_LAM_G).is_empty())
-              output(NLP_SOLVER_LAM_G).setNZ(worhp_o_.Mu);
+            if (!output(NLPSOL_F).is_empty())
+              output(NLPSOL_F).set(worhp_o_.F);
+            if (!output(NLPSOL_G).is_empty())
+              output(NLPSOL_G).setNZ(worhp_o_.G);
+            if (!output(NLPSOL_LAM_X).is_empty())
+              output(NLPSOL_LAM_X).setNZ(worhp_o_.Lambda);
+            if (!output(NLPSOL_LAM_G).is_empty())
+              output(NLPSOL_LAM_G).setNZ(worhp_o_.Mu);
 
             Dict iteration;
             iteration["iter"] = worhp_w_.MajorIter;
@@ -557,7 +557,7 @@ namespace casadi {
             t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
             time1 = clock();
 
-            for (int i=0; i<NLP_SOLVER_NUM_OUT; ++i) {
+            for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
               fcallback_.setInput(output(i), i);
             }
             fcallback_.evaluate();
@@ -612,11 +612,11 @@ namespace casadi {
     t_mainloop_ += (time2-time1)/CLOCKS_PER_SEC;
 
     // Copy outputs
-    output(NLP_SOLVER_X).set(worhp_o_.X);
-    output(NLP_SOLVER_F).set(worhp_o_.F);
-    output(NLP_SOLVER_G).set(worhp_o_.G);
-    output(NLP_SOLVER_LAM_X).setNZ(worhp_o_.Lambda);
-    output(NLP_SOLVER_LAM_G).set(worhp_o_.Mu);
+    output(NLPSOL_X).set(worhp_o_.X);
+    output(NLPSOL_F).set(worhp_o_.F);
+    output(NLPSOL_G).set(worhp_o_.G);
+    output(NLPSOL_LAM_X).setNZ(worhp_o_.Lambda);
+    output(NLPSOL_LAM_G).set(worhp_o_.Mu);
 
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
 
@@ -686,7 +686,7 @@ namespace casadi {
 
       // Pass input
       hessLag.setInputNZ(x, HESSLAG_X);
-      hessLag.setInput(input(NLP_SOLVER_P), HESSLAG_P);
+      hessLag.setInput(input(NLPSOL_P), HESSLAG_P);
       hessLag.setInput(obj_factor, HESSLAG_LAM_F);
       hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
 
@@ -762,7 +762,7 @@ namespace casadi {
 
       // Pass the argument to the function
       jacG.setInputNZ(x, JACG_X);
-      jacG.setInput(input(NLP_SOLVER_P), JACG_P);
+      jacG.setInput(input(NLPSOL_P), JACG_P);
 
       // Evaluate the function
       jacG.evaluate();
@@ -797,7 +797,7 @@ namespace casadi {
 
       // Pass the argument to the function
       nlp_.setInputNZ(x, NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+      nlp_.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate the function
       nlp_.evaluate();
@@ -834,7 +834,7 @@ namespace casadi {
       if (worhp_o_.m>0) {
         // Pass the argument to the function
         nlp_.setInputNZ(x, NL_X);
-        nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+        nlp_.setInput(input(NLPSOL_P), NL_P);
 
         // Evaluate the function and tape
         nlp_.evaluate();
@@ -870,7 +870,7 @@ namespace casadi {
 
       // Pass the argument to the function
       gradF_.setInputNZ(x, NL_X);
-      gradF_.setInput(input(NLP_SOLVER_P), NL_P);
+      gradF_.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate, adjoint mode
       gradF_.evaluate();

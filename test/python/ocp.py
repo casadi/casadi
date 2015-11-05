@@ -29,7 +29,7 @@ from types import *
 from helpers import *
 
 class OCPtests(casadiTestCase):
-  @requires_nlp_solver("ipopt")
+  @requires_nlpsol("ipopt")
   def testdiscrete(self):
     self.message("Linear-quadratic problem, discrete, using IPOPT")
     # inspired by www.cs.umsl.edu/~janikow/publications/1992/GAforOpt/text.pdf
@@ -58,7 +58,7 @@ class OCPtests(casadiTestCase):
     opts["hessian_approximation"] = "limited-memory"
     opts["max_iter"] = 100
     opts["print_level"] = 0
-    solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
+    solver = Function.nlpsol("solver", "ipopt", nlp, opts)
     solver.setInput([-1000 for i in range(V.nnz())],"lbx")
     solver.setInput([1000 for i in range(V.nnz())],"ubx")
     solver.setInput([0 for i in range(N+1)],"lbg")
@@ -72,7 +72,7 @@ class OCPtests(casadiTestCase):
     exact_sol=K * x0**2
     self.assertAlmostEqual(ocp_sol,exact_sol,10,"Linear-quadratic problem solution using IPOPT")
 
-  @requires_nlp_solver("ipopt")
+  @requires_nlpsol("ipopt")
   def test_singleshooting(self):
     self.message("Single shooting")
     p0 = 0.2
@@ -113,7 +113,7 @@ class OCPtests(casadiTestCase):
     opts["max_iter"] = 10
     opts["derivative_test"] = "first-order"
     opts["print_level"] = 0
-    solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
+    solver = Function.nlpsol("solver", "ipopt", nlp, opts)
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
     solver.evaluate()
@@ -126,7 +126,7 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[1],0,8,"Constraint is supposed to be unactive")
 
-  @requires_nlp_solver("ipopt")
+  @requires_nlpsol("ipopt")
   def test_singleshooting2(self):
     self.message("Single shooting 2")
     p0 = 0.2
@@ -166,7 +166,7 @@ class OCPtests(casadiTestCase):
     opts["max_iter"] = 10
     opts["derivative_test"] = "first-order"
     #opts["print_level"] = 0
-    solver = Function.nlp_solver("solver", "ipopt", nlp, opts)
+    solver = Function.nlpsol("solver", "ipopt", nlp, opts)
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
     solver.setInput([-1],"lbg")

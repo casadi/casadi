@@ -52,7 +52,7 @@ int main(int argc, char **argv){
   // opts["detect_linear"] = true;
 
   // Allocate NLP solver and buffers
-  Function nlp_solver = Function::nlp_solver("nlp_solver", "snopt", nlp, opts);
+  Function nlpsol = Function::nlpsol("nlpsol", "snopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
     
   // Solve NLP
@@ -61,7 +61,7 @@ int main(int argc, char **argv){
   arg["lbg"] = nl.g_lb;
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
-  res = nlp_solver(arg);
+  res = nlpsol(arg);
   
   return 0;
 }

@@ -119,8 +119,8 @@ Solver = "nlp"
 # Solver options
 opts = {}
 if Solver=="nlp":
-    opts["nlp_solver"] = "ipopt"
-    opts["nlp_solver_options"] = {"hessian_approximation":"limited-memory"}
+    opts["nlpsol"] = "ipopt"
+    opts["nlpsol_options"] = {"hessian_approximation":"limited-memory"}
 elif Solver=="newton":
     opts["linear_solver"] = CSparse
 elif Solver=="kinsol":

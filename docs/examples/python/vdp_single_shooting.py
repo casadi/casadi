@@ -63,7 +63,7 @@ g = X
 
 # Allocate an NLP solver
 nlp = {'x':x, 'f':f, 'g':g}
-solver = Function.nlp_solver("solver", "ipopt", nlp)
+solver = Function.nlpsol("solver", "ipopt", nlp)
 
 # Solve the problem
 sol = solver({"lbx" : -0.75,

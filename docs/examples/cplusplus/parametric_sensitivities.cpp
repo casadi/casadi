@@ -112,7 +112,7 @@ int main(){
   opts["n_sens_steps"] = 1;
   
   // Create NLP solver and buffers
-  Function solver = Function::nlp_solver("solver", "ipopt", nlp, opts);
+  Function solver = Function::nlpsol("solver", "ipopt", nlp, opts);
   std::map<std::string, DMatrix> arg, res;
   
   // Solve NLP

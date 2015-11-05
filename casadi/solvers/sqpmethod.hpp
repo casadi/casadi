@@ -26,25 +26,25 @@
 #ifndef CASADI_SQPMETHOD_HPP
 #define CASADI_SQPMETHOD_HPP
 
-#include "casadi/core/function/nlp_solver.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 #include <deque>
 
-#include <casadi/solvers/casadi_nlpsolver_sqpmethod_export.h>
+#include <casadi/solvers/casadi_nlpsol_sqpmethod_export.h>
 
-/** \defgroup plugin_NlpSolver_sqpmethod
+/** \defgroup plugin_Nlpsol_sqpmethod
  A textbook SQPMethod
 */
 
-/** \pluginsection{NlpSolver,sqpmethod} */
+/** \pluginsection{Nlpsol,sqpmethod} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief  \pluginbrief{NlpSolver,sqpmethod}
+  /** \brief  \pluginbrief{Nlpsol,sqpmethod}
   *  @copydoc NLPSolver_doc
-  *  @copydoc plugin_NlpSolver_sqpmethod
+  *  @copydoc plugin_Nlpsol_sqpmethod
   */
-  class CASADI_NLPSOLVER_SQPMETHOD_EXPORT Sqpmethod : public NlpSolver {
+  class CASADI_NLPSOL_SQPMETHOD_EXPORT Sqpmethod : public Nlpsol {
   public:
     explicit Sqpmethod(const std::string& name, const XProblem& nlp);
     virtual ~Sqpmethod();
@@ -53,7 +53,7 @@ namespace casadi {
   virtual const char* plugin_name() const { return "sqpmethod";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolver* creator(const std::string& name, const XProblem& nlp) {
+    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
       return new Sqpmethod(name, nlp);
     }
 

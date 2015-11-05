@@ -195,7 +195,7 @@ for k in range(nk):
 #$ the derivative information needed by IPOPT, including the Jacobian of the NLP constraints and the 
 #$ Hessian of the Lagrangian function:
 nlp = {'x':v, 'f':J, 'g':vertcat(eq)}
-solver = Function.nlp_solver("solver", "ipopt", nlp)
+solver = Function.nlpsol("solver", "ipopt", nlp)
 #$ Pass bounds on the variables and constraints. The upper and lower bounds on the equality constraints are 0:
 solver.setInput(lbv,"lbx")
 solver.setInput(ubv,"ubx")

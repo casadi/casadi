@@ -23,13 +23,13 @@
  */
 
 
-#include "nlp_solver.hpp"
+#include "nlpsol.hpp"
 #include "casadi/core/timing.hpp"
 
 using namespace std;
 namespace casadi {
 
-  NlpSolver::NlpSolver(const std::string& name, const XProblem& nlp)
+  Nlpsol::Nlpsol(const std::string& name, const XProblem& nlp)
     : FunctionInternal(name), nlp2_(nlp) {
 
     // Options available in all NLP solvers
@@ -80,61 +80,61 @@ namespace casadi {
                                                        "qp", true);
 
     // Enable string notation for IO
-    ischeme_ = Function::nlp_solver_in();
-    oscheme_ = Function::nlp_solver_out();
+    ischeme_ = Function::nlpsol_in();
+    oscheme_ = Function::nlpsol_out();
 
     // Make the ref object a non-refence counted pointer to this (as reference counting would
     // prevent deletion of the object)
     ref_.assignNodeNoCount(this);
 
     if (nlp.is_sx) {
-      nlp_ = NlpSolver::problem2fun<SX>(nlp);
+      nlp_ = Nlpsol::problem2fun<SX>(nlp);
     } else {
-      nlp_ = NlpSolver::problem2fun<MX>(nlp);
+      nlp_ = Nlpsol::problem2fun<MX>(nlp);
     }
   }
 
-  NlpSolver::~NlpSolver() {
+  Nlpsol::~Nlpsol() {
     // Explicitly remove the pointer to this (as the counter would otherwise be decreased)
     ref_.assignNodeNoCount(0);
   }
 
-  Sparsity NlpSolver::get_sparsity_in(int ind) const {
-    switch (static_cast<NlpSolverInput>(ind)) {
-    case NLP_SOLVER_X0:
-    case NLP_SOLVER_LBX:
-    case NLP_SOLVER_UBX:
-    case NLP_SOLVER_LAM_X0:
-      return get_sparsity_out(NLP_SOLVER_X);
-    case NLP_SOLVER_LBG:
-    case NLP_SOLVER_UBG:
-    case NLP_SOLVER_LAM_G0:
-      return get_sparsity_out(NLP_SOLVER_G);
-    case NLP_SOLVER_P:
-      return get_sparsity_out(NLP_SOLVER_P);
-    case NLP_SOLVER_NUM_IN: break;
+  Sparsity Nlpsol::get_sparsity_in(int ind) const {
+    switch (static_cast<NlpsolInput>(ind)) {
+    case NLPSOL_X0:
+    case NLPSOL_LBX:
+    case NLPSOL_UBX:
+    case NLPSOL_LAM_X0:
+      return get_sparsity_out(NLPSOL_X);
+    case NLPSOL_LBG:
+    case NLPSOL_UBG:
+    case NLPSOL_LAM_G0:
+      return get_sparsity_out(NLPSOL_G);
+    case NLPSOL_P:
+      return get_sparsity_out(NLPSOL_P);
+    case NLPSOL_NUM_IN: break;
     }
     return Sparsity();
   }
 
-  Sparsity NlpSolver::get_sparsity_out(int ind) const {
-    switch (static_cast<NlpSolverOutput>(ind)) {
-    case NLP_SOLVER_F:
+  Sparsity Nlpsol::get_sparsity_out(int ind) const {
+    switch (static_cast<NlpsolOutput>(ind)) {
+    case NLPSOL_F:
       return Sparsity::scalar();
-    case NLP_SOLVER_X:
-    case NLP_SOLVER_LAM_X:
+    case NLPSOL_X:
+    case NLPSOL_LAM_X:
       return nlp_.sparsity_in(NL_X);
-    case NLP_SOLVER_LAM_G:
-    case NLP_SOLVER_G:
+    case NLPSOL_LAM_G:
+    case NLPSOL_G:
       return nlp_.sparsity_out(NL_G);
-    case NLP_SOLVER_LAM_P:
+    case NLPSOL_LAM_P:
       return nlp_.sparsity_in(NL_P);
-    case NLP_SOLVER_NUM_OUT: break;
+    case NLPSOL_NUM_OUT: break;
     }
     return Sparsity();
   }
 
-  void NlpSolver::init() {
+  void Nlpsol::init() {
     casadi_assert_message(nlp_.n_in()==NL_NUM_IN,
                           "The NLP function must have exactly two input");
     casadi_assert_message(nlp_.n_out()==NL_NUM_OUT,
@@ -151,24 +151,24 @@ namespace casadi {
     ng_ = g_sparsity.nnz();
 
     // Allocate space for inputs
-    ibuf_.resize(NLP_SOLVER_NUM_IN);
-    input(NLP_SOLVER_X0)       =  DMatrix::zeros(x_sparsity);
-    input(NLP_SOLVER_LBX)      = -DMatrix::inf(x_sparsity);
-    input(NLP_SOLVER_UBX)      =  DMatrix::inf(x_sparsity);
-    input(NLP_SOLVER_LBG)      = -DMatrix::inf(g_sparsity);
-    input(NLP_SOLVER_UBG)      =  DMatrix::inf(g_sparsity);
-    input(NLP_SOLVER_LAM_X0)   =  DMatrix::zeros(x_sparsity);
-    input(NLP_SOLVER_LAM_G0)   =  DMatrix::zeros(g_sparsity);
-    input(NLP_SOLVER_P)        =  DMatrix::zeros(p_sparsity);
+    ibuf_.resize(NLPSOL_NUM_IN);
+    input(NLPSOL_X0)       =  DMatrix::zeros(x_sparsity);
+    input(NLPSOL_LBX)      = -DMatrix::inf(x_sparsity);
+    input(NLPSOL_UBX)      =  DMatrix::inf(x_sparsity);
+    input(NLPSOL_LBG)      = -DMatrix::inf(g_sparsity);
+    input(NLPSOL_UBG)      =  DMatrix::inf(g_sparsity);
+    input(NLPSOL_LAM_X0)   =  DMatrix::zeros(x_sparsity);
+    input(NLPSOL_LAM_G0)   =  DMatrix::zeros(g_sparsity);
+    input(NLPSOL_P)        =  DMatrix::zeros(p_sparsity);
 
     // Allocate space for outputs
-    obuf_.resize(NLP_SOLVER_NUM_OUT);
-    output(NLP_SOLVER_X)       = DMatrix::zeros(x_sparsity);
-    output(NLP_SOLVER_F)       = DMatrix::zeros(1);
-    output(NLP_SOLVER_LAM_X)   = DMatrix::zeros(x_sparsity);
-    output(NLP_SOLVER_LAM_G)   = DMatrix::zeros(g_sparsity);
-    output(NLP_SOLVER_LAM_P)   = DMatrix::zeros(p_sparsity);
-    output(NLP_SOLVER_G)       = DMatrix::zeros(g_sparsity);
+    obuf_.resize(NLPSOL_NUM_OUT);
+    output(NLPSOL_X)       = DMatrix::zeros(x_sparsity);
+    output(NLPSOL_F)       = DMatrix::zeros(1);
+    output(NLPSOL_LAM_X)   = DMatrix::zeros(x_sparsity);
+    output(NLPSOL_LAM_G)   = DMatrix::zeros(g_sparsity);
+    output(NLPSOL_LAM_P)   = DMatrix::zeros(p_sparsity);
+    output(NLPSOL_G)       = DMatrix::zeros(g_sparsity);
 
     // Call the initialization method of the base class
     const bool verbose_init = option("verbose_init");
@@ -196,14 +196,14 @@ namespace casadi {
 
       // Consistency checks
       casadi_assert(!fcallback_.isNull());
-      casadi_assert(fcallback_.n_in()==NLP_SOLVER_NUM_OUT);
+      casadi_assert(fcallback_.n_in()==NLPSOL_NUM_OUT);
       casadi_assert(fcallback_.n_out()==1);
-      casadi_assert(fcallback_.input(NLP_SOLVER_X).size()==x_sparsity.size());
-      casadi_assert(fcallback_.input(NLP_SOLVER_F).is_scalar());
-      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_X).size()==x_sparsity.size());
-      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_G).size()==g_sparsity.size());
-      casadi_assert(fcallback_.input(NLP_SOLVER_LAM_P).size()==p_sparsity.size());
-      casadi_assert(fcallback_.input(NLP_SOLVER_G).size()==g_sparsity.size());
+      casadi_assert(fcallback_.input(NLPSOL_X).size()==x_sparsity.size());
+      casadi_assert(fcallback_.input(NLPSOL_F).is_scalar());
+      casadi_assert(fcallback_.input(NLPSOL_LAM_X).size()==x_sparsity.size());
+      casadi_assert(fcallback_.input(NLPSOL_LAM_G).size()==g_sparsity.size());
+      casadi_assert(fcallback_.input(NLPSOL_LAM_P).size()==p_sparsity.size());
+      casadi_assert(fcallback_.input(NLPSOL_G).size()==g_sparsity.size());
     }
 
     callback_step_ = option("iteration_callback_step");
@@ -211,12 +211,12 @@ namespace casadi {
 
   }
 
-  void NlpSolver::checkInitialBounds() {
-    const std::vector<double>& x0 = input(NLP_SOLVER_X0).data();
-    const std::vector<double>& lbx = input(NLP_SOLVER_LBX).data();
-    const std::vector<double>& ubx = input(NLP_SOLVER_UBX).data();
-    const std::vector<double>& lbg = input(NLP_SOLVER_LBG).data();
-    const std::vector<double>& ubg = input(NLP_SOLVER_UBG).data();
+  void Nlpsol::checkInitialBounds() {
+    const std::vector<double>& x0 = input(NLPSOL_X0).data();
+    const std::vector<double>& lbx = input(NLPSOL_LBX).data();
+    const std::vector<double>& ubx = input(NLPSOL_UBX).data();
+    const std::vector<double>& lbg = input(NLPSOL_LBG).data();
+    const std::vector<double>& ubg = input(NLPSOL_UBG).data();
     const double inf = std::numeric_limits<double>::infinity();
 
     // Detect ill-posed problems (simple bounds)
@@ -233,38 +233,38 @@ namespace casadi {
     // Warn if initial condition violates bounds
     if (static_cast<bool>(option("warn_initial_bounds"))) {
       for (int k=0; !violated && k<nx_; ++k) violated = x0[k]>ubx[k] || x0[k]<lbx[k];
-      if (violated) casadi_warning("NlpSolver: The initial guess does not satisfy LBX and UBX. "
+      if (violated) casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
                                    "Option 'warn_initial_bounds' controls this warning.");
     }
   }
 
 
-  void NlpSolver::reportConstraints(std::ostream &stream) {
+  void Nlpsol::reportConstraints(std::ostream &stream) {
 
     stream << "Reporting NLP constraints" << endl;
-    FunctionInternal::reportConstraints(stream, output(NLP_SOLVER_X), input(NLP_SOLVER_LBX),
-                                        input(NLP_SOLVER_UBX), "decision bounds");
+    FunctionInternal::reportConstraints(stream, output(NLPSOL_X), input(NLPSOL_LBX),
+                                        input(NLPSOL_UBX), "decision bounds");
     double tol = 1e-8;
     if (hasOption("constr_viol_tol")) tol = option("constr_viol_tol");
-    FunctionInternal::reportConstraints(stream, output(NLP_SOLVER_G), input(NLP_SOLVER_LBG),
-                                        input(NLP_SOLVER_UBG), "constraints", tol);
+    FunctionInternal::reportConstraints(stream, output(NLPSOL_G), input(NLPSOL_LBG),
+                                        input(NLPSOL_UBG), "constraints", tol);
   }
 
-  Function& NlpSolver::gradF() {
+  Function& Nlpsol::gradF() {
     if (gradF_.isNull()) {
       gradF_ = getGradF();
     }
     return gradF_;
   }
 
-  Function& NlpSolver::jacF() {
+  Function& Nlpsol::jacF() {
     if (jacF_.isNull()) {
       jacF_ = getJacF();
     }
     return jacF_;
   }
 
-  Function NlpSolver::getJacF() {
+  Function Nlpsol::getJacF() {
     Function jacF;
     if (hasSetOption("jac_f")) {
       jacF = option("jac_f");
@@ -295,7 +295,7 @@ namespace casadi {
     return jacF;
   }
 
-  Function NlpSolver::getGradF() {
+  Function Nlpsol::getGradF() {
     Function gradF;
     if (hasSetOption("grad_f")) {
       gradF = option("grad_f");
@@ -326,14 +326,14 @@ namespace casadi {
     return gradF;
   }
 
-  Function& NlpSolver::jacG() {
+  Function& Nlpsol::jacG() {
     if (jacG_.isNull()) {
       jacG_ = getJacG();
     }
     return jacG_;
   }
 
-  Function NlpSolver::getJacG() {
+  Function Nlpsol::getJacG() {
     Function jacG;
 
     // Return null if no constraints
@@ -368,14 +368,14 @@ namespace casadi {
     return jacG;
   }
 
-  Function& NlpSolver::gradLag() {
+  Function& Nlpsol::gradLag() {
     if (gradLag_.isNull()) {
       gradLag_ = getGradLag();
     }
     return gradLag_;
   }
 
-  Function NlpSolver::getGradLag() {
+  Function Nlpsol::getGradLag() {
     Function gradLag;
     if (hasSetOption("grad_lag")) {
       gradLag = option("grad_lag");
@@ -401,14 +401,14 @@ namespace casadi {
     return gradLag;
   }
 
-  Function& NlpSolver::hessLag() {
+  Function& Nlpsol::hessLag() {
     if (hessLag_.isNull()) {
       hessLag_ = getHessLag();
     }
     return hessLag_;
   }
 
-  Function NlpSolver::getHessLag() {
+  Function Nlpsol::getHessLag() {
     Function hessLag;
     if (hasSetOption("hess_lag")) {
       hessLag = option("hess_lag");
@@ -439,14 +439,14 @@ namespace casadi {
     return hessLag;
   }
 
-  Sparsity& NlpSolver::spHessLag() {
+  Sparsity& Nlpsol::spHessLag() {
     if (spHessLag_.isNull()) {
       spHessLag_ = getSpHessLag();
     }
     return spHessLag_;
   }
 
-  Sparsity NlpSolver::getSpHessLag() {
+  Sparsity Nlpsol::getSpHessLag() {
     Sparsity spHessLag;
     if (false /*hasSetOption("hess_lag_sparsity")*/) {
       // NOTE: No such option yet, need support for GenericType(Sparsity)
@@ -469,43 +469,43 @@ namespace casadi {
     return spHessLag;
   }
 
-  void NlpSolver::checkInputs() const {
-    for (int i=0;i<input(NLP_SOLVER_LBX).nnz();++i) {
-      casadi_assert_message(input(NLP_SOLVER_LBX).at(i)<=input(NLP_SOLVER_UBX).at(i),
+  void Nlpsol::checkInputs() const {
+    for (int i=0;i<input(NLPSOL_LBX).nnz();++i) {
+      casadi_assert_message(input(NLPSOL_LBX).at(i)<=input(NLPSOL_UBX).at(i),
                             "LBX[i] <= UBX[i] was violated for i=" << i
-                            << ". Got LBX[i]=" << input(NLP_SOLVER_LBX).at(i)
-                            << " and UBX[i]=" << input(NLP_SOLVER_UBX).at(i));
+                            << ". Got LBX[i]=" << input(NLPSOL_LBX).at(i)
+                            << " and UBX[i]=" << input(NLPSOL_UBX).at(i));
     }
-    for (int i=0;i<input(NLP_SOLVER_LBG).nnz();++i) {
-      casadi_assert_message(input(NLP_SOLVER_LBG).at(i)<=input(NLP_SOLVER_UBG).at(i),
+    for (int i=0;i<input(NLPSOL_LBG).nnz();++i) {
+      casadi_assert_message(input(NLPSOL_LBG).at(i)<=input(NLPSOL_UBG).at(i),
                             "LBG[i] <= UBG[i] was violated for i=" << i
-                            << ". Got LBG[i]=" << input(NLP_SOLVER_LBG).at(i)
-                            << " and UBG[i]=" << input(NLP_SOLVER_UBG).at(i));
+                            << ". Got LBG[i]=" << input(NLPSOL_LBG).at(i)
+                            << " and UBG[i]=" << input(NLPSOL_UBG).at(i));
     }
   }
 
-  std::map<std::string, NlpSolver::Plugin> NlpSolver::solvers_;
+  std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
 
-  const std::string NlpSolver::infix_ = "nlpsolver";
+  const std::string Nlpsol::infix_ = "nlpsol";
 
-  DMatrix NlpSolver::getReducedHessian() {
-    casadi_error("NlpSolver::getReducedHessian not defined for class "
+  DMatrix Nlpsol::getReducedHessian() {
+    casadi_error("Nlpsol::getReducedHessian not defined for class "
                  << typeid(*this).name());
     return DMatrix();
   }
 
-  void NlpSolver::setOptionsFromFile(const std::string & file) {
-    casadi_error("NlpSolver::setOptionsFromFile not defined for class "
+  void Nlpsol::setOptionsFromFile(const std::string & file) {
+    casadi_error("Nlpsol::setOptionsFromFile not defined for class "
                  << typeid(*this).name());
   }
 
-  const double& NlpSolver::default_in(int ind) const {
+  const double& Nlpsol::default_in(int ind) const {
     switch (ind) {
-    case NLP_SOLVER_LBX:
-    case NLP_SOLVER_LBG:
+    case NLPSOL_LBX:
+    case NLPSOL_LBG:
       return default_minf();
-    case NLP_SOLVER_UBX:
-    case NLP_SOLVER_UBG:
+    case NLPSOL_UBX:
+    case NLPSOL_UBG:
       return default_inf();
     default:
       return default_zero();
