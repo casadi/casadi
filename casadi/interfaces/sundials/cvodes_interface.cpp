@@ -588,7 +588,8 @@ namespace casadi {
   }
 
   int CvodesInterface::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
-                                    N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2) {
+                                    N_Vector *xdotF, void *user_data,
+                                    N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
       CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
@@ -740,7 +741,7 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsQB(t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rqdot));
+      this_->rhsQB(t, x, rx, rqdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;;
@@ -748,39 +749,38 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsQB(double t, const double* x, const double* rx, double* rqdot) {
+  void CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector rqdot) {
     if (monitor_rhsQB_) {
       userOut() << "CvodesInterface::rhsQB: begin" << endl;
     }
 
-    // Pass inputs
-    g_.setInputNZ(&t, RDAE_T);
-    g_.setInputNZ(x, RDAE_X);
-    g_.setInput(p(), RDAE_P);
-    g_.setInput(rp(), RDAE_RP);
-    g_.setInputNZ(rx, RDAE_RX);
-
-    if (monitor_rhsB_) {
-      userOut() << "t       = " << t << endl;
-      userOut() << "x       = " << g_.input(RDAE_X) << endl;
-      userOut() << "p       = " << g_.input(RDAE_P) << endl;
-      userOut() << "rx      = " << g_.input(RDAE_RX) << endl;
-      userOut() << "rp      = " << g_.input(RDAE_RP) << endl;
+    // Debug output
+    if (monitor_rhsQB_) {
+      printvar("t", t);
+      printvar("x", x);
+      printvar("rx", rx);
     }
 
-    // Evaluate
-    g_.evaluate();
+    // Evaluate g_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(x);
+    arg1_[RDAE_Z] = 0;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(rx);
+    arg1_[RDAE_RZ] = 0;
+    arg1_[RDAE_RP] = rp_;
+    res1_[RDAE_ODE] = 0;
+    res1_[RDAE_ALG] = 0;
+    res1_[RDAE_QUAD] = NV_DATA_S(rqdot);
+    g_(0, arg1_, res1_, iw_, w_);
 
-    // Save to output
-    g_.getOutputNZ(rqdot, RDAE_QUAD);
-
-    if (monitor_rhsB_) {
-      userOut() << "qdotB = " << g_.output(RDAE_QUAD) << endl;
+    // Debug output
+    if (monitor_rhsQB_) {
+      printvar("rqdot", rqdot);
     }
 
     // Negate (note definition of g)
-    for (int i=0; i<nrq_; ++i)
-      rqdot[i] *= -1;
+    casadi_scal(nrq_, -1., NV_DATA_S(rqdot), 1);
 
     if (monitor_rhsQB_) {
       userOut() << "CvodesInterface::rhsQB: end" << endl;
