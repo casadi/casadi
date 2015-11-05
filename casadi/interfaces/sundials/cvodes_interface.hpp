@@ -137,7 +137,7 @@ namespace casadi {
     void rhsQ(double t, N_Vector x, N_Vector qdot);
     void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot,
                N_Vector tmp1, N_Vector tmp2);
-    void rhsB(double t, const double* x, const double *rx, double* rxdot);
+    void rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot);
     void rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xB, N_Vector xdotB);
     void rhsQB(double t, const double* x, const double* rx, double* rqdot);
     void jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, N_Vector tmp);

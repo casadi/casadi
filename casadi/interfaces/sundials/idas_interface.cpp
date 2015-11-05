@@ -985,8 +985,8 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA,
-                           N_Vector xzdotA, N_Vector rrA) {
+  void IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
+                           N_Vector rxzdot, N_Vector rr) {
     log("IdasInterface::resB", "begin");
 
     // Debug output
@@ -994,8 +994,8 @@ namespace casadi {
       printvar("t", t);
       printvar("xz", xz);
       printvar("xzdot", xzdot);
-      printvar("xzA", xzA);
-      printvar("xzdotA", xzdotA);
+      printvar("rxz", rxz);
+      printvar("rxzdot", rxzdot);
     }
 
     // Evaluate g_
@@ -1003,20 +1003,20 @@ namespace casadi {
     arg1_[RDAE_X] = NV_DATA_S(xz);
     arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
     arg1_[RDAE_P] = p_;
-    arg1_[RDAE_RX] = NV_DATA_S(xzA);
-    arg1_[RDAE_RZ] = NV_DATA_S(xzA)+nrx_;
+    arg1_[RDAE_RX] = NV_DATA_S(rxz);
+    arg1_[RDAE_RZ] = NV_DATA_S(rxz)+nrx_;
     arg1_[RDAE_RP] = rp_;
-    res1_[RDAE_ODE] = NV_DATA_S(rrA);
-    res1_[RDAE_ALG] = NV_DATA_S(rrA) + nrx_;
+    res1_[RDAE_ODE] = NV_DATA_S(rr);
+    res1_[RDAE_ALG] = NV_DATA_S(rr) + nrx_;
     res1_[RDAE_QUAD] = 0;
     g_(0, arg1_, res1_, iw_, w_);
 
     // Subtract state derivative to get residual
-    casadi_axpy(nrx_, 1., NV_DATA_S(xzdotA), 1, NV_DATA_S(rrA), 1);
+    casadi_axpy(nrx_, 1., NV_DATA_S(rxzdot), 1, NV_DATA_S(rr), 1);
 
     // Debug output
     if (monitored("resB")) {
-      printvar("rrA", rrA);
+      printvar("rr", rr);
     }
 
     log("IdasInterface::resB", "end");

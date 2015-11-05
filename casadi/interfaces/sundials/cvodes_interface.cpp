@@ -669,37 +669,36 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsB(double t, const double* x, const double *rx, double* rxdot) {
+  void CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot) {
     log("CvodesInterface::rhsB", "begin");
 
-    // Pass inputs
-    g_.setInputNZ(&t, RDAE_T);
-    g_.setInputNZ(x, RDAE_X);
-    g_.setInput(p(), RDAE_P);
-    g_.setInput(rp(), RDAE_RP);
-    g_.setInputNZ(rx, RDAE_RX);
-
+    // Debug output
     if (monitor_rhsB_) {
-      userOut() << "t       = " << t << endl;
-      userOut() << "x       = " << g_.input(RDAE_X) << endl;
-      userOut() << "p       = " << g_.input(RDAE_P) << endl;
-      userOut() << "rx      = " << g_.input(RDAE_RX) << endl;
-      userOut() << "rp      = " << g_.input(RDAE_RP) << endl;
+      printvar("t", t);
+      printvar("x", x);
+      printvar("rx", rx);
     }
 
-    // Evaluate
-    g_.evaluate();
+    // Evaluate g_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(x);
+    arg1_[RDAE_Z] = 0;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(rx);
+    arg1_[RDAE_RZ] = 0;
+    arg1_[RDAE_RP] = rp_;
+    res1_[RDAE_ODE] = NV_DATA_S(rxdot);
+    res1_[RDAE_ALG] = 0;
+    res1_[RDAE_QUAD] = 0;
+    g_(0, arg1_, res1_, iw_, w_);
 
-    // Save to output
-    g_.getOutputNZ(rxdot, RDAE_ODE);
-
+    // Debug output
     if (monitor_rhsB_) {
-      userOut() << "xdotB = " << g_.output(RDAE_ODE) << endl;
+      printvar("rxdot", rxdot);
     }
 
     // Negate (note definition of g)
-    for (int i=0; i<nrx_; ++i)
-      rxdot[i] *= -1;
+    casadi_scal(nrx_, -1., NV_DATA_S(rxdot), 1);
 
     log("CvodesInterface::rhsB", "end");
   }
@@ -715,7 +714,7 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsB(t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rxdot));
+      this_->rhsB(t, x, rx, rxdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsB failed: " << e.what() << endl;;
