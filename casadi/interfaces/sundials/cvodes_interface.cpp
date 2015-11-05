@@ -844,31 +844,44 @@ namespace casadi {
     log("CvodesInterface::jtimes", "end");
   }
 
-  void CvodesInterface::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
-                               N_Vector xdotB, N_Vector tmpB) {
+  void CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector rx,
+                               N_Vector rxdot, N_Vector tmpB) {
     log("CvodesInterface::jtimesB", "begin");
     // Get time
     time1 = clock();
 
-    // Pass input
-    g_fwd_.setInputNZ(&t,                  RDAE_T);
-    g_fwd_.setInputNZ(NV_DATA_S(x),        RDAE_X);
-    g_fwd_.setInput(p(), RDAE_P);
-    g_fwd_.setInputNZ(NV_DATA_S(xB),       RDAE_RX);
-    g_fwd_.setInput(rp(), RDAE_RP);
+    // Hack:
+    vector<const double*> arg1(g_fwd_.sz_arg());
+    const double** arg1_ = getPtr(arg1);
+    vector<double*> res1(g_fwd_.sz_res());
+    double** res1_ = getPtr(res1);
+    vector<int> iw(g_fwd_.sz_iw());
+    int* iw_ = getPtr(iw);
+    vector<double> w(g_fwd_.sz_w());
+    double* w_ = getPtr(w);
 
-    // Pass input seeds
-    g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_T);
-    g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_X);
-    g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_P);
-    g_fwd_.setInputNZ(NV_DATA_S(vB), RDAE_NUM_IN + RDAE_RX);
-    g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_RP);
-
-    // Evaluate
-    g_fwd_.evaluate();
-
-    // Get the output seeds
-    g_fwd_.getOutputNZ(NV_DATA_S(JvB), RDAE_NUM_OUT + RDAE_ODE);
+    // Evaluate g_fwd_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(x);
+    arg1_[RDAE_Z] = 0;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(rx);
+    arg1_[RDAE_RZ] = 0;
+    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_NUM_IN + RDAE_T] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_X] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_Z] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_P] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_RX] = NV_DATA_S(v);
+    arg1_[RDAE_NUM_IN + RDAE_RZ] = 0;
+    arg1_[RDAE_NUM_IN + RDAE_RP] = 0;
+    res1_[RDAE_ODE] = 0;
+    res1_[RDAE_ALG] = 0;
+    res1_[RDAE_QUAD] = 0;
+    res1_[RDAE_NUM_OUT + RDAE_ODE] = NV_DATA_S(Jv);
+    res1_[RDAE_NUM_OUT + RDAE_ALG] = 0;
+    res1_[RDAE_NUM_OUT + RDAE_QUAD] = 0;
+    g_fwd_(0, arg1_, res1_, iw_, w_);
 
     // Log time duration
     time2 = clock();

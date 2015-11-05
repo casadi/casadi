@@ -141,8 +141,8 @@ namespace casadi {
     void rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xB, N_Vector xdotB);
     void rhsQB(double t, N_Vector x, N_Vector rx, N_Vector rqdot);
     void jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, N_Vector tmp);
-    void jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
-                 N_Vector xdotB, N_Vector tmpB);
+    void jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector rx,
+                 N_Vector rxdot, N_Vector tmpB);
     void djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
     void djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB,
