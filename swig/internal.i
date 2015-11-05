@@ -307,9 +307,6 @@
 %exception casadi::LibInfo< std::string >::LibInfo(const std::string &bin_name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LinearSolver::LinearSolver() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception casadi::Matrix< DataType >::Matrix(const Sparsity &sp, const DataType &val, bool dummy) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
