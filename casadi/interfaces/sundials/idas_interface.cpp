@@ -392,6 +392,7 @@ namespace casadi {
     if (monitored("res")) {
       printvar("t", t);
       printvar("xz", xz);
+      printvar("xzdot", xzdot);
     }
 
     // Evaluate f_
@@ -522,7 +523,7 @@ namespace casadi {
     vector<double> w(g_fwd_.sz_w());
     double* w_ = getPtr(w);
 
-    // Evaluate f_fwd_
+    // Evaluate g_fwd_
     arg1_[RDAE_T] = &t;
     arg1_[RDAE_X] = NV_DATA_S(xz);
     arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
@@ -573,9 +574,9 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::resS(int Ns, double t, const double* xz, const double* xzdot,
-                          const double *resval, N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
-                          double *tmp1, double *tmp2, double *tmp3) {
+  void IdasInterface::resS(int Ns, double t, N_Vector xz, N_Vector xzdot,
+                          N_Vector resval, N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
+                          N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     log("IdasInterface::resS", "begin");
 
     // Record the current cpu time
@@ -595,8 +596,7 @@ namespace casadi {
                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
-      this_->resS(Ns, t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(resval),
-                  xzF, xzdotF, rrF, NV_DATA_S(tmp1), NV_DATA_S(tmp2), NV_DATA_S(tmp3));
+      this_->resS(Ns, t, xz, xzdot, resval, xzF, xzdotF, rrF, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "resS failed: " << e.what() << endl;
@@ -935,7 +935,7 @@ namespace casadi {
                                  void *user_data) {
     try {
       IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
-      this_->rhsQ(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(rhsQ));
+      this_->rhsQ(t, xz, xzdot, rhsQ);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;
@@ -943,19 +943,19 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::rhsQ(double t, const double* xz, const double* xzdot, double* rhsQ) {
+  void IdasInterface::rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ) {
     log("IdasInterface::rhsQ", "begin");
-    // Pass input
-    f_.setInputNZ(&t, DAE_T);
-    f_.setInputNZ(xz, DAE_X);
-    f_.setInputNZ(xz+nx_, DAE_Z);
-    f_.setInput(p(), DAE_P);
 
-    // Evaluate
-    f_.evaluate();
+    // Evaluate f_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(xz);
+    arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[DAE_P] = p_;
+    res1_[DAE_ODE] = 0;
+    res1_[DAE_ALG] = 0;
+    res1_[DAE_QUAD] = NV_DATA_S(rhsQ);
+    f_(0, arg1_, res1_, iw_, w_);
 
-    // Get results
-    f_.getOutputNZ(rhsQ, DAE_QUAD);
     log("IdasInterface::rhsQ", "end");
   }
 
@@ -985,63 +985,39 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::resB(double t, const double* xz, const double* xzdot, const double* xzA,
-                          const double* xzdotA, double* rrA) {
+  void IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA,
+                           N_Vector xzdotA, N_Vector rrA) {
     log("IdasInterface::resB", "begin");
 
-    // Pass inputs
-    g_.setInputNZ(&t, RDAE_T);
-    g_.setInputNZ(xz, RDAE_X);
-    g_.setInputNZ(xz+nx_, RDAE_Z);
-    g_.setInput(p(), RDAE_P);
-    g_.setInput(rp(), RDAE_RP);
-    g_.setInputNZ(xzA, RDAE_RX);
-    g_.setInputNZ(xzA+nrx_, RDAE_RZ);
-
+    // Debug output
     if (monitored("resB")) {
-      userOut() << "RDAE_T    = " << t << endl;
-      userOut() << "RDAE_X    = " << g_.input(RDAE_X) << endl;
-      userOut() << "RDAE_Z    = " << g_.input(RDAE_Z) << endl;
-      userOut() << "RDAE_P    = " << g_.input(RDAE_P) << endl;
-      userOut() << "RDAE_XDOT  = ";
-      for (int k=0;k<nx_;++k) {
-        userOut() << xzdot[k] << " " ;
-      }
-      userOut() << endl;
-      userOut() << "RDAE_RX    = " << g_.input(RDAE_RX) << endl;
-      userOut() << "RDAE_RZ    = " << g_.input(RDAE_RZ) << endl;
-      userOut() << "RDAE_RP    = " << g_.input(RDAE_RP) << endl;
-      userOut() << "RDAE_RXDOT  = ";
-      for (int k=0;k<nrx_;++k) {
-        userOut() << xzdotA[k] << " " ;
-      }
-      userOut() << endl;
+      printvar("t", t);
+      printvar("xz", xz);
+      printvar("xzdot", xzdot);
+      printvar("xzA", xzA);
+      printvar("xzdotA", xzdotA);
     }
 
-    // Evaluate
-    g_.evaluate();
+    // Evaluate g_
+    arg1_[RDAE_T] = &t;
+    arg1_[RDAE_X] = NV_DATA_S(xz);
+    arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_RX] = NV_DATA_S(xzA);
+    arg1_[RDAE_RZ] = NV_DATA_S(xzA)+nrx_;
+    arg1_[RDAE_RP] = rp_;
+    res1_[RDAE_ODE] = NV_DATA_S(rrA);
+    res1_[RDAE_ALG] = NV_DATA_S(rrA) + nrx_;
+    res1_[RDAE_QUAD] = 0;
+    g_(0, arg1_, res1_, iw_, w_);
 
-    // Save to output
-    g_.getOutputNZ(rrA, RDAE_ODE);
-    g_.getOutputNZ(rrA+nrx_, RDAE_ALG);
+    // Subtract state derivative to get residual
+    casadi_axpy(nrx_, 1., NV_DATA_S(xzdotA), 1, NV_DATA_S(rrA), 1);
 
+    // Debug output
     if (monitored("resB")) {
-      userOut() << "RDAE_ODE    = " << g_.output(RDAE_ODE) << endl;
-      userOut() << "RDAE_ALG    = " << g_.output(RDAE_ALG) << endl;
+      printvar("rrA", rrA);
     }
-
-    // Add state derivative to get residual (note definition of g)
-    for (int i=0; i<nrx_; ++i) {
-      rrA[i] += xzdotA[i];
-    }
-
-    if (monitored("resB")) {
-      g_.setOutputNZ(rrA, RDAE_ODE);
-      g_.setOutputNZ(rrA+nrx_, RDAE_ALG);
-      userOut() << "res ODE    = " << g_.output(RDAE_ODE) << endl;
-      userOut() << "res ALG    = " << g_.output(RDAE_ALG) << endl;
-    }
-
 
     log("IdasInterface::resB", "end");
   }
@@ -1050,8 +1026,7 @@ namespace casadi {
                                  N_Vector xzdotA, N_Vector rrA, void *user_data) {
     try {
       IdasInterface *this_ = static_cast<IdasInterface*>(user_data);
-      this_->resB(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(xzA),
-                  NV_DATA_S(xzdotA), NV_DATA_S(rrA));
+      this_->resB(t, xz, xzdot, xzA, xzdotA, rrA);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "resB failed: " << e.what() << endl;

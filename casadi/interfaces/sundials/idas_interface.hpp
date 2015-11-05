@@ -147,15 +147,13 @@ namespace casadi {
     void jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                  N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
                  double cjB, N_Vector tmp1B, N_Vector tmp2B);
-    void resS(int Ns, double t, const double* xz, const double* xzdot, const double *resval,
+    void resS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
               N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
-              double *tmp1, double *tmp2, double *tmp3);
-    void rhsQ(double t, const double* xz, const double* xzdot, double* qdot);
+              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    void rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot);
     void rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF, N_Vector *xzdotF,
-               N_Vector rrQ, N_Vector *qdotF,
-               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    void resB(double t, const double* y, const double* xzdot, const double* xA,
-              const double* xzdotB, double* rrB);
+               N_Vector rrQ, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    void resB(double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotB, N_Vector rrB);
     void rhsQB(double t, const double* y, const double* xzdot, const double* xA,
                const double* xzdotB, double *qdotA);
     void psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec,
