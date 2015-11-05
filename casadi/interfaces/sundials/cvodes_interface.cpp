@@ -281,31 +281,38 @@ namespace casadi {
     isInitAdj_ = true;
   }
 
-  void CvodesInterface::rhs(double t, const double* x, double* xdot) {
+  void CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot) {
     log("CvodesInterface::rhs", "begin");
 
     // Get time
     time1 = clock();
 
-    // Pass input
-    f_.setInputNZ(&t, DAE_T);
-    f_.setInputNZ(x, DAE_X);
-    f_.setInput(p(), DAE_P);
-
+    // Debug output
     if (monitor_rhs_) {
-      userOut() << "t       = " << t << endl;
-      userOut() << "x       = " << f_.input(DAE_X) << endl;
-      userOut() << "p       = " << f_.input(DAE_P) << endl;
+      printvar("t", t);
+      printvar("x", x);
     }
-    // Evaluate
+
+    // Hack hack
+    f_.setInputNZ(&t, DAE_T);
+    f_.setInputNZ(NV_DATA_S(x), DAE_X);
+    f_.setInputNZ(p_, DAE_P);
     f_.evaluate();
 
-    if (monitor_rhs_) {
-      userOut() << "xdot       = " << f_.output(DAE_ODE)<< endl;
-    }
+    // Evaluate f_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(x);
+    arg1_[DAE_Z] = 0;
+    arg1_[DAE_P] = p_;
+    res1_[DAE_ODE] = NV_DATA_S(xdot);
+    res1_[DAE_ALG] = 0;
+    res1_[DAE_QUAD] = 0;
+    f_(0, arg1_, res1_, iw_, w_);
 
-    // Get results
-    f_.getOutputNZ(xdot);
+    // Debug output
+    if (monitor_rhs_) {
+      printvar("xdot", xdot);
+    }
 
     // Log time
     time2 = clock();
@@ -319,7 +326,7 @@ namespace casadi {
     try {
       casadi_assert(user_data);
       CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhs(t, NV_DATA_S(x), NV_DATA_S(xdot));
+      this_->rhs(t, x, xdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhs failed: " << e.what() << endl;
@@ -1559,6 +1566,7 @@ namespace casadi {
     if (exact_jacobian_) {
       // Form the Jacobian-times-vector function
       f_fwd_ = f_.derivative(1, 0);
+      alloc(f_fwd_);
 
       flag = CVSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVSpilsSetJacTimesVecFn", flag);
@@ -1641,6 +1649,7 @@ namespace casadi {
     if (exact_jacobianB_) {
       // Form the Jacobian-times-vector function
       g_fwd_ = g_.derivative(1, 0);
+      alloc(g_fwd_);
 
       flag = CVSpilsSetJacTimesVecFnB(mem_, whichB_, jtimesB_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVSpilsSetJacTimesVecFnB", flag);

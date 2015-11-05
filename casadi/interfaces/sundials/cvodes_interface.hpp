@@ -128,7 +128,7 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void rhs(double t, const double* x, double* xdot);
+    void rhs(double t, N_Vector x, N_Vector xdot);
     void ehfun(int error_code, const char *module, const char *function, char *msg);
     void rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF,
               N_Vector tmp1, N_Vector tmp2);
