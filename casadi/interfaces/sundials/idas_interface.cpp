@@ -1091,21 +1091,21 @@ namespace casadi {
     // Get time
     time1 = clock();
 
-    // Pass input to the Jacobian function
-    jac_.setInputNZ(&t, DAE_T);
-    jac_.setInputNZ(NV_DATA_S(xz), DAE_X);
-    jac_.setInputNZ(NV_DATA_S(xz)+nx_, DAE_Z);
-    jac_.setInput(p(), DAE_P);
-    jac_.setInput(cj, DAE_NUM_IN);
-
-    // Evaluate Jacobian
-    jac_.evaluate();
+    // Evaluate jac_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(xz);
+    arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[DAE_P] = p_;
+    arg1_[DAE_NUM_IN] = &cj;
+    fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
+    res1_[0] = w_ + jac_.sz_w();
+    jac_(0, arg1_, res1_, iw_, w_);
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
     int ncol = jac_.size2_out(0);
     const int* row = jac_.sparsity_out(0).row();
-    const vector<double>& val = jac_.output().data();
+    double *val = res1_[0];
 
     // Loop over columns
     for (int cc=0; cc<ncol; ++cc) {
@@ -1231,21 +1231,21 @@ namespace casadi {
     // Get time
     time1 = clock();
 
-    // Pass input to the jacobian function
-    jac_.setInputNZ(&t, DAE_T);
-    jac_.setInputNZ(NV_DATA_S(xz), DAE_X);
-    jac_.setInputNZ(NV_DATA_S(xz)+nx_, DAE_Z);
-    jac_.setInput(p(), DAE_P);
-    jac_.setInput(cj, DAE_NUM_IN);
-
-    // Evaluate jacobian
-    jac_.evaluate();
+    // Evaluate jac_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(xz);
+    arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[DAE_P] = p_;
+    arg1_[DAE_NUM_IN] = &cj;
+    fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
+    res1_[0] = w_ + jac_.sz_w();
+    jac_(0, arg1_, res1_, iw_, w_);
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
     int ncol = jac_.size2_out(0);
     const int* row = jac_.sparsity_out(0).row();
-    const vector<double>& val = jac_.output().data();
+    double *val = res1_[0];
 
     // Loop over columns
     for (int cc=0; cc<ncol; ++cc) {
@@ -1506,34 +1506,28 @@ namespace casadi {
     // Get time
     time1 = clock();
 
-    // Pass input to the jacobian function
-    jac_.setInputNZ(&t, DAE_T);
-    jac_.setInputNZ(NV_DATA_S(xz), DAE_X);
-    jac_.setInputNZ(NV_DATA_S(xz)+nx_, DAE_Z);
-    jac_.setInput(p(), DAE_P);
-    jac_.setInput(cj, DAE_NUM_IN);
+    // Evaluate jac_
+    arg1_[DAE_T] = &t;
+    arg1_[DAE_X] = NV_DATA_S(xz);
+    arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
+    arg1_[DAE_P] = p_;
+    arg1_[DAE_NUM_IN] = &cj;
+    fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
+    res1_[0] = w_ + jac_.sz_w();
+    jac_(0, arg1_, res1_, iw_, w_);
 
-    if (monitored("psetup")) {
-      userOut() << "DAE_T    = " << t << endl;
-      userOut() << "DAE_X    = " << jac_.input(DAE_X) << endl;
-      userOut() << "DAE_Z    = " << jac_.input(DAE_Z) << endl;
-      userOut() << "DAE_P    = " << jac_.input(DAE_P) << endl;
-      userOut() << "cj = " << cj << endl;
-    }
-
-    // Evaluate jacobian
-    jac_.evaluate();
-
-    if (monitored("psetup")) {
-      userOut() << "psetup = " << jac_.output() << endl;
-    }
+    // Get sparsity and non-zero elements
+    const int* colind = jac_.sparsity_out(0).colind();
+    int ncol = jac_.size2_out(0);
+    const int* row = jac_.sparsity_out(0).row();
+    double *val = res1_[0];
 
     // Log time duration
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements to the linear solver
-    linsol_.setInput(jac_.output(), 0);
+    linsol_.setInputNZ(val, 0);
 
     // Prepare the solution of the linear system (e.g. factorize)
     // -- only if the linear solver inherits from LinearSolver
