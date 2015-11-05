@@ -28,7 +28,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Integrator_cvodes
+/** \addtogroup plugin_Ivpsol_cvodes
 \n
 \par
 <a name='monitors'></a><table>
@@ -98,7 +98,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Integrator_idas
+/** \addtogroup plugin_Ivpsol_idas
 \n
 \par
 <a name='monitors'></a><table>
@@ -133,7 +133,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_ipopt
+/** \addtogroup plugin_Nlpsol_ipopt
 \n
 \par
 <a name='monitors'></a><table>
@@ -160,7 +160,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Rootfinder_kinsol
+/** \addtogroup plugin_Nlsol_kinsol
 \n
 \par
 <a name='monitors'></a><table>
@@ -187,7 +187,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_knitro
+/** \addtogroup plugin_Nlpsol_knitro
 \n
 \par
 <a name='monitors'></a><table>
@@ -217,7 +217,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Rootfinder_newton
+/** \addtogroup plugin_Nlsol_newton
 \n
 \par
 <a name='monitors'></a><table>
@@ -249,7 +249,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_scpgen
+/** \addtogroup plugin_Nlpsol_scpgen
 \n
 \par
 <a name='monitors'></a><table>
@@ -290,7 +290,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_snopt
+/** \addtogroup plugin_Nlpsol_snopt
 \n
 \par
 <a name='monitors'></a><table>
@@ -320,7 +320,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_sqpmethod
+/** \addtogroup plugin_Nlpsol_sqpmethod
 \n
 \par
 <a name='monitors'></a><table>
@@ -353,7 +353,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_worhp
+/** \addtogroup plugin_Nlpsol_worhp
 \n
 \par
 <a name='monitors'></a><table>
