@@ -38,52 +38,54 @@ x=DMatrix([tan(i) for i in range(n)])
 #! We generate the b vector:
 b=mul(A,x)
 
-#! We demonstrate the LinearSolver API with CSparse:
-s = LinearSolver("s", "csparse", A.sparsity())
+# Commented out pendling completion #1615
 
-#! Give it the matrix A
-s.setInput(A,"A")
-#! Do the LU factorization
-s.prepare()
+# #! We demonstrate the LinearSolver API with CSparse:
+# s = LinearSolver("s", "csparse", A.sparsity())
 
-#! Give it the matrix b
-s.setInput(b,"B")
+# #! Give it the matrix A
+# s.setInput(A,"A")
+# #! Do the LU factorization
+# s.prepare()
 
-#! And we are off to find x...
-s.solve()
+# #! Give it the matrix b
+# s.setInput(b,"B")
 
-x_ = s.getOutput("X")
+# #! And we are off to find x...
+# s.solve()
 
-#! By looking at the residuals between the x we knew in advance and the computed x, we see that the CSparse solver works
-print "Sum of residuals = %.2e" % norm_1(x-x_)
+# x_ = s.getOutput("X")
 
-#! Comparison of different linear solvers
-#! ======================================
-for solver in ("lapacklu","lapackqr","csparse"):
-  s = LinearSolver("s", solver, A.sparsity()) # We create a solver
+# #! By looking at the residuals between the x we knew in advance and the computed x, we see that the CSparse solver works
+# print "Sum of residuals = %.2e" % norm_1(x-x_)
 
-  s.setInput(A,"A") # Give it the matrix A
+# #! Comparison of different linear solvers
+# #! ======================================
+# for solver in ("lapacklu","lapackqr","csparse"):
+#   s = LinearSolver("s", solver, A.sparsity()) # We create a solver
+
+#   s.setInput(A,"A") # Give it the matrix A
   
-  t0 = time.time()
-  for i in range(100):
-    s.prepare()        # Do the LU factorization
-  pt = (time.time()-t0)/100
+#   t0 = time.time()
+#   for i in range(100):
+#     s.prepare()        # Do the LU factorization
+#   pt = (time.time()-t0)/100
 
-  s.setInput(b,"B")  # Give it the matrix b
+#   s.setInput(b,"B")  # Give it the matrix b
 
-  t0 = time.time()
-  for i in range(100):
-    s.solve()
-  st = (time.time()-t0)/100
+#   t0 = time.time()
+#   for i in range(100):
+#     s.solve()
+#   st = (time.time()-t0)/100
   
-  x_ = s.getOutput("X")
+#   x_ = s.getOutput("X")
 
-  print ""
-  print solver
-  print "=" * 10
-  print "Sum of residuals = %.2e" % norm_1(x-x_)
-  print "Preparation time = %0.2f ms" % (pt*1000)
-  print "Solve time       = %0.2f ms" % (st*1000)
-  assert(norm_1(x-x_)<1e-9)
+#   print ""
+#   print solver
+#   print "=" * 10
+#   print "Sum of residuals = %.2e" % norm_1(x-x_)
+#   print "Preparation time = %0.2f ms" % (pt*1000)
+#   print "Solve time       = %0.2f ms" % (st*1000)
+#   assert(norm_1(x-x_)<1e-9)
   
-#! Note that these 
+# #! Note that these 

@@ -64,7 +64,7 @@ f=Function("f", [vertcat([a, gamma]), vertcat(params)], [vertcat([res0, res1])])
 opts = {}
 opts["nlpsol"] = "ipopt"
 opts["nlpsol_options"] = {"tol":1e-14}
-s=f.nlsol("s", "nlp", opts)
+s=f.nlsol("s", "nlpsol", opts)
 s.setInput(params_,1)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve
