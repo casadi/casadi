@@ -26,7 +26,7 @@
 #ifndef CASADI_COLLOCATION_IVPSOL_HPP
 #define CASADI_COLLOCATION_IVPSOL_HPP
 
-#include "implicit_fixed_step_integrator.hpp"
+#include "casadi/core/function/ivpsol.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
 #include <casadi/solvers/casadi_ivpsol_collocation_export.h>
 

@@ -26,7 +26,7 @@
 #ifndef CASADI_RK_IVPSOL_HPP
 #define CASADI_RK_IVPSOL_HPP
 
-#include "fixed_step_integrator.hpp"
+#include "casadi/core/function/ivpsol.hpp"
 #include <casadi/solvers/casadi_ivpsol_rk_export.h>
 
 /** \defgroup plugin_Ivpsol_rk

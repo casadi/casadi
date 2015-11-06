@@ -86,7 +86,7 @@ namespace casadi {
       }
     }
 
-    casadi_msg("SXFunction::evaluate():begin  " << name_);
+    casadi_msg("SXFunction::evalD():begin  " << name_);
 
     // NOTE: The implementation of this function is very delicate. Small changes in the
     // class structure can cause large performance losses. For this reason,
