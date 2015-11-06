@@ -26,7 +26,7 @@ import casadi.*
 disp 'Testing sensitivity analysis in CasADi'
 
 % All ODE and DAE integrators to be tested
-DAE_integrators = {'idas','collocation','oldcollocation'};
+DAE_integrators = {'idas','collocation'};
 ODE_integrators = {'cvodes','rk', DAE_integrators{:}};
 
 for ode=0:1
@@ -116,12 +116,9 @@ for ode=0:1
     % Integrator options
     opts = struct;
     opts.tf = tf;
-    if strcmp(MyIntegrator,'collocation') | strcmp(MyIntegrator,'oldcollocation')
+    if strcmp(MyIntegrator,'collocation')
       opts.implicit_solver = 'kinsol';
       opts.implicit_solver_options = struct('linear_solver', 'csparse');
-      if strcmp(MyIntegrator,'oldcollocation')
-        opts.expand_f=true;
-      end
     end
 
     % Integrator

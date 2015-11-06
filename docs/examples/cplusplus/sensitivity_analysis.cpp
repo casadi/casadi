@@ -124,7 +124,6 @@ int main(){
                     {"collocation_scheme", "legendre"},
                     {"implicit_solver_options", Dict{{"linear_solver", "csparse"}}}};
   solvers.push_back({"collocation", false, coll_opts});
-  solvers.push_back({"oldcollocation", false, coll_opts});
 
   // Loop over all problems
   for (auto&& test : tests) {

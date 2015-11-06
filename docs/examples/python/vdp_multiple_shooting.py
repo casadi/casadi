@@ -27,7 +27,6 @@ import matplotlib.pyplot as plt
 
 nk = 20      # Control discretization
 tf = 10.0    # End time
-coll = False # Use collocation integrator
 
 # Declare variables (use scalar graph)
 u  = SX.sym("u")    # control
@@ -41,19 +40,10 @@ dae = {'x':x, 'p':u, 'ode':ode}
 
 # Create an integrator
 opts = {"tf":tf/nk} # final time
-if coll:
-  opts["number_of_finite_elements"] = 5
-  opts["interpolation_order"] = 5
-  opts["collocation_scheme"] = "legendre"
-  opts["implicit_solver"] = "kinsol"
-  opts["implicit_solver_options"] =  {'linear_solver' : 'csparse'}
-  opts["expand_f"] = True
-  integrator = Function.ivpsol("integrator", "oldcollocation", dae, opts)
-else:
-  opts["abstol"] = 1e-8 # tolerance
-  opts["reltol"] = 1e-8 # tolerance
-  opts["steps_per_checkpoint"] = 1000
-  integrator = Function.ivpsol("integrator", "cvodes", dae, opts)
+opts["abstol"] = 1e-8 # tolerance
+opts["reltol"] = 1e-8 # tolerance
+opts["steps_per_checkpoint"] = 1000
+integrator = Function.ivpsol("integrator", "cvodes", dae, opts)
 
 # Total number of variables
 nv = 1*nk + 3*(nk+1)

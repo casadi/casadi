@@ -12,12 +12,6 @@ casadi_plugin(Ivpsol collocation
   collocation_integrator.cpp
   collocation_integrator_meta.cpp)
 
-# Old (all-at-once) collocation integrator
-casadi_plugin(Ivpsol oldcollocation
-  old_collocation_integrator.hpp
-  old_collocation_integrator.cpp
-  old_collocation_integrator_meta.cpp)
-
 casadi_plugin(Nlsol newton
   newton.hpp newton.cpp newton_meta.cpp)
 
