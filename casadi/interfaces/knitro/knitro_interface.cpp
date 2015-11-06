@@ -178,7 +178,16 @@ namespace casadi {
 
   }
 
-  void KnitroInterface::evaluate() {
+  void KnitroInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert(kc_handle_==0);
     kc_handle_ = KTR_new();
@@ -320,6 +329,10 @@ namespace casadi {
     KTR_free(&kc_handle_);
     kc_handle_ = 0;
 
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
 

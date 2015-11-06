@@ -67,9 +67,6 @@ namespace casadi {
     // Initialize
     virtual void init();
 
-    // Solve the system of equations
-    virtual void evaluate();
-
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
 

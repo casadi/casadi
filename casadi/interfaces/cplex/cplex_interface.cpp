@@ -172,7 +172,19 @@ namespace casadi {
     lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
   }
 
-  void CplexInterface::evaluate() {
+  void CplexInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Number of inputs and outputs
+    int num_in = n_in();
+    int num_out = n_out();
+
+    // Pass the inputs to the function
+    for (int i=0; i<num_in; ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
 
     if (inputs_check_) checkInputs();
 
@@ -317,6 +329,10 @@ namespace casadi {
       is_warm_ = true;
     }
 
+    // Get the outputs
+    for (int i=0; i<num_out; ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
   CplexInterface::~CplexInterface() {

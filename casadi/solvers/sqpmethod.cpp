@@ -231,7 +231,16 @@ namespace casadi {
     }
   }
 
-  void Sqpmethod::evaluate() {
+  void Sqpmethod::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     if (inputs_check_) checkInputs();
     checkInitialBounds();
 
@@ -645,6 +654,11 @@ namespace casadi {
     stats_["n_eval_g"] = n_eval_g_;
     stats_["n_eval_jac_g"] = n_eval_jac_g_;
     stats_["n_eval_h"] = n_eval_h_;
+
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
   void Sqpmethod::printIteration(std::ostream &stream) {

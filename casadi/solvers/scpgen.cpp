@@ -653,7 +653,16 @@ namespace casadi {
     }
   }
 
-  void Scpgen::evaluate() {
+  void Scpgen::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     if (inputs_check_) checkInputs();
     checkInitialBounds();
 
@@ -821,6 +830,11 @@ namespace casadi {
     stats_["iter_count"] = iter;
 
     userOut() << endl;
+
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
   double Scpgen::primalInfeasibility() {

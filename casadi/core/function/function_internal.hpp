@@ -79,9 +79,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~FunctionInternal() = 0;
 
-    /** \brief  Evaluate using internal data structures */
-    virtual void evaluate();
-
     /** \brief  Obtain solver name from Adaptor */
     virtual std::string getAdaptorSolverName() const { return ""; }
 
@@ -115,7 +112,7 @@ namespace casadi {
     /** \brief  Evaluate numerically, possibly using just-in-time compilation */
     void eval(void* mem, const double** arg, double** res, int* iw, double* w);
 
-    /** \brief  Evaluate numerically, work vectors given */
+    /** \brief  Evaluate numerically */
     virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /** \brief Quickfix to avoid segfault, #1552 */

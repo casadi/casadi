@@ -427,8 +427,17 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::evaluate() {
+  void WorhpInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     log("WorhpInterface::evaluate");
+
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
 
     if (gather_stats_) {
       Dict iterations;
@@ -670,6 +679,10 @@ namespace casadi {
     stats_["return_code"] = worhp_c_.status;
     stats_["return_status"] = flagmap[worhp_c_.status];
 
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
   bool WorhpInterface::eval_h(const double* x, double obj_factor,

@@ -71,7 +71,7 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
-  virtual void evaluate();
+  virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
   /// A documentation string
   static const std::string meta_doc;

@@ -69,7 +69,7 @@ namespace casadi {
     virtual void init();
 
     /// Solve the QP
-    virtual void evaluate();
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Throw error
     static const char* errFlag(int flag);

@@ -53,7 +53,16 @@ namespace casadi {
   QpToNlp::~QpToNlp() {
   }
 
-  void QpToNlp::evaluate() {
+  void QpToNlp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     if (inputs_check_) checkInputs();
 
     int k = 0;
@@ -88,6 +97,11 @@ namespace casadi {
     output(QPSOL_COST).set(solver_.output(NLPSOL_F));
     output(QPSOL_LAM_A).set(solver_.output(NLPSOL_LAM_G));
     output(QPSOL_LAM_X).set(solver_.output(NLPSOL_LAM_X));
+
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
   void QpToNlp::init() {

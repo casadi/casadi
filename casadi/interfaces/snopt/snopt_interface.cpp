@@ -484,7 +484,16 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::evaluate() {
+  void SnoptInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     log("SnoptInterface::evaluate");
 
     // Initial checks
@@ -731,6 +740,11 @@ namespace casadi {
     // Reset the counters
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
     n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
+
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
   void SnoptInterface::setOptionsFromFile(const std::string & file) {

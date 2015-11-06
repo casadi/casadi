@@ -1217,46 +1217,9 @@ namespace casadi {
     log("FunctionInternal::getPartition end");
   }
 
-  void FunctionInternal::evaluate() {
-    // Allocate temporary memory if needed
-    alloc();
-
-    // Get pointers to input arguments
-    int n_in = this->n_in();
-    vector<const double*> arg(sz_arg());
-    for (int i=0; i<n_in; ++i) arg[i]=input(i).ptr();
-
-    // Get pointers to output arguments
-    int n_out = this->n_out();
-    vector<double*> res(sz_res());
-    for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
-
-    // Call memory-less
-    eval(0, getPtr(arg), getPtr(res), getPtr(iw_tmp_), getPtr(w_tmp_));
-  }
-
   void FunctionInternal::evalD(void* mem, const double** arg,
                                double** res, int* iw, double* w) {
-    // Number of inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
-
-    // Pass the inputs to the function
-    for (int i=0; i<num_in; ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
-      } else {
-        setInput(0., i);
-      }
-    }
-
-    // Evaluate
-    evaluate();
-
-    // Get the outputs
-    for (int i=0; i<num_out; ++i) {
-      if (res[i] != 0) getOutputNZ(res[i], i);
-    }
+    casadi_error("'evalD' not defined for " + type_name());
   }
 
   void FunctionInternal::evalSX(void* mem, const SXElem** arg, SXElem** res,
@@ -1808,14 +1771,45 @@ namespace casadi {
 
   void FunctionInternal::call(const DMatrixVector& arg, DMatrixVector& res,
                         bool always_inline, bool never_inline) {
-    for (int i=0;i<arg.size();++i) {
-      setInput(arg[i], i);
+    // Get the number of inputs and outputs
+    int num_in = n_in();
+    int num_out = n_out();
+
+    // Check if matching input sparsity
+    bool matching_sparsity = true;
+    casadi_assert(arg.size()==num_in);
+    for (int i=0; matching_sparsity && i<num_in; ++i)
+      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
+
+    // Correct input sparsity if needed
+    if (!matching_sparsity) {
+      vector<DMatrix> arg2(arg);
+      for (int i=0; i<num_in; ++i)
+        if (arg2[i].sparsity()!=input(i).sparsity())
+          arg2[i] = project(arg2[i], input(i).sparsity());
+      return call(arg2, res, always_inline, never_inline);
     }
-    evaluate();
-    res.resize(n_out());
-    for (int i=0;i<res.size();++i) {
-      res[i]=output(i);
-    }
+
+    // Allocate results
+    res.resize(num_out);
+    for (int i=0; i<num_out; ++i)
+      if (res[i].sparsity()!=output(i).sparsity())
+        res[i] = DMatrix::zeros(output(i).sparsity());
+
+    // Allocate temporary memory if needed
+    iw_tmp_.resize(sz_iw());
+    vector<double> w_tmp(sz_w());
+
+    // Get pointers to input arguments
+    vector<const double*> argp(sz_arg());
+    for (int i=0; i<arg.size(); ++i) argp[i]=getPtr(arg[i]);
+
+    // Get pointers to output arguments
+    vector<double*> resp(sz_res());
+    for (int i=0; i<n_out(); ++i) resp[i]=getPtr(res[i]);
+
+    // Call memory-less
+    eval(0, getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp));
   }
 
   Function FunctionInternal::

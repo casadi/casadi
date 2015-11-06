@@ -112,7 +112,16 @@ namespace casadi {
     pi_.resize(nc_);
   }
 
-  void OoqpInterface::evaluate() {
+  void OoqpInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     // Check inputs for consistency
     if (inputs_check_) checkInputs();
 
@@ -428,6 +437,11 @@ namespace casadi {
       } else {
         lam_x[i] = phi_[ii]-gamma_[ii];
       }
+    }
+
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
     }
   }
 

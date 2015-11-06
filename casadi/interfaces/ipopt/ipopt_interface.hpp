@@ -83,7 +83,7 @@ public:
   void freeIpopt();
 
   virtual void init();
-  virtual void evaluate();
+  virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
   /// Set default options for a given recipe
   virtual void setDefaultOptions(const std::vector<std::string>& recipes);

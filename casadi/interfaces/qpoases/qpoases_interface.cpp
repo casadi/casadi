@@ -211,12 +211,8 @@ namespace casadi {
 
   void QpoasesInterface::evalD(void* mem, const double** arg,
                                double** res, int* iw, double* w) {
-    // Number of inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
-
     // Pass the inputs to the function
-    for (int i=0; i<num_in; ++i) {
+    for (int i=0; i<n_in(); ++i) {
       if (arg[i] != 0) {
         setInputNZ(arg[i], i);
       } else {
@@ -303,7 +299,7 @@ namespace casadi {
               negate<double>());
 
     // Get the outputs
-    for (int i=0; i<num_out; ++i) {
+    for (int i=0; i<n_out(); ++i) {
       if (res[i] != 0) getOutputNZ(res[i], i);
     }
   }

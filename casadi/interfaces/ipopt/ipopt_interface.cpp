@@ -405,7 +405,17 @@ namespace casadi {
 
   }
 
-  void IpoptInterface::evaluate() {
+  void IpoptInterface::evalD(void* mem, const double** arg, double** res,
+                             int* iw, double* w) {
+
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       profileWriteEntry(CasadiOptions::profilingLog, this);
@@ -573,6 +583,11 @@ namespace casadi {
     stats_["n_eval_callback"] = n_eval_callback_;
 
     stats_["iter_count"] = n_iter_-1;
+
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
 
   }
 
