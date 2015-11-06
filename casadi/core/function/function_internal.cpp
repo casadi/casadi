@@ -2454,6 +2454,7 @@ namespace casadi {
   }
 
   void FunctionInternal::alloc(const Function& f) {
+    if (f.isNull()) return;
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     alloc_arg(sz_arg);

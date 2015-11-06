@@ -94,6 +94,18 @@ namespace casadi {
     /// Access Qpsol
     const Function getQpsol() const { return qpsol_;}
 
+    // Inputs
+    const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
+
+    // Outputs
+    double /* *x_, */ *f_, *g_, *lam_x_, *lam_g_, *lam_p_;
+
+    // Work vectors
+    const double** arg1_;
+    double** res1_;
+    int* iw_;
+    double* w_;
+
     /// Lagrange multipliers of the NLP
     std::vector<double> mu_, mu_x_;
 
@@ -148,41 +160,34 @@ namespace casadi {
     void reset_h();
 
     // Evaluate the gradient of the objective
-    virtual void eval_f(const std::vector<double>& x, double& f);
+    virtual double eval_f(const double* x);
 
     // Evaluate the gradient of the objective
-    virtual void eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f);
+    virtual void eval_grad_f(const double* x, double* f, double* grad_f);
 
     // Evaluate the constraints
-    virtual void eval_g(const std::vector<double>& x, std::vector<double>& g);
+    virtual void eval_g(const double* x, double* g);
 
     // Evaluate the Jacobian of the constraints
-    virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g,
-      Matrix<double>& J);
+    virtual void eval_jac_g(const double* x, double* g, double* J);
 
     // Evaluate the Hessian of the Lagrangian
-    virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda,
-                        double sigma, Matrix<double>& H);
+    virtual void eval_h(const double* x, const double* lambda, double sigma, double* H);
 
     // Calculate the regularization parameter using Gershgorin theorem
-    double getRegularization(const Matrix<double>& H);
+    double getRegularization(const double* H);
 
     // Regularize by adding a multiple of the identity
-    void regularize(Matrix<double>& H, double reg);
+    void regularize(double* H, double reg);
 
     // Solve the QP subproblem
-    virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
-                          const std::vector<double>& lbx, const std::vector<double>& ubx,
-                          const Matrix<double>& A, const std::vector<double>& lbA,
-                          const std::vector<double>& ubA,
-                          std::vector<double>& x_opt, std::vector<double>& lambda_x_opt,
-                          std::vector<double>& lambda_A_opt);
+    virtual void solve_QP(const double* H, const double* g, const double* lbx, const double* ubx,
+                          const double* A, const double* lbA, const double* ubA,
+                          double* x_opt, double* lambda_x_opt, double* lambda_A_opt);
 
     // Calculate the L1-norm of the primal infeasibility
-    double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx,
-                               const std::vector<double>& ubx,
-                               const std::vector<double>& g, const std::vector<double>& lbg,
-                               const std::vector<double>& ubg);
+    double primalInfeasibility(const double* x, const double* lbx, const double* ubx,
+                               const double* g, const double* lbg, const double* ubg);
 
     // Accumulated time since last reset:
     double t_eval_f_; // time spent in eval_f

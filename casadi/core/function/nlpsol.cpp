@@ -92,6 +92,7 @@ namespace casadi {
     } else {
       nlp_ = Nlpsol::problem2fun<MX>(nlp);
     }
+    alloc(nlp_);
   }
 
   Nlpsol::~Nlpsol() {
@@ -193,6 +194,7 @@ namespace casadi {
 
     if (hasSetOption("iteration_callback")) {
       fcallback_ = option("iteration_callback");
+      alloc(fcallback_);
 
       // Consistency checks
       casadi_assert(!fcallback_.isNull());
@@ -253,6 +255,7 @@ namespace casadi {
   Function& Nlpsol::gradF() {
     if (gradF_.isNull()) {
       gradF_ = getGradF();
+      alloc(gradF_);
     }
     return gradF_;
   }
@@ -260,6 +263,7 @@ namespace casadi {
   Function& Nlpsol::jacF() {
     if (jacF_.isNull()) {
       jacF_ = getJacF();
+      alloc(jacF_);
     }
     return jacF_;
   }
@@ -329,6 +333,7 @@ namespace casadi {
   Function& Nlpsol::jacG() {
     if (jacG_.isNull()) {
       jacG_ = getJacG();
+      alloc(jacG_);
     }
     return jacG_;
   }
@@ -371,6 +376,7 @@ namespace casadi {
   Function& Nlpsol::gradLag() {
     if (gradLag_.isNull()) {
       gradLag_ = getGradLag();
+      alloc(gradLag_);
     }
     return gradLag_;
   }
@@ -404,6 +410,7 @@ namespace casadi {
   Function& Nlpsol::hessLag() {
     if (hessLag_.isNull()) {
       hessLag_ = getHessLag();
+      alloc(hessLag_);
     }
     return hessLag_;
   }
