@@ -72,7 +72,7 @@ public:
   vector<double> p_scale_;
 
   /// NLP solver
-  Function nlp_solver_;
+  Function nlpsol_;
 };
 
 void Tester::model(){
@@ -343,16 +343,16 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   opts["print_x"] = range(2);
 
   if(ipopt_as_qpsol){
-    opts["qpsol"] = "nlp";
+    opts["qpsol"] = "nlpsol";
     Dict nlp_opts = {{"tol", 1e-12}, {"print_level", 0}, {"print_time", false}};
-    opts["qpsol_options"] = Dict{{"nlp_solver", "ipopt"}, {"nlp_solver_options", nlp_opts}};
+    opts["qpsol_options"] = Dict{{"nlpsol", "ipopt"}, {"nlpsol_options", nlp_opts}};
   } else {
     opts["qpsol"] = "qpoases";
     opts["qpsol_options"] = Dict{{"printLevel", "none"}};
   }
 
   // Create NLP solver instance
-  nlp_solver_ = Function::nlp_solver("nlp_solver", "scpgen", nlp, opts);
+  nlpsol_ = Function::nlpsol("nlpsol", "scpgen", nlp, opts);
 }
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){
@@ -362,32 +362,32 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   vector<double> p_init(2);
   p_init[0] = drag_guess/p_scale_[0];
   p_init[1] = depth_guess/p_scale_[1];
-  nlp_solver_.setInputNZ(p_init,"x0");
+  nlpsol_.setInputNZ(p_init,"x0");
 
   // Bounds on the variables
   vector<double> lbu(2), ubu(2);  
   lbu.at(0) = 1.0e-1 / p_scale_[0]; // drag positive
   lbu.at(1) = 5.0e-4 / p_scale_[1]; // depth positive
-  nlp_solver_.setInputNZ(lbu,"lbx");
+  nlpsol_.setInputNZ(lbu,"lbx");
 
   ubu.at(0) = 100.0 / p_scale_[0]; // max drag
   ubu.at(1) =  0.10 / p_scale_[1]; // max depth
-  nlp_solver_.setInputNZ(ubu,"ubx");
+  nlpsol_.setInputNZ(ubu,"ubx");
 
   // Constraint bounds
-  nlp_solver_.setInput(-spheight_, "lbg");
-  nlp_solver_.setInput( spheight_, "ubg");
+  nlpsol_.setInput(-spheight_, "lbg");
+  nlpsol_.setInput( spheight_, "ubg");
 
   clock_t time1 = clock();
-  nlp_solver_.evaluate();
+  nlpsol_.evaluate();
   clock_t time2 = clock();
   
   // Solution statistics  
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
-  const vector<double>& x_opt = nlp_solver_.output(NLP_SOLVER_X).data();
+  const vector<double>& x_opt = nlpsol_.output(NLPSOL_X).data();
   drag_est = x_opt.at(0)*p_scale_[0];
   depth_est = x_opt.at(1)*p_scale_[1];
-  iter_count = nlp_solver_.getStat("iter_count");
+  iter_count = nlpsol_.getStat("iter_count");
 }
 
 int main(){
@@ -396,7 +396,7 @@ int main(){
   double drag_true = 2.0, depth_true = 0.01;
   
   // Use IPOPT as QP solver (can handle non-convex QPs)
-  bool ipopt_as_qpsol = false;
+  bool ipopt_as_qpsol = true;
 
   // Use Gauss-Newton method
   bool gauss_newton = true;
@@ -412,8 +412,8 @@ int main(){
 
   // Problem size
   //  int  n = 100, n_euler = 100, n_finite_elements = 1, n_meas = 100;
-  int  n = 30, n_euler = 100, n_finite_elements = 1, n_meas = 100; // Paper
-  //  int n = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
+  //int  n = 30, n_euler = 100, n_finite_elements = 1, n_meas = 100; // Paper
+  int n = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
 
   // Initial guesses
   vector<double> drag_guess, depth_guess;

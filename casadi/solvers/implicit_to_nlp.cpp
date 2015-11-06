@@ -106,8 +106,8 @@ namespace casadi {
     // Buffers for calling the NLP solver
     const double** arg1 = arg + n_in();
     double** res1 = res + n_out();
-    fill(arg1, arg1+NLPSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res1, res1+NLPSOL_NUM_OUT, static_cast<double*>(0));
+    fill(arg1, arg1+NLPSOL_NUM_IN, nullptr);
+    fill(res1, res1+NLPSOL_NUM_OUT, nullptr);
 
     // Initial guess
     arg1[NLPSOL_X] = arg[iin_];

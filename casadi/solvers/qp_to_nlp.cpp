@@ -54,57 +54,6 @@ namespace casadi {
   QpToNlp::~QpToNlp() {
   }
 
-  void QpToNlp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
-      } else {
-        setInput(0., i);
-      }
-    }
-
-    if (inputs_check_) checkInputs();
-
-    int k = 0;
-
-    // Pass inputs of QP to NLP form
-
-    std::copy(input(QPSOL_H).data().begin(),
-              input(QPSOL_H).data().end(),
-              solver_.input(NLPSOL_P).data().begin()+k); k+= input(QPSOL_H).nnz();
-    std::copy(input(QPSOL_G).data().begin(),
-              input(QPSOL_G).data().end(),
-              solver_.input(NLPSOL_P).data().begin()+k); k+= input(QPSOL_G).nnz();
-    std::copy(input(QPSOL_A).data().begin(),
-              input(QPSOL_A).data().end(),
-              solver_.input(NLPSOL_P).data().begin()+k);
-
-
-    solver_.input(NLPSOL_LBX).set(input(QPSOL_LBX));
-    solver_.input(NLPSOL_UBX).set(input(QPSOL_UBX));
-
-    solver_.input(NLPSOL_LBG).set(input(QPSOL_LBA));
-    solver_.input(NLPSOL_UBG).set(input(QPSOL_UBA));
-
-    // Delegate computation to NLP Solver
-    solver_.evaluate();
-
-    // Pass the stats
-    stats_["nlpsol_stats"] = solver_.getStats();
-
-    // Read the outputs from Ipopt
-    output(QPSOL_X).set(solver_.output(NLPSOL_X));
-    output(QPSOL_COST).set(solver_.output(NLPSOL_F));
-    output(QPSOL_LAM_A).set(solver_.output(NLPSOL_LAM_G));
-    output(QPSOL_LAM_X).set(solver_.output(NLPSOL_LAM_X));
-
-    // Get the outputs
-    for (int i=0; i<n_out(); ++i) {
-      if (res[i] != 0) getOutputNZ(res[i], i);
-    }
-  }
-
   void QpToNlp::init() {
     // Initialize the base classes
     Qpsol::init();
@@ -118,12 +67,10 @@ namespace casadi {
     SX A = SX::sym("A", input(QPSOL_A).sparsity());
 
     // Put parameters in a vector
-    std::vector< SX > par;
+    std::vector<SX> par;
     par.push_back(H.data());
     par.push_back(G.data());
     par.push_back(A.data());
-
-
 
     // The nlp looks exactly like a mathematical description of the NLP
     SXDict nlp = {{"x", X}, {"p", vertcat(par)},
@@ -135,6 +82,88 @@ namespace casadi {
 
     // Create an Nlpsol instance
     solver_ = Function::nlpsol("nlpsol", option("nlpsol"), nlp, options);
+    alloc(solver_);
+
+    // Allocate storage for NLP solver  parameters
+    alloc_w(solver_.nnz_in(NLPSOL_P), true);
+  }
+
+  void QpToNlp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Inputs
+    const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_, *lam_x0_;
+    // Outputs
+    double *x_, *f_, *lam_a_, *lam_x_;
+
+    // Get input pointers
+    h_ = arg[QPSOL_H];
+    g_ = arg[QPSOL_G];
+    a_ = arg[QPSOL_A];
+    lba_ = arg[QPSOL_LBA];
+    uba_ = arg[QPSOL_UBA];
+    lbx_ = arg[QPSOL_LBX];
+    ubx_ = arg[QPSOL_UBX];
+    x0_ = arg[QPSOL_X0];
+
+    // Get output pointers
+    x_ = res[QPSOL_X];
+    f_ = res[QPSOL_COST];
+    lam_a_ = res[QPSOL_LAM_A];
+    lam_x_ = res[QPSOL_LAM_X];
+
+    // Buffers for calling the NLP solver
+    const double** arg1 = arg + n_in();
+    double** res1 = res + n_out();
+    fill_n(arg1, static_cast<int>(NLPSOL_NUM_IN), nullptr);
+    fill_n(res1, static_cast<int>(NLPSOL_NUM_OUT), nullptr);
+
+    // NLP inputs
+    arg1[NLPSOL_X0] = x0_;
+    arg1[NLPSOL_LBG] = lba_;
+    arg1[NLPSOL_UBG] = uba_;
+    arg1[NLPSOL_LBX] = lbx_;
+    arg1[NLPSOL_UBX] = ubx_;
+
+    // NLP parameters
+    arg1[NLPSOL_P] = w;
+
+    // Quadratic term
+    int nh = nnz_in(QPSOL_H);
+    if (h_) {
+      copy_n(h_, nh, w);
+    } else {
+      fill_n(w, nh, 0);
+    }
+    w += nh;
+
+    // Linear objective term
+    int ng = nnz_in(QPSOL_G);
+    if (g_) {
+      copy_n(g_, ng, w);
+    } else {
+      fill_n(w, ng, 0);
+    }
+    w += ng;
+
+    // Linear constraints
+    int na = nnz_in(QPSOL_A);
+    if (a_) {
+      copy_n(a_, na, w);
+    } else {
+      fill_n(w, na, 0);
+    }
+    w += na;
+
+    // Solution
+    res1[NLPSOL_X] = x_;
+    res1[NLPSOL_F] = f_;
+    res1[NLPSOL_LAM_X] = lam_x_;
+    res1[NLPSOL_LAM_G] = lam_a_;
+
+    // Solve the NLP
+    solver_(0, arg1, res1, iw, w);
+
+    // Pass the stats
+    stats_["nlpsol_stats"] = solver_.getStats();
   }
 
 } // namespace casadi
