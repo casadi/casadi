@@ -390,10 +390,18 @@ namespace casadi {
       return val;
     } else if (name.compare("Log")==0) {
       return log(readExpr(node[0]));
+    } else if (name.compare("LogLeq")==0) { // Logical less than equal
+      return readExpr(node[0]) <= readExpr(node[1]);
+    } else if (name.compare("LogGeq")==0) { // Logical greater than equal
+      return readExpr(node[0]) >= readExpr(node[1]);
     } else if (name.compare("LogLt")==0) { // Logical less than
       return readExpr(node[0]) < readExpr(node[1]);
-    } else if (name.compare("LogGt")==0) { // Logical less than
+    } else if (name.compare("LogGt")==0) { // Logical greater than
       return readExpr(node[0]) > readExpr(node[1]);
+    } else if (name.compare("Max")==0) {
+      return fmax(readExpr(node[0]), readExpr(node[1]));
+    } else if (name.compare("Min")==0) {
+      return fmin(readExpr(node[0]), readExpr(node[1]));
     } else if (name.compare("Mul")==0) { // Multiplication
       return readExpr(node[0]) * readExpr(node[1]);
     } else if (name.compare("Neg")==0) {
