@@ -72,7 +72,7 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-    /// Solve with
+    /// NLP solver
     Function solver_;
   };
 

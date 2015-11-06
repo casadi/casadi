@@ -54,67 +54,6 @@ namespace casadi {
   ImplicitToNlp::~ImplicitToNlp() {
   }
 
-  void ImplicitToNlp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
-    // Copy to buffers
-    for (int i=0; i<n_in(); ++i) {
-      if (arg[i]) {
-        setInputNZ(arg[i], i);
-      } else {
-        setInputNZ(0, i);
-      }
-    }
-    setOutput(input(iin_), iout_);
-
-    // Equality nonlinear constraints
-    solver_.input(NLPSOL_LBG).set(0.);
-    solver_.input(NLPSOL_UBG).set(0.);
-
-    // Simple constraints
-    vector<double>& lbx = solver_.input(NLPSOL_LBX).data();
-    vector<double>& ubx = solver_.input(NLPSOL_UBX).data();
-    for (int k=0; k<u_c_.size(); ++k) {
-      lbx[k] = u_c_[k] <= 0 ? -std::numeric_limits<double>::infinity() : 0;
-      ubx[k] = u_c_[k] >= 0 ?  std::numeric_limits<double>::infinity() : 0;
-    }
-
-    // Pass initial guess
-    solver_.input(NLPSOL_X0).set(output(iout_));
-
-    // Add auxiliary inputs
-    auto nlp_p = solver_.input(NLPSOL_P)->begin();
-    for (int i=0; i<n_in(); ++i) {
-      if (i!=iin_) {
-        std::copy(input(i)->begin(), input(i)->end(), nlp_p);
-        nlp_p += input(i).nnz();
-      }
-    }
-
-    // Solve the NLP
-    solver_.evaluate();
-    stats_["solver_stats"] = solver_.getStats();
-
-    // Get the implicit variable
-    output(iout_).set(solver_.output(NLPSOL_X));
-
-    // Evaluate auxilary outputs, if necessary
-    if (n_out()>0) {
-      f_.setInput(output(iout_), iin_);
-      for (int i=0; i<n_in(); ++i)
-        if (i!=iin_) f_.setInput(input(i), i);
-      f_.evaluate();
-      for (int i=0; i<n_out(); ++i) {
-        if (i!=iout_) f_.getOutput(output(i), i);
-      }
-    }
-
-    // Get from buffers
-    for (int i=0; i<n_out(); ++i) {
-      if (res[i]) {
-        getOutputNZ(res[i], i);
-      }
-    }
-  }
-
   void ImplicitToNlp::init() {
     // Call the base class initializer
     Nlsol::init();
@@ -150,6 +89,89 @@ namespace casadi {
     if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");
     // Create an Nlpsol instance
     solver_ = Function::nlpsol("nlpsol", option("nlpsol"), nlp, options);
+    alloc(solver_);
+
+    // Allocate storage for variable bounds
+    alloc_w(n_, true); // lbx
+    alloc_w(n_, true); // ubx
+
+    // Allocate storage for NLP solver parameters
+    alloc_w(f_.nnz_in() - nnz_in(iin_), true);
+
+    // Allocate storage for NLP primal solution
+    alloc_w(n_, true);
+  }
+
+  void ImplicitToNlp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Buffers for calling the NLP solver
+    const double** arg1 = arg + n_in();
+    double** res1 = res + n_out();
+    fill(arg1, arg1+NLPSOL_NUM_IN, static_cast<const double*>(0));
+    fill(res1, res1+NLPSOL_NUM_OUT, static_cast<double*>(0));
+
+    // Initial guess
+    arg1[NLPSOL_X] = arg[iin_];
+
+    // Nonlinear bounds
+    arg1[NLPSOL_LBG] = 0;
+    arg1[NLPSOL_UBG] = 0;
+
+    // Variable bounds
+    double* lbx = w; w += n_;
+    fill_n(lbx, n_, -std::numeric_limits<double>::infinity());
+    arg1[NLPSOL_LBX] = lbx;
+    double* ubx = w; w += n_;
+    fill_n(ubx, n_,  std::numeric_limits<double>::infinity());
+    arg1[NLPSOL_UBX] = ubx;
+    for (int k=0; k<u_c_.size(); ++k) {
+      if (u_c_[k] > 0) lbx[k] = 0;
+      if (u_c_[k] < 0) ubx[k] = 0;
+    }
+
+    // NLP parameters
+    arg1[NLPSOL_P] = w;
+    for (int i=0; i<n_in(); ++i) {
+      if (i!=iin_) {
+        int n = f_.nnz_in(i);
+        if (arg[i]) {
+          copy_n(arg[i], n, w);
+        } else {
+          fill_n(w, n, 0.);
+        }
+        w += n;
+      }
+    }
+
+    // Primal solution
+    double* x = w; w += n_;
+    res1[NLPSOL_X] = x;
+
+    // Solve the NLP
+    solver_(0, arg1, res1, iw, w);
+    stats_["solver_stats"] = solver_.getStats();
+
+    // Get the implicit variable
+    if (res[iout_]) {
+      copy_n(x, n_, res[iout_]);
+    }
+
+    // Check if any auxilary outputs to evaluate
+    bool has_aux = false;
+    for (int i=0; i<n_out(); ++i) {
+      if (i!=iout_ && res[i]) {
+        has_aux = true;
+        break;
+      }
+    }
+
+    // Evaluate auxilary outputs, if necessary
+    if (has_aux) {
+      copy_n(arg, n_in(), arg1);
+      arg1[iin_] = x;
+      copy_n(res, n_out(), res1);
+      res1[iout_] = 0;
+      f_(0, arg1, res1, iw, w);
+    }
   }
 
 } // namespace casadi

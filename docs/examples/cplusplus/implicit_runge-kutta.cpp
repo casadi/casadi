@@ -36,7 +36,6 @@ using namespace casadi;
 using namespace std;
 
 int main(){
-
   // End time
   double tf = 10.0;
 
@@ -61,7 +60,11 @@ int main(){
   double h = tf/n;
 
   // Choose collocation points
-  vector<double> tau_root = collocationPoints(4,"legendre");
+  vector<double> tau_root = collocationPoints(4, "legendre");
+
+  // Nonlinear solver to use
+  string solver = "newton";
+  //string solver = "ipopt";
 
   // Degree of interpolating polynomial
   int d = tau_root.size()-1;
@@ -127,15 +130,24 @@ int main(){
   Function vfcn_sx = vfcn.expand("vfcn");
 
   // Create a implicit function instance to solve the system of equations
-  Function ifcn = vfcn_sx.nlsol("ifcn", "newton", {{"linear_solver", "csparse"}});
+  Dict opts;
+  if (solver=="ipopt") {
+    // Use an NLP solver
+    Dict nlpsol_options = {{"print_time", false}, {"print_level", 0}};
+    opts = {{"nlpsol", "ipopt"}, {"nlpsol_options", nlpsol_options}};
+    solver = "nlpsol";
+  } else {
+    opts = {{"linear_solver", "csparse"}};
+  }
+  Function ifcn = vfcn_sx.nlsol("ifcn", solver, opts);
+
+  // Get an expression for the state at the end of the finite element
   vector<MX> ifcn_arg = {MX(), X0, P};
   V = ifcn(ifcn_arg).front();
   X.resize(1);
   for(int r=0; r<d; ++r){
     X.push_back(V[Slice(r*nx, (r+1)*nx)]);
   }
-
-  // Get an expression for the state at the end of the finite element
   MX XF = 0;
   for(int r=0; r<d+1; ++r){
     XF += D[r]*X[r];
