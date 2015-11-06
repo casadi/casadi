@@ -23,7 +23,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LinearSolver_csparsecholesky
+/** \addtogroup plugin_Linsol_csparsecholesky
 \n
 \par
 <a name='options'></a><table>
@@ -272,7 +272,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LinearSolver_csparse
+/** \addtogroup plugin_Linsol_csparse
 \n
 \par
 <a name='options'></a><table>
@@ -1546,7 +1546,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LinearSolver_lapacklu
+/** \addtogroup plugin_Linsol_lapacklu
 \n
 \par
 <a name='options'></a><table>
@@ -1581,7 +1581,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LinearSolver_lapackqr
+/** \addtogroup plugin_Linsol_lapackqr
 \n
 \par
 <a name='options'></a><table>
@@ -2850,7 +2850,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_LinearSolver_symbolicqr
+/** \addtogroup plugin_Linsol_symbolicqr
 \n
 \par
 <a name='options'></a><table>

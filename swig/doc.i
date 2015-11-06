@@ -622,12 +622,6 @@ required length of iw field.
 
 ";
 
-%feature("docstring")  casadi::Function::linsol_prepare() "
-
-Factorize the matrix.
-
-";
-
 %feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
 oind=0) const "
 
@@ -1977,7 +1971,7 @@ Create a solver for linear systems of equations Solves the linear system A*X
 If A is structurally singular, an error will be thrown during init. If A is
 numerically singular, the prepare step will fail.
 
-The usual procedure to use LinearSolver is: init()
+The usual procedure to use Linsol is: init()
 
 set the first input (A)
 
@@ -3787,7 +3781,7 @@ Create a solver for linear systems of equations Solves the linear system A*X
 If A is structurally singular, an error will be thrown during init. If A is
 numerically singular, the prepare step will fail.
 
-The usual procedure to use LinearSolver is: init()
+The usual procedure to use Linsol is: init()
 
 set the first input (A)
 
@@ -4002,12 +3996,6 @@ Get output scheme.
 %feature("docstring")  casadi::Function::name_out(int ind) const  "
 
 Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::Function::linsol_prepare() "
-
-Factorize the matrix.
 
 ";
 
@@ -11458,7 +11446,7 @@ Create a solver for linear systems of equations Solves the linear system A*X
 If A is structurally singular, an error will be thrown during init. If A is
 numerically singular, the prepare step will fail.
 
-The usual procedure to use LinearSolver is: init()
+The usual procedure to use Linsol is: init()
 
 set the first input (A)
 
@@ -11673,12 +11661,6 @@ Get output scheme.
 %feature("docstring")  casadi::Function::name_out(int ind) const  "
 
 Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::Function::linsol_prepare() "
-
-Factorize the matrix.
 
 ";
 
