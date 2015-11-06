@@ -45,5 +45,7 @@ def loadAllCompiledPlugins():
       casadi.Function.load_qpsol(name)
     elif cls=='Nlsol':
       casadi.Function.load_nlsol(name)
+    elif cls=='Linsol':
+      casadi.Function.load_linsol(name)
     else:
       getattr(casadi,cls).loadPlugin(name)
