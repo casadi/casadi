@@ -2802,11 +2802,6 @@ namespace casadi {
                                  const std::vector<std::vector<SX> >& aseed,
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    if (aseed.empty()) { // Quick return if no seeds
-      asens.clear();
-      return;
-    }
     casadi_error("'reverse' (SX) not defined for " + type_name());
   }
 
@@ -2815,52 +2810,7 @@ namespace casadi {
           const std::vector<std::vector<DMatrix> >& fseed,
           std::vector<std::vector<DMatrix> >& fsens,
           bool always_inline, bool never_inline) {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_error("DMatrix does not support call-nodes");
-
-    // TODO(@jaeandersson): Evaluate in "batches"
-
-    // Retrieve derivative function
-    int nfwd = fseed.size();
-    Function dfcn = forward(nfwd);
-
-    // Pass inputs
-    int n_in = this->n_in();
-    int di=0;
-    casadi_assert(arg.size()==n_in);
-    for (int i=0; i<n_in; ++i) {
-      dfcn.setInput(arg[i], di++);
-    }
-
-    // Pass outputs
-    int n_out = this->n_out();
-    casadi_assert(res.size()==n_out);
-    for (int i=0; i<n_out; ++i) {
-      dfcn.setInput(res[i], di++);
-    }
-
-    // Pass seeds
-    for (int d=0; d<nfwd; ++d) {
-      casadi_assert(fseed[d].size()==n_in);
-      for (int i=0; i<n_in; ++i) {
-        dfcn.setInput(fseed[d][i], di++);
-      }
-    }
-    casadi_assert(di==dfcn.n_in()); // Consistency check
-
-    // Calculate derivatives
-    dfcn.evaluate();
-
-    // Get sensitivities
-    fsens.resize(nfwd);
-    di = 0;
-    for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(n_out);
-      for (int i=0; i<n_out; ++i) {
-        fsens[d][i] = dfcn.output(di++);
-      }
-    }
-    casadi_assert(di==dfcn.n_out()); // Consistency check
+    casadi_error("Not implemented");
   }
 
   void FunctionInternal::
@@ -2868,52 +2818,7 @@ namespace casadi {
           const std::vector<std::vector<DMatrix> >& aseed,
           std::vector<std::vector<DMatrix> >& asens,
           bool always_inline, bool never_inline) {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_error("DMatrix does not support call-nodes");
-
-    // TODO(@jaeandersson): Evaluate in "batches"
-
-    // Retrieve derivative function
-    int nadj = aseed.size();
-    Function dfcn = reverse(nadj);
-
-    // Pass inputs
-    int n_in = this->n_in();
-    int di=0;
-    casadi_assert(arg.size()==n_in);
-    for (int i=0; i<n_in; ++i) {
-      dfcn.setInput(arg[i], di++);
-    }
-
-    // Pass outputs
-    int n_out = this->n_out();
-    casadi_assert(res.size()==n_out);
-    for (int i=0; i<n_out; ++i) {
-      dfcn.setInput(res[i], di++);
-    }
-
-    // Pass seeds
-    for (int d=0; d<nadj; ++d) {
-      casadi_assert(aseed[d].size()==n_out);
-      for (int i=0; i<n_out; ++i) {
-        dfcn.setInput(aseed[d][i], di++);
-      }
-    }
-    casadi_assert(di==dfcn.n_in()); // Consistency check
-
-    // Calculate derivatives
-    dfcn.evaluate();
-
-    // Get sensitivities
-    asens.resize(nadj);
-    di = 0;
-    for (int d=0; d<nadj; ++d) {
-      asens[d].resize(n_in);
-      for (int i=0; i<n_in; ++i) {
-        asens[d][i] = dfcn.output(di++);
-      }
-    }
-    casadi_assert(di==dfcn.n_out()); // Consistency check
+    casadi_error("Not implemented");
   }
 
   double FunctionInternal::adWeight() {
