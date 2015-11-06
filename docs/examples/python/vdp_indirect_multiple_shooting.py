@@ -112,7 +112,7 @@ G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at fi
 rfp = Function('rfp', [V], [vertcat(G)])
 
 # Select a solver for the root-finding problem
-Solver = "nlp"
+Solver = "nlpsol"
 #Solver = "newton"
 #Solver = "kinsol"
 

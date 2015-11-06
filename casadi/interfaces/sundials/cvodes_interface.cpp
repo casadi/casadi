@@ -1247,8 +1247,8 @@ namespace casadi {
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill_n(arg1_, LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill_n(res1_, LINSOL_NUM_OUT, static_cast<double*>(0));
+    fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
+    fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     arg1_[LINSOL_A] = val;
     linsol_.linsol_prepare(0, arg1_, res1_, iw_, w_);
 
@@ -1287,8 +1287,8 @@ namespace casadi {
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill_n(arg1_, LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill_n(res1_, LINSOL_NUM_OUT, static_cast<double*>(0));
+    fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
+    fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     arg1_[LINSOL_A] = val;
     linsolB_.linsol_prepare(0, arg1_, res1_, iw_, w_);
 

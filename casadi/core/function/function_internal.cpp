@@ -2802,6 +2802,11 @@ namespace casadi {
                                  const std::vector<std::vector<SX> >& aseed,
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    if (aseed.empty()) { // Quick return if no seeds
+      asens.clear();
+      return;
+    }
     casadi_error("'reverse' (SX) not defined for " + type_name());
   }
 

@@ -101,13 +101,13 @@ g = lam_f
 rfp = Function('rfp', [l_init], [g])
 
 # Select a solver for the root-finding problem
-Solver = 'nlp'
+Solver = 'nlpsol'
 #Solver = 'newton'
 #Solver = 'kinsol'
 
 # Allocate an implict solver
 opts = {}
-if Solver=='nlp':
+if Solver=='nlpsol':
     opts['nlpsol'] = 'ipopt'
     opts['nlpsol_options'] = {'hessian_approximation':'limited-memory'}
 elif Solver=='newton':
