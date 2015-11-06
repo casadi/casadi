@@ -76,7 +76,7 @@ namespace casadi {
     }
 
     // Symbolic expression for A
-    SX A = SX::sym("A", input(0).sparsity());
+    SX A = SX::sym("A", sparsity_in(LINSOL_A));
 
     // Get the inverted column permutation
     std::vector<int> inv_colperm(colperm_.size());
@@ -105,11 +105,12 @@ namespace casadi {
     } else {
       fact_fcn_ = fact_fcn;
     }
+    alloc(fact_fcn_);
 
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", QR[0].sparsity());
     SX R = SX::sym("R", QR[1].sparsity());
-    SX b = SX::sym("b", input(1).size1(), 1);
+    SX b = SX::sym("b", size1_in(LINSOL_B), 1);
 
     // Solve non-transposed
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
@@ -135,6 +136,7 @@ namespace casadi {
     } else {
       solv_fcn_N_ = solv_fcn;
     }
+    alloc(solv_fcn_N_);
 
     // Solve transposed
     // We have (Pb' * Q * R * Px)' * x = b
@@ -161,36 +163,42 @@ namespace casadi {
     } else {
       solv_fcn_T_ = solv_fcn;
     }
+    alloc(solv_fcn_T_);
 
     // Allocate storage for QR factorization
-    Q_ = DMatrix::zeros(Q.sparsity());
-    R_ = DMatrix::zeros(R.sparsity());
+    q_.resize(Q.nnz());
+    r_.resize(R.nnz());
+
+    // Temporary storage
+    alloc_w(Q.size1(), true);
   }
 
   void SymbolicQr::linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w) {
     Linsol::linsol_prepare(mem, arg, res, iw, w);
 
     // Factorize
-    fact_fcn_.setInputNZ(a_);
-    fact_fcn_.evaluate();
-    fact_fcn_.getOutput(Q_, 0);
-    fact_fcn_.getOutput(R_, 1);
+    arg1_[0] = a_;
+    res1_[0] = getPtr(q_);
+    res1_[1] = getPtr(r_);
+    fact_fcn_(0, arg1_, res1_, iw_, w_);
   }
 
-  void SymbolicQr::linsol_solve(double* x, int nrhs, bool transpose) {
+  void SymbolicQr::linsol_solve(double* x, int nrhs, bool tr) {
     // Select solve function
-    Function& solv = transpose ? solv_fcn_T_ : solv_fcn_N_;
+    Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
 
-    // Pass QR factorization
-    solv.setInput(Q_, 0);
-    solv.setInput(R_, 1);
+    // Number of equations
+    int neq = size1_in(LINSOL_B);
 
     // Solve for all right hand sides
+    arg1_[0] = getPtr(q_);
+    arg1_[1] = getPtr(r_);
     for (int i=0; i<nrhs; ++i) {
-      solv.setInputNZ(x, 2);
-      solv.evaluate();
-      solv.getOutputNZ(x);
-      x += solv.nnz_out(0);
+      copy_n(x, neq, w_); // Copy x to a temporary
+      arg1_[2] = w_;
+      res1_[0] = x;
+      solv(0, arg1_, res1_, iw_, w_+neq);
+      x += neq;
     }
   }
 

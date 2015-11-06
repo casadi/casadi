@@ -93,7 +93,7 @@ namespace casadi {
     Function solv_fcn_N_, solv_fcn_T_;
 
     // Storage for QR factorization
-    DMatrix Q_, R_;
+    std::vector<double> q_, r_;
 
     /// A documentation string
     static const std::string meta_doc;

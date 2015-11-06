@@ -96,6 +96,8 @@ namespace casadi {
     x_ = res[LINSOL_X];
     arg1_ = arg + LINSOL_NUM_IN;
     res1_ = res + LINSOL_NUM_OUT;
+    iw_ = iw;
+    w_ = w;
 
     if (a_) {
       setInputNZ(a_, LINSOL_A);
