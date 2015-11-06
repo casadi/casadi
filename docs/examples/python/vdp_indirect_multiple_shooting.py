@@ -118,7 +118,7 @@ Solver = "nlpsol"
 
 # Solver options
 opts = {}
-if Solver=="nlp":
+if Solver=="nlpsol":
     opts["nlpsol"] = "ipopt"
     opts["nlpsol_options"] = {"hessian_approximation":"limited-memory"}
 elif Solver=="newton":
