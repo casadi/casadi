@@ -14088,26 +14088,6 @@ if alive.
 ";
 
 
-// File: classcasadi_1_1Wrapper.xml
-%feature("docstring")  casadi::Wrapper< Derived >::checkDimensions() "
-[INTERNAL]  Check the dimensions of the internal function after
-initialization.
-
-";
-
-%feature("docstring")  casadi::Wrapper< Derived >::evaluate() " [INTERNAL]
-Evaluate the internal function and make it external.
-
-";
-
-%feature("docstring") casadi::Wrapper "[INTERNAL]  A helper class for a
-Function that wrap another Function.
-
-Joris Gillis
-
-C++ includes: wrapper.hpp ";
-
-
 // File: classcasadi_1_1XFunction.xml
 
 

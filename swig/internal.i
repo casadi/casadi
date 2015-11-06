@@ -181,12 +181,6 @@
 %exception  casadi::WeakRef::shared() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Wrapper< Derived >::checkDimensions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Wrapper< Derived >::evaluate() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
