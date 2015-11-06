@@ -49,34 +49,35 @@ namespace casadi {
    * \date 2011
    *
    * */
-class CASADI_QPSOL_QPOASES_EXPORT QpoasesInterface : public Qpsol {
-public:
-  /** \brief  Constructor */
-  explicit QpoasesInterface();
+  class CASADI_QPSOL_QPOASES_EXPORT QpoasesInterface : public Qpsol {
+  public:
+    /** \brief  Constructor */
+    explicit QpoasesInterface();
 
-  /** \brief  Create a new QP Solver */
-  static Qpsol* creator(const std::string& name,
-                                   const std::map<std::string, Sparsity>& st) {
-    return new QpoasesInterface(name, st);
-  }
+    /** \brief  Create a new QP Solver */
+    static Qpsol* creator(const std::string& name,
+                          const std::map<std::string, Sparsity>& st) {
+      return new QpoasesInterface(name, st);
+    }
 
-  /** \brief  Create a new Solver */
-  explicit QpoasesInterface(const std::string& name,
-                            const std::map<std::string, Sparsity>& st);
+    /** \brief  Create a new Solver */
+    explicit QpoasesInterface(const std::string& name,
+                              const std::map<std::string, Sparsity>& st);
 
-  /** \brief  Destructor */
-  virtual ~QpoasesInterface();
+    /** \brief  Destructor */
+    virtual ~QpoasesInterface();
 
-  // Get name of the plugin
-  virtual const char* plugin_name() const { return "qpoases";}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "qpoases";}
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
 
-  virtual void evaluate();
+    /** \brief  Evaluate numerically */
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
-  /// A documentation string
-  static const std::string meta_doc;
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
 
@@ -86,7 +87,7 @@ public:
     };
 
     ///@{
-      /// Convert between qpOASES types and standard types
+    /// Convert between qpOASES types and standard types
     static bool BooleanType_to_bool(qpOASES::BooleanType b);
     static qpOASES::BooleanType bool_to_BooleanType(bool b);
     static std::string SubjectToStatus_to_string(qpOASES::SubjectToStatus b);
@@ -117,7 +118,7 @@ public:
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
 
-};
+  };
 
 } // namespace casadi
 

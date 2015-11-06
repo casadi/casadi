@@ -141,10 +141,6 @@ namespace casadi {
     throw CasadiException("Qpsol::evaluate: Not implemented");
   }
 
-  void Qpsol::solve() {
-    throw CasadiException("Qpsol::solve: Not implemented");
-  }
-
   void Qpsol::checkInputs() const {
     for (int i=0;i<input(QPSOL_LBX).nnz();++i) {
       casadi_assert_message(input(QPSOL_LBX).at(i)<=input(QPSOL_UBX).at(i),

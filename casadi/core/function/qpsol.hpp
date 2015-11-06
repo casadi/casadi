@@ -70,9 +70,6 @@ namespace casadi {
     // Solve the system of equations
     virtual void evaluate();
 
-    // Solve the system of equations
-    virtual void solve();
-
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
 
@@ -81,7 +78,7 @@ namespace casadi {
 
     // Creator function for internal class
     typedef Qpsol* (*Creator)(const std::string& name,
-                                         const std::map<std::string, Sparsity>& st);
+                              const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
     struct Exposed{ };

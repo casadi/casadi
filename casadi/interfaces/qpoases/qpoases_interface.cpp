@@ -209,12 +209,24 @@ namespace casadi {
     qp_->setOptions(ops);
   }
 
-  void QpoasesInterface::evaluate() {
+  void QpoasesInterface::evalD(void* mem, const double** arg,
+                               double** res, int* iw, double* w) {
+    // Number of inputs and outputs
+    int num_in = n_in();
+    int num_out = n_out();
+
+    // Pass the inputs to the function
+    for (int i=0; i<num_in; ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     if (inputs_check_) checkInputs();
 
     if (verbose()) {
-      //     userOut() << "X_INIT = " << input(QPSOL_X_INIT) << endl;
-      //     userOut() << "LAMBDA_INIT = " << input(QPSOL_LAMBDA_INIT) << endl;
       userOut() << "LBX = " << input(QPSOL_LBX) << endl;
       userOut() << "UBX = " << input(QPSOL_UBX) << endl;
       userOut() << "LBA = " << input(QPSOL_LBA) << endl;
@@ -289,6 +301,11 @@ namespace casadi {
               negate<double>());
     transform(dual_.begin()+n_, dual_.end(),     output(QPSOL_LAM_A)->begin(),
               negate<double>());
+
+    // Get the outputs
+    for (int i=0; i<num_out; ++i) {
+      if (res[i] != 0) getOutputNZ(res[i], i);
+    }
   }
 
   std::string QpoasesInterface::getErrorMessage(int flag) {
