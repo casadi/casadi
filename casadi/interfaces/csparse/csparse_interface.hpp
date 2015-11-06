@@ -26,33 +26,33 @@
 #ifndef CASADI_CSPARSE_INTERFACE_HPP
 #define CASADI_CSPARSE_INTERFACE_HPP
 
-/** \defgroup plugin_LinearSolver_csparse
- * LinearSolver with CSparse Interface
+/** \defgroup plugin_Linsol_csparse
+ * Linsol with CSparse Interface
 */
 
-/** \pluginsection{LinearSolver,csparse} */
+/** \pluginsection{Linsol,csparse} */
 
 /// \cond INTERNAL
 #include <cs.h>
 #include "casadi/core/function/linsol.hpp"
-#include <casadi/interfaces/csparse/casadi_linearsolver_csparse_export.h>
+#include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {
 
-  /** \brief \pluginbrief{LinearSolver,csparse}
-   * @copydoc LinearSolver_doc
-   * @copydoc plugin_LinearSolver_csparse
+  /** \brief \pluginbrief{Linsol,csparse}
+   * @copydoc Linsol_doc
+   * @copydoc plugin_Linsol_csparse
    */
-  class CASADI_LINEARSOLVER_CSPARSE_EXPORT CsparseInterface : public Linsol {
+  class CASADI_LINSOL_CSPARSE_EXPORT CsparseInterface : public Linsol {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     CsparseInterface(const std::string& name, const Sparsity& sp, int nrhs);
 
-    /** \brief  Create a new LinearSolver */
-    static Linsol* creator(const std::string& name,
-                                         const Sparsity& sp, int nrhs)
-    { return new CsparseInterface(name, sp, nrhs);}
+    /** \brief  Create a new Linsol */
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+      return new CsparseInterface(name, sp, nrhs);
+    }
 
     // Destructor
     virtual ~CsparseInterface();
@@ -61,7 +61,7 @@ namespace casadi {
     virtual void init();
 
     // Factorize the matrix
-    virtual void linsol_prepare();
+    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
 
     // Solve the system of equations
     virtual void linsol_solve(double* x, int nrhs, bool transpose);

@@ -27,18 +27,18 @@
 #define CASADI_LAPACK_LU_DENSE_HPP
 
 #include "casadi/core/function/linsol.hpp"
-#include <casadi/interfaces/lapack/casadi_linearsolver_lapacklu_export.h>
+#include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
 
 namespace casadi {
 
-/** \defgroup plugin_LinearSolver_lapacklu
+/** \defgroup plugin_Linsol_lapacklu
 *
    * This class solves the linear system <tt>A.x=b</tt> by making an LU factorization of A: \n
    * <tt>A = L.U</tt>, with L lower and U upper triangular
    *
 */
 
-/** \pluginsection{LinearSolver,lapacklu} */
+/** \pluginsection{Linsol,lapacklu} */
 
 /// \cond INTERNAL
 
@@ -57,18 +57,18 @@ namespace casadi {
   extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
                           double *colcnd, double *rowcnd, double *amax, char *equed);
 
-  /** \brief \pluginbrief{LinearSolver,lapacklu}
+  /** \brief \pluginbrief{Linsol,lapacklu}
    *
-   * @copydoc LinearSolver_doc
-   * @copydoc plugin_LinearSolver_lapacklu
+   * @copydoc Linsol_doc
+   * @copydoc plugin_Linsol_lapacklu
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLuDense : public Linsol {
+  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLuDense : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackLuDense(const std::string& name, const Sparsity& sparsity, int nrhs);
 
-    /** \brief  Create a new LinearSolver */
+    /** \brief  Create a new Linsol */
     static Linsol* creator(const std::string& name,
                                          const Sparsity& sp, int nrhs) {
       return new LapackLuDense(name, sp, nrhs);
@@ -81,7 +81,7 @@ namespace casadi {
     virtual void init();
 
     /// Prepare the solution of the linear system
-    virtual void linsol_prepare();
+    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Solve the system of equations
     virtual void linsol_solve(double* x, int nrhs, bool transpose);

@@ -130,9 +130,13 @@ namespace casadi {
         }
       }
 
-      // Prepare the linear solver with J
-      linsol_.setInput(J, LINSOL_A);
-      linsol_.linsol_prepare();
+      // Factorize the linear solver with J
+      const double** arg1 = arg + n_in();
+      double** res1 = res + n_out();
+      fill_n(arg1, LINSOL_NUM_IN, static_cast<const double*>(0));
+      fill_n(res1, LINSOL_NUM_OUT, static_cast<double*>(0));
+      arg1[LINSOL_A] = J.ptr();
+      linsol_.linsol_prepare(0, arg1, res1, iw, w);
       linsol_.linsol_solve(&F->front(), 1, false);
 
       double abstolStep=0;

@@ -1787,8 +1787,9 @@ namespace casadi {
     return ret;
   }
 
-  void Function::linsol_prepare() {
-    (*this)->linsol_prepare();
+  void Function::linsol_prepare(void* mem, const double** arg, double** res,
+                                int* iw, double* w) {
+    (*this)->linsol_prepare(mem, arg, res, iw, w);
   }
 
   void Function::linsol_solve(double* x, int nrhs, bool tr) {

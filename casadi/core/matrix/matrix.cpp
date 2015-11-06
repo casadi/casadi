@@ -52,12 +52,10 @@ namespace casadi {
            const string& lsolver, const Dict& dict) const {
     const Matrix<double>& A = *this;
     Function mysolver = Function::linsol("tmp", lsolver, A.sparsity(), b.size2(), dict);
-    mysolver.setInput(A, LINSOL_A);
-    mysolver.setInput(b, LINSOL_B);
-    mysolver.linsol_prepare();
-    mysolver.linsol_solve(false);
-
-    return mysolver.output(LINSOL_X);
+    vector<DMatrix> arg(LINSOL_NUM_IN);
+    arg.at(LINSOL_A) = A;
+    arg.at(LINSOL_B) = b;
+    return mysolver(arg).at(LINSOL_X);
   }
 
   template<>

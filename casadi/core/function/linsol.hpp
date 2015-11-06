@@ -34,10 +34,9 @@
 namespace casadi {
 
   /** Internal class
-      @copydoc LinearSolver_doc
+      @copydoc Linsol_doc
   */
-  class CASADI_EXPORT
-  Linsol : public FunctionInternal, public PluginInterface<Linsol> {
+  class CASADI_EXPORT Linsol : public FunctionInternal, public PluginInterface<Linsol> {
   private:
     Sparsity sparsity_;
     int nrhs_;
@@ -64,10 +63,10 @@ namespace casadi {
     virtual void init();
 
     /// Solve the system of equations
-    virtual void evaluate();
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Prepare the factorization
-    virtual void linsol_prepare() {}
+    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Solve the system of equations, using internal vector
     virtual void linsol_solve(bool tr);
@@ -126,8 +125,7 @@ namespace casadi {
     const int* colind() const { return input(LINSOL_A).colind();}
 
     // Creator function for internal class
-    typedef Linsol* (*Creator)(const std::string& name,
-                                             const Sparsity& sp, int nrhs);
+    typedef Linsol* (*Creator)(const std::string& name, const Sparsity& sp, int nrhs);
 
     // No static functions exposed
     struct Exposed{ };
@@ -140,6 +138,14 @@ namespace casadi {
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "none";}
+
+    // Memory
+    const double *a_, *b_;
+    double *x_;
+    const double **arg1_;
+    double **res1_;
+    int *iw_;
+    double *w_;
   };
 
 

@@ -88,13 +88,22 @@ namespace casadi {
     virtual int numFunctions() const {return 1;}
 
     /** \brief  Get function reference */
-    virtual const Function& getFunction(int i) const { return linear_solver_;}
+    virtual const Function& getFunction(int i) const { return linsol_;}
+
+    /** \brief Get required length of arg field */
+    virtual size_t sz_arg() const;
+
+    /** \brief Get required length of res field */
+    virtual size_t sz_res() const;
+
+    /** \brief Get required length of iw field */
+    virtual size_t sz_iw() const;
 
     /** \brief Get required length of w field */
-    virtual size_t sz_w() const { return sparsity().size1();}
+    virtual size_t sz_w() const;
 
     /// Linear Solver (may be shared between multiple nodes)
-    Function linear_solver_;
+    Function linsol_;
   };
 
 

@@ -758,8 +758,8 @@ namespace casadi {
     virtual void free_mem(void* mem) {}
 
     ///@{
-    /// Linear solver specific (cf. LinearSolver class)
-    virtual void linsol_prepare();
+    /// Linear solver specific (cf. Linsol class)
+    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
     virtual void linsol_solve(bool tr);
     virtual void linsol_solve(double* x, int nrhs, bool tr);
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);

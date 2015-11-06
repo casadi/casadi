@@ -69,7 +69,7 @@ namespace casadi {
     ///@}
 
     /// Supported linear solvers in Sundials
-    enum LinearSolverType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
+    enum LinsolType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
 
     /// Supported iterative solvers in Sundials
     enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR};
@@ -78,7 +78,7 @@ namespace casadi {
     struct LinSolDataDense {};
 
     /// Linear solver
-    LinearSolverType linsol_f_, linsol_g_;
+    LinsolType linsol_f_, linsol_g_;
 
     /// Iterative solver
     IterativeSolverType itsol_f_, itsol_g_;

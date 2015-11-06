@@ -28,7 +28,7 @@
 
       const std::string casadi::CSparseCholeskyInternal::meta_doc=
       "\n"
-"LinearSolver with CSparseCholesky Interface\n"
+"Linsol with CSparseCholesky Interface\n"
 "\n"
 "\n"
 ">List of available options\n"

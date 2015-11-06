@@ -35,7 +35,7 @@ namespace casadi {
 
   template<bool Tr>
   Solve<Tr>::Solve(const MX& r, const MX& A, const Function& linear_solver) :
-      linear_solver_(linear_solver) {
+      linsol_(linear_solver) {
     casadi_assert_message(r.size1() == A.size2(), "Solve::Solve: dimension mismatch.");
     setDependencies(r, A);
     setSparsity(r.sparsity());
@@ -51,17 +51,20 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalD(void* mem, const double** arg, double** res,
-                        int* iw, double* w) {
+  void Solve<Tr>::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    linear_solver_.setInputNZ(arg[1], LINSOL_A);
-    linear_solver_.linsol_prepare();
-    linear_solver_.linsol_solve(res[0], dep(0).size2(), Tr);
+    const double** arg1 = arg + ndep();
+    double** res1 = res + nout();
+    arg1[LINSOL_A] = arg[1];
+    arg1[LINSOL_B] = 0;
+    res1[LINSOL_X] = 0;
+    linsol_.linsol_prepare(0, arg1, res1, iw, w);
+    linsol_.linsol_solve(res[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>
   void Solve<Tr>::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
-    linear_solver_->linsol_evalSX(mem, arg, res, iw, w, Tr, dep(0).size2());
+    linsol_->linsol_evalSX(mem, arg, res, iw, w, Tr, dep(0).size2());
   }
 
   template<bool Tr>
@@ -69,7 +72,7 @@ namespace casadi {
     if (arg[0].is_zero()) {
       res[0] = MX(arg[0].size());
     } else {
-      res[0] = linear_solver_->linsol_solve(arg[1], arg[0], Tr);
+      res[0] = linsol_->linsol_solve(arg[1], arg[0], Tr);
     }
   }
 
@@ -83,7 +86,7 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Call the cached functions
-    linear_solver_->linsol_forward(arg, res, fseed, fsens, Tr);
+    linsol_->linsol_forward(arg, res, fseed, fsens, Tr);
   }
 
   template<bool Tr>
@@ -96,17 +99,37 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Call the cached functions
-    linear_solver_->linsol_reverse(arg, res, aseed, asens, Tr);
+    linsol_->linsol_reverse(arg, res, aseed, asens, Tr);
   }
 
   template<bool Tr>
   void Solve<Tr>::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    linear_solver_->linsol_spFwd(mem, arg, res, iw, w, Tr, dep(0).size2());
+    linsol_->linsol_spFwd(mem, arg, res, iw, w, Tr, dep(0).size2());
   }
 
   template<bool Tr>
   void Solve<Tr>::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    linear_solver_->linsol_spAdj(mem, arg, res, iw, w, Tr, dep(0).size2());
+    linsol_->linsol_spAdj(mem, arg, res, iw, w, Tr, dep(0).size2());
+  }
+
+  template<bool Tr>
+  size_t Solve<Tr>::sz_arg() const {
+    return ndep() + linsol_.sz_arg();
+  }
+
+  template<bool Tr>
+  size_t Solve<Tr>::sz_res() const {
+    return nout() + linsol_.sz_res();
+  }
+
+  template<bool Tr>
+  size_t Solve<Tr>::sz_iw() const {
+    return linsol_.sz_iw();
+  }
+
+  template<bool Tr>
+  size_t Solve<Tr>::sz_w() const {
+    return linsol_.sz_w() + sparsity().size1();
   }
 
 } // namespace casadi

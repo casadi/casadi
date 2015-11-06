@@ -27,15 +27,15 @@
 #define CASADI_LAPACK_QR_DENSE_HPP
 
 #include "casadi/core/function/linsol.hpp"
-#include <casadi/interfaces/lapack/casadi_linearsolver_lapackqr_export.h>
+#include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
 
-/** \defgroup plugin_LinearSolver_lapackqr
+/** \defgroup plugin_Linsol_lapackqr
 *
 * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
 * <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
 */
 
-/** \pluginsection{LinearSolver,lapackqr} */
+/** \pluginsection{Linsol,lapackqr} */
 
 /// \cond INTERNAL
 namespace casadi {
@@ -53,18 +53,18 @@ namespace casadi {
   extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
                          double *alpha, double *a, int *lda, double *b, int *ldb);
 
-  /** \brief  \pluginbrief{LinearSolver,lapackqr}
+  /** \brief  \pluginbrief{Linsol,lapackqr}
    *
-   @copydoc LinearSolver_doc
-   @copydoc plugin_LinearSolver_lapackqr
+   @copydoc Linsol_doc
+   @copydoc plugin_Linsol_lapackqr
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQrDense : public Linsol {
+  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQrDense : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackQrDense(const std::string& name, const Sparsity& sparsity, int nrhs);
 
-    /** \brief  Create a new LinearSolver */
+    /** \brief  Create a new Linsol */
     static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
       return new LapackQrDense(name, sp, nrhs);
     }
@@ -76,10 +76,10 @@ namespace casadi {
     virtual void init();
 
     // Prepare the solution of the linear system
-    virtual void linsol_prepare();
+    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
 
     // Solve the system of equations
-    virtual void linsol_solve(double* x, int nrhs, bool transpose);
+    virtual void linsol_solve(double* x, int nrhs, bool tr);
 
     /// A documentation string
     static const std::string meta_doc;

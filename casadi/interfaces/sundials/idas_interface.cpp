@@ -223,16 +223,16 @@ namespace casadi {
     // attach a linear solver
     switch (linsol_f_) {
     case SD_DENSE:
-      initDenseLinearSolver();
+      initDenseLinsol();
       break;
     case SD_BANDED:
-      initBandedLinearSolver();
+      initBandedLinsol();
       break;
     case SD_ITERATIVE:
-      initIterativeLinearSolver();
+      initIterativeLinsol();
       break;
     case SD_USER_DEFINED:
-      initUserDefinedLinearSolver();
+      initUserDefinedLinsol();
       break;
     default: casadi_error("Uncaught switch");
     }
@@ -346,16 +346,16 @@ namespace casadi {
     // attach linear solver
     switch (linsol_g_) {
     case SD_DENSE:
-      initDenseLinearSolverB();
+      initDenseLinsolB();
       break;
     case SD_BANDED:
-      initBandedLinearSolverB();
+      initBandedLinsolB();
       break;
     case SD_ITERATIVE:
-      initIterativeLinearSolverB();
+      initIterativeLinsolB();
       break;
     case SD_USER_DEFINED:
-      initUserDefinedLinearSolverB();
+      initUserDefinedLinsolB();
       break;
     default: casadi_error("Uncaught switch");
     }
@@ -1475,12 +1475,11 @@ namespace casadi {
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    // Pass non-zero elements to the linear solver
-    linsol_.setInputNZ(val, 0);
-
     // Prepare the solution of the linear system (e.g. factorize)
-    // -- only if the linear solver inherits from LinearSolver
-    linsol_.linsol_prepare();
+    fill_n(arg1_, LINSOL_NUM_IN, static_cast<const double*>(0));
+    fill_n(res1_, LINSOL_NUM_OUT, static_cast<double*>(0));
+    arg1_[LINSOL_A] = val;
+    linsol_.linsol_prepare(0, arg1_, res1_, iw_, w_);
 
     // Log time duration
     time1 = clock();
@@ -1517,12 +1516,11 @@ namespace casadi {
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    // Pass non-zero elements to the linear solver
-    linsolB_.setInputNZ(val, 0);
-
     // Prepare the solution of the linear system (e.g. factorize)
-    // -- only if the linear solver inherits from LinearSolver
-    linsolB_.linsol_prepare();
+    fill_n(arg1_, LINSOL_NUM_IN, static_cast<const double*>(0));
+    fill_n(res1_, LINSOL_NUM_OUT, static_cast<double*>(0));
+    arg1_[LINSOL_A] = val;
+    linsolB_.linsol_prepare(0, arg1_, res1_, iw_, w_);
 
     // Log time duration
     time1 = clock();
@@ -1704,7 +1702,7 @@ namespace casadi {
   }
 
 
-  void IdasInterface::initDenseLinearSolver() {
+  void IdasInterface::initDenseLinsol() {
     // Dense jacobian
     int flag = IDADense(mem_, nx_+nz_);
     if (flag != IDA_SUCCESS) idas_error("IDADense", flag);
@@ -1714,7 +1712,7 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::initBandedLinearSolver() {
+  void IdasInterface::initBandedLinsol() {
     // Banded jacobian
     pair<int, int> bw = getBandwidth();
     int flag = IDABand(mem_, nx_+nz_, bw.first, bw.second);
@@ -1727,7 +1725,7 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::initIterativeLinearSolver() {
+  void IdasInterface::initIterativeLinsol() {
     // Attach an iterative solver
     int flag;
     switch (itsol_f_) {
@@ -1773,7 +1771,7 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::initUserDefinedLinearSolver() {
+  void IdasInterface::initUserDefinedLinsol() {
     // Make sure that a Jacobian has been provided
     casadi_assert(!jac_.isNull());
 
@@ -1788,7 +1786,7 @@ namespace casadi {
     IDA_mem->ida_setupNonNull = TRUE;
   }
 
-  void IdasInterface::initDenseLinearSolverB() {
+  void IdasInterface::initDenseLinsolB() {
     // Dense jacobian
     int flag = IDADenseB(mem_, whichB_, nrx_+nrz_);
     if (flag != IDA_SUCCESS) idas_error("IDADenseB", flag);
@@ -1799,7 +1797,7 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::initBandedLinearSolverB() {
+  void IdasInterface::initBandedLinsolB() {
     pair<int, int> bw = getBandwidthB();
     int flag = IDABandB(mem_, whichB_, nrx_+nrz_, bw.first, bw.second);
     if (flag != IDA_SUCCESS) idas_error("IDABand", flag);
@@ -1915,7 +1913,7 @@ namespace casadi {
   }
 #endif // WITH_SYSTEM_SUNDIALS
 
-  void IdasInterface::initIterativeLinearSolverB() {
+  void IdasInterface::initIterativeLinsolB() {
     int flag;
     switch (itsol_g_) {
     case SD_GMRES:
@@ -1965,7 +1963,7 @@ namespace casadi {
 
   }
 
-  void IdasInterface::initUserDefinedLinearSolverB() {
+  void IdasInterface::initUserDefinedLinsolB() {
     // Make sure that a Jacobian has been provided
     casadi_assert(!jacB_.isNull());
 

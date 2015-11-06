@@ -31,8 +31,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_CSPARSE_EXPORT
-  casadi_register_linearsolver_csparse(Linsol::Plugin* plugin) {
+  int CASADI_LINSOL_CSPARSE_EXPORT
+  casadi_register_linsol_csparse(Linsol::Plugin* plugin) {
     plugin->creator = CsparseInterface::creator;
     plugin->name = "csparse";
     plugin->doc = CsparseInterface::meta_doc.c_str();
@@ -41,8 +41,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_CSPARSE_EXPORT casadi_load_linearsolver_csparse() {
-    Linsol::registerPlugin(casadi_register_linearsolver_csparse);
+  void CASADI_LINSOL_CSPARSE_EXPORT casadi_load_linsol_csparse() {
+    Linsol::registerPlugin(casadi_register_linsol_csparse);
   }
 
   CsparseInterface::CsparseInterface(const std::string& name,
@@ -85,12 +85,10 @@ namespace casadi {
     }
   }
 
-  void CsparseInterface::linsol_prepare() {
-    double time_start=0;
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
+  void CsparseInterface::linsol_prepare(void* mem, const double** arg, double** res,
+                                        int* iw, double* w) {
+    Linsol::linsol_prepare(mem, arg, res, iw, w);
+
     if (!called_once_) {
       if (verbose()) {
         userOut() << "CsparseInterface::prepare: symbolic factorization" << endl;
@@ -149,14 +147,6 @@ namespace casadi {
       }
     }
     casadi_assert(N_!=0);
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 0,
-                       time_stop-time_start,
-                       time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
-    }
   }
 
   void CsparseInterface::linsol_solve(double* x, int nrhs, bool transpose) {

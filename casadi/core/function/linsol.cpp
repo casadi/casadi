@@ -90,12 +90,35 @@ namespace casadi {
   Linsol::~Linsol() {
   }
 
-  void Linsol::evaluate() {
+  void Linsol::linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w) {
+    a_ = arg[LINSOL_A];
+    b_ = arg[LINSOL_B];
+    x_ = res[LINSOL_X];
+    arg1_ = arg + LINSOL_NUM_IN;
+    res1_ = res + LINSOL_NUM_OUT;
+
+    if (a_) {
+      setInputNZ(a_, LINSOL_A);
+    } else {
+      setInput(0., LINSOL_A);
+    }
+    if (b_) {
+      setInputNZ(b_, LINSOL_B);
+    } else {
+      setInput(0., LINSOL_B);
+    }
+  }
+
+  void Linsol::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     // Call the solve routine
-    linsol_prepare();
+    linsol_prepare(mem, arg, res, iw, w);
 
     // Solve the factorized system
     linsol_solve(false);
+
+    if (x_) {
+      getOutputNZ(x_, LINSOL_X);
+    }
   }
 
   void Linsol::linsol_solve(bool tr) {
@@ -348,7 +371,7 @@ namespace casadi {
 
   std::map<std::string, Linsol::Plugin> Linsol::solvers_;
 
-  const std::string Linsol::infix_ = "linearsolver";
+  const std::string Linsol::infix_ = "linsol";
 
 } // namespace casadi
 

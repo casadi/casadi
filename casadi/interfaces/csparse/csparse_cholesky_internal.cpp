@@ -31,8 +31,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
-  casadi_register_linearsolver_csparsecholesky(Linsol::Plugin* plugin) {
+  int CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
+  casadi_register_linsol_csparsecholesky(Linsol::Plugin* plugin) {
     plugin->creator = CSparseCholeskyInternal::creator;
     plugin->name = "csparsecholesky";
     plugin->doc = CSparseCholeskyInternal::meta_doc.c_str();
@@ -41,8 +41,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT casadi_load_linearsolver_csparsecholesky() {
-    Linsol::registerPlugin(casadi_register_linearsolver_csparsecholesky);
+  void CASADI_LINSOL_CSPARSECHOLESKY_EXPORT casadi_load_linsol_csparsecholesky() {
+    Linsol::registerPlugin(casadi_register_linsol_csparsecholesky);
   }
 
   CSparseCholeskyInternal::CSparseCholeskyInternal(const std::string& name,
@@ -137,7 +137,10 @@ namespace casadi {
     return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInternal::linsol_prepare() {
+  void CSparseCholeskyInternal::linsol_prepare(void* mem, const double** arg, double** res,
+                                               int* iw, double* w) {
+    Linsol::linsol_prepare(mem, arg, res, iw, w);
+
     // Get a reference to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();
 

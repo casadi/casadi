@@ -33,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_LAPACKLU_EXPORT
-  casadi_register_linearsolver_lapacklu(Linsol::Plugin* plugin) {
+  int CASADI_LINSOL_LAPACKLU_EXPORT
+  casadi_register_linsol_lapacklu(Linsol::Plugin* plugin) {
     plugin->creator = LapackLuDense::creator;
     plugin->name = "lapacklu";
     plugin->doc = LapackLuDense::meta_doc.c_str();
@@ -43,8 +43,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_LAPACKLU_EXPORT casadi_load_linearsolver_lapacklu() {
-    Linsol::registerPlugin(casadi_register_linearsolver_lapacklu);
+  void CASADI_LINSOL_LAPACKLU_EXPORT casadi_load_linsol_lapacklu() {
+    Linsol::registerPlugin(casadi_register_linsol_lapacklu);
   }
 
   LapackLuDense::LapackLuDense(const std::string& name,
@@ -95,12 +95,9 @@ namespace casadi {
     }
   }
 
-  void LapackLuDense::linsol_prepare() {
-    double time_start=0;
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
+  void LapackLuDense::linsol_prepare(void* mem, const double** arg, double** res,
+                                     int* iw, double* w) {
+    Linsol::linsol_prepare(mem, arg, res, iw, w);
 
     // Get the elements of the matrix, dense format
     input(0).get(mat_);
@@ -140,15 +137,8 @@ namespace casadi {
     // Factorize the matrix
     int info = -100;
     dgetrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(ipiv_), &info);
-    if (info != 0) throw CasadiException("LapackLuDense::prepare: "
-                                         "dgetrf_ failed to factorize the Jacobian");
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 0, time_stop-time_start,
-                       time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
-    }
+    casadi_assert_message(info==0, "LapackLuDense::prepare: "
+                          "dgetrf_ failed to factorize the Jacobian");
   }
 
   void LapackLuDense::linsol_solve(double* x, int nrhs, bool transpose) {

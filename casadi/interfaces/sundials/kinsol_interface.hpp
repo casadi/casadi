@@ -91,8 +91,8 @@ namespace casadi {
     bool exact_jacobian_;
 
     // Type of linear solver
-    enum LinearSolverType { DENSE, BANDED, ITERATIVE, USER_DEFINED};
-    LinearSolverType linear_solver_type_;
+    enum LinsolType { DENSE, BANDED, ITERATIVE, USER_DEFINED};
+    LinsolType linear_solver_type_;
 
     // Bandwidth (for banded solvers)
     int upper_bandwidth_, lower_bandwidth_;

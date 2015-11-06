@@ -160,16 +160,16 @@ namespace casadi {
     // attach a linear solver
     switch (linsol_f_) {
     case SD_DENSE:
-      initDenseLinearSolver();
+      initDenseLinsol();
       break;
     case SD_BANDED:
-      initBandedLinearSolver();
+      initBandedLinsol();
       break;
     case SD_ITERATIVE:
-      initIterativeLinearSolver();
+      initIterativeLinsol();
       break;
     case SD_USER_DEFINED:
-      initUserDefinedLinearSolver();
+      initUserDefinedLinsol();
       break;
     }
 
@@ -250,16 +250,16 @@ namespace casadi {
     // attach linear solver to backward problem
     switch (linsol_g_) {
     case SD_DENSE:
-      initDenseLinearSolverB();
+      initDenseLinsolB();
       break;
     case SD_BANDED:
-      initBandedLinearSolverB();
+      initBandedLinsolB();
       break;
     case SD_ITERATIVE:
-      initIterativeLinearSolverB();
+      initIterativeLinsolB();
       break;
     case SD_USER_DEFINED:
-      initUserDefinedLinearSolverB();
+      initUserDefinedLinsolB();
       break;
     }
 
@@ -1246,12 +1246,11 @@ namespace casadi {
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    // Pass non-zero elements, scaled by -gamma, to the linear solver
-    linsol_.setInputNZ(val, 0);
-
     // Prepare the solution of the linear system (e.g. factorize)
-    // -- only if the linear solver inherits from LinearSolver
-    linsol_.linsol_prepare();
+    fill_n(arg1_, LINSOL_NUM_IN, static_cast<const double*>(0));
+    fill_n(res1_, LINSOL_NUM_OUT, static_cast<double*>(0));
+    arg1_[LINSOL_A] = val;
+    linsol_.linsol_prepare(0, arg1_, res1_, iw_, w_);
 
     // Log time duration
     time1 = clock();
@@ -1287,12 +1286,11 @@ namespace casadi {
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
-    // Pass non-zero elements, scaled by -gamma, to the linear solver
-    linsolB_.setInputNZ(val, 0);
-
     // Prepare the solution of the linear system (e.g. factorize)
-    // -- only if the linear solver inherits from LinearSolver
-    linsolB_.linsol_prepare();
+    fill_n(arg1_, LINSOL_NUM_IN, static_cast<const double*>(0));
+    fill_n(res1_, LINSOL_NUM_OUT, static_cast<double*>(0));
+    arg1_[LINSOL_A] = val;
+    linsolB_.linsol_prepare(0, arg1_, res1_, iw_, w_);
 
     // Log time duration
     time1 = clock();
@@ -1447,7 +1445,7 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initDenseLinearSolver() {
+  void CvodesInterface::initDenseLinsol() {
     int flag = CVDense(mem_, nx_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDense", flag);
     if (exact_jacobian_) {
@@ -1456,7 +1454,7 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initBandedLinearSolver() {
+  void CvodesInterface::initBandedLinsol() {
     pair<int, int> bw = getBandwidth();
     int flag = CVBand(mem_, nx_, bw.first, bw.second);
     if (flag!=CV_SUCCESS) cvodes_error("CVBand", flag);
@@ -1466,7 +1464,7 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initIterativeLinearSolver() {
+  void CvodesInterface::initIterativeLinsol() {
     // Attach the sparse solver
     int flag;
     switch (itsol_f_) {
@@ -1511,15 +1509,15 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initUserDefinedLinearSolver() {
+  void CvodesInterface::initUserDefinedLinsol() {
     // Make sure that a Jacobian has been provided
     if (jac_.isNull())
-        throw CasadiException("CvodesInterface::initUserDefinedLinearSolver(): "
+        throw CasadiException("CvodesInterface::initUserDefinedLinsol(): "
                               "No Jacobian has been provided.");
 
     // Make sure that a linear solver has been provided
     if (linsol_.isNull())
-        throw CasadiException("CvodesInterface::initUserDefinedLinearSolver(): "
+        throw CasadiException("CvodesInterface::initUserDefinedLinsol(): "
                               "No user defined linear solver has been provided.");
 
     //  Set fields in the IDA memory
@@ -1530,7 +1528,7 @@ namespace casadi {
     cv_mem->cv_setupNonNull = TRUE;
   }
 
-  void CvodesInterface::initDenseLinearSolverB() {
+  void CvodesInterface::initDenseLinsolB() {
     int flag = CVDenseB(mem_, whichB_, nrx_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDenseB", flag);
     if (exact_jacobianB_) {
@@ -1539,7 +1537,7 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initBandedLinearSolverB() {
+  void CvodesInterface::initBandedLinsolB() {
     pair<int, int> bw = getBandwidthB();
     int flag = CVBandB(mem_, whichB_, nrx_, bw.first, bw.second);
     if (flag!=CV_SUCCESS) cvodes_error("CVBandB", flag);
@@ -1550,7 +1548,7 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initIterativeLinearSolverB() {
+  void CvodesInterface::initIterativeLinsolB() {
     int flag;
     switch (itsol_g_) {
     case SD_GMRES:
@@ -1595,15 +1593,15 @@ namespace casadi {
 
   }
 
-  void CvodesInterface::initUserDefinedLinearSolverB() {
+  void CvodesInterface::initUserDefinedLinsolB() {
     // Make sure that a Jacobian has been provided
     if (jacB_.isNull())
-        throw CasadiException("CvodesInterface::initUserDefinedLinearSolverB(): "
+        throw CasadiException("CvodesInterface::initUserDefinedLinsolB(): "
                               "No backwards Jacobian has been provided.");
 
     // Make sure that a linear solver has been provided
     if (linsolB_.isNull())
-        throw CasadiException("CvodesInterface::initUserDefinedLinearSolverB(): "
+        throw CasadiException("CvodesInterface::initUserDefinedLinsolB(): "
                               "No user defined backward linear solver has been provided.");
 
     CVodeMem cv_mem = static_cast<CVodeMem>(mem_);

@@ -273,6 +273,7 @@ namespace casadi {
       // Create a linear solver
       linsol_ = Function::linsol("linsol", option("linear_solver"), jac_.sparsity_out(0),
                                  1, linear_solver_options);
+      alloc(linsol_);
     }
 
     if ((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()) {
@@ -289,6 +290,7 @@ namespace casadi {
         hasSetOption("linear_solverB") ? option("linear_solverB") : option("linear_solver");
       linsolB_ = Function::linsol("linsolB", linear_solver_name, jacB_.sparsity_out(0),
                                   1, opts);
+      alloc(linsolB_);
     }
   }
 

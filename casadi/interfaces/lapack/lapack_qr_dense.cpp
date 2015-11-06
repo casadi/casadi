@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_LAPACKQR_EXPORT
-  casadi_register_linearsolver_lapackqr(Linsol::Plugin* plugin) {
+  int CASADI_LINSOL_LAPACKQR_EXPORT
+  casadi_register_linsol_lapackqr(Linsol::Plugin* plugin) {
     plugin->creator = LapackQrDense::creator;
     plugin->name = "lapackqr";
     plugin->doc = LapackQrDense::meta_doc.c_str();;
@@ -40,8 +40,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_LAPACKQR_EXPORT casadi_load_linearsolver_lapackqr() {
-    Linsol::registerPlugin(casadi_register_linearsolver_lapackqr);
+  void CASADI_LINSOL_LAPACKQR_EXPORT casadi_load_linsol_lapackqr() {
+    Linsol::registerPlugin(casadi_register_linsol_lapackqr);
   }
 
   LapackQrDense::LapackQrDense(const std::string& name,
@@ -70,7 +70,10 @@ namespace casadi {
     work_.resize(10*ncol_);
   }
 
-  void LapackQrDense::linsol_prepare() {
+  void LapackQrDense::linsol_prepare(void* mem, const double** arg, double** res,
+                                     int* iw, double* w) {
+    Linsol::linsol_prepare(mem, arg, res, iw, w);
+
     // Get the elements of the matrix, dense format
     input(0).get(mat_);
 

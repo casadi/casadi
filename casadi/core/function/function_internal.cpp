@@ -3092,7 +3092,8 @@ namespace casadi {
     return v;
   }
 
-  void FunctionInternal::linsol_prepare() {
+  void FunctionInternal::linsol_prepare(void* mem, const double** arg, double** res,
+                                        int* iw, double* w) {
     casadi_error("'linsol_prepare' not defined for " + type_name());
   }
 

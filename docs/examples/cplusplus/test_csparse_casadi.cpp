@@ -57,54 +57,31 @@ int main(int argc, char *argv[])
   double   s, u, p, e, r, l;
   s = 19.0; u = 21.0; p = 16.0; e = 5.0; r = 18.0; l = 12.0;
 
-  vector<double> val(nnz);
-  val[0] = s; val[1] = l; val[2] = l; val[3] = u; val[4] = l; val[5] = l;
-  val[6] = u; val[7] = p; val[8] = u; val[9] = e; val[10]= u; val[11]= r;
+  vector<double> a(nnz);
+  a[0] = s; a[1] = l; a[2] = l; a[3] = u; a[4] = l; a[5] = l;
+  a[6] = u; a[7] = p; a[8] = u; a[9] = e; a[10]= u; a[11]= r;
   
   // Right hand side
-  vector<double> rhs(ncol,1.0);
-  
-  // Transpose?
-  bool tr = false;
+  vector<double> b(ncol,1.0);
 
   // Solve
-  linear_solver.setInputNZ(val,"A");
-  linear_solver.setInputNZ(rhs,"B");
-  linear_solver.linsol_prepare();
-  linear_solver.linsol_solve(tr);
+  vector<double> x;
+  linear_solver({{"A", a}, {"B", b}}, {{"X", &x}});
   
   // Print the solution
-  cout << "solution = " << linear_solver.output("X") << endl;
+  cout << "solution            = " << x << endl;
 
   // Embed in an MX graph
-  MX A = MX::sym("A",spA);
-  MX B = MX::sym("B",ncol,1);
-  MX X = linear_solver.linsol_solve(A,B,tr);
+  MX A = MX::sym("A", spA);
+  MX B = MX::sym("B", ncol);
+  MX X = linear_solver.linsol_solve(A, B);
   Function F("F", {A, B}, {X}, {"A", "B"}, {"X"});
 
   // Solve
-  F.setInputNZ(val,"A");
-  F.setInputNZ(rhs,"B");
-  F.evaluate();
+  F({{"A", a}, {"B", b}}, {{"X", &x}});
   
   // Print the solution
-  cout << "solution (embedded) = " << F.output("X") << endl;
-  
-  // Preturb the linear solver
-  double t = 0.01;
-  DMatrix x_unpreturbed = F.output("X");
-  F.input("A")(3,2)   += 1*t;
-  F.input("B")(2,0)   += 2*t;
-  F.evaluate();
-  cout << "solution (fd) = " << (F.output("X")-x_unpreturbed)/t << endl;
+  cout << "solution (embedded) = " << x << endl;
 
-  // Jacobian
-  Function J = F.jacobian("B","X");  
-  J.setInputNZ(val,"A");
-  J.setInputNZ(rhs,"B");
-  J.evaluate();
-  cout << "solution (dx/db) = " << J.output() << endl;
-  DMatrix J_analytic = inv(J.input("A"));
-  if(tr) J_analytic = J_analytic.T();
-  cout << "analytic solution (dx/db) = " << J_analytic << endl;
+  return 0;
 }

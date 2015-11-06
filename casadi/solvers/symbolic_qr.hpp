@@ -27,15 +27,15 @@
 #define CASADI_SYMBOLIC_QR_HPP
 
 #include "casadi/core/function/linsol.hpp"
-#include <casadi/solvers/casadi_linearsolver_symbolicqr_export.h>
+#include <casadi/solvers/casadi_linsol_symbolicqr_export.h>
 
-/** \defgroup plugin_LinearSolver_symbolicqr
+/** \defgroup plugin_Linsol_symbolicqr
 
-       LinearSolver based on QR factorization with sparsity pattern based reordering
+       Linsol based on QR factorization with sparsity pattern based reordering
       _without_ partial pivoting
 */
 
-/** \pluginsection{LinearSolver,symbolicqr} */
+/** \pluginsection{Linsol,symbolicqr} */
 
 /// \cond INTERNAL
 
@@ -43,14 +43,14 @@ namespace casadi {
   typedef SX* SXPtr;
   typedef std::vector<SXPtr> SXPtrV;
 
-  /** \brief \pluginbrief{LinearSolver,symbolicqr}
+  /** \brief \pluginbrief{Linsol,symbolicqr}
 
-      @copydoc LinearSolver_doc
-      @copydoc plugin_LinearSolver_symbolicqr
+      @copydoc Linsol_doc
+      @copydoc plugin_Linsol_symbolicqr
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQr : public Linsol {
+  class CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQr : public Linsol {
   public:
     // Constructor
     SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs);
@@ -61,7 +61,7 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "symbolicqr";}
 
-    /** \brief  Create a new LinearSolver */
+    /** \brief  Create a new Linsol */
     static Linsol* creator(const std::string& name,
                                          const Sparsity& sp, int nrhs) {
       return new SymbolicQr(name, sp, nrhs);
@@ -71,7 +71,7 @@ namespace casadi {
     virtual void init();
 
     // Prepare the factorization
-    virtual void linsol_prepare();
+    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
 
     // Solve the system of equations
     virtual void linsol_solve(double* x, int nrhs, bool transpose);

@@ -260,28 +260,28 @@ namespace casadi {
     static void idas_error(const std::string& module, int flag);
 
     // Initialize the dense linear solver
-    void initDenseLinearSolver();
+    void initDenseLinsol();
 
     // Initialize the banded linear solver
-    void initBandedLinearSolver();
+    void initBandedLinsol();
 
     // Initialize the iterative linear solver
-    void initIterativeLinearSolver();
+    void initIterativeLinsol();
 
     // Initialize the user defined linear solver
-    void initUserDefinedLinearSolver();
+    void initUserDefinedLinsol();
 
     // Initialize the dense linear solver (backward integration)
-    void initDenseLinearSolverB();
+    void initDenseLinsolB();
 
     // Initialize the banded linear solver (backward integration)
-    void initBandedLinearSolverB();
+    void initBandedLinsolB();
 
     // Initialize the iterative linear solver (backward integration)
-    void initIterativeLinearSolverB();
+    void initIterativeLinsolB();
 
     // Initialize the user defined linear solver (backward integration)
-    void initUserDefinedLinearSolverB();
+    void initUserDefinedLinsolB();
 
     // Ids of backward problem
     int whichB_;

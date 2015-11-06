@@ -92,7 +92,7 @@ namespace casadi {
     virtual MX getTranspose() const { return dep();}
 
     /// Solve for square linear system
-    //virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const {
+    //virtual MX getSolve(const MX& r, bool tr, const Linsol& linear_solver) const {
     // return dep()->getSolve(r, !tr, linear_solver);} // FIXME #1001
 
     /** \brief Check if two nodes are equivalent up to a given depth */

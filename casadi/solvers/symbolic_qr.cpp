@@ -33,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT
-  casadi_register_linearsolver_symbolicqr(Linsol::Plugin* plugin) {
+  int CASADI_LINSOL_SYMBOLICQR_EXPORT
+  casadi_register_linsol_symbolicqr(Linsol::Plugin* plugin) {
     plugin->creator = SymbolicQr::creator;
     plugin->name = "symbolicqr";
     plugin->doc = SymbolicQr::meta_doc.c_str();
@@ -43,8 +43,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT casadi_load_linearsolver_symbolicqr() {
-    Linsol::registerPlugin(casadi_register_linearsolver_symbolicqr);
+  void CASADI_LINSOL_SYMBOLICQR_EXPORT casadi_load_linsol_symbolicqr() {
+    Linsol::registerPlugin(casadi_register_linsol_symbolicqr);
   }
 
   SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs) :
@@ -167,9 +167,11 @@ namespace casadi {
     R_ = DMatrix::zeros(R.sparsity());
   }
 
-  void SymbolicQr::linsol_prepare() {
+  void SymbolicQr::linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w) {
+    Linsol::linsol_prepare(mem, arg, res, iw, w);
+
     // Factorize
-    fact_fcn_.setInput(input(LINSOL_A));
+    fact_fcn_.setInputNZ(a_);
     fact_fcn_.evaluate();
     fact_fcn_.getOutput(Q_, 0);
     fact_fcn_.getOutput(R_, 1);

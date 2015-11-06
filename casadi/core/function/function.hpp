@@ -1122,7 +1122,6 @@ namespace casadi {
     static Function external(const std::string& name, const Compiler& compiler,
                              const Dict& opts=Dict());
 
-
     ///@{
     /// Check if a particular plugin is available
     static bool has_ivpsol(const std::string& name);
@@ -1158,7 +1157,7 @@ namespace casadi {
      *  If A is structurally singular, an error will be thrown during init.
      *  If A is numerically singular, the prepare step will fail.
      *
-     *  The usual procedure to use LinearSolver is: \n
+     *  The usual procedure to use Linsol is: \n
      *  -# init()
      *  -# set the first input (A)
      *  -# prepare()
@@ -1176,9 +1175,6 @@ namespace casadi {
                            const Sparsity& sp, int nrhs, const Dict& opts=Dict());
     ///@}
 
-    /// Factorize the matrix
-    void linsol_prepare();
-
     /// Solve the system of equations, internal vector
     void linsol_solve(bool tr=false);
 
@@ -1186,6 +1182,9 @@ namespace casadi {
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
 
 #ifndef SWIG
+    /// Factorize the matrix
+    void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
+
     /// Solve the factorized system of equations
     void linsol_solve(double* x, int nrhs=1, bool tr=false);
 

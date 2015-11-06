@@ -117,13 +117,14 @@ namespace casadi {
           linear_solver_options = option("linear_solver_options");
         }
 
-        // Allocate an NLP solver
+        // Allocate a linear solver
         linsol_ = Function::linsol("linsol", option("linear_solver"),
                                    jac_.sparsity_out(0), 1, linear_solver_options);
       }
     } else {
       casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));
     }
+    alloc(linsol_);
 
     // Constraints
     if (hasSetOption("constraints")) u_c_ = option("constraints");

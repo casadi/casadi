@@ -43,7 +43,7 @@ casadi_plugin(Qpsol nlpsol
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 casadi_plugin(Nlsol nlpsol
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)
-casadi_plugin(LinearSolver symbolicqr
+casadi_plugin(Linsol symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp
 )
 
