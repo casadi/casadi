@@ -1,20 +1,6 @@
 
 // File: index.xml
 
-// File: classcasadi_1_1Adaptor.xml
-%feature("docstring") casadi::Adaptor "[INTERNAL]  A helper class for a
-Solver that delegates work to another solver.
-
-Joris Gillis
-
-C++ includes: adaptor.hpp ";
-
-%feature("docstring") casadi::Adaptor::addOptions "[INTERNAL]  Add options
-that are common to all Adaptor classes.
-
-";
-
-
 // File: classcasadi_1_1Assertion.xml
 
 
@@ -5072,6 +5058,9 @@ C++ includes: generic_type.hpp ";
 // File: classcasadi_1_1ImplicitFixedStepIvpsol.xml
 
 
+// File: classcasadi_1_1ImplicitToNlp.xml
+
+
 // File: classcasadi_1_1InfSX.xml
 
 
@@ -7500,9 +7489,6 @@ Return a string with a description (for SWIG)
 
 
 // File: classcasadi_1_1Qpsol.xml
-
-
-// File: classcasadi_1_1QpToImplicit.xml
 
 
 // File: classcasadi_1_1QpToNlp.xml

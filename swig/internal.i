@@ -1,6 +1,3 @@
-%exception  casadi::Adaptor< Derived, Solver >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::checkInputs() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

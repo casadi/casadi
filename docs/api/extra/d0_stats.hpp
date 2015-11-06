@@ -51,6 +51,26 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::ImplicitToNlp
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>solver_stats</td><td>casadi::ImplicitToNlp</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Nlsol_nlp
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th></tr>
+<tr><td>solver_stats</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::IpoptInterface
 \n
 \par
@@ -189,26 +209,6 @@
 </table>
 */
 /// \endcond
-/// \cond INTERNAL
-/** \class casadi::QpToImplicit
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>solver_stats</td><td>casadi::QpToImplicit</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_Nlsol_nlp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>solver_stats</td></tr>
-</table>
-*/
 /// \cond INTERNAL
 /** \class casadi::QpToNlp
 \n
