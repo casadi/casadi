@@ -66,124 +66,6 @@ namespace casadi {
   Newton::~Newton() {
   }
 
-  void Newton::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
-    casadi_msg("Newton::solveNonLinear:begin");
-
-    // Set up timers for profiling
-    double time_zero=0;
-    double time_start=0;
-    double time_stop=0;
-    if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
-      time_zero = getRealTime();
-      CasadiOptions::profilingLog  << "start " << this << ":" <<name_ << std::endl;
-    }
-
-    // Get the initial guess
-    if (arg[iin_]) {
-      copy(arg[iin_], arg[iin_]+nnz_in(iin_), z_.begin());
-    } else {
-      fill(z_.begin(), z_.end(), 0);
-    }
-
-    // Perform the Newton iterations
-    int iter=0;
-
-    bool success = true;
-
-    while (true) {
-      // Break if maximum number of iterations already reached
-      if (iter >= max_iter_) {
-        log("evaluate", "Max. iterations reached.");
-        stats_["return_status"] = "max_iteration_reached";
-        success = false;
-        break;
-      }
-
-      // Start a new iteration
-      iter++;
-
-      // Use u to evaluate J
-      jac_.setInputNZ(z_, iin_);
-
-      for (int i=0; i<n_in(); ++i) {
-        if (i!=iin_) {
-          if (arg[i]) {
-            jac_.setInputNZ(arg[i], i);
-          } else {
-            jac_.setInputNZ(0, i);
-          }
-        }
-      }
-      jac_.evaluate();
-      DMatrix &J = jac_.output(0);
-      DMatrix &F = jac_.output(1+iout_);
-
-      double abstol = 0;
-      if (numeric_limits<double>::infinity() != abstol_) {
-        abstol = std::max((*std::max_element(F.data().begin(),
-                                             F.data().end())),
-                          -(*std::min_element(F.data().begin(),
-                                              F.data().end())));
-        if (abstol <= abstol_) {
-          casadi_msg("Converged to acceptable tolerance - abstol: " << abstol_);
-          break;
-        }
-      }
-
-      // Factorize the linear solver with J
-      const double** arg1 = arg + n_in();
-      double** res1 = res + n_out();
-      fill_n(arg1, LINSOL_NUM_IN, static_cast<const double*>(0));
-      fill_n(res1, LINSOL_NUM_OUT, static_cast<double*>(0));
-      arg1[LINSOL_A] = J.ptr();
-      linsol_.linsol_prepare(0, arg1, res1, iw, w);
-      linsol_.linsol_solve(&F->front(), 1, false);
-
-      double abstolStep=0;
-      if (numeric_limits<double>::infinity() != abstolStep_) {
-        abstolStep = std::max((*std::max_element(F.data().begin(),
-                                                 F.data().end())),
-                              -(*std::min_element(F.data().begin(),
-                                                  F.data().end())));
-        if (abstolStep <= abstolStep_) {
-          casadi_msg("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
-          break;
-        }
-      }
-
-      if (print_iteration_) {
-        // Only print iteration header once in a while
-        if (iter % 10==0) {
-          printIteration(userOut());
-        }
-
-        // Print iteration information
-        printIteration(userOut(), iter, abstol, abstolStep);
-      }
-
-      // Update Xk+1 = Xk - J^(-1) F
-      std::transform(z_.begin(), z_.end(), F->begin(), z_.begin(), std::minus<double>());
-    }
-
-    // Get the solution
-    if (res[iout_]) {
-      copy_n(z_.begin(), nnz_out(iout_), res[iout_]);
-    }
-
-    // Get auxiliary outputs
-    for (int i=0; i<n_out(); ++i) {
-      if (i!=iout_ && res[i]) {
-        copy_n(jac_.output(i+1).ptr(), nnz_out(i), res[i]);
-      }
-    }
-
-    // Store the iteration count
-    if (gather_stats_) stats_["iter"] = iter;
-    if (success) stats_["return_status"] = "success";
-
-    casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
-  }
-
   void Newton::init() {
 
     // Call the base class initializer
@@ -206,7 +88,106 @@ namespace casadi {
     print_iteration_ = option("print_iteration");
 
     // Allocate memory
-    z_.resize(n_);
+    alloc_w(n_, true); // x
+    alloc_w(jac_.nnz_out(1+iout_), true); // F
+    alloc_w(jac_.nnz_out(0), true); // J
+  }
+
+  void Newton::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // IO buffers
+    const double** arg1 = arg + n_in();
+    double** res1 = res + n_out();
+
+    // Work vectors
+    double* x = w; w += n_;
+    double* f = w; w += jac_.nnz_out(1+iout_);
+    double* jac = w; w += jac_.nnz_out(0);
+
+    // Get the initial guess
+    if (arg[iin_]) {
+      copy_n(arg[iin_], n_, x);
+    } else {
+      fill_n(x, n_, 0);
+    }
+
+    // Perform the Newton iterations
+    int iter=0;
+    bool success = true;
+    while (true) {
+      // Break if maximum number of iterations already reached
+      if (iter >= max_iter_) {
+        log("evalD", "Max. iterations reached.");
+        stats_["return_status"] = "max_iteration_reached";
+        success = false;
+        break;
+      }
+
+      // Start a new iteration
+      iter++;
+
+      // Use x to evaluate J
+      copy_n(arg, n_in(), arg1);
+      arg1[iin_] = x;
+      res1[0] = jac;
+      copy_n(res, n_out(), res1+1);
+      res1[1+iout_] = f;
+      jac_(0, arg1, res1, iw, w);
+
+      // Check convergence
+      double abstol = 0;
+      if (abstol_ != numeric_limits<double>::infinity()) {
+        for (int i=0; i<n_; ++i) {
+          abstol = max(abstol, fabs(f[i]));
+        }
+        if (abstol <= abstol_) {
+          casadi_msg("Converged to acceptable tolerance - abstol: " << abstol_);
+          break;
+        }
+      }
+
+      // Factorize the linear solver with J
+      fill_n(arg1, LINSOL_NUM_IN, nullptr);
+      fill_n(res1, LINSOL_NUM_OUT, nullptr);
+      arg1[LINSOL_A] = jac;
+      linsol_.linsol_prepare(0, arg1, res1, iw, w);
+      linsol_.linsol_solve(f, 1, false);
+
+      // Check convergence again
+      double abstolStep=0;
+      if (numeric_limits<double>::infinity() != abstolStep_) {
+        for (int i=0; i<n_; ++i) {
+          abstolStep = max(abstolStep, fabs(f[i]));
+        }
+        if (abstolStep <= abstolStep_) {
+          casadi_msg("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
+          break;
+        }
+      }
+
+      if (print_iteration_) {
+        // Only print iteration header once in a while
+        if (iter % 10==0) {
+          printIteration(userOut());
+        }
+
+        // Print iteration information
+        printIteration(userOut(), iter, abstol, abstolStep);
+      }
+
+      // Update Xk+1 = Xk - J^(-1) F
+      casadi_axpy(n_, -1., f, 1, x, 1);
+    }
+
+    // Get the solution
+    if (res[iout_]) {
+      copy_n(x, n_, res[iout_]);
+    }
+
+    // Store the iteration count
+    if (gather_stats_) stats_["iter"] = iter;
+    if (success) stats_["return_status"] = "success";
+
+    casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
   }
 
   void Newton::printIteration(std::ostream &stream) {

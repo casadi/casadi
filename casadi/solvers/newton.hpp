@@ -90,9 +90,6 @@ namespace casadi {
 
     /// Print iteration
     void printIteration(std::ostream &stream, int iter, double abstol, double abstolStep);
-
-    /// Current iterate
-    std::vector<double> z_;
   };
 
 } // namespace casadi
