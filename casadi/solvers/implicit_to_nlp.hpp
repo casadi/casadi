@@ -47,18 +47,17 @@ namespace casadi {
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_NLSOL_NLPSOL_EXPORT QpToImplicit : public Nlsol,
-    public Adaptor<QpToImplicit, Nlpsol> {
+  class CASADI_NLSOL_NLPSOL_EXPORT ImplicitToNlp : public Nlsol {
   public:
     /** \brief  Constructor */
-    explicit QpToImplicit(const std::string& name, const Function& f);
+    explicit ImplicitToNlp(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
-    virtual ~QpToImplicit();
+    virtual ~ImplicitToNlp();
 
     /** \brief  Create a new Nlsol */
     static Nlsol* creator(const std::string& name, const Function& f) {
-      return new QpToImplicit(name, f);
+      return new ImplicitToNlp(name, f);
     }
 
     // Get name of the plugin

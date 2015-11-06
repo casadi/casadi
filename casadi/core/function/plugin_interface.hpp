@@ -25,7 +25,6 @@
 
 #include "../function/function_internal.hpp"
 #include "../casadi_options.hpp"
-#include "adaptor.hpp"
 
 #include <stdlib.h>
 

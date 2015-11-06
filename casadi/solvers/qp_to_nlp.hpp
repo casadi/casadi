@@ -43,42 +43,41 @@ namespace casadi {
 
   /** \brief \pluginbrief{Qpsol,nlp}
 
-   @copydoc Qpsol_doc
-   @copydoc plugin_Qpsol_nlp
+      @copydoc Qpsol_doc
+      @copydoc plugin_Qpsol_nlp
 
-   \author Joris Gillis
-   \date 2011
+      \author Joris Gillis
+      \date 2011
   */
-class CASADI_QPSOL_NLPSOL_EXPORT QpToNlp : public Qpsol,
-  public Adaptor<QpToNlp, Nlpsol> {
-public:
-  /** \brief  Create a new Solver */
-  explicit QpToNlp(const std::string& name,
-                   const std::map<std::string, Sparsity> &st);
+  class CASADI_QPSOL_NLPSOL_EXPORT QpToNlp : public Qpsol {
+  public:
+    /** \brief  Create a new Solver */
+    explicit QpToNlp(const std::string& name,
+                     const std::map<std::string, Sparsity> &st);
 
-  /** \brief  Create a new QP Solver */
-  static Qpsol* creator(const std::string& name,
-                                   const std::map<std::string, Sparsity>& st) {
-    return new QpToNlp(name, st);
-  }
+    /** \brief  Create a new QP Solver */
+    static Qpsol* creator(const std::string& name,
+                          const std::map<std::string, Sparsity>& st) {
+      return new QpToNlp(name, st);
+    }
 
-  /** \brief  Destructor */
-  virtual ~QpToNlp();
+    /** \brief  Destructor */
+    virtual ~QpToNlp();
 
-  // Get name of the plugin
-  virtual const char* plugin_name() const { return "nlpsol";}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "nlpsol";}
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
 
-  virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
 
-  /// A documentation string
-  static const std::string meta_doc;
+    /// A documentation string
+    static const std::string meta_doc;
 
-  /// Solve with
-  Function solver_;
-};
+    /// Solve with
+    Function solver_;
+  };
 
 } // namespace casadi
 /// \endcond

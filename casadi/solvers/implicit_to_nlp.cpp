@@ -31,9 +31,9 @@ namespace casadi {
   extern "C"
   int CASADI_NLSOL_NLPSOL_EXPORT
   casadi_register_nlsol_nlpsol(Nlsol::Plugin* plugin) {
-    plugin->creator = QpToImplicit::creator;
+    plugin->creator = ImplicitToNlp::creator;
     plugin->name = "nlpsol";
-    plugin->doc = QpToImplicit::meta_doc.c_str();
+    plugin->doc = ImplicitToNlp::meta_doc.c_str();
     plugin->version = 23;
     plugin->adaptorHasPlugin = Function::has_nlpsol;
     return 0;
@@ -44,16 +44,17 @@ namespace casadi {
     Nlsol::registerPlugin(casadi_register_nlsol_nlpsol);
   }
 
-  QpToImplicit::QpToImplicit(const std::string& name, const Function& f)
+  ImplicitToNlp::ImplicitToNlp(const std::string& name, const Function& f)
     : Nlsol(name, f) {
 
-    Adaptor<QpToImplicit, Nlpsol>::addOptions();
+    addOption("nlpsol", OT_STRING, GenericType(), "Name of solver.");
+    addOption("nlpsol_options", OT_DICT,  Dict(), "Options to be passed to solver.");
   }
 
-  QpToImplicit::~QpToImplicit() {
+  ImplicitToNlp::~ImplicitToNlp() {
   }
 
-  void QpToImplicit::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void ImplicitToNlp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
     // Copy to buffers
     for (int i=0; i<n_in(); ++i) {
       if (arg[i]) {
@@ -114,7 +115,7 @@ namespace casadi {
     }
   }
 
-  void QpToImplicit::init() {
+  void ImplicitToNlp::init() {
     // Call the base class initializer
     Nlsol::init();
 
@@ -146,9 +147,9 @@ namespace casadi {
     MXDict nlp = {{"x", u}, {"p", p}, {"f", nlp_f}, {"g", nlp_g}};
 
     Dict options;
-    if (hasSetOption(optionsname())) options = option(optionsname());
+    if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");
     // Create an Nlpsol instance
-    solver_ = Function::nlpsol("nlpsol", option(solvername()), nlp, options);
+    solver_ = Function::nlpsol("nlpsol", option("nlpsol"), nlp, options);
   }
 
 } // namespace casadi

@@ -26,7 +26,7 @@
       #include "implicit_to_nlp.hpp"
       #include <string>
 
-      const std::string casadi::QpToImplicit::meta_doc=
+      const std::string casadi::ImplicitToNlp::meta_doc=
       "\n"
 "Use an Nlpsol as Nlsol solver\n"
 "\n"

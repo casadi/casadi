@@ -97,7 +97,6 @@ set(CASADI_SRCS
   function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
   function/qpsol.hpp               function/qpsol.cpp
   function/code_generator.hpp      function/code_generator.cpp
-  function/adaptor.hpp
   function/switch.hpp              function/switch.cpp
   function/map.hpp                 function/map.cpp
   function/mapaccum.hpp            function/mapaccum.cpp

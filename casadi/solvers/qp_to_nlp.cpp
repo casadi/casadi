@@ -47,7 +47,8 @@ namespace casadi {
   QpToNlp::QpToNlp(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Qpsol(name, st) {
 
-    Adaptor<QpToNlp, Nlpsol>::addOptions();
+    addOption("nlpsol", OT_STRING, GenericType(), "Name of solver.");
+    addOption("nlpsol_options", OT_DICT,  Dict(), "Options to be passed to solver.");
   }
 
   QpToNlp::~QpToNlp() {
@@ -129,11 +130,11 @@ namespace casadi {
                   {"f", mul(G.T(), X) + 0.5*mul(mul(X.T(), H), X)}, {"g", mul(A, X)}};
 
     Dict options;
-    if (hasSetOption(optionsname())) options = option(optionsname());
+    if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");
     options = OptionsFunctionality::addOptionRecipe(options, "qp");
 
     // Create an Nlpsol instance
-    solver_ = Function::nlpsol("nlpsol", option(solvername()), nlp, options);
+    solver_ = Function::nlpsol("nlpsol", option("nlpsol"), nlp, options);
   }
 
 } // namespace casadi
