@@ -91,6 +91,22 @@ namespace casadi {
     /// Hessian regularization
     double reg_;
 
+    /// BFGS update function
+    enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};
+    Function bfgs_;
+
+    // Hessian sparsity
+    Sparsity Hsp_;
+
+    // Jacobian sparsity
+    Sparsity Asp_;
+
+    /// Initial Hessian approximation (BFGS)
+    DMatrix B_init_;
+
+    /// Regularization
+    bool regularize_;
+
     /// Access Qpsol
     const Function getQpsol() const { return qpsol_;}
 
@@ -106,45 +122,35 @@ namespace casadi {
     int* iw_;
     double* w_;
 
-    /// Lagrange multipliers of the NLP
-    std::vector<double> mu_, mu_x_;
-
     /// Current cost function value
     double fk_;
 
+    /// Lagrange multipliers of the NLP
+    double *mu_, *mu_x_;
+
     /// Current and previous linearization point and candidate
-    std::vector<double> x_, x_old_, x_cand_;
+    double *x_, *x_old_, *x_cand_;
 
     /// Lagrange gradient in the next iterate
-    std::vector<double> gLag_, gLag_old_;
+    double *gLag_, *gLag_old_;
 
     /// Constraint function value
-    std::vector<double> gk_, gk_cand_;
+    double *gk_, *gk_cand_;
 
     /// Gradient of the objective function
-    std::vector<double> gf_;
-
-    /// BFGS update function
-    enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};
-    Function bfgs_;
-
-    /// Initial Hessian approximation (BFGS)
-    DMatrix B_init_;
-
-    /// Current Hessian approximation
-    DMatrix Bk_;
-
-    // Current Jacobian
-    DMatrix Jk_;
+    double *gf_;
 
     // Bounds of the QP
-    std::vector<double> qp_LBA_, qp_UBA_, qp_LBX_, qp_UBX_;
+    double *qp_LBA_, *qp_UBA_, *qp_LBX_, *qp_UBX_;
 
     // QP solution
-    std::vector<double> dx_, qp_DUAL_X_, qp_DUAL_A_;
+    double *dx_, *qp_DUAL_X_, *qp_DUAL_A_;
 
-    /// Regularization
-    bool regularize_;
+    // Current Jacobian
+    double *Jk_;
+
+    /// Current Hessian approximation
+    double *Bk_;
 
     // Storage for merit function
     std::deque<double> merit_mem_;

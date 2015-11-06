@@ -108,6 +108,12 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(trans)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp);
 
+  /** Inf-norm of a vector *
+      Returns the largest element in absolute value
+   */
+  template<typename real_t>
+  real_t CASADI_PREFIX(norm_inf)(int n, const real_t* x);
+
   /** Inf-norm of a Matrix-matrix product,*
    * \param dwork  A real work vector that you must allocate
    *               Minimum size: y.size1()
@@ -412,6 +418,16 @@ namespace casadi {
     for (k=0; k<nnz_x; ++k) {
       y[tmp[row_x[k]]++] = x[k];
     }
+  }
+
+  template<typename real_t>
+  real_t CASADI_PREFIX(norm_inf)(int n, const real_t* x) {
+    real_t ret = 0;
+    int k;
+    for (k=0; k<n; ++k) {
+      ret = fmax(ret, fabs(x[k]));
+    }
+    return ret;
   }
 
   template<typename real_t>
