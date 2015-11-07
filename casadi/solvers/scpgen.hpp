@@ -179,10 +179,6 @@ namespace casadi {
 
     // Nonlifted variables with bound
     std::vector<double> x_lb_, x_ub_, x_init_, x_opt_, x_step_, x_lam_, x_dlam_;
-    MX x_;
-
-    // Parameter
-    MX p_;
 
     // Nonlinear bounds
     std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_;

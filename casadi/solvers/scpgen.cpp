@@ -174,8 +174,8 @@ namespace casadi {
     vector<MX> vdef_out = vdef_fcn(vdef_in);
 
     // Get the dimensions
-    x_ = vdef_in.at(0);
-    p_ = vdef_in.at(1);
+    MX x = vdef_in.at(0);
+    MX p = vdef_in.at(1);
     v_.resize(vdef_in.size()-2);
     for (int i=0; i<v_.size(); ++i) {
       v_[i].v = vdef_in.at(i+2);
@@ -259,10 +259,10 @@ namespace casadi {
       i=0;
 
       gL_defL = asens[0].at(i++);
-      if (gL_defL.isNull()) gL_defL = MX::zeros(x_.sparsity()); // Needed?
+      if (gL_defL.isNull()) gL_defL = MX::zeros(x.sparsity()); // Needed?
 
       p_defL = asens[0].at(i++);
-      if (p_defL.isNull()) p_defL = MX::zeros(p_.sparsity()); // Needed?
+      if (p_defL.isNull()) p_defL = MX::zeros(p.sparsity()); // Needed?
 
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         it->v_defL = asens[0].at(i++);
@@ -283,8 +283,8 @@ namespace casadi {
     // Inputs
     vector<MX> res_fcn_in;
     int n=0;
-    res_fcn_in.push_back(x_);             res_x_ = n++;
-    res_fcn_in.push_back(p_);             res_p_ = n++;
+    res_fcn_in.push_back(x);             res_x_ = n++;
+    res_fcn_in.push_back(p);             res_p_ = n++;
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       res_fcn_in.push_back(it->v);        it->res_var = n++;
     }
@@ -377,8 +377,8 @@ namespace casadi {
     // Modified function inputs
     vector<MX> mfcn_in;
     n=0;
-    mfcn_in.push_back(p_);                               mod_p_ = n++;
-    mfcn_in.push_back(x_);                               mod_x_ = n++;
+    mfcn_in.push_back(p);                               mod_p_ = n++;
+    mfcn_in.push_back(x);                               mod_x_ = n++;
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       mfcn_in.push_back(it->d);                          it->mod_var = n++;
     }

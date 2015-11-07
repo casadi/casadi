@@ -519,4 +519,49 @@ namespace casadi {
     }
   }
 
+  void Nlpsol::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+    // Reset the solver, prepare for solution
+    reset(mem, arg, res, iw, w);
+
+    // Work vectors for evaluation
+    arg1_ = arg;
+    res1_ = res;
+    iw_ = iw;
+    w_ = w;
+
+    // Solve the NLP
+    solve(mem);
+  }
+
+  void Nlpsol::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      if (arg[i] != 0) {
+        setInputNZ(arg[i], i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
+    // Get input pointers
+    x0_ = arg[NLPSOL_X0];
+    p_ = arg[NLPSOL_P];
+    lbx_ = arg[NLPSOL_LBX];
+    ubx_ = arg[NLPSOL_UBX];
+    lbg_ = arg[NLPSOL_LBG];
+    ubg_ = arg[NLPSOL_UBG];
+    lam_x0_ = arg[NLPSOL_LAM_X0];
+    lam_g0_ = arg[NLPSOL_LAM_G0];
+    arg += NLPSOL_NUM_IN;
+
+    // Get output pointers
+    x_ = res[NLPSOL_X];
+    f_ = res[NLPSOL_F];
+    g_ = res[NLPSOL_G];
+    lam_x_ = res[NLPSOL_LAM_X];
+    lam_g_ = res[NLPSOL_LAM_G];
+    lam_p_ = res[NLPSOL_LAM_P];
+    res += NLPSOL_NUM_OUT;
+  }
+
 } // namespace casadi

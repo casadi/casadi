@@ -158,6 +158,27 @@ namespace casadi {
     /// A reference to this object to be passed to the user functions
     Function ref_;
 
+    // Inputs
+    const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
+
+    // Outputs
+    double *x_, *f_, *g_, *lam_x_, *lam_g_, *lam_p_;
+
+    // Work vectors
+    const double** arg1_;
+    double** res1_;
+    int* iw_;
+    double* w_;
+
+    // Evaluate numerically
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
+    // Solve the NLP
+    virtual void solve(void* mem) {}
+
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const XProblem& nlp);
 

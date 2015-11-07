@@ -57,8 +57,14 @@ namespace casadi {
       return new Sqpmethod(name, nlp);
     }
 
+    // Initialize the solver
     virtual void init();
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
+    // Solve the NLP
+    virtual void solve(void* mem);
 
     /// QP solver for the subproblems
     Function qpsol_;
@@ -110,18 +116,6 @@ namespace casadi {
     /// Access Qpsol
     const Function getQpsol() const { return qpsol_;}
 
-    // Inputs
-    const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
-
-    // Outputs
-    double /* *x_, */ *f_, *g_, *lam_x_, *lam_g_, *lam_p_;
-
-    // Work vectors
-    const double** arg1_;
-    double** res1_;
-    int* iw_;
-    double* w_;
-
     /// Current cost function value
     double fk_;
 
@@ -129,7 +123,7 @@ namespace casadi {
     double *mu_, *mu_x_;
 
     /// Current and previous linearization point and candidate
-    double *x_, *x_old_, *x_cand_;
+    double *xk_, *x_old_, *x_cand_;
 
     /// Lagrange gradient in the next iterate
     double *gLag_, *gLag_old_;
