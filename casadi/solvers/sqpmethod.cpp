@@ -400,20 +400,20 @@ namespace casadi {
         time1 = clock();
 
         // Callback inputs
-        fill_n(arg1_, fcallback_.n_in(), nullptr);
-        arg1_[NLPSOL_F] = &fk_;
-        arg1_[NLPSOL_X] = x_;
-        arg1_[NLPSOL_LAM_G] = lam_g_;
-        arg1_[NLPSOL_LAM_X] = lam_x_;
-        arg1_[NLPSOL_G] = g_;
+        fill_n(arg_, fcallback_.n_in(), nullptr);
+        arg_[NLPSOL_F] = &fk_;
+        arg_[NLPSOL_X] = x_;
+        arg_[NLPSOL_LAM_G] = lam_g_;
+        arg_[NLPSOL_LAM_X] = lam_x_;
+        arg_[NLPSOL_G] = g_;
 
         // Callback outputs
-        fill_n(res1_, fcallback_.n_out(), nullptr);
+        fill_n(res_, fcallback_.n_out(), nullptr);
         double ret;
-        arg1_[0] = &ret;
+        arg_[0] = &ret;
 
         // Evaluate
-        fcallback_(arg1_, res1_, iw_, w_, 0);
+        fcallback_(arg_, res_, iw_, w_, 0);
 
         time2 = clock();
         t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -601,15 +601,15 @@ namespace casadi {
         }
 
         // Update the Hessian approximation
-        fill_n(arg1_, bfgs_.n_in(), nullptr);
-        arg1_[BFGS_BK] = Bk_;
-        arg1_[BFGS_X] = xk_;
-        arg1_[BFGS_X_OLD] = x_old_;
-        arg1_[BFGS_GLAG] = gLag_;
-        arg1_[BFGS_GLAG_OLD] = gLag_old_;
-        fill_n(res1_, bfgs_.n_out(), nullptr);
-        res1_[0] = Bk_;
-        bfgs_(arg1_, res1_, iw_, w_, 0);
+        fill_n(arg_, bfgs_.n_in(), nullptr);
+        arg_[BFGS_BK] = Bk_;
+        arg_[BFGS_X] = xk_;
+        arg_[BFGS_X_OLD] = x_old_;
+        arg_[BFGS_GLAG] = gLag_;
+        arg_[BFGS_GLAG_OLD] = gLag_old_;
+        fill_n(res_, bfgs_.n_out(), nullptr);
+        res_[0] = Bk_;
+        bfgs_(arg_, res_, iw_, w_, 0);
 
       } else {
         // Exact Hessian
@@ -759,18 +759,18 @@ namespace casadi {
       Function& hessLag = this->hessLag();
 
       // Inputs
-      fill_n(arg1_, static_cast<int>(HESSLAG_NUM_IN), nullptr);
-      arg1_[HESSLAG_X] = x;
-      arg1_[HESSLAG_P] = p_;
-      arg1_[HESSLAG_LAM_F] = &sigma;
-      arg1_[HESSLAG_LAM_G] = lambda;
+      fill_n(arg_, hessLag.n_in(), nullptr);
+      arg_[HESSLAG_X] = x;
+      arg_[HESSLAG_P] = p_;
+      arg_[HESSLAG_LAM_F] = &sigma;
+      arg_[HESSLAG_LAM_G] = lambda;
 
       // Outputs
-      fill_n(res1_, static_cast<int>(HESSLAG_NUM_OUT), nullptr);
-      res1_[0] = H;
+      fill_n(res_, hessLag.n_out(), nullptr);
+      res_[0] = H;
 
       // Evaluate
-      hessLag(arg1_, res1_, iw_, w_, 0);
+      hessLag(arg_, res_, iw_, w_, 0);
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
@@ -794,16 +794,16 @@ namespace casadi {
       if (ng_==0) return;
 
       // Inputs
-      fill_n(arg1_, static_cast<int>(NL_NUM_IN), nullptr);
-      arg1_[NL_X] = x;
-      arg1_[NL_P] = p_;
+      fill_n(arg_, nlp_.n_in(), nullptr);
+      arg_[NL_X] = x;
+      arg_[NL_P] = p_;
 
       // Outputs
-      fill_n(res1_, static_cast<int>(NL_NUM_OUT), nullptr);
-      res1_[NL_G] = g;
+      fill_n(res_, nlp_.n_out(), nullptr);
+      res_[NL_G] = g;
 
       // Evaluate the function
-      nlp_(arg1_, res1_, iw_, w_, 0);
+      nlp_(arg_, res_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -825,17 +825,17 @@ namespace casadi {
       Function& jacG = this->jacG();
 
       // Inputs
-      fill_n(arg1_, static_cast<int>(NL_NUM_IN), nullptr);
-      arg1_[NL_X] = x;
-      arg1_[NL_P] = p_;
+      fill_n(arg_, jacG_.n_out(), nullptr);
+      arg_[NL_X] = x;
+      arg_[NL_P] = p_;
 
       // Outputs
-      fill_n(res1_, jacG_.n_out(), nullptr);
-      res1_[0] = J;
-      res1_[1+NL_G] = g;
+      fill_n(res_, jacG_.n_out(), nullptr);
+      res_[0] = J;
+      res_[1+NL_G] = g;
 
       // Evaluate the function
-      jacG_(arg1_, res1_, iw_, w_, 0);
+      jacG_(arg_, res_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -855,17 +855,17 @@ namespace casadi {
       Function& gradF = this->gradF();
 
       // Inputs
-      fill_n(arg1_, static_cast<int>(NL_NUM_IN), nullptr);
-      arg1_[NL_X] = x;
-      arg1_[NL_P] = p_;
+      fill_n(arg_, gradF.n_in(), nullptr);
+      arg_[NL_X] = x;
+      arg_[NL_P] = p_;
 
       // Outputs
-      fill_n(res1_, gradF_.n_out(), nullptr);
-      res1_[0] = grad_f;
-      res1_[1+NL_X] = f;
+      fill_n(res_, gradF_.n_out(), nullptr);
+      res_[0] = grad_f;
+      res_[1+NL_X] = f;
 
       // Evaluate the function
-      gradF_(arg1_, res1_, iw_, w_, 0);
+      gradF_(arg_, res_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -883,17 +883,17 @@ namespace casadi {
       double time1 = clock();
 
       // Inputs
-      fill_n(arg1_, static_cast<int>(NL_NUM_IN), nullptr);
-      arg1_[NL_X] = x;
-      arg1_[NL_P] = p_;
+      fill_n(arg_, nlp_.n_in(), nullptr);
+      arg_[NL_X] = x;
+      arg_[NL_P] = p_;
 
       // Outputs
-      fill_n(res1_, static_cast<int>(NL_NUM_OUT), nullptr);
+      fill_n(res_, nlp_.n_out(), nullptr);
       double f;
-      res1_[NL_F] = &f;
+      res_[NL_F] = &f;
 
       // Evaluate the function
-      nlp_(arg1_, res1_, iw_, w_, 0);
+      nlp_(arg_, res_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -910,24 +910,24 @@ namespace casadi {
                            const double* A, const double* lbA, const double* ubA,
                            double* x_opt, double* lambda_x_opt, double* lambda_A_opt) {
     // Inputs
-    fill_n(arg1_, static_cast<int>(QPSOL_NUM_IN), nullptr);
-    arg1_[QPSOL_H] = H;
-    arg1_[QPSOL_G] = g;
-    arg1_[QPSOL_X0] = x_opt;
-    arg1_[QPSOL_LBX] = lbx;
-    arg1_[QPSOL_UBX] = ubx;
-    arg1_[QPSOL_A] = A;
-    arg1_[QPSOL_LBA] = lbA;
-    arg1_[QPSOL_UBA] = ubA;
+    fill_n(arg_, qpsol_.n_in(), nullptr);
+    arg_[QPSOL_H] = H;
+    arg_[QPSOL_G] = g;
+    arg_[QPSOL_X0] = x_opt;
+    arg_[QPSOL_LBX] = lbx;
+    arg_[QPSOL_UBX] = ubx;
+    arg_[QPSOL_A] = A;
+    arg_[QPSOL_LBA] = lbA;
+    arg_[QPSOL_UBA] = ubA;
 
     // Outputs
-    fill_n(res1_, static_cast<int>(QPSOL_NUM_OUT), nullptr);
-    res1_[QPSOL_X] = x_opt;
-    res1_[QPSOL_LAM_X] = lambda_x_opt;
-    res1_[QPSOL_LAM_A] = lambda_A_opt;
+    fill_n(res_, qpsol_.n_out(), nullptr);
+    res_[QPSOL_X] = x_opt;
+    res_[QPSOL_LAM_X] = lambda_x_opt;
+    res_[QPSOL_LAM_A] = lambda_A_opt;
 
     // Solve the QP
-    qpsol_(arg1_, res1_, iw_, w_, 0);
+    qpsol_(arg_, res_, iw_, w_, 0);
   }
 
   double Sqpmethod::primalInfeasibility(const double* x, const double* lbx, const double* ubx,

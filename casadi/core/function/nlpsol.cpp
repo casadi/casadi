@@ -524,8 +524,8 @@ namespace casadi {
     reset(mem, arg, res, iw, w);
 
     // Work vectors for evaluation
-    arg1_ = arg;
-    res1_ = res;
+    arg_ = arg;
+    res_ = res;
     iw_ = iw;
     w_ = w;
 

@@ -60,10 +60,14 @@ namespace casadi {
     virtual const char* plugin_name() const { return "scpgen";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, const XProblem& nlp)
-    { return new Scpgen(name, nlp);}
+    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+      return new Scpgen(name, nlp);
+    }
 
+    // Initialize the solver
     virtual void init();
+
+    // Reset the solver
     virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     // Calculate the L1-norm of the primal infeasibility

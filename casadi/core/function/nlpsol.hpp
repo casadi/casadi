@@ -165,8 +165,8 @@ namespace casadi {
     double *x_, *f_, *g_, *lam_x_, *lam_g_, *lam_p_;
 
     // Work vectors
-    const double** arg1_;
-    double** res1_;
+    const double** arg_;
+    double** res_;
     int* iw_;
     double* w_;
 
