@@ -68,7 +68,10 @@ namespace casadi {
     virtual void init();
 
     // Reset the solver
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
+    // Solve the NLP
+    virtual void solve(void* mem);
 
     // Calculate the L1-norm of the primal infeasibility
     double primalInfeasibility();
@@ -178,14 +181,14 @@ namespace casadi {
     Function exp_fcn_;
 
     // Objective value
-    double f_;
+    double fk_;
     std::vector<double> gf_, gL_, b_gn_;
 
     // Nonlifted variables with bound
     std::vector<double> x_lb_, x_ub_, x_init_, x_opt_, x_step_, x_lam_, x_dlam_;
 
     // Nonlinear bounds
-    std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_;
+    std::vector<double> gk_, g_lb_, g_ub_, g_lam_, g_dlam_;
 
     // Residual function io indices
     int res_x_, res_p_, res_g_lam_, res_p_lam_, res_p_d_;

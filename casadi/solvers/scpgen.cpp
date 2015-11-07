@@ -53,8 +53,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_scpgen);
   }
 
-  Scpgen::Scpgen(const std::string& name, const XProblem& nlp)
-    : Nlpsol(name, nlp) {
+  Scpgen::Scpgen(const std::string& name, const XProblem& nlp) : Nlpsol(name, nlp) {
     casadi_warning("SCPgen is under development");
     addOption("qpsol",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
@@ -188,7 +187,7 @@ namespace casadi {
     x_ub_.resize(nx_, numeric_limits<double>::infinity());
     g_lb_.resize(ng_, -numeric_limits<double>::infinity());
     g_ub_.resize(ng_, numeric_limits<double>::infinity());
-    g_.resize(ng_, numeric_limits<double>::quiet_NaN());
+    gk_.resize(ng_, numeric_limits<double>::quiet_NaN());
     g_lam_.resize(ng_, 0);
     g_dlam_.resize(ng_, 0);
     qpH_times_du_.resize(nx_);
@@ -653,11 +652,27 @@ namespace casadi {
     }
   }
 
-  void Scpgen::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
+  void Scpgen::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Reset the base classes
+    Nlpsol::reset(mem, arg, res, iw, w);
+  }
+
+  void Scpgen::solve(void* mem) {
+    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
+      const double *v;
+      switch (i) {
+      case NLPSOL_X0: v = x0_; break;
+      case NLPSOL_P: v = p_; break;
+      case NLPSOL_LBX: v = lbx_; break;
+      case NLPSOL_UBX: v = ubx_; break;
+      case NLPSOL_LBG: v = lbg_; break;
+      case NLPSOL_UBG: v = ubg_; break;
+      case NLPSOL_LAM_X0: v = lam_x0_; break;
+      case NLPSOL_LAM_G0: v = lam_g0_; break;
+      default: casadi_assert(0);
+      }
+      if (v) {
+        setInputNZ(v, i);
       } else {
         setInput(0., i);
       }
@@ -705,7 +720,7 @@ namespace casadi {
     }
 
     // Objective value
-    f_ = numeric_limits<double>::quiet_NaN();
+    fk_ = numeric_limits<double>::quiet_NaN();
 
     // Reset line-search
     fill(merit_mem_.begin(), merit_mem_.end(), 0.0);
@@ -760,7 +775,7 @@ namespace casadi {
       if (iter % 10 == 0) printIteration(userOut());
 
       // Printing information about the actual iterate
-      printIteration(userOut(), iter, f_, pr_inf, du_inf, reg_, ls_iter, ls_success);
+      printIteration(userOut(), iter, fk_, pr_inf, du_inf, reg_, ls_iter, ls_success);
 
       // Checking convergence criteria
       bool converged = pr_inf <= tol_pr_ && pr_step_ <= tol_pr_step_ && reg_ <= tol_reg_;
@@ -779,7 +794,7 @@ namespace casadi {
       }
 
       // Check if not-a-number
-      if (f_!=f_ || pr_step_ != pr_step_ || pr_inf != pr_inf) {
+      if (fk_!=fk_ || pr_step_ != pr_step_ || pr_inf != pr_inf) {
         userOut() << "casadi::SCPgen: Aborted, nan detected" << endl;
         break;
       }
@@ -806,14 +821,14 @@ namespace casadi {
     t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Store optimal value
-    userOut() << "optimal cost = " << f_ << endl;
+    userOut() << "optimal cost = " << fk_ << endl;
 
     // Save results to outputs
-    output(NLPSOL_F).set(f_);
+    output(NLPSOL_F).set(fk_);
     output(NLPSOL_X).setNZ(x_opt_);
     output(NLPSOL_LAM_G).setNZ(g_lam_);
     output(NLPSOL_LAM_X).setNZ(x_lam_);
-    output(NLPSOL_G).setNZ(g_);
+    output(NLPSOL_G).setNZ(gk_);
 
     // Write timers
     if (print_time_) {
@@ -831,9 +846,18 @@ namespace casadi {
 
     userOut() << endl;
 
-    // Get the outputs
-    for (int i=0; i<n_out(); ++i) {
-      if (res[i] != 0) getOutputNZ(res[i], i);
+    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
+      double **v;
+      switch (i) {
+      case NLPSOL_X: v = &x_; break;
+      case NLPSOL_F: v = &f_; break;
+      case NLPSOL_G: v = &g_; break;
+      case NLPSOL_LAM_X: v = &lam_x_; break;
+      case NLPSOL_LAM_G: v = &lam_g_; break;
+      case NLPSOL_LAM_P: v = &lam_p_; break;
+      default: casadi_assert(0);
+      }
+      if (*v) getOutputNZ(*v, i);
     }
   }
 
@@ -851,8 +875,8 @@ namespace casadi {
     }
 
     // Nonlinear bounds
-    for (int i=0; i<ng_; ++i) pr_inf += std::max(g_[i]-g_ub_[i], 0.);
-    for (int i=0; i<ng_; ++i) pr_inf += std::max(g_lb_[i]-g_[i], 0.);
+    for (int i=0; i<ng_; ++i) pr_inf += std::max(gk_[i]-g_ub_[i], 0.);
+    for (int i=0; i<ng_; ++i) pr_inf += std::max(g_lb_[i]-gk_[i], 0.);
 
     return pr_inf;
   }
@@ -1008,7 +1032,7 @@ namespace casadi {
     res_fcn_.evaluate();
 
     // Get objective
-    f_ = res_fcn_.output(res_f_).toScalar();
+    fk_ = res_fcn_.output(res_f_).toScalar();
 
     // Get objective gradient
     if (gauss_newton_) {
@@ -1018,7 +1042,7 @@ namespace casadi {
     }
 
     // Get constraints
-    res_fcn_.getOutputNZ(g_, res_g_);
+    res_fcn_.getOutputNZ(gk_, res_g_);
 
     // Get residuals
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
@@ -1060,7 +1084,7 @@ namespace casadi {
     vec_fcn_.evaluate();
 
     // Linear offset in the reduced QP
-    transform(g_.begin(), g_.end(), vec_fcn_.output(vec_g_)->begin(),
+    transform(gk_.begin(), gk_.end(), vec_fcn_.output(vec_g_)->begin(),
               qpB_.begin(), std::minus<double>());
 
     // Gradient of the objective in the reduced QP
@@ -1167,7 +1191,7 @@ namespace casadi {
     double F_sens = 0;
     for (int i=0; i<nx_; ++i) F_sens += x_step_[i] * gf_[i];
     double L1dir = F_sens - sigma_ * l1_infeas;
-    double L1merit = f_ + sigma_ * l1_infeas;
+    double L1merit = fk_ + sigma_ * l1_infeas;
 
     // Storing the actual merit function value in a list
     merit_mem_[merit_ind_] = L1merit;
@@ -1211,7 +1235,7 @@ namespace casadi {
 
       // Calculating merit-function in candidate
       l1_infeas = primalInfeasibility();
-      L1merit_cand = f_ + sigma_ * l1_infeas;
+      L1merit_cand = fk_ + sigma_ * l1_infeas;
 
       // Calculating maximal merit function value so far
       double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());

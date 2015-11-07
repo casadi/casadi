@@ -73,11 +73,14 @@ namespace casadi {
     // Reset solver
     void reset();
 
-    // (Re)initialize
+    // Initialize the solver
     virtual void init();
 
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
     // Solve the NLP
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void solve(void* mem);
 
     /// Set default options for a given recipe
     virtual void setDefaultOptions(const std::vector<std::string>& recipes);

@@ -57,8 +57,14 @@ namespace casadi {
       return new KnitroInterface(name, nlp);
     }
 
+    // Initialize the solver
     virtual void init();
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
+    // Solve the NLP
+    virtual void solve(void* mem);
 
     // KNITRO callback functions
     void evalfc(const double* x, double& obj, double *c);

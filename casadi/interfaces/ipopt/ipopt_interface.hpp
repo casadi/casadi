@@ -82,8 +82,14 @@ public:
   // Free Ipopt related memory
   void freeIpopt();
 
+  // Initialize the solver
   virtual void init();
-  virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+
+  // Reset the solver
+  virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
+  // Solve the NLP
+  virtual void solve(void* mem);
 
   /// Set default options for a given recipe
   virtual void setDefaultOptions(const std::vector<std::string>& recipes);

@@ -434,7 +434,7 @@ namespace casadi {
     bl_.resize(nx_+m_);
     bu_.resize(nx_+m_);
     hs_.resize(nx_+m_);
-    x_.resize(nx_+m_);
+    xk_.resize(nx_+m_);
     pi_.resize(m_);
     rc_.resize(nx_+m_);
     A_data_.resize(A_structure_.nnz());
@@ -484,17 +484,31 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
+  void SnoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Reset the base classes
+    Nlpsol::reset(mem, arg, res, iw, w);
+  }
+
+  void SnoptInterface::solve(void* mem) {
+    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
+      const double *v;
+      switch (i) {
+      case NLPSOL_X0: v = x0_; break;
+      case NLPSOL_P: v = p_; break;
+      case NLPSOL_LBX: v = lbx_; break;
+      case NLPSOL_UBX: v = ubx_; break;
+      case NLPSOL_LBG: v = lbg_; break;
+      case NLPSOL_UBG: v = ubg_; break;
+      case NLPSOL_LAM_X0: v = lam_x0_; break;
+      case NLPSOL_LAM_G0: v = lam_g0_; break;
+      default: casadi_assert(0);
+      }
+      if (v) {
+        setInputNZ(v, i);
       } else {
         setInput(0., i);
       }
     }
-
-    log("SnoptInterface::evaluate");
 
     // Initial checks
     if (inputs_check_) checkInputs();
@@ -561,7 +575,7 @@ namespace casadi {
       int kk = x_order_[k];
       bl_[k] = input(NLPSOL_LBX).data()[kk];
       bu_[k] = input(NLPSOL_UBX).data()[kk];
-      x_[k] = input(NLPSOL_X0).data()[kk];
+      xk_[k] = input(NLPSOL_X0).data()[kk];
     }
     for (int k = 0; k < ng_; ++k) {
       int kk = g_order_[k];
@@ -573,7 +587,7 @@ namespace casadi {
         bl_[nx_+k] = input(NLPSOL_LBG).data()[kk];
         bu_[nx_+k] = input(NLPSOL_UBG).data()[kk];
       }
-      x_[nx_+k] = input(NLPSOL_LAM_G0).data()[kk];
+      xk_[nx_+k] = input(NLPSOL_LAM_G0).data()[kk];
     }
 
     // Objective row / dummy row should be unbounded
@@ -596,7 +610,7 @@ namespace casadi {
     casadi_assert(bl_.size() == n+m_);
     casadi_assert(bu_.size() == n+m_);
     casadi_assert(pi_.size() == m_);
-    casadi_assert(x_.size() == n+m_);
+    casadi_assert(xk_.size() == n+m_);
     casadi_assert(col.at(0) == 0);
     casadi_assert(col.at(n) == nea);
 
@@ -636,7 +650,7 @@ namespace casadi {
     snoptProbC.setProblemSize(m_, nx_, nnCon_, nnJac_, nnObj_);
     snoptProbC.setObjective(iObj_, ObjAdd);
     snoptProbC.setJ(nea, getPtr(A_data_), getPtr(row), getPtr(col));
-    snoptProbC.setX(getPtr(bl_), getPtr(bu_), getPtr(x_), getPtr(pi_), getPtr(rc_), getPtr(hs_));
+    snoptProbC.setX(getPtr(bl_), getPtr(bu_), getPtr(xk_), getPtr(pi_), getPtr(rc_), getPtr(hs_));
     snoptProbC.setUserFun(userfunPtr);
     snoptProbC.setSTOP(snStopPtr);
     passOptions(snoptProbC);
@@ -659,16 +673,16 @@ namespace casadi {
     // Store results into output
     for (int k = 0; k < nx_; ++k) {
       int kk =  x_order_[k];
-      output(NLPSOL_X).data()[kk] = x_[k];
+      output(NLPSOL_X).data()[kk] = xk_[k];
       output(NLPSOL_LAM_X).data()[kk] = -rc_[k];
     }
 
-    setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLPSOL_F);
+    setOutput(Obj+ (jacF_row_? xk_[nx_+ng_] : 0), NLPSOL_F);
 
     for (int k = 0; k < ng_; ++k) {
       int kk = g_order_[k];
       output(NLPSOL_LAM_G).data()[kk] = -rc_[nx_+k];
-      output(NLPSOL_G).data()[kk] = x_[nx_+k];  // TODO(Joris): this is not quite right
+      output(NLPSOL_G).data()[kk] = xk_[nx_+k];  // TODO(Joris): this is not quite right
       // mul_no_alloc
     }
 
@@ -741,9 +755,18 @@ namespace casadi {
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
     n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
 
-    // Get the outputs
-    for (int i=0; i<n_out(); ++i) {
-      if (res[i] != 0) getOutputNZ(res[i], i);
+    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
+      double **v;
+      switch (i) {
+      case NLPSOL_X: v = &x_; break;
+      case NLPSOL_F: v = &f_; break;
+      case NLPSOL_G: v = &g_; break;
+      case NLPSOL_LAM_X: v = &lam_x_; break;
+      case NLPSOL_LAM_G: v = &lam_g_; break;
+      case NLPSOL_LAM_P: v = &lam_p_; break;
+      default: casadi_assert(0);
+      }
+      if (*v) getOutputNZ(*v, i);
     }
   }
 
@@ -902,15 +925,15 @@ namespace casadi {
         double time0 = clock();
         for (int k = 0; k < nx_; ++k) {
           int kk = x_order_[k];
-          output(NLPSOL_X).data()[kk] = x_[k];
+          output(NLPSOL_X).data()[kk] = xk_[k];
           // output(NLPSOL_LAM_X).data()[kk] = -rc_[k];
         }
 
-        // setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLPSOL_F);
+        // setOutput(Obj+ (jacF_row_? xk_[nx_+ng_] : 0), NLPSOL_F);
         for (int k = 0; k < ng_; ++k) {
           int kk =  g_order_[k];
           // output(NLPSOL_LAM_G).data()[kk] = -rc_[nx_+k];
-          output(NLPSOL_G).data()[kk] = x_[nx_+k];
+          output(NLPSOL_G).data()[kk] = xk_[nx_+k];
         }
 
         for (int i=0; i<NLPSOL_NUM_OUT; ++i) {

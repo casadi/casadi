@@ -61,11 +61,14 @@ namespace casadi {
       return new SnoptInterface(name, nlp);
     }
 
-    // (Re)initialize
+    // Initialize the solver
     virtual void init();
 
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
     // Solve the NLP
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void solve(void* mem);
 
     /// Read options from snopt parameter xml
     virtual void setOptionsFromFile(const std::string & file);
@@ -118,7 +121,7 @@ namespace casadi {
     std::vector<double> bl_;
     std::vector<double> bu_;
     std::vector<int> hs_;
-    std::vector<double> x_;
+    std::vector<double> xk_;
     std::vector<double> pi_;
     std::vector<double> rc_;
 

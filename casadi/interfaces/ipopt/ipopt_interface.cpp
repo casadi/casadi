@@ -405,12 +405,27 @@ namespace casadi {
 
   }
 
-  void IpoptInterface::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void IpoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Reset the base classes
+    Nlpsol::reset(mem, arg, res, iw, w);
+  }
 
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
+  void IpoptInterface::solve(void* mem) {
+    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
+      const double *v;
+      switch (i) {
+      case NLPSOL_X0: v = x0_; break;
+      case NLPSOL_P: v = p_; break;
+      case NLPSOL_LBX: v = lbx_; break;
+      case NLPSOL_UBX: v = ubx_; break;
+      case NLPSOL_LBG: v = lbg_; break;
+      case NLPSOL_UBG: v = ubg_; break;
+      case NLPSOL_LAM_X0: v = lam_x0_; break;
+      case NLPSOL_LAM_G0: v = lam_g0_; break;
+      default: casadi_assert(0);
+      }
+      if (v) {
+        setInputNZ(v, i);
       } else {
         setInput(0., i);
       }
@@ -583,11 +598,20 @@ namespace casadi {
 
     stats_["iter_count"] = n_iter_-1;
 
-    // Get the outputs
-    for (int i=0; i<n_out(); ++i) {
-      if (res[i] != 0) getOutputNZ(res[i], i);
-    }
 
+    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
+      double **v;
+      switch (i) {
+      case NLPSOL_X: v = &x_; break;
+      case NLPSOL_F: v = &f_; break;
+      case NLPSOL_G: v = &g_; break;
+      case NLPSOL_LAM_X: v = &lam_x_; break;
+      case NLPSOL_LAM_G: v = &lam_g_; break;
+      case NLPSOL_LAM_P: v = &lam_p_; break;
+      default: casadi_assert(0);
+      }
+      if (*v) getOutputNZ(*v, i);
+    }
   }
 
   bool IpoptInterface::intermediate_callback(
