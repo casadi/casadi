@@ -288,22 +288,15 @@ namespace casadi {
       stats_["iterations"] = iterations;
     }
 
-    // Get problem data
-    const vector<double>& x_init = input(NLPSOL_X0).data();
-    const vector<double>& lbx = input(NLPSOL_LBX).data();
-    const vector<double>& ubx = input(NLPSOL_UBX).data();
-    const vector<double>& lbg = input(NLPSOL_LBG).data();
-    const vector<double>& ubg = input(NLPSOL_UBG).data();
-
     // Set linearization point to initial guess
-    copy(x_init.begin(), x_init.end(), xk_);
+    copy(x0_, x0_ + nx_, xk_);
 
     // Initialize Lagrange multipliers of the NLP
-    copy(input(NLPSOL_LAM_G0)->begin(), input(NLPSOL_LAM_G0)->end(), mu_);
-    copy(input(NLPSOL_LAM_X0)->begin(), input(NLPSOL_LAM_X0)->end(), mu_x_);
+    copy(lam_g0_, lam_g0_ + ng_, mu_);
+    copy(lam_x0_, lam_x0_ + nx_, mu_x_);
 
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ =
-        t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+      t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
 
@@ -349,8 +342,7 @@ namespace casadi {
     while (true) {
 
       // Primal infeasability
-      double pr_inf = primalInfeasibility(xk_, getPtr(lbx), getPtr(ubx),
-                                          gk_, getPtr(lbg), getPtr(ubg));
+      double pr_inf = primalInfeasibility(xk_, lbx_, ubx_, gk_, lbg_, ubg_);
 
       // inf-norm of lagrange gradient
       double gLag_norminf = casadi_norm_inf(nx_, gLag_);
@@ -459,10 +451,10 @@ namespace casadi {
 
       log("Formulating QP");
       // Formulate the QP
-      transform(lbx.begin(), lbx.end(), xk_, qp_LBX_, minus<double>());
-      transform(ubx.begin(), ubx.end(), xk_, qp_UBX_, minus<double>());
-      transform(lbg.begin(), lbg.end(), gk_, qp_LBA_, minus<double>());
-      transform(ubg.begin(), ubg.end(), gk_, qp_UBA_, minus<double>());
+      transform(lbx_, lbx_ + nx_, xk_, qp_LBX_, minus<double>());
+      transform(ubx_, ubx_ + nx_, xk_, qp_UBX_, minus<double>());
+      transform(lbg_, lbg_ + ng_, gk_, qp_LBA_, minus<double>());
+      transform(ubg_, ubg_ + ng_, gk_, qp_UBA_, minus<double>());
 
       // Solve the QP
       solve_QP(Bk_, gf_, qp_LBX_, qp_UBX_, Jk_, qp_LBA_,
@@ -480,8 +472,7 @@ namespace casadi {
       sigma_ = std::max(sigma_, 1.01*casadi_norm_inf(ng_, qp_DUAL_A_));
 
       // Calculate L1-merit function in the actual iterate
-      double l1_infeas = primalInfeasibility(xk_, getPtr(lbx), getPtr(ubx),
-                                             gk_, getPtr(lbg), getPtr(ubg));
+      double l1_infeas = primalInfeasibility(xk_, lbx_, ubx_, gk_, lbg_, ubg_);
 
       // Right-hand side of Armijo condition
       double F_sens = casadi_inner_prod(nx_, dx_, gf_);
@@ -526,8 +517,7 @@ namespace casadi {
           ls_iter++;
 
           // Calculating merit-function in candidate
-          l1_infeas = primalInfeasibility(x_cand_, getPtr(lbx), getPtr(ubx),
-                                          gk_cand_, getPtr(lbg), getPtr(ubg));
+          l1_infeas = primalInfeasibility(x_cand_, lbx_, ubx_, gk_cand_, lbg_, ubg_);
 
           L1merit_cand = fk_cand + sigma_ * l1_infeas;
           // Calculating maximal merit function value so far
