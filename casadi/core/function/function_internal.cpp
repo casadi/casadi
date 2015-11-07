@@ -88,10 +88,16 @@ namespace casadi {
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
-    sz_arg_ = 0;
-    sz_res_ = 0;
-    sz_iw_ = 0;
-    sz_w_ = 0;
+
+    sz_arg_tmp_ = 0;
+    sz_res_tmp_ = 0;
+    sz_iw_tmp_ = 0;
+    sz_w_tmp_ = 0;
+
+    sz_arg_per_ = 0;
+    sz_res_per_ = 0;
+    sz_iw_per_ = 0;
+    sz_w_per_ = 0;
   }
 
   FunctionInternal::~FunctionInternal() {
@@ -99,6 +105,10 @@ namespace casadi {
 
   void FunctionInternal::init() {
     setDefaultOptions();
+
+    // Allocate memory for function inputs and outputs
+    sz_arg_per_ += n_in();
+    sz_res_per_ += n_out();
 
     verbose_ = option("verbose");
     jit_ = option("jit");
@@ -2409,57 +2419,57 @@ namespace casadi {
 
   void FunctionInternal::sz_work(size_t& sz_arg, size_t& sz_res,
                                  size_t& sz_iw, size_t& sz_w) const {
-    sz_arg = sz_arg_;
-    sz_res = sz_res_;
-    sz_iw = sz_iw_;
-    sz_w = sz_w_;
+    sz_arg = this->sz_arg();
+    sz_res = this->sz_res();
+    sz_iw = this->sz_iw();
+    sz_w = this->sz_w();
   }
 
-  void FunctionInternal::alloc_arg(size_t sz_arg, bool add) {
-    if (add) {
-      sz_arg_ += sz_arg;
+  void FunctionInternal::alloc_arg(size_t sz_arg, bool persistent) {
+    if (persistent) {
+      sz_arg_per_ += sz_arg;
     } else {
-      sz_arg_ = max(sz_arg + n_in(), sz_arg_);
+      sz_arg_tmp_ = max(sz_arg_tmp_, sz_arg);
     }
   }
 
-  void FunctionInternal::alloc_res(size_t sz_res, bool add) {
-    if (add) {
-      sz_res_ += sz_res;
+  void FunctionInternal::alloc_res(size_t sz_res, bool persistent) {
+    if (persistent) {
+      sz_res_per_ += sz_res;
     } else {
-      sz_res_ = max(sz_res + n_out(), sz_res_);
+      sz_res_tmp_ = max(sz_res_tmp_, sz_res);
     }
   }
 
-  void FunctionInternal::alloc_iw(size_t sz_iw, bool add) {
-    if (add) {
-      sz_iw_ += sz_iw;
+  void FunctionInternal::alloc_iw(size_t sz_iw, bool persistent) {
+    if (persistent) {
+      sz_iw_per_ += sz_iw;
     } else {
-      sz_iw_ = max(sz_iw, sz_iw_);
+      sz_iw_tmp_ = max(sz_iw_tmp_, sz_iw);
     }
   }
 
-  void FunctionInternal::alloc_w(size_t sz_w, bool add) {
-    if (add) {
-      sz_w_ += sz_w;
+  void FunctionInternal::alloc_w(size_t sz_w, bool persistent) {
+    if (persistent) {
+      sz_w_per_ += sz_w;
     } else {
-      sz_w_ = max(sz_w, sz_w_);
+      sz_w_tmp_ = max(sz_w_tmp_, sz_w);
     }
   }
 
-  void FunctionInternal::alloc(const Function& f) {
+  void FunctionInternal::alloc(const Function& f, bool persistent) {
     if (f.isNull()) return;
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-    alloc_arg(sz_arg);
-    alloc_res(sz_res);
-    alloc_iw(sz_iw);
-    alloc_w(sz_w);
+    alloc_arg(sz_arg, persistent);
+    alloc_res(sz_res, persistent);
+    alloc_iw(sz_iw, persistent);
+    alloc_w(sz_w, persistent);
   }
 
   void FunctionInternal::alloc() {
-    iw_tmp_.resize(sz_iw_);
-    w_tmp_.resize(sz_w_);
+    iw_tmp_.resize(sz_iw());
+    w_tmp_.resize(sz_w());
   }
 
   void FunctionInternal::reportConstraints(std::ostream &stream, const Matrix<double> &v,

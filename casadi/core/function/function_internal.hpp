@@ -615,31 +615,31 @@ namespace casadi {
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
     /** \brief Get required length of arg field */
-    size_t sz_arg() const { return sz_arg_;}
+    size_t sz_arg() const { return sz_arg_per_ + sz_arg_tmp_;}
 
     /** \brief Get required length of res field */
-    size_t sz_res() const { return sz_res_;}
+    size_t sz_res() const { return sz_res_per_ + sz_res_tmp_;}
 
     /** \brief Get required length of iw field */
-    size_t sz_iw() const { return sz_iw_;}
+    size_t sz_iw() const { return sz_iw_per_ + sz_iw_tmp_;}
 
     /** \brief Get required length of w field */
-    size_t sz_w() const { return sz_w_;}
+    size_t sz_w() const { return sz_w_per_ + sz_w_tmp_;}
 
     /** \brief Ensure required length of arg field */
-    void alloc_arg(size_t sz_arg, bool add=false);
+    void alloc_arg(size_t sz_arg, bool persistent=false);
 
     /** \brief Ensure required length of res field */
-    void alloc_res(size_t sz_res, bool add=false);
+    void alloc_res(size_t sz_res, bool persistent=false);
 
     /** \brief Ensure required length of iw field */
-    void alloc_iw(size_t sz_iw, bool add=false);
+    void alloc_iw(size_t sz_iw, bool persistent=false);
 
     /** \brief Ensure required length of w field */
-    void alloc_w(size_t sz_w, bool add=false);
+    void alloc_w(size_t sz_w, bool persistent=false);
 
     /** \brief Ensure work vectors long enough to evaluate function */
-    void alloc(const Function& f);
+    void alloc(const Function& f, bool persistent=false);
 
     /** \brief Update lengths of temporary work vectors */
     void alloc();
@@ -786,8 +786,11 @@ namespace casadi {
     std::vector<double> w_tmp_;
 
   private:
-    /** \brief Sizes of input and output buffers and number of memory blocks */
-    size_t sz_arg_, sz_res_, sz_iw_, sz_w_;
+    /** \brief Memory that is persistent during a call (but not between calls) */
+    size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;
+
+    /** \brief Temporary memory inside a function */
+    size_t sz_arg_tmp_, sz_res_tmp_, sz_iw_tmp_, sz_w_tmp_;
   };
 
   // Template implementations
