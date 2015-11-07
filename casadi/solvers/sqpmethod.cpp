@@ -316,7 +316,6 @@ namespace casadi {
       stats_["iterations"] = iterations;
     }
 
-
     // Get problem data
     const vector<double>& x_init = input(NLPSOL_X0).data();
     const vector<double>& lbx = input(NLPSOL_LBX).data();
@@ -636,18 +635,16 @@ namespace casadi {
           }
         }
 
-        // Pass to BFGS update function
-        bfgs_.setInputNZ(Bk_, BFGS_BK);
-        bfgs_.setInputNZ(x_, BFGS_X);
-        bfgs_.setInputNZ(x_old_, BFGS_X_OLD);
-        bfgs_.setInputNZ(gLag_, BFGS_GLAG);
-        bfgs_.setInputNZ(gLag_old_, BFGS_GLAG_OLD);
-
         // Update the Hessian approximation
-        bfgs_.evaluate();
-
-        // Get the updated Hessian
-        bfgs_.getOutputNZ(Bk_);
+        fill_n(arg1_, bfgs_.n_in(), nullptr);
+        arg1_[BFGS_BK] = Bk_;
+        arg1_[BFGS_X] = x_;
+        arg1_[BFGS_X_OLD] = x_old_;
+        arg1_[BFGS_GLAG] = gLag_;
+        arg1_[BFGS_GLAG_OLD] = gLag_old_;
+        fill_n(res1_, bfgs_.n_out(), nullptr);
+        res1_[0] = Bk_;
+        bfgs_(0, arg1_, res1_, iw_, w_);
 
       } else {
         // Exact Hessian
@@ -801,17 +798,19 @@ namespace casadi {
       // Get function
       Function& hessLag = this->hessLag();
 
-      // Pass the argument to the function
-      hessLag.setInputNZ(x, HESSLAG_X);
-      hessLag.setInputNZ(p_, HESSLAG_P);
-      hessLag.setInputNZ(&sigma, HESSLAG_LAM_F);
-      hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
+      // Inputs
+      fill_n(arg1_, static_cast<int>(HESSLAG_NUM_IN), nullptr);
+      arg1_[HESSLAG_X] = x;
+      arg1_[HESSLAG_P] = p_;
+      arg1_[HESSLAG_LAM_F] = &sigma;
+      arg1_[HESSLAG_LAM_G] = lambda;
+
+      // Outputs
+      fill_n(res1_, static_cast<int>(HESSLAG_NUM_OUT), nullptr);
+      res1_[0] = H;
 
       // Evaluate
-      hessLag.evaluate();
-
-      // Get results
-      hessLag.getOutputNZ(H);
+      hessLag(0, arg1_, res1_, iw_, w_);
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
@@ -820,7 +819,7 @@ namespace casadi {
           regularize(H, reg_);
         }
       }
-
+      
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
       throw;
@@ -834,15 +833,17 @@ namespace casadi {
       // Quick return if no constraints
       if (ng_==0) return;
 
-      // Pass the argument to the function
-      nlp_.setInputNZ(x, NL_X);
-      nlp_.setInputNZ(p_, NL_P);
+      // Inputs
+      fill_n(arg1_, static_cast<int>(NL_NUM_IN), nullptr);
+      arg1_[NL_X] = x;
+      arg1_[NL_P] = p_;
 
-      // Evaluate the function and tape
-      nlp_.evaluate();
+      // Outputs
+      fill_n(res1_, static_cast<int>(NL_NUM_OUT), nullptr);
+      res1_[NL_G] = g;
 
-      // Ge the result
-      nlp_.getOutputNZ(g, NL_G);
+      // Evaluate the function
+      nlp_(0, arg1_, res1_, iw_, w_);
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -863,16 +864,18 @@ namespace casadi {
       // Get function
       Function& jacG = this->jacG();
 
-      // Pass the argument to the function
-      jacG.setInputNZ(x, NL_X);
-      jacG.setInputNZ(p_, NL_P);
+      // Inputs
+      fill_n(arg1_, static_cast<int>(NL_NUM_IN), nullptr);
+      arg1_[NL_X] = x;
+      arg1_[NL_P] = p_;
+
+      // Outputs
+      fill_n(res1_, jacG_.n_out(), nullptr);
+      res1_[0] = J;
+      res1_[1+NL_G] = g;
 
       // Evaluate the function
-      jacG.evaluate();
-
-      // Get the output
-      jacG.getOutputNZ(g, 1+NL_G);
-      jacG.getOutputNZ(J);
+      jacG_(0, arg1_, res1_, iw_, w_);
 
       double time2 = clock();
       t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -891,16 +894,18 @@ namespace casadi {
       // Get function
       Function& gradF = this->gradF();
 
-      // Pass the argument to the function
-      gradF.setInputNZ(x, NL_X);
-      gradF.setInputNZ(p_, NL_P);
+      // Inputs
+      fill_n(arg1_, static_cast<int>(NL_NUM_IN), nullptr);
+      arg1_[NL_X] = x;
+      arg1_[NL_P] = p_;
 
-      // Evaluate, adjoint mode
-      gradF.evaluate();
+      // Outputs
+      fill_n(res1_, gradF_.n_out(), nullptr);
+      res1_[0] = grad_f;
+      res1_[1+NL_X] = f;
 
-      // Get the result
-      gradF.getOutputNZ(grad_f);
-      gradF.getOutputNZ(f, 1+NL_X);
+      // Evaluate the function
+      gradF_(0, arg1_, res1_, iw_, w_);
 
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -917,16 +922,18 @@ namespace casadi {
        // Log time
       double time1 = clock();
 
-      // Pass the argument to the function
-      nlp_.setInputNZ(x, NL_X);
-      nlp_.setInputNZ(p_, NL_P);
+      // Inputs
+      fill_n(arg1_, static_cast<int>(NL_NUM_IN), nullptr);
+      arg1_[NL_X] = x;
+      arg1_[NL_P] = p_;
+
+      // Outputs
+      fill_n(res1_, static_cast<int>(NL_NUM_OUT), nullptr);
+      double f;
+      res1_[NL_F] = &f;
 
       // Evaluate the function
-      nlp_.evaluate();
-
-      // Get the result
-      double f;
-      nlp_.getOutputNZ(&f, NL_F);
+      nlp_(0, arg1_, res1_, iw_, w_);
 
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -942,32 +949,25 @@ namespace casadi {
   void Sqpmethod::solve_QP(const double* H, const double* g, const double* lbx, const double* ubx,
                            const double* A, const double* lbA, const double* ubA,
                            double* x_opt, double* lambda_x_opt, double* lambda_A_opt) {
+    // Inputs
+    fill_n(arg1_, static_cast<int>(QPSOL_NUM_IN), nullptr);
+    arg1_[QPSOL_H] = H;
+    arg1_[QPSOL_G] = g;
+    arg1_[QPSOL_X0] = x_opt;
+    arg1_[QPSOL_LBX] = lbx;
+    arg1_[QPSOL_UBX] = ubx;
+    arg1_[QPSOL_A] = A;
+    arg1_[QPSOL_LBA] = lbA;
+    arg1_[QPSOL_UBA] = ubA;
 
-    // Pass data to QP solver
-    qpsol_.setInputNZ(H, QPSOL_H);
-    qpsol_.setInputNZ(g, QPSOL_G);
-
-    // Hot-starting if possible
-    qpsol_.setInputNZ(x_opt, QPSOL_X0);
-
-    // Pass simple bounds
-    qpsol_.setInputNZ(lbx, QPSOL_LBX);
-    qpsol_.setInputNZ(ubx, QPSOL_UBX);
-
-    // Pass linear bounds
-    if (ng_>0) {
-      qpsol_.setInputNZ(A, QPSOL_A);
-      qpsol_.setInputNZ(lbA, QPSOL_LBA);
-      qpsol_.setInputNZ(ubA, QPSOL_UBA);
-    }
+    // Outputs
+    fill_n(res1_, static_cast<int>(QPSOL_NUM_OUT), nullptr);
+    res1_[QPSOL_X] = x_opt;
+    res1_[QPSOL_LAM_X] = lambda_x_opt;
+    res1_[QPSOL_LAM_A] = lambda_A_opt;
 
     // Solve the QP
-    qpsol_.evaluate();
-
-    // Get the optimal solution
-    qpsol_.getOutputNZ(x_opt, QPSOL_X);
-    qpsol_.getOutputNZ(lambda_x_opt, QPSOL_LAM_X);
-    qpsol_.getOutputNZ(lambda_A_opt, QPSOL_LAM_A);
+    qpsol_(0, arg1_, res1_, iw_, w_);
   }
 
   double Sqpmethod::primalInfeasibility(const double* x, const double* lbx, const double* ubx,
