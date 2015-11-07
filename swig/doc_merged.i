@@ -7191,9 +7191,6 @@ C++ includes: nonzeros.hpp ";
 // File: classcasadi_1_1NormInf.xml
 
 
-// File: classcasadi_1_1OldCollocationIvpsol.xml
-
-
 // File: classcasadi_1_1OneSX.xml
 
 
@@ -11228,6 +11225,11 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 %feature("docstring") casadi::casadi_to_dense "[INTERNAL]  Convert sparse
 to dense.
+
+";
+
+%feature("docstring") casadi::casadi_norm_inf "[INTERNAL]  Inf-norm of a
+vector * Returns the largest element in absolute value
 
 ";
 

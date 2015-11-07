@@ -9514,9 +9514,6 @@ C++ includes: nonzeros.hpp ";
 // File: classcasadi_1_1NormInf.xml
 
 
-// File: classcasadi_1_1OldCollocationIvpsol.xml
-
-
 // File: classcasadi_1_1OneSX.xml
 
 
@@ -14608,6 +14605,12 @@ int inc_x) " [INTERNAL]  SCAL: x <- alpha*x.
 
 %feature("docstring")  casadi::casadi_to_dense(const real1_t *x, const int
 *sp_x, real2_t *y) " [INTERNAL]  Convert sparse to dense.
+
+";
+
+%feature("docstring")  casadi::casadi_norm_inf(int n, const real_t *x) "
+[INTERNAL]  Inf-norm of a vector * Returns the largest element in absolute
+value
 
 ";
 
