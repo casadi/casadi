@@ -386,12 +386,6 @@ namespace casadi {
       if (!fcallback_.isNull()) {
         double time1 = clock();
 
-        if (!output(NLPSOL_F).is_empty()) output(NLPSOL_F).set(fk_);
-        if (!output(NLPSOL_X).is_empty()) output(NLPSOL_X).setNZ(xk_);
-        if (!output(NLPSOL_LAM_G).is_empty()) output(NLPSOL_LAM_G).setNZ(mu_);
-        if (!output(NLPSOL_LAM_X).is_empty()) output(NLPSOL_LAM_X).setNZ(mu_x_);
-        if (!output(NLPSOL_G).is_empty()) output(NLPSOL_G).setNZ(gk_);
-
         Dict iteration;
         iteration["iter"] = iter;
         iteration["inf_pr"] = pr_inf;
@@ -405,16 +399,25 @@ namespace casadi {
         t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
         time1 = clock();
 
-        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-          fcallback_.setInput(output(i), i);
-        }
-        fcallback_.evaluate();
-        double ret_double;
-        fcallback_.getOutput(ret_double);
-        int ret = static_cast<int>(ret_double);
+        // Callback inputs
+        fill_n(arg1_, fcallback_.n_in(), nullptr);
+        arg1_[NLPSOL_F] = &fk_;
+        arg1_[NLPSOL_X] = x_;
+        arg1_[NLPSOL_LAM_G] = lam_g_;
+        arg1_[NLPSOL_LAM_X] = lam_x_;
+        arg1_[NLPSOL_G] = g_;
+
+        // Callback outputs
+        fill_n(res1_, fcallback_.n_out(), nullptr);
+        double ret;
+        arg1_[0] = &ret;
+
+        // Evaluate
+        fcallback_(arg1_, res1_, iw_, w_, 0);
+
         time2 = clock();
         t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
-        if (ret) {
+        if (static_cast<int>(ret)) {
           userOut() << endl;
           userOut() << "casadi::SQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";
@@ -619,11 +622,11 @@ namespace casadi {
     t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Save results to outputs
-    output(NLPSOL_F).set(fk_);
-    output(NLPSOL_X).setNZ(xk_);
-    output(NLPSOL_LAM_G).setNZ(mu_);
-    output(NLPSOL_LAM_X).setNZ(mu_x_);
-    output(NLPSOL_G).setNZ(gk_);
+    if (f_) *f_ = fk_;
+    if (x_) copy_n(xk_, nx_, x_);
+    if (lam_g_) copy_n(mu_, ng_, lam_g_);
+    if (lam_x_) copy_n(mu_x_, nx_, lam_x_);
+    if (g_) copy_n(gk_, ng_, g_);
 
     if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       // Write timings

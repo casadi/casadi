@@ -534,15 +534,6 @@ namespace casadi {
   }
 
   void Nlpsol::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
-      } else {
-        setInput(0., i);
-      }
-    }
-
     // Get input pointers
     x0_ = arg[NLPSOL_X0];
     p_ = arg[NLPSOL_P];
