@@ -135,17 +135,17 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::primitives(std::vector<MX>::iterator& it) const {
+  void MXNode::primitives(vector<MX>::iterator& it) const {
     throw CasadiException(string("MXNode::primitives() not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void MXNode::split_primitives(const MX& x, vector<MX>::iterator& it) const {
     throw CasadiException(string("MXNode::split_primitives() not defined for class ")
                           + typeid(*this).name());
   }
 
-  MX MXNode::join_primitives(std::vector<MX>::const_iterator& it) const {
+  MX MXNode::join_primitives(vector<MX>::const_iterator& it) const {
     throw CasadiException(string("MXNode::join_primitives() not defined for class ")
                           + typeid(*this).name());
   }
@@ -199,16 +199,16 @@ namespace casadi {
     return dep_.size()-1;
   }
 
-  void MXNode::assign(const MX& d, const std::vector<int>& inz, bool add) {
+  void MXNode::assign(const MX& d, const vector<int>& inz, bool add) {
     casadi_assert(0);
   }
 
-  void MXNode::assign(const MX& d, const std::vector<int>& inz,
-                      const std::vector<int>& onz, bool add) {
+  void MXNode::assign(const MX& d, const vector<int>& inz,
+                      const vector<int>& onz, bool add) {
     casadi_assert(0);
   }
 
-  void MXNode::setDependencies(const std::vector<MX>& dep) {
+  void MXNode::setDependencies(const vector<MX>& dep) {
     dep_ = dep;
   }
 
@@ -258,7 +258,7 @@ namespace casadi {
   }
 
   std::string MXNode::print_compact(std::map<const MXNode*, int>& nodeind,
-                                   std::vector<std::string>& intermed) const {
+                                   vector<std::string>& intermed) const {
     // Get reference to node index
     int& ind = nodeind[this];
 
@@ -301,34 +301,34 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void MXNode::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     throw CasadiException(string("MXNode::evalD not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+  void MXNode::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     throw CasadiException(string("MXNode::evalSX not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void MXNode::evalMX(const vector<MX>& arg, vector<MX>& res) {
     throw CasadiException(string("MXNode::evalMX not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalFwd(const std::vector<std::vector<MX> >& fseed,
-                       std::vector<std::vector<MX> >& fsens) {
+  void MXNode::evalFwd(const vector<vector<MX> >& fseed,
+                       vector<vector<MX> >& fsens) {
     throw CasadiException(string("MXNode::evalFwd not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalAdj(const std::vector<std::vector<MX> >& aseed,
-                       std::vector<std::vector<MX> >& asens) {
+  void MXNode::evalAdj(const vector<vector<MX> >& aseed,
+                       vector<vector<MX> >& asens) {
     throw CasadiException(string("MXNode::evalAdj not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MXNode::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -349,7 +349,7 @@ namespace casadi {
     }
   }
 
-  void MXNode::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MXNode::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -377,7 +377,7 @@ namespace casadi {
   }
 
   void MXNode::generate(CodeGenerator& g, const std::string& mem,
-                        const std::vector<int>& arg, const std::vector<int>& res) const {
+                        const vector<int>& arg, const vector<int>& res) const {
     g.body << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }
 
@@ -437,7 +437,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
+  MX MXNode::getGetNonzeros(const Sparsity& sp, const vector<int>& nz) const {
     if (nz.size()==0) {
       return MX::zeros(sp);
     } else {
@@ -455,7 +455,7 @@ namespace casadi {
     }
   }
 
-  MX MXNode::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
+  MX MXNode::getSetNonzeros(const MX& y, const vector<int>& nz) const {
     // Check if any element needs to be set at all
     bool set_any = false;
     for (vector<int>::const_iterator i=nz.begin(); i!=nz.end() && !set_any; ++i) {
@@ -482,7 +482,7 @@ namespace casadi {
   }
 
 
-  MX MXNode::getAddNonzeros(const MX& y, const std::vector<int>& nz) const {
+  MX MXNode::getAddNonzeros(const MX& y, const vector<int>& nz) const {
     if (nz.size()==0 || is_zero()) {
       return y;
     } else {
@@ -767,7 +767,7 @@ namespace casadi {
     return MX::create(new Norm1(shared_from_this<MX>()));
   }
 
-  MX MXNode::getHorzcat(const std::vector<MX>& x) const {
+  MX MXNode::getHorzcat(const vector<MX>& x) const {
     // Check if there is any existing horzcat operation
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
       if (i->op()==OP_HORZCAT) {
@@ -788,12 +788,12 @@ namespace casadi {
     return MX::create(new Horzcat(x));
   }
 
-  MX MXNode::get_diagcat(const std::vector<MX>& x) const {
+  MX MXNode::get_diagcat(const vector<MX>& x) const {
     // Create a Horzcat node
     return MX::create(new Diagcat(x));
   }
 
-  MX MXNode::getVertcat(const std::vector<MX>& x) const {
+  MX MXNode::getVertcat(const vector<MX>& x) const {
     // Check if there is any existing vertcat operation
     for (vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i) {
       if (i->op()==OP_VERTCAT) {
@@ -813,16 +813,16 @@ namespace casadi {
     return MX::create(new Vertcat(x));
   }
 
-  std::vector<MX> MXNode::getHorzsplit(const std::vector<int>& output_offset) const {
+  vector<MX> MXNode::getHorzsplit(const vector<int>& output_offset) const {
     if (is_zero()) {
-      std::vector<MX> ret =
+      vector<MX> ret =
           MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(), output_offset));
       for (int i=0;i<ret.size();++i) {
         ret[i]=MX::zeros(ret[i].sparsity());
       }
       return ret;
     }
-    std::vector<MX> ret =
+    vector<MX> ret =
         MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(), output_offset));
 
     if (CasadiOptions::simplification_on_the_fly) {
@@ -863,32 +863,32 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> MXNode::get_diagsplit(const std::vector<int>& offset1,
-                                       const std::vector<int>& offset2) const {
+  vector<MX> MXNode::get_diagsplit(const vector<int>& offset1,
+                                       const vector<int>& offset2) const {
     if (is_zero()) {
-      std::vector<MX> ret =
+      vector<MX> ret =
           MX::createMultipleOutput(new Diagsplit(shared_from_this<MX>(), offset1, offset2));
       for (int i=0;i<ret.size();++i) {
         ret[i]=MX::zeros(ret[i].sparsity());
       }
       return ret;
     }
-    std::vector<MX> ret =
+    vector<MX> ret =
         MX::createMultipleOutput(new Diagsplit(shared_from_this<MX>(), offset1, offset2));
 
     return ret;
   }
 
-  std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const {
+  vector<MX> MXNode::getVertsplit(const vector<int>& output_offset) const {
     if (is_zero()) {
-      std::vector<MX> ret =
+      vector<MX> ret =
           MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(), output_offset));
       for (int i=0;i<ret.size();++i) {
         ret[i]=MX::zeros(ret[i].sparsity());
       }
       return ret;
     }
-    std::vector<MX> ret =
+    vector<MX> ret =
         MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(), output_offset));
 
     if (CasadiOptions::simplification_on_the_fly) {

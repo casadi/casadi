@@ -73,8 +73,7 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunction::evalD(void* mem, const double** arg, double** res,
-                                 int* iw, double* w) {
+  void SXFunction::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     double time_start=0;
     double time_stop=0;
     if (CasadiOptions::profiling) {
@@ -568,8 +567,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                  int* iw, SXElem* w) {
+  void SXFunction::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     if (verbose()) userOut() << "SXFunction::evalSXsparse begin" << endl;
 
     // Iterator to the binary operations
@@ -837,8 +835,7 @@ namespace casadi {
     if (!fwd) fill_n(iwork, sz_w(), bvec_t(0));
   }
 
-  void SXFunction::spFwd(void* mem, const bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* w) {
+  void SXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
@@ -855,8 +852,7 @@ namespace casadi {
     }
   }
 
-  void SXFunction::spAdj(void* mem, bvec_t** arg, bvec_t** res,
-                                 int* iw, bvec_t* w) {
+  void SXFunction::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward

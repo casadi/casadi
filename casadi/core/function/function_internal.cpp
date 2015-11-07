@@ -176,11 +176,11 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::eval(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (evalD_) {
-      evalD_(mem, arg, res, iw, w);
+      evalD_(arg, res, iw, w, mem);
     } else {
-      evalD(mem, arg, res, iw, w);
+      evalD(arg, res, iw, w, mem);
     }
   }
 
@@ -1217,13 +1217,11 @@ namespace casadi {
     log("FunctionInternal::getPartition end");
   }
 
-  void FunctionInternal::evalD(void* mem, const double** arg,
-                               double** res, int* iw, double* w) {
+  void FunctionInternal::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     casadi_error("'evalD' not defined for " + type_name());
   }
 
-  void FunctionInternal::evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                int* iw, SXElem* w) {
+  void FunctionInternal::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     casadi_assert(canEvalSX());
 
     // Number of inputs and outputs
@@ -1292,7 +1290,7 @@ namespace casadi {
     for (int i=0; i<n_out(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
-    evalSX(0, getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp));
+    evalSX(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
   }
 
   void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -1317,14 +1315,14 @@ namespace casadi {
       for (int i=0; i<n_in(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
 
       // Call memory-less
-      spFwd(0, getPtr(arg), getPtr(res), iw, w);
+      spFwd(getPtr(arg), getPtr(res), iw, w, 0);
     } else {
       // Get pointers to input arguments
       vector<bvec_t*> arg(sz_arg());
       for (int i=0; i<n_in(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
 
       // Call memory-less
-      spAdj(0, getPtr(arg), getPtr(res), iw, w);
+      spAdj(getPtr(arg), getPtr(res), iw, w, 0);
     }
   }
 
@@ -1809,7 +1807,7 @@ namespace casadi {
     for (int i=0; i<n_out(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
-    eval(0, getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp));
+    eval(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
   }
 
   Function FunctionInternal::
@@ -1924,7 +1922,7 @@ namespace casadi {
     }
     g.body
       << "int " << fname
-      << "(void *mem, const real_t** arg, real_t** res, int* iw, real_t* w) {" << endl;
+      << "(const real_t** arg, real_t** res, int* iw, real_t* w, void *mem) {" << endl;
 
     // Insert the function body
     generateBody(g);
@@ -1967,8 +1965,8 @@ namespace casadi {
       }
 
       // Call function
-      g.body << "  if (" << generic_call(g, "0", "arg1", "res1",
-                                         "iw", "w") << ") return 1;" << endl;
+      g.body << "  if (" << generic_call(g, "arg1", "res1", "iw", "w", "0")
+             << ") return 1;" << endl;
     }
   }
 
@@ -2142,8 +2140,8 @@ namespace casadi {
       for (int i=0; i<n_in; ++i) {
         std::string p = "argv[" + g.to_string(i) + "]";
         s << "  if (--argc>=0) arg[" << i << "] = "
-          << g.from_mex(p, "w", offset, input(i).sparsity(), fw) << endl;
-        offset += input(i).nnz();
+          << g.from_mex(p, "w", offset, sparsity_in(i), fw) << endl;
+        offset += nnz_in(i);
       }
 
       // Allocate output buffers
@@ -2159,19 +2157,19 @@ namespace casadi {
         }
         // Create and get pointer
         s << "res[" << i << "] = w+" << g.to_string(offset) << ";" << endl;
-        offset += output(i).nnz();
+        offset += nnz_out(i);
       }
 
       // Call the function
-      s << "  i = " << fname << "(0, arg, res, iw, " << fw << ");" << endl;
+      s << "  i = " << fname << "(arg, res, iw, " << fw << ", 0);" << endl;
       s << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
-             << "\\\" failed.\");" << endl;
+        << "\\\" failed.\");" << endl;
 
       // Save results
       for (int i=0; i<n_out; ++i) {
         string res_i = "res[" + g.to_string(i) + "]";
         s << "  if (" << res_i << ") resv[" << i << "] = "
-          << g.to_mex(output(i).sparsity(), res_i) << endl;
+          << g.to_mex(sparsity_out(i), res_i) << endl;
       }
 
       // End conditional compilation and function
@@ -2214,7 +2212,7 @@ namespace casadi {
         << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
-      s << "  int flag = " << fname << "(0, arg, res, iw, w+" << off << ");" << endl
+      s << "  int flag = " << fname << "(arg, res, iw, w+" << off << ", 0);" << endl
         << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
@@ -2231,9 +2229,9 @@ namespace casadi {
     }
   }
 
-  std::string FunctionInternal::generic_call(const CodeGenerator& g, const std::string& proc,
-                                             const std::string& arg, const std::string& res,
-                                             const std::string& iw, const std::string& w) const {
+  std::string FunctionInternal::generic_call(const CodeGenerator& g, const std::string& arg,
+                                             const std::string& res, const std::string& iw,
+                                             const std::string& w, const std::string& mem) const {
     // Get the index of the function
     CodeGenerator::PointerMap::const_iterator it=g.added_dependencies_.find(this);
     casadi_assert(it!=g.added_dependencies_.end());
@@ -2241,8 +2239,7 @@ namespace casadi {
 
     // Create a function call
     stringstream ss;
-    ss << "f" << f << "(" << proc << " , " << arg << ", " << res << ", "
-       << iw << ", " << w << ")";
+    ss << "f" << f << "(" << arg << ", " << res << ", " << iw << ", " << w << " , " << mem << ")";
     return ss.str();
   }
 
@@ -2273,8 +2270,8 @@ namespace casadi {
 
       // Shorthand
       g.body
-        << "#define " << name << "(mem, arg, res, iw, w) "
-        << "CASADI_PREFIX(" << name << ")(mem, arg, res, iw, w)" << endl << endl;
+        << "#define " << name << "(arg, res, iw, w, mem) "
+        << "CASADI_PREFIX(" << name << ")(arg, res, iw, w, mem)" << endl << endl;
     }
   }
 
@@ -2297,14 +2294,13 @@ namespace casadi {
     return Function::external(fname, dlname);
   }
 
-  void FunctionInternal::spFwdSwitch(void* mem, const bvec_t** arg, bvec_t** res,
-                                     int* iw, bvec_t* w) {
+  void FunctionInternal::
+  spFwdSwitch(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
-    spFwd(0, arg, res, iw, w);
+    spFwd(arg, res, iw, w, 0);
   }
 
-  void FunctionInternal::spFwd(void* mem, const bvec_t** arg, bvec_t** res,
-                               int* iw, bvec_t* w) {
+  void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // Number inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2354,14 +2350,12 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
-  void FunctionInternal::spAdjSwitch(void* mem, bvec_t** arg, bvec_t** res,
-                                     int* iw, bvec_t* w) {
+  void FunctionInternal::spAdjSwitch(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
-    spAdj(mem, arg, res, iw, w);
+    spAdj(arg, res, iw, w, mem);
   }
 
-  void FunctionInternal::spAdj(void* mem, bvec_t** arg, bvec_t** res,
-                               int* iw, bvec_t* w) {
+  void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // Number inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2997,8 +2991,8 @@ namespace casadi {
     return v;
   }
 
-  void FunctionInternal::linsol_prepare(void* mem, const double** arg, double** res,
-                                        int* iw, double* w) {
+  void FunctionInternal::
+  linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
     casadi_error("'linsol_prepare' not defined for " + type_name());
   }
 
@@ -3034,30 +3028,35 @@ namespace casadi {
     casadi_error("'linsol_cholesky' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                       int* iw, SXElem* w, bool tr, int nrhs) {
+  void FunctionInternal::
+  linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                bool tr, int nrhs) {
     casadi_error("'linsol_evalSX' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                        const std::vector<std::vector<MX> >& fseed,
-                                        std::vector<std::vector<MX> >& fsens, bool tr) {
+  void FunctionInternal::
+  linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+                 const std::vector<std::vector<MX> >& fseed,
+                 std::vector<std::vector<MX> >& fsens, bool tr) {
     casadi_error("'linsol_forward' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                        const std::vector<std::vector<MX> >& aseed,
-                                        std::vector<std::vector<MX> >& asens, bool tr) {
+  void FunctionInternal::
+  linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+                 const std::vector<std::vector<MX> >& aseed,
+                 std::vector<std::vector<MX> >& asens, bool tr) {
     casadi_error("'linsol_reverse' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_spFwd(void* mem, const bvec_t** arg, bvec_t** res,
-                                      int* iw, bvec_t* w, bool tr, int nrhs) {
+  void FunctionInternal::
+  linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+               bool tr, int nrhs) {
     casadi_error("'linsol_spFwd' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_spAdj(void* mem, bvec_t** arg, bvec_t** res,
-                                      int* iw, bvec_t* w, bool tr, int nrhs) {
+  void FunctionInternal::
+  linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+               bool tr, int nrhs) {
     casadi_error("'linsol_spAdj' not defined for " + type_name());
   }
 

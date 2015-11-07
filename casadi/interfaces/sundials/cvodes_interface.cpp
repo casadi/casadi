@@ -300,7 +300,7 @@ namespace casadi {
     res1_[DAE_ODE] = NV_DATA_S(xdot);
     res1_[DAE_ALG] = 0;
     res1_[DAE_QUAD] = 0;
-    f_(0, arg1_, res1_, iw_, w_);
+    f_(arg1_, res1_, iw_, w_, 0);
 
     // Debug output
     if (monitor_rhs_) {
@@ -636,7 +636,7 @@ namespace casadi {
     res1_[DAE_ODE] = 0;
     res1_[DAE_ALG] = 0;
     res1_[DAE_QUAD] = NV_DATA_S(qdot);
-    f_(0, arg1_, res1_, iw_, w_);
+    f_(arg1_, res1_, iw_, w_, 0);
   }
 
   void CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
@@ -684,7 +684,7 @@ namespace casadi {
     res1_[RDAE_ODE] = NV_DATA_S(rxdot);
     res1_[RDAE_ALG] = 0;
     res1_[RDAE_QUAD] = 0;
-    g_(0, arg1_, res1_, iw_, w_);
+    g_(arg1_, res1_, iw_, w_, 0);
 
     // Debug output
     if (monitor_rhsB_) {
@@ -765,7 +765,7 @@ namespace casadi {
     res1_[RDAE_ODE] = 0;
     res1_[RDAE_ALG] = 0;
     res1_[RDAE_QUAD] = NV_DATA_S(rqdot);
-    g_(0, arg1_, res1_, iw_, w_);
+    g_(arg1_, res1_, iw_, w_, 0);
 
     // Debug output
     if (monitor_rhsQB_) {
@@ -828,7 +828,7 @@ namespace casadi {
     res1_[DAE_NUM_OUT + DAE_ODE] = NV_DATA_S(Jv);
     res1_[DAE_NUM_OUT + DAE_ALG] = 0;
     res1_[DAE_NUM_OUT + DAE_QUAD] = 0;
-    f_fwd_(0, arg1_, res1_, iw_, w_);
+    f_fwd_(arg1_, res1_, iw_, w_, 0);
 
     // Log time duration
     time2 = clock();
@@ -874,7 +874,7 @@ namespace casadi {
     res1_[RDAE_NUM_OUT + RDAE_ODE] = NV_DATA_S(Jv);
     res1_[RDAE_NUM_OUT + RDAE_ALG] = 0;
     res1_[RDAE_NUM_OUT + RDAE_QUAD] = 0;
-    g_fwd_(0, arg1_, res1_, iw_, w_);
+    g_fwd_(arg1_, res1_, iw_, w_, 0);
 
     // Log time duration
     time2 = clock();
@@ -926,7 +926,7 @@ namespace casadi {
     arg1_[DAE_NUM_IN+1] = &zero;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
-    jac_(0, arg1_, res1_, iw_, w_);
+    jac_(arg1_, res1_, iw_, w_, 0);
     double *val = res1_[0];
 
     // Get sparsity and non-zero elements
@@ -972,7 +972,7 @@ namespace casadi {
     arg1_[RDAE_NUM_IN+1] = 0;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
-    jacB_(0, arg1_, res1_, iw_, w_);
+    jacB_(arg1_, res1_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jacB_.sparsity_out(0).colind();
@@ -1043,7 +1043,7 @@ namespace casadi {
     arg1_[DAE_NUM_IN+1] = 0;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
-    jac_(0, arg1_, res1_, iw_, w_);
+    jac_(arg1_, res1_, iw_, w_, 0);
     double *val = res1_[0];
 
     // Get sparsity and non-zero elements
@@ -1092,7 +1092,7 @@ namespace casadi {
     arg1_[RDAE_NUM_IN+1] = 0;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
-    jacB_(0, arg1_, res1_, iw_, w_);
+    jacB_(arg1_, res1_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jacB_.sparsity_out(0).colind();
@@ -1239,7 +1239,7 @@ namespace casadi {
     arg1_[DAE_NUM_IN+1] = &d2;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
-    jac_(0, arg1_, res1_, iw_, w_);
+    jac_(arg1_, res1_, iw_, w_, 0);
     double *val = res1_[0];
 
     // Log time duration
@@ -1250,7 +1250,7 @@ namespace casadi {
     fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     arg1_[LINSOL_A] = val;
-    linsol_.linsol_prepare(0, arg1_, res1_, iw_, w_);
+    linsol_.linsol_prepare(arg1_, res1_, iw_, w_, 0);
 
     // Log time duration
     time1 = clock();
@@ -1279,7 +1279,7 @@ namespace casadi {
     arg1_[RDAE_NUM_IN+1] = &one;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
-    jacB_(0, arg1_, res1_, iw_, w_);
+    jacB_(arg1_, res1_, iw_, w_, 0);
     double *val = res1_[0];
 
     // Log time duration
@@ -1290,7 +1290,7 @@ namespace casadi {
     fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     arg1_[LINSOL_A] = val;
-    linsolB_.linsol_prepare(0, arg1_, res1_, iw_, w_);
+    linsolB_.linsol_prepare(arg1_, res1_, iw_, w_, 0);
 
     // Log time duration
     time1 = clock();

@@ -256,8 +256,8 @@ namespace casadi {
   }
 
   template<typename LibType>
-  void SimplifiedExternal<LibType>::evalD(void* mem, const double** arg, double** res,
-                                          int* iw, double* w) {
+  void SimplifiedExternal<LibType>::
+  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Copy arguments to input buffers
     const double* arg1=w;
     for (int i=0; i<this->n_in(); ++i) {
@@ -275,9 +275,9 @@ namespace casadi {
   }
 
   template<typename LibType>
-  void GenericExternal<LibType>::evalD(void* mem, const double** arg, double** res,
-                                       int* iw, double* w) {
-    int flag = eval_(mem, arg, res, iw, w);
+  void GenericExternal<LibType>::
+  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+    int flag = eval_(arg, res, iw, w, mem);
     if (flag) throw CasadiException("CommonExternal: \""+this->name_+"\" failed");
   }
 

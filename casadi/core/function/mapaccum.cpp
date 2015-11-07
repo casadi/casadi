@@ -123,8 +123,7 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-  void Mapaccum::evalGen(void* mem, const T** arg, T** res, int* iw, T* w,
-                                 R reduction) {
+  void Mapaccum::evalGen(const T** arg, T** res, int* iw, T* w, void* mem, R reduction) {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     // Catch: must accomodate scenario where res[j] of the accumulator = 0.
@@ -177,7 +176,7 @@ namespace casadi {
       }
 
       // Evaluate the function
-      f_(0, arg1, res1, iw, w);
+      f_(arg1, res1, iw, w, 0);
 
       // Copy the temporary storage to the accumulator
       copy(w+f_.sz_w()+nnz_accum_, w+f_.sz_w()+nnz_accum_*2, w+f_.sz_w());
@@ -195,18 +194,16 @@ namespace casadi {
     }
   }
 
-  void Mapaccum::evalD(void* mem, const double** arg, double** res,
-                                int* iw, double* w) {
-    evalGen(mem, arg, res, iw, w, std::plus<double>());
+  void Mapaccum::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen(arg, res, iw, w, mem, std::plus<double>());
   }
 
-  void Mapaccum::evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                int* iw, SXElem* w) {
-    evalGen(mem, arg, res, iw, w, std::plus<SXElem>());
+  void Mapaccum::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen(arg, res, iw, w, mem, std::plus<SXElem>());
   }
 
-  void Mapaccum::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    evalGen(mem, arg, res, iw, w, orop);
+  void Mapaccum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    evalGen(arg, res, iw, w, mem, orop);
   }
 
   std::vector<MX> bisect(const MX& a, int b) {

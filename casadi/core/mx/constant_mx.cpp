@@ -55,13 +55,11 @@ namespace casadi {
                            std::vector<std::vector<MX> >& asens) {
   }
 
-  void ConstantMX::spFwd(void* mem, const bvec_t** arg,
-                         bvec_t** res, int* iw, bvec_t* w) {
+  void ConstantMX::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantMX::spAdj(void* mem, bvec_t** arg,
-                         bvec_t** res, int* iw, bvec_t* w) {
+  void ConstantMX::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     fill_n(res[0], nnz(), 0);
   }
 

@@ -70,9 +70,9 @@ namespace casadi {
     work_.resize(10*ncol_);
   }
 
-  void LapackQrDense::linsol_prepare(void* mem, const double** arg, double** res,
-                                     int* iw, double* w) {
-    Linsol::linsol_prepare(mem, arg, res, iw, w);
+  void LapackQrDense::
+  linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
+    Linsol::linsol_prepare(arg, res, iw, w, mem);
 
     // Get the elements of the matrix, dense format
     input(0).get(mat_);

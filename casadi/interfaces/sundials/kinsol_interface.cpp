@@ -205,11 +205,11 @@ namespace casadi {
     abstol_ = option("abstol");
   }
 
-  void KinsolInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void KinsolInterface::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (mem==0) {
       mem = alloc_mem();
       try {
-        evalD(mem, arg, res, iw, w);
+        evalD(arg, res, iw, w, mem);
       } catch (...) {
         free_mem(mem);
         throw;
@@ -263,7 +263,7 @@ namespace casadi {
       arg1[iin_] = NV_DATA_S(m->u_);
       copy_n(res, n_out(), res1);
       res1[iout_] = 0;
-      f_(0, arg1, res1, iw, w);
+      f_(arg1, res1, iw, w, 0);
     }
   }
 
@@ -280,7 +280,7 @@ namespace casadi {
     arg1[self.iin_] = NV_DATA_S(u);
     fill_n(res1, self.n_out(), static_cast<double*>(0));
     res1[self.iout_] = NV_DATA_S(fval);
-    self.f_(0, arg1, res1, iw_, w_);
+    self.f_(arg1, res1, iw_, w_, 0);
 
     // Print it, if requested
     if (self.monitored("eval_f")) {
@@ -358,7 +358,7 @@ namespace casadi {
     arg1[self.iin_] = NV_DATA_S(u);
     fill_n(res1, self.jac_.n_out(), static_cast<double*>(0));
     res1[0] = jac;
-    self.jac_(0, arg1, res1, iw_, w_);
+    self.jac_(arg1, res1, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = self.jac_.sparsity_out(0).colind();
@@ -416,7 +416,7 @@ namespace casadi {
     arg1[self.iin_] = NV_DATA_S(u);
     fill_n(res1, self.jac_.n_out(), static_cast<double*>(0));
     res1[0] = jac;
-    self.jac_(0, arg1, res1, iw_, w_);
+    self.jac_(arg1, res1, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = self.jac_.sparsity_out(0).colind();
@@ -470,7 +470,7 @@ namespace casadi {
     arg1[self.n_in()+self.iin_] = NV_DATA_S(v);
     fill_n(res1, self.f_fwd_.n_out(), static_cast<double*>(0));
     res1[self.n_out()] = NV_DATA_S(Jv);
-    self.f_fwd_(0, arg1, res1, iw_, w_);
+    self.f_fwd_(arg1, res1, iw_, w_, 0);
 
     // Log time duration
     time2_ = clock();
@@ -507,7 +507,7 @@ namespace casadi {
     arg1[self.iin_] = NV_DATA_S(u);
     fill_n(res1, self.jac_.n_out(), static_cast<double*>(0));
     res1[0] = jac;
-    self.jac_(0, arg1, res1, iw_, w_);
+    self.jac_(arg1, res1, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = self.jac_.sparsity_out(0).colind();
@@ -522,7 +522,7 @@ namespace casadi {
     fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
     arg_[LINSOL_A] = jac;
-    self.linsol_.linsol_prepare(0, arg_, res_, iw_, w_);
+    self.linsol_.linsol_prepare(arg_, res_, iw_, w_, 0);
 
     // Log time duration
     time1_ = clock();

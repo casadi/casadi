@@ -58,7 +58,7 @@ namespace casadi {
     }
 
     virtual void init();
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// QP solver for the subproblems
     Function qpsol_;

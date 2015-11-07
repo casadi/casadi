@@ -57,16 +57,16 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /// Evaluate the function numerically
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w);
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief Generate code for the operation */
     virtual void generate(CodeGenerator& g, const std::string& mem,

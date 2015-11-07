@@ -173,14 +173,14 @@ namespace casadi {
     alloc_w(Q.size1(), true);
   }
 
-  void SymbolicQr::linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w) {
-    Linsol::linsol_prepare(mem, arg, res, iw, w);
+  void SymbolicQr::linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
+    Linsol::linsol_prepare(arg, res, iw, w, mem);
 
     // Factorize
     arg1_[0] = a_;
     res1_[0] = getPtr(q_);
     res1_[1] = getPtr(r_);
-    fact_fcn_(0, arg1_, res1_, iw_, w_);
+    fact_fcn_(arg1_, res1_, iw_, w_, 0);
   }
 
   void SymbolicQr::linsol_solve(double* x, int nrhs, bool tr) {
@@ -197,13 +197,13 @@ namespace casadi {
       copy_n(x, neq, w_); // Copy x to a temporary
       arg1_[2] = w_;
       res1_[0] = x;
-      solv(0, arg1_, res1_, iw_, w_+neq);
+      solv(arg1_, res1_, iw_, w_+neq, 0);
       x += neq;
     }
   }
 
-  void SymbolicQr::linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                 int* iw, SXElem* w, bool tr, int nrhs) {
+  void SymbolicQr::linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                                 bool tr, int nrhs) {
     casadi_assert(arg[0]!=0);
     casadi_assert(arg[1]!=0);
     casadi_assert(res[0]!=0);

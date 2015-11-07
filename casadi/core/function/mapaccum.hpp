@@ -74,25 +74,24 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T, typename R>
-    void evalGen(void* mem, const T** arg, T** res, int* iw, T* w, R reduction);
+    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem, R reduction);
 
     /** \brief Binary or, helper function */
     static inline bvec_t orop(bvec_t x, bvec_t y) { return x | y; }
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}
 
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                int* iw, SXElem* w);
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Evaluate symbolically, MX type */
     //virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
-    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return fwd; }

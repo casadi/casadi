@@ -95,14 +95,13 @@ class CASADI_EXPORT SXFunction :
   virtual ~SXFunction();
 
   /** \brief  Evaluate numerically, work vectors given */
-  virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+  virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
   /** \brief Quickfix to avoid segfault, #1552 */
   virtual bool canEvalSX() const {return true;}
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
-                      int* iw, SXElem* w);
+  virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
   /** \brief Calculate forward mode directional derivatives */
   virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,
@@ -222,10 +221,10 @@ class CASADI_EXPORT SXFunction :
   virtual void generateBody(CodeGenerator& g) const;
 
   /** \brief  Propagate sparsity forward */
-  virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+  virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
   /** \brief  Propagate sparsity backwards */
-  virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+  virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
   /// Is the class able to propagate seeds through the algorithm?
   virtual bool spCanEvaluate(bool fwd) { return true;}

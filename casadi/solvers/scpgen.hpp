@@ -64,7 +64,7 @@ namespace casadi {
     { return new Scpgen(name, nlp);}
 
     virtual void init();
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     // Calculate the L1-norm of the primal infeasibility
     double primalInfeasibility();

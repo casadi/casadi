@@ -538,18 +538,18 @@ namespace casadi {
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
-    void operator()(void* mem, const double** arg, double** res, int* iw, double* w);
+    void operator()(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
      */
-    void operator()(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w);
+    void operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Propagate sparsity forward */
-    void operator()(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity backward */
-    void rev(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
 #endif // SWIG
 
@@ -1183,7 +1183,7 @@ namespace casadi {
 
 #ifndef SWIG
     /// Factorize the matrix
-    void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
+    void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Solve the factorized system of equations
     void linsol_solve(double* x, int nrhs=1, bool tr=false);

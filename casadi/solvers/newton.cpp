@@ -93,7 +93,7 @@ namespace casadi {
     alloc_w(jac_.nnz_out(0), true); // J
   }
 
-  void Newton::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void Newton::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // IO buffers
     const double** arg1 = arg + n_in();
     double** res1 = res + n_out();
@@ -131,7 +131,7 @@ namespace casadi {
       res1[0] = jac;
       copy_n(res, n_out(), res1+1);
       res1[1+iout_] = f;
-      jac_(0, arg1, res1, iw, w);
+      jac_(arg1, res1, iw, w, 0);
 
       // Check convergence
       double abstol = 0;
@@ -149,7 +149,7 @@ namespace casadi {
       fill_n(arg1, static_cast<int>(LINSOL_NUM_IN), nullptr);
       fill_n(res1, static_cast<int>(LINSOL_NUM_OUT), nullptr);
       arg1[LINSOL_A] = jac;
-      linsol_.linsol_prepare(0, arg1, res1, iw, w);
+      linsol_.linsol_prepare(arg1, res1, iw, w, 0);
       linsol_.linsol_solve(f, 1, false);
 
       // Check convergence again

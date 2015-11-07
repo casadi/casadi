@@ -405,8 +405,7 @@ namespace casadi {
 
   }
 
-  void IpoptInterface::evalD(void* mem, const double** arg, double** res,
-                             int* iw, double* w) {
+  void IpoptInterface::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
 
     // Pass the inputs to the function
     for (int i=0; i<n_in(); ++i) {

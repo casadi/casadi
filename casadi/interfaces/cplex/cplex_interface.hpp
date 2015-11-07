@@ -75,7 +75,7 @@ namespace casadi {
     virtual void init();
 
     // Solve the QP
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     // OPTIONS
     /** Which algorithm to use

@@ -65,7 +65,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief  Integrate */
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     // Ivpsol instance
     Function integrator_;

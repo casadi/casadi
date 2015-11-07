@@ -112,7 +112,7 @@ namespace casadi {
     pi_.resize(nc_);
   }
 
-  void OoqpInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void OoqpInterface::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Pass the inputs to the function
     for (int i=0; i<n_in(); ++i) {
       if (arg[i] != 0) {

@@ -58,7 +58,7 @@ namespace casadi {
     }
 
     virtual void init();
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     // KNITRO callback functions
     void evalfc(const double* x, double& obj, double *c);

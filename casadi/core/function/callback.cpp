@@ -60,7 +60,7 @@ namespace casadi {
     return std::vector<DMatrix>();
   }
 
-  void Callback::eval(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void Callback::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Allocate input matrices
     int num_in = n_in();
     std::vector<DMatrix> argv(num_in);

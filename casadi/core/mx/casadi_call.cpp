@@ -83,9 +83,8 @@ namespace casadi {
     return ss.str();
   }
 
-  void Call::evalD(void* mem, const double** arg, double** res,
-                           int* iw, double* w) {
-    fcn_->eval(mem, arg, res, iw, w);
+  void Call::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+    fcn_->eval(arg, res, iw, w, mem);
   }
 
   int Call::nout() const {
@@ -96,8 +95,8 @@ namespace casadi {
     return fcn_.output(oind).sparsity();
   }
 
-  void Call::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
-    fcn_->evalSX(mem, arg, res, iw, w);
+  void Call::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    fcn_->evalSX(arg, res, iw, w, mem);
   }
 
   void Call::evalMX(const vector<MX>& arg, vector<MX>& res) {
@@ -136,12 +135,12 @@ namespace casadi {
     }
   }
 
-  void Call::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    fcn_(mem, arg, res, iw, w);
+  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    fcn_.rev(mem, arg, res, iw, w);
+  void Call::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    fcn_.rev(arg, res, iw, w, mem);
   }
 
   void Call::addDependency(CodeGenerator& g) const {

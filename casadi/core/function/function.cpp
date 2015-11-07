@@ -357,7 +357,7 @@ namespace casadi {
     vector<double> buf_w(sz_w());
 
     // Evaluate memoryless
-    (*this)(0, getPtr(arg), getPtr(res), getPtr(buf_iw), getPtr(buf_w));
+    (*this)(getPtr(arg), getPtr(res), getPtr(buf_iw), getPtr(buf_w), 0);
   }
 
   Function Function::mapaccum(const string& name, int N, const Dict& opts) const {
@@ -547,8 +547,8 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
-    (*this)->eval(0, getPtr(arg), getPtr(res),
-                  getPtr((*this)->iw_tmp_), getPtr((*this)->w_tmp_));
+    (*this)->eval(getPtr(arg), getPtr(res),
+                  getPtr((*this)->iw_tmp_), getPtr((*this)->w_tmp_), 0);
   }
 
   int Function::n_in() const {
@@ -777,12 +777,12 @@ namespace casadi {
     return MemBlock(f);
   }
 
-  void Function::operator()(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    (*this)->spFwdSwitch(mem, arg, res, iw, w);
+  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    (*this)->spFwdSwitch(arg, res, iw, w, mem);
   }
 
-  void Function::rev(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    (*this)->spAdjSwitch(mem, arg, res, iw, w);
+  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    (*this)->spAdjSwitch(arg, res, iw, w, mem);
   }
 
   bool Function::spCanEvaluate(bool fwd) {
@@ -1319,12 +1319,12 @@ namespace casadi {
     return (*this)->default_in(ind);
   }
 
-  void Function::operator()(void* mem, const double** arg, double** res, int* iw, double* w) {
-    (*this)->eval(mem, arg, res, iw, w);
+  void Function::operator()(const double** arg, double** res, int* iw, double* w, void* mem) {
+    (*this)->eval(arg, res, iw, w, mem);
   }
 
-  void Function::operator()(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
-    (*this)->evalSX(mem, arg, res, iw, w);
+  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    (*this)->evalSX(arg, res, iw, w, mem);
   }
 
   const SX Function::sx_in(int ind) const {
@@ -1802,9 +1802,8 @@ namespace casadi {
     return ret;
   }
 
-  void Function::linsol_prepare(void* mem, const double** arg, double** res,
-                                int* iw, double* w) {
-    (*this)->linsol_prepare(mem, arg, res, iw, w);
+  void Function::linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
+    (*this)->linsol_prepare(arg, res, iw, w, mem);
   }
 
   void Function::linsol_solve(double* x, int nrhs, bool tr) {

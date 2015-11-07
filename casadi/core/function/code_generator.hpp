@@ -85,9 +85,9 @@ namespace casadi {
     static bool simplifiedCall(const Function& f);
 
     /** \brief Generate a call to a function (generic signature) */
-    std::string operator()(const Function& f, const std::string& mem,
-                           const std::string& arg, const std::string& res,
-                           const std::string& iw, const std::string& w) const;
+    std::string operator()(const Function& f, const std::string& arg,
+                           const std::string& res, const std::string& iw,
+                           const std::string& w, const std::string& mem) const;
 
     /** \brief Generate a call to a function (simplified signature) */
     std::string operator()(const Function& f, const std::string& arg, const std::string& res) const;

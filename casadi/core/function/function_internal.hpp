@@ -58,7 +58,7 @@ namespace casadi {
   typedef int (*work_t)(void* mem, int *sz_arg, int* sz_res, int *sz_iw, int *sz_w);
   typedef int (*sparsity_t)(void* mem, int i, int *n_row, int *n_col,
                             const int **colind, const int **row);
-  typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
@@ -110,17 +110,16 @@ namespace casadi {
     virtual void spInit(bool fwd) {}
 
     /** \brief  Evaluate numerically, possibly using just-in-time compilation */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w);
+    void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief  Evaluate numerically */
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return false;}
 
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
-                        int* iw, SXElem* w);
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
@@ -338,9 +337,9 @@ namespace casadi {
     virtual bool simplifiedCall() const { return false;}
 
     /** \brief Generate a call to a function (generic signature) */
-    virtual std::string generic_call(const CodeGenerator& g, const std::string& mem,
-                                     const std::string& arg, const std::string& res,
-                                     const std::string& iw, const std::string& w) const;
+    virtual std::string generic_call(const CodeGenerator& g, const std::string& arg,
+                                     const std::string& res, const std::string& iw,
+                                     const std::string& w, const std::string& mem) const;
 
     /** \brief Generate a call to a function (simplified signature) */
     virtual std::string simple_call(const CodeGenerator& g,
@@ -601,16 +600,16 @@ namespace casadi {
     /// For documentation, see the MXNode class
     ///@{
     /** \brief  Propagate sparsity forward */
-    virtual void spFwdSwitch(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwdSwitch(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdjSwitch(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdjSwitch(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
@@ -756,7 +755,7 @@ namespace casadi {
 
     ///@{
     /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
     virtual void linsol_solve(bool tr);
     virtual void linsol_solve(double* x, int nrhs, bool tr);
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
@@ -765,18 +764,18 @@ namespace casadi {
     virtual void linsol_solveL(double* x, int nrhs, bool tr);
     virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
     virtual DMatrix linsol_cholesky(bool tr) const;
-    virtual void linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
-                               int* iw, SXElem* w, bool tr, int nrhs);
+    virtual void linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                               bool tr, int nrhs);
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                                 const std::vector<std::vector<MX> >& fseed,
                                 std::vector<std::vector<MX> >& fsens, bool tr);
     virtual void linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                                 const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens, bool tr);
-    virtual void linsol_spFwd(void* mem, const bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, bool tr, int nrhs);
-    virtual void linsol_spAdj(void* mem, bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, bool tr, int nrhs);
+    virtual void linsol_spFwd(const bvec_t** arg, bvec_t** res,
+                              int* iw, bvec_t* w, void* mem, bool tr, int nrhs);
+    virtual void linsol_spAdj(bvec_t** arg, bvec_t** res,
+                              int* iw, bvec_t* w, void* mem, bool tr, int nrhs);
     ///@}
 
   protected:

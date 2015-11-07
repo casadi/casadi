@@ -36,24 +36,24 @@ namespace casadi {
     setSparsity(sp);
   }
 
-  void Reshape::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(mem, arg, res, iw, w);
+  void Reshape::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Reshape::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
-    evalGen<SXElem>(mem, arg, res, iw, w);
+  void Reshape::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void Reshape::evalGen(void* mem, const T** arg, T** res, int* iw, T* w) {
+  void Reshape::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void Reshape::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Reshape::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void Reshape::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Reshape::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     copyAdj(arg[0], res[0], nnz());
   }
 

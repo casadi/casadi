@@ -61,13 +61,13 @@ namespace casadi {
     }
   }
 
-  void Monitor::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+  void Monitor::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Monitor::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void Monitor::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Print comment
     userOut() << comment_ << ":" << endl;
     userOut() << "[";
@@ -84,13 +84,13 @@ namespace casadi {
     }
   }
 
-  void Monitor::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Monitor::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Monitor::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Monitor::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();

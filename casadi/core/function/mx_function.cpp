@@ -358,8 +358,7 @@ namespace casadi {
     log("MXFunction::init end");
   }
 
-  void MXFunction::evalD(void* mem, const double** arg,
-                         double** res, int* iw, double* w) {
+  void MXFunction::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     casadi_msg("MXFunction::evalD():begin "  << name_);
     // Set up timers for profiling
     double time_zero=0;
@@ -418,7 +417,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalD(0, arg1, res1, iw, w);
+        it->data->evalD(arg1, res1, iw, w, 0);
       }
 
       // Write out profiling information
@@ -519,7 +518,7 @@ namespace casadi {
     fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
-  void MXFunction::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -553,12 +552,12 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity forwards
-        it->data->spFwd(mem, arg1, res1, iw, w);
+        it->data->spFwd(arg1, res1, iw, w, mem);
       }
     }
   }
 
-  void MXFunction::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MXFunction::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -594,7 +593,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->spAdj(mem, arg1, res1, iw, w);
+        it->data->spAdj(arg1, res1, iw, w, mem);
       }
     }
   }
@@ -996,8 +995,7 @@ namespace casadi {
     log("MXFunction::evalAdj end");
   }
 
-  void MXFunction::evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                  int* iw, SXElem* w) {
+  void MXFunction::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElem*> argp(sz_arg());
     vector<SXElem*> resp(sz_res());
@@ -1032,7 +1030,7 @@ namespace casadi {
           resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalSX(0, getPtr(argp), getPtr(resp), iw, w);
+        it->data->evalSX(getPtr(argp), getPtr(resp), iw, w, 0);
       }
     }
   }

@@ -232,7 +232,7 @@ namespace casadi {
     alloc_w(Asp_.nnz(), true); // Jk_
   }
 
-  void Sqpmethod::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void Sqpmethod::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Get input pointers
     x0_ = arg[NLPSOL_X0];
     p_ = arg[NLPSOL_P];
@@ -644,7 +644,7 @@ namespace casadi {
         arg1_[BFGS_GLAG_OLD] = gLag_old_;
         fill_n(res1_, bfgs_.n_out(), nullptr);
         res1_[0] = Bk_;
-        bfgs_(0, arg1_, res1_, iw_, w_);
+        bfgs_(arg1_, res1_, iw_, w_, 0);
 
       } else {
         // Exact Hessian
@@ -810,7 +810,7 @@ namespace casadi {
       res1_[0] = H;
 
       // Evaluate
-      hessLag(0, arg1_, res1_, iw_, w_);
+      hessLag(arg1_, res1_, iw_, w_, 0);
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
@@ -819,7 +819,7 @@ namespace casadi {
           regularize(H, reg_);
         }
       }
-      
+
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
       throw;
@@ -843,7 +843,7 @@ namespace casadi {
       res1_[NL_G] = g;
 
       // Evaluate the function
-      nlp_(0, arg1_, res1_, iw_, w_);
+      nlp_(arg1_, res1_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -875,7 +875,7 @@ namespace casadi {
       res1_[1+NL_G] = g;
 
       // Evaluate the function
-      jacG_(0, arg1_, res1_, iw_, w_);
+      jacG_(arg1_, res1_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -905,7 +905,7 @@ namespace casadi {
       res1_[1+NL_X] = f;
 
       // Evaluate the function
-      gradF_(0, arg1_, res1_, iw_, w_);
+      gradF_(arg1_, res1_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -933,7 +933,7 @@ namespace casadi {
       res1_[NL_F] = &f;
 
       // Evaluate the function
-      nlp_(0, arg1_, res1_, iw_, w_);
+      nlp_(arg1_, res1_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -967,7 +967,7 @@ namespace casadi {
     res1_[QPSOL_LAM_A] = lambda_A_opt;
 
     // Solve the QP
-    qpsol_(0, arg1_, res1_, iw_, w_);
+    qpsol_(arg1_, res1_, iw_, w_, 0);
   }
 
   double Sqpmethod::primalInfeasibility(const double* x, const double* lbx, const double* ubx,

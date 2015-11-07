@@ -89,9 +89,9 @@ namespace casadi {
     FunctionInternal::finalize();
   }
 
-  void CallbackInternal::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void CallbackInternal::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
-    self_->eval(mem, arg, res, iw, w);
+    self_->eval(arg, res, iw, w, mem);
   }
 
   bool CallbackInternal::hasFullJacobian() const {

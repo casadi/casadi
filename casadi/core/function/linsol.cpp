@@ -90,7 +90,7 @@ namespace casadi {
   Linsol::~Linsol() {
   }
 
-  void Linsol::linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void Linsol::linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
     a_ = arg[LINSOL_A];
     b_ = arg[LINSOL_B];
     x_ = res[LINSOL_X];
@@ -111,9 +111,9 @@ namespace casadi {
     }
   }
 
-  void Linsol::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void Linsol::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Call the solve routine
-    linsol_prepare(mem, arg, res, iw, w);
+    linsol_prepare(arg, res, iw, w, mem);
 
     // Solve the factorized system
     linsol_solve(false);
@@ -210,8 +210,8 @@ namespace casadi {
   }
 
   void Linsol::
-  linsol_spFwd(void* mem, const bvec_t** arg, bvec_t** res,
-               int* iw, bvec_t* w, bool tr, int nrhs) {
+  linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+               bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -247,8 +247,8 @@ namespace casadi {
   }
 
   void Linsol::
-  linsol_spAdj(void* mem, bvec_t** arg, bvec_t** res,
-               int* iw, bvec_t* w, bool tr, int nrhs) {
+  linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+               bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = input(LINSOL_A).sparsity();
     const int* A_colind = A_sp.colind();
@@ -357,8 +357,8 @@ namespace casadi {
     }
   }
 
-  void Linsol::linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                           int* iw, SXElem* w, bool tr, int nrhs) {
+  void Linsol::linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                             bool tr, int nrhs) {
     casadi_error("Linsol::evalSXLinsol not defined for class "
                  << typeid(*this).name());
   }

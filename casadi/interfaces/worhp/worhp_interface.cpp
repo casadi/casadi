@@ -427,7 +427,7 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void WorhpInterface::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     log("WorhpInterface::evaluate");
 
     // Pass the inputs to the function

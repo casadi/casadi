@@ -61,7 +61,7 @@ namespace casadi {
     alloc(integrator_);
   }
 
-  void SimulatorInternal::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void SimulatorInternal::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Arguments when calling the integrator
     double** res1 = res+n_out();
     copy_n(res, n_out(), res1);

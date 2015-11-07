@@ -65,7 +65,7 @@ namespace casadi {
     virtual void init();
 
     // Solve the NLP
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Read options from snopt parameter xml
     virtual void setOptionsFromFile(const std::string & file);

@@ -402,7 +402,7 @@ namespace casadi {
     res1_[DAE_ODE] = NV_DATA_S(rr);
     res1_[DAE_ALG] = NV_DATA_S(rr)+nx_;
     res1_[DAE_QUAD] = 0;
-    f_(0, arg1_, res1_, iw_, w_);
+    f_(arg1_, res1_, iw_, w_, 0);
 
     // Subtract state derivative to get residual
     casadi_axpy(nx_, -1., NV_DATA_S(xzdot), 1, NV_DATA_S(rr), 1);
@@ -471,7 +471,7 @@ namespace casadi {
     res1_[DAE_NUM_OUT + DAE_ODE] = NV_DATA_S(Jv);
     res1_[DAE_NUM_OUT + DAE_ALG] = NV_DATA_S(Jv) + nx_;
     res1_[DAE_NUM_OUT + DAE_QUAD] = 0;
-    f_fwd_(0, arg1_, res1_, iw_, w_);
+    f_fwd_(arg1_, res1_, iw_, w_, 0);
 
     // Subtract state derivative to get residual
     casadi_axpy(nx_, -cj, NV_DATA_S(v), 1, NV_DATA_S(Jv), 1);
@@ -543,7 +543,7 @@ namespace casadi {
     res1_[RDAE_NUM_OUT + RDAE_ODE] = NV_DATA_S(JvB);
     res1_[RDAE_NUM_OUT + RDAE_ALG] = NV_DATA_S(JvB) + nrx_;
     res1_[RDAE_NUM_OUT + RDAE_QUAD] = 0;
-    g_fwd_(0, arg1_, res1_, iw_, w_);
+    g_fwd_(arg1_, res1_, iw_, w_, 0);
 
     // Subtract state derivative to get residual
     casadi_axpy(nrx_, cjB, NV_DATA_S(vB), 1, NV_DATA_S(JvB), 1);
@@ -953,7 +953,7 @@ namespace casadi {
     res1_[DAE_ODE] = 0;
     res1_[DAE_ALG] = 0;
     res1_[DAE_QUAD] = NV_DATA_S(rhsQ);
-    f_(0, arg1_, res1_, iw_, w_);
+    f_(arg1_, res1_, iw_, w_, 0);
 
     log("IdasInterface::rhsQ", "end");
   }
@@ -1008,7 +1008,7 @@ namespace casadi {
     res1_[RDAE_ODE] = NV_DATA_S(rr);
     res1_[RDAE_ALG] = NV_DATA_S(rr) + nrx_;
     res1_[RDAE_QUAD] = 0;
-    g_(0, arg1_, res1_, iw_, w_);
+    g_(arg1_, res1_, iw_, w_, 0);
 
     // Subtract state derivative to get residual
     casadi_axpy(nrx_, 1., NV_DATA_S(rxzdot), 1, NV_DATA_S(rr), 1);
@@ -1057,7 +1057,7 @@ namespace casadi {
     res1_[RDAE_ODE] = 0;
     res1_[RDAE_ALG] = 0;
     res1_[RDAE_QUAD] = NV_DATA_S(qdotA);
-    g_(0, arg1_, res1_, iw_, w_);
+    g_(arg1_, res1_, iw_, w_, 0);
 
     // Debug output
     if (monitored("rhsQB")) {
@@ -1098,7 +1098,7 @@ namespace casadi {
     arg1_[DAE_NUM_IN] = &cj;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
-    jac_(0, arg1_, res1_, iw_, w_);
+    jac_(arg1_, res1_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
@@ -1157,7 +1157,7 @@ namespace casadi {
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
-    jacB_(0, arg1_, res1_, iw_, w_);
+    jacB_(arg1_, res1_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jacB_.sparsity_out(0).colind();
@@ -1213,7 +1213,7 @@ namespace casadi {
     arg1_[DAE_NUM_IN] = &cj;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
-    jac_(0, arg1_, res1_, iw_, w_);
+    jac_(arg1_, res1_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
@@ -1274,7 +1274,7 @@ namespace casadi {
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
-    jacB_(0, arg1_, res1_, iw_, w_);
+    jacB_(arg1_, res1_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jacB_.sparsity_out(0).colind();
@@ -1463,7 +1463,7 @@ namespace casadi {
     arg1_[DAE_NUM_IN] = &cj;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
-    jac_(0, arg1_, res1_, iw_, w_);
+    jac_(arg1_, res1_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
@@ -1479,7 +1479,7 @@ namespace casadi {
     fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     arg1_[LINSOL_A] = val;
-    linsol_.linsol_prepare(0, arg1_, res1_, iw_, w_);
+    linsol_.linsol_prepare(arg1_, res1_, iw_, w_, 0);
 
     // Log time duration
     time1 = clock();
@@ -1509,7 +1509,7 @@ namespace casadi {
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
-    jacB_(0, arg1_, res1_, iw_, w_);
+    jacB_(arg1_, res1_, iw_, w_, 0);
     double *val = res1_[0];
 
     // Log time duration
@@ -1520,7 +1520,7 @@ namespace casadi {
     fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     arg1_[LINSOL_A] = val;
-    linsolB_.linsol_prepare(0, arg1_, res1_, iw_, w_);
+    linsolB_.linsol_prepare(arg1_, res1_, iw_, w_, 0);
 
     // Log time duration
     time1 = clock();

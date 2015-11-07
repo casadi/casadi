@@ -60,15 +60,13 @@ namespace casadi {
     }
   }
 
-  void Assertion::evalSX(void* mem, const SXElem** arg, SXElem** res,
-                             int* iw, SXElem* w) {
+  void Assertion::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Assertion::evalD(void* mem, const double** arg, double** res,
-                        int* iw, double* w) {
+  void Assertion::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (arg[1][0]!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }
@@ -78,15 +76,13 @@ namespace casadi {
     }
   }
 
-  void Assertion::spFwd(void* mem, const bvec_t** arg,
-                        bvec_t** res, int* iw, bvec_t* w) {
+  void Assertion::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Assertion::spAdj(void* mem, bvec_t** arg,
-                        bvec_t** res, int* iw, bvec_t* w) {
+  void Assertion::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();

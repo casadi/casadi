@@ -51,20 +51,20 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void Solve<Tr>::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     const double** arg1 = arg + ndep();
     double** res1 = res + nout();
     arg1[LINSOL_A] = arg[1];
     arg1[LINSOL_B] = 0;
     res1[LINSOL_X] = 0;
-    linsol_.linsol_prepare(0, arg1, res1, iw, w);
+    linsol_.linsol_prepare(arg1, res1, iw, w, 0);
     linsol_.linsol_solve(res[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
-    linsol_->linsol_evalSX(mem, arg, res, iw, w, Tr, dep(0).size2());
+  void Solve<Tr>::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    linsol_->linsol_evalSX(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>
@@ -103,13 +103,13 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    linsol_->linsol_spFwd(mem, arg, res, iw, w, Tr, dep(0).size2());
+  void Solve<Tr>::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    linsol_->linsol_spFwd(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    linsol_->linsol_spAdj(mem, arg, res, iw, w, Tr, dep(0).size2());
+  void Solve<Tr>::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    linsol_->linsol_spAdj(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>

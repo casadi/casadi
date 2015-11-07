@@ -46,16 +46,16 @@ namespace casadi {
   }
 
   template<typename T>
-  void Project::evalGen(void* mem, const T** arg, T** res, int* iw, T* w) {
+  void Project::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     casadi_project(arg[0], dep().sparsity(), res[0], sparsity(), w);
   }
 
-  void Project::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(mem, arg, res, iw, w);
+  void Project::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Project::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
-    evalGen<SXElem>(mem, arg, res, iw, w);
+  void Project::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   void Project::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -78,11 +78,11 @@ namespace casadi {
     }
   }
 
-  void Project::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Project::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     sparsity().set(res[0], arg[0], dep().sparsity());
   }
 
-  void Project::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Project::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
   }

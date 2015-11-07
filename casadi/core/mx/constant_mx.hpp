@@ -60,10 +60,10 @@ namespace casadi {
     static ConstantMX* create(const Matrix<double>& val);
 
     /// Evaluate the function numerically
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w) = 0;
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem) = 0;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) = 0;
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) = 0;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -77,10 +77,10 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief Get the operation */
     virtual int op() const { return OP_CONST;}
@@ -117,12 +117,12 @@ namespace casadi {
     }
 
     /** \brief  Evaluate the function numerically */
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
       std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
       std::copy(x_->begin(), x_->end(), res[0]);
     }
 
@@ -174,10 +174,10 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w) {}
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem) {}
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {}
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {}
 
     /** \brief Generate code for the operation */
     virtual void generate(CodeGenerator& g, const std::string& mem,
@@ -268,10 +268,10 @@ namespace casadi {
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w);
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief Generate code for the operation */
     virtual void generate(CodeGenerator& g, const std::string& mem,
@@ -458,13 +458,12 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void Constant<Value>::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     std::fill(res[0], res[0]+nnz(), static_cast<double>(v_.value));
   }
 
   template<typename Value>
-  void Constant<Value>::evalSX(void* mem, const SXElem** arg, SXElem** res,
-                               int* iw, SXElem* w) {
+  void Constant<Value>::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     std::fill(res[0], res[0]+nnz(), SXElem(v_.value));
   }
 

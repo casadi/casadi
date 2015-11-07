@@ -88,7 +88,7 @@ namespace casadi {
     alloc_w(solver_.nnz_in(NLPSOL_P), true);
   }
 
-  void QpToNlp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void QpToNlp::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Inputs
     const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_, *lam_x0_;
     // Outputs
@@ -160,7 +160,7 @@ namespace casadi {
     res1[NLPSOL_LAM_G] = lam_a_;
 
     // Solve the NLP
-    solver_(0, arg1, res1, iw, w);
+    solver_(arg1, res1, iw, w, 0);
 
     // Pass the stats
     stats_["nlpsol_stats"] = solver_.getStats();

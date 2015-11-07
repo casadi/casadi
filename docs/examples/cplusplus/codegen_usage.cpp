@@ -128,7 +128,7 @@ int usage_c(){
   printf("sz_arg = %d, sz_res = %d, sz_iw = %d, sz_w = %d\n", sz_arg, sz_res, sz_iw, sz_w);
 
   /* Function for numerical evaluation */
-  typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
   eval_t eval = (eval_t)dlsym(handle, "f");
   if(dlerror()){
     printf("Failed to retrieve \"f\" function.\n");
@@ -161,7 +161,7 @@ int usage_c(){
   arg[1] = &y_val;
   res[0] = &res0;
   res[1] = res1;
-  if (eval(mem, arg, res, iw, w)) return 1;
+  if (eval(arg, res, iw, w, mem)) return 1;
 
   /* Print result of evaluation */
   printf("result (0): %g\n",res0);

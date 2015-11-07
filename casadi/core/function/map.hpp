@@ -100,20 +100,19 @@ namespace casadi {
 
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
-    void evalGen(void* mem, const T** arg, T** res, int* iw, T* w);
+    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem);
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
-                        int* iw, SXElem* w);
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return true; }
@@ -157,7 +156,7 @@ namespace casadi {
     virtual ~MapOmp();
 
     /// Evaluate the function numerically
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -194,25 +193,24 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T, typename R>
-      void evalGen(void* mem, const T** arg, T** res, int* iw, T* w,
-                   void (FunctionInternal::*ptrEval)(void* mem, const T** arg, T** res,
-                                                     int* iw, T* w),
+      void evalGen(const T** arg, T** res, int* iw, T* w, void* mem,
+                   void (FunctionInternal::*ptrEval)(const T** arg, T** res,
+                                                     int* iw, T* w, void* mem),
                    R reduction);
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}
 
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
-                                int* iw, SXElem* w);
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Evaluate symbolically, MX type */
     //virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
-    virtual void spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return fwd; }

@@ -63,10 +63,10 @@ namespace casadi {
     virtual void init();
 
     /// Solve the system of equations
-    virtual void evalD(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Prepare the factorization
-    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Solve the system of equations, using internal vector
     virtual void linsol_solve(bool tr);
@@ -78,16 +78,15 @@ namespace casadi {
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
 
     /// Evaluate SX, possibly transposed
-    virtual void linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
-                              int* iw, SXElem* w, bool tr, int nrhs);
+    virtual void linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                               bool tr, int nrhs);
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}
 
     /// Evaluate SX
-    virtual void evalSX(void* mem, const SXElem** arg, SXElem** res,
-                        int* iw, SXElem* w) {
-      linsol_evalSX(0, arg, res, iw, w, false, output(LINSOL_X).size2());
+    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+      linsol_evalSX(arg, res, iw, w, 0, false, output(LINSOL_X).size2());
     }
 
     /** \brief Calculate forward mode directional derivatives */
@@ -101,12 +100,12 @@ namespace casadi {
                                 std::vector<std::vector<MX> >& asens, bool tr);
 
     /** \brief  Propagate sparsity forward */
-    virtual void linsol_spFwd(void* mem, const bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, bool tr, int nrhs);
+    virtual void linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+                              bool tr, int nrhs);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void linsol_spAdj(void* mem, bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, bool tr, int nrhs);
+    virtual void linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+                              bool tr, int nrhs);
 
     ///@{
     /// Propagate sparsity through a linear solve

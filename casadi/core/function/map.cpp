@@ -123,7 +123,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void MapSerial::evalGen(void* mem, const T** arg, T** res, int* iw, T* w) {
+  void MapSerial::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     int n_in = n_in_, n_out = n_out_;
     const T** arg1 = arg+this->n_in();
     T** res1 = res+this->n_out();
@@ -134,23 +134,23 @@ namespace casadi {
       for (int j=0; j<n_out; ++j) {
         res1[j]= res[j] ? res[j]+i*f_.output(j).nnz(): 0;
       }
-      f_(0, arg1, res1, iw, w);
+      f_(arg1, res1, iw, w, 0);
     }
   }
 
-  void MapSerial::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
-    evalGen(mem, arg, res, iw, w);
+  void MapSerial::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen(arg, res, iw, w, mem);
   }
 
-  void MapSerial::evalSX(void* mem, const SXElem** arg, SXElem** res, int* iw, SXElem* w) {
-    evalGen(mem, arg, res, iw, w);
+  void MapSerial::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen(arg, res, iw, w, mem);
   }
 
-  void MapSerial::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    evalGen(mem, arg, res, iw, w);
+  void MapSerial::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    evalGen(arg, res, iw, w, mem);
   }
 
-  void MapSerial::spAdj(void* mem, bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void MapSerial::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     int n_in = n_in_, n_out = n_out_;
     bvec_t** arg1 = arg+this->n_in();
     bvec_t** res1 = res+this->n_out();
@@ -161,7 +161,7 @@ namespace casadi {
       for (int j=0; j<n_out; ++j) {
         res1[j]= res[j] ? res[j]+i*f_.output(j).nnz(): 0;
       }
-      f_->spAdj(0, arg1, res1, iw, w);
+      f_->spAdj(arg1, res1, iw, w, 0);
     }
   }
 
@@ -184,7 +184,7 @@ namespace casadi {
       g.body << "    res1[" << j << "] = res[" << j << "]? " <<
         "res[" << j << "]+i*" << f_.output(j).nnz() << " : 0;" << endl;
     }
-    g.body << "    " << g(f_, "0", "arg1", "res1", "iw", "w") << ";" << endl;
+    g.body << "    if (" << g(f_, "arg1", "res1", "iw", "w", "0") << ") return 1;" << endl;
     g.body << "  }" << std::endl;
   }
 
@@ -327,9 +327,9 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-  void MapReduce::evalGen(void* mem, const T** arg, T** res, int* iw, T* w,
-                          void (FunctionInternal::*eval)(void* mem, const T** arg, T** res,
-                                                         int* iw, T* w),
+  void MapReduce::evalGen(const T** arg, T** res, int* iw, T* w, void* mem,
+                          void (FunctionInternal::*eval)(const T** arg, T** res,
+                                                         int* iw, T* w, void* mem),
                           R reduction) {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -368,7 +368,7 @@ namespace casadi {
 
       // Evaluate the function
       FunctionInternal *f = f_.operator->();
-      (f->*eval)(0, arg1, res1, iw, w);
+      (f->*eval)(arg1, res1, iw, w, 0);
 
       // Sum results from temporary storage to accumulator
       for (int k=0;k<num_out;++k) {
@@ -378,10 +378,9 @@ namespace casadi {
     }
   }
 
-  void MapReduce::evalD(void* mem, const double** arg, double** res,
-                          int* iw, double* w) {
+  void MapReduce::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
-      evalGen<double>(0, arg, res, iw, w, &FunctionInternal::eval, std::plus<double>());
+      evalGen<double>(arg, res, iw, w, 0, &FunctionInternal::eval, std::plus<double>());
     } else {
 #ifndef WITH_OPENMP
       casadi_error("the \"impossible\" happened: " <<
@@ -408,18 +407,17 @@ namespace casadi {
     }
   }
 
-  void MapReduce::evalSX(void* mem, const SXElem** arg, SXElem** res,
-                         int* iw, SXElem* w) {
-    evalGen<SXElem>(mem, arg, res, iw, w, &FunctionInternal::evalSX, std::plus<SXElem>());
+  void MapReduce::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem, &FunctionInternal::evalSX, std::plus<SXElem>());
   }
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void MapReduce::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    evalGen<bvec_t>(mem, arg, res, iw, w, &FunctionInternal::spFwd, &Orring);
+  void MapReduce::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    evalGen<bvec_t>(arg, res, iw, w, mem, &FunctionInternal::spFwd, &Orring);
   }
 
-  /**void Map::spFwd(void* mem, const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  /**void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
      evalGen<SXElem>(arg, res, iw, w);
      }*/
 
@@ -550,7 +548,7 @@ namespace casadi {
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
 
     g.body << "    real_t* temp_res = w+"  << f_.sz_w() <<  ";" << endl
-           << "    if (temp_res!=0)" << g.fill_n("temp_res", nnz_out_, "0") << endl;
+           << "    if (temp_res!=0) " << g.fill_n("temp_res", nnz_out_, "0") << endl;
 
     for (int j=0; j<num_in; ++j) {
       g.body << "    arg1[" << j << "] = (arg[" << j << "]==0)? " <<
@@ -566,7 +564,7 @@ namespace casadi {
       }
     }
 
-    g.body << "    " << g(f_, "0", "arg1", "res1", "iw", "w") << ";" << endl;
+    g.body << "    " << g(f_, "arg1", "res1", "iw", "w", "0") << ";" << endl;
 
     g.addAuxiliary(CodeGenerator::AUX_AXPY);
     // Sum results
@@ -597,7 +595,7 @@ namespace casadi {
   MapOmp::~MapOmp() {
   }
 
-  void MapOmp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void MapOmp::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for

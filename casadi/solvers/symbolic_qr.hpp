@@ -62,8 +62,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "symbolicqr";}
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name,
-                                         const Sparsity& sp, int nrhs) {
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
       return new SymbolicQr(name, sp, nrhs);
     }
 
@@ -71,10 +70,10 @@ namespace casadi {
     virtual void init();
 
     // Prepare the factorization
-    virtual void linsol_prepare(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
 
     // Solve the system of equations
-    virtual void linsol_solve(double* x, int nrhs, bool transpose);
+    virtual void linsol_solve(double* x, int nrhs, bool tr);
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -83,8 +82,8 @@ namespace casadi {
     virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Evaluate symbolically (SX) */
-    virtual void linsol_evalSX(void* mem, const SXElem** arg, SXElem** res,
-                               int* iw, SXElem* w, bool tr, int nrhs);
+    virtual void linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                               bool tr, int nrhs);
 
     // Factorization function
     Function fact_fcn_;

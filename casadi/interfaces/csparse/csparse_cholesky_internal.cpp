@@ -137,9 +137,9 @@ namespace casadi {
     return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInternal::linsol_prepare(void* mem, const double** arg, double** res,
-                                               int* iw, double* w) {
-    Linsol::linsol_prepare(mem, arg, res, iw, w);
+  void CSparseCholeskyInternal::
+  linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
+    Linsol::linsol_prepare(arg, res, iw, w, mem);
 
     // Get a reference to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();

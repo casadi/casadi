@@ -102,7 +102,7 @@ namespace casadi {
     alloc_w(n_, true);
   }
 
-  void ImplicitToNlp::evalD(void* mem, const double** arg, double** res, int* iw, double* w) {
+  void ImplicitToNlp::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Buffers for calling the NLP solver
     const double** arg1 = arg + n_in();
     double** res1 = res + n_out();
@@ -147,7 +147,7 @@ namespace casadi {
     res1[NLPSOL_X] = x;
 
     // Solve the NLP
-    solver_(0, arg1, res1, iw, w);
+    solver_(arg1, res1, iw, w, 0);
     stats_["solver_stats"] = solver_.getStats();
 
     // Get the implicit variable
@@ -170,7 +170,7 @@ namespace casadi {
       arg1[iin_] = x;
       copy_n(res, n_out(), res1);
       res1[iout_] = 0;
-      f_(0, arg1, res1, iw, w);
+      f_(arg1, res1, iw, w, 0);
     }
   }
 
