@@ -205,6 +205,15 @@ namespace casadi {
 
     std::vector<Var> v_;
 
+    // Names of the components
+    std::vector<std::string> name_x_;
+
+    // Components to print
+    std::vector<int> print_x_;
+
+    // QP sparsity
+    Sparsity spH_, spA_;
+
     // Current objective value
     double fk_;
 
@@ -231,17 +240,11 @@ namespace casadi {
     // Regularization
     double reg_;
 
-    // Names of the components
-    std::vector<std::string> name_x_;
-
-    // Components to print
-    std::vector<int> print_x_;
-
     // Message applying to a particular iteration
     std::string iteration_note_;
 
     // QP
-    DMatrix qpH_, qpA_;
+    double *qpH_, *qpA_;
     std::vector<double> qpB_;
 
     // Hessian times a step

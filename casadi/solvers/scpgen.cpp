@@ -183,34 +183,6 @@ namespace casadi {
       v_[i].n = v_[i].v.nnz();
     }
 
-    // Allocate memory, nonlfted problem
-    alloc_w(nx_, true); // xk_
-    alloc_w(ng_, true); // gk_
-    alloc_w(nx_, true); // xk_
-    alloc_w(ng_, true); // xg_
-    alloc_w(nx_, true); // dxk_
-    alloc_w(nx_, true); // lam_xk_
-    alloc_w(nx_, true); // dlam_xk_
-    alloc_w(ng_, true); // lam_gk_
-    alloc_w(ng_, true); // dlam_gk_
-    alloc_w(nx_, true); // gfk_
-    alloc_w(nx_, true); // gL_
-
-    // Allocate memory, lifted problem
-    lifted_mem_.resize(v_.size());
-    for (int i=0; i<v_.size(); ++i) {
-      int n = lifted_mem_[i].n = v_[i].n;
-      alloc_w(n, true); // dx
-      alloc_w(n, true); // x0
-      alloc_w(n, true); // x
-      alloc_w(n, true); // res
-      if (!gauss_newton_) {
-        alloc_w(n, true); // lam
-        alloc_w(n, true); // dlam
-        alloc_w(n, true); // resL
-      }
-    }
-
     // Legacy
     qpH_times_du_.resize(nx_);
 
@@ -231,7 +203,6 @@ namespace casadi {
       f = inner_prod(vdef_out[0], vdef_out[0])/2;
       gL_defL = vdef_out[0];
       ngn_ = gL_defL.nnz();
-      alloc_w(ngn_, true); // b_gn_
       work_.resize(ngn_);
     } else {
       // Scalar objective function
@@ -583,9 +554,9 @@ namespace casadi {
     alloc(exp_fcn_);
 
     // Allocate QP data
-    Sparsity sp_B_obj = mat_fcn_.output(mat_hes_).sparsity();
-    qpH_ = DMatrix::zeros(sp_B_obj.T().zz_mtimes(sp_B_obj));
-    qpA_ = mat_fcn_.output(mat_jac_);
+    Sparsity sp_B_obj = mat_fcn_.sparsity_out(mat_hes_);
+    spH_ = mul(sp_B_obj.T(), sp_B_obj);
+    spA_ = mat_fcn_.sparsity_out(mat_jac_);
     qpB_.resize(ng_);
 
     // QP solver options
@@ -595,9 +566,8 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    qpsol_ = Function::qpsol("qpsol", option("qpsol"),
-                                     {{"h", qpH_.sparsity()}, {"a", qpA_.sparsity()}},
-                                     qpsol_options);
+    qpsol_ = Function::qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
+                             qpsol_options);
     alloc(qpsol_);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
@@ -649,6 +619,39 @@ namespace casadi {
         << "\"reg_threshold\":" << reg_threshold_ << "}" << endl
         << endl;
     }
+
+    // Allocate memory, nonlfted problem
+    alloc_w(nx_, true); // xk_
+    alloc_w(ng_, true); // gk_
+    alloc_w(nx_, true); // xk_
+    alloc_w(ng_, true); // xg_
+    alloc_w(nx_, true); // dxk_
+    alloc_w(nx_, true); // lam_xk_
+    alloc_w(nx_, true); // dlam_xk_
+    alloc_w(ng_, true); // lam_gk_
+    alloc_w(ng_, true); // dlam_gk_
+    alloc_w(nx_, true); // gfk_
+    alloc_w(nx_, true); // gL_
+    if (gauss_newton_) {
+      alloc_w(ngn_, true); // b_gn_
+    }
+    alloc_w(spH_.nnz(), true); // qpH_
+    alloc_w(spA_.nnz(), true); // qpA_
+
+    // Allocate memory, lifted problem
+    lifted_mem_.resize(v_.size());
+    for (int i=0; i<v_.size(); ++i) {
+      int n = lifted_mem_[i].n = v_[i].n;
+      alloc_w(n, true); // dx
+      alloc_w(n, true); // x0
+      alloc_w(n, true); // x
+      alloc_w(n, true); // res
+      if (!gauss_newton_) {
+        alloc_w(n, true); // lam
+        alloc_w(n, true); // dlam
+        alloc_w(n, true); // resL
+      }
+    }
   }
 
   void Scpgen::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
@@ -668,6 +671,8 @@ namespace casadi {
     if (gauss_newton_) {
       b_gn_ = w; w += ngn_;
     }
+    qpH_ = w; w += spH_.nnz();
+    qpA_ = w; w += spA_.nnz();
 
     // Get work vectors, lifted problem
     for (VarMem& v : lifted_mem_) {
@@ -991,33 +996,32 @@ namespace casadi {
     mat_fcn_.evaluate();
 
     // Get the Jacobian
-    mat_fcn_.getOutput(qpA_, mat_jac_);
+    mat_fcn_.getOutputNZ(qpA_, mat_jac_);
 
     if (gauss_newton_) {
       // Gauss-Newton Hessian
       const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
-      fill(qpH_->begin(), qpH_->end(), 0);
+      casadi_fill(qpH_, spH_.nnz(), 0.);
       casadi_mul(B_obj.ptr(), B_obj.sparsity(), B_obj.ptr(), B_obj.sparsity(),
-                 qpH_.ptr(), qpH_.sparsity(), getPtr(work_), true);
+                 qpH_, spH_, getPtr(work_), true);
 
       // Gradient of the objective in Gauss-Newton
       casadi_fill(gfk_, nx_, 0.);
       casadi_mv(B_obj.ptr(), B_obj.sparsity(), b_gn_, gfk_, true);
     } else {
       // Exact Hessian
-      mat_fcn_.getOutput(qpH_, mat_hes_);
+      mat_fcn_.getOutputNZ(qpH_, mat_hes_);
     }
 
     // Calculate the gradient of the lagrangian
-    const vector<double> &qpA_data = qpA_.data();
-    const int* qpA_colind = qpA_.colind();
-    int qpA_ncol = qpA_.size2();
-    const int* qpA_row = qpA_.row();
+    const int* qpA_colind = spA_.colind();
+    int qpA_ncol = spA_.size2();
+    const int* qpA_row = spA_.row();
     for (int i=0; i<nx_; ++i)  gL_[i] = gfk_[i] + lam_xk_[i];
     for (int cc=0; cc<qpA_ncol; ++cc) {
       for (int el=qpA_colind[cc]; el<qpA_colind[cc+1]; ++el) {
         int rr = qpA_row[el];
-        gL_[cc] += qpA_data[el]*lam_gk_[rr];
+        gL_[cc] += qpA_[el]*lam_gk_[rr];
       }
     }
 
@@ -1117,16 +1121,16 @@ namespace casadi {
   }
 
   void Scpgen::regularize() {
-    casadi_assert(nx_==2);
+    casadi_assert(nx_==2 && spH_.is_dense());
 
     // Regularization
     reg_ = 0;
 
     // Check the smallest eigenvalue of the Hessian
-    double a = qpH_.elem(0, 0);
-    double b = qpH_.elem(0, 1);
-    double c = qpH_.elem(1, 0);
-    double d = qpH_.elem(1, 1);
+    double a = qpH_[0];
+    double b = qpH_[2];
+    double c = qpH_[1];
+    double d = qpH_[3];
 
     // Make sure no not a numbers
     casadi_assert(a==a && b==b && c==c &&  d==d);
@@ -1134,15 +1138,15 @@ namespace casadi {
     // Make sure symmetric
     if (b!=c) {
       casadi_assert_warning(fabs(b-c)<1e-10, "Hessian is not symmetric: " << b << " != " << c);
-      qpH_.elem(1, 0) = c = b;
+      qpH_[1] = c = b;
     }
 
     double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
     if (eig_smallest<reg_threshold_) {
       // Regularization
       reg_ = reg_threshold_-eig_smallest;
-      qpH_(0, 0) += reg_;
-      qpH_(1, 1) += reg_;
+      qpH_[0] += reg_;
+      qpH_[3] += reg_;
     }
   }
 
@@ -1151,9 +1155,9 @@ namespace casadi {
     double time1 = clock();
 
     // Solve the QP
-    qpsol_.setInputNZ(qpH_.ptr(), QPSOL_H);
+    qpsol_.setInputNZ(qpH_, QPSOL_H);
     qpsol_.setInputNZ(gfk_, QPSOL_G);
-    qpsol_.setInputNZ(qpA_.ptr(), QPSOL_A);
+    qpsol_.setInputNZ(qpA_, QPSOL_A);
     double* qp_lbx = qpsol_.input(QPSOL_LBX).ptr();
     double* qp_ubx = qpsol_.input(QPSOL_UBX).ptr();
     double* qp_lba = qpsol_.input(QPSOL_LBA).ptr();
@@ -1192,7 +1196,7 @@ namespace casadi {
     // Make sure that we have a decent direction
     if (!gauss_newton_) {
       // Get the curvature in the step direction
-      double gain = casadi_qform(qpH_.ptr(), qpH_.sparsity(), dxk_);
+      double gain = casadi_qform(qpH_, spH_, dxk_);
       if (gain < 0) {
         iteration_note_ = "Hessian indefinite in the search direction";
       }
