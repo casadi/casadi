@@ -472,7 +472,7 @@ namespace casadi {
     for (int k=0; k<num_out; ++k) {
       g.body << "      if (res1[" << k << "] && sum[" << k << "])" << endl
              << "       axpy(" << step_out_[k] << ",1," <<
-                          "res1["<< k << "],1,sum[" << k << "],1);" << endl;
+                          "res1["<< k << "],sum[" << k << "]);" << endl;
     }
     g.body << "    }" << std::endl;
     g.body << "  }" << std::endl;

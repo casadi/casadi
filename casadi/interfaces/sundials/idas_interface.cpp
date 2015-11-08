@@ -405,7 +405,7 @@ namespace casadi {
     f_(arg1_, res1_, iw_, w_, 0);
 
     // Subtract state derivative to get residual
-    casadi_axpy(nx_, -1., NV_DATA_S(xzdot), 1, NV_DATA_S(rr), 1);
+    casadi_axpy(nx_, -1., NV_DATA_S(xzdot), NV_DATA_S(rr));
 
     // Debug output
     if (monitored("res")) {
@@ -474,7 +474,7 @@ namespace casadi {
     f_fwd_(arg1_, res1_, iw_, w_, 0);
 
     // Subtract state derivative to get residual
-    casadi_axpy(nx_, -cj, NV_DATA_S(v), 1, NV_DATA_S(Jv), 1);
+    casadi_axpy(nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
 
     // Log time duration
     time2 = clock();
@@ -546,7 +546,7 @@ namespace casadi {
     g_fwd_(arg1_, res1_, iw_, w_, 0);
 
     // Subtract state derivative to get residual
-    casadi_axpy(nrx_, cjB, NV_DATA_S(vB), 1, NV_DATA_S(JvB), 1);
+    casadi_axpy(nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));
 
     // Debug output
     if (monitored("jtimesB")) {
@@ -1011,7 +1011,7 @@ namespace casadi {
     g_(arg1_, res1_, iw_, w_, 0);
 
     // Subtract state derivative to get residual
-    casadi_axpy(nrx_, 1., NV_DATA_S(rxzdot), 1, NV_DATA_S(rr), 1);
+    casadi_axpy(nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
 
     // Debug output
     if (monitored("resB")) {

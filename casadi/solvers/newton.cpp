@@ -171,7 +171,7 @@ namespace casadi {
       }
 
       // Update Xk+1 = Xk - J^(-1) F
-      casadi_axpy(n_, -1., f, 1, x, 1);
+      casadi_axpy(n_, -1., f, x);
     }
 
     // Get the solution
