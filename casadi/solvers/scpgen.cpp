@@ -184,10 +184,14 @@ namespace casadi {
     }
 
     // Allocate memory
-    x_lb_.resize(nx_, -numeric_limits<double>::infinity());
-    x_ub_.resize(nx_, numeric_limits<double>::infinity());
-    g_lb_.resize(ng_, -numeric_limits<double>::infinity());
-    g_ub_.resize(ng_, numeric_limits<double>::infinity());
+
+    // Lifted variables for lifted variables
+    vm_.resize(v_.size());
+    for (int i=0; i<v_.size(); ++i) {
+      vm_[i].n = v_[i].n;
+    }
+
+    // Legacy
     gk_.resize(ng_, numeric_limits<double>::quiet_NaN());
     g_lam_.resize(ng_, 0);
     g_dlam_.resize(ng_, 0);
@@ -690,14 +694,6 @@ namespace casadi {
     // Get problem data
     for (int i=0; i<nx_; ++i) {
       x_init_[i] = x0(i);
-      x_lb_[i] = lbx(i);
-      x_ub_[i] = ubx(i);
-      g_lb_[i] = lbg(i);
-      g_ub_[i] = ubg(i);
-    }
-    for (int i=0; i<ng_; ++i) {
-      g_lb_[i] = lbg(i);
-      g_ub_[i] = ubg(i);
     }
 
     if (v_.size()>0) {
@@ -874,8 +870,8 @@ namespace casadi {
     double pr_inf = 0;
 
     // Simple bounds
-    for (int i=0; i<nx_; ++i) pr_inf +=  std::max(x_opt_[i]-x_ub_[i], 0.);
-    for (int i=0; i<nx_; ++i) pr_inf +=  std::max(x_lb_[i]-x_opt_[i], 0.);
+    for (int i=0; i<nx_; ++i) pr_inf +=  std::max(x_opt_[i]-ubx(i), 0.);
+    for (int i=0; i<nx_; ++i) pr_inf +=  std::max(lbx(i)-x_opt_[i], 0.);
 
     // Lifted variables
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
@@ -883,8 +879,8 @@ namespace casadi {
     }
 
     // Nonlinear bounds
-    for (int i=0; i<ng_; ++i) pr_inf += std::max(gk_[i]-g_ub_[i], 0.);
-    for (int i=0; i<ng_; ++i) pr_inf += std::max(g_lb_[i]-gk_[i], 0.);
+    for (int i=0; i<ng_; ++i) pr_inf += std::max(gk_[i]-ubg(i), 0.);
+    for (int i=0; i<ng_; ++i) pr_inf += std::max(lbg(i)-gk_[i], 0.);
 
     return pr_inf;
   }
@@ -1143,18 +1139,23 @@ namespace casadi {
     double time1 = clock();
 
     // Solve the QP
-    qpsol_.setInput(qpH_, QPSOL_H);
+    qpsol_.setInputNZ(qpH_.ptr(), QPSOL_H);
     qpsol_.setInputNZ(gf_, QPSOL_G);
-    qpsol_.setInput(qpA_, QPSOL_A);
-    std::transform(x_lb_.begin(), x_lb_.end(), x_opt_.begin(),
-                   qpsol_.input(QPSOL_LBX)->begin(), std::minus<double>());
-    std::transform(x_ub_.begin(), x_ub_.end(), x_opt_.begin(),
-                   qpsol_.input(QPSOL_UBX)->begin(), std::minus<double>());
-    std::transform(g_lb_.begin(), g_lb_.end(), qpB_.begin(),
-                   qpsol_.input(QPSOL_LBA)->begin(), std::minus<double>());
-    std::transform(g_ub_.begin(), g_ub_.end(), qpB_.begin(),
-                   qpsol_.input(QPSOL_UBA)->begin(), std::minus<double>());
+    qpsol_.setInputNZ(qpA_.ptr(), QPSOL_A);
+    double* qp_lbx = qpsol_.input(QPSOL_LBX).ptr();
+    double* qp_ubx = qpsol_.input(QPSOL_UBX).ptr();
+    double* qp_lba = qpsol_.input(QPSOL_LBA).ptr();
+    double* qp_uba = qpsol_.input(QPSOL_UBA).ptr();
 
+    // Get bounds
+    casadi_copy(lbx_, nx_, qp_lbx);
+    casadi_copy(ubx_, nx_, qp_ubx);
+    casadi_copy(lbg_, ng_, qp_lba);
+    casadi_copy(ubg_, ng_, qp_uba);
+    casadi_axpy(nx_, -1., getPtr(x_opt_), qp_lbx);
+    casadi_axpy(nx_, -1., getPtr(x_opt_), qp_ubx);
+    casadi_axpy(ng_, -1., getPtr(qpB_), qp_lba);
+    casadi_axpy(ng_, -1., getPtr(qpB_), qp_uba);
     qpsol_.evaluate();
 
     // Condensed primal step
