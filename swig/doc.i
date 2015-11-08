@@ -14144,7 +14144,14 @@ Print a representation of the object.
 
 
 // File: namespacecasadi.xml
+%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int inc_x) "
+[INTERNAL] 
+IAMAX: index corresponding to the entry with the largest absolute
+value.
+";
+
 %feature("docstring")  casadi::isIncreasing(const std::vector< T > &v) "
+
 Check if the vector is strictly increasing.
 
 ";
@@ -14155,10 +14162,14 @@ Get typename.
 
 ";
 
-%feature("docstring")  casadi::casadi_quad_form(const real_t *A, const int
-*sp_A, const real_t *x) " [INTERNAL]  Calculates inner_prod(x, mul(A, x))
+%feature("docstring")  casadi::complement(const std::vector< int > &v, int
+size) "
 
-Calculates inner_prod(x, mul(A, x)) without memory allocation.
+Returns the list of all i in [0, size[ not found in supplied list.
+
+The supplied vector may contain duplicates and may be non-monotonous The
+supplied vector will be checked for bounds The result vector is guaranteed
+to be monotonously increasing
 
 ";
 
@@ -14232,14 +14243,13 @@ Q-transpose (lapack)
 
 ";
 
-%feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
-char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
-int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
+%feature("docstring")  casadi::casadi_dot(int n, const real_t *x, const
+real_t *y) " [INTERNAL]  Inner product.
 
 ";
 
 %feature("docstring")  casadi::casadi_axpy(int n, real_t alpha, const real_t
-*x, int inc_x, real_t *y, int inc_y) " [INTERNAL]  AXPY: y <- a*x + y.
+*x, real_t *y) " [INTERNAL]  AXPY: y <- a*x + y.
 
 ";
 
@@ -14258,17 +14268,6 @@ David Robert Nadeau (http://NadeauSoftware.com/)
 
 %feature("docstring")  casadi::diffTimers(const timer t1, const timer t0) "
 [INTERNAL] ";
-
-%feature("docstring")  casadi::complement(const std::vector< int > &v, int
-size) "
-
-Returns the list of all i in [0, size[ not found in supplied list.
-
-The supplied vector may contain duplicates and may be non-monotonous The
-supplied vector will be checked for bounds The result vector is guaranteed
-to be monotonously increasing
-
-";
 
 %feature("docstring")  casadi::swapIndices(const std::vector< std::vector< T
 > > &m) "
@@ -14293,9 +14292,8 @@ Check if the vector is monotone.
 
 ";
 
-%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
-inc_x) " [INTERNAL]  IAMAX: index corresponding to the entry with the
-largest absolute value.
+%feature("docstring")  casadi::casadi_scal(int n, real_t alpha, real_t *x,
+int inc_x) " [INTERNAL]  SCAL: x <- alpha*x.
 
 ";
 
@@ -14322,6 +14320,11 @@ Print matrix, matlab style.
 
 ";
 
+%feature("docstring")  casadi::casadi_sparsify(const real1_t *x, real2_t *y,
+const int *sp_y, int tr) " [INTERNAL]  Convert dense to sparse.
+
+";
+
 %feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const
 std::vector< int > &colind, const std::vector< int > &row) "
 
@@ -14338,9 +14341,8 @@ double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
 
 ";
 
-%feature("docstring")  casadi::casadi_mv(const real_t *x, const int *sp_x,
-const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
-multiplication: z <- z + x*y.
+%feature("docstring")  casadi::casadi_copy(const real_t *x, int n, real_t
+*y) " [INTERNAL]  COPY: y <-x.
 
 ";
 
@@ -14360,25 +14362,21 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
-size) "
-
-Returns a vector for quickly looking up entries of supplied list.
-
-lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
-i
-
-Duplicates are treated by looking up last occurrence
-
-";
-
-%feature("docstring")  casadi::casadi_to_dense_tr(const real1_t *x, const
-int *sp_x, real2_t *yt) " [INTERNAL]  Convert sparse to transposed dense.
+%feature("docstring")  casadi::casadi_vm(const real_t *x, const int *sp_x,
+const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
+multiplication, first factor transposed: z <- z + trans(x)*y.
 
 ";
 
 %feature("docstring")  casadi::iszero(double x) " [INTERNAL]  Check if entry
 is zero (false negative allowed)
+
+";
+
+%feature("docstring")  casadi::casadi_qform(const real_t *A, const int
+*sp_A, const real_t *x) " [INTERNAL]  Calculates dot(x, mul(A, x))
+
+Calculates dot(x, mul(A, x)) without memory allocation.
 
 ";
 
@@ -14412,6 +14410,18 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
+%feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
+size) "
+
+Returns a vector for quickly looking up entries of supplied list.
+
+lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
+i
+
+Duplicates are treated by looking up last occurrence
+
+";
+
 %feature("docstring")  casadi::matrixName() "
 
 Get typename.
@@ -14432,19 +14442,14 @@ Checks if vector does not contain NaN or Inf.
 
 %feature("docstring")  casadi::is_regular(N_Vector v) " [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_to_sparse_tr(const real1_t *xt,
-real2_t *y, const int *sp_y) " [INTERNAL]  Convert transposed dense to
-sparse.
+%feature("docstring")  casadi::casadi_mv(const real_t *x, const int *sp_x,
+const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
+multiplication: z <- z + x*y.
 
 ";
 
 %feature("docstring")  casadi::casadi_nrm2(int n, const real_t *x, int
 inc_x) " [INTERNAL]  NRM2: ||x||_2 -> return.
-
-";
-
-%feature("docstring")  casadi::casadi_inner_prod(int n, const real_t *x,
-const real_t *y) " [INTERNAL]  Inner product.
 
 ";
 
@@ -14491,13 +14496,9 @@ Hash value of an integer.
 
 ";
 
-%feature("docstring")  casadi::casadi_copy_n(const real_t *x, int n, real_t
-*y) " [INTERNAL]  COPY: y <-x.
-
-";
-
-%feature("docstring")  casadi::casadi_to_sparse(const real1_t *x, real2_t
-*y, const int *sp_y) " [INTERNAL]  Convert dense to sparse.
+%feature("docstring")  casadi::casadi_spmm(const real_t *x, const int *sp_x,
+const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t *w, int
+tr) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
 
 ";
 
@@ -14554,20 +14555,10 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
-%feature("docstring")  casadi::casadi_fill_n(real_t *x, int n, real_t alpha)
-" [INTERNAL]  FILL: x <- alpha.
-
-";
-
 %feature("docstring")  casadi::matrixName< SXElem >() " [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_scal(int n, real_t alpha, real_t *x,
-int inc_x) " [INTERNAL]  SCAL: x <- alpha*x.
-
-";
-
-%feature("docstring")  casadi::casadi_to_dense(const real1_t *x, const int
-*sp_x, real2_t *y) " [INTERNAL]  Convert sparse to dense.
+%feature("docstring")  casadi::casadi_densify(const real1_t *x, const int
+*sp_x, real2_t *y, int tr) " [INTERNAL]  Convert sparse to dense.
 
 ";
 
@@ -14582,16 +14573,9 @@ int *ipiv, int *info) " [INTERNAL]  LU-Factorize dense matrix (lapack)
 
 ";
 
-%feature("docstring")  casadi::casadi_mm_sparse(const real_t *x, const int
-*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
-*w) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
-
-";
-
-%feature("docstring")  casadi::casadi_mm_sparse_t(const real_t *x, const int
-*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
-*w) " [INTERNAL]  Sparse matrix-matrix multiplication, first factor
-transposed: z <- z + trans(x)*y.
+%feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
+char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
+int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
 
 ";
 
@@ -14652,14 +14636,13 @@ Generate a hash value incrementally (function taken from boost)
 
 ";
 
-%feature("docstring")  casadi::casadi_mv_t(const real_t *x, const int *sp_x,
-const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
-multiplication, first factor transposed: z <- z + trans(x)*y.
+%feature("docstring")  casadi::casadi_swap(int n, real_t *x, int inc_x,
+real_t *y, int inc_y) " [INTERNAL]  SWAP: x <-> y.
 
 ";
 
-%feature("docstring")  casadi::casadi_swap(int n, real_t *x, int inc_x,
-real_t *y, int inc_y) " [INTERNAL]  SWAP: x <-> y.
+%feature("docstring")  casadi::casadi_fill(real_t *x, int n, real_t alpha) "
+[INTERNAL]  FILL: x <- alpha.
 
 ";
 

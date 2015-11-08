@@ -10827,7 +10827,14 @@ Print a representation of the object.
 
 
 // File: namespacecasadi.xml
+%feature("docstring") casadi::casadi_iamax "
+[INTERNAL] 
+IAMAX: index corresponding to the entry with the largest absolute
+value.
+";
+
 %feature("docstring") casadi::isIncreasing "
+
 Check if the vector is strictly increasing.
 
 ";
@@ -10838,10 +10845,13 @@ Get typename.
 
 ";
 
-%feature("docstring") casadi::casadi_quad_form "[INTERNAL]  Calculates
-inner_prod(x, mul(A, x))
+%feature("docstring") casadi::complement "
 
-Calculates inner_prod(x, mul(A, x)) without memory allocation.
+Returns the list of all i in [0, size[ not found in supplied list.
+
+The supplied vector may contain duplicates and may be non-monotonous The
+supplied vector will be checked for bounds The result vector is guaranteed
+to be monotonously increasing
 
 ";
 
@@ -10895,8 +10905,7 @@ with Q-transpose (lapack)
 
 ";
 
-%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
-system (lapack)
+%feature("docstring") casadi::casadi_dot "[INTERNAL]  Inner product.
 
 ";
 
@@ -10918,16 +10927,6 @@ David Robert Nadeau (http://NadeauSoftware.com/)
 ";
 
 %feature("docstring") casadi::diffTimers "[INTERNAL] ";
-
-%feature("docstring") casadi::complement "
-
-Returns the list of all i in [0, size[ not found in supplied list.
-
-The supplied vector may contain duplicates and may be non-monotonous The
-supplied vector will be checked for bounds The result vector is guaranteed
-to be monotonously increasing
-
-";
 
 %feature("docstring") casadi::swapIndices "
 
@@ -10951,8 +10950,7 @@ Check if the vector is monotone.
 
 ";
 
-%feature("docstring") casadi::casadi_iamax "[INTERNAL]  IAMAX: index
-corresponding to the entry with the largest absolute value.
+%feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
 
 ";
 
@@ -10978,6 +10976,11 @@ Print matrix, matlab style.
 
 ";
 
+%feature("docstring") casadi::casadi_sparsify "[INTERNAL]  Convert dense to
+sparse.
+
+";
+
 %feature("docstring") casadi::hash_sparsity "
 
 >  std.size_t hash_sparsity(int nrow, int ncol, [int ] colind, [int ] row)
@@ -10991,8 +10994,7 @@ Hash a sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
-multiplication: z <- z + x*y.
+%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
 
 ";
 
@@ -11009,24 +11011,20 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring") casadi::lookupvector "
-
-Returns a vector for quickly looking up entries of supplied list.
-
-lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
-i
-
-Duplicates are treated by looking up last occurrence
-
-";
-
-%feature("docstring") casadi::casadi_to_dense_tr "[INTERNAL]  Convert
-sparse to transposed dense.
+%feature("docstring") casadi::casadi_vm "[INTERNAL]  Sparse matrix-vector
+multiplication, first factor transposed: z <- z + trans(x)*y.
 
 ";
 
 %feature("docstring") casadi::iszero "[INTERNAL]  Check if entry is zero
 (false negative allowed)
+
+";
+
+%feature("docstring") casadi::casadi_qform "[INTERNAL]  Calculates dot(x,
+mul(A, x))
+
+Calculates dot(x, mul(A, x)) without memory allocation.
 
 ";
 
@@ -11058,6 +11056,17 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
+%feature("docstring") casadi::lookupvector "
+
+Returns a vector for quickly looking up entries of supplied list.
+
+lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
+i
+
+Duplicates are treated by looking up last occurrence
+
+";
+
 %feature("docstring") casadi::matrixName "
 
 Get typename.
@@ -11081,17 +11090,13 @@ Checks if vector does not contain NaN or Inf.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::casadi_to_sparse_tr "[INTERNAL]  Convert
-transposed dense to sparse.
+%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
+multiplication: z <- z + x*y.
 
 ";
 
 %feature("docstring") casadi::casadi_nrm2 "[INTERNAL]  NRM2: ||x||_2 ->
 return.
-
-";
-
-%feature("docstring") casadi::casadi_inner_prod "[INTERNAL]  Inner product.
 
 ";
 
@@ -11135,12 +11140,8 @@ Hash value of an integer.
 
 ";
 
-%feature("docstring") casadi::casadi_copy_n "[INTERNAL]  COPY: y <-x.
-
-";
-
-%feature("docstring") casadi::casadi_to_sparse "[INTERNAL]  Convert dense
-to sparse.
+%feature("docstring") casadi::casadi_spmm "[INTERNAL]  Sparse matrix-matrix
+multiplication: z <- z + x*y.
 
 ";
 
@@ -11194,18 +11195,10 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
-%feature("docstring") casadi::casadi_fill_n "[INTERNAL]  FILL: x <- alpha.
-
-";
-
 %feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
 
-%feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
-
-";
-
-%feature("docstring") casadi::casadi_to_dense "[INTERNAL]  Convert sparse
-to dense.
+%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
+dense.
 
 ";
 
@@ -11219,13 +11212,8 @@ matrix (lapack)
 
 ";
 
-%feature("docstring") casadi::casadi_mm_sparse "[INTERNAL]  Sparse matrix-
-matrix multiplication: z <- z + x*y.
-
-";
-
-%feature("docstring") casadi::casadi_mm_sparse_t "[INTERNAL]  Sparse
-matrix-matrix multiplication, first factor transposed: z <- z + trans(x)*y.
+%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
+system (lapack)
 
 ";
 
@@ -11280,12 +11268,11 @@ Generate a hash value incrementally, array.
 
 ";
 
-%feature("docstring") casadi::casadi_mv_t "[INTERNAL]  Sparse matrix-vector
-multiplication, first factor transposed: z <- z + trans(x)*y.
+%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
 
 ";
 
-%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
+%feature("docstring") casadi::casadi_fill "[INTERNAL]  FILL: x <- alpha.
 
 ";
 
