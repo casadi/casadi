@@ -987,41 +987,36 @@ namespace casadi {
     // Get current time
     double time1 = clock();
 
-    // Pass parameters
-    mat_fcn_.setInputNZ(p_, mod_p_);
-
-    // Pass primal step/variables
-    mat_fcn_.setInputNZ(xk_, mod_x_);
+    // Inputs
+    fill_n(arg_, mat_fcn_.n_in(), nullptr);
+    arg_[mod_p_] = p_; // Parameters
+    arg_[mod_x_] = xk_; // Primal step/variables
     for (size_t i=0; i<v_.size(); ++i) {
-      mat_fcn_.setInputNZ(lifted_mem_[i].res, v_[i].mod_var);
+      arg_[v_[i].mod_var] = lifted_mem_[i].res;
     }
-
-    // Pass dual steps/variables
-    if (!gauss_newton_) {
-      mat_fcn_.setInputNZ(lam_gk_, mod_g_lam_);
+    if (!gauss_newton_) { // Dual steps/variables
+      arg_[mod_g_lam_] = lam_gk_;
       for (size_t i=0; i<v_.size(); ++i) {
-        mat_fcn_.setInputNZ(lifted_mem_[i].resL, v_[i].mod_lam);
+        arg_[v_[i].mod_lam] = lifted_mem_[i].resL;
       }
     }
 
-    // Evaluate condensed Hessian
-    mat_fcn_.evaluate();
+    // Outputs
+    fill_n(res_, mat_fcn_.n_out(), nullptr);
+    res_[mat_jac_] = qpA_; // Condensed Jacobian
+    res_[mat_hes_] = gauss_newton_ ? qpL_ : qpH_; // Condensed Hessian
 
-    // Get the Jacobian
-    mat_fcn_.getOutputNZ(qpA_, mat_jac_);
+    // Calculate condensed problem
+    mat_fcn_(arg_, res_, iw_, w_, 0);
 
     if (gauss_newton_) {
       // Gauss-Newton Hessian
-      mat_fcn_.getOutputNZ(qpL_, mat_hes_);
       casadi_fill(qpH_, spH_.nnz(), 0.);
       casadi_mul(qpL_, spL_, qpL_, spL_, qpH_, spH_, w_, true);
 
       // Gradient of the objective in Gauss-Newton
       casadi_fill(gfk_, nx_, 0.);
       casadi_mv(qpL_, spL_, b_gn_, gfk_, true);
-    } else {
-      // Exact Hessian
-      mat_fcn_.getOutputNZ(qpH_, mat_hes_);
     }
 
     // Calculate the gradient of the lagrangian
@@ -1037,49 +1032,35 @@ namespace casadi {
     // Get current time
     double time1 = clock();
 
-    // Pass parameters
-    res_fcn_.setInputNZ(p_, res_p_);
-
-    // Pass primal variables to the residual function for initial evaluation
-    res_fcn_.setInputNZ(xk_, res_x_);
-    for (size_t i=0; i<v_.size(); ++i) {
-      res_fcn_.setInputNZ(lifted_mem_[i].x, v_[i].res_var);
+    // Inputs
+    fill_n(arg_, res_fcn_.n_in(), nullptr);
+    arg_[res_p_] = p_; // Parameters
+    arg_[res_x_] = xk_; // Non-lifted primal variables
+    for (size_t i=0; i<v_.size(); ++i) { // Lifted primal variables
+      arg_[v_[i].res_var] = lifted_mem_[i].x;
     }
-
-    // Pass dual variables to the residual function for initial evaluation
     if (!gauss_newton_) {
-      res_fcn_.setInput(0.0, res_g_lam_);
-      for (size_t i=0; i<v_.size(); ++i) {
-        res_fcn_.setInputNZ(lifted_mem_[i].lam, v_[i].res_lam);
+      arg_[res_g_lam_] = 0; // Non-lifted dual variables
+      for (size_t i=0; i<v_.size(); ++i) { // Lifted dual variables
+        arg_[v_[i].res_lam] = lifted_mem_[i].lam;
       }
     }
+
+    // Outputs
+    fill_n(res_, res_fcn_.n_out(), nullptr);
+    res_[res_f_] = &fk_; // Objective
+    res_[res_gl_] = gauss_newton_ ? b_gn_ : gfk_; // Objective gradient
+    res_[res_g_] = gk_; // Constraints
+    for (size_t i=0; i<v_.size(); ++i) {
+      res_[v_[i].res_d] = lifted_mem_[i].res;
+      if (!gauss_newton_) {
+        res_[v_[i].res_lam_d] = lifted_mem_[i].resL;
+      }
+    }
+    res_[res_p_d_] = output(NLPSOL_LAM_P).ptr(); // Parameter sensitivities
 
     // Evaluate residual function
-    res_fcn_.evaluate();
-
-    // Get objective
-    fk_ = res_fcn_.output(res_f_).toScalar();
-
-    // Get objective gradient
-    if (gauss_newton_) {
-      res_fcn_.getOutputNZ(b_gn_, res_gl_);
-    } else {
-      res_fcn_.getOutputNZ(gfk_, res_gl_);
-    }
-
-    // Get constraints
-    res_fcn_.getOutputNZ(gk_, res_g_);
-
-    // Get residuals
-    for (size_t i=0; i<v_.size(); ++i) {
-      res_fcn_.getOutputNZ(lifted_mem_[i].res,  v_[i].res_d);
-      if (!gauss_newton_) {
-        res_fcn_.getOutputNZ(lifted_mem_[i].resL, v_[i].res_lam_d);
-      }
-    }
-
-    // Parameter sensitivities
-    res_fcn_.getOutput(output(NLPSOL_LAM_P), res_p_d_);
+    res_fcn_(arg_, res_, iw_, w_, 0);
 
     double time2 = clock();
     t_eval_res_ += (time2-time1)/CLOCKS_PER_SEC;
