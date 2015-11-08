@@ -240,18 +240,6 @@ namespace casadi {
     }
   }
 
-
-  void Nlpsol::reportConstraints(std::ostream &stream) {
-
-    stream << "Reporting NLP constraints" << endl;
-    FunctionInternal::reportConstraints(stream, output(NLPSOL_X), input(NLPSOL_LBX),
-                                        input(NLPSOL_UBX), "decision bounds");
-    double tol = 1e-8;
-    if (hasOption("constr_viol_tol")) tol = option("constr_viol_tol");
-    FunctionInternal::reportConstraints(stream, output(NLPSOL_G), input(NLPSOL_LBG),
-                                        input(NLPSOL_UBG), "constraints", tol);
-  }
-
   Function& Nlpsol::gradF() {
     if (gradF_.isNull()) {
       gradF_ = getGradF();

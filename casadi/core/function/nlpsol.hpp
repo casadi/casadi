@@ -64,9 +64,6 @@ namespace casadi {
     /// Initialize
     virtual void init();
 
-    /// Prints out a human readable report about possible constraint violations - all constraints
-    void reportConstraints(std::ostream &stream=casadi::userOut());
-
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs(void* mem) const;
 

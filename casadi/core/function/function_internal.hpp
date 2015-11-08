@@ -645,25 +645,6 @@ namespace casadi {
     void alloc();
     ///@}
 
-    /** \brief Prints out a human readable report about possible constraint violations
-    *          - specific constraints
-    *
-    * Constraint visualizer strip:
-    * \verbatim
-    *  o-------=-------o   Indicates that the value is nicely inbetween the bounds
-    *  o-=-------------o   Indicates that the value is closer to the lower bound
-    *  X---------------o   Indicates that the lower bound is active
-    *  8---------------o   Indicates that the lower bound is -infinity
-    *  o------------=--o   Indicates that the value is closer to the upper bound
-    *  o---------------X   Indicates that the upper bound is active
-    *  o---------------8   Indicates that the upper bound is infinity
-    *     VIOLATED         Indicates constraint violation
-    * \endverbatim
-    */
-    static void reportConstraints(std::ostream &stream, const Matrix<double> &v,
-                                  const Matrix<double> &lb, const Matrix<double> &ub,
-                                  const std::string &name, double tol=1e-8);
-
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
     virtual bool fwdViaJac(int nfwd);
