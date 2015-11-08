@@ -482,10 +482,10 @@ namespace casadi {
 
     // Add the appropriate function
     switch (f) {
-    case AUX_COPY_N:
+    case AUX_COPY:
       this->auxiliaries
-        << codegen_str_copy_n
-        << codegen_str_copy_n_define << endl
+        << codegen_str_copy
+        << codegen_str_copy_define << endl
         << endl;
       break;
     case AUX_SWAP:
@@ -503,10 +503,10 @@ namespace casadi {
         << codegen_str_axpy_define
         << endl;
       break;
-    case AUX_INNER_PROD:
+    case AUX_DOT:
       this->auxiliaries
-        << codegen_str_inner_prod
-        << codegen_str_inner_prod_define << endl
+        << codegen_str_dot
+        << codegen_str_dot_define << endl
         << endl;
       break;
     case AUX_ASUM:
@@ -524,15 +524,15 @@ namespace casadi {
         << codegen_str_nrm2_define
         << endl;
       break;
-    case AUX_FILL_N:
+    case AUX_FILL:
       this->auxiliaries
-        << codegen_str_fill_n
-        << codegen_str_fill_n_define << endl
+        << codegen_str_fill
+        << codegen_str_fill_define << endl
         << endl;
       break;
-    case AUX_MM_SPARSE:
-      this->auxiliaries << codegen_str_mm_sparse
-        << codegen_str_mm_sparse_define
+    case AUX_SPMM:
+      this->auxiliaries << codegen_str_spmm
+        << codegen_str_spmm_define
         << endl;
       break;
     case AUX_SQ:
@@ -572,7 +572,7 @@ namespace casadi {
         << "#endif" << endl << endl;
       break;
     case AUX_FROM_MEX:
-      addAuxiliary(AUX_FILL_N);
+      addAuxiliary(AUX_FILL);
       this->auxiliaries
         << "#ifdef MATLAB_MEX_FILE" << endl
         << "real_t* CASADI_PREFIX(from_mex)(const mxArray *p, "
@@ -589,7 +589,7 @@ namespace casadi {
         << "  mwIndex *Ir = is_sparse ? mxGetIr(p) : 0;" << endl
         << "  if (p_nrow==1 && p_ncol==1) {" << endl
         << "    double v = is_sparse && Jc[1]==0 ? 0 : *p_data;" << endl
-        << "    fill_n(y, nnz, v);" << endl
+        << "    fill(y, nnz, v);" << endl
         << "  } else {" << endl
         << "    bool tr = false;" << endl
         << "    if (nrow!=p_nrow || ncol!=p_ncol) {" << endl
@@ -685,29 +685,29 @@ namespace casadi {
     return s.str();
   }
 
-  std::string CodeGenerator::copy_n(const std::string& arg,
-                                    std::size_t n, const std::string& res) {
+  std::string CodeGenerator::copy(const std::string& arg,
+                                  std::size_t n, const std::string& res) {
     stringstream s;
     // Perform operation
-    addAuxiliary(AUX_COPY_N);
-    s << "copy_n(" << arg << ", " << n << ", " << res << ");";
+    addAuxiliary(AUX_COPY);
+    s << "copy(" << arg << ", " << n << ", " << res << ");";
     return s.str();
   }
 
-  std::string CodeGenerator::fill_n(const std::string& res,
-                                    std::size_t n, const std::string& v) {
+  std::string CodeGenerator::fill(const std::string& res,
+                                  std::size_t n, const std::string& v) {
     stringstream s;
     // Perform operation
-    addAuxiliary(AUX_FILL_N);
-    s << "fill_n(" << res << ", " << n << ", " << v << ");";
+    addAuxiliary(AUX_FILL);
+    s << "fill(" << res << ", " << n << ", " << v << ");";
     return s.str();
   }
 
-  std::string CodeGenerator::inner_prod(int n, const std::string& x,
+  std::string CodeGenerator::dot(int n, const std::string& x,
                                         const std::string& y) {
-    addAuxiliary(AUX_INNER_PROD);
+    addAuxiliary(AUX_DOT);
     stringstream s;
-    s << "inner_prod(" << n << ", " << x << ", " << y << ")";
+    s << "dot(" << n << ", " << x << ", " << y << ")";
     return s.str();
   }
 
@@ -716,7 +716,7 @@ namespace casadi {
                          const std::string& res, const Sparsity& sp_res,
                          const std::string& w) {
     // If sparsity match, simple copy
-    if (sp_arg==sp_res) return copy_n(arg, sp_arg.nnz(), res);
+    if (sp_arg==sp_res) return copy(arg, sp_arg.nnz(), res);
 
     // Create call
     addAuxiliary(CodeGenerator::AUX_PROJECT);
@@ -785,6 +785,17 @@ namespace casadi {
 
     // Return name of compiled function
     return dlname;
+  }
+
+  std::string CodeGenerator::spmm(const std::string& x, const Sparsity& sp_x,
+                                  const std::string& y, const Sparsity& sp_y,
+                                  const std::string& z, const Sparsity& sp_z,
+                                  const std::string& w, bool tr) {
+    addAuxiliary(CodeGenerator::AUX_SPMM);
+    stringstream s;
+    s << "spmm(" << x << ", " << sparsity(sp_x) << ", " << y << ", " << sparsity(sp_y) << ", "
+      << z << ", " << sparsity(sp_z) << ", " << w << ", " <<  (tr ? "1" : "0") << ");";
+    return s.str();
   }
 
 } // namespace casadi

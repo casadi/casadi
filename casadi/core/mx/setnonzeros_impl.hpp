@@ -744,8 +744,8 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                                 g.work(res[0], this->nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                               g.work(res[0], this->nnz())) << endl;
     }
 
     // Condegen the indices
@@ -764,8 +764,8 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                                 g.work(res[0], this->nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                               g.work(res[0], this->nnz())) << endl;
     }
 
     // Perform the operation inplace
@@ -782,8 +782,8 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                                 g.work(res[0], this->nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                               g.work(res[0], this->nnz())) << endl;
     }
 
     // Perform the operation inplace

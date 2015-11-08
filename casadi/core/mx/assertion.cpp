@@ -104,8 +104,7 @@ namespace casadi {
 
     // Copy if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),
-                                 g.work(res[0], nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
     }
   }
 

@@ -48,7 +48,7 @@ namespace casadi {
 
   template<typename T>
   void NormF::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
-    *res[0] = sqrt(casadi_inner_prod(dep().nnz(), arg[0], arg[0]));
+    *res[0] = sqrt(casadi_dot(dep().nnz(), arg[0], arg[0]));
   }
 
   void NormF::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -74,8 +74,8 @@ namespace casadi {
   void NormF::generate(CodeGenerator& g, const std::string& mem,
                        const std::vector<int>& arg, const std::vector<int>& res) const {
     g.assign(g.body, g.workel(res[0]),
-             "sqrt(" + g.inner_prod(dep().nnz(), g.work(arg[0], dep(0).nnz()),
-                                      g.work(arg[0], dep(0).nnz())) + ")");
+             "sqrt(" + g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()),
+                             g.work(arg[0], dep(0).nnz())) + ")");
   }
 
   std::string Norm2::print(const std::vector<std::string>& arg) const {

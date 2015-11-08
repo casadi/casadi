@@ -272,7 +272,7 @@ namespace casadi {
 
     for (int i=0;i<num_in;++i) {
       // Sparsity of the original input
-      Sparsity in_sp = f_.input(i).sparsity();
+      Sparsity in_sp = f_.sparsity_in(i);
 
       // Repeat if requested
       if (repeat_in_[i]) in_sp = repmat(in_sp, 1, n_);
@@ -283,7 +283,7 @@ namespace casadi {
 
     for (int i=0;i<num_out;++i) {
       // Sparsity of the original output
-      Sparsity out_sp = f_.output(i).sparsity();
+      Sparsity out_sp = f_.sparsity_out(i);
 
       // Repeat if requested
       if (repeat_out_[i]) out_sp = repmat(out_sp, 1, n_);
@@ -539,7 +539,7 @@ namespace casadi {
     // Clear the accumulators
     for (int k=0;k<num_out;++k) {
       g.body << "  if (sum[" << k << "]!=0) " <<
-        g.fill_n(STRING("sum[" << k << "]"), step_out_[k], "0") << endl;
+        g.fill(STRING("sum[" << k << "]"), step_out_[k], "0") << endl;
     }
 
     g.body << "  real_t** res1 = res+"  << f_.sz_res() <<  ";" << endl;
@@ -548,7 +548,7 @@ namespace casadi {
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
 
     g.body << "    real_t* temp_res = w+"  << f_.sz_w() <<  ";" << endl
-           << "    if (temp_res!=0) " << g.fill_n("temp_res", nnz_out_, "0") << endl;
+           << "    if (temp_res!=0) " << g.fill("temp_res", nnz_out_, "0") << endl;
 
     for (int j=0; j<num_in; ++j) {
       g.body << "    arg1[" << j << "] = (arg[" << j << "]==0)? " <<

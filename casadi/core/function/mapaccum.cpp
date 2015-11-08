@@ -624,7 +624,7 @@ namespace casadi {
   }
 
   void Mapaccum::generateBody(CodeGenerator& g) const {
-    g.addAuxiliary(CodeGenerator::AUX_COPY_N);
+    g.addAuxiliary(CodeGenerator::AUX_COPY);
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     g.body << "  const real_t** arg1 = arg+" << f_.sz_arg() << ";" << endl
@@ -636,7 +636,7 @@ namespace casadi {
     int offset=0;
     for (int j=0; j<num_in; ++j) {
       if (input_accum_[j]) {
-        g.body << "  copy_n(arg[" << j << "], " << step_in_[j] <<
+        g.body << "  copy(arg[" << j << "], " << step_in_[j] <<
           ", accum + " << offset << ");" << std::endl;
         g.body << "  arg1[" << j << "] = accum + " << offset << ";" << std::endl;
         offset+= step_in_[j];
@@ -676,7 +676,7 @@ namespace casadi {
       g.body << "    " << g(f_, "arg1", "res1", "iw", "w", "0") << ";" << endl;
 
       // Copy the temporary storage to the accumulator
-      g.body << "    copy_n(accum+" << nnz_accum_ << ", " << nnz_accum_ << ", accum);" << endl;
+      g.body << "    copy(accum+" << nnz_accum_ << ", " << nnz_accum_ << ", accum);" << endl;
 
       // Copy the accumulator to the global output ...
       offset = 0;
@@ -684,7 +684,7 @@ namespace casadi {
         int jj = output_accum_[j];
         // ... but beware of a null pointer
         g.body << "    if (res[" << jj << "]!=0)" << endl;
-        g.body << "      copy_n(accum+ " << offset << ", " << step_out_[jj] <<
+        g.body << "      copy(accum+ " << offset << ", " << step_out_[jj] <<
           ", res[" << jj << "]+i*" << step_out_[jj] << ");" << endl;
         offset += step_out_[jj];
       }

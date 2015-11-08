@@ -60,9 +60,9 @@ namespace casadi {
   template<typename T>
   void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    casadi_mm_sparse(arg[1], dep(1).sparsity(),
-                     arg[2], dep(2).sparsity(),
-                     res[0], sparsity(), w);
+    casadi_spmm(arg[1], dep(1).sparsity(),
+                arg[2], dep(2).sparsity(),
+                res[0], sparsity(), w, false);
   }
 
   void Multiplication::evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -105,15 +105,13 @@ namespace casadi {
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
     }
 
     // Perform sparse matrix multiplication
-    g.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
-    g.body << "  mm_sparse(   ";
-    g.body << g.work(arg[1], dep(1).nnz()) << ", " << g.sparsity(dep(1).sparsity()) << ", ";
-    g.body << g.work(arg[2], dep(2).nnz()) << ", " << g.sparsity(dep(2).sparsity()) << ", ";
-    g.body << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", w);" << endl;
+    g.body << "  " << g.spmm(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
+                             g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
+                             g.work(res[0], nnz()), sparsity(), "w", false) << endl;
   }
 
   void DenseMultiplication::
@@ -121,8 +119,8 @@ namespace casadi {
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),
-                                 g.work(res[0], nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], nnz()), nnz(),
+                               g.work(res[0], nnz())) << endl;
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();

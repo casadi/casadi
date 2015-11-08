@@ -394,8 +394,8 @@ namespace casadi {
   }
 
   void KernelSum::generateBody(CodeGenerator& g) const {
-    g.addAuxiliary(CodeGenerator::AUX_COPY_N);
-    g.addAuxiliary(CodeGenerator::AUX_FILL_N);
+    g.addAuxiliary(CodeGenerator::AUX_COPY);
+    g.addAuxiliary(CodeGenerator::AUX_FILL);
     g.addAuxiliary(CodeGenerator::AUX_AXPY);
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -405,7 +405,7 @@ namespace casadi {
     // Clear the accumulators
     g.body << "  real_t** sum = res;" << std::endl;
     for (int k=0;k<num_out;++k) {
-      g.body << "  if (sum[" << k << "]!=0) fill_n(sum[" << k << "], "
+      g.body << "  if (sum[" << k << "]!=0) fill(sum[" << k << "], "
         << step_out_[k] << ", 0);" << std::endl;
     }
 
@@ -428,7 +428,7 @@ namespace casadi {
     g.body << "  real_t* temp_res = w+" << f_.sz_w() << ";" << std::endl;
 
     // Clear the temp_res storage space
-    g.body << "  if (temp_res!=0) fill_n(temp_res, " << nnz_out_ << ", 0);" << std::endl;
+    g.body << "  if (temp_res!=0) fill(temp_res, " << nnz_out_ << ", 0);" << std::endl;
 
     // Set the function outputs
     int offset = 0;

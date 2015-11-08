@@ -96,22 +96,28 @@ namespace casadi {
     static std::string constant(double v);
 
     /** \brief Codegen inner product */
-    std::string inner_prod(int n, const std::string& x, const std::string& y);
+    std::string dot(int n, const std::string& x, const std::string& y);
+
+    /** \brief Codegen sparse matrix-matrix multiplication */
+    std::string spmm(const std::string& x, const Sparsity& sp_x,
+                     const std::string& y, const Sparsity& sp_y,
+                     const std::string& z, const Sparsity& sp_z,
+                     const std::string& w, bool tr);
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
-      AUX_COPY_N,
+      AUX_COPY,
       AUX_SWAP,
       AUX_SCAL,
       AUX_AXPY,
-      AUX_INNER_PROD,
+      AUX_DOT,
       AUX_NRM2,
       AUX_IAMAX,
-      AUX_FILL_N,
+      AUX_FILL,
       AUX_ASUM,
       AUX_SQ,
       AUX_SIGN,
-      AUX_MM_SPARSE,
+      AUX_SPMM,
       AUX_PROJECT,
       AUX_TRANS,
       AUX_TO_MEX,
@@ -136,11 +142,11 @@ namespace casadi {
     /** \brief  Print real vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
 
-    /** \brief Create a copy_n operation */
-    std::string copy_n(const std::string& arg, std::size_t n, const std::string& res);
+    /** \brief Create a copy operation */
+    std::string copy(const std::string& arg, std::size_t n, const std::string& res);
 
-    /** \brief Create a fill_n operation */
-    std::string fill_n(const std::string& res, std::size_t n, const std::string& v);
+    /** \brief Create a fill operation */
+    std::string fill(const std::string& res, std::size_t n, const std::string& v);
 
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,

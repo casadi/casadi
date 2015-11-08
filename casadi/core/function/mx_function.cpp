@@ -1090,7 +1090,7 @@ namespace casadi {
           if (n==1) {
             s << "*" << r << " = " << g.workel(i) << ";" << endl;
           } else {
-            s << g.copy_n(g.work(i, n), n, r) << endl;
+            s << g.copy(g.work(i, n), n, r) << endl;
           }
         }
       } else if (it->op==OP_INPUT) {
@@ -1111,9 +1111,9 @@ namespace casadi {
               << arg << "[" << ic << "] : 0;" << endl;
           } else {
             s << "  if (" << arg << ")" << endl
-              << "    " << g.copy_n(arg_nz, n, g.work(i, n)) << endl
+              << "    " << g.copy(arg_nz, n, g.work(i, n)) << endl
               << "  else " << endl
-              << "    " << g.fill_n(g.work(i, n), n, "0") << endl;
+              << "    " << g.fill(g.work(i, n), n, "0") << endl;
           }
         }
       } else {

@@ -1331,8 +1331,8 @@ namespace casadi {
       // Carry out the matrix product
       Matrix<DataType> ret = z;
       std::vector<DataType> work(size1());
-      casadi_mm_sparse(ptr(), sparsity(), y.ptr(), y.sparsity(),
-                       ret.ptr(), ret.sparsity(), getPtr(work));
+      casadi_spmm(ptr(), sparsity(), y.ptr(), y.sparsity(),
+                  ret.ptr(), ret.sparsity(), getPtr(work), false);
       return ret;
     }
   }
@@ -1351,7 +1351,7 @@ namespace casadi {
                           << " and A.shape = " << A.size());
 
     // Calculate using runtime function
-    return casadi_quad_form(A.ptr(), A.sparsity(), ptr());
+    return casadi_qform(A.ptr(), A.sparsity(), ptr());
   }
 
   template<typename DataType>
@@ -2797,11 +2797,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::get(double* val, bool tr) const {
-    if (tr) {
-      casadi_to_dense_tr(this->ptr(), this->sparsity(), val);
-    } else {
-      casadi_to_dense(this->ptr(), this->sparsity(), val);
-    }
+    casadi_densify(this->ptr(), this->sparsity(), val, tr);
   }
 
   template<typename DataType>

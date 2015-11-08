@@ -95,9 +95,10 @@ namespace casadi {
                             const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
     g.body << "  for (i=0;i<" << n_ << ";++i) {" << endl;
-    g.body << "    copy_n(" << g.work(arg[0], dep(0).nnz()) << ", " << nnz<< ", "
-      << g.work(res[0], sparsity().nnz()) << "+ i*" << nnz << ");" << endl;
-    g.body << "  }" << endl;
+    g.body << "    " << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
+                               g.work(res[0], sparsity().nnz()) + "+ i*" + g.to_string(nnz))
+           << endl
+    << "  }" << endl;
   }
 
   HorzRepsum::HorzRepsum(const MX& x, int n) : n_(n) {
@@ -171,7 +172,7 @@ namespace casadi {
   void HorzRepsum::generate(CodeGenerator& g, const std::string& mem,
                             const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = sparsity().nnz();
-    g.body << "  " << g.fill_n(g.work(res[0], nnz), nnz, "0") << endl;
+    g.body << "  " << g.fill(g.work(res[0], nnz), nnz, "0") << endl;
     g.body << "  for (i=0;i<" << n_ << ";++i) {" << endl;
     g.body << "    for (j=0;j<" << nnz << ";++j) {" << endl;
     g.body << "      " << g.work(res[0], nnz)<< "[j] += " <<

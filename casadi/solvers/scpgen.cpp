@@ -987,12 +987,12 @@ namespace casadi {
       // Gauss-Newton Hessian
       const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
       fill(qpH_->begin(), qpH_->end(), 0);
-      casadi_mm_sparse_t(B_obj.ptr(), B_obj.sparsity(), B_obj.ptr(), B_obj.sparsity(),
-                         qpH_.ptr(), qpH_.sparsity(), getPtr(work_));
+      casadi_spmm(B_obj.ptr(), B_obj.sparsity(), B_obj.ptr(), B_obj.sparsity(),
+                  qpH_.ptr(), qpH_.sparsity(), getPtr(work_), true);
 
       // Gradient of the objective in Gauss-Newton
       fill(gf_.begin(), gf_.end(), 0);
-      casadi_mv_t(B_obj.ptr(), B_obj.sparsity(), getPtr(b_gn_), getPtr(gf_));
+      casadi_vm(B_obj.ptr(), B_obj.sparsity(), getPtr(b_gn_), getPtr(gf_));
     } else {
       // Exact Hessian
       mat_fcn_.getOutput(qpH_, mat_hes_);
@@ -1181,7 +1181,7 @@ namespace casadi {
     // Make sure that we have a decent direction
     if (!gauss_newton_) {
       // Get the curvature in the step direction
-      double gain = casadi_quad_form(qpH_.ptr(), qpH_.sparsity(), getPtr(x_step_));
+      double gain = casadi_qform(qpH_.ptr(), qpH_.sparsity(), getPtr(x_step_));
       if (gain < 0) {
         iteration_note_ = "Hessian indefinite in the search direction";
       }

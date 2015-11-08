@@ -69,7 +69,7 @@ namespace casadi {
     int ind = g.getConstant(x_.data(), true);
 
     // Copy the constant to the work vector
-    g.body << "  " << g.copy_n("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << endl;
+    g.body << "  " << g.copy("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << endl;
   }
 
   bool ConstantMX::__nonzero__() const {

@@ -318,7 +318,7 @@ namespace casadi {
 
     // Evaluate the initial gradient of the Lagrangian
     copy(gf_, gf_+nx_, gLag_);
-    if (ng_>0) casadi_mv_t(Jk_, Asp_, mu_, gLag_);
+    if (ng_>0) casadi_vm(Jk_, Asp_, mu_, gLag_);
     // gLag += mu_x_;
     transform(gLag_, gLag_+nx_, mu_x_, gLag_, plus<double>());
 
@@ -465,7 +465,7 @@ namespace casadi {
       log("QP solved");
 
       // Detecting indefiniteness
-      double gain = casadi_quad_form(Bk_, Hsp_, dx_);
+      double gain = casadi_qform(Bk_, Hsp_, dx_);
       if (gain < 0) {
         casadi_warning("Indefinite Hessian detected...");
       }
@@ -478,7 +478,7 @@ namespace casadi {
       double l1_infeas = primalInfeasibility(xk_, lbx_, ubx_, gk_, lbg_, ubg_);
 
       // Right-hand side of Armijo condition
-      double F_sens = casadi_inner_prod(nx_, dx_, gf_);
+      double F_sens = casadi_dot(nx_, dx_, gf_);
       double L1dir = F_sens - sigma_ * l1_infeas;
       double L1merit = fk_ + sigma_ * l1_infeas;
 
@@ -563,7 +563,7 @@ namespace casadi {
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
         copy(gf_, gf_+nx_, gLag_old_);
-        if (ng_>0) casadi_mv_t(Jk_, Asp_, mu_, gLag_old_);
+        if (ng_>0) casadi_vm(Jk_, Asp_, mu_, gLag_old_);
         // gLag_old += mu_x_;
         transform(gLag_old_, gLag_old_+nx_, mu_x_, gLag_old_, plus<double>());
       }
@@ -578,7 +578,7 @@ namespace casadi {
 
       // Evaluate the gradient of the Lagrangian with the new x and new mu
       copy(gf_, gf_+nx_, gLag_);
-      if (ng_>0) casadi_mv_t(Jk_, Asp_, mu_, gLag_);
+      if (ng_>0) casadi_vm(Jk_, Asp_, mu_, gLag_);
 
       // gLag += mu_x_;
       transform(gLag_, gLag_+nx_, mu_x_, gLag_, plus<double>());
