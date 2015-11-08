@@ -26,12 +26,28 @@
 #include "timing.hpp"
 #include <ctime>
 
-namespace casadi {
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#include <sys/time.h>
+#endif
 
+namespace casadi {
   timer getTimerTime() {
     timer ret;
     ret.user = clock();
-    ret.real = getRealTime();
+#ifdef _WIN32
+    FILETIME tm;
+    ULONGLONG t;
+    GetSystemTimePreciseAsFileTime(&tm);
+    t = (static_cast<ULONGLONG>(tm.dwHighDateTime) << 32) | (ULONGLONG)tm.dwLowDateTime;
+    ret.real = static_cast<double>(t) / 10000000.0;
+#else
+    struct timeval tm;
+    gettimeofday(&tm, NULL);
+    ret.real = tm.tv_sec + tm.tv_usec/1000000.0;
+#endif
     return ret;
   }
 
@@ -56,5 +72,4 @@ namespace casadi {
     ret["user"] = diff.user;
     return ret;
   }
-
 } // namespace casadi

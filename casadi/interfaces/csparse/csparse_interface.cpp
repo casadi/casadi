@@ -24,7 +24,6 @@
 
 
 #include "csparse_interface.hpp"
-#include "casadi/core/profiling.hpp"
 #include "casadi/core/casadi_options.hpp"
 
 using namespace std;
@@ -75,14 +74,6 @@ namespace casadi {
 
     // Has the routine been called once
     called_once_ = false;
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, "CSparse",
-                       ProfilingData_FunctionType_Other, 2);
-
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare", -1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve", -1);
-    }
   }
 
   void CsparseInterface::
@@ -151,11 +142,6 @@ namespace casadi {
 
   void CsparseInterface::linsol_solve(double* x, int nrhs, bool transpose) {
     double time_start=0;
-    if (CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
-      time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
-
     casadi_assert(N_!=0);
 
     double *t = &temp_.front();
@@ -174,14 +160,6 @@ namespace casadi {
         cs_ipvec(S_->q, t, x, A_.n) ;      // x = P2\t
       }
       x += ncol();
-    }
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 1,
-                       time_stop-time_start,
-                       time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
     }
   }
 

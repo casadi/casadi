@@ -28,7 +28,6 @@
 #include <iterator>
 
 #include "../casadi_options.hpp"
-#include "../profiling.hpp"
 
 using namespace std;
 namespace casadi {

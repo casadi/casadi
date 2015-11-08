@@ -24,10 +24,6 @@
 
 
 #include "newton.hpp"
-
-#include "casadi/core/profiling.hpp"
-#include "casadi/core/casadi_options.hpp"
-
 #include <iomanip>
 
 using namespace std;

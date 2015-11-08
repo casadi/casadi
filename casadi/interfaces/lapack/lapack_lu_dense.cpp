@@ -26,9 +26,6 @@
 #include "lapack_lu_dense.hpp"
 #include "../../core/std_vector_tools.hpp"
 
-#include "../../core/profiling.hpp"
-#include "../../core/casadi_options.hpp"
-
 using namespace std;
 namespace casadi {
 
@@ -85,14 +82,6 @@ namespace casadi {
 
     // Allow equilibration failures
     allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, "LapackLUDense",
-                       ProfilingData_FunctionType_Other, 2);
-
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare", -1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve", -1);
-    }
   }
 
   void LapackLuDense::
@@ -142,12 +131,6 @@ namespace casadi {
   }
 
   void LapackLuDense::linsol_solve(double* x, int nrhs, bool transpose) {
-    double time_start=0;
-    if (CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
-      time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
-
     // Scale the right hand side
     if (transpose) {
       rowScaling(x, nrhs);
@@ -167,13 +150,6 @@ namespace casadi {
       colScaling(x, nrhs);
     } else {
       rowScaling(x, nrhs);
-    }
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 1,
-                       time_stop-time_start, time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
     }
   }
 

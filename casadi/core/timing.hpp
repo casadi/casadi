@@ -26,11 +26,10 @@
 #ifndef CASADI_TIMING_HPP
 #define CASADI_TIMING_HPP
 
-#include "profiling.hpp"
 #include "generic_type.hpp"
 
 namespace casadi {
-/// \cond INTERNAL
+  /// \cond INTERNAL
 
   typedef struct {
     double user;
@@ -42,6 +41,15 @@ namespace casadi {
     double real;
   } diffTime;
 
+  /**
+   * Returns the real time, in seconds, or -1.0 if an error occurred.
+   *
+   * Time is measured since an arbitrary and OS-dependent start time.
+   * The returned real time is only useful for computing an elapsed time
+   * between two calls to this function.
+   * 
+   * \author David Robert Nadeau (http://NadeauSoftware.com/)
+   */
   CASADI_EXPORT timer getTimerTime(void);
   // ret = t1 - t0
   CASADI_EXPORT diffTime diffTimers(const timer t1, const timer t0);

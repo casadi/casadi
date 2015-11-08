@@ -34,7 +34,6 @@
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
 #include "../matrix/sparsity_internal.hpp"
-#include "../profiling.hpp"
 #include "../casadi_options.hpp"
 #include "../casadi_interrupt.hpp"
 
@@ -76,14 +75,6 @@ namespace casadi {
   void SXFunction::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     double time_start=0;
     double time_stop=0;
-    if (CasadiOptions::profiling) {
-      time_start = getRealTime();
-      if (CasadiOptions::profilingBinary) {
-        profileWriteEntry(CasadiOptions::profilingLog, this);
-      } else {
-      CasadiOptions::profilingLog  << "start " << this << ":" <<name_ << std::endl;
-      }
-    }
 
     casadi_msg("SXFunction::evalD():begin  " << name_);
 
@@ -118,20 +109,6 @@ namespace casadi {
     }
 
     casadi_msg("SXFunction::evalD():end " << name_);
-
-    if (CasadiOptions::profiling) {
-      time_stop = getRealTime();
-      if (CasadiOptions::profilingBinary) {
-        profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
-      } else {
-        CasadiOptions::profilingLog
-          << (time_stop-time_start)*1e6 << " ns | "
-          << (time_stop-time_start)*1e3 << " ms | "
-          << this << ":" <<name_
-          << ":0||SX algorithm size: " << algorithm_.size()
-          << std::endl;
-      }
-    }
   }
 
 
@@ -513,51 +490,6 @@ namespace casadi {
       casadi_error("Option \"just_in_time_sparsity\" true requires CasADi to "
                    "have been compiled with WITH_OPENCL=ON");
 #endif // WITH_OPENCL
-    }
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-
-      profileWriteName(CasadiOptions::profilingLog, this, name_,
-                       ProfilingData_FunctionType_SXFunction, algorithm_.size());
-      int alg_counter = 0;
-
-      // Iterator to free variables
-      vector<SXElem>::const_iterator p_it = free_vars_.begin();
-
-      std::stringstream stream;
-      for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
-        stream.str("");
-        if (it->op==OP_OUTPUT) {
-          stream << "output[" << it->i0 << "][" << it->i2 << "] = @" << it->i1;
-        } else {
-          stream << "@" << it->i0 << " = ";
-          if (it->op==OP_INPUT) {
-            stream << "input[" << it->i1 << "][" << it->i2 << "]";
-          } else {
-            if (it->op==OP_CONST) {
-              stream << it->d;
-            } else if (it->op==OP_PARAMETER) {
-              stream << *p_it++;
-            } else {
-              int ndep = casadi_math<double>::ndeps(it->op);
-              casadi_math<double>::printPre(it->op, stream);
-              for (int c=0; c<ndep; ++c) {
-                if (c==0) {
-                  stream << "@" << it->i1;
-                } else {
-                  casadi_math<double>::printSep(it->op, stream);
-                  stream << "@" << it->i2;
-                }
-
-              }
-              casadi_math<double>::printPost(it->op, stream);
-            }
-          }
-        }
-        stream << std::endl;
-        profileWriteSourceLine(CasadiOptions::profilingLog, this,
-                               alg_counter++, stream.str(), it->op);
-      }
     }
 
     // Print

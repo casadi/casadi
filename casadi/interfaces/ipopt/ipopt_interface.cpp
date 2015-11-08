@@ -27,7 +27,6 @@
 #include "ipopt_interface.hpp"
 #include "ipopt_nlp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
 

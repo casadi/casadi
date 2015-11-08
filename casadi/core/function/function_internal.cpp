@@ -27,9 +27,6 @@
 #include "../mx/casadi_call.hpp"
 #include "../std_vector_tools.hpp"
 
-#include "../casadi_options.hpp"
-#include "../profiling.hpp"
-
 #include <typeinfo>
 #include <cctype>
 #ifdef WITH_DL

@@ -25,7 +25,6 @@
 #include "mx_function.hpp"
 #include "../std_vector_tools.hpp"
 #include "../casadi_types.hpp"
-#include "../profiling.hpp"
 #include "../casadi_options.hpp"
 #include "../casadi_interrupt.hpp"
 
@@ -334,45 +333,11 @@ namespace casadi {
       }
     }
 
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, name_,
-                       ProfilingData_FunctionType_MXFunction, algorithm_.size());
-      int alg_counter = 0;
-      for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end();
-           ++it, ++alg_counter) {
-        std::stringstream ss;
-        print(ss, *it);
-        ss << endl;
-        int nf = it->data.isNull() ? 0 : it->data->numFunctions();
-        if (nf>0) {
-          for (int i=0; i<nf; ++i) {
-            profileWriteSourceLineDep(CasadiOptions::profilingLog, this, alg_counter,
-                                      ss.str(), it->op, it->data->getFunction(i).operator->());
-          }
-        } else {
-          profileWriteSourceLine(CasadiOptions::profilingLog, this, alg_counter, ss.str(), it->op);
-        }
-      }
-    }
-
     log("MXFunction::init end");
   }
 
   void MXFunction::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     casadi_msg("MXFunction::evalD():begin "  << name_);
-    // Set up timers for profiling
-    double time_zero=0;
-    double time_start=0;
-    double time_stop=0;
-    if (CasadiOptions::profiling) {
-      time_zero = getRealTime();
-      if (CasadiOptions::profilingBinary) {
-        profileWriteEntry(CasadiOptions::profilingLog, this);
-      } else {
-        CasadiOptions::profilingLog  << "start " << this << ":" <<name_ << std::endl;
-      }
-    }
-
     // Work vector and temporaries to hold pointers to operation input and outputs
     const double** arg1 = arg+n_in();
     double** res1 = res+n_out();
@@ -389,10 +354,6 @@ namespace casadi {
     // should only evaluate nodes that have not yet been calculated!
     int alg_counter = 0;
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
-      if (CasadiOptions::profiling) {
-        time_start = getRealTime(); // Start timer
-      }
-
       if (it->op==OP_INPUT) {
         // Pass an input
         double *w1 = w+workloc_[it->res.front()];
@@ -418,43 +379,6 @@ namespace casadi {
 
         // Evaluate
         it->data->evalD(arg1, res1, iw, w, 0);
-      }
-
-      // Write out profiling information
-      if (CasadiOptions::profiling) {
-        time_stop = getRealTime(); // Stop timer
-
-        if (CasadiOptions::profilingBinary) {
-          profileWriteTime(CasadiOptions::profilingLog, this, alg_counter,
-                           time_stop-time_start, time_stop-time_zero);
-        } else {
-          CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | "
-                                       << (time_stop-time_zero)*1e3 << " ms | "
-                                       << this << ":" <<name_ << ":"
-                                       << alg_counter <<"|";
-          if (!it->data.isNull()) {
-            int nf = it->data->numFunctions();
-            for (int i=0; i<nf; ++i) {
-              Function f = it->data->getFunction(i);
-              CasadiOptions::profilingLog << f.get() << ":" << f.name();
-            }
-          }
-          CasadiOptions::profilingLog << "|";
-          print(CasadiOptions::profilingLog, *it);
-          CasadiOptions::profilingLog << endl;
-        }
-
-      }
-    }
-
-    if (CasadiOptions::profiling) {
-      time_stop = getRealTime();
-      if (CasadiOptions::profilingBinary) {
-        profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_zero);
-      } else {
-        CasadiOptions::profilingLog  << "stop " << this << ":"
-                                     <<name_ << (time_stop-time_zero)*1e3
-                                     << " ms" << std::endl;
       }
     }
 
