@@ -54,7 +54,7 @@ namespace casadi {
 
   /// SCAL: x <- alpha*x
   template<typename real_t>
-  void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x, int inc_x);
+  void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x);
 
   /// AXPY: y <- a*x + y
   template<typename real_t>
@@ -218,12 +218,9 @@ namespace casadi {
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x, int inc_x) {
+  void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x) {
     int i;
-    for (i=0; i<n; ++i) {
-      *x *= alpha;
-      x += inc_x;
-    }
+    for (i=0; i<n; ++i) *x++ *= alpha;
   }
 
   template<typename real_t>

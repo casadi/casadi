@@ -647,6 +647,9 @@ namespace casadi {
     alloc_w(nx_, true); // qpH_times_du_
     if (gauss_newton_) {
       alloc_w(spL_.nnz(), true); // qpL_
+      alloc_w(ngn_, true); // qpG_
+    } else {
+      alloc_w(nx_, true); // qpG_
     }
 
     // Temporary work vectors
@@ -696,6 +699,9 @@ namespace casadi {
     qpB_ = w; w += ng_;
     if (gauss_newton_) {
       qpL_ = w; w += spL_.nnz();
+      qpG_ = w; w += ngn_;
+    } else {
+      qpG_ = w; w += nx_;
     }
     qpH_times_du_ = w; w += nx_;
 
@@ -1089,16 +1095,18 @@ namespace casadi {
 
     // Evaluate to get QP
     vec_fcn_.evaluate();
+    vec_fcn_.getOutputNZ(qpG_, vec_gf_);
+    vec_fcn_.getOutputNZ(qpB_, vec_g_);
 
     // Linear offset in the reduced QP
-    casadi_copy(gk_, ng_, qpB_);
-    casadi_axpy(ng_, -1., vec_fcn_.output(vec_g_).ptr(), qpB_);
+    casadi_scal(ng_, -1., qpB_);
+    casadi_axpy(ng_, 1., gk_, qpB_);
 
     // Gradient of the objective in the reduced QP
     if (gauss_newton_) {
-      casadi_axpy(ngn_, -1., vec_fcn_.output(vec_gf_).ptr(), b_gn_);
+      casadi_axpy(ngn_, -1., qpG_, b_gn_);
     } else {
-      casadi_axpy(nx_, -1., vec_fcn_.output(vec_gf_).ptr(), gfk_);
+      casadi_axpy(nx_, -1., qpG_, gfk_);
     }
 
     double time2 = clock();

@@ -1065,7 +1065,7 @@ namespace casadi {
     }
 
     // Negate (note definition of g)
-    casadi_scal(nrq_, -1., NV_DATA_S(qdotA), 1);
+    casadi_scal(nrq_, -1., NV_DATA_S(qdotA));
 
     log("IdasInterface::rhsQB", "end");
   }

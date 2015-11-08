@@ -692,7 +692,7 @@ namespace casadi {
     }
 
     // Negate (note definition of g)
-    casadi_scal(nrx_, -1., NV_DATA_S(rxdot), 1);
+    casadi_scal(nrx_, -1., NV_DATA_S(rxdot));
 
     log("CvodesInterface::rhsB", "end");
   }
@@ -773,7 +773,7 @@ namespace casadi {
     }
 
     // Negate (note definition of g)
-    casadi_scal(nrq_, -1., NV_DATA_S(rqdot), 1);
+    casadi_scal(nrq_, -1., NV_DATA_S(rqdot));
 
     if (monitor_rhsQB_) {
       userOut() << "CvodesInterface::rhsQB: end" << endl;

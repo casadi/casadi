@@ -247,7 +247,7 @@ namespace casadi {
     std::string iteration_note_;
 
     // QP
-    double *qpH_, *qpA_, *qpB_, *qpL_, *qpH_times_du_;
+    double *qpH_, *qpA_, *qpB_, *qpL_, *qpG_, *qpH_times_du_;
   };
 
 } // namespace casadi
