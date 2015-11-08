@@ -1012,7 +1012,7 @@ namespace casadi {
     res_[mat_jac_] = qpA_; // Condensed Jacobian
     res_[mat_hes_] = gauss_newton_ ? qpL_ : qpH_; // Condensed Hessian
 
-    // Calculate condensed problem
+    // Calculate condensed QP matrices
     mat_fcn_(arg_, res_, iw_, w_, 0);
 
     if (gauss_newton_) {
@@ -1076,27 +1076,27 @@ namespace casadi {
     // Get current time
     double time1 = clock();
 
-    // Pass current parameter guess
-    vec_fcn_.setInputNZ(p_, mod_p_);
-
-    // Pass primal step/variables
-    vec_fcn_.setInputNZ(xk_, mod_x_);
+    // Inputs
+    fill_n(arg_, vec_fcn_.n_in(), nullptr);
+    arg_[mod_p_] = p_; // Parameters
+    arg_[mod_x_] = xk_; // Primal step/variables
     for (size_t i=0; i<v_.size(); ++i) {
-      vec_fcn_.setInputNZ(lifted_mem_[i].res, v_[i].mod_var);
+      arg_[v_[i].mod_var] = lifted_mem_[i].res;
     }
-
-    // Pass dual steps/variables
     if (!gauss_newton_) {
-      vec_fcn_.setInput(0.0, mod_g_lam_);
+      arg_[mod_g_lam_] = 0; // Dual steps/variables
       for (size_t i=0; i<v_.size(); ++i) {
-        vec_fcn_.setInputNZ(lifted_mem_[i].resL, v_[i].mod_lam);
+        arg_[v_[i].mod_lam] = lifted_mem_[i].resL;
       }
     }
 
-    // Evaluate to get QP
-    vec_fcn_.evaluate();
-    vec_fcn_.getOutputNZ(qpG_, vec_gf_);
-    vec_fcn_.getOutputNZ(qpB_, vec_g_);
+    // Outputs
+    fill_n(res_, vec_fcn_.n_out(), nullptr);
+    res_[vec_gf_] = qpG_;
+    res_[vec_g_] = qpB_;
+
+    // Calculate condensed QP vectors
+    vec_fcn_(arg_, res_, iw_, w_, 0);
 
     // Linear offset in the reduced QP
     casadi_scal(ng_, -1., qpB_);
