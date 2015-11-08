@@ -183,22 +183,21 @@ namespace casadi {
       v_[i].n = v_[i].v.nnz();
     }
 
-    // Allocate memory
+    // Allocate memory, nonlfted problem
+    alloc_w(nx_, true); //xk_
+    alloc_w(ng_, true); //gk_
 
-    // Lifted variables for lifted variables
+    // Allocate memory, lifted problem
     vm_.resize(v_.size());
     for (int i=0; i<v_.size(); ++i) {
       vm_[i].n = v_[i].n;
     }
 
     // Legacy
-    gk_.resize(ng_, numeric_limits<double>::quiet_NaN());
     g_lam_.resize(ng_, 0);
     g_dlam_.resize(ng_, 0);
     qpH_times_du_.resize(nx_);
 
-    x_init_.resize(nx_, 0);
-    x_opt_.resize(nx_, 0);
     x_step_.resize(nx_, 0);
     x_lam_.resize(nx_, 0);
     x_dlam_.resize(nx_, 0);
@@ -665,6 +664,10 @@ namespace casadi {
   void Scpgen::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
     // Reset the base classes
     Nlpsol::reset(mem, arg, res, iw, w);
+
+    // Get work vectors, nonlifted problem
+    xk_ = w; w += nx_;
+    gk_ = w; w += ng_;
   }
 
   void Scpgen::solve(void* mem) {
@@ -690,12 +693,6 @@ namespace casadi {
 
     // Check the provided inputs
     checkInputs(mem);
-
-    // Get problem data
-    for (int i=0; i<nx_; ++i) {
-      x_init_[i] = x0(i);
-    }
-
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function
       fill_n(arg_, vinit_fcn_.n_in(), nullptr);
@@ -731,7 +728,7 @@ namespace casadi {
     merit_ind_ = 0;
 
     // Current guess for the primal solution
-    copy(x_init_.begin(), x_init_.end(), x_opt_.begin());
+    casadi_copy(x0_, nx_, xk_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       copy(it->init.begin(), it->init.end(), it->opt.begin());
     }
@@ -828,8 +825,8 @@ namespace casadi {
     userOut() << "optimal cost = " << fk_ << endl;
 
     // Save results to outputs
-    output(NLPSOL_F).set(fk_);
-    output(NLPSOL_X).setNZ(x_opt_);
+    output(NLPSOL_F).setNZ(&fk_);
+    output(NLPSOL_X).setNZ(xk_);
     output(NLPSOL_LAM_G).setNZ(g_lam_);
     output(NLPSOL_LAM_X).setNZ(x_lam_);
     output(NLPSOL_G).setNZ(gk_);
@@ -870,8 +867,8 @@ namespace casadi {
     double pr_inf = 0;
 
     // Simple bounds
-    for (int i=0; i<nx_; ++i) pr_inf +=  std::max(x_opt_[i]-ubx(i), 0.);
-    for (int i=0; i<nx_; ++i) pr_inf +=  std::max(lbx(i)-x_opt_[i], 0.);
+    for (int i=0; i<nx_; ++i) pr_inf +=  std::max(xk_[i]-ubx(i), 0.);
+    for (int i=0; i<nx_; ++i) pr_inf +=  std::max(lbx(i)-xk_[i], 0.);
 
     // Lifted variables
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
@@ -939,7 +936,7 @@ namespace casadi {
 
     // Print variables
     for (vector<int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
-      stream << setw(9) << setprecision(4) << x_opt_.at(*i);
+      stream << setw(9) << setprecision(4) << xk_[*i];
     }
 
     // Print note
@@ -957,10 +954,10 @@ namespace casadi {
     double time1 = clock();
 
     // Pass parameters
-    mat_fcn_.setInput(input(NLPSOL_P), mod_p_);
+    mat_fcn_.setInputNZ(p_, mod_p_);
 
     // Pass primal step/variables
-    mat_fcn_.setInputNZ(x_opt_, mod_x_);
+    mat_fcn_.setInputNZ(xk_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       mat_fcn_.setInputNZ(it->res, it->mod_var);
     }
@@ -1016,10 +1013,10 @@ namespace casadi {
     double time1 = clock();
 
     // Pass parameters
-    res_fcn_.setInput(input(NLPSOL_P), res_p_);
+    res_fcn_.setInputNZ(p_, res_p_);
 
     // Pass primal variables to the residual function for initial evaluation
-    res_fcn_.setInputNZ(x_opt_, res_x_);
+    res_fcn_.setInputNZ(xk_, res_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       res_fcn_.setInputNZ(it->opt, it->res_var);
     }
@@ -1068,10 +1065,10 @@ namespace casadi {
     double time1 = clock();
 
     // Pass current parameter guess
-    vec_fcn_.setInput(input(NLPSOL_P), mod_p_);
+    vec_fcn_.setInputNZ(p_, mod_p_);
 
     // Pass primal step/variables
-    vec_fcn_.setInputNZ(x_opt_, mod_x_);
+    vec_fcn_.setInputNZ(xk_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       vec_fcn_.setInputNZ(it->res, it->mod_var);
     }
@@ -1088,7 +1085,7 @@ namespace casadi {
     vec_fcn_.evaluate();
 
     // Linear offset in the reduced QP
-    transform(gk_.begin(), gk_.end(), vec_fcn_.output(vec_g_)->begin(),
+    transform(gk_, gk_ + ng_, vec_fcn_.output(vec_g_)->begin(),
               qpB_.begin(), std::minus<double>());
 
     // Gradient of the objective in the reduced QP
@@ -1152,8 +1149,8 @@ namespace casadi {
     casadi_copy(ubx_, nx_, qp_ubx);
     casadi_copy(lbg_, ng_, qp_lba);
     casadi_copy(ubg_, ng_, qp_uba);
-    casadi_axpy(nx_, -1., getPtr(x_opt_), qp_lbx);
-    casadi_axpy(nx_, -1., getPtr(x_opt_), qp_ubx);
+    casadi_axpy(nx_, -1., xk_, qp_lbx);
+    casadi_axpy(nx_, -1., xk_, qp_ubx);
     casadi_axpy(ng_, -1., getPtr(qpB_), qp_lba);
     casadi_axpy(ng_, -1., getPtr(qpB_), qp_uba);
     qpsol_.evaluate();
@@ -1223,7 +1220,7 @@ namespace casadi {
     while (true) {
 
       // Take the primal step
-      for (int i=0; i<nx_; ++i) x_opt_[i] += (t-t_prev) * x_step_[i];
+      for (int i=0; i<nx_; ++i) xk_[i] += (t-t_prev) * x_step_[i];
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         for (int i=0; i<it->n; ++i) it->opt[i] += (t-t_prev) * it->step[i];
       }
@@ -1297,11 +1294,11 @@ namespace casadi {
     double time1 = clock();
 
     // Pass current parameter guess
-    exp_fcn_.setInput(input(NLPSOL_P), mod_p_);
+    exp_fcn_.setInputNZ(p_, mod_p_);
 
     // Pass primal step/variables
     exp_fcn_.setInputNZ(x_step_, mod_du_);
-    exp_fcn_.setInputNZ(x_opt_, mod_x_);
+    exp_fcn_.setInputNZ(xk_, mod_x_);
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       exp_fcn_.setInputNZ(it->res, it->mod_var);
     }

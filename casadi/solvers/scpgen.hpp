@@ -180,15 +180,19 @@ namespace casadi {
     /// Step expansion
     Function exp_fcn_;
 
-    // Objective value
+    // Current objective value
     double fk_;
+
+    // Work vectors, nonlifted problem
+    double *xk_, *gk_;
+
     std::vector<double> gf_, gL_, b_gn_;
 
     // Nonlifted variables with bound
-    std::vector<double> x_init_, x_opt_, x_step_, x_lam_, x_dlam_;
+    std::vector<double> x_step_, x_lam_, x_dlam_;
 
     // Nonlinear bounds
-    std::vector<double> gk_, g_lam_, g_dlam_;
+    std::vector<double> g_lam_, g_dlam_;
 
     // Residual function io indices
     int res_x_, res_p_, res_g_lam_, res_p_lam_, res_p_d_;
