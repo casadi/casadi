@@ -202,7 +202,6 @@ namespace casadi {
       int mod_var, mod_lam, mod_def, mod_defL;
       int exp_def, exp_defL;
 
-      std::vector<double> step, init, opt, lam, dlam;
       std::vector<double> res, resL;
     };
 
@@ -217,8 +216,9 @@ namespace casadi {
     // Memory for lifted variables
     struct VarMem {
       int n;
+      double *dx, *x0, *x, *lam, *dlam;
     };
-    std::vector<VarMem> vm_;
+    std::vector<VarMem> lifted_mem_;
 
     // Penalty parameter of merit function
     double sigma_;

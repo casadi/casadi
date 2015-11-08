@@ -197,23 +197,20 @@ namespace casadi {
     alloc_w(nx_, true); // gL_
 
     // Allocate memory, lifted problem
-    vm_.resize(v_.size());
+    lifted_mem_.resize(v_.size());
     for (int i=0; i<v_.size(); ++i) {
-      vm_[i].n = v_[i].n;
+      int n = lifted_mem_[i].n = v_[i].n;
+      alloc_w(n, true); // dx
+      alloc_w(n, true); // x0
+      alloc_w(n, true); // x
+      if (!gauss_newton_) {
+        alloc_w(n, true); // lam
+        alloc_w(n, true); // dlam
+      }
     }
 
     // Legacy
     qpH_times_du_.resize(nx_);
-
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      it->init.resize(it->n, 0);
-      it->opt.resize(it->n, 0);
-      it->step.resize(it->n, 0);
-      if (!gauss_newton_) {
-        it->lam.resize(it->n, 0);
-        it->dlam.resize(it->n, 0);
-      }
-    }
 
     // Line-search memory
     merit_mem_.resize(merit_memsize_);
@@ -680,6 +677,17 @@ namespace casadi {
     if (gauss_newton_) {
       b_gn_ = w; w += ngn_;
     }
+
+    // Get work vectors, lifted problem
+    for (VarMem& v : lifted_mem_) {
+      v.dx = w; w += v.n;
+      v.x0 = w; w += v.n;
+      v.x = w; w += v.n;
+      if (!gauss_newton_) {
+        v.lam = w; w += v.n;
+        v.dlam = w; w += v.n;
+      }
+    }
   }
 
   void Scpgen::solve(void* mem) {
@@ -712,7 +720,7 @@ namespace casadi {
       arg_[1] = p_;
       fill_n(res_, vinit_fcn_.n_out(), nullptr);
       for (int i=0; i<v_.size(); ++i) {
-        res_[i] = getPtr(v_[i].init);
+        res_[i] = lifted_mem_[i].x0;
       }
       vinit_fcn_(arg_, res_, iw_, w_, 0);
     }
@@ -726,9 +734,9 @@ namespace casadi {
     casadi_fill(lam_xk_, nx_, 0.);
     casadi_fill(dlam_xk_, nx_, 0.);
     if (!gauss_newton_) {
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        fill(it->lam.begin(), it->lam.end(), 0);
-        fill(it->dlam.begin(), it->dlam.end(), 0);
+      for (VarMem& v : lifted_mem_) {
+        casadi_fill(v.lam, v.n, 0.);
+        casadi_fill(v.dlam, v.n, 0.);
       }
     }
 
@@ -741,8 +749,8 @@ namespace casadi {
 
     // Current guess for the primal solution
     casadi_copy(x0_, nx_, xk_);
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      copy(it->init.begin(), it->init.end(), it->opt.begin());
+    for (VarMem& v : lifted_mem_) {
+      casadi_copy(v.x0, v.n, v.x);
     }
 
     // Get current time and reset timers
@@ -1029,15 +1037,15 @@ namespace casadi {
 
     // Pass primal variables to the residual function for initial evaluation
     res_fcn_.setInputNZ(xk_, res_x_);
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      res_fcn_.setInputNZ(it->opt, it->res_var);
+    for (size_t i=0; i<v_.size(); ++i) {
+      res_fcn_.setInputNZ(lifted_mem_[i].x, v_[i].res_var);
     }
 
     // Pass dual variables to the residual function for initial evaluation
     if (!gauss_newton_) {
       res_fcn_.setInput(0.0, res_g_lam_);
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        res_fcn_.setInputNZ(it->lam, it->res_lam);
+      for (size_t i=0; i<v_.size(); ++i) {
+        res_fcn_.setInputNZ(lifted_mem_[i].lam, v_[i].res_lam);
       }
     }
 
@@ -1226,20 +1234,16 @@ namespace casadi {
 
     // Line-search loop
     while (true) {
-
       // Take the primal step
-      for (int i=0; i<nx_; ++i) xk_[i] += (t-t_prev) * dxk_[i];
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        for (int i=0; i<it->n; ++i) it->opt[i] += (t-t_prev) * it->step[i];
-      }
+      double dt = t-t_prev;
+      casadi_axpy(nx_, dt, dxk_, xk_);
+      for (VarMem& v : lifted_mem_) casadi_axpy(v.n, dt, v.dx, v.x);
 
       // Take the dual step
-      for (int i=0; i<ng_; ++i)  lam_gk_[i] += (t-t_prev) * dlam_gk_[i];
-      for (int i=0; i<nx_; ++i)  lam_xk_[i] += (t-t_prev) * dlam_xk_[i];
+      casadi_axpy(ng_, dt, dlam_gk_, lam_gk_);
+      casadi_axpy(nx_, dt, dlam_xk_, lam_xk_);
       if (!gauss_newton_) {
-        for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-          for (int i=0; i<it->n; ++i) it->lam[i] += (t-t_prev) * it->dlam[i];
-        }
+        for (VarMem& v : lifted_mem_) casadi_axpy(v.n, dt, v.dlam, v.lam);
       }
 
       // Evaluate residual function to get objective and constraints
@@ -1273,20 +1277,13 @@ namespace casadi {
     }
 
     // Calculate primal step-size
-    pr_step_ = 0;
-    for (size_t i=0; i<nx_; ++i) pr_step_ += fabs(dxk_[i]);
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      for (vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i)
-        pr_step_ += fabs(*i);
-    }
+    pr_step_ = casadi_asum(nx_, dxk_);
+    for (VarMem& v : lifted_mem_) pr_step_ += casadi_asum(v.n, v.dx);
     pr_step_ *= t;
 
     // Calculate the dual step-size
     du_step_ = casadi_asum(ng_, dlam_gk_) + casadi_asum(nx_, dlam_xk_);
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      for (vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i)
-        du_step_ += fabs(*i);
-    }
+    for (VarMem& v : lifted_mem_) du_step_ += casadi_asum(v.n, v.dlam);
     du_step_ *= t;
   }
 
@@ -1317,16 +1314,16 @@ namespace casadi {
     exp_fcn_.evaluate();
 
     // Expanded primal step
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      const DMatrix& dv = exp_fcn_.output(it->exp_def);
-      copy(dv->begin(), dv->end(), it->step.begin());
+    for (int i=0; i<v_.size(); ++ i) {
+      const DMatrix& dv = exp_fcn_.output(v_[i].exp_def);
+      casadi_copy(dv.ptr(), v_[i].n, lifted_mem_[i].dx);
     }
 
     // Expanded dual step
     if (!gauss_newton_) {
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
-        copy(dlam_v->begin(), dlam_v->end(), it->dlam.begin());
+      for (int i=0; i<v_.size(); ++ i) {
+        const DMatrix& dlam_v = exp_fcn_.output(v_[i].exp_defL);
+        casadi_copy(dlam_v.ptr(), v_[i].n, lifted_mem_[i].dlam);
       }
     }
 
