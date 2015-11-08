@@ -11011,8 +11011,14 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring") casadi::casadi_vm "[INTERNAL]  Sparse matrix-vector
-multiplication, first factor transposed: z <- z + trans(x)*y.
+%feature("docstring") casadi::lookupvector "
+
+Returns a vector for quickly looking up entries of supplied list.
+
+lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
+i
+
+Duplicates are treated by looking up last occurrence
 
 ";
 
@@ -11056,25 +11062,9 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring") casadi::lookupvector "
-
-Returns a vector for quickly looking up entries of supplied list.
-
-lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
-i
-
-Duplicates are treated by looking up last occurrence
-
-";
-
 %feature("docstring") casadi::matrixName "
 
 Get typename.
-
-";
-
-%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
-trans(x)
 
 ";
 
@@ -11140,8 +11130,8 @@ Hash value of an integer.
 
 ";
 
-%feature("docstring") casadi::casadi_spmm "[INTERNAL]  Sparse matrix-matrix
-multiplication: z <- z + x*y.
+%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
+trans(x)
 
 ";
 
@@ -11209,6 +11199,11 @@ vector * Returns the largest element in absolute value
 
 %feature("docstring") casadi::dgetrf_ "[INTERNAL]  LU-Factorize dense
 matrix (lapack)
+
+";
+
+%feature("docstring") casadi::casadi_mul "[INTERNAL]  Sparse matrix-matrix
+multiplication: z <- z + x*y.
 
 ";
 

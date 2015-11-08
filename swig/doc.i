@@ -14292,8 +14292,8 @@ Check if the vector is monotone.
 
 ";
 
-%feature("docstring")  casadi::casadi_scal(int n, real_t alpha, real_t *x,
-int inc_x) " [INTERNAL]  SCAL: x <- alpha*x.
+%feature("docstring")  casadi::casadi_scal(int n, real_t alpha, real_t *x) "
+[INTERNAL]  SCAL: x <- alpha*x.
 
 ";
 
@@ -14362,9 +14362,15 @@ Check if the vector is strictly monotone.
 
 ";
 
-%feature("docstring")  casadi::casadi_vm(const real_t *x, const int *sp_x,
-const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
-multiplication, first factor transposed: z <- z + trans(x)*y.
+%feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
+size) "
+
+Returns a vector for quickly looking up entries of supplied list.
+
+lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
+i
+
+Duplicates are treated by looking up last occurrence
 
 ";
 
@@ -14410,27 +14416,9 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
-size) "
-
-Returns a vector for quickly looking up entries of supplied list.
-
-lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
-i
-
-Duplicates are treated by looking up last occurrence
-
-";
-
 %feature("docstring")  casadi::matrixName() "
 
 Get typename.
-
-";
-
-%feature("docstring")  casadi::casadi_trans(const real_t *x, const int
-*sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-
-trans(x)
 
 ";
 
@@ -14443,7 +14431,7 @@ Checks if vector does not contain NaN or Inf.
 %feature("docstring")  casadi::is_regular(N_Vector v) " [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_mv(const real_t *x, const int *sp_x,
-const real_t *y, real_t *z) " [INTERNAL]  Sparse matrix-vector
+const real_t *y, real_t *z, int tr) " [INTERNAL]  Sparse matrix-vector
 multiplication: z <- z + x*y.
 
 ";
@@ -14479,8 +14467,8 @@ double *r, double *c, double *colcnd, double *rowcnd, double *amax, int
 
 ";
 
-%feature("docstring")  casadi::casadi_asum(int n, const real_t *x, int
-inc_x) " [INTERNAL]  ASUM: ||x||_1 -> return.
+%feature("docstring")  casadi::casadi_asum(int n, const real_t *x) "
+[INTERNAL]  ASUM: ||x||_1 -> return.
 
 ";
 
@@ -14496,9 +14484,9 @@ Hash value of an integer.
 
 ";
 
-%feature("docstring")  casadi::casadi_spmm(const real_t *x, const int *sp_x,
-const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t *w, int
-tr) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
+%feature("docstring")  casadi::casadi_trans(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-
+trans(x)
 
 ";
 
@@ -14570,6 +14558,12 @@ value
 
 %feature("docstring")  casadi::dgetrf_(int *m, int *n, double *a, int *lda,
 int *ipiv, int *info) " [INTERNAL]  LU-Factorize dense matrix (lapack)
+
+";
+
+%feature("docstring")  casadi::casadi_mul(const real_t *x, const int *sp_x,
+const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t *w, int
+tr) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
 
 ";
 
