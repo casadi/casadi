@@ -248,6 +248,9 @@ namespace casadi {
 
     // QP
     double *qpH_, *qpA_, *qpB_, *qpL_, *qpG_, *qpH_times_du_;
+
+    // QP solver
+    double *qp_lbx_, *qp_ubx_, *qp_lba_, *qp_uba_;
   };
 
 } // namespace casadi

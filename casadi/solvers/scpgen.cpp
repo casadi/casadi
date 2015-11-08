@@ -557,7 +557,6 @@ namespace casadi {
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
     qpsol_ = Function::qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
                              qpsol_options);
-    alloc(qpsol_);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
     }
@@ -652,6 +651,12 @@ namespace casadi {
       alloc_w(nx_, true); // qpG_
     }
 
+    // QP solver
+    alloc_w(nx_, true); // qp_lbx_
+    alloc_w(nx_, true); // qp_ubx_
+    alloc_w(ng_, true); // qp_lba_
+    alloc_w(ng_, true); // qp_uba_
+
     // Temporary work vectors
     alloc(mat_fcn_);
     alloc(res_fcn_);
@@ -660,6 +665,7 @@ namespace casadi {
     if (gauss_newton_) {
       alloc_w(ngn_); // casadi_mul to get GN Hessian
     }
+    alloc(qpsol_);
   }
 
   void Scpgen::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
@@ -704,6 +710,12 @@ namespace casadi {
       qpG_ = w; w += nx_;
     }
     qpH_times_du_ = w; w += nx_;
+
+    // QP solver
+    qp_lbx_ = w; w += nx_;
+    qp_ubx_ = w; w += nx_;
+    qp_lba_ = w; w += ng_;
+    qp_uba_ = w; w += ng_;
 
     // Residual
     for (VarMem& v : lifted_mem_) casadi_fill(v.res, v.n, 0.);
@@ -1147,38 +1159,37 @@ namespace casadi {
     // Get current time
     double time1 = clock();
 
+    // Get bounds on step
+    casadi_copy(lbx_, nx_, qp_lbx_);
+    casadi_copy(ubx_, nx_, qp_ubx_);
+    casadi_copy(lbg_, ng_, qp_lba_);
+    casadi_copy(ubg_, ng_, qp_uba_);
+    casadi_axpy(nx_, -1., xk_, qp_lbx_);
+    casadi_axpy(nx_, -1., xk_, qp_ubx_);
+    casadi_axpy(ng_, -1., qpB_, qp_lba_);
+    casadi_axpy(ng_, -1., qpB_, qp_uba_);
+
+    // Inputs
+    fill_n(arg_, qpsol_.n_in(), nullptr);
+    arg_[QPSOL_H] = qpH_;
+    arg_[QPSOL_G] = gfk_;
+    arg_[QPSOL_A] = qpA_;
+    arg_[QPSOL_LBX] = qp_lbx_;
+    arg_[QPSOL_UBX] = qp_ubx_;
+    arg_[QPSOL_LBA] = qp_lba_;
+    arg_[QPSOL_UBA] = qp_uba_;
+
+    // Outputs
+    fill_n(res_, qpsol_.n_out(), nullptr);
+    res_[QPSOL_X] = dxk_; // Condensed primal step
+    res_[QPSOL_LAM_X] = dlam_xk_; // Multipliers (simple bounds)
+    res_[QPSOL_LAM_A] = dlam_gk_; // Multipliers (linear bounds)
+
     // Solve the QP
-    qpsol_.setInputNZ(qpH_, QPSOL_H);
-    qpsol_.setInputNZ(gfk_, QPSOL_G);
-    qpsol_.setInputNZ(qpA_, QPSOL_A);
-    double* qp_lbx = qpsol_.input(QPSOL_LBX).ptr();
-    double* qp_ubx = qpsol_.input(QPSOL_UBX).ptr();
-    double* qp_lba = qpsol_.input(QPSOL_LBA).ptr();
-    double* qp_uba = qpsol_.input(QPSOL_UBA).ptr();
+    qpsol_(arg_, res_, iw_, w_, 0);
 
-    // Get bounds
-    casadi_copy(lbx_, nx_, qp_lbx);
-    casadi_copy(ubx_, nx_, qp_ubx);
-    casadi_copy(lbg_, ng_, qp_lba);
-    casadi_copy(ubg_, ng_, qp_uba);
-    casadi_axpy(nx_, -1., xk_, qp_lbx);
-    casadi_axpy(nx_, -1., xk_, qp_ubx);
-    casadi_axpy(ng_, -1., qpB_, qp_lba);
-    casadi_axpy(ng_, -1., qpB_, qp_uba);
-    qpsol_.evaluate();
-
-    // Condensed primal step
-    const DMatrix& du = qpsol_.output(QPSOL_X);
-    copy(du->begin(), du->end(), dxk_);
-
-    // Condensed dual step (simple bounds)
-    const DMatrix& lam_x_new = qpsol_.output(QPSOL_LAM_X);
-    copy(lam_x_new->begin(), lam_x_new->end(), dlam_xk_);
+    // Calculate step in multipliers
     casadi_axpy(nx_, -1., lam_xk_, dlam_xk_);
-
-    // Condensed dual step (nonlinear bounds)
-    const DMatrix& lam_g_new = qpsol_.output(QPSOL_LAM_A);
-    copy(lam_g_new->begin(), lam_g_new->end(), dlam_gk_);
     casadi_axpy(ng_, -1., lam_gk_, dlam_gk_);
 
     double time2 = clock();
