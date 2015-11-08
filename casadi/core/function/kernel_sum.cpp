@@ -466,10 +466,10 @@ namespace casadi {
     g.body << "      value[0] = V[I+J*" << size_.first << "];" << std::endl;
 
     // Evaluate the function
-    g.body << "      " << g(f_, "0", "arg1", "res1", "iw", "w") << ";" << endl;
+    g.body << "      if (" << g(f_, "arg1", "res1", "iw", "w", "0") << ") return 1;" << endl;
 
     // Sum results from temporary storage to accumulator
-    for (int k=0;k<num_out;++k) {
+    for (int k=0; k<num_out; ++k) {
       g.body << "      if (res1[" << k << "] && sum[" << k << "])" << endl
              << "       axpy(" << step_out_[k] << ",1," <<
                           "res1["<< k << "],1,sum[" << k << "],1);" << endl;
