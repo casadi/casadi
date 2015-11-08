@@ -213,7 +213,10 @@ namespace casadi {
 
   }
 
-  void Nlpsol::checkInitialBounds(void* mem) {
+  void Nlpsol::checkInputs(void* mem) const {
+    // Skip check?
+    if (!inputs_check_) return;
+
     const double inf = std::numeric_limits<double>::infinity();
     bool warn_initial_bounds = option("warn_initial_bounds");
 
@@ -462,24 +465,6 @@ namespace casadi {
       log("Hessian sparsity pattern generated");
     }
     return spHessLag;
-  }
-
-  void Nlpsol::checkInputs(void* mem) const {
-    // Simple bounds
-    for (int i=0; i<nx_; ++i) {
-      double lbx = lbx_ ? lbx_[i] : 0;
-      double ubx = ubx_ ? ubx_[i] : 0;
-      casadi_assert_message(lbx<=ubx, "Variable bound " << i << " is infeasible ("
-                            << lbx << " > " << ubx << ")");
-    }
-
-    // Nonlinear bounds
-    for (int i=0; i<ng_; ++i) {
-      double lbg = lbg_ ? lbg_[i] : 0;
-      double ubg = ubg_ ? ubg_[i] : 0;
-      casadi_assert_message(lbg<=ubg, "Nonlinear bound " << i << " is infeasible ("
-                            << lbg << " > " << ubg << ")");
-    }
   }
 
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;

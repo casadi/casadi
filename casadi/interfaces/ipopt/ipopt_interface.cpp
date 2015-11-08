@@ -385,24 +385,6 @@ namespace casadi {
       (*app_sens)->Initialize();
     }
 #endif // WITH_SIPOPT
-
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, name_,
-                       ProfilingData_FunctionType_Other, 5);
-
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this,
-        0, "f", nlp_.operator->());
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 1,
-        "grad_f", gradF_.operator->());
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 2,
-        "g", nlp_.operator->());
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 3,
-        "jac_g", this->jacG().operator->());
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 4,
-        "h", hessLag_.isNull() ? 0 : hessLag_.operator->());
-    }
-
   }
 
   void IpoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
@@ -431,15 +413,8 @@ namespace casadi {
       }
     }
 
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
-
-    if (inputs_check_) checkInputs(mem);
-
-    checkInitialBounds(mem);
-
-
+    // Check the provided inputs
+    checkInputs(mem);
 
     if (gather_stats_) {
       Dict iterations;
@@ -499,11 +474,6 @@ namespace casadi {
 #endif // WITH_CASADI_PATCH
     }
 #endif // WITH_SIPOPT
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteExit(CasadiOptions::profilingLog, this,
-        t_mainloop_.user - (t_callback_fun_.user-t_callback_prepare_.user));
-    }
 
     if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       // Write timings
@@ -769,9 +739,6 @@ namespace casadi {
       }
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_h_, delta);
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 4, delta.user);
-      }
       n_eval_h_ += 1;
       log("eval_h ok");
       return true;
@@ -831,9 +798,6 @@ namespace casadi {
 
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_jac_g_, delta);
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 3, delta.user);
-      }
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
@@ -879,9 +843,6 @@ namespace casadi {
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_f_, delta);
       n_eval_f_ += 1;
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 0, delta.user);
-      }
       log("eval_f ok");
       return true;
     } catch(exception& ex) {
@@ -920,9 +881,6 @@ namespace casadi {
 
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_g_, delta);
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 2, delta.user);
-      }
       n_eval_g_ += 1;
       log("eval_g ok");
       return true;
@@ -960,9 +918,6 @@ namespace casadi {
 
       const diffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_grad_f_, delta);
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 1, delta.user);
-      }
       n_eval_grad_f_ += 1;
       log("eval_grad_f ok");
       return true;

@@ -64,11 +64,8 @@ namespace casadi {
     /// Initialize
     virtual void init();
 
-    /** \brief Check if the numerical values of the supplied bounds make sense */
+    /** \brief Check if the inputs correspond to a well-posed problem */
     virtual void checkInputs(void* mem) const;
-
-    /// Warns the user about initial bounds, if option 'warn_initial_bounds' is true
-    virtual void checkInitialBounds(void* mem);
 
     /// Set options that make the NLP solver more suitable for solving QPs
     virtual void setDefaultOptions(const std::string& recipe) {}

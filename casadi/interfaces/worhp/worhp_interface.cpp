@@ -246,7 +246,86 @@ namespace casadi {
     status_[FunctionErrorHM]="FunctionErrorHM";
   }
 
-  void WorhpInterface::reset() {
+  void WorhpInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
+    for (int i=0;i<recipes.size();++i) {
+      if (recipes[i]=="qp") {
+        setOption("UserHM", true);
+      }
+    }
+  }
+
+  void WorhpInterface::passOptions() {
+
+     for (int i=0;i<WorhpGetParamCount();++i) {
+      WorhpType type = WorhpGetParamType(i+1);
+      const char* name = WorhpGetParamName(i+1);
+      if (strcmp(name, "Ares")==0) continue;
+
+      switch (type) {
+        case WORHP_BOOL_T:
+          if (hasSetOption(name)) WorhpSetBoolParam(&worhp_p_, name, option(name));
+          break;
+        case WORHP_DOUBLE_T:
+          if (hasSetOption(name)) WorhpSetDoubleParam(&worhp_p_, name, option(name));
+          break;
+        case WORHP_INT_T:
+          if (hasSetOption(name)) WorhpSetIntParam(&worhp_p_, name, option(name));
+          break;
+        default:
+          break;// do nothing
+      }
+    }
+
+    if (hasSetOption("qp_ipBarrier")) worhp_p_.qp.ipBarrier = option("qp_ipBarrier");
+    if (hasSetOption("qp_ipComTol")) worhp_p_.qp.ipComTol = option("qp_ipComTol");
+    if (hasSetOption("qp_ipFracBound")) worhp_p_.qp.ipFracBound = option("qp_ipFracBound");
+    if (hasSetOption("qp_ipLsMethod")) worhp_p_.qp.ipLsMethod = optionEnumValue("qp_ipLsMethod");
+    if (hasSetOption("qp_ipMinAlpha")) worhp_p_.qp.ipMinAlpha = option("qp_ipMinAlpha");
+    if (hasSetOption("qp_ipTryRelax")) worhp_p_.qp.ipTryRelax = option("qp_ipTryRelax");
+    if (hasSetOption("qp_ipRelaxDiv")) worhp_p_.qp.ipRelaxDiv = option("qp_ipRelaxDiv");
+    if (hasSetOption("qp_ipRelaxMult")) worhp_p_.qp.ipRelaxMult = option("qp_ipRelaxMult");
+    if (hasSetOption("qp_ipRelaxMax")) worhp_p_.qp.ipRelaxMax = option("qp_ipRelaxMax");
+    if (hasSetOption("qp_ipRelaxMin")) worhp_p_.qp.ipRelaxMin = option("qp_ipRelaxMin");
+    if (hasSetOption("qp_ipResTol")) worhp_p_.qp.ipResTol = option("qp_ipResTol");
+    if (hasSetOption("qp_lsItMaxIter")) worhp_p_.qp.lsItMaxIter = option("qp_lsItMaxIter");
+    if (hasSetOption("qp_lsItMethod")) worhp_p_.qp.lsItMethod = optionEnumValue("qp_lsItMethod");
+    if (hasSetOption("qp_lsItPrecondMethod"))
+        worhp_p_.qp.lsItPrecondMethod = optionEnumValue("qp_lsItPrecondMethod");
+    if (hasSetOption("qp_lsRefineMaxIter"))
+        worhp_p_.qp.lsRefineMaxIter = option("qp_lsRefineMaxIter");
+    if (hasSetOption("qp_lsScale")) worhp_p_.qp.lsScale = option("qp_lsScale");
+    if (hasSetOption("qp_lsTrySimple")) worhp_p_.qp.lsTrySimple = option("qp_lsTrySimple");
+    if (hasSetOption("qp_lsTol")) worhp_p_.qp.lsTol = option("qp_lsTol");
+    if (hasSetOption("qp_maxIter")) worhp_p_.qp.maxIter = option("qp_maxIter");
+    if (hasSetOption("qp_method")) worhp_p_.qp.method = optionEnumValue("qp_method");
+    if (hasSetOption("qp_nsnBeta")) worhp_p_.qp.nsnBeta = option("qp_nsnBeta");
+    if (hasSetOption("qp_nsnGradStep")) worhp_p_.qp.nsnGradStep = option("qp_nsnGradStep");
+    if (hasSetOption("qp_nsnKKT")) worhp_p_.qp.nsnKKT = option("qp_nsnKKT");
+    if (hasSetOption("qp_nsnLsMethod"))
+        worhp_p_.qp.nsnLsMethod = optionEnumValue("qp_nsnLsMethod");
+    if (hasSetOption("qp_nsnMinAlpha")) worhp_p_.qp.nsnMinAlpha = option("qp_nsnMinAlpha");
+    if (hasSetOption("qp_nsnSigma")) worhp_p_.qp.nsnSigma = option("qp_nsnSigma");
+    if (hasSetOption("qp_printLevel")) worhp_p_.qp.printLevel = optionEnumValue("qp_printLevel");
+    if (hasSetOption("qp_scaleIntern")) worhp_p_.qp.scaleIntern = option("qp_scaleIntern");
+    if (hasSetOption("qp_strict")) worhp_p_.qp.strict = option("qp_strict");
+
+    // Mark the parameters as set
+    worhp_p_.initialised = true;
+  }
+
+  std::string WorhpInterface::formatStatus(int status) const {
+    if (status_.find(status)==status_.end()) {
+      std::stringstream ss;
+      ss << "Unknown status: " << status;
+      return ss.str();
+    } else {
+      return (*status_.find(status)).second;
+    }
+  }
+
+  void WorhpInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Reset the base classes
+    Nlpsol::reset(mem, arg, res, iw, w);
 
     // Number of (free) variables
     worhp_o_.n = nx_;
@@ -350,88 +429,6 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
-    for (int i=0;i<recipes.size();++i) {
-      if (recipes[i]=="qp") {
-        setOption("UserHM", true);
-      }
-    }
-  }
-
-  void WorhpInterface::passOptions() {
-
-     for (int i=0;i<WorhpGetParamCount();++i) {
-      WorhpType type = WorhpGetParamType(i+1);
-      const char* name = WorhpGetParamName(i+1);
-      if (strcmp(name, "Ares")==0) continue;
-
-      switch (type) {
-        case WORHP_BOOL_T:
-          if (hasSetOption(name)) WorhpSetBoolParam(&worhp_p_, name, option(name));
-          break;
-        case WORHP_DOUBLE_T:
-          if (hasSetOption(name)) WorhpSetDoubleParam(&worhp_p_, name, option(name));
-          break;
-        case WORHP_INT_T:
-          if (hasSetOption(name)) WorhpSetIntParam(&worhp_p_, name, option(name));
-          break;
-        default:
-          break;// do nothing
-      }
-    }
-
-    if (hasSetOption("qp_ipBarrier")) worhp_p_.qp.ipBarrier = option("qp_ipBarrier");
-    if (hasSetOption("qp_ipComTol")) worhp_p_.qp.ipComTol = option("qp_ipComTol");
-    if (hasSetOption("qp_ipFracBound")) worhp_p_.qp.ipFracBound = option("qp_ipFracBound");
-    if (hasSetOption("qp_ipLsMethod")) worhp_p_.qp.ipLsMethod = optionEnumValue("qp_ipLsMethod");
-    if (hasSetOption("qp_ipMinAlpha")) worhp_p_.qp.ipMinAlpha = option("qp_ipMinAlpha");
-    if (hasSetOption("qp_ipTryRelax")) worhp_p_.qp.ipTryRelax = option("qp_ipTryRelax");
-    if (hasSetOption("qp_ipRelaxDiv")) worhp_p_.qp.ipRelaxDiv = option("qp_ipRelaxDiv");
-    if (hasSetOption("qp_ipRelaxMult")) worhp_p_.qp.ipRelaxMult = option("qp_ipRelaxMult");
-    if (hasSetOption("qp_ipRelaxMax")) worhp_p_.qp.ipRelaxMax = option("qp_ipRelaxMax");
-    if (hasSetOption("qp_ipRelaxMin")) worhp_p_.qp.ipRelaxMin = option("qp_ipRelaxMin");
-    if (hasSetOption("qp_ipResTol")) worhp_p_.qp.ipResTol = option("qp_ipResTol");
-    if (hasSetOption("qp_lsItMaxIter")) worhp_p_.qp.lsItMaxIter = option("qp_lsItMaxIter");
-    if (hasSetOption("qp_lsItMethod")) worhp_p_.qp.lsItMethod = optionEnumValue("qp_lsItMethod");
-    if (hasSetOption("qp_lsItPrecondMethod"))
-        worhp_p_.qp.lsItPrecondMethod = optionEnumValue("qp_lsItPrecondMethod");
-    if (hasSetOption("qp_lsRefineMaxIter"))
-        worhp_p_.qp.lsRefineMaxIter = option("qp_lsRefineMaxIter");
-    if (hasSetOption("qp_lsScale")) worhp_p_.qp.lsScale = option("qp_lsScale");
-    if (hasSetOption("qp_lsTrySimple")) worhp_p_.qp.lsTrySimple = option("qp_lsTrySimple");
-    if (hasSetOption("qp_lsTol")) worhp_p_.qp.lsTol = option("qp_lsTol");
-    if (hasSetOption("qp_maxIter")) worhp_p_.qp.maxIter = option("qp_maxIter");
-    if (hasSetOption("qp_method")) worhp_p_.qp.method = optionEnumValue("qp_method");
-    if (hasSetOption("qp_nsnBeta")) worhp_p_.qp.nsnBeta = option("qp_nsnBeta");
-    if (hasSetOption("qp_nsnGradStep")) worhp_p_.qp.nsnGradStep = option("qp_nsnGradStep");
-    if (hasSetOption("qp_nsnKKT")) worhp_p_.qp.nsnKKT = option("qp_nsnKKT");
-    if (hasSetOption("qp_nsnLsMethod"))
-        worhp_p_.qp.nsnLsMethod = optionEnumValue("qp_nsnLsMethod");
-    if (hasSetOption("qp_nsnMinAlpha")) worhp_p_.qp.nsnMinAlpha = option("qp_nsnMinAlpha");
-    if (hasSetOption("qp_nsnSigma")) worhp_p_.qp.nsnSigma = option("qp_nsnSigma");
-    if (hasSetOption("qp_printLevel")) worhp_p_.qp.printLevel = optionEnumValue("qp_printLevel");
-    if (hasSetOption("qp_scaleIntern")) worhp_p_.qp.scaleIntern = option("qp_scaleIntern");
-    if (hasSetOption("qp_strict")) worhp_p_.qp.strict = option("qp_strict");
-
-    // Mark the parameters as set
-    worhp_p_.initialised = true;
-  }
-
-  std::string WorhpInterface::formatStatus(int status) const {
-    if (status_.find(status)==status_.end()) {
-      std::stringstream ss;
-      ss << "Unknown status: " << status;
-      return ss.str();
-    } else {
-      return (*status_.find(status)).second;
-    }
-  }
-
-  void WorhpInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
-    // Reset the base classes
-    Nlpsol::reset(mem, arg, res, iw, w);
-  }
-
   void WorhpInterface::solve(void* mem) {
     for (int i=0; i<NLPSOL_NUM_IN; ++i) {
       const double *v;
@@ -463,11 +460,8 @@ namespace casadi {
       stats_["iterations"] = iterations;
     }
 
-    // Prepare the solver
-    reset();
-
-    if (inputs_check_) checkInputs(mem);
-    checkInitialBounds(mem);
+    // Check the provided inputs
+    checkInputs(mem);
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
