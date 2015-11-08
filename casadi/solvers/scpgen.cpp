@@ -702,12 +702,14 @@ namespace casadi {
 
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function
-      vinit_fcn_.setInputNZ(x_init_, 0);
-      vinit_fcn_.setInputNZ(p_, 1);
-      vinit_fcn_.evaluate();
+      fill_n(arg_, vinit_fcn_.n_in(), nullptr);
+      arg_[0] = x0_;
+      arg_[1] = p_;
+      fill_n(res_, vinit_fcn_.n_out(), nullptr);
       for (int i=0; i<v_.size(); ++i) {
-        vinit_fcn_.getOutputNZ(v_[i].init, i);
+        res_[i] = getPtr(v_[i].init);
       }
+      vinit_fcn_(arg_, res_, iw_, w_, 0);
     }
     if (verbose_) {
       userOut() << "Passed initial guess" << endl;
