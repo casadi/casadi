@@ -552,8 +552,8 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    spB_ = mat_fcn_.sparsity_out(mat_hes_);
-    spH_ = mul(spB_.T(), spB_);
+    spL_ = mat_fcn_.sparsity_out(mat_hes_);
+    spH_ = mul(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
     qpsol_ = Function::qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
                              qpsol_options);
@@ -645,6 +645,9 @@ namespace casadi {
     alloc_w(spA_.nnz(), true); // qpA_
     alloc_w(ng_, true); // qpB_
     alloc_w(nx_, true); // qpH_times_du_
+    if (gauss_newton_) {
+      alloc_w(spL_.nnz(), true); // qpL_
+    }
 
     // Temporary work vectors
     alloc(mat_fcn_);
@@ -691,6 +694,9 @@ namespace casadi {
     qpH_ = w; w += spH_.nnz();
     qpA_ = w; w += spA_.nnz();
     qpB_ = w; w += ng_;
+    if (gauss_newton_) {
+      qpL_ = w; w += spL_.nnz();
+    }
     qpH_times_du_ = w; w += nx_;
 
     // Residual
@@ -1006,29 +1012,22 @@ namespace casadi {
 
     if (gauss_newton_) {
       // Gauss-Newton Hessian
-      double* B_obj = mat_fcn_.output(mat_hes_).ptr();
+      mat_fcn_.getOutputNZ(qpL_, mat_hes_);
       casadi_fill(qpH_, spH_.nnz(), 0.);
-      casadi_mul(B_obj, spB_, B_obj, spB_, qpH_, spH_, w_, true);
+      casadi_mul(qpL_, spL_, qpL_, spL_, qpH_, spH_, w_, true);
 
       // Gradient of the objective in Gauss-Newton
       casadi_fill(gfk_, nx_, 0.);
-      casadi_mv(B_obj, spB_, b_gn_, gfk_, true);
+      casadi_mv(qpL_, spL_, b_gn_, gfk_, true);
     } else {
       // Exact Hessian
       mat_fcn_.getOutputNZ(qpH_, mat_hes_);
     }
 
     // Calculate the gradient of the lagrangian
-    const int* qpA_colind = spA_.colind();
-    int qpA_ncol = spA_.size2();
-    const int* qpA_row = spA_.row();
-    for (int i=0; i<nx_; ++i)  gL_[i] = gfk_[i] + lam_xk_[i];
-    for (int cc=0; cc<qpA_ncol; ++cc) {
-      for (int el=qpA_colind[cc]; el<qpA_colind[cc+1]; ++el) {
-        int rr = qpA_row[el];
-        gL_[cc] += qpA_[el]*lam_gk_[rr];
-      }
-    }
+    casadi_copy(gfk_, nx_, gL_);
+    casadi_axpy(nx_, 1., lam_xk_, gL_);
+    casadi_mv(qpA_, spA_, lam_gk_, gL_, true);
 
     double time2 = clock();
     t_eval_mat_ += (time2-time1)/CLOCKS_PER_SEC;

@@ -212,7 +212,7 @@ namespace casadi {
     std::vector<int> print_x_;
 
     // QP sparsity
-    Sparsity spH_, spA_, spB_;
+    Sparsity spH_, spA_, spL_;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -247,7 +247,7 @@ namespace casadi {
     std::string iteration_note_;
 
     // QP
-    double *qpH_, *qpA_, *qpB_, *qpH_times_du_;
+    double *qpH_, *qpA_, *qpB_, *qpL_, *qpH_times_du_;
   };
 
 } // namespace casadi
