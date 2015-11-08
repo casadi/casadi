@@ -115,27 +115,6 @@
 %exception  casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name, int v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ProfilingType() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_ENTRY >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_EXIT >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_IO >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_NAME >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_SOURCE >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_TIMELINE >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SharedObject::printPtr(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -187,9 +166,6 @@
 %exception  casadi::diffToDict(const diffTime &diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::getRealTime() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::getTimerTime(void) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -203,12 +179,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::operation_checker(unsigned int op) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::profileWrite(std::ofstream &f, const T &s) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::profileWriteBare(std::ofstream &f, const T &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ptrVec(const std::vector< T > &v) {

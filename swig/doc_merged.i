@@ -10827,12 +10827,10 @@ Print a representation of the object.
 
 
 // File: namespacecasadi.xml
-%feature("docstring") casadi::casadi_trans "
-[INTERNAL] 
-TRANS: y <- trans(x)
-";
+%feature("docstring") casadi::isIncreasing "
+Check if the vector is strictly increasing.
 
-%feature("docstring") casadi::profileWrite "[INTERNAL] ";
+";
 
 %feature("docstring") casadi::matrixName< double > "
 
@@ -10897,7 +10895,10 @@ with Q-transpose (lapack)
 
 ";
 
-%feature("docstring") casadi::profileWriteTime "[INTERNAL] ";
+%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
+system (lapack)
+
+";
 
 %feature("docstring") casadi::casadi_axpy "[INTERNAL]  AXPY: y <- a*x + y.
 
@@ -10905,9 +10906,14 @@ with Q-transpose (lapack)
 
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
 
-%feature("docstring") casadi::isStrictlyMonotone "
+%feature("docstring") casadi::getTimerTime "[INTERNAL]  Returns the real
+time, in seconds, or -1.0 if an error occurred.
 
-Check if the vector is strictly monotone.
+Time is measured since an arbitrary and OS-dependent start time. The
+returned real time is only useful for computing an elapsed time between two
+calls to this function.
+
+David Robert Nadeau (http://NadeauSoftware.com/)
 
 ";
 
@@ -10939,9 +10945,9 @@ swap inner and outer indices of list of lists
 
 ";
 
-%feature("docstring") casadi::isDecreasing "
+%feature("docstring") casadi::isMonotone "
 
-Check if the vector is strictly decreasing.
+Check if the vector is monotone.
 
 ";
 
@@ -10972,8 +10978,14 @@ Print matrix, matlab style.
 
 ";
 
-%feature("docstring") casadi::ProfilingType< ProfilingData_TIMELINE > "
-[INTERNAL] ";
+%feature("docstring") casadi::hash_sparsity "
+
+>  std.size_t hash_sparsity(int nrow, int ncol, [int ] colind, [int ] row)
+------------------------------------------------------------------------
+
+Hash a sparsity pattern.
+
+";
 
 %feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
 
@@ -10989,13 +11001,13 @@ equation using an LU-factorized matrix (lapack)
 
 ";
 
-%feature("docstring") casadi::isMonotone "
+%feature("docstring") casadi::diffToDict "[INTERNAL] ";
 
-Check if the vector is monotone.
+%feature("docstring") casadi::isStrictlyMonotone "
+
+Check if the vector is strictly monotone.
 
 ";
-
-%feature("docstring") casadi::ProfilingType "[INTERNAL] ";
 
 %feature("docstring") casadi::lookupvector "
 
@@ -11008,27 +11020,15 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
-%feature("docstring") casadi::casadi_mm_sparse "[INTERNAL]  Sparse matrix-
-matrix multiplication: z <- z + x*y.
+%feature("docstring") casadi::casadi_to_dense_tr "[INTERNAL]  Convert
+sparse to transposed dense.
 
 ";
 
-%feature("docstring") casadi::matrixName "
-
-Get typename.
-
-";
-
-%feature("docstring") casadi::hash_sparsity "
-
->  std.size_t hash_sparsity(int nrow, int ncol, [int ] colind, [int ] row)
-------------------------------------------------------------------------
-
-Hash a sparsity pattern.
+%feature("docstring") casadi::iszero "[INTERNAL]  Check if entry is zero
+(false negative allowed)
 
 ";
-
-%feature("docstring") casadi::profileWriteEntry "[INTERNAL] ";
 
 %feature("docstring") casadi::collocationInterpolators "
 
@@ -11058,12 +11058,16 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring") casadi::ProfilingType< ProfilingData_SOURCE > "
-[INTERNAL] ";
+%feature("docstring") casadi::matrixName "
 
-%feature("docstring") casadi::profileWriteExit "[INTERNAL] ";
+Get typename.
 
-%feature("docstring") casadi::profileWriteSourceLine "[INTERNAL] ";
+";
+
+%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
+trans(x)
+
+";
 
 %feature("docstring") casadi::is_regular "
 
@@ -11104,26 +11108,20 @@ y.size1()+x.size2()+1
 
 ";
 
-%feature("docstring") casadi::profileWriteName "[INTERNAL] ";
+%feature("docstring") casadi::isDecreasing "
 
-%feature("docstring") casadi::getTimerTime "[INTERNAL] ";
-
-%feature("docstring") casadi::casadi_to_sparse "[INTERNAL]  Convert dense
-to sparse.
+Check if the vector is strictly decreasing.
 
 ";
 
-%feature("docstring") casadi::iszero "[INTERNAL]  Check if entry is zero
-(false negative allowed)
+%feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
+scaling.
 
 ";
 
 %feature("docstring") casadi::casadi_asum "[INTERNAL]  ASUM: ||x||_1 ->
 return.
 
-";
-
-%feature("docstring") casadi::ProfilingType< ProfilingData_IO > " [INTERNAL]
 ";
 
 %feature("docstring") casadi::dgeqrf_ "[INTERNAL]  QR-factorize dense
@@ -11141,12 +11139,8 @@ Hash value of an integer.
 
 ";
 
-%feature("docstring") casadi::getRealTime "[INTERNAL]  Returns the real
-time, in seconds, or -1.0 if an error occurred.
-
-Time is measured since an arbitrary and OS-dependent start time. The
-returned real time is only useful for computing an elapsed time between two
-calls to this function.
+%feature("docstring") casadi::casadi_to_sparse "[INTERNAL]  Convert dense
+to sparse.
 
 ";
 
@@ -11160,8 +11154,6 @@ Parameters:
 scheme:  'radau' or 'legendre'
 
 ";
-
-%feature("docstring") casadi::profileWriteSourceLineDep "[INTERNAL] ";
 
 %feature("docstring") casadi::simpleRK "
 
@@ -11180,16 +11172,7 @@ order:  Order of interpolating polynomials
 
 ";
 
-%feature("docstring") casadi::ProfilingType< ProfilingData_NAME > "
-[INTERNAL] ";
-
 %feature("docstring") casadi::operation_checker "[INTERNAL] ";
-
-%feature("docstring") casadi::isIncreasing "
-
-Check if the vector is strictly increasing.
-
-";
 
 %feature("docstring") casadi::simpleIntegrator "
 
@@ -11215,9 +11198,7 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
-%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
-
-";
+%feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
 
 %feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
 
@@ -11238,23 +11219,15 @@ matrix (lapack)
 
 ";
 
-%feature("docstring") casadi::ptrToLong "[INTERNAL] ";
+%feature("docstring") casadi::casadi_mm_sparse "[INTERNAL]  Sparse matrix-
+matrix multiplication: z <- z + x*y.
 
-%feature("docstring") casadi::ProfilingType< ProfilingData_ENTRY > "
-[INTERNAL] ";
+";
 
 %feature("docstring") casadi::casadi_mm_sparse_t "[INTERNAL]  Sparse
 matrix-matrix multiplication, first factor transposed: z <- z + trans(x)*y.
 
 ";
-
-%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
-system (lapack)
-
-";
-
-%feature("docstring") casadi::ProfilingType< ProfilingData_EXIT > "
-[INTERNAL] ";
 
 %feature("docstring") casadi::isNonDecreasing "
 
@@ -11262,20 +11235,8 @@ Check if the vector is non-decreasing.
 
 ";
 
-%feature("docstring") casadi::casadi_to_dense_tr "[INTERNAL]  Convert
-sparse to transposed dense.
-
-";
-
 %feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
 x, w work vector (length >= number of rows)
-
-";
-
-%feature("docstring") casadi::profileWriteBare "[INTERNAL] ";
-
-%feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
-scaling.
 
 ";
 
@@ -11324,9 +11285,9 @@ multiplication, first factor transposed: z <- z + trans(x)*y.
 
 ";
 
-%feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
+%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
 
-%feature("docstring") casadi::diffToDict "[INTERNAL] ";
+";
 
 
 // File: namespaceIpopt.xml
