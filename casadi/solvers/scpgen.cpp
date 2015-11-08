@@ -725,26 +725,6 @@ namespace casadi {
   }
 
   void Scpgen::solve(void* mem) {
-    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
-      const double *v;
-      switch (i) {
-      case NLPSOL_X0: v = x0_; break;
-      case NLPSOL_P: v = p_; break;
-      case NLPSOL_LBX: v = lbx_; break;
-      case NLPSOL_UBX: v = ubx_; break;
-      case NLPSOL_LBG: v = lbg_; break;
-      case NLPSOL_UBG: v = ubg_; break;
-      case NLPSOL_LAM_X0: v = lam_x0_; break;
-      case NLPSOL_LAM_G0: v = lam_g0_; break;
-      default: casadi_assert(0);
-      }
-      if (v) {
-        setInputNZ(v, i);
-      } else {
-        setInput(0., i);
-      }
-    }
-
     // Check the provided inputs
     checkInputs(mem);
     if (v_.size()>0) {
@@ -879,11 +859,11 @@ namespace casadi {
     userOut() << "optimal cost = " << fk_ << endl;
 
     // Save results to outputs
-    output(NLPSOL_F).setNZ(&fk_);
-    output(NLPSOL_X).setNZ(xk_);
-    output(NLPSOL_LAM_G).setNZ(lam_gk_);
-    output(NLPSOL_LAM_X).setNZ(lam_xk_);
-    output(NLPSOL_G).setNZ(gk_);
+    casadi_copy(&fk_, 1, f_);
+    casadi_copy(xk_, nx_, x_);
+    casadi_copy(lam_gk_, ng_, lam_g_);
+    casadi_copy(lam_xk_, nx_, lam_x_);
+    casadi_copy(gk_, ng_, g_);
 
     // Write timers
     if (print_time_) {
@@ -900,20 +880,6 @@ namespace casadi {
     stats_["iter_count"] = iter;
 
     userOut() << endl;
-
-    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-      double **v;
-      switch (i) {
-      case NLPSOL_X: v = &x_; break;
-      case NLPSOL_F: v = &f_; break;
-      case NLPSOL_G: v = &g_; break;
-      case NLPSOL_LAM_X: v = &lam_x_; break;
-      case NLPSOL_LAM_G: v = &lam_g_; break;
-      case NLPSOL_LAM_P: v = &lam_p_; break;
-      default: casadi_assert(0);
-      }
-      if (*v) getOutputNZ(*v, i);
-    }
   }
 
   double Scpgen::primalInfeasibility() {
@@ -1075,7 +1041,7 @@ namespace casadi {
         res_[v_[i].res_lam_d] = lifted_mem_[i].resL;
       }
     }
-    res_[res_p_d_] = output(NLPSOL_LAM_P).ptr(); // Parameter sensitivities
+    res_[res_p_d_] = lam_p_; // Parameter sensitivities
 
     // Evaluate residual function
     res_fcn_(arg_, res_, iw_, w_, 0);
