@@ -318,7 +318,7 @@ namespace casadi {
 
     // Evaluate the initial gradient of the Lagrangian
     copy(gf_, gf_+nx_, gLag_);
-    if (ng_>0) casadi_vm(Jk_, Asp_, mu_, gLag_);
+    if (ng_>0) casadi_mv(Jk_, Asp_, mu_, gLag_, true);
     // gLag += mu_x_;
     transform(gLag_, gLag_+nx_, mu_x_, gLag_, plus<double>());
 
@@ -563,7 +563,7 @@ namespace casadi {
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
         copy(gf_, gf_+nx_, gLag_old_);
-        if (ng_>0) casadi_vm(Jk_, Asp_, mu_, gLag_old_);
+        if (ng_>0) casadi_mv(Jk_, Asp_, mu_, gLag_old_, true);
         // gLag_old += mu_x_;
         transform(gLag_old_, gLag_old_+nx_, mu_x_, gLag_old_, plus<double>());
       }
@@ -578,7 +578,7 @@ namespace casadi {
 
       // Evaluate the gradient of the Lagrangian with the new x and new mu
       copy(gf_, gf_+nx_, gLag_);
-      if (ng_>0) casadi_vm(Jk_, Asp_, mu_, gLag_);
+      if (ng_>0) casadi_mv(Jk_, Asp_, mu_, gLag_, true);
 
       // gLag += mu_x_;
       transform(gLag_, gLag_+nx_, mu_x_, gLag_, plus<double>());

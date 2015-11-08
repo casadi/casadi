@@ -99,10 +99,10 @@ namespace casadi {
     std::string dot(int n, const std::string& x, const std::string& y);
 
     /** \brief Codegen sparse matrix-matrix multiplication */
-    std::string spmm(const std::string& x, const Sparsity& sp_x,
-                     const std::string& y, const Sparsity& sp_y,
-                     const std::string& z, const Sparsity& sp_z,
-                     const std::string& w, bool tr);
+    std::string mul(const std::string& x, const Sparsity& sp_x,
+                    const std::string& y, const Sparsity& sp_y,
+                    const std::string& z, const Sparsity& sp_z,
+                    const std::string& w, bool tr);
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
@@ -117,7 +117,7 @@ namespace casadi {
       AUX_ASUM,
       AUX_SQ,
       AUX_SIGN,
-      AUX_SPMM,
+      AUX_MUL,
       AUX_PROJECT,
       AUX_TRANS,
       AUX_TO_MEX,

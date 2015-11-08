@@ -1331,8 +1331,8 @@ namespace casadi {
       // Carry out the matrix product
       Matrix<DataType> ret = z;
       std::vector<DataType> work(size1());
-      casadi_spmm(ptr(), sparsity(), y.ptr(), y.sparsity(),
-                  ret.ptr(), ret.sparsity(), getPtr(work), false);
+      casadi_mul(ptr(), sparsity(), y.ptr(), y.sparsity(),
+                 ret.ptr(), ret.sparsity(), getPtr(work), false);
       return ret;
     }
   }

@@ -157,6 +157,9 @@ namespace casadi {
     /// Regularization
     bool regularize_;
 
+    // Number of gauss_newton equations
+    int ngn_;
+
     // Options
     double reg_threshold_;
 
@@ -180,14 +183,6 @@ namespace casadi {
     /// Step expansion
     Function exp_fcn_;
 
-    // Current objective value
-    double fk_;
-
-    // Work vectors, nonlifted problem
-    double *xk_, *gk_, *dxk_, *lam_xk_, *dlam_xk_, *lam_gk_, *dlam_gk_;
-
-    std::vector<double> gf_, gL_, b_gn_;
-
     // Residual function io indices
     int res_x_, res_p_, res_g_lam_, res_p_lam_, res_p_d_;
     int res_f_, res_gl_, res_g_;
@@ -209,10 +204,15 @@ namespace casadi {
 
       std::vector<double> step, init, opt, lam, dlam;
       std::vector<double> res, resL;
-
     };
 
     std::vector<Var> v_;
+
+    // Current objective value
+    double fk_;
+
+    // Work vectors, nonlifted problem
+    double *xk_, *gk_, *dxk_, *lam_xk_, *dlam_xk_, *lam_gk_, *dlam_gk_, *gfk_, *gL_, *b_gn_;
 
     // Memory for lifted variables
     struct VarMem {

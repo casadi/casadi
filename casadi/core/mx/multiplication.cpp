@@ -60,9 +60,9 @@ namespace casadi {
   template<typename T>
   void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    casadi_spmm(arg[1], dep(1).sparsity(),
-                arg[2], dep(2).sparsity(),
-                res[0], sparsity(), w, false);
+    casadi_mul(arg[1], dep(1).sparsity(),
+               arg[2], dep(2).sparsity(),
+               res[0], sparsity(), w, false);
   }
 
   void Multiplication::evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -109,9 +109,9 @@ namespace casadi {
     }
 
     // Perform sparse matrix multiplication
-    g.body << "  " << g.spmm(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
-                             g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
-                             g.work(res[0], nnz()), sparsity(), "w", false) << endl;
+    g.body << "  " << g.mul(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
+                            g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
+                            g.work(res[0], nnz()), sparsity(), "w", false) << endl;
   }
 
   void DenseMultiplication::

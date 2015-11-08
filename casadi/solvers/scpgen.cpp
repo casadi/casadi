@@ -193,6 +193,8 @@ namespace casadi {
     alloc_w(nx_, true); // dlam_xk_
     alloc_w(ng_, true); // lam_gk_
     alloc_w(ng_, true); // dlam_gk_
+    alloc_w(nx_, true); // gfk_
+    alloc_w(nx_, true); // gL_
 
     // Allocate memory, lifted problem
     vm_.resize(v_.size());
@@ -229,8 +231,9 @@ namespace casadi {
       // Least square objective
       f = inner_prod(vdef_out[0], vdef_out[0])/2;
       gL_defL = vdef_out[0];
-      b_gn_.resize(gL_defL.nnz(), numeric_limits<double>::quiet_NaN());
-      work_.resize(gL_defL.nnz());
+      ngn_ = gL_defL.nnz();
+      alloc_w(ngn_, true); // b_gn_
+      work_.resize(ngn_);
     } else {
       // Scalar objective function
       f = vdef_out[0];
@@ -279,8 +282,6 @@ namespace casadi {
         userOut() << "Generated the gradient of the Lagrangian." << endl;
       }
     }
-    gL_.resize(nx_, numeric_limits<double>::quiet_NaN());
-    gf_.resize(nx_, numeric_limits<double>::quiet_NaN());
 
     // Residual function
 
@@ -674,6 +675,11 @@ namespace casadi {
     dlam_xk_ = w; w += nx_;
     lam_gk_ = w; w += ng_;
     dlam_gk_ = w; w += ng_;
+    gfk_ = w; w += nx_;
+    gL_ = w; w += nx_;
+    if (gauss_newton_) {
+      b_gn_ = w; w += ngn_;
+    }
   }
 
   void Scpgen::solve(void* mem) {
@@ -986,12 +992,12 @@ namespace casadi {
       // Gauss-Newton Hessian
       const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
       fill(qpH_->begin(), qpH_->end(), 0);
-      casadi_spmm(B_obj.ptr(), B_obj.sparsity(), B_obj.ptr(), B_obj.sparsity(),
-                  qpH_.ptr(), qpH_.sparsity(), getPtr(work_), true);
+      casadi_mul(B_obj.ptr(), B_obj.sparsity(), B_obj.ptr(), B_obj.sparsity(),
+                 qpH_.ptr(), qpH_.sparsity(), getPtr(work_), true);
 
       // Gradient of the objective in Gauss-Newton
-      fill(gf_.begin(), gf_.end(), 0);
-      casadi_vm(B_obj.ptr(), B_obj.sparsity(), getPtr(b_gn_), getPtr(gf_));
+      casadi_fill(gfk_, nx_, 0.);
+      casadi_mv(B_obj.ptr(), B_obj.sparsity(), b_gn_, gfk_, true);
     } else {
       // Exact Hessian
       mat_fcn_.getOutput(qpH_, mat_hes_);
@@ -1002,7 +1008,7 @@ namespace casadi {
     const int* qpA_colind = qpA_.colind();
     int qpA_ncol = qpA_.size2();
     const int* qpA_row = qpA_.row();
-    for (int i=0; i<nx_; ++i)  gL_[i] = gf_[i] + lam_xk_[i];
+    for (int i=0; i<nx_; ++i)  gL_[i] = gfk_[i] + lam_xk_[i];
     for (int cc=0; cc<qpA_ncol; ++cc) {
       for (int el=qpA_colind[cc]; el<qpA_colind[cc+1]; ++el) {
         int rr = qpA_row[el];
@@ -1045,7 +1051,7 @@ namespace casadi {
     if (gauss_newton_) {
       res_fcn_.getOutputNZ(b_gn_, res_gl_);
     } else {
-      res_fcn_.getOutputNZ(gf_, res_gl_);
+      res_fcn_.getOutputNZ(gfk_, res_gl_);
     }
 
     // Get constraints
@@ -1096,11 +1102,9 @@ namespace casadi {
 
     // Gradient of the objective in the reduced QP
     if (gauss_newton_) {
-      transform(b_gn_.begin(), b_gn_.end(), vec_fcn_.output(vec_gf_)->begin(),
-                b_gn_.begin(), std::minus<double>());
+      casadi_axpy(ngn_, -1., vec_fcn_.output(vec_gf_).ptr(), b_gn_);
     } else {
-      transform(gf_.begin(), gf_.end(), vec_fcn_.output(vec_gf_)->begin(),
-                gf_.begin(), std::minus<double>());
+      casadi_axpy(nx_, -1., vec_fcn_.output(vec_gf_).ptr(), gfk_);
     }
 
     double time2 = clock();
@@ -1143,7 +1147,7 @@ namespace casadi {
 
     // Solve the QP
     qpsol_.setInputNZ(qpH_.ptr(), QPSOL_H);
-    qpsol_.setInputNZ(gf_, QPSOL_G);
+    qpsol_.setInputNZ(gfk_, QPSOL_G);
     qpsol_.setInputNZ(qpA_.ptr(), QPSOL_A);
     double* qp_lbx = qpsol_.input(QPSOL_LBX).ptr();
     double* qp_ubx = qpsol_.input(QPSOL_UBX).ptr();
@@ -1199,7 +1203,7 @@ namespace casadi {
 
     // Right-hand side of Armijo condition
     double F_sens = 0;
-    for (int i=0; i<nx_; ++i) F_sens += dxk_[i] * gf_[i];
+    for (int i=0; i<nx_; ++i) F_sens += dxk_[i] * gfk_[i];
     double L1dir = F_sens - sigma_ * l1_infeas;
     double L1merit = fk_ + sigma_ * l1_infeas;
 
