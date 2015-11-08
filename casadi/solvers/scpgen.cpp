@@ -203,9 +203,11 @@ namespace casadi {
       alloc_w(n, true); // dx
       alloc_w(n, true); // x0
       alloc_w(n, true); // x
+      alloc_w(n, true); // res
       if (!gauss_newton_) {
         alloc_w(n, true); // lam
         alloc_w(n, true); // dlam
+        alloc_w(n, true); // resL
       }
     }
 
@@ -601,17 +603,6 @@ namespace casadi {
       userOut() << "Allocated QP solver." << endl;
     }
 
-    // Residual
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      it->res.resize(it->d.nnz(), 0);
-    }
-
-    if (!gauss_newton_) {
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        it->resL.resize(it->d_lam.nnz(), 0);
-      }
-    }
-
     if (verbose_) {
       userOut() << "NLP preparation completed" << endl;
     }
@@ -683,10 +674,18 @@ namespace casadi {
       v.dx = w; w += v.n;
       v.x0 = w; w += v.n;
       v.x = w; w += v.n;
+      v.res = w; w += v.n;
       if (!gauss_newton_) {
         v.lam = w; w += v.n;
         v.dlam = w; w += v.n;
+        v.resL = w; w += v.n;
       }
+    }
+
+    // Residual
+    for (VarMem& v : lifted_mem_) casadi_fill(v.res, v.n, 0.);
+    if (!gauss_newton_) {
+      for (VarMem& v : lifted_mem_) casadi_fill(v.resL, v.n, 0.);
     }
   }
 
@@ -891,9 +890,7 @@ namespace casadi {
     for (int i=0; i<nx_; ++i) pr_inf +=  std::max(lbx(i)-xk_[i], 0.);
 
     // Lifted variables
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      for (int i=0; i<it->n; ++i) pr_inf += ::fabs(it->res[i]);
-    }
+    for (VarMem& v : lifted_mem_) pr_inf += casadi_asum(v.n, v.res);
 
     // Nonlinear bounds
     for (int i=0; i<ng_; ++i) pr_inf += std::max(gk_[i]-ubg(i), 0.);
@@ -978,15 +975,15 @@ namespace casadi {
 
     // Pass primal step/variables
     mat_fcn_.setInputNZ(xk_, mod_x_);
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      mat_fcn_.setInputNZ(it->res, it->mod_var);
+    for (size_t i=0; i<v_.size(); ++i) {
+      mat_fcn_.setInputNZ(lifted_mem_[i].res, v_[i].mod_var);
     }
 
     // Pass dual steps/variables
     if (!gauss_newton_) {
       mat_fcn_.setInputNZ(lam_gk_, mod_g_lam_);
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        mat_fcn_.setInputNZ(it->resL, it->mod_lam);
+      for (size_t i=0; i<v_.size(); ++i) {
+        mat_fcn_.setInputNZ(lifted_mem_[i].resL, v_[i].mod_lam);
       }
     }
 
@@ -1066,10 +1063,10 @@ namespace casadi {
     res_fcn_.getOutputNZ(gk_, res_g_);
 
     // Get residuals
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      res_fcn_.getOutputNZ(it->res,  it->res_d);
+    for (size_t i=0; i<v_.size(); ++i) {
+      res_fcn_.getOutputNZ(lifted_mem_[i].res,  v_[i].res_d);
       if (!gauss_newton_) {
-        res_fcn_.getOutputNZ(it->resL, it->res_lam_d);
+        res_fcn_.getOutputNZ(lifted_mem_[i].resL, v_[i].res_lam_d);
       }
     }
 
@@ -1089,15 +1086,15 @@ namespace casadi {
 
     // Pass primal step/variables
     vec_fcn_.setInputNZ(xk_, mod_x_);
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      vec_fcn_.setInputNZ(it->res, it->mod_var);
+    for (size_t i=0; i<v_.size(); ++i) {
+      vec_fcn_.setInputNZ(lifted_mem_[i].res, v_[i].mod_var);
     }
 
     // Pass dual steps/variables
     if (!gauss_newton_) {
       vec_fcn_.setInput(0.0, mod_g_lam_);
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        vec_fcn_.setInputNZ(it->resL, it->mod_lam);
+      for (size_t i=0; i<v_.size(); ++i) {
+        vec_fcn_.setInputNZ(lifted_mem_[i].resL, v_[i].mod_lam);
       }
     }
 
@@ -1297,16 +1294,16 @@ namespace casadi {
     // Pass primal step/variables
     exp_fcn_.setInputNZ(dxk_, mod_du_);
     exp_fcn_.setInputNZ(xk_, mod_x_);
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      exp_fcn_.setInputNZ(it->res, it->mod_var);
+    for (size_t i=0; i<v_.size(); ++i) {
+      exp_fcn_.setInputNZ(lifted_mem_[i].res, v_[i].mod_var);
     }
 
     // Pass dual step/variables
     if (!gauss_newton_) {
       exp_fcn_.setInputNZ(dlam_gk_, mod_dlam_g_);
       exp_fcn_.setInputNZ(lam_gk_, mod_g_lam_);
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        exp_fcn_.setInputNZ(it->resL, it->mod_lam);
+      for (size_t i=0; i<v_.size(); ++i) {
+        exp_fcn_.setInputNZ(lifted_mem_[i].resL, v_[i].mod_lam);
       }
     }
 

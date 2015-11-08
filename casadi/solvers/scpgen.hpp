@@ -201,8 +201,6 @@ namespace casadi {
       int res_var, res_lam, res_d, res_lam_d;
       int mod_var, mod_lam, mod_def, mod_defL;
       int exp_def, exp_defL;
-
-      std::vector<double> res, resL;
     };
 
     std::vector<Var> v_;
@@ -217,6 +215,7 @@ namespace casadi {
     struct VarMem {
       int n;
       double *dx, *x0, *x, *lam, *dlam;
+      double *res, *resL;
     };
     std::vector<VarMem> lifted_mem_;
 
