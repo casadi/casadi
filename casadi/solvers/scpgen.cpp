@@ -167,6 +167,7 @@ namespace casadi {
     Function vdef_fcn, vinit_fcn;
     fg.generate_lifted(vdef_fcn, vinit_fcn);
     vinit_fcn_ = vinit_fcn;
+    alloc(vinit_fcn_);
 
     // Extract the expressions
     vector<MX> vdef_in = vdef_fcn.mx_in();
@@ -572,6 +573,10 @@ namespace casadi {
       vec_fcn_ = vec_fcn;
       exp_fcn_ = exp_fcn;
     }
+    alloc(mat_fcn_);
+    alloc(res_fcn_);
+    alloc(vec_fcn_);
+    alloc(exp_fcn_);
 
     // Allocate QP data
     Sparsity sp_B_obj = mat_fcn_.output(mat_hes_).sparsity();
@@ -589,6 +594,7 @@ namespace casadi {
     qpsol_ = Function::qpsol("qpsol", option("qpsol"),
                                      {{"h", qpH_.sparsity()}, {"a", qpA_.sparsity()}},
                                      qpsol_options);
+    alloc(qpsol_);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
     }
@@ -682,22 +688,22 @@ namespace casadi {
     checkInputs(mem);
 
     // Get problem data
-    const vector<double>& x_init = input(NLPSOL_X0).data();
-    const vector<double>& lbx = input(NLPSOL_LBX).data();
-    const vector<double>& ubx = input(NLPSOL_UBX).data();
-    const vector<double>& lbg = input(NLPSOL_LBG).data();
-    const vector<double>& ubg = input(NLPSOL_UBG).data();
-
-    copy(x_init.begin(), x_init.end(), x_init_.begin());
-    copy(lbx.begin(), lbx.end(), x_lb_.begin());
-    copy(ubx.begin(), ubx.end(), x_ub_.begin());
-    copy(lbg.begin(), lbg.end(), g_lb_.begin());
-    copy(ubg.begin(), ubg.end(), g_ub_.begin());
+    for (int i=0; i<nx_; ++i) {
+      x_init_[i] = x0(i);
+      x_lb_[i] = lbx(i);
+      x_ub_[i] = ubx(i);
+      g_lb_[i] = lbg(i);
+      g_ub_[i] = ubg(i);
+    }
+    for (int i=0; i<ng_; ++i) {
+      g_lb_[i] = lbg(i);
+      g_ub_[i] = ubg(i);
+    }
 
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function
       vinit_fcn_.setInputNZ(x_init_, 0);
-      vinit_fcn_.setInput(input(NLPSOL_P), 1);
+      vinit_fcn_.setInputNZ(p_, 1);
       vinit_fcn_.evaluate();
       for (int i=0; i<v_.size(); ++i) {
         vinit_fcn_.getOutputNZ(v_[i].init, i);

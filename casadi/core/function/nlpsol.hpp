@@ -155,6 +155,16 @@ namespace casadi {
     // Inputs
     const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
 
+    // Get an element of the inputs
+    inline double x0(int i) const { return x0_ ? x0_[i] : 0;}
+    inline double p(int i) const { return p_ ? p_[i] : 0;}
+    inline double lbx(int i) const { return lbx_ ? lbx_[i] : 0;}
+    inline double ubx(int i) const { return ubx_ ? ubx_[i] : 0;}
+    inline double lbg(int i) const { return lbg_ ? lbg_[i] : 0;}
+    inline double ubg(int i) const { return ubg_ ? ubg_[i] : 0;}
+    inline double lam_x0(int i) const { return lam_x0_ ? lam_x0_[i] : 0;}
+    inline double lam_g0(int i) const { return lam_g0_ ? lam_g0_[i] : 0;}
+
     // Outputs
     double *x_, *f_, *g_, *lam_x_, *lam_g_, *lam_p_;
 
@@ -163,6 +173,7 @@ namespace casadi {
     double** res_;
     int* iw_;
     double* w_;
+
 
     // Evaluate numerically
     virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
