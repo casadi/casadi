@@ -466,8 +466,8 @@ namespace casadi {
     // Prepare the solver
     reset();
 
-    if (inputs_check_) checkInputs();
-    checkInitialBounds();
+    if (inputs_check_) checkInputs(mem);
+    checkInitialBounds(mem);
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =

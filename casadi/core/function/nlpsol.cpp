@@ -213,30 +213,30 @@ namespace casadi {
 
   }
 
-  void Nlpsol::checkInitialBounds() {
-    const std::vector<double>& x0 = input(NLPSOL_X0).data();
-    const std::vector<double>& lbx = input(NLPSOL_LBX).data();
-    const std::vector<double>& ubx = input(NLPSOL_UBX).data();
-    const std::vector<double>& lbg = input(NLPSOL_LBG).data();
-    const std::vector<double>& ubg = input(NLPSOL_UBG).data();
+  void Nlpsol::checkInitialBounds(void* mem) {
     const double inf = std::numeric_limits<double>::infinity();
+    bool warn_initial_bounds = option("warn_initial_bounds");
 
     // Detect ill-posed problems (simple bounds)
-    bool violated = false;
-    for (int i=0; !violated && i<nx_; ++i)
-      violated = lbx[i]==inf || lbx[i]>ubx[i] || ubx[i]==-inf;
-    casadi_assert_message(!violated, "Ill-posed problem detected (x bounds)");
+    for (int i=0; i<nx_; ++i) {
+      double lbx = lbx_ ? lbx_[i] : 0;
+      double ubx = ubx_ ? ubx_[i] : 0;
+      double x0 = x0_ ? x0_[i] : 0;
+      casadi_assert_message(!(lbx==inf || lbx>ubx || ubx==-inf),
+                            "Ill-posed problem detected (x bounds)");
+      if (warn_initial_bounds && (x0>ubx || x0<lbx)) {
+        casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
+                       "Option 'warn_initial_bounds' controls this warning.");
+        break;
+      }
+    }
 
     // Detect ill-posed problems (nonlinear bounds)
-    for (int i=0; !violated && i<ng_; ++i)
-      violated = lbg[i]==inf || lbg[i]>ubg[i] || ubg[i]==-inf;
-    casadi_assert_message(!violated, "Ill-posed problem detected (g bounds)");
-
-    // Warn if initial condition violates bounds
-    if (static_cast<bool>(option("warn_initial_bounds"))) {
-      for (int k=0; !violated && k<nx_; ++k) violated = x0[k]>ubx[k] || x0[k]<lbx[k];
-      if (violated) casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
-                                   "Option 'warn_initial_bounds' controls this warning.");
+    for (int i=0; i<ng_; ++i) {
+      double lbg = lbg_ ? lbg_[i] : 0;
+      double ubg = ubg_ ? ubg_[i] : 0;
+      casadi_assert_message(!(lbg==inf || lbg>ubg || ubg==-inf),
+                            "Ill-posed problem detected (g bounds)");
     }
   }
 
@@ -476,18 +476,21 @@ namespace casadi {
     return spHessLag;
   }
 
-  void Nlpsol::checkInputs() const {
-    for (int i=0;i<input(NLPSOL_LBX).nnz();++i) {
-      casadi_assert_message(input(NLPSOL_LBX).at(i)<=input(NLPSOL_UBX).at(i),
-                            "LBX[i] <= UBX[i] was violated for i=" << i
-                            << ". Got LBX[i]=" << input(NLPSOL_LBX).at(i)
-                            << " and UBX[i]=" << input(NLPSOL_UBX).at(i));
+  void Nlpsol::checkInputs(void* mem) const {
+    // Simple bounds
+    for (int i=0; i<nx_; ++i) {
+      double lbx = lbx_ ? lbx_[i] : 0;
+      double ubx = ubx_ ? ubx_[i] : 0;
+      casadi_assert_message(lbx<=ubx, "Variable bound " << i << " is infeasible ("
+                            << lbx << " > " << ubx << ")");
     }
-    for (int i=0;i<input(NLPSOL_LBG).nnz();++i) {
-      casadi_assert_message(input(NLPSOL_LBG).at(i)<=input(NLPSOL_UBG).at(i),
-                            "LBG[i] <= UBG[i] was violated for i=" << i
-                            << ". Got LBG[i]=" << input(NLPSOL_LBG).at(i)
-                            << " and UBG[i]=" << input(NLPSOL_UBG).at(i));
+
+    // Nonlinear bounds
+    for (int i=0; i<ng_; ++i) {
+      double lbg = lbg_ ? lbg_[i] : 0;
+      double ubg = ubg_ ? ubg_[i] : 0;
+      casadi_assert_message(lbg<=ubg, "Nonlinear bound " << i << " is infeasible ("
+                            << lbg << " > " << ubg << ")");
     }
   }
 

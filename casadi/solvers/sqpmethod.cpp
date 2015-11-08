@@ -275,8 +275,8 @@ namespace casadi {
   }
 
   void Sqpmethod::solve(void* mem) {
-    if (inputs_check_) checkInputs();
-    checkInitialBounds();
+    if (inputs_check_) checkInputs(mem);
+    checkInitialBounds(mem);
 
     if (gather_stats_) {
       Dict iterations;

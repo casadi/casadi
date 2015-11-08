@@ -435,9 +435,9 @@ namespace casadi {
       profileWriteEntry(CasadiOptions::profilingLog, this);
     }
 
-    if (inputs_check_) checkInputs();
+    if (inputs_check_) checkInputs(mem);
 
-    checkInitialBounds();
+    checkInitialBounds(mem);
 
 
 

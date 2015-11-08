@@ -68,10 +68,10 @@ namespace casadi {
     void reportConstraints(std::ostream &stream=casadi::userOut());
 
     /** \brief Check if the numerical values of the supplied bounds make sense */
-    virtual void checkInputs() const;
+    virtual void checkInputs(void* mem) const;
 
     /// Warns the user about initial bounds, if option 'warn_initial_bounds' is true
-    virtual void checkInitialBounds();
+    virtual void checkInitialBounds(void* mem);
 
     /// Set options that make the NLP solver more suitable for solving QPs
     virtual void setDefaultOptions(const std::string& recipe) {}

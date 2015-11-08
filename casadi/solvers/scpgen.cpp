@@ -678,8 +678,8 @@ namespace casadi {
       }
     }
 
-    if (inputs_check_) checkInputs();
-    checkInitialBounds();
+    if (inputs_check_) checkInputs(mem);
+    checkInitialBounds(mem);
 
     // Get problem data
     const vector<double>& x_init = input(NLPSOL_X0).data();
