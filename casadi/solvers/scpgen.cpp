@@ -1296,41 +1296,33 @@ namespace casadi {
     // Get current time
     double time1 = clock();
 
-    // Pass current parameter guess
-    exp_fcn_.setInputNZ(p_, mod_p_);
-
-    // Pass primal step/variables
-    exp_fcn_.setInputNZ(dxk_, mod_du_);
-    exp_fcn_.setInputNZ(xk_, mod_x_);
+    // Inputs
+    fill_n(arg_, exp_fcn_.n_in(), nullptr);
+    arg_[mod_p_] = p_; // Parameter
+    arg_[mod_du_] = dxk_; // Primal step
+    arg_[mod_x_] = xk_; // Primal variables
     for (size_t i=0; i<v_.size(); ++i) {
-      exp_fcn_.setInputNZ(lifted_mem_[i].res, v_[i].mod_var);
+      arg_[v_[i].mod_var] = lifted_mem_[i].res;
+    }
+    if (!gauss_newton_) {
+      arg_[mod_dlam_g_] = dlam_gk_; // Dual variables
+      arg_[mod_g_lam_] = lam_gk_; // Dual step
+      for (size_t i=0; i<v_.size(); ++i) {
+        arg_[v_[i].mod_lam] = lifted_mem_[i].resL;
+      }
     }
 
-    // Pass dual step/variables
-    if (!gauss_newton_) {
-      exp_fcn_.setInputNZ(dlam_gk_, mod_dlam_g_);
-      exp_fcn_.setInputNZ(lam_gk_, mod_g_lam_);
-      for (size_t i=0; i<v_.size(); ++i) {
-        exp_fcn_.setInputNZ(lifted_mem_[i].resL, v_[i].mod_lam);
+    // Outputs
+    fill_n(res_, exp_fcn_.n_out(), nullptr);
+    for (int i=0; i<v_.size(); ++ i) {
+      res_[v_[i].exp_def] = lifted_mem_[i].dx; // Expanded primal step
+      if (!gauss_newton_) {
+        res_[v_[i].exp_defL] = lifted_mem_[i].dlam; // Expanded dual step
       }
     }
 
     // Perform the step expansion
-    exp_fcn_.evaluate();
-
-    // Expanded primal step
-    for (int i=0; i<v_.size(); ++ i) {
-      const DMatrix& dv = exp_fcn_.output(v_[i].exp_def);
-      casadi_copy(dv.ptr(), v_[i].n, lifted_mem_[i].dx);
-    }
-
-    // Expanded dual step
-    if (!gauss_newton_) {
-      for (int i=0; i<v_.size(); ++ i) {
-        const DMatrix& dlam_v = exp_fcn_.output(v_[i].exp_defL);
-        casadi_copy(dlam_v.ptr(), v_[i].n, lifted_mem_[i].dlam);
-      }
-    }
+    exp_fcn_(arg_, res_, iw_, w_, 0);
 
     double time2 = clock();
     t_eval_exp_ += (time2-time1)/CLOCKS_PER_SEC;
