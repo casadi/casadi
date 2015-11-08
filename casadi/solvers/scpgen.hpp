@@ -212,7 +212,10 @@ namespace casadi {
     std::vector<int> print_x_;
 
     // QP sparsity
-    Sparsity spH_, spA_;
+    Sparsity spH_, spA_, spB_;
+
+    /// A documentation string
+    static const std::string meta_doc;
 
     // Current objective value
     double fk_;
@@ -245,12 +248,6 @@ namespace casadi {
 
     // QP
     double *qpH_, *qpA_, *qpB_, *qpH_times_du_;
-
-    /// A documentation string
-    static const std::string meta_doc;
-
-    /// Work vector
-    std::vector<double> work_;
   };
 
 } // namespace casadi

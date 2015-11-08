@@ -200,7 +200,6 @@ namespace casadi {
       f = inner_prod(vdef_out[0], vdef_out[0])/2;
       gL_defL = vdef_out[0];
       ngn_ = gL_defL.nnz();
-      work_.resize(ngn_);
     } else {
       // Scalar objective function
       f = vdef_out[0];
@@ -545,10 +544,6 @@ namespace casadi {
       vec_fcn_ = vec_fcn;
       exp_fcn_ = exp_fcn;
     }
-    alloc(mat_fcn_);
-    alloc(res_fcn_);
-    alloc(vec_fcn_);
-    alloc(exp_fcn_);
 
     // QP solver options
     Dict qpsol_options;
@@ -557,8 +552,8 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    Sparsity sp_B_obj = mat_fcn_.sparsity_out(mat_hes_);
-    spH_ = mul(sp_B_obj.T(), sp_B_obj);
+    spB_ = mat_fcn_.sparsity_out(mat_hes_);
+    spH_ = mul(spB_.T(), spB_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
     qpsol_ = Function::qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
                              qpsol_options);
@@ -650,6 +645,15 @@ namespace casadi {
     alloc_w(spA_.nnz(), true); // qpA_
     alloc_w(ng_, true); // qpB_
     alloc_w(nx_, true); // qpH_times_du_
+
+    // Temporary work vectors
+    alloc(mat_fcn_);
+    alloc(res_fcn_);
+    alloc(vec_fcn_);
+    alloc(exp_fcn_);
+    if (gauss_newton_) {
+      alloc_w(ngn_); // casadi_mul to get GN Hessian
+    }
   }
 
   void Scpgen::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
@@ -1002,14 +1006,13 @@ namespace casadi {
 
     if (gauss_newton_) {
       // Gauss-Newton Hessian
-      const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
+      double* B_obj = mat_fcn_.output(mat_hes_).ptr();
       casadi_fill(qpH_, spH_.nnz(), 0.);
-      casadi_mul(B_obj.ptr(), B_obj.sparsity(), B_obj.ptr(), B_obj.sparsity(),
-                 qpH_, spH_, getPtr(work_), true);
+      casadi_mul(B_obj, spB_, B_obj, spB_, qpH_, spH_, w_, true);
 
       // Gradient of the objective in Gauss-Newton
       casadi_fill(gfk_, nx_, 0.);
-      casadi_mv(B_obj.ptr(), B_obj.sparsity(), b_gn_, gfk_, true);
+      casadi_mv(B_obj, spB_, b_gn_, gfk_, true);
     } else {
       // Exact Hessian
       mat_fcn_.getOutputNZ(qpH_, mat_hes_);
