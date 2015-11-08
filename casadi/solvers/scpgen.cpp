@@ -183,9 +183,6 @@ namespace casadi {
       v_[i].n = v_[i].v.nnz();
     }
 
-    // Legacy
-    qpH_times_du_.resize(nx_);
-
     // Line-search memory
     merit_mem_.resize(merit_memsize_);
 
@@ -553,12 +550,6 @@ namespace casadi {
     alloc(vec_fcn_);
     alloc(exp_fcn_);
 
-    // Allocate QP data
-    Sparsity sp_B_obj = mat_fcn_.sparsity_out(mat_hes_);
-    spH_ = mul(sp_B_obj.T(), sp_B_obj);
-    spA_ = mat_fcn_.sparsity_out(mat_jac_);
-    qpB_.resize(ng_);
-
     // QP solver options
     Dict qpsol_options;
     if (hasSetOption("qpsol_options")) {
@@ -566,6 +557,9 @@ namespace casadi {
     }
 
     // Allocate a QP solver
+    Sparsity sp_B_obj = mat_fcn_.sparsity_out(mat_hes_);
+    spH_ = mul(sp_B_obj.T(), sp_B_obj);
+    spA_ = mat_fcn_.sparsity_out(mat_jac_);
     qpsol_ = Function::qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
                              qpsol_options);
     alloc(qpsol_);
@@ -635,8 +629,6 @@ namespace casadi {
     if (gauss_newton_) {
       alloc_w(ngn_, true); // b_gn_
     }
-    alloc_w(spH_.nnz(), true); // qpH_
-    alloc_w(spA_.nnz(), true); // qpA_
 
     // Allocate memory, lifted problem
     lifted_mem_.resize(v_.size());
@@ -652,6 +644,12 @@ namespace casadi {
         alloc_w(n, true); // resL
       }
     }
+
+    // Allocate QP
+    alloc_w(spH_.nnz(), true); // qpH_
+    alloc_w(spA_.nnz(), true); // qpA_
+    alloc_w(ng_, true); // qpB_
+    alloc_w(nx_, true); // qpH_times_du_
   }
 
   void Scpgen::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
@@ -671,8 +669,6 @@ namespace casadi {
     if (gauss_newton_) {
       b_gn_ = w; w += ngn_;
     }
-    qpH_ = w; w += spH_.nnz();
-    qpA_ = w; w += spA_.nnz();
 
     // Get work vectors, lifted problem
     for (VarMem& v : lifted_mem_) {
@@ -686,6 +682,12 @@ namespace casadi {
         v.resL = w; w += v.n;
       }
     }
+
+    // QP
+    qpH_ = w; w += spH_.nnz();
+    qpA_ = w; w += spA_.nnz();
+    qpB_ = w; w += ng_;
+    qpH_times_du_ = w; w += nx_;
 
     // Residual
     for (VarMem& v : lifted_mem_) casadi_fill(v.res, v.n, 0.);
@@ -1106,8 +1108,8 @@ namespace casadi {
     vec_fcn_.evaluate();
 
     // Linear offset in the reduced QP
-    transform(gk_, gk_ + ng_, vec_fcn_.output(vec_g_)->begin(),
-              qpB_.begin(), std::minus<double>());
+    casadi_copy(gk_, ng_, qpB_);
+    casadi_axpy(ng_, -1., vec_fcn_.output(vec_g_).ptr(), qpB_);
 
     // Gradient of the objective in the reduced QP
     if (gauss_newton_) {
@@ -1170,8 +1172,8 @@ namespace casadi {
     casadi_copy(ubg_, ng_, qp_uba);
     casadi_axpy(nx_, -1., xk_, qp_lbx);
     casadi_axpy(nx_, -1., xk_, qp_ubx);
-    casadi_axpy(ng_, -1., getPtr(qpB_), qp_lba);
-    casadi_axpy(ng_, -1., getPtr(qpB_), qp_uba);
+    casadi_axpy(ng_, -1., qpB_, qp_lba);
+    casadi_axpy(ng_, -1., qpB_, qp_uba);
     qpsol_.evaluate();
 
     // Condensed primal step

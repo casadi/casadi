@@ -244,11 +244,7 @@ namespace casadi {
     std::string iteration_note_;
 
     // QP
-    double *qpH_, *qpA_;
-    std::vector<double> qpB_;
-
-    // Hessian times a step
-    std::vector<double> qpH_times_du_;
+    double *qpH_, *qpA_, *qpB_, *qpH_times_du_;
 
     /// A documentation string
     static const std::string meta_doc;
