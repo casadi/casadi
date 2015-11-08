@@ -130,9 +130,9 @@ namespace casadi {
     string compiler = option("compiler");
     gauss_newton_ = option("hessian_approximation") == "gauss-newton";
     if (gauss_newton_) {
-      casadi_assert(nlp_.output(NL_F).nnz()>1);
+      casadi_assert(nlp_.nnz_out(NL_F)>1);
     } else {
-      casadi_assert(nlp_.output(NL_F).nnz()==1);
+      casadi_assert(nlp_.nnz_out(NL_F)==1);
     }
 
     // Name the components
@@ -1188,6 +1188,11 @@ namespace casadi {
     // Solve the QP
     qpsol_(arg_, res_, iw_, w_, 0);
 
+    // Calculate penalty parameter of merit function
+    sigma_ = merit_start_;
+    sigma_ = std::max(sigma_, 1.01*casadi_norm_inf(nx_, dlam_xk_));
+    sigma_ = std::max(sigma_, 1.01*casadi_norm_inf(ng_, dlam_gk_));
+
     // Calculate step in multipliers
     casadi_axpy(nx_, -1., lam_xk_, dlam_xk_);
     casadi_axpy(ng_, -1., lam_gk_, dlam_gk_);
@@ -1205,11 +1210,6 @@ namespace casadi {
         iteration_note_ = "Hessian indefinite in the search direction";
       }
     }
-
-    // Calculate penalty parameter of merit function
-    sigma_ = merit_start_;
-    sigma_ = std::max(sigma_, 1.01*norm_inf(qpsol_.output(QPSOL_LAM_X).data()));
-    sigma_ = std::max(sigma_, 1.01*norm_inf(qpsol_.output(QPSOL_LAM_A).data()));
 
     // Calculate L1-merit function in the actual iterate
     double l1_infeas = primalInfeasibility();
