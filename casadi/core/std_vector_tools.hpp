@@ -36,6 +36,7 @@
 #include <limits>
 #include <algorithm>
 #include <map>
+#include <cmath>
 #include "casadi_exception.hpp"
 #include "casadi_types.hpp"
 
@@ -269,9 +270,11 @@ namespace casadi {
   std::vector<T> cumsum0(const std::vector<T> &values);
 #endif //SWIG
 
-  /// Checks if vector does not contain NaN or Inf
+  /// Checks if array does not contain NaN or Inf
   template<typename T>
-  bool is_regular(const std::vector<T> &v);
+  bool is_regular(const std::vector<T> &v) {
+    return std::all_of(v.begin(), v.end(), std::isfinite<T>);
+  }
 
 } // namespace casadi
 
@@ -674,16 +677,6 @@ namespace casadi {
     }
 
     return ret;
-  }
-
-
-  template<typename T>
-  bool is_regular(const std::vector<T> &v) {
-    for (int k=0;k<v.size();++k) {
-      if (v[k]!=v[k] || v[k]==std::numeric_limits<T>::infinity() ||
-          v[k]==-std::numeric_limits<T>::infinity()) return false;
-    }
-    return true;
   }
 
   template<typename T>

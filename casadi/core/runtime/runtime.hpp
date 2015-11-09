@@ -108,9 +108,13 @@ namespace casadi {
   real_t CASADI_PREFIX(norm_inf_mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y,
                              real_t *dwork, int *iwork);
 
-  /// Calculates dot(x, mul(A, x))
+  /// Calculates dot(x, mul(A, x)) without memory allocation
   template<typename real_t>
   real_t CASADI_PREFIX(qform)(const real_t* A, const int* sp_A, const real_t* x);
+
+  /// Get the nonzeros for the upper triangular half
+  template<typename real_t>
+  void CASADI_PREFIX(getu)(const real_t* x, const int* sp_x, real_t* v);
 }
 
 // Helper functions
@@ -461,30 +465,45 @@ namespace casadi {
     return res;
   }
 
-    /// Calculates dot(x, mul(A, x)) without memory allocation
   template<typename real_t>
   real_t CASADI_PREFIX(qform)(const real_t* A, const int* sp_A, const real_t* x) {
     /* Get sparsities */
     int ncol_A = sp_A[1];
     const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;
 
-    // Return value
+    /* Return value */
     real_t ret=0;
 
+    /* Loop over the columns of A */
     int cc, el;
-    // Loop over the columns of A
     for (cc=0; cc<ncol_A; ++cc) {
-      // Loop over the nonzeros of A
+      /* Loop over the nonzeros of A */
       for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
-        // Get row
+        /* Get row */
         int rr = row_A[el];
 
-        // Add contribution
+        /* Add contribution */
         ret += x[rr]*A[el]*x[cc];
       }
     }
 
     return ret;
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(getu)(const real_t* x, const int* sp_x, real_t* v) {
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+
+    /* Loop over the columns of x */
+    int cc, el;
+    for (cc=0; cc<ncol_x; ++cc) {
+      /* Loop over the nonzeros of x */
+      for (el=colind_x[cc]; el<colind_x[cc+1] && row_x[el]<=cc; ++el) {
+        *v++ = x[el];
+      }
+    }
   }
 
 } // namespace casadi

@@ -174,7 +174,6 @@ namespace casadi {
     int* iw_;
     double* w_;
 
-
     // Evaluate numerically
     virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 

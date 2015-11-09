@@ -296,11 +296,29 @@ namespace casadi {
       (*app_sens)->Initialize();
     }
 #endif // WITH_SIPOPT
+
+    // Setup NLP functions
+    if (nlp2_.is_sx) {
+      setup<SX>();
+    } else {
+      setup<MX>();
+    }
+
+    // Allocate work vectors
+    alloc_w(nx_, true); // xk_
+    alloc_w(ng_, true); // lam_gk_
   }
 
   void IpoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
     // Reset the base classes
     Nlpsol::reset(mem, arg, res, iw, w);
+
+    // Work vectors
+    xk_ = w; w += nx_;
+    lam_gk_ = w; w += ng_;
+
+    // New iterate
+    new_x_ = new_lam_g_ = true;
   }
 
   void IpoptInterface::solve(void* mem) {
@@ -1230,6 +1248,54 @@ namespace casadi {
     // todo(jaeandersson/jgillis): please review.
     const std::string ret = out.str();
     userOut() << ret;
+  }
+
+  void IpoptInterface::set_x(double *x) {
+    // Is a recalculation needed
+    if (new_x_ || !equal(x, x+nx_, xk_)) {
+      copy_n(x, nx_, xk_);
+      have_hess_lk_ = have_grad_lk_ = have_fk_ = have_grad_fk_ = have_jac_gk_ = false;
+      new_x_ = false;
+    }
+  }
+
+  void IpoptInterface::set_lam_g(double *lam_g) {
+    // Is a recalculation needed
+    if (new_lam_g_ || !equal(lam_g, lam_g+ng_, lam_gk_)) {
+      copy_n(lam_g, ng_, lam_gk_);
+      have_hess_lk_ = have_grad_lk_ = false;
+      new_lam_g_ = false;
+    }
+  }
+
+  void IpoptInterface::calc_fk() {
+    if (!have_fk_) {
+      fill_n(arg_, fk_fcn_.n_in(), nullptr);
+      arg_[FK_X] = xk_;
+      arg_[FK_P] = p_;
+      fill_n(res_, fk_fcn_.n_out(), nullptr);
+      res_[FK_F] = &fk_;
+      fk_fcn_(arg_, res_, iw_, w_, 0);
+      have_fk_ = true;
+    }
+  }
+
+  template<typename M> 
+  void IpoptInterface::setup_fk() {
+    const Problem<M>& nlp = nlp2_;
+    vector<M> arg(FK_NUM_IN);
+    arg[FK_X] = nlp.in[NL_X];
+    arg[FK_P] = nlp.in[NL_P];
+    vector<M> res(FK_NUM_OUT);
+    res[FK_F] = nlp.out[NL_F];
+    fk_fcn_ = Function("ipopt_eval_f", arg, res);
+    alloc(fk_fcn_);
+  }
+
+  template<typename M>
+  void IpoptInterface::setup() {
+    // Objective function
+    setup_fk<M>();
   }
 
 } // namespace casadi

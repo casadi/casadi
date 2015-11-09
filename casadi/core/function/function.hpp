@@ -39,7 +39,7 @@ namespace casadi {
 #ifndef SWIG
   /** Symbolic representation of a problem */
   template<typename XType>
-  struct Problem {
+  struct CASADI_EXPORT Problem {
     std::vector<XType> in;
     std::vector<XType> out;
   };
@@ -47,7 +47,7 @@ namespace casadi {
   typedef Problem<MX> MXProblem;
 
   /** Can be either an SXProblem or MXProblem */
-  class XProblem {
+  class CASADI_EXPORT XProblem {
   public:
     union {
       SXProblem *sx_p;
