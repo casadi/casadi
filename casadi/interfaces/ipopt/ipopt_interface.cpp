@@ -364,7 +364,7 @@ namespace casadi {
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
         t_callback_prepare_ = t_mainloop_ = {0, 0};
 
-    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ =
+    n_calc_fk_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ =
         n_eval_callback_ = n_iter_ = 0;
 
     // Get back the smart pointers
@@ -373,7 +373,7 @@ namespace casadi {
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app =
         static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
 
-    const timer time0 = getTimerTime();
+    Timer time0 = getTimerTime();
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
     t_mainloop_ = diffTimers(getTimerTime(), time0);
@@ -406,9 +406,9 @@ namespace casadi {
 
     if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       // Write timings
-      std::vector<std::tuple<std::string, int, diffTime> > times;
+      std::vector<std::tuple<std::string, int, DiffTime> > times;
       times.push_back(
-        std::make_tuple("eval_f", n_eval_f_, t_eval_f_));
+        std::make_tuple("eval_f", n_calc_fk_, t_eval_f_));
       times.push_back(
         std::make_tuple("eval_grad_f", n_eval_grad_f_, t_eval_grad_f_));
       times.push_back(
@@ -419,7 +419,7 @@ namespace casadi {
         std::make_tuple("eval_h", n_eval_h_, t_eval_h_));
 
       // These guys get -1 calls to supress that part of the printout.
-      diffTime t_all_functions = {0.0, 0.0};
+      DiffTime t_all_functions = {0.0, 0.0};
       timerPlusEq(t_all_functions, t_eval_f_);
       timerPlusEq(t_all_functions, t_eval_grad_f_);
       timerPlusEq(t_all_functions, t_eval_g_);
@@ -427,7 +427,7 @@ namespace casadi {
       timerPlusEq(t_all_functions, t_eval_h_);
       times.push_back(
         std::make_tuple("all previous", -1, t_all_functions));
-      diffTime t_ipopt;
+      DiffTime t_ipopt;
       t_ipopt.user = t_mainloop_.user - t_all_functions.user
         - t_callback_prepare_.user - t_callback_fun_.user;
       t_ipopt.real = t_mainloop_.real - t_all_functions.real
@@ -488,7 +488,7 @@ namespace casadi {
     stats_["t_callback_fun"] = diffToDict(t_callback_fun_);
     stats_["t_callback_prepare"] = diffToDict(t_callback_prepare_);
 
-    stats_["n_eval_f"] = n_eval_f_;
+    stats_["n_eval_f"] = n_calc_fk_;
     stats_["n_eval_grad_f"] = n_eval_grad_f_;
     stats_["n_eval_g"] = n_eval_g_;
     stats_["n_eval_jac_g"] = n_eval_jac_g_;
@@ -535,7 +535,7 @@ namespace casadi {
         append_to_vec(iterations["obj"], obj_value);
         stats_["iterations"] = iterations;
       }
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       if (!fcallback_.isNull()) {
         if (full_callback) {
           if (!output(NLPSOL_X).is_empty()) copy(x, x+nx_, output(NLPSOL_X)->begin());
@@ -589,7 +589,7 @@ namespace casadi {
         fcallback_(arg_, res_, iw_, w_, 0);
         int ret = static_cast<int>(ret_double);
 
-        const diffTime delta = diffTimers(getTimerTime(), time0);
+        DiffTime delta = diffTimers(getTimerTime(), time0);
         timerPlusEq(t_callback_fun_, delta);
         return  !ret;
       } else {
@@ -640,7 +640,7 @@ namespace casadi {
                              int* iRow, int* jCol, double* values) {
     try {
       log("eval_h started");
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       if (values == NULL) {
         int nz=0;
         const int* colind = hessLag_.sparsity_out(0).colind();
@@ -675,7 +675,7 @@ namespace casadi {
             casadi_error("IpoptInterface::h: NaN or Inf detected.");
 
       }
-      const diffTime delta = diffTimers(getTimerTime(), time0);
+      DiffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_h_, delta);
       n_eval_h_ += 1;
       log("eval_h ok");
@@ -701,7 +701,7 @@ namespace casadi {
       // Get function
       Function& jacG = this->jacG();
 
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       if (values == NULL) {
         int nz=0;
         const int* colind = jacG.sparsity_out(0).colind();
@@ -734,7 +734,7 @@ namespace casadi {
             casadi_error("IpoptInterface::jac_g: NaN or Inf detected.");
       }
 
-      const diffTime delta = diffTimers(getTimerTime(), time0);
+      DiffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_jac_g_, delta);
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
@@ -746,55 +746,10 @@ namespace casadi {
     }
   }
 
-  bool IpoptInterface::eval_f(int n, const double* x, bool new_x, double& obj_value) {
-
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    try {
-
-      log("eval_f started");
-
-      // Log time
-      const timer time0 = getTimerTime();
-      casadi_assert(n == nx_);
-
-      // Pass the argument to the function
-      nlp_.setInputNZ(x, NL_X);
-      nlp_.setInput(input(NLPSOL_P), NL_P);
-
-      // Evaluate the function
-      nlp_.evaluate();
-
-      // Get the result
-      nlp_.getOutput(obj_value, NL_F);
-
-      // Printing
-      if (monitored("eval_f")) {
-        userOut() << "x = " << nlp_.input(NL_X) << endl;
-        userOut() << "obj_value = " << obj_value << endl;
-      }
-
-      if (regularity_check_ && !is_regular(nlp_.output(NL_F).data()))
-          casadi_error("IpoptInterface::f: NaN or Inf detected.");
-
-      const diffTime delta = diffTimers(getTimerTime(), time0);
-      timerPlusEq(t_eval_f_, delta);
-      n_eval_f_ += 1;
-      log("eval_f ok");
-      return true;
-    } catch(exception& ex) {
-      if (eval_errors_fatal_) throw ex;
-      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
-      return false;
-    }
-
-  }
-
   bool IpoptInterface::eval_g(int n, const double* x, bool new_x, int m, double* g) {
     try {
       log("eval_g started");
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
 
       if (m>0) {
         // Pass the argument to the function
@@ -817,7 +772,7 @@ namespace casadi {
       if (regularity_check_ && !is_regular(nlp_.output(NL_G).data()))
           casadi_error("IpoptInterface::g: NaN or Inf detected.");
 
-      const diffTime delta = diffTimers(getTimerTime(), time0);
+      DiffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_g_, delta);
       n_eval_g_ += 1;
       log("eval_g ok");
@@ -832,7 +787,7 @@ namespace casadi {
   bool IpoptInterface::eval_grad_f(int n, const double* x, bool new_x, double* grad_f) {
     try {
       log("eval_grad_f started");
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       casadi_assert(n == nx_);
 
       // Pass the argument to the function
@@ -854,7 +809,7 @@ namespace casadi {
       if (regularity_check_ && !is_regular(gradF_.output().data()))
           casadi_error("IpoptInterface::grad_f: NaN or Inf detected.");
 
-      const diffTime delta = diffTimers(getTimerTime(), time0);
+      DiffTime delta = diffTimers(getTimerTime(), time0);
       timerPlusEq(t_eval_grad_f_, delta);
       n_eval_grad_f_ += 1;
       log("eval_grad_f ok");
@@ -1192,7 +1147,7 @@ namespace casadi {
   // Will print one row per tuple in the input vector.
   // The tuple must contain {name, # evals, total time in seconds}.
   void IpoptInterface::timingSummary(
-    std::vector<std::tuple<std::string, int, diffTime> > & xs) {
+    std::vector<std::tuple<std::string, int, DiffTime> > & xs) {
     // get padding of names
     int maxNameLen = 0;
     for (int k=0; k < xs.size(); ++k) {
@@ -1209,10 +1164,10 @@ namespace casadi {
       << "      time           time     evals       user time        real time"
       << endl;
     for (int k=0; k < xs.size(); ++k) {
-      const std::tuple<std::string, int, diffTime> x = xs[k];
+      const std::tuple<std::string, int, DiffTime> x = xs[k];
       const std::string name = std::get<0>(x);
       const int n = std::get<1>(x);
-      const diffTime dt = std::get<2>(x);
+      DiffTime dt = std::get<2>(x);
 
       // don't print out this row if there were 0 calls
       if (n == 0)
@@ -1250,7 +1205,7 @@ namespace casadi {
     userOut() << ret;
   }
 
-  void IpoptInterface::set_x(double *x) {
+  void IpoptInterface::set_x(const double *x) {
     // Is a recalculation needed
     if (new_x_ || !equal(x, x+nx_, xk_)) {
       copy_n(x, nx_, xk_);
@@ -1268,19 +1223,42 @@ namespace casadi {
     }
   }
 
-  void IpoptInterface::calc_fk() {
+  int IpoptInterface::calc_fk(double* f) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Calculate, if needed
     if (!have_fk_) {
+      // Log time
+      Timer time0 = getTimerTime();
+
       fill_n(arg_, fk_fcn_.n_in(), nullptr);
       arg_[FK_X] = xk_;
       arg_[FK_P] = p_;
       fill_n(res_, fk_fcn_.n_out(), nullptr);
       res_[FK_F] = &fk_;
-      fk_fcn_(arg_, res_, iw_, w_, 0);
+      n_calc_fk_ += 1;
+      try {
+        fk_fcn_(arg_, res_, iw_, w_, 0);
+      } catch(exception& ex) {
+        // Fatal error
+        userOut<true, PL_WARN>() << "calc_fk failed:" << ex.what() << endl;
+        return 1;
+      }
       have_fk_ = true;
     }
+
+    // Make sure not not-a-number or inf
+    if (!isfinite(fk_)) return -1;
+
+    // Return to user
+    if (f) *f = fk_;
+
+    // Success
+    return 0;
   }
 
-  template<typename M> 
+  template<typename M>
   void IpoptInterface::setup_fk() {
     const Problem<M>& nlp = nlp2_;
     vector<M> arg(FK_NUM_IN);
@@ -1288,7 +1266,7 @@ namespace casadi {
     arg[FK_P] = nlp.in[NL_P];
     vector<M> res(FK_NUM_OUT);
     res[FK_F] = nlp.out[NL_F];
-    fk_fcn_ = Function("ipopt_eval_f", arg, res);
+    fk_fcn_ = Function("nlp_fk", arg, res);
     alloc(fk_fcn_);
   }
 

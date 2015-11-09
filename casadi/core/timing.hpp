@@ -31,15 +31,15 @@
 namespace casadi {
   /// \cond INTERNAL
 
-  typedef struct {
+  struct Timer {
     double user;
     double real;
-  } timer;
+  };
 
-  typedef struct {
+  struct DiffTime {
     double user;
     double real;
-  } diffTime;
+  };
 
   /**
    * Returns the real time, in seconds, or -1.0 if an error occurred.
@@ -50,13 +50,13 @@ namespace casadi {
    * 
    * \author David Robert Nadeau (http://NadeauSoftware.com/)
    */
-  CASADI_EXPORT timer getTimerTime(void);
+  CASADI_EXPORT Timer getTimerTime(void);
   // ret = t1 - t0
-  CASADI_EXPORT diffTime diffTimers(const timer t1, const timer t0);
+  CASADI_EXPORT DiffTime diffTimers(const Timer t1, const Timer t0);
   // t += diff
-  CASADI_EXPORT void timerPlusEq(diffTime & t, const diffTime diff);
+  CASADI_EXPORT void timerPlusEq(DiffTime & t, const DiffTime diff);
 
-  CASADI_EXPORT Dict diffToDict(const diffTime& diff);
+  CASADI_EXPORT Dict diffToDict(const DiffTime& diff);
 
 /// \endcond
 } // namespace casadi

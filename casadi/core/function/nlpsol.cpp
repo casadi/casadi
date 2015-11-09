@@ -175,9 +175,9 @@ namespace casadi {
     const bool verbose_init = option("verbose_init");
     if (verbose_init)
       userOut() << "Initializing base class...";
-    const timer time0 = getTimerTime();
+    Timer time0 = getTimerTime();
     FunctionInternal::init();
-    const diffTime diff = diffTimers(getTimerTime(), time0);
+    DiffTime diff = diffTimers(getTimerTime(), time0);
     stats_["base class init time"] = diffToDict(diff);
     if (verbose_init)
       userOut() << "Initialized base class in " << diff.user << " seconds.";
@@ -268,9 +268,9 @@ namespace casadi {
       const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating objective Jacobian...";
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       jacF = nlp_.jacobian(NL_X, NL_F);
-      const diffTime diff = diffTimers(getTimerTime(), time0);
+      DiffTime diff = diffTimers(getTimerTime(), time0);
       stats_["objective jacobian gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated objective Jacobian in " << diff.user << " seconds.";
@@ -299,9 +299,9 @@ namespace casadi {
       const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating objective gradient...";
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       gradF = nlp_.gradient(NL_X, NL_F);
-      const diffTime diff = diffTimers(getTimerTime(), time0);
+      DiffTime diff = diffTimers(getTimerTime(), time0);
       stats_["objective gradient gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated objective gradient in " << diff.user << " seconds.";
@@ -342,9 +342,9 @@ namespace casadi {
       const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating constraint Jacobian...";
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       jacG = nlp_.jacobian(NL_X, NL_G);
-      const diffTime diff = diffTimers(getTimerTime(), time0);
+      DiffTime diff = diffTimers(getTimerTime(), time0);
       stats_["constraint jacobian gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated constraint Jacobian in " << diff.user << " seconds.";
@@ -381,9 +381,9 @@ namespace casadi {
       const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating/retrieving Lagrangian gradient function...";
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       gradLag = nlp_.derivative(0, 1);
-      const diffTime diff = diffTimers(getTimerTime(), time0);
+      DiffTime diff = diffTimers(getTimerTime(), time0);
       stats_["grad lag gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated/retrieved Lagrangien gradient in "
@@ -416,9 +416,9 @@ namespace casadi {
       const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating Hessian of the Lagrangian...";
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       hessLag = gradLag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
-      const diffTime diff = diffTimers(getTimerTime(), time0);
+      DiffTime diff = diffTimers(getTimerTime(), time0);
       stats_["hess lag gen time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated Hessian of the Lagrangian in "
@@ -455,9 +455,9 @@ namespace casadi {
       const bool verbose_init = option("verbose_init");
       if (verbose_init)
         userOut() << "Generating Hessian of the Lagrangian sparsity pattern...";
-      const timer time0 = getTimerTime();
+      Timer time0 = getTimerTime();
       spHessLag = gradLag.sparsity_jac(NL_X, NL_NUM_OUT+NL_X, false, true);
-      const diffTime diff = diffTimers(getTimerTime(), time0);
+      DiffTime diff = diffTimers(getTimerTime(), time0);
       stats_["hess lag sparsity time"] = diffToDict(diff);
       if (verbose_init)
         userOut() << "Generated Hessian of the Lagrangian sparsity pattern in "

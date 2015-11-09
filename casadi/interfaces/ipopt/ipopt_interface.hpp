@@ -131,7 +131,7 @@ namespace casadi {
     bool have_fk_, have_grad_fk_, have_jac_gk_, have_hess_lk_, have_grad_lk_;
 
     // Set primal variable
-    void set_x(double *x);
+    void set_x(const double *x);
 
     // Set dual variable
     void set_lam_g(double *lam_g);
@@ -141,7 +141,7 @@ namespace casadi {
     enum FkOut { FK_F, FK_NUM_OUT};
     Function fk_fcn_;
     template<typename M> void setup_fk();
-    void calc_fk();
+    int calc_fk(double* f=0);
 
     // Setup all functions
     template<typename M> void setup();
@@ -162,8 +162,8 @@ namespace casadi {
     void get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag);
     int get_number_of_nonlinear_variables();
     bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars);
-    bool intermediate_callback(
-                               const double* x, const double* z_L, const double* z_U, const double* g,
+    bool intermediate_callback(const double* x, const double* z_L, const double* z_U,
+                               const double* g,
                                const double* lambda, double obj_value, int iter,
                                double inf_pr, double inf_du, double mu, double d_norm,
                                double regularization_size, double alpha_du, double alpha_pr,
@@ -186,21 +186,20 @@ namespace casadi {
                            const std::map<std::string, std::vector<int> >& con_integer_md,
                            const std::map<std::string, std::vector<double> >& con_numeric_md);
 
-    static void timingSummary(
-                              std::vector<std::tuple<std::string, int, diffTime> >& xs);
+    static void timingSummary(std::vector<std::tuple<std::string, int, DiffTime> >& xs);
 
     // Accumulated time since last reset:
-    diffTime t_eval_f_; // time spent in eval_f
-    diffTime t_eval_grad_f_; // time spent in eval_grad_f
-    diffTime t_eval_g_; // time spent in eval_g
-    diffTime t_eval_jac_g_; // time spent in eval_jac_g
-    diffTime t_eval_h_; // time spent in eval_h
-    diffTime t_callback_fun_;  // time spent in callback function
-    diffTime t_callback_prepare_; // time spent in callback preparation
-    diffTime t_mainloop_; // time spent in the main loop of the solver
+    DiffTime t_eval_f_; // time spent in eval_f
+    DiffTime t_eval_grad_f_; // time spent in eval_grad_f
+    DiffTime t_eval_g_; // time spent in eval_g
+    DiffTime t_eval_jac_g_; // time spent in eval_jac_g
+    DiffTime t_eval_h_; // time spent in eval_h
+    DiffTime t_callback_fun_;  // time spent in callback function
+    DiffTime t_callback_prepare_; // time spent in callback preparation
+    DiffTime t_mainloop_; // time spent in the main loop of the solver
 
     // Accumulated counts since last reset:
-    int n_eval_f_; // number of calls to eval_f
+    int n_calc_fk_; // number of calls to calc_fk
     int n_eval_grad_f_; // number of calls to eval_grad_f
     int n_eval_g_; // number of calls to eval_g
     int n_eval_jac_g_; // number of calls to eval_jac_g

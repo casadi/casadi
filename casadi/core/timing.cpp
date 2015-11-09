@@ -34,8 +34,8 @@
 #endif
 
 namespace casadi {
-  timer getTimerTime() {
-    timer ret;
+  Timer getTimerTime() {
+    Timer ret;
     ret.user = clock();
 #ifdef _WIN32
     FILETIME tm;
@@ -52,20 +52,20 @@ namespace casadi {
   }
 
   // ret = t1 - t0
-  diffTime diffTimers(const timer t1, const timer t0) {
-    diffTime ret;
+  DiffTime diffTimers(const Timer t1, const Timer t0) {
+    DiffTime ret;
     ret.user = (t1.user - t0.user)/CLOCKS_PER_SEC;
     ret.real = t1.real - t0.real;
     return ret;
   }
 
   // t += diff
-  void timerPlusEq(diffTime & t, const diffTime diff) {
+  void timerPlusEq(DiffTime & t, const DiffTime diff) {
     t.user += diff.user;
     t.real += diff.real;
   }
 
-  Dict diffToDict(const diffTime& diff) {
+  Dict diffToDict(const DiffTime& diff) {
     Dict ret;
     // compatable names with the linux "time" utility
     ret["real"] = diff.real;
