@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
+#include <chrono>
 
 using namespace std;
 #include <IpIpoptApplication.hpp>
@@ -462,7 +463,6 @@ namespace casadi {
     stats_["n_eval_callback"] = n_eval_callback_;
 
     stats_["iter_count"] = n_iter_-1;
-
 
     for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
       double **v;
@@ -1158,15 +1158,13 @@ namespace casadi {
 
     // Calculate, if needed
     if (!have_fk_) {
-      // Get current time
-      clock_t clock0 = clock();
-
       fill_n(arg_, f_fcn_.n_in(), nullptr);
       arg_[F_X] = xk_;
       arg_[F_P] = p_;
       fill_n(res_, f_fcn_.n_out(), nullptr);
       res_[F_F] = &fk_;
       n_calc_f_ += 1;
+      auto t_start = chrono::steady_clock::now(); // start timer
       try {
         f_fcn_(arg_, res_, iw_, w_, 0);
       } catch(exception& ex) {
@@ -1174,6 +1172,7 @@ namespace casadi {
         userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
         return 1;
       }
+      auto t_stop = chrono::steady_clock::now(); // stop timer
 
       // Make sure not not-a-number or inf
       if (isnan(fk_)) {
@@ -1189,7 +1188,7 @@ namespace casadi {
 
       // Update stats
       n_calc_f_ += 1;
-      t_calc_f_ += static_cast<double>(clock()-clock0)/CLOCKS_PER_SEC;
+      t_calc_f_ += chrono::duration<double>(t_stop - t_start).count();
       have_fk_ = true;
     }
 
@@ -1227,6 +1226,7 @@ namespace casadi {
       arg_[G_P] = p_;
       fill_n(res_, g_fcn_.n_out(), nullptr);
       res_[G_G] = gk_;
+      auto t_start = chrono::steady_clock::now(); // start timer
       try {
         g_fcn_(arg_, res_, iw_, w_, 0);
       } catch(exception& ex) {
@@ -1234,6 +1234,7 @@ namespace casadi {
         userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
         return 1;
       }
+      auto t_stop = chrono::steady_clock::now(); // stop timer
 
       // Make sure not not-a-number
       if (any_of(gk_, gk_+ng_, isnan)) {
@@ -1249,7 +1250,7 @@ namespace casadi {
 
       // Update stats
       n_calc_g_ += 1;
-      t_calc_g_ += static_cast<double>(clock()-clock0)/CLOCKS_PER_SEC;
+      t_calc_g_ += chrono::duration<double>(t_stop - t_start).count();
       have_gk_ = true;
     }
 
