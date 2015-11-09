@@ -48,94 +48,6 @@ using namespace std;
 #endif // WITH_SIPOPT
 
 namespace casadi {
-  // Convert a float to a string of an exact length.
-  // First it tries fixed precision, then falls back to exponential notation.
-  //
-  // todo(jaeandersson,jgillis): needs either review or unit tests
-  // because it throws exceptions if it fail.
-  std::string formatFloat(double x, int totalWidth, int maxPrecision, int fallbackPrecision) {
-    std::ostringstream out0;
-    out0 << fixed << setw(totalWidth) << setprecision(maxPrecision) << x;
-    std::string ret0 = out0.str();
-    if (ret0.length() == totalWidth) {
-      return ret0;
-    } else if (ret0.length() > totalWidth) {
-      std::ostringstream out1;
-      out1 << setw(totalWidth) << setprecision(fallbackPrecision) << x;
-      std::string ret1 = out1.str();
-      if (ret1.length() != totalWidth)
-        casadi_error(
-          "ipopt timing formatting fallback is bugged, sorry about that."
-          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
-          << ", string: \"" << ret1 << "\", number: " << x);
-      return ret1;
-    } else {
-      casadi_error("ipopt timing formatting is bugged, sorry about that.");
-    }
-  }
-
-  // Print out a beautiful timing summary.
-  // Will print one row per tuple in the input vector.
-  // The tuple must contain {name, # evals, total time in seconds}.
-  void IpoptInterface::timingSummary(
-    std::vector<std::tuple<std::string, int, diffTime> > & xs) {
-    // get padding of names
-    int maxNameLen = 0;
-    for (int k=0; k < xs.size(); ++k) {
-      const int len = std::get<0>(xs[k]).length();
-      maxNameLen = max(maxNameLen, len);
-    }
-
-    std::ostringstream out;
-    std::string blankName(maxNameLen, ' ');
-    out
-      << blankName
-      << "      user           real      num           mean             mean"
-      << endl << blankName
-      << "      time           time     evals       user time        real time"
-      << endl;
-    for (int k=0; k < xs.size(); ++k) {
-      const std::tuple<std::string, int, diffTime> x = xs[k];
-      const std::string name = std::get<0>(x);
-      const int n = std::get<1>(x);
-      const diffTime dt = std::get<2>(x);
-
-      // don't print out this row if there were 0 calls
-      if (n == 0)
-        continue;
-
-      out
-        << setw(maxNameLen) << name << " "
-        << formatFloat(dt.user, 9, 3, 3) << " [s]  "
-        << formatFloat(dt.real, 9, 3, 3) << " [s]";
-      if (n == -1) {
-        // things like main loop don't have # evals
-        out << endl;
-      } else {
-        out
-          << " "
-          << setw(5) << n;
-        if (n < 2) {
-          out << endl;
-        } else {
-          // only print averages if there is more than 1 eval
-          out
-            << " "
-            << formatFloat(1000.0*dt.user/n, 10, 2, 3) << " [ms]  "
-            << formatFloat(1000.0*dt.real/n, 10, 2, 3) << " [ms]"
-            << endl;
-        }
-      }
-    }
-    // I'm worried that the following will set stdout stream state:
-    // userOut() << out;
-
-    // Just convert it to a string first to be safe.
-    // todo(jaeandersson/jgillis): please review.
-    const std::string ret = out.str();
-    userOut() << ret;
-  }
-
   extern "C"
   int CASADI_NLPSOL_IPOPT_EXPORT
   casadi_register_nlpsol_ipopt(Nlpsol::Plugin* plugin) {
@@ -1221,6 +1133,94 @@ namespace casadi {
 #endif // WITH_SIPOPT
 #endif // WITH_CASADI_PATCH
 
+  }
+
+  // Convert a float to a string of an exact length.
+  // First it tries fixed precision, then falls back to exponential notation.
+  //
+  // todo(jaeandersson,jgillis): needs either review or unit tests
+  // because it throws exceptions if it fail.
+  std::string formatFloat(double x, int totalWidth, int maxPrecision, int fallbackPrecision) {
+    std::ostringstream out0;
+    out0 << fixed << setw(totalWidth) << setprecision(maxPrecision) << x;
+    std::string ret0 = out0.str();
+    if (ret0.length() == totalWidth) {
+      return ret0;
+    } else if (ret0.length() > totalWidth) {
+      std::ostringstream out1;
+      out1 << setw(totalWidth) << setprecision(fallbackPrecision) << x;
+      std::string ret1 = out1.str();
+      if (ret1.length() != totalWidth)
+        casadi_error(
+          "ipopt timing formatting fallback is bugged, sorry about that."
+          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
+          << ", string: \"" << ret1 << "\", number: " << x);
+      return ret1;
+    } else {
+      casadi_error("ipopt timing formatting is bugged, sorry about that.");
+    }
+  }
+
+  // Print out a beautiful timing summary.
+  // Will print one row per tuple in the input vector.
+  // The tuple must contain {name, # evals, total time in seconds}.
+  void IpoptInterface::timingSummary(
+    std::vector<std::tuple<std::string, int, diffTime> > & xs) {
+    // get padding of names
+    int maxNameLen = 0;
+    for (int k=0; k < xs.size(); ++k) {
+      const int len = std::get<0>(xs[k]).length();
+      maxNameLen = max(maxNameLen, len);
+    }
+
+    std::ostringstream out;
+    std::string blankName(maxNameLen, ' ');
+    out
+      << blankName
+      << "      user           real      num           mean             mean"
+      << endl << blankName
+      << "      time           time     evals       user time        real time"
+      << endl;
+    for (int k=0; k < xs.size(); ++k) {
+      const std::tuple<std::string, int, diffTime> x = xs[k];
+      const std::string name = std::get<0>(x);
+      const int n = std::get<1>(x);
+      const diffTime dt = std::get<2>(x);
+
+      // don't print out this row if there were 0 calls
+      if (n == 0)
+        continue;
+
+      out
+        << setw(maxNameLen) << name << " "
+        << formatFloat(dt.user, 9, 3, 3) << " [s]  "
+        << formatFloat(dt.real, 9, 3, 3) << " [s]";
+      if (n == -1) {
+        // things like main loop don't have # evals
+        out << endl;
+      } else {
+        out
+          << " "
+          << setw(5) << n;
+        if (n < 2) {
+          out << endl;
+        } else {
+          // only print averages if there is more than 1 eval
+          out
+            << " "
+            << formatFloat(1000.0*dt.user/n, 10, 2, 3) << " [ms]  "
+            << formatFloat(1000.0*dt.real/n, 10, 2, 3) << " [ms]"
+            << endl;
+        }
+      }
+    }
+    // I'm worried that the following will set stdout stream state:
+    // userOut() << out;
+
+    // Just convert it to a string first to be safe.
+    // todo(jaeandersson/jgillis): please review.
+    const std::string ret = out.str();
+    userOut() << ret;
   }
 
 } // namespace casadi

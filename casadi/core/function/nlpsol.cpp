@@ -198,14 +198,17 @@ namespace casadi {
 
       // Consistency checks
       casadi_assert(!fcallback_.isNull());
-      casadi_assert(fcallback_.n_in()==NLPSOL_NUM_OUT);
-      casadi_assert(fcallback_.n_out()==1);
-      casadi_assert(fcallback_.input(NLPSOL_X).size()==x_sparsity.size());
-      casadi_assert(fcallback_.input(NLPSOL_F).is_scalar());
-      casadi_assert(fcallback_.input(NLPSOL_LAM_X).size()==x_sparsity.size());
-      casadi_assert(fcallback_.input(NLPSOL_LAM_G).size()==g_sparsity.size());
-      casadi_assert(fcallback_.input(NLPSOL_LAM_P).size()==p_sparsity.size());
-      casadi_assert(fcallback_.input(NLPSOL_G).size()==g_sparsity.size());
+      casadi_assert_message(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
+                            "Callback function must return a scalar");
+      casadi_assert_message(fcallback_.n_in()==n_out(),
+                            "Callback input signature must match the NLP solver output signature");
+      for (int i=0; i<n_out(); ++i) {
+        casadi_assert_message(fcallback_.size_in(i)==size_out(i),
+                              "Callback function input size mismatch");
+        // TODO(@jaeandersson): Wrap fcallback_ in a function with correct sparsity
+        casadi_assert_message(fcallback_.sparsity_in(i)==sparsity_out(i),
+                              "Not implemented");
+      }
     }
 
     callback_step_ = option("iteration_callback_step");
