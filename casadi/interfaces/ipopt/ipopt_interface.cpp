@@ -552,16 +552,25 @@ namespace casadi {
         iteration["obj"] = obj_value;
         stats_["iteration"] = iteration;
 
-        output(NLPSOL_F).at(0) = obj_value;
+        // Inputs
+        fill_n(arg_, fcallback_.n_in(), nullptr);
+        arg_[NLPSOL_X] = x;
+        arg_[NLPSOL_F] = &obj_value;
+        arg_[NLPSOL_G] = g;
+        arg_[NLPSOL_LAM_P] = output(NLPSOL_LAM_P).ptr();
+        arg_[NLPSOL_LAM_X] = output(NLPSOL_LAM_X).ptr();
+        arg_[NLPSOL_LAM_G] = output(NLPSOL_LAM_G).ptr();
 
-        n_eval_callback_ += 1;
-        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-          fcallback_.setInput(output(i), i);
-        }
-        fcallback_.evaluate();
+        // Outputs
+        fill_n(res_, fcallback_.n_out(), nullptr);
         double ret_double;
-        fcallback_.getOutput(ret_double);
+        res_[0] = &ret_double;
+
+        // Evaluate the callback function
+        n_eval_callback_ += 1;
+        fcallback_(arg_, res_, iw_, w_, 0);
         int ret = static_cast<int>(ret_double);
+
         const diffTime delta = diffTimers(getTimerTime(), time0);
         timerPlusEq(t_callback_fun_, delta);
         return  !ret;

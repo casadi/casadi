@@ -194,7 +194,6 @@ namespace casadi {
 
     if (hasSetOption("iteration_callback")) {
       fcallback_ = option("iteration_callback");
-      alloc(fcallback_);
 
       // Consistency checks
       casadi_assert(!fcallback_.isNull());
@@ -209,6 +208,9 @@ namespace casadi {
         casadi_assert_message(fcallback_.sparsity_in(i)==sparsity_out(i),
                               "Not implemented");
       }
+
+      // Allocate temporary memory
+      alloc(fcallback_);
     }
 
     callback_step_ = option("iteration_callback_step");
