@@ -1006,7 +1006,11 @@ namespace casadi {
   }
 
   string Function::name() const {
-    return (*this)->name_;
+    if (isNull()) {
+      return "NULL";
+    } else {
+      return (*this)->name();
+    }
   }
 
   string Function::getSanitizedName() const {

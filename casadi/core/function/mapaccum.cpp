@@ -691,16 +691,8 @@ namespace casadi {
     g.body << "  }" << endl;
   }
 
-  inline string name(const Function& f) {
-    if (f.isNull()) {
-      return "NULL";
-    } else {
-      return f.name();
-    }
-  }
-
   void Mapaccum::print(ostream &stream) const {
-    stream << "MapAccum(" << name(f_) << ", " << n_ << ")";
+    stream << "MapAccum(" << f_.name() << ", " << n_ << ")";
   }
 
 } // namespace casadi

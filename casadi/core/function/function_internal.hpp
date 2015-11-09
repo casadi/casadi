@@ -412,6 +412,9 @@ namespace casadi {
     std::pair<int, int> size_out(int ind) const { return output(ind).size(); }
     ///@}
 
+    /** \brief Name of the function */
+    const std::string& name() const { return name_;}
+
     /// Get all statistics obtained at the end of the last evaluate call
     const Dict & getStats() const;
 

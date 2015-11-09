@@ -83,7 +83,7 @@ namespace casadi {
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
     solver->set_x(x);
-    return solver->calc_fk(&obj_value)==0;
+    return solver->calc_f(&obj_value)==0;
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
@@ -93,7 +93,8 @@ namespace casadi {
 
   // return the value of the constraints: g(x)
   bool IpoptUserClass::eval_g(Index n, const Number* x, bool new_x, Index m, Number* g) {
-    return solver->eval_g(n, x, new_x, m, g);
+    solver->set_x(x);
+    return solver->calc_g(g)==0;
   }
 
   // return the structure or values of the jacobian

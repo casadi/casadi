@@ -479,16 +479,8 @@ namespace casadi {
 
   }
 
-  inline string name(const Function& f) {
-    if (f.isNull()) {
-      return "NULL";
-    } else {
-      return f.name();
-    }
-  }
-
   void KernelSum::print(ostream &stream) const {
-    stream << "KernelSum2D(" << name(f_) << ", " << n_ << ")";
+    stream << "KernelSum2D(" << f_.name() << ", " << n_ << ")";
   }
 
 } // namespace casadi

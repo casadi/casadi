@@ -578,16 +578,8 @@ namespace casadi {
     g.body << "  }" << std::endl;
   }
 
-  inline string name(const Function& f) {
-    if (f.isNull()) {
-      return "NULL";
-    } else {
-      return f.name();
-    }
-  }
-
   void MapReduce::print(ostream &stream) const {
-    stream << "Map(" << name(f_) << ", " << n_ << ")";
+    stream << "Map(" << f_.name() << ", " << n_ << ")";
   }
 
 #ifdef WITH_OPENMP

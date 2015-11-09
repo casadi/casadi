@@ -125,10 +125,10 @@ namespace casadi {
     bool new_x_, new_lam_g_;
 
     // Current calculated quantities
-    double fk_, *grad_fk_, *jac_gk_, *hess_lk_, *grad_lk_;
+    double fk_, *gk_, *grad_fk_, *jac_gk_, *hess_lk_, *grad_lk_;
 
     // What is up-to-date?
-    bool have_fk_, have_grad_fk_, have_jac_gk_, have_hess_lk_, have_grad_lk_;
+    bool have_fk_, have_gk_, have_grad_fk_, have_jac_gk_, have_hess_lk_, have_grad_lk_;
 
     // Set primal variable
     void set_x(const double *x);
@@ -137,19 +137,24 @@ namespace casadi {
     void set_lam_g(double *lam_g);
 
     // Calculate objective
-    enum FkIn { FK_X, FK_P, FK_NUM_IN };
-    enum FkOut { FK_F, FK_NUM_OUT};
-    Function fk_fcn_;
-    template<typename M> void setup_fk();
-    int calc_fk(double* f=0);
+    enum FIn { F_X, F_P, F_NUM_IN };
+    enum FOut { F_F, F_NUM_OUT};
+    Function f_fcn_;
+    template<typename M> void setup_f();
+    int calc_f(double* f=0);
+
+    // Calculate constraints
+    enum GIn { G_X, G_P, G_NUM_IN };
+    enum GOut { G_G, G_NUM_OUT};
+    Function g_fcn_;
+    template<typename M> void setup_g();
+    int calc_g(double* g=0);
 
     // Setup all functions
     template<typename M> void setup();
 
     // Ipopt callback functions
-    bool eval_f(int n, const double* x, bool new_x, double& obj_value);
     bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f);
-    bool eval_g(int n, const double* x, bool new_x, int m, double* g);
     bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac, int* iRow, int *jCol,
                     double* values);
     bool eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,
@@ -189,9 +194,9 @@ namespace casadi {
     static void timingSummary(std::vector<std::tuple<std::string, int, DiffTime> >& xs);
 
     // Accumulated time since last reset:
-    DiffTime t_eval_f_; // time spent in eval_f
+    double t_calc_f_; // time spent in calc_f
+    double t_calc_g_; // time spent in calc_g
     DiffTime t_eval_grad_f_; // time spent in eval_grad_f
-    DiffTime t_eval_g_; // time spent in eval_g
     DiffTime t_eval_jac_g_; // time spent in eval_jac_g
     DiffTime t_eval_h_; // time spent in eval_h
     DiffTime t_callback_fun_;  // time spent in callback function
@@ -199,9 +204,9 @@ namespace casadi {
     DiffTime t_mainloop_; // time spent in the main loop of the solver
 
     // Accumulated counts since last reset:
-    int n_calc_fk_; // number of calls to calc_fk
+    int n_calc_f_; // number of calls to calc_f
+    int n_calc_g_; // number of calls to calc_g
     int n_eval_grad_f_; // number of calls to eval_grad_f
-    int n_eval_g_; // number of calls to eval_g
     int n_eval_jac_g_; // number of calls to eval_jac_g
     int n_eval_h_; // number of calls to eval_h
     int n_eval_callback_; // number of calls to callback
