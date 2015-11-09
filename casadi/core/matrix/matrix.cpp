@@ -640,8 +640,8 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_jacobian(const SX &arg) const {
-    Function temp("temp", {arg}, {*this});
+  SX SX::jacobian(const SX &ex, const SX &arg) {
+    Function temp("temp", {arg}, {ex});
     return SX::jac(temp);
   }
 

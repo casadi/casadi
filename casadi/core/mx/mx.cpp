@@ -1712,8 +1712,8 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_jacobian(const MX &arg) const {
-    Function temp("helper_jacobian_MX", {arg}, {*this});
+  MX MX::jacobian(const MX &ex, const MX &arg) {
+    Function temp("helper_jacobian_MX", {arg}, {ex});
     return MX::jac(temp);
   }
 

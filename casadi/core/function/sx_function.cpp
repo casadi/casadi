@@ -818,7 +818,7 @@ namespace casadi {
   }
 
   Function SXFunction::getFullJacobian() {
-    SX J = veccat(outputv_).zz_jacobian(veccat(inputv_));
+    SX J = SX::jacobian(veccat(outputv_), veccat(inputv_));
     return Function(name_ + "_jac", inputv_, {J});
   }
 

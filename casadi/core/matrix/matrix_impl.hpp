@@ -2604,7 +2604,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_jacobian(const Matrix<DataType> &arg) const {
+  Matrix<DataType> Matrix<DataType>::jacobian(const Matrix<DataType> &ex,
+                                              const Matrix<DataType> &arg) {
     throw CasadiException("\"jacobian\" not defined for instantiation");
     return Matrix<DataType>();
   }
@@ -3080,7 +3081,7 @@ namespace casadi {
                                            bool reverse);
   template<> bool SX::zz_dependsOn(const SX &arg) const;
   template<> std::vector<SX > SX::zz_symvar() const;
-  template<> SX SX::zz_jacobian(const SX &arg) const;
+  template<> SX SX::jacobian(const SX &ex, const SX &arg);
   template<> SX SX::zz_gradient(const SX &arg) const;
   template<> SX SX::zz_tangent(const SX &arg) const;
   template<> SX SX::zz_hessian(const SX &arg) const;

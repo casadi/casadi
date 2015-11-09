@@ -514,7 +514,7 @@ namespace casadi {
     /** \brief Calculate jacobian via source code transformation
     */
     inline friend MatType jacobian(const MatType &ex, const MatType &arg) {
-      return ex.zz_jacobian(arg);
+      return MatType::jacobian(ex, arg);
     }
     inline friend MatType gradient(const MatType &ex, const MatType &arg) {
       return ex.zz_gradient(arg);
