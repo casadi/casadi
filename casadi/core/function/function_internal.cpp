@@ -1240,11 +1240,6 @@ namespace casadi {
     casadi_error("'eval_sx' not defined for " + type_name());
   }
 
-  void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    Function f = wrapMXFunction();
-    f.call(arg, res, true);
-  }
-
   void FunctionInternal::spEvaluate(bool fwd) {
     // Allocate temporary memory if needed
     iw_tmp_.resize(sz_iw());
@@ -1671,18 +1666,15 @@ namespace casadi {
 
   void FunctionInternal::eval_mx(const MXVector& arg, MXVector& res,
                                  bool always_inline, bool never_inline) {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-
-    // Lo logic for inlining yet
-    bool inline_function = always_inline;
-
-    if (inline_function) {
-      // Evaluate the function symbolically
-      evalMX(arg, res);
-    } else {
-      // Create a call-node
-      res = create_call(arg);
+    // The code below creates a call node, to inline, wrap in an MXFunction
+    if (always_inline) {
+      casadi_assert_message(!never_inline, "Inconsistent options");
+      Function f = wrapMXFunction();
+      return f.call(arg, res, true);
     }
+
+    // Create a call-node
+    res = create_call(arg);
   }
 
   std::vector<MX> FunctionInternal::create_call(const std::vector<MX>& arg) {

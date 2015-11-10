@@ -559,7 +559,13 @@ namespace casadi {
     }
   }
 
-  void MXFunction::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
+                           bool always_inline, bool never_inline) {
+    // The code below inlines the call, for creating a call, use the base class
+    if (!always_inline) {
+      return FunctionInternal::eval_mx(arg, res, false, true);
+    }
+
     log("MXFunction::evalMX begin");
     casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
 
