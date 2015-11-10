@@ -311,6 +311,9 @@ namespace casadi {
     alloc_w(ng_, true); // gk_
     alloc_w(nx_, true); // grad_fk_
     alloc_w(jacg_sp_.nnz(), true); // jac_gk_
+    if (exact_hessian_) {
+      alloc_w(hesslag_sp_.nnz(), true); // hess_lk_
+    }
   }
 
   void IpoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
@@ -323,9 +326,12 @@ namespace casadi {
     gk_ = w; w += ng_;
     grad_fk_ = w; w += nx_;
     jac_gk_ = w; w += jacg_sp_.nnz();
+    if (exact_hessian_) {
+      hess_lk_ = w; w += hesslag_sp_.nnz();
+    }
 
     // New iterate
-    new_x_ = new_lam_g_ = true;
+    new_x_ = new_lam_f_ = new_lam_g_ = true;
   }
 
   void IpoptInterface::solve(void* mem) {
@@ -371,14 +377,14 @@ namespace casadi {
     n_iter_ = 0;
 
     // Reset function timers
-    t_calc_f_ = t_calc_g_ = t_calc_grad_f_ = t_calc_jac_g_ = 0;
+    t_calc_f_ = t_calc_g_ = t_calc_grad_f_ = t_calc_jac_g_ = t_calc_hess_l_ = 0;
 
     // Reset function counters
-    n_calc_f_ = n_calc_g_ = n_calc_grad_f_ = n_calc_jac_g_ = 0;
+    n_calc_f_ = n_calc_g_ = n_calc_grad_f_ = n_calc_jac_g_ = n_calc_hess_l_ = 0;
 
     // Legacy
-    t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = {0, 0};
-    n_eval_h_ = n_eval_callback_ = 0;
+    t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = {0, 0};
+    n_eval_callback_ = 0;
 
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass =
@@ -458,14 +464,12 @@ namespace casadi {
     stats_["t_calc_grad_f"] = t_calc_grad_f_;
     stats_["n_calc_jac_g"] = n_calc_jac_g_;
     stats_["t_calc_jac_g"] = t_calc_jac_g_;
-
-    stats_["t_eval_h"] = diffToDict(t_eval_h_);
+    stats_["n_calc_hess_l"] = n_calc_hess_l_;
+    stats_["t_calc_hess_l"] = t_calc_hess_l_;
 
     stats_["t_mainloop"] = diffToDict(t_mainloop_);
     stats_["t_callback_fun"] = diffToDict(t_callback_fun_);
     stats_["t_callback_prepare"] = diffToDict(t_callback_prepare_);
-
-    stats_["n_eval_h"] = n_eval_h_;
     stats_["n_eval_callback"] = n_eval_callback_;
 
     stats_["iter_count"] = n_iter_-1;
@@ -604,58 +608,6 @@ namespace casadi {
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "finalize_solution failed: " << ex.what() << endl;
-    }
-  }
-
-  bool IpoptInterface::eval_h(const double* x, bool new_x, double obj_factor,
-                             const double* lambda, bool new_lambda, int nele_hess,
-                             int* iRow, int* jCol, double* values) {
-    try {
-      log("eval_h started");
-      Timer time0 = getTimerTime();
-      if (values == NULL) {
-        int nz=0;
-        const int* colind = hessLag_.sparsity_out(0).colind();
-        int ncol = hessLag_.size2_out(0);
-        const int* row = hessLag_.sparsity_out(0).row();
-        for (int cc=0; cc<ncol; ++cc)
-          for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
-            iRow[nz] = row[el];
-            jCol[nz] = cc;
-            nz++;
-          }
-      } else {
-        // Pass the argument to the function
-        hessLag_.setInputNZ(x, NL_X);
-        hessLag_.setInput(input(NLPSOL_P), NL_P);
-        hessLag_.setInput(obj_factor, NL_NUM_IN+NL_F);
-        hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
-
-        // Evaluate
-        hessLag_.evaluate();
-
-        // Get results
-        hessLag_.output().getSym(values);
-
-        if (monitored("eval_h")) {
-          userOut() << "x = " << hessLag_.input(NL_X).data() << endl;
-          userOut() << "H = " << endl;
-          hessLag_.output().printSparse();
-        }
-
-        if (regularity_check_ && !is_regular(hessLag_.output().data()))
-            casadi_error("IpoptInterface::h: NaN or Inf detected.");
-
-      }
-      DiffTime delta = diffTimers(getTimerTime(), time0);
-      timerPlusEq(t_eval_h_, delta);
-      n_eval_h_ += 1;
-      log("eval_h ok");
-      return true;
-    } catch(exception& ex) {
-      if (eval_errors_fatal_) throw ex;
-      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
-      return false;
     }
   }
 
@@ -1053,7 +1005,16 @@ namespace casadi {
     }
   }
 
-  void IpoptInterface::set_lam_g(double *lam_g) {
+  void IpoptInterface::set_lam_f(double lam_f) {
+    // Is a recalculation needed
+    if (new_lam_f_ || lam_f != lam_fk_) {
+      lam_fk_ = lam_f;
+      have_hess_lk_ = have_grad_lk_ = false;
+      new_lam_f_ = false;
+    }
+  }
+
+  void IpoptInterface::set_lam_g(const double *lam_g) {
     // Is a recalculation needed
     if (new_lam_g_ || !equal(lam_g, lam_g+ng_, lam_gk_)) {
       copy_n(lam_g, ng_, lam_gk_);
@@ -1176,10 +1137,10 @@ namespace casadi {
     if (!have_grad_fk_) {
       // Evaluate User function
       fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
-      arg_[GRADF_X] = xk_;
-      arg_[GRADF_P] = p_;
+      arg_[GF_X] = xk_;
+      arg_[GF_P] = p_;
       fill_n(res_, grad_f_fcn_.n_out(), nullptr);
-      res_[GRADF_GRAD] = grad_fk_;
+      res_[GF_GF] = grad_fk_;
       auto t_start = chrono::system_clock::now(); // start timer
       try {
         grad_f_fcn_(arg_, res_, iw_, w_, 0);
@@ -1212,11 +1173,11 @@ namespace casadi {
   template<typename M>
   void IpoptInterface::setup_grad_f() {
     const Problem<M>& nlp = nlp2_;
-    vector<M> arg(GRADF_NUM_IN);
-    arg[GRADF_X] = nlp.in[NL_X];
-    arg[GRADF_P] = nlp.in[NL_P];
-    vector<M> res(GRADF_NUM_OUT);
-    res[GRADF_GRADF] = M::gradient(nlp.out[NL_F], nlp.in[NL_X]);
+    vector<M> arg(GF_NUM_IN);
+    arg[GF_X] = nlp.in[NL_X];
+    arg[GF_P] = nlp.in[NL_P];
+    vector<M> res(GF_NUM_OUT);
+    res[GF_GF] = M::gradient(nlp.out[NL_F], nlp.in[NL_X]);
     grad_f_fcn_ = Function("nlp_grad_f", arg, res);
     alloc(grad_f_fcn_);
   }
@@ -1229,10 +1190,10 @@ namespace casadi {
     if (!have_jac_gk_) {
       // Evaluate User function
       fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-      arg_[JACG_X] = xk_;
-      arg_[JACG_P] = p_;
+      arg_[JG_X] = xk_;
+      arg_[JG_P] = p_;
       fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-      res_[JACG_JACG] = jac_gk_;
+      res_[JG_JG] = jac_gk_;
       auto t_start = chrono::system_clock::now(); // start timer
       try {
         jac_g_fcn_(arg_, res_, iw_, w_, 0);
@@ -1265,14 +1226,74 @@ namespace casadi {
   template<typename M>
   void IpoptInterface::setup_jac_g() {
     const Problem<M>& nlp = nlp2_;
-    vector<M> arg(JACG_NUM_IN);
-    arg[JACG_X] = nlp.in[NL_X];
-    arg[JACG_P] = nlp.in[NL_P];
-    vector<M> res(JACG_NUM_OUT);
-    res[JACG_JAC] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
+    vector<M> arg(JG_NUM_IN);
+    arg[JG_X] = nlp.in[NL_X];
+    arg[JG_P] = nlp.in[NL_P];
+    vector<M> res(JG_NUM_OUT);
+    res[JG_JG] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
     jac_g_fcn_ = Function("nlp_jac_g", arg, res);
-    jacg_sp_ = res[JACG_JAC].sparsity();
+    jacg_sp_ = res[JG_JG].sparsity();
     alloc(jac_g_fcn_);
+  }
+
+  int IpoptInterface::calc_hess_l(double* hess_l) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Calculate, if needed
+    if (!have_hess_lk_) {
+      // Evaluate User function
+      fill_n(arg_, hess_l_fcn_.n_in(), nullptr);
+      arg_[HL_X] = xk_;
+      arg_[HL_P] = p_;
+      arg_[HL_LAM_F] = &lam_fk_;
+      arg_[HL_LAM_G] = lam_gk_;
+      fill_n(res_, hess_l_fcn_.n_out(), nullptr);
+      res_[HL_HL] = hess_lk_;
+      auto t_start = chrono::system_clock::now(); // start timer
+      try {
+        hess_l_fcn_(arg_, res_, iw_, w_, 0);
+      } catch(exception& ex) {
+        // Fatal error
+        userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
+        return 1;
+      }
+      auto t_stop = chrono::system_clock::now(); // stop timer
+
+      // Make sure not NaN or Inf
+      if (!all_of(hess_lk_, hess_lk_+hesslag_sp_.nnz(), [](double v) { return isfinite(v);})) {
+        userOut<true, PL_WARN>() << name() << ":calc_hess_l failed: NaN or Inf detected" << endl;
+        return -1;
+      }
+
+      // Update stats
+      n_calc_hess_l_ += 1;
+      t_calc_hess_l_ += chrono::duration<double>(t_stop - t_start).count();
+      have_hess_lk_ = true;
+    }
+
+    // Return to user
+    casadi_copy(hess_lk_, hesslag_sp_.nnz(), hess_l);
+
+    // Success
+    return 0;
+  }
+
+  template<typename M>
+  void IpoptInterface::setup_hess_l() {
+    const Problem<M>& nlp = nlp2_;
+    vector<M> arg(HL_NUM_IN);
+    M x = arg[HL_X] = nlp.in[NL_X];
+    arg[HL_P] = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M g = nlp.out[NL_G];
+    M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
+    M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
+    vector<M> res(HL_NUM_OUT);
+    res[HL_HL] = M::hessian(dot(lam_f, f) + dot(lam_g, g), x);
+    hess_l_fcn_ = Function("nlp_hess_l", arg, res);
+    hesslag_sp_ = res[HL_HL].sparsity();
+    alloc(hess_l_fcn_);
   }
 
   template<typename M>
@@ -1288,6 +1309,11 @@ namespace casadi {
 
     // Jacobian of the constraits
     setup_jac_g<M>();
+
+    // Hessian of the Lagrangian
+    if (exact_hessian_) {
+      setup_hess_l<M>();
+    }
   }
 
 } // namespace casadi

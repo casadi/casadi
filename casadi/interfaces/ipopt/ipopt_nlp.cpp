@@ -129,7 +129,31 @@ namespace casadi {
                               Number obj_factor, Index m, const Number* lambda,
                               bool new_lambda, Index nele_hess, Index* iRow,
                               Index* jCol, Number* values) {
-    return solver->eval_h(x, new_x, obj_factor, lambda, new_lambda, nele_hess, iRow, jCol, values);
+    if (values) {
+      // Evaluate Hessian
+      solver->set_x(x);
+      solver->set_lam_f(obj_factor);
+      solver->set_lam_g(lambda);
+      if (solver->calc_hess_l()!=0) return false;
+
+      // Get the upper triangular half
+      casadi_getu(solver->hess_lk_, solver->hesslag_sp_, values);
+      return true;
+    } else {
+      // Get the sparsity pattern
+      int ncol = solver->hesslag_sp_.size2();
+      const int* colind = solver->hesslag_sp_.colind();
+      const int* row = solver->hesslag_sp_.row();
+
+      // Pass to IPOPT
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
+          *iRow++ = row[el];
+          *jCol++ = cc;
+        }
+      }
+      return true;
+    }
   }
 
 

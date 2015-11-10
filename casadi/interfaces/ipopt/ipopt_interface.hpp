@@ -119,13 +119,13 @@ namespace casadi {
     std::map<std::string, TypeID> ops_;
 
     // Sparsities
-    Sparsity jacg_sp_;
+    Sparsity jacg_sp_, hesslag_sp_;
 
     // Current solution
-    double *xk_, *lam_gk_;
+    double *xk_, lam_fk_, *lam_gk_;
 
     // Trigger recalculation?
-    bool new_x_, new_lam_g_;
+    bool new_x_, new_lam_f_, new_lam_g_;
 
     // Current calculated quantities
     double fk_, *gk_, *grad_fk_, *jac_gk_, *hess_lk_, *grad_lk_;
@@ -135,8 +135,10 @@ namespace casadi {
 
     // Set primal variable
     void set_x(const double *x);
+
     // Set dual variable
-    void set_lam_g(double *lam_g);
+    void set_lam_f(double lam_f);
+    void set_lam_g(const double *lam_g);
 
     // Calculate objective
     enum FIn { F_X, F_P, F_NUM_IN };
@@ -153,25 +155,30 @@ namespace casadi {
     int calc_g(double* g=0);
 
     // Calculate gradient of the objective
-    enum GradFIn { GRADF_X, GRADF_P, GRADF_NUM_IN };
-    enum GradFOut { GRADF_GRADF, GRADF_NUM_OUT};
+    enum GradFIn { GF_X, GF_P, GF_NUM_IN };
+    enum GradFOut { GF_GF, GF_NUM_OUT};
     Function grad_f_fcn_;
     template<typename M> void setup_grad_f();
     int calc_grad_f(double* grad_f=0);
 
     // Calculate Jacobian of constraints
-    enum JacGIn { JACG_X, JACG_P, JACG_NUM_IN };
-    enum JacGOut { JACG_JACG, JACG_NUM_OUT};
+    enum JacGIn { JG_X, JG_P, JG_NUM_IN };
+    enum JacGOut { JG_JG, JG_NUM_OUT};
     Function jac_g_fcn_;
     template<typename M> void setup_jac_g();
     int calc_jac_g(double* jac_g=0);
+
+    // Calculate Hessian of the Lagrangian constraints
+    enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
+    enum HessLagOut { HL_HL, HL_NUM_OUT};
+    Function hess_l_fcn_;
+    template<typename M> void setup_hess_l();
+    int calc_hess_l(double* hess_l=0);
 
     // Setup all functions
     template<typename M> void setup();
 
     // Ipopt callback functions
-    bool eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,
-                bool new_lambda, int nele_hess, int* iRow, int* jCol, double* values);
     void finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g,
                            const double* lambda, double obj_value, int iter_count);
     bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l, double* g_u);
@@ -211,7 +218,7 @@ namespace casadi {
     double t_calc_g_; // time spent in calc_g
     double t_calc_grad_f_; // time spent in calc_grad_f
     double t_calc_jac_g_; // time spent in calc_jac_g
-    DiffTime t_eval_h_; // time spent in eval_h
+    double t_calc_hess_l_; // time spent in calc_hess_l
 
     // Timings for different parts of the main loop
     DiffTime t_callback_fun_;  // time spent in callback function
@@ -223,8 +230,7 @@ namespace casadi {
     int n_calc_g_; // number of calls to calc_g
     int n_calc_grad_f_; // number of calls to calc_grad_f
     int n_calc_jac_g_; // number of calls to calc_jac_g
-
-    int n_eval_h_; // number of calls to eval_h
+    int n_calc_hess_l_; // number of calls to calc_hess_l
     int n_eval_callback_; // number of calls to callback
     int n_iter_; // number of iterations
 
