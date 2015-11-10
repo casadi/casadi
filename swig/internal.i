@@ -160,10 +160,10 @@
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::diffTimers(const timer t1, const timer t0) {
+%exception  casadi::diffTimers(const Timer t1, const Timer t0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::diffToDict(const diffTime &diff) {
+%exception  casadi::diffToDict(const DiffTime &diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::getTimerTime(void) {
@@ -193,7 +193,7 @@
 %exception  casadi::ptrVec(std::vector< std::vector< T > > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::timerPlusEq(diffTime &t, const diffTime diff) {
+%exception  casadi::timerPlusEq(DiffTime &t, const DiffTime diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {

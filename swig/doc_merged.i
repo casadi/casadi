@@ -2614,6 +2614,9 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Diagsplit.xml
 
 
+// File: classcasadi_1_1Dot.xml
+
+
 // File: classcasadi_1_1External.xml
 
 
@@ -4432,31 +4435,15 @@ Return a row-wise summation of elements.
 
 ";
 
-%feature("docstring") friendwrap_substitute "
+%feature("docstring") friendwrap_dot "
 
->  MatType substitute(MatType ex, MatType v, MatType vdef)
-------------------------------------------------------------------------
-
-Substitute variable v with expression vdef in an expression ex.
-
->  [MatType] substitute([MatType ] ex, [MatType ] v, [MatType ] vdef)
-------------------------------------------------------------------------
-
-Substitute variable var with expression expr in multiple expressions.
+Inner product of two matrices with x and y matrices of the same dimension.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::numel "
+%feature("docstring") casadi::GenericMatrix::size2 "
 
->  int MatType .numel() const 
-------------------------------------------------------------------------
-
-Get the number of elements.
-
->  int MatType .numel(int i) const 
-------------------------------------------------------------------------
-
-Get the number of elements in slice (cf. MATLAB)
+Get the second dimension (i.e. number of columns)
 
 ";
 
@@ -4503,7 +4490,19 @@ Count number of nodes
 
 ";
 
-%feature("docstring") friendwrap_hessian "";
+%feature("docstring") friendwrap_substitute "
+
+>  MatType substitute(MatType ex, MatType v, MatType vdef)
+------------------------------------------------------------------------
+
+Substitute variable v with expression vdef in an expression ex.
+
+>  [MatType] substitute([MatType ] ex, [MatType ] v, [MatType ] vdef)
+------------------------------------------------------------------------
+
+Substitute variable var with expression expr in multiple expressions.
+
+";
 
 %feature("docstring") friendwrap_trace "
 
@@ -4523,9 +4522,9 @@ Matrix divide (cf. backslash '\\\\' in MATLAB)
 
 ";
 
-%feature("docstring") friendwrap_inner_prod "
+%feature("docstring") friendwrap_jacobian "
 
-Inner product of two matrices with x and y matrices of the same dimension.
+Calculate jacobian via source code transformation.
 
 ";
 
@@ -4587,9 +4586,9 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::size2 "
+%feature("docstring") casadi::GenericMatrix::is_column "
 
-Get the second dimension (i.e. number of columns)
+Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
@@ -4810,12 +4809,6 @@ Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring") friendwrap_extractShared "
-
-Extract shared subexpressions from an set of expressions.
-
-";
-
 %feature("docstring") casadi::GenericMatrix::nnz_upper "
 
 Get the number of non-zeros in the upper triangular half.
@@ -4834,9 +4827,17 @@ Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
-%feature("docstring") friendwrap_jacobian "
+%feature("docstring") casadi::GenericMatrix::numel "
 
-Calculate jacobian via source code transformation.
+>  int MatType .numel() const 
+------------------------------------------------------------------------
+
+Get the number of elements.
+
+>  int MatType .numel(int i) const 
+------------------------------------------------------------------------
+
+Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -4926,6 +4927,8 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 ";
 
+%feature("docstring") friendwrap_hessian "";
+
 %feature("docstring") friendwrap_densify "
 
 >  MatType densify(MatType x)
@@ -4998,9 +5001,9 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix::is_column "
+%feature("docstring") friendwrap_extractShared "
 
-Check if the matrix is a column vector (i.e. size2()==1)
+Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -5062,9 +5065,6 @@ C++ includes: generic_type.hpp ";
 
 
 // File: classcasadi_1_1InfSX.xml
-
-
-// File: classcasadi_1_1InnerProd.xml
 
 
 // File: classcasadi_1_1IntegerSX.xml
@@ -10915,14 +10915,8 @@ with Q-transpose (lapack)
 
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
 
-%feature("docstring") casadi::getTimerTime "[INTERNAL]  Returns the real
-time, in seconds, or -1.0 if an error occurred.
-
-Time is measured since an arbitrary and OS-dependent start time. The
-returned real time is only useful for computing an elapsed time between two
-calls to this function.
-
-David Robert Nadeau (http://NadeauSoftware.com/)
+%feature("docstring") casadi::casadi_getu "[INTERNAL]  Get the nonzeros for
+the upper triangular half.
 
 ";
 
@@ -11028,9 +11022,7 @@ Duplicates are treated by looking up last occurrence
 ";
 
 %feature("docstring") casadi::casadi_qform "[INTERNAL]  Calculates dot(x,
-mul(A, x))
-
-Calculates dot(x, mul(A, x)) without memory allocation.
+mul(A, x)) without memory allocation.
 
 ";
 
@@ -11073,7 +11065,7 @@ Get typename.
 >  bool is_regular([T ] v)
 ------------------------------------------------------------------------
 
-Checks if vector does not contain NaN or Inf.
+Checks if array does not contain NaN or Inf.
 
 >  bool is_regular([N_] v)
 ------------------------------------------------------------------------
@@ -11209,6 +11201,17 @@ multiplication: z <- z + x*y.
 
 %feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
 system (lapack)
+
+";
+
+%feature("docstring") casadi::getTimerTime "[INTERNAL]  Returns the real
+time, in seconds, or -1.0 if an error occurred.
+
+Time is measured since an arbitrary and OS-dependent start time. The
+returned real time is only useful for computing an elapsed time between two
+calls to this function.
+
+David Robert Nadeau (http://NadeauSoftware.com/)
 
 ";
 

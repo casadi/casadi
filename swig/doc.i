@@ -3436,6 +3436,9 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Diagsplit.xml
 
 
+// File: classcasadi_1_1Dot.xml
+
+
 // File: classcasadi_1_1External.xml
 
 
@@ -6057,30 +6060,15 @@ Return a row-wise summation of elements.
 
 ";
 
-%feature("docstring")  substitute(const MatType &ex, const MatType &v, const
-MatType &vdef) "
+%feature("docstring")  dot(const MatType &x, const MatType &y) "
 
-Substitute variable v with expression vdef in an expression ex.
-
-";
-
-%feature("docstring")  substitute(const std::vector< MatType > &ex, const
-std::vector< MatType > &v, const std::vector< MatType > &vdef) "
-
-Substitute variable var with expression expr in multiple expressions.
+Inner product of two matrices with x and y matrices of the same dimension.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::size2() const  "
 
-Get the number of elements.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
-"
-
-Get the number of elements in slice (cf. MATLAB)
+Get the second dimension (i.e. number of columns)
 
 ";
 
@@ -6126,10 +6114,19 @@ Count number of nodes
 
 ";
 
-%feature("docstring")  hessian(const MatType &ex, const MatType &arg) " ";
+%feature("docstring")  substitute(const MatType &ex, const MatType &v, const
+MatType &vdef) "
 
-%feature("docstring")  hessian(const MatType &ex, const MatType &arg,
-MatType &output_g) " ";
+Substitute variable v with expression vdef in an expression ex.
+
+";
+
+%feature("docstring")  substitute(const std::vector< MatType > &ex, const
+std::vector< MatType > &v, const std::vector< MatType > &vdef) "
+
+Substitute variable var with expression expr in multiple expressions.
+
+";
 
 %feature("docstring")  trace(const MatType &a) "
 
@@ -6150,9 +6147,9 @@ Matrix divide (cf. backslash '\\\\' in MATLAB)
 
 ";
 
-%feature("docstring")  inner_prod(const MatType &x, const MatType &y) "
+%feature("docstring")  jacobian(const MatType &ex, const MatType &arg) "
 
-Inner product of two matrices with x and y matrices of the same dimension.
+Calculate jacobian via source code transformation.
 
 ";
 
@@ -6217,9 +6214,10 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::size2() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_column() const
+"
 
-Get the second dimension (i.e. number of columns)
+Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
@@ -6443,23 +6441,6 @@ Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring")  extractShared(std::vector< MatType > &ex,
-std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
-&v_prefix="v_", const std::string &v_suffix="") "
-
-Extract shared subexpressions from an set of expressions.
-
-";
-
-%feature("docstring")  extractShared(const std::vector< MatType > &ex,
-std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
-MatType > &vdef, const std::string &v_prefix="v_", const std::string
-&v_suffix="") "
-
-Extract shared subexpressions from an set of expressions.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper() const
 "
 
@@ -6479,9 +6460,16 @@ Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
-%feature("docstring")  jacobian(const MatType &ex, const MatType &arg) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::numel() const  "
 
-Calculate jacobian via source code transformation.
+Get the number of elements.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::numel(int i) const
+"
+
+Get the number of elements in slice (cf. MATLAB)
 
 ";
 
@@ -6592,6 +6580,11 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 ";
 
+%feature("docstring")  hessian(const MatType &ex, const MatType &arg) " ";
+
+%feature("docstring")  hessian(const MatType &ex, const MatType &arg,
+MatType &output_g) " ";
+
 %feature("docstring")  densify(const MatType &x) "
 
 Make the matrix dense if not already.
@@ -6677,10 +6670,20 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::is_column() const
-"
+%feature("docstring")  extractShared(std::vector< MatType > &ex,
+std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
+&v_prefix="v_", const std::string &v_suffix="") "
 
-Check if the matrix is a column vector (i.e. size2()==1)
+Extract shared subexpressions from an set of expressions.
+
+";
+
+%feature("docstring")  extractShared(const std::vector< MatType > &ex,
+std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
+MatType > &vdef, const std::string &v_prefix="v_", const std::string
+&v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -6759,9 +6762,6 @@ C++ includes: generic_type.hpp ";
 
 
 // File: classcasadi_1_1InfSX.xml
-
-
-// File: classcasadi_1_1InnerProd.xml
 
 
 // File: classcasadi_1_1IntegerSX.xml
@@ -14255,18 +14255,12 @@ real_t *y) " [INTERNAL]  Inner product.
 
 %feature("docstring")  casadi::check_exposed(T t) " [INTERNAL] ";
 
-%feature("docstring")  casadi::getTimerTime(void) "[INTERNAL]  Returns the
-real time, in seconds, or -1.0 if an error occurred.
-
-Time is measured since an arbitrary and OS-dependent start time. The
-returned real time is only useful for computing an elapsed time between two
-calls to this function.
-
-David Robert Nadeau (http://NadeauSoftware.com/)
+%feature("docstring")  casadi::casadi_getu(const real_t *x, const int *sp_x,
+real_t *v) " [INTERNAL]  Get the nonzeros for the upper triangular half.
 
 ";
 
-%feature("docstring")  casadi::diffTimers(const timer t1, const timer t0) "
+%feature("docstring")  casadi::diffTimers(const Timer t1, const Timer t0) "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::swapIndices(const std::vector< std::vector< T
@@ -14352,7 +14346,7 @@ Solve a system of equation using an LU-factorized matrix (lapack)
 
 ";
 
-%feature("docstring")  casadi::diffToDict(const diffTime &diff) " [INTERNAL]
+%feature("docstring")  casadi::diffToDict(const DiffTime &diff) " [INTERNAL]
 ";
 
 %feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
@@ -14380,9 +14374,8 @@ is zero (false negative allowed)
 ";
 
 %feature("docstring")  casadi::casadi_qform(const real_t *A, const int
-*sp_A, const real_t *x) " [INTERNAL]  Calculates dot(x, mul(A, x))
-
-Calculates dot(x, mul(A, x)) without memory allocation.
+*sp_A, const real_t *x) " [INTERNAL]  Calculates dot(x, mul(A, x)) without
+memory allocation.
 
 ";
 
@@ -14424,7 +14417,7 @@ Get typename.
 
 %feature("docstring")  casadi::is_regular(const std::vector< T > &v) "
 
-Checks if vector does not contain NaN or Inf.
+Checks if array does not contain NaN or Inf.
 
 ";
 
@@ -14573,6 +14566,17 @@ int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
 
 ";
 
+%feature("docstring")  casadi::getTimerTime(void) "[INTERNAL]  Returns the
+real time, in seconds, or -1.0 if an error occurred.
+
+Time is measured since an arbitrary and OS-dependent start time. The
+returned real time is only useful for computing an elapsed time between two
+calls to this function.
+
+David Robert Nadeau (http://NadeauSoftware.com/)
+
+";
+
 %feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
 
 Check if the vector is non-decreasing.
@@ -14587,7 +14591,7 @@ Check if the vector is non-decreasing.
 
 %feature("docstring")  casadi::userOut() "";
 
-%feature("docstring")  casadi::timerPlusEq(diffTime &t, const diffTime diff)
+%feature("docstring")  casadi::timerPlusEq(DiffTime &t, const DiffTime diff)
 " [INTERNAL] ";
 
 %feature("docstring")  casadi::read_matlab(std::istream &stream,
