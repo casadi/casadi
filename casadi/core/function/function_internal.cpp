@@ -2985,21 +2985,21 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-          const std::vector<std::vector<MX> >& fseed,
-          std::vector<std::vector<MX> >& fsens,
-          bool always_inline, bool never_inline) {
+  _forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+             const std::vector<std::vector<MX> >& fseed,
+             std::vector<std::vector<MX> >& fsens,
+             bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingFwdSeed(fseed)) {
       return forward(arg, res, replaceFwdSeed(fseed), fsens,
-                        always_inline, never_inline);
+                     always_inline, never_inline);
     }
     forward_mx(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   void FunctionInternal::
-  reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+  _reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) {
@@ -3013,24 +3013,24 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  forward(const std::vector<SX>& arg, const std::vector<SX>& res,
-          const std::vector<std::vector<SX> >& fseed,
-          std::vector<std::vector<SX> >& fsens,
-          bool always_inline, bool never_inline) {
+  _forward(const std::vector<SX>& arg, const std::vector<SX>& res,
+           const std::vector<std::vector<SX> >& fseed,
+           std::vector<std::vector<SX> >& fsens,
+           bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingFwdSeed(fseed)) {
       return forward(arg, res, replaceFwdSeed(fseed), fsens,
-                        always_inline, never_inline);
+                     always_inline, never_inline);
     }
     forward_sx(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   void FunctionInternal::
-  reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
-          const std::vector<std::vector<SX> >& aseed,
-          std::vector<std::vector<SX> >& asens,
-          bool always_inline, bool never_inline) {
+  _reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+           const std::vector<std::vector<SX> >& aseed,
+           std::vector<std::vector<SX> >& asens,
+           bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingAdjSeed(aseed)) {
@@ -3041,7 +3041,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  forward(const std::vector<DM>& arg, const std::vector<DM>& res,
+  _forward(const std::vector<DM>& arg, const std::vector<DM>& res,
           const std::vector<std::vector<DM> >& fseed,
           std::vector<std::vector<DM> >& fsens,
           bool always_inline, bool never_inline) {
@@ -3055,10 +3055,10 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
-          const std::vector<std::vector<DM> >& aseed,
-          std::vector<std::vector<DM> >& asens,
-          bool always_inline, bool never_inline) {
+  _reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
+           const std::vector<std::vector<DM> >& aseed,
+           std::vector<std::vector<DM> >& asens,
+           bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
     if (!matchingAdjSeed(aseed)) {

@@ -201,73 +201,83 @@ namespace casadi {
     /** \brief Create call */
     virtual std::vector<MX> create_call(const std::vector<MX>& arg);
 
-    /** \brief Create call to (cached) derivative function, forward mode  */
+    ///@{
+    /** \brief Forward mode AD, virtual functions overloaded in derived classes */
     virtual void forward_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
                             const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens,
                             bool always_inline, bool never_inline);
-
-    /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void reverse_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
-                            const std::vector<std::vector<MX> >& aseed,
-                            std::vector<std::vector<MX> >& asens,
-                            bool always_inline, bool never_inline);
-
-    /** \brief Create call to (cached) derivative function, forward mode  */
     virtual void forward_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
                             const std::vector<std::vector<SX> >& fseed,
                             std::vector<std::vector<SX> >& fsens,
                             bool always_inline, bool never_inline);
-
-    /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void reverse_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
-                            const std::vector<std::vector<SX> >& aseed,
-                            std::vector<std::vector<SX> >& asens,
-                            bool always_inline, bool never_inline);
-
-    /** \brief Create call to (cached) derivative function, forward mode  */
     virtual void forward_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
                             const std::vector<std::vector<DM> >& fseed,
                             std::vector<std::vector<DM> >& fsens,
                             bool always_inline, bool never_inline);
+    ///@}
 
-    /** \brief Create call to (cached) derivative function, reverse mode  */
+    ///@{
+    /** \brief Forward mode AD, overloaded */
+    void _forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+                  const std::vector<std::vector<MX> >& fseed,
+                  std::vector<std::vector<MX> >& fsens,
+                  bool always_inline, bool never_inline);
+    void _forward(const std::vector<SX>& arg, const std::vector<SX>& res,
+                  const std::vector<std::vector<SX> >& fseed,
+                  std::vector<std::vector<SX> >& fsens,
+                  bool always_inline, bool never_inline);
+    void _forward(const std::vector<DM>& arg, const std::vector<DM>& res,
+                  const std::vector<std::vector<DM> >& fseed,
+                  std::vector<std::vector<DM> >& fsens,
+                  bool always_inline, bool never_inline);
+    ///@}
+
+    /** \brief Forward mode AD, templated */
+    template<typename M>
+      void forward(const std::vector<M>& arg, const std::vector<M>& res,
+                   const std::vector<std::vector<M> >& fseed,
+                   std::vector<std::vector<M> >& fsens,
+                   bool always_inline, bool never_inline);
+
+    ///@{
+    /** \brief Reverse mode, virtual functions overloaded in derived classes */
+    virtual void reverse_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+                            const std::vector<std::vector<MX> >& aseed,
+                            std::vector<std::vector<MX> >& asens,
+                            bool always_inline, bool never_inline);
+    virtual void reverse_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+                            const std::vector<std::vector<SX> >& aseed,
+                            std::vector<std::vector<SX> >& asens,
+                            bool always_inline, bool never_inline);
     virtual void reverse_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
                             const std::vector<std::vector<DM> >& aseed,
                             std::vector<std::vector<DM> >& asens,
                             bool always_inline, bool never_inline);
-
-    ///@{
-    /** \brief Forward mode AD, overloaded */
-    void forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                 const std::vector<std::vector<MX> >& fseed,
-                 std::vector<std::vector<MX> >& fsens,
-                 bool always_inline, bool never_inline);
-    void reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                 const std::vector<std::vector<MX> >& aseed,
-                 std::vector<std::vector<MX> >& asens,
-                 bool always_inline, bool never_inline);
-    void forward(const std::vector<SX>& arg, const std::vector<SX>& res,
-                 const std::vector<std::vector<SX> >& fseed,
-                 std::vector<std::vector<SX> >& fsens,
-                 bool always_inline, bool never_inline);
     ///@}
 
     ///@{
     /** \brief Reverse mode AD, overloaded */
-    void reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
-                 const std::vector<std::vector<SX> >& aseed,
-                 std::vector<std::vector<SX> >& asens,
-                 bool always_inline, bool never_inline);
-    void forward(const std::vector<DM>& arg, const std::vector<DM>& res,
-                 const std::vector<std::vector<DM> >& fseed,
-                 std::vector<std::vector<DM> >& fsens,
-                 bool always_inline, bool never_inline);
-    void reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
-                 const std::vector<std::vector<DM> >& aseed,
-                 std::vector<std::vector<DM> >& asens,
-                 bool always_inline, bool never_inline);
+    void _reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+                  const std::vector<std::vector<MX> >& aseed,
+                  std::vector<std::vector<MX> >& asens,
+                  bool always_inline, bool never_inline);
+    void _reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+                  const std::vector<std::vector<SX> >& aseed,
+                  std::vector<std::vector<SX> >& asens,
+                  bool always_inline, bool never_inline);
+    void _reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
+                  const std::vector<std::vector<DM> >& aseed,
+                  std::vector<std::vector<DM> >& asens,
+                  bool always_inline, bool never_inline);
     ///@}
+
+    /** \brief Reverse mode AD, templated */
+    template<typename M>
+      void reverse(const std::vector<M>& arg, const std::vector<M>& res,
+                   const std::vector<std::vector<M> >& aseed,
+                   std::vector<std::vector<M> >& asens,
+                   bool always_inline, bool never_inline);
 
     ///@{
     /** \brief Parallel evaluation */
@@ -933,6 +943,24 @@ namespace casadi {
       }
     }
     return aseed;
+  }
+
+  template<typename M>
+  void FunctionInternal::
+  forward(const std::vector<M>& arg, const std::vector<M>& res,
+          const std::vector<std::vector<M> >& fseed,
+          std::vector<std::vector<M> >& fsens,
+          bool always_inline, bool never_inline) {
+    _forward(arg, res, fseed, fsens, always_inline, never_inline);
+  }
+
+  template<typename M>
+  void FunctionInternal::
+  reverse(const std::vector<M>& arg, const std::vector<M>& res,
+          const std::vector<std::vector<M> >& aseed,
+          std::vector<std::vector<M> >& asens,
+          bool always_inline, bool never_inline) {
+    _reverse(arg, res, aseed, asens, always_inline, never_inline);
   }
 
 } // namespace casadi
