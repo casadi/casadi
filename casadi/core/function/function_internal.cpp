@@ -1731,6 +1731,9 @@ namespace casadi {
 
   void FunctionInternal::call(const MXVector& arg, MXVector& res,
                               bool always_inline, bool never_inline) {
+    if (!matchingArg(arg)) {
+      return call(replaceArg(arg), res, always_inline, never_inline);
+    }
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
 
     // Lo logic for inlining yet
@@ -1769,6 +1772,9 @@ namespace casadi {
 
   void FunctionInternal::call(const SXVector& arg, SXVector& res,
                         bool always_inline, bool never_inline) {
+    if (!matchingArg(arg)) {
+      return call(replaceArg(arg), res, always_inline, never_inline);
+    }
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
     evalSX(arg, res);
@@ -1776,6 +1782,10 @@ namespace casadi {
 
   void FunctionInternal::call(const DMVector& arg, DMVector& res,
                         bool always_inline, bool never_inline) {
+    if (!matchingArg(arg)) {
+      return call(replaceArg(arg), res, always_inline, never_inline);
+    }
+
     // Get the number of inputs and outputs
     int num_in = n_in();
     int num_out = n_out();
@@ -2979,6 +2989,12 @@ namespace casadi {
           const std::vector<std::vector<MX> >& fseed,
           std::vector<std::vector<MX> >& fsens,
           bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingFwdSeed(fseed)) {
+      return forward(arg, res, replaceFwdSeed(fseed), fsens,
+                        always_inline, never_inline);
+    }
     forward_mx(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
@@ -2987,6 +3003,12 @@ namespace casadi {
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingAdjSeed(aseed)) {
+      return reverse(arg, res, replaceAdjSeed(aseed), asens,
+                        always_inline, never_inline);
+    }
     reverse_mx(arg, res, aseed, asens, always_inline, never_inline);
   }
 
@@ -2995,6 +3017,12 @@ namespace casadi {
           const std::vector<std::vector<SX> >& fseed,
           std::vector<std::vector<SX> >& fsens,
           bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingFwdSeed(fseed)) {
+      return forward(arg, res, replaceFwdSeed(fseed), fsens,
+                        always_inline, never_inline);
+    }
     forward_sx(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
@@ -3003,6 +3031,12 @@ namespace casadi {
           const std::vector<std::vector<SX> >& aseed,
           std::vector<std::vector<SX> >& asens,
           bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingAdjSeed(aseed)) {
+      return reverse(arg, res, replaceAdjSeed(aseed), asens,
+                        always_inline, never_inline);
+    }
     reverse_sx(arg, res, aseed, asens, always_inline, never_inline);
   }
 
@@ -3011,6 +3045,12 @@ namespace casadi {
           const std::vector<std::vector<DM> >& fseed,
           std::vector<std::vector<DM> >& fsens,
           bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingFwdSeed(fseed)) {
+      return forward(arg, res, replaceFwdSeed(fseed), fsens,
+                        always_inline, never_inline);
+    }
     forward_dm(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
@@ -3019,7 +3059,277 @@ namespace casadi {
           const std::vector<std::vector<DM> >& aseed,
           std::vector<std::vector<DM> >& asens,
           bool always_inline, bool never_inline) {
+    checkArg(arg);
+    checkRes(res);
+    if (!matchingAdjSeed(aseed)) {
+      return reverse(arg, res, replaceAdjSeed(aseed), asens,
+                        always_inline, never_inline);
+    }
     reverse_dm(arg, res, aseed, asens, always_inline, never_inline);
+  }
+
+  inline bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false) {
+    return arg.size()==inp.size() || arg.is_empty() || arg.is_scalar() ||
+      (inp.size2()==arg.size1() && inp.size1()==arg.size2()
+       && (arg.is_column() || inp.is_column())) ||
+      (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
+  }
+
+  template<typename M>
+  void FunctionInternal::checkArg(const vector<M>& arg, bool hcat) const {
+    int n_in = this->n_in();
+    casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
+                          << n_in << ", got " << arg.size());
+    for (int i=0; i<n_in; ++i) {
+      casadi_assert_message(checkMat(arg[i].sparsity(), input(i).sparsity(), hcat),
+                            "Input " << i << " has mismatching shape. Expected "
+                            << input(i).size() << ", got " << arg[i].size());
+    }
+  }
+
+  template<typename M>
+  void FunctionInternal::checkRes(const vector<M>& res) const {
+    int n_out = this->n_out();
+    casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
+                          << n_out << ", got " << res.size());
+    for (int i=0; i<n_out; ++i) {
+      casadi_assert_message(checkMat(res[i].sparsity(), output(i).sparsity()),
+                            "Output " << i << " has mismatching shape. Expected "
+                            << output(i).size() << ", got " << res[i].size());
+    }
+  }
+
+  template<typename M>
+  void FunctionInternal::checkFwdSeed(const vector<vector<M> >& fseed) const {
+    int n_in = this->n_in();
+    for (int d=0; d<fseed.size(); ++d) {
+      casadi_assert_message(fseed[d].size()==n_in,
+                            "Incorrect number of forward seeds for direction " << d
+                            << ": Expected " << n_in << ", got " << fseed[d].size());
+      for (int i=0; i<n_in; ++i) {
+        casadi_assert_message(checkMat(fseed[d][i].sparsity(), input(i).sparsity()),
+                              "Forward seed " << i << " for direction " << d
+                              << " has mismatching shape. Expected " << input(i).size()
+                              << ", got " << fseed[d][i].size());
+      }
+    }
+  }
+
+  template<typename M>
+  void FunctionInternal::checkAdjSeed(const vector<vector<M> >& aseed) const {
+    int n_out = this->n_out();
+    for (int d=0; d<aseed.size(); ++d) {
+      casadi_assert_message(aseed[d].size()==n_out,
+                            "Incorrect number of adjoint seeds for direction " << d
+                            << ": Expected " << n_out << ", got " << aseed[d].size());
+      for (int i=0; i<n_out; ++i) {
+        casadi_assert_message(checkMat(aseed[d][i].sparsity(), output(i).sparsity()),
+                              "Adjoint seed " << i << " for direction " << d
+                              << " has mismatching shape. Expected " << output(i).size()
+                              << ", got " << aseed[d][i].size());
+      }
+    }
+  }
+
+  template<typename M>
+  bool FunctionInternal::matchingArg(const vector<M>& arg, bool hcat) const {
+    checkArg(arg, hcat);
+    int n_in = this->n_in();
+    for (int i=0; i<n_in; ++i) {
+      if (hcat) {
+        if (arg.at(i).size1()!=input(i).size1()) return false;
+        if (arg.at(i).size2() % input(i).size2()!=0 || arg.at(i).size2()==0) return false;
+      } else {
+        if (arg.at(i).size()!=input(i).size()) return false;
+      }
+    }
+    return true;
+  }
+
+  template<typename M>
+  bool FunctionInternal::matchingRes(const vector<M>& res) const {
+    checkRes(res);
+    int n_out = this->n_out();
+    for (int i=0; i<n_out; ++i) {
+      if (res.at(i).size()!=output(i).size()) return false;
+    }
+    return true;
+  }
+
+  template<typename M>
+  bool FunctionInternal::matchingFwdSeed(const vector<vector<M> >& fseed) const {
+    checkFwdSeed(fseed);
+    for (int d=0; d<fseed.size(); ++d) {
+      if (!matchingArg(fseed[d])) return false;
+    }
+    return true;
+  }
+
+  template<typename M>
+  bool FunctionInternal::matchingAdjSeed(const vector<vector<M> >& aseed) const {
+    checkAdjSeed(aseed);
+    for (int d=0; d<aseed.size(); ++d) {
+      if (!matchingRes(aseed[d])) return false;
+    }
+    return true;
+  }
+
+  template<typename M>
+  M replaceMat(const M& arg, const Sparsity& inp, bool hcat=false) {
+    if (arg.size()==inp.size()) {
+      // Matching dimensions already
+      return arg;
+    } else if (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0
+               && arg.size2() >=0) {
+      // Matching horzcat dimensions
+      return arg;
+    } else if (arg.is_empty()) {
+      // Empty matrix means set zero
+      return M(inp.size());
+    } else if (arg.is_scalar()) {
+      // Scalar assign means set all
+      return M(inp, arg);
+    } else {
+      // Assign vector with transposing
+      casadi_assert(arg.size1()==inp.size2() && arg.size2()==inp.size1()
+                    && (arg.is_column() || inp.is_column()));
+      return arg.T();
+    }
+  }
+
+  template<typename M>
+  vector<M> FunctionInternal::replaceArg(const vector<M>& arg, bool hcat) const {
+    vector<M> r(arg.size());
+    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(arg[i], input(i).sparsity(), hcat);
+    return r;
+  }
+
+  template<typename M>
+  vector<M> FunctionInternal::replaceRes(const vector<M>& res) const {
+    vector<M> r(res.size());
+    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(res[i], output(i).sparsity());
+    return r;
+  }
+
+  template<typename M>
+  vector<vector<M> >
+  FunctionInternal::replaceFwdSeed(const vector<vector<M> >& fseed) const {
+    vector<vector<M> > r(fseed.size());
+    for (int d=0; d<r.size(); ++d) r[d] = replaceArg(fseed[d]);
+    return r;
+  }
+
+  template<typename M>
+  vector<vector<M> >
+  FunctionInternal::replaceAdjSeed(const vector<vector<M> >& aseed) const {
+    vector<vector<M> > r(aseed.size());
+    for (int d=0; d<r.size(); ++d) r[d] = replaceRes(aseed[d]);
+    return r;
+  }
+
+  std::vector<std::vector<MX> >
+  FunctionInternal::map_mx(const std::vector<std::vector<MX> > &x,
+                           const std::string& parallelization) {
+    if (x.empty()) return x;
+
+    // Check if arguments match
+    int n = x.size();
+    bool matching=true;
+    for (int i=0; i<n; ++i) {
+      matching = matchingArg(x[i]) && matching; // non-short circuiting
+    }
+
+    // Replace arguments if needed
+    if (!matching) {
+      vector<vector<MX> > x_new(n);
+      for (int i=0; i<n; ++i) x_new[i] = replaceArg(x[i]);
+      return map_mx(x_new, parallelization);
+    }
+
+    vector< vector<MX> > trans = swapIndices(x);
+    vector< MX > x_cat(trans.size());
+    for (int i=0;i<trans.size();++i) {
+      x_cat[i] = horzcat(trans[i]);
+    }
+
+    // Call the internal function
+    vector< MX > ret_cat = map_mx(x_cat, parallelization);
+    vector< vector<MX> > ret;
+
+    for (int i=0;i<ret_cat.size();++i) {
+      ret.push_back(horzsplit(ret_cat[i], output(i).size2()));
+    }
+    return swapIndices(ret);
+  }
+
+  std::vector<MX>
+  FunctionInternal::map_mx(const std::vector<MX > &x,
+                           const std::string& parallelization) {
+    if (x.empty()) return x;
+
+    // Replace arguments if needed
+    if (!matchingArg(x, true)) {
+      vector< MX > x_new = replaceArg(x, true);
+      return map_mx(x_new, parallelization);
+    }
+
+    int n = 1;
+    for (int i=0;i<x.size();++i) {
+      n = max(x[i].size2()/input(i).size2(), n);
+    }
+
+    vector<bool> repeat_n;
+    for (int i=0;i<x.size();++i) {
+      repeat_n.push_back(x[i].size2()/input(i).size2()==n);
+    }
+
+    bool repeated = true;
+    for (int i=0;i<repeat_n.size();++i) {
+      repeated &= repeat_n[i];
+    }
+
+    // Call the internal function
+
+    Dict options = {{"parallelization", parallelization}};
+
+    Function ms;
+    if (repeated) {
+      ms = shared_from_this<Function>().map("map", n, options);
+    } else {
+      ms = shared_from_this<Function>().
+        map("mapsum", n, repeat_n, vector<bool>(n_out(), true), options);
+    }
+    // Call the internal function
+    return ms(x);
+  }
+
+  std::vector<MX>
+  FunctionInternal::mapsum_mx(const std::vector<MX > &x,
+                              const std::string& parallelization) {
+    if (x.empty()) return x;
+
+    // Replace arguments if needed
+    if (!matchingArg(x, true)) {
+      vector< MX > x_new = replaceArg(x, true);
+      return mapsum_mx(x_new, parallelization);
+    }
+
+    int n = 1;
+    for (int i=0;i<x.size();++i) {
+      n = max(x[i].size2()/input(i).size2(), n);
+    }
+
+    vector<bool> repeat_n;
+    for (int i=0;i<x.size();++i) {
+      repeat_n.push_back(x[i].size2()/input(i).size2()==n);
+    }
+
+    Dict options = {{"parallelization", parallelization}};
+    Function ms = shared_from_this<Function>().map("mapsum", n, repeat_n,
+                      vector<bool>(n_out(), false), options);
+
+    // Call the internal function
+    return ms(x);
   }
 
 } // namespace casadi
