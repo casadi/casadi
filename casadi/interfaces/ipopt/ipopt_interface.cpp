@@ -309,6 +309,7 @@ namespace casadi {
     alloc_w(nx_, true); // xk_
     alloc_w(ng_, true); // lam_gk_
     alloc_w(ng_, true); // gk_
+    alloc_w(jacg_sp_.nnz(), true); // jac_gk_
   }
 
   void IpoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
@@ -319,6 +320,7 @@ namespace casadi {
     xk_ = w; w += nx_;
     lam_gk_ = w; w += ng_;
     gk_ = w; w += ng_;
+    jac_gk_ = w; w += jacg_sp_.nnz();
 
     // New iterate
     new_x_ = new_lam_g_ = true;
@@ -363,17 +365,19 @@ namespace casadi {
       stats_["iterations"] = iterations;
     }
 
-    // Reset timers
-    t_calc_f_ = t_calc_g_ = 0;
+    // Reset number of iterations
+    n_iter_ = 0;
 
-    // Reset the counters
-    n_calc_f_ = n_calc_g_ = 0;
+    // Reset function timers
+    t_calc_f_ = t_calc_g_ = t_calc_jac_g_ = 0;
+
+    // Reset function counters
+    n_calc_f_ = n_calc_g_ = n_calc_jac_g_ = 0;
 
     // Legacy
-    t_eval_grad_f_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
+    t_eval_grad_f_ = t_eval_h_ = t_callback_fun_ =
         t_callback_prepare_ = t_mainloop_ = {0, 0};
-    n_eval_grad_f_ = n_eval_jac_g_ = n_eval_h_ =
-        n_eval_callback_ = n_iter_ = 0;
+    n_eval_grad_f_ = n_eval_h_ = n_eval_callback_ = 0;
 
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass =
@@ -445,20 +449,21 @@ namespace casadi {
     if (status == Insufficient_Memory)
       stats_["return_status"] = "Insufficient_Memory";
 
-    stats_["t_calc_f"] = t_calc_f_;
-    stats_["t_calc_g"] = t_calc_g_;
     stats_["n_calc_f"] = n_calc_f_;
+    stats_["t_calc_f"] = t_calc_f_;
     stats_["n_calc_g"] = n_calc_g_;
+    stats_["t_calc_g"] = t_calc_g_;
+    stats_["n_calc_jac_g"] = n_calc_jac_g_;
+    stats_["t_calc_jac_g"] = t_calc_jac_g_;
 
     stats_["t_eval_grad_f"] = diffToDict(t_eval_grad_f_);
-    stats_["t_eval_jac_g"] = diffToDict(t_eval_jac_g_);
     stats_["t_eval_h"] = diffToDict(t_eval_h_);
+
     stats_["t_mainloop"] = diffToDict(t_mainloop_);
     stats_["t_callback_fun"] = diffToDict(t_callback_fun_);
     stats_["t_callback_prepare"] = diffToDict(t_callback_prepare_);
 
     stats_["n_eval_grad_f"] = n_eval_grad_f_;
-    stats_["n_eval_jac_g"] = n_eval_jac_g_;
     stats_["n_eval_h"] = n_eval_h_;
     stats_["n_eval_callback"] = n_eval_callback_;
 
@@ -649,65 +654,6 @@ namespace casadi {
     } catch(exception& ex) {
       if (eval_errors_fatal_) throw ex;
       userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
-  bool IpoptInterface::eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
-                                  int* iRow, int *jCol, double* values) {
-    try {
-      log("eval_jac_g started");
-
-      // Quich finish if no constraints
-      if (m==0) {
-        log("eval_jac_g quick return (m==0)");
-        return true;
-      }
-
-      // Get function
-      Function& jacG = this->jacG();
-
-      Timer time0 = getTimerTime();
-      if (values == NULL) {
-        int nz=0;
-        const int* colind = jacG.sparsity_out(0).colind();
-        int ncol = jacG.size2_out(0);
-        const int* row = jacG.sparsity_out(0).row();
-        for (int cc=0; cc<ncol; ++cc)
-          for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-            int rr = row[el];
-            iRow[nz] = rr;
-            jCol[nz] = cc;
-            nz++;
-          }
-      } else {
-        // Pass the argument to the function
-        jacG.setInputNZ(x, NL_X);
-        jacG.setInput(input(NLPSOL_P), NL_P);
-
-        // Evaluate the function
-        jacG.evaluate();
-
-        // Get the output
-        jacG.getOutputNZ(values);
-
-        if (monitored("eval_jac_g")) {
-          userOut() << "x = " << jacG.input(NL_X).data() << endl;
-          userOut() << "J = " << endl;
-          jacG.output().printSparse();
-        }
-        if (regularity_check_ && !is_regular(jacG.output().data()))
-            casadi_error("IpoptInterface::jac_g: NaN or Inf detected.");
-      }
-
-      DiffTime delta = diffTimers(getTimerTime(), time0);
-      timerPlusEq(t_eval_jac_g_, delta);
-      n_eval_jac_g_ += 1;
-      log("eval_jac_g ok");
-      return true;
-    } catch(exception& ex) {
-      if (eval_errors_fatal_) throw ex;
-      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -1174,15 +1120,9 @@ namespace casadi {
       }
       auto t_stop = chrono::steady_clock::now(); // stop timer
 
-      // Make sure not not-a-number or inf
-      if (isnan(fk_)) {
-        userOut<true, PL_WARN>() << name() << ":calc_f failed: NaN detected" << endl;
-        return -1;
-      }
-
-      // Make sure not not-a-number or inf
-      if (isinf(fk_)) {
-        userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf detected" << endl;
+      // Make sure not NaN or Inf
+      if (!isfinite(fk_)) {
+        userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf or NaN detected" << endl;
         return -1;
       }
 
@@ -1217,9 +1157,6 @@ namespace casadi {
 
     // Calculate, if needed
     if (!have_gk_) {
-      // Get current time
-      clock_t clock0 = clock();
-
       // Evaluate User function
       fill_n(arg_, g_fcn_.n_in(), nullptr);
       arg_[G_X] = xk_;
@@ -1236,15 +1173,9 @@ namespace casadi {
       }
       auto t_stop = chrono::steady_clock::now(); // stop timer
 
-      // Make sure not not-a-number
-      if (any_of(gk_, gk_+ng_, isnan)) {
-        userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN" << endl;
-        return -1;
-      }
-
-      // Make sure not inf
-      if (any_of(gk_, gk_+ng_, isinf)) {
-        userOut<true, PL_WARN>() << name() << ":calc_g failed: Inf detected" << endl;
+      // Make sure not NaN or Inf
+      if (!all_of(gk_, gk_+ng_, isfinite<double>)) {
+        userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN or Inf detected" << endl;
         return -1;
       }
 
@@ -1273,14 +1204,70 @@ namespace casadi {
     alloc(g_fcn_);
   }
 
+  int IpoptInterface::calc_jac_g(double* jac_g) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Calculate, if needed
+    if (!have_jac_gk_) {
+      // Evaluate User function
+      fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
+      arg_[JACG_X] = xk_;
+      arg_[JACG_P] = p_;
+      fill_n(res_, jac_g_fcn_.n_out(), nullptr);
+      res_[JACG_JAC] = jac_gk_;
+      auto t_start = chrono::steady_clock::now(); // start timer
+      try {
+        jac_g_fcn_(arg_, res_, iw_, w_, 0);
+      } catch(exception& ex) {
+        // Fatal error
+        userOut<true, PL_WARN>() << name() << ":calc_jac_g failed:" << ex.what() << endl;
+        return 1;
+      }
+      auto t_stop = chrono::steady_clock::now(); // stop timer
+
+      // Make sure not NaN or Inf
+      if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), isfinite<double>)) {
+        userOut<true, PL_WARN>() << name() << ":calc_jac_g failed: NaN or Inf detected" << endl;
+        return -1;
+      }
+
+      // Update stats
+      n_calc_jac_g_ += 1;
+      t_calc_jac_g_ += chrono::duration<double>(t_stop - t_start).count();
+      have_jac_gk_ = true;
+    }
+
+    // Return to user
+    casadi_copy(jac_gk_, jacg_sp_.nnz(), jac_g);
+
+    // Success
+    return 0;
+  }
+
+  template<typename M>
+  void IpoptInterface::setup_jac_g() {
+    const Problem<M>& nlp = nlp2_;
+    vector<M> arg(JACG_NUM_IN);
+    arg[JACG_X] = nlp.in[NL_X];
+    arg[JACG_P] = nlp.in[NL_P];
+    vector<M> res(JACG_NUM_OUT);
+    res[JACG_JAC] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
+    jac_g_fcn_ = Function("nlp_jac_g", arg, res);
+    jacg_sp_ = res[JACG_JAC].sparsity();
+    alloc(jac_g_fcn_);
+  }
 
   template<typename M>
   void IpoptInterface::setup() {
-    // Objective function
+    // Objective
     setup_f<M>();
 
-    // Objective function
+    // Constraints
     setup_g<M>();
+
+    // Jacobian of the constraits
+    setup_jac_g<M>();
   }
 
 } // namespace casadi

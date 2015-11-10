@@ -101,7 +101,26 @@ namespace casadi {
   bool IpoptUserClass::eval_jac_g(Index n, const Number* x, bool new_x,
                                   Index m, Index nele_jac, Index* iRow, Index *jCol,
                                   Number* values) {
-    return solver->eval_jac_g(n, x, new_x, m, nele_jac, iRow, jCol, values);
+    if (values) {
+      // Evaluate Jacobian
+      solver->set_x(x);
+      return solver->calc_jac_g(values)==0;
+    } else {
+      // Get the sparsity pattern
+      int ncol = solver->jacg_sp_.size2();
+      const int* colind = solver->jacg_sp_.colind();
+      const int* row = solver->jacg_sp_.row();
+      if (nele_jac!=colind[ncol]) return false; // consistency check
+
+      // Pass to IPOPT
+      for (int cc=0; cc<ncol; ++cc) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          *iRow++ = row[el];
+          *jCol++ = cc;
+        }
+      }
+      return true;
+    }
   }
 
 
