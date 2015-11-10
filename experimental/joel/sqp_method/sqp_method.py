@@ -214,7 +214,7 @@ while True:
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
   fk = ffcn.getOutput()
-  gfk = DMatrix(ffcn.getAdjSens())
+  gfk = DM(ffcn.getAdjSens())
   
   # Pass data to QP solver
   qpsol.setInput(Bk,"h")

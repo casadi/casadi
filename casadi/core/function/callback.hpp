@@ -94,7 +94,7 @@ namespace casadi {
     virtual void finalize() {}
 
     /** \brief Evaluate numerically, temporary matrices and work vectors */
-    virtual std::vector<DMatrix> eval(const std::vector<DMatrix>& arg);
+    virtual std::vector<DM> eval(const std::vector<DM>& arg);
 
 #ifndef SWIG
     /** \brief Evaluate numerically, work vectors given */

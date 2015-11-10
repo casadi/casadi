@@ -76,13 +76,13 @@ for N in range(1,11):
     l.append(f)
   
   # Get the coefficients of the continuity equation
-  D = DMatrix.zeros(K+1)
+  D = DM.zeros(K+1)
   for j in range(K+1):
     [D[j]] = l[j]([1.])[0]
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
-  C = DMatrix.zeros(K+1,K+1)
+  C = DM.zeros(K+1,K+1)
   for j in range(K+1):
     tfcn = l[j].tangent()
     for k in range(K+1):

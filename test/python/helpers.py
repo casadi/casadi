@@ -148,18 +148,18 @@ class casadiTestCase(unittest.TestCase):
       
     unittest.TestCase.__init__(self,*margs,**kwargs)
 
-  def randDMatrix(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1),symm=False ):
+  def randDM(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1),symm=False ):
     if sparsity < 1:
-      spp = self.randDMatrix(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
+      spp = self.randDM(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
       spm = (spp < sparsity)
       spm = sparsify(spm)
-      ret = DMatrix(spm.sparsity(),array([valuegenerator() for i in range(spm.nnz())]))
+      ret = DM(spm.sparsity(),array([valuegenerator() for i in range(spm.nnz())]))
       if symm:
         return (ret + ret.T)/2
       else:
         return ret
     else:
-      ret = casadi.reshape(DMatrix([valuegenerator() for i in range(n*m)]),n,m)
+      ret = casadi.reshape(DM([valuegenerator() for i in range(n*m)]),n,m)
       if symm:
         return (ret + ret.T)/2
       else:
@@ -321,8 +321,8 @@ class casadiTestCase(unittest.TestCase):
       message = "input(%d)" % i
       self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
-    trial_inputs    = [ DMatrix(trial.getInput(k)) for k in range(trial.n_in())]
-    solution_inputs = [ DMatrix(solution.getInput(k)) for k in range(solution.n_in())] 
+    trial_inputs    = [ DM(trial.getInput(k)) for k in range(trial.n_in())]
+    solution_inputs = [ DM(solution.getInput(k)) for k in range(solution.n_in())] 
 
     try:
       trial.evaluate()
@@ -424,17 +424,17 @@ class casadiTestCase(unittest.TestCase):
     if evals:
 
       def remove_first(x):
-        ret = DMatrix(x)
+        ret = DM(x)
         if ret.numel()>0:
-          ret[0,0] = DMatrix(1,1)
+          ret[0,0] = DM(1,1)
           return ret
         else:
           return ret
 
       def remove_last(x):
-        ret = DMatrix(x)
+        ret = DM(x)
         if ret.nnz()>0:
-          ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DMatrix(1,1)
+          ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DM(1,1)
           return ret
         else:
           return x
@@ -477,7 +477,7 @@ class casadiTestCase(unittest.TestCase):
           # Complete random seeding
           for i in range(f.n_in(),vf.n_in()):
             random.seed(i)
-            vf.setInput(DMatrix(vf.sparsity_in(i),random.random(vf.nnz_in(i))),i)
+            vf.setInput(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))),i)
           
           vf.evaluate()
           storagekey = (spmod,spmod2)
@@ -507,7 +507,7 @@ class casadiTestCase(unittest.TestCase):
             
               for i in range(f.n_in(),vf2.n_in()):
                 random.seed(i)
-                vf2.setInput(DMatrix(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))),i)
+                vf2.setInput(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))),i)
               
               vf2.evaluate()
               storagekey = (spmod,spmod2)

@@ -185,7 +185,7 @@ int main(){
     Function dintegrator = integrator.derivative(2,1);
 
     // Arguments for evaluation
-    map<string, DMatrix> arg, res;
+    map<string, DM> arg, res;
     arg["der_x0"] = x0_val;
     arg["der_p"] = p_val;
 

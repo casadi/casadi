@@ -77,9 +77,9 @@ for (i,x0) in enumerate([0.08]):
   u = ssym("u",nk)
 
   # Initial guess for u
-  u_guess = DMatrix.zeros(nk)
-  u_min = u_min*DMatrix.ones(nk)
-  u_max = u_max*DMatrix.ones(nk)
+  u_guess = DM.zeros(nk)
+  u_min = u_min*DM.ones(nk)
+  u_max = u_max*DM.ones(nk)
 
   # Lifted variables
   L = SX()
@@ -213,14 +213,14 @@ for (i,x0) in enumerate([0.08]):
 
   # Variables
   u_k = u_guess
-  x_k = DMatrix.zeros(x.shape)
-  d_k = DMatrix.zeros(x.shape)
-  mux_k = DMatrix.zeros(mux.shape)
-  mug_k = DMatrix.zeros(mug.shape)
-  dmux_k = DMatrix.zeros(mux.shape)
-  dmug_k = DMatrix.zeros(mug.shape)
-  f1_k = DMatrix.nan(f1.shape)
-  f2_k = DMatrix.nan(f2.shape)
+  x_k = DM.zeros(x.shape)
+  d_k = DM.zeros(x.shape)
+  mux_k = DM.zeros(mux.shape)
+  mug_k = DM.zeros(mug.shape)
+  dmux_k = DM.zeros(mux.shape)
+  dmug_k = DM.zeros(mug.shape)
+  f1_k = DM.nan(f1.shape)
+  f2_k = DM.nan(f2.shape)
 
   if manual_init:
     # Initialize node values manually
@@ -244,10 +244,10 @@ for (i,x0) in enumerate([0.08]):
     Z.getOutput(f2_k,2)
     
   # Zero seeds
-  u0seed = DMatrix.zeros(u.shape)
-  d0seed = DMatrix.zeros(d.shape)
-  mux0seed = DMatrix.zeros(mux.shape)
-  mug0seed = DMatrix.zeros(mug.shape)
+  u0seed = DM.zeros(u.shape)
+  d0seed = DM.zeros(d.shape)
+  mux0seed = DM.zeros(mux.shape)
+  mug0seed = DM.zeros(mug.shape)
 
   # Iterate
   k = 0

@@ -151,18 +151,18 @@ class ComplexityTests(casadiTestCase):
         self.assertTrue(False,"We expected order %d, but found %s" % (order,str(orders)))
     
     
-  def test_DMatrixadd(self):
-    self.message("DMatrix add column vectors")
+  def test_DMadd(self):
+    self.message("DM add column vectors")
     def setupfun(self,N):
-      return {'A': DMatrix(N,1,0), 'B': DMatrix(N,1,0)}
+      return {'A': DM(N,1,0), 'B': DM(N,1,0)}
     def fun(self,N,setup):
       setup['A'] + setup['B']
     
     self.complexity(setupfun,fun, 1)
     
-    self.message("DMatrix add rows vectors")
+    self.message("DM add rows vectors")
     def setupfun(self,N):
-      return {'A': DMatrix(1,N,0), 'B': DMatrix(1,N,0)}
+      return {'A': DM(1,N,0), 'B': DM(1,N,0)}
     
     self.complexity(setupfun,fun, 1)
 
@@ -241,18 +241,18 @@ class ComplexityTests(casadiTestCase):
       return {'f':f}
     self.complexity(setupfun,fun, 2)  # 1
 
-  def test_DMatrixdot(self):
-    self.message("DMatrix inner dot vectors")
+  def test_DMdot(self):
+    self.message("DM inner dot vectors")
     def setupfun(self,N):
-      return {'A': DMatrix(1,N,0), 'B': DMatrix(N,1,0)}
+      return {'A': DM(1,N,0), 'B': DM(N,1,0)}
     def fun(self,N,setup):
       c.dot(setup['A'],setup['B'])
     
     self.complexity(setupfun,fun, 1)
     
-    self.message("DMatrix outer dot vectors")
+    self.message("DM outer dot vectors")
     def setupfun(self,N):
-      return {'A': DMatrix(N,1,0), 'B': DMatrix(1,N,0)}
+      return {'A': DM(N,1,0), 'B': DM(1,N,0)}
     def fun(self,N,setup):
       c.dot(setup['A'],setup['B'])
     

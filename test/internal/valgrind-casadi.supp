@@ -107,7 +107,7 @@
    fun:PyObject_Call
    fun:SWIG_Python_NewShadowInstance
    fun:SWIG_Python_NewPointerObj
-   fun:_wrap_DMatrix___radd____SWIG_0
+   fun:_wrap_DM___radd____SWIG_0
 }
 
 #Error in swig 

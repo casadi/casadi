@@ -64,7 +64,7 @@ int main(int argc, char **argv){
 
   // Allocate NLP solver and buffers
   Function nlpsol = Function::nlpsol("nlpsol", "sqpmethod", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  std::map<std::string, DM> arg, res;
 
   // Solve NLP
   arg["lbx"] = nl.x_lb;

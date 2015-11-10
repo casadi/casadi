@@ -199,7 +199,7 @@ namespace casadi {
     static std::string shortname() { return "nlpsol";}
 
     // Get reduced Hessian
-    virtual DMatrix getReducedHessian();
+    virtual DM getReducedHessian();
 
     /// Read options from parameter xml
     virtual void setOptionsFromFile(const std::string & file);

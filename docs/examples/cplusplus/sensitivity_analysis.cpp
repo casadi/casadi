@@ -140,7 +140,7 @@ int main(){
       Function I = Function::ivpsol("I", solver.plugin, test.dae, opts);
 
       // Buffers for evaluation
-      std::map<std::string, DMatrix> arg, res;
+      std::map<std::string, DM> arg, res;
       
       // Integrate to get results
       arg = decltype(arg){{"x0", test.x0},

@@ -51,8 +51,8 @@ namespace casadi {
 
     // Allocate inputs
     ibuf_.resize(LINSOL_NUM_IN);
-    input(LINSOL_A) = DMatrix::zeros(sparsity);
-    input(LINSOL_B) = DMatrix::zeros(sparsity.size2(), nrhs);
+    input(LINSOL_A) = DM::zeros(sparsity);
+    input(LINSOL_B) = DM::zeros(sparsity.size2(), nrhs);
 
     // Allocate outputs
     obuf_.resize(LINSOL_NUM_OUT);
@@ -286,7 +286,7 @@ namespace casadi {
   }
 
   void Linsol::
-  linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const {
+  linsol_spsolve(DM& X, const DM& B, bool tr) const {
     bvec_t* X_bvec = reinterpret_cast<bvec_t*>(X.ptr());
     const bvec_t* B_bvec = reinterpret_cast<const bvec_t*>(B.ptr());
     linsol_spsolve(X_bvec, B_bvec, tr);

@@ -180,7 +180,7 @@ namespace casadi {
 
 #if !defined(SWIG) || defined(DOXYGEN)
 /** \defgroup expression_tools Expression tools
-* Functions for manipulating DMatrix, SX, MX or Sparsity
+* Functions for manipulating DM, SX, MX or Sparsity
 *
 */
 /**
@@ -263,9 +263,9 @@ namespace casadi {
      the last entry returned will have a size smaller than \p incr.
      
      \doctest
-     print vertsplit(DMatrix([0,1,2,3,4]),2)
+     print vertsplit(DM([0,1,2,3,4]),2)
      \doctestout
-     [DMatrix([0, 1]), DMatrix([2, 3]), DMatrix(4)]
+     [DM([0, 1]), DM([2, 3]), DM(4)]
      \enddoctest
      *
      */

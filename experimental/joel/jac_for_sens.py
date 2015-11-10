@@ -41,7 +41,7 @@ for jac_for_sens in (True,False):
 
   f.setAdjSeed([0,0,0,0,0],0)
   f.setAdjSeed(1,1)
-  f.setAdjSeed(DMatrix(5,5,0),2)
+  f.setAdjSeed(DM(5,5,0),2)
 
   f.evaluate(1,1)
 

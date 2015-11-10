@@ -101,15 +101,15 @@ namespace casadi {
     virtual bool __nonzero__() const;
   };
 
-  /// A constant given as a DMatrix
-  class CASADI_EXPORT ConstantDMatrix : public ConstantMX {
+  /// A constant given as a DM
+  class CASADI_EXPORT ConstantDM : public ConstantMX {
   public:
 
     /** \brief  Constructor */
-    explicit ConstantDMatrix(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x) {}
+    explicit ConstantDM(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x) {}
 
     /// Destructor
-    virtual ~ConstantDMatrix() {}
+    virtual ~ConstantDM() {}
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const {
@@ -187,7 +187,7 @@ namespace casadi {
     virtual double getValue() const { return 0;}
 
     /// Get the value (only for constant nodes)
-    virtual DMatrix getMatrixValue() const { return DMatrix(); }
+    virtual DM getMatrixValue() const { return DM(); }
 
     /// Get densification
     virtual MX getProject(const Sparsity& sp) const;
@@ -387,8 +387,8 @@ namespace casadi {
       }
       double ret2;
       casadi_math<double>::fun(op, 0, 0.0, ret2);
-      return DMatrix(sparsity(), ret, false)
-        + DMatrix(sparsity().pattern_inverse(), ret2, false);
+      return DM(sparsity(), ret, false)
+        + DM(sparsity().pattern_inverse(), ret2, false);
     }
   }
 
@@ -407,7 +407,7 @@ namespace casadi {
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
-      if (y->op()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
+      if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==0) {
         double ret;
         casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->getValue() : 0, ret);
         grow = ret!=0;
@@ -445,7 +445,7 @@ namespace casadi {
 
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
-    if (y->op()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
+    if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==0) {
       double y_value = y.nnz()>0 ? y->getValue() : 0;
       double ret;
       casadi_math<double>::fun(op, nnz()> 0 ? v_.value: 0, y_value, ret);

@@ -193,11 +193,11 @@ class SXtests(casadiTestCase):
       z=SX.sym("z")
       x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([x,y,z]))
       if scipy_available:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
+        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
       
         self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SX",setx0=x0,excludeflags={'nozero'})
       else:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
+        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
       
         self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SX",setx0=x0,excludeflags={'nozero'})
       
@@ -211,7 +211,7 @@ class SXtests(casadiTestCase):
       self.assertRaises(RuntimeError, lambda : mul(x,y))
 
       
-  def test_DMatrixbinary(self):
+  def test_DMbinary(self):
       self.message("SX binary operations")
       x=SX.sym("x",3,2)
       y=SX.sym("x",3,2)
@@ -232,13 +232,13 @@ class SXtests(casadiTestCase):
       yy=SX(Sparsity(4,3,[0,2,2,3],[0,2,3]),vertcat([x2,z2,y2]))
       
       if scipy_available:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
-        y0=DMatrix(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toCsc_matrix()
+        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
+        y0=DM(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toCsc_matrix()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SX",setx0=[x0,y0])
       else:
-        x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
-        y0=DMatrix(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toArray()
+        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toArray()
+        y0=DM(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toArray()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="SX",setx0=[x0,y0])
       self.assertRaises(RuntimeError, lambda : mul(xx,yy))
@@ -277,7 +277,7 @@ class SXtests(casadiTestCase):
       
       x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([SX.sym("x"),SX.sym("y"),SX.sym("z")]))
       sx0=[0.738,0.39,0.99]
-      x0=DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]).toArray()
+      x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]).toArray()
       self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: SX(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]",setx0=[sx0])
@@ -396,7 +396,7 @@ class SXtests(casadiTestCase):
         T2 = t2!=0
         f.setInput([t1,t2])
         f.evaluate()
-        self.checkarray(f.getOutput(),DMatrix([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f.getOutput())))
+        self.checkarray(f.getOutput(),DM([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f.getOutput())))
 
   def test_SXineq(self):
     self.message("SX ineq")
@@ -413,7 +413,7 @@ class SXtests(casadiTestCase):
         T2 = t2
         f.setInput([t1,t2])
         f.evaluate()
-        self.checkarray(f.getOutput(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
+        self.checkarray(f.getOutput(),DM([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
 
     
     
@@ -451,8 +451,8 @@ class SXtests(casadiTestCase):
       
   def test_sparseconstr(self):
     self.message("Check sparsity constructors")
-    self.checkarray(DMatrix.ones(Sparsity.lower(3)).toArray(),matrix([[1,0,0],[1,1,0],[1,1,1]]),"tril")
-    self.checkarray(DMatrix.ones(Sparsity.diag(3)).toArray(),matrix([[1,0,0],[0,1,0],[0,0,1]]),"diag")
+    self.checkarray(DM.ones(Sparsity.lower(3)).toArray(),matrix([[1,0,0],[1,1,0],[1,1,1]]),"tril")
+    self.checkarray(DM.ones(Sparsity.diag(3)).toArray(),matrix([[1,0,0],[0,1,0],[0,0,1]]),"diag")
     
   def test_subsassignment(self):
     self.message("Check subscripted assignment")
@@ -461,9 +461,9 @@ class SXtests(casadiTestCase):
     numpy.random.seed(42)
     xn = numpy.random.random((3,4))
 
-    x=DMatrix(xn)
+    x=DM(xn)
     
-    y=DMatrix(7,8)
+    y=DM(7,8)
     z = numpy.zeros((7,8))
     y[0,0]=12; z[0,0] = 12
     self.checkarray(y,z,"scalar assignment")
@@ -477,7 +477,7 @@ class SXtests(casadiTestCase):
     for k in kl:
       z[s.row()[k],s.get_col()[k]]=1.0
     self.checkarray(y,z,"nonzero scalar assignment")
-    y.nz[kl]=DMatrix(kl)
+    y.nz[kl]=DM(kl)
     
     cnt=0
     for k in kl:
@@ -837,8 +837,8 @@ class SXtests(casadiTestCase):
     with self.assertRaises(Exception):
       self.assertTrue(x.nz[0])
       
-    self.assertTrue(SX(DMatrix([0,1])).is_regular())
-    self.assertFalse(SX(DMatrix([0,Inf])).is_regular())
+    self.assertTrue(SX(DM([0,1])).is_regular())
+    self.assertFalse(SX(DM([0,Inf])).is_regular())
     self.assertFalse(vertcat([x,Inf]).is_regular())
     with self.assertRaises(Exception):
       self.assertFalse(vertcat([x,x]).is_regular())
@@ -913,7 +913,7 @@ class SXtests(casadiTestCase):
     f.setInput([11,1.3,-1.7,0.1])
     f.evaluate()
     f.getOutput()
-    self.checkarray(f.getOutput(),DMatrix([0.298028,-0.479787,0.0635774]),digits=5)
+    self.checkarray(f.getOutput(),DM([0.298028,-0.479787,0.0635774]),digits=5)
     
     p = SX.sym("[a,b,c,d,e]")
     r = poly_roots(p)
@@ -922,14 +922,14 @@ class SXtests(casadiTestCase):
     f.setInput([3,6,-123,  -126,1080])
     f.evaluate()
     f.getOutput()
-    self.checkarray(f.getOutput(),DMatrix([5,3,-4,-6]),digits=5)
+    self.checkarray(f.getOutput(),DM([5,3,-4,-6]),digits=5)
     
   def test_eig_symbolic(self):
     x = SX.sym("x",2,2)
     f = Function("f", [x],[eig_symbolic(x)])
-    f.setInput(DMatrix([[2,0.1],[0.3,0.7]]))
+    f.setInput(DM([[2,0.1],[0.3,0.7]]))
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([0.67732,2.02268]),digits=5)
+    self.checkarray(f.getOutput(),DM([0.67732,2.02268]),digits=5)
     
     
     x = SX.sym("x",2)
@@ -948,10 +948,10 @@ class SXtests(casadiTestCase):
     x = SX.sym("x",2,2)
     y = SX.sym("y",2)
     f = Function("f", [x,y],[eig_symbolic(diagcat([x,c.diag(y)]))])
-    f.setInput(DMatrix([[2,0.1],[0.3,0.7]]),0)
+    f.setInput(DM([[2,0.1],[0.3,0.7]]),0)
     f.setInput([3,7],1)
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([0.67732,2.02268,3,7]),digits=5)
+    self.checkarray(f.getOutput(),DM([0.67732,2.02268,3,7]),digits=5)
 
     x = SX.sym("x",3,3)
     x[2,0] = 0
@@ -965,7 +965,7 @@ class SXtests(casadiTestCase):
     f.setInputNZ(range(1,8))
     f.getInput().printDense()
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([1,-0.29150,10.29150]),digits=5)
+    self.checkarray(f.getOutput(),DM([1,-0.29150,10.29150]),digits=5)
     
     
     x = SX.sym("x",3,3)
@@ -981,7 +981,7 @@ class SXtests(casadiTestCase):
     f.setInputNZ(range(1,7))
     f.getInput().printDense()
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([1,3,6]),digits=5)
+    self.checkarray(f.getOutput(),DM([1,3,6]),digits=5)
 
     x = SX.sym("x",Sparsity.upper(5))
   
@@ -991,12 +991,12 @@ class SXtests(casadiTestCase):
     tmp[Sparsity.diag(5)] = c.diag(range(5))
     f.setInput(tmp)
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix(range(5)))
+    self.checkarray(f.getOutput(),DM(range(5)))
     
   def test_jacobian_empty(self):
     x = SX.sym("x",3)
 
-    s = jacobian(DMatrix(0,0),x).shape
+    s = jacobian(DM(0,0),x).shape
     self.assertEqual(s[0],0)
     self.assertEqual(s[1],3)
 
@@ -1016,8 +1016,8 @@ class SXtests(casadiTestCase):
     x = SX.sym("x",N,N)
     y = SX.sym("y",N,N)
 
-    x_ = self.randDMatrix(N,N)
-    y_ = self.randDMatrix(N,N)
+    x_ = self.randDM(N,N)
+    y_ = self.randDM(N,N)
 
     filt = Sparsity.diag(N)+Sparsity.triplet(N,N,[1],[3])
 
@@ -1042,7 +1042,7 @@ class SXtests(casadiTestCase):
 
     A = pickle.load(file("../data/apoa1-2.pkl",'r'))
 
-    H = DMatrix(A,range(A.nnz()))
+    H = DM(A,range(A.nnz()))
     H = H + H.T
     
     H = H[:20000,:20000]
@@ -1124,81 +1124,81 @@ class SXtests(casadiTestCase):
     f.setInput(2,0)
     f.setInput(0.5,1)
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([2]))
+    self.checkarray(f.getOutput(),DM([2]))
 
     f.setInput(2,0)
     f.setInput(-0.5,1)
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([-2]))
+    self.checkarray(f.getOutput(),DM([-2]))
     
     f.setInput(-2,0)
     f.setInput(0.5,1)
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([2]))
+    self.checkarray(f.getOutput(),DM([2]))
 
     f.setInput(-2,0)
     f.setInput(-0.5,1)
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([-2]))
+    self.checkarray(f.getOutput(),DM([-2]))
     
     f.setInput(2,0)
     f.setInput(0,1)
     f.evaluate()
-    self.checkarray(f.getOutput(),DMatrix([2]))
+    self.checkarray(f.getOutput(),DM([2]))
     
     J = f.jacobian()
     
     J.setInput(2,0)
     J.setInput(0.5,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([1]))
+    self.checkarray(J.getOutput(),DM([1]))
 
     J.setInput(2,0)
     J.setInput(-0.5,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([-1]))
+    self.checkarray(J.getOutput(),DM([-1]))
     
     J.setInput(-2,0)
     J.setInput(0.5,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([1]))
+    self.checkarray(J.getOutput(),DM([1]))
 
     J.setInput(-2,0)
     J.setInput(-0.5,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([-1]))
+    self.checkarray(J.getOutput(),DM([-1]))
     
     J.setInput(2,0)
     J.setInput(0,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([1]))
+    self.checkarray(J.getOutput(),DM([1]))
 
     J = f.jacobian(1)
     
     J.setInput(2,0)
     J.setInput(0.5,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DM([0]))
 
     J.setInput(2,0)
     J.setInput(-0.5,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DM([0]))
     
     J.setInput(-2,0)
     J.setInput(0.5,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DM([0]))
 
     J.setInput(-2,0)
     J.setInput(-0.5,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DM([0]))
     
     J.setInput(2,0)
     J.setInput(0,1)
     J.evaluate()
-    self.checkarray(J.getOutput(),DMatrix([0]))
+    self.checkarray(J.getOutput(),DM([0]))
     
   def test_dependsOn(self):
     a = SX.sym("a")

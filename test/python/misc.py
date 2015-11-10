@@ -56,20 +56,20 @@ class Misctests(casadiTestCase):
     print_sparsity()
     
   def test_sanity(self):
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,4,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,12],[1,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[-10,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[8,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[-3,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1,2]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,0,3],[1,2,1]),[0.738,0.39,0.99]))    
+    DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,4,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,2,12],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[-10,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,2,3],[8,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,2,3],[-3,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,2,3],[1,2,1,2]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,0,3],[1,2,1]),[0.738,0.39,0.99]))    
     
   def test_copyconstr_norefcount(self):
     self.message("Copy constructor for non-refcounted classes")
-    x = DMatrix.ones(2,3)
+    x = DM.ones(2,3)
 
-    y = DMatrix(x)
+    y = DM(x)
     x[0,0] = 5
     
     self.assertFalse(id(x)==id(y))
@@ -109,7 +109,7 @@ class Misctests(casadiTestCase):
     self.message("Shallow copy for non-refcounted classes")
     import copy
     
-    x = DMatrix.ones(2,3)
+    x = DM.ones(2,3)
 
     y = copy.copy(x)
     x[0,0] = 5
@@ -151,7 +151,7 @@ class Misctests(casadiTestCase):
     self.message("Deep copy for non-refcounted classes")
     import copy
     
-    x = DMatrix.ones(2,3)
+    x = DM.ones(2,3)
 
     y = copy.deepcopy(x)
     x[0,0] = 5
@@ -216,7 +216,7 @@ class Misctests(casadiTestCase):
     self.checkarray(a,b)
 
 
-    a = DMatrix(Sparsity.lower(4),range(10))
+    a = DM(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
@@ -239,7 +239,7 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "vertcat([SX]" in e.message
-      assert "vertcat([DMatrix" in e.message
+      assert "vertcat([DM" in e.message
       assert "You have: vertcat(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
@@ -298,14 +298,14 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "diagsplit(SX,int)" in e.message
-      assert "diagsplit(DMatrix ,int)" in e.message
+      assert "diagsplit(DM ,int)" in e.message
 
     try:
-      DMatrix("df")
+      DM("df")
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "  DMatrix (" in e.message
+      assert "  DM (" in e.message
 
     try:
       vertcat([1,SX.sym('x'),MX.sym('x')])
@@ -322,15 +322,15 @@ class Misctests(casadiTestCase):
     
     fc = F({'x':3,'p':4})
     [f] = fc['f']
-    self.checkarray(f,DMatrix([7]))
+    self.checkarray(f,DM([7]))
     [g] = fc['g']
-    self.checkarray(g,DMatrix([9]))
+    self.checkarray(g,DM([9]))
     [f,g] = itemgetter('f','g')(fc)
-    self.checkarray(f,DMatrix([7]))
-    self.checkarray(g,DMatrix([9]))
+    self.checkarray(f,DM([7]))
+    self.checkarray(g,DM([9]))
     [g,f] = itemgetter('g','f')(fc)
-    self.checkarray(f,DMatrix([7]))
-    self.checkarray(g,DMatrix([9]))
+    self.checkarray(f,DM([7]))
+    self.checkarray(g,DM([9]))
     
   def test_assertions(self):
     
@@ -360,7 +360,7 @@ class Misctests(casadiTestCase):
   @requiresPlugin(Function.nlpsol,"ipopt")
   def test_output(self):
     with capture_stdout() as result:
-      DMatrix([1,2]).printDense()
+      DM([1,2]).printDense()
 
     assert "2" in result[0]
 

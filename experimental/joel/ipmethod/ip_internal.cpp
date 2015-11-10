@@ -105,11 +105,11 @@ void IPInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
 
   // Current value of x
-  DMatrix &x_curr = output(NLP_SOLVER_X);
+  DM &x_curr = output(NLP_SOLVER_X);
   copy(input(NLP_SOLVER_X0).begin(),input(NLP_SOLVER_X0).end(),x_curr.begin());
   
   // Step size
-  DMatrix dx = DMatrix(x_curr.sparsity(),0);
+  DM dx = DM(x_curr.sparsity(),0);
   
   // Barrier parameter
   double t = 1;
@@ -138,7 +138,7 @@ void IPInternal::evaluate(int nfdir, int nadir){
       linear_solver_.setInput(kfcn_.output(K_K),0);
       linear_solver_.setInput(kfcn_.output(K_k),1);
       linear_solver_.evaluate();
-      const DMatrix& dx_nu = linear_solver_.output();
+      const DM& dx_nu = linear_solver_.output();
       copy(dx_nu.begin(),dx_nu.begin()+dx.size(),dx.begin());
       
       // Update x

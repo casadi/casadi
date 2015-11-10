@@ -32,8 +32,8 @@ import time
 
 n=100
 #$ We generate $A \in \mathbf{R}^{n \times n}$, $x \in \mathbf{R}^{n}$ with $n=100$
-A=DMatrix([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
-x=DMatrix([tan(i) for i in range(n)])
+A=DM([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
+x=DM([tan(i) for i in range(n)])
 
 #! We generate the b vector:
 b=mul(A,x)

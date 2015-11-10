@@ -31,30 +31,30 @@ using namespace std;
 using namespace casadi;
 
 int main() {
-  DMatrix H(2,2,0);
+  DM H(2,2,0);
   H(0,0) = 1.0;
   H(1,1) = 0.5;
   
-  DMatrix A(1,2,0);
+  DM A(1,2,0);
   A(0,0) = 1.0;
   A(0,1) = 1.0;
   
-  DMatrix g(2,1,0);
+  DM g(2,1,0);
   g(0) = 1.5;
   g(1) = 1.0;
   
-  DMatrix lb(2,1,0);
+  DM lb(2,1,0);
   lb(0) = 0.5;
   lb(1) = -2.0;
   
-  DMatrix ub(2,1,0);
+  DM ub(2,1,0);
   ub(0) = 5.0;
   ub(1) = 2.0;
   
-  DMatrix lbA(1,1,0);
+  DM lbA(1,1,0);
   lbA(0) = -1.0;
   
-  DMatrix ubA(1,1,0);
+  DM ubA(1,1,0);
   ubA(0) = 2.0;
   
   for(int rep=0; rep<2; ++rep){

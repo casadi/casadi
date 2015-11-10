@@ -30,12 +30,12 @@ from casadi import *
 from numpy import *
 #! Contructors & printing
 #! --------------------------------------
-#! The python name for Matrix<double> is DMatrix
-a = DMatrix.zeros(3,4)
+#! The python name for Matrix<double> is DM
+a = DM.zeros(3,4)
 print a
 #! The string representation shows only the structural non-zero entries. In this case there are none.
-#! Let's make a DMatrix with some structural non-zero entries.
-w = DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
+#! Let's make a DM with some structural non-zero entries.
+w = DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
 print w
 #! Internally, the Matrix<> class uses a Compressed Column Format which containts the offset to the first nonzero on each column ...
 print "column offsets: ", w.colind()
@@ -45,7 +45,7 @@ print "row: ", w.row()
 print "nonzeros: ", w.nonzeros()
 #! Conversion
 #! --------------
-#! DMatrix can easily be converted into other data formats
+#! DM can easily be converted into other data formats
 print w.nonzeros()
 print w.full()
 print array(w)

@@ -261,7 +261,7 @@ namespace casadi {
         // Perform a single dependency sweep
         jacG_.spEvaluate(true);
 
-        DMatrix out_trans = jacG_.output().T();
+        DM out_trans = jacG_.output().T();
         bvec_t* output_v_trans = get_bvec_t(out_trans.data());
 
         for (int j = 0; j < nx_; ++j) {  // Harvest the results
@@ -621,7 +621,7 @@ namespace casadi {
       userOut() << "locA:" << col << std::endl;
       userOut() << "colA:" << A_data_ << std::endl;
       A_structure_.sparsity().spy();
-      userOut() << "A:" << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
+      userOut() << "A:" << DM(A_structure_.sparsity(), A_data_) << std::endl;
       userOut() << "n:" << n << std::endl;
       userOut() << "m:" << m_ << std::endl;
       userOut() << "nea:" << nea << std::endl;
@@ -795,7 +795,7 @@ namespace casadi {
       if (monitored("eval_nlp")) {
         userOut() << "mode: " << *mode << std::endl;
         userOut() << "A before we touch it:"
-                  << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
+                  << DM(A_structure_.sparsity(), A_data_) << std::endl;
         userOut() << "x (obj - sorted indices   - all elements present):"
                   << std::vector<double>(x, x+nnObj) << std::endl;
         userOut() << "x (obj - original indices - linear elements zero):"
@@ -873,7 +873,7 @@ namespace casadi {
         }
 
         // provide nonlinear part of objective to SNOPT
-        DMatrix g = jacG_.output();
+        DM g = jacG_.output();
         for (int k = 0; k < nnCon; ++k) {
           fCon[k] = jacG_.output(GRADF_G).data()[g_order_[k]];
         }

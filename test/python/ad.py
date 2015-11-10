@@ -149,7 +149,7 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("evalSX on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
-            f_in = DMatrix(f.sparsity_in(0),n)
+            f_in = DM(f.sparsity_in(0),n)
             [r] = f([f_in])
             J = self.jacobians[inputtype][outputtype](*n)
             
@@ -157,8 +157,8 @@ class ADtests(casadiTestCase):
             
             y = SX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
-            aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
+            fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
+            aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
             res = f([y])
             fwdsens = f.forward([y], res, map(lambda x: [x],fseeds))
             adjsens = f.reverse([y], res, map(lambda x: [x],aseeds))
@@ -189,7 +189,7 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("evalMX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f_in = DMatrix(f.sparsity_in(0),n)
+            f_in = DM(f.sparsity_in(0),n)
             [r] = f([f_in])
             J = self.jacobians[inputtype][outputtype](*n)
             
@@ -197,8 +197,8 @@ class ADtests(casadiTestCase):
             
             y = MX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
-            aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
+            fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
+            aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
             res = f([y])
             fwdsens = f.forward([y],res,map(lambda x: [x],fseeds))
             adjsens = f.reverse([y],res,map(lambda x: [x],aseeds))
@@ -239,8 +239,8 @@ class ADtests(casadiTestCase):
             
             y = SX.sym("y",f.sparsity_in(0))
             
-            fseeds = map(lambda x: DMatrix(f.sparsity_in(0),x), seeds)
-            aseeds = map(lambda x: DMatrix(f.sparsity_out(0),x), seeds)
+            fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
+            aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
             res = f([y])
             fwdsens = f.forward([y],res,map(lambda x: [x],fseeds))
             adjsens = f.reverse([y],res,map(lambda x: [x],aseeds))
@@ -274,7 +274,7 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("evalSX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f_in = DMatrix(f.sparsity_in(0),n)
+            f_in = DM(f.sparsity_in(0),n)
             [r] = f([f_in])
   
             y = SX.sym("y",f.sparsity_in(0))
@@ -302,7 +302,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1              
               f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype], opts)
               Jf=f.jacobian(0,0)
-              J_in = DMatrix(f.sparsity_in(0),n)
+              J_in = DM(f.sparsity_in(0),n)
               [Jout,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jout),J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
@@ -323,7 +323,7 @@ class ADtests(casadiTestCase):
                   )
               ]
             )
-            J_in = DMatrix(Jf.sparsity_in(0),n)
+            J_in = DM(Jf.sparsity_in(0),n)
             [J_out] = Jf([J_in])
             J = self.jacobians[inputtype][outputtype](*n)
             self.checkarray(array(J_out),J,"jacobian")
@@ -337,7 +337,7 @@ class ADtests(casadiTestCase):
             self.message("jacsparsity on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             J = self.jacobians[inputtype][outputtype](*n)
-            self.checkarray(DMatrix.ones(f.sparsity_jac()),array(J!=0,int),"jacsparsity")
+            self.checkarray(DM.ones(f.sparsity_jac()),array(J!=0,int),"jacsparsity")
               
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
@@ -352,7 +352,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf=f.jacobian(0,0)
-              J_in = DMatrix(f.sparsity_in(0),n)
+              J_in = DM(f.sparsity_in(0),n)
               [J_out,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(J_out,J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
@@ -370,11 +370,11 @@ class ADtests(casadiTestCase):
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1              
               f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf=f.jacobian(0,0)
-              J_in = DMatrix(f.sparsity_in(0),n)
+              J_in = DM(f.sparsity_in(0),n)
               [J_out,_] = Jf([J_in])
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(J_out),J,"jacobian")
-              self.checkarray(array(DMatrix.ones(f.sparsity_jac())),array(J!=0,int),"jacsparsity")
+              self.checkarray(array(DM.ones(f.sparsity_jac())),array(J!=0,int),"jacsparsity")
               
      
               
@@ -427,7 +427,7 @@ class ADtests(casadiTestCase):
 
     f=Function("f", [inp],[vertcat([x+y,x,y])])
     J=f.jacobian(0,0)
-    J_in = DMatrix(f.sparsity_in(0),[2,7])
+    J_in = DM(f.sparsity_in(0),[2,7])
     [J_out,_] = J([J_in])
 
     f=Function("f", [inp],[vertcat([x+y,x,y])])
@@ -450,7 +450,7 @@ class ADtests(casadiTestCase):
     ndir = 2
     
     in1 = [x,y]
-    v1 = [DMatrix([1.1,1.3]),DMatrix([[0.7,1.5],[2.1,0.9]])]
+    v1 = [DM([1.1,1.3]),DM([[0.7,1.5],[2.1,0.9]])]
     
     w=x[:]
     w[1]*=2
@@ -485,17 +485,17 @@ class ADtests(casadiTestCase):
     
 
     def remove_first(x):
-      ret = DMatrix(x)
+      ret = DM(x)
       if ret.numel()>0:
-        ret[0,0] = DMatrix(1,1)
+        ret[0,0] = DM(1,1)
         return ret
       else:
         return ret
 
     def remove_last(x):
-      ret = DMatrix(x)
+      ret = DM(x)
       if ret.nnz()>0:
-        ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DMatrix(1,1)
+        ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DM(1,1)
         return ret
       else:
         return x
@@ -505,54 +505,54 @@ class ADtests(casadiTestCase):
     # TODO: sparse seeding
     
     for inputs,values,out, jac in [
-          (in1,v1,x,DMatrix.eye(2)),
-          (in1,v1,x.T,DMatrix.eye(2)),
+          (in1,v1,x,DM.eye(2)),
+          (in1,v1,x.T,DM.eye(2)),
           (in1,v1,x**2,2*c.diag(x)),
           (in1,v1,(x**2).attachAssert(True),2*c.diag(x)),
           (in1,v1,(x**2).T,2*c.diag(x)),
-          (in1,v1,c.reshape(x,(1,2)),DMatrix.eye(2)),
+          (in1,v1,c.reshape(x,(1,2)),DM.eye(2)),
           (in1,v1,c.reshape(x**2,(1,2)),2*c.diag(x)),
-          (in1,v1,x+y.nz[0],DMatrix.eye(2)),
-          (in1,v1,x+y[0,0],DMatrix.eye(2)),
-          (in1,v1,x+x,2*DMatrix.eye(2)),
-          (in1,v1,x**2+x,2*c.diag(x)+DMatrix.eye(2)),
+          (in1,v1,x+y.nz[0],DM.eye(2)),
+          (in1,v1,x+y[0,0],DM.eye(2)),
+          (in1,v1,x+x,2*DM.eye(2)),
+          (in1,v1,x**2+x,2*c.diag(x)+DM.eye(2)),
           (in1,v1,x*x,2*c.diag(x)),
-          (in1,v1,x*y.nz[0],DMatrix.eye(2)*y.nz[0]),
-          (in1,v1,x*y[0,0],DMatrix.eye(2)*y[0,0]),
-          (in1,v1,x[0],DMatrix.eye(2)[0,:]),
+          (in1,v1,x*y.nz[0],DM.eye(2)*y.nz[0]),
+          (in1,v1,x*y[0,0],DM.eye(2)*y[0,0]),
+          (in1,v1,x[0],DM.eye(2)[0,:]),
           (in1,v1,(x**2)[0],horzcat([2*x[0],MX(1,1)])),
-          (in1,v1,x[0]+x[1],DMatrix.ones(1,2)),
+          (in1,v1,x[0]+x[1],DM.ones(1,2)),
           (in1,v1,sin(repmat(x**2,1,3)),repmat(cos(c.diag(x**2))*2*c.diag(x),3,1)),
           (in1,v1,sin(repsum((x**2).T,1,2)),cos(x[0]**2+x[1]**2)*2*x.T),
-          (in1,v1,vertcat([x[1],x[0]]),sparsify(DMatrix([[0,1],[1,0]]))),
-          (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DMatrix([[0,1]]))),
+          (in1,v1,vertcat([x[1],x[0]]),sparsify(DM([[0,1],[1,0]]))),
+          (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DM([[0,1]]))),
           (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
           (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX(1,1),2*x[1]]])),
           (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX(1,1),6*x[1]**5]])),
-          (in1,v1,horzcat([x[1],x[0]]).T,sparsify(DMatrix([[0,1],[1,0]]))),
+          (in1,v1,horzcat([x[1],x[0]]).T,sparsify(DM([[0,1],[1,0]]))),
           (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
           (in1,v1,diagcat([x[1]**2,y,x[0]**2]),
             blockcat(  [[MX(1,1),2*x[1]]] + ([[MX(1,1),MX(1,1)]]*14)  + [[2*x[0],MX(1,1)]] )
           ),
           (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
-          (in1,v1,x[[0,1]],sparsify(DMatrix([[1,0],[0,1]]))),
+          (in1,v1,x[[0,1]],sparsify(DM([[1,0],[0,1]]))),
           (in1,v1,(x**2)[[0,1]],2*c.diag(x)),
-          (in1,v1,x[[0,0,1,1]],sparsify(DMatrix([[1,0],[1,0],[0,1],[0,1]]))),
+          (in1,v1,x[[0,0,1,1]],sparsify(DM([[1,0],[1,0],[0,1],[0,1]]))),
           (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX(1,1)],[2*x[0],MX(1,1)],[MX(1,1),2*x[1]],[MX(1,1),2*x[1]]])),
-          (in1,v1,wwr,sparsify(DMatrix([[2,0],[0,2]]))),
-          (in1,v1,x[[1,0]],sparsify(DMatrix([[0,1],[1,0]]))), 
-          (in1,v1,x[[1,0],0],sparsify(DMatrix([[0,1],[1,0]]))),
-          (in1,v1,w,sparsify(DMatrix([[1,0],[0,2]]))),
+          (in1,v1,wwr,sparsify(DM([[2,0],[0,2]]))),
+          (in1,v1,x[[1,0]],sparsify(DM([[0,1],[1,0]]))), 
+          (in1,v1,x[[1,0],0],sparsify(DM([[0,1],[1,0]]))),
+          (in1,v1,w,sparsify(DM([[1,0],[0,2]]))),
           (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]])),
           (in1,v1,ww,2*c.diag(x)),
           (in1,v1,wwf,vertcat([x[[1,0]].T,x[[1,0]].T])),
-          (in1,v1,yy[:,0],DMatrix.eye(2)),
+          (in1,v1,yy[:,0],DM.eye(2)),
           (in1,v1,yy2[:,0],2*c.diag(x)),
-          (in1,v1,yyy[:,0],sparsify(DMatrix([[0,1],[1,0]]))),
+          (in1,v1,yyy[:,0],sparsify(DM([[0,1],[1,0]]))),
           (in1,v1,mul(y,x),y),
           (in1,v1,mul(x.T,y.T),y),
-          (in1,v1,mac(y,x,DMatrix.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
-          (in1,v1,mac(x.T,y.T,DMatrix.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
+          (in1,v1,mac(y,x,DM.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
+          (in1,v1,mac(x.T,y.T,DM.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
           (in1,v1,mul(y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],x),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
           (in1,v1,mul(x.T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
           (in1,v1,mul(y,x**2),y*2*vertcat([x.T,x.T])),
@@ -565,19 +565,19 @@ class ADtests(casadiTestCase):
           (in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0])),
           (in1,v1,c.dot(x,x),(2*x).T),
           (in1,v1,c.dot(x**2,x),(3*x**2).T),
-          #(in1,v1,c.det(horzcat([x,DMatrix([1,2])])),DMatrix([-1,2])), not implemented
+          #(in1,v1,c.det(horzcat([x,DM([1,2])])),DM([-1,2])), not implemented
           (in1,v1,f1(in1)[1],y),
           (in1,v1,f1([x**2,y])[1],y*2*vertcat([x.T,x.T])),
-          (in1,v1,f2(in1)[0],DMatrix.zeros(0,2)),
-          (in1,v1,f2([x**2,y])[0],DMatrix.zeros(0,2)),
-          (in1,v1,f3(in1)[0],DMatrix.zeros(0,2)),
-          (in1,v1,f3([x**2,y])[0],DMatrix.zeros(0,2)),
-          (in1,v1,f4(in1)[0],DMatrix.zeros(0,2)),
-          (in1,v1,f4([x**2,y])[0],DMatrix.zeros(0,2)),
-          #(in1,v1,f1([x**2,[]])[1],DMatrix.zeros(2,2)),
-          #(in1,v1,f1([[],y])[1],DMatrix.zeros(2,2)),
-          (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2)),
-          (in1,v1,(x**2).project(sparsify(DMatrix([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
+          (in1,v1,f2(in1)[0],DM.zeros(0,2)),
+          (in1,v1,f2([x**2,y])[0],DM.zeros(0,2)),
+          (in1,v1,f3(in1)[0],DM.zeros(0,2)),
+          (in1,v1,f3([x**2,y])[0],DM.zeros(0,2)),
+          (in1,v1,f4(in1)[0],DM.zeros(0,2)),
+          (in1,v1,f4([x**2,y])[0],DM.zeros(0,2)),
+          #(in1,v1,f1([x**2,[]])[1],DM.zeros(2,2)),
+          #(in1,v1,f1([[],y])[1],DM.zeros(2,2)),
+          (in1,v1,vertcat([x,DM(0,1)]),DM.eye(2)),
+          (in1,v1,(x**2).project(sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
           (in1,v1,c.dot(x,y[:,0]),y[:,0].T),
           (in1,v1,x.nz[IMatrix([[1,0]])].T*y.nz[IMatrix([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]])),
@@ -634,8 +634,8 @@ class ADtests(casadiTestCase):
             fwdsens = f.forward(inputss,res,fseeds,True)
             adjsens = f.reverse(inputss,res,aseeds,True)
             
-            fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
-            aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
+            fseed = [DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
+            aseed = [DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
             vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
             
             for i,v in enumerate(values):
@@ -677,7 +677,7 @@ class ADtests(casadiTestCase):
             # Complete random seeding
             random.seed(1)
             for i in range(vf.n_in()):
-              vf.setInput(DMatrix(vf.sparsity_in(i),random.random(vf.nnz_in(i))),i)
+              vf.setInput(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))),i)
             
             vf.evaluate()
             self.check_codegen(vf)
@@ -709,7 +709,7 @@ class ADtests(casadiTestCase):
                 
               random.seed(1)
               for i in range(vf2.n_in()):
-                vf2.setInput(DMatrix(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))),i)
+                vf2.setInput(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))),i)
               
               vf2.evaluate()
               self.check_codegen(vf2)
@@ -740,8 +740,8 @@ class ADtests(casadiTestCase):
           
           self.check_codegen(Jf)
           self.checkarray(Jf.getOutput(),J_)
-          self.checkarray(DMatrix.ones(Jf.sparsity_out(0)),DMatrix.ones(J_.sparsity()),str(out)+str(mode))
-          self.checkarray(DMatrix.ones(f.sparsity_jac()),DMatrix.ones(J_.sparsity()))
+          self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
+          self.checkarray(DM.ones(f.sparsity_jac()),DM.ones(J_.sparsity()))
                 
       # Scalarized
       if out.is_empty(): continue
@@ -766,7 +766,7 @@ class ADtests(casadiTestCase):
           Gf.evaluate()
           self.check_codegen(Gf)
           self.checkarray(Gf.getOutput(),J_,failmessage=("mode: %s" % mode))
-          #self.checkarray(DMatrix(Gf.sparsity_out(0),1),DMatrix(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
+          #self.checkarray(DM(Gf.sparsity_out(0),1),DM(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
 
           Hf=f.hessian(0,0)
           for i,v in enumerate(values):
@@ -776,7 +776,7 @@ class ADtests(casadiTestCase):
           if H_ is None:
             H_ = Hf.getOutput()
           self.checkarray(Hf.getOutput(),H_,failmessage=("mode: %s" % mode))
-          #self.checkarray(DMatrix(Gf.sparsity_out(0),1),DMatrix(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
+          #self.checkarray(DM(Gf.sparsity_out(0),1),DM(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
     
 if __name__ == '__main__':
     unittest.main()

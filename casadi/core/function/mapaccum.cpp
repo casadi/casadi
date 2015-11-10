@@ -80,7 +80,7 @@ namespace casadi {
       if (!input_accum_[i]) in_sp = repmat(in_sp, 1, n_);
 
       // Allocate space for input
-      input(i) = DMatrix::zeros(in_sp);
+      input(i) = DM::zeros(in_sp);
     }
 
     for (int i=0;i<num_out;++i) {
@@ -90,7 +90,7 @@ namespace casadi {
       out_sp = repmat(out_sp, 1, n_);
 
       // Allocate space for output
-      output(i) = DMatrix::zeros(out_sp);
+      output(i) = DM::zeros(out_sp);
     }
 
     step_in_.resize(num_in, 0);
@@ -563,7 +563,7 @@ namespace casadi {
           if (reverse_) {
             // 0, [X1_bar X2_bar X3_bar] -> all
             MX all = horzcat(outs[output_accum_[i_output_accum]],
-              DMatrix::zeros(ins[j].sparsity()));
+              DM::zeros(ins[j].sparsity()));
             // [0 X1_bar X2_bar], X3_bar -> splits
             std::vector<MX> splits = bisect(all, ins[j].size2());
 
@@ -574,7 +574,7 @@ namespace casadi {
             f_der_ins.push_back(splits[1]);
           } else {
             // 0, [X1_bar X2_bar X3_bar] -> all
-            MX all = horzcat(DMatrix::zeros(ins[j].sparsity()),
+            MX all = horzcat(DM::zeros(ins[j].sparsity()),
               outs[output_accum_[i_output_accum]]);
             // [0 X1_bar X2_bar], X3_bar -> splits
             std::vector<MX> splits = bisect(all, ins[j].size2()*n_);

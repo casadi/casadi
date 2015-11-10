@@ -15,8 +15,8 @@ public:
   virtual int get_n_out() { return 1;}
 
   // Evaluate numerically
-  virtual vector<DMatrix> eval(const vector<DMatrix>& arg) {
-    vector<DMatrix> ret(1);
+  virtual vector<DM> eval(const vector<DM>& arg) {
+    vector<DM> ret(1);
     ret.at(0) = sin(arg.at(0));
     return ret;
   }
@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
 
   Function f = MyCallback::fun("f");
 
-  DMatrix arg = DMatrix(2);
-  DMatrix res = f(vector<DMatrix>(1,arg)).at(0);
+  DM arg = DM(2);
+  DM res = f(vector<DM>(1,arg)).at(0);
 
   cout << "out:" << res << endl;
 

@@ -72,11 +72,11 @@ class LinearSolverTests(casadiTestCase):
   def test_nullspace(self):
   
     for A in  [
-                  DMatrix([[1,1.3],[2,5],[1,0.5],[1.8,1.7]]),
-                  DMatrix([[1,1.3],[2,5],[1,0.5]]),
-                  DMatrix([[1,1.3],[2,5],[1,0.5],[0.2,0.3],[-0.3,0.7]]),
-                  DMatrix([[1,0],[0,0],[0,1],[0,0]]),
-                  DMatrix([[1.3,0,0.4,1],[0.2,0.1,11,0],[0,1,0,0],[0.7,0.9,0,0],[1.1,0.99,0,0]])
+                  DM([[1,1.3],[2,5],[1,0.5],[1.8,1.7]]),
+                  DM([[1,1.3],[2,5],[1,0.5]]),
+                  DM([[1,1.3],[2,5],[1,0.5],[0.2,0.3],[-0.3,0.7]]),
+                  DM([[1,0],[0,0],[0,1],[0,0]]),
+                  DM([[1.3,0,0.4,1],[0.2,0.1,11,0],[0,1,0,0],[0.7,0.9,0,0],[1.1,0.99,0,0]])
               ]:
       n ,m = A.shape
       for Solver, options in nsolvers:
@@ -85,8 +85,8 @@ class LinearSolverTests(casadiTestCase):
 
         solver.evaluate()
         
-        self.checkarray(mul(A.T,solver.getOutput()),DMatrix.zeros(m,n-m))
-        self.checkarray(mul(solver.getOutput().T,solver.getOutput()),DMatrix.eye(n-m))
+        self.checkarray(mul(A.T,solver.getOutput()),DM.zeros(m,n-m))
+        self.checkarray(mul(solver.getOutput().T,solver.getOutput()),DM.eye(n-m))
         
         options["ad_weight"] = 0
         options["ad_weight_sp"] = 0
@@ -143,7 +143,7 @@ class LinearSolverTests(casadiTestCase):
         V = numpy.random.rand(A.shape[0]-A.shape[1],A.shape[0]-A.shape[1])
         V = V+V.T
         print V
-        #V = DMatrix.eye(A.shape[0]-A.shape[1])
+        #V = DM.eye(A.shape[0]-A.shape[1])
         a = mul([nom,V,fd.T])+mul([fd,V,nom.T])
         b = mul([nom,V,exact.T])+mul([exact,V,nom.T])
         
@@ -153,15 +153,15 @@ class LinearSolverTests(casadiTestCase):
     
         V = numpy.random.rand(A.shape[0],A.shape[0])
         V = V+V.T
-        V = DMatrix.eye(A.shape[0])
+        V = DM.eye(A.shape[0])
         a = mul([nom.T,V,fd])+mul([fd.T,V,nom])
         b = mul([nom.T,V,exact])+mul([exact.T,V,nom])
         
         self.checkarray(a,b,digits=5)
   
   def test_simple_solve(self):
-    A_ = DMatrix([[3,7],[1,2]])
-    b_ = DMatrix([1,0.5])
+    A_ = DM([[3,7],[1,2]])
+    b_ = DM([1,0.5])
     
     A = MX.sym("A",A_.sparsity())
     b = MX.sym("b",b_.sparsity())
@@ -175,12 +175,12 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(b_,1)
       f.evaluate()
       
-      self.checkarray(f.getOutput(),DMatrix([1.5,-0.5]))
+      self.checkarray(f.getOutput(),DM([1.5,-0.5]))
       self.checkarray(mul(A_,f.getOutput()),b_)
 
   def test_pseudo_inverse(self):
     numpy.random.seed(0)
-    A_ = DMatrix(numpy.random.rand(4,6))
+    A_ = DM(numpy.random.rand(4,6))
     
     A = MX.sym("A",A_.sparsity())
     As = SX.sym("A",A_.sparsity())
@@ -193,20 +193,20 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(4))
+      self.checkarray(mul(A_,f.getOutput()),DM.eye(4))
       
       f = Function("f", [As],[pinv(As)])
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(4))
+      self.checkarray(mul(A_,f.getOutput()),DM.eye(4))
       
       solve(mul(A,A.T),A,Solver,options)
       pinv(A_,Solver,options)
       
-      #self.checkarray(mul(A_,pinv(A_,Solver,options)),DMatrix.eye(4))
+      #self.checkarray(mul(A_,pinv(A_,Solver,options)),DM.eye(4))
       
-    A_ = DMatrix(numpy.random.rand(3,5))
+    A_ = DM(numpy.random.rand(3,5))
     
     A = MX.sym("A",A_.sparsity())
     As = SX.sym("A",A_.sparsity())
@@ -219,49 +219,49 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(3)) 
+      self.checkarray(mul(A_,f.getOutput()),DM.eye(3)) 
       
       f = Function("f", [As],[pinv(As)])
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(3))
+      self.checkarray(mul(A_,f.getOutput()),DM.eye(3))
       
-      #self.checkarray(mul(pinv(A_,Solver,options),A_),DMatrix.eye(3))
+      #self.checkarray(mul(pinv(A_,Solver,options),A_),DM.eye(3))
       
   def test_simple_solve_dmatrix(self):
-    A = DMatrix([[3,7],[1,2]])
-    b = DMatrix([1,0.5])
+    A = DM([[3,7],[1,2]])
+    b = DM([1,0.5])
     for Solver, options in lsolvers:
       print Solver
       C = solve(A,b,Solver,options)
       
-      self.checkarray(C,DMatrix([1.5,-0.5]))
-      self.checkarray(mul(A,DMatrix([1.5,-0.5])),b)
+      self.checkarray(C,DM([1.5,-0.5]))
+      self.checkarray(mul(A,DM([1.5,-0.5])),b)
 
   def test_simple_trans(self):
-    A = DMatrix([[3,1],[7,2]])
+    A = DM([[3,1],[7,2]])
     for Solver, options in lsolvers:
       solver = Function.linsol("solver", Solver, A.sparsity().T, 1, options)
-      b = DMatrix([1,0.5])
+      b = DM([1,0.5])
       sol = solver({'A':A.T, 'B':b})
-      res = DMatrix([1.5,-0.5])
+      res = DM([1.5,-0.5])
       self.checkarray(sol['X'], res)
 
   def test_simple(self):
-    A = DMatrix([[3,1],[7,2]])
+    A = DM([[3,1],[7,2]])
     for Solver, options in lsolvers:
       print Solver
       solver = Function.linsol("solver", Solver, A.sparsity(), 1, options)
-      b = DMatrix([1,0.5])
+      b = DM([1,0.5])
       sol = solver({'A':A, 'B':b})      
-      res = DMatrix([-1.5,5.5])
+      res = DM([-1.5,5.5])
       self.checkarray(sol['X'], res)
 
   def test_simple_function_direct(self):
-    A_ = DMatrix([[3,1],[7,2]])
+    A_ = DM([[3,1],[7,2]])
     A = MX.sym("A",A_.sparsity())
-    b_ = DMatrix([1,0.5])
+    b_ = DM([1,0.5])
     b = MX.sym("b",b_.sparsity())
     
     for Solver, options in lsolvers:
@@ -287,9 +287,9 @@ class LinearSolverTests(casadiTestCase):
       
        
   def test_simple_function_indirect(self):
-    A_ = DMatrix([[3,1],[7,2]])
+    A_ = DM([[3,1],[7,2]])
     A = MX.sym("A",A_.sparsity())
-    b_ = DMatrix([1,0.5])
+    b_ = DM([1,0.5])
     b = MX.sym("b",b_.sparsity())
     
     for Solver, options in lsolvers:
@@ -324,9 +324,9 @@ class LinearSolverTests(casadiTestCase):
   @memory_heavy()
   def test_simple_solve_node(self):
     for A_,b_ in [
-                     (DMatrix([[3,1],[7,2]]),DMatrix([[1,0.3],[0.5,0.7]])),    
-                     (sparsify(DMatrix([[3,0],[7,2]])),DMatrix([[1,0.3],[0.5,0.7]])),
-                     (DMatrix([[3,1],[7,2]]),sparsify(DMatrix([[1,0],[0,0.7]])))
+                     (DM([[3,1],[7,2]]),DM([[1,0.3],[0.5,0.7]])),    
+                     (sparsify(DM([[3,0],[7,2]])),DM([[1,0.3],[0.5,0.7]])),
+                     (DM([[3,1],[7,2]]),sparsify(DM([[1,0],[0,0.7]])))
                  ]:
                              
       A = MX.sym("A",A_.sparsity())
@@ -377,10 +377,10 @@ class LinearSolverTests(casadiTestCase):
   def test_cholesky(self):
     numpy.random.seed(0)
     n = 10
-    L = self.randDMatrix(n,n,sparsity=0.2) +  1.5*c.diag(range(1,n+1))
+    L = self.randDM(n,n,sparsity=0.2) +  1.5*c.diag(range(1,n+1))
     L = L[Sparsity.lower(n)]
     M = mul(L,L.T)
-    b = self.randDMatrix(n,1)
+    b = self.randDM(n,1)
     
     M.sparsity().spy()
 
@@ -423,8 +423,8 @@ class LinearSolverTests(casadiTestCase):
   def test_large_sparse(self):
     numpy.random.seed(1)
     n = 10
-    A = self.randDMatrix(n,n,sparsity=0.5)
-    b = self.randDMatrix(n,3,sparsity=0.5)
+    A = self.randDM(n,n,sparsity=0.5)
+    b = self.randDM(n,3,sparsity=0.5)
     
     As = MX.sym("A",A.sparsity())
     bs = MX.sym("B",b.sparsity())
@@ -444,8 +444,8 @@ class LinearSolverTests(casadiTestCase):
   def test_large_sparse(self):
     numpy.random.seed(1)
     n = 10
-    A = self.randDMatrix(n,n,sparsity=0.5)
-    b = self.randDMatrix(n,3)
+    A = self.randDM(n,n,sparsity=0.5)
+    b = self.randDM(n,3)
     
     As = MX.sym("A",A.sparsity())
     bs = MX.sym("B",b.sparsity())

@@ -105,11 +105,11 @@ namespace casadi {
 
     for (int i=0;i<n_in_;++i) {
       // Allocate space for input
-      input(i) = DMatrix::zeros(repmat(f_.sparsity_in(i), 1, n_));
+      input(i) = DM::zeros(repmat(f_.sparsity_in(i), 1, n_));
     }
 
     for (int i=0;i<n_out_;++i) {
-      output(i) = DMatrix::zeros(repmat(f_.sparsity_out(i), 1, n_));
+      output(i) = DM::zeros(repmat(f_.sparsity_out(i), 1, n_));
     }
 
     // Call the initialization method of the base class
@@ -278,7 +278,7 @@ namespace casadi {
       if (repeat_in_[i]) in_sp = repmat(in_sp, 1, n_);
 
       // Allocate space for input
-      input(i) = DMatrix::zeros(in_sp);
+      input(i) = DM::zeros(in_sp);
     }
 
     for (int i=0;i<num_out;++i) {
@@ -289,7 +289,7 @@ namespace casadi {
       if (repeat_out_[i]) out_sp = repmat(out_sp, 1, n_);
 
       // Allocate space for output
-      output(i) = DMatrix::zeros(out_sp);
+      output(i) = DM::zeros(out_sp);
     }
 
     step_in_.resize(num_in, 0);

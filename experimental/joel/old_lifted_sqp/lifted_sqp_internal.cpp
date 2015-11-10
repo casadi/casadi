@@ -333,11 +333,11 @@ void LiftedSQPInternal::init(){
   }
   
   // Current guess for the primal solution
-  DMatrix &x_k = output(NLP_SOLVER_X);
+  DM &x_k = output(NLP_SOLVER_X);
   
   // Current guess for the dual solution
-  DMatrix &lam_x_k = output(NLP_SOLVER_LAM_X);
-  DMatrix &lam_g_k = output(NLP_SOLVER_LAM_G);
+  DM &lam_x_k = output(NLP_SOLVER_LAM_X);
+  DM &lam_g_k = output(NLP_SOLVER_LAM_G);
 
   // Allocate a QP solver
   QpsolCreator qpsol_creator = option("qpsol");
@@ -356,14 +356,14 @@ void LiftedSQPInternal::init(){
   }
 
   // Residual
-  d_k_ = DMatrix(d.sparsity(),0);
+  d_k_ = DM(d.sparsity(),0);
   
   // Primal step
-  dx_k_ = DMatrix(x_k.sparsity());
+  dx_k_ = DM(x_k.sparsity());
 
   // Dual step
-  dlam_x_k_ = DMatrix(lam_x_k.sparsity());
-  dlam_g_k_ = DMatrix(lam_g_k.sparsity());
+  dlam_x_k_ = DM(lam_x_k.sparsity());
+  dlam_g_k_ = DM(lam_g_k.sparsity());
   
 }
 
@@ -375,20 +375,20 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   double f_k = numeric_limits<double>::quiet_NaN();
   
   // Current guess for the primal solution
-  DMatrix &x_k = output(NLP_SOLVER_X);
-  const DMatrix &x_init = input(NLP_SOLVER_X0);
+  DM &x_k = output(NLP_SOLVER_X);
+  const DM &x_init = input(NLP_SOLVER_X0);
   copy(x_init.begin(),x_init.end(),x_k.begin());
   
   // Current guess for the dual solution
-  DMatrix &lam_x_k = output(NLP_SOLVER_LAM_X);
-  DMatrix &lam_g_k = output(NLP_SOLVER_LAM_G);
+  DM &lam_x_k = output(NLP_SOLVER_LAM_X);
+  DM &lam_g_k = output(NLP_SOLVER_LAM_G);
 
   // Bounds
-  const DMatrix &x_min = input(NLP_SOLVER_LBX);
-  const DMatrix &x_max = input(NLP_SOLVER_UBX);
+  const DM &x_min = input(NLP_SOLVER_LBX);
+  const DM &x_max = input(NLP_SOLVER_UBX);
   
-  const DMatrix &g_min = input(NLP_SOLVER_LBG);
-  const DMatrix &g_max = input(NLP_SOLVER_UBG);
+  const DM &g_min = input(NLP_SOLVER_LBG);
+  const DM &g_max = input(NLP_SOLVER_UBG);
   int k=0;
   
   // Does G depend on the multipliers?
@@ -404,7 +404,7 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     rfcn_.evaluate();
     rfcn_.getOutput(d_k_,G_D);
     f_k = rfcn_.output(G_F).toScalar();
-    const DMatrix& g_k = rfcn_.output(G_G);
+    const DM& g_k = rfcn_.output(G_G);
     
     // Construct the QP
     lfcn_.setInput(x_k,LIN_X);
@@ -412,10 +412,10 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     if(has_lam_g) lfcn_.setInput(lam_g_k,LIN_LAM_G);
     lfcn_.setInput(d_k_,LIN_D);
     lfcn_.evaluate();
-    DMatrix& B1_k = lfcn_.output(LIN_J1);
-    const DMatrix& b1_k = lfcn_.output(LIN_F1);
-    const DMatrix& B2_k = lfcn_.output(LIN_J2);
-    const DMatrix& b2_k = lfcn_.output(LIN_F2);
+    DM& B1_k = lfcn_.output(LIN_J1);
+    const DM& b1_k = lfcn_.output(LIN_F1);
+    const DM& B2_k = lfcn_.output(LIN_J2);
+    const DM& b2_k = lfcn_.output(LIN_F2);
 
     // Regularization
     double reg = 0;
@@ -458,9 +458,9 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     std::transform(g_min.begin()+nv,g_min.end(), b2_k.begin(),qpsol_.input(QP_LBA).begin(),std::minus<double>());
     std::transform(g_max.begin()+nv,g_max.end(), b2_k.begin(),qpsol_.input(QP_UBA).begin(),std::minus<double>());
     qpsol_.evaluate();
-    const DMatrix& du_k = qpsol_.output(QP_PRIMAL);
-    const DMatrix& dlam_u_k = qpsol_.output(QP_LAMBDA_X);
-    const DMatrix& dlam_f2_k = qpsol_.output(QP_LAMBDA_A);    
+    const DM& du_k = qpsol_.output(QP_PRIMAL);
+    const DM& dlam_u_k = qpsol_.output(QP_LAMBDA_X);
+    const DM& dlam_f2_k = qpsol_.output(QP_LAMBDA_A);    
     
     // Expand the step
     for(int i=0; i<LIN_NUM_IN; ++i){
@@ -469,7 +469,7 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     efcn_.setInput(du_k,EXP_DU);
     if(has_lam_f2) efcn_.setInput(dlam_f2_k,EXP_DLAM_F2);
     efcn_.evaluate();
-    const DMatrix& dv_k = efcn_.output();
+    const DM& dv_k = efcn_.output();
     
     // Expanded primal step
     copy(du_k.begin(),du_k.end(),dx_k_.begin());

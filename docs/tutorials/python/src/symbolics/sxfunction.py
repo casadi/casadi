@@ -146,8 +146,8 @@ print x*y # Not a dot product
 f = Function('f', [x,y], [x*y])
 print "%d -> %d" % (f.n_in(),f.n_out())
 print f([x,y])
-f.setInput(DMatrix([[1,2],[3,4]]),0)
-f.setInput(DMatrix([[4,5],[6,7]]),1)
+f.setInput(DM([[1,2],[3,4]]),0)
+f.setInput(DM([[4,5],[6,7]]),1)
 f.evaluate()
 print f.getOutput()
 print SX.jac(f,0).T

@@ -386,7 +386,7 @@ namespace casadi {
 
     if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {
       // Get sparsity pattern. Note WORHP is column major
-      const DMatrix & J = jacG_.output(JACG_JAC);
+      const DM & J = jacG_.output(JACG_JAC);
 
       int nz=0;
       const int* colind = J.colind();
@@ -471,13 +471,13 @@ namespace casadi {
 
     // Get inputs
     log("WorhpInterface::evaluate: Reading user inputs");
-    const DMatrix& x0 = input(NLPSOL_X0);
-    const DMatrix& lbx = input(NLPSOL_LBX);
-    const DMatrix& ubx = input(NLPSOL_UBX);
-    const DMatrix& lam_x0 = input(NLPSOL_LAM_X0);
-    const DMatrix& lbg = input(NLPSOL_LBG);
-    const DMatrix& ubg = input(NLPSOL_UBG);
-    const DMatrix& lam_g0 = input(NLPSOL_LAM_G0);
+    const DM& x0 = input(NLPSOL_X0);
+    const DM& lbx = input(NLPSOL_LBX);
+    const DM& ubx = input(NLPSOL_UBX);
+    const DM& lam_x0 = input(NLPSOL_LAM_X0);
+    const DM& lbg = input(NLPSOL_LBG);
+    const DM& ubg = input(NLPSOL_UBG);
+    const DM& lam_g0 = input(NLPSOL_LAM_G0);
 
     double inf = numeric_limits<double>::infinity();
 
@@ -724,7 +724,7 @@ namespace casadi {
       hessLag.evaluate();
 
       // Get results
-      const DMatrix& H = hessLag.output();
+      const DM& H = hessLag.output();
       const int* colind = H.colind();
       const int* row = H.row();
       const vector<double>& data = H.data();
@@ -797,7 +797,7 @@ namespace casadi {
       // Evaluate the function
       jacG.evaluate();
 
-      const DMatrix& J = jacG.output(JACG_JAC);
+      const DM& J = jacG.output(JACG_JAC);
 
       std::copy(J.data().begin(), J.data().end(), values);
 

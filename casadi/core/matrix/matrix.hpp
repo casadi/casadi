@@ -48,12 +48,12 @@ namespace casadi {
   /** \brief Get typename */
   template <typename DataType> inline std::string matrixName()
   { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
-  template<> inline std::string matrixName<double>() { return "DMatrix"; }
+  template<> inline std::string matrixName<double>() { return "DM"; }
   template<> inline std::string matrixName<int>() { return "IMatrix"; }
   ///@}
 /// \endcond
 
-  /** \brief Sparse matrix class. SX and DMatrix are specializations.
+  /** \brief Sparse matrix class. SX and DM are specializations.
 
       General sparse matrix class that is designed with the idea that "everything is a matrix",
       that is, also scalars and vectors.\n
@@ -1174,10 +1174,10 @@ namespace casadi {
   ///@{
   /// Readability typedefs
   typedef Matrix<int> IMatrix;
-  typedef Matrix<double> DMatrix;
-  typedef std::vector<DMatrix> DMatrixVector;
-  typedef std::vector<DMatrixVector> DMatrixVectorVector;
-  typedef std::map<std::string, DMatrix> DMatrixDict;
+  typedef Matrix<double> DM;
+  typedef std::vector<DM> DMVector;
+  typedef std::vector<DMVector> DMVectorVector;
+  typedef std::map<std::string, DM> DMDict;
   ///@}
 } // namespace casadi
 

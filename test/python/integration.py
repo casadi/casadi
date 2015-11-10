@@ -65,7 +65,7 @@ class Integrationtests(casadiTestCase):
   @slow()
   def test_full(self):
     num = self.num
-    tc = DMatrix(n.linspace(0,num['tend'],100))
+    tc = DM(n.linspace(0,num['tend'],100))
     
     t=SX.sym("t")
     q=SX.sym("q")
@@ -143,7 +143,7 @@ class Integrationtests(casadiTestCase):
     # This test is not automized, but works by inspection only.
     # To activate, recompile after ucnommenting the printout lines in cvodes.c, near "Used for validating casadi#536"
     #return
-    DMatrix.setPrecision(18)
+    DM.setPrecision(18)
 
     tstart = SX.sym("tstart")
     tend = SX.sym("tend")
@@ -506,7 +506,7 @@ class Integrationtests(casadiTestCase):
               opts["reltol"] = 1e-9
             opts["tf"] = tend_
             if Integrator=='idas':
-              opts["init_xdot"] = list(DMatrix(point["x0"]))
+              opts["init_xdot"] = list(DM(point["x0"]))
               opts["calc_icB"] = True
               opts["augmented_options"] = {"init_xdot":None, "abstol":1e-9,"reltol":1e-9}
             integrator = Function.ivpsol("integrator", Integrator, dae, opts)
@@ -1028,8 +1028,8 @@ class Integrationtests(casadiTestCase):
     self.message("hessian")
     N=2
 
-    x0_ = DMatrix([1,0.1])
-    A_  = DMatrix([[3,1],[0.74,4]])
+    x0_ = DM([1,0.1])
+    A_  = DM([[3,1],[0.74,4]])
 
     A = SX.sym("A",N,N)
     x = SX.sym("x",N)
@@ -1107,7 +1107,7 @@ class Integrationtests(casadiTestCase):
     for k in range(1,10):
       r = collocationPoints(k,"radau")
       self.assertEqual(len(r),k+1)
-      self.checkarray(DMatrix(r[-1]),DMatrix([1]))
+      self.checkarray(DM(r[-1]),DM([1]))
     for k in range(1,10):
       r = collocationPoints(k,"legendre")
       self.assertEqual(len(r),k+1) 

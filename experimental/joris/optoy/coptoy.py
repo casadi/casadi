@@ -188,18 +188,18 @@ def minimize(f,gl=[],verbose=False):
   G = original.evalMX(X[...]+P[...])
   
   def linear(g):
-    return jacobian(g,X),substitute(g,X,DMatrix.zeros(X.size))
+    return jacobian(g,X),substitute(g,X,DM.zeros(X.size))
   
   (A_le,b_le),(A_eq,b_eq),(A_nsd,b_nsd),(A_f,b_f) = map(linear,G)
   
   if A_le.shape[1]==0:
-    A_le = DMatrix.zeros(0,X.size)
+    A_le = DM.zeros(0,X.size)
 
   if A_eq.shape[1]==0:
-    A_eq = DMatrix.zeros(0,X.size)
+    A_eq = DM.zeros(0,X.size)
     
   if A_nsd.shape[1]==0:
-    A_nsd = DMatrix.zeros(0,X.size)
+    A_nsd = DM.zeros(0,X.size)
     
   f = MXFunction([P],[A_le,b_le,A_eq,b_eq,A_nsd.T,b_nsd,A_f.T,b_f])
   f.init()
@@ -207,23 +207,23 @@ def minimize(f,gl=[],verbose=False):
   A = vertcat([A_le,A_eq])
 
   if A.shape[1]==0:
-    A = DMatrix.zeros(0,X.size)
+    A = DM.zeros(0,X.size)
     
   G_nsd_block = diagcat(g_nsd)
   
   Fi = []
   for j in range(X.size):
-    a = DMatrix(f.output(4)[j,:].sparsity(),1)
+    a = DM(f.output(4)[j,:].sparsity(),1)
     makeDense(a)
-    patt = DMatrix(G_nsd_block.sparsity(),a.data())
+    patt = DM(G_nsd_block.sparsity(),a.data())
     makeSparse(patt)
     Fi.append(patt)
 
   F = vertcat(Fi)
   
-  a = DMatrix(f.output(5).sparsity(),1)
+  a = DM(f.output(5).sparsity(),1)
   makeDense(a)
-  patt = DMatrix(G_nsd_block.sparsity(),a.data())
+  patt = DM(G_nsd_block.sparsity(),a.data())
   makeSparse(patt)
   G = patt
     
@@ -252,7 +252,7 @@ def minimize(f,gl=[],verbose=False):
   
 
   # Set constraint bounds
-  solver.setInput(vertcat([-DMatrix.inf(f.output(1).shape),-f.output(3)]),"lba")
+  solver.setInput(vertcat([-DM.inf(f.output(1).shape),-f.output(3)]),"lba")
   solver.setInput(vertcat([-f.output(1),-f.output(3)]),"uba")
   
   solver.setInput(vertcat([f.output(0),f.output(2)]),"a")

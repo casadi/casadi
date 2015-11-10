@@ -127,8 +127,8 @@ namespace casadi {
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
-    /** \brief Call a function, DMatrix type (overloaded) */
-    void call(const DMatrixVector& arg, DMatrixVector& res,
+    /** \brief Call a function, DM type (overloaded) */
+    void call(const DMVector& arg, DMVector& res,
               bool always_inline, bool never_inline);
 
     /** \brief Call a function, MX type (overloaded) */
@@ -167,15 +167,15 @@ namespace casadi {
                             bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void forward_dm(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-                            const std::vector<std::vector<DMatrix> >& fseed,
-                            std::vector<std::vector<DMatrix> >& fsens,
+    virtual void forward_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
+                            const std::vector<std::vector<DM> >& fseed,
+                            std::vector<std::vector<DM> >& fsens,
                             bool always_inline, bool never_inline);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void reverse_dm(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-                            const std::vector<std::vector<DMatrix> >& aseed,
-                            std::vector<std::vector<DMatrix> >& asens,
+    virtual void reverse_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
+                            const std::vector<std::vector<DM> >& aseed,
+                            std::vector<std::vector<DM> >& asens,
                             bool always_inline, bool never_inline);
 
     ///@{
@@ -200,13 +200,13 @@ namespace casadi {
                  const std::vector<std::vector<SX> >& aseed,
                  std::vector<std::vector<SX> >& asens,
                  bool always_inline, bool never_inline);
-    void forward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-                 const std::vector<std::vector<DMatrix> >& fseed,
-                 std::vector<std::vector<DMatrix> >& fsens,
+    void forward(const std::vector<DM>& arg, const std::vector<DM>& res,
+                 const std::vector<std::vector<DM> >& fseed,
+                 std::vector<std::vector<DM> >& fsens,
                  bool always_inline, bool never_inline);
-    void reverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-                 const std::vector<std::vector<DMatrix> >& aseed,
-                 std::vector<std::vector<DMatrix> >& asens,
+    void reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
+                 const std::vector<std::vector<DM> >& aseed,
+                 std::vector<std::vector<DM> >& asens,
                  bool always_inline, bool never_inline);
     ///@}
 
@@ -688,7 +688,7 @@ namespace casadi {
     ///@}
 
     /// Input and output buffers
-    std::vector<DMatrix> ibuf_, obuf_;
+    std::vector<DM> ibuf_, obuf_;
 
     /// Input and output scheme
     std::vector<std::string> ischeme_, oscheme_;
@@ -777,10 +777,10 @@ namespace casadi {
     virtual void linsol_solve(double* x, int nrhs, bool tr);
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
     virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
-    virtual void linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const;
+    virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;
     virtual void linsol_solveL(double* x, int nrhs, bool tr);
     virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
-    virtual DMatrix linsol_cholesky(bool tr) const;
+    virtual DM linsol_cholesky(bool tr) const;
     virtual void linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                bool tr, int nrhs);
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,

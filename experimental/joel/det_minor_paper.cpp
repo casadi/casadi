@@ -80,8 +80,8 @@ M getMinor(const M& x, int i, int j){
 
 clock_t time1, time2;
 
-DMatrix x0(int n){
-  DMatrix A0(n,n,0);
+DM x0(int n){
+  DM A0(n,n,0);
   for(int i=0; i<n*n; ++i)
     A0[i] = 0.1 + sqrt(double(i*1323 % 124));
     

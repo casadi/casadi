@@ -8,11 +8,11 @@ namespace myproject {
     return 42;
   }
 
-  double casadi2scalar(const casadi::DMatrix& x) {
+  double casadi2scalar(const casadi::DM& x) {
     return x.toScalar();
   }
 
-  casadi::DMatrix scalar2casadi(double x) {
+  casadi::DM scalar2casadi(double x) {
     return x;
   }
 

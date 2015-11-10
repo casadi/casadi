@@ -51,8 +51,8 @@ f = Function('f', [x,y],[z])
 
 #! Evaluation
 #! ----------------
-f.setInput(DMatrix([[1,2,3],[4,5,6]]),0);
-f.setInput(DMatrix([[1,3],[0,6],[0,9]]),1);
+f.setInput(DM([[1,2,3],[4,5,6]]),0);
+f.setInput(DM([[1,3],[0,6],[0,9]]),1);
 f.evaluate()
 
 print f.getOutput()
@@ -63,10 +63,10 @@ print a.T*b.T
 
 #! Numerical matrices
 #! ------------------------------
-X = MX(DMatrix([[1,2,3],[4,5,6]]))
+X = MX(DM([[1,2,3],[4,5,6]]))
 print X
 print outer_prod(X,X)
-print MX(DMatrix([1,2,3]).T)
+print MX(DM([1,2,3]).T)
 print MX([1,2,3])
 #! As before, evaluation is lazy on the matrix level
 Y = MX.sym("Y")

@@ -108,7 +108,7 @@ namespace casadi {
     Sparsity Asp_;
 
     /// Initial Hessian approximation (BFGS)
-    DMatrix B_init_;
+    DM B_init_;
 
     /// Regularization
     bool regularize_;

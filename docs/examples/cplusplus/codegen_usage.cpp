@@ -192,8 +192,8 @@ void usage_cplusplus(){
 
   // Use like any other CasADi function
   vector<double> x = {1, 2, 3, 4};
-  vector<DMatrix> arg = {reshape(DMatrix(x), 2, 2), 5};
-  vector<DMatrix> res = f(arg);
+  vector<DM> arg = {reshape(DM(x), 2, 2), 5};
+  vector<DM> res = f(arg);
 
   cout << "result (0): " << res.at(0) << endl;
   cout << "result (1): " << res.at(1) << endl;

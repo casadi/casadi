@@ -330,10 +330,10 @@ class NLPtests(casadiTestCase):
       
       digits = 5
         
-      self.checkarray(solver.getOutput("f"),DMatrix([0]),str(Solver),digits=digits)
-      self.checkarray(solver.getOutput("x"),DMatrix([1,1]),str(Solver),digits=digits)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(Solver),digits=digits)
-      self.checkarray(solver.getOutput("lam_g"),DMatrix([0]),str(Solver),digits=digits)
+      self.checkarray(solver.getOutput("f"),DM([0]),str(Solver),digits=digits)
+      self.checkarray(solver.getOutput("x"),DM([1,1]),str(Solver),digits=digits)
+      self.checkarray(solver.getOutput("lam_x"),DM([0,0]),str(Solver),digits=digits)
+      self.checkarray(solver.getOutput("lam_g"),DM([0]),str(Solver),digits=digits)
 
   def testIPOPTrhb2_gen_par(self):
     self.message("rosenbrock, exact hessian generated, constrained, parametric")
@@ -467,7 +467,7 @@ class NLPtests(casadiTestCase):
       print "bazmeg", solver.getOutput("f")
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.checkarray(array(solver.getOutput("x")).squeeze(),x0,str(Solver),digits=8)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0]*10),8,str(Solver),digits=8)
+      self.checkarray(solver.getOutput("lam_x"),DM([0]*10),8,str(Solver),digits=8)
       self.assertAlmostEqual(solver.getOutput("lam_g")[1],0,8,str(Solver))
       
   def testIPOPTnoc(self):
@@ -720,7 +720,7 @@ class NLPtests(casadiTestCase):
     N = 50 
 
     x = SX.sym("x",N)
-    x0 = DMatrix(range(N))
+    x0 = DM(range(N))
     H = diag(range(1,N+1))
     obj = 0.5*mul([(x-x0).T,H,(x-x0)])
 
@@ -734,18 +734,18 @@ class NLPtests(casadiTestCase):
       solver.evaluate()
       self.checkarray(solver.getOutput("x"),x0,str(Solver),digits=2)
       self.assertAlmostEqual(solver.getOutput("f")[0],0,3,str(Solver))
-      self.checkarray(solver.getOutput("lam_x"),DMatrix.zeros(N,1),str(Solver),digits=4)
+      self.checkarray(solver.getOutput("lam_x"),DM.zeros(N,1),str(Solver),digits=4)
            
   def test_QP2(self):
-    H = DMatrix([[1,-1],[-1,2]])
-    G = DMatrix([-2,-6])
-    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+    H = DM([[1,-1],[-1,2]])
+    G = DM([-2,-6])
+    A =  DM([[1, 1],[-1, 2],[2, 1]])
 
-    LBA = DMatrix([-inf]*3)
-    UBA = DMatrix([2, 2, 3])
+    LBA = DM([-inf]*3)
+    UBA = DM([2, 2, 3])
 
-    LBX = DMatrix([0.5,0])
-    UBX = DMatrix([0.5,inf])
+    LBX = DM([0.5,0])
+    UBX = DM([0.5,inf])
 
     x=SX.sym("x",2)
     nlp={'x':x, 'f':0.5*mul([x.T,H,x])+mul(G.T,x), 'g':mul(A,x)}
@@ -777,7 +777,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
 
-      self.checkarray(solver.getOutput("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DM([0,2,0]),str(Solver),digits=6)
       
       self.assertAlmostEqual(solver.getOutput("f")[0],-7.4375,6,str(Solver))
       
@@ -795,20 +795,20 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
 
-      self.checkarray(solver.getOutput("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DM([0,2,0]),str(Solver),digits=6)
       
       self.assertAlmostEqual(solver.getOutput("f")[0],-7.4375,6,str(Solver))
 
   def test_QP2_unconvex(self):
-    H = DMatrix([[1,-1],[-1,-2]])
-    G = DMatrix([-2,-6])
-    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+    H = DM([[1,-1],[-1,-2]])
+    G = DM([-2,-6])
+    A =  DM([[1, 1],[-1, 2],[2, 1]])
     
-    LBA = DMatrix([-inf]*3)
-    UBA = DMatrix([2, 2, 3])
+    LBA = DM([-inf]*3)
+    UBA = DM([2, 2, 3])
 
-    LBX = DMatrix([0]*2)
-    UBX = DMatrix([inf]*2)
+    LBX = DM([0]*2)
+    UBX = DM([inf]*2)
 
     x=SX.sym("x",2)
     nlp={'x':x, 'f':0.5*mul([x.T,H,x])+mul(G.T,x), 'g':mul(A,x)}
@@ -833,7 +833,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(solver))
 
-      self.checkarray(solver.getOutput("lam_g"),DMatrix([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
       
       self.assertAlmostEqual(solver.getOutput("f")[0],-10-16.0/9,6,str(solver))
 
@@ -852,7 +852,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(solver))
 
-      self.checkarray(solver.getOutput("lam_g"),DMatrix([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DM([4+8.0/9,20.0/9,0]),str(solver),digits=6)
       
       self.assertAlmostEqual(solver.getOutput("f")[0],-10-16.0/9,6,str(solver))
       
@@ -886,28 +886,28 @@ class NLPtests(casadiTestCase):
           solver = Function.nlpsol("mysolver",Solver,F,solver_options)
           
           ubx = solver.getInput("ubx")
-          ubx[permute_x]= DMatrix([inf,inf,inf,inf])
+          ubx[permute_x]= DM([inf,inf,inf,inf])
           solver.setInput(ubx,"ubx")
           
           
           lbx = solver.getInput("lbx")
-          lbx[permute_x]= DMatrix([-inf,-inf,0,0])
+          lbx[permute_x]= DM([-inf,-inf,0,0])
           solver.setInput(lbx,"lbx")
           
-          solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
-          solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
+          solver.setInput(DM([2,4,inf])[permute_g],"ubg")
+          solver.setInput(DM([2,4,0])[permute_g],"lbg")
           
           x0 = solver.getInput("x0")
-          x0[permute_x] = DMatrix([-0.070,1.41,0,0.0199])
+          x0[permute_x] = DM([-0.070,1.41,0,0.0199])
           solver.setInput(x0,"x0")
           
           solver.evaluate()
 
-          self.checkarray(solver.getOutput("f"),DMatrix([1.9001249992187681e+00]),digits=7)
-          self.checkarray(solver.getOutput("x")[permute_x],DMatrix([-7.0622015054877127e-02,1.4124491251068008e+00,0,1.9925001159906402e-02]),failmessage=str(permute_x)+str(permute_g),digits=7)
-          self.checkarray(solver.getOutput("lam_x")[permute_x],DMatrix([0,0,-2.4683779218120115e+01,0]),digits=7)
-          self.checkarray(solver.getOutput("lam_g"),DMatrix([1.9000124997534527e+01,-5,0])[permute_g],digits=7)
-          self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.5085524702939])[permute_g],digits=7)
+          self.checkarray(solver.getOutput("f"),DM([1.9001249992187681e+00]),digits=7)
+          self.checkarray(solver.getOutput("x")[permute_x],DM([-7.0622015054877127e-02,1.4124491251068008e+00,0,1.9925001159906402e-02]),failmessage=str(permute_x)+str(permute_g),digits=7)
+          self.checkarray(solver.getOutput("lam_x")[permute_x],DM([0,0,-2.4683779218120115e+01,0]),digits=7)
+          self.checkarray(solver.getOutput("lam_g"),DM([1.9000124997534527e+01,-5,0])[permute_g],digits=7)
+          self.checkarray(solver.getOutput("g"),DM([2,4,5.5085524702939])[permute_g],digits=7)
 
   @requires_nlpsol("snopt")
   def test_permute2(self):
@@ -926,28 +926,28 @@ class NLPtests(casadiTestCase):
           solver = Function.nlpsol("mysolver",Solver,F,solver_options)
 
           ubx = solver.getInput("ubx")
-          ubx[permute_x]= DMatrix([inf,inf,inf,inf])
+          ubx[permute_x]= DM([inf,inf,inf,inf])
           solver.setInput(ubx,"ubx")
           
           lbx = solver.getInput("lbx")
-          lbx[permute_x]= DMatrix([-inf,-inf,0,0])
+          lbx[permute_x]= DM([-inf,-inf,0,0])
           solver.setInput(lbx,"lbx")
 
-          solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
-          solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
+          solver.setInput(DM([2,4,inf])[permute_g],"ubg")
+          solver.setInput(DM([2,4,0])[permute_g],"lbg")
           
           x0 = solver.getInput("x0")
           
-          x0[permute_x] = DMatrix([-0.070,1.41,0,0.0199])
+          x0[permute_x] = DM([-0.070,1.41,0,0.0199])
           solver.setInput(x0,"x0")
           
           solver.evaluate()
 
-          self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=8)
-          self.checkarray(solver.getOutput("x")[permute_x],DMatrix([0,2,0,4]),digits=4,failmessage=str(permute_x)+str(permute_g))
-          self.checkarray(solver.getOutput("lam_x")[permute_x],DMatrix([0,0,0,0]),digits=3)
-          self.checkarray(solver.getOutput("lam_g"),DMatrix([0,0,0])[permute_g],digits=3)
-          #self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.50855])[permute_g])
+          self.checkarray(solver.getOutput("f"),DM([0]),digits=8)
+          self.checkarray(solver.getOutput("x")[permute_x],DM([0,2,0,4]),digits=4,failmessage=str(permute_x)+str(permute_g))
+          self.checkarray(solver.getOutput("lam_x")[permute_x],DM([0,0,0,0]),digits=3)
+          self.checkarray(solver.getOutput("lam_g"),DM([0,0,0])[permute_g],digits=3)
+          #self.checkarray(solver.getOutput("g"),DM([2,4,5.50855])[permute_g])
 
   @requires_nlpsol("snopt")
   def test_permute3(self):
@@ -966,27 +966,27 @@ class NLPtests(casadiTestCase):
           solver = Function.nlpsol("mysolver",Solver,F,solver_options)
           
           ubx = solver.getInput("ubx")
-          ubx[permute_x]= DMatrix([inf,inf,inf,inf])
+          ubx[permute_x]= DM([inf,inf,inf,inf])
           solver.setInput(ubx,"ubx")
 
           lbx = solver.getInput("lbx")
-          lbx[permute_x]= DMatrix([-inf,-inf,0,0])
+          lbx[permute_x]= DM([-inf,-inf,0,0])
           solver.setInput(lbx,"lbx")
           
-          solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
-          solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
+          solver.setInput(DM([2,4,inf])[permute_g],"ubg")
+          solver.setInput(DM([2,4,0])[permute_g],"lbg")
           
           x0 = solver.getInput("x0") 
-          x0[permute_x] = DMatrix([1,-0.5,0.5,4])
+          x0[permute_x] = DM([1,-0.5,0.5,4])
           solver.setInput(x0,"x0")
           
           solver.evaluate()
 
-          self.checkarray(solver.getOutput("f"),DMatrix([9.9030108869944522e-01]),failmessage=str(permute_x)+str(permute_g))
-          self.checkarray(solver.getOutput("x")[permute_x],DMatrix([1.53822842722,-0.76911421361,0.402967519303,3.83761717839]),digits=6)
-          self.checkarray(solver.getOutput("lam_x")[permute_x],DMatrix([0,0,0,0]),digits=7)
-          self.checkarray(solver.getOutput("lam_g"),DMatrix([-8.0593503860219973e-01,6.52750754744e-10,-0.298516240384])[permute_g],failmessage=str(permute_x)+str(permute_g),digits=8)
-          #self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.50855])[permute_g])
+          self.checkarray(solver.getOutput("f"),DM([9.9030108869944522e-01]),failmessage=str(permute_x)+str(permute_g))
+          self.checkarray(solver.getOutput("x")[permute_x],DM([1.53822842722,-0.76911421361,0.402967519303,3.83761717839]),digits=6)
+          self.checkarray(solver.getOutput("lam_x")[permute_x],DM([0,0,0,0]),digits=7)
+          self.checkarray(solver.getOutput("lam_g"),DM([-8.0593503860219973e-01,6.52750754744e-10,-0.298516240384])[permute_g],failmessage=str(permute_x)+str(permute_g),digits=8)
+          #self.checkarray(solver.getOutput("g"),DM([2,4,5.50855])[permute_g])
         
   @requires_nlpsol("snopt")
   def test_classifications(self):      
@@ -1004,10 +1004,10 @@ class NLPtests(casadiTestCase):
 
     solver.evaluate()
     
-    self.checkarray(solver.getOutput("f"),DMatrix([0]))
-    self.checkarray(solver.getOutput("x"),DMatrix([1,0]))
-    self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-7.7]),digits=7)
-    self.checkarray(solver.getOutput("lam_g"),DMatrix([0]))
+    self.checkarray(solver.getOutput("f"),DM([0]))
+    self.checkarray(solver.getOutput("x"),DM([1,0]))
+    self.checkarray(solver.getOutput("lam_x"),DM([0,-7.7]),digits=7)
+    self.checkarray(solver.getOutput("lam_g"),DM([0]))
     
   def test_pathological(self):      
     x=SX.sym("x")
@@ -1025,9 +1025,9 @@ class NLPtests(casadiTestCase):
 
       solver.evaluate()
       
-      self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=7)
-      self.checkarray(solver.getOutput("x"),DMatrix([1,0]),digits=7,failmessage=str(Solver))
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-0]),digits=7,failmessage=str(Solver))
+      self.checkarray(solver.getOutput("f"),DM([0]),digits=7)
+      self.checkarray(solver.getOutput("x"),DM([1,0]),digits=7,failmessage=str(Solver))
+      self.checkarray(solver.getOutput("lam_x"),DM([0,-0]),digits=7,failmessage=str(Solver))
 
   def test_pathological2(self):      
     x=SX.sym("x")
@@ -1044,9 +1044,9 @@ class NLPtests(casadiTestCase):
 
       solver.evaluate()
       
-      self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=7)
-      self.checkarray(solver.getOutput("x"),DMatrix([1,0]),digits=7)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-1]),digits=7)
+      self.checkarray(solver.getOutput("f"),DM([0]),digits=7)
+      self.checkarray(solver.getOutput("x"),DM([1,0]),digits=7)
+      self.checkarray(solver.getOutput("lam_x"),DM([0,-1]),digits=7)
 
   def test_pathological3(self):      
     x=SX.sym("x")
@@ -1066,9 +1066,9 @@ class NLPtests(casadiTestCase):
       
       solver.evaluate()
       
-      self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=7)
-      self.checkarray(solver.getOutput("x"),DMatrix([1,1]),digits=7)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),digits=7)
+      self.checkarray(solver.getOutput("f"),DM([0]),digits=7)
+      self.checkarray(solver.getOutput("x"),DM([1,1]),digits=7)
+      self.checkarray(solver.getOutput("lam_x"),DM([0,0]),digits=7)
     
   def test_pathological4(self):      
     x=SX.sym("x")
@@ -1085,9 +1085,9 @@ class NLPtests(casadiTestCase):
       
       solver.evaluate()
       
-      self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=7)
-      self.checkarray(solver.getOutput("x"),DMatrix([0]),digits=7)
-      self.checkarray(solver.getOutput("lam_x"),DMatrix([0]),digits=7)
+      self.checkarray(solver.getOutput("f"),DM([0]),digits=7)
+      self.checkarray(solver.getOutput("x"),DM([0]),digits=7)
+      self.checkarray(solver.getOutput("lam_x"),DM([0]),digits=7)
       
 if __name__ == '__main__':
     unittest.main()

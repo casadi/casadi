@@ -53,9 +53,9 @@ p = ssym("p", 3,N+1)
 pdot = ssym("pdot", 3,N)  
 
 # Initial guess (uniformly distributed and in rest)
-pInit = DMatrix.zeros(3,N+1)
+pInit = DM.zeros(3,N+1)
 pInit[2,:] = linspace(0,1.0,N+1).T
-pdotInit = DMatrix.zeros(3,N)
+pdotInit = DM.zeros(3,N)
 
 # Control vector (velocity of the last ball)
 u = ssym("u",3)
@@ -83,7 +83,7 @@ a[2,:] -= g
 
 # State vector with initial guess as well as differential equations
 x = SX.zeros(0,1)
-xInit = DMatrix.zeros(0,1)
+xInit = DM.zeros(0,1)
 f = SX.zeros(0,1)
 for i in range(N):
   # Position

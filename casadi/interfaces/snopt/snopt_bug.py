@@ -13,7 +13,7 @@ alldata = []
 for d in data[:1]:
 
   H = d["H"]
-  nlp = createNLP(DMatrix([[1.2,0.3],[0.7,1.3]]),DMatrix([[0.2,0.4],[0.77,0.12]],lift=True,simple=False)
+  nlp = createNLP(DM([[1.2,0.3],[0.7,1.3]]),DM([[0.2,0.4],[0.77,0.12]],lift=True,simple=False)
   
   log = []
   dists = []
@@ -30,7 +30,7 @@ for d in data[:1]:
   
   nlpsol.setInput(1e-5,"x0")
   
-  bs_ = mul(d["problem"]["Bs"][0],1e-5*DMatrix.ones(2,2))
+  bs_ = mul(d["problem"]["Bs"][0],1e-5*DM.ones(2,2))
   nlpsol.input("x0")[-bs_.size():] = vec(bs_)
   
   nlpsol.setInput(0,"lbg")

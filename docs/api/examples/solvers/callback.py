@@ -93,7 +93,7 @@ class MyCallback(Callback):
     subplot(111)
     
     x_,y_ = mgrid[-1:1.5:0.01,-1:1.5:0.01]
-    z_ = DMatrix.zeros(x_.shape)
+    z_ = DM.zeros(x_.shape)
     
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):

@@ -134,7 +134,7 @@
 #endif
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning,
-// for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
+// for example vertcat(SXVector), vertcat(DMVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
 
 #define CASADI_EXPORT
@@ -319,7 +319,7 @@ import_array();
     bool to_ptr(GUESTOBJECT *p, std::string** m);
     bool to_ptr(GUESTOBJECT *p, casadi::Slice** m);
     bool to_ptr(GUESTOBJECT *p, casadi::Sparsity** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::DMatrix** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::DM** m);
     bool to_ptr(GUESTOBJECT *p, casadi::IMatrix** m);
     bool to_ptr(GUESTOBJECT *p, casadi::SX** m);
     bool to_ptr(GUESTOBJECT *p, casadi::MX** m);
@@ -352,7 +352,7 @@ import_array();
     GUESTOBJECT* from_ptr(const std::string *a);
     GUESTOBJECT* from_ptr(const casadi::Slice *a);
     GUESTOBJECT* from_ptr(const casadi::Sparsity *a);
-    GUESTOBJECT* from_ptr(const casadi::DMatrix *a);
+    GUESTOBJECT* from_ptr(const casadi::DM *a);
     GUESTOBJECT* from_ptr(const casadi::IMatrix *a);
     GUESTOBJECT* from_ptr(const casadi::SX *a);
     GUESTOBJECT* from_ptr(const casadi::MX *a);
@@ -613,9 +613,9 @@ import_array();
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(double)(p, m ? *m : 0))) return true;
 
-      // Scalar DMatrix
+      // Scalar DM
       {
-        DMatrix *m2;
+        DM *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
             && m2->is_scalar()) {
           if (m) **m = m2->getValue();
@@ -1201,8 +1201,8 @@ import_array();
       // Treat Null
       if (is_null(p)) return false;
 
-      // Convert to DMatrix
-      DMatrix tmp, *tmp_ptr=&tmp;
+      // Convert to DM
+      DM tmp, *tmp_ptr=&tmp;
       if (to_ptr(p, &tmp_ptr) && tmp_ptr->is_column()) {
         if (m) tmp_ptr->get(**m);
         return true;
@@ -1226,10 +1226,10 @@ import_array();
         return true;
       }
 
-      // Object is an DMatrix
+      // Object is an DM
       {
         // Pointer to object
-        DMatrix *m2;
+        DM *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
                                       $descriptor(casadi::Matrix<double>*), 0))) {
           if (m) **m=*m2;
@@ -1276,9 +1276,9 @@ import_array();
         }
       }
 
-      // Try first converting to a temporary DMatrix
+      // Try first converting to a temporary DM
       {
-        DMatrix tmp, *mt=&tmp;
+        DM tmp, *mt=&tmp;
         if(casadi::to_ptr(p, m ? &mt : 0)) {
           if (m) **m = *mt;
           return true;
@@ -1345,10 +1345,10 @@ import_array();
         return true;
       }
 
-      // Object is an DMatrix
+      // Object is an DM
       {
         // Pointer to object
-        DMatrix *m2;
+        DM *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
                                       $descriptor(casadi::Matrix<double>*), 0))) {
           if (m) **m=*m2;
@@ -1366,9 +1366,9 @@ import_array();
         }
       }
 
-      // Try first converting to a temporary DMatrix
+      // Try first converting to a temporary DM
       {
-        DMatrix tmp, *mt=&tmp;
+        DM tmp, *mt=&tmp;
         if(casadi::to_ptr(p, m ? &mt : 0)) {
           if (m) **m = *mt;
           return true;
@@ -1410,11 +1410,11 @@ import_array();
     }
 #endif // SWIGPYTHON
 
-    bool to_ptr(GUESTOBJECT *p, DMatrix** m) {
+    bool to_ptr(GUESTOBJECT *p, DM** m) {
       // Treat Null
       if (is_null(p)) return false;
 
-      // DMatrix already?
+      // DM already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
                                     $descriptor(casadi::Matrix<double>*), 0))) {
         return true;
@@ -1436,7 +1436,7 @@ import_array();
         Sparsity *m2;
         if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
                                       $descriptor(casadi::Sparsity*), 0))) {
-          if (m) **m=DMatrix::ones(*m2);
+          if (m) **m=DM::ones(*m2);
           return true;
         }
       }
@@ -1460,9 +1460,9 @@ import_array();
       }
 
 #ifdef SWIGPYTHON
-      // Object has __DMatrix__ method
-      if (PyObject_HasAttrString(p,"__DMatrix__")) {
-        char name[] = "__DMatrix__";
+      // Object has __DM__ method
+      if (PyObject_HasAttrString(p,"__DM__")) {
+        char name[] = "__DM__";
         PyObject *cr = PyObject_CallMethod(p, name, 0);
         if (!cr) return false;
         int result = to_val(cr, m ? *m : 0);
@@ -1511,7 +1511,7 @@ import_array();
         return true;
       }
 
-      // scipy's csc_matrix will be cast to sparse DMatrix
+      // scipy's csc_matrix will be cast to sparse DM
       if(PyObjectHasClassName(p, "csc_matrix")) {
 
         // Get the dimensions of the csc_matrix
@@ -1606,7 +1606,7 @@ import_array();
       // MATLAB double matrix (sparse or dense)
       if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
         if (m) {
-          **m = casadi::DMatrix(getSparsity(p));
+          **m = casadi::DM(getSparsity(p));
           double* data = static_cast<double*>(mxGetData(p));
           (*m)->setNZ(data);
         }
@@ -1627,8 +1627,8 @@ import_array();
       return false;
     }
 
-    GUESTOBJECT* from_ptr(const DMatrix *a) {
-      return SWIG_NewPointerObj(new DMatrix(*a), $descriptor(casadi::Matrix<double>*), SWIG_POINTER_OWN);
+    GUESTOBJECT* from_ptr(const DM *a) {
+      return SWIG_NewPointerObj(new DM(*a), $descriptor(casadi::Matrix<double>*), SWIG_POINTER_OWN);
     }
   } // namespace casadi
 }
@@ -1934,9 +1934,9 @@ import_array();
 %define PREC_IMatrixVector 98 %enddef
 %define PREC_IMatrixVectorVector 98 %enddef
 %define PREC_DVector 99 %enddef
-%define PREC_DMatrix 100 %enddef
-%define PREC_DMatrixVector 101 %enddef
-%define PREC_DMatrixVectorVector 101 %enddef
+%define PREC_DM 100 %enddef
+%define PREC_DMVector 101 %enddef
+%define PREC_DMVectorVector 101 %enddef
 %define PREC_SX 103 %enddef
 %define PREC_SXVector 103 %enddef
 %define PREC_SXVectorVector 103 %enddef
@@ -1979,10 +1979,10 @@ import_array();
 %casadi_template("[MX]", PREC_MXVector, std::vector<casadi::MX>)
 %casadi_template("[[MX]]", PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
 %casadi_template("str:MX", PREC_MX, std::map<std::string, casadi::MX>)
-%casadi_typemaps("DMatrix", PREC_DMatrix, casadi::Matrix<double>)
-%casadi_template("[DMatrix]", PREC_DMatrixVector, std::vector< casadi::Matrix<double> >)
-%casadi_template("[[DMatrix]]", PREC_DMatrixVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
-%casadi_template("str:DMatrix", PREC_DMatrix, std::map<std::string, casadi::Matrix<double> >)
+%casadi_typemaps("DM", PREC_DM, casadi::Matrix<double>)
+%casadi_template("[DM]", PREC_DMVector, std::vector< casadi::Matrix<double> >)
+%casadi_template("[[DM]]", PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
+%casadi_template("str:DM", PREC_DM, std::map<std::string, casadi::Matrix<double> >)
 %casadi_typemaps("IMatrix", PREC_IMatrix, casadi::Matrix<int>)
 %casadi_template("[IMatrix]", PREC_IMatrixVector, std::vector< casadi::Matrix<int> >)
 %casadi_template("[[IMatrix]]", PREC_IMatrixVectorVector, std::vector<std::vector< casadi::Matrix<int> > >)
@@ -2337,7 +2337,7 @@ class NZproxy:
 %template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;
 %template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
 %template(PrintIMatrix)      casadi::PrintableObject<casadi::Matrix<int> >;
-%template(PrintDMatrix)      casadi::PrintableObject<casadi::Matrix<double> >;
+%template(PrintDM)      casadi::PrintableObject<casadi::Matrix<double> >;
 //%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElem> >;
 %template(PrintNlpBuilder)     casadi::PrintableObject<casadi::NlpBuilder>;
 %template(PrintVariable)        casadi::PrintableObject<casadi::Variable>;
@@ -2396,21 +2396,21 @@ namespace casadi{
  //#endif
 
 %template(SpIMatrix)        casadi::SparsityInterface<casadi::Matrix<int> >;
-%template(SpDMatrix)        casadi::SparsityInterface<casadi::Matrix<double> >;
+%template(SpDM)        casadi::SparsityInterface<casadi::Matrix<double> >;
 %template(SpSX)             casadi::SparsityInterface<casadi::Matrix<casadi::SXElem> >;
 %template(SpMX)             casadi::SparsityInterface<casadi::MX>;
 
 %include <casadi/core/matrix/generic_matrix.hpp>
 
 %template(GenIMatrix)        casadi::GenericMatrix<casadi::Matrix<int> >;
-%template(GenDMatrix)        casadi::GenericMatrix<casadi::Matrix<double> >;
+%template(GenDM)        casadi::GenericMatrix<casadi::Matrix<double> >;
 %template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElem> >;
 %template(GenMX)             casadi::GenericMatrix<casadi::MX>;
 
 %include <casadi/core/matrix/generic_expression.hpp>
 
 %template(ExpIMatrix)        casadi::GenericExpression<casadi::Matrix<int> >;
-%template(ExpDMatrix)        casadi::GenericExpression<casadi::Matrix<double> >;
+%template(ExpDM)        casadi::GenericExpression<casadi::Matrix<double> >;
 %template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElem> >;
 %template(ExpMX)             casadi::GenericExpression<casadi::MX>;
 
@@ -3005,10 +3005,10 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 %include <casadi/core/matrix/matrix.hpp>
 
 %template(IMatrix)           casadi::Matrix<int>;
-%template(DMatrix)           casadi::Matrix<double>;
+%template(DM)           casadi::Matrix<double>;
 
 %extend casadi::Matrix<double> {
-   %template(DMatrix) Matrix<int>;
+   %template(DM) Matrix<int>;
 };
 
 namespace casadi{
@@ -3028,7 +3028,7 @@ namespace casadi{
   }
 }
 
-// Extend DMatrix with SWIG unique features
+// Extend DM with SWIG unique features
 namespace casadi{
   %extend Matrix<double> {
     // Convert to a dense matrix
@@ -3080,7 +3080,7 @@ namespace casadi{
 // The following code has some trickery to fool numpy ufunc.
 // Normally, because of the presence of __array__, an ufunctor like nump.sqrt
 // will unleash its activity on the output of __array__
-// However, we wish DMatrix to remain a DMatrix
+// However, we wish DM to remain a DM
 // So when we receive a call from a functor, we return a dummy empty array
 // and return the real result during the postprocessing (__array_wrap__) of the functor.
 %pythoncode %{
@@ -3191,7 +3191,7 @@ namespace casadi{
             return _casadi.transpose(self)
 
         def __array__(self,*args,**kwargs):
-            return DMatrix.ones(self).toArray()
+            return DM.ones(self).toArray()
     %}
 };
 
@@ -3522,7 +3522,7 @@ def swig_typename_convertor_cpp2python(s):
   s = re.sub("(const )?Matrix< ?SXElem *>( &)?",r"SX",s)
   s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
   s = re.sub("(const )?Matrix< ?int *>( ?&)?",r"IMatrix ",s)
-  s = re.sub("(const )?Matrix< ?double *>( ?&)?",r"DMatrix ",s)
+  s = re.sub("(const )?Matrix< ?double *>( ?&)?",r"DM ",s)
   s = re.sub("(const )?Matrix< ?(\w+) *>( ?&)?",r"array(\2) ",s)
   s = re.sub("(const )?GenericMatrix< ?([\w\(\)]+) *>( ?&)?",r"\2 ",s)
   s = re.sub(r"const (\w+) &",r"\1 ",s)

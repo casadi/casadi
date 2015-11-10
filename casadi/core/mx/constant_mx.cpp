@@ -63,7 +63,7 @@ namespace casadi {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantDMatrix::generate(CodeGenerator& g, const std::string& mem,
+  void ConstantDM::generate(CodeGenerator& g, const std::string& mem,
                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print the constant
     int ind = g.getConstant(x_.data(), true);
@@ -116,7 +116,7 @@ namespace casadi {
       for (vector<double>::const_iterator i=vdata.begin(); i!=vdata.end(); ++i) {
         if (*i!=v) {
           // Values not all the same
-          return new ConstantDMatrix(val);
+          return new ConstantDM(val);
         }
       }
 
@@ -125,27 +125,27 @@ namespace casadi {
     }
   }
 
-  bool ConstantDMatrix::is_zero() const {
+  bool ConstantDM::is_zero() const {
     return x_.is_zero();
   }
 
-  bool ConstantDMatrix::is_one() const {
+  bool ConstantDM::is_one() const {
     return x_.is_one();
   }
 
-  bool ConstantDMatrix::is_minus_one() const {
+  bool ConstantDM::is_minus_one() const {
     return x_.is_minus_one();
   }
 
-  bool ConstantDMatrix::is_identity() const {
+  bool ConstantDM::is_identity() const {
     return x_.is_identity();
   }
 
   // MX ConstantMX::getMultiplication(const MX& y) const {
   //   if (y.is_constant()) {
   //     // Constant folding
-  //     DMatrix xv = getMatrixValue();
-  //     DMatrix yv = y->getMatrixValue();
+  //     DM xv = getMatrixValue();
+  //     DM yv = y->getMatrixValue();
   //     return mul(xv, yv);
   //   } else {
   //     return MXNode::getMultiplication(y);
@@ -155,17 +155,17 @@ namespace casadi {
   MX ConstantMX::getDot(const MX& y) const {
     if (y.is_constant()) {
       // Constant folding
-      DMatrix xv = getMatrixValue();
-      DMatrix yv = y->getMatrixValue();
+      DM xv = getMatrixValue();
+      DM yv = y->getMatrixValue();
       return dot(xv, yv);
     } else {
       return MXNode::getDot(y);
     }
   }
 
-  bool ConstantDMatrix::zz_is_equal(const MXNode* node, int depth) const {
+  bool ConstantDM::zz_is_equal(const MXNode* node, int depth) const {
     // Check if same node
-    const ConstantDMatrix* n = dynamic_cast<const ConstantDMatrix*>(node);
+    const ConstantDM* n = dynamic_cast<const ConstantDM*>(node);
     if (n==0) return false;
 
     // Check sparsity

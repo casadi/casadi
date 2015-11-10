@@ -44,8 +44,8 @@ N  = 21 # number of control intervals
 te = 10 # end time [s]
 
 # The system equations:   x' = A.x + B.u
-A = DMatrix([[0.4,0.1,-2],[0,-0.3,4],[1,0,0]])
-B = DMatrix([[1,1],[0,1],[1,0]])
+A = DM([[0.4,0.1,-2],[0,-0.3,4],[1,0,0]])
+B = DM([[1,1],[0,1],[1,0]])
 
 # Inspect the open-loop system
 [D,V] = linalg.eig(A)
@@ -76,9 +76,9 @@ assert(rank==ns)
 y  = SX.sym('y',ns)
 u  = SX.sym('u',nu)
 
-x0 = DMatrix([1,0,0])
+x0 = DM([1,0,0])
 # no control
-u_ = (DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))).T
+u_ = (DM([[ -1, 1 ],[1,-1]]*((N-1)/2))).T
 
 p = SX.sym('p')
 
@@ -107,7 +107,7 @@ p = SX.sym('p')
 # #   sensitivity for initial conditions
 # # -----------------------------------
 
-# x0_pert = DMatrix([0,0,1])*1e-4
+# x0_pert = DM([0,0,1])*1e-4
 # sim.setInput(x0+x0_pert,'x0')
 # sim.setInput(u_,'u')
 # sim.evaluate()
@@ -149,7 +149,7 @@ p = SX.sym('p')
 # # -----------------------------------
 # # What if we perturb the input?
 
-# u_perturb = DMatrix(u_)
+# u_perturb = DM(u_)
 # u_perturb[0,N/5] = 1e-4
 # sim.setInput(x0,'x0')
 # sim.setInput(u_+u_perturb,'u')
@@ -201,7 +201,7 @@ p = SX.sym('p')
 # t1 = te
 
 # # Initial conditions
-# e = densify(DMatrix.eye(ns))
+# e = densify(DM.eye(ns))
 # states_ = states(0)
 # states_['eAt'] = e
 # states_['Wt'] = 0
@@ -281,8 +281,8 @@ p = SX.sym('p')
 # # -----------------------------------
 
 # # Weights for the infinite horizon LQR control
-# Q = DMatrix.eye(ns)
-# R = DMatrix.eye(nu)
+# Q = DM.eye(ns)
+# R = DM.eye(nu)
 
 # # Continuous Riccati equation
 # P = SX.sym('P',ns,ns)
@@ -296,7 +296,7 @@ p = SX.sym('p')
 # integrator = Integrator('integrator', 'cvodes', dae, opts)
 
 # # Start from P = identity matrix
-# u = densify(DMatrix.eye(ns))
+# u = densify(DM.eye(ns))
 # xe = vec(u)
 
 # # Keep integrating until steady state is reached
@@ -363,12 +363,12 @@ p = SX.sym('p')
 # # ---------------------------------------------------------
 # #
 
-# x0 = DMatrix([1,0,0])
+# x0 = DM([1,0,0])
 
 # y  = SX.sym('y',ns)
 
-# C = DMatrix([[1,0,0],[0,1,0]])
-# D = DMatrix([[0,0],[0,0]])
+# C = DM([[1,0,0],[0,1,0]])
+# D = DM([[0,0],[0,0]])
 
 # temp = inv(blockcat([[A,B],[C,D]]))
 
@@ -462,7 +462,7 @@ p = SX.sym('p')
 
 # figure(7)
   
-# for k,(caption,K_) in enumerate([('K: zero',DMatrix.zeros((nu,ns))),('K: LQR',K)]):
+# for k,(caption,K_) in enumerate([('K: zero',DM.zeros((nu,ns))),('K: LQR',K)]):
 #   param_['K'] = K_
 
 #   sim.setInput(states_,'x0')
@@ -512,7 +512,7 @@ p = SX.sym('p')
 
 # u_ = vertcat([controls_,yref_])
 
-# x0 = DMatrix([1,0,0])
+# x0 = DM([1,0,0])
 
 # controls = struct_symSX([
 #              entry('uref',shape=nu),

@@ -120,7 +120,7 @@ int main(){
   }
 
   // Create a matrix
-  DMatrix D2(C2,valv);
+  DM D2(C2,valv);
 //  D2.printSparse();
     
   // Right hand side

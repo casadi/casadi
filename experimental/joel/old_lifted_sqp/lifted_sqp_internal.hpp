@@ -65,13 +65,13 @@ public:
   //@}
   
    /// Residual
-   DMatrix d_k_;
+   DM d_k_;
    
    /// Primal step
-   DMatrix dx_k_;
+   DM dx_k_;
    
    /// Dual step
-   DMatrix dlam_x_k_, dlam_g_k_;
+   DM dlam_x_k_, dlam_g_k_;
 
    /// Indices
    enum GIn{G_X,G_LAM_X,G_LAM_G,G_NUM_IN};

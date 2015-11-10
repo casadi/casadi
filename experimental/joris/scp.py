@@ -24,7 +24,7 @@
 from numpy import *
 from casadi import *
 
-DMatrix.setPrecision(16)
+DM.setPrecision(16)
 
 solver = None
   
@@ -67,7 +67,7 @@ ipopt.solve()
 
 print "reference sol= ", ipopt.output("x")
 
-g = DMatrix(0,1)
+g = DM(0,1)
 
 lambd = ssym("lambda",g.shape)
 Lambd = ssym("lambda",nsd.sparsity())
@@ -77,9 +77,9 @@ lag = f+mul(lambd.T,g)+trace(mul(Lambd,nsd))
 oracle = SXFunction(customIO(x=x,lambd=lambd,Lambd=Lambd),customIO(f=f,g=g,nsd=nsd,hess=hessian(lag,x), gradF=gradient(f,x), jacG= jacobian(g,x),jac_nsd=jacobian(vec(nsd),x)))
 oracle.init()
 
-lambda_k = DMatrix([0])
-Lambda_k = DMatrix([0])
-x_k = DMatrix([2,3])
+lambda_k = DM([0])
+Lambda_k = DM([0])
+x_k = DM([2,3])
 
 for i in range(25):
   print i, x_k

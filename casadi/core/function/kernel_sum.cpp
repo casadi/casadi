@@ -55,17 +55,17 @@ namespace casadi {
     ibuf_.resize(num_in-1);
     obuf_.resize(num_out);
 
-    input(0) = DMatrix::zeros(size_);
-    input(1) = DMatrix::zeros(2, n_);
+    input(0) = DM::zeros(size_);
+    input(1) = DM::zeros(2, n_);
 
     for (int i=0;i<num_in-3;++i) {
       // Allocate space for input
-      input(2+i) = DMatrix::zeros(f_.sparsity_in(i+3));
+      input(2+i) = DM::zeros(f_.sparsity_in(i+3));
     }
 
     for (int i=0;i<num_out;++i) {
       // Allocate space for output
-      output(i) = DMatrix::zeros(f_.sparsity_out(i));
+      output(i) = DM::zeros(f_.sparsity_out(i));
     }
 
     // Call the initialization method of the base class

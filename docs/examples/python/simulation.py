@@ -101,7 +101,7 @@ rhs["dy"] = F[1]
 # # PF = d(I)/d(x0) P0 [d(I)/d(x0)]^T
   
 # P0 = states.squared()
-# P0[:,:] = 0.01*DMatrix.eye(states.size)
+# P0[:,:] = 0.01*DM.eye(states.size)
 # P0["x","dy"] = P0["dy","x"] = 0.002
 
 # # Not supported in current revision, cf. #929
@@ -153,10 +153,10 @@ rhs["dy"] = F[1]
 # n = states.size
 
 # W0 = 0
-# x0 = DMatrix(x0)
-# W = DMatrix([  W0 ] + [(1.0-W0)/2/n for j in range(2*n)])
+# x0 = DM(x0)
+# W = DM([  W0 ] + [(1.0-W0)/2/n for j in range(2*n)])
 
-# sqm = sqrtm(n/(1.0-W0)*DMatrix(P0)).real
+# sqm = sqrtm(n/(1.0-W0)*DM(P0)).real
 # sample_x = [ x0 ] + [x0+sqm[:,i] for i in range(n)] + [x0-sqm[:,i] for i in range(n)]
 
 # csim.setInput(parameters_,"p")
@@ -172,7 +172,7 @@ rhs["dy"] = F[1]
 
 # Xf_mean = mul(simulated_x,W)
 
-# x_dev = simulated_x-mul(Xf_mean,DMatrix.ones(1,2*n+1))
+# x_dev = simulated_x-mul(Xf_mean,DM.ones(1,2*n+1))
 
 # PF_method3 = mul([x_dev,diag(W),x_dev.T])
 # print "State cov (method 3) = ", PF_method3

@@ -173,12 +173,12 @@ namespace casadi {
     // Allocate space for inputs
     ibuf_.resize(inputv_.size());
     for (int i=0; i<inputv_.size(); ++i)
-      input(i) = DMatrix::zeros(inputv_[i].sparsity());
+      input(i) = DM::zeros(inputv_[i].sparsity());
 
     // Allocate space for outputs
     obuf_.resize(outputv_.size());
     for (int i=0; i<outputv_.size(); ++i)
-      output(i) = DMatrix::zeros(outputv_[i].sparsity());
+      output(i) = DM::zeros(outputv_[i].sparsity());
 
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;

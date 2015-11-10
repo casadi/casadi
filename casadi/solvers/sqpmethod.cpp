@@ -171,8 +171,8 @@ namespace casadi {
       alloc(bfgs_);
 
       // Initial Hessian approximation
-      B_init_ = DMatrix(Hsp_);
-      B_init_.set(DMatrix::eye(nx_));
+      B_init_ = DM(Hsp_);
+      B_init_.set(DM::eye(nx_));
     }
 
     // Header

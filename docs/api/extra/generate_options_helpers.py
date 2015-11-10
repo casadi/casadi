@@ -72,8 +72,8 @@ def addExtra(metadata):
   i = Function.qpsol("mysolver", "qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
   extra(metadata,i,"QpoasesInterface")
  
-  G = sparsify(DMatrix([[1,0],[0,1]])).T
-  E = sparsify(DMatrix([0,0]))
+  G = sparsify(DM([[1,0],[0,1]])).T
+  E = sparsify(DM([0,0]))
 
-  A = DMatrix(0,2)
+  A = DM(0,2)
 

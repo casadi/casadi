@@ -449,7 +449,7 @@ namespace casadi {
 #ifndef SWIG
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
-    void call(const std::vector<DMatrix> &arg, std::vector<DMatrix>& res,
+    void call(const std::vector<DM> &arg, std::vector<DM>& res,
               bool always_inline=false, bool never_inline=false);
     void call(const std::vector<SX> &arg, std::vector<SX>& res,
               bool always_inline=false, bool never_inline=false);
@@ -509,13 +509,13 @@ namespace casadi {
 
     ///@{
     /// Functor shorthand for evaluation
-    std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg,
+    std::vector<DM> operator()(const std::vector<DM>& arg,
                                     bool always_inline=false, bool never_inline=false);
     std::vector<SX> operator()(const std::vector<SX>& arg,
                                bool always_inline=false, bool never_inline=false);
     std::vector<MX> operator()(const std::vector<MX>& arg,
                                bool always_inline=false, bool never_inline=false);
-    const DMatrixDict operator()(const DMatrixDict& arg,
+    const DMDict operator()(const DMDict& arg,
                                  bool always_inline=false, bool never_inline=false);
     const SXDict operator()(const SXDict& arg,
                             bool always_inline=false, bool never_inline=false);
@@ -526,8 +526,8 @@ namespace casadi {
 #ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
-    std::vector<DMatrix> operator()(const DMatrix& arg0) {
-      return operator()(std::vector<DMatrix>{arg0});
+    std::vector<DM> operator()(const DM& arg0) {
+      return operator()(std::vector<DM>{arg0});
     }
     std::vector<SX> operator()(const SX& arg0) {
       return operator()(std::vector<SX>{arg0});
@@ -578,15 +578,15 @@ namespace casadi {
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void forward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-                 const std::vector<std::vector<DMatrix> >& fseed,
-                 std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(fsens),
+    void forward(const std::vector<DM>& arg, const std::vector<DM>& res,
+                 const std::vector<std::vector<DM> >& fseed,
+                 std::vector<std::vector<DM> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void reverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-                 const std::vector<std::vector<DMatrix> >& aseed,
-                 std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(asens),
+    void reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
+                 const std::vector<std::vector<DM> >& aseed,
+                 std::vector<std::vector<DM> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
     /// \cond INTERNAL
@@ -598,9 +598,9 @@ namespace casadi {
      * The next two arguments are a set of adjoint directional seeds and the resulting adjoint
      * directional derivatives, the length of the vector being the number of adjoint directions.
      */
-    void derivative(const DMatrixVector& arg, DMatrixVector& SWIG_OUTPUT(res),
-                    const DMatrixVectorVector& fseed, DMatrixVectorVector& SWIG_OUTPUT(fsens),
-                    const DMatrixVectorVector& aseed, DMatrixVectorVector& SWIG_OUTPUT(asens),
+    void derivative(const DMVector& arg, DMVector& SWIG_OUTPUT(res),
+                    const DMVectorVector& fseed, DMVectorVector& SWIG_OUTPUT(fsens),
+                    const DMVectorVector& aseed, DMVectorVector& SWIG_OUTPUT(asens),
                     bool always_inline=false, bool never_inline=false);
 
     void derivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res),
@@ -1146,7 +1146,7 @@ namespace casadi {
     ///@{
     /// Propagate sparsity through a linear solve
     void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr=false) const;
-    void linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr=false) const;
+    void linsol_spsolve(DM& X, const DM& B, bool tr=false) const;
     ///@}
 
     /** \brief Solve the system of equations <tt>Lx = b</tt>
@@ -1163,7 +1163,7 @@ namespace casadi {
     /** \brief Obtain a numeric Cholesky factorization
         Only for Cholesky solvers
      */
-    DMatrix linsol_cholesky(bool tr=false) const;
+    DM linsol_cholesky(bool tr=false) const;
 
     ///@{
     /** Create a solver for rootfinding problems

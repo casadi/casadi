@@ -99,7 +99,7 @@ namespace casadi {
     x_index_.resize(n_);
     c_index_.resize(nc_);
     p_.resize(n_);
-    AT_ = DMatrix::zeros(input(QPSOL_A).sparsity().T());
+    AT_ = DM::zeros(input(QPSOL_A).sparsity().T());
     AT_tmp_.resize(nc_);
 
     // Solution
@@ -293,12 +293,12 @@ namespace casadi {
       userOut() << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
       userOut() << "with" << endl;
       userOut() << "Q = " <<
-          tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
+          tril2symm(DM::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
                                      vector<int>(jcolQ_.begin(), jcolQ_.begin()+nnzQ),
                                      vector<double>(dQ_.begin(), dQ_.begin()+nnzQ),
                                      nx, nx)) << endl;
       userOut() << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
-      userOut() << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),
+      userOut() << "A = " << DM::triplet(vector<int>(irowA_.begin(),
                                                      irowA_.begin()+nnzA),
                                         vector<int>(jcolA_.begin(),
                                                     jcolA_.begin()+nnzA),
@@ -306,7 +306,7 @@ namespace casadi {
                                                        dA_.begin()+nnzA),
                                          nA, nx) << endl;
       userOut() << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
-      userOut() << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),
+      userOut() << "C = " << DM::triplet(vector<int>(irowC_.begin(),
                                                      irowC_.begin()+nnzC),
                                         vector<int>(jcolC_.begin(),
                                                     jcolC_.begin()+nnzC),

@@ -46,13 +46,13 @@ namespace casadi {
     // Allocate inputs
     ibuf_.resize(get_n_in());
     for (int i=0; i<ibuf_.size(); ++i) {
-      input(i) = DMatrix(get_sparsity_in(i));
+      input(i) = DM(get_sparsity_in(i));
     }
 
     // Allocate outputs
     obuf_.resize(get_n_out());
     for (int i=0; i<obuf_.size(); ++i) {
-      output(i) = DMatrix(get_sparsity_out(i));
+      output(i) = DM(get_sparsity_out(i));
     }
 
     // Call base class method

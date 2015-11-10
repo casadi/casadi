@@ -2401,7 +2401,7 @@ namespace casadi {
       rrlookup = lookupvector(rr_sorted, size1());
       // Else: Time complexity: O(ii.size()*jj.size())
       // Typical use case:
-      // a = DMatrix.ones(1000, 1000)
+      // a = DM.ones(1000, 1000)
       // a[[0, 1],[0, 1]]
     }
 

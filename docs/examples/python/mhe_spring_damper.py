@@ -40,8 +40,8 @@ dt = 0.05; # Time step
 
 sigma_p = 0.005 # Standard deviation of the position measurements
 sigma_w = 0.1 # Standard deviation for the process noise
-R = DMatrix(1/sigma_p**2) # resulting weighting matrix for the position measurements
-Q = DMatrix(1/sigma_w**2) # resulting weighting matrix for the process noise
+R = DM(1/sigma_p**2) # resulting weighting matrix for the position measurements
+Q = DM(1/sigma_w**2) # resulting weighting matrix for the process noise
 
 Nsimulation = 1000 # Lenght of the simulation
 
@@ -121,12 +121,12 @@ for i in range(N-1):
 nlp = {'x':shooting, 'p':parameters, 'f':obj, 'g':vertcat(g)}
 
 # Make a simulation to create the data for the problem
-simulated_X = DMatrix.zeros(Nstates,Nsimulation)
-simulated_X[:,0] = DMatrix([1,0]) # Initial state
+simulated_X = DM.zeros(Nstates,Nsimulation)
+simulated_X[:,0] = DM([1,0]) # Initial state
 t = NP.linspace(0,(Nsimulation-1)*dt,Nsimulation) # Time grid
-simulated_U = DMatrix(cos(t[0:-1])).T # control input for the simulation
+simulated_U = DM(cos(t[0:-1])).T # control input for the simulation
 simulated_U[:,Nsimulation/2:] = 0.0
-simulated_W = DMatrix(sigma_w*NP.random.randn(Ndisturbances,Nsimulation-1)) # Process noise for the simulation
+simulated_W = DM(sigma_w*NP.random.randn(Ndisturbances,Nsimulation-1)) # Process noise for the simulation
 for i in range(Nsimulation-1):
   phi.setInput(simulated_X[:,i],0)
   phi.setInput(simulated_U[:,i],1)
@@ -134,7 +134,7 @@ for i in range(Nsimulation-1):
   phi.evaluate()
   simulated_X[:,i+1] = phi.getOutput(0)
 #Create the measurements from these states
-simulated_Y = DMatrix.zeros(Nmeas,Nsimulation) # Holder for the measurements
+simulated_Y = DM.zeros(Nmeas,Nsimulation) # Holder for the measurements
 for i in range(Nsimulation):
   h.setInput(simulated_X[:,i],0)
   h.evaluate()
@@ -144,7 +144,7 @@ simulated_Y += sigma_p*NP.random.randn(simulated_Y.shape[0],simulated_Y.shape[1]
 
 #The initial estimate and related covariance, which will be used for the arrival cost
 sigma_x0 = 0.01
-P = sigma_x0**2*DMatrix.eye(Nstates)
+P = sigma_x0**2*DM.eye(Nstates)
 x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
 opts = {"print_level":0, "print_time": False, 'max_iter':100}
@@ -155,8 +155,8 @@ nlpsol.setInput(0,"lbg")
 nlpsol.setInput(0,"ubg")
 
 # Create a holder for the estimated states and disturbances
-estimated_X= DMatrix.zeros(Nstates,Nsimulation)
-estimated_W = DMatrix.zeros(Ndisturbances,Nsimulation-1)
+estimated_X= DM.zeros(Nstates,Nsimulation)
+estimated_W = DM.zeros(Ndisturbances,Nsimulation-1)
 # For the first instance we run the filter, we need to initialize it.
 current_parameters = parameters(0)
 current_parameters["U",horzcat] = simulated_U[:,0:N-1]
@@ -184,7 +184,7 @@ for i in range(1,Nsimulation-N+1):
   H.evaluate()
   H0 = H.getOutput(0)
   K = mul([P,H0.T,linalg.inv(mul([H0,P,H0.T])+R)])
-  P = mul((DMatrix.eye(Nstates)-mul(K,H0)),P)
+  P = mul((DM.eye(Nstates)-mul(K,H0)),P)
   h.setInput(solution["X",0],0)
   h.evaluate()
   x0 = x0 + mul(K, current_parameters["Y",0]-h.getOutput(0)-mul(H0,x0-solution["X",0]) )
@@ -207,7 +207,7 @@ for i in range(1,Nsimulation-N+1):
   current_parameters["x0"] = x0
   # Initialize the system with the shifted solution
   initialisation_state["W",horzcat,0:N-2] = estimated_W[:,i:i+N-2] # The shifted solution for the disturbances
-  initialisation_state["W",N-2] = DMatrix.zeros(Ndisturbances,1) # The last node for the disturbances is initialized with zeros
+  initialisation_state["W",N-2] = DM.zeros(Ndisturbances,1) # The last node for the disturbances is initialized with zeros
   initialisation_state["X",horzcat,0:N-1] = estimated_X[:,i:i+N-1] # The shifted solution for the state estimates
   # The last node for the state is initialized with a forward simulation
   phi.setInput(initialisation_state["X",N-1] ,0)

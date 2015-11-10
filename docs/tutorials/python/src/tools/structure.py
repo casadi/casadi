@@ -139,7 +139,7 @@ print shooting["X",0,0,"x"]
 print shooting["X",:,0,"x"]
 
 #! Having structured symbolics is one thing. The numeric structures can be derived:
-#! The following line allocates a DMatrix of correct size, initialised with zeros
+#! The following line allocates a DM of correct size, initialised with zeros
 init = shooting(0)
 
 print init.cat
@@ -235,7 +235,7 @@ print init["X",vertcat,:,horzcat,:,"x"]
 print init["X",blockcat,:,:,"x"]
 
 #! Set all quaternions to 1,0,0,0
-init["X",:,:,"q"] = repeated(repeated(DMatrix([1,0,0,0])))
+init["X",:,:,"q"] = repeated(repeated(DM([1,0,0,0])))
 
 #! {} can be used in the powerIndex to expand into a dictionary once
 init["X",:,0,{}] = repeated({"y": 9})
@@ -321,19 +321,19 @@ initial["z"] = 3
 #! -------------------
 
 #! If you work with Simulator, ControlSimulator, you typically end up
-#! with wanting to index a DMatrix that is n x N
+#! with wanting to index a DM that is n x N
 #! with n the size of a statespace and N an arbitrary integer
 
 states = struct(["x","y","z"])
 
-#! We artificially construct here a DMatrix that could be a Simulator output.
-output = DMatrix.zeros(states.size,8)
+#! We artificially construct here a DM that could be a Simulator output.
+output = DM.zeros(states.size,8)
 
 #! The helper construct is 'repeated' here. Instead of "states(output)", we have
 outputs = states.repeated(output)
 
 #! Now we have an object that supports powerIndexing:
-outputs[-1] = DMatrix([1,2,3])
+outputs[-1] = DM([1,2,3])
 outputs[:,"x"] = range(8) 
 
 print output
@@ -341,7 +341,7 @@ print outputs[5,{}]
 
 #! Next we represent the 'squared' helper construct
 #! Imagine we somehow obtain a matrix that represents covariance
-P0 = DMatrix.zeros(states.size,states.size)
+P0 = DM.zeros(states.size,states.size)
 
 #! We can conveniently access it as follows:
 P = states.squared(P0)
@@ -356,12 +356,12 @@ print P
 #! You can access its concents with a call:
 print P()
 
-#! But often, it will behave like a DMatrix transparantly:
+#! But often, it will behave like a DM transparantly:
 P0.set(P)
 
 #! Next we represent the 'squared_repeated' helper construct
 #! Imagine we somehow obtain a matrix that represents a horizontal concatenation of covariance
-P0 = horzcat([DMatrix.zeros(states.size,states.size),DMatrix.ones(states.size,states.size)])
+P0 = horzcat([DM.zeros(states.size,states.size),DM.ones(states.size,states.size)])
 
 #! We can conveniently access it as follows:
 P = states.squared_repeated(P0)
@@ -373,7 +373,7 @@ print P0
 #! Finally, we present the 'product' helper construct
 controls = struct(["u","v"])
 
-J0 = DMatrix.zeros(states.size,controls.size)
+J0 = DM.zeros(states.size,controls.size)
 
 J = states.product(controls,J0)
 

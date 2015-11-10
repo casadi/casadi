@@ -31,7 +31,7 @@ import numpy as n
 N = 5000
 
 # We work with a sparse diaginal matrix with 5000 elements
-x = DMatrix(sp_diag(N),5)
+x = DM(sp_diag(N),5)
 
 x_s = x.toCsr_matrix()
 
@@ -62,10 +62,10 @@ print "CasADi generating procuct sparsity pattern = %.4f s" % (time()-t)
 
 t = time()
 # Create the return object with correct sparsity
-ret = c.DMatrix(spres)
+ret = c.DM(spres)
 print "CasADi allocating resulting = %.4f s" % (time()-t)
 
 t = time()
 # Carry out the matrix product
-c.DMatrix.mul_no_alloc(x,x,ret)
+c.DM.mul_no_alloc(x,x,ret)
 print "CasADi actual multiplication = %.4f s" % (time()-t)

@@ -55,15 +55,15 @@ public:
   int n_meas_;
 
   // Initial conditions
-  DMatrix u0_;
-  DMatrix v0_;
-  DMatrix h0_;
+  DM u0_;
+  DM v0_;
+  DM h0_;
 
   // Discrete time dynamics
   Function f_;
   
   // Generated measurements
-  vector<DMatrix> H_meas_;
+  vector<DM> H_meas_;
 
   // Height of the splash
   double spheight_;
@@ -95,9 +95,9 @@ void Tester::model(){
   }
 
   // Initial conditions
-  u0_ = DMatrix::zeros(n_+1,n_  );
-  v0_ = DMatrix::zeros(n_  ,n_+1);
-  h0_ = DMatrix::zeros(n_  ,n_  );
+  u0_ = DM::zeros(n_+1,n_  );
+  v0_ = DM::zeros(n_  ,n_+1);
+  h0_ = DM::zeros(n_  ,n_  );
   bool any_point_in_domain = false;
   for(int i=0; i<n_; ++i){
     for(int j=0; j<n_; ++j){
@@ -249,9 +249,9 @@ void Tester::simulate(double drag_true, double depth_true){
   clock_t time1 = clock();
   for(int k=0; k<n_meas_; ++k){
     f_.evaluate();
-    const DMatrix& u = f_.output(0);
-    const DMatrix& v = f_.output(1);
-    const DMatrix& h = f_.output(2);
+    const DM& u = f_.output(0);
+    const DM& v = f_.output(1);
+    const DM& h = f_.output(2);
     f_.setInput(u,1);
     f_.setInput(v,2);
     f_.setInput(h,3);
@@ -298,7 +298,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
       // Initialize with initial conditions
       // U = lift(U, u0_);
       // V = lift(V, v0_);
-      // H = lift(H, DMatrix::zeros(n_  ,n_));
+      // H = lift(H, DM::zeros(n_  ,n_));
       
       // Initialize through simulation
       // U = lift(U, U);

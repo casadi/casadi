@@ -85,12 +85,12 @@ int main(){
   gmax.resize(2+nu, 1.1);
 
   // Solve the problem
-  DMatrixDict arg = {{"lbx", -10},
+  DMDict arg = {{"lbx", -10},
                      {"ubx", 10},
                      {"x0", 0.4},
                      {"lbg", gmin},
                      {"ubg", gmax}};  
-  DMatrixDict res = solver(arg);
+  DMDict res = solver(arg);
 
   // Print the optimal cost
   double cost(res.at("f"));

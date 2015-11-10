@@ -153,23 +153,23 @@ namespace casadi {
 
     // Allocate space for inputs
     ibuf_.resize(NLPSOL_NUM_IN);
-    input(NLPSOL_X0)       =  DMatrix::zeros(x_sparsity);
-    input(NLPSOL_LBX)      = -DMatrix::inf(x_sparsity);
-    input(NLPSOL_UBX)      =  DMatrix::inf(x_sparsity);
-    input(NLPSOL_LBG)      = -DMatrix::inf(g_sparsity);
-    input(NLPSOL_UBG)      =  DMatrix::inf(g_sparsity);
-    input(NLPSOL_LAM_X0)   =  DMatrix::zeros(x_sparsity);
-    input(NLPSOL_LAM_G0)   =  DMatrix::zeros(g_sparsity);
-    input(NLPSOL_P)        =  DMatrix::zeros(p_sparsity);
+    input(NLPSOL_X0)       =  DM::zeros(x_sparsity);
+    input(NLPSOL_LBX)      = -DM::inf(x_sparsity);
+    input(NLPSOL_UBX)      =  DM::inf(x_sparsity);
+    input(NLPSOL_LBG)      = -DM::inf(g_sparsity);
+    input(NLPSOL_UBG)      =  DM::inf(g_sparsity);
+    input(NLPSOL_LAM_X0)   =  DM::zeros(x_sparsity);
+    input(NLPSOL_LAM_G0)   =  DM::zeros(g_sparsity);
+    input(NLPSOL_P)        =  DM::zeros(p_sparsity);
 
     // Allocate space for outputs
     obuf_.resize(NLPSOL_NUM_OUT);
-    output(NLPSOL_X)       = DMatrix::zeros(x_sparsity);
-    output(NLPSOL_F)       = DMatrix::zeros(1);
-    output(NLPSOL_LAM_X)   = DMatrix::zeros(x_sparsity);
-    output(NLPSOL_LAM_G)   = DMatrix::zeros(g_sparsity);
-    output(NLPSOL_LAM_P)   = DMatrix::zeros(p_sparsity);
-    output(NLPSOL_G)       = DMatrix::zeros(g_sparsity);
+    output(NLPSOL_X)       = DM::zeros(x_sparsity);
+    output(NLPSOL_F)       = DM::zeros(1);
+    output(NLPSOL_LAM_X)   = DM::zeros(x_sparsity);
+    output(NLPSOL_LAM_G)   = DM::zeros(g_sparsity);
+    output(NLPSOL_LAM_P)   = DM::zeros(p_sparsity);
+    output(NLPSOL_G)       = DM::zeros(g_sparsity);
 
     // Call the initialization method of the base class
     const bool verbose_init = option("verbose_init");
@@ -471,10 +471,10 @@ namespace casadi {
 
   const std::string Nlpsol::infix_ = "nlpsol";
 
-  DMatrix Nlpsol::getReducedHessian() {
+  DM Nlpsol::getReducedHessian() {
     casadi_error("Nlpsol::getReducedHessian not defined for class "
                  << typeid(*this).name());
-    return DMatrix();
+    return DM();
   }
 
   void Nlpsol::setOptionsFromFile(const std::string & file) {

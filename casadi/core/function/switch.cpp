@@ -119,9 +119,9 @@ namespace casadi {
     // Allocate input and output buffers
     ibuf_.resize(1+num_in);
     input(0) = 0; // conditional
-    for (int i=0; i<num_in; ++i) input(i+1) = DMatrix::zeros(sp_in[i]);
+    for (int i=0; i<num_in; ++i) input(i+1) = DM::zeros(sp_in[i]);
     obuf_.resize(num_out);
-    for (int i=0; i<num_out; ++i) output(i) = DMatrix::zeros(sp_out[i]);
+    for (int i=0; i<num_out; ++i) output(i) = DM::zeros(sp_out[i]);
 
     // Call the initialization method of the base class
     FunctionInternal::init();

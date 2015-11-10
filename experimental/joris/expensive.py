@@ -363,10 +363,10 @@ class QuadcopterModel:
     p_["I"] = casadi.diag([I_ref/2,I_ref/2,I_ref]) # [N.m^2]
     
 
-    p_["rotors_p",0] = DMatrix([L,0,0])
-    p_["rotors_p",1] = DMatrix([0,L,0])
-    p_["rotors_p",2] = DMatrix([-L,0,0])
-    p_["rotors_p",3] = DMatrix([0,-L,0])
+    p_["rotors_p",0] = DM([L,0,0])
+    p_["rotors_p",1] = DM([0,L,0])
+    p_["rotors_p",2] = DM([-L,0,0])
+    p_["rotors_p",3] = DM([0,-L,0])
 
     for i in range(NR):
         R_ = p_["rotors_model",i,"R"] #  Radius of propeller [m]
@@ -539,7 +539,7 @@ scaling_controls  = model.scaling_controls
 scaling_dist      = model.scaling_dist
 
 scaling_P = mul(scaling_states.cat,scaling_states.cat.T)
-scaling_K = DMatrix.ones(controls.size,states.size)
+scaling_K = DM.ones(controls.size,states.size)
 
 # Number of control intervals
 N = 4 #analysis.N
@@ -555,7 +555,7 @@ tf = 10
 ns = states.shape[0]
 nu = controls.shape[0]
 
-waypoints = DMatrix([[-2,0,2],[2,0,1]]).T
+waypoints = DM([[-2,0,2],[2,0,1]]).T
 
 # Formulate the estimation problem using a collocation approach
 
@@ -609,9 +609,9 @@ dL.init()
 
 L.input().set(1)
 L.evaluate()
-Lend = DMatrix(L.output())  # Le at the end of the control interval
+Lend = DM(L.output())  # Le at the end of the control interval
 
-dLm = numSample1D(dL,DMatrix(tau_root).T)  # d-by-d
+dLm = numSample1D(dL,DM(tau_root).T)  # d-by-d
 
 resf = SXFunction(customIO(t=model.t, x=states, dx= dstates, u=controls, p=model.p,w=model.w),[model.res_w])
 resf.init()
@@ -699,7 +699,7 @@ scaling_statesMX = MX(scaling_states)
 scaling_controlsMX = MX(scaling_controls)
 SigmaMX = MX(Sigma)
 
-W = MX(DMatrix.zeros(model.w.size))
+W = MX(DM.zeros(model.w.size))
 
 # P propagation function -- start
 
@@ -789,7 +789,7 @@ g = struct_MX([
   ),
   entry("quatnorm",expr=Cmx), # Add the quaternion norm constraint at the start
   entry("Jz",expr=mul(J,z)),   # Null space magic by Julia and Sebastien
-  entry("zz",expr=mul(z.T,z)-DMatrix.eye(states.shape[0]-1)),   # Null space magic by Julia and Sebastien
+  entry("zz",expr=mul(z.T,z)-DM.eye(states.shape[0]-1)),   # Null space magic by Julia and Sebastien
   entry("p",expr=mul(z.T,optvar["X",0,0]-optvar["X",-1,-1])),    # periodicity on all states
   entry("obstacle",expr=optvar["X",:,:,lambda x: x[0]**2+x[1]**2,"p"]),
   entry("T-Tw",expr=T-Tw),
@@ -804,7 +804,7 @@ f = T
 f += 0.01 * sumAll( (optvar["U",horzcat].T-optvar["umean"])**2 )  # control regularisation
 
 # Favor positions close to unit quaternion
-q0 = DMatrix([0,0,0,1])
+q0 = DM([0,0,0,1])
 f += 0.01 * sum( [ sumAll(q - q0)**2 for q in optvar["X",:,0,"q"] ] )
 
 # Favor small angular velocities

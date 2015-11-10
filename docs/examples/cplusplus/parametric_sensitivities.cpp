@@ -113,7 +113,7 @@ int main(){
   
   // Create NLP solver and buffers
   Function solver = Function::nlpsol("solver", "ipopt", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  std::map<std::string, DM> arg, res;
   
   // Solve NLP
   arg["lbx"] = lbx;

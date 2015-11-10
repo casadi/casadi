@@ -73,23 +73,23 @@ namespace casadi {
 
     // Input arguments
     ibuf_.resize(QPSOL_NUM_IN);
-    input(QPSOL_X0) = DMatrix::zeros(x_sparsity);
-    input(QPSOL_H) = DMatrix::zeros(H);
-    input(QPSOL_G) = DMatrix::zeros(x_sparsity);
-    input(QPSOL_A) = DMatrix::zeros(A);
-    input(QPSOL_LBA) = -DMatrix::inf(bounds_sparsity);
-    input(QPSOL_UBA) =  DMatrix::inf(bounds_sparsity);
-    input(QPSOL_LBX) = -DMatrix::inf(x_sparsity);
-    input(QPSOL_UBX) =  DMatrix::inf(x_sparsity);
-    input(QPSOL_LAM_X0) = DMatrix::zeros(x_sparsity);
-    //input(QPSOL_LAM_A0) = DMatrix::zeros(x_sparsity);
+    input(QPSOL_X0) = DM::zeros(x_sparsity);
+    input(QPSOL_H) = DM::zeros(H);
+    input(QPSOL_G) = DM::zeros(x_sparsity);
+    input(QPSOL_A) = DM::zeros(A);
+    input(QPSOL_LBA) = -DM::inf(bounds_sparsity);
+    input(QPSOL_UBA) =  DM::inf(bounds_sparsity);
+    input(QPSOL_LBX) = -DM::inf(x_sparsity);
+    input(QPSOL_UBX) =  DM::inf(x_sparsity);
+    input(QPSOL_LAM_X0) = DM::zeros(x_sparsity);
+    //input(QPSOL_LAM_A0) = DM::zeros(x_sparsity);
 
     // Output arguments
     obuf_.resize(QPSOL_NUM_OUT);
-    output(QPSOL_X) = DMatrix::zeros(x_sparsity);
+    output(QPSOL_X) = DM::zeros(x_sparsity);
     output(QPSOL_COST) = 0.0;
-    output(QPSOL_LAM_X) = DMatrix::zeros(x_sparsity);
-    output(QPSOL_LAM_A) = DMatrix::zeros(bounds_sparsity);
+    output(QPSOL_LAM_X) = DM::zeros(x_sparsity);
+    output(QPSOL_LAM_A) = DM::zeros(bounds_sparsity);
 
     ischeme_ = Function::qpsol_in();
     oscheme_ = Function::qpsol_out();

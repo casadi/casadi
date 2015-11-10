@@ -94,7 +94,7 @@ public:
   static int jac_wrapper (double t, const double y[], double *dfdy, double dfdt[], void *userdata);
   
   // Current state of the integrator
-  DMatrix state;
+  DM state;
   
   virtual void printStats(std::ostream &stream) const;
   

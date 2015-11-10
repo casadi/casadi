@@ -164,7 +164,7 @@ int main(){
 
   // Create an NLP solver and buffers
   Function nlpsol = Function::nlpsol("nlpsol", "ipopt", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  std::map<std::string, DM> arg, res;
 
   // Bounds and initial guess
   arg["lbx"] = v_min;

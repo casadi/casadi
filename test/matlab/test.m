@@ -23,7 +23,7 @@ f.evaluate()
 
 disp(f.getOutput())
 
-res = f.getOutput()-DMatrix(cos(3))
+res = f.getOutput()-DM(cos(3))
 assert(iszero(res))
 
 
@@ -97,7 +97,7 @@ assert(flag);
 
 delete 'diary'
 diary ON
-x = DMatrix.ones(2,2);
+x = DM.ones(2,2);
 
 x.printDense();
 
@@ -140,8 +140,8 @@ end
 %assert(~isempty(strfind(msg,'  Function(char,{SX} ,{SX} ,Dict)')))
 %assert(~isempty(strfind(msg,'You have: char, SX')))
 
-% Check mixing DMatrix and MX
-res = (DMatrix(1)+MX(1)) - (MX(1)+DMatrix(1))
+% Check mixing DM and MX
+res = (DM(1)+MX(1)) - (MX(1)+DM(1))
 assert(iszero(res))
 
 % Try substitute (non-member function)
@@ -207,12 +207,12 @@ if Compiler.hasPlugin('clang')
 end
 
 
-a = DMatrix.ones(Sparsity.upper(5));
+a = DM.ones(Sparsity.upper(5));
 i = full(full(sparse(a))-a);
 assert(any(any(i))==0);
 
 % Element assignment
-A = DMatrix.ones(1,4);
+A = DM.ones(1,4);
 A(2) = 20;
 A(3:4) = [30,40];
 assert(all(full(A)==[1 20 30 40]))

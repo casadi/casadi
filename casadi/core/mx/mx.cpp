@@ -61,7 +61,7 @@ namespace casadi {
   }
 
   MX::MX(const std::vector<double>& x) {
-    assignNode(ConstantMX::create(DMatrix(x)));
+    assignNode(ConstantMX::create(DM(x)));
   }
 
   MX::MX(const Sparsity& sp, const MX& val) {

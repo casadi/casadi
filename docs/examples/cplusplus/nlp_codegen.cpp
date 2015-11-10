@@ -102,11 +102,11 @@ int main(){
                          {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}});
 
   // Bounds and initial guess
-  std::map<std::string, DMatrix> arg, res;
-  arg["lbx"] = -DMatrix::inf();
-  arg["ubx"] =  DMatrix::inf();
+  std::map<std::string, DM> arg, res;
+  arg["lbx"] = -DM::inf();
+  arg["ubx"] =  DM::inf();
   arg["lbg"] =  0;
-  arg["ubg"] =  DMatrix::inf();
+  arg["ubg"] =  DM::inf();
   arg["x0"] = 0;
 
   // Solve the NLP

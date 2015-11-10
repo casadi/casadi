@@ -186,23 +186,23 @@ namespace casadi {
 
     // Allocate space for inputs
     ibuf_.resize(IVPSOL_NUM_IN);
-    x0()  = DMatrix::zeros(f_.input(DAE_X).sparsity());
-    p()   = DMatrix::zeros(f_.input(DAE_P).sparsity());
-    z0()   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
+    x0()  = DM::zeros(f_.input(DAE_X).sparsity());
+    p()   = DM::zeros(f_.input(DAE_P).sparsity());
+    z0()   = DM::zeros(f_.input(DAE_Z).sparsity());
     if (!g_.isNull()) {
-      rx0()  = DMatrix::zeros(g_.input(RDAE_RX).sparsity());
-      rp()  = DMatrix::zeros(g_.input(RDAE_RP).sparsity());
-      rz0()  = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
+      rx0()  = DM::zeros(g_.input(RDAE_RX).sparsity());
+      rp()  = DM::zeros(g_.input(RDAE_RP).sparsity());
+      rz0()  = DM::zeros(g_.input(RDAE_RZ).sparsity());
     }
 
     // Allocate space for outputs
     obuf_.resize(IVPSOL_NUM_OUT);
     xf() = x0();
-    qf() = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
+    qf() = DM::zeros(f_.output(DAE_QUAD).sparsity());
     zf() = z0();
     if (!g_.isNull()) {
       rxf()  = rx0();
-      rqf()  = DMatrix::zeros(g_.output(RDAE_QUAD).sparsity());
+      rqf()  = DM::zeros(g_.output(RDAE_QUAD).sparsity());
       rzf()  = rz0();
     }
 
@@ -316,7 +316,7 @@ namespace casadi {
     vector<MatType> tmp;
 
     // Zero with the dimension of t
-    MatType zero_t = DMatrix::zeros(aug_t.sparsity());
+    MatType zero_t = DM::zeros(aug_t.sparsity());
 
     // The DAE being constructed
     vector<MatType> f_ode, f_alg, f_quad, g_ode, g_alg, g_quad;
@@ -481,7 +481,7 @@ namespace casadi {
     vector<MatType> tmp;
 
     // Zero with the dimension of t
-    MatType zero_t = DMatrix::zeros(aug_t.sparsity());
+    MatType zero_t = DM::zeros(aug_t.sparsity());
 
     // The DAE being constructed
     vector<MatType> f_ode, f_alg, f_quad, g_ode, g_alg, g_quad;
@@ -1402,7 +1402,7 @@ namespace casadi {
     // Get discrete time dimensions
     Z_ = F_.input(DAE_Z);
     nZ_ = Z_.nnz();
-    RZ_ = G_.isNull() ? DMatrix() : G_.input(RDAE_RZ);
+    RZ_ = G_.isNull() ? DM() : G_.input(RDAE_RZ);
     nRZ_ =  RZ_.nnz();
 
     // Allocate tape if backward states are present

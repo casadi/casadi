@@ -103,7 +103,7 @@ int main(){
   Dict opts = {{"tol", 1e-10},
                {"hessian_approximation", "limited-memory"}};
   Function solver = Function::nlpsol("solver", "ipopt", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  std::map<std::string, DM> arg, res;
 
   // Bounds on u and initial condition
   arg["lbx"] = -10;

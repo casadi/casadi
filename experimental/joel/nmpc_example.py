@@ -56,7 +56,7 @@ S.solve()
 from matplotlib.pylab import *
 u = S.getOutput("x")
 plot(u)
-x = DMatrix(0.30)
+x = DM(0.30)
 for k in range(30):
     xk = x[-1,0]
     x.append(xk + 0.1*(xk*(xk+1) + u[k]))

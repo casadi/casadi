@@ -1774,7 +1774,7 @@ namespace casadi {
     evalSX(arg, res);
   }
 
-  void FunctionInternal::call(const DMatrixVector& arg, DMatrixVector& res,
+  void FunctionInternal::call(const DMVector& arg, DMVector& res,
                         bool always_inline, bool never_inline) {
     // Get the number of inputs and outputs
     int num_in = n_in();
@@ -1788,7 +1788,7 @@ namespace casadi {
 
     // Correct input sparsity if needed
     if (!matching_sparsity) {
-      vector<DMatrix> arg2(arg);
+      vector<DM> arg2(arg);
       for (int i=0; i<num_in; ++i)
         if (arg2[i].sparsity()!=input(i).sparsity())
           arg2[i] = project(arg2[i], input(i).sparsity());
@@ -1799,7 +1799,7 @@ namespace casadi {
     res.resize(num_out);
     for (int i=0; i<num_out; ++i)
       if (res[i].sparsity()!=output(i).sparsity())
-        res[i] = DMatrix::zeros(output(i).sparsity());
+        res[i] = DM::zeros(output(i).sparsity());
 
     // Allocate temporary memory if needed
     iw_tmp_.resize(sz_iw());
@@ -2720,17 +2720,17 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  forward_dm(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-          const std::vector<std::vector<DMatrix> >& fseed,
-          std::vector<std::vector<DMatrix> >& fsens,
+  forward_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
+          const std::vector<std::vector<DM> >& fseed,
+          std::vector<std::vector<DM> >& fsens,
           bool always_inline, bool never_inline) {
     casadi_error("Not implemented");
   }
 
   void FunctionInternal::
-  reverse_dm(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-          const std::vector<std::vector<DMatrix> >& aseed,
-          std::vector<std::vector<DMatrix> >& asens,
+  reverse_dm(const std::vector<DM>& arg, const std::vector<DM>& res,
+          const std::vector<std::vector<DM> >& aseed,
+          std::vector<std::vector<DM> >& asens,
           bool always_inline, bool never_inline) {
     casadi_error("Not implemented");
   }
@@ -2926,7 +2926,7 @@ namespace casadi {
     casadi_error("'linsol_spsolve' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const {
+  void FunctionInternal::linsol_spsolve(DM& X, const DM& B, bool tr) const {
     casadi_error("'linsol_spsolve' not defined for " + type_name());
   }
 
@@ -2938,7 +2938,7 @@ namespace casadi {
     casadi_error("'linsol_cholesky_sparsity' not defined for " + type_name());
   }
 
-  DMatrix FunctionInternal::linsol_cholesky(bool tr) const {
+  DM FunctionInternal::linsol_cholesky(bool tr) const {
     casadi_error("'linsol_cholesky' not defined for " + type_name());
   }
 
@@ -3007,17 +3007,17 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  forward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-          const std::vector<std::vector<DMatrix> >& fseed,
-          std::vector<std::vector<DMatrix> >& fsens,
+  forward(const std::vector<DM>& arg, const std::vector<DM>& res,
+          const std::vector<std::vector<DM> >& fseed,
+          std::vector<std::vector<DM> >& fsens,
           bool always_inline, bool never_inline) {
     forward_dm(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   void FunctionInternal::
-  reverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-          const std::vector<std::vector<DMatrix> >& aseed,
-          std::vector<std::vector<DMatrix> >& asens,
+  reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
+          const std::vector<std::vector<DM> >& aseed,
+          std::vector<std::vector<DM> >& asens,
           bool always_inline, bool never_inline) {
     reverse_dm(arg, res, aseed, asens, always_inline, never_inline);
   }

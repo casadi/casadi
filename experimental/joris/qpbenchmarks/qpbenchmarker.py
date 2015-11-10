@@ -31,17 +31,17 @@ class OnlineQPBenchMark:
     
     self.nQP,self.nV,self.nC,self.nEC = self.readmatrix('dims.oqp')
 
-    self.H  = DMatrix(self.readmatrix('H.oqp'))
-    self.g  = DMatrix(self.readmatrix('g.oqp'))
-    self.lb = DMatrix(self.readmatrix('lb.oqp'))
-    self.ub = DMatrix(self.readmatrix('ub.oqp'))
+    self.H  = DM(self.readmatrix('H.oqp'))
+    self.g  = DM(self.readmatrix('g.oqp'))
+    self.lb = DM(self.readmatrix('lb.oqp'))
+    self.ub = DM(self.readmatrix('ub.oqp'))
 
     if self.nC > 0:
-        self.A   = DMatrix(self.readmatrix('A.oqp'))
-        self.lbA = DMatrix(self.readmatrix('lbA.oqp'))
-        self.ubA = DMatrix(self.readmatrix('ubA.oqp'))
+        self.A   = DM(self.readmatrix('A.oqp'))
+        self.lbA = DM(self.readmatrix('lbA.oqp'))
+        self.ubA = DM(self.readmatrix('ubA.oqp'))
 
-    self.x_opt   = DMatrix(self.readmatrix('x_opt.oqp'))
+    self.x_opt   = DM(self.readmatrix('x_opt.oqp'))
     self.y_opt   = self.readmatrix('y_opt.oqp')
     self.obj_opt = self.readmatrix('obj_opt.oqp')
 

@@ -55,17 +55,17 @@ namespace casadi {
     return ret;
   }
 
-  std::vector<DMatrix> Callback::eval(const std::vector<DMatrix>& arg) {
+  std::vector<DM> Callback::eval(const std::vector<DM>& arg) {
     casadi_error("Callback::eval has not been implemented");
-    return std::vector<DMatrix>();
+    return std::vector<DM>();
   }
 
   void Callback::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Allocate input matrices
     int num_in = n_in();
-    std::vector<DMatrix> argv(num_in);
+    std::vector<DM> argv(num_in);
     for (int i=0; i<num_in; ++i) {
-      argv[i] = DMatrix::zeros(input(i).sparsity());
+      argv[i] = DM::zeros(input(i).sparsity());
       if (arg[i] != 0) {
         argv[i].setNZ(arg[i]);
       } else {
@@ -74,7 +74,7 @@ namespace casadi {
     }
 
     // Evaluate
-    std::vector<DMatrix> resv = eval(argv);
+    std::vector<DM> resv = eval(argv);
 
     // Get the outputs
     int num_out = n_out();

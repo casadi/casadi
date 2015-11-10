@@ -2212,7 +2212,7 @@ namespace casadi {
     casadi_assert_message(m>=n, "nullspace(): expecting a flat matrix (more columns than rows), "
                           "but got " << dim() << ".");
 
-    Matrix<DataType> seed = DMatrix::eye(m)(Slice(0, m), Slice(n, m));
+    Matrix<DataType> seed = DM::eye(m)(Slice(0, m), Slice(n, m));
 
     std::vector< Matrix<DataType> > us;
     std::vector< Matrix<DataType> > betas;

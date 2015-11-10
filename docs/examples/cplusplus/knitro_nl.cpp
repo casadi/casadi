@@ -53,7 +53,7 @@ int main(int argc, char **argv){
 
   // Allocate NLP solver and buffers
   Function nlpsol = Function::nlpsol("nlpsol", "knitro", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  std::map<std::string, DM> arg, res;
 
   // Structure with bounds and initial guess
   arg["lbx"] = nl.x_lb;

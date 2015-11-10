@@ -222,13 +222,13 @@ namespace casadi {
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation
-      D[j] = lfcn(vector<DMatrix>{1.}).at(0)->front();
+      D[j] = lfcn(vector<DM>{1.}).at(0)->front();
 
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Function tfcn = lfcn.tangent();
       for (int j2=0; j2<deg+1; ++j2) {
-        C[j2][j] =  tfcn(vector<DMatrix>{tau_root[j2]}).at(0)->front();
+        C[j2][j] =  tfcn(vector<DM>{tau_root[j2]}).at(0)->front();
       }
     }
   }

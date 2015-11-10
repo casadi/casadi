@@ -80,13 +80,13 @@ public:
 				  std::map<std::string,casadi::SX> & p,
 				  casadi::SX t );
 
-     casadi::DMatrix rk4Step( casadi::DMatrix & xk,
-			      casadi::DMatrix & uk,
+     casadi::DM rk4Step( casadi::DM & xk,
+			      casadi::DM & uk,
 			      double t0,
 			      double dt);
 
-     casadi::DMatrix eulerStep( casadi::DMatrix & xk,
-				casadi::DMatrix & uk,
+     casadi::DM eulerStep( casadi::DM & xk,
+				casadi::DM & uk,
 				double t0,
 				double dt);
 

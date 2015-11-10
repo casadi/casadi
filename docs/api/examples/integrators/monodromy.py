@@ -84,7 +84,7 @@ dae={'x':x, 'p':params, 'ode':rhs}
 
 # show()
 
-# x0 = DMatrix([-3.1,0])
+# x0 = DM([-3.1,0])
 
 # #! Monodromy matrix at tf - Jacobian of integrator
 # #! ===============================================

@@ -443,13 +443,13 @@ class CasadiStructureDerivable:
   
   def argtype(self,arg):
     mtype = None
-    if isinstance(arg,DMatrix):
+    if isinstance(arg,DM):
       a = arg
-      mtype = DMatrix
+      mtype = DM
     else:
       try:
-        a = DMatrix(arg)
-        mtype = DMatrix
+        a = DM(arg)
+        mtype = DM
       except:
         pass
         
@@ -473,17 +473,17 @@ class CasadiStructureDerivable:
           a = SX(arg)
           mtype = SX
         except:
-          raise Exception("Call to Structure has weird argument: expecting DMatrix-like or MX-like or SXMatrix-like")
+          raise Exception("Call to Structure has weird argument: expecting DM-like or MX-like or SXMatrix-like")
     
     return (a,mtype)
 
   def __call__(self,arg=0):
     (a,mtype) = self.argtype(arg)
 
-    if isinstance(a,DMatrix):
+    if isinstance(a,DM):
       if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-        a = DMatrix.ones(self.size,1)*a
-      return DMatrixStruct(self,data=a)
+        a = DM.ones(self.size,1)*a
+      return DMStruct(self,data=a)
       
     if isinstance(a,MX):
       return MXStruct(self,data=a)
@@ -495,10 +495,10 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0] == self.size):
-       raise Exception("Expecting %d x n DMatrix. Got %s" % (self.size,a.dim()))  
+       raise Exception("Expecting %d x n DM. Got %s" % (self.size,a.dim()))  
     s = struct([entry("t",struct=self,repeat=a.shape[1])])
 
-    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+    for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
         numbers = c(s,data=DataReferenceRepeated(a,a.shape[1]))
    
@@ -510,11 +510,11 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-       a = DMatrix.ones(self.size,self.size)*a
+       a = DM.ones(self.size,self.size)*a
     if not(a.shape[1] == a.shape[0] and a.shape[0]==self.size):
-       raise Exception("Expecting square DMatrix of size %s. Got %s" % (self.size,a.dim()))
+       raise Exception("Expecting square DM of size %s. Got %s" % (self.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,self))])
-    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+    for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
         numbers = c(s,data=DataReferenceSquared(a,a.shape[0]))
     p = numbers.prefix["t"]
@@ -525,11 +525,11 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-       a = DMatrix.ones(self.size,otherstruct.size)*a
+       a = DM.ones(self.size,otherstruct.size)*a
     if not(a.shape[1]==otherstruct.size and a.shape[0]==self.size):
-       raise Exception("Expecting DMatrix of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dim()))
+       raise Exception("Expecting DM of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,otherstruct))])
-    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+    for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
         numbers = c(s,data=DataReferenceProduct(a,a.shape[0],a.shape[1]))
     p = numbers.prefix["t"]
@@ -540,10 +540,10 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):
-       raise Exception("Expecting square (%d) DMatrix by N. Got %s" % (self.size,a.dim()))
+       raise Exception("Expecting square (%d) DM by N. Got %s" % (self.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[1] / self.size)])
 
-    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+    for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
         numbers = c(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[1] / self.size))
 
@@ -596,7 +596,7 @@ class SetterDispatcher(Dispatcher):
             self.master[i] = payload_
             self.master[iflip] = payload_
           else:
-            oi = performExtraIndex(DMatrix.ones(entry.originalsparsity),extraIndex=extraIndex,entry=entry)
+            oi = performExtraIndex(DM.ones(entry.originalsparsity),extraIndex=extraIndex,entry=entry)
             if oi.sparsity()!=payload_.sparsity():
               raise Exception("Payload sparsity " + payload_.dim() +  " does not match lhs sparisty " + oi.dim() + "." )
             self.master[iflip] = payload_.T[iflip.sparsity()]
@@ -677,7 +677,7 @@ class Prefixer:
     self.prefix = prefix
     self.castmaster = castmaster
     
-    methods = [ "__DMatrix__", "__SX__","__MX__"]
+    methods = [ "__DM__", "__SX__","__MX__"]
     for m in methods:
       if hasattr(self.struct,m):
         setattr(self,m,self.cast)
@@ -1017,7 +1017,7 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
     for e in self.entries:
       self[e.name] = e.expr
  
-class DMatrixStruct(MatrixStruct):
+class DMStruct(MatrixStruct):
 
   def save(self,filename):
     import pickle
@@ -1034,9 +1034,9 @@ class DMatrixStruct(MatrixStruct):
     return d
     
   def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,DMatrix,data=data)
+    MatrixStruct.__init__(self,struct,DM,data=data)
     
-  def __DMatrix__(self):
+  def __DM__(self):
     return self.cat
 
 class SXStruct(MatrixStruct):

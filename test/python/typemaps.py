@@ -55,31 +55,31 @@ class typemaptests(casadiTestCase):
       #  self.checkarray(m,zt.toCsc_matrix(),"IMatrix(numpy.ndarray).toCsc_matrix()")
       
   def test_0(self):
-    self.message("Typemap array -> DMatrix")
+    self.message("Typemap array -> DM")
     arrays = [array([[1,2],[3,4],[5,6]],dtype=double),array([[3.2,4.6,9.9]])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
-      self.assertTrue(isinstance(zt,DMatrix),"DMatrix expected")
-      self.checkarray(m,zt,"DMatrix(numpy.ndarray)")
-      self.checkarray(m,zt.toArray(),"DMatrix(numpy.ndarray).toArray()")
+      self.assertTrue(isinstance(zt,DM),"DM expected")
+      self.checkarray(m,zt,"DM(numpy.ndarray)")
+      self.checkarray(m,zt.toArray(),"DM(numpy.ndarray).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(numpy.ndarray).toCsc_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DM(numpy.ndarray).toCsc_matrix()")
       
   def test_1(self):
-    self.message("DMatrix -> DMatrix")
-    arrays = [DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])]
+    self.message("DM -> DM")
+    arrays = [DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
-      self.assertTrue(isinstance(zt,DMatrix),"DMatrix expected")
-      self.checkarray(m,zt,"DMatrix(DMatrix)")
-      self.checkarray(m,zt.toArray(),"DMatrix(DMatrix).toArray()")
+      self.assertTrue(isinstance(zt,DM),"DM expected")
+      self.checkarray(m,zt,"DM(DM)")
+      self.checkarray(m,zt.toArray(),"DM(DM).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(DMatrix).toCsc_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DM(DM).toCsc_matrix()")
    
   def test_2(self):
-    self.message("crs_matrix -> DMatrix")
+    self.message("crs_matrix -> DM")
     if not(scipy_available):
       return
     arrays = [csr_matrix( ([3,2.3,8],([0,2,0],[1,1,2])), shape = (3,4), dtype=double ),
@@ -88,18 +88,18 @@ class typemaptests(casadiTestCase):
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
-      self.assertTrue(isinstance(zt,DMatrix),"DMatrix expected")
-      self.checkarray(m,zt,"DMatrix(crs_matrix)")
-      self.checkarray(m,zt.toArray(),"DMatrix(crs_matrix).toArray()")
+      self.assertTrue(isinstance(zt,DM),"DM expected")
+      self.checkarray(m,zt,"DM(crs_matrix)")
+      self.checkarray(m,zt.toArray(),"DM(crs_matrix).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(crs_matrix).toCsc_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DM(crs_matrix).toCsc_matrix()")
       
       
   def test_setget(self):
     return # get/set with return-by-reference has been dropped
-    self.message("DMatrix set/get")
+    self.message("DM set/get")
     data = n.array([3,2.3,8])
-    dm=DMatrix(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
+    dm=DM(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
     
     if scipy_available:
       c=dm.toCsc_matrix()
@@ -141,8 +141,8 @@ class typemaptests(casadiTestCase):
       self.assertRaises(TypeError,lambda :  dm.get(c))
 
   def test_conversion(self):
-    self.message("DMatrix conversions")
-    w = DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
+    self.message("DM conversions")
+    w = DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     
     list(w.nonzeros())
@@ -154,17 +154,17 @@ class typemaptests(casadiTestCase):
     if scipy_available:
       w.toCsc_matrix()
 
-    self.checkarray(DMatrix(d),d,"DMatrix(numpy.ndarray)")
-    #self.checkarray(DMatrix(array([1,2,3,4,5,6])),d.ravel(),"DMatrix(numpy.ndarray)")
-    #print DMatrix(array([1,2,3,4,5,6]))
-    #print DMatrix(array([1,2,3,6]),2,2).toArray()
+    self.checkarray(DM(d),d,"DM(numpy.ndarray)")
+    #self.checkarray(DM(array([1,2,3,4,5,6])),d.ravel(),"DM(numpy.ndarray)")
+    #print DM(array([1,2,3,4,5,6]))
+    #print DM(array([1,2,3,6]),2,2).toArray()
 
-    #print DMatrix(array([1,2,3,6]),2,2).toArray()
+    #print DM(array([1,2,3,6]),2,2).toArray()
     
   def test_autoconversion(self):
-    self.message("Auto conversion DMatrix")
+    self.message("Auto conversion DM")
     x=array([2.3])
-    s = DMatrix([[1,2],[3,4]])
+    s = DM([[1,2],[3,4]])
     n = array(s)
     
     self.checkarray(x[0]*s,s*x[0],"")
@@ -228,7 +228,7 @@ class typemaptests(casadiTestCase):
 
   def test_autoconversionMX(self):
     self.message("Auto conversion MX")
-    s = DMatrix([[1,2],[3,4]])
+    s = DM([[1,2],[3,4]])
     x = SX(3)
     y = MX(3)
     
@@ -263,7 +263,7 @@ class typemaptests(casadiTestCase):
         f_.evaluate()
         
 
-        self.checkarray(fun(f_.getOutput(),DMatrix(s)),f.getOutput(),"operation",str(f_.getOutput(0))+str(s)+":"+str(fun(f_.getOutput(),DMatrix(s)))+"->"+str(f.getOutput())+":"+str(s)+str(z)+"->"+str(r))
+        self.checkarray(fun(f_.getOutput(),DM(s)),f.getOutput(),"operation",str(f_.getOutput(0))+str(s)+":"+str(fun(f_.getOutput(),DM(s)))+"->"+str(f.getOutput())+":"+str(s)+str(z)+"->"+str(r))
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
@@ -304,7 +304,7 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: copysign(z,s))
       doit(z,s,lambda z,s: copysign(s,z))
 
-    nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
+    nums = [array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), array(4),4.0,4]
         
     ## numeric & SX
     for s in nums:
@@ -371,7 +371,7 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s==z)
       doit(z,s,lambda z,s: s!=z)
       
-    nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
+    nums = [array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), array(4),4.0,4]
         
     ## numeric & SX
     for s in nums:
@@ -402,7 +402,7 @@ class typemaptests(casadiTestCase):
         tests(z,s)
         
   def test_set(self):
-    self.message("DMatrix set on dense matrices")
+    self.message("DM set on dense matrices")
     
     # should be integers
     goallist = [1,2,3]
@@ -414,7 +414,7 @@ class typemaptests(casadiTestCase):
       "array1ddouble" : array(goallist,dtype=double),
       "array1dint" : array(goallist)
     }
-    w=DMatrix(goal)
+    w=DM(goal)
     self.checkarray(w,goal,"Constructor")
     
     for name, value in test.items():
@@ -425,32 +425,32 @@ class typemaptests(casadiTestCase):
       "array2ddouble" : array([goallist],dtype=double).T,
       "array2dint" : array([goallist]).T,
     }
-    w=DMatrix(goal)
+    w=DM(goal)
     self.checkarray(w,goal,"Constructor")
     
     for name, value in test.items():
       w.set(value)
       self.checkarray(w,goal,"name")
 
-  def test_DMatrixSXcast(self):
-    self.message("Casting DMatrix to SX")
+  def test_DMSXcast(self):
+    self.message("Casting DM to SX")
     
-    W = SX(DMatrix([[1,2,3],[4,5,6]]))
+    W = SX(DM([[1,2,3],[4,5,6]]))
 
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
 
-  def test_DMatrixMXcast(self):
-    self.message("Casting DMatrix to MX")
-    W = MX(DMatrix([[1,2,3],[4,5,6]]))
+  def test_DMMXcast(self):
+    self.message("Casting DM to MX")
+    W = MX(DM([[1,2,3],[4,5,6]]))
     
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
     
-  def test_DMatrixSX(self):
-    self.message("Casting DMatrix to SX")
+  def test_DMSX(self):
+    self.message("Casting DM to SX")
     
-    w = DMatrix([[1,2,3],[4,5,6]])
+    w = DM([[1,2,3],[4,5,6]])
     x = SX.sym("x")
     
     f = Function("f", [x],[w])
@@ -459,9 +459,9 @@ class typemaptests(casadiTestCase):
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
 
-  def test_DMatrixMX(self):
-    self.message("Casting DMatrix to MX")
-    w = DMatrix([[1,2,3],[4,5,6]])
+  def test_DMMX(self):
+    self.message("Casting DM to MX")
+    w = DM([[1,2,3],[4,5,6]])
     x = MX.sym("x")
     
     f = Function("f", [x],[w])
@@ -472,9 +472,9 @@ class typemaptests(casadiTestCase):
     self.assertEqual(W.size2(),3)
 
   def test_setgetslicetransp(self):
-    self.message("set/get on DMatrix using tranpose")
+    self.message("set/get on DM using tranpose")
     
-    w = DMatrix([[0,0],[0,0]])
+    w = DM([[0,0],[0,0]])
 
     A = matrix([[1.0,2],[3,4]])
     B = matrix([[4.0,5],[6,7]])
@@ -487,9 +487,9 @@ class typemaptests(casadiTestCase):
     
 
   def test_setgetslice(self):
-    self.message("set/get on DMatrix using slices")
+    self.message("set/get on DM using slices")
     
-    w = DMatrix([[0,0]])
+    w = DM([[0,0]])
 
     A = matrix([[1.0,2],[3,4]])
     B = matrix([[4.0,5],[6,7]])
@@ -499,7 +499,7 @@ class typemaptests(casadiTestCase):
     B[0,:] = w
     self.checkarray(B[0,:],A[0,:],"get")
     
-    w = DMatrix([[0],[0]])
+    w = DM([[0],[0]])
 
 
     w.set(A[:,0])
@@ -507,7 +507,7 @@ class typemaptests(casadiTestCase):
     B[:,0] = w
     self.checkarray(B[:,0],A[:,0],"get")
     
-    w = DMatrix([[1,2],[3,4]])
+    w = DM([[1,2],[3,4]])
     A = zeros((8,7))
     B = zeros((8,7))
     A[2:7:3,:7:4] = w
@@ -515,12 +515,12 @@ class typemaptests(casadiTestCase):
     self.checkarray(A,B,"get")
     
   def test_vertcatprecedence(self):
-    self.message("Argument precedence DMatrix")
-    a = DMatrix([1,2])
-    self.assertTrue(isinstance(vertcat([a,a]),DMatrix))
+    self.message("Argument precedence DM")
+    a = DM([1,2])
+    self.assertTrue(isinstance(vertcat([a,a]),DM))
     
-    a = DMatrix([1,2])
-    self.assertTrue(isinstance(vertcat([a,[1,2,3]]),DMatrix))
+    a = DM([1,2])
+    self.assertTrue(isinstance(vertcat([a,[1,2,3]]),DM))
     
     
     a = MX([1,2])
@@ -544,13 +544,13 @@ class typemaptests(casadiTestCase):
     self.message("std::vector<double> typemap.")
     a = array([0,2,2,3])
     b = array([0.738,0.39,0.99])
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
-    DMatrix(Sparsity(4,3,(0,2,2,3),[1,2,1]),[0.738,0.39,0.99])
-    DMatrix(Sparsity(4,3,list(a),[1,2,1]),[0.738,0.39,0.99])
-    DMatrix(Sparsity(4,3,a,[1,2,1]),[0.738,0.39,0.99])
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),(0.738,0.39,0.99))
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),list(b))
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),b)
+    DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
+    DM(Sparsity(4,3,(0,2,2,3),[1,2,1]),[0.738,0.39,0.99])
+    DM(Sparsity(4,3,list(a),[1,2,1]),[0.738,0.39,0.99])
+    DM(Sparsity(4,3,a,[1,2,1]),[0.738,0.39,0.99])
+    DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),(0.738,0.39,0.99))
+    DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),list(b))
+    DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),b)
     
   def test_imatrix(self):
     self.message("IMatrix")
@@ -558,15 +558,15 @@ class typemaptests(casadiTestCase):
     A = IMatrix.ones(2,2)
     B = A + 1
     self.assertEqual(type(B),type(A))
-    self.checkarray(array(B),repmat(DMatrix(2),2,2),"Imatrix")
+    self.checkarray(array(B),repmat(DM(2),2,2),"Imatrix")
     
   def test_issue314(self):
     self.message("regression test for #314: SX sparsity constructor")
     SX(Sparsity.diag(3),[1,2,3])
   def test_setAll_365(self):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
-    m = DMatrix.ones(5,5)
-    m.set(DMatrix(4))
+    m = DM.ones(5,5)
+    m.set(DM(4))
     m.set(IMatrix(4))
         
   def test_issue570(self):
@@ -578,26 +578,26 @@ class typemaptests(casadiTestCase):
     print casadi.SX.sym('x') + longint
     print longint + casadi.SX.sym('x')
     
-  def test_casting_DMatrix(self):
-    self.message("casting DMatrix")
+  def test_casting_DM(self):
+    self.message("casting DM")
     
     x = SX.sym("x")
     f = Function("f", [x],[x])
     class Foo:
-      def __DMatrix__(self):
-        return DMatrix([4])
+      def __DM__(self):
+        return DM([4])
         
     f.setInput(Foo())
     self.assertEqual(f.getInput(),4)
 
     class Foo:
-      def __DMatrix__(self):
+      def __DM__(self):
         return SX([4])
         
     self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
     
     class Foo:
-      def __DMatrix__(self):
+      def __DM__(self):
         raise Exception("15")
         
     self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
@@ -706,7 +706,7 @@ class typemaptests(casadiTestCase):
   def test_ufuncsum(self):
     self.message("ufunc.add")
     
-    self.checkarray(DMatrix(sum(DMatrix([1,2,3]))),DMatrix(6))
+    self.checkarray(DM(sum(DM([1,2,3]))),DM(6))
     
   def test_sxmatrix(self):
 
@@ -720,21 +720,21 @@ class typemaptests(casadiTestCase):
       print val(SX(a))
       print val(SX(a.T))
 
-      self.checkarray(val(SX(a)),DMatrix([[1,2],[3,4]]))
-      self.checkarray(val(SX(a.T).T),DMatrix([[1,2],[3,4]]))
+      self.checkarray(val(SX(a)),DM([[1,2],[3,4]]))
+      self.checkarray(val(SX(a.T).T),DM([[1,2],[3,4]]))
 
 
       a = numpy.matrix([[1,2],[3,4]])
       
       print val(SX(a))
-      print DMatrix([[1,2],[3,4]])
+      print DM([[1,2],[3,4]])
 
-      self.checkarray(val(SX(a)),DMatrix([[1,2],[3,4]]))
-      self.checkarray(val(SX(a.T).T),DMatrix([[1,2],[3,4]]))
+      self.checkarray(val(SX(a)),DM([[1,2],[3,4]]))
+      self.checkarray(val(SX(a.T).T),DM([[1,2],[3,4]]))
       
   def test_issue1158(self):
     A = numpy.zeros((0,2))
-    a = DMatrix(A)
+    a = DM(A)
     self.assertEqual(a.shape[0],0)
     self.assertEqual(a.shape[1],2)
     
@@ -751,21 +751,21 @@ class typemaptests(casadiTestCase):
       Ds+=[
           csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
           csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.int),
-          DMatrix([[1,2],[3,4]]).toCsc_matrix()
+          DM([[1,2],[3,4]]).toCsc_matrix()
       ]
 
 
     for D in Ds:
       print D
-      d = DMatrix.ones(2,2)
+      d = DM.ones(2,2)
       
       x = SX.sym("x",d.sparsity())
       f = Function("f", [x],[x])
       f.setInput(D)
 
-      self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
+      self.checkarray(f.getInput(),DM([[1,2],[3,4]]))
       d.set(D)
-      self.checkarray(d,DMatrix([[1,2],[3,4]]))
+      self.checkarray(d,DM([[1,2],[3,4]]))
 
   def test_issue1217(self):
     a = numpy.matrix([0,SX.sym("x")])
@@ -773,11 +773,11 @@ class typemaptests(casadiTestCase):
     print if_else(0,a,a)
 
   def test_issue1373(self):
-    print np.array(casadi.DMatrix([2]))
-    print np.array(casadi.DMatrix([1,2,3.0]))
+    print np.array(casadi.DM([2]))
+    print np.array(casadi.DM([1,2,3.0]))
 
   def test_None(self):
-    #self.assertFalse(None==DMatrix(3))
+    #self.assertFalse(None==DM(3))
     b = atleast_2d(None)
     with self.assertRaises(NotImplementedError):
       c = repmat(b, 1, 1)

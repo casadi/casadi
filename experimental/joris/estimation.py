@@ -107,8 +107,8 @@ states.X_ = states.V_ = [0,0,0]  # Initial state to generate the dummy measureme
 states.q_ = [0,0,0,1]            
 
 sim.setInput(states.veccat_(),"x0")
-sim.input("v")[:,imu.i_a.T] = DMatrix([sin(tsm),cos(3*tsm),sin(2*tsm)]).T
-sim.input("v")[:,imu.i_w.T] = DMatrix([cos(3*tsm),sin(7*tsm),sin(11*tsm)]).T
+sim.input("v")[:,imu.i_a.T] = DM([sin(tsm),cos(3*tsm),sin(2*tsm)]).T
+sim.input("v")[:,imu.i_w.T] = DM([cos(3*tsm),sin(7*tsm),sin(11*tsm)]).T
 
 sim.evaluate()
 
@@ -144,17 +144,17 @@ dL.init()
 
 
 # Show the lagrange basis for didactic purposes
-x = DMatrix([2,-1,4,3]) # some random numbers
+x = DM([2,-1,4,3]) # some random numbers
 
 xp = SXFunction([tau],[ mul(x.T,Le), mul(x.T,dL.eval([tau])[0]) ])
 xp.init()
-taus = DMatrix(numpy.linspace(0,1,500)).T
+taus = DM(numpy.linspace(0,1,500)).T
     
 L.setInput(1)
 L.evaluate()
 Lend = L.getOutput()  # Le at the end of the control interval
 
-dLm = numSample1D(dL,DMatrix(tau_root).T)  # d-by-d
+dLm = numSample1D(dL,DM(tau_root).T)  # d-by-d
 
 optvar = Variables()  # Decision variables we optimize for
 

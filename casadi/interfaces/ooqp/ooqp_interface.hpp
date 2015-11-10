@@ -97,7 +97,7 @@ namespace casadi {
     std::vector<double> p_;
 
     // Transpose of linear constraints
-    DMatrix AT_;
+    DM AT_;
     std::vector<int> AT_tmp_;
 
     // Print level

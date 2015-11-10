@@ -83,14 +83,14 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   g = SX::zeros(n_con);
 
   // Allocate bounds for x and primal initial guess
-  x_lb = -DMatrix::inf(x.sparsity());
-  x_ub = DMatrix::inf(x.sparsity());
-  x_init = DMatrix::zeros(x.sparsity());
+  x_lb = -DM::inf(x.sparsity());
+  x_ub = DM::inf(x.sparsity());
+  x_init = DM::zeros(x.sparsity());
 
   // Allocate bounds for g and dual initial guess
-  g_lb = -DMatrix::inf(g.sparsity());
-  g_ub = DMatrix::inf(g.sparsity());
-  lambda_init = DMatrix::zeros(g.sparsity());
+  g_lb = -DM::inf(g.sparsity());
+  g_ub = DM::inf(g.sparsity());
+  lambda_init = DM::zeros(g.sparsity());
 
   // All variables, including dependent
   vector<SXElem> v = x.data();

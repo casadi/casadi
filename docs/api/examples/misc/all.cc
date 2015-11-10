@@ -5,7 +5,7 @@ using namespace casadi;
 
 int main(int argc, char *argv[])
 {
-  DMatrix d = DMatrix::zeros(3,1);
+  DM d = DM::zeros(3,1);
 
   casadi_assert(!all(d).toScalar());
   casadi_assert(!any(d).toScalar());

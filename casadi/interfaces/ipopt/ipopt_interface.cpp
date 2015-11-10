@@ -385,7 +385,7 @@ namespace casadi {
         casadi_assert(N*N==red_hess.size());
 
         // Store to statistics
-        red_hess_ = DMatrix(Sparsity::dense(N, N), red_hess);
+        red_hess_ = DM(Sparsity::dense(N, N), red_hess);
       }
 #endif // WITH_CASADI_PATCH
     }
@@ -848,7 +848,7 @@ namespace casadi {
     }
   }
 
-  DMatrix IpoptInterface::getReducedHessian() {
+  DM IpoptInterface::getReducedHessian() {
 #ifndef WITH_SIPOPT
     casadi_error("This feature requires sIPOPT support. Please consult the CasADi documentation.");
 #else // WITH_SIPOPT

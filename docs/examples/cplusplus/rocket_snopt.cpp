@@ -79,7 +79,7 @@ int main(){
 
   // Create an NLP solver and buffers
   Function solver = Function::nlpsol("solver", "snopt", nlp);
-  std::map<std::string, DMatrix> arg, res;
+  std::map<std::string, DM> arg, res;
 
   // Bounds on u and initial condition
   arg["lbx"] = -10;

@@ -76,7 +76,7 @@ namespace casadi {
     virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
 
     /// Obtain a numeric Cholesky factorization
-    virtual DMatrix linsol_cholesky(bool tr) const;
+    virtual DM linsol_cholesky(bool tr) const;
 
     // The transpose of linear system in form (CCS)
     cs AT_;

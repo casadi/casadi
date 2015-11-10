@@ -54,9 +54,9 @@ class ImplicitFunctiontests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver)
       x=SX.sym("x",2)
-      A_ = DMatrix([[1,2],[3,2.1]])
-      C_ = DMatrix([[1.6,2.1],[1,1.3]])
-      b_ = DMatrix([0.7,0.6])
+      A_ = DM([[1,2],[3,2.1]])
+      C_ = DM([[1.6,2.1],[1,1.3]])
+      b_ = DM([0.7,0.6])
       f=Function("f", [x],[mul(A_,x)-b_, mul(C_,x)])
       solver=f.nlsol("solver", Solver, options)
       solver.evaluate()
@@ -159,7 +159,7 @@ class ImplicitFunctiontests(casadiTestCase):
       x=SX.sym("x",s)
 
       y=SX.sym("y",s)
-      y0 = DMatrix(Sparsity.diag(N),0.1)
+      y0 = DM(Sparsity.diag(N),0.1)
 
       f=Function("f", [vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
       options2 = dict(options)
@@ -194,7 +194,7 @@ class ImplicitFunctiontests(casadiTestCase):
       message = Solver
       x=SX.sym("x")
       y=SX.sym("y",2)
-      y0 = DMatrix([0.1,0.4])
+      y0 = DM([0.1,0.4])
       yy = y + y0
       n=0.2
       f=Function("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
@@ -226,7 +226,7 @@ class ImplicitFunctiontests(casadiTestCase):
       solver=f.nlsol("solver", Solver, options2)
       solver.evaluate()
       
-      self.checkarray(solver.getOutput(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
+      self.checkarray(solver.getOutput(),DM([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
       f=Function("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
@@ -234,7 +234,7 @@ class ImplicitFunctiontests(casadiTestCase):
       solver=f.nlsol("solver", Solver, options2)
       solver.evaluate()
       
-      self.checkarray(solver.getOutput(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
+      self.checkarray(solver.getOutput(),DM([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
 
   def test_implicitbug(self):
     # Total number of variables for one finite element
@@ -274,8 +274,8 @@ class ImplicitFunctiontests(casadiTestCase):
     print J.getOutput()
     print J
     
-    self.checkarray(G.getOutput(),DMatrix([2]))
-    self.checkarray(J.getOutput(),DMatrix([2]))
+    self.checkarray(G.getOutput(),DM([2]))
+    self.checkarray(J.getOutput(),DM([2]))
     
   def test_extra_outputs(self):
     x = SX.sym("x")

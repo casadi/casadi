@@ -34,11 +34,11 @@ namespace casadi {
     ibuf_.resize(self_->get_n_in());
     obuf_.resize(self_->get_n_out());
     for (int k=0; k<ibuf_.size(); ++k) {
-      input(k) = DMatrix::zeros(self_->get_input_sparsity(k));
+      input(k) = DM::zeros(self_->get_input_sparsity(k));
     }
 
     for (int k=0; k<obuf_.size(); ++k) {
-      output(k) = DMatrix::zeros(self_->get_output_sparsity(k));
+      output(k) = DM::zeros(self_->get_output_sparsity(k));
     }
   }
 

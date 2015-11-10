@@ -78,9 +78,9 @@ class Functiontests(casadiTestCase):
       
       p = Function("p", [x0,y0,x1,y1],[z0,z1])
       
-      n1 = DMatrix([4,5])
+      n1 = DM([4,5])
       N1 = 3
-      n2 = DMatrix([5,7])
+      n2 = DM([5,7])
       N2 = 8
       
 
@@ -97,9 +97,9 @@ class Functiontests(casadiTestCase):
     y2 = MX.sym("y")
     p= Function("p", [x1,y1,x2,y2],[sin(x1) + y1,sin(x2) + y2])
     
-    n1 = DMatrix([4,5])
+    n1 = DM([4,5])
     N1 = 3
-    n2 = DMatrix([5,7])
+    n2 = DM([5,7])
     N2 = 8
     
     out = p([n1,N1,n2,N2])
@@ -122,9 +122,9 @@ class Functiontests(casadiTestCase):
     [[F1],[F2]] = f.map([[x1,y1],[x2,y2]])
     p = Function("p", [x1,y1,x2,y2],[F1,F2])
     
-    n1 = DMatrix([4,5])
+    n1 = DM([4,5])
     N1 = 3
-    n2 = DMatrix([5,7])
+    n2 = DM([5,7])
     N2 = 8
   
     out = p([n1,N1,n2,N2])
@@ -185,7 +185,7 @@ class Functiontests(casadiTestCase):
     
     def test(sp):
       x = SX.sym("x",sp.size2())
-      sp2 = jacobian(mul(DMatrix.ones(sp),x),x).sparsity()
+      sp2 = jacobian(mul(DM.ones(sp),x),x).sparsity()
       self.checkarray(sp.row(),sp2.row());
       self.checkarray(sp.colind(),sp2.colind());   
 
@@ -276,7 +276,7 @@ class Functiontests(casadiTestCase):
     def test(sp):
       x = SX.sym("x",sp.size2())
       self.assertTrue(sp==sp.T)
-      f = Function("f", [x],[mul([x.T,DMatrix.ones(sp),x])])
+      f = Function("f", [x],[mul([x.T,DM.ones(sp),x])])
       J = f.hessian()
       sp2 = J.sparsity_out(0)
       self.checkarray(sp.row(),sp2.row())
@@ -365,18 +365,18 @@ class Functiontests(casadiTestCase):
     
     ret = f({"i0": 12})
 
-    self.checkarray(DMatrix([144]),ret["foo"])
-    self.checkarray(DMatrix([12]),ret["bar"])
+    self.checkarray(DM([144]),ret["foo"])
+    self.checkarray(DM([12]),ret["bar"])
 
     
     with self.assertRaises(Exception):
       f.getOutput("baz")
       
     ret = f({'i0':SX(12)})
-    self.checkarray(ret["foo"],DMatrix([144]))
-    self.checkarray(ret["bar"],DMatrix([12]))
+    self.checkarray(ret["foo"],DM([144]))
+    self.checkarray(ret["bar"],DM([12]))
     with self.assertRaises(Exception):
-      self.checkarray(ret["baz"],DMatrix([12]))
+      self.checkarray(ret["baz"],DM([12]))
               
   def test_setjacsparsity(self):
     x = MX.sym("x",4)
@@ -401,7 +401,7 @@ class Functiontests(casadiTestCase):
     n = 1
     x = SX.sym("x",n)
 
-    M = Function("M", [x],[mul((x-DMatrix(range(n))),x.T)])
+    M = Function("M", [x],[mul((x-DM(range(n))),x.T)])
     M.evaluate()
 
 
@@ -428,9 +428,9 @@ class Functiontests(casadiTestCase):
 
     random.random(())
 
-    r = [[ DMatrix([1,2]).T , 3],
-    [ DMatrix([2,1]).T , 1.7],
-    [ DMatrix([3,4.1]).T , 2.7],
+    r = [[ DM([1,2]).T , 3],
+    [ DM([2,1]).T , 1.7],
+    [ DM([3,4.1]).T , 2.7],
     ]
 
     Fref = blockcat([f(e) for e in r])
@@ -449,9 +449,9 @@ class Functiontests(casadiTestCase):
 
     random.random(())
 
-    r = [[ DMatrix([1,2]).T ],
-    [ DMatrix([2,1]).T ],
-    [ DMatrix([3,4.1]).T],
+    r = [[ DM([1,2]).T ],
+    [ DM([2,1]).T ],
+    [ DM([3,4.1]).T],
     ]
 
     Fref = blockcat([f(e) for e in r])
@@ -471,9 +471,9 @@ class Functiontests(casadiTestCase):
 
     random.random(())
 
-    r = [[ DMatrix([1,2]).T , 3],
-    [ DMatrix([2,1]).T , 1.7],
-    [ DMatrix([3,4.1]).T , 2.7],
+    r = [[ DM([1,2]).T , 3],
+    [ DM([2,1]).T , 1.7],
+    [ DM([3,4.1]).T , 2.7],
     ]
 
     Fref = blockcat([f(e) for e in r])
@@ -605,10 +605,10 @@ class Functiontests(casadiTestCase):
         Fref = Function("F",X+Y+Z+V,map(horzcat,resref))
         
         np.random.seed(0)
-        X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-        V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+        X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+        Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+        Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+        V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
         for f in [F, F.expand('expand_'+F.name())]:
           for i,e in enumerate(X_+Y_+Z_+V_):
@@ -656,10 +656,10 @@ class Functiontests(casadiTestCase):
         Fref = Function("F",X+Y+Z+V,flatresref)
         
         np.random.seed(0)
-        X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-        V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+        X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+        Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+        Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+        V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
         for f in [F, F.expand('expand_'+F.name())]:
           for i,e in enumerate(X_+Y_+Z_+V_):
@@ -704,10 +704,10 @@ class Functiontests(casadiTestCase):
         Fref = Function("F",X+Y+Z+V,map(sin,resref))
         
         np.random.seed(0)
-        X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-        V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+        X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+        Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+        Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+        V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
         name = "trial_%s_%d" % (parallelization,zi)
         F.generate(name)
@@ -766,10 +766,10 @@ class Functiontests(casadiTestCase):
         Fref = Function("F",[horzcat(X),horzcat(Y),Z,V],[acc,horzcat(bl),horzcat(cl)])
 
         np.random.seed(0)
-        X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = DMatrix(Z.sparsity(),np.random.random(Z.nnz()))
-        V_ = DMatrix(V.sparsity(),np.random.random(V.nnz()))
+        X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+        Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+        Z_ = DM(Z.sparsity(),np.random.random(Z.nnz()))
+        V_ = DM(V.sparsity(),np.random.random(V.nnz()))
 
 
         name = "trial2_%s" % parallelization
@@ -842,8 +842,8 @@ class Functiontests(casadiTestCase):
 
     Fref = Function("f",[x,z],[sumCols(sumRows(y))])
     
-    x0 = DMatrix([1,7])
-    x1 = DMatrix([[3,0],[2,4]])
+    x0 = DM([1,7])
+    x1 = DM([[3,0],[2,4]])
     F.setInput(x0)
     Fref.setInput(x0)
     F.setInput(x1,1)
@@ -865,8 +865,8 @@ class Functiontests(casadiTestCase):
 
     Fref = Function("f",[x,z],[sin(repsum((x**2).T,1,2)),(cos(x**2)*2*x).T])
 
-    x0 = DMatrix([1,7])
-    x1 = DMatrix([[3,0],[2,4]])
+    x0 = DM([1,7])
+    x1 = DM([[3,0],[2,4]])
     F.setInput(x0)
     Fref.setInput(x0)
     F.setInput(x1,1)
@@ -894,10 +894,10 @@ class Functiontests(casadiTestCase):
     V = [MX.sym("v",v.sparsity()) for i in range(n)]
 
     np.random.seed(0)
-    X_ = DMatrix(x.sparsity(),np.random.random(x.nnz()))
-    Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-    Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-    V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+    X_ = DM(x.sparsity(),np.random.random(x.nnz()))
+    Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+    Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+    V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
     F = fun.mapaccum("map",n,[True,False,False,False],[0])
 
@@ -1009,7 +1009,7 @@ class Functiontests(casadiTestCase):
 
     F = f.kernel_sum("test",(n,m),4,1,{"ad_weight": 1})
 
-    x0 = DMatrix([n/2,m/2])
+    x0 = DM([n/2,m/2])
 
     Fref = f.map("f",n*m,[True,True,False],[False])
     

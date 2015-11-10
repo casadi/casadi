@@ -46,9 +46,9 @@ q = [1,0,0,0,0]
 b = [1,1,1,1,1]
 
 X = MX.sym("x",5,1)
-P = MX(DMatrix(P))
-q = MX(DMatrix(q))
-A = MX(DMatrix(A))
+P = MX(DM(P))
+q = MX(DM(q))
+A = MX(DM(A))
 
 #! Objective
 F = 0.5*mul([X.T,P,X]) + mul(q.T,X)

@@ -16,8 +16,8 @@ from casadi import *
 N = 10000  # Number of samples
 fs = 610.1 # Sampling frequency [hz]
 
-param_truth = DMatrix([5.625e-6,2.3e-4,1,4.69])
-param_guess = DMatrix([5,2,1,5])
+param_truth = DM([5.625e-6,2.3e-4,1,4.69])
+param_guess = DM([5,2,1,5])
 scale = vertcat([1e-6,1e-4,1,1])
 
 ############ MODELING #####################
@@ -72,9 +72,9 @@ all_samples = one_sample.mapaccum("all_samples", N)
 
 # Choose an excitation signal
 numpy.random.seed(0)
-u_data = DMatrix(0.1*numpy.random.random(N))
+u_data = DM(0.1*numpy.random.random(N))
 
-x0 = DMatrix([0,0])
+x0 = DM([0,0])
 [X_measured] = all_samples([x0, u_data, repmat(param_truth,1,N) ])
 
 y_data = X_measured[0,:].T

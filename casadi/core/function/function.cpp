@@ -221,7 +221,7 @@ namespace casadi {
     return static_cast<FunctionInternal*>(OptionsFunctionality::operator->());
   }
 
-  void Function::call(const vector<DMatrix> &arg, vector<DMatrix> &res,
+  void Function::call(const vector<DM> &arg, vector<DM> &res,
                       bool always_inline, bool never_inline) {
     if (!matchingArg(arg))
       return call(replaceArg(arg), res, always_inline, never_inline);
@@ -978,9 +978,9 @@ namespace casadi {
     return (*this)->checkInputs();
   }
 
-  void Function::derivative(const DMatrixVector& arg, DMatrixVector& res,
-                          const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens,
-                          const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
+  void Function::derivative(const DMVector& arg, DMVector& res,
+                          const DMVectorVector& fseed, DMVectorVector& fsens,
+                          const DMVectorVector& aseed, DMVectorVector& asens,
                           bool always_inline, bool never_inline) {
     call(arg, res, always_inline, never_inline);
     forward(arg, res, fseed, fsens, always_inline, never_inline);
@@ -1073,9 +1073,9 @@ namespace casadi {
     (*this)->reverse_sx(arg, res, aseed, asens, always_inline, never_inline);
   }
 
-  void Function::forward(const vector<DMatrix>& arg, const vector<DMatrix>& res,
-                         const vector<vector<DMatrix> >& fseed,
-                         vector<vector<DMatrix> >& fsens,
+  void Function::forward(const vector<DM>& arg, const vector<DM>& res,
+                         const vector<vector<DM> >& fseed,
+                         vector<vector<DM> >& fsens,
                          bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
@@ -1086,9 +1086,9 @@ namespace casadi {
     (*this)->forward_dm(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
-  void Function::reverse(const vector<DMatrix>& arg, const vector<DMatrix>& res,
-                         const vector<vector<DMatrix> >& aseed,
-                         vector<vector<DMatrix> >& asens,
+  void Function::reverse(const vector<DM>& arg, const vector<DM>& res,
+                         const vector<vector<DM> >& aseed,
+                         vector<vector<DM> >& asens,
                          bool always_inline, bool never_inline) {
     checkArg(arg);
     checkRes(res);
@@ -1099,9 +1099,9 @@ namespace casadi {
     (*this)->reverse_dm(arg, res, aseed, asens, always_inline, never_inline);
   }
 
-  vector<DMatrix> Function::operator()(const vector<DMatrix>& arg,
+  vector<DM> Function::operator()(const vector<DM>& arg,
                                             bool always_inline, bool never_inline) {
-    vector<DMatrix> res;
+    vector<DM> res;
     call(arg, res, always_inline, never_inline);
     return res;
   }
@@ -1145,7 +1145,7 @@ namespace casadi {
     return ret;
   }
 
-  const DMatrixDict Function::operator()(const DMatrixDict& arg, bool always_inline,
+  const DMDict Function::operator()(const DMDict& arg, bool always_inline,
                                          bool never_inline) {
     return callMap(arg, always_inline, never_inline);
   }
@@ -1830,7 +1830,7 @@ namespace casadi {
     return (*this)->linsol_cholesky_sparsity(tr);
   }
 
-  DMatrix Function::linsol_cholesky(bool tr) const {
+  DM Function::linsol_cholesky(bool tr) const {
     return (*this)->linsol_cholesky(tr);
   }
 
@@ -1838,7 +1838,7 @@ namespace casadi {
     (*this)->linsol_spsolve(X, B, tr);
   }
 
-  void Function::linsol_spsolve(DMatrix& X, const DMatrix& B, bool tr) const {
+  void Function::linsol_spsolve(DM& X, const DM& B, bool tr) const {
     (*this)->linsol_spsolve(X, B, tr);
   }
 

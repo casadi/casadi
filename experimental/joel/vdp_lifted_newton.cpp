@@ -51,15 +51,15 @@ int main(){
   
   // Intermediate variables with initial values and bounds
   SX v, v_def;
-  DMatrix v_init, v_min, v_max;
+  DM v_init, v_min, v_max;
   
   // Initial values and bounds for the state at the different stages
-  DMatrix x_k_init =  DMatrix::zeros(nx);
-  DMatrix x_k_min  = -DMatrix::inf(nx); 
-  DMatrix x_k_max  =  DMatrix::inf(nx);
+  DM x_k_init =  DM::zeros(nx);
+  DM x_k_min  = -DM::inf(nx); 
+  DM x_k_max  =  DM::inf(nx);
   
   // Initial conditions
-  DMatrix x_0 = DMatrix::zeros(nx);
+  DM x_0 = DM::zeros(nx);
   x_0[0] = 0; // x
   x_0[1] = 1; // y
   x_0[2] = 0; // lterm
@@ -108,18 +108,18 @@ int main(){
   g.append(x_k[1]);
 
   // Bounds on g
-  DMatrix g_min = DMatrix::zeros(2);
-  DMatrix g_max = DMatrix::zeros(2);
+  DM g_min = DM::zeros(2);
+  DM g_max = DM::zeros(2);
 
   // Bounds on u and initial condition
-  DMatrix u_min  = -0.75*DMatrix::ones(nk);
-  DMatrix u_max  =  1.00*DMatrix::ones(nk);
-  DMatrix u_init =       DMatrix::zeros(nk);
-  DMatrix xv_min = vertcat(u_min,v_min);
-  DMatrix xv_max = vertcat(u_max,v_max);
-  DMatrix xv_init = vertcat(u_init,v_init);
-  DMatrix gv_min = vertcat(DMatrix::zeros(v.size()),g_min);
-  DMatrix gv_max = vertcat(DMatrix::zeros(v.size()),g_max);
+  DM u_min  = -0.75*DM::ones(nk);
+  DM u_max  =  1.00*DM::ones(nk);
+  DM u_init =       DM::zeros(nk);
+  DM xv_min = vertcat(u_min,v_min);
+  DM xv_max = vertcat(u_max,v_max);
+  DM xv_init = vertcat(u_init,v_init);
+  DM gv_min = vertcat(DM::zeros(v.size()),g_min);
+  DM gv_max = vertcat(DM::zeros(v.size()),g_max);
   
   // Formulate the full-space NLP
   SXFunction ffcn(vertcat(u,v),f);

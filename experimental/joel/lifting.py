@@ -92,10 +92,10 @@ AB  = SXFunction([u,d],[A,B])
 AB.init()
 
 # Variables
-uk = u_guess*DMatrix.ones(1)
-dk = DMatrix.zeros(xdef.size())
-xk = DMatrix.nan(xdef.size())
-fk = DMatrix.nan()
+uk = u_guess*DM.ones(1)
+dk = DM.zeros(xdef.size())
+xk = DM.nan(xdef.size())
+fk = DM.nan()
 
 # Initialize x0 by function evaluation
 Z.setInput(uk,0)

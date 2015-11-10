@@ -149,18 +149,18 @@ namespace casadi {
 
     ///@{
     // Shorthands
-    DMatrix&  x0() { return input(IVPSOL_X0);}
-    DMatrix&   p() { return input(IVPSOL_P );}
-    DMatrix&  z0() { return input(IVPSOL_Z0);}
-    DMatrix& rx0() { return input(IVPSOL_RX0);}
-    DMatrix&  rp() { return input(IVPSOL_RP);}
-    DMatrix& rz0() { return input(IVPSOL_RZ0);}
-    DMatrix&  xf() { return output(IVPSOL_XF);}
-    DMatrix&  qf() { return output(IVPSOL_QF);}
-    DMatrix&  zf() { return output(IVPSOL_ZF);}
-    DMatrix& rxf() { return output(IVPSOL_RXF);}
-    DMatrix& rqf() { return output(IVPSOL_RQF);}
-    DMatrix& rzf() { return output(IVPSOL_RZF);}
+    DM&  x0() { return input(IVPSOL_X0);}
+    DM&   p() { return input(IVPSOL_P );}
+    DM&  z0() { return input(IVPSOL_Z0);}
+    DM& rx0() { return input(IVPSOL_RX0);}
+    DM&  rp() { return input(IVPSOL_RP);}
+    DM& rz0() { return input(IVPSOL_RZ0);}
+    DM&  xf() { return output(IVPSOL_XF);}
+    DM&  qf() { return output(IVPSOL_QF);}
+    DM&  zf() { return output(IVPSOL_ZF);}
+    DM& rxf() { return output(IVPSOL_RXF);}
+    DM& rqf() { return output(IVPSOL_RQF);}
+    DM& rzf() { return output(IVPSOL_RZF);}
     ///@}
 
     /// Number of states for the forward integration
@@ -368,7 +368,7 @@ namespace casadi {
     int nZ_, nRZ_;
 
     /// Algebraic variables for the discrete time integration
-    DMatrix Z_, RZ_;
+    DM Z_, RZ_;
 
     // Tape
     std::vector<std::vector<double> > x_tape_, Z_tape_;

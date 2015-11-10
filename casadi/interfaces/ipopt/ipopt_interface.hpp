@@ -92,7 +92,7 @@ namespace casadi {
     virtual void setDefaultOptions(const std::vector<std::string>& recipes);
 
     // Get reduced Hessian
-    virtual DMatrix getReducedHessian();
+    virtual DM getReducedHessian();
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -233,7 +233,7 @@ namespace casadi {
 #ifdef WITH_SIPOPT
     bool run_sens_;
     bool compute_red_hessian_;
-    DMatrix red_hess_;
+    DM red_hess_;
 #endif // WITH_SIPOPT
 
     /// A documentation string

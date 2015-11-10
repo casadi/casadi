@@ -24,7 +24,7 @@
 from casadi import *
 
 # This pattern should work fine for unidirectional coloring
-A = DMatrix.eye(5)
+A = DM.eye(5)
 A[0,:] = 1
 
 # Unidirectional coloring
@@ -32,8 +32,8 @@ coloring = A.sparsity().uni_coloring()
 print coloring
 
 # Create a symmetric matrix with a for unidirectional coloring "bad" sparsity pattern
-A = DMatrix.eye(5)
-#A = DMatrix.zeros(5,5)
+A = DM.eye(5)
+#A = DM.zeros(5,5)
 A[:,-1] = 1
 A[-1,:] = 1
 

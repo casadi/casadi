@@ -52,16 +52,16 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
       SX g;
 
       /// Bounds on x
-      DMatrix x_lb, x_ub;
+      DM x_lb, x_ub;
 
       /// Bounds on g
-      DMatrix g_lb, g_ub;
+      DM g_lb, g_ub;
 
       /// Primal initial guess
-      DMatrix x_init;
+      DM x_init;
 
       /// Dual initial guess
-      DMatrix lambda_init;
+      DM lambda_init;
 
     ///@}
 

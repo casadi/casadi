@@ -120,7 +120,7 @@ namespace casadi {
 
   }
 
-  DMatrix CSparseCholeskyInternal::linsol_cholesky(bool tr) const {
+  DM CSparseCholeskyInternal::linsol_cholesky(bool tr) const {
     casadi_assert(L_);
     cs *L = L_->L;
     int nz = L->nzmax;
@@ -132,7 +132,7 @@ namespace casadi {
     std::copy(L->i, L->i+nz, row.begin());
     std::vector< double > data(nz);
     std::copy(L->x, L->x+nz, data.begin());
-    DMatrix ret(Sparsity(n, m, colind, row), data, false);
+    DM ret(Sparsity(n, m, colind, row), data, false);
 
     return tr ? ret.T() : ret;
   }
@@ -159,7 +159,7 @@ namespace casadi {
     if (L_) cs_nfree(L_);
     L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization
     if (L_==0) {
-      DMatrix temp = sparsify(input());
+      DM temp = sparsify(input());
       if (temp.sparsity().is_singular()) {
         stringstream ss;
         ss << "CSparseCholeskyInternal::prepare: factorization failed due "
