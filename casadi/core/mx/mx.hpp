@@ -404,11 +404,11 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    static MX jacobian(const MX& ex, const MX& arg);
-    MX zz_gradient(const MX& arg) const;
-    MX zz_tangent(const MX& arg) const;
-    MX zz_hessian(const MX& arg) const;
-    MX zz_hessian(const MX& arg, MX& g) const;
+    static MX jacobian(const MX& f, const MX& x);
+    static MX gradient(const MX& f, const MX& x);
+    static MX tangent(const MX& f, const MX& x);
+    static MX hessian(const MX& f, const MX& x);
+    static MX hessian(const MX& f, const MX& x, MX& g);
     MX zz_substitute(const MX& v, const MX& vdef) const;
     static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,

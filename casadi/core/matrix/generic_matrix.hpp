@@ -517,20 +517,20 @@ namespace casadi {
       return MatType::jacobian(ex, arg);
     }
     inline friend MatType gradient(const MatType &ex, const MatType &arg) {
-      return ex.zz_gradient(arg);
+      return MatType::gradient(ex, arg);
     }
     inline friend MatType tangent(const MatType &ex, const MatType &arg) {
-      return ex.zz_tangent(arg);
+      return MatType::tangent(ex, arg);
     }
     ///@}
 
     ///@{
     // Hessian and (optionally) gradient
     inline friend MatType hessian(const MatType &ex, const MatType &arg) {
-      return ex.zz_hessian(arg);
+      return MatType::hessian(ex, arg);
     }
     inline friend MatType hessian(const MatType &ex, const MatType &arg, MatType& output_g) {
-      return ex.zz_hessian(arg, output_g);
+      return MatType::hessian(ex, arg, output_g);
     }
     ///@}
 

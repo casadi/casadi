@@ -1712,29 +1712,29 @@ namespace casadi {
     }
   }
 
-  MX MX::jacobian(const MX &ex, const MX &arg) {
-    Function temp("helper_jacobian_MX", {arg}, {ex});
+  MX MX::jacobian(const MX &f, const MX &x) {
+    Function temp("helper_jacobian_MX", {x}, {f});
     return MX::jac(temp);
   }
 
-  MX MX::zz_gradient(const MX &arg) const {
-    Function temp("helper_gradient_MX", {arg}, {*this});
+  MX MX::gradient(const MX& f, const MX& x) {
+    Function temp("helper_gradient_MX", {x}, {f});
     return MX::grad(temp);
   }
 
-  MX MX::zz_tangent(const MX &arg) const {
-    Function temp("helper_tangent_MX", {arg}, {*this});
+  MX MX::tangent(const MX& f, const MX& x) {
+    Function temp("helper_tangent_MX", {x}, {f});
     return MX::tang(temp);
   }
 
-  MX MX::zz_hessian(const MX &arg) const {
+  MX MX::hessian(const MX& f, const MX& x) {
     MX g;
-    return hessian(*this, arg, g);
+    return hessian(f, x, g);
   }
 
-  MX MX::zz_hessian(const MX &arg, MX &g) const {
-    g = gradient(*this, arg);
-    Function gfcn("gfcn", {arg}, {g});
+  MX MX::hessian(const MX& f, const MX& x, MX &g) {
+    g = gradient(f, x);
+    Function gfcn("gfcn", {x}, {g});
     return MX::jac(gfcn, 0, 0, false, true);
   }
 

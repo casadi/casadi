@@ -413,11 +413,12 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
-    static Matrix<DataType> jacobian(const Matrix<DataType> &arg, const Matrix<DataType> &res);
-    Matrix<DataType> zz_gradient(const Matrix<DataType> &arg) const;
-    Matrix<DataType> zz_tangent(const Matrix<DataType> &arg) const;
-    Matrix<DataType> zz_hessian(const Matrix<DataType> &arg) const;
-    Matrix<DataType> zz_hessian(const Matrix<DataType> &arg, Matrix<DataType>& g) const;
+    static Matrix<DataType> jacobian(const Matrix<DataType> &f, const Matrix<DataType> &x);
+    static Matrix<DataType> gradient(const Matrix<DataType> &f, const Matrix<DataType> &x);
+    static Matrix<DataType> tangent(const Matrix<DataType> &f, const Matrix<DataType> &x);
+    static Matrix<DataType> hessian(const Matrix<DataType> &f, const Matrix<DataType> &x);
+    static Matrix<DataType> hessian(const Matrix<DataType> &f, const Matrix<DataType> &x,
+                                    Matrix<DataType>& g);
     Matrix<DataType> zz_substitute(const Matrix<DataType>& v, const Matrix<DataType>& vdef) const;
     static std::vector<Matrix<DataType> >
       zz_substitute(const std::vector<Matrix<DataType> >& ex,

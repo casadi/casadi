@@ -646,26 +646,26 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_gradient(const SX &arg) const {
-    Function temp("temp", {arg}, {*this});
+  SX SX::gradient(const SX &ex, const SX &arg) {
+    Function temp("temp", {arg}, {ex});
     return SX::grad(temp);
   }
 
   template<>
-  SX SX::zz_tangent(const SX &arg) const {
-    Function temp("temp", {arg}, {*this});
+  SX SX::tangent(const SX &ex, const SX &arg) {
+    Function temp("temp", {arg}, {ex});
     return SX::tang(temp);
   }
 
   template<>
-  SX SX::zz_hessian(const SX &arg) const {
+  SX SX::hessian(const SX &ex, const SX &arg) {
     SX g;
-    return hessian(*this, arg, g);
+    return hessian(ex, arg, g);
   }
 
   template<>
-  SX SX::zz_hessian(const SX &arg, SX &g) const {
-    g = gradient(*this, arg);
+  SX SX::hessian(const SX &ex, const SX &arg, SX &g) {
+    g = gradient(ex, arg);
     Function gfcn("gfcn", {arg}, {g});
     return SX::jac(gfcn, 0, 0, false, true);
   }

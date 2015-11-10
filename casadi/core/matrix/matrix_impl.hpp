@@ -2604,41 +2604,45 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::jacobian(const Matrix<DataType> &ex,
-                                              const Matrix<DataType> &arg) {
+  Matrix<DataType> Matrix<DataType>::jacobian(const Matrix<DataType> &f,
+                                              const Matrix<DataType> &x) {
     throw CasadiException("\"jacobian\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_gradient(const Matrix<DataType> &arg) const {
+  Matrix<DataType> Matrix<DataType>::gradient(const Matrix<DataType> &f,
+                                              const Matrix<DataType> &x) {
     throw CasadiException("\"gradient\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_tangent(const Matrix<DataType> &arg) const {
+  Matrix<DataType> Matrix<DataType>::tangent(const Matrix<DataType> &f,
+                                                const Matrix<DataType> &x) {
     throw CasadiException("\"tangent\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_hessian(const Matrix<DataType> &arg) const {
+  Matrix<DataType> Matrix<DataType>::hessian(const Matrix<DataType> &f,
+                                             const Matrix<DataType> &x) {
     throw CasadiException("\"hessian\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_hessian(const Matrix<DataType> &arg,
-                                                Matrix<DataType> &g) const {
+  Matrix<DataType> Matrix<DataType>::hessian(const Matrix<DataType> &f,
+                                             const Matrix<DataType> &x,
+                                             Matrix<DataType> &g) {
     throw CasadiException("\"hessian\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_jmtimes(const Matrix<DataType> &arg,
-                                                            const Matrix<DataType> &v,
-                                                            bool transpose_jacobian) const {
+                                                const Matrix<DataType> &v,
+                                                bool transpose_jacobian) const {
     throw CasadiException("\"jmtimes\" not defined for instantiation");
     return Matrix<DataType>();
   }
@@ -3081,11 +3085,11 @@ namespace casadi {
                                            bool reverse);
   template<> bool SX::zz_dependsOn(const SX &arg) const;
   template<> std::vector<SX > SX::zz_symvar() const;
-  template<> SX SX::jacobian(const SX &ex, const SX &arg);
-  template<> SX SX::zz_gradient(const SX &arg) const;
-  template<> SX SX::zz_tangent(const SX &arg) const;
-  template<> SX SX::zz_hessian(const SX &arg) const;
-  template<> SX SX::zz_hessian(const SX &arg, SX &g) const;
+  template<> SX SX::jacobian(const SX &f, const SX &x);
+  template<> SX SX::gradient(const SX &f, const SX &x);
+  template<> SX SX::tangent(const SX &f, const SX &x);
+  template<> SX SX::hessian(const SX &f, const SX &x);
+  template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
   template<> SX SX::zz_jmtimes(const SX &arg, const SX &v,
                                            bool transpose_jacobian) const;
   template<> SX SX::zz_taylor(const SX& x, const SX& a, int order) const;
