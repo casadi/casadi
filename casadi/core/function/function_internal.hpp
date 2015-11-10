@@ -112,11 +112,11 @@ namespace casadi {
     /** \brief  Evaluate numerically */
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
-    /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
+    /** \brief  Evaluate with symbolic scalars */
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     ///@{
-    /** \brief  Evaluate symbolically, MX type */
+    /** \brief  Evaluate with symbolic matrices */
     virtual void eval_mx(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);
     ///@}
 
