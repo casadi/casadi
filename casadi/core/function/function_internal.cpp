@@ -183,12 +183,20 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (evalD_) {
       evalD_(arg, res, iw, w, mem);
     } else {
       evalD(arg, res, iw, w, mem);
     }
+  }
+
+  void FunctionInternal::_eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalSX(arg, res, iw, w, mem);
+  }
+
+  void FunctionInternal::_eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    spFwd(arg, res, iw, w, mem);
   }
 
   void FunctionInternal::printDimensions(ostream &stream) const {
@@ -1796,7 +1804,7 @@ namespace casadi {
     for (int i=0; i<n_out(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
-    eval(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
+    evalD(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
   }
 
   Function FunctionInternal::

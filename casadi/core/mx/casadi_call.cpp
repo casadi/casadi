@@ -84,7 +84,7 @@ namespace casadi {
   }
 
   void Call::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
-    fcn_->eval(arg, res, iw, w, mem);
+    fcn_(arg, res, iw, w, mem);
   }
 
   int Call::nout() const {
@@ -96,7 +96,7 @@ namespace casadi {
   }
 
   void Call::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    fcn_->evalSX(arg, res, iw, w, mem);
+    fcn_(arg, res, iw, w, mem);
   }
 
   void Call::evalMX(const vector<MX>& arg, vector<MX>& res) {

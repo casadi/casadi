@@ -327,10 +327,7 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-  void MapReduce::evalGen(const T** arg, T** res, int* iw, T* w, void* mem,
-                          void (FunctionInternal::*eval)(const T** arg, T** res,
-                                                         int* iw, T* w, void* mem),
-                          R reduction) {
+  void MapReduce::evalGen(const T** arg, T** res, int* iw, T* w, void* mem, R reduction) {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     const T** arg1 = arg+f_.sz_arg();
@@ -368,7 +365,7 @@ namespace casadi {
 
       // Evaluate the function
       FunctionInternal *f = f_.operator->();
-      (f->*eval)(arg1, res1, iw, w, 0);
+      f_(arg1, res1, iw, w, 0);
 
       // Sum results from temporary storage to accumulator
       for (int k=0;k<num_out;++k) {
@@ -380,7 +377,7 @@ namespace casadi {
 
   void MapReduce::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
-      evalGen<double>(arg, res, iw, w, 0, &FunctionInternal::eval, std::plus<double>());
+      evalGen<double>(arg, res, iw, w, 0, std::plus<double>());
     } else {
 #ifndef WITH_OPENMP
       casadi_error("the \"impossible\" happened: " <<
@@ -408,63 +405,14 @@ namespace casadi {
   }
 
   void MapReduce::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    evalGen<SXElem>(arg, res, iw, w, mem, &FunctionInternal::evalSX, std::plus<SXElem>());
+    evalGen<SXElem>(arg, res, iw, w, mem, std::plus<SXElem>());
   }
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
   void MapReduce::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    evalGen<bvec_t>(arg, res, iw, w, mem, &FunctionInternal::spFwd, &Orring);
+    evalGen<bvec_t>(arg, res, iw, w, mem, &Orring);
   }
-
-  /**void Map::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-     evalGen<SXElem>(arg, res, iw, w);
-     }*/
-
-  /**
-     void MapReduce::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-     int num_in = f_.n_in(), num_out = f_.n_out();
-
-     // split arguments
-     std::vector< std::vector< MX > > arg_split;
-     for (int i=0;i<arg.size();++i) {
-     arg_split.push_back(horzsplit(arg[i], f_.input(i).size2()));
-     }
-
-     std::vector< std::vector<MX> > ret(n_);
-
-     // call the original function
-     for (int i=0; i<n_; ++i) {
-     std::vector< MX > argi;
-     for (int j=0;j<arg.size();++j) {
-     if (repeat_in_[j]) {
-     argi.push_back(arg_split[j][i]);
-     } else {
-     argi.push_back(arg_split[j][0]);
-     }
-     }
-     const_cast<Function&>(f_)->call(argi, ret[i], false, false);
-     }
-
-     ret = transpose(ret);
-
-     res.resize(num_out);
-
-     std::vector<MX> ret_cat;
-     for (int i=0;i<num_out;++i) {
-     if (repeat_out_[i]) {
-     res[i] = horzcat(ret[i]);
-     } else {
-     MX sum = 0;
-     for (int j=0;j<ret[i].size();++j) {
-     sum += ret[i][j];
-     }
-     res[i] = sum;
-     }
-     }
-
-     }
-  */
 
   Function MapReduce
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {

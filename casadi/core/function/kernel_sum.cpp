@@ -136,7 +136,7 @@ namespace casadi {
     value[0] = 0;
 
     // Evaluate the function
-    f_->spFwd(arg1, res1, iw, w, 0);
+    f_(arg1, res1, iw, w, 0);
 
     // Sum results from temporary storage to accumulator
     for (int k=0;k<num_out;++k) {
@@ -204,7 +204,7 @@ namespace casadi {
         value[0] = V[I+J*size_.first];
 
         // Evaluate the function
-        f_->eval(arg1, res1, iw, w, 0);
+        f_(arg1, res1, iw, w, 0);
 
         // Sum results from temporary storage to accumulator
         for (int k=0;k<num_out;++k) {

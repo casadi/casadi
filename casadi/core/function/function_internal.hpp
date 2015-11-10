@@ -109,9 +109,6 @@ namespace casadi {
     /** \brief  Reset the sparsity propagation */
     virtual void spInit(bool fwd) {}
 
-    /** \brief  Evaluate numerically, possibly using just-in-time compilation */
-    void eval(const double** arg, double** res, int* iw, double* w, void* mem);
-
     /** \brief  Evaluate numerically */
     virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
@@ -128,6 +125,13 @@ namespace casadi {
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
     virtual void eval_mx(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);
+    ///@}
+
+    ///@{
+    /** \brief Evaluate a function, overloaded */
+    void _eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    void _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    void _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
     ///@}
 
     ///@{

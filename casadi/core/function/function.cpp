@@ -454,8 +454,8 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
     // Call memory-less
-    (*this)->eval(getPtr(arg), getPtr(res),
-                  getPtr((*this)->iw_tmp_), getPtr((*this)->w_tmp_), 0);
+    (*this)->evalD(getPtr(arg), getPtr(res),
+                   getPtr((*this)->iw_tmp_), getPtr((*this)->w_tmp_), 0);
   }
 
   int Function::n_in() const {
@@ -1036,7 +1036,7 @@ namespace casadi {
   }
 
   void Function::operator()(const double** arg, double** res, int* iw, double* w, void* mem) {
-    (*this)->eval(arg, res, iw, w, mem);
+    (*this)->evalD(arg, res, iw, w, mem);
   }
 
   void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {

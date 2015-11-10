@@ -172,7 +172,7 @@ namespace casadi {
     }
 
     // Evaluate the corresponding function
-    fk->eval(arg+1, res, iw, w, 0);
+    fk(arg+1, res, iw, w, 0);
   }
 
   Function Switch
