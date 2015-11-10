@@ -79,9 +79,6 @@ namespace casadi {
       return new IpoptInterface(name, nlp);
     }
 
-    // Free Ipopt related memory
-    void freeIpopt();
-
     // Initialize the solver
     virtual void init();
 
@@ -122,7 +119,7 @@ namespace casadi {
     Sparsity jacg_sp_, hesslag_sp_;
 
     // Current solution
-    double *xk_, lam_fk_, *lam_gk_;
+    double *xk_, lam_fk_, *lam_gk_, *lam_xk_;
 
     // Trigger recalculation?
     bool new_x_, new_lam_f_, new_lam_g_;
@@ -210,8 +207,6 @@ namespace casadi {
                            const std::map<std::string, std::vector<std::string> >& con_string_md,
                            const std::map<std::string, std::vector<int> >& con_integer_md,
                            const std::map<std::string, std::vector<double> >& con_numeric_md);
-
-    static void timingSummary(std::vector<std::tuple<std::string, int, DiffTime> >& xs);
 
     // Accumulated time since last reset:
     double t_calc_f_; // time spent in calc_f

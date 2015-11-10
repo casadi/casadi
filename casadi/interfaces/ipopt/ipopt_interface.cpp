@@ -161,7 +161,7 @@ namespace casadi {
     }
   }
 
-  void IpoptInterface::freeIpopt() {
+  IpoptInterface::~IpoptInterface() {
     // Free sensitivity application (or rather, the smart pointer holding it)
 #ifdef WITH_SIPOPT
     if (app_sens_ != 0) {
@@ -183,14 +183,7 @@ namespace casadi {
     }
   }
 
-  IpoptInterface::~IpoptInterface() {
-    freeIpopt();
-  }
-
   void IpoptInterface::init() {
-    // Free existing IPOPT instance
-    freeIpopt();
-
     // Call the init method of the base class
     Nlpsol::init();
 
@@ -209,13 +202,6 @@ namespace casadi {
       compute_red_hessian_ = false;
     }
 #endif // WITH_SIPOPT
-
-    // Get/generate required functions
-    gradF();
-    jacG();
-    if (exact_hessian_) {
-      hessLag();
-    }
 
     // Start an IPOPT application
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
@@ -308,6 +294,7 @@ namespace casadi {
     // Allocate work vectors
     alloc_w(nx_, true); // xk_
     alloc_w(ng_, true); // lam_gk_
+    alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
     alloc_w(nx_, true); // grad_fk_
     alloc_w(jacg_sp_.nnz(), true); // jac_gk_
@@ -323,6 +310,7 @@ namespace casadi {
     // Work vectors
     xk_ = w; w += nx_;
     lam_gk_ = w; w += ng_;
+    lam_xk_ = w; w += nx_;
     gk_ = w; w += ng_;
     grad_fk_ = w; w += nx_;
     jac_gk_ = w; w += jacg_sp_.nnz();
@@ -335,26 +323,6 @@ namespace casadi {
   }
 
   void IpoptInterface::solve(void* mem) {
-    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
-      const double *v;
-      switch (i) {
-      case NLPSOL_X0: v = x0_; break;
-      case NLPSOL_P: v = p_; break;
-      case NLPSOL_LBX: v = lbx_; break;
-      case NLPSOL_UBX: v = ubx_; break;
-      case NLPSOL_LBG: v = lbg_; break;
-      case NLPSOL_UBG: v = ubg_; break;
-      case NLPSOL_LAM_X0: v = lam_x0_; break;
-      case NLPSOL_LAM_G0: v = lam_g0_; break;
-      default: casadi_assert(0);
-      }
-      if (v) {
-        setInputNZ(v, i);
-      } else {
-        setInput(0., i);
-      }
-    }
-
     // Check the provided inputs
     checkInputs(mem);
 
@@ -423,6 +391,13 @@ namespace casadi {
     }
 #endif // WITH_SIPOPT
 
+    // Save results to outputs
+    casadi_copy(&fk_, 1, f_);
+    casadi_copy(xk_, nx_, x_);
+    casadi_copy(lam_gk_, ng_, lam_g_);
+    casadi_copy(lam_xk_, nx_, lam_x_);
+    casadi_copy(gk_, ng_, g_);
+
     if (status == Solve_Succeeded)
       stats_["return_status"] = "Solve_Succeeded";
     if (status == Solved_To_Acceptable_Level)
@@ -473,20 +448,6 @@ namespace casadi {
     stats_["n_eval_callback"] = n_eval_callback_;
 
     stats_["iter_count"] = n_iter_-1;
-
-    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-      double **v;
-      switch (i) {
-      case NLPSOL_X: v = &x_; break;
-      case NLPSOL_F: v = &f_; break;
-      case NLPSOL_G: v = &g_; break;
-      case NLPSOL_LAM_X: v = &lam_x_; break;
-      case NLPSOL_LAM_G: v = &lam_g_; break;
-      case NLPSOL_LAM_P: v = &lam_p_; break;
-      default: casadi_assert(0);
-      }
-      if (*v) getOutputNZ(*v, i);
-    }
   }
 
   bool IpoptInterface::intermediate_callback(
@@ -514,15 +475,12 @@ namespace casadi {
       Timer time0 = getTimerTime();
       if (!fcallback_.isNull()) {
         if (full_callback) {
-          if (!output(NLPSOL_X).is_empty()) copy(x, x+nx_, output(NLPSOL_X)->begin());
-
-          vector<double>& lambda_x = output(NLPSOL_LAM_X).data();
-          for (int i=0; i<lambda_x.size(); ++i) {
-            lambda_x[i] = z_U[i]-z_L[i];
+          casadi_copy(x, nx_, xk_);
+          for (int i=0; i<nx_; ++i) {
+            lam_xk_[i] = z_U[i]-z_L[i];
           }
-          if (!output(NLPSOL_LAM_G).is_empty())
-            copy(lambda, lambda+ng_, output(NLPSOL_LAM_G)->begin());
-          if (!output(NLPSOL_G).is_empty()) copy(g, g+ng_, output(NLPSOL_G)->begin());
+          casadi_copy(lambda, ng_, lam_gk_);
+          casadi_copy(g, ng_, gk_);
         } else {
           if (iter==0) {
             userOut<true, PL_WARN>()
@@ -551,9 +509,9 @@ namespace casadi {
         arg_[NLPSOL_X] = x;
         arg_[NLPSOL_F] = &obj_value;
         arg_[NLPSOL_G] = g;
-        arg_[NLPSOL_LAM_P] = output(NLPSOL_LAM_P).ptr();
-        arg_[NLPSOL_LAM_X] = output(NLPSOL_LAM_X).ptr();
-        arg_[NLPSOL_LAM_G] = output(NLPSOL_LAM_G).ptr();
+        arg_[NLPSOL_LAM_P] = 0;
+        arg_[NLPSOL_LAM_X] = lam_xk_;
+        arg_[NLPSOL_LAM_G] = lam_gk_;
 
         // Outputs
         fill_n(res_, fcallback_.n_out(), nullptr);
@@ -586,22 +544,23 @@ namespace casadi {
                                         int iter_count) {
     try {
       // Get primal solution
-      copy(x, x+nx_, output(NLPSOL_X)->begin());
+      casadi_copy(x, nx_, xk_);
 
       // Get optimal cost
-      output(NLPSOL_F).at(0) = obj_value;
+      fk_ = obj_value;
 
       // Get dual solution (simple bounds)
-      vector<double>& lambda_x = output(NLPSOL_LAM_X).data();
-      for (int i=0; i<lambda_x.size(); ++i) {
-        lambda_x[i] = z_U[i]-z_L[i];
+      if (lam_xk_) {
+        for (int i=0; i<nx_; ++i) {
+          lam_xk_[i] = z_U[i]-z_L[i];
+        }
       }
 
       // Get dual solution (nonlinear bounds)
-      copy(lambda, lambda+ng_, output(NLPSOL_LAM_G)->begin());
+      casadi_copy(lambda, ng_, lam_gk_);
 
       // Get the constraints
-      copy(g, g+ng_, output(NLPSOL_G)->begin());
+      casadi_copy(g, ng_, gk_);
 
       // Get statistics
       stats_["iter_count"] = iter_count;
@@ -616,10 +575,10 @@ namespace casadi {
     try {
       casadi_assert(n == nx_);
       casadi_assert(m == ng_);
-      input(NLPSOL_LBX).getNZ(x_l);
-      input(NLPSOL_UBX).getNZ(x_u);
-      input(NLPSOL_LBG).getNZ(g_l);
-      input(NLPSOL_UBG).getNZ(g_u);
+      casadi_copy(lbx_, nx_, x_l);
+      casadi_copy(ubx_, nx_, x_u);
+      casadi_copy(lbg_, ng_, g_l);
+      casadi_copy(ubg_, ng_, g_u);
       return true;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_bounds_info failed: " << ex.what() << endl;
@@ -632,29 +591,27 @@ namespace casadi {
                                          int m, bool init_lambda,
                                          double* lambda) {
     try {
-      bool warmstart = hasSetOption("warm_start_init_point") &&
-          option("warm_start_init_point")=="yes";
-      //casadi_assert_warning(init_x, "Not initializing x");
-      if (warmstart) {
-        //casadi_assert_warning(init_lambda, "Not initializing lambda");
-        //casadi_assert_warning(init_z, "Not initializing z");
-      }
-
+      // Initialize primal variables
       if (init_x) {
-        input(NLPSOL_X0).getNZ(x);
+        casadi_copy(x0_, nx_, x);
       }
 
+      // Initialize dual variables (simple bounds)
       if (init_z) {
-        // Get dual solution (simple bounds)
-        vector<double>& lambda_x = input(NLPSOL_LAM_X0).data();
-        for (int i=0; i<lambda_x.size(); ++i) {
-          z_L[i] = max(0., -lambda_x[i]);
-          z_U[i] = max(0., lambda_x[i]);
+        if (lam_x0_) {
+          for (int i=0; i<nx_; ++i) {
+            z_L[i] = max(0., -lam_x0_[i]);
+            z_U[i] = max(0., lam_x0_[i]);
+          }
+        } else {
+          casadi_fill(z_L, nx_, 0.);
+          casadi_fill(z_U, nx_, 0.);
         }
       }
 
+      // Initialize dual variables (nonlinear bounds)
       if (init_lambda) {
-        input(NLPSOL_LAM_G0).getNZ(lambda);
+        casadi_copy(lam_g0_, ng_, lambda);
       }
 
       return true;
@@ -666,20 +623,18 @@ namespace casadi {
 
   void IpoptInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag) {
     try {
-      n = nx_;               // number of variables
-      m = ng_;               // number of constraints
+      // Number of variables
+      n = nx_;
 
-      // Get Jacobian sparsity pattern
-      if (nlp_.output(NL_G).nnz()==0)
-        nnz_jac_g = 0;
-      else
-        nnz_jac_g = jacG().nnz_out(0);
+      // Number of constraints
+      m = ng_;
 
-      // Get Hessian sparsity pattern
-      if (exact_hessian_)
-        nnz_h_lag = hessLag().sparsity_out(0).nnz_upper();
-      else
-        nnz_h_lag = 0;
+      // Number of Jacobian nonzeros
+      nnz_jac_g = ng_==0 ? 0 : jacg_sp_.nnz();
+
+      // Number of Hessian nonzeros (only upper triangular half)
+      nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz_upper() : 0;
+
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_nlp_info failed: " << ex.what() << endl;
     }
@@ -904,95 +859,6 @@ namespace casadi {
     return red_hess_;
 #endif // WITH_SIPOPT
 #endif // WITH_CASADI_PATCH
-
-  }
-
-  // Convert a float to a string of an exact length.
-  // First it tries fixed precision, then falls back to exponential notation.
-  //
-  // todo(jaeandersson,jgillis): needs either review or unit tests
-  // because it throws exceptions if it fail.
-  std::string formatFloat(double x, int totalWidth, int maxPrecision, int fallbackPrecision) {
-    std::ostringstream out0;
-    out0 << fixed << setw(totalWidth) << setprecision(maxPrecision) << x;
-    std::string ret0 = out0.str();
-    if (ret0.length() == totalWidth) {
-      return ret0;
-    } else if (ret0.length() > totalWidth) {
-      std::ostringstream out1;
-      out1 << setw(totalWidth) << setprecision(fallbackPrecision) << x;
-      std::string ret1 = out1.str();
-      if (ret1.length() != totalWidth)
-        casadi_error(
-          "ipopt timing formatting fallback is bugged, sorry about that."
-          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
-          << ", string: \"" << ret1 << "\", number: " << x);
-      return ret1;
-    } else {
-      casadi_error("ipopt timing formatting is bugged, sorry about that.");
-    }
-  }
-
-  // Print out a beautiful timing summary.
-  // Will print one row per tuple in the input vector.
-  // The tuple must contain {name, # evals, total time in seconds}.
-  void IpoptInterface::timingSummary(
-    std::vector<std::tuple<std::string, int, DiffTime> > & xs) {
-    // get padding of names
-    int maxNameLen = 0;
-    for (int k=0; k < xs.size(); ++k) {
-      const int len = std::get<0>(xs[k]).length();
-      maxNameLen = max(maxNameLen, len);
-    }
-
-    std::ostringstream out;
-    std::string blankName(maxNameLen, ' ');
-    out
-      << blankName
-      << "      user           real      num           mean             mean"
-      << endl << blankName
-      << "      time           time     evals       user time        real time"
-      << endl;
-    for (int k=0; k < xs.size(); ++k) {
-      const std::tuple<std::string, int, DiffTime> x = xs[k];
-      const std::string name = std::get<0>(x);
-      const int n = std::get<1>(x);
-      DiffTime dt = std::get<2>(x);
-
-      // don't print out this row if there were 0 calls
-      if (n == 0)
-        continue;
-
-      out
-        << setw(maxNameLen) << name << " "
-        << formatFloat(dt.user, 9, 3, 3) << " [s]  "
-        << formatFloat(dt.real, 9, 3, 3) << " [s]";
-      if (n == -1) {
-        // things like main loop don't have # evals
-        out << endl;
-      } else {
-        out
-          << " "
-          << setw(5) << n;
-        if (n < 2) {
-          out << endl;
-        } else {
-          // only print averages if there is more than 1 eval
-          out
-            << " "
-            << formatFloat(1000.0*dt.user/n, 10, 2, 3) << " [ms]  "
-            << formatFloat(1000.0*dt.real/n, 10, 2, 3) << " [ms]"
-            << endl;
-        }
-      }
-    }
-    // I'm worried that the following will set stdout stream state:
-    // userOut() << out;
-
-    // Just convert it to a string first to be safe.
-    // todo(jaeandersson/jgillis): please review.
-    const std::string ret = out.str();
-    userOut() << ret;
   }
 
   void IpoptInterface::set_x(const double *x) {
