@@ -105,10 +105,10 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(const std::vector< DMatrix
-> &arg, const std::vector< DMatrix > &res, const std::vector< std::vector<
-DMatrix > > &aseed, std::vector< std::vector< DMatrix > > &output_asens,
-bool always_inline=false, bool never_inline=false) "
+%feature("docstring")  casadi::Function::reverse(const std::vector< DM >
+&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
+&aseed, std::vector< std::vector< DM > > &output_asens, bool
+always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, reverse mode.
 
@@ -288,10 +288,10 @@ Create call to (cached) derivative function, forward mode.
 
 ";
 
-%feature("docstring")  casadi::Function::forward(const std::vector< DMatrix
-> &arg, const std::vector< DMatrix > &res, const std::vector< std::vector<
-DMatrix > > &fseed, std::vector< std::vector< DMatrix > > &output_fsens,
-bool always_inline=false, bool never_inline=false) "
+%feature("docstring")  casadi::Function::forward(const std::vector< DM >
+&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
+&fseed, std::vector< std::vector< DM > > &output_fsens, bool
+always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, forward mode.
 
@@ -1394,18 +1394,17 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::derivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
+%feature("docstring")  casadi::Function::derivative(const DMVector &arg,
+DMVector &output_res, const DMVectorVector &fseed, DMVectorVector
+&output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
 
 ";
 
@@ -1752,8 +1751,8 @@ Create a solve node.
 
 ";
 
-%feature("docstring")  casadi::Callback::eval(const std::vector< DMatrix >
-&arg) "
+%feature("docstring")  casadi::Callback::eval(const std::vector< DM > &arg)
+"
 
 Evaluate numerically, temporary matrices and work vectors.
 
@@ -2846,7 +2845,7 @@ Get the type name of a certain option.
 // File: classcasadi_1_1Constant.xml
 
 
-// File: classcasadi_1_1ConstantDMatrix.xml
+// File: classcasadi_1_1ConstantDM.xml
 
 
 // File: classcasadi_1_1ConstantMX.xml
@@ -4098,18 +4097,17 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::Function::derivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
+%feature("docstring")  casadi::Function::derivative(const DMVector &arg,
+DMVector &output_res, const DMVectorVector &fseed, DMVectorVector
+&output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
 
 ";
 
@@ -4347,10 +4345,10 @@ Create call to (cached) derivative function, forward mode.
 
 ";
 
-%feature("docstring")  casadi::Function::forward(const std::vector< DMatrix
-> &arg, const std::vector< DMatrix > &res, const std::vector< std::vector<
-DMatrix > > &fseed, std::vector< std::vector< DMatrix > > &output_fsens,
-bool always_inline=false, bool never_inline=false) "
+%feature("docstring")  casadi::Function::forward(const std::vector< DM >
+&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
+&fseed, std::vector< std::vector< DM > > &output_fsens, bool
+always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, forward mode.
 
@@ -4919,10 +4917,10 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(const std::vector< DMatrix
-> &arg, const std::vector< DMatrix > &res, const std::vector< std::vector<
-DMatrix > > &aseed, std::vector< std::vector< DMatrix > > &output_asens,
-bool always_inline=false, bool never_inline=false) "
+%feature("docstring")  casadi::Function::reverse(const std::vector< DM >
+&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
+&aseed, std::vector< std::vector< DM > > &output_asens, bool
+always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, reverse mode.
 
@@ -7428,7 +7426,7 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 %feature("docstring")  casadi::Matrix< DataType >::toSlice(bool ind1=false)
 const  "
 
-Convert to Slice (only for IMatrix)
+Convert to Slice (only for IM)
 
 ";
 
@@ -7457,7 +7455,7 @@ Get the sparsity pattern.
 %feature("docstring")  casadi::Matrix< DataType >::isSlice(bool ind1=false)
 const  "
 
-Is the Matrix a Slice (only for IMatrix)
+Is the Matrix a Slice (only for IM)
 
 ";
 
@@ -7780,7 +7778,7 @@ Get strings corresponding to the nonzeros and the interdependencies.
 
 %feature("docstring") casadi::Matrix "
 
-Sparse matrix class. SX and DMatrix are specializations.
+Sparse matrix class. SX and DM are specializations.
 
 General sparse matrix class that is designed with the idea that \"everything
 is a matrix\", that is, also scalars and vectors. This philosophy makes it
@@ -9341,7 +9339,7 @@ Get the value (only for constant nodes)
 
 %feature("docstring")  casadi::MX::mapping() const  "
 
-Get an IMatrix representation of a GetNonzeros or SetNonzeros node.
+Get an IM representation of a GetNonzeros or SetNonzeros node.
 
 ";
 
@@ -10274,10 +10272,10 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
-%feature("docstring")  casadi::Function::reverse(const std::vector< DMatrix
-> &arg, const std::vector< DMatrix > &res, const std::vector< std::vector<
-DMatrix > > &aseed, std::vector< std::vector< DMatrix > > &output_asens,
-bool always_inline=false, bool never_inline=false) "
+%feature("docstring")  casadi::Function::reverse(const std::vector< DM >
+&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
+&aseed, std::vector< std::vector< DM > > &output_asens, bool
+always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, reverse mode.
 
@@ -11757,18 +11755,17 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::Function::derivative(const DMatrixVector
-&arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
-DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
-DMatrixVectorVector &output_asens, bool always_inline=false, bool
-never_inline=false) " [INTERNAL]  Evaluate the function symbolically or
-numerically with directional derivatives The first two arguments are the
-nondifferentiated inputs and results of the evaluation, the next two
-arguments are a set of forward directional seeds and the resulting forward
-directional derivatives, the length of the vector being the number of
-forward directions. The next two arguments are a set of adjoint directional
-seeds and the resulting adjoint directional derivatives, the length of the
-vector being the number of adjoint directions.
+%feature("docstring")  casadi::Function::derivative(const DMVector &arg,
+DMVector &output_res, const DMVectorVector &fseed, DMVectorVector
+&output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens,
+bool always_inline=false, bool never_inline=false) " [INTERNAL]  Evaluate
+the function symbolically or numerically with directional derivatives The
+first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions.
 
 ";
 
@@ -11942,10 +11939,10 @@ Create call to (cached) derivative function, forward mode.
 
 ";
 
-%feature("docstring")  casadi::Function::forward(const std::vector< DMatrix
-> &arg, const std::vector< DMatrix > &res, const std::vector< std::vector<
-DMatrix > > &fseed, std::vector< std::vector< DMatrix > > &output_fsens,
-bool always_inline=false, bool never_inline=false) "
+%feature("docstring")  casadi::Function::forward(const std::vector< DM >
+&arg, const std::vector< DM > &res, const std::vector< std::vector< DM > >
+&fseed, std::vector< std::vector< DM > > &output_fsens, bool
+always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, forward mode.
 
@@ -12295,7 +12292,7 @@ Default constructor - all elements.
 
 %feature("docstring") casadi::Slice::Slice(int i, bool ind1=false) "
 
-A single element (explicit to avoid ambiguity with IMatrix overload.
+A single element (explicit to avoid ambiguity with IM overload.
 
 ";
 
@@ -13877,8 +13874,8 @@ will have a size smaller than incr.
 
 ::
 
-  >>> print vertsplit(DMatrix([0,1,2,3,4]),2)
-  [DMatrix([0, 1]), DMatrix([2, 3]), DMatrix(4)]
+  >>> print vertsplit(DM([0,1,2,3,4]),2)
+  [DM([0, 1]), DM([2, 3]), DM(4)]
   
 
 
@@ -14368,6 +14365,12 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
+%feature("docstring")  casadi::matrixName() "
+
+Get typename.
+
+";
+
 %feature("docstring")  casadi::iszero(double x) " [INTERNAL]  Check if entry
 is zero (false negative allowed)
 
@@ -14409,11 +14412,8 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring")  casadi::matrixName() "
-
-Get typename.
-
-";
+%feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp,
+bool hcat=false) " [INTERNAL] ";
 
 %feature("docstring")  casadi::is_regular(const std::vector< T > &v) "
 

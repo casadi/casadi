@@ -1,7 +1,7 @@
 %exception  casadi::Function::checkInputs() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::derivative(const DMatrixVector &arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed, DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed, DMatrixVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
+%exception  casadi::Function::derivative(const DMVector &arg, DMVector &output_res, const DMVectorVector &fseed, DMVectorVector &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::derivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
@@ -191,6 +191,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ptrVec(std::vector< std::vector< T > > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::replaceMat(const M &arg, const Sparsity &inp, bool hcat=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::timerPlusEq(DiffTime &t, const DiffTime diff) {

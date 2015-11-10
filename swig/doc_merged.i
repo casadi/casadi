@@ -78,7 +78,7 @@ Get input dimension.
 
 >  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.reverse([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] aseed,[[DMatrix ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, reverse mode.
@@ -210,7 +210,7 @@ propagating_sparsity.cpp)
 
 >  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
 
->  void Function.forward([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] fseed,[[DMatrix ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void Function.forward([DM ] arg, [DM ] res, [[DM ] ] fseed,[[DM ] ] output_fsens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, forward mode.
@@ -383,7 +383,7 @@ length of iw field.
 
 %feature("docstring") casadi::Callback::getOutput "
 
->  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
+>  DM  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -393,7 +393,7 @@ Parameters:
 
 oind:  index within the range [0..n_out()-1]
 
->  DMatrix  IOInterface< Function  >.getOutput(str oname) const
+>  DM  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -866,7 +866,7 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::Callback::derivative "
 
->  void Function.derivative([DMatrix] arg, [DMatrix] &output_res, [DMatrixVector] fseed, [DMatrixVector] &output_fsens, [DMatrixVector] aseed, [DMatrixVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void Function.derivative([DM] arg, [DM] &output_res, [DMVector] fseed, [DMVector] &output_fsens, [DMVector] aseed, [DMVector] &output_asens, bool always_inline=false, bool never_inline=false)
 
 >  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
 
@@ -1605,7 +1605,7 @@ Access the objective gradient function for an NLP solver
 
 %feature("docstring") casadi::Callback::getInput "
 
->  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
+>  DM  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -1615,7 +1615,7 @@ Parameters:
 
 iind:  index within the range [0..n_in()-1]
 
->  DMatrix  IOInterface< Function  >.getInput(str iname) const
+>  DM  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -2056,7 +2056,7 @@ Get the type name of a certain option.
 // File: classcasadi_1_1Constant.xml
 
 
-// File: classcasadi_1_1ConstantDMatrix.xml
+// File: classcasadi_1_1ConstantDM.xml
 
 
 // File: classcasadi_1_1ConstantMX.xml
@@ -2841,7 +2841,7 @@ Get the number of atomic operations.
 
 %feature("docstring") casadi::Function::getOutput "
 
->  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
+>  DM  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -2851,7 +2851,7 @@ Parameters:
 
 oind:  index within the range [0..n_out()-1]
 
->  DMatrix  IOInterface< Function  >.getOutput(str oname) const
+>  DM  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -3026,7 +3026,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring") casadi::Function::derivative "
 
->  void Function.derivative([DMatrix] arg, [DMatrix] &output_res, [DMatrixVector] fseed, [DMatrixVector] &output_fsens, [DMatrixVector] aseed, [DMatrixVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void Function.derivative([DM] arg, [DM] &output_res, [DMVector] fseed, [DMVector] &output_fsens, [DMVector] aseed, [DMVector] &output_asens, bool always_inline=false, bool never_inline=false)
 
 >  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
 
@@ -3143,7 +3143,7 @@ ownership, only weak references to the derivatives are kept internally.
 
 >  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
 
->  void Function.forward([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] fseed,[[DMatrix ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void Function.forward([DM ] arg, [DM ] res, [[DM ] ] fseed,[[DM ] ] output_fsens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, forward mode.
@@ -3508,7 +3508,7 @@ Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 %feature("docstring") casadi::Function::getInput "
 
->  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
+>  DM  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -3518,7 +3518,7 @@ Parameters:
 
 iind:  index within the range [0..n_in()-1]
 
->  DMatrix  IOInterface< Function  >.getInput(str iname) const
+>  DM  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -3592,7 +3592,7 @@ Get the documentation string for a plugin
 
 >  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.reverse([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] aseed,[[DMatrix ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, reverse mode.
@@ -5275,7 +5275,7 @@ Get the elements numerically.
 
 >  void array(DataType) .getNZ(array(DataType) output_m, bool ind1, Slice k) const
 
->  void array(DataType) .getNZ(array(DataType) output_m, bool ind1, IMatrix k) const 
+>  void array(DataType) .getNZ(array(DataType) output_m, bool ind1, IM k) const 
 ------------------------------------------------------------------------
 
 Get a set of nonzeros
@@ -5349,7 +5349,7 @@ Get the elements numerically.
 
 >  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, IMatrix rr)
+>  void array(DataType) .set(array(DataType) m, bool ind1, IM rr)
 
 >  void array(DataType) .set(array(DataType) m, bool ind1, Sparsity sp)
 ------------------------------------------------------------------------
@@ -5358,11 +5358,11 @@ Set a submatrix, single argument
 
 >  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr, Slice cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr, IMatrix cc)
+>  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr, IM cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, IMatrix rr, Slice cc)
+>  void array(DataType) .set(array(DataType) m, bool ind1, IM rr, Slice cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, IMatrix rr, IMatrix cc)
+>  void array(DataType) .set(array(DataType) m, bool ind1, IM rr, IM cc)
 ------------------------------------------------------------------------
 
 Set a submatrix, two arguments
@@ -5402,7 +5402,7 @@ Get the elements numerically.
 
 >  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, IMatrix rr) const
+>  void array(DataType) .get(array(DataType) output_m, bool ind1, IM rr) const
 
 >  void array(DataType) .get(array(DataType) output_m, bool ind1, Sparsity sp) const 
 ------------------------------------------------------------------------
@@ -5411,11 +5411,11 @@ Get a submatrix, single argument
 
 >  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr, Slice cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr, IMatrix cc) const
+>  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr, IM cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, IMatrix rr, Slice cc) const
+>  void array(DataType) .get(array(DataType) output_m, bool ind1, IM rr, Slice cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, IMatrix rr, IMatrix cc) const 
+>  void array(DataType) .get(array(DataType) output_m, bool ind1, IM rr, IM cc) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
@@ -5470,7 +5470,7 @@ Set the elements numerically.
 
 >  void array(DataType) .setNZ(array(DataType) m, bool ind1, Slice k)
 
->  void array(DataType) .setNZ(array(DataType) m, bool ind1, IMatrix k)
+>  void array(DataType) .setNZ(array(DataType) m, bool ind1, IM k)
 ------------------------------------------------------------------------
 
 Set a set of nonzeros
@@ -5560,7 +5560,7 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 >  Slice array(DataType) .toSlice(bool ind1=false) const 
 ------------------------------------------------------------------------
 
-Convert to Slice (only for IMatrix)
+Convert to Slice (only for IM)
 
 ";
 
@@ -5587,7 +5587,7 @@ Get the sparsity pattern.
 >  bool array(DataType) .isSlice(bool ind1=false) const 
 ------------------------------------------------------------------------
 
-Is the Matrix a Slice (only for IMatrix)
+Is the Matrix a Slice (only for IM)
 
 ";
 
@@ -5802,7 +5802,7 @@ Get strings corresponding to the nonzeros and the interdependencies.
 
 %feature("docstring") casadi::Matrix "
 
-Sparse matrix class. SX and DMatrix are specializations.
+Sparse matrix class. SX and DM are specializations.
 
 General sparse matrix class that is designed with the idea that \"everything
 is a matrix\", that is, also scalars and vectors. This philosophy makes it
@@ -6447,7 +6447,7 @@ Check if evaluation output.
 
 >  void MX.set(MX m, bool ind1, Slice rr)
 
->  void MX.set(MX m, bool ind1, IMatrix rr)
+>  void MX.set(MX m, bool ind1, IM rr)
 
 >  void MX.set(MX m, bool ind1, Sparsity sp)
 ------------------------------------------------------------------------
@@ -6896,7 +6896,7 @@ Check if the matrix expression is square.
 
 >  void MX.get(MX &output_m, bool ind1, Slice rr) const
 
->  void MX.get(MX &output_m, bool ind1, IMatrix rr) const
+>  void MX.get(MX &output_m, bool ind1, IM rr) const
 
 >  void MX.get(MX &output_m, bool ind1, Sparsity sp) const 
 ------------------------------------------------------------------------
@@ -6905,11 +6905,11 @@ Get a submatrix, single argument
 
 >  void MX.get(MX &output_m, bool ind1, Slice rr, Slice cc) const
 
->  void MX.get(MX &output_m, bool ind1, Slice rr, IMatrix cc) const
+>  void MX.get(MX &output_m, bool ind1, Slice rr, IM cc) const
 
->  void MX.get(MX &output_m, bool ind1, IMatrix rr, Slice cc) const
+>  void MX.get(MX &output_m, bool ind1, IM rr, Slice cc) const
 
->  void MX.get(MX &output_m, bool ind1, IMatrix rr, IMatrix cc) const 
+>  void MX.get(MX &output_m, bool ind1, IM rr, IM cc) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
@@ -7000,7 +7000,7 @@ Copy constructor.
 
 Create vector constant (also implicit type conversion)
 
->  MX(DMatrix x)
+>  MX(DM x)
 ------------------------------------------------------------------------
 
 Create sparse matrix constant (also implicit type conversion)
@@ -7032,7 +7032,7 @@ Get the value (only for constant nodes)
 
 %feature("docstring") casadi::MX::mapping "
 
-Get an IMatrix representation of a GetNonzeros or SetNonzeros node.
+Get an IM representation of a GetNonzeros or SetNonzeros node.
 
 ";
 
@@ -7781,7 +7781,7 @@ Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 %feature("docstring") casadi::Simulator::getInput "
 
->  DMatrix  IOInterface< Function  >.getInput(int iind=0) const
+>  DM  IOInterface< Function  >.getInput(int iind=0) const
 ------------------------------------------------------------------------
 
 Get an input by index.
@@ -7791,7 +7791,7 @@ Parameters:
 
 iind:  index within the range [0..n_in()-1]
 
->  DMatrix  IOInterface< Function  >.getInput(str iname) const
+>  DM  IOInterface< Function  >.getInput(str iname) const
 ------------------------------------------------------------------------
 
 Get an input by name.
@@ -7871,7 +7871,7 @@ length of iw field.
 
 >  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
 
->  void Function.reverse([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] aseed,[[DMatrix ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, reverse mode.
@@ -8657,7 +8657,7 @@ Joel Andersson
 
 %feature("docstring") casadi::Simulator::getOutput "
 
->  DMatrix  IOInterface< Function  >.getOutput(int oind=0) const
+>  DM  IOInterface< Function  >.getOutput(int oind=0) const
 ------------------------------------------------------------------------
 
 Get an output by index.
@@ -8667,7 +8667,7 @@ Parameters:
 
 oind:  index within the range [0..n_out()-1]
 
->  DMatrix  IOInterface< Function  >.getOutput(str oname) const
+>  DM  IOInterface< Function  >.getOutput(str oname) const
 ------------------------------------------------------------------------
 
 Get an output by name.
@@ -8832,7 +8832,7 @@ The the mapaccumulated version has the signature:
 
 %feature("docstring") casadi::Simulator::derivative "
 
->  void Function.derivative([DMatrix] arg, [DMatrix] &output_res, [DMatrixVector] fseed, [DMatrixVector] &output_fsens, [DMatrixVector] aseed, [DMatrixVector] &output_asens, bool always_inline=false, bool never_inline=false)
+>  void Function.derivative([DM] arg, [DM] &output_res, [DMVector] fseed, [DMVector] &output_fsens, [DMVector] aseed, [DMVector] &output_asens, bool always_inline=false, bool never_inline=false)
 
 >  void Function.derivative([SX] arg, [SX] &output_res, [SXVector] fseed, [SXVector] &output_fsens, [SXVector] aseed, [SXVector] &output_asens, bool always_inline=false, bool never_inline=false)
 
@@ -8915,7 +8915,7 @@ Get the number of function outputs.
 
 >  void Function.forward([SX ] arg, [SX ] res, [[SX ] ] fseed,[[SX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
 
->  void Function.forward([DMatrix ] arg, [DMatrix ] res, [[DMatrix ] ] fseed,[[DMatrix ] ] output_fsens, bool always_inline=false, bool never_inline=false)
+>  void Function.forward([DM ] arg, [DM ] res, [[DM ] ] fseed,[[DM ] ] output_fsens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
 Create call to (cached) derivative function, forward mode.
@@ -9165,7 +9165,7 @@ Default constructor - all elements.
 >  Slice(int i, bool ind1=false)
 ------------------------------------------------------------------------
 
-A single element (explicit to avoid ambiguity with IMatrix overload.
+A single element (explicit to avoid ambiguity with IM overload.
 
 >  Slice(int start, int stop, int step=1)
 ------------------------------------------------------------------------
@@ -10569,8 +10569,8 @@ will have a size smaller than incr.
 
 ::
 
-  >>> print vertsplit(DMatrix([0,1,2,3,4]),2)
-  [DMatrix([0, 1]), DMatrix([2, 3]), DMatrix(4)]
+  >>> print vertsplit(DM([0,1,2,3,4]),2)
+  [DM([0, 1]), DM([2, 3]), DM(4)]
   
 
 
@@ -11016,6 +11016,12 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
+%feature("docstring") casadi::matrixName "
+
+Get typename.
+
+";
+
 %feature("docstring") casadi::iszero "[INTERNAL]  Check if entry is zero
 (false negative allowed)
 
@@ -11054,11 +11060,7 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
-%feature("docstring") casadi::matrixName "
-
-Get typename.
-
-";
+%feature("docstring") casadi::replaceMat "[INTERNAL] ";
 
 %feature("docstring") casadi::is_regular "
 
