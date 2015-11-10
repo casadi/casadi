@@ -1074,7 +1074,7 @@ namespace casadi {
       fill_n(res_, f_fcn_.n_out(), nullptr);
       res_[F_F] = &fk_;
       n_calc_f_ += 1;
-      auto t_start = chrono::steady_clock::now(); // start timer
+      auto t_start = chrono::system_clock::now(); // start timer
       try {
         f_fcn_(arg_, res_, iw_, w_, 0);
       } catch(exception& ex) {
@@ -1082,7 +1082,7 @@ namespace casadi {
         userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
         return 1;
       }
-      auto t_stop = chrono::steady_clock::now(); // stop timer
+      auto t_stop = chrono::system_clock::now(); // stop timer
 
       // Make sure not NaN or Inf
       if (!isfinite(fk_)) {
@@ -1127,7 +1127,7 @@ namespace casadi {
       arg_[G_P] = p_;
       fill_n(res_, g_fcn_.n_out(), nullptr);
       res_[G_G] = gk_;
-      auto t_start = chrono::steady_clock::now(); // start timer
+      auto t_start = chrono::system_clock::now(); // start timer
       try {
         g_fcn_(arg_, res_, iw_, w_, 0);
       } catch(exception& ex) {
@@ -1135,7 +1135,7 @@ namespace casadi {
         userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
         return 1;
       }
-      auto t_stop = chrono::steady_clock::now(); // stop timer
+      auto t_stop = chrono::system_clock::now(); // stop timer
 
       // Make sure not NaN or Inf
       if (!all_of(gk_, gk_+ng_, [](double v) { return isfinite(v);})) {
@@ -1180,7 +1180,7 @@ namespace casadi {
       arg_[GRADF_P] = p_;
       fill_n(res_, grad_f_fcn_.n_out(), nullptr);
       res_[GRADF_GRAD] = grad_fk_;
-      auto t_start = chrono::steady_clock::now(); // start timer
+      auto t_start = chrono::system_clock::now(); // start timer
       try {
         grad_f_fcn_(arg_, res_, iw_, w_, 0);
       } catch(exception& ex) {
@@ -1188,7 +1188,7 @@ namespace casadi {
         userOut<true, PL_WARN>() << name() << ":calc_grad_f failed:" << ex.what() << endl;
         return 1;
       }
-      auto t_stop = chrono::steady_clock::now(); // stop timer
+      auto t_stop = chrono::system_clock::now(); // stop timer
 
       // Make sure not NaN or Inf
       if (!all_of(grad_fk_, grad_fk_+nx_, [](double v) { return isfinite(v);})) {
@@ -1233,7 +1233,7 @@ namespace casadi {
       arg_[JACG_P] = p_;
       fill_n(res_, jac_g_fcn_.n_out(), nullptr);
       res_[JACG_JACG] = jac_gk_;
-      auto t_start = chrono::steady_clock::now(); // start timer
+      auto t_start = chrono::system_clock::now(); // start timer
       try {
         jac_g_fcn_(arg_, res_, iw_, w_, 0);
       } catch(exception& ex) {
@@ -1241,7 +1241,7 @@ namespace casadi {
         userOut<true, PL_WARN>() << name() << ":calc_jac_g failed:" << ex.what() << endl;
         return 1;
       }
-      auto t_stop = chrono::steady_clock::now(); // stop timer
+      auto t_stop = chrono::system_clock::now(); // stop timer
 
       // Make sure not NaN or Inf
       if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
