@@ -1138,7 +1138,7 @@ namespace casadi {
       auto t_stop = chrono::steady_clock::now(); // stop timer
 
       // Make sure not NaN or Inf
-      if (!all_of(gk_, gk_+ng_, isfinite<double>)) {
+      if (!all_of(gk_, gk_+ng_, [](double v) { return isfinite(v);})) {
         userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN or Inf detected" << endl;
         return -1;
       }
@@ -1191,7 +1191,7 @@ namespace casadi {
       auto t_stop = chrono::steady_clock::now(); // stop timer
 
       // Make sure not NaN or Inf
-      if (!all_of(grad_fk_, grad_fk_+nx_, isfinite<double>)) {
+      if (!all_of(grad_fk_, grad_fk_+nx_, [](double v) { return isfinite(v);})) {
         userOut<true, PL_WARN>() << name() << ":calc_grad_f failed: NaN or Inf detected" << endl;
         return -1;
       }
@@ -1244,7 +1244,7 @@ namespace casadi {
       auto t_stop = chrono::steady_clock::now(); // stop timer
 
       // Make sure not NaN or Inf
-      if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), isfinite<double>)) {
+      if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
         userOut<true, PL_WARN>() << name() << ":calc_jac_g failed: NaN or Inf detected" << endl;
         return -1;
       }
