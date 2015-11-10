@@ -3089,4 +3089,11 @@ namespace casadi {
     return ms(x);
   }
 
+  bool FunctionInternal::checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat) {
+    return arg.size()==inp.size() || arg.is_empty() || arg.is_scalar() ||
+      (inp.size2()==arg.size1() && inp.size1()==arg.size2()
+       && (arg.is_column() || inp.is_column())) ||
+      (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
+  }
+
 } // namespace casadi

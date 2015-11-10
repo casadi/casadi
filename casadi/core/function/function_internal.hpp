@@ -128,16 +128,16 @@ namespace casadi {
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Call a function, DM type (overloaded) */
-    void call(const DMVector& arg, DMVector& res,
-              bool always_inline, bool never_inline);
+    void call(const DMVector& arg, DMVector& res, bool always_inline, bool never_inline);
 
     /** \brief Call a function, MX type (overloaded) */
-    void call(const MXVector& arg, MXVector& res,
-              bool always_inline, bool never_inline);
+    void call(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);
 
     /** \brief Call a function, SX type (overloaded) */
-    void call(const SXVector& arg, SXVector& res,
-              bool always_inline, bool never_inline);
+    void call(const SXVector& arg, SXVector& res, bool always_inline, bool never_inline);
+
+    /** Helper function */
+    static bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false);
 
     /** \brief Check if input arguments have correct length and dimensions
      *
@@ -150,14 +150,6 @@ namespace casadi {
     template<typename M>
       void checkRes(const std::vector<M>& res) const;
 
-    /** \brief Check forward mode seeds dimensions */
-    template<typename M>
-      void checkFwdSeed(const std::vector<std::vector<M> >& fseed) const;
-
-    /** \brief Check reverse mode seeds dimensions */
-    template<typename M>
-      void checkAdjSeed(const std::vector<std::vector<M> >& aseed) const;
-
     /** \brief Check if input arguments that needs to be replaced
      * 
      * \param hcat check if horizontal repetion of the function input is allowed
@@ -168,14 +160,6 @@ namespace casadi {
     /** \brief Check if output arguments that needs to be replaced */
     template<typename M>
       bool matchingRes(const std::vector<M>& arg) const;
-
-    /** \brief Check if there are 0-by-0 forward seeds that needs to be replaced */
-    template<typename M>
-      bool matchingFwdSeed(const std::vector<std::vector<M> >& fseed) const;
-
-    /** \brief Check if there are 0-by-0 reverse seeds that needs to be replaced */
-    template<typename M>
-      bool matchingAdjSeed(const std::vector<std::vector<M> >& aseed) const;
 
     /** \brief Replace 0-by-0 inputs
      *
@@ -502,9 +486,6 @@ namespace casadi {
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
 
-
-
-
     ///@{
     /** \brief Number of function inputs and outputs */
     inline int n_in() const { return ibuf_.size();}
@@ -516,9 +497,9 @@ namespace casadi {
     ///@{
     /** \brief Number of input/output nonzeros */
     int nnz_in() const;
-    int nnz_in(int ind) const { return input(ind).nnz(); }
+    int nnz_in(int ind) const { return sparsity_in(ind).nnz(); }
     int nnz_out() const;
-    int nnz_out(int ind) const { return output(ind).nnz(); }
+    int nnz_out(int ind) const { return sparsity_out(ind).nnz(); }
     ///@}
 
     ///@{
@@ -641,10 +622,10 @@ namespace casadi {
 
     /** \brief Get sparsity of a given input */
     /// @{
-    inline Sparsity sparsity_in(int ind) const {
+    inline const Sparsity& sparsity_in(int ind) const {
       return input(ind).sparsity();
     }
-    inline Sparsity sparsity_in(const std::string& iname) const {
+    inline const Sparsity& sparsity_in(const std::string& iname) const {
       return sparsity_in(index_in(iname));
     }
     virtual Sparsity get_sparsity_in(int ind) const = 0;
@@ -652,15 +633,14 @@ namespace casadi {
 
     /** \brief Get sparsity of a given output */
     /// @{
-    inline Sparsity sparsity_out(int ind) const {
+    inline const Sparsity& sparsity_out(int ind) const {
       return output(ind).sparsity();
     }
-    inline Sparsity sparsity_out(const std::string& iname) const {
+    inline const Sparsity& sparsity_out(const std::string& iname) const {
       return sparsity_out(index_out(iname));
     }
     virtual Sparsity get_sparsity_out(int ind) const = 0;
     /// @}
-
 
     /// Access input argument by index
     inline Matrix<double>& input(int i=0) {
@@ -968,63 +948,11 @@ namespace casadi {
           const std::vector<std::vector<M> >& fseed,
           std::vector<std::vector<M> >& fsens,
           bool always_inline, bool never_inline) {
+    // Check inputs
     checkArg(arg);
     checkRes(res);
-    if (!matchingFwdSeed(fseed)) {
-      return forward(arg, res, replaceFwdSeed(fseed), fsens,
-                        always_inline, never_inline);
-    }
-    _forward(arg, res, fseed, fsens, always_inline, never_inline);
-  }
 
-  template<typename M>
-  void FunctionInternal::
-  reverse(const std::vector<M>& arg, const std::vector<M>& res,
-          const std::vector<std::vector<M> >& aseed,
-          std::vector<std::vector<M> >& asens,
-          bool always_inline, bool never_inline) {
-    checkArg(arg);
-    checkRes(res);
-    if (!matchingAdjSeed(aseed)) {
-      return reverse(arg, res, replaceAdjSeed(aseed), asens,
-                        always_inline, never_inline);
-    }
-    _reverse(arg, res, aseed, asens, always_inline, never_inline);
-  }
-
-  inline bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false) {
-    return arg.size()==inp.size() || arg.is_empty() || arg.is_scalar() ||
-      (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-       && (arg.is_column() || inp.is_column())) ||
-      (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
-  }
-
-  template<typename M>
-  void FunctionInternal::checkArg(const std::vector<M>& arg, bool hcat) const {
-    int n_in = this->n_in();
-    casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
-                          << n_in << ", got " << arg.size());
-    for (int i=0; i<n_in; ++i) {
-      casadi_assert_message(checkMat(arg[i].sparsity(), input(i).sparsity(), hcat),
-                            "Input " << i << " has mismatching shape. Expected "
-                            << input(i).size() << ", got " << arg[i].size());
-    }
-  }
-
-  template<typename M>
-  void FunctionInternal::checkRes(const std::vector<M>& res) const {
-    int n_out = this->n_out();
-    casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
-                          << n_out << ", got " << res.size());
-    for (int i=0; i<n_out; ++i) {
-      casadi_assert_message(checkMat(res[i].sparsity(), output(i).sparsity()),
-                            "Output " << i << " has mismatching shape. Expected "
-                            << output(i).size() << ", got " << res[i].size());
-    }
-  }
-
-  template<typename M>
-  void FunctionInternal::checkFwdSeed(const std::vector<std::vector<M> >& fseed) const {
+    // Check forward mode seeds dimensions
     int n_in = this->n_in();
     for (int d=0; d<fseed.size(); ++d) {
       casadi_assert_message(fseed[d].size()==n_in,
@@ -1037,10 +965,30 @@ namespace casadi {
                               << ", got " << fseed[d][i].size());
       }
     }
+
+    // Check if there are 0-by-0 forward seeds that needs to be replaced
+    for (int d=0; d<fseed.size(); ++d) {
+      if (!matchingArg(fseed[d])) {
+        return forward(arg, res, replaceFwdSeed(fseed), fsens,
+                       always_inline, never_inline);
+      }
+    }
+
+    // Call the type-specific method
+    _forward(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   template<typename M>
-  void FunctionInternal::checkAdjSeed(const std::vector<std::vector<M> >& aseed) const {
+  void FunctionInternal::
+  reverse(const std::vector<M>& arg, const std::vector<M>& res,
+          const std::vector<std::vector<M> >& aseed,
+          std::vector<std::vector<M> >& asens,
+          bool always_inline, bool never_inline) {
+    // Check inputs
+    checkArg(arg);
+    checkRes(res);
+
+    // Check reverse mode seeds dimensions
     int n_out = this->n_out();
     for (int d=0; d<aseed.size(); ++d) {
       casadi_assert_message(aseed[d].size()==n_out,
@@ -1053,6 +1001,41 @@ namespace casadi {
                               << ", got " << aseed[d][i].size());
       }
     }
+
+    // Check if there are 0-by-0 reverse seeds that needs to be replaced
+    for (int d=0; d<aseed.size(); ++d) {
+      if (!matchingRes(aseed[d])) {
+        return reverse(arg, res, replaceAdjSeed(aseed), asens,
+                       always_inline, never_inline);
+      }
+    }
+
+    // Call the type-specific method
+    _reverse(arg, res, aseed, asens, always_inline, never_inline);
+  }
+
+  template<typename M>
+  void FunctionInternal::checkArg(const std::vector<M>& arg, bool hcat) const {
+    int n_in = this->n_in();
+    casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
+                          << n_in << ", got " << arg.size());
+    for (int i=0; i<n_in; ++i) {
+      casadi_assert_message(checkMat(arg[i].sparsity(), sparsity_in(i), hcat),
+                            "Input " << i << " has mismatching shape. Expected "
+                            << size_in(i) << ", got " << arg[i].size());
+    }
+  }
+
+  template<typename M>
+  void FunctionInternal::checkRes(const std::vector<M>& res) const {
+    int n_out = this->n_out();
+    casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
+                          << n_out << ", got " << res.size());
+    for (int i=0; i<n_out; ++i) {
+      casadi_assert_message(checkMat(res[i].sparsity(), sparsity_out(i)),
+                            "Output " << i << " has mismatching shape. Expected "
+                            << size_out(i) << ", got " << res[i].size());
+    }
   }
 
   template<typename M>
@@ -1061,10 +1044,10 @@ namespace casadi {
     int n_in = this->n_in();
     for (int i=0; i<n_in; ++i) {
       if (hcat) {
-        if (arg.at(i).size1()!=input(i).size1()) return false;
-        if (arg.at(i).size2() % input(i).size2()!=0 || arg.at(i).size2()==0) return false;
+        if (arg.at(i).size1()!=size1_in(i)) return false;
+        if (arg.at(i).size2() % size2_in(i)!=0 || arg.at(i).size2()==0) return false;
       } else {
-        if (arg.at(i).size()!=input(i).size()) return false;
+        if (arg.at(i).size()!=size_in(i)) return false;
       }
     }
     return true;
@@ -1075,25 +1058,7 @@ namespace casadi {
     checkRes(res);
     int n_out = this->n_out();
     for (int i=0; i<n_out; ++i) {
-      if (res.at(i).size()!=output(i).size()) return false;
-    }
-    return true;
-  }
-
-  template<typename M>
-  bool FunctionInternal::matchingFwdSeed(const std::vector<std::vector<M> >& fseed) const {
-    checkFwdSeed(fseed);
-    for (int d=0; d<fseed.size(); ++d) {
-      if (!matchingArg(fseed[d])) return false;
-    }
-    return true;
-  }
-
-  template<typename M>
-  bool FunctionInternal::matchingAdjSeed(const std::vector<std::vector<M> >& aseed) const {
-    checkAdjSeed(aseed);
-    for (int d=0; d<aseed.size(); ++d) {
-      if (!matchingRes(aseed[d])) return false;
+      if (res.at(i).size()!=size_out(i)) return false;
     }
     return true;
   }
@@ -1124,14 +1089,14 @@ namespace casadi {
   template<typename M>
   std::vector<M> FunctionInternal::replaceArg(const std::vector<M>& arg, bool hcat) const {
     std::vector<M> r(arg.size());
-    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(arg[i], input(i).sparsity(), hcat);
+    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(arg[i], sparsity_in(i), hcat);
     return r;
   }
 
   template<typename M>
   std::vector<M> FunctionInternal::replaceRes(const std::vector<M>& res) const {
     std::vector<M> r(res.size());
-    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(res[i], output(i).sparsity());
+    for (int i=0; i<r.size(); ++i) r[i] = replaceMat(res[i], sparsity_out(i));
     return r;
   }
 
