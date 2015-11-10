@@ -1233,79 +1233,11 @@ namespace casadi {
   }
 
   void FunctionInternal::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
-    casadi_error("'evalD' not defined for " + type_name());
+    casadi_error("'eval' not defined for " + type_name());
   }
 
   void FunctionInternal::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    casadi_assert(canEvalSX());
-
-    // Number of inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
-
-    // Create input arguments
-    vector<SX> argv(num_in);
-    for (int i=0; i<num_in; ++i) {
-      argv[i] = SX::zeros(input(i).sparsity());
-      if (arg[i] != 0) {
-        std::copy(arg[i], arg[i]+argv[i].nnz(), argv[i]->begin());
-      }
-    }
-
-    // Evaluate symbolically
-    vector<SX> resv;
-    evalSX(argv, resv);
-
-    // Collect the result
-    for (int i = 0; i < num_out; ++i) {
-      if (res[i] != 0) {
-        std::copy(resv[i]->begin(), resv[i]->end(), res[i]);
-      }
-    }
-  }
-
-  void FunctionInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res) {
-    casadi_assert(canEvalSX());
-
-    // Get the number of inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
-
-    // Check if matching input sparsity
-    bool matching_sparsity = true;
-    casadi_assert(arg.size()==num_in);
-    for (int i=0; matching_sparsity && i<num_in; ++i)
-      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
-
-    // Correct input sparsity if needed
-    if (!matching_sparsity) {
-      vector<SX> arg2(arg);
-      for (int i=0; i<num_in; ++i)
-        if (arg2[i].sparsity()!=input(i).sparsity())
-          arg2[i] = project(arg2[i], input(i).sparsity());
-      return evalSX(arg2, res);
-    }
-
-    // Allocate results
-    res.resize(num_out);
-    for (int i=0; i<num_out; ++i)
-      if (res[i].sparsity()!=output(i).sparsity())
-        res[i] = SX::zeros(output(i).sparsity());
-
-    // Allocate temporary memory if needed
-    iw_tmp_.resize(sz_iw());
-    vector<SXElem> w_tmp(sz_w());
-
-    // Get pointers to input arguments
-    vector<const SXElem*> argp(sz_arg());
-    for (int i=0; i<arg.size(); ++i) argp[i]=getPtr(arg[i]);
-
-    // Get pointers to output arguments
-    vector<SXElem*> resp(sz_res());
-    for (int i=0; i<n_out(); ++i) resp[i]=getPtr(res[i]);
-
-    // Call memory-less
-    evalSX(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
+    casadi_error("'eval_sx' not defined for " + type_name());
   }
 
   void FunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
@@ -1759,9 +1691,47 @@ namespace casadi {
 
   void FunctionInternal::_call(const SXVector& arg, SXVector& res,
                         bool always_inline, bool never_inline) {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
-    evalSX(arg, res);
+
+    // Get the number of inputs and outputs
+    int num_in = n_in();
+    int num_out = n_out();
+
+    // Check if matching input sparsity
+    bool matching_sparsity = true;
+    casadi_assert(arg.size()==num_in);
+    for (int i=0; matching_sparsity && i<num_in; ++i)
+      matching_sparsity = arg[i].sparsity()==input(i).sparsity();
+
+    // Correct input sparsity if needed
+    if (!matching_sparsity) {
+      vector<SX> arg2(arg);
+      for (int i=0; i<num_in; ++i)
+        if (arg2[i].sparsity()!=input(i).sparsity())
+          arg2[i] = project(arg2[i], input(i).sparsity());
+      return _call(arg2, res, always_inline, never_inline);
+    }
+
+    // Allocate results
+    res.resize(num_out);
+    for (int i=0; i<num_out; ++i)
+      if (res[i].sparsity()!=output(i).sparsity())
+        res[i] = SX::zeros(output(i).sparsity());
+
+    // Allocate temporary memory if needed
+    iw_tmp_.resize(sz_iw());
+    vector<SXElem> w_tmp(sz_w());
+
+    // Get pointers to input arguments
+    vector<const SXElem*> argp(sz_arg());
+    for (int i=0; i<arg.size(); ++i) argp[i]=getPtr(arg[i]);
+
+    // Get pointers to output arguments
+    vector<SXElem*> resp(sz_res());
+    for (int i=0; i<n_out(); ++i) resp[i]=getPtr(res[i]);
+
+    // Call memory-less
+    _eval(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
   }
 
   void FunctionInternal::_call(const DMVector& arg, DMVector& res,
@@ -1804,7 +1774,7 @@ namespace casadi {
     for (int i=0; i<n_out(); ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
-    evalD(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
+    _eval(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
   }
 
   Function FunctionInternal::
@@ -2291,12 +2261,6 @@ namespace casadi {
     return Function::external(fname, dlname);
   }
 
-  void FunctionInternal::
-  spFwdSwitch(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
-    spFwd(arg, res, iw, w, 0);
-  }
-
   void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // Number inputs and outputs
     int n_in = this->n_in();
@@ -2345,11 +2309,6 @@ namespace casadi {
     // Clear seeds and sensitivities
     for (int i=0; i<n_in; ++i) input(i).set(0.);
     for (int i=0; i<n_out; ++i) output(i).set(0.);
-  }
-
-  void FunctionInternal::spAdjSwitch(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    // TODO(@jaeandersson) Calculate from full-Jacobian sparsity  when necessary or more efficient
-    spAdj(arg, res, iw, w, mem);
   }
 
   void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {

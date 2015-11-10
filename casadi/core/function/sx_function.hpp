@@ -97,9 +97,6 @@ class CASADI_EXPORT SXFunction :
   /** \brief  Evaluate numerically, work vectors given */
   virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
-  /** \brief Quickfix to avoid segfault, #1552 */
-  virtual bool canEvalSX() const {return true;}
-
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 

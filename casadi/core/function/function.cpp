@@ -685,11 +685,11 @@ namespace casadi {
   }
 
   void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    (*this)->spFwdSwitch(arg, res, iw, w, mem);
+    (*this)->spFwd(arg, res, iw, w, mem);
   }
 
   void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    (*this)->spAdjSwitch(arg, res, iw, w, mem);
+    (*this)->spAdj(arg, res, iw, w, mem);
   }
 
   bool Function::spCanEvaluate(bool fwd) {

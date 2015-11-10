@@ -998,12 +998,11 @@ namespace casadi {
     }
 
     // Evaluate symbolically
-    FunctionInternal::evalSX(arg, res);
+    call(arg, res, true, false);
 
     // Create function
     return Function("expand_" + name_, arg, res,
-                    Dict{{"input_scheme", ischeme_},
-                        {"output_scheme", oscheme_}});
+                    Dict{{"input_scheme", ischeme_}, {"output_scheme", oscheme_}});
   }
 
   void MXFunction::printWork(ostream &stream) {

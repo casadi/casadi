@@ -112,14 +112,8 @@ namespace casadi {
     /** \brief  Evaluate numerically */
     virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
 
-    /** \brief Quickfix to avoid segfault, #1552 */
-    virtual bool canEvalSX() const {return false;}
-
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
-
-    /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
 
     ///@{
     /** \brief  Evaluate symbolically, MX type */
@@ -721,12 +715,6 @@ namespace casadi {
     /// The following functions are called internally from EvaluateMX.
     /// For documentation, see the MXNode class
     ///@{
-    /** \brief  Propagate sparsity forward */
-    virtual void spFwdSwitch(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
-
-    /** \brief  Propagate sparsity backwards */
-    virtual void spAdjSwitch(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
-
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
