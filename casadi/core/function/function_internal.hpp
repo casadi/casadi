@@ -133,8 +133,9 @@ namespace casadi {
     void _call(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline) {
       eval_mx(arg, res, always_inline, never_inline);
     }
-    void _call(const SXVector& arg, SXVector& res, bool always_inline, bool never_inline);
-    void _call(const DMVector& arg, DMVector& res, bool always_inline, bool never_inline);
+    template<typename D>
+    void _call(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
+               bool always_inline, bool never_inline);
     ///@}
 
     /** \brief Call a function, templated */
@@ -943,9 +944,8 @@ namespace casadi {
   }
 
   template<typename M>
-  void FunctionInternal::
-  call(const std::vector<M>& arg, std::vector<M>& res,
-       bool always_inline, bool never_inline) {
+  void FunctionInternal::call(const std::vector<M>& arg, std::vector<M>& res,
+                              bool always_inline, bool never_inline) {
     // Check if inputs need to be replaced
     if (!matchingArg(arg)) {
       return call(replaceArg(arg), res, always_inline, never_inline);
@@ -953,6 +953,52 @@ namespace casadi {
 
     // Call the type-specific method
     _call(arg, res, always_inline, never_inline);
+  }
+
+  template<typename D>
+  void FunctionInternal::_call(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
+                               bool always_inline, bool never_inline) {
+    casadi_assert_message(!never_inline, "Call-nodes only possible in MX expressions");
+
+    // Get the number of inputs and outputs
+    int n_in = this->n_in();
+    int n_out = this->n_out();
+
+    // Check if matching input sparsity
+    bool matching_sparsity = true;
+    casadi_assert(arg.size()==n_in);
+    for (int i=0; matching_sparsity && i<n_in; ++i)
+      matching_sparsity = arg[i].sparsity()==sparsity_in(i);
+
+    // Correct input sparsity if needed
+    if (!matching_sparsity) {
+      std::vector<Matrix<D> > arg2(arg);
+      for (int i=0; i<n_in; ++i)
+        if (arg2[i].sparsity()!=sparsity_in(i))
+          arg2[i] = project(arg2[i], sparsity_in(i));
+      return _call(arg2, res, always_inline, never_inline);
+    }
+
+    // Allocate results
+    res.resize(n_out);
+    for (int i=0; i<n_out; ++i)
+      if (res[i].sparsity()!=sparsity_out(i))
+        res[i] = Matrix<D>::zeros(sparsity_out(i));
+
+    // Allocate temporary memory if needed
+    iw_tmp_.resize(sz_iw());
+    std::vector<D> w_tmp(sz_w());
+
+    // Get pointers to input arguments
+    std::vector<const D*> argp(sz_arg());
+    for (int i=0; i<n_in; ++i) argp[i]=getPtr(arg[i]);
+
+    // Get pointers to output arguments
+    std::vector<D*> resp(sz_res());
+    for (int i=0; i<n_out; ++i) resp[i]=getPtr(res[i]);
+
+    // Call memory-less
+    _eval(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
   }
 
   template<typename M>
