@@ -39,11 +39,11 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Split::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Split::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Split::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
@@ -136,7 +136,7 @@ namespace casadi {
     return "horzsplit(" + arg.at(0) + ")";
   }
 
-  void Horzsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Horzsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get column offsets
     vector<int> col_offset;
     col_offset.reserve(offset_.size());
@@ -211,7 +211,7 @@ namespace casadi {
     return "diagsplit(" + arg.at(0) + ")";
   }
 
-  void Diagsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Diagsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get offsets
     vector<int> offset1;
     offset1.reserve(offset_.size());
@@ -293,7 +293,7 @@ namespace casadi {
     return "vertsplit(" + arg.at(0) + ")";
   }
 
-  void Vertsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Vertsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get row offsets
     vector<int> row_offset;
     row_offset.reserve(offset_.size());

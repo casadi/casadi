@@ -185,7 +185,7 @@ def minimize(f,gl=[],verbose=False):
   original = MXFunction(x+p,[G_le,G_eq,G_nsd,f])
   original.init()
   
-  G = original.evalMX(X[...]+P[...])
+  G = original.eval_mx(X[...]+P[...])
   
   def linear(g):
     return jacobian(g,X),substitute(g,X,DM.zeros(X.size))

@@ -42,7 +42,7 @@ namespace casadi {
     return "assertion(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
-  void Assertion::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Assertion::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0].attachAssert(arg[1], fail_message_);
   }
 
@@ -60,13 +60,13 @@ namespace casadi {
     }
   }
 
-  void Assertion::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Assertion::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Assertion::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Assertion::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (arg[1][0]!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }

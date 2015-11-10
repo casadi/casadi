@@ -102,7 +102,7 @@ namespace casadi {
     alloc_w(n_, true);
   }
 
-  void ImplicitToNlp::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void ImplicitToNlp::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Buffers for calling the NLP solver
     const double** arg1 = arg + n_in();
     double** res1 = res + n_out();

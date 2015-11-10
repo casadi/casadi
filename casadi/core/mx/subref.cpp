@@ -33,11 +33,11 @@ namespace casadi {
     setDependencies(x);
   }
 
-  void SubRef::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void SubRef::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void SubRef::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void SubRef::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
@@ -60,7 +60,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void SubRef::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SubRef::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     casadi_error("not ready");
   }
 

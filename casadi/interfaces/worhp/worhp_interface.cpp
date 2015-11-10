@@ -605,14 +605,14 @@ namespace casadi {
         DoneUserAction(&worhp_c_, evalG);
       }
 
-      if (GetUserAction(&worhp_c_, evalDF)) {
+      if (GetUserAction(&worhp_c_, evalF)) {
         eval_grad_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_w_.DF.val);
-        DoneUserAction(&worhp_c_, evalDF);
+        DoneUserAction(&worhp_c_, evalF);
       }
 
-      if (GetUserAction(&worhp_c_, evalDG)) {
+      if (GetUserAction(&worhp_c_, evalG)) {
         eval_jac_g(worhp_o_.X, worhp_w_.DG.val);
-        DoneUserAction(&worhp_c_, evalDG);
+        DoneUserAction(&worhp_c_, evalG);
       }
 
       if (GetUserAction(&worhp_c_, evalHM)) {

@@ -138,11 +138,11 @@ namespace casadi {
     }
   }
 
-  void MapSerial::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void MapSerial::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen(arg, res, iw, w, mem);
   }
 
-  void MapSerial::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void MapSerial::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen(arg, res, iw, w, mem);
   }
 
@@ -375,7 +375,7 @@ namespace casadi {
     }
   }
 
-  void MapReduce::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void MapReduce::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
       evalGen<double>(arg, res, iw, w, 0, std::plus<double>());
     } else {
@@ -404,7 +404,7 @@ namespace casadi {
     }
   }
 
-  void MapReduce::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void MapReduce::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem, std::plus<SXElem>());
   }
 
@@ -535,7 +535,7 @@ namespace casadi {
   MapOmp::~MapOmp() {
   }
 
-  void MapOmp::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void MapOmp::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for

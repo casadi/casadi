@@ -110,10 +110,10 @@ namespace casadi {
     virtual void spInit(bool fwd) {}
 
     /** \brief  Evaluate numerically */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     ///@{
     /** \brief  Evaluate symbolically, MX type */
@@ -772,7 +772,7 @@ namespace casadi {
 
     /** \brief  Use just-in-time compiler */
     bool jit_;
-    eval_t evalD_;
+    eval_t eval_;
 
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;
@@ -855,7 +855,7 @@ namespace casadi {
     virtual void linsol_solveL(double* x, int nrhs, bool tr);
     virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
     virtual DM linsol_cholesky(bool tr) const;
-    virtual void linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                bool tr, int nrhs);
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                                 const std::vector<std::vector<MX> >& fseed,

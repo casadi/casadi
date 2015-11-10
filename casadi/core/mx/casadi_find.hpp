@@ -46,10 +46,10 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,

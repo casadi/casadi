@@ -37,11 +37,11 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Concat::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void Concat::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
@@ -152,7 +152,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Diagcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Diagcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = diagcat(arg);
   }
 
@@ -208,7 +208,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Horzcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Horzcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = horzcat(arg);
   }
 
@@ -261,7 +261,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Vertcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Vertcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = vertcat(arg);
   }
 

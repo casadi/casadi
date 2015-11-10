@@ -36,12 +36,12 @@ namespace casadi {
   }
 
   void GetNonzerosVector::
-  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
   void GetNonzerosVector::
-  evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
@@ -56,12 +56,12 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
   void GetNonzerosSlice::
-  evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
@@ -77,12 +77,12 @@ namespace casadi {
   }
 
   void GetNonzerosSlice2::
-  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
   void GetNonzerosSlice2::
-  evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
@@ -180,7 +180,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void GetNonzeros::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void GetNonzeros::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 

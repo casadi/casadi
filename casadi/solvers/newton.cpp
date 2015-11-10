@@ -89,7 +89,7 @@ namespace casadi {
     alloc_w(jac_.nnz_out(0), true); // J
   }
 
-  void Newton::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Newton::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // IO buffers
     const double** arg1 = arg + n_in();
     double** res1 = res + n_out();
@@ -112,7 +112,7 @@ namespace casadi {
     while (true) {
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
-        log("evalD", "Max. iterations reached.");
+        log("eval", "Max. iterations reached.");
         stats_["return_status"] = "max_iteration_reached";
         success = false;
         break;

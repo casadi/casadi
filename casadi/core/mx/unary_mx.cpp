@@ -51,17 +51,17 @@ namespace casadi {
     return ss.str();
   }
 
-  void UnaryMX::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void UnaryMX::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     double dummy = numeric_limits<double>::quiet_NaN();
     casadi_math<double>::fun(op_, arg[0], dummy, res[0], nnz());
   }
 
-  void UnaryMX::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     SXElem dummy = 0;
     casadi_math<SXElem>::fun(op_, arg[0], dummy, res[0], nnz());
   }
 
-  void UnaryMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void UnaryMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     MX dummy;
     casadi_math<MX>::fun(op_, arg[0], dummy, res[0]);
   }

@@ -172,7 +172,7 @@ namespace casadi {
     lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
   }
 
-  void CplexInterface::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void CplexInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Number of inputs and outputs
     int num_in = n_in();
     int num_out = n_out();

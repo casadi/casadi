@@ -145,7 +145,7 @@ namespace casadi {
     }
   }
 
-  void KernelSum::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void KernelSum::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     const double* V = arg[0];

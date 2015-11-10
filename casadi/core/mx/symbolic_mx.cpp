@@ -42,13 +42,13 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void SymbolicMX::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
   }
 
-  void SymbolicMX::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void SymbolicMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
   }
 
-  void SymbolicMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
   }
 
   void SymbolicMX::evalFwd(const std::vector<std::vector<MX> >& fseed,

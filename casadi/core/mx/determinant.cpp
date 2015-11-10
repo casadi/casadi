@@ -38,7 +38,7 @@ namespace casadi {
     return "det(" + arg.at(0) + ")";
   }
 
-  void Determinant::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Determinant::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = det(arg[0]);
   }
 

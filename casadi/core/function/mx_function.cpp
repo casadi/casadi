@@ -336,8 +336,8 @@ namespace casadi {
     log("MXFunction::init end");
   }
 
-  void MXFunction::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
-    casadi_msg("MXFunction::evalD():begin "  << name_);
+  void MXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    casadi_msg("MXFunction::eval():begin "  << name_);
     // Work vector and temporaries to hold pointers to operation input and outputs
     const double** arg1 = arg+n_in();
     double** res1 = res+n_out();
@@ -378,11 +378,11 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalD(arg1, res1, iw, w, 0);
+        it->data->eval(arg1, res1, iw, w, 0);
       }
     }
 
-    casadi_msg("MXFunction::evalD():end "  << name_);
+    casadi_msg("MXFunction::eval():end "  << name_);
   }
 
   void MXFunction::print(ostream &stream, const AlgEl& el) const {
@@ -566,7 +566,7 @@ namespace casadi {
       return FunctionInternal::eval_mx(arg, res, false, true);
     }
 
-    log("MXFunction::evalMX begin");
+    log("MXFunction::eval_mx begin");
     casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
 
     // Resize the number of outputs
@@ -580,7 +580,7 @@ namespace casadi {
 
     // Symbolic work, non-differentiated
     vector<MX> swork(workloc_.size()-1);
-    log("MXFunction::evalMX allocated work vector");
+    log("MXFunction::eval_mx allocated work vector");
 
     // Split up inputs analogous to symbolic primitives
     vector<vector<MX> > arg_split(arg.size());
@@ -611,7 +611,7 @@ namespace casadi {
 
         // Perform the operation
         res1.resize(it->res.size());
-        it->data->evalMX(arg1, res1);
+        it->data->eval_mx(arg1, res1);
 
         // Get the result
         for (int i=0; i<res1.size(); ++i) {
@@ -620,7 +620,7 @@ namespace casadi {
         }
       }
     }
-    log("MXFunction::evalMX end");
+    log("MXFunction::eval_mx end");
   }
 
   void MXFunction::evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -925,7 +925,7 @@ namespace casadi {
     log("MXFunction::evalAdj end");
   }
 
-  void MXFunction::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElem*> argp(sz_arg());
     vector<SXElem*> resp(sz_res());
@@ -960,7 +960,7 @@ namespace casadi {
           resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->evalSX(getPtr(argp), getPtr(resp), iw, w, 0);
+        it->data->eval_sx(getPtr(argp), getPtr(resp), iw, w, 0);
       }
     }
   }
@@ -1216,7 +1216,7 @@ namespace casadi {
 
             // Perform the operation
             res1.resize(it->res.size());
-            it->data->evalMX(arg1, res1);
+            it->data->eval_mx(arg1, res1);
 
             // Get the result
             for (int i=0; i<res1.size(); ++i) {

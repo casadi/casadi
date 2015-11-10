@@ -81,7 +81,7 @@ namespace casadi {
 
     verbose_ = false;
     jit_ = false;
-    evalD_ = 0;
+    eval_ = 0;
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
@@ -178,21 +178,21 @@ namespace casadi {
       gen.add(shared_from_this<Function>(), "jit_tmp");
       gen.generate("jit_tmp");
       compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
-      evalD_ = (eval_t)compiler_.getFunction("jit_tmp");
-      casadi_assert_message(evalD_!=0, "Cannot load JIT'ed function.");
+      eval_ = (eval_t)compiler_.getFunction("jit_tmp");
+      casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
     }
   }
 
   void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    if (evalD_) {
-      evalD_(arg, res, iw, w, mem);
+    if (eval_) {
+      eval_(arg, res, iw, w, mem);
     } else {
-      evalD(arg, res, iw, w, mem);
+      eval(arg, res, iw, w, mem);
     }
   }
 
   void FunctionInternal::_eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    evalSX(arg, res, iw, w, mem);
+    eval_sx(arg, res, iw, w, mem);
   }
 
   void FunctionInternal::_eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
@@ -1232,11 +1232,11 @@ namespace casadi {
     log("FunctionInternal::getPartition end");
   }
 
-  void FunctionInternal::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     casadi_error("'eval' not defined for " + type_name());
   }
 
-  void FunctionInternal::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void FunctionInternal::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     casadi_error("'eval_sx' not defined for " + type_name());
   }
 
@@ -2796,9 +2796,9 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+  linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                 bool tr, int nrhs) {
-    casadi_error("'linsol_evalSX' not defined for " + type_name());
+    casadi_error("'linsol_eval_sx' not defined for " + type_name());
   }
 
   void FunctionInternal::

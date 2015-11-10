@@ -40,7 +40,7 @@ namespace casadi {
     return "inv(" + arg.at(0) + ")";
   }
 
-  void Inverse::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Inverse::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = inv(arg[0]);
   }
 

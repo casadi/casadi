@@ -63,7 +63,7 @@ namespace casadi {
     virtual void init();
 
     /// Solve the system of equations
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Prepare the factorization
     virtual void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
@@ -78,15 +78,15 @@ namespace casadi {
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
 
     /// Evaluate SX, possibly transposed
-    virtual void linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                bool tr, int nrhs);
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}
 
     /// Evaluate SX
-    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-      linsol_evalSX(arg, res, iw, w, 0, false, output(LINSOL_X).size2());
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+      linsol_eval_sx(arg, res, iw, w, 0, false, output(LINSOL_X).size2());
     }
 
     /** \brief Calculate forward mode directional derivatives */

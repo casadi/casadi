@@ -301,18 +301,18 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
-    throw CasadiException(string("MXNode::evalD not defined for class ")
+  void MXNode::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    throw CasadiException(string("MXNode::eval not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    throw CasadiException(string("MXNode::evalSX not defined for class ")
+  void MXNode::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    throw CasadiException(string("MXNode::eval_sx not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::evalMX(const vector<MX>& arg, vector<MX>& res) {
-    throw CasadiException(string("MXNode::evalMX not defined for class ")
+  void MXNode::eval_mx(const vector<MX>& arg, vector<MX>& res) {
+    throw CasadiException(string("MXNode::eval_mx not defined for class ")
                           + typeid(*this).name());
   }
 

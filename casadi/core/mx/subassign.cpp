@@ -34,11 +34,11 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void SubAssign::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void SubAssign::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void SubAssign::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
@@ -61,7 +61,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void SubAssign::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SubAssign::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     casadi_error("not ready");
   }
 

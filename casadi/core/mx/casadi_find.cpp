@@ -39,7 +39,7 @@ namespace casadi {
     return "find(" + arg.at(0) + ")";
   }
 
-  void Find::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Find::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     const double* x = arg[0];
     int nnz = dep(0).nnz();
     int k=0;
@@ -47,7 +47,7 @@ namespace casadi {
     res[0][0] = k<nnz ? dep(0).row(k) : dep(0).size1();
   }
 
-  void Find::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Find::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = find(arg[0]);
   }
 

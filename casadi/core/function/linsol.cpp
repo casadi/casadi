@@ -111,7 +111,7 @@ namespace casadi {
     }
   }
 
-  void Linsol::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Linsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Call the solve routine
     linsol_prepare(arg, res, iw, w, mem);
 
@@ -357,9 +357,9 @@ namespace casadi {
     }
   }
 
-  void Linsol::linsol_evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+  void Linsol::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                              bool tr, int nrhs) {
-    casadi_error("Linsol::evalSXLinsol not defined for class "
+    casadi_error("Linsol::eval_sxLinsol not defined for class "
                  << typeid(*this).name());
   }
 

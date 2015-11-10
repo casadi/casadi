@@ -152,7 +152,7 @@ namespace casadi {
     }
   }
 
-  void Switch::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Switch::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Get conditional
     int k = static_cast<int>(*arg[0]);
 

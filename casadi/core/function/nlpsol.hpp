@@ -175,7 +175,7 @@ namespace casadi {
     double* w_;
 
     // Evaluate numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     // Reset the solver
     virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);

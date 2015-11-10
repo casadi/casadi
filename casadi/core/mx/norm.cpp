@@ -38,11 +38,11 @@ namespace casadi {
     return "||" + arg.at(0) + "||_F";
   }
 
-  void NormF::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void NormF::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void NormF::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void NormF::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
@@ -51,7 +51,7 @@ namespace casadi {
     *res[0] = sqrt(casadi_dot(dep().nnz(), arg[0], arg[0]));
   }
 
-  void NormF::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void NormF::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0]->getNormF();
   }
 

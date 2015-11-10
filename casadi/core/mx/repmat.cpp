@@ -49,15 +49,15 @@ namespace casadi {
     }
   }
 
-  void HorzRepmat::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void HorzRepmat::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void HorzRepmat::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void HorzRepmat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
-  void HorzRepmat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void HorzRepmat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0]->getRepmat(1, n_);
   }
 
@@ -129,15 +129,15 @@ namespace casadi {
     }
   }
 
-  void HorzRepsum::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void HorzRepsum::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem, std::plus<double>());
   }
 
-  void HorzRepsum::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void HorzRepsum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem, std::plus<SXElem>());
   }
 
-  void HorzRepsum::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void HorzRepsum::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0]->getRepsum(1, n_);
   }
 

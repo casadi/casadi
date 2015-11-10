@@ -47,7 +47,7 @@ namespace casadi {
     virtual ~GetNonzeros() {}
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -93,10 +93,10 @@ namespace casadi {
     void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -142,10 +142,10 @@ namespace casadi {
     void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -186,10 +186,10 @@ namespace casadi {
     void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;

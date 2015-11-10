@@ -64,7 +64,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SetNonzeros<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -437,13 +437,13 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
@@ -468,13 +468,13 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
@@ -500,13 +500,13 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 

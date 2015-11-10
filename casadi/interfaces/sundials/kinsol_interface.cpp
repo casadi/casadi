@@ -205,11 +205,11 @@ namespace casadi {
     abstol_ = option("abstol");
   }
 
-  void KinsolInterface::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void KinsolInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (mem==0) {
       mem = alloc_mem();
       try {
-        evalD(arg, res, iw, w, mem);
+        eval(arg, res, iw, w, mem);
       } catch (...) {
         free_mem(mem);
         throw;

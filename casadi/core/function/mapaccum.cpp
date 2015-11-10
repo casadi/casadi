@@ -194,11 +194,11 @@ namespace casadi {
     }
   }
 
-  void Mapaccum::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Mapaccum::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen(arg, res, iw, w, mem, std::plus<double>());
   }
 
-  void Mapaccum::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Mapaccum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen(arg, res, iw, w, mem, std::plus<SXElem>());
   }
 

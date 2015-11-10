@@ -51,7 +51,7 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Solve<Tr>::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     const double** arg1 = arg + ndep();
     double** res1 = res + nout();
@@ -63,12 +63,12 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    linsol_->linsol_evalSX(arg, res, iw, w, mem, Tr, dep(0).size2());
+  void Solve<Tr>::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    linsol_->linsol_eval_sx(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>
-  void Solve<Tr>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Solve<Tr>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     if (arg[0].is_zero()) {
       res[0] = MX(arg[0].size());
     } else {

@@ -82,7 +82,7 @@ namespace casadi {
     virtual ~MXFunction();
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
@@ -111,7 +111,7 @@ namespace casadi {
                                         bool compact, bool symmetric, const Dict& opts);
 
     /** \brief Evaluate symbolically, SX type*/
-    virtual void evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief Evaluate symbolically, MX type */
     virtual void eval_mx(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);

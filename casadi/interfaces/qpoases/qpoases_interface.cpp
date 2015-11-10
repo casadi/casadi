@@ -209,7 +209,7 @@ namespace casadi {
     qp_->setOptions(ops);
   }
 
-  void QpoasesInterface::evalD(void* mem, const double** arg,
+  void QpoasesInterface::eval(void* mem, const double** arg,
                                double** res, int* iw, double* w) {
     // Pass the inputs to the function
     for (int i=0; i<n_in(); ++i) {

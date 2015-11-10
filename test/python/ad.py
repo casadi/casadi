@@ -141,13 +141,13 @@ class ADtests(casadiTestCase):
       }
     }
                 
-  def test_SXevalSX(self):
+  def test_SXeval_sx(self):
     n=array([1.2,2.3,7,1.4])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            self.message("evalSX on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            self.message("eval_sx on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             f_in = DM(f.sparsity_in(0),n)
             [r] = f([f_in])
@@ -181,13 +181,13 @@ class ADtests(casadiTestCase):
               [re] = fe([f_in])
               self.checkarray(c.vec(re),mul(J.T,c.vec(seed)),"AD") 
               
-  def test_MXevalMX(self):
+  def test_MXeval_mx(self):
     n=array([1.2,2.3,7,1.4])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            self.message("evalMX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            self.message("eval_mx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f_in = DM(f.sparsity_in(0),n)
             [r] = f([f_in])
@@ -222,13 +222,13 @@ class ADtests(casadiTestCase):
               self.checkarray(c.vec(re),mul(J.T,c.vec(seed)),"AD") 
 
   @known_bug()  # Not implemented
-  def test_MXevalSX(self):
+  def test_MXeval_sx(self):
     n=array([1.2,2.3,7,1.4])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            self.message("evalSX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            self.message("eval_sx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.setInput(n)
             f.evaluate()
@@ -266,13 +266,13 @@ class ADtests(casadiTestCase):
               fe.evaluate()
               self.checkarray(c.vec(fe.getOutput().T),mul(J.T,c.vec(seed.T)),"AD")
 
-  def test_MXevalSX_reduced(self):
+  def test_MXeval_sx_reduced(self):
     n=array([1.2,2.3,7,1.4])
     for inputshape in ["column","row","matrix"]:
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            self.message("evalSX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            self.message("eval_sx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f_in = DM(f.sparsity_in(0),n)
             [r] = f([f_in])

@@ -495,7 +495,7 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Reset the solver, prepare for solution
     reset(mem, arg, res, iw, w);
 

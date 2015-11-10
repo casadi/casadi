@@ -50,15 +50,15 @@ namespace casadi {
     casadi_project(arg[0], dep().sparsity(), res[0], sparsity(), w);
   }
 
-  void Project::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Project::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Project::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Project::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
-  void Project::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Project::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = project(arg[0], sparsity());
   }
 

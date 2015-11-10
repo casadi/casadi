@@ -62,7 +62,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void BinaryMX<ScX, ScY>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     casadi_math<MX>::fun(op_, arg[0], arg[1], res[0]);
   }
 
@@ -174,13 +174,13 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 

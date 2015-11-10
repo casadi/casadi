@@ -128,7 +128,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Ivpsol::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Ivpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Reset solver, take time to t0
     reset(arg, res, iw, w);
 

@@ -39,7 +39,7 @@ namespace casadi {
     return "monitor(" + arg.at(0) + ", " + comment_ + ")";
   }
 
-  void Monitor::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Monitor::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0].monitor(comment_);
   }
 
@@ -61,13 +61,13 @@ namespace casadi {
     }
   }
 
-  void Monitor::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Monitor::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Monitor::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Monitor::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Print comment
     userOut() << comment_ << ":" << endl;
     userOut() << "[";

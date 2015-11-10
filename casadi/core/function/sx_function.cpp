@@ -72,11 +72,11 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunction::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void SXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     double time_start=0;
     double time_stop=0;
 
-    casadi_msg("SXFunction::evalD():begin  " << name_);
+    casadi_msg("SXFunction::eval():begin  " << name_);
 
     // NOTE: The implementation of this function is very delicate. Small changes in the
     // class structure can cause large performance losses. For this reason,
@@ -104,11 +104,11 @@ namespace casadi {
       case OP_INPUT: w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
       case OP_OUTPUT: if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1]; break;
       default:
-        casadi_error("SXFunction::evalD: Unknown operation" << it->op);
+        casadi_error("SXFunction::eval: Unknown operation" << it->op);
       }
     }
 
-    casadi_msg("SXFunction::evalD():end " << name_);
+    casadi_msg("SXFunction::eval():end " << name_);
   }
 
 
@@ -499,8 +499,8 @@ namespace casadi {
     }
   }
 
-  void SXFunction::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    if (verbose()) userOut() << "SXFunction::evalSXsparse begin" << endl;
+  void SXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    if (verbose()) userOut() << "SXFunction::eval_sxsparse begin" << endl;
 
     // Iterator to the binary operations
     vector<SXElem>::const_iterator b_it=operations_.begin();
@@ -513,7 +513,7 @@ namespace casadi {
 
     // Evaluate algorithm
     if (verbose()) {
-      userOut() << "SXFunction::evalSXsparse evaluating algorithm forward" << endl;
+      userOut() << "SXFunction::eval_sxsparse evaluating algorithm forward" << endl;
     }
     for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
@@ -547,7 +547,7 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::evalSX end" << endl;
+    if (verbose()) userOut() << "SXFunction::eval_sx end" << endl;
   }
 
   void SXFunction::evalFwd(const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens) {

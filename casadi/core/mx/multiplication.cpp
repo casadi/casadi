@@ -49,11 +49,11 @@ namespace casadi {
     return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
-  void Multiplication::evalD(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Multiplication::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Multiplication::evalSX(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Multiplication::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
@@ -83,7 +83,7 @@ namespace casadi {
     }
   }
 
-  void Multiplication::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Multiplication::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
