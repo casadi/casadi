@@ -119,16 +119,14 @@ namespace casadi {
     virtual bool isInput(const std::vector<MatType>& arg) const;
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void forward(const std::vector<MatType>& arg, const std::vector<MatType>& res,
-                         const std::vector<std::vector<MatType> >& fseed,
-                         std::vector<std::vector<MatType> >& fsens,
-                         bool always_inline, bool never_inline);
+    void forward_x(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+                   const std::vector<std::vector<MatType> >& fseed,
+                   std::vector<std::vector<MatType> >& fsens);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void reverse(const std::vector<MatType>& arg, const std::vector<MatType>& res,
-                         const std::vector<std::vector<MatType> >& aseed,
-                         std::vector<std::vector<MatType> >& asens,
-                         bool always_inline, bool never_inline);
+    void reverse_x(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+                   const std::vector<std::vector<MatType> >& aseed,
+                   std::vector<std::vector<MatType> >& asens);
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() const { return inputv_.size(); }
@@ -573,7 +571,7 @@ namespace casadi {
     }
 
     // Calculate with adjoint mode AD
-    static_cast<DerivedType*>(this)->reverse(inputv_, outputv_, aseed, asens, true, false);
+    reverse_x(inputv_, outputv_, aseed, asens);
 
     int dir = 0;
     for (int i=0; i<n_in(); ++i) { // Correct sparsities #1025
@@ -608,7 +606,7 @@ namespace casadi {
     }
 
     // Calculate with forward mode AD
-    static_cast<DerivedType*>(this)->forward(inputv_, outputv_, fseed, fsens, true, false);
+    forward(inputv_, outputv_, fseed, fsens, true, false);
 
     // Return adjoint directional derivative
     return fsens[0].at(oind);
@@ -809,12 +807,10 @@ namespace casadi {
       if (verbose()) userOut() << "XFunction::jac making function call" << std::endl;
       if (fseed.size()>0) {
         casadi_assert(aseed.size()==0);
-        static_cast<DerivedType*>(this)->forward(inputv_, outputv_,
-                                                 fseed, fsens, always_inline, never_inline);
+        forward(inputv_, outputv_, fseed, fsens, always_inline, never_inline);
       } else if (aseed.size()>0) {
         casadi_assert(fseed.size()==0);
-        static_cast<DerivedType*>(this)->reverse(inputv_, outputv_,
-                                                 aseed, asens, always_inline, never_inline);
+        reverse(inputv_, outputv_, aseed, asens, always_inline, never_inline);
       }
 
       // Carry out the forward sweeps
@@ -1092,22 +1088,13 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::
-  forward(const std::vector<MatType>& arg, const std::vector<MatType>& res,
-          const std::vector<std::vector<MatType> >& fseed,
-          std::vector<std::vector<MatType> >& fsens,
-          bool always_inline, bool never_inline) {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    bool inline_function = always_inline;     // TODO(@jaeandersson): Add logic for inlining
-
+  forward_x(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+            const std::vector<std::vector<MatType> >& fseed,
+            std::vector<std::vector<MatType> >& fsens) {
     // Quick return if no seeds
     if (fseed.empty()) {
       fsens.clear();
       return;
-    }
-
-    // The non-inlining version is implemented in the base class
-    if (!inline_function) {
-      return FunctionInternal::forward(arg, res, fseed, fsens, always_inline, never_inline);
     }
 
     if (isInput(arg)) {
@@ -1122,22 +1109,13 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::
-  reverse(const std::vector<MatType>& arg, const std::vector<MatType>& res,
-          const std::vector<std::vector<MatType> >& aseed,
-          std::vector<std::vector<MatType> >& asens,
-          bool always_inline, bool never_inline) {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    bool inline_function = always_inline;     // TODO(@jaeandersson): Add logic for inlining
-
+  reverse_x(const std::vector<MatType>& arg, const std::vector<MatType>& res,
+            const std::vector<std::vector<MatType> >& aseed,
+            std::vector<std::vector<MatType> >& asens) {
     // Quick return if no seeds
     if (aseed.empty()) {
       asens.clear();
       return;
-    }
-
-    // The non-inlining version is implemented in the base class
-    if (!inline_function) {
-      return FunctionInternal::reverse(arg, res, aseed, asens, always_inline, never_inline);
     }
 
     if (isInput(arg)) {

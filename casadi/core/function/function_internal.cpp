@@ -2530,10 +2530,11 @@ namespace casadi {
     return false;
   }
 
-  void FunctionInternal::forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                 const std::vector<std::vector<MX> >& fseed,
-                                 std::vector<std::vector<MX> >& fsens,
-                                 bool always_inline, bool never_inline) {
+  void FunctionInternal::
+  forward_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+             const std::vector<std::vector<MX> >& fseed,
+             std::vector<std::vector<MX> >& fsens,
+             bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!always_inline, "Class " + type_name() +
                           " cannot be inlined in an MX expression");
@@ -2606,10 +2607,11 @@ namespace casadi {
     casadi_assert(x_it==x.end());
   }
 
-  void FunctionInternal::reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                 const std::vector<std::vector<MX> >& aseed,
-                                 std::vector<std::vector<MX> >& asens,
-                                 bool always_inline, bool never_inline) {
+  void FunctionInternal::
+  reverse_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+             const std::vector<std::vector<MX> >& aseed,
+             std::vector<std::vector<MX> >& asens,
+             bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!always_inline, "Class " + type_name() +
                           " cannot be inlined in an MX expression");
@@ -2691,10 +2693,11 @@ namespace casadi {
     casadi_assert(x_it==x.end());
   }
 
-  void FunctionInternal::forward(const std::vector<SX>& arg, const std::vector<SX>& res,
-                                 const std::vector<std::vector<SX> >& fseed,
-                                 std::vector<std::vector<SX> >& fsens,
-                                 bool always_inline, bool never_inline) {
+  void FunctionInternal::
+  forward_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+             const std::vector<std::vector<SX> >& fseed,
+             std::vector<std::vector<SX> >& fsens,
+             bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     if (fseed.empty()) { // Quick return if no seeds
       fsens.clear();
@@ -2703,10 +2706,11 @@ namespace casadi {
     casadi_error("'forward' (SX) not defined for " + type_name());
   }
 
-  void FunctionInternal::reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
-                                 const std::vector<std::vector<SX> >& aseed,
-                                 std::vector<std::vector<SX> >& asens,
-                                 bool always_inline, bool never_inline) {
+  void FunctionInternal::
+  reverse_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+             const std::vector<std::vector<SX> >& aseed,
+             std::vector<std::vector<SX> >& asens,
+             bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     if (aseed.empty()) { // Quick return if no seeds
       asens.clear();
@@ -2716,7 +2720,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  forward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+  forward_dm(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
           const std::vector<std::vector<DMatrix> >& fseed,
           std::vector<std::vector<DMatrix> >& fsens,
           bool always_inline, bool never_inline) {
@@ -2724,7 +2728,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  reverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+  reverse_dm(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
           const std::vector<std::vector<DMatrix> >& aseed,
           std::vector<std::vector<DMatrix> >& asens,
           bool always_inline, bool never_inline) {
@@ -2968,6 +2972,54 @@ namespace casadi {
   linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
                bool tr, int nrhs) {
     casadi_error("'linsol_spAdj' not defined for " + type_name());
+  }
+
+  void FunctionInternal::
+  forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+          const std::vector<std::vector<MX> >& fseed,
+          std::vector<std::vector<MX> >& fsens,
+          bool always_inline, bool never_inline) {
+    forward_mx(arg, res, fseed, fsens, always_inline, never_inline);
+  }
+
+  void FunctionInternal::
+  reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+          const std::vector<std::vector<MX> >& aseed,
+          std::vector<std::vector<MX> >& asens,
+          bool always_inline, bool never_inline) {
+    reverse_mx(arg, res, aseed, asens, always_inline, never_inline);
+  }
+
+  void FunctionInternal::
+  forward(const std::vector<SX>& arg, const std::vector<SX>& res,
+          const std::vector<std::vector<SX> >& fseed,
+          std::vector<std::vector<SX> >& fsens,
+          bool always_inline, bool never_inline) {
+    forward_sx(arg, res, fseed, fsens, always_inline, never_inline);
+  }
+
+  void FunctionInternal::
+  reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+          const std::vector<std::vector<SX> >& aseed,
+          std::vector<std::vector<SX> >& asens,
+          bool always_inline, bool never_inline) {
+    reverse_sx(arg, res, aseed, asens, always_inline, never_inline);
+  }
+
+  void FunctionInternal::
+  forward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+          const std::vector<std::vector<DMatrix> >& fseed,
+          std::vector<std::vector<DMatrix> >& fsens,
+          bool always_inline, bool never_inline) {
+    forward_dm(arg, res, fseed, fsens, always_inline, never_inline);
+  }
+
+  void FunctionInternal::
+  reverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
+          const std::vector<std::vector<DMatrix> >& aseed,
+          std::vector<std::vector<DMatrix> >& asens,
+          bool always_inline, bool never_inline) {
+    reverse_dm(arg, res, aseed, asens, always_inline, never_inline);
   }
 
 } // namespace casadi

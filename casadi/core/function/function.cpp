@@ -1031,7 +1031,7 @@ namespace casadi {
       return forward(arg, res, replaceFwdSeed(fseed), fsens,
                      always_inline, never_inline);
     }
-    (*this)->forward(arg, res, fseed, fsens, always_inline, never_inline);
+    (*this)->forward_mx(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   void Function::reverse(const vector<MX>& arg, const vector<MX>& res,
@@ -1044,7 +1044,7 @@ namespace casadi {
       return reverse(arg, res, replaceAdjSeed(aseed), asens,
                      always_inline, never_inline);
     }
-    (*this)->reverse(arg, res, aseed, asens, always_inline, never_inline);
+    (*this)->reverse_mx(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   void Function::forward(const vector<SX>& arg, const vector<SX>& res,
@@ -1057,7 +1057,7 @@ namespace casadi {
       return forward(arg, res, replaceFwdSeed(fseed), fsens,
                      always_inline, never_inline);
     }
-    (*this)->forward(arg, res, fseed, fsens, always_inline, never_inline);
+    (*this)->forward_sx(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   void Function::reverse(const vector<SX>& arg, const vector<SX>& res,
@@ -1070,7 +1070,7 @@ namespace casadi {
       return reverse(arg, res, replaceAdjSeed(aseed), asens,
                      always_inline, never_inline);
     }
-    (*this)->reverse(arg, res, aseed, asens, always_inline, never_inline);
+    (*this)->reverse_sx(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   void Function::forward(const vector<DMatrix>& arg, const vector<DMatrix>& res,
@@ -1083,7 +1083,7 @@ namespace casadi {
       return forward(arg, res, replaceFwdSeed(fseed), fsens,
                      always_inline, never_inline);
     }
-    (*this)->forward(arg, res, fseed, fsens, always_inline, never_inline);
+    (*this)->forward_dm(arg, res, fseed, fsens, always_inline, never_inline);
   }
 
   void Function::reverse(const vector<DMatrix>& arg, const vector<DMatrix>& res,
@@ -1096,7 +1096,7 @@ namespace casadi {
       return reverse(arg, res, replaceAdjSeed(aseed), asens,
                      always_inline, never_inline);
     }
-    (*this)->reverse(arg, res, aseed, asens, always_inline, never_inline);
+    (*this)->reverse_dm(arg, res, aseed, asens, always_inline, never_inline);
   }
 
   vector<DMatrix> Function::operator()(const vector<DMatrix>& arg,

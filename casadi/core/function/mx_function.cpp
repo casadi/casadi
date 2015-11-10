@@ -1236,6 +1236,38 @@ namespace casadi {
     vinit_fcn = Function("lifting_variable_guess", f_in, f_out);
   }
 
+  void MXFunction::forward_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+                                   const std::vector<std::vector<MX> >& fseed,
+                                   std::vector<std::vector<MX> >& fsens,
+                                   bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    bool inline_function = always_inline;     // TODO(@jaeandersson): Add logic for inlining
+
+    if (inline_function) {
+      // Call inlining
+      forward_x(arg, res, fseed, fsens);
+    } else {
+      // The non-inlining version is implemented in the base class
+      FunctionInternal::forward_mx(arg, res, fseed, fsens, always_inline, never_inline);
+    }
+  }
+
+  void MXFunction::reverse_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+                                 const std::vector<std::vector<MX> >& aseed,
+                                 std::vector<std::vector<MX> >& asens,
+                                 bool always_inline, bool never_inline) {
+    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    bool inline_function = always_inline;     // TODO(@jaeandersson): Add logic for inlining
+
+    if (inline_function) {
+      // Call inlining
+      reverse_x(arg, res, aseed, asens);
+    } else {
+      // The non-inlining version is implemented in the base class
+      FunctionInternal::reverse_mx(arg, res, aseed, asens, always_inline, never_inline);
+    }
+  }
+
   MX MXFunction::grad_mx(int iind, int oind) {
     return grad(iind, oind);
   }

@@ -1350,22 +1350,26 @@ namespace casadi {
 
 #endif // WITH_OPENCL
 
-  void SXFunction::forward(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void SXFunction::forward_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
                                    const std::vector<std::vector<SX> >& fseed,
                                    std::vector<std::vector<SX> >& fsens,
                                    bool always_inline, bool never_inline) {
+    // Consistency check
     casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
-    XFunction<SXFunction, SX, SXNode>
-      ::forward(arg, res, fseed, fsens, true, false);
+
+    // Call inlining
+    forward_x(arg, res, fseed, fsens);
   }
 
-  void SXFunction::reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+  void SXFunction::reverse_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
                                  const std::vector<std::vector<SX> >& aseed,
                                  std::vector<std::vector<SX> >& asens,
                                  bool always_inline, bool never_inline) {
+    // Consistency check
     casadi_assert_message(!never_inline, "SX expressions do not have call nodes");
-    XFunction<SXFunction, SX, SXNode>
-      ::reverse(arg, res, aseed, asens, true, false);
+
+    // Call inlining
+    reverse_x(arg, res, aseed, asens);
   }
 
   SX SXFunction::grad_sx(int iind, int oind) {
