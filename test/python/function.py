@@ -204,7 +204,7 @@ class Functiontests(casadiTestCase):
       b = Sparsity.band(i,-1) + Sparsity.band(i,1)
       test(b + Sparsity.rowcol([0],[5],i,i))
       
-    m = IMatrix.ones(Sparsity.diag(129))
+    m = IM.ones(Sparsity.diag(129))
     m[:50,0] = 1
     m[60:,0] = 1
     m[6:9,6] = 1
@@ -215,7 +215,7 @@ class Functiontests(casadiTestCase):
     test(sp)
     #test(sp.T)
     
-    m = IMatrix.ones(Sparsity.diag(64))
+    m = IM.ones(Sparsity.diag(64))
     m[:50,0] = 1
     m[60:,0] = 1
 
@@ -248,7 +248,7 @@ class Functiontests(casadiTestCase):
         
         random.seed(0)
         
-        I = IMatrix.ones(sp)
+        I = IM.ones(sp)
         for i in range(n):
           for j in range(m):
             if random.random()<0.5:
@@ -259,7 +259,7 @@ class Functiontests(casadiTestCase):
         
         test(sp_holes)
         
-        z = IMatrix(sp_holes.size1(), sp_holes.size2())
+        z = IM(sp_holes.size1(), sp_holes.size2())
         
         R = 5
         v = []
@@ -282,31 +282,31 @@ class Functiontests(casadiTestCase):
       self.checkarray(sp.row(),sp2.row())
       self.checkarray(sp.colind(),sp2.colind())
       
-    A = IMatrix([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+    A = IM([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
     A = sparsify(A)
     C = A.sparsity()
     
     test(C)
     
-    A = IMatrix([[1,0,0,0,0,0],[0,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+    A = IM([[1,0,0,0,0,0],[0,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
     A = sparsify(A)
     C = A.sparsity()
     
     test(C)
     
-    A = IMatrix([[1,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    A = sparsify(A)
-    C = A.sparsity()
-      
-    test(C)
-
-    A = IMatrix([[0,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+    A = IM([[1,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
     A = sparsify(A)
     C = A.sparsity()
       
     test(C)
 
-    A = IMatrix([[0,0,0,0,0,0],[0,1,0,0,1,0],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,0,0,1,0,1]])
+    A = IM([[0,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+    A = sparsify(A)
+    C = A.sparsity()
+      
+    test(C)
+
+    A = IM([[0,0,0,0,0,0],[0,1,0,0,1,0],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,0,0,1,0,1]])
     A = sparsify(A)
     C = A.sparsity()
       
@@ -334,7 +334,7 @@ class Functiontests(casadiTestCase):
         
       random.seed(0)
       
-      I = IMatrix.ones(sp)
+      I = IM.ones(sp)
       for ii in range(i):
         for jj in range(i):
           if random.random()<0.5:
@@ -346,7 +346,7 @@ class Functiontests(casadiTestCase):
       
       test(sp_holes)
       
-      z = IMatrix(sp_holes.size1(), sp_holes.size2())
+      z = IM(sp_holes.size1(), sp_holes.size2())
       
       R = 5
       v = []

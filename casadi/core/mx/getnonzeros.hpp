@@ -57,7 +57,7 @@ namespace casadi {
     virtual void evalAdj(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens);
 
-    /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
+    /// Get an IM representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
     /// Get all the nonzeros

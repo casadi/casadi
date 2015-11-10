@@ -524,7 +524,7 @@ class casadiTestCase(unittest.TestCase):
               if a.numel()==0 and sparsify(b).nnz()==0: continue
               
               if (allow_nondiff and (a.nnz()==0 or b.nnz()==0 )): continue
-              #self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
+              #self.checkarray(IM(a.sparsity(),1),IM(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               
     for k in range(trial.n_in()):

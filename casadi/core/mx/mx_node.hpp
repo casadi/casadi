@@ -298,7 +298,7 @@ namespace casadi {
     /// Simplify the expression (ex is a reference to the node)
     virtual void simplifyMe(MX& ex) {}
 
-    /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
+    /// Get an IM representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
     /// Create a horizontal concatenation node

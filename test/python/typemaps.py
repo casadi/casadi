@@ -43,16 +43,16 @@ class typemaptests(casadiTestCase):
     pass
 
   def test_0a(self):
-    self.message("Typemap array -> IMatrix")
+    self.message("Typemap array -> IM")
     arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]]),array([[1,2,3],[4,5,6]],dtype=int)]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=c.transpose(c.transpose(m))
-      self.assertTrue(isinstance(zt,IMatrix),"IMatrix expected")
-      self.checkarray(m,zt,"IMatrix(numpy.ndarray)")
-      self.checkarray(m,zt.toArray(),"IMatrix(numpy.ndarray).toArray()")
+      self.assertTrue(isinstance(zt,IM),"IM expected")
+      self.checkarray(m,zt,"IM(numpy.ndarray)")
+      self.checkarray(m,zt.toArray(),"IM(numpy.ndarray).toArray()")
       #if scipy_available:
-      #  self.checkarray(m,zt.toCsc_matrix(),"IMatrix(numpy.ndarray).toCsc_matrix()")
+      #  self.checkarray(m,zt.toCsc_matrix(),"IM(numpy.ndarray).toCsc_matrix()")
       
   def test_0(self):
     self.message("Typemap array -> DM")
@@ -553,9 +553,9 @@ class typemaptests(casadiTestCase):
     DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),b)
     
   def test_imatrix(self):
-    self.message("IMatrix")
+    self.message("IM")
     
-    A = IMatrix.ones(2,2)
+    A = IM.ones(2,2)
     B = A + 1
     self.assertEqual(type(B),type(A))
     self.checkarray(array(B),repmat(DM(2),2,2),"Imatrix")
@@ -567,7 +567,7 @@ class typemaptests(casadiTestCase):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
     m = DM.ones(5,5)
     m.set(DM(4))
-    m.set(IMatrix(4))
+    m.set(IM(4))
         
   def test_issue570(self):
     self.message("Issue #570: long int")
@@ -607,23 +607,23 @@ class typemaptests(casadiTestCase):
         
     self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
 
-  def test_casting_IMatrix(self):
-    self.message("casting IMatrix")
+  def test_casting_IM(self):
+    self.message("casting IM")
 
     class Foo:
-      def __IMatrix__(self):
-        return IMatrix([[4,6],[2,4]])
+      def __IM__(self):
+        return IM([[4,6],[2,4]])
         
     self.assertEqual(det(Foo()),4)
 
     class Foo:
-      def __IMatrix__(self):
+      def __IM__(self):
         return SX([[4,6],[2,4]])
         
     self.assertRaises(NotImplementedError,lambda :det(Foo()))
     
     class Foo:
-      def __IMatrix__(self):
+      def __IM__(self):
         raise Exception("15")
         
     self.assertRaises(NotImplementedError,lambda :det(Foo()))

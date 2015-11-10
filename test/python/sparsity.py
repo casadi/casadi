@@ -507,8 +507,8 @@ class Sparsitytests(casadiTestCase):
     n = 3
     
     s = Sparsity.rowcol([n-1,0],[0,n-1],n,n)
-    self.checkarray(IMatrix(s.colind()),IMatrix([0,2,2,4]))
-    self.checkarray(IMatrix(s.row()),IMatrix([0,2,0,2]))
+    self.checkarray(IM(s.colind()),IM([0,2,2,4]))
+    self.checkarray(IM(s.row()),IM([0,2,0,2]))
 
   def test_inverse(self):
     numpy.random.seed(0)
@@ -517,12 +517,12 @@ class Sparsitytests(casadiTestCase):
     
     for sp in [sp,Sparsity.dense(4,4),Sparsity(4,4),Sparsity.lower(4),Sparsity.lower(4).T]:
     
-      d = IMatrix.ones(sp)
+      d = IM.ones(sp)
       
       dt = sparsify(1-d)
-      dt = IMatrix.ones(dt.sparsity())
+      dt = IM.ones(dt.sparsity())
       
-      trial = IMatrix.ones(sp.pattern_inverse())
+      trial = IM.ones(sp.pattern_inverse())
       
       d.printDense()
       dt.printDense()
@@ -540,7 +540,7 @@ class Sparsitytests(casadiTestCase):
     self.assertEqual(c_.size2(),a.size2()*b.size2())
     self.assertEqual(c_.nnz(),a.nnz()*b.nnz())
     
-    self.checkarray(IMatrix(c_,1),IMatrix(c.kron(a,b).sparsity(),1))
+    self.checkarray(IM(c_,1),IM(c.kron(a,b).sparsity(),1))
     
 if __name__ == '__main__':
     unittest.main()

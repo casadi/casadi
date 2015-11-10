@@ -93,21 +93,21 @@ namespace casadi {
       return;
     }
 
-    // Fall back on IMatrix-IMatrix
+    // Fall back on IM-IM
     get(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
   void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Matrix<int>& cc) const {
-    // Fall back on IMatrix-IMatrix
+    // Fall back on IM-IM
     get(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
   template<typename DataType>
   void Matrix<DataType>::get(Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Slice& cc) const {
-    // Fall back on IMatrix-IMatrix
+    // Fall back on IM-IM
     get(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
@@ -148,7 +148,7 @@ namespace casadi {
       return;
     }
 
-    // Fall back on IMatrix
+    // Fall back on IM
     get(m, ind1, rr.getAll(numel(), ind1));
   }
 
@@ -194,21 +194,21 @@ namespace casadi {
       return;
     }
 
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     set(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Slice& rr, const Matrix<int>& cc) {
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     set(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
                                 const Matrix<int>& rr, const Slice& cc) {
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     set(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
@@ -275,7 +275,7 @@ namespace casadi {
     }
 
     // Collect all assignments
-    IMatrix el = IMatrix::zeros(m.sparsity());
+    IM el = IM::zeros(m.sparsity());
     for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
       int this_j = cc.at(j) - ind1; // Corresponding column in this
       if (this_j<0) this_j += sz2;
@@ -298,7 +298,7 @@ namespace casadi {
       return;
     }
 
-    // Fall back on IMatrix
+    // Fall back on IM
     set(m, ind1, rr.getAll(numel(), ind1));
   }
 
@@ -404,7 +404,7 @@ namespace casadi {
       return;
     }
 
-    // Fall back on IMatrix
+    // Fall back on IM
     getNZ(m, ind1, kk.getAll(nnz(), ind1));
   }
 
@@ -450,7 +450,7 @@ namespace casadi {
       return;
     }
 
-    // Fallback on IMatrix
+    // Fallback on IM
     setNZ(m, ind1, kk.getAll(nnz(), ind1));
   }
 
@@ -1839,8 +1839,8 @@ namespace casadi {
 
     // Find out which is the best direction to expand along
 
-    // Build up an IMatrix with ones on the non-zeros
-    Matrix<int> sp = IMatrix::ones(sparsity());
+    // Build up an IM with ones on the non-zeros
+    Matrix<int> sp = IM::ones(sparsity());
 
     // Have a count of the nonzeros for each row
     Matrix<int> row_count = sp.zz_sumCols();

@@ -1031,7 +1031,7 @@ class SXtests(casadiTestCase):
     f.evaluate()
     g.evaluate()
     
-    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.sparsity_out(0)))
+    self.checkarray(IM.ones(filt),IM.ones(g.sparsity_out(0)))
     
     self.checkarray(f.getOutput()[filt],g.getOutput())
     

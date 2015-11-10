@@ -65,7 +65,7 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int op() const { return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
 
-    /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
+    /// Get an IM representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)

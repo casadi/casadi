@@ -375,12 +375,12 @@ namespace casadi {
     //  entries of jacG are encoded "1+i"
     //  "0" is to be interpreted not as an index but as a literal zero
 
-    IMatrix mapping_jacG  = IMatrix(0, nx_);
-    IMatrix mapping_gradF = IMatrix(jacF_.sparsity_out(0),
+    IM mapping_jacG  = IM(0, nx_);
+    IM mapping_gradF = IM(jacF_.sparsity_out(0),
                                     range(-1, -1-jacF_.nnz_out(0), -1));
 
     if (!jacG_.isNull()) {
-      mapping_jacG = IMatrix(jacG_.sparsity_out(0), range(1, jacG_.nnz_out(0)+1));
+      mapping_jacG = IM(jacG_.sparsity_out(0), range(1, jacG_.nnz_out(0)+1));
     }
 
     // First, remap jacG
@@ -389,7 +389,7 @@ namespace casadi {
     m_ = ng_;
 
     // Construct the linear objective row
-    IMatrix d = mapping_gradF(Slice(0), x_order_);
+    IM d = mapping_gradF(Slice(0), x_order_);
 
     std::vector<int> ii = mapping_gradF.sparsity().get_col();
     for (int j = 0; j < nnObj_; ++j) {
@@ -415,7 +415,7 @@ namespace casadi {
     // Is the A matrix completely empty?
     dummyrow_ = A_structure_.nnz() == 0;  // Then we need a dummy row
     if (dummyrow_) {
-      IMatrix dummyrow = IMatrix(1, nx_);
+      IM dummyrow = IM(1, nx_);
       dummyrow(0, 0) = 0;
       A_structure_ = vertcat(A_structure_, dummyrow);
       m_+=1;

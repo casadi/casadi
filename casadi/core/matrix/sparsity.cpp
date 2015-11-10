@@ -1288,7 +1288,7 @@ namespace casadi {
     std::vector<Sparsity> ret;
 
     // Caveat: this is a very silly implementation
-    IMatrix x = IMatrix::zeros(*this);
+    IM x = IM::zeros(*this);
 
     for (int i=0;i<n;++i) {
       ret.push_back(x(Slice(offset1[i], offset1[i+1]),

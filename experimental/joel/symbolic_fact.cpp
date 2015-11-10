@@ -141,7 +141,7 @@ int main(){
   int ncol3 = 5;
   CRSSparsity S3(nrow3,ncol3,vector<int>(col3,col3+10),vector<int>(rowind3,rowind3+11));
   
-  IMatrix(S3,1).printDense();
+  IM(S3,1).printDense();
 
   
   cs AT_;

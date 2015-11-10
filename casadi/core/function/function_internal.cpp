@@ -665,14 +665,14 @@ namespace casadi {
             nsweeps+=1;
 
             // Construct lookup table
-            IMatrix lookup = IMatrix::triplet(lookup_row, lookup_col, lookup_value,
+            IM lookup = IM::triplet(lookup_row, lookup_col, lookup_value,
                                               bvec_size, coarse.size());
 
             std::reverse(lookup_col.begin(), lookup_col.end());
             std::reverse(lookup_row.begin(), lookup_row.end());
             std::reverse(lookup_value.begin(), lookup_value.end());
-            IMatrix duplicates =
-              IMatrix::triplet(lookup_row, lookup_col, lookup_value, bvec_size, coarse.size())
+            IM duplicates =
+              IM::triplet(lookup_row, lookup_col, lookup_value, bvec_size, coarse.size())
               - lookup;
             duplicates = sparsify(duplicates);
             lookup(duplicates.sparsity()) = -bvec_size;
@@ -971,7 +971,7 @@ namespace casadi {
             nsweeps+=1;
 
             // Construct lookup table
-            IMatrix lookup = IMatrix::triplet(lookup_row, lookup_col, lookup_value, bvec_size,
+            IM lookup = IM::triplet(lookup_row, lookup_col, lookup_value, bvec_size,
                                               coarse_col.size());
 
             // Propagate the dependencies

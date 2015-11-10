@@ -44,7 +44,7 @@ namespace casadi {
     /// Default constructor - all elements
     Slice();
 
-    /// A single element (explicit to avoid ambiguity with IMatrix overload
+    /// A single element (explicit to avoid ambiguity with IM overload
     explicit Slice(int i, bool ind1=false);
 
     /// A slice

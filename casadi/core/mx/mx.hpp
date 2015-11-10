@@ -585,7 +585,7 @@ namespace casadi {
     /// Transpose the matrix
     MX T() const;
 
-    /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
+    /** \brief Get an IM representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */

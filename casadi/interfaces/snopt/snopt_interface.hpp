@@ -114,7 +114,7 @@ namespace casadi {
     /// sorted constraint index -> original constraint index
     std::vector<int> g_order_;
 
-    IMatrix A_structure_;
+    IM A_structure_;
     std::vector<double> A_data_;
 
 

@@ -210,7 +210,7 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.assertTrue(a.isNull())
     
-    a = IMatrix(Sparsity.lower(4),range(10))
+    a = IM(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)

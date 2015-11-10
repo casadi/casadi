@@ -49,7 +49,7 @@ namespace casadi {
   template <typename DataType> inline std::string matrixName()
   { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
   template<> inline std::string matrixName<double>() { return "DM"; }
-  template<> inline std::string matrixName<int>() { return "IMatrix"; }
+  template<> inline std::string matrixName<int>() { return "IM"; }
   ///@}
 /// \endcond
 
@@ -219,10 +219,10 @@ namespace casadi {
     /// Returns the truth value of a Matrix
     bool __nonzero__() const;
 
-    /// Is the Matrix a Slice (only for IMatrix)
+    /// Is the Matrix a Slice (only for IM)
     bool isSlice(bool ind1=false) const;
 
-    ///  Convert to Slice (only for IMatrix)
+    ///  Convert to Slice (only for IM)
     Slice toSlice(bool ind1=false) const;
 
     /** \brief Set all the entries without changing sparsity pattern */
@@ -1173,7 +1173,7 @@ namespace casadi {
 
   ///@{
   /// Readability typedefs
-  typedef Matrix<int> IMatrix;
+  typedef Matrix<int> IM;
   typedef Matrix<double> DM;
   typedef std::vector<DM> DMVector;
   typedef std::vector<DMVector> DMVectorVector;

@@ -125,17 +125,17 @@ namespace casadi {
   }
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     return get(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) const {
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     get(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) const {
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     get(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
@@ -155,7 +155,7 @@ namespace casadi {
   }
 
   void MX::get(MX& m, bool ind1, const Slice& rr) const {
-    // Fall back on IMatrix
+    // Fall back on IM
     get(m, ind1, rr.getAll(numel(), ind1));
   }
 
@@ -186,17 +186,17 @@ namespace casadi {
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     set(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) {
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     set(m, ind1, rr.getAll(size1(), ind1), cc);
   }
 
   void MX::set(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) {
-    // Fall back on (IMatrix, IMatrix)
+    // Fall back on (IM, IM)
     set(m, ind1, rr, cc.getAll(size2(), ind1));
   }
 
@@ -256,7 +256,7 @@ namespace casadi {
     }
 
     // Collect all assignments
-    IMatrix el = IMatrix::zeros(m.sparsity());
+    IM el = IM::zeros(m.sparsity());
     for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
       int this_j = cc.at(j) - ind1; // Corresponding column in this
       if (this_j<0) this_j += sz2;
@@ -271,7 +271,7 @@ namespace casadi {
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr) {
-    // Fall back on IMatrix
+    // Fall back on IM
     set(m, ind1, rr.getAll(size1(), ind1));
   }
 
@@ -361,7 +361,7 @@ namespace casadi {
   }
 
   void MX::getNZ(MX& m, bool ind1, const Slice& kk) const {
-    // Fallback on IMatrix
+    // Fallback on IM
     getNZ(m, ind1, kk.getAll(nnz(), ind1));
   }
 
@@ -404,7 +404,7 @@ namespace casadi {
   }
 
   void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
-    // Fallback on IMatrix
+    // Fallback on IM
     setNZ(m, ind1, kk.getAll(nnz(), ind1));
   }
 

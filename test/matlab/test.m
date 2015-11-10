@@ -29,7 +29,7 @@ assert(iszero(res))
 
 x = SX.sym('x',4);
 
-f = Function('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
+f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
 
 f.setInput([1,2,3,4])
 f.evaluate()
@@ -62,7 +62,7 @@ assert(flag);
 
 x = MX.sym('x',4);
 
-f = Function('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
+f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
 
 f.setInput([1,2,3,4])
 f.evaluate()

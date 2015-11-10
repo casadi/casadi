@@ -649,24 +649,24 @@ class MXtests(casadiTestCase):
     self.checkarray(f.getOutput(),nxn+nyn,"unite sparse")
      
   def test_imatrix_index(self):
-    self.message("IMatrix indexing")
+    self.message("IM indexing")
     X = MX.sym("x",2,2)
-    Y = X.nz[IMatrix([[0,2],[1,1],[3,3]])]
+    Y = X.nz[IM([[0,2],[1,1],[3,3]])]
     
     f = Function("f", [X],[Y])
     f.setInputNZ([1,2,3,4])
     f.evaluate()
     
-    self.checkarray(f.getOutput(),array([[1,3],[2,2],[4,4]]),"IMatrix indexing")
+    self.checkarray(f.getOutput(),array([[1,3],[2,2],[4,4]]),"IM indexing")
     
     Y = X[:,:]
-    Y.nz[IMatrix([[0,2]])] = DM([[9,8]])
+    Y.nz[IM([[0,2]])] = DM([[9,8]])
     
     f = Function("f", [X],[Y])
     f.setInputNZ([1,2,3,4])
     f.evaluate()
     
-    self.checkarray(f.getOutput(),array([[9,8],[2,4]]),"IMatrix indexing assignment")
+    self.checkarray(f.getOutput(),array([[9,8],[2,4]]),"IM indexing assignment")
         
   def test_subsass(self):
      self.message("Check subscripted assignment")
@@ -1327,7 +1327,7 @@ class MXtests(casadiTestCase):
     self.message("reshape")
     X = MX.sym("X",10)
 
-    i = IMatrix(Sparsity.lower(3),range(6))
+    i = IM(Sparsity.lower(3),range(6))
 
     i.printDense()
     print vecNZ(i.T)
@@ -1338,7 +1338,7 @@ class MXtests(casadiTestCase):
     f.setInput(range(10))
     f.evaluate()
     
-    self.checkarray(IMatrix([0,1,9,4,16,25]),f.getOutput())
+    self.checkarray(IM([0,1,9,4,16,25]),f.getOutput())
 
     Y = MX.sym("Y",10)
 
@@ -1346,13 +1346,13 @@ class MXtests(casadiTestCase):
     ff.setInput(range(10))
     ff.evaluate()
 
-    self.checkarray(IMatrix([0,1,9,4,16,25]),ff.getOutput())
+    self.checkarray(IM([0,1,9,4,16,25]),ff.getOutput())
     
     J = Function("J", [X],[MX.jac(f)])
     J.setInput(range(10))
     J.evaluate()
     
-    i = horzcat([diag([0,2,4,6,8,10]),IMatrix.zeros(6,4)])
+    i = horzcat([diag([0,2,4,6,8,10]),IM.zeros(6,4)])
     i[[2,3],:] = i[[3,2],:]
     
     self.checkarray(i,J.getOutput())
@@ -1363,7 +1363,7 @@ class MXtests(casadiTestCase):
     J.setInput(range(10))
     J.evaluate()
     
-    i = horzcat([diag([0,2,4,6,8,10]),IMatrix.zeros(6,4)])
+    i = horzcat([diag([0,2,4,6,8,10]),IM.zeros(6,4)])
     i[[2,3],:] = i[[3,2],:]
     
     self.checkarray(i,J.getOutput())
@@ -1378,7 +1378,7 @@ class MXtests(casadiTestCase):
     f.setInput(range(10))
     f.evaluate()
     
-    self.checkarray(IMatrix([16,4]),f.getOutput())
+    self.checkarray(IM([16,4]),f.getOutput())
 
     Y = MX.sym("Y",10)
 
@@ -1386,13 +1386,13 @@ class MXtests(casadiTestCase):
     ff.setInput(range(10))
     ff.evaluate()
 
-    self.checkarray(IMatrix([16,4]),ff.getOutput())
+    self.checkarray(IM([16,4]),ff.getOutput())
     
     J = Function("J", [X],[MX.jac(f)])
     J.setInput(range(10))
     J.evaluate()
     
-    i = IMatrix.zeros(2,10)
+    i = IM.zeros(2,10)
     i[0,4] = 8
     i[1,2] = 4
     
@@ -1453,7 +1453,7 @@ class MXtests(casadiTestCase):
     B_ = DM([[1,2,3,4,5],[6,7,8,9,10]])
     B = MX.sym("B",2,5)
     
-    A = IMatrix([[1,1,0,0,0],[0,0,1,0,0]])
+    A = IM([[1,1,0,0,0],[0,0,1,0,0]])
     A = sparsify(A)
     sp = A.sparsity()
     import copy
@@ -1539,7 +1539,7 @@ class MXtests(casadiTestCase):
     f.evaluate()
     g.evaluate()
     
-    self.checkarray(IMatrix.ones(filt),IMatrix.ones(g.sparsity_out(0)))
+    self.checkarray(IM.ones(filt),IM.ones(g.sparsity_out(0)))
     
     self.checkarray(f.getOutput()[filt],g.getOutput())
     
@@ -1751,8 +1751,8 @@ class MXtests(casadiTestCase):
             
             self.checkarray(f.getOutput(),numpyop(x_))
             
-            a = IMatrix(f.sparsity_out(0),1)
-            b = IMatrix.ones(DM(numpyop(x_)).sparsity())
+            a = IM(f.sparsity_out(0),1)
+            b = IM.ones(DM(numpyop(x_)).sparsity())
             
             c = b-a
             if c.nnz()>0:
@@ -1789,8 +1789,8 @@ class MXtests(casadiTestCase):
                 
                 
                 if "mul" not in name:
-                  a = IMatrix.ones(f.sparsity_out(0))
-                  b = IMatrix.ones(g.sparsity_out(0))
+                  a = IM.ones(f.sparsity_out(0))
+                  b = IM.ones(g.sparsity_out(0))
                   
                   c = b-a
                   if c.nnz()>0:
@@ -1820,8 +1820,8 @@ class MXtests(casadiTestCase):
             
             self.checkarray(r.getMatrixValue(),numpyop(x_),str([x_,name]))
             
-            a = IMatrix.ones(r.getMatrixValue().sparsity())
-            b = IMatrix.ones(DM(numpyop(x_)).sparsity())
+            a = IM.ones(r.getMatrixValue().sparsity())
+            b = IM.ones(DM(numpyop(x_)).sparsity())
             
             c = b-a
             if c.nnz()>0:
@@ -1845,8 +1845,8 @@ class MXtests(casadiTestCase):
                 
                 self.checkarray(f.getOutput(),numpyop([x1_,x2_]),str([sp,sp2,v1,v2,name]))
                 if "mul" not in name:
-                  a = IMatrix.ones(f.sparsity_out(0))
-                  b = IMatrix.ones(DM(numpyop([x1_,x2_])).sparsity())
+                  a = IM.ones(f.sparsity_out(0))
+                  b = IM.ones(DM(numpyop([x1_,x2_])).sparsity())
                   
                   c = b-a
                   if c.nnz()>0:
@@ -1957,7 +1957,7 @@ class MXtests(casadiTestCase):
     f.evaluate()
     
     self.checkarray(f.getOutput(),DM([[1,0,0],[0,4,0],[0,0,6]]))
-    self.checkarray(IMatrix.ones(f.sparsity_out(0)),IMatrix.ones(Sparsity.lower(3).T))
+    self.checkarray(IM.ones(f.sparsity_out(0)),IM.ones(Sparsity.lower(3).T))
     
   def test_repmat(self):
     a = DM([[1,2],[3,4],[5,6]])
@@ -2337,7 +2337,7 @@ class MXtests(casadiTestCase):
 
     sp = Sparsity.triplet(3,3,[0,1,2,2],[0,0,1,2])
 
-    f = Function("f", [x],[x.nz[IMatrix(sp,range(sp.nnz()))]])
+    f = Function("f", [x],[x.nz[IM(sp,range(sp.nnz()))]])
 
     g = Function("g", [x],[MX(sp,x)])
     
