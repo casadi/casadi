@@ -152,9 +152,16 @@ namespace casadi {
     template<typename M> void setup_g();
     int calc_g(double* g=0);
 
+    // Calculate gradient of the objective
+    enum GradFIn { GRADF_X, GRADF_P, GRADF_NUM_IN };
+    enum GradFOut { GRADF_GRADF, GRADF_NUM_OUT};
+    Function grad_f_fcn_;
+    template<typename M> void setup_grad_f();
+    int calc_grad_f(double* grad_f=0);
+
     // Calculate Jacobian of constraints
     enum JacGIn { JACG_X, JACG_P, JACG_NUM_IN };
-    enum JacGOut { JACG_JAC, JACG_NUM_OUT};
+    enum JacGOut { JACG_JACG, JACG_NUM_OUT};
     Function jac_g_fcn_;
     template<typename M> void setup_jac_g();
     int calc_jac_g(double* jac_g=0);
@@ -163,7 +170,6 @@ namespace casadi {
     template<typename M> void setup();
 
     // Ipopt callback functions
-    bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f);
     bool eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,
                 bool new_lambda, int nele_hess, int* iRow, int* jCol, double* values);
     void finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g,
@@ -203,9 +209,11 @@ namespace casadi {
     // Accumulated time since last reset:
     double t_calc_f_; // time spent in calc_f
     double t_calc_g_; // time spent in calc_g
-    double t_calc_jac_g_; // time spent in eval_jac_g
-    DiffTime t_eval_grad_f_; // time spent in eval_grad_f
+    double t_calc_grad_f_; // time spent in calc_grad_f
+    double t_calc_jac_g_; // time spent in calc_jac_g
     DiffTime t_eval_h_; // time spent in eval_h
+
+    // Timings for different parts of the main loop
     DiffTime t_callback_fun_;  // time spent in callback function
     DiffTime t_callback_prepare_; // time spent in callback preparation
     DiffTime t_mainloop_; // time spent in the main loop of the solver
@@ -213,9 +221,9 @@ namespace casadi {
     // Accumulated counts since last reset:
     int n_calc_f_; // number of calls to calc_f
     int n_calc_g_; // number of calls to calc_g
+    int n_calc_grad_f_; // number of calls to calc_grad_f
     int n_calc_jac_g_; // number of calls to calc_jac_g
 
-    int n_eval_grad_f_; // number of calls to eval_grad_f
     int n_eval_h_; // number of calls to eval_h
     int n_eval_callback_; // number of calls to callback
     int n_iter_; // number of iterations
