@@ -124,17 +124,25 @@ namespace casadi {
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res);
 
+    ///@{
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);
+    ///@}
 
-    /** \brief Call a function, DM type (overloaded) */
-    void call(const DMVector& arg, DMVector& res, bool always_inline, bool never_inline);
+    ///@{
+    /** \brief Call a function, overloaded */
+    void _call(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline) {
+      eval_mx(arg, res, always_inline, never_inline);
+    }
+    void _call(const SXVector& arg, SXVector& res, bool always_inline, bool never_inline);
+    void _call(const DMVector& arg, DMVector& res, bool always_inline, bool never_inline);
+    ///@}
 
-    /** \brief Call a function, MX type (overloaded) */
-    void call(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);
-
-    /** \brief Call a function, SX type (overloaded) */
-    void call(const SXVector& arg, SXVector& res, bool always_inline, bool never_inline);
+    /** \brief Call a function, templated */
+    template<typename M>
+      void call(const std::vector<M>& arg, std::vector<M>& res,
+               bool always_inline, bool never_inline);
 
     /** Helper function */
     static bool checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat=false);
@@ -944,6 +952,19 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::
+  call(const std::vector<M>& arg, std::vector<M>& res,
+       bool always_inline, bool never_inline) {
+    // Check if inputs need to be replaced
+    if (!matchingArg(arg)) {
+      return call(replaceArg(arg), res, always_inline, never_inline);
+    }
+
+    // Call the type-specific method
+    _call(arg, res, always_inline, never_inline);
+  }
+
+  template<typename M>
+  void FunctionInternal::
   forward(const std::vector<M>& arg, const std::vector<M>& res,
           const std::vector<std::vector<M> >& fseed,
           std::vector<std::vector<M> >& fsens,
@@ -966,7 +987,7 @@ namespace casadi {
       }
     }
 
-    // Check if there are 0-by-0 forward seeds that needs to be replaced
+    // Check if forward mode seeds need to be replaced
     for (int d=0; d<fseed.size(); ++d) {
       if (!matchingArg(fseed[d])) {
         return forward(arg, res, replaceFwdSeed(fseed), fsens,
@@ -1002,7 +1023,7 @@ namespace casadi {
       }
     }
 
-    // Check if there are 0-by-0 reverse seeds that needs to be replaced
+    // Check if reverse mode seeds need to be replaced
     for (int d=0; d<aseed.size(); ++d) {
       if (!matchingRes(aseed[d])) {
         return reverse(arg, res, replaceAdjSeed(aseed), asens,

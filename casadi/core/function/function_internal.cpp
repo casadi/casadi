@@ -1729,11 +1729,8 @@ namespace casadi {
     return ret;
   }
 
-  void FunctionInternal::call(const MXVector& arg, MXVector& res,
-                              bool always_inline, bool never_inline) {
-    if (!matchingArg(arg)) {
-      return call(replaceArg(arg), res, always_inline, never_inline);
-    }
+  void FunctionInternal::eval_mx(const MXVector& arg, MXVector& res,
+                                 bool always_inline, bool never_inline) {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
 
     // Lo logic for inlining yet
@@ -1742,26 +1739,8 @@ namespace casadi {
     if (inline_function) {
       // Evaluate the function symbolically
       evalMX(arg, res);
-
     } else {
       // Create a call-node
-
-      // Argument checking
-      casadi_assert_message(
-        arg.size()<=n_in(), "Function::call: number of passed-in dependencies ("
-        << arg.size() << ") should not exceed the number of inputs of the function ("
-        << n_in() << ").");
-
-      // Assumes initialized
-      for (int i=0; i<arg.size(); ++i) {
-        if (arg[i].isNull() || arg[i].is_empty() || input(i).is_empty()) continue;
-        casadi_assert_message(
-          arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
-          "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function."
-          << endl << ischeme_.at(i) <<  " has shape (" << input(i).size2()
-          << ", " << input(i).size1() << ") while a shape (" << arg[i].size2() << ", "
-          << arg[i].size1() << ") was supplied.");
-      }
       res = create_call(arg);
     }
   }
@@ -1770,22 +1749,15 @@ namespace casadi {
     return Call::create(shared_from_this<Function>(), arg);
   }
 
-  void FunctionInternal::call(const SXVector& arg, SXVector& res,
+  void FunctionInternal::_call(const SXVector& arg, SXVector& res,
                         bool always_inline, bool never_inline) {
-    if (!matchingArg(arg)) {
-      return call(replaceArg(arg), res, always_inline, never_inline);
-    }
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
     evalSX(arg, res);
   }
 
-  void FunctionInternal::call(const DMVector& arg, DMVector& res,
+  void FunctionInternal::_call(const DMVector& arg, DMVector& res,
                         bool always_inline, bool never_inline) {
-    if (!matchingArg(arg)) {
-      return call(replaceArg(arg), res, always_inline, never_inline);
-    }
-
     // Get the number of inputs and outputs
     int num_in = n_in();
     int num_out = n_out();
