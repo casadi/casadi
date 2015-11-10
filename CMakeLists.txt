@@ -85,7 +85,7 @@ option(WITH_JSON "Compile the JSON front-end" OFF)
 option(WITH_DEBIAN_BUILD "Add -DWITH_DEBIAN_BUILD (used for debian-specific warnings)" OFF)
 option(WITH_DEEPBIND "Load plugins with RTLD_DEEPBIND (can be used to resolve conflicting libraries in e.g. MATLAB)" OFF)
 option(WITH_SELFCONTAINED "Make the install directory self-contained" OFF)
-option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" OFF)
+option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
 
 # static on windows, shared on linux/osx by default
