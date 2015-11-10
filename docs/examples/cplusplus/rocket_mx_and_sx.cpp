@@ -91,7 +91,7 @@ int main(){
   }
 
   // Objective function
-  MX F = inner_prod(U,U);
+  MX F = dot(U,U);
 
   // Terminal constraints
   MX G = vertcat(X[0],X[1]);

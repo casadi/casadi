@@ -56,7 +56,7 @@ umin = -1*ones(10)
 umax = 0.5*ones(10)
 
 # minimize fuel
-f = inner_prod(u,u)/2
+f = dot(u,u)/2
 
 # Calculate acceleration for all points
 a = SX(100,1,0)
@@ -258,7 +258,7 @@ while True:
   feasviol = sumRows(fabs(gk))
 
   # Use a quadratic model of T1 to get a lower bound on mu (eq. 18.36 in Nocedal)
-  mu_lb = (inner_prod(gfk,p) + sigma/2.0*dot(trans(p),dot(Bk,p)))/(1.-rho)/feasviol
+  mu_lb = (dot(gfk,p) + sigma/2.0*dot(trans(p),dot(Bk,p)))/(1.-rho)/feasviol
 
   # Increase mu if it is below the lower bound
   if float(mu) < float(mu_lb):
@@ -268,7 +268,7 @@ while True:
   T1 = fk + mu*feasviol
 
   # Calculate the directional derivative of T1 at x (cf. 18.29 in Nocedal)
-  DT1 = inner_prod(gfk,p) - mu*sumRows(fabs(gk))
+  DT1 = dot(gfk,p) - mu*sumRows(fabs(gk))
   
   lsiter = 0
   alpha = 1
@@ -353,13 +353,13 @@ while True:
   yk = gradL_new - gradL
   Bdx = dot(Bk,dx)
   dxBdx = dot(trans(dx),Bdx)
-  ydx = inner_prod(dx,yk)
+  ydx = dot(dx,yk)
   if float(ydx) >= 0.2*float(dxBdx):
     thetak = 1.
   else:
     thetak = 0.8*dxBdx/(dxBdx - ydx)
   rk = thetak*dx + (1-thetak)*Bdx # rk replaces yk to assure Bk pos.def.
-  Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ inner_prod(rk,dx)
+  Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ dot(rk,dx)
 print "SQP algorithm terminated after %d iterations" % (k-1)
 
 plt.show()

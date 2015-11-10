@@ -120,7 +120,7 @@ void LiftedSQPInternal::init(){
   if(gauss_newton_){
     
     // Least square objective
-    f = inner_prod(f1,f1)/2;
+    f = dot(f1,f1)/2;
     
   } else {
     
@@ -150,9 +150,9 @@ void LiftedSQPInternal::init(){
     lam_g = vertcat(lam_v_eq,lam_f2);
     
     // Lagrangian function
-    SX lag = f + inner_prod(lam_x,x);
-    if(!f2.empty()) lag += inner_prod(lam_f2,f2);
-    if(!v.empty()) lag += inner_prod(lam_v_eq,v_def);
+    SX lag = f + dot(lam_x,x);
+    if(!f2.empty()) lag += dot(lam_f2,f2);
+    if(!v.empty()) lag += dot(lam_v_eq,v_def);
     
     // Gradient of the Lagrangian
     SX lgrad = casadi::gradient(lag,x);

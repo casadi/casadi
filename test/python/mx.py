@@ -130,7 +130,7 @@ class MXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
     self.matrixbinarypool.append(lambda a: mul(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
     self.matrixbinarypool.append(lambda a: arctan2(a[0],a[1]),lambda a: arctan2(a[0],a[1]),"arctan2")
-    #self.matrixbinarypool.append(lambda a: inner_mul(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_mul(Matrix,Matrix)") 
+    #self.matrixbinarypool.append(lambda a: inner_mul(a[0],trans(a[1])),lambda a: c.dot(a[0].T,a[1]),name="inner_mul(Matrix,Matrix)") 
     self.matrixbinarypool.append(lambda a: mul(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
     
   def test_MX1(self):
@@ -2394,7 +2394,7 @@ class MXtests(casadiTestCase):
     i1 = x[0,0]
     z = i1*x
     i3 = i1*a
-    i3= inner_prod(x,a)
+    i3= c.dot(x,a)
     d = Function("d", [x,a],[z,i3])
     d.setInput([1,2],0)
     d.setInput([3,4],1)
@@ -2408,7 +2408,7 @@ class MXtests(casadiTestCase):
   def test_bug_1042tris(self):
     x = MX.sym('x',2,1)
     a = MX.sym("ax",2,1)
-    d = Function("d", [x,a],[inner_prod(x,a)])
+    d = Function("d", [x,a],[c.dot(x,a)])
     d.setInput([1,2],0)
     d.setInput([3,4],1)
 

@@ -197,7 +197,7 @@ namespace casadi {
 
     if (gauss_newton_) {
       // Least square objective
-      f = inner_prod(vdef_out[0], vdef_out[0])/2;
+      f = dot(vdef_out[0], vdef_out[0])/2;
       gL_defL = vdef_out[0];
       ngn_ = gL_defL.nnz();
     } else {

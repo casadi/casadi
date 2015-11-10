@@ -48,7 +48,7 @@ namespace casadi {
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = det_X * inner_prod(trans_inv_X, fseed[d][0]);
+      fsens[d][0] = det_X * dot(trans_inv_X, fseed[d][0]);
     }
   }
 

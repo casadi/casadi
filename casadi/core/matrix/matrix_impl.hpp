@@ -2094,15 +2094,16 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_inner_prod(const Matrix<DataType> &y) const {
-    casadi_assert_message(size()==y.size(), "inner_prod: Dimension mismatch");
-    if (sparsity()!=y.sparsity()) {
-      Sparsity sp = sparsity() * y.sparsity();
-      return inner_prod(project(*this, sp), project(y, sp));
+  Matrix<DataType> Matrix<DataType>::dot(const Matrix<DataType> &x,
+                                         const Matrix<DataType> &y) {
+    casadi_assert_message(x.size()==y.size(), "dot: Dimension mismatch");
+    if (x.sparsity()!=y.sparsity()) {
+      Sparsity sp = x.sparsity() * y.sparsity();
+      return dot(project(x, sp), project(y, sp));
     }
     Matrix<DataType> ret(0);
-    for (int k=0; k<nnz(); ++k) {
-      ret.at(0) += at(k) * y.at(k);
+    for (int k=0; k<x.nnz(); ++k) {
+      ret.at(0) += x.at(k) * y.at(k);
     }
     return ret;
   }
@@ -2134,7 +2135,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_norm_1() const {
-    return inner_prod(fabs(*this), Matrix<DataType>::ones(sparsity()));
+    return dot(fabs(*this), Matrix<DataType>::ones(sparsity()));
   }
 
   template<typename DataType>
@@ -2184,7 +2185,7 @@ namespace casadi {
         Matrix<DataType> qj = Q(ALL, j);
 
         ri(j, 0) = mul(qi.T(), qj); // Modified Gram-Schmidt
-        // ri[j] = inner_prod(qj, ai); // Classical Gram-Schmidt
+        // ri[j] = dot(qj, ai); // Classical Gram-Schmidt
 
         // Remove projection in direction j
         if (ri.hasNZ(j, 0))

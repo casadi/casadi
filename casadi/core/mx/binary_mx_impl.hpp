@@ -96,7 +96,7 @@ namespace casadi {
         // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
         if (!t.is_scalar() && t.size() != dep(c).size()) {
           if (pd[c].size()!=s.size()) pd[c] = MX(s.sparsity(), pd[c]);
-          t = inner_prod(pd[c], s);
+          t = dot(pd[c], s);
         }
 
         // Propagate the seeds

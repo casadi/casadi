@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_INNER_PROD_HPP
-#define CASADI_INNER_PROD_HPP
+#ifndef CASADI_DOT_HPP
+#define CASADI_DOT_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -33,18 +33,18 @@
 /// \cond INTERNAL
 
 namespace casadi {
-  /** \brief Matrix inner_prod
+  /** \brief Matrix dot
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_EXPORT InnerProd : public MXNode {
+  class CASADI_EXPORT Dot : public MXNode {
   public:
 
     /// Constructor
-    InnerProd(const MX& x, const MX& y);
+    Dot(const MX& x, const MX& y);
 
     /// Destructor
-    virtual ~InnerProd() {}
+    virtual ~Dot() {}
 
     /// Evaluate the function (template)
     template<typename T>
@@ -81,11 +81,11 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_INNER_PROD;}
+    virtual int op() const { return OP_DOT;}
   };
 
 
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_INNER_PROD_HPP
+#endif // CASADI_DOT_HPP

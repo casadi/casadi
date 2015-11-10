@@ -446,7 +446,7 @@ class NLPtests(casadiTestCase):
   def testIPOPTnorm(self):
     self.message("IPOPT min ||x||^2_2")
     def norm_2(mx):
-      return inner_prod(mx,mx)
+      return c.dot(mx,mx)
     N=10
     x=MX.sym("x",N)
     x0=linspace(0,1,N)

@@ -95,7 +95,7 @@ namespace casadi {
     //    virtual MX getMultiplication(const MX& y) const;
 
     /// Inner product
-    virtual MX getInnerProd(const MX& y) const;
+    virtual MX getDot(const MX& y) const;
 
     /// Return truth value of an MX
     virtual bool __nonzero__() const;

@@ -59,7 +59,7 @@ namespace casadi {
                       std::vector<std::vector<MX> >& fsens) {
     MX self = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = dep(0)->getInnerProd(fseed[d][0]) / self;
+      fsens[d][0] = dep(0)->getDot(fseed[d][0]) / self;
     }
   }
 

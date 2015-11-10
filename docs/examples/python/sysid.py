@@ -101,7 +101,7 @@ def gauss_newton(e,nlp,V):
 [X_symbolic] = all_samples([x0, u_data, repmat(params*scale,1,N) ])
 
 e = y_data-X_symbolic[0,:].T;
-nlp = {'x':params, 'f':0.5*inner_prod(e,e)}
+nlp = {'x':params, 'f':0.5*dot(e,e)}
 
 solver = gauss_newton(e,nlp, params)
 
@@ -124,7 +124,7 @@ e = y_data-Xn[0,:].T;
 
 V = veccat([params, X])
 
-nlp = {'x':V, 'f':0.5*inner_prod(e,e),'g':gaps}
+nlp = {'x':V, 'f':0.5*dot(e,e),'g':gaps}
 
 # Multipleshooting allows for careful initialization
 yd = np.diff(y_data,axis=0)*fs

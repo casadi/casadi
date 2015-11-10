@@ -216,7 +216,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
     X = integrator([T0,TF,X,U[k],xdot,MX()])
 
   # Objective function
-  F = inner_prod(U,U)
+  F = dot(U,U)
 
   # Terminal constraints
   G = vertcat((X[0],X[1]))

@@ -146,7 +146,7 @@ void model(SymbolicOCP &ocp){
   ocp.ffcn = SXFunction(y,Tdot);
   
   // Objective function (meyer term)
-  ocp.mfcn = SXFunction(y,inner_prod(T,T));
+  ocp.mfcn = SXFunction(y,dot(T,T));
 
   // Nonlinear constraint function
 //  ocp.cfcn = SXFunction(y,Tj-Ta);

@@ -183,13 +183,13 @@ namespace casadi {
     MatType zz_quad_form(const MatType &A) const {
       casadi_assert(is_vector());
       if (!is_column()) return quad_form(self().T(), A);
-      return inner_prod(self(), mul(A, self()));
+      return dot(self(), mul(A, self()));
     }
     MatType zz_quad_form() const {
       casadi_assert(is_vector());
-      return inner_prod(self(), self());
+      return dot(self(), self());
     }
-    MatType zz_sum_square() const { return inner_prod(self(), self());}
+    MatType zz_sum_square() const { return dot(self(), self());}
     MatType zz_linspace(const MatType &b, int nsteps) const;
     MatType zz_cross(const MatType &b, int dim=-1) const;
     MatType zz_tril2symm() const;
@@ -340,8 +340,8 @@ namespace casadi {
     /** \brief Inner product of two matrices
         with x and y matrices of the same dimension
     */
-    inline friend MatType inner_prod(const MatType &x, const MatType &y) {
-      return x.zz_inner_prod(y);
+    inline friend MatType dot(const MatType &x, const MatType &y) {
+      return MatType::dot(x, y);
     }
 
     /** \brief  Take the outer product of two vectors

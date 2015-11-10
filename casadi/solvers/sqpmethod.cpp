@@ -151,13 +151,13 @@ namespace casadi {
       SX qk = mul(Bk, sk);
 
       // Calculating theta
-      SX skBksk = inner_prod(sk, qk);
-      SX omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
-                         0.8 * skBksk / (skBksk - inner_prod(sk, yk)),
+      SX skBksk = dot(sk, qk);
+      SX omega = if_else(dot(yk, sk) < 0.2 * dot(sk, qk),
+                         0.8 * skBksk / (skBksk - dot(sk, yk)),
                          1);
       yk = omega * yk + (1 - omega) * qk;
-      SX theta = 1. / inner_prod(sk, yk);
-      SX phi = 1. / inner_prod(qk, sk);
+      SX theta = 1. / dot(sk, yk);
+      SX phi = 1. / dot(qk, sk);
       SX Bk_new = Bk + theta * mul(yk, yk.T()) - phi * mul(qk, qk.T());
 
       // Inputs of the BFGS update function

@@ -378,7 +378,7 @@ namespace casadi {
     virtual MX getInverse() const;
 
     /// Inner product
-    virtual MX getInnerProd(const MX& y) const;
+    virtual MX getDot(const MX& y) const;
 
     /// Frobenius norm
     virtual MX getNormF() const;

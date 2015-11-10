@@ -42,7 +42,7 @@ L = x0*x0 + x1*x1 + u*u
 lam = SX.sym("lam",2)
 
 # Hamiltonian function
-H = inner_prod(lam,xdot) + L
+H = dot(lam,xdot) + L
 
 # Costate equations
 ldot = -gradient(H,x)

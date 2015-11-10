@@ -2652,8 +2652,8 @@ DECL M %SHOW(sumRows)(const M& x) {
   return sumRows(x);            
 }
 
-DECL M %SHOW(inner_prod)(const M& x, const M& y) {
-  return inner_prod(x, y);      
+DECL M %SHOW(dot)(const M& x, const M& y) {
+  return dot(x, y);      
 }
 
 DECL M %SHOW(outer_prod)(const M& x, const M& y) {

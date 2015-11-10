@@ -680,7 +680,7 @@ namespace casadi {
   }
 
   template<typename T>
-  T inner_prod(const std::vector<T>& a, const std::vector<T>& b) {
+  T dot(const std::vector<T>& a, const std::vector<T>& b) {
     T ret = 0;
     for (int k=0; k<a.size(); ++k) {
       ret += a[k]*b[k];

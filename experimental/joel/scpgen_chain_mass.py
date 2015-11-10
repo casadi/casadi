@@ -70,7 +70,7 @@ for i in range(N+1):
     d = p[:,i] - p[:,i-1]
 
   # Length of the spring (add small constant to avoid square root of zero)
-  L_d = sqrt(inner_prod(d,d) + 1e-10)
+  L_d = sqrt(dot(d,d) + 1e-10)
 
   # Force acting on ball i+1 
   F[:,i] = D*(1.0 - L/L_d) * d
@@ -114,7 +114,7 @@ gamma = 0.01
 dpEnd = p[:,-1]-pEnd
 
 # Cost function
-L = alpha * inner_prod(dpEnd,dpEnd) + beta * inner_prod(vec(p),vec(p)) + gamma * inner_prod(u,u)
+L = alpha * dot(dpEnd,dpEnd) + beta * dot(vec(p),vec(p)) + gamma * dot(u,u)
 
 # Number of shooting intervals
 nk = 20

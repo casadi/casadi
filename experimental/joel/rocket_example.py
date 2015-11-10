@@ -88,7 +88,7 @@ for k in range(nu):
   X = integrator([T0,TF,X,U[k],xdot])  
 
 # Objective function
-F = inner_prod(U,U)
+F = dot(U,U)
 
 # Terminal constraints
 G = vertcat((X[0],X[1]))

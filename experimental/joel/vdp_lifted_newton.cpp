@@ -100,7 +100,7 @@ int main(){
   }
 
   // Objective function
-  SX f = x_k[2] + (tf/nk)*inner_prod(u,u);
+  SX f = x_k[2] + (tf/nk)*dot(u,u);
   
   // Terminal constraints
   SX g;

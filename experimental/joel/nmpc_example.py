@@ -26,7 +26,7 @@ from casadi import *
 # Formulate the NLP
 N = 30
 u = msym("u",N); p = msym("p")
-f = inner_prod(u,u)
+f = dot(u,u)
 g = MX([]); gmax = []; gmin = []
 x = p
 for k in range(N):

@@ -462,7 +462,7 @@ namespace casadi {
     Matrix<DataType> zz_norm_inf() const;
     Matrix<DataType> zz_sumCols() const;
     Matrix<DataType> zz_sumRows() const;
-    Matrix<DataType> zz_inner_prod(const Matrix<DataType> &y) const;
+    static Matrix<DataType> dot(const Matrix<DataType> &x, const Matrix<DataType> &y);
     Matrix<DataType> zz_outer_prod(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_nullspace() const;
     Matrix<DataType> zz_diag() const;

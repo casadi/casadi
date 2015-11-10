@@ -39,7 +39,7 @@
 #include "binary_mx.hpp"
 #include "determinant.hpp"
 #include "inverse.hpp"
-#include "inner_prod.hpp"
+#include "dot.hpp"
 #include "norm.hpp"
 #include "concat.hpp"
 #include "split.hpp"
@@ -727,10 +727,10 @@ namespace casadi {
   }
 
 
-  MX MXNode::getInnerProd(const MX& y) const {
+  MX MXNode::getDot(const MX& y) const {
     casadi_assert_message(
       size2()==y.size2() && size1()==y.size1(),
-      "MXNode::inner_prod: Dimension mismatch. inner_prod requires its "
+      "MXNode::dot: Dimension mismatch. dot requires its "
       "two arguments to have equal shapes, but got ("
       << size2() << ", " << size1() << ") and ("
       << y.size2() << ", " << y.size1() << ").");
@@ -740,14 +740,14 @@ namespace casadi {
       } else if (sparsity().is_scalar()) {
         return getBinarySwitch(OP_MUL, y);
       } else {
-        return MX::create(new InnerProd(shared_from_this<MX>(), y));
+        return MX::create(new Dot(shared_from_this<MX>(), y));
       }
     } else {
       // Project to pattern intersection
       Sparsity sp = sparsity().intersect(y.sparsity());
       MX xx = project(shared_from_this<MX>(), sp);
       MX yy = project(y, sp);
-      return xx->getInnerProd(yy);
+      return xx->getDot(yy);
     }
   }
 

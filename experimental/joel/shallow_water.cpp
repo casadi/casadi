@@ -311,7 +311,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     if(gauss_newton){
       nlp_fv.push_back(vec(H_dev));
     } else {
-      nlp_fv.front() += inner_prod(H_dev, H_dev)/2;
+      nlp_fv.front() += dot(H_dev, H_dev)/2;
     }
 
     // Add to the constraints

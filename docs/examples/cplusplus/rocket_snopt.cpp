@@ -69,7 +69,7 @@ int main(){
   }
 
   // Objective function
-  SX f = inner_prod(u,u);
+  SX f = dot(u,u);
 
   // Terminal constraints
   SX g = vertcat(s, v, v_traj);

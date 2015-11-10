@@ -102,7 +102,7 @@ int main(){
   // Use Gauss-Newton?
   bool gauss_newton = true;
   if(!gauss_newton){
-    f = inner_prod(f,f)/2;
+    f = dot(f,f)/2;
   }
 
   // Form the NLP

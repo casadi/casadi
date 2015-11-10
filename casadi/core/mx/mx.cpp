@@ -609,8 +609,8 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_inner_prod(const MX& y) const {
-    return (*this)->getInnerProd(y);
+  MX MX::dot(const MX& x, const MX& y) {
+    return x->getDot(y);
   }
 
   MX MX::zz_outer_prod(const MX& y) const {

@@ -861,18 +861,18 @@ For \texttt{SX} graphs, this alternative way is completely equivalent, but for \
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 x = SX.sym('x',2,2)
-print inner_prod(x,x)
+print dot(x,x)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 x = SX.sym('x',2,2)
-disp inner_prod(x,x)
+disp dot(x,x)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
 x = SX.sym('x',2,2)
-print inner_prod(x,x)
+print dot(x,x)
 \end{pytexoutput}
 
 Many of the above operations are also defined for the \texttt{Sparsity} class (Section~\ref{sec:sparsity_class}), e.g. \texttt{vertcat}, \texttt{horzsplit}, transposing, addition (which returns the \emph{union} of two sparsity patterns) and multiplication (which returns the \emph{intersection} of two sparsity patterns).
@@ -1641,7 +1641,7 @@ each operation. Further information is available in the API documentation.
     *Transpose
     & \verb|transpose(A)| or \verb|A.T| & \verb|transpose(A)| or \verb|A.T()|& \verb|transpose(A)| or \verb|A'| or \verb|A.'| \\ \hline
     Inner product
-    & \verb|inner_prod(x, y)| & \verb|inner_prod(x, y)| & \verb|inner_prod(x, y)| \\ \hline
+    & \verb|dot(x, y)| & \verb|dot(x, y)| & \verb|dot(x, y)| \\ \hline
     *Horizontal/vertical concatenation
     & \verb|horzcat([x, y])| \linebreak \verb|vertcat([x, y])|
     & \verb|horzcat(v)| \verb|vertcat(v)|, \linebreak (\verb|v| vector of matrices)

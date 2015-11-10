@@ -112,7 +112,7 @@ for (i,x0) in enumerate([0.08]):
     
   else:
     # Objective function (SQP)
-    F1 = SXFunction([u],[inner_prod(F,F)])
+    F1 = SXFunction([u],[dot(F,F)])
 
   # Constraint function
   F2 = SXFunction([u],[G])
@@ -171,7 +171,7 @@ for (i,x0) in enumerate([0.08]):
 
     # Gradient of the Lagrangian
     xu = vertcat((u,x))
-    lgrad = gradient(f1 - inner_prod(mug,f2) + inner_prod(xdot,xdef),xu)
+    lgrad = gradient(f1 - dot(mug,f2) + dot(xdot,xdef),xu)
 
     # Gradient of the Lagrangian
     f1 = lgrad[:u.size1(),0] # + mux # What about the mux term?

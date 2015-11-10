@@ -1648,7 +1648,7 @@ namespace casadi {
       // Add linear combination of expressions
       vector<MX> res=output(oind), lam_res=multiplier(oind);
       for (int i=0; i<res.size(); ++i) {
-        ret += inner_prod(lam_res[i], res[i]);
+        ret += dot(lam_res[i], res[i]);
       }
     }
 

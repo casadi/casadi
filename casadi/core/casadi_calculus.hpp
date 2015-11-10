@@ -96,7 +96,7 @@ namespace casadi {
     OP_INVERSE,
 
     // Inner product
-    OP_INNER_PROD,
+    OP_DOT,
 
     // Horizontal concatenation
     OP_HORZCAT,

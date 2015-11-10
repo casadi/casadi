@@ -28,7 +28,7 @@ b = ssym("b",5)
 
 for jac_for_sens in (True,False):
   print "jac_for_sens = ", jac_for_sens, ":"
-  f = SXFunction([a,b],[sqrt(b-sin(a)),inner_prod(a,b),outer_prod(a,b)])
+  f = SXFunction([a,b],[sqrt(b-sin(a)),dot(a,b),outer_prod(a,b)])
   f.setOption("jac_for_sens",jac_for_sens)
   f.init()
   #print f.sparsity_jac(0,0)

@@ -75,7 +75,7 @@ set(CASADI_SRCS
   mx/project.hpp             mx/project.cpp             # Sparse copy to another sparsity pattern
   mx/determinant.hpp         mx/determinant.cpp         # Determinant
   mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
-  mx/inner_prod.hpp          mx/inner_prod.cpp          # Inner product
+  mx/dot.hpp                 mx/dot.cpp                 # Inner product
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/assertion.hpp           mx/assertion.cpp           # Assertion
   mx/monitor.hpp             mx/monitor.cpp             # Monitor

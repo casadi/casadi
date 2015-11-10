@@ -152,14 +152,14 @@ namespace casadi {
   //   }
   // }
 
-  MX ConstantMX::getInnerProd(const MX& y) const {
+  MX ConstantMX::getDot(const MX& y) const {
     if (y.is_constant()) {
       // Constant folding
       DMatrix xv = getMatrixValue();
       DMatrix yv = y->getMatrixValue();
-      return inner_prod(xv, yv);
+      return dot(xv, yv);
     } else {
-      return MXNode::getInnerProd(y);
+      return MXNode::getDot(y);
     }
   }
 

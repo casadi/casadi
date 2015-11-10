@@ -454,7 +454,7 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     MX zz_mpower(const MX& b) const;
-    MX zz_inner_prod(const MX& y) const;
+    static MX dot(const MX& x, const MX& y);
     MX zz_outer_prod(const MX& y) const;
     MX zz_mrdivide(const MX& b) const;
     MX zz_mldivide(const MX& b) const;
