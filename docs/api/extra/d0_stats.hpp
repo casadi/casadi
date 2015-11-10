@@ -91,19 +91,19 @@
 <tr><td>n_calc_f</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_calc_g</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_calc_grad_f</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>n_calc_hess_l</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_calc_jac_g</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>n_eval_callback</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>n_eval_h</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>objective gradient gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>objective jacobian gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>return_status</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_calc_f</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_calc_g</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_calc_grad_f</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>t_calc_hess_l</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_calc_jac_g</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_callback_fun</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_callback_prepare</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>t_eval_h</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>t_mainloop</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_integer_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>casadi::IpoptInterface</td></tr>
@@ -126,17 +126,17 @@
 <tr><td>n_calc_f</td></tr>
 <tr><td>n_calc_g</td></tr>
 <tr><td>n_calc_grad_f</td></tr>
+<tr><td>n_calc_hess_l</td></tr>
 <tr><td>n_calc_jac_g</td></tr>
 <tr><td>n_eval_callback</td></tr>
-<tr><td>n_eval_h</td></tr>
 <tr><td>return_status</td></tr>
 <tr><td>t_calc_f</td></tr>
 <tr><td>t_calc_g</td></tr>
 <tr><td>t_calc_grad_f</td></tr>
+<tr><td>t_calc_hess_l</td></tr>
 <tr><td>t_calc_jac_g</td></tr>
 <tr><td>t_callback_fun</td></tr>
 <tr><td>t_callback_prepare</td></tr>
-<tr><td>t_eval_h</td></tr>
 <tr><td>t_mainloop</td></tr>
 <tr><td>var_integer_md</td></tr>
 <tr><td>var_numeric_md</td></tr>
