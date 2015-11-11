@@ -94,46 +94,33 @@ namespace casadi {
 
   }
 
-  void Linsol::reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
-    // Get input pointers
-    a_ = arg[LINSOL_A];
-    b_ = arg[LINSOL_B];
-    arg += LINSOL_NUM_IN;
-
-    // Get output pointers
-    x_ = res[LINSOL_X];
-    res += LINSOL_NUM_OUT;
-  }
-
-  void Linsol::reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w) {
-    arg_ = arg;
-    res_ = res;
-    iw_ = iw;
-    w_ = w;
-  }
-
   void Linsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    // Get inputs and outputs
+    const double *A = arg[LINSOL_A];
+    const double *b = arg[LINSOL_B];
+    double *x = res[LINSOL_X];
+
     // Create memory reference
     Memory m(this, arg, res, iw, w, mem);
 
     // A zero linear system would be singular
-    casadi_assert(a_!=0);
+    casadi_assert(A!=0);
 
     // If output not requested, nothing to do
-    if (!x_) return;
+    if (!x) return;
 
     // If right hand side is zero, solution is trivially zero (if well-defined)
-    if (!b_) {
-      casadi_fill(x_, neq_*nrhs_, 0.);
+    if (!b) {
+      casadi_fill(x, neq_*nrhs_, 0.);
       return;
     }
 
     // Factorize the linear system
-    linsol_factorize(m, a_);
+    linsol_factorize(m, A);
 
     // Solve the factorized system
-    casadi_copy(b_, neq_*nrhs_, x_);
-    linsol_solve(m, x_, nrhs_, false);
+    casadi_copy(b, neq_*nrhs_, x);
+    linsol_solve(m, x, nrhs_, false);
   }
 
   void Linsol::

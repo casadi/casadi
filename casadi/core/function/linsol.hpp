@@ -62,12 +62,6 @@ namespace casadi {
     /// Solve the system of equations
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
-    /** \brief Set the work vectors - permanent memory */
-    virtual void reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
-
-    /** \brief Set the work vectors - temporary memory */
-    virtual void reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w);
-
     /// Create a solve node
     using FunctionInternal::linsol_solve;
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
@@ -138,18 +132,6 @@ namespace casadi {
 
     // Number of right-hand-sides
     int nrhs_;
-
-    // Inputs
-    const double *a_, *b_;
-
-    // Outputs
-    double *x_;
-
-    // Work vectors
-    const double **arg_;
-    double **res_;
-    int *iw_;
-    double *w_;
   };
 
 

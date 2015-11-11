@@ -174,25 +174,37 @@ namespace casadi {
   }
 
   void SymbolicQr::linsol_factorize(Memory& m, const double* A) {
+    // IO buffers
+    const double** arg1 = m.arg+n_in();
+    double** res1 = m.res+n_out();
+
     // Factorize
-    arg_[0] = A;
-    res_[0] = getPtr(q_);
-    res_[1] = getPtr(r_);
-    fact_fcn_(arg_, res_, iw_, w_, 0);
+    fill_n(arg1, fact_fcn_.n_in(), nullptr);
+    arg1[0] = A;
+    fill_n(res1, fact_fcn_.n_out(), nullptr);
+    res1[0] = getPtr(q_);
+    res1[1] = getPtr(r_);
+    fact_fcn_(arg1, res1, m.iw, m.w, m.mem);
   }
 
   void SymbolicQr::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
+    // IO buffers
+    const double** arg1 = m.arg+n_in();
+    double** res1 = m.res+n_out();
+
     // Select solve function
     Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
 
     // Solve for all right hand sides
-    arg_[0] = getPtr(q_);
-    arg_[1] = getPtr(r_);
+    fill_n(arg1, solv.n_in(), nullptr);
+    arg1[0] = getPtr(q_);
+    arg1[1] = getPtr(r_);
+    fill_n(res1, solv.n_out(), nullptr);
     for (int i=0; i<nrhs; ++i) {
-      copy_n(x, neq_, w_); // Copy x to a temporary
-      arg_[2] = w_;
-      res_[0] = x;
-      solv(arg_, res_, iw_, w_+neq_, 0);
+      copy_n(x, neq_, m.w); // Copy x to a temporary
+      arg1[2] = m.w;
+      res1[0] = x;
+      solv(arg1, res1, m.iw, m.w+neq_, 0);
       x += neq_;
     }
   }
