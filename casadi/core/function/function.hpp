@@ -950,11 +950,23 @@ namespace casadi {
     /** \brief Allocate memory block */
     MemBlock alloc() const;
 
+    /** \brief Does the solver require the allocation of a memory block */
+    bool has_mem() const;
+
     /** \brief Allocate memory block */
     void* alloc_mem();
 
     /** \brief Free allocated memory block */
     void free_mem(void* mem);
+
+    /** \brief Set the work vectors - permanent memory */
+    void reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
+    /** \brief Set the work vectors - temporary memory */
+    void reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w);
+
+    /** \brief Reset the memory, both permanent and temporary */
+    void reset(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
@@ -1071,18 +1083,15 @@ namespace casadi {
                            const Sparsity& sp, int nrhs, const Dict& opts=Dict());
     ///@}
 
-    /// Solve the system of equations, internal vector
-    void linsol_solve(bool tr=false);
-
     /// Create a solve node
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
 
 #ifndef SWIG
-    /// Factorize the matrix
-    void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
+    // Factorize linear system of equations
+    void linsol_factorize(void* mem, const double* A);
 
-    /// Solve the factorized system of equations
-    void linsol_solve(double* x, int nrhs=1, bool tr=false);
+    // Solver linear system of equations
+    void linsol_solve(void* mem, double* x, int nrhs=1, bool tr=false);
 
     ///@{
     /// Propagate sparsity through a linear solve

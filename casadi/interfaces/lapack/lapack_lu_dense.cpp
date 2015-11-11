@@ -84,12 +84,10 @@ namespace casadi {
     allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
   }
 
-  void LapackLuDense::
-  linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
-    Linsol::linsol_prepare(arg, res, iw, w, mem);
+  void LapackLuDense::linsol_factorize(void* mem, const double* A) {
 
     // Get the elements of the matrix, dense format
-    input(0).get(mat_);
+    casadi_densify(A, sparsity_, getPtr(mat_), false);
 
     if (equilibriate_) {
       // Calculate the col and row scaling factors
@@ -130,9 +128,9 @@ namespace casadi {
                           "dgetrf_ failed to factorize the Jacobian");
   }
 
-  void LapackLuDense::linsol_solve(double* x, int nrhs, bool transpose) {
+  void LapackLuDense::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
     // Scale the right hand side
-    if (transpose) {
+    if (tr) {
       rowScaling(x, nrhs);
     } else {
       colScaling(x, nrhs);
@@ -140,13 +138,13 @@ namespace casadi {
 
     // Solve the system of equations
     int info = 100;
-    char trans = transpose ? 'T' : 'N';
+    char trans = tr ? 'T' : 'N';
     dgetrs_(&trans, &ncol_, &nrhs, getPtr(mat_), &ncol_, getPtr(ipiv_), x, &ncol_, &info);
     if (info != 0) throw CasadiException("LapackLuDense::solve: "
                                         "failed to solve the linear system");
 
     // Scale the solution
-    if (transpose) {
+    if (tr) {
       colScaling(x, nrhs);
     } else {
       rowScaling(x, nrhs);

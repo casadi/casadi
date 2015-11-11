@@ -63,11 +63,11 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
-    // Factorize the matrix
-    virtual void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
+    // Factorize the linear system
+    virtual void linsol_factorize(void* mem, const double* A);
 
-    // Solve the system of equations
-    virtual void linsol_solve(double* x, int nrhs, bool tr);
+    // Solve the linear system
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr);
 
     // Solve the system of equations <tt>Lx = b</tt>
     virtual void linsol_solveL(double* x, int nrhs, bool tr);

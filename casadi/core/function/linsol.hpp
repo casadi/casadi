@@ -37,9 +37,6 @@ namespace casadi {
       @copydoc Linsol_doc
   */
   class CASADI_EXPORT Linsol : public FunctionInternal, public PluginInterface<Linsol> {
-  private:
-    Sparsity sparsity_;
-    int nrhs_;
   public:
     /// Constructor
     Linsol(const std::string& name, const Sparsity& sparsity, int nrhs);
@@ -65,24 +62,23 @@ namespace casadi {
     /// Solve the system of equations
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
-    /// Prepare the factorization
-    virtual void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
+    // Reset the solver
+    virtual void linsol_reset(void* mem, const double**& arg, double**& res,
+                              int*& iw, double*& w);
 
-    /// Solve the system of equations, using internal vector
-    virtual void linsol_solve(bool tr);
+    /** \brief Set the work vectors - permanent memory */
+    virtual void reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
 
-    /// Solve the system of equations
-    virtual void linsol_solve(double* x, int nrhs, bool tr);
+    /** \brief Set the work vectors - temporary memory */
+    virtual void reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /// Create a solve node
+    using FunctionInternal::linsol_solve;
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
 
     /// Evaluate SX, possibly transposed
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                bool tr, int nrhs);
-
-    /** \brief Quickfix to avoid segfault, #1552 */
-    virtual bool canEvalSX() const {return true;}
 
     /// Evaluate SX
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
@@ -138,11 +134,24 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "none";}
 
-    // Memory
+    // Sparsity of the linear system
+    Sparsity sparsity_;
+
+    // Number of equations
+    int neq_;
+
+    // Number of right-hand-sides
+    int nrhs_;
+
+    // Inputs
     const double *a_, *b_;
+
+    // Outputs
     double *x_;
-    const double **arg1_;
-    double **res1_;
+
+    // Work vectors
+    const double **arg_;
+    double **res_;
     int *iw_;
     double *w_;
   };

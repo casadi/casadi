@@ -2758,16 +2758,19 @@ namespace casadi {
     return v;
   }
 
-  void FunctionInternal::
-  linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
-    casadi_error("'linsol_prepare' not defined for " + type_name());
+  void FunctionInternal::reset(void* mem, const double** arg, double** res, int* iw, double* w) {
+    // Recursive call to allocate persistent memory
+    reset_per(mem, arg, res, iw, w);
+
+    // Allocate temporary memory
+    reset_tmp(mem, arg, res, iw, w);
   }
 
-  void FunctionInternal::linsol_solve(bool tr) {
-    casadi_error("'linsol_solve' not defined for " + type_name());
+  void FunctionInternal::linsol_factorize(void* mem, const double* A) {
+    casadi_error("'linsol_factorize' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_solve(double* x, int nrhs, bool tr) {
+  void FunctionInternal::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
     casadi_error("'linsol_solve' not defined for " + type_name());
   }
 

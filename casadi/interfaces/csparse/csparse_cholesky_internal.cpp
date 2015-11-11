@@ -137,9 +137,10 @@ namespace casadi {
     return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInternal::
-  linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
-    Linsol::linsol_prepare(arg, res, iw, w, mem);
+  void CSparseCholeskyInternal::linsol_factorize(void* mem, const double* A) {
+    if (A) {
+      setInputNZ(A, 0);
+    }
 
     // Get a reference to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();
@@ -186,12 +187,12 @@ namespace casadi {
     casadi_assert(L_!=0);
   }
 
-  void CSparseCholeskyInternal::linsol_solve(double* x, int nrhs, bool transpose) {
+  void CSparseCholeskyInternal::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
     casadi_assert(L_!=0);
 
     double *t = &temp_.front();
     for (int k=0; k<nrhs; ++k) {
-      if (transpose) {
+      if (tr) {
         cs_pvec(S_->q, x, t, AT_.n) ;   // t = P1\b
         cs_ltsolve(L_->L, t) ;               // t = L\t
         cs_lsolve(L_->L, t) ;              // t = U\t

@@ -76,9 +76,9 @@ namespace casadi {
     called_once_ = false;
   }
 
-  void CsparseInterface::
-  linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
-    Linsol::linsol_prepare(arg, res, iw, w, mem);
+  void CsparseInterface::linsol_factorize(void* mem, const double* A) {
+    casadi_assert(A!=0);
+    setInputNZ(A, 0);
 
     if (!called_once_) {
       if (verbose()) {
@@ -140,14 +140,14 @@ namespace casadi {
     casadi_assert(N_!=0);
   }
 
-  void CsparseInterface::linsol_solve(double* x, int nrhs, bool transpose) {
+  void CsparseInterface::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
     double time_start=0;
     casadi_assert(N_!=0);
 
     double *t = &temp_.front();
 
     for (int k=0; k<nrhs; ++k) {
-      if (transpose) {
+      if (tr) {
         cs_pvec(S_->q, x, t, A_.n) ;       // t = P2*b
         casadi_assert(N_->U!=0);
         cs_utsolve(N_->U, t) ;              // t = U'\t

@@ -753,6 +753,24 @@ namespace casadi {
 
     /** \brief Update lengths of temporary work vectors */
     void alloc();
+
+    /** \brief Does the solver require the allocation of a memory block */
+    virtual bool has_mem() const {return false;}
+
+    /** \brief Allocate memory block */
+    virtual void* alloc_mem() {return 0;}
+
+    /** \brief Free allocated memory block */
+    virtual void free_mem(void* mem) {}
+
+    /** \brief Set the work vectors - permanent memory */
+    virtual void reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {}
+
+    /** \brief Set the work vectors - temporary memory */
+    virtual void reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w) {}
+
+    /** \brief Reset the memory, both permanent and temporary */
+    void reset(void* mem, const double** arg, double** res, int* iw, double* w);
     ///@}
 
     ///@{
@@ -838,17 +856,10 @@ namespace casadi {
     template<typename MatType>
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadj, const std::vector<MatType>& v);
 
-    /** \brief Allocate memory block */
-    virtual void* alloc_mem() {return 0;}
-
-    /** \brief Free allocated memory block */
-    virtual void free_mem(void* mem) {}
-
     ///@{
     /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem);
-    virtual void linsol_solve(bool tr);
-    virtual void linsol_solve(double* x, int nrhs, bool tr);
+    virtual void linsol_factorize(void* mem, const double* A);
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr);
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
     virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
     virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;

@@ -70,12 +70,10 @@ namespace casadi {
     work_.resize(10*ncol_);
   }
 
-  void LapackQrDense::
-  linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
-    Linsol::linsol_prepare(arg, res, iw, w, mem);
+  void LapackQrDense::linsol_factorize(void* mem, const double* A) {
 
     // Get the elements of the matrix, dense format
-    input(0).get(mat_);
+    casadi_densify(A, sparsity_, getPtr(mat_), false);
 
     // Factorize the matrix
     int info = -100;
@@ -85,21 +83,21 @@ namespace casadi {
                                          "failed to factorize the Jacobian");
   }
 
-  void LapackQrDense::linsol_solve(double* x, int nrhs, bool transpose) {
+  void LapackQrDense::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
     // Properties of R
     char uploR = 'U';
     char diagR = 'N';
     char sideR = 'L';
     double alphaR = 1.;
-    char transR = transpose ? 'T' : 'N';
+    char transR = tr ? 'T' : 'N';
 
     // Properties of Q
-    char transQ = transpose ? 'N' : 'T';
+    char transQ = tr ? 'N' : 'T';
     char sideQ = 'L';
     int k = tau_.size(); // minimum of ncol_ and nrow_
     int lwork = work_.size();
 
-    if (transpose) {
+    if (tr) {
 
       // Solve for transpose(R)
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,

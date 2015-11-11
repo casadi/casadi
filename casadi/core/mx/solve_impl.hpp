@@ -53,13 +53,9 @@ namespace casadi {
   template<bool Tr>
   void Solve<Tr>::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    const double** arg1 = arg + ndep();
-    double** res1 = res + nout();
-    arg1[LINSOL_A] = arg[1];
-    arg1[LINSOL_B] = 0;
-    res1[LINSOL_X] = 0;
-    linsol_.linsol_prepare(arg1, res1, iw, w, 0);
-    linsol_.linsol_solve(res[0], dep(0).size2(), Tr);
+    linsol_.reset(mem, arg, res, iw, w);
+    linsol_.linsol_factorize(mem, arg[1]);
+    linsol_.linsol_solve(mem, res[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>

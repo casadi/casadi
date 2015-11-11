@@ -49,10 +49,13 @@ namespace casadi {
     sparsity.btf(rowperm_, colperm_, rowblock_, colblock_,
                                coarse_rowblock, coarse_colblock);
 
+    // Number of equations
+    neq_ = sparsity.size2();
+
     // Allocate inputs
     ibuf_.resize(LINSOL_NUM_IN);
     input(LINSOL_A) = DM::zeros(sparsity);
-    input(LINSOL_B) = DM::zeros(sparsity.size2(), nrhs);
+    input(LINSOL_B) = DM::zeros(neq_, nrhs);
 
     // Allocate outputs
     obuf_.resize(LINSOL_NUM_OUT);
@@ -60,6 +63,9 @@ namespace casadi {
 
     ischeme_ = {"A", "B"};
     oscheme_ = {"X"};
+  }
+
+  Linsol::~Linsol() {
   }
 
   Sparsity Linsol::get_sparsity_in(int ind) const {
@@ -85,55 +91,61 @@ namespace casadi {
   void Linsol::init() {
     // Call the base class initializer
     FunctionInternal::init();
+
   }
 
-  Linsol::~Linsol() {
+  void Linsol::linsol_reset(void* mem, const double**& arg, double**& res,
+                            int*& iw, double*& w) {
+    // Reset work vectors
+    reset(mem, arg, res, iw, w);
+
+    // Add temporary memory
+    arg_ = arg; arg += sz_arg();
+    res_ = res; res += sz_res();
+    iw_ = iw; iw += sz_iw();
+    w_ = w; w += sz_w();
   }
 
-  void Linsol::linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Linsol::reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Get input pointers
     a_ = arg[LINSOL_A];
     b_ = arg[LINSOL_B];
+    arg += LINSOL_NUM_IN;
+
+    // Get output pointers
     x_ = res[LINSOL_X];
-    arg1_ = arg + LINSOL_NUM_IN;
-    res1_ = res + LINSOL_NUM_OUT;
+    res += LINSOL_NUM_OUT;
+  }
+
+  void Linsol::reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w) {
+    arg_ = arg;
+    res_ = res;
     iw_ = iw;
     w_ = w;
-
-    if (a_) {
-      setInputNZ(a_, LINSOL_A);
-    } else {
-      setInput(0., LINSOL_A);
-    }
-    if (b_) {
-      setInputNZ(b_, LINSOL_B);
-    } else {
-      setInput(0., LINSOL_B);
-    }
   }
 
   void Linsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    // Call the solve routine
-    linsol_prepare(arg, res, iw, w, mem);
+    // Reset the solver, prepare for solution
+    reset(mem, arg, res, iw, w);
+
+    // A zero linear system would be singular
+    casadi_assert(a_!=0);
+
+    // If output not requested, nothing to do
+    if (!x_) return;
+
+    // If right hand side is zero, solution is trivially zero (if well-defined)
+    if (!b_) {
+      casadi_fill(x_, neq_*nrhs_, 0.);
+      return;
+    }
+
+    // Factorize the linear system
+    linsol_factorize(mem, a_);
 
     // Solve the factorized system
-    linsol_solve(false);
-
-    if (x_) {
-      getOutputNZ(x_, LINSOL_X);
-    }
-  }
-
-  void Linsol::linsol_solve(bool tr) {
-    // Get input and output vector
-    const vector<double>& b = input(LINSOL_B).data();
-    vector<double>& x = output(LINSOL_X).data();
-    int nrhs = input(LINSOL_B).size2();
-
-    // Copy input to output
-    copy(b.begin(), b.end(), x.begin());
-
-    // Solve the factorized system in-place
-    linsol_solve(getPtr(x), nrhs, tr);
+    casadi_copy(b_, neq_*nrhs_, x_);
+    linsol_solve(mem, x_, nrhs_, false);
   }
 
   void Linsol::
@@ -365,10 +377,6 @@ namespace casadi {
 
   MX Linsol::linsol_solve(const MX& A, const MX& B, bool tr) {
     return A->getSolve(B, tr, shared_from_this<Function>());
-  }
-
-  void Linsol::linsol_solve(double* x, int nrhs, bool tr) {
-    casadi_error("Linsol::solve not defined for class " << typeid(*this).name());
   }
 
   std::map<std::string, Linsol::Plugin> Linsol::solvers_;

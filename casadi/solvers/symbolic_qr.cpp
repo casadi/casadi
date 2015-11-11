@@ -170,35 +170,30 @@ namespace casadi {
     r_.resize(R.nnz());
 
     // Temporary storage
-    alloc_w(Q.size1(), true);
+    alloc_w(neq_, true);
   }
 
-  void SymbolicQr::linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
-    Linsol::linsol_prepare(arg, res, iw, w, mem);
-
+  void SymbolicQr::linsol_factorize(void* mem, const double* A) {
     // Factorize
-    arg1_[0] = a_;
-    res1_[0] = getPtr(q_);
-    res1_[1] = getPtr(r_);
-    fact_fcn_(arg1_, res1_, iw_, w_, 0);
+    arg_[0] = A;
+    res_[0] = getPtr(q_);
+    res_[1] = getPtr(r_);
+    fact_fcn_(arg_, res_, iw_, w_, 0);
   }
 
-  void SymbolicQr::linsol_solve(double* x, int nrhs, bool tr) {
+  void SymbolicQr::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
     // Select solve function
     Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
 
-    // Number of equations
-    int neq = size1_in(LINSOL_B);
-
     // Solve for all right hand sides
-    arg1_[0] = getPtr(q_);
-    arg1_[1] = getPtr(r_);
+    arg_[0] = getPtr(q_);
+    arg_[1] = getPtr(r_);
     for (int i=0; i<nrhs; ++i) {
-      copy_n(x, neq, w_); // Copy x to a temporary
-      arg1_[2] = w_;
-      res1_[0] = x;
-      solv(arg1_, res1_, iw_, w_+neq, 0);
-      x += neq;
+      copy_n(x, neq_, w_); // Copy x to a temporary
+      arg_[2] = w_;
+      res_[0] = x;
+      solv(arg_, res_, iw_, w_+neq_, 0);
+      x += neq_;
     }
   }
 

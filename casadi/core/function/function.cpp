@@ -1518,16 +1518,28 @@ namespace casadi {
     return ret;
   }
 
-  void Function::linsol_prepare(const double** arg, double** res, int* iw, double* w, void* mem) {
-    (*this)->linsol_prepare(arg, res, iw, w, mem);
+  bool Function::has_mem() const {
+    (*this)->has_mem();
   }
 
-  void Function::linsol_solve(double* x, int nrhs, bool tr) {
-    (*this)->linsol_solve(x, nrhs, tr);
+  void Function::reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    (*this)->reset_per(mem, arg, res, iw, w);
   }
 
-  void Function::linsol_solve(bool tr) {
-    (*this)->linsol_solve(tr);
+  void Function::reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w) {
+    (*this)->reset_tmp(mem, arg, res, iw, w);
+  }
+
+  void Function::reset(void* mem, const double** arg, double** res, int* iw, double* w) {
+    (*this)->reset(mem, arg, res, iw, w);
+  }
+
+  void Function::linsol_factorize(void* mem, const double* A) {
+    (*this)->linsol_factorize(mem, A);
+  }
+
+  void Function::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
+    (*this)->linsol_solve(mem, x, nrhs, tr);
   }
 
   MX Function::linsol_solve(const MX& A, const MX& B, bool tr) {
