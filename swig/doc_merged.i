@@ -1093,14 +1093,6 @@ internally
 
 %feature("docstring") casadi::Callback::linsol_solve "
 
->  void Function.linsol_solve(bool tr=false)
-------------------------------------------------------------------------
-
-Solve the system of equations, internal vector.
-
->  MX Function.linsol_solve(MX A, MX B, bool tr=false)
-------------------------------------------------------------------------
-
 Create a solve node.
 
 ";
@@ -3280,14 +3272,6 @@ Get output dimension.
 ";
 
 %feature("docstring") casadi::Function::linsol_solve "
-
->  void Function.linsol_solve(bool tr=false)
-------------------------------------------------------------------------
-
-Solve the system of equations, internal vector.
-
->  MX Function.linsol_solve(MX A, MX B, bool tr=false)
-------------------------------------------------------------------------
 
 Create a solve node.
 
@@ -8981,14 +8965,6 @@ Get output dimension.
 ";
 
 %feature("docstring") casadi::Simulator::linsol_solve "
-
->  void Function.linsol_solve(bool tr=false)
-------------------------------------------------------------------------
-
-Solve the system of equations, internal vector.
-
->  MX Function.linsol_solve(MX A, MX B, bool tr=false)
-------------------------------------------------------------------------
 
 Create a solve node.
 

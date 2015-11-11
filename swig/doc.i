@@ -1738,12 +1738,6 @@ internally
 
 ";
 
-%feature("docstring")  casadi::Function::linsol_solve(bool tr=false) "
-
-Solve the system of equations, internal vector.
-
-";
-
 %feature("docstring")  casadi::Function::linsol_solve(const MX &A, const MX
 &B, bool tr=false) "
 
@@ -4504,12 +4498,6 @@ Get output dimension.
 const  "
 
 Get output dimension.
-
-";
-
-%feature("docstring")  casadi::Function::linsol_solve(bool tr=false) "
-
-Solve the system of equations, internal vector.
 
 ";
 
@@ -12014,12 +12002,6 @@ Get output dimension.
 const  "
 
 Get output dimension.
-
-";
-
-%feature("docstring")  casadi::Function::linsol_solve(bool tr=false) "
-
-Solve the system of equations, internal vector.
 
 ";
 
