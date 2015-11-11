@@ -114,7 +114,7 @@ namespace casadi {
 
   void Linsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Create memory reference
-    Memory m(arg, res, iw, w, mem);
+    Memory m(this, arg, res, iw, w, mem);
 
     // Reset the solver, prepare for solution
     reset(m.mem, m.arg, m.res, m.iw, m.w);

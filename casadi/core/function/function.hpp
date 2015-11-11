@@ -844,16 +844,18 @@ namespace casadi {
     /** \brief Export / Generate C code for the function */
     void generate(const Dict& opts=Dict());
 
+#ifndef SWIG
     /// \cond INTERNAL
-    /** \brief  Access functions of the node */
-    FunctionInternal* operator->();
+    /// Get a const pointer to the node
+    FunctionInternal* get() const;
 
     /** \brief  Const access functions of the node */
-    const FunctionInternal* operator->() const;
+    FunctionInternal* operator->() const;
 
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectNode* ptr);
     /// \endcond
+#endif // SWIG
 
     /// Get all statistics obtained at the end of the last evaluate call
     const Dict& getStats() const;
@@ -1365,6 +1367,7 @@ namespace casadi {
   class CASADI_EXPORT Memory {
     public:
     // Public data members
+    FunctionInternal *f;
     const double **arg;
     double **res;
     int *iw;
@@ -1375,7 +1378,12 @@ namespace casadi {
     Memory();
 
     // Construct non-owning
-    Memory(const double** arg, double** res, int* iw, double* w, void* mem);
+    Memory(const Function& f, const double** arg, double** res,
+           int* iw, double* w, void* mem);
+
+    // Construct non-owning
+    Memory(FunctionInternal *f, const double** arg, double** res,
+           int* iw, double* w, void* mem);
 
     // Construct owning
     Memory(const Function& f);
@@ -1398,9 +1406,6 @@ namespace casadi {
   private:
     // Own the data ?
     bool own_;
-
-    // Function object (needed to free memory)
-    FunctionInternal *f_;
   };
 #endif // SWIG
 } // namespace casadi

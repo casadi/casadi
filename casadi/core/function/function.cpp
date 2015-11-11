@@ -213,12 +213,12 @@ namespace casadi {
     return ret;
   }
 
-  const FunctionInternal* Function::operator->() const {
-    return static_cast<const FunctionInternal*>(OptionsFunctionality::operator->());
+  FunctionInternal* Function::operator->() const {
+    return get();
   }
 
-  FunctionInternal* Function::operator->() {
-    return static_cast<FunctionInternal*>(OptionsFunctionality::operator->());
+  FunctionInternal* Function::get() const {
+    return static_cast<FunctionInternal*>(SharedObject::get());
   }
 
   void Function::call(const vector<DM> &arg, vector<DM> &res,
@@ -1621,33 +1621,38 @@ namespace casadi {
   }
 
   Memory::Memory()
-    : arg(0), res(0), iw(0), w(0), mem(0), own_(false), f_(0) {
+    : f(0), arg(0), res(0), iw(0), w(0), mem(0), own_(false) {
   }
 
-  Memory::Memory(const double** arg, double** res, int* iw, double* w, void* mem)
-    : arg(arg), res(res), iw(iw), w(w), mem(mem), own_(false), f_(0) {
+  Memory::Memory(FunctionInternal *_f, const double** _arg, double** _res,
+                 int* _iw, double* _w, void* _mem)
+    : f(_f), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
   }
 
-  Memory::Memory(const Function& f)
-    : arg(0), res(0), iw(0), w(0), mem(0), own_(true), f_(0) {
+  Memory::Memory(const Function& _f, const double** _arg, double** _res,
+                 int* _iw, double* _w, void* _mem)
+    : f(_f.get()), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
+  }
+
+  Memory::Memory(const Function& _f)
+    : f(_f.get()), arg(0), res(0), iw(0), w(0), mem(0), own_(true) {
     // Make an owning reference
-    casadi_assert(!f.isNull());
-    f_ = static_cast<FunctionInternal*>(f.get());
-    f_->count++; // prevent object from being deleted
+    casadi_assert(f!=0);
+    f->count++; // prevent object from being deleted
 
     // Allocate work vectors
-    arg = new const double*[f.sz_arg()];
-    res = new double*[f.sz_res()];
-    iw = new int[f.sz_iw()];
-    w = new double[f.sz_w()];
+    arg = new const double*[f->sz_arg()];
+    res = new double*[f->sz_res()];
+    iw = new int[f->sz_iw()];
+    w = new double[f->sz_w()];
 
     // Allocate memory
-    mem = f_->alloc_mem();
+    mem = f->alloc_mem();
   }
 
   Memory::Memory(Memory&& obj)
-    : arg(obj.arg), res(obj.res), iw(obj.iw), w(obj.w), mem(obj.mem),
-      own_(obj.own_), f_(obj.f_) {
+    : f(obj.f), arg(obj.arg), res(obj.res), iw(obj.iw), w(obj.w), mem(obj.mem),
+        own_(obj.own_) {
   }
 
   Memory::~Memory() {
@@ -1659,30 +1664,30 @@ namespace casadi {
       if (w) delete[] w;
 
       // Free memory object
-      if (mem) f_->free_mem(mem);
-      if (--f_->count==0) delete f_;
-      f_ = 0;
+      if (mem) f->free_mem(mem);
+      if (--f->count==0) delete f;
+      f = 0;
     }
   }
 
   Memory& Memory::operator=(Memory&& obj) {
     if (&obj != this) {
       // Copy the members
+      f = obj.f;
       arg = obj.arg;
       res = obj.res;
       iw = obj.iw;
       w = obj.w;
       mem = obj.mem;
       own_ = obj.own_;
-      f_ = obj.f_;
       // Clear from assigning object
+      obj.f = 0;
       obj.arg = 0;
       obj.res = 0;
       obj.iw = 0;
       obj.w = 0;
       obj.mem = 0;
       obj.own_ = 0;
-      obj.f_ = 0;
     }
     return *this;
   }
