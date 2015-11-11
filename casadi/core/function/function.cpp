@@ -678,12 +678,6 @@ namespace casadi {
 
   void Function::free_mem(void* mem) { (*this)->free_mem(mem);}
 
-  MemBlock Function::alloc() const {
-    casadi_assert(!isNull());
-    const Function& f = *this;
-    return MemBlock(f);
-  }
-
   void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     (*this)->spFwd(arg, res, iw, w, mem);
   }
@@ -1519,7 +1513,7 @@ namespace casadi {
   }
 
   bool Function::has_mem() const {
-    (*this)->has_mem();
+    return (*this)->has_mem();
   }
 
   void Function::reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
@@ -1626,27 +1620,57 @@ namespace casadi {
     return *mx_p;
   }
 
-  MemBlock::MemBlock() : mem_(0) {
+  Memory::Memory()
+    : arg(0), res(0), iw(0), w(0), mem(0), own_(false), f_(0) {
   }
 
-  MemBlock::MemBlock(const Function& f) : f_(f), mem_(0) {
-    mem_ = f_.alloc_mem();
+  Memory::Memory(const double** arg, double** res, int* iw, double* w, void* mem)
+    : arg(arg), res(res), iw(iw), w(w), mem(mem), own_(false), f_(0) {
   }
 
-  MemBlock::MemBlock(const MemBlock& obj) : f_(obj.f_), mem_(0) {
-    mem_ = f_.alloc_mem();
+  Memory::Memory(const Function& f)
+    : arg(0), res(0), iw(0), w(0), mem(0), own_(true), f_(0) {
+    // Make an owning reference
+    casadi_assert(!f.isNull());
+    f_ = static_cast<FunctionInternal*>(f.get());
+    f_->count++; // prevent object from being deleted
+
+    // Allocate work vectors
+    arg = new const double*[f.sz_arg()];
+    res = new double*[f.sz_res()];
+    iw = new int[f.sz_iw()];
+    w = new double[f.sz_w()];
+
+    // Allocate memory
+    mem = f_->alloc_mem();
   }
 
-  MemBlock& MemBlock::operator=(const MemBlock& obj) {
-    if (mem_) f_.free_mem(mem_);
-    f_ = obj.f_;
-    mem_ = f_.alloc_mem();
+  Memory::Memory(const Memory& obj)
+    : arg(0), res(0), iw(0), w(0), mem(0), own_(false), f_(0) {
+    casadi_error("Not implemented");
+  }
+
+  Memory& Memory::operator=(const Memory& obj) {
+    casadi_error("Not implemented");
     return *this;
   }
 
-  MemBlock::~MemBlock() {
-    if (mem_) f_.free_mem(mem_);
+  Memory::~Memory() {
+    if (own_) {
+      // Free work vectors
+      if (arg) delete[] arg;
+      if (res) delete[] res;
+      if (iw) delete[] iw;
+      if (w) delete[] w;
+
+      // Free memory object
+      if (mem) f_->free_mem(mem);
+      if (--f_->count==0) delete f_;
+      f_ = 0;
+    }
   }
+
+
 
 } // namespace casadi
 

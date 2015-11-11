@@ -36,6 +36,7 @@
 */
 
 namespace casadi {
+
 #ifndef SWIG
   /** Symbolic representation of a problem */
   template<typename XType>
@@ -67,13 +68,14 @@ namespace casadi {
     operator const SXProblem&() const;
     operator const MXProblem&() const;
   };
-#endif // SWIG
 
   /** Forward declaration of internal class */
   class FunctionInternal;
 
   /** Forward declaration of memory block class */
   class MemBlock;
+
+#endif // SWIG
 
   /** \brief General function
 
@@ -947,9 +949,6 @@ namespace casadi {
     size_t sz_w() const;
 
 #ifndef SWIG
-    /** \brief Allocate memory block */
-    MemBlock alloc() const;
-
     /** \brief Does the solver require the allocation of a memory block */
     bool has_mem() const;
 
@@ -1362,30 +1361,42 @@ namespace casadi {
 
 
 #ifndef SWIG
-    /** \brief Helper class - keeps track of ownership of evaluation memory  */
-    class MemBlock {
-  public:
-      /// Default constructor -- null pointer
-      MemBlock();
+  /** Struct holding memory */
+  class Memory {
+    public:
+    // Public data members
+    const double **arg;
+    double **res;
+    int *iw;
+    double *w;
+    void *mem;
 
-      /// Allocate memory block
-      MemBlock(const Function& f);
+    // Default constructor
+    Memory();
 
-      /// Copy constructor -- deep copy
-      MemBlock(const MemBlock& obj);
+    // Construct non-owning
+    Memory(const double** arg, double** res, int* iw, double* w, void* mem);
 
-      /// Copy constructor -- deep copy
-      MemBlock& operator=(const MemBlock& obj);
+    // Construct owning
+    Memory(const Function& f);
 
-      /// Free memory
-      ~MemBlock();
+    /// Copy constructor (throws an error)
+    Memory(const Memory& obj);
 
-    private:
-      Function f_;
-      void *mem_;
-    };
+    /// Assignment operator (throws an error)
+    Memory& operator=(const Memory& obj);
+
+    // Destructor
+    ~Memory();
+
+  private:
+    // Own the data ?
+    bool own_;
+
+    // Function object (needed to free memory)
+    FunctionInternal *f_;
+  };
 #endif // SWIG
-
 } // namespace casadi
 
 #include "../matrix/matrix_impl.hpp"

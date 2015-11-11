@@ -78,11 +78,7 @@ namespace casadi {
     return *this;
   }
 
-  const SharedObjectNode* SharedObject::get() const {
-    return node;
-  }
-
-  SharedObjectNode* SharedObject::get() {
+  SharedObjectNode* SharedObject::get() const {
     return node;
   }
 
@@ -101,12 +97,7 @@ namespace casadi {
     }
   }
 
-  const SharedObjectNode* SharedObject::operator->() const {
-    casadi_assert(!isNull());
-    return node;
-  }
-
-  SharedObjectNode* SharedObject::operator->() {
+  SharedObjectNode* SharedObject::operator->() const {
     casadi_assert(!isNull());
     return node;
   }

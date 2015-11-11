@@ -109,10 +109,7 @@ namespace casadi {
     void assignNodeNoCount(SharedObjectNode* node);
 
     /// Get a const pointer to the node
-    const SharedObjectNode* get() const;
-
-    /// Get a pointer to the node
-    SharedObjectNode* get();
+    SharedObjectNode* get() const;
 
     /// Get the reference count
     int getCount() const;
@@ -121,10 +118,7 @@ namespace casadi {
     void swap(SharedObject& other);
 
     /// Access a member function or object
-    SharedObjectNode* operator->();
-
-    /// Const access a member function or object
-    const SharedObjectNode* operator->() const;
+    SharedObjectNode* operator->() const;
     /// \endcond
 #endif // SWIG
 
@@ -167,6 +161,7 @@ namespace casadi {
   /// Internal class for the reference counting framework, see comments on the public class.
   class CASADI_EXPORT SharedObjectNode {
     friend class SharedObject;
+    friend class Memory;
   public:
 
     /// Default constructor
