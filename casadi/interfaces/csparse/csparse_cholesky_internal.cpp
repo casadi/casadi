@@ -207,15 +207,15 @@ namespace casadi {
     }
   }
 
-  void CSparseCholeskyInternal::linsol_solveL(double* x, int nrhs, bool transpose) {
+  void CSparseCholeskyInternal::linsol_solveL(double* x, int nrhs, bool tr) {
     casadi_assert(L_!=0);
 
     double *t = getPtr(temp_);
 
     for (int k=0; k<nrhs; ++k) {
       cs_ipvec(L_->pinv, x, t, AT_.n) ;   // t = P1\b
-      if (transpose) cs_lsolve(L_->L, t) ; // t = L\t
-      if (!transpose) cs_ltsolve(L_->L, t) ; // t = U\t
+      if (tr) cs_lsolve(L_->L, t) ; // t = L\t
+      if (!tr) cs_ltsolve(L_->L, t) ; // t = U\t
       cs_ipvec(S_->q, t, x, AT_.n) ;      // x = P2\t
       x += ncol();
     }

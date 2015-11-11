@@ -1665,12 +1665,7 @@ namespace casadi {
 
   void Memory::reset(const double** arg1, double** res1, int* iw1, double* w1) {
     casadi_assert(f!=0);
-
-    // Recursive call to allocate persistent memory
-    f->reset_per(mem, arg1, res1, iw1, w1);
-
-    // Allocate temporary memory
-    f->reset_tmp(mem, arg1, res1, iw1, w1);
+    f->reset(*this, arg1, res1, iw1, w1);
   }
 
   Memory& Memory::operator=(Memory&& obj) {

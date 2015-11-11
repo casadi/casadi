@@ -60,13 +60,13 @@ namespace casadi {
     // Call the init method of the base class
     Linsol::init();
 
-    A_.nzmax = input().nnz();  // maximum number of entries
-    A_.m = input().size1(); // number of rows
-    A_.n = input().size2(); // number of columns
-    A_.p = const_cast<int*>(input().colind()); // column pointers (size n+1)
-                                                        // or col indices (size nzmax)
-    A_.i = const_cast<int*>(input().row()); // row indices, size nzmax
-    A_.x = &input()->front(); // numerical values, size nzmax
+    A_.nzmax = nnz_in(0);  // maximum number of entries
+    A_.m = size1_in(0); // number of rows
+    A_.n = size2_in(0); // number of columns
+    A_.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
+                                                     // or column indices (size nzmax)
+    A_.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
+    A_.x = 0; // numerical values, size nzmax
     A_.nz = -1; // of entries in triplet matrix, -1 for compressed-col
 
     // Temporary
@@ -78,7 +78,9 @@ namespace casadi {
 
   void CsparseInterface::linsol_factorize(Memory& m, const double* A) {
     casadi_assert(A!=0);
-    setInputNZ(A, 0);
+
+    // Set the nonzeros of the matrix
+    A_.x = const_cast<double*>(A);
 
     if (!called_once_) {
       if (verbose()) {
@@ -93,19 +95,16 @@ namespace casadi {
 
     called_once_ = true;
 
-    // Get a referebce to the nonzeros of the linear system
-    const vector<double>& linsys_nz = input().data();
-
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<linsys_nz.size(); ++k) {
-      casadi_assert_message(!isnan(linsys_nz[k]), "Nonzero " << k << " is not-a-number");
-      casadi_assert_message(!isinf(linsys_nz[k]), "Nonzero " << k << " is infinite");
+    for (int k=0; k<sparsity_.nnz(); ++k) {
+      casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
+      casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
     }
 
     if (verbose()) {
       userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
       userOut() << "linear system to be factorized = " << endl;
-      input(0).printSparse();
+      DM(sparsity_, vector<double>(A, A+sparsity_.nnz())).printSparse();
     }
 
     double tol = 1e-8;
@@ -113,7 +112,8 @@ namespace casadi {
     if (N_) cs_nfree(N_);
     N_ = cs_lu(&A_, S_, tol) ;                 // numeric LU factorization
     if (N_==0) {
-      DM temp = sparsify(input());
+      DM temp(sparsity_, vector<double>(A, A+sparsity_.nnz()));
+      temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
         stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed due to matrix"
@@ -123,7 +123,7 @@ namespace casadi {
             " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          input(LINSOL_A).sparsity().print(ss); // print detailed
+          sparsity_.print(ss); // print detailed
         }
         throw CasadiException(ss.str());
       } else {
@@ -132,7 +132,7 @@ namespace casadi {
            << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          input(LINSOL_A).sparsity().print(ss); // print detailed
+          sparsity_.print(ss); // print detailed
         }
         throw CasadiException(ss.str());
       }
