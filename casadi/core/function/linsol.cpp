@@ -46,8 +46,7 @@ namespace casadi {
 
     // Calculate the Dulmage-Mendelsohn decomposition
     std::vector<int> coarse_rowblock, coarse_colblock;
-    sparsity.btf(rowperm_, colperm_, rowblock_, colblock_,
-                               coarse_rowblock, coarse_colblock);
+    sparsity.btf(rowperm_, colperm_, rowblock_, colblock_, coarse_rowblock, coarse_colblock);
 
     // Number of equations
     neq_ = sparsity.size2();

@@ -103,9 +103,29 @@ namespace casadi {
   void FunctionInternal::init() {
     setDefaultOptions();
 
+    // Get the number of inputs and outputs
+    isp_.resize(get_n_in());
+    osp_.resize(get_n_out());
+    int n_in = isp_.size();
+    int n_out = osp_.size();
+
+    // Get the input and output sparsities
+    for (int i=0; i<n_in; ++i) isp_[i] = get_sparsity_in(i);
+    for (int i=0; i<n_out; ++i) osp_[i] = get_sparsity_out(i);
+
+    // Set up input and output buffers
+    if (ibuf_.empty()) {
+      ibuf_.resize(n_in);
+      for (int i=0; i<n_in; ++i) ibuf_[i] = DM(isp_[i], default_in(i));
+    }
+    if (obuf_.empty()) {
+      obuf_.resize(n_out);
+      for (int i=0; i<n_out; ++i) obuf_[i] = DM::zeros(osp_[i]);
+    }
+
     // Allocate memory for function inputs and outputs
-    sz_arg_per_ += n_in();
-    sz_res_per_ += n_out();
+    sz_arg_per_ += n_in;
+    sz_res_per_ += n_out;
 
     verbose_ = option("verbose");
     jit_ = option("jit");
@@ -114,17 +134,17 @@ namespace casadi {
     regularity_check_ = option("regularity_check");
 
     // Warn for functions with too many inputs or outputs
-    casadi_assert_warning(n_in()<10000, "Function " << name_
-                          << " has a large number of inputs (" << n_in() << "). "
+    casadi_assert_warning(n_in<10000, "Function " << name_
+                          << " has a large number of inputs (" << n_in << "). "
                           "Changing the problem formulation is strongly encouraged.");
-    casadi_assert_warning(n_out()<10000, "Function " << name_
-                          << " has a large number of outputs (" << n_out() << "). "
+    casadi_assert_warning(n_out<10000, "Function " << name_
+                          << " has a large number of outputs (" << n_out << "). "
                           "Changing the problem formulation is strongly encouraged.");
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ =
-        SparseStorage<Sparsity>(Sparsity(n_out(), n_in()));
-    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(n_out(), n_in()));
+        SparseStorage<Sparsity>(Sparsity(n_out, n_in));
+    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(n_out, n_in));
 
     if (hasSetOption("user_data")) {
       user_data_ = option("user_data").toVoidPointer();
@@ -145,7 +165,7 @@ namespace casadi {
 
     // If input scheme empty, provide default names
     if (ischeme_.empty()) {
-      ischeme_.resize(n_in());
+      ischeme_.resize(n_in);
       for (size_t i=0; i!=ischeme_.size(); ++i) {
         ischeme_[i] = "i" + CodeGenerator::to_string(i);
       }
@@ -158,7 +178,7 @@ namespace casadi {
 
     // If output scheme null, provide default names
     if (oscheme_.empty()) {
-      oscheme_.resize(n_out());
+      oscheme_.resize(n_out);
       for (size_t i=0; i!=oscheme_.size(); ++i) {
         oscheme_[i] = "o" + CodeGenerator::to_string(i);
       }

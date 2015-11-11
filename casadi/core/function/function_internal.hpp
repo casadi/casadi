@@ -773,6 +773,9 @@ namespace casadi {
     virtual bool adjViaJac(int nadj);
     ///@}
 
+    /// Input and output sparsity
+    std::vector<Sparsity> isp_, osp_;
+
     /// Input and output buffers
     std::vector<DM> ibuf_, obuf_;
 
