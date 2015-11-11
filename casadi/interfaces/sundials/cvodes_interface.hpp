@@ -296,18 +296,18 @@ namespace casadi {
 
     /// number of checkpoints stored so far
     int ncheck_;
+  };
 
-    // Memory
-    struct Memory {
-      /// Shared memory
-      CvodesInterface& self;
+  // CvodesMemory
+  struct CASADI_IVPSOL_CVODES_EXPORT CvodesMemory {
+    /// Shared memory
+    CvodesInterface& self;
 
-      /// Constructor
-      Memory(CvodesInterface& s);
+    /// Constructor
+    CvodesMemory(CvodesInterface& s);
 
-      /// Destructor
-      ~Memory();
-    };
+    /// Destructor
+    ~CvodesMemory();
   };
 
 } // namespace casadi

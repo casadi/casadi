@@ -144,7 +144,8 @@ namespace casadi {
       // Factorize the linear solver with J
       fill_n(arg1, static_cast<int>(LINSOL_NUM_IN), nullptr);
       fill_n(res1, static_cast<int>(LINSOL_NUM_OUT), nullptr);
-      linsol_.reset(0, arg1, res1, iw, w);
+      Memory m(arg1, res1, iw, w, 0);
+      linsol_.reset(m);
       linsol_.linsol_factorize(0, jac);
       linsol_.linsol_solve(0, f, 1, false);
 

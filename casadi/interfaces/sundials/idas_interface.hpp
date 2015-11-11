@@ -314,18 +314,18 @@ namespace casadi {
 
     /// number of checkpoints stored so far
     int ncheck_;
+  };
 
-    // Memory
-    struct Memory {
-      /// Shared memory
-      IdasInterface& self;
+  // IdasMemory
+  struct CASADI_IVPSOL_IDAS_EXPORT IdasMemory {
+    /// Shared memory
+    IdasInterface& self;
 
-      /// Constructor
-      Memory(IdasInterface& s);
+    /// Constructor
+    IdasMemory(IdasInterface& s);
 
-      /// Destructor
-      ~Memory();
-    };
+    /// Destructor
+    ~IdasMemory();
   };
 
 } // namespace casadi

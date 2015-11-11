@@ -219,7 +219,7 @@ namespace casadi {
     }
 
     // Get memory block
-    auto m = static_cast<Memory*>(mem);
+    auto m = static_cast<KinsolMemory*>(mem);
 
     // Update IO references
     m->arg_ = arg;
@@ -267,7 +267,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::Memory::func(N_Vector u, N_Vector fval) {
+  void KinsolMemory::func(N_Vector u, N_Vector fval) {
     // Get time
     time1_ = clock();
 
@@ -318,10 +318,10 @@ namespace casadi {
     t_func_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::Memory::func_wrapper(N_Vector u, N_Vector fval, void *user_data) {
+  int KinsolMemory::func_wrapper(N_Vector u, N_Vector fval, void *user_data) {
     try {
       casadi_assert(user_data);
-      auto this_ = static_cast<Memory*>(user_data);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->func(u, fval);
       return 0;
     } catch(exception& e) {
@@ -330,11 +330,11 @@ namespace casadi {
     }
   }
 
-  int KinsolInterface::Memory::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J,
+  int KinsolMemory::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J,
                                             void *user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      auto this_ = static_cast<Memory*>(user_data);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->djac(N, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -343,7 +343,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::Memory::djac(long N, N_Vector u, N_Vector fu, DlsMat J,
+  void KinsolMemory::djac(long N, N_Vector u, N_Vector fu, DlsMat J,
                                      N_Vector tmp1, N_Vector tmp2) {
     // Get time
     time1_ = clock();
@@ -387,12 +387,12 @@ namespace casadi {
     t_jac_ += static_cast<double>(time2_ - time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::Memory::bjac_wrapper(long N, long mupper, long mlower, N_Vector u,
+  int KinsolMemory::bjac_wrapper(long N, long mupper, long mlower, N_Vector u,
                                             N_Vector fu, DlsMat J, void *user_data,
                                             N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      auto this_ = static_cast<Memory*>(user_data);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->bjac(N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -401,7 +401,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::Memory::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu,
+  void KinsolMemory::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu,
                                      DlsMat J, N_Vector tmp1, N_Vector tmp2) {
     // Get time
     time1_ = clock();
@@ -442,11 +442,11 @@ namespace casadi {
     t_jac_ += static_cast<double>(time2_ - time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::Memory::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u,
+  int KinsolMemory::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u,
                                      void *user_data) {
     try {
       casadi_assert(user_data);
-      auto this_ = static_cast<Memory*>(user_data);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->jtimes(v, Jv, u, new_u);
       return 0;
     } catch(exception& e) {
@@ -455,7 +455,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::Memory::jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u) {
+  void KinsolMemory::jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u) {
     // Get time
     time1_ = clock();
 
@@ -477,12 +477,12 @@ namespace casadi {
     t_jac_ += static_cast<double>(time2_ - time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::Memory::
+  int KinsolMemory::
   psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
                  void* user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      auto this_ = static_cast<Memory*>(user_data);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->psetup(u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
@@ -491,7 +491,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::Memory::
+  void KinsolMemory::
   psetup(N_Vector u, N_Vector uscale, N_Vector fval,
          N_Vector fscale, N_Vector tmp1, N_Vector tmp2) {
     // Get time
@@ -521,7 +521,8 @@ namespace casadi {
     // Prepare the solution of the linear system (e.g. factorize)
     fill_n(arg_, self.linsol_.n_in(), nullptr);
     fill_n(res_, self.linsol_.n_out(), nullptr);
-    self.linsol_.reset(0, arg_, res_, iw_, w_);
+    linsol_mem_ = Memory(arg_, res_, iw_, w_, 0);
+    self.linsol_.reset(linsol_mem_);
     self.linsol_.linsol_factorize(0, jac);
 
     // Log time duration
@@ -529,11 +530,11 @@ namespace casadi {
     t_lsetup_fac_ += static_cast<double>(time1_ - time2_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::Memory::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
+  int KinsolMemory::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
                                      N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp) {
     try {
       casadi_assert(user_data);
-      auto this_ = static_cast<Memory*>(user_data);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->psolve(u, uscale, fval, fscale, v, tmp);
       return 0;
     } catch(exception& e) {
@@ -542,7 +543,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::Memory::psolve(N_Vector u, N_Vector uscale, N_Vector fval,
+  void KinsolMemory::psolve(N_Vector u, N_Vector uscale, N_Vector fval,
                                        N_Vector fscale, N_Vector v, N_Vector tmp) {
     // Get time
     time1_ = clock();
@@ -555,9 +556,9 @@ namespace casadi {
     t_lsolve_ += static_cast<double>(time2_ - time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::Memory::lsetup_wrapper(KINMem kin_mem) {
+  int KinsolMemory::lsetup_wrapper(KINMem kin_mem) {
     try {
-      auto this_ = static_cast<Memory*>(kin_mem->kin_lmem);
+      auto this_ = static_cast<KinsolMemory*>(kin_mem->kin_lmem);
       casadi_assert(this_);
       this_->lsetup(kin_mem);
       return 0;
@@ -567,7 +568,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::Memory::lsetup(KINMem kin_mem) {
+  void KinsolMemory::lsetup(KINMem kin_mem) {
     N_Vector u =  kin_mem->kin_uu;
     N_Vector uscale = kin_mem->kin_uscale;
     N_Vector fval = kin_mem->kin_fval;
@@ -577,10 +578,10 @@ namespace casadi {
     psetup(u, uscale, fval, fscale, tmp1, tmp2);
   }
 
-  int KinsolInterface::Memory::
+  int KinsolMemory::
   lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
     try {
-      auto this_ = static_cast<Memory*>(kin_mem->kin_lmem);
+      auto this_ = static_cast<KinsolMemory*>(kin_mem->kin_lmem);
       casadi_assert(this_);
       this_->lsolve(kin_mem, x, b, res_norm);
       return 0;
@@ -591,7 +592,7 @@ namespace casadi {
   }
 
 
-  void KinsolInterface::Memory::lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
+  void KinsolMemory::lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
     // Get vectors
     N_Vector u =  kin_mem->kin_uu;
     N_Vector uscale = kin_mem->kin_uscale;
@@ -612,19 +613,19 @@ namespace casadi {
     *res_norm = sqrt(N_VDotProd(tmp1, tmp1));
   }
 
-  void KinsolInterface::Memory::
+  void KinsolMemory::
   ehfun_wrapper(int error_code, const char *module, const char *function,
                 char *msg, void *eh_data) {
     try {
       casadi_assert(eh_data);
-      auto this_ = static_cast<Memory*>(eh_data);
+      auto this_ = static_cast<KinsolMemory*>(eh_data);
       this_->ehfun(error_code, module, function, msg);
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
     }
   }
 
-  void KinsolInterface::Memory::ehfun(int error_code, const char *module, const char *function,
+  void KinsolMemory::ehfun(int error_code, const char *module, const char *function,
                                       char *msg) {
     if (!self.disable_internal_warnings_) {
       userOut<true, PL_WARN>() << msg << endl;
@@ -750,7 +751,7 @@ namespace casadi {
     }
   }
 
-  KinsolInterface::Memory::Memory(KinsolInterface& s) : self(s) {
+  KinsolMemory::KinsolMemory(KinsolInterface& s) : self(s) {
     // Current solution
     u_ = N_VNew_Serial(self.n_);
 
@@ -791,7 +792,7 @@ namespace casadi {
     }
 
     switch (self.linear_solver_type_) {
-    case DENSE:
+    case KinsolInterface::DENSE:
       // Dense Jacobian
       flag = KINDense(mem_, self.n_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
@@ -801,7 +802,7 @@ namespace casadi {
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
       }
       break;
-    case BANDED:
+    case KinsolInterface::BANDED:
       // Banded Jacobian
       flag = KINBand(mem_, self.n_, self.upper_bandwidth_, self.lower_bandwidth_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
@@ -811,18 +812,18 @@ namespace casadi {
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
       }
       break;
-    case ITERATIVE:
+    case KinsolInterface::ITERATIVE:
       // Attach the sparse solver
       switch (self.iterative_solver_) {
-      case GMRES:
+      case KinsolInterface::GMRES:
         flag = KINSpgmr(mem_, self.maxl_);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
         break;
-      case BCGSTAB:
+      case KinsolInterface::BCGSTAB:
         flag = KINSpbcg(mem_, self.maxl_);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
         break;
-      case TFQMR:
+      case KinsolInterface::TFQMR:
         flag = KINSptfqmr(mem_, self.maxl_);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
         break;
@@ -840,7 +841,7 @@ namespace casadi {
         casadi_assert(flag==KIN_SUCCESS);
       }
       break;
-    case USER_DEFINED:
+    case KinsolInterface::USER_DEFINED:
       // Set fields in the IDA memory
       KINMem kin_mem = KINMem(mem_);
       kin_mem->kin_lmem   = this;
@@ -855,17 +856,17 @@ namespace casadi {
     casadi_assert(flag==KIN_SUCCESS);
   }
 
-  KinsolInterface::Memory::~Memory() {
+  KinsolMemory::~KinsolMemory() {
     if (u_) N_VDestroy_Serial(u_);
     if (mem_) KINFree(&mem_);
   }
 
   void* KinsolInterface::alloc_mem() {
-    return new Memory(*this);
+    return new KinsolMemory(*this);
   }
 
   void KinsolInterface::free_mem(void* mem) {
-    delete static_cast<Memory*>(mem);
+    delete static_cast<KinsolMemory*>(mem);
   }
 
 } // namespace casadi

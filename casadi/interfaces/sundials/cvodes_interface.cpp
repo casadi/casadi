@@ -1249,7 +1249,8 @@ namespace casadi {
     // Prepare the solution of the linear system (e.g. factorize)
     fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsol_.reset(0, arg1_, res1_, iw_, w_);
+    linsol_mem_ = Memory(arg1_, res1_, iw_, w_, 0);
+    linsol_.reset(linsol_mem_);
     linsol_.linsol_factorize(0, val);
 
     // Log time duration
@@ -1289,7 +1290,8 @@ namespace casadi {
     // Prepare the solution of the linear system (e.g. factorize)
     fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsolB_.reset(0, arg1_, res1_, iw_, w_);
+    linsolB_mem_ = Memory(arg1_, res1_, iw_, w_, 0);
+    linsolB_.reset(linsolB_mem_);
     linsolB_.linsol_factorize(0, val);
 
     // Log time duration
@@ -1668,10 +1670,10 @@ namespace casadi {
     }
   }
 
-  CvodesInterface::Memory::Memory(CvodesInterface& s) : self(s) {
+  CvodesMemory::CvodesMemory(CvodesInterface& s) : self(s) {
   }
 
-  CvodesInterface::Memory::~Memory() {
+  CvodesMemory::~CvodesMemory() {
   }
 
 

@@ -73,7 +73,7 @@ namespace casadi {
   class FunctionInternal;
 
   /** Forward declaration of memory block class */
-  class MemBlock;
+  class Memory;
 
 #endif // SWIG
 
@@ -965,7 +965,7 @@ namespace casadi {
     void reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w);
 
     /** \brief Reset the memory, both permanent and temporary */
-    void reset(void* mem, const double** arg, double** res, int* iw, double* w);
+    void reset(Memory& m);
 
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
@@ -1362,7 +1362,7 @@ namespace casadi {
 
 #ifndef SWIG
   /** Struct holding memory */
-  class Memory {
+  class CASADI_EXPORT Memory {
     public:
     // Public data members
     const double **arg;
@@ -1380,10 +1380,16 @@ namespace casadi {
     // Construct owning
     Memory(const Function& f);
 
-    /// Copy constructor (throws an error)
+    /// Move constructor
+    Memory(Memory&& obj);
+
+    /// Move assignment operator
+    Memory& operator=(Memory&& obj);
+
+    /// Copy constructor (undefined)
     Memory(const Memory& obj);
 
-    /// Assignment operator (throws an error)
+    /// Assignment operator (undefined)
     Memory& operator=(const Memory& obj);
 
     // Destructor

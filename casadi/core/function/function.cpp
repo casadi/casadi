@@ -1524,8 +1524,8 @@ namespace casadi {
     (*this)->reset_tmp(mem, arg, res, iw, w);
   }
 
-  void Function::reset(void* mem, const double** arg, double** res, int* iw, double* w) {
-    (*this)->reset(mem, arg, res, iw, w);
+  void Function::reset(Memory& m) {
+    (*this)->reset(m.mem, m.arg, m.res, m.iw, m.w);
   }
 
   void Function::linsol_factorize(void* mem, const double* A) {
@@ -1645,14 +1645,9 @@ namespace casadi {
     mem = f_->alloc_mem();
   }
 
-  Memory::Memory(const Memory& obj)
-    : arg(0), res(0), iw(0), w(0), mem(0), own_(false), f_(0) {
-    casadi_error("Not implemented");
-  }
-
-  Memory& Memory::operator=(const Memory& obj) {
-    casadi_error("Not implemented");
-    return *this;
+  Memory::Memory(Memory&& obj)
+    : arg(obj.arg), res(obj.res), iw(obj.iw), w(obj.w), mem(obj.mem),
+      own_(obj.own_), f_(obj.f_) {
   }
 
   Memory::~Memory() {
@@ -1670,7 +1665,27 @@ namespace casadi {
     }
   }
 
-
+  Memory& Memory::operator=(Memory&& obj) {
+    if (&obj != this) {
+      // Copy the members
+      arg = obj.arg;
+      res = obj.res;
+      iw = obj.iw;
+      w = obj.w;
+      mem = obj.mem;
+      own_ = obj.own_;
+      f_ = obj.f_;
+      // Clear from assigning object
+      obj.arg = 0;
+      obj.res = 0;
+      obj.iw = 0;
+      obj.w = 0;
+      obj.mem = 0;
+      obj.own_ = 0;
+      obj.f_ = 0;
+    }
+    return *this;
+  }
 
 } // namespace casadi
 

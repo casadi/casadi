@@ -57,6 +57,9 @@ namespace casadi {
     /// Linear solver forward, backward
     Function linsol_, linsolB_;
 
+    /// Memory or the linear solvers
+    Memory linsol_mem_, linsolB_mem_;
+
     ///@{
     /// options
     bool exact_jacobian_, exact_jacobianB_;
