@@ -523,7 +523,7 @@ namespace casadi {
     fill_n(res_, self.linsol_.n_out(), nullptr);
     linsol_mem_ = Memory(arg_, res_, iw_, w_, 0);
     self.linsol_.reset(linsol_mem_);
-    self.linsol_.linsol_factorize(0, jac);
+    self.linsol_.linsol_factorize(linsol_mem_, jac);
 
     // Log time duration
     time1_ = clock();
@@ -549,7 +549,7 @@ namespace casadi {
     time1_ = clock();
 
     // Solve the factorized system
-    self.linsol_.linsol_solve(0, NV_DATA_S(v));
+    self.linsol_.linsol_solve(linsol_mem_, NV_DATA_S(v));
 
     // Log time duration
     time2_ = clock();

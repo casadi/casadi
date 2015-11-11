@@ -70,7 +70,7 @@ namespace casadi {
     work_.resize(10*ncol_);
   }
 
-  void LapackQrDense::linsol_factorize(void* mem, const double* A) {
+  void LapackQrDense::linsol_factorize(Memory& m, const double* A) {
 
     // Get the elements of the matrix, dense format
     casadi_densify(A, sparsity_, getPtr(mat_), false);
@@ -83,7 +83,7 @@ namespace casadi {
                                          "failed to factorize the Jacobian");
   }
 
-  void LapackQrDense::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
+  void LapackQrDense::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     // Properties of R
     char uploR = 'U';
     char diagR = 'N';

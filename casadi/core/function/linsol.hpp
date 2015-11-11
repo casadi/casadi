@@ -62,10 +62,6 @@ namespace casadi {
     /// Solve the system of equations
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
-    // Reset the solver
-    virtual void linsol_reset(void* mem, const double**& arg, double**& res,
-                              int*& iw, double*& w);
-
     /** \brief Set the work vectors - permanent memory */
     virtual void reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
 

@@ -146,8 +146,8 @@ namespace casadi {
       fill_n(res1, static_cast<int>(LINSOL_NUM_OUT), nullptr);
       Memory m(arg1, res1, iw, w, 0);
       linsol_.reset(m);
-      linsol_.linsol_factorize(0, jac);
-      linsol_.linsol_solve(0, f, 1, false);
+      linsol_.linsol_factorize(m, jac);
+      linsol_.linsol_solve(m, f, 1, false);
 
       // Check convergence again
       double abstolStep=0;

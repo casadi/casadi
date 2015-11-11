@@ -84,7 +84,7 @@ namespace casadi {
     allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
   }
 
-  void LapackLuDense::linsol_factorize(void* mem, const double* A) {
+  void LapackLuDense::linsol_factorize(Memory& m, const double* A) {
 
     // Get the elements of the matrix, dense format
     casadi_densify(A, sparsity_, getPtr(mat_), false);
@@ -128,7 +128,7 @@ namespace casadi {
                           "dgetrf_ failed to factorize the Jacobian");
   }
 
-  void LapackLuDense::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
+  void LapackLuDense::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     // Scale the right hand side
     if (tr) {
       rowScaling(x, nrhs);

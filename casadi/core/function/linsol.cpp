@@ -94,18 +94,6 @@ namespace casadi {
 
   }
 
-  void Linsol::linsol_reset(void* mem, const double**& arg, double**& res,
-                            int*& iw, double*& w) {
-    // Reset work vectors
-    reset(mem, arg, res, iw, w);
-
-    // Add temporary memory
-    arg_ = arg; arg += sz_arg();
-    res_ = res; res += sz_res();
-    iw_ = iw; iw += sz_iw();
-    w_ = w; w += sz_w();
-  }
-
   void Linsol::reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
     // Get input pointers
     a_ = arg[LINSOL_A];
@@ -125,8 +113,11 @@ namespace casadi {
   }
 
   void Linsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    // Create memory reference
+    Memory m(arg, res, iw, w, mem);
+
     // Reset the solver, prepare for solution
-    reset(mem, arg, res, iw, w);
+    reset(m.mem, m.arg, m.res, m.iw, m.w);
 
     // A zero linear system would be singular
     casadi_assert(a_!=0);
@@ -141,11 +132,11 @@ namespace casadi {
     }
 
     // Factorize the linear system
-    linsol_factorize(mem, a_);
+    linsol_factorize(m, a_);
 
     // Solve the factorized system
     casadi_copy(b_, neq_*nrhs_, x_);
-    linsol_solve(mem, x_, nrhs_, false);
+    linsol_solve(m, x_, nrhs_, false);
   }
 
   void Linsol::

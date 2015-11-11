@@ -1528,12 +1528,12 @@ namespace casadi {
     (*this)->reset(m.mem, m.arg, m.res, m.iw, m.w);
   }
 
-  void Function::linsol_factorize(void* mem, const double* A) {
-    (*this)->linsol_factorize(mem, A);
+  void Function::linsol_factorize(Memory& m, const double* A) {
+    (*this)->linsol_factorize(m, A);
   }
 
-  void Function::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
-    (*this)->linsol_solve(mem, x, nrhs, tr);
+  void Function::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
+    (*this)->linsol_solve(m, x, nrhs, tr);
   }
 
   MX Function::linsol_solve(const MX& A, const MX& B, bool tr) {

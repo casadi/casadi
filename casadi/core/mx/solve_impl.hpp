@@ -55,8 +55,8 @@ namespace casadi {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     Memory m(arg, res, iw, w, mem);
     linsol_.reset(m);
-    linsol_.linsol_factorize(mem, arg[1]);
-    linsol_.linsol_solve(mem, res[0], dep(0).size2(), Tr);
+    linsol_.linsol_factorize(m, arg[1]);
+    linsol_.linsol_solve(m, res[0], dep(0).size2(), Tr);
   }
 
   template<bool Tr>

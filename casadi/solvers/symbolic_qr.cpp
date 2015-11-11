@@ -173,7 +173,7 @@ namespace casadi {
     alloc_w(neq_, true);
   }
 
-  void SymbolicQr::linsol_factorize(void* mem, const double* A) {
+  void SymbolicQr::linsol_factorize(Memory& m, const double* A) {
     // Factorize
     arg_[0] = A;
     res_[0] = getPtr(q_);
@@ -181,7 +181,7 @@ namespace casadi {
     fact_fcn_(arg_, res_, iw_, w_, 0);
   }
 
-  void SymbolicQr::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
+  void SymbolicQr::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     // Select solve function
     Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
 

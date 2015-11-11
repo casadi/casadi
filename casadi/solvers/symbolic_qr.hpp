@@ -70,10 +70,10 @@ namespace casadi {
     virtual void init();
 
     // Factorize the linear system
-    virtual void linsol_factorize(void* mem, const double* A);
+    virtual void linsol_factorize(Memory& m, const double* A);
 
     // Solve the linear system
-    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr);
+    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;

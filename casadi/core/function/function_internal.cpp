@@ -2766,11 +2766,11 @@ namespace casadi {
     reset_tmp(mem, arg, res, iw, w);
   }
 
-  void FunctionInternal::linsol_factorize(void* mem, const double* A) {
+  void FunctionInternal::linsol_factorize(Memory& m, const double* A) {
     casadi_error("'linsol_factorize' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
+  void FunctionInternal::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     casadi_error("'linsol_solve' not defined for " + type_name());
   }
 

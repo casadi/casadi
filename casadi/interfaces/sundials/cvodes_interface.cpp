@@ -1195,7 +1195,7 @@ namespace casadi {
 
     // Solve the (possibly factorized) system
     casadi_assert(linsol_.nnz_out(0) == NV_LENGTH_S(z));
-    linsol_.linsol_solve(0, NV_DATA_S(z));
+    linsol_.linsol_solve(linsol_mem_, NV_DATA_S(z));
 
     // Log time duration
     time2 = clock();
@@ -1215,7 +1215,7 @@ namespace casadi {
 
     // Solve the (possibly factorized) system
     casadi_assert(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
-    linsolB_.linsol_solve(0, NV_DATA_S(zvecB), 1);
+    linsolB_.linsol_solve(linsolB_mem_, NV_DATA_S(zvecB), 1);
 
     // Log time duration
     time2 = clock();
@@ -1251,7 +1251,7 @@ namespace casadi {
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     linsol_mem_ = Memory(arg1_, res1_, iw_, w_, 0);
     linsol_.reset(linsol_mem_);
-    linsol_.linsol_factorize(0, val);
+    linsol_.linsol_factorize(linsol_mem_, val);
 
     // Log time duration
     time1 = clock();
@@ -1292,7 +1292,7 @@ namespace casadi {
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     linsolB_mem_ = Memory(arg1_, res1_, iw_, w_, 0);
     linsolB_.reset(linsolB_mem_);
-    linsolB_.linsol_factorize(0, val);
+    linsolB_.linsol_factorize(linsolB_mem_, val);
 
     // Log time duration
     time1 = clock();

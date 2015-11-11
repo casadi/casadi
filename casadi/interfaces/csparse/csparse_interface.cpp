@@ -76,7 +76,7 @@ namespace casadi {
     called_once_ = false;
   }
 
-  void CsparseInterface::linsol_factorize(void* mem, const double* A) {
+  void CsparseInterface::linsol_factorize(Memory& m, const double* A) {
     casadi_assert(A!=0);
     setInputNZ(A, 0);
 
@@ -140,7 +140,7 @@ namespace casadi {
     casadi_assert(N_!=0);
   }
 
-  void CsparseInterface::linsol_solve(void* mem, double* x, int nrhs, bool tr) {
+  void CsparseInterface::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     double time_start=0;
     casadi_assert(N_!=0);
 
