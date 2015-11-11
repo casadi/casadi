@@ -1250,7 +1250,6 @@ namespace casadi {
     fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     linsol_mem_ = Memory(linsol_, arg1_, res1_, iw_, w_, 0);
-    linsol_.reset(linsol_mem_);
     linsol_.linsol_factorize(linsol_mem_, val);
 
     // Log time duration
@@ -1291,7 +1290,6 @@ namespace casadi {
     fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
     linsolB_mem_ = Memory(linsolB_, arg1_, res1_, iw_, w_, 0);
-    linsolB_.reset(linsolB_mem_);
     linsolB_.linsol_factorize(linsolB_mem_, val);
 
     // Log time duration

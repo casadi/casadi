@@ -768,9 +768,6 @@ namespace casadi {
 
     /** \brief Set the work vectors - temporary memory */
     virtual void reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w) {}
-
-    /** \brief Reset the memory, both permanent and temporary */
-    void reset(void* mem, const double** arg, double** res, int* iw, double* w);
     ///@}
 
     ///@{

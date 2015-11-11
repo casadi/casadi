@@ -2758,14 +2758,6 @@ namespace casadi {
     return v;
   }
 
-  void FunctionInternal::reset(void* mem, const double** arg, double** res, int* iw, double* w) {
-    // Recursive call to allocate persistent memory
-    reset_per(mem, arg, res, iw, w);
-
-    // Allocate temporary memory
-    reset_tmp(mem, arg, res, iw, w);
-  }
-
   void FunctionInternal::linsol_factorize(Memory& m, const double* A) {
     casadi_error("'linsol_factorize' not defined for " + type_name());
   }

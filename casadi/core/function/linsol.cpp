@@ -116,9 +116,6 @@ namespace casadi {
     // Create memory reference
     Memory m(this, arg, res, iw, w, mem);
 
-    // Reset the solver, prepare for solution
-    reset(m.mem, m.arg, m.res, m.iw, m.w);
-
     // A zero linear system would be singular
     casadi_assert(a_!=0);
 

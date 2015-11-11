@@ -960,15 +960,6 @@ namespace casadi {
     /** \brief Free allocated memory block */
     void free_mem(void* mem);
 
-    /** \brief Set the work vectors - permanent memory */
-    void reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
-
-    /** \brief Set the work vectors - temporary memory */
-    void reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w);
-
-    /** \brief Reset the memory, both permanent and temporary */
-    void reset(Memory& m);
-
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 #endif // SWIG
@@ -1404,6 +1395,9 @@ namespace casadi {
     ~Memory();
 
   private:
+    // Set up memory object
+    void reset(const double** arg1, double** res1, int* iw1, double* w1);
+
     // Own the data ?
     bool own_;
   };

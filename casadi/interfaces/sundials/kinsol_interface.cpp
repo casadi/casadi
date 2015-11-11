@@ -522,7 +522,6 @@ namespace casadi {
     fill_n(arg_, self.linsol_.n_in(), nullptr);
     fill_n(res_, self.linsol_.n_out(), nullptr);
     linsol_mem_ = Memory(self.linsol_, arg_, res_, iw_, w_, 0);
-    self.linsol_.reset(linsol_mem_);
     self.linsol_.linsol_factorize(linsol_mem_, jac);
 
     // Log time duration

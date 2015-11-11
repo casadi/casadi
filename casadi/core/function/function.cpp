@@ -1516,18 +1516,6 @@ namespace casadi {
     return (*this)->has_mem();
   }
 
-  void Function::reset_per(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
-    (*this)->reset_per(mem, arg, res, iw, w);
-  }
-
-  void Function::reset_tmp(void* mem, const double** arg, double** res, int* iw, double* w) {
-    (*this)->reset_tmp(mem, arg, res, iw, w);
-  }
-
-  void Function::reset(Memory& m) {
-    (*this)->reset(m.mem, m.arg, m.res, m.iw, m.w);
-  }
-
   void Function::linsol_factorize(Memory& m, const double* A) {
     (*this)->linsol_factorize(m, A);
   }
@@ -1627,11 +1615,13 @@ namespace casadi {
   Memory::Memory(FunctionInternal *_f, const double** _arg, double** _res,
                  int* _iw, double* _w, void* _mem)
     : f(_f), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
+    reset(arg, res, iw, w);
   }
 
   Memory::Memory(const Function& _f, const double** _arg, double** _res,
                  int* _iw, double* _w, void* _mem)
     : f(_f.get()), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
+    reset(arg, res, iw, w);
   }
 
   Memory::Memory(const Function& _f)
@@ -1648,6 +1638,9 @@ namespace casadi {
 
     // Allocate memory
     mem = f->alloc_mem();
+
+    // Set up memory object
+    reset(arg, res, iw, w);
   }
 
   Memory::Memory(Memory&& obj)
@@ -1668,6 +1661,16 @@ namespace casadi {
       if (--f->count==0) delete f;
       f = 0;
     }
+  }
+
+  void Memory::reset(const double** arg1, double** res1, int* iw1, double* w1) {
+    casadi_assert(f!=0);
+
+    // Recursive call to allocate persistent memory
+    f->reset_per(mem, arg1, res1, iw1, w1);
+
+    // Allocate temporary memory
+    f->reset_tmp(mem, arg1, res1, iw1, w1);
   }
 
   Memory& Memory::operator=(Memory&& obj) {
