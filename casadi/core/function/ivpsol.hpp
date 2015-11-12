@@ -365,6 +365,9 @@ namespace casadi {
     /// Number of algebraic variables for the discrete time integration
     int nZ_, nRZ_;
 
+    // CUrrent state
+    std::vector<double> x_, z_, p_, q_, rx_, rz_, rp_, rq_;
+
     /// Algebraic variables for the discrete time integration
     DM Z_, RZ_;
 

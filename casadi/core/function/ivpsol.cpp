@@ -184,39 +184,28 @@ namespace casadi {
     // Call the base class method
     FunctionInternal::init();
 
-    // Initialize the functions
-    casadi_assert(!f_.isNull());
+    // Get dimensions
+    nx_ = x().nnz();
+    nz_ = z().nnz();
+    nq_ = q().nnz();
+    np_  = p().nnz();
+    nrx_ = rx().nnz();
+    nrz_ = rz().nnz();
+    nrp_ = rp().nnz();
+    nrq_ = rq().nnz();
 
-    // Get dimensions for the forward integration
+    // Consistency checks
+    casadi_assert(!f_.isNull());
     casadi_assert_message(f_.n_in()==DAE_NUM_IN,
                           "Wrong number of inputs for the DAE callback function");
     casadi_assert_message(f_.n_out()==DAE_NUM_OUT,
                           "Wrong number of outputs for the DAE callback function");
-    nx_ = f_.input(DAE_X).nnz();
-    nz_ = f_.input(DAE_Z).nnz();
-    nq_ = f_.output(DAE_QUAD).nnz();
-    np_  = f_.input(DAE_P).nnz();
-
-    // Initialize and get dimensions for the backward integration
-    if (g_.isNull()) {
-      // No backwards integration
-      nrx_ = nrz_ = nrq_ = nrp_ = 0;
-    } else {
+    if (!g_.isNull()) {
       casadi_assert_message(g_.n_in()==RDAE_NUM_IN,
                             "Wrong number of inputs for the backwards DAE callback function");
       casadi_assert_message(g_.n_out()==RDAE_NUM_OUT,
                             "Wrong number of outputs for the backwards DAE callback function");
-      nrx_ = g_.input(RDAE_RX).nnz();
-      nrz_ = g_.input(RDAE_RZ).nnz();
-      nrp_ = g_.input(RDAE_RP).nnz();
-      nrq_ = g_.output(RDAE_QUAD).nnz();
     }
-
-    // Warn if sparse inputs (was previously an error)
-    casadi_assert_warning(f_.sparsity_in(DAE_X).is_dense(),
-                          "Sparse states in integrators are experimental");
-
-    // Consistency checks
     casadi_assert_message(f_.size_out(DAE_ODE)==x().size(),
                           "Inconsistent dimensions. Expecting DAE_ODE output of shape "
                           << size_in(IVPSOL_X0) << ", but got "
@@ -235,13 +224,9 @@ namespace casadi {
       casadi_assert(g_.sparsity_out(RDAE_ALG)==rz());
     }
 
-
-    {
-      std::stringstream ss;
-      ss << "Ivpsol dimensions: nx=" << nx_ << ", nz="<< nz_
-         << ", nq=" << nq_ << ", np=" << np_;
-      log("Ivpsol::init", ss.str());
-    }
+    // Warn if sparse inputs (was previously an error)
+    casadi_assert_warning(f_.sparsity_in(DAE_X).is_dense(),
+                          "Sparse states in integrators are experimental");
 
     // read options
     if (hasSetOption("grid")) {
@@ -282,15 +267,13 @@ namespace casadi {
     offset = getAugOffset(nfwd, 0);
 
     // Create augmented problem
-    MatType aug_t = MatType::sym("aug_t", f_.input(DAE_T).sparsity());
-    MatType aug_x = MatType::sym("aug_x", size1_in(IVPSOL_X0), offset.x.back());
+    MatType aug_t = MatType::sym("aug_t", t());
+    MatType aug_x = MatType::sym("aug_x", x().size1(), offset.x.back());
     MatType aug_z = MatType::sym("aug_z", std::max(z().size1(), rz().size1()), offset.z.back());
     MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
-    MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
-    MatType aug_rz = MatType::sym("aug_rz", std::max(z().size1(), rz().size1()),
-                                  offset.rz.back());
-    MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()),
-                                  offset.rp.back());
+    MatType aug_rx = MatType::sym("aug_rx", x().size1(), offset.rx.back());
+    MatType aug_rz = MatType::sym("aug_rz", std::max(z().size1(), rz().size1()), offset.rz.back());
+    MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()), offset.rp.back());
 
     // Split up the augmented vectors
     vector<MatType> aug_x_split = horzsplit(aug_x, offset.x);
@@ -1369,6 +1352,16 @@ namespace casadi {
     // Setup discrete time dynamics
     setupFG();
 
+    // Allocate state
+    x_.resize(nx_);
+    z_.resize(nz_);
+    p_.resize(np_);
+    q_.resize(nq_);
+    rx_.resize(nrx_);
+    rz_.resize(nrz_);
+    rp_.resize(nrp_);
+    rq_.resize(nrq_);
+
     // Get discrete time dimensions
     Z_ = DM::zeros(F_.sparsity_in(DAE_Z));
     nZ_ = Z_.nnz();
@@ -1460,6 +1453,16 @@ namespace casadi {
     // Reset the base classes
     Ivpsol::reset(m, t, x, z, p);
 
+    // Set parameters
+    casadi_copy(p, np_, getPtr(p_));
+
+    // Update the state
+    casadi_copy(x, nx_, getPtr(x_));
+    casadi_copy(z, nz_, getPtr(z_));
+
+    // Reset summation states
+    casadi_fill(getPtr(q_), nq_, 0.);
+
     // Bring discrete time to the beginning
     k_ = 0;
 
@@ -1476,6 +1479,16 @@ namespace casadi {
                                const double* rz, const double* rp) {
     // Reset the base classes
     Ivpsol::resetB(m, t, rx, rz, rp);
+
+    // Set parameters
+    casadi_copy(rp, nrp_, getPtr(rp_));
+
+    // Update the state
+    casadi_copy(rx, nrx_, getPtr(rx_));
+    casadi_copy(rz, nrz_, getPtr(rz_));
+
+    // Reset summation states
+    casadi_fill(getPtr(rq_), nrq_, 0.);
 
     // Bring discrete time to the end
     k_ = nk_;
