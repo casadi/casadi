@@ -360,12 +360,12 @@ namespace casadi {
 
     // Save the final state
     copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, x);
-    casadi_copy(NV_DATA_S(q_), nq_, q);
 
     if (nq_>0) {
       double tret;
       flag = CVodeGetQuad(mem_, &tret, q_);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad", flag);
+      casadi_copy(NV_DATA_S(q_), nq_, q);
     }
 
     // Print statistics
@@ -645,7 +645,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(rx);
     arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     res1_[RDAE_ODE] = NV_DATA_S(rxdot);
     res1_[RDAE_ALG] = 0;
     res1_[RDAE_QUAD] = 0;
@@ -726,7 +726,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(rx);
     arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     res1_[RDAE_ODE] = 0;
     res1_[RDAE_ALG] = 0;
     res1_[RDAE_QUAD] = NV_DATA_S(rqdot);
@@ -825,7 +825,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(rx);
     arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = rp().ptr();;
+    arg1_[RDAE_RP] = getPtr(rp_);;
     arg1_[RDAE_NUM_IN + RDAE_T] = 0;
     arg1_[RDAE_NUM_IN + RDAE_X] = 0;
     arg1_[RDAE_NUM_IN + RDAE_Z] = 0;
@@ -931,7 +931,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(xB);
     arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     double minus_one = -1;
     arg1_[RDAE_NUM_IN] = &minus_one;
     arg1_[RDAE_NUM_IN+1] = 0;
@@ -1051,7 +1051,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(xB);
     arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     double minus_one = -1;
     arg1_[RDAE_NUM_IN] = &minus_one;
     arg1_[RDAE_NUM_IN+1] = 0;
@@ -1238,7 +1238,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(xB);
     arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     arg1_[RDAE_NUM_IN] = &gammaB;
     double one=1;
     arg1_[RDAE_NUM_IN+1] = &one;

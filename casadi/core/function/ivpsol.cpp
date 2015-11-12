@@ -1004,7 +1004,7 @@ namespace casadi {
       ss.clear();
       ss << "rp";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_RP] = MX::sym(ss.str(), rp().sparsity());
+      dd[IVPSOL_RP] = MX::sym(ss.str(), rp());
       rp_augv.push_back(dd[IVPSOL_RP]);
 
       // Initial guess for backward algebraic variable
@@ -1136,7 +1136,7 @@ namespace casadi {
     rx0_augv.push_back(dd[IVPSOL_RX0]);
 
     // Backward parameter
-    dd[IVPSOL_RP] = MX::sym("rp", rp().sparsity());
+    dd[IVPSOL_RP] = MX::sym("rp", rp());
     rp_augv.push_back(dd[IVPSOL_RP]);
 
     // Initial guess for backward algebraic variable

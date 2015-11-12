@@ -498,7 +498,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(xzB);
     arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     arg1_[RDAE_NUM_IN + RDAE_T] = 0;
     arg1_[RDAE_NUM_IN + RDAE_X] = 0;
     arg1_[RDAE_NUM_IN + RDAE_Z] = 0;
@@ -677,6 +677,8 @@ namespace casadi {
         flag = IDASolve(mem_, t_out, &t_, xz_, xzdot_, IDA_NORMAL);
         if (flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolve", flag);
       }
+      casadi_copy(NV_DATA_S(xz_), nx_, x);
+      casadi_copy(NV_DATA_S(xz_)+nx_, nz_, z);
       log("IdasInterface::integrate", "integration complete");
 
       // Get quadrature states
@@ -684,13 +686,9 @@ namespace casadi {
         double tret;
         flag = IDAGetQuad(mem_, &tret, q_);
         if (flag != IDA_SUCCESS) idas_error("IDAGetQuad", flag);
+        casadi_copy(NV_DATA_S(q_), nq_, q);
       }
     }
-
-    // Save the final state
-    casadi_copy(NV_DATA_S(xz_), nx_, x);
-    casadi_copy(NV_DATA_S(xz_)+nx_, nz_, z);
-    casadi_copy(NV_DATA_S(q_), nq_, q);
 
     // Print statistics
     if (option("print_stats")) printStats(userOut());
@@ -955,7 +953,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(rxz);
     arg1_[RDAE_RZ] = NV_DATA_S(rxz)+nrx_;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     res1_[RDAE_ODE] = NV_DATA_S(rr);
     res1_[RDAE_ALG] = NV_DATA_S(rr) + nrx_;
     res1_[RDAE_QUAD] = 0;
@@ -1004,7 +1002,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(xzA);
     arg1_[RDAE_RZ] = NV_DATA_S(xzA)+nrx_;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     res1_[RDAE_ODE] = 0;
     res1_[RDAE_ALG] = 0;
     res1_[RDAE_QUAD] = NV_DATA_S(qdotA);
@@ -1104,7 +1102,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(xzB);
     arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
@@ -1221,7 +1219,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(xzB);
     arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
@@ -1456,7 +1454,7 @@ namespace casadi {
     arg1_[RDAE_P] = getPtr(p_);
     arg1_[RDAE_RX] = NV_DATA_S(xzB);
     arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    arg1_[RDAE_RP] = rp().ptr();
+    arg1_[RDAE_RP] = getPtr(rp_);
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
