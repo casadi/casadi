@@ -142,10 +142,10 @@ namespace casadi {
     if (nrx_>0) {
 
       // Integrate backward
-      resetB(m);
+      resetB(m, grid_.back(), arg[IVPSOL_RX0], arg[IVPSOL_RZ0], arg[IVPSOL_RP]);
 
       // Proceed to t0
-      retreat(m, 0);
+      retreat(m, grid_.front(), res[IVPSOL_RXF], res[IVPSOL_RZF], res[IVPSOL_RQF]);
     }
 
     // Print statistics
@@ -1298,7 +1298,8 @@ namespace casadi {
     }
   }
 
-  void Ivpsol::reset(Memory& m, double t, const double* x, const double* z, const double* p) {
+  void Ivpsol::reset(Memory& m, double t, const double* x,
+                     const double* z, const double* p) {
     log("Ivpsol::reset", "begin");
 
     // Go to the start time
@@ -1314,7 +1315,8 @@ namespace casadi {
     log("Ivpsol::reset", "end");
   }
 
-  void Ivpsol::resetB(Memory& m) {
+  void Ivpsol::resetB(Memory& m, double t, const double* rx,
+                      const double* rz, const double* rp) {
     log("Ivpsol::resetB", "begin");
 
     // Go to the end time
@@ -1451,9 +1453,9 @@ namespace casadi {
     }
   }
 
-  void FixedStepIvpsol::retreat(Memory& m, int k) {
+  void FixedStepIvpsol::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
     // Get discrete time sought
-    int k_out = std::floor((grid_.at(k) - grid_.front())/h_);
+    int k_out = std::floor((t - grid_.front())/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
     casadi_assert(k_out<=nk_);
 
@@ -1503,9 +1505,10 @@ namespace casadi {
     }
   }
 
-  void FixedStepIvpsol::resetB(Memory& m) {
+  void FixedStepIvpsol::resetB(Memory& m, double t, const double* rx,
+                               const double* rz, const double* rp) {
     // Reset the base classes
-    Ivpsol::resetB(m);
+    Ivpsol::resetB(m, t, rx, rz, rp);
 
     // Bring discrete time to the end
     k_ = nk_;

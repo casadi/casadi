@@ -101,10 +101,10 @@ namespace casadi {
     virtual void advance(Memory& m, double t, double* x, double* z, double* q);
 
     /** \brief  Reset the backward problem and take time to tf */
-    virtual void resetB(Memory& m);
+    virtual void resetB(Memory& m, double t, const double* rx, const double* rz, const double* rp);
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(Memory& m, int k);
+    virtual void retreat(Memory& m, double t, double* rx, double* rz, double* rq);
 
     /** \brief  Set the stop time of the forward integration */
     virtual void setStopTime(double tf);

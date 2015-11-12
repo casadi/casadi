@@ -760,7 +760,8 @@ namespace casadi {
     casadi_msg("IdasInterface::integrate(" << t_out << ") end");
   }
 
-  void IdasInterface::resetB(Memory& m) {
+  void IdasInterface::resetB(Memory& m, double t, const double* rx,
+                             const double* rz, const double* rp) {
     log("IdasInterface::resetB", "begin");
 
     int flag;
@@ -804,8 +805,8 @@ namespace casadi {
 
   }
 
-  void IdasInterface::retreat(Memory& m, int k) {
-    double t_out = grid_.at(k);
+  void IdasInterface::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
+    double t_out = t;
 
     casadi_msg("IdasInterface::retreat(" << t_out << ") begin");
     int flag;

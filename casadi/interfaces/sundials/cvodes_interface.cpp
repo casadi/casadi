@@ -424,11 +424,12 @@ namespace casadi {
     casadi_msg("CvodesInterface::integrate(" << t_out << ") end");
   }
 
-  void CvodesInterface::resetB(Memory& m) {
+  void CvodesInterface::resetB(Memory& m, double t, const double* rx,
+                               const double* rz, const double* rp) {
     casadi_msg("CvodesInterface::resetB begin");
 
     // Reset the base classes
-    SundialsInterface::resetB(m);
+    SundialsInterface::resetB(m, t, rx, rz, rp);
 
     int flag;
     if (isInitAdj_) {
@@ -447,8 +448,8 @@ namespace casadi {
     casadi_msg("CvodesInterface::resetB end");
   }
 
-  void CvodesInterface::retreat(Memory& m, int k) {
-    double t_out = grid_.at(k);
+  void CvodesInterface::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
+    double t_out = t;
 
     casadi_msg("CvodesInterface::retreat(" << t_out << ") begin");
     int flag;
