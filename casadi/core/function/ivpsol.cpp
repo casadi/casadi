@@ -181,6 +181,9 @@ namespace casadi {
 
   void Ivpsol::init() {
 
+    // Call the base class method
+    FunctionInternal::init();
+
     // Initialize the functions
     casadi_assert(!f_.isNull());
 
@@ -209,28 +212,6 @@ namespace casadi {
       nrq_ = g_.output(RDAE_QUAD).nnz();
     }
 
-    // Allocate space for inputs
-    ibuf_.resize(IVPSOL_NUM_IN);
-    x0()  = DM::zeros(f_.input(DAE_X).sparsity());
-    p()   = DM::zeros(f_.input(DAE_P).sparsity());
-    z0()   = DM::zeros(f_.input(DAE_Z).sparsity());
-    if (!g_.isNull()) {
-      rx0()  = DM::zeros(g_.input(RDAE_RX).sparsity());
-      rp()  = DM::zeros(g_.input(RDAE_RP).sparsity());
-      rz0()  = DM::zeros(g_.input(RDAE_RZ).sparsity());
-    }
-
-    // Allocate space for outputs
-    obuf_.resize(IVPSOL_NUM_OUT);
-    xf() = x0();
-    qf() = DM::zeros(f_.output(DAE_QUAD).sparsity());
-    zf() = z0();
-    if (!g_.isNull()) {
-      rxf()  = rx0();
-      rqf()  = DM::zeros(g_.output(RDAE_QUAD).sparsity());
-      rzf()  = rz0();
-    }
-
     // Warn if sparse inputs (was previously an error)
     casadi_assert_warning(f_.input(DAE_X).is_dense(),
                           "Sparse states in integrators are experimental");
@@ -254,8 +235,6 @@ namespace casadi {
       casadi_assert(g_.output(RDAE_ALG).sparsity()==rz0().sparsity());
     }
 
-    // Call the base class method
-    FunctionInternal::init();
 
     {
       std::stringstream ss;
