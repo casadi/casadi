@@ -369,8 +369,8 @@ namespace casadi {
     casadi_msg("CvodesInterface::reset end");
   }
 
-  void CvodesInterface::advance(Memory& m, int k) {
-    double t_out = grid_.at(k);
+  void CvodesInterface::advance(Memory& m, double t, double* x, double* z, double* q) {
+    double t_out = t;
 
     casadi_msg("CvodesInterface::integrate(" << t_out << ") begin");
 

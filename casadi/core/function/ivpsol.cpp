@@ -136,7 +136,7 @@ namespace casadi {
     reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
 
     // Integrate forward
-    advance(m, ngrid_-1);
+    advance(m, grid_.back(), res[IVPSOL_XF], res[IVPSOL_ZF], res[IVPSOL_QF]);
 
     // If backwards integration is needed
     if (nrx_>0) {
@@ -1413,9 +1413,9 @@ namespace casadi {
     }
   }
 
-  void FixedStepIvpsol::advance(Memory& m, int k) {
+  void FixedStepIvpsol::advance(Memory& m, double t, double* x, double* z, double* q) {
     // Get discrete time sought
-    int k_out = std::ceil((grid_.at(k) - grid_.front())/h_);
+    int k_out = std::ceil((t - grid_.front())/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
     casadi_assert(k_out>=0);
 

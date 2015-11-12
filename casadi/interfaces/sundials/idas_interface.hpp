@@ -98,7 +98,7 @@ namespace casadi {
                        const double* z, const double* p);
 
     /** \brief  Advance solution in time */
-    virtual void advance(Memory& m, int k);
+    virtual void advance(Memory& m, double t, double* x, double* z, double* q);
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB(Memory& m);

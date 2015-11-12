@@ -691,8 +691,8 @@ namespace casadi {
     log("IdasInterface::correctInitialConditions", "end");
   }
 
-  void IdasInterface::advance(Memory& m, int k) {
-    double t_out = grid_.at(k);
+  void IdasInterface::advance(Memory& m, double t, double* x, double* z, double* q) {
+    double t_out = t;
 
     casadi_msg("IdasInterface::integrate(" << t_out << ") begin");
 

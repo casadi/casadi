@@ -70,7 +70,7 @@ namespace casadi {
     virtual void reset(Memory& m, double t, const double* x, const double* z, const double* p);
 
     /** \brief  Advance solution in time */
-    virtual void advance(Memory& m, int k) = 0;
+    virtual void advance(Memory& m, double t, double* x, double* z, double* q) = 0;
 
     /** \brief Reset the backward problem */
     virtual void resetB(Memory& m);
@@ -335,7 +335,7 @@ namespace casadi {
     virtual void reset(Memory& m, double t, const double* x, const double* z, const double* p);
 
     /** \brief  Advance solution in time */
-    virtual void advance(Memory& m, int k);
+    virtual void advance(Memory& m, double t, double* x, double* z, double* q);
 
     /// Reset the backward problem and take time to tf
     virtual void resetB(Memory& m);
