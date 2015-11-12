@@ -144,6 +144,10 @@ namespace casadi {
     rxz_ = N_VNew_Serial(nrx_+nrz_);
     rq_ = N_VNew_Serial(nrq_);
 
+    // Allocate memory
+    p_.resize(np_);
+    rp_.resize(nrp_);
+
     // Read options
     abstol_ = option("abstol");
     reltol_ = option("reltol");
@@ -327,6 +331,9 @@ namespace casadi {
     // Reset the base classes
     Ivpsol::reset(m, t, x, z, p);
 
+    // Set parameters
+    casadi_copy(p, np_, getPtr(p_));
+
     // Set the state
     casadi_copy(x, nx_, NV_DATA_S(xz_));
     casadi_copy(z, nz_, NV_DATA_S(xz_)+nx_);
@@ -342,6 +349,9 @@ namespace casadi {
                                  const double* rz, const double* rp) {
     // Reset the base classes
     Ivpsol::resetB(m, t, rx, rz, rp);
+
+    // Set parameters
+    casadi_copy(rp, nrp_, getPtr(rp_));
 
     // Get the backward state
     casadi_copy(rx, nrx_, NV_DATA_S(rxz_));

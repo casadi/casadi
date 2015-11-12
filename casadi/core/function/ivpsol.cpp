@@ -217,19 +217,19 @@ namespace casadi {
                           "Sparse states in integrators are experimental");
 
     // Consistency checks
-    casadi_assert_message(f_.size_out(DAE_ODE)==size_in(IVPSOL_X0),
+    casadi_assert_message(f_.size_out(DAE_ODE)==x().size(),
                           "Inconsistent dimensions. Expecting DAE_ODE output of shape "
                           << size_in(IVPSOL_X0) << ", but got "
                           << f_.size_out(DAE_ODE) << " instead.");
-    casadi_assert(f_.sparsity_out(DAE_ODE)==sparsity_in(IVPSOL_X0));
+    casadi_assert(f_.sparsity_out(DAE_ODE)==x());
     casadi_assert_message(f_.size_out(DAE_ALG)==z().size(),
                           "Inconsistent dimensions. Expecting DAE_ALG output of shape "
                           << z().size() << ", but got "
                           << f_.size_out(DAE_ALG) << " instead.");
     casadi_assert(f_.sparsity_out(DAE_ALG)==z());
     if (!g_.isNull()) {
-      casadi_assert(g_.sparsity_in(RDAE_P)==p().sparsity());
-      casadi_assert(g_.sparsity_in(RDAE_X)==sparsity_in(IVPSOL_X0));
+      casadi_assert(g_.sparsity_in(RDAE_P)==p());
+      casadi_assert(g_.sparsity_in(RDAE_X)==x());
       casadi_assert(g_.sparsity_in(RDAE_Z)==z());
       casadi_assert(g_.sparsity_out(RDAE_ODE)==rx());
       casadi_assert(g_.sparsity_out(RDAE_ALG)==rz());
@@ -274,16 +274,6 @@ namespace casadi {
   template<typename MatType>
   map<string, MatType> Ivpsol::aug_fwd(int nfwd, AugOffset& offset) {
     log("Ivpsol::aug_fwd", "call");
-
-    // // Cast to right type
-    // map<string, MatType> dae = dae_;
-
-    // // Augmented DAE
-    // map<string, vector<MatType>> aug;
-    // for (auto&& i : dae) {
-    //   aug[i.first].push_back(i.second);
-    // }
-
 
     // Return object
     map<string, MatType> ret;
@@ -993,7 +983,7 @@ namespace casadi {
       ss.clear();
       ss << "p";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_P] = MX::sym(ss.str(), p().sparsity());
+      dd[IVPSOL_P] = MX::sym(ss.str(), p());
       p_augv.push_back(dd[IVPSOL_P]);
 
       // Initial guess for algebraic variable
@@ -1134,7 +1124,7 @@ namespace casadi {
     x0_augv.push_back(dd[IVPSOL_X0]);
 
     // Parameter
-    dd[IVPSOL_P] = MX::sym("p", p().sparsity());
+    dd[IVPSOL_P] = MX::sym("p", p());
     p_augv.push_back(dd[IVPSOL_P]);
 
     // Initial guess for algebraic variable

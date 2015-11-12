@@ -72,7 +72,7 @@ namespace casadi {
     N_Vector rxz_, rxzdot_, rq_;
 
     // Parameters
-    //double *p_, *rp_;
+    std::vector<double> p_, rp_;
 
     /// Memory or the linear solvers
     Memory linsol_mem_, linsolB_mem_;

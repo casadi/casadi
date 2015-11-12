@@ -154,11 +154,11 @@ namespace casadi {
     // Shorthands
     const Sparsity&  x() { return sparsity_out(IVPSOL_XF);}
     const Sparsity&  z() { return sparsity_out(IVPSOL_ZF);}
+    const Sparsity&  p() { return sparsity_in(IVPSOL_P);}
     const Sparsity&  q() { return sparsity_out(IVPSOL_QF);}
     const Sparsity& rx() { return sparsity_in(IVPSOL_RX0);}
     const Sparsity& rz() { return sparsity_in(IVPSOL_RZ0);}
     const Sparsity& rq() { return sparsity_out(IVPSOL_RQF);}
-    DM&   p() { return input(IVPSOL_P );}
     DM&  rp() { return input(IVPSOL_RP);}
     ///@}
 
