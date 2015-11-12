@@ -222,15 +222,15 @@ namespace casadi {
                           << size_in(IVPSOL_X0) << ", but got "
                           << f_.size_out(DAE_ODE) << " instead.");
     casadi_assert(f_.sparsity_out(DAE_ODE)==sparsity_in(IVPSOL_X0));
-    casadi_assert_message(f_.size_out(DAE_ALG)==z0().size(),
+    casadi_assert_message(f_.size_out(DAE_ALG)==z().size(),
                           "Inconsistent dimensions. Expecting DAE_ALG output of shape "
-                          << z0().size() << ", but got "
+                          << z().size() << ", but got "
                           << f_.size_out(DAE_ALG) << " instead.");
-    casadi_assert(f_.sparsity_out(DAE_ALG)==z0().sparsity());
+    casadi_assert(f_.sparsity_out(DAE_ALG)==z());
     if (!g_.isNull()) {
       casadi_assert(g_.sparsity_in(RDAE_P)==p().sparsity());
       casadi_assert(g_.sparsity_in(RDAE_X)==sparsity_in(IVPSOL_X0));
-      casadi_assert(g_.sparsity_in(RDAE_Z)==z0().sparsity());
+      casadi_assert(g_.sparsity_in(RDAE_Z)==z());
       casadi_assert(g_.sparsity_out(RDAE_ODE)==rx0().sparsity());
       casadi_assert(g_.sparsity_out(RDAE_ALG)==rz0().sparsity());
     }
@@ -294,10 +294,10 @@ namespace casadi {
     // Create augmented problem
     MatType aug_t = MatType::sym("aug_t", f_.input(DAE_T).sparsity());
     MatType aug_x = MatType::sym("aug_x", size1_in(IVPSOL_X0), offset.x.back());
-    MatType aug_z = MatType::sym("aug_z", std::max(z0().size1(), rz0().size1()), offset.z.back());
+    MatType aug_z = MatType::sym("aug_z", std::max(z().size1(), rz0().size1()), offset.z.back());
     MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
     MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
-    MatType aug_rz = MatType::sym("aug_rz", std::max(z0().size1(), rz0().size1()),
+    MatType aug_rz = MatType::sym("aug_rz", std::max(z().size1(), rz0().size1()),
                                   offset.rz.back());
     MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()),
                                   offset.rp.back());
@@ -459,10 +459,10 @@ namespace casadi {
     // Create augmented problem
     MatType aug_t = MatType::sym("aug_t", f_.sparsity_in(DAE_T));
     MatType aug_x = MatType::sym("aug_x", size1_in(IVPSOL_X0), offset.x.back());
-    MatType aug_z = MatType::sym("aug_z", std::max(z0().size1(), rz0().size1()), offset.z.back());
+    MatType aug_z = MatType::sym("aug_z", std::max(z().size1(), rz0().size1()), offset.z.back());
     MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
     MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
-    MatType aug_rz = MatType::sym("aug_rz", std::max(z0().size1(), rz0().size1()),
+    MatType aug_rz = MatType::sym("aug_rz", std::max(z().size1(), rz0().size1()),
                                   offset.rz.back());
     MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()),
                                   offset.rp.back());
@@ -904,8 +904,8 @@ namespace casadi {
 
     // Count nondifferentiated and forward sensitivities
     for (int dir=-1; dir<nfwd; ++dir) {
-      if ( nx_>0) ret.x.push_back(size2_in(IVPSOL_X0));
-      if ( nz_>0) ret.z.push_back(z0().size2());
+      if ( nx_>0) ret.x.push_back(x().size2());
+      if ( nz_>0) ret.z.push_back(z().size2());
       if ( nq_>0) ret.q.push_back(q().size2());
       if ( np_>0) ret.p.push_back(p().size2());
       if (nrx_>0) ret.rx.push_back(rx0().size2());
@@ -916,11 +916,11 @@ namespace casadi {
 
     // Count adjoint sensitivities
     for (int dir=0; dir<nadj; ++dir) {
-      if ( nx_>0) ret.rx.push_back(size2_in(IVPSOL_X0));
-      if ( nz_>0) ret.rz.push_back(z0().size2());
+      if ( nx_>0) ret.rx.push_back(x().size2());
+      if ( nz_>0) ret.rz.push_back(z().size2());
       if ( np_>0) ret.rq.push_back(p().size2());
       if ( nq_>0) ret.rp.push_back(q().size2());
-      if (nrx_>0) ret.x.push_back(size2_in(IVPSOL_X0));
+      if (nrx_>0) ret.x.push_back(x().size2());
       if (nrz_>0) ret.z.push_back(rz0().size2());
       if (nrp_>0) ret.q.push_back(rp().size2());
       if (nrq_>0) ret.p.push_back(rqf().size2());
@@ -986,7 +986,7 @@ namespace casadi {
       ss.clear();
       ss << "x0";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_X0] = MX::sym(ss.str(), sparsity_in(IVPSOL_X0));
+      dd[IVPSOL_X0] = MX::sym(ss.str(), x());
       x0_augv.push_back(dd[IVPSOL_X0]);
 
       // Parameter
@@ -1000,7 +1000,7 @@ namespace casadi {
       ss.clear();
       ss << "r0";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_Z0] = MX::sym(ss.str(), z0().sparsity());
+      dd[IVPSOL_Z0] = MX::sym(ss.str(), z());
       z0_augv.push_back(dd[IVPSOL_Z0]);
 
       // Backward state
@@ -1130,7 +1130,7 @@ namespace casadi {
     fill(dd.begin(), dd.end(), MX());
 
     // Differential state
-    dd[IVPSOL_X0] = MX::sym("x0", sparsity_in(IVPSOL_X0));
+    dd[IVPSOL_X0] = MX::sym("x0", x());
     x0_augv.push_back(dd[IVPSOL_X0]);
 
     // Parameter
@@ -1138,7 +1138,7 @@ namespace casadi {
     p_augv.push_back(dd[IVPSOL_P]);
 
     // Initial guess for algebraic variable
-    dd[IVPSOL_Z0] = MX::sym("r0", z0().sparsity());
+    dd[IVPSOL_Z0] = MX::sym("r0", z());
     z0_augv.push_back(dd[IVPSOL_Z0]);
 
     // Backward state
