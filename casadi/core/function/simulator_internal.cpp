@@ -70,7 +70,8 @@ namespace casadi {
     Memory m(integrator_, arg, res1, iw, w, 0);
 
     // Reset the integrator_
-    dynamic_cast<Ivpsol*>(integrator_.get())->reset(m);
+    dynamic_cast<Ivpsol*>(integrator_.get())->
+      reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
 
     // Advance solution in time
     for (int k=0; k<grid_.size(); ++k) {

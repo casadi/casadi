@@ -48,9 +48,6 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(Memory& m) = 0;
-
     /** \brief  Set stop time for the integration */
     virtual void setStopTime(double tf) = 0;
 

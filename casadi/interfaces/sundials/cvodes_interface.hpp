@@ -92,7 +92,8 @@ namespace casadi {
     virtual void initAdj();
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(Memory& m);
+    virtual void reset(Memory& m, double t, const double* x,
+                       const double* z, const double* p);
 
     /** \brief  Advance solution in time */
     virtual void advance(Memory& m, int k);

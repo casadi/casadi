@@ -603,11 +603,12 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::reset(Memory& m) {
+  void IdasInterface::reset(Memory& m, double t, const double* _x,
+                            const double* _z, const double* _p) {
     log("IdasInterface::reset", "begin");
 
     // Reset the base classes
-    SundialsInterface::reset(m);
+    SundialsInterface::reset(m, t, _x, _z, _p);
 
     if (nrx_>0 && !isInitTaping_)
       initTaping();

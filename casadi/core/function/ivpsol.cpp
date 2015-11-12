@@ -133,7 +133,7 @@ namespace casadi {
     Memory m(this, arg, res, iw, w, mem);
 
     // Reset solver, take time to t0
-    reset(m);
+    reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
 
     // Integrate forward
     advance(m, ngrid_-1);
@@ -1298,7 +1298,7 @@ namespace casadi {
     }
   }
 
-  void Ivpsol::reset(Memory& m) {
+  void Ivpsol::reset(Memory& m, double t, const double* x, const double* z, const double* p) {
     log("Ivpsol::reset", "begin");
 
     // Go to the start time
@@ -1486,9 +1486,10 @@ namespace casadi {
     }
   }
 
-  void FixedStepIvpsol::reset(Memory& m) {
+  void FixedStepIvpsol::reset(Memory& m, double t, const double* x,
+                              const double* z, const double* p) {
     // Reset the base classes
-    Ivpsol::reset(m);
+    Ivpsol::reset(m, t, x, z, p);
 
     // Bring discrete time to the beginning
     k_ = 0;

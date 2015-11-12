@@ -327,11 +327,12 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::reset(Memory& m) {
+  void CvodesInterface::reset(Memory& m, double t, const double* x,
+                              const double* z, const double* _p) {
     casadi_msg("CvodesInterface::reset begin");
 
     // Reset the base classes
-    SundialsInterface::reset(m);
+    SundialsInterface::reset(m, t, x, z, _p);
 
     if (monitored("reset")) {
       userOut() << "initial state: " << endl;

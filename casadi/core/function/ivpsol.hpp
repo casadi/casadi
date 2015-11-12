@@ -66,13 +66,13 @@ namespace casadi {
     /** \brief Set the work vectors */
     virtual void setup(Memory& m, const double**& arg, double**& res, int*& iw, double*& w);
 
-    /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(Memory& m);
+    /** \brief Reset the forward problem */
+    virtual void reset(Memory& m, double t, const double* x, const double* z, const double* p);
 
     /** \brief  Advance solution in time */
     virtual void advance(Memory& m, int k) = 0;
 
-    /** \brief  Reset the backward problem and take time to tf */
+    /** \brief Reset the backward problem */
     virtual void resetB(Memory& m);
 
     /** \brief  Retreat solution in time */
@@ -331,8 +331,8 @@ namespace casadi {
     /// Setup F and G
     virtual void setupFG() = 0;
 
-    /// Reset the forward problem and bring the time back to t0
-    virtual void reset(Memory& m);
+    /** \brief Reset the forward problem */
+    virtual void reset(Memory& m, double t, const double* x, const double* z, const double* p);
 
     /** \brief  Advance solution in time */
     virtual void advance(Memory& m, int k);
