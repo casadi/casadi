@@ -1060,9 +1060,9 @@ namespace casadi {
     dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(size_out(IVPSOL_XF)));
     dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
-    dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
+    dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
     dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
-    dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().size()));
+    dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
     std::copy(dd.begin(), dd.end(), ret_in.begin()+IVPSOL_NUM_IN);
 
     // All outputs of the return function
@@ -1161,9 +1161,9 @@ namespace casadi {
     dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
     dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
-    dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
+    dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
     dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
-    dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().size()));
+    dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
     ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
     // Add adjoint seeds
@@ -1192,7 +1192,7 @@ namespace casadi {
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rxf" << "_" << dir;
-      dd[IVPSOL_RXF] = MX::sym(ss.str(), rxf().sparsity());
+      dd[IVPSOL_RXF] = MX::sym(ss.str(), rx());
       x0_augv.push_back(dd[IVPSOL_RXF]);
 
       // Backward quadratures becomes (forward) parameters
@@ -1204,7 +1204,7 @@ namespace casadi {
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rzf" << "_" << dir;
-      dd[IVPSOL_RZF] = MX::sym(ss.str(), rzf().sparsity());
+      dd[IVPSOL_RZF] = MX::sym(ss.str(), rz());
       z0_augv.push_back(dd[IVPSOL_RZF]);
 
       // Add to input vector

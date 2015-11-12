@@ -160,8 +160,6 @@ namespace casadi {
     const Sparsity& rq() { return sparsity_out(IVPSOL_RQF);}
     DM&   p() { return input(IVPSOL_P );}
     DM&  rp() { return input(IVPSOL_RP);}
-    DM& rxf() { return output(IVPSOL_RXF);}
-    DM& rzf() { return output(IVPSOL_RZF);}
     ///@}
 
     /// Number of states for the forward integration
