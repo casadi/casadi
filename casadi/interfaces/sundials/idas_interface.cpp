@@ -79,9 +79,8 @@ namespace casadi {
 
     mem_ = 0;
 
-    xz_  = 0;
-    xzdot_ = 0,
-      q_ = 0;
+    xzdot_ = 0;
+    q_ = 0;
 
     rxz_ = 0;
     rxzdot_ = 0;
@@ -100,7 +99,6 @@ namespace casadi {
     if (mem_) { IDAFree(&mem_); mem_ = 0; }
 
     // Forward integration
-    if (xz_) { N_VDestroy_Serial(xz_); xz_ = 0; }
     if (xzdot_) { N_VDestroy_Serial(xzdot_); xzdot_ = 0; }
     if (q_) { N_VDestroy_Serial(q_); q_ = 0; }
 
@@ -108,14 +106,6 @@ namespace casadi {
     if (rxz_) { N_VDestroy_Serial(rxz_); rxz_ = 0; }
     if (rxzdot_) { N_VDestroy_Serial(rxzdot_); rxzdot_ = 0; }
     if (rq_) { N_VDestroy_Serial(rq_); rq_ = 0; }
-
-    // Forward problem
-    for (vector<N_Vector>::iterator it=xzF_.begin(); it != xzF_.end(); ++it)
-        if (*it) { N_VDestroy_Serial(*it); *it = 0; }
-    for (vector<N_Vector>::iterator it=xzdotF_.begin(); it != xzdotF_.end(); ++it)
-        if (*it) { N_VDestroy_Serial(*it); *it = 0; }
-    for (vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)
-        if (*it) { N_VDestroy_Serial(*it); *it = 0; }
   }
 
   void IdasInterface::init() {
@@ -158,7 +148,6 @@ namespace casadi {
     if (mem_==0) throw CasadiException("IDACreate(): Creation failed");
 
     // Allocate n-vectors for ivp
-    xz_ = N_VNew_Serial(nx_+nz_);
     xzdot_ = N_VNew_Serial(nx_+nz_);
 
     // Initialize Idas
@@ -621,9 +610,7 @@ namespace casadi {
 
     // Copy to N_Vectors
     const Matrix<double>& x = xf();
-    copy(x->begin(), x->begin()+nx_, NV_DATA_S(xz_));
     const Matrix<double>& z = zf();
-    copy(z->begin(), z->end(), NV_DATA_S(xz_)+nx_);
     copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(xzdot_));
 
     // Re-initialize
@@ -664,11 +651,6 @@ namespace casadi {
 
   void IdasInterface::correctInitialConditions() {
     log("IdasInterface::correctInitialConditions", "begin");
-    if (monitored("correctInitialConditions")) {
-      userOut() << "initial guess: " << endl;
-      userOut() << "p = " << p() << endl;
-      userOut() << "x0 = " << x0() << endl;
-    }
 
     int icopt = IDA_YA_YDP_INIT; // calculate z and xdot given x
     // int icopt = IDA_Y_INIT; // calculate z and x given zdot and xdot (e.g. start in stationary)
@@ -683,11 +665,6 @@ namespace casadi {
     if (flag != IDA_SUCCESS) idas_error("IDAGetConsistentIC", flag);
 
     // Print progress
-    log("IdasInterface::correctInitialConditions", "found consistent initial values");
-    if (monitored("correctInitialConditions")) {
-      userOut() << "p = " << p() << endl;
-      userOut() << "x0 = " << x0() << endl;
-    }
     log("IdasInterface::correctInitialConditions", "end");
   }
 
@@ -736,8 +713,6 @@ namespace casadi {
 
     // Save the final state
     copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, xf()->begin());
-
-    // Save the final algebraic variable
     copy(NV_DATA_S(xz_)+nx_, NV_DATA_S(xz_)+nx_+nz_, zf()->begin());
 
     // Print statistics

@@ -152,7 +152,6 @@ namespace casadi {
 
     ///@{
     // Shorthands
-    DM&  x0() { return input(IVPSOL_X0);}
     DM&   p() { return input(IVPSOL_P );}
     DM&  z0() { return input(IVPSOL_Z0);}
     DM& rx0() { return input(IVPSOL_RX0);}

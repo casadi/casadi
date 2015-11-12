@@ -126,8 +126,8 @@ namespace casadi {
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
     for (int d=1; d<=deg_; ++d) {
-      x[d] = reshape(*vv_it++, this->x0().size());
-      z[d] = reshape(*vv_it++, this->z0().size());
+      x[d] = reshape(*vv_it++, size_in(IVPSOL_X0));
+      z[d] = reshape(*vv_it++, size_in(IVPSOL_Z0));
     }
     casadi_assert(vv_it==vv.end());
 

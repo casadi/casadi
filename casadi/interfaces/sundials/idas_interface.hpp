@@ -248,15 +248,6 @@ namespace casadi {
     // Idas memory block
     void* mem_;
 
-    // N-vectors for the forward integration
-    N_Vector xz_, xzdot_, q_;
-
-    // N-vectors for the backward integration
-    N_Vector rxz_, rxzdot_, rq_;
-
-    // N-vectors for the forward sensitivities
-    std::vector<N_Vector> xzF_, xzdotF_, qF_;
-
     // sensitivity method
     int ism_;
 

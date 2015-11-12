@@ -62,7 +62,7 @@ namespace casadi {
 
     mem_ = 0;
 
-    x0_ = x_ = q_ = 0;
+    q_ = 0;
     rx0_ = rx_ = rq_ = 0;
 
     isInitAdj_ = false;
@@ -73,8 +73,6 @@ namespace casadi {
     if (mem_) { CVodeFree(&mem_); mem_ = 0;}
 
     // Forward integration
-    if (x0_) { N_VDestroy_Serial(x0_); x0_ = 0; }
-    if (x_) { N_VDestroy_Serial(x_); x_ = 0; }
     if (q_) { N_VDestroy_Serial(q_); q_ = 0; }
 
     // Backward integration
@@ -133,10 +131,6 @@ namespace casadi {
     mem_ = CVodeCreate(lmm_, iter_);
     if (mem_==0) throw CasadiException("CVodeCreate: Creation failed");
 
-    // Allocate n-vectors for ivp
-    x0_ = N_VMake_Serial(nx_, x0().ptr());
-    x_ = N_VMake_Serial(nx_, xf().ptr());
-
     // Disable internal warning messages?
     disable_internal_warnings_ = option("disable_internal_warnings");
 
@@ -146,7 +140,7 @@ namespace casadi {
 
     // Initialize CVodes
     double t0 = 0;
-    flag = CVodeInit(mem_, rhs_wrapper, t0, x0_);
+    flag = CVodeInit(mem_, rhs_wrapper, t0, xz_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeInit", flag);
 
     // Set tolerances
@@ -334,17 +328,11 @@ namespace casadi {
     // Reset the base classes
     SundialsInterface::reset(m, t, x, z, _p);
 
-    if (monitored("reset")) {
-      userOut() << "initial state: " << endl;
-      userOut() << "p = " << p() << endl;
-      userOut() << "x0 = " << x0() << endl;
-    }
-
     // Reset timers
     t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
 
     // Re-initialize
-    int flag = CVodeReInit(mem_, grid_.front(), x0_);
+    int flag = CVodeReInit(mem_, t, xz_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeReInit", flag);
 
     // Re-initialize quadratures
@@ -391,13 +379,16 @@ namespace casadi {
       return;
     }
     if (nrx_>0) {
-      flag = CVodeF(mem_, t_out, x_, &t_, CV_NORMAL, &ncheck_);
+      flag = CVodeF(mem_, t_out, xz_, &t_, CV_NORMAL, &ncheck_);
       if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVodeF", flag);
 
     } else {
-      flag = CVode(mem_, t_out, x_, &t_, CV_NORMAL);
+      flag = CVode(mem_, t_out, xz_, &t_, CV_NORMAL);
       if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVode", flag);
     }
+
+    // Save the final state
+    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, xf()->begin());
 
     if (nq_>0) {
       double tret;

@@ -93,17 +93,17 @@ namespace casadi {
   Sparsity Ivpsol::get_sparsity_in(int ind) const {
     switch (static_cast<IvpsolInput>(ind)) {
     case IVPSOL_X0:
-      return f_.input(DAE_X).sparsity();
+      return f_.sparsity_in(DAE_X);
     case IVPSOL_P:
-      return f_.input(DAE_P).sparsity();
+      return f_.sparsity_in(DAE_P);
     case IVPSOL_Z0:
-      return f_.input(DAE_Z).sparsity();
+      return f_.sparsity_in(DAE_Z);
     case IVPSOL_RX0:
-      return g_.isNull() ? Sparsity() : g_.input(RDAE_RX).sparsity();
+      return g_.isNull() ? Sparsity() : g_.sparsity_in(RDAE_RX);
     case IVPSOL_RP:
-      return g_.isNull() ? Sparsity() : g_.input(RDAE_RP).sparsity();
+      return g_.isNull() ? Sparsity() : g_.sparsity_in(RDAE_RP);
     case IVPSOL_RZ0:
-      return g_.isNull() ? Sparsity() : g_.input(RDAE_RZ).sparsity();
+      return g_.isNull() ? Sparsity() : g_.sparsity_in(RDAE_RZ);
     case IVPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -114,13 +114,13 @@ namespace casadi {
     case IVPSOL_XF:
       return get_sparsity_in(IVPSOL_X0);
     case IVPSOL_QF:
-      return f_.output(DAE_QUAD).sparsity();
+      return f_.sparsity_out(DAE_QUAD);
     case IVPSOL_ZF:
       return get_sparsity_in(IVPSOL_ZF);
     case IVPSOL_RXF:
       return get_sparsity_in(IVPSOL_RX0);
     case IVPSOL_RQF:
-      return g_.isNull() ? Sparsity() : g_.output(RDAE_QUAD).sparsity();
+      return g_.isNull() ? Sparsity() : g_.sparsity_out(RDAE_QUAD);
     case IVPSOL_RZF:
       return get_sparsity_in(IVPSOL_RZ0);
     case IVPSOL_NUM_OUT: break;
@@ -213,26 +213,26 @@ namespace casadi {
     }
 
     // Warn if sparse inputs (was previously an error)
-    casadi_assert_warning(f_.input(DAE_X).is_dense(),
+    casadi_assert_warning(f_.sparsity_in(DAE_X).is_dense(),
                           "Sparse states in integrators are experimental");
 
     // Consistency checks
-    casadi_assert_message(f_.output(DAE_ODE).size()==x0().size(),
+    casadi_assert_message(f_.size_out(DAE_ODE)==size_in(IVPSOL_X0),
                           "Inconsistent dimensions. Expecting DAE_ODE output of shape "
-                          << x0().size() << ", but got "
-                          << f_.output(DAE_ODE).size() << " instead.");
-    casadi_assert(f_.output(DAE_ODE).sparsity()==x0().sparsity());
-    casadi_assert_message(f_.output(DAE_ALG).size()==z0().size(),
+                          << size_in(IVPSOL_X0) << ", but got "
+                          << f_.size_out(DAE_ODE) << " instead.");
+    casadi_assert(f_.sparsity_out(DAE_ODE)==sparsity_in(IVPSOL_X0));
+    casadi_assert_message(f_.size_out(DAE_ALG)==z0().size(),
                           "Inconsistent dimensions. Expecting DAE_ALG output of shape "
                           << z0().size() << ", but got "
-                          << f_.output(DAE_ALG).size() << " instead.");
-    casadi_assert(f_.output(DAE_ALG).sparsity()==z0().sparsity());
+                          << f_.size_out(DAE_ALG) << " instead.");
+    casadi_assert(f_.sparsity_out(DAE_ALG)==z0().sparsity());
     if (!g_.isNull()) {
-      casadi_assert(g_.input(RDAE_P).sparsity()==p().sparsity());
-      casadi_assert(g_.input(RDAE_X).sparsity()==x0().sparsity());
-      casadi_assert(g_.input(RDAE_Z).sparsity()==z0().sparsity());
-      casadi_assert(g_.output(RDAE_ODE).sparsity()==rx0().sparsity());
-      casadi_assert(g_.output(RDAE_ALG).sparsity()==rz0().sparsity());
+      casadi_assert(g_.sparsity_in(RDAE_P)==p().sparsity());
+      casadi_assert(g_.sparsity_in(RDAE_X)==sparsity_in(IVPSOL_X0));
+      casadi_assert(g_.sparsity_in(RDAE_Z)==z0().sparsity());
+      casadi_assert(g_.sparsity_out(RDAE_ODE)==rx0().sparsity());
+      casadi_assert(g_.sparsity_out(RDAE_ALG)==rz0().sparsity());
     }
 
 
@@ -293,10 +293,10 @@ namespace casadi {
 
     // Create augmented problem
     MatType aug_t = MatType::sym("aug_t", f_.input(DAE_T).sparsity());
-    MatType aug_x = MatType::sym("aug_x", x0().size1(), offset.x.back());
+    MatType aug_x = MatType::sym("aug_x", size1_in(IVPSOL_X0), offset.x.back());
     MatType aug_z = MatType::sym("aug_z", std::max(z0().size1(), rz0().size1()), offset.z.back());
     MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
-    MatType aug_rx = MatType::sym("aug_rx", x0().size1(), offset.rx.back());
+    MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
     MatType aug_rz = MatType::sym("aug_rz", std::max(z0().size1(), rz0().size1()),
                                   offset.rz.back());
     MatType aug_rp = MatType::sym("aug_rp", std::max(qf().size1(), rp().size1()),
@@ -457,11 +457,11 @@ namespace casadi {
     offset = getAugOffset(0, nadj);
 
     // Create augmented problem
-    MatType aug_t = MatType::sym("aug_t", f_.input(DAE_T).sparsity());
-    MatType aug_x = MatType::sym("aug_x", x0().size1(), offset.x.back());
+    MatType aug_t = MatType::sym("aug_t", f_.sparsity_in(DAE_T));
+    MatType aug_x = MatType::sym("aug_x", size1_in(IVPSOL_X0), offset.x.back());
     MatType aug_z = MatType::sym("aug_z", std::max(z0().size1(), rz0().size1()), offset.z.back());
     MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
-    MatType aug_rx = MatType::sym("aug_rx", x0().size1(), offset.rx.back());
+    MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
     MatType aug_rz = MatType::sym("aug_rz", std::max(z0().size1(), rz0().size1()),
                                   offset.rz.back());
     MatType aug_rp = MatType::sym("aug_rp", std::max(qf().size1(), rp().size1()),
@@ -904,7 +904,7 @@ namespace casadi {
 
     // Count nondifferentiated and forward sensitivities
     for (int dir=-1; dir<nfwd; ++dir) {
-      if ( nx_>0) ret.x.push_back(x0().size2());
+      if ( nx_>0) ret.x.push_back(size2_in(IVPSOL_X0));
       if ( nz_>0) ret.z.push_back(z0().size2());
       if ( nq_>0) ret.q.push_back(qf().size2());
       if ( np_>0) ret.p.push_back(p().size2());
@@ -916,11 +916,11 @@ namespace casadi {
 
     // Count adjoint sensitivities
     for (int dir=0; dir<nadj; ++dir) {
-      if ( nx_>0) ret.rx.push_back(x0().size2());
+      if ( nx_>0) ret.rx.push_back(size2_in(IVPSOL_X0));
       if ( nz_>0) ret.rz.push_back(z0().size2());
       if ( np_>0) ret.rq.push_back(p().size2());
       if ( nq_>0) ret.rp.push_back(qf().size2());
-      if (nrx_>0) ret.x.push_back(rx0().size2());
+      if (nrx_>0) ret.x.push_back(size2_in(IVPSOL_X0));
       if (nrz_>0) ret.z.push_back(rz0().size2());
       if (nrp_>0) ret.q.push_back(rp().size2());
       if (nrq_>0) ret.p.push_back(rqf().size2());
@@ -986,7 +986,7 @@ namespace casadi {
       ss.clear();
       ss << "x0";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_X0] = MX::sym(ss.str(), x0().sparsity());
+      dd[IVPSOL_X0] = MX::sym(ss.str(), sparsity_in(IVPSOL_X0));
       x0_augv.push_back(dd[IVPSOL_X0]);
 
       // Parameter
@@ -1130,7 +1130,7 @@ namespace casadi {
     fill(dd.begin(), dd.end(), MX());
 
     // Differential state
-    dd[IVPSOL_X0] = MX::sym("x0", x0().sparsity());
+    dd[IVPSOL_X0] = MX::sym("x0", sparsity_in(IVPSOL_X0));
     x0_augv.push_back(dd[IVPSOL_X0]);
 
     // Parameter
@@ -1285,36 +1285,28 @@ namespace casadi {
 
   void Ivpsol::reset(Memory& m, double t, const double* x,
                      const double* z, const double* p) {
-    log("Ivpsol::reset", "begin");
+    // Update time
+    t_ = t;
 
-    // Go to the start time
-    t_ = grid_.front();
-
-    // Initialize output
-    xf().set(x0());
-    zf().set(z0());
+    // Get state
+    casadi_copy(x, nx_, xf().ptr());
+    casadi_copy(z, nz_, zf().ptr());
 
     // Reset summation states
-    qf().set(0.0);
-
-    log("Ivpsol::reset", "end");
+    casadi_fill(qf().ptr(), nq_, 0.);
   }
 
   void Ivpsol::resetB(Memory& m, double t, const double* rx,
                       const double* rz, const double* rp) {
-    log("Ivpsol::resetB", "begin");
+    // Update time
+    t_ = t;
 
-    // Go to the end time
-    t_ = grid_.back();
-
-    // Initialize output
-    rxf().set(rx0());
-    rzf().set(rz0());
+    // Get state
+    casadi_copy(rx, nrx_, rxf().ptr());
+    casadi_copy(rz, nrz_, rzf().ptr());
 
     // Reset summation states
-    rqf().set(0.0);
-
-    log("Ivpsol::resetB", "end");
+    casadi_fill(rqf().ptr(), nrq_, 0.);
   }
 
   Dict Ivpsol::getDerivativeOptions(bool fwd) {
@@ -1388,9 +1380,9 @@ namespace casadi {
     setupFG();
 
     // Get discrete time dimensions
-    Z_ = F_.input(DAE_Z);
+    Z_ = DM::zeros(F_.sparsity_in(DAE_Z));
     nZ_ = Z_.nnz();
-    RZ_ = G_.isNull() ? DM() : G_.input(RDAE_RZ);
+    RZ_ = G_.isNull() ? DM() : DM::zeros(G_.sparsity_in(RDAE_RZ));
     nRZ_ =  RZ_.nnz();
 
     // Allocate tape if backward states are present
