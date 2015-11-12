@@ -329,44 +329,40 @@ namespace casadi {
   }
 
   void CvodesInterface::advance(Memory& m, double t, double* x, double* z, double* q) {
-    double t_out = t;
-
-    casadi_msg("CvodesInterface::integrate(" << t_out << ") begin");
-
-    casadi_assert_message(t_out>=grid_.front(),
-                          "CvodesInterface::integrate(" << t_out << "): "
+    casadi_assert_message(t>=grid_.front(),
+                          "CvodesInterface::integrate(" << t << "): "
                           "Cannot integrate to a time earlier than t0 ("
                           << grid_.front() << ")");
-    casadi_assert_message(t_out<=grid_.back() || !stop_at_end_, "CvodesInterface::integrate("
-                          << t_out << "):"
+    casadi_assert_message(t<=grid_.back() || !stop_at_end_, "CvodesInterface::integrate("
+                          << t << "):"
                           " Cannot integrate past a time later than tf (" << grid_.back() << ") "
                           "unless stop_at_end is set to False.");
 
-    int flag;
+    // Integrate, unless already at desired time
+    const double ttol = 1e-9;
+    if (fabs(t_-t)>=ttol) {
 
-    // tolerance
-    double ttol = 1e-9;
-    if (fabs(t_-t_out)<ttol) {
-      return;
+      // Integrate forward problem, possibly checkpointing
+      if (nrx_>0) {
+        int flag = CVodeF(mem_, t, xz_, &t_, CV_NORMAL, &ncheck_);
+        if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVodeF", flag);
+
+      } else {
+        int flag = CVode(mem_, t, xz_, &t_, CV_NORMAL);
+        if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVode", flag);
+      }
+
+      // Get the quadratures
+      if (nq_>0) {
+        double tret;
+        int flag = CVodeGetQuad(mem_, &tret, q_);
+        if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad", flag);
+      }
     }
-    if (nrx_>0) {
-      flag = CVodeF(mem_, t_out, xz_, &t_, CV_NORMAL, &ncheck_);
-      if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVodeF", flag);
 
-    } else {
-      flag = CVode(mem_, t_out, xz_, &t_, CV_NORMAL);
-      if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVode", flag);
-    }
-
-    // Save the final state
-    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, x);
-
-    if (nq_>0) {
-      double tret;
-      flag = CVodeGetQuad(mem_, &tret, q_);
-      if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad", flag);
-      casadi_copy(NV_DATA_S(q_), nq_, q);
-    }
+    // Get the solution
+    casadi_copy(NV_DATA_S(xz_), nx_, x);
+    casadi_copy(NV_DATA_S(q_), nq_, q);
 
     // Print statistics
     if (option("print_stats")) printStats(userOut());
@@ -378,19 +374,15 @@ namespace casadi {
       int flag = CVodeGetIntegratorStats(mem_, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
                                          &qcur, &hinused, &hlast, &hcur, &tcur);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
-
       stats_["nsteps"] = 1.0*nsteps;
       stats_["nlinsetups"] = 1.0*nlinsetups;
-
     }
 
-    casadi_msg("CvodesInterface::integrate(" << t_out << ") end");
+    casadi_msg("CvodesInterface::integrate(" << t << ") end");
   }
 
   void CvodesInterface::resetB(Memory& m, double t, const double* rx,
                                const double* rz, const double* rp) {
-    casadi_msg("CvodesInterface::resetB begin");
-
     // Reset the base classes
     SundialsInterface::resetB(m, t, rx, rz, rp);
 
@@ -404,6 +396,7 @@ namespace casadi {
       if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB", flag);
 
     } else {
+
       // Initialize the adjoint integration
       initAdj();
     }

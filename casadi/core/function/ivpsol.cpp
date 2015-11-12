@@ -132,27 +132,6 @@ namespace casadi {
     // Create memory reference
     Memory m(this, arg, res, iw, w, mem);
 
-#if 1
-    // Reset solver, take time to t0
-    reset(m, grid_.front(), input(IVPSOL_X0).ptr(), input(IVPSOL_Z0).ptr(),
-          input(IVPSOL_P).ptr());
-
-    // Integrate forward
-    advance(m, grid_.back(), output(IVPSOL_XF).ptr(), output(IVPSOL_ZF).ptr(),
-            output(IVPSOL_QF).ptr());
-
-    // If backwards integration is needed
-    if (nrx_>0) {
-
-      // Integrate backward
-      resetB(m, grid_.back(), input(IVPSOL_RX0).ptr(), input(IVPSOL_RZ0).ptr(),
-             input(IVPSOL_RP).ptr());
-
-      // Proceed to t0
-      retreat(m, grid_.front(), output(IVPSOL_RXF).ptr(), output(IVPSOL_RZF).ptr(),
-              output(IVPSOL_RQF).ptr());
-    }
-#else
     // Reset solver, take time to t0
     reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
 
@@ -161,22 +140,15 @@ namespace casadi {
 
     // If backwards integration is needed
     if (nrx_>0) {
-
       // Integrate backward
       resetB(m, grid_.back(), arg[IVPSOL_RX0], arg[IVPSOL_RZ0], arg[IVPSOL_RP]);
 
       // Proceed to t0
       retreat(m, grid_.front(), res[IVPSOL_RXF], res[IVPSOL_RZF], res[IVPSOL_RQF]);
     }
-#endif
 
     // Print statistics
     if (print_stats_) printStats(userOut());
-
-    // Get the outputs
-    for (int i=0; i<n_out(); ++i) {
-      casadi_copy(output(i).ptr(), nnz_out(i), res[i]);
-    }
   }
 
   void Ivpsol::init() {
@@ -1236,37 +1208,18 @@ namespace casadi {
     res1_ = res + IVPSOL_NUM_OUT;
     iw_ = iw;
     w_ = w;
-
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      casadi_copy(arg[i], nnz_in(i), input(i).ptr());
-    }
   }
 
   void Ivpsol::reset(Memory& m, double t, const double* x,
                      const double* z, const double* p) {
     // Update time
     t_ = t;
-
-    // Set the state
-    casadi_copy(x, nx_, output(IVPSOL_XF).ptr());
-    casadi_copy(z, nz_, output(IVPSOL_ZF).ptr());
-
-    // Reset summation states
-    casadi_fill(output(IVPSOL_QF).ptr(), nq_, 0.);
   }
 
   void Ivpsol::resetB(Memory& m, double t, const double* rx,
                       const double* rz, const double* rp) {
     // Update time
     t_ = t;
-
-    // Get state
-    casadi_copy(rx, nrx_, output(IVPSOL_RXF).ptr());
-    casadi_copy(rz, nrz_, output(IVPSOL_RZF).ptr());
-
-    // Reset summation states
-    casadi_fill(output(IVPSOL_RQF).ptr(), nrq_, 0.);
   }
 
   Dict Ivpsol::getDerivativeOptions(bool fwd) {
