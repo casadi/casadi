@@ -63,23 +63,26 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Print solver statistics */
-    virtual void printStats(std::ostream &stream) const {}
+    /** \brief Set the work vectors */
+    virtual void setup(Memory& m, const double**& arg, double**& res, int*& iw, double*& w);
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(const double** arg, double** res, int* iw, double* w);
-
-    /** \brief  Reset the backward problem and take time to tf */
-    virtual void resetB();
+    virtual void reset(Memory& m);
 
     /** \brief  Advance solution in time */
-    virtual void advance(int k) = 0;
+    virtual void advance(Memory& m, int k) = 0;
+
+    /** \brief  Reset the backward problem and take time to tf */
+    virtual void resetB(Memory& m);
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(int k) = 0;
+    virtual void retreat(Memory& m, int k) = 0;
 
     /** \brief  evaluate */
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+
+    /** \brief  Print solver statistics */
+    virtual void printStats(std::ostream &stream) const {}
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
@@ -328,17 +331,17 @@ namespace casadi {
     /// Setup F and G
     virtual void setupFG() = 0;
 
-    /** \brief  Advance solution in time */
-    virtual void advance(int k);
-
-    /** \brief  Retreat solution in time */
-    virtual void retreat(int k);
-
     /// Reset the forward problem and bring the time back to t0
-    virtual void reset(const double** arg, double** res, int* iw, double* w);
+    virtual void reset(Memory& m);
+
+    /** \brief  Advance solution in time */
+    virtual void advance(Memory& m, int k);
 
     /// Reset the backward problem and take time to tf
-    virtual void resetB();
+    virtual void resetB(Memory& m);
+
+    /** \brief  Retreat solution in time */
+    virtual void retreat(Memory& m, int k);
 
     /// Get initial guess for the algebraic variable
     virtual void calculateInitialConditions();

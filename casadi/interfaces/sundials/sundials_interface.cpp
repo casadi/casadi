@@ -294,9 +294,9 @@ namespace casadi {
     }
   }
 
-  void SundialsInterface::reset(const double** arg, double** res, int* iw, double* w) {
+  void SundialsInterface::reset(Memory& m) {
     // Reset the base classes
-    Ivpsol::reset(arg, res, iw, w);
+    Ivpsol::reset(m);
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {

@@ -1396,7 +1396,7 @@ namespace casadi {
 
   private:
     // Set up memory object
-    void reset(const double** arg1, double** res1, int* iw1, double* w1);
+    void setup(const double** arg1, double** res1, int* iw1, double* w1);
 
     // Own the data ?
     bool own_;

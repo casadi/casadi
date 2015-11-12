@@ -1615,13 +1615,13 @@ namespace casadi {
   Memory::Memory(FunctionInternal *_f, const double** _arg, double** _res,
                  int* _iw, double* _w, void* _mem)
     : f(_f), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
-    reset(arg, res, iw, w);
+    setup(arg, res, iw, w);
   }
 
   Memory::Memory(const Function& _f, const double** _arg, double** _res,
                  int* _iw, double* _w, void* _mem)
     : f(_f.get()), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
-    reset(arg, res, iw, w);
+    setup(arg, res, iw, w);
   }
 
   Memory::Memory(const Function& _f)
@@ -1640,7 +1640,7 @@ namespace casadi {
     mem = f->alloc_mem();
 
     // Set up memory object
-    reset(arg, res, iw, w);
+    setup(arg, res, iw, w);
   }
 
   Memory::Memory(Memory&& obj)
@@ -1663,9 +1663,9 @@ namespace casadi {
     }
   }
 
-  void Memory::reset(const double** arg1, double** res1, int* iw1, double* w1) {
+  void Memory::setup(const double** arg1, double** res1, int* iw1, double* w1) {
     casadi_assert(f!=0);
-    f->reset(*this, arg1, res1, iw1, w1);
+    f->setup(*this, arg1, res1, iw1, w1);
   }
 
   Memory& Memory::operator=(Memory&& obj) {

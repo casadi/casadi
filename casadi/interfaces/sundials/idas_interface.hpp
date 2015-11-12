@@ -94,16 +94,16 @@ namespace casadi {
     virtual void initAdj();
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(const double** arg, double** res, int* iw, double* w);
-
-    /** \brief  Reset the backward problem and take time to tf */
-    virtual void resetB();
+    virtual void reset(Memory& m);
 
     /** \brief  Advance solution in time */
-    virtual void advance(int k);
+    virtual void advance(Memory& m, int k);
+
+    /** \brief  Reset the backward problem and take time to tf */
+    virtual void resetB(Memory& m);
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(int k);
+    virtual void retreat(Memory& m, int k);
 
     /** \brief  Set the stop time of the forward integration */
     virtual void setStopTime(double tf);

@@ -66,14 +66,16 @@ namespace casadi {
     double** res1 = res+n_out();
     copy_n(res, n_out(), res1);
 
+    // Integrator memory block
+    Memory m(integrator_, arg, res1, iw, w, 0);
+
     // Reset the integrator_
-    dynamic_cast<Ivpsol*>(integrator_.get())
-      ->reset(arg, res1, iw, w);
+    dynamic_cast<Ivpsol*>(integrator_.get())->reset(m);
 
     // Advance solution in time
     for (int k=0; k<grid_.size(); ++k) {
       // Integrate to the output time
-      dynamic_cast<Ivpsol*>(integrator_.get())->advance(k);
+      dynamic_cast<Ivpsol*>(integrator_.get())->advance(m, k);
 
       // Save the outputs of the function
       for (int i=0; i<n_out(); ++i) {

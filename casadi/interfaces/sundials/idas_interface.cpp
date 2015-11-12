@@ -603,11 +603,11 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::reset(const double** arg, double** res, int* iw, double* w) {
+  void IdasInterface::reset(Memory& m) {
     log("IdasInterface::reset", "begin");
 
     // Reset the base classes
-    SundialsInterface::reset(arg, res, iw, w);
+    SundialsInterface::reset(m);
 
     if (nrx_>0 && !isInitTaping_)
       initTaping();
@@ -690,7 +690,7 @@ namespace casadi {
     log("IdasInterface::correctInitialConditions", "end");
   }
 
-  void IdasInterface::advance(int k) {
+  void IdasInterface::advance(Memory& m, int k) {
     double t_out = grid_.at(k);
 
     casadi_msg("IdasInterface::integrate(" << t_out << ") begin");
@@ -759,7 +759,7 @@ namespace casadi {
     casadi_msg("IdasInterface::integrate(" << t_out << ") end");
   }
 
-  void IdasInterface::resetB() {
+  void IdasInterface::resetB(Memory& m) {
     log("IdasInterface::resetB", "begin");
 
     int flag;
@@ -803,7 +803,7 @@ namespace casadi {
 
   }
 
-  void IdasInterface::retreat(int k) {
+  void IdasInterface::retreat(Memory& m, int k) {
     double t_out = grid_.at(k);
 
     casadi_msg("IdasInterface::retreat(" << t_out << ") begin");
