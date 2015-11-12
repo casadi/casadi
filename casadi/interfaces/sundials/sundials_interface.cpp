@@ -249,16 +249,14 @@ namespace casadi {
     }
 
     if (!jac_.isNull()) {
-      casadi_assert_message(
-                            jac_.size2_out(0)==jac_.size1_out(0),
+      casadi_assert_message(jac_.size2_out(0)==jac_.size1_out(0),
                             "SundialsInterface::init: the jacobian of the forward problem must "
-                            "be square but got " << jac_.output().dim());
+                            "be square but got " << jac_.sparsity_out(0).dim());
 
-      casadi_assert_message(
-                            !jac_.sparsity_out(0).is_singular(),
+      casadi_assert_message(!jac_.sparsity_out(0).is_singular(),
                             "SundialsInterface::init: singularity - the jacobian of the forward "
                             "problem is structurally rank-deficient. sprank(J)="
-                            << sprank(jac_.output()) << " (in stead of "<< jac_.size2_out(0)
+                            << sprank(jac_.sparsity_out(0)) << " (in stead of "<< jac_.size2_out(0)
                             << ")");
     }
 
@@ -268,16 +266,14 @@ namespace casadi {
     if (!jacB_.isNull()) {
       alloc(jacB_);
       alloc_w(jacB_.sz_w() + jacB_.nnz_out(0));
-      casadi_assert_message(
-                            jacB_.size2_out(0)==jacB_.size1_out(0),
+      casadi_assert_message(jacB_.size2_out(0)==jacB_.size1_out(0),
                             "SundialsInterface::init: the jacobian of the backward problem must be "
-                            "square but got " << jacB_.output().dim());
+                            "square but got " << jacB_.sparsity_out(0).dim());
 
-      casadi_assert_message(
-                            !jacB_.sparsity_out(0).is_singular(),
+      casadi_assert_message(!jacB_.sparsity_out(0).is_singular(),
                             "SundialsInterface::init: singularity - the jacobian of the backward"
                             " problem is structurally rank-deficient. sprank(J)="
-                            << sprank(jacB_.output()) << " (instead of "
+                            << sprank(jacB_.sparsity_out(0)) << " (instead of "
                             << jacB_.size2_out(0) << ")");
     }
 
@@ -367,7 +363,7 @@ namespace casadi {
     if (hasSetOption("upper_bandwidth")) {
       bw.first = option("upper_bandwidth");
     } else if (!jac_.isNull()) {
-      bw.first = jac_.getOutput().sparsity().bw_upper();
+      bw.first = jac_.sparsity_out(0).bw_upper();
     } else {
       casadi_error("\"upper_bandwidth\" has not been set and cannot be "
                    "detected since exact Jacobian is not available.");
@@ -393,7 +389,7 @@ namespace casadi {
     if (hasSetOption("upper_bandwidthB")) {
       bw.first = option("upper_bandwidthB");
     } else if (!jacB_.isNull()) {
-      bw.first = jacB_.getOutput().sparsity().bw_upper();
+      bw.first = jacB_.sparsity_out(0).bw_upper();
     } else {
       casadi_error("\"upper_bandwidthB\" has not been set and cannot be detected "
                    "since exact Jacobian for backward problem is not available.");
@@ -403,7 +399,7 @@ namespace casadi {
     if (hasSetOption("lower_bandwidthB")) {
       bw.second = option("lower_bandwidthB");
     } else if (!jacB_.isNull()) {
-      bw.second = jacB_.getOutput().sparsity().bw_lower();
+      bw.second = jacB_.sparsity_out(0).bw_lower();
     } else {
       casadi_error("\"lower_bandwidthB\" has not been set and cannot be detected "
                    "since exact Jacobian for backward problem is not available.");
