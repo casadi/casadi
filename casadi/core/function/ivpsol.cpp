@@ -231,7 +231,7 @@ namespace casadi {
       casadi_assert(g_.sparsity_in(RDAE_P)==p().sparsity());
       casadi_assert(g_.sparsity_in(RDAE_X)==sparsity_in(IVPSOL_X0));
       casadi_assert(g_.sparsity_in(RDAE_Z)==z());
-      casadi_assert(g_.sparsity_out(RDAE_ODE)==rx0().sparsity());
+      casadi_assert(g_.sparsity_out(RDAE_ODE)==rx());
       casadi_assert(g_.sparsity_out(RDAE_ALG)==rz());
     }
 
@@ -908,7 +908,7 @@ namespace casadi {
       if ( nz_>0) ret.z.push_back(z().size2());
       if ( nq_>0) ret.q.push_back(q().size2());
       if ( np_>0) ret.p.push_back(p().size2());
-      if (nrx_>0) ret.rx.push_back(rx0().size2());
+      if (nrx_>0) ret.rx.push_back(rx().size2());
       if (nrz_>0) ret.rz.push_back(rz().size2());
       if (nrq_>0) ret.rq.push_back(rqf().size2());
       if (nrp_>0) ret.rp.push_back(rp().size2());
@@ -1007,7 +1007,7 @@ namespace casadi {
       ss.clear();
       ss << "rx0";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_RX0] = MX::sym(ss.str(), rx0().sparsity());
+      dd[IVPSOL_RX0] = MX::sym(ss.str(), rx());
       rx0_augv.push_back(dd[IVPSOL_RX0]);
 
       // Backward parameter
@@ -1142,7 +1142,7 @@ namespace casadi {
     z0_augv.push_back(dd[IVPSOL_Z0]);
 
     // Backward state
-    dd[IVPSOL_RX0] = MX::sym("rx0", rx0().sparsity());
+    dd[IVPSOL_RX0] = MX::sym("rx0", rx());
     rx0_augv.push_back(dd[IVPSOL_RX0]);
 
     // Backward parameter

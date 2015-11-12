@@ -243,12 +243,6 @@ namespace casadi {
     double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
     double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
 
-    // N-vectors for the backward integration
-    N_Vector rx0_, rx_;
-
-    // N-vectors for the forward sensitivities
-    std::vector<N_Vector> xF0_, xF_, qF_;
-
     bool isInitAdj_;
 
     int ism_;

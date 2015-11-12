@@ -80,8 +80,6 @@ namespace casadi {
     mem_ = 0;
 
     xzdot_ = 0;
-
-    rxz_ = 0;
     rxzdot_ = 0;
     rq_ = 0;
 
@@ -101,7 +99,6 @@ namespace casadi {
     if (xzdot_) { N_VDestroy_Serial(xzdot_); xzdot_ = 0; }
 
     // Backward integration
-    if (rxz_) { N_VDestroy_Serial(rxz_); rxz_ = 0; }
     if (rxzdot_) { N_VDestroy_Serial(rxzdot_); rxzdot_ = 0; }
     if (rq_) { N_VDestroy_Serial(rq_); rq_ = 0; }
   }
@@ -737,10 +734,6 @@ namespace casadi {
 
     // Reset adjoint sensitivities for the parameters
     N_VConst(0.0, rq_);
-
-    // Get the backward state
-    copy(rx0()->begin(), rx0()->end(), NV_DATA_S(rxz_));
-
     if (isInitAdj_) {
       flag = IDAReInitB(mem_, whichB_, grid_.back(), rxz_, rxzdot_);
       if (flag != IDA_SUCCESS) idas_error("IDAReInitB", flag);
@@ -794,9 +787,8 @@ namespace casadi {
     }
 
     // Save the backward state and algebraic variable
-    const double *rxz = NV_DATA_S(rxz_);
-    copy(rxz, rxz+nrx_, rxf()->begin());
-    copy(rxz+nrx_, rxz+nrx_+nrz_, rzf()->begin());
+    casadi_copy(NV_DATA_S(rxz_), nrx_, rx);
+    casadi_copy(NV_DATA_S(rxz_)+nrx_, nrz_, rz);
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;

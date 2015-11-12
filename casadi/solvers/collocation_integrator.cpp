@@ -211,7 +211,7 @@ namespace casadi {
       // Collocated states
       vector<MX> rx(deg_+1), rz(deg_+1);
       for (int d=1; d<=deg_; ++d) {
-        rx[d] = reshape(*rvv_it++, this->rx0().size());
+        rx[d] = reshape(*rvv_it++, this->rx().size());
         rz[d] = reshape(*rvv_it++, this->rz().size());
       }
       casadi_assert(rvv_it==rvv.end());

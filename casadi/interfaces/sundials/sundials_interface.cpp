@@ -123,11 +123,13 @@ namespace casadi {
               "[default: equal to linear_solver_options]");
     xz_  = 0;
     q_ = 0;
+    rxz_ = 0;
   }
 
   SundialsInterface::~SundialsInterface() {
     if (xz_) { N_VDestroy_Serial(xz_); xz_ = 0; }
     if (q_) { N_VDestroy_Serial(q_); q_ = 0; }
+    if (rxz_) { N_VDestroy_Serial(rxz_); rxz_ = 0; }
   }
 
   void SundialsInterface::init() {
@@ -137,6 +139,7 @@ namespace casadi {
     // Allocate n-vectors
     xz_ = N_VNew_Serial(nx_+nz_);
     q_ = N_VNew_Serial(nq_);
+    rxz_ = N_VNew_Serial(nrx_+nrz_);
 
     // Read options
     abstol_ = option("abstol");
@@ -336,6 +339,9 @@ namespace casadi {
                                  const double* rz, const double* rp) {
     // Reset the base classes
     Ivpsol::resetB(m, t, rx, rz, rp);
+
+    // Get the backward state
+    casadi_copy(rx, nrx_, NV_DATA_S(rxz_));
 
     // Store parameters
     //casadi_copy(rp, nrp_, rp_);

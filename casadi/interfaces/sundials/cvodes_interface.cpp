@@ -61,8 +61,7 @@ namespace casadi {
               "", "res|resB|resQB|reset|psetupB|djacB", true);
 
     mem_ = 0;
-
-    rx0_ = rx_ = rq_ = 0;
+    rq_ = 0;
 
     isInitAdj_ = false;
     disable_internal_warnings_ = false;
@@ -72,17 +71,7 @@ namespace casadi {
     if (mem_) { CVodeFree(&mem_); mem_ = 0;}
 
     // Backward integration
-    if (rx0_) { N_VDestroy_Serial(rx0_); rx0_ = 0; }
-    if (rx_)  { N_VDestroy_Serial(rx_);  rx_  = 0; }
     if (rq_)  { N_VDestroy_Serial(rq_);  rq_  = 0; }
-
-    // Sensitivities of the forward integration
-    for (vector<N_Vector>::iterator it=xF0_.begin(); it != xF0_.end(); ++it)
-        if (*it) { N_VDestroy_Serial(*it); *it=0;}
-    for (vector<N_Vector>::iterator it=xF_.begin(); it != xF_.end(); ++it)
-        if (*it) { N_VDestroy_Serial(*it); *it=0;}
-    for (vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)
-        if (*it) { N_VDestroy_Serial(*it); *it=0;}
   }
 
   CvodesInterface::~CvodesInterface() {
@@ -189,8 +178,6 @@ namespace casadi {
     if (!g_.isNull()) {
 
       // Allocate n-vectors for backward integration
-      rx0_ = N_VMake_Serial(nrx_, rx0().ptr());
-      rx_ = N_VMake_Serial(nrx_, rxf().ptr());
       rq_ = N_VMake_Serial(nrq_, rqf().ptr());
 
       // Get the number of steos per checkpoint
@@ -222,7 +209,7 @@ namespace casadi {
 
     // Initialize the backward problem
     double tB0 = grid_.back();
-    flag = CVodeInitB(mem_, whichB_, rhsB_wrapper, tB0, rx0_);
+    flag = CVodeInitB(mem_, whichB_, rhsB_wrapper, tB0, rxz_);
     if (flag != CV_SUCCESS) cvodes_error("CVodeInitB", flag);
 
     // Set tolerances
@@ -417,8 +404,7 @@ namespace casadi {
 
     int flag;
     if (isInitAdj_) {
-
-      flag = CVodeReInitB(mem_, whichB_, grid_.back(), rx0_);
+      flag = CVodeReInitB(mem_, whichB_, grid_.back(), rxz_);
       if (flag != CV_SUCCESS) cvodes_error("CVodeReInitB", flag);
 
       N_VConst(0.0, rq_);
@@ -444,12 +430,12 @@ namespace casadi {
 
     // Get the sensitivities
     double tret;
-    flag = CVodeGetB(mem_, whichB_, &tret, rx_);
+    flag = CVodeGetB(mem_, whichB_, &tret, rxz_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeGetB", flag);
+    casadi_copy(NV_DATA_S(rxz_), nrx_, rx);
 
     flag = CVodeGetQuadB(mem_, whichB_, &tret, rq_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB", flag);
-
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;
