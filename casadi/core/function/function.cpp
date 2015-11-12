@@ -1665,7 +1665,10 @@ namespace casadi {
 
   void Memory::setup(const double** arg1, double** res1, int* iw1, double* w1) {
     casadi_assert(f!=0);
-    f->setup(*this, arg1, res1, iw1, w1);
+    arg1 += f->n_in();
+    res1 += f->n_out();
+    f->set_work(*this, arg1, res1, iw1, w1);
+    f->set_temp(*this, arg1, res1, iw1, w1);
   }
 
   Memory& Memory::operator=(Memory&& obj) {

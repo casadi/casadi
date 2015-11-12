@@ -257,14 +257,14 @@ namespace casadi {
     }
 
     // Evaluate f_
-    arg1_[DAE_T] = &t;
-    arg1_[DAE_X] = NV_DATA_S(x);
-    arg1_[DAE_Z] = 0;
-    arg1_[DAE_P] = getPtr(p_);
-    res1_[DAE_ODE] = NV_DATA_S(xdot);
-    res1_[DAE_ALG] = 0;
-    res1_[DAE_QUAD] = 0;
-    f_(arg1_, res1_, iw_, w_, 0);
+    arg_[DAE_T] = &t;
+    arg_[DAE_X] = NV_DATA_S(x);
+    arg_[DAE_Z] = 0;
+    arg_[DAE_P] = getPtr(p_);
+    res_[DAE_ODE] = NV_DATA_S(xdot);
+    res_[DAE_ALG] = 0;
+    res_[DAE_QUAD] = 0;
+    f_(arg_, res_, iw_, w_, 0);
 
     // Debug output
     if (monitor_rhs_) {
@@ -585,14 +585,14 @@ namespace casadi {
 
   void CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot) {
     // Evaluate f_
-    arg1_[DAE_T] = &t;
-    arg1_[DAE_X] = NV_DATA_S(x);
-    arg1_[DAE_Z] = 0;
-    arg1_[DAE_P] = getPtr(p_);
-    res1_[DAE_ODE] = 0;
-    res1_[DAE_ALG] = 0;
-    res1_[DAE_QUAD] = NV_DATA_S(qdot);
-    f_(arg1_, res1_, iw_, w_, 0);
+    arg_[DAE_T] = &t;
+    arg_[DAE_X] = NV_DATA_S(x);
+    arg_[DAE_Z] = 0;
+    arg_[DAE_P] = getPtr(p_);
+    res_[DAE_ODE] = 0;
+    res_[DAE_ALG] = 0;
+    res_[DAE_QUAD] = NV_DATA_S(qdot);
+    f_(arg_, res_, iw_, w_, 0);
   }
 
   void CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
@@ -630,17 +630,17 @@ namespace casadi {
     }
 
     // Evaluate g_
-    arg1_[RDAE_T] = &t;
-    arg1_[RDAE_X] = NV_DATA_S(x);
-    arg1_[RDAE_Z] = 0;
-    arg1_[RDAE_P] = getPtr(p_);
-    arg1_[RDAE_RX] = NV_DATA_S(rx);
-    arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = getPtr(rp_);
-    res1_[RDAE_ODE] = NV_DATA_S(rxdot);
-    res1_[RDAE_ALG] = 0;
-    res1_[RDAE_QUAD] = 0;
-    g_(arg1_, res1_, iw_, w_, 0);
+    arg_[RDAE_T] = &t;
+    arg_[RDAE_X] = NV_DATA_S(x);
+    arg_[RDAE_Z] = 0;
+    arg_[RDAE_P] = getPtr(p_);
+    arg_[RDAE_RX] = NV_DATA_S(rx);
+    arg_[RDAE_RZ] = 0;
+    arg_[RDAE_RP] = getPtr(rp_);
+    res_[RDAE_ODE] = NV_DATA_S(rxdot);
+    res_[RDAE_ALG] = 0;
+    res_[RDAE_QUAD] = 0;
+    g_(arg_, res_, iw_, w_, 0);
 
     // Debug output
     if (monitor_rhsB_) {
@@ -711,17 +711,17 @@ namespace casadi {
     }
 
     // Evaluate g_
-    arg1_[RDAE_T] = &t;
-    arg1_[RDAE_X] = NV_DATA_S(x);
-    arg1_[RDAE_Z] = 0;
-    arg1_[RDAE_P] = getPtr(p_);
-    arg1_[RDAE_RX] = NV_DATA_S(rx);
-    arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = getPtr(rp_);
-    res1_[RDAE_ODE] = 0;
-    res1_[RDAE_ALG] = 0;
-    res1_[RDAE_QUAD] = NV_DATA_S(rqdot);
-    g_(arg1_, res1_, iw_, w_, 0);
+    arg_[RDAE_T] = &t;
+    arg_[RDAE_X] = NV_DATA_S(x);
+    arg_[RDAE_Z] = 0;
+    arg_[RDAE_P] = getPtr(p_);
+    arg_[RDAE_RX] = NV_DATA_S(rx);
+    arg_[RDAE_RZ] = 0;
+    arg_[RDAE_RP] = getPtr(rp_);
+    res_[RDAE_ODE] = 0;
+    res_[RDAE_ALG] = 0;
+    res_[RDAE_QUAD] = NV_DATA_S(rqdot);
+    g_(arg_, res_, iw_, w_, 0);
 
     // Debug output
     if (monitor_rhsQB_) {
@@ -770,21 +770,21 @@ namespace casadi {
     time1 = clock();
 
     // Evaluate f_fwd_
-    arg1_[DAE_T] = &t;
-    arg1_[DAE_X] = NV_DATA_S(x);
-    arg1_[DAE_Z] = 0;
-    arg1_[DAE_P] = getPtr(p_);
-    arg1_[DAE_NUM_IN + DAE_T] = 0;
-    arg1_[DAE_NUM_IN + DAE_X] = NV_DATA_S(v);
-    arg1_[DAE_NUM_IN + DAE_Z] = 0;
-    arg1_[DAE_NUM_IN + DAE_P] = 0;
-    res1_[DAE_ODE] = 0;
-    res1_[DAE_ALG] = 0;
-    res1_[DAE_QUAD] = 0;
-    res1_[DAE_NUM_OUT + DAE_ODE] = NV_DATA_S(Jv);
-    res1_[DAE_NUM_OUT + DAE_ALG] = 0;
-    res1_[DAE_NUM_OUT + DAE_QUAD] = 0;
-    f_fwd_(arg1_, res1_, iw_, w_, 0);
+    arg_[DAE_T] = &t;
+    arg_[DAE_X] = NV_DATA_S(x);
+    arg_[DAE_Z] = 0;
+    arg_[DAE_P] = getPtr(p_);
+    arg_[DAE_NUM_IN + DAE_T] = 0;
+    arg_[DAE_NUM_IN + DAE_X] = NV_DATA_S(v);
+    arg_[DAE_NUM_IN + DAE_Z] = 0;
+    arg_[DAE_NUM_IN + DAE_P] = 0;
+    res_[DAE_ODE] = 0;
+    res_[DAE_ALG] = 0;
+    res_[DAE_QUAD] = 0;
+    res_[DAE_NUM_OUT + DAE_ODE] = NV_DATA_S(Jv);
+    res_[DAE_NUM_OUT + DAE_ALG] = 0;
+    res_[DAE_NUM_OUT + DAE_QUAD] = 0;
+    f_fwd_(arg_, res_, iw_, w_, 0);
 
     // Log time duration
     time2 = clock();
@@ -873,17 +873,17 @@ namespace casadi {
     time1 = clock();
 
     // Evaluate jac_
-    arg1_[DAE_T] = &t;
-    arg1_[DAE_X] = NV_DATA_S(x);
-    arg1_[DAE_Z] = 0;
-    arg1_[DAE_P] = getPtr(p_);
+    arg_[DAE_T] = &t;
+    arg_[DAE_X] = NV_DATA_S(x);
+    arg_[DAE_Z] = 0;
+    arg_[DAE_P] = getPtr(p_);
     double one=1, zero=0;
-    arg1_[DAE_NUM_IN] = &one;
-    arg1_[DAE_NUM_IN+1] = &zero;
-    fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
-    res1_[0] = w_ + jac_.sz_w();
-    jac_(arg1_, res1_, iw_, w_, 0);
-    double *val = res1_[0];
+    arg_[DAE_NUM_IN] = &one;
+    arg_[DAE_NUM_IN+1] = &zero;
+    fill_n(res_, jac_.n_out(), static_cast<double*>(0));
+    res_[0] = w_ + jac_.sz_w();
+    jac_(arg_, res_, iw_, w_, 0);
+    double *val = res_[0];
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
@@ -916,25 +916,25 @@ namespace casadi {
     time1 = clock();
 
     // Evaluate jacB_
-    arg1_[RDAE_T] = &t;
-    arg1_[RDAE_X] = NV_DATA_S(x);
-    arg1_[RDAE_Z] = 0;
-    arg1_[RDAE_P] = getPtr(p_);
-    arg1_[RDAE_RX] = NV_DATA_S(xB);
-    arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = getPtr(rp_);
+    arg_[RDAE_T] = &t;
+    arg_[RDAE_X] = NV_DATA_S(x);
+    arg_[RDAE_Z] = 0;
+    arg_[RDAE_P] = getPtr(p_);
+    arg_[RDAE_RX] = NV_DATA_S(xB);
+    arg_[RDAE_RZ] = 0;
+    arg_[RDAE_RP] = getPtr(rp_);
     double minus_one = -1;
-    arg1_[RDAE_NUM_IN] = &minus_one;
-    arg1_[RDAE_NUM_IN+1] = 0;
-    fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
-    res1_[0] = w_ + jacB_.sz_w();
-    jacB_(arg1_, res1_, iw_, w_, 0);
+    arg_[RDAE_NUM_IN] = &minus_one;
+    arg_[RDAE_NUM_IN+1] = 0;
+    fill_n(res_, jacB_.n_out(), static_cast<double*>(0));
+    res_[0] = w_ + jacB_.sz_w();
+    jacB_(arg_, res_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jacB_.sparsity_out(0).colind();
     int ncol = jacB_.size2_out(0);
     const int* row = jacB_.sparsity_out(0).row();
-    double *val = res1_[0];
+    double *val = res_[0];
 
     // Loop over columns
     for (int cc=0; cc<ncol; ++cc) {
@@ -990,17 +990,17 @@ namespace casadi {
     time1 = clock();
 
     // Evaluate jac_
-    arg1_[DAE_T] = &t;
-    arg1_[DAE_X] = NV_DATA_S(x);
-    arg1_[DAE_Z] = 0;
-    arg1_[DAE_P] = getPtr(p_);
+    arg_[DAE_T] = &t;
+    arg_[DAE_X] = NV_DATA_S(x);
+    arg_[DAE_Z] = 0;
+    arg_[DAE_P] = getPtr(p_);
     double one=1;
-    arg1_[DAE_NUM_IN] = &one;
-    arg1_[DAE_NUM_IN+1] = 0;
-    fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
-    res1_[0] = w_ + jac_.sz_w();
-    jac_(arg1_, res1_, iw_, w_, 0);
-    double *val = res1_[0];
+    arg_[DAE_NUM_IN] = &one;
+    arg_[DAE_NUM_IN+1] = 0;
+    fill_n(res_, jac_.n_out(), static_cast<double*>(0));
+    res_[0] = w_ + jac_.sz_w();
+    jac_(arg_, res_, iw_, w_, 0);
+    double *val = res_[0];
 
     // Get sparsity and non-zero elements
     const int* colind = jac_.sparsity_out(0).colind();
@@ -1036,25 +1036,25 @@ namespace casadi {
     time1 = clock();
 
     // Evaluate jacB_
-    arg1_[RDAE_T] = &t;
-    arg1_[RDAE_X] = NV_DATA_S(x);
-    arg1_[RDAE_Z] = 0;
-    arg1_[RDAE_P] = getPtr(p_);
-    arg1_[RDAE_RX] = NV_DATA_S(xB);
-    arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = getPtr(rp_);
+    arg_[RDAE_T] = &t;
+    arg_[RDAE_X] = NV_DATA_S(x);
+    arg_[RDAE_Z] = 0;
+    arg_[RDAE_P] = getPtr(p_);
+    arg_[RDAE_RX] = NV_DATA_S(xB);
+    arg_[RDAE_RZ] = 0;
+    arg_[RDAE_RP] = getPtr(rp_);
     double minus_one = -1;
-    arg1_[RDAE_NUM_IN] = &minus_one;
-    arg1_[RDAE_NUM_IN+1] = 0;
-    fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
-    res1_[0] = w_ + jacB_.sz_w();
-    jacB_(arg1_, res1_, iw_, w_, 0);
+    arg_[RDAE_NUM_IN] = &minus_one;
+    arg_[RDAE_NUM_IN+1] = 0;
+    fill_n(res_, jacB_.n_out(), static_cast<double*>(0));
+    res_[0] = w_ + jacB_.sz_w();
+    jacB_(arg_, res_, iw_, w_, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = jacB_.sparsity_out(0).colind();
     int ncol = jacB_.size2_out(0);
     const int* row = jacB_.sparsity_out(0).row();
-    double *val = res1_[0];
+    double *val = res_[0];
 
     // Loop over columns
     for (int cc=0; cc<ncol; ++cc) {
@@ -1186,26 +1186,26 @@ namespace casadi {
     time1 = clock();
 
     // Evaluate jac_
-    arg1_[DAE_T] = &t;
-    arg1_[DAE_X] = NV_DATA_S(x);
-    arg1_[DAE_Z] = 0;
-    arg1_[DAE_P] = getPtr(p_);
+    arg_[DAE_T] = &t;
+    arg_[DAE_X] = NV_DATA_S(x);
+    arg_[DAE_Z] = 0;
+    arg_[DAE_P] = getPtr(p_);
     double d1 = -gamma, d2 = 1.;
-    arg1_[DAE_NUM_IN] = &d1;
-    arg1_[DAE_NUM_IN+1] = &d2;
-    fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
-    res1_[0] = w_ + jac_.sz_w();
-    jac_(arg1_, res1_, iw_, w_, 0);
-    double *val = res1_[0];
+    arg_[DAE_NUM_IN] = &d1;
+    arg_[DAE_NUM_IN+1] = &d2;
+    fill_n(res_, jac_.n_out(), static_cast<double*>(0));
+    res_[0] = w_ + jac_.sz_w();
+    jac_(arg_, res_, iw_, w_, 0);
+    double *val = res_[0];
 
     // Log time duration
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsol_mem_ = Memory(linsol_, arg1_, res1_, iw_, w_, 0);
+    fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
+    fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
+    linsol_mem_ = Memory(linsol_, arg_, res_, iw_, w_, 0);
     linsol_.linsol_factorize(linsol_mem_, val);
 
     // Log time duration
@@ -1223,29 +1223,29 @@ namespace casadi {
     time1 = clock();
 
     // Evaluate jacB_
-    arg1_[RDAE_T] = &t;
-    arg1_[RDAE_X] = NV_DATA_S(x);
-    arg1_[RDAE_Z] = 0;
-    arg1_[RDAE_P] = getPtr(p_);
-    arg1_[RDAE_RX] = NV_DATA_S(xB);
-    arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = getPtr(rp_);
-    arg1_[RDAE_NUM_IN] = &gammaB;
+    arg_[RDAE_T] = &t;
+    arg_[RDAE_X] = NV_DATA_S(x);
+    arg_[RDAE_Z] = 0;
+    arg_[RDAE_P] = getPtr(p_);
+    arg_[RDAE_RX] = NV_DATA_S(xB);
+    arg_[RDAE_RZ] = 0;
+    arg_[RDAE_RP] = getPtr(rp_);
+    arg_[RDAE_NUM_IN] = &gammaB;
     double one=1;
-    arg1_[RDAE_NUM_IN+1] = &one;
-    fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
-    res1_[0] = w_ + jacB_.sz_w();
-    jacB_(arg1_, res1_, iw_, w_, 0);
-    double *val = res1_[0];
+    arg_[RDAE_NUM_IN+1] = &one;
+    fill_n(res_, jacB_.n_out(), static_cast<double*>(0));
+    res_[0] = w_ + jacB_.sz_w();
+    jacB_(arg_, res_, iw_, w_, 0);
+    double *val = res_[0];
 
     // Log time duration
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill(arg1_, arg1_+LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res1_, res1_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsolB_mem_ = Memory(linsolB_, arg1_, res1_, iw_, w_, 0);
+    fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
+    fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
+    linsolB_mem_ = Memory(linsolB_, arg_, res_, iw_, w_, 0);
     linsolB_.linsol_factorize(linsolB_mem_, val);
 
     // Log time duration

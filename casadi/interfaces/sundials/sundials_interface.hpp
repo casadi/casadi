@@ -48,9 +48,6 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief Set the work vectors */
-    virtual void setup(Memory& m, const double**& arg, double**& res, int*& iw, double*& w);
-
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(Memory& m, double t, const double* x,
                        const double* z, const double* p);

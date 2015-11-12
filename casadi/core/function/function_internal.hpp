@@ -762,8 +762,11 @@ namespace casadi {
     /** \brief Free allocated memory block */
     virtual void free_mem(void* mem) {}
 
-    /** \brief Set up the memory block for evaluation */
-    virtual void setup(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {}
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {}
+
+    /** \brief Set the (temporary) work vectors */
+    virtual void set_temp(Memory& m, const double** arg, double** res, int* iw, double* w) {}
     ///@}
 
     ///@{

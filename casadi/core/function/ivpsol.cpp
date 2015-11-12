@@ -1202,10 +1202,12 @@ namespace casadi {
     return Function(name, ret_in, ret_out, opts);
   }
 
-  void Ivpsol::setup(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {
-    // Work vectors
-    arg1_ = arg + IVPSOL_NUM_IN;
-    res1_ = res + IVPSOL_NUM_OUT;
+  void Ivpsol::set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {
+  }
+
+  void Ivpsol::set_temp(Memory& m, const double** arg, double** res, int* iw, double* w) {
+    arg_ = arg;
+    res_ = res;
     iw_ = iw;
     w_ = w;
   }

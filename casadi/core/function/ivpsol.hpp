@@ -63,8 +63,11 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief Set the work vectors */
-    virtual void setup(Memory& m, const double**& arg, double**& res, int*& iw, double*& w);
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w);
+
+    /** \brief Set the (temporary) work vectors */
+    virtual void set_temp(Memory& m, const double** arg, double** res, int* iw, double* w);
 
     /** \brief Reset the forward problem */
     virtual void reset(Memory& m, double t, const double* x,
@@ -145,8 +148,8 @@ namespace casadi {
     template<typename MatType> Function get_g() const;
 
     // Work vectors
-    const double **arg1_;
-    double **res1_;
+    const double **arg_;
+    double **res_;
     int *iw_;
     double *w_;
 
