@@ -280,30 +280,34 @@ namespace casadi {
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
-  void CollocationIvpsol::calculateInitialConditions() {
-    auto x0_it = input(IVPSOL_X0)->begin();
-    auto z_it = input(IVPSOL_Z0)->begin();
-    auto Z_it = Z_->begin();
+  void CollocationIvpsol::reset(Memory& m, double t, const double* x,
+                                const double* z, const double* p) {
+    // Reset the base classes
+    ImplicitFixedStepIvpsol::reset(m, t, x, z, p);
+
+    // Initial guess for Z
+    double* Z = Z_.ptr();
     for (int d=0; d<deg_; ++d) {
-      copy(x0_it, x0_it+nx_, Z_it);
-      Z_it += nx_;
-      copy(z_it, z_it+nz_, Z_it);
-      Z_it += nz_;
+      casadi_copy(x, nx_, Z);
+      Z += nx_;
+      casadi_copy(z, nz_, Z);
+      Z += nz_;
     }
-    casadi_assert(Z_it==Z_->end());
   }
 
-  void CollocationIvpsol::calculateInitialConditionsB() {
-    auto rx0_it = input(IVPSOL_RX0)->begin();
-    auto rz_it = input(IVPSOL_RZ0)->begin();
-    auto RZ_it = RZ_->begin();
+  void CollocationIvpsol::resetB(Memory& m, double t, const double* rx,
+                               const double* rz, const double* rp) {
+    // Reset the base classes
+    ImplicitFixedStepIvpsol::resetB(m, t, rx, rz, rp);
+
+    // Initial guess for RZ
+    double* RZ = RZ_.ptr();
     for (int d=0; d<deg_; ++d) {
-      copy(rx0_it, rx0_it+nrx_, RZ_it);
-      RZ_it += nrx_;
-      copy(rz_it, rz_it+nrz_, RZ_it);
-      RZ_it += nrz_;
+      casadi_copy(rx, nrx_, RZ);
+      RZ += nrx_;
+      casadi_copy(rz, nrz_, RZ);
+      RZ += nrz_;
     }
-    casadi_assert(RZ_it==RZ_->end());
   }
 
 } // namespace casadi

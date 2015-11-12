@@ -80,11 +80,13 @@ namespace casadi {
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
 
-    /// Get initial guess for the algebraic variable
-    virtual void calculateInitialConditions();
+    /** \brief Reset the forward problem */
+    virtual void reset(Memory& m, double t, const double* x,
+                       const double* z, const double* p);
 
-    /// Get initial guess for the algebraic variable (backward problem)
-    virtual void calculateInitialConditionsB();
+    /// Reset the backward problem and take time to tf
+    virtual void resetB(Memory& m, double t, const double* rx,
+                        const double* rz, const double* rp);
 
     // Interpolation order
     int deg_;

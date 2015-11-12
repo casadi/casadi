@@ -344,12 +344,6 @@ namespace casadi {
     virtual void retreat(Memory& m, double t, double* rx,
                          double* rz, double* rq);
 
-    /// Get initial guess for the algebraic variable
-    virtual void calculateInitialConditions();
-
-    /// Get initial guess for the algebraic variable (backward problem)
-    virtual void calculateInitialConditionsB();
-
     /// Get explicit dynamics
     virtual Function& getExplicit() { return F_;}
 

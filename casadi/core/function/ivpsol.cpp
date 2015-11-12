@@ -1464,11 +1464,11 @@ namespace casadi {
     k_ = 0;
 
     // Get consistent initial conditions
-    calculateInitialConditions();
+    Z_.set(numeric_limits<double>::quiet_NaN());
 
     // Add the first element in the tape
     if (nrx_>0) {
-      output(IVPSOL_XF).getNZ(x_tape_.at(0));
+      casadi_copy(x, nx_, getPtr(x_tape_.at(0)));
     }
   }
 
@@ -1481,14 +1481,6 @@ namespace casadi {
     k_ = nk_;
 
     // Get consistent initial conditions
-    calculateInitialConditionsB();
-  }
-
-  void FixedStepIvpsol::calculateInitialConditions() {
-    Z_.set(numeric_limits<double>::quiet_NaN());
-  }
-
-  void FixedStepIvpsol::calculateInitialConditionsB() {
     RZ_.set(numeric_limits<double>::quiet_NaN());
   }
 
