@@ -48,11 +48,25 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
+    /** \brief Set the work vectors */
+    virtual void setup(Memory& m, const double**& arg, double**& res, int*& iw, double*& w);
+
+    /** \brief  Reset the forward problem and bring the time back to t0 */
+    virtual void reset(Memory& m, double t, const double* x,
+                       const double* z, const double* p);
+
+    /** \brief  Reset the backward problem and take time to tf */
+    virtual void resetB(Memory& m, double t, const double* rx,
+                        const double* rz, const double* rp);
+
     /** \brief  Set stop time for the integration */
     virtual void setStopTime(double tf) = 0;
 
     /// Linear solver forward, backward
     Function linsol_, linsolB_;
+
+    // Parameters
+    //double *p_, *rp_;
 
     /// Memory or the linear solvers
     Memory linsol_mem_, linsolB_mem_;

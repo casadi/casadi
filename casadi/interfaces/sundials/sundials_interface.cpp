@@ -292,6 +292,38 @@ namespace casadi {
                                   1, opts);
       alloc(linsolB_);
     }
+
+    // Allocate temporary memory
+    //alloc_w(np_, true); // p_
+    //alloc_w(nrp_, true); // rp_
+  }
+
+  void SundialsInterface::setup(Memory& m, const double**& arg, double**& res,
+                                int*& iw, double*& w) {
+    // Initialize the base classes
+    Ivpsol::setup(m, arg, res, iw, w);
+
+    // Get work vectors
+    //p_ = w; w += np_;
+    //rp_ = w; w += nrp_;
+  }
+
+  void SundialsInterface::reset(Memory& m, double t, const double* x,
+                                const double* z, const double* p) {
+    // Reset the base classes
+    Ivpsol::reset(m, t, x, z, p);
+
+    // Store parameters
+    //casadi_copy(p, np_, p_);
+  }
+
+  void SundialsInterface::resetB(Memory& m, double t, const double* rx,
+                                 const double* rz, const double* rp) {
+    // Reset the base classes
+    Ivpsol::resetB(m, t, rx, rz, rp);
+
+    // Store parameters
+    //casadi_copy(rp, nrp_, rp_);
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {

@@ -1270,22 +1270,6 @@ namespace casadi {
   }
 
   void Ivpsol::setup(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {
-    // Read inputs
-    x0_ = arg[IVPSOL_X0];
-    p_ = arg[IVPSOL_P];
-    z0_ = arg[IVPSOL_Z0];
-    rx0_ = arg[IVPSOL_RX0];
-    rp_ = arg[IVPSOL_RP];
-    rz0_ = arg[IVPSOL_RZ0];
-
-    // Read outputs
-    xf_ = res[IVPSOL_XF];
-    qf_ = res[IVPSOL_QF];
-    zf_ = res[IVPSOL_ZF];
-    rxf_ = res[IVPSOL_RXF];
-    rqf_ = res[IVPSOL_RQF];
-    rzf_ = res[IVPSOL_RZF];
-
     // Work vectors
     arg1_ = arg + IVPSOL_NUM_IN;
     res1_ = res + IVPSOL_NUM_OUT;

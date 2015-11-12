@@ -398,7 +398,7 @@ namespace casadi {
     arg1_[DAE_T] = &t;
     arg1_[DAE_X] = NV_DATA_S(xz);
     arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[DAE_P] = p_;
+    arg1_[DAE_P] = p().ptr();
     res1_[DAE_ODE] = NV_DATA_S(rr);
     res1_[DAE_ALG] = NV_DATA_S(rr)+nx_;
     res1_[DAE_QUAD] = 0;
@@ -460,7 +460,7 @@ namespace casadi {
     arg1_[DAE_T] = &t;
     arg1_[DAE_X] = NV_DATA_S(xz);
     arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[DAE_P] = p_;
+    arg1_[DAE_P] = p().ptr();
     arg1_[DAE_NUM_IN + DAE_T] = 0;
     arg1_[DAE_NUM_IN + DAE_X] = NV_DATA_S(v);
     arg1_[DAE_NUM_IN + DAE_Z] = NV_DATA_S(v)+nx_;
@@ -526,10 +526,10 @@ namespace casadi {
     arg1_[RDAE_T] = &t;
     arg1_[RDAE_X] = NV_DATA_S(xz);
     arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_P] = p().ptr();
     arg1_[RDAE_RX] = NV_DATA_S(xzB);
     arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_RP] = rp().ptr();
     arg1_[RDAE_NUM_IN + RDAE_T] = 0;
     arg1_[RDAE_NUM_IN + RDAE_X] = 0;
     arg1_[RDAE_NUM_IN + RDAE_Z] = 0;
@@ -764,6 +764,9 @@ namespace casadi {
                              const double* rz, const double* rp) {
     log("IdasInterface::resetB", "begin");
 
+    // Reset the base classes
+    SundialsInterface::resetB(m, t, rx, rz, rp);
+
     int flag;
 
     // Reset adjoint sensitivities for the parameters
@@ -951,7 +954,7 @@ namespace casadi {
     arg1_[DAE_T] = &t;
     arg1_[DAE_X] = NV_DATA_S(xz);
     arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[DAE_P] = p_;
+    arg1_[DAE_P] = p().ptr();
     res1_[DAE_ODE] = 0;
     res1_[DAE_ALG] = 0;
     res1_[DAE_QUAD] = NV_DATA_S(rhsQ);
@@ -1003,10 +1006,10 @@ namespace casadi {
     arg1_[RDAE_T] = &t;
     arg1_[RDAE_X] = NV_DATA_S(xz);
     arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_P] = p().ptr();
     arg1_[RDAE_RX] = NV_DATA_S(rxz);
     arg1_[RDAE_RZ] = NV_DATA_S(rxz)+nrx_;
-    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_RP] = rp().ptr();
     res1_[RDAE_ODE] = NV_DATA_S(rr);
     res1_[RDAE_ALG] = NV_DATA_S(rr) + nrx_;
     res1_[RDAE_QUAD] = 0;
@@ -1052,10 +1055,10 @@ namespace casadi {
     arg1_[RDAE_T] = &t;
     arg1_[RDAE_X] = NV_DATA_S(xz);
     arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_P] = p().ptr();
     arg1_[RDAE_RX] = NV_DATA_S(xzA);
     arg1_[RDAE_RZ] = NV_DATA_S(xzA)+nrx_;
-    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_RP] = rp().ptr();
     res1_[RDAE_ODE] = 0;
     res1_[RDAE_ALG] = 0;
     res1_[RDAE_QUAD] = NV_DATA_S(qdotA);
@@ -1096,7 +1099,7 @@ namespace casadi {
     arg1_[DAE_T] = &t;
     arg1_[DAE_X] = NV_DATA_S(xz);
     arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[DAE_P] = p_;
+    arg1_[DAE_P] = p().ptr();
     arg1_[DAE_NUM_IN] = &cj;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
@@ -1152,10 +1155,10 @@ namespace casadi {
     arg1_[RDAE_T] = &t;
     arg1_[RDAE_X] = NV_DATA_S(xz);
     arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_P] = p().ptr();
     arg1_[RDAE_RX] = NV_DATA_S(xzB);
     arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_RP] = rp().ptr();
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
@@ -1211,7 +1214,7 @@ namespace casadi {
     arg1_[DAE_T] = &t;
     arg1_[DAE_X] = NV_DATA_S(xz);
     arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[DAE_P] = p_;
+    arg1_[DAE_P] = p().ptr();
     arg1_[DAE_NUM_IN] = &cj;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
@@ -1269,10 +1272,10 @@ namespace casadi {
     arg1_[RDAE_T] = &t;
     arg1_[RDAE_X] = NV_DATA_S(xz);
     arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_P] = p().ptr();
     arg1_[RDAE_RX] = NV_DATA_S(xzB);
     arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_RP] = rp().ptr();
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();
@@ -1461,7 +1464,7 @@ namespace casadi {
     arg1_[DAE_T] = &t;
     arg1_[DAE_X] = NV_DATA_S(xz);
     arg1_[DAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[DAE_P] = p_;
+    arg1_[DAE_P] = p().ptr();
     arg1_[DAE_NUM_IN] = &cj;
     fill_n(res1_, jac_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jac_.sz_w();
@@ -1504,10 +1507,10 @@ namespace casadi {
     arg1_[RDAE_T] = &t;
     arg1_[RDAE_X] = NV_DATA_S(xz);
     arg1_[RDAE_Z] = NV_DATA_S(xz)+nx_;
-    arg1_[RDAE_P] = p_;
+    arg1_[RDAE_P] = p().ptr();
     arg1_[RDAE_RX] = NV_DATA_S(xzB);
     arg1_[RDAE_RZ] = NV_DATA_S(xzB)+nrx_;
-    arg1_[RDAE_RP] = rp_;
+    arg1_[RDAE_RP] = rp().ptr();
     arg1_[RDAE_NUM_IN] = &cjB;
     fill_n(res1_, jacB_.n_out(), static_cast<double*>(0));
     res1_[0] = w_ + jacB_.sz_w();

@@ -144,10 +144,6 @@ namespace casadi {
     /// Get the (legacy) dae backward function
     template<typename MatType> Function get_g() const;
 
-    // Pointers to inputs and outputs
-    const double *x0_, *p_, *z0_, *rx0_, *rp_, *rz0_;
-    double *xf_, *qf_, *zf_, *rxf_, *rqf_, *rzf_;
-
     // Work vectors
     const double **arg1_;
     double **res1_;
