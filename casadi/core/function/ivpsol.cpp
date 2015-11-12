@@ -412,17 +412,6 @@ namespace casadi {
   map<string, MatType> Ivpsol::aug_adj(int nadj, AugOffset& offset) {
     log("Ivpsol::aug_adj", "call");
 
-    // // Cast to right type
-    // map<string, MatType> dae = dae_;
-
-    // // Augmented DAE
-    // map<string, vector<MatType>> aug;
-    // for (auto&& i : dae) {
-    //   aug[i.first].push_back(i.second);
-    // }
-
-
-
     // Return object
     map<string, MatType> ret;
 
@@ -430,15 +419,13 @@ namespace casadi {
     offset = getAugOffset(0, nadj);
 
     // Create augmented problem
-    MatType aug_t = MatType::sym("aug_t", f_.sparsity_in(DAE_T));
-    MatType aug_x = MatType::sym("aug_x", size1_in(IVPSOL_X0), offset.x.back());
+    MatType aug_t = MatType::sym("aug_t", t());
+    MatType aug_x = MatType::sym("aug_x", x().size1(), offset.x.back());
     MatType aug_z = MatType::sym("aug_z", std::max(z().size1(), rz().size1()), offset.z.back());
     MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
     MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
-    MatType aug_rz = MatType::sym("aug_rz", std::max(z().size1(), rz().size1()),
-                                  offset.rz.back());
-    MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()),
-                                  offset.rp.back());
+    MatType aug_rz = MatType::sym("aug_rz", std::max(z().size1(), rz().size1()), offset.rz.back());
+    MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()), offset.rp.back());
 
     // Split up the augmented vectors
     vector<MatType> aug_x_split = horzsplit(aug_x, offset.x);
@@ -1387,13 +1374,13 @@ namespace casadi {
     // Take time steps until end time has been reached
     while (k_<k_out) {
       // Take step
-      F.input(DAE_T).set(t_);
-      F.input(DAE_X).set(output(IVPSOL_XF));
-      F.input(DAE_Z).set(Z_);
-      F.input(DAE_P).set(input(IVPSOL_P));
+      F.input(DAE_T).setNZ(&t_);
+      F.input(DAE_X).setNZ(output(IVPSOL_XF).ptr());
+      F.input(DAE_Z).setNZ(getPtr(Z_));
+      F.input(DAE_P).setNZ(getPtr(p_));
       F.evaluate();
-      F.output(DAE_ODE).get(output(IVPSOL_XF));
-      F.output(DAE_ALG).get(Z_);
+      F.output(DAE_ODE).getNZ(output(IVPSOL_XF).ptr());
+      F.output(DAE_ALG).getNZ(getPtr(Z_));
       copy(Z_->end()-nz_, Z_->end(), output(IVPSOL_ZF)->begin());
       transform(F.output(DAE_QUAD)->begin(),
                 F.output(DAE_QUAD)->end(),
@@ -1429,16 +1416,16 @@ namespace casadi {
       t_ = grid_.front() + k_*h_;
 
       // Take step
-      G.input(RDAE_T).set(t_);
+      G.input(RDAE_T).setNZ(&t_);
       G.input(RDAE_X).setNZ(x_tape_.at(k_));
       G.input(RDAE_Z).setNZ(Z_tape_.at(k_));
-      G.input(RDAE_P).set(input(IVPSOL_P));
-      G.input(RDAE_RX).set(output(IVPSOL_RXF));
-      G.input(RDAE_RZ).set(RZ_);
-      G.input(RDAE_RP).set(input(IVPSOL_RP));
+      G.input(RDAE_P).setNZ(getPtr(p_));
+      G.input(RDAE_RX).setNZ(output(IVPSOL_RXF).ptr());
+      G.input(RDAE_RZ).setNZ(getPtr(RZ_));
+      G.input(RDAE_RP).setNZ(getPtr(rp_));
       G.evaluate();
-      G.output(RDAE_ODE).get(output(IVPSOL_RXF));
-      G.output(RDAE_ALG).get(RZ_);
+      G.output(RDAE_ODE).getNZ(output(IVPSOL_RXF).ptr());
+      G.output(RDAE_ALG).getNZ(getPtr(RZ_));
       copy(RZ_->end()-nrz_, RZ_->end(), output(IVPSOL_RZF)->begin());
       transform(G.output(RDAE_QUAD)->begin(),
                 G.output(RDAE_QUAD)->end(),
