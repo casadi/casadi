@@ -404,23 +404,24 @@ namespace casadi {
   }
 
   void CvodesInterface::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
-    double t_out = t;
+    // Integrate, unless already at desired time
+    if (t<t_) {
+      int flag = CVodeB(mem_, t, CV_NORMAL);
+      if (flag<CV_SUCCESS) cvodes_error("CVodeB", flag);
 
-    casadi_msg("CvodesInterface::retreat(" << t_out << ") begin");
-    int flag;
+      // Get backward state
+      flag = CVodeGetB(mem_, whichB_, &t_, rxz_);
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeGetB", flag);
 
-    // Integrate backward to t_out
-    flag = CVodeB(mem_, t_out, CV_NORMAL);
-    if (flag<CV_SUCCESS) cvodes_error("CVodeB", flag);
+      // Get backward qudratures
+      if (nrq_>0) {
+        flag = CVodeGetQuadB(mem_, whichB_, &t_, rq_);
+        if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB", flag);
+      }
+    }
 
-    // Get the sensitivities
-    double tret;
-    flag = CVodeGetB(mem_, whichB_, &tret, rxz_);
-    if (flag!=CV_SUCCESS) cvodes_error("CVodeGetB", flag);
+    // Save to outputs
     casadi_copy(NV_DATA_S(rxz_), nrx_, rx);
-
-    flag = CVodeGetQuadB(mem_, whichB_, &tret, rq_);
-    if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB", flag);
     casadi_copy(NV_DATA_S(rq_), nrq_, rq);
 
     if (gather_stats_) {
@@ -440,7 +441,6 @@ namespace casadi {
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
 
     }
-    casadi_msg("CvodesInterface::retreat(" << t_out << ") end");
   }
 
   void CvodesInterface::printStats(std::ostream &stream) const {
