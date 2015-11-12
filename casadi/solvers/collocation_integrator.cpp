@@ -212,7 +212,7 @@ namespace casadi {
       vector<MX> rx(deg_+1), rz(deg_+1);
       for (int d=1; d<=deg_; ++d) {
         rx[d] = reshape(*rvv_it++, this->rx0().size());
-        rz[d] = reshape(*rvv_it++, this->rz0().size());
+        rz[d] = reshape(*rvv_it++, this->rz().size());
       }
       casadi_assert(rvv_it==rvv.end());
 
