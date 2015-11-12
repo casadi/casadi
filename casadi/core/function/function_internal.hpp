@@ -67,8 +67,7 @@ namespace casadi {
       \date 2010
       A regular user should never work with any Node class. Use Function directly.
   */
-  class CASADI_EXPORT FunctionInternal : public OptionsFunctionalityNode,
-                                         public IOInterface<FunctionInternal>{
+  class CASADI_EXPORT FunctionInternal : public OptionsFunctionalityNode {
     friend class Function;
 
   protected:

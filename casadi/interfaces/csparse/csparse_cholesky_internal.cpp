@@ -138,9 +138,7 @@ namespace casadi {
   }
 
   void CSparseCholeskyInternal::linsol_factorize(Memory& m, const double* A) {
-    if (A) {
-      setInputNZ(A, 0);
-    }
+    casadi_copy(A, nnz_in(0), input(0).ptr());
 
     // Get a reference to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();
