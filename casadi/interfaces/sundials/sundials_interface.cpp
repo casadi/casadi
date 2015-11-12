@@ -324,8 +324,8 @@ namespace casadi {
 
   void SundialsInterface::reset(Memory& m, double t, const double* x,
                                 const double* z, const double* p) {
-    // Reset the base classes
-    Ivpsol::reset(m, t, x, z, p);
+    // Update time
+    t_ = t;
 
     // Set parameters
     casadi_copy(p, np_, getPtr(p_));
@@ -340,8 +340,8 @@ namespace casadi {
 
   void SundialsInterface::resetB(Memory& m, double t, const double* rx,
                                  const double* rz, const double* rp) {
-    // Reset the base classes
-    Ivpsol::resetB(m, t, rx, rz, rp);
+    // Update time
+    t_ = t;
 
     // Set parameters
     casadi_copy(rp, nrp_, getPtr(rp_));

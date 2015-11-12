@@ -68,7 +68,7 @@ namespace casadi {
 
     /** \brief Reset the forward problem */
     virtual void reset(Memory& m, double t, const double* x,
-                       const double* z, const double* p);
+                       const double* z, const double* p) = 0;
 
     /** \brief  Advance solution in time */
     virtual void advance(Memory& m, double t, double* x,
@@ -76,7 +76,7 @@ namespace casadi {
 
     /** \brief Reset the backward problem */
     virtual void resetB(Memory& m, double t, const double* rx,
-                        const double* rz, const double* rp);
+                        const double* rz, const double* rp) = 0;
 
     /** \brief  Retreat solution in time */
     virtual void retreat(Memory& m, double t, double* rx,
@@ -175,9 +175,6 @@ namespace casadi {
     // Time grid
     std::vector<double> grid_;
     int ngrid_;
-
-    // Current time
-    double t_;
 
     // Dae
     XProblem dae_;
@@ -365,7 +362,10 @@ namespace casadi {
     /// Number of algebraic variables for the discrete time integration
     int nZ_, nRZ_;
 
-    // CUrrent state
+    // Current time
+    double t_;
+
+    // Current state
     std::vector<double> x_, z_, p_, q_, rx_, rz_, rp_, rq_;
 
     /// Algebraic variables for the discrete time integration

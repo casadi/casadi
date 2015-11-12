@@ -65,6 +65,9 @@ namespace casadi {
     /// Linear solver forward, backward
     Function linsol_, linsolB_;
 
+    // Current time
+    double t_;
+
     // N-vectors for the forward integration
     N_Vector xz_, xzdot_, q_;
 

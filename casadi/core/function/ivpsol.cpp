@@ -1210,18 +1210,6 @@ namespace casadi {
     w_ = w;
   }
 
-  void Ivpsol::reset(Memory& m, double t, const double* x,
-                     const double* z, const double* p) {
-    // Update time
-    t_ = t;
-  }
-
-  void Ivpsol::resetB(Memory& m, double t, const double* rx,
-                      const double* rz, const double* rp) {
-    // Update time
-    t_ = t;
-  }
-
   Dict Ivpsol::getDerivativeOptions(bool fwd) {
     // Copy all options
     return dictionary();
@@ -1390,8 +1378,8 @@ namespace casadi {
 
   void FixedStepIvpsol::reset(Memory& m, double t, const double* x,
                               const double* z, const double* p) {
-    // Reset the base classes
-    Ivpsol::reset(m, t, x, z, p);
+    // Update time
+    t_ = t;
 
     // Set parameters
     casadi_copy(p, np_, getPtr(p_));
@@ -1417,8 +1405,8 @@ namespace casadi {
 
   void FixedStepIvpsol::resetB(Memory& m, double t, const double* rx,
                                const double* rz, const double* rp) {
-    // Reset the base classes
-    Ivpsol::resetB(m, t, rx, rz, rp);
+    // Update time
+    t_ = t;
 
     // Set parameters
     casadi_copy(rp, nrp_, getPtr(rp_));
