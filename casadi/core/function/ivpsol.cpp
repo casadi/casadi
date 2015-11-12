@@ -1375,29 +1375,29 @@ namespace casadi {
     while (k_<k_out) {
       // Take step
       F.input(DAE_T).setNZ(&t_);
-      F.input(DAE_X).setNZ(output(IVPSOL_XF).ptr());
+      F.input(DAE_X).setNZ(getPtr(x_));
       F.input(DAE_Z).setNZ(getPtr(Z_));
       F.input(DAE_P).setNZ(getPtr(p_));
       F.evaluate();
-      F.output(DAE_ODE).getNZ(output(IVPSOL_XF).ptr());
+      F.output(DAE_ODE).getNZ(getPtr(x_));
       F.output(DAE_ALG).getNZ(getPtr(Z_));
-      copy(Z_->end()-nz_, Z_->end(), output(IVPSOL_ZF)->begin());
-      transform(F.output(DAE_QUAD)->begin(),
-                F.output(DAE_QUAD)->end(),
-                output(IVPSOL_QF)->begin(),
-                output(IVPSOL_QF)->begin(),
-                std::plus<double>());
+      casadi_axpy(nq_, 1., F.output(DAE_QUAD).ptr(), getPtr(q_));
 
       // Tape
       if (nrx_>0) {
-        output(IVPSOL_XF).getNZ(x_tape_.at(k_+1));
-        Z_.getNZ(Z_tape_.at(k_));
+        casadi_copy(getPtr(x_), nx_, getPtr(x_tape_.at(k_+1)));
+        casadi_copy(getPtr(Z_), Z_.nnz(), getPtr(Z_tape_.at(k_)));
       }
 
       // Advance time
       k_++;
       t_ = grid_.front() + k_*h_;
     }
+
+    // Return to user
+    casadi_copy(getPtr(x_), nx_, x);
+    casadi_copy(getPtr(Z_)+Z_.nnz()-nz_, nz_, z);
+    casadi_copy(getPtr(q_), nq_, q);
   }
 
   void FixedStepIvpsol::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
