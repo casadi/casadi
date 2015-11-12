@@ -229,7 +229,6 @@ namespace casadi {
     }
 
     // Quadratures for the backward problem
-    N_VConst(0.0, rq_);
     flag = CVodeQuadInitB(mem_, whichB_, rhsQB_wrapper, rq_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB", flag);
 
@@ -341,18 +340,18 @@ namespace casadi {
     // Integrate, unless already at desired time
     const double ttol = 1e-9;
     if (fabs(t_-t)>=ttol) {
-
-      // Integrate forward problem, possibly checkpointing
+      // Integrate forward ...
       if (nrx_>0) {
+        // ... with taping
         int flag = CVodeF(mem_, t, xz_, &t_, CV_NORMAL, &ncheck_);
         if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVodeF", flag);
-
       } else {
+        // ... without taping
         int flag = CVode(mem_, t, xz_, &t_, CV_NORMAL);
         if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVode", flag);
       }
 
-      // Get the quadratures
+      // Get quadratures
       if (nq_>0) {
         double tret;
         int flag = CVodeGetQuad(mem_, &tret, q_);
@@ -360,7 +359,7 @@ namespace casadi {
       }
     }
 
-    // Get the solution
+    // Set function outputs
     casadi_copy(NV_DATA_S(xz_), nx_, x);
     casadi_copy(NV_DATA_S(q_), nq_, q);
 
@@ -391,7 +390,6 @@ namespace casadi {
       flag = CVodeReInitB(mem_, whichB_, grid_.back(), rxz_);
       if (flag != CV_SUCCESS) cvodes_error("CVodeReInitB", flag);
 
-      N_VConst(0.0, rq_);
       flag = CVodeQuadReInitB(mem_, whichB_, rq_);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB", flag);
 

@@ -336,9 +336,6 @@ namespace casadi {
 
     // Reset summation states
     N_VConst(0., q_);
-
-    // Store parameters
-    //casadi_copy(p, np_, p_);
   }
 
   void SundialsInterface::resetB(Memory& m, double t, const double* rx,
@@ -352,8 +349,8 @@ namespace casadi {
     // Get the backward state
     casadi_copy(rx, nrx_, NV_DATA_S(rxz_));
 
-    // Store parameters
-    //casadi_copy(rp, nrp_, rp_);
+    // Reset summation states
+    N_VConst(0., rq_);
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {

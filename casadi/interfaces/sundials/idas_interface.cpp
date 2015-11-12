@@ -330,7 +330,6 @@ namespace casadi {
     }
 
     // Quadratures for the adjoint problem
-    N_VConst(0.0, rq_);
     flag = IDAQuadInitB(mem_, whichB_, rhsQB_wrapper, rq_);
     if (flag!=IDA_SUCCESS) idas_error("IDAQuadInitB", flag);
 
@@ -597,7 +596,6 @@ namespace casadi {
 
     // Re-initialize quadratures
     if (nq_>0) {
-      N_VConst(0.0, q_);
       flag = IDAQuadReInit(mem_, q_);
       if (flag != IDA_SUCCESS) idas_error("IDAQuadReInit", flag);
       log("IdasInterface::reset", "re-initialized quadratures");
@@ -645,50 +643,39 @@ namespace casadi {
   }
 
   void IdasInterface::advance(Memory& m, double t, double* x, double* z, double* q) {
-    double t_out = t;
-
-    casadi_msg("IdasInterface::integrate(" << t_out << ") begin");
-
-    casadi_assert_message(t_out>=grid_.front(), "IdasInterface::integrate(" << t_out << "): "
+    casadi_assert_message(t>=grid_.front(), "IdasInterface::integrate(" << t << "): "
                           "Cannot integrate to a time earlier than t0 (" << grid_.front() << ")");
-    casadi_assert_message(t_out<=grid_.back() || !stop_at_end_, "IdasInterface::integrate("
-                          << t_out << "): "
+    casadi_assert_message(t<=grid_.back() || !stop_at_end_, "IdasInterface::integrate("
+                          << t << "): "
                           "Cannot integrate past a time later than tf (" << grid_.back() << ") "
                           "unless stop_at_end is set to False.");
 
-    int flag;
-
-    // Check if we are already at the output time
+    // Integrate, unless already at desired time
     double ttol = 1e-9;   // tolerance
-    if (fabs(t_-t_out)<ttol) {
-      // No integration necessary
-      log("IdasInterface::integrate", "already at the end of the horizon end");
-
-    } else {
-      // Integrate ...
+    if (fabs(t_-t)>=ttol) {
+      // Integrate forward ...
       if (nrx_>0) {
         // ... with taping
-        log("IdasInterface::integrate", "integration with taping");
-        flag = IDASolveF(mem_, t_out, &t_, xz_, xzdot_, IDA_NORMAL, &ncheck_);
+        int flag = IDASolveF(mem_, t, &t_, xz_, xzdot_, IDA_NORMAL, &ncheck_);
         if (flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolveF", flag);
       } else {
         // ... without taping
-        log("IdasInterface::integrate", "integration without taping");
-        flag = IDASolve(mem_, t_out, &t_, xz_, xzdot_, IDA_NORMAL);
+        int flag = IDASolve(mem_, t, &t_, xz_, xzdot_, IDA_NORMAL);
         if (flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolve", flag);
       }
-      casadi_copy(NV_DATA_S(xz_), nx_, x);
-      casadi_copy(NV_DATA_S(xz_)+nx_, nz_, z);
-      log("IdasInterface::integrate", "integration complete");
 
-      // Get quadrature states
+      // Get quadratures
       if (nq_>0) {
         double tret;
-        flag = IDAGetQuad(mem_, &tret, q_);
+        int flag = IDAGetQuad(mem_, &tret, q_);
         if (flag != IDA_SUCCESS) idas_error("IDAGetQuad", flag);
-        casadi_copy(NV_DATA_S(q_), nq_, q);
       }
     }
+
+    // Set function outputs
+    casadi_copy(NV_DATA_S(xz_), nx_, x);
+    casadi_copy(NV_DATA_S(xz_)+nx_, nz_, z);
+    casadi_copy(NV_DATA_S(q_), nq_, q);
 
     // Print statistics
     if (option("print_stats")) printStats(userOut());
@@ -703,11 +690,7 @@ namespace casadi {
 
       stats_["nsteps"] = 1.0*nsteps;
       stats_["nlinsetups"] = 1.0*nlinsetups;
-
     }
-
-
-    casadi_msg("IdasInterface::integrate(" << t_out << ") end");
   }
 
   void IdasInterface::resetB(Memory& m, double t, const double* rx,
@@ -720,13 +703,11 @@ namespace casadi {
     int flag;
 
     // Reset adjoint sensitivities for the parameters
-    N_VConst(0.0, rq_);
     if (isInitAdj_) {
       flag = IDAReInitB(mem_, whichB_, grid_.back(), rxz_, rxzdot_);
       if (flag != IDA_SUCCESS) idas_error("IDAReInitB", flag);
 
       if (nrq_>0) {
-        N_VConst(0.0, rq_);
         flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_), rq_);
         // flag = IDAQuadReInitB(mem_, whichB_[dir], rq_[dir]); // BUG in Sundials
         //                                                      // do not use this!
