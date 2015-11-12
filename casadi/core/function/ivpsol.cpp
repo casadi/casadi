@@ -132,6 +132,27 @@ namespace casadi {
     // Create memory reference
     Memory m(this, arg, res, iw, w, mem);
 
+#if 1
+    // Reset solver, take time to t0
+    reset(m, grid_.front(), input(IVPSOL_X0).ptr(), input(IVPSOL_Z0).ptr(),
+          input(IVPSOL_P).ptr());
+
+    // Integrate forward
+    advance(m, grid_.back(), output(IVPSOL_XF).ptr(), output(IVPSOL_ZF).ptr(),
+            output(IVPSOL_QF).ptr());
+
+    // If backwards integration is needed
+    if (nrx_>0) {
+
+      // Integrate backward
+      resetB(m, grid_.back(), input(IVPSOL_RX0).ptr(), input(IVPSOL_RZ0).ptr(),
+             input(IVPSOL_RP).ptr());
+
+      // Proceed to t0
+      retreat(m, grid_.front(), output(IVPSOL_RXF).ptr(), output(IVPSOL_RZF).ptr(),
+              output(IVPSOL_RQF).ptr());
+    }
+#else
     // Reset solver, take time to t0
     reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
 
@@ -147,6 +168,7 @@ namespace casadi {
       // Proceed to t0
       retreat(m, grid_.front(), res[IVPSOL_RXF], res[IVPSOL_RZF], res[IVPSOL_RQF]);
     }
+#endif
 
     // Print statistics
     if (print_stats_) printStats(userOut());
