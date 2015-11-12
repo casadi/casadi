@@ -122,10 +122,12 @@ namespace casadi {
               "Options to be passed to the linear solver for backwards integration "
               "[default: equal to linear_solver_options]");
     xz_  = 0;
+    q_ = 0;
   }
 
   SundialsInterface::~SundialsInterface() {
     if (xz_) { N_VDestroy_Serial(xz_); xz_ = 0; }
+    if (q_) { N_VDestroy_Serial(q_); q_ = 0; }
   }
 
   void SundialsInterface::init() {
@@ -134,6 +136,7 @@ namespace casadi {
 
     // Allocate n-vectors
     xz_ = N_VNew_Serial(nx_+nz_);
+    q_ = N_VNew_Serial(nq_);
 
     // Read options
     abstol_ = option("abstol");
@@ -323,7 +326,7 @@ namespace casadi {
     casadi_copy(z, nz_, NV_DATA_S(xz_)+nx_);
 
     // Reset summation states
-    //casadi_fill(qf().ptr(), nq_, 0.);
+    N_VConst(0., q_);
 
     // Store parameters
     //casadi_copy(p, np_, p_);

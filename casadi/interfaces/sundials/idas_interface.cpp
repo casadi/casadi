@@ -80,7 +80,6 @@ namespace casadi {
     mem_ = 0;
 
     xzdot_ = 0;
-    q_ = 0;
 
     rxz_ = 0;
     rxzdot_ = 0;
@@ -100,7 +99,6 @@ namespace casadi {
 
     // Forward integration
     if (xzdot_) { N_VDestroy_Serial(xzdot_); xzdot_ = 0; }
-    if (q_) { N_VDestroy_Serial(q_); q_ = 0; }
 
     // Backward integration
     if (rxz_) { N_VDestroy_Serial(rxz_); rxz_ = 0; }
@@ -229,11 +227,7 @@ namespace casadi {
     // Quadrature equations
     if (nq_>0) {
 
-      // Allocate n-vectors for quadratures
-      q_ = N_VMake_Serial(nq_, &qf()->front());
-
       // Initialize quadratures in IDAS
-      N_VConst(0.0, q_);
       flag = IDAQuadInit(mem_, rhsQ_wrapper, q_);
       if (flag != IDA_SUCCESS) idas_error("IDAQuadInit", flag);
 
@@ -711,8 +705,9 @@ namespace casadi {
     }
 
     // Save the final state
-    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, x);
-    copy(NV_DATA_S(xz_)+nx_, NV_DATA_S(xz_)+nx_+nz_, zf()->begin());
+    casadi_copy(NV_DATA_S(xz_), nx_, x);
+    casadi_copy(NV_DATA_S(xz_)+nx_, nz_, z);
+    casadi_copy(NV_DATA_S(q_), nq_, q);
 
     // Print statistics
     if (option("print_stats")) printStats(userOut());

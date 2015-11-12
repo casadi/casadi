@@ -299,7 +299,7 @@ namespace casadi {
     MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
     MatType aug_rz = MatType::sym("aug_rz", std::max(z0().size1(), rz0().size1()),
                                   offset.rz.back());
-    MatType aug_rp = MatType::sym("aug_rp", std::max(qf().size1(), rp().size1()),
+    MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()),
                                   offset.rp.back());
 
     // Split up the augmented vectors
@@ -464,7 +464,7 @@ namespace casadi {
     MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
     MatType aug_rz = MatType::sym("aug_rz", std::max(z0().size1(), rz0().size1()),
                                   offset.rz.back());
-    MatType aug_rp = MatType::sym("aug_rp", std::max(qf().size1(), rp().size1()),
+    MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()),
                                   offset.rp.back());
 
     // Split up the augmented vectors
@@ -906,7 +906,7 @@ namespace casadi {
     for (int dir=-1; dir<nfwd; ++dir) {
       if ( nx_>0) ret.x.push_back(size2_in(IVPSOL_X0));
       if ( nz_>0) ret.z.push_back(z0().size2());
-      if ( nq_>0) ret.q.push_back(qf().size2());
+      if ( nq_>0) ret.q.push_back(q().size2());
       if ( np_>0) ret.p.push_back(p().size2());
       if (nrx_>0) ret.rx.push_back(rx0().size2());
       if (nrz_>0) ret.rz.push_back(rz0().size2());
@@ -919,7 +919,7 @@ namespace casadi {
       if ( nx_>0) ret.rx.push_back(size2_in(IVPSOL_X0));
       if ( nz_>0) ret.rz.push_back(z0().size2());
       if ( np_>0) ret.rq.push_back(p().size2());
-      if ( nq_>0) ret.rp.push_back(qf().size2());
+      if ( nq_>0) ret.rp.push_back(q().size2());
       if (nrx_>0) ret.x.push_back(size2_in(IVPSOL_X0));
       if (nrz_>0) ret.z.push_back(rz0().size2());
       if (nrp_>0) ret.q.push_back(rp().size2());
@@ -1058,7 +1058,7 @@ namespace casadi {
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(IVPSOL_NUM_OUT);
     dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(size_out(IVPSOL_XF)));
-    dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(qf().size()));
+    dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(zf().size()));
     dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
     dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().size()));
@@ -1159,7 +1159,7 @@ namespace casadi {
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(IVPSOL_NUM_OUT);
     dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
-    dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(qf().size()));
+    dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(zf().size()));
     dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
     dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().size()));
@@ -1180,7 +1180,7 @@ namespace casadi {
       // Quadratures become backward parameters
       ss.clear();
       ss << "qf" << "_" << dir;
-      dd[IVPSOL_QF] = MX::sym(ss.str(), qf().sparsity());
+      dd[IVPSOL_QF] = MX::sym(ss.str(), q());
       rp_augv.push_back(dd[IVPSOL_QF]);
 
       // Algebraic variables become backward algebraic variables

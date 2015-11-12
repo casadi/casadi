@@ -62,7 +62,6 @@ namespace casadi {
 
     mem_ = 0;
 
-    q_ = 0;
     rx0_ = rx_ = rq_ = 0;
 
     isInitAdj_ = false;
@@ -71,9 +70,6 @@ namespace casadi {
 
   void CvodesInterface::freeCVodes() {
     if (mem_) { CVodeFree(&mem_); mem_ = 0;}
-
-    // Forward integration
-    if (q_) { N_VDestroy_Serial(q_); q_ = 0; }
 
     // Backward integration
     if (rx0_) { N_VDestroy_Serial(rx0_); rx0_ = 0; }
@@ -173,11 +169,7 @@ namespace casadi {
 
     // Quadrature equations
     if (nq_>0) {
-      // Allocate n-vectors for quadratures
-      q_ = N_VMake_Serial(nq_, qf().ptr());
-
       // Initialize quadratures in CVodes
-      N_VConst(0.0, q_);
       flag = CVodeQuadInit(mem_, rhsQ_wrapper, q_);
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadInit", flag);
 
@@ -389,6 +381,7 @@ namespace casadi {
 
     // Save the final state
     copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, x);
+    casadi_copy(NV_DATA_S(q_), nq_, q);
 
     if (nq_>0) {
       double tret;
