@@ -602,11 +602,8 @@ namespace casadi {
     // Return flag
     int flag;
 
-    // Copy to N_Vectors
-    const Matrix<double>& z = zf();
-    copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(xzdot_));
-
     // Re-initialize
+    copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(xzdot_));
     flag = IDAReInit(mem_, grid_.front(), xz_, xzdot_);
     if (flag != IDA_SUCCESS) idas_error("IDAReInit", flag);
     log("IdasInterface::reset", "re-initialized IVP solution");

@@ -1059,7 +1059,7 @@ namespace casadi {
     dd.resize(IVPSOL_NUM_OUT);
     dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(size_out(IVPSOL_XF)));
     dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
-    dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(zf().size()));
+    dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
     dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
     dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().size()));
     dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().size()));
@@ -1160,7 +1160,7 @@ namespace casadi {
     dd.resize(IVPSOL_NUM_OUT);
     dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
     dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
-    dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(zf().size()));
+    dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
     dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
     dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().size()));
     dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().size()));
@@ -1186,7 +1186,7 @@ namespace casadi {
       // Algebraic variables become backward algebraic variables
       ss.clear();
       ss << "zf" << "_" << dir;
-      dd[IVPSOL_ZF] = MX::sym(ss.str(), zf().sparsity());
+      dd[IVPSOL_ZF] = MX::sym(ss.str(), z());
       rz0_augv.push_back(dd[IVPSOL_ZF]);
 
       // Backward differential states becomes forward differential states
