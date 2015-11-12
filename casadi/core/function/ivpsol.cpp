@@ -1394,7 +1394,7 @@ namespace casadi {
       t_ = grid_.front() + k_*h_;
     }
 
-    // Return to user
+    // Return to user TODO(@jaeandersson): interpolate
     casadi_copy(getPtr(x_), nx_, x);
     casadi_copy(getPtr(Z_)+Z_.nnz()-nz_, nz_, z);
     casadi_copy(getPtr(q_), nq_, q);
@@ -1420,19 +1420,19 @@ namespace casadi {
       G.input(RDAE_X).setNZ(x_tape_.at(k_));
       G.input(RDAE_Z).setNZ(Z_tape_.at(k_));
       G.input(RDAE_P).setNZ(getPtr(p_));
-      G.input(RDAE_RX).setNZ(output(IVPSOL_RXF).ptr());
+      G.input(RDAE_RX).setNZ(getPtr(rx_));
       G.input(RDAE_RZ).setNZ(getPtr(RZ_));
       G.input(RDAE_RP).setNZ(getPtr(rp_));
       G.evaluate();
-      G.output(RDAE_ODE).getNZ(output(IVPSOL_RXF).ptr());
+      G.output(RDAE_ODE).getNZ(getPtr(rx_));
       G.output(RDAE_ALG).getNZ(getPtr(RZ_));
-      copy(RZ_->end()-nrz_, RZ_->end(), output(IVPSOL_RZF)->begin());
-      transform(G.output(RDAE_QUAD)->begin(),
-                G.output(RDAE_QUAD)->end(),
-                output(IVPSOL_RQF)->begin(),
-                output(IVPSOL_RQF)->begin(),
-                std::plus<double>());
+      casadi_axpy(nrq_, 1., G.output(RDAE_QUAD).ptr(), getPtr(rq_));
     }
+
+    // Return to user TODO(@jaeandersson): interpolate
+    casadi_copy(getPtr(rx_), nrx_, rx);
+    casadi_copy(getPtr(RZ_)+RZ_.nnz()-nrz_, nrz_, rz);
+    casadi_copy(getPtr(rq_), nrq_, rq);
   }
 
   void FixedStepIvpsol::reset(Memory& m, double t, const double* x,
