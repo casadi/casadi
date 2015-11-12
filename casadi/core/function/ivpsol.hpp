@@ -152,6 +152,7 @@ namespace casadi {
 
     ///@{
     // Shorthands
+    const Sparsity&  t() { return f_->sparsity_in(DAE_T);}
     const Sparsity&  x() { return sparsity_out(IVPSOL_XF);}
     const Sparsity&  z() { return sparsity_out(IVPSOL_ZF);}
     const Sparsity&  p() { return sparsity_in(IVPSOL_P);}
