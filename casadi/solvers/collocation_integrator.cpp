@@ -109,9 +109,9 @@ namespace casadi {
     }
 
     // Symbolic inputs
-    MX x0 = MX::sym("x0", f_.input(DAE_X).sparsity());
-    MX p = MX::sym("p", f_.input(DAE_P).sparsity());
-    MX t = MX::sym("t", f_.input(DAE_T).sparsity());
+    MX x0 = MX::sym("x0", this->x());
+    MX p = MX::sym("p", this->p());
+    MX t = MX::sym("t", this->t());
 
     // Implicitly defined variables (z and x)
     MX v = MX::sym("v", deg_*(nx_+nz_));
@@ -141,7 +141,7 @@ namespace casadi {
     vector<MX> eq;
 
     // Quadratures
-    MX qf = MX::zeros(f_.output(DAE_QUAD).sparsity());
+    MX qf = MX::zeros(this->q());
 
     // End state
     MX xf = D[0]*x0;
@@ -195,8 +195,8 @@ namespace casadi {
     if (!g_.isNull()) {
 
       // Symbolic inputs
-      MX rx0 = MX::sym("x0", g_.input(RDAE_RX).sparsity());
-      MX rp = MX::sym("p", g_.input(RDAE_RP).sparsity());
+      MX rx0 = MX::sym("rx0", this->rx());
+      MX rp = MX::sym("rp", this->rp());
 
       // Implicitly defined variables (rz and rx)
       MX rv = MX::sym("v", deg_*(nrx_+nrz_));
@@ -220,7 +220,7 @@ namespace casadi {
       eq.clear();
 
       // Quadratures
-      MX rqf = MX::zeros(g_.output(RDAE_QUAD).sparsity());
+      MX rqf = MX::zeros(this->rq());
 
       // End state
       MX rxf = D[0]*rx0;
