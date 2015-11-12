@@ -61,7 +61,6 @@ namespace casadi {
               "", "res|resB|resQB|reset|psetupB|djacB", true);
 
     mem_ = 0;
-    rq_ = 0;
 
     isInitAdj_ = false;
     disable_internal_warnings_ = false;
@@ -69,9 +68,6 @@ namespace casadi {
 
   void CvodesInterface::freeCVodes() {
     if (mem_) { CVodeFree(&mem_); mem_ = 0;}
-
-    // Backward integration
-    if (rq_)  { N_VDestroy_Serial(rq_);  rq_  = 0; }
   }
 
   CvodesInterface::~CvodesInterface() {
@@ -176,10 +172,6 @@ namespace casadi {
 
     // Adjoint sensitivity problem
     if (!g_.isNull()) {
-
-      // Allocate n-vectors for backward integration
-      rq_ = N_VMake_Serial(nrq_, rqf().ptr());
-
       // Get the number of steos per checkpoint
       int Nd = option("steps_per_checkpoint");
 
@@ -436,6 +428,7 @@ namespace casadi {
 
     flag = CVodeGetQuadB(mem_, whichB_, &tret, rq_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB", flag);
+    casadi_copy(NV_DATA_S(rq_), nrq_, rq);
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;

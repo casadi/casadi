@@ -910,7 +910,7 @@ namespace casadi {
       if ( np_>0) ret.p.push_back(p().size2());
       if (nrx_>0) ret.rx.push_back(rx().size2());
       if (nrz_>0) ret.rz.push_back(rz().size2());
-      if (nrq_>0) ret.rq.push_back(rqf().size2());
+      if (nrq_>0) ret.rq.push_back(rq().size2());
       if (nrp_>0) ret.rp.push_back(rp().size2());
     }
 
@@ -923,7 +923,7 @@ namespace casadi {
       if (nrx_>0) ret.x.push_back(x().size2());
       if (nrz_>0) ret.z.push_back(rz().size2());
       if (nrp_>0) ret.q.push_back(rp().size2());
-      if (nrq_>0) ret.p.push_back(rqf().size2());
+      if (nrq_>0) ret.p.push_back(rq().size2());
     }
 
     // Get cummulative offsets
@@ -1061,7 +1061,7 @@ namespace casadi {
     dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
     dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
-    dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().size()));
+    dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
     dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().size()));
     std::copy(dd.begin(), dd.end(), ret_in.begin()+IVPSOL_NUM_IN);
 
@@ -1162,7 +1162,7 @@ namespace casadi {
     dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
     dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
-    dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rqf().size()));
+    dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
     dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rzf().size()));
     ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
@@ -1198,7 +1198,7 @@ namespace casadi {
       // Backward quadratures becomes (forward) parameters
       ss.clear();
       ss << "rqf" << "_" << dir;
-      dd[IVPSOL_RQF] = MX::sym(ss.str(), rqf().sparsity());
+      dd[IVPSOL_RQF] = MX::sym(ss.str(), rq());
       p_augv.push_back(dd[IVPSOL_RQF]);
 
       // Backward differential states becomes forward differential states
@@ -1302,11 +1302,11 @@ namespace casadi {
     t_ = t;
 
     // Get state
-    casadi_copy(rx, nrx_, rxf().ptr());
-    casadi_copy(rz, nrz_, rzf().ptr());
+    casadi_copy(rx, nrx_, output(IVPSOL_RXF).ptr());
+    casadi_copy(rz, nrz_, output(IVPSOL_RZF).ptr());
 
     // Reset summation states
-    casadi_fill(rqf().ptr(), nrq_, 0.);
+    casadi_fill(output(IVPSOL_RQF).ptr(), nrq_, 0.);
   }
 
   Dict Ivpsol::getDerivativeOptions(bool fwd) {

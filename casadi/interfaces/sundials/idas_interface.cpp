@@ -78,10 +78,8 @@ namespace casadi {
               "Initial values for the state derivatives");
 
     mem_ = 0;
-
     xzdot_ = 0;
     rxzdot_ = 0;
-    rq_ = 0;
 
     isInitAdj_ = false;
     isInitTaping_ = false;
@@ -94,13 +92,8 @@ namespace casadi {
 
   void IdasInterface::freeIDAS() {
     if (mem_) { IDAFree(&mem_); mem_ = 0; }
-
-    // Forward integration
     if (xzdot_) { N_VDestroy_Serial(xzdot_); xzdot_ = 0; }
-
-    // Backward integration
     if (rxzdot_) { N_VDestroy_Serial(rxzdot_); rxzdot_ = 0; }
-    if (rq_) { N_VDestroy_Serial(rq_); rq_ = 0; }
   }
 
   void IdasInterface::init() {
@@ -246,13 +239,9 @@ namespace casadi {
     if (!g_.isNull()) {
 
       // Allocate n-vectors
-      rxz_ = N_VNew_Serial(nrx_+nrz_);
       rxzdot_ = N_VNew_Serial(nrx_+nrz_);
       N_VConst(0.0, rxz_);
       N_VConst(0.0, rxzdot_);
-
-      // Allocate n-vectors for quadratures
-      rq_ = N_VMake_Serial(nrq_, rqf().ptr());
     }
     log("IdasInterface::init", "initialized adjoint sensitivities");
 
@@ -780,15 +769,14 @@ namespace casadi {
     double tret;
     flag = IDAGetB(mem_, whichB_, &tret, rxz_, rxzdot_);
     if (flag!=IDA_SUCCESS) idas_error("IDAGetB", flag);
+    casadi_copy(NV_DATA_S(rxz_), nrx_, rx);
+    casadi_copy(NV_DATA_S(rxz_)+nrx_, nrz_, rz);
 
     if (nrq_>0) {
       flag = IDAGetQuadB(mem_, whichB_, &tret, rq_);
       if (flag!=IDA_SUCCESS) idas_error("IDAGetQuadB", flag);
+      casadi_copy(NV_DATA_S(rq_), nrq_, rq);
     }
-
-    // Save the backward state and algebraic variable
-    casadi_copy(NV_DATA_S(rxz_), nrx_, rx);
-    casadi_copy(NV_DATA_S(rxz_)+nrx_, nrz_, rz);
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;

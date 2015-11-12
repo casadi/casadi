@@ -124,12 +124,14 @@ namespace casadi {
     xz_  = 0;
     q_ = 0;
     rxz_ = 0;
+    rq_ = 0;
   }
 
   SundialsInterface::~SundialsInterface() {
     if (xz_) { N_VDestroy_Serial(xz_); xz_ = 0; }
     if (q_) { N_VDestroy_Serial(q_); q_ = 0; }
     if (rxz_) { N_VDestroy_Serial(rxz_); rxz_ = 0; }
+    if (rq_) { N_VDestroy_Serial(rq_); rq_ = 0; }
   }
 
   void SundialsInterface::init() {
@@ -140,6 +142,7 @@ namespace casadi {
     xz_ = N_VNew_Serial(nx_+nz_);
     q_ = N_VNew_Serial(nq_);
     rxz_ = N_VNew_Serial(nrx_+nrz_);
+    rq_ = N_VNew_Serial(nrq_);
 
     // Read options
     abstol_ = option("abstol");
