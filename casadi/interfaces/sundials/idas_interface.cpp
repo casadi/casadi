@@ -736,26 +736,26 @@ namespace casadi {
   }
 
   void IdasInterface::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
-    double t_out = t;
+    // Integrate, unless already at desired time
+    if (t<t_) {
+      int flag = IDASolveB(mem_, t, IDA_NORMAL);
+      if (flag<IDA_SUCCESS) idas_error("IDASolveB", flag);
 
-    casadi_msg("IdasInterface::retreat(" << t_out << ") begin");
-    int flag;
-    // Integrate backwards to t_out
-    flag = IDASolveB(mem_, t_out, IDA_NORMAL);
-    if (flag<IDA_SUCCESS) idas_error("IDASolveB", flag);
+      // Get backward state
+      flag = IDAGetB(mem_, whichB_, &t_, rxz_, rxzdot_);
+      if (flag!=IDA_SUCCESS) idas_error("IDAGetB", flag);
 
-    // Get the sensitivities
-    double tret;
-    flag = IDAGetB(mem_, whichB_, &tret, rxz_, rxzdot_);
-    if (flag!=IDA_SUCCESS) idas_error("IDAGetB", flag);
+      // Get backward qudratures
+      if (nrq_>0) {
+        flag = IDAGetQuadB(mem_, whichB_, &t_, rq_);
+        if (flag!=IDA_SUCCESS) idas_error("IDAGetQuadB", flag);
+      }
+    }
+
+    // Save outputs
     casadi_copy(NV_DATA_S(rxz_), nrx_, rx);
     casadi_copy(NV_DATA_S(rxz_)+nrx_, nrz_, rz);
-
-    if (nrq_>0) {
-      flag = IDAGetQuadB(mem_, whichB_, &tret, rq_);
-      if (flag!=IDA_SUCCESS) idas_error("IDAGetQuadB", flag);
-      casadi_copy(NV_DATA_S(rq_), nrq_, rq);
-    }
+    casadi_copy(NV_DATA_S(rq_), nrq_, rq);
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;
@@ -773,7 +773,6 @@ namespace casadi {
       stats_["nstepsB"] = 1.0*nsteps;
       stats_["nlinsetupsB"] = 1.0*nlinsetups;
     }
-    casadi_msg("IdasInterface::retreat(" << t_out << ") end");
   }
 
   void IdasInterface::printStats(std::ostream &stream) const {

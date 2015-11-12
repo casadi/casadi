@@ -418,7 +418,7 @@ namespace casadi {
       }
     }
 
-    // Save to outputs
+    // Save outputs
     casadi_copy(NV_DATA_S(rxz_), nrx_, rx);
     casadi_copy(NV_DATA_S(rq_), nrq_, rq);
 
