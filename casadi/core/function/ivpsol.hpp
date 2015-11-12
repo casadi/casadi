@@ -157,7 +157,7 @@ namespace casadi {
     DM& rx0() { return input(IVPSOL_RX0);}
     DM&  rp() { return input(IVPSOL_RP);}
     DM& rz0() { return input(IVPSOL_RZ0);}
-    DM&  xf() { return output(IVPSOL_XF);}
+    const Sparsity&  x() { return sparsity_out(IVPSOL_XF);}
     DM&  qf() { return output(IVPSOL_QF);}
     DM&  zf() { return output(IVPSOL_ZF);}
     DM& rxf() { return output(IVPSOL_RXF);}

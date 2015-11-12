@@ -388,7 +388,7 @@ namespace casadi {
     }
 
     // Save the final state
-    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, xf()->begin());
+    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, x);
 
     if (nq_>0) {
       double tret;

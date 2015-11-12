@@ -77,7 +77,10 @@ namespace casadi {
     for (int k=0; k<grid_.size(); ++k) {
       // Integrate to the output time
       dynamic_cast<Ivpsol*>(integrator_.get())->
-        advance(m, grid_[k], res1[IVPSOL_XF], res1[IVPSOL_ZF], res1[IVPSOL_QF]);
+        advance(m, grid_[k],
+                integrator_.output(IVPSOL_XF).ptr(),
+                integrator_.output(IVPSOL_ZF).ptr(),
+                integrator_.output(IVPSOL_QF).ptr());
 
       // Save the outputs of the function
       for (int i=0; i<n_out(); ++i) {

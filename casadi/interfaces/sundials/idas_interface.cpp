@@ -609,7 +609,6 @@ namespace casadi {
     int flag;
 
     // Copy to N_Vectors
-    const Matrix<double>& x = xf();
     const Matrix<double>& z = zf();
     copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(xzdot_));
 
@@ -712,7 +711,7 @@ namespace casadi {
     }
 
     // Save the final state
-    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, xf()->begin());
+    copy(NV_DATA_S(xz_), NV_DATA_S(xz_)+nx_, x);
     copy(NV_DATA_S(xz_)+nx_, NV_DATA_S(xz_)+nx_+nz_, zf()->begin());
 
     // Print statistics

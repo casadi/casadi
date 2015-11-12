@@ -1057,7 +1057,7 @@ namespace casadi {
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(IVPSOL_NUM_OUT);
-    dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(xf().size()));
+    dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(size_out(IVPSOL_XF)));
     dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(qf().size()));
     dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(zf().size()));
     dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
@@ -1158,7 +1158,7 @@ namespace casadi {
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(IVPSOL_NUM_OUT);
-    dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(xf().size()));
+    dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
     dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(qf().size()));
     dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(zf().size()));
     dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rxf().size()));
@@ -1174,7 +1174,7 @@ namespace casadi {
       // Differential states become backward differential state
       ss.clear();
       ss << "xf" << "_" << dir;
-      dd[IVPSOL_XF] = MX::sym(ss.str(), xf().sparsity());
+      dd[IVPSOL_XF] = MX::sym(ss.str(), x());
       rx0_augv.push_back(dd[IVPSOL_XF]);
 
       // Quadratures become backward parameters
@@ -1288,12 +1288,12 @@ namespace casadi {
     // Update time
     t_ = t;
 
-    // Get state
-    casadi_copy(x, nx_, xf().ptr());
-    casadi_copy(z, nz_, zf().ptr());
+    // Set the state
+    casadi_copy(x, nx_, output(IVPSOL_XF).ptr());
+    casadi_copy(z, nz_, output(IVPSOL_ZF).ptr());
 
     // Reset summation states
-    casadi_fill(qf().ptr(), nq_, 0.);
+    casadi_fill(output(IVPSOL_QF).ptr(), nq_, 0.);
   }
 
   void Ivpsol::resetB(Memory& m, double t, const double* rx,
