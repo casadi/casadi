@@ -61,21 +61,20 @@ namespace casadi {
     dynamic_cast<Ivpsol*>(integrator_.get())->
       reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
 
+    // Where to store outputs
+    double* x = res[IVPSOL_XF];
+    double* z = res[IVPSOL_ZF];
+    double* q = res[IVPSOL_QF];
+
     // Advance solution in time
     for (int k=0; k<grid_.size(); ++k) {
       // Integrate to the output time
-      dynamic_cast<Ivpsol*>(integrator_.get())->
-        advance(m, grid_[k],
-                integrator_.output(IVPSOL_XF).ptr(),
-                integrator_.output(IVPSOL_ZF).ptr(),
-                integrator_.output(IVPSOL_QF).ptr());
+      dynamic_cast<Ivpsol*>(integrator_.get())->advance(m, grid_[k], x, z, q);
 
-      // Save the outputs of the function
-      for (int i=0; i<n_out(); ++i) {
-        const Matrix<double> &res = integrator_.output(i);
-        if (res1[i]) copy(res->begin(), res->end(), res1[i]);
-        res1[i] += res.nnz();
-      }
+      // Go to the next output
+      if (x) x += dynamic_cast<Ivpsol*>(integrator_.get())->x().nnz();
+      if (z) z += dynamic_cast<Ivpsol*>(integrator_.get())->z().nnz();
+      if (q) q += dynamic_cast<Ivpsol*>(integrator_.get())->q().nnz();
     }
   }
 
