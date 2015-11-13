@@ -1282,16 +1282,6 @@ namespace casadi {
     // Setup discrete time dynamics
     setupFG();
 
-    // Allocate state
-    x_.resize(nx_);
-    z_.resize(nz_);
-    p_.resize(np_);
-    q_.resize(nq_);
-    rx_.resize(nrx_);
-    rz_.resize(nrz_);
-    rp_.resize(nrp_);
-    rq_.resize(nrq_);
-
     // Get discrete time dimensions
     Z_ = DM::zeros(F_.sparsity_in(DAE_Z));
     nZ_ = Z_.nnz();
@@ -1303,6 +1293,22 @@ namespace casadi {
       x_tape_.resize(nk_+1, vector<double>(nx_));
       Z_tape_.resize(nk_, vector<double>(nZ_));
     }
+
+    // Allocate state
+    x_.resize(nx_);
+    z_.resize(nz_);
+    p_.resize(np_);
+    q_.resize(nq_);
+    rx_.resize(nrx_);
+    rz_.resize(nrz_);
+    rp_.resize(nrp_);
+    rq_.resize(nrq_);
+    x_prev_.resize(nx_);
+    Z_prev_.resize(nZ_);
+    q_prev_.resize(nq_);
+    rx_prev_.resize(nrx_);
+    RZ_prev_.resize(nRZ_);
+    rq_prev_.resize(nrq_);
   }
 
   void FixedStepIvpsol::advance(Memory& m, double t, double* x, double* z, double* q) {
@@ -1314,17 +1320,29 @@ namespace casadi {
     // Explicit discrete time dynamics
     Function& F = getExplicit();
 
+    // Discrete dynamics function inputs ...
+    fill_n(arg_, F.n_in(), nullptr);
+    arg_[DAE_T] = &t_;
+    arg_[DAE_X] = getPtr(x_prev_);
+    arg_[DAE_Z] = getPtr(Z_prev_);
+    arg_[DAE_P] = getPtr(p_);
+
+    // ... and outputs
+    fill_n(res_, F.n_out(), nullptr);
+    res_[DAE_ODE] = getPtr(x_);
+    res_[DAE_ALG] = getPtr(Z_);
+    res_[DAE_QUAD] = getPtr(q_);
+
     // Take time steps until end time has been reached
     while (k_<k_out) {
+      // Update the previous step
+      casadi_copy(getPtr(x_), nx_, getPtr(x_prev_));
+      casadi_copy(getPtr(Z_), nZ_, getPtr(Z_prev_));
+      casadi_copy(getPtr(q_), nq_, getPtr(q_prev_));
+
       // Take step
-      F.input(DAE_T).setNZ(&t_);
-      F.input(DAE_X).setNZ(getPtr(x_));
-      F.input(DAE_Z).setNZ(getPtr(Z_));
-      F.input(DAE_P).setNZ(getPtr(p_));
-      F.evaluate();
-      F.output(DAE_ODE).getNZ(getPtr(x_));
-      F.output(DAE_ALG).getNZ(getPtr(Z_));
-      casadi_axpy(nq_, 1., F.output(DAE_QUAD).ptr(), getPtr(q_));
+      F(arg_, res_, iw_, w_, 0);
+      casadi_axpy(nq_, 1., getPtr(q_prev_), getPtr(q_));
 
       // Tape
       if (nrx_>0) {
@@ -1455,9 +1473,9 @@ namespace casadi {
     implicit_solver_options["implicit_output"] = DAE_ALG;
 
     // Allocate a solver
-    implicit_solver_ =
-      F_.nlsol(name_ + "_implicit_solver", implicit_function_name,
-                    implicit_solver_options);
+    implicit_solver_ = F_.nlsol(name_ + "_implicit_solver", implicit_function_name,
+                                implicit_solver_options);
+    alloc(implicit_solver_);
 
     // Allocate a root-finding solver for the backward problem
     if (nRZ_>0) {
@@ -1473,10 +1491,11 @@ namespace casadi {
       backward_implicit_solver_options["implicit_input"] = RDAE_RZ;
       backward_implicit_solver_options["implicit_output"] = RDAE_ALG;
 
-      // Allocate an NLP solver
+      // Allocate a Newton solver
       backward_implicit_solver_ =
         G_.nlsol(name_+ "_backward_implicit_solver", backward_implicit_function_name,
                       backward_implicit_solver_options);
+      alloc(backward_implicit_solver_);
     }
   }
 

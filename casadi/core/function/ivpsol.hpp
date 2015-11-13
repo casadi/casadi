@@ -371,6 +371,9 @@ namespace casadi {
     // Current state
     std::vector<double> x_, z_, p_, q_, rx_, rz_, rp_, rq_;
 
+    // Previous state
+    std::vector<double> x_prev_, Z_prev_, q_prev_, rx_prev_, RZ_prev_, rq_prev_;
+
     /// Algebraic variables for the discrete time integration
     DM Z_, RZ_;
 

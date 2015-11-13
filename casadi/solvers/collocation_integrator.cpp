@@ -188,6 +188,7 @@ namespace casadi {
     F_out[DAE_ALG] = vertcat(eq);
     F_out[DAE_QUAD] = qf;
     F_ = Function("dae", F_in, F_out);
+    alloc(F_);
 
     // Backwards dynamics
     // NOTE: The following is derived so that it will give the exact adjoint
@@ -272,6 +273,7 @@ namespace casadi {
       G_out[RDAE_ALG] = vertcat(eq);
       G_out[RDAE_QUAD] = rqf;
       G_ = Function("rdae", G_in, G_out);
+      alloc(G_);
     }
   }
 
