@@ -202,6 +202,7 @@ namespace casadi {
 
     /// Output the state at the initial time
     bool output_t0_;
+    int ntout_;
 
     // Creator function for internal class
     typedef Ivpsol* (*Creator)(const std::string& name, const XProblem& dae);

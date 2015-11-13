@@ -34,14 +34,18 @@ namespace casadi {
 
   Simulator::Simulator(const std::string& name, const std::string& solver,
                        const SXDict& dae, const Dict& opts) {
-    Function integrator = Function::ivpsol(name + "_integrator", solver, dae, opts);
+    Dict opts2 = opts;
+    opts2["output_t0"] = true;
+    Function integrator = Function::ivpsol(name + "_integrator", solver, dae, opts2);
     assignNode(new SimulatorInternal(name, integrator));
     init();
   }
 
   Simulator::Simulator(const std::string& name, const std::string& solver,
                        const MXDict& dae, const Dict& opts) {
-    Function integrator = Function::ivpsol(name + "_integrator", solver, dae, opts);
+    Dict opts2 = opts;
+    opts2["output_t0"] = true;
+    Function integrator = Function::ivpsol(name + "_integrator", solver, dae, opts2);
     assignNode(new SimulatorInternal(name, integrator));
     init();
   }

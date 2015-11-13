@@ -108,9 +108,9 @@ namespace casadi {
     case IVPSOL_X0: return x_;
     case IVPSOL_P: return p_;
     case IVPSOL_Z0: return z_;
-    case IVPSOL_RX0: return rx_;
-    case IVPSOL_RP: return rp_;
-    case IVPSOL_RZ0: return rz_;
+    case IVPSOL_RX0: return repmat(rx_, 1, ntout_);
+    case IVPSOL_RP: return repmat(rp_, 1, ntout_);
+    case IVPSOL_RZ0: return repmat(rz_, 1, ntout_);
     case IVPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -118,9 +118,9 @@ namespace casadi {
 
   Sparsity Ivpsol::get_sparsity_out(int ind) const {
     switch (static_cast<IvpsolOutput>(ind)) {
-    case IVPSOL_XF: return x_;
-    case IVPSOL_QF: return q_;
-    case IVPSOL_ZF: return z_;
+    case IVPSOL_XF: return repmat(x_, 1, ntout_);
+    case IVPSOL_QF: return repmat(q_, 1, ntout_);
+    case IVPSOL_ZF: return repmat(z_, 1, ntout_);
     case IVPSOL_RXF: return rx_;
     case IVPSOL_RQF: return rq_;
     case IVPSOL_RZF: return rz_;
@@ -153,6 +153,17 @@ namespace casadi {
   }
 
   void Ivpsol::init() {
+    // Read options
+    output_t0_ = option("output_t0");
+    print_stats_ = option("print_stats");
+    if (hasSetOption("grid")) {
+      grid_ = option("grid");
+    } else {
+      grid_ = vector<double>{option("t0"), option("tf")};
+    }
+    ngrid_ = grid_.size();
+    ntout_ = output_t0_ ? ngrid_ : ngrid_-1;
+
     // Call the base class method
     FunctionInternal::init();
 
@@ -199,16 +210,6 @@ namespace casadi {
     // Warn if sparse inputs (was previously an error)
     casadi_assert_warning(f_.sparsity_in(DAE_X).is_dense(),
                           "Sparse states in integrators are experimental");
-
-    // read options
-    if (hasSetOption("grid")) {
-      grid_ = option("grid");
-    } else {
-      grid_ = vector<double>{option("t0"), option("tf")};
-    }
-    ngrid_ = grid_.size();
-    print_stats_ = option("print_stats");
-    output_t0_ = option("output_t0");
 
     // Form a linear solver for the sparsity propagation
     linsol_f_ = Function::linsol("linsol_f", "none", spJacF(), 1);

@@ -57,7 +57,7 @@ namespace casadi {
       return integrator_.sparsity_in(ind);
     }
     virtual Sparsity get_sparsity_out(int ind) const {
-      return repmat(integrator_.sparsity_out(ind), 1, grid_.size());
+      return integrator_.sparsity_out(ind);
     }
     /// @}
 
