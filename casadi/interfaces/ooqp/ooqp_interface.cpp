@@ -122,8 +122,10 @@ namespace casadi {
       }
     }
 
-    // Check inputs for consistency
-    if (inputs_check_) checkInputs();
+    if (inputs_check_) {
+      checkInputs(input(QPSOL_LBX).ptr(), input(QPSOL_UBX).ptr(),
+                  input(QPSOL_LBA).ptr(), input(QPSOL_UBA).ptr());
+    }
 
     // Get problem data
     const vector<double>& lbx = input(QPSOL_LBX).data();

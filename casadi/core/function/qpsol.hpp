@@ -68,7 +68,8 @@ namespace casadi {
     virtual void init();
 
     /// \brief Check if the numerical values of the supplied bounds make sense
-    virtual void checkInputs() const;
+    virtual void checkInputs(const double* lbx, const double* ubx,
+                             const double* lba, const double* uba) const;
 
     /** Generate native code in the interfaced language for debugging */
     virtual void generateNativeCode(std::ostream& file) const;

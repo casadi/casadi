@@ -58,7 +58,10 @@ namespace casadi {
   }
 
   void SqicInterface::evaluate() {
-    if (inputs_check_) checkInputs();
+    if (inputs_check_) {
+      checkInputs(input(QPSOL_LBX).ptr(), input(QPSOL_UBX).ptr(),
+                  input(QPSOL_LBA).ptr(), input(QPSOL_UBA).ptr());
+    }
 
     std::copy(input(QPSOL_X0)->begin(), input(QPSOL_X0)->end(), x_.begin());
     std::fill(x_.begin()+n_, x_.end(), 0);

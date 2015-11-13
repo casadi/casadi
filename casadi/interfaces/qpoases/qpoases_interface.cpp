@@ -216,7 +216,10 @@ namespace casadi {
       casadi_copy(arg[i], nnz_in(i), input(i).ptr());
     }
 
-    if (inputs_check_) checkInputs();
+    if (inputs_check_) {
+      checkInputs(input(QPSOL_LBX).ptr(), input(QPSOL_UBX).ptr(),
+                  input(QPSOL_LBA).ptr(), input(QPSOL_UBA).ptr());
+    }
 
     if (verbose()) {
       userOut() << "LBX = " << input(QPSOL_LBX) << endl;
