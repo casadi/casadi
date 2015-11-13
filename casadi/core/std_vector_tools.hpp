@@ -273,7 +273,11 @@ namespace casadi {
   /// Checks if array does not contain NaN or Inf
   template<typename T>
   bool is_regular(const std::vector<T> &v) {
-    return std::all_of(v.begin(), v.end(), [](T v) { return std::isfinite(v);});
+    for (auto&& vk : v) {
+      if (vk!=vk || vk==std::numeric_limits<T>::infinity() ||
+          vk==-std::numeric_limits<T>::infinity()) return false;
+    }
+    return true;
   }
 
 } // namespace casadi
