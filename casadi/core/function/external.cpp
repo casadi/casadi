@@ -171,16 +171,6 @@ namespace casadi {
     li_.get(eval_, eval_s);
     casadi_assert_message(eval_!=0, "SimplifiedExternal: no \"" + eval_s + "\" found");
 
-    // All inputs are scalars
-    for (int i=0; i<this->n_in(); ++i) {
-      this->input(i) = 0;
-    }
-
-    // All outputs are scalars
-    for (int i=0; i<this->n_out(); ++i) {
-      this->output(i) = 0;
-    }
-
     // Arrays for holding inputs and outputs
     this->alloc_w(this->n_in() + this->n_out());
   }
@@ -227,16 +217,6 @@ namespace casadi {
     if (this->sparsity_==0) {
       // Fall back to scalar sparsity
       this->sparsity_ = scalarSparsity;
-    }
-
-    // Get input sparsities
-    for (int i=0; i<this->n_in(); ++i) {
-      this->input(i) = Matrix<double>::zeros(this->get_sparsity_in(i));
-    }
-
-    // Get output sparsities
-    for (int i=0; i<this->n_out(); ++i) {
-      this->output(i) = Matrix<double>::zeros(this->get_sparsity_out(i));
     }
   }
 

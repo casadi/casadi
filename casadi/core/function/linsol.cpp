@@ -51,15 +51,6 @@ namespace casadi {
     // Number of equations
     neq_ = sparsity.size2();
 
-    // Allocate inputs
-    ibuf_.resize(LINSOL_NUM_IN);
-    input(LINSOL_A) = DM::zeros(sparsity);
-    input(LINSOL_B) = DM::zeros(neq_, nrhs);
-
-    // Allocate outputs
-    obuf_.resize(LINSOL_NUM_OUT);
-    output(LINSOL_X) = input(LINSOL_B);
-
     ischeme_ = {"A", "B"};
     oscheme_ = {"X"};
   }
@@ -72,7 +63,7 @@ namespace casadi {
     case LINSOL_A:
       return sparsity_;
     case LINSOL_B:
-      return Sparsity::dense(sparsity_.size2(), nrhs_);
+      return Sparsity::dense(neq_, nrhs_);
     case LINSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -81,7 +72,7 @@ namespace casadi {
   Sparsity Linsol::get_sparsity_out(int ind) const {
     switch (static_cast<LinsolOutput>(ind)) {
     case LINSOL_X:
-      return sparsity_;
+      return Sparsity::dense(neq_, nrhs_);
     case LINSOL_NUM_OUT: break;
     }
     return Sparsity();
@@ -199,7 +190,7 @@ namespace casadi {
   linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
                bool tr, int nrhs) {
     // Sparsities
-    const Sparsity& A_sp = input(LINSOL_A).sparsity();
+    const Sparsity& A_sp = sparsity_in(LINSOL_A);
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
     int n = A_sp.size1();
@@ -236,7 +227,7 @@ namespace casadi {
   linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
                bool tr, int nrhs) {
     // Sparsities
-    const Sparsity& A_sp = input(LINSOL_A).sparsity();
+    const Sparsity& A_sp = sparsity_in(LINSOL_A);
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
     int n = A_sp.size1();
@@ -280,7 +271,7 @@ namespace casadi {
 
   void Linsol::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
 
-    const Sparsity& A_sp = input(LINSOL_A).sparsity();
+    const Sparsity& A_sp = sparsity_in(LINSOL_A);
     const int* A_colind = A_sp.colind();
     const int* A_row = A_sp.row();
     int nb = rowblock_.size()-1; // number of blocks

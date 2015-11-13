@@ -72,7 +72,7 @@ namespace casadi {
 
     /// Evaluate SX
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-      linsol_eval_sx(arg, res, iw, w, 0, false, output(LINSOL_X).size2());
+      linsol_eval_sx(arg, res, iw, w, 0, false, size2_out(LINSOL_X));
     }
 
     /** \brief Calculate forward mode directional derivatives */
@@ -103,11 +103,11 @@ namespace casadi {
     std::vector<int> rowperm_, colperm_, rowblock_, colblock_;
 
     /// Get sparsity pattern
-    int nrow() const { return input(LINSOL_A).size1();}
-    int ncol() const { return input(LINSOL_A).size2();}
-    int nnz() const { return input(LINSOL_A).nnz();}
-    const int* row() const { return input(LINSOL_A).row();}
-    const int* colind() const { return input(LINSOL_A).colind();}
+    int nrow() const { return size1_in(LINSOL_A);}
+    int ncol() const { return size2_in(LINSOL_A);}
+    int nnz() const { return nnz_in(LINSOL_A);}
+    const int* row() const { return sparsity_in(LINSOL_A).row();}
+    const int* colind() const { return sparsity_in(LINSOL_A).colind();}
 
     // Creator function for internal class
     typedef Linsol* (*Creator)(const std::string& name, const Sparsity& sp, int nrhs);

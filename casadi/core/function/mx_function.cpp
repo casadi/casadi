@@ -369,7 +369,7 @@ namespace casadi {
         // Get an output
         double *w1 = w+workloc_[it->arg.front()];
         int i=it->res.front();
-        if (res[i]!=0) copy(w1, w1+output(i).nnz(), res[i]);
+        if (res[i]!=0) copy(w1, w1+nnz_out(i), res[i]);
       } else {
         // Point pointers to the data corresponding to the element
         for (int i=0; i<it->arg.size(); ++i)
@@ -464,7 +464,7 @@ namespace casadi {
       } else if (it->op==OP_OUTPUT) {
         // Get the output sensitivities
         int i=it->res.front();
-        int nnz=output(i).nnz();
+        int nnz=nnz_out(i);
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[it->arg.front()];
         if (resi!=0) copy(w1, w1+nnz, resi);
@@ -502,7 +502,7 @@ namespace casadi {
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
         int i=it->res.front();
-        int nnz=output(i).nnz();
+        int nnz=nnz_out(i);
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[it->arg.front()];
         if (resi!=0) {
@@ -648,7 +648,7 @@ namespace casadi {
         for (int d=0; d<nfwd; ++d) {
           if (purgable(fseed[d])) {
             for (int i=0; i<fsens[d].size(); ++i) {
-              fsens[d][i] = MX(output(i).size());
+              fsens[d][i] = MX(size_out(i));
             }
           } else {
             fseed_purged.push_back(fsens[d]);
@@ -777,7 +777,7 @@ namespace casadi {
         for (int d=0; d<nadj; ++d) {
           if (purgable(aseed[d])) {
             for (int i=0; i<asens[d].size(); ++i) {
-              asens[d][i] = MX(input(i).size());
+              asens[d][i] = MX(size_in(i));
             }
           } else {
             aseed_purged.push_back(asens[d]);
@@ -827,7 +827,7 @@ namespace casadi {
       } else if (it->op==OP_OUTPUT) {
         // Pass the adjoint seeds
         for (int d=0; d<nadj; ++d) {
-          MX a = project(aseed[d][it->res.front()], output(it->res.front()).sparsity(), true);
+          MX a = project(aseed[d][it->res.front()], sparsity_out(it->res.front()), true);
           if (dwork[it->arg.front()][d].is_empty(true)) {
             dwork[it->arg.front()][d] = a;
           } else {
@@ -949,7 +949,7 @@ namespace casadi {
         SXElem *w1 = w+workloc_[it->arg.front()];
         int i=it->res.front();
         if (res[i]!=0)
-          std::copy(w1, w1+output(i).nnz(), res[i]);
+          std::copy(w1, w1+nnz_out(i), res[i]);
       } else if (it->op==OP_PARAMETER) {
         continue; // FIXME
       } else {
@@ -1081,7 +1081,7 @@ namespace casadi {
     // Codegen the algorithm
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (it->op==OP_OUTPUT) {
-        int n = output(it->res.front()).nnz();
+        int n = nnz_out(it->res.front());
         if (n!=0) {
           int oind = it->res.front();
           if (g.verbose) {

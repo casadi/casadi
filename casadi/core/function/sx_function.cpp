@@ -113,7 +113,7 @@ namespace casadi {
 
 
   SX SXFunction::hess(int iind, int oind) {
-    casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
+    casadi_assert_message(sparsity_out(oind).is_scalar(false), "Function must be scalar");
     SX g = densify(grad(iind, oind));
     if (verbose())  userOut() << "SXFunction::hess: calculating gradient done " << endl;
 
@@ -569,7 +569,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       casadi_assert(fseed[d].size()==num_in);
       for (int i=0; matching_sparsity && i<num_in; ++i)
-        matching_sparsity = fseed[d][i].sparsity()==input(i).sparsity();
+        matching_sparsity = fseed[d][i].sparsity()==sparsity_in(i);
     }
 
     // Correct sparsity if needed
@@ -577,8 +577,8 @@ namespace casadi {
       vector<vector<SX> > fseed2(fseed);
       for (int d=0; d<nfwd; ++d)
         for (int i=0; i<num_in; ++i)
-          if (fseed2[d][i].sparsity()!=input(i).sparsity())
-            fseed2[d][i] = project(fseed2[d][i], input(i).sparsity());
+          if (fseed2[d][i].sparsity()!=sparsity_in(i))
+            fseed2[d][i] = project(fseed2[d][i], sparsity_in(i));
       return evalFwd(fseed2, fsens);
     }
 
@@ -586,8 +586,8 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       fsens[d].resize(num_out);
       for (int i=0; i<fsens[d].size(); ++i)
-        if (fsens[d][i].sparsity()!=output(i).sparsity())
-          fsens[d][i] = SX::zeros(output(i).sparsity());
+        if (fsens[d][i].sparsity()!=sparsity_out(i))
+          fsens[d][i] = SX::zeros(sparsity_out(i));
     }
 
     // Iterator to the binary operations

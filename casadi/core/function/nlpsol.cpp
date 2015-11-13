@@ -112,7 +112,7 @@ namespace casadi {
     case NLPSOL_LAM_G0:
       return get_sparsity_out(NLPSOL_G);
     case NLPSOL_P:
-      return get_sparsity_out(NLPSOL_P);
+      return nlp_.sparsity_in(NL_P);
     case NLPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -129,58 +129,20 @@ namespace casadi {
     case NLPSOL_G:
       return nlp_.sparsity_out(NL_G);
     case NLPSOL_LAM_P:
-      return nlp_.sparsity_in(NL_P);
+      return get_sparsity_in(NLPSOL_P);
     case NLPSOL_NUM_OUT: break;
     }
     return Sparsity();
   }
 
   void Nlpsol::init() {
-    casadi_assert_message(nlp_.n_in()==NL_NUM_IN,
-                          "The NLP function must have exactly two input");
-    casadi_assert_message(nlp_.n_out()==NL_NUM_OUT,
-                          "The NLP function must have exactly two outputs");
-
-    // Sparsity patterns
-    const Sparsity& x_sparsity = nlp_.sparsity_in(NL_X);
-    const Sparsity& p_sparsity = nlp_.sparsity_in(NL_P);
-    const Sparsity& g_sparsity = nlp_.sparsity_out(NL_G);
+    // Call the initialization method of the base class
+    FunctionInternal::init();
 
     // Get dimensions
-    nx_ = x_sparsity.nnz();
-    np_ = p_sparsity.nnz();
-    ng_ = g_sparsity.nnz();
-
-    // Allocate space for inputs
-    ibuf_.resize(NLPSOL_NUM_IN);
-    input(NLPSOL_X0)       =  DM::zeros(x_sparsity);
-    input(NLPSOL_LBX)      = -DM::inf(x_sparsity);
-    input(NLPSOL_UBX)      =  DM::inf(x_sparsity);
-    input(NLPSOL_LBG)      = -DM::inf(g_sparsity);
-    input(NLPSOL_UBG)      =  DM::inf(g_sparsity);
-    input(NLPSOL_LAM_X0)   =  DM::zeros(x_sparsity);
-    input(NLPSOL_LAM_G0)   =  DM::zeros(g_sparsity);
-    input(NLPSOL_P)        =  DM::zeros(p_sparsity);
-
-    // Allocate space for outputs
-    obuf_.resize(NLPSOL_NUM_OUT);
-    output(NLPSOL_X)       = DM::zeros(x_sparsity);
-    output(NLPSOL_F)       = DM::zeros(1);
-    output(NLPSOL_LAM_X)   = DM::zeros(x_sparsity);
-    output(NLPSOL_LAM_G)   = DM::zeros(g_sparsity);
-    output(NLPSOL_LAM_P)   = DM::zeros(p_sparsity);
-    output(NLPSOL_G)       = DM::zeros(g_sparsity);
-
-    // Call the initialization method of the base class
-    const bool verbose_init = option("verbose_init");
-    if (verbose_init)
-      userOut() << "Initializing base class...";
-    Timer time0 = getTimerTime();
-    FunctionInternal::init();
-    DiffTime diff = diffTimers(getTimerTime(), time0);
-    stats_["base class init time"] = diffToDict(diff);
-    if (verbose_init)
-      userOut() << "Initialized base class in " << diff.user << " seconds.";
+    nx_ = nnz_out(NLPSOL_X);
+    np_ = nnz_in(NLPSOL_P);
+    ng_ = nnz_out(NLPSOL_G);
 
     // Find out if we are to expand the NLP in terms of scalar operations
     bool expand = option("expand");

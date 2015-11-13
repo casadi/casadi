@@ -212,6 +212,12 @@ namespace casadi {
 
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return true;}
+
+    /// @{
+    /** \brief Retreive sparsities */
+    sparsity_t sparsity_;
+    virtual Sparsity get_sparsity(int ind) const { return Sparsity::scalar();}
+    /// @}
   protected:
     /** \brief  Function pointers */
     simple_t eval_;
