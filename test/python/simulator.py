@@ -85,9 +85,9 @@ class Simulatortests(casadiTestCase):
     opts['abstol'] = 1e-15
     opts['fsens_err_con'] = True
     #opts['verbose'] = True
-    opts['t0'] = 0
     opts['grid'] = tc
-    integrator = Simulator('integrator', 'cvodes', f, opts)
+    opts['output_t0'] = True
+    integrator = Function.ivpsol('integrator', 'cvodes', f, opts)
 
     solution = Function('solution', {'x0':q, 'p':p, 'xf':horzcat([q*exp(t**3/(3*p)) for t in tc])},
                         Function.ivpsol_in(), Function.ivpsol_out())
@@ -104,12 +104,12 @@ class Simulatortests(casadiTestCase):
     t = n.linspace(0.7,num['tend'],100)
 
     opts = {}
-    opts['t0'] = 0.7
     opts['reltol'] = 1e-15
     opts['abstol'] = 1e-15
     opts['fsens_err_con'] = True
     opts['grid'] = t
-    integrator = Simulator('integrator', 'cvodes', self.dae, opts)
+    opts['output_t0'] = True
+    integrator = Function.ivpsol('integrator', 'cvodes', self.dae, opts)
 
     integrator.setInput([num['q0']],0)
     integrator.setInput([num['p']],1)

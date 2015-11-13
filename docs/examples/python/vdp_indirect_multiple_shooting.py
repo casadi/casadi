@@ -138,7 +138,7 @@ V_sol, = solver([0])
 tgrid = NP.linspace(0,tf,100)
 
 # Simulator to get optimal state and control trajectories
-simulator = Simulator('simulator', 'cvodes', dae, {'grid':tgrid})
+simulator = Function.ivpsol('simulator', 'cvodes', dae, {'grid':tgrid,'output_t0':True})
 
 # Simulate to get the trajectories
 sol = simulator({"x0" : V_sol[0:4]})["xf"]

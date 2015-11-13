@@ -73,7 +73,7 @@ ivp.makeExplicit()
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': vertcat(ivp.ode)}
 grid = NP.linspace(0,1,100)
-integrator = Simulator('integrator', 'cvodes', dae, {'grid':grid})
+integrator = Function.ivpsol('integrator', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
 x0 = ivp.start(vertcat(ivp.x))
@@ -114,7 +114,7 @@ ivp.makeExplicit()
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': vertcat(ivp.ode)}
 grid = NP.linspace(0,10,100)
-integrator = Simulator('integrator', 'cvodes', dae, {'grid':grid})
+integrator = Function.ivpsol('integrator', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
 x0 = ivp.start(vertcat(ivp.x))
@@ -148,7 +148,7 @@ ivp.makeExplicit()
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': densify(vertcat(ivp.ode))}
 grid = NP.linspace(0,2,100)
-integrator = Simulator('integrator', 'cvodes', dae, {'grid':grid})
+integrator = Function.ivpsol('integrator', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
 x0 = ivp.start(vertcat(ivp.x))

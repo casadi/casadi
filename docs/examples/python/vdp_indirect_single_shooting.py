@@ -126,7 +126,7 @@ l_init_opt = NP.array(l_init_opt.nonzeros())
 tgrid = NP.linspace(0, 10, 100)
 
 # Simulator to get optimal state and control trajectories
-simulator = Simulator('simulator', 'cvodes', dae, {'grid':tgrid})
+simulator = Function.ivpsol('simulator', 'cvodes', dae, {'grid':tgrid, 'output_t0':True})
 
 # Simulate to get the state trajectory
 sol = simulator({'x0' : NP.concatenate((x_init, l_init_opt))})['xf']

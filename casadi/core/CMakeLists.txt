@@ -83,7 +83,10 @@ set(CASADI_SRCS
 
   # A dynamically created function with AD capabilities
   function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
-  function/function.hpp            function/function.cpp            function/function_internal.hpp            function/function_internal.cpp
+  function/function.hpp            function/function.cpp            # Function object class (public API)
+  function/function_internal.hpp   function/function_internal.cpp   # Function object class (internal API)
+  function/callback.cpp            function/callback.hpp            # Interface for user-defined function classes (public API)
+  function/callback_internal.cpp function/callback_internal.hpp     # Interface for user-defined function classes (internal API)
   function/plugin_interface.hpp                                     # Plugin interface for Function
   function/x_function.hpp                                           # Base class for SXFunction and MXFunction
   function/sx_function.hpp         function/sx_function.cpp
@@ -93,15 +96,13 @@ set(CASADI_SRCS
   function/nlsol.hpp               function/nlsol.cpp
   function/ivpsol.hpp              function/ivpsol.cpp
   function/nlpsol.hpp              function/nlpsol.cpp
-  function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
   function/qpsol.hpp               function/qpsol.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/switch.hpp              function/switch.cpp
   function/map.hpp                 function/map.cpp
   function/mapaccum.hpp            function/mapaccum.cpp
-  function/compiler.hpp            function/compiler.cpp            function/compiler_internal.hpp function/compiler_internal.cpp
   function/kernel_sum.hpp          function/kernel_sum.cpp
-  function/callback.cpp            function/callback.hpp            function/callback_internal.cpp function/callback_internal.hpp
+  function/compiler.hpp            function/compiler.cpp            function/compiler_internal.hpp function/compiler_internal.cpp
 
   # MISC useful stuff
   misc/integration_tools.hpp       misc/integration_tools.cpp
