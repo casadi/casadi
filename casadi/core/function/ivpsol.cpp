@@ -1370,24 +1370,36 @@ namespace casadi {
     // Explicit discrete time dynamics
     Function& G = getExplicitB();
 
+    // Discrete dynamics function inputs ...
+    fill_n(arg_, G.n_in(), nullptr);
+    arg_[RDAE_T] = &t_;
+    arg_[RDAE_P] = getPtr(p_);
+    arg_[RDAE_RX] = getPtr(rx_prev_);
+    arg_[RDAE_RZ] = getPtr(RZ_prev_);
+    arg_[RDAE_RP] = getPtr(rp_);
+
+    // ... and outputs
+    fill_n(res_, G.n_out(), nullptr);
+    res_[RDAE_ODE] = getPtr(rx_);
+    res_[RDAE_ALG] = getPtr(RZ_);
+    res_[RDAE_QUAD] = getPtr(rq_);
+
     // Take time steps until end time has been reached
     while (k_>k_out) {
       // Advance time
       k_--;
       t_ = grid_.front() + k_*h_;
 
+      // Update the previous step
+      casadi_copy(getPtr(rx_), nrx_, getPtr(rx_prev_));
+      casadi_copy(getPtr(RZ_), nRZ_, getPtr(RZ_prev_));
+      casadi_copy(getPtr(rq_), nrq_, getPtr(rq_prev_));
+
       // Take step
-      G.input(RDAE_T).setNZ(&t_);
-      G.input(RDAE_X).setNZ(x_tape_.at(k_));
-      G.input(RDAE_Z).setNZ(Z_tape_.at(k_));
-      G.input(RDAE_P).setNZ(getPtr(p_));
-      G.input(RDAE_RX).setNZ(getPtr(rx_));
-      G.input(RDAE_RZ).setNZ(getPtr(RZ_));
-      G.input(RDAE_RP).setNZ(getPtr(rp_));
-      G.evaluate();
-      G.output(RDAE_ODE).getNZ(getPtr(rx_));
-      G.output(RDAE_ALG).getNZ(getPtr(RZ_));
-      casadi_axpy(nrq_, 1., G.output(RDAE_QUAD).ptr(), getPtr(rq_));
+      arg_[RDAE_X] = getPtr(x_tape_.at(k_));
+      arg_[RDAE_Z] = getPtr(Z_tape_.at(k_));
+      G(arg_, res_, iw_, w_, 0);
+      casadi_axpy(nrq_, 1., getPtr(rq_prev_), getPtr(rq_));
     }
 
     // Return to user TODO(@jaeandersson): interpolate
