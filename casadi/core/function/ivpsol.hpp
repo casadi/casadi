@@ -153,17 +153,20 @@ namespace casadi {
     int *iw_;
     double *w_;
 
+    // Sparities
+    Sparsity t_, x_, z_, p_, q_, rx_, rz_, rp_, rq_;
+
     ///@{
     // Shorthands
-    const Sparsity&  t() { return f_->sparsity_in(DAE_T);}
-    const Sparsity&  x() { return sparsity_out(IVPSOL_XF);}
-    const Sparsity&  z() { return sparsity_out(IVPSOL_ZF);}
-    const Sparsity&  p() { return sparsity_in(IVPSOL_P);}
-    const Sparsity&  q() { return sparsity_out(IVPSOL_QF);}
-    const Sparsity& rx() { return sparsity_in(IVPSOL_RX0);}
-    const Sparsity& rz() { return sparsity_in(IVPSOL_RZ0);}
-    const Sparsity& rp() { return sparsity_in(IVPSOL_RP);}
-    const Sparsity& rq() { return sparsity_out(IVPSOL_RQF);}
+    const Sparsity&  t() { return t_;}
+    const Sparsity&  x() { return x_;}
+    const Sparsity&  z() { return z_;}
+    const Sparsity&  p() { return p_;}
+    const Sparsity&  q() { return q_;}
+    const Sparsity& rx() { return rx_;}
+    const Sparsity& rz() { return rz_;}
+    const Sparsity& rp() { return rp_;}
+    const Sparsity& rq() { return rq_;}
     ///@}
 
     /// Number of states for the forward integration

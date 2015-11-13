@@ -52,6 +52,19 @@ namespace casadi {
     // Negative number of parameters for consistancy checking
     np_ = -1;
 
+    // Get the sparsities
+    t_ = f_.sparsity_in(DAE_T);
+    x_ = f_.sparsity_in(DAE_X);
+    z_ = f_.sparsity_in(DAE_Z);
+    p_ = f_.sparsity_in(DAE_P);
+    q_ = f_.sparsity_out(DAE_QUAD);
+    if (!g_.isNull()) {
+      rx_ = g_.sparsity_in(RDAE_RX);
+      rz_ = g_.sparsity_in(RDAE_RZ);
+      rp_ = g_.sparsity_in(RDAE_RP);
+      rq_ = g_.sparsity_out(RDAE_QUAD);
+    }
+
     ischeme_ = Function::ivpsol_in();
     oscheme_ = Function::ivpsol_out();
   }
@@ -92,18 +105,12 @@ namespace casadi {
 
   Sparsity Ivpsol::get_sparsity_in(int ind) const {
     switch (static_cast<IvpsolInput>(ind)) {
-    case IVPSOL_X0:
-      return f_.sparsity_in(DAE_X);
-    case IVPSOL_P:
-      return f_.sparsity_in(DAE_P);
-    case IVPSOL_Z0:
-      return f_.sparsity_in(DAE_Z);
-    case IVPSOL_RX0:
-      return g_.isNull() ? Sparsity() : g_.sparsity_in(RDAE_RX);
-    case IVPSOL_RP:
-      return g_.isNull() ? Sparsity() : g_.sparsity_in(RDAE_RP);
-    case IVPSOL_RZ0:
-      return g_.isNull() ? Sparsity() : g_.sparsity_in(RDAE_RZ);
+    case IVPSOL_X0: return x_;
+    case IVPSOL_P: return p_;
+    case IVPSOL_Z0: return z_;
+    case IVPSOL_RX0: return rx_;
+    case IVPSOL_RP: return rp_;
+    case IVPSOL_RZ0: return rz_;
     case IVPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -111,18 +118,12 @@ namespace casadi {
 
   Sparsity Ivpsol::get_sparsity_out(int ind) const {
     switch (static_cast<IvpsolOutput>(ind)) {
-    case IVPSOL_XF:
-      return get_sparsity_in(IVPSOL_X0);
-    case IVPSOL_QF:
-      return f_.sparsity_out(DAE_QUAD);
-    case IVPSOL_ZF:
-      return get_sparsity_in(IVPSOL_ZF);
-    case IVPSOL_RXF:
-      return get_sparsity_in(IVPSOL_RX0);
-    case IVPSOL_RQF:
-      return g_.isNull() ? Sparsity() : g_.sparsity_out(RDAE_QUAD);
-    case IVPSOL_RZF:
-      return get_sparsity_in(IVPSOL_RZ0);
+    case IVPSOL_XF: return x_;
+    case IVPSOL_QF: return q_;
+    case IVPSOL_ZF: return z_;
+    case IVPSOL_RXF: return rx_;
+    case IVPSOL_RQF: return rq_;
+    case IVPSOL_RZF: return rz_;
     case IVPSOL_NUM_OUT: break;
     }
     return Sparsity();
@@ -152,7 +153,6 @@ namespace casadi {
   }
 
   void Ivpsol::init() {
-
     // Call the base class method
     FunctionInternal::init();
 
