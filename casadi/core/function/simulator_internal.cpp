@@ -45,37 +45,11 @@ namespace casadi {
 
     // Call base class method
     FunctionInternal::init();
-
     alloc(integrator_);
   }
 
   void SimulatorInternal::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    // Arguments when calling the integrator
-    double** res1 = res+n_out();
-    copy_n(res, n_out(), res1);
-
-    // Integrator memory block
-    Memory m(integrator_, arg, res1, iw, w, 0);
-
-    // Reset the integrator_
-    dynamic_cast<Ivpsol*>(integrator_.get())->
-      reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
-
-    // Where to store outputs
-    double* x = res[IVPSOL_XF];
-    double* z = res[IVPSOL_ZF];
-    double* q = res[IVPSOL_QF];
-
-    // Advance solution in time
-    for (int k=0; k<grid_.size(); ++k) {
-      // Integrate to the output time
-      dynamic_cast<Ivpsol*>(integrator_.get())->advance(m, grid_[k], x, z, q);
-
-      // Go to the next output
-      if (x) x += dynamic_cast<Ivpsol*>(integrator_.get())->x().nnz();
-      if (z) z += dynamic_cast<Ivpsol*>(integrator_.get())->z().nnz();
-      if (q) q += dynamic_cast<Ivpsol*>(integrator_.get())->q().nnz();
-    }
+    integrator_(arg, res, iw, w, mem);
   }
 
 } // namespace casadi

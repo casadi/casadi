@@ -136,8 +136,22 @@ namespace casadi {
     // Reset solver, take time to t0
     reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
 
+    // Where to store outputs
+    double* x = res[IVPSOL_XF];
+    double* z = res[IVPSOL_ZF];
+    double* q = res[IVPSOL_QF];
+
     // Integrate forward
-    advance(m, grid_.back(), res[IVPSOL_XF], res[IVPSOL_ZF], res[IVPSOL_QF]);
+    for (int k=0; k<grid_.size(); ++k) {
+      // Skip t0?
+      if (k==0 && !output_t0_) continue;
+
+      // Integrate forward
+      advance(m, grid_[k], x, z, q);
+      if (x) x += x_.nnz();
+      if (z) z += z_.nnz();
+      if (q) q += q_.nnz();
+    }
 
     // If backwards integration is needed
     if (nrx_>0) {
