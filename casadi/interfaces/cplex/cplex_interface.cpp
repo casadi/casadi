@@ -157,7 +157,7 @@ namespace casadi {
     rstat_.resize(nc_);
 
     // Matrix A, count the number of elements per column
-    const Sparsity& A_sp = input(QPSOL_A).sparsity();
+    const Sparsity& A_sp = sparsity_in(QPSOL_A);
     matcnt_.resize(A_sp.size2());
     transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), matcnt_.begin(),
               minus<int>());
@@ -178,12 +178,8 @@ namespace casadi {
     int num_out = n_out();
 
     // Pass the inputs to the function
-    for (int i=0; i<num_in; ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
-      } else {
-        setInput(0., i);
-      }
+    for (int i=0; i<n_in(); ++i) {
+      casadi_copy(arg[i], nnz_in(i), input(i).ptr());
     }
 
     if (inputs_check_) {
