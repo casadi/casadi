@@ -329,8 +329,8 @@ namespace casadi {
     }
 
     // Get the outputs
-    for (int i=0; i<num_out; ++i) {
-      if (res[i] != 0) getOutputNZ(res[i], i);
+    for (int i=0; i<n_out(); ++i) {
+      casadi_copy(output(i).ptr(), nnz_out(i), res[i]);
     }
   }
 
