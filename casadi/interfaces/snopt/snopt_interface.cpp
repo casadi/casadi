@@ -503,11 +503,7 @@ namespace casadi {
       case NLPSOL_LAM_G0: v = lam_g0_; break;
       default: casadi_assert(0);
       }
-      if (v) {
-        setInputNZ(v, i);
-      } else {
-        setInput(0., i);
-      }
+      casadi_copy(v, nnz_in(i), input(i).ptr());
     }
 
     // Check the provided inputs
@@ -765,7 +761,7 @@ namespace casadi {
       case NLPSOL_LAM_P: v = &lam_p_; break;
       default: casadi_assert(0);
       }
-      if (*v) getOutputNZ(*v, i);
+      casadi_copy(output(i).ptr(), nnz_out(i), *v);
     }
   }
 
