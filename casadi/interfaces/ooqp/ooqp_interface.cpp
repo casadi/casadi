@@ -115,11 +115,7 @@ namespace casadi {
   void OoqpInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Pass the inputs to the function
     for (int i=0; i<n_in(); ++i) {
-      if (arg[i] != 0) {
-        setInputNZ(arg[i], i);
-      } else {
-        setInput(0., i);
-      }
+      casadi_copy(arg[i], nnz_in(i), input(i).ptr());
     }
 
     if (inputs_check_) {
@@ -442,8 +438,9 @@ namespace casadi {
     }
 
     // Get the outputs
+    // Get the outputs
     for (int i=0; i<n_out(); ++i) {
-      if (res[i] != 0) getOutputNZ(res[i], i);
+      casadi_copy(output(i).ptr(), nnz_out(i), res[i]);
     }
   }
 
@@ -478,4 +475,3 @@ namespace casadi {
 
 
 } // namespace casadi
-
