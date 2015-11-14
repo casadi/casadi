@@ -1394,12 +1394,6 @@ namespace casadi {
     res_[0] = w_ + jac_.sz_w();
     jac_(arg_, res_, iw_, w_, 0);
 
-    // Get sparsity and non-zero elements
-    const int* colind = jac_.sparsity_out(0).colind();
-    int ncol = jac_.size2_out(0);
-    const int* row = jac_.sparsity_out(0).row();
-    double *val = res_[0];
-
     // Log time duration
     time2 = clock();
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
@@ -1408,7 +1402,7 @@ namespace casadi {
     fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
     linsol_mem_ = Memory(linsol_, arg_, res_, iw_, w_, 0);
-    linsol_.linsol_factorize(linsol_mem_, val);
+    linsol_.linsol_factorize(linsol_mem_, res_[0]);
 
     // Log time duration
     time1 = clock();
