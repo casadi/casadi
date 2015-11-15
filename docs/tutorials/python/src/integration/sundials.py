@@ -98,12 +98,11 @@ opts["quad_err_con"] = True
 opts["abstol"] = 1e-6
 opts["reltol"] = 1e-6
 opts["grid"] = ts
-sim = Simulator("sim", "cvodes", dae, opts)
-sim.setInput([x0,y0],"x0")
-sim.setInput(0,"p")
-sim.evaluate()
+opts["output_t0"] = True
+sim = Function.ivpsol("sim", "cvodes", dae, opts)
+sol = sim({"x0":[x0,y0], "p":0})
 
-sol = sim.getOutput().full().T
+sol = sol['xf'].full().T
 
 #! Plot the trajectory
 figure()
@@ -124,13 +123,10 @@ def out(dx0):
 	integrator.evaluate()
 	return integrator.getOutput().full()
 dx0=numpy.linspace(-2,2,100)
-
 out = array([out(dx) for dx in dx0]).squeeze()
-	
 dxtend=out[:,0]-sol[-1,0]
-
 figure()
-plot(dx0,dxtend)
+plot(dx0, dxtend)
 grid()
 title('Initial perturbation map')
 xlabel('dx(0)')
@@ -144,6 +140,8 @@ dintegrator.setInput([x0,y0],"der_x0")
 dintegrator.setInput([1,0],"fwd0_x0")
 dintegrator.evaluate()
 A = dintegrator.getOutput("fwd0_xf")[0]
+A = float(A) # FIXME
+
 plot(dx0,A*dx0)
 legend(('True sensitivity','Linearised sensitivity'))
 plot(0,0,'o')
