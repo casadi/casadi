@@ -77,7 +77,6 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>base class init time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>con_integer_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_numeric_md</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_string_md</td><td>casadi::IpoptInterface</td></tr>
@@ -150,7 +149,6 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>base class init time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>constraint jacobian gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad lag gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess lag gen time</td><td>casadi::Nlpsol</td></tr>
@@ -199,7 +197,6 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>base class init time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>constraint jacobian gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad lag gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess lag gen time</td><td>casadi::Nlpsol</td></tr>
@@ -236,7 +233,6 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>base class init time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>constraint jacobian gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad lag gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess lag gen time</td><td>casadi::Nlpsol</td></tr>
@@ -263,7 +259,6 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>base class init time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>constraint jacobian gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad lag gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess lag gen time</td><td>casadi::Nlpsol</td></tr>
@@ -308,7 +303,6 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>base class init time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>constraint jacobian gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad lag gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess lag gen time</td><td>casadi::Nlpsol</td></tr>
@@ -367,7 +361,6 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>base class init time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>constraint jacobian gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad lag gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess lag gen time</td><td>casadi::Nlpsol</td></tr>
