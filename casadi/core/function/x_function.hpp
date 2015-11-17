@@ -29,15 +29,9 @@
 #include <stack>
 #include "function_internal.hpp"
 
-// To reuse variables we need to be able to sort by sparsity pattern (preferably using a hash map)
-#ifdef USE_CXX11
+// To reuse variables we need to be able to sort by sparsity pattern
 #include <unordered_map>
 #define SPARSITY_MAP std::unordered_map
-#else // USE_CXX11
-// Falling back to std::map (binary search tree)
-#include <map>
-#define SPARSITY_MAP std::map
-#endif // USE_CXX11
 
 /// \cond INTERNAL
 

@@ -31,16 +31,9 @@
 
 /// \cond INTERNAL
 
-// Cashing of constants requires a map (preferably a hash map)
-#ifdef USE_CXX11
-// Using C++11 unordered_map (hash map)
+// Cashing of constants requires a map
 #include <unordered_map>
 #define CACHING_MAP std::unordered_map
-#else // USE_CXX11
-// Falling back to std::map (binary search tree)
-#include <map>
-#define CACHING_MAP std::map
-#endif // USE_CXX11
 
 namespace casadi {
 

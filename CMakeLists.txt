@@ -223,9 +223,8 @@ if(USE_CXX11)
   endif()
   add_definitions(-DUSE_CXX11)
 else()
-  message(STATUS "Cannot enable C++11 features.")
+  message(FATAL_ERROR "Cannot enable C++11 features.")
 endif()
-add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficiency and is required for some examples).")
 
 if(CXX11FLAG)
   try_compile(HAS_COPYSIGN
