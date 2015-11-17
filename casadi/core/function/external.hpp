@@ -118,6 +118,9 @@ namespace casadi {
     /** \brief Constructor */
     External(const std::string& name);
 
+    /** \brief Get type name */
+    virtual std::string type_name() const { return "external";}
+
     /** \brief Destructor */
     virtual ~External() = 0;
 

@@ -154,8 +154,6 @@ namespace casadi {
     // Function for freeing memory, if any
     li_.get(freemem_, name + "_free");
 
-    ibuf_.resize(n_in_);
-    obuf_.resize(n_out_);
     alloc_arg(sz_arg);
     alloc_res(sz_res);
     alloc_iw(sz_iw);
@@ -180,7 +178,7 @@ namespace casadi {
   }
 
   Sparsity External::get_sparsity_out(int ind) const {
-    return get_sparsity(ind+n_in());
+    return get_sparsity(ind+get_n_in());
   }
 
   template<typename LibType>
