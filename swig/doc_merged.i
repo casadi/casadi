@@ -9554,6 +9554,25 @@ multiplication: z <- z + x*y.
 
 ";
 
+%feature("docstring") casadi::external "
+
+>  Function external(str name, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Load an external function File name is assumed to be ./<f_name>.so.
+
+>  Function external(str name, str bin_name, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Load an external function File name given.
+
+>  Function external(str name, Compiler compiler, Dict opts=Dict())
+------------------------------------------------------------------------
+
+Load a just-in-time compiled external function File name given.
+
+";
+
 %feature("docstring") casadi::casadi_nrm2 "[INTERNAL]  NRM2: ||x||_2 ->
 return.
 

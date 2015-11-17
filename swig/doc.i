@@ -12133,6 +12133,27 @@ multiplication: z <- z + x*y.
 
 ";
 
+%feature("docstring")  casadi::external(const std::string &name, const Dict
+&opts=Dict()) "
+
+Load an external function File name is assumed to be ./<f_name>.so.
+
+";
+
+%feature("docstring")  casadi::external(const std::string &name, const
+std::string &bin_name, const Dict &opts=Dict()) "
+
+Load an external function File name given.
+
+";
+
+%feature("docstring")  casadi::external(const std::string &name, const
+Compiler &compiler, const Dict &opts=Dict()) "
+
+Load a just-in-time compiled external function File name given.
+
+";
+
 %feature("docstring")  casadi::casadi_nrm2(int n, const real_t *x, int
 inc_x) " [INTERNAL]  NRM2: ||x||_2 -> return.
 
