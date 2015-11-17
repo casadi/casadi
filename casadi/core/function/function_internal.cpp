@@ -1867,23 +1867,8 @@ namespace casadi {
     int n_out = this->n_out();
     stringstream &s = g.body;
 
-    // Function that returns type and number of processes
-    string tmp = "int " + fname + "_info(int *f_type, int *n_proc)";
-    if (g.cpp) {
-      tmp = "extern \"C\" " + tmp;  // C linkage
-    }
-    if (g.with_header) {
-      g.header << tmp << ";" << endl;
-    }
-    s << tmp << " {" << endl
-      << "  if (f_type) *f_type = 1;" << endl
-      << "  if (n_proc) *n_proc = 1;" << endl
-      << "  return 0;" << endl
-      << "}" << endl
-      << endl;
-
     // Function that returns the number of inputs and outputs
-    tmp = "int " + fname + "_init(void **mem, int *n_in, int *n_out, void *data)";
+    string tmp = "int " + fname + "_init(void **mem, int *n_in, int *n_out, void *data)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
