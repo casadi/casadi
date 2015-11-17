@@ -534,10 +534,10 @@ namespace casadi {
       }
 
       // Load the generated code
-      res_fcn_ = Function::external("res_fcn", compiler_);
-      mat_fcn_ = Function::external("mat_fcn", compiler_);
-      vec_fcn_ = Function::external("vec_fcn", compiler_);
-      exp_fcn_ = Function::external("exp_fcn", compiler_);
+      res_fcn_ = external("res_fcn", compiler_);
+      mat_fcn_ = external("mat_fcn", compiler_);
+      vec_fcn_ = external("vec_fcn", compiler_);
+      exp_fcn_ = external("exp_fcn", compiler_);
     } else {
       mat_fcn_ = mat_fcn;
       res_fcn_ = res_fcn;

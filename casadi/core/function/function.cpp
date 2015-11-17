@@ -1122,7 +1122,7 @@ namespace casadi {
     (*this)->finalize();
   }
 
-  Function Function::external(const string& name, const Dict& opts) {
+  Function external(const string& name, const Dict& opts) {
     Function ret;
     ret.assignNode(External::create("./" + name + ".so", name));
     ret.setOption(opts);
@@ -1130,7 +1130,7 @@ namespace casadi {
     return ret;
   }
 
-  Function Function::external(const string& name, const string& bin_name,
+  Function external(const string& name, const string& bin_name,
                               const Dict& opts) {
     Function ret;
     ret.assignNode(External::create(bin_name, name));
@@ -1139,7 +1139,7 @@ namespace casadi {
     return ret;
   }
 
-  Function Function::external(const string& name, const Compiler& compiler,
+  Function external(const string& name, const Compiler& compiler,
                               const Dict& opts) {
     Function ret;
     ret.assignNode(External::create(compiler, name));

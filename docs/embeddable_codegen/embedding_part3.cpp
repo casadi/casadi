@@ -36,10 +36,10 @@ using namespace std;
 int main(){
     
   // Load the generated functions
-  Function nlp = Function::external("nlp", "./nlp.casadi");
-  Function grad_f = Function::external("grad_f", "./grad_f.casadi");
-  Function jac_g = Function::external("jac_g", "./jac_g.casadi");
-  Function hess_lag = Function::external("hess_lag", "./hess_lag.casadi");
+  Function nlp = external("nlp", "./nlp.casadi");
+  Function grad_f = external("grad_f", "./grad_f.casadi");
+  Function jac_g = external("jac_g", "./jac_g.casadi");
+  Function hess_lag = external("hess_lag", "./hess_lag.casadi");
 
   // Create an NLP solver passing derivative information
   Dict opts = {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}};

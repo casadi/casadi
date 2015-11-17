@@ -2167,7 +2167,7 @@ namespace casadi {
     string dlname = g.compile(fname, compiler);
 
     // Load it
-    return Function::external(fname, dlname);
+    return external(fname, dlname);
   }
 
   void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {

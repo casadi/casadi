@@ -55,7 +55,7 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   casadi_assert_message(flag==0, "Compilation failed");
 
   // Load the generated function for evaluation
-  return Function::external(name);
+  return external(name);
 }
 
 int main(){

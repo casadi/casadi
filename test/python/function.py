@@ -714,7 +714,7 @@ class Functiontests(casadiTestCase):
 
         import subprocess
         p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name),shell=True).wait()
-        Fcgen = Function.external(name)
+        Fcgen = external(name)
         for i,e in enumerate(X_+Y_+Z_+V_):
           Fcgen.setInput(e,i)
           Fref.setInput(e,i)
@@ -777,7 +777,7 @@ class Functiontests(casadiTestCase):
 
         import subprocess
         p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
-        Fcgen = Function.external(name)
+        Fcgen = external(name)
         for i,e in enumerate([horzcat(X_),horzcat(Y_),Z_,V_]):
           Fcgen.setInput(e,i)
           Fref.setInput(e,i)
@@ -960,21 +960,21 @@ class Functiontests(casadiTestCase):
   # @requiresPlugin(Compiler,"clang")
   # def test_clang_c(self):
   #   compiler = Compiler('../data/helloworld.c', 'clang')
-  #   f = Function.external("helloworld_c", compiler)
+  #   f = external("helloworld_c", compiler)
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
 
   # @requiresPlugin(Compiler,"clang")
   # def test_clang_cxx(self):
   #   compiler = Compiler('../data/helloworld.cxx', 'clang')
-  #   f = Function.external("helloworld_cxx", compiler)
+  #   f = external("helloworld_cxx", compiler)
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
 
   # @requiresPlugin(Compiler,"shell")
   # def test_shell_c(self):
   #   compiler = Compiler('../data/helloworld.c', 'shell')
-  #   f = Function.external("helloworld_c", compiler)
+  #   f = external("helloworld_c", compiler)
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
 
@@ -982,7 +982,7 @@ class Functiontests(casadiTestCase):
   # def test_shell_cxx(self):
   #   opts = {'compiler':'g++'}
   #   compiler = Compiler('../data/helloworld.cxx', 'shell', opts)
-  #   f = Function.external("helloworld_cxx", compiler)
+  #   f = external("helloworld_cxx", compiler)
   #   [v] = f([])
   #   self.checkarray(2.37683, v, digits=4)
     
