@@ -1194,9 +1194,10 @@ namespace casadi {
     arg_[DAE_NUM_IN] = &d1;
     arg_[DAE_NUM_IN+1] = &d2;
     fill_n(res_, jac_.n_out(), static_cast<double*>(0));
-    res_[0] = w_ + jac_.sz_w();
-    jac_(arg_, res_, iw_, w_, 0);
-    double *val = res_[0];
+    double *val = w_;
+    double *w2 = w_ + jac_.nnz_out(0);
+    res_[0] = val;
+    jac_(arg_, res_, iw_, w2, 0);
 
     // Log time duration
     time2 = clock();
@@ -1205,7 +1206,7 @@ namespace casadi {
     // Prepare the solution of the linear system (e.g. factorize)
     fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsol_mem_ = Memory(linsol_, arg_, res_, iw_, w_, 0);
+    linsol_mem_ = Memory(linsol_, arg_, res_, iw_, w2, 0);
     linsol_.linsol_factorize(linsol_mem_, val);
 
     // Log time duration
@@ -1234,9 +1235,10 @@ namespace casadi {
     double one=1;
     arg_[RDAE_NUM_IN+1] = &one;
     fill_n(res_, jacB_.n_out(), static_cast<double*>(0));
-    res_[0] = w_ + jacB_.sz_w();
-    jacB_(arg_, res_, iw_, w_, 0);
-    double *val = res_[0];
+    double *val = w_;
+    double *w2 = w_ + jacB_.nnz_out(0);
+    res_[0] = val;
+    jacB_(arg_, res_, iw_, w2, 0);
 
     // Log time duration
     time2 = clock();
@@ -1245,7 +1247,7 @@ namespace casadi {
     // Prepare the solution of the linear system (e.g. factorize)
     fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
     fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsolB_mem_ = Memory(linsolB_, arg_, res_, iw_, w_, 0);
+    linsolB_mem_ = Memory(linsolB_, arg_, res_, iw_, w2, 0);
     linsolB_.linsol_factorize(linsolB_mem_, val);
 
     // Log time duration

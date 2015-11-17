@@ -93,11 +93,14 @@ namespace casadi {
     // Create memory reference
     Memory m(this, arg, res, iw, w, mem);
 
-    // A zero linear system would be singular
-    casadi_assert(A!=0);
-
     // If output not requested, nothing to do
     if (!x) return;
+
+    // A zero linear system would be singular
+    if (A==0) {
+      casadi_fill(x, neq_*nrhs_, numeric_limits<double>::quiet_NaN());
+      return;
+    }
 
     // If right hand side is zero, solution is trivially zero (if well-defined)
     if (!b) {

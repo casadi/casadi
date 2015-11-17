@@ -500,14 +500,15 @@ namespace casadi {
     // Temporary memory
     const double** arg1 = arg_ + self.n_in();
     double** res1 = res_ + self.n_out();
-    double* jac = w_ + self.jac_.sz_w();
+    double* jac = w_;
+    double* w1 = w_ + self.jac_.nnz_out(0);
 
     // Evaluate jac_
     copy(arg_, arg_ + self.jac_.n_in(), arg1);
     arg1[self.iin_] = NV_DATA_S(u);
     fill_n(res1, self.jac_.n_out(), static_cast<double*>(0));
     res1[0] = jac;
-    self.jac_(arg1, res1, iw_, w_, 0);
+    self.jac_(arg1, res1, iw_, w1, 0);
 
     // Get sparsity and non-zero elements
     const int* colind = self.jac_.sparsity_out(0).colind();
@@ -521,7 +522,7 @@ namespace casadi {
     // Prepare the solution of the linear system (e.g. factorize)
     fill_n(arg_, self.linsol_.n_in(), nullptr);
     fill_n(res_, self.linsol_.n_out(), nullptr);
-    linsol_mem_ = Memory(self.linsol_, arg_, res_, iw_, w_, 0);
+    linsol_mem_ = Memory(self.linsol_, arg_, res_, iw_, w1, 0);
     self.linsol_.linsol_factorize(linsol_mem_, jac);
 
     // Log time duration

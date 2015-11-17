@@ -245,7 +245,7 @@ namespace casadi {
     if (exact_jacobian_) {
       jac_ = getJac();
       alloc(jac_);
-      alloc_w(jac_.sz_w() + jac_.nnz_out(0));
+      alloc_w(jac_.nnz_out(0), true);
     }
 
     if (!jac_.isNull()) {
@@ -265,7 +265,7 @@ namespace casadi {
 
     if (!jacB_.isNull()) {
       alloc(jacB_);
-      alloc_w(jacB_.sz_w() + jacB_.nnz_out(0));
+      alloc_w(jacB_.nnz_out(0), true);
       casadi_assert_message(jacB_.size2_out(0)==jacB_.size1_out(0),
                             "SundialsInterface::init: the jacobian of the backward problem must be "
                             "square but got " << jacB_.sparsity_out(0).dim());
