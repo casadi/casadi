@@ -33,8 +33,8 @@ import itertools
 
 solvers= []
  
-if Function.has_nlpsol("worhp")  and not args.ignore_memory_heavy:
-  solvers.append(("worhp",{"TolOpti":1e-20}))
+#if Function.has_nlpsol("worhp")  and not args.ignore_memory_heavy:
+#  solvers.append(("worhp",{"TolOpti":1e-20}))
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
 
 if Function.has_nlpsol("ipopt"):
