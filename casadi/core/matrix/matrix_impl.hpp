@@ -1999,7 +1999,7 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType>
-  Matrix<DataType>::zz_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
+  Matrix<DataType>::blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
     std::vector< Matrix<DataType> > ret;
     for (int i=0; i<v.size(); ++i)
       ret.push_back(horzcat(v[i]));
@@ -2007,11 +2007,11 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_horzcat(const std::vector<Matrix<DataType> > &v) {
+  Matrix<DataType> Matrix<DataType>::horzcat(const std::vector<Matrix<DataType> > &v) {
     // Concatenate sparsity patterns
     std::vector<Sparsity> sp(v.size());
     for (int i=0; i<v.size(); ++i) sp[i] = v[i].sparsity();
-    Matrix<DataType> ret = zeros(horzcat(sp));
+    Matrix<DataType> ret = zeros(Sparsity::horzcat(sp));
 
     // Copy nonzeros
     auto i=ret->begin();
@@ -2046,7 +2046,7 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_vertcat(const std::vector<Matrix<DataType> > &v) {
+  Matrix<DataType> Matrix<DataType>::vertcat(const std::vector<Matrix<DataType> > &v) {
     std::vector<Matrix<DataType> > vT(v.size());
     for (int i=0; i<v.size(); ++i) vT[i] = v[i].T();
     return horzcat(vT).T();
@@ -2197,8 +2197,8 @@ namespace casadi {
       qi /= ri(i, 0);
 
       // Update R and Q
-      Q = horzcat(Q, qi);
-      R = horzcat(R, ri);
+      Q = Matrix<DataType>::horzcat({Q, qi});
+      R = Matrix<DataType>::horzcat({R, ri});
     }
   }
 
@@ -2429,7 +2429,7 @@ namespace casadi {
 
   /** \brief   Construct a matrix with given block on the diagonal */
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_diagcat(const std::vector< Matrix<DataType> > &A) {
+  Matrix<DataType> Matrix<DataType>::diagcat(const std::vector< Matrix<DataType> > &A) {
     std::vector<DataType> data;
 
     std::vector<Sparsity> sp;
@@ -2438,7 +2438,7 @@ namespace casadi {
       sp.push_back(A[i].sparsity());
     }
 
-    return Matrix<DataType>(diagcat(sp), data, false);
+    return Matrix<DataType>(Sparsity::diagcat(sp), data, false);
   }
 
   template<typename DataType>

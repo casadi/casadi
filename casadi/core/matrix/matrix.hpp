@@ -476,10 +476,10 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for SparsityInterface
-    static Matrix<DataType> zz_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
-    static Matrix<DataType> zz_horzcat(const std::vector<Matrix<DataType> > &v);
+    static Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
+    static Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
     std::vector<Matrix<DataType> > zz_horzsplit(const std::vector<int>& offset) const;
-    static Matrix<DataType> zz_vertcat(const std::vector<Matrix<DataType> > &v);
+    static Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
     std::vector< Matrix<DataType> > zz_vertsplit(const std::vector<int>& offset) const;
     std::vector< Matrix<DataType> > zz_diagsplit(const std::vector<int>& offset1,
                                                  const std::vector<int>& offset2) const;
@@ -525,7 +525,7 @@ namespace casadi {
     Matrix<DataType> zz_cofactor(int i, int j) const;
     Matrix<DataType> zz_chol() const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
-    static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
+    static Matrix<DataType> diagcat(const std::vector< Matrix<DataType> > &A);
     ///@}
     /// \endcond
 #endif // SWIG

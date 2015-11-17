@@ -434,14 +434,14 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for SparsityInterface
-    static MX zz_horzcat(const std::vector<MX>& x);
-    static MX zz_diagcat(const std::vector<MX>& x);
-    static MX zz_vertcat(const std::vector<MX>& x);
+    static MX horzcat(const std::vector<MX>& x);
+    static MX diagcat(const std::vector<MX>& x);
+    static MX vertcat(const std::vector<MX>& x);
     std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
     std::vector<MX> zz_diagsplit(const std::vector<int>& offset1,
                                  const std::vector<int>& offset2) const;
     std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
-    static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
+    static MX blockcat(const std::vector< std::vector<MX > > &v);
     MX zz_mtimes(const MX& y) const;
     MX zz_mac(const MX& y, const MX& z) const;
     MX zz_reshape(int nrow, int ncol) const;

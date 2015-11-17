@@ -193,7 +193,7 @@ namespace casadi {
      *   horzcat(horzsplit(x, ...)) = x
      */
     inline friend MatType horzcat(const std::vector<MatType> &v) {
-      return MatType::zz_horzcat(v);
+      return MatType::horzcat(v);
     }
 
     /** \brief Concatenate a list of matrices vertically
@@ -202,7 +202,7 @@ namespace casadi {
      *   vertcat(vertsplit(x, ...)) = x
      */
     friend MatType vertcat(const std::vector<MatType> &v) {
-      return MatType::zz_vertcat(v);
+      return MatType::vertcat(v);
     }
 
     /** \brief  split horizontally, retaining groups of columns
@@ -276,7 +276,7 @@ namespace casadi {
     /** \brief Construct a matrix from a list of list of blocks.
      */
     inline friend MatType blockcat(const std::vector< std::vector<MatType > > &v) {
-      return MatType::zz_blockcat(v);
+      return MatType::blockcat(v);
     }
 
     /** \brief Construct a matrix from 4 blocks
@@ -313,7 +313,7 @@ namespace casadi {
     /** \brief Construct a matrix with given block on the diagonal
      */
     inline friend MatType diagcat(const std::vector<MatType> &A) {
-      return MatType::zz_diagcat(A);
+      return MatType::diagcat(A);
     }
 
     /** \brief  split diagonally, retaining square matrices

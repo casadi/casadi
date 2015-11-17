@@ -444,10 +444,10 @@ namespace casadi {
     /// \cond INTERNAL
     /// @{
     /** \brief Accessed by SparsityInterface */
-    static Sparsity zz_horzcat(const std::vector<Sparsity> & sp);
-    static Sparsity zz_vertcat(const std::vector<Sparsity> & sp);
-    static Sparsity zz_blockcat(const std::vector< std::vector< Sparsity > > &v);
-    static Sparsity zz_diagcat(const std::vector< Sparsity > &v);
+    static Sparsity horzcat(const std::vector<Sparsity> & sp);
+    static Sparsity vertcat(const std::vector<Sparsity> & sp);
+    static Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
+    static Sparsity diagcat(const std::vector< Sparsity > &v);
     std::vector<Sparsity> zz_horzsplit(const std::vector<int>& output_offset) const;
     std::vector<Sparsity> zz_vertsplit(const std::vector<int>& output_offset) const;
     std::vector<Sparsity> zz_diagsplit(const std::vector<int>& offset1,

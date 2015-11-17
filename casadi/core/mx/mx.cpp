@@ -1031,7 +1031,7 @@ namespace casadi {
     return ret;
   }
 
-  MX MX::zz_horzcat(const vector<MX>& x) {
+  MX MX::horzcat(const vector<MX>& x) {
     // Check dimensions
     if (x.size()>1) {
       vector<MX> ne = trim_empty(x, true);
@@ -1065,7 +1065,7 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_diagcat(const vector<MX>& x) {
+  MX MX::diagcat(const vector<MX>& x) {
     if (x.empty()) {
       return MX();
     } else if (x.size()==1) {
@@ -1090,7 +1090,7 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_vertcat(const vector<MX>& x) {
+  MX MX::vertcat(const vector<MX>& x) {
     // Check dimensions
     if (x.size()>1) {
       vector<MX> ne = trim_empty(x, true);
@@ -1186,7 +1186,7 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_blockcat(const std::vector< std::vector<MX > > &v) {
+  MX MX::blockcat(const std::vector< std::vector<MX > > &v) {
     // Quick return if no block rows
     if (v.empty()) return MX(0, 0);
 

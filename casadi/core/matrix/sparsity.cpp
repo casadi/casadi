@@ -419,7 +419,7 @@ namespace casadi {
         *this = (*this)->zz_appendVector(*sp);
       } else {
         // Append to matrix (inefficient)
-        *this = vertcat(*this, sp);
+        *this = vertcat({*this, sp});
       }
     }
   }
@@ -1071,7 +1071,7 @@ namespace casadi {
     return (*this)->bw_lower();
   }
 
-  Sparsity Sparsity::zz_horzcat(const std::vector<Sparsity> & sp) {
+  Sparsity Sparsity::horzcat(const std::vector<Sparsity> & sp) {
     // Quick return if possible
     if (sp.empty()) return Sparsity(0, 0);
     if (sp.size()==1) return sp.front();
@@ -1097,7 +1097,7 @@ namespace casadi {
       const int* sp_colind = i->colind();
       const int* sp_row = i->row();
       casadi_assert_message(sp_nrow==ret_nrow || sp_nrow==0,
-                            "Sparsity::zz_horzcat: Mismatching number of rows");
+                            "Sparsity::horzcat: Mismatching number of rows");
 
       // Add entries to pattern
       for (int cc=0; cc<sp_ncol; ++cc) {
@@ -1129,7 +1129,7 @@ namespace casadi {
     return blockcat(blocks);
   }
 
-  Sparsity Sparsity::zz_vertcat(const std::vector<Sparsity> & sp) {
+  Sparsity Sparsity::vertcat(const std::vector<Sparsity> & sp) {
     // Quick return if possible
     if (sp.empty()) return Sparsity(0, 0);
     if (sp.size()==1) return sp.front();
@@ -1155,7 +1155,7 @@ namespace casadi {
       const int* sp_colind = i->colind();
       const int* sp_row = i->row();
       casadi_assert_message(sp_ncol==ret_ncol || sp_ncol==0,
-                            "Sparsity::zz_vertcat: Mismatching number of columns");
+                            "Sparsity::vertcat: Mismatching number of columns");
 
       // Add entries to pattern
       for (int cc=0; cc<sp_ncol; ++cc) {
@@ -1171,7 +1171,7 @@ namespace casadi {
     return Sparsity::triplet(ret_nrow, ret_ncol, ret_row, ret_col);
   }
 
-  Sparsity Sparsity::zz_diagcat(const std::vector< Sparsity > &v) {
+  Sparsity Sparsity::diagcat(const std::vector< Sparsity > &v) {
     int n = 0;
     int m = 0;
 
@@ -1253,7 +1253,7 @@ namespace casadi {
     return ret;
   }
 
-  Sparsity Sparsity::zz_blockcat(const std::vector< std::vector< Sparsity > > &v) {
+  Sparsity Sparsity::blockcat(const std::vector< std::vector< Sparsity > > &v) {
     std::vector< Sparsity > ret;
     for (int i=0; i<v.size(); ++i)
       ret.push_back(horzcat(v[i]));
