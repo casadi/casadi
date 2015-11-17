@@ -2179,6 +2179,7 @@ class NZproxy:
 
     def __getitem__(self, s):
           if isinstance(s, tuple) and len(s)==2:
+            if s[1] is None: raise TypeError("Cannot slice with None")
             return self.get(False, s[0], s[1])
           return self.get(False, s)
 
