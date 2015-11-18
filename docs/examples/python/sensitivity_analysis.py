@@ -118,7 +118,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
       opts["implicit_solver_options"] = {"linear_solver":"csparse"}
 
     # Integrator
-    I = Function.ivpsol("I", MyIntegrator, dae, opts)
+    I = integrator("I", MyIntegrator, dae, opts)
 
     # Integrate to get results
     arg = {"x0":x0, "p":u0}

@@ -50,7 +50,7 @@ rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
 #! We will simulate over 50 seconds, 1000 timesteps.
 dae={'x':states, 'p':params, 't':t, 'ode':rhs}
 ts = linspace(0, 50, 1000)
-integrator = Function.ivpsol('integrator', 'cvodes', dae, {'grid':ts, 'output_t0':True})
+integrator = integrator('integrator', 'cvodes', dae, {'grid':ts, 'output_t0':True})
 
 sol = integrator({'x0':[1,0], 'p':[0.1,0.1,0.1,0.3,0.1]})
 

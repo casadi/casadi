@@ -87,8 +87,7 @@ int main(){
   SXDict dae = {{"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}};
 
   // Create an integrator (CVodes)
-  Function integrator = Function::ivpsol("integrator", "cvodes",
-                                             dae, {{"t0", 0}, {"tf", tf/ns}});
+  Function F = integrator("integrator", "cvodes", dae, {{"t0", 0}, {"tf", tf/ns}});
   
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;
@@ -144,7 +143,7 @@ int main(){
   // Loop over shooting nodes
   for(int k=0; k<ns; ++k){
     // Create an evaluation node
-    MXDict I_out = integrator(MXDict{{"x0", X[k]}, {"p", U[k]}});
+    MXDict I_out = F(MXDict{{"x0", X[k]}, {"p", U[k]}});
 
     // Save continuity constraints
     g.push_back( I_out.at("xf") - X[k+1] );

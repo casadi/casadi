@@ -35,8 +35,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IVPSOL_IDAS_EXPORT
-      casadi_register_ivpsol_idas(Ivpsol::Plugin* plugin) {
+  int CASADI_INTEGRATOR_IDAS_EXPORT
+      casadi_register_integrator_idas(Integrator::Plugin* plugin) {
     plugin->creator = IdasInterface::creator;
     plugin->name = "idas";
     plugin->doc = IdasInterface::meta_doc.c_str();
@@ -45,8 +45,8 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IVPSOL_IDAS_EXPORT casadi_load_ivpsol_idas() {
-    Ivpsol::registerPlugin(casadi_register_ivpsol_idas);
+  void CASADI_INTEGRATOR_IDAS_EXPORT casadi_load_integrator_idas() {
+    Integrator::registerPlugin(casadi_register_integrator_idas);
   }
 
   IdasInterface::IdasInterface(const std::string& name, const XProblem& dae)

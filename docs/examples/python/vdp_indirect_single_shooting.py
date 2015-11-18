@@ -79,7 +79,7 @@ opts['abstol'] = 1e-8 # abs. tolerance
 opts['reltol'] = 1e-8 # rel. tolerance
 opts['t0'] = 0.0
 opts['tf'] = 10.0
-I = Function.ivpsol('I', 'cvodes', dae, opts)
+I = integrator('I', 'cvodes', dae, opts)
 
 # The initial state
 x_init = NP.array([0.,1.])
@@ -126,7 +126,7 @@ l_init_opt = NP.array(l_init_opt.nonzeros())
 tgrid = NP.linspace(0, 10, 100)
 
 # Simulator to get optimal state and control trajectories
-simulator = Function.ivpsol('simulator', 'cvodes', dae, {'grid':tgrid, 'output_t0':True})
+simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid, 'output_t0':True})
 
 # Simulate to get the state trajectory
 sol = simulator({'x0' : NP.concatenate((x_init, l_init_opt))})['xf']

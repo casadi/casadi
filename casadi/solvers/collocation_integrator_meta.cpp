@@ -26,7 +26,7 @@
       #include "collocation_integrator.hpp"
       #include <string>
 
-      const std::string casadi::CollocationIvpsol::meta_doc=
+      const std::string casadi::CollocationIntegrator::meta_doc=
       "\n"
 "Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on\n"
 "collocation schemes\n"

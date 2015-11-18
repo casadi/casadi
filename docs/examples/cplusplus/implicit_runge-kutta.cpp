@@ -164,10 +164,10 @@ int main(){
 
   // Fixed-step integrator
   Function irk_integrator("irk_integrator", {{"x0", X0}, {"p", P}, {"xf", Xk}},
-                          Function::ivpsol_in(), Function::ivpsol_out());
+                          integrator_in(), integrator_out());
 
   // Create a convensional integrator for reference
-  Function ref_integrator = Function::ivpsol("ref_integrator",
+  Function ref_integrator = integrator("ref_integrator",
                                                  "cvodes", dae, {{"tf", tf}});
 
   // Test values

@@ -87,7 +87,7 @@ iopts["abstol"] = 1e-8 # abs. tolerance
 iopts["reltol"] = 1e-8 # rel. tolerance
 iopts["t0"] = 0.0
 iopts["tf"] = tf/num_nodes
-I = Function.ivpsol("I", "cvodes", dae, iopts)
+I = integrator("I", "cvodes", dae, iopts)
 
 # Variables in the root finding problem
 NV = nX*(num_nodes+1)
@@ -138,7 +138,7 @@ V_sol, = solver([0])
 tgrid = NP.linspace(0,tf,100)
 
 # Simulator to get optimal state and control trajectories
-simulator = Function.ivpsol('simulator', 'cvodes', dae, {'grid':tgrid,'output_t0':True})
+simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid,'output_t0':True})
 
 # Simulate to get the trajectories
 sol = simulator({"x0" : V_sol[0:4]})["xf"]

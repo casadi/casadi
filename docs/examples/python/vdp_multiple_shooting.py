@@ -29,8 +29,8 @@ nk = 20      # Control discretization
 tf = 10.0    # End time
 
 # Declare variables (use scalar graph)
-u  = SX.sym("u")    # control
-x  = SX.sym("x",3)  # state
+u  = SX.sym('u')    # control
+x  = SX.sym('x',3)  # state
 
 # ODE rhs function
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
@@ -39,17 +39,17 @@ ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
 dae = {'x':x, 'p':u, 'ode':ode}
 
 # Create an integrator
-opts = {"tf":tf/nk} # final time
-opts["abstol"] = 1e-8 # tolerance
-opts["reltol"] = 1e-8 # tolerance
-opts["steps_per_checkpoint"] = 1000
-integrator = Function.ivpsol("integrator", "cvodes", dae, opts)
+opts = {'tf':tf/nk} # final time
+opts['abstol'] = 1e-8 # tolerance
+opts['reltol'] = 1e-8 # tolerance
+opts['steps_per_checkpoint'] = 1000
+F = integrator('F', 'cvodes', dae, opts)
 
 # Total number of variables
 nv = 1*nk + 3*(nk+1)
 
 # Declare variable vector
-V = MX.sym("V", nv)
+V = MX.sym('V', nv)
 
 # Get the expressions for local variables
 U = V[0:nk]
@@ -87,7 +87,7 @@ for k in range(nk):
   Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
   
   # Call the integrator
-  Xk_end = integrator({'x0':Xk,'p':U[k]})["xf"]
+  Xk_end = F({'x0':Xk,'p':U[k]})['xf']
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)
@@ -102,17 +102,17 @@ g = vertcat(g)
 
 # Create NLP solver instance
 nlp = {'x':V, 'f':f, 'g':g}
-solver = Function.nlpsol("solver", "ipopt", nlp)
+solver = Function.nlpsol('solver', 'ipopt', nlp)
 
 # Solve the problem
-sol = solver({"lbx" : VMIN,
-              "ubx" : VMAX,
-              "x0" : VINIT,
-              "lbg" : NP.concatenate(g_min),
-              "ubg" : NP.concatenate(g_max)})
+sol = solver({'lbx' : VMIN,
+              'ubx' : VMAX,
+              'x0' : VINIT,
+              'lbg' : NP.concatenate(g_min),
+              'ubg' : NP.concatenate(g_max)})
 
 # Retrieve the solution
-v_opt = sol["x"]
+v_opt = sol['x']
 u_opt = v_opt[0:nk]
 x0_opt = v_opt[nk+0::3]
 x1_opt = v_opt[nk+1::3]
@@ -128,7 +128,7 @@ plt.clf()
 plt.plot(tgrid_x,x0_opt,'--')
 plt.plot(tgrid_x,x1_opt,'-')
 plt.plot(tgrid_u,u_opt,'-.')
-plt.title("Van der Pol optimization - multiple shooting")
+plt.title('Van der Pol optimization - multiple shooting')
 plt.xlabel('time')
 plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])
 plt.grid()

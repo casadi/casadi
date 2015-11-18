@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_IVPSOL_HPP
-#define CASADI_IVPSOL_HPP
+#ifndef CASADI_INTEGRATOR_HPP
+#define CASADI_INTEGRATOR_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -40,18 +40,18 @@ namespace casadi {
       \date 2010
   */
   class CASADI_EXPORT
-  Ivpsol : public FunctionInternal, public PluginInterface<Ivpsol> {
+  Integrator : public FunctionInternal, public PluginInterface<Integrator> {
   public:
     /** \brief  Constructor */
-    Ivpsol(const std::string& name, const XProblem& dae);
+    Integrator(const std::string& name, const XProblem& dae);
 
     /** \brief  Destructor */
-    virtual ~Ivpsol()=0;
+    virtual ~Integrator()=0;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return IVPSOL_NUM_IN;}
-    virtual size_t get_n_out() const { return IVPSOL_NUM_OUT;}
+    virtual size_t get_n_in() const { return INTEGRATOR_NUM_IN;}
+    virtual size_t get_n_out() const { return INTEGRATOR_NUM_OUT;}
     ///@}
 
    /// @{
@@ -194,7 +194,7 @@ namespace casadi {
     /// ODE/DAE backward integration function, if any
     Function g_;
 
-    /// Ivpsol for sparsity pattern propagation
+    /// Integrator for sparsity pattern propagation
     Function linsol_f_, linsol_g_;
 
     /// Options
@@ -205,7 +205,7 @@ namespace casadi {
     int ntout_;
 
     // Creator function for internal class
-    typedef Ivpsol* (*Creator)(const std::string& name, const XProblem& dae);
+    typedef Integrator* (*Creator)(const std::string& name, const XProblem& dae);
 
     // No static functions exposed
     struct Exposed{ };
@@ -231,7 +231,7 @@ namespace casadi {
 
 
   template<typename XType>
-  Problem<XType> Ivpsol::map2problem(const std::map<std::string, XType>& d) {
+  Problem<XType> Integrator::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="t") {
@@ -268,7 +268,7 @@ namespace casadi {
   }
 
   template<typename XType>
-  std::map<std::string, XType> Ivpsol::problem2map(const Problem<XType>& d) {
+  std::map<std::string, XType> Integrator::problem2map(const Problem<XType>& d) {
     return {
         {"t", d.in[DE_T]},
         {"x", d.in[DE_X]},
@@ -287,7 +287,7 @@ namespace casadi {
   }
 
   template<typename XType>
-  Problem<XType> Ivpsol::fun2problem(Function f, Function g) {
+  Problem<XType> Integrator::fun2problem(Function f, Function g) {
     Problem<XType> dae;
     dae.in.resize(DE_NUM_IN);
     dae.out.resize(DE_NUM_OUT);
@@ -317,14 +317,14 @@ namespace casadi {
     return dae;
   }
 
-  class CASADI_EXPORT FixedStepIvpsol : public Ivpsol {
+  class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   public:
 
     /// Constructor
-    explicit FixedStepIvpsol(const std::string& name, const XProblem& dae);
+    explicit FixedStepIntegrator(const std::string& name, const XProblem& dae);
 
     /// Destructor
-    virtual ~FixedStepIvpsol();
+    virtual ~FixedStepIntegrator();
 
     /// Initialize stage
     virtual void init();
@@ -385,14 +385,14 @@ namespace casadi {
     std::vector<std::vector<double> > x_tape_, Z_tape_;
   };
 
-  class CASADI_EXPORT ImplicitFixedStepIvpsol : public FixedStepIvpsol {
+  class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
   public:
 
     /// Constructor
-    explicit ImplicitFixedStepIvpsol(const std::string& name, const XProblem& dae);
+    explicit ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae);
 
     /// Destructor
-    virtual ~ImplicitFixedStepIvpsol();
+    virtual ~ImplicitFixedStepIntegrator();
 
     /// Initialize stage
     virtual void init();
@@ -410,4 +410,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_IVPSOL_HPP
+#endif // CASADI_INTEGRATOR_HPP

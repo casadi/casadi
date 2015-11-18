@@ -1007,7 +1007,7 @@ namespace casadi {
 
     ///@{
     /// Check if a particular plugin is available
-    static bool has_ivpsol(const std::string& name);
+    static bool has_integrator(const std::string& name);
     static bool has_qpsol(const std::string& name);
     static bool has_nlpsol(const std::string& name);
     static bool has_nlsol(const std::string& name);
@@ -1017,7 +1017,7 @@ namespace casadi {
     ///@{
     /// Explicitly load a plugin dynamically
     static void load_qpsol(const std::string& name);
-    static void load_ivpsol(const std::string& name);
+    static void load_integrator(const std::string& name);
     static void load_nlpsol(const std::string& name);
     static void load_nlsol(const std::string& name);
     static void load_linsol(const std::string& name);
@@ -1025,7 +1025,7 @@ namespace casadi {
 
     ///@{
     /// Get the documentation string for a plugin
-    static std::string doc_ivpsol(const std::string& name);
+    static std::string doc_integrator(const std::string& name);
     static std::string doc_qpsol(const std::string& name);
     static std::string doc_nlpsol(const std::string& name);
     static std::string doc_nlsol(const std::string& name);
@@ -1122,74 +1122,8 @@ namespace casadi {
     /// Access linear solver of a nlsol
     Function nlsol_linsol();
 
-    ///@{
-    /** Create an ODE/DAE integrator
-        Solves an initial value problem (IVP) coupled to a terminal value problem
-        with differential equation given as an implicit ODE coupled to an algebraic
-        equation and a set of quadratures:
-
-        \verbatim
-        Initial conditions at t=t0
-        x(t0)  = x0
-        q(t0)  = 0
-
-        Forward integration from t=t0 to t=tf
-        der(x) = function(x, z, p, t)                  Forward ODE
-        0 = fz(x, z, p, t)                  Forward algebraic equations
-        der(q) = fq(x, z, p, t)                  Forward quadratures
-
-        Terminal conditions at t=tf
-        rx(tf)  = rx0
-        rq(tf)  = 0
-
-        Backward integration from t=tf to t=t0
-        der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-        0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-        der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-
-        where we assume that both the forward and backwards integrations are index-1
-        (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-        gx, gz and gq have a linear dependency on rx, rz and rp.
-
-        \endverbatim
-        \author Joel Andersson
-        \date 2011-2015
-     */
-    static Function ivpsol(const std::string& name, const std::string& solver,
-                           const SXDict& dae, const Dict& opts=Dict());
-    static Function ivpsol(const std::string& name, const std::string& solver,
-                           const MXDict& dae, const Dict& opts=Dict());
-    static Function ivpsol(const std::string& name, const std::string& solver,
-                           const Function& dae, const Dict& opts=Dict());
-    static Function ivpsol(const std::string& name, const std::string& solver,
-                           const std::pair<Function, Function>& dae,
-                           const Dict& opts=Dict());
-#ifndef SWIG
-    static Function ivpsol(const std::string& name, const std::string& solver,
-                           const XProblem& dae, const Dict& opts=Dict());
-#endif // SWIG
-    ///@}
-
     /// Get the DAE for an integrator
-    Function ivpsol_dae();
-
-    /** \brief Get input scheme of integrators */
-    static std::vector<std::string> ivpsol_in();
-
-    /** \brief Get integrator output scheme of integrators */
-    static std::vector<std::string> ivpsol_out();
-
-    /** \brief Get integrator input scheme name by index */
-    static std::string ivpsol_in(int ind);
-
-    /** \brief Get output scheme name by index */
-    static std::string ivpsol_out(int ind);
-
-    /** \brief Get the number of integrator inputs */
-    static int ivpsol_n_in();
-
-    /** \brief Get the number of integrator outputs */
-    static int ivpsol_n_out();
+    Function integrator_dae();
 
     ///@{
     /** Create an NLP solver
@@ -1389,19 +1323,84 @@ namespace casadi {
   /** \brief  Load an external function
    * File name is assumed to be ./<f_name>.so
    */
-  Function CASADI_EXPORT external(const std::string& name, const Dict& opts=Dict());
+  CASADI_EXPORT Function external(const std::string& name, const Dict& opts=Dict());
 
   /** \brief  Load an external function
    * File name given
    */
-  Function CASADI_EXPORT external(const std::string& name, const std::string& bin_name,
+  CASADI_EXPORT Function external(const std::string& name, const std::string& bin_name,
                                   const Dict& opts=Dict());
 
   /** \brief  Load a just-in-time compiled external function
    * File name given
    */
-  Function CASADI_EXPORT external(const std::string& name, const Compiler& compiler,
+  CASADI_EXPORT Function external(const std::string& name, const Compiler& compiler,
                                   const Dict& opts=Dict());
+  ///@{
+  /** Create an ODE/DAE integrator
+      Solves an initial value problem (IVP) coupled to a terminal value problem
+      with differential equation given as an implicit ODE coupled to an algebraic
+      equation and a set of quadratures:
+
+      \verbatim
+      Initial conditions at t=t0
+      x(t0)  = x0
+      q(t0)  = 0
+
+      Forward integration from t=t0 to t=tf
+      der(x) = function(x, z, p, t)                  Forward ODE
+      0 = fz(x, z, p, t)                  Forward algebraic equations
+      der(q) = fq(x, z, p, t)                  Forward quadratures
+
+      Terminal conditions at t=tf
+      rx(tf)  = rx0
+      rq(tf)  = 0
+
+      Backward integration from t=tf to t=t0
+      der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+      0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+      der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
+
+      where we assume that both the forward and backwards integrations are index-1
+      (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
+      gx, gz and gq have a linear dependency on rx, rz and rp.
+
+      \endverbatim
+      \author Joel Andersson
+      \date 2011-2015
+  */
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                const SXDict& dae, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                const MXDict& dae, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                const Function& dae, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                const std::pair<Function, Function>& dae,
+                                const Dict& opts=Dict());
+#ifndef SWIG
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                const XProblem& dae, const Dict& opts=Dict());
+#endif // SWIG
+  ///@}
+
+  /** \brief Get input scheme of integrators */
+  CASADI_EXPORT std::vector<std::string> integrator_in();
+
+  /** \brief Get integrator output scheme of integrators */
+  CASADI_EXPORT std::vector<std::string> integrator_out();
+
+  /** \brief Get integrator input scheme name by index */
+  CASADI_EXPORT std::string integrator_in(int ind);
+
+  /** \brief Get output scheme name by index */
+  CASADI_EXPORT std::string integrator_out(int ind);
+
+  /** \brief Get the number of integrator inputs */
+  CASADI_EXPORT int integrator_n_in();
+
+  /** \brief Get the number of integrator outputs */
+  CASADI_EXPORT int integrator_n_out();
 
 } // namespace casadi
 

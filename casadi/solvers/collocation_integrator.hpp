@@ -23,14 +23,14 @@
  */
 
 
-#ifndef CASADI_COLLOCATION_IVPSOL_HPP
-#define CASADI_COLLOCATION_IVPSOL_HPP
+#ifndef CASADI_COLLOCATION_INTEGRATOR_HPP
+#define CASADI_COLLOCATION_INTEGRATOR_HPP
 
-#include "casadi/core/function/ivpsol.hpp"
+#include "casadi/core/function/integrator.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
-#include <casadi/solvers/casadi_ivpsol_collocation_export.h>
+#include <casadi/solvers/casadi_integrator_collocation_export.h>
 
-/** \defgroup plugin_Ivpsol_collocation
+/** \defgroup plugin_Integrator_collocation
 
      Fixed-step implicit Runge-Kutta integrator
      ODE/DAE integrator based on collocation schemes
@@ -39,34 +39,34 @@
 
 */
 
-/** \pluginsection{Ivpsol,collocation} */
+/** \pluginsection{Integrator,collocation} */
 
 /// \cond INTERNAL
 namespace casadi {
 
   /**
-     \brief \pluginbrief{Ivpsol,collocation}
+     \brief \pluginbrief{Integrator,collocation}
 
      @copydoc DAE_doc
-     @copydoc plugin_Ivpsol_collocation
+     @copydoc plugin_Integrator_collocation
 
      \author Joel Andersson
      \date 2014
   */
-  class CASADI_IVPSOL_COLLOCATION_EXPORT CollocationIvpsol :
-        public ImplicitFixedStepIvpsol {
+  class CASADI_INTEGRATOR_COLLOCATION_EXPORT CollocationIntegrator :
+        public ImplicitFixedStepIntegrator {
   public:
 
     /// Constructor
-    explicit CollocationIvpsol(const std::string& name, const XProblem& dae);
+    explicit CollocationIntegrator(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static Ivpsol* creator(const std::string& name, const XProblem& dae) {
-      return new CollocationIvpsol(name, dae);
+    static Integrator* creator(const std::string& name, const XProblem& dae) {
+      return new CollocationIntegrator(name, dae);
     }
 
     /// Destructor
-    virtual ~CollocationIvpsol();
+    virtual ~CollocationIntegrator();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "collocation";}
@@ -98,4 +98,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_COLLOCATION_IVPSOL_HPP
+#endif // CASADI_COLLOCATION_INTEGRATOR_HPP

@@ -94,7 +94,7 @@ set(CASADI_SRCS
   function/external.hpp            function/external.cpp
   function/linsol.hpp              function/linsol.cpp
   function/nlsol.hpp               function/nlsol.cpp
-  function/ivpsol.hpp              function/ivpsol.cpp
+  function/integrator.hpp              function/integrator.cpp
   function/nlpsol.hpp              function/nlpsol.cpp
   function/qpsol.hpp               function/qpsol.cpp
   function/code_generator.hpp      function/code_generator.cpp

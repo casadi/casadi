@@ -95,7 +95,7 @@ namespace casadi {
                        const std::string& solver="newton",
                        const Dict& solver_options = Dict());
 
-  /** \brief Simplified wrapper for the Ivpsol class
+  /** \brief Simplified wrapper for the Integrator class
    * Constructs an integrator using the same syntax as simpleRK and simpleIRK.
    * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)

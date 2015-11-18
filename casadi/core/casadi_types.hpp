@@ -164,39 +164,39 @@ namespace casadi {
   };
 
   /// Input arguments of an integrator
-  enum IvpsolInput {
+  enum IntegratorInput {
     /// Differential state at the initial time
-    IVPSOL_X0,
+    INTEGRATOR_X0,
     /// Parameters
-    IVPSOL_P,
+    INTEGRATOR_P,
     /// Initial guess for the algebraic variable
-    IVPSOL_Z0,
+    INTEGRATOR_Z0,
     /// Backward differential state at the final time
-    IVPSOL_RX0,
+    INTEGRATOR_RX0,
     /// Backward parameter vector
-    IVPSOL_RP,
+    INTEGRATOR_RP,
     /// Initial guess for the backwards algebraic variable
-    IVPSOL_RZ0,
+    INTEGRATOR_RZ0,
     /// Number of input arguments of an integrator
-    IVPSOL_NUM_IN
+    INTEGRATOR_NUM_IN
   };
 
   /// Output arguments of an integrator
-  enum IvpsolOutput {
+  enum IntegratorOutput {
     /// Differential state at the final time
-    IVPSOL_XF,
+    INTEGRATOR_XF,
     /// Quadrature state at the final time
-    IVPSOL_QF,
+    INTEGRATOR_QF,
     /// Algebraic variable at the final time
-    IVPSOL_ZF,
+    INTEGRATOR_ZF,
     /// Backward differential state at the initial time
-    IVPSOL_RXF,
+    INTEGRATOR_RXF,
     /// Backward quadrature state at the initial time
-    IVPSOL_RQF,
+    INTEGRATOR_RQF,
     /// Backward algebraic variable at the initial time
-    IVPSOL_RZF,
+    INTEGRATOR_RZF,
     /// Number of output arguments of an integrator
-    IVPSOL_NUM_OUT
+    INTEGRATOR_NUM_OUT
   };
 
   /// Input arguments of an NLP function

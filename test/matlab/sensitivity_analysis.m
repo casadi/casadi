@@ -122,7 +122,7 @@ for ode=0:1
     end
 
     % Integrator
-    I = Function.ivpsol('myintegrator', MyIntegrator, dae, opts);
+    I = casadi.integrator('myintegrator', MyIntegrator, dae, opts);
 
     % Integrate to get results
     arg = struct;

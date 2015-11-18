@@ -66,7 +66,7 @@ f_q = x[0]**2 + x[1]**2 + u**2
 # Create an integrator
 dae = {'x':x, 'z':z, 'p':u, 'ode':f_x, 'alg':f_z, 'quad':f_q}
 opts = {"tf":0.5} # interval length
-I = Function.ivpsol('I', "idas", dae, opts)
+I = integrator('I', "idas", dae, opts)
 
 # All controls
 U = MX.sym("U", 20)

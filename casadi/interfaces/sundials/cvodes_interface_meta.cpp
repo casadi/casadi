@@ -152,7 +152,7 @@
 "| iterative_solve | OT_STRING       | GenericType()   | (gmres|bcgstab| |\n"
 "| rB              |                 |                 | tfqmr)          |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| linear_multiste | OT_STRING       | \"bdf\"           | Ivpsol      |\n"
+"| linear_multiste | OT_STRING       | \"bdf\"           | Integrator      |\n"
 "| p_method        |                 |                 | scheme          |\n"
 "|                 |                 |                 | (bdf|adams)     |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"

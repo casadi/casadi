@@ -46,7 +46,7 @@ tend=10
 opts["t0"] = 0
 opts["tf"] = tend
 #! Create the Integrator
-integrator = Function.ivpsol("integrator", "cvodes", dae, opts)
+integrator = integrator("integrator", "cvodes", dae, opts)
 #$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
 #$   der(x) = fx(x,z,p,t)
@@ -99,7 +99,7 @@ opts["abstol"] = 1e-6
 opts["reltol"] = 1e-6
 opts["grid"] = ts
 opts["output_t0"] = True
-sim = Function.ivpsol("sim", "cvodes", dae, opts)
+sim = integrator("sim", "cvodes", dae, opts)
 sol = sim({"x0":[x0,y0], "p":0})
 
 sol = sol['xf'].full().T

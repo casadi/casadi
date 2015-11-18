@@ -30,9 +30,9 @@ using namespace casadi;
 using namespace std;
 
 // Declare solvers to be loaded manually
-extern "C" void casadi_load_ivpsol_cvodes();
-extern "C" void casadi_load_ivpsol_idas();
-extern "C" void casadi_load_ivpsol_rk();
+extern "C" void casadi_load_integrator_cvodes();
+extern "C" void casadi_load_integrator_idas();
+extern "C" void casadi_load_integrator_rk();
 extern "C" void casadi_load_nlpsol_ipopt();
 extern "C" void casadi_load_nlpsol_scpgen();
 
@@ -42,9 +42,9 @@ bool lifted_newton = false;
 
 int main(){
   // Load integrators manually
-  casadi_load_ivpsol_cvodes();
-  casadi_load_ivpsol_idas();
-  casadi_load_ivpsol_rk();
+  casadi_load_integrator_cvodes();
+  casadi_load_integrator_idas();
+  casadi_load_integrator_rk();
   casadi_load_nlpsol_ipopt();
   casadi_load_nlpsol_scpgen();
   
@@ -125,7 +125,7 @@ int main(){
   opts["tf"] = tf;
 
   // Create integrator
-  Function integrator = Function::ivpsol("integrator", plugin, dae, opts);
+  Function F = integrator("integrator", plugin, dae, opts);
 
   // control for all segments
   MX U = MX::sym("U",nu); 
@@ -134,7 +134,7 @@ int main(){
   MX X=X0;
   for(int k=0; k<nu; ++k){
     // Integrate
-    X = integrator(MXDict{{"x0", X}, {"p", U[k]}}).at("xf");
+    X = F(MXDict{{"x0", X}, {"p", U[k]}}).at("xf");
 
     // Lift X
     if(lifted_newton){
@@ -143,13 +143,13 @@ int main(){
   }
 
   // Objective function
-  MX F = dot(U,U);
+  MX J = dot(U,U);
 
   // Terminal constraints
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXDict nlp = {{"x", U}, {"f", F}, {"g", G}};
+  MXDict nlp = {{"x", U}, {"f", J}, {"g", G}};
 
   // NLP solver options
   Dict solver_opts;

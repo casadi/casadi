@@ -23,13 +23,13 @@
  */
 
 
-#include "ivpsol.hpp"
+#include "integrator.hpp"
 #include "../std_vector_tools.hpp"
 
 using namespace std;
 namespace casadi {
 
-  Ivpsol::Ivpsol(const std::string& name, const XProblem& dae)
+  Integrator::Integrator(const std::string& name, const XProblem& dae)
     : FunctionInternal(name), dae_(dae) {
 
     // Additional options
@@ -65,15 +65,15 @@ namespace casadi {
       rq_ = g_.sparsity_out(RDAE_QUAD);
     }
 
-    ischeme_ = Function::ivpsol_in();
-    oscheme_ = Function::ivpsol_out();
+    ischeme_ = integrator_in();
+    oscheme_ = integrator_out();
   }
 
-  Ivpsol::~Ivpsol() {
+  Integrator::~Integrator() {
   }
 
   template<typename MatType>
-  Function Ivpsol::get_f() const {
+  Function Integrator::get_f() const {
     vector<MatType> dae_in(DAE_NUM_IN), dae_out(DAE_NUM_OUT);
     const Problem<MatType>& dae = this->dae_;
     dae_in[DAE_T]=dae.in[DE_T];
@@ -87,7 +87,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  Function Ivpsol::get_g() const {
+  Function Integrator::get_g() const {
     vector<MatType> rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
     const Problem<MatType>& dae = this->dae_;
     rdae_in[RDAE_T]=dae.in[DE_T];
@@ -103,43 +103,43 @@ namespace casadi {
     return Function("rdae", rdae_in, rdae_out);
   }
 
-  Sparsity Ivpsol::get_sparsity_in(int ind) const {
-    switch (static_cast<IvpsolInput>(ind)) {
-    case IVPSOL_X0: return x_;
-    case IVPSOL_P: return p_;
-    case IVPSOL_Z0: return z_;
-    case IVPSOL_RX0: return repmat(rx_, 1, ntout_);
-    case IVPSOL_RP: return repmat(rp_, 1, ntout_);
-    case IVPSOL_RZ0: return repmat(rz_, 1, ntout_);
-    case IVPSOL_NUM_IN: break;
+  Sparsity Integrator::get_sparsity_in(int ind) const {
+    switch (static_cast<IntegratorInput>(ind)) {
+    case INTEGRATOR_X0: return x_;
+    case INTEGRATOR_P: return p_;
+    case INTEGRATOR_Z0: return z_;
+    case INTEGRATOR_RX0: return repmat(rx_, 1, ntout_);
+    case INTEGRATOR_RP: return repmat(rp_, 1, ntout_);
+    case INTEGRATOR_RZ0: return repmat(rz_, 1, ntout_);
+    case INTEGRATOR_NUM_IN: break;
     }
     return Sparsity();
   }
 
-  Sparsity Ivpsol::get_sparsity_out(int ind) const {
-    switch (static_cast<IvpsolOutput>(ind)) {
-    case IVPSOL_XF: return repmat(x_, 1, ntout_);
-    case IVPSOL_QF: return repmat(q_, 1, ntout_);
-    case IVPSOL_ZF: return repmat(z_, 1, ntout_);
-    case IVPSOL_RXF: return rx_;
-    case IVPSOL_RQF: return rq_;
-    case IVPSOL_RZF: return rz_;
-    case IVPSOL_NUM_OUT: break;
+  Sparsity Integrator::get_sparsity_out(int ind) const {
+    switch (static_cast<IntegratorOutput>(ind)) {
+    case INTEGRATOR_XF: return repmat(x_, 1, ntout_);
+    case INTEGRATOR_QF: return repmat(q_, 1, ntout_);
+    case INTEGRATOR_ZF: return repmat(z_, 1, ntout_);
+    case INTEGRATOR_RXF: return rx_;
+    case INTEGRATOR_RQF: return rq_;
+    case INTEGRATOR_RZF: return rz_;
+    case INTEGRATOR_NUM_OUT: break;
     }
     return Sparsity();
   }
 
-  void Ivpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Integrator::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Create memory reference
     Memory m(this, arg, res, iw, w, mem);
 
     // Reset solver, take time to t0
-    reset(m, grid_.front(), arg[IVPSOL_X0], arg[IVPSOL_Z0], arg[IVPSOL_P]);
+    reset(m, grid_.front(), arg[INTEGRATOR_X0], arg[INTEGRATOR_Z0], arg[INTEGRATOR_P]);
 
     // Where to store outputs
-    double* x = res[IVPSOL_XF];
-    double* z = res[IVPSOL_ZF];
-    double* q = res[IVPSOL_QF];
+    double* x = res[INTEGRATOR_XF];
+    double* z = res[INTEGRATOR_ZF];
+    double* q = res[INTEGRATOR_QF];
 
     // Integrate forward
     for (int k=0; k<grid_.size(); ++k) {
@@ -156,17 +156,17 @@ namespace casadi {
     // If backwards integration is needed
     if (nrx_>0) {
       // Integrate backward
-      resetB(m, grid_.back(), arg[IVPSOL_RX0], arg[IVPSOL_RZ0], arg[IVPSOL_RP]);
+      resetB(m, grid_.back(), arg[INTEGRATOR_RX0], arg[INTEGRATOR_RZ0], arg[INTEGRATOR_RP]);
 
       // Proceed to t0
-      retreat(m, grid_.front(), res[IVPSOL_RXF], res[IVPSOL_RZF], res[IVPSOL_RQF]);
+      retreat(m, grid_.front(), res[INTEGRATOR_RXF], res[INTEGRATOR_RZF], res[INTEGRATOR_RQF]);
     }
 
     // Print statistics
     if (print_stats_) printStats(userOut());
   }
 
-  void Ivpsol::init() {
+  void Integrator::init() {
     // Read options
     output_t0_ = option("output_t0");
     print_stats_ = option("print_stats");
@@ -205,7 +205,7 @@ namespace casadi {
     }
     casadi_assert_message(f_.size_out(DAE_ODE)==x().size(),
                           "Inconsistent dimensions. Expecting DAE_ODE output of shape "
-                          << size_in(IVPSOL_X0) << ", but got "
+                          << size_in(INTEGRATOR_X0) << ", but got "
                           << f_.size_out(DAE_ODE) << " instead.");
     casadi_assert(f_.sparsity_out(DAE_ODE)==x());
     casadi_assert_message(f_.size_out(DAE_ALG)==z().size(),
@@ -244,8 +244,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> Ivpsol::aug_fwd(int nfwd, AugOffset& offset) {
-    log("Ivpsol::aug_fwd", "call");
+  map<string, MatType> Integrator::aug_fwd(int nfwd, AugOffset& offset) {
+    log("Integrator::aug_fwd", "call");
 
     // Return object
     map<string, MatType> ret;
@@ -396,8 +396,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> Ivpsol::aug_adj(int nadj, AugOffset& offset) {
-    log("Ivpsol::aug_adj", "call");
+  map<string, MatType> Integrator::aug_adj(int nadj, AugOffset& offset) {
+    log("Integrator::aug_adj", "call");
 
     // Return object
     map<string, MatType> ret;
@@ -410,7 +410,7 @@ namespace casadi {
     MatType aug_x = MatType::sym("aug_x", x().size1(), offset.x.back());
     MatType aug_z = MatType::sym("aug_z", std::max(z().size1(), rz().size1()), offset.z.back());
     MatType aug_p = MatType::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
-    MatType aug_rx = MatType::sym("aug_rx", size1_in(IVPSOL_X0), offset.rx.back());
+    MatType aug_rx = MatType::sym("aug_rx", size1_in(INTEGRATOR_X0), offset.rx.back());
     MatType aug_rz = MatType::sym("aug_rz", std::max(z().size1(), rz().size1()), offset.rz.back());
     MatType aug_rp = MatType::sym("aug_rp", std::max(q().size1(), rp().size1()), offset.rp.back());
 
@@ -635,8 +635,8 @@ namespace casadi {
     return ret;
   }
 
-  void Ivpsol::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    log("Ivpsol::spFwd", "begin");
+  void Integrator::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    log("Integrator::spFwd", "begin");
 
     // Work vectors
     bvec_t *tmp_x = w; w += nx_;
@@ -647,15 +647,15 @@ namespace casadi {
     // Propagate through f
     const bvec_t** arg1 = arg+n_in();
     fill(arg1, arg1+DAE_NUM_IN, static_cast<bvec_t*>(0));
-    arg1[DAE_X] = arg[IVPSOL_X0];
-    arg1[DAE_P] = arg[IVPSOL_P];
+    arg1[DAE_X] = arg[INTEGRATOR_X0];
+    arg1[DAE_P] = arg[INTEGRATOR_P];
     bvec_t** res1 = res+n_out();
     fill(res1, res1+DAE_NUM_OUT, static_cast<bvec_t*>(0));
     res1[DAE_ODE] = tmp_x;
     res1[DAE_ALG] = tmp_z;
     f_(arg1, res1, iw, w, 0);
-    if (arg[IVPSOL_X0]) {
-      const bvec_t *tmp = arg[IVPSOL_X0];
+    if (arg[INTEGRATOR_X0]) {
+      const bvec_t *tmp = arg[INTEGRATOR_X0];
       for (int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
     }
 
@@ -666,17 +666,17 @@ namespace casadi {
     linsol_f_.linsol_spsolve(tmp_x, w, false);
 
     // Get xf and zf
-    if (res[IVPSOL_XF])
-      copy(tmp_x, tmp_x+nx_, res[IVPSOL_XF]);
-    if (res[IVPSOL_ZF])
-      copy(tmp_z, tmp_z+nz_, res[IVPSOL_ZF]);
+    if (res[INTEGRATOR_XF])
+      copy(tmp_x, tmp_x+nx_, res[INTEGRATOR_XF]);
+    if (res[INTEGRATOR_ZF])
+      copy(tmp_z, tmp_z+nz_, res[INTEGRATOR_ZF]);
 
     // Propagate to quadratures
-    if (nq_>0 && res[IVPSOL_QF]) {
+    if (nq_>0 && res[INTEGRATOR_QF]) {
       arg1[DAE_X] = tmp_x;
       arg1[DAE_Z] = tmp_z;
       res1[DAE_ODE] = res1[DAE_ALG] = 0;
-      res1[DAE_QUAD] = res[IVPSOL_QF];
+      res1[DAE_QUAD] = res[INTEGRATOR_QF];
       f_(arg1, res1, iw, w, 0);
     }
 
@@ -684,17 +684,17 @@ namespace casadi {
       // Propagate through g
       fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
       arg1[RDAE_X] = tmp_x;
-      arg1[RDAE_P] = arg[IVPSOL_P];
+      arg1[RDAE_P] = arg[INTEGRATOR_P];
       arg1[RDAE_Z] = tmp_z;
-      arg1[RDAE_RX] = arg[IVPSOL_X0];
-      arg1[RDAE_RX] = arg[IVPSOL_RX0];
-      arg1[RDAE_RP] = arg[IVPSOL_RP];
+      arg1[RDAE_RX] = arg[INTEGRATOR_X0];
+      arg1[RDAE_RX] = arg[INTEGRATOR_RX0];
+      arg1[RDAE_RP] = arg[INTEGRATOR_RP];
       fill(res1, res1+RDAE_NUM_OUT, static_cast<bvec_t*>(0));
       res1[RDAE_ODE] = tmp_rx;
       res1[RDAE_ALG] = tmp_rz;
       g_(arg1, res1, iw, w, 0);
-      if (arg[IVPSOL_RX0]) {
-        const bvec_t *tmp = arg[IVPSOL_RX0];
+      if (arg[INTEGRATOR_RX0]) {
+        const bvec_t *tmp = arg[INTEGRATOR_RX0];
         for (int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
       }
 
@@ -705,25 +705,25 @@ namespace casadi {
       linsol_g_.linsol_spsolve(tmp_rx, w, false);
 
       // Get rxf and rzf
-      if (res[IVPSOL_RXF])
-        copy(tmp_rx, tmp_rx+nrx_, res[IVPSOL_RXF]);
-      if (res[IVPSOL_RZF])
-        copy(tmp_rz, tmp_rz+nrz_, res[IVPSOL_RZF]);
+      if (res[INTEGRATOR_RXF])
+        copy(tmp_rx, tmp_rx+nrx_, res[INTEGRATOR_RXF]);
+      if (res[INTEGRATOR_RZF])
+        copy(tmp_rz, tmp_rz+nrz_, res[INTEGRATOR_RZF]);
 
       // Propagate to quadratures
-      if (nrq_>0 && res[IVPSOL_RQF]) {
+      if (nrq_>0 && res[INTEGRATOR_RQF]) {
         arg1[RDAE_RX] = tmp_rx;
         arg1[RDAE_RZ] = tmp_rz;
         res1[RDAE_ODE] = res1[RDAE_ALG] = 0;
-        res1[RDAE_QUAD] = res[IVPSOL_RQF];
+        res1[RDAE_QUAD] = res[INTEGRATOR_RQF];
         g_(arg1, res1, iw, w, 0);
       }
     }
-    log("Ivpsol::spFwd", "end");
+    log("Integrator::spFwd", "end");
   }
 
-  void Ivpsol::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    log("Ivpsol::spAdj", "begin");
+  void Integrator::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+    log("Integrator::spAdj", "begin");
 
     // Work vectors
     bvec_t** arg1 = arg+n_in();
@@ -732,11 +732,11 @@ namespace casadi {
     bvec_t *tmp_z = w; w += nz_;
 
     // Shorthands
-    bvec_t* x0 = arg[IVPSOL_X0];
-    bvec_t* p = arg[IVPSOL_P];
-    bvec_t* xf = res[IVPSOL_XF];
-    bvec_t* zf = res[IVPSOL_ZF];
-    bvec_t* qf = res[IVPSOL_QF];
+    bvec_t* x0 = arg[INTEGRATOR_X0];
+    bvec_t* p = arg[INTEGRATOR_P];
+    bvec_t* xf = res[INTEGRATOR_XF];
+    bvec_t* zf = res[INTEGRATOR_ZF];
+    bvec_t* qf = res[INTEGRATOR_QF];
 
     // Propagate from outputs to state vectors
     if (xf) {
@@ -758,11 +758,11 @@ namespace casadi {
       bvec_t *tmp_rz = w; w += nrz_;
 
       // Shorthands
-      bvec_t* rx0 = arg[IVPSOL_RX0];
-      bvec_t* rp = arg[IVPSOL_RP];
-      bvec_t* rxf = res[IVPSOL_RXF];
-      bvec_t* rzf = res[IVPSOL_RZF];
-      bvec_t* rqf = res[IVPSOL_RQF];
+      bvec_t* rx0 = arg[INTEGRATOR_RX0];
+      bvec_t* rp = arg[INTEGRATOR_RP];
+      bvec_t* rxf = res[INTEGRATOR_RXF];
+      bvec_t* rzf = res[INTEGRATOR_RZF];
+      bvec_t* rqf = res[INTEGRATOR_RQF];
 
       // Propagate from outputs to state vectors
       if (rxf) {
@@ -804,7 +804,7 @@ namespace casadi {
       res1[RDAE_ALG] = tmp_rz;
       res1[RDAE_QUAD] = 0;
       arg1[RDAE_RX] = rx0;
-      arg1[RDAE_RZ] = 0; // arg[IVPSOL_RZ0] is a guess, no dependency
+      arg1[RDAE_RZ] = 0; // arg[INTEGRATOR_RZ0] is a guess, no dependency
       g_.rev(arg1, res1, iw, w, 0);
     }
 
@@ -831,13 +831,13 @@ namespace casadi {
     res1[DAE_ALG] = tmp_z;
     res1[DAE_QUAD] = 0;
     arg1[DAE_X] = x0;
-    arg1[DAE_Z] = 0; // arg[IVPSOL_Z0] is a guess, no dependency
+    arg1[DAE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
     f_.rev(arg1, res1, iw, w, 0);
 
-    log("Ivpsol::spAdj", "end");
+    log("Integrator::spAdj", "end");
   }
 
-  Ivpsol::AugOffset Ivpsol::getAugOffset(int nfwd, int nadj) {
+  Integrator::AugOffset Integrator::getAugOffset(int nfwd, int nadj) {
     // Form return object
     AugOffset ret;
     ret.x.resize(1, 0);
@@ -887,10 +887,10 @@ namespace casadi {
     return ret;
   }
 
-  Function Ivpsol::get_forward(const std::string& name, int nfwd, Dict& opts) {
-    log("Ivpsol::get_forward", "begin");
+  Function Integrator::get_forward(const std::string& name, int nfwd, Dict& opts) {
+    log("Integrator::get_forward", "begin");
 
-    // Ivpsol options
+    // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
     if (hasSetOption("augmented_options")) {
       Dict aug_opts_user = option("augmented_options");
@@ -904,20 +904,20 @@ namespace casadi {
     ss << "aug_f" << nfwd << name_;
 
     // Create integrator for augmented DAE
-    Function integrator;
+    Function aug_int;
     AugOffset offset;
     if (f_.is_a("sxfunction")) {
       SXDict aug_dae = aug_fwd<SX>(nfwd, offset);
-      integrator = Function::ivpsol(ss.str(), plugin_name(), aug_dae, aug_opts);
+      aug_int = integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
     } else {
       casadi_assert(f_.is_a("mxfunction"));
       MXDict aug_dae = aug_fwd<MX>(nfwd, offset);
-      integrator = Function::ivpsol(ss.str(), plugin_name(), aug_dae, aug_opts);
+      aug_int = integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
     }
 
     // All inputs of the return function
     vector<MX> ret_in;
-    ret_in.reserve(IVPSOL_NUM_IN*(1+nfwd) + IVPSOL_NUM_OUT);
+    ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT);
 
     // Augmented state
     vector<MX> x0_augv, p_augv, z0_augv, rx0_augv, rp_augv, rz0_augv;
@@ -926,75 +926,75 @@ namespace casadi {
     vector<MX> dd;
 
     // Add nondifferentiated inputs and forward seeds
-    dd.resize(IVPSOL_NUM_IN);
+    dd.resize(INTEGRATOR_NUM_IN);
     for (int dir=-1; dir<nfwd; ++dir) {
 
       // Differential state
       ss.clear();
       ss << "x0";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_X0] = MX::sym(ss.str(), x());
-      x0_augv.push_back(dd[IVPSOL_X0]);
+      dd[INTEGRATOR_X0] = MX::sym(ss.str(), x());
+      x0_augv.push_back(dd[INTEGRATOR_X0]);
 
       // Parameter
       ss.clear();
       ss << "p";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_P] = MX::sym(ss.str(), p());
-      p_augv.push_back(dd[IVPSOL_P]);
+      dd[INTEGRATOR_P] = MX::sym(ss.str(), p());
+      p_augv.push_back(dd[INTEGRATOR_P]);
 
       // Initial guess for algebraic variable
       ss.clear();
       ss << "r0";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_Z0] = MX::sym(ss.str(), z());
-      z0_augv.push_back(dd[IVPSOL_Z0]);
+      dd[INTEGRATOR_Z0] = MX::sym(ss.str(), z());
+      z0_augv.push_back(dd[INTEGRATOR_Z0]);
 
       // Backward state
       ss.clear();
       ss << "rx0";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_RX0] = MX::sym(ss.str(), rx());
-      rx0_augv.push_back(dd[IVPSOL_RX0]);
+      dd[INTEGRATOR_RX0] = MX::sym(ss.str(), rx());
+      rx0_augv.push_back(dd[INTEGRATOR_RX0]);
 
       // Backward parameter
       ss.clear();
       ss << "rp";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_RP] = MX::sym(ss.str(), rp());
-      rp_augv.push_back(dd[IVPSOL_RP]);
+      dd[INTEGRATOR_RP] = MX::sym(ss.str(), rp());
+      rp_augv.push_back(dd[INTEGRATOR_RP]);
 
       // Initial guess for backward algebraic variable
       ss.clear();
       ss << "rz0";
       if (dir>=0) ss << "_" << dir;
-      dd[IVPSOL_RZ0] = MX::sym(ss.str(), rz());
-      rz0_augv.push_back(dd[IVPSOL_RZ0]);
+      dd[INTEGRATOR_RZ0] = MX::sym(ss.str(), rz());
+      rz0_augv.push_back(dd[INTEGRATOR_RZ0]);
 
       // Add to input vector
       ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
       // Make space for dummy outputs
-      if (dir==-1) ret_in.resize(ret_in.size() + IVPSOL_NUM_OUT);
+      if (dir==-1) ret_in.resize(ret_in.size() + INTEGRATOR_NUM_OUT);
     }
 
     // Call the integrator
-    vector<MX> ivpsol_in(IVPSOL_NUM_IN);
-    ivpsol_in[IVPSOL_X0] = horzcat(x0_augv);
-    ivpsol_in[IVPSOL_P] = horzcat(p_augv);
-    ivpsol_in[IVPSOL_Z0] = horzcat(z0_augv);
-    ivpsol_in[IVPSOL_RX0] = horzcat(rx0_augv);
-    ivpsol_in[IVPSOL_RP] = horzcat(rp_augv);
-    ivpsol_in[IVPSOL_RZ0] = horzcat(rz0_augv);
-    vector<MX> ivpsol_out = integrator(ivpsol_in);
+    vector<MX> integrator_in(INTEGRATOR_NUM_IN);
+    integrator_in[INTEGRATOR_X0] = horzcat(x0_augv);
+    integrator_in[INTEGRATOR_P] = horzcat(p_augv);
+    integrator_in[INTEGRATOR_Z0] = horzcat(z0_augv);
+    integrator_in[INTEGRATOR_RX0] = horzcat(rx0_augv);
+    integrator_in[INTEGRATOR_RP] = horzcat(rp_augv);
+    integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_augv);
+    vector<MX> integrator_out = aug_int(integrator_in);
 
     // Augmented results
-    vector<MX> xf_aug = horzsplit(ivpsol_out[IVPSOL_XF], offset.x);
-    vector<MX> qf_aug = horzsplit(ivpsol_out[IVPSOL_QF], offset.q);
-    vector<MX> zf_aug = horzsplit(ivpsol_out[IVPSOL_ZF], offset.z);
-    vector<MX> rxf_aug = horzsplit(ivpsol_out[IVPSOL_RXF], offset.rx);
-    vector<MX> rqf_aug = horzsplit(ivpsol_out[IVPSOL_RQF], offset.rq);
-    vector<MX> rzf_aug = horzsplit(ivpsol_out[IVPSOL_RZF], offset.rz);
+    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
+    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset.q);
+    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset.z);
+    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
+    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
+    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
     vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
     vector<MX>::const_iterator qf_aug_it = qf_aug.begin();
     vector<MX>::const_iterator zf_aug_it = zf_aug.begin();
@@ -1003,41 +1003,41 @@ namespace casadi {
     vector<MX>::const_iterator rzf_aug_it = rzf_aug.begin();
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
-    dd.resize(IVPSOL_NUM_OUT);
-    dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(size_out(IVPSOL_XF)));
-    dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
-    dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
-    dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
-    dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
-    dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
-    std::copy(dd.begin(), dd.end(), ret_in.begin()+IVPSOL_NUM_IN);
+    dd.resize(INTEGRATOR_NUM_OUT);
+    dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(size_out(INTEGRATOR_XF)));
+    dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
+    dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
+    dd[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
+    dd[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
+    dd[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
+    std::copy(dd.begin(), dd.end(), ret_in.begin()+INTEGRATOR_NUM_IN);
 
     // All outputs of the return function
     vector<MX> ret_out;
-    ret_out.reserve(IVPSOL_NUM_OUT*nfwd);
+    ret_out.reserve(INTEGRATOR_NUM_OUT*nfwd);
 
     // Collect the forward sensitivities
     fill(dd.begin(), dd.end(), MX());
     for (int dir=-1; dir<nfwd; ++dir) {
-      if ( nx_>0) dd[IVPSOL_XF]  = *xf_aug_it++;
-      if ( nq_>0) dd[IVPSOL_QF]  = *qf_aug_it++;
-      if ( nz_>0) dd[IVPSOL_ZF]  = *zf_aug_it++;
-      if (nrx_>0) dd[IVPSOL_RXF] = *rxf_aug_it++;
-      if (nrq_>0) dd[IVPSOL_RQF] = *rqf_aug_it++;
-      if (nrz_>0) dd[IVPSOL_RZF] = *rzf_aug_it++;
+      if ( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
+      if ( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
+      if ( nz_>0) dd[INTEGRATOR_ZF]  = *zf_aug_it++;
+      if (nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
+      if (nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
+      if (nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
       if (dir>=0) // Nondifferentiated output ignored
         ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    log("Ivpsol::get_forward", "end");
+    log("Integrator::get_forward", "end");
 
     // Create derivative function and return
     return Function(name, ret_in, ret_out, opts);
   }
 
-  Function Ivpsol::get_reverse(const std::string& name, int nadj, Dict& opts) {
-    log("Ivpsol::get_reverse", "begin");
+  Function Integrator::get_reverse(const std::string& name, int nadj, Dict& opts) {
+    log("Integrator::get_reverse", "begin");
 
-    // Ivpsol options
+    // Integrator options
     Dict aug_opts = getDerivativeOptions(false);
     if (hasSetOption("augmented_options")) {
       Dict aug_opts_user = option("augmented_options");
@@ -1051,20 +1051,20 @@ namespace casadi {
     ss << "aug_r" << nadj << name_;
 
     // Create integrator for augmented DAE
-    Function integrator;
+    Function aug_int;
     AugOffset offset;
     if (f_.is_a("sxfunction")) {
       SXDict aug_dae = aug_adj<SX>(nadj, offset);
-      integrator = Function::ivpsol(ss.str(), plugin_name(), aug_dae, aug_opts);
+      aug_int = integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
     } else {
       casadi_assert(f_.is_a("mxfunction"));
       MXDict aug_dae = aug_adj<MX>(nadj, offset);
-      integrator = Function::ivpsol(ss.str(), plugin_name(), aug_dae, aug_opts);
+      aug_int = integrator(ss.str(), plugin_name(), aug_dae, aug_opts);
     }
 
     // All inputs of the return function
     vector<MX> ret_in;
-    ret_in.reserve(IVPSOL_NUM_IN + IVPSOL_NUM_OUT*(1+nadj));
+    ret_in.reserve(INTEGRATOR_NUM_IN + INTEGRATOR_NUM_OUT*(1+nadj));
 
     // Augmented state
     vector<MX> x0_augv, p_augv, z0_augv, rx0_augv, rp_augv, rz0_augv;
@@ -1073,108 +1073,108 @@ namespace casadi {
     vector<MX> dd;
 
     // Add nondifferentiated inputs and forward seeds
-    dd.resize(IVPSOL_NUM_IN);
+    dd.resize(INTEGRATOR_NUM_IN);
     fill(dd.begin(), dd.end(), MX());
 
     // Differential state
-    dd[IVPSOL_X0] = MX::sym("x0", x());
-    x0_augv.push_back(dd[IVPSOL_X0]);
+    dd[INTEGRATOR_X0] = MX::sym("x0", x());
+    x0_augv.push_back(dd[INTEGRATOR_X0]);
 
     // Parameter
-    dd[IVPSOL_P] = MX::sym("p", p());
-    p_augv.push_back(dd[IVPSOL_P]);
+    dd[INTEGRATOR_P] = MX::sym("p", p());
+    p_augv.push_back(dd[INTEGRATOR_P]);
 
     // Initial guess for algebraic variable
-    dd[IVPSOL_Z0] = MX::sym("r0", z());
-    z0_augv.push_back(dd[IVPSOL_Z0]);
+    dd[INTEGRATOR_Z0] = MX::sym("r0", z());
+    z0_augv.push_back(dd[INTEGRATOR_Z0]);
 
     // Backward state
-    dd[IVPSOL_RX0] = MX::sym("rx0", rx());
-    rx0_augv.push_back(dd[IVPSOL_RX0]);
+    dd[INTEGRATOR_RX0] = MX::sym("rx0", rx());
+    rx0_augv.push_back(dd[INTEGRATOR_RX0]);
 
     // Backward parameter
-    dd[IVPSOL_RP] = MX::sym("rp", rp());
-    rp_augv.push_back(dd[IVPSOL_RP]);
+    dd[INTEGRATOR_RP] = MX::sym("rp", rp());
+    rp_augv.push_back(dd[INTEGRATOR_RP]);
 
     // Initial guess for backward algebraic variable
-    dd[IVPSOL_RZ0] = MX::sym("rz0", rz());
-    rz0_augv.push_back(dd[IVPSOL_RZ0]);
+    dd[INTEGRATOR_RZ0] = MX::sym("rz0", rz());
+    rz0_augv.push_back(dd[INTEGRATOR_RZ0]);
 
     // Add to input vector
     ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
-    dd.resize(IVPSOL_NUM_OUT);
-    dd[IVPSOL_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
-    dd[IVPSOL_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
-    dd[IVPSOL_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
-    dd[IVPSOL_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
-    dd[IVPSOL_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
-    dd[IVPSOL_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
+    dd.resize(INTEGRATOR_NUM_OUT);
+    dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
+    dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
+    dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
+    dd[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
+    dd[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
+    dd[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
     ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
     // Add adjoint seeds
-    dd.resize(IVPSOL_NUM_OUT);
+    dd.resize(INTEGRATOR_NUM_OUT);
     fill(dd.begin(), dd.end(), MX());
     for (int dir=0; dir<nadj; ++dir) {
 
       // Differential states become backward differential state
       ss.clear();
       ss << "xf" << "_" << dir;
-      dd[IVPSOL_XF] = MX::sym(ss.str(), x());
-      rx0_augv.push_back(dd[IVPSOL_XF]);
+      dd[INTEGRATOR_XF] = MX::sym(ss.str(), x());
+      rx0_augv.push_back(dd[INTEGRATOR_XF]);
 
       // Quadratures become backward parameters
       ss.clear();
       ss << "qf" << "_" << dir;
-      dd[IVPSOL_QF] = MX::sym(ss.str(), q());
-      rp_augv.push_back(dd[IVPSOL_QF]);
+      dd[INTEGRATOR_QF] = MX::sym(ss.str(), q());
+      rp_augv.push_back(dd[INTEGRATOR_QF]);
 
       // Algebraic variables become backward algebraic variables
       ss.clear();
       ss << "zf" << "_" << dir;
-      dd[IVPSOL_ZF] = MX::sym(ss.str(), z());
-      rz0_augv.push_back(dd[IVPSOL_ZF]);
+      dd[INTEGRATOR_ZF] = MX::sym(ss.str(), z());
+      rz0_augv.push_back(dd[INTEGRATOR_ZF]);
 
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rxf" << "_" << dir;
-      dd[IVPSOL_RXF] = MX::sym(ss.str(), rx());
-      x0_augv.push_back(dd[IVPSOL_RXF]);
+      dd[INTEGRATOR_RXF] = MX::sym(ss.str(), rx());
+      x0_augv.push_back(dd[INTEGRATOR_RXF]);
 
       // Backward quadratures becomes (forward) parameters
       ss.clear();
       ss << "rqf" << "_" << dir;
-      dd[IVPSOL_RQF] = MX::sym(ss.str(), rq());
-      p_augv.push_back(dd[IVPSOL_RQF]);
+      dd[INTEGRATOR_RQF] = MX::sym(ss.str(), rq());
+      p_augv.push_back(dd[INTEGRATOR_RQF]);
 
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rzf" << "_" << dir;
-      dd[IVPSOL_RZF] = MX::sym(ss.str(), rz());
-      z0_augv.push_back(dd[IVPSOL_RZF]);
+      dd[INTEGRATOR_RZF] = MX::sym(ss.str(), rz());
+      z0_augv.push_back(dd[INTEGRATOR_RZF]);
 
       // Add to input vector
       ret_in.insert(ret_in.end(), dd.begin(), dd.end());
     }
 
     // Call the integrator
-    vector<MX> ivpsol_in(IVPSOL_NUM_IN);
-    ivpsol_in[IVPSOL_X0] = horzcat(x0_augv);
-    ivpsol_in[IVPSOL_P] = horzcat(p_augv);
-    ivpsol_in[IVPSOL_Z0] = horzcat(z0_augv);
-    ivpsol_in[IVPSOL_RX0] = horzcat(rx0_augv);
-    ivpsol_in[IVPSOL_RP] = horzcat(rp_augv);
-    ivpsol_in[IVPSOL_RZ0] = horzcat(rz0_augv);
-    vector<MX> ivpsol_out = integrator(ivpsol_in);
+    vector<MX> integrator_in(INTEGRATOR_NUM_IN);
+    integrator_in[INTEGRATOR_X0] = horzcat(x0_augv);
+    integrator_in[INTEGRATOR_P] = horzcat(p_augv);
+    integrator_in[INTEGRATOR_Z0] = horzcat(z0_augv);
+    integrator_in[INTEGRATOR_RX0] = horzcat(rx0_augv);
+    integrator_in[INTEGRATOR_RP] = horzcat(rp_augv);
+    integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_augv);
+    vector<MX> integrator_out = aug_int(integrator_in);
 
     // Augmented results
-    vector<MX> xf_aug = horzsplit(ivpsol_out[IVPSOL_XF], offset.x);
-    vector<MX> qf_aug = horzsplit(ivpsol_out[IVPSOL_QF], offset.q);
-    vector<MX> zf_aug = horzsplit(ivpsol_out[IVPSOL_ZF], offset.z);
-    vector<MX> rxf_aug = horzsplit(ivpsol_out[IVPSOL_RXF], offset.rx);
-    vector<MX> rqf_aug = horzsplit(ivpsol_out[IVPSOL_RQF], offset.rq);
-    vector<MX> rzf_aug = horzsplit(ivpsol_out[IVPSOL_RZF], offset.rz);
+    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
+    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset.q);
+    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset.z);
+    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
+    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
+    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
     vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
     vector<MX>::const_iterator qf_aug_it = qf_aug.begin();
     vector<MX>::const_iterator zf_aug_it = zf_aug.begin();
@@ -1184,55 +1184,55 @@ namespace casadi {
 
     // All outputs of the return function
     vector<MX> ret_out;
-    ret_out.reserve(IVPSOL_NUM_IN*nadj);
+    ret_out.reserve(INTEGRATOR_NUM_IN*nadj);
 
     // Collect the nondifferentiated results and forward sensitivities
-    dd.resize(IVPSOL_NUM_OUT);
+    dd.resize(INTEGRATOR_NUM_OUT);
     fill(dd.begin(), dd.end(), MX());
     for (int dir=-1; dir<0; ++dir) {
-      if ( nx_>0) dd[IVPSOL_XF]  = *xf_aug_it++;
-      if ( nq_>0) dd[IVPSOL_QF]  = *qf_aug_it++;
-      if ( nz_>0) dd[IVPSOL_ZF]  = *zf_aug_it++;
-      if (nrx_>0) dd[IVPSOL_RXF] = *rxf_aug_it++;
-      if (nrq_>0) dd[IVPSOL_RQF] = *rqf_aug_it++;
-      if (nrz_>0) dd[IVPSOL_RZF] = *rzf_aug_it++;
+      if ( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
+      if ( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
+      if ( nz_>0) dd[INTEGRATOR_ZF]  = *zf_aug_it++;
+      if (nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
+      if (nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
+      if (nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
       //ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
 
     // Collect the adjoint sensitivities
-    dd.resize(IVPSOL_NUM_IN);
+    dd.resize(INTEGRATOR_NUM_IN);
     fill(dd.begin(), dd.end(), MX());
     for (int dir=0; dir<nadj; ++dir) {
-      if ( nx_>0) dd[IVPSOL_X0]  = *rxf_aug_it++;
-      if ( np_>0) dd[IVPSOL_P]   = *rqf_aug_it++;
-      if ( nz_>0) dd[IVPSOL_Z0]  = *rzf_aug_it++;
-      if (nrx_>0) dd[IVPSOL_RX0] = *xf_aug_it++;
-      if (nrp_>0) dd[IVPSOL_RP]  = *qf_aug_it++;
-      if (nrz_>0) dd[IVPSOL_RZ0] = *zf_aug_it++;
+      if ( nx_>0) dd[INTEGRATOR_X0]  = *rxf_aug_it++;
+      if ( np_>0) dd[INTEGRATOR_P]   = *rqf_aug_it++;
+      if ( nz_>0) dd[INTEGRATOR_Z0]  = *rzf_aug_it++;
+      if (nrx_>0) dd[INTEGRATOR_RX0] = *xf_aug_it++;
+      if (nrp_>0) dd[INTEGRATOR_RP]  = *qf_aug_it++;
+      if (nrz_>0) dd[INTEGRATOR_RZ0] = *zf_aug_it++;
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    log("Ivpsol::getDerivative", "end");
+    log("Integrator::getDerivative", "end");
 
     // Create derivative function and return
     return Function(name, ret_in, ret_out, opts);
   }
 
-  void Ivpsol::set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {
+  void Integrator::set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {
   }
 
-  void Ivpsol::set_temp(Memory& m, const double** arg, double** res, int* iw, double* w) {
+  void Integrator::set_temp(Memory& m, const double** arg, double** res, int* iw, double* w) {
     arg_ = arg;
     res_ = res;
     iw_ = iw;
     w_ = w;
   }
 
-  Dict Ivpsol::getDerivativeOptions(bool fwd) {
+  Dict Integrator::getDerivativeOptions(bool fwd) {
     // Copy all options
     return dictionary();
   }
 
-  Sparsity Ivpsol::spJacF() {
+  Sparsity Integrator::spJacF() {
     // Start with the sparsity pattern of the ODE part
     Sparsity jac_ode_x = f_.sparsity_jac(DAE_X, DAE_ODE);
 
@@ -1250,7 +1250,7 @@ namespace casadi {
                     jac_alg_x, jac_alg_z);
   }
 
-  Sparsity Ivpsol::spJacG() {
+  Sparsity Integrator::spJacG() {
     // Start with the sparsity pattern of the ODE part
     Sparsity jac_ode_x = g_.sparsity_jac(RDAE_RX, RDAE_ODE);
 
@@ -1268,26 +1268,26 @@ namespace casadi {
                     jac_alg_x, jac_alg_z);
   }
 
-  std::map<std::string, Ivpsol::Plugin> Ivpsol::solvers_;
+  std::map<std::string, Integrator::Plugin> Integrator::solvers_;
 
-  const std::string Ivpsol::infix_ = "ivpsol";
+  const std::string Integrator::infix_ = "integrator";
 
-  void Ivpsol::setStopTime(double tf) {
-    casadi_error("Ivpsol::setStopTime not defined for class "
+  void Integrator::setStopTime(double tf) {
+    casadi_error("Integrator::setStopTime not defined for class "
                  << typeid(*this).name());
   }
 
-  FixedStepIvpsol::FixedStepIvpsol(const std::string& name, const XProblem& dae)
-    : Ivpsol(name, dae) {
+  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
+    : Integrator(name, dae) {
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
-  FixedStepIvpsol::~FixedStepIvpsol() {
+  FixedStepIntegrator::~FixedStepIntegrator() {
   }
 
-  void FixedStepIvpsol::init() {
+  void FixedStepIntegrator::init() {
     // Call the base class init
-    Ivpsol::init();
+    Integrator::init();
 
     // Number of finite elements and time steps
     nk_ = option("number_of_finite_elements");
@@ -1326,7 +1326,7 @@ namespace casadi {
     rq_prev_.resize(nrq_);
   }
 
-  void FixedStepIvpsol::advance(Memory& m, double t, double* x, double* z, double* q) {
+  void FixedStepIntegrator::advance(Memory& m, double t, double* x, double* z, double* q) {
     // Get discrete time sought
     int k_out = std::ceil((t - grid_.front())/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
@@ -1376,7 +1376,7 @@ namespace casadi {
     casadi_copy(getPtr(q_), nq_, q);
   }
 
-  void FixedStepIvpsol::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
+  void FixedStepIntegrator::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
     // Get discrete time sought
     int k_out = std::floor((t - grid_.front())/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
@@ -1423,7 +1423,7 @@ namespace casadi {
     casadi_copy(getPtr(rq_), nrq_, rq);
   }
 
-  void FixedStepIvpsol::reset(Memory& m, double t, const double* x,
+  void FixedStepIntegrator::reset(Memory& m, double t, const double* x,
                               const double* z, const double* p) {
     // Update time
     t_ = t;
@@ -1450,7 +1450,7 @@ namespace casadi {
     }
   }
 
-  void FixedStepIvpsol::resetB(Memory& m, double t, const double* rx,
+  void FixedStepIntegrator::resetB(Memory& m, double t, const double* rx,
                                const double* rz, const double* rp) {
     // Update time
     t_ = t;
@@ -1472,21 +1472,21 @@ namespace casadi {
     RZ_.set(numeric_limits<double>::quiet_NaN());
   }
 
-  ImplicitFixedStepIvpsol::
-  ImplicitFixedStepIvpsol(const std::string& name, const XProblem& dae)
-    : FixedStepIvpsol(name, dae) {
+  ImplicitFixedStepIntegrator::
+  ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae)
+    : FixedStepIntegrator(name, dae) {
     addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICT, GenericType(),
               "Options to be passed to the NLP Solver");
   }
 
-  ImplicitFixedStepIvpsol::~ImplicitFixedStepIvpsol() {
+  ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {
   }
 
-  void ImplicitFixedStepIvpsol::init() {
+  void ImplicitFixedStepIntegrator::init() {
     // Call the base class init
-    FixedStepIvpsol::init();
+    FixedStepIntegrator::init();
 
     // Get the NLP creator function
     std::string implicit_function_name = option("implicit_solver");

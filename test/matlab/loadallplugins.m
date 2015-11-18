@@ -4,8 +4,8 @@ for pl = strsplit(CasadiMeta.getPlugins(),';')
   out  = strsplit(pl{:},'::');
   cls  = out{1};
   name = out{2};
-  if strcmp(cls, 'Ivpsol')
-    eval(['Function.load_ivpsol(''' name ''')'])
+  if strcmp(cls, 'Integrator')
+    eval(['Function.load_casadi.integrator(''' name ''')'])
   elseif strcmp(cls, 'Nlpsol')
     eval(['Function.load_nlpsol(''' name ''')'])
   elseif strcmp(cls, 'Qpsol')

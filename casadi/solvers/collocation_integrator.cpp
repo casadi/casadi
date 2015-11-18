@@ -31,22 +31,22 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IVPSOL_COLLOCATION_EXPORT
-      casadi_register_ivpsol_collocation(Ivpsol::Plugin* plugin) {
-    plugin->creator = CollocationIvpsol::creator;
+  int CASADI_INTEGRATOR_COLLOCATION_EXPORT
+      casadi_register_integrator_collocation(Integrator::Plugin* plugin) {
+    plugin->creator = CollocationIntegrator::creator;
     plugin->name = "collocation";
-    plugin->doc = CollocationIvpsol::meta_doc.c_str();
+    plugin->doc = CollocationIntegrator::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
 
   extern "C"
-  void CASADI_IVPSOL_COLLOCATION_EXPORT casadi_load_ivpsol_collocation() {
-    Ivpsol::registerPlugin(casadi_register_ivpsol_collocation);
+  void CASADI_INTEGRATOR_COLLOCATION_EXPORT casadi_load_integrator_collocation() {
+    Integrator::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIvpsol::CollocationIvpsol(const std::string& name, const XProblem& dae)
-    : ImplicitFixedStepIvpsol(name, dae) {
+  CollocationIntegrator::CollocationIntegrator(const std::string& name, const XProblem& dae)
+    : ImplicitFixedStepIntegrator(name, dae) {
 
     addOption("interpolation_order",           OT_INTEGER,  3,
               "Order of the interpolating polynomials");
@@ -54,17 +54,17 @@ namespace casadi {
               "Collocation scheme", "radau|legendre");
   }
 
-  CollocationIvpsol::~CollocationIvpsol() {
+  CollocationIntegrator::~CollocationIntegrator() {
   }
 
-  void CollocationIvpsol::init() {
+  void CollocationIntegrator::init() {
 
     // Call the base class init
-    ImplicitFixedStepIvpsol::init();
+    ImplicitFixedStepIntegrator::init();
 
   }
 
-  void CollocationIvpsol::setupFG() {
+  void CollocationIntegrator::setupFG() {
 
     // Interpolation order
     deg_ = option("interpolation_order");
@@ -126,8 +126,8 @@ namespace casadi {
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
     for (int d=1; d<=deg_; ++d) {
-      x[d] = reshape(*vv_it++, size_in(IVPSOL_X0));
-      z[d] = reshape(*vv_it++, size_in(IVPSOL_Z0));
+      x[d] = reshape(*vv_it++, size_in(INTEGRATOR_X0));
+      z[d] = reshape(*vv_it++, size_in(INTEGRATOR_Z0));
     }
     casadi_assert(vv_it==vv.end());
 
@@ -278,14 +278,14 @@ namespace casadi {
   }
 
 
-  double CollocationIvpsol::zeroIfSmall(double x) {
+  double CollocationIntegrator::zeroIfSmall(double x) {
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
-  void CollocationIvpsol::reset(Memory& m, double t, const double* x,
+  void CollocationIntegrator::reset(Memory& m, double t, const double* x,
                                 const double* z, const double* p) {
     // Reset the base classes
-    ImplicitFixedStepIvpsol::reset(m, t, x, z, p);
+    ImplicitFixedStepIntegrator::reset(m, t, x, z, p);
 
     // Initial guess for Z
     double* Z = Z_.ptr();
@@ -297,10 +297,10 @@ namespace casadi {
     }
   }
 
-  void CollocationIvpsol::resetB(Memory& m, double t, const double* rx,
+  void CollocationIntegrator::resetB(Memory& m, double t, const double* rx,
                                const double* rz, const double* rp) {
     // Reset the base classes
-    ImplicitFixedStepIvpsol::resetB(m, t, rx, rz, rp);
+    ImplicitFixedStepIntegrator::resetB(m, t, rx, rz, rp);
 
     // Initial guess for RZ
     double* RZ = RZ_.ptr();
