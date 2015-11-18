@@ -555,8 +555,8 @@ namespace casadi {
     spL_ = mat_fcn_.sparsity_out(mat_hes_);
     spH_ = mul(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
-    qpsol_ = Function::qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
-                             qpsol_options);
+    qpsol_ = qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
+                   qpsol_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
     }

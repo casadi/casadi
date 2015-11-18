@@ -73,7 +73,7 @@ class QpsolTests(casadiTestCase):
     for qpsol, qp_options, aux_options in qpsols:
       self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -106,7 +106,7 @@ class QpsolTests(casadiTestCase):
     for qpsol, qp_options, aux_options in qpsols:
       self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -142,7 +142,7 @@ class QpsolTests(casadiTestCase):
     for qpsol, qp_options, aux_options in qpsols:
       self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -184,7 +184,7 @@ class QpsolTests(casadiTestCase):
     for qpsol, qp_options, aux_options in qpsols:
       self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -280,7 +280,7 @@ class QpsolTests(casadiTestCase):
     for qpsol, qp_options, aux_options in qpsols:
       self.message("general_convex: " + str(qpsol))
 
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -321,7 +321,7 @@ class QpsolTests(casadiTestCase):
       self.message("general_nonconvex: " + str(qpsol))
       if not("cplex" in str(qpsol)):
         continue
-      solver = Function.qpsol("mysolver",qpsol, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       solver.setInput(H,"h")
       solver.setInput(G,"g")
@@ -344,7 +344,7 @@ class QpsolTests(casadiTestCase):
       self.message("equality: " + str(qpsol))
       if "ooqp" in str(qpsol):
         continue
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]      
@@ -432,7 +432,7 @@ class QpsolTests(casadiTestCase):
     for qpsol, qp_options, aux_options in qpsols:
       self.message("degenerate hessian: " + str(qpsol))
       if 'qcqp' in str(qpsol): continue
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -476,7 +476,7 @@ class QpsolTests(casadiTestCase):
 
     for qpsol, qp_options, aux_options in qpsols:
       self.message("no inequality: " + str(qpsol))
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -522,7 +522,7 @@ class QpsolTests(casadiTestCase):
       if "cplex" in str(qpsol):
         continue
       self.message("no A: " + str(qpsol))
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
       
       try:
         less_digits=aux_options["less_digits"]
@@ -559,7 +559,7 @@ class QpsolTests(casadiTestCase):
     UBX = DM([10])
 
     for qpsol, qp_options, aux_options in qpsols:
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       
       try:
@@ -605,7 +605,7 @@ class QpsolTests(casadiTestCase):
         continue
       if 'worhp' in str(qpsol): # works but occasionaly throws segfaults, ulimit on travis?
         continue
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -646,7 +646,7 @@ class QpsolTests(casadiTestCase):
         
       for qpsol, qp_options, aux_options in qpsols:
         if 'qcqp' in str(qpsol): continue
-        solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+        solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
           less_digits=aux_options["less_digits"]
@@ -679,7 +679,7 @@ class QpsolTests(casadiTestCase):
 
     for qpsol, qp_options, aux_options in qpsols:
       if 'qcqp' in str(qpsol): continue
-      solver = Function.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("mysolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]
@@ -716,7 +716,7 @@ class QpsolTests(casadiTestCase):
     for qpsol, qp_options, aux_options in qpsols:
       if 'qcqp' in str(qpsol): continue
       if 'nlp' in str(qpsol): continue
-      solver = Function.qpsol("msyolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+      solver = casadi.qpsol("msyolver",qpsol,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
         less_digits=aux_options["less_digits"]

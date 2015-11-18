@@ -132,9 +132,9 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    qpsol_ = Function::qpsol("qpsol", option("qpsol"),
-                             {{"h", Hsp_}, {"a", Asp_}},
-                             qpsol_options);
+    qpsol_ = qpsol("qpsol", option("qpsol"),
+                   {{"h", Hsp_}, {"a", Asp_}},
+                   qpsol_options);
     alloc(qpsol_);
 
     // Create Hessian update function

@@ -69,7 +69,7 @@ def addExtra(metadata):
   i = nlpsol("mysolver", "snopt", f)
   extra(metadata,i,"SnoptInterface")
 
-  i = Function.qpsol("mysolver", "qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
+  i = qpsol("mysolver", "qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
   extra(metadata,i,"QpoasesInterface")
  
   G = sparsify(DM([[1,0],[0,1]])).T

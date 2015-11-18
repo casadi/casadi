@@ -1137,60 +1137,11 @@ namespace casadi {
     /** \brief Access the Jacobian of the constraint function for an NLP solver */
     Function nlpsol_hesslag();
 
-    ///@{
-    /** Create a QP solver
-        Solves the following strictly convex problem:
-
-        \verbatim
-        min          1/2 x' H x + g' x
-        x
-
-        subject to
-        LBA <= A x <= UBA
-        LBX <= x   <= UBX
-
-        with :
-        H sparse (n x n) positive definite
-        g dense  (n x 1)
-
-        n: number of decision variables (x)
-        nc: number of constraints (A)
-
-        \endverbatim
-
-        If H is not positive-definite, the solver should throw an error.
-
-        \endverbatim
-        \author Joel Andersson
-        \date 2011-2015
-    */
-    static Function qpsol(const std::string& name, const std::string& solver,
-                              const SpDict& qp, const Dict& opts=Dict());
-    ///@}
-
     /** Generate native code in the interfaced language for debugging */
     void qpsol_debug(const std::string &filename) const;
 
     /** Generate native code in the interfaced language for debugging */
     void qpsol_debug(std::ostream &file) const;
-
-    /** \brief Get input scheme of QP solvers */
-    static std::vector<std::string> qpsol_in();
-
-    /** \brief Get QP solver output scheme of QP solvers */
-    static std::vector<std::string> qpsol_out();
-
-    /** \brief Get QP solver input scheme name by index */
-    static std::string qpsol_in(int ind);
-
-    /** \brief Get output scheme name by index */
-    static std::string qpsol_out(int ind);
-
-    /** \brief Get the number of QP solver inputs */
-    static int qpsol_n_in();
-
-    /** \brief Get the number of QP solver outputs */
-    static int qpsol_n_out();
 
 #ifndef SWIG
     protected:
@@ -1400,6 +1351,54 @@ namespace casadi {
   /** \brief Get the number of NLP solver outputs */
   CASADI_EXPORT int nlpsol_n_out();
 
+  ///@{
+  /** Create a QP solver
+      Solves the following strictly convex problem:
+
+      \verbatim
+      min          1/2 x' H x + g' x
+      x
+
+      subject to
+      LBA <= A x <= UBA
+      LBX <= x   <= UBX
+
+      with :
+      H sparse (n x n) positive definite
+      g dense  (n x 1)
+
+      n: number of decision variables (x)
+      nc: number of constraints (A)
+
+      \endverbatim
+
+      If H is not positive-definite, the solver should throw an error.
+
+      \endverbatim
+      \author Joel Andersson
+      \date 2011-2015
+  */
+  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+                               const SpDict& qp, const Dict& opts=Dict());
+  ///@}
+
+  /** \brief Get input scheme of QP solvers */
+  CASADI_EXPORT std::vector<std::string> qpsol_in();
+
+  /** \brief Get QP solver output scheme of QP solvers */
+  CASADI_EXPORT std::vector<std::string> qpsol_out();
+
+  /** \brief Get QP solver input scheme name by index */
+  CASADI_EXPORT std::string qpsol_in(int ind);
+
+  /** \brief Get output scheme name by index */
+  CASADI_EXPORT std::string qpsol_out(int ind);
+
+  /** \brief Get the number of QP solver inputs */
+  CASADI_EXPORT int qpsol_n_in();
+
+  /** \brief Get the number of QP solver outputs */
+  CASADI_EXPORT int qpsol_n_out();
 
 } // namespace casadi
 

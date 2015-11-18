@@ -43,7 +43,7 @@ namespace casadi {
   /// Internal class
   class CASADI_EXPORT
   Qpsol : public FunctionInternal,
-                     public PluginInterface<Qpsol> {
+          public PluginInterface<Qpsol> {
   public:
 
     // Constructor

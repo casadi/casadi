@@ -1430,7 +1430,7 @@ namespace casadi {
     return NLPSOL_NUM_OUT;
   }
 
-  Function Function::qpsol(const string& name, const string& solver,
+  Function qpsol(const string& name, const string& solver,
                                const SpDict& qp, const Dict& opts) {
     Function ret;
     ret.assignNode(Qpsol::instantiatePlugin(name, solver, qp));
@@ -1452,19 +1452,19 @@ namespace casadi {
     return n->generateNativeCode(file);
   }
 
-  vector<string> Function::qpsol_in() {
+  vector<string> qpsol_in() {
     vector<string> ret(qpsol_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=qpsol_in(i);
     return ret;
   }
 
-  vector<string> Function::qpsol_out() {
+  vector<string> qpsol_out() {
     vector<string> ret(qpsol_n_out());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=qpsol_out(i);
     return ret;
   }
 
-  string Function::qpsol_in(int ind) {
+  string qpsol_in(int ind) {
     switch (static_cast<QpsolInput>(ind)) {
     case QPSOL_H:      return "h";
     case QPSOL_G:      return "g";
@@ -1480,7 +1480,7 @@ namespace casadi {
     return string();
   }
 
-  string Function::qpsol_out(int ind) {
+  string qpsol_out(int ind) {
     switch (static_cast<QpsolOutput>(ind)) {
     case QPSOL_X:     return "x";
     case QPSOL_COST:  return "cost";
@@ -1491,11 +1491,11 @@ namespace casadi {
     return string();
   }
 
-  int Function::qpsol_n_in() {
+  int qpsol_n_in() {
     return QPSOL_NUM_IN;
   }
 
-  int Function::qpsol_n_out() {
+  int qpsol_n_out() {
     return QPSOL_NUM_OUT;
   }
 
