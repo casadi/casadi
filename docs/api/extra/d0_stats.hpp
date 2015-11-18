@@ -61,7 +61,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Nlsol_nlp
+/** \addtogroup plugin_Rootfinder_nlp
 \n
 \par
 <a name='stats'></a><table>
@@ -180,7 +180,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Nlsol_newton
+/** \addtogroup plugin_Rootfinder_newton
 \n
 \par
 <a name='stats'></a><table>

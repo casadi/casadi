@@ -160,7 +160,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Nlsol_kinsol
+/** \addtogroup plugin_Rootfinder_kinsol
 \n
 \par
 <a name='monitors'></a><table>
@@ -217,7 +217,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Nlsol_newton
+/** \addtogroup plugin_Rootfinder_newton
 \n
 \par
 <a name='monitors'></a><table>

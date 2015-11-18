@@ -60,12 +60,6 @@ Default implementation: 1
 
 ";
 
-%feature("docstring") casadi::Callback::dictionary "
-
-Get the dictionary.
-
-";
-
 %feature("docstring") casadi::Callback::size_in "
 
 Get input dimension.
@@ -83,6 +77,12 @@ Default constructor.
 ------------------------------------------------------------------------
 
 Copy constructor (throws an error)
+
+";
+
+%feature("docstring") casadi::Callback::load_rootfinder "
+
+Explicitly load a plugin dynamically
 
 ";
 
@@ -116,9 +116,21 @@ length of arg field.
 
 ";
 
+%feature("docstring") casadi::Callback::has_rootfinder "
+
+Check if a particular plugin is available
+
+";
+
 %feature("docstring") casadi::Callback::print "
 
 Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Callback::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
@@ -222,29 +234,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::Callback::nlpsol "
-
-Create an NLP solver Creates a solver for the following parametric nonlinear
-program (NLP):
-
-::
-
-  min          F(x, p)
-  x
-  
-  subject to
-  LBX <=   x    <= UBX
-  LBG <= G(x, p) <= UBG
-  p  == P
-  
-  nx: number of decision variables
-  ng: number of constraints
-  np: number of parameters
-
-Joel Andersson
-
-";
-
 %feature("docstring") casadi::Callback::default_in "
 
 Get default input value (NOTE: constant reference)
@@ -306,6 +295,12 @@ the numerical values of the supplied bounds make sense.
 
 ";
 
+%feature("docstring") casadi::Callback::qpsol_debug "
+
+Generate native code in the interfaced language for debugging
+
+";
+
 %feature("docstring") casadi::Callback::get_n_reverse "
 
 Return function that calculates adjoint derivatives reverse(nadj) returns a
@@ -345,12 +340,6 @@ exploited by the algorithm.
 
 The generated Jacobian has one more output than the calling function
 corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring") casadi::Callback::has_rootfinder "
-
-Check if a particular plugin is available
 
 ";
 
@@ -416,26 +405,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 Set a function that calculates nadj adjoint derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring") casadi::Callback::rootfinder "
-
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
 
 ";
 
@@ -602,12 +571,6 @@ no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Callback::rootfinder_jac "
-
-Access Jacobian of the ths function for a rootfinder.
-
-";
-
 %feature("docstring") casadi::Callback::sx_in "
 
 Get symbolic primitives equivalent to the input expressions.
@@ -651,39 +614,15 @@ Default implementation: scalar (1,1)
 
 ";
 
-%feature("docstring") casadi::Callback::qpsol "
+%feature("docstring") casadi::Callback::dictionary "
 
-Create a QP solver Solves the following strictly convex problem:
-
-
-
-::
-
-  min          1/2 x' H x + g' x
-  x
-  
-  subject to
-  LBA <= A x <= UBA
-  LBX <= x   <= UBX
-  
-  with :
-  H sparse (n x n) positive definite
-  g dense  (n x 1)
-  
-  n: number of decision variables (x)
-  nc: number of constraints (A)
-
-
-
-If H is not positive-definite, the solver should throw an error.
-
-Joel Andersson
+Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::Callback::optionAllowed "
+%feature("docstring") casadi::Callback::rootfinder_fun "
 
-Get the allowed values of a certain option.
+Access rhs function for a rootfinder.
 
 ";
 
@@ -934,21 +873,9 @@ Joris Gillis
 
 ";
 
-%feature("docstring") casadi::Callback::rootfinder_linsol "
-
-Access linear solver of a rootfinder.
-
-";
-
 %feature("docstring") casadi::Callback::load_qpsol "
 
 Explicitly load a plugin dynamically
-
-";
-
-%feature("docstring") casadi::Callback::doc_rootfinder "
-
-Get the documentation string for a plugin
 
 ";
 
@@ -958,9 +885,9 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Callback::qpsol_debug "
+%feature("docstring") casadi::Callback::doc_rootfinder "
 
-Generate native code in the interfaced language for debugging
+Get the documentation string for a plugin
 
 ";
 
@@ -972,6 +899,12 @@ Get the number of atomic operations.
 
 %feature("docstring") casadi::Callback::sz_res "[INTERNAL]  Get required
 length of res field.
+
+";
+
+%feature("docstring") casadi::Callback::optionAllowed "
+
+Get the allowed values of a certain option.
 
 ";
 
@@ -1175,48 +1108,21 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring") casadi::Callback::load_rootfinder "
-
-Explicitly load a plugin dynamically
-
-";
-
 %feature("docstring") casadi::Callback::size1_in "
 
 Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::linsol "
-
-Create a solver for linear systems of equations Solves the linear system A*X
-= B or A^T*X = B for X with A square and non-singular
-
-If A is structurally singular, an error will be thrown during init. If A is
-numerically singular, the prepare step will fail.
-
-The usual procedure to use Linsol is: init()
-
-set the first input (A)
-
-prepare()
-
-set the second input (b)
-
-solve()
-
-Repeat steps 4 and 5 to work with other b vectors.
-
-The standard evaluation combines the prepare() and solve() step and may
-therefore more expensive if A is invariant.
-
-Joel Andersson
-
-";
-
 %feature("docstring") casadi::Callback::sparsity_in "
 
 Get sparsity of a given input.
+
+";
+
+%feature("docstring") casadi::Callback::rootfinder_linsol "
+
+Access linear solver of a rootfinder.
 
 ";
 
@@ -1524,12 +1430,6 @@ Name of the function.
 %feature("docstring") casadi::Callback::size_out "
 
 Get output dimension.
-
-";
-
-%feature("docstring") casadi::Callback::rootfinder_fun "
-
-Access rhs function for a rootfinder.
 
 ";
 
@@ -2700,12 +2600,6 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::Function::rootfinder_fun "
-
-Access rhs function for a rootfinder.
-
-";
-
 %feature("docstring") casadi::Function::nlpsol_jacg "
 
 Access the Hessian of the Lagrangian function for an NLP solver.
@@ -2718,33 +2612,6 @@ Get the DAE for an integrator.
 
 ";
 
-%feature("docstring") casadi::Function::linsol "
-
-Create a solver for linear systems of equations Solves the linear system A*X
-= B or A^T*X = B for X with A square and non-singular
-
-If A is structurally singular, an error will be thrown during init. If A is
-numerically singular, the prepare step will fail.
-
-The usual procedure to use Linsol is: init()
-
-set the first input (A)
-
-prepare()
-
-set the second input (b)
-
-solve()
-
-Repeat steps 4 and 5 to work with other b vectors.
-
-The standard evaluation combines the prepare() and solve() step and may
-therefore more expensive if A is invariant.
-
-Joel Andersson
-
-";
-
 %feature("docstring") casadi::Function::load_nlpsol "
 
 Explicitly load a plugin dynamically
@@ -2754,26 +2621,6 @@ Explicitly load a plugin dynamically
 %feature("docstring") casadi::Function::getAtomicOperation "
 
 Get an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::Function::rootfinder "
-
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
 
 ";
 
@@ -2933,6 +2780,12 @@ Get the number of function inputs.
 
 ";
 
+%feature("docstring") casadi::Function::rootfinder_linsol "
+
+Access linear solver of a rootfinder.
+
+";
+
 %feature("docstring") casadi::Function::mx_out "
 
 Get symbolic primitives equivalent to the output expressions.
@@ -3063,35 +2916,6 @@ the inputs.
 
 ";
 
-%feature("docstring") casadi::Function::rootfinder_linsol "
-
-Access linear solver of a rootfinder.
-
-";
-
-%feature("docstring") casadi::Function::nlpsol "
-
-Create an NLP solver Creates a solver for the following parametric nonlinear
-program (NLP):
-
-::
-
-  min          F(x, p)
-  x
-  
-  subject to
-  LBX <=   x    <= UBX
-  LBG <= G(x, p) <= UBG
-  p  == P
-  
-  nx: number of decision variables
-  ng: number of constraints
-  np: number of parameters
-
-Joel Andersson
-
-";
-
 %feature("docstring") casadi::Function::set_forward "
 
 Set a function that calculates nfwd forward derivatives NOTE: Does not take
@@ -3131,6 +2955,12 @@ returned.
 %feature("docstring") casadi::Function::n_out "
 
 Get the number of function outputs.
+
+";
+
+%feature("docstring") casadi::Function::optionDefault "
+
+Get the default of a certain option.
 
 ";
 
@@ -3246,21 +3076,9 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::Function::load_rootfinder "
-
-Explicitly load a plugin dynamically
-
-";
-
 %feature("docstring") casadi::Function::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::Function::has_rootfinder "
-
-Check if a particular plugin is available
 
 ";
 
@@ -3294,6 +3112,12 @@ corresponding to the Hessian and the gradients.
 %feature("docstring") casadi::Function::expand "
 
 Expand a function to SX.
+
+";
+
+%feature("docstring") casadi::Function::rootfinder_jac "
+
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
@@ -3415,12 +3239,6 @@ Return a string with a representation (for SWIG)
 %feature("docstring") casadi::Function::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::Function::rootfinder_jac "
-
-Access Jacobian of the ths function for a rootfinder.
 
 ";
 
@@ -3858,6 +3676,18 @@ Export / Generate C code for the function.
 
 ";
 
+%feature("docstring") casadi::Function::rootfinder_fun "
+
+Access rhs function for a rootfinder.
+
+";
+
+%feature("docstring") casadi::Function::load_rootfinder "
+
+Explicitly load a plugin dynamically
+
+";
+
 %feature("docstring") casadi::Function::getAtomicOutput "
 
 Get the (integer) output argument of an atomic operation.
@@ -3967,9 +3797,9 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring") casadi::Function::optionDefault "
+%feature("docstring") casadi::Function::has_rootfinder "
 
-Get the default of a certain option.
+Check if a particular plugin is available
 
 ";
 
@@ -4040,36 +3870,6 @@ class able to propagate seeds through the algorithm?
 %feature("docstring") casadi::Function::sx_out "
 
 Get symbolic primitives equivalent to the output expressions.
-
-";
-
-%feature("docstring") casadi::Function::qpsol "
-
-Create a QP solver Solves the following strictly convex problem:
-
-
-
-::
-
-  min          1/2 x' H x + g' x
-  x
-  
-  subject to
-  LBA <= A x <= UBA
-  LBX <= x   <= UBX
-  
-  with :
-  H sparse (n x n) positive definite
-  g dense  (n x 1)
-  
-  n: number of decision variables (x)
-  nc: number of constraints (A)
-
-
-
-If H is not positive-definite, the solver should throw an error.
-
-Joel Andersson
 
 ";
 
@@ -7067,9 +6867,6 @@ Print a description of the object.
 // File: classcasadi_1_1Nlpsol.xml
 
 
-// File: classcasadi_1_1Nlsol.xml
-
-
 // File: classcasadi_1_1NonZeros.xml
 %feature("docstring") casadi::NonZeros::NonZeros "
 
@@ -7410,6 +7207,9 @@ Return a string with a description (for SWIG)
 
 
 // File: classcasadi_1_1RkIntegrator.xml
+
+
+// File: classcasadi_1_1Rootfinder.xml
 
 
 // File: classcasadi_1_1Scpgen.xml
@@ -9325,6 +9125,20 @@ the upper triangular half.
 
 %feature("docstring") casadi::diffTimers "[INTERNAL] ";
 
+%feature("docstring") casadi::read_matlab "
+
+>  void read_matlab(std.istream &stream,[T ] v)
+------------------------------------------------------------------------
+
+Read vector, matlab style.
+
+>  void read_matlab(std.ifstream &file,[[T ] ] v)
+------------------------------------------------------------------------
+
+Read matrix, matlab style.
+
+";
+
 %feature("docstring") casadi::swapIndices "
 
 swap inner and outer indices of list of lists
@@ -9341,15 +9155,13 @@ swap inner and outer indices of list of lists
 
 ";
 
-%feature("docstring") casadi::isMonotone "
+%feature("docstring") casadi::qpsol_n_out "
 
-Check if the vector is monotone.
-
-";
-
-%feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
+Get the number of QP solver outputs.
 
 ";
+
+%feature("docstring") casadi::zip "[INTERNAL] ";
 
 %feature("docstring") casadi::isNon_increasing "
 
@@ -9357,7 +9169,11 @@ Check if the vector is non-increasing.
 
 ";
 
-%feature("docstring") casadi::zip "[INTERNAL] ";
+%feature("docstring") casadi::qpsol_n_in "
+
+Get the number of QP solver inputs.
+
+";
 
 %feature("docstring") casadi::write_matlab "
 
@@ -9391,7 +9207,23 @@ Hash a sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
+%feature("docstring") casadi::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
 
 ";
 
@@ -9400,7 +9232,11 @@ equation using an LU-factorized matrix (lapack)
 
 ";
 
-%feature("docstring") casadi::diffToDict "[INTERNAL] ";
+%feature("docstring") casadi::isMonotone "
+
+Check if the vector is monotone.
+
+";
 
 %feature("docstring") casadi::isStrictlyMonotone "
 
@@ -9419,9 +9255,25 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
-%feature("docstring") casadi::matrixName "
+%feature("docstring") casadi::replaceMat "[INTERNAL] ";
 
-Get typename.
+%feature("docstring") casadi::simpleIntegrator "
+
+Simplified wrapper for the Integrator class Constructs an integrator using
+the same syntax as simpleRK and simpleIRK. The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
+
+Parameters:
+-----------
+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+N:  Number of integrator steps
+
+order:  Order of interpolating polynomials
+
+scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
@@ -9430,8 +9282,16 @@ Get typename.
 
 ";
 
-%feature("docstring") casadi::casadi_qform "[INTERNAL]  Calculates dot(x,
-mul(A, x)) without memory allocation.
+%feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
+a Matrix-matrix product,*
+
+Parameters:
+-----------
+
+dwork:  A real work vector that you must allocate Minimum size: y.size1()
+
+iwork:  A integer work vector that you must allocate Minimum size:
+y.size1()+x.size2()+1
 
 ";
 
@@ -9463,13 +9323,41 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
+%feature("docstring") casadi::nlpsol_n_in "
+
+Get the number of NLP solver inputs.
+
+";
+
 %feature("docstring") casadi::integrator_n_out "
 
 Get the number of integrator outputs.
 
 ";
 
-%feature("docstring") casadi::replaceMat "[INTERNAL] ";
+%feature("docstring") casadi::matrixName "
+
+Get typename.
+
+";
+
+%feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
+
+";
+
+%feature("docstring") casadi::nlpsol_out "
+
+>  CASADI_EXPORT[str] nlpsol_out()
+------------------------------------------------------------------------
+
+Get NLP solver output scheme of NLP solvers.
+
+>  str nlpsol_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
+
+";
 
 %feature("docstring") casadi::integrator_in "
 
@@ -9497,8 +9385,7 @@ Checks if array does not contain NaN or Inf.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
-multiplication: z <- z + x*y.
+%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
 
 ";
 
@@ -9526,16 +9413,23 @@ return.
 
 ";
 
-%feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
-a Matrix-matrix product,*
+%feature("docstring") casadi::qpsol_in "
 
-Parameters:
------------
+>  CASADI_EXPORT[str] qpsol_in()
+------------------------------------------------------------------------
 
-dwork:  A real work vector that you must allocate Minimum size: y.size1()
+Get input scheme of QP solvers.
 
-iwork:  A integer work vector that you must allocate Minimum size:
-y.size1()+x.size2()+1
+>  str qpsol_in(int ind)
+------------------------------------------------------------------------
+
+Get QP solver input scheme name by index.
+
+";
+
+%feature("docstring") casadi::nlpsol_n_out "
+
+Get the number of NLP solver outputs.
 
 ";
 
@@ -9571,6 +9465,11 @@ trans(x)
 
 ";
 
+%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
+multiplication: z <- z + x*y.
+
+";
+
 %feature("docstring") casadi::collocationPoints "
 
 Obtain collocation points of specific order and scheme.
@@ -9599,25 +9498,35 @@ order:  Order of interpolating polynomials
 
 ";
 
+%feature("docstring") casadi::qpsol_out "
+
+>  CASADI_EXPORT[str] qpsol_out()
+------------------------------------------------------------------------
+
+Get QP solver output scheme of QP solvers.
+
+>  str qpsol_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
+
+";
+
 %feature("docstring") casadi::operation_checker "[INTERNAL] ";
 
-%feature("docstring") casadi::simpleIntegrator "
+%feature("docstring") casadi::diffToDict "[INTERNAL] ";
 
-Simplified wrapper for the Integrator class Constructs an integrator using
-the same syntax as simpleRK and simpleIRK. The constructed function has
-three inputs, corresponding to initial state (x0), parameter (p) and
-integration time (h) and one output, corresponding to final state (xf).
+%feature("docstring") casadi::nlpsol_in "
 
-Parameters:
------------
+>  CASADI_EXPORT[str] nlpsol_in()
+------------------------------------------------------------------------
 
-f:  ODE function with two inputs (x and p) and one output (xdot)
+Get input scheme of NLP solvers.
 
-N:  Number of integrator steps
+>  str nlpsol_in(int ind)
+------------------------------------------------------------------------
 
-order:  Order of interpolating polynomials
-
-scheme:  Collocation scheme, as excepted by collocationPoints function.
+Get NLP solver input scheme name by index.
 
 ";
 
@@ -9625,8 +9534,33 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
-%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
-dense.
+%feature("docstring") casadi::qpsol "
+
+Create a QP solver Solves the following strictly convex problem:
+
+
+
+::
+
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H sparse (n x n) positive definite
+  g dense  (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
+
+
+
+If H is not positive-definite, the solver should throw an error.
+
+Joel Andersson
 
 ";
 
@@ -9667,6 +9601,29 @@ Check if the vector is non-decreasing.
 
 ";
 
+%feature("docstring") casadi::nlpsol "
+
+Create an NLP solver Creates a solver for the following parametric nonlinear
+program (NLP):
+
+::
+
+  min          F(x, p)
+  x
+  
+  subject to
+  LBX <=   x    <= UBX
+  LBG <= G(x, p) <= UBG
+  p  == P
+  
+  nx: number of decision variables
+  ng: number of constraints
+  np: number of parameters
+
+Joel Andersson
+
+";
+
 %feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
 x, w work vector (length >= number of rows)
 
@@ -9686,21 +9643,39 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring") casadi::linsol "
+
+Create a solver for linear systems of equations Solves the linear system A*X
+= B or A^T*X = B for X with A square and non-singular
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
+
+The usual procedure to use Linsol is: init()
+
+set the first input (A)
+
+prepare()
+
+set the second input (b)
+
+solve()
+
+Repeat steps 4 and 5 to work with other b vectors.
+
+The standard evaluation combines the prepare() and solve() step and may
+therefore more expensive if A is invariant.
+
+Joel Andersson
+
+";
+
 %feature("docstring") casadi::userOut "";
 
 %feature("docstring") casadi::timerPlusEq "[INTERNAL] ";
 
-%feature("docstring") casadi::read_matlab "
-
->  void read_matlab(std.istream &stream,[T ] v)
-------------------------------------------------------------------------
-
-Read vector, matlab style.
-
->  void read_matlab(std.ifstream &file,[[T ] ] v)
-------------------------------------------------------------------------
-
-Read matrix, matlab style.
+%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
+dense.
 
 ";
 
@@ -9765,6 +9740,11 @@ ODE coupled to an algebraic equation and a set of quadratures:
   gx, gz and gq have a linear dependency on rx, rz and rp.
 
 Joel Andersson
+
+";
+
+%feature("docstring") casadi::casadi_qform "[INTERNAL]  Calculates dot(x,
+mul(A, x)) without memory allocation.
 
 ";
 
