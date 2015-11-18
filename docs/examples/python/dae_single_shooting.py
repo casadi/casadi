@@ -43,7 +43,7 @@ subject to   dot(x0) == z*x0-x1+u     \
              x1(t=10) == 0
              -0.75 <= u <= 1  for 0 <= t <= 10
 
-Note that other methods such as direct collocation or direct single shooting
+Note that other methods such as direct collocation or direct multiple shooting
 are usually preferably to the direct single shooting method in practise.
 
 Joel Andersson, 2012-2015
