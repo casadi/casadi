@@ -72,34 +72,17 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::reverse "
+%feature("docstring") casadi::Callback::Callback "
 
->  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
-
->  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
-
->  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  Callback()
 ------------------------------------------------------------------------
 
-Create call to (cached) derivative function, reverse mode.
+Default constructor.
 
->  Function Function.reverse(int nadj)
+>  Callback(Callback obj)
 ------------------------------------------------------------------------
 
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+Copy constructor (throws an error)
 
 ";
 
@@ -337,6 +320,12 @@ Get type name.
 
 ";
 
+%feature("docstring") casadi::Callback::doc_integrator "
+
+Get the documentation string for a plugin
+
+";
+
 %feature("docstring") casadi::Callback::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
@@ -367,12 +356,6 @@ Check if a particular plugin is available
 
 %feature("docstring") casadi::Callback::optionEnumValue "[INTERNAL]  Get
 the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring") casadi::Callback::doc_ivpsol "
-
-Get the documentation string for a plugin
 
 ";
 
@@ -436,12 +419,6 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring") casadi::Callback::has_ivpsol "
-
-Check if a particular plugin is available
-
-";
-
 %feature("docstring") casadi::Callback::nlsol "
 
 Create a solver for rootfinding problems Takes a function where one of the
@@ -468,17 +445,40 @@ Get symbolic primitives equivalent to the output expressions.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
+%feature("docstring") casadi::Callback::optionNames "
 
->  Callback()
+Get a list of all option names.
+
+";
+
+%feature("docstring") casadi::Callback::reverse "
+
+>  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
-Default constructor.
+Create call to (cached) derivative function, reverse mode.
 
->  Callback(Callback obj)
+>  Function Function.reverse(int nadj)
 ------------------------------------------------------------------------
 
-Copy constructor (throws an error)
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -570,6 +570,12 @@ sparsity propagation.
 
 ";
 
+%feature("docstring") casadi::Callback::optionDefault "
+
+Get the default of a certain option.
+
+";
+
 %feature("docstring") casadi::Callback::index_out "
 
 Find the index for a string describing a particular entry of an output
@@ -577,42 +583,6 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLPSOL_X if FunctionInternal
 adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring") casadi::Callback::ivpsol "
-
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
 
 ";
 
@@ -723,50 +693,6 @@ Check if a particular plugin is available
 
 ";
 
-%feature("docstring") casadi::Callback::finalize "
-
-Finalize the object This function is called after the construction and init
-steps are completed, but before user functions are called. It is called
-recursively for the whole class hierarchy, starting with the highest level.
-
-";
-
-%feature("docstring") casadi::Callback::size1_out "
-
-Get output dimension.
-
-";
-
-%feature("docstring") casadi::Callback::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm?
-
-(for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::Callback::load_ivpsol "
-
-Explicitly load a plugin dynamically
-
-";
-
-%feature("docstring") casadi::Callback::has_jacobian "
-
-Return Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::Callback::get_output_sparsity "
-
-Specify output sparsity.
-
-Specify the sparsity corresponding to a given output. The sparsity must not
-be changed over the lifetime of the object
-
-Default implementation: dense using outputShape
-
-";
-
 %feature("docstring") casadi::Callback::setOutput "
 
 >  void IOInterface< Function  >.setOutput(T val, int oind=0)
@@ -797,6 +723,44 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
+%feature("docstring") casadi::Callback::size1_out "
+
+Get output dimension.
+
+";
+
+%feature("docstring") casadi::Callback::spCanEvaluate "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::Callback::has_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Callback::get_output_sparsity "
+
+Specify output sparsity.
+
+Specify the sparsity corresponding to a given output. The sparsity must not
+be changed over the lifetime of the object
+
+Default implementation: dense using outputShape
+
+";
+
+%feature("docstring") casadi::Callback::finalize "
+
+Finalize the object This function is called after the construction and init
+steps are completed, but before user functions are called. It is called
+recursively for the whole class hierarchy, starting with the highest level.
+
+";
+
 %feature("docstring") casadi::Callback::size2_out "
 
 Get output dimension.
@@ -819,6 +783,12 @@ Get symbolic primitives equivalent to the input expressions.
 
 Check if the function is of a particular type Optionally check if name
 matches one of the base classes (default true)
+
+";
+
+%feature("docstring") casadi::Callback::integrator_dae "
+
+Get the DAE for an integrator.
 
 ";
 
@@ -933,9 +903,9 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::Callback::optionNames "
+%feature("docstring") casadi::Callback::has_integrator "
 
-Get a list of all option names.
+Check if a particular plugin is available
 
 ";
 
@@ -1480,9 +1450,9 @@ Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::Callback::optionDefault "
+%feature("docstring") casadi::Callback::load_integrator "
 
-Get the default of a certain option.
+Explicitly load a plugin dynamically
 
 ";
 
@@ -1536,12 +1506,6 @@ Extract the functions needed for the Lifted Newton method.
 %feature("docstring") casadi::Callback::load_linsol "
 
 Explicitly load a plugin dynamically
-
-";
-
-%feature("docstring") casadi::Callback::ivpsol_dae "
-
-Get the DAE for an integrator.
 
 ";
 
@@ -1782,7 +1746,7 @@ Generate a file, return code as string.
 ";
 
 
-// File: classcasadi_1_1CollocationIvpsol.xml
+// File: classcasadi_1_1CollocationIntegrator.xml
 
 
 // File: classcasadi_1_1CommonExternal.xml
@@ -2615,7 +2579,7 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Find.xml
 
 
-// File: classcasadi_1_1FixedStepIvpsol.xml
+// File: classcasadi_1_1FixedStepIntegrator.xml
 
 
 // File: classcasadi_1_1Function.xml
@@ -2647,12 +2611,6 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::Function::has_ivpsol "
-
-Check if a particular plugin is available
-
-";
-
 %feature("docstring") casadi::Function::nnz_in "
 
 Get of number of input nonzeros For a particular input or for all for all of
@@ -2674,12 +2632,6 @@ Access the NLP for an NLP solver.
 %feature("docstring") casadi::Function::name "
 
 Name of the function.
-
-";
-
-%feature("docstring") casadi::Function::mx_in "
-
-Get symbolic primitives equivalent to the input expressions.
 
 ";
 
@@ -2757,6 +2709,12 @@ Access rhs function for a nlsol.
 %feature("docstring") casadi::Function::nlpsol_jacg "
 
 Access the Hessian of the Lagrangian function for an NLP solver.
+
+";
+
+%feature("docstring") casadi::Function::integrator_dae "
+
+Get the DAE for an integrator.
 
 ";
 
@@ -2892,6 +2850,12 @@ Generate native code in the interfaced language for debugging
 
 ";
 
+%feature("docstring") casadi::Function::doc_integrator "
+
+Get the documentation string for a plugin
+
+";
+
 %feature("docstring") casadi::Function::numel_out "
 
 Get of number of output elements For a particular output or for all for all
@@ -2940,6 +2904,12 @@ Joris Gillis
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Function::has_integrator "
+
+Check if a particular plugin is available
 
 ";
 
@@ -3164,57 +3134,9 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::Function::map "
+%feature("docstring") casadi::Function::getAtomicInput "
 
->  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
-
->  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
-------------------------------------------------------------------------
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
->  Function Function.map(str name, int N, Dict opts=Dict()) const 
-------------------------------------------------------------------------
-
-Create a mapped version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (a, p) -> ( s )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (A, P) -> (S )
-  
-      with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
-      and
-          s0 <- f(a0, p0)
-          s1 <- f(a1, p1)
-          ...
-          s_(N-1) <- f(a_(N-1), p_(N-1))
-  
-
-
-
->  Function Function.map(str name, int n, [bool ] repeat_in, [bool ] repeat_out, Dict opts=Dict()) const 
-------------------------------------------------------------------------
-
-Generic map.
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -3250,12 +3172,6 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLPSOL_X if FunctionInternal
 adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring") casadi::Function::load_ivpsol "
-
-Explicitly load a plugin dynamically
 
 ";
 
@@ -3424,9 +3340,57 @@ Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::Function::getAtomicInput "
+%feature("docstring") casadi::Function::map "
 
-Get the (integer) input arguments of an atomic operation.
+>  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+------------------------------------------------------------------------
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: expand|serial|openmp
+
+>  Function Function.map(str name, int N, Dict opts=Dict()) const 
+------------------------------------------------------------------------
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          a: horzcat([a0, a1, ..., a_(N-1)])
+          p: horzcat([p0, p1, ..., p_(N-1)])
+          s: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+>  Function Function.map(str name, int n, [bool ] repeat_in, [bool ] repeat_out, Dict opts=Dict()) const 
+------------------------------------------------------------------------
+
+Generic map.
 
 ";
 
@@ -3439,12 +3403,6 @@ Get symbolic primitives equivalent to the input expressions.
 %feature("docstring") casadi::Function::evaluate "
 
 Evaluate.
-
-";
-
-%feature("docstring") casadi::Function::ivpsol_dae "
-
-Get the DAE for an integrator.
 
 ";
 
@@ -3475,6 +3433,12 @@ Get input scheme description by index.
 %feature("docstring") casadi::Function::doc_linsol "
 
 Get the documentation string for a plugin
+
+";
+
+%feature("docstring") casadi::Function::load_integrator "
+
+Explicitly load a plugin dynamically
 
 ";
 
@@ -3564,9 +3528,9 @@ Get input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::Function::doc_ivpsol "
+%feature("docstring") casadi::Function::mx_in "
 
-Get the documentation string for a plugin
+Get symbolic primitives equivalent to the input expressions.
 
 ";
 
@@ -4052,42 +4016,6 @@ the index into allowed options of a certain option.
 %feature("docstring") casadi::Function::size2_in "
 
 Get input dimension.
-
-";
-
-%feature("docstring") casadi::Function::ivpsol "
-
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
 
 ";
 
@@ -5042,7 +4970,7 @@ C++ includes: generic_type.hpp ";
 // File: classcasadi_1_1Horzsplit.xml
 
 
-// File: classcasadi_1_1ImplicitFixedStepIvpsol.xml
+// File: classcasadi_1_1ImplicitFixedStepIntegrator.xml
 
 
 // File: classcasadi_1_1ImplicitToNlp.xml
@@ -5052,6 +4980,9 @@ C++ includes: generic_type.hpp ";
 
 
 // File: classcasadi_1_1IntegerSX.xml
+
+
+// File: classcasadi_1_1Integrator.xml
 
 
 // File: classcasadi_1_1InterruptHandler.xml
@@ -5149,9 +5080,6 @@ NULL)
 ";
 
 %feature("docstring") casadi::IpoptUserClass::IpoptUserClass "[INTERNAL] ";
-
-
-// File: classcasadi_1_1Ivpsol.xml
 
 
 // File: classcasadi_1_1KernelSum.xml
@@ -7481,7 +7409,7 @@ Return a string with a description (for SWIG)
 // File: classcasadi_1_1Reshape.xml
 
 
-// File: classcasadi_1_1RkIvpsol.xml
+// File: classcasadi_1_1RkIntegrator.xml
 
 
 // File: classcasadi_1_1Scpgen.xml
@@ -9535,7 +9463,27 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
+%feature("docstring") casadi::integrator_n_out "
+
+Get the number of integrator outputs.
+
+";
+
 %feature("docstring") casadi::replaceMat "[INTERNAL] ";
+
+%feature("docstring") casadi::integrator_in "
+
+>  CASADI_EXPORT[str] integrator_in()
+------------------------------------------------------------------------
+
+Get input scheme of integrators.
+
+>  str integrator_in(int ind)
+------------------------------------------------------------------------
+
+Get integrator input scheme name by index.
+
+";
 
 %feature("docstring") casadi::is_regular "
 
@@ -9655,10 +9603,10 @@ order:  Order of interpolating polynomials
 
 %feature("docstring") casadi::simpleIntegrator "
 
-Simplified wrapper for the Ivpsol class Constructs an integrator using the
-same syntax as simpleRK and simpleIRK. The constructed function has three
-inputs, corresponding to initial state (x0), parameter (p) and integration
-time (h) and one output, corresponding to final state (xf).
+Simplified wrapper for the Integrator class Constructs an integrator using
+the same syntax as simpleRK and simpleIRK. The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
 
 Parameters:
 -----------
@@ -9673,7 +9621,9 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
-%feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
+%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
+
+";
 
 %feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
 dense.
@@ -9722,6 +9672,20 @@ x, w work vector (length >= number of rows)
 
 ";
 
+%feature("docstring") casadi::integrator_out "
+
+>  CASADI_EXPORT[str] integrator_out()
+------------------------------------------------------------------------
+
+Get integrator output scheme of integrators.
+
+>  str integrator_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
+
+";
+
 %feature("docstring") casadi::userOut "";
 
 %feature("docstring") casadi::timerPlusEq "[INTERNAL] ";
@@ -9762,11 +9726,51 @@ Generate a hash value incrementally, array.
 
 ";
 
-%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
+%feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
+
+%feature("docstring") casadi::casadi_fill "[INTERNAL]  FILL: x <- alpha.
 
 ";
 
-%feature("docstring") casadi::casadi_fill "[INTERNAL]  FILL: x <- alpha.
+%feature("docstring") casadi::integrator "
+
+Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
+to a terminal value problem with differential equation given as an implicit
+ODE coupled to an algebraic equation and a set of quadratures:
+
+
+
+::
+
+  Initial conditions at t=t0
+  x(t0)  = x0
+  q(t0)  = 0
+  
+  Forward integration from t=t0 to t=tf
+  der(x) = function(x, z, p, t)                  Forward ODE
+  0 = fz(x, z, p, t)                  Forward algebraic equations
+  der(q) = fq(x, z, p, t)                  Forward quadratures
+  
+  Terminal conditions at t=tf
+  rx(tf)  = rx0
+  rq(tf)  = 0
+  
+  Backward integration from t=tf to t=t0
+  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
+  
+  where we assume that both the forward and backwards integrations are index-1
+  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
+  gx, gz and gq have a linear dependency on rx, rz and rp.
+
+Joel Andersson
+
+";
+
+%feature("docstring") casadi::integrator_n_in "
+
+Get the number of integrator inputs.
 
 ";
 

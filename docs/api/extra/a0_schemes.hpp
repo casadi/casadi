@@ -1,3 +1,15 @@
+/** \defgroup scheme_IntegratorOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 6) []</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>INTEGRATOR_XF</td><td></td><td>Differential state at the final time.</td></tr>
+<tr><td>INTEGRATOR_QF</td><td></td><td>Quadrature state at the final time.</td></tr>
+<tr><td>INTEGRATOR_ZF</td><td></td><td>Algebraic variable at the final time.</td></tr>
+<tr><td>INTEGRATOR_RXF</td><td></td><td>Backward differential state at the initial time.</td></tr>
+<tr><td>INTEGRATOR_RQF</td><td></td><td>Backward quadrature state at the initial time.</td></tr>
+<tr><td>INTEGRATOR_RZF</td><td></td><td>Backward algebraic variable at the initial time.</td></tr>
+</table>
+*/
 /** \defgroup scheme_HessLagOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::HessLagOutput  (HESSLAG_NUM_OUT = 5) []</caption>
@@ -98,18 +110,6 @@
 <tr><td>GRADF_G</td><td></td><td>Constraint function.</td></tr>
 </table>
 */
-/** \defgroup scheme_IvpsolInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::IvpsolInput  (IVPSOL_NUM_IN = 6) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>IVPSOL_X0</td><td></td><td>Differential state at the initial time.</td></tr>
-<tr><td>IVPSOL_P</td><td></td><td>Parameters.</td></tr>
-<tr><td>IVPSOL_Z0</td><td></td><td>Initial guess for the algebraic variable.</td></tr>
-<tr><td>IVPSOL_RX0</td><td></td><td>Backward differential state at the final time.</td></tr>
-<tr><td>IVPSOL_RP</td><td></td><td>Backward parameter vector.</td></tr>
-<tr><td>IVPSOL_RZ0</td><td></td><td>Initial guess for the backwards algebraic variable.</td></tr>
-</table>
-*/
 /** \defgroup scheme_QPStruct
 <a name='schemes'></a><table>
 <caption>Struct scheme: casadi::QPStruct  ( = 2) []</caption>
@@ -118,16 +118,16 @@
 <tr><td>QP_STRUCT_A</td><td></td><td>The matrix A: sparse, (nc x n) - product with x must be dense.</td></tr>
 </table>
 */
-/** \defgroup scheme_IvpsolOutput
+/** \defgroup scheme_IntegratorInput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::IvpsolOutput  (IVPSOL_NUM_OUT = 6) []</caption>
+<caption>Input scheme: casadi::IntegratorInput  (INTEGRATOR_NUM_IN = 6) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>IVPSOL_XF</td><td></td><td>Differential state at the final time.</td></tr>
-<tr><td>IVPSOL_QF</td><td></td><td>Quadrature state at the final time.</td></tr>
-<tr><td>IVPSOL_ZF</td><td></td><td>Algebraic variable at the final time.</td></tr>
-<tr><td>IVPSOL_RXF</td><td></td><td>Backward differential state at the initial time.</td></tr>
-<tr><td>IVPSOL_RQF</td><td></td><td>Backward quadrature state at the initial time.</td></tr>
-<tr><td>IVPSOL_RZF</td><td></td><td>Backward algebraic variable at the initial time.</td></tr>
+<tr><td>INTEGRATOR_X0</td><td></td><td>Differential state at the initial time.</td></tr>
+<tr><td>INTEGRATOR_P</td><td></td><td>Parameters.</td></tr>
+<tr><td>INTEGRATOR_Z0</td><td></td><td>Initial guess for the algebraic variable.</td></tr>
+<tr><td>INTEGRATOR_RX0</td><td></td><td>Backward differential state at the final time.</td></tr>
+<tr><td>INTEGRATOR_RP</td><td></td><td>Backward parameter vector.</td></tr>
+<tr><td>INTEGRATOR_RZ0</td><td></td><td>Initial guess for the backwards algebraic variable.</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPInput
@@ -212,26 +212,26 @@
 /** \class casadi::CvodesInterface
 \n
 \par
-@copydoc scheme_IvpsolInput
+@copydoc scheme_IntegratorInput
 <br/>
-@copydoc scheme_IvpsolOutput
+@copydoc scheme_IntegratorOutput
 */
 /// \endcond
 /// \cond INTERNAL
 /** \class casadi::IdasInterface
 \n
 \par
-@copydoc scheme_IvpsolInput
+@copydoc scheme_IntegratorInput
 <br/>
-@copydoc scheme_IvpsolOutput
+@copydoc scheme_IntegratorOutput
 */
 /// \endcond
 /// \cond INTERNAL
 /** \class casadi::SundialsInterface
 \n
 \par
-@copydoc scheme_IvpsolInput
+@copydoc scheme_IntegratorInput
 <br/>
-@copydoc scheme_IvpsolOutput
+@copydoc scheme_IntegratorOutput
 */
 /// \endcond

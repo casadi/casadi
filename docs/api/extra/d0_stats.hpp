@@ -12,7 +12,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Ivpsol_cvodes
+/** \addtogroup plugin_Integrator_cvodes
 \n
 \par
 <a name='stats'></a><table>
@@ -38,7 +38,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_Ivpsol_idas
+/** \addtogroup plugin_Integrator_idas
 \n
 \par
 <a name='stats'></a><table>
