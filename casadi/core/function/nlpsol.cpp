@@ -80,8 +80,8 @@ namespace casadi {
                                                        "qp", true);
 
     // Enable string notation for IO
-    ischeme_ = Function::nlpsol_in();
-    oscheme_ = Function::nlpsol_out();
+    ischeme_ = nlpsol_in();
+    oscheme_ = nlpsol_out();
 
     // Make the ref object a non-refence counted pointer to this (as reference counting would
     // prevent deletion of the object)

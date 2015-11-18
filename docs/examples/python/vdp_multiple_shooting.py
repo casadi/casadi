@@ -102,7 +102,7 @@ g = vertcat(g)
 
 # Create NLP solver instance
 nlp = {'x':V, 'f':f, 'g':g}
-solver = Function.nlpsol('solver', 'ipopt', nlp)
+solver = nlpsol('solver', 'ipopt', nlp)
 
 # Solve the problem
 sol = solver({'lbx' : VMIN,

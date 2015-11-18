@@ -88,7 +88,7 @@ namespace casadi {
     Dict options;
     if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");
     // Create an Nlpsol instance
-    solver_ = Function::nlpsol("nlpsol", option("nlpsol"), nlp, options);
+    solver_ = nlpsol("nlpsol", option("nlpsol"), nlp, options);
     alloc(solver_);
 
     // Allocate storage for variable bounds

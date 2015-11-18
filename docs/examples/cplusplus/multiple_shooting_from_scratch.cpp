@@ -162,7 +162,7 @@ int main(){
   opts["linear_solver"] = "ma27";
 
   // Create an NLP solver and buffers
-  Function nlpsol = Function::nlpsol("nlpsol", "ipopt", nlp, opts);
+  Function solver = nlpsol("nlpsol", "ipopt", nlp, opts);
   std::map<std::string, DM> arg, res;
 
   // Bounds and initial guess
@@ -173,7 +173,7 @@ int main(){
   arg["x0"] = v_init;
 
   // Solve the problem
-  res = nlpsol(arg);
+  res = solver(arg);
     
   // Optimal solution of the NLP
   const Matrix<double>& V_opt = res.at("x");

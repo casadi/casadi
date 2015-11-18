@@ -174,7 +174,7 @@ int main(){
   }
 
   // Create NLP solver
-  Function solver = Function::nlpsol("nlpsol", solver_name, nlp, solver_opts);
+  Function solver = nlpsol("nlpsol", solver_name, nlp, solver_opts);
 
   // Bounds on u and initial condition
   vector<double> umin(nu, -10), umax(nu, 10), u0(nu, 0.4);

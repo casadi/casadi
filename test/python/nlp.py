@@ -66,7 +66,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':(x-1)**2, 'g':x}
     
     for Solver, solver_options in solvers:
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
       solver.setInput([-10],"lbx")
       solver.setInput([-20],"ubx")
@@ -76,7 +76,7 @@ class NLPtests(casadiTestCase):
         solver.evaluate()
 
     for Solver, solver_options in solvers:
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
       solver.setInput([-10],"lbx")
       solver.setInput([10],"ubx")
@@ -91,7 +91,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message("trivial " + str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
        
       solver.setInput([-10],"lbx")
       solver.setInput([10],"ubx")
@@ -111,7 +111,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message("trivial " + str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
       solver.setInput([-10],"lbx")
       solver.setInput([10],"ubx")
@@ -131,7 +131,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-Inf],"lbx")
       solver.setInput([Inf],"ubx")
       solver.setInput([-Inf],"lbg")
@@ -160,7 +160,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.evaluate()
@@ -178,7 +178,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.setInput([-10],"lbg")
@@ -202,7 +202,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([0,1],"x0")
       solver.setInput([-10,1],"lbx")
       solver.setInput([10,1],"ubx")
@@ -236,7 +236,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(Solver)
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([0.5,0.5],"x0")
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
@@ -262,7 +262,7 @@ class NLPtests(casadiTestCase):
         options["warm_start_slack_bound_push"]=1e-6
         options["warm_start_mult_bound_push"]=1e-6
         options["mu_init"]=1e-6
-        solver = Function.nlpsol("mysolver", Solver, nlp, options)
+        solver = nlpsol("mysolver", Solver, nlp, options)
 
         solver.setInput([-10]*2,"lbx")
         solver.setInput([10]*2,"ubx")
@@ -291,7 +291,7 @@ class NLPtests(casadiTestCase):
   
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options) #"toldx": 1e-15, "tolgl": 1e-15}).iteritems():
+      solver = nlpsol("mysolver", Solver, nlp, solver_options) #"toldx": 1e-15, "tolgl": 1e-15}).iteritems():
       solver.setInput([0.5,0.5],"x0")
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
@@ -320,7 +320,7 @@ class NLPtests(casadiTestCase):
       self.message(str(Solver))
       if "worhp"==Solver:
         continue
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([0.5,0.5],"x0")
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
@@ -349,7 +349,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
       solver.setInput([0.5,0.5],"x0")
       solver.setInput([-10]*2,"lbx")
@@ -380,7 +380,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.evaluate()
@@ -402,7 +402,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([1,-10],"lbx")
       solver.setInput([1,10],"ubx")
 
@@ -433,7 +433,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.setInput(1,"p")
@@ -454,7 +454,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':norm_2(x-X0), 'g':2*x}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       # ({"tol":1e-8,"max_iter":103, "MaxIter": 103,"print_level":0,"derivative_test":"first-order"}).iteritems():
 
       solver.setInput([-10]*N,"lbx")
@@ -477,7 +477,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':(x-1)**2}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       # ({"tol":1e-8,"max_iter":103, "MaxIter": 103,"print_level":0,"derivative_test":"first-order"}).iteritems():
 
       solver.setInput([-10],"lbx")
@@ -493,7 +493,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
       # ({"tol":1e-8,"max_iter":103, "MaxIter": 103,"print_level":0,"derivative_test":"first-order"}).iteritems():
 
@@ -512,7 +512,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10],"lbx")
       solver.setInput([10],"ubx")
       solver.setInput([-10, -10, -10],"lbg")
@@ -528,7 +528,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10],"lbx")
       solver.setInput([10],"ubx")
       solver.setInput([-10, -10, -10],"lbg")
@@ -544,7 +544,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10],"lbx")
       solver.setInput([10],"ubx")
       solver.setInput([-10,-10,-10],"lbg")
@@ -560,7 +560,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat([x,y]), 'f':0, 'g':vertcat([x-y,x])}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10, -10],"lbx")
       solver.setInput([10, 10],"ubx")
       solver.setInput([0, 3],"lbg")
@@ -576,7 +576,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([-10, -10],"lbx")
       solver.setInput([10, 10],"ubx")
       solver.setInput([0, 3 , -10],"lbg")
@@ -593,7 +593,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([0,1],"x0")
       solver.setInput([-10,-10],"lbx")
       solver.setInput([10,10],"ubx")
@@ -625,7 +625,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(Solver)
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([0,1],"x0")
       solver.setInput([-10,1.2],"lbx")
       solver.setInput([10,2],"ubx")
@@ -655,7 +655,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([0,1],"x0")
       solver.setInput([-10,-10],"lbx")
       solver.setInput([10,10],"ubx")
@@ -677,7 +677,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([0,1],"x0")
       solver.setInput([-10,-10],"lbx")
       solver.setInput([10,10],"ubx")
@@ -699,7 +699,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options in solvers:
       self.message(str(Solver))
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver.setInput([0,1],"x0")
       solver.setInput([-10,0],"lbx")
       solver.setInput([10,0.9],"ubx")
@@ -728,7 +728,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       if Solver=="sqpmethod" and "limited-memory" in str(solver_options): continue
-      solver = Function.nlpsol("mysolver",Solver, nlp, solver_options)
+      solver = nlpsol("mysolver",Solver, nlp, solver_options)
       solver.setInput(-1000,"lbx")
       solver.setInput(1000,"ubx")
       solver.evaluate()
@@ -755,7 +755,7 @@ class NLPtests(casadiTestCase):
       options = dict(solver_options)
       if "ipopt" in str(Solver):
         options["fixed_variable_treatment"] = "make_constraint"
-      solver = Function.nlpsol("mysolver", Solver, nlp, options)
+      solver = nlpsol("mysolver", Solver, nlp, options)
       #{"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100,"MaxIter": 100,"print_level":0, "fixed_variable_treatment": "make_constraint"}).iteritems():
           
       solver.setInput(LBX,"lbx")
@@ -781,7 +781,7 @@ class NLPtests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("f")[0],-7.4375,6,str(Solver))
       
-      solver = Function.nlpsol("mysolver", Solver, nlp, options)
+      solver = nlpsol("mysolver", Solver, nlp, options)
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
       solver.setInput(LBA,"lbg")
@@ -818,7 +818,7 @@ class NLPtests(casadiTestCase):
       options = dict(solver_options)
       if "ipopt" in str(Solver):
         options["fixed_variable_treatment"] = "make_constraint"
-      solver = Function.nlpsol("mysolver", Solver, nlp, options)
+      solver = nlpsol("mysolver", Solver, nlp, options)
 
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
@@ -837,7 +837,7 @@ class NLPtests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("f")[0],-10-16.0/9,6,str(solver))
 
-      solver = Function.nlpsol("mysolver", Solver, nlp, options)
+      solver = nlpsol("mysolver", Solver, nlp, options)
           
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
@@ -867,7 +867,7 @@ class NLPtests(casadiTestCase):
     [f_call] = f([a, b])
     nlp = {'x':aa, 'f':f_call}
     for Solver, solver_options in solvers:
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
       
   @requires_nlpsol("snopt")
   def test_permute(self):
@@ -883,7 +883,7 @@ class NLPtests(casadiTestCase):
           f= (x1+x2+x3)**2+3*x3+5*x4
           F= {'x':x, 'f':f, 'g':vertcat(g)[permute_g]}
           
-          solver = Function.nlpsol("mysolver",Solver,F,solver_options)
+          solver = nlpsol("mysolver",Solver,F,solver_options)
           
           ubx = solver.getInput("ubx")
           ubx[permute_x]= DM([inf,inf,inf,inf])
@@ -923,7 +923,7 @@ class NLPtests(casadiTestCase):
           f= x1**2+x3**2
           F= {'x':x, 'f':f, 'g':vertcat(g)[permute_g]}
           
-          solver = Function.nlpsol("mysolver",Solver,F,solver_options)
+          solver = nlpsol("mysolver",Solver,F,solver_options)
 
           ubx = solver.getInput("ubx")
           ubx[permute_x]= DM([inf,inf,inf,inf])
@@ -963,7 +963,7 @@ class NLPtests(casadiTestCase):
           f= x1**2+x3**2+2*x2
           F= {'x':x, 'f':f, 'g':vertcat(g)[permute_g]}
 
-          solver = Function.nlpsol("mysolver",Solver,F,solver_options)
+          solver = nlpsol("mysolver",Solver,F,solver_options)
           
           ubx = solver.getInput("ubx")
           ubx[permute_x]= DM([inf,inf,inf,inf])
@@ -994,7 +994,7 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+7.7*y, 'g':y**2}
 
-    solver = Function.nlpsol("mysolver","snopt", nlp,{"Verify level" :3})
+    solver = nlpsol("mysolver","snopt", nlp,{"Verify level" :3})
     
     solver.setInput([1,1],"x0")
     solver.setInput([-10,0],"lbx")
@@ -1017,7 +1017,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       if "worhp"==Solver or "stabilizedsqp"==Solver : continue
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
           
       solver.setInput([1,1],"x0")
       solver.setInput([-10,-1],"lbx")
@@ -1036,7 +1036,7 @@ class NLPtests(casadiTestCase):
 
     for Solver, solver_options in solvers:
       self.message(Solver)
-      solver = Function.nlpsol("mysolver", Solver, nlp, solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
       solver.setInput([1,1],"x0")
       solver.setInput([-10,0],"lbx")
@@ -1056,7 +1056,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       self.message(str(Solver))
       if "worhp"==Solver: continue
-      solver = Function.nlpsol("mysolver",Solver, nlp,solver_options)
+      solver = nlpsol("mysolver",Solver, nlp,solver_options)
 
       solver.setInput([1,1],"x0")
       solver.setInput([-10,0],"lbx")
@@ -1077,7 +1077,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       self.message(Solver)
       if "worhp"==Solver: continue
-      solver = Function.nlpsol("mysolver",Solver, nlp,solver_options)
+      solver = nlpsol("mysolver",Solver, nlp,solver_options)
           
       solver.setInput([0],"x0")
       solver.setInput([0],"lbx")

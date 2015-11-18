@@ -63,7 +63,7 @@ int main(int argc, char **argv){
                                      {"print_time", 0}}}};
 
   // Allocate NLP solver and buffers
-  Function nlpsol = Function::nlpsol("nlpsol", "sqpmethod", nlp, opts);
+  Function solver = nlpsol("nlpsol", "sqpmethod", nlp, opts);
   std::map<std::string, DM> arg, res;
 
   // Solve NLP
@@ -72,7 +72,7 @@ int main(int argc, char **argv){
   arg["lbg"] = nl.g_lb;
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
-  res = nlpsol(arg);
+  res = solver(arg);
 
   return 0;
 }

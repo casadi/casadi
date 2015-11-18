@@ -50,7 +50,7 @@ opts = {}
 # opts["hessian_approximation"] = "limited-memory"
 
 # Create an NLP solver
-nlpsol = Function.nlpsol("nlpsol", "ipopt", nlp, opts)
+nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
   
 # Pass the bounds and initial guess
 arg = {"lbx" : nl.x_lb, 

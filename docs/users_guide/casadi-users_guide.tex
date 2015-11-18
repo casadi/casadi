@@ -1384,7 +1384,7 @@ g_{\min} \le g(x,p) \le g_{\max}
 
 With a function \texttt{nlp}, which given $x$ and $p$, gives $f$ and $g$, an NLP solver instance can be allocated by:
 \begin{lstlisting}[language=Python]
-nlpsol = Function.nlpsol(display_name,plugin_name,nlp,options)
+nlpsol = nlpsol(display_name,plugin_name,nlp,options)
 \end{lstlisting}
 
 The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver.

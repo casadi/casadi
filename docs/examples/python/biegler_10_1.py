@@ -127,7 +127,7 @@ for N in range(1,11):
   opts = {"tol" : 1e-10}
 
   # Allocate an NLP solver and buffer
-  solver = Function.nlpsol("solver", "ipopt", nlp, opts)
+  solver = nlpsol("solver", "ipopt", nlp, opts)
   arg = {}
 
   # Initial condition

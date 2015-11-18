@@ -44,7 +44,7 @@ if MySolver=="sqpmethod":
   opts["qpsol_options"] = {"printLevel":"none"}
 
 # Allocate a solver
-solver = Function.nlpsol("solver", MySolver, nlp, opts)
+solver = nlpsol("solver", MySolver, nlp, opts)
 
 # Solve the NLP
 sol = solver({"lbg" : 0})

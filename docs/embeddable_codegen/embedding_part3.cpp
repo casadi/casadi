@@ -43,7 +43,7 @@ int main(){
 
   // Create an NLP solver passing derivative information
   Dict opts = {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}};
-  Function solver = Function::nlpsol("solver", "ipopt", nlp, opts);
+  Function solver = nlpsol("solver", "ipopt", nlp, opts);
 
   // Set constraint bounds
   solver.setInput(0.,"lbg");

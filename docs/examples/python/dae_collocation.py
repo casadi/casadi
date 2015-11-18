@@ -375,7 +375,7 @@ opts["tol"] = 1e-4
 opts["linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = Function.nlpsol("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Initial condition

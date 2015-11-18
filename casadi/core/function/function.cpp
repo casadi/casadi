@@ -1324,28 +1324,28 @@ namespace casadi {
     return INTEGRATOR_NUM_OUT;
   }
 
-  Function Function::nlpsol(const string& name, const string& solver,
+  Function nlpsol(const string& name, const string& solver,
                                 const SXDict& nlp, const Dict& opts) {
     return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
   }
 
-  Function Function::nlpsol(const string& name, const string& solver,
+  Function nlpsol(const string& name, const string& solver,
                                 const MXDict& nlp, const Dict& opts) {
     return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
   }
 
-  Function Function::nlpsol(const string& name, const string& solver,
+  Function nlpsol(const string& name, const string& solver,
                                 const Function& nlp, const Dict& opts) {
     if (nlp.is_a("sxfunction")) {
-      return Function::nlpsol(name, solver,
+      return nlpsol(name, solver,
                                   Nlpsol::fun2problem<SX>(nlp), opts);
     } else {
-      return Function::nlpsol(name, solver,
+      return nlpsol(name, solver,
                                   Nlpsol::fun2problem<MX>(nlp), opts);
     }
   }
 
-  Function Function::nlpsol(const string& name, const string& solver,
+  Function nlpsol(const string& name, const string& solver,
                                 const XProblem& nlp, const Dict& opts) {
     Function ret;
     ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
@@ -1382,19 +1382,19 @@ namespace casadi {
     return n->hessLag();
   }
 
-  vector<string> Function::nlpsol_in() {
+  vector<string> nlpsol_in() {
     vector<string> ret(nlpsol_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_in(i);
     return ret;
   }
 
-  vector<string> Function::nlpsol_out() {
+  vector<string> nlpsol_out() {
     vector<string> ret(nlpsol_n_out());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_out(i);
     return ret;
   }
 
-  string Function::nlpsol_in(int ind) {
+  string nlpsol_in(int ind) {
     switch (static_cast<NlpsolInput>(ind)) {
     case NLPSOL_X0:     return "x0";
     case NLPSOL_P:      return "p";
@@ -1409,7 +1409,7 @@ namespace casadi {
     return string();
   }
 
-  string Function::nlpsol_out(int ind) {
+  string nlpsol_out(int ind) {
     switch (static_cast<NlpsolOutput>(ind)) {
     case NLPSOL_X:     return "x";
     case NLPSOL_F:     return "f";
@@ -1422,11 +1422,11 @@ namespace casadi {
     return string();
   }
 
-  int Function::nlpsol_n_in() {
+  int nlpsol_n_in() {
     return NLPSOL_NUM_IN;
   }
 
-  int Function::nlpsol_n_out() {
+  int nlpsol_n_out() {
     return NLPSOL_NUM_OUT;
   }
 

@@ -1125,41 +1125,6 @@ namespace casadi {
     /// Get the DAE for an integrator
     Function integrator_dae();
 
-    ///@{
-    /** Create an NLP solver
-      Creates a solver for the following parametric nonlinear program (NLP):
-      \verbatim
-
-      min          F(x, p)
-      x
-
-      subject to
-      LBX <=   x    <= UBX
-      LBG <= G(x, p) <= UBG
-      p  == P
-
-      nx: number of decision variables
-      ng: number of constraints
-      np: number of parameters
-
-      \endverbatim
-      \author Joel Andersson
-      \date 2011-2015
-    */
-    static Function nlpsol(const std::string& name, const std::string& solver,
-                               const SXDict& nlp, const Dict& opts=Dict());
-    static Function nlpsol(const std::string& name, const std::string& solver,
-                               const MXDict& nlp, const Dict& opts=Dict());
-    static Function nlpsol(const std::string& name, const std::string& solver,
-                               const Function& nlp, const Dict& opts=Dict());
-#ifndef SWIG
-    static Function nlpsol(const std::string& name, const std::string& solver,
-                               const XProblem& nlp, const Dict& opts=Dict());
-#endif // SWIG
-
-
-    ///@}
-
     /** \brief Access the NLP for an NLP solver */
     Function nlpsol_nlp();
 
@@ -1171,24 +1136,6 @@ namespace casadi {
 
     /** \brief Access the Jacobian of the constraint function for an NLP solver */
     Function nlpsol_hesslag();
-
-    /** \brief Get input scheme of NLP solvers */
-    static std::vector<std::string> nlpsol_in();
-
-    /** \brief Get NLP solver output scheme of NLP solvers */
-    static std::vector<std::string> nlpsol_out();
-
-    /** \brief Get NLP solver input scheme name by index */
-    static std::string nlpsol_in(int ind);
-
-    /** \brief Get output scheme name by index */
-    static std::string nlpsol_out(int ind);
-
-    /** \brief Get the number of NLP solver inputs */
-    static int nlpsol_n_in();
-
-    /** \brief Get the number of NLP solver outputs */
-    static int nlpsol_n_out();
 
     ///@{
     /** Create a QP solver
@@ -1401,6 +1348,58 @@ namespace casadi {
 
   /** \brief Get the number of integrator outputs */
   CASADI_EXPORT int integrator_n_out();
+
+  ///@{
+  /** Create an NLP solver
+      Creates a solver for the following parametric nonlinear program (NLP):
+      \verbatim
+
+      min          F(x, p)
+      x
+
+      subject to
+      LBX <=   x    <= UBX
+      LBG <= G(x, p) <= UBG
+      p  == P
+
+      nx: number of decision variables
+      ng: number of constraints
+      np: number of parameters
+
+      \endverbatim
+      \author Joel Andersson
+      \date 2011-2015
+  */
+  CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
+                                const SXDict& nlp, const Dict& opts=Dict());
+  CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
+                                const MXDict& nlp, const Dict& opts=Dict());
+  CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
+                                const Function& nlp, const Dict& opts=Dict());
+#ifndef SWIG
+  CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
+                                const XProblem& nlp, const Dict& opts=Dict());
+#endif // SWIG
+  ///@}
+
+  /** \brief Get input scheme of NLP solvers */
+  CASADI_EXPORT std::vector<std::string> nlpsol_in();
+
+  /** \brief Get NLP solver output scheme of NLP solvers */
+  CASADI_EXPORT std::vector<std::string> nlpsol_out();
+
+  /** \brief Get NLP solver input scheme name by index */
+  CASADI_EXPORT std::string nlpsol_in(int ind);
+
+  /** \brief Get output scheme name by index */
+  CASADI_EXPORT std::string nlpsol_out(int ind);
+
+  /** \brief Get the number of NLP solver inputs */
+  CASADI_EXPORT int nlpsol_n_in();
+
+  /** \brief Get the number of NLP solver outputs */
+  CASADI_EXPORT int nlpsol_n_out();
+
 
 } // namespace casadi
 

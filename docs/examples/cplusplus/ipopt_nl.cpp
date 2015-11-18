@@ -55,7 +55,7 @@ int main(int argc, char **argv){
   //  opts["derivative_test"] = "second-order";
 
   // Allocate NLP solver and buffers
-  Function nlpsol = Function::nlpsol("nlpsol", "ipopt", nlp, opts);
+  Function solver = nlpsol("nlpsol", "ipopt", nlp, opts);
   std::map<std::string, DM> arg, res;
   
   // Solve NLP
@@ -64,6 +64,6 @@ int main(int argc, char **argv){
   arg["lbg"] = nl.g_lb;
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
-  res = nlpsol(arg);
+  res = solver(arg);
   return 0;
 }

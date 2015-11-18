@@ -75,7 +75,7 @@ nlp = {'x':U, 'f':J, 'g':G}
  
 # Allocate an NLP solver
 opts = {"tol":1e-10, "expand":True}
-solver = Function.nlpsol("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Bounds on u and initial condition

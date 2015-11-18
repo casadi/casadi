@@ -81,7 +81,7 @@ namespace casadi {
     options = OptionsFunctionality::addOptionRecipe(options, "qp");
 
     // Create an Nlpsol instance
-    solver_ = Function::nlpsol("nlpsol", option("nlpsol"), nlp, options);
+    solver_ = nlpsol("nlpsol", option("nlpsol"), nlp, options);
     alloc(solver_);
 
     // Allocate storage for NLP solver  parameters

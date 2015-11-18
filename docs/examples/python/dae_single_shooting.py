@@ -82,7 +82,7 @@ for k in range(20):
 # Allocate an NLP solver
 nlp = {'x':U, 'f':J, 'g':X}
 opts = {"linear_solver":"ma27"}
-solver = Function.nlpsol("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 
 # Pass bounds, initial guess and solve NLP
 sol = solver({"lbx" : -0.75, # Lower variable bound

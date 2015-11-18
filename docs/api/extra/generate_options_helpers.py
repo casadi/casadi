@@ -58,15 +58,15 @@ def addExtra(metadata):
   x=SX.sym("x")
   f = {'x':x, 'f':x**2}
   
-  i = Function.nlpsol("mysolver", "ipopt", f)
+  i = nlpsol("mysolver", "ipopt", f)
   extra(metadata,i,"IpoptInterface")
 
   x=SX.sym("x")
-  i = Function.nlpsol("mysolver", "worhp", f)
+  i = nlpsol("mysolver", "worhp", f)
   extra(metadata,i,"WorhpInterface")
 
   x=SX.sym("x")
-  i = Function.nlpsol("mysolver", "snopt", f)
+  i = nlpsol("mysolver", "snopt", f)
   extra(metadata,i,"SnoptInterface")
 
   i = Function.qpsol("mysolver", "qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})

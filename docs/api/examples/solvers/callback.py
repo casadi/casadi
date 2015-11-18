@@ -60,7 +60,7 @@ fcn = Function('f', [x, y], [f])
 # opts["iteration_callback"] = simplecallback
 # opts["tol"] = 1e-8
 # opts["max_iter"] = 20
-# solver = Function.nlpsol("solver", "ipopt", nlp, opts)
+# solver = nlpsol("solver", "ipopt", nlp, opts)
 # solver.setInput([-10]*2,"lbx")
 # solver.setInput([10]*2,"ubx")
 # solver.setInput([-10],"lbg")
@@ -86,7 +86,7 @@ class MyCallback(Callback):
     self.ng = ng
     self.np = np
 
-    opts['input_scheme'] = Function.nlpsol_out()
+    opts['input_scheme'] = nlpsol_out()
     opts['output_scheme'] = ['ret']
 
     figure(1)
@@ -109,12 +109,12 @@ class MyCallback(Callback):
     # Initialize internal objects
     self.construct(name, opts)
 
-  def get_n_in(self): return Function.nlpsol_n_out()
+  def get_n_in(self): return nlpsol_n_out()
   def get_n_out(self): return 1
 
 
   def get_input_shape(self, i):
-    n = Function.nlpsol_out(i)
+    n = nlpsol_out(i)
     if n=='f':
       return (1,1)
     elif n in ('x', 'lam_x'):
@@ -126,7 +126,7 @@ class MyCallback(Callback):
   def eval(self, arg):
     # Create dictionary
     darg = {}
-    for (i,s) in enumerate(Function.nlpsol_out()): darg[s] = arg[i]
+    for (i,s) in enumerate(nlpsol_out()): darg[s] = arg[i]
 
     sol = darg['x']
     self.x_sols.append(float(sol[0]))
@@ -148,7 +148,7 @@ opts = {}
 opts["iteration_callback"] = mycallback
 opts["tol"] = 1e-8
 opts["max_iter"] = 50
-solver = Function.nlpsol("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")

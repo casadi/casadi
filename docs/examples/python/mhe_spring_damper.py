@@ -148,7 +148,7 @@ P = sigma_x0**2*DM.eye(Nstates)
 x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
 opts = {"print_level":0, "print_time": False, 'max_iter':100}
-nlpsol = Function.nlpsol("nlpsol", "ipopt", nlp, opts)
+nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
 
 # Set the bounds for the constraints: we only have the multiple shooting constraints, so all constraints have upper and lower bound of zero
 nlpsol.setInput(0,"lbg")

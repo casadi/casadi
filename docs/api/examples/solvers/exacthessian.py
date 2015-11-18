@@ -35,11 +35,11 @@ constr = x**2+y**2
 nlp={'x':vertcat([x,y]), 'f':obj, 'g':constr}
 
 #! We solve the problem with an exact Hessian (default)
-solver = Function.nlpsol('solver', 'ipopt', nlp)
+solver = nlpsol('solver', 'ipopt', nlp)
 sol = solver({'lbx':-10, 'ubx':10, 'lbg':0, 'ubg':1})
 print 'Optimal solution (exact Hessian): %s' % sol['x']
 
 #! Same problem but with limited memory BFSG
-solver = Function.nlpsol('solver', 'ipopt', nlp, {'hessian_approximation':'limited-memory'})
+solver = nlpsol('solver', 'ipopt', nlp, {'hessian_approximation':'limited-memory'})
 sol = solver({'lbx':-10, 'ubx':10, 'lbg':0, 'ubg':1})
 print 'Optimal solution (BFGS): %s' % sol['x']

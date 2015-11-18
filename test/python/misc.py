@@ -174,12 +174,12 @@ class Misctests(casadiTestCase):
     self.checkarray(x.shape,(2,8),"shape")
     self.checkarray(y.shape,(4,4),"shape")
     
-  @requiresPlugin(Function.nlpsol,"ipopt")
+  @requiresPlugin(nlpsol,"ipopt")
   def test_options_introspection(self):
     self.message("options introspection")
     x=SX.sym("x")
     nlp = {'x':x, 'f':x**2}
-    i = Function.nlpsol('i', "ipopt", nlp)
+    i = nlpsol('i', "ipopt", nlp)
     
     opts = i.optionNames()
     self.assertTrue(isinstance(opts,list))
@@ -224,12 +224,12 @@ class Misctests(casadiTestCase):
   @known_bug()
   def test_exceptions(self):
     try:
-      Function.nlpsol(123)
+      nlpsol(123)
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "Function.nlpsol(str,str,Function,Dict)" in e.message
-      assert "You have: Function.nlpsol(int)" in e.message
+      assert "nlpsol(str,str,Function,Dict)" in e.message
+      assert "You have: nlpsol(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
 
@@ -357,7 +357,7 @@ class Misctests(casadiTestCase):
       print str(e)
       self.assertTrue("x must be larger than 3" in str(e))
 
-  @requiresPlugin(Function.nlpsol,"ipopt")
+  @requiresPlugin(nlpsol,"ipopt")
   def test_output(self):
     with capture_stdout() as result:
       DM([1,2]).printDense()
@@ -366,7 +366,7 @@ class Misctests(casadiTestCase):
 
     x=SX.sym("x")
     f = {'x':x, 'f':x**2}
-    solver = Function.nlpsol("solver", "ipopt",f)
+    solver = nlpsol("solver", "ipopt",f)
     with capture_stdout() as result:
       solver.evaluate()
 
@@ -376,7 +376,7 @@ class Misctests(casadiTestCase):
 
     with capture_stdout() as result:
       try:    
-        solver = Function.nlpsol("solver","foo",f)
+        solver = nlpsol("solver","foo",f)
       except:
         pass
     

@@ -52,7 +52,7 @@ int main(int argc, char **argv){
   // opts["verbose"] = true;
 
   // Allocate NLP solver and buffers
-  Function nlpsol = Function::nlpsol("nlpsol", "knitro", nlp, opts);
+  Function solver = nlpsol("nlpsol", "knitro", nlp, opts);
   std::map<std::string, DM> arg, res;
 
   // Structure with bounds and initial guess
@@ -63,7 +63,7 @@ int main(int argc, char **argv){
   arg["x0"] = nl.x_init;
 
   // Solve the NLP
-  res = nlpsol(arg);
+  res = solver(arg);
 
   return 0;
 }
