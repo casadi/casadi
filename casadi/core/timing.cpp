@@ -39,9 +39,10 @@ namespace casadi {
     ret.user = clock();
 #ifdef _WIN32
     FILETIME tm;
-    ULONGLONG t;
-    GetSystemTimePreciseAsFileTime(&tm);
-    t = (static_cast<ULONGLONG>(tm.dwHighDateTime) << 32) | (ULONGLONG)tm.dwLowDateTime;
+    GetSystemTimeAsFileTime(&tm);
+    //GetSystemTimePreciseAsFileTime(&tm);
+    ULONGLONG t = (static_cast<ULONGLONG>(tm.dwHighDateTime) << 32)
+      | (ULONGLONG)tm.dwLowDateTime;
     ret.real = static_cast<double>(t) / 10000000.0;
 #else
     struct timeval tm;
