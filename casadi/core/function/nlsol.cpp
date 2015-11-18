@@ -105,8 +105,8 @@ namespace casadi {
         }
 
         // Allocate a linear solver
-        linsol_ = Function::linsol("linsol", option("linear_solver"),
-                                   jac_.sparsity_out(0), 1, linear_solver_options);
+        linsol_ = linsol("linsol", option("linear_solver"),
+                         jac_.sparsity_out(0), 1, linear_solver_options);
       }
     } else {
       casadi_assert(linsol_.sparsity_in(0)==jac_.sparsity_out(0));

@@ -242,7 +242,7 @@ class LinearSolverTests(casadiTestCase):
   def test_simple_trans(self):
     A = DM([[3,1],[7,2]])
     for Solver, options in lsolvers:
-      solver = Function.linsol("solver", Solver, A.sparsity().T, 1, options)
+      solver = casadi.linsol("solver", Solver, A.sparsity().T, 1, options)
       b = DM([1,0.5])
       sol = solver({'A':A.T, 'B':b})
       res = DM([1.5,-0.5])
@@ -252,7 +252,7 @@ class LinearSolverTests(casadiTestCase):
     A = DM([[3,1],[7,2]])
     for Solver, options in lsolvers:
       print Solver
-      solver = Function.linsol("solver", Solver, A.sparsity(), 1, options)
+      solver = casadi.linsol("solver", Solver, A.sparsity(), 1, options)
       b = DM([1,0.5])
       sol = solver({'A':A, 'B':b})      
       res = DM([-1.5,5.5])
@@ -266,7 +266,7 @@ class LinearSolverTests(casadiTestCase):
     
     for Solver, options in lsolvers:
       print Solver
-      solver = Function.linsol("solver", Solver, A.sparsity(), 1, options)
+      solver = casadi.linsol("solver", Solver, A.sparsity(), 1, options)
       solver.setInput(A_,"A")
       solver.setInput(b_,"B")
       
@@ -294,7 +294,7 @@ class LinearSolverTests(casadiTestCase):
     
     for Solver, options in lsolvers:
       print Solver
-      solver = Function.linsol("solver", Solver, A.sparsity(), 1, options)
+      solver = casadi.linsol("solver", Solver, A.sparsity(), 1, options)
       solver.setInput(A_,"A")
       solver.setInput(b_,"B")
 
@@ -333,7 +333,7 @@ class LinearSolverTests(casadiTestCase):
       b = MX.sym("b",b_.sparsity())
       for Solver, options in lsolvers:
         print Solver
-        solver = Function.linsol("solver", Solver, A.sparsity(), 1, options)
+        solver = casadi.linsol("solver", Solver, A.sparsity(), 1, options)
         for tr in [True, False]:
           x = solver.linsol_solve(A,b,tr)
           f = Function("f", [A,b],[x])
@@ -384,7 +384,7 @@ class LinearSolverTests(casadiTestCase):
     
     M.sparsity().spy()
 
-    S = Function.linsol("S", "csparsecholesky", M.sparsity(), 1)
+    S = casadi.linsol("S", "csparsecholesky", M.sparsity(), 1)
     S.setInput(M)
     S.linsol_prepare()
     
@@ -411,7 +411,7 @@ class LinearSolverTests(casadiTestCase):
     M = mul(L,L.T)
 
     print L
-    S = Function.linsol("S", "csparsecholesky", M.sparsity(), 1)
+    S = casadi.linsol("S", "csparsecholesky", M.sparsity(), 1)
     
     S.linsol_cholesky_sparsity().spy()
     S.setInput(M)

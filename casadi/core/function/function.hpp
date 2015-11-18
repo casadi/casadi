@@ -1032,32 +1032,6 @@ namespace casadi {
     static std::string doc_linsol(const std::string& name);
     ///@}
 
-    ///@{
-    /** Create a solver for linear systems of equations
-     * Solves the linear system A*X = B or A^T*X = B for X
-     * with A square and non-singular
-     *
-     *  If A is structurally singular, an error will be thrown during init.
-     *  If A is numerically singular, the prepare step will fail.
-     *
-     *  The usual procedure to use Linsol is: \n
-     *  -# init()
-     *  -# set the first input (A)
-     *  -# prepare()
-     *  -# set the second input (b)
-     *  -# solve()
-     *  -# Repeat steps 4 and 5 to work with other b vectors.
-     *
-     * The standard evaluation combines the prepare() and solve() step and may
-     * therefore more expensive if A is invariant.
-     *
-     * \author Joel Andersson
-     * \date 2011-2015
-     */
-    static Function linsol(const std::string& name, const std::string& solver,
-                           const Sparsity& sp, int nrhs, const Dict& opts=Dict());
-    ///@}
-
     /// Create a solve node
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
 
@@ -1399,6 +1373,32 @@ namespace casadi {
 
   /** \brief Get the number of QP solver outputs */
   CASADI_EXPORT int qpsol_n_out();
+
+  ///@{
+  /** Create a solver for linear systems of equations
+   * Solves the linear system A*X = B or A^T*X = B for X
+   * with A square and non-singular
+   *
+   *  If A is structurally singular, an error will be thrown during init.
+   *  If A is numerically singular, the prepare step will fail.
+   *
+   *  The usual procedure to use Linsol is: \n
+   *  -# init()
+   *  -# set the first input (A)
+   *  -# prepare()
+   *  -# set the second input (b)
+   *  -# solve()
+   *  -# Repeat steps 4 and 5 to work with other b vectors.
+   *
+   * The standard evaluation combines the prepare() and solve() step and may
+   * therefore more expensive if A is invariant.
+   *
+   * \author Joel Andersson
+   * \date 2011-2015
+   */
+  CASADI_EXPORT Function linsol(const std::string& name, const std::string& solver,
+                                const Sparsity& sp, int nrhs, const Dict& opts=Dict());
+  ///@}
 
 } // namespace casadi
 

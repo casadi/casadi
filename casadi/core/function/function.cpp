@@ -1499,8 +1499,8 @@ namespace casadi {
     return QPSOL_NUM_OUT;
   }
 
-  Function Function::linsol(const std::string& name, const std::string& solver,
-                            const Sparsity& sp, int nrhs, const Dict& opts) {
+  Function linsol(const std::string& name, const std::string& solver,
+                  const Sparsity& sp, int nrhs, const Dict& opts) {
     Function ret;
     if (solver=="none") {
       ret.assignNode(new Linsol(name, sp, nrhs));

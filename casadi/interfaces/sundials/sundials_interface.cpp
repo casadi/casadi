@@ -285,7 +285,7 @@ namespace casadi {
       }
 
       // Create a linear solver
-      linsol_ = Function::linsol("linsol", option("linear_solver"), jac_.sparsity_out(0),
+      linsol_ = linsol("linsol", option("linear_solver"), jac_.sparsity_out(0),
                                  1, linear_solver_options);
       alloc(linsol_);
     }
@@ -302,7 +302,7 @@ namespace casadi {
       // Create a linear solver
       std::string linear_solver_name =
         hasSetOption("linear_solverB") ? option("linear_solverB") : option("linear_solver");
-      linsolB_ = Function::linsol("linsolB", linear_solver_name, jacB_.sparsity_out(0),
+      linsolB_ = linsol("linsolB", linear_solver_name, jacB_.sparsity_out(0),
                                   1, opts);
       alloc(linsolB_);
     }

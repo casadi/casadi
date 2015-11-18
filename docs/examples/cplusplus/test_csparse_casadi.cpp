@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
   Sparsity spA(nrow,ncol,colind,row);
   
   // Create a solver instance
-  Function linear_solver = Function::linsol("linear_solver", "csparse", spA, 1);
+  Function linear_solver = linsol("linear_solver", "csparse", spA, 1);
     
   // Pass Non-zero elements
   double   s, u, p, e, r, l;

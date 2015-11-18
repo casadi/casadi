@@ -226,9 +226,9 @@ namespace casadi {
                           "Sparse states in integrators are experimental");
 
     // Form a linear solver for the sparsity propagation
-    linsol_f_ = Function::linsol("linsol_f", "none", spJacF(), 1);
+    linsol_f_ = linsol("linsol_f", "none", spJacF(), 1);
     if (!g_.isNull()) {
-      linsol_g_ = Function::linsol("linsol_g", "none", spJacG(), 1);
+      linsol_g_ = linsol("linsol_g", "none", spJacG(), 1);
     }
 
     // Allocate sufficiently large work vectors

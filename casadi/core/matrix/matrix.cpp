@@ -51,7 +51,7 @@ namespace casadi {
   zz_solve(const Matrix<double>& b,
            const string& lsolver, const Dict& dict) const {
     const Matrix<double>& A = *this;
-    Function mysolver = Function::linsol("tmp", lsolver, A.sparsity(), b.size2(), dict);
+    Function mysolver = linsol("tmp", lsolver, A.sparsity(), b.size2(), dict);
     vector<DM> arg(LINSOL_NUM_IN);
     arg.at(LINSOL_A) = A;
     arg.at(LINSOL_B) = b;
