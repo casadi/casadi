@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_NLSOL_HPP
-#define CASADI_NLSOL_HPP
+#ifndef CASADI_ROOTFINDER_HPP
+#define CASADI_ROOTFINDER_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -34,16 +34,16 @@ namespace casadi {
 
   /// Internal class
   class CASADI_EXPORT
-  Nlsol : public FunctionInternal, public PluginInterface<Nlsol> {
+  Rootfinder : public FunctionInternal, public PluginInterface<Rootfinder> {
   public:
     /** \brief Constructor
      *
      * \param f   Function mapping from (n+1) inputs to 1 output.
      */
-    Nlsol(const std::string& name, const Function& f);
+    Rootfinder(const std::string& name, const Function& f);
 
     /// Destructor
-    virtual ~Nlsol() = 0;
+    virtual ~Rootfinder() = 0;
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() const { return f_.n_in();}
@@ -114,7 +114,7 @@ namespace casadi {
     int iin_, iout_;
 
     // Creator function for internal class
-    typedef Nlsol* (*Creator)(const std::string& name, const Function& f);
+    typedef Rootfinder* (*Creator)(const std::string& name, const Function& f);
 
     // No static functions exposed
     struct Exposed{ };
@@ -123,7 +123,7 @@ namespace casadi {
     static std::map<std::string, Plugin> solvers_;
 
     /// Short name
-    static std::string shortname() { return "nlsol";}
+    static std::string shortname() { return "rootfinder";}
 
     /// Infix
     static const std::string infix_;
@@ -134,4 +134,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_NLSOL_HPP
+#endif // CASADI_ROOTFINDER_HPP

@@ -29,8 +29,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLSOL_NLPSOL_EXPORT
-  casadi_register_nlsol_nlpsol(Nlsol::Plugin* plugin) {
+  int CASADI_ROOTFINDER_NLPSOL_EXPORT
+  casadi_register_rootfinder_nlpsol(Rootfinder::Plugin* plugin) {
     plugin->creator = ImplicitToNlp::creator;
     plugin->name = "nlpsol";
     plugin->doc = ImplicitToNlp::meta_doc.c_str();
@@ -40,12 +40,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLSOL_NLPSOL_EXPORT casadi_load_nlsol_nlpsol() {
-    Nlsol::registerPlugin(casadi_register_nlsol_nlpsol);
+  void CASADI_ROOTFINDER_NLPSOL_EXPORT casadi_load_rootfinder_nlpsol() {
+    Rootfinder::registerPlugin(casadi_register_rootfinder_nlpsol);
   }
 
   ImplicitToNlp::ImplicitToNlp(const std::string& name, const Function& f)
-    : Nlsol(name, f) {
+    : Rootfinder(name, f) {
 
     addOption("nlpsol", OT_STRING, GenericType(), "Name of solver.");
     addOption("nlpsol_options", OT_DICT,  Dict(), "Options to be passed to solver.");
@@ -56,7 +56,7 @@ namespace casadi {
 
   void ImplicitToNlp::init() {
     // Call the base class initializer
-    Nlsol::init();
+    Rootfinder::init();
 
     // Free variable in the NLP
     MX u = MX::sym("u", input(iin_).sparsity());

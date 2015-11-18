@@ -26,28 +26,28 @@
 #ifndef CASADI_IMPLICIT_TO_NLP_HPP
 #define CASADI_IMPLICIT_TO_NLP_HPP
 
-#include "casadi/core/function/nlsol.hpp"
+#include "casadi/core/function/rootfinder.hpp"
 #include "casadi/core/function/nlpsol.hpp"
 
-#include <casadi/solvers/casadi_nlsol_nlpsol_export.h>
+#include <casadi/solvers/casadi_rootfinder_nlpsol_export.h>
 
-/** \defgroup plugin_Nlsol_nlp
-  Use an Nlpsol as Nlsol solver
+/** \defgroup plugin_Rootfinder_nlp
+  Use an Nlpsol as Rootfinder solver
 */
-/** \pluginsection{Nlsol,nlp} */
+/** \pluginsection{Rootfinder,nlp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief  \pluginbrief{Nlsol,nlp}
+  /** \brief  \pluginbrief{Rootfinder,nlp}
 
-   @copydoc Nlsol_doc
-   @copydoc plugin_Nlsol_nlp
+   @copydoc Rootfinder_doc
+   @copydoc plugin_Rootfinder_nlp
 
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_NLSOL_NLPSOL_EXPORT ImplicitToNlp : public Nlsol {
+  class CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlp : public Rootfinder {
   public:
     /** \brief  Constructor */
     explicit ImplicitToNlp(const std::string& name, const Function& f);
@@ -55,8 +55,8 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~ImplicitToNlp();
 
-    /** \brief  Create a new Nlsol */
-    static Nlsol* creator(const std::string& name, const Function& f) {
+    /** \brief  Create a new Rootfinder */
+    static Rootfinder* creator(const std::string& name, const Function& f) {
       return new ImplicitToNlp(name, f);
     }
 

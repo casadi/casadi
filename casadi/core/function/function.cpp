@@ -35,7 +35,7 @@
 #include "integrator.hpp"
 #include "qpsol.hpp"
 #include "nlpsol.hpp"
-#include "nlsol.hpp"
+#include "rootfinder.hpp"
 #include "linsol.hpp"
 
 
@@ -1184,16 +1184,16 @@ namespace casadi {
     return Nlpsol::getPlugin(name).doc;
   }
 
-  bool Function::has_nlsol(const string& name) {
-    return Nlsol::hasPlugin(name);
+  bool Function::has_rootfinder(const string& name) {
+    return Rootfinder::hasPlugin(name);
   }
 
-  void Function::load_nlsol(const string& name) {
-    Nlsol::loadPlugin(name);
+  void Function::load_rootfinder(const string& name) {
+    Rootfinder::loadPlugin(name);
   }
 
-  string Function::doc_nlsol(const string& name) {
-    return Nlsol::getPlugin(name).doc;
+  string Function::doc_rootfinder(const string& name) {
+    return Rootfinder::getPlugin(name).doc;
   }
 
   bool Function::has_linsol(const string& name) {
@@ -1208,24 +1208,24 @@ namespace casadi {
     return Linsol::getPlugin(name).doc;
   }
 
-  Function Function::nlsol_fun() {
+  Function Function::rootfinder_fun() {
     casadi_assert(!isNull());
-    Nlsol* n = dynamic_cast<Nlsol*>(get());
-    casadi_assert_message(n!=0, "Not a nlsol");
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+    casadi_assert_message(n!=0, "Not a rootfinder");
     return n->f_;
   }
 
-  Function Function::nlsol_jac() {
+  Function Function::rootfinder_jac() {
     casadi_assert(!isNull());
-    Nlsol* n = dynamic_cast<Nlsol*>(get());
-    casadi_assert_message(n!=0, "Not a nlsol");
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+    casadi_assert_message(n!=0, "Not a rootfinder");
     return n->jac_;
   }
 
-  Function Function::nlsol_linsol() {
+  Function Function::rootfinder_linsol() {
     casadi_assert(!isNull());
-    Nlsol* n = dynamic_cast<Nlsol*>(get());
-    casadi_assert_message(n!=0, "Not a nlsol");
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+    casadi_assert_message(n!=0, "Not a rootfinder");
     return n->linsol_;
   }
 
@@ -1548,10 +1548,10 @@ namespace casadi {
     (*this)->linsol_spsolve(X, B, tr);
   }
 
-  Function Function::nlsol(const string& name, const string& solver,
-                                const Dict& opts) const {
+  Function rootfinder(const std::string& name, const std::string& solver,
+                   const Function& f, const Dict& opts) {
     Function ret;
-    ret.assignNode(Nlsol::instantiatePlugin(name, solver, *this));
+    ret.assignNode(Rootfinder::instantiatePlugin(name, solver, f));
     ret.setOption(opts);
     ret.init();
     return ret;

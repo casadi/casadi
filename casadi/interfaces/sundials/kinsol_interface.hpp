@@ -26,8 +26,8 @@
 #ifndef CASADI_KINSOL_INTERFACE_HPP
 #define CASADI_KINSOL_INTERFACE_HPP
 
-#include <casadi/interfaces/sundials/casadi_nlsol_kinsol_export.h>
-#include "casadi/core/function/nlsol.hpp"
+#include <casadi/interfaces/sundials/casadi_rootfinder_kinsol_export.h>
+#include "casadi/core/function/rootfinder.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
 #include <sundials/sundials_types.h>  /* definition of type double */
@@ -40,20 +40,20 @@
 #include <kinsol/kinsol_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_Nlsol_kinsol
+/** \defgroup plugin_Rootfinder_kinsol
  KINSOL interface from the Sundials suite
 */
-/** \pluginsection{Nlsol,kinsol} */
+/** \pluginsection{Rootfinder,kinsol} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{Nlsol,kinsol}
+  /** \brief \pluginbrief{Rootfinder,kinsol}
   *
-  * @copydoc Nlsol_doc
-  * @copydoc plugin_Nlsol_kinsol
+  * @copydoc Rootfinder_doc
+  * @copydoc plugin_Rootfinder_kinsol
   */
-  class CASADI_NLSOL_KINSOL_EXPORT KinsolInterface : public Nlsol {
+  class CASADI_ROOTFINDER_KINSOL_EXPORT KinsolInterface : public Rootfinder {
   public:
     /** \brief  Constructor */
     explicit KinsolInterface(const std::string& name, const Function& f);
@@ -61,8 +61,8 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~KinsolInterface();
 
-    /** \brief  Create a new Nlsol */
-    static Nlsol* creator(const std::string& name, const Function& f) {
+    /** \brief  Create a new Rootfinder */
+    static Rootfinder* creator(const std::string& name, const Function& f) {
       return new KinsolInterface(name, f);
     }
 
@@ -127,7 +127,7 @@ namespace casadi {
   };
 
   // Memory
-  struct CASADI_NLSOL_KINSOL_EXPORT KinsolMemory {
+  struct CASADI_ROOTFINDER_KINSOL_EXPORT KinsolMemory {
     /// Shared memory
     KinsolInterface& self;
 

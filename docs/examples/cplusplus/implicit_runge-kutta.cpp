@@ -139,7 +139,7 @@ int main(){
   } else {
     opts = {{"linear_solver", "csparse"}};
   }
-  Function ifcn = vfcn_sx.nlsol("ifcn", solver, opts);
+  Function ifcn = rootfinder("ifcn", solver, vfcn_sx, opts);
 
   // Get an expression for the state at the end of the finite element
   vector<MX> ifcn_arg = {MX(), X0, P};

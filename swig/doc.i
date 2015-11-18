@@ -556,7 +556,7 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::has_nlsol(const std::string &name)
+%feature("docstring")  casadi::Function::has_rootfinder(const std::string &name)
 "
 
 Check if a particular plugin is available
@@ -630,7 +630,7 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring")  casadi::Function::nlsol(const std::string &name,
+%feature("docstring")  casadi::Function::rootfinder(const std::string &name,
 const std::string &solver, const Dict &opts=Dict()) const  "
 
 Create a solver for rootfinding problems Takes a function where one of the
@@ -900,9 +900,9 @@ no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Function::nlsol_jac() "
+%feature("docstring")  casadi::Function::rootfinder_jac() "
 
-Access Jacobian of the ths function for a nlsol.
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
@@ -1428,9 +1428,9 @@ Joris Gillis
 
 ";
 
-%feature("docstring")  casadi::Function::nlsol_linsol() "
+%feature("docstring")  casadi::Function::rootfinder_linsol() "
 
-Access linear solver of a nlsol.
+Access linear solver of a rootfinder.
 
 ";
 
@@ -1441,7 +1441,7 @@ Explicitly load a plugin dynamically
 
 ";
 
-%feature("docstring")  casadi::Function::doc_nlsol(const std::string &name)
+%feature("docstring")  casadi::Function::doc_rootfinder(const std::string &name)
 "
 
 Get the documentation string for a plugin
@@ -1777,7 +1777,7 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring")  casadi::Function::load_nlsol(const std::string &name)
+%feature("docstring")  casadi::Function::load_rootfinder(const std::string &name)
 "
 
 Explicitly load a plugin dynamically
@@ -2174,9 +2174,9 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::nlsol_fun() "
+%feature("docstring")  casadi::Function::rootfinder_fun() "
 
-Access rhs function for a nlsol.
+Access rhs function for a rootfinder.
 
 ";
 
@@ -3566,9 +3566,9 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring")  casadi::Function::nlsol_fun() "
+%feature("docstring")  casadi::Function::rootfinder_fun() "
 
-Access rhs function for a nlsol.
+Access rhs function for a rootfinder.
 
 ";
 
@@ -3626,7 +3626,7 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring")  casadi::Function::nlsol(const std::string &name,
+%feature("docstring")  casadi::Function::rootfinder(const std::string &name,
 const std::string &solver, const Dict &opts=Dict()) const  "
 
 Create a solver for rootfinding problems Takes a function where one of the
@@ -4080,9 +4080,9 @@ the inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::nlsol_linsol() "
+%feature("docstring")  casadi::Function::rootfinder_linsol() "
 
-Access linear solver of a nlsol.
+Access linear solver of a rootfinder.
 
 ";
 
@@ -4340,7 +4340,7 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::Function::load_nlsol(const std::string &name)
+%feature("docstring")  casadi::Function::load_rootfinder(const std::string &name)
 "
 
 Explicitly load a plugin dynamically
@@ -4353,7 +4353,7 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::Function::has_nlsol(const std::string &name)
+%feature("docstring")  casadi::Function::has_rootfinder(const std::string &name)
 "
 
 Check if a particular plugin is available
@@ -4606,9 +4606,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring")  casadi::Function::nlsol_jac() "
+%feature("docstring")  casadi::Function::rootfinder_jac() "
 
-Access Jacobian of the ths function for a nlsol.
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
@@ -5125,7 +5125,7 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring")  casadi::Function::doc_nlsol(const std::string &name)
+%feature("docstring")  casadi::Function::doc_rootfinder(const std::string &name)
 "
 
 Get the documentation string for a plugin

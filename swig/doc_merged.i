@@ -348,7 +348,7 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring") casadi::Callback::has_nlsol "
+%feature("docstring") casadi::Callback::has_rootfinder "
 
 Check if a particular plugin is available
 
@@ -419,7 +419,7 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring") casadi::Callback::nlsol "
+%feature("docstring") casadi::Callback::rootfinder "
 
 Create a solver for rootfinding problems Takes a function where one of the
 inputs is unknown and one of the outputs is a residual function that is
@@ -602,9 +602,9 @@ no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Callback::nlsol_jac "
+%feature("docstring") casadi::Callback::rootfinder_jac "
 
-Access Jacobian of the ths function for a nlsol.
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
@@ -934,9 +934,9 @@ Joris Gillis
 
 ";
 
-%feature("docstring") casadi::Callback::nlsol_linsol "
+%feature("docstring") casadi::Callback::rootfinder_linsol "
 
-Access linear solver of a nlsol.
+Access linear solver of a rootfinder.
 
 ";
 
@@ -946,7 +946,7 @@ Explicitly load a plugin dynamically
 
 ";
 
-%feature("docstring") casadi::Callback::doc_nlsol "
+%feature("docstring") casadi::Callback::doc_rootfinder "
 
 Get the documentation string for a plugin
 
@@ -1175,7 +1175,7 @@ The the mapaccumulated version has the signature:
 
 ";
 
-%feature("docstring") casadi::Callback::load_nlsol "
+%feature("docstring") casadi::Callback::load_rootfinder "
 
 Explicitly load a plugin dynamically
 
@@ -1527,9 +1527,9 @@ Get output dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::nlsol_fun "
+%feature("docstring") casadi::Callback::rootfinder_fun "
 
-Access rhs function for a nlsol.
+Access rhs function for a rootfinder.
 
 ";
 
@@ -2700,9 +2700,9 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::Function::nlsol_fun "
+%feature("docstring") casadi::Function::rootfinder_fun "
 
-Access rhs function for a nlsol.
+Access rhs function for a rootfinder.
 
 ";
 
@@ -2757,7 +2757,7 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::Function::nlsol "
+%feature("docstring") casadi::Function::rootfinder "
 
 Create a solver for rootfinding problems Takes a function where one of the
 inputs is unknown and one of the outputs is a residual function that is
@@ -3063,9 +3063,9 @@ the inputs.
 
 ";
 
-%feature("docstring") casadi::Function::nlsol_linsol "
+%feature("docstring") casadi::Function::rootfinder_linsol "
 
-Access linear solver of a nlsol.
+Access linear solver of a rootfinder.
 
 ";
 
@@ -3246,7 +3246,7 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::Function::load_nlsol "
+%feature("docstring") casadi::Function::load_rootfinder "
 
 Explicitly load a plugin dynamically
 
@@ -3258,7 +3258,7 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::Function::has_nlsol "
+%feature("docstring") casadi::Function::has_rootfinder "
 
 Check if a particular plugin is available
 
@@ -3418,9 +3418,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::Function::nlsol_jac "
+%feature("docstring") casadi::Function::rootfinder_jac "
 
-Access Jacobian of the ths function for a nlsol.
+Access Jacobian of the ths function for a rootfinder.
 
 ";
 
@@ -3832,7 +3832,7 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::Function::doc_nlsol "
+%feature("docstring") casadi::Function::doc_rootfinder "
 
 Get the documentation string for a plugin
 

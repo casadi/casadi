@@ -26,28 +26,28 @@
 #ifndef CASADI_NEWTON_HPP
 #define CASADI_NEWTON_HPP
 
-#include "casadi/core/function/nlsol.hpp"
+#include "casadi/core/function/rootfinder.hpp"
 
-#include <casadi/solvers/casadi_nlsol_newton_export.h>
+#include <casadi/solvers/casadi_rootfinder_newton_export.h>
 
-/** \defgroup plugin_Nlsol_newton
+/** \defgroup plugin_Rootfinder_newton
      Implements simple newton iterations to solve an implicit function.
 */
 
-/** \pluginsection{Nlsol,newton} */
+/** \pluginsection{Rootfinder,newton} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{Nlsol,newton}
+  /** \brief \pluginbrief{Rootfinder,newton}
 
-      @copydoc Nlsol_doc
-      @copydoc plugin_Nlsol_newton
+      @copydoc Rootfinder_doc
+      @copydoc plugin_Rootfinder_newton
 
       \author Joris Gillis
       \date 2012
   */
-  class CASADI_NLSOL_NEWTON_EXPORT Newton : public Nlsol {
+  class CASADI_ROOTFINDER_NEWTON_EXPORT Newton : public Rootfinder {
   public:
     /** \brief  Constructor */
     explicit Newton(const std::string& name, const Function& f);
@@ -58,8 +58,8 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "newton";}
 
-    /** \brief  Create a new Nlsol */
-    static Nlsol* creator(const std::string& name, const Function& f) {
+    /** \brief  Create a new Rootfinder */
+    static Rootfinder* creator(const std::string& name, const Function& f) {
       return new Newton(name, f);
     }
 

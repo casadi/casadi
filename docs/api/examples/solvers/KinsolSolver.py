@@ -27,7 +27,7 @@ from casadi import *
 from numpy import *
 from pylab import *
 
-#! We will investigate the working of Function::nlsol with the help of the parametrically exited Duffing equation.
+#! We will investigate the working of rootfinder with the help of the parametrically exited Duffing equation.
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$. \\
 #$
@@ -67,7 +67,7 @@ opts["abstol"] = 1e-14
 
 #$ Require $a > 0$ and $\gamma < 0$
 opts["constraints"] = [2,-2]
-s=f.nlsol("s", "kinsol", opts)
+s=rootfinder("s", "kinsol", f, opts)
 s.setInput(params_,1)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve

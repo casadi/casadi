@@ -284,7 +284,7 @@ namespace casadi {
     Function rfp("rfp", {v, x0, p, h}, {vertcat(V_eq)});
 
     // Create a implicit function instance to solve the system of equations
-    Function ifcn = rfp.nlsol("ifcn", solver, solver_options);
+    Function ifcn = rootfinder("ifcn", solver, rfp, solver_options);
 
     // Get state at end time
     MX xf = x0;

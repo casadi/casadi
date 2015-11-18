@@ -1010,7 +1010,7 @@ namespace casadi {
     static bool has_integrator(const std::string& name);
     static bool has_qpsol(const std::string& name);
     static bool has_nlpsol(const std::string& name);
-    static bool has_nlsol(const std::string& name);
+    static bool has_rootfinder(const std::string& name);
     static bool has_linsol(const std::string& name);
     ///@}
 
@@ -1019,7 +1019,7 @@ namespace casadi {
     static void load_qpsol(const std::string& name);
     static void load_integrator(const std::string& name);
     static void load_nlpsol(const std::string& name);
-    static void load_nlsol(const std::string& name);
+    static void load_rootfinder(const std::string& name);
     static void load_linsol(const std::string& name);
     ///@}
 
@@ -1028,7 +1028,7 @@ namespace casadi {
     static std::string doc_integrator(const std::string& name);
     static std::string doc_qpsol(const std::string& name);
     static std::string doc_nlpsol(const std::string& name);
-    static std::string doc_nlsol(const std::string& name);
+    static std::string doc_rootfinder(const std::string& name);
     static std::string doc_linsol(const std::string& name);
     ///@}
 
@@ -1064,37 +1064,14 @@ namespace casadi {
      */
     DM linsol_cholesky(bool tr=false) const;
 
-    ///@{
-    /** Create a solver for rootfinding problems
-     * Takes a function where one of the inputs is unknown and one of the outputs
-     * is a residual function that is always zero, defines a new function where
-     * the the unknown input has been replaced by a _guess_ for the unknown and the
-     * residual output has been replaced by the calculated value for the input.
-     *
-     * For a function
-     * [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm),
-     * where xj is unknown and yi=0, defines a new function
-     * [y0, y1, ...,xj, .., yn] = G(x0, x1, ..., xj_guess, ..., xm),
-     *
-     * xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-     *
-     * By default, the first input is unknown and the first output is the residual.
-     *
-     * \author Joel Andersson
-     * \date 2011-2015
-     */
-    Function nlsol(const std::string& name, const std::string& solver,
-                        const Dict& opts=Dict()) const;
-    ///@}
+    /// Access rhs function for a rootfinder
+    Function rootfinder_fun();
 
-    /// Access rhs function for a nlsol
-    Function nlsol_fun();
+    /// Access Jacobian of the ths function for a rootfinder
+    Function rootfinder_jac();
 
-    /// Access Jacobian of the ths function for a nlsol
-    Function nlsol_jac();
-
-    /// Access linear solver of a nlsol
-    Function nlsol_linsol();
+    /// Access linear solver of a rootfinder
+    Function rootfinder_linsol();
 
     /// Get the DAE for an integrator
     Function integrator_dae();
@@ -1399,6 +1376,30 @@ namespace casadi {
   CASADI_EXPORT Function linsol(const std::string& name, const std::string& solver,
                                 const Sparsity& sp, int nrhs, const Dict& opts=Dict());
   ///@}
+
+  ///@{
+  /** Create a solver for rootfinding problems
+   * Takes a function where one of the inputs is unknown and one of the outputs
+   * is a residual function that is always zero, defines a new function where
+   * the the unknown input has been replaced by a _guess_ for the unknown and the
+   * residual output has been replaced by the calculated value for the input.
+   *
+   * For a function
+   * [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm),
+   * where xj is unknown and yi=0, defines a new function
+   * [y0, y1, ...,xj, .., yn] = G(x0, x1, ..., xj_guess, ..., xm),
+   *
+   * xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+   *
+   * By default, the first input is unknown and the first output is the residual.
+   *
+   * \author Joel Andersson
+   * \date 2011-2015
+   */
+  CASADI_EXPORT Function rootfinder(const std::string& name, const std::string& solver,
+                               const Function& f, const Dict& opts=Dict());
+  ///@}
+
 
 } // namespace casadi
 

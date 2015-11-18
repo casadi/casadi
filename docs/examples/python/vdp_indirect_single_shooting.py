@@ -116,7 +116,7 @@ elif Solver=='kinsol':
     opts['linear_solver_type'] = 'user_defined'
     opts['linear_solver'] = 'csparse'
     opts['max_iter'] = 1000
-solver = rfp.nlsol('solver', Solver, opts)
+solver = rootfinder('solver', Solver, rfp, opts)
 
 # Solve the problem
 l_init_opt, = solver([0])

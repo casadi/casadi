@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLSOL_NEWTON_EXPORT
-  casadi_register_nlsol_newton(Nlsol::Plugin* plugin) {
+  int CASADI_ROOTFINDER_NEWTON_EXPORT
+  casadi_register_rootfinder_newton(Rootfinder::Plugin* plugin) {
     plugin->creator = Newton::creator;
     plugin->name = "newton";
     plugin->doc = Newton::meta_doc.c_str();
@@ -40,12 +40,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLSOL_NEWTON_EXPORT casadi_load_nlsol_newton() {
-    Nlsol::registerPlugin(casadi_register_nlsol_newton);
+  void CASADI_ROOTFINDER_NEWTON_EXPORT casadi_load_rootfinder_newton() {
+    Rootfinder::registerPlugin(casadi_register_rootfinder_newton);
   }
 
   Newton::Newton(const std::string& name, const Function& f)
-    : Nlsol(name, f) {
+    : Rootfinder(name, f) {
 
     addOption("abstol",                      OT_REAL, 1e-12,
               "Stopping criterion tolerance on max(|F|)");
@@ -65,7 +65,7 @@ namespace casadi {
   void Newton::init() {
 
     // Call the base class initializer
-    Nlsol::init();
+    Rootfinder::init();
 
     casadi_assert_message(f_.n_in()>0,
                           "Newton: the supplied f must have at least one input.");

@@ -11,7 +11,7 @@ for pl = strsplit(CasadiMeta.getPlugins(),';')
   elseif strcmp(cls, 'Qpsol')
     eval(['Function.load_qpsol(''' name ''')'])
   elseif strcmp(cls, 'Nlsol')
-    eval(['Function.load_nlsol(''' name ''')'])
+    eval(['Function.load_rootfinder(''' name ''')'])
   elseif strcmp(cls, 'Linsol')
     eval(['Function.load_linsol(''' name ''')'])
   else

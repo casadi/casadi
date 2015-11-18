@@ -659,7 +659,7 @@ namespace casadi {
       for (int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
     }
 
-    // "Solve" in order to resolve interdependencies (cf. Nlsol)
+    // "Solve" in order to resolve interdependencies (cf. Rootfinder)
     copy(tmp_x, tmp_x+nx_+nz_, w);
     fill_n(tmp_x, nx_+nz_, 0);
     casadi_assert(!linsol_f_.isNull());
@@ -698,7 +698,7 @@ namespace casadi {
         for (int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
       }
 
-      // "Solve" in order to resolve interdependencies (cf. Nlsol)
+      // "Solve" in order to resolve interdependencies (cf. Rootfinder)
       copy(tmp_rx, tmp_rx+nrx_+nrz_, w);
       fill_n(tmp_rx, nrx_+nrz_, 0);
       casadi_assert(!linsol_g_.isNull());
@@ -1500,8 +1500,8 @@ namespace casadi {
     implicit_solver_options["implicit_output"] = DAE_ALG;
 
     // Allocate a solver
-    implicit_solver_ = F_.nlsol(name_ + "_implicit_solver", implicit_function_name,
-                                implicit_solver_options);
+    implicit_solver_ = rootfinder(name_ + "_implicit_solver", implicit_function_name,
+                                  F_, implicit_solver_options);
     alloc(implicit_solver_);
 
     // Allocate a root-finding solver for the backward problem
@@ -1520,8 +1520,8 @@ namespace casadi {
 
       // Allocate a Newton solver
       backward_implicit_solver_ =
-        G_.nlsol(name_+ "_backward_implicit_solver", backward_implicit_function_name,
-                      backward_implicit_solver_options);
+        rootfinder(name_+ "_backward_implicit_solver", backward_implicit_function_name,
+                   G_, backward_implicit_solver_options);
       alloc(backward_implicit_solver_);
     }
   }

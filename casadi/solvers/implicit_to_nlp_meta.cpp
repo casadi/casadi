@@ -28,7 +28,7 @@
 
       const std::string casadi::ImplicitToNlp::meta_doc=
       "\n"
-"Use an Nlpsol as Nlsol solver\n"
+"Use an Nlpsol as Rootfinder solver\n"
 "\n"
 "\n"
 ">List of available options\n"

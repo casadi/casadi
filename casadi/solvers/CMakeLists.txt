@@ -12,7 +12,7 @@ casadi_plugin(Integrator collocation
   collocation_integrator.cpp
   collocation_integrator_meta.cpp)
 
-casadi_plugin(Nlsol newton
+casadi_plugin(Rootfinder newton
   newton.hpp newton.cpp newton_meta.cpp)
 
 # SQPMethod -  A basic SQP method
@@ -26,7 +26,7 @@ casadi_plugin(Nlpsol scpgen
 # Reformulations
 casadi_plugin(Qpsol nlpsol
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
-casadi_plugin(Nlsol nlpsol
+casadi_plugin(Rootfinder nlpsol
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)
 casadi_plugin(Linsol symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp

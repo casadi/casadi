@@ -23,14 +23,14 @@
  */
 
 /** 
-* This example looks at a use of nlsols
+* This example looks at a use of rootfinders
 *
 *
 * \pythonexample{solvers/NewtonImplicitSolver}
 *
 * \sa
 * \code
-* casadi::Function::nlsol();
+* casadi::rootfinder();
 * \endcode
 *
 */
