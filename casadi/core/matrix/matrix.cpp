@@ -640,9 +640,9 @@ namespace casadi {
   }
 
   template<>
-  SX SX::jacobian(const SX &ex, const SX &arg) {
+  SX SX::jacobian(const SX &ex, const SX &arg, bool symmetric) {
     Function temp("temp", {arg}, {ex});
-    return SX::jac(temp);
+    return SX::jac(temp, 0, 0, false, symmetric);
   }
 
   template<>
@@ -752,8 +752,7 @@ namespace casadi {
     SX result = substitute(ex, x, a)*current_dx/current_denom;
     for (int i=0;i<x.nnz();i++) {
       if (order_contributions[i]<=order) {
-        result += mtaylor_recursive(
-                                    jacobian(ex, x.at(i)),
+        result += mtaylor_recursive(jacobian(ex, x.at(i)),
                                     x, a,
                                     order-order_contributions[i],
                                     order_contributions,

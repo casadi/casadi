@@ -74,7 +74,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief  Evaluate numerically */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// A documentation string
     static const std::string meta_doc;

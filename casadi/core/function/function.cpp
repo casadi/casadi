@@ -1337,11 +1337,9 @@ namespace casadi {
   Function nlpsol(const string& name, const string& solver,
                                 const Function& nlp, const Dict& opts) {
     if (nlp.is_a("sxfunction")) {
-      return nlpsol(name, solver,
-                                  Nlpsol::fun2problem<SX>(nlp), opts);
+      return nlpsol(name, solver, Nlpsol::fun2problem<SX>(nlp), opts);
     } else {
-      return nlpsol(name, solver,
-                                  Nlpsol::fun2problem<MX>(nlp), opts);
+      return nlpsol(name, solver, Nlpsol::fun2problem<MX>(nlp), opts);
     }
   }
 
@@ -1691,6 +1689,99 @@ namespace casadi {
       obj.own_ = 0;
     }
     return *this;
+  }
+
+  template<typename M>
+  Function qpsol_nlp(const std::string& name, const std::string& solver,
+                     const Problem<M>& qp, const Dict& opts) {
+    // We have: minimize    f(x) = 1/2 * x' H x + c'x
+    //          subject to  lbx <= x <= ubx
+    //                      lbg <= g(x) = A x + b <= ubg
+    M x = qp.in[NL_X];
+    M p = qp.in[NL_P];
+    M f = qp.out[NL_F];
+    M g = qp.out[NL_G];
+
+    // Gradient of the objective: gf == Hx + g
+    M gf = M::gradient(f, x);
+
+    // Identify the linear term in the objective
+    M c = substitute(gf, x, M::zeros(x.sparsity()));
+
+    // Identify the quadratic term in the objective
+    M H = M::jacobian(gf, x, true);
+
+    // Identify the constant term in the constraints
+    M b = substitute(g, x, M::zeros(x.sparsity()));
+
+    // Identify the linear term in the constraints
+    M A = M::jacobian(g, x);
+
+    // Create a function for calculating the required matrices vectors
+    Function prob(name + "_qp", qp.in, {H, c, A, b});
+
+    // Create the QP solver
+    Function qpsol_f = qpsol(name + "_qpsol", solver,
+                             {{"h", H.sparsity()}, {"a", A.sparsity()}}, opts);
+
+    // Create an MXFunction with the right signature
+    vector<MX> ret_in(NLPSOL_NUM_IN);
+    ret_in[NLPSOL_X0] = MX::sym("x0", x.sparsity());
+    ret_in[NLPSOL_P] = MX::sym("p", p.sparsity());
+    ret_in[NLPSOL_LBX] = MX::sym("lbx", x.sparsity());
+    ret_in[NLPSOL_UBX] = MX::sym("ubx", x.sparsity());
+    ret_in[NLPSOL_LBG] = MX::sym("lbg", g.sparsity());
+    ret_in[NLPSOL_UBG] = MX::sym("ubg", g.sparsity());
+    ret_in[NLPSOL_LAM_X0] = MX::sym("lam_x0", x.sparsity());
+    ret_in[NLPSOL_LAM_G0] = MX::sym("lam_g0", g.sparsity());
+    vector<MX> ret_out(NLPSOL_NUM_OUT);
+
+    // Get expressions for the QP matrices and vectors
+    vector<MX> v(NL_NUM_IN);
+    v[NL_X] = ret_in[NLPSOL_X0];
+    v[NL_P] = ret_in[NLPSOL_P];
+    v = prob(v);
+
+    // Call the QP solver
+    vector<MX> w(QPSOL_NUM_IN);
+    w[QPSOL_H] = v.at(0);
+    w[QPSOL_G] = v.at(1);
+    w[QPSOL_A] = v.at(2);
+    w[QPSOL_LBX] = ret_in[NLPSOL_LBX];
+    w[QPSOL_UBX] = ret_in[NLPSOL_UBX];
+    w[QPSOL_LBA] = ret_in[NLPSOL_LBG] - v.at(3);
+    w[QPSOL_UBA] = ret_in[NLPSOL_UBG] - v.at(3);
+    w[QPSOL_X0] = ret_in[NLPSOL_X0];
+    w[QPSOL_LAM_X0] = ret_in[NLPSOL_LAM_X0];
+    w = qpsol_f(w);
+
+    // Get expressions for the solution
+    ret_out[NLPSOL_X] = w[QPSOL_X];
+    ret_out[NLPSOL_F] = w[QPSOL_COST];
+    ret_out[NLPSOL_G] = mul(v.at(2), w[QPSOL_X]) + v.at(3);
+    ret_out[NLPSOL_LAM_X] = w[QPSOL_LAM_X];
+    ret_out[NLPSOL_LAM_G] = w[QPSOL_LAM_A];
+    ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());
+    return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out());
+  }
+
+  Function qpsol(const std::string& name, const std::string& solver,
+                 const XProblem& qp, const Dict& opts) {
+    if (qp.is_sx) {
+      return qpsol_nlp<SX>(name, solver, qp, opts);
+    } else {
+      return qpsol_nlp<MX>(name, solver, qp, opts);
+    }
+  }
+
+  Function qpsol(const std::string& name, const std::string& solver,
+                 const SXDict& qp, const Dict& opts) {
+    return qpsol(name, solver, Nlpsol::map2problem(qp), opts);
+  }
+
+  Function qpsol(const std::string& name, const std::string& solver,
+                 const MXDict& qp, const Dict& opts) {
+    return qpsol(name, solver, Nlpsol::map2problem(qp), opts);
   }
 
 } // namespace casadi

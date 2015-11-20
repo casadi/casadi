@@ -413,7 +413,8 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
-    static Matrix<DataType> jacobian(const Matrix<DataType> &f, const Matrix<DataType> &x);
+    static Matrix<DataType> jacobian(const Matrix<DataType> &f, const Matrix<DataType> &x,
+                                     bool symmetric=false);
     static Matrix<DataType> gradient(const Matrix<DataType> &f, const Matrix<DataType> &x);
     static Matrix<DataType> tangent(const Matrix<DataType> &f, const Matrix<DataType> &x);
     static Matrix<DataType> hessian(const Matrix<DataType> &f, const Matrix<DataType> &x);

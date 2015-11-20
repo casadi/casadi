@@ -404,7 +404,7 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    static MX jacobian(const MX& f, const MX& x);
+    static MX jacobian(const MX& f, const MX& x, bool symmetric=false);
     static MX gradient(const MX& f, const MX& x);
     static MX tangent(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x);

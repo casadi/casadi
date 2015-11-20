@@ -1331,6 +1331,14 @@ namespace casadi {
   */
   CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
                                const SpDict& qp, const Dict& opts=Dict());
+  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+                               const SXDict& qp, const Dict& opts=Dict());
+  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+                               const MXDict& qp, const Dict& opts=Dict());
+#ifndef SWIG
+  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+                               const XProblem& qp, const Dict& opts=Dict());
+#endif // SWIG
   ///@}
 
   /** \brief Get input scheme of QP solvers */
