@@ -41,13 +41,13 @@ except:
 integrators = []
 
 try:
-  load_casadi.integrator("cvodes")
+  load_integrator("cvodes")
   integrators.append(("cvodes",["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False}))
 except:
   pass
   
 try:
-  load_casadi.integrator("idas")
+  load_integrator("idas")
   integrators.append(("idas",["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
 except:
   pass

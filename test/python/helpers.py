@@ -608,7 +608,7 @@ class requires_integrator(object):
   
   def __call__(self,c):
     try:
-      load_casadi.integrator(self.n)
+      load_integrator(self.n)
       return c
     except:
       print "Not available integrator plugin %s, skipping unittests" % self.n
