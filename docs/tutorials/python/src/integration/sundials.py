@@ -46,7 +46,7 @@ tend=10
 opts["t0"] = 0
 opts["tf"] = tend
 #! Create the Integrator
-integrator = integrator("integrator", "cvodes", dae, opts)
+F = integrator("F", "cvodes", dae, opts)
 #$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
 #$   der(x) = fx(x,z,p,t)
@@ -85,8 +85,7 @@ integrator = integrator("integrator", "cvodes", dae, opts)
 #$   [x(tf),q(tf),rx(t0),rq(t0)]  = F(x(t0),p,rx(0),rp)
 #$ \end{verbatim}
 #$ 
-print isinstance(integrator,Function)
-print "%d -> %d" % (integrator.n_in(),integrator.n_out())
+print "%d -> %d" % (F.n_in(),F.n_out())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
 #! The output of Integrator is the state at the end of integration.
 #! To obtain the whole trajectory of states, use Simulator:
@@ -119,9 +118,9 @@ show()
 #$ We plot the map $\delta x_0 \mapsto \delta x(tend) $
 
 def out(dx0):
-	integrator.setInput([x0+dx0,y0],"x0")
-	integrator.evaluate()
-	return integrator.getOutput().full()
+	F.setInput([x0+dx0,y0],"x0")
+	F.evaluate()
+	return F.getOutput().full()
 dx0=numpy.linspace(-2,2,100)
 out = array([out(dx) for dx in dx0]).squeeze()
 dxtend=out[:,0]-sol[-1,0]
@@ -135,7 +134,7 @@ show()
 #$ By definition, this mapping goes through the origin. In the limit of $dx0 \to 0$, this map is purely linear. The slope at the origin is exactly what we call 'sensitivity'
 #
 
-dintegrator = integrator.derivative(1,0)
+dintegrator = F.derivative(1,0)
 dintegrator.setInput([x0,y0],"der_x0")
 dintegrator.setInput([1,0],"fwd0_x0")
 dintegrator.evaluate()
@@ -194,7 +193,7 @@ show()
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
 u=MX.sym("u")
-w = integrator({'x0':MX([1,0]),'p':u})["xf"]
+w = F({'x0':MX([1,0]),'p':u})["xf"]
 
 #! We construct an MXfunction and a python help function 'out'
 f=Function('f', [u],[w])
