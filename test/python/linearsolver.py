@@ -33,25 +33,25 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 
 lsolvers = []
 try:
-  Function.load_linsol("csparse")
+  load_linsol("csparse")
   lsolvers.append(("csparse",{}))
 except:
   pass
   
 try:
-  Function.load_linsol("lapacklu")
+  load_linsol("lapacklu")
   lsolvers.append(("lapacklu",{}))
 except:
   pass
   
 try:
-  Function.load_linsol("lapackqr")
+  load_linsol("lapackqr")
   lsolvers.append(("lapackqr",{}))
 except:
   pass
   
 try:
-  Function.load_linsol("symbolicqr")
+  load_linsol("symbolicqr")
   lsolvers.append(("symbolicqr",{}))
 except:
   pass

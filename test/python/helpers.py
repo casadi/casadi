@@ -584,7 +584,7 @@ class requires_qpsol(object):
   
   def __call__(self,c):
     try:
-      Function.load_qpsol(self.n)
+      load_qpsol(self.n)
       return c
     except:
       print "Not available QP plugin %s, skipping unittests" % self.n
@@ -596,7 +596,7 @@ class requires_nlpsol(object):
   
   def __call__(self,c):
     try:
-      Function.load_nlpsol(self.n)
+      load_nlpsol(self.n)
       return c
     except:
       print "Not available NLP plugin %s, skipping unittests" % self.n
@@ -608,7 +608,7 @@ class requires_integrator(object):
   
   def __call__(self,c):
     try:
-      Function.load_casadi.integrator(self.n)
+      load_casadi.integrator(self.n)
       return c
     except:
       print "Not available integrator plugin %s, skipping unittests" % self.n
@@ -620,7 +620,7 @@ class requires_rootfinder(object):
   
   def __call__(self,c):
     try:
-      Function.load_rootfinder(self.n)
+      load_rootfinder(self.n)
       return c
     except:
       print "Not available RFP plugin %s, skipping unittests" % self.n
@@ -632,7 +632,7 @@ class requires_linsol(object):
   
   def __call__(self,c):
     try:
-      Function.load_linsol(self.n)
+      load_linsol(self.n)
       return c
     except:
       print "Not available linear solver plugin %s, skipping unittests" % self.n

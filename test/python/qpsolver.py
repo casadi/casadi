@@ -29,28 +29,28 @@ from types import *
 from helpers import *
 
 qpsols = []
-if Function.has_nlpsol("ipopt"):
+if has_nlpsol("ipopt"):
   qpsols.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options": {"tol": 1e-12}},{}))
 
-if Function.has_nlpsol("ipopt"):
+if has_nlpsol("ipopt"):
   qpsols.append(("nlpsol.ipopt",{"nlpsol_options": {"tol": 1e-12}},{}))
 
-# if Function.has_nlpsol("worhp") and not args.ignore_memory_heavy:
+# if has_nlpsol("worhp") and not args.ignore_memory_heavy:
 #   qpsols.append(("nlpsol",{"nlpsol": "worhp", "nlpsol_options": {"TolOpti": 1e-12}},{}))
 
-# if Function.has_nlpsol("worhp") and not args.ignore_memory_heavy:
+# if has_nlpsol("worhp") and not args.ignore_memory_heavy:
 #   qpsols.append(("nlpsol.worhp",{"nlpsol_options": {"TolOpti": 1e-12}},{}))
 
-# if Function.has_qpsol("ooqp"):
+# if has_qpsol("ooqp"):
 #   qpsols.append(("ooqp",{},{}))
 
-# if Function.has_qpsol("qpoases"):
+# if has_qpsol("qpoases"):
 #   qpsols.append(("qpoases",{},{}))
 
-# if Function.has_qpsol("cplex"):
+# if has_qpsol("cplex"):
 #   qpsols.append(("cplex",{},{}))
 
-# if Function.has_qpsol("sqic"):
+# if has_qpsol("sqic"):
 #   qpsols.append(("sqic",{},{}))
 
 print qpsols

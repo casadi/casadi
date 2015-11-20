@@ -31,13 +31,13 @@ from helpers import *
 solvers= []
 try:
   LinearSolver.loadPlugin("csparse")
-  Function.load_rootfinder("kinsol")
+  load_rootfinder("kinsol")
   solvers.append(("kinsol",{"linear_solver": "csparse","abstol":1e-10}))
 except:
   pass
 try:
   LinearSolver.loadPlugin("csparse")
-  Function.load_nlpsol("ipopt")
+  load_nlpsol("ipopt")
   solvers.append(("nlpsol",{"linear_solver": "csparse", "nlpsol": "ipopt"}))
 except:
   pass

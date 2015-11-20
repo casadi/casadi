@@ -256,7 +256,7 @@ class Misctests(casadiTestCase):
       assert "std" not in e.message
 
     try:
-      Function.load_nlpsol(132)
+      load_nlpsol(132)
       self.assertTrue(False)
     except TypeError as e:
       print e.message

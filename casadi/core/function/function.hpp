@@ -1005,33 +1005,6 @@ namespace casadi {
     void init();
 #endif // SWIG
 
-    ///@{
-    /// Check if a particular plugin is available
-    static bool has_integrator(const std::string& name);
-    static bool has_qpsol(const std::string& name);
-    static bool has_nlpsol(const std::string& name);
-    static bool has_rootfinder(const std::string& name);
-    static bool has_linsol(const std::string& name);
-    ///@}
-
-    ///@{
-    /// Explicitly load a plugin dynamically
-    static void load_qpsol(const std::string& name);
-    static void load_integrator(const std::string& name);
-    static void load_nlpsol(const std::string& name);
-    static void load_rootfinder(const std::string& name);
-    static void load_linsol(const std::string& name);
-    ///@}
-
-    ///@{
-    /// Get the documentation string for a plugin
-    static std::string doc_integrator(const std::string& name);
-    static std::string doc_qpsol(const std::string& name);
-    static std::string doc_nlpsol(const std::string& name);
-    static std::string doc_rootfinder(const std::string& name);
-    static std::string doc_linsol(const std::string& name);
-    ///@}
-
     /// Create a solve node
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
 
@@ -1231,6 +1204,33 @@ namespace casadi {
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
                                 const XProblem& dae, const Dict& opts=Dict());
 #endif // SWIG
+  ///@}
+
+  ///@{
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_integrator(const std::string& name);
+  CASADI_EXPORT bool has_qpsol(const std::string& name);
+  CASADI_EXPORT bool has_nlpsol(const std::string& name);
+  CASADI_EXPORT bool has_rootfinder(const std::string& name);
+  CASADI_EXPORT bool has_linsol(const std::string& name);
+  ///@}
+
+  ///@{
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_qpsol(const std::string& name);
+  CASADI_EXPORT void load_integrator(const std::string& name);
+  CASADI_EXPORT void load_nlpsol(const std::string& name);
+  CASADI_EXPORT void load_rootfinder(const std::string& name);
+  CASADI_EXPORT void load_linsol(const std::string& name);
+  ///@}
+
+  ///@{
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_integrator(const std::string& name);
+  CASADI_EXPORT std::string doc_qpsol(const std::string& name);
+  CASADI_EXPORT std::string doc_nlpsol(const std::string& name);
+  CASADI_EXPORT std::string doc_rootfinder(const std::string& name);
+  CASADI_EXPORT std::string doc_linsol(const std::string& name);
   ///@}
 
   /** \brief Get input scheme of integrators */

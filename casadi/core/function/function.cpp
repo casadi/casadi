@@ -1148,63 +1148,63 @@ namespace casadi {
     return ret;
   }
 
-  bool Function::has_integrator(const string& name) {
+  bool has_integrator(const string& name) {
     return Integrator::hasPlugin(name);
   }
 
-  void Function::load_integrator(const string& name) {
+  void load_integrator(const string& name) {
     Integrator::loadPlugin(name);
   }
 
-  string Function::doc_integrator(const string& name) {
+  string doc_integrator(const string& name) {
     return Integrator::getPlugin(name).doc;
   }
 
-  bool Function::has_qpsol(const string& name) {
+  bool has_qpsol(const string& name) {
     return Qpsol::hasPlugin(name);
   }
 
-  void Function::load_qpsol(const string& name) {
+  void load_qpsol(const string& name) {
     Qpsol::loadPlugin(name);
   }
 
-  string Function::doc_qpsol(const string& name) {
+  string doc_qpsol(const string& name) {
     return Qpsol::getPlugin(name).doc;
   }
 
-  bool Function::has_nlpsol(const string& name) {
+  bool has_nlpsol(const string& name) {
     return Nlpsol::hasPlugin(name);
   }
 
-  void Function::load_nlpsol(const string& name) {
+  void load_nlpsol(const string& name) {
     Nlpsol::loadPlugin(name);
   }
 
-  string Function::doc_nlpsol(const string& name) {
+  string doc_nlpsol(const string& name) {
     return Nlpsol::getPlugin(name).doc;
   }
 
-  bool Function::has_rootfinder(const string& name) {
+  bool has_rootfinder(const string& name) {
     return Rootfinder::hasPlugin(name);
   }
 
-  void Function::load_rootfinder(const string& name) {
+  void load_rootfinder(const string& name) {
     Rootfinder::loadPlugin(name);
   }
 
-  string Function::doc_rootfinder(const string& name) {
+  string doc_rootfinder(const string& name) {
     return Rootfinder::getPlugin(name).doc;
   }
 
-  bool Function::has_linsol(const string& name) {
+  bool has_linsol(const string& name) {
     return Linsol::hasPlugin(name);
   }
 
-  void Function::load_linsol(const string& name) {
+  void load_linsol(const string& name) {
     Linsol::loadPlugin(name);
   }
 
-  string Function::doc_linsol(const string& name) {
+  string doc_linsol(const string& name) {
     return Linsol::getPlugin(name).doc;
   }
 

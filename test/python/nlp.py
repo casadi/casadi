@@ -33,18 +33,18 @@ import itertools
 
 solvers= []
  
-#if Function.has_nlpsol("worhp")  and not args.ignore_memory_heavy:
+#if has_nlpsol("worhp")  and not args.ignore_memory_heavy:
 #  solvers.append(("worhp",{"TolOpti":1e-20}))
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
 
-if Function.has_nlpsol("ipopt"):
+if has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"tol": 1e-10, "derivative_test":"second-order"}))
   solvers.append(("ipopt",{"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory"}))
 
-if Function.has_nlpsol("snopt"):
+if has_nlpsol("snopt"):
   solvers.append(("snopt",{"Verify level": 3,"detect_linear": True,"Major optimality tolerance":1e-12,"Minor feasibility tolerance":1e-12,"Major feasibility tolerance":1e-12}))
 
-if Function.has_nlpsol("ipopt") and Function.has_nlpsol("sqpmethod"):
+if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"tol": 1e-12} }
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
@@ -52,7 +52,7 @@ if Function.has_nlpsol("ipopt") and Function.has_nlpsol("sqpmethod"):
 print solvers
 """
 try:
-  Function.load_nlpsol("knitro")
+  load_nlpsol("knitro")
   solvers.append(("knitro",{}))
   print "Will test knitro"
 except:
