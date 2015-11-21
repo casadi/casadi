@@ -11213,274 +11213,6 @@ to a terminal value problem with differential equation given as an implicit
 ODE coupled to an algebraic equation and a set of quadratures:
 
 
-<<<<<<< Updated upstream
-=======
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
-
-";
-
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const MXDict &dae, const Dict &opts=Dict()) "
-
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
-
-";
-
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const Function &dae, const Dict &opts=Dict()) "
-
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
-
-";
-
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const std::pair< Function, Function > &dae, const Dict
-&opts=Dict()) "
-
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
-
-";
-
-%feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
-
-Check if the vector has negative entries.
-
-";
-
-%feature("docstring")  casadi::doc_qpsol(const std::string &name) "
-
-Get the documentation string for a plugin
-
-";
-
-%feature("docstring")  casadi::check_exposed(T t) " [INTERNAL] ";
-
-%feature("docstring")  casadi::getTimerTime(void) "[INTERNAL]  Returns the
-real time, in seconds, or -1.0 if an error occurred.
-
-Time is measured since an arbitrary and OS-dependent start time. The
-returned real time is only useful for computing an elapsed time between two
-calls to this function.
-
-David Robert Nadeau (http://NadeauSoftware.com/)
-
-";
-
-%feature("docstring")  casadi::read_matlab(std::istream &stream,
-std::vector< T > &v) "
-
-Read vector, matlab style.
-
-";
-
-%feature("docstring")  casadi::read_matlab(std::ifstream &file, std::vector<
-std::vector< T > > &v) "
-
-Read matrix, matlab style.
-
-";
-
-%feature("docstring")  casadi::qpsol_n_out() "
-
-Get the number of QP solver outputs.
-
-";
-
-%feature("docstring")  casadi::zip(const std::vector< std::string > &id,
-const std::vector< T > &mat) " [INTERNAL] ";
-
-%feature("docstring")  casadi::qpsol_n_in() "
-
-Get the number of QP solver inputs.
-
-";
-
-%feature("docstring")  casadi::write_matlab(std::ostream &stream, const
-std::vector< T > &v) "
-
-Print vector, matlab style.
-
-";
-
-%feature("docstring")  casadi::write_matlab(std::ostream &stream, const
-std::vector< std::vector< T > > &v) "
-
-Print matrix, matlab style.
-
-";
-
-%feature("docstring")  casadi::casadi_sparsify(const real1_t *x, real2_t *y,
-const int *sp_y, int tr) " [INTERNAL]  Convert dense to sparse.
-
-";
-
-%feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const
-std::vector< int > &colind, const std::vector< int > &row) "
-
-Hash a sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const int
-*colind, const int *row) " ";
-
-%feature("docstring")  casadi::rootfinder(const std::string &name, const
-std::string &solver, const Function &f, const Dict &opts=Dict()) "
-
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
-
-";
-
-%feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
-"
-
-Check if the vector is strictly monotone.
-
-";
-
-%feature("docstring")  casadi::casadi_copy(const real_t *x, int n, real_t
-*y) " [INTERNAL]  COPY: y <-x.
-
-";
-
-%feature("docstring")  casadi::dgeequ_(int *m, int *n, double *a, int *lda,
-double *r, double *c, double *colcnd, double *rowcnd, double *amax, int
-*info) " [INTERNAL]  Calculate col and row scaling.
-
-";
-
-%feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
-size) "
->>>>>>> Stashed changes
 
 ::
 
@@ -11851,113 +11583,6 @@ pointers.
 
 ";
 
-<<<<<<< Updated upstream
-%feature("docstring")  casadi::dormqr_(char *side, char *trans, int *n, int
-*m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double
-*work, int *lwork, int *info) " [INTERNAL]  Multiply right hand side with
-Q-transpose (lapack)
-
-";
-
-%feature("docstring")  casadi::operation_checker(unsigned int op) "
-[INTERNAL] ";
-
-%feature("docstring")  casadi::has_integrator(const std::string &name) "
-
-Check if a particular plugin is available
-
-";
-
-%feature("docstring")  casadi::isNonDecreasing(const std::vector< T > &v) "
-
-Check if the vector is non-decreasing.
-
-";
-
-%feature("docstring")  casadi::integrator_out() "
-
-Get integrator output scheme of integrators.
-
-";
-
-%feature("docstring")  casadi::integrator_out(int ind) "
-
-Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::load_rootfinder(const std::string &name) "
-
-Explicitly load a plugin dynamically
-
-";
-
-%feature("docstring")  casadi::dgeqrf_(int *m, int *n, double *a, int *lda,
-double *tau, double *work, int *lwork, int *info) " [INTERNAL]  QR-factorize
-dense matrix (lapack)
-
-";
-
-%feature("docstring")  casadi::integrator_n_in() "
-
-Get the number of integrator inputs.
-
-";
-
-%feature("docstring")  casadi::simpleIRK(Function f, int N=10, int order=4,
-const std::string &scheme="radau", const std::string &solver="newton", const
-Dict &solver_options=Dict()) "
-
-Construct an implicit Runge-Kutta integrator using a collocation scheme The
-constructed function has three inputs, corresponding to initial state (x0),
-parameter (p) and integration time (h) and one output, corresponding to
-final state (xf).
-=======
-%feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
-char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
-int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
-
-";
-
-%feature("docstring")  casadi::casadi_axpy(int n, real_t alpha, const real_t
-*x, real_t *y) " [INTERNAL]  AXPY: y <- a*x + y.
->>>>>>> Stashed changes
-
-";
-
-%feature("docstring")  casadi::has_nlpsol(const std::string &name) "
-
-Check if a particular plugin is available
-
-";
-
-%feature("docstring")  casadi::casadi_getu(const real_t *x, const int *sp_x,
-real_t *v) " [INTERNAL]  Get the nonzeros for the upper triangular half.
-
-";
-
-<<<<<<< Updated upstream
-%feature("docstring")  casadi::ptrVec(std::vector< T > &v) " [INTERNAL]
-Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(const std::vector< T > &v) "
-[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(std::vector< std::vector< T > > &v) "
-[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(const std::vector< std::vector< T > >
-&v) " [INTERNAL]  Convenience function, convert vectors to vectors of
-pointers.
-
-";
-
 %feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
 char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
 int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
@@ -11992,20 +11617,6 @@ Check if the vector is monotone.
 
 ";
 
-=======
-%feature("docstring")  casadi::doc_nlpsol(const std::string &name) "
-
-Get the documentation string for a plugin
-
-";
-
-%feature("docstring")  casadi::isMonotone(const std::vector< T > &v) "
-
-Check if the vector is monotone.
-
-";
-
->>>>>>> Stashed changes
 %feature("docstring")  casadi::casadi_densify(const real1_t *x, const int
 *sp_x, real2_t *y, int tr) " [INTERNAL]  Convert sparse to dense.
 
@@ -12263,10 +11874,6 @@ f:  ODE function with two inputs (x and p) and one output (xdot)
 N:  Number of integrator steps
 
 order:  Order of interpolating polynomials
-<<<<<<< Updated upstream
-
-";
-=======
 
 ";
 
@@ -12286,41 +11893,6 @@ Get NLP solver input scheme name by index.
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
 Create a QP solver Solves the following strictly convex problem:
->>>>>>> Stashed changes
-
-
-
-::
-
-  min          1/2 x' H x + g' x
-  x
-  
-  subject to
-  LBA <= A x <= UBA
-  LBX <= x   <= UBX
-  
-  with :
-  H sparse (n x n) positive definite
-  g dense  (n x 1)
-  
-  n: number of decision variables (x)
-  nc: number of constraints (A)
-
-
-
-<<<<<<< Updated upstream
-=======
-If H is not positive-definite, the solver should throw an error.
-
-Joel Andersson
-
-";
-
->>>>>>> Stashed changes
-%feature("docstring")  casadi::qpsol(const std::string &name, const
-std::string &solver, const SXDict &qp, const Dict &opts=Dict()) "
-
-Create a QP solver Solves the following strictly convex problem:
 
 
 
@@ -12348,42 +11920,6 @@ Joel Andersson
 
 ";
 
-<<<<<<< Updated upstream
-=======
-%feature("docstring")  casadi::qpsol(const std::string &name, const
-std::string &solver, const MXDict &qp, const Dict &opts=Dict()) "
-
-Create a QP solver Solves the following strictly convex problem:
-
-
-
-::
-
-  min          1/2 x' H x + g' x
-  x
-  
-  subject to
-  LBA <= A x <= UBA
-  LBX <= x   <= UBX
-  
-  with :
-  H sparse (n x n) positive definite
-  g dense  (n x 1)
-  
-  n: number of decision variables (x)
-  nc: number of constraints (A)
-
-
-
-If H is not positive-definite, the solver should throw an error.
-
-Joel Andersson
-
-";
-
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const SXDict &qp, const Dict &opts=Dict()) "
 
@@ -12446,6 +11982,74 @@ Joel Andersson
 
 ";
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+%feature("docstring")  casadi::qpsol(const std::string &name, const
+std::string &solver, const SXDict &qp, const Dict &opts=Dict()) "
+
+Create a QP solver Solves the following strictly convex problem:
+
+
+
+::
+
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H sparse (n x n) positive definite
+  g dense  (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
+
+
+
+If H is not positive-definite, the solver should throw an error.
+
+Joel Andersson
+
+";
+
+%feature("docstring")  casadi::qpsol(const std::string &name, const
+std::string &solver, const MXDict &qp, const Dict &opts=Dict()) "
+
+Create a QP solver Solves the following strictly convex problem:
+
+
+
+::
+
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H sparse (n x n) positive definite
+  g dense  (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
+
+
+
+If H is not positive-definite, the solver should throw an error.
+
+Joel Andersson
+
+";
+
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 %feature("docstring")  casadi::doc_rootfinder(const std::string &name) "
 
