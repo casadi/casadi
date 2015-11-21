@@ -21,9 +21,9 @@
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::Callback::has_linsol "
+casadi::Callback::copyOptions "
 
-Check if a particular plugin is available
+Copy all options from another object.
 
 ";
 
@@ -66,43 +66,28 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
+%feature("docstring") casadi::Callback::set_forward "
 
->  Callback()
-------------------------------------------------------------------------
-
-Default constructor.
-
->  Callback(Callback obj)
-------------------------------------------------------------------------
-
-Copy constructor (throws an error)
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring") casadi::Callback::load_rootfinder "
+%feature("docstring") casadi::Callback::nlpsol_jacg "
 
-Explicitly load a plugin dynamically
-
-";
-
-%feature("docstring") casadi::Callback::doc_qpsol "
-
-Get the documentation string for a plugin
+Access the Hessian of the Lagrangian function for an NLP solver.
 
 ";
 
-%feature("docstring") casadi::Callback::setFullJacobian "
+%feature("docstring") casadi::Callback::getWorkSize "
 
-Set the Jacobian of all the input nonzeros with respect to all output
-nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
-are kept internally
+Get the length of the work vector.
 
 ";
 
-%feature("docstring") casadi::Callback::copyOptions "
+%feature("docstring") casadi::Callback::optionAllowed "
 
-Copy all options from another object.
+Get the allowed values of a certain option.
 
 ";
 
@@ -113,12 +98,6 @@ Set a certain option by giving its index into the allowed values.
 
 %feature("docstring") casadi::Callback::sz_arg "[INTERNAL]  Get required
 length of arg field.
-
-";
-
-%feature("docstring") casadi::Callback::has_rootfinder "
-
-Check if a particular plugin is available
 
 ";
 
@@ -155,12 +134,6 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 %feature("docstring") casadi::Callback::description_in "
 
 Get input scheme description by index.
-
-";
-
-%feature("docstring") casadi::Callback::has_nlpsol "
-
-Check if a particular plugin is available
 
 ";
 
@@ -295,12 +268,6 @@ the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::Callback::qpsol_debug "
-
-Generate native code in the interfaced language for debugging
-
-";
-
 %feature("docstring") casadi::Callback::get_n_reverse "
 
 Return function that calculates adjoint derivatives reverse(nadj) returns a
@@ -312,12 +279,6 @@ no cached version is available.
 %feature("docstring") casadi::Callback::type_name "
 
 Get type name.
-
-";
-
-%feature("docstring") casadi::Callback::doc_integrator "
-
-Get the documentation string for a plugin
 
 ";
 
@@ -414,40 +375,17 @@ Get symbolic primitives equivalent to the output expressions.
 
 ";
 
-%feature("docstring") casadi::Callback::optionNames "
+%feature("docstring") casadi::Callback::Callback "
 
-Get a list of all option names.
-
-";
-
-%feature("docstring") casadi::Callback::reverse "
-
->  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
-
->  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
-
->  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
+>  Callback()
 ------------------------------------------------------------------------
 
-Create call to (cached) derivative function, reverse mode.
+Default constructor.
 
->  Function Function.reverse(int nadj)
+>  Callback(Callback obj)
 ------------------------------------------------------------------------
 
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+Copy constructor (throws an error)
 
 ";
 
@@ -496,12 +434,6 @@ Default implementation: dense using inputShape
 
 ";
 
-%feature("docstring") casadi::Callback::nlpsol_jacg "
-
-Access the Hessian of the Lagrangian function for an NLP solver.
-
-";
-
 %feature("docstring") casadi::Callback::linsol_cholesky "
 
 Obtain a numeric Cholesky factorization Only for Cholesky solvers.
@@ -526,9 +458,11 @@ Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
 
 ";
 
-%feature("docstring") casadi::Callback::getWorkSize "
+%feature("docstring") casadi::Callback::setFullJacobian "
 
-Get the length of the work vector.
+Set the Jacobian of all the input nonzeros with respect to all output
+nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
+are kept internally
 
 ";
 
@@ -536,12 +470,6 @@ Get the length of the work vector.
 sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") casadi::Callback::optionDefault "
-
-Get the default of a certain option.
 
 ";
 
@@ -623,12 +551,6 @@ Get the dictionary.
 %feature("docstring") casadi::Callback::rootfinder_fun "
 
 Access rhs function for a rootfinder.
-
-";
-
-%feature("docstring") casadi::Callback::has_qpsol "
-
-Check if a particular plugin is available
 
 ";
 
@@ -737,9 +659,38 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Callback::doc_nlpsol "
+%feature("docstring") casadi::Callback::mapaccum "
 
-Get the documentation string for a plugin
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
 
 ";
 
@@ -754,6 +705,37 @@ Get input scheme.
 ------------------------------------------------------------------------
 
 Get input scheme name by index.
+
+";
+
+%feature("docstring") casadi::Callback::reverse "
+
+>  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
+------------------------------------------------------------------------
+
+Create call to (cached) derivative function, reverse mode.
+
+>  Function Function.reverse(int nadj)
+------------------------------------------------------------------------
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -842,9 +824,9 @@ pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::Callback::has_integrator "
+%feature("docstring") casadi::Callback::optionNames "
 
-Check if a particular plugin is available
+Get a list of all option names.
 
 ";
 
@@ -873,21 +855,15 @@ Joris Gillis
 
 ";
 
-%feature("docstring") casadi::Callback::load_qpsol "
-
-Explicitly load a plugin dynamically
-
-";
-
 %feature("docstring") casadi::Callback::set_jac_sparsity "
 
 Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Callback::doc_rootfinder "
+%feature("docstring") casadi::Callback::qpsol_debug "
 
-Get the documentation string for a plugin
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -902,12 +878,6 @@ length of res field.
 
 ";
 
-%feature("docstring") casadi::Callback::optionAllowed "
-
-Get the allowed values of a certain option.
-
-";
-
 %feature("docstring") casadi::Callback::printOptions "
 
 Print options to a stream.
@@ -917,12 +887,6 @@ Print options to a stream.
 %feature("docstring") casadi::Callback::countNodes "
 
 Number of nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::Callback::load_nlpsol "
-
-Explicitly load a plugin dynamically
 
 ";
 
@@ -1070,41 +1034,6 @@ The the mapaccumulated version has the signature:
 ------------------------------------------------------------------------
 
 Generic map.
-
-";
-
-%feature("docstring") casadi::Callback::mapaccum "
-
-Create a mapaccumulated version of this function.
-
-Suppose the function has a signature of:
-
-::
-
-     f: (x, u) -> (x_next , y )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (x0, U) -> (X , Y )
-  
-      with
-          U: horzcat([u0, u1, ..., u_(N-1)])
-          X: horzcat([x1, x2, ..., x_N])
-          Y: horzcat([y0, y1, ..., y_(N-1)])
-  
-      and
-          x1, y0 <- f(x0, u0)
-          x2, y1 <- f(x1, u1)
-          ...
-          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
-  
-
-
 
 ";
 
@@ -1356,9 +1285,9 @@ Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::Callback::load_integrator "
+%feature("docstring") casadi::Callback::optionDefault "
 
-Explicitly load a plugin dynamically
+Get the default of a certain option.
 
 ";
 
@@ -1409,12 +1338,6 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::Callback::load_linsol "
-
-Explicitly load a plugin dynamically
-
-";
-
 %feature("docstring") casadi::Callback::sparsity_out "
 
 Get sparsity of a given output.
@@ -1437,19 +1360,6 @@ Get output dimension.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring") casadi::Callback::doc_linsol "
-
-Get the documentation string for a plugin
-
-";
-
-%feature("docstring") casadi::Callback::set_forward "
-
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
 
 ";
 
@@ -2612,12 +2522,6 @@ Get the DAE for an integrator.
 
 ";
 
-%feature("docstring") casadi::Function::load_nlpsol "
-
-Explicitly load a plugin dynamically
-
-";
-
 %feature("docstring") casadi::Function::getAtomicOperation "
 
 Get an atomic operation operator index.
@@ -2697,12 +2601,6 @@ Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring") casadi::Function::doc_integrator "
-
-Get the documentation string for a plugin
-
-";
-
 %feature("docstring") casadi::Function::numel_out "
 
 Get of number of output elements For a particular output or for all for all
@@ -2751,12 +2649,6 @@ Joris Gillis
 
 Returns a number that is unique for a given Node. If the Object does not
 point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring") casadi::Function::has_integrator "
-
-Check if a particular plugin is available
 
 ";
 
@@ -2958,12 +2850,6 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::Function::optionDefault "
-
-Get the default of a certain option.
-
-";
-
 %feature("docstring") casadi::Function::getAtomicInput "
 
 Get the (integer) input arguments of an atomic operation.
@@ -3127,21 +3013,9 @@ Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::Function::doc_qpsol "
-
-Get the documentation string for a plugin
-
-";
-
 %feature("docstring") casadi::Function::nlpsol_hesslag "
 
 Access the Jacobian of the constraint function for an NLP solver.
-
-";
-
-%feature("docstring") casadi::Function::has_qpsol "
-
-Check if a particular plugin is available
 
 ";
 
@@ -3245,24 +3119,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 %feature("docstring") casadi::Function::description_in "
 
 Get input scheme description by index.
-
-";
-
-%feature("docstring") casadi::Function::doc_linsol "
-
-Get the documentation string for a plugin
-
-";
-
-%feature("docstring") casadi::Function::load_integrator "
-
-Explicitly load a plugin dynamically
-
-";
-
-%feature("docstring") casadi::Function::load_qpsol "
-
-Explicitly load a plugin dynamically
 
 ";
 
@@ -3650,12 +3506,6 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::Function::doc_rootfinder "
-
-Get the documentation string for a plugin
-
-";
-
 %feature("docstring") casadi::Function::getAtomicInputReal "
 
 Get the floating point output argument of an atomic operation.
@@ -3682,21 +3532,9 @@ Access rhs function for a rootfinder.
 
 ";
 
-%feature("docstring") casadi::Function::load_rootfinder "
-
-Explicitly load a plugin dynamically
-
-";
-
 %feature("docstring") casadi::Function::getAtomicOutput "
 
 Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Function::has_nlpsol "
-
-Check if a particular plugin is available
 
 ";
 
@@ -3719,9 +3557,8 @@ Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::Function::removeMonitor "
-
-Remove modules to be monitored.
+%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
+length of w field.
 
 ";
 
@@ -3797,21 +3634,15 @@ Get sparsity of a given input.
 
 ";
 
-%feature("docstring") casadi::Function::has_rootfinder "
+%feature("docstring") casadi::Function::optionDefault "
 
-Check if a particular plugin is available
+Get the default of a certain option.
 
 ";
 
 %feature("docstring") casadi::Function::sparsity_jac "
 
 Get, if necessary generate, the sparsity of a Jacobian block
-
-";
-
-%feature("docstring") casadi::Function::load_linsol "
-
-Explicitly load a plugin dynamically
 
 ";
 
@@ -3832,12 +3663,6 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::Function::has_linsol "
-
-Check if a particular plugin is available
-
-";
-
 %feature("docstring") casadi::Function::optionAllowedIndex "[INTERNAL]  Get
 the index into allowed options of a certain option.
 
@@ -3849,14 +3674,9 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Function::doc_nlpsol "
+%feature("docstring") casadi::Function::removeMonitor "
 
-Get the documentation string for a plugin
-
-";
-
-%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
-length of w field.
+Remove modules to be monitored.
 
 ";
 
@@ -9030,20 +8850,7 @@ Print a representation of the object.
 
 
 // File: namespacecasadi.xml
-%feature("docstring") casadi::casadi_iamax "
-[INTERNAL] 
-IAMAX: index corresponding to the entry with the largest absolute
-value.
-";
-
-%feature("docstring") casadi::isIncreasing "
-
-Check if the vector is strictly increasing.
-
-";
-
 %feature("docstring") casadi::matrixName< double > "
-
 Get typename.
 
 ";
@@ -9058,12 +8865,6 @@ to be monotonously increasing
 
 ";
 
-%feature("docstring") casadi::hasNegative "
-
-Check if the vector has negative entries.
-
-";
-
 %feature("docstring") casadi::inBounds "
 
 >  bool inBounds([T ] v, int upper)
@@ -9075,67 +8876,6 @@ Check if for each element of v holds: v_i < upper.
 ------------------------------------------------------------------------
 
 Check if for each element of v holds: lower <= v_i < upper.
-
-";
-
-%feature("docstring") casadi::simpleIRK "
-
-Construct an implicit Runge-Kutta integrator using a collocation scheme The
-constructed function has three inputs, corresponding to initial state (x0),
-parameter (p) and integration time (h) and one output, corresponding to
-final state (xf).
-
-Parameters:
------------
-
-f:  ODE function with two inputs (x and p) and one output (xdot)
-
-N:  Number of integrator steps
-
-order:  Order of interpolating polynomials
-
-scheme:  Collocation scheme, as excepted by collocationPoints function.
-
-";
-
-%feature("docstring") casadi::ptrVec "[INTERNAL]  Convenience function,
-convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring") casadi::dormqr_ "[INTERNAL]  Multiply right hand side
-with Q-transpose (lapack)
-
-";
-
-%feature("docstring") casadi::casadi_dot "[INTERNAL]  Inner product.
-
-";
-
-%feature("docstring") casadi::casadi_axpy "[INTERNAL]  AXPY: y <- a*x + y.
-
-";
-
-%feature("docstring") casadi::check_exposed "[INTERNAL] ";
-
-%feature("docstring") casadi::casadi_getu "[INTERNAL]  Get the nonzeros for
-the upper triangular half.
-
-";
-
-%feature("docstring") casadi::diffTimers "[INTERNAL] ";
-
-%feature("docstring") casadi::read_matlab "
-
->  void read_matlab(std.istream &stream,[T ] v)
-------------------------------------------------------------------------
-
-Read vector, matlab style.
-
->  void read_matlab(std.ifstream &file,[[T ] ] v)
-------------------------------------------------------------------------
-
-Read matrix, matlab style.
 
 ";
 
@@ -9155,51 +8895,9 @@ swap inner and outer indices of list of lists
 
 ";
 
-%feature("docstring") casadi::qpsol_n_out "
-
-Get the number of QP solver outputs.
-
-";
-
-%feature("docstring") casadi::zip "[INTERNAL] ";
-
 %feature("docstring") casadi::isNon_increasing "
 
 Check if the vector is non-increasing.
-
-";
-
-%feature("docstring") casadi::qpsol_n_in "
-
-Get the number of QP solver inputs.
-
-";
-
-%feature("docstring") casadi::write_matlab "
-
->  void write_matlab(std.ostream &stream, [T ] v)
-------------------------------------------------------------------------
-
-Print vector, matlab style.
-
->  void write_matlab(std.ostream &stream, [[T ] ] v)
-------------------------------------------------------------------------
-
-Print matrix, matlab style.
-
-";
-
-%feature("docstring") casadi::casadi_sparsify "[INTERNAL]  Convert dense to
-sparse.
-
-";
-
-%feature("docstring") casadi::hash_sparsity "
-
->  std.size_t hash_sparsity(int nrow, int ncol, [int ] colind, [int ] row)
-------------------------------------------------------------------------
-
-Hash a sparsity pattern.
 
 ";
 
@@ -9207,73 +8905,9 @@ Hash a sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::rootfinder "
+%feature("docstring") casadi::doc_linsol "
 
-Create a solver for rootfinding problems Takes a function where one of the
-inputs is unknown and one of the outputs is a residual function that is
-always zero, defines a new function where the the unknown input has been
-replaced by a guess for the unknown and the residual output has been
-replaced by the calculated value for the input.
-
-For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
-xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
-G(x0, x1, ..., xj_guess, ..., xm),
-
-xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
-
-By default, the first input is unknown and the first output is the residual.
-
-Joel Andersson
-
-";
-
-%feature("docstring") casadi::dgetrs_ "[INTERNAL]   Solve a system of
-equation using an LU-factorized matrix (lapack)
-
-";
-
-%feature("docstring") casadi::isMonotone "
-
-Check if the vector is monotone.
-
-";
-
-%feature("docstring") casadi::isStrictlyMonotone "
-
-Check if the vector is strictly monotone.
-
-";
-
-%feature("docstring") casadi::lookupvector "
-
-Returns a vector for quickly looking up entries of supplied list.
-
-lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
-i
-
-Duplicates are treated by looking up last occurrence
-
-";
-
-%feature("docstring") casadi::replaceMat "[INTERNAL] ";
-
-%feature("docstring") casadi::simpleIntegrator "
-
-Simplified wrapper for the Integrator class Constructs an integrator using
-the same syntax as simpleRK and simpleIRK. The constructed function has
-three inputs, corresponding to initial state (x0), parameter (p) and
-integration time (h) and one output, corresponding to final state (xf).
-
-Parameters:
------------
-
-f:  ODE function with two inputs (x and p) and one output (xdot)
-
-N:  Number of integrator steps
-
-order:  Order of interpolating polynomials
-
-scheme:  Collocation scheme, as excepted by collocationPoints function.
+Get the documentation string for a plugin
 
 ";
 
@@ -9282,110 +8916,9 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
-%feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
-a Matrix-matrix product,*
-
-Parameters:
------------
-
-dwork:  A real work vector that you must allocate Minimum size: y.size1()
-
-iwork:  A integer work vector that you must allocate Minimum size:
-y.size1()+x.size2()+1
-
-";
-
-%feature("docstring") casadi::collocationInterpolators "
-
-Obtain collocation interpolating matrices.
-
-Parameters:
------------
-
-tau_root:  location of collocation points, as obtained from
-collocationPoints
-
-C:  interpolating coefficients to obtain derivatives Length: order+1, order
-+ 1
-
-
-
-::
-
-dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
-
-
-
-Parameters:
------------
-
-D:  interpolating coefficients to obtain end state Length: order+1
-
-";
-
-%feature("docstring") casadi::nlpsol_n_in "
-
-Get the number of NLP solver inputs.
-
-";
-
 %feature("docstring") casadi::integrator_n_out "
 
 Get the number of integrator outputs.
-
-";
-
-%feature("docstring") casadi::matrixName "
-
-Get typename.
-
-";
-
-%feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
-
-";
-
-%feature("docstring") casadi::nlpsol_out "
-
->  CASADI_EXPORT[str] nlpsol_out()
-------------------------------------------------------------------------
-
-Get NLP solver output scheme of NLP solvers.
-
->  str nlpsol_out(int ind)
-------------------------------------------------------------------------
-
-Get output scheme name by index.
-
-";
-
-%feature("docstring") casadi::integrator_in "
-
->  CASADI_EXPORT[str] integrator_in()
-------------------------------------------------------------------------
-
-Get input scheme of integrators.
-
->  str integrator_in(int ind)
-------------------------------------------------------------------------
-
-Get integrator input scheme name by index.
-
-";
-
-%feature("docstring") casadi::is_regular "
-
->  bool is_regular([T ] v)
-------------------------------------------------------------------------
-
-Checks if array does not contain NaN or Inf.
-
->  bool is_regular([N_] v)
-------------------------------------------------------------------------
-[INTERNAL] 
-";
-
-%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
 
 ";
 
@@ -9408,8 +8941,39 @@ Load a just-in-time compiled external function File name given.
 
 ";
 
-%feature("docstring") casadi::casadi_nrm2 "[INTERNAL]  NRM2: ||x||_2 ->
-return.
+%feature("docstring") casadi::nlpsol_n_out "
+
+Get the number of NLP solver outputs.
+
+";
+
+%feature("docstring") casadi::isDecreasing "
+
+Check if the vector is strictly decreasing.
+
+";
+
+%feature("docstring") casadi::load_integrator "
+
+Explicitly load a plugin dynamically
+
+";
+
+%feature("docstring") casadi::load_nlpsol "
+
+Explicitly load a plugin dynamically
+
+";
+
+%feature("docstring") casadi::casadi_scal "[INTERNAL]  SCAL: x <- alpha*x.
+
+";
+
+%feature("docstring") casadi::timerPlusEq "[INTERNAL] ";
+
+%feature("docstring") casadi::load_linsol "
+
+Explicitly load a plugin dynamically
 
 ";
 
@@ -9424,264 +8988,6 @@ Get input scheme of QP solvers.
 ------------------------------------------------------------------------
 
 Get QP solver input scheme name by index.
-
-";
-
-%feature("docstring") casadi::nlpsol_n_out "
-
-Get the number of NLP solver outputs.
-
-";
-
-%feature("docstring") casadi::isDecreasing "
-
-Check if the vector is strictly decreasing.
-
-";
-
-%feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
-scaling.
-
-";
-
-%feature("docstring") casadi::casadi_asum "[INTERNAL]  ASUM: ||x||_1 ->
-return.
-
-";
-
-%feature("docstring") casadi::dgeqrf_ "[INTERNAL]  QR-factorize dense
-matrix (lapack)
-
-";
-
-%feature("docstring") casadi::hash_value "
-
-Hash value of an integer.
-
-";
-
-%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
-trans(x)
-
-";
-
-%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
-multiplication: z <- z + x*y.
-
-";
-
-%feature("docstring") casadi::collocationPoints "
-
-Obtain collocation points of specific order and scheme.
-
-Parameters:
------------
-
-scheme:  'radau' or 'legendre'
-
-";
-
-%feature("docstring") casadi::simpleRK "
-
-Construct an explicit Runge-Kutta integrator The constructed function has
-three inputs, corresponding to initial state (x0), parameter (p) and
-integration time (h) and one output, corresponding to final state (xf).
-
-Parameters:
------------
-
-f:  ODE function with two inputs (x and p) and one output (xdot)
-
-N:  Number of integrator steps
-
-order:  Order of interpolating polynomials
-
-";
-
-%feature("docstring") casadi::qpsol_out "
-
->  CASADI_EXPORT[str] qpsol_out()
-------------------------------------------------------------------------
-
-Get QP solver output scheme of QP solvers.
-
->  str qpsol_out(int ind)
-------------------------------------------------------------------------
-
-Get output scheme name by index.
-
-";
-
-%feature("docstring") casadi::operation_checker "[INTERNAL] ";
-
-%feature("docstring") casadi::diffToDict "[INTERNAL] ";
-
-%feature("docstring") casadi::nlpsol_in "
-
->  CASADI_EXPORT[str] nlpsol_in()
-------------------------------------------------------------------------
-
-Get input scheme of NLP solvers.
-
->  str nlpsol_in(int ind)
-------------------------------------------------------------------------
-
-Get NLP solver input scheme name by index.
-
-";
-
-%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
-
-";
-
-%feature("docstring") casadi::qpsol "
-
-Create a QP solver Solves the following strictly convex problem:
-
-
-
-::
-
-  min          1/2 x' H x + g' x
-  x
-  
-  subject to
-  LBA <= A x <= UBA
-  LBX <= x   <= UBX
-  
-  with :
-  H sparse (n x n) positive definite
-  g dense  (n x 1)
-  
-  n: number of decision variables (x)
-  nc: number of constraints (A)
-
-
-
-If H is not positive-definite, the solver should throw an error.
-
-Joel Andersson
-
-";
-
-%feature("docstring") casadi::casadi_norm_inf "[INTERNAL]  Inf-norm of a
-vector * Returns the largest element in absolute value
-
-";
-
-%feature("docstring") casadi::dgetrf_ "[INTERNAL]  LU-Factorize dense
-matrix (lapack)
-
-";
-
-%feature("docstring") casadi::casadi_mul "[INTERNAL]  Sparse matrix-matrix
-multiplication: z <- z + x*y.
-
-";
-
-%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
-system (lapack)
-
-";
-
-%feature("docstring") casadi::getTimerTime "[INTERNAL]  Returns the real
-time, in seconds, or -1.0 if an error occurred.
-
-Time is measured since an arbitrary and OS-dependent start time. The
-returned real time is only useful for computing an elapsed time between two
-calls to this function.
-
-David Robert Nadeau (http://NadeauSoftware.com/)
-
-";
-
-%feature("docstring") casadi::isNonDecreasing "
-
-Check if the vector is non-decreasing.
-
-";
-
-%feature("docstring") casadi::nlpsol "
-
-Create an NLP solver Creates a solver for the following parametric nonlinear
-program (NLP):
-
-::
-
-  min          F(x, p)
-  x
-  
-  subject to
-  LBX <=   x    <= UBX
-  LBG <= G(x, p) <= UBG
-  p  == P
-  
-  nx: number of decision variables
-  ng: number of constraints
-  np: number of parameters
-
-Joel Andersson
-
-";
-
-%feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
-x, w work vector (length >= number of rows)
-
-";
-
-%feature("docstring") casadi::integrator_out "
-
->  CASADI_EXPORT[str] integrator_out()
-------------------------------------------------------------------------
-
-Get integrator output scheme of integrators.
-
->  str integrator_out(int ind)
-------------------------------------------------------------------------
-
-Get output scheme name by index.
-
-";
-
-%feature("docstring") casadi::linsol "
-
-Create a solver for linear systems of equations Solves the linear system A*X
-= B or A^T*X = B for X with A square and non-singular
-
-If A is structurally singular, an error will be thrown during init. If A is
-numerically singular, the prepare step will fail.
-
-The usual procedure to use Linsol is: init()
-
-set the first input (A)
-
-prepare()
-
-set the second input (b)
-
-solve()
-
-Repeat steps 4 and 5 to work with other b vectors.
-
-The standard evaluation combines the prepare() and solve() step and may
-therefore more expensive if A is invariant.
-
-Joel Andersson
-
-";
-
-%feature("docstring") casadi::userOut "";
-
-%feature("docstring") casadi::timerPlusEq "[INTERNAL] ";
-
-%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
-dense.
-
-";
-
-%feature("docstring") casadi::matrixName< int > "
-
-Get typename.
 
 ";
 
@@ -9701,9 +9007,7 @@ Generate a hash value incrementally, array.
 
 ";
 
-%feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
-
-%feature("docstring") casadi::casadi_fill "[INTERNAL]  FILL: x <- alpha.
+%feature("docstring") casadi::casadi_swap "[INTERNAL]  SWAP: x <-> y.
 
 ";
 
@@ -9743,14 +9047,618 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::casadi_qform "[INTERNAL]  Calculates dot(x,
-mul(A, x)) without memory allocation.
+%feature("docstring") casadi::hasNegative "
+
+Check if the vector has negative entries.
+
+";
+
+%feature("docstring") casadi::doc_qpsol "
+
+Get the documentation string for a plugin
+
+";
+
+%feature("docstring") casadi::check_exposed "[INTERNAL] ";
+
+%feature("docstring") casadi::getTimerTime "[INTERNAL]  Returns the real
+time, in seconds, or -1.0 if an error occurred.
+
+Time is measured since an arbitrary and OS-dependent start time. The
+returned real time is only useful for computing an elapsed time between two
+calls to this function.
+
+David Robert Nadeau (http://NadeauSoftware.com/)
+
+";
+
+%feature("docstring") casadi::read_matlab "
+
+>  void read_matlab(std.istream &stream,[T ] v)
+------------------------------------------------------------------------
+
+Read vector, matlab style.
+
+>  void read_matlab(std.ifstream &file,[[T ] ] v)
+------------------------------------------------------------------------
+
+Read matrix, matlab style.
+
+";
+
+%feature("docstring") casadi::qpsol_n_out "
+
+Get the number of QP solver outputs.
+
+";
+
+%feature("docstring") casadi::zip "[INTERNAL] ";
+
+%feature("docstring") casadi::qpsol_n_in "
+
+Get the number of QP solver inputs.
+
+";
+
+%feature("docstring") casadi::write_matlab "
+
+>  void write_matlab(std.ostream &stream, [T ] v)
+------------------------------------------------------------------------
+
+Print vector, matlab style.
+
+>  void write_matlab(std.ostream &stream, [[T ] ] v)
+------------------------------------------------------------------------
+
+Print matrix, matlab style.
+
+";
+
+%feature("docstring") casadi::casadi_sparsify "[INTERNAL]  Convert dense to
+sparse.
+
+";
+
+%feature("docstring") casadi::hash_sparsity "
+
+>  std.size_t hash_sparsity(int nrow, int ncol, [int ] colind, [int ] row)
+------------------------------------------------------------------------
+
+Hash a sparsity pattern.
+
+";
+
+%feature("docstring") casadi::rootfinder "
+
+Create a solver for rootfinding problems Takes a function where one of the
+inputs is unknown and one of the outputs is a residual function that is
+always zero, defines a new function where the the unknown input has been
+replaced by a guess for the unknown and the residual output has been
+replaced by the calculated value for the input.
+
+For a function [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm), where
+xj is unknown and yi=0, defines a new function [y0, y1, ...,xj, .., yn] =
+G(x0, x1, ..., xj_guess, ..., xm),
+
+xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+
+By default, the first input is unknown and the first output is the residual.
+
+Joel Andersson
+
+";
+
+%feature("docstring") casadi::isStrictlyMonotone "
+
+Check if the vector is strictly monotone.
+
+";
+
+%feature("docstring") casadi::casadi_copy "[INTERNAL]  COPY: y <-x.
+
+";
+
+%feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
+scaling.
+
+";
+
+%feature("docstring") casadi::lookupvector "
+
+Returns a vector for quickly looking up entries of supplied list.
+
+lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
+i
+
+Duplicates are treated by looking up last occurrence
+
+";
+
+%feature("docstring") casadi::dormqr_ "[INTERNAL]  Multiply right hand side
+with Q-transpose (lapack)
+
+";
+
+%feature("docstring") casadi::operation_checker "[INTERNAL] ";
+
+%feature("docstring") casadi::has_integrator "
+
+Check if a particular plugin is available
+
+";
+
+%feature("docstring") casadi::isNonDecreasing "
+
+Check if the vector is non-decreasing.
+
+";
+
+%feature("docstring") casadi::integrator_out "
+
+>  CASADI_EXPORT[str] integrator_out()
+------------------------------------------------------------------------
+
+Get integrator output scheme of integrators.
+
+>  str integrator_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
+
+";
+
+%feature("docstring") casadi::load_rootfinder "
+
+Explicitly load a plugin dynamically
+
+";
+
+%feature("docstring") casadi::dgeqrf_ "[INTERNAL]  QR-factorize dense
+matrix (lapack)
 
 ";
 
 %feature("docstring") casadi::integrator_n_in "
 
 Get the number of integrator inputs.
+
+";
+
+%feature("docstring") casadi::simpleIRK "
+
+Construct an implicit Runge-Kutta integrator using a collocation scheme The
+constructed function has three inputs, corresponding to initial state (x0),
+parameter (p) and integration time (h) and one output, corresponding to
+final state (xf).
+
+Parameters:
+-----------
+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+N:  Number of integrator steps
+
+order:  Order of interpolating polynomials
+
+scheme:  Collocation scheme, as excepted by collocationPoints function.
+
+";
+
+%feature("docstring") casadi::ptrVec "[INTERNAL]  Convenience function,
+convert vectors to vectors of pointers.
+
+";
+
+%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
+system (lapack)
+
+";
+
+%feature("docstring") casadi::casadi_axpy "[INTERNAL]  AXPY: y <- a*x + y.
+
+";
+
+%feature("docstring") casadi::has_nlpsol "
+
+Check if a particular plugin is available
+
+";
+
+%feature("docstring") casadi::casadi_getu "[INTERNAL]  Get the nonzeros for
+the upper triangular half.
+
+";
+
+%feature("docstring") casadi::doc_nlpsol "
+
+Get the documentation string for a plugin
+
+";
+
+%feature("docstring") casadi::isMonotone "
+
+Check if the vector is monotone.
+
+";
+
+%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
+dense.
+
+";
+
+%feature("docstring") casadi::casadi_iamax "[INTERNAL]  IAMAX: index
+corresponding to the entry with the largest absolute value.
+
+";
+
+%feature("docstring") casadi::matrixName "
+
+Get typename.
+
+";
+
+%feature("docstring") casadi::casadi_qform "[INTERNAL]  Calculates dot(x,
+mul(A, x)) without memory allocation.
+
+";
+
+%feature("docstring") casadi::collocationInterpolators "
+
+Obtain collocation interpolating matrices.
+
+Parameters:
+-----------
+
+tau_root:  location of collocation points, as obtained from
+collocationPoints
+
+C:  interpolating coefficients to obtain derivatives Length: order+1, order
++ 1
+
+
+
+::
+
+dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
+
+
+
+Parameters:
+-----------
+
+D:  interpolating coefficients to obtain end state Length: order+1
+
+";
+
+%feature("docstring") casadi::nlpsol_n_in "
+
+Get the number of NLP solver inputs.
+
+";
+
+%feature("docstring") casadi::replaceMat "[INTERNAL] ";
+
+%feature("docstring") casadi::integrator_in "
+
+>  CASADI_EXPORT[str] integrator_in()
+------------------------------------------------------------------------
+
+Get input scheme of integrators.
+
+>  str integrator_in(int ind)
+------------------------------------------------------------------------
+
+Get integrator input scheme name by index.
+
+";
+
+%feature("docstring") casadi::is_regular "
+
+>  bool is_regular([T ] v)
+------------------------------------------------------------------------
+
+Checks if array does not contain NaN or Inf.
+
+>  bool is_regular([N_] v)
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+%feature("docstring") casadi::casadi_nrm2 "[INTERNAL]  NRM2: ||x||_2 ->
+return.
+
+";
+
+%feature("docstring") casadi::hash_value "
+
+Hash value of an integer.
+
+";
+
+%feature("docstring") casadi::collocationPoints "
+
+Obtain collocation points of specific order and scheme.
+
+Parameters:
+-----------
+
+scheme:  'radau' or 'legendre'
+
+";
+
+%feature("docstring") casadi::qpsol_out "
+
+>  CASADI_EXPORT[str] qpsol_out()
+------------------------------------------------------------------------
+
+Get QP solver output scheme of QP solvers.
+
+>  str qpsol_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
+
+";
+
+%feature("docstring") casadi::simpleIntegrator "
+
+Simplified wrapper for the Integrator class Constructs an integrator using
+the same syntax as simpleRK and simpleIRK. The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
+
+Parameters:
+-----------
+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+N:  Number of integrator steps
+
+order:  Order of interpolating polynomials
+
+scheme:  Collocation scheme, as excepted by collocationPoints function.
+
+";
+
+%feature("docstring") casadi::casadi_norm_inf "[INTERNAL]  Inf-norm of a
+vector * Returns the largest element in absolute value
+
+";
+
+%feature("docstring") casadi::dgetrf_ "[INTERNAL]  LU-Factorize dense
+matrix (lapack)
+
+";
+
+%feature("docstring") casadi::has_rootfinder "
+
+Check if a particular plugin is available
+
+";
+
+%feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
+x, w work vector (length >= number of rows)
+
+";
+
+%feature("docstring") casadi::matrixName< int > "
+
+Get typename.
+
+";
+
+%feature("docstring") casadi::diffTimers "[INTERNAL] ";
+
+%feature("docstring") casadi::isIncreasing "
+
+Check if the vector is strictly increasing.
+
+";
+
+%feature("docstring") casadi::doc_integrator "
+
+Get the documentation string for a plugin
+
+";
+
+%feature("docstring") casadi::casadi_dot "[INTERNAL]  Inner product.
+
+";
+
+%feature("docstring") casadi::load_qpsol "
+
+Explicitly load a plugin dynamically
+
+";
+
+%feature("docstring") casadi::diffToDict "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_mul "[INTERNAL]  Sparse matrix-matrix
+multiplication: z <- z + x*y.
+
+";
+
+%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
+multiplication: z <- z + x*y.
+
+";
+
+%feature("docstring") casadi::dgetrs_ "[INTERNAL]   Solve a system of
+equation using an LU-factorized matrix (lapack)
+
+";
+
+%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
+trans(x)
+
+";
+
+%feature("docstring") casadi::nlpsol_out "
+
+>  CASADI_EXPORT[str] nlpsol_out()
+------------------------------------------------------------------------
+
+Get NLP solver output scheme of NLP solvers.
+
+>  str nlpsol_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
+
+";
+
+%feature("docstring") casadi::has_linsol "
+
+Check if a particular plugin is available
+
+";
+
+%feature("docstring") casadi::casadi_asum "[INTERNAL]  ASUM: ||x||_1 ->
+return.
+
+";
+
+%feature("docstring") casadi::simpleRK "
+
+Construct an explicit Runge-Kutta integrator The constructed function has
+three inputs, corresponding to initial state (x0), parameter (p) and
+integration time (h) and one output, corresponding to final state (xf).
+
+Parameters:
+-----------
+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+N:  Number of integrator steps
+
+order:  Order of interpolating polynomials
+
+";
+
+%feature("docstring") casadi::nlpsol_in "
+
+>  CASADI_EXPORT[str] nlpsol_in()
+------------------------------------------------------------------------
+
+Get input scheme of NLP solvers.
+
+>  str nlpsol_in(int ind)
+------------------------------------------------------------------------
+
+Get NLP solver input scheme name by index.
+
+";
+
+%feature("docstring") casadi::qpsol "
+
+Create a QP solver Solves the following strictly convex problem:
+
+
+
+::
+
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H sparse (n x n) positive definite
+  g dense  (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
+
+
+
+If H is not positive-definite, the solver should throw an error.
+
+Joel Andersson
+
+";
+
+%feature("docstring") casadi::doc_rootfinder "
+
+Get the documentation string for a plugin
+
+";
+
+%feature("docstring") casadi::nlpsol "
+
+Create an NLP solver Creates a solver for the following parametric nonlinear
+program (NLP):
+
+::
+
+  min          F(x, p)
+  x
+  
+  subject to
+  LBX <=   x    <= UBX
+  LBG <= G(x, p) <= UBG
+  p  == P
+  
+  nx: number of decision variables
+  ng: number of constraints
+  np: number of parameters
+
+Joel Andersson
+
+";
+
+%feature("docstring") casadi::has_qpsol "
+
+Check if a particular plugin is available
+
+";
+
+%feature("docstring") casadi::linsol "
+
+Create a solver for linear systems of equations Solves the linear system A*X
+= B or A^T*X = B for X with A square and non-singular
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
+
+The usual procedure to use Linsol is: init()
+
+set the first input (A)
+
+prepare()
+
+set the second input (b)
+
+solve()
+
+Repeat steps 4 and 5 to work with other b vectors.
+
+The standard evaluation combines the prepare() and solve() step and may
+therefore more expensive if A is invariant.
+
+Joel Andersson
+
+";
+
+%feature("docstring") casadi::userOut "";
+
+%feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
+a Matrix-matrix product,*
+
+Parameters:
+-----------
+
+dwork:  A real work vector that you must allocate Minimum size: y.size1()
+
+iwork:  A integer work vector that you must allocate Minimum size:
+y.size1()+x.size2()+1
+
+";
+
+%feature("docstring") casadi::matrixName< SXElem > " [INTERNAL] ";
+
+%feature("docstring") casadi::casadi_fill "[INTERNAL]  FILL: x <- alpha.
 
 ";
 
