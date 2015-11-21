@@ -11893,6 +11893,7 @@ Get NLP solver input scheme name by index.
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
 Create a QP solver Solves the following strictly convex problem:
+<<<<<<< Updated upstream
 
 
 
@@ -11955,6 +11956,8 @@ Joel Andersson
 std::string &solver, const MXDict &qp, const Dict &opts=Dict()) "
 
 Create a QP solver Solves the following strictly convex problem:
+=======
+>>>>>>> Stashed changes
 
 
 
@@ -11982,10 +11985,13 @@ Joel Andersson
 
 ";
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 >>>>>>> Stashed changes
 =======
+=======
+>>>>>>> Stashed changes
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const SXDict &qp, const Dict &opts=Dict()) "
 
@@ -12048,6 +12054,9 @@ Joel Andersson
 
 ";
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
