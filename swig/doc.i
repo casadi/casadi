@@ -11893,7 +11893,6 @@ Get NLP solver input scheme name by index.
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
 Create a QP solver Solves the following strictly convex problem:
-<<<<<<< Updated upstream
 
 
 
@@ -11956,8 +11955,6 @@ Joel Andersson
 std::string &solver, const MXDict &qp, const Dict &opts=Dict()) "
 
 Create a QP solver Solves the following strictly convex problem:
-=======
->>>>>>> Stashed changes
 
 
 
@@ -11985,6 +11982,7 @@ Joel Andersson
 
 ";
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -12056,6 +12054,8 @@ Joel Andersson
 ";
 
 <<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
