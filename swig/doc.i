@@ -12381,6 +12381,71 @@ Joel Andersson
 
 ";
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+%feature("docstring")  casadi::qpsol(const std::string &name, const
+std::string &solver, const SXDict &qp, const Dict &opts=Dict()) "
+
+Create a QP solver Solves the following strictly convex problem:
+
+
+
+::
+
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H sparse (n x n) positive definite
+  g dense  (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
+
+
+
+If H is not positive-definite, the solver should throw an error.
+
+Joel Andersson
+
+";
+
+%feature("docstring")  casadi::qpsol(const std::string &name, const
+std::string &solver, const MXDict &qp, const Dict &opts=Dict()) "
+
+Create a QP solver Solves the following strictly convex problem:
+
+
+
+::
+
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H sparse (n x n) positive definite
+  g dense  (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
+
+
+
+If H is not positive-definite, the solver should throw an error.
+
+Joel Andersson
+
+";
+
 >>>>>>> Stashed changes
 %feature("docstring")  casadi::doc_rootfinder(const std::string &name) "
 
