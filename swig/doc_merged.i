@@ -4702,6 +4702,9 @@ NULL)
 %feature("docstring") casadi::IpoptUserClass::IpoptUserClass "[INTERNAL] ";
 
 
+// File: classcasadi_1_1Jit.xml
+
+
 // File: classcasadi_1_1KernelSum.xml
 
 
@@ -9281,8 +9284,33 @@ Check if the vector is monotone.
 
 ";
 
-%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
-dense.
+%feature("docstring") casadi::qpsol "
+
+Create a QP solver Solves the following strictly convex problem:
+
+
+
+::
+
+  min          1/2 x' H x + g' x
+  x
+  
+  subject to
+  LBA <= A x <= UBA
+  LBX <= x   <= UBX
+  
+  with :
+  H sparse (n x n) positive definite
+  g dense  (n x 1)
+  
+  n: number of decision variables (x)
+  nc: number of constraints (A)
+
+
+
+If H is not positive-definite, the solver should throw an error.
+
+Joel Andersson
 
 ";
 
@@ -9465,6 +9493,21 @@ Get the documentation string for a plugin
 
 ";
 
+%feature("docstring") casadi::jit "
+
+Create a just-in-time compiled function from a C/C++ language string The
+function can an arbitrary number of inputs and outputs that must all be
+scalar-valued. Only specify the function body, assuming that the inputs are
+stored in an array named 'arg' and the outputs stored in an array named
+'res'. The data type used must be 'real_t', which is typically equal to
+'double` or another data type with the same API as 'double'.
+
+The final generated function will have a structure similar to:
+
+void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+
+";
+
 %feature("docstring") casadi::load_qpsol "
 
 Explicitly load a plugin dynamically
@@ -9549,33 +9592,8 @@ Get NLP solver input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::qpsol "
-
-Create a QP solver Solves the following strictly convex problem:
-
-
-
-::
-
-  min          1/2 x' H x + g' x
-  x
-  
-  subject to
-  LBA <= A x <= UBA
-  LBX <= x   <= UBX
-  
-  with :
-  H sparse (n x n) positive definite
-  g dense  (n x 1)
-  
-  n: number of decision variables (x)
-  nc: number of constraints (A)
-
-
-
-If H is not positive-definite, the solver should throw an error.
-
-Joel Andersson
+%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
+dense.
 
 ";
 
