@@ -59,7 +59,8 @@ namespace casadi {
    casadi_assert(output_accum.size()==n_accum);
    casadi_assert(isMonotone(output_accum));
 
-
+   setOption("input_scheme", f.inputScheme());
+   setOption("output_scheme", f.outputScheme());
 
     // Give a name
     setOption("name", "unnamed_mapaccum");
