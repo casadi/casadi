@@ -82,6 +82,7 @@ namespace casadi {
     verbose_ = false;
     jit_ = false;
     eval_ = 0;
+    simple_ = 0;
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
@@ -204,10 +205,31 @@ namespace casadi {
   }
 
   void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    if (eval_) {
-      eval_(arg, res, iw, w, mem);
+    if (simplifiedCall()) {
+      // Copy arguments to input buffers
+      const double* arg1=w;
+      for (int i=0; i<this->n_in(); ++i) {
+        *w++ = arg[i] ? *arg[i] : 0;
+      }
+
+      // Evaluate
+      if (simple_) {
+        simple_(arg1, w);
+      } else {
+        simple(arg1, w);
+      }
+
+      // Get outputs
+      for (int i=0; i<this->n_out(); ++i) {
+        if (res[i]) *res[i] = *w;
+        ++w;
+      }
     } else {
-      eval(arg, res, iw, w, mem);
+      if (eval_) {
+        eval_(arg, res, iw, w, mem);
+      } else {
+        eval(arg, res, iw, w, mem);
+      }
     }
   }
 
@@ -1254,6 +1276,10 @@ namespace casadi {
 
   void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     casadi_error("'eval' not defined for " + type_name());
+  }
+
+  void FunctionInternal::simple(const double* arg, double* res) {
+    casadi_error("'simple' not defined for " + type_name());
   }
 
   void FunctionInternal::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {

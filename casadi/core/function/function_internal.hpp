@@ -113,6 +113,9 @@ namespace casadi {
     /** \brief  Evaluate numerically */
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
+    /** \brief  Evaluate numerically, simplied syntax */
+    virtual void simple(const double* arg, double* res);
+
     /** \brief  Evaluate with symbolic scalars */
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
@@ -792,6 +795,7 @@ namespace casadi {
     /** \brief  Use just-in-time compiler */
     bool jit_;
     eval_t eval_;
+    simple_t simple_;
 
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;

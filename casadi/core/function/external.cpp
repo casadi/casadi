@@ -235,21 +235,8 @@ namespace casadi {
 
   template<typename LibType>
   void SimplifiedExternal<LibType>::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    // Copy arguments to input buffers
-    const double* arg1=w;
-    for (int i=0; i<this->n_in(); ++i) {
-      *w++ = arg[i] ? *arg[i] : 0;
-    }
-
-    // Evaluate
-    eval_(arg1, w);
-
-    // Get outputs
-    for (int i=0; i<this->n_out(); ++i) {
-      if (res[i]) *res[i] = *w;
-      ++w;
-    }
+  simple(const double* arg, double* res) {
+    eval_(arg, res);
   }
 
   template<typename LibType>

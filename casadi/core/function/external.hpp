@@ -203,8 +203,8 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~SimplifiedExternal() {}
 
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    /** \brief  Evaluate numerically */
+    virtual void simple(const double* arg, double* res);
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
