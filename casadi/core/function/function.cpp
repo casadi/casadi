@@ -37,7 +37,7 @@
 #include "nlpsol.hpp"
 #include "rootfinder.hpp"
 #include "linsol.hpp"
-
+#include "jit.hpp"
 
 #include <typeinfo>
 
@@ -1782,6 +1782,15 @@ namespace casadi {
   Function qpsol(const std::string& name, const std::string& solver,
                  const MXDict& qp, const Dict& opts) {
     return qpsol(name, solver, Nlpsol::map2problem(qp), opts);
+  }
+
+  Function jit(const std::string& name, int n_in, int n_out,
+               const std::string& body, const Dict& opts) {
+    Function ret;
+    ret.assignNode(new Jit(name, n_in, n_out, body, opts));
+    ret.setOption(opts);
+    ret.init();
+    return ret;
   }
 
 } // namespace casadi

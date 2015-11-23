@@ -199,8 +199,14 @@ namespace casadi {
       gen.add(shared_from_this<Function>(), "jit_tmp");
       gen.generate("jit_tmp");
       compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
-      eval_ = (eval_t)compiler_.getFunction("jit_tmp");
-      casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
+
+      // Try to load with simplified syntax
+      simple_ = (simple_t)compiler_.getFunction("jit_tmp_simple");
+      // If not succesful, try generic syntax
+      if (simple_==0) {
+        eval_ = (eval_t)compiler_.getFunction("jit_tmp");
+        casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
+      }
     }
   }
 
@@ -1804,8 +1810,7 @@ namespace casadi {
     // Form Jacobian
     MX J;
     {
-      Function tmp("tmp", {arg}, {res},
-                   Dict{{"ad_weight", adWeight()}});
+      Function tmp("tmp", {arg}, {res}, {{"ad_weight", adWeight()}});
       J = MX::jac(tmp);
     }
 
@@ -1837,18 +1842,14 @@ namespace casadi {
     } else if (g.cpp) {
       g.body << "extern \"C\" ";
     }
-    g.body
-      << "int " << fname
-      << "(const real_t** arg, real_t** res, int* iw, real_t* w, void *mem) {" << endl;
+    g.body << signature(fname) << " {" << endl;
 
     // Insert the function body
     generateBody(g);
 
     // Finalize the function
-    g.body
-      << "  return 0;" << endl
-      << "}" << endl
-      << endl;
+    if (!simplifiedCall()) g.body << "  return 0;" << endl;
+    g.body << "}" << endl << endl;
   }
 
   void FunctionInternal::generate(CodeGenerator& g, const std::string& mem,
@@ -1887,6 +1888,14 @@ namespace casadi {
     }
   }
 
+  std::string FunctionInternal::signature(const std::string& fname) const {
+    if (simplifiedCall()) {
+      return "void " + fname + "_simple(const real_t* arg, real_t* res)";
+    } else {
+      return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, void *mem)";
+    }
+  }
+
   void FunctionInternal::generateMeta(CodeGenerator& g, const std::string& fname) const {
     // Short-hands
     int n_in = this->n_in();
@@ -1909,6 +1918,11 @@ namespace casadi {
       << "  return 0;" << endl
       << "}" << endl
       << endl;
+
+    // Quick return if simplified syntax
+    if (simplifiedCall()) {
+      return;
+    }
 
     // Function for freeing memory allocated in init
     tmp = "int " + fname + "_free(void *mem)";
@@ -2135,7 +2149,7 @@ namespace casadi {
                                              const std::string& res, const std::string& iw,
                                              const std::string& w, const std::string& mem) const {
     // Get the index of the function
-    CodeGenerator::PointerMap::const_iterator it=g.added_dependencies_.find(this);
+    auto it=g.added_dependencies_.find(this);
     casadi_assert(it!=g.added_dependencies_.end());
     int f = it->second;
 
@@ -2148,9 +2162,16 @@ namespace casadi {
   std::string FunctionInternal::simple_call(const CodeGenerator& g,
                                              const std::string& arg,
                                              const std::string& res) const {
-    casadi_error("'simple_call' not defined for " + type_name());
-  }
+    // Get the index of the function
+    auto it=g.added_dependencies_.find(this);
+    casadi_assert(it!=g.added_dependencies_.end());
+    int f = it->second;
 
+    // Create a function call
+    stringstream ss;
+    ss << "f" << f << "(" << arg << ", " << res << ")";
+    return ss.str();
+  }
 
   void FunctionInternal::addDependency(CodeGenerator& g) const {
     // Get the current number of functions before looking for it

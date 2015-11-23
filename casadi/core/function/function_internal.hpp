@@ -469,6 +469,9 @@ namespace casadi {
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
 
+    /** \brief Code generate the function  */
+    std::string signature(const std::string& fname) const;
+
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
 

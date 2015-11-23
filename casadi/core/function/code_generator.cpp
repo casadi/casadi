@@ -95,9 +95,7 @@ namespace casadi {
     f->generateFunction(*this, fname, false);
     if (this->with_header) {
       if (this->cpp) this->header << "extern \"C\" " ; // C linkage
-      this->header
-        << "int " << fname
-        << "(const real_t** arg, real_t** res, int* iw, real_t* w, void *mem);" << endl;
+      this->header << f->signature(fname) << ";" << endl;
     }
     f->generateMeta(*this, fname);
     this->exposed_fname.push_back(fname);

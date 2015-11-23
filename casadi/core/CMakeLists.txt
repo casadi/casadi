@@ -92,9 +92,10 @@ set(CASADI_SRCS
   function/sx_function.hpp         function/sx_function.cpp
   function/mx_function.hpp         function/mx_function.cpp
   function/external.hpp            function/external.cpp
+  function/jit.hpp                 function/jit.cpp
   function/linsol.hpp              function/linsol.cpp
-  function/rootfinder.hpp               function/rootfinder.cpp
-  function/integrator.hpp              function/integrator.cpp
+  function/rootfinder.hpp          function/rootfinder.cpp
+  function/integrator.hpp          function/integrator.cpp
   function/nlpsol.hpp              function/nlpsol.cpp
   function/qpsol.hpp               function/qpsol.cpp
   function/code_generator.hpp      function/code_generator.cpp
