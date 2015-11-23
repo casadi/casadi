@@ -54,6 +54,10 @@ namespace casadi {
         Having V fixed is a common use case:
           V may be a large bitmap (observation),
           onto which a kernel is fitted.
+          
+        Summation does not occur outside the image.
+        Runtime will not grow after distance r grows large enough to contian the whole image.
+        
   
       \author Joris Gillis
       \date 2015

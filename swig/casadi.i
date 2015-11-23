@@ -4239,7 +4239,8 @@ for name,v in locals().items():
   p = swig_monkeypatch(v,cl=False)
   #setattr(casadi,name,p)
   import sys
-  setattr(sys.modules[__name__], name, p)
+  if not name.startswith("_"):
+    setattr(sys.modules[__name__], name, p)
 
 
 %}
