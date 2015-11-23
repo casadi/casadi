@@ -441,8 +441,11 @@ namespace casadi {
                                  std::vector<Matrix<DataType> >& vdef,
                                  const std::string& v_prefix,
                                  const std::string& v_suffix);
-    Matrix<DataType> zz_quad_form() const { return B::zz_quad_form();}
-    Matrix<DataType> zz_quad_form(const Matrix<DataType>& A) const;
+    static Matrix<DataType> qform(const Matrix<DataType>& x) {
+      return B::qform(x);
+    }
+    static Matrix<DataType> qform(const Matrix<DataType>& x,
+                                  const Matrix<DataType>& A);
     Matrix<DataType> zz_if_else(const Matrix<DataType> &if_true,
                                 const Matrix<DataType> &if_false,
                                 bool short_circuit) const;
@@ -572,7 +575,7 @@ namespace casadi {
     /** \brief Obtain a Cholesky factorisation of a matrix
      * Returns an upper triangular R such that R'R = A.
      * Matrix A must be positive definite.
-     * 
+     *
      * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
      * There is an open ticket #1212 to make it sparse.
      */
@@ -1023,8 +1026,8 @@ namespace casadi {
     static Matrix<DataType> eye(int ncol);
 
     /** \brief Returns a number that is unique for a given symbolic scalar
-     * 
-     * Only defined if symbolic scalar. 
+     *
+     * Only defined if symbolic scalar.
      */
     size_t element_hash() const;
 
@@ -1035,14 +1038,14 @@ namespace casadi {
     bool is_smooth() const;
 
     /** \brief Check if SX is a leaf of the SX graph
-    
-        Only defined if symbolic scalar. 
+
+        Only defined if symbolic scalar.
     */
     bool is_leaf() const;
 
     /** \brief Check whether a binary SX is commutative
-    
-        Only defined if symbolic scalar. 
+
+        Only defined if symbolic scalar.
     */
     bool is_commutative() const;
 
@@ -1127,14 +1130,14 @@ namespace casadi {
     /** \brief Get name (only if symbolic scalar) */
     std::string getName() const;
 
-    /** \brief Get expressions of the children of the expression 
-        Only defined if symbolic scalar. 
+    /** \brief Get expressions of the children of the expression
+        Only defined if symbolic scalar.
         Wraps SXElem SXElem::getDep(int ch=0) const.
      */
     Matrix<DataType> getDep(int ch=0) const;
 
     /** \brief Get the number of dependencies of a binary SXElem
-        Only defined if symbolic scalar. 
+        Only defined if symbolic scalar.
     */
     int getNdeps() const;
 

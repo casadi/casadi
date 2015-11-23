@@ -487,7 +487,7 @@ namespace casadi {
       }
     }
 
-    return ret;
+    return ret/2;
   }
 
   template<typename real_t>

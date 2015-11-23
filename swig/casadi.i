@@ -120,7 +120,7 @@
   mxDestroyArray(warning_rhs[0]);
   mxDestroyArray(warning_rhs[1]);
 
-  
+
   // Set logger functions
   casadi::Logger::writeWarn = casadi::mexlogger;
   casadi::Logger::writeProg = casadi::mexlogger;
@@ -273,7 +273,7 @@ namespace std {
 	if ($error != NULL) {
     SWIG_PYTHON_THREAD_BEGIN_BLOCK;
     PyErr_Print();
-    SWIG_PYTHON_THREAD_END_BLOCK; 
+    SWIG_PYTHON_THREAD_END_BLOCK;
 		throw Swig::DirectorMethodException();
 	}
 }
@@ -1105,9 +1105,9 @@ import_array();
 	  for (int k=0; k<fields.size(); ++k) mxDestroyArray(fields[k]);
 	  return 0;
 	}
-	fields.push_back(f);	
+	fields.push_back(f);
       }
-      
+
       // Create return object
       mxArray *p = mxCreateStructMatrix(1, 1, fields.size(),
 					fieldnames.empty() ? 0 : &fieldnames[0]);
@@ -1814,7 +1814,7 @@ import_array();
 
  // Directorout typemap; as input by value
 %typemap(directorout, noblock=1, fragment="casadi_all") xType {
-    if (!casadi::to_val($input, &$result)) { 
+    if (!casadi::to_val($input, &$result)) {
       %dirout_fail(SWIG_TypeError,"$type");
     }
  }
@@ -1950,7 +1950,7 @@ import_array();
 #ifndef SWIGXML
 
  // std::ostream & is not typemapped to anything useful and should be ignored
- // (or possibly turned into a string output) 
+ // (or possibly turned into a string output)
 %typemap(in, noblock=1, numinputs=0) std::ostream &stream ""
 
 %casadi_typemaps("str", PREC_STRING, std::string)
@@ -2006,7 +2006,7 @@ if __name__ != "casadi.casadi":
 
             When setting PYTHONPATH or sys.path.append,
             take care not to add a trailing '/casadi'.
-                        
+
         """)
 import _casadi
 %}
@@ -2589,16 +2589,16 @@ DECL std::vector< M > %SHOW(symvar)(const M& x) {
   return symvar(x);
 }
 
-DECL M %SHOW(quad_form)(const M& X, const M& A) {
-  return quad_form(X, A);
+DECL M %SHOW(qform)(const M& X, const M& A) {
+  return qform(X, A);
 }
 
-DECL M %SHOW(quad_form)(const M& X) {
-  return quad_form(X);          
+DECL M %SHOW(qform)(const M& X) {
+  return qform(X);          
 }
 
 DECL M %SHOW(sum_square)(const M& X) {
-  return sum_square(X);         
+  return sum_square(X);
 }
 
 DECL M %SHOW(linspace)(const M& a, const M& b, int nsteps) {
@@ -2606,97 +2606,97 @@ DECL M %SHOW(linspace)(const M& a, const M& b, int nsteps) {
 }
 
 DECL M %SHOW(cross)(const M& a, const M& b, int dim = -1) {
-  return cross(a, b, dim);      
+  return cross(a, b, dim);
 }
 
 DECL M %SHOW(det)(const M& A) {
-  return det(A);                
+  return det(A);
 }
 
 DECL M %SHOW(inv)(const M& A) {
-  return inv(A);                
+  return inv(A);
 }
 
 DECL M %SHOW(trace)(const M& a) {
-  return trace(a);              
+  return trace(a);
 }
 
 DECL M %SHOW(tril2symm)(const M& a) {
-  return tril2symm(a);          
+  return tril2symm(a);
 }
 
 DECL M %SHOW(triu2symm)(const M& a) {
-  return triu2symm(a);          
+  return triu2symm(a);
 }
 
 DECL M %SHOW(norm_F)(const M& x) {
-  return norm_F(x);             
+  return norm_F(x);
 }
 
 DECL M %SHOW(norm_2)(const M& x) {
-  return norm_2(x);             
+  return norm_2(x);
 }
 
 DECL M %SHOW(norm_1)(const M& x) {
-  return norm_1(x);             
+  return norm_1(x);
 }
 
 DECL M %SHOW(norm_inf)(const M& x) {
-  return norm_inf(x);           
+  return norm_inf(x);
 }
 
 DECL M %SHOW(sumCols)(const M& x) {
-  return sumCols(x);            
+  return sumCols(x);
 }
 
 DECL M %SHOW(sumRows)(const M& x) {
-  return sumRows(x);            
+  return sumRows(x);
 }
 
 DECL M %SHOW(dot)(const M& x, const M& y) {
-  return dot(x, y);      
+  return dot(x, y);
 }
 
 DECL M %SHOW(outer_prod)(const M& x, const M& y) {
-  return outer_prod(x, y);      
+  return outer_prod(x, y);
 }
 
 DECL M %SHOW(nullspace)(const M& A) {
-  return nullspace(A);          
+  return nullspace(A);
 }
 
 DECL M %SHOW(polyval)(const M& p, const M& x) {
-  return polyval(p, x);         
+  return polyval(p, x);
 }
 
 DECL M %SHOW(diag)(const M& A) {
-  return diag(A);               
+  return diag(A);
 }
 
 DECL M %SHOW(unite)(const M& A, const M& B) {
-  return unite(A, B);           
+  return unite(A, B);
 }
 
 DECL M %SHOW(densify)(const M& x) {
-  return densify(x);            
+  return densify(x);
 }
 
 DECL M %SHOW(project)(const M& A, const Sparsity& sp, bool intersect=false) {
-  return project(A, sp, intersect);    
+  return project(A, sp, intersect);
 }
 
-DECL M %SHOW(if_else)(const M& cond, const M& if_true, 
+DECL M %SHOW(if_else)(const M& cond, const M& if_true,
                     const M& if_false, bool short_circuit=true) {
-  return if_else(cond, if_true, if_false, short_circuit);   
+  return if_else(cond, if_true, if_false, short_circuit);
 }
 
 DECL M %SHOW(conditional)(const M& ind, const std::vector< M > &x,
                         const M& x_default, bool short_circuit=true) {
-  return conditional(ind, x, x_default, short_circuit);     
+  return conditional(ind, x, x_default, short_circuit);
 }
 
 DECL bool %SHOW(dependsOn)(const M& f, const M& arg) {
-  return dependsOn(f, arg);     
+  return dependsOn(f, arg);
 }
 
 DECL M %SHOW(solve)(const M& A, const M& b) {
@@ -2785,7 +2785,7 @@ GENERIC_MATRIX_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
 GENERIC_MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 %enddef
 
-%define GENERIC_EXPRESSION_FUN(DECL, FLAG, M) 
+%define GENERIC_EXPRESSION_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
 DECL M %HIDE(plus)(const M& x, const M& y) { return x+y; }
 DECL M %HIDE(minus)(const M& x, const M& y) { return x-y; }
@@ -2836,7 +2836,7 @@ DECL M %HIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }
 #endif // FLAG & IS_MEMBER
 %enddef
 
-%define GENERIC_EXPRESSION_ALL(DECL, FLAG) 
+%define GENERIC_EXPRESSION_ALL(DECL, FLAG)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_MX), MX)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
@@ -3537,9 +3537,9 @@ def swig_typename_convertor_cpp2python(s):
   s = s.replace(".operator ()","")
   s = re.sub(r"([A-Z]\w+)Vector",r"[\1]",s)
   return s
-  
+
 def swig_typename_convertor_python2cpp(a):
-  try:  
+  try:
     import numpy as np
   except:
     class NoExist:
@@ -3590,7 +3590,7 @@ def swig_monkeypatch(v,cl=True):
     except TypeError as e:
       import sys
       exc_info = sys.exc_info()
-      
+
       methodname = "method"
       try:
         methodname = exc_info[2].tb_next.tb_frame.f_code.co_name
@@ -3635,7 +3635,7 @@ def swig_monkeypatch(v,cl=True):
       import sys
       exc_info = sys.exc_info()
       raise exc_info[1], None, exc_info[2].tb_next
-      
+
   if v.__doc__ is not None:
     foo.__doc__ = swig_typename_convertor_cpp2python(v.__doc__)
   foo.__name__ = v.__name__
@@ -3667,7 +3667,7 @@ for name,cl in locals().items():
     setattr(cl,k,swig_monkeypatch(vv))
   for k,v in inspect.getmembers(cl, inspect.isfunction):
     setattr(cl,k,staticmethod(swig_monkeypatch(v,cl=False)))
-  
+
 for name,v in locals().items():
   if not inspect.isfunction(v): continue
   if name.startswith("swig") : continue

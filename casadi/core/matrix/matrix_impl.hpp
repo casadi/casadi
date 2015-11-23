@@ -1338,20 +1338,21 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_quad_form(const Matrix<DataType>& A) const {
-    casadi_assert(is_vector());
-    if (!is_column()) return quad_form(this->T(), A);
+  Matrix<DataType> Matrix<DataType>::qform(const Matrix<DataType>& x,
+    const Matrix<DataType>& A) {
+    casadi_assert(x.is_vector());
+    if (!x.is_column()) return qform(x.T(), A);
 
     // Call recursively if vector not dense
-    if (!is_dense()) return densify(*this).zz_quad_form(A);
+    if (!x.is_dense()) return qform(densify(x), A);
 
     // Assert dimensions
-    casadi_assert_message(size1()==A.size2() && size1()==A.size1(),
-                          "Dimension mismatch. Got x.size1 = " << size1()
+    casadi_assert_message(x.size1()==A.size2() && x.size1()==A.size1(),
+                          "Dimension mismatch. Got x.size1 = " << x.size1()
                           << " and A.shape = " << A.size());
 
     // Calculate using runtime function
-    return casadi_qform(A.ptr(), A.sparsity(), ptr());
+    return casadi_qform(A.ptr(), A.sparsity(), x.ptr());
   }
 
   template<typename DataType>

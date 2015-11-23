@@ -180,14 +180,14 @@ namespace casadi {
     MatType zz_triu(bool includeDiagonal=true) const {
       return project(self(), triu(sparsity(), includeDiagonal));
     }
-    MatType zz_quad_form(const MatType &A) const {
-      casadi_assert(is_vector());
-      if (!is_column()) return quad_form(self().T(), A);
-      return dot(self(), mul(A, self()));
+    static MatType qform(const MatType &x, const MatType &A) {
+      casadi_assert(x.is_vector());
+      if (!x.is_column()) return qform(x.T(), A);
+      return dot(x, mul(A, x))/2;
     }
-    MatType zz_quad_form() const {
-      casadi_assert(is_vector());
-      return dot(self(), self());
+    static MatType qform(const MatType &x) {
+      casadi_assert(x.is_vector());
+      return dot(x, x)/2;
     }
     MatType zz_sum_square() const { return dot(self(), self());}
     MatType zz_linspace(const MatType &b, int nsteps) const;
@@ -274,17 +274,17 @@ namespace casadi {
 
     /** \brief Calculate quadratic form X^T A X
      */
-    inline friend MatType quad_form(const MatType &X, const MatType &A) {
-      return X.zz_quad_form(A);
+    inline friend MatType qform(const MatType &X, const MatType &A) {
+      return MatType::qform(X, A);
     }
 
     /** \brief Calculate quadratic form X^T X
      */
-    inline friend MatType quad_form(const MatType &X) {
-      return X.zz_quad_form();
+    inline friend MatType qform(const MatType &X) {
+      return MatType::qform(X);
     }
 
-    /** \brief Calculate some of squares: sum_ij X_ij^2 
+    /** \brief Calculate some of squares: sum_ij X_ij^2
      */
     inline friend MatType sum_square(const MatType &X) {
       return X.zz_sum_square();
@@ -486,7 +486,7 @@ namespace casadi {
     /** \brief Computes the Moore-Penrose pseudo-inverse
      *
      * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
-     * 
+     *
      *  pinv(A)' = (AA')^(-1) A
      *
      *
