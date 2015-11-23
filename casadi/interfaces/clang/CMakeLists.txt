@@ -20,8 +20,8 @@ file(COPY ${CLANG_LLVM_LIB_DIR}/clang DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/
 
 # Create text files containing system paths
 set(SYSTEM_FILE ${CMAKE_CURRENT_BINARY_DIR}/system_includes.txt)
-set(CSYSTEM_FILE ${CMAKE_CURRENT_BINARY_DIR}/system_includes.txt)
-set(CXXSYSTEM_FILE ${CMAKE_CURRENT_BINARY_DIR}/system_includes.txt)
+set(CSYSTEM_FILE ${CMAKE_CURRENT_BINARY_DIR}/csystem_includes.txt)
+set(CXXSYSTEM_FILE ${CMAKE_CURRENT_BINARY_DIR}/cxxsystem_includes.txt)
 file(WRITE ${SYSTEM_FILE}) # for both C and C++
 file(WRITE ${CSYSTEM_FILE}) # Only C
 file(WRITE ${CXXSYSTEM_FILE}) # Only C++
