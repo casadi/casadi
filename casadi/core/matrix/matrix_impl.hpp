@@ -1356,6 +1356,37 @@ namespace casadi {
   }
 
   template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::qform(const Matrix<DataType>& x) {
+    casadi_assert(x.is_vector());
+
+    // Calculate using runtime function
+    return casadi_dot(x.nnz(), x.ptr(), x.ptr())/2;
+  }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::rank1(const Matrix<DataType>& A,
+    const Matrix<DataType>& alpha, const Matrix<DataType>& x) {
+    // Check/correct x
+    casadi_assert(x.is_vector());
+    if (!x.is_column()) return rank1(A, alpha, x.T());
+    if (!x.is_dense()) return rank1(A, alpha, densify(x));
+
+    // Check alpha, quick return
+    casadi_assert(alpha.is_scalar());
+    if (!alpha.is_dense()) return A;
+
+    // Assert dimensions
+    casadi_assert_message(x.size1()==A.size2() && x.size1()==A.size1(),
+                          "Dimension mismatch. Got x.size1 = " << x.size1()
+                          << " and A.shape = " << A.size());
+
+    // Calculate using runtime function
+    Matrix<DataType> ret = A;
+    casadi_rank1(ret.ptr(), ret.sparsity(), *alpha.ptr(), x.ptr());
+    return ret;
+  }
+
+  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::T() const {
     // quick return if empty or scalar
     if ((size1()==0 && size2()==0) || is_scalar()) return *this;

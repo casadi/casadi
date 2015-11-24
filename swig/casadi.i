@@ -2594,7 +2594,11 @@ DECL M %SHOW(qform)(const M& X, const M& A) {
 }
 
 DECL M %SHOW(qform)(const M& X) {
-  return qform(X);          
+  return qform(X);
+}
+
+DECL M %SHOW(rank1)(const M& A, const M& alpha, const M& x) {
+  return rank1(A, alpha, x);
 }
 
 DECL M %SHOW(sum_square)(const M& X) {

@@ -180,15 +180,6 @@ namespace casadi {
     MatType zz_triu(bool includeDiagonal=true) const {
       return project(self(), triu(sparsity(), includeDiagonal));
     }
-    static MatType qform(const MatType &x, const MatType &A) {
-      casadi_assert(x.is_vector());
-      if (!x.is_column()) return qform(x.T(), A);
-      return dot(x, mul(A, x))/2;
-    }
-    static MatType qform(const MatType &x) {
-      casadi_assert(x.is_vector());
-      return dot(x, x)/2;
-    }
     MatType zz_sum_square() const { return dot(self(), self());}
     MatType zz_linspace(const MatType &b, int nsteps) const;
     MatType zz_cross(const MatType &b, int dim=-1) const;
@@ -273,6 +264,8 @@ namespace casadi {
     }
 
     /** \brief Calculate quadratic form X^T A X
+     * A is assumed to be symmetric and entries in the strictly lower triangular
+     * half are ignored.
      */
     inline friend MatType qform(const MatType &X, const MatType &A) {
       return MatType::qform(X, A);
@@ -282,6 +275,13 @@ namespace casadi {
      */
     inline friend MatType qform(const MatType &X) {
       return MatType::qform(X);
+    }
+
+    /** \brief Make a rank-1 update to a matrix A
+     * Calculates A + 1/2 * alpha * outer_prod(x, x)
+     */
+    inline friend MatType rank1(const MatType &X, const MatType &A, const MatType &alpha) {
+      return MatType::rank1(X, A, alpha);
     }
 
     /** \brief Calculate some of squares: sum_ij X_ij^2
