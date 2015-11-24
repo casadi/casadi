@@ -46,7 +46,7 @@ namespace casadi {
   }
 
   void Jit::generateBody(CodeGenerator& g) const {
-    g.body << body_ << endl;
+    g.body << body_;
   }
 
 } // namespace casadi

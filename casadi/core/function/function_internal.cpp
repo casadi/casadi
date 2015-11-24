@@ -1890,7 +1890,7 @@ namespace casadi {
 
   std::string FunctionInternal::signature(const std::string& fname) const {
     if (simplifiedCall()) {
-      return "void " + fname + "_simple(const real_t* arg, real_t* res)";
+      return "void " + fname + "(const real_t* arg, real_t* res)";
     } else {
       return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, void *mem)";
     }
@@ -2192,9 +2192,15 @@ namespace casadi {
       generateFunction(g, "CASADI_PREFIX(" + name + ")", true);
 
       // Shorthand
-      g.body
-        << "#define " << name << "(arg, res, iw, w, mem) "
-        << "CASADI_PREFIX(" << name << ")(arg, res, iw, w, mem)" << endl << endl;
+      if (simplifiedCall()) {
+        g.body
+          << "#define " << name << "(arg, res) "
+          << "CASADI_PREFIX(" << name << ")(arg, res)" << endl << endl;
+      } else {
+        g.body
+          << "#define " << name << "(arg, res, iw, w, mem) "
+          << "CASADI_PREFIX(" << name << ")(arg, res, iw, w, mem)" << endl << endl;
+      }
     }
   }
 
