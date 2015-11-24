@@ -507,6 +507,12 @@ namespace casadi {
         << codegen_str_dot_define << endl
         << endl;
       break;
+    case AUX_QFORM:
+      this->auxiliaries
+        << codegen_str_qform
+        << codegen_str_qform_define << endl
+        << endl;
+      break;
     case AUX_ASUM:
       this->auxiliaries << codegen_str_asum
         << codegen_str_asum_define
@@ -706,6 +712,14 @@ namespace casadi {
     addAuxiliary(AUX_DOT);
     stringstream s;
     s << "dot(" << n << ", " << x << ", " << y << ")";
+    return s.str();
+  }
+
+  std::string CodeGenerator::qform(const std::string& A, const Sparsity& sp_A,
+                                   const std::string& x) {
+    addAuxiliary(AUX_QFORM);
+    stringstream s;
+    s << "qform(" << A << ", " << sparsity(sp_A) << ", " << x << ")";
     return s.str();
   }
 

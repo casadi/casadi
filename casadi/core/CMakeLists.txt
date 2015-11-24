@@ -12,7 +12,7 @@ set(CASADI_SRCS
   # Since this compilation takes some time, we put it up-front,
   # So that a make -jn will not be blocked
   casadi_instantiations.cpp
-  
+
   # MISC
   casadi_limits.hpp
   casadi_types.hpp
@@ -76,6 +76,7 @@ set(CASADI_SRCS
   mx/determinant.hpp         mx/determinant.cpp         # Determinant
   mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
   mx/dot.hpp                 mx/dot.cpp                 # Inner product
+  mx/qform.hpp               mx/qform.cpp               # Inner product
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/assertion.hpp           mx/assertion.cpp           # Assertion
   mx/monitor.hpp             mx/monitor.cpp             # Monitor

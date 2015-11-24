@@ -280,8 +280,8 @@ namespace casadi {
     /** \brief Make a rank-1 update to a matrix A
      * Calculates A + 1/2 * alpha * outer_prod(x, x)
      */
-    inline friend MatType rank1(const MatType &X, const MatType &A, const MatType &alpha) {
-      return MatType::rank1(X, A, alpha);
+    inline friend MatType rank1(const MatType &A, const MatType &alpha, const MatType &x) {
+      return MatType::rank1(A, alpha, x);
     }
 
     /** \brief Calculate some of squares: sum_ij X_ij^2

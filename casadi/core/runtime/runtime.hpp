@@ -481,23 +481,18 @@ namespace casadi {
     real_t ret=0;
 
     /* Loop over the columns of A */
-    int cc, el;
+    int cc, rr, el;
     for (cc=0; cc<ncol_A; ++cc) {
       /* Loop over the nonzeros of A (upper triangular part only) */
-      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
-        /* Get row */
-        int rr = row_A[el];
-
-        /* Add contribution (off-diagonal) */
-        if (rr<cc) {
-          ret += x[rr]*A[el]*x[cc];
+      for (el=colind_A[cc]; el<colind_A[cc+1] && (rr=row_A[el])<=cc; ++el) {        
+        /* Add contribution */
+        if (rr==cc) {
+          ret += x[cc]*A[el]*x[cc]/2;
         } else {
-          if (rr==cc) ret += x[cc]*A[el]*x[cc]/2;
-          break;
+          ret += x[rr]*A[el]*x[cc];
         }
       }
     }
-
     return ret;
   }
 
