@@ -5281,9 +5281,15 @@ Given a repeated matrix, computes the sum of repeated parts.
 
 ";
 
-%feature("docstring")  countNodes(const MatType &A) "
+%feature("docstring")  qform(const MatType &X, const MatType &A) "
 
-Count number of nodes
+Calculate quadratic form X^T A X.
+
+";
+
+%feature("docstring")  qform(const MatType &X) "
+
+Calculate quadratic form X^T X.
 
 ";
 
@@ -5361,18 +5367,6 @@ reverse=false) "
 Inplace substitution with piggyback expressions Substitute variables v out
 of the expressions vdef sequentially, as well as out of a number of other
 expressions piggyback.
-
-";
-
-%feature("docstring")  quad_form(const MatType &X, const MatType &A) "
-
-Calculate quadratic form X^T A X.
-
-";
-
-%feature("docstring")  quad_form(const MatType &X) "
-
-Calculate quadratic form X^T X.
 
 ";
 
@@ -5490,6 +5484,12 @@ The sparsity pattern, which is reference counted and cached, can be accessed
 with Sparsity& sparsity() Joel Andersson
 
 C++ includes: generic_matrix.hpp ";
+
+%feature("docstring")  countNodes(const MatType &A) "
+
+Count number of nodes
+
+";
 
 %feature("docstring")  tangent(const MatType &ex, const MatType &arg) "
 
@@ -12000,6 +12000,7 @@ Get NLP solver input scheme name by index.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
@@ -12219,11 +12220,16 @@ Joel Andersson
 
 >>>>>>> Stashed changes
 =======
+=======
+>>>>>>> Stashed changes
 %feature("docstring")  casadi::casadi_densify(const real1_t *x, const int
 *sp_x, real2_t *y, int tr) " [INTERNAL]  Convert sparse to dense.
 
 ";
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

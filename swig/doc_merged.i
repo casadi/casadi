@@ -4016,9 +4016,17 @@ Given a repeated matrix, computes the sum of repeated parts.
 
 ";
 
-%feature("docstring") friendwrap_countNodes "
+%feature("docstring") friendwrap_qform "
 
-Count number of nodes
+>  MatType qform(MatType X, MatType A)
+------------------------------------------------------------------------
+
+Calculate quadratic form X^T A X.
+
+>  MatType qform(MatType X)
+------------------------------------------------------------------------
+
+Calculate quadratic form X^T X.
 
 ";
 
@@ -4089,20 +4097,6 @@ Convert a lower triangular matrix to a symmetric one.
 Inplace substitution with piggyback expressions Substitute variables v out
 of the expressions vdef sequentially, as well as out of a number of other
 expressions piggyback.
-
-";
-
-%feature("docstring") friendwrap_quad_form "
-
->  MatType quad_form(MatType X, MatType A)
-------------------------------------------------------------------------
-
-Calculate quadratic form X^T A X.
-
->  MatType quad_form(MatType X)
-------------------------------------------------------------------------
-
-Calculate quadratic form X^T X.
 
 ";
 
@@ -4218,6 +4212,12 @@ The sparsity pattern, which is reference counted and cached, can be accessed
 with Sparsity& sparsity() Joel Andersson
 
 C++ includes: generic_matrix.hpp ";
+
+%feature("docstring") friendwrap_countNodes "
+
+Count number of nodes
+
+";
 
 %feature("docstring") friendwrap_tangent "
 
