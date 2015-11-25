@@ -4024,7 +4024,12 @@ Given a repeated matrix, computes the sum of repeated parts.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 Calculate quadratic form X^T A X.
+=======
+Calculate quadratic form X^T A X A is assumed to be symmetric and entries in
+the strictly lower triangular half are ignored.
+>>>>>>> Stashed changes
 =======
 Calculate quadratic form X^T A X A is assumed to be symmetric and entries in
 the strictly lower triangular half are ignored.
