@@ -4021,7 +4021,12 @@ Given a repeated matrix, computes the sum of repeated parts.
 >  MatType qform(MatType X, MatType A)
 ------------------------------------------------------------------------
 
+<<<<<<< Updated upstream
 Calculate quadratic form X^T A X.
+=======
+Calculate quadratic form X^T A X A is assumed to be symmetric and entries in
+the strictly lower triangular half are ignored.
+>>>>>>> Stashed changes
 
 >  MatType qform(MatType X)
 ------------------------------------------------------------------------
@@ -4176,6 +4181,13 @@ Get the sparsity pattern. See the Sparsity class for details.
 %feature("docstring") casadi::GenericMatrix::nnz_diag "
 
 Get get the number of non-zeros on the diagonal.
+
+";
+
+%feature("docstring") friendwrap_rank1 "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
+outer_prod(x, x)
 
 ";
 
@@ -8882,6 +8894,11 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
+%feature("docstring") casadi::casadi_rank1 "[INTERNAL]  Adds a multiple
+alpha/2 of the outer product mul(x, trans(x)) to A.
+
+";
+
 %feature("docstring") casadi::swapIndices "
 
 swap inner and outer indices of list of lists
@@ -9326,7 +9343,8 @@ Get typename.
 ";
 
 %feature("docstring") casadi::casadi_qform "[INTERNAL]  Calculates dot(x,
-mul(A, x)) without memory allocation.
+mul(A, x))/2. A assumed to be symmetric. Only the upper triangular half of A
+is considered.
 
 ";
 

@@ -5283,7 +5283,12 @@ Given a repeated matrix, computes the sum of repeated parts.
 
 %feature("docstring")  qform(const MatType &X, const MatType &A) "
 
+<<<<<<< Updated upstream
 Calculate quadratic form X^T A X.
+=======
+Calculate quadratic form X^T A X A is assumed to be symmetric and entries in
+the strictly lower triangular half are ignored.
+>>>>>>> Stashed changes
 
 ";
 
@@ -5449,6 +5454,14 @@ Get the sparsity pattern. See the Sparsity class for details.
 %feature("docstring")  casadi::GenericMatrix< MatType >::nnz_diag() const  "
 
 Get get the number of non-zeros on the diagonal.
+
+";
+
+%feature("docstring")  rank1(const MatType &X, const MatType &A, const
+MatType &alpha) "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
+outer_prod(x, x)
 
 ";
 
@@ -11066,6 +11079,12 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
+%feature("docstring")  casadi::casadi_rank1(real_t *A, const int *sp_A,
+real_t alpha, const real_t *x) " [INTERNAL]  Adds a multiple alpha/2 of the
+outer product mul(x, trans(x)) to A.
+
+";
+
 %feature("docstring")  casadi::swapIndices(const std::vector< std::vector< T
 > > &m) "
 
@@ -11726,8 +11745,8 @@ Get typename.
 ";
 
 %feature("docstring")  casadi::casadi_qform(const real_t *A, const int
-*sp_A, const real_t *x) " [INTERNAL]  Calculates dot(x, mul(A, x)) without
-memory allocation.
+*sp_A, const real_t *x) " [INTERNAL]  Calculates dot(x, mul(A, x))/2. A
+assumed to be symmetric. Only the upper triangular half of A is considered.
 
 ";
 
@@ -12001,6 +12020,7 @@ Get NLP solver input scheme name by index.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
@@ -12222,12 +12242,17 @@ Joel Andersson
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 %feature("docstring")  casadi::casadi_densify(const real1_t *x, const int
 *sp_x, real2_t *y, int tr) " [INTERNAL]  Convert sparse to dense.
 
 ";
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
