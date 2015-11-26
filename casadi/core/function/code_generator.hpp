@@ -104,8 +104,13 @@ namespace casadi {
                     const std::string& z, const Sparsity& sp_z,
                     const std::string& w, bool tr);
 
-    /** \brief Codegen quadratic form */
-    std::string qform(const std::string& A, const Sparsity& sp_A, const std::string& x);
+    /** \brief Codegen bilinear form */
+    std::string bilin(const std::string& A, const Sparsity& sp_A,
+                      const std::string& x, const std::string& y);
+
+    /** \brief Rank-1 update */
+    std::string rank1(const std::string& A, const Sparsity& sp_A, const std::string& alpha,
+                      const std::string& x, const std::string& y);
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
@@ -114,7 +119,8 @@ namespace casadi {
       AUX_SCAL,
       AUX_AXPY,
       AUX_DOT,
-      AUX_QFORM,
+      AUX_BILIN,
+      AUX_RANK1,
       AUX_NRM2,
       AUX_IAMAX,
       AUX_FILL,

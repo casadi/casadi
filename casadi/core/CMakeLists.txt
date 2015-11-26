@@ -76,7 +76,8 @@ set(CASADI_SRCS
   mx/determinant.hpp         mx/determinant.cpp         # Determinant
   mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
   mx/dot.hpp                 mx/dot.cpp                 # Inner product
-  mx/qform.hpp               mx/qform.cpp               # Inner product
+  mx/bilin.hpp               mx/bilin.cpp               # Bilinear form
+  mx/rank1.hpp               mx/rank1.cpp               # Rank-1 update
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/assertion.hpp           mx/assertion.cpp           # Assertion
   mx/monitor.hpp             mx/monitor.cpp             # Monitor

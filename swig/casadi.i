@@ -2589,16 +2589,12 @@ DECL std::vector< M > %SHOW(symvar)(const M& x) {
   return symvar(x);
 }
 
-DECL M %SHOW(qform)(const M& X, const M& A) {
-  return qform(X, A);
+DECL M %SHOW(bilin)(const M& A, const M& x, const M& y) {
+  return bilin(A, x, y);
 }
 
-DECL M %SHOW(qform)(const M& X) {
-  return qform(X);
-}
-
-DECL M %SHOW(rank1)(const M& A, const M& alpha, const M& x) {
-  return rank1(A, alpha, x);
+DECL M %SHOW(rank1)(const M& A, const M& alpha, const M& x, const M& y) {
+  return rank1(A, alpha, x, y);
 }
 
 DECL M %SHOW(sum_square)(const M& X) {

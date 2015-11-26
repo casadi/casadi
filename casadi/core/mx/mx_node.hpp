@@ -335,6 +335,12 @@ namespace casadi {
     /** \brief Matrix multiplication and addition */
     virtual MX getMultiplication(const MX& y, const MX& z) const;
 
+    /** \brief Bilinear form */
+    virtual MX getBilin(const MX& x, const MX& y) const;
+
+    /** \brief Bilinear form */
+    virtual MX getRank1(const MX& alpha, const MX& x, const MX& y) const;
+
     /** \brief Solve a system of linear equations
     *
     *      For system Ax = b:

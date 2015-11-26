@@ -29,6 +29,8 @@
 #include "transpose.hpp"
 #include "reshape.hpp"
 #include "multiplication.hpp"
+#include "bilin.hpp"
+#include "rank1.hpp"
 #include "subref.hpp"
 #include "subassign.hpp"
 #include "getnonzeros.hpp"
@@ -427,6 +429,14 @@ namespace casadi {
     } else {
       return MX::create(new Multiplication(z, x, y));
     }
+  }
+
+  MX MXNode::getBilin(const MX& x, const MX& y) const {
+    return MX::create(new Bilin(shared_from_this<MX>(), x, y));
+  }
+
+  MX MXNode::getRank1(const MX& alpha, const MX& x, const MX& y) const {
+    return MX::create(new Rank1(shared_from_this<MX>(), alpha, x, y));
   }
 
   MX MXNode::getSolve(const MX& r, bool tr, const Function& linear_solver) const {

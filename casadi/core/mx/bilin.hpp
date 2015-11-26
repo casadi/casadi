@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_QFORM_HPP
-#define CASADI_QFORM_HPP
+#ifndef CASADI_BILIN_HPP
+#define CASADI_BILIN_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -33,18 +33,18 @@
 /// \cond INTERNAL
 
 namespace casadi {
-  /** \brief Matrix dot
+  /** \brief Calculate quadratic form
       \author Joel Andersson
-      \date 2013
+      \date 2015
   */
-  class CASADI_EXPORT Qform : public MXNode {
+  class CASADI_EXPORT Bilin : public MXNode {
   public:
 
     /// Constructor
-    Qform(const MX& x, const MX& A);
+    Bilin(const MX& A, const MX& x, const MX& y);
 
     /// Destructor
-    virtual ~Qform() {}
+    virtual ~Bilin() {}
 
     /// Evaluate the function (template)
     template<typename T>
@@ -81,11 +81,11 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_QFORM;}
+    virtual int op() const { return OP_BILIN;}
   };
 
 
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_QFORM_HPP
+#endif // CASADI_BILIN_HPP

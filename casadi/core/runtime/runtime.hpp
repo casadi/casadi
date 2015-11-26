@@ -108,11 +108,9 @@ namespace casadi {
   real_t CASADI_PREFIX(norm_inf_mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y,
                              real_t *dwork, int *iwork);
 
-  /** Calculates dot(x, mul(A, x))/2.
-   * A assumed to be symmetric. Only the upper triangular half of A is considered.
-   */
+  /** Calculates dot(x, mul(A, y)) */
   template<typename real_t>
-  real_t CASADI_PREFIX(qform)(const real_t* A, const int* sp_A, const real_t* x);
+  real_t CASADI_PREFIX(bilin)(const real_t* A, const int* sp_A, const real_t* x, const real_t* y);
 
   /// Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A
   template<typename real_t>
@@ -472,7 +470,7 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(qform)(const real_t* A, const int* sp_A, const real_t* x) {
+  real_t CASADI_PREFIX(bilin)(const real_t* A, const int* sp_A, const real_t* x, const real_t* y) {
     /* Get sparsities */
     int ncol_A = sp_A[1];
     const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;
@@ -483,38 +481,34 @@ namespace casadi {
     /* Loop over the columns of A */
     int cc, rr, el;
     for (cc=0; cc<ncol_A; ++cc) {
-      /* Loop over the nonzeros of A (upper triangular part only) */
-      for (el=colind_A[cc]; el<colind_A[cc+1] && (rr=row_A[el])<=cc; ++el) {        
+      /* Loop over the nonzeros of A */
+      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {        
+        /* Get the row */
+        rr=row_A[el];
+
         /* Add contribution */
-        if (rr==cc) {
-          ret += x[cc]*A[el]*x[cc]/2;
-        } else {
-          ret += x[rr]*A[el]*x[cc];
-        }
+        ret += x[rr]*A[el]*y[cc];
       }
     }
     return ret;
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(rank1)(real_t* A, const int* sp_A, real_t alpha, const real_t* x) {
-    /* Handle the factor 2 once */
-    alpha /= 2;
-
+  void CASADI_PREFIX(rank1)(real_t* A, const int* sp_A, real_t alpha, const real_t* x, const real_t* y) {
     /* Get sparsities */
     int ncol_A = sp_A[1];
     const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;
 
     /* Loop over the columns of A */
-    int cc, el;
+    int cc, rr, el;
     for (cc=0; cc<ncol_A; ++cc) {
       /* Loop over the nonzeros of A */
       for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
         /* Get row */
-        int rr = row_A[el];
+        rr = row_A[el];
 
         /* Add the multiple */
-        A[el] += alpha * x[rr] * x[cc];
+        A[el] += alpha*x[rr]*y[cc];
       }
     }
   }

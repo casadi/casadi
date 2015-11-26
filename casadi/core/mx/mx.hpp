@@ -475,9 +475,8 @@ namespace casadi {
     MX zz_nullspace() const;
     MX zz_repsum(int n, int m=1) const;
     MX zz_densify(const MX& val=0) const;
-    static MX qform(const MX& x, const MX& A);
-    static MX qform(const MX& x);
-    static MX rank1(const MX& A, const MX& alpha, const MX& x);
+    static MX _bilin(const MX& A, const MX& x, const MX& y);
+    static MX _rank1(const MX& A, const MX& alpha, const MX& x, const MX& y);
     ///@}
 
     ///@{

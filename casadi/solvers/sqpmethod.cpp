@@ -465,7 +465,7 @@ namespace casadi {
       log("QP solved");
 
       // Detecting indefiniteness
-      double gain = casadi_qform(Bk_, Hsp_, dx_);
+      double gain = casadi_bilin(Bk_, Hsp_, dx_, dx_);
       if (gain < 0) {
         casadi_warning("Indefinite Hessian detected...");
       }

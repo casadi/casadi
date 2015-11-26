@@ -441,12 +441,13 @@ namespace casadi {
                                  std::vector<Matrix<DataType> >& vdef,
                                  const std::string& v_prefix,
                                  const std::string& v_suffix);
-    static Matrix<DataType> qform(const Matrix<DataType>& x);
-    static Matrix<DataType> qform(const Matrix<DataType>& x,
-                                  const Matrix<DataType>& A);
-    static Matrix<DataType> rank1(const Matrix<DataType>& A,
-                                  const Matrix<DataType>& alpha,
-                                  const Matrix<DataType>& x);
+    static Matrix<DataType> _bilin(const Matrix<DataType>& A,
+                                  const Matrix<DataType>& x,
+                                  const Matrix<DataType>& y);
+    static Matrix<DataType> _rank1(const Matrix<DataType>& A,
+                                   const Matrix<DataType>& alpha,
+                                   const Matrix<DataType>& x,
+                                   const Matrix<DataType>& y);
     Matrix<DataType> zz_if_else(const Matrix<DataType> &if_true,
                                 const Matrix<DataType> &if_false,
                                 bool short_circuit) const;

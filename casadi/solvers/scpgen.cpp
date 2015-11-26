@@ -1171,7 +1171,7 @@ namespace casadi {
     // Make sure that we have a decent direction
     if (!gauss_newton_) {
       // Get the curvature in the step direction
-      double gain = casadi_qform(qpH_, spH_, dxk_);
+      double gain = casadi_bilin(qpH_, spH_, dxk_, dxk_);
       if (gain < 0) {
         iteration_note_ = "Hessian indefinite in the search direction";
       }

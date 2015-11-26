@@ -507,10 +507,16 @@ namespace casadi {
         << codegen_str_dot_define << endl
         << endl;
       break;
-    case AUX_QFORM:
+    case AUX_BILIN:
       this->auxiliaries
-        << codegen_str_qform
-        << codegen_str_qform_define << endl
+        << codegen_str_bilin
+        << codegen_str_bilin_define << endl
+        << endl;
+      break;
+    case AUX_RANK1:
+      this->auxiliaries
+        << codegen_str_rank1
+        << codegen_str_rank1_define << endl
         << endl;
       break;
     case AUX_ASUM:
@@ -715,11 +721,21 @@ namespace casadi {
     return s.str();
   }
 
-  std::string CodeGenerator::qform(const std::string& A, const Sparsity& sp_A,
-                                   const std::string& x) {
-    addAuxiliary(AUX_QFORM);
+  std::string CodeGenerator::bilin(const std::string& A, const Sparsity& sp_A,
+                                   const std::string& x, const std::string& y) {
+    addAuxiliary(AUX_BILIN);
     stringstream s;
-    s << "qform(" << A << ", " << sparsity(sp_A) << ", " << x << ")";
+    s << "bilin(" << A << ", " << sparsity(sp_A) << ", " << x << ", " << y << ")";
+    return s.str();
+  }
+
+  std::string CodeGenerator::rank1(const std::string& A, const Sparsity& sp_A,
+                                   const std::string& alpha, const std::string& x,
+                                   const std::string& y) {
+    addAuxiliary(AUX_RANK1);
+    stringstream s;
+    s << "rank1(" << A << ", " << sparsity(sp_A) << ", "
+      << alpha << ", " << x << ", " << y << ");";
     return s.str();
   }
 

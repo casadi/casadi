@@ -1903,19 +1903,12 @@ namespace casadi {
     return tang(f, f.index_in(iname), f.index_out(oname));
   }
 
- MX MX::qform(const MX& x, const MX& A) {
-   casadi_assert(x.is_vector());
-   if (!x.is_column()) return qform(x.T(), A);
-   return dot(x, mul(A, x))/2;
+ MX MX::_bilin(const MX& A, const MX& x, const MX& y) {
+   return A->getBilin(x, y);
  }
 
- MX MX::qform(const MX& x) {
-   casadi_assert(x.is_vector());
-   return dot(x, x)/2;
- }
-
- MX MX::rank1(const MX& A, const MX& alpha, const MX& x) {
-   casadi_error("not implemented");
+ MX MX::_rank1(const MX& A, const MX& alpha, const MX& x, const MX& y) {
+   return A->getRank1(alpha, x, y);
  }
 
 } // namespace casadi

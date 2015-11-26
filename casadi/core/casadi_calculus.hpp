@@ -98,8 +98,11 @@ namespace casadi {
     // Inner product
     OP_DOT,
 
-    // Quadratic form
-    OP_QFORM,
+    // Bilinear form
+    OP_BILIN,
+
+    // Rank-1 update
+    OP_RANK1,
 
     // Horizontal concatenation
     OP_HORZCAT,

@@ -263,26 +263,26 @@ namespace casadi {
       return x.zz_symvar();
     }
 
-    /** \brief Calculate quadratic form X^T A X
-     * A is assumed to be symmetric and entries in the strictly lower triangular
-     * half are ignored.
+    ///@{
+    /** \brief Calculate bilinear form x^T A y
      */
-    inline friend MatType qform(const MatType &X, const MatType &A) {
-      return MatType::qform(X, A);
+    inline friend MatType bilin(const MatType &A, const MatType &x, const MatType &y) {
+      return MatType::bilin(A, x, y);
     }
+    static MatType bilin(const MatType& A, const MatType& x, const MatType& y);
+    ///@}
 
-    /** \brief Calculate quadratic form X^T X
-     */
-    inline friend MatType qform(const MatType &X) {
-      return MatType::qform(X);
-    }
-
+    ///@{
     /** \brief Make a rank-1 update to a matrix A
      * Calculates A + 1/2 * alpha * outer_prod(x, x)
      */
-    inline friend MatType rank1(const MatType &A, const MatType &alpha, const MatType &x) {
-      return MatType::rank1(A, alpha, x);
+    inline friend MatType rank1(const MatType &A, const MatType &alpha,
+                                const MatType &x, const MatType &y) {
+      return MatType::rank1(A, alpha, x, y);
     }
+    static MatType rank1(const MatType& A, const MatType& alpha,
+                         const MatType& x, const MatType& y);
+    ///@}
 
     /** \brief Calculate some of squares: sum_ij X_ij^2
      */
@@ -822,6 +822,55 @@ namespace casadi {
     return self() + self().T() - diag(diag(self()));
   }
 
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::bilin(const MatType& A, const MatType& x,
+                                        const MatType& y) {
+    // Check/correct x
+    casadi_assert(x.is_vector());
+    if (!x.is_column()) return bilin(A, x.T(), y);
+    if (!x.is_dense()) return bilin(A, densify(x), y);
+
+    // Check/correct y
+    casadi_assert(y.is_vector());
+    if (!y.is_column()) return bilin(A, x, y.T());
+    if (!y.is_dense()) return bilin(A, x, densify(y));
+
+    // Assert dimensions
+    casadi_assert_message(x.size1()==A.size1() && y.size1()==A.size2(),
+                          "Dimension mismatch. Got x.size1() = " << x.size1()
+                          << " and y.size1() = " << y.size1()
+                          << " but A.size() = " << A.size());
+
+    // Call the class specific method
+    return MatType::_bilin(A, x, y);
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::rank1(const MatType& A, const MatType& alpha,
+                                        const MatType& x, const MatType& y) {
+    // Check/correct x
+    casadi_assert(x.is_vector());
+    if (!x.is_column()) return rank1(A, alpha, x.T(), y);
+    if (!x.is_dense()) return rank1(A, alpha, densify(x), y);
+
+    // Check/correct y
+    casadi_assert(y.is_vector());
+    if (!y.is_column()) return rank1(A, alpha, x, y.T());
+    if (!y.is_dense()) return rank1(A, alpha, x, densify(y));
+
+    // Check alpha, quick return
+    casadi_assert(alpha.is_scalar());
+    if (!alpha.is_dense()) return A;
+
+    // Assert dimensions
+    casadi_assert_message(x.size1()==A.size1() && y.size1()==A.size2(),
+                          "Dimension mismatch. Got x.size1() = " << x.size1()
+                          << " and y.size1() = " << y.size1()
+                          << " but A.size() = " << A.size());
+
+    // Call the class specific method
+    return MatType::_rank1(A, alpha, x, y);
+  }
 
 } // namespace casadi
 
