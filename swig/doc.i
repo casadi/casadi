@@ -5288,7 +5288,12 @@ Given a repeated matrix, computes the sum of repeated parts.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 Calculate quadratic form X^T A X.
+=======
+Calculate quadratic form X^T A X A is assumed to be symmetric and entries in
+the strictly lower triangular half are ignored.
+>>>>>>> Stashed changes
 =======
 Calculate quadratic form X^T A X A is assumed to be symmetric and entries in
 the strictly lower triangular half are ignored.
@@ -12045,6 +12050,7 @@ Get NLP solver input scheme name by index.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
@@ -12276,6 +12282,8 @@ Joel Andersson
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 %feature("docstring")  casadi::casadi_densify(const real1_t *x, const int
 *sp_x, real2_t *y, int tr) " [INTERNAL]  Convert sparse to dense.
 
@@ -12287,6 +12295,9 @@ Joel Andersson
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
