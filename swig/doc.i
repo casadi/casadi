@@ -5256,6 +5256,7 @@ Infinity-norm.
 ";
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 %feature("docstring")  pinv(const MatType &A) "
 
 Computes the Moore-Penrose pseudo-inverse.
@@ -5283,9 +5284,13 @@ matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 %feature("docstring")  repsum(const MatType &A, int n, int m=1) "
 
 Given a repeated matrix, computes the sum of repeated parts.
+=======
+%feature("docstring")  outer_prod(const MatType &x, const MatType &y) "
+>>>>>>> Stashed changes
 
-";
+Take the outer product of two vectors Equals.
 
+<<<<<<< Updated upstream
 %feature("docstring")  qform(const MatType &X, const MatType &A) "
 
 <<<<<<< Updated upstream
@@ -5352,6 +5357,8 @@ the strictly lower triangular half are ignored.
 
 Take the outer product of two vectors Equals.
 
+=======
+>>>>>>> Stashed changes
 with x and y vectors
 
 ";
@@ -12171,6 +12178,7 @@ Get NLP solver input scheme name by index.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
@@ -12416,6 +12424,8 @@ Joel Andersson
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 %feature("docstring")  casadi::casadi_densify(const real1_t *x, const int
 *sp_x, real2_t *y, int tr) " [INTERNAL]  Convert sparse to dense.
 
@@ -12434,6 +12444,9 @@ Joel Andersson
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

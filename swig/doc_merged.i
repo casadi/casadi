@@ -3989,6 +3989,7 @@ Infinity-norm.
 ";
 
 %feature("docstring") friendwrap_outer_prod "
+<<<<<<< Updated upstream
 
 Take the outer product of two vectors Equals.
 
@@ -4065,6 +4066,17 @@ the strictly lower triangular half are ignored.
 %feature("docstring") friendwrap_countNodes "
 >>>>>>> Stashed changes
 
+=======
+
+Take the outer product of two vectors Equals.
+
+with x and y vectors
+
+";
+
+%feature("docstring") friendwrap_countNodes "
+
+>>>>>>> Stashed changes
 Count number of nodes
 
 ";
@@ -8994,12 +9006,21 @@ Check if for each element of v holds: lower <= v_i < upper.
 ";
 
 %feature("docstring") casadi::casadi_rank1 "
+<<<<<<< Updated upstream
 
 >  void casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 
+=======
+
+>  void casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x)
+------------------------------------------------------------------------
+[INTERNAL] 
+Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
+
+>>>>>>> Stashed changes
 >  void casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x, const real_t *y)
 ------------------------------------------------------------------------
 [INTERNAL] 
