@@ -3993,6 +3993,7 @@ Infinity-norm.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 Take the outer product of two vectors Equals.
 
@@ -4109,6 +4110,11 @@ Matrix power x^n.
 Take the outer product of two vectors Equals.
 
 with x and y vectors
+=======
+
+Take the outer product of two vectors Equals.
+
+with x and y vectors
 
 ";
 
@@ -4118,6 +4124,32 @@ Count number of nodes
 
 ";
 
+%feature("docstring") casadi::GenericMatrix::bilin "
+
+Matrix power x^n.
+
+";
+
+%feature("docstring") friendwrap_mrdivide "
+
+Matrix divide (cf. slash '/' in MATLAB)
+
+";
+
+%feature("docstring") friendwrap_linspace "
+
+Matlab's linspace command.
+>>>>>>> Stashed changes
+
+";
+
+%feature("docstring") friendwrap_countNodes "
+
+Count number of nodes
+
+";
+
+<<<<<<< Updated upstream
 %feature("docstring") casadi::GenericMatrix::bilin "
 
 Matrix power x^n.
@@ -4201,6 +4233,10 @@ Matrix divide (cf. backslash '\\\\' in MATLAB)
 >>>>>>> Stashed changes
 %feature("docstring") friendwrap_sum_square "
 
+=======
+%feature("docstring") friendwrap_sum_square "
+
+>>>>>>> Stashed changes
 =======
 %feature("docstring") friendwrap_sum_square "
 
@@ -9112,6 +9148,9 @@ Check if for each element of v holds: lower <= v_i < upper.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 
@@ -9120,6 +9159,7 @@ Check if for each element of v holds: lower <= v_i < upper.
 [INTERNAL] 
 Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 =======
 
@@ -9144,6 +9184,8 @@ Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 [INTERNAL] 
 Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
