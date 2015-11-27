@@ -5259,6 +5259,7 @@ Infinity-norm.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 %feature("docstring")  pinv(const MatType &A) "
 
 Computes the Moore-Penrose pseudo-inverse.
@@ -5375,6 +5376,12 @@ with x and y vectors
 Take the outer product of two vectors Equals.
 
 >>>>>>> Stashed changes
+=======
+%feature("docstring")  outer_prod(const MatType &x, const MatType &y) "
+
+Take the outer product of two vectors Equals.
+
+>>>>>>> Stashed changes
 with x and y vectors
 
 ";
@@ -5395,6 +5402,7 @@ Matrix power x^n.
 %feature("docstring")  mrdivide(const MatType &x, const MatType &n) "
 
 Matrix divide (cf. slash '/' in MATLAB)
+<<<<<<< Updated upstream
 =======
 %feature("docstring")  countNodes(const MatType &A) "
 
@@ -5406,6 +5414,15 @@ Count number of nodes
 &A, const MatType &x, const MatType &y) "
 
 Matrix power x^n.
+=======
+
+";
+
+%feature("docstring")  linspace(const MatType &a, const MatType &b, int
+nsteps) "
+
+Matlab's linspace command.
+>>>>>>> Stashed changes
 
 ";
 
@@ -5415,6 +5432,7 @@ Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
+<<<<<<< Updated upstream
 %feature("docstring")  linspace(const MatType &a, const MatType &b, int
 nsteps) "
 
@@ -5441,6 +5459,10 @@ Matrix divide (cf. backslash '\\\\' in MATLAB)
 >>>>>>> Stashed changes
 %feature("docstring")  sum_square(const MatType &X) "
 
+=======
+%feature("docstring")  sum_square(const MatType &X) "
+
+>>>>>>> Stashed changes
 Calculate some of squares: sum_ij X_ij^2.
 
 ";
@@ -12225,6 +12247,7 @@ Get NLP solver input scheme name by index.
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
@@ -12476,6 +12499,8 @@ Joel Andersson
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 %feature("docstring")  casadi::casadi_densify(const real1_t *x, const int
 *sp_x, real2_t *y, int tr) " [INTERNAL]  Convert sparse to dense.
 
@@ -12497,6 +12522,9 @@ Joel Andersson
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
