@@ -4,6 +4,9 @@
 // File: classcasadi_1_1Assertion.xml
 
 
+// File: classcasadi_1_1Bilin.xml
+
+
 // File: classcasadi_1_1BinaryMX.xml
 
 
@@ -5233,9 +5236,10 @@ Return a row-wise summation of elements.
 
 ";
 
-%feature("docstring")  dot(const MatType &x, const MatType &y) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper() const
+"
 
-Inner product of two matrices with x and y matrices of the same dimension.
+Get the number of non-zeros in the upper triangular half.
 
 ";
 
@@ -5251,6 +5255,7 @@ Infinity-norm.
 
 ";
 
+<<<<<<< Updated upstream
 %feature("docstring")  pinv(const MatType &A) "
 
 Computes the Moore-Penrose pseudo-inverse.
@@ -5341,37 +5346,39 @@ the strictly lower triangular half are ignored.
 >>>>>>> Stashed changes
 
 ";
+=======
+%feature("docstring")  outer_prod(const MatType &x, const MatType &y) "
+>>>>>>> Stashed changes
 
-%feature("docstring")  qform(const MatType &X) "
+Take the outer product of two vectors Equals.
 
-Calculate quadratic form X^T X.
-
-";
-
-%feature("docstring")  substitute(const MatType &ex, const MatType &v, const
-MatType &vdef) "
-
-Substitute variable v with expression vdef in an expression ex.
+with x and y vectors
 
 ";
 
-%feature("docstring")  substitute(const std::vector< MatType > &ex, const
-std::vector< MatType > &v, const std::vector< MatType > &vdef) "
+%feature("docstring")  countNodes(const MatType &A) "
 
-Substitute variable var with expression expr in multiple expressions.
-
-";
-
-%feature("docstring")  trace(const MatType &a) "
-
-Matrix trace.
+Count number of nodes
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::nnz_lower() const
-"
+%feature("docstring")  casadi::GenericMatrix< MatType >::bilin(const MatType
+&A, const MatType &x, const MatType &y) "
 
-Get the number of non-zeros in the lower triangular half.
+Matrix power x^n.
+
+";
+
+%feature("docstring")  mrdivide(const MatType &x, const MatType &n) "
+
+Matrix divide (cf. slash '/' in MATLAB)
+
+";
+
+%feature("docstring")  linspace(const MatType &a, const MatType &b, int
+nsteps) "
+
+Matlab's linspace command.
 
 ";
 
@@ -5381,17 +5388,9 @@ Matrix divide (cf. backslash '\\\\' in MATLAB)
 
 ";
 
-%feature("docstring")  jacobian(const MatType &ex, const MatType &arg, bool
-symmetric=false) "
+%feature("docstring")  sum_square(const MatType &X) "
 
-Calculate jacobian via source code transformation.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::is_vector() const
-"
-
-Check if the matrix is a row or column vector.
+Calculate some of squares: sum_ij X_ij^2.
 
 ";
 
@@ -5409,9 +5408,10 @@ Matlab's cross command.
 
 ";
 
-%feature("docstring")  tril2symm(const MatType &a) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_scalar(bool
+scalar_and_dense=false) const  "
 
-Convert a lower triangular matrix to a symmetric one.
+Check if the matrix expression is scalar.
 
 ";
 
@@ -5422,6 +5422,40 @@ reverse=false) "
 Inplace substitution with piggyback expressions Substitute variables v out
 of the expressions vdef sequentially, as well as out of a number of other
 expressions piggyback.
+
+";
+
+%feature("docstring")  solve(const MatType &A, const MatType &b) "
+
+Solve a system of equations: A*x = b The solve routine works similar to
+Matlab's backslash when A is square and nonsingular. The algorithm used is
+the following:
+
+A simple forward or backward substitution if A is upper or lower triangular
+
+If the linear system is at most 3-by-3, form the inverse via minor expansion
+and multiply
+
+Permute the variables and equations as to get a (structurally) nonzero
+diagonal, then perform a QR factorization without pivoting and solve the
+factorized system.
+
+Note 1: If there are entries of the linear system known to be zero, these
+will be removed. Elements that are very small, or will evaluate to be zero,
+can still cause numerical errors, due to the lack of pivoting (which is not
+possible since cannot compare the size of entries)
+
+Note 2: When permuting the linear system, a BLT (block lower triangular)
+transformation is formed. Only the permutation part of this is however used.
+An improvement would be to solve block-by-block if there are multiple BLT
+blocks.
+
+";
+
+%feature("docstring")  solve(const MatType &A, const MatType &b, const
+std::string &lsolver, const Dict &dict=Dict()) "
+
+Solve a system of equations: A*x = b.
 
 ";
 
@@ -5458,9 +5492,32 @@ optionally both dimensions)
 
 ";
 
-%feature("docstring")  dependsOn(const MatType &f, const MatType &arg) "
+%feature("docstring")  conditional(const MatType &ind, const std::vector<
+MatType > &x, const MatType &x_default, bool short_circuit=true) "
 
-Check if expression depends on the argument The argument must be symbolic.
+Create a switch.
+
+If the condition
+
+Parameters:
+-----------
+
+ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
+returned, otherwise
+
+x_default:  will be returned.
+
+";
+
+%feature("docstring")  densify(const MatType &x) "
+
+Make the matrix dense if not already.
+
+";
+
+%feature("docstring")  densify(const MatType &x, const MatType &val) "
+
+Make the matrix dense and assign nonzeros to a value.
 
 ";
 
@@ -5470,15 +5527,21 @@ Matrix power x^n.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::nnz() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_row() const  "
 
-Get the number of (structural) non-zero elements.
+Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::is_dense() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_tril() const  "
 
-Check if the matrix expression is dense.
+Check if the matrix is lower triangular.
+
+";
+
+%feature("docstring")  tril2symm(const MatType &a) "
+
+Convert a lower triangular matrix to a symmetric one.
 
 ";
 
@@ -5488,9 +5551,15 @@ Frobenius norm.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::is_tril() const  "
+%feature("docstring")  repsum(const MatType &A, int n, int m=1) "
 
-Check if the matrix is lower triangular.
+Given a repeated matrix, computes the sum of repeated parts.
+
+";
+
+%feature("docstring")  dot(const MatType &x, const MatType &y) "
+
+Inner product of two matrices with x and y matrices of the same dimension.
 
 ";
 
@@ -5507,8 +5576,8 @@ Get get the number of non-zeros on the diagonal.
 
 ";
 
-%feature("docstring")  rank1(const MatType &X, const MatType &A, const
-MatType &alpha) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::rank1(const MatType
+&A, const MatType &alpha, const MatType &x, const MatType &y) "
 
 Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
 outer_prod(x, x)
@@ -5548,15 +5617,9 @@ with Sparsity& sparsity() Joel Andersson
 
 C++ includes: generic_matrix.hpp ";
 
-%feature("docstring")  countNodes(const MatType &A) "
-
-Count number of nodes
-
-";
-
 %feature("docstring")  tangent(const MatType &ex, const MatType &arg) "
 
-Matrix power x^n.
+Calculate jacobian via source code transformation.
 
 ";
 
@@ -5584,17 +5647,17 @@ Evaluate a polynomial with coefficients p in x.
 
 ";
 
-%feature("docstring")  triu2symm(const MatType &a) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::dim() const  "
 
-Convert a upper triangular matrix to a symmetric one.
+Get string representation of dimensions. The representation is (nrow x ncol
+= numel | size)
 
 ";
 
-%feature("docstring")  outer_prod(const MatType &x, const MatType &y) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::bilin(const MatType
+&A, const MatType &x, const MatType &y) "
 
-Take the outer product of two vectors Equals.
-
-with x and y vectors
+Calculate bilinear form x^T A y.
 
 ";
 
@@ -5607,43 +5670,16 @@ See:  SXFunction::getFree(), MXFunction::getFree()
 
 ";
 
-%feature("docstring")  sum_square(const MatType &X) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_vector() const
+"
 
-Calculate some of squares: sum_ij X_ij^2.
-
-";
-
-%feature("docstring")  solve(const MatType &A, const MatType &b) "
-
-Solve a system of equations: A*x = b The solve routine works similar to
-Matlab's backslash when A is square and nonsingular. The algorithm used is
-the following:
-
-A simple forward or backward substitution if A is upper or lower triangular
-
-If the linear system is at most 3-by-3, form the inverse via minor expansion
-and multiply
-
-Permute the variables and equations as to get a (structurally) nonzero
-diagonal, then perform a QR factorization without pivoting and solve the
-factorized system.
-
-Note 1: If there are entries of the linear system known to be zero, these
-will be removed. Elements that are very small, or will evaluate to be zero,
-can still cause numerical errors, due to the lack of pivoting (which is not
-possible since cannot compare the size of entries)
-
-Note 2: When permuting the linear system, a BLT (block lower triangular)
-transformation is formed. Only the permutation part of this is however used.
-An improvement would be to solve block-by-block if there are multiple BLT
-blocks.
+Check if the matrix is a row or column vector.
 
 ";
 
-%feature("docstring")  solve(const MatType &A, const MatType &b, const
-std::string &lsolver, const Dict &dict=Dict()) "
+%feature("docstring")  norm_1(const MatType &x) "
 
-Solve a system of equations: A*x = b.
+1-norm
 
 ";
 
@@ -5659,9 +5695,15 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
+%feature("docstring")  trace(const MatType &a) "
+
+Matrix trace.
+
+";
+
 %feature("docstring")  gradient(const MatType &ex, const MatType &arg) "
 
-Matrix power x^n.
+Calculate jacobian via source code transformation.
 
 ";
 
@@ -5678,10 +5720,20 @@ Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper() const
-"
+%feature("docstring")  extractShared(std::vector< MatType > &ex,
+std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
+&v_prefix="v_", const std::string &v_suffix="") "
 
-Get the number of non-zeros in the upper triangular half.
+Extract shared subexpressions from an set of expressions.
+
+";
+
+%feature("docstring")  extractShared(const std::vector< MatType > &ex,
+std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
+MatType > &vdef, const std::string &v_prefix="v_", const std::string
+&v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -5691,9 +5743,9 @@ Matrix inverse (experimental)
 
 ";
 
-%feature("docstring")  mrdivide(const MatType &x, const MatType &n) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::size1() const  "
 
-Matrix divide (cf. slash '/' in MATLAB)
+Get the first dimension (i.e. number of rows)
 
 ";
 
@@ -5734,26 +5786,30 @@ zero.
 
 ";
 
-%feature("docstring")  conditional(const MatType &ind, const std::vector<
-MatType > &x, const MatType &x_default, bool short_circuit=true) "
+%feature("docstring")  substitute(const MatType &ex, const MatType &v, const
+MatType &vdef) "
 
-Create a switch.
-
-If the condition
-
-Parameters:
------------
-
-ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
-returned, otherwise
-
-x_default:  will be returned.
+Substitute variable v with expression vdef in an expression ex.
 
 ";
 
-%feature("docstring")  norm_1(const MatType &x) "
+%feature("docstring")  substitute(const std::vector< MatType > &ex, const
+std::vector< MatType > &v, const std::vector< MatType > &vdef) "
 
-1-norm
+Substitute variable var with expression expr in multiple expressions.
+
+";
+
+%feature("docstring")  jacobian(const MatType &ex, const MatType &arg, bool
+symmetric=false) "
+
+Calculate jacobian via source code transformation.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_dense() const  "
+
+Check if the matrix expression is dense.
 
 ";
 
@@ -5790,30 +5846,16 @@ diagonal matrix is constructed with it.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::is_row() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::nnz_lower() const
+"
 
-Check if the matrix is a row vector (i.e. size1()==1)
-
-";
-
-%feature("docstring")  linspace(const MatType &a, const MatType &b, int
-nsteps) "
-
-Matlab's linspace command.
+Get the number of non-zeros in the lower triangular half.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::is_scalar(bool
-scalar_and_dense=false) const  "
+%feature("docstring")  triu2symm(const MatType &a) "
 
-Check if the matrix expression is scalar.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::dim() const  "
-
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size)
+Convert a upper triangular matrix to a symmetric one.
 
 ";
 
@@ -5822,15 +5864,9 @@ Get string representation of dimensions. The representation is (nrow x ncol
 %feature("docstring")  hessian(const MatType &ex, const MatType &arg,
 MatType &output_g) " ";
 
-%feature("docstring")  densify(const MatType &x) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::nnz() const  "
 
-Make the matrix dense if not already.
-
-";
-
-%feature("docstring")  densify(const MatType &x, const MatType &val) "
-
-Make the matrix dense and assign nonzeros to a value.
+Get the number of (structural) non-zero elements.
 
 ";
 
@@ -5900,6 +5936,12 @@ taken from an existing matrix.
 
 ";
 
+%feature("docstring")  dependsOn(const MatType &f, const MatType &arg) "
+
+Check if expression depends on the argument The argument must be symbolic.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::row(int el) const
 "
 
@@ -5907,20 +5949,27 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  extractShared(std::vector< MatType > &ex,
-std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
-&v_prefix="v_", const std::string &v_suffix="") "
+%feature("docstring")  pinv(const MatType &A) "
 
-Extract shared subexpressions from an set of expressions.
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+
+pinv(A)' = (AA')^(-1) A
+
+If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+
+pinv(A) = (A'A)^(-1) A'
 
 ";
 
-%feature("docstring")  extractShared(const std::vector< MatType > &ex,
-std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
-MatType > &vdef, const std::string &v_prefix="v_", const std::string
-&v_suffix="") "
+%feature("docstring")  pinv(const MatType &A, const std::string &lsolver,
+const Dict &dict=Dict()) "
 
-Extract shared subexpressions from an set of expressions.
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 
 ";
 
@@ -5948,9 +5997,11 @@ one.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::size1() const  "
+%feature("docstring")  casadi::GenericMatrix< MatType >::rank1(const MatType
+&A, const MatType &alpha, const MatType &x, const MatType &y) "
 
-Get the first dimension (i.e. number of rows)
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
+outer_prod(x, x)
 
 ";
 
@@ -6694,14 +6745,13 @@ Get the sparsity pattern.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::isSlice(bool ind1=false)
-const  "
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::bilin(const Matrix< DataType > &A, const Matrix< DataType > &x, const
+Matrix< DataType > &y) "
 
-Is the Matrix a Slice (only for IM)
+Matrix power x^n.
 
 ";
-
-%feature("docstring")  casadi::Matrix< int >::isSlice(bool ind1) const " ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::dim()
 const "
@@ -6820,6 +6870,15 @@ Check if the matrix expression is dense.
 Get the number of non-zeros in the lower triangular half.
 
 ";
+
+%feature("docstring")  casadi::Matrix< DataType >::isSlice(bool ind1=false)
+const  "
+
+Is the Matrix a Slice (only for IM)
+
+";
+
+%feature("docstring")  casadi::Matrix< int >::isSlice(bool ind1) const " ";
 
 %feature("docstring")  casadi::Matrix< DataType >::reserve(int nnz) " ";
 
@@ -7001,6 +7060,15 @@ zero.
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< DataType >
+>::rank1(const Matrix< DataType > &A, const Matrix< DataType > &alpha, const
+Matrix< DataType > &x, const Matrix< DataType > &y) "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
+outer_prod(x, x)
 
 ";
 
@@ -8556,6 +8624,21 @@ Create sparse matrix constant (also implicit type conversion)
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MX  >::rank1(const MX &A,
+const MX &alpha, const MX &x, const MX &y) "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
+outer_prod(x, x)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::bilin(const MX &A,
+const MX &x, const MX &y) "
+
+Matrix power x^n.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MX  >::nnz_lower() const "
 
 Get the number of non-zeros in the lower triangular half.
@@ -9076,6 +9159,9 @@ Return a string with a description (for SWIG)
 
 
 // File: classcasadi_1_1QpToNlp.xml
+
+
+// File: classcasadi_1_1Rank1.xml
 
 
 // File: classcasadi_1_1RealtypeSX.xml
@@ -11135,6 +11221,9 @@ outer product mul(x, trans(x)) to A.
 
 ";
 
+%feature("docstring")  casadi::casadi_rank1(real_t *A, const int *sp_A,
+real_t alpha, const real_t *x, const real_t *y) " [INTERNAL] ";
+
 %feature("docstring")  casadi::swapIndices(const std::vector< std::vector< T
 > > &m) "
 
@@ -11794,12 +11883,6 @@ Get typename.
 
 ";
 
-%feature("docstring")  casadi::casadi_qform(const real_t *A, const int
-*sp_A, const real_t *x) " [INTERNAL]  Calculates dot(x, mul(A, x))/2. A
-assumed to be symmetric. Only the upper triangular half of A is considered.
-
-";
-
 %feature("docstring")  casadi::collocationInterpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &OUTPUT,
 std::vector< double > &OUTPUT) "
@@ -12007,6 +12090,12 @@ Solve a system of equation using an LU-factorized matrix (lapack)
 
 ";
 
+%feature("docstring")  casadi::casadi_bilin(const real_t *A, const int
+*sp_A, const real_t *x, const real_t *y) " [INTERNAL]  Calculates dot(x,
+mul(A, y))
+
+";
+
 %feature("docstring")  casadi::casadi_trans(const real_t *x, const int
 *sp_x, real_t *y, const int *sp_y, int *tmp) " [INTERNAL]  TRANS: y <-
 trans(x)
@@ -12065,6 +12154,7 @@ Get NLP solver input scheme name by index.
 
 ";
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -12324,6 +12414,8 @@ Joel Andersson
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 %feature("docstring")  casadi::casadi_densify(const real1_t *x, const int
 *sp_x, real2_t *y, int tr) " [INTERNAL]  Convert sparse to dense.
 
@@ -12341,6 +12433,9 @@ Joel Andersson
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
