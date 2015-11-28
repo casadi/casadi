@@ -90,7 +90,7 @@ namespace casadi {
 
   void QpToNlp::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Inputs
-    const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_, *lam_x0_;
+    const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_;
     // Outputs
     double *x_, *f_, *lam_a_, *lam_x_;
 

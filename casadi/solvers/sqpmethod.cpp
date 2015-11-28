@@ -821,9 +821,6 @@ namespace casadi {
       // Quich finish if no constraints
       if (ng_==0) return;
 
-      // Get function
-      Function& jacG = this->jacG();
-
       // Inputs
       fill_n(arg_, jacG_.n_out(), nullptr);
       arg_[NL_X] = x;

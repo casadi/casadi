@@ -364,7 +364,6 @@ namespace casadi {
       }
 
       // Evaluate the function
-      FunctionInternal *f = f_.operator->();
       f_(arg1, res1, iw, w, 0);
 
       // Sum results from temporary storage to accumulator

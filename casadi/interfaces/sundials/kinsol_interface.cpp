@@ -107,9 +107,6 @@ namespace casadi {
       strategy_ = KIN_NONE;
     }
 
-    // Return flag
-    int flag;
-
     // Use exact Jacobian?
     exact_jacobian_ = option("exact_jacobian");
 

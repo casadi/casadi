@@ -141,7 +141,6 @@ namespace casadi {
   }
 
   void CsparseInterface::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
-    double time_start=0;
     casadi_assert(N_!=0);
 
     double *t = &temp_.front();

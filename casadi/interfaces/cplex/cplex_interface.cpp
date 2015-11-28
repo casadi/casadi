@@ -173,10 +173,6 @@ namespace casadi {
   }
 
   void CplexInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    // Number of inputs and outputs
-    int num_in = n_in();
-    int num_out = n_out();
-
     // Pass the inputs to the function
     for (int i=0; i<n_in(); ++i) {
       casadi_copy(arg[i], nnz_in(i), input(i).ptr());

@@ -31,7 +31,7 @@ namespace casadi {
   Callback::Callback() {
   }
 
-  Callback::Callback(const Callback& obj) {
+  Callback::Callback(const Callback& obj) : Function(obj) {
     casadi_error("Callback objects cannot be copied");
   }
 

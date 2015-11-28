@@ -114,9 +114,7 @@ intg.evaluate();
 diary OFF
 
 logged = fileread('diary');
-
 assert(~isempty(strfind(logged,'1')))
-assert(~isempty(strfind(logged,'::init')))
 
 
 clear
