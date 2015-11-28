@@ -218,8 +218,12 @@ namespace casadi {
   }
 
   void* ClangCompiler::getFunction(const std::string& symname) {
-    return reinterpret_cast<void*>((intptr_t)executionEngine_
-                                   ->getPointerToFunction(module_->getFunction(symname)));
+    llvm::Function* f = module_->getFunction(symname);
+    if (f) {
+      return executionEngine_->getPointerToFunction(f);
+    } else {
+      return 0;
+    }
   }
 
   std::vector<std::pair<std::string, bool> > ClangCompiler::
