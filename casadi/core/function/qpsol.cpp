@@ -33,38 +33,31 @@ namespace casadi {
   Qpsol::Qpsol(const std::string& name,
                const std::map<std::string, Sparsity> &st)
   : FunctionInternal(name) {
-
-    st_.resize(QP_STRUCT_NUM);
-    for (std::map<std::string, Sparsity>::const_iterator i=st.begin(); i!=st.end(); ++i) {
+    for (auto i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {
-        st_[QP_STRUCT_A]=i->second;
+        A_ = i->second;
       } else if (i->first=="h") {
-        st_[QP_STRUCT_H]=i->second;
+        H_ = i->second;
       } else {
         casadi_error("Unrecognized field in QP structure: " << i->first);
       }
     }
 
-    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
-                                                       "lp", true);
+    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "", "lp", true);
+    n_ = H_.size2();
+    nc_ = A_.isNull() ? 0 : A_.size1();
 
-    const Sparsity& A = st_[QP_STRUCT_A];
-    const Sparsity& H = st_[QP_STRUCT_H];
-
-    n_ = H.size2();
-    nc_ = A.isNull() ? 0 : A.size1();
-
-    if (!A.isNull()) {
-      casadi_assert_message(A.size2()==n_,
+    if (!A_.isNull()) {
+      casadi_assert_message(A_.size2()==n_,
         "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
         << std::endl <<
-        "H: " << H.dim() << " - A: " << A.dim() << std::endl <<
-        "We need: H.size2()==A.size2()" << std::endl);
+        "H: " << H_.dim() << " - A: " << A_.dim() << std::endl <<
+        "We need: H_.size2()==A_.size2()" << std::endl);
     }
 
-    casadi_assert_message(H.is_symmetric(),
+    casadi_assert_message(H_.is_symmetric(),
       "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
-      "H: " << H.dim() <<
+      "H: " << H_.dim() <<
       "We need H square & symmetric" << std::endl);
 
     // Sparsity
@@ -87,9 +80,9 @@ namespace casadi {
     case QPSOL_UBA:
       return get_sparsity_out(QPSOL_LAM_A);
     case QPSOL_A:
-      return st_[QP_STRUCT_A];
+      return A_;
     case QPSOL_H:
-      return st_[QP_STRUCT_H];
+      return H_;
     case QPSOL_NUM_IN: break;
     }
     return Sparsity();

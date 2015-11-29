@@ -41,9 +41,7 @@ namespace casadi {
     QP_STRUCT_NUM};
 
   /// Internal class
-  class CASADI_EXPORT
-  Qpsol : public FunctionInternal,
-          public PluginInterface<Qpsol> {
+  class CASADI_EXPORT Qpsol : public FunctionInternal, public PluginInterface<Qpsol> {
   public:
 
     // Constructor
@@ -96,7 +94,7 @@ namespace casadi {
   protected:
 
     /// Problem structure
-    std::vector<Sparsity> st_;
+    Sparsity H_, A_;
 
     /// Number of decision variables
     int n_;
