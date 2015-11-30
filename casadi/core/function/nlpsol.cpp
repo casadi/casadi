@@ -444,16 +444,16 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  const double& Nlpsol::default_in(int ind) const {
+  double Nlpsol::default_in(int ind) const {
     switch (ind) {
     case NLPSOL_LBX:
     case NLPSOL_LBG:
-      return default_minf();
+      return -std::numeric_limits<double>::infinity();
     case NLPSOL_UBX:
     case NLPSOL_UBG:
-      return default_inf();
+      return std::numeric_limits<double>::infinity();
     default:
-      return default_zero();
+      return 0;
     }
   }
 

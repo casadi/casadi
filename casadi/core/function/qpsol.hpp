@@ -31,15 +31,6 @@
 
 /// \cond INTERNAL
 namespace casadi {
-  /// Structure specification of a QP
-  enum QPStruct {
-    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-    /// The matrix is assumed to be symmetrical.
-    QP_STRUCT_H,
-    /// The matrix A: sparse, (nc x n) - product with x must be dense.
-    QP_STRUCT_A,
-    QP_STRUCT_NUM};
-
   /// Internal class
   class CASADI_EXPORT Qpsol : public FunctionInternal, public PluginInterface<Qpsol> {
   public:
@@ -89,7 +80,7 @@ namespace casadi {
     static std::string shortname() { return "qpsol";}
 
     /** \brief Get default input value */
-    virtual const double& default_in(int ind) const;
+    virtual double default_in(int ind) const;
 
   protected:
 

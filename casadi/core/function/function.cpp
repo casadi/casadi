@@ -283,10 +283,7 @@ namespace casadi {
 
   vector<const double*> Function::buf_in(Function::MapArg arg) const {
     // Return value (RVO)
-    vector<const double*> ret(sz_arg());
-
-    // Get default values
-    for (int i=0; i<n_in(); ++i) ret[i] = &default_in(i);
+    vector<const double*> ret(sz_arg(), 0);
 
     // Read inputs
     for (auto i=arg.begin(); i!=arg.end(); ++i) {
@@ -314,10 +311,7 @@ namespace casadi {
 
   vector<const double*> Function::buf_in(Function::L2dArg arg) const {
     // Return value (RVO)
-    vector<const double*> ret(sz_arg());
-
-    // Get default values
-    for (int i=0; i<n_in(); ++i) ret[i] = &default_in(i);
+    vector<const double*> ret(sz_arg(), 0);
 
     // Read inputs
     for (auto i=arg.begin(); i!=arg.end(); ++i) {
@@ -1025,7 +1019,7 @@ namespace casadi {
     return callMap(arg, always_inline, never_inline);
   }
 
-  const double& Function::default_in(int ind) const {
+  double Function::default_in(int ind) const {
     return (*this)->default_in(ind);
   }
 

@@ -328,7 +328,7 @@ namespace casadi {
     std::string description_out(int ind) const;
 
     /** \brief Get default input value (NOTE: constant reference) */
-    const double& default_in(int ind) const;
+    double default_in(int ind) const;
 
     /** \brief Get sparsity of a given input */
     /// @{

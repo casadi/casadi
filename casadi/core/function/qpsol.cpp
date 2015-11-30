@@ -135,16 +135,16 @@ namespace casadi {
 
   const std::string Qpsol::infix_ = "qpsol";
 
-  const double& Qpsol::default_in(int ind) const {
+  double Qpsol::default_in(int ind) const {
     switch (ind) {
     case QPSOL_LBX:
     case QPSOL_LBA:
-      return default_minf();
+      return -std::numeric_limits<double>::infinity();
     case QPSOL_UBX:
     case QPSOL_UBA:
-      return default_inf();
+      return std::numeric_limits<double>::infinity();
     default:
-      return default_zero();
+      return 0;
     }
   }
 

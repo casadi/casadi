@@ -626,11 +626,8 @@ namespace casadi {
     }
 
     /** \brief Get default input value */
-    static const double& default_zero();
-    static const double& default_inf();
-    static const double& default_minf();
-    virtual const double& default_in(int ind) const {
-      return default_zero();
+    virtual double default_in(int ind) const {
+      return 0;
     }
 
     /** \brief Get sparsity of a given input */
