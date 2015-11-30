@@ -110,14 +110,6 @@
 <tr><td>GRADF_G</td><td></td><td>Constraint function.</td></tr>
 </table>
 */
-/** \defgroup scheme_QPStruct
-<a name='schemes'></a><table>
-<caption>Struct scheme: casadi::QPStruct  ( = 2) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QP_STRUCT_H</td><td></td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
-<tr><td>QP_STRUCT_A</td><td></td><td>The matrix A: sparse, (nc x n) - product with x must be dense.</td></tr>
-</table>
-*/
 /** \defgroup scheme_IntegratorInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::IntegratorInput  (INTEGRATOR_NUM_IN = 6) []</caption>
