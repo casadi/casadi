@@ -31,7 +31,7 @@
 
 // GUROBI header
 extern "C" {
-#include "gurobi_c.h"
+#include "gurobi_c.h" // NOLINT(build/include)
 }
 
 /** \defgroup plugin_Qpsol_gurobi
