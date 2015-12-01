@@ -1695,6 +1695,7 @@ namespace casadi {
     M p = qp.in[NL_P];
     M f = qp.out[NL_F];
     M g = qp.out[NL_G];
+    if (g.is_empty(true)) g = M(0, 1); // workaround
 
     // Gradient of the objective: gf == Hx + g
     M gf = M::gradient(f, x);
