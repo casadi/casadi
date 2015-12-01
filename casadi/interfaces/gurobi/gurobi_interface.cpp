@@ -71,6 +71,7 @@ namespace casadi {
     alloc_w(n_, true); // val
     alloc_iw(n_, true); // ind
     alloc_iw(n_, true); // ind2
+    alloc_iw(n_, true); // tr_ind
   }
 
   void GurobiInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
@@ -95,6 +96,7 @@ namespace casadi {
     double *val=w; w+=n_;
     int *ind=iw; iw+=n_;
     int *ind2=iw; iw+=n_;
+    int *tr_ind=iw; iw+=n_;
 
     // Greate an empty model
     GRBmodel *model = 0;
@@ -145,24 +147,22 @@ namespace casadi {
 
       // Add constraints
       const int *A_colind=sparsity_in(QPSOL_A).colind(), *A_row=sparsity_in(QPSOL_A).row();
+      casadi_copy(A_colind, n_, tr_ind);
       for (int i=0; i<nc_; ++i) {
         // Get bounds
         double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
 //        if (isinf(lb)) lb = -GRB_INFINITY;
 //        if (isinf(ub)) ub =  GRB_INFINITY;
 
-        // Constraint nonzero indices
-        int numnz = A_colind[1]-A_colind[0];
-        casadi_copy(A_row, numnz, ind);
-        A_colind++;
-        A_row += numnz;
-
         // Constraint nonzeros
-        if (a) {
-          casadi_copy(a, numnz, val);
-          a += numnz;
-        } else {
-          casadi_fill(val, numnz, 0.);
+        int numnz = 0;
+        for (int j=0; j<n_; ++j) {
+          if (tr_ind[j]<A_colind[j+1] && A_row[tr_ind[j]]==i) {
+            ind[numnz] = j;
+            val[numnz] = a ? a[tr_ind[j]] : 0;
+            numnz++;
+            tr_ind[j]++;
+          }
         }
 
         // Pass to model

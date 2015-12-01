@@ -664,7 +664,7 @@ namespace casadi {
 
   size_t Function::sz_res() const { return (*this)->sz_res();}
 
-  size_t Function::sz_iw() const { return (*this)->sz_w();}
+  size_t Function::sz_iw() const { return (*this)->sz_iw();}
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
