@@ -2257,7 +2257,7 @@ namespace casadi {
           s << "  if (--resc>=0) ";
         }
         // Create and get pointer
-        s << "res[" << i << "] = w+" << g.to_string(offset) << endl;
+        s << "res[" << i << "] = w+" << g.to_string(offset) << ";" << endl;
         offset += output(i).nnz();
       }
 
