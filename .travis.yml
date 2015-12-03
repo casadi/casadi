@@ -227,7 +227,8 @@ before_install:
   - |
     if [ $NEEDMATLAB ]
     then
-      travis_retry testbot/recipes/fetch.sh swig_matlab.tar.gz && mkdir swig_matlab && tar -xf swig_matlab.tar.gz -C swig_matlab && rm swig_matlab.tar.gz
+      swig_matlab_file=`python testbot/helpers/gitmatch.py testbot/recipes/swig_matlab.yaml /home/travis/build/casadi/casadi`
+      travis_retry testbot/recipes/fetch.sh ${swig_matlab_file}.tar.gz && mkdir swig_matlab && tar -xf ${swig_matlab_file}.tar.gz -C swig_matlab && rm ${swig_matlab_file}.tar.gz
       pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig_matlab  swig-matlab-install  && popd
     else
       travis_retry testbot/recipes/fetch.sh swig.tar.gz && mkdir swig && tar -xf swig.tar.gz -C swig && rm swig.tar.gz
