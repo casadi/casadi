@@ -164,6 +164,7 @@ matrix:
       before_install:
         - brew update
         - brew tap homebrew/science
+        - brew outdated swig || brew install swig
         #- brew install swig pkg-config
         #- brew doctor
         - sudo easy_install pip
