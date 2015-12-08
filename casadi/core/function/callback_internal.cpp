@@ -31,15 +31,6 @@ namespace casadi {
   CallbackInternal::
   CallbackInternal(const std::string& name, Callback *self)
     : FunctionInternal(name), self_(self), own_(false) {
-    ibuf_.resize(self_->get_n_in());
-    obuf_.resize(self_->get_n_out());
-    for (int k=0; k<ibuf_.size(); ++k) {
-      input(k) = DM::zeros(self_->get_input_sparsity(k));
-    }
-
-    for (int k=0; k<obuf_.size(); ++k) {
-      output(k) = DM::zeros(self_->get_output_sparsity(k));
-    }
   }
 
   CallbackInternal::~CallbackInternal() {

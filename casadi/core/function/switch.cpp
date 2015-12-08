@@ -120,13 +120,6 @@ namespace casadi {
     // Illegal to pass only "null" functions
     casadi_assert_message(num_in>=0, "All functions are null");
 
-    // Allocate input and output buffers
-    ibuf_.resize(1+num_in);
-    input(0) = 0; // conditional
-    for (int i=0; i<num_in; ++i) input(i+1) = DM::zeros(sp_in[i]);
-    obuf_.resize(num_out);
-    for (int i=0; i<num_out; ++i) output(i) = DM::zeros(sp_out[i]);
-
     // Call the initialization method of the base class
     FunctionInternal::init();
 
@@ -141,14 +134,14 @@ namespace casadi {
 
       // Add size for input buffers
       for (int i=1; i<n_in(); ++i) {
-        const Sparsity& s = fk.input(i-1).sparsity();
-        if (s!=input(i).sparsity()) sz_w += s.nnz();
+        const Sparsity& s = fk.sparsity_in(i-1);
+        if (s!=sparsity_in(i)) sz_w += s.nnz();
       }
 
       // Add size for output buffers
       for (int i=0; i<n_out(); ++i) {
-        const Sparsity& s = fk.output(i).sparsity();
-        if (s!=output(i).sparsity()) sz_w += s.nnz();
+        const Sparsity& s = fk.sparsity_out(i);
+        if (s!=sparsity_out(i)) sz_w += s.nnz();
       }
 
       // Make sure enough work for this
@@ -165,14 +158,14 @@ namespace casadi {
 
     // Input buffers
     for (int i=1; i<n_in(); ++i) {
-      const Sparsity& s = fk.input(i-1).sparsity();
-      casadi_assert_message(s==input(i).sparsity(), "Not implemented");
+      const Sparsity& s = fk.sparsity_in(i-1);
+      casadi_assert_message(s==sparsity_in(i), "Not implemented");
     }
 
     // Output buffers
     for (int i=0; i<n_out(); ++i) {
-      const Sparsity& s = fk.output(i).sparsity();
-      casadi_assert_message(s==output(i).sparsity(), "Not implemented");
+      const Sparsity& s = fk.sparsity_out(i);
+      casadi_assert_message(s==sparsity_out(i), "Not implemented");
     }
 
     // Evaluate the corresponding function

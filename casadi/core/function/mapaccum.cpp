@@ -65,57 +65,23 @@ namespace casadi {
 
   void Mapaccum::init() {
 
-    int num_in = f_.n_in(), num_out = f_.n_out();
-
-    // Initialize the functions, get input and output sparsities
-    // Input and output sparsities
-
-    ibuf_.resize(num_in);
-    obuf_.resize(num_out);
-
-    for (int i=0;i<num_in;++i) {
-      // Sparsity of the original input
-      Sparsity in_sp = f_.input(i).sparsity();
-
-      if (!input_accum_[i]) in_sp = repmat(in_sp, 1, n_);
-
-      // Allocate space for input
-      input(i) = DM::zeros(in_sp);
-    }
-
-    for (int i=0;i<num_out;++i) {
-      // Sparsity of the original output
-      Sparsity out_sp = f_.output(i).sparsity();
-
-      out_sp = repmat(out_sp, 1, n_);
-
-      // Allocate space for output
-      output(i) = DM::zeros(out_sp);
-    }
-
-    step_in_.resize(num_in, 0);
-    step_out_.resize(num_out, 0);
-
-    for (int i=0;i<num_in;++i) {
-      step_in_[i] = f_.input(i).nnz();
-    }
-
-    for (int i=0;i<num_out;++i) {
-      step_out_[i] = f_.output(i).nnz();
-    }
-
     // Call the initialization method of the base class
     FunctionInternal::init();
+
+    int num_in = f_.n_in(), num_out = f_.n_out();
+    step_in_.resize(num_in, 0);
+    step_out_.resize(num_out, 0);
+    for (int i=0; i<num_in; ++i) step_in_[i] = f_.nnz_in(i);
+    for (int i=0; i<num_out; ++i) step_out_[i] = f_.nnz_out(i);
 
     // We cannot rely on the output buffer to use as accumulator:
     // a null-pointer may be passed as output
     nnz_accum_ = 0;
-    for (int i=0;i<num_in;++i) {
+    for (int i=0; i<num_in; ++i) {
       if (input_accum_[i]) nnz_accum_+= step_in_[i];
     }
 
     // We need double this space: one end to serve as input, one end to dump the output
-
     alloc_w(f_.sz_w()+2*nnz_accum_);
     alloc_iw(f_.sz_iw());
     alloc_arg(2*f_.sz_arg());

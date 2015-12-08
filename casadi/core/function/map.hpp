@@ -209,6 +209,18 @@ namespace casadi {
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return fwd; }
 
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int ind) const {
+      return repeat_in_.at(ind) ? repmat(f_.sparsity_in(ind), 1, n_)
+        : f_.sparsity_in(ind);
+    }
+    virtual Sparsity get_sparsity_out(int ind) const {
+      return repeat_out_.at(ind) ? repmat(f_.sparsity_out(ind), 1, n_)
+        : f_.sparsity_out(ind);
+    }
+    /// @}
+
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);

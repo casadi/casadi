@@ -97,21 +97,6 @@ namespace casadi {
   }
 
   void MapSerial::init() {
-
-    // Initialize the functions, get input and output sparsities
-    // Input and output sparsities
-    ibuf_.resize(n_in_);
-    obuf_.resize(n_out_);
-
-    for (int i=0;i<n_in_;++i) {
-      // Allocate space for input
-      input(i) = DM::zeros(repmat(f_.sparsity_in(i), 1, n_));
-    }
-
-    for (int i=0;i<n_out_;++i) {
-      output(i) = DM::zeros(repmat(f_.sparsity_out(i), 1, n_));
-    }
-
     // Call the initialization method of the base class
     MapBase::init();
 
@@ -266,50 +251,19 @@ namespace casadi {
 
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities
-
-    ibuf_.resize(num_in);
-    obuf_.resize(num_out);
-
-    for (int i=0;i<num_in;++i) {
-      // Sparsity of the original input
-      Sparsity in_sp = f_.sparsity_in(i);
-
-      // Repeat if requested
-      if (repeat_in_[i]) in_sp = repmat(in_sp, 1, n_);
-
-      // Allocate space for input
-      input(i) = DM::zeros(in_sp);
-    }
-
-    for (int i=0;i<num_out;++i) {
-      // Sparsity of the original output
-      Sparsity out_sp = f_.sparsity_out(i);
-
-      // Repeat if requested
-      if (repeat_out_[i]) out_sp = repmat(out_sp, 1, n_);
-
-      // Allocate space for output
-      output(i) = DM::zeros(out_sp);
-    }
-
     step_in_.resize(num_in, 0);
     step_out_.resize(num_out, 0);
-
-    for (int i=0;i<num_in;++i) {
-      if (repeat_in_[i])
-        step_in_[i] = f_.input(i).nnz();
+    for (int i=0; i<num_in;++i) {
+      if (repeat_in_[i]) step_in_[i] = f_.nnz_in(i);
     }
-
-    for (int i=0;i<num_out;++i) {
-      step_out_[i] = f_.output(i).nnz();
-    }
+    for (int i=0; i<num_out; ++i) step_out_[i] = f_.nnz_out(i);
 
     // Call the initialization method of the base class
     MapBase::init();
 
     // Allocate some space to evaluate each function to.
     nnz_out_ = 0;
-    for (int i=0;i<num_out;++i) {
+    for (int i=0; i<num_out; ++i) {
       if (!repeat_out_[i]) nnz_out_+= step_out_[i];
     }
 

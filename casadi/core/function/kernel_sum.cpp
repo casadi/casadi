@@ -52,29 +52,13 @@ namespace casadi {
 
     int num_in = f_.n_in(), num_out = f_.n_out();
 
-    ibuf_.resize(num_in-1);
-    obuf_.resize(num_out);
-
-    input(0) = DM::zeros(size_);
-    input(1) = DM::zeros(2, n_);
-
-    for (int i=0;i<num_in-3;++i) {
-      // Allocate space for input
-      input(2+i) = DM::zeros(f_.sparsity_in(i+3));
-    }
-
-    for (int i=0;i<num_out;++i) {
-      // Allocate space for output
-      output(i) = DM::zeros(f_.sparsity_out(i));
-    }
-
     // Call the initialization method of the base class
     FunctionInternal::init();
 
     step_out_.resize(num_out, 0);
 
-    for (int i=0;i<num_out;++i) {
-      step_out_[i] = f_.output(i).nnz();
+    for (int i=0; i<num_out; ++i) {
+      step_out_[i] = f_.nnz_out(i);
     }
 
     // Allocate some space to evaluate each function to.
