@@ -107,9 +107,6 @@ namespace casadi {
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
-    /** \brief  Reset the sparsity propagation */
-    virtual void spInit(bool fwd) {}
-
     /** \brief  Evaluate numerically */
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 

@@ -225,9 +225,6 @@ class CASADI_EXPORT SXFunction :
   /// Is the class able to propagate seeds through the algorithm?
   virtual bool spCanEvaluate(bool fwd) { return true;}
 
-  /// Reset the sparsity propagation
-  virtual void spInit(bool fwd);
-
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   virtual Function getFullJacobian();
 

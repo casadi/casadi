@@ -1827,7 +1827,6 @@ namespace casadi {
 
     // Construct a temporary algorithm
     Function temp("tmp", {arg}, {*this});
-    temp.spInit(true);
 
     bvec_t* input_ =  get_bvec_t(temp.input().data());
     // Make a column with all variables active

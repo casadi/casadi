@@ -461,9 +461,6 @@ namespace casadi {
     // Use forward mode?
     bool use_fwd = w*nsweep_fwd <= (1-w)*nsweep_adj;
 
-    // Reset the virtual machine
-    spInit(use_fwd);
-
     // Clear the forward seeds/adjoint sensitivities
     for (int ind=0; ind<n_in(); ++ind) {
       vector<double> &v = ibuf_[ind].data();
@@ -628,9 +625,6 @@ namespace casadi {
       Sparsity D = r.star_coloring();
 
       casadi_msg("Star coloring on " << r.dim() << ": " << D.size2() << " <-> " << D.size1());
-
-      // Reset the virtual machine
-      spInit(true);
 
       // Get seeds and sensitivities
       bvec_t* input_v = get_bvec_t(ibuf_[iind].data());
@@ -909,9 +903,6 @@ namespace casadi {
         casadi_msg("Adjoint mode chosen (adj cost: " << w*D1.size2()*fwd_cost << ", adj cost: "
                    << (1-w)*D2.size2()*adj_cost << ")");
       }
-
-      // Reset the virtual machine
-      spInit(use_fwd);
 
       // Get seeds and sensitivities
       bvec_t* input_v = get_bvec_t(ibuf_[iind].data());
@@ -2251,7 +2242,6 @@ namespace casadi {
     }
 
     // Propagate seeds
-    spInit(true); // NOTE: should only be done once
     if (spCanEvaluate(true)) {
       spEvaluate(true);
     } else {
@@ -2301,7 +2291,6 @@ namespace casadi {
     }
 
     // Propagate seeds
-    spInit(false); // NOTE: should only be done once
     if (spCanEvaluate(false)) {
       spEvaluate(false);
     } else {

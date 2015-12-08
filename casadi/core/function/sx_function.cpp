@@ -749,9 +749,6 @@ namespace casadi {
     if (verbose()) userOut() << "SXFunction::evalAdj end" << endl;
   }
 
-  void SXFunction::spInit(bool fwd) {
-  }
-
   void SXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // Propagate sparsity forward
     for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {

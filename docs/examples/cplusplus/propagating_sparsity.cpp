@@ -90,7 +90,6 @@ int main(){
     f_out[0] = 0;
     
     // Propagate dependencies
-    f.spInit(fwd);
     f.spEvaluate(fwd);
 
     // Print the result
@@ -112,7 +111,6 @@ int main(){
     f_in[2] = 0;
     
     // Propagate dependencies
-    f.spInit(fwd);
     f.spEvaluate(fwd);
 
     // Print the result

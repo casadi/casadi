@@ -684,10 +684,6 @@ namespace casadi {
     return (*this)->spCanEvaluate(fwd);
   }
 
-  void Function::spInit(bool fwd) {
-    (*this)->spInit(fwd);
-  }
-
   Function Function::derivative(int nfwd, int nadj) {
     // Quick return
     if (nfwd==0 && nadj==0) return *this;

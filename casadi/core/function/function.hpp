@@ -928,11 +928,6 @@ namespace casadi {
      * (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);
 
-    /** \brief Reset the sparsity propagation
-     *
-     * (for usage, see the example propagating_sparsity.cpp) */
-    void spInit(bool fwd);
-
     /** \brief Propagate the sparsity pattern through a set of directional
      *
      * derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */

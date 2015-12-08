@@ -154,12 +154,6 @@ namespace casadi {
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd) { return true;}
 
-    /// Reset the sparsity propagation
-    virtual void spInit(bool fwd);
-
-    /// Print work vector
-    void printWork(std::ostream &stream=casadi::userOut());
-
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;
 

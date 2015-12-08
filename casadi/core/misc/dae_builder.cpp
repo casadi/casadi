@@ -1186,9 +1186,6 @@ namespace casadi {
     bvec_t* f_sdot = reinterpret_cast<bvec_t*>(f.input().ptr());
     bvec_t* f_dae = reinterpret_cast<bvec_t*>(f.output().ptr());
 
-    // First find out which equations depend on sdot
-    f.spInit(true);
-
     // Seed all inputs
     std::fill(f_sdot, f_sdot+ns, bvec_t(1));
 
@@ -1206,9 +1203,6 @@ namespace casadi {
         new_alg.push_back(this->dae[i]);
       }
     }
-
-    // Now find out what sdot enter in the equations
-    f.spInit(false);
 
     // Seed all outputs
     std::fill(f_dae, f_dae+ns, bvec_t(1));

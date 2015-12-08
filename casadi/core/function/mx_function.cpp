@@ -436,9 +436,6 @@ namespace casadi {
     }
   }
 
-  void MXFunction::spInit(bool fwd) {
-  }
-
   void MXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
@@ -1006,9 +1003,6 @@ namespace casadi {
     // Create function
     return Function("expand_" + name_, arg, res,
                     Dict{{"input_scheme", ischeme_}, {"output_scheme", oscheme_}});
-  }
-
-  void MXFunction::printWork(ostream &stream) {
   }
 
   void MXFunction::generateDeclarations(CodeGenerator& g) const {
