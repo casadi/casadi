@@ -421,7 +421,6 @@ namespace casadi {
 
     // Allocate work vectors (symbolic/numeric)
     alloc_w(worksize);
-    alloc();
     s_work_.resize(worksize);
 
     // Reset the temporary variables
@@ -751,20 +750,6 @@ namespace casadi {
   }
 
   void SXFunction::spInit(bool fwd) {
-    // Quick return if just-in-time compilation for
-    //  sparsity pattern propagation, no work vector needed
-#ifdef WITH_OPENCL
-    if (just_in_time_sparsity_) {
-      return; // Quick return
-    }
-#endif // WITH_OPENCL
-
-    // We need a work array containing unsigned long rather than doubles.
-    // Since the two datatypes have the same size (64 bits)
-    // we can save overhead by reusing the double array
-    alloc();
-    bvec_t *iwork = get_bvec_t(w_tmp_);
-    if (!fwd) fill_n(iwork, sz_w(), bvec_t(0));
   }
 
   void SXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {

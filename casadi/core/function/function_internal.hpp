@@ -755,9 +755,6 @@ namespace casadi {
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f, bool persistent=false);
 
-    /** \brief Update lengths of temporary work vectors */
-    void alloc();
-
     /** \brief Does the solver require the allocation of a memory block */
     virtual bool has_mem() const {return false;}
 
@@ -885,13 +882,6 @@ namespace casadi {
                               int* iw, bvec_t* w, void* mem, bool tr, int nrhs);
     ///@}
 
-  protected:
-    /** \brief  Temporary vector needed for the evaluation (integer) */
-    std::vector<int> iw_tmp_;
-
-    /** \brief  Temporary vector needed for the evaluation (real) */
-    std::vector<double> w_tmp_;
-
   private:
     /** \brief Memory that is persistent during a call (but not between calls) */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;
@@ -996,12 +986,14 @@ namespace casadi {
 
     // Allocate results
     res.resize(n_out);
-    for (int i=0; i<n_out; ++i)
-      if (res[i].sparsity()!=sparsity_out(i))
+    for (int i=0; i<n_out; ++i) {
+      if (res[i].sparsity()!=sparsity_out(i)) {
         res[i] = Matrix<D>::zeros(sparsity_out(i));
+      }
+    }
 
     // Allocate temporary memory if needed
-    iw_tmp_.resize(sz_iw());
+    std::vector<int> iw_tmp(sz_iw());
     std::vector<D> w_tmp(sz_w());
 
     // Get pointers to input arguments
@@ -1013,7 +1005,7 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) resp[i]=getPtr(res[i]);
 
     // Call memory-less
-    _eval(getPtr(argp), getPtr(resp), getPtr(iw_tmp_), getPtr(w_tmp), 0);
+    _eval(getPtr(argp), getPtr(resp), getPtr(iw_tmp), getPtr(w_tmp), 0);
   }
 
   template<typename M>

@@ -434,9 +434,6 @@ namespace casadi {
   }
 
   void Function::evaluate() {
-    // Allocate temporary memory if needed
-    (*this)->alloc();
-
     // Get pointers to input arguments
     int n_in = this->n_in();
     vector<const double*> arg(sz_arg());
@@ -447,9 +444,12 @@ namespace casadi {
     vector<double*> res(sz_res());
     for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
 
+    // Temporary memory
+    std::vector<int> iw(sz_iw());
+    std::vector<double> w(sz_w());
+
     // Call memory-less
-    (*this)->eval(getPtr(arg), getPtr(res),
-                   getPtr((*this)->iw_tmp_), getPtr((*this)->w_tmp_), 0);
+    (*this)->eval(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
   }
 
   int Function::n_in() const {

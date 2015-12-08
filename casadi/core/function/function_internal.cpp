@@ -1293,11 +1293,9 @@ namespace casadi {
   }
 
   void FunctionInternal::spEvaluate(bool fwd) {
-    // Allocate temporary memory if needed
-    iw_tmp_.resize(sz_iw());
-    w_tmp_.resize(sz_w());
-    int *iw = getPtr(iw_tmp_);
-    bvec_t *w = reinterpret_cast<bvec_t*>(getPtr(w_tmp_));
+    // Allocate temporary memory
+    std::vector<int> iw(sz_iw());
+    std::vector<bvec_t> w(sz_w(), 0);
 
     // Get pointers to output arguments
     vector<bvec_t*> res(sz_res());
@@ -1309,14 +1307,14 @@ namespace casadi {
       for (int i=0; i<n_in(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
 
       // Call memory-less
-      spFwd(getPtr(arg), getPtr(res), iw, w, 0);
+      spFwd(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
     } else {
       // Get pointers to input arguments
       vector<bvec_t*> arg(sz_arg());
       for (int i=0; i<n_in(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
 
       // Call memory-less
-      spAdj(getPtr(arg), getPtr(res), iw, w, 0);
+      spAdj(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
     }
   }
 
@@ -2373,11 +2371,6 @@ namespace casadi {
     alloc_res(sz_res, persistent);
     alloc_iw(sz_iw, persistent);
     alloc_w(sz_w, persistent);
-  }
-
-  void FunctionInternal::alloc() {
-    iw_tmp_.resize(sz_iw());
-    w_tmp_.resize(sz_w());
   }
 
   // helper function for getSanitizedName

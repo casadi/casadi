@@ -437,9 +437,6 @@ namespace casadi {
   }
 
   void MXFunction::spInit(bool fwd) {
-    alloc();
-    bvec_t *iwork = get_bvec_t(w_tmp_);
-    fill(iwork+workloc_.front(), iwork+workloc_.back(), bvec_t(0));
   }
 
   void MXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
@@ -1012,11 +1009,6 @@ namespace casadi {
   }
 
   void MXFunction::printWork(ostream &stream) {
-    for (int k=0; k<workloc_.size()-1; ++k) {
-      vector<double>::const_iterator start=w_tmp_.begin() + workloc_[k];
-      vector<double>::const_iterator stop=w_tmp_.begin() + workloc_[k+1];
-      stream << "work[" << k << "] = " << vector<double>(start, stop) << endl;
-    }
   }
 
   void MXFunction::generateDeclarations(CodeGenerator& g) const {
