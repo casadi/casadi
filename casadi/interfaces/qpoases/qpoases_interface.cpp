@@ -154,15 +154,6 @@ namespace casadi {
       max_cputime_ = -1;
     }
 
-    // Create data for H if not dense
-    if (!input(QPSOL_H).sparsity().is_dense()) h_data_.resize(n_*n_);
-
-    // Create data for A
-    a_data_.resize(n_*nc_);
-
-    // Dual solution vector
-    dual_.resize(n_+nc_);
-
     // Create qpOASES instance
     if (qp_) delete qp_;
     if (nc_==0) {
@@ -207,45 +198,31 @@ namespace casadi {
 
     // Pass to qpOASES
     qp_->setOptions(ops);
+
+    // Allocate work vectors
+    alloc_w(n_*n_, true); // h
+    alloc_w(n_*nc_, true); // a
+    alloc_w(n_, true); // g
+    alloc_w(n_, true); // lbx
+    alloc_w(n_, true); // ubx
+    alloc_w(nc_, true); // lba
+    alloc_w(nc_, true); // uba
+    alloc_w(n_+nc_, true); // dual
   }
 
   void QpoasesInterface::eval(const double** arg,
                               double** res, int* iw, double* w, void* mem) {
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      casadi_copy(arg[i], nnz_in(i), input(i).ptr());
-    }
-
     if (inputs_check_) {
-      checkInputs(input(QPSOL_LBX).ptr(), input(QPSOL_UBX).ptr(),
-                  input(QPSOL_LBA).ptr(), input(QPSOL_UBA).ptr());
+      checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
     }
 
-    if (verbose()) {
-      userOut() << "LBX = " << input(QPSOL_LBX) << endl;
-      userOut() << "UBX = " << input(QPSOL_UBX) << endl;
-      userOut() << "LBA = " << input(QPSOL_LBA) << endl;
-      userOut() << "UBA = " << input(QPSOL_UBA) << endl;
-    }
+    // Get quadratic term
+    double* h=w; w += n_*n_;
+    casadi_densify(arg[QPSOL_H], sparsity_in(QPSOL_H), h, false);
 
-    // Get pointer to H
-    const double* h=0;
-    if (h_data_.empty()) {
-      // No copying needed
-      h = getPtr(input(QPSOL_H));
-    } else {
-      // First copy to dense array
-      input(QPSOL_H).get(h_data_);
-      h = getPtr(h_data_);
-    }
-
-    // Copy A to a row-major dense vector
-    const double* a = 0;
-    if (nc_>0) {
-      double* a_mutable = getPtr(a_data_);
-      input(QPSOL_A).get(a_mutable, true);
-      a = getPtr(a_data_);
-    }
+    // Get linear term
+    double* a = w; w += n_*nc_;
+    casadi_densify(arg[QPSOL_A], sparsity_in(QPSOL_A), a, true);
 
     // Maxiumum number of working set changes
     int nWSR = max_nWSR_;
@@ -253,11 +230,16 @@ namespace casadi {
     double *cputime_ptr = cputime<=0 ? 0 : &cputime;
 
     // Get the arguments to call qpOASES with
-    const double* g = getPtr(input(QPSOL_G));
-    const double* lb = getPtr(input(QPSOL_LBX));
-    const double* ub = getPtr(input(QPSOL_UBX));
-    const double* lbA = getPtr(input(QPSOL_LBA));
-    const double* ubA = getPtr(input(QPSOL_UBA));
+    double* g=w; w += n_;
+    casadi_copy(arg[QPSOL_G], n_, g);
+    double* lb=w; w += n_;
+    casadi_copy(arg[QPSOL_LBX], n_, lb);
+    double* ub=w; w += n_;
+    casadi_copy(arg[QPSOL_UBX], n_, ub);
+    double* lbA=w; w += nc_;
+    casadi_copy(arg[QPSOL_LBA], nc_, lbA);
+    double* ubA=w; w += nc_;
+    casadi_copy(arg[QPSOL_UBA], nc_, ubA);
 
     int flag;
     if (!called_once_) {
@@ -283,23 +265,18 @@ namespace casadi {
     }
 
     // Get optimal cost
-    output(QPSOL_COST).set(qp_->getObjVal());
+    if (res[QPSOL_COST]) *res[QPSOL_COST] = qp_->getObjVal();
 
     // Get the primal solution
-    qp_->getPrimalSolution(&output(QPSOL_X)->front());
+    if (res[QPSOL_X]) qp_->getPrimalSolution(res[QPSOL_X]);
 
     // Get the dual solution
-    qp_->getDualSolution(&dual_.front());
-
-    // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-    transform(dual_.begin(),   dual_.begin()+n_, output(QPSOL_LAM_X)->begin(),
-              negate<double>());
-    transform(dual_.begin()+n_, dual_.end(),     output(QPSOL_LAM_A)->begin(),
-              negate<double>());
-
-    // Get the outputs
-    for (int i=0; i<n_out(); ++i) {
-      casadi_copy(output(i).ptr(), nnz_out(i), res[i]);
+    if (res[QPSOL_LAM_X] || res[QPSOL_LAM_A]) {
+      double* dual=w; w += n_+nc_;
+      qp_->getDualSolution(dual);
+      casadi_scal(n_+nc_, -1., dual);
+      casadi_copy(dual, n_, res[QPSOL_LAM_X]);
+      casadi_copy(dual+n_, nc_, res[QPSOL_LAM_A]);
     }
   }
 

@@ -113,16 +113,18 @@ namespace casadi {
   void Qpsol::checkInputs(const double* lbx, const double* ubx,
                           const double* lba, const double* uba) const {
     for (int i=0; i<n_; ++i) {
-      casadi_assert_message(lbx[i] <= ubx[i],
+      double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
+      casadi_assert_message(lb <= ub,
                             "LBX[" << i << "] <= UBX[" << i << "] was violated. "
-                            << "Got LBX[" << i << "]=" << lbx[i] <<
-                            " and UBX[" << i << "] = " << ubx[i] << ".");
+                            << "Got LBX[" << i << "]=" << lb <<
+                            " and UBX[" << i << "] = " << ub << ".");
     }
     for (int i=0; i<nc_; ++i) {
-      casadi_assert_message(lba[i] <= uba[i],
+      double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
+      casadi_assert_message(lb <= ub,
                             "LBA[" << i << "] <= UBA[" << i << "] was violated. "
-                            << "Got LBA[" << i << "] = " << lba[i] <<
-                            " and UBA[" << i << "] = " << uba[i] << ".");
+                            << "Got LBA[" << i << "] = " << lb <<
+                            " and UBA[" << i << "] = " << ub << ".");
     }
   }
 

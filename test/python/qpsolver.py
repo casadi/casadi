@@ -44,8 +44,8 @@ if has_nlpsol("ipopt"):
 # if has_qpsol("ooqp"):
 #   qpsols.append(("ooqp",{},{}))
 
-# if has_qpsol("qpoases"):
-#   qpsols.append(("qpoases",{},{}))
+if has_qpsol("qpoases"):
+  qpsols.append(("qpoases",{},{}))
 
 # if has_qpsol("cplex"):
 #   qpsols.append(("cplex",{},{}))

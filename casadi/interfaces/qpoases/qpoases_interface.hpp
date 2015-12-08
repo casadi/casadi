@@ -108,13 +108,6 @@ namespace casadi {
     /// Has qpOASES been called once?
     bool called_once_;
 
-    /// Dense data for H and A
-    std::vector<double> h_data_;
-    std::vector<double> a_data_;
-
-    /// Temporary vector holding the dual solution
-    std::vector<double> dual_;
-
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
 
