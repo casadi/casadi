@@ -1309,103 +1309,6 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::spEvaluateViaJacSparsity(bool fwd) {
-    if (fwd) {
-      // Clear the outputs
-      for (int oind = 0; oind < n_out(); ++oind) {
-        // Get data array for output and clear it
-        bvec_t *outputd = get_bvec_t(output(oind).data());
-        fill_n(outputd, output(oind).nnz(), 0);
-      }
-    }
-
-    // Loop over inputs
-    for (int iind = 0; iind < n_in(); ++iind) {
-      // Skip if no seeds
-      if (fwd && input(iind).is_empty())
-        continue;
-
-      // Get data array for input
-      bvec_t *inputd = get_bvec_t(input(iind).data());
-
-      // Loop over outputs
-      for (int oind = 0; oind < n_out(); ++oind) {
-
-        // Skip if no seeds
-        if (!fwd && output(oind).is_empty())
-          continue;
-
-
-        // Save the seeds/sens (#1532)
-        // This code should stay in place until refactored away
-        std::vector<double> store_in(nnz_in());
-        std::vector<double> store_out(nnz_out());
-
-        int offset = 0;
-        for (int i=0;i<n_in();++i) {
-          std::copy(input(i).data().begin(), input(i).data().begin()+input(i).nnz(),
-            store_in.begin()+offset);
-          offset+=input(i).nnz();
-        }
-        offset = 0;
-        for (int i=0;i<n_out();++i) {
-          std::copy(output(i).data().begin(), output(i).data().begin()+output(i).nnz(),
-            store_out.begin()+offset);
-          offset+=output(i).nnz();
-        }
-
-
-        // Get the sparsity of the Jacobian block
-        Sparsity sp = sparsity_jac(iind, oind, true, false);
-        if (sp.isNull() || sp.nnz() == 0)
-          continue; // Skip if zero
-
-        // recover the seeds/sens
-        offset = 0;
-        for (int i=0;i<n_in();++i) {
-          std::copy(store_in.begin()+offset, store_in.begin()+offset+input(i).nnz(),
-            input(i).data().begin());
-          offset+=input(i).nnz();
-        }
-        offset = 0;
-        for (int i=0;i<n_out();++i) {
-          std::copy(store_out.begin()+offset, store_out.begin()+offset+output(i).nnz(),
-            output(i).data().begin());
-          offset+=output(i).nnz();
-        }
-
-        const int d1 = sp.size2();
-        //const int d2 = sp.size1();
-        const int* colind = sp.colind();
-        const int* row = sp.row();
-
-        // Get data array for output
-        bvec_t *outputd = get_bvec_t(output(oind).data());
-
-        // Carry out the sparse matrix-vector multiplication
-        for (int cc = 0; cc < d1; ++cc) {
-          for (int el = colind[cc]; el < colind[cc + 1]; ++el) {
-            // Get row
-            int rr = row[el];
-
-            // Propagate dependencies
-            if (fwd) {
-              outputd[rr] |= inputd[cc];
-            } else {
-              inputd[cc] |= outputd[rr];
-            }
-          }
-        }
-      }
-    }
-    if (!fwd) {
-      for (int oind=0; oind < n_out(); ++oind) {
-        vector<double> &w = output(oind).data();
-        fill_n(get_bvec_t(w), w.size(), bvec_t(0));
-      }
-    }
-  }
-
   Function FunctionInternal::jacobian(int iind, int oind, bool compact, bool symmetric) {
 
     // Return value
@@ -2213,103 +2116,71 @@ namespace casadi {
   }
 
   void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    // Number inputs and outputs
+    // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
 
-    // Pass/clear forward seeds/adjoint sensitivities
-    for (int i=0; i<n_in; ++i) {
-      // Input vector
-      bvec_t* input_i = reinterpret_cast<bvec_t*>(input(i).ptr());
-      if (arg[i]==0) {
-        // Set to zero if not used
-        fill_n(input_i, input(i).nnz(), 0);
-      } else {
-        copy(arg[i], arg[i]+input(i).nnz(), input_i);
+    // Loop over outputs
+    for (int oind=0; oind<n_out; ++oind) {
+      // Skip if nothing to assign
+      if (res[oind]==0 || nnz_out(oind)==0) continue;
+
+      // Clear result
+      casadi_fill(res[oind], nnz_out(oind), bvec_t(0));
+
+      // Loop over inputs
+      for (int iind=0; iind<n_in; ++iind) {
+        // Skip if no seeds
+        if (arg[iind]==0 || nnz_in(iind)==0) continue;
+
+        // Get the sparsity of the Jacobian block
+        Sparsity sp = sparsity_jac(iind, oind, true, false);
+        if (sp.isNull() || sp.nnz() == 0) continue; // Skip if zero
+
+        // Carry out the sparse matrix-vector multiplication
+        int d1 = sp.size2();
+        const int *colind = sp.colind(), *row = sp.row();
+        for (int cc=0; cc<d1; ++cc) {
+          for (int el = colind[cc]; el < colind[cc+1]; ++el) {
+            res[oind][row[el]] |= arg[iind][cc];
+          }
+        }
       }
     }
-
-    // Pass/clear adjoint seeds/forward sensitivities
-    for (int i=0; i<n_out; ++i) {
-      // Output vector
-      bvec_t* output_i = reinterpret_cast<bvec_t*>(output(i).ptr());
-      if (res[i]==0) {
-        // Set to zero if not used
-        fill_n(output_i, output(i).nnz(), 0);
-      } else {
-        copy(res[i], res[i]+output(i).nnz(), output_i);
-      }
-    }
-
-    // Propagate seeds
-    if (spCanEvaluate(true)) {
-      spEvaluate(true);
-    } else {
-      spEvaluateViaJacSparsity(true);
-    }
-
-    // Get the sensitivities
-    for (int i=0; i<n_out; ++i) {
-      if (res[i]!=0) {
-        const bvec_t* output_i = reinterpret_cast<const bvec_t*>(output(i).ptr());
-        copy(output_i, output_i+output(i).nnz(), res[i]);
-      }
-    }
-
-    // Clear seeds and sensitivities
-    for (int i=0; i<n_in; ++i) input(i).set(0.);
-    for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
   void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    // Number inputs and outputs
+    // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
 
-    // Pass/clear forward seeds/adjoint sensitivities
-    for (int i=0; i<n_in; ++i) {
-      // Input vector
-      bvec_t* input_i = reinterpret_cast<bvec_t*>(input(i).ptr());
-      if (arg[i]==0) {
-        // Set to zero if not used
-        fill_n(input_i, input(i).nnz(), 0);
-      } else {
-        copy(arg[i], arg[i]+input(i).nnz(), input_i);
+    // Loop over outputs
+    for (int oind=0; oind<n_out; ++oind) {
+      // Skip if nothing to assign
+      if (res[oind]==0 || nnz_out(oind)==0) continue;
+
+      // Loop over inputs
+      for (int iind=0; iind<n_in; ++iind) {
+        // Skip if no seeds
+        if (arg[iind]==0 || nnz_in(iind)==0) continue;
+
+        // Get the sparsity of the Jacobian block
+        Sparsity sp = sparsity_jac(iind, oind, true, false);
+        if (sp.isNull() || sp.nnz() == 0) continue; // Skip if zero
+
+        // Carry out the sparse matrix-vector multiplication
+        int d1 = sp.size2();
+        const int *colind = sp.colind(), *row = sp.row();
+        for (int cc=0; cc<d1; ++cc) {
+          for (int el = colind[cc]; el < colind[cc+1]; ++el) {
+            arg[iind][cc] |= res[oind][row[el]];
+          }
+        }
       }
-    }
 
-    // Pass/clear adjoint seeds/forward sensitivities
-    for (int i=0; i<n_out; ++i) {
-      // Output vector
-      bvec_t* output_i = reinterpret_cast<bvec_t*>(output(i).ptr());
-      if (res[i]==0) {
-        // Set to zero if not used
-        fill_n(output_i, output(i).nnz(), 0);
-      } else {
-        copy(res[i], res[i]+output(i).nnz(), output_i);
-      }
+      // Clear seeds
+      casadi_fill(res[oind], nnz_out(oind), bvec_t(0));
     }
-
-    // Propagate seeds
-    if (spCanEvaluate(false)) {
-      spEvaluate(false);
-    } else {
-      spEvaluateViaJacSparsity(false);
-    }
-
-    // Get the sensitivities
-    for (int i=0; i<n_in; ++i) {
-      if (arg[i]!=0) {
-        int n = input(i).nnz();
-        bvec_t* arg_i = arg[i];
-        const bvec_t* input_i = reinterpret_cast<const bvec_t*>(input(i).ptr());
-        for (int k=0; k<n; ++k) *arg_i++ |= *input_i++;
-      }
-    }
-
-    // Clear seeds and sensitivities
-    for (int i=0; i<n_in; ++i) input(i).set(0.);
-    for (int i=0; i<n_out; ++i) output(i).set(0.);
   }
 
   void FunctionInternal::sz_work(size_t& sz_arg, size_t& sz_res,

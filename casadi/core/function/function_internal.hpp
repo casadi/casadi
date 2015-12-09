@@ -100,10 +100,6 @@ namespace casadi {
         derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
-    /** \brief  Propagate the sparsity pattern through a set of directional derivatives
-        forward or backward, using the sparsity patterns */
-    virtual void spEvaluateViaJacSparsity(bool fwd);
-
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
