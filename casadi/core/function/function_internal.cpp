@@ -577,19 +577,22 @@ namespace casadi {
     casadi_assert(spCanEvaluate(true));
 
     // Number of nonzero inputs
-    int nz = input(iind).nnz();
+    int nz = nnz_in(iind);
+    casadi_assert(nz==nnz_out(oind));
 
-    // Clear the forward seeds/adjoint sensitivities
-    for (int ind=0; ind<n_in(); ++ind) {
-      vector<double> &v = ibuf_[ind].data();
-      if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-    }
+    // Evaluation buffers
+    vector<const bvec_t*> arg(sz_arg(), 0);
+    vector<bvec_t*> res(sz_res(), 0);
+    vector<int> iw(sz_iw());
+    vector<bvec_t> w(sz_w());
 
-    // Clear the adjoint seeds/forward sensitivities
-    for (int ind=0; ind<n_out(); ++ind) {
-      vector<double> &v = obuf_[ind].data();
-      if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-    }
+    // Seeds
+    vector<bvec_t> seed(nz, 0);
+    arg[iind] = getPtr(seed);
+
+    // Sensitivities
+    vector<bvec_t> sens(nz, 0);
+    res[oind] = getPtr(sens);
 
     // Sparsity triplet accumulator
     std::vector<int> jcol, jrow;
@@ -626,17 +629,11 @@ namespace casadi {
 
       casadi_msg("Star coloring on " << r.dim() << ": " << D.size2() << " <-> " << D.size1());
 
-      // Get seeds and sensitivities
-      bvec_t* input_v = get_bvec_t(ibuf_[iind].data());
-      bvec_t* output_v = get_bvec_t(obuf_[oind].data());
-      bvec_t* seed_v = input_v;
-      bvec_t* sens_v = output_v;
-
       // Clear the seeds
-      for (int i=0; i<nz; ++i) seed_v[i]=0;
+      fill(seed.begin(), seed.end(), 0);
 
       // Subdivide the coarse block
-      for (int k=0;k<coarse.size()-1;++k) {
+      for (int k=0; k<coarse.size()-1; ++k) {
         int diff = coarse[k+1]-coarse[k];
         int new_diff = diff/subdivision;
         if (diff%subdivision>0) new_diff++;
@@ -699,7 +696,7 @@ namespace casadi {
               }
 
               // Toggle on seeds
-              bvec_toggle(seed_v, fine[fci+fci_start], fine[fci+fci_start+1], bvec_i+bvec_i_mod);
+              bvec_toggle(getPtr(seed), fine[fci+fci_start], fine[fci+fci_start+1], bvec_i+bvec_i_mod);
               bvec_i_mod++;
             }
           }
@@ -728,18 +725,18 @@ namespace casadi {
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies
-            spEvaluate(true);
+            spFwd(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
 
             // Temporary bit work vector
             bvec_t spsens;
 
             // Loop over the cols of coarse blocks
-            for (int cri=0;cri<coarse.size()-1;++cri) {
+            for (int cri=0; cri<coarse.size()-1; ++cri) {
 
               // Loop over the cols of fine blocks within the current coarse block
               for (int fri=fine_lookup[coarse[cri]];fri<fine_lookup[coarse[cri+1]];++fri) {
                 // Lump individual sensitivities together into fine block
-                bvec_or(sens_v, spsens, fine[fri], fine[fri+1]);
+                bvec_or(getPtr(sens), spsens, fine[fri], fine[fri+1]);
 
                 // Loop over all bvec_bits
                 for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
@@ -758,16 +755,7 @@ namespace casadi {
             }
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
-            for (int ind=0; ind<n_in(); ++ind) {
-              vector<double> &v = ibuf_[ind].data();
-              if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-            }
-
-            // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
-            for (int ind=0; ind<n_out(); ++ind) {
-              vector<double> &v = obuf_[ind].data();
-              if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-            }
+            fill(seed.begin(), seed.end(), 0);
 
             // Clean lookup table
             lookup_col.clear();
@@ -782,9 +770,7 @@ namespace casadi {
           } else {
             f_finished = true;
           }
-
         }
-
       }
 
       // Construct fine sparsity pattern
@@ -990,7 +976,7 @@ namespace casadi {
             int value = -bvec_i + fci_offset + fci_start;
 
             // Loop over the rows of the fine block
-            for (int fci = fci_offset;fci<min(fci_end-fci_start, fci_cap);++fci) {
+            for (int fci = fci_offset; fci<min(fci_end-fci_start, fci_cap); ++fci) {
 
               // Loop over the coarse block cols that appear in the coloring
               // for the current coarse seed direction
