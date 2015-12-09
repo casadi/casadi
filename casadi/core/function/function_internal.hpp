@@ -538,6 +538,12 @@ namespace casadi {
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
 
+    /// Get the sparsity pattern, forward mode
+    Sparsity getJacSparsityFwd(int iind, int oind);
+
+    /// Get the sparsity pattern, reverse mode
+    Sparsity getJacSparsityAdj(int iind, int oind);
+
     /// A flavor of getJacSparsity without any magic
     Sparsity getJacSparsityPlain(int iind, int oind);
 

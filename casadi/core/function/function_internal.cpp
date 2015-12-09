@@ -442,10 +442,10 @@ namespace casadi {
 
   Sparsity FunctionInternal::getJacSparsityPlain(int iind, int oind) {
     // Number of nonzero inputs
-    int nz_in = input(iind).nnz();
+    int nz_in = nnz_in(iind);
 
     // Number of nonzero outputs
-    int nz_out = output(oind).nnz();
+    int nz_out = nnz_out(oind);
 
     // Number of forward sweeps we must make
     int nsweep_fwd = nz_in/bvec_size;
@@ -459,38 +459,141 @@ namespace casadi {
     double w = adWeightSp();
 
     // Use forward mode?
-    bool use_fwd = w*nsweep_fwd <= (1-w)*nsweep_adj;
-
-    // Clear the forward seeds/adjoint sensitivities
-    for (int ind=0; ind<n_in(); ++ind) {
-      vector<double> &v = ibuf_[ind].data();
-      if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
+    if (w*nsweep_fwd <= (1-w)*nsweep_adj) {
+      return getJacSparsityFwd(iind, oind);
+    } else {
+      return getJacSparsityAdj(iind, oind);
     }
+  }
 
-    // Clear the adjoint seeds/forward sensitivities
-    for (int ind=0; ind<n_out(); ++ind) {
-      vector<double> &v = obuf_[ind].data();
-      if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-    }
+  Sparsity FunctionInternal::getJacSparsityFwd(int iind, int oind) {
+    // Number of nonzero inputs
+    int nz_in = nnz_in(iind);
 
-    // Get seeds and sensitivities
-    bvec_t* input_v = get_bvec_t(ibuf_[iind].data());
-    bvec_t* output_v = get_bvec_t(obuf_[oind].data());
-    bvec_t* seed_v = use_fwd ? input_v : output_v;
-    bvec_t* sens_v = use_fwd ? output_v : input_v;
+    // Number of nonzero outputs
+    int nz_out = nnz_out(oind);
 
-    // Number of sweeps needed
-    int nsweep = use_fwd ? nsweep_fwd : nsweep_adj;
+    // Number of forward sweeps we must make
+    int nsweep = nz_in/bvec_size;
+    if (nz_in%bvec_size>0) nsweep++;
 
-    // The number of zeros in the seed and sensitivity directions
-    int nz_seed = use_fwd ? nz_in  : nz_out;
-    int nz_sens = use_fwd ? nz_out : nz_in;
+    // Evaluation buffers
+    vector<const bvec_t*> arg(sz_arg(), 0);
+    vector<bvec_t*> res(sz_res(), 0);
+    vector<int> iw(sz_iw());
+    vector<bvec_t> w(sz_w());
+
+    // Seeds
+    vector<bvec_t> seed(nz_in, 0);
+    arg[iind] = getPtr(seed);
+
+    // Sensitivities
+    vector<bvec_t> sens(nz_out, 0);
+    res[oind] = getPtr(sens);
 
     // Print
     if (verbose()) {
-      userOut() << "FunctionInternal::getJacSparsity: using "
-                << (use_fwd ? "forward" : "adjoint") << " mode: ";
-      userOut() << nsweep << " sweeps needed for " << nz_seed << " directions" << endl;
+      userOut() << "FunctionInternal::getJacSparsityFwd: "
+                << nsweep << " sweeps needed for " << nz_in << " directions" << endl;
+    }
+
+    // Progress
+    int progress = -10;
+
+    // Temporary vectors
+    std::vector<int> jcol, jrow;
+
+    // Loop over the variables, bvec_size variables at a time
+    for (int s=0; s<nsweep; ++s) {
+
+      // Print progress
+      if (verbose()) {
+        int progress_new = (s*100)/nsweep;
+        // Print when entering a new decade
+        if (progress_new / 10 > progress / 10) {
+          progress = progress_new;
+          userOut() << progress << " %"  << endl;
+        }
+      }
+
+      // Nonzero offset
+      int offset = s*bvec_size;
+
+      // Number of local seed directions
+      int ndir_local = std::min(bvec_size, nz_in-offset);
+
+      for (int i=0; i<ndir_local; ++i) {
+        seed[offset+i] |= bvec_t(1)<<i;
+      }
+
+      // Propagate the dependencies
+      spFwd(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
+
+      // Loop over the nonzeros of the output
+      for (int el=0; el<nz_out; ++el) {
+
+        // Get the sparsity sensitivity
+        bvec_t spsens = sens[el];
+
+        // If there is a dependency in any of the directions
+        if (spsens!=0) {
+
+          // Loop over seed directions
+          for (int i=0; i<ndir_local; ++i) {
+
+            // If dependents on the variable
+            if ((bvec_t(1) << i) & spsens) {
+              // Add to pattern
+              jcol.push_back(el);
+              jrow.push_back(i+offset);
+            }
+          }
+        }
+      }
+
+      // Remove the seeds
+      for (int i=0; i<ndir_local; ++i) {
+        seed[offset+i] = 0;
+      }
+    }
+
+    // Construct sparsity pattern and return
+    Sparsity ret = Sparsity::triplet(nz_out, nz_in, jcol, jrow);
+    casadi_msg("Formed Jacobian sparsity pattern (dimension " << ret.size() << ", "
+               << ret.nnz() << " nonzeros, " << (100.0*ret.nnz())/ret.numel() << " % nonzeros).");
+    casadi_msg("FunctionInternal::getJacSparsity end ");
+    return ret;
+  }
+
+  Sparsity FunctionInternal::getJacSparsityAdj(int iind, int oind) {
+    // Number of nonzero outputs
+    int nz_out = nnz_out(oind);
+
+    // Number of nonzero inputs
+    int nz_in = nnz_in(iind);
+
+    // Number of adjoint sweeps we must make
+    int nsweep = nz_out/bvec_size;
+    if (nz_out%bvec_size>0) nsweep++;
+
+    // Evaluation buffers
+    vector<bvec_t*> arg(sz_arg(), 0);
+    vector<bvec_t*> res(sz_res(), 0);
+    vector<int> iw(sz_iw());
+    vector<bvec_t> w(sz_w());
+
+    // Seeds
+    vector<bvec_t> seed(nz_out, 0);
+    res[oind] = getPtr(seed);
+
+    // Sensitivities
+    vector<bvec_t> sens(nz_in, 0);
+    arg[iind] = getPtr(sens);
+
+    // Print
+    if (verbose()) {
+      userOut() << "FunctionInternal::getJacSparsityAdj: "
+                << nsweep << " sweeps needed for " << nz_out << " directions" << endl;
     }
 
     // Progress
@@ -516,25 +619,23 @@ namespace casadi {
       int offset = s*bvec_size;
 
       // Number of local seed directions
-      int ndir_local = std::min(bvec_size, nz_seed-offset);
+      int ndir_local = std::min(bvec_size, nz_out-offset);
 
       for (int i=0; i<ndir_local; ++i) {
-        seed_v[offset+i] |= bvec_t(1)<<i;
+        seed[offset+i] |= bvec_t(1)<<i;
       }
 
       // Propagate the dependencies
-      spEvaluate(use_fwd);
+      spAdj(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
 
       // Loop over the nonzeros of the output
-      for (int el=0; el<nz_sens; ++el) {
+      for (int el=0; el<nz_in; ++el) {
 
         // Get the sparsity sensitivity
-        bvec_t spsens = sens_v[el];
+        bvec_t spsens = sens[el];
 
         // Clear the sensitivities for the next sweep
-        if (!use_fwd) {
-          sens_v[el] = 0;
-        }
+        sens[el] = 0;
 
         // If there is a dependency in any of the directions
         if (0!=spsens) {
@@ -553,23 +654,16 @@ namespace casadi {
       }
 
       // Remove the seeds
-      for (int i=0; i<bvec_size && offset+i<nz_seed; ++i) {
-        seed_v[offset+i] = 0;
+      for (int i=0; i<ndir_local; ++i) {
+        seed[offset+i] = 0;
       }
     }
 
-    // Set inputs and outputs to zero
-    for (int ind=0; ind<n_in(); ++ind) input(ind).setAll(0);
-    for (int ind=0; ind<n_out(); ++ind) output(ind).setAll(0);
-
-    // Construct sparsity pattern
-    Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
-
+    // Construct sparsity pattern and return
+    Sparsity ret = Sparsity::triplet(nz_out, nz_in, jrow, jcol);
     casadi_msg("Formed Jacobian sparsity pattern (dimension " << ret.size() << ", "
                << ret.nnz() << " nonzeros, " << (100.0*ret.nnz())/ret.numel() << " % nonzeros).");
     casadi_msg("FunctionInternal::getJacSparsity end ");
-
-    // Return sparsity pattern
     return ret;
   }
 
@@ -696,7 +790,8 @@ namespace casadi {
               }
 
               // Toggle on seeds
-              bvec_toggle(getPtr(seed), fine[fci+fci_start], fine[fci+fci_start+1], bvec_i+bvec_i_mod);
+              bvec_toggle(getPtr(seed), fine[fci+fci_start], fine[fci+fci_start+1],
+                          bvec_i+bvec_i_mod);
               bvec_i_mod++;
             }
           }
