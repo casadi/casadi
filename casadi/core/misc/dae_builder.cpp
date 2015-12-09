@@ -1182,16 +1182,12 @@ namespace casadi {
     int ns = f.nnz_in(0);
     casadi_assert(f.nnz_out(0)==ns);
 
-    // Input/output arrays
-    bvec_t* f_sdot = reinterpret_cast<bvec_t*>(f.input().ptr());
-    bvec_t* f_dae = reinterpret_cast<bvec_t*>(f.output().ptr());
-
-    // Seed all inputs
-    std::fill(f_sdot, f_sdot+ns, bvec_t(1));
+    // Input/output buffers
+    vector<bvec_t> f_sdot(ns, 1);
+    vector<bvec_t> f_dae(ns, 0);
 
     // Propagate to f_dae
-    std::fill(f_dae, f_dae+ns, bvec_t(0));
-    f.spEvaluate(true);
+    f({getPtr(f_sdot)}, {getPtr(f_dae)});
 
     // Get the new differential and algebraic equations
     vector<MX> new_dae, new_alg;
@@ -1205,11 +1201,11 @@ namespace casadi {
     }
 
     // Seed all outputs
-    std::fill(f_dae, f_dae+ns, bvec_t(1));
+    std::fill(f_dae.begin(), f_dae.end(), 1);
 
     // Propagate to f_sdot
-    std::fill(f_sdot, f_sdot+ns, bvec_t(0));
-    f.spEvaluate(false);
+    std::fill(f_sdot.begin(), f_sdot.end(), 0);
+    f.rev({getPtr(f_sdot)}, {getPtr(f_dae)});
 
     // Get the new algebraic variables and new states
     vector<MX> new_s, new_sdot, new_z;

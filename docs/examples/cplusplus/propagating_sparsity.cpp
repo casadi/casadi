@@ -69,17 +69,16 @@ int main(){
       MX z = x[0]*x[0]+x[2] + 3;
       f = Function("f", {x}, {z});
     }
-    
-    // Get arrays for the inputs and outputs, reinterpreting the vector of double as an array of unsigned integers
-    bvec_t* f_in = get_bvec_t(f.input().data());
-    bvec_t* f_out = get_bvec_t(f.output().data());
-    
+
+    // Memory for inputs and outputs
+    vector<bvec_t> f_in(f.nnz_in(0), 0);
+    vector<bvec_t> f_out(f.nnz_out(0), 0);
+
     // Propagate from input to output (forward mode)
     cout << "forward mode" << endl;
-    int fwd = true;
-    
+
     // Make sure that the class is able to support the dependency propagation
-    casadi_assert(f.spCanEvaluate(fwd));
+    casadi_assert(f.spCanEvaluate(true));
     
     // Pass seeds
     f_in[0] = bvec_t(1) << 0; // seed in direction 0
@@ -88,19 +87,18 @@ int main(){
 
     // Reset sensitivities
     f_out[0] = 0;
-    
+
     // Propagate dependencies
-    f.spEvaluate(fwd);
+    f({&f_in.front()}, {&f_out.front()});
 
     // Print the result
     printBinary(f_out[0]);
     
     // Propagate from output to input (adjoint/reverse/backward mode)
     cout << "backward mode" << endl;
-    fwd = false;
 
     // Make sure that the class is able to support the dependency propagation
-    casadi_assert(f.spCanEvaluate(fwd));
+    casadi_assert(f.spCanEvaluate(false));
 
     // Pass seeds
     f_out[0] = (bvec_t(1) << 5) | (bvec_t(1) << 6); // seed in direction 5 and 6
@@ -111,7 +109,7 @@ int main(){
     f_in[2] = 0;
     
     // Propagate dependencies
-    f.spEvaluate(fwd);
+    f.rev({&f_in.front()}, {&f_out.front()});
 
     // Print the result
     printBinary(f_in[0]);

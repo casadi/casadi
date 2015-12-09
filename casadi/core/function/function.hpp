@@ -459,8 +459,13 @@ namespace casadi {
               bool always_inline=false, bool never_inline=false);
     ///@}
 
-    /** \brief Evaluate with input and output buffers given */
+    ///@{
+    /** \brief Evaluate with temporary memory allocation */
     void operator()(std::vector<const double*> arg, std::vector<double*> res);
+    void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res);
+    void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res);
+    template<typename D> void _call(std::vector<const D*> arg, std::vector<D*> res);
+    ///@}
 
     ///@{
     /** \brief Supported arguments for numerical evaluation and converters */
@@ -552,6 +557,9 @@ namespace casadi {
 
     /** \brief  Propagate sparsity backward */
     void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+
+    /** \brief Propagate sparsity backward with temporary memory allocation */
+    void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res);
 
 #endif // SWIG
 

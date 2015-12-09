@@ -1828,16 +1828,13 @@ namespace casadi {
     // Construct a temporary algorithm
     Function temp("tmp", {arg}, {*this});
 
-    bvec_t* input_ =  get_bvec_t(temp.input().data());
-    // Make a column with all variables active
-    std::fill(input_, input_+temp.nnz_in(0), bvec_t(1));
-    bvec_t* output_ = get_bvec_t(temp.output().data());
     // Perform a single dependency sweep
-    temp.spEvaluate(true);
+    vector<bvec_t> t_in(arg.nnz(), 1), t_out(nnz());
+    temp({getPtr(t_in)}, {getPtr(t_out)});
 
     // Loop over results
-    for (int i=0;i<temp.nnz_out(0);++i) {
-      if (output_[i]) return true;
+    for (int i=0; i<t_out.size(); ++i) {
+      if (t_out[i]) return true;
     }
 
     return false;

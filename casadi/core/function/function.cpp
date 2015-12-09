@@ -338,14 +338,52 @@ namespace casadi {
     return ret;
   }
 
-  void Function::operator()(vector<const double*> arg, vector<double*> res) {
-    casadi_assert(arg.size()>=sz_arg());
-    casadi_assert(res.size()>=sz_res());
-    vector<int> buf_iw(sz_iw());
-    vector<double> buf_w(sz_w());
+  template<typename D>
+  void Function::_call(vector<const D*> arg, vector<D*> res) {
+    // Input buffer
+    casadi_assert(arg.size()>=n_in());
+    arg.resize(sz_arg());
+
+    // Output buffer
+    casadi_assert(res.size()>=n_out());
+    res.resize(sz_res());
+
+    // Work vectors
+    vector<int> iw(sz_iw());
+    vector<D> w(sz_w());
 
     // Evaluate memoryless
-    (*this)(getPtr(arg), getPtr(res), getPtr(buf_iw), getPtr(buf_w), 0);
+    (*this)(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
+  }
+
+
+  void Function::operator()(vector<const double*> arg, vector<double*> res) {
+    return _call(arg, res);
+  }
+
+  void Function::operator()(vector<const bvec_t*> arg, vector<bvec_t*> res) {
+    return _call(arg, res);
+  }
+
+  void Function::operator()(vector<const SXElem*> arg, vector<SXElem*> res) {
+    return _call(arg, res);
+  }
+
+  void Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) {
+    // Input buffer
+    casadi_assert(arg.size()>=n_in());
+    arg.resize(sz_arg());
+
+    // Output buffer
+    casadi_assert(res.size()>=n_out());
+    res.resize(sz_res());
+
+    // Work vectors
+    vector<int> iw(sz_iw());
+    vector<bvec_t> w(sz_w());
+
+    // Evaluate memoryless
+    rev(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
   }
 
   Function Function::mapaccum(const string& name, int N, const Dict& opts) const {
@@ -955,21 +993,21 @@ namespace casadi {
   }
 
   vector<DM> Function::operator()(const vector<DM>& arg,
-                                            bool always_inline, bool never_inline) {
+                                  bool always_inline, bool never_inline) {
     vector<DM> res;
     call(arg, res, always_inline, never_inline);
     return res;
   }
 
   vector<SX> Function::operator()(const vector<SX>& arg,
-                                       bool always_inline, bool never_inline) {
+                                  bool always_inline, bool never_inline) {
     vector<SX> res;
     call(arg, res, always_inline, never_inline);
     return res;
   }
 
   vector<MX> Function::operator()(const vector<MX>& arg,
-                                       bool always_inline, bool never_inline) {
+                                  bool always_inline, bool never_inline) {
     vector<MX> res;
     call(arg, res, always_inline, never_inline);
     return res;
@@ -1001,7 +1039,7 @@ namespace casadi {
   }
 
   const DMDict Function::operator()(const DMDict& arg, bool always_inline,
-                                         bool never_inline) {
+                                    bool never_inline) {
     return callMap(arg, always_inline, never_inline);
   }
 
