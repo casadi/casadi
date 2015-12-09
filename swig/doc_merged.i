@@ -449,12 +449,6 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Callback::repr "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring") casadi::Callback::linsol_cholesky_sparsity "
 
 Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
@@ -469,10 +463,9 @@ are kept internally
 
 ";
 
-%feature("docstring") casadi::Callback::spInit "[INTERNAL]  Reset the
-sparsity propagation.
+%feature("docstring") casadi::Callback::repr "
 
-(for usage, see the example propagating_sparsity.cpp)
+Print a representation of the object.
 
 ";
 
@@ -2856,13 +2849,6 @@ Get the number of function outputs.
 %feature("docstring") casadi::Function::getAtomicInput "
 
 Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Function::spInit "[INTERNAL]  Reset the
-sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
 
 ";
 

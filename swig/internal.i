@@ -16,9 +16,6 @@
 %exception  casadi::Function::spEvaluate(bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::spInit(bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::sz_arg() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

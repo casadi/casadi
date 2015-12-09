@@ -674,13 +674,6 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
 %feature("docstring")  casadi::Function::linsol_cholesky_sparsity(bool
 tr=false) const  "
 
@@ -697,10 +690,10 @@ are kept internally
 
 ";
 
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
 
-(for usage, see the example propagating_sparsity.cpp)
+Print a representation of the object.
 
 ";
 
@@ -3816,13 +3809,6 @@ Get the number of function outputs.
 %feature("docstring")  casadi::Function::getAtomicInput(int k) const  "
 
 Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::Function::spInit(bool fwd) " [INTERNAL]
-Reset the sparsity propagation.
-
-(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
