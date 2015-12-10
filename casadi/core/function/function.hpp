@@ -936,11 +936,6 @@ namespace casadi {
      * (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);
 
-    /** \brief Propagate the sparsity pattern through a set of directional
-     *
-     * derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
-    void spEvaluate(bool fwd);
-
     /** \brief Get required length of arg field */
     size_t sz_arg() const;
 

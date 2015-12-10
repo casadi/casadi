@@ -96,10 +96,6 @@ namespace casadi {
     */
     virtual void finalize();
 
-    /** \brief  Propagate the sparsity pattern through a set of directional
-        derivatives forward or backward */
-    virtual void spEvaluate(bool fwd);
-
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
@@ -540,10 +536,7 @@ namespace casadi {
 
     /// Get the sparsity pattern, forward mode
     template<bool fwd>
-    Sparsity getJacSparsityGen(int iind, int oind);
-
-    /// A flavor of getJacSparsity without any magic
-    Sparsity getJacSparsityPlain(int iind, int oind);
+    Sparsity getJacSparsityGen(int iind, int oind, bool symmetric, int gr_i=1, int gr_o=1);
 
     /// A flavor of getJacSparsity that does hierarchical block structure recognition
     Sparsity getJacSparsityHierarchical(int iind, int oind);

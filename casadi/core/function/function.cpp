@@ -690,10 +690,6 @@ namespace casadi {
     return (*this)->output(oname);
   }
 
-  void Function::spEvaluate(bool fwd) {
-    (*this)->spEvaluate(fwd);
-  }
-
   void Function::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {
     (*this)->sz_work(sz_arg, sz_res, sz_iw, sz_w);
   }

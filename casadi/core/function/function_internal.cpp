@@ -440,30 +440,6 @@ namespace casadi {
   }
   /// \endcond
 
-  Sparsity FunctionInternal::getJacSparsityPlain(int iind, int oind) {
-    // Number of nonzero inputs and outputs
-    int nz_in = nnz_in(iind);
-    int nz_out = nnz_out(oind);
-
-    // Number of forward sweeps we must make
-    int nsweep_fwd = nz_in/bvec_size;
-    if (nz_in%bvec_size) nsweep_fwd++;
-
-    // Number of adjoint sweeps we must make
-    int nsweep_adj = nz_out/bvec_size;
-    if (nz_out%bvec_size) nsweep_adj++;
-
-    // Get weighting factor
-    double w = adWeightSp();
-
-    // Use forward mode?
-    if (w*nsweep_fwd <= (1-w)*nsweep_adj) {
-      return getJacSparsityGen<true>(iind, oind);
-    } else {
-      return getJacSparsityGen<false>(iind, oind);
-    }
-  }
-
   // Traits
   template<bool fwd> struct JacSparsityTraits {};
   template<> struct JacSparsityTraits<true> {
@@ -482,7 +458,8 @@ namespace casadi {
   };
 
   template<bool fwd>
-  Sparsity FunctionInternal::getJacSparsityGen(int iind, int oind) {
+  Sparsity FunctionInternal::getJacSparsityGen(int iind, int oind,
+                                               bool symmetric, int gr_i, int gr_o) {
     // Number of nonzero inputs and outputs
     int nz_in = nnz_in(iind);
     int nz_out = nnz_out(oind);
@@ -808,22 +785,23 @@ namespace casadi {
 
   Sparsity FunctionInternal::getJacSparsityHierarchical(int iind, int oind) {
     // Number of nonzero inputs
-    int nz_in = input(iind).nnz();
+    int nz_in = nnz_in(iind);
 
     // Number of nonzero outputs
-    int nz_out = output(oind).nnz();
+    int nz_out = nnz_out(oind);
 
-    // Clear the forward seeds/adjoint sensitivities
-    for (int ind=0; ind<n_in(); ++ind) {
-      vector<double> &v = ibuf_[ind].data();
-      if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-    }
+    // Seeds and sensitivities
+    vector<bvec_t> s_in(nz_in, 0);
+    vector<bvec_t> s_out(nz_out, 0);
 
-    // Clear the adjoint seeds/forward sensitivities
-    for (int ind=0; ind<n_out(); ++ind) {
-      vector<double> &v = obuf_[ind].data();
-      if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-    }
+    // Evaluation buffers
+    vector<const bvec_t*> arg_fwd(sz_arg(), 0);
+    vector<bvec_t*> arg_adj(sz_arg(), 0);
+    arg_fwd[iind] = arg_adj[iind] = getPtr(s_in);
+    vector<bvec_t*> res(sz_res(), 0);
+    res[oind] = getPtr(s_out);
+    vector<int> iw(sz_iw());
+    vector<bvec_t> w(sz_w());
 
     // Sparsity triplet accumulator
     std::vector<int> jcol, jrow;
@@ -855,7 +833,7 @@ namespace casadi {
     bool hasrun = false;
 
     // Get weighting factor
-    double w = adWeightSp();
+    double sp_w = adWeightSp();
 
     // Lookup table for bvec_t
     std::vector<bvec_t> bvec_lookup;
@@ -893,21 +871,19 @@ namespace casadi {
       int adj_cost = use_fwd ? granularity_col: granularity_row;
 
       // Use whatever required less colors if we tried both (with preference to forward mode)
-      if ((w*D1.size2()*fwd_cost <= (1-w)*D2.size2()*adj_cost)) {
+      if ((sp_w*D1.size2()*fwd_cost <= (1-sp_w)*D2.size2()*adj_cost)) {
         use_fwd = true;
-        casadi_msg("Forward mode chosen (fwd cost: " << w*D1.size2()*fwd_cost << ", adj cost: "
-                   << (1-w)*D2.size2()*adj_cost << ")");
+        casadi_msg("Forward mode chosen (fwd cost: " << sp_w*D1.size2()*fwd_cost << ", adj cost: "
+                   << (1-sp_w)*D2.size2()*adj_cost << ")");
       } else {
         use_fwd = false;
-        casadi_msg("Adjoint mode chosen (adj cost: " << w*D1.size2()*fwd_cost << ", adj cost: "
-                   << (1-w)*D2.size2()*adj_cost << ")");
+        casadi_msg("Adjoint mode chosen (adj cost: " << sp_w*D1.size2()*fwd_cost << ", adj cost: "
+                   << (1-sp_w)*D2.size2()*adj_cost << ")");
       }
 
       // Get seeds and sensitivities
-      bvec_t* input_v = get_bvec_t(ibuf_[iind].data());
-      bvec_t* output_v = get_bvec_t(obuf_[oind].data());
-      bvec_t* seed_v = use_fwd ? input_v : output_v;
-      bvec_t* sens_v = use_fwd ? output_v : input_v;
+      bvec_t* seed_v = use_fwd ? getPtr(s_in) : getPtr(s_out);
+      bvec_t* sens_v = use_fwd ? getPtr(s_out) : getPtr(s_in);
 
       // The number of zeros in the seed and sensitivity directions
       int nz_seed = use_fwd ? nz_in  : nz_out;
@@ -1021,7 +997,12 @@ namespace casadi {
                                               coarse_col.size());
 
             // Propagate the dependencies
-            spEvaluate(use_fwd);
+            if (use_fwd) {
+              spFwd(getPtr(arg_fwd), getPtr(res), getPtr(iw), getPtr(w), 0);
+            } else {
+              fill(w.begin(), w.end(), 0);
+              spAdj(getPtr(arg_adj), getPtr(res), getPtr(iw), getPtr(w), 0);
+            }
 
             // Temporary bit work vector
             bvec_t spsens;
@@ -1050,16 +1031,10 @@ namespace casadi {
             }
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
-            for (int ind=0; ind<n_in(); ++ind) {
-              vector<double> &v = ibuf_[ind].data();
-              if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-            }
+            fill(s_in.begin(), s_in.end(), 0);
 
             // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
-            for (int ind=0; ind<n_out(); ++ind) {
-              vector<double> &v = obuf_[ind].data();
-              if (!v.empty()) fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-            }
+            fill(s_out.begin(), s_out.end(), 0);
 
             // Clean lookup table
             lookup_col.clear();
@@ -1104,14 +1079,34 @@ namespace casadi {
     // Check if we are able to propagate dependencies through the function
     if (spCanEvaluate(true) || spCanEvaluate(false)) {
       Sparsity sp;
-      if (input(iind).nnz()>3*bvec_size && output(oind).nnz()>3*bvec_size) {
+      if (nnz_in(iind)>3*bvec_size && nnz_out(oind)>3*bvec_size) {
         if (symmetric) {
           sp = getJacSparsityHierarchicalSymm(iind, oind);
         } else {
           sp = getJacSparsityHierarchical(iind, oind);
         }
       } else {
-        sp = getJacSparsityPlain(iind, oind);
+        // Number of nonzero inputs and outputs
+        int nz_in = nnz_in(iind);
+        int nz_out = nnz_out(oind);
+
+        // Number of forward sweeps we must make
+        int nsweep_fwd = nz_in/bvec_size;
+        if (nz_in%bvec_size) nsweep_fwd++;
+
+        // Number of adjoint sweeps we must make
+        int nsweep_adj = nz_out/bvec_size;
+        if (nz_out%bvec_size) nsweep_adj++;
+
+        // Get weighting factor
+        double w = adWeightSp();
+
+        // Use forward mode?
+        if (w*nsweep_fwd <= (1-w)*nsweep_adj) {
+          sp = getJacSparsityGen<true>(iind, oind, false);
+        } else {
+          sp = getJacSparsityGen<false>(iind, oind, false);
+        }
       }
       // There may be false positives here that are not present
       // in the reverse mode that precedes it.
@@ -1121,7 +1116,7 @@ namespace casadi {
       return sp;
     } else {
       // Dense sparsity by default
-      return Sparsity::dense(output(oind).nnz(), input(iind).nnz());
+      return Sparsity::dense(nnz_out(oind), nnz_in(iind));
     }
   }
 
@@ -1280,32 +1275,6 @@ namespace casadi {
 
   void FunctionInternal::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     casadi_error("'eval_sx' not defined for " + type_name());
-  }
-
-  void FunctionInternal::spEvaluate(bool fwd) {
-    // Allocate temporary memory
-    std::vector<int> iw(sz_iw());
-    std::vector<bvec_t> w(sz_w(), 0);
-
-    // Get pointers to output arguments
-    vector<bvec_t*> res(sz_res());
-    for (int i=0; i<n_out(); ++i) res[i]=reinterpret_cast<bvec_t*>(output(i).ptr());
-
-    if (fwd) {
-      // Get pointers to input arguments
-      vector<const bvec_t*> arg(sz_arg());
-      for (int i=0; i<n_in(); ++i) arg[i]=reinterpret_cast<const bvec_t*>(input(i).ptr());
-
-      // Call memory-less
-      spFwd(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
-    } else {
-      // Get pointers to input arguments
-      vector<bvec_t*> arg(sz_arg());
-      for (int i=0; i<n_in(); ++i) arg[i]=reinterpret_cast<bvec_t*>(input(i).ptr());
-
-      // Call memory-less
-      spAdj(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
-    }
   }
 
   Function FunctionInternal::jacobian(int iind, int oind, bool compact, bool symmetric) {
