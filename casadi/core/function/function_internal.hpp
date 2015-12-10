@@ -1015,9 +1015,9 @@ namespace casadi {
                             "Incorrect number of forward seeds for direction " << d
                             << ": Expected " << n_in << ", got " << fseed[d].size());
       for (int i=0; i<n_in; ++i) {
-        casadi_assert_message(checkMat(fseed[d][i].sparsity(), input(i).sparsity()),
+        casadi_assert_message(checkMat(fseed[d][i].sparsity(), sparsity_in(i)),
                               "Forward seed " << i << " for direction " << d
-                              << " has mismatching shape. Expected " << input(i).size()
+                              << " has mismatching shape. Expected " << size_in(i)
                               << ", got " << fseed[d][i].size());
       }
     }
@@ -1051,9 +1051,9 @@ namespace casadi {
                             "Incorrect number of adjoint seeds for direction " << d
                             << ": Expected " << n_out << ", got " << aseed[d].size());
       for (int i=0; i<n_out; ++i) {
-        casadi_assert_message(checkMat(aseed[d][i].sparsity(), output(i).sparsity()),
+        casadi_assert_message(checkMat(aseed[d][i].sparsity(), sparsity_out(i)),
                               "Adjoint seed " << i << " for direction " << d
-                              << " has mismatching shape. Expected " << output(i).size()
+                              << " has mismatching shape. Expected " << size_out(i)
                               << ", got " << aseed[d][i].size());
       }
     }

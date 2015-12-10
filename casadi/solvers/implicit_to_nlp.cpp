@@ -67,7 +67,7 @@ namespace casadi {
       if (i!=iin_) {
         stringstream ss;
         ss << "p" << i;
-        inputs.push_back(MX::sym(ss.str(), input(i).sparsity()));
+        inputs.push_back(MX::sym(ss.str(), sparsity_in(i)));
       }
     }
     MX p = veccat(inputs);

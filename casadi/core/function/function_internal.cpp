@@ -1400,22 +1400,22 @@ namespace casadi {
 
     // Consistency check for inputs
     for (int i=0; i<ret.n_in(); ++i) {
-      const Sparsity& sp = i<n_in ? input(i).sparsity() :
-        i<n_in+n_out ? output(i-n_in).sparsity() :
+      const Sparsity& sp = i<n_in ? sparsity_in(i) :
+        i<n_in+n_out ? sparsity_out(i-n_in) :
         input((i-n_in-n_out) % n_in).sparsity();
-      casadi_assert_message(ret.input(i).size()==sp.size(),
+      casadi_assert_message(ret.size_in(i)==sp.size(),
                             "Incorrect shape for " << ret << " input " << i << " \""
                             << i_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.input(i).size());
+                            << " but got " << ret.size_in(i));
     }
 
     // Consistency check for outputs
     for (int i=0; i<ret.n_out(); ++i) {
       const Sparsity& sp = output(i % n_out).sparsity();
-      casadi_assert_message(ret.output(i).size()==sp.size(),
+      casadi_assert_message(ret.size_out(i)==sp.size(),
                             "Incorrect shape for " << ret << " output " << i << " \""
                             << o_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.output(i).size());
+                            << " but got " << ret.size_out(i));
     }
 
     // Save to cache
@@ -1496,22 +1496,22 @@ namespace casadi {
 
     // Consistency check for inputs
     for (int i=0; i<ret.n_in(); ++i) {
-      const Sparsity& sp = i<n_in ? input(i).sparsity() :
+      const Sparsity& sp = i<n_in ? sparsity_in(i) :
         i<n_in+n_out ? output(i-n_in).sparsity() :
         output((i-n_in-n_out) % n_out).sparsity();
-      casadi_assert_message(ret.input(i).size()==sp.size(),
+      casadi_assert_message(ret.size_in(i)==sp.size(),
                             "Incorrect shape for " << ret << " input " << i << " \""
                             << i_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.input(i).size());
+                            << " but got " << ret.size_in(i));
     }
 
     // Consistency check for outputs
     for (int i=0; i<ret.n_out(); ++i) {
       const Sparsity& sp = input(i % n_in).sparsity();
-      casadi_assert_message(ret.output(i).size()==sp.size(),
+      casadi_assert_message(ret.size_out(i)==sp.size(),
                             "Incorrect shape for " << ret << " output " << i << " \""
                             << o_names.at(i) << "\". Expected " << sp.size()
-                            << " but got " << ret.output(i).size());
+                            << " but got " << ret.size_out(i));
     }
 
     // Save to cache
@@ -1646,7 +1646,7 @@ namespace casadi {
       vector<Sparsity> sp_argv(n_in);
       vector<int> row_offset(n_in+1, 0);
       for (int i=0; i<n_in; ++i) {
-        sp_argv[i] = vec(input(i).sparsity());
+        sp_argv[i] = vec(sparsity_in(i));
         row_offset[i+1] = row_offset[i]+sp_argv[i].numel();
       }
       Sparsity sp_arg = vertcat(sp_argv);
@@ -1657,7 +1657,7 @@ namespace casadi {
       // Split up and reshape to correct shape
       argv = vertsplit(arg, row_offset);
       for (int i=0; i<n_in; ++i) {
-        argv[i] = reshape(argv[i], input(i).sparsity());
+        argv[i] = reshape(argv[i], sparsity_in(i));
       }
 
       // Evaluate symbolically
@@ -1807,7 +1807,7 @@ namespace casadi {
     // Get the sparsity pattern of all inputs
     for (int i=0; i<n_in+n_out; ++i) {
       // Get the sparsity pattern
-      const Sparsity& sp = i<n_in ? input(i).sparsity() : output(i-n_in).sparsity();
+      const Sparsity& sp = i<n_in ? sparsity_in(i) : output(i-n_in).sparsity();
 
       // Print the sparsity pattern or retrieve the index of an existing pattern
       int ind = g.addSparsity(sp);
@@ -1901,7 +1901,7 @@ namespace casadi {
       int i_nnz = nnz_in(), o_nnz = nnz_out();
       size_t sz_w = this->sz_w();
       for (int i=0; i<n_in; ++i) {
-        const Sparsity& s = input(i).sparsity();
+        const Sparsity& s = sparsity_in(i);
         sz_w = max(sz_w, static_cast<size_t>(s.size1())); // To be able to copy a column
         sz_w = max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
@@ -2307,7 +2307,7 @@ namespace casadi {
       for (int d=0; d<nfwd; ++d) {
         fsens[d] = vertsplit(v[d], offset);
         for (int i=0; i<n_out; ++i) {
-          fsens[d][i] = reshape(fsens[d][i], output(i).size());
+          fsens[d][i] = reshape(fsens[d][i], size_out(i));
         }
       }
       return;
@@ -2386,9 +2386,9 @@ namespace casadi {
         vector<MX> a = vertsplit(v[d], offset);
         for (int i=0; i<n_in; ++i) {
           if (asens[d][i].is_empty(true)) {
-            asens[d][i] = reshape(a[i], input(i).size());
+            asens[d][i] = reshape(a[i], size_in(i));
           } else {
-            asens[d][i] += reshape(a[i], input(i).size());
+            asens[d][i] += reshape(a[i], size_in(i));
           }
         }
       }

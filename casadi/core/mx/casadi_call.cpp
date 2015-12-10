@@ -66,7 +66,7 @@ namespace casadi {
     // Create arguments of the right dimensions and sparsity
     vector<MX> arg1(num_in);
     for (int i=0; i<num_in; ++i) {
-      arg1[i] = projectArg(arg[i], fcn_.input(i).sparsity(), i);
+      arg1[i] = projectArg(arg[i], fcn_.sparsity_in(i), i);
     }
     setDependencies(arg1);
     setSparsity(Sparsity::scalar());
@@ -92,7 +92,7 @@ namespace casadi {
   }
 
   const Sparsity& Call::sparsity(int oind) const {
-    return fcn_.output(oind).sparsity();
+    return fcn_.sparsity_out(oind);
   }
 
   void Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {

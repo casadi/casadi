@@ -139,7 +139,7 @@ namespace casadi {
     casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");
 
     MX x0 = MX::sym("x0", f.sparsity_in(0));
-    MX p = MX::sym("p", f.input(1).sparsity());
+    MX p = MX::sym("p", f.sparsity_in(1));
     MX h = MX::sym("h");
 
     std::vector<double> b(order);
@@ -255,7 +255,7 @@ namespace casadi {
 
     // Inputs of constructed function
     MX x0 = MX::sym("x0", f.sparsity_in(0));
-    MX p = MX::sym("p", f.input(1).sparsity());
+    MX p = MX::sym("p", f.sparsity_in(1));
     MX h = MX::sym("h");
 
     // Time step
@@ -314,7 +314,7 @@ namespace casadi {
 
     // Sparsities
     Sparsity x_sp = f.sparsity_in(0);
-    Sparsity p_sp = f.input(1).sparsity();
+    Sparsity p_sp = f.sparsity_in(1);
 
     // Wrapper function inputs
     MX x = MX::sym("x", x_sp);

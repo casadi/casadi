@@ -360,7 +360,7 @@ namespace casadi {
     if (hasSetOption("lower_bandwidth")) {
       bw.second = option("lower_bandwidth");
     } else if (!jac_.isNull()) {
-      bw.second = jac_.getOutput().sparsity().bw_lower();
+      bw.second = jac_.sparsity_out(0).bw_lower();
     } else {
       casadi_error("\"lower_bandwidth\" has not been set and cannot be "
                    "detected since exact Jacobian is not available.");

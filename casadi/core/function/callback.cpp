@@ -65,7 +65,7 @@ namespace casadi {
     int num_in = n_in();
     std::vector<DM> argv(num_in);
     for (int i=0; i<num_in; ++i) {
-      argv[i] = DM::zeros(input(i).sparsity());
+      argv[i] = DM::zeros(sparsity_in(i));
       if (arg[i] != 0) {
         argv[i].setNZ(arg[i]);
       } else {

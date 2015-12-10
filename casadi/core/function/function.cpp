@@ -475,12 +475,12 @@ namespace casadi {
     // Get pointers to input arguments
     int n_in = this->n_in();
     vector<const double*> arg(sz_arg());
-    for (int i=0; i<n_in; ++i) arg[i]=input(i).ptr();
+    for (int i=0; i<n_in; ++i) arg[i]=(*this)->input(i).ptr();
 
     // Get pointers to output arguments
     int n_out = this->n_out();
     vector<double*> res(sz_res());
-    for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
+    for (int i=0; i<n_out; ++i) res[i]=(*this)->output(i).ptr();
 
     // Temporary memory
     std::vector<int> iw(sz_iw());
@@ -642,52 +642,20 @@ namespace casadi {
     return (*this)->description_out(ind);
   }
 
-  const Matrix<double>& Function::input(int i) const {
-    return (*this)->input(i);
-  }
-
-  const Matrix<double>& Function::input(const string &iname) const {
-    return (*this)->input(iname);
-  }
-
-  Sparsity Function::sparsity_in(int ind) const {
+  const Sparsity& Function::sparsity_in(int ind) const {
     return (*this)->sparsity_in(ind);
   }
 
-  Sparsity Function::sparsity_in(const string &iname) const {
+  const Sparsity& Function::sparsity_in(const string &iname) const {
     return (*this)->sparsity_in(iname);
   }
 
-  Sparsity Function::sparsity_out(int ind) const {
+  const Sparsity& Function::sparsity_out(int ind) const {
     return (*this)->sparsity_out(ind);
   }
 
-  Sparsity Function::sparsity_out(const string &iname) const {
+  const Sparsity& Function::sparsity_out(const string &iname) const {
     return (*this)->sparsity_out(iname);
-  }
-
-  Matrix<double>& Function::input(int i) {
-    return (*this)->input(i);
-  }
-
-  Matrix<double>& Function::input(const string &iname) {
-    return (*this)->input(iname);
-  }
-
-  const Matrix<double>& Function::output(int i) const {
-    return (*this)->output(i);
-  }
-
-  const Matrix<double>& Function::output(const string &oname) const {
-    return (*this)->output(oname);
-  }
-
-  Matrix<double>& Function::output(int i) {
-    return (*this)->output(i);
-  }
-
-  Matrix<double>& Function::output(const string &oname) {
-    return (*this)->output(oname);
   }
 
   void Function::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {
@@ -742,7 +710,7 @@ namespace casadi {
       vector<MX>::iterator it=res.begin();
       for (int d=0; d<nfwd; ++d)
         for (int i=0; i<num_out; ++i, ++it)
-          *it = project(*it, output(i).sparsity());
+          *it = project(*it, sparsity_out(i));
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 
@@ -757,7 +725,7 @@ namespace casadi {
       vector<MX>::iterator it=res.begin();
       for (int d=0; d<nadj; ++d)
         for (int i=0; i<num_in; ++i, ++it)
-          *it = project(*it, input(i).sparsity());
+          *it = project(*it, sparsity_in(i));
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 
@@ -829,19 +797,19 @@ namespace casadi {
     int ind=0;
     for (int d=-1; d<nfwd; ++d) {
       for (int i=0; i<n_in(); ++i, ++ind) {
-        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
+        if (ret.nnz_in(ind)!=0 && ret.sparsity_in(ind)!=sparsity_in(i)) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
-                       << i_names.at(ind) << "\". Expected " << input(i).dim()
-                       << " but got " << ret.input(ind).dim());
+                       << i_names.at(ind) << "\". Expected " << size_in(i)
+                       << " but got " << ret.size_in(ind));
         }
       }
     }
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<n_out(); ++i, ++ind) {
-        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
+        if (ret.nnz_in(ind)!=0 && ret.sparsity_in(ind)!=sparsity_out(i)) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
-                       " \"" << i_names.at(ind) << "\". Expected " << output(i).dim()
-                       << " but got " << ret.input(ind).dim());
+                       " \"" << i_names.at(ind) << "\". Expected " << size_out(i)
+                       << " but got " << ret.size_in(ind));
         }
       }
     }
@@ -850,19 +818,19 @@ namespace casadi {
     ind=0;
     for (int d=-1; d<nfwd; ++d) {
       for (int i=0; i<n_out(); ++i, ++ind) {
-        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
+        if (ret.nnz_out(ind)!=0 && ret.sparsity_out(ind)!=sparsity_out(i)) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
-                       " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dim()
-                       << " but got " << ret.output(ind).dim());
+                       " \"" <<  o_names.at(ind) << "\". Expected " << size_out(i)
+                       << " but got " << ret.size_out(ind));
         }
       }
     }
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<n_in(); ++i, ++ind) {
-        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
+        if (ret.nnz_out(ind)!=0 && ret.sparsity_out(ind)!=sparsity_in(i)) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
-                       << o_names.at(ind) << "\". Expected " << input(i).dim()
-                       << " but got " << ret.output(ind).dim());
+                       << o_names.at(ind) << "\". Expected " << size_in(i)
+                       << " but got " << ret.size_out(ind));
         }
       }
     }
@@ -1816,6 +1784,38 @@ namespace casadi {
     ret.setOption(opts);
     ret.init();
     return ret;
+  }
+
+  const Matrix<double>& Function::input(int i) const {
+    return (*this)->input(i);
+  }
+
+  const Matrix<double>& Function::input(const string &iname) const {
+    return (*this)->input(iname);
+  }
+
+  Matrix<double>& Function::input(int i) {
+    return (*this)->input(i);
+  }
+
+  Matrix<double>& Function::input(const string &iname) {
+    return (*this)->input(iname);
+  }
+
+  const Matrix<double>& Function::output(int i) const {
+    return (*this)->output(i);
+  }
+
+  const Matrix<double>& Function::output(const string &oname) const {
+    return (*this)->output(oname);
+  }
+
+  Matrix<double>& Function::output(int i) {
+    return (*this)->output(i);
+  }
+
+  Matrix<double>& Function::output(const string &oname) {
+    return (*this)->output(oname);
   }
 
 } // namespace casadi

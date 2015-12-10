@@ -332,14 +332,14 @@ namespace casadi {
 
     /** \brief Get sparsity of a given input */
     /// @{
-    Sparsity sparsity_in(int ind) const;
-    Sparsity sparsity_in(const std::string& iname) const;
+    const Sparsity& sparsity_in(int ind) const;
+    const Sparsity& sparsity_in(const std::string& iname) const;
     /// @}
 
     /** \brief Get sparsity of a given output */
     /// @{
-    Sparsity sparsity_out(int ind) const;
-    Sparsity sparsity_out(const std::string& iname) const;
+    const Sparsity& sparsity_out(int ind) const;
+    const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
     /** \brief  Evaluate */
