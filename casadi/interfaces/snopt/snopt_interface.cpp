@@ -230,15 +230,15 @@ namespace casadi {
 
     if (detect_linear_) {
       // Detect dependencies w.r.t. gradF
-      // Dependency seeds
-      bvec_t* input_v_x =  get_bvec_t(jacF_->input(GRADF_X).data());
-      bvec_t* input_v_p =  get_bvec_t(jacF_->input(GRADF_P).data());
-      // Make a column with all variables active
-      std::fill(input_v_x, input_v_x+nx_, bvec_t(1));
-      std::fill(input_v_p, input_v_p+np_, bvec_t(0));
-      bvec_t* output_v = get_bvec_t(jacF_->output().data());
+      std::vector<const bvec_t*> arg(jacF_.sz_arg(), 0);
+      std::vector<bvec_t> input_v_x(nx_, 1);
+      arg[GRADF_X] = getPtr(input_v_x);
+      std::vector<bvec_t*> res(jacF_.sz_res(), 0);
+      std::vector<bvec_t> output_v(jacF_.nnz_out(0), 0);
+      res[0] = getPtr(output_v);
+
       // Perform a single dependency sweep
-      jacF_.spEvaluate(true);
+      jacF_(arg, res);
 
       // Harvest the results
       for (int j = 0; j < nx_; ++j) {
@@ -249,19 +249,23 @@ namespace casadi {
         }
       }
 
-      if (!jacG_.isNull()) {  // Detect dependencies w.r.t. jacG
-        // Dependency seeds
-        bvec_t* input_v_x =  get_bvec_t(jacG_->input(JACG_X).data());
-        bvec_t* input_v_p =  get_bvec_t(jacG_->input(JACG_P).data());
-        // Make a column with all variables active
-        std::fill(input_v_x, input_v_x+nx_, bvec_t(1));
-        std::fill(input_v_p, input_v_p+np_, bvec_t(0));
-        bvec_t* output_v = get_bvec_t(jacG_->output().data());
-        // Perform a single dependency sweep
-        jacG_.spEvaluate(true);
+      if (!jacG_.isNull()) {
+        // Detect dependencies w.r.t. jacG
+        std::vector<const bvec_t*> arg(jacG_.sz_arg(), 0);
+        std::vector<bvec_t> input_v_x(nx_, 1);
+        arg[JACG_X] = getPtr(input_v_x);
+        std::vector<bvec_t*> res(jacG_.sz_res(), 0);
+        std::vector<bvec_t> output_v(jacG_.nnz_out(0), 0);
+        res[0] = getPtr(output_v);
 
-        DM out_trans = jacG_.output().T();
-        bvec_t* output_v_trans = get_bvec_t(out_trans.data());
+        // Perform a single dependency sweep
+        jacG_(arg, res);
+
+        Sparsity out_trans = jacG_.sparsity_out(0).T();
+        std::vector<bvec_t> output_v_trans(output_v.size());
+        std::vector<int> iw(jacG_.size2_out(0));
+        casadi_trans(getPtr(output_v), jacG_.sparsity_out(0),
+                     getPtr(output_v_trans), out_trans, getPtr(iw));
 
         for (int j = 0; j < nx_; ++j) {  // Harvest the results
           if (jacG_.sparsity_out(0).colind(j) == jacG_.sparsity_out(0).colind(j+1)) {
