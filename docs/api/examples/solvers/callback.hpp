@@ -30,7 +30,7 @@
 *
 * \sa
 * \code
-* casadi::NlpSolver();
+* casadi::Function();
 * \endcode
 *
 */

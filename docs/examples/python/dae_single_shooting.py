@@ -43,7 +43,7 @@ subject to   dot(x0) == z*x0-x1+u     \
              x1(t=10) == 0
              -0.75 <= u <= 1  for 0 <= t <= 10
 
-Note that other methods such as direct collocation or direct single shooting
+Note that other methods such as direct collocation or direct multiple shooting
 are usually preferably to the direct single shooting method in practise.
 
 Joel Andersson, 2012-2015
@@ -66,7 +66,7 @@ f_q = x[0]**2 + x[1]**2 + u**2
 # Create an integrator
 dae = {'x':x, 'z':z, 'p':u, 'ode':f_x, 'alg':f_z, 'quad':f_q}
 opts = {"tf":0.5} # interval length
-I = Integrator('I', "idas", dae, opts)
+I = integrator('I', "idas", dae, opts)
 
 # All controls
 U = MX.sym("U", 20)
@@ -82,7 +82,7 @@ for k in range(20):
 # Allocate an NLP solver
 nlp = {'x':U, 'f':J, 'g':X}
 opts = {"linear_solver":"ma27"}
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 
 # Pass bounds, initial guess and solve NLP
 sol = solver({"lbx" : -0.75, # Lower variable bound

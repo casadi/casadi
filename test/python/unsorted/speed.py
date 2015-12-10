@@ -73,7 +73,7 @@ for sol in solvers:
   for i in range(rep):
     # create empty matrix
     if sol=="casadi":
-      M = DMatrix(n,m)
+      M = DM(n,m)
     else:
       if use_lil:
         M = lil_matrix((n,m))
@@ -106,7 +106,7 @@ for sol in solvers:
     dim = M.shape
     col = list(int(i) for i in M.indices)
     rowind = list(int(i) for i in M.indptr)
-    M = DMatrix(dim[0],dim[1],col,rowind,M.data)
+    M = DM(dim[0],dim[1],col,rowind,M.data)
     
     # Save the matrix
     CM.append(M)

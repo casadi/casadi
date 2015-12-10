@@ -30,6 +30,8 @@ from types import *
 from helpers import *
 import pickle
 from operator import itemgetter
+import sys
+
 
 scipy_available = True
 try:
@@ -44,8 +46,8 @@ class Misctests(casadiTestCase):
     self.message('Regression test #179 (B)')
     def calc_sparsity():
       x = casadi.SX.sym("x")
-      f = casadi.SXFunction('f', [x], [x ** 2])
-      return f.jacSparsity()
+      f = casadi.Function('f', [x], [x ** 2])
+      return f.sparsity_jac()
     
     def print_sparsity():
         sparsity = calc_sparsity()
@@ -54,20 +56,20 @@ class Misctests(casadiTestCase):
     print_sparsity()
     
   def test_sanity(self):
-    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,4,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,12],[1,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[-10,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[8,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[-3,2,1]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1,2]),[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,0,3],[1,2,1]),[0.738,0.39,0.99]))    
+    DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,4,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,2,12],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[-10,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,2,3],[8,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,2,3],[-3,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,2,3],[1,2,1,2]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DM(Sparsity(4,3,[0,2,0,3],[1,2,1]),[0.738,0.39,0.99]))    
     
   def test_copyconstr_norefcount(self):
     self.message("Copy constructor for non-refcounted classes")
-    x = DMatrix.ones(2,3)
+    x = DM.ones(2,3)
 
-    y = DMatrix(x)
+    y = DM(x)
     x[0,0] = 5
     
     self.assertFalse(id(x)==id(y))
@@ -92,9 +94,9 @@ class Misctests(casadiTestCase):
     self.message("Copy constructor for refcounted classes - lazy")
     x = SX.sym("x")
 
-    f = SXFunction('f', [x],[2*x])
+    f = Function('f', [x],[2*x])
     f.setInput(2,0)
-    g = SXFunction(f)
+    g = Function(f)
 
     f.setInput(5,0)
     f.evaluate()
@@ -107,7 +109,7 @@ class Misctests(casadiTestCase):
     self.message("Shallow copy for non-refcounted classes")
     import copy
     
-    x = DMatrix.ones(2,3)
+    x = DM.ones(2,3)
 
     y = copy.copy(x)
     x[0,0] = 5
@@ -135,7 +137,7 @@ class Misctests(casadiTestCase):
     import copy
     x = SX.sym("x")
 
-    f = SXFunction('f', [x],[2*x])
+    f = Function('f', [x],[2*x])
     f.setInput(2,0)
     g = copy.copy(f)
 
@@ -149,7 +151,7 @@ class Misctests(casadiTestCase):
     self.message("Deep copy for non-refcounted classes")
     import copy
     
-    x = DMatrix.ones(2,3)
+    x = DM.ones(2,3)
 
     y = copy.deepcopy(x)
     x[0,0] = 5
@@ -172,14 +174,14 @@ class Misctests(casadiTestCase):
     self.checkarray(x.shape,(2,8),"shape")
     self.checkarray(y.shape,(4,4),"shape")
     
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requiresPlugin(nlpsol,"ipopt")
   def test_options_introspection(self):
     self.message("options introspection")
     x=SX.sym("x")
-    nlp = SXFunction('nlp', nlpIn(x=x),nlpOut(f=x**2))
-    i = NlpSolver('i', "ipopt", nlp)
+    nlp = {'x':x, 'f':x**2}
+    i = nlpsol('i', "ipopt", nlp)
     
-    opts = i.getOptionNames()
+    opts = i.optionNames()
     self.assertTrue(isinstance(opts,list))
     
     n = opts[0]
@@ -187,14 +189,14 @@ class Misctests(casadiTestCase):
     
     n = "monitor"
     
-    d = i.getOptionDescription(n)
+    d = i.optionDescription(n)
     self.assertTrue(type(d)==type(""))
     self.assertTrue(not("d"=="N/A"))
     
-    d = i.getOptionTypeName(n)
+    d = i.optionTypeName(n)
     self.assertEqual(d,"OT_STRINGVECTOR")
 
-    #d = i.getOptionAllowed(n)
+    #d = i.optionAllowed(n)
 
   def test_pickling(self):
 
@@ -208,33 +210,26 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.assertTrue(a.isNull())
     
-    a = IMatrix(Sparsity.lower(4),range(10))
+    a = IM(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
 
 
-    a = DMatrix(Sparsity.lower(4),range(10))
+    a = DM(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
     
+  @known_bug()
   def test_exceptions(self):
     try:
-      MXFunction('tmp', nlpIn(x=SX.sym("x")))
+      nlpsol(123)
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      for m in e.message.split("\n"):
-        if "You have" in m:
-          assert "SX" in m
-    try:
-      NlpSolver(123)
-      self.assertTrue(False)
-    except NotImplementedError as e:
-      print e.message
-      assert "NlpSolver(str,str,Function,Dict)" in e.message
-      assert "You have: NlpSolver(int)" in e.message
+      assert "nlpsol(str,str,Function,Dict)" in e.message
+      assert "You have: nlpsol(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
 
@@ -244,7 +239,7 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "vertcat([SX]" in e.message
-      assert "vertcat([DMatrix" in e.message
+      assert "vertcat([DM" in e.message
       assert "You have: vertcat(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
@@ -259,18 +254,9 @@ class Misctests(casadiTestCase):
       assert "You have: substitute(int)" in e.message
       assert "::" not in e.message
       assert "std" not in e.message
-      
-    try:
-      SXFunction('tmp', daeIn(x=SX.sym("x")))
-      self.assertTrue(False)
-    except NotImplementedError as e:
-      print e.message
-      assert "You have: SXFunction(str, (str:SX,[str]))" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
 
     try:
-      NlpSolver.loadPlugin(132)
+      load_nlpsol(132)
       self.assertTrue(False)
     except TypeError as e:
       print e.message
@@ -312,14 +298,14 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "diagsplit(SX,int)" in e.message
-      assert "diagsplit(DMatrix ,int)" in e.message
+      assert "diagsplit(DM ,int)" in e.message
 
     try:
-      DMatrix("df")
+      DM("df")
       self.assertTrue(False)
     except NotImplementedError as e:
       print e.message
-      assert "  DMatrix (" in e.message
+      assert "  DM (" in e.message
 
     try:
       vertcat([1,SX.sym('x'),MX.sym('x')])
@@ -327,44 +313,24 @@ class Misctests(casadiTestCase):
     except NotImplementedError as e:
       print e.message
       assert "  vertcat(" in e.message
-
-  def test_callkw(self):
-      x = SX.sym("x")
-
-      f = SXFunction('f', nlpIn(x=x),nlpOut(g=x**2))
-
-      [f_,g_] = itemgetter('f','g')(f({'x':4}))
-      self.checkarray(g_,DMatrix(16))
-
-      with self.assertRaises(RuntimeError):
-        [f_,g_] = itemgetter('f','g')(f({'m':4}))
-      
-      with self.assertRaises(RuntimeError):
-        [f_,g_] = itemgetter('f','g')(f({'x':[x]}))
-
-
-      f = SXFunction('f', [x],nlpOut(g=x**2))
-
-      with self.assertRaises(Exception):
-        [f_,g_] = itemgetter('f','g')(f({'x':4}))
         
   def test_getscheme(self):
     x = SX.sym("x")
     p = SX.sym("p")
 
-    F = SXFunction('F', nlpIn(x=x,p=p),nlpOut(g=x**2,f=x+p))
+    F = Function('F', [x, p], [x+p, x**2], ['x', 'p'], ['f', 'g'])
     
     fc = F({'x':3,'p':4})
     [f] = fc['f']
-    self.checkarray(f,DMatrix([7]))
+    self.checkarray(f,DM([7]))
     [g] = fc['g']
-    self.checkarray(g,DMatrix([9]))
+    self.checkarray(g,DM([9]))
     [f,g] = itemgetter('f','g')(fc)
-    self.checkarray(f,DMatrix([7]))
-    self.checkarray(g,DMatrix([9]))
+    self.checkarray(f,DM([7]))
+    self.checkarray(g,DM([9]))
     [g,f] = itemgetter('g','f')(fc)
-    self.checkarray(f,DMatrix([7]))
-    self.checkarray(g,DMatrix([9]))
+    self.checkarray(f,DM([7]))
+    self.checkarray(g,DM([9]))
     
   def test_assertions(self):
     
@@ -376,7 +342,7 @@ class Misctests(casadiTestCase):
     
     v = sin(z)
     
-    f = MXFunction('f', [x],[v])
+    f = Function('f', [x],[v])
     
     print f
     
@@ -391,16 +357,16 @@ class Misctests(casadiTestCase):
       print str(e)
       self.assertTrue("x must be larger than 3" in str(e))
 
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requiresPlugin(nlpsol,"ipopt")
   def test_output(self):
     with capture_stdout() as result:
-      DMatrix([1,2]).printDense()
+      DM([1,2]).printDense()
 
     assert "2" in result[0]
 
     x=SX.sym("x")
-    f = SXFunction('f', nlpIn(x=x),nlpOut(f=x**2))
-    solver = NlpSolver("solver", "ipopt",f)
+    f = {'x':x, 'f':x**2}
+    solver = nlpsol("solver", "ipopt",f)
     with capture_stdout() as result:
       solver.evaluate()
 
@@ -410,21 +376,11 @@ class Misctests(casadiTestCase):
 
     with capture_stdout() as result:
       try:    
-        solver = NlpSolver("solver","foo",f)
+        solver = nlpsol("solver","foo",f)
       except:
         pass
     
-    assert "casadi_nlpsolver_foo" in result[1]
-
-
-  def test_nlpInErr(self):
-    msg = ""
-    try:
-      nlpIn(foo=SX.sym('x'))
-    except Exception as e:
-      msg = str(e)
-    print msg
-    assert("'x', 'p'" in msg)
+    assert "casadi_nlpsol_foo" in result[1]
     
 
 pickle.dump(Sparsity(),file("temp.txt","w"))

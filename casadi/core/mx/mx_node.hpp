@@ -27,10 +27,9 @@
 #define CASADI_MX_NODE_HPP
 
 #include "mx.hpp"
-#include "../sx/sx_element.hpp"
+#include "../sx/sx_elem.hpp"
 #include "../casadi_math.hpp"
 #include "../function/code_generator.hpp"
-#include "../function/linear_solver.hpp"
 #include <vector>
 #include <stack>
 
@@ -91,22 +90,22 @@ namespace casadi {
     virtual bool __nonzero__() const;
 
     /** \brief Check if identically zero */
-    virtual bool isZero() const { return false;}
+    virtual bool is_zero() const { return false;}
 
     /** \brief Check if identically one */
-    virtual bool isOne() const { return false;}
+    virtual bool is_one() const { return false;}
 
     /** \brief Check if a certain value */
     virtual bool isValue(double val) const { return false;}
 
     /** \brief Check if identity matrix */
-    virtual bool isIdentity() const { return false;}
+    virtual bool is_identity() const { return false;}
 
     /** \brief Check if unary operation */
-    virtual bool isUnaryOp() const { return false;}
+    virtual bool is_unaryOp() const { return false;}
 
     /** \brief Check if binary operation */
-    virtual bool isBinaryOp() const { return false;}
+    virtual bool is_binaryOp() const { return false;}
 
     /** \brief  Print a representation */
     virtual void repr(std::ostream &stream) const;
@@ -115,10 +114,10 @@ namespace casadi {
     virtual void print(std::ostream &stream) const;
 
     /** \brief Find out which nodes can be inlined */
-    void canInline(std::map<const MXNode*, int>& nodeind) const;
+    void can_inline(std::map<const MXNode*, int>& nodeind) const;
 
     /** \brief Print compact */
-    std::string printCompact(std::map<const MXNode*, int>& nodeind,
+    std::string print_compact(std::map<const MXNode*, int>& nodeind,
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */
@@ -128,18 +127,17 @@ namespace casadi {
     virtual void addDependency(CodeGenerator& g) const {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Evaluate numerically */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evalSX(const SXElement** arg, SXElement** res,
-                        int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -150,31 +148,31 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
 
     /** \brief  Check if valid function input */
-    virtual bool isValidInput() const { return false;}
+    virtual bool is_valid_input() const { return false;}
 
     /** \brief Get the number of symbolic primitives */
-    virtual int numPrimitives() const;
+    virtual int n_primitives() const;
 
     /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MX>::iterator& it) const;
+    virtual void primitives(std::vector<MX>::iterator& it) const;
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool hasDuplicates();
+    virtual bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     virtual void resetInput();
@@ -192,16 +190,16 @@ namespace casadi {
     virtual const Function& getFunction(int i) const;
 
     /** \brief  Get function input */
-    virtual int getFunctionInput() const;
+    virtual int getFunction_input() const;
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const;
 
     /** \brief Get the operation */
-    virtual int getOp() const = 0;
+    virtual int op() const = 0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const { return false;}
+    virtual bool zz_is_equal(const MXNode* node, int depth) const { return false;}
 
     /** \brief Get equality checking depth */
     inline static bool maxDepth() { return MX::getEqualityCheckingDepth();}
@@ -237,7 +235,7 @@ namespace casadi {
     int nnz(int i=0) const { return sparsity(i).nnz(); }
     int size1() const { return sparsity().size1(); }
     int size2() const { return sparsity().size2(); }
-    std::pair<int, int> shape() const { return sparsity().shape();}
+    std::pair<int, int> size() const { return sparsity().size();}
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear() {return false;}
@@ -281,7 +279,7 @@ namespace casadi {
 
     /// Convert scalar to matrix
     inline static MX toMatrix(const MX& x, const Sparsity& sp) {
-      if (x.shape()==sp.shape()) {
+      if (x.size()==sp.size()) {
         return x;
       } else {
         return MX(sp, x);
@@ -300,7 +298,7 @@ namespace casadi {
     /// Simplify the expression (ex is a reference to the node)
     virtual void simplifyMe(MX& ex) {}
 
-    /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
+    /// Get an IM representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
     /// Create a horizontal concatenation node
@@ -322,10 +320,10 @@ namespace casadi {
     virtual std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
 
     /// Create a diagonal concatenation node
-    virtual MX getDiagcat(const std::vector<MX>& x) const;
+    virtual MX get_diagcat(const std::vector<MX>& x) const;
 
     /// Create a diagonal split node
-    virtual std::vector<MX> getDiagsplit(const std::vector<int>& offset1,
+    virtual std::vector<MX> get_diagsplit(const std::vector<int>& offset1,
                                          const std::vector<int>& offset2) const;
 
     /// Transpose
@@ -337,6 +335,12 @@ namespace casadi {
     /** \brief Matrix multiplication and addition */
     virtual MX getMultiplication(const MX& y, const MX& z) const;
 
+    /** \brief Bilinear form */
+    virtual MX getBilin(const MX& x, const MX& y) const;
+
+    /** \brief Bilinear form */
+    virtual MX getRank1(const MX& alpha, const MX& x, const MX& y) const;
+
     /** \brief Solve a system of linear equations
     *
     *      For system Ax = b:
@@ -344,7 +348,7 @@ namespace casadi {
     *      A->getSolve(b)
     *
     */
-    virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const;
+    virtual MX getSolve(const MX& r, bool tr, const Function& linear_solver) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
@@ -380,7 +384,7 @@ namespace casadi {
     virtual MX getInverse() const;
 
     /// Inner product
-    virtual MX getInnerProd(const MX& y) const;
+    virtual MX getDot(const MX& y) const;
 
     /// Frobenius norm
     virtual MX getNormF() const;

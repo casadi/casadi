@@ -26,38 +26,36 @@
 #ifndef CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
 #define CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
 
-/** \defgroup plugin_LinearSolver_csparsecholesky
-   * LinearSolver with CSparseCholesky Interface
+/** \defgroup plugin_Linsol_csparsecholesky
+   * Linsol with CSparseCholesky Interface
 */
 
-/** \pluginsection{LinearSolver,csparsecholesky} */
+/** \pluginsection{Linsol,csparsecholesky} */
 
 /// \cond INTERNAL
 #include <cs.h>
-#include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/csparse/casadi_linearsolver_csparsecholesky_export.h>
+#include "casadi/core/function/linsol.hpp"
+#include <casadi/interfaces/csparse/casadi_linsol_csparsecholesky_export.h>
 
 namespace casadi {
 
-  /** \brief \pluginbrief{LinearSolver,csparsecholesky}
+  /** \brief \pluginbrief{Linsol,csparsecholesky}
    *
    *
-   @copydoc LinearSolver_doc
-   @copydoc plugin_LinearSolver_csparsecholesky
+   @copydoc Linsol_doc
+   @copydoc plugin_Linsol_csparsecholesky
    *
    */
-  class CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
-  CSparseCholeskyInternal : public LinearSolverInternal {
+  class CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
+  CSparseCholeskyInternal : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInternal(const Sparsity& sp, int nrhs);
+    CSparseCholeskyInternal(const std::string& name, const Sparsity& sp, int nrhs);
 
-    // Copy constructor
-    CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol);
-
-    /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new CSparseCholeskyInternal(sp, nrhs);}
+    /** \brief  Create a new Linsol */
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+      return new CSparseCholeskyInternal(name, sp, nrhs);
+    }
 
     // Destructor
     virtual ~CSparseCholeskyInternal();
@@ -65,20 +63,20 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
-    // Factorize the matrix
-    virtual void prepare();
+    // Factorize the linear system
+    virtual void linsol_factorize(Memory& m, const double* A);
 
-    // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    // Solve the linear system
+    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
 
     // Solve the system of equations <tt>Lx = b</tt>
-    virtual void solveL(double* x, int nrhs, bool transpose);
+    virtual void linsol_solveL(double* x, int nrhs, bool tr);
 
     /// Obtain a symbolic Cholesky factorization
-    virtual Sparsity getFactorizationSparsity(bool transpose) const;
+    virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
 
     /// Obtain a numeric Cholesky factorization
-    virtual DMatrix getFactorization(bool transpose) const;
+    virtual DM linsol_cholesky(bool tr) const;
 
     // The transpose of linear system in form (CCS)
     cs AT_;
@@ -95,6 +93,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "csparsecholesky";}
   };
 
 } // namespace casadi

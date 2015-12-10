@@ -36,14 +36,14 @@ using namespace std;
 int main(){
     
   // Load the generated functions
-  ExternalFunction nlp("nlp", "./nlp.casadi");
-  ExternalFunction grad_f("grad_f", "./grad_f.casadi");
-  ExternalFunction jac_g("jac_g", "./jac_g.casadi");
-  ExternalFunction hess_lag("hess_lag", "./hess_lag.casadi");
+  Function nlp = external("nlp", "./nlp.casadi");
+  Function grad_f = external("grad_f", "./grad_f.casadi");
+  Function jac_g = external("jac_g", "./jac_g.casadi");
+  Function hess_lag = external("hess_lag", "./hess_lag.casadi");
 
   // Create an NLP solver passing derivative information
-  NlpSolver solver("solver", "ipopt", nlp,
-                   make_dict("grad_f", grad_f, "jac_g", jac_g, "hess_lag",hess_lag));
+  Dict opts = {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}};
+  Function solver = nlpsol("solver", "ipopt", nlp, opts);
 
   // Set constraint bounds
   solver.setInput(0.,"lbg");

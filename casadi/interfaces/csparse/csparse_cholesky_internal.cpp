@@ -31,8 +31,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
-  casadi_register_linearsolver_csparsecholesky(LinearSolverInternal::Plugin* plugin) {
+  int CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
+  casadi_register_linsol_csparsecholesky(Linsol::Plugin* plugin) {
     plugin->creator = CSparseCholeskyInternal::creator;
     plugin->name = "csparsecholesky";
     plugin->doc = CSparseCholeskyInternal::meta_doc.c_str();
@@ -41,24 +41,19 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT casadi_load_linearsolver_csparsecholesky() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparsecholesky);
+  void CASADI_LINSOL_CSPARSECHOLESKY_EXPORT casadi_load_linsol_csparsecholesky() {
+    Linsol::registerPlugin(casadi_register_linsol_csparsecholesky);
   }
 
-  CSparseCholeskyInternal::CSparseCholeskyInternal(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity, nrhs) {
+  CSparseCholeskyInternal::CSparseCholeskyInternal(const std::string& name,
+                                                   const Sparsity& sparsity, int nrhs) :
+    Linsol(name, sparsity, nrhs) {
     L_ = 0;
     S_ = 0;
 
-    casadi_assert_message(sparsity.issymmetric(),
+    casadi_assert_message(sparsity.is_symmetric(),
                           "CSparseCholeskyInternal: supplied sparsity must be symmetric, got "
-                          << sparsity.dimString() << ".");
-  }
-
-  CSparseCholeskyInternal::CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol) :
-      LinearSolverInternal(linsol) {
-    L_ = 0;
-    S_ = 0;
+                          << sparsity.dim() << ".");
   }
 
   CSparseCholeskyInternal::~CSparseCholeskyInternal() {
@@ -68,7 +63,7 @@ namespace casadi {
 
   void CSparseCholeskyInternal::init() {
     // Call the init method of the base class
-    LinearSolverInternal::init();
+    Linsol::init();
 
     AT_.nzmax = input().nnz();  // maximum number of entries
     AT_.m = input().size1(); // number of cols
@@ -76,7 +71,7 @@ namespace casadi {
     AT_.p = const_cast<int*>(input().colind()); // row pointers (size n+1)
                                                          // or row indices (size nzmax)
     AT_.i = const_cast<int*>(input().row()); // col indices, size nzmax
-    AT_.x = &input().front(); // col indices, size nzmax
+    AT_.x = &input()->front(); // col indices, size nzmax
     AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
     // Temporary
@@ -93,7 +88,7 @@ namespace casadi {
   }
 
 
-  Sparsity CSparseCholeskyInternal::getFactorizationSparsity(bool transpose) const {
+  Sparsity CSparseCholeskyInternal::linsol_cholesky_sparsity(bool tr) const {
     casadi_assert(S_);
     int n = AT_.n;
     int nzmax = S_->cp[n];
@@ -121,11 +116,11 @@ namespace casadi {
     Lp[n] = S_->cp[n] ;
     Sparsity ret(n, n, row, colind); // BUG?
 
-    return transpose? ret.T() : ret;
+    return tr ? ret.T() : ret;
 
   }
 
-  DMatrix CSparseCholeskyInternal::getFactorization(bool transpose) const {
+  DM CSparseCholeskyInternal::linsol_cholesky(bool tr) const {
     casadi_assert(L_);
     cs *L = L_->L;
     int nz = L->nzmax;
@@ -137,14 +132,13 @@ namespace casadi {
     std::copy(L->i, L->i+nz, row.begin());
     std::vector< double > data(nz);
     std::copy(L->x, L->x+nz, data.begin());
-    DMatrix ret(Sparsity(n, m, colind, row), data, false);
+    DM ret(Sparsity(n, m, colind, row), data, false);
 
-    return transpose? ret.T() : ret;
+    return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInternal::prepare() {
-
-    prepared_ = false;
+  void CSparseCholeskyInternal::linsol_factorize(Memory& m, const double* A) {
+    casadi_copy(A, nnz_in(0), input(0).ptr());
 
     // Get a reference to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();
@@ -164,8 +158,8 @@ namespace casadi {
     if (L_) cs_nfree(L_);
     L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization
     if (L_==0) {
-      DMatrix temp = sparsify(input());
-      if (temp.sparsity().issingular()) {
+      DM temp = sparsify(input());
+      if (temp.sparsity().is_singular()) {
         stringstream ss;
         ss << "CSparseCholeskyInternal::prepare: factorization failed due "
           "to matrix being singular. Matrix contains numerical zeros which are"
@@ -189,17 +183,14 @@ namespace casadi {
       }
     }
     casadi_assert(L_!=0);
-
-    prepared_ = true;
   }
 
-  void CSparseCholeskyInternal::solve(double* x, int nrhs, bool transpose) {
-    casadi_assert(prepared_);
+  void CSparseCholeskyInternal::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     casadi_assert(L_!=0);
 
     double *t = &temp_.front();
     for (int k=0; k<nrhs; ++k) {
-      if (transpose) {
+      if (tr) {
         cs_pvec(S_->q, x, t, AT_.n) ;   // t = P1\b
         cs_ltsolve(L_->L, t) ;               // t = L\t
         cs_lsolve(L_->L, t) ;              // t = U\t
@@ -214,16 +205,15 @@ namespace casadi {
     }
   }
 
-  void CSparseCholeskyInternal::solveL(double* x, int nrhs, bool transpose) {
-    casadi_assert(prepared_);
+  void CSparseCholeskyInternal::linsol_solveL(double* x, int nrhs, bool tr) {
     casadi_assert(L_!=0);
 
     double *t = getPtr(temp_);
 
     for (int k=0; k<nrhs; ++k) {
       cs_ipvec(L_->pinv, x, t, AT_.n) ;   // t = P1\b
-      if (transpose) cs_lsolve(L_->L, t) ; // t = L\t
-      if (!transpose) cs_ltsolve(L_->L, t) ; // t = U\t
+      if (tr) cs_lsolve(L_->L, t) ; // t = L\t
+      if (!tr) cs_ltsolve(L_->L, t) ; // t = U\t
       cs_ipvec(S_->q, t, x, AT_.n) ;      // x = P2\t
       x += ncol();
     }

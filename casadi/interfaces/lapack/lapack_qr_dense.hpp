@@ -26,16 +26,16 @@
 #ifndef CASADI_LAPACK_QR_DENSE_HPP
 #define CASADI_LAPACK_QR_DENSE_HPP
 
-#include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/lapack/casadi_linearsolver_lapackqr_export.h>
+#include "casadi/core/function/linsol.hpp"
+#include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
 
-/** \defgroup plugin_LinearSolver_lapackqr
+/** \defgroup plugin_Linsol_lapackqr
 *
 * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
 * <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
 */
 
-/** \pluginsection{LinearSolver,lapackqr} */
+/** \pluginsection{Linsol,lapackqr} */
 
 /// \cond INTERNAL
 namespace casadi {
@@ -53,20 +53,21 @@ namespace casadi {
   extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
                          double *alpha, double *a, int *lda, double *b, int *ldb);
 
-  /** \brief  \pluginbrief{LinearSolver,lapackqr}
+  /** \brief  \pluginbrief{Linsol,lapackqr}
    *
-   @copydoc LinearSolver_doc
-   @copydoc plugin_LinearSolver_lapackqr
+   @copydoc Linsol_doc
+   @copydoc plugin_Linsol_lapackqr
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQrDense : public LinearSolverInternal {
+  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQrDense : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQrDense(const Sparsity& sparsity, int nrhs);
+    LapackQrDense(const std::string& name, const Sparsity& sparsity, int nrhs);
 
-    /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new LapackQrDense(sp, nrhs);}
+    /** \brief  Create a new Linsol */
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+      return new LapackQrDense(name, sp, nrhs);
+    }
 
     // Destructor
     virtual ~LapackQrDense();
@@ -74,15 +75,17 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
-    // Prepare the solution of the linear system
-    virtual void prepare();
+    // Factorize the linear system
+    virtual void linsol_factorize(Memory& m, const double* A);
 
-    // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    // Solve the linear system
+    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
 
     /// A documentation string
     static const std::string meta_doc;
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "lapackqr";}
   protected:
 
     // Matrix

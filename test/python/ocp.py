@@ -29,7 +29,7 @@ from types import *
 from helpers import *
 
 class OCPtests(casadiTestCase):
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requires_nlpsol("ipopt")
   def testdiscrete(self):
     self.message("Linear-quadratic problem, discrete, using IPOPT")
     # inspired by www.cs.umsl.edu/~janikow/publications/1992/GAforOpt/text.pdf
@@ -52,13 +52,13 @@ class OCPtests(casadiTestCase):
       cost = cost + s*X[i]**2+r*U[i]**2
     cost = cost + q*X[N]**2
     
-    nlp = SXFunction('nlp', nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
+    nlp = {'x':V, 'f':cost, 'g':vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])}
     opts = {}
     opts["tol"] = 1e-5
     opts["hessian_approximation"] = "limited-memory"
     opts["max_iter"] = 100
     opts["print_level"] = 0
-    solver = NlpSolver("solver", "ipopt", nlp, opts)
+    solver = nlpsol("solver", "ipopt", nlp, opts)
     solver.setInput([-1000 for i in range(V.nnz())],"lbx")
     solver.setInput([1000 for i in range(V.nnz())],"ubx")
     solver.setInput([0 for i in range(N+1)],"lbg")
@@ -72,7 +72,7 @@ class OCPtests(casadiTestCase):
     exact_sol=K * x0**2
     self.assertAlmostEqual(ocp_sol,exact_sol,10,"Linear-quadratic problem solution using IPOPT")
 
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requires_nlpsol("ipopt")
   def test_singleshooting(self):
     self.message("Single shooting")
     p0 = 0.2
@@ -85,7 +85,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    dae={'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],p[0]+q[1]**2 ])}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -93,7 +93,7 @@ class OCPtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -105,15 +105,15 @@ class OCPtests(casadiTestCase):
     
     parc = MX(0)
     
-    f = MXFunction('f', [var,parMX],[qend[0]])
-    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
+    f = Function('f', [var,parMX],[qend[0]])
+    nlp = {'x':var, 'f':-f([var,parc])[0]}
     opts = {}
     opts["tol"] = 1e-12
     opts["hessian_approximation"] = "limited-memory"
     opts["max_iter"] = 10
     opts["derivative_test"] = "first-order"
     opts["print_level"] = 0
-    solver = NlpSolver("solver", "ipopt", nlp, opts)
+    solver = nlpsol("solver", "ipopt", nlp, opts)
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
     solver.evaluate()
@@ -126,7 +126,7 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[1],0,8,"Constraint is supposed to be unactive")
 
-  @requiresPlugin(NlpSolver,"ipopt")
+  @requires_nlpsol("ipopt")
   def test_singleshooting2(self):
     self.message("Single shooting 2")
     p0 = 0.2
@@ -139,7 +139,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction('f', daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    dae={'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],p[0]+q[1]**2 ])}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -147,7 +147,7 @@ class OCPtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -158,15 +158,15 @@ class OCPtests(casadiTestCase):
     
     parc = MX(dy0)
     
-    f = MXFunction('f', [var,par],[qend[0]])
-    nlp = MXFunction('nlp', nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
+    f = Function('f', [var,par],[qend[0]])
+    nlp = {'x':var, 'f':-f([var,parc])[0], 'g':var[0]-var[1]}
     opts = {}
     opts["tol"] = 1e-12
     opts["hessian_approximation"] = "limited-memory"
     opts["max_iter"] = 10
     opts["derivative_test"] = "first-order"
     #opts["print_level"] = 0
-    solver = NlpSolver("solver", "ipopt", nlp, opts)
+    solver = nlpsol("solver", "ipopt", nlp, opts)
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
     solver.setInput([-1],"lbg")
@@ -216,9 +216,9 @@ class OCPtests(casadiTestCase):
     #self.assertEquals(ivp.path.nnz(),3)
     #self.assertEquals(len(ivp.cfcn_lb),3)
     #self.assertEquals(len(ivp.cfcn_ub),3)
-    #self.assertTrue(ivp.cfcn[0].isEqual(T)) 
-    #self.assertTrue(ivp.cfcn[1].isEqual(u)) 
-    #self.assertTrue(ivp.cfcn[2].isEqual(u)) 
+    #self.assertTrue(ivp.cfcn[0].is_equal(T)) 
+    #self.assertTrue(ivp.cfcn[1].is_equal(u)) 
+    #self.assertTrue(ivp.cfcn[2].is_equal(u)) 
     #self.assertTrue(ivp.cfcn_lb[0].isMinusInf()) 
     #self.assertEquals(ivp.cfcn_lb[1].getValue(),230) 
     #self.assertTrue(ivp.cfcn_lb[2].isMinusInf()) 
@@ -228,7 +228,7 @@ class OCPtests(casadiTestCase):
     print ivp.init
     print c,T,cost
     #print c.atTime(0)
-    f=MXFunction('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
+    f=Function('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
     return 
     f.evaluate()
     self.checkarray(f.getOutput(),matrix([-956.271065,-250.051971,0]).T,"initeq")

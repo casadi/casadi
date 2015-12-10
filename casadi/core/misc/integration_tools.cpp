@@ -24,9 +24,6 @@
 
 
 #include "integration_tools.hpp"
-#include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/function/implicit_function.hpp"
-#include "casadi/core/function/integrator.hpp"
 
 #include <vector>
 
@@ -130,18 +127,18 @@ namespace casadi {
     return collocationPointsGen<long double>(order, scheme);
   }
 
-  MXFunction simpleRK(Function f, int N, int order) {
+  Function simpleRK(Function f, int N, int order) {
     // Initialize f, if needed
-    f.init(false);
+    f.init();
 
     // Consistency check
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
                           << N << ".");
     casadi_assert_message(order==4, "Only RK order 4 is supported now.");
-    casadi_assert_message(f.nIn()==2, "Function must have two inputs: x and p");
-    casadi_assert_message(f.nOut()==1, "Function must have one outputs: dot(x)");
+    casadi_assert_message(f.n_in()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");
 
-    MX x0 = MX::sym("x0", f.input(0).sparsity());
+    MX x0 = MX::sym("x0", f.sparsity_in(0));
     MX p = MX::sym("p", f.input(1).sparsity());
     MX h = MX::sym("h");
 
@@ -191,13 +188,7 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    vector<MX> ret_in(3);
-    ret_in[0] = x0;
-    ret_in[1] = p;
-    ret_in[2] = h;
-    return MXFunction("F", ret_in, make_vector(xf),
-                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
-                                "output_scheme", IOScheme("xf")));
+    return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
 
   void collocationInterpolators(const std::vector<double> & tau_root,
@@ -227,37 +218,32 @@ namespace casadi {
         }
       }
 
-      SXFunction lfcn("lfcn", make_vector(tau), make_vector(L));
+      Function lfcn("lfcn", {tau}, {L});
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation
-      lfcn.setInput(1.0);
-      lfcn.evaluate();
-      D[j] = lfcn.output().at(0);
+      D[j] = lfcn(vector<DM>{1.}).at(0)->front();
 
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Function tfcn = lfcn.tangent();
-      tfcn.init();
       for (int j2=0; j2<deg+1; ++j2) {
-        tfcn.setInput(tau_root[j2]);
-        tfcn.evaluate();
-        C[j2][j] = tfcn.output().at(0);
+        C[j2][j] =  tfcn(vector<DM>{tau_root[j2]}).at(0)->front();
       }
     }
   }
 
-  MXFunction simpleIRK(Function f, int N, int order, const std::string& scheme,
+  Function simpleIRK(Function f, int N, int order, const std::string& scheme,
                        const std::string& solver,
                        const Dict& solver_options) {
     // Initialize f, if needed
-    f.init(false);
+    f.init();
 
     // Consistency check
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
                           << N << ".");
-    casadi_assert_message(f.nIn()==2, "Function must have two inputs: x and p");
-    casadi_assert_message(f.nOut()==1, "Function must have one outputs: dot(x)");
+    casadi_assert_message(f.n_in()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");
 
     // Obtain collocation points
     std::vector<double> tau_root = collocationPoints(order, scheme);
@@ -268,7 +254,7 @@ namespace casadi {
     collocationInterpolators(tau_root, C, D);
 
     // Inputs of constructed function
-    MX x0 = MX::sym("x0", f.input(0).sparsity());
+    MX x0 = MX::sym("x0", f.sparsity_in(0));
     MX p = MX::sym("p", f.input(1).sparsity());
     MX h = MX::sym("h");
 
@@ -295,15 +281,15 @@ namespace casadi {
     }
 
     // Root-finding function
-    MXFunction rfp("rfp", make_vector(v, x0, p, h), make_vector(vertcat(V_eq)));
+    Function rfp("rfp", {v, x0, p, h}, {vertcat(V_eq)});
 
     // Create a implicit function instance to solve the system of equations
-    ImplicitFunction ifcn("ifcn", solver, rfp, solver_options);
+    Function ifcn = rootfinder("ifcn", solver, rfp, solver_options);
 
     // Get state at end time
     MX xf = x0;
     for (int k=0; k<N; ++k) {
-      std::vector<MX> ifcn_out = ifcn(make_vector(repmat(xf, order), xf, p, h));
+      std::vector<MX> ifcn_out = ifcn({repmat(xf, order), xf, p, h});
       x = vertsplit(ifcn_out[0], x0.size1());
 
       // State at end of step
@@ -314,22 +300,20 @@ namespace casadi {
     }
 
     // Form discrete-time dynamics
-    return MXFunction("F", make_vector(x0, p, h), make_vector(xf),
-                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
-                                "output_scheme", IOScheme("xf")));
+    return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
 
-  MXFunction simpleIntegrator(Function f, const std::string& integrator,
-                              const Dict& integrator_options) {
+  Function simpleIntegrator(Function f, const std::string& plugin,
+                            const Dict& plugin_options) {
     // Initialize f, if needed
-    f.init(false);
+    f.init();
 
     // Consistency check
-    casadi_assert_message(f.nIn()==2, "Function must have two inputs: x and p");
-    casadi_assert_message(f.nOut()==1, "Function must have one outputs: dot(x)");
+    casadi_assert_message(f.n_in()==2, "Function must have two inputs: x and p");
+    casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");
 
     // Sparsities
-    Sparsity x_sp = f.input(0).sparsity();
+    Sparsity x_sp = f.sparsity_in(0);
     Sparsity p_sp = f.input(1).sparsity();
 
     // Wrapper function inputs
@@ -340,19 +324,19 @@ namespace casadi {
     int u_offset[] = {0, 1, 1+p_sp.size1()};
     vector<MX> pp = vertsplit(u, vector<int>(u_offset, u_offset+3));
     MX h = pp[0];
-    MX p = reshape(pp[1], p_sp.shape());
+    MX p = reshape(pp[1], p_sp.size());
     MX f_in[] = {x, p};
     MX xdot = f(vector<MX>(f_in, f_in+2)).at(0);
     xdot *= h;
 
     // Form DAE function
-    MXFunction dae("dae", daeIn("x", x, "p", u), daeOut("ode", xdot));
+    MXDict dae = {{"x", x}, {"p", u}, {"ode", xdot}};
 
     // Create integrator function
-    Dict integrator_options2 = integrator_options;
-    integrator_options2["t0"] = 0; // Normalized time
-    integrator_options2["tf"] = 1; // Normalized time
-    Integrator ifcn("integrator", integrator, dae, integrator_options2);
+    Dict plugin_options2 = plugin_options;
+    plugin_options2["t0"] = 0; // Normalized time
+    plugin_options2["tf"] = 1; // Normalized time
+    Function ifcn = integrator("integrator", plugin, dae, plugin_options2);
 
     // Inputs of constructed function
     MX x0 = MX::sym("x0", x_sp);
@@ -360,12 +344,10 @@ namespace casadi {
     h = MX::sym("h");
 
     // State at end
-    MX xf = ifcn(make_map("x0", x0, "p", vertcat(h, vec(p)))).at("xf");
+    MX xf = ifcn(MXDict{{"x0", x0}, {"p", vertcat(h, vec(p))}}).at("xf");
 
     // Form discrete-time dynamics
-    return MXFunction("F", make_vector(x0, p, h), make_vector(xf),
-                      make_dict("input_scheme", IOScheme("x0", "p", "h"),
-                                "output_scheme", IOScheme("xf")));
+    return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
 
 } // namespace casadi

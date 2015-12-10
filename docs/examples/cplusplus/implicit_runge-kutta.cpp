@@ -36,7 +36,6 @@ using namespace casadi;
 using namespace std;
 
 int main(){
-
   // End time
   double tf = 10.0;
 
@@ -52,7 +51,7 @@ int main(){
   SX ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p,
                    x[0],
                    x[0]*x[0] + x[1]*x[1] + p*p);
-  SXFunction f("f", daeIn("x",x,"p",p),daeOut("ode",ode));
+  SXDict dae = {{"x", x}, {"p", p}, {"ode", ode}};
 
   // Number of finite elements
   int n = 100;
@@ -61,7 +60,11 @@ int main(){
   double h = tf/n;
 
   // Choose collocation points
-  vector<double> tau_root = collocationPoints(4,"legendre");
+  vector<double> tau_root = collocationPoints(4, "legendre");
+
+  // Nonlinear solver to use
+  string solver = "newton";
+  //string solver = "ipopt";
 
   // Degree of interpolating polynomial
   int d = tau_root.size()-1;
@@ -103,8 +106,9 @@ int main(){
   for(int r=0; r<d; ++r){
     X.push_back(V[Slice(r*nx,(r+1)*nx)]);
   }
-  
+
   // Get the collocation quations (that define V)
+  Function f("f", {dae["x"], dae["p"]}, {dae["ode"]});
   vector<MX> V_eq;
   for(int j=1; j<d+1; ++j){
     // Expression for the state derivative at the collocation point
@@ -114,33 +118,43 @@ int main(){
     }
     
     // Append collocation equations
-    MX f_j = f(make_map("x",X[j],"p",P)).at("ode");
-    V_eq.push_back(h*f_j - xp_j);
+    vector<MX> v = {X[j], P};
+    v = f(v);
+    V_eq.push_back(h*v[0] - xp_j);
   }
 
   // Root-finding function, implicitly defines V as a function of X0 and P
-  MXFunction vfcn("vfcn", {V, X0, P}, {vertcat(V_eq)});
+  Function vfcn("vfcn", {V, X0, P}, {vertcat(V_eq)});
   
-  // Convert to SXFunction to decrease overhead
-  SXFunction vfcn_sx(vfcn);
+  // Convert to sxfunction to decrease overhead
+  Function vfcn_sx = vfcn.expand("vfcn");
 
   // Create a implicit function instance to solve the system of equations
-  ImplicitFunction ifcn("ifcn", "newton", vfcn_sx, make_dict("linear_solver", "csparse"));
+  Dict opts;
+  if (solver=="ipopt") {
+    // Use an NLP solver
+    Dict nlpsol_options = {{"print_time", false}, {"print_level", 0}};
+    opts = {{"nlpsol", "ipopt"}, {"nlpsol_options", nlpsol_options}};
+    solver = "nlpsol";
+  } else {
+    opts = {{"linear_solver", "csparse"}};
+  }
+  Function ifcn = rootfinder("ifcn", solver, vfcn_sx, opts);
+
+  // Get an expression for the state at the end of the finite element
   vector<MX> ifcn_arg = {MX(), X0, P};
   V = ifcn(ifcn_arg).front();
   X.resize(1);
   for(int r=0; r<d; ++r){
     X.push_back(V[Slice(r*nx, (r+1)*nx)]);
   }
-
-  // Get an expression for the state at the end of the finite element
   MX XF = 0;
   for(int r=0; r<d+1; ++r){
     XF += D[r]*X[r];
   }
   
   // Get the discrete time dynamics
-  MXFunction F("F", {X0, P}, {XF});
+  Function F("F", {X0, P}, {XF});
 
   // Do this iteratively for all finite elements
   MX Xk = X0;
@@ -149,12 +163,12 @@ int main(){
   }
 
   // Fixed-step integrator
-  MXFunction irk_integrator("irk_integrator",
-                            integratorIn("x0", X0, "p", P),
-                            integratorOut("xf", Xk));
+  Function irk_integrator("irk_integrator", {{"x0", X0}, {"p", P}, {"xf", Xk}},
+                          integrator_in(), integrator_out());
 
   // Create a convensional integrator for reference
-  Integrator ref_integrator("ref_integrator", "cvodes", f, make_dict("tf", tf));
+  Function ref_integrator = integrator("ref_integrator",
+                                                 "cvodes", dae, {{"tf", tf}});
 
   // Test values
   vector<double> x0_val = {0, 1, 0};
@@ -164,14 +178,14 @@ int main(){
   for(int integ=0; integ<2; ++integ){
     Function integrator = integ==0 ? Function(irk_integrator) : Function(ref_integrator);
     cout << "-------" << endl;
-    cout << "Testing " << integrator.getOption("name") << endl;
+    cout << "Testing " << integrator.name() << endl;
     cout << "-------" << endl;
 
     // Generate a new function that calculates two forward directions and one adjoint direction
     Function dintegrator = integrator.derivative(2,1);
 
     // Arguments for evaluation
-    map<string, DMatrix> arg, res;
+    map<string, DM> arg, res;
     arg["der_x0"] = x0_val;
     arg["der_p"] = p_val;
 

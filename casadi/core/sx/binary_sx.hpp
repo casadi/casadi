@@ -33,7 +33,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-/** \brief Represents a basic binary operation on two SXElement nodes
+/** \brief Represents a basic binary operation on two SXElem nodes
   \author Joel Andersson
   \date 2010
 */
@@ -41,14 +41,14 @@ class CASADI_EXPORT BinarySX : public SXNode {
   private:
 
     /** \brief  Constructor is private, use "create" below */
-    BinarySX(unsigned char op, const SXElement& dep0, const SXElement& dep1) :
+    BinarySX(unsigned char op, const SXElem& dep0, const SXElem& dep1) :
         op_(op), dep0_(dep0), dep1_(dep1) {}
 
   public:
 
     /** \brief  Create a binary expression */
-    inline static SXElement create(unsigned char op, const SXElement& dep0, const SXElement& dep1) {
-      if (dep0.isConstant() && dep1.isConstant()) {
+    inline static SXElem create(unsigned char op, const SXElem& dep0, const SXElem& dep1) {
+      if (dep0.is_constant() && dep1.is_constant()) {
         // Evaluate constant
         double dep0_val = dep0.getValue();
         double dep1_val = dep1.getValue();
@@ -57,7 +57,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
         return ret_val;
       } else {
         // Expression containing free variables
-        return SXElement::create(new BinarySX(op, dep0, dep1));
+        return SXElem::create(new BinarySX(op, dep0, dep1));
       }
     }
 
@@ -69,7 +69,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
       // Start destruction method if any of the dependencies has dependencies
       for (int c1=0; c1<2; ++c1) {
         // Get the node of the dependency and remove it from the smart pointer
-        SXNode* n1 = dep(c1).assignNoDelete(casadi_limits<SXElement>::nan);
+        SXNode* n1 = dep(c1).assignNoDelete(casadi_limits<SXElem>::nan);
 
         // Check if this was the last reference
         if (n1->count==0) {
@@ -99,7 +99,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
 
                 // Get the node of the dependency of the top element
                 // and remove it from the smart pointer
-                SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SXElement>::nan);
+                SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SXElem>::nan);
 
                 // Check if this is the only reference to the element
                 if (n2->count == 0) {
@@ -130,18 +130,18 @@ class CASADI_EXPORT BinarySX : public SXNode {
       }
     }
 
-    virtual bool isSmooth() const { return operation_checker<SmoothChecker>(op_);}
+    virtual bool is_smooth() const { return operation_checker<SmoothChecker>(op_);}
 
     virtual bool hasDep() const { return true; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const SXNode* node, int depth) const {
+    virtual bool zz_is_equal(const SXNode* node, int depth) const {
       const BinarySX* n = dynamic_cast<const BinarySX*>(node);
       if (n==0) return false;
       if (n->op_ != op_) return false;
-      if (n->dep0_.zz_isEqual(dep0_, depth-1) && n->dep1_.zz_isEqual(dep1_, depth-1)) return true;
-      if (operation_checker<CommChecker>(op_) && n->dep1_.zz_isEqual(dep0_, depth-1) &&
-         n->dep0_.zz_isEqual(dep1_, depth-1)) return true;
+      if (n->dep0_.zz_is_equal(dep0_, depth-1) && n->dep1_.zz_is_equal(dep1_, depth-1)) return true;
+      if (operation_checker<CommChecker>(op_) && n->dep1_.zz_is_equal(dep0_, depth-1) &&
+         n->dep0_.zz_is_equal(dep1_, depth-1)) return true;
       return false;
     }
 
@@ -149,11 +149,11 @@ class CASADI_EXPORT BinarySX : public SXNode {
     virtual int ndep() const { return 2;}
 
     /** \brief  get the reference of a dependency */
-    virtual const SXElement& dep(int i) const { return i==0 ? dep0_ : dep1_;}
-    virtual SXElement& dep(int i) { return i==0 ? dep0_ : dep1_;}
+    virtual const SXElem& dep(int i) const { return i==0 ? dep0_ : dep1_;}
+    virtual SXElem& dep(int i) { return i==0 ? dep0_ : dep1_;}
 
     /** \brief  Get the operation */
-    virtual int getOp() const { return op_;}
+    virtual int op() const { return op_;}
 
     /** \brief  Print expression */
     virtual std::string print(const std::string& arg1, const std::string& arg2) const {
@@ -181,7 +181,7 @@ class CASADI_EXPORT BinarySX : public SXNode {
     unsigned char op_;
 
     /** \brief  The dependencies of the node */
-    SXElement dep0_, dep1_;
+    SXElem dep0_, dep1_;
 };
 
 } // namespace casadi

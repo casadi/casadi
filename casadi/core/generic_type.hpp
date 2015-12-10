@@ -33,6 +33,8 @@
 
 namespace casadi {
 
+#ifndef SWIG
+
   /** \brief  Types of options */
   enum TypeID {
     OT_NULL,
@@ -46,20 +48,25 @@ namespace casadi {
     OT_REALVECTOR,
     OT_STRINGVECTOR,
     OT_DICT,
-    OT_DERIVATIVEGENERATOR,
     OT_FUNCTION,
-    OT_CALLBACK,
     OT_VOIDPTR,
     OT_UNKNOWN};
+#endif // SWIG
 
   /** \brief Generic data type, can hold different types such as bool, int, string etc.
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT GenericType : public SharedObject {
+  class CASADI_EXPORT GenericType
+#ifndef SWIG
+    : public SharedObject
+#endif // SWIG
+  {
   public:
     /// C++ equivalent of Python's dict or MATLAB's struct
     typedef std::map<std::string, GenericType> Dict;
+
+#ifndef SWIG
 
     /// Default constructor
     GenericType();
@@ -76,12 +83,8 @@ namespace casadi {
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const Function& f);
-    GenericType(const DerivativeGenerator& c);
-    GenericType(const Callback& c);
     GenericType(const Dict& dict);
-    #ifndef SWIG
     GenericType(void* ptr);
-    #endif // SWIG
 
     /// Get a description of a type
     static std::string get_type_description(TypeID type);
@@ -92,7 +95,6 @@ namespace casadi {
     /// Construct a GenericType given an TypeID
     static GenericType from_type(TypeID type);
 
-    #ifndef SWIG
     ///@{
     /// Implicit typecasting
     operator bool() const { return toBool();}
@@ -105,10 +107,7 @@ namespace casadi {
     operator std::vector<std::string>() const { return toStringVector();}
     operator const Function&() const { return asFunction();}
     operator const Dict&() const { return asDict();}
-    operator const DerivativeGenerator& () const { return asDerivativeGenerator();}
-    operator const Callback& () const { return asCallback();}
     ///@}
-    #endif // SWIG
 
     // Get type of object
     TypeID getType() const;
@@ -122,7 +121,7 @@ namespace casadi {
     bool isInt() const;
     bool isDouble() const;
     bool isString() const;
-    bool isemptyVector() const;
+    bool is_emptyVector() const;
     bool isIntVector() const;
     bool isIntVectorVector() const;
     bool isDoubleVector() const;
@@ -130,11 +129,8 @@ namespace casadi {
     bool isDict() const;
     bool isFunction() const;
     bool isVoidPointer() const;
-    bool isCallback() const;
-    bool isDerivativeGenerator() const;
     ///@}
 
-#ifndef SWIG
     ///@{
     /** \brief Cast to the internal type */
     const bool& asBool() const;
@@ -148,10 +144,7 @@ namespace casadi {
     const Dict& asDict() const;
     const Function& asFunction() const;
     void* const & asVoidPointer() const;
-    const DerivativeGenerator& asDerivativeGenerator() const;
-    const Callback& asCallback() const;
     ///@}
-#endif // SWIG
 
     ///@{
     //! \brief Convert to a type
@@ -172,7 +165,6 @@ namespace casadi {
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
 
-#ifndef SWIG
     //! \brief Print
     CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                   const GenericType& ref);
@@ -181,68 +173,6 @@ namespace casadi {
 
   /// C++ equivalent of Python's dict or MATLAB's struct
   typedef GenericType::Dict Dict;
-
-#ifndef SWIG
-  // Create dictionary with 1 element
-  inline Dict
-  make_dict(const std::string& n0, const GenericType& x0) {
-    Dict ret;
-    ret[n0]=x0;
-    return ret;
-  }
-
-  // Create dictionary with 2 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1) {
-    Dict ret=make_dict(n0, x0);
-    ret[n1]=x1;
-    return ret;
-  }
-
-  // Create dictionary with 3 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2) {
-    Dict ret=make_dict(n0, x0, n1, x1);
-    ret[n2]=x2;
-    return ret;
-  }
-
-  // Create dictionary with 4 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2,
-                        const std::string& n3, const GenericType& x3) {
-    Dict ret=make_dict(n0, x0, n1, x1, n2, x2);
-    ret[n3]=x3;
-    return ret;
-  }
-
-  // Create dictionary with 5 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2,
-                        const std::string& n3, const GenericType& x3,
-                        const std::string& n4, const GenericType& x4) {
-    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3);
-    ret[n4]=x4;
-    return ret;
-  }
-
-  // Create dictionary with 6 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2,
-                        const std::string& n3, const GenericType& x3,
-                        const std::string& n4, const GenericType& x4,
-                        const std::string& n5, const GenericType& x5) {
-    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4);
-    ret[n5]=x5;
-    return ret;
-  }
-
-#endif // SWIG
-
 
 } // namespace casadi
 

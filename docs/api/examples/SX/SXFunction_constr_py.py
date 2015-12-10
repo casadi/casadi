@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-#! SXFunction constructors
+#! Function constructors
 #! =======================
 from casadi import *
 
@@ -34,15 +34,16 @@ outs = [x,y,vertcat((x,y)),y*x,0]
 
 print outs
 
-f = SXFunction("f", ins, outs)
+f = Function("f", ins, outs)
 
 #! f now has two inputs and a 4 outputs:
-print f.nIn()
-print f.nOut()
+print f.n_in()
+print f.n_out()
 
 #! The outputs has the following string representation.
 #! Note how all elements of out have been converted to SX by
 #! automatic typecasting functionality
 
+f_out = f(f.sx_in())
 for i in range(3):
-  print f.outputExpr(i)
+  print f_out[i]

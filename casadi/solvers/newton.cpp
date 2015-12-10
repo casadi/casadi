@@ -24,20 +24,14 @@
 
 
 #include "newton.hpp"
-
-#include "casadi/core/function/mx_function.hpp"
-
-#include "casadi/core/profiling.hpp"
-#include "casadi/core/casadi_options.hpp"
-
 #include <iomanip>
 
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_NEWTON_EXPORT
-  casadi_register_implicitfunction_newton(ImplicitFunctionInternal::Plugin* plugin) {
+  int CASADI_ROOTFINDER_NEWTON_EXPORT
+  casadi_register_rootfinder_newton(Rootfinder::Plugin* plugin) {
     plugin->creator = Newton::creator;
     plugin->name = "newton";
     plugin->doc = Newton::meta_doc.c_str();
@@ -46,11 +40,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_NEWTON_EXPORT casadi_load_implicitfunction_newton() {
-    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_newton);
+  void CASADI_ROOTFINDER_NEWTON_EXPORT casadi_load_rootfinder_newton() {
+    Rootfinder::registerPlugin(casadi_register_rootfinder_newton);
   }
 
-  Newton::Newton(const Function& f) : ImplicitFunctionInternal(f) {
+  Newton::Newton(const std::string& name, const Function& f)
+    : Rootfinder(name, f) {
+
     addOption("abstol",                      OT_REAL, 1e-12,
               "Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL, 1e-12,
@@ -66,37 +62,57 @@ namespace casadi {
   Newton::~Newton() {
   }
 
-  void Newton::solveNonLinear() {
-    casadi_msg("Newton::solveNonLinear:begin");
+  void Newton::init() {
 
-    // Set up timers for profiling
-    double time_zero=0;
-    double time_start=0;
-    double time_stop=0;
-    if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
-      time_zero = getRealTime();
-      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl;
+    // Call the base class initializer
+    Rootfinder::init();
+
+    casadi_assert_message(f_.n_in()>0,
+                          "Newton: the supplied f must have at least one input.");
+    casadi_assert_message(!linsol_.isNull(),
+                          "Newton::init: linear_solver must be supplied");
+
+    if (hasSetOption("max_iter"))
+      max_iter_ = option("max_iter");
+
+    if (hasSetOption("abstol"))
+      abstol_ = option("abstol");
+
+    if (hasSetOption("abstolStep"))
+      abstolStep_ = option("abstolStep");
+
+    print_iteration_ = option("print_iteration");
+
+    // Allocate memory
+    alloc_w(n_, true); // x
+    alloc_w(jac_.nnz_out(1+iout_), true); // F
+    alloc_w(jac_.nnz_out(0), true); // J
+  }
+
+  void Newton::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    // IO buffers
+    const double** arg1 = arg + n_in();
+    double** res1 = res + n_out();
+
+    // Work vectors
+    double* x = w; w += n_;
+    double* f = w; w += jac_.nnz_out(1+iout_);
+    double* jac = w; w += jac_.nnz_out(0);
+
+    // Get the initial guess
+    if (arg[iin_]) {
+      copy_n(arg[iin_], n_, x);
+    } else {
+      fill_n(x, n_, 0);
     }
-
-    // Pass the inputs to J
-    for (int i=0; i<nIn(); ++i) {
-      if (i!=iin_) jac_.setInput(input(i), i);
-    }
-
-    // Aliases
-    DMatrix &u = output(iout_);
-    DMatrix &J = jac_.output(0);
-    DMatrix &F = jac_.output(1+iout_);
 
     // Perform the Newton iterations
     int iter=0;
-
     bool success = true;
-
     while (true) {
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
-        log("evaluate", "Max. iterations reached.");
+        log("eval", "Max. iterations reached.");
         stats_["return_status"] = "max_iteration_reached";
         success = false;
         break;
@@ -105,98 +121,38 @@ namespace casadi {
       // Start a new iteration
       iter++;
 
-      // Print progress
-      if (monitored("step") || monitored("stepsize")) {
-        userOut() << "Step " << iter << "." << std::endl;
-      }
+      // Use x to evaluate J
+      copy_n(arg, n_in(), arg1);
+      arg1[iin_] = x;
+      res1[0] = jac;
+      copy_n(res, n_out(), res1+1);
+      res1[1+iout_] = f;
+      jac_(arg1, res1, iw, w, 0);
 
-      if (monitored("step")) {
-        userOut() << "  u = " << u << std::endl;
-      }
-
-      // Use u to evaluate J
-      jac_.setInput(u, iin_);
-      for (int i=0; i<nIn(); ++i)
-        if (i!=iin_) jac_.setInput(input(i), i);
-
-      if (CasadiOptions::profiling) {
-        time_start = getRealTime(); // Start timer
-      }
-
-      jac_.evaluate();
-
-      // Write out profiling information
-      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
-        time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog
-            << (time_stop-time_start)*1e6 << " ns | "
-            << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << getOption("name") << ":0|" << jac_.get() << ":"
-            << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
-      }
-
-      if (monitored("F")) userOut() << "  F = " << F << std::endl;
-      if (monitored("normF"))
-        userOut() << "  F (min, max, 1-norm, 2-norm) = "
-                  << (*std::min_element(F.data().begin(), F.data().end()))
-                  << ", " << (*std::max_element(F.data().begin(), F.data().end()))
-                  << ", " << norm_1(F) << ", " << norm_F(F) << std::endl;
-      if (monitored("J")) userOut() << "  J = " << J << std::endl;
-
+      // Check convergence
       double abstol = 0;
-      if (numeric_limits<double>::infinity() != abstol_) {
-        abstol = std::max((*std::max_element(F.data().begin(),
-                                                  F.data().end())),
-                               -(*std::min_element(F.data().begin(),
-                                                   F.data().end())));
+      if (abstol_ != numeric_limits<double>::infinity()) {
+        for (int i=0; i<n_; ++i) {
+          abstol = max(abstol, fabs(f[i]));
+        }
         if (abstol <= abstol_) {
           casadi_msg("Converged to acceptable tolerance - abstol: " << abstol_);
           break;
         }
       }
 
-      // Prepare the linear solver with J
-      linsol_.setInput(J, LINSOL_A);
+      // Factorize the linear solver with J
+      fill_n(arg1, static_cast<int>(LINSOL_NUM_IN), nullptr);
+      fill_n(res1, static_cast<int>(LINSOL_NUM_OUT), nullptr);
+      Memory m(linsol_, arg1, res1, iw, w, 0);
+      linsol_.linsol_factorize(m, jac);
+      linsol_.linsol_solve(m, f, 1, false);
 
-      if (CasadiOptions::profiling) {
-        time_start = getRealTime(); // Start timer
-      }
-      linsol_.prepare();
-      // Write out profiling information
-      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
-        time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog
-            << (time_stop-time_start)*1e6 << " ns | "
-            << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << getOption("name")
-            << ":1||prepare linear system" << std::endl;
-      }
-
-      if (CasadiOptions::profiling) {
-        time_start = getRealTime(); // Start timer
-      }
-      // Solve against F
-      linsol_.solve(&F.front(), 1, false);
-      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
-        time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog
-            << (time_stop-time_start)*1e6 << " ns | "
-            << (time_stop-time_zero)*1e3 << " ms | "
-            << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;
-      }
-
-      if (monitored("step")) {
-        userOut() << "  step = " << F << std::endl;
-      }
-
+      // Check convergence again
       double abstolStep=0;
       if (numeric_limits<double>::infinity() != abstolStep_) {
-        abstolStep = std::max((*std::max_element(F.data().begin(),
-                                                  F.data().end())),
-                               -(*std::min_element(F.data().begin(),
-                                                   F.data().end())));
-        if (monitored("stepsize")) {
-          userOut() << "  stepsize = " << abstolStep << std::endl;
+        for (int i=0; i<n_; ++i) {
+          abstolStep = max(abstolStep, fabs(f[i]));
         }
         if (abstolStep <= abstolStep_) {
           casadi_msg("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
@@ -215,47 +171,19 @@ namespace casadi {
       }
 
       // Update Xk+1 = Xk - J^(-1) F
-      std::transform(u.begin(), u.end(), F.begin(), u.begin(), std::minus<double>());
-
+      casadi_axpy(n_, -1., f, x);
     }
 
-    // Get auxiliary outputs
-    for (int i=0; i<nOut(); ++i) {
-      if (i!=iout_) jac_.getOutput(output(i), 1+i);
+    // Get the solution
+    if (res[iout_]) {
+      copy_n(x, n_, res[iout_]);
     }
 
     // Store the iteration count
     if (gather_stats_) stats_["iter"] = iter;
-
     if (success) stats_["return_status"] = "success";
 
-    // Factorization up-to-date
-    fact_up_to_date_ = true;
-
     casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
-  }
-
-  void Newton::init() {
-
-    // Call the base class initializer
-    ImplicitFunctionInternal::init();
-
-    casadi_assert_message(f_.nIn()>0,
-                          "Newton: the supplied f must have at least one input.");
-    casadi_assert_message(!linsol_.isNull(),
-                          "Newton::init: linear_solver must be supplied");
-
-    if (hasSetOption("max_iter"))
-      max_iter_ = getOption("max_iter");
-
-    if (hasSetOption("abstol"))
-      abstol_ = getOption("abstol");
-
-    if (hasSetOption("abstolStep"))
-      abstolStep_ = getOption("abstolStep");
-
-    print_iteration_ = getOption("print_iteration");
-
   }
 
   void Newton::printIteration(std::ostream &stream) {

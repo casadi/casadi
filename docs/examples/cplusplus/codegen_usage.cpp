@@ -31,7 +31,7 @@
  *  generated files is not recommended and subject to change.
  *
  *  We show how the generated code can be used from C (or C++), without requiring
- *  any CasADi classes as well as how to use it from C++ using CasADi's ExternalFunction.
+ *  any CasADi classes as well as how to use it from C++ using CasADi's external.
  *
  *  Joel Andersson, 2013-2015
  */
@@ -45,12 +45,6 @@ int usage_c(){
   printf("Usage from C.\n");
   printf("\n");
 
-  /* Signature of the entry points */
-  typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
-  typedef int (*sparsityPtr)(int n_in, int *n_col, int *n_row, int **colind, int **row);
-  typedef int (*workPtr)(int *sz_iw, int *sz_w);
-  typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
-
   /* Handle to the dll */
   void* handle;
 
@@ -62,50 +56,30 @@ int usage_c(){
   }
 
   /* Reset error */
-  dlerror(); 
+  dlerror();
 
-  /* Function for initialization and getting the number of inputs and outputs */
-  initPtr init = (initPtr)dlsym(handle, "f_init");
+  /* Initialize and get the number of inputs and outputs */
+  typedef int (*init_t)(void **mem, int *n_in, int *n_out, void *data);
+  init_t init = (init_t)dlsym(handle, "f_init");
   if(dlerror()){
     printf("Failed to retrieve \"init\" function.\n");
     return 1;
   }
+  int n_in, n_out;
+  void *mem;
+  if (init(&mem, &n_in, &n_out, 0)) return 1;
+  printf("n_in = %d, n_out = %d\n", n_in, n_out);
 
-  /* Function for getting the sparsities of the inputs and outptus */
-  sparsityPtr sparsity = (sparsityPtr)dlsym(handle, "f_sparsity");
+  /* Function for retrieving sparsities */
+  typedef int (*sparsity_t)(void* mem, int ind, int *n_col, int *n_row,
+                             const int** colind, const int** row);
+  sparsity_t sparsity = (sparsity_t)dlsym(handle, "f_sparsity");
   if(dlerror()){
     printf("Failed to retrieve \"sparsity\" function.\n");
     return 1;
   }
 
-  /* Function for getting the size of the required work vectors */
-  workPtr work = (workPtr)dlsym(handle, "f_work");
-  if(dlerror()){
-    printf("Failed to retrieve \"work\" function.\n");
-    return 1;
-  }
-
-  /* Function for numerical evaluation */
-  evalPtr eval = (evalPtr)dlsym(handle, "f");
-  if(dlerror()){
-    printf("Failed to retrieve \"f\" function.\n");
-    return 1;
-  }
-
-  /* Initialize and get the number of inputs and outputs */
-  int f_type, n_in, n_out, sz_arg, sz_res;
-  int flag = init(&f_type, &n_in, &n_out, &sz_arg, &sz_res);
-  if (flag) {
-    printf("Initialization failed.\n");
-    return 1;
-  }
-  if (f_type!=1) {
-    printf("Function type not supported.\n");
-    return 1;
-  }
-  printf("n_in = %d, n_out = %d, sz_arg = %d, sz_out = %d\n", n_in, n_out, sz_arg, sz_res);
-
-  /* Get sparsities */
+  /* Get sparsities of the inputs and outptus */
   int ind;
   for(ind=0; ind<n_in + n_out; ++ind){
     if(ind<n_in){
@@ -115,10 +89,10 @@ int usage_c(){
     }
 
     int nrow,ncol;
-    int *colind, *row;
-    sparsity(ind,&nrow,&ncol,&colind,&row);
+    const int *colind, *row;
+    if (sparsity(mem, ind, &nrow, &ncol, &colind, &row)) return 1;
 
-    printf("  Dimension: %d-by-%d\n",nrow,ncol);
+    printf("  Dimension: %d-by-%d\n", nrow, ncol);
     printf("  Nonzeros: {");
     int rr,cc,el;
     for(cc=0; cc<ncol; ++cc){ /* loop over rows */
@@ -133,13 +107,42 @@ int usage_c(){
         printf("{%d,%d}",rr,cc);
       }
     }
-
     printf("}\n\n");
   }
 
-  /* Work vector size */
-  int sz_iw, sz_w;
-  work(&sz_iw, &sz_w);
+  /* Get sizes of the required work vectors */
+  int sz_arg, sz_res, sz_iw, sz_w;
+  typedef int (*work_t)(void* mem, int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
+  work_t work = (work_t)dlsym(handle, "f_work");
+  if(dlerror()){
+    // No work vectors by default
+    sz_arg = n_in;
+    sz_res = n_out;
+    sz_iw = sz_w = 0;
+    // Reset error flags
+    dlerror();
+  } else {
+    // Read from functions
+    if (work(mem, &sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;
+  }
+  printf("sz_arg = %d, sz_res = %d, sz_iw = %d, sz_w = %d\n", sz_arg, sz_res, sz_iw, sz_w);
+
+  /* Function for numerical evaluation */
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
+  eval_t eval = (eval_t)dlsym(handle, "f");
+  if(dlerror()){
+    printf("Failed to retrieve \"f\" function.\n");
+    return 1;
+  }
+
+  /* Function for freeing memory */
+  typedef int (*freemem_t)(void *mem);
+  freemem_t freemem = (freemem_t)dlsym(handle, "f_free");
+  if(dlerror()){
+    // No free function
+    freemem = 0;
+    dlerror(); // Reset error flags
+  }
 
   /* Allocate input/output buffers and work vectors*/
   const double *arg[sz_arg];
@@ -158,12 +161,15 @@ int usage_c(){
   arg[1] = &y_val;
   res[0] = &res0;
   res[1] = res1;
-  eval(arg, res, iw, w);
+  if (eval(arg, res, iw, w, mem)) return 1;
 
   /* Print result of evaluation */
   printf("result (0): %g\n",res0);
   printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
-  
+
+  /* Free memory */
+  freemem(mem);
+
   /* Free the handle */
   dlclose(handle);
 
@@ -181,13 +187,13 @@ void usage_cplusplus(){
   cout << "Usage from C++" << endl;
   cout << endl;
 
-  // Use CasADi's "ExternalFunction" to load the compiled function
-  ExternalFunction f("f");
+  // Use CasADi's "external" to load the compiled function
+  Function f = external("f");
 
   // Use like any other CasADi function
   vector<double> x = {1, 2, 3, 4};
-  vector<DMatrix> arg = {reshape(DMatrix(x), 2, 2), 5};
-  vector<DMatrix> res = f(arg);
+  vector<DM> arg = {reshape(DM(x), 2, 2), 5};
+  vector<DM> res = f(arg);
 
   cout << "result (0): " << res.at(0) << endl;
   cout << "result (1): " << res.at(1) << endl;
@@ -200,7 +206,7 @@ int main(){
   SX y = SX::sym("y");
 
   // Simple function
-  SXFunction f("f", {x, y}, {sqrt(y)-1, sin(x)-y});
+  Function f("f", {x, y}, {sqrt(y)-1, sin(x)-y});
 
   // Generate C-code
   f.generate("f");

@@ -27,156 +27,161 @@
 #define CASADI_MX_FUNCTION_HPP
 
 #include <set>
+#include <map>
+#include <vector>
 #include <iostream>
-#include "../mx/mx.hpp"
-#include "sx_function.hpp"
+
+#include "x_function.hpp"
+#include "../mx/mx_node.hpp"
+
+/// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief  Forward declaration of internal class */
-  class MXFunctionInternal;
+#ifndef SWIG
+  /** \brief  An element of the algorithm, namely an MX node */
+  struct MXAlgEl {
+    /// Operator index
+    int op;
 
-  /** \brief  General function mapping from/to MX
+    /// Data associated with the operation
+    MX data;
+
+    /// Work vector indices of the arguments
+    std::vector<int> arg;
+
+    /// Work vector indices of the results
+    std::vector<int> res;
+  };
+#endif // SWIG
+
+  /** \brief  Internal node class for MXFunction
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT MXFunction : public Function {
+  class CASADI_EXPORT MXFunction :
+        public XFunction<MXFunction, MX, MXNode>{
   public:
+    /** \brief  An element of the algorithm, namely an MX node */
+    typedef MXAlgEl AlgEl;
 
-    /** \brief  Default constructor */
-    MXFunction();
+    /** \brief  All the runtime elements in the order of evaluation */
+    std::vector<AlgEl> algorithm_;
 
-    /** \brief  Attempt to form an MXFunction out of an Function */
-    explicit MXFunction(const Function& function);
+    /** \brief Offsets for elements in the w_ vector */
+    std::vector<int> workloc_;
 
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    MXFunction(const std::string& name, const std::vector<MX>& arg,
-               const std::vector<MX>& res, const Dict& opts=Dict());
+    /// Free variables
+    std::vector<MX> free_vars_;
 
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    MXFunction(const std::string& name, const std::pair< MXDict, std::vector<std::string> >& arg,
-               const std::vector<MX>& res, const Dict& opts=Dict());
+    /** \brief Constructor */
+    MXFunction(const std::string& name, const std::vector<MX>& input,
+                       const std::vector<MX>& output);
 
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    MXFunction(const std::string& name, const std::vector<MX>& arg,
-               const std::pair< MXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
+    /** \brief  Destructor */
+    virtual ~MXFunction();
 
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    MXFunction(const std::string& name, const std::pair< MXDict, std::vector<std::string> >& arg,
-               const std::pair< MXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
-#ifndef SWIG
-#ifdef USE_CXX11
-    /** \brief Construct from initializer lists (new syntax, includes initialization) */
-    MXFunction(const std::string& name,
-               std::initializer_list<MX> arg,
-               std::initializer_list<MX> res,
-               const Dict& opts=Dict());
+    /** \brief  Print description */
+    virtual void print(std::ostream &stream) const;
 
-    /** \brief Construct from vector & initializer list (new syntax, includes initialization) */
-    MXFunction(const std::string& name,
-               std::vector<MX> arg,
-               std::initializer_list<MX> res,
-               const Dict& opts=Dict());
+    /** \brief Get type name */
+    virtual std::string type_name() const;
 
-    /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
-    MXFunction(const std::string& name,
-               std::initializer_list<MX> arg,
-               std::vector<MX> res,
-               const Dict& opts=Dict());
-#endif // USE_CXX11
-#endif // SWIG
+    /** \brief Check if the function is of a particular type */
+    virtual bool is_a(const std::string& type, bool recursive) const;
 
-    /// \cond INTERNAL
-    /** \brief  Access functions of the node */
-    MXFunctionInternal* operator->();
+    /** \brief  Initialize */
+    virtual void init();
 
-    /** \brief  Const access functions of the node */
-    const MXFunctionInternal* operator->() const;
-    /// \endcond
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
 
-    /** \brief Get function input */
-    const MX inputExpr(int ind) const;
-    const MX inputExpr(const std::string & iname) const {
-      return inputExpr(inputIndex(iname));
-    }
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
 
-    /** \brief Get function output */
-    const MX outputExpr(int ind) const;
-    const MX outputExpr(const std::string & oname) const {
-      return outputExpr(outputIndex(oname));
-    }
+    /** \brief Extract the residual function G and the modified function Z out of an expression
+     * (see Albersmeyer2010 paper) */
+    void generate_lifted(Function& vdef_fcn, Function& vinit_fcn);
 
-    /** \brief Get all function inputs */
-    const std::vector<MX> inputExpr() const;
+    /** \brief Generate a function that calculates a Jacobian function by operator overloading */
+    virtual Function getNumericJacobian(const std::string& name, int iind, int oind,
+                                        bool compact, bool symmetric, const Dict& opts);
 
-    /** \brief Get all function outputs */
-    const std::vector<MX> outputExpr() const;
+    /** \brief Evaluate symbolically, SX type*/
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
-    /// \cond INTERNAL
-#ifndef SWIG
-    /** \brief Called from constructor */
-    void construct(const std::string& name, const std::vector<MX>& arg,
-                   const std::vector<MX>& res, const Dict& opts,
-                   const std::vector<std::string>& ischeme=std::vector<std::string>(),
-                   const std::vector<std::string>& oscheme=std::vector<std::string>());
-#endif // SWIG
-    /// \endcond
+    /** \brief Evaluate symbolically, MX type */
+    virtual void eval_mx(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);
 
-    /** \brief Number of nodes in the algorithm */
-    int countNodes() const;
+    /** \brief Calculate forward mode directional derivatives */
+    virtual void evalFwd(const std::vector<std::vector<MX> >& fwdSeed,
+                        std::vector<std::vector<MX> >& fwdSens);
 
-    /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    /** \brief Calculate reverse mode directional derivatives */
+    virtual void evalAdj(const std::vector<std::vector<MX> >& adjSeed,
+                        std::vector<std::vector<MX> >& adjSens);
 
-    ///@{
-    /** \brief Jacobian via source code transformation */
-    MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    MX jac(const std::string & iname, int oind=0, bool compact=false, bool symmetric=false)
-    { return jac(inputIndex(iname), oind, compact, symmetric); }
-    MX jac(int iind, const std::string & oname, bool compact=false, bool symmetric=false)
-    { return jac(iind, outputIndex(oname), compact, symmetric); }
-    MX jac(const std::string & iname, const std::string & oname,
-           bool compact=false, bool symmetric=false)
-    { return jac(inputIndex(iname), outputIndex(oname), compact, symmetric); }
-    ///@}
+    /** \brief Create call to (cached) derivative function, forward mode  */
+    virtual void forward_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+                            const std::vector<std::vector<MX> >& fseed,
+                            std::vector<std::vector<MX> >& fsens,
+                            bool always_inline, bool never_inline);
 
-    ///@{
-    /** \brief Gradient via source code transformation */
-    MX grad(int iind=0, int oind=0);
-    MX grad(const std::string & iname, int oind=0) { return grad(inputIndex(iname), oind); }
-    MX grad(int iind, const std::string & oname) { return grad(iind, outputIndex(oname)); }
-    MX grad(const std::string & iname, const std::string & oname)
-    { return grad(inputIndex(iname), outputIndex(oname)); }
-    ///@}
-
-    ///@{
-    /** \brief Tangent via source code transformation */
-    MX tang(int iind=0, int oind=0);
-    MX tang(const std::string & iname, int oind=0) { return tang(inputIndex(iname), oind); }
-    MX tang(int iind, const std::string & oname) { return tang(iind, outputIndex(oname)); }
-    MX tang(const std::string & iname, const std::string & oname)
-    { return tang(inputIndex(iname), outputIndex(oname)); }
-    ///@}
+    /** \brief Create call to (cached) derivative function, reverse mode  */
+    virtual void reverse_mx(const std::vector<MX>& arg, const std::vector<MX>& res,
+                            const std::vector<std::vector<MX> >& aseed,
+                            std::vector<std::vector<MX> >& asens,
+                            bool always_inline, bool never_inline);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
-    SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());
+    Function expand(const std::vector<SX>& inputv);
 
-    /** \brief Get all the free variables of the function */
-    std::vector<MX> getFree() const;
+    /// Get a vector of symbolic variables corresponding to the outputs
+    virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
 
-    /// \cond INTERNAL
-    /** \brief Extract the functions needed for the Lifted Newton method */
-    void generateLiftingFunctions(MXFunction& SWIG_OUTPUT(vdef_fcn),
-                                  MXFunction& SWIG_OUTPUT(vinit_fcn));
-    /// \endcond
+    /** \brief Create call */
+    virtual std::vector<MX> create_call(const std::vector<MX>& arg);
 
-    /** \brief Get the corresponding matrix type */
-    typedef MX MatType;
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+
+    /// Is the class able to propagate seeds through the algorithm?
+    virtual bool spCanEvaluate(bool fwd) { return true;}
+
+    // print an element of an algorithm
+    void print(std::ostream &stream, const AlgEl& el) const;
+
+    /** \brief Gradient expression */
+    virtual MX grad_mx(int iind=0, int oind=0);
+
+    /** \brief Tangent expression */
+    virtual MX tang_mx(int iind=0, int oind=0);
+
+    /** \brief Jacobian expression */
+    virtual MX jac_mx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
+                      bool always_inline=true, bool never_inline=false);
+
+    ///@{
+    /** \brief Get function input(s) and output(s)  */
+    virtual const MX mx_in(int ind) const;
+    virtual const std::vector<MX> mx_in() const;
+    ///@}
+
+    /// Get free variables (MX)
+    virtual std::vector<MX> free_mx() const {return free_vars_;}
+
+    /** \brief Number of nodes in the algorithm */
+    virtual int countNodes() const { return algorithm_.size();}
   };
 
 } // namespace casadi
-
+/// \endcond
 
 #endif // CASADI_MX_FUNCTION_HPP
 

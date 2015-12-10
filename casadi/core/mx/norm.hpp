@@ -61,16 +61,16 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem);
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -81,14 +81,14 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                  CodeGenerator& g) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_NORMF;}
+    virtual int op() const { return OP_NORMF;}
   };
 
   /** \brief Represents a 2-norm (spectral norm)
@@ -108,7 +108,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_NORM2;}
+    virtual int op() const { return OP_NORM2;}
   };
 
   /** \brief 1-norm
@@ -128,7 +128,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_NORM1;}
+    virtual int op() const { return OP_NORM1;}
   };
 
   /** \brief Represents an infinity-norm operation on a MX
@@ -148,7 +148,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_NORMINF;}
+    virtual int op() const { return OP_NORMINF;}
   };
 
 } // namespace casadi

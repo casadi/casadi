@@ -33,8 +33,8 @@ using namespace std;
 extern "C" void casadi_load_integrator_cvodes();
 extern "C" void casadi_load_integrator_idas();
 extern "C" void casadi_load_integrator_rk();
-extern "C" void casadi_load_nlpsolver_ipopt();
-extern "C" void casadi_load_nlpsolver_scpgen();
+extern "C" void casadi_load_nlpsol_ipopt();
+extern "C" void casadi_load_nlpsol_scpgen();
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
@@ -45,8 +45,8 @@ int main(){
   casadi_load_integrator_cvodes();
   casadi_load_integrator_idas();
   casadi_load_integrator_rk();
-  casadi_load_nlpsolver_ipopt();
-  casadi_load_nlpsolver_scpgen();
+  casadi_load_nlpsol_ipopt();
+  casadi_load_nlpsol_scpgen();
   
   // Time length
   double T = 10.0;
@@ -87,13 +87,10 @@ int main(){
   rhs[2] = -beta*u*u;
 
   // Initial conditions
-  vector<double> x0(3);
-  x0[0] = 0;
-  x0[1] = 0;
-  x0[2] = 1;
+  vector<double> x0 = {0, 0, 1};
 
-  // DAE residual function
-  SXFunction daefcn("dae_residual", daeIn("x", x, "p", u, "t", t), daeOut("ode", rhs));
+  // DAE
+  SXDict dae = {{"x", x}, {"p", u}, {"t", t}, {"ode", rhs}};
 
   // Integrator options
   string plugin;
@@ -128,7 +125,7 @@ int main(){
   opts["tf"] = tf;
 
   // Create integrator
-  Integrator integrator("integrator", plugin, daefcn, opts);
+  Function F = integrator("integrator", plugin, dae, opts);
 
   // control for all segments
   MX U = MX::sym("U",nu); 
@@ -137,7 +134,7 @@ int main(){
   MX X=X0;
   for(int k=0; k<nu; ++k){
     // Integrate
-    X = integrator(make_map("x0", X, "p", U[k])).at("xf");
+    X = F(MXDict{{"x0", X}, {"p", U[k]}}).at("xf");
 
     // Lift X
     if(lifted_newton){
@@ -146,13 +143,13 @@ int main(){
   }
 
   // Objective function
-  MX F = inner_prod(U,U);
+  MX J = dot(U,U);
 
   // Terminal constraints
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction nlp("nlp", nlpIn("x", U), nlpOut("f", F, "g", G));
+  MXDict nlp = {{"x", U}, {"f", J}, {"g", G}};
 
   // NLP solver options
   Dict solver_opts;
@@ -163,40 +160,32 @@ int main(){
     solver_opts["regularize"] = false;
     solver_opts["max_iter_ls"] = 1;
     solver_opts["max_iter"] = 100;
-    solver_opts["qp_solver"] = "nlp"; // Use IPOPT as QP solver
+    solver_opts["qpsol"] = "nlp"; // Use IPOPT as QP solver
     Dict ipopt_options;
     ipopt_options["tol"] = 1e-12;
     ipopt_options["print_level"] = 0;
     ipopt_options["print_time"] = false;
-    solver_opts["qp_solver_options"] =
-      make_dict("nlp_solver_options", make_dict("nlp_solver", "ipopt"));
+    solver_opts["qpsol_options"] =
+      Dict{{"nlpsol_options", Dict{{"nlpsol", "ipopt"}}}};
   } else {
     solver_name = "ipopt";
     solver_opts["tol"] = 1e-10;
     solver_opts["hessian_approximation"] = "limited-memory";
   }
 
-  // NLP solver and buffers
-  NlpSolver solver("nlp_solver", solver_name, nlp, solver_opts);
-  std::map<std::string, DMatrix> arg, res;
+  // Create NLP solver
+  Function solver = nlpsol("nlpsol", solver_name, nlp, solver_opts);
 
   // Bounds on u and initial condition
-  arg["lbx"] = -10;
-  arg["ubx"] = 10;
-  arg["x0"] = 0.4;
+  vector<double> umin(nu, -10), umax(nu, 10), u0(nu, 0.4);
 
   // Bounds on g
-  vector<double> gmin(2), gmax(2);
-  gmin[0] = gmax[0] = 10;
-  gmin[1] = gmax[1] =  0;
-  arg["lbg"] = gmin;
-  arg["ubg"] = gmax;
+  vector<double> gmin = {10, 0}, gmax = {10, 0};
 
-  // Solve the problem
-  res = solver(arg);
-
-  // Get the solution
-  vector<double> Usol(res.at("x"));
+  // Solve NLP
+  vector<double> Usol;
+  solver({{"lbx", umin}, {"ubx", umax}, {"x0", u0}, {"lbg", gmin}, {"ubg", gmax}},
+         {{"x", &Usol}});
   cout << "optimal solution: " << Usol << endl;
 
   return 0;

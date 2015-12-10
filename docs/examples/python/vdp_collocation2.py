@@ -47,10 +47,10 @@ rhs["x"] = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]])
 rhs["L"] = x[0]*x[0] + x[1]*x[1] + u*u
 
 # ODE right hand side function
-f = SXFunction('f', [t,states,u],[rhs])
+f = Function('f', [t,states,u],[rhs])
 
 # Objective function (meyer term)
-m = SXFunction('m', [t,states,u],[states["L"]])
+m = Function('m', [t,states,u],[states["L"]])
 
 # Control bounds
 u_min = -0.75
@@ -105,7 +105,7 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SXFunction('lfcn', [tau],[L])
+  lfcn = Function('lfcn', [tau],[L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   D[j], = lfcn([1.0])
@@ -162,7 +162,7 @@ for k in range(nk):
       xp_jk += C[r,j]*V["X",k,r]
       
     # Add collocation equations to the NLP
-    [fk] = f.call([T[k][j], V["X",k,j], V["U",k]])
+    [fk] = f([T[k][j], V["X",k,j], V["U",k]])
     g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
@@ -181,10 +181,10 @@ for k in range(nk):
 g = vertcat(g)
 
 # Objective function
-[f] = m.call([T[nk-1][d],V["X",nk,0],V["U",nk-1]])
+[f] = m([T[nk-1][d],V["X",nk,0],V["U",nk-1]])
   
 # NLP
-nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
+nlp = {'x':V, 'f':f, 'g':g}
   
 ## ----
 ## SOLVE THE NLP
@@ -197,7 +197,7 @@ opts["expand"] = True
 opts["linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Initial condition

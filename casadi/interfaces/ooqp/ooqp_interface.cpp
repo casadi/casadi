@@ -24,7 +24,7 @@
 
 
 #include "ooqp_interface.hpp"
-#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/function/qpsol.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 
 // OOQP headers
@@ -40,8 +40,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_OOQP_EXPORT
-  casadi_register_qpsolver_ooqp(QpSolverInternal::Plugin* plugin) {
+  int CASADI_QPSOL_OOQP_EXPORT
+  casadi_register_qpsol_ooqp(Qpsol::Plugin* plugin) {
     plugin->creator = OoqpInterface::creator;
     plugin->name = "ooqp";
     plugin->doc = OoqpInterface::meta_doc.c_str();
@@ -50,12 +50,14 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_OOQP_EXPORT casadi_load_qpsolver_ooqp() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_ooqp);
+  void CASADI_QPSOL_OOQP_EXPORT casadi_load_qpsol_ooqp() {
+    Qpsol::registerPlugin(casadi_register_qpsol_ooqp);
   }
 
-  OoqpInterface::OoqpInterface(const std::map<std::string, Sparsity>& st)
-    : QpSolverInternal(st) {
+  OoqpInterface::OoqpInterface(const std::string& name,
+                               const std::map<std::string, Sparsity>& st)
+    : Qpsol(name, st) {
+
     addOption("print_level", OT_INTEGER, 0,
               "Print level. OOQP listens to print_level 0, 10 and 100");
     addOption("mutol", OT_REAL, 1e-8, "tolerance as provided with setMuTol to OOQP");
@@ -67,12 +69,12 @@ namespace casadi {
 
   void OoqpInterface::init() {
     // Initialize the base classes
-    QpSolverInternal::init();
+    Qpsol::init();
 
     // Read options
-    print_level_ = getOption("print_level");
-    mutol_ = getOption("mutol");
-    artol_ = getOption("artol");
+    print_level_ = option("print_level");
+    mutol_ = option("mutol");
+    artol_ = option("artol");
 
     // Allocate memory for problem
     c_.resize(n_);
@@ -85,10 +87,10 @@ namespace casadi {
     iclow_.resize(nc_);
     cupp_.resize(nc_);
     icupp_.resize(nc_);
-    dQ_.resize(input(QP_SOLVER_H).sizeU());
+    dQ_.resize(input(QPSOL_H).nnz_upper());
     irowQ_.resize(dQ_.size());
     jcolQ_.resize(dQ_.size());
-    dA_.resize(input(QP_SOLVER_A).size());
+    dA_.resize(input(QPSOL_A).size());
     irowA_.resize(dA_.size());
     jcolA_.resize(dA_.size());
     dC_.resize(dA_.size());
@@ -97,7 +99,7 @@ namespace casadi {
     x_index_.resize(n_);
     c_index_.resize(nc_);
     p_.resize(n_);
-    AT_ = DMatrix::zeros(input(QP_SOLVER_A).sparsity().T());
+    AT_ = DM::zeros(input(QPSOL_A).sparsity().T());
     AT_tmp_.resize(nc_);
 
     // Solution
@@ -110,16 +112,23 @@ namespace casadi {
     pi_.resize(nc_);
   }
 
-  void OoqpInterface::evaluate() {
-    // Check inputs for consistency
-    if (inputs_check_) checkInputs();
+  void OoqpInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      casadi_copy(arg[i], nnz_in(i), input(i).ptr());
+    }
+
+    if (inputs_check_) {
+      checkInputs(input(QPSOL_LBX).ptr(), input(QPSOL_UBX).ptr(),
+                  input(QPSOL_LBA).ptr(), input(QPSOL_UBA).ptr());
+    }
 
     // Get problem data
-    const vector<double>& lbx = input(QP_SOLVER_LBX).data();
-    const vector<double>& ubx = input(QP_SOLVER_UBX).data();
-    const vector<double>& lba = input(QP_SOLVER_LBA).data();
-    const vector<double>& uba = input(QP_SOLVER_UBA).data();
-    const vector<double>& g = input(QP_SOLVER_G).data();
+    const vector<double>& lbx = input(QPSOL_LBX).data();
+    const vector<double>& ubx = input(QPSOL_UBX).data();
+    const vector<double>& lba = input(QPSOL_LBA).data();
+    const vector<double>& uba = input(QPSOL_UBA).data();
+    const vector<double>& g = input(QPSOL_G).data();
 
     // Parameter contribution to the objective
     double objParam = 0;
@@ -159,9 +168,9 @@ namespace casadi {
     }
 
     // Get quadratic term
-    const vector<double>& H = input(QP_SOLVER_H).data();
-    const int* H_colind = input(QP_SOLVER_H).colind();
-    const int* H_row = input(QP_SOLVER_H).row();
+    const vector<double>& H = input(QPSOL_H).data();
+    const int* H_colind = input(QPSOL_H).colind();
+    const int* H_row = input(QPSOL_H).row();
     int nnzQ = 0;
     // Loop over the columns of the quadratic term
     for (int cc=0; cc<n_; ++cc) {
@@ -200,9 +209,9 @@ namespace casadi {
     }
 
     // Get the transpose of the sparsity pattern to be able to loop over the constraints
-    const vector<double>& A = input(QP_SOLVER_A).data();
-    const int* A_colind = input(QP_SOLVER_A).colind();
-    const int* A_row = input(QP_SOLVER_A).row();
+    const vector<double>& A = input(QPSOL_A).data();
+    const int* A_colind = input(QPSOL_A).colind();
+    const int* A_row = input(QPSOL_A).row();
     vector<double>& AT = AT_.data();
     const int* AT_colind = AT_.colind();
     const int* AT_row = AT_.row();
@@ -282,12 +291,12 @@ namespace casadi {
       userOut() << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
       userOut() << "with" << endl;
       userOut() << "Q = " <<
-          tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
+          tril2symm(DM::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
                                      vector<int>(jcolQ_.begin(), jcolQ_.begin()+nnzQ),
                                      vector<double>(dQ_.begin(), dQ_.begin()+nnzQ),
                                      nx, nx)) << endl;
       userOut() << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
-      userOut() << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),
+      userOut() << "A = " << DM::triplet(vector<int>(irowA_.begin(),
                                                      irowA_.begin()+nnzA),
                                         vector<int>(jcolA_.begin(),
                                                     jcolA_.begin()+nnzA),
@@ -295,7 +304,7 @@ namespace casadi {
                                                        dA_.begin()+nnzA),
                                          nA, nx) << endl;
       userOut() << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
-      userOut() << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),
+      userOut() << "C = " << DM::triplet(vector<int>(irowC_.begin(),
                                                      irowC_.begin()+nnzC),
                                         vector<int>(jcolC_.begin(),
                                                     jcolC_.begin()+nnzC),
@@ -382,10 +391,10 @@ namespace casadi {
     }
 
     // Save optimal cost
-    output(QP_SOLVER_COST).set(objectiveValue + objParam);
+    output(QPSOL_COST).set(objectiveValue + objParam);
 
     // Save primal solution
-    vector<double>& x = output(QP_SOLVER_X).data();
+    vector<double>& x = output(QPSOL_X).data();
     for (int i=0; i<n_; ++i) {
       int ii = x_index_[i];
       if (ii<0) {
@@ -396,7 +405,7 @@ namespace casadi {
     }
 
     // Save dual solution (linear bounds)
-    vector<double>& lam_a = output(QP_SOLVER_LAM_A).data();
+    vector<double>& lam_a = output(QPSOL_LAM_A).data();
     for (int j=0; j<nc_; ++j) {
       int jj = c_index_[j];
       if (jj==0) {
@@ -409,7 +418,7 @@ namespace casadi {
     }
 
     // Save dual solution (simple bounds)
-    vector<double>& lam_x = output(QP_SOLVER_LAM_X).data();
+    vector<double>& lam_x = output(QPSOL_LAM_X).data();
     for (int i=0; i<n_; ++i) {
       int ii = x_index_[i];
       if (ii<0) {
@@ -426,6 +435,12 @@ namespace casadi {
       } else {
         lam_x[i] = phi_[ii]-gamma_[ii];
       }
+    }
+
+    // Get the outputs
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      casadi_copy(output(i).ptr(), nnz_out(i), res[i]);
     }
   }
 
@@ -460,4 +475,3 @@ namespace casadi {
 
 
 } // namespace casadi
-

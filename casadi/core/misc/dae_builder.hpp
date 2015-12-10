@@ -184,7 +184,7 @@ namespace casadi {
     void add_quad(const MX& new_quad, const std::string& name=std::string());
 
     /// Check if dimensions match
-    void sanityCheck() const;
+    void sanity_check() const;
     ///@}
 
     /** @name Manipulation
@@ -306,13 +306,13 @@ namespace casadi {
 #endif // SWIG
 
     /// Add a named linear combination of output expressions
-    MX addLinearCombination(const std::string& name,
+    MX add_lc(const std::string& name,
                             const std::vector<std::string>& f_out);
 
     /// Construct a function object
-    MXFunction create(const std::string& fname,
-                      const std::vector<std::string>& s_in,
-                      const std::vector<std::string>& s_out) const;
+    Function create(const std::string& fname,
+                    const std::vector<std::string>& s_in,
+                    const std::vector<std::string>& s_out) const;
     ///@}
 
     /// Get variable expression by name

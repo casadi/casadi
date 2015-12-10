@@ -24,52 +24,52 @@
 
 
 #include "core/casadi.hpp"
-#include "interfaces/ooqp/ooqp_solver.hpp"
+#include "interfaces/ooqp/ooqpsol.hpp"
 #include <ctime>
 
 using namespace std;
 using namespace casadi;
 
 int main() {
-  DMatrix H(2,2,0);
+  DM H(2,2,0);
   H(0,0) = 1.0;
   H(1,1) = 0.5;
   
-  DMatrix A(1,2,0);
+  DM A(1,2,0);
   A(0,0) = 1.0;
   A(0,1) = 1.0;
   
-  DMatrix g(2,1,0);
+  DM g(2,1,0);
   g(0) = 1.5;
   g(1) = 1.0;
   
-  DMatrix lb(2,1,0);
+  DM lb(2,1,0);
   lb(0) = 0.5;
   lb(1) = -2.0;
   
-  DMatrix ub(2,1,0);
+  DM ub(2,1,0);
   ub(0) = 5.0;
   ub(1) = 2.0;
   
-  DMatrix lbA(1,1,0);
+  DM lbA(1,1,0);
   lbA(0) = -1.0;
   
-  DMatrix ubA(1,1,0);
+  DM ubA(1,1,0);
   ubA(0) = 2.0;
   
   for(int rep=0; rep<2; ++rep){
-    OOQpSolver qp_solver(H.sparsity(), A.sparsity());
-    qp_solver.init();
-    qp_solver.setInput(A,"a");
-    qp_solver.setInput(H,"h");
-    qp_solver.setInput(g,"g");
-    qp_solver.setInput(lb,"lbx");
-    qp_solver.setInput(ub,"ubx");
-    qp_solver.setInput(lbA,"lba");
-    qp_solver.setInput(ubA,"uba");
-    qp_solver.evaluate();
-    qp_solver.evaluate();
-    qp_solver.evaluate();
+    OOQpsol qpsol(H.sparsity(), A.sparsity());
+    qpsol.init();
+    qpsol.setInput(A,"a");
+    qpsol.setInput(H,"h");
+    qpsol.setInput(g,"g");
+    qpsol.setInput(lb,"lbx");
+    qpsol.setInput(ub,"ubx");
+    qpsol.setInput(lbA,"lba");
+    qpsol.setInput(ubA,"uba");
+    qpsol.evaluate();
+    qpsol.evaluate();
+    qpsol.evaluate();
   }
     
   return 0;

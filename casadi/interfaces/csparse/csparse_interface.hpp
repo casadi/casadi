@@ -26,35 +26,33 @@
 #ifndef CASADI_CSPARSE_INTERFACE_HPP
 #define CASADI_CSPARSE_INTERFACE_HPP
 
-/** \defgroup plugin_LinearSolver_csparse
- * LinearSolver with CSparse Interface
+/** \defgroup plugin_Linsol_csparse
+ * Linsol with CSparse Interface
 */
 
-/** \pluginsection{LinearSolver,csparse} */
+/** \pluginsection{Linsol,csparse} */
 
 /// \cond INTERNAL
 #include <cs.h>
-#include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/csparse/casadi_linearsolver_csparse_export.h>
+#include "casadi/core/function/linsol.hpp"
+#include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {
 
-  /** \brief \pluginbrief{LinearSolver,csparse}
-   * @copydoc LinearSolver_doc
-   * @copydoc plugin_LinearSolver_csparse
+  /** \brief \pluginbrief{Linsol,csparse}
+   * @copydoc Linsol_doc
+   * @copydoc plugin_Linsol_csparse
    */
-  class CASADI_LINEARSOLVER_CSPARSE_EXPORT CsparseInterface : public LinearSolverInternal {
+  class CASADI_LINSOL_CSPARSE_EXPORT CsparseInterface : public Linsol {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CsparseInterface(const Sparsity& sp, int nrhs);
+    CsparseInterface(const std::string& name, const Sparsity& sp, int nrhs);
 
-    // Copy constructor
-    CsparseInterface(const CsparseInterface& linsol);
-
-    /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new CsparseInterface(sp, nrhs);}
+    /** \brief  Create a new Linsol */
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+      return new CsparseInterface(name, sp, nrhs);
+    }
 
     // Destructor
     virtual ~CsparseInterface();
@@ -62,11 +60,11 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
-    // Factorize the matrix
-    virtual void prepare();
+    // Factorize the linear system
+    virtual void linsol_factorize(Memory& m, const double* A);
 
-    // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    // Solve the linear system
+    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
 
     // Has the solve function been called once
     bool called_once_;
@@ -86,6 +84,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "csparse";}
   };
 
 } // namespace casadi

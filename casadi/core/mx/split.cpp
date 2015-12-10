@@ -25,7 +25,6 @@
 
 #include "split.hpp"
 #include "../std_vector_tools.hpp"
-#include "../function/sx_function.hpp"
 #include "../casadi_options.hpp"
 
 using namespace std;
@@ -40,16 +39,16 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::evalD(const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void Split::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Split::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void Split::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void Split::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void Split::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     // Number of derivatives
     int nx = offset_.size()-1;
 
@@ -62,7 +61,7 @@ namespace casadi {
     }
   }
 
-  void Split::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Split::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -76,7 +75,7 @@ namespace casadi {
     }
   }
 
-  void Split::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Split::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     int nx = offset_.size()-1;
     for (int i=0; i<nx; ++i) {
       if (res[i]!=0) {
@@ -91,8 +90,8 @@ namespace casadi {
     }
   }
 
-  void Split::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                       CodeGenerator& g) const {
+  void Split::generate(CodeGenerator& g, const std::string& mem,
+                       const std::vector<int>& arg, const std::vector<int>& res) const {
     int nx = nout();
     for (int i=0; i<nx; ++i) {
       int nz_first = offset_[i];
@@ -113,7 +112,7 @@ namespace casadi {
           // assign vector
           std::string r = g.work(arg[0], dep(0).nnz());
           if (nz_first!=0) r = r + "+" + g.to_string(nz_first);
-          g.body << "  " << g.copy_n(r, nz, g.work(res[i], nnz(i))) << endl;
+          g.body << "  " << g.copy(r, nz, g.work(res[i], nnz(i))) << endl;
         }
       }
     }
@@ -137,7 +136,7 @@ namespace casadi {
     return "horzsplit(" + arg.at(0) + ")";
   }
 
-  void Horzsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Horzsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get column offsets
     vector<int> col_offset;
     col_offset.reserve(offset_.size());
@@ -212,7 +211,7 @@ namespace casadi {
     return "diagsplit(" + arg.at(0) + ")";
   }
 
-  void Diagsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Diagsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get offsets
     vector<int> offset1;
     offset1.reserve(offset_.size());
@@ -294,7 +293,7 @@ namespace casadi {
     return "vertsplit(" + arg.at(0) + ")";
   }
 
-  void Vertsplit::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Vertsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get row offsets
     vector<int> row_offset;
     row_offset.reserve(offset_.size());
@@ -377,16 +376,16 @@ namespace casadi {
     return dep();
   }
 
-  MX Diagsplit::getDiagcat(const std::vector<MX>& x) const {
+  MX Diagsplit::get_diagcat(const std::vector<MX>& x) const {
     // Check x length
     if (x.size()!=nout()) {
-      return MXNode::getDiagcat(x);
+      return MXNode::get_diagcat(x);
     }
 
     // Check x content
     for (int i=0; i<x.size(); ++i) {
       if (!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)) {
-        return MXNode::getDiagcat(x);
+        return MXNode::get_diagcat(x);
       }
     }
 

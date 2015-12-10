@@ -79,13 +79,13 @@ namespace casadi {
     int nnz() const;
 
     /** \brief Get the number of non-zeros in the lower triangular half */
-    int sizeL() const;
+    int nnz_lower() const;
 
     /** \brief Get the number of non-zeros in the upper triangular half */
-    int sizeU() const;
+    int nnz_upper() const;
 
     /** \brief Get get the number of non-zeros on the diagonal */
-    int sizeD() const;
+    int nnz_diag() const;
 
     /** \brief Get the number of elements */
     int numel() const;
@@ -102,46 +102,46 @@ namespace casadi {
     /** \brief Get string representation of dimensions.
         The representation is (nrow x ncol = numel | size)
     */
-    std::string dimString() const;
+    std::string dim() const;
 
     /** \brief  Get the shape */
-    std::pair<int, int> shape() const;
+    std::pair<int, int> size() const;
 
     /** \brief  Get the size along a particular dimensions */
-    int shape(int axis) const;
+    int size(int axis) const;
 
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
-    bool isempty(bool both=false) const { return sparsity().isempty(both);}
+    bool is_empty(bool both=false) const { return sparsity().is_empty(both);}
 
     /** \brief  Check if the matrix expression is dense */
-    bool isdense() const { return sparsity().isdense();}
+    bool is_dense() const { return sparsity().is_dense();}
 
     /** \brief  Check if the matrix expression is scalar */
-    bool isscalar(bool scalar_and_dense=false) const;
+    bool is_scalar(bool scalar_and_dense=false) const;
 
     /** \brief  Check if the matrix expression is square */
-    bool issquare() const { return sparsity().issquare();}
+    bool is_square() const { return sparsity().is_square();}
 
     /** \brief  Check if the matrix is a row or column vector */
-    bool isvector() const { return sparsity().isvector();}
+    bool is_vector() const { return sparsity().is_vector();}
 
     /** \brief  Check if the matrix is a row vector (i.e. size1()==1) */
-    bool isrow() const { return sparsity().isrow();}
+    bool is_row() const { return sparsity().is_row();}
 
     /** \brief  Check if the matrix is a column vector (i.e. size2()==1) */
-    bool iscolumn() const { return sparsity().iscolumn();}
+    bool is_column() const { return sparsity().is_column();}
 
     /** \brief Check if the matrix is upper triangular */
-    bool istriu() const { return sparsity().istriu();}
+    bool is_triu() const { return sparsity().is_triu();}
 
     /** \brief Check if the matrix is lower triangular */
-    bool istril() const { return sparsity().istril();}
+    bool is_tril() const { return sparsity().is_tril();}
 
     ///@{
     /** \brief Get the sparsity pattern. See the Sparsity class for details. */
-    std::vector<int> getRow() const { return sparsity().getRow(); }
-    std::vector<int> getColind() const { return sparsity().getColind(); }
+    std::vector<int> get_row() const { return sparsity().get_row(); }
+    std::vector<int> get_colind() const { return sparsity().get_colind(); }
 #ifndef SWIG
     const int* row() const { return sparsity().row(); }
     const int* colind() const { return sparsity().colind(); }
@@ -180,16 +180,7 @@ namespace casadi {
     MatType zz_triu(bool includeDiagonal=true) const {
       return project(self(), triu(sparsity(), includeDiagonal));
     }
-    MatType zz_quad_form(const MatType &A) const {
-      casadi_assert(isvector());
-      if (!iscolumn()) return quad_form(self().T(), A);
-      return inner_prod(self(), mul(A, self()));
-    }
-    MatType zz_quad_form() const {
-      casadi_assert(isvector());
-      return inner_prod(self(), self());
-    }
-    MatType zz_sum_square() const { return inner_prod(self(), self());}
+    MatType zz_sum_square() const { return dot(self(), self());}
     MatType zz_linspace(const MatType &b, int nsteps) const;
     MatType zz_cross(const MatType &b, int dim=-1) const;
     MatType zz_tril2symm() const;
@@ -272,19 +263,28 @@ namespace casadi {
       return x.zz_symvar();
     }
 
-    /** \brief Calculate quadratic form X^T A X
+    ///@{
+    /** \brief Calculate bilinear form x^T A y
      */
-    inline friend MatType quad_form(const MatType &X, const MatType &A) {
-      return X.zz_quad_form(A);
+    inline friend MatType bilin(const MatType &A, const MatType &x, const MatType &y) {
+      return MatType::bilin(A, x, y);
     }
+    static MatType bilin(const MatType& A, const MatType& x, const MatType& y);
+    ///@}
 
-    /** \brief Calculate quadratic form X^T X
+    ///@{
+    /** \brief Make a rank-1 update to a matrix A
+     * Calculates A + 1/2 * alpha * outer_prod(x, x)
      */
-    inline friend MatType quad_form(const MatType &X) {
-      return X.zz_quad_form();
+    inline friend MatType rank1(const MatType &A, const MatType &alpha,
+                                const MatType &x, const MatType &y) {
+      return MatType::rank1(A, alpha, x, y);
     }
+    static MatType rank1(const MatType& A, const MatType& alpha,
+                         const MatType& x, const MatType& y);
+    ///@}
 
-    /** \brief Calculate some of squares: sum_ij X_ij^2 
+    /** \brief Calculate some of squares: sum_ij X_ij^2
      */
     inline friend MatType sum_square(const MatType &X) {
       return X.zz_sum_square();
@@ -340,8 +340,8 @@ namespace casadi {
     /** \brief Inner product of two matrices
         with x and y matrices of the same dimension
     */
-    inline friend MatType inner_prod(const MatType &x, const MatType &y) {
-      return x.zz_inner_prod(y);
+    inline friend MatType dot(const MatType &x, const MatType &y) {
+      return MatType::dot(x, y);
     }
 
     /** \brief  Take the outer product of two vectors
@@ -486,7 +486,7 @@ namespace casadi {
     /** \brief Computes the Moore-Penrose pseudo-inverse
      *
      * If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
-     * 
+     *
      *  pinv(A)' = (AA')^(-1) A
      *
      *
@@ -513,24 +513,24 @@ namespace casadi {
     ///@{
     /** \brief Calculate jacobian via source code transformation
     */
-    inline friend MatType jacobian(const MatType &ex, const MatType &arg) {
-      return ex.zz_jacobian(arg);
+    inline friend MatType jacobian(const MatType &ex, const MatType &arg, bool symmetric=false) {
+      return MatType::jacobian(ex, arg, symmetric);
     }
     inline friend MatType gradient(const MatType &ex, const MatType &arg) {
-      return ex.zz_gradient(arg);
+      return MatType::gradient(ex, arg);
     }
     inline friend MatType tangent(const MatType &ex, const MatType &arg) {
-      return ex.zz_tangent(arg);
+      return MatType::tangent(ex, arg);
     }
     ///@}
 
     ///@{
     // Hessian and (optionally) gradient
     inline friend MatType hessian(const MatType &ex, const MatType &arg) {
-      return ex.zz_hessian(arg);
+      return MatType::hessian(ex, arg);
     }
     inline friend MatType hessian(const MatType &ex, const MatType &arg, MatType& output_g) {
-      return ex.zz_hessian(arg, output_g);
+      return MatType::hessian(ex, arg, output_g);
     }
     ///@}
 
@@ -541,8 +541,8 @@ namespace casadi {
 
     /** \brief Get a string representation for a binary MatType, using custom arguments */
     inline friend std::string
-      getOperatorRepresentation(const MatType& xb, const std::vector<std::string>& args) {
-      return xb.zz_getOperatorRepresentation(args);
+      print_operator(const MatType& xb, const std::vector<std::string>& args) {
+      return xb.zz_print_operator(args);
     }
 
     /** \brief Extract shared subexpressions from an set of expressions */
@@ -633,7 +633,6 @@ namespace casadi {
   };
 
 #ifndef SWIG
-#ifdef casadi_implementation
   // Implementations
 
   template<typename MatType>
@@ -652,18 +651,18 @@ namespace casadi {
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeL() const {
-    return sparsity().sizeL();
+  int GenericMatrix<MatType>::nnz_lower() const {
+    return sparsity().nnz_lower();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeU() const {
-    return sparsity().sizeU();
+  int GenericMatrix<MatType>::nnz_upper() const {
+    return sparsity().nnz_upper();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeD() const {
-    return sparsity().sizeD();
+  int GenericMatrix<MatType>::nnz_diag() const {
+    return sparsity().nnz_diag();
   }
 
   template<typename MatType>
@@ -682,12 +681,12 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::pair<int, int> GenericMatrix<MatType>::shape() const {
-    return sparsity().shape();
+  std::pair<int, int> GenericMatrix<MatType>::size() const {
+    return sparsity().size();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::shape(int axis) const {
+  int GenericMatrix<MatType>::size(int axis) const {
     if (axis==1)
       return sparsity().size1();
     if (axis==2)
@@ -696,19 +695,17 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::string GenericMatrix<MatType>::dimString() const {
-    return sparsity().dimString();
+  std::string GenericMatrix<MatType>::dim() const {
+    return sparsity().dim();
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::isscalar(bool scalar_and_dense) const {
-    return sparsity().isscalar(scalar_and_dense);
+  bool GenericMatrix<MatType>::is_scalar(bool scalar_and_dense) const {
+    return sparsity().is_scalar(scalar_and_dense);
   }
 
-#endif
 #endif // SWIG
 
-#ifdef casadi_implementation
   template<typename MatType>
   std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name,
                                                    const Sparsity& sp, int p) {
@@ -757,12 +754,12 @@ namespace casadi {
     const MatType &a = self();
     casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),
                           "cross(a, b): Inconsistent dimensions. Dimension of a ("
-                          << a.dimString() << " ) must equal that of b ("
-                          << b.dimString() << ").");
+                          << a.dim() << " ) must equal that of b ("
+                          << b.dim() << ").");
 
     casadi_assert_message(a.size1()==3 || a.size2()==3,
                           "cross(a, b): One of the dimensions of a should have length 3, but got "
-                          << a.dimString() << ".");
+                          << a.dim() << ".");
     casadi_assert_message(dim==-1 || dim==1 || dim==2,
                           "cross(a, b, dim): Dim must be 1, 2 or -1 (automatic).");
 
@@ -790,12 +787,12 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::zz_tril2symm() const {
-    casadi_assert_message(self().issquare(),
+    casadi_assert_message(self().is_square(),
                           "Shape error in tril2symm. Expecting square shape but got "
-                          << self().dimString());
-    casadi_assert_message(self().sizeU()-self().sizeD()==0,
+                          << self().dim());
+    casadi_assert_message(self().nnz_upper()-self().nnz_diag()==0,
                           "Sparsity error in tril2symm. Found above-diagonal entries in argument: "
-                          << self().dimString());
+                          << self().dim());
     return self() +  self().T() - diag(diag(self()));
   }
 
@@ -816,16 +813,64 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::zz_triu2symm() const {
-    casadi_assert_message(self().issquare(),
+    casadi_assert_message(self().is_square(),
                           "Shape error in triu2symm. Expecting square shape but got "
-                          << self().dimString());
-    casadi_assert_message(self().sizeL()-self().sizeD()==0,
+                          << self().dim());
+    casadi_assert_message(self().nnz_lower()-self().nnz_diag()==0,
                           "Sparsity error in triu2symm. Found below-diagonal entries in argument: "
-                          << self().dimString());
+                          << self().dim());
     return self() + self().T() - diag(diag(self()));
   }
 
-#endif
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::bilin(const MatType& A, const MatType& x,
+                                        const MatType& y) {
+    // Check/correct x
+    casadi_assert(x.is_vector());
+    if (!x.is_column()) return bilin(A, x.T(), y);
+    if (!x.is_dense()) return bilin(A, densify(x), y);
+
+    // Check/correct y
+    casadi_assert(y.is_vector());
+    if (!y.is_column()) return bilin(A, x, y.T());
+    if (!y.is_dense()) return bilin(A, x, densify(y));
+
+    // Assert dimensions
+    casadi_assert_message(x.size1()==A.size1() && y.size1()==A.size2(),
+                          "Dimension mismatch. Got x.size1() = " << x.size1()
+                          << " and y.size1() = " << y.size1()
+                          << " but A.size() = " << A.size());
+
+    // Call the class specific method
+    return MatType::_bilin(A, x, y);
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::rank1(const MatType& A, const MatType& alpha,
+                                        const MatType& x, const MatType& y) {
+    // Check/correct x
+    casadi_assert(x.is_vector());
+    if (!x.is_column()) return rank1(A, alpha, x.T(), y);
+    if (!x.is_dense()) return rank1(A, alpha, densify(x), y);
+
+    // Check/correct y
+    casadi_assert(y.is_vector());
+    if (!y.is_column()) return rank1(A, alpha, x, y.T());
+    if (!y.is_dense()) return rank1(A, alpha, x, densify(y));
+
+    // Check alpha, quick return
+    casadi_assert(alpha.is_scalar());
+    if (!alpha.is_dense()) return A;
+
+    // Assert dimensions
+    casadi_assert_message(x.size1()==A.size1() && y.size1()==A.size2(),
+                          "Dimension mismatch. Got x.size1() = " << x.size1()
+                          << " and y.size1() = " << y.size1()
+                          << " but A.size() = " << A.size());
+
+    // Call the class specific method
+    return MatType::_rank1(A, alpha, x, y);
+  }
 
 } // namespace casadi
 

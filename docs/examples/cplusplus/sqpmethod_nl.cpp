@@ -45,7 +45,7 @@ int main(int argc, char **argv){
   nl.parseNL(problem);
 
   // NLP
-  SXFunction nlp("nlp", nlpIn("x", nl.x), nlpOut("f", nl.f, "g", nl.g));
+  SXDict nlp = {{"x", nl.x}, {"f", nl.f}, {"g", nl.g}};
 
   // Set options
   Dict opts;
@@ -56,15 +56,15 @@ int main(int argc, char **argv){
   // opts["derivative_test"] = "second-order";
 
   // Specify QP solver
-  opts["qp_solver"]  = "nlp";
-  opts["qp_solver_options"] =
-    make_dict("nlp_solver", "ipopt",
-              "nlp_solver_options", make_dict("print_level", 0,
-                                              "print_time", 0));
+  opts["qpsol"]  = "nlpsol";
+  opts["qpsol_options"] =
+    Dict{{"nlpsol", "ipopt"},
+         {"nlpsol_options", Dict{{"print_level", 0},
+                                     {"print_time", 0}}}};
 
   // Allocate NLP solver and buffers
-  NlpSolver nlp_solver("nlp_solver", "sqpmethod", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  Function solver = nlpsol("nlpsol", "sqpmethod", nlp, opts);
+  std::map<std::string, DM> arg, res;
 
   // Solve NLP
   arg["lbx"] = nl.x_lb;
@@ -72,7 +72,7 @@ int main(int argc, char **argv){
   arg["lbg"] = nl.g_lb;
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
-  res = nlp_solver(arg);
+  res = solver(arg);
 
   return 0;
 }

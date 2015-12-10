@@ -26,52 +26,58 @@
 #ifndef CASADI_QPOASES_INTERFACE_HPP
 #define CASADI_QPOASES_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
-#include <casadi/interfaces/qpoases/casadi_qpsolver_qpoases_export.h>
+#include "casadi/core/function/qpsol.hpp"
+#include <casadi/interfaces/qpoases/casadi_qpsol_qpoases_export.h>
 #include <qpOASES.hpp>
 
-/** \defgroup plugin_QpSolver_qpoases
+/** \defgroup plugin_Qpsol_qpoases
 Interface to QPOases Solver for quadratic programming
 
 */
 
-/** \pluginsection{QpSolver,qpoases} */
+/** \pluginsection{Qpsol,qpoases} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{QpSolver,qpoases}
+  /** \brief \pluginbrief{Qpsol,qpoases}
    *
    * @copydoc QPSolver_doc
-   * @copydoc plugin_QpSolver_qpoases
+   * @copydoc plugin_Qpsol_qpoases
    *
    * \author Joris Gillis, Joel Andersson
    * \date 2011
    *
    * */
-class CASADI_QPSOLVER_QPOASES_EXPORT QpoasesInterface : public QpSolverInternal {
-public:
-  /** \brief  Constructor */
-  explicit QpoasesInterface();
+  class CASADI_QPSOL_QPOASES_EXPORT QpoasesInterface : public Qpsol {
+  public:
+    /** \brief  Constructor */
+    explicit QpoasesInterface();
 
-  /** \brief  Create a new QP Solver */
-  static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-    return new QpoasesInterface(st);
-  }
+    /** \brief  Create a new QP Solver */
+    static Qpsol* creator(const std::string& name,
+                          const std::map<std::string, Sparsity>& st) {
+      return new QpoasesInterface(name, st);
+    }
 
-  /** \brief  Create a new Solver */
-  explicit QpoasesInterface(const std::map<std::string, Sparsity>& st);
+    /** \brief  Create a new Solver */
+    explicit QpoasesInterface(const std::string& name,
+                              const std::map<std::string, Sparsity>& st);
 
-  /** \brief  Destructor */
-  virtual ~QpoasesInterface();
+    /** \brief  Destructor */
+    virtual ~QpoasesInterface();
 
-  /** \brief  Initialize */
-  virtual void init();
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "qpoases";}
 
-  virtual void evaluate();
+    /** \brief  Initialize */
+    virtual void init();
 
-  /// A documentation string
-  static const std::string meta_doc;
+    /** \brief  Evaluate numerically */
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
 
@@ -81,7 +87,7 @@ public:
     };
 
     ///@{
-      /// Convert between qpOASES types and standard types
+    /// Convert between qpOASES types and standard types
     static bool BooleanType_to_bool(qpOASES::BooleanType b);
     static qpOASES::BooleanType bool_to_BooleanType(bool b);
     static std::string SubjectToStatus_to_string(qpOASES::SubjectToStatus b);
@@ -102,17 +108,10 @@ public:
     /// Has qpOASES been called once?
     bool called_once_;
 
-    /// Dense data for H and A
-    std::vector<double> h_data_;
-    std::vector<double> a_data_;
-
-    /// Temporary vector holding the dual solution
-    std::vector<double> dual_;
-
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
 
-};
+  };
 
 } // namespace casadi
 

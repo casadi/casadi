@@ -26,231 +26,388 @@
 #ifndef CASADI_INTEGRATOR_HPP
 #define CASADI_INTEGRATOR_HPP
 
-#include "function.hpp"
-#include "linear_solver.hpp"
+#include "function_internal.hpp"
+#include "plugin_interface.hpp"
 
-/** \brief Base class for integrators
- *
- * \defgroup DAE_doc
-    Solves an initial value problem (IVP) coupled to a terminal value problem
-    with differential equation given as an implicit ODE coupled to an algebraic
-    equation and a set of quadratures:
-    \verbatim
-    Initial conditions at t=t0
-    x(t0)  = x0
-    q(t0)  = 0
+/// \cond INTERNAL
 
-    Forward integration from t=t0 to t=tf
-    der(x) = function(x, z, p, t)                  Forward ODE
-    0 = fz(x, z, p, t)                  Forward algebraic equations
-    der(q) = fq(x, z, p, t)                  Forward quadratures
-
-    Terminal conditions at t=tf
-    rx(tf)  = rx0
-    rq(tf)  = 0
-
-    Backward integration from t=tf to t=t0
-    der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-    0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-    der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-
-    where we assume that both the forward and backwards integrations are index-1
-    (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-    gx, gz and gq have a linear dependency on rx, rz and rp.
-
-    \endverbatim
-*/
 namespace casadi {
-#ifndef SWIG
 
-  /// Input arguments of an ODE/DAE function [daeIn]
-  enum DAEInput {
-    /// Differential state [x]
-    DAE_X,
-    /// Algebraic state [z]
-    DAE_Z,
-    /// Parameter [p]
-    DAE_P,
-    /// Explicit time dependence [t]
-    DAE_T,
-    /// Number of arguments.
-    DAE_NUM_IN
-  };
-
-  /// Output arguments of an DAE function [daeOut]
-  enum DAEOutput {
-    /// Right hand side of the implicit ODE [ode]
-    DAE_ODE,
-    /// Right hand side of algebraic equations [alg]
-    DAE_ALG,
-    /// Right hand side of quadratures equations [quad]
-    DAE_QUAD,
-    /// Number of arguments.
-    DAE_NUM_OUT
-  };
-
-  /// Input arguments of an ODE/DAE backward integration function [rdaeIn]
-  enum RDAEInput {
-    /// Backward differential state [rx]
-    RDAE_RX,
-    /// Backward algebraic state [rz]
-    RDAE_RZ,
-    /// Backward  parameter vector [rp]
-    RDAE_RP,
-    /// Forward differential state [x]
-    RDAE_X,
-    /// Forward algebraic state [z]
-    RDAE_Z,
-    /// Parameter vector [p]
-    RDAE_P,
-    /// Explicit time dependence [t]
-    RDAE_T,
-    /// Number of arguments.
-    RDAE_NUM_IN
-  };
-
-  /// Output arguments of an ODE/DAE backward integration function [rdaeOut]
-  enum RDAEOutput {
-    /// Right hand side of ODE. [ode]
-    RDAE_ODE,
-    /// Right hand side of algebraic equations. [alg]
-    RDAE_ALG,
-    /// Right hand side of quadratures. [quad]
-    RDAE_QUAD,
-    /// Number of arguments.
-    RDAE_NUM_OUT
-  };
-
-  /// Input arguments of an integrator [integratorIn]
-  enum IntegratorInput {
-    /// Differential state at the initial time [x0]
-    INTEGRATOR_X0,
-    /// Parameters [p]
-    INTEGRATOR_P,
-    /// Initial guess for the algebraic variable [z0]
-    INTEGRATOR_Z0,
-    /// Backward differential state at the final time [rx0]
-    INTEGRATOR_RX0,
-    /// Backward parameter vector [rp]
-    INTEGRATOR_RP,
-    /// Initial guess for the backwards algebraic variable [rz0]
-    INTEGRATOR_RZ0,
-    /// Number of input arguments of an integrator
-    INTEGRATOR_NUM_IN
-  };
-
-  /// Output arguments of an integrator [integratorOut]
-  enum IntegratorOutput {
-    /// Differential state at the final time [xf]
-    INTEGRATOR_XF,
-    /// Quadrature state at the final time [qf]
-    INTEGRATOR_QF,
-    /// Algebraic variable at the final time [zf]
-    INTEGRATOR_ZF,
-    /// Backward differential state at the initial time [rxf]
-    INTEGRATOR_RXF,
-    /// Backward quadrature state at the initial time [rqf]
-    INTEGRATOR_RQF,
-    /// Backward algebraic variable at the initial time [rzf]
-    INTEGRATOR_RZF,
-    /// Number of output arguments of an integrator
-    INTEGRATOR_NUM_OUT
-  };
-#endif // SWIG
-
-  /// Forward declaration of internal class
-  class IntegratorInternal;
-
-  // grep "addOption" integrator_internal.cpp |
-  //   perl -pe 's/addOption\((.*?),(.*?), (.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
-
-  /** Integrator abstract base class
+  /** \brief Internal storage for integrator related data
 
       @copydoc DAE_doc
-
-      The Integrator class provides some additional functionality, such as getting the value
-      of the state and/or sensitivities at certain time points.
-
-      \generalsection{Integrator}
-      \pluginssection{Integrator}
-
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT Integrator : public Function {
+  class CASADI_EXPORT
+  Integrator : public FunctionInternal, public PluginInterface<Integrator> {
   public:
-    /// Default constructor
-    Integrator();
+    /** \brief  Constructor */
+    Integrator(const std::string& name, const XProblem& dae);
 
-    ///@}
-    /** \brief  Integrator factory (new syntax, includes initialization)
-    *
-    * \param solver \pluginargument{Integrator}
-    * \param f dynamical system
-    * \parblock
-    * \copydoc scheme_DAEInput
-    * \copydoc scheme_DAEOutput
-    * \endparblock
-    */
-    Integrator(const std::string& name, const std::string& solver, const Function& f,
-               const Dict& opts=Dict());
-    Integrator(const std::string& name, const std::string& solver,
-               const std::pair<Function, Function>& fg, const Dict& opts=Dict());
-    Integrator(const std::string& name, const std::string& solver,
-               const SXDict& dae, const Dict& opts=Dict());
-    Integrator(const std::string& name, const std::string& solver,
-               const MXDict& dae, const Dict& opts=Dict());
+    /** \brief  Destructor */
+    virtual ~Integrator()=0;
+
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in() const { return INTEGRATOR_NUM_IN;}
+    virtual size_t get_n_out() const { return INTEGRATOR_NUM_OUT;}
     ///@}
 
-    /// Print solver statistics
-    void printStats(std::ostream &stream=casadi::userOut()) const;
+   /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int ind) const;
+    virtual Sparsity get_sparsity_out(int ind) const;
+    /// @}
 
-    /// Access functions of the node
-    IntegratorInternal* operator->();
+    /** \brief  Initialize */
+    virtual void init();
 
-    /// Access functions of the node
-    const IntegratorInternal* operator->() const;
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w);
 
-    /** \brief Reset the forward problem
-     * Time will be set to t0 and state to input(INTEGRATOR_X0)
-     */
-    void reset();
+    /** \brief Set the (temporary) work vectors */
+    virtual void set_temp(Memory& m, const double** arg, double** res, int* iw, double* w);
 
-    /// Integrate forward until a specified time point
-    void integrate(double t_out);
+    /** \brief Reset the forward problem */
+    virtual void reset(Memory& m, double t, const double* x,
+                       const double* z, const double* p) = 0;
 
-    /** \brief Reset the backward problem
-     *
-     * Time will be set to tf and backward state to input(INTEGRATOR_RX0)
-     */
-    void resetB();
+    /** \brief  Advance solution in time */
+    virtual void advance(Memory& m, double t, double* x,
+                         double* z, double* q) = 0;
 
-    /// Integrate backward until a specified time point
-    void integrateB(double t_out);
+    /** \brief Reset the backward problem */
+    virtual void resetB(Memory& m, double t, const double* rx,
+                        const double* rz, const double* rp) = 0;
 
-    /// Check if a plugin is available
-    static bool hasPlugin(const std::string& name);
+    /** \brief  Retreat solution in time */
+    virtual void retreat(Memory& m, double t, double* rx,
+                         double* rz, double* rq) = 0;
 
-    /// Explicitly load a plugin dynamically
-    static void loadPlugin(const std::string& name);
+    /** \brief  evaluate */
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
-    /// Get solver specific documentation
-    static std::string doc(const std::string& name);
+    /** \brief  Print solver statistics */
+    virtual void printStats(std::ostream &stream) const {}
+
+    /** \brief  Propagate sparsity forward */
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+
+    /// Is the class able to propagate seeds through the algorithm?
+    virtual bool spCanEvaluate(bool fwd) { return true;}
+
+    ///@{
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual int get_n_forward() const { return 64;}
+    ///@}
+
+    ///@{
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual int get_n_reverse() const { return 64;}
+    ///@}
+
+    /** \brief  Set stop time for the integration */
+    virtual void setStopTime(double tf);
+
+    // Helper structure
+    struct AugOffset {
+      std::vector<int> x, z, q, p, rx, rz, rq, rp;
+    };
+
+    /** \brief Set solver specific options to generated augmented integrators */
+    virtual Dict getDerivativeOptions(bool fwd);
+
+    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities  */
+    template<typename MatType>
+      std::map<std::string, MatType> aug_fwd(int nfwd, AugOffset& offset);
 
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
-     *    and \a nadj adjoint sensitivities
-     */
-    std::pair<Function, Function> getAugmented(int nfwd, int nadj);
+    * and \a nadj adjoint sensitivities */
+    template<typename MatType>
+      std::map<std::string, MatType> aug_adj(int nadj, AugOffset& offset);
 
-    /// Get the DAE
-    Function getDAE();
+    /// Get offsets in augmented problem
+    AugOffset getAugOffset(int nfwd, int nadj);
 
-    /// Set a stop time for the forward integration
-    void setStopTime(double tf);
+    /// Create sparsity pattern of the extended Jacobian (forward problem)
+    Sparsity spJacF();
 
-    /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    /// Create sparsity pattern of the extended Jacobian (backward problem)
+    Sparsity spJacG();
+
+    /// Get the (legacy) dae forward function
+    template<typename MatType> Function get_f() const;
+
+    /// Get the (legacy) dae backward function
+    template<typename MatType> Function get_g() const;
+
+    // Work vectors
+    const double **arg_;
+    double **res_;
+    int *iw_;
+    double *w_;
+
+    // Sparities
+    Sparsity t_, x_, z_, p_, q_, rx_, rz_, rp_, rq_;
+
+    ///@{
+    // Shorthands
+    const Sparsity&  t() { return t_;}
+    const Sparsity&  x() { return x_;}
+    const Sparsity&  z() { return z_;}
+    const Sparsity&  p() { return p_;}
+    const Sparsity&  q() { return q_;}
+    const Sparsity& rx() { return rx_;}
+    const Sparsity& rz() { return rz_;}
+    const Sparsity& rp() { return rp_;}
+    const Sparsity& rq() { return rq_;}
+    ///@}
+
+    /// Number of states for the forward integration
+    int nx_, nz_, nq_;
+
+    /// Number of states for the backward integration
+    int nrx_, nrz_, nrq_;
+
+    /// Number of forward and backward parameters
+    int np_, nrp_;
+
+    // Time grid
+    std::vector<double> grid_;
+    int ngrid_;
+
+    // Dae
+    XProblem dae_;
+
+    /// One step
+    Function onestep_;
+
+    /// ODE/DAE forward integration function
+    Function f_;
+
+    /// ODE/DAE backward integration function, if any
+    Function g_;
+
+    /// Integrator for sparsity pattern propagation
+    Function linsol_f_, linsol_g_;
+
+    /// Options
+    bool print_stats_;
+
+    /// Output the state at the initial time
+    bool output_t0_;
+    int ntout_;
+
+    // Creator function for internal class
+    typedef Integrator* (*Creator)(const std::string& name, const XProblem& dae);
+
+    // No static functions exposed
+    struct Exposed{ };
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+
+    /// Infix
+    static const std::string infix_;
+
+    /// Convert dictionary to Problem
+    template<typename XType>
+      static Problem<XType> map2problem(const std::map<std::string, XType>& d);
+
+    /// Convert Problem to dictionary
+    template<typename XType>
+      static std::map<std::string, XType> problem2map(const Problem<XType>& d);
+
+    /// Get the (legacy) dae forward function
+    template<typename XType>
+      static Problem<XType> fun2problem(Function f, Function g=Function());
   };
+
+
+  template<typename XType>
+  Problem<XType> Integrator::map2problem(const std::map<std::string, XType>& d) {
+    std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
+    for (auto&& i : d) {
+      if (i.first=="t") {
+        de_in[DE_T]=i.second;
+      } else if (i.first=="x") {
+        de_in[DE_X]=i.second;
+      } else if (i.first=="z") {
+        de_in[DE_Z]=i.second;
+      } else if (i.first=="p") {
+        de_in[DE_P]=i.second;
+      } else if (i.first=="rx") {
+        de_in[DE_RX]=i.second;
+      } else if (i.first=="rz") {
+        de_in[DE_RZ]=i.second;
+      } else if (i.first=="rp") {
+        de_in[DE_RP]=i.second;
+      } else if (i.first=="ode") {
+        de_out[DE_ODE]=i.second;
+      } else if (i.first=="alg") {
+        de_out[DE_ALG]=i.second;
+      } else if (i.first=="quad") {
+        de_out[DE_QUAD]=i.second;
+      } else if (i.first=="rode") {
+        de_out[DE_RODE]=i.second;
+      } else if (i.first=="ralg") {
+        de_out[DE_RALG]=i.second;
+      } else if (i.first=="rquad") {
+        de_out[DE_RQUAD]=i.second;
+      } else {
+        casadi_error("No such field: " + i.first);
+      }
+    }
+    return {de_in, de_out};
+  }
+
+  template<typename XType>
+  std::map<std::string, XType> Integrator::problem2map(const Problem<XType>& d) {
+    return {
+        {"t", d.in[DE_T]},
+        {"x", d.in[DE_X]},
+        {"z", d.in[DE_Z]},
+        {"p", d.in[DE_P]},
+        {"rx", d.in[DE_RX]},
+        {"rz", d.in[DE_RZ]},
+        {"rp", d.in[DE_RP]},
+        {"ode", d.out[DE_ODE]},
+        {"alg", d.out[DE_ALG]},
+        {"quad", d.out[DE_QUAD]},
+        {"rode", d.out[DE_RODE]},
+        {"ralg", d.out[DE_RALG]},
+        {"rquad", d.out[DE_RQUAD]},
+      };
+  }
+
+  template<typename XType>
+  Problem<XType> Integrator::fun2problem(Function f, Function g) {
+    Problem<XType> dae;
+    dae.in.resize(DE_NUM_IN);
+    dae.out.resize(DE_NUM_OUT);
+    std::vector<XType> v = XType::get_input(f), vf=v, vg=v;
+    dae.in[DE_T] = v[DAE_T];
+    dae.in[DE_X] = v[DAE_X];
+    dae.in[DE_Z] = v[DAE_Z];
+    dae.in[DE_P] = v[DAE_P];
+    v = f(v);
+    dae.out[DE_ODE] = v[DAE_ODE];
+    dae.out[DE_ALG] = v[DAE_ALG];
+    dae.out[DE_QUAD] = v[DAE_QUAD];
+    if (!g.isNull()) {
+      v = XType::get_input(g);
+      dae.in[DE_RX] = v[RDAE_RX];
+      dae.in[DE_RZ] = v[RDAE_RZ];
+      dae.in[DE_RP] = v[RDAE_RP];
+      vg[DAE_T] = v[RDAE_T];
+      vg[DAE_X] = v[RDAE_X];
+      vg[DAE_Z] = v[RDAE_Z];
+      vg[DAE_P] = v[RDAE_P];
+      v = substitute(g(v), vg, vf);
+      dae.out[DE_RODE] = v[RDAE_ODE];
+      dae.out[DE_RALG] = v[RDAE_ALG];
+      dae.out[DE_RQUAD] = v[RDAE_QUAD];
+    }
+    return dae;
+  }
+
+  class CASADI_EXPORT FixedStepIntegrator : public Integrator {
+  public:
+
+    /// Constructor
+    explicit FixedStepIntegrator(const std::string& name, const XProblem& dae);
+
+    /// Destructor
+    virtual ~FixedStepIntegrator();
+
+    /// Initialize stage
+    virtual void init();
+
+    /// Setup F and G
+    virtual void setupFG() = 0;
+
+    /** \brief Reset the forward problem */
+    virtual void reset(Memory& m, double t, const double* x,
+                       const double* z, const double* p);
+
+    /** \brief  Advance solution in time */
+    virtual void advance(Memory& m, double t, double* x,
+                         double* z, double* q);
+
+    /// Reset the backward problem and take time to tf
+    virtual void resetB(Memory& m, double t, const double* rx,
+                        const double* rz, const double* rp);
+
+    /** \brief  Retreat solution in time */
+    virtual void retreat(Memory& m, double t, double* rx,
+                         double* rz, double* rq);
+
+    /// Get explicit dynamics
+    virtual Function& getExplicit() { return F_;}
+
+    /// Get explicit dynamics (backward problem)
+    virtual Function& getExplicitB() { return G_;}
+
+    // Discrete time dynamics
+    Function F_, G_;
+
+    // Number of finite elements
+    int nk_;
+
+    // Discrete time
+    int k_;
+
+    // Time step size
+    double h_;
+
+    /// Number of algebraic variables for the discrete time integration
+    int nZ_, nRZ_;
+
+    // Current time
+    double t_;
+
+    // Current state
+    std::vector<double> x_, z_, p_, q_, rx_, rz_, rp_, rq_;
+
+    // Previous state
+    std::vector<double> x_prev_, Z_prev_, q_prev_, rx_prev_, RZ_prev_, rq_prev_;
+
+    /// Algebraic variables for the discrete time integration
+    DM Z_, RZ_;
+
+    // Tape
+    std::vector<std::vector<double> > x_tape_, Z_tape_;
+  };
+
+  class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
+  public:
+
+    /// Constructor
+    explicit ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae);
+
+    /// Destructor
+    virtual ~ImplicitFixedStepIntegrator();
+
+    /// Initialize stage
+    virtual void init();
+
+    /// Get explicit dynamics
+    virtual Function& getExplicit() { return implicit_solver_;}
+
+    /// Get explicit dynamics (backward problem)
+    virtual Function& getExplicitB() { return backward_implicit_solver_;}
+
+    // Implicit function solver
+    Function implicit_solver_, backward_implicit_solver_;
+  };
+
 } // namespace casadi
+/// \endcond
 
 #endif // CASADI_INTEGRATOR_HPP

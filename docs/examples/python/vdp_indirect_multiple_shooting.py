@@ -42,7 +42,7 @@ L = x0*x0 + x1*x1 + u*u
 lam = SX.sym("lam",2)
 
 # Hamiltonian function
-H = inner_prod(lam,xdot) + L
+H = dot(lam,xdot) + L
 
 # Costate equations
 ldot = -gradient(H,x)
@@ -66,9 +66,11 @@ print "optimal control: ", u_opt
 f = vertcat((xdot,ldot))
 f = substitute(f,u,u_opt)
 
-# Create the right hand side function
-rhs_in = daeIn(x=vertcat((x,lam)))
-rhs = SXFunction('rhs', rhs_in,daeOut(ode=f))
+# Function for obtaining the optimal control from the augmented state
+u_fcn = Function("ufcn", [vertcat((x,lam))], [u_opt])
+
+# Formulate the DAE
+dae = {'x':vertcat((x,lam)), 'ode':f}
 
 # Augmented DAE state dimension
 nX = 4
@@ -85,7 +87,7 @@ iopts["abstol"] = 1e-8 # abs. tolerance
 iopts["reltol"] = 1e-8 # rel. tolerance
 iopts["t0"] = 0.0
 iopts["tf"] = tf/num_nodes
-I = Integrator("I", "cvodes", rhs, iopts)
+I = integrator("I", "cvodes", dae, iopts)
 
 # Variables in the root finding problem
 NV = nX*(num_nodes+1)
@@ -107,18 +109,18 @@ for k in range(num_nodes):
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-rfp = MXFunction('rfp', [V], [vertcat(G)])
+rfp = Function('rfp', [V], [vertcat(G)])
 
 # Select a solver for the root-finding problem
-Solver = "nlp"
+Solver = "nlpsol"
 #Solver = "newton"
 #Solver = "kinsol"
 
 # Solver options
 opts = {}
-if Solver=="nlp":
-    opts["nlp_solver"] = "ipopt"
-    opts["nlp_solver_options"] = {"hessian_approximation":"limited-memory"}
+if Solver=="nlpsol":
+    opts["nlpsol"] = "ipopt"
+    opts["nlpsol_options"] = {"hessian_approximation":"limited-memory"}
 elif Solver=="newton":
     opts["linear_solver"] = CSparse
 elif Solver=="kinsol":
@@ -127,7 +129,7 @@ elif Solver=="kinsol":
     opts["max_iter"] = 1000
 
 # Allocate a solver
-solver = ImplicitFunction('solver', Solver, rfp, opts)
+solver = rootfinder('solver', Solver, rfp, opts)
 
 # Solve the problem
 V_sol, = solver([0])
@@ -135,21 +137,22 @@ V_sol, = solver([0])
 # Time grid for visualization
 tgrid = NP.linspace(0,tf,100)
 
-# Output functions
-output_fcn = SXFunction("output", rhs_in, [x0,x1,u_opt])
-
 # Simulator to get optimal state and control trajectories
-simulator = Simulator("simulator", I, output_fcn, tgrid)
+simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid,'output_t0':True})
 
 # Simulate to get the trajectories
-sol = simulator({"x0" : V_sol[0:4]})
+sol = simulator({"x0" : V_sol[0:4]})["xf"]
+
+# Calculate the optimal control
+ufcn_all = u_fcn.map("ufcn_all", len(tgrid))
+[u_opt] = ufcn_all([sol])
 
 # Plot the results
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid, sol["o0"].T, '--')
-plt.plot(tgrid, sol["o1"].T, '-')
-plt.plot(tgrid, sol["o2"].T, '-.')
+plt.plot(tgrid, sol[0, :].T, '--')
+plt.plot(tgrid, sol[1, :].T, '-')
+plt.plot(tgrid, u_opt.T, '-.')
 plt.title("Van der Pol optimization - indirect multiple shooting")
 plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])

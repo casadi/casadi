@@ -26,51 +26,48 @@
 #ifndef CASADI_NEWTON_HPP
 #define CASADI_NEWTON_HPP
 
-#include "casadi/core/function/implicit_function_internal.hpp"
-#include "casadi/core/function/nlp_solver.hpp"
-#include "casadi/core/function/linear_solver.hpp"
+#include "casadi/core/function/rootfinder.hpp"
 
-#include <casadi/solvers/casadi_implicitfunction_newton_export.h>
+#include <casadi/solvers/casadi_rootfinder_newton_export.h>
 
-/** \defgroup plugin_ImplicitFunction_newton
+/** \defgroup plugin_Rootfinder_newton
      Implements simple newton iterations to solve an implicit function.
 */
 
-/** \pluginsection{ImplicitFunction,newton} */
+/** \pluginsection{Rootfinder,newton} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{ImplicitFunction,newton}
+  /** \brief \pluginbrief{Rootfinder,newton}
 
-      @copydoc ImplicitFunction_doc
-      @copydoc plugin_ImplicitFunction_newton
+      @copydoc Rootfinder_doc
+      @copydoc plugin_Rootfinder_newton
 
       \author Joris Gillis
       \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT Newton
-      : public ImplicitFunctionInternal {
+  class CASADI_ROOTFINDER_NEWTON_EXPORT Newton : public Rootfinder {
   public:
     /** \brief  Constructor */
-    explicit Newton(const Function& f);
+    explicit Newton(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
     virtual ~Newton();
 
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f) const
-    { return new Newton(f);}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "newton";}
 
-    /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const Function& f)
-    { return new Newton(f);}
+    /** \brief  Create a new Rootfinder */
+    static Rootfinder* creator(const std::string& name, const Function& f) {
+      return new Newton(name, f);
+    }
 
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Solve the nonlinear system of equations */
-    virtual void solveNonLinear();
+    /// Solve the system of equations and calculate derivatives
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// A documentation string
     static const std::string meta_doc;
@@ -93,7 +90,6 @@ namespace casadi {
 
     /// Print iteration
     void printIteration(std::ostream &stream, int iter, double abstol, double abstolStep);
-
   };
 
 } // namespace casadi

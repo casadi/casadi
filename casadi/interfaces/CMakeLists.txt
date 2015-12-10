@@ -34,6 +34,10 @@ if(OOQP_FOUND)
   add_subdirectory(ooqp)
 endif()
 
+if(GUROBI_FOUND)
+  add_subdirectory(gurobi)
+endif()
+
 if(WORHP_FOUND)
   add_subdirectory(worhp)
 endif()

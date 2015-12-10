@@ -86,7 +86,7 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
     void setOption(const Dict& dict, bool skipUnknown = false);
 
     /** \brief  get an option value */
-    GenericType getOption(const std::string &str) const;
+    GenericType option(const std::string &str) const;
 
     /** \brief  check if there is an option str */
     bool hasOption(const std::string &str) const;
@@ -106,39 +106,41 @@ class CASADI_EXPORT OptionsFunctionality : public SharedObject {
 
 /// @}
     /** \brief Get a list of all option names */
-    std::vector<std::string> getOptionNames() const;
+    std::vector<std::string> optionNames() const;
 
     /** \brief Get the description of a certain option */
-    std::string getOptionDescription(const std::string &str) const;
+    std::string optionDescription(const std::string &str) const;
 
+  #ifndef SWIG
     /** \brief Get the type of a certain option */
-    TypeID getOptionType(const std::string &str) const;
+    TypeID optionType(const std::string &str) const;
+  #endif // SWIG
 
     /** \brief Get the type name of a certain option */
-    std::string getOptionTypeName(const std::string &str) const;
+    std::string optionTypeName(const std::string &str) const;
 
     /** \brief Get the allowed values of a certain option */
-    std::vector<GenericType> getOptionAllowed(const std::string &str) const;
+    std::vector<GenericType> optionAllowed(const std::string &str) const;
 
     /// \cond INTERNAL
     /** \brief Get the index into allowed options of a certain option */
-    int getOptionAllowedIndex(const std::string &name) const;
+    int optionAllowedIndex(const std::string &name) const;
 
     /** \brief Set a certain option by giving its index into the allowed values */
     void setOptionByAllowedIndex(const std::string &name, int i);
 
     /** \brief Get the enum value corresponding to th certain option */
-    int getOptionEnumValue(const std::string &name) const;
+    int optionEnumValue(const std::string &name) const;
 
     /** \brief Set a certain option by giving an enum value */
     void setOptionByEnumValue(const std::string &name, int v);
     /// \endcond
 
     /** \brief Get the default of a certain option */
-    GenericType getOptionDefault(const std::string &str) const;
+    GenericType optionDefault(const std::string &str) const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
     // Add an option to the recipe list
     static Dict addOptionRecipe(const Dict& dict, const std::string& recipe);
@@ -175,33 +177,33 @@ virtual ~OptionsFunctionalityNode();
   void setOption(const Dict& dict, bool skipUnknown = false);
 
   /** \brief Get a list of all option names */
-  std::vector<std::string> getOptionNames() const;
+  std::vector<std::string> optionNames() const;
 
   /** \brief Get the description of a certain option */
-  std::string getOptionDescription(const std::string &str) const;
+  std::string optionDescription(const std::string &str) const;
 
   /** \brief Get the type of a certain option */
-  TypeID getOptionType(const std::string &str) const;
+  TypeID optionType(const std::string &str) const;
 
   /** \brief Get the type name of a certain option */
-  std::string getOptionTypeName(const std::string &str) const;
+  std::string optionTypeName(const std::string &str) const;
 
   /** \brief Get the default of a certain option */
-  GenericType getOptionDefault(const std::string &str) const;
+  GenericType optionDefault(const std::string &str) const;
 
   #ifndef SWIG
   /** \brief Get the allowed values of a certain option */
-  std::vector<GenericType> getOptionAllowed(const std::string &str) const;
+  std::vector<GenericType> optionAllowed(const std::string &str) const;
   #endif // SWIG
 
   /** \brief Get the index into allowed options of a certain option */
-  int getOptionAllowedIndex(const std::string &name) const;
+  int optionAllowedIndex(const std::string &name) const;
 
   /** \brief Set a certain option by giving its index into the allowed values */
   void setOptionByAllowedIndex(const std::string &name, int i);
 
   /** \brief Get the enum value corresponding to th certain option */
-  int getOptionEnumValue(const std::string &name) const;
+  int optionEnumValue(const std::string &name) const;
 
   /** \brief Set a certain option by giving an enum value */
   void setOptionByEnumValue(const std::string &name, int v);
@@ -219,13 +221,13 @@ virtual ~OptionsFunctionalityNode();
   void printOption(const std::string &name, std::ostream &stream = userOut()) const;
 
   /** \brief  get an option value */
-  GenericType getOption(const std::string &str) const;
+  GenericType option(const std::string &str) const;
 
   /** \brief  Print description */
   virtual void print(std::ostream &stream) const = 0;
 
   /** \brief  Print representation */
-  virtual void repr(std::ostream &stream) const;
+  virtual void repr(std::ostream &stream) const = 0;
 
   /** \brief  Copy all options from another object*/
   void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);

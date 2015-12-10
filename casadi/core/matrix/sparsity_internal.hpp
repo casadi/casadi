@@ -49,7 +49,7 @@ namespace casadi {
       sp_[1] = ncol;
       std::copy(colind, colind+ncol+1, sp_.begin()+2);
       std::copy(row, row+colind[ncol], sp_.begin()+2+ncol+1);
-      sanityCheck(false);
+      sanity_check(false);
     }
 
     /** \brief Get number of rows (see public class) */
@@ -71,23 +71,23 @@ namespace casadi {
     inline int nnz() const { return colind()[size2()];}
 
     /// Check if the dimensions and colind, row vectors are compatible
-    void sanityCheck(bool complete=false) const;
+    void sanity_check(bool complete=false) const;
 
     /** \brief Get the diagonal of the matrix/create a diagonal matrix
      *
      * \param[out] mapping will contain the nonzero mapping
      */
-    Sparsity getDiag(std::vector<int>& mapping) const;
+    Sparsity get_diag(std::vector<int>& mapping) const;
 
     /// Calculate the elimination tree: See cs_etree in CSparse
-    std::vector<int> eliminationTree(bool ata) const;
+    std::vector<int> etree(bool ata) const;
 
     /// Find strongly connected components: See cs_dfs in CSparse
-    int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
+    int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
                          const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
     /// Find the strongly connected components of a square matrix: See cs_scc in CSparse
-    int stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const;
+    int scc(std::vector<int>& p, std::vector<int>& r) const;
 
     /// Transpose the matrix
     Sparsity T() const;
@@ -99,7 +99,7 @@ namespace casadi {
     Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
 
     /// Check if the sparsity is the transpose of another
-    bool isTranspose(const SparsityInternal& y) const;
+    bool is_transpose(const SparsityInternal& y) const;
 
     /// Check if the sparsity is a reshape of another
     bool isReshape(const SparsityInternal& y) const;
@@ -129,11 +129,11 @@ namespace casadi {
                     std::vector<int>& colind, std::vector<int>& row);
 
     /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
-    int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm,
+    int btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                           std::vector<int>& rowblock, std::vector<int>& colblock,
                           std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock,
                           int seed) const {
-      return T()->dulmageMendelsohnUpper(colperm, rowperm, colblock, rowblock,
+      return T()->btfUpper(colperm, rowperm, colblock, rowblock,
                                                  coarse_colblock, coarse_rowblock, seed);
     }
 
@@ -141,7 +141,7 @@ namespace casadi {
      *
      * -- upper triangular TODO: refactor and merge with the above
      */
-    int dulmageMendelsohnUpper(std::vector<int>& rowperm, std::vector<int>& colperm,
+    int btfUpper(std::vector<int>& rowperm, std::vector<int>& colperm,
                                std::vector<int>& rowblock, std::vector<int>& colblock,
                                std::vector<int>& coarse_rowblock,
                                std::vector<int>& coarse_colblock, int seed) const;
@@ -187,7 +187,7 @@ namespace casadi {
     static std::vector<int> postorder(const std::vector<int>& parent, int n);
 
     /// Depth-first search and postorder of a tree rooted at node j: See cs_tdfs in CSparse
-    static int depthFirstSearchAndPostorder(int j, int k, int *head,
+    static int dfs_postorder(int j, int k, int *head,
                                             const int *next, int *post, int *stack);
 
     /// row counts of LL'=A or LL'=A'A, given parent & post ordering: see init_ata in CSparse
@@ -199,7 +199,7 @@ namespace casadi {
     /** Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise.
      * order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
      */
-    std::vector<int> approximateMinimumDegree(int order) const;
+    std::vector<int> amd(int order) const;
 
     /// symbolic ordering and analysis for QR or LU: See cs_sqr in CSparse
     void prefactorize(int order, int qr, std::vector<int>& pinv, std::vector<int>& q,
@@ -221,13 +221,13 @@ namespace casadi {
     int scatter(int j, std::vector<int>& w, int mark, int* Ci, int nz) const;
 
     /// Get row() as a vector
-    std::vector<int> getRow() const;
+    std::vector<int> get_row() const;
 
     /// Get colind() as a vector
-    std::vector<int> getColind() const;
+    std::vector<int> get_colind() const;
 
     /// Get the column for each nonzero
-    std::vector<int> getCol() const;
+    std::vector<int> get_col() const;
 
     /// Resize
     Sparsity zz_resize(int nrow, int ncol) const;
@@ -236,62 +236,62 @@ namespace casadi {
     Sparsity zz_reshape(int nrow, int ncol) const;
 
     /// Number of elements
-    size_t numel() const;
+    int numel() const;
 
     /// Number of non-zeros in the lower triangular half
-    int sizeL() const;
+    int nnz_lower() const;
 
     /// Number of non-zeros in the upper triangular half
-    int sizeU() const;
+    int nnz_upper() const;
 
     /// Number of non-zeros on the diagonal
-    int sizeD() const;
+    int nnz_diag() const;
 
     /** \brief Upper half-bandwidth */
-    int bandwidthU() const;
+    int bw_upper() const;
 
     /** \brief Lower half-bandwidth */
-    int bandwidthL() const;
+    int bw_lower() const;
 
     /// Shape
-    std::pair<int, int> shape() const;
+    std::pair<int, int> size() const;
 
     /// Is scalar?
-    bool isscalar(bool scalar_and_dense) const;
+    bool is_scalar(bool scalar_and_dense) const;
 
     /** \brief Check if the sparsity is empty
      *
      * A sparsity is considered empty if one of the dimensions is zero
      * (or optionally both dimensions)
      */
-    bool isempty(bool both=false) const;
+    bool is_empty(bool both=false) const;
 
     /// Is dense?
-    bool isdense() const;
+    bool is_dense() const;
 
     /** \brief  Check if the pattern is a row vector (i.e. size1()==1) */
-    bool isrow() const;
+    bool is_row() const;
 
     /** \brief  Check if the pattern is a column vector (i.e. size2()==1) */
-    bool iscolumn() const;
+    bool is_column() const;
 
     /** \brief  Check if the pattern is a row or column vector */
-    bool isvector() const;
+    bool is_vector() const;
 
     /// Is diagonal?
-    bool isdiag() const;
+    bool is_diag() const;
 
     /// Is square?
-    bool issquare() const;
+    bool is_square() const;
 
     /// Is symmetric?
-    bool issymmetric() const;
+    bool is_symmetric() const;
 
     /// Is lower triangular?
-    bool istril() const;
+    bool is_tril() const;
 
     /// is upper triangular?
-    bool istriu() const;
+    bool is_triu() const;
 
     /// Get upper triangular part
     Sparsity zz_triu(bool includeDiagonal) const;
@@ -300,43 +300,43 @@ namespace casadi {
     Sparsity zz_tril(bool includeDiagonal) const;
 
     /// Get nonzeros in lower triangular part
-    std::vector<int> getLowerNZ() const;
+    std::vector<int> get_lower() const;
 
     /// Get nonzeros in upper triangular part
-    std::vector<int> getUpperNZ() const;
+    std::vector<int> get_upper() const;
 
     /// Get the dimension as a string
-    std::string dimString() const;
+    std::string dim() const;
 
     /// Sparsity pattern for a matrix-matrix product (details in public class)
-    Sparsity patternProduct(const Sparsity& y) const;
+    Sparsity zz_mtimes(const Sparsity& y) const;
 
     ///@{
     /// Union of two sparsity patterns
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
                             std::vector<unsigned char>& mapping) const;
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
 
     template<bool with_mapping>
-    Sparsity patternCombineGen1(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
+    Sparsity combineGen1(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
                                 std::vector<unsigned char>& mapping) const;
 
     template<bool with_mapping, bool f0x_is_zero, bool function0_is_zero>
-    Sparsity patternCombineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
+    Sparsity combineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     ///@}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
-    Sparsity patternInverse() const;
+    Sparsity pattern_inverse() const;
 
     /// Check if two sparsity patterns are the same
-    bool isEqual(const Sparsity& y) const;
+    bool is_equal(const Sparsity& y) const;
 
     /// Check if two sparsity patterns are the same
-    bool isEqual(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
+    bool is_equal(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
                  const std::vector<int>& y_row) const;
 
     /// Check if two sparsity patterns are the same
-    bool isEqual(int y_nrow, int y_ncol, const int* y_colind, const int* y_row) const;
+    bool is_equal(int y_nrow, int y_ncol, const int* y_colind, const int* y_row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
     Sparsity zz_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const;
@@ -411,20 +411,20 @@ namespace casadi {
      * A greedy distance-2 coloring algorithm
      * (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
      */
-    Sparsity unidirectionalColoring(const Sparsity& AT, int cutoff) const;
+    Sparsity uni_coloring(const Sparsity& AT, int cutoff) const;
 
     /** \brief A greedy distance-2 coloring algorithm
      * See description in public class.
      */
-    Sparsity starColoring(int ordering, int cutoff) const;
+    Sparsity star_coloring(int ordering, int cutoff) const;
 
     /** \brief An improved distance-2 coloring algorithm
      * See description in public class.
      */
-    Sparsity starColoring2(int ordering, int cutoff) const;
+    Sparsity star_coloring2(int ordering, int cutoff) const;
 
     /// Order the columns by decreasing degree
-    std::vector<int> largestFirstOrdering() const;
+    std::vector<int> largest_first() const;
 
     /// Permute rows and/or columns
     Sparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_cols=true,
@@ -434,10 +434,10 @@ namespace casadi {
     void spy(std::ostream &stream) const;
 
     /** \brief Print a compact description of the sparsity pattern */
-    void printCompact(std::ostream &stream) const;
+    void print_compact(std::ostream &stream) const;
 
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
-    void spyMatlab(const std::string& mfile) const;
+    void spy_matlab(const std::string& mfile) const;
 };
 
 } // namespace casadi

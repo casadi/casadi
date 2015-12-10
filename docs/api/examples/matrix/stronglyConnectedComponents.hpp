@@ -23,14 +23,14 @@
  */
 
 /** 
-* This example looks at stronglyConnectedComponents
+* This example looks at scc
 *
 *
-* \pythonexample{matrix/stronglyConnectedComponents}
+* \pythonexample{matrix/scc}
 *
 * \sa
 * \code
-* casadi::Sparsity::stronglyConnectedComponents();
+* casadi::Sparsity::scc();
 * casadi::diagcat();
 * \endcode
 *

@@ -25,7 +25,6 @@
 
 #include "concat.hpp"
 #include "../std_vector_tools.hpp"
-#include "../function/sx_function.hpp"
 
 using namespace std;
 
@@ -38,17 +37,16 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Concat::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void Concat::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Concat::evalGen(const T* const* arg, T* const* res,
-                       int* iw, T* w) {
+  void Concat::evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
     T* r = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n = dep(i).nnz();
@@ -57,8 +55,7 @@ namespace casadi {
     }
   }
 
-  void Concat::spFwd(const bvec_t** arg,
-                     bvec_t** res, int* iw, bvec_t* w) {
+  void Concat::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
@@ -68,8 +65,7 @@ namespace casadi {
     }
   }
 
-  void Concat::spAdj(bvec_t** arg,
-                     bvec_t** res, int* iw, bvec_t* w) {
+  void Concat::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n_i = dep(i).nnz();
@@ -81,8 +77,8 @@ namespace casadi {
     }
   }
 
-  void Concat::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                        CodeGenerator& g) const {
+  void Concat::generate(CodeGenerator& g, const std::string& mem,
+                        const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "  rr=" << g.work(res[0], nnz()) << ";" << endl;
     for (int i=0; i<arg.size(); ++i) {
       int nz = dep(i).nnz();
@@ -156,7 +152,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Diagcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Diagcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = diagcat(arg);
   }
 
@@ -212,7 +208,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Horzcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Horzcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = horzcat(arg);
   }
 
@@ -265,7 +261,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Vertcat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Vertcat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = vertcat(arg);
   }
 
@@ -301,71 +297,71 @@ namespace casadi {
     }
   }
 
-  bool Concat::isValidInput() const {
+  bool Concat::is_valid_input() const {
     for (int i=0; i<ndep(); ++i) {
-      if (!dep(i)->isValidInput()) return false;
+      if (!dep(i)->is_valid_input()) return false;
     }
     return true;
   }
 
-  int Concat::numPrimitives() const {
+  int Concat::n_primitives() const {
     int nprim = 0;
     for (int i=0; i<ndep(); ++i) {
-      nprim +=  dep(i)->numPrimitives();
+      nprim +=  dep(i)->n_primitives();
     }
     return nprim;
   }
 
-  void Horzcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void Horzcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     vector<MX> s = horzsplit(x, offset());
     for (int i=0; i<s.size(); ++i) {
-      dep(i)->splitPrimitives(s[i], it);
+      dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Horzcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+  MX Horzcat::join_primitives(std::vector<MX>::const_iterator& it) const {
     vector<MX> s(ndep());
     for (int i=0; i<s.size(); ++i) {
-      s[i] = dep(i)->joinPrimitives(it);
+      s[i] = dep(i)->join_primitives(it);
     }
     return horzcat(s);
   }
 
-  void Vertcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void Vertcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     vector<MX> s = vertsplit(x, offset());
     for (int i=0; i<s.size(); ++i) {
-      dep(i)->splitPrimitives(s[i], it);
+      dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Vertcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+  MX Vertcat::join_primitives(std::vector<MX>::const_iterator& it) const {
     vector<MX> s(ndep());
     for (int i=0; i<s.size(); ++i) {
-      s[i] = dep(i)->joinPrimitives(it);
+      s[i] = dep(i)->join_primitives(it);
     }
     return vertcat(s);
   }
 
-  void Diagcat::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void Diagcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     std::pair<std::vector<int>, std::vector<int> > off = offset();
     vector<MX> s = diagsplit(x, off.first, off.second);
     for (int i=0; i<s.size(); ++i) {
-      dep(i)->splitPrimitives(s[i], it);
+      dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Diagcat::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+  MX Diagcat::join_primitives(std::vector<MX>::const_iterator& it) const {
     vector<MX> s(ndep());
     for (int i=0; i<s.size(); ++i) {
-      s[i] = dep(i)->joinPrimitives(it);
+      s[i] = dep(i)->join_primitives(it);
     }
     return diagcat(s);
   }
 
-  bool Concat::hasDuplicates() {
+  bool Concat::has_duplicates() {
     bool has_duplicates = false;
     for (int i=0; i<ndep(); ++i) {
-      has_duplicates = dep(i)->hasDuplicates() || has_duplicates;
+      has_duplicates = dep(i)->has_duplicates() || has_duplicates;
     }
     return has_duplicates;
   }
@@ -376,9 +372,9 @@ namespace casadi {
     }
   }
 
-  void Concat::getPrimitives(std::vector<MX>::iterator& it) const {
+  void Concat::primitives(std::vector<MX>::iterator& it) const {
     for (int i=0; i<ndep(); ++i) {
-      dep(i)->getPrimitives(it);
+      dep(i)->primitives(it);
     }
   }
 

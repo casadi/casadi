@@ -16,9 +16,9 @@ from casadi import *
 N = 10000  # Number of samples
 fs = 610.1 # Sampling frequency [hz]
 
-param_truth = DMatrix([5.625e-6,2.3e-4,1,4.69])
-param_guess = DMatrix([5,2,1,5])
-scale = vertcat([1e-6,1e-4,1,1])j
+param_truth = DM([5.625e-6,2.3e-4,1,4.69])
+param_guess = DM([5,2,1,5])
+scale = vertcat([1e-6,1e-4,1,1])
 
 ############ MODELING #####################
 y  = MX.sym('y')
@@ -38,7 +38,7 @@ params = vertcat([M,c,k,k_NL])
 rhs = vertcat([dy , (u-k_NL*y**3-k*y-c*dy)/M])
 
 # Form an ode function
-ode = MXFunction('ode',[states,controls,params],[rhs])
+ode = Function('ode',[states,controls,params],[rhs])
 
 ############ Creating a simulator ##########
 N_steps_per_sample = 10
@@ -53,7 +53,7 @@ dt = 1/fs/N_steps_per_sample
 states_final = states+dt/6.0*(k1+2*k2+2*k3+k4)
 
 # Create a function that simulates one step propagation in a sample
-one_step = MXFunction('one_step',[states, controls, params],[states_final]);
+one_step = Function('one_step',[states, controls, params],[states_final]);
 
 X = states;
 
@@ -61,10 +61,10 @@ for i in range(N_steps_per_sample):
   [X] = one_step([X, controls, params])
 
 # Create a function that simulates all step propagation on a sample
-one_sample = MXFunction('one_sample',[states, controls, params], [X])
+one_sample = Function('one_sample',[states, controls, params], [X])
 
 # speedup trick: expand into scalar operations
-one_sample = one_sample.expand()
+one_sample = one_sample.expand('one_sample_sx')
 
 ############ Simulating the system ##########
 
@@ -72,9 +72,9 @@ all_samples = one_sample.mapaccum("all_samples", N)
 
 # Choose an excitation signal
 numpy.random.seed(0)
-u_data = DMatrix(0.1*numpy.random.random(N))
+u_data = DM(0.1*numpy.random.random(N))
 
-x0 = DMatrix([0,0])
+x0 = DM([0,0])
 [X_measured] = all_samples([x0, u_data, repmat(param_truth,1,N) ])
 
 y_data = X_measured[0,:].T
@@ -84,19 +84,15 @@ y_data = X_measured[0,:].T
 # When noise is absent, the fit will be perfect.
 
 # Use just-in-time compilation to speed up the evaluation
-opts = {'jit': Compiler.hasPlugin('clang') , "jit_options":{"flags":['-O3']}}
+opts = {'jit':True, "jit_options":{"flags":['-O3']}}
 
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
-  gradF = nlp.gradient()
-  jacG = nlp.jacobian("x","g")
-
-  gradF.derivative(0, 1)
-
   J = jacobian(e,V)
   sigma = MX.sym("sigma")
-  hessLag = MXFunction('H',hessLagIn(x=V,lam_f=sigma),hessLagOut(hess=sigma*mul(J.T,J)),opts)
-  return NlpSolver("solver","ipopt", nlp, {"hess_lag":hessLag})
+  hessLag = Function('H',{'x':V,'lam_f':sigma, 'hess':sigma*mul(J.T,J)},
+                     ['x','p','lam_f','lam_g'], ['hess','f','g','grad_x','grad_p'], opts)
+  return nlpsol("solver","ipopt", nlp, {"hess_lag":hessLag})
 
 ############ Identifying the simulated system: single shooting strategy ##########
 
@@ -105,7 +101,7 @@ def gauss_newton(e,nlp,V):
 [X_symbolic] = all_samples([x0, u_data, repmat(params*scale,1,N) ])
 
 e = y_data-X_symbolic[0,:].T;
-nlp = MXFunction("nlp", nlpIn(x=params), nlpOut(f=0.5*inner_prod(e,e)),opts)
+nlp = {'x':params, 'f':0.5*dot(e,e)}
 
 solver = gauss_newton(e,nlp, params)
 
@@ -128,7 +124,7 @@ e = y_data-Xn[0,:].T;
 
 V = veccat([params, X])
 
-nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=0.5*inner_prod(e,e),g=gaps),opts)
+nlp = {'x':V, 'f':0.5*dot(e,e),'g':gaps}
 
 # Multipleshooting allows for careful initialization
 yd = np.diff(y_data,axis=0)*fs

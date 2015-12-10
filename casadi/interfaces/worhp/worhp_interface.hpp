@@ -26,8 +26,8 @@
 #ifndef CASADI_WORHP_INTERFACE_HPP
 #define CASADI_WORHP_INTERFACE_HPP
 
-#include "casadi/core/function/nlp_solver_internal.hpp"
-#include <casadi/interfaces/worhp/casadi_nlpsolver_worhp_export.h>
+#include "casadi/core/function/nlpsol.hpp"
+#include <casadi/interfaces/worhp/casadi_nlpsol_worhp_export.h>
 
 // GCC_VERSION is defined in 'worhp.h'
 #ifdef GCC_VERSION
@@ -41,39 +41,46 @@
 
 // MACROs that pollute our code
 #undef Q
-/**\defgroup plugin_NlpSolver_worhp
+/**\defgroup plugin_Nlpsol_worhp
  WORHP interface
 */
-/** \pluginsection{NlpSolver,worhp} **/
+/** \pluginsection{Nlpsol,worhp} **/
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{NlpSolver,worhp}
-     @copydoc NlpSolver_doc
-     @copydoc plugin_NlpSolver_worhp
+  /** \brief \pluginbrief{Nlpsol,worhp}
+     @copydoc Nlpsol_doc
+     @copydoc plugin_Nlpsol_worhp
   */
-  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInterface : public NlpSolverInternal {
+  class CASADI_NLPSOL_WORHP_EXPORT WorhpInterface : public Nlpsol {
 
   public:
     // Constructor
-    explicit WorhpInterface(const Function& nlp);
+    explicit WorhpInterface(const std::string& name, const XProblem& nlp);
 
     // Destructor
     virtual ~WorhpInterface();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "worhp";}
+
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new WorhpInterface(nlp);}
+    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+      return new WorhpInterface(name, nlp);
+    }
 
     // Reset solver
     void reset();
 
-    // (Re)initialize
+    // Initialize the solver
     virtual void init();
 
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
     // Solve the NLP
-    virtual void evaluate();
+    virtual void solve(void* mem);
 
     /// Set default options for a given recipe
     virtual void setDefaultOptions(const std::vector<std::string>& recipes);

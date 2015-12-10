@@ -31,9 +31,9 @@ namespace casadi {
 
   Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message)
       : fail_message_(fail_message) {
-    casadi_assert_message(y.isscalar(),
+    casadi_assert_message(y.is_scalar(),
                           "Assertion:: assertion expression y must be scalar, but got "
-                          << y.dimString());
+                          << y.dim());
     setDependencies(x, y);
     setSparsity(x.sparsity());
   }
@@ -42,7 +42,7 @@ namespace casadi {
     return "assertion(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
-  void Assertion::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Assertion::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0].attachAssert(arg[1], fail_message_);
   }
 
@@ -60,15 +60,13 @@ namespace casadi {
     }
   }
 
-  void Assertion::evalSX(const SXElement** arg, SXElement** res,
-                             int* iw, SXElement* w) {
+  void Assertion::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Assertion::evalD(const double** arg, double** res,
-                        int* iw, double* w) {
+  void Assertion::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (arg[1][0]!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }
@@ -78,15 +76,13 @@ namespace casadi {
     }
   }
 
-  void Assertion::spFwd(const bvec_t** arg,
-                        bvec_t** res, int* iw, bvec_t* w) {
+  void Assertion::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
   }
 
-  void Assertion::spAdj(bvec_t** arg,
-                        bvec_t** res, int* iw, bvec_t* w) {
+  void Assertion::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();
@@ -98,8 +94,8 @@ namespace casadi {
     }
   }
 
-  void Assertion::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                           CodeGenerator& g) const {
+  void Assertion::generate(CodeGenerator& g, const std::string& mem,
+                           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Generate assertion
     g.body << "  if (" << g.workel(arg[1]) << "!=1.) {" << endl
            << "    /* " << fail_message_ << " */" << endl
@@ -108,8 +104,7 @@ namespace casadi {
 
     // Copy if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),
-                                 g.work(res[0], nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
     }
   }
 

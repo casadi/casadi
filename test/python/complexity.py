@@ -151,54 +151,54 @@ class ComplexityTests(casadiTestCase):
         self.assertTrue(False,"We expected order %d, but found %s" % (order,str(orders)))
     
     
-  def test_DMatrixadd(self):
-    self.message("DMatrix add column vectors")
+  def test_DMadd(self):
+    self.message("DM add column vectors")
     def setupfun(self,N):
-      return {'A': DMatrix(N,1,0), 'B': DMatrix(N,1,0)}
+      return {'A': DM(N,1,0), 'B': DM(N,1,0)}
     def fun(self,N,setup):
       setup['A'] + setup['B']
     
     self.complexity(setupfun,fun, 1)
     
-    self.message("DMatrix add rows vectors")
+    self.message("DM add rows vectors")
     def setupfun(self,N):
-      return {'A': DMatrix(1,N,0), 'B': DMatrix(1,N,0)}
+      return {'A': DM(1,N,0), 'B': DM(1,N,0)}
     
     self.complexity(setupfun,fun, 1)
 
 
-  def test_SXFunctionadd(self):
+  def test_SX_funadd(self):
     return
-    self.message("SXFunction add column vectors")
+    self.message("SX add column vectors")
     def setupfun(self,N):
       A = SX.sym("A",N,1)
       B = SX.sym("B",N,1)
-      f = SXFunction('f', [A,B],[A+B])
+      f = Function('f', [A,B],[A+B])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     
     self.complexity(setupfun,fun, 1)
 
-  def test_SXFunctionprodvec(self):
+  def test_SX_funprodvec(self):
     return
-    self.message("SXFunction prod column vectors")
+    self.message("SX prod column vectors")
     def setupfun(self,N):
       A = SX.sym("A",N,1)
       B = SX.sym("B",N,1)
-      f = SXFunction('f', [A,B],[c.dot(A.T,B)])
+      f = Function('f', [A,B],[c.dot(A.T,B)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 1)
 
-  def test_SXFunctionprodsparse(self):
-    self.message("SXFunction prod sparse")
+  def test_SX_funprodsparse(self):
+    self.message("SX prod sparse")
     def setupfun(self,N):
       A = SX.sym("A",Sparsity.diag(N))
       A[-1,0]=SX("off") # Have one of-diagonal element
       B = SX.sym("B",N,1)
-      f = SXFunction('f', [A,B],[c.dot(A,B)])
+      f = Function('f', [A,B],[c.dot(A,B)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
@@ -206,30 +206,30 @@ class ComplexityTests(casadiTestCase):
     self.complexity(setupfun,fun, 1)
 
 
-  def test_MXFunctionprodvec(self):
-    self.message("MXFunction prod")
+  def test_MX_funprodvec(self):
+    self.message("MX prod")
     def setupfun(self,N):
       G = MX.sym("G",N,1)
       X = MX.sym("X",N,1)
-      f = MXFunction('f', [G,X],[c.prod(G.T,X)])
+      f = Function('f', [G,X],[c.prod(G.T,X)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 1)
 
-  def test_MXFunctionprodsparse(self):
-    self.message("MXFunction sparse product")
+  def test_MX_funprodsparse(self):
+    self.message("MX sparse product")
     def setupfun(self,N):
       s = Sparsity.diag(N)
       s[-1,0]=1
       H = MX.sym("H",s)
       X = MX.sym("X",N,1)
-      f = MXFunction('f', [H,X],[c.prod(H,X)])
+      f = Function('f', [H,X],[c.prod(H,X)])
       return {'f':f}
     def fun(self,N,setup):
       setup['f'].evaluate()
     self.complexity(setupfun,fun, 2)  # 1
-    self.message("MXFunction sparse sparse product")
+    self.message("MX sparse sparse product")
     def setupfun(self,N):
       s = Sparsity.diag(N)
       s[-1,0]=1
@@ -237,22 +237,22 @@ class ComplexityTests(casadiTestCase):
       s = Sparsity.diag(N)
       s[-1,0]=1
       X = MX.sym("X",s)
-      f = MXFunction('f', [H,X],[c.prod(H,X)])
+      f = Function('f', [H,X],[c.prod(H,X)])
       return {'f':f}
     self.complexity(setupfun,fun, 2)  # 1
 
-  def test_DMatrixdot(self):
-    self.message("DMatrix inner dot vectors")
+  def test_DMdot(self):
+    self.message("DM inner dot vectors")
     def setupfun(self,N):
-      return {'A': DMatrix(1,N,0), 'B': DMatrix(N,1,0)}
+      return {'A': DM(1,N,0), 'B': DM(N,1,0)}
     def fun(self,N,setup):
       c.dot(setup['A'],setup['B'])
     
     self.complexity(setupfun,fun, 1)
     
-    self.message("DMatrix outer dot vectors")
+    self.message("DM outer dot vectors")
     def setupfun(self,N):
-      return {'A': DMatrix(N,1,0), 'B': DMatrix(1,N,0)}
+      return {'A': DM(N,1,0), 'B': DM(1,N,0)}
     def fun(self,N,setup):
       c.dot(setup['A'],setup['B'])
     

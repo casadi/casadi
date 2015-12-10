@@ -23,7 +23,9 @@
  */
 
 
-#include "sx/sx_element.hpp"
+#include "function/function.hpp"
+
+#include "sx/sx_elem.hpp"
 #include "matrix/matrix.hpp"
 #include "matrix/sparse_storage.hpp"
 #include "mx/mx.hpp"
@@ -33,32 +35,10 @@
 #include "weak_ref.hpp"
 #include <iostream>
 
-#include "function/schemes_helpers.hpp"
-
 #include "matrix/sparse_storage_impl.hpp"
 
 using namespace std;
 namespace casadi {
-
-  INSTANTIATE_SUBMATRIX(Matrix<SXElement>)
-  INSTANTIATE_NONZEROS(Matrix<SXElement>)
-
-  template class GenericMatrix< Matrix<SXElement> >;
-  template class Matrix< SXElement >;
-
-  INSTANTIATE_SUBMATRIX(MX)
-  INSTANTIATE_NONZEROS(MX)
-
-  INSTANTIATE_SUBMATRIX(Matrix<int>)
-  INSTANTIATE_SUBMATRIX(Matrix<double>)
-  INSTANTIATE_NONZEROS(Matrix<int>)
-  INSTANTIATE_NONZEROS(Matrix<double>)
-
-  template class GenericMatrix< Matrix<double> >;
-  template class GenericMatrix< Matrix<int> >;
-
-  template class Matrix<double>;
-  template class Matrix<int>;
 
   template<class T>
   const T casadi_limits<T>::zero = T(0);
@@ -82,7 +62,7 @@ namespace casadi {
 
 namespace std {
   #ifndef _MSC_VER
-  template class std::numeric_limits<casadi::SXElement>;
+  template class std::numeric_limits<casadi::SXElem>;
   #endif
 
 } // namespace std

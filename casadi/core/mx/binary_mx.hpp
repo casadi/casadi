@@ -48,13 +48,13 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return op_;}
+    virtual int op() const { return op_;}
 
     /** \brief Check if binary operation */
-    virtual bool isBinaryOp() const { return true;}
+    virtual bool is_binaryOp() const { return true;}
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -65,27 +65,27 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /// Evaluate the function (template)
     template<typename T>
     void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 2;}
 
     /** \brief Generate code for the operation */
-    void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                  CodeGenerator& g) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /// Get a unary operation
     virtual MX getUnary(int op) const;
@@ -94,15 +94,15 @@ namespace casadi {
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const {
-      if (op_==node->getOp()) {
-        if (isEqual(dep(0), node->dep(0), depth-1) && isEqual(dep(1), node->dep(1), depth-1)) {
+    virtual bool zz_is_equal(const MXNode* node, int depth) const {
+      if (op_==node->op()) {
+        if (is_equal(dep(0), node->dep(0), depth-1) && is_equal(dep(1), node->dep(1), depth-1)) {
           // If arguments are equal
           return true;
         } else {
           // If arguments are flipped
-          return operation_checker<CommChecker>(op_) && isEqual(dep(1), node->dep(0), depth-1) &&
-            isEqual(dep(0), node->dep(1), depth-1);
+          return operation_checker<CommChecker>(op_) && is_equal(dep(1), node->dep(0), depth-1) &&
+            is_equal(dep(0), node->dep(1), depth-1);
         }
       } else {
         return false;

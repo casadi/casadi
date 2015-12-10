@@ -25,8 +25,6 @@
 
 #include "qpoases_interface.hpp"
 
-#include "../../core/std_vector_tools.hpp"
-
 // Bug in qpOASES?
 #define ALLOW_QPROBLEMB true
 #define ALLOW_ALL_OPTIONS
@@ -35,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOLVER_QPOASES_EXPORT
-  casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin* plugin) {
+  int CASADI_QPSOL_QPOASES_EXPORT
+  casadi_register_qpsol_qpoases(Qpsol::Plugin* plugin) {
     plugin->creator = QpoasesInterface::creator;
     plugin->name = "qpoases";
     plugin->doc = QpoasesInterface::meta_doc.c_str();
@@ -45,12 +43,14 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_QPOASES_EXPORT casadi_load_qpsolver_qpoases() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_qpoases);
+  void CASADI_QPSOL_QPOASES_EXPORT casadi_load_qpsol_qpoases() {
+    Qpsol::registerPlugin(casadi_register_qpsol_qpoases);
   }
 
-  QpoasesInterface::QpoasesInterface(const std::map<std::string, Sparsity>& st)
-    : QpSolverInternal(st) {
+  QpoasesInterface::QpoasesInterface(const std::string& name,
+                                     const std::map<std::string, Sparsity>& st)
+    : Qpsol(name, st) {
+
     addOption("nWSR",                   OT_INTEGER,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
               "the initial homotopy. Default is 5(nx + nc)");
@@ -137,31 +137,22 @@ namespace casadi {
   }
 
   void QpoasesInterface::init() {
-    QpSolverInternal::init();
+    Qpsol::init();
 
     // Read options
     if (hasSetOption("nWSR")) {
-      max_nWSR_ = getOption("nWSR");
+      max_nWSR_ = option("nWSR");
       casadi_assert(max_nWSR_>=0);
     } else {
       max_nWSR_ = 5 *(n_ + nc_);
     }
 
     if (hasSetOption("CPUtime")) {
-      max_cputime_ = getOption("CPUtime");
+      max_cputime_ = option("CPUtime");
       casadi_assert(max_cputime_>0);
     } else {
       max_cputime_ = -1;
     }
-
-    // Create data for H if not dense
-    if (!input(QP_SOLVER_H).sparsity().isdense()) h_data_.resize(n_*n_);
-
-    // Create data for A
-    a_data_.resize(n_*nc_);
-
-    // Dual solution vector
-    dual_.resize(n_+nc_);
 
     // Create qpOASES instance
     if (qp_) delete qp_;
@@ -174,71 +165,64 @@ namespace casadi {
 
     qpOASES::Options ops;
     ops.setToDefault();
-    ops.printLevel = string_to_PrintLevel(getOption("printLevel"));
-    ops.enableRamping = bool_to_BooleanType(getOption("enableRamping"));
-    ops.enableFarBounds = bool_to_BooleanType(getOption("enableFarBounds"));
-    ops.enableFlippingBounds = bool_to_BooleanType(getOption("enableFlippingBounds"));
-    ops.enableRegularisation = bool_to_BooleanType(getOption("enableRegularisation"));
-    ops.enableFullLITests = bool_to_BooleanType(getOption("enableFullLITests"));
-    ops.enableNZCTests = bool_to_BooleanType(getOption("enableNZCTests"));
-    ops.enableDriftCorrection = static_cast<int>(getOption("enableDriftCorrection"));
+    ops.printLevel = string_to_PrintLevel(option("printLevel"));
+    ops.enableRamping = bool_to_BooleanType(option("enableRamping"));
+    ops.enableFarBounds = bool_to_BooleanType(option("enableFarBounds"));
+    ops.enableFlippingBounds = bool_to_BooleanType(option("enableFlippingBounds"));
+    ops.enableRegularisation = bool_to_BooleanType(option("enableRegularisation"));
+    ops.enableFullLITests = bool_to_BooleanType(option("enableFullLITests"));
+    ops.enableNZCTests = bool_to_BooleanType(option("enableNZCTests"));
+    ops.enableDriftCorrection = static_cast<int>(option("enableDriftCorrection"));
     ops.enableCholeskyRefactorisation =
-      static_cast<int>(getOption("enableCholeskyRefactorisation"));
-    ops.enableEqualities = bool_to_BooleanType(getOption("enableEqualities"));
-    ops.terminationTolerance = getOption("terminationTolerance");
-    ops.boundTolerance = getOption("boundTolerance");
-    ops.boundRelaxation = getOption("boundRelaxation");
-    ops.epsNum = getOption("epsNum");
-    ops.epsDen = getOption("epsDen");
-    ops.maxPrimalJump = getOption("maxPrimalJump");
-    ops.maxDualJump = getOption("maxDualJump");
-    ops.initialRamping = getOption("initialRamping");
-    ops.finalRamping = getOption("finalRamping");
-    ops.initialFarBounds = getOption("initialFarBounds");
-    ops.growFarBounds = getOption("growFarBounds");
-    ops.initialStatusBounds = string_to_SubjectToStatus(getOption("initialStatusBounds"));
-    ops.epsFlipping = getOption("epsFlipping");
-    ops.numRegularisationSteps = static_cast<int>(getOption("numRegularisationSteps"));
-    ops.epsRegularisation = getOption("epsRegularisation");
-    ops.numRefinementSteps = static_cast<int>(getOption("numRefinementSteps"));
-    ops.epsIterRef = getOption("epsIterRef");
-    ops.epsLITests = getOption("epsLITests");
-    ops.epsNZCTests = getOption("epsNZCTests");
+      static_cast<int>(option("enableCholeskyRefactorisation"));
+    ops.enableEqualities = bool_to_BooleanType(option("enableEqualities"));
+    ops.terminationTolerance = option("terminationTolerance");
+    ops.boundTolerance = option("boundTolerance");
+    ops.boundRelaxation = option("boundRelaxation");
+    ops.epsNum = option("epsNum");
+    ops.epsDen = option("epsDen");
+    ops.maxPrimalJump = option("maxPrimalJump");
+    ops.maxDualJump = option("maxDualJump");
+    ops.initialRamping = option("initialRamping");
+    ops.finalRamping = option("finalRamping");
+    ops.initialFarBounds = option("initialFarBounds");
+    ops.growFarBounds = option("growFarBounds");
+    ops.initialStatusBounds = string_to_SubjectToStatus(option("initialStatusBounds"));
+    ops.epsFlipping = option("epsFlipping");
+    ops.numRegularisationSteps = static_cast<int>(option("numRegularisationSteps"));
+    ops.epsRegularisation = option("epsRegularisation");
+    ops.numRefinementSteps = static_cast<int>(option("numRefinementSteps"));
+    ops.epsIterRef = option("epsIterRef");
+    ops.epsLITests = option("epsLITests");
+    ops.epsNZCTests = option("epsNZCTests");
 
     // Pass to qpOASES
     qp_->setOptions(ops);
+
+    // Allocate work vectors
+    alloc_w(n_*n_, true); // h
+    alloc_w(n_*nc_, true); // a
+    alloc_w(n_, true); // g
+    alloc_w(n_, true); // lbx
+    alloc_w(n_, true); // ubx
+    alloc_w(nc_, true); // lba
+    alloc_w(nc_, true); // uba
+    alloc_w(n_+nc_, true); // dual
   }
 
-  void QpoasesInterface::evaluate() {
-    if (inputs_check_) checkInputs();
-
-    if (verbose()) {
-      //     userOut() << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;
-      //     userOut() << "LAMBDA_INIT = " << input(QP_SOLVER_LAMBDA_INIT) << endl;
-      userOut() << "LBX = " << input(QP_SOLVER_LBX) << endl;
-      userOut() << "UBX = " << input(QP_SOLVER_UBX) << endl;
-      userOut() << "LBA = " << input(QP_SOLVER_LBA) << endl;
-      userOut() << "UBA = " << input(QP_SOLVER_UBA) << endl;
+  void QpoasesInterface::eval(const double** arg,
+                              double** res, int* iw, double* w, void* mem) {
+    if (inputs_check_) {
+      checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
     }
 
-    // Get pointer to H
-    const double* h=0;
-    if (h_data_.empty()) {
-      // No copying needed
-      h = getPtr(input(QP_SOLVER_H));
-    } else {
-      // First copy to dense array
-      input(QP_SOLVER_H).get(h_data_);
-      h = getPtr(h_data_);
-    }
+    // Get quadratic term
+    double* h=w; w += n_*n_;
+    casadi_densify(arg[QPSOL_H], sparsity_in(QPSOL_H), h, false);
 
-    // Copy A to a row-major dense vector
-    const double* a = 0;
-    if (nc_>0) {
-      double* a_mutable = getPtr(a_data_);
-      input(QP_SOLVER_A).get(a_mutable, true);
-      a = getPtr(a_data_);
-    }
+    // Get linear term
+    double* a = w; w += n_*nc_;
+    casadi_densify(arg[QPSOL_A], sparsity_in(QPSOL_A), a, true);
 
     // Maxiumum number of working set changes
     int nWSR = max_nWSR_;
@@ -246,11 +230,16 @@ namespace casadi {
     double *cputime_ptr = cputime<=0 ? 0 : &cputime;
 
     // Get the arguments to call qpOASES with
-    const double* g = getPtr(input(QP_SOLVER_G));
-    const double* lb = getPtr(input(QP_SOLVER_LBX));
-    const double* ub = getPtr(input(QP_SOLVER_UBX));
-    const double* lbA = getPtr(input(QP_SOLVER_LBA));
-    const double* ubA = getPtr(input(QP_SOLVER_UBA));
+    double* g=w; w += n_;
+    casadi_copy(arg[QPSOL_G], n_, g);
+    double* lb=w; w += n_;
+    casadi_copy(arg[QPSOL_LBX], n_, lb);
+    double* ub=w; w += n_;
+    casadi_copy(arg[QPSOL_UBX], n_, ub);
+    double* lbA=w; w += nc_;
+    casadi_copy(arg[QPSOL_LBA], nc_, lbA);
+    double* ubA=w; w += nc_;
+    casadi_copy(arg[QPSOL_UBA], nc_, ubA);
 
     int flag;
     if (!called_once_) {
@@ -276,17 +265,19 @@ namespace casadi {
     }
 
     // Get optimal cost
-    output(QP_SOLVER_COST).set(qp_->getObjVal());
+    if (res[QPSOL_COST]) *res[QPSOL_COST] = qp_->getObjVal();
 
     // Get the primal solution
-    qp_->getPrimalSolution(&output(QP_SOLVER_X).front());
+    if (res[QPSOL_X]) qp_->getPrimalSolution(res[QPSOL_X]);
 
     // Get the dual solution
-    qp_->getDualSolution(&dual_.front());
-
-    // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-    transform(dual_.begin(),   dual_.begin()+n_, output(QP_SOLVER_LAM_X).begin(), negate<double>());
-    transform(dual_.begin()+n_, dual_.end(),     output(QP_SOLVER_LAM_A).begin(), negate<double>());
+    if (res[QPSOL_LAM_X] || res[QPSOL_LAM_A]) {
+      double* dual=w; w += n_+nc_;
+      qp_->getDualSolution(dual);
+      casadi_scal(n_+nc_, -1., dual);
+      casadi_copy(dual, n_, res[QPSOL_LAM_X]);
+      casadi_copy(dual+n_, nc_, res[QPSOL_LAM_A]);
+    }
   }
 
   std::string QpoasesInterface::getErrorMessage(int flag) {

@@ -44,7 +44,7 @@ namespace casadi {
     /// Default constructor - all elements
     Slice();
 
-    /// A single element (explicit to avoid ambiguity with IMatrix overload
+    /// A single element (explicit to avoid ambiguity with IM overload
     explicit Slice(int i, bool ind1=false);
 
     /// A slice
@@ -69,9 +69,9 @@ namespace casadi {
     std::vector<int> getAll(const Slice& outer, int len) const;
 
     /// Is the slice a scalar
-    bool isscalar(int len) const;
+    bool is_scalar(int len) const;
 
-    /// Get scalar (if isscalar)
+    /// Get scalar (if is_scalar)
     int toScalar(int len) const;
 
     /// Check equality

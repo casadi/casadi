@@ -26,16 +26,16 @@
 #ifndef CASADI_SYMBOLIC_QR_HPP
 #define CASADI_SYMBOLIC_QR_HPP
 
-#include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/solvers/casadi_linearsolver_symbolicqr_export.h>
+#include "casadi/core/function/linsol.hpp"
+#include <casadi/solvers/casadi_linsol_symbolicqr_export.h>
 
-/** \defgroup plugin_LinearSolver_symbolicqr
+/** \defgroup plugin_Linsol_symbolicqr
 
-       LinearSolver based on QR factorization with sparsity pattern based reordering
+       Linsol based on QR factorization with sparsity pattern based reordering
       _without_ partial pivoting
 */
 
-/** \pluginsection{LinearSolver,symbolicqr} */
+/** \pluginsection{Linsol,symbolicqr} */
 
 /// \cond INTERNAL
 
@@ -43,34 +43,37 @@ namespace casadi {
   typedef SX* SXPtr;
   typedef std::vector<SXPtr> SXPtrV;
 
-  /** \brief \pluginbrief{LinearSolver,symbolicqr}
+  /** \brief \pluginbrief{Linsol,symbolicqr}
 
-      @copydoc LinearSolver_doc
-      @copydoc plugin_LinearSolver_symbolicqr
+      @copydoc Linsol_doc
+      @copydoc plugin_Linsol_symbolicqr
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQr
-    : public LinearSolverInternal {
+  class CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQr : public Linsol {
   public:
     // Constructor
-    SymbolicQr(const Sparsity& sparsity, int nrhs);
+    SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     // Destructor
     virtual ~SymbolicQr();
 
-    /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new SymbolicQr(sp, nrhs);}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "symbolicqr";}
+
+    /** \brief  Create a new Linsol */
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+      return new SymbolicQr(name, sp, nrhs);
+    }
 
     // Initialize
     virtual void init();
 
-    // Prepare the factorization
-    virtual void prepare();
+    // Factorize the linear system
+    virtual void linsol_factorize(Memory& m, const double* A);
 
-    // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    // Solve the linear system
+    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -79,8 +82,8 @@ namespace casadi {
     virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Evaluate symbolically (SX) */
-    virtual void evalSXLinsol(const SXElement** arg, SXElement** res,
-                              int* iw, SXElement* w, bool tr, int nrhs);
+    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                               bool tr, int nrhs);
 
     // Factorization function
     Function fact_fcn_;
@@ -89,7 +92,7 @@ namespace casadi {
     Function solv_fcn_N_, solv_fcn_T_;
 
     // Storage for QR factorization
-    DMatrix Q_, R_;
+    std::vector<double> q_, r_;
 
     /// A documentation string
     static const std::string meta_doc;

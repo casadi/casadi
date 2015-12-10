@@ -30,7 +30,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_RK_EXPORT
-      casadi_register_integrator_rk(IntegratorInternal::Plugin* plugin) {
+      casadi_register_integrator_rk(Integrator::Plugin* plugin) {
     plugin->creator = RkIntegrator::creator;
     plugin->name = "rk";
     plugin->doc = RkIntegrator::meta_doc.c_str();
@@ -40,11 +40,11 @@ namespace casadi {
 
   extern "C"
   void CASADI_INTEGRATOR_RK_EXPORT casadi_load_integrator_rk() {
-    IntegratorInternal::registerPlugin(casadi_register_integrator_rk);
+    Integrator::registerPlugin(casadi_register_integrator_rk);
   }
 
-  RkIntegrator::RkIntegrator(const Function& f, const Function& g) :
-      FixedStepIntegrator(f, g) {
+  RkIntegrator::RkIntegrator(const std::string& name, const XProblem& dae)
+    : FixedStepIntegrator(name, dae) {
   }
 
   RkIntegrator::~RkIntegrator() {
@@ -62,9 +62,9 @@ namespace casadi {
   void RkIntegrator::setupFG() {
 
     // Symbolic inputs
-    MX x0 = MX::sym("x0", f_.input(DAE_X).sparsity());
-    MX p = MX::sym("p", f_.input(DAE_P).sparsity());
-    MX t = MX::sym("t", f_.input(DAE_T).sparsity());
+    MX x0 = MX::sym("x0", this->x());
+    MX p = MX::sym("p", this->p());
+    MX t = MX::sym("t", this->t());
 
     // Intermediate variables (does not enter in F_, only in G_)
     MX v = MX::sym("v", x0.size1(), x0.size2()*3);
@@ -125,14 +125,15 @@ namespace casadi {
       f_res[DAE_ODE] = xf;
       f_res[DAE_QUAD] = qf;
       f_res[DAE_ALG] = horzcat(x_def);
-      F_ = MXFunction("dae", f_arg, f_res);
+      F_ = Function("dae", f_arg, f_res);
+      alloc(F_);
     }
 
     // Backward integration
     if (!g_.isNull()) {
       // Symbolic inputs
-      MX rx0 = MX::sym("x0", g_.input(RDAE_RX).sparsity());
-      MX rp = MX::sym("p", g_.input(RDAE_RP).sparsity());
+      MX rx0 = MX::sym("rx0", this->rx());
+      MX rp = MX::sym("rp", this->rp());
 
       // Intermediate variables (do not enter in G_)
       MX rv = MX::sym("rv", rx0.size1(), 3*rx0.size2());
@@ -191,7 +192,8 @@ namespace casadi {
       g_res[RDAE_ODE] = rxf;
       g_res[RDAE_QUAD] = rqf;
       g_res[RDAE_ALG] = horzcat(rx_def);
-      G_ = MXFunction("rdae", g_arg, g_res);
+      G_ = Function("rdae", g_arg, g_res);
+      alloc(G_);
     }
   }
 

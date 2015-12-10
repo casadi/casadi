@@ -25,8 +25,6 @@
 
 #include "symbolic_qr.hpp"
 
-#include "casadi/core/function/sx_function.hpp"
-
 #ifdef WITH_DL
 #include <cstdlib>
 #endif // WITH_DL
@@ -35,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT
-  casadi_register_linearsolver_symbolicqr(LinearSolverInternal::Plugin* plugin) {
+  int CASADI_LINSOL_SYMBOLICQR_EXPORT
+  casadi_register_linsol_symbolicqr(Linsol::Plugin* plugin) {
     plugin->creator = SymbolicQr::creator;
     plugin->name = "symbolicqr";
     plugin->doc = SymbolicQr::meta_doc.c_str();
@@ -45,12 +43,12 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT casadi_load_linearsolver_symbolicqr() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_symbolicqr);
+  void CASADI_LINSOL_SYMBOLICQR_EXPORT casadi_load_linsol_symbolicqr() {
+    Linsol::registerPlugin(casadi_register_linsol_symbolicqr);
   }
 
-  SymbolicQr::SymbolicQr(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity, nrhs) {
+  SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs) :
+    Linsol(name, sparsity, nrhs) {
     addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");
     addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",
               "Compiler command to be used for compiling generated code");
@@ -61,11 +59,11 @@ namespace casadi {
 
   void SymbolicQr::init() {
     // Call the base class initializer
-    LinearSolverInternal::init();
+    Linsol::init();
 
     // Read options
-    bool codegen = getOption("codegen");
-    string compiler = getOption("compiler");
+    bool codegen = option("codegen");
+    string compiler = option("compiler");
 
     // Make sure that command processor is available
     if (codegen) {
@@ -78,7 +76,7 @@ namespace casadi {
     }
 
     // Symbolic expression for A
-    SX A = SX::sym("A", input(0).sparsity());
+    SX A = SX::sym("A", sparsity_in(LINSOL_A));
 
     // Get the inverted column permutation
     std::vector<int> inv_colperm(colperm_.size());
@@ -96,7 +94,7 @@ namespace casadi {
     // Generate the QR factorization function
     vector<SX> QR(2);
     qr(Aperm, QR[0], QR[1]);
-    SXFunction fact_fcn("QR_fact", make_vector(A), QR);
+    Function fact_fcn("QR_fact", {A}, QR);
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -107,11 +105,12 @@ namespace casadi {
     } else {
       fact_fcn_ = fact_fcn;
     }
+    alloc(fact_fcn_);
 
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", QR[0].sparsity());
     SX R = SX::sym("R", QR[1].sparsity());
-    SX b = SX::sym("b", input(1).size1(), 1);
+    SX b = SX::sym("b", size1_in(LINSOL_B), 1);
 
     // Solve non-transposed
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
@@ -126,8 +125,8 @@ namespace casadi {
     SX x = xperm(inv_colperm, ALL);
 
     // Generate the QR solve function
-    vector<SX> solv_in = make_vector(Q, R, b);
-    SXFunction solv_fcn("QR_solv", solv_in, make_vector(x));
+    vector<SX> solv_in = {Q, R, b};
+    Function solv_fcn("QR_solv", solv_in, {x});
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -137,6 +136,7 @@ namespace casadi {
     } else {
       solv_fcn_N_ = solv_fcn;
     }
+    alloc(solv_fcn_N_);
 
     // Solve transposed
     // We have (Pb' * Q * R * Px)' * x = b
@@ -153,7 +153,7 @@ namespace casadi {
     x = xperm(inv_rowperm, ALL);
 
     // Mofify the QR solve function
-    solv_fcn = SXFunction("QR_solv_T", solv_in, make_vector(x));
+    solv_fcn = Function("QR_solv_T", solv_in, {x});
 
     // Optionally generate c code and load as DLL
     if (codegen) {
@@ -163,47 +163,61 @@ namespace casadi {
     } else {
       solv_fcn_T_ = solv_fcn;
     }
+    alloc(solv_fcn_T_);
 
     // Allocate storage for QR factorization
-    Q_ = DMatrix::zeros(Q.sparsity());
-    R_ = DMatrix::zeros(R.sparsity());
+    q_.resize(Q.nnz());
+    r_.resize(R.nnz());
+
+    // Temporary storage
+    alloc_w(neq_, true);
   }
 
-  void SymbolicQr::prepare() {
+  void SymbolicQr::linsol_factorize(Memory& m, const double* A) {
+    // IO buffers
+    const double** arg1 = m.arg+n_in();
+    double** res1 = m.res+n_out();
+
     // Factorize
-    fact_fcn_.setInput(input(LINSOL_A));
-    fact_fcn_.evaluate();
-    fact_fcn_.getOutput(Q_, 0);
-    fact_fcn_.getOutput(R_, 1);
-    prepared_ = true;
+    fill_n(arg1, fact_fcn_.n_in(), nullptr);
+    arg1[0] = A;
+    fill_n(res1, fact_fcn_.n_out(), nullptr);
+    res1[0] = getPtr(q_);
+    res1[1] = getPtr(r_);
+    fact_fcn_(arg1, res1, m.iw, m.w, m.mem);
   }
 
-  void SymbolicQr::solve(double* x, int nrhs, bool transpose) {
-    // Select solve function
-    Function& solv = transpose ? solv_fcn_T_ : solv_fcn_N_;
+  void SymbolicQr::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
+    // IO buffers
+    const double** arg1 = m.arg+n_in();
+    double** res1 = m.res+n_out();
 
-    // Pass QR factorization
-    solv.setInput(Q_, 0);
-    solv.setInput(R_, 1);
+    // Select solve function
+    Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
 
     // Solve for all right hand sides
+    fill_n(arg1, solv.n_in(), nullptr);
+    arg1[0] = getPtr(q_);
+    arg1[1] = getPtr(r_);
+    fill_n(res1, solv.n_out(), nullptr);
     for (int i=0; i<nrhs; ++i) {
-      solv.setInputNZ(x, 2);
-      solv.evaluate();
-      solv.getOutputNZ(x);
-      x += solv.output().nnz();
+      copy_n(x, neq_, m.w); // Copy x to a temporary
+      arg1[2] = m.w;
+      res1[0] = x;
+      solv(arg1, res1, m.iw, m.w+neq_, 0);
+      x += neq_;
     }
   }
 
-  void SymbolicQr::evalSXLinsol(const SXElement** arg, SXElement** res,
-                                int* iw, SXElement* w, bool tr, int nrhs) {
+  void SymbolicQr::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                                 bool tr, int nrhs) {
     casadi_assert(arg[0]!=0);
     casadi_assert(arg[1]!=0);
     casadi_assert(res[0]!=0);
 
     // Get A and factorize it
     SX A = SX::zeros(input(LINSOL_A).sparsity());
-    copy(arg[1], arg[1]+A.nnz(), A.begin());
+    copy(arg[1], arg[1]+A.nnz(), A->begin());
     vector<SX> v = fact_fcn_(A);
 
     // Select solve function
@@ -211,12 +225,12 @@ namespace casadi {
 
     // Solve for every right hand side
     v.push_back(SX::zeros(A.size1()));
-    const SXElement* a=arg[0];
-    SXElement* r=res[0];
+    const SXElem* a=arg[0];
+    SXElem* r=res[0];
     for (int i=0; i<nrhs; ++i) {
-      copy(a, a+v[2].nnz(), v[2].begin());
+      copy(a, a+v[2].nnz(), v[2]->begin());
       SX rr = solv(v).at(0);
-      copy(rr.begin(), rr.end(), r);
+      copy(rr->begin(), rr->end(), r);
       r += rr.nnz();
     }
   }

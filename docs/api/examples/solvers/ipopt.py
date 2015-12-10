@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-#! NlpSolver
+#! nlpsol
 #! =====================
 from casadi import *
 from numpy import *
@@ -35,17 +35,15 @@ from numpy import *
 #$
 #$ with x scalar
 
-x=SX.sym("x")
-nlp=SXFunction("nlp", nlpIn(x=x),nlpOut(f=(x-1)**2))
+x=SX.sym('x')
+nlp = {'x':x, 'f':(x-1)**2}
 
-solver = NlpSolver("solver", "ipopt", nlp)
-solver.setInput([-10],"lbx")
-solver.setInput([10],"ubx")
-solver.evaluate()
+solver = nlpsol('solver', 'ipopt', nlp)
+sol = solver({'lbx':-10, 'ubx':10})
 
 #! The solution is obviously 1:
-print solver.getOutput()
-assert(abs(solver.getOutput()[0]-1)<1e-9)
+print sol['x']
+assert(abs(sol['x']-1)<1e-9)
 
 #! Constrained problem
 #! ============================
@@ -58,22 +56,19 @@ assert(abs(solver.getOutput()[0]-1)<1e-9)
 
 n = 5
 
-x=SX.sym("x",n)
+x=SX.sym('x',n)
 #! Note how we do not distinguish between equalities and inequalities here
-nlp=SXFunction("nlp", nlpIn(x=x),nlpOut(f=mul((x-1).T,x-1),g=vertcat([x[1]+x[2],x[0]])))
+nlp = {'x':x, 'f':mul((x-1).T,x-1), 'g':vertcat([x[1]+x[2],x[0]])}
 
-solver = NlpSolver("solver", "ipopt", nlp)
-solver.setInput([-10]*n,"lbx")
-solver.setInput([10]*n,"ubx")
-#$  $ 2 \le x_0 \le 2$ is not really as bad it looks. Ipopt will recognise this situation as an equality constraint. 
-solver.setInput([0,2],"lbg")
-solver.setInput([1,2],"ubg")
-solver.evaluate()
+solver = nlpsol('solver', 'ipopt', nlp)
+sol = solver({'lbx':-10, 'ubx':10, 'lbg':[0,2], 'ubg':[1,2]})
+#$ $ 2 \le x_0 \le 2$ is not really as bad it looks. 
+#$ Ipopt will recognise this situation as an equality constraint.
 
 #! The solution is obviously [2,0.5,0.5,1,1]:
-print solver.getOutput()
+print sol['x']
 for (i,e) in zip(range(n),[2,0.5,0.5,1,1]):
-  assert(abs(solver.getOutput()[i]-e)<1e-7)
+  assert(abs(sol['x'][i]-e)<1e-7)
 
 
 #! Problem with parameters
@@ -83,26 +78,23 @@ for (i,e) in zip(range(n),[2,0.5,0.5,1,1]):
 #$
 #$ with x scalar
 
-x=SX.sym("x")
-a=SX.sym("a")
+x=SX.sym('x')
+a=SX.sym('a')
 a_ = 2
-nlp=SXFunction("nlp", nlpIn(x=x,p=a),nlpOut(f=(x-a)**2))
+nlp={'x':x, 'p':a, 'f':(x-a)**2}
 
-solver = NlpSolver("solver", "ipopt", nlp)
-solver.setInput([-10],"lbx")
-solver.setInput([10],"ubx")
-solver.setInput([a_],"p")
-solver.evaluate()
+solver = nlpsol('solver', 'ipopt', nlp)
+arg = {'lbx':-10, 'ubx':10, 'p':a_}
+sol = solver(arg)
 
 #! The solution is obviously a:
-print solver.getOutput()
-assert(abs(solver.getOutput()[0]-a_)<1e-9)
+print sol['x']
+assert(abs(sol['x']-a_)<1e-9)
 
 #! The parameter can change inbetween two solve calls:
-solver.setInput([2*a_],"p")
-solver.evaluate()
+arg['p'] = 2*a_
+sol = solver(arg)
 
 #! The solution is obviously 2*a:
-print solver.getOutput()
-assert(abs(solver.getOutput()[0]-2*a_)<1e-9)
-
+print sol['x']
+assert(abs(sol['x']-2*a_)<1e-9)

@@ -30,7 +30,7 @@ import sys
 
 import __builtin__
 
-def isInteger(a):
+def is_integer(a):
   return isinstance(a,int) or isinstance(a,np.integer)
   
 def isString(a):
@@ -218,7 +218,7 @@ class StructEntry:
         s = dims[0]
         if isinstance(p,slice): # Expand slice
           p = range(*p.indices(s))
-        if isInteger(p):
+        if is_integer(p):
           return self.traverseByPowerIndex(
                    powerIndex[1:],
                    dims=dims[1:],
@@ -443,13 +443,13 @@ class CasadiStructureDerivable:
   
   def argtype(self,arg):
     mtype = None
-    if isinstance(arg,DMatrix):
+    if isinstance(arg,DM):
       a = arg
-      mtype = DMatrix
+      mtype = DM
     else:
       try:
-        a = DMatrix(arg)
-        mtype = DMatrix
+        a = DM(arg)
+        mtype = DM
       except:
         pass
         
@@ -473,17 +473,17 @@ class CasadiStructureDerivable:
           a = SX(arg)
           mtype = SX
         except:
-          raise Exception("Call to Structure has weird argument: expecting DMatrix-like or MX-like or SXMatrix-like")
+          raise Exception("Call to Structure has weird argument: expecting DM-like or MX-like or SXMatrix-like")
     
     return (a,mtype)
 
   def __call__(self,arg=0):
     (a,mtype) = self.argtype(arg)
 
-    if isinstance(a,DMatrix):
+    if isinstance(a,DM):
       if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-        a = DMatrix.ones(self.size,1)*a
-      return DMatrixStruct(self,data=a)
+        a = DM.ones(self.size,1)*a
+      return DMStruct(self,data=a)
       
     if isinstance(a,MX):
       return MXStruct(self,data=a)
@@ -495,10 +495,10 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0] == self.size):
-       raise Exception("Expecting %d x n DMatrix. Got %s" % (self.size,a.dimString()))  
+       raise Exception("Expecting %d x n DM. Got %s" % (self.size,a.dim()))  
     s = struct([entry("t",struct=self,repeat=a.shape[1])])
 
-    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+    for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
         numbers = c(s,data=DataReferenceRepeated(a,a.shape[1]))
    
@@ -510,11 +510,11 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-       a = DMatrix.ones(self.size,self.size)*a
+       a = DM.ones(self.size,self.size)*a
     if not(a.shape[1] == a.shape[0] and a.shape[0]==self.size):
-       raise Exception("Expecting square DMatrix of size %s. Got %s" % (self.size,a.dimString()))
+       raise Exception("Expecting square DM of size %s. Got %s" % (self.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,self))])
-    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+    for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
         numbers = c(s,data=DataReferenceSquared(a,a.shape[0]))
     p = numbers.prefix["t"]
@@ -525,11 +525,11 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size!=1:
-       a = DMatrix.ones(self.size,otherstruct.size)*a
+       a = DM.ones(self.size,otherstruct.size)*a
     if not(a.shape[1]==otherstruct.size and a.shape[0]==self.size):
-       raise Exception("Expecting DMatrix of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dimString()))
+       raise Exception("Expecting DM of shape (%s,%s). Got %s" % (self.size,otherstruct.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,otherstruct))])
-    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+    for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
         numbers = c(s,data=DataReferenceProduct(a,a.shape[0],a.shape[1]))
     p = numbers.prefix["t"]
@@ -540,10 +540,10 @@ class CasadiStructureDerivable:
     (a,mtype) = self.argtype(arg)
 
     if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):
-       raise Exception("Expecting square (%d) DMatrix by N. Got %s" % (self.size,a.dimString()))
+       raise Exception("Expecting square (%d) DM by N. Got %s" % (self.size,a.dim()))
     s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[1] / self.size)])
 
-    for (t,c) in [(DMatrix,DMatrixStruct), (MX, MXStruct), (SX, SXStruct)]:
+    for (t,c) in [(DM,DMStruct), (MX, MXStruct), (SX, SXStruct)]:
       if isinstance(a,t):
         numbers = c(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[1] / self.size))
 
@@ -592,13 +592,13 @@ class SetterDispatcher(Dispatcher):
           self.master[i] = payload_
         elif type=="symm":
           iflip = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry,flip=True)
-          if payload_.isscalar():
+          if payload_.is_scalar():
             self.master[i] = payload_
             self.master[iflip] = payload_
           else:
-            oi = performExtraIndex(DMatrix.ones(entry.originalsparsity),extraIndex=extraIndex,entry=entry)
+            oi = performExtraIndex(DM.ones(entry.originalsparsity),extraIndex=extraIndex,entry=entry)
             if oi.sparsity()!=payload_.sparsity():
-              raise Exception("Payload sparsity " + payload_.dimString() +  " does not match lhs sparisty " + oi.dimString() + "." )
+              raise Exception("Payload sparsity " + payload_.dim() +  " does not match lhs sparisty " + oi.dim() + "." )
             self.master[iflip] = payload_.T[iflip.sparsity()]
             self.master[i] = payload_[i.sparsity()]
         else:
@@ -613,7 +613,7 @@ class SetterDispatcher(Dispatcher):
       raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
       
   def callableInner(self):
-    return CasadiStructure.IMatrixDispatcher(struct=self.struct)
+    return CasadiStructure.IMDispatcher(struct=self.struct)
   
   def callableOuter(self,payload,canonicalIndex,extraIndex=None,entry=None,inner=None):
     try:
@@ -677,7 +677,7 @@ class Prefixer:
     self.prefix = prefix
     self.castmaster = castmaster
     
-    methods = [ "__DMatrix__", "__SX__","__MX__"]
+    methods = [ "__DM__", "__SX__","__MX__"]
     for m in methods:
       if hasattr(self.struct,m):
         setattr(self,m,self.cast)
@@ -755,7 +755,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
       else:
         raise Exception("Canonical index %s not found." % str(canonicalIndex))
 
-  class IMatrixDispatcher(Dispatcher):
+  class IMDispatcher(Dispatcher):
     def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
       if canonicalIndex in self.struct.map:
         return performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
@@ -780,11 +780,11 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     for i in self.traverseCanonicalIndex():
       e = self.getStructEntryByCanonicalIndex(i)
       sp = Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
-      m = IMatrix(sp,range(k,k+sp.nnz()))
+      m = IM(sp,range(k,k+sp.nnz()))
       k += sp.nnz()
       it = tuple(i)
       self.map[it] = m
-      self.lookuptable+=[(it,kk,p) for kk,p in enumerate(zip(sp.getCol(),sp.row()))]
+      self.lookuptable+=[(it,kk,p) for kk,p in enumerate(zip(sp.get_col(),sp.row()))]
       for a in canonicalIndexAncestors(it)[1:]:
         if a in hmap:
           hmap[a].append(m)
@@ -800,17 +800,17 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
       def __init__(self,struct):
         self.struct = struct
     
-    class IMatrixGetter(StructureGetter):
+    class IMGetter(StructureGetter):
       @properGetitem
       def __getitem__(self,powerIndex):           
-        return self.struct.traverseByPowerIndex(powerIndex,dispatcher=CasadiStructure.IMatrixDispatcher(struct=self.struct))
+        return self.struct.traverseByPowerIndex(powerIndex,dispatcher=CasadiStructure.IMDispatcher(struct=self.struct))
 
     class FlatIndexGetter(StructureGetter):
       @properGetitem
       def __getitem__(self,powerIndex):
         return vec(self.struct.traverseByPowerIndex(powerIndex,dispatcher=CasadiStructure.FlatIndexDispatcher(struct=self.struct)))
             
-    self.i = IMatrixGetter(self)
+    self.i = IMGetter(self)
     self.f = FlatIndexGetter(self)
     self.struct = self
 
@@ -967,7 +967,7 @@ class VertsplitStructure:
     for it, k, sp,e in zip(its,vertsplit(parent,ks),sps,es):
       if not(e.isPrimitive()):
         self.buildMap(struct=e.struct,parentIndex = parentIndex + it,parent=k)
-      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else MX(sp,k) #[IMatrix(sp,range(sp.nnz()))]      
+      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else MX(sp,k) #[IM(sp,range(sp.nnz()))]      
     
 class msymStruct(CasadiStructured,MasterGettable,VertsplitStructure):
   description = "MX.sym"
@@ -1010,14 +1010,14 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
       self.master = mtype(data)
       
     if self.master.shape[0]!=self.size:
-      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
+      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dim()))
     if self.master.shape[1]!=1 and self.master.shape[0]>0:
-      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
+      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dim()))
         
     for e in self.entries:
       self[e.name] = e.expr
  
-class DMatrixStruct(MatrixStruct):
+class DMStruct(MatrixStruct):
 
   def save(self,filename):
     import pickle
@@ -1034,9 +1034,9 @@ class DMatrixStruct(MatrixStruct):
     return d
     
   def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,DMatrix,data=data)
+    MatrixStruct.__init__(self,struct,DM,data=data)
     
-  def __DMatrix__(self):
+  def __DM__(self):
     return self.cat
 
 class SXStruct(MatrixStruct):
@@ -1085,7 +1085,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
       
       if canonicalIndex in self.mapping:
         if self.struct.map[canonicalIndex].sparsity()!=payload.sparsity():
-          raise Exception("Error in powerIndex slicing %s for canonicalIndex %s: Shape mismatch. lhs is %s, rhs is %s." % (str(powerIndex),str(canonicalIndex),self.struct.map[canonicalIndex].sparsity().dimString(),payload.sparsity().dimString()))
+          raise Exception("Error in powerIndex slicing %s for canonicalIndex %s: Shape mismatch. lhs is %s, rhs is %s." % (str(powerIndex),str(canonicalIndex),self.struct.map[canonicalIndex].sparsity().dim(),payload.sparsity().dim()))
         self.storage[self.mapping[canonicalIndex]] = payload
       else:
         raise Exception("Not found: %s " % str(canonicalIndex))
@@ -1158,7 +1158,7 @@ class CasadiStructEntry(StructEntry):
     if 'repeat' in kwargs:
       self.repeat = kwargs["repeat"] if isinstance(kwargs["repeat"],list) else [kwargs["repeat"]]
     
-    if not all(map(lambda x: isInteger(x),self.repeat)):
+    if not all(map(lambda x: is_integer(x),self.repeat)):
       raise Exception("The 'repeat' argument, if present, must be a list of integers, but got %s" % str(self.repeat))
 
       
@@ -1176,7 +1176,7 @@ class CasadiStructEntry(StructEntry):
     #     shape   argument
     if 'shape' in kwargs:
       shape = kwargs["shape"]
-      if isInteger(shape) :
+      if is_integer(shape) :
         self.sparsity = Sparsity.dense(shape,1)
       elif isinstance(shape,list) or isinstance(shape,tuple):
         if len(shape)==0 or len(shape)>2:
@@ -1197,20 +1197,20 @@ class CasadiStructEntry(StructEntry):
       if isinstance(shapestruct,Structured) or isinstance(shapestruct,Structure):
         self.shapestruct = (shapestruct.struct,1)
       elif isinstance(shapestruct,tuple):
-        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or isInteger(e) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
+        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or is_integer(e) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
           raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of structures or numbers")
-        self.shapestruct = tuple([e if isInteger(e) else e.struct for e in shapestruct])
+        self.shapestruct = tuple([e if is_integer(e) else e.struct for e in shapestruct])
       else:
         raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of at most structures")
       
       if 'shape' not in kwargs:
-        self.sparsity = Sparsity.dense(*[e if isInteger(e) else e.size for e in self.shapestruct])
+        self.sparsity = Sparsity.dense(*[e if is_integer(e) else e.size for e in self.shapestruct])
         
     #     sym    argument
     self.sym = None
     if 'sym' in kwargs:
       sym = kwargs["sym"]
-      if isinstance(sym,SX) and sym.isValidInput():
+      if isinstance(sym,SX) and sym.is_valid_input():
         self.sym = sym
       elif isinstance(sym,Structured): 
         self.struct = sym.struct
@@ -1256,7 +1256,7 @@ class CasadiStructEntry(StructEntry):
         raise Exception("You supplied a type argument '%s' but it is not recognised. Use one of %s" % (str(self.type,str(allowedclass))))
       if self.type=="symm":
         if self.sparsity.size1() != self.sparsity.size2():
-          raise Exception("You supplied a type 'symm', but matrix is not square. Got " % self.sparsity.dimString() + ".")
+          raise Exception("You supplied a type 'symm', but matrix is not square. Got " % self.sparsity.dim() + ".")
         self.originalsparsity = self.sparsity
         self.sparsity = self.sparsity*Sparsity.upper(self.sparsity.size1())
         
@@ -1266,9 +1266,9 @@ class CasadiStructEntry(StructEntry):
  
   def primitiveString(self):
     if self.type is None:
-      return self.sparsity.dimString()
+      return self.sparsity.dim()
     elif self.type=="symm":
-      return "symm(" +  self.sparsity.dimString() + ")"
+      return "symm(" +  self.sparsity.dim() + ")"
       
   def __getstate__(self):
     return dict((k,getattr(self,k)) for k in ["name", "struct", "sparsity","type","repeat","shapestruct","dims"])
@@ -1357,13 +1357,13 @@ class DataReference:
   def shape(self):
     return self.v.shape
     
-  def dimString(self):
-    return self.v.dimString()
+  def dim(self):
+    return self.v.dim()
 
   
 class DataReferenceRepeated(DataReference):
   def __init__(self,a,n):
-    assert(a.isdense())
+    assert(a.is_dense())
     self.a = a
     self.n = n
     self.v = a.reshape((n*a.size1(),1))
@@ -1378,7 +1378,7 @@ class DataReferenceRepeated(DataReference):
 
 class DataReferenceSquared(DataReference):
   def __init__(self,a,n):
-    assert(a.isdense())
+    assert(a.is_dense())
     self.a = a
     self.v = a
     self.n = n
@@ -1395,7 +1395,7 @@ class DataReferenceSquared(DataReference):
     
 class DataReferenceProduct(DataReference):
   def __init__(self,a,n,m):
-    assert(a.isdense())
+    assert(a.is_dense())
     self.a = a
     self.v = a
     self.n = n
@@ -1419,7 +1419,7 @@ class DataReferenceProduct(DataReference):
 
 class DataReferenceSquaredRepeated(DataReference):
   def __init__(self,a,n,N):
-    assert(a.isdense())
+    assert(a.is_dense())
     self.a = a
     self.n = n
     self.N = N

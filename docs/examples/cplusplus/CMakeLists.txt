@@ -1,7 +1,5 @@
 include_directories(../../)
 
-if(USE_CXX11)
-
 # Add IPOPT link directories
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})
@@ -45,11 +43,6 @@ if(IPOPT_FOUND)
   target_link_libraries(sqpmethod_nl casadi)
 endif()
 
-if(SQIC_FOUND AND IPOPT_FOUND)
-  add_executable(stabilized_sqpmethod_nl stabilized_sqpmethod_nl.cpp)
-  target_link_libraries(stabilized_sqpmethod_nl casadi)
-endif()
-
 # Parse AMPL models and solve with Worhp
 if(WORHP_FOUND AND IPOPT_FOUND)
   add_executable(worhp_nl worhp_nl.cpp)
@@ -68,9 +61,9 @@ if(WITH_SUNDIALS AND IPOPT_FOUND)
   target_link_libraries(rocket_single_shooting
     casadi_integrator_cvodes
     casadi_integrator_idas
-    casadi_nlpsolver_ipopt
+    casadi_nlpsol_ipopt
     casadi_integrator_rk
-    casadi_nlpsolver_scpgen)
+    casadi_nlpsol_scpgen)
 endif()
 
 # Writing a multiple shooting code from scratch
@@ -131,4 +124,7 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
   target_link_libraries(implicit_runge-kutta casadi)
 endif()
 
-endif(USE_CXX11)
+if (QPOASES_FOUND)
+  add_executable(chain_qp chain_qp.cpp)
+  target_link_libraries(chain_qp casadi)   
+endif()

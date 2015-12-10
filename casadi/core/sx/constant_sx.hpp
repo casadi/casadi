@@ -31,16 +31,9 @@
 
 /// \cond INTERNAL
 
-// Cashing of constants requires a map (preferably a hash map)
-#ifdef USE_CXX11
-// Using C++11 unordered_map (hash map)
+// Cashing of constants requires a map
 #include <unordered_map>
 #define CACHING_MAP std::unordered_map
-#else // USE_CXX11
-// Falling back to std::map (binary search tree)
-#include <map>
-#define CACHING_MAP std::map
-#endif // USE_CXX11
 
 namespace casadi {
 
@@ -58,13 +51,13 @@ virtual ~ConstantSX() {}
 virtual double getValue() const = 0;
 
 /** \brief  Properties */
-virtual bool isConstant() const { return true; }
+virtual bool is_constant() const { return true; }
 
 /** \brief  Get the operation */
-virtual int getOp() const { return OP_CONST;}
+virtual int op() const { return OP_CONST;}
 
 /** \brief Check if two nodes are equivalent up to a given depth */
-virtual bool zz_isEqual(const SXNode* node, int depth) const {
+virtual bool zz_is_equal(const SXNode* node, int depth) const {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
   return n && n->getValue()==getValue();
 }
@@ -183,7 +176,7 @@ class CASADI_EXPORT IntegerSX : public ConstantSX {
     ///@}
 
     /** \brief  Properties */
-    virtual bool isInteger() const { return true; }
+    virtual bool is_integer() const { return true; }
 
   protected:
 
@@ -213,8 +206,8 @@ public:
 
   ///@{
   /** \brief  Properties */
-  virtual bool isInteger() const { return true; }
-  virtual bool isZero() const { return true; }
+  virtual bool is_integer() const { return true; }
+  virtual bool is_zero() const { return true; }
   virtual bool isAlmostZero(double tol) const { return true; }
   ///@}
 };
@@ -235,8 +228,8 @@ public:
   virtual int getIntValue() const { return 1;}
 
   /** \brief  Properties */
-  virtual bool isInteger() const { return true; }
-  virtual bool isOne() const { return true; }
+  virtual bool is_integer() const { return true; }
+  virtual bool is_one() const { return true; }
 
 };
 
@@ -259,8 +252,8 @@ public:
 
   ///@{
   /** \brief  Properties */
-  virtual bool isInteger() const { return true; }
-  virtual bool isMinusOne() const { return true; }
+  virtual bool is_integer() const { return true; }
+  virtual bool is_minus_one() const { return true; }
   ///@}
 
 };

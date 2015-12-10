@@ -26,11 +26,9 @@
 #ifndef CASADI_IO_INTERFACE_HPP
 #define CASADI_IO_INTERFACE_HPP
 
-#include "../sx/sx_element.hpp"
+#include "../sx/sx_elem.hpp"
 #include "../mx/mx.hpp"
 #include "../options_functionality.hpp"
-#include "../function/schemes_helpers.hpp"
-#include "../function/io_scheme.hpp"
 
 #include <exception>
 
@@ -61,12 +59,12 @@ namespace casadi {
 
     /**
     * \defgroup  iind
-    *   \param[in] iind index within the range [0..nIn()-1]
+    *   \param[in] iind index within the range [0..n_in()-1]
     */
 
     /**
     * \defgroup  oind
-    *   \param[in] oind index within the range [0..nOut()-1]
+    *   \param[in] oind index within the range [0..n_out()-1]
     */
 
     /**
@@ -190,7 +188,6 @@ namespace casadi {
 
 #define SETTERS_NZ(T) \
     void setInputNZ(T val, int iind=0) {                                \
-      self().assertInit();                                              \
       try {                                                             \
         self().input(iind).setNZ(val);                                  \
       } catch(std::exception& e) {                                      \
@@ -198,18 +195,17 @@ namespace casadi {
       }                                                                 \
     }                                                                   \
     void setOutputNZ(T val, int oind=0) {                               \
-      self().assertInit(); self().output(oind).setNZ(val);              \
+      self().output(oind).setNZ(val);              \
     }                                                                   \
     void setInputNZ(T val, const std::string &iname) {                  \
-      setInputNZ(val, self().inputIndex(iname));                        \
+      setInputNZ(val, self().index_in(iname));                        \
     }                                                                   \
     void setOutputNZ(T val, const std::string &oname) {                 \
-      setOutputNZ(val, self().outputIndex(oname));                      \
+      setOutputNZ(val, self().index_out(oname));                      \
     }
 
 #define SETTERS_SUB(T)                                                  \
     void setInput(T val, int iind=0) {                                  \
-      self().assertInit();                                              \
       try {                                                             \
         self().input(iind).set(val);                                    \
       } catch(std::exception& e) {                                      \
@@ -217,13 +213,13 @@ namespace casadi {
       }                                                                 \
     }                                                                   \
     void setOutput(T val, int oind=0) {                                 \
-      self().assertInit(); self().output(oind).set(val);                \
+      self().output(oind).set(val);                \
     }                                                                   \
     void setInput(T val, const std::string &iname) {                    \
-      setInput(val, self().inputIndex(iname));                          \
+      setInput(val, self().index_in(iname));                          \
     }                                                                   \
     void setOutput(T val, const std::string &oname) {                   \
-      setOutput(val, self().outputIndex(oname));                        \
+      setOutput(val, self().index_out(oname));                        \
     }
 
 #ifndef DOXYGENPROC
@@ -242,30 +238,30 @@ namespace casadi {
 
 #define GETTERS_NZ(T)                                           \
       void getInputNZ(T val, int iind=0) const {                \
-        self().assertInit(); self().input(iind).getNZ(val);     \
+        self().input(iind).getNZ(val);     \
       }                                                         \
       void getOutputNZ(T val, int oind=0) const {               \
-        self().assertInit(); self().output(oind).getNZ(val);    \
+        self().output(oind).getNZ(val);    \
       }                                                         \
       void getInputNZ(T val, const std::string &iname) const {  \
-        getInputNZ(val, self().inputIndex(iname));              \
+        getInputNZ(val, self().index_in(iname));              \
       }                                                         \
       void getOutputNZ(T val, const std::string &oname) const { \
-        getOutputNZ(val, self().outputIndex(oname));            \
+        getOutputNZ(val, self().index_out(oname));            \
       }
 
 #define GETTERS_SUB(T)                                                  \
       void getInput(T val, int iind=0) const {                          \
-        self().assertInit(); self().input(iind).get(val);               \
+        self().input(iind).get(val);               \
       }                                                                 \
       void getOutput(T val, int oind=0) const {                         \
-        self().assertInit(); self().output(oind).get(val);              \
+        self().output(oind).get(val);              \
       }                                                                 \
       void getInput(T val, const std::string &iname) const {            \
-        getInput(val, self().inputIndex(iname));                        \
+        getInput(val, self().index_in(iname));                        \
       }                                                                 \
       void getOutput(T val, const std::string &oname) const {           \
-        getOutput(val, self().outputIndex(oname));                      \
+        getOutput(val, self().index_out(oname));                      \
       }
 
 #ifndef DOXYGENPROC

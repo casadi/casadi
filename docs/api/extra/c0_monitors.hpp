@@ -43,28 +43,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::ExternalFunctionInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class casadi::ExternalFunction
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::FunctionInternal
 \n
 \par
@@ -155,7 +133,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_ipopt
+/** \addtogroup plugin_Nlpsol_ipopt
 \n
 \par
 <a name='monitors'></a><table>
@@ -182,7 +160,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_ImplicitFunction_kinsol
+/** \addtogroup plugin_Rootfinder_kinsol
 \n
 \par
 <a name='monitors'></a><table>
@@ -209,7 +187,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_knitro
+/** \addtogroup plugin_Nlpsol_knitro
 \n
 \par
 <a name='monitors'></a><table>
@@ -239,7 +217,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_ImplicitFunction_newton
+/** \addtogroup plugin_Rootfinder_newton
 \n
 \par
 <a name='monitors'></a><table>
@@ -271,7 +249,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_scpgen
+/** \addtogroup plugin_Nlpsol_scpgen
 \n
 \par
 <a name='monitors'></a><table>
@@ -299,32 +277,6 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::SimulatorInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>initial</td><td>casadi::SimulatorInternal</td></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>step</td><td>casadi::SimulatorInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class casadi::Simulator
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>initial</td><td>casadi::SimulatorInternal</td></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>step</td><td>casadi::SimulatorInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::SnoptInterface
 \n
 \par
@@ -338,7 +290,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_snopt
+/** \addtogroup plugin_Nlpsol_snopt
 \n
 \par
 <a name='monitors'></a><table>
@@ -368,47 +320,13 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_sqpmethod
+/** \addtogroup plugin_Nlpsol_sqpmethod
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th></tr>
 <tr><td>bfgs</td></tr>
-<tr><td>dx</td></tr>
-<tr><td>eval_f</td></tr>
-<tr><td>eval_g</td></tr>
-<tr><td>eval_grad_f</td></tr>
-<tr><td>eval_h</td></tr>
-<tr><td>eval_jac_g</td></tr>
-<tr><td>qp</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::StabilizedSqp
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>dx</td><td>casadi::StabilizedSqp</td></tr>
-<tr><td>eval_f</td><td>casadi::StabilizedSqp</td></tr>
-<tr><td>eval_g</td><td>casadi::StabilizedSqp</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::StabilizedSqp</td></tr>
-<tr><td>eval_h</td><td>casadi::StabilizedSqp</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::StabilizedSqp</td></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>qp</td><td>casadi::StabilizedSqp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_NlpSolver_stabilizedsqp
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th></tr>
 <tr><td>dx</td></tr>
 <tr><td>eval_f</td></tr>
 <tr><td>eval_g</td></tr>
@@ -435,7 +353,7 @@
 </table>
 */
 /// \endcond
-/** \addtogroup plugin_NlpSolver_worhp
+/** \addtogroup plugin_Nlpsol_worhp
 \n
 \par
 <a name='monitors'></a><table>
@@ -449,7 +367,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::XFunctionInternal
+/** \class casadi::XFunction
 \n
 \par
 <a name='monitors'></a><table>

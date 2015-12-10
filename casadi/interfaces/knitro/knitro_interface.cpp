@@ -33,8 +33,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_KNITRO_EXPORT
-  casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLPSOL_KNITRO_EXPORT
+  casadi_register_nlpsol_knitro(Nlpsol::Plugin* plugin) {
     plugin->creator = KnitroInterface::creator;
     plugin->name = "knitro";
     plugin->doc = KnitroInterface::meta_doc.c_str();
@@ -43,11 +43,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_KNITRO_EXPORT casadi_load_nlpsolver_knitro() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_knitro);
+  void CASADI_NLPSOL_KNITRO_EXPORT casadi_load_nlpsol_knitro() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_knitro);
   }
 
-  KnitroInterface::KnitroInterface(const Function& nlp) : NlpSolverInternal(nlp) {
+  KnitroInterface::KnitroInterface(const std::string& name, const XProblem& nlp)
+    : Nlpsol(name, nlp) {
+
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
               "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
@@ -127,40 +129,40 @@ namespace casadi {
 
   void KnitroInterface::init() {
     // Call the init method of the base class
-    NlpSolverInternal::init();
+    Nlpsol::init();
 
-    //if (hasSetOption("Alg")) int_param_["alg"] = getOption("Alg");
-    if (hasSetOption("BarRule")) int_param_["barrule"] = getOption("BarRule");
-    if (hasSetOption("NewPoint")) int_param_["newpoint"] = getOption("NewPoint");
-    if (hasSetOption("GradOpt")) int_param_["gradopt"] = getOption("GradOpt");
-    if (hasSetOption("HessOpt")) int_param_["hessopt"] = getOption("HessOpt");
-    if (hasSetOption("Feasible")) int_param_["feasible"] = getOption("Feasible");
-    if (hasSetOption("HonorBnds")) int_param_["honorbnds"] = getOption("HonorBnds");
-    if (hasSetOption("LpSolver")) int_param_["lpsolver"] = getOption("LpSolver");
-    if (hasSetOption("Multistart")) int_param_["multistart"] = getOption("Multistart");
-    //if (hasSetOption("MsMaxSolves")) int_param_["msmaxsolves"] = getOption("MsMaxSolves");
-    if (hasSetOption("MaxCgIt")) int_param_["maxcgit"] = getOption("MaxCgIt");
-    //if (hasSetOption("MaxCrossTt")) int_param_["maxcrosstt"] = getOption("MaxCrossTt");
-    if (hasSetOption("MaxIt")) int_param_["maxit"] = getOption("MaxIt");
-    //if (hasSetOption("MaxTimeCPU")) double_param_["maxtimecpu"] = getOption("MaxTimeCPU");
-    //if (hasSetOption("MaxTimeReal")) double_param_["maxtimereal"] = getOption("MaxTimeReal");
-    if (hasSetOption("LmSize")) int_param_["lmsize"] = getOption("LmSize");
-    if (hasSetOption("Scale")) int_param_["scale"] = getOption("Scale");
-    if (hasSetOption("ShiftInit")) int_param_["shiftinit"] = getOption("ShiftInit");
-    if (hasSetOption("Soc")) int_param_["soc"] = getOption("Soc");
-    if (hasSetOption("InitPt")) int_param_["initpt"] = getOption("InitPt");
-    if (hasSetOption("Delta")) double_param_["delta"] = getOption("Delta");
-    if (hasSetOption("FeasModeTol")) double_param_["feasmodetol"] = getOption("FeasModeTol");
-    if (hasSetOption("FeasTol")) double_param_["feastol"] = getOption("FeasTol");
-    if (hasSetOption("FeasTolAbs")) double_param_["feastolabs"] = getOption("FeasTolAbs");
-    if (hasSetOption("OptTol")) double_param_["opttol"] = getOption("OptTol");
-    if (hasSetOption("OptTolAbs")) double_param_["opttolabs"] = getOption("OptTolAbs");
-    if (hasSetOption("Pivot")) double_param_["pivot"] = getOption("Pivot");
-    if (hasSetOption("XTol")) double_param_["xtol"] = getOption("XTol");
-    if (hasSetOption("Mu")) double_param_["mu"] = getOption("Mu");
-    if (hasSetOption("ObjRange")) double_param_["objrange"] = getOption("ObjRange");
-    if (hasSetOption("OutLev")) int_param_["outlev"] = getOption("OutLev");
-    if (hasSetOption("Debug")) int_param_["debug"] = getOption("Debug");
+    //if (hasSetOption("Alg")) int_param_["alg"] = option("Alg");
+    if (hasSetOption("BarRule")) int_param_["barrule"] = option("BarRule");
+    if (hasSetOption("NewPoint")) int_param_["newpoint"] = option("NewPoint");
+    if (hasSetOption("GradOpt")) int_param_["gradopt"] = option("GradOpt");
+    if (hasSetOption("HessOpt")) int_param_["hessopt"] = option("HessOpt");
+    if (hasSetOption("Feasible")) int_param_["feasible"] = option("Feasible");
+    if (hasSetOption("HonorBnds")) int_param_["honorbnds"] = option("HonorBnds");
+    if (hasSetOption("LpSolver")) int_param_["lpsolver"] = option("LpSolver");
+    if (hasSetOption("Multistart")) int_param_["multistart"] = option("Multistart");
+    //if (hasSetOption("MsMaxSolves")) int_param_["msmaxsolves"] = option("MsMaxSolves");
+    if (hasSetOption("MaxCgIt")) int_param_["maxcgit"] = option("MaxCgIt");
+    //if (hasSetOption("MaxCrossTt")) int_param_["maxcrosstt"] = option("MaxCrossTt");
+    if (hasSetOption("MaxIt")) int_param_["maxit"] = option("MaxIt");
+    //if (hasSetOption("MaxTimeCPU")) double_param_["maxtimecpu"] = option("MaxTimeCPU");
+    //if (hasSetOption("MaxTimeReal")) double_param_["maxtimereal"] = option("MaxTimeReal");
+    if (hasSetOption("LmSize")) int_param_["lmsize"] = option("LmSize");
+    if (hasSetOption("Scale")) int_param_["scale"] = option("Scale");
+    if (hasSetOption("ShiftInit")) int_param_["shiftinit"] = option("ShiftInit");
+    if (hasSetOption("Soc")) int_param_["soc"] = option("Soc");
+    if (hasSetOption("InitPt")) int_param_["initpt"] = option("InitPt");
+    if (hasSetOption("Delta")) double_param_["delta"] = option("Delta");
+    if (hasSetOption("FeasModeTol")) double_param_["feasmodetol"] = option("FeasModeTol");
+    if (hasSetOption("FeasTol")) double_param_["feastol"] = option("FeasTol");
+    if (hasSetOption("FeasTolAbs")) double_param_["feastolabs"] = option("FeasTolAbs");
+    if (hasSetOption("OptTol")) double_param_["opttol"] = option("OptTol");
+    if (hasSetOption("OptTolAbs")) double_param_["opttolabs"] = option("OptTolAbs");
+    if (hasSetOption("Pivot")) double_param_["pivot"] = option("Pivot");
+    if (hasSetOption("XTol")) double_param_["xtol"] = option("XTol");
+    if (hasSetOption("Mu")) double_param_["mu"] = option("Mu");
+    if (hasSetOption("ObjRange")) double_param_["objrange"] = option("ObjRange");
+    if (hasSetOption("OutLev")) int_param_["outlev"] = option("OutLev");
+    if (hasSetOption("Debug")) int_param_["debug"] = option("Debug");
 
     // Get/generate required functions
     gradF();
@@ -176,7 +178,32 @@ namespace casadi {
 
   }
 
-  void KnitroInterface::evaluate() {
+  void KnitroInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Reset the base classes
+    Nlpsol::reset(mem, arg, res, iw, w);
+  }
+
+  void KnitroInterface::solve(void* mem) {
+    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
+      const double *v;
+      switch (i) {
+      case NLPSOL_X0: v = x0_; break;
+      case NLPSOL_P: v = p_; break;
+      case NLPSOL_LBX: v = lbx_; break;
+      case NLPSOL_UBX: v = ubx_; break;
+      case NLPSOL_LBG: v = lbg_; break;
+      case NLPSOL_UBG: v = ubg_; break;
+      case NLPSOL_LAM_X0: v = lam_x0_; break;
+      case NLPSOL_LAM_G0: v = lam_g0_; break;
+      default: casadi_assert(0);
+      }
+      if (v) {
+        setInputNZ(v, i);
+      } else {
+        setInput(0., i);
+      }
+    }
+
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert(kc_handle_==0);
     kc_handle_ = KTR_new();
@@ -186,19 +213,19 @@ namespace casadi {
     // Jacobian sparsity
     vector<int> Jcol, Jrow;
     if (!jacG_.isNull()) {
-      Jcol = jacG_.output().sparsity().getCol();
-      int sz = jacG_.output().nnz();
-      const int* row = jacG_.output().row();
+      Jcol = jacG_.sparsity_out(0).get_col();
+      int sz = jacG_.nnz_out(0);
+      const int* row = jacG_.sparsity_out(0).row();
       Jrow = vector<int>(row, row+sz);
     }
 
     // Hessian sparsity
-    int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
+    int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().nnz_lower();
     vector<int> Hcol(nnzH), Hrow(nnzH);
     if (nnzH>0) {
-      const int* colind = hessLag_.output().colind();
-      int ncol = hessLag_.output().size2();
-      const int* row = hessLag_.output().row();
+      const int* colind = hessLag_.sparsity_out(0).colind();
+      int ncol = hessLag_.size2_out(0);
+      const int* row = hessLag_.sparsity_out(0).row();
       int nz=0;
       for (int cc=0; cc<ncol; ++cc) {
         for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
@@ -217,8 +244,7 @@ namespace casadi {
     }
 
     // Set user set options
-    for (std::map<std::string, double>::iterator it=double_param_.begin();
-        it!=double_param_.end(); ++it) {
+    for (auto it=double_param_.begin(); it!=double_param_.end(); ++it) {
       status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
       if (status!=0) {
         throw CasadiException("KnitroInterface::evaluate: cannot set " + it->first);
@@ -243,23 +269,19 @@ namespace casadi {
     // Type of constraints
     vector<int> cType(ng_, KTR_CONTYPE_GENERAL);
     if (hasSetOption("contype")) {
-      vector<int> contype = getOption("contype");
+      vector<int> contype = option("contype");
       casadi_assert(contype.size()==cType.size());
       copy(contype.begin(), contype.end(), cType.begin());
     }
 
     // "Correct" upper and lower bounds
-    for (vector<double>::iterator it=input(NLP_SOLVER_LBX).begin();
-        it!=input(NLP_SOLVER_LBX).end(); ++it)
+    for (auto it=input(NLPSOL_LBX)->begin(); it!=input(NLPSOL_LBX)->end(); ++it)
       if (isinf(*it)) *it = -KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_UBX).begin();
-        it!=input(NLP_SOLVER_UBX).end(); ++it)
+    for (auto it=input(NLPSOL_UBX)->begin(); it!=input(NLPSOL_UBX)->end(); ++it)
       if (isinf(*it)) *it =  KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_LBG).begin();
-        it!=input(NLP_SOLVER_LBG).end(); ++it)
+    for (auto it=input(NLPSOL_LBG)->begin(); it!=input(NLPSOL_LBG)->end(); ++it)
       if (isinf(*it)) *it = -KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_UBG).begin();
-        it!=input(NLP_SOLVER_UBG).end(); ++it)
+    for (auto it=input(NLPSOL_UBG)->begin(); it!=input(NLPSOL_UBG)->end(); ++it)
       if (isinf(*it)) *it =  KTR_INFBOUND;
 
     // Initialize KNITRO
@@ -267,19 +289,19 @@ namespace casadi {
                               nx_,
                               KTR_OBJGOAL_MINIMIZE,
                               KTR_OBJTYPE_GENERAL,
-                              input(NLP_SOLVER_LBX).ptr(),
-                              input(NLP_SOLVER_UBX).ptr(),
+                              input(NLPSOL_LBX).ptr(),
+                              input(NLPSOL_UBX).ptr(),
                               ng_,
                               getPtr(cType),
-                              input(NLP_SOLVER_LBG).ptr(),
-                              input(NLP_SOLVER_UBG).ptr(),
+                              input(NLPSOL_LBG).ptr(),
+                              input(NLPSOL_UBG).ptr(),
                               Jcol.size(),
                               getPtr(Jcol),
                               getPtr(Jrow),
                               nnzH,
                               getPtr(Hrow),
                               getPtr(Hcol),
-                              input(NLP_SOLVER_X0).ptr(),
+                              input(NLPSOL_X0).ptr(),
                               0); // initial lambda
     casadi_assert_message(status==0, "KTR_init_problem failed");
 
@@ -300,10 +322,10 @@ namespace casadi {
 
     // Solve NLP
     status = KTR_solve(kc_handle_,
-                       output(NLP_SOLVER_X).ptr(),
+                       output(NLPSOL_X).ptr(),
                        getPtr(lambda),
                        0,  // not used
-                       output(NLP_SOLVER_F).ptr(),
+                       output(NLPSOL_F).ptr(),
                        0,  // not used
                        0,  // not used
                        0,  // not used
@@ -313,16 +335,29 @@ namespace casadi {
     stats_["return_status"] = status;
 
     // Copy constraints
-    nlp_.output(NL_G).get(output(NLP_SOLVER_G));
+    nlp_.output(NL_G).get(output(NLPSOL_G));
 
     // Copy lagrange multipliers
-    output(NLP_SOLVER_LAM_G).setNZ(getPtr(lambda));
-    output(NLP_SOLVER_LAM_X).setNZ(getPtr(lambda)+ng_);
+    output(NLPSOL_LAM_G).setNZ(getPtr(lambda));
+    output(NLPSOL_LAM_X).setNZ(getPtr(lambda)+ng_);
 
     // Free memory (move to destructor!)
     KTR_free(&kc_handle_);
     kc_handle_ = 0;
 
+    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
+      double **v;
+      switch (i) {
+      case NLPSOL_X: v = &x_; break;
+      case NLPSOL_F: v = &f_; break;
+      case NLPSOL_G: v = &g_; break;
+      case NLPSOL_LAM_X: v = &lam_x_; break;
+      case NLPSOL_LAM_G: v = &lam_g_; break;
+      case NLPSOL_LAM_P: v = &lam_p_; break;
+      default: casadi_assert(0);
+      }
+      if (*v) getOutputNZ(*v, i);
+    }
   }
 
 
@@ -353,7 +388,7 @@ namespace casadi {
   void KnitroInterface::evalfc(const double* x, double& obj, double *c) {
     // Pass the argument to the function
     nlp_.setInputNZ(x, NL_X);
-    nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+    nlp_.setInput(input(NLPSOL_P), NL_P);
 
     // Evaluate the function
     nlp_.evaluate();
@@ -376,7 +411,7 @@ namespace casadi {
   void KnitroInterface::evalga(const double* x, double* objGrad, double* jac) {
     // Pass the argument to the function
     gradF_.setInputNZ(x, NL_X);
-    gradF_.setInput(input(NLP_SOLVER_P), NL_P);
+    gradF_.setInput(input(NLPSOL_P), NL_P);
 
     // Evaluate the function using adjoint mode AD
     gradF_.evaluate();
@@ -393,7 +428,7 @@ namespace casadi {
     if (!jacG_.isNull()) {
       // Pass the argument to the Jacobian function
       jacG_.setInputNZ(x, NL_X);
-      jacG_.setInput(input(NLP_SOLVER_P), NL_P);
+      jacG_.setInput(input(NLPSOL_P), NL_P);
 
       // Evaluate the Jacobian function
       jacG_.evaluate();
@@ -412,7 +447,7 @@ namespace casadi {
   void KnitroInterface::evalh(const double* x, const double* lambda, double* hessian) {
     // Pass the argument to the function
     hessLag_.setInputNZ(x, NL_X);
-    hessLag_.setInput(input(NLP_SOLVER_P), NL_P);
+    hessLag_.setInput(input(NLPSOL_P), NL_P);
     hessLag_.setInput(1.0, NL_NUM_IN+NL_F);
     hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
 

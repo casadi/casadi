@@ -51,11 +51,17 @@ namespace casadi {
     /// Destructor
     virtual ~CompilerInternal() = 0;
 
-    /** \brief  Print */
+    /** \brief Print */
     virtual void print(std::ostream &stream) const;
+
+    /** \brief Print representation */
+    virtual void repr(std::ostream &stream) const;
 
     // Creator function for internal class
     typedef CompilerInternal* (*Creator)(const std::string& name);
+
+    /** \brief Initialize */
+    virtual void init() = 0;
 
     // No static functions exposed
     struct Exposed{ };

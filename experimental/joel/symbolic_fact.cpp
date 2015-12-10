@@ -120,7 +120,7 @@ int main(){
   }
 
   // Create a matrix
-  DMatrix D2(C2,valv);
+  DM D2(C2,valv);
 //  D2.printSparse();
     
   // Right hand side
@@ -141,7 +141,7 @@ int main(){
   int ncol3 = 5;
   CRSSparsity S3(nrow3,ncol3,vector<int>(col3,col3+10),vector<int>(rowind3,rowind3+11));
   
-  IMatrix(S3,1).printDense();
+  IM(S3,1).printDense();
 
   
   cs AT_;
@@ -221,7 +221,7 @@ int main(){
   cout << coarse_colblock3 << endl;
   
   
-  S3.dulmageMendelsohn(rowperm3, colperm3, rowblock3, colblock3, coarse_rowblock3, coarse_colblock3, dmseed);
+  S3.btf(rowperm3, colperm3, rowblock3, colblock3, coarse_rowblock3, coarse_colblock3, dmseed);
 
   cout << "casadi" << endl;
   cout << rowperm3 << endl;

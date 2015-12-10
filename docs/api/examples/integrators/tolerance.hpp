@@ -30,9 +30,7 @@
 *
 * \sa
 * \code
-* casadi::Integrator();
-* casadi::Simulator();
-* casadi::ODEInput
+* casadi::integrator();
 * \endcode
 *
 */

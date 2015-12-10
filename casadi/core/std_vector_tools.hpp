@@ -36,6 +36,7 @@
 #include <limits>
 #include <algorithm>
 #include <map>
+#include <cmath>
 #include "casadi_exception.hpp"
 #include "casadi_types.hpp"
 
@@ -170,7 +171,7 @@ namespace casadi {
 
   /// Check if the vector is non-increasing
   template<typename T>
-  bool isNonIncreasing(const std::vector<T> &v);
+  bool isNon_increasing(const std::vector<T> &v);
 
   /// Check if the vector is non-decreasing
   template<typename T>
@@ -269,9 +270,15 @@ namespace casadi {
   std::vector<T> cumsum0(const std::vector<T> &values);
 #endif //SWIG
 
-  /// Checks if vector does not contain NaN or Inf
+  /// Checks if array does not contain NaN or Inf
   template<typename T>
-  bool isRegular(const std::vector<T> &v);
+  bool is_regular(const std::vector<T> &v) {
+    for (auto&& vk : v) {
+      if (vk!=vk || vk==std::numeric_limits<T>::infinity() ||
+          vk==-std::numeric_limits<T>::infinity()) return false;
+    }
+    return true;
+  }
 
 } // namespace casadi
 
@@ -429,7 +436,7 @@ namespace casadi {
   }
 
   template<typename T>
-  bool isNonIncreasing(const std::vector<T> &v) {
+  bool isNon_increasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
     for (int i=1;i<v.size();++i) {
@@ -452,7 +459,7 @@ namespace casadi {
 
   template<typename T>
   bool isMonotone(const std::vector<T> &v) {
-    return isNonDecreasing(v) || isNonIncreasing(v);
+    return isNonDecreasing(v) || isNon_increasing(v);
   }
 
   template<typename T>
@@ -676,18 +683,8 @@ namespace casadi {
     return ret;
   }
 
-
   template<typename T>
-  bool isRegular(const std::vector<T> &v) {
-    for (int k=0;k<v.size();++k) {
-      if (v[k]!=v[k] || v[k]==std::numeric_limits<T>::infinity() ||
-          v[k]==-std::numeric_limits<T>::infinity()) return false;
-    }
-    return true;
-  }
-
-  template<typename T>
-  T inner_prod(const std::vector<T>& a, const std::vector<T>& b) {
+  T dot(const std::vector<T>& a, const std::vector<T>& b) {
     T ret = 0;
     for (int k=0; k<a.size(); ++k) {
       ret += a[k]*b[k];
@@ -780,6 +777,11 @@ namespace casadi {
     }
     return ret;
   }
+
+  ///@{
+  /// Readability typedefs
+  typedef std::vector<std::string> StringVector;
+  ///@}
 
 } // namespace casadi
 #endif // SWIG

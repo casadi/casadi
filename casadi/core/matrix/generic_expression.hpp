@@ -280,14 +280,14 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
      * a = x*x
      * b = x*x
      *
-     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
+     *  a.is_equal(b, 0)  will return false, but a.is_equal(b, 1) will return true
      */
-    friend inline bool isEqual(const ExType& x, const ExType& y, int depth=0) {
-      return x.zz_isEqual(y, depth);
+    friend inline bool is_equal(const ExType& x, const ExType& y, int depth=0) {
+      return x.zz_is_equal(y, depth);
     }
 
     friend inline bool iszero(const ExType& x) {
-      return x.isZero();
+      return x.is_zero();
     }
 
     /// Copy sign

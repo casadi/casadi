@@ -33,8 +33,6 @@
 
 #include "../std_vector_tools.hpp"
 #include "../casadi_exception.hpp"
-#include "../function/mx_function.hpp"
-#include "../function/integrator.hpp"
 #include "../function/code_generator.hpp"
 #include "../casadi_calculus.hpp"
 #include "xml_file.hpp"
@@ -392,10 +390,18 @@ namespace casadi {
       return val;
     } else if (name.compare("Log")==0) {
       return log(readExpr(node[0]));
+    } else if (name.compare("LogLeq")==0) { // Logical less than equal
+      return readExpr(node[0]) <= readExpr(node[1]);
+    } else if (name.compare("LogGeq")==0) { // Logical greater than equal
+      return readExpr(node[0]) >= readExpr(node[1]);
     } else if (name.compare("LogLt")==0) { // Logical less than
       return readExpr(node[0]) < readExpr(node[1]);
-    } else if (name.compare("LogGt")==0) { // Logical less than
+    } else if (name.compare("LogGt")==0) { // Logical greater than
       return readExpr(node[0]) > readExpr(node[1]);
+    } else if (name.compare("Max")==0) {
+      return fmax(readExpr(node[0]), readExpr(node[1]));
+    } else if (name.compare("Min")==0) {
+      return fmin(readExpr(node[0]), readExpr(node[1]));
     } else if (name.compare("Mul")==0) { // Multiplication
       return readExpr(node[0]) * readExpr(node[1]);
     } else if (name.compare("Neg")==0) {
@@ -454,7 +460,7 @@ namespace casadi {
 
   void DaeBuilder::print(ostream &stream, bool trailing_newline) const {
     // Assert correctness
-    sanityCheck();
+    sanity_check();
 
     // Print dimensions
     repr(stream);
@@ -537,7 +543,7 @@ namespace casadi {
 
   void DaeBuilder::scaleVariables() {
     // Assert correctness
-    sanityCheck();
+    sanity_check();
 
     // Gather variables and expressions to replace
     vector<MX> v_id, v_rep;
@@ -595,14 +601,13 @@ namespace casadi {
     if (this->d.empty()) return;
 
     // Find out which intermediates depends on which other
-    MXFunction f("tmp", make_vector(vertcat(this->d)),
-                 make_vector(vertcat(this->d) - vertcat(this->ddef)));
-    Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.issquare());
+    Function f("tmp", {vertcat(this->d)}, {vertcat(this->d) - vertcat(this->ddef)});
+    Sparsity sp = f.sparsity_jac();
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    sp.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
     vector<MX> ddefnew(this->d.size()), dnew(this->d.size());
@@ -664,70 +669,6 @@ namespace casadi {
 
   void DaeBuilder::scaleEquations() {
     casadi_error("DaeBuilder::scaleEquations broken");
-#if 0
-    userOut() << "Scaling equations ..." << endl;
-    double time1 = clock();
-
-    // Variables
-    enum Variables {T, X, XDOT, Z, P, U, NUM_VAR};
-    vector<MX > v(NUM_VAR); // all variables
-    v[T] = this->t;
-    v[X] = this->x;
-    v[XDOT] = der(this->x); // BUG!!!
-    v[Z] = this->z;
-    v[P] = this->p;
-    v[U] = this->u;
-
-    // Create the jacobian of the implicit equations with respect to [x, z, p, u]
-    MX xz;
-    xz.append(v[X]);
-    xz.append(v[Z]);
-    xz.append(v[P]);
-    xz.append(v[U]);
-    MXFunction fcn = MXFunction(xz, this->ode);
-    MXFunction J(v, fcn.jac());
-
-    // Evaluate the Jacobian in the starting point
-    J.init();
-    J.setInput(0.0, T);
-    J.setInput(start(this->x, true), X);
-    J.input(XDOT).setAll(0.0);
-    J.setInput(start(this->z, true), Z);
-    J.setInput(start(this->p, true), P);
-    J.setInput(start(this->u, true), U);
-    J.evaluate();
-
-    // Get the maximum of every row
-    Matrix<double> &J0 = J.output();
-    vector<double> scale(J0.size1(), 0.0); // scaling factors
-    for (int cc=0; cc<J0.size2(); ++cc) {
-      // Loop over non-zero entries of the column
-      for (int el=J0.colind(cc); el<J0.colind(cc+1); ++el) {
-        // Row
-        int rr=J0.row(el);
-
-        // The scaling factor is the maximum norm, ignoring not-a-number entries
-        if (!isnan(J0.at(el))) {
-          scale[rr] = std::max(scale[rr], fabs(J0.at(el)));
-        }
-      }
-    }
-
-    // Make sure nonzero factor found
-    for (int rr=0; rr<J0.size1(); ++rr) {
-      if (scale[rr]==0) {
-        userOut() << "Warning: Could not generate a scaling factor for equation " << rr;
-        scale[rr]=1.;
-      }
-    }
-
-    // Scale the equations
-    this->ode /= scale;
-
-    double time2 = clock();
-    double dt = (time2-time1)/CLOCKS_PER_SEC;
-    userOut() << "... equation scaling complete after " << dt << " seconds." << endl;
-#endif
   }
 
   void DaeBuilder::sort_dae() {
@@ -735,13 +676,13 @@ namespace casadi {
     if (this->x.empty()) return;
 
     // Find out which differential equation depends on which differential state
-    MXFunction f("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
-    Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.issquare());
+    Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
+    Sparsity sp = f.sparsity_jac();
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    sp.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
     vector<MX> daenew(this->s.size()), snew(this->s.size()), sdotnew(this->s.size());
@@ -763,13 +704,13 @@ namespace casadi {
     if (this->z.empty()) return;
 
     // Find out which algebraic equation depends on which algebraic state
-    MXFunction f("tmp", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
-    Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.issquare());
+    Function f("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
+    Sparsity sp = f.sparsity_jac();
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    sp.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
     vector<MX> algnew(this->z.size()), znew(this->z.size());
@@ -795,16 +736,16 @@ namespace casadi {
     if (this->s.empty()) return;
 
     // Write the ODE as a function of the state derivatives
-    MXFunction f("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
+    Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
-    Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.issquare());
+    Sparsity sp = f.sparsity_jac();
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    int nb = sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+    int nb = sp.btf(rowperm, colperm, rowblock, colblock,
                                   coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
@@ -822,10 +763,10 @@ namespace casadi {
     this->sdot = sdotnew;
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = MXFunction("tmp", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
+    f = Function("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
 
     // Get the Jacobian
-    MX J = f.jac();
+    MX J = MX::jac(f);
 
     // Explicit ODE
     vector<MX> new_ode;
@@ -879,16 +820,16 @@ namespace casadi {
     if (this->z.empty()) return;
 
     // Write the algebraic equations as a function of the algebraic states
-    MXFunction f("f", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
+    Function f("f", {vertcat(this->z)}, {vertcat(this->alg)});
 
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
-    Sparsity sp = f.jacSparsity();
-    casadi_assert(sp.issquare());
+    Sparsity sp = f.sparsity_jac();
+    casadi_assert(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    int nb = sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+    int nb = sp.btf(rowperm, colperm, rowblock, colblock,
                                   coarse_rowblock, coarse_colblock);
 
     // Resort equations and variables
@@ -904,7 +845,7 @@ namespace casadi {
     this->z = znew;
 
     // Rewrite the sorted algebraic equations as a function of the algebraic states
-    f = MXFunction("f", make_vector(vertcat(this->z)), make_vector(vertcat(this->alg)));
+    f = Function("f", {vertcat(this->z)}, {vertcat(this->alg)});
 
     // Variables where we have found an explicit expression and where we haven't
     vector<MX> z_exp, z_imp;
@@ -1113,18 +1054,18 @@ namespace casadi {
     this->lam_quad.push_back(MX::sym("lam_" + name, new_quad.sparsity()));
   }
 
-  void DaeBuilder::sanityCheck() const {
+  void DaeBuilder::sanity_check() const {
     // Time
-    casadi_assert_message(this->t.isSymbolic(), "Non-symbolic time t");
-    casadi_assert_message(this->t.isscalar(), "Non-scalar time t");
+    casadi_assert_message(this->t.is_symbolic(), "Non-symbolic time t");
+    casadi_assert_message(this->t.is_scalar(), "Non-scalar time t");
 
     // Differential states
     casadi_assert_message(this->x.size()==this->ode.size(),
                           "x and ode have different lengths");
     for (int i=0; i<this->x.size(); ++i) {
-      casadi_assert_message(this->x[i].shape()==this->ode[i].shape(),
+      casadi_assert_message(this->x[i].size()==this->ode[i].size(),
                             "ode has wrong dimensions");
-      casadi_assert_message(this->x[i].isSymbolic(), "Non-symbolic state x");
+      casadi_assert_message(this->x[i].is_symbolic(), "Non-symbolic state x");
     }
 
     // DAE
@@ -1133,10 +1074,10 @@ namespace casadi {
     casadi_assert_message(this->s.size()==this->dae.size(),
                           "s and dae have different lengths");
     for (int i=0; i<this->s.size(); ++i) {
-      casadi_assert_message(this->s[i].isSymbolic(), "Non-symbolic state s");
-      casadi_assert_message(this->s[i].shape()==this->sdot[i].shape(),
+      casadi_assert_message(this->s[i].is_symbolic(), "Non-symbolic state s");
+      casadi_assert_message(this->s[i].size()==this->sdot[i].size(),
                             "sdot has wrong dimensions");
-      casadi_assert_message(this->s[i].shape()==this->dae[i].shape(),
+      casadi_assert_message(this->s[i].size()==this->dae[i].size(),
                             "dae has wrong dimensions");
     }
 
@@ -1144,8 +1085,8 @@ namespace casadi {
     casadi_assert_message(this->z.size()==this->alg.size(),
                           "z and alg have different lengths");
     for (int i=0; i<this->z.size(); ++i) {
-      casadi_assert_message(this->z[i].isSymbolic(), "Non-symbolic algebraic variable z");
-      casadi_assert_message(this->z[i].shape()==this->alg[i].shape(),
+      casadi_assert_message(this->z[i].is_symbolic(), "Non-symbolic algebraic variable z");
+      casadi_assert_message(this->z[i].size()==this->alg[i].size(),
                             "alg has wrong dimensions");
     }
 
@@ -1153,8 +1094,8 @@ namespace casadi {
     casadi_assert_message(this->q.size()==this->quad.size(),
                           "q and quad have different lengths");
     for (int i=0; i<this->q.size(); ++i) {
-      casadi_assert_message(this->q[i].isSymbolic(), "Non-symbolic quadrature state q");
-      casadi_assert_message(this->q[i].shape()==this->quad[i].shape(),
+      casadi_assert_message(this->q[i].is_symbolic(), "Non-symbolic quadrature state q");
+      casadi_assert_message(this->q[i].size()==this->quad[i].size(),
                             "quad has wrong dimensions");
     }
 
@@ -1162,8 +1103,8 @@ namespace casadi {
     casadi_assert_message(this->d.size()==this->ddef.size(),
                           "d and ddef have different lengths");
     for (int i=0; i<this->d.size(); ++i) {
-      casadi_assert_message(this->d[i].isSymbolic(), "Non-symbolic dependent parameter d");
-      casadi_assert_message(this->d[i].shape()==this->ddef[i].shape(),
+      casadi_assert_message(this->d[i].is_symbolic(), "Non-symbolic dependent parameter d");
+      casadi_assert_message(this->d[i].size()==this->ddef[i].size(),
                             "ddef has wrong dimensions");
     }
 
@@ -1171,19 +1112,19 @@ namespace casadi {
     casadi_assert_message(this->y.size()==this->ydef.size(),
                           "y and ydef have different lengths");
     for (int i=0; i<this->y.size(); ++i) {
-      casadi_assert_message(this->y[i].isSymbolic(), "Non-symbolic output y");
-      casadi_assert_message(this->y[i].shape()==this->ydef[i].shape(),
+      casadi_assert_message(this->y[i].is_symbolic(), "Non-symbolic output y");
+      casadi_assert_message(this->y[i].size()==this->ydef[i].size(),
                             "ydef has wrong dimensions");
     }
 
     // Control
     for (int i=0; i<this->u.size(); ++i) {
-      casadi_assert_message(this->u[i].isSymbolic(), "Non-symbolic control u");
+      casadi_assert_message(this->u[i].is_symbolic(), "Non-symbolic control u");
     }
 
     // Parameter
     for (int i=0; i<this->p.size(); ++i) {
-      casadi_assert_message(this->p[i].isSymbolic(), "Non-symbolic parameter p");
+      casadi_assert_message(this->p[i].is_symbolic(), "Non-symbolic parameter p");
     }
   }
 
@@ -1219,7 +1160,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::der(const MX& var) const {
-    casadi_assert(var.iscolumn() && var.isSymbolic());
+    casadi_assert(var.is_column() && var.is_symbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
       ret[i] = der(var.at(i).getName());
@@ -1235,25 +1176,18 @@ namespace casadi {
     if (this->s.empty()) return;
 
     // We investigate the interdependencies in sdot -> dae
-    MXFunction f("f", make_vector(vertcat(this->sdot)), make_vector(vertcat(this->dae)));
+    Function f("f", {vertcat(this->sdot)}, {vertcat(this->dae)});
 
     // Number of s
-    int ns = f.input().nnz();
-    casadi_assert(f.output().nnz()==ns);
+    int ns = f.nnz_in(0);
+    casadi_assert(f.nnz_out(0)==ns);
 
-    // Input/output arrays
-    bvec_t* f_sdot = reinterpret_cast<bvec_t*>(f.input().ptr());
-    bvec_t* f_dae = reinterpret_cast<bvec_t*>(f.output().ptr());
-
-    // First find out which equations depend on sdot
-    f.spInit(true);
-
-    // Seed all inputs
-    std::fill(f_sdot, f_sdot+ns, bvec_t(1));
+    // Input/output buffers
+    vector<bvec_t> f_sdot(ns, 1);
+    vector<bvec_t> f_dae(ns, 0);
 
     // Propagate to f_dae
-    std::fill(f_dae, f_dae+ns, bvec_t(0));
-    f.spEvaluate(true);
+    f({getPtr(f_sdot)}, {getPtr(f_dae)});
 
     // Get the new differential and algebraic equations
     vector<MX> new_dae, new_alg;
@@ -1266,15 +1200,12 @@ namespace casadi {
       }
     }
 
-    // Now find out what sdot enter in the equations
-    f.spInit(false);
-
     // Seed all outputs
-    std::fill(f_dae, f_dae+ns, bvec_t(1));
+    std::fill(f_dae.begin(), f_dae.end(), 1);
 
     // Propagate to f_sdot
-    std::fill(f_sdot, f_sdot+ns, bvec_t(0));
-    f.spEvaluate(false);
+    std::fill(f_sdot.begin(), f_sdot.end(), 0);
+    f.rev({getPtr(f_sdot)}, {getPtr(f_dae)});
 
     // Get the new algebraic variables and new states
     vector<MX> new_s, new_sdot, new_z;
@@ -1304,12 +1235,12 @@ namespace casadi {
   }
 
   std::string DaeBuilder::unit(const MX& var) const {
-    casadi_assert_message(!var.iscolumn() && var.isValidInput(),
+    casadi_assert_message(!var.is_column() && var.is_valid_input(),
                           "DaeBuilder::unit: Argument must be a symbolic vector");
-    if (var.isempty()) {
+    if (var.is_empty()) {
       return "n/a";
     } else {
-      std::vector<MX> prim = var.getPrimitives();
+      std::vector<MX> prim = var.primitives();
       string ret = unit(prim.at(0).getName());
       for (int i=1; i<prim.size(); ++i) {
         casadi_assert_message(ret == unit(prim.at(i).getName()),
@@ -1332,10 +1263,10 @@ namespace casadi {
   }
 
   std::vector<double> DaeBuilder::nominal(const MX& var) const {
-    casadi_assert_message(var.iscolumn() && var.isValidInput(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
-    std::vector<MX> prim = var.getPrimitives();
+    std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
       ret[i] = nominal(prim.at(i).getName());
@@ -1344,10 +1275,10 @@ namespace casadi {
   }
 
   void DaeBuilder::setNominal(const MX& var, const std::vector<double>& val) {
-    casadi_assert_message(var.iscolumn() && var.isValidInput(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
     casadi_assert_message(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
-    std::vector<MX> prim = var.getPrimitives();
+    std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
       setNominal(prim.at(i).getName(), val.at(i));
@@ -1355,10 +1286,10 @@ namespace casadi {
   }
 
   std::vector<double> DaeBuilder::attribute(getAtt f, const MX& var, bool normalized) const {
-    casadi_assert_message(var.iscolumn() && var.isValidInput(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::attribute: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
-    std::vector<MX> prim = var.getPrimitives();
+    std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
       ret[i] = (this->*f)(prim[i].getName(), normalized);
@@ -1367,10 +1298,10 @@ namespace casadi {
   }
 
   MX DaeBuilder::attribute(getAttS f, const MX& var) const {
-    casadi_assert_message(var.iscolumn() && var.isValidInput(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::attribute: Argument must be a symbolic vector");
     MX ret = MX::zeros(var.sparsity());
-    std::vector<MX> prim = var.getPrimitives();
+    std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
       ret[i] = (this->*f)(prim[i].getName());
@@ -1380,10 +1311,10 @@ namespace casadi {
 
   void DaeBuilder::setAttribute(setAtt f, const MX& var, const std::vector<double>& val,
                                  bool normalized) {
-    casadi_assert_message(var.iscolumn() && var.isValidInput(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.nnz()==val.size(), "DaeBuilder::setAttribute: Dimension mismatch");
-    std::vector<MX> prim = var.getPrimitives();
+    std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
       (this->*f)(prim[i].getName(), val[i], normalized);
@@ -1391,11 +1322,11 @@ namespace casadi {
   }
 
   void DaeBuilder::setAttribute(setAttS f, const MX& var, const MX& val) {
-    casadi_assert_message(var.iscolumn() && var.isValidInput(),
+    casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::setAttribute: Argument must be a symbolic vector");
     casadi_assert_message(var.sparsity()==val.sparsity(),
                           "DaeBuilder::setAttribute: Sparsity mismatch");
-    std::vector<MX> prim = var.getPrimitives();
+    std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
       (this->*f)(var[i].getName(), val[i]);
@@ -1675,21 +1606,21 @@ namespace casadi {
     }
   }
 
-  MX DaeBuilder::addLinearCombination(const std::string& name,
+  MX DaeBuilder::add_lc(const std::string& name,
                                       const std::vector<std::string>& f_out) {
     // Make sure object valid
-    sanityCheck();
+    sanity_check();
 
     // Make sure name is valid
-    casadi_assert_message(!name.empty(), "DaeBuilder::addLinearCombination: \"name\" is empty");
+    casadi_assert_message(!name.empty(), "DaeBuilder::add_lc: \"name\" is empty");
     for (string::const_iterator i=name.begin(); i!=name.end(); ++i) {
       casadi_assert_message(isalnum(*i),
-                            "DaeBuilder::addLinearCombination: \"name\" must be alphanumeric");
+                            "DaeBuilder::add_lc: \"name\" must be alphanumeric");
     }
 
     // Get a reference to the expression
     MX& ret = lin_comb_[name];
-    casadi_assert_warning(ret.isempty(), "DaeBuilder::addLinearCombination: Overwriting " << name);
+    casadi_assert_warning(ret.is_empty(), "DaeBuilder::add_lc: Overwriting " << name);
     ret = 0;
 
     // Get indices of outputs
@@ -1698,16 +1629,16 @@ namespace casadi {
     for (int i=0; i<f_out.size(); ++i) {
       DaeBuilderOut oind = outputEnum(f_out[i]);
       casadi_assert_message(oind!=DAE_BUILDER_NUM_OUT,
-                            "DaeBuilder::addLinearCombination: No output expression " << f_out[i]
+                            "DaeBuilder::add_lc: No output expression " << f_out[i]
                             << ". Valid expressions are " << outputString());
       casadi_assert_message(!in_use[oind],
-                            "DaeBuilder::addLinearCombination: Duplicate expression " << f_out[i]);
+                            "DaeBuilder::add_lc: Duplicate expression " << f_out[i]);
       in_use[oind] = true;
 
       // Add linear combination of expressions
       vector<MX> res=output(oind), lam_res=multiplier(oind);
       for (int i=0; i<res.size(); ++i) {
-        ret += inner_prod(lam_res[i], res[i]);
+        ret += dot(lam_res[i], res[i]);
       }
     }
 
@@ -1715,7 +1646,7 @@ namespace casadi {
     return ret;
   }
 
-  MXFunction DaeBuilder::create(const std::string& fname,
+  Function DaeBuilder::create(const std::string& fname,
                                 const std::vector<std::string>& s_in,
                                 const std::vector<std::string>& s_out) const {
     // Collect function inputs
@@ -1977,8 +1908,8 @@ namespace casadi {
     }
 
     // Generate the constructed function
-    return MXFunction(fname, ret_in, ret_out,
-                      make_dict("input_scheme", s_in, "output_scheme", s_out));
+    return Function(fname, ret_in, ret_out,
+                    {{"input_scheme", s_in}, {"output_scheme", s_out}});
   }
 
 } // namespace casadi

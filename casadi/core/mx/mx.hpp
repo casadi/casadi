@@ -47,7 +47,7 @@ namespace casadi {
       The MX class is designed to have identical syntax with the Matrix<> template class,
       and uses Matrix<double> as its internal representation of the values at a node. By keeping
       the syntaxes identical, it is possible to switch from one class to the other,
-      as well as inlining MX functions to SXElement functions.
+      as well as inlining MX functions to SXElem functions.
 
       Note that an operation is always "lazy", making a matrix multiplication will create a
       matrix multiplication node, not perform the actual multiplication.
@@ -166,12 +166,12 @@ namespace casadi {
     MX getDep(int ch=0) const;
 
     /** \brief  Number of outputs */
-    int nOut() const;
+    int n_out() const;
 
     /** \brief  Get an output */
     MX getOutput(int oind=0) const;
 
-    /** \brief Get the number of dependencies of a binary SXElement */
+    /** \brief Get the number of dependencies of a binary SXElem */
     int getNdeps() const;
 
     /// Get the name.
@@ -184,50 +184,50 @@ namespace casadi {
     Matrix<double> getMatrixValue() const;
 
     /// Check if symbolic
-    bool isSymbolic() const;
+    bool is_symbolic() const;
 
     /// Check if constant
-    bool isConstant() const;
+    bool is_constant() const;
 
     /// Check if evaluation
-    bool isEvaluation() const;
+    bool is_call() const;
 
     /// Check if evaluation output
-    bool isEvaluationOutput() const;
+    bool is_output() const;
 
-    /// Get the index of evaluation output - only valid when isEvaluationoutput() is true
-    int getEvaluationOutput() const;
+    /// Get the index of evaluation output - only valid when is_calloutput() is true
+    int get_output() const;
 
     /// Is it a certain operation
-    bool isOperation(int op) const;
+    bool is_op(int op) const;
 
     /// Check if multiplication
-    bool isMultiplication() const;
+    bool is_multiplication() const;
 
     /// Check if commutative operation
-    bool isCommutative() const;
+    bool is_commutative() const;
 
     /// Check if norm
-    bool isNorm() const;
+    bool is_norm() const;
 
     /** \brief Check if matrix can be used to define function inputs.
         Valid inputs for MXFunctions are combinations of Reshape, concatenations and SymbolicMX
     */
-    bool isValidInput() const;
+    bool is_valid_input() const;
 
     /** \brief Get the number of symbolic primitive
-        Assumes isValidInput() returns true.
+        Assumes is_valid_input() returns true.
     */
-    int numPrimitives() const;
+    int n_primitives() const;
 
     /** \brief Get symbolic primitives */
-    std::vector<MX> getPrimitives() const;
+    std::vector<MX> primitives() const;
 
     /** \brief Split up an expression along symbolic primitives */
-    std::vector<MX> splitPrimitives(const MX& x) const;
+    std::vector<MX> split_primitives(const MX& x) const;
 
     /** \brief Join an expression along symbolic primitives */
-    MX joinPrimitives(std::vector<MX>& v) const;
+    MX join_primitives(std::vector<MX>& v) const;
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
@@ -236,29 +236,29 @@ namespace casadi {
         Note: Will mark the node using MX::setTemp.
         Make sure to call resetInput() after usage.
     */
-    bool hasDuplicates();
+    bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     void resetInput();
   /// \endcond
 
     /** \brief  check if identity */
-    bool isIdentity() const;
+    bool is_identity() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
-    bool isZero() const;
+    bool is_zero() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
-    bool isOne() const;
+    bool is_one() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
-    bool isMinusOne() const;
+    bool is_minus_one() const;
 
     /** \brief  Is the expression a transpose? */
-    bool isTranspose() const;
+    bool is_transpose() const;
 
     /// Checks if expression does not contain NaN or Inf
-    bool isRegular() const;
+    bool is_regular() const;
 
     /** \brief  Number of functions */
     int numFunctions() const;
@@ -267,13 +267,13 @@ namespace casadi {
     Function getFunction(int i=0);
 
     /// Is binary operation
-    bool isBinary() const;
+    bool is_binary() const;
 
     /// Is unary operation
-    bool isUnary() const;
+    bool is_unary() const;
 
     /// Get operation type
-    int getOp() const;
+    int op() const;
 
     /// \cond INTERNAL
     /// Get the temporary variable
@@ -396,19 +396,19 @@ namespace casadi {
     MX zz_power(const MX& b) const;
     MX zz_mod(const MX& y) const;
     MX zz_simplify() const;
-    bool zz_isEqual(const MX& y, int depth) const;
-    bool zz_isEqual(const MXNode* y, int depth) const;
+    bool zz_is_equal(const MX& y, int depth) const;
+    bool zz_is_equal(const MXNode* y, int depth) const;
     MX zz_copysign(const MX& y) const;
     MX zz_constpow(const MX& y) const;
     ///@}
 
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    MX zz_jacobian(const MX& arg) const;
-    MX zz_gradient(const MX& arg) const;
-    MX zz_tangent(const MX& arg) const;
-    MX zz_hessian(const MX& arg) const;
-    MX zz_hessian(const MX& arg, MX& g) const;
+    static MX jacobian(const MX& f, const MX& x, bool symmetric=false);
+    static MX gradient(const MX& f, const MX& x);
+    static MX tangent(const MX& f, const MX& x);
+    static MX hessian(const MX& f, const MX& x);
+    static MX hessian(const MX& f, const MX& x, MX& g);
     MX zz_substitute(const MX& v, const MX& vdef) const;
     static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,
@@ -421,7 +421,7 @@ namespace casadi {
     MX zz_pinv(const std::string& lsolver="symbolicqr",
                const Dict& dict = Dict()) const;
     int zz_countNodes() const;
-    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+    std::string zz_print_operator(const std::vector<std::string>& args) const;
     static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v,
                                  std::vector<MX>& vdef, const std::string& v_prefix,
                                  const std::string& v_suffix);
@@ -434,14 +434,14 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for SparsityInterface
-    static MX zz_horzcat(const std::vector<MX>& x);
-    static MX zz_diagcat(const std::vector<MX>& x);
-    static MX zz_vertcat(const std::vector<MX>& x);
+    static MX horzcat(const std::vector<MX>& x);
+    static MX diagcat(const std::vector<MX>& x);
+    static MX vertcat(const std::vector<MX>& x);
     std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
     std::vector<MX> zz_diagsplit(const std::vector<int>& offset1,
                                  const std::vector<int>& offset2) const;
     std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
-    static MX zz_blockcat(const std::vector< std::vector<MX > > &v);
+    static MX blockcat(const std::vector< std::vector<MX > > &v);
     MX zz_mtimes(const MX& y) const;
     MX zz_mac(const MX& y, const MX& z) const;
     MX zz_reshape(int nrow, int ncol) const;
@@ -454,7 +454,7 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     MX zz_mpower(const MX& b) const;
-    MX zz_inner_prod(const MX& y) const;
+    static MX dot(const MX& x, const MX& y);
     MX zz_outer_prod(const MX& y) const;
     MX zz_mrdivide(const MX& b) const;
     MX zz_mldivide(const MX& b) const;
@@ -475,6 +475,8 @@ namespace casadi {
     MX zz_nullspace() const;
     MX zz_repsum(int n, int m=1) const;
     MX zz_densify(const MX& val=0) const;
+    static MX _bilin(const MX& A, const MX& x, const MX& y);
+    static MX _rank1(const MX& A, const MX& alpha, const MX& x, const MX& y);
     ///@}
 
     ///@{
@@ -585,7 +587,7 @@ namespace casadi {
     /// Transpose the matrix
     MX T() const;
 
-    /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
+    /** \brief Get an IM representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
@@ -595,7 +597,43 @@ namespace casadi {
     static int getEqualityCheckingDepth();
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
+
+    /** \brief Get function inputs */
+    static std::vector<MX> get_input(const Function& f);
+
+    ///@{
+    /// Readability typedefs
+    typedef std::map<std::string, MX> MXDict;
+    ///@}
+
+    ///@{
+    /** \brief Jacobian expression */
+    static MX jac(const Function& f, int iind=0, int oind=0,
+                  bool compact=false, bool symmetric=false);
+    static MX jac(const Function& f, const std::string & iname, int oind=0,
+                  bool compact=false, bool symmetric=false);
+    static MX jac(const Function& f, int iind, const std::string& oname,
+                  bool compact=false, bool symmetric=false);
+    static MX jac(const Function& f, const std::string& iname, const std::string& oname,
+                  bool compact=false, bool symmetric=false);
+    ///@}
+
+    ///@{
+    /** \brief Gradient expression */
+    static MX grad(const Function& f, int iind=0, int oind=0);
+    static MX grad(const Function& f, const std::string& iname, int oind=0);
+    static MX grad(const Function& f, int iind, const std::string& oname);
+    static MX grad(const Function& f, const std::string& iname, const std::string& oname);
+    ///@}
+
+    ///@{
+    /** \brief Tangent expression */
+    static MX tang(const Function& f, int iind=0, int oind=0);
+    static MX tang(const Function& f, const std::string& iname, int oind=0);
+    static MX tang(const Function& f, int iind, const std::string& oname);
+    static MX tang(const Function& f, const std::string& iname, const std::string& oname);
+    ///@}
 
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and all
@@ -619,6 +657,7 @@ namespace casadi {
   ///@{
   /// Readability typedefs
   typedef std::vector<MX> MXVector;
+  typedef std::initializer_list<MX> MXIList;
   typedef std::vector<MXVector> MXVectorVector;
   typedef std::map<std::string, MX> MXDict;
   ///@}

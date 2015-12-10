@@ -48,12 +48,12 @@ namespace casadi {
   /** \brief Get typename */
   template <typename DataType> inline std::string matrixName()
   { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
-  template<> inline std::string matrixName<double>() { return "DMatrix"; }
-  template<> inline std::string matrixName<int>() { return "IMatrix"; }
+  template<> inline std::string matrixName<double>() { return "DM"; }
+  template<> inline std::string matrixName<int>() { return "IM"; }
   ///@}
 /// \endcond
 
-  /** \brief Sparse matrix class. SX and DMatrix are specializations.
+  /** \brief Sparse matrix class. SX and DM are specializations.
 
       General sparse matrix class that is designed with the idea that "everything is a matrix",
       that is, also scalars and vectors.\n
@@ -102,6 +102,12 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Create a sparse matrix with all structural zeros */
     explicit Matrix(const std::pair<int, int>& rc);
+
+    /** \brief  Access functions of the node */
+    std::vector<DataType>* operator->() { return &data_;}
+
+    /** \brief  Const access functions of the node */
+    const std::vector<DataType>* operator->() const { return &data_;}
 #endif // SWIG
 
     /** \brief Create a sparse matrix from a sparsity pattern.
@@ -116,7 +122,7 @@ namespace casadi {
      * \param complete  set to true to also check elementwise
      * throws an error as possible result
      */
-    void sanityCheck(bool complete=false) const;
+    void sanity_check(bool complete=false) const;
 
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
@@ -129,14 +135,14 @@ namespace casadi {
      */
     template<typename A>
     Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.nnz())) {
-      copy(x.begin(), x.end(), begin());
+      copy(x->begin(), x->end(), data_.begin());
     }
 
     /** \brief  Create an expression from a vector  */
     template<typename A>
     Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
-        data_(std::vector<DataType>(x.size())) {
-      copy(x.begin(), x.end(), begin());
+      data_(std::vector<DataType>(x.size())) {
+        copy(x.begin(), x.end(), data_.begin());
     }
 
 #ifndef SWIG
@@ -154,23 +160,23 @@ namespace casadi {
 
     /// Expose base class functions
     using B::nnz;
-    using B::sizeL;
-    using B::sizeU;
+    using B::nnz_lower;
+    using B::nnz_upper;
     using B::numel;
     using B::size1;
     using B::size2;
-    using B::shape;
-    using B::isempty;
-    using B::isscalar;
-    using B::isdense;
-    using B::isvector;
-    using B::isrow;
-    using B::iscolumn;
-    using B::istril;
-    using B::istriu;
+    using B::size;
+    using B::is_empty;
+    using B::is_scalar;
+    using B::is_dense;
+    using B::is_vector;
+    using B::is_row;
+    using B::is_column;
+    using B::is_tril;
+    using B::is_triu;
     using B::colind;
     using B::row;
-    using B::dimString;
+    using B::dim;
     using B::sym;
     using B::zeros;
     using B::ones;
@@ -179,28 +185,6 @@ namespace casadi {
     using B::zz_horzsplit;
     using B::zz_vertsplit;
     using B::zz_diagsplit;
-
-    /// \cond INTERNAL
-    /// Expose iterators
-    typedef typename std::vector<DataType>::iterator iterator;
-    typedef typename std::vector<DataType>::const_iterator const_iterator;
-
-    /// References
-    typedef DataType& reference;
-    typedef const DataType& const_reference;
-
-    /// Get iterators to beginning and end
-    iterator begin() { return data().begin();}
-    const_iterator begin() const { return data().begin();}
-    iterator end() { return data().end();}
-    const_iterator end() const { return data().end();}
-
-    /// Get references to beginning and end
-    reference front() { return data().front();}
-    const_reference front() const { return data().front();}
-    reference back() { return data().back();}
-    const_reference back() const { return data().back();}
-    /// \endcond
 
     /// Get a non-zero element
     inline const DataType& at(int k) const {
@@ -235,10 +219,10 @@ namespace casadi {
     /// Returns the truth value of a Matrix
     bool __nonzero__() const;
 
-    /// Is the Matrix a Slice (only for IMatrix)
+    /// Is the Matrix a Slice (only for IM)
     bool isSlice(bool ind1=false) const;
 
-    ///  Convert to Slice (only for IMatrix)
+    ///  Convert to Slice (only for IM)
     Slice toSlice(bool ind1=false) const;
 
     /** \brief Set all the entries without changing sparsity pattern */
@@ -421,7 +405,7 @@ namespace casadi {
     Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_mod(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_simplify() const;
-    bool zz_isEqual(const Matrix<DataType> &ex2, int depth=0) const;
+    bool zz_is_equal(const Matrix<DataType> &ex2, int depth=0) const;
     Matrix<DataType> zz_copysign(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_constpow(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_not() const;
@@ -429,11 +413,13 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
-    Matrix<DataType> zz_jacobian(const Matrix<DataType> &arg) const;
-    Matrix<DataType> zz_gradient(const Matrix<DataType> &arg) const;
-    Matrix<DataType> zz_tangent(const Matrix<DataType> &arg) const;
-    Matrix<DataType> zz_hessian(const Matrix<DataType> &arg) const;
-    Matrix<DataType> zz_hessian(const Matrix<DataType> &arg, Matrix<DataType>& g) const;
+    static Matrix<DataType> jacobian(const Matrix<DataType> &f, const Matrix<DataType> &x,
+                                     bool symmetric=false);
+    static Matrix<DataType> gradient(const Matrix<DataType> &f, const Matrix<DataType> &x);
+    static Matrix<DataType> tangent(const Matrix<DataType> &f, const Matrix<DataType> &x);
+    static Matrix<DataType> hessian(const Matrix<DataType> &f, const Matrix<DataType> &x);
+    static Matrix<DataType> hessian(const Matrix<DataType> &f, const Matrix<DataType> &x,
+                                    Matrix<DataType>& g);
     Matrix<DataType> zz_substitute(const Matrix<DataType>& v, const Matrix<DataType>& vdef) const;
     static std::vector<Matrix<DataType> >
       zz_substitute(const std::vector<Matrix<DataType> >& ex,
@@ -449,14 +435,19 @@ namespace casadi {
     Matrix<DataType> zz_solve(const Matrix<DataType>& b,
                               const std::string& lsolver, const Dict& opts) const;
     int zz_countNodes() const;
-    std::string zz_getOperatorRepresentation(const std::vector<std::string>& args) const;
+    std::string zz_print_operator(const std::vector<std::string>& args) const;
     static void zz_extractShared(std::vector<Matrix<DataType> >& ex,
                                  std::vector<Matrix<DataType> >& v,
                                  std::vector<Matrix<DataType> >& vdef,
                                  const std::string& v_prefix,
                                  const std::string& v_suffix);
-    Matrix<DataType> zz_quad_form() const { return B::zz_quad_form();}
-    Matrix<DataType> zz_quad_form(const Matrix<DataType>& A) const;
+    static Matrix<DataType> _bilin(const Matrix<DataType>& A,
+                                  const Matrix<DataType>& x,
+                                  const Matrix<DataType>& y);
+    static Matrix<DataType> _rank1(const Matrix<DataType>& A,
+                                   const Matrix<DataType>& alpha,
+                                   const Matrix<DataType>& x,
+                                   const Matrix<DataType>& y);
     Matrix<DataType> zz_if_else(const Matrix<DataType> &if_true,
                                 const Matrix<DataType> &if_false,
                                 bool short_circuit) const;
@@ -477,7 +468,7 @@ namespace casadi {
     Matrix<DataType> zz_norm_inf() const;
     Matrix<DataType> zz_sumCols() const;
     Matrix<DataType> zz_sumRows() const;
-    Matrix<DataType> zz_inner_prod(const Matrix<DataType> &y) const;
+    static Matrix<DataType> dot(const Matrix<DataType> &x, const Matrix<DataType> &y);
     Matrix<DataType> zz_outer_prod(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_nullspace() const;
     Matrix<DataType> zz_diag() const;
@@ -491,10 +482,10 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for SparsityInterface
-    static Matrix<DataType> zz_blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
-    static Matrix<DataType> zz_horzcat(const std::vector<Matrix<DataType> > &v);
+    static Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
+    static Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
     std::vector<Matrix<DataType> > zz_horzsplit(const std::vector<int>& offset) const;
-    static Matrix<DataType> zz_vertcat(const std::vector<Matrix<DataType> > &v);
+    static Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
     std::vector< Matrix<DataType> > zz_vertsplit(const std::vector<int>& offset) const;
     std::vector< Matrix<DataType> > zz_diagsplit(const std::vector<int>& offset1,
                                                  const std::vector<int>& offset2) const;
@@ -521,7 +512,7 @@ namespace casadi {
     Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
                                          const Matrix<DataType> &b, int order,
                                          const Matrix<DataType>& w) const;
-    Matrix<DataType> zz_jacobianTimesVector(const Matrix<DataType> &arg, const Matrix<DataType> &v,
+    Matrix<DataType> zz_jmtimes(const Matrix<DataType> &arg, const Matrix<DataType> &v,
                                             bool transpose_jacobian=false) const;
     Matrix<DataType> zz_taylor(const Matrix<DataType>& x,
                                const Matrix<DataType>& a, int order) const;
@@ -540,7 +531,7 @@ namespace casadi {
     Matrix<DataType> zz_cofactor(int i, int j) const;
     Matrix<DataType> zz_chol() const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
-    static Matrix<DataType> zz_diagcat(const std::vector< Matrix<DataType> > &A);
+    static Matrix<DataType> diagcat(const std::vector< Matrix<DataType> > &A);
     ///@}
     /// \endcond
 #endif // SWIG
@@ -586,7 +577,7 @@ namespace casadi {
     /** \brief Obtain a Cholesky factorisation of a matrix
      * Returns an upper triangular R such that R'R = A.
      * Matrix A must be positive definite.
-     * 
+     *
      * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
      * There is an open ticket #1212 to make it sparse.
      */
@@ -741,11 +732,11 @@ namespace casadi {
         expressions, it will use directional derivatives which is typically (but
         not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
     */
-    friend inline Matrix<DataType> jacobianTimesVector(const Matrix<DataType> &ex,
+    friend inline Matrix<DataType> jmtimes(const Matrix<DataType> &ex,
                                                        const Matrix<DataType> &arg,
                                                        const Matrix<DataType> &v,
                                                        bool transpose_jacobian=false) {
-      return ex.zz_jacobianTimesVector(arg, v, transpose_jacobian);
+      return ex.zz_jmtimes(arg, v, transpose_jacobian);
     }
 
     ///@{
@@ -851,6 +842,49 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int getEqualityCheckingDepth();
 
+    /** \brief Get function input */
+    static std::vector<Matrix<DataType> > get_input(const Function& f);
+
+    ///@{
+    /** \brief Jacobian expression */
+    static Matrix<DataType> jac(const Function& f, int iind=0, int oind=0,
+                  bool compact=false, bool symmetric=false);
+    static Matrix<DataType> jac(const Function& f, const std::string & iname, int oind=0,
+                  bool compact=false, bool symmetric=false);
+    static Matrix<DataType> jac(const Function& f, int iind, const std::string& oname,
+                  bool compact=false, bool symmetric=false);
+    static Matrix<DataType> jac(const Function& f, const std::string& iname,
+                                const std::string& oname,
+                                bool compact=false, bool symmetric=false);
+    ///@}
+
+    ///@{
+    /** \brief Gradient expression */
+    static Matrix<DataType> grad(const Function& f, int iind=0, int oind=0);
+    static Matrix<DataType> grad(const Function& f, const std::string& iname, int oind=0);
+    static Matrix<DataType> grad(const Function& f, int iind, const std::string& oname);
+    static Matrix<DataType> grad(const Function& f, const std::string& iname,
+                                 const std::string& oname);
+    ///@}
+
+    ///@{
+    /** \brief Tangent expression */
+    static Matrix<DataType> tang(const Function& f, int iind=0, int oind=0);
+    static Matrix<DataType> tang(const Function& f, const std::string& iname, int oind=0);
+    static Matrix<DataType> tang(const Function& f, int iind, const std::string& oname);
+    static Matrix<DataType> tang(const Function& f, const std::string& iname,
+                                 const std::string& oname);
+    ///@}
+
+    ///@{
+    /** \bried Hessian expression */
+    static Matrix<DataType> hess(const Function& f, int iind=0, int oind=0);
+    static Matrix<DataType> hess(const Function& f, const std::string& iname, int oind=0);
+    static Matrix<DataType> hess(const Function& f, int iind, const std::string& oname);
+    static Matrix<DataType> hess(const Function& f, const std::string& iname,
+                                 const std::string& oname);
+    ///@}
+
     /// Get name of the class
     static std::string className();
 
@@ -908,12 +942,20 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Get a pointer to the data
-    DataType* ptr() { return isempty() ? static_cast<DataType*>(0) : &front();}
-    friend inline DataType* getPtr(Matrix<DataType>& v) { return v.ptr();}
+    DataType* ptr() {
+      return is_empty() ? static_cast<DataType*>(0) : &data_.front();
+    }
+    friend inline DataType* getPtr(Matrix<DataType>& v) {
+      return v.ptr();
+    }
 
     /// Get a const pointer to the data
-    const DataType* ptr() const { return isempty() ? static_cast<const DataType*>(0) : &front();}
-    friend inline const DataType* getPtr(const Matrix<DataType>& v) { return v.ptr();}
+    const DataType* ptr() const {
+      return is_empty() ? static_cast<const DataType*>(0) : &data_.front();
+    }
+    friend inline const DataType* getPtr(const Matrix<DataType>& v) {
+      return v.ptr();
+    }
     /// \endcond
 
     /// Const access the sparsity - reference to data member
@@ -986,74 +1028,74 @@ namespace casadi {
     static Matrix<DataType> eye(int ncol);
 
     /** \brief Returns a number that is unique for a given symbolic scalar
-     * 
-     * Only defined if symbolic scalar. 
+     *
+     * Only defined if symbolic scalar.
      */
-    size_t getElementHash() const;
+    size_t element_hash() const;
 
     /// Checks if expression does not contain NaN or Inf
-    bool isRegular() const;
+    bool is_regular() const;
 
     /** \brief Check if smooth */
-    bool isSmooth() const;
+    bool is_smooth() const;
 
     /** \brief Check if SX is a leaf of the SX graph
-    
-        Only defined if symbolic scalar. 
+
+        Only defined if symbolic scalar.
     */
-    bool isLeaf() const;
+    bool is_leaf() const;
 
     /** \brief Check whether a binary SX is commutative
-    
-        Only defined if symbolic scalar. 
+
+        Only defined if symbolic scalar.
     */
-    bool isCommutative() const;
+    bool is_commutative() const;
 
     /** \brief Check if symbolic (Dense)
         Sparse matrices invariable return false
     */
-    bool isSymbolic() const;
+    bool is_symbolic() const;
 
     /** \brief Check if matrix can be used to define function inputs.
         Sparse matrices can return true if all non-zero elements are symbolic
     */
-    bool isValidInput() const;
+    bool is_valid_input() const;
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
         true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
-        Note: Will mark the node using SXElement::setTemp.
+        Note: Will mark the node using SXElem::setTemp.
         Make sure to call resetInput() after usage.
     */
-    bool hasDuplicates();
+    bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     void resetInput();
   /// \endcond
 
     /** \brief Check if the matrix is constant (note that false negative answers are possible)*/
-    bool isConstant() const;
+    bool is_constant() const;
 
     /** \brief Check if the matrix is integer-valued
      * (note that false negative answers are possible)*/
-    bool isInteger() const;
+    bool is_integer() const;
 
     /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
-    bool isZero() const;
+    bool is_zero() const;
 
     /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
-    bool isOne() const;
+    bool is_one() const;
 
     /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
-    bool isMinusOne() const;
+    bool is_minus_one() const;
 
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
      * are possible)*/
-    bool isIdentity() const;
+    bool is_identity() const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
-    bool hasNonStructuralZeros() const;
+    bool has_zeros() const;
 
     /** \brief Get double value (only if constant) */
     double getValue() const;
@@ -1077,7 +1119,6 @@ namespace casadi {
     std::vector<int> nonzeros_int() const;
 
 #ifndef SWIG
-#ifdef USE_CXX11
     /** \brief Type conversion to double */
     explicit operator double() const;
 
@@ -1086,20 +1127,19 @@ namespace casadi {
 
     /** \brief Type conversion to int */
     explicit operator int() const;
-#endif // USE_CXX11
 #endif // SWIG
 
     /** \brief Get name (only if symbolic scalar) */
     std::string getName() const;
 
-    /** \brief Get expressions of the children of the expression 
-        Only defined if symbolic scalar. 
-        Wraps SXElement SXElement::getDep(int ch=0) const.
+    /** \brief Get expressions of the children of the expression
+        Only defined if symbolic scalar.
+        Wraps SXElem SXElem::getDep(int ch=0) const.
      */
     Matrix<DataType> getDep(int ch=0) const;
 
-    /** \brief Get the number of dependencies of a binary SXElement
-        Only defined if symbolic scalar. 
+    /** \brief Get the number of dependencies of a binary SXElem
+        Only defined if symbolic scalar.
     */
     int getNdeps() const;
 
@@ -1137,16 +1177,12 @@ namespace casadi {
 
   ///@{
   /// Readability typedefs
-  typedef Matrix<int> IMatrix;
-  typedef Matrix<double> DMatrix;
-  typedef std::vector<DMatrix> DMatrixVector;
-  typedef std::vector<DMatrixVector> DMatrixVectorVector;
-  typedef std::map<std::string, DMatrix> DMatrixDict;
+  typedef Matrix<int> IM;
+  typedef Matrix<double> DM;
+  typedef std::vector<DM> DMVector;
+  typedef std::vector<DMVector> DMVectorVector;
+  typedef std::map<std::string, DM> DMDict;
   ///@}
 } // namespace casadi
-
-#ifdef casadi_implementation
-#include "matrix_impl.hpp"
-#endif
 
 #endif // CASADI_MATRIX_HPP

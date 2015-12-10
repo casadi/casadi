@@ -34,12 +34,12 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::evalD(const double** arg, double** res, int* iw, double* w) {
+  void SubAssign::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void SubAssign::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void SubAssign::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
@@ -47,11 +47,11 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void SubAssign::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     casadi_error("not ready");
   }
 
-  void SubAssign::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void SubAssign::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     casadi_error("not ready");
   }
 
@@ -61,7 +61,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void SubAssign::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SubAssign::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     casadi_error("not ready");
   }
 
@@ -75,8 +75,8 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                           CodeGenerator& g) const {
+  void SubAssign::generate(CodeGenerator& g, const std::string& mem,
+                           const std::vector<int>& arg, const std::vector<int>& res) const {
     casadi_error("not ready");
   }
 

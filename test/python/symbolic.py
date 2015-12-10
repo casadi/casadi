@@ -73,16 +73,15 @@ class Symbolictests(casadiTestCase):
       for b1 in nodes():
         yield b1
         
-    for a_s, b_s, xfunction in [(SX.sym("a"),SX.sym("b"),SXFunction),(MX.sym("a"),MX.sym("b"),MXFunction)]:
-      print  xfunction
+    for a_s, b_s in [(SX.sym("a"),SX.sym("b")),(MX.sym("a"),MX.sym("b"))]:
       i=0
       for op1 in operations_node():
         for op2 in operations_node():
            for op3 in operations_toplevel(op1,op2):
              i+= 1
              e = eval(op3,{"a": a_s, "b": b_s})
-             f = xfunction("f", [a_s,b_s],[e])
-             #print i, xfunction, op1, op2, op3, " -> ", e
+             f = Function("f", [a_s,b_s],[e])
+             #print i, op1, op2, op3, " -> ", e
              f.setInput(numbers[0],0)
              f.setInput(numbers[1],1)
              f.evaluate()

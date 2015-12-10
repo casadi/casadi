@@ -42,14 +42,13 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::evalD(const double** arg, double** res, int* iw, double* w) {
+  void SymbolicMX::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
   }
 
-  void SymbolicMX::evalSX(const SXElement** arg, SXElement** res,
-                          int* iw, SXElement* w) {
+  void SymbolicMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
   }
 
-  void SymbolicMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
   }
 
   void SymbolicMX::evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -64,35 +63,33 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::spFwd(const bvec_t** arg,
-                         bvec_t** res, int* iw, bvec_t* w) {
+  void SymbolicMX::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void SymbolicMX::spAdj(bvec_t** arg,
-                         bvec_t** res, int* iw, bvec_t* w) {
+  void SymbolicMX::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void SymbolicMX::getPrimitives(std::vector<MX>::iterator& it) const {
+  void SymbolicMX::primitives(std::vector<MX>::iterator& it) const {
     *it++ = shared_from_this<MX>();
   }
 
-  void SymbolicMX::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void SymbolicMX::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     *it++ = x;
   }
 
-  MX SymbolicMX::joinPrimitives(std::vector<MX>::const_iterator& it) const {
+  MX SymbolicMX::join_primitives(std::vector<MX>::const_iterator& it) const {
     MX ret = *it++;
-    if (ret.shape()==shape()) {
+    if (ret.size()==size()) {
       return ret;
     } else {
-      casadi_assert(ret.isempty(true));
-      return MX(shape());
+      casadi_assert(ret.is_empty(true));
+      return MX(size());
     }
   }
 
-  bool SymbolicMX::hasDuplicates() {
+  bool SymbolicMX::has_duplicates() {
     if (this->temp!=0) {
       userOut<true, PL_WARN>() << "Duplicate expression: " << getName() << endl;
       return true;

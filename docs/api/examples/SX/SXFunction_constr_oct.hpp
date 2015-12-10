@@ -23,7 +23,7 @@
  */
 
 /** 
-* This examples demonstrates how to create an SXFunction in octave
+* This examples demonstrates how to create a Function in octave
 *
 * \example SX/SXFunction_constr_oct.m
 *
@@ -33,6 +33,6 @@
 *
 * \sa
 * \code
-*  casadi::SXFunction();
+*  casadi::Function();
 * \endcode
 */

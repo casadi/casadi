@@ -29,7 +29,7 @@ x = ssym("x",10)
 f = x+5
 f[2] = 44
 f[3] = 55
-f[4:7] += inner_prod(x[1:4],x[1:4])
+f[4:7] += dot(x[1:4],x[1:4])
 fcn = SXFunction([x],[f])
 
 # Use forward or adjoint mode ad to calculate directional derivatives (uncomment one to force a mode)
@@ -68,5 +68,5 @@ print "J2(x0)", array(J2.getOutput())
 
 # Print difference
 print "Difference: ", J2.getOutput()-J1.getOutput()
-assert isEqual(J1.getOutput(),J2.getOutput())
+assert is_equal(J1.getOutput(),J2.getOutput())
 

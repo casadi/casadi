@@ -25,8 +25,6 @@
 
 #include "../function/function_internal.hpp"
 #include "../casadi_options.hpp"
-#include "wrapper.hpp"
-#include "adaptor.hpp"
 
 #include <stdlib.h>
 
@@ -35,7 +33,12 @@
 // For dynamic loading
 #ifdef WITH_DL
 #ifdef _WIN32 // also for 64-bit
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0502
+#endif
 #include <windows.h>
 #else // _WIN32
 #include <dlfcn.h>
@@ -83,13 +86,13 @@ namespace casadi {
     typedef int (*RegFcn)(Plugin* plugin);
 
     /// Check if a plugin is available or can be loaded
-    static bool hasPlugin(const std::string& name, bool verbose=false);
+    static bool hasPlugin(const std::string& pname, bool verbose=false);
 
     /// Instantiate a Plugin struct from a factory function
     static Plugin pluginFromRegFcn(RegFcn regfcn);
 
     /// Load a plugin dynamically
-    static Plugin loadPlugin(const std::string& name, bool register_plugin=true);
+    static Plugin loadPlugin(const std::string& pname, bool register_plugin=true);
 
     /// Register an integrator in the factory
     static void registerPlugin(const Plugin& plugin);
@@ -98,20 +101,23 @@ namespace casadi {
     static void registerPlugin(RegFcn regfcn);
 
     /// Load and get the creator function
-    static Plugin& getPlugin(const std::string& name);
+    static Plugin& getPlugin(const std::string& pname);
 
     // Create solver instance
     template<class Problem>
-      static Derived* instantiatePlugin(const std::string& name, Problem problem);
+      static Derived* instantiatePlugin(const std::string& fname,
+                                        const std::string& pname, Problem problem);
+    // Get name of the plugin
+    virtual const char* plugin_name() const = 0;
   };
 
   template<class Derived>
-  bool PluginInterface<Derived>::hasPlugin(const std::string& name, bool verbose) {
+  bool PluginInterface<Derived>::hasPlugin(const std::string& pname, bool verbose) {
 
     // Check if any dot in the name, i.e. an adaptor
-    std::string::size_type dotpos = name.find(".");
+    std::string::size_type dotpos = pname.find(".");
 
-    std::string short_name = name.substr(0, dotpos);
+    std::string short_name = pname.substr(0, dotpos);
 
     // Quick return if available
     if (Derived::solvers_.find(short_name) != Derived::solvers_.end()) {
@@ -123,7 +129,7 @@ namespace casadi {
       Plugin plugin = loadPlugin(short_name, false);
       // Do a recursion if the name contains dots
       if (plugin.adaptorHasPlugin!=0 && dotpos!=std::string::npos) {
-        return plugin.adaptorHasPlugin(name.substr(dotpos+1));
+        return plugin.adaptorHasPlugin(pname.substr(dotpos+1));
       }
       return true;
     } catch (CasadiException& ex) {
@@ -151,10 +157,10 @@ namespace casadi {
 
   template<class Derived>
   typename PluginInterface<Derived>::Plugin
-      PluginInterface<Derived>::loadPlugin(const std::string& name, bool register_plugin) {
+      PluginInterface<Derived>::loadPlugin(const std::string& pname, bool register_plugin) {
     // Issue warning and quick return if already loaded
-    if (Derived::solvers_.find(name) != Derived::solvers_.end()) {
-      casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
+    if (Derived::solvers_.find(pname) != Derived::solvers_.end()) {
+      casadi_warning("PluginInterface: Solver " + pname + " is already in use. Ignored.");
       return Plugin();
     }
 
@@ -167,10 +173,10 @@ namespace casadi {
 
     // Get the name of the shared library
     std::string lib = SHARED_LIBRARY_PREFIX "casadi_"
-      + Derived::infix_ + "_" + name + SHARED_LIBRARY_SUFFIX;
+      + Derived::infix_ + "_" + pname + SHARED_LIBRARY_SUFFIX;
 
     // Load the dll
-    std::string regName = "casadi_register_" + Derived::infix_ + "_" + name;
+    std::string regName = "casadi_register_" + Derived::infix_ + "_" + pname;
 
     // Build up search paths;
     std::vector<std::string> search_paths;
@@ -253,8 +259,8 @@ namespace casadi {
       handle = LoadLibrary(TEXT(lib.c_str()));
       SetDllDirectory(NULL);
 #else // _WIN32
-      std::string name = searchpath.size()==0 ? lib : searchpath + filesep + lib;
-      handle = dlopen(name.c_str(), flag);
+      std::string pname = searchpath.size()==0 ? lib : searchpath + filesep + lib;
+      handle = dlopen(pname.c_str(), flag);
 #endif // _WIN32
       if (handle) {
         break;
@@ -313,20 +319,20 @@ namespace casadi {
 
   template<class Derived>
   typename PluginInterface<Derived>::Plugin&
-  PluginInterface<Derived>::getPlugin(const std::string& name) {
+  PluginInterface<Derived>::getPlugin(const std::string& pname) {
 
 
     // Check if any dot in the name, i.e. an adaptor
-    std::string::size_type dotpos = name.find(".");
-    if (dotpos != std::string::npos) return getPlugin(name.substr(0, dotpos));
+    std::string::size_type dotpos = pname.find(".");
+    if (dotpos != std::string::npos) return getPlugin(pname.substr(0, dotpos));
 
     // Check if the solver has been loaded
-    typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(name);
+    typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(pname);
 
     // Load the solver if needed
     if (it==Derived::solvers_.end()) {
-      loadPlugin(name);
-      it=Derived::solvers_.find(name);
+      loadPlugin(pname);
+      it=Derived::solvers_.find(pname);
     }
     casadi_assert(it!=Derived::solvers_.end());
     return it->second;
@@ -335,29 +341,30 @@ namespace casadi {
   template<class Derived>
   template<class Problem>
   Derived*
-  PluginInterface<Derived>::instantiatePlugin(const std::string& name, Problem problem) {
+  PluginInterface<Derived>::instantiatePlugin(const std::string& fname,
+                                              const std::string& pname, Problem problem) {
 
     // Assert the plugin exists (needed for adaptors)
-    if (!hasPlugin(name, true)) {
-      casadi_error("Plugin '" << name << "' is not found.");
+    if (!hasPlugin(pname, true)) {
+      casadi_error("Plugin '" << pname << "' is not found.");
     }
 
     // Check if any dot in the name, i.e. an adaptor
-    std::string::size_type dotpos = name.find(".");
+    std::string::size_type dotpos = pname.find(".");
     if (dotpos == std::string::npos) {
       // No dot, normal instantiation
-      return getPlugin(name).creator(problem);
+      return getPlugin(pname).creator(fname, problem);
     } else {
       // Dot present, separate adaptor name from solver name
-      std::string adaptor_name = name.substr(0, dotpos);
-      std::string solver_name = name.substr(dotpos+1);
+      std::string adaptor_name = pname.substr(0, dotpos);
+      std::string solver_name = pname.substr(dotpos+1);
 
       // Load the adaptor
-      Derived* adaptor = getPlugin(adaptor_name).creator(problem);
+      Derived* adaptor = getPlugin(adaptor_name).creator(fname, problem);
 
       // Pass solver name to adaptor
       if (adaptor->getAdaptorSolverName().size()==0) {
-        adaptor->setOption(adaptor_name + "_solver", solver_name);
+        adaptor->setOption(adaptor_name, solver_name);
       } else {
         adaptor->setOption(adaptor->getAdaptorSolverName(), solver_name);
       }

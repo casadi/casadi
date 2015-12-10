@@ -1,46 +1,19 @@
-%exception  casadi::Adaptor< Derived, Solver >::addOptions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::init() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::inputD(int i) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::inputD(int i) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::outputD(int i) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::outputD(int i) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::readInputs() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DenseIO< Derived >::writeOutputs() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::callDerivative(const DMatrixVector &arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed, DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed, DMatrixVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::callDerivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::callDerivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Function::checkInputs() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::derivative(const DMVector &arg, DMVector &output_res, const DMVectorVector &fseed, DMVectorVector &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::derivative(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Function::derivative(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens, bool always_inline=false, bool never_inline=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::spCanEvaluate(bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::spEvaluate(bool fwd) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Function::spInit(bool fwd) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::sz_arg() const  {
@@ -53,6 +26,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::sz_w() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix< SX >::sym(const std::string &name, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::IOInterface< Function  >::getInput(T val, const std::string &iname) {
@@ -85,22 +61,16 @@
 %exception  casadi::LibInfo< Compiler >::get(FcnPtr &fcnPtr, const std::string &sym) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LibInfo< Compiler >::name() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::LibInfo< std::string >::clear() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LibInfo< std::string >::get(FcnPtr &fcnPtr, const std::string &sym) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LibInfo< std::string >::name() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::MX::getTemp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::hasDuplicates() {
+%exception  casadi::MX::has_duplicates() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::resetInput() {
@@ -109,13 +79,10 @@
 %exception  casadi::MX::setTemp(int t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MXFunction::generateLiftingFunctions(MXFunction &output_vdef_fcn, MXFunction &output_vinit_fcn) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Matrix< DataType >::binary(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Matrix< DataType >::hasDuplicates() {
+%exception  casadi::Matrix< DataType >::has_duplicates() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< DataType >::matrix_matrix(int op, const Matrix< DataType > &x, const Matrix< DataType > &y) {
@@ -133,40 +100,16 @@
 %exception  casadi::Matrix< DataType >::unary(int op, const Matrix< DataType > &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name) const  {
+%exception  casadi::OptionsFunctionality::optionAllowedIndex(const std::string &name) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name) const  {
+%exception  casadi::OptionsFunctionality::optionEnumValue(const std::string &name) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string &name, int i) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name, int v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_ENTRY >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_EXIT >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_IO >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_NAME >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_SOURCE >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ProfilingType< ProfilingData_TIMELINE >() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SharedObject::assertInit() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObject::printPtr(std::ostream &stream=casadi::userOut()) const  {
@@ -205,64 +148,34 @@
 %exception  casadi::SparseStorage< DataType >::toScalar() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sparsity::reCache() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_tril(bool includeDiagonal=true) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Sparsity::zz_triu(bool includeDiagonal=true) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::WeakRef::alive() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::shared() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Wrapper< Derived >::checkDimensions() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Wrapper< Derived >::evaluate() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::diffTimers(const timer t1, const timer t0) {
+%exception  casadi::diffTimers(const Timer t1, const Timer t0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::diffToDict(const diffTime &diff) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::getRealTime() {
+%exception  casadi::diffToDict(const DiffTime &diff) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::getTimerTime(void) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::hash_combine(std::size_t &seed, T v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::hash_combine(std::size_t &seed, const std::vector< int > &v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::hash_sparsity(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::hash_value(T v) {
+%exception  casadi::is_regular(N_Vector v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::iszero(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::matrixName< SXElem >() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::operation_checker(unsigned int op) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::profileWrite(std::ofstream &f, const T &s) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::profileWriteBare(std::ofstream &f, const T &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ptrVec(const std::vector< T > &v) {
@@ -277,7 +190,13 @@
 %exception  casadi::ptrVec(std::vector< std::vector< T > > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::timerPlusEq(diffTime &t, const diffTime diff) {
+%exception  casadi::replaceMat(const M &arg, const Sparsity &inp, bool hcat=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::timerPlusEq(DiffTime &t, const DiffTime diff) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2, isqLog sqLog) {
@@ -340,16 +259,13 @@
 %exception casadi::LibInfo< Compiler >::LibInfo() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LibInfo< Compiler >::LibInfo(const Compiler &compiler, const std::string &name) {
+%exception casadi::LibInfo< Compiler >::LibInfo(const Compiler &compiler) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LibInfo< std::string >::LibInfo() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LibInfo< std::string >::LibInfo(const std::string &bin_name, const std::string &name) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::LinearSolver::LinearSolver() {
+%exception casadi::LibInfo< std::string >::LibInfo(const std::string &bin_name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Matrix< DataType >::Matrix(const Sparsity &sp, const DataType &val, bool dummy) {

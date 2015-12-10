@@ -26,7 +26,7 @@ import casadi.*
 disp 'Testing sensitivity analysis in CasADi'
 
 % All ODE and DAE integrators to be tested
-DAE_integrators = {'idas','collocation','oldcollocation'};
+DAE_integrators = {'idas','collocation'};
 ODE_integrators = {'cvodes','rk', DAE_integrators{:}};
 
 for ode=0:1
@@ -57,8 +57,8 @@ for ode=0:1
     % Quadrature
     quad = v^3 + ((3-sin(t)) - u)^2;
 
-    % DAE callback function
-    ffcn = SXFunction('ffcn', daeIn('t',t,'x',x,'p',u),daeOut('ode',ode,'quad',quad));
+    % DAE
+    dae = struct('t', t, 'x', x, 'p', u, 'ode', ode, 'quad', quad);
 
     % Time length
     tf = 0.5;
@@ -92,8 +92,8 @@ for ode=0:1
     % Quadrature
     quad = x*x + 3.0*u*u;
 
-    % DAE callback function
-    ffcn = SXFunction('ffcn', daeIn('x',x,'z',z,'p',u),daeOut('ode',ode,'alg',alg,'quad',quad));
+    % DAE
+    dae = struct('x', x, 'z', z, 'p', u, 'ode', ode, 'alg', alg, 'quad', quad);
     
     % End time
     tf = 5;
@@ -116,16 +116,13 @@ for ode=0:1
     % Integrator options
     opts = struct;
     opts.tf = tf;
-    if strcmp(MyIntegrator,'collocation') | strcmp(MyIntegrator,'oldcollocation')
+    if strcmp(MyIntegrator,'collocation')
       opts.implicit_solver = 'kinsol';
       opts.implicit_solver_options = struct('linear_solver', 'csparse');
-      if strcmp(MyIntegrator,'oldcollocation')
-        opts.expand_f=true;
-      end
     end
 
     % Integrator
-    I = Integrator('myintegrator', MyIntegrator, ffcn, opts);
+    I = casadi.integrator('myintegrator', MyIntegrator, dae, opts);
 
     % Integrate to get results
     arg = struct;
@@ -146,7 +143,7 @@ for ode=0:1
         (xf_pert-xf)/h, (qf_pert-qf)/h);
 
     % Calculate once directional derivative, forward mode
-    I_fwd = I.derForward(1);
+    I_fwd = I.forward(1);
     arg = struct('der_x0',x0,'der_p',u0,'der_xf',xf,'der_qf',qf);
     arg.fwd0_x0 = 0;
     arg.fwd0_p = 1;
@@ -157,7 +154,7 @@ for ode=0:1
         fwd_xf, fwd_qf);
 
     % Calculate one directional derivative, reverse mode
-    I_adj = I.derReverse(1);
+    I_adj = I.reverse(1);
     arg = struct('der_x0',x0,'der_p',u0,'der_xf',xf,'der_qf',qf);
     arg.adj0_xf = 0;
     arg.adj0_qf = 1;
@@ -177,7 +174,7 @@ for ode=0:1
         (adj_x0_pert-adj_x0)/h, (adj_p_pert-adj_p)/h);
 
     % Forward over adjoint to get the second order sensitivities
-    I_foa = I_adj.derForward(1);
+    I_foa = I_adj.forward(1);
     arg = struct('der_der_x0',x0,'der_der_p',u0,'der_der_xf',xf,'der_der_qf',qf);
     arg.der_adj0_x0 = adj_x0;
     arg.der_adj0_p = adj_p;
@@ -191,7 +188,7 @@ for ode=0:1
         fwd_adj_x0, fwd_adj_p);
 
     % Adjoint over adjoint to get the second order sensitivities
-    I_aoa = I_adj.derReverse(1);
+    I_aoa = I_adj.reverse(1);
     arg = struct('der_der_x0',x0,'der_der_p',u0,'der_der_xf',xf,'der_der_qf',qf);
     arg.der_adj0_x0 = adj_x0;
     arg.der_adj0_p = adj_p;

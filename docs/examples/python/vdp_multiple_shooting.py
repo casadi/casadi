@@ -27,40 +27,29 @@ import matplotlib.pyplot as plt
 
 nk = 20      # Control discretization
 tf = 10.0    # End time
-coll = False # Use collocation integrator
 
 # Declare variables (use scalar graph)
-t  = SX.sym("t")    # time
-u  = SX.sym("u")    # control
-x  = SX.sym("x",3)  # state
+u  = SX.sym('u')    # control
+x  = SX.sym('x',3)  # state
 
 # ODE rhs function
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
        x[0], \
        x[0]*x[0] + x[1]*x[1] + u*u])
-dae = SXFunction("dae", daeIn(x=x, p=u, t=t), daeOut(ode=ode))
+dae = {'x':x, 'p':u, 'ode':ode}
 
 # Create an integrator
-opts = {"tf":tf/nk} # final time
-if coll:
-  opts["number_of_finite_elements"] = 5
-  opts["interpolation_order"] = 5
-  opts["collocation_scheme"] = "legendre"
-  opts["implicit_solver"] = "kinsol"
-  opts["implicit_solver_options"] =  {'linear_solver' : 'csparse'}
-  opts["expand_f"] = True
-  integrator = Integrator("integrator", "oldcollocation", dae, opts)
-else:
-  opts["abstol"] = 1e-8 # tolerance
-  opts["reltol"] = 1e-8 # tolerance
-  opts["steps_per_checkpoint"] = 1000
-  integrator = Integrator("integrator", "cvodes", dae, opts)
+opts = {'tf':tf/nk} # final time
+opts['abstol'] = 1e-8 # tolerance
+opts['reltol'] = 1e-8 # tolerance
+opts['steps_per_checkpoint'] = 1000
+F = integrator('F', 'cvodes', dae, opts)
 
 # Total number of variables
 nv = 1*nk + 3*(nk+1)
 
 # Declare variable vector
-V = MX.sym("V", nv)
+V = MX.sym('V', nv)
 
 # Get the expressions for local variables
 U = V[0:nk]
@@ -98,7 +87,7 @@ for k in range(nk):
   Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
   
   # Call the integrator
-  Xk_end = integrator({'x0':Xk,'p':U[k]})["xf"]
+  Xk_end = F({'x0':Xk,'p':U[k]})['xf']
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)
@@ -112,18 +101,18 @@ f = X2[nk]
 g = vertcat(g)
 
 # Create NLP solver instance
-nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=f,g=g))
-solver = NlpSolver("solver", "ipopt", nlp)
+nlp = {'x':V, 'f':f, 'g':g}
+solver = nlpsol('solver', 'ipopt', nlp)
 
 # Solve the problem
-sol = solver({"lbx" : VMIN,
-              "ubx" : VMAX,
-              "x0" : VINIT,
-              "lbg" : NP.concatenate(g_min),
-              "ubg" : NP.concatenate(g_max)})
+sol = solver({'lbx' : VMIN,
+              'ubx' : VMAX,
+              'x0' : VINIT,
+              'lbg' : NP.concatenate(g_min),
+              'ubg' : NP.concatenate(g_max)})
 
 # Retrieve the solution
-v_opt = sol["x"]
+v_opt = sol['x']
 u_opt = v_opt[0:nk]
 x0_opt = v_opt[nk+0::3]
 x1_opt = v_opt[nk+1::3]
@@ -139,7 +128,7 @@ plt.clf()
 plt.plot(tgrid_x,x0_opt,'--')
 plt.plot(tgrid_x,x1_opt,'-')
 plt.plot(tgrid_u,u_opt,'-.')
-plt.title("Van der Pol optimization - multiple shooting")
+plt.title('Van der Pol optimization - multiple shooting')
 plt.xlabel('time')
 plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])
 plt.grid()

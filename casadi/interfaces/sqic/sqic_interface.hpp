@@ -26,33 +26,33 @@
 #ifndef CASADI_SQIC_INTERFACE_HPP
 #define CASADI_SQIC_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
-#include <casadi/interfaces/sqic/casadi_qpsolver_sqic_export.h>
+#include "casadi/core/function/qpsol.hpp"
+#include <casadi/interfaces/sqic/casadi_qpsol_sqic_export.h>
 
-/** \defgroup plugin_QpSolver_sqic
+/** \defgroup plugin_Qpsol_sqic
        Interface to the SQIC solver for quadratic programming
 */
 
-/** \pluginsection{QpSolver,sqic} */
+/** \pluginsection{Qpsol,sqic} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /**  \brief \pluginbrief{QpSolver,sqic}
+  /**  \brief \pluginbrief{Qpsol,sqic}
 
-       @copydoc QpSolver_doc
-       @copydoc plugin_QpSolver_sqic
+       @copydoc Qpsol_doc
+       @copydoc plugin_Qpsol_sqic
        \author Joris Gillis
        \date 2013
 
   */
-  class CASADI_QPSOLVER_SQIC_EXPORT SqicInterface : public QpSolverInternal {
+  class CASADI_QPSOL_SQIC_EXPORT SqicInterface : public Qpsol {
   public:
     /** \brief  Constructor */
     explicit SqicInterface();
 
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
+    static Qpsol* creator(const std::map<std::string, Sparsity>& st) {
       return new SqicInterface(st);
     }
 
@@ -61,6 +61,9 @@ namespace casadi {
 
     /** \brief  Destructor */
     virtual ~SqicInterface();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "sqic";}
 
     /** \brief  Initialize */
     virtual void init();

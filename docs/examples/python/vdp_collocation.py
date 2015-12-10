@@ -38,10 +38,10 @@ x  = SX.sym("x",3)  # state
 rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
                x[0], \
                x[0]*x[0] + x[1]*x[1] + u*u])
-f = SXFunction('f', [t,x,u],[rhs])
+f = Function('f', [t,x,u],[rhs])
 
 # Objective function (meyer term)
-m = SXFunction('m', [t,x,u],[x[2]])
+m = Function('m', [t,x,u],[x[2]])
 
 # Control bounds
 u_min = -0.75
@@ -96,7 +96,7 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SXFunction('lfcn', [tau],[L])
+  lfcn = Function('lfcn', [tau],[L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   [D[j]] = lfcn([1.0])
@@ -173,7 +173,7 @@ for k in range(nk):
       xp_jk += C[r,j]*X[k,r]
       
     # Add collocation equations to the NLP
-    [fk] = f.call([T[k,j], X[k,j], U[k]])
+    [fk] = f([T[k,j], X[k,j], U[k]])
     g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
@@ -192,10 +192,10 @@ for k in range(nk):
 g = vertcat(g)
 
 # Objective function
-[f] = m.call([T[nk-1,d],X[nk,0],U[nk-1]])
+[f] = m([T[nk-1,d],X[nk,0],U[nk-1]])
   
 # NLP
-nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
+nlp = {'x':V, 'f':f, 'g':g}
 
 ## ----
 ## SOLVE THE NLP
@@ -208,7 +208,7 @@ opts["expand"] = True
 opts["linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
   
 # Initial condition

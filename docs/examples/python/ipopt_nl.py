@@ -40,7 +40,7 @@ nl = NlpBuilder()
 nl.parseNL("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP function
-nlp = SXFunction("nlp", nlpIn(x=nl.x),nlpOut(f=nl.f,g=nl.g))
+nlp = {'x':nl.x, 'f':nl.f, 'g':nl.g}
 
 # NLP solver options
 opts = {}
@@ -50,7 +50,7 @@ opts = {}
 # opts["hessian_approximation"] = "limited-memory"
 
 # Create an NLP solver
-nlp_solver = NlpSolver("nlp_solver", "ipopt", nlp, opts)
+nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
   
 # Pass the bounds and initial guess
 arg = {"lbx" : nl.x_lb, 
@@ -60,5 +60,5 @@ arg = {"lbx" : nl.x_lb,
        "x0" : nl.x_init}
   
 # Solve NLP
-res = nlp_solver(arg)
+res = nlpsol(arg)
 

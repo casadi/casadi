@@ -47,12 +47,12 @@ for N in range(1,11):
   
   # Differential equation
   z = SX.sym("z")
-  F = SXFunction("dz/dt", [z],[z*z - 2*z + 1])
+  F = Function("dz/dt", [z],[z*z - 2*z + 1])
   
   z0 = -3
   
   # Analytic solution
-  z_analytic = SXFunction("analytic solution", [t], [(4*t-3)/(3*t+1)])
+  z_analytic = Function("analytic solution", [t], [(4*t-3)/(3*t+1)])
   
   # Collocation point
   tau = SX.sym("tau")
@@ -70,19 +70,19 @@ for N in range(1,11):
 
     print "l(", j, ") = ", L
 
-    f = SXFunction("l(" + str(j) + ")", [tau],[L])
+    f = Function("l(" + str(j) + ")", [tau],[L])
     
     # initialize
     l.append(f)
   
   # Get the coefficients of the continuity equation
-  D = DMatrix.zeros(K+1)
+  D = DM.zeros(K+1)
   for j in range(K+1):
     [D[j]] = l[j]([1.])[0]
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
-  C = DMatrix.zeros(K+1,K+1)
+  C = DM.zeros(K+1,K+1)
   for j in range(K+1):
     tfcn = l[j].tangent()
     for k in range(K+1):
@@ -117,7 +117,7 @@ for N in range(1,11):
   print "g = ", g
 
   # NLP
-  nlp = SXFunction('nlp', nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
+  nlp = {'x':x, 'f':x[0]**2, 'g':g}
 
   ## ----
   ## SOLVE THE NLP
@@ -127,7 +127,7 @@ for N in range(1,11):
   opts = {"tol" : 1e-10}
 
   # Allocate an NLP solver and buffer
-  solver = NlpSolver("solver", "ipopt", nlp, opts)
+  solver = nlpsol("solver", "ipopt", nlp, opts)
   arg = {}
 
   # Initial condition

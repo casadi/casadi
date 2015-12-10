@@ -57,7 +57,7 @@ Function create_integrator(int nj, int nu){
   SX x0 = vertcat(s0, v0, m0);
 
   // Integrator
-  return SXFunction("integrator", {u, x0}, {x});
+  return Function("integrator", {u, x0}, {x});
 }
 
 
@@ -91,19 +91,19 @@ int main(){
   }
 
   // Objective function
-  MX F = inner_prod(U,U);
+  MX F = dot(U,U);
 
   // Terminal constraints
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction nlp("nlp", nlpIn("x",U),nlpOut("f",F,"g",G));
+  MXDict nlp = {{"x", U}, {"f", F}, {"g", G}};
 
   // Allocate an NLP solver and buffers
-  Dict opts = make_dict("tol", 1e-10,
-                        "hessian_approximation", "limited-memory");
-  NlpSolver solver("solver", "ipopt", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  Dict opts = {{"tol", 1e-10},
+               {"hessian_approximation", "limited-memory"}};
+  Function solver = nlpsol("solver", "ipopt", nlp, opts);
+  std::map<std::string, DM> arg, res;
 
   // Bounds on u and initial condition
   arg["lbx"] = -10;

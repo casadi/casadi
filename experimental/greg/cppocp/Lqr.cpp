@@ -47,33 +47,33 @@ Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> 
 
      // initialize trajectory
      for (int k=0; k<N; k++){
-	  V_0.push_back(   DMatrix(        1,        1, 0.0) );
-	  V_x.push_back(   DMatrix( ode.nx(),        1, 0.0) );
-	  V_xx.push_back(  DMatrix( ode.nx(), ode.nx(), 0.0) );
+	  V_0.push_back(   DM(        1,        1, 0.0) );
+	  V_x.push_back(   DM( ode.nx(),        1, 0.0) );
+	  V_xx.push_back(  DM( ode.nx(), ode.nx(), 0.0) );
 
-	  cost_0.push_back(  DMatrix(        1,        1, 0.0) );
-	  cost_x.push_back(  DMatrix( ode.nx(),        1, 0.0) );
-	  cost_u.push_back(  DMatrix( ode.nu(),        1, 0.0) );
-	  cost_xx.push_back( DMatrix( ode.nx(), ode.nx(), 0.0) );
-	  cost_xu.push_back( DMatrix( ode.nx(), ode.nu(), 0.0) );
-	  cost_uu.push_back( DMatrix( ode.nu(), ode.nu(), 0.0) );
+	  cost_0.push_back(  DM(        1,        1, 0.0) );
+	  cost_x.push_back(  DM( ode.nx(),        1, 0.0) );
+	  cost_u.push_back(  DM( ode.nu(),        1, 0.0) );
+	  cost_xx.push_back( DM( ode.nx(), ode.nx(), 0.0) );
+	  cost_xu.push_back( DM( ode.nx(), ode.nu(), 0.0) );
+	  cost_uu.push_back( DM( ode.nu(), ode.nu(), 0.0) );
 
-	  xTrajectory.push_back(         DMatrix( ode.nx(),        1, 0.0) );
-	  xNominalTrajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
-	  uTrajectory.push_back(         DMatrix( ode.nu(),        1, 0.0) );
-	  uOpenLoop.push_back(           DMatrix( ode.nu(),        1, 0.0) );
-	  feedbackGain.push_back(        DMatrix( ode.nu(), ode.nx(), 0.0) );
+	  xTrajectory.push_back(         DM( ode.nx(),        1, 0.0) );
+	  xNominalTrajectory.push_back(  DM( ode.nx(),        1, 0.0) );
+	  uTrajectory.push_back(         DM( ode.nu(),        1, 0.0) );
+	  uOpenLoop.push_back(           DM( ode.nu(),        1, 0.0) );
+	  feedbackGain.push_back(        DM( ode.nu(), ode.nx(), 0.0) );
 
-	  Q0Trajectory.push_back(  DMatrix(        1,        1, 0.0) );
-	  QxTrajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
-	  QuTrajectory.push_back(  DMatrix( ode.nu(),        1, 0.0) );
-	  QxxTrajectory.push_back( DMatrix( ode.nx(), ode.nx(), 0.0) );
-	  QxuTrajectory.push_back( DMatrix( ode.nx(), ode.nu(), 0.0) );
-	  QuuTrajectory.push_back( DMatrix( ode.nu(), ode.nu(), 0.0) );
+	  Q0Trajectory.push_back(  DM(        1,        1, 0.0) );
+	  QxTrajectory.push_back(  DM( ode.nx(),        1, 0.0) );
+	  QuTrajectory.push_back(  DM( ode.nu(),        1, 0.0) );
+	  QxxTrajectory.push_back( DM( ode.nx(), ode.nx(), 0.0) );
+	  QxuTrajectory.push_back( DM( ode.nx(), ode.nu(), 0.0) );
+	  QuuTrajectory.push_back( DM( ode.nu(), ode.nu(), 0.0) );
 		
-	  f0Trajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
-	  functionTrajectory.push_back(  DMatrix( ode.nx(), ode.nx(), 0.0) );
-	  fuTrajectory.push_back(  DMatrix( ode.nx(), ode.nu(), 0.0) );
+	  f0Trajectory.push_back(  DM( ode.nx(),        1, 0.0) );
+	  functionTrajectory.push_back(  DM( ode.nx(), ode.nx(), 0.0) );
+	  fuTrajectory.push_back(  DM( ode.nx(), ode.nu(), 0.0) );
 
 	  // initialize action bounds
 	  vector<double> ubAction_;
@@ -87,8 +87,8 @@ Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> 
      }
 
 
-     stateRegularization  = DMatrix( ode.nx(), ode.nx(), 0.0 );
-     actionRegularization = DMatrix( ode.nu(), ode.nu(), 0.0 );
+     stateRegularization  = DM( ode.nx(), ode.nx(), 0.0 );
+     actionRegularization = DM( ode.nu(), ode.nu(), 0.0 );
 
      setupBackwardSweepFunction();
      setupCostFunctions();

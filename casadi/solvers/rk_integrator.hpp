@@ -26,7 +26,7 @@
 #ifndef CASADI_RK_INTEGRATOR_HPP
 #define CASADI_RK_INTEGRATOR_HPP
 
-#include "fixed_step_integrator.hpp"
+#include "casadi/core/function/integrator.hpp"
 #include <casadi/solvers/casadi_integrator_rk_export.h>
 
 /** \defgroup plugin_Integrator_rk
@@ -53,18 +53,18 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit RkIntegrator(const Function& f, const Function& g);
-
-    /// Create a new integrator
-    virtual RkIntegrator* create(const Function& f, const Function& g) const
-    { return new RkIntegrator(f, g);}
+    explicit RkIntegrator(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new RkIntegrator(f, g);}
+    static Integrator* creator(const std::string& name, const XProblem& dae) {
+      return new RkIntegrator(name, dae);
+    }
 
     /// Destructor
     virtual ~RkIntegrator();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "rk";}
 
     /// Initialize stage
     virtual void init();

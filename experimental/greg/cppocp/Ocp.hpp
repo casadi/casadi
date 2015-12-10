@@ -69,13 +69,13 @@ public:
      void boundParam(std::string p, double lb_, double ub_);
      void setParamGuess(std::string p, double guess_);
         
-     casadi::DMatrix getStateSolution(int timestep);
-     casadi::DMatrix getActionSolution(int timestep);
+     casadi::DM getStateSolution(int timestep);
+     casadi::DM getActionSolution(int timestep);
 
-     void setState(  casadi::DMatrix x, int timestep );
-     void setAction( casadi::DMatrix u, int timestep );
-     void setStates(  std::vector<casadi::DMatrix> & x);
-     void setActions( std::vector<casadi::DMatrix> & u);
+     void setState(  casadi::DM x, int timestep );
+     void setAction( casadi::DM u, int timestep );
+     void setStates(  std::vector<casadi::DM> & x);
+     void setActions( std::vector<casadi::DM> & u);
 
      void writeSolution( std::ostream & f );
      void writeSolution( const char * filename );

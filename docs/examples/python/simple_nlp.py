@@ -30,7 +30,7 @@ x = SX.sym("x",2)
 # Form the NLP
 f = x[0]**2 + x[1]**2 # objective
 g = x[0]+x[1]-10      # constraint
-nlp = SXFunction('nlp', nlpIn(x=x), nlpOut(f=f, g=g))
+nlp = {'x':x, 'f':f, 'g':g}
 
 # Pick an NLP solver
 MySolver = "ipopt"
@@ -40,11 +40,11 @@ MySolver = "ipopt"
 # Solver options
 opts = {}
 if MySolver=="sqpmethod":
-  opts["qp_solver"] = "qpoases"
-  opts["qp_solver_options"] = {"printLevel":"none"}
+  opts["qpsol"] = "qpoases"
+  opts["qpsol_options"] = {"printLevel":"none"}
 
 # Allocate a solver
-solver = NlpSolver("solver", MySolver, nlp, opts)
+solver = nlpsol("solver", MySolver, nlp, opts)
 
 # Solve the NLP
 sol = solver({"lbg" : 0})

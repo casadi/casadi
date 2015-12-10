@@ -85,32 +85,49 @@ namespace casadi {
     static bool simplifiedCall(const Function& f);
 
     /** \brief Generate a call to a function (generic signature) */
-    std::string call(const Function& f, const std::string& arg, const std::string& res,
-                     const std::string& iw, const std::string& w) const;
+    std::string operator()(const Function& f, const std::string& arg,
+                           const std::string& res, const std::string& iw,
+                           const std::string& w, const std::string& mem) const;
 
     /** \brief Generate a call to a function (simplified signature) */
-    std::string call(const Function& f, const std::string& arg, const std::string& res) const;
+    std::string operator()(const Function& f, const std::string& arg, const std::string& res) const;
 
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
 
     /** \brief Codegen inner product */
-    std::string inner_prod(int n, const std::string& x, const std::string& y);
+    std::string dot(int n, const std::string& x, const std::string& y);
+
+    /** \brief Codegen sparse matrix-matrix multiplication */
+    std::string mul(const std::string& x, const Sparsity& sp_x,
+                    const std::string& y, const Sparsity& sp_y,
+                    const std::string& z, const Sparsity& sp_z,
+                    const std::string& w, bool tr);
+
+    /** \brief Codegen bilinear form */
+    std::string bilin(const std::string& A, const Sparsity& sp_A,
+                      const std::string& x, const std::string& y);
+
+    /** \brief Rank-1 update */
+    std::string rank1(const std::string& A, const Sparsity& sp_A, const std::string& alpha,
+                      const std::string& x, const std::string& y);
 
     /** \brief Auxiliary functions */
     enum Auxiliary {
-      AUX_COPY_N,
+      AUX_COPY,
       AUX_SWAP,
       AUX_SCAL,
       AUX_AXPY,
-      AUX_INNER_PROD,
+      AUX_DOT,
+      AUX_BILIN,
+      AUX_RANK1,
       AUX_NRM2,
       AUX_IAMAX,
-      AUX_FILL_N,
+      AUX_FILL,
       AUX_ASUM,
       AUX_SQ,
       AUX_SIGN,
-      AUX_MM_SPARSE,
+      AUX_MUL,
       AUX_PROJECT,
       AUX_TRANS,
       AUX_TO_MEX,
@@ -135,11 +152,11 @@ namespace casadi {
     /** \brief  Print real vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
 
-    /** \brief Create a copy_n operation */
-    std::string copy_n(const std::string& arg, std::size_t n, const std::string& res);
+    /** \brief Create a copy operation */
+    std::string copy(const std::string& arg, std::size_t n, const std::string& res);
 
-    /** \brief Create a fill_n operation */
-    std::string fill_n(const std::string& res, std::size_t n, const std::string& v);
+    /** \brief Create a fill operation */
+    std::string fill(const std::string& res, std::size_t n, const std::string& v);
 
     /** \brief Sparse assignment */
     std::string project(const std::string& arg, const Sparsity& sp_arg,

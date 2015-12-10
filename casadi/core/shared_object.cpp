@@ -37,13 +37,11 @@ namespace casadi {
   }
 
   SharedObjectNode::SharedObjectNode(const SharedObjectNode& node) {
-    is_init_ = node.is_init_;
     count = 0; // reference counter is _not_ copied
     weak_ref_ = 0; // nor will they have the same weak references
   }
 
   SharedObjectNode& SharedObjectNode::operator=(const SharedObjectNode& node) {
-    is_init_ = node.is_init_;
     // do _not_ copy the reference counter
     return *this;
   }
@@ -80,11 +78,7 @@ namespace casadi {
     return *this;
   }
 
-  const SharedObjectNode* SharedObject::get() const {
-    return node;
-  }
-
-  SharedObjectNode* SharedObject::get() {
+  SharedObjectNode* SharedObject::get() const {
     return node;
   }
 
@@ -103,18 +97,12 @@ namespace casadi {
     }
   }
 
-  const SharedObjectNode* SharedObject::operator->() const {
-    casadi_assert(!isNull());
-    return node;
-  }
-
-  SharedObjectNode* SharedObject::operator->() {
+  SharedObjectNode* SharedObject::operator->() const {
     casadi_assert(!isNull());
     return node;
   }
 
   SharedObjectNode::SharedObjectNode() {
-    is_init_ = false;
     count = 0;
     weak_ref_ = 0;
   }
@@ -129,19 +117,6 @@ namespace casadi {
       weak_ref_->kill();
       delete weak_ref_;
     }
-  }
-
-  void SharedObject::init(bool allow_reinit) {
-    if (allow_reinit || !isInit()) {
-      (*this)->init();
-      (*this)->finalize();
-    }
-  }
-
-  void SharedObjectNode::init() {
-  }
-
-  void SharedObjectNode::finalize() {
   }
 
   void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {
@@ -188,24 +163,6 @@ namespace casadi {
 
   int SharedObjectNode::getCount() const {
     return count;
-  }
-
-  bool SharedObject::isInit() const {
-    return (*this)->isInit();
-  }
-
-  void SharedObject::assertInit() const {
-    (*this)->assertInit();
-  }
-
-  bool SharedObjectNode::isInit() const {
-    return is_init_;
-  }
-
-  void SharedObjectNode::assertInit() const {
-    casadi_assert_message(isInit(),
-                          "You must first initialize a Shared Object before you can use it."
-                          << std::endl <<  "Use something like f.init()");
   }
 
   WeakRef* SharedObject::weak() {

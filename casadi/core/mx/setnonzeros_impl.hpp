@@ -28,7 +28,6 @@
 
 #include "setnonzeros.hpp"
 #include "../std_vector_tools.hpp"
-#include "../function/sx_function.hpp"
 
 /// \cond INTERNAL
 
@@ -65,18 +64,18 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void SetNonzeros<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get all the nonzeros
     vector<int> nz = getAll();
 
     // Output sparsity
     const Sparsity &osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
@@ -164,7 +163,7 @@ namespace casadi {
 
         // Create a new pattern which includes both the the previous seed
         // and the addition/assignment
-        Sparsity sp = res[0].sparsity().patternUnion(osp);
+        Sparsity sp = res[0].sparsity().unite(osp);
         res[0] = res[0]->getProject(sp);
 
         // Recalculate the nz locations in the arguments corresponding to the inputs
@@ -198,11 +197,11 @@ namespace casadi {
     // Output sparsity
     const Sparsity &osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
@@ -296,7 +295,7 @@ namespace casadi {
 
           // Create a new pattern which includes both the the previous seed
           // and the addition/assignment
-          Sparsity sp = res.sparsity().patternUnion(osp);
+          Sparsity sp = res.sparsity().unite(osp);
           res = res->getProject(sp);
 
           // Recalculate the nz locations in the arguments corresponding to the inputs
@@ -331,12 +330,12 @@ namespace casadi {
     // Output sparsity
     const Sparsity &osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.getCol();
+    vector<int> ocol = osp.get_col();
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
     const int* irow = isp.row();
-    vector<int> icol = isp.getCol();
+    vector<int> icol = isp.get_col();
 
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
@@ -437,21 +436,21 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalD(const double** arg, double** res,
-                                     int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void SetNonzerosVector<Add>::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evalSX(const SXElement** arg, SXElement** res,
-                                      int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void SetNonzerosVector<Add>::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosVector<Add>::evalGen(const T** arg, T** res,
-                                       int* iw, T* w) {
+  void SetNonzerosVector<Add>::
+  evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
     T* odata = res[0];
@@ -468,21 +467,21 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalD(const double** arg, double** res,
-                                    int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void SetNonzerosSlice<Add>::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evalSX(const SXElement** arg, SXElement** res,
-                                     int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void SetNonzerosSlice<Add>::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice<Add>::evalGen(const T** arg, T** res,
-                                      int* iw, T* w) {
+  void SetNonzerosSlice<Add>::
+  evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
     T* odata = res[0];
@@ -500,21 +499,21 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalD(const double** arg, double** res,
-                                     int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void SetNonzerosSlice2<Add>::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evalSX(const SXElement** arg, SXElement** res,
-                                      int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void SetNonzerosSlice2<Add>::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<bool Add>
   template<typename T>
-  void SetNonzerosSlice2<Add>::evalGen(const T** arg, T** res,
-                                       int* iw, T* w) {
+  void SetNonzerosSlice2<Add>::
+  evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     const T* idata0 = arg[0];
     const T* idata = arg[1];
     T* odata = res[0];
@@ -538,8 +537,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spFwd(const bvec_t** arg,
-        bvec_t** res, int* iw, bvec_t* w) {
+  spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -558,8 +556,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosVector<Add>::
-  spAdj(bvec_t** arg,
-        bvec_t** res, int* iw, bvec_t* w) {
+  spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
@@ -575,8 +572,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spFwd(const bvec_t** arg,
-        bvec_t** res, int* iw, bvec_t* w) {
+  spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -595,8 +591,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
-  spAdj(bvec_t** arg,
-        bvec_t** res, int* iw, bvec_t* w) {
+  spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
@@ -610,8 +605,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spFwd(const bvec_t** arg,
-        bvec_t** res, int* iw, bvec_t* w) {
+  spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     const bvec_t *a0 = arg[0];
     const bvec_t *a = arg[1];
     bvec_t *r = res[0];
@@ -632,8 +626,7 @@ namespace casadi {
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
-  spAdj(bvec_t** arg,
-        bvec_t** res, int* iw, bvec_t* w) {
+  spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
     for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
@@ -676,7 +669,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  bool SetNonzerosVector<Add>::zz_isEqual(const MXNode* node, int depth) const {
+  bool SetNonzerosVector<Add>::zz_is_equal(const MXNode* node, int depth) const {
     // Check dependencies
     if (!this->sameOpAndDeps(node, depth)) return false;
 
@@ -695,7 +688,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  bool SetNonzerosSlice<Add>::zz_isEqual(const MXNode* node, int depth) const {
+  bool SetNonzerosSlice<Add>::zz_is_equal(const MXNode* node, int depth) const {
     // Check dependencies
     if (!this->sameOpAndDeps(node, depth)) return false;
 
@@ -713,7 +706,7 @@ namespace casadi {
   }
 
   template<bool Add>
-  bool SetNonzerosSlice2<Add>::zz_isEqual(const MXNode* node, int depth) const {
+  bool SetNonzerosSlice2<Add>::zz_is_equal(const MXNode* node, int depth) const {
     // Check dependencies
     if (!this->sameOpAndDeps(node, depth)) return false;
 
@@ -746,12 +739,13 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                        CodeGenerator& g) const {
+  void SetNonzerosVector<Add>::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                                 g.work(res[0], this->nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                               g.work(res[0], this->nnz())) << endl;
     }
 
     // Condegen the indices
@@ -765,12 +759,13 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                       CodeGenerator& g) const {
+  void SetNonzerosSlice<Add>::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                                 g.work(res[0], this->nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                               g.work(res[0], this->nnz())) << endl;
     }
 
     // Perform the operation inplace
@@ -782,12 +777,13 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                        CodeGenerator& g) const {
+  void SetNonzerosSlice2<Add>::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                                 g.work(res[0], this->nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
+                               g.work(res[0], this->nnz())) << endl;
     }
 
     // Perform the operation inplace

@@ -76,14 +76,11 @@ namespace casadi {
   }
 
   void ClangCompiler::init() {
-    // Initialize the base classes
-    CompilerInternal::init();
-
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
     std::vector<std::string> flags;
     if (hasSetOption("flags")) {
-      flags = getOption("flags");
+      flags = option("flags");
       for (auto i=flags.begin(); i!=flags.end(); ++i) {
         args.push_back(i->c_str());
       }
@@ -122,10 +119,10 @@ namespace casadi {
 
 #if 0
     // Initialize target info with the default triple for our platform.
-    auto targetoptions = std::make_shared<clang::TargetOptions>();
+    auto targetoptions = std::make_shared<clang::Taroptions>();
     targetoptions->Triple = llvm::sys::getDefaultTargetTriple();
     clang::TargetInfo *targetInfo =
-      clang::TargetInfo::CreateTargetInfo(compInst.getDiagnostics(), targetoptions);
+      clang::TargetInfo::CreateTargetInfo(compInst.get_diagnostics(), targetoptions);
     compInst.setTarget(targetInfo);
 #endif
 
@@ -182,7 +179,7 @@ namespace casadi {
 
     // Search path
     std::stringstream paths;
-    paths << getOption("include_path").toString() << pathsep;
+    paths << option("include_path").toString() << pathsep;
     std::string path;
     while (std::getline(paths, path, pathsep)) {
       compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);
@@ -221,8 +218,12 @@ namespace casadi {
   }
 
   void* ClangCompiler::getFunction(const std::string& symname) {
-    return reinterpret_cast<void*>((intptr_t)executionEngine_
-                                   ->getPointerToFunction(module_->getFunction(symname)));
+    llvm::Function* f = module_->getFunction(symname);
+    if (f) {
+      return executionEngine_->getPointerToFunction(f);
+    } else {
+      return 0;
+    }
   }
 
   std::vector<std::pair<std::string, bool> > ClangCompiler::

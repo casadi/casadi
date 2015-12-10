@@ -27,7 +27,6 @@
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
 #include <fstream>
-#include <stdlib.h>
 #include <dlfcn.h>
 #include <cstdlib>
 #include <unistd.h>
@@ -73,14 +72,11 @@ namespace casadi {
   }
 
   void ShellCompiler::init() {
-    // Initialize the base classes
-    CompilerInternal::init();
-
     // Read options
-    string compiler = getOption("compiler").toString();
-    string compiler_setup = getOption("compiler_setup").toString();
+    string compiler = option("compiler").toString();
+    string compiler_setup = option("compiler_setup").toString();
     vector<string> flags;
-    if (hasSetOption("flags")) flags = getOption("flags");
+    if (hasSetOption("flags")) flags = option("flags");
 
     // Construct the compiler command
     stringstream cmd;
@@ -102,7 +98,7 @@ namespace casadi {
     bin_name_ = bin_name;
 #else
     // Fallback, may result in deprecation warnings
-    char* bin_name = tempnam(0, "tmp_casadi_compiler_shell_");
+    char* bin_name = tempnam(0, "ca.so");
     bin_name_ = bin_name;
     free(bin_name);
 #endif

@@ -26,35 +26,51 @@
 #include "timing.hpp"
 #include <ctime>
 
-namespace casadi {
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#include <sys/time.h>
+#endif
 
-  timer getTimerTime() {
-    timer ret;
+namespace casadi {
+  Timer getTimerTime() {
+    Timer ret;
     ret.user = clock();
-    ret.real = getRealTime();
+#ifdef _WIN32
+    FILETIME tm;
+    GetSystemTimeAsFileTime(&tm);
+    //GetSystemTimePreciseAsFileTime(&tm);
+    ULONGLONG t = (static_cast<ULONGLONG>(tm.dwHighDateTime) << 32)
+      | (ULONGLONG)tm.dwLowDateTime;
+    ret.real = static_cast<double>(t) / 10000000.0;
+#else
+    struct timeval tm;
+    gettimeofday(&tm, NULL);
+    ret.real = tm.tv_sec + tm.tv_usec/1000000.0;
+#endif
     return ret;
   }
 
   // ret = t1 - t0
-  diffTime diffTimers(const timer t1, const timer t0) {
-    diffTime ret;
+  DiffTime diffTimers(const Timer t1, const Timer t0) {
+    DiffTime ret;
     ret.user = (t1.user - t0.user)/CLOCKS_PER_SEC;
     ret.real = t1.real - t0.real;
     return ret;
   }
 
   // t += diff
-  void timerPlusEq(diffTime & t, const diffTime diff) {
+  void timerPlusEq(DiffTime & t, const DiffTime diff) {
     t.user += diff.user;
     t.real += diff.real;
   }
 
-  Dict diffToDict(const diffTime& diff) {
+  Dict diffToDict(const DiffTime& diff) {
     Dict ret;
     // compatable names with the linux "time" utility
     ret["real"] = diff.real;
     ret["user"] = diff.user;
     return ret;
   }
-
 } // namespace casadi

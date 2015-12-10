@@ -33,11 +33,9 @@ from pylab import *
 u = SX.sym("u")
 x = SX.sym("x")
 y = SX.sym("y")
-f  = SXFunction('f', [vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
-#! Manipulate the function to adhere to the integrator's
-#! input/output signature
-#! f(time;states;parameters)
-fmod=SXFunction('ODE_right_hand_side', daeIn(x=f.inputExpr(0),p=f.inputExpr(1)),daeOut(ode=f.outputExpr(0)))
+ode = vertcat([(1-y*y)*x-y+u,x])
+#! DAE problem formulation as expected by CasADi's integrators:
+dae  = {'x':vertcat([x,y]), 'p':u, 'ode':ode}
 #! The whole series of sundials options are available for the user
 opts = {}
 opts["fsens_err_con"] = True
@@ -48,7 +46,7 @@ tend=10
 opts["t0"] = 0
 opts["tf"] = tend
 #! Create the Integrator
-integrator = Integrator("integrator", "cvodes", fmod, opts)
+F = integrator("F", "cvodes", dae, opts)
 #$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
 #$   der(x) = fx(x,z,p,t)
@@ -87,29 +85,24 @@ integrator = Integrator("integrator", "cvodes", fmod, opts)
 #$   [x(tf),q(tf),rx(t0),rq(t0)]  = F(x(t0),p,rx(0),rp)
 #$ \end{verbatim}
 #$ 
-print isinstance(integrator,Function)
-print "%d -> %d" % (integrator.nIn(),integrator.nOut())
+print "%d -> %d" % (F.n_in(),F.n_out())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
 #! The output of Integrator is the state at the end of integration.
-#! There are two basic mechanisms two retrieve the whole trajectory of states:
-#!  - method A, using reset + integrate
-#!  - method B, using Simulator
-#!
-#! We demonstrate first method A:
+#! To obtain the whole trajectory of states, use Simulator:
 ts=numpy.linspace(0,tend,100)
-x0 = 0;y0 = 1
-integrator.setInput([x0,y0],"x0")
-integrator.setInput(0,"p")
-integrator.evaluate()
-integrator.reset()
-	
-#! Define a convenience function to acces x(t)
-def out(t):
-	integrator.integrate(t)
-	return integrator.getOutput().toArray()
+x0 = 0; y0 = 1
+opts = {}
+opts["fsens_err_con"] = True
+opts["quad_err_con"] = True
+opts["abstol"] = 1e-6
+opts["reltol"] = 1e-6
+opts["grid"] = ts
+opts["output_t0"] = True
+sim = integrator("sim", "cvodes", dae, opts)
+sol = sim({"x0":[x0,y0], "p":0})
 
-sol = array([out(t) for t in ts]).squeeze()
-	
+sol = sol['xf'].full().T
+
 #! Plot the trajectory
 figure()
 plot(sol[:,0],sol[:,1])
@@ -118,16 +111,6 @@ xlabel('x')
 ylabel('y')
 show()
 
-#! We demonstrate method B:
-sim=Simulator("sim", integrator, ts)
-sim.setInput([x0,y0],"x0")
-sim.setInput(0,"p")
-sim.evaluate()
-
-sol2 = sim.getOutput().toArray().T
-#! sol and sol2 are exactly the same
-print linalg.norm(sol-sol2)
-
 #! Sensitivity for initial conditions
 #! ------------------------------------
 #$ Let's see how a perturbation $\delta x(0)$ on the initial state $x(0)=x'(0) + \delta x(0)$
@@ -135,17 +118,14 @@ print linalg.norm(sol-sol2)
 #$ We plot the map $\delta x_0 \mapsto \delta x(tend) $
 
 def out(dx0):
-	integrator.setInput([x0+dx0,y0],"x0")
-	integrator.evaluate()
-	return integrator.getOutput().toArray()
+	F.setInput([x0+dx0,y0],"x0")
+	F.evaluate()
+	return F.getOutput().full()
 dx0=numpy.linspace(-2,2,100)
-
 out = array([out(dx) for dx in dx0]).squeeze()
-	
 dxtend=out[:,0]-sol[-1,0]
-
 figure()
-plot(dx0,dxtend)
+plot(dx0, dxtend)
 grid()
 title('Initial perturbation map')
 xlabel('dx(0)')
@@ -154,11 +134,13 @@ show()
 #$ By definition, this mapping goes through the origin. In the limit of $dx0 \to 0$, this map is purely linear. The slope at the origin is exactly what we call 'sensitivity'
 #
 
-dintegrator = integrator.derivative(1,0)
+dintegrator = F.derivative(1,0)
 dintegrator.setInput([x0,y0],"der_x0")
 dintegrator.setInput([1,0],"fwd0_x0")
 dintegrator.evaluate()
 A = dintegrator.getOutput("fwd0_xf")[0]
+A = float(A) # FIXME
+
 plot(dx0,A*dx0)
 legend(('True sensitivity','Linearised sensitivity'))
 plot(0,0,'o')
@@ -169,10 +151,10 @@ show()
 def out(t):
 	dintegrator.setInput([1,0],"fwd0_x0")
         dintegrator.evaluate()
-	A=dintegrator.getOutput("fwd0_xf").toArray()
+	A=dintegrator.getOutput("fwd0_xf").full()
 	dintegrator.setInput([0,1],"fwd0_x0")
 	dintegrator.evaluate()
-	B=dintegrator.getOutput("fwd0_xf").toArray()
+	B=dintegrator.getOutput("fwd0_xf").full()
 	return array([A,B]).squeeze().T
 
 circle = array([[sin(x),cos(x)] for x in numpy.linspace(0,2*pi,100)]).T
@@ -196,7 +178,7 @@ show()
 #J.setInput([x0,y0],"x0")
 #J.setInput(0,"p")
 #J.evaluate()
-#print J.getOutput().toArray()
+#print J.getOutput().full()
 
 #! The figure reveals that perturbations perpendicular to the phase space trajectory shrink.
 
@@ -211,15 +193,15 @@ show()
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
 u=MX.sym("u")
-w = integrator({'x0':MX([1,0]),'p':u})["xf"]
+w = F({'x0':MX([1,0]),'p':u})["xf"]
 
 #! We construct an MXfunction and a python help function 'out'
-f=MXFunction('f', [u],[w])
+f=Function('f', [u],[w])
 
 def out(u):
 	f.setInput(u)
 	f.evaluate()
-	return f.getOutput().toArray()
+	return f.getOutput().full()
 
 print out(0)
 print out(1)

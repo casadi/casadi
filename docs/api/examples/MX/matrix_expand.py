@@ -35,22 +35,20 @@ e = d*c
 #! The element-wise addition and multiplication operators appear just as a single node in the MX expression graph
 dotdraw(e)
 
-#! We can use MXFunction.expand to expand into subexpressions
+#! We can use expand to expand into subexpressions
 
-f = MXFunction("f", [a,b,c],[e])
+f = Function("f", [a,b,c],[e])
 
-g = SXFunction(f.expand())
+g = f.expand('g')
 
-dotdraw(g.outputExpr(0))
+dotdraw(g(g.sx_in())[0])
 
 #! There is also a variant to perform expansion immediately on the MX graph
-#! The expanded SX graph is hidden inside an SXFunction graph call
+#! The expanded SX graph is hidden inside an SX graph call
 dotdraw(matrix_expand(e))
 
 #! An additional features of this variant is that one can choose which expressions remin outside of the expansion scope.
 #! In the following we list 'a+b=d' as a node on the boundary of expansion:
 dotdraw(matrix_expand(e,[d]))
 
-#! Note how the additions is not expanded, while the multiplication ended up in the SXFunction
-
-
+#! Note how the additions is not expanded, while the multiplication ended up in the expression

@@ -56,7 +56,7 @@ umin = -1*ones(10)
 umax = 0.5*ones(10)
 
 # minimize fuel
-f = inner_prod(u,u)/2
+f = dot(u,u)/2
 
 # Calculate acceleration for all points
 a = SX(100,1,0)
@@ -112,25 +112,25 @@ tgrid = linspace(0,10,10)
 x = u0
 
 # Create SQP method
-sqp_solver = SQPMethod(ffcn,gfcn)
+sqpsol = SQPMethod(ffcn,gfcn)
 
 # qpOASES
-sqp_solver.setOption("qp_solver",QPOasesSolver)
-sqp_solver.setOption("qp_solver_options",{"printLevel" : "low"})
+sqpsol.setOption("qpsol",QPOasesSolver)
+sqpsol.setOption("qpsol_options",{"printLevel" : "low"})
 
 # OOQP
-#sqp_solver.setOption("qp_solver",OOQpSolver)
+#sqpsol.setOption("qpsol",OOQpsol)
 
-sqp_solver.init()
-sqp_solver.setInput(umin,     "lbx")
-sqp_solver.setInput(umax,     "ubx")
-sqp_solver.setInput(u0,       "x0")
-sqp_solver.setInput(zeros(2), "lbg")
-sqp_solver.setInput(zeros(2), "ubg")
-sqp_solver.evaluate()
+sqpsol.init()
+sqpsol.setInput(umin,     "lbx")
+sqpsol.setInput(umax,     "ubx")
+sqpsol.setInput(u0,       "x0")
+sqpsol.setInput(zeros(2), "lbg")
+sqpsol.setInput(zeros(2), "ubg")
+sqpsol.evaluate()
 
 # Retrieve the solution
-u_opt2 = array(sqp_solver.getOutput("x"))
+u_opt2 = array(sqpsol.getOutput("x"))
 
 # Plot the results
 plt.figure(1)
@@ -178,21 +178,21 @@ G_sparsity = sp_dense(n)
 A_sparsity = jfcn.output().sparsity()
 
 # qpOASES
-qp_solver = QPOasesSolver(H_sparsity,A_sparsity)
-qp_solver.setOption("printLevel","low")
+qpsol = QPOasesSolver(H_sparsity,A_sparsity)
+qpsol.setOption("printLevel","low")
 
 # IPOPT
-#qp_solver =  NLPQpSolver(H_sparsity,A_sparsity)
-#qp_solver.setOption("nlp_solver", IpoptSolver)
+#qpsol =  NLPQpsol(H_sparsity,A_sparsity)
+#qpsol.setOption("nlp_solver", IpoptSolver)
 
 # OOQP
-#qp_solver = OOQpSolver(H_sparsity,A_sparsity)
+#qpsol = OOQpsol(H_sparsity,A_sparsity)
 
-qp_solver.init()
+qpsol.init()
 
 # No bounds on the control
-qp_solver.setInput(-inf,"lbx")
-qp_solver.setInput( inf,"ubx")
+qpsol.setInput(-inf,"lbx")
+qpsol.setInput( inf,"ubx")
 
 # Header
 print ' k  nls | dx         gradL      eq viol    ineq viol'
@@ -214,26 +214,26 @@ while True:
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
   fk = ffcn.getOutput()
-  gfk = DMatrix(ffcn.getAdjSens())
+  gfk = DM(ffcn.getAdjSens())
   
   # Pass data to QP solver
-  qp_solver.setInput(Bk,"h")
-  qp_solver.setInput(Jgk,"a")
-  qp_solver.setInput(gfk,"g")
-  qp_solver.setInput(-gk,"lba")
-  qp_solver.setInput(-gk,"uba")
+  qpsol.setInput(Bk,"h")
+  qpsol.setInput(Jgk,"a")
+  qpsol.setInput(gfk,"g")
+  qpsol.setInput(-gk,"lba")
+  qpsol.setInput(-gk,"uba")
 
   # Solve the QP subproblem
-  qp_solver.evaluate()
+  qpsol.evaluate()
 
   # Get the optimal solution
-  p = qp_solver.getOutput("primal")
+  p = qpsol.getOutput("primal")
   
   # Get the dual solution for the inequalities
-  lambda_hat = -qp_solver.getOutput("lambda_a")
+  lambda_hat = -qpsol.getOutput("lambda_a")
   
   # Get the dual solution for the bounds
-  lambda_x_hat = -qp_solver.getOutput("lambda_x")
+  lambda_x_hat = -qpsol.getOutput("lambda_x")
   
   # Get the gradient of the Lagrangian
   gradL = ffcn.getAdjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat
@@ -258,7 +258,7 @@ while True:
   feasviol = sumRows(fabs(gk))
 
   # Use a quadratic model of T1 to get a lower bound on mu (eq. 18.36 in Nocedal)
-  mu_lb = (inner_prod(gfk,p) + sigma/2.0*dot(trans(p),dot(Bk,p)))/(1.-rho)/feasviol
+  mu_lb = (dot(gfk,p) + sigma/2.0*dot(trans(p),dot(Bk,p)))/(1.-rho)/feasviol
 
   # Increase mu if it is below the lower bound
   if float(mu) < float(mu_lb):
@@ -268,7 +268,7 @@ while True:
   T1 = fk + mu*feasviol
 
   # Calculate the directional derivative of T1 at x (cf. 18.29 in Nocedal)
-  DT1 = inner_prod(gfk,p) - mu*sumRows(fabs(gk))
+  DT1 = dot(gfk,p) - mu*sumRows(fabs(gk))
   
   lsiter = 0
   alpha = 1
@@ -353,13 +353,13 @@ while True:
   yk = gradL_new - gradL
   Bdx = dot(Bk,dx)
   dxBdx = dot(trans(dx),Bdx)
-  ydx = inner_prod(dx,yk)
+  ydx = dot(dx,yk)
   if float(ydx) >= 0.2*float(dxBdx):
     thetak = 1.
   else:
     thetak = 0.8*dxBdx/(dxBdx - ydx)
   rk = thetak*dx + (1-thetak)*Bdx # rk replaces yk to assure Bk pos.def.
-  Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ inner_prod(rk,dx)
+  Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ dot(rk,dx)
 print "SQP algorithm terminated after %d iterations" % (k-1)
 
 plt.show()

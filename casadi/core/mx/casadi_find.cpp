@@ -30,7 +30,7 @@ using namespace std;
 namespace casadi {
 
   Find::Find(const MX& x) {
-    casadi_assert(x.iscolumn());
+    casadi_assert(x.is_column());
     setDependencies(x);
     setSparsity(Sparsity::scalar());
   }
@@ -39,7 +39,7 @@ namespace casadi {
     return "find(" + arg.at(0) + ")";
   }
 
-  void Find::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Find::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     const double* x = arg[0];
     int nnz = dep(0).nnz();
     int k=0;
@@ -47,7 +47,7 @@ namespace casadi {
     res[0][0] = k<nnz ? dep(0).row(k) : dep(0).size1();
   }
 
-  void Find::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Find::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = find(arg[0]);
   }
 
@@ -62,21 +62,21 @@ namespace casadi {
                      std::vector<std::vector<MX> >& asens) {
   }
 
-  void Find::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Find::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     res[0][0] = 0; // pw constant
   }
 
-  void Find::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Find::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     res[0][0] = 0; // pw constant
   }
 
-  void Find::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                      CodeGenerator& g) const {
+  void Find::generate(CodeGenerator& g, const std::string& mem,
+                      const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
     g.body << "  for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
            << " && *cr++==0; ++i) {}" << endl
            << "  " << g.workel(res[0]) << " = ";
-    if (dep(0).isdense()) {
+    if (dep(0).is_dense()) {
       g.body << "i" << ";" << endl;
     } else {
       // The row is in position 1+1+2+i (colind has length 2)

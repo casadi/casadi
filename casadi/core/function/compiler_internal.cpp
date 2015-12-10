@@ -24,8 +24,6 @@
 
 
 #include "compiler_internal.hpp"
-#include "mx_function.hpp"
-#include "sx_function.hpp"
 
 using namespace std;
 namespace casadi {
@@ -37,6 +35,10 @@ namespace casadi {
   }
 
   void CompilerInternal::print(ostream &stream) const {
+    stream << "Compiler" << endl;
+  }
+
+  void CompilerInternal::repr(ostream &stream) const {
     stream << "Compiler" << endl;
   }
 

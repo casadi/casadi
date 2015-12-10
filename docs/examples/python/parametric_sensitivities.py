@@ -75,7 +75,7 @@ lbg = [0.00, 0.00, p_a[0], p_a[1]]
 ubg = [0.00, 0.00, p_a[0], p_a[1]]
     
 # Create NLP
-nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
+nlp = {'x':x, 'f':f, 'g':g}
 
 # NLP solver options
 opts = {}
@@ -100,7 +100,7 @@ opts["run_sens"] = "yes"
 opts["n_sens_steps"] = 1
   
 # Create NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
   
 # Solve NLP
 res = solver({"x0" : x0,

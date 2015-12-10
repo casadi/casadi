@@ -26,15 +26,12 @@
 #include "lapack_lu_dense.hpp"
 #include "../../core/std_vector_tools.hpp"
 
-#include "../../core/profiling.hpp"
-#include "../../core/casadi_options.hpp"
-
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_LAPACKLU_EXPORT
-  casadi_register_linearsolver_lapacklu(LinearSolverInternal::Plugin* plugin) {
+  int CASADI_LINSOL_LAPACKLU_EXPORT
+  casadi_register_linsol_lapacklu(Linsol::Plugin* plugin) {
     plugin->creator = LapackLuDense::creator;
     plugin->name = "lapacklu";
     plugin->doc = LapackLuDense::meta_doc.c_str();
@@ -43,12 +40,14 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_LAPACKLU_EXPORT casadi_load_linearsolver_lapacklu() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapacklu);
+  void CASADI_LINSOL_LAPACKLU_EXPORT casadi_load_linsol_lapacklu() {
+    Linsol::registerPlugin(casadi_register_linsol_lapacklu);
   }
 
-  LapackLuDense::LapackLuDense(const Sparsity& sparsity, int nrhs)
-      : LinearSolverInternal(sparsity, nrhs) {
+  LapackLuDense::LapackLuDense(const std::string& name,
+                               const Sparsity& sparsity, int nrhs)
+    : Linsol(name, sparsity, nrhs) {
+
     // Equilibrate the matrix
     addOption("equilibration", OT_BOOLEAN, true);
     addOption("allow_equilibration_failure", OT_BOOLEAN, false);
@@ -59,7 +58,7 @@ namespace casadi {
 
   void LapackLuDense::init() {
     // Call the base class initializer
-    LinearSolverInternal::init();
+    Linsol::init();
 
     // Get dimensions
     ncol_ = ncol();
@@ -74,7 +73,7 @@ namespace casadi {
     ipiv_.resize(ncol_);
 
     // Equilibrate?
-    equilibriate_ = getOption("equilibration").toInt();
+    equilibriate_ = option("equilibration").toInt();
     if (equilibriate_) {
       r_.resize(ncol_);
       c_.resize(nrow_);
@@ -82,27 +81,13 @@ namespace casadi {
     equed_ = 'N'; // No equilibration
 
     // Allow equilibration failures
-    allow_equilibration_failure_ = getOption("allow_equilibration_failure").toInt();
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, "LapackLUDense",
-                       ProfilingData_FunctionType_Other, 2);
-
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare", -1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve", -1);
-    }
+    allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
   }
 
-  void LapackLuDense::prepare() {
-    double time_start=0;
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
-    prepared_ = false;
+  void LapackLuDense::linsol_factorize(Memory& m, const double* A) {
 
     // Get the elements of the matrix, dense format
-    input(0).get(mat_);
+    casadi_densify(A, sparsity_, getPtr(mat_), false);
 
     if (equilibriate_) {
       // Calculate the col and row scaling factors
@@ -139,29 +124,13 @@ namespace casadi {
     // Factorize the matrix
     int info = -100;
     dgetrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(ipiv_), &info);
-    if (info != 0) throw CasadiException("LapackLuDense::prepare: "
-                                         "dgetrf_ failed to factorize the Jacobian");
-
-    // Success if reached this point
-    prepared_ = true;
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 0, time_stop-time_start,
-                       time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
-    }
+    casadi_assert_message(info==0, "LapackLuDense::prepare: "
+                          "dgetrf_ failed to factorize the Jacobian");
   }
 
-  void LapackLuDense::solve(double* x, int nrhs, bool transpose) {
-    double time_start=0;
-    if (CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
-      time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
-
+  void LapackLuDense::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     // Scale the right hand side
-    if (transpose) {
+    if (tr) {
       rowScaling(x, nrhs);
     } else {
       colScaling(x, nrhs);
@@ -169,23 +138,16 @@ namespace casadi {
 
     // Solve the system of equations
     int info = 100;
-    char trans = transpose ? 'T' : 'N';
+    char trans = tr ? 'T' : 'N';
     dgetrs_(&trans, &ncol_, &nrhs, getPtr(mat_), &ncol_, getPtr(ipiv_), x, &ncol_, &info);
     if (info != 0) throw CasadiException("LapackLuDense::solve: "
                                         "failed to solve the linear system");
 
     // Scale the solution
-    if (transpose) {
+    if (tr) {
       colScaling(x, nrhs);
     } else {
       rowScaling(x, nrhs);
-    }
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 1,
-                       time_stop-time_start, time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
     }
   }
 

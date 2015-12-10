@@ -25,46 +25,48 @@
 #ifndef CASADI_CPLEX_INTERFACE_HPP
 #define CASADI_CPLEX_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
-#include <casadi/interfaces/cplex/casadi_qpsolver_cplex_export.h>
+#include "casadi/core/function/qpsol.hpp"
+#include <casadi/interfaces/cplex/casadi_qpsol_cplex_export.h>
 #include "ilcplex/cplex.h"
 
 #include <string>
 
-/** \defgroup plugin_QpSolver_cplex
+/** \defgroup plugin_Qpsol_cplex
 
       Interface to Cplex solver for sparse Quadratic Programs
 */
 
-/** \pluginsection{QpSolver,cplex} */
+/** \pluginsection{Qpsol,cplex} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief \pluginbrief{QpSolver,cplex}
+  /** \brief \pluginbrief{Qpsol,cplex}
 
-      @copydoc QpSolver_doc
-      @copydoc plugin_QpSolver_cplex
+      @copydoc Qpsol_doc
+      @copydoc plugin_Qpsol_cplex
 
       \author Attila Kozma, Joel Andersson
       \date 2012
   */
-  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInterface : public QpSolverInternal {
+  class CASADI_QPSOL_CPLEX_EXPORT CplexInterface : public Qpsol {
   public:
-    /** \brief Default constructor */
-    explicit CplexInterface();
-
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-      return new CplexInterface(st);
+    static Qpsol* creator(const std::string& name,
+                                     const std::map<std::string, Sparsity>& st) {
+      return new CplexInterface(name, st);
     }
 
     /// Constructor using sparsity patterns
-    explicit CplexInterface(const std::map<std::string, Sparsity>& st);
+    explicit CplexInterface(const std::string& name,
+                            const std::map<std::string, Sparsity>& st);
 
     /// Destructor
     virtual ~CplexInterface();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "cplex";}
 
     /// Free Cplex memory
     void freeCplex();
@@ -73,7 +75,7 @@ namespace casadi {
     virtual void init();
 
     // Solve the QP
-    virtual void evaluate();
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     // OPTIONS
     /** Which algorithm to use

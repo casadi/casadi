@@ -31,9 +31,18 @@
 using namespace std;
 using namespace casadi;
 
+struct Test {
+  SXDict dae;
+  double tf;
+  vector<double> x0;
+  double u0;
+  bool is_ode;
+  string name;
+};
+
 /** \brief Generate a simple ODE */
-void simpleODE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
-  // Time 
+Test simpleODE(){
+  // Time
   SX t = SX::sym("t");
   
   // Parameter
@@ -53,24 +62,19 @@ void simpleODE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   // Quadrature
   SX quad = pow(v,3) + pow((3-sin(t))-u,2);
 
-  // Callback function
-  ffcn = SXFunction("simple_ode", daeIn("t", t, "x", x, "p", u), daeOut("ode", ode, "quad", quad));
-
-  // End time
-  tf = 0.5;
-
-  // Initial value
-  x0.resize(3);
-  x0[0] = 0;
-  x0[1] = 0;
-  x0[2] = 1;
-  
-  // Parameter
-  u0 = 0.4;
+  // Return test problem
+  Test r;
+  r.dae = decltype(r.dae){{"t", t}, {"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}}; // decltype because MSVC bug
+  r.tf = 0.5;
+  r.x0 = {0, 0, 1};
+  r.u0 = 0.4;
+  r.is_ode = true;
+  r.name = "simple_ode";
+  return r;
 }
 
 /** \brief Generate a simple DAE */
-void simpleDAE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
+Test simpleDAE(){  
   // Parameter
   SX u = SX::sym("u");
   
@@ -89,91 +93,60 @@ void simpleDAE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   // Quadrature
   SX quad = x*x + 3.0*u*u;
   
-  // Callback function
-  ffcn = SXFunction("simple_dae", daeIn("x", x, "z", z, "p", u),
-                    daeOut("ode", ode, "alg", alg, "quad", quad));
-
-  // End time
-  tf = 5;
-
-  // Initial value
-  x0.resize(1);
-  x0[0] = 1;
-  
-  // Parameter
-  u0 = 0.4;
+  // Return DAE
+  Test r;
+  r.dae = decltype(r.dae){{"x", x}, {"z", z}, {"p", u}, {"ode", ode}, {"alg", alg}, {"quad", quad}};
+  r.tf = 5;
+  r.x0 = {1};
+  r.u0 = 0.4;
+  r.is_ode = false;
+  r.name = "simple_dae";
+  return r;
 }
 
+struct Solver {
+  string plugin;
+  bool ode_only;
+  Dict opts;
+};
 
 int main(){
 
-  // For all problems
-  enum Problems{ODE,DAE,NUM_PROBLEMS};
-  for(int problem=0; problem<NUM_PROBLEMS; ++problem){
-    
-    // Get problem
-    Function ffcn;              // Callback function
-    vector<double> x0;    // Initial value
-    double u0;            // Parameter value
-    double tf;            // End time
-    switch(problem){
-      case ODE:
-        cout << endl << "** Testing ODE example **" << endl;
-        simpleODE(ffcn,tf,x0,u0);
-        break;
-      case DAE:
-        cout << endl << "** Testing DAE example **" << endl;
-        simpleDAE(ffcn,tf,x0,u0);
-        break;
-    }
-    
-    // For all integrators
-    enum Integrators{CVODES,IDAS,RK,COLLOCATION,OLD_COLLOCATION,NUM_INTEGRATORS};
-    for(int integrator=0; integrator<NUM_INTEGRATORS; ++integrator){
+  // Test problems
+  vector<Test> tests = {simpleODE(), simpleDAE()};
 
-      // Integrator options
-      Dict opts = make_dict("tf", tf);
+  // ODE/DAE integrators
+  vector<Solver> solvers;
+  solvers.push_back({"cvodes", true, Dict()});
+  solvers.push_back({"idas", false, Dict()});
+  solvers.push_back({"rk", true, Dict()});
+  Dict kinsol_options = {{"linear_solver", "csparse"},{"linear_solver_type", "dense"}};
+
+  Dict coll_opts = {{"implicit_solver", "kinsol"},
+                    {"collocation_scheme", "legendre"},
+                    {"implicit_solver_options", kinsol_options}};
+  solvers.push_back({"collocation", false, coll_opts});
+
+  // Loop over all problems
+  for (auto&& test : tests) {
+    // Loop over all solvers
+    for (auto&& solver : solvers) {
+      // Skip if problem cannot be handled
+      if (solver.ode_only && !test.is_ode) continue;
+      // Printout
+      cout << "Solving \"" << test.name << "\" using \"" << solver.plugin << "\"" << endl;
 
       // Get integrator
-      Integrator I;
-      switch(integrator){
-      case CVODES:
-        if(problem==DAE) continue; // Skip if DAE
-        cout << endl << "== cvodes == " << endl;
-        I = Integrator("I", "cvodes", ffcn, opts);
-        break;
-      case IDAS:
-        cout << endl << "== idas == " << endl;
-        I = Integrator("I", "idas", ffcn, opts);
-        break;
-      case RK:
-        if(problem==DAE) continue; // Skip if DAE
-        cout << endl << "== RKIntegrator == " << endl;
-        I = Integrator("I", "rk", ffcn, opts);
-        break;
-      case COLLOCATION:
-        cout << endl << "== CollocationIntegrator == " << endl;
-        opts["implicit_solver"] = "kinsol";
-        opts["collocation_scheme"] = "legendre";
-        opts["implicit_solver_options"] = make_dict("linear_solver", "csparse");
-        I = Integrator("I", "collocation", ffcn, opts);
-        break;
-      case OLD_COLLOCATION:        
-        cout << endl << "== OldCollocationIntegrator == " << endl;
-        opts["expand_f"] = true;
-        opts["collocation_scheme"] = "legendre";
-        opts["implicit_solver"] = "kinsol";
-        opts["implicit_solver_options"] = make_dict("linear_solver", "csparse");
-        I = Integrator("I", "oldcollocation", ffcn, opts);
-        break;
-      }
+      Dict opts = solver.opts;
+      opts["tf"] = test.tf;
+      Function I = integrator("I", solver.plugin, test.dae, opts);
 
       // Buffers for evaluation
-      std::map<std::string, DMatrix> arg, res;
+      std::map<std::string, DM> arg, res;
       
       // Integrate to get results
-      arg["x0"] = x0;
-      arg["p"] = u0;
+      arg = decltype(arg){{"x0", test.x0},
+                          {"p", test.u0}};
       res = I(arg);
       vector<double> xf(res.at("xf"));
       vector<double> qf(res.at("qf"));
@@ -181,7 +154,7 @@ int main(){
 
       // Perturb solution to get a finite difference approximation
       double h = 0.001;
-      arg["p"] = u0+h;
+      arg["p"] = test.u0+h;
       res = I(arg);
       vector<double> fd_xf((res.at("xf")-xf)/h);
       vector<double> fd_qf((res.at("qf")-qf)/h);
@@ -189,11 +162,10 @@ int main(){
 
       // Calculate once, forward
       Function I_fwd = I.derivative(1, 0);
-      arg.clear();
-      arg["der_x0"] = x0;
-      arg["der_p"] = u0;
-      arg["fwd0_x0"] = 0;
-      arg["fwd0_p"] = 1;
+      arg = decltype(arg){{"der_x0", test.x0},
+                          {"der_p", test.u0},
+                          {"fwd0_x0", 0},
+                          {"fwd0_p", 1}};
       res = I_fwd(arg);
       vector<double> fwd_xf(res.at("fwd0_xf"));
       vector<double> fwd_qf(res.at("fwd0_qf"));
@@ -201,18 +173,14 @@ int main(){
 
       // Calculate once, adjoint
       Function I_adj = I.derivative(0, 1);
-      arg.clear();
-      arg["der_x0"] = x0;
-      arg["der_p"] = u0;
-      arg["adj0_xf"] = 0;
-      arg["adj0_qf"] = 1;
+      arg = decltype(arg){{"der_x0", test.x0}, {"der_p", test.u0}, {"adj0_xf", 0}, {"adj0_qf", 1}};
       res = I_adj(arg);
       vector<double> adj_x0(res.at("adj0_x0"));
       vector<double> adj_p(res.at("adj0_p"));
       cout << setw(50) << "Adjoint sensitivities: " << "d(qf)/d(x0) = " << adj_x0 << ", d(qf)/d(p) = " << adj_p << endl;
 
       // Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
-      arg["der_p"] = u0+h;
+      arg["der_p"] = test.u0+h;
       res = I_adj(arg);
       vector<double> fd_adj_x0((res.at("adj0_x0")-adj_x0)/h);
       vector<double> fd_adj_p((res.at("adj0_p")-adj_p)/h);
@@ -220,12 +188,11 @@ int main(){
       
       // Forward over adjoint to get the second order sensitivities
       Function I_foa = I_adj.derivative(1, 0);
-      arg.clear();
-      arg["der_der_x0"] = x0;
-      arg["der_der_p"] = u0;
-      arg["fwd0_der_p"] = 1;
-      arg["der_adj0_xf"] = 0;
-      arg["der_adj0_qf"] = 1;
+      arg = decltype(arg){{"der_der_x0", test.x0},
+                          {"der_der_p", test.u0},
+                          {"fwd0_der_p", 1},
+                          {"der_adj0_xf", 0},
+                          {"der_adj0_qf", 1}};
       res = I_foa(arg);
       vector<double> fwd_adj_x0(res.at("fwd0_adj0_x0"));
       vector<double> fwd_adj_p(res.at("fwd0_adj0_p"));
@@ -233,12 +200,11 @@ int main(){
 
       // Adjoint over adjoint to get the second order sensitivities
       Function I_aoa = I_adj.derivative(0, 1);
-      arg.clear();
-      arg["der_der_x0"] = x0;
-      arg["der_der_p"] = u0;
-      arg["der_adj0_xf"] = 0;
-      arg["der_adj0_qf"] = 1;
-      arg["adj0_adj0_p"] = 1;
+      arg = decltype(arg){{"der_der_x0", test.x0},
+                          {"der_der_p", test.u0},
+                          {"der_adj0_xf", 0},
+                          {"der_adj0_qf", 1},
+                          {"adj0_adj0_p", 1}};
       res = I_aoa(arg);
       vector<double> adj_adj_x0(res.at("adj0_der_x0"));
       vector<double> adj_adj_p(res.at("adj0_der_p"));

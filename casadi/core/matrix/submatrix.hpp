@@ -144,26 +144,6 @@ namespace casadi {
     ///@}
   };
 
-#define INSTANTIATE_SUBMATRIX(Mt)\
-template class SubMatrix< Mt , int, int >;\
-template class SubMatrix< Mt , int, std::vector<int> >;\
-template class SubMatrix< Mt , int, Slice >;\
-template class SubMatrix< Mt , std::vector<int> , int >;\
-template class SubMatrix< Mt , std::vector<int> , std::vector<int> >;\
-template class SubMatrix< Mt , std::vector<int> , Matrix<int> >;\
-template class SubMatrix< Mt , std::vector<int> , Slice >;\
-template class SubMatrix< Mt , int , Matrix<int> >;\
-template class SubMatrix< Mt , Slice, int >;\
-template class SubMatrix< Mt , Slice, Slice >;\
-template class SubMatrix< Mt , Matrix<int> , int >;\
-template class SubMatrix< Mt , Matrix<int> , std::vector<int> >;\
-template class SubMatrix< Mt , Matrix<int> , Matrix<int> >;\
-template class SubIndex< Mt , int >;\
-template class SubIndex< Mt , std::vector<int> >;\
-template class SubIndex< Mt , Slice >;\
-template class SubIndex< Mt , Matrix<int> >;\
-template class SubIndex< Mt , Sparsity>;
-
 } // namespace casadi
 
 

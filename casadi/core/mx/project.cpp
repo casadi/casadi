@@ -38,7 +38,7 @@ namespace casadi {
   }
 
   std::string Project::print(const std::vector<std::string>& arg) const {
-    if (sparsity().isdense()) {
+    if (sparsity().is_dense()) {
       return "dense(" + arg.at(0) + ")";
     } else {
       return "project(" + arg.at(0) + ")";
@@ -46,19 +46,19 @@ namespace casadi {
   }
 
   template<typename T>
-  void Project::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void Project::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     casadi_project(arg[0], dep().sparsity(), res[0], sparsity(), w);
   }
 
-  void Project::evalD(const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void Project::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Project::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void Project::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
-  void Project::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Project::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = project(arg[0], sparsity());
   }
 
@@ -78,17 +78,17 @@ namespace casadi {
     }
   }
 
-  void Project::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Project::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     sparsity().set(res[0], arg[0], dep().sparsity());
   }
 
-  void Project::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Project::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
   }
 
-  void Project::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                           CodeGenerator& g) const {
+  void Project::generate(CodeGenerator& g, const std::string& mem,
+                         const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "  " << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
                                 g.work(res.front(), nnz()), sparsity(), "w") << endl;
   }

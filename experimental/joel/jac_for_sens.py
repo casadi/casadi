@@ -28,10 +28,10 @@ b = ssym("b",5)
 
 for jac_for_sens in (True,False):
   print "jac_for_sens = ", jac_for_sens, ":"
-  f = SXFunction([a,b],[sqrt(b-sin(a)),inner_prod(a,b),outer_prod(a,b)])
+  f = SXFunction([a,b],[sqrt(b-sin(a)),dot(a,b),outer_prod(a,b)])
   f.setOption("jac_for_sens",jac_for_sens)
   f.init()
-  #print f.jacSparsity(0,0)
+  #print f.sparsity_jac(0,0)
 
   f.setInput([1,2,3,4,5],0)
   f.setInput([10,20,30,40,50],1)
@@ -41,7 +41,7 @@ for jac_for_sens in (True,False):
 
   f.setAdjSeed([0,0,0,0,0],0)
   f.setAdjSeed(1,1)
-  f.setAdjSeed(DMatrix(5,5,0),2)
+  f.setAdjSeed(DM(5,5,0),2)
 
   f.evaluate(1,1)
 

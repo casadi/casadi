@@ -31,6 +31,6 @@
 * \sa
 * \code
 * casadi::matrix_expand(x);
-* casadi::MXFunction::expand();
+* casadi::Function::expand();
 * \endcode
 */

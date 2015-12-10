@@ -23,14 +23,14 @@
  */
 
 /** 
-* This example looks at the jacSparsity method
+* This example looks at the sparsity_jac method
 *
 *
-* \pythonexample{SX/jacSparsity}
+* \pythonexample{SX/sparsity_jac}
 *
 * \sa
 * \code
-* casadi::SXfunction::jacSparsity();
+* casadi::SXfunction::sparsity_jac();
 * \endcode
 *
 */

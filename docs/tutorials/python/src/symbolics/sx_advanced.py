@@ -30,25 +30,25 @@ from numpy import *
 #! We demonstrate this with the help of symbolic substitution.
 x=SX.sym("x")
 y=x**2
-f = SXFunction('f', [x],[y])
+f = Function('f', [x],[y])
 print f([SX.sym("w")])
 #! We expect w^2.
 l = x
-f = SXFunction('f', [l],[y])
+f = Function('f', [l],[y])
 print f([SX.sym("w")])
 #! We expect w^2.
 k=SX(x)
 l=k[0]
-f = SXFunction('f', [l],[y])
+f = Function('f', [l],[y])
 print f([SX.sym("w")])
 #! We expect w^2.
 k=SX.sym("d",2,2)
 k.nz[1] = x
 l=k.nz[1]
-f = SXFunction('f', [l],[y])
+f = Function('f', [l],[y])
 print f([SX.sym("w")])
 #! We expect w^2.
 #! Identity is not associated with name:
 l=SX.sym("x")
-f = SXFunction('f', [l],[y])
+f = Function('f', [l],[y])
 print f([SX.sym("w")])

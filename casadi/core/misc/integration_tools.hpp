@@ -26,7 +26,7 @@
 #ifndef CASADI_INTEGRATION_TOOLS_HPP
 #define CASADI_INTEGRATION_TOOLS_HPP
 
-#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/function.hpp"
 
 namespace casadi {
 
@@ -70,7 +70,7 @@ namespace casadi {
   enum CollocationPoints {LEGENDRE, RADAU};
 
   /** \brief Construct an explicit Runge-Kutta integrator
-   * The constructed function (which is of type MXFunction), has three inputs,
+   * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
    *
@@ -78,10 +78,10 @@ namespace casadi {
    * \param N     Number of integrator steps
    * \param order Order of interpolating polynomials
    */
-  CASADI_EXPORT MXFunction simpleRK(Function f, int N=10, int order=4);
+  CASADI_EXPORT Function simpleRK(Function f, int N=10, int order=4);
 
   /** \brief Construct an implicit Runge-Kutta integrator using a collocation scheme
-   * The constructed function (which is of type MXFunction), has three inputs,
+   * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
    *
@@ -91,13 +91,13 @@ namespace casadi {
    * \param scheme Collocation scheme, as excepted by collocationPoints function.
   */
   CASADI_EXPORT
-  MXFunction simpleIRK(Function f, int N=10, int order=4, const std::string& scheme="radau",
+  Function simpleIRK(Function f, int N=10, int order=4, const std::string& scheme="radau",
                        const std::string& solver="newton",
                        const Dict& solver_options = Dict());
 
   /** \brief Simplified wrapper for the Integrator class
    * Constructs an integrator using the same syntax as simpleRK and simpleIRK.
-   * The constructed function (which is of type MXFunction), has three inputs,
+   * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
    *
@@ -107,7 +107,7 @@ namespace casadi {
    * \param scheme Collocation scheme, as excepted by collocationPoints function.
   */
   CASADI_EXPORT
-  MXFunction simpleIntegrator(Function f, const std::string& integrator="cvodes",
+  Function simpleIntegrator(Function f, const std::string& integrator="cvodes",
                               const Dict& integrator_options = Dict());
 } // namespace casadi
 

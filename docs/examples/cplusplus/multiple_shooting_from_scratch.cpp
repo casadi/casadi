@@ -84,10 +84,10 @@ int main(){
   // ODE right hand side and quadrature
   SX ode = vertcat((1 - s*s)*r - s + u, r);
   SX quad = r*r + s*s + u*u;
-  SXFunction rhs("rhs", daeIn("x", x, "p", u), daeOut("ode", ode, "quad", quad));
+  SXDict dae = {{"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}};
 
   // Create an integrator (CVodes)
-  Integrator integrator("integrator", "cvodes", rhs, make_dict("t0", 0, "tf", tf/ns));
+  Function F = integrator("integrator", "cvodes", dae, {{"t0", 0}, {"tf", tf/ns}});
   
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;
@@ -143,7 +143,7 @@ int main(){
   // Loop over shooting nodes
   for(int k=0; k<ns; ++k){
     // Create an evaluation node
-    map<string, MX> I_out = integrator(make_map("x0", X[k], "p", U[k]));
+    MXDict I_out = F(MXDict{{"x0", X[k]}, {"p", U[k]}});
 
     // Save continuity constraints
     g.push_back( I_out.at("xf") - X[k+1] );
@@ -153,7 +153,7 @@ int main(){
   }
   
   // NLP 
-  MXFunction nlp("nlp", nlpIn("x", V), nlpOut("f", J, "g", vertcat(g)));
+  MXDict nlp = {{"x", V}, {"f", J}, {"g", vertcat(g)}};
 
   // Set options
   Dict opts;
@@ -162,8 +162,8 @@ int main(){
   opts["linear_solver"] = "ma27";
 
   // Create an NLP solver and buffers
-  NlpSolver nlp_solver("nlp_solver", "ipopt", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  Function solver = nlpsol("nlpsol", "ipopt", nlp, opts);
+  std::map<std::string, DM> arg, res;
 
   // Bounds and initial guess
   arg["lbx"] = v_min;
@@ -173,7 +173,7 @@ int main(){
   arg["x0"] = v_init;
 
   // Solve the problem
-  res = nlp_solver(arg);
+  res = solver(arg);
     
   // Optimal solution of the NLP
   const Matrix<double>& V_opt = res.at("x");

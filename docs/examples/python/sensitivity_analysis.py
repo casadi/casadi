@@ -28,7 +28,7 @@ from copy import deepcopy
 print "Testing sensitivity analysis in CasADi"
 
 # All ODE and DAE integrators to be tested
-DAE_integrators = ["idas","collocation","oldcollocation"]
+DAE_integrators = ["idas","collocation"]
 ODE_integrators = ["cvodes","rk"] + DAE_integrators
 
 for Integrators in (ODE_integrators,DAE_integrators):    
@@ -60,7 +60,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = v**3 + ((3-sin(t)) - u)**2
 
     # DAE callback function
-    ffcn = SXFunction("ffcn",daeIn(t=t,x=x,p=u),daeOut(ode=ode,quad=quad))
+    dae = {'t':t, 'x':x, 'p':u, 'ode':ode, 'quad':quad}
 
     # Time length
     tf = 0.5
@@ -94,7 +94,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = x*x + 3.0*u*u
 
     # DAE callback function
-    ffcn = SXFunction("ffcn",daeIn(x=x,z=z,p=u),daeOut(ode=ode,alg=alg,quad=quad))
+    dae = {'x':x, 'z':z, 'p':u, 'ode':ode, 'alg':alg, 'quad':quad}
     
     # End time
     tf = 5.
@@ -113,13 +113,12 @@ for Integrators in (ODE_integrators,DAE_integrators):
     
     # Integrator options
     opts = {"tf":tf}
-    if MyIntegrator in ("collocation","oldcollocation"):
+    if MyIntegrator=="collocation":
       opts["implicit_solver"] = "kinsol"
       opts["implicit_solver_options"] = {"linear_solver":"csparse"}
-      if MyIntegrator=="oldcollocation": opts["expand_f"] = True
 
     # Integrator
-    I = Integrator("I", MyIntegrator, ffcn, opts)
+    I = integrator("I", MyIntegrator, dae, opts)
 
     # Integrate to get results
     arg = {"x0":x0, "p":u0}

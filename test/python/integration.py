@@ -41,25 +41,18 @@ except:
 integrators = []
 
 try:
-  Integrator.loadPlugin("cvodes")
+  load_integrator("cvodes")
   integrators.append(("cvodes",["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False}))
 except:
   pass
   
 try:
-  Integrator.loadPlugin("idas")
+  load_integrator("idas")
   integrators.append(("idas",["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
 except:
   pass
 
 integrators.append(("collocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18}))
-
-try:
-  Integrator.loadPlugin("oldcollocation")
-  integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"idas"}))
-  #integrators.append(("oldcollocation",["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": "csparse"}}))
-except:
-  pass
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000}))
 
@@ -72,15 +65,13 @@ class Integrationtests(casadiTestCase):
   @slow()
   def test_full(self):
     num = self.num
-    tc = DMatrix(n.linspace(0,num['tend'],100))
+    tc = DM(n.linspace(0,num['tend'],100))
     
     t=SX.sym("t")
     q=SX.sym("q")
     p=SX.sym("p")
     
-    out = SXFunction("out", daeIn(t=t, x=q, p=p),[q,t,p])
-        
-    f=SXFunction("f", daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
+    dae = {'t':t, 'x':q, 'p':p, 'ode':q/p*t**2}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -88,11 +79,11 @@ class Integrationtests(casadiTestCase):
     #opts["verbose"] = True
     opts["t0"] = 0
     opts["tf"] = 2.3
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
     tf = 2.3
     
-    solution = SXFunction("solution", integratorIn(x0=q, p=p),integratorOut(xf=q*exp(tf**3/(3*p))))
-    
+    solution = Function("solution", {'x0':q, 'p':p, 'xf':q*exp(tf**3/(3*p))},
+                        casadi.integrator_in(), casadi.integrator_out())
     for f in [solution,integrator]:
       f.setInput(0.3,"x0")
       f.setInput(0.7,"p")
@@ -105,7 +96,7 @@ class Integrationtests(casadiTestCase):
     x = SX.sym("x")
     p = SX.sym("p",0)
     tf = SX.sym("tf")
-    f=SXFunction("f", [x,p], [x])
+    f=Function("f", [x,p], [x])
     
     for integrator in [
          simpleRK(f),
@@ -113,7 +104,7 @@ class Integrationtests(casadiTestCase):
          simpleIntegrator(f)
        ]:
 
-      solution = SXFunction("solution", [x,p,tf],[x*exp(tf)], {"input_scheme":["x0","p","h"], "output_scheme":["xf"]})
+      solution = Function("solution", [x,p,tf], [x*exp(tf)], ["x0","p","h"], ["xf"])
 
       for f in [solution,integrator]:
         f.setInput(1,"x0")
@@ -130,15 +121,14 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p")
     t0=SX.sym("t0")
     q0=SX.sym("q0")
-    f=SXFunction("f", [vertcat((q,t)),p],[vertcat((q/p*t**2,1))])
+    f=Function("f", [vertcat((q,t)),p],[vertcat((q/p*t**2,1))])
     for integrator in [
             simpleRK(f,500),
             simpleIRK(f,50),
             simpleIntegrator(f)
             ]:
 
-      opts = {'input_scheme':["x0","p","h"], 'output_scheme':["xf"]}
-      solution = SXFunction('solver', [vertcat((q0,t0)),p,t], [vertcat([q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])], opts)
+      solution = Function('solver', [vertcat((q0,t0)),p,t], [vertcat([q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])], ["x0","p","h"], ["xf"])
       
       for f in [solution,integrator]:
         f.setInput([0.3,0],"x0")
@@ -153,7 +143,7 @@ class Integrationtests(casadiTestCase):
     # This test is not automized, but works by inspection only.
     # To activate, recompile after ucnommenting the printout lines in cvodes.c, near "Used for validating casadi#536"
     #return
-    DMatrix.setPrecision(18)
+    DM.setPrecision(18)
 
     tstart = SX.sym("tstart")
     tend = SX.sym("tend")
@@ -212,19 +202,20 @@ class Integrationtests(casadiTestCase):
         for Integrator, features, options in integrators:
           self.message(Integrator)
           x = SX.sym("x")
-          dummyIntegrator = c.Integrator("dummyIntegrator", Integrator, SXFunction("dae", daeIn(x=x), daeOut(ode=x)))
+          dummyIntegrator = casadi.integrator("dummyIntegrator", Integrator, {'x':x, 'ode':x})
           if p_features[0] in features:
-            g = Function()
-            if len(rdin)>1:
-              g = SXFunction("g", rdaeIn(**rdin),rdaeOut(**rdout))
-               
-            f = SXFunction("f", daeIn(**din),daeOut(**dout))
+
+            dae = din.copy()
+            dae.update(dout)
+            dae.update(rdin)
+            for k, v in rdout.iteritems(): dae['r'+k] = v
             
             for k in solution.keys():
               solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
 
-            fs = SXFunction("fs", integratorIn(**solutionin),integratorOut(**solution))
-              
+            sol = solutionin.copy()
+            sol.update(solution)
+            fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
           
             def itoptions(post=""):
               yield {"iterative_solver"+post: "gmres"}
@@ -233,7 +224,7 @@ class Integrationtests(casadiTestCase):
              
             def solveroptions(post=""):
               yield {"linear_solver_type" +post: "dense" }
-              allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
+              allowedOpts = list(dummyIntegrator.optionAllowed("linear_solver_type" +post))
               #allowedOpts.remove("iterative") # disabled, see #1231
               if "iterative" in allowedOpts:
                   for it in itoptions(post):
@@ -258,10 +249,10 @@ class Integrationtests(casadiTestCase):
                 for op in (options, f_options, a_options):
                   for (k,v) in op.items():
                     opts[k] = v
-                integrator = c.Integrator("integrator", Integrator, (f, g), opts)
+                integrator = casadi.integrator("integrator", Integrator, dae, opts)
                 for ff in [fs,integrator]:
                   for k,v in point.items():
-                    if not ff.getInput(k).isempty():
+                    if not ff.sparsity_in(k).is_empty():
                       ff.setInput(v,k)
 
                 integrator.evaluate()
@@ -325,19 +316,21 @@ class Integrationtests(casadiTestCase):
       for Integrator, features, options in integrators:
         self.message(Integrator)
         x = SX.sym("x")
-        dummyIntegrator = c.Integrator("dummyIntegrator", Integrator, SXFunction("dae", daeIn(x=x), daeOut(ode=x)))
+        dummyIntegrator = casadi.integrator("dummyIntegrator", Integrator, {'x':x, 'ode':x})
         if p_features[0] in features:
-          g = Function()
-          if len(rdin)>1:
-            g = SXFunction("g", rdaeIn(**rdin),rdaeOut(**rdout))
-             
-          f = SXFunction("f", daeIn(**din),daeOut(**dout))
+
+          dae = din.copy()
+          dae.update(dout)
+          dae.update(rdin)
+          for k, v in rdout.iteritems(): dae['r'+k] = v
             
           for k in solution.keys():
             solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
           
-          fs = SXFunction("fs", integratorIn(**solutionin),integratorOut(**solution))
-        
+          sol = solutionin.copy()
+          sol.update(solution)
+          fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
+
           def itoptions(post=""):
             yield {"iterative_solver"+post: "gmres"}
             yield {"iterative_solver"+post: "bcgstab"}
@@ -345,7 +338,7 @@ class Integrationtests(casadiTestCase):
            
           def solveroptions(post=""):
             yield {"linear_solver_type" +post: "dense" }
-            allowedOpts = list(dummyIntegrator.getOptionAllowed("linear_solver_type" +post))
+            allowedOpts = list(dummyIntegrator.optionAllowed("linear_solver_type" +post))
             #allowedOpts.remove("iterative")  # disabled, see #1231
             if "iterative" in allowedOpts:
                 for it in itoptions(post):
@@ -368,11 +361,11 @@ class Integrationtests(casadiTestCase):
               for op in (options, f_options, a_options):
                  for (k,v) in op.items():
                     opts[k] = v
-              integrator = c.Integrator("integrator", Integrator, (f, g), opts)
+              integrator = casadi.integrator("integrator", Integrator, dae, opts)
               
               for ff in [fs,integrator]:
                 for k,v in point.items():
-                  if not ff.getInput(k).isempty():
+                  if not ff.sparsity_in(k).is_empty():
                     ff.setInput(v,k)
 
               integrator.evaluate()
@@ -493,17 +486,18 @@ class Integrationtests(casadiTestCase):
           if p_features[0] in features:
             message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
             print message
-            g = Function()
-            if len(rdin)>1:
-              g = SXFunction("g", rdaeIn(**rdin),rdaeOut(**rdout))
-               
-            dout_sx = {k:SX(v) for k, v in dout.iteritems()} # hack
-            f = SXFunction("f", daeIn(**din),daeOut(**dout_sx))
+
+            dae = din.copy()
+            dae.update(dout)
+            dae.update(rdin)
+            for k, v in rdout.iteritems(): dae['r'+k] = v
             
             for k in solution.keys():
               solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
             
-            fs = SXFunction("fs", integratorIn(**solutionin),integratorOut(**solution))
+            sol = solutionin.copy()
+            sol.update(solution)
+            fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
 
             opts = dict(options)
             opts["t0"] = tstart_
@@ -512,14 +506,14 @@ class Integrationtests(casadiTestCase):
               opts["reltol"] = 1e-9
             opts["tf"] = tend_
             if Integrator=='idas':
-              opts["init_xdot"] = list(DMatrix(point["x0"]))
+              opts["init_xdot"] = list(DM(point["x0"]))
               opts["calc_icB"] = True
               opts["augmented_options"] = {"init_xdot":None, "abstol":1e-9,"reltol":1e-9}
-            integrator = c.Integrator("integrator", Integrator, (f, g), opts)
+            integrator = casadi.integrator("integrator", Integrator, dae, opts)
 
             for ff in [fs,integrator]:
               for k,v in point.items():
-                if not ff.getInput(k).isempty():
+                if not ff.sparsity_in(k).is_empty():
                   ff.setInput(v,k)
             integrator.evaluate()
             
@@ -531,7 +525,7 @@ class Integrationtests(casadiTestCase):
     t=SX.sym("t")
     x=SX.sym("x")
     p=SX.sym("p")
-    f=SXFunction("f", daeIn(t=t, x=x, p=p),daeOut(ode=x/p*t**2))
+    dae={'t':t, 'x':x, 'p':p, 'ode':x/p*t**2}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -539,32 +533,32 @@ class Integrationtests(casadiTestCase):
     #opts["verbose"] = True
     opts["t0"] = 0
     opts["tf"] = 2.3
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
     q0   = MX.sym("q0")
     par  = MX.sym("p")
     
     qend = integrator({'x0':q0, 'p':par})["xf"]
     
-    qe=MXFunction("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
     self.integrator = integrator
     self.qe=qe
     self.qend=qend
     self.q0=q0
     self.par=par
-    self.f = f
+    self.dae = dae
     self.num={'tend':2.3,'q0':7.1,'p':2}
     pass
             
   def test_eval2(self):
-    self.message('CVodes integration: evaluation with MXFunction indirection')
+    self.message('CVodes integration: evaluation with Function indirection')
     num=self.num
     qend=self.qend
     
     par=self.par
     q0=self.q0
-    qe=MXFunction("qe", [q0,par],[qend[0]])
+    qe=Function("qe", [q0,par],[qend[0]])
     
-    f = MXFunction("f", [q0],qe.call([q0,MX(num['p'])]))
+    f = Function("f", [q0],qe([q0,MX(num['p'])]))
     f.setInput([num['q0']],0)
     f.evaluate()
 
@@ -572,33 +566,18 @@ class Integrationtests(casadiTestCase):
     q0=num['q0']
     p=num['p']
     self.assertAlmostEqual(f.getOutput()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
-  
-  def test_issue92c(self):
-    self.message("regression check for issue 92")
-    t=SX.sym("t")
-    x=SX.sym("x")
-    y=SX.sym("y")
-    z=x*exp(t)
-    f=SXFunction("f", daeIn(t=t, x=vertcat([x,y])),[vertcat([z,z])])
-    # Pass inputs
-    f.setInput(1.0,"t")
-    f.setInput([1.0,0.0],"x")
-    # Evaluate 
-    f.evaluate()
-    # print result
-    print f.getOutput()
-  
+    
   def test_issue92b(self):
     self.message("regression check for issue 92")
     t=SX.sym("t")
     x=SX.sym("x")
     y=SX.sym("y")
-    f=SXFunction("f", daeIn(t=t, x=vertcat([x,y])),daeOut(ode=vertcat([x,(1+1e-9)*x])))
+    dae = {'t':t, 'x':vertcat([x,y]), 'ode':vertcat([x,(1+1e-9)*x])}
     opts = {}
     opts["fsens_err_con"] = True
     opts["t0"] = 0
     opts["tf"] = 1
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     # Pass inputs
     integrator.setInput([1,0],"x0")
@@ -616,17 +595,17 @@ class Integrationtests(casadiTestCase):
     q = vertcat([x,SX.sym("problem")])
 
     dq=vertcat([x,x])
-    f=SXFunction("f", daeIn(t=t,x=q),daeOut(ode=dq))
+    dae = {'t':t, 'x':q, 'ode':dq}
     opts = {}
     opts["fsens_err_con"] = True
     opts["reltol"] = 1e-12
     opts["t0"] = 0
     opts["tf"] = 1
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     qend = integrator({'x0':var})["xf"]
 
-    f = MXFunction("f", [var],[qend[0]])
+    f = Function("f", [var],[qend[0]])
 
     J=f.jacobian(0)
     J.setInput([1,0])
@@ -686,7 +665,7 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p")
 
     dh = p+q[0]**2
-    f=SXFunction("f", daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],dh])))
+    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat([dh ,q[0],dh])}
 
     opts = {}
     opts["reltol"] = 1e-15
@@ -696,12 +675,12 @@ class Integrationtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",1,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MXFunction("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
 
     #J=self.qe.jacobian(2)
     J=qe.jacobian(0)
@@ -709,7 +688,7 @@ class Integrationtests(casadiTestCase):
     J.setInput(p0,1)
     J.evaluate()
     outA=J.getOutput().toArray()
-    f=SXFunction("f", daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],(1+1e-9)*dh])))
+    dae={'x':q, 'p':p, 't':t, 'ode':vertcat([dh ,q[0],(1+1e-9)*dh])}
     
     opts = {}
     opts["reltol"] = 1e-15
@@ -719,12 +698,12 @@ class Integrationtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",1,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MXFunction("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
 
     #J=self.qe.jacobian(2)
     J=qe.jacobian(0)
@@ -755,7 +734,10 @@ class Integrationtests(casadiTestCase):
     
     q0=MX.sym("q0")
     p=MX.sym("p")
-    Ji = MXFunction("Ji", [q0,p],(J({'x0':q0,'p':p}), J.outputScheme()))
+    Ji = J({'x0':q0,'p':p})
+    Ji["q0"] = q0
+    Ji["p"] = p
+    Ji = Function("Ji", Ji, ["q0", "p"], J.name_out())
     H=Ji.jacobian(1)
     H.setInput([num['q0']],0)
     H.setInput([num['p']],1)
@@ -771,9 +753,13 @@ class Integrationtests(casadiTestCase):
     num=self.num
     q0=MX.sym("q0")
     p=MX.sym("p")
-    qe = MXFunction("qe", [q0,p],integratorOut(**self.integrator({'x0':q0,'p':p})))
 
-    JT = MXFunction("JT", [q0,p],[qe.jac(1,0)[0].T])
+    sol = self.integrator({'x0':q0,'p':p})
+    sol["q0"] = q0
+    sol["p"] = p
+    qe = Function("qe", sol, ["q0", "p"], casadi.integrator_out())
+
+    JT = Function("JT", [q0,p],[MX.jac(qe, 1,0)[0].T])
     JT.setInput([num['q0']],0)
     JT.setInput([num['p']],1)
     JT.evaluate()
@@ -793,7 +779,11 @@ class Integrationtests(casadiTestCase):
     num=self.num
     q0=MX.sym("q0")
     p=MX.sym("p")
-    qe = MXFunction("qe", [q0,p],integratorOut(**self.integrator({'x0':q0,'p':p})))
+
+    sol = self.integrator({'x0':q0,'p':p})
+    sol["q0"] = q0
+    sol["p"] = p
+    qe = Function("qe", sol, ["q0", "p"], casadi.integrator_out())
     
     H = qe.hessian(1)
     H.setInput([num['q0']],0)
@@ -814,21 +804,19 @@ class Integrationtests(casadiTestCase):
     t=SX.sym("t")
     q=SX.sym("q",3,1)
     p=SX.sym("p",9,1)
-    f_in = daeIn(t=t, x=q, p=p)
-    f_out = daeOut(ode=mul(c.reshape(p,3,3),q))
-    f=SXFunction("f", f_in,f_out)
+    dae = {'t':t, 'x':q, 'p':p, 'ode':mul(c.reshape(p,3,3),q)}
     opts = {}
     opts["fsens_err_con"] = True
     opts["steps_per_checkpoint"] = 1000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",9,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
     qe=integrator.jacobian("p","xf")
     qe = qe({'x0':q0,'p':par})['jac']
-    qef=MXFunction("qef", [q0,par],[qe])
+    qef=Function("qef", [q0,par],[qe])
 
     qef.setInput(A,0)
     qef.setInput(B.ravel(),1)
@@ -846,7 +834,7 @@ class Integrationtests(casadiTestCase):
     q=SX.sym("q",3,1)
     p=SX.sym("p",9,1)
 
-    f=SXFunction("f", daeIn(t=t,x=q,p=p),daeOut(ode=mul(c.reshape(p,3,3),q)))
+    dae = {'t':t, 'x':q, 'p':p, 'ode':mul(c.reshape(p,3,3),q)}
     opts = {}
     opts["fsens_err_con"] = True
     opts["reltol"] = 1e-15
@@ -855,21 +843,21 @@ class Integrationtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",9,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MXFunction("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian("x0","xf")
     qendJ = qendJ({'x0':q0,'p':par})['jac']
 
-    qeJ=MXFunction("qeJ", [q0,par],[qendJ])
+    qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qendJ2=integrator.jacobian("x0","xf")
     qendJ2 = qendJ2({'x0':q0,'p':par})['jac']
 
-    qeJ2=MXFunction("qeJ2", [q0,par],[qendJ2])
+    qeJ2=Function("qeJ2", [q0,par],[qendJ2])
     
     qe.setInput(A,0)
     qe.setInput(vec(B),1)
@@ -903,7 +891,7 @@ class Integrationtests(casadiTestCase):
     q=SX.sym("q",2,1)
     p=SX.sym("p",3,1)
 
-    f=SXFunction("f", daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])))
+    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])}
     opts = {}
     opts["fsens_err_con"] = True
     opts["reltol"] = 1e-15
@@ -912,15 +900,15 @@ class Integrationtests(casadiTestCase):
     opts["steps_per_checkpoint"] = 10000
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     q0   = MX.sym("q0",2,1)
     par  = MX.sym("p",3,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MXFunction("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian("x0","xf")
     qendJ =qendJ({'x0':q0,'p':par})['jac']
-    qeJ=MXFunction("qeJ", [q0,par],[qendJ])
+    qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qe.setInput(A,0)
     qe.setInput(B,1)
@@ -947,7 +935,7 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    f=SXFunction("f", daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
+    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],p[0]+q[1]**2])}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -956,17 +944,17 @@ class Integrationtests(casadiTestCase):
     opts["fsens_err_con"] = True
     opts["t0"] = 0
     opts["tf"] = te
-    integrator = Integrator("integrator", "cvodes", f, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     t0   = MX(0)
     tend = MX(te)
     q0   = MX.sym("q0",2,1)
     par  = MX.sym("p",1,1)
     qend = integrator({'x0':q0, 'p':par})["xf"]
-    qe=MXFunction("qe", [q0,par],[qend])
+    qe=Function("qe", [q0,par],[qend])
     qendJ=integrator.jacobian("x0","xf")
     qendJ = qendJ({'x0':q0, 'p':par})['jac']
-    qeJ=MXFunction("qeJ", [q0,par],[qendJ])
+    qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qe.setInput(A,0)
     qe.setInput(p0,1)
@@ -1012,7 +1000,7 @@ class Integrationtests(casadiTestCase):
     
     qendJ=integrator.jacobian("p","xf")
     qendJ = qendJ({'x0':q0,'p':par})['jac']
-    qeJ=MXFunction("qeJ", [q0,par],[qendJ])
+    qeJ=Function("qeJ", [q0,par],[qendJ])
 
     qeJ.setInput(A,0)
     qeJ.setInput(p0,1)
@@ -1023,7 +1011,7 @@ class Integrationtests(casadiTestCase):
     
     
     
-    qeJf=MXFunction("qeJf", [q0,par],[vec(qeJ.call([q0,par])[0])])
+    qeJf=Function("qeJf", [q0,par],[vec(qeJ([q0,par])[0])])
     
     H=qeJf.jacobian(0,0)
     H.setInput(A,0)
@@ -1040,23 +1028,27 @@ class Integrationtests(casadiTestCase):
     self.message("hessian")
     N=2
 
-    x0_ = DMatrix([1,0.1])
-    A_  = DMatrix([[3,1],[0.74,4]])
+    x0_ = DM([1,0.1])
+    A_  = DM([[3,1],[0.74,4]])
 
     A = SX.sym("A",N,N)
     x = SX.sym("x",N)
 
-    ode = SXFunction("ode", daeIn(x=x, p=vec(A)),daeOut(ode=mul(A,x)))
-    I = Integrator("I", "cvodes", ode, {"fsens_err_con": True, 'reltol' : 1e-12})
+    dae = {'x':x, 'p':vec(A), 'ode':mul(A,x)}
+    I = casadi.integrator("I", "cvodes", dae, {"fsens_err_con": True, 'reltol' : 1e-12})
     I.setInput(x0_,"x0")
     I.setInput(vec(A_),"p")
     I.evaluate()
 
     q0=MX.sym("q0",N)
     p=MX.sym("p",N*N)
-    qe = MXFunction("qe", [q0,p],integratorOut(**I({'x0':q0,'p':p})))
 
-    JT = MXFunction("JT", [q0,p],[qe.jac(1,0).T])
+    sol = I({'x0':q0,'p':p})
+    sol["q0"] = q0
+    sol["p"] = p
+    qe = Function("qe", sol, ["q0", "p"], casadi.integrator_out())
+
+    JT = Function("JT", [q0,p],[MX.jac(qe, 1,0).T])
 
     H  = JT.jacobian(1)
     H.setInput(x0_,0)
@@ -1085,17 +1077,16 @@ class Integrationtests(casadiTestCase):
     z=SX.sym("z")
     rz=SX.sym("rz")
     rp=SX.sym("rp")
-    f = SXFunction("f", daeIn(**{'x': x, 'z': z}),daeOut(**{'alg': x-z, 'ode': z}))
-    g = SXFunction("g", rdaeIn(**{'x': x, 'z': z, 'rx': rx, 'rz': rz}),rdaeOut(**{'alg': x-rz, 'ode': rz}))
+    dae = {'x': x, 'z': z, 'rx': rx, 'rz': rz, 'alg': x-z, 'ode': z, 'ralg': x-rz, 'rode': rz}
 
-    integrator = Integrator("integrator", "idas", (f,g), {'calc_ic': True, 'tf': 2.3, 'reltol': 1e-10, 'augmented_options': {'reltol': 1e-09, 'abstol': 1e-09 }, 'calc_icB': True, 'abstol': 1e-10, 't0': 0.2})
+    integrator = casadi.integrator("integrator", "idas", dae, {'calc_ic': True, 'tf': 2.3, 'reltol': 1e-10, 'augmented_options': {'reltol': 1e-09, 'abstol': 1e-09 }, 'calc_icB': True, 'abstol': 1e-10, 't0': 0.2})
 
     integrator.setInput(7.1,"x0")
-    if not integrator.getInput("p").isempty():
+    if not integrator.getInput("p").is_empty():
       integrator.setInput(2,"p")
-    if not integrator.getInput("rx0").isempty():
+    if not integrator.getInput("rx0").is_empty():
       integrator.setInput(0.13,"rx0")
-    if not integrator.getInput("rp").isempty():
+    if not integrator.getInput("rp").is_empty():
       integrator.setInput(0.127,"rp")
 
     integrator.evaluate()
@@ -1116,7 +1107,7 @@ class Integrationtests(casadiTestCase):
     for k in range(1,10):
       r = collocationPoints(k,"radau")
       self.assertEqual(len(r),k+1)
-      self.checkarray(DMatrix(r[-1]),DMatrix([1]))
+      self.checkarray(DM(r[-1]),DM([1]))
     for k in range(1,10):
       r = collocationPoints(k,"legendre")
       self.assertEqual(len(r),k+1) 

@@ -26,7 +26,7 @@
 #ifndef CASADI_NLP_BUILDER_HPP
 #define CASADI_NLP_BUILDER_HPP
 
-#include "../sx/sx_element.hpp"
+#include "../sx/sx_elem.hpp"
 
 namespace casadi {
 
@@ -52,16 +52,16 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
       SX g;
 
       /// Bounds on x
-      DMatrix x_lb, x_ub;
+      DM x_lb, x_ub;
 
       /// Bounds on g
-      DMatrix g_lb, g_ub;
+      DM g_lb, g_ub;
 
       /// Primal initial guess
-      DMatrix x_init;
+      DM x_init;
 
       /// Dual initial guess
-      DMatrix lambda_init;
+      DM lambda_init;
 
     ///@}
 
@@ -78,7 +78,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
   protected:
 
     /// Read an expression from an NL-file (Polish infix format)
-    static SXElement readExpressionNL(std::istream &stream, const std::vector<SXElement>& v);
+    static SXElem readExpressionNL(std::istream &stream, const std::vector<SXElem>& v);
 
 #endif // SWIG
 };

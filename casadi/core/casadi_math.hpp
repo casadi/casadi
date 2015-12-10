@@ -505,7 +505,7 @@ inline void casadi_math<T>::printName(unsigned char op, std::ostream &stream) {
     case OP_TRANSPOSE:           stream << "transpose";           break;
     case OP_DETERMINANT:         stream << "determinant";         break;
     case OP_INVERSE:             stream << "inverse";             break;
-    case OP_INNER_PROD:          stream << "inner_prod";          break;
+    case OP_DOT:          stream << "dot";          break;
     case OP_HORZCAT:             stream << "horzcat";             break;
     case OP_VERTCAT:             stream << "vertcat";             break;
     case OP_DIAGCAT:             stream << "diagcat";             break;

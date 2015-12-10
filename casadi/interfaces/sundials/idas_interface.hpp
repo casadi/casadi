@@ -28,7 +28,6 @@
 
 #include <casadi/interfaces/sundials/casadi_integrator_idas_export.h>
 #include "sundials_interface.hpp"
-#include "casadi/core/function/linear_solver.hpp"
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
 #include <idas/idas_band.h>
@@ -69,21 +68,18 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    explicit IdasInterface(const Function& f, const Function& g);
-
-    /** \brief  Copy constructor */
-    //  IdasInterface(const IdasInterface& integrator);
+    explicit IdasInterface(const std::string& name, const XProblem& dae);
 
     /** \brief  Create a new integrator */
-    virtual IdasInterface* create(const Function& f, const Function& g) const
-    { return new IdasInterface(f, g);}
-
-    /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new IdasInterface(f, g);}
+    static Integrator* creator(const std::string& name, const XProblem& dae) {
+      return new IdasInterface(name, dae);
+    }
 
     /** \brief  Destructor */
     virtual ~IdasInterface();
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "idas";}
 
     /** \brief  Free all IDAS memory */
     virtual void freeIDAS();
@@ -98,16 +94,20 @@ namespace casadi {
     virtual void initAdj();
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset();
+    virtual void reset(Memory& m, double t, const double* x,
+                       const double* z, const double* p);
+
+    /** \brief  Advance solution in time */
+    virtual void advance(Memory& m, double t, double* x,
+                         double* z, double* q);
 
     /** \brief  Reset the backward problem and take time to tf */
-    virtual void resetB();
+    virtual void resetB(Memory& m, double t, const double* rx,
+                        const double* rz, const double* rp);
 
-    /** \brief  Integrate forward until a specified time point */
-    virtual void integrate(double t_out);
-
-    /** \brief  Integrate backward until a specified time point */
-    virtual void integrateB(double t_out);
+    /** \brief  Retreat solution in time */
+    virtual void retreat(Memory& m, double t, double* rx,
+                         double* rz, double* rq);
 
     /** \brief  Set the stop time of the forward integration */
     virtual void setStopTime(double tf);
@@ -116,8 +116,7 @@ namespace casadi {
     virtual void printStats(std::ostream &stream) const;
 
     /** \brief  Get the integrator Jacobian for the forward problem (generic) */
-    template<typename FunctionType>
-      FunctionType getJacGen();
+    template<typename MatType> Function getJacGen();
 
     /** \brief  Get the integrator Jacobian for the backward problem (generic)
      *   Structure:
@@ -127,8 +126,7 @@ namespace casadi {
      *   | diff(gz, rx)                        |   diff(gz, rz) |
      * \endverbatim
      */
-    template<typename FunctionType>
-      FunctionType getJacGenB();
+    template<typename MatType> Function getJacGenB();
 
     /** \brief  Get the integrator Jacobian for the forward problem */
     virtual Function getJac();
@@ -145,24 +143,21 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void res(double t, const double* xz, const double* xzdot, double* rr);
+    void res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr);
     void ehfun(int error_code, const char *module, const char *function, char *msg);
-    void jtimes(double t, const double *xz, const double *xzdot, const double *rr,
-                const double *v, double *Jv, double cj, double *tmp1, double *tmp2);
-    void jtimesB(double t, const double *xz, const double *xzdot, const double *xzB,
-                 const double *xzdotB, const double *resvalB, const double *vB, double *JvB,
-                 double cjB, double * tmp1B, double * tmp2B);
-    void resS(int Ns, double t, const double* xz, const double* xzdot, const double *resval,
+    void jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
+                N_Vector v, N_Vector Jv, double cj, N_Vector tmp1, N_Vector tmp2);
+    void jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
+                 N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
+                 double cjB, N_Vector tmp1B, N_Vector tmp2B);
+    void resS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
               N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
-              double *tmp1, double *tmp2, double *tmp3);
-    void rhsQ(double t, const double* xz, const double* xzdot, double* qdot);
+              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    void rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot);
     void rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF, N_Vector *xzdotF,
-               N_Vector rrQ, N_Vector *qdotF,
-               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    void resB(double t, const double* y, const double* xzdot, const double* xA,
-              const double* xzdotB, double* rrB);
-    void rhsQB(double t, const double* y, const double* xzdot, const double* xA,
-               const double* xzdotB, double *qdotA);
+               N_Vector rrQ, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    void resB(double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotB, N_Vector rrB);
+    void rhsQB(double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotB, N_Vector qdotA);
     void psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec,
                 double cj, double delta, N_Vector tmp);
     void psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
@@ -253,15 +248,6 @@ namespace casadi {
     // Idas memory block
     void* mem_;
 
-    // N-vectors for the forward integration
-    N_Vector xz_, xzdot_, q_;
-
-    // N-vectors for the backward integration
-    N_Vector rxz_, rxzdot_, rq_;
-
-    // N-vectors for the forward sensitivities
-    std::vector<N_Vector> xzF_, xzdotF_, qF_;
-
     // sensitivity method
     int ism_;
 
@@ -269,28 +255,28 @@ namespace casadi {
     static void idas_error(const std::string& module, int flag);
 
     // Initialize the dense linear solver
-    void initDenseLinearSolver();
+    void initDenseLinsol();
 
     // Initialize the banded linear solver
-    void initBandedLinearSolver();
+    void initBandedLinsol();
 
     // Initialize the iterative linear solver
-    void initIterativeLinearSolver();
+    void initIterativeLinsol();
 
     // Initialize the user defined linear solver
-    void initUserDefinedLinearSolver();
+    void initUserDefinedLinsol();
 
     // Initialize the dense linear solver (backward integration)
-    void initDenseLinearSolverB();
+    void initDenseLinsolB();
 
     // Initialize the banded linear solver (backward integration)
-    void initBandedLinearSolverB();
+    void initBandedLinsolB();
 
     // Initialize the iterative linear solver (backward integration)
-    void initIterativeLinearSolverB();
+    void initIterativeLinsolB();
 
     // Initialize the user defined linear solver (backward integration)
-    void initUserDefinedLinearSolverB();
+    void initUserDefinedLinsolB();
 
     // Ids of backward problem
     int whichB_;
@@ -321,6 +307,20 @@ namespace casadi {
     //  Initial values for \p xdot and \p z
     std::vector<double> init_xdot_;
 
+    /// number of checkpoints stored so far
+    int ncheck_;
+  };
+
+  // IdasMemory
+  struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory {
+    /// Shared memory
+    IdasInterface& self;
+
+    /// Constructor
+    IdasMemory(IdasInterface& s);
+
+    /// Destructor
+    ~IdasMemory();
   };
 
 } // namespace casadi

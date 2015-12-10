@@ -24,15 +24,14 @@
 
 
 #include "csparse_interface.hpp"
-#include "casadi/core/profiling.hpp"
 #include "casadi/core/casadi_options.hpp"
 
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_CSPARSE_EXPORT
-  casadi_register_linearsolver_csparse(LinearSolverInternal::Plugin* plugin) {
+  int CASADI_LINSOL_CSPARSE_EXPORT
+  casadi_register_linsol_csparse(Linsol::Plugin* plugin) {
     plugin->creator = CsparseInterface::creator;
     plugin->name = "csparse";
     plugin->doc = CsparseInterface::meta_doc.c_str();
@@ -41,21 +40,15 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_CSPARSE_EXPORT casadi_load_linearsolver_csparse() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparse);
+  void CASADI_LINSOL_CSPARSE_EXPORT casadi_load_linsol_csparse() {
+    Linsol::registerPlugin(casadi_register_linsol_csparse);
   }
 
-  CsparseInterface::CsparseInterface(const Sparsity& sparsity, int nrhs)
-      : LinearSolverInternal(sparsity, nrhs) {
+  CsparseInterface::CsparseInterface(const std::string& name,
+                                     const Sparsity& sparsity, int nrhs)
+    : Linsol(name, sparsity, nrhs) {
     N_ = 0;
     S_ = 0;
-  }
-
-  CsparseInterface::CsparseInterface(const CsparseInterface& linsol)
-      : LinearSolverInternal(linsol) {
-    N_ = 0;
-    S_ = 0;
-    is_init_ = false;
   }
 
   CsparseInterface::~CsparseInterface() {
@@ -65,15 +58,15 @@ namespace casadi {
 
   void CsparseInterface::init() {
     // Call the init method of the base class
-    LinearSolverInternal::init();
+    Linsol::init();
 
-    A_.nzmax = input().nnz();  // maximum number of entries
-    A_.m = input().size1(); // number of rows
-    A_.n = input().size2(); // number of columns
-    A_.p = const_cast<int*>(input().colind()); // column pointers (size n+1)
-                                                        // or col indices (size nzmax)
-    A_.i = const_cast<int*>(input().row()); // row indices, size nzmax
-    A_.x = &input().front(); // numerical values, size nzmax
+    A_.nzmax = nnz_in(0);  // maximum number of entries
+    A_.m = size1_in(0); // number of rows
+    A_.n = size2_in(0); // number of columns
+    A_.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
+                                                     // or column indices (size nzmax)
+    A_.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
+    A_.x = 0; // numerical values, size nzmax
     A_.nz = -1; // of entries in triplet matrix, -1 for compressed-col
 
     // Temporary
@@ -81,22 +74,14 @@ namespace casadi {
 
     // Has the routine been called once
     called_once_ = false;
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, "CSparse",
-                       ProfilingData_FunctionType_Other, 2);
-
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare", -1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve", -1);
-    }
   }
 
-  void CsparseInterface::prepare() {
-    double time_start=0;
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
+  void CsparseInterface::linsol_factorize(Memory& m, const double* A) {
+    casadi_assert(A!=0);
+
+    // Set the nonzeros of the matrix
+    A_.x = const_cast<double*>(A);
+
     if (!called_once_) {
       if (verbose()) {
         userOut() << "CsparseInterface::prepare: symbolic factorization" << endl;
@@ -108,22 +93,18 @@ namespace casadi {
       S_ = cs_sqr(order, &A_, 0) ;
     }
 
-    prepared_ = false;
     called_once_ = true;
 
-    // Get a referebce to the nonzeros of the linear system
-    const vector<double>& linsys_nz = input().data();
-
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<linsys_nz.size(); ++k) {
-      casadi_assert_message(!isnan(linsys_nz[k]), "Nonzero " << k << " is not-a-number");
-      casadi_assert_message(!isinf(linsys_nz[k]), "Nonzero " << k << " is infinite");
+    for (int k=0; k<sparsity_.nnz(); ++k) {
+      casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
+      casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
     }
 
     if (verbose()) {
       userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
       userOut() << "linear system to be factorized = " << endl;
-      input(0).printSparse();
+      DM(sparsity_, vector<double>(A, A+sparsity_.nnz())).printSparse();
     }
 
     double tol = 1e-8;
@@ -131,8 +112,9 @@ namespace casadi {
     if (N_) cs_nfree(N_);
     N_ = cs_lu(&A_, S_, tol) ;                 // numeric LU factorization
     if (N_==0) {
-      DMatrix temp = sparsify(input());
-      if (temp.sparsity().issingular()) {
+      DM temp(sparsity_, vector<double>(A, A+sparsity_.nnz()));
+      temp = sparsify(temp);
+      if (temp.sparsity().is_singular()) {
         stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed due to matrix"
           " being singular. Matrix contains numerical zeros which are "
@@ -141,7 +123,7 @@ namespace casadi {
             " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          input(LINSOL_A).sparsity().print(ss); // print detailed
+          sparsity_.print(ss); // print detailed
         }
         throw CasadiException(ss.str());
       } else {
@@ -150,39 +132,21 @@ namespace casadi {
            << endl;
         if (verbose()) {
           ss << "Sparsity of the linear system: " << endl;
-          input(LINSOL_A).sparsity().print(ss); // print detailed
+          sparsity_.print(ss); // print detailed
         }
         throw CasadiException(ss.str());
       }
     }
     casadi_assert(N_!=0);
-
-    prepared_ = true;
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 0,
-                       time_stop-time_start,
-                       time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
-    }
   }
 
-  void CsparseInterface::solve(double* x, int nrhs, bool transpose) {
-    double time_start=0;
-    if (CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
-      time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog, this);
-    }
-
-
-    casadi_assert(prepared_);
+  void CsparseInterface::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     casadi_assert(N_!=0);
 
     double *t = &temp_.front();
 
     for (int k=0; k<nrhs; ++k) {
-      if (transpose) {
+      if (tr) {
         cs_pvec(S_->q, x, t, A_.n) ;       // t = P2*b
         casadi_assert(N_->U!=0);
         cs_utsolve(N_->U, t) ;              // t = U'\t
@@ -195,14 +159,6 @@ namespace casadi {
         cs_ipvec(S_->q, t, x, A_.n) ;      // x = P2\t
       }
       x += ncol();
-    }
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog, this, 1,
-                       time_stop-time_start,
-                       time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
     }
   }
 

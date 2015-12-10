@@ -26,57 +26,58 @@
 #ifndef CASADI_QP_TO_NLP_HPP
 #define CASADI_QP_TO_NLP_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/qpsol.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 
-#include <casadi/solvers/casadi_qpsolver_nlp_export.h>
+#include <casadi/solvers/casadi_qpsol_nlpsol_export.h>
 
 
-/** \defgroup plugin_QpSolver_nlp
-   Solve QPs using an NlpSolver
+/** \defgroup plugin_Qpsol_nlp
+   Solve QPs using an Nlpsol
 */
 
-/** \pluginsection{QpSolver,nlp} */
+/** \pluginsection{Qpsol,nlp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{QpSolver,nlp}
+  /** \brief \pluginbrief{Qpsol,nlp}
 
-   @copydoc QpSolver_doc
-   @copydoc plugin_QpSolver_nlp
+      @copydoc Qpsol_doc
+      @copydoc plugin_Qpsol_nlp
 
-   \author Joris Gillis
-   \date 2011
+      \author Joris Gillis
+      \date 2011
   */
-class CASADI_QPSOLVER_NLP_EXPORT QpToNlp : public QpSolverInternal,
-  public Adaptor<QpToNlp, NlpSolverInternal> {
-public:
-  /** \brief  Constructor */
-  explicit QpToNlp();
+  class CASADI_QPSOL_NLPSOL_EXPORT QpToNlp : public Qpsol {
+  public:
+    /** \brief  Create a new Solver */
+    explicit QpToNlp(const std::string& name,
+                     const std::map<std::string, Sparsity> &st);
 
-  /** \brief  Create a new QP Solver */
-  static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-    return new QpToNlp(st);
-  }
+    /** \brief  Create a new QP Solver */
+    static Qpsol* creator(const std::string& name,
+                          const std::map<std::string, Sparsity>& st) {
+      return new QpToNlp(name, st);
+    }
 
-  /** \brief  Create a new Solver */
-  explicit QpToNlp(const std::map<std::string, Sparsity> &st);
+    /** \brief  Destructor */
+    virtual ~QpToNlp();
 
-  /** \brief  Destructor */
-  virtual ~QpToNlp();
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "nlpsol";}
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
 
-  virtual void evaluate();
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
-  /// A documentation string
-  static const std::string meta_doc;
+    /// A documentation string
+    static const std::string meta_doc;
 
-  /// Solve with
-  NlpSolver solver_;
-};
+    /// Solve with
+    Function solver_;
+  };
 
 } // namespace casadi
 /// \endcond

@@ -24,29 +24,29 @@
 from casadi import *
 
 # This pattern should work fine for unidirectional coloring
-A = DMatrix.eye(5)
+A = DM.eye(5)
 A[0,:] = 1
 
 # Unidirectional coloring
-coloring = A.sparsity().unidirectionalColoring()
+coloring = A.sparsity().uni_coloring()
 print coloring
 
 # Create a symmetric matrix with a for unidirectional coloring "bad" sparsity pattern
-A = DMatrix.eye(5)
-#A = DMatrix.zeros(5,5)
+A = DM.eye(5)
+#A = DM.zeros(5,5)
 A[:,-1] = 1
 A[-1,:] = 1
 
 # Unidirectional coloring
-coloring = A.sparsity().unidirectionalColoring()
+coloring = A.sparsity().uni_coloring()
 print coloring
 
 # Star coloring
-coloring = A.sparsity().starColoring()
+coloring = A.sparsity().star_coloring()
 print coloring
 
 # Largest first ordering
-ordering = A.sparsity().largestFirstOrdering()
+ordering = A.sparsity().largest_first()
 print "ordering = ", ordering
 
 # Create a function whose hessian has the corresponding sparsity pattern

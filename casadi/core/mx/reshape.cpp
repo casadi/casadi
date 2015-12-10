@@ -25,7 +25,6 @@
 
 #include "reshape.hpp"
 #include "../std_vector_tools.hpp"
-#include "../function/sx_function.hpp"
 
 using namespace std;
 
@@ -37,35 +36,35 @@ namespace casadi {
     setSparsity(sp);
   }
 
-  void Reshape::evalD(const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void Reshape::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Reshape::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void Reshape::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void Reshape::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void Reshape::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 
-  void Reshape::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Reshape::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void Reshape::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void Reshape::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     copyAdj(arg[0], res[0], nnz());
   }
 
   std::string Reshape::print(const std::vector<std::string>& arg) const {
     // For vectors, reshape is also a transpose
-    if (dep().isvector() && sparsity().isvector()) {
+    if (dep().is_vector() && sparsity().is_vector()) {
       // Print as transpose: X'
       return arg.at(0) + "'";
     } else {
       // Print as reshape(X) or vec(X)
-      if (sparsity().iscolumn()) {
+      if (sparsity().is_column()) {
         return "vec(" + arg.at(0) + ")";
       } else {
         return "reshape(" + arg.at(0) + ")";
@@ -73,29 +72,28 @@ namespace casadi {
     }
   }
 
-  void Reshape::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
-    res[0] = reshape(arg[0], shape());
+  void Reshape::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
+    res[0] = reshape(arg[0], size());
   }
 
   void Reshape::evalFwd(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) {
     for (int d = 0; d<fsens.size(); ++d) {
-      fsens[d][0] = reshape(fseed[d][0], shape());
+      fsens[d][0] = reshape(fseed[d][0], size());
     }
   }
 
   void Reshape::evalAdj(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0] += reshape(aseed[d][0], dep().shape());
+      asens[d][0] += reshape(aseed[d][0], dep().size());
     }
   }
 
-  void Reshape::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                         CodeGenerator& g) const {
+  void Reshape::generate(CodeGenerator& g, const std::string& mem,
+                         const std::vector<int>& arg, const std::vector<int>& res) const {
     if (arg[0]==res[0]) return;
-    g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),
-                               g.work(res[0], nnz())) << endl;
+    g.body << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
   }
 
   MX Reshape::getReshape(const Sparsity& sp) const {
@@ -104,36 +102,36 @@ namespace casadi {
 
   MX Reshape::getTranspose() const {
     // For vectors, reshape is also a transpose
-    if (dep().isvector() && sparsity().isvector()) {
+    if (dep().is_vector() && sparsity().is_vector()) {
       return dep();
     } else {
       return MXNode::getTranspose();
     }
   }
 
-  bool Reshape::isValidInput() const {
-    if (!dep()->isValidInput()) return false;
+  bool Reshape::is_valid_input() const {
+    if (!dep()->is_valid_input()) return false;
     return true;
   }
 
-  int Reshape::numPrimitives() const {
-    return dep()->numPrimitives();
+  int Reshape::n_primitives() const {
+    return dep()->n_primitives();
   }
 
-  void Reshape::getPrimitives(std::vector<MX>::iterator& it) const {
-    dep()->getPrimitives(it);
+  void Reshape::primitives(std::vector<MX>::iterator& it) const {
+    dep()->primitives(it);
   }
 
-  void Reshape::splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {
-    dep()->splitPrimitives(reshape(x, dep().shape()), it);
+  void Reshape::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    dep()->split_primitives(reshape(x, dep().size()), it);
   }
 
-  MX Reshape::joinPrimitives(std::vector<MX>::const_iterator& it) const {
-    return reshape(dep()->joinPrimitives(it), shape());
+  MX Reshape::join_primitives(std::vector<MX>::const_iterator& it) const {
+    return reshape(dep()->join_primitives(it), size());
   }
 
-  bool Reshape::hasDuplicates() {
-    return dep()->hasDuplicates();
+  bool Reshape::has_duplicates() {
+    return dep()->has_duplicates();
   }
 
   void Reshape::resetInput() {

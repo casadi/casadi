@@ -67,7 +67,7 @@ int main(){
   vector<double> ubg = {0.00};
 
   // Create NLP
-  SXFunction nlp("nlp", nlpIn("x", x), nlpOut("f", f, "g", g));
+  SXDict nlp = {{"x", x}, {"f", f}, {"g", g}};
 
   // NLP solver options
   Dict opts;
@@ -81,8 +81,8 @@ int main(){
   opts["compute_red_hessian"] = "yes";
   
   // Create NLP solver and buffers
-  NlpSolver solver("solver", "ipopt", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  Function solver = nlpsol("solver", "ipopt", nlp, opts);
+  std::map<std::string, DM> arg, res;
 
   // Solve NLP
   arg["x0"] = x0;
@@ -103,7 +103,7 @@ int main(){
   
   // Get the reduced Hessian
   try{
-    DMatrix red_hess = solver.getReducedHessian();
+    DM red_hess = solver.getReducedHessian();
     cout << "Reduced Hessian = " << red_hess << endl;
   } catch(...){
     cout << "Support for retrieving the reduced Hessian not enabled." << endl;

@@ -38,20 +38,20 @@ namespace casadi {
     return "||" + arg.at(0) + "||_F";
   }
 
-  void NormF::evalD(const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void NormF::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void NormF::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void NormF::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void NormF::evalGen(const T** arg, T** res, int* iw, T* w) {
-    *res[0] = sqrt(casadi_inner_prod(dep().nnz(), arg[0], arg[0]));
+  void NormF::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
+    *res[0] = sqrt(casadi_dot(dep().nnz(), arg[0], arg[0]));
   }
 
-  void NormF::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void NormF::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0]->getNormF();
   }
 
@@ -59,7 +59,7 @@ namespace casadi {
                       std::vector<std::vector<MX> >& fsens) {
     MX self = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = dep(0)->getInnerProd(fseed[d][0]) / self;
+      fsens[d][0] = dep(0)->getDot(fseed[d][0]) / self;
     }
   }
 
@@ -71,11 +71,11 @@ namespace casadi {
     }
   }
 
-  void NormF::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                       CodeGenerator& g) const {
+  void NormF::generate(CodeGenerator& g, const std::string& mem,
+                       const std::vector<int>& arg, const std::vector<int>& res) const {
     g.assign(g.body, g.workel(res[0]),
-             "sqrt(" + g.inner_prod(dep().nnz(), g.work(arg[0], dep(0).nnz()),
-                                      g.work(arg[0], dep(0).nnz())) + ")");
+             "sqrt(" + g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()),
+                             g.work(arg[0], dep(0).nnz())) + ")");
   }
 
   std::string Norm2::print(const std::vector<std::string>& arg) const {

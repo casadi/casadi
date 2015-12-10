@@ -26,35 +26,45 @@
 #ifndef CASADI_KNITRO_INTERFACE_HPP
 #define CASADI_KNITRO_INTERFACE_HPP
 
-#include <casadi/interfaces/knitro/casadi_nlpsolver_knitro_export.h>
+#include <casadi/interfaces/knitro/casadi_nlpsol_knitro_export.h>
 #include <knitro.h>
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 
-/** \defgroup plugin_NlpSolver_knitro
+/** \defgroup plugin_Nlpsol_knitro
   KNITRO interface
 */
 
-/** \pluginsection{NlpSolver,knitro} */
+/** \pluginsection{Nlpsol,knitro} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{NlpSolver,knitro}
-     @copydoc NlpSolver_doc
-     @copydoc plugin_NlpSolver_knitro
+  /** \brief \pluginbrief{Nlpsol,knitro}
+     @copydoc Nlpsol_doc
+     @copydoc plugin_Nlpsol_knitro
   */
-  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInterface : public NlpSolverInternal {
+  class CASADI_NLPSOL_KNITRO_EXPORT KnitroInterface : public Nlpsol {
 
   public:
-    explicit KnitroInterface(const Function& nlp);
+    explicit KnitroInterface(const std::string& name, const XProblem& nlp);
     virtual ~KnitroInterface();
 
-    /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new KnitroInterface(nlp);}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "knitro";}
 
+    /** \brief  Create a new NLP Solver */
+    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+      return new KnitroInterface(name, nlp);
+    }
+
+    // Initialize the solver
     virtual void init();
-    virtual void evaluate();
+
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
+    // Solve the NLP
+    virtual void solve(void* mem);
 
     // KNITRO callback functions
     void evalfc(const double* x, double& obj, double *c);

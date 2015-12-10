@@ -69,17 +69,17 @@ int main(){
   }
 
   // Objective function
-  SX f = inner_prod(u,u);
+  SX f = dot(u,u);
 
   // Terminal constraints
   SX g = vertcat(s, v, v_traj);
 
   // Create an NLP
-  SXFunction nlp("nlp", nlpIn("x", u), nlpOut("f", f, "g", g));
+  SXDict nlp = {{"x", u}, {"f", f}, {"g", g}};
 
   // Create an NLP solver and buffers
-  NlpSolver solver("solver", "snopt", nlp);
-  std::map<std::string, DMatrix> arg, res;
+  Function solver = nlpsol("solver", "snopt", nlp);
+  std::map<std::string, DM> arg, res;
 
   // Bounds on u and initial condition
   arg["lbx"] = -10;
@@ -107,18 +107,16 @@ int main(){
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
-  SXFunction xfcn("xfcn", make_vector(u), make_vector(s_traj, v_traj, m_traj));
-  vector<DMatrix> xopt = xfcn(make_vector(DMatrix(uopt)));
-  vector<double> sopt(xopt.at(0));
-  vector<double> vopt(xopt.at(1));
-  vector<double> mopt(xopt.at(2));
+  Function xfcn("xfcn", {u}, {s_traj, v_traj, m_traj});
+  vector<double> sopt, vopt, mopt;
+  xfcn({uopt}, {&sopt, &vopt, &mopt});
   cout << "position: " << sopt << endl;
   cout << "velocity: " << vopt << endl;
   cout << "mass:     " << mopt << endl;
 
   // Create Matlab script to plot the solution
   ofstream file;
-  string filename = "rocket_ipopt_results.m";
+  string filename = "rocket_snopt_results.m";
   file.open(filename.c_str());
   file << "% Results file from " __FILE__ << endl;
   file << "% Generated " __DATE__ " at " __TIME__ << endl;

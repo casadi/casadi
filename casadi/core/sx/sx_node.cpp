@@ -54,7 +54,7 @@ namespace casadi {
     throw CasadiException(string("getIntValue() not defined for class ") + typeid(*this).name());
   }
 
-  bool SXNode::isZero() const {
+  bool SXNode::is_zero() const {
     return false;
   }
 
@@ -62,11 +62,11 @@ namespace casadi {
     return false;
   }
 
-  bool SXNode::isOne() const {
+  bool SXNode::is_one() const {
     return false;
   }
 
-  bool SXNode::isMinusOne() const {
+  bool SXNode::is_minus_one() const {
     return false;
   }
 
@@ -82,15 +82,15 @@ namespace casadi {
     return false;
   }
 
-  bool SXNode::isConstant() const {
+  bool SXNode::is_constant() const {
     return false;
   }
 
-  bool SXNode::isInteger() const {
+  bool SXNode::is_integer() const {
     return false;
   }
 
-  bool SXNode::isSymbolic() const {
+  bool SXNode::is_symbolic() const {
     return false;
   }
 
@@ -98,7 +98,7 @@ namespace casadi {
     return false;
   }
 
-  bool SXNode::zz_isEqual(const SXNode* node, int depth) const {
+  bool SXNode::zz_is_equal(const SXNode* node, int depth) const {
     return false;
   }
 
@@ -106,26 +106,26 @@ namespace casadi {
     throw CasadiException("SXNode::getName failed, the node must be symbolic");
   }
 
-  const SXElement& SXNode::dep(int i) const {
+  const SXElem& SXNode::dep(int i) const {
     casadi_error("child() not defined for class " << typeid(*this).name());
   }
 
-  SXElement& SXNode::dep(int i) {
+  SXElem& SXNode::dep(int i) {
     casadi_error("child() not defined for class " << typeid(*this).name());
   }
 
-  bool SXNode::isSmooth() const {
+  bool SXNode::is_smooth() const {
     return true; // nodes are smooth by default
   }
 
   void SXNode::print(std::ostream &stream) const {
     // Find out which noded can be inlined
     std::map<const SXNode*, int> nodeind;
-    canInline(nodeind);
+    can_inline(nodeind);
 
     // Print expression
     vector<string> intermed;
-    string s = printCompact(nodeind, intermed);
+    string s = print_compact(nodeind, intermed);
 
     // Print intermediate expressions
     for (int i=0; i<intermed.size(); ++i)
@@ -143,7 +143,7 @@ namespace casadi {
     temp = -temp-1;
   }
 
-  void SXNode::canInline(std::map<const SXNode*, int>& nodeind) const {
+  void SXNode::can_inline(std::map<const SXNode*, int>& nodeind) const {
     // Add or mark node in map
     std::map<const SXNode*, int>::iterator it=nodeind.find(this);
     if (it==nodeind.end()) {
@@ -152,15 +152,15 @@ namespace casadi {
 
       // Handle dependencies with recursion
       for (int i=0; i<ndep(); ++i) {
-        dep(i)->canInline(nodeind);
+        dep(i)->can_inline(nodeind);
       }
-    } else if (it->second==0 && getOp()!=OP_PARAMETER) {
+    } else if (it->second==0 && op()!=OP_PARAMETER) {
       // Node encountered before, do not inline (except if symbolic primitive)
       it->second = -1;
     }
   }
 
-  std::string SXNode::printCompact(std::map<const SXNode*, int>& nodeind,
+  std::string SXNode::print_compact(std::map<const SXNode*, int>& nodeind,
                                    std::vector<std::string>& intermed) const {
     // Get reference to node index
     int& ind = nodeind[this];
@@ -175,7 +175,7 @@ namespace casadi {
     // Get expressions for dependencies
     std::string arg[2];
     for (int i=0; i<ndep(); ++i) {
-      arg[i] = dep(i)->printCompact(nodeind, intermed);
+      arg[i] = dep(i)->print_compact(nodeind, intermed);
     }
 
     // Get expression for this

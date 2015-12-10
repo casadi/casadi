@@ -27,12 +27,11 @@
 #define CASADI_CORE_HPP
 
 // Scalar expressions (why do I need to put it up here?)
-#include "sx/sx_element.hpp"
+#include "sx/sx_elem.hpp"
 
 // Generic tools
 #include "polynomial.hpp"
 #include "std_vector_tools.hpp"
-#include "functor.hpp"
 #include "casadi_options.hpp"
 #include "casadi_meta.hpp"
 
@@ -44,26 +43,8 @@
 
 // Functions
 #include "function/code_generator.hpp"
-#include "function/sx_function.hpp"
-#include "function/mx_function.hpp"
 #include "function/compiler.hpp"
-#include "function/external_function.hpp"
-#include "function/switch.hpp"
-#include "function/linear_solver.hpp"
-#include "function/nlp_solver.hpp"
-#include "function/integrator.hpp"
-#include "function/implicit_function.hpp"
-#include "function/custom_function.hpp"
 #include "function/callback.hpp"
-#include "function/simulator.hpp"
-#include "function/control_simulator.hpp"
-#include "function/qp_solver.hpp"
-#include "function/homotopy_nlp_solver.hpp"
-#include "function/stabilized_qp_solver.hpp"
-#include "function/nullspace.hpp"
-#include "function/map.hpp"
-#include "function/mapaccum.hpp"
-#include "function/kernel_sum_2d.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

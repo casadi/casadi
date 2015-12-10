@@ -2265,7 +2265,7 @@ returnValue QProblem::setupCholeskyDecompositionProjected( )
 				/* now Z is trivial, and so is Z'HZ */
 				int nFR = getNFR ();
 				for ( j=0; j < nFR; ++j )
-					H->getCol (FR_idx[j], bounds.getFree (), 1.0, &R[j*nV]);
+					H->get_col (FR_idx[j], bounds.getFree (), 1.0, &R[j*nV]);
 			} else {
 				/* this is expensive if Z is large! */
 				H->bilinear(bounds.getFree(), nZ, Q, nV, R, nV);
@@ -2995,7 +2995,7 @@ returnValue QProblem::addConstraint(	int number, SubjectToStatus C_status,
 
 	/* II) ADD NEW ACTIVE CONSTRAINT TO MATRIX T: */
 	/* 1) Add row [wZ wY] = aFR'*[Z Y] to the end of T: assign aFR. */
-	A->getRow(number, bounds.getFree(), 1.0, aFR);
+	A->get_row(number, bounds.getFree(), 1.0, aFR);
 
 	/* calculate wZ */
 	for( i=0; i<nFR; ++i )
@@ -3127,7 +3127,7 @@ returnValue QProblem::addConstraint_checkLI( int number )
 		for (ii = 0; ii < dim; ++ii)
 			nul[ii]=0.0;
 
-		A->getRow (number, 0, 1.0, delta_g);
+		A->get_row (number, 0, 1.0, delta_g);
 
 		returnvalue = determineStepDirection ( delta_g,
 											  nul, nul, nul, nul,
@@ -3181,7 +3181,7 @@ returnValue QProblem::addConstraint_checkLI( int number )
 		 */
 
 		real_t *Arow = new real_t[nFR];
-		A->getRow(number, bounds.getFree(), 1.0, Arow);
+		A->get_row(number, bounds.getFree(), 1.0, Arow);
 
 		real_t sum, l2;
 
@@ -3260,7 +3260,7 @@ returnValue QProblem::addConstraint_ensureLI( int number, SubjectToStatus C_stat
 	int y_min_number_bound = -1;
 	BooleanType y_min_isBound = BT_FALSE;
 
-	A->getRow(number, bounds.getFree(), C_status == ST_LOWER ? 1.0 : -1.0, Arow);
+	A->get_row(number, bounds.getFree(), C_status == ST_LOWER ? 1.0 : -1.0, Arow);
 
 	/* 2) Calculate xiC */
 	if ( nAC > 0 )
@@ -3286,7 +3286,7 @@ returnValue QProblem::addConstraint_ensureLI( int number, SubjectToStatus C_stat
 	int* AC_idx;
 	constraints.getActive( )->getNumberArray( &AC_idx );
 
-	A->getRow(number, bounds.getFixed(), C_status == ST_LOWER ? 1.0 : -1.0, xiB);
+	A->get_row(number, bounds.getFixed(), C_status == ST_LOWER ? 1.0 : -1.0, xiB);
 	A->transTimes(constraints.getActive(), bounds.getFixed(), 1, -1.0, xiC, nAC, 1.0, xiB, nFX);
 
 	/* III) DETERMINE CONSTRAINT/BOUND TO BE REMOVED. */
@@ -4187,7 +4187,7 @@ returnValue QProblem::removeBound(	int number,
 		constraints.getActive( )->getNumberArray( &AC_idx );
 
 		real_t* tmp = new real_t[nAC];
-		A->getCol(number, constraints.getActive(), 1.0, tmp);
+		A->get_col(number, constraints.getActive(), 1.0, tmp);
 
 
 		/* II) RESTORE TRIANGULAR FORM OF T,
@@ -4236,7 +4236,7 @@ returnValue QProblem::removeBound(	int number,
 			z[nFR] = 0.0;
 			H->times(bounds.getFree(), bounds.getFree(), 1, 1.0, z, nFR+1, 0.0, Hz, nFR+1);
 
-			H->getCol(nnFRp1, bounds.getFree(), 1.0, z);
+			H->get_col(nnFRp1, bounds.getFree(), 1.0, z);
 
 			if ( nZ > 0 )
 			{

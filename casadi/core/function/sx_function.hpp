@@ -26,17 +26,19 @@
 #ifndef CASADI_SX_FUNCTION_HPP
 #define CASADI_SX_FUNCTION_HPP
 
-#include "function.hpp"
-#ifdef USE_CXX11
-#include <initializer_list>
-#endif // USE_CXX11
+#include "x_function.hpp"
+
+#ifdef WITH_OPENCL
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/cl.h>
+#endif
+#endif // WITH_OPENCL
+/// \cond INTERNAL
 
 namespace casadi {
-
-/// \cond INTERNAL
-#ifndef SWIG
-
-  /** \brief  An atomic operation for the SXElement virtual machine */
+  /** \brief  An atomic operation for the SXElem virtual machine */
   struct ScalarAtomic {
     int op;     /// Operator index
     int i0;
@@ -46,189 +48,240 @@ namespace casadi {
     };
   };
 
-#endif // SWIG
-
-/// \endcond
-
-  /// Forward declaration of internal class
-  class SXFunctionInternal;
-
-  /// Forward declaration of MXFunction
-  class MXFunction;
-
-  /**   \brief Dynamically created function that can be expanded into a series of scalar operations.
-
-        \author Joel Andersson
-        \date 2010-2013
+#ifdef WITH_OPENCL
+  /** \brief Singleton for the sparsity propagation kernel
+      TODO: Move to a separate file and make non sparsity pattern specific
+      \author Joel Andersson
+      \date 2013
   */
-  class CASADI_EXPORT SXFunction : public Function {
-
+  class SparsityPropagationKernel {
   public:
-    /// Default constructor
-    SXFunction();
+    // Default constructor
+    SparsityPropagationKernel();
 
-    /// Expand an MXFunction
-    explicit SXFunction(const MXFunction &f);
+    // Destructor
+    ~SparsityPropagationKernel();
 
-    /// Expand an Function
-    explicit SXFunction(const Function &f);
+    // Copy constructor and equality operator
+    // (not implemented, declared to prevent use of the default ones)
+    SparsityPropagationKernel(const SparsityPropagationKernel& sparsityPropagationKernel);
+    SparsityPropagationKernel&
+      operator=(const SparsityPropagationKernel& sparsityPropagationKernel);
 
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const std::vector<SX>& arg,
-               const std::vector<SX>& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const std::pair< SXDict, std::vector<std::string> >& arg,
-               const std::vector<SX>& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const std::vector<SX>& arg,
-               const std::pair< SXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
-
-    /** \brief Construct from vectors (new syntax, includes initialization) */
-    SXFunction(const std::string& name, const std::pair< SXDict, std::vector<std::string> >& arg,
-               const std::pair< SXDict, std::vector<std::string> >& res, const Dict& opts=Dict());
-#ifndef SWIG
-#ifdef USE_CXX11
-    /** \brief Construct from initializer lists (new syntax, includes initialization) */
-    SXFunction(const std::string& name,
-               std::initializer_list<SX> arg,
-               std::initializer_list<SX> res,
-               const Dict& opts=Dict());
-
-    /** \brief Construct from vector & nitializer list (new syntax, includes initialization) */
-    SXFunction(const std::string& name,
-               std::vector<SX> arg,
-               std::initializer_list<SX> res,
-               const Dict& opts=Dict());
-
-    /** \brief Construct from initializer list & vector (new syntax, includes initialization) */
-    SXFunction(const std::string& name,
-               std::initializer_list<SX> arg,
-               std::vector<SX> res,
-               const Dict& opts=Dict());
-#endif // USE_CXX11
-#endif // SWIG
-
-/// \cond INTERNAL
-    /// Access functions of the node
-    SXFunctionInternal* operator->();
-
-    /// Const access functions of the node
-    const SXFunctionInternal* operator->() const;
-/// \endcond
-
-    ///@{
-    /** \brief Jacobian via source code transformation
-     *
-     * \see casadi::Jacobian for an AD approach
-     */
-    SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false)
-    { return jac(inputIndex(iname), oind, compact, symmetric); }
-    SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false)
-    { return jac(iind, outputIndex(oname), compact, symmetric); }
-    SX jac(const std::string& iname, const std::string& oname,
-           bool compact=false, bool symmetric=false)
-    { return jac(inputIndex(iname), outputIndex(oname), compact, symmetric); }
-    ///@}
-
-    ///@{
-    /// Gradient via source code transformation
-    SX grad(int iind=0, int oind=0);
-    SX grad(const std::string& iname, int oind=0) { return grad(inputIndex(iname), oind); }
-    SX grad(int iind, const std::string& oname) { return grad(iind, outputIndex(oname)); }
-    SX grad(const std::string& iname, const std::string& oname)
-    { return grad(inputIndex(iname), outputIndex(oname)); }
-    ///@}
-
-    ///@{
-    /// Tangent via source code transformation
-    SX tang(int iind=0, int oind=0);
-    SX tang(const std::string& iname, int oind=0) { return tang(inputIndex(iname), oind); }
-    SX tang(int iind, const std::string& oname) { return tang(iind, outputIndex(oname)); }
-    SX tang(const std::string& iname, const std::string& oname)
-    { return tang(inputIndex(iname), outputIndex(oname)); }
-    ///@}
-
-    ///@{
-    /// Hessian (forward over adjoint) via source code transformation
-    SX hess(int iind=0, int oind=0);
-    SX hess(const std::string& iname, int oind=0) { return hess(inputIndex(iname), oind); }
-    SX hess(int iind, const std::string& oname) { return hess(iind, outputIndex(oname)); }
-    SX hess(const std::string& iname, const std::string& oname) {
-      return hess(inputIndex(iname), outputIndex(oname));
-    }
-    ///@}
-
-    /** \brief Get function input */
-    const SX inputExpr(int iind) const;
-    const SX inputExpr(const std::string& iname) const {
-      return inputExpr(inputIndex(iname));
-    }
-
-    /** \brief Get function output */
-    const SX outputExpr(int oind) const;
-    const SX outputExpr(const std::string& oname) const {
-      return outputExpr(outputIndex(oname));
-    }
-
-    /** \brief Get all function inputs */
-    const std::vector<SX> inputExpr() const;
-
-    /** \brief Get all function outputs */
-    const std::vector<SX> outputExpr() const;
-
-/// \cond INTERNAL
-#ifndef SWIG
-    /** \brief Access the algorithm directly */
-    const std::vector<ScalarAtomic>& algorithm() const;
-
-    /** \brief Called from constructor */
-    void construct(const std::string& name, const std::vector<SX>& arg,
-                   const std::vector<SX>& res, const Dict& opts,
-                   const std::vector<std::string>& ischeme=std::vector<std::string>(),
-                   const std::vector<std::string>& oscheme=std::vector<std::string>());
-#endif // SWIG
-/// \endcond
-
-    /** \brief Get the number of atomic operations */
-    int getAlgorithmSize() const { return algorithm().size();}
-
-    /** \brief Get the length of the work vector */
-    int getWorkSize() const;
-
-    /** \brief Get an atomic operation operator index */
-    int getAtomicOperation(int k) const { return algorithm().at(k).op;}
-
-    /** \brief Get the (integer) input arguments of an atomic operation */
-    std::pair<int, int> getAtomicInput(int k) const {
-      const ScalarAtomic& atomic = algorithm().at(k);
-      return std::pair<int, int>(atomic.i1, atomic.i2);}
-
-    /** \brief Get the floating point output argument of an atomic operation */
-    double getAtomicInputReal(int k) const { return algorithm().at(k).d;}
-
-    /** \brief Get the (integer) output argument of an atomic operation */
-    int getAtomicOutput(int k) const { return algorithm().at(k).i0;}
-
-    /** \brief Number of nodes in the algorithm */
-    int countNodes() const;
-
-    /** \brief Clear the function from its symbolic representation, to free up memory,
-     * no symbolic evaluations are possible after this */
-    void clearSymbolic();
-
-    /** \brief Get all the free variables of the function */
-    SX getFree() const;
-
-    /** \brief Get the corresponding matrix type */
-    typedef SX MatType;
-
-    /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    // Data members (all public)
+    cl_device_id device_id;
+    cl_context context;
+    cl_command_queue command_queue;
+    cl_platform_id platform_id;
+    cl_uint ret_num_devices;
+    cl_uint ret_num_platforms;
   };
+#endif // WITH_OPENCL
+
+/** \brief  Internal node class for SXFunction
+    Do not use any internal class directly - always use the public Function
+    \author Joel Andersson
+    \date 2010-2015
+*/
+class CASADI_EXPORT SXFunction :
+        public XFunction<SXFunction, Matrix<SXElem>, SXNode>{
+  public:
+    /** \brief Constructor */
+    SXFunction(const std::string& name,
+                       const std::vector<Matrix<SXElem> >& inputv,
+                       const std::vector<Matrix<SXElem> >& outputv);
+
+  /** \brief  Destructor */
+  virtual ~SXFunction();
+
+  /** \brief  Evaluate numerically, work vectors given */
+  virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+
+  /** \brief  evaluate symbolically while also propagating directional derivatives */
+  virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+
+  /** \brief Calculate forward mode directional derivatives */
+  virtual void evalFwd(const std::vector<std::vector<SX> >& fseed,
+                       std::vector<std::vector<SX> >& fsens);
+
+  /** \brief Calculate reverse mode directional derivatives */
+  virtual void evalAdj(const std::vector<std::vector<SX> >& aseed,
+                       std::vector<std::vector<SX> >& asens);
+
+  /** \brief Create call to (cached) derivative function, forward mode  */
+  virtual void forward_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+                          const std::vector<std::vector<SX> >& fseed,
+                          std::vector<std::vector<SX> >& fsens,
+                          bool always_inline, bool never_inline);
+
+  /** \brief Create call to (cached) derivative function, reverse mode  */
+  virtual void reverse_sx(const std::vector<SX>& arg, const std::vector<SX>& res,
+                          const std::vector<std::vector<SX> >& aseed,
+                          std::vector<std::vector<SX> >& asens,
+                          bool always_inline, bool never_inline);
+
+  /** \brief  Check if smooth */
+  bool is_smooth() const;
+
+  /** \brief  Print the algorithm */
+  virtual void print(std::ostream &stream) const;
+
+  /** \brief Get type name */
+  virtual std::string type_name() const;
+
+  /** \brief Check if the function is of a particular type */
+  virtual bool is_a(const std::string& type, bool recursive) const;
+
+  /** \brief Gradient expression */
+  virtual SX grad_sx(int iind=0, int oind=0);
+
+  /** \brief Tangent expression */
+  virtual SX tang_sx(int iind=0, int oind=0);
+
+  /** \brief Jacobian expression */
+  virtual SX jac_sx(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
+                    bool always_inline=true, bool never_inline=false);
+
+  /** \brief Hessian expression */
+  virtual SX hess_sx(int iind, int oind);
+
+  ///@{
+  /** \brief Get function input(s) and output(s)  */
+  virtual const SX sx_in(int ind) const;
+  virtual const std::vector<SX> sx_in() const;
+  ///@}
+
+  /// Get free variables (SX)
+  virtual SX free_sx() const {return free_vars_;}
+
+  /** \brief Hessian (forward over adjoint) via source code transformation */
+  SX hess(int iind=0, int oind=0);
+
+  /** \brief Get the number of atomic operations */
+  virtual int getAlgorithmSize() const { return algorithm_.size();}
+
+  /** \brief Get the length of the work vector */
+  virtual int getWorkSize() const { return sz_w();}
+
+  /** \brief Get an atomic operation operator index */
+  virtual int getAtomicOperation(int k) const { return algorithm_.at(k).op;}
+
+  /** \brief Get the (integer) input arguments of an atomic operation */
+  virtual std::pair<int, int> getAtomicInput(int k) const {
+    const ScalarAtomic& atomic = algorithm_.at(k);
+    return std::pair<int, int>(atomic.i1, atomic.i2);
+  }
+
+  /** \brief Get the floating point output argument of an atomic operation */
+  virtual double getAtomicInputReal(int k) const {
+    return algorithm_.at(k).d;
+  }
+
+  /** \brief Get the (integer) output argument of an atomic operation */
+  virtual int getAtomicOutput(int k) const { return algorithm_.at(k).i0;}
+
+  /** \brief Number of nodes in the algorithm */
+  virtual int countNodes() const { return algorithm_.size() - nnz_out();}
+
+  /** \brief  DATA MEMBERS */
+
+  /** \brief  An element of the algorithm, namely a binary operation */
+  typedef ScalarAtomic AlgEl;
+
+  /** \brief  An element of the tape */
+  template<typename T>
+  struct TapeEl {
+    T d[2];
+  };
+
+  /** \brief  all binary nodes of the tree in the order of execution */
+  std::vector<AlgEl> algorithm_;
+
+  /// work vector for symbolic calculations (allocated first time)
+  std::vector<SXElem> s_work_;
+  std::vector<SXElem> free_vars_;
+
+  /// The expressions corresponding to each binary operation
+  std::vector<SXElem> operations_;
+
+  /// The expressions corresponding to each constant
+  std::vector<SXElem> constants_;
+
+  /** \brief  Initialize */
+  virtual void init();
+
+  /** \brief Generate code for the declarations of the C function */
+  virtual void generateDeclarations(CodeGenerator& g) const;
+
+  /** \brief Generate code for the body of the C function */
+  virtual void generateBody(CodeGenerator& g) const;
+
+  /** \brief  Propagate sparsity forward */
+  virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+
+  /** \brief  Propagate sparsity backwards */
+  virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+
+  /// Is the class able to propagate seeds through the algorithm?
+  virtual bool spCanEvaluate(bool fwd) { return true;}
+
+  /** \brief Return Jacobian of all input elements with respect to all output elements */
+  virtual Function getFullJacobian();
+
+  /// With just-in-time compilation using OpenCL
+  bool just_in_time_opencl_;
+
+  /// With just-in-time compilation for the sparsity propagation
+  bool just_in_time_sparsity_;
+
+#ifdef WITH_OPENCL
+  // Initialize sparsity propagation using OpenCL
+  void allocOpenCL();
+
+  // Propagate sparsity using OpenCL
+  void evaluateOpenCL();
+
+  // Free memory for sparsity propagation using OpenCL
+  void freeOpenCL();
+
+  // Initialize sparsity propagation using OpenCL
+  void spAllocOpenCL();
+
+  // Propagate sparsity using OpenCL
+  void spEvaluateOpenCL(bool fwd);
+
+  // Free memory for sparsity propagation using OpenCL
+  void spFreeOpenCL();
+
+  // Compile OpenCL program
+  static void compileProgram(cl_program program);
+
+  // Execute OpenCL kernel
+  static void executeKernel(cl_kernel kernel);
+
+  // OpenCL memory object for the numerical evaluation
+  cl_program program_;
+
+  // OpenCL memory object for the sparsity propagation
+  cl_program sp_program_;
+
+  // Buffers and kernels for numerical evaluation
+  std::vector<cl_mem> input_memobj_, output_memobj_;
+  cl_kernel kernel_;
+
+  // Buffers and kernels for sparsity propagation
+  std::vector<cl_mem> sp_input_memobj_, sp_output_memobj_;
+  cl_kernel sp_fwd_kernel_, sp_adj_kernel_;
+
+  // OpenCL context. TODO: Nothing class specific in this class, move to a central location
+  static SparsityPropagationKernel sparsity_propagation_kernel_;
+
+#endif // WITH_OPENCL
+
+};
+
 
 } // namespace casadi
 
+/// \endcond
 #endif // CASADI_SX_FUNCTION_HPP

@@ -33,19 +33,19 @@ def optionDocumented(name,cl,metadata):
   
 def extra(metadata,i,iname):
   print "Adding to ", metadata
-  for name in i.getOptionNames():
+  for name in i.optionNames():
     print "found option", name
     if optionDocumented(name,"casadi::%s" % iname,metadata):
       continue
     print "Adding it."
     meta = metadata["casadi::%s" % iname]["options"][name] = dict()
     meta['name'] = name
-    meta['type'] = i.getOptionTypeName(name)
+    meta['type'] = i.optionTypeName(name)
     meta['used'] = "casadi::%s" % iname
     meta['inherit'] = False
-    meta['description'] = i.getOptionDescription(name)
+    meta['description'] = i.optionDescription(name)
     try:
-      meta['default'] = i.getOptionDefault(name)
+      meta['default'] = i.optionDefault(name)
     except:
       meta['default'] = ''
       pass #too bad
@@ -56,26 +56,24 @@ def addExtra(metadata):
   print "Adding extra"
 
   x=SX.sym("x")
-  f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
+  f = {'x':x, 'f':x**2}
   
-  i = NlpSolver("mysolver", "ipopt", f)
+  i = nlpsol("mysolver", "ipopt", f)
   extra(metadata,i,"IpoptInterface")
 
   x=SX.sym("x")
-  f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
-  i = NlpSolver("mysolver", "worhp", f)
+  i = nlpsol("mysolver", "worhp", f)
   extra(metadata,i,"WorhpInterface")
 
   x=SX.sym("x")
-  f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
-  i = NlpSolver("mysolver", "snopt", f)
+  i = nlpsol("mysolver", "snopt", f)
   extra(metadata,i,"SnoptInterface")
 
-  i = QpSolver("mysolver", "qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
+  i = qpsol("mysolver", "qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
   extra(metadata,i,"QpoasesInterface")
  
-  G = sparsify(DMatrix([[1,0],[0,1]])).T
-  E = sparsify(DMatrix([0,0]))
+  G = sparsify(DM([[1,0],[0,1]])).T
+  E = sparsify(DM([0,0]))
 
-  A = DMatrix(0,2)
+  A = DM(0,2)
 

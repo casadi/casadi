@@ -26,56 +26,54 @@
 #ifndef CASADI_IMPLICIT_TO_NLP_HPP
 #define CASADI_IMPLICIT_TO_NLP_HPP
 
-#include "casadi/core/function/implicit_function_internal.hpp"
-#include "casadi/core/function/nlp_solver_internal.hpp"
-#include "casadi/core/function/linear_solver.hpp"
+#include "casadi/core/function/rootfinder.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 
-#include <casadi/solvers/casadi_implicitfunction_nlp_export.h>
+#include <casadi/solvers/casadi_rootfinder_nlpsol_export.h>
 
-/** \defgroup plugin_ImplicitFunction_nlp
-  Use an NlpSolver as ImplicitFunction solver
+/** \defgroup plugin_Rootfinder_nlp
+  Use an Nlpsol as Rootfinder solver
 */
-/** \pluginsection{ImplicitFunction,nlp} */
+/** \pluginsection{Rootfinder,nlp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief  \pluginbrief{ImplicitFunction,nlp}
+  /** \brief  \pluginbrief{Rootfinder,nlp}
 
-   @copydoc ImplicitFunction_doc
-   @copydoc plugin_ImplicitFunction_nlp
+   @copydoc Rootfinder_doc
+   @copydoc plugin_Rootfinder_nlp
 
    \author Joris Gillis
    \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NLP_EXPORT QpToImplicit : public ImplicitFunctionInternal,
-    public Adaptor<QpToImplicit, NlpSolverInternal> {
+  class CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlp : public Rootfinder {
   public:
     /** \brief  Constructor */
-    explicit QpToImplicit(const Function& f);
+    explicit ImplicitToNlp(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
-    virtual ~QpToImplicit();
+    virtual ~ImplicitToNlp();
 
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual QpToImplicit* create(const Function& f) const
-    { return new QpToImplicit(f);}
+    /** \brief  Create a new Rootfinder */
+    static Rootfinder* creator(const std::string& name, const Function& f) {
+      return new ImplicitToNlp(name, f);
+    }
 
-    /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const Function& f)
-    { return new QpToImplicit(f);}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "nlpsol";}
 
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Solve the nonlinear system of equations */
-    virtual void solveNonLinear();
+    /// Solve the system of equations and calculate derivatives
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /// A documentation string
     static const std::string meta_doc;
 
-    /// Solve with
-    NlpSolver solver_;
+    /// NLP solver
+    Function solver_;
   };
 
 } // namespace casadi

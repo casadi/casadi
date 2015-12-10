@@ -39,9 +39,9 @@ using namespace std;
 Function generateCodeAndCompile(Function fcn, const std::string& name, bool expand){
   cout << "Generating code for " << name << endl;
 
-  // Convert to an SXFunction (may or may not improve efficiency)
-  if(expand && is_a<MXFunction>(fcn)){
-    fcn = SXFunction(shared_cast<MXFunction>(fcn));
+  // Convert to sx (may or may not improve efficiency)
+  if(expand && fcn.is_a("mxfunction")) {
+    fcn = fcn.expand();
   }
 
   // Generate C code
@@ -55,8 +55,7 @@ Function generateCodeAndCompile(Function fcn, const std::string& name, bool expa
   casadi_assert_message(flag==0, "Compilation failed");
 
   // Load the generated function for evaluation
-  ExternalFunction fcn_e(name);
-  return fcn_e;
+  return external(name);
 }
 
 int main(){
@@ -75,11 +74,11 @@ int main(){
   // Constraints
   MX g = x[0]+x[1]-10;
     
-  // Convert MXFunction to SXFunction before code generation (may or may not improve efficiency)
+  // Convert mxfunction to sxfunction before code generation (may or may not improve efficiency)
   bool expand = true;
 
   // NLP function
-  Function nlp = MXFunction("nlp", nlpIn("x", x),nlpOut("f", f, "g", g));
+  Function nlp("nlp", {{"x", x}, {"f", f}, {"g", g}}, {"x", "p"}, {"f", "g"});
 
   // Gradient of the objective
   Function grad_f = nlp.gradient("x", "f");
@@ -98,15 +97,16 @@ int main(){
   hess_lag = generateCodeAndCompile(hess_lag,"hess_lag", expand);
 
   // Create an NLP solver passing derivative information
-  NlpSolver solver("solver", "ipopt", nlp,
-                   make_dict("grad_f", grad_f, "jac_g", jac_g, "hess_lag",hess_lag));
+  Function solver =
+    nlpsol("solver", "ipopt", nlp,
+                         {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}});
 
   // Bounds and initial guess
-  std::map<std::string, DMatrix> arg, res;
-  arg["lbx"] = -DMatrix::inf();
-  arg["ubx"] =  DMatrix::inf();
+  std::map<std::string, DM> arg, res;
+  arg["lbx"] = -DM::inf();
+  arg["ubx"] =  DM::inf();
   arg["lbg"] =  0;
-  arg["ubg"] =  DMatrix::inf();
+  arg["ubg"] =  DM::inf();
   arg["x0"] = 0;
 
   // Solve the NLP

@@ -38,8 +38,8 @@ namespace casadi {
     casadi_assert_message(
       x.size2() == y.size1() && x.size1() == z.size1() && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
-      << x.dimString() << " with " << y.dimString()
-      << " and add the result to " << z.dimString());
+      << x.dim() << " with " << y.dim()
+      << " and add the result to " << z.dim());
 
     setDependencies(z, x, y);
     setSparsity(z.sparsity());
@@ -49,21 +49,20 @@ namespace casadi {
     return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
-  void Multiplication::evalD(const double** arg, double** res, int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void Multiplication::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Multiplication::evalSX(const SXElement** arg, SXElement** res,
-                              int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void Multiplication::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    casadi_mm_sparse(arg[1], dep(1).sparsity(),
-                     arg[2], dep(2).sparsity(),
-                     res[0], sparsity(), w);
+    casadi_mul(arg[1], dep(1).sparsity(),
+               arg[2], dep(2).sparsity(),
+               res[0], sparsity(), w, false);
   }
 
   void Multiplication::evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -84,47 +83,44 @@ namespace casadi {
     }
   }
 
-  void Multiplication::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Multiplication::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw,
-                             bvec_t* w) {
+  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     copyFwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
   }
 
-  void Multiplication::spAdj(bvec_t** arg, bvec_t** res,
-                             int* iw, bvec_t* w) {
+  void Multiplication::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
     copyAdj(arg[0], res[0], nnz());
   }
 
-  void Multiplication::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                CodeGenerator& g) const {
+  void Multiplication::generate(CodeGenerator& g, const std::string& mem,
+                                const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << endl;
     }
 
     // Perform sparse matrix multiplication
-    g.addAuxiliary(CodeGenerator::AUX_MM_SPARSE);
-    g.body << "  mm_sparse(   ";
-    g.body << g.work(arg[1], dep(1).nnz()) << ", " << g.sparsity(dep(1).sparsity()) << ", ";
-    g.body << g.work(arg[2], dep(2).nnz()) << ", " << g.sparsity(dep(2).sparsity()) << ", ";
-    g.body << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", w);" << endl;
+    g.body << "  " << g.mul(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
+                            g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
+                            g.work(res[0], nnz()), sparsity(), "w", false) << endl;
   }
 
-  void DenseMultiplication::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                     CodeGenerator& g) const {
+  void DenseMultiplication::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
-      g.body << "  " << g.copy_n(g.work(arg[0], nnz()), nnz(),
-                                 g.work(res[0], nnz())) << endl;
+      g.body << "  " << g.copy(g.work(arg[0], nnz()), nnz(),
+                               g.work(res[0], nnz())) << endl;
     }
 
     int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();

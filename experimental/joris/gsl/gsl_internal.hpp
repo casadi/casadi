@@ -27,7 +27,7 @@
 #define GSL_INTERNAL_HPP
 
 #include "gsl_integrator.hpp"
-#include "core/function/integrator_internal.hpp"
+#include "core/function/ivpsol_internal.hpp"
 #include "core/function/linear_solver.hpp"
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_matrix.h>
@@ -94,7 +94,7 @@ public:
   static int jac_wrapper (double t, const double y[], double *dfdy, double dfdt[], void *userdata);
   
   // Current state of the integrator
-  DMatrix state;
+  DM state;
   
   virtual void printStats(std::ostream &stream) const;
   

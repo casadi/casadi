@@ -30,25 +30,24 @@ from numpy import *
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
-t = SX.sym("t")
+t = SX.sym('t') 
+u = SX.sym('u') 
+v = SX.sym('v') 
 
-u = SX.sym("u") 
-v = SX.sym("v") 
-
-eps   = SX.sym("eps")
-mu    = SX.sym("mu")
-alpha = SX.sym("alpha")
-k     = SX.sym("k")
-sigma = SX.sym("sigma")
+eps   = SX.sym('eps')
+mu    = SX.sym('mu')
+alpha = SX.sym('alpha')
+k     = SX.sym('k')
+sigma = SX.sym('sigma')
 Omega = 2 + eps*sigma
 
 params = vertcat([eps,mu,alpha,k,sigma])
 states = vertcat([u,v])
 rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
 
-f=SXFunction("f", daeIn(x=states,p=params,t=t),daeOut(ode=rhs))
+dae = {'x':states, 'p':params, 't':t, 'ode':rhs}
 
-integrator = Integrator("integrator", "cvodes", f)
+integrator = integrator('integrator', 'cvodes', dae)
 
 #! First argument is input index, secpnd argument is output index
-jac = integrator.jacobian("p", "xf")
+jac = integrator.jacobian('p', 'xf')

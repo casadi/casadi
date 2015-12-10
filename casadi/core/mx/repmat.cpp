@@ -25,7 +25,6 @@
 
 #include "repmat.hpp"
 #include "../std_vector_tools.hpp"
-#include "../function/sx_function.hpp"
 
 using namespace std;
 
@@ -43,36 +42,34 @@ namespace casadi {
   }
 
   template<typename T>
-    void HorzRepmat::evalGen(const T** arg, T** res, int* iw, T* w) {
+  void HorzRepmat::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     int nnz = dep(0).nnz();
-    for (int i=0;i<n_;++i) {
+    for (int i=0; i<n_; ++i) {
       std::copy(arg[0], arg[0]+nnz, res[0]+i*nnz);
     }
   }
 
-  void HorzRepmat::evalD(const double** arg, double** res,
-                                int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w);
+  void HorzRepmat::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void HorzRepmat::evalSX(const SXElement** arg, SXElement** res,
-                                int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void HorzRepmat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
-  void HorzRepmat::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void HorzRepmat::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0]->getRepmat(1, n_);
   }
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void HorzRepmat::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void HorzRepmat::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     int nnz = dep(0).nnz();
     std::fill(res[0], res[0]+nnz, 0);
-    evalGen<bvec_t>(arg, res, iw, w);
+    evalGen<bvec_t>(arg, res, iw, w, mem);
   }
 
-  void HorzRepmat::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void HorzRepmat::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     int nnz = dep(0).nnz();
     for (int i=0;i<n_;++i) {
       std::transform(res[0]+i*nnz, res[0]+(i+1)*nnz, arg[0], arg[0], &Orring);
@@ -94,13 +91,14 @@ namespace casadi {
     }
   }
 
-  void HorzRepmat::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                           CodeGenerator& g) const {
+  void HorzRepmat::generate(CodeGenerator& g, const std::string& mem,
+                            const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = dep(0).nnz();
     g.body << "  for (i=0;i<" << n_ << ";++i) {" << endl;
-    g.body << "    copy_n(" << g.work(arg[0], dep(0).nnz()) << ", " << nnz<< ", "
-      << g.work(res[0], sparsity().nnz()) << "+ i*" << nnz << ");" << endl;
-    g.body << "  }" << endl;
+    g.body << "    " << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
+                               g.work(res[0], sparsity().nnz()) + "+ i*" + g.to_string(nnz))
+           << endl
+    << "  }" << endl;
   }
 
   HorzRepsum::HorzRepsum(const MX& x, int n) : n_(n) {
@@ -122,8 +120,8 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-    void HorzRepsum::evalGen(const T** arg, T** res, int* iw, T* w,
-      R reduction) {
+  void HorzRepsum::evalGen(const T** arg, T** res, int* iw, T* w, void* mem,
+                           R reduction) {
     int nnz = sparsity().nnz();
     fill_n(res[0], nnz, 0);
     for (int i=0;i<n_;++i) {
@@ -131,27 +129,25 @@ namespace casadi {
     }
   }
 
-  void HorzRepsum::evalD(const double** arg, double** res,
-                                int* iw, double* w) {
-    evalGen<double>(arg, res, iw, w, std::plus<double>());
+  void HorzRepsum::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    evalGen<double>(arg, res, iw, w, mem, std::plus<double>());
   }
 
-  void HorzRepsum::evalSX(const SXElement** arg, SXElement** res,
-                                int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w, std::plus<SXElement>());
+  void HorzRepsum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    evalGen<SXElem>(arg, res, iw, w, mem, std::plus<SXElem>());
   }
 
-  void HorzRepsum::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void HorzRepsum::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0]->getRepsum(1, n_);
   }
 
-  void HorzRepsum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void HorzRepsum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     int nnz = sparsity().nnz();
     std::fill(res[0], res[0]+nnz, 0);
-    evalGen<bvec_t>(arg, res, iw, w, &Orring);
+    evalGen<bvec_t>(arg, res, iw, w, mem, &Orring);
   }
 
-  void HorzRepsum::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+  void HorzRepsum::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     int nnz = sparsity().nnz();
     for (int i=0;i<n_;++i) {
       std::transform(res[0], res[0]+nnz, arg[0]+i*nnz, arg[0]+i*nnz, &Orring);
@@ -173,10 +169,10 @@ namespace casadi {
     }
   }
 
-  void HorzRepsum::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                           CodeGenerator& g) const {
+  void HorzRepsum::generate(CodeGenerator& g, const std::string& mem,
+                            const std::vector<int>& arg, const std::vector<int>& res) const {
     int nnz = sparsity().nnz();
-    g.body << "  " << g.fill_n(g.work(res[0], nnz), nnz, "0") << endl;
+    g.body << "  " << g.fill(g.work(res[0], nnz), nnz, "0") << endl;
     g.body << "  for (i=0;i<" << n_ << ";++i) {" << endl;
     g.body << "    for (j=0;j<" << nnz << ";++j) {" << endl;
     g.body << "      " << g.work(res[0], nnz)<< "[j] += " <<

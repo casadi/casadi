@@ -33,15 +33,12 @@ y = MX.sym("y",2,1)
 z = mul(x,y)
 
 #! Let's construct an MXfunction
-f = MXFunction("f", [x,y],[z])
+f = Function("f", [x,y],[z])
 
-#! An MX graph is lazy in evaluation
-print "Expression = ", f.outputExpr(0)
+#! We expand the MX expression into an SX expression
+fSX = f.expand('fSX')
 
-#! We expand the MXFunction into an SXFunction
-fSX = f.expand()
-
-print "Expanded expression = ", fSX.outputExpr(0)
+print "Expanded expression = ", fSX
 
 
 #! Limitations
@@ -49,13 +46,12 @@ print "Expanded expression = ", fSX.outputExpr(0)
 #! Not all MX graphs can be expanded.
 #! Here is an example of a situation where it will not work.
 #!
-linear_solver = LinearSolver("linear_solver", "csparse", x.sparsity())
-g = linear_solver.solve(x,y)
-G = MXFunction("G", [x,y], [g])
+linear_solver = linsol("linear_solver", "csparse", x.sparsity(), 1)
+g = linear_solver.linsol_solve(x, y)
+G = Function("G", [x,y], [g])
 
 #! This function cannot be expanded.
 try:
-  G.expand()
+  G.expand('G_sx')
 except Exception as e:
   print e
-

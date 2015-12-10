@@ -30,7 +30,7 @@
 *
 * \sa
 * \code
-* casadi::Simulator();
+* casadi::Function();
 * \endcode
 *
 */

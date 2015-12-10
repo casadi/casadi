@@ -37,8 +37,8 @@ namespace casadi {
   using namespace std;
 
   extern "C"
-  int CASADI_QPSOLVER_CPLEX_EXPORT
-  casadi_register_qpsolver_cplex(QpSolverInternal::Plugin* plugin) {
+  int CASADI_QPSOL_CPLEX_EXPORT
+  casadi_register_qpsol_cplex(Qpsol::Plugin* plugin) {
     plugin->creator = CplexInterface::creator;
     plugin->name = "cplex";
     plugin->doc = CplexInterface::meta_doc.c_str();
@@ -47,12 +47,14 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOLVER_CPLEX_EXPORT casadi_load_qpsolver_cplex() {
-    QpSolverInternal::registerPlugin(casadi_register_qpsolver_cplex);
+  void CASADI_QPSOL_CPLEX_EXPORT casadi_load_qpsol_cplex() {
+    Qpsol::registerPlugin(casadi_register_qpsol_cplex);
   }
 
-  CplexInterface::CplexInterface(const std::map<std::string, Sparsity>& st) : QpSolverInternal(st) {
-    // Options available
+  CplexInterface::CplexInterface(const std::string& name,
+                                 const std::map<std::string, Sparsity>& st)
+    : Qpsol(name, st) {
+
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
               "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
     addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format.");
@@ -79,12 +81,12 @@ namespace casadi {
     freeCplex();
 
     // Call the init method of the base class
-    QpSolverInternal::init();
+    Qpsol::init();
 
-    qp_method_     = getOptionEnumValue("qp_method");
-    dump_to_file_  = getOption("dump_to_file");
-    tol_           = getOption("tol");
-    //  dump_filename_ = getOption("dump_filename");
+    qp_method_     = optionEnumValue("qp_method");
+    dump_to_file_  = option("dump_to_file");
+    tol_           = option("tol");
+    //  dump_filename_ = option("dump_filename");
 
     int status;
     casadi_assert(env_==0);
@@ -116,16 +118,16 @@ namespace casadi {
       status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, qp_method_);
     }
     // Setting dependency check option
-    status = CPXsetintparam(env_, CPX_PARAM_DEPIND, getOptionEnumValue("dep_check"));
+    status = CPXsetintparam(env_, CPX_PARAM_DEPIND, optionEnumValue("dep_check"));
     // Setting barrier iteration limit
-    status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, getOption("barrier_maxiter"));
+    status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, option("barrier_maxiter"));
     // Setting simplex iteration limit
-    status = CPXsetintparam(env_, CPX_PARAM_ITLIM, getOption("simplex_maxiter"));
+    status = CPXsetintparam(env_, CPX_PARAM_ITLIM, option("simplex_maxiter"));
     if (qp_method_ == 7) {
       // Setting crossover algorithm
       status = CPXsetintparam(env_, CPX_PARAM_BARCROSSALG, 1);
     }
-    if (!static_cast<bool>(getOption("convex"))) {
+    if (!static_cast<bool>(option("convex"))) {
       // Enabling non-convex QPs
       status = CPXsetintparam(env_, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
     }
@@ -155,13 +157,13 @@ namespace casadi {
     rstat_.resize(nc_);
 
     // Matrix A, count the number of elements per column
-    const Sparsity& A_sp = input(QP_SOLVER_A).sparsity();
+    const Sparsity& A_sp = sparsity_in(QPSOL_A);
     matcnt_.resize(A_sp.size2());
     transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), matcnt_.begin(),
               minus<int>());
 
     // Matrix H, count the number of elements per column
-    const Sparsity& H_sp = input(QP_SOLVER_H).sparsity();
+    const Sparsity& H_sp = input(QPSOL_H).sparsity();
     qmatcnt_.resize(H_sp.size2());
     transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), qmatcnt_.begin(),
               minus<int>());
@@ -170,9 +172,16 @@ namespace casadi {
     lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
   }
 
-  void CplexInterface::evaluate() {
+  void CplexInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    // Pass the inputs to the function
+    for (int i=0; i<n_in(); ++i) {
+      casadi_copy(arg[i], nnz_in(i), input(i).ptr());
+    }
 
-    if (inputs_check_) checkInputs();
+    if (inputs_check_) {
+      checkInputs(input(QPSOL_LBX).ptr(), input(QPSOL_UBX).ptr(),
+                  input(QPSOL_LBA).ptr(), input(QPSOL_UBA).ptr());
+    }
 
     int status;
 
@@ -182,8 +191,8 @@ namespace casadi {
     }
 
     // Looping over constraints
-    const vector<double>& lba = input(QP_SOLVER_LBA).data();
-    const vector<double>& uba = input(QP_SOLVER_UBA).data();
+    const vector<double>& lba = input(QPSOL_LBA).data();
+    const vector<double>& uba = input(QPSOL_UBA).data();
 
     for (int i = 0; i < nc_; ++i) {
       // CPX_INFBOUND
@@ -211,31 +220,31 @@ namespace casadi {
     }
 
     // Copying objective, constraints, and bounds.
-    const Sparsity& A_sp = input(QP_SOLVER_A).sparsity();
+    const Sparsity& A_sp = input(QPSOL_A).sparsity();
     const int* matbeg = A_sp.colind();
     const int* matind = A_sp.row();
-    const double* matval = input(QP_SOLVER_A).ptr();
-    const double* obj = input(QP_SOLVER_G).ptr();
-    const double* lb = input(QP_SOLVER_LBX).ptr();
-    const double* ub = input(QP_SOLVER_UBX).ptr();
+    const double* matval = input(QPSOL_A).ptr();
+    const double* obj = input(QPSOL_G).ptr();
+    const double* lb = input(QPSOL_LBX).ptr();
+    const double* ub = input(QPSOL_UBX).ptr();
     status = CPXcopylp(env_, lp_, n_, nc_, objsen_, obj, rhs_.data(), sense_.data(),
                         matbeg, getPtr(matcnt_), matind, matval, lb, ub, rngval_.data());
 
     // Preparing coefficient matrix Q
-    const Sparsity& H_sp = input(QP_SOLVER_H).sparsity();
+    const Sparsity& H_sp = input(QPSOL_H).sparsity();
     const int* qmatbeg = H_sp.colind();
     const int* qmatind = H_sp.row();
-    const double* qmatval = input(QP_SOLVER_H).ptr();
+    const double* qmatval = input(QPSOL_H).ptr();
     status = CPXcopyquad(env_, lp_, qmatbeg, getPtr(qmatcnt_), qmatind, qmatval);
 
     if (dump_to_file_) {
-      const char* fn = string(getOption("dump_filename")).c_str();
+      const char* fn = string(option("dump_filename")).c_str();
       CPXwriteprob(env_, lp_, fn, "LP");
     }
 
     // Warm-starting if possible
-    const double* x0 = input(QP_SOLVER_X0).ptr();
-    const double* lam_x0 = input(QP_SOLVER_LAM_X0).ptr();
+    const double* x0 = input(QPSOL_X0).ptr();
+    const double* lam_x0 = input(QPSOL_LAM_X0).ptr();
     if (qp_method_ != 0 && qp_method_ != 4 && is_warm_) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
       CPXcopystart(env_, lp_, getPtr(cstat_), getPtr(rstat_), x0, NULL, NULL, lam_x0);
@@ -255,11 +264,11 @@ namespace casadi {
     std::vector<double> slack;
     slack.resize(nc_);
     status = CPXsolution(env_, lp_, &solstat,
-                          output(QP_SOLVER_COST).ptr(),
-                          output(QP_SOLVER_X).ptr(),
-                          output(QP_SOLVER_LAM_A).ptr(),
+                          output(QPSOL_COST).ptr(),
+                          output(QPSOL_X).ptr(),
+                          output(QPSOL_LAM_A).ptr(),
                           getPtr(slack),
-                          output(QP_SOLVER_LAM_X).ptr());
+                          output(QPSOL_LAM_X).ptr());
 
     if (status) {
       userOut() << "CPLEX: Failed to get solution.\n";
@@ -270,10 +279,10 @@ namespace casadi {
     }
 
     // Flip the sign of the multipliers
-    for (vector<double>::iterator it=output(QP_SOLVER_LAM_A).begin();
-        it!=output(QP_SOLVER_LAM_A).end(); ++it) *it = -*it;
-    for (vector<double>::iterator it=output(QP_SOLVER_LAM_X).begin();
-        it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
+    for (auto it=output(QPSOL_LAM_A)->begin();
+         it!=output(QPSOL_LAM_A)->end(); ++it) *it = -*it;
+    for (auto it=output(QPSOL_LAM_X)->begin();
+         it!=output(QPSOL_LAM_X)->end(); ++it) *it = -*it;
 
     int solnstat = CPXgetstat(env_, lp_);
     stringstream errormsg;
@@ -311,10 +320,14 @@ namespace casadi {
     }
 
     // Next time we warm start
-    if (static_cast<bool>(getOption("warm_start"))) {
+    if (static_cast<bool>(option("warm_start"))) {
       is_warm_ = true;
     }
 
+    // Get the outputs
+    for (int i=0; i<n_out(); ++i) {
+      casadi_copy(output(i).ptr(), nnz_out(i), res[i]);
+    }
   }
 
   CplexInterface::~CplexInterface() {

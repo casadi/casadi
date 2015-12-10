@@ -1482,7 +1482,7 @@ returnValue QProblemB::setupCholeskyDecomposition( )
 
 			/* get H */
 			for ( j=0; j < nFR; ++j )
-				H->getCol (FR_idx[j], bounds.getFree (), 1.0, &R[j*nV]);
+				H->get_col (FR_idx[j], bounds.getFree (), 1.0, &R[j*nV]);
 
 			/* R'*R = H */
 			long info = 0;
@@ -3547,7 +3547,7 @@ returnValue QProblemB::removeBound(	int number,
 				break;
 
 			default:
-				H->getRow(number, bounds.getFree(), 1.0, rhs);
+				H->get_row(number, bounds.getFree(), 1.0, rhs);
 				r0 = H->diag(number);
 				break;
 		}

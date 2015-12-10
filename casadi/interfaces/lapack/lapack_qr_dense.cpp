@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_LINEARSOLVER_LAPACKQR_EXPORT
-  casadi_register_linearsolver_lapackqr(LinearSolverInternal::Plugin* plugin) {
+  int CASADI_LINSOL_LAPACKQR_EXPORT
+  casadi_register_linsol_lapackqr(Linsol::Plugin* plugin) {
     plugin->creator = LapackQrDense::creator;
     plugin->name = "lapackqr";
     plugin->doc = LapackQrDense::meta_doc.c_str();;
@@ -40,12 +40,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_LINEARSOLVER_LAPACKQR_EXPORT casadi_load_linearsolver_lapackqr() {
-    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapackqr);
+  void CASADI_LINSOL_LAPACKQR_EXPORT casadi_load_linsol_lapackqr() {
+    Linsol::registerPlugin(casadi_register_linsol_lapackqr);
   }
 
-  LapackQrDense::LapackQrDense(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity, nrhs) {
+  LapackQrDense::LapackQrDense(const std::string& name,
+                               const Sparsity& sparsity, int nrhs) :
+    Linsol(name, sparsity, nrhs) {
   }
 
   LapackQrDense::~LapackQrDense() {
@@ -53,7 +54,7 @@ namespace casadi {
 
   void LapackQrDense::init() {
     // Call the base class initializer
-    LinearSolverInternal::init();
+    Linsol::init();
 
     // Get dimensions
     ncol_ = ncol();
@@ -69,11 +70,10 @@ namespace casadi {
     work_.resize(10*ncol_);
   }
 
-  void LapackQrDense::prepare() {
-    prepared_ = false;
+  void LapackQrDense::linsol_factorize(Memory& m, const double* A) {
 
     // Get the elements of the matrix, dense format
-    input(0).get(mat_);
+    casadi_densify(A, sparsity_, getPtr(mat_), false);
 
     // Factorize the matrix
     int info = -100;
@@ -81,26 +81,23 @@ namespace casadi {
     dgeqrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(tau_), getPtr(work_), &lwork, &info);
     if (info != 0) throw CasadiException("LapackQrDense::prepare: dgeqrf_ "
                                          "failed to factorize the Jacobian");
-
-    // Success if reached this point
-    prepared_ = true;
   }
 
-  void LapackQrDense::solve(double* x, int nrhs, bool transpose) {
+  void LapackQrDense::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
     // Properties of R
     char uploR = 'U';
     char diagR = 'N';
     char sideR = 'L';
     double alphaR = 1.;
-    char transR = transpose ? 'T' : 'N';
+    char transR = tr ? 'T' : 'N';
 
     // Properties of Q
-    char transQ = transpose ? 'N' : 'T';
+    char transQ = tr ? 'N' : 'T';
     char sideQ = 'L';
     int k = tau_.size(); // minimum of ncol_ and nrow_
     int lwork = work_.size();
 
-    if (transpose) {
+    if (tr) {
 
       // Solve for transpose(R)
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,

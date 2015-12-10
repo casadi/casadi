@@ -28,7 +28,7 @@
 
       const std::string casadi::SymbolicQr::meta_doc=
       "\n"
-"LinearSolver based on QR factorization with sparsity pattern based\n"
+"Linsol based on QR factorization with sparsity pattern based\n"
 "reordering without partial pivoting\n"
 "\n"
 "\n"

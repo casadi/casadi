@@ -13,32 +13,32 @@ alldata = []
 for d in data[:1]:
 
   H = d["H"]
-  nlp = createNLP(DMatrix([[1.2,0.3],[0.7,1.3]]),DMatrix([[0.2,0.4],[0.77,0.12]],lift=True,simple=False)
+  nlp = createNLP(DM([[1.2,0.3],[0.7,1.3]]),DM([[0.2,0.4],[0.77,0.12]],lift=True,simple=False)
   
   log = []
   dists = []
   
-  nlpsolver = SnoptSolver(nlp)
-  #nlpsolver.setOption("tol",1e-12)
-  nlpsolver.setOption("gather_stats",True)
-  nlpsolver.setOption("_feasibility_tolerance",1e-12)
-  nlpsolver.setOption("_optimality_tolerance",1e-12)
-  nlpsolver.setOption("_major_iteration_limit",3000)
-  nlpsolver.setOption("detect_linear",True)
-  #nlpsolver.setOption("max_iter",3000)
-  nlpsolver.init()
+  nlpsol = SnoptSolver(nlp)
+  #nlpsol.setOption("tol",1e-12)
+  nlpsol.setOption("gather_stats",True)
+  nlpsol.setOption("_feasibility_tolerance",1e-12)
+  nlpsol.setOption("_optimality_tolerance",1e-12)
+  nlpsol.setOption("_major_iteration_limit",3000)
+  nlpsol.setOption("detect_linear",True)
+  #nlpsol.setOption("max_iter",3000)
+  nlpsol.init()
   
-  nlpsolver.setInput(1e-5,"x0")
+  nlpsol.setInput(1e-5,"x0")
   
-  bs_ = mul(d["problem"]["Bs"][0],1e-5*DMatrix.ones(2,2))
-  nlpsolver.input("x0")[-bs_.size():] = vec(bs_)
+  bs_ = mul(d["problem"]["Bs"][0],1e-5*DM.ones(2,2))
+  nlpsol.input("x0")[-bs_.size():] = vec(bs_)
   
-  nlpsolver.setInput(0,"lbg")
-  nlpsolver.setInput(0,"ubg")
+  nlpsol.setInput(0,"lbg")
+  nlpsol.setInput(0,"ubg")
   
-  nlpsolver.evaluate()
+  nlpsol.evaluate()
   
-  print nlpsolver.getStats()
+  print nlpsol.getStats()
   
-  alldata.append({"f": nlpsolver.output("f"),"x":nlpsolver.output("x"), "stats": nlpsolver.getStats()})
+  alldata.append({"f": nlpsol.output("f"),"x":nlpsol.output("x"), "stats": nlpsol.getStats()})
   

@@ -60,7 +60,6 @@ class CASADI_EXPORT NonZeros : public M {
     K k_;
 };
 
-#ifdef casadi_implementation
 // Implementation
 template<typename M, typename K>
 const M& NonZeros<M, K>::operator=(const NonZeros<M, K> &y) {
@@ -102,13 +101,6 @@ M NonZeros<M, K>::operator/=(const M &y) {
   mat_.setNZ(s, false, k_);
   return s;
 }
-#endif
-
-#define INSTANTIATE_NONZEROS(Mt) \
-template class NonZeros< Mt , std::vector<int> >;\
-template class NonZeros< Mt , int >;\
-template class NonZeros< Mt , Matrix<int> >;\
-template class NonZeros< Mt , Slice >;
 
 } // namespace casadi
 

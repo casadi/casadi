@@ -81,11 +81,11 @@ int main(){
   vector<double> p0  = {5.00, 1.00};
 
   // NLP
-  SXFunction nlp("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
+  SXDict nlp = {{"x", x}, {"p", p}, {"f", f}, {"g", g}};
 
   // Create NLP solver and buffers
-  NlpSolver solver("solver", "ipopt", nlp);
-  std::map<std::string, DMatrix> arg, res;
+  Function solver = nlpsol("solver", "ipopt", nlp);
+  std::map<std::string, DM> arg, res;
 
   // Solve the NLP
   arg["lbx"] = lbx;

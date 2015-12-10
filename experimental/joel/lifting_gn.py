@@ -36,11 +36,11 @@ gauss_newton = False
 
 # QP-solver
 if False:
-  QpSolverClass = OOQpSolver
-  qp_solver_options = {}
+  QpsolClass = OOQpsol
+  qpsol_options = {}
 else:
-  QpSolverClass = QPOasesSolver
-  qp_solver_options = {"printLevel" : "none"}
+  QpsolClass = QPOasesSolver
+  qpsol_options = {"printLevel" : "none"}
 
 # Initial condition
 x0_test = [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.20, 0.30]
@@ -77,9 +77,9 @@ for (i,x0) in enumerate([0.08]):
   u = ssym("u",nk)
 
   # Initial guess for u
-  u_guess = DMatrix.zeros(nk)
-  u_min = u_min*DMatrix.ones(nk)
-  u_max = u_max*DMatrix.ones(nk)
+  u_guess = DM.zeros(nk)
+  u_min = u_min*DM.ones(nk)
+  u_max = u_max*DM.ones(nk)
 
   # Lifted variables
   L = SX()
@@ -112,15 +112,15 @@ for (i,x0) in enumerate([0.08]):
     
   else:
     # Objective function (SQP)
-    F1 = SXFunction([u],[inner_prod(F,F)])
+    F1 = SXFunction([u],[dot(F,F)])
 
   # Constraint function
   F2 = SXFunction([u],[G])
 
   # Solve with ipopt
   #nlp_solver = SQPMethod(F1,F2)
-  #nlp_solver.setOption("qp_solver",QPOasesSolver)
-  #nlp_solver.setOption("qp_solver_options",{"printLevel":"none"})
+  #nlp_solver.setOption("qpsol",QPOasesSolver)
+  #nlp_solver.setOption("qpsol_options",{"printLevel":"none"})
   nlp_solver = IpoptSolver(F1,F2)
   nlp_solver.init()
   nlp_solver.setInput(u_guess,"x0")
@@ -171,7 +171,7 @@ for (i,x0) in enumerate([0.08]):
 
     # Gradient of the Lagrangian
     xu = vertcat((u,x))
-    lgrad = gradient(f1 - inner_prod(mug,f2) + inner_prod(xdot,xdef),xu)
+    lgrad = gradient(f1 - dot(mug,f2) + dot(xdot,xdef),xu)
 
     # Gradient of the Lagrangian
     f1 = lgrad[:u.size1(),0] # + mux # What about the mux term?
@@ -213,14 +213,14 @@ for (i,x0) in enumerate([0.08]):
 
   # Variables
   u_k = u_guess
-  x_k = DMatrix.zeros(x.shape)
-  d_k = DMatrix.zeros(x.shape)
-  mux_k = DMatrix.zeros(mux.shape)
-  mug_k = DMatrix.zeros(mug.shape)
-  dmux_k = DMatrix.zeros(mux.shape)
-  dmug_k = DMatrix.zeros(mug.shape)
-  f1_k = DMatrix.nan(f1.shape)
-  f2_k = DMatrix.nan(f2.shape)
+  x_k = DM.zeros(x.shape)
+  d_k = DM.zeros(x.shape)
+  mux_k = DM.zeros(mux.shape)
+  mug_k = DM.zeros(mug.shape)
+  dmux_k = DM.zeros(mux.shape)
+  dmug_k = DM.zeros(mug.shape)
+  f1_k = DM.nan(f1.shape)
+  f2_k = DM.nan(f2.shape)
 
   if manual_init:
     # Initialize node values manually
@@ -244,10 +244,10 @@ for (i,x0) in enumerate([0.08]):
     Z.getOutput(f2_k,2)
     
   # Zero seeds
-  u0seed = DMatrix.zeros(u.shape)
-  d0seed = DMatrix.zeros(d.shape)
-  mux0seed = DMatrix.zeros(mux.shape)
-  mug0seed = DMatrix.zeros(mug.shape)
+  u0seed = DM.zeros(u.shape)
+  d0seed = DM.zeros(d.shape)
+  mux0seed = DM.zeros(mux.shape)
+  mug0seed = DM.zeros(mug.shape)
 
   # Iterate
   k = 0
@@ -296,29 +296,29 @@ for (i,x0) in enumerate([0.08]):
 
     if k==0:
       # Allocate a QP solver
-      qp_solver = QpSolverClass(H.sparsity(),A.sparsity())
-      qp_solver.setOption(qp_solver_options)
-      qp_solver.init()
+      qpsol = QpsolClass(H.sparsity(),A.sparsity())
+      qpsol.setOption(qpsol_options)
+      qpsol.init()
 
     # Formulate the QP
-    qp_solver.setInput(H,"h")
-    qp_solver.setInput(g,"g")
-    qp_solver.setInput(A,"a")
-    qp_solver.setInput(u_min-u_k,"lbx")
-    qp_solver.setInput(u_max-u_k,"ubx")
-    qp_solver.setInput(g_min-a,"lba")
-    qp_solver.setInput(g_max-a,"uba")
+    qpsol.setInput(H,"h")
+    qpsol.setInput(g,"g")
+    qpsol.setInput(A,"a")
+    qpsol.setInput(u_min-u_k,"lbx")
+    qpsol.setInput(u_max-u_k,"ubx")
+    qpsol.setInput(g_min-a,"lba")
+    qpsol.setInput(g_max-a,"uba")
 
     # Solve the QP
-    qp_solver.evaluate()
+    qpsol.evaluate()
 
     # Get the primal solution
-    du_k = qp_solver.getOutput("primal")
+    du_k = qpsol.getOutput("primal")
     
     # Get the dual solution
     if not gauss_newton:
-      qp_solver.getOutput(dmux_k,"lambda_x")
-      qp_solver.getOutput(dmug_k,"lambda_a")
+      qpsol.getOutput(dmux_k,"lambda_x")
+      qpsol.getOutput(dmug_k,"lambda_a")
       dmux_k = -dmux_k
       dmug_k = -dmug_k
     

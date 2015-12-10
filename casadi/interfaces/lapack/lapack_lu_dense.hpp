@@ -26,19 +26,19 @@
 #ifndef CASADI_LAPACK_LU_DENSE_HPP
 #define CASADI_LAPACK_LU_DENSE_HPP
 
-#include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/lapack/casadi_linearsolver_lapacklu_export.h>
+#include "casadi/core/function/linsol.hpp"
+#include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
 
 namespace casadi {
 
-/** \defgroup plugin_LinearSolver_lapacklu
+/** \defgroup plugin_Linsol_lapacklu
 *
    * This class solves the linear system <tt>A.x=b</tt> by making an LU factorization of A: \n
    * <tt>A = L.U</tt>, with L lower and U upper triangular
    *
 */
 
-/** \pluginsection{LinearSolver,lapacklu} */
+/** \pluginsection{Linsol,lapacklu} */
 
 /// \cond INTERNAL
 
@@ -57,20 +57,22 @@ namespace casadi {
   extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
                           double *colcnd, double *rowcnd, double *amax, char *equed);
 
-  /** \brief \pluginbrief{LinearSolver,lapacklu}
+  /** \brief \pluginbrief{Linsol,lapacklu}
    *
-   * @copydoc LinearSolver_doc
-   * @copydoc plugin_LinearSolver_lapacklu
+   * @copydoc Linsol_doc
+   * @copydoc plugin_Linsol_lapacklu
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLuDense : public LinearSolverInternal {
+  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLuDense : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLuDense(const Sparsity& sparsity, int nrhs);
+    LapackLuDense(const std::string& name, const Sparsity& sparsity, int nrhs);
 
-    /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new LapackLuDense(sp, nrhs);}
+    /** \brief  Create a new Linsol */
+    static Linsol* creator(const std::string& name,
+                                         const Sparsity& sp, int nrhs) {
+      return new LapackLuDense(name, sp, nrhs);
+    }
 
     /// Destructor
     virtual ~LapackLuDense();
@@ -78,11 +80,11 @@ namespace casadi {
     /// Initialize the solver
     virtual void init();
 
-    /// Prepare the solution of the linear system
-    virtual void prepare();
+    // Factorize the linear system
+    virtual void linsol_factorize(Memory& m, const double* A);
 
-    /// Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    // Solve the linear system
+    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
 
     /// A documentation string
     static const std::string meta_doc;
@@ -116,6 +118,8 @@ namespace casadi {
     /// Dimensions
     int ncol_, nrow_;
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "lapacklu";}
   };
 
 /// \endcond

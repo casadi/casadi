@@ -23,8 +23,8 @@
  */
 
 
-#ifndef SYMBOLIC_SXElement_HPP
-#define SYMBOLIC_SXElement_HPP
+#ifndef SYMBOLIC_SXElem_HPP
+#define SYMBOLIC_SXElem_HPP
 
 #include "sx_node.hpp"
 /// \cond INTERNAL
@@ -42,12 +42,12 @@ public:
   explicit SymbolicSX(const std::string &name) : name(name) {}
   virtual ~SymbolicSX() {}
 
-  virtual bool isSymbolic() const { return true; }
+  virtual bool is_symbolic() const { return true; }
 
   virtual const std::string& getName() const { return name; }
 
     /** \brief  Get the operation */
-  virtual int getOp() const { return OP_PARAMETER;}
+  virtual int op() const { return OP_PARAMETER;}
 
   /** \brief  Name */
   std::string name;
@@ -62,4 +62,4 @@ protected:
 
 } // namespace casadi
 /// \endcond
-#endif // SYMBOLIC_SXElement_HPP
+#endif // SYMBOLIC_SXElem_HPP

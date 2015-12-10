@@ -33,37 +33,39 @@ from numpy import *
 x=SX.sym("x")
 y=SX.sym("y")
 
-nlp=SXFunction("nlp", nlpIn(x=vertcat((x,y))),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
-    
-#! Simple callback
-#! ===============
-#! First we demonstrate a callback that does nothing more than printing some information on the screen
+f = (1-x)**2+100*(y-x**2)**2
+nlp={'x':vertcat((x,y)), 'f':f,'g':x+y}
+fcn = Function('f', [x, y], [f])
+ 
+# #! Simple callback
+# #! ===============
+# #! First we demonstrate a callback that does nothing more than printing some information on the screen
 
-it = 0
+# it = 0
 
-@pycallback
-def simplecallback(f):
-  global it
-  print "====Hey, I'm an iteration===="
-  print "X_OPT = ", f.getOutput("x")
-  print f.getStat("iteration")
-  it = it + 1
-  if it > 5:
-    print "5 Iterations, that is quite enough!"
-    return 1 # With this statement you can halt the iterations
-  else:
-    return 0
+# @pycallback
+# def simplecallback(f):
+#   global it
+#   print "====Hey, I'm an iteration===="
+#   print "X_OPT = ", f.getOutput("x")
+#   print f.getStat("iteration")
+#   it = it + 1
+#   if it > 5:
+#     print "5 Iterations, that is quite enough!"
+#     return 1 # With this statement you can halt the iterations
+#   else:
+#     return 0
 
-opts = {}
-opts["iteration_callback"] = simplecallback
-opts["tol"] = 1e-8
-opts["max_iter"] = 20
-solver = NlpSolver("solver", "ipopt", nlp, opts)
-solver.setInput([-10]*2,"lbx")
-solver.setInput([10]*2,"ubx")
-solver.setInput([-10],"lbg")
-solver.setInput([10],"ubg")
-solver.evaluate()
+# opts = {}
+# opts["iteration_callback"] = simplecallback
+# opts["tol"] = 1e-8
+# opts["max_iter"] = 20
+# solver = nlpsol("solver", "ipopt", nlp, opts)
+# solver.setInput([-10]*2,"lbx")
+# solver.setInput([10]*2,"ubx")
+# solver.setInput([-10],"lbg")
+# solver.setInput([10],"ubg")
+# solver.evaluate()
 
 #! Matplotlib callback
 #! ===================
@@ -75,21 +77,27 @@ from pylab import figure, subplot, contourf, colorbar, draw, show, plot, title
 import time
 import matplotlib
 matplotlib.interactive(True)
-  
-@pycallback
-class MyCallback:
-  def __init__(self):
+
+class MyCallback(Callback):
+  def __init__(self, name, nx, ng, np, opts={}):
+    Callback.__init__(self)
+
+    self.nx = nx
+    self.ng = ng
+    self.np = np
+
+    opts['input_scheme'] = nlpsol_out()
+    opts['output_scheme'] = ['ret']
+
     figure(1)
     subplot(111)
     
     x_,y_ = mgrid[-1:1.5:0.01,-1:1.5:0.01]
-    z_ = DMatrix.zeros(x_.shape)
+    z_ = DM.zeros(x_.shape)
     
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):
-        nlp.setInput([x_[i,j],y_[i,j]],"x")
-        nlp.evaluate()
-        z_[i,j] = float(nlp.getOutput("f"))
+        [z_[i,j]] = fcn([x_[i,j],y_[i,j]])
     contourf(x_,y_,z_)
     colorbar()
     title('Iterations of Rosenbrock')
@@ -97,9 +105,30 @@ class MyCallback:
     
     self.x_sols = []
     self.y_sols = []
-    
-  def __call__(self,f,*args):
-    sol = f.getOutput("x")
+
+    # Initialize internal objects
+    self.construct(name, opts)
+
+  def get_n_in(self): return nlpsol_n_out()
+  def get_n_out(self): return 1
+
+
+  def get_input_shape(self, i):
+    n = nlpsol_out(i)
+    if n=='f':
+      return (1,1)
+    elif n in ('x', 'lam_x'):
+      return (self.nx, 1)
+    elif n in ('g', 'lam_g'):
+      return (self.ng, 1)
+    else:
+      return (0, 0)
+  def eval(self, arg):
+    # Create dictionary
+    darg = {}
+    for (i,s) in enumerate(nlpsol_out()): darg[s] = arg[i]
+
+    sol = darg['x']
     self.x_sols.append(float(sol[0]))
     self.y_sols.append(float(sol[1]))
     subplot(111)
@@ -112,11 +141,14 @@ class MyCallback:
     draw()
     time.sleep(0.25)
 
+    return [0]
+
+mycallback = MyCallback('mycallback', 2, 1, 0)
 opts = {}
-opts["iteration_callback"] = MyCallback()
+opts["iteration_callback"] = mycallback
 opts["tol"] = 1e-8
 opts["max_iter"] = 50
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")

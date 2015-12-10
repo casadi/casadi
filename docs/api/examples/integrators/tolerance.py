@@ -27,11 +27,11 @@ from casadi import *
 from numpy import *
 from pylab import *
 
-x=SX.sym("x") 
-dx=SX.sym("dx")
+x=SX.sym('x') 
+dx=SX.sym('dx')
 states = vertcat([x,dx])
 
-f=SXFunction("f", daeIn(x=states),daeOut(ode=vertcat([dx,-x])))
+dae={'x':states, 'ode':vertcat([dx,-x])}
 
 tend = 2*pi*3
 ts = linspace(0,tend,1000)
@@ -41,16 +41,15 @@ tolerances = [-10,-5,-4,-3,-2,-1]
 figure()
 
 for tol in tolerances:
-  integrator = Integrator("integrator", "cvodes", f, {"reltol":10.0**tol, "abstol":10.0**tol})
-  sim=Simulator("sim", integrator, ts)
-  sim.setInput([1,0],"x0")
-  sim.evaluate()
+  opts = {'reltol':10.0**tol, 'abstol':10.0**tol, 'grid':ts, 'output_t0':True}
+  F = integrator('F', 'cvodes', dae, opts)
+  res = F({'x0':[1,0]})
 
-  plot(ts,array(sim.getOutput())[0,:].T,label="tol = 1e%d" % tol)
+  plot(ts,array(res['xf'])[0,:].T,label='tol = 1e%d' % tol)
 
 legend( loc='upper left')
-xlabel("Time [s]")
-ylabel("State x [-]")
+xlabel('Time [s]')
+ylabel('State x [-]')
 show()
 
 
@@ -59,18 +58,17 @@ endresult=[]
 
 for tol in tolerances:
   opts = {}
-  opts["reltol"] = tol
-  opts["abstol"] = tol
-  opts["tf"] = tend
-  integrator = Integrator("integrator", "cvodes", f, opts)
-  integrator.setInput([1,0],"x0")
-  integrator.evaluate()
-  endresult.append(integrator.getOutput()[0])
+  opts['reltol'] = tol
+  opts['abstol'] = tol
+  opts['tf'] = tend
+  F = integrator('F', 'cvodes', dae, opts)
+  res = F({'x0':[1,0]})
+  endresult.append(res['xf'][0])
   
 figure()
-loglog(tolerances,(array(endresult)-1),'b',label="Positive error")
-loglog(tolerances,-(array(endresult)-1),'r',label="Negative error")
-xlabel("Integrator relative tolerance")
-ylabel("Error at the end of integration time")
+loglog(tolerances,(array(endresult)-1),'b',label='Positive error')
+loglog(tolerances,-(array(endresult)-1),'r',label='Negative error')
+xlabel('Integrator relative tolerance')
+ylabel('Error at the end of integration time')
 legend(loc='upper left')
 show()

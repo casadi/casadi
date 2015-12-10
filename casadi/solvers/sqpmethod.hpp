@@ -26,39 +26,48 @@
 #ifndef CASADI_SQPMETHOD_HPP
 #define CASADI_SQPMETHOD_HPP
 
-#include "casadi/core/function/nlp_solver_internal.hpp"
-#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 #include <deque>
 
-#include <casadi/solvers/casadi_nlpsolver_sqpmethod_export.h>
+#include <casadi/solvers/casadi_nlpsol_sqpmethod_export.h>
 
-/** \defgroup plugin_NlpSolver_sqpmethod
+/** \defgroup plugin_Nlpsol_sqpmethod
  A textbook SQPMethod
 */
 
-/** \pluginsection{NlpSolver,sqpmethod} */
+/** \pluginsection{Nlpsol,sqpmethod} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief  \pluginbrief{NlpSolver,sqpmethod}
+  /** \brief  \pluginbrief{Nlpsol,sqpmethod}
   *  @copydoc NLPSolver_doc
-  *  @copydoc plugin_NlpSolver_sqpmethod
+  *  @copydoc plugin_Nlpsol_sqpmethod
   */
-  class CASADI_NLPSOLVER_SQPMETHOD_EXPORT Sqpmethod : public NlpSolverInternal {
+  class CASADI_NLPSOL_SQPMETHOD_EXPORT Sqpmethod : public Nlpsol {
   public:
-    explicit Sqpmethod(const Function& nlp);
+    explicit Sqpmethod(const std::string& name, const XProblem& nlp);
     virtual ~Sqpmethod();
 
-    /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new Sqpmethod(nlp);}
+  // Get name of the plugin
+  virtual const char* plugin_name() const { return "sqpmethod";}
 
+    /** \brief  Create a new NLP Solver */
+    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+      return new Sqpmethod(name, nlp);
+    }
+
+    // Initialize the solver
     virtual void init();
-    virtual void evaluate();
+
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
+    // Solve the NLP
+    virtual void solve(void* mem);
 
     /// QP solver for the subproblems
-    QpSolver qp_solver_;
+    Function qpsol_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -88,48 +97,54 @@ namespace casadi {
     /// Hessian regularization
     double reg_;
 
-    /// Access QpSolver
-    const QpSolver getQpSolver() const { return qp_solver_;}
-
-    /// Lagrange multipliers of the NLP
-    std::vector<double> mu_, mu_x_;
-
-    /// Current cost function value
-    double fk_;
-
-    /// Current and previous linearization point and candidate
-    std::vector<double> x_, x_old_, x_cand_;
-
-    /// Lagrange gradient in the next iterate
-    std::vector<double> gLag_, gLag_old_;
-
-    /// Constraint function value
-    std::vector<double> gk_, gk_cand_;
-
-    /// Gradient of the objective function
-    std::vector<double> gf_;
-
     /// BFGS update function
     enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};
     Function bfgs_;
 
+    // Hessian sparsity
+    Sparsity Hsp_;
+
+    // Jacobian sparsity
+    Sparsity Asp_;
+
     /// Initial Hessian approximation (BFGS)
-    DMatrix B_init_;
-
-    /// Current Hessian approximation
-    DMatrix Bk_;
-
-    // Current Jacobian
-    DMatrix Jk_;
-
-    // Bounds of the QP
-    std::vector<double> qp_LBA_, qp_UBA_, qp_LBX_, qp_UBX_;
-
-    // QP solution
-    std::vector<double> dx_, qp_DUAL_X_, qp_DUAL_A_;
+    DM B_init_;
 
     /// Regularization
     bool regularize_;
+
+    /// Access Qpsol
+    const Function getQpsol() const { return qpsol_;}
+
+    /// Current cost function value
+    double fk_;
+
+    /// Lagrange multipliers of the NLP
+    double *mu_, *mu_x_;
+
+    /// Current and previous linearization point and candidate
+    double *xk_, *x_old_, *x_cand_;
+
+    /// Lagrange gradient in the next iterate
+    double *gLag_, *gLag_old_;
+
+    /// Constraint function value
+    double *gk_, *gk_cand_;
+
+    /// Gradient of the objective function
+    double *gf_;
+
+    // Bounds of the QP
+    double *qp_LBA_, *qp_UBA_, *qp_LBX_, *qp_UBX_;
+
+    // QP solution
+    double *dx_, *qp_DUAL_X_, *qp_DUAL_A_;
+
+    // Current Jacobian
+    double *Jk_;
+
+    /// Current Hessian approximation
+    double *Bk_;
 
     // Storage for merit function
     std::deque<double> merit_mem_;
@@ -145,41 +160,34 @@ namespace casadi {
     void reset_h();
 
     // Evaluate the gradient of the objective
-    virtual void eval_f(const std::vector<double>& x, double& f);
+    virtual double eval_f(const double* x);
 
     // Evaluate the gradient of the objective
-    virtual void eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f);
+    virtual void eval_grad_f(const double* x, double* f, double* grad_f);
 
     // Evaluate the constraints
-    virtual void eval_g(const std::vector<double>& x, std::vector<double>& g);
+    virtual void eval_g(const double* x, double* g);
 
     // Evaluate the Jacobian of the constraints
-    virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g,
-      Matrix<double>& J);
+    virtual void eval_jac_g(const double* x, double* g, double* J);
 
     // Evaluate the Hessian of the Lagrangian
-    virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda,
-                        double sigma, Matrix<double>& H);
+    virtual void eval_h(const double* x, const double* lambda, double sigma, double* H);
 
     // Calculate the regularization parameter using Gershgorin theorem
-    double getRegularization(const Matrix<double>& H);
+    double getRegularization(const double* H);
 
     // Regularize by adding a multiple of the identity
-    void regularize(Matrix<double>& H, double reg);
+    void regularize(double* H, double reg);
 
     // Solve the QP subproblem
-    virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
-                          const std::vector<double>& lbx, const std::vector<double>& ubx,
-                          const Matrix<double>& A, const std::vector<double>& lbA,
-                          const std::vector<double>& ubA,
-                          std::vector<double>& x_opt, std::vector<double>& lambda_x_opt,
-                          std::vector<double>& lambda_A_opt);
+    virtual void solve_QP(const double* H, const double* g, const double* lbx, const double* ubx,
+                          const double* A, const double* lbA, const double* ubA,
+                          double* x_opt, double* lambda_x_opt, double* lambda_A_opt);
 
     // Calculate the L1-norm of the primal infeasibility
-    double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx,
-                               const std::vector<double>& ubx,
-                               const std::vector<double>& g, const std::vector<double>& lbg,
-                               const std::vector<double>& ubg);
+    double primalInfeasibility(const double* x, const double* lbx, const double* ubx,
+                               const double* g, const double* lbg, const double* ubg);
 
     // Accumulated time since last reset:
     double t_eval_f_; // time spent in eval_f

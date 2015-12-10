@@ -25,89 +25,45 @@
 
 #include "implicit_to_nlp.hpp"
 
-#include "casadi/core/function/mx_function.hpp"
-
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_NLP_EXPORT
-  casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin* plugin) {
-    plugin->creator = QpToImplicit::creator;
-    plugin->name = "nlp";
-    plugin->doc = QpToImplicit::meta_doc.c_str();
+  int CASADI_ROOTFINDER_NLPSOL_EXPORT
+  casadi_register_rootfinder_nlpsol(Rootfinder::Plugin* plugin) {
+    plugin->creator = ImplicitToNlp::creator;
+    plugin->name = "nlpsol";
+    plugin->doc = ImplicitToNlp::meta_doc.c_str();
     plugin->version = 23;
-    plugin->adaptorHasPlugin = NlpSolver::hasPlugin;
+    plugin->adaptorHasPlugin = has_nlpsol;
     return 0;
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_NLP_EXPORT casadi_load_implicitfunction_nlp() {
-    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_nlp);
+  void CASADI_ROOTFINDER_NLPSOL_EXPORT casadi_load_rootfinder_nlpsol() {
+    Rootfinder::registerPlugin(casadi_register_rootfinder_nlpsol);
   }
 
-  QpToImplicit::QpToImplicit(const Function& f) : ImplicitFunctionInternal(f) {
-    Adaptor<QpToImplicit, NlpSolverInternal>::addOptions();
+  ImplicitToNlp::ImplicitToNlp(const std::string& name, const Function& f)
+    : Rootfinder(name, f) {
+
+    addOption("nlpsol", OT_STRING, GenericType(), "Name of solver.");
+    addOption("nlpsol_options", OT_DICT,  Dict(), "Options to be passed to solver.");
   }
 
-  QpToImplicit::~QpToImplicit() {
+  ImplicitToNlp::~ImplicitToNlp() {
   }
 
-  void QpToImplicit::solveNonLinear() {
-
-    // Equality nonlinear constraints
-    solver_.input(NLP_SOLVER_LBG).set(0.);
-    solver_.input(NLP_SOLVER_UBG).set(0.);
-
-    // Simple constraints
-    vector<double>& lbx = solver_.input(NLP_SOLVER_LBX).data();
-    vector<double>& ubx = solver_.input(NLP_SOLVER_UBX).data();
-    for (int k=0; k<u_c_.size(); ++k) {
-      lbx[k] = u_c_[k] <= 0 ? -std::numeric_limits<double>::infinity() : 0;
-      ubx[k] = u_c_[k] >= 0 ?  std::numeric_limits<double>::infinity() : 0;
-    }
-
-    // Pass initial guess
-    solver_.input(NLP_SOLVER_X0).set(output(iout_));
-
-    // Add auxiliary inputs
-    vector<double>::iterator nlp_p = solver_.input(NLP_SOLVER_P).begin();
-    for (int i=0; i<nIn(); ++i) {
-      if (i!=iin_) {
-        std::copy(input(i).begin(), input(i).end(), nlp_p);
-        nlp_p += input(i).nnz();
-      }
-    }
-
-    // Solve the NLP
-    solver_.evaluate();
-    stats_["solver_stats"] = solver_.getStats();
-
-    // Get the implicit variable
-    output(iout_).set(solver_.output(NLP_SOLVER_X));
-
-    // Evaluate auxilary outputs, if necessary
-    if (nOut()>0) {
-      f_.setInput(output(iout_), iin_);
-      for (int i=0; i<nIn(); ++i)
-        if (i!=iin_) f_.setInput(input(i), i);
-      f_.evaluate();
-      for (int i=0; i<nOut(); ++i) {
-        if (i!=iout_) f_.getOutput(output(i), i);
-      }
-    }
-  }
-
-  void QpToImplicit::init() {
+  void ImplicitToNlp::init() {
     // Call the base class initializer
-    ImplicitFunctionInternal::init();
+    Rootfinder::init();
 
     // Free variable in the NLP
     MX u = MX::sym("u", input(iin_).sparsity());
 
     // So that we can pass it on to createParent
     std::vector<MX> inputs;
-    for (int i=0; i<nIn(); ++i) {
+    for (int i=0; i<n_in(); ++i) {
       if (i!=iin_) {
         stringstream ss;
         ss << "p" << i;
@@ -120,19 +76,102 @@ namespace casadi {
     MX nlp_f = 0;
 
     // NLP constraints
-    std::vector< MX > args_call(nIn());
+    std::vector< MX > args_call(n_in());
     args_call[iin_] = u;
-    for (int i=0, i2=0; i<nIn(); ++i)
+    for (int i=0, i2=0; i<n_in(); ++i)
       if (i!=iin_) args_call[i] = inputs[i2++];
     MX nlp_g = f_(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
-    MXFunction nlp("nlp", nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));
+    MXDict nlp = {{"x", u}, {"p", p}, {"f", nlp_f}, {"g", nlp_g}};
 
     Dict options;
-    if (hasSetOption(optionsname())) options = getOption(optionsname());
-    // Create an NlpSolver instance
-    solver_ = NlpSolver("nlpsolver", getOption(solvername()), nlp, options);
+    if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");
+    // Create an Nlpsol instance
+    solver_ = nlpsol("nlpsol", option("nlpsol"), nlp, options);
+    alloc(solver_);
+
+    // Allocate storage for variable bounds
+    alloc_w(n_, true); // lbx
+    alloc_w(n_, true); // ubx
+
+    // Allocate storage for NLP solver parameters
+    alloc_w(f_.nnz_in() - nnz_in(iin_), true);
+
+    // Allocate storage for NLP primal solution
+    alloc_w(n_, true);
+  }
+
+  void ImplicitToNlp::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    // Buffers for calling the NLP solver
+    const double** arg1 = arg + n_in();
+    double** res1 = res + n_out();
+    fill(arg1, arg1+NLPSOL_NUM_IN, nullptr);
+    fill(res1, res1+NLPSOL_NUM_OUT, nullptr);
+
+    // Initial guess
+    arg1[NLPSOL_X] = arg[iin_];
+
+    // Nonlinear bounds
+    arg1[NLPSOL_LBG] = 0;
+    arg1[NLPSOL_UBG] = 0;
+
+    // Variable bounds
+    double* lbx = w; w += n_;
+    fill_n(lbx, n_, -std::numeric_limits<double>::infinity());
+    arg1[NLPSOL_LBX] = lbx;
+    double* ubx = w; w += n_;
+    fill_n(ubx, n_,  std::numeric_limits<double>::infinity());
+    arg1[NLPSOL_UBX] = ubx;
+    for (int k=0; k<u_c_.size(); ++k) {
+      if (u_c_[k] > 0) lbx[k] = 0;
+      if (u_c_[k] < 0) ubx[k] = 0;
+    }
+
+    // NLP parameters
+    arg1[NLPSOL_P] = w;
+    for (int i=0; i<n_in(); ++i) {
+      if (i!=iin_) {
+        int n = f_.nnz_in(i);
+        if (arg[i]) {
+          copy_n(arg[i], n, w);
+        } else {
+          fill_n(w, n, 0.);
+        }
+        w += n;
+      }
+    }
+
+    // Primal solution
+    double* x = w; w += n_;
+    res1[NLPSOL_X] = x;
+
+    // Solve the NLP
+    solver_(arg1, res1, iw, w, 0);
+    stats_["solver_stats"] = solver_.getStats();
+
+    // Get the implicit variable
+    if (res[iout_]) {
+      copy_n(x, n_, res[iout_]);
+    }
+
+    // Check if any auxilary outputs to evaluate
+    bool has_aux = false;
+    for (int i=0; i<n_out(); ++i) {
+      if (i!=iout_ && res[i]) {
+        has_aux = true;
+        break;
+      }
+    }
+
+    // Evaluate auxilary outputs, if necessary
+    if (has_aux) {
+      copy_n(arg, n_in(), arg1);
+      arg1[iin_] = x;
+      copy_n(res, n_out(), res1);
+      res1[iout_] = 0;
+      f_(arg1, res1, iw, w, 0);
+    }
   }
 
 } // namespace casadi

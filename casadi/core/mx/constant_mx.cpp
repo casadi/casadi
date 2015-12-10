@@ -39,7 +39,7 @@ namespace casadi {
   ConstantMX::~ConstantMX() {
   }
 
-  void ConstantMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = shared_from_this<MX>();
   }
 
@@ -55,33 +55,31 @@ namespace casadi {
                            std::vector<std::vector<MX> >& asens) {
   }
 
-  void ConstantMX::spFwd(const bvec_t** arg,
-                         bvec_t** res, int* iw, bvec_t* w) {
+  void ConstantMX::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantMX::spAdj(bvec_t** arg,
-                         bvec_t** res, int* iw, bvec_t* w) {
+  void ConstantMX::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
     fill_n(res[0], nnz(), 0);
   }
 
-  void ConstantDMatrix::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                 CodeGenerator& g) const {
+  void ConstantDM::generate(CodeGenerator& g, const std::string& mem,
+                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print the constant
     int ind = g.getConstant(x_.data(), true);
 
     // Copy the constant to the work vector
-    g.body << "  " << g.copy_n("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << endl;
+    g.body << "  " << g.copy("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << endl;
   }
 
   bool ConstantMX::__nonzero__() const {
     if (numel()!=1) casadi_error("Can only determine truth value of scalar MX.");
     if (nnz()!=1) casadi_error("Can only determine truth value of dense scalar MX.");
-    return !isZero();
+    return !is_zero();
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, int val) {
-    if (sp.isempty(true)) {
+    if (sp.is_empty(true)) {
       return ZeroByZero::getInstance();
     } else {
       switch (val) {
@@ -94,7 +92,7 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, double val) {
-    if (sp.isempty(true)) {
+    if (sp.is_empty(true)) {
       return ZeroByZero::getInstance();
     } else {
       int intval(val);
@@ -109,7 +107,7 @@ namespace casadi {
   ConstantMX* ConstantMX::create(const Matrix<double>& val) {
     if (val.nnz()==0) {
       return create(val.sparsity(), 0);
-    } else if (val.isscalar()) {
+    } else if (val.is_scalar()) {
       return create(val.sparsity(), val.toScalar());
     } else {
       // Check if all values are the same
@@ -118,7 +116,7 @@ namespace casadi {
       for (vector<double>::const_iterator i=vdata.begin(); i!=vdata.end(); ++i) {
         if (*i!=v) {
           // Values not all the same
-          return new ConstantDMatrix(val);
+          return new ConstantDM(val);
         }
       }
 
@@ -127,54 +125,54 @@ namespace casadi {
     }
   }
 
-  bool ConstantDMatrix::isZero() const {
-    return x_.isZero();
+  bool ConstantDM::is_zero() const {
+    return x_.is_zero();
   }
 
-  bool ConstantDMatrix::isOne() const {
-    return x_.isOne();
+  bool ConstantDM::is_one() const {
+    return x_.is_one();
   }
 
-  bool ConstantDMatrix::isMinusOne() const {
-    return x_.isMinusOne();
+  bool ConstantDM::is_minus_one() const {
+    return x_.is_minus_one();
   }
 
-  bool ConstantDMatrix::isIdentity() const {
-    return x_.isIdentity();
+  bool ConstantDM::is_identity() const {
+    return x_.is_identity();
   }
 
   // MX ConstantMX::getMultiplication(const MX& y) const {
-  //   if (y.isConstant()) {
+  //   if (y.is_constant()) {
   //     // Constant folding
-  //     DMatrix xv = getMatrixValue();
-  //     DMatrix yv = y->getMatrixValue();
+  //     DM xv = getMatrixValue();
+  //     DM yv = y->getMatrixValue();
   //     return mul(xv, yv);
   //   } else {
   //     return MXNode::getMultiplication(y);
   //   }
   // }
 
-  MX ConstantMX::getInnerProd(const MX& y) const {
-    if (y.isConstant()) {
+  MX ConstantMX::getDot(const MX& y) const {
+    if (y.is_constant()) {
       // Constant folding
-      DMatrix xv = getMatrixValue();
-      DMatrix yv = y->getMatrixValue();
-      return inner_prod(xv, yv);
+      DM xv = getMatrixValue();
+      DM yv = y->getMatrixValue();
+      return dot(xv, yv);
     } else {
-      return MXNode::getInnerProd(y);
+      return MXNode::getDot(y);
     }
   }
 
-  bool ConstantDMatrix::zz_isEqual(const MXNode* node, int depth) const {
+  bool ConstantDM::zz_is_equal(const MXNode* node, int depth) const {
     // Check if same node
-    const ConstantDMatrix* n = dynamic_cast<const ConstantDMatrix*>(node);
+    const ConstantDM* n = dynamic_cast<const ConstantDM*>(node);
     if (n==0) return false;
 
     // Check sparsity
     if (this->sparsity()!=node->sparsity()) return false;
 
     // Check indices
-    if (!std::equal(x_.begin(), x_.end(), n->x_.begin())) return false;
+    if (!std::equal(x_->begin(), x_->end(), n->x_->begin())) return false;
 
     return true;
   }
@@ -209,7 +207,7 @@ namespace casadi {
   }
 
   MX ZeroByZero::getReshape(const Sparsity& sp) const {
-    casadi_assert(sp.isempty());
+    casadi_assert(sp.is_empty());
     return MX::zeros(sp);
   }
 

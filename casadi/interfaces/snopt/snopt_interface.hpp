@@ -26,42 +26,49 @@
 #ifndef CASADI_SNOPT_INTERFACE_HPP
 #define CASADI_SNOPT_INTERFACE_HPP
 
-#include "casadi/core/function/nlp_solver_internal.hpp"
-#include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
+#include "casadi/core/function/nlpsol.hpp"
+#include "casadi/interfaces/snopt/casadi_nlpsol_snopt_export.h"
 #include "casadi/interfaces/snopt/snopt.h"
 #include "snoptProblem.hpp"
 
-/** \defgroup plugin_NlpSolver_snopt
+/** \defgroup plugin_Nlpsol_snopt
   SNOPT interface
 */
 
-/** \pluginsection{NlpSolver,snopt} */
+/** \pluginsection{Nlpsol,snopt} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{NlpSolver,snopt}
-     @copydoc NlpSolver_doc
-     @copydoc plugin_NlpSolver_snopt
+  /** \brief \pluginbrief{Nlpsol,snopt}
+     @copydoc Nlpsol_doc
+     @copydoc plugin_Nlpsol_snopt
   */
-  class CASADI_NLPSOLVER_SNOPT_EXPORT SnoptInterface : public NlpSolverInternal {
+  class CASADI_NLPSOL_SNOPT_EXPORT SnoptInterface : public Nlpsol {
 
   public:
     // Constructor
-    explicit SnoptInterface(const Function& nlp);
+    explicit SnoptInterface(const std::string& name, const XProblem& nlp);
 
     // Destructor
     virtual ~SnoptInterface();
 
-    /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new SnoptInterface(nlp);}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "snopt";}
 
-    // (Re)initialize
+    /** \brief  Create a new NLP Solver */
+    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+      return new SnoptInterface(name, nlp);
+    }
+
+    // Initialize the solver
     virtual void init();
 
+    // Reset the solver
+    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+
     // Solve the NLP
-    virtual void evaluate();
+    virtual void solve(void* mem);
 
     /// Read options from snopt parameter xml
     virtual void setOptionsFromFile(const std::string & file);
@@ -107,14 +114,14 @@ namespace casadi {
     /// sorted constraint index -> original constraint index
     std::vector<int> g_order_;
 
-    IMatrix A_structure_;
+    IM A_structure_;
     std::vector<double> A_data_;
 
 
     std::vector<double> bl_;
     std::vector<double> bu_;
     std::vector<int> hs_;
-    std::vector<double> x_;
+    std::vector<double> xk_;
     std::vector<double> pi_;
     std::vector<double> rc_;
 

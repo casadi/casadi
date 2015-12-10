@@ -47,180 +47,54 @@ tf = 40
 params = vertcat([w0,a3,a5,mu1,mu3,ff])
 rhs    = vertcat([x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff])
 
-f=SXFunction("f", daeIn(x=x,p=params),daeOut(ode=rhs))
+dae={'x':x, 'p':params, 'ode':rhs}
 
-t = SX.sym("t")
-cf=SXFunction("cf", controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
-
-opts = {}
-opts["tf"] = tf
-opts["reltol"] = 1e-10
-opts["abstol"] = 1e-10
-opts["fsens_err_con"] = True
-integrator = Integrator("integrator", "cvodes", f, opts)
-
-N = 500
-
-#! Let's get acquainted with the system by drawing a phase portrait
-ts = linspace(0,tf,N)
-
-sim = Simulator("sim", integrator,ts)
-
-w0_ = 5.278
-params_ = [ w0_, -1.402*w0_**2,  0.271*w0_**2,0,0,0 ]
-
-sim.setInput(params_,"p")
-
-x2_0 = 0
-figure(1)
-for x1_0 in [-3.5,-3.1,-3,-2,-1,0]:
-  sim.setInput([x1_0,x2_0],"x0")
-  sim.evaluate()
-  plot(sim.getOutput()[0,:],sim.getOutput()[1,:],'k')
-
-title('phase portrait for mu_1 = 0, mu_2 = 0')
-xlabel('x_1')
-ylabel('x_2')
-
-show()
-
-x0 = DMatrix([-3.1,0])
-
-#! Monodromy matrix at tf - Jacobian of integrator
-#! ===============================================
-#! First argument is input index, second argument is output index
-jac = integrator.jacobian("x0","xf")
-
-jac.setInput(x0,"x0")
-jac.setInput(params_,"p")
-jac.evaluate()
-
-Ji = jac.getOutput()
-
-print Ji
-
-#! Note the remainder of this file depends on Jacobian of Simulator,
-#!  a feature that is currently disabled 
-#! https://github.com/casadi/casadi/issues/929
-
-# #! Monodromy matrix at various instances - Jacobian of Simulator
-# #! =============================================================
-
-# jacsim = sim.jacobian(INTEGRATOR_X0,0)
-
-# jacsim.setInput(x0,"x0")
-# jacsim.setInput(params_,"p")
-# jacsim.evaluate()
-
-# #! For each of the 500 intervals, we have a 2-by-2 matrix as output
-# print "jacsim.getOutput().shape = ", jacsim.getOutput().shape
-
-# #! Show only the last 3 intervals.
-# print jacsim.getOutput()[-3*2:,:]
-
-# Js = jacsim.getOutput()[-2:,:]
-
-
-# e = max(fabs(Js - Ji))/max(fabs(Js))
-
-# # Assert that the two methods yield identical results
-# assert(e < 1e-6)
-
-# #! Monodromy matrix at various instances - Jacobian of ControlSimulator
-# #! ====================================================================
+# t = SX.sym("t")
+# cf=SX.fun("cf", controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
 
 # opts = {}
-# opts["nf"] = 10
-# opts["integrator"] = "cvodes"
-# opts["integrator_options"] = {"reltol":1e-11,"abstol":1e-11, "fsens_err_con": True}
-# csim = ControlSimulator("csim", cf, linspace(0, tf, 50), opts)
+# opts["tf"] = tf
+# opts["reltol"] = 1e-10
+# opts["abstol"] = 1e-10
+# opts["fsens_err_con"] = True
+# integrator = integrator("integrator", "cvodes", dae, opts)
 
-# jaccsim = csim.jacobian(CONTROLSIMULATOR_X0,0)
-# jaccsim.setInput(params_[:-1],"p")
-# jaccsim.setInput(x0,"x0")
-# jaccsim.setInput(0,"u")
-# jaccsim.evaluate()
+# N = 500
 
-# #! For each of the 500 intervals, we have a 2-by-2 matrix as output
-# print "jaccsim.getOutput().shape = ", jaccsim.getOutput().shape
+# #! Let's get acquainted with the system by drawing a phase portrait
+# ts = linspace(0,tf,N)
 
-# #! Show only the last 3 intervals.
-# print jaccsim.getOutput()[-3*2:,:]
-# Jcs = jaccsim.getOutput()[-2:,:]
+# sim = Simulator("sim", integrator,ts)
 
-# e = max(fabs(Jcs - Js))/max(fabs(Js))
+# w0_ = 5.278
+# params_ = [ w0_, -1.402*w0_**2,  0.271*w0_**2,0,0,0 ]
 
-# # Assert that the two methods yield identical results
-# assert(e < 1e-5)
-
-# #! Intuitive interpretation
-# #! ========================
-
-# sim.setInput(x0,"x0")
 # sim.setInput(params_,"p")
-# sim.evaluate()
-# unperturbed_output = sim.getOutput()
 
-# circle = array([[sin(x),cos(x)] for x in numpy.linspace(-pi/2,3/2.0*pi,100)]).T
-# circle = hstack((circle,circle[:,50:51]))
+# x2_0 = 0
+# figure(1)
+# for x1_0 in [-3.5,-3.1,-3,-2,-1,0]:
+#   sim.setInput([x1_0,x2_0],"x0")
+#   sim.evaluate()
+#   plot(sim.getOutput()[0,:],sim.getOutput()[1,:],'k')
 
-
-
-# for t in range(0,N/5,2):
-#   J = jacsim.getOutput()[t*2:(t+1)*2,:]
-#   if t < 10:
-#     scale = 0.1
-#   else:
-#     scale = 0.01
-#   e=scale*mul(J,circle).T
-#   e[:,0] += sim.getOutput()[t,0]
-#   e[:,1] += sim.getOutput()[t,1]
-#   if t < 10 :
-#     plot(e[:,0],e[:,1],color='red')
-#   else:
-#     plot(e[:,0],e[:,1],color='blue')
-    
-# show()
-# #! Consider the case of perturbation simulation with a slightly perturbed initial condition
-
-# sim.setInput(x0,"x0")
-# sim.setInput(params_,"p")
-# sim.evaluate()
-# unperturbed_output = sim.getOutput()
-
-# perturb = DMatrix([1e-2,0])
-# sim.setInput(x0+perturb,"x0")
-# sim.setInput(params_,"p")
-# sim.evaluate()
-# perturbed_output = sim.getOutput()
-
-# figure(2)
-
-# title('Evolution of a perturbation')
-# plot(ts,perturbed_output-unperturbed_output)
-
-# effects = DMatrix.zeros(N,2)
-
-# for t in range(N):
-#   effects[t,:] = mul(jacsim.getOutput()[t*2:(t+1)*2,:],perturb).T
-  
-# plot(ts,effects)
-
-# legend(('x_1','x_2','perturbed(x_1)','preturbed(y_2)'))
-# xlabel('t')
+# title('phase portrait for mu_1 = 0, mu_2 = 0')
+# xlabel('x_1')
+# ylabel('x_2')
 
 # show()
 
-# figure(3)
-# linear_perturbed = unperturbed_output.reshape((2*N,1)) + mul(jacsim.getOutput(),perturb)
+# x0 = DM([-3.1,0])
 
-# title('phase portrait perturbation')
-# plot(unperturbed_output[:,0],unperturbed_output[:,1])
-# plot(perturbed_output[:,0],perturbed_output[:,1])
-# plot(linear_perturbed[0:N/2:2],linear_perturbed[1:N/2:2])
+# #! Monodromy matrix at tf - Jacobian of integrator
+# #! ===============================================
+# #! First argument is input index, second argument is output index
+# jac = integrator.jacobian("x0","xf")
 
-# legend(('nominal','pertubed','monodromy prediction'))
+# jac.setInput(x0,"x0")
+# jac.setInput(params_,"p")
+# jac.evaluate()
 
+# Ji = jac.getOutput()
 
-show()
-
+# print Ji

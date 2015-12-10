@@ -37,7 +37,7 @@ namespace casadi {
                            const Dict& opts) {
     assignNode(CompilerInternal::getPlugin(compiler).creator(name));
     setOption(opts);
-    init();
+    (*this)->init();
   }
 
   CompilerInternal* Compiler::operator->() {
@@ -48,7 +48,7 @@ namespace casadi {
     return static_cast<const CompilerInternal*>(OptionsFunctionality::operator->());
   }
 
-  bool Compiler::testCast(const SharedObjectNode* ptr) {
+  bool Compiler::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const CompilerInternal*>(ptr)!=0;
   }
 

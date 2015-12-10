@@ -28,12 +28,13 @@
 
 #include <math.h>
 #define CASADI_PREFIX(ID) casadi_##ID
+#define CASADI_CAST(TYPE, ARG) static_cast<TYPE>(ARG)
 
 /// \cond INTERNAL
 namespace casadi {
   /// COPY: y <-x
   template<typename real_t>
-  void CASADI_PREFIX(copy_n)(const real_t* x, int n, real_t* y);
+  void CASADI_PREFIX(copy)(const real_t* x, int n, real_t* y);
 
   /// SWAP: x <-> y
   template<typename real_t>
@@ -43,21 +44,29 @@ namespace casadi {
   template<typename real_t>
   void CASADI_PREFIX(project)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, real_t* w);
 
+  /// Convert sparse to dense
+  template<typename real1_t, typename real2_t>
+  void CASADI_PREFIX(densify)(const real1_t* x, const int* sp_x, real2_t* y, int tr);
+
+  /// Convert dense to sparse
+  template<typename real1_t, typename real2_t>
+  void CASADI_PREFIX(sparsify)(const real1_t* x, real2_t* y, const int* sp_y, int tr);
+
   /// SCAL: x <- alpha*x
   template<typename real_t>
-  void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x, int inc_x);
+  void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x);
 
   /// AXPY: y <- a*x + y
   template<typename real_t>
-  void CASADI_PREFIX(axpy)(int n, real_t alpha, const real_t* x, int inc_x, real_t* y, int inc_y);
+  void CASADI_PREFIX(axpy)(int n, real_t alpha, const real_t* x, real_t* y);
 
   /// Inner product
   template<typename real_t>
-  real_t CASADI_PREFIX(inner_prod)(int n, const real_t* x, const real_t* y);
+  real_t CASADI_PREFIX(dot)(int n, const real_t* x, const real_t* y);
 
   /// ASUM: ||x||_1 -> return
   template<typename real_t>
-  real_t CASADI_PREFIX(asum)(int n, const real_t* x, int inc_x);
+  real_t CASADI_PREFIX(asum)(int n, const real_t* x);
 
   /// IAMAX: index corresponding to the entry with the largest absolute value
   template<typename real_t>
@@ -65,23 +74,15 @@ namespace casadi {
 
   /// FILL: x <- alpha
   template<typename real_t>
-  void CASADI_PREFIX(fill_n)(real_t* x, int n, real_t alpha);
+  void CASADI_PREFIX(fill)(real_t* x, int n, real_t alpha);
 
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename real_t>
-  void CASADI_PREFIX(mm_sparse)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
-
-  /// Sparse matrix-matrix multiplication, first factor transposed: z <- z + trans(x)*y
-  template<typename real_t>
-  void CASADI_PREFIX(mm_sparse_t)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w);
+  void CASADI_PREFIX(mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w, int tr);
 
   /// Sparse matrix-vector multiplication: z <- z + x*y
   template<typename real_t>
-  void CASADI_PREFIX(mv)(const real_t* x, const int* sp_x, const real_t* y, real_t* z);
-
-  /// Sparse matrix-vector multiplication, first factor transposed: z <- z + trans(x)*y
-  template<typename real_t>
-  void CASADI_PREFIX(mv_t)(const real_t* x, const int* sp_x, const real_t* y, real_t* z);
+  void CASADI_PREFIX(mv)(const real_t* x, const int* sp_x, const real_t* y, real_t* z, int tr);
 
   /// NRM2: ||x||_2 -> return
   template<typename real_t>
@@ -90,6 +91,12 @@ namespace casadi {
   /// TRANS: y <- trans(x)
   template<typename real_t>
   void CASADI_PREFIX(trans)(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp);
+
+  /** Inf-norm of a vector *
+      Returns the largest element in absolute value
+   */
+  template<typename real_t>
+  real_t CASADI_PREFIX(norm_inf)(int n, const real_t* x);
 
   /** Inf-norm of a Matrix-matrix product,*
    * \param dwork  A real work vector that you must allocate
@@ -101,9 +108,17 @@ namespace casadi {
   real_t CASADI_PREFIX(norm_inf_mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y,
                              real_t *dwork, int *iwork);
 
-  /// Calculates inner_prod(x, mul(A, x))
+  /** Calculates dot(x, mul(A, y)) */
   template<typename real_t>
-  real_t CASADI_PREFIX(quad_form)(const real_t* A, const int* sp_A, const real_t* x);
+  real_t CASADI_PREFIX(bilin)(const real_t* A, const int* sp_A, const real_t* x, const real_t* y);
+
+  /// Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A
+  template<typename real_t>
+  void CASADI_PREFIX(rank1)(real_t* A, const int* sp_A, real_t alpha, const real_t* x);
+
+  /// Get the nonzeros for the upper triangular half
+  template<typename real_t>
+  void CASADI_PREFIX(getu)(const real_t* x, const int* sp_x, real_t* v);
 }
 
 // Helper functions
@@ -127,9 +142,15 @@ namespace casadi {
 namespace casadi {
 
   template<typename real_t>
-  void CASADI_PREFIX(copy_n)(const real_t* x, int n, real_t* y) {
+  void CASADI_PREFIX(copy)(const real_t* x, int n, real_t* y) {
     int i;
-    for (i=0; i<n; ++i) *y++ = *x++;
+    if (y) {
+      if (x) {
+        for (i=0; i<n; ++i) *y++ = *x++;
+      } else {
+        for (i=0; i<n; ++i) *y++ = 0.;
+      }
+    }
   }
 
   template<typename real_t>
@@ -163,27 +184,67 @@ namespace casadi {
     }
   }
 
-  template<typename real_t>
-  void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x, int inc_x) {
-    int i;
-    for (i=0; i<n; ++i) {
-      *x *= alpha;
-      x += inc_x;
+  template<typename real1_t, typename real2_t>
+  void CASADI_PREFIX(densify)(const real1_t* x, const int* sp_x, real2_t* y, int tr) {
+    /* Quick return - output ignored */
+    if (!y) return;
+    int nrow_x = sp_x[0], ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x+ncol_x+3;
+    /* Zero out return value */
+    CASADI_PREFIX(fill)(y, nrow_x*ncol_x, CASADI_CAST(real2_t, 0));
+    /* Quick return - input is zero */
+    if (!x) return;
+    /* Copy nonzeros */
+    int i, el;
+    if (tr) {
+      for (i=0; i<ncol_x; ++i) {
+        for (el=colind_x[i]; el!=colind_x[i+1]; ++el) {
+          y[i + row_x[el]*ncol_x] = CASADI_CAST(real2_t, *x++);
+        }
+      }
+    } else {
+      for (i=0; i<ncol_x; ++i) {
+        for (el=colind_x[i]; el!=colind_x[i+1]; ++el) {
+          y[row_x[el] + i*nrow_x] = CASADI_CAST(real2_t, *x++);
+        }
+      }
+    }
+  }
+
+  template<typename real1_t, typename real2_t>
+  void CASADI_PREFIX(sparsify)(const real1_t* x, real2_t* y, const int* sp_y, int tr) {
+    int nrow_y = sp_y[0], ncol_y = sp_y[1];
+    const int *colind_y = sp_y+2, *row_y = sp_y+ncol_y+3;
+    int i, el;
+    if (tr) {
+      for (i=0; i<ncol_y; ++i) {
+        for (el=colind_y[i]; el!=colind_y[i+1]; ++el) {
+          *y++ = CASADI_CAST(real2_t, x[i + row_y[el]*ncol_y]);
+        }
+      }
+    } else {
+      for (i=0; i<ncol_y; ++i) {
+        for (el=colind_y[i]; el!=colind_y[i+1]; ++el) {
+          *y++ = CASADI_CAST(real2_t, x[row_y[el] + i*nrow_y]);
+        }
+      }
     }
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(axpy)(int n, real_t alpha, const real_t* x, int inc_x, real_t* y, int inc_y) {
+  void CASADI_PREFIX(scal)(int n, real_t alpha, real_t* x) {
     int i;
-    for (i=0; i<n; ++i) {
-      *y += alpha**x;
-      x += inc_x;
-      y += inc_y;
-    }
+    for (i=0; i<n; ++i) *x++ *= alpha;
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(inner_prod)(int n, const real_t* x, const real_t* y) {
+  void CASADI_PREFIX(axpy)(int n, real_t alpha, const real_t* x, real_t* y) {
+    int i;
+    for (i=0; i<n; ++i) *y++ += alpha**x++;
+  }
+
+  template<typename real_t>
+  real_t CASADI_PREFIX(dot)(int n, const real_t* x, const real_t* y) {
     real_t r = 0;
     int i;
     for (i=0; i<n; ++i) r += *x++ * *y++;
@@ -191,12 +252,11 @@ namespace casadi {
   }
 
   template<typename real_t>
-  real_t CASADI_PREFIX(asum)(int n, const real_t* x, int inc_x) {
+  real_t CASADI_PREFIX(asum)(int n, const real_t* x) {
     real_t r = 0;
     int i;
-    for (i=0; i<n; ++i) {
-      r += fabs(*x);
-      x += inc_x;
+    if (x) {
+      for (i=0; i<n; ++i) r += fabs(*x++);
     }
     return r;
   }
@@ -219,13 +279,15 @@ namespace casadi {
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(fill_n)(real_t* x, int n, real_t alpha) {
+  void CASADI_PREFIX(fill)(real_t* x, int n, real_t alpha) {
     int i;
-    for (i=0; i<n; ++i) *x++ = alpha;
+    if (x) {
+      for (i=0; i<n; ++i) *x++ = alpha;
+    }
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(mm_sparse)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
+  void CASADI_PREFIX(mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w, int tr) {
     /* Get sparsities */
     int ncol_x = sp_x[1];
     const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
@@ -235,83 +297,66 @@ namespace casadi {
     const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
 
     int cc,kk, kk1;
-    /* Loop over the columns of y and z */
-    for (cc=0; cc<ncol_y; ++cc) {
-      /* Get the dense column of z */
-      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
-        w[row_z[kk]] = z[kk];
-      }
-      /* Loop over the nonzeros of y */
-      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
-        int rr = row_y[kk];
-        /* Loop over corresponding columns of x */
-        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
-          w[row_x[kk1]] += x[kk1]*y[kk];
+    if (tr) {
+      /* Loop over the columns of y and z */
+      for (cc=0; cc<ncol_z; ++cc) {
+        /* Get the dense column of y */
+        for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+          w[row_y[kk]] = y[kk];
+        }
+        /* Loop over the nonzeros of z */
+        for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+          int rr = row_z[kk];
+          /* Loop over corresponding columns of x */
+          for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+            z[kk] += x[kk1] * w[row_x[kk1]];
+          }
         }
       }
-      /* Get the sparse column of z */
-      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
-        z[kk] = w[row_z[kk]];
-      }
-    }
-  }
-
-  template<typename real_t>
-  void CASADI_PREFIX(mm_sparse_t)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w) {
-    /* Get sparsities */
-    int ncol_x = sp_x[1];
-    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
-    int ncol_y = sp_y[1];
-    const int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
-    int ncol_z = sp_z[1];
-    const int *colind_z = sp_z+2, *row_z = sp_z + 2 + ncol_z+1;
-
-    int cc,kk, kk1;
-    /* Loop over the columns of y and z */
-    for (cc=0; cc<ncol_z; ++cc) {
-      /* Get the dense column of y */
-      for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
-        w[row_y[kk]] = y[kk];
-      }
-      /* Loop over the nonzeros of z */
-      for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
-        int rr = row_z[kk];
-        /* Loop over corresponding columns of x */
-        for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
-          z[kk] += x[kk1] * w[row_x[kk1]];
+    } else {
+      /* Loop over the columns of y and z */
+      for (cc=0; cc<ncol_y; ++cc) {
+        /* Get the dense column of z */
+        for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+          w[row_z[kk]] = z[kk];
+        }
+        /* Loop over the nonzeros of y */
+        for (kk=colind_y[cc]; kk<colind_y[cc+1]; ++kk) {
+          int rr = row_y[kk];
+          /* Loop over corresponding columns of x */
+          for (kk1=colind_x[rr]; kk1<colind_x[rr+1]; ++kk1) {
+            w[row_x[kk1]] += x[kk1]*y[kk];
+          }
+        }
+        /* Get the sparse column of z */
+        for (kk=colind_z[cc]; kk<colind_z[cc+1]; ++kk) {
+          z[kk] = w[row_z[kk]];
         }
       }
     }
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(mv)(const real_t* x, const int* sp_x, const real_t* y, real_t* z) {
+  void CASADI_PREFIX(mv)(const real_t* x, const int* sp_x, const real_t* y, real_t* z, int tr) {
     /* Get sparsities */
     int ncol_x = sp_x[1];
     const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
-
     int i, el;
-    /* loop over the columns of x */
-    for (i=0; i<ncol_x; ++i) {
-      /* loop over the non-zeros of x */
-      for (el=colind_x[i]; el<colind_x[i+1]; ++el) {
-        z[row_x[el]] += x[el] * y[i];
+    if (tr) {
+      /* loop over the columns of x */
+      for (i=0; i<ncol_x; ++i) {
+        /* loop over the non-zeros of x */
+        for (el=colind_x[i]; el<colind_x[i+1]; ++el) {
+          z[i] += x[el] * y[row_x[el]];
+        }
       }
-    }
-  }
-
-  template<typename real_t>
-  void CASADI_PREFIX(mv_t)(const real_t* x, const int* sp_x, const real_t* y, real_t* z) {
-    /* Get sparsities */
-    int ncol_x = sp_x[1];
-    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
-
-    int i, el;
-    /* loop over the columns of x */
-    for (i=0; i<ncol_x; ++i) {
-      /* loop over the non-zeros of x */
-      for (el=colind_x[i]; el<colind_x[i+1]; ++el) {
-        z[i] += x[el] * y[row_x[el]];
+    } else {
+      /* loop over the columns of x */
+      for (i=0; i<ncol_x; ++i) {
+        /* loop over the non-zeros of x */
+        for (el=colind_x[i]; el<colind_x[i+1]; ++el) {
+          z[row_x[el]] += x[el] * y[i];
+        }
       }
     }
   }
@@ -339,6 +384,16 @@ namespace casadi {
     for (k=0; k<nnz_x; ++k) {
       y[tmp[row_x[k]]++] = x[k];
     }
+  }
+
+  template<typename real_t>
+  real_t CASADI_PREFIX(norm_inf)(int n, const real_t* x) {
+    real_t ret = 0;
+    int k;
+    for (k=0; k<n; ++k) {
+      ret = fmax(ret, fabs(x[k]));
+    }
+    return ret;
   }
 
   template<typename real_t>
@@ -418,30 +473,64 @@ namespace casadi {
     return res;
   }
 
-    /// Calculates inner_prod(x, mul(A, x)) without memory allocation
   template<typename real_t>
-  real_t CASADI_PREFIX(quad_form)(const real_t* A, const int* sp_A, const real_t* x) {
+  real_t CASADI_PREFIX(bilin)(const real_t* A, const int* sp_A, const real_t* x, const real_t* y) {
     /* Get sparsities */
     int ncol_A = sp_A[1];
     const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;
 
-    // Return value
+    /* Return value */
     real_t ret=0;
 
-    int cc, el;
-    // Loop over the columns of A
+    /* Loop over the columns of A */
+    int cc, rr, el;
     for (cc=0; cc<ncol_A; ++cc) {
-      // Loop over the nonzeros of A
-      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
-        // Get row
-        int rr = row_A[el];
+      /* Loop over the nonzeros of A */
+      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {        
+        /* Get the row */
+        rr=row_A[el];
 
-        // Add contribution
-        ret += x[rr]*A[el]*x[cc];
+        /* Add contribution */
+        ret += x[rr]*A[el]*y[cc];
       }
     }
-
     return ret;
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(rank1)(real_t* A, const int* sp_A, real_t alpha, const real_t* x, const real_t* y) {
+    /* Get sparsities */
+    int ncol_A = sp_A[1];
+    const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;
+
+    /* Loop over the columns of A */
+    int cc, rr, el;
+    for (cc=0; cc<ncol_A; ++cc) {
+      /* Loop over the nonzeros of A */
+      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
+        /* Get row */
+        rr = row_A[el];
+
+        /* Add the multiple */
+        A[el] += alpha*x[rr]*y[cc];
+      }
+    }
+  }
+
+  template<typename real_t>
+  void CASADI_PREFIX(getu)(const real_t* x, const int* sp_x, real_t* v) {
+    /* Get sparsities */
+    int ncol_x = sp_x[1];
+    const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+
+    /* Loop over the columns of x */
+    int cc, el;
+    for (cc=0; cc<ncol_x; ++cc) {
+      /* Loop over the nonzeros of x */
+      for (el=colind_x[cc]; el<colind_x[cc+1] && row_x[el]<=cc; ++el) {
+        *v++ = x[el];
+      }
+    }
   }
 
 } // namespace casadi

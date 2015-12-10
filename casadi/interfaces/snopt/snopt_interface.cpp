@@ -22,26 +22,21 @@
  *
  */
 
+#include "snopt_interface.hpp"
+#include "casadi/core/std_vector_tools.hpp"
 
 #include <stdio.h>
 #include <string.h>
 #include <ctime>
 #include <utility>
-#include <string>
 #include <algorithm>
-#include <vector>
 #include <iomanip>
-
-#include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/mx_function.hpp"
-
-#include "snopt_interface.hpp"
 
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_SNOPT_EXPORT
-  casadi_register_nlpsolver_snopt(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLPSOL_SNOPT_EXPORT
+  casadi_register_nlpsol_snopt(Nlpsol::Plugin* plugin) {
     plugin->creator = SnoptInterface::creator;
     plugin->name = "snopt";
     plugin->doc = SnoptInterface::meta_doc.c_str();
@@ -50,11 +45,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_SNOPT_EXPORT casadi_load_nlpsolver_snopt() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_snopt);
+  void CASADI_NLPSOL_SNOPT_EXPORT casadi_load_nlpsol_snopt() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_snopt);
   }
 
-  SnoptInterface::SnoptInterface(const Function& nlp) : NlpSolverInternal(nlp) {
+  SnoptInterface::SnoptInterface(const std::string& name, const XProblem& nlp)
+    : Nlpsol(name, nlp) {
+
     addOption("detect_linear", OT_BOOLEAN, true,
               "Make an effort to treat linear constraints and linear variables specially.");
 
@@ -76,8 +73,8 @@ namespace casadi {
     // Printing
     intOpts_["Major print level"] = "1 * 1-line major iteration log";
     intOpts_["Minor print level"] = "1 * 1-line minor iteration log";
-    // special om["Print file"] = OT_S; //  * specified by subroutine snInit
-    // special om["Summary file"] = OT_S; //  * specified by subroutine snInit
+    // special om["Print file"] = OT_S; //  * specified by subroutine sn_init
+    // special om["Summary file"] = OT_S; //  * specified by subroutine sn_init
     intOpts_["Print frequency"] = "100 * minor iterations log on Print file";
     intOpts_["Summary frequency"] = "100 * minor iterations log on Summary file";
     strOpts_["Solution"] = spair("Yes|No|If Optimal|If Infeasible|If Unbounded",
@@ -210,10 +207,10 @@ namespace casadi {
 
   void SnoptInterface::init() {
     // Read in casadi options
-    detect_linear_ = getOption("detect_linear");
+    detect_linear_ = option("detect_linear");
 
     // Call the init method of the base class
-    NlpSolverInternal::init();
+    Nlpsol::init();
 
     // Get/generate required functions
     jacF();
@@ -232,7 +229,6 @@ namespace casadi {
     g_type_.resize(ng_);
 
     if (detect_linear_) {
-      jacF_.spInit(true);
       // Detect dependencies w.r.t. gradF
       // Dependency seeds
       bvec_t* input_v_x =  get_bvec_t(jacF_->input(GRADF_X).data());
@@ -246,10 +242,10 @@ namespace casadi {
 
       // Harvest the results
       for (int j = 0; j < nx_; ++j) {
-        if (jacF_.output().colind(j) == jacF_.output().colind(j+1)) {
+        if (jacF_.sparsity_out(0).colind(j) == jacF_.sparsity_out(0).colind(j+1)) {
           x_type_f_[j] = 0;
         } else {
-          x_type_f_[j] = output_v[jacF_.output().colind(j)]?  2 : 1;
+          x_type_f_[j] = output_v[jacF_.sparsity_out(0).colind(j)]?  2 : 1;
         }
       }
 
@@ -264,15 +260,16 @@ namespace casadi {
         // Perform a single dependency sweep
         jacG_.spEvaluate(true);
 
-        DMatrix out_trans = jacG_.output().T();
+        DM out_trans = jacG_.output().T();
         bvec_t* output_v_trans = get_bvec_t(out_trans.data());
 
         for (int j = 0; j < nx_; ++j) {  // Harvest the results
-          if (jacG_.output().colind(j) == jacG_.output().colind(j+1)) {
+          if (jacG_.sparsity_out(0).colind(j) == jacG_.sparsity_out(0).colind(j+1)) {
             x_type_g_[j] = 0;
           } else {
             bool linear = true;
-            for (int k = jacG_.output().colind(j); k < jacG_.output().colind(j+1); ++k) {
+            for (int k = jacG_.sparsity_out(0).colind(j);
+                 k<jacG_.sparsity_out(0).colind(j+1); ++k) {
               linear = linear && !output_v[k];
             }
             x_type_g_[j] = linear? 1 : 2;
@@ -377,12 +374,12 @@ namespace casadi {
     //  entries of jacG are encoded "1+i"
     //  "0" is to be interpreted not as an index but as a literal zero
 
-    IMatrix mapping_jacG  = IMatrix(0, nx_);
-    IMatrix mapping_gradF = IMatrix(jacF_.output().sparsity(),
-                                    range(-1, -1-jacF_.output().nnz(), -1));
+    IM mapping_jacG  = IM(0, nx_);
+    IM mapping_gradF = IM(jacF_.sparsity_out(0),
+                                    range(-1, -1-jacF_.nnz_out(0), -1));
 
     if (!jacG_.isNull()) {
-      mapping_jacG = IMatrix(jacG_.output().sparsity(), range(1, jacG_.output().nnz()+1));
+      mapping_jacG = IM(jacG_.sparsity_out(0), range(1, jacG_.nnz_out(0)+1));
     }
 
     // First, remap jacG
@@ -391,9 +388,9 @@ namespace casadi {
     m_ = ng_;
 
     // Construct the linear objective row
-    IMatrix d = mapping_gradF(Slice(0), x_order_);
+    IM d = mapping_gradF(Slice(0), x_order_);
 
-    std::vector<int> ii = mapping_gradF.sparsity().getCol();
+    std::vector<int> ii = mapping_gradF.sparsity().get_col();
     for (int j = 0; j < nnObj_; ++j) {
       if (d.colind(j) != d.colind(j+1)) {
         int k = d.colind(j);
@@ -417,7 +414,7 @@ namespace casadi {
     // Is the A matrix completely empty?
     dummyrow_ = A_structure_.nnz() == 0;  // Then we need a dummy row
     if (dummyrow_) {
-      IMatrix dummyrow = IMatrix(1, nx_);
+      IM dummyrow = IM(1, nx_);
       dummyrow(0, 0) = 0;
       A_structure_ = vertcat(A_structure_, dummyrow);
       m_+=1;
@@ -436,7 +433,7 @@ namespace casadi {
     bl_.resize(nx_+m_);
     bu_.resize(nx_+m_);
     hs_.resize(nx_+m_);
-    x_.resize(nx_+m_);
+    xk_.resize(nx_+m_);
     pi_.resize(m_);
     rc_.resize(nx_+m_);
     A_data_.resize(A_structure_.nnz());
@@ -450,7 +447,7 @@ namespace casadi {
     for (std::map<std::string, std::string>::const_iterator it = intOpts_.begin();
          it != intOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
-          int value = getOption(it->first);
+          int value = option(it->first);
           casadi_assert(it->first.size() <= 55);
           int Error = probC.setIntParameter(it->first.c_str(), value);
           casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
@@ -458,7 +455,7 @@ namespace casadi {
     for (std::map<std::string, std::string>::const_iterator it = realOpts_.begin();
          it != realOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
-          double value = getOption(it->first);
+          double value = option(it->first);
           casadi_assert(it->first.size() <= 55);
           int Error = probC.setRealParameter(it->first.c_str(), value);
           casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
@@ -466,7 +463,7 @@ namespace casadi {
     for (std::map<std::string, std::pair<std::string, std::string> >::const_iterator
              it = strOpts_.begin(); it != strOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
-          std::string value = getOption(it->first);
+          std::string value = option(it->first);
           std::string buffer = it->first;
           buffer.append(" ");
           buffer.append(value);
@@ -486,12 +483,30 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::evaluate() {
-    log("SnoptInterface::evaluate");
+  void SnoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Reset the base classes
+    Nlpsol::reset(mem, arg, res, iw, w);
+  }
 
-    // Initial checks
-    if (inputs_check_) checkInputs();
-    checkInitialBounds();
+  void SnoptInterface::solve(void* mem) {
+    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
+      const double *v;
+      switch (i) {
+      case NLPSOL_X0: v = x0_; break;
+      case NLPSOL_P: v = p_; break;
+      case NLPSOL_LBX: v = lbx_; break;
+      case NLPSOL_UBX: v = ubx_; break;
+      case NLPSOL_LBG: v = lbg_; break;
+      case NLPSOL_UBG: v = ubg_; break;
+      case NLPSOL_LAM_X0: v = lam_x0_; break;
+      case NLPSOL_LAM_G0: v = lam_g0_; break;
+      default: casadi_assert(0);
+      }
+      casadi_copy(v, nnz_in(i), input(i).ptr());
+    }
+
+    // Check the provided inputs
+    checkInputs(mem);
 
     if (gather_stats_) {
       Dict iterations;
@@ -507,12 +522,12 @@ namespace casadi {
 
     // Evaluate gradF and jacG at initial value
     if (!jacG_.isNull()) {
-      jacG_.setInput(input(NLP_SOLVER_X0), JACG_X);
-      jacG_.setInput(input(NLP_SOLVER_P), JACG_P);
+      jacG_.setInput(input(NLPSOL_X0), JACG_X);
+      jacG_.setInput(input(NLPSOL_P), JACG_P);
       jacG_.evaluate();
     }
-    jacF_.setInput(input(NLP_SOLVER_X0), GRADF_X);
-    jacF_.setInput(input(NLP_SOLVER_P), GRADF_P);
+    jacF_.setInput(input(NLPSOL_X0), GRADF_X);
+    jacF_.setInput(input(NLPSOL_P), GRADF_P);
 
     jacF_.evaluate();
 
@@ -534,7 +549,7 @@ namespace casadi {
     if (detect_linear_) {
       nlp_.setInput(0.0, NL_X);
       // Setting the zero might actually be problematic
-      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+      nlp_.setInput(input(NLPSOL_P), NL_P);
       nlp_.evaluate();
     }
 
@@ -552,21 +567,21 @@ namespace casadi {
     // Obtain initial guess and bounds through the mapping
     for (int k = 0; k < nx_; ++k) {
       int kk = x_order_[k];
-      bl_[k] = input(NLP_SOLVER_LBX).data()[kk];
-      bu_[k] = input(NLP_SOLVER_UBX).data()[kk];
-      x_[k] = input(NLP_SOLVER_X0).data()[kk];
+      bl_[k] = input(NLPSOL_LBX).data()[kk];
+      bu_[k] = input(NLPSOL_UBX).data()[kk];
+      xk_[k] = input(NLPSOL_X0).data()[kk];
     }
     for (int k = 0; k < ng_; ++k) {
       int kk = g_order_[k];
       if (g_type_[kk] < 2) {
         // casadi_error("woops");
-        bl_[nx_+k] = input(NLP_SOLVER_LBG).data()[kk]-nlp_.output(NL_G).data()[kk];
-        bu_[nx_+k] = input(NLP_SOLVER_UBG).data()[kk]-nlp_.output(NL_G).data()[kk];
+        bl_[nx_+k] = input(NLPSOL_LBG).data()[kk]-nlp_.output(NL_G).data()[kk];
+        bu_[nx_+k] = input(NLPSOL_UBG).data()[kk]-nlp_.output(NL_G).data()[kk];
       } else {
-        bl_[nx_+k] = input(NLP_SOLVER_LBG).data()[kk];
-        bu_[nx_+k] = input(NLP_SOLVER_UBG).data()[kk];
+        bl_[nx_+k] = input(NLPSOL_LBG).data()[kk];
+        bu_[nx_+k] = input(NLPSOL_UBG).data()[kk];
       }
-      x_[nx_+k] = input(NLP_SOLVER_LAM_G0).data()[kk];
+      xk_[nx_+k] = input(NLPSOL_LAM_G0).data()[kk];
     }
 
     // Objective row / dummy row should be unbounded
@@ -589,7 +604,7 @@ namespace casadi {
     casadi_assert(bl_.size() == n+m_);
     casadi_assert(bu_.size() == n+m_);
     casadi_assert(pi_.size() == m_);
-    casadi_assert(x_.size() == n+m_);
+    casadi_assert(xk_.size() == n+m_);
     casadi_assert(col.at(0) == 0);
     casadi_assert(col.at(n) == nea);
 
@@ -601,7 +616,7 @@ namespace casadi {
       userOut() << "locA:" << col << std::endl;
       userOut() << "colA:" << A_data_ << std::endl;
       A_structure_.sparsity().spy();
-      userOut() << "A:" << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
+      userOut() << "A:" << DM(A_structure_.sparsity(), A_data_) << std::endl;
       userOut() << "n:" << n << std::endl;
       userOut() << "m:" << m_ << std::endl;
       userOut() << "nea:" << nea << std::endl;
@@ -612,24 +627,24 @@ namespace casadi {
     // Outputs
     double Obj = 0; // TODO(Greg): get this from snopt
 
-    if (getOption("summary"))
+    if (option("summary"))
         summaryOn();
     else
         summaryOff();
     snoptProblemC snoptProbC = snoptProblemC();
     if (hasSetOption("specs file")) {
-        std::string specs_file = getOption("specs file");
+        std::string specs_file = option("specs file");
         snoptProbC.setSpecsFile(specs_file.c_str());
     }
     if (hasSetOption("print file")) {
-        std::string print_file = getOption("print file");
+        std::string print_file = option("print file");
         snoptProbC.setPrintFile(print_file.c_str());
     }
 
     snoptProbC.setProblemSize(m_, nx_, nnCon_, nnJac_, nnObj_);
     snoptProbC.setObjective(iObj_, ObjAdd);
     snoptProbC.setJ(nea, getPtr(A_data_), getPtr(row), getPtr(col));
-    snoptProbC.setX(getPtr(bl_), getPtr(bu_), getPtr(x_), getPtr(pi_), getPtr(rc_), getPtr(hs_));
+    snoptProbC.setX(getPtr(bl_), getPtr(bu_), getPtr(xk_), getPtr(pi_), getPtr(rc_), getPtr(hs_));
     snoptProbC.setUserFun(userfunPtr);
     snoptProbC.setSTOP(snStopPtr);
     passOptions(snoptProbC);
@@ -643,7 +658,7 @@ namespace casadi {
 
     // Run SNOPT
     double time0 = clock();
-    int info = snoptProbC.solve(getOptionEnumValue("start"));
+    int info = snoptProbC.solve(optionEnumValue("start"));
     casadi_assert_message(99 != info, "snopt problem set up improperly");
     t_mainloop_ = static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
 
@@ -652,27 +667,27 @@ namespace casadi {
     // Store results into output
     for (int k = 0; k < nx_; ++k) {
       int kk =  x_order_[k];
-      output(NLP_SOLVER_X).data()[kk] = x_[k];
-      output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
+      output(NLPSOL_X).data()[kk] = xk_[k];
+      output(NLPSOL_LAM_X).data()[kk] = -rc_[k];
     }
 
-    setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLP_SOLVER_F);
+    setOutput(Obj+ (jacF_row_? xk_[nx_+ng_] : 0), NLPSOL_F);
 
     for (int k = 0; k < ng_; ++k) {
       int kk = g_order_[k];
-      output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];
-      output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];  // TODO(Joris): this is not quite right
+      output(NLPSOL_LAM_G).data()[kk] = -rc_[nx_+k];
+      output(NLPSOL_G).data()[kk] = xk_[nx_+k];  // TODO(Joris): this is not quite right
       // mul_no_alloc
     }
 
     // todo(Greg): get these from snopt
     // we overwrite F and G for now because the current snopt interface
     // doesn't provide F, and the above comment suggests that G is wrong
-    nlp_.setInput(output(NLP_SOLVER_X), NL_X);
-    nlp_.setInput(input(NLP_SOLVER_P), NL_P);
+    nlp_.setInput(output(NLPSOL_X), NL_X);
+    nlp_.setInput(input(NLPSOL_P), NL_P);
     nlp_.evaluate();
-    setOutput(nlp_.output(NL_F), NLP_SOLVER_F);
-    setOutput(nlp_.output(NL_G), NLP_SOLVER_G);
+    setOutput(nlp_.output(NL_F), NLPSOL_F);
+    setOutput(nlp_.output(NL_G), NLPSOL_G);
 
     // print timing information
     // save state
@@ -683,7 +698,7 @@ namespace casadi {
     const int w_ms = 7;
     const int p_ms = 2;
     const int w_n = 5;
-    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       userOut() << std::endl;
 
       userOut() << "time spent in eval_grad_f       "
@@ -733,6 +748,20 @@ namespace casadi {
     // Reset the counters
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
     n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
+
+    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
+      double **v;
+      switch (i) {
+      case NLPSOL_X: v = &x_; break;
+      case NLPSOL_F: v = &f_; break;
+      case NLPSOL_G: v = &g_; break;
+      case NLPSOL_LAM_X: v = &lam_x_; break;
+      case NLPSOL_LAM_G: v = &lam_g_; break;
+      case NLPSOL_LAM_P: v = &lam_p_; break;
+      default: casadi_assert(0);
+      }
+      casadi_copy(output(i).ptr(), nnz_out(i), *v);
+    }
   }
 
   void SnoptInterface::setOptionsFromFile(const std::string & file) {
@@ -751,7 +780,7 @@ namespace casadi {
 
       // Evaluate gradF with the linear variables put to zero
       jacF_.setInput(0.0, NL_X);
-      jacF_.setInput(input(NLP_SOLVER_P), NL_P);
+      jacF_.setInput(input(NLPSOL_P), NL_P);
       for (int k = 0; k < nnObj; ++k) {
         if (x_type_f_[x_order_[k]] == 2) {
           jacF_.input(NL_X)[x_order_[k]] = x[k];
@@ -761,7 +790,7 @@ namespace casadi {
       if (monitored("eval_nlp")) {
         userOut() << "mode: " << *mode << std::endl;
         userOut() << "A before we touch it:"
-                  << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
+                  << DM(A_structure_.sparsity(), A_data_) << std::endl;
         userOut() << "x (obj - sorted indices   - all elements present):"
                   << std::vector<double>(x, x+nnObj) << std::endl;
         userOut() << "x (obj - original indices - linear elements zero):"
@@ -777,8 +806,8 @@ namespace casadi {
       for (int k = 0; k < nnObj; ++k) {
         int i = x_order_[k];
         if (x_type_f_[i] == 2) {
-          int el = jacF_.output().colind(i);
-          if (jacF_.output().colind(i+1) > el) {
+          int el = jacF_.sparsity_out(0).colind(i);
+          if (jacF_.sparsity_out(0).colind(i+1) > el) {
             gObj[k] = jacF_.output().data()[el];
           } else {
             gObj[k] = 0;
@@ -788,8 +817,8 @@ namespace casadi {
         }
       }
 
-      jacF_.output().sparsity().sanityCheck(true);
-      jacF_.output().sparsity().sanityCheck(false);
+      jacF_.sparsity_out(0).sanity_check(true);
+      jacF_.sparsity_out(0).sanity_check(false);
 
       // timing and counters
       t_eval_grad_f_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
@@ -815,7 +844,7 @@ namespace casadi {
           userOut() << "x (con - original indices - linear elements zero):"
                     << jacG_.input(JACG_X) << std::endl;
         }
-        jacG_.setInput(input(NLP_SOLVER_P), JACG_P);
+        jacG_.setInput(input(NLPSOL_P), JACG_P);
 
         // Evaluate the function
         jacG_.evaluate();
@@ -839,7 +868,7 @@ namespace casadi {
         }
 
         // provide nonlinear part of objective to SNOPT
-        DMatrix g = jacG_.output();
+        DM g = jacG_.output();
         for (int k = 0; k < nnCon; ++k) {
           fCon[k] = jacG_.output(GRADF_G).data()[g_order_[k]];
         }
@@ -886,27 +915,33 @@ namespace casadi {
         append_to_vec(iterations["qp_num_iter"], static_cast<int>(nMinor));
         stats_["iterations"] = iterations;
       }
-      if (!callback_.isNull()) {
+      if (!fcallback_.isNull()) {
         double time0 = clock();
         for (int k = 0; k < nx_; ++k) {
           int kk = x_order_[k];
-          output(NLP_SOLVER_X).data()[kk] = x_[k];
-          // output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
+          output(NLPSOL_X).data()[kk] = xk_[k];
+          // output(NLPSOL_LAM_X).data()[kk] = -rc_[k];
         }
 
-        // setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLP_SOLVER_F);
+        // setOutput(Obj+ (jacF_row_? xk_[nx_+ng_] : 0), NLPSOL_F);
         for (int k = 0; k < ng_; ++k) {
           int kk =  g_order_[k];
-          // output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];
-          output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];
+          // output(NLPSOL_LAM_G).data()[kk] = -rc_[nx_+k];
+          output(NLPSOL_G).data()[kk] = xk_[nx_+k];
         }
 
-        *iAbort = callback_(ref_, user_data_);
+        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
+          fcallback_.setInput(output(i), i);
+        }
+        fcallback_.evaluate();
+        double ret_double;
+        fcallback_.getOutput(ret_double);
+        *iAbort = static_cast<int>(ret_double);
         t_callback_fun_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
         n_callback_fun_ += 1;
       }
     } catch(std::exception& ex) {
-      if (getOption("iteration_callback_ignore_errors")) {
+      if (option("iteration_callback_ignore_errors")) {
         userOut<true, PL_WARN>() << "callback: " << ex.what() << std::endl;
       } else {
         throw ex;

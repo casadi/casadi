@@ -27,7 +27,6 @@
 #include "ipopt_interface.hpp"
 #include "ipopt_nlp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
 
@@ -35,6 +34,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
+#include <chrono>
 
 using namespace std;
 #include <IpIpoptApplication.hpp>
@@ -49,97 +49,9 @@ using namespace std;
 #endif // WITH_SIPOPT
 
 namespace casadi {
-  // Convert a float to a string of an exact length.
-  // First it tries fixed precision, then falls back to exponential notation.
-  //
-  // todo(jaeandersson,jgillis): needs either review or unit tests
-  // because it throws exceptions if it fail.
-  std::string formatFloat(double x, int totalWidth, int maxPrecision, int fallbackPrecision) {
-    std::ostringstream out0;
-    out0 << fixed << setw(totalWidth) << setprecision(maxPrecision) << x;
-    std::string ret0 = out0.str();
-    if (ret0.length() == totalWidth) {
-      return ret0;
-    } else if (ret0.length() > totalWidth) {
-      std::ostringstream out1;
-      out1 << setw(totalWidth) << setprecision(fallbackPrecision) << x;
-      std::string ret1 = out1.str();
-      if (ret1.length() != totalWidth)
-        casadi_error(
-          "ipopt timing formatting fallback is bugged, sorry about that."
-          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
-          << ", string: \"" << ret1 << "\", number: " << x);
-      return ret1;
-    } else {
-      casadi_error("ipopt timing formatting is bugged, sorry about that.");
-    }
-  }
-
-  // Print out a beautiful timing summary.
-  // Will print one row per tuple in the input vector.
-  // The tuple must contain {name, # evals, total time in seconds}.
-  void IpoptInterface::timingSummary(
-    std::vector<std::tuple<std::string, int, diffTime> > & xs) {
-    // get padding of names
-    int maxNameLen = 0;
-    for (int k=0; k < xs.size(); ++k) {
-      const int len = std::get<0>(xs[k]).length();
-      maxNameLen = max(maxNameLen, len);
-    }
-
-    std::ostringstream out;
-    std::string blankName(maxNameLen, ' ');
-    out
-      << blankName
-      << "      user           real      num           mean             mean"
-      << endl << blankName
-      << "      time           time     evals       user time        real time"
-      << endl;
-    for (int k=0; k < xs.size(); ++k) {
-      const std::tuple<std::string, int, diffTime> x = xs[k];
-      const std::string name = std::get<0>(x);
-      const int n = std::get<1>(x);
-      const diffTime dt = std::get<2>(x);
-
-      // don't print out this row if there were 0 calls
-      if (n == 0)
-        continue;
-
-      out
-        << setw(maxNameLen) << name << " "
-        << formatFloat(dt.user, 9, 3, 3) << " [s]  "
-        << formatFloat(dt.real, 9, 3, 3) << " [s]";
-      if (n == -1) {
-        // things like main loop don't have # evals
-        out << endl;
-      } else {
-        out
-          << " "
-          << setw(5) << n;
-        if (n < 2) {
-          out << endl;
-        } else {
-          // only print averages if there is more than 1 eval
-          out
-            << " "
-            << formatFloat(1000.0*dt.user/n, 10, 2, 3) << " [ms]  "
-            << formatFloat(1000.0*dt.real/n, 10, 2, 3) << " [ms]"
-            << endl;
-        }
-      }
-    }
-    // I'm worried that the following will set stdout stream state:
-    // userOut() << out;
-
-    // Just convert it to a string first to be safe.
-    // todo(jaeandersson/jgillis): please review.
-    const std::string ret = out.str();
-    userOut() << ret;
-  }
-
   extern "C"
-  int CASADI_NLPSOLVER_IPOPT_EXPORT
-  casadi_register_nlpsolver_ipopt(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLPSOL_IPOPT_EXPORT
+  casadi_register_nlpsol_ipopt(Nlpsol::Plugin* plugin) {
     plugin->creator = IpoptInterface::creator;
     plugin->name = "ipopt";
     plugin->doc = IpoptInterface::meta_doc.c_str();
@@ -148,11 +60,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_IPOPT_EXPORT casadi_load_nlpsolver_ipopt() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_ipopt);
+  void CASADI_NLPSOL_IPOPT_EXPORT casadi_load_nlpsol_ipopt() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_ipopt);
   }
 
-  IpoptInterface::IpoptInterface(const Function& nlp) : NlpSolverInternal(nlp) {
+  IpoptInterface::IpoptInterface(const std::string& name, const XProblem& nlp)
+    : Nlpsol(name, nlp) {
+
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true,
               "print information about execution time");
@@ -247,7 +161,7 @@ namespace casadi {
     }
   }
 
-  void IpoptInterface::freeIpopt() {
+  IpoptInterface::~IpoptInterface() {
     // Free sensitivity application (or rather, the smart pointer holding it)
 #ifdef WITH_SIPOPT
     if (app_sens_ != 0) {
@@ -269,39 +183,25 @@ namespace casadi {
     }
   }
 
-  IpoptInterface::~IpoptInterface() {
-    freeIpopt();
-  }
-
   void IpoptInterface::init() {
-    // Free existing IPOPT instance
-    freeIpopt();
-
     // Call the init method of the base class
-    NlpSolverInternal::init();
+    Nlpsol::init();
 
     // Read user options
     exact_hessian_ = !hasSetOption("hessian_approximation") ||
-        getOption("hessian_approximation")=="exact";
+        option("hessian_approximation")=="exact";
 #ifdef WITH_SIPOPT
     if (hasSetOption("run_sens")) {
-      run_sens_ = getOption("run_sens")=="yes";
+      run_sens_ = option("run_sens")=="yes";
     } else {
       run_sens_  = false;
     }
     if (hasSetOption("compute_red_hessian")) {
-      compute_red_hessian_ = getOption("compute_red_hessian")=="yes";
+      compute_red_hessian_ = option("compute_red_hessian")=="yes";
     } else {
       compute_red_hessian_ = false;
     }
 #endif // WITH_SIPOPT
-
-    // Get/generate required functions
-    gradF();
-    jacG();
-    if (exact_hessian_) {
-      hessLag();
-    }
 
     // Start an IPOPT application
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
@@ -346,7 +246,7 @@ namespace casadi {
     // Pass all the options to ipopt
     for (map<string, TypeID>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
       if (hasSetOption(it->first)) {
-        GenericType op = getOption(it->first);
+        GenericType op = option(it->first);
         switch (it->second) {
         case OT_REAL:
           ret &= (*app)->Options()->SetNumericValue(it->first, op.toDouble(), false);
@@ -384,36 +284,47 @@ namespace casadi {
     }
 #endif // WITH_SIPOPT
 
-
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog, this, getOption("name"),
-                       ProfilingData_FunctionType_Other, 5);
-
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this,
-        0, "f", nlp_.operator->());
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 1,
-        "grad_f", gradF_.operator->());
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 2,
-        "g", nlp_.operator->());
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 3,
-        "jac_g", this->jacG().operator->());
-      profileWriteSourceLineDep(CasadiOptions::profilingLog, this, 4,
-        "h", hessLag_.isNull() ? 0 : hessLag_.operator->());
+    // Setup NLP functions
+    if (nlp2_.is_sx) {
+      setup<SX>();
+    } else {
+      setup<MX>();
     }
 
+    // Allocate work vectors
+    alloc_w(nx_, true); // xk_
+    alloc_w(ng_, true); // lam_gk_
+    alloc_w(nx_, true); // lam_xk_
+    alloc_w(ng_, true); // gk_
+    alloc_w(nx_, true); // grad_fk_
+    alloc_w(jacg_sp_.nnz(), true); // jac_gk_
+    if (exact_hessian_) {
+      alloc_w(hesslag_sp_.nnz(), true); // hess_lk_
+    }
   }
 
-  void IpoptInterface::evaluate() {
+  void IpoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+    // Reset the base classes
+    Nlpsol::reset(mem, arg, res, iw, w);
 
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteEntry(CasadiOptions::profilingLog, this);
+    // Work vectors
+    xk_ = w; w += nx_;
+    lam_gk_ = w; w += ng_;
+    lam_xk_ = w; w += nx_;
+    gk_ = w; w += ng_;
+    grad_fk_ = w; w += nx_;
+    jac_gk_ = w; w += jacg_sp_.nnz();
+    if (exact_hessian_) {
+      hess_lk_ = w; w += hesslag_sp_.nnz();
     }
 
-    if (inputs_check_) checkInputs();
+    // New iterate
+    new_x_ = new_lam_f_ = new_lam_g_ = true;
+  }
 
-    checkInitialBounds();
-
-
+  void IpoptInterface::solve(void* mem) {
+    // Check the provided inputs
+    checkInputs(mem);
 
     if (gather_stats_) {
       Dict iterations;
@@ -430,12 +341,18 @@ namespace casadi {
       stats_["iterations"] = iterations;
     }
 
-    // Reset the counters
-    t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
-        t_callback_prepare_ = t_mainloop_ = {0, 0};
+    // Reset number of iterations
+    n_iter_ = 0;
 
-    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ =
-        n_eval_callback_ = n_iter_ = 0;
+    // Reset function timers
+    t_calc_f_ = t_calc_g_ = t_calc_grad_f_ = t_calc_jac_g_ = t_calc_hess_l_ = 0;
+
+    // Reset function counters
+    n_calc_f_ = n_calc_g_ = n_calc_grad_f_ = n_calc_jac_g_ = n_calc_hess_l_ = 0;
+
+    // Legacy
+    t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = {0, 0};
+    n_eval_callback_ = 0;
 
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass =
@@ -443,7 +360,7 @@ namespace casadi {
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app =
         static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
 
-    const timer time0 = getTimerTime();
+    Timer time0 = getTimerTime();
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
     t_mainloop_ = diffTimers(getTimerTime(), time0);
@@ -468,58 +385,18 @@ namespace casadi {
         casadi_assert(N*N==red_hess.size());
 
         // Store to statistics
-        red_hess_ = DMatrix(Sparsity::dense(N, N), red_hess);
+        red_hess_ = DM(Sparsity::dense(N, N), red_hess);
       }
 #endif // WITH_CASADI_PATCH
     }
 #endif // WITH_SIPOPT
 
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteExit(CasadiOptions::profilingLog, this,
-        t_mainloop_.user - (t_callback_fun_.user-t_callback_prepare_.user));
-    }
-
-    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
-      // Write timings
-      std::vector<std::tuple<std::string, int, diffTime> > times;
-      times.push_back(
-        std::make_tuple("eval_f", n_eval_f_, t_eval_f_));
-      times.push_back(
-        std::make_tuple("eval_grad_f", n_eval_grad_f_, t_eval_grad_f_));
-      times.push_back(
-        std::make_tuple("eval_g", n_eval_g_, t_eval_g_));
-      times.push_back(
-        std::make_tuple("eval_jac_g", n_eval_jac_g_, t_eval_jac_g_));
-      times.push_back(
-        std::make_tuple("eval_h", n_eval_h_, t_eval_h_));
-
-      // These guys get -1 calls to supress that part of the printout.
-      diffTime t_all_functions = {0.0, 0.0};
-      timerPlusEq(t_all_functions, t_eval_f_);
-      timerPlusEq(t_all_functions, t_eval_grad_f_);
-      timerPlusEq(t_all_functions, t_eval_g_);
-      timerPlusEq(t_all_functions, t_eval_jac_g_);
-      timerPlusEq(t_all_functions, t_eval_h_);
-      times.push_back(
-        std::make_tuple("all previous", -1, t_all_functions));
-      diffTime t_ipopt;
-      t_ipopt.user = t_mainloop_.user - t_all_functions.user
-        - t_callback_prepare_.user - t_callback_fun_.user;
-      t_ipopt.real = t_mainloop_.real - t_all_functions.real
-        - t_callback_prepare_.real - t_callback_fun_.real;
-
-      times.push_back(
-        std::make_tuple("callback prep", n_eval_callback_, t_callback_prepare_));
-      times.push_back(
-        std::make_tuple("callback", n_eval_callback_, t_callback_fun_));
-      times.push_back(
-        std::make_tuple("ipopt", -1, t_ipopt));
-      times.push_back(
-        std::make_tuple("main loop", -1, t_mainloop_));
-
-      // do the summary
-      timingSummary(times);
-    }
+    // Save results to outputs
+    casadi_copy(&fk_, 1, f_);
+    casadi_copy(xk_, nx_, x_);
+    casadi_copy(lam_gk_, ng_, lam_g_);
+    casadi_copy(lam_xk_, nx_, lam_x_);
+    casadi_copy(gk_, ng_, g_);
 
     if (status == Solve_Succeeded)
       stats_["return_status"] = "Solve_Succeeded";
@@ -554,24 +431,23 @@ namespace casadi {
     if (status == Insufficient_Memory)
       stats_["return_status"] = "Insufficient_Memory";
 
-    stats_["t_eval_f"] = diffToDict(t_eval_f_);
-    stats_["t_eval_grad_f"] = diffToDict(t_eval_grad_f_);
-    stats_["t_eval_g"] = diffToDict(t_eval_g_);
-    stats_["t_eval_jac_g"] = diffToDict(t_eval_jac_g_);
-    stats_["t_eval_h"] = diffToDict(t_eval_h_);
+    stats_["n_calc_f"] = n_calc_f_;
+    stats_["t_calc_f"] = t_calc_f_;
+    stats_["n_calc_g"] = n_calc_g_;
+    stats_["t_calc_g"] = t_calc_g_;
+    stats_["n_calc_grad_f"] = n_calc_grad_f_;
+    stats_["t_calc_grad_f"] = t_calc_grad_f_;
+    stats_["n_calc_jac_g"] = n_calc_jac_g_;
+    stats_["t_calc_jac_g"] = t_calc_jac_g_;
+    stats_["n_calc_hess_l"] = n_calc_hess_l_;
+    stats_["t_calc_hess_l"] = t_calc_hess_l_;
+
     stats_["t_mainloop"] = diffToDict(t_mainloop_);
     stats_["t_callback_fun"] = diffToDict(t_callback_fun_);
     stats_["t_callback_prepare"] = diffToDict(t_callback_prepare_);
-
-    stats_["n_eval_f"] = n_eval_f_;
-    stats_["n_eval_grad_f"] = n_eval_grad_f_;
-    stats_["n_eval_g"] = n_eval_g_;
-    stats_["n_eval_jac_g"] = n_eval_jac_g_;
-    stats_["n_eval_h"] = n_eval_h_;
     stats_["n_eval_callback"] = n_eval_callback_;
 
     stats_["iter_count"] = n_iter_-1;
-
   }
 
   bool IpoptInterface::intermediate_callback(
@@ -596,18 +472,15 @@ namespace casadi {
         append_to_vec(iterations["obj"], obj_value);
         stats_["iterations"] = iterations;
       }
-      const timer time0 = getTimerTime();
-      if (!callback_.isNull()) {
+      Timer time0 = getTimerTime();
+      if (!fcallback_.isNull()) {
         if (full_callback) {
-          if (!output(NLP_SOLVER_X).isempty()) copy(x, x+nx_, output(NLP_SOLVER_X).begin());
-
-          vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
-          for (int i=0; i<lambda_x.size(); ++i) {
-            lambda_x[i] = z_U[i]-z_L[i];
+          casadi_copy(x, nx_, xk_);
+          for (int i=0; i<nx_; ++i) {
+            lam_xk_[i] = z_U[i]-z_L[i];
           }
-          if (!output(NLP_SOLVER_LAM_G).isempty())
-              copy(lambda, lambda+ng_, output(NLP_SOLVER_LAM_G).begin());
-          if (!output(NLP_SOLVER_G).isempty()) copy(g, g+ng_, output(NLP_SOLVER_G).begin());
+          casadi_copy(lambda, ng_, lam_gk_);
+          casadi_copy(g, ng_, gk_);
         } else {
           if (iter==0) {
             userOut<true, PL_WARN>()
@@ -631,19 +504,33 @@ namespace casadi {
         iteration["obj"] = obj_value;
         stats_["iteration"] = iteration;
 
-        output(NLP_SOLVER_F).at(0) = obj_value;
+        // Inputs
+        fill_n(arg_, fcallback_.n_in(), nullptr);
+        arg_[NLPSOL_X] = x;
+        arg_[NLPSOL_F] = &obj_value;
+        arg_[NLPSOL_G] = g;
+        arg_[NLPSOL_LAM_P] = 0;
+        arg_[NLPSOL_LAM_X] = lam_xk_;
+        arg_[NLPSOL_LAM_G] = lam_gk_;
 
+        // Outputs
+        fill_n(res_, fcallback_.n_out(), nullptr);
+        double ret_double;
+        res_[0] = &ret_double;
+
+        // Evaluate the callback function
         n_eval_callback_ += 1;
-        int ret = callback_(ref_, user_data_);
+        fcallback_(arg_, res_, iw_, w_, 0);
+        int ret = static_cast<int>(ret_double);
 
-        const diffTime delta = diffTimers(getTimerTime(), time0);
+        DiffTime delta = diffTimers(getTimerTime(), time0);
         timerPlusEq(t_callback_fun_, delta);
         return  !ret;
       } else {
         return 1;
       }
     } catch(exception& ex) {
-      if (getOption("iteration_callback_ignore_errors")) {
+      if (option("iteration_callback_ignore_errors")) {
         userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
       } else {
         throw ex;
@@ -657,22 +544,23 @@ namespace casadi {
                                         int iter_count) {
     try {
       // Get primal solution
-      copy(x, x+nx_, output(NLP_SOLVER_X).begin());
+      casadi_copy(x, nx_, xk_);
 
       // Get optimal cost
-      output(NLP_SOLVER_F).at(0) = obj_value;
+      fk_ = obj_value;
 
       // Get dual solution (simple bounds)
-      vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
-      for (int i=0; i<lambda_x.size(); ++i) {
-        lambda_x[i] = z_U[i]-z_L[i];
+      if (lam_xk_) {
+        for (int i=0; i<nx_; ++i) {
+          lam_xk_[i] = z_U[i]-z_L[i];
+        }
       }
 
       // Get dual solution (nonlinear bounds)
-      copy(lambda, lambda+ng_, output(NLP_SOLVER_LAM_G).begin());
+      casadi_copy(lambda, ng_, lam_gk_);
 
       // Get the constraints
-      copy(g, g+ng_, output(NLP_SOLVER_G).begin());
+      casadi_copy(g, ng_, gk_);
 
       // Get statistics
       stats_["iter_count"] = iter_count;
@@ -682,261 +570,15 @@ namespace casadi {
     }
   }
 
-  bool IpoptInterface::eval_h(const double* x, bool new_x, double obj_factor,
-                             const double* lambda, bool new_lambda, int nele_hess,
-                             int* iRow, int* jCol, double* values) {
-    try {
-      log("eval_h started");
-      const timer time0 = getTimerTime();
-      if (values == NULL) {
-        int nz=0;
-        const int* colind = hessLag_.output().colind();
-        int ncol = hessLag_.output().size2();
-        const int* row = hessLag_.output().row();
-        for (int cc=0; cc<ncol; ++cc)
-          for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
-            iRow[nz] = row[el];
-            jCol[nz] = cc;
-            nz++;
-          }
-      } else {
-        // Pass the argument to the function
-        hessLag_.setInputNZ(x, NL_X);
-        hessLag_.setInput(input(NLP_SOLVER_P), NL_P);
-        hessLag_.setInput(obj_factor, NL_NUM_IN+NL_F);
-        hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
-
-        // Evaluate
-        hessLag_.evaluate();
-
-        // Get results
-        hessLag_.output().getSym(values);
-
-        if (monitored("eval_h")) {
-          userOut() << "x = " << hessLag_.input(NL_X).data() << endl;
-          userOut() << "H = " << endl;
-          hessLag_.output().printSparse();
-        }
-
-        if (regularity_check_ && !isRegular(hessLag_.output().data()))
-            casadi_error("IpoptInterface::h: NaN or Inf detected.");
-
-      }
-      const diffTime delta = diffTimers(getTimerTime(), time0);
-      timerPlusEq(t_eval_h_, delta);
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 4, delta.user);
-      }
-      n_eval_h_ += 1;
-      log("eval_h ok");
-      return true;
-    } catch(exception& ex) {
-      if (eval_errors_fatal_) throw ex;
-      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
-  bool IpoptInterface::eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
-                                  int* iRow, int *jCol, double* values) {
-    try {
-      log("eval_jac_g started");
-
-      // Quich finish if no constraints
-      if (m==0) {
-        log("eval_jac_g quick return (m==0)");
-        return true;
-      }
-
-      // Get function
-      Function& jacG = this->jacG();
-
-      const timer time0 = getTimerTime();
-      if (values == NULL) {
-        int nz=0;
-        const int* colind = jacG.output().colind();
-        int ncol = jacG.output().size2();
-        const int* row = jacG.output().row();
-        for (int cc=0; cc<ncol; ++cc)
-          for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-            int rr = row[el];
-            iRow[nz] = rr;
-            jCol[nz] = cc;
-            nz++;
-          }
-      } else {
-        // Pass the argument to the function
-        jacG.setInputNZ(x, NL_X);
-        jacG.setInput(input(NLP_SOLVER_P), NL_P);
-
-        // Evaluate the function
-        jacG.evaluate();
-
-        // Get the output
-        jacG.getOutputNZ(values);
-
-        if (monitored("eval_jac_g")) {
-          userOut() << "x = " << jacG.input(NL_X).data() << endl;
-          userOut() << "J = " << endl;
-          jacG.output().printSparse();
-        }
-        if (regularity_check_ && !isRegular(jacG.output().data()))
-            casadi_error("IpoptInterface::jac_g: NaN or Inf detected.");
-      }
-
-      const diffTime delta = diffTimers(getTimerTime(), time0);
-      timerPlusEq(t_eval_jac_g_, delta);
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 3, delta.user);
-      }
-      n_eval_jac_g_ += 1;
-      log("eval_jac_g ok");
-      return true;
-    } catch(exception& ex) {
-      if (eval_errors_fatal_) throw ex;
-      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
-  bool IpoptInterface::eval_f(int n, const double* x, bool new_x, double& obj_value) {
-
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    try {
-
-      log("eval_f started");
-
-      // Log time
-      const timer time0 = getTimerTime();
-      casadi_assert(n == nx_);
-
-      // Pass the argument to the function
-      nlp_.setInputNZ(x, NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
-
-      // Evaluate the function
-      nlp_.evaluate();
-
-      // Get the result
-      nlp_.getOutput(obj_value, NL_F);
-
-      // Printing
-      if (monitored("eval_f")) {
-        userOut() << "x = " << nlp_.input(NL_X) << endl;
-        userOut() << "obj_value = " << obj_value << endl;
-      }
-
-      if (regularity_check_ && !isRegular(nlp_.output(NL_F).data()))
-          casadi_error("IpoptInterface::f: NaN or Inf detected.");
-
-      const diffTime delta = diffTimers(getTimerTime(), time0);
-      timerPlusEq(t_eval_f_, delta);
-      n_eval_f_ += 1;
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 0, delta.user);
-      }
-      log("eval_f ok");
-      return true;
-    } catch(exception& ex) {
-      if (eval_errors_fatal_) throw ex;
-      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
-      return false;
-    }
-
-  }
-
-  bool IpoptInterface::eval_g(int n, const double* x, bool new_x, int m, double* g) {
-    try {
-      log("eval_g started");
-      const timer time0 = getTimerTime();
-
-      if (m>0) {
-        // Pass the argument to the function
-        nlp_.setInputNZ(x, NL_X);
-        nlp_.setInput(input(NLP_SOLVER_P), NL_P);
-
-        // Evaluate the function and tape
-        nlp_.evaluate();
-
-        // Ge the result
-        nlp_.getOutputNZ(g, NL_G);
-
-        // Printing
-        if (monitored("eval_g")) {
-          userOut() << "x = " << nlp_.input(NL_X) << endl;
-          userOut() << "g = " << nlp_.output(NL_G) << endl;
-        }
-      }
-
-      if (regularity_check_ && !isRegular(nlp_.output(NL_G).data()))
-          casadi_error("IpoptInterface::g: NaN or Inf detected.");
-
-      const diffTime delta = diffTimers(getTimerTime(), time0);
-      timerPlusEq(t_eval_g_, delta);
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 2, delta.user);
-      }
-      n_eval_g_ += 1;
-      log("eval_g ok");
-      return true;
-    } catch(exception& ex) {
-      if (eval_errors_fatal_) throw ex;
-      userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
-  bool IpoptInterface::eval_grad_f(int n, const double* x, bool new_x, double* grad_f) {
-    try {
-      log("eval_grad_f started");
-      const timer time0 = getTimerTime();
-      casadi_assert(n == nx_);
-
-      // Pass the argument to the function
-      gradF_.setInputNZ(x, NL_X);
-      gradF_.setInput(input(NLP_SOLVER_P), NL_P);
-
-      // Evaluate, adjoint mode
-      gradF_.evaluate();
-
-      // Get the result
-      gradF_.output().get(grad_f);
-
-      // Printing
-      if (monitored("eval_grad_f")) {
-        userOut() << "x = " << gradF_.input(NL_X) << endl;
-        userOut() << "grad_f = " << gradF_.output() << endl;
-      }
-
-      if (regularity_check_ && !isRegular(gradF_.output().data()))
-          casadi_error("IpoptInterface::grad_f: NaN or Inf detected.");
-
-      const diffTime delta = diffTimers(getTimerTime(), time0);
-      timerPlusEq(t_eval_grad_f_, delta);
-      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-        profileWriteTime(CasadiOptions::profilingLog, this, 1, delta.user);
-      }
-      n_eval_grad_f_ += 1;
-      log("eval_grad_f ok");
-      return true;
-    } catch(exception& ex) {
-      if (eval_errors_fatal_) throw ex;
-      userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
   bool IpoptInterface::get_bounds_info(int n, double* x_l, double* x_u,
                                       int m, double* g_l, double* g_u) {
     try {
       casadi_assert(n == nx_);
       casadi_assert(m == ng_);
-      input(NLP_SOLVER_LBX).getNZ(x_l);
-      input(NLP_SOLVER_UBX).getNZ(x_u);
-      input(NLP_SOLVER_LBG).getNZ(g_l);
-      input(NLP_SOLVER_UBG).getNZ(g_u);
+      casadi_copy(lbx_, nx_, x_l);
+      casadi_copy(ubx_, nx_, x_u);
+      casadi_copy(lbg_, ng_, g_l);
+      casadi_copy(ubg_, ng_, g_u);
       return true;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_bounds_info failed: " << ex.what() << endl;
@@ -949,29 +591,27 @@ namespace casadi {
                                          int m, bool init_lambda,
                                          double* lambda) {
     try {
-      bool warmstart = hasSetOption("warm_start_init_point") &&
-          getOption("warm_start_init_point")=="yes";
-      //casadi_assert_warning(init_x, "Not initializing x");
-      if (warmstart) {
-        //casadi_assert_warning(init_lambda, "Not initializing lambda");
-        //casadi_assert_warning(init_z, "Not initializing z");
-      }
-
+      // Initialize primal variables
       if (init_x) {
-        input(NLP_SOLVER_X0).getNZ(x);
+        casadi_copy(x0_, nx_, x);
       }
 
+      // Initialize dual variables (simple bounds)
       if (init_z) {
-        // Get dual solution (simple bounds)
-        vector<double>& lambda_x = input(NLP_SOLVER_LAM_X0).data();
-        for (int i=0; i<lambda_x.size(); ++i) {
-          z_L[i] = max(0., -lambda_x[i]);
-          z_U[i] = max(0., lambda_x[i]);
+        if (lam_x0_) {
+          for (int i=0; i<nx_; ++i) {
+            z_L[i] = max(0., -lam_x0_[i]);
+            z_U[i] = max(0., lam_x0_[i]);
+          }
+        } else {
+          casadi_fill(z_L, nx_, 0.);
+          casadi_fill(z_U, nx_, 0.);
         }
       }
 
+      // Initialize dual variables (nonlinear bounds)
       if (init_lambda) {
-        input(NLP_SOLVER_LAM_G0).getNZ(lambda);
+        casadi_copy(lam_g0_, ng_, lambda);
       }
 
       return true;
@@ -983,20 +623,18 @@ namespace casadi {
 
   void IpoptInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag) {
     try {
-      n = nx_;               // number of variables
-      m = ng_;               // number of constraints
+      // Number of variables
+      n = nx_;
 
-      // Get Jacobian sparsity pattern
-      if (nlp_.output(NL_G).nnz()==0)
-        nnz_jac_g = 0;
-      else
-        nnz_jac_g = jacG().output().nnz();
+      // Number of constraints
+      m = ng_;
 
-      // Get Hessian sparsity pattern
-      if (exact_hessian_)
-        nnz_h_lag = hessLag().output().sparsity().sizeU();
-      else
-        nnz_h_lag = 0;
+      // Number of Jacobian nonzeros
+      nnz_jac_g = ng_==0 ? 0 : jacg_sp_.nnz();
+
+      // Number of Hessian nonzeros (only upper triangular half)
+      nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz_upper() : 0;
+
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_nlp_info failed: " << ex.what() << endl;
     }
@@ -1004,7 +642,7 @@ namespace casadi {
 
   int IpoptInterface::get_number_of_nonlinear_variables() {
     try {
-      if (!static_cast<bool>(getOption("pass_nonlinear_variables"))) {
+      if (!static_cast<bool>(option("pass_nonlinear_variables"))) {
         // No Hessian has been interfaced
         return -1;
       } else {
@@ -1064,7 +702,7 @@ namespace casadi {
                                            map<string, vector<int> >& con_integer_md,
                                            map<string, vector<double> >& con_numeric_md) {
     if (hasSetOption("var_string_md")) {
-      Dict dict = getOption("var_string_md");
+      Dict dict = option("var_string_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<string> entry = it->second; // Get the entry
@@ -1075,7 +713,7 @@ namespace casadi {
     }
 
     if (hasSetOption("var_integer_md")) {
-      Dict dict = getOption("var_integer_md");
+      Dict dict = option("var_integer_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<int> entry = it->second; // Get the entry
@@ -1086,7 +724,7 @@ namespace casadi {
     }
 
     if (hasSetOption("var_numeric_md")) {
-      Dict dict = getOption("var_numeric_md");
+      Dict dict = option("var_numeric_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<double> entry = it->second; // Get the entry
@@ -1097,7 +735,7 @@ namespace casadi {
     }
 
     if (hasSetOption("con_string_md")) {
-      Dict dict = getOption("con_string_md");
+      Dict dict = option("con_string_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<string> entry = it->second; // Get the entry
@@ -1108,7 +746,7 @@ namespace casadi {
     }
 
     if (hasSetOption("con_integer_md")) {
-      Dict dict = getOption("con_integer_md");
+      Dict dict = option("con_integer_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<int> entry = it->second; // Get the entry
@@ -1119,7 +757,7 @@ namespace casadi {
     }
 
     if (hasSetOption("con_numeric_md")) {
-      Dict dict = getOption("con_numeric_md");
+      Dict dict = option("con_numeric_md");
       for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<double> entry = it->second; // Get the entry
@@ -1210,7 +848,7 @@ namespace casadi {
     }
   }
 
-  DMatrix IpoptInterface::getReducedHessian() {
+  DM IpoptInterface::getReducedHessian() {
 #ifndef WITH_SIPOPT
     casadi_error("This feature requires sIPOPT support. Please consult the CasADi documentation.");
 #else // WITH_SIPOPT
@@ -1221,7 +859,327 @@ namespace casadi {
     return red_hess_;
 #endif // WITH_SIPOPT
 #endif // WITH_CASADI_PATCH
+  }
 
+  void IpoptInterface::set_x(const double *x) {
+    // Is a recalculation needed
+    if (new_x_ || !equal(x, x+nx_, xk_)) {
+      copy_n(x, nx_, xk_);
+      have_fk_ = have_gk_ = have_hess_lk_ = have_grad_lk_ = have_grad_fk_
+        = have_jac_gk_ = false;
+      new_x_ = false;
+    }
+  }
+
+  void IpoptInterface::set_lam_f(double lam_f) {
+    // Is a recalculation needed
+    if (new_lam_f_ || lam_f != lam_fk_) {
+      lam_fk_ = lam_f;
+      have_hess_lk_ = have_grad_lk_ = false;
+      new_lam_f_ = false;
+    }
+  }
+
+  void IpoptInterface::set_lam_g(const double *lam_g) {
+    // Is a recalculation needed
+    if (new_lam_g_ || !equal(lam_g, lam_g+ng_, lam_gk_)) {
+      copy_n(lam_g, ng_, lam_gk_);
+      have_hess_lk_ = have_grad_lk_ = false;
+      new_lam_g_ = false;
+    }
+  }
+
+  int IpoptInterface::calc_f(double* f) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Calculate, if needed
+    if (!have_fk_) {
+      fill_n(arg_, f_fcn_.n_in(), nullptr);
+      arg_[F_X] = xk_;
+      arg_[F_P] = p_;
+      fill_n(res_, f_fcn_.n_out(), nullptr);
+      res_[F_F] = &fk_;
+      n_calc_f_ += 1;
+      auto t_start = chrono::system_clock::now(); // start timer
+      try {
+        f_fcn_(arg_, res_, iw_, w_, 0);
+      } catch(exception& ex) {
+        // Fatal error
+        userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
+        return 1;
+      }
+      auto t_stop = chrono::system_clock::now(); // stop timer
+
+      // Make sure not NaN or Inf
+      if (!isfinite(fk_)) {
+        userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf or NaN detected" << endl;
+        return -1;
+      }
+
+      // Update stats
+      n_calc_f_ += 1;
+      t_calc_f_ += chrono::duration<double>(t_stop - t_start).count();
+      have_fk_ = true;
+    }
+
+    // Return to user
+    if (f) *f = fk_;
+
+    // Success
+    return 0;
+  }
+
+  template<typename M>
+  void IpoptInterface::setup_f() {
+    const Problem<M>& nlp = nlp2_;
+    vector<M> arg(F_NUM_IN);
+    arg[F_X] = nlp.in[NL_X];
+    arg[F_P] = nlp.in[NL_P];
+    vector<M> res(F_NUM_OUT);
+    res[F_F] = nlp.out[NL_F];
+    f_fcn_ = Function("nlp_f", arg, res);
+    alloc(f_fcn_);
+  }
+
+  int IpoptInterface::calc_g(double* g) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Calculate, if needed
+    if (!have_gk_) {
+      // Evaluate User function
+      fill_n(arg_, g_fcn_.n_in(), nullptr);
+      arg_[G_X] = xk_;
+      arg_[G_P] = p_;
+      fill_n(res_, g_fcn_.n_out(), nullptr);
+      res_[G_G] = gk_;
+      auto t_start = chrono::system_clock::now(); // start timer
+      try {
+        g_fcn_(arg_, res_, iw_, w_, 0);
+      } catch(exception& ex) {
+        // Fatal error
+        userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
+        return 1;
+      }
+      auto t_stop = chrono::system_clock::now(); // stop timer
+
+      // Make sure not NaN or Inf
+      if (!all_of(gk_, gk_+ng_, [](double v) { return isfinite(v);})) {
+        userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN or Inf detected" << endl;
+        return -1;
+      }
+
+      // Update stats
+      n_calc_g_ += 1;
+      t_calc_g_ += chrono::duration<double>(t_stop - t_start).count();
+      have_gk_ = true;
+    }
+
+    // Return to user
+    casadi_copy(gk_, ng_, g);
+
+    // Success
+    return 0;
+  }
+
+  template<typename M>
+  void IpoptInterface::setup_g() {
+    const Problem<M>& nlp = nlp2_;
+    vector<M> arg(G_NUM_IN);
+    arg[G_X] = nlp.in[NL_X];
+    arg[G_P] = nlp.in[NL_P];
+    vector<M> res(G_NUM_OUT);
+    res[G_G] = nlp.out[NL_G];
+    g_fcn_ = Function("nlp_g", arg, res);
+    alloc(g_fcn_);
+  }
+
+  int IpoptInterface::calc_grad_f(double* grad_f) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Calculate, if needed
+    if (!have_grad_fk_) {
+      // Evaluate User function
+      fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
+      arg_[GF_X] = xk_;
+      arg_[GF_P] = p_;
+      fill_n(res_, grad_f_fcn_.n_out(), nullptr);
+      res_[GF_GF] = grad_fk_;
+      auto t_start = chrono::system_clock::now(); // start timer
+      try {
+        grad_f_fcn_(arg_, res_, iw_, w_, 0);
+      } catch(exception& ex) {
+        // Fatal error
+        userOut<true, PL_WARN>() << name() << ":calc_grad_f failed:" << ex.what() << endl;
+        return 1;
+      }
+      auto t_stop = chrono::system_clock::now(); // stop timer
+
+      // Make sure not NaN or Inf
+      if (!all_of(grad_fk_, grad_fk_+nx_, [](double v) { return isfinite(v);})) {
+        userOut<true, PL_WARN>() << name() << ":calc_grad_f failed: NaN or Inf detected" << endl;
+        return -1;
+      }
+
+      // Update stats
+      n_calc_grad_f_ += 1;
+      t_calc_grad_f_ += chrono::duration<double>(t_stop - t_start).count();
+      have_grad_fk_ = true;
+    }
+
+    // Return to user
+    casadi_copy(grad_fk_, nx_, grad_f);
+
+    // Success
+    return 0;
+  }
+
+  template<typename M>
+  void IpoptInterface::setup_grad_f() {
+    const Problem<M>& nlp = nlp2_;
+    vector<M> arg(GF_NUM_IN);
+    arg[GF_X] = nlp.in[NL_X];
+    arg[GF_P] = nlp.in[NL_P];
+    vector<M> res(GF_NUM_OUT);
+    res[GF_GF] = M::gradient(nlp.out[NL_F], nlp.in[NL_X]);
+    grad_f_fcn_ = Function("nlp_grad_f", arg, res);
+    alloc(grad_f_fcn_);
+  }
+
+  int IpoptInterface::calc_jac_g(double* jac_g) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Calculate, if needed
+    if (!have_jac_gk_) {
+      // Evaluate User function
+      fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
+      arg_[JG_X] = xk_;
+      arg_[JG_P] = p_;
+      fill_n(res_, jac_g_fcn_.n_out(), nullptr);
+      res_[JG_JG] = jac_gk_;
+      auto t_start = chrono::system_clock::now(); // start timer
+      try {
+        jac_g_fcn_(arg_, res_, iw_, w_, 0);
+      } catch(exception& ex) {
+        // Fatal error
+        userOut<true, PL_WARN>() << name() << ":calc_jac_g failed:" << ex.what() << endl;
+        return 1;
+      }
+      auto t_stop = chrono::system_clock::now(); // stop timer
+
+      // Make sure not NaN or Inf
+      if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
+        userOut<true, PL_WARN>() << name() << ":calc_jac_g failed: NaN or Inf detected" << endl;
+        return -1;
+      }
+
+      // Update stats
+      n_calc_jac_g_ += 1;
+      t_calc_jac_g_ += chrono::duration<double>(t_stop - t_start).count();
+      have_jac_gk_ = true;
+    }
+
+    // Return to user
+    casadi_copy(jac_gk_, jacg_sp_.nnz(), jac_g);
+
+    // Success
+    return 0;
+  }
+
+  template<typename M>
+  void IpoptInterface::setup_jac_g() {
+    const Problem<M>& nlp = nlp2_;
+    vector<M> arg(JG_NUM_IN);
+    arg[JG_X] = nlp.in[NL_X];
+    arg[JG_P] = nlp.in[NL_P];
+    vector<M> res(JG_NUM_OUT);
+    res[JG_JG] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
+    jac_g_fcn_ = Function("nlp_jac_g", arg, res);
+    jacg_sp_ = res[JG_JG].sparsity();
+    alloc(jac_g_fcn_);
+  }
+
+  int IpoptInterface::calc_hess_l(double* hess_l) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Calculate, if needed
+    if (!have_hess_lk_) {
+      // Evaluate User function
+      fill_n(arg_, hess_l_fcn_.n_in(), nullptr);
+      arg_[HL_X] = xk_;
+      arg_[HL_P] = p_;
+      arg_[HL_LAM_F] = &lam_fk_;
+      arg_[HL_LAM_G] = lam_gk_;
+      fill_n(res_, hess_l_fcn_.n_out(), nullptr);
+      res_[HL_HL] = hess_lk_;
+      auto t_start = chrono::system_clock::now(); // start timer
+      try {
+        hess_l_fcn_(arg_, res_, iw_, w_, 0);
+      } catch(exception& ex) {
+        // Fatal error
+        userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
+        return 1;
+      }
+      auto t_stop = chrono::system_clock::now(); // stop timer
+
+      // Make sure not NaN or Inf
+      if (!all_of(hess_lk_, hess_lk_+hesslag_sp_.nnz(), [](double v) { return isfinite(v);})) {
+        userOut<true, PL_WARN>() << name() << ":calc_hess_l failed: NaN or Inf detected" << endl;
+        return -1;
+      }
+
+      // Update stats
+      n_calc_hess_l_ += 1;
+      t_calc_hess_l_ += chrono::duration<double>(t_stop - t_start).count();
+      have_hess_lk_ = true;
+    }
+
+    // Return to user
+    casadi_copy(hess_lk_, hesslag_sp_.nnz(), hess_l);
+
+    // Success
+    return 0;
+  }
+
+  template<typename M>
+  void IpoptInterface::setup_hess_l() {
+    const Problem<M>& nlp = nlp2_;
+    vector<M> arg(HL_NUM_IN);
+    M x = arg[HL_X] = nlp.in[NL_X];
+    arg[HL_P] = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M g = nlp.out[NL_G];
+    M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
+    M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
+    vector<M> res(HL_NUM_OUT);
+    res[HL_HL] = M::hessian(dot(lam_f, f) + dot(lam_g, g), x);
+    hess_l_fcn_ = Function("nlp_hess_l", arg, res);
+    hesslag_sp_ = res[HL_HL].sparsity();
+    alloc(hess_l_fcn_);
+  }
+
+  template<typename M>
+  void IpoptInterface::setup() {
+    // Objective
+    setup_f<M>();
+
+    // Constraints
+    setup_g<M>();
+
+    // Gradient of the objective
+    setup_grad_f<M>();
+
+    // Jacobian of the constraits
+    setup_jac_g<M>();
+
+    // Hessian of the Lagrangian
+    if (exact_hessian_) {
+      setup_hess_l<M>();
+    }
   }
 
 } // namespace casadi
