@@ -90,7 +90,7 @@ namespace casadi {
     dQ_.resize(input(QPSOL_H).nnz_upper());
     irowQ_.resize(dQ_.size());
     jcolQ_.resize(dQ_.size());
-    dA_.resize(input(QPSOL_A).size());
+    dA_.resize(input(QPSOL_A).nnz());
     irowA_.resize(dA_.size());
     jcolA_.resize(dA_.size());
     dC_.resize(dA_.size());

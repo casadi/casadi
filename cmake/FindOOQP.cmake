@@ -1,7 +1,7 @@
 # TRY TO FIND THE INCLUDE DIRECTORY
 find_path(OOQP_INCLUDE_DIR 
 QpGenData.h
-HINTS /usr/local/include/ooqp/
+HINTS $ENV{OOQP}/include/ooqp /usr/local/include/ooqp/
 )
 
 set(OOQP_LIBRARIES ${BLAS_LIBRARIES} ${HSL_LIBRARIES})
