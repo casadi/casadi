@@ -167,14 +167,6 @@ the inputs.
 
 ";
 
-%feature("docstring") casadi::Callback::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
-
-";
-
 %feature("docstring") casadi::Callback::forward "
 
 >  void Function.forward([MX ] arg, [MX ] res, [[MX ] ] fseed,[[MX ] ] output_fsens, bool always_inline=false, bool never_inline=false)
@@ -2495,14 +2487,6 @@ Get sparsity of a given output.
 
 %feature("docstring") casadi::Function::setOptionByAllowedIndex "[INTERNAL]
 Set a certain option by giving its index into the allowed values.
-
-";
-
-%feature("docstring") casadi::Function::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional.
-
-derivatives forward or backward (for usage, see the example
-propagating_sparsity.cpp)
 
 ";
 
