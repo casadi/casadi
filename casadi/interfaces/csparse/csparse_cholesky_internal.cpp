@@ -65,17 +65,17 @@ namespace casadi {
     // Call the init method of the base class
     Linsol::init();
 
-    AT_.nzmax = input().nnz();  // maximum number of entries
-    AT_.m = input().size1(); // number of cols
-    AT_.n = input().size2(); // number of rows
-    AT_.p = const_cast<int*>(input().colind()); // row pointers (size n+1)
+    A_.nzmax = nnz_in(0);  // maximum number of entries
+    A_.m = size1_in(0); // number of columns
+    A_.n = size2_in(0); // number of rows
+    A_.p = const_cast<int*>(sparsity_in(0).colind()); // row pointers (size n+1)
                                                          // or row indices (size nzmax)
-    AT_.i = const_cast<int*>(input().row()); // col indices, size nzmax
-    AT_.x = &input()->front(); // col indices, size nzmax
-    AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-row
+    A_.i = const_cast<int*>(sparsity_in(0).row()); // column indices, size nzmax
+    A_.x = 0; // numerical values, size nzmax
+    A_.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
     // Temporary
-    temp_.resize(AT_.n);
+    temp_.resize(A_.n);
 
     if (verbose()) {
       userOut() << "CSparseCholeskyInternal::prepare: symbolic factorization" << endl;
@@ -84,13 +84,13 @@ namespace casadi {
     // ordering and symbolic analysis
     int order = 0; // ordering?
     if (S_) cs_sfree(S_);
-    S_ = cs_schol(order, &AT_) ;
+    S_ = cs_schol(order, &A_) ;
   }
 
 
   Sparsity CSparseCholeskyInternal::linsol_cholesky_sparsity(bool tr) const {
     casadi_assert(S_);
-    int n = AT_.n;
+    int n = A_.n;
     int nzmax = S_->cp[n];
     std::vector< int > row(n+1);
     std::copy(S_->cp, S_->cp+n+1, row.begin());
@@ -98,7 +98,7 @@ namespace casadi {
     int *Li = &colind.front();
     int *Lp = &row.front();
     const cs* C;
-    C = S_->pinv ? cs_symperm(&AT_, S_->pinv, 1) : &AT_;
+    C = S_->pinv ? cs_symperm(&A_, S_->pinv, 1) : &A_;
     std::vector< int > temp(2*n);
     int *c = & temp.front();
     int *s = c+n;
@@ -138,50 +138,19 @@ namespace casadi {
   }
 
   void CSparseCholeskyInternal::linsol_factorize(Memory& m, const double* A) {
-    casadi_copy(A, nnz_in(0), input(0).ptr());
-
-    // Get a reference to the nonzeros of the linear system
-    const vector<double>& linsys_nz = input().data();
+    // Set the nonzeros of the matrix
+    casadi_assert(A!=0);
+    A_.x = const_cast<double*>(A);
 
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<linsys_nz.size(); ++k) {
-      casadi_assert_message(!isnan(linsys_nz[k]), "Nonzero " << k << " is not-a-number");
-      casadi_assert_message(!isinf(linsys_nz[k]), "Nonzero " << k << " is infinite");
-    }
-
-    if (verbose()) {
-      userOut() << "CSparseCholeskyInternal::prepare: numeric factorization" << endl;
-      userOut() << "linear system to be factorized = " << endl;
-      input(0).printSparse();
+    int nnz = nnz_in(0);
+    for (int k=0; k<nnz; ++k) {
+      casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
+      casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
     }
 
     if (L_) cs_nfree(L_);
-    L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization
-    if (L_==0) {
-      DM temp = sparsify(input());
-      if (temp.sparsity().is_singular()) {
-        stringstream ss;
-        ss << "CSparseCholeskyInternal::prepare: factorization failed due "
-          "to matrix being singular. Matrix contains numerical zeros which are"
-          " structurally non-zero. Promoting these zeros to be structural "
-          "zeros, the matrix was found to be structurally rank deficient. "
-          "sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
-        if (verbose()) {
-          ss << "Sparsity of the linear system: " << endl;
-          input(LINSOL_A).sparsity().print(ss); // print detailed
-        }
-        throw CasadiException(ss.str());
-      } else {
-        stringstream ss;
-        ss << "CSparseCholeskyInternal::prepare: factorization failed, "
-            "check if Jacobian is singular" << endl;
-        if (verbose()) {
-          ss << "Sparsity of the linear system: " << endl;
-          input(LINSOL_A).sparsity().print(ss); // print detailed
-        }
-        throw CasadiException(ss.str());
-      }
-    }
+    L_ = cs_chol(&A_, S_) ;                 // numeric Cholesky factorization
     casadi_assert(L_!=0);
   }
 
@@ -191,15 +160,15 @@ namespace casadi {
     double *t = &temp_.front();
     for (int k=0; k<nrhs; ++k) {
       if (tr) {
-        cs_pvec(S_->q, x, t, AT_.n) ;   // t = P1\b
+        cs_pvec(S_->q, x, t, A_.n) ;   // t = P1\b
         cs_ltsolve(L_->L, t) ;               // t = L\t
         cs_lsolve(L_->L, t) ;              // t = U\t
-        cs_pvec(L_->pinv, t, x, AT_.n) ;      // x = P2\t
+        cs_pvec(L_->pinv, t, x, A_.n) ;      // x = P2\t
       } else {
-        cs_ipvec(L_->pinv, x, t, AT_.n) ;   // t = P1\b
+        cs_ipvec(L_->pinv, x, t, A_.n) ;   // t = P1\b
         cs_lsolve(L_->L, t) ;               // t = L\t
         cs_ltsolve(L_->L, t) ;              // t = U\t
-        cs_ipvec(S_->q, t, x, AT_.n) ;      // x = P2\t
+        cs_ipvec(S_->q, t, x, A_.n) ;      // x = P2\t
       }
       x += ncol();
     }
@@ -211,10 +180,10 @@ namespace casadi {
     double *t = getPtr(temp_);
 
     for (int k=0; k<nrhs; ++k) {
-      cs_ipvec(L_->pinv, x, t, AT_.n) ;   // t = P1\b
+      cs_ipvec(L_->pinv, x, t, A_.n) ;   // t = P1\b
       if (tr) cs_lsolve(L_->L, t) ; // t = L\t
       if (!tr) cs_ltsolve(L_->L, t) ; // t = U\t
-      cs_ipvec(S_->q, t, x, AT_.n) ;      // x = P2\t
+      cs_ipvec(S_->q, t, x, A_.n) ;      // x = P2\t
       x += ncol();
     }
   }

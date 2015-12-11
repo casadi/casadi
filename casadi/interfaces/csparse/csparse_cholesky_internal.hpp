@@ -79,7 +79,7 @@ namespace casadi {
     virtual DM linsol_cholesky(bool tr) const;
 
     // The transpose of linear system in form (CCS)
-    cs AT_;
+    cs A_;
 
     // The symbolic factorization
     css *S_;
