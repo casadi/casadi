@@ -128,6 +128,7 @@ int main(){
 
   // Solve with IPOPT
   Function solver = qpsol("solver", "qpoases", qp);
+  //Function solver = qpsol("solver", "cplex", qp);
   //Function solver = qpsol("solver", "ooqp", qp);
   //Function solver = qpsol("solver", "gurobi", qp);
   //Function solver = nlpsol("solver", "ipopt", qp)

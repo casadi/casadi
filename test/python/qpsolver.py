@@ -41,8 +41,8 @@ if has_qpsol("ooqp"):
 if has_qpsol("qpoases"):
   qpsols.append(("qpoases",{},{}))
 
-# if has_qpsol("cplex"):
-#   qpsols.append(("cplex",{},{}))
+if has_qpsol("cplex"):
+  qpsols.append(("cplex",{},{}))
 
 # if has_qpsol("sqic"):
 #   qpsols.append(("sqic",{},{}))
