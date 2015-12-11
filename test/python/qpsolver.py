@@ -35,14 +35,8 @@ if has_nlpsol("ipopt"):
 if has_nlpsol("ipopt"):
   qpsols.append(("nlpsol.ipopt",{"nlpsol_options": {"tol": 1e-12}},{}))
 
-# if has_nlpsol("worhp") and not args.ignore_memory_heavy:
-#   qpsols.append(("nlpsol",{"nlpsol": "worhp", "nlpsol_options": {"TolOpti": 1e-12}},{}))
-
-# if has_nlpsol("worhp") and not args.ignore_memory_heavy:
-#   qpsols.append(("nlpsol.worhp",{"nlpsol_options": {"TolOpti": 1e-12}},{}))
-
-# if has_qpsol("ooqp"):
-#   qpsols.append(("ooqp",{},{}))
+if has_qpsol("ooqp"):
+  qpsols.append(("ooqp",{},{"less_digits":1}))
 
 if has_qpsol("qpoases"):
   qpsols.append(("qpoases",{},{}))

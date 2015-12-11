@@ -87,10 +87,10 @@ namespace casadi {
     iclow_.resize(nc_);
     cupp_.resize(nc_);
     icupp_.resize(nc_);
-    dQ_.resize(input(QPSOL_H).nnz_upper());
+    dQ_.resize(sparsity_in(QPSOL_H).nnz_upper());
     irowQ_.resize(dQ_.size());
     jcolQ_.resize(dQ_.size());
-    dA_.resize(input(QPSOL_A).nnz());
+    dA_.resize(nnz_in(QPSOL_A));
     irowA_.resize(dA_.size());
     jcolA_.resize(dA_.size());
     dC_.resize(dA_.size());
@@ -99,7 +99,7 @@ namespace casadi {
     x_index_.resize(n_);
     c_index_.resize(nc_);
     p_.resize(n_);
-    AT_ = DM::zeros(input(QPSOL_A).sparsity().T());
+    AT_ = DM::zeros(sparsity_in(QPSOL_A).T());
     AT_tmp_.resize(nc_);
 
     // Solution
@@ -110,25 +110,37 @@ namespace casadi {
     z_.resize(nc_);
     lambda_.resize(nc_);
     pi_.resize(nc_);
+
+    // Allocate work vectors
+    alloc_w(n_, true); // g
+    alloc_w(n_, true); // lbx
+    alloc_w(n_, true); // ubx
+    alloc_w(nc_, true); // lba
+    alloc_w(nc_, true); // uba
+    alloc_w(nnz_in(QPSOL_H), true); // H
+    alloc_w(nnz_in(QPSOL_A), true); // A
   }
 
   void OoqpInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    // Pass the inputs to the function
-    for (int i=0; i<n_in(); ++i) {
-      casadi_copy(arg[i], nnz_in(i), input(i).ptr());
-    }
-
     if (inputs_check_) {
-      checkInputs(input(QPSOL_LBX).ptr(), input(QPSOL_UBX).ptr(),
-                  input(QPSOL_LBA).ptr(), input(QPSOL_UBA).ptr());
+      checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
     }
 
     // Get problem data
-    const vector<double>& lbx = input(QPSOL_LBX).data();
-    const vector<double>& ubx = input(QPSOL_UBX).data();
-    const vector<double>& lba = input(QPSOL_LBA).data();
-    const vector<double>& uba = input(QPSOL_UBA).data();
-    const vector<double>& g = input(QPSOL_G).data();
+    double* g=w; w += n_;
+    casadi_copy(arg[QPSOL_G], n_, g);
+    double* lbx=w; w += n_;
+    casadi_copy(arg[QPSOL_LBX], n_, lbx);
+    double* ubx=w; w += n_;
+    casadi_copy(arg[QPSOL_UBX], n_, ubx);
+    double* lba=w; w += nc_;
+    casadi_copy(arg[QPSOL_LBA], nc_, lba);
+    double* uba=w; w += nc_;
+    casadi_copy(arg[QPSOL_UBA], nc_, uba);
+    double* H=w; w += nnz_in(QPSOL_H);
+    casadi_copy(arg[QPSOL_H], nnz_in(QPSOL_H), H);
+    double* A=w; w += nnz_in(QPSOL_A);
+    casadi_copy(arg[QPSOL_A], nnz_in(QPSOL_A), A);
 
     // Parameter contribution to the objective
     double objParam = 0;
@@ -168,9 +180,8 @@ namespace casadi {
     }
 
     // Get quadratic term
-    const vector<double>& H = input(QPSOL_H).data();
-    const int* H_colind = input(QPSOL_H).colind();
-    const int* H_row = input(QPSOL_H).row();
+    const int* H_colind = sparsity_in(QPSOL_H).colind();
+    const int* H_row = sparsity_in(QPSOL_H).row();
     int nnzQ = 0;
     // Loop over the columns of the quadratic term
     for (int cc=0; cc<n_; ++cc) {
@@ -209,9 +220,8 @@ namespace casadi {
     }
 
     // Get the transpose of the sparsity pattern to be able to loop over the constraints
-    const vector<double>& A = input(QPSOL_A).data();
-    const int* A_colind = input(QPSOL_A).colind();
-    const int* A_row = input(QPSOL_A).row();
+    const int* A_colind = sparsity_in(QPSOL_A).colind();
+    const int* A_row = sparsity_in(QPSOL_A).row();
     vector<double>& AT = AT_.data();
     const int* AT_colind = AT_.colind();
     const int* AT_row = AT_.row();
@@ -282,39 +292,6 @@ namespace casadi {
         }
         c_index_[j] = 1+nC++;
       }
-    }
-
-    // Print problem
-    if (verbose()) {
-      userOut() << "Attempting to solve the QP:" << endl;
-      userOut() << "   minimize    1/2*x'*Q*x + c'*x" << endl;
-      userOut() << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
-      userOut() << "with" << endl;
-      userOut() << "Q = " <<
-          tril2symm(DM::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
-                                     vector<int>(jcolQ_.begin(), jcolQ_.begin()+nnzQ),
-                                     vector<double>(dQ_.begin(), dQ_.begin()+nnzQ),
-                                     nx, nx)) << endl;
-      userOut() << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
-      userOut() << "A = " << DM::triplet(vector<int>(irowA_.begin(),
-                                                     irowA_.begin()+nnzA),
-                                        vector<int>(jcolA_.begin(),
-                                                    jcolA_.begin()+nnzA),
-                                        vector<double>(dA_.begin(),
-                                                       dA_.begin()+nnzA),
-                                         nA, nx) << endl;
-      userOut() << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
-      userOut() << "C = " << DM::triplet(vector<int>(irowC_.begin(),
-                                                     irowC_.begin()+nnzC),
-                                        vector<int>(jcolC_.begin(),
-                                                    jcolC_.begin()+nnzC),
-                                        vector<double>(dC_.begin(),
-                                                       dC_.begin()+nnzC),
-                                         nC, nx) << endl;
-      userOut() << "d = " << printBounds(clow_, iclow_, nC, "-") << endl;
-      userOut() << "f = " << printBounds(cupp_, icupp_, nC, "") << endl;
-      userOut() << "l = " << printBounds(xlow_, ixlow_, nx, "-") << endl;
-      userOut() << "u = " << printBounds(xupp_, ixupp_, nx, "") << endl;
     }
 
     // Reset the solution
@@ -390,58 +367,58 @@ namespace casadi {
       casadi_error("Fatal error: " << errFlag(ierr));
     }
 
-    // Save optimal cost
-    output(QPSOL_COST).set(objectiveValue + objParam);
-
-    // Save primal solution
-    vector<double>& x = output(QPSOL_X).data();
-    for (int i=0; i<n_; ++i) {
+    // Retrieve eliminated decision variables
+    for (int i=n_-1; i>=0; --i) {
       int ii = x_index_[i];
       if (ii<0) {
-        x[i] = p_[-1-ii];
+        x_[i] = p_[-1-ii];
       } else {
-        x[i] = x_[ii];
+        x_[i] = x_[ii];
       }
     }
 
-    // Save dual solution (linear bounds)
-    vector<double>& lam_a = output(QPSOL_LAM_A).data();
-    for (int j=0; j<nc_; ++j) {
+    // Retreive eliminated dual variables (linear bounds)
+    for (int j=nc_-1; j>=0; --j) {
       int jj = c_index_[j];
       if (jj==0) {
-        lam_a[j] = 0;
+        lambda_[j] = 0;
       } else if (jj<0) {
-        lam_a[j] = -y_[-1-jj];
+        lambda_[j] = -y_[-1-jj];
       } else {
-        lam_a[j] = pi_[-1+jj]-lambda_[-1+jj];
+        lambda_[j] = pi_[-1+jj]-lambda_[-1+jj];
       }
     }
 
-    // Save dual solution (simple bounds)
-    vector<double>& lam_x = output(QPSOL_LAM_X).data();
-    for (int i=0; i<n_; ++i) {
+    // Retreive eliminated dual variables (simple bounds)
+    for (int i=n_-1; i>=0; --i) {
       int ii = x_index_[i];
       if (ii<0) {
         // The dual solution for the fixed parameters follows from the KKT conditions
-        lam_x[i] = -g[i];
+        gamma_[i] = -g[i];
         for (int el=H_colind[i]; el<H_colind[i+1]; ++el) {
           int j=H_row[el];
-          lam_x[i] -= H[el]*x[j];
+          gamma_[i] -= H[el]*x_[j];
         }
         for (int el=A_colind[i]; el<A_colind[i+1]; ++el) {
           int j=A_row[el];
-          lam_x[i] -= A[el]*lam_a[j];
+          gamma_[i] -= A[el]*lambda_[j];
         }
       } else {
-        lam_x[i] = phi_[ii]-gamma_[ii];
+        gamma_[i] = phi_[ii]-gamma_[ii];
       }
     }
 
-    // Get the outputs
-    // Get the outputs
-    for (int i=0; i<n_out(); ++i) {
-      casadi_copy(output(i).ptr(), nnz_out(i), res[i]);
-    }
+    // Save optimal cost
+    if (res[QPSOL_COST]) *res[QPSOL_COST] = objectiveValue + objParam;
+
+    // Save primal solution
+    casadi_copy(getPtr(x_), n_, res[QPSOL_X]);
+
+    // Save dual solution (linear bounds)
+    casadi_copy(getPtr(lambda_), nc_, res[QPSOL_LAM_A]);
+
+    // Save dual solution (simple bounds)
+    casadi_copy(getPtr(gamma_), n_, res[QPSOL_LAM_X]);
   }
 
   const char* OoqpInterface::errFlag(int flag) {
