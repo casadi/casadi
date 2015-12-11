@@ -77,39 +77,10 @@ namespace casadi {
     artol_ = option("artol");
 
     // Allocate memory for problem
-    c_.resize(n_);
-    xlow_.resize(n_);
-    ixlow_.resize(n_);
-    xupp_.resize(n_);
-    ixupp_.resize(n_);
-    bA_.resize(nc_);
-    clow_.resize(nc_);
-    iclow_.resize(nc_);
-    cupp_.resize(nc_);
-    icupp_.resize(nc_);
-    dQ_.resize(sparsity_in(QPSOL_H).nnz_upper());
-    irowQ_.resize(dQ_.size());
-    jcolQ_.resize(dQ_.size());
-    dA_.resize(nnz_in(QPSOL_A));
-    irowA_.resize(dA_.size());
-    jcolA_.resize(dA_.size());
-    dC_.resize(dA_.size());
-    irowC_.resize(dC_.size());
-    jcolC_.resize(dC_.size());
-    x_index_.resize(n_);
-    c_index_.resize(nc_);
-    p_.resize(n_);
-    AT_ = DM::zeros(sparsity_in(QPSOL_A).T());
-    AT_tmp_.resize(nc_);
-
-    // Solution
-    x_.resize(n_);
-    gamma_.resize(n_);
-    phi_.resize(n_);
-    y_.resize(nc_);
-    z_.resize(nc_);
-    lambda_.resize(nc_);
-    pi_.resize(nc_);
+    nQ_ = sparsity_in(QPSOL_H).nnz_upper();
+    nA_ = nnz_in(QPSOL_A);
+    nH_ = nnz_in(QPSOL_H);
+    spAT_ = sparsity_in(QPSOL_A).T();
 
     // Allocate work vectors
     alloc_w(n_, true); // g
@@ -117,8 +88,39 @@ namespace casadi {
     alloc_w(n_, true); // ubx
     alloc_w(nc_, true); // lba
     alloc_w(nc_, true); // uba
-    alloc_w(nnz_in(QPSOL_H), true); // H
-    alloc_w(nnz_in(QPSOL_A), true); // A
+    alloc_w(nH_, true); // H
+    alloc_w(nA_, true); // A
+    alloc_w(n_, true); // c_
+    alloc_w(nc_, true); // bA_
+    alloc_w(n_, true); // xlow_
+    alloc_w(n_, true); // xupp_
+    alloc_w(nc_, true); // clow_
+    alloc_w(nc_, true); // cupp_
+    alloc_w(n_, true); // x_
+    alloc_w(n_, true); // gamma_
+    alloc_w(n_, true); // phi_
+    alloc_w(nc_, true); // y_
+    alloc_w(nc_, true); // z_
+    alloc_w(nc_, true); // lambda_
+    alloc_w(nc_, true); // pi_
+    alloc_iw(n_, true); // ixlow_
+    alloc_iw(n_, true); // ixupp_
+    alloc_iw(nc_, true); // iclow_
+    alloc_iw(nc_, true); // icupp_
+    alloc_w(nQ_, true); // dQ_
+    alloc_w(nA_, true); // dA_
+    alloc_w(nA_, true); // dC_
+    alloc_iw(nQ_, true); // irowQ_
+    alloc_iw(nQ_, true); // jcolQ_
+    alloc_iw(nA_, true); // irowA_
+    alloc_iw(nA_, true); // jcolA_
+    alloc_iw(nA_, true); // irowC_
+    alloc_iw(nA_, true); // jcolC_
+    alloc_iw(n_, true); // x_index_
+    alloc_iw(nc_, true); // c_index_
+    alloc_w(n_, true); // p_
+    alloc_w(nA_, true); // AT
+    alloc_iw(nc_); // casadi_trans
   }
 
   void OoqpInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
@@ -141,6 +143,38 @@ namespace casadi {
     casadi_copy(arg[QPSOL_H], nnz_in(QPSOL_H), H);
     double* A=w; w += nnz_in(QPSOL_A);
     casadi_copy(arg[QPSOL_A], nnz_in(QPSOL_A), A);
+
+    // Temporary memory
+    double* c_ = w; w += n_;
+    double* bA_ = w; w += nc_;
+    double* xlow_ = w; w += n_;
+    double* xupp_ = w; w += n_;
+    double* clow_ = w; w += nc_;
+    double* cupp_ = w; w += nc_;
+    double* x_ = w; w += n_;
+    double* gamma_ = w; w += n_;
+    double* phi_ = w; w += n_;
+    double* y_ = w; w += nc_;
+    double* z_ = w; w += nc_;
+    double* lambda_ = w; w += nc_;
+    double* pi_ = w; w += nc_;
+    char* ixlow_ = reinterpret_cast<char*>(iw); iw += n_;
+    char* ixupp_ = reinterpret_cast<char*>(iw); iw += n_;
+    char* iclow_ = reinterpret_cast<char*>(iw); iw += nc_;
+    char* icupp_ = reinterpret_cast<char*>(iw); iw += nc_;
+    double* dQ_ = w; w += nQ_;
+    double* dA_ = w; w += nA_;
+    double* dC_ = w; w += nA_;
+    int* irowQ_ = iw; iw += nQ_;
+    int* jcolQ_ = iw; iw += nQ_;
+    int* irowA_ = iw; iw += nA_;
+    int* jcolA_ = iw; iw += nA_;
+    int* irowC_ = iw; iw += nA_;
+    int* jcolC_ = iw; iw += nA_;
+    int* x_index_ = iw; iw += n_;
+    int* c_index_ = iw; iw += nc_;
+    double* p_ = w; w += n_;
+    double* AT = w; w += nA_;
 
     // Parameter contribution to the objective
     double objParam = 0;
@@ -220,21 +254,13 @@ namespace casadi {
     }
 
     // Get the transpose of the sparsity pattern to be able to loop over the constraints
-    const int* A_colind = sparsity_in(QPSOL_A).colind();
-    const int* A_row = sparsity_in(QPSOL_A).row();
-    vector<double>& AT = AT_.data();
-    const int* AT_colind = AT_.colind();
-    const int* AT_row = AT_.row();
-    std::copy(AT_colind, AT_colind+nc_, AT_tmp_.begin());
-    for (int cc=0; cc<n_; ++cc) {
-      for (int el=A_colind[cc]; el<A_colind[cc+1]; ++el) {
-        int rr=A_row[el];
-        int elT = AT_tmp_[rr]++;
-        AT[elT] = A[el];
-      }
-    }
+    casadi_trans(A, sparsity_in(QPSOL_A), AT, spAT_, iw);
 
     // Loop over constraints
+    const int* A_colind = sparsity_in(QPSOL_A).colind();
+    const int* A_row = sparsity_in(QPSOL_A).row();
+    const int* AT_colind = spAT_.colind();
+    const int* AT_row = spAT_.row();
     int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
     for (int j=0; j<nc_; ++j) {
       if (lba[j] == -numeric_limits<double>::infinity() &&
@@ -295,13 +321,13 @@ namespace casadi {
     }
 
     // Reset the solution
-    fill(x_.begin(), x_.end(), 0);
-    fill(gamma_.begin(), gamma_.end(), 0);
-    fill(phi_.begin(), phi_.end(), 0);
-    fill(y_.begin(), y_.end(), 0);
-    fill(z_.begin(), z_.end(), 0);
-    fill(lambda_.begin(), lambda_.end(), 0);
-    fill(pi_.begin(), pi_.end(), 0);
+    casadi_fill(x_, n_, 0.);
+    casadi_fill(gamma_, n_, 0.);
+    casadi_fill(phi_, n_, 0.);
+    casadi_fill(y_, nc_, 0.);
+    casadi_fill(z_, nc_, 0.);
+    casadi_fill(lambda_, nc_, 0.);
+    casadi_fill(pi_, nc_, 0.);
 
     // Solve the QP
     double objectiveValue;
@@ -309,18 +335,18 @@ namespace casadi {
     int ierr;
     if (false) { // Use C interface
       // TODO(jgillis): Change to qpsolvehb, see OOQP users guide
-      qpsolvesp(getPtr(c_), nx,
-                getPtr(irowQ_),  nnzQ, getPtr(jcolQ_), getPtr(dQ_),
-                getPtr(xlow_), getPtr(ixlow_),
-                getPtr(xupp_), getPtr(ixupp_),
-                getPtr(irowA_), nnzA, getPtr(jcolA_), getPtr(dA_),
-                getPtr(bA_), nA,
-                getPtr(irowC_), nnzC, getPtr(jcolC_), getPtr(dC_),
-                getPtr(clow_), nC, getPtr(iclow_),
-                getPtr(cupp_), getPtr(icupp_),
-                getPtr(x_), getPtr(gamma_), getPtr(phi_),
-                getPtr(y_),
-                getPtr(z_), getPtr(lambda_), getPtr(pi_),
+      qpsolvesp(c_, nx,
+                irowQ_,  nnzQ, jcolQ_, dQ_,
+                xlow_, ixlow_,
+                xupp_, ixupp_,
+                irowA_, nnzA, jcolA_, dA_,
+                bA_, nA,
+                irowC_, nnzC, jcolC_, dC_,
+                clow_, nC, iclow_,
+                cupp_, icupp_,
+                x_, gamma_, phi_,
+                y_,
+                z_, lambda_, pi_,
                 &objectiveValue,
                 print_level_, &ierr);
     } else { // Use C++ interface
@@ -332,19 +358,19 @@ namespace casadi {
       std::vector<int> krowC(nC+1);
 
       //int status_code = 0;
-      makehb(getPtr(irowQ_), nnzQ, getPtr(krowQ), nx, &ierr);
-      if (ierr == 0) makehb(getPtr(irowA_), nnzA, getPtr(krowA), nA, &ierr);
-      if (ierr == 0) makehb(getPtr(irowC_), nnzC, getPtr(krowC), nC, &ierr);
+      makehb(irowQ_, nnzQ, getPtr(krowQ), nx, &ierr);
+      if (ierr == 0) makehb(irowA_, nnzA, getPtr(krowA), nA, &ierr);
+      if (ierr == 0) makehb(irowC_, nnzC, getPtr(krowC), nC, &ierr);
 
       if (ierr == 0) {
         QpGenContext ctx;
 
-        QpGenHbGondzioSetup(getPtr(c_), nx, getPtr(krowQ), getPtr(jcolQ_), getPtr(dQ_),
-        getPtr(xlow_), getPtr(ixlow_), getPtr(xupp_), getPtr(ixupp_),
-        getPtr(krowA), nA, getPtr(jcolA_), getPtr(dA_), getPtr(bA_),
-        getPtr(krowC), nC, getPtr(jcolC_), getPtr(dC_),
-        getPtr(clow_), getPtr(iclow_), getPtr(cupp_), getPtr(icupp_), &ctx,
-        &ierr);
+        QpGenHbGondzioSetup(c_, nx, getPtr(krowQ), jcolQ_, dQ_,
+                            xlow_, ixlow_, xupp_, ixupp_,
+                            getPtr(krowA), nA, jcolA_, dA_, bA_,
+                            getPtr(krowC), nC, jcolC_, dC_,
+                            clow_, iclow_, cupp_, icupp_, &ctx,
+                            &ierr);
         if (ierr == 0) {
           Solver* solver = static_cast<Solver *>(ctx.solver);
           gOoqpPrintLevel = print_level_;
@@ -352,9 +378,9 @@ namespace casadi {
           solver->setMuTol(mutol_);
           solver->setMuTol(mutol_);
 
-          QpGenFinish(&ctx, getPtr(x_), getPtr(gamma_), getPtr(phi_),
-              getPtr(y_), getPtr(z_), getPtr(lambda_), getPtr(pi_),
-              &objectiveValue, &ierr);
+          QpGenFinish(&ctx, x_, gamma_, phi_,
+                      y_, z_, lambda_, pi_,
+                      &objectiveValue, &ierr);
         }
 
         QpGenCleanup(&ctx);
@@ -412,13 +438,13 @@ namespace casadi {
     if (res[QPSOL_COST]) *res[QPSOL_COST] = objectiveValue + objParam;
 
     // Save primal solution
-    casadi_copy(getPtr(x_), n_, res[QPSOL_X]);
+    casadi_copy(x_, n_, res[QPSOL_X]);
 
     // Save dual solution (linear bounds)
-    casadi_copy(getPtr(lambda_), nc_, res[QPSOL_LAM_A]);
+    casadi_copy(lambda_, nc_, res[QPSOL_LAM_A]);
 
     // Save dual solution (simple bounds)
-    casadi_copy(getPtr(gamma_), n_, res[QPSOL_LAM_X]);
+    casadi_copy(gamma_, n_, res[QPSOL_LAM_X]);
   }
 
   const char* OoqpInterface::errFlag(int flag) {
