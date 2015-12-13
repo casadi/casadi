@@ -135,7 +135,7 @@ namespace casadi {
                           double gObj[],
                           double yCon[], double pi[], double rc[], double rg[], double x[],
                           char cu[], int *lencu, int iu[], int *leniu, double ru[], int *lenru,
-                          char cw[], int *lencw, int iw[], int *leniw, double rw[], int *lenrw );
+                          char cw[], int *lencw, int iw[], int *leniw, double rw[], int *lenrw);
 
     // Matrix A has a linear objective row
     bool jacF_row_;
