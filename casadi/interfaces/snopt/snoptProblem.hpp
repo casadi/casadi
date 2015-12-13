@@ -1,11 +1,7 @@
-// Used with permission from the SNOPT developers
-
 #ifndef SNOPTPROBLEM_H
 #define SNOPTPROBLEM_H
 
 #include "snopt.h"
-
-/// \cond INTERNAL
 
 /* File snoptProblem.hpp
  *   C++ interface for SNOPT
@@ -33,7 +29,7 @@ protected:
   char    Prob[30];
 
   int     inform;
-  int     initCalled, memCalled;
+  int     initCalled, memCalled, allocA, allocG;
 
   int     leniw, lenrw;
   double *rw;
@@ -112,17 +108,15 @@ public:
   snoptProblemA( const char *name, const char *prtfile );
   ~snoptProblemA();
 
-  int  computeJac    ();
+  int  computeJac    ( int &neA, int &neG );
   int  solve         ( int starttype );
   void setWorkspace  ();
 
   void setProblemSize( int n, int neF );
   void setObjective  ( int ObjRow, double ObjAdd );
 
-  void setA          ( int lenA, int *iAfun, int *jAvar, double *A );
-  void setG          ( int lenG, int *iGfun, int *jGvar );
-  void setNeA        ( int neA );
-  void setNeG        ( int neG );
+  void setA          ( int lenA, int neA, int *iAfun, int *jAvar, double *A );
+  void setG          ( int lenG, int neG, int *iGfun, int *jGvar );
 
   void setX          ( double *x, double *xlow, double *xupp,
                        double *xmul, int *xstate );
@@ -191,7 +185,5 @@ public:
   void setFuncon     ( snConB funcon );
   void setFunobj     ( snObjB funobj );
 };
-
-/// \endcond
 
 #endif /* SNOPTPROBLEM_H */

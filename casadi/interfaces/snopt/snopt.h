@@ -1,5 +1,3 @@
-// Used with permission from the SNOPT developers
-
 #ifndef SNOPT_H
 #define SNOPT_H
 
@@ -30,7 +28,7 @@ extern "C" {
   ( int *Prob, char *ProbTag, int *Elastc, int *gotR, int *jstFea, int *feasbl,
     int *m, int *mBS, int *nnH, int *nS, int *jSq, int *jBr, int *jSr,
     int *linesP, int *linesS, int *itn, int *itQP, int *kPrc, int *lvlInf,
-    double *pivot, double *step, int *n_inf, double *sInf, double *wtInf,
+    double *pivot, double *step, int *nInf, double *sInf, double *wtInf,
     double *ObjPrt, double *condHz, double *djqPrt, double *rgNorm,
     int kBS[], double xBS[],
     int iw[], int *leniw );
@@ -39,13 +37,13 @@ extern "C" {
   ( int *Prob, char *ProbTag, int *Elastc, int *gotR, int *jstFea, int *feasbl,
     int *m, int *mBS, int *nnH, int *nS, int *jSq, int *jBr, int *jSr,
     int *linesP, int *linesS, int *itn, int *itQP, int *kPrc, int *lvlInf,
-    double *pivot, double *step, int *n_inf, double *sInf, double *wtInf,
+    double *pivot, double *step, int *nInf, double *sInf, double *wtInf,
     double *ObjPrt, double *condHz, double *djqPrt, double *rgNorm,
     int kBS[], double xBS[],
     int iw[], int *leniw );
 
   typedef void (*isnSTOP)
-  ( int *iAbort, int *info, int *HQNType, int KTcond[], int *MjrPrt, int *minimz,
+  ( int *iAbort, int KTcond[], int *MjrPrt, int *minimz,
     int *m, int *maxS, int *n, int *nb,
     int *nnCon0, int *nnCon, int *nnObj0, int *nnObj, int *nS,
     int *itn, int *nMajor, int *nMinor, int *nSwap,
@@ -92,130 +90,129 @@ extern "C" {
     double   ru[], int   *lenru );
 
 
-  void f_sninit ( const char *name, int *len, int *iprint, int *isumm,
-		  int *iw, int *leniw, double *rw, int *lenrw );
-  void f_snspec ( const char *specfile, int *len, int *inform,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+  void f_sninit ( const char *name, int len, int iprint, int isumm,
+		  int iw[], int leniw, double rw[], int lenrw );
+  void f_snspec ( const char *specfile, int len, int *inform,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_sngetc ( const char *buffer, int *lenb, char *ivalue,
-		  int *lenc, int *errors,
-		  int *iw, int *leniw, double *rw, int *lenrw );
-  void f_sngeti ( const char *buffer, int *len, int  *ivalue, int *errors,
-		  int *iw, int *leniw, double *rw, int *lenrw );
-  void f_sngetr ( const char *buffer, int *len, double *ivalue, int *errors,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+  void f_sngetc ( const char *buffer, int lenb, char *ivalue,
+		  int lenc, int *errors,
+		  int iw[], int leniw, double rw[], int lenrw );
+  void f_sngeti ( const char *buffer, int len, int  *ivalue, int *errors,
+		  int iw[], int leniw, double rw[], int lenrw );
+  void f_sngetr ( const char *buffer, int len, double *ivalue, int *errors,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_snset  ( const char *buffer, int *len, int *errors,
-		  int *iw, int *leniw, double *rw, int *lenrw );
-  void f_snseti ( const char *buffer, int *len,
-		  int *iopt, int *errors,
-		  int *iw, int *leniw, double *rw, int *lenrw );
-  void f_snsetr ( const char *buffer, int *len,
-		  double *rvalue, int *errors,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+  void f_snset  ( const char *buffer, int len, int *errors,
+		  int iw[], int leniw, double rw[], int lenrw );
+  void f_snseti ( const char *buffer, int len, int iopt, int *errors,
+		  int iw[], int leniw, double rw[], int lenrw );
+  void f_snsetr ( const char *buffer, int len, double rvalue, int *errors,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_snsetprint ( const char *name, int *len, int *iprint,
-		      int *iw, int *leniw, double *rw, int *lenrw );
-  void f_snend ( int *iprint );
+  void f_snsetprint ( const char *name, int len, int iprint,
+		      int iw[], int leniw, double rw[], int lenrw );
+  void f_snend ( int iprint );
 
   /* SNOPTA */
-  void f_snopta ( int *start, const char *name,
-		  int *nf, int *n, double *objadd, int *objrow,
+  void f_snopta ( int start, const char *name,
+		  int nf, int n, double objadd, int objrow,
 		  snFunA usrfun,
-		  int *iAfun, int *jAvar, int *neA, double *A,
-		  int *iGfun, int *jGvar, int *neG,
-		  double *xlow, double *xupp,
-		  double *flow, double *fupp,
-		  double *x, int *xstate, double *xmul,
-		  double *f, int *fstate, double *fmul,
+		  int iAfun[], int jAvar[], int neA, double A[],
+		  int iGfun[], int jGvar[], int neG,
+		  double xlow[], double xupp[],
+		  double flow[], double fupp[],
+		  double x[], int xstate[], double xmul[],
+		  double f[], int fstate[], double fmul[],
 		  int *inform, int *ns, int *ninf, double *sinf,
 		  int *miniw, int *minrw,
-		  int *iu, int *leniu, double *ru, int *lenru,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+		  int iu[], int leniu, double ru[], int lenru,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_snkera ( int *start, const char *name,
-		  int *nf, int *n, double *objadd, int *objrow,
+  void f_snkera ( int start, const char *name,
+		  int nf, int n, double objadd, int objrow,
 		  snFunA usrfun, isnLog snLog, isnLog2 snLog2,
 		  isqLog sqLog, isnSTOP snSTOP,
-		  int *iAfun, int *jAvar, int *neA, double *A,
-		  int *iGfun, int *jGvar, int *neG,
-		  double *xlow, double *xupp,
-		  double *flow, double *fupp,
-		  double *x, int *xstate, double *xmul,
-		  double *f, int *fstate, double *fmul,
+		  int iAfun[], int jAvar[], int neA, double A[],
+		  int iGfun[], int jGvar[], int neG,
+		  double xlow[], double xupp[],
+		  double flow[], double fupp[],
+		  double x[], int xstate[], double xmul[],
+		  double f[], int fstate[], double fmul[],
 		  int *inform, int *ns, int *ninf, double *sinf,
 		  int *miniw, int *minrw,
-		  int *iu, int *leniu, double *ru, int *lenru,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+		  int iu[], int leniu, double ru[], int lenru,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_snjac  ( int *info, int *nf, int *n, snFunA usrfun,
-		  double *x, double *xlow, double *xupp,
-		  int *iAfun, int *jAvar, int *lenA, int *neA, double *A,
-		  int *iGfun, int *jGvar, int *lenG, int *neG,
+  void f_snjac  ( int *info, int nf, int n, snFunA usrfun,
+		  double x[], double xlow[], double xupp[],
+		  int iAfun[], int jAvar[], int lenA, int *neA, double A[],
+		  int iGfun[], int jGvar[], int lenG, int *neG,
 		  int *miniw, int *minrw,
-		  int *iu, int *leniu, double *ru, int *lenru,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+		  int iu[], int leniu, double ru[], int lenru,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_snmema ( int *info, int *nf, int *n, int *neA, int *neG,
+  void f_snmema ( int *info, int nf, int n, int neA, int neG,
 		  int *miniw, int *minrw,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+		  int iw[], int leniw, double rw[], int lenrw );
 
   /* SNOPTB/C */
-  void f_snoptb ( int *start, const char *name,
-		  int *m, int *n, int*ne, int *nncon,
-		  int *nnobj, int *nnjac, int *iobj, double *objadd,
+  void f_snoptb ( int start, const char *name,
+		  int m, int n, int ne, int nncon,
+		  int nnobj, int nnjac, int iobj, double objadd,
 		  snConB funcon, snObjB funobj,
-		  double *jval, int *indj, int *locj,
-		  double *bl, double *bu, int *hs, double *x,
-		  double *pi, double *rc, int *inform,
+		  double jval[], int indj[], int locj[],
+		  double bl[], double bu[], int hs[], double x[],
+		  double pi[], double rc[], int *inform,
 		  int *ns, int *ninf, double *sinf, double *obj,
-		  int *miniw, int*minrw,
-		  int *iu, int *leniu, double *ru, int *lenru,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+		  int *miniw, int *minrw,
+		  int iu[], int leniu, double ru[], int lenru,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_snkerb ( int *start, const char *name,
-		  int *m, int *n, int*ne, int *nncon,
-		  int *nnobj, int *nnjac, int *iobj, double *objadd,
+  void f_snkerb ( int start, const char *name,
+		  int m, int n, int ne, int nncon,
+		  int nnobj, int nnjac, int iobj, double objadd,
 		  snConB funcon, snObjB funobj,
 		  isnLog snLog, isnLog2 snLog2,
 		  isqLog sqLog, isnSTOP snSTOP,
-		  double *jval, int *indj, int *locj,
-		  double *bl, double *bu, int *hs, double *x,
-		  double *pi, double *rc, int *inform,
+		  double jval[], int indj[], int locj[],
+		  double bl[], double bu[], int hs[], double x[],
+		  double pi[], double rc[], int *inform,
 		  int *ns, int *ninf, double *sinf, double *obj,
-		  int *miniw, int*minrw,
-		  int *iu, int *leniu, double *ru, int *lenru,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+		  int *miniw, int *minrw,
+		  int iu[], int leniu, double ru[], int lenru,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_snoptc ( int *start, const char *name,
-		  int *m, int *n, int*ne, int *nncon,
-		  int *nnobj, int *nnjac, int *iobj, double *objadd,
-		  snFunC usrfun, double *jval, int *indj, int *locj,
-		  double *bl, double *bu, int *hs, double *x,
-		  double *pi, double *rc, int *inform,
+  void f_snoptc ( int start, const char *name,
+		  int m, int n, int ne, int nncon,
+		  int nnobj, int nnjac, int iobj, double objadd,
+		  snFunC usrfun,
+		  double jval[], int indj[], int locj[],
+		  double bl[], double bu[], int hs[], double x[],
+		  double pi[], double rc[], int *inform,
 		  int *ns, int *ninf, double *sinf, double *obj,
-		  int *miniw, int*minrw,
-		  int *iu, int *leniu, double *ru, int *lenru,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+		  int *miniw, int *minrw,
+		  int iu[], int leniu, double ru[], int lenru,
+		  int iw[], int leniw, double rw[], int lenrw );
 
-  void f_snkerc ( int *start, const char *name,
-		  int *m, int *n, int*ne, int *nncon,
-		  int *nnobj, int *nnjac, int *iobj, double *objadd,
+  void f_snkerc ( int start, const char *name,
+		  int m, int n, int ne, int nncon,
+		  int nnobj, int nnjac, int iobj, double objadd,
 		  snFunC usrfun,
 		  isnLog snLog, isnLog2 snLog2,
 		  isqLog sqLog, isnSTOP snSTOP,
-		  double *jval, int *indj, int *locj,
-		  double *bl, double *bu, int *hs, double *x,
-		  double *pi, double *rc, int *inform,
+		  double jval[], int indj[], int locj[],
+		  double bl[], double bu[], int hs[], double x[],
+		  double pi[], double rc[], int *inform,
 		  int *ns, int *ninf, double *sinf, double *obj,
-		  int *miniw, int*minrw,
-		  int *iu, int *leniu, double *ru, int *lenru,
-		  int *iw, int *leniw, double *rw, int *lenrw );
-
-  void f_snmem  ( int *info, int *m, int *n, int *ne, int *negcon,
-		  int *nncon, int *nnobj, int *nnjac,
 		  int *miniw, int *minrw,
-		  int *iw, int *leniw, double *rw, int *lenrw );
+		  int iu[], int leniu, double ru[], int lenru,
+		  int iw[], int leniw, double rw[], int lenrw );
+
+  void f_snmem  ( int *info, int m, int n, int ne, int negcon,
+		  int nncon, int nnobj, int nnjac,
+		  int *miniw, int *minrw,
+		  int iw[], int leniw, double rw[], int lenrw );
 
 #ifdef __cplusplus
 }

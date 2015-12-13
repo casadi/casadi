@@ -512,18 +512,6 @@ namespace casadi {
     // Check the provided inputs
     checkInputs(mem);
 
-    if (gather_stats_) {
-      Dict iterations;
-      iterations["inf_pr"] = std::vector<double>();
-      iterations["inf_du"] = std::vector<double>();
-      iterations["merit"] = std::vector<double>();
-      iterations["step_size"] = std::vector<double>();
-      iterations["pen_norm"] = std::vector<double>();
-      iterations["cond_H"] = std::vector<double>();
-      iterations["qp_num_iter"] = std::vector<int>();
-      stats_["iterations"] = iterations;
-    }
-
     // Evaluate gradF and jacG at initial value
     if (!jacG_.isNull()) {
       jacG_.setInput(input(NLPSOL_X0), JACG_X);
@@ -614,19 +602,6 @@ namespace casadi {
 
     // Pointer magic, courtesy of Greg
     casadi_assert_message(!jacF_.isNull(), "blaasssshc");
-
-    if (monitored("setup_nlp")) {
-      userOut() << "indA:" << row << std::endl;
-      userOut() << "locA:" << col << std::endl;
-      userOut() << "colA:" << A_data_ << std::endl;
-      A_structure_.sparsity().spy();
-      userOut() << "A:" << DM(A_structure_.sparsity(), A_data_) << std::endl;
-      userOut() << "n:" << n << std::endl;
-      userOut() << "m:" << m_ << std::endl;
-      userOut() << "nea:" << nea << std::endl;
-      userOut() << "bl_:" << bl_ << std::endl;
-      userOut() << "bu_:" << bu_ << std::endl;
-    }
 
     // Outputs
     double Obj = 0; // TODO(Greg): get this from snopt
@@ -894,103 +869,62 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::callback(
-      int* iAbort, int* info, int HQNType, int* KTcond, int MjrPrt, int minimz,
-      int m, int maxS, int n, int nb, int nnCon0, int nnCon, int nnObj0, int nnObj, int nS,
-      int itn, int nMajor, int nMinor, int nSwap,
-      double condHz, int iObj, double sclObj, double ObjAdd,
-      double fMrt,  double PenNrm,  double step,
-      double prInf,  double duInf,  double vimax,  double virel, int* hs,
-      int ne, int nlocJ, int* locJ, int* indJ, double* Jcol, int negCon,
-      double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
-      double* yCon, double* pi, double* rc, double* rg, double* x,
-      char*   cu, int lencu, int* iu, int leniu, double* ru, int lenru,
-      char*   cw, int lencw,  int* iw, int leniw, double* rw, int lenrw) {
-    try {
-      n_iter_+=1;
-      if (gather_stats_) {
-        Dict iterations = stats_["iterations"];
-        append_to_vec(iterations["inf_pr"], static_cast<double>(prInf));
-        append_to_vec(iterations["inf_du"], static_cast<double>(duInf));
-        append_to_vec(iterations["merit"], static_cast<double>(fMrt));
-        append_to_vec(iterations["step_size"], static_cast<double>(step));
-        append_to_vec(iterations["pen_norm"], static_cast<double>(PenNrm));
-        append_to_vec(iterations["cond_H"], static_cast<double>(condHz));
-        append_to_vec(iterations["qp_num_iter"], static_cast<int>(nMinor));
-        stats_["iterations"] = iterations;
-      }
-      if (!fcallback_.isNull()) {
-        double time0 = clock();
-        for (int k = 0; k < nx_; ++k) {
-          int kk = x_order_[k];
-          output(NLPSOL_X).data()[kk] = xk_[k];
-          // output(NLPSOL_LAM_X).data()[kk] = -rc_[k];
-        }
-
-        // setOutput(Obj+ (jacF_row_? xk_[nx_+ng_] : 0), NLPSOL_F);
-        for (int k = 0; k < ng_; ++k) {
-          int kk =  g_order_[k];
-          // output(NLPSOL_LAM_G).data()[kk] = -rc_[nx_+k];
-          output(NLPSOL_G).data()[kk] = xk_[nx_+k];
-        }
-
-        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-          fcallback_.setInput(output(i), i);
-        }
-        fcallback_.evaluate();
-        double ret_double;
-        fcallback_.getOutput(ret_double);
-        *iAbort = static_cast<int>(ret_double);
-        t_callback_fun_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
-        n_callback_fun_ += 1;
-      }
-    } catch(std::exception& ex) {
-      if (option("iteration_callback_ignore_errors")) {
-        userOut<true, PL_WARN>() << "callback: " << ex.what() << std::endl;
-      } else {
-        throw ex;
-      }
-    }
-  }
-
   void SnoptInterface::userfunPtr(
       int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac,
       double *x, double *fObj, double *gObj, double * fCon, double* gCon,
       int* nState,
       char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru) {
-    SnoptInterface* interface;  // = reinterpret_cast<SnoptInterface*>(iu);
+    SnoptInterface* interface;
     memcpy(&interface, &(iu[0]), sizeof(SnoptInterface*));
-
     interface->userfun(mode, *nnObj, *nnCon, *nJac, *nnL, *neJac,
                        x, fObj, gObj, fCon, gCon, *nState,
                        cu, *lencu, iu, *leniu, ru, *lenru);
   }
 
-  void SnoptInterface::snStopPtr(
-    int* iAbort, int* info, int* HQNType, int* KTcond, int* MjrPrt, int* minimz,
-    int* m, int* maxS, int* n, int* nb,
-    int* nnCon0, int* nnCon, int* nnObj0, int* nnObj, int* nS,
-    int* itn, int* nMajor, int* nMinor, int* nSwap,
-    double * condHz, int* iObj, double * sclObj,  double *ObjAdd,
-    double * fMrt,  double * PenNrm,  double * step,
-    double *prInf,  double *duInf,  double *vimax,  double *virel, int* hs,
-    int* ne, int* nlocJ, int* locJ, int* indJ, double* Jcol, int* negCon,
-    double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
-    double* yCon, double* pi, double* rc, double* rg, double* x,
-    char*   cu, int * lencu, int* iu, int* leniu, double* ru, int *lenru,
-    char*   cw, int* lencw,  int* iw, int *leniw, double* rw, int* lenrw) {
-    SnoptInterface* interface;  // = reinterpret_cast<SnoptInterface*>(iu);
-    memcpy(&interface, &(iu[0]), sizeof(SnoptInterface*));
+  void SnoptInterface::
+  snStopPtr(int *iAbort, int KTcond[], int *MjrPrt, int *minimz,
+            int *m, int *maxS, int *n, int *nb,
+            int *nnCon0, int *nnCon, int *nnObj0, int *nnObj, int *nS,
+            int *itn, int *nMajor, int *nMinor, int *nSwap,
+            double *condHz, int *iObj, double *sclObj, double *ObjAdd,
+            double *fMrt, double *PenNrm, double *step,
+            double *prInf, double *duInf, double *vimax, double *virel, int hs[],
+            int *ne, int *nlocJ, int locJ[], int indJ[], double Jcol[], int *negCon,
+            double Ascale[], double bl[], double bu[], double fCon[], double gCon[], double gObj[],
+            double yCon[], double pi[], double rc[], double rg[], double x[],
+            char cu[], int *lencu, int iu[], int *leniu, double ru[], int *lenru,
+            char cw[], int *lencw, int iw[], int *leniw, double rw[], int *lenrw ) {
+    SnoptInterface* self;
+    memcpy(&self, &(iu[0]), sizeof(SnoptInterface*));
+    try {
+      self->n_iter_+=1;
+      if (!self->fcallback_.isNull()) {
+        double time0 = clock();
+        for (int k = 0; k < self->nx_; ++k) {
+          int kk = self->x_order_[k];
+          self->output(NLPSOL_X).data()[kk] = self->xk_[k];
+        }
+        for (int k = 0; k < self->ng_; ++k) {
+          int kk =  self->g_order_[k];
+          self->output(NLPSOL_G).data()[kk] = self->xk_[self->nx_+k];
+        }
 
-    interface->callback(iAbort, info, *HQNType, KTcond, *MjrPrt, *minimz,
-    *m, *maxS, *n, *nb, *nnCon0, *nnCon, *nnObj0, *nnObj, *nS,
-    *itn, *nMajor, *nMinor, *nSwap,
-    *condHz, *iObj, *sclObj, *ObjAdd,  *fMrt,  *PenNrm,  *step,
-    *prInf,  *duInf, *vimax, *virel, hs,
-    *ne, *nlocJ, locJ, indJ, Jcol, *negCon,
-    Ascale, bl, bu, fCon, gCon, gObj,
-    yCon, pi, rc, rg, x,
-     cu, *lencu, iu, *leniu, ru, *lenru,
-    cw, *lencw,  iw, *leniw, rw, *lenrw);
+        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
+          self->fcallback_.setInput(self->output(i), i);
+        }
+        self->fcallback_.evaluate();
+        double ret_double;
+        self->fcallback_.getOutput(ret_double);
+        *iAbort = static_cast<int>(ret_double);
+        self->t_callback_fun_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
+        self->n_callback_fun_ += 1;
+      }
+    } catch(std::exception& ex) {
+      if (self->option("iteration_callback_ignore_errors")) {
+        userOut<true, PL_WARN>() << "callback: " << ex.what() << std::endl;
+      } else {
+        throw ex;
+      }
+    }
   }
 }  // namespace casadi

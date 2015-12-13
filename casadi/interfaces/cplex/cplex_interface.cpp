@@ -163,7 +163,7 @@ namespace casadi {
               minus<int>());
 
     // Matrix H, count the number of elements per column
-    const Sparsity& H_sp = input(QPSOL_H).sparsity();
+    const Sparsity& H_sp = sparsity_in(QPSOL_H);
     qmatcnt_.resize(H_sp.size2());
     transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), qmatcnt_.begin(),
               minus<int>());
