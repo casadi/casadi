@@ -405,6 +405,9 @@ namespace casadi {
     n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
 
     // Allocate temporary memory
+    alloc_w(nx_, true); // xk2_
+    alloc_w(ng_, true); // lam_gk_
+    alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
     alloc_w(jacF_.nnz_out(0), true); // jac_fk_
     alloc_w(jacG_.nnz_out(0), true); // jac_gk_
@@ -455,6 +458,9 @@ namespace casadi {
     Nlpsol::reset(mem, arg, res, iw, w);
 
     // Work vectors
+    xk2_ = w; w += nx_;
+    lam_gk_ = w; w += ng_;
+    lam_xk_ = w; w += nx_;
     gk_ = w; w += ng_;
     jac_fk_ = w; w += jacF_.nnz_out(0);
     jac_gk_ = w; w += jacG_.nnz_out(0);
@@ -695,19 +701,22 @@ namespace casadi {
       casadi_assert_message(nnObj_ == nnObj, "Obj " << nnObj_ << " <-> " << nnObj);
       casadi_assert_message(nnJac_ == nnJac, "Jac " << nnJac_ << " <-> " << nnJac);
 
-      // Evaluate gradF with the linear variables put to zero
-      jacF_.setInput(0.0, NL_X);
-      jacF_.setInput(input(NLPSOL_P), NL_P);
+      // Get reduced decision variables
+      casadi_fill(x_, nx_, 0.);
       for (int k = 0; k < nnObj; ++k) {
         if (x_type_f_[x_order_[k]] == 2) {
-          jacF_.input(NL_X)[x_order_[k]] = x[k];
+          xk2_[x_order_[k]] = x[k];
         }
       }
 
-      jacF_.evaluate();
-
-      // provide objective (without linear contributions) to SNOPT
-      *fObj = jacF_.output(1).at(0);
+      // Evaluate gradF with the linear variables put to zero
+      std::fill_n(arg_, jacF_.n_in(), nullptr);
+      arg_[NL_X] = xk2_;
+      arg_[NL_P] = input(NLPSOL_P).ptr();
+      std::fill_n(res_, jacF_.n_out(), nullptr);
+      res_[0] = jac_fk_;
+      res_[1] = fObj;
+      jacF_(arg_, res_, iw_, w_, 0);
 
       // provide nonlinear part of objective gradient to SNOPT
       for (int k = 0; k < nnObj; ++k) {
@@ -715,7 +724,7 @@ namespace casadi {
         if (x_type_f_[i] == 2) {
           int el = jacF_.sparsity_out(0).colind(i);
           if (jacF_.sparsity_out(0).colind(i+1) > el) {
-            gObj[k] = jacF_.output().data()[el];
+            gObj[k] = jac_fk_[el];
           } else {
             gObj[k] = 0;
           }

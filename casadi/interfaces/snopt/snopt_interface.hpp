@@ -145,6 +145,9 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Current solution
+    double *xk2_, *lam_gk_, *lam_xk_;
+
     // Current calculated quantities
     double fk_, *gk_, *jac_fk_, *jac_gk_;
 
