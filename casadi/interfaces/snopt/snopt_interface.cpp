@@ -489,15 +489,15 @@ namespace casadi {
     // Evaluate gradF and jacG at initial value
     if (!jacG_.isNull()) {
       std::fill_n(arg_, jacG_.n_in(), nullptr);
-      arg_[JACG_X] = input(NLPSOL_X0).ptr();
-      arg_[JACG_P] = input(NLPSOL_P).ptr();
+      arg_[JACG_X] = x0_;
+      arg_[JACG_P] = p_;
       std::fill_n(res_, jacG_.n_out(), nullptr);
       res_[0] = jac_gk_;
       jacG_(arg_, res_, iw_, w_, 0);
     }
     std::fill_n(arg_, jacF_.n_in(), nullptr);
-    arg_[GRADF_X] = input(NLPSOL_X0).ptr();
-    arg_[GRADF_P] = input(NLPSOL_P).ptr();
+    arg_[GRADF_X] = x0_;
+    arg_[GRADF_P] = p_;
     std::fill_n(res_, jacF_.n_out(), nullptr);
     res_[0] = jac_fk_;
     jacF_(arg_, res_, iw_, w_, 0);
@@ -519,7 +519,7 @@ namespace casadi {
     // Obtain constraint offsets for linear constraints
     if (detect_linear_) {
       std::fill_n(arg_, nlp_.n_in(), nullptr);
-      arg_[NL_P] = input(NLPSOL_P).ptr();
+      arg_[NL_P] = p_;
       std::fill_n(res_, nlp_.n_out(), nullptr);
       res_[NL_F] = &fk_;
       res_[NL_G] = gk_;
@@ -538,23 +538,29 @@ namespace casadi {
     }
 
     // Obtain initial guess and bounds through the mapping
+    casadi_copy(lbx_, nx_, getPtr(bl_));
+    casadi_copy(ubx_, nx_, getPtr(bu_));
+    casadi_copy(x0_, nx_, getPtr(xk_));
     for (int k = 0; k < nx_; ++k) {
       int kk = x_order_[k];
-      bl_[k] = input(NLPSOL_LBX).data()[kk];
-      bu_[k] = input(NLPSOL_UBX).data()[kk];
-      xk_[k] = input(NLPSOL_X0).data()[kk];
+      bl_[k] = bl_[kk];
+      bu_[k] = bu_[kk];
+      xk_[k] = xk_[kk];
     }
+    casadi_copy(lbg_, ng_, getPtr(bl_)+nx_);
+    casadi_copy(ubg_, ng_, getPtr(bu_)+nx_);
+    casadi_copy(lam_g0_, ng_, getPtr(xk_)+nx_);
+
     for (int k = 0; k < ng_; ++k) {
       int kk = g_order_[k];
       if (g_type_[kk] < 2) {
-        // casadi_error("woops");
-        bl_[nx_+k] = input(NLPSOL_LBG).data()[kk]-gk_[kk];
-        bu_[nx_+k] = input(NLPSOL_UBG).data()[kk]-gk_[kk];
+        bl_[nx_+k] = bl_[nx_+kk]-gk_[kk];
+        bu_[nx_+k] = bu_[nx_+kk]-gk_[kk];
       } else {
-        bl_[nx_+k] = input(NLPSOL_LBG).data()[kk];
-        bu_[nx_+k] = input(NLPSOL_UBG).data()[kk];
+        bl_[nx_+k] = bl_[nx_+kk];
+        bu_[nx_+k] = bu_[nx_+kk];
       }
-      xk_[nx_+k] = input(NLPSOL_LAM_G0).data()[kk];
+      xk_[nx_+k] = xk_[nx_+kk];
     }
 
     // Objective row / dummy row should be unbounded
@@ -645,7 +651,7 @@ namespace casadi {
     // doesn't provide F, and the above comment suggests that G is wrong
     std::fill_n(arg_, nlp_.n_in(), nullptr);
     arg_[NL_X] = output(NLPSOL_X).ptr();
-    arg_[NL_P] = input(NLPSOL_P).ptr();
+    arg_[NL_P] = p_;
     std::fill_n(res_, nlp_.n_out(), nullptr);
     res_[NL_F] = &fk_;
     res_[NL_G] = gk_;
@@ -712,7 +718,7 @@ namespace casadi {
       // Evaluate gradF with the linear variables put to zero
       std::fill_n(arg_, jacF_.n_in(), nullptr);
       arg_[NL_X] = xk2_;
-      arg_[NL_P] = input(NLPSOL_P).ptr();
+      arg_[NL_P] = p_;
       std::fill_n(res_, jacF_.n_out(), nullptr);
       res_[0] = jac_fk_;
       res_[1] = fObj;
@@ -752,7 +758,7 @@ namespace casadi {
         // Evaluate jacG with the linear variabes put to zero
         std::fill_n(arg_, jacG_.n_in(), nullptr);
         arg_[JACG_X] = xk2_;
-        arg_[JACG_P] = input(NLPSOL_P).ptr();
+        arg_[JACG_P] = p_;
         std::fill_n(res_, jacG_.n_out(), nullptr);
         res_[0] = jac_gk_;
         res_[GRADF_G] = gk_;
