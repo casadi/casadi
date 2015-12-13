@@ -702,7 +702,7 @@ namespace casadi {
       casadi_assert_message(nnJac_ == nnJac, "Jac " << nnJac_ << " <-> " << nnJac);
 
       // Get reduced decision variables
-      casadi_fill(x_, nx_, 0.);
+      casadi_fill(xk2_, nx_, 0.);
       for (int k = 0; k < nnObj; ++k) {
         if (x_type_f_[x_order_[k]] == 2) {
           xk2_[x_order_[k]] = x[k];
@@ -743,15 +743,20 @@ namespace casadi {
 
       time0 = clock();
       if (!jacG_.isNull()) {
-        // Evaluate jacG with the linear variabes put to zero
-        jacG_.setInput(0.0, JACG_X);
+        // Get reduced decision variables
+        casadi_fill(xk2_, nx_, 0.);
         for (int k = 0; k < nnJac; ++k) {
-          jacG_.input(JACG_X)[x_order_[k]] = x[k];
+          xk2_[x_order_[k]] = x[k];
         }
-        jacG_.setInput(input(NLPSOL_P), JACG_P);
 
-        // Evaluate the function
-        jacG_.evaluate();
+        // Evaluate jacG with the linear variabes put to zero
+        std::fill_n(arg_, jacG_.n_in(), nullptr);
+        arg_[JACG_X] = xk2_;
+        arg_[JACG_P] = input(NLPSOL_P).ptr();
+        std::fill_n(res_, jacG_.n_out(), nullptr);
+        res_[0] = jac_gk_;
+        res_[GRADF_G] = gk_;
+        jacG_(arg_, res_, iw_, w_, 0);
 
         // provide nonlinear part of constraint jacobian to SNOPT
         int kk = 0;
@@ -760,7 +765,7 @@ namespace casadi {
             if (A_structure_.row(k) >= nnCon) break;
             int i = A_structure_.data()[k];
             if (i > 0) {
-              gCon[kk++] = jacG_.output().data()[i-1];
+              gCon[kk++] = jac_gk_[i-1];
             }
           }
         }
@@ -768,9 +773,8 @@ namespace casadi {
         casadi_assert(kk == 0 || kk == neJac);
 
         // provide nonlinear part of objective to SNOPT
-        DM g = jacG_.output();
         for (int k = 0; k < nnCon; ++k) {
-          fCon[k] = jacG_.output(GRADF_G).data()[g_order_[k]];
+          fCon[k] = gk_[g_order_[k]];
         }
 
         // timing and counters
