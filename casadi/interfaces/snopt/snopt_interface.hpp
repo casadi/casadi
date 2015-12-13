@@ -145,6 +145,9 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Current calculated quantities
+    double fk_, *gk_, *jac_fk_, *jac_gk_;
+
   private:
       // options
       std::map<std::string, std::string> intOpts_;

@@ -403,6 +403,11 @@ namespace casadi {
     // Reset the counters
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
     n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
+
+    // Allocate temporary memory
+    alloc_w(ng_, true); // gk_
+    alloc_w(jacF_.nnz_out(0), true); // jac_fk_
+    alloc_w(jacG_.nnz_out(0), true); // jac_gk_
   }
 
   void SnoptInterface::passOptions(snoptProblemC &probC) {
@@ -448,6 +453,11 @@ namespace casadi {
   void SnoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
     // Reset the base classes
     Nlpsol::reset(mem, arg, res, iw, w);
+
+    // Work vectors
+    gk_ = w; w += ng_;
+    jac_fk_ = w; w += jacF_.nnz_out(0);
+    jac_gk_ = w; w += jacG_.nnz_out(0);
   }
 
   void SnoptInterface::solve(void* mem) {
@@ -472,14 +482,19 @@ namespace casadi {
 
     // Evaluate gradF and jacG at initial value
     if (!jacG_.isNull()) {
-      jacG_.setInput(input(NLPSOL_X0), JACG_X);
-      jacG_.setInput(input(NLPSOL_P), JACG_P);
-      jacG_.evaluate();
+      std::fill_n(arg_, jacG_.n_in(), nullptr);
+      arg_[JACG_X] = input(NLPSOL_X0).ptr();
+      arg_[JACG_P] = input(NLPSOL_P).ptr();
+      std::fill_n(res_, jacG_.n_out(), nullptr);
+      res_[0] = jac_gk_;
+      jacG_(arg_, res_, iw_, w_, 0);
     }
-    jacF_.setInput(input(NLPSOL_X0), GRADF_X);
-    jacF_.setInput(input(NLPSOL_P), GRADF_P);
-
-    jacF_.evaluate();
+    std::fill_n(arg_, jacF_.n_in(), nullptr);
+    arg_[GRADF_X] = input(NLPSOL_X0).ptr();
+    arg_[GRADF_P] = input(NLPSOL_P).ptr();
+    std::fill_n(res_, jacF_.n_out(), nullptr);
+    res_[0] = jac_fk_;
+    jacF_(arg_, res_, iw_, w_, 0);
 
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
@@ -489,18 +504,20 @@ namespace casadi {
       if (i == 0) {
         A_data_[k] = 0;
       } else if (i > 0) {
-        A_data_[k] = jacG_.output().data()[i-1];
+        A_data_[k] = jac_gk_[i-1];
       } else {
-        A_data_[k] = jacF_.output().data()[-i-1];
+        A_data_[k] = jac_fk_[-i-1];
       }
     }
 
     // Obtain constraint offsets for linear constraints
     if (detect_linear_) {
-      nlp_.setInput(0.0, NL_X);
-      // Setting the zero might actually be problematic
-      nlp_.setInput(input(NLPSOL_P), NL_P);
-      nlp_.evaluate();
+      std::fill_n(arg_, nlp_.n_in(), nullptr);
+      arg_[NL_P] = input(NLPSOL_P).ptr();
+      std::fill_n(res_, nlp_.n_out(), nullptr);
+      res_[NL_F] = &fk_;
+      res_[NL_G] = gk_;
+      nlp_(arg_, res_, iw_, w_, 0);
     }
 
     // Obtain sparsity pattern of A (Fortran is Index-1 based, but the C++ wrappers are Index-0)
@@ -525,8 +542,8 @@ namespace casadi {
       int kk = g_order_[k];
       if (g_type_[kk] < 2) {
         // casadi_error("woops");
-        bl_[nx_+k] = input(NLPSOL_LBG).data()[kk]-nlp_.output(NL_G).data()[kk];
-        bu_[nx_+k] = input(NLPSOL_UBG).data()[kk]-nlp_.output(NL_G).data()[kk];
+        bl_[nx_+k] = input(NLPSOL_LBG).data()[kk]-gk_[kk];
+        bu_[nx_+k] = input(NLPSOL_UBG).data()[kk]-gk_[kk];
       } else {
         bl_[nx_+k] = input(NLPSOL_LBG).data()[kk];
         bu_[nx_+k] = input(NLPSOL_UBG).data()[kk];
@@ -620,11 +637,16 @@ namespace casadi {
     // todo(Greg): get these from snopt
     // we overwrite F and G for now because the current snopt interface
     // doesn't provide F, and the above comment suggests that G is wrong
-    nlp_.setInput(output(NLPSOL_X), NL_X);
-    nlp_.setInput(input(NLPSOL_P), NL_P);
-    nlp_.evaluate();
-    setOutput(nlp_.output(NL_F), NLPSOL_F);
-    setOutput(nlp_.output(NL_G), NLPSOL_G);
+    std::fill_n(arg_, nlp_.n_in(), nullptr);
+    arg_[NL_X] = output(NLPSOL_X).ptr();
+    arg_[NL_P] = input(NLPSOL_P).ptr();
+    std::fill_n(res_, nlp_.n_out(), nullptr);
+    res_[NL_F] = &fk_;
+    res_[NL_G] = gk_;
+    nlp_(arg_, res_, iw_, w_, 0);
+
+    setOutputNZ(&fk_, NLPSOL_F);
+    setOutputNZ(gk_, NLPSOL_G);
 
     // print timing information
     // save state
