@@ -366,22 +366,6 @@ namespace casadi {
   }
 
   void SnoptInterface::solve(void* mem) {
-    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
-      const double *v;
-      switch (i) {
-      case NLPSOL_X0: v = x0_; break;
-      case NLPSOL_P: v = p_; break;
-      case NLPSOL_LBX: v = lbx_; break;
-      case NLPSOL_UBX: v = ubx_; break;
-      case NLPSOL_LBG: v = lbg_; break;
-      case NLPSOL_UBG: v = ubg_; break;
-      case NLPSOL_LAM_X0: v = lam_x0_; break;
-      case NLPSOL_LAM_G0: v = lam_g0_; break;
-      default: casadi_assert(0);
-      }
-      casadi_copy(v, nnz_in(i), input(i).ptr());
-    }
-
     // Check the provided inputs
     checkInputs(mem);
 
@@ -510,33 +494,32 @@ namespace casadi {
 
     stats_["return_status"] = info;
 
-    // Store results into output
-    for (int k = 0; k < nx_; ++k) {
-      output(NLPSOL_X).data()[k] = xk_[k];
-      output(NLPSOL_LAM_X).data()[k] = -rc_[k];
-    }
+    // Negate rc to match CasADi's definition
+    casadi_scal(nx_ + ng_, -1., getPtr(rc_));
 
-    setOutput(Obj+ (jacF_row_? xk_[nx_+ng_] : 0), NLPSOL_F);
+    // Get primal solution
+    casadi_copy(getPtr(xk_), nx_, x_);
 
-    for (int k = 0; k < ng_; ++k) {
-      output(NLPSOL_LAM_G).data()[k] = -rc_[nx_+k];
-      output(NLPSOL_G).data()[k] = xk_[nx_+k];  // TODO(Joris): this is not quite right
-      // mul_no_alloc
-    }
+    // Get dual solution
+    casadi_copy(getPtr(rc_), nx_, lam_x_);
+    casadi_copy(getPtr(rc_)+nx_, ng_, lam_g_);
 
     // todo(Greg): get these from snopt
     // we overwrite F and G for now because the current snopt interface
     // doesn't provide F, and the above comment suggests that G is wrong
     std::fill_n(arg_, nlp_.n_in(), nullptr);
-    arg_[NL_X] = output(NLPSOL_X).ptr();
+    arg_[NL_X] = getPtr(xk_);
     arg_[NL_P] = p_;
     std::fill_n(res_, nlp_.n_out(), nullptr);
     res_[NL_F] = &fk_;
     res_[NL_G] = gk_;
     nlp_(arg_, res_, iw_, w_, 0);
 
-    setOutputNZ(&fk_, NLPSOL_F);
-    setOutputNZ(gk_, NLPSOL_G);
+    // Copy optimal cost to output
+    if (f_) *f_ = fk_;
+
+    // Copy optimal constraint values to output
+    casadi_copy(gk_, ng_, g_);
 
     // print timing information
     // save state
@@ -554,20 +537,6 @@ namespace casadi {
     // Reset the counters
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
     n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
-
-    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-      double **v;
-      switch (i) {
-      case NLPSOL_X: v = &x_; break;
-      case NLPSOL_F: v = &f_; break;
-      case NLPSOL_G: v = &g_; break;
-      case NLPSOL_LAM_X: v = &lam_x_; break;
-      case NLPSOL_LAM_G: v = &lam_g_; break;
-      case NLPSOL_LAM_P: v = &lam_p_; break;
-      default: casadi_assert(0);
-      }
-      casadi_copy(output(i).ptr(), nnz_out(i), *v);
-    }
   }
 
   void SnoptInterface::setOptionsFromFile(const std::string & file) {
