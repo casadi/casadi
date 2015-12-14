@@ -89,14 +89,6 @@ namespace casadi {
     int nnObj_;
     int nnCon_;
 
-    /// Classification arrays
-    /// original variable index -> category w.r.t. f
-    std::vector<int> x_type_g_;
-    /// original variable index -> category w.r.t. g
-    std::vector<int> x_type_f_;
-    /// original constraint index -> category
-    std::vector<int> g_type_;
-
     /// sorted variable index -> original variable index
     std::vector<int> x_order_;
     /// sorted constraint index -> original constraint index
