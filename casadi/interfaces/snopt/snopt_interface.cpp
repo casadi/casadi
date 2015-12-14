@@ -242,79 +242,9 @@ namespace casadi {
     x_type_f_.resize(nx_);
     x_type_g_.resize(nx_);
     g_type_.resize(ng_);
-
-    if (detect_linear_) {
-      // Detect dependencies w.r.t. gradF
-      std::vector<const bvec_t*> arg(jacF_.sz_arg(), 0);
-      std::vector<bvec_t> input_v_x(nx_, 1);
-      arg[GRADF_X] = getPtr(input_v_x);
-      std::vector<bvec_t*> res(jacF_.sz_res(), 0);
-      std::vector<bvec_t> output_v(jacF_.nnz_out(0), 0);
-      res[0] = getPtr(output_v);
-
-      // Perform a single dependency sweep
-      jacF_(arg, res);
-
-      // Harvest the results
-      for (int j = 0; j < nx_; ++j) {
-        if (jacF_.sparsity_out(0).colind(j) == jacF_.sparsity_out(0).colind(j+1)) {
-          x_type_f_[j] = 0;
-        } else {
-          x_type_f_[j] = output_v[jacF_.sparsity_out(0).colind(j)]?  2 : 1;
-        }
-      }
-
-      if (!jacG_.isNull()) {
-        // Detect dependencies w.r.t. jacG
-        std::vector<const bvec_t*> arg(jacG_.sz_arg(), 0);
-        std::vector<bvec_t> input_v_x(nx_, 1);
-        arg[JACG_X] = getPtr(input_v_x);
-        std::vector<bvec_t*> res(jacG_.sz_res(), 0);
-        std::vector<bvec_t> output_v(jacG_.nnz_out(0), 0);
-        res[0] = getPtr(output_v);
-
-        // Perform a single dependency sweep
-        jacG_(arg, res);
-
-        Sparsity out_trans = jacG_.sparsity_out(0).T();
-        std::vector<bvec_t> output_v_trans(output_v.size());
-        std::vector<int> iw(jacG_.size2_out(0));
-        casadi_trans(getPtr(output_v), jacG_.sparsity_out(0),
-                     getPtr(output_v_trans), out_trans, getPtr(iw));
-
-        for (int j = 0; j < nx_; ++j) {  // Harvest the results
-          if (jacG_.sparsity_out(0).colind(j) == jacG_.sparsity_out(0).colind(j+1)) {
-            x_type_g_[j] = 0;
-          } else {
-            bool linear = true;
-            for (int k = jacG_.sparsity_out(0).colind(j);
-                 k<jacG_.sparsity_out(0).colind(j+1); ++k) {
-              linear = linear && !output_v[k];
-            }
-            x_type_g_[j] = linear? 1 : 2;
-          }
-        }
-        for (int j = 0; j < ng_; ++j) {  // Harvest the results
-          if (out_trans.colind(j) == out_trans.colind(j+1)) {
-            g_type_[j] = 0;
-          } else {
-            bool linear = true;
-            for (int k = out_trans.colind(j); k < out_trans.colind(j+1); ++k) {
-              linear = linear && !output_v_trans[k];
-            }
-            g_type_[j] = linear? 1 : 2;
-          }
-        }
-      } else {  // Assume all non-linear
-        std::fill(x_type_g_.begin(), x_type_g_.end(), 1);
-        std::fill(g_type_.begin(), g_type_.end(), 1);
-      }
-
-    } else {  // Assume all non-linear variables
-      std::fill(x_type_f_.begin(), x_type_f_.end(), 2);
-      std::fill(x_type_g_.begin(), x_type_g_.end(), 2);
-      std::fill(g_type_.begin(), g_type_.end(), 2);
-    }
+    std::fill(x_type_f_.begin(), x_type_f_.end(), 2);
+    std::fill(x_type_g_.begin(), x_type_g_.end(), 2);
+    std::fill(g_type_.begin(), g_type_.end(), 2);
 
     // An encoding of the desired sorting pattern
     // Digits xy  with x correspodning to x_type_f_ and y corresponding to x_type_g_
@@ -532,16 +462,6 @@ namespace casadi {
       } else {
         A_data_[k] = jac_fk_[-i-1];
       }
-    }
-
-    // Obtain constraint offsets for linear constraints
-    if (detect_linear_) {
-      std::fill_n(arg_, nlp_.n_in(), nullptr);
-      arg_[NL_P] = p_;
-      std::fill_n(res_, nlp_.n_out(), nullptr);
-      res_[NL_F] = &fk_;
-      res_[NL_G] = gk_;
-      nlp_(arg_, res_, iw_, w_, 0);
     }
 
     // Obtain sparsity pattern of A (Fortran is Index-1 based, but the C++ wrappers are Index-0)
