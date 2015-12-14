@@ -612,7 +612,6 @@ namespace casadi {
     snoptProbC.setJ(nea, getPtr(A_data_), getPtr(row), getPtr(col));
     snoptProbC.setX(getPtr(bl_), getPtr(bu_), getPtr(xk_), getPtr(pi_), getPtr(rc_), getPtr(hs_));
     snoptProbC.setUserFun(userfunPtr);
-    snoptProbC.setSTOP(snStopPtr);
     passOptions(snoptProbC);
 
     // user data
@@ -806,52 +805,5 @@ namespace casadi {
     interface->userfun(mode, *nnObj, *nnCon, *nJac, *nnL, *neJac,
                        x, fObj, gObj, fCon, gCon, *nState,
                        cu, *lencu, iu, *leniu, ru, *lenru);
-  }
-
-  void SnoptInterface::
-  snStopPtr(int *iAbort, int KTcond[], int *MjrPrt, int *minimz,
-            int *m, int *maxS, int *n, int *nb,
-            int *nnCon0, int *nnCon, int *nnObj0, int *nnObj, int *nS,
-            int *itn, int *nMajor, int *nMinor, int *nSwap,
-            double *condHz, int *iObj, double *sclObj, double *ObjAdd,
-            double *fMrt, double *PenNrm, double *step,
-            double *prInf, double *duInf, double *vimax, double *virel, int hs[],
-            int *ne, int *nlocJ, int locJ[], int indJ[], double Jcol[], int *negCon,
-            double Ascale[], double bl[], double bu[], double fCon[], double gCon[], double gObj[],
-            double yCon[], double pi[], double rc[], double rg[], double x[],
-            char cu[], int *lencu, int iu[], int *leniu, double ru[], int *lenru,
-            char cw[], int *lencw, int iw[], int *leniw, double rw[], int *lenrw ) {
-    SnoptInterface* self;
-    memcpy(&self, &(iu[0]), sizeof(SnoptInterface*));
-    try {
-      self->n_iter_+=1;
-      if (!self->fcallback_.isNull()) {
-        double time0 = clock();
-        for (int k = 0; k < self->nx_; ++k) {
-          int kk = self->x_order_[k];
-          self->output(NLPSOL_X).data()[kk] = self->xk_[k];
-        }
-        for (int k = 0; k < self->ng_; ++k) {
-          int kk =  self->g_order_[k];
-          self->output(NLPSOL_G).data()[kk] = self->xk_[self->nx_+k];
-        }
-
-        for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-          self->fcallback_.setInput(self->output(i), i);
-        }
-        self->fcallback_.evaluate();
-        double ret_double;
-        self->fcallback_.getOutput(ret_double);
-        *iAbort = static_cast<int>(ret_double);
-        self->t_callback_fun_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
-        self->n_callback_fun_ += 1;
-      }
-    } catch(std::exception& ex) {
-      if (self->option("iteration_callback_ignore_errors")) {
-        userOut<true, PL_WARN>() << "callback: " << ex.what() << std::endl;
-      } else {
-        throw ex;
-      }
-    }
   }
 }  // namespace casadi

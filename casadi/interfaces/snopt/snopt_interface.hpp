@@ -123,19 +123,6 @@ namespace casadi {
                            double *x, double *fObj, double *gObj, double * fCon, double* gCon,
                            int* nState, char* cu, int* lencu, int* iu, int* leniu,
                            double* ru, int *lenru);
-    static void snStopPtr(int *iAbort, int KTcond[], int *MjrPrt, int *minimz,
-                          int *m, int *maxS, int *n, int *nb,
-                          int *nnCon0, int *nnCon, int *nnObj0, int *nnObj, int *nS,
-                          int *itn, int *nMajor, int *nMinor, int *nSwap,
-                          double *condHz, int *iObj, double *sclObj, double *ObjAdd,
-                          double *fMrt, double *PenNrm, double *step,
-                          double *prInf, double *duInf, double *vimax, double *virel, int hs[],
-                          int *ne, int *nlocJ, int locJ[], int indJ[], double Jcol[], int *negCon,
-                          double Ascale[], double bl[], double bu[], double fCon[], double gCon[],
-                          double gObj[],
-                          double yCon[], double pi[], double rc[], double rg[], double x[],
-                          char cu[], int *lencu, int iu[], int *leniu, double ru[], int *lenru,
-                          char cw[], int *lencw, int iw[], int *leniw, double rw[], int *lenrw);
 
     // Matrix A has a linear objective row
     bool jacF_row_;
