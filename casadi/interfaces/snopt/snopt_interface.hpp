@@ -138,6 +138,9 @@ namespace casadi {
     // Current calculated quantities
     double fk_, *gk_, *jac_fk_, *jac_gk_;
 
+    // Memory bool
+    static std::vector<SnoptInterface*> mempool_;
+
   private:
       // options
       std::map<std::string, std::string> intOpts_;

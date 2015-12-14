@@ -49,8 +49,20 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_snopt);
   }
 
+  std::vector<SnoptInterface*> SnoptInterface::mempool_;
+
   SnoptInterface::SnoptInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
+
+    // Add to memory pool
+    auto mem_it = std::find(mempool_.begin(), mempool_.end(), static_cast<SnoptInterface*>(0));
+    if (mem_it==mempool_.end()) {
+      // Add to end
+      mempool_.push_back(this);
+    } else {
+      // Reuse freed element
+      *mem_it = this;
+    }
 
     addOption("detect_linear", OT_BOOLEAN, true,
               "Make an effort to treat linear constraints and linear variables specially.");
@@ -200,6 +212,12 @@ namespace casadi {
   }
 
   SnoptInterface::~SnoptInterface() {
+    auto mem_it = std::find(mempool_.begin(), mempool_.end(), this);
+    if (mem_it!=mempool_.end()) {
+      *mem_it = 0;
+    } else {
+      casadi_warning("SNOPT memory pool failure");
+    }
   }
 
   void SnoptInterface::init() {
@@ -615,11 +633,10 @@ namespace casadi {
     passOptions(snoptProbC);
 
     // user data
-    int iulen = 8;
-    std::vector<int> iu(iulen);
-    SnoptInterface* source = this;
-    memcpy(&(iu[0]), &source, sizeof(SnoptInterface*));
-    snoptProbC.setUserI(getPtr(iu), iulen);
+    auto mem_it = std::find(mempool_.begin(), mempool_.end(), this);
+    casadi_assert(mem_it!=mempool_.end());
+    int mem_ind = mem_it-mempool_.begin();
+    snoptProbC.setUserI(&mem_ind, 1);
 
     // Run SNOPT
     double time0 = clock();
@@ -800,8 +817,7 @@ namespace casadi {
              double *gObj, double * fCon, double* gCon,
              int* nState, char* cu, int* lencu, int* iu,
              int* leniu, double* ru, int *lenru) {
-    SnoptInterface* interface;
-    memcpy(&interface, &(iu[0]), sizeof(SnoptInterface*));
+    SnoptInterface* interface = mempool_.at(iu[0]);
     interface->userfun(mode, *nnObj, *nnCon, *nJac, *nnL, *neJac,
                        x, fObj, gObj, fCon, gCon, *nState,
                        cu, *lencu, iu, *leniu, ru, *lenru);
