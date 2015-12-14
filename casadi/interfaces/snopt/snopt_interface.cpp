@@ -231,41 +231,10 @@ namespace casadi {
     jacF();
     jacG();
 
-    // An encoding of the desired sorting pattern
-    // Digits xy  with x correspodning to x_type_f_ and y corresponding to x_type_g_
-    std::vector<int> order_template = {22, 12, 2, 21, 20, 11, 10, 1, 0};
-
-    // prepare the mapping for variables
-    x_order_.resize(0);
-    x_order_.reserve(nx_);
-
-    // Populate the order vector
-    std::vector<int> x_order_count;  // Cumulative index into x_order_
-    for (int p = 0; p < order_template.size(); ++p) {
-      for (int k = 0; k < nx_; ++k) {
-        if (22 == order_template[p]) {
-          x_order_.push_back(k);
-        }
-      }
-      // Save a cumulative index
-      x_order_count.push_back(x_order_.size());
-    }
-
     // prepare the mapping for constraints
-    g_order_.resize(0);
-    g_order_.reserve(ng_);
-    std::vector<int> g_order_count;  // Cumulative index into g_order_
-    for (int p = 2; p >= 0; --p) {
-      for (int k = 0; k < ng_; ++k) {
-        if (2 == p) {
-          g_order_.push_back(k);
-        }
-      }
-      g_order_count.push_back(g_order_.size());
-    }
-    nnJac_ = x_order_count[2];
-    nnObj_ = x_order_count[4];
-    nnCon_ = g_order_count[0];
+    nnJac_ = nx_;
+    nnObj_ = nx_;
+    nnCon_ = ng_;
 
     // Here follows the core of the mapping
     //  Two integer matrices are constructed:
@@ -284,12 +253,12 @@ namespace casadi {
     }
 
     // First, remap jacG
-    A_structure_ = mapping_jacG(g_order_, x_order_);
+    A_structure_ = mapping_jacG;
 
     m_ = ng_;
 
     // Construct the linear objective row
-    IM d = mapping_gradF(Slice(0), x_order_);
+    IM d = mapping_gradF(Slice(0), Slice());
 
     std::vector<int> ii = mapping_gradF.sparsity().get_col();
     for (int j = 0; j < nnObj_; ++j) {
@@ -462,20 +431,18 @@ namespace casadi {
     casadi_copy(ubx_, nx_, getPtr(bu_));
     casadi_copy(x0_, nx_, getPtr(xk_));
     for (int k = 0; k < nx_; ++k) {
-      int kk = x_order_[k];
-      bl_[k] = bl_[kk];
-      bu_[k] = bu_[kk];
-      xk_[k] = xk_[kk];
+      bl_[k] = bl_[k];
+      bu_[k] = bu_[k];
+      xk_[k] = xk_[k];
     }
     casadi_copy(lbg_, ng_, getPtr(bl_)+nx_);
     casadi_copy(ubg_, ng_, getPtr(bu_)+nx_);
     casadi_copy(lam_g0_, ng_, getPtr(xk_)+nx_);
 
     for (int k = 0; k < ng_; ++k) {
-      int kk = g_order_[k];
-      bl_[nx_+k] = bl_[nx_+kk];
-      bu_[nx_+k] = bu_[nx_+kk];
-      xk_[nx_+k] = xk_[nx_+kk];
+      bl_[nx_+k] = bl_[nx_+k];
+      bu_[nx_+k] = bu_[nx_+k];
+      xk_[nx_+k] = xk_[nx_+k];
     }
 
     // Objective row / dummy row should be unbounded
@@ -545,17 +512,15 @@ namespace casadi {
 
     // Store results into output
     for (int k = 0; k < nx_; ++k) {
-      int kk =  x_order_[k];
-      output(NLPSOL_X).data()[kk] = xk_[k];
-      output(NLPSOL_LAM_X).data()[kk] = -rc_[k];
+      output(NLPSOL_X).data()[k] = xk_[k];
+      output(NLPSOL_LAM_X).data()[k] = -rc_[k];
     }
 
     setOutput(Obj+ (jacF_row_? xk_[nx_+ng_] : 0), NLPSOL_F);
 
     for (int k = 0; k < ng_; ++k) {
-      int kk = g_order_[k];
-      output(NLPSOL_LAM_G).data()[kk] = -rc_[nx_+k];
-      output(NLPSOL_G).data()[kk] = xk_[nx_+k];  // TODO(Joris): this is not quite right
+      output(NLPSOL_LAM_G).data()[k] = -rc_[nx_+k];
+      output(NLPSOL_G).data()[k] = xk_[nx_+k];  // TODO(Joris): this is not quite right
       // mul_no_alloc
     }
 
@@ -623,7 +588,7 @@ namespace casadi {
       // Get reduced decision variables
       casadi_fill(xk2_, nx_, 0.);
       for (int k = 0; k < nnObj; ++k) {
-        xk2_[x_order_[k]] = x[k];
+        xk2_[k] = x[k];
       }
 
       // Evaluate gradF with the linear variables put to zero
@@ -637,9 +602,8 @@ namespace casadi {
 
       // provide nonlinear part of objective gradient to SNOPT
       for (int k = 0; k < nnObj; ++k) {
-        int i = x_order_[k];
-        int el = jacF_.sparsity_out(0).colind(i);
-        if (jacF_.sparsity_out(0).colind(i+1) > el) {
+        int el = jacF_.sparsity_out(0).colind(k);
+        if (jacF_.sparsity_out(0).colind(k+1) > el) {
           gObj[k] = jac_fk_[el];
         } else {
           gObj[k] = 0;
@@ -659,7 +623,7 @@ namespace casadi {
         // Get reduced decision variables
         casadi_fill(xk2_, nx_, 0.);
         for (int k = 0; k < nnJac; ++k) {
-          xk2_[x_order_[k]] = x[k];
+          xk2_[k] = x[k];
         }
 
         // Evaluate jacG with the linear variabes put to zero
@@ -687,7 +651,7 @@ namespace casadi {
 
         // provide nonlinear part of objective to SNOPT
         for (int k = 0; k < nnCon; ++k) {
-          fCon[k] = gk_[g_order_[k]];
+          fCon[k] = gk_[k];
         }
 
         // timing and counters
