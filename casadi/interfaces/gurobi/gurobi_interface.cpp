@@ -49,6 +49,9 @@ namespace casadi {
                                    const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
 
+    addOption("vtype", OT_STRINGVECTOR, GenericType(),
+              "Type of variables, Each entry can be one of: "
+              "'continuous', 'binary', 'integer', 'semicont', 'semiint'");
     env_ = 0;
   }
 
@@ -62,6 +65,32 @@ namespace casadi {
   void GurobiInterface::init() {
     // Initialize the base classes
     Qpsol::init();
+
+    // Read options
+    vtype_.resize(n_);
+    if (hasSetOption("vtype")) {
+      fill(vtype_.begin(), vtype_.end(), GRB_CONTINUOUS);
+    } else {
+      std::vector<std::string> vtype_str = option("vtype");
+      casadi_assert_message(vtype_str.size()==n_, "Option 'vtype' has wrong length");
+      for (auto i=vtype_str.begin(); i!=vtype_str.end(); ++i) {
+        char t;
+        if (*i=="continuous") {
+          t = GRB_CONTINUOUS;
+        } else if (*i=="binary") {
+          t = GRB_BINARY;
+        } else if (*i=="integer") {
+          t = GRB_INTEGER;
+        } else if (*i=="semicont") {
+          t = GRB_SEMICONT;
+        } else if (*i=="semiint") {
+          t = GRB_SEMIINT;
+        } else {
+          casadi_error("No such variable type: " + *i);
+        }
+        vtype_[i-vtype_str.begin()] = t;
+      }
+    }
 
     // Load environment
     int flag = GRBloadenv(&env_, 0); // no log file
@@ -112,7 +141,7 @@ namespace casadi {
         if (isinf(ub)) ub =  GRB_INFINITY;
 
         // Pass to model
-        flag = GRBaddvar(model, 0, 0, 0, g ? g[i] : 0., lb, ub, GRB_CONTINUOUS, 0);
+        flag = GRBaddvar(model, 0, 0, 0, g ? g[i] : 0., lb, ub, vtype_.at(i), 0);
         casadi_assert_message(!flag, GRBgeterrormsg(env_));
       }
       flag = GRBupdatemodel(model);
