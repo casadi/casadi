@@ -69,8 +69,6 @@ namespace casadi {
     // Read options
     vtype_.resize(n_);
     if (hasSetOption("vtype")) {
-      fill(vtype_.begin(), vtype_.end(), GRB_CONTINUOUS);
-    } else {
       std::vector<std::string> vtype_str = option("vtype");
       casadi_assert_message(vtype_str.size()==n_, "Option 'vtype' has wrong length");
       for (auto i=vtype_str.begin(); i!=vtype_str.end(); ++i) {
@@ -90,6 +88,8 @@ namespace casadi {
         }
         vtype_[i-vtype_str.begin()] = t;
       }
+    } else {
+      fill(vtype_.begin(), vtype_.end(), GRB_CONTINUOUS);
     }
 
     // Load environment

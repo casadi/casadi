@@ -110,8 +110,8 @@ for i in range(1, N+1):
 qp = {'x':vertcat(x), 'f':Vchain, 'g':vertcat(g)}
 
 # Solve with IPOPT
-solver = qpsol('solver', 'qpoases', qp)
-#solver = qpsol('solver', 'gurobi', qp)
+#solver = qpsol('solver', 'qpoases', qp)
+solver = qpsol('solver', 'gurobi', qp)
 #solver = nlpsol('solver', 'ipopt', qp)
 
 # Get the optimal solution
