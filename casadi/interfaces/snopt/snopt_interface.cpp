@@ -309,7 +309,9 @@ namespace casadi {
     alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
     alloc_w(jacF_.nnz_out(0), true); // jac_fk_
-    alloc_w(jacG_.nnz_out(0), true); // jac_gk_
+    if (!jacG_.isNull()) {
+      alloc_w(jacG_.nnz_out(0), true); // jac_gk_
+    }
   }
 
   void SnoptInterface::passOptions(snoptProblemC &probC) {
@@ -362,7 +364,9 @@ namespace casadi {
     lam_xk_ = w; w += nx_;
     gk_ = w; w += ng_;
     jac_fk_ = w; w += jacF_.nnz_out(0);
-    jac_gk_ = w; w += jacG_.nnz_out(0);
+    if (!jacG_.isNull()) {
+      jac_gk_ = w; w += jacG_.nnz_out(0);
+    }
   }
 
   void SnoptInterface::solve(void* mem) {
