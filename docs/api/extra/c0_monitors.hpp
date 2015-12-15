@@ -277,30 +277,6 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::SnoptInterface
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_nlp</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>setup_nlp</td><td>casadi::SnoptInterface</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_Nlpsol_snopt
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th></tr>
-<tr><td>eval_nlp</td></tr>
-<tr><td>setup_nlp</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::Sqpmethod
 \n
 \par

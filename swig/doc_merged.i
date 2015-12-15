@@ -7245,205 +7245,197 @@ Return a string with a representation (for SWIG)
 
 
 // File: classsnoptProblem.xml
-%feature("docstring") snoptProblem::setParameter "[INTERNAL] ";
+%feature("docstring") snoptProblem::setParameter "";
 
-%feature("docstring") snoptProblem::setLog "[INTERNAL] ";
+%feature("docstring") snoptProblem::setLog "";
 
-%feature("docstring") snoptProblem::getIntParameter "[INTERNAL] ";
+%feature("docstring") snoptProblem::getIntParameter "";
 
-%feature("docstring") snoptProblem::setSpecsFile "[INTERNAL] ";
+%feature("docstring") snoptProblem::setSpecsFile "";
 
-%feature("docstring") snoptProblem::setIntParameter "[INTERNAL] ";
+%feature("docstring") snoptProblem::setIntParameter "";
 
-%feature("docstring") snoptProblem::getRealParameter "[INTERNAL] ";
+%feature("docstring") snoptProblem::getRealParameter "";
 
-%feature("docstring") snoptProblem::setPrintFile "[INTERNAL] ";
+%feature("docstring") snoptProblem::setPrintFile "";
 
-%feature("docstring") snoptProblem::getParameter "[INTERNAL] ";
+%feature("docstring") snoptProblem::getParameter "";
 
-%feature("docstring") snoptProblem::setUserR "[INTERNAL] ";
+%feature("docstring") snoptProblem::setUserR "";
 
-%feature("docstring") snoptProblem::setSTOP "[INTERNAL] ";
+%feature("docstring") snoptProblem::setSTOP "";
 
-%feature("docstring") snoptProblem::setRealParameter "[INTERNAL] ";
+%feature("docstring") snoptProblem::setRealParameter "";
 
-%feature("docstring") snoptProblem::setUserI "[INTERNAL] ";
+%feature("docstring") snoptProblem::setUserI "";
 
-%feature("docstring") snoptProblem::setProbName "[INTERNAL] ";
+%feature("docstring") snoptProblem::setProbName "";
 
-%feature("docstring") snoptProblem::solve "[INTERNAL] ";
+%feature("docstring") snoptProblem::solve "";
 
-%feature("docstring") snoptProblem::setUserspace "[INTERNAL] ";
+%feature("docstring") snoptProblem::setUserspace "";
 
-%feature("docstring") snoptProblem "[INTERNAL] C++ includes:
-snoptProblem.hpp ";
+%feature("docstring") snoptProblem "C++ includes: snoptProblem.hpp ";
 
 
 // File: classsnoptProblemA.xml
-%feature("docstring") snoptProblemA::getIntParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemA::getIntParameter "";
 
-%feature("docstring") snoptProblemA::computeJac "[INTERNAL] ";
+%feature("docstring") snoptProblemA::computeJac "";
 
-%feature("docstring") snoptProblemA::snoptProblemA "[INTERNAL] ";
+%feature("docstring") snoptProblemA::snoptProblemA "";
 
-%feature("docstring") snoptProblemA::getRealParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemA::getRealParameter "";
 
-%feature("docstring") snoptProblemA::setSpecsFile "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setSpecsFile "";
 
-%feature("docstring") snoptProblemA::setRealParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setRealParameter "";
 
-%feature("docstring") snoptProblemA::setWorkspace "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setWorkspace "";
 
-%feature("docstring") snoptProblemA::setNeG "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setSTOP "";
 
-%feature("docstring") snoptProblemA::setNeA "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setUserspace "";
 
-%feature("docstring") snoptProblemA::setSTOP "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setIntParameter "";
 
-%feature("docstring") snoptProblemA::setUserspace "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setG "";
 
-%feature("docstring") snoptProblemA::setIntParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setF "";
 
-%feature("docstring") snoptProblemA::setG "[INTERNAL] ";
+%feature("docstring") snoptProblemA::~snoptProblemA "";
 
-%feature("docstring") snoptProblemA::setF "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setPrintFile "";
 
-%feature("docstring") snoptProblemA::~snoptProblemA "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setA "";
 
-%feature("docstring") snoptProblemA::setPrintFile "[INTERNAL] ";
+%feature("docstring") snoptProblemA::solve "";
 
-%feature("docstring") snoptProblemA::setA "[INTERNAL] ";
+%feature("docstring") snoptProblemA "C++ includes: snoptProblem.hpp ";
 
-%feature("docstring") snoptProblemA::solve "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setX "";
 
-%feature("docstring") snoptProblemA "[INTERNAL] C++ includes:
-snoptProblem.hpp ";
+%feature("docstring") snoptProblemA::setUserFun "";
 
-%feature("docstring") snoptProblemA::setX "[INTERNAL] ";
+%feature("docstring") snoptProblemA::getParameter "";
 
-%feature("docstring") snoptProblemA::setUserFun "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setProblemSize "";
 
-%feature("docstring") snoptProblemA::getParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setParameter "";
 
-%feature("docstring") snoptProblemA::setProblemSize "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setLog "";
 
-%feature("docstring") snoptProblemA::setParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setUserI "";
 
-%feature("docstring") snoptProblemA::setLog "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setObjective "";
 
-%feature("docstring") snoptProblemA::setUserI "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setUserR "";
 
-%feature("docstring") snoptProblemA::setObjective "[INTERNAL] ";
-
-%feature("docstring") snoptProblemA::setUserR "[INTERNAL] ";
-
-%feature("docstring") snoptProblemA::setProbName "[INTERNAL] ";
+%feature("docstring") snoptProblemA::setProbName "";
 
 
 // File: classsnoptProblemB.xml
-%feature("docstring") snoptProblemB::setPrintFile "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setPrintFile "";
 
-%feature("docstring") snoptProblemB::getRealParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemB::getRealParameter "";
 
-%feature("docstring") snoptProblemB::setFuncon "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setFuncon "";
 
-%feature("docstring") snoptProblemB::setParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setParameter "";
 
-%feature("docstring") snoptProblemB::setObjective "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setObjective "";
 
-%feature("docstring") snoptProblemB::setWorkspace "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setWorkspace "";
 
-%feature("docstring") snoptProblemB::setSTOP "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setSTOP "";
 
-%feature("docstring") snoptProblemB::getIntParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemB::getIntParameter "";
 
-%feature("docstring") snoptProblemB::setFunobj "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setFunobj "";
 
-%feature("docstring") snoptProblemB::setUserspace "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setUserspace "";
 
-%feature("docstring") snoptProblemB::snoptProblemB "[INTERNAL] ";
+%feature("docstring") snoptProblemB::snoptProblemB "";
 
-%feature("docstring") snoptProblemB::getParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemB::getParameter "";
 
-%feature("docstring") snoptProblemB::setUserFun "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setUserFun "";
 
-%feature("docstring") snoptProblemB::setIntParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setIntParameter "";
 
-%feature("docstring") snoptProblemB::setLog "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setLog "";
 
-%feature("docstring") snoptProblemB::setUserI "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setUserI "";
 
-%feature("docstring") snoptProblemB::setJ "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setJ "";
 
-%feature("docstring") snoptProblemB::setProbName "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setProbName "";
 
-%feature("docstring") snoptProblemB::setUserR "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setUserR "";
 
-%feature("docstring") snoptProblemB "[INTERNAL] C++ includes:
-snoptProblem.hpp ";
+%feature("docstring") snoptProblemB "C++ includes: snoptProblem.hpp ";
 
-%feature("docstring") snoptProblemB::setProblemSize "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setProblemSize "";
 
-%feature("docstring") snoptProblemB::setX "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setX "";
 
-%feature("docstring") snoptProblemB::setSpecsFile "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setSpecsFile "";
 
-%feature("docstring") snoptProblemB::setRealParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemB::setRealParameter "";
 
-%feature("docstring") snoptProblemB::solve "[INTERNAL] ";
+%feature("docstring") snoptProblemB::solve "";
 
-%feature("docstring") snoptProblemB::~snoptProblemB "[INTERNAL] ";
+%feature("docstring") snoptProblemB::~snoptProblemB "";
 
 
 // File: classsnoptProblemC.xml
-%feature("docstring") snoptProblemC::setPrintFile "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setPrintFile "";
 
-%feature("docstring") snoptProblemC "[INTERNAL] C++ includes:
-snoptProblem.hpp ";
+%feature("docstring") snoptProblemC "C++ includes: snoptProblem.hpp ";
 
-%feature("docstring") snoptProblemC::getRealParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemC::getRealParameter "";
 
-%feature("docstring") snoptProblemC::setRealParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setRealParameter "";
 
-%feature("docstring") snoptProblemC::solve "[INTERNAL] ";
+%feature("docstring") snoptProblemC::solve "";
 
-%feature("docstring") snoptProblemC::setParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setParameter "";
 
-%feature("docstring") snoptProblemC::setUserR "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setUserR "";
 
-%feature("docstring") snoptProblemC::getIntParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemC::getIntParameter "";
 
-%feature("docstring") snoptProblemC::getParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemC::getParameter "";
 
-%feature("docstring") snoptProblemC::snoptProblemC "[INTERNAL] ";
+%feature("docstring") snoptProblemC::snoptProblemC "";
 
-%feature("docstring") snoptProblemC::setUserspace "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setUserspace "";
 
-%feature("docstring") snoptProblemC::setUserI "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setUserI "";
 
-%feature("docstring") snoptProblemC::setWorkspace "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setWorkspace "";
 
-%feature("docstring") snoptProblemC::setJ "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setJ "";
 
-%feature("docstring") snoptProblemC::setProbName "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setProbName "";
 
-%feature("docstring") snoptProblemC::setSpecsFile "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setSpecsFile "";
 
-%feature("docstring") snoptProblemC::setSTOP "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setSTOP "";
 
-%feature("docstring") snoptProblemC::setX "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setX "";
 
-%feature("docstring") snoptProblemC::setUserFun "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setUserFun "";
 
-%feature("docstring") snoptProblemC::~snoptProblemC "[INTERNAL] ";
+%feature("docstring") snoptProblemC::~snoptProblemC "";
 
-%feature("docstring") snoptProblemC::setObjective "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setObjective "";
 
-%feature("docstring") snoptProblemC::setLog "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setLog "";
 
-%feature("docstring") snoptProblemC::setProblemSize "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setProblemSize "";
 
-%feature("docstring") snoptProblemC::setIntParameter "[INTERNAL] ";
+%feature("docstring") snoptProblemC::setIntParameter "";
 
 
 // File: classcasadi_1_1Solve.xml

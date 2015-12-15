@@ -263,18 +263,9 @@
 <tr><td>grad lag gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess lag gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess lag sparsity time</td><td>casadi::Nlpsol</td></tr>
-<tr><td>iter_count</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>iterations</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>n_callback_fun</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>n_eval_grad_f</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>n_eval_jac_g</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>objective gradient gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>objective jacobian gen time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>return_status</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>t_callback_fun</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>t_eval_grad_f</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>t_eval_jac_g</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>t_mainloop</td><td>casadi::SnoptInterface</td></tr>
 </table>
 */
 /// \endcond
@@ -284,16 +275,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th></tr>
-<tr><td>iter_count</td></tr>
-<tr><td>iterations</td></tr>
-<tr><td>n_callback_fun</td></tr>
-<tr><td>n_eval_grad_f</td></tr>
-<tr><td>n_eval_jac_g</td></tr>
 <tr><td>return_status</td></tr>
-<tr><td>t_callback_fun</td></tr>
-<tr><td>t_eval_grad_f</td></tr>
-<tr><td>t_eval_jac_g</td></tr>
-<tr><td>t_mainloop</td></tr>
 </table>
 */
 /// \cond INTERNAL

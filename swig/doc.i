@@ -9262,294 +9262,253 @@ Return a string with a representation (for SWIG)
 
 
 // File: classsnoptProblem.xml
-%feature("docstring")  snoptProblem::setParameter(const char *stroptin) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setParameter(const char *stroptin) " ";
 
 %feature("docstring")  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2,
-isqLog sqLog) " [INTERNAL] ";
+isqLog sqLog) " ";
 
 %feature("docstring")  snoptProblem::getIntParameter(const char *stropt, int
-&opt) " [INTERNAL] ";
+&opt) " ";
 
-%feature("docstring")  snoptProblem::setSpecsFile(const char *specname) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setSpecsFile(const char *specname) " ";
 
 %feature("docstring")  snoptProblem::setIntParameter(const char *stropt, int
-opt) " [INTERNAL] ";
+opt) " ";
 
 %feature("docstring")  snoptProblem::getRealParameter(const char *stropt,
-double &opt) " [INTERNAL] ";
+double &opt) " ";
 
-%feature("docstring")  snoptProblem::setPrintFile(const char *prtname) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setPrintFile(const char *prtname) " ";
 
 %feature("docstring")  snoptProblem::getParameter(const char *stroptin, char
-*stroptout) " [INTERNAL] ";
+*stroptout) " ";
 
-%feature("docstring")  snoptProblem::setUserR(double *ru, int lenru) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setUserR(double *ru, int lenru) " ";
 
-%feature("docstring")  snoptProblem::setSTOP(isnSTOP snSTOP) " [INTERNAL] ";
+%feature("docstring")  snoptProblem::setSTOP(isnSTOP snSTOP) " ";
 
 %feature("docstring")  snoptProblem::setRealParameter(const char *stropt,
-double opt) " [INTERNAL] ";
+double opt) " ";
 
-%feature("docstring")  snoptProblem::setUserI(int *iu, int leniu) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setUserI(int *iu, int leniu) " ";
 
-%feature("docstring")  snoptProblem::setProbName(const char *Prob) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setProbName(const char *Prob) " ";
 
-%feature("docstring")  snoptProblem::solve(int starttype) " [INTERNAL] ";
+%feature("docstring")  snoptProblem::solve(int starttype) " ";
 
 %feature("docstring")  snoptProblem::setUserspace(int *iu, int leniu, double
-*ru, int lenru) " [INTERNAL] ";
+*ru, int lenru) " ";
 
-%feature("docstring") snoptProblem "[INTERNAL] C++ includes:
-snoptProblem.hpp ";
+%feature("docstring") snoptProblem "C++ includes: snoptProblem.hpp ";
 
 
 // File: classsnoptProblemA.xml
 %feature("docstring")  snoptProblem::getIntParameter(const char *stropt, int
-&opt) " [INTERNAL] ";
+&opt) " ";
 
-%feature("docstring")  snoptProblemA::computeJac() "[INTERNAL] ";
+%feature("docstring")  snoptProblemA::computeJac(int &neA, int &neG) " ";
 
-%feature("docstring") snoptProblemA::snoptProblemA() "[INTERNAL] ";
+%feature("docstring") snoptProblemA::snoptProblemA() "";
 
-%feature("docstring") snoptProblemA::snoptProblemA(const char *name) "
-[INTERNAL] ";
+%feature("docstring") snoptProblemA::snoptProblemA(const char *name) " ";
 
 %feature("docstring") snoptProblemA::snoptProblemA(const char *name, const
-char *prtfile) " [INTERNAL] ";
+char *prtfile) " ";
 
 %feature("docstring")  snoptProblem::getRealParameter(const char *stropt,
-double &opt) " [INTERNAL] ";
+double &opt) " ";
 
-%feature("docstring")  snoptProblem::setSpecsFile(const char *specname) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setSpecsFile(const char *specname) " ";
 
 %feature("docstring")  snoptProblem::setRealParameter(const char *stropt,
-double opt) " [INTERNAL] ";
+double opt) " ";
 
-%feature("docstring")  snoptProblemA::setWorkspace() "[INTERNAL] ";
+%feature("docstring")  snoptProblemA::setWorkspace() "";
 
-%feature("docstring")  snoptProblemA::setNeG(int neG) " [INTERNAL] ";
-
-%feature("docstring")  snoptProblemA::setNeA(int neA) " [INTERNAL] ";
-
-%feature("docstring")  snoptProblem::setSTOP(isnSTOP snSTOP) " [INTERNAL] ";
+%feature("docstring")  snoptProblem::setSTOP(isnSTOP snSTOP) " ";
 
 %feature("docstring")  snoptProblem::setUserspace(int *iu, int leniu, double
-*ru, int lenru) " [INTERNAL] ";
+*ru, int lenru) " ";
 
 %feature("docstring")  snoptProblem::setIntParameter(const char *stropt, int
-opt) " [INTERNAL] ";
+opt) " ";
 
-%feature("docstring")  snoptProblemA::setG(int lenG, int *iGfun, int *jGvar)
-" [INTERNAL] ";
+%feature("docstring")  snoptProblemA::setG(int lenG, int neG, int *iGfun,
+int *jGvar) " ";
 
 %feature("docstring")  snoptProblemA::setF(double *F, double *Flow, double
-*Fupp, double *Fmul, int *Fstate) " [INTERNAL] ";
+*Fupp, double *Fmul, int *Fstate) " ";
 
-%feature("docstring") snoptProblemA::~snoptProblemA "[INTERNAL] ";
+%feature("docstring") snoptProblemA::~snoptProblemA "";
 
-%feature("docstring")  snoptProblem::setPrintFile(const char *prtname) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setPrintFile(const char *prtname) " ";
 
-%feature("docstring")  snoptProblemA::setA(int lenA, int *iAfun, int *jAvar,
-double *A) " [INTERNAL] ";
+%feature("docstring")  snoptProblemA::setA(int lenA, int neA, int *iAfun,
+int *jAvar, double *A) " ";
 
-%feature("docstring")  snoptProblemA::solve(int starttype) " [INTERNAL] ";
+%feature("docstring")  snoptProblemA::solve(int starttype) " ";
 
-%feature("docstring") snoptProblemA "[INTERNAL] C++ includes:
-snoptProblem.hpp ";
+%feature("docstring") snoptProblemA "C++ includes: snoptProblem.hpp ";
 
 %feature("docstring")  snoptProblemA::setX(double *x, double *xlow, double
-*xupp, double *xmul, int *xstate) " [INTERNAL] ";
+*xupp, double *xmul, int *xstate) " ";
 
-%feature("docstring")  snoptProblemA::setUserFun(snFunA usrfun) " [INTERNAL]
-";
+%feature("docstring")  snoptProblemA::setUserFun(snFunA usrfun) " ";
 
 %feature("docstring")  snoptProblem::getParameter(const char *stroptin, char
-*stroptout) " [INTERNAL] ";
+*stroptout) " ";
 
-%feature("docstring")  snoptProblemA::setProblemSize(int n, int neF) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblemA::setProblemSize(int n, int neF) " ";
 
-%feature("docstring")  snoptProblem::setParameter(const char *stroptin) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setParameter(const char *stroptin) " ";
 
 %feature("docstring")  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2,
-isqLog sqLog) " [INTERNAL] ";
+isqLog sqLog) " ";
 
-%feature("docstring")  snoptProblem::setUserI(int *iu, int leniu) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setUserI(int *iu, int leniu) " ";
 
 %feature("docstring")  snoptProblemA::setObjective(int ObjRow, double
-ObjAdd) " [INTERNAL] ";
+ObjAdd) " ";
 
-%feature("docstring")  snoptProblem::setUserR(double *ru, int lenru) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setUserR(double *ru, int lenru) " ";
 
-%feature("docstring")  snoptProblem::setProbName(const char *Prob) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setProbName(const char *Prob) " ";
 
 
 // File: classsnoptProblemB.xml
-%feature("docstring")  snoptProblem::setPrintFile(const char *prtname) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setPrintFile(const char *prtname) " ";
 
 %feature("docstring")  snoptProblem::getRealParameter(const char *stropt,
-double &opt) " [INTERNAL] ";
+double &opt) " ";
 
-%feature("docstring")  snoptProblemB::setFuncon(snConB funcon) " [INTERNAL]
-";
+%feature("docstring")  snoptProblemB::setFuncon(snConB funcon) " ";
 
-%feature("docstring")  snoptProblem::setParameter(const char *stroptin) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setParameter(const char *stroptin) " ";
 
 %feature("docstring")  snoptProblemC::setObjective(int iObj, double ObjAdd)
-" [INTERNAL] ";
+" ";
 
-%feature("docstring")  snoptProblemC::setWorkspace() "[INTERNAL] ";
+%feature("docstring")  snoptProblemC::setWorkspace() "";
 
-%feature("docstring")  snoptProblem::setSTOP(isnSTOP snSTOP) " [INTERNAL] ";
+%feature("docstring")  snoptProblem::setSTOP(isnSTOP snSTOP) " ";
 
 %feature("docstring")  snoptProblem::getIntParameter(const char *stropt, int
-&opt) " [INTERNAL] ";
+&opt) " ";
 
-%feature("docstring")  snoptProblemB::setFunobj(snObjB funobj) " [INTERNAL]
-";
+%feature("docstring")  snoptProblemB::setFunobj(snObjB funobj) " ";
 
 %feature("docstring")  snoptProblem::setUserspace(int *iu, int leniu, double
-*ru, int lenru) " [INTERNAL] ";
+*ru, int lenru) " ";
 
-%feature("docstring") snoptProblemB::snoptProblemB() "[INTERNAL] ";
+%feature("docstring") snoptProblemB::snoptProblemB() "";
 
-%feature("docstring") snoptProblemB::snoptProblemB(const char *name) "
-[INTERNAL] ";
+%feature("docstring") snoptProblemB::snoptProblemB(const char *name) " ";
 
 %feature("docstring") snoptProblemB::snoptProblemB(const char *name, const
-char *prtfile) " [INTERNAL] ";
+char *prtfile) " ";
 
 %feature("docstring")  snoptProblem::getParameter(const char *stroptin, char
-*stroptout) " [INTERNAL] ";
+*stroptout) " ";
 
-%feature("docstring")  snoptProblemC::setUserFun(snFunC usrfun) " [INTERNAL]
-";
+%feature("docstring")  snoptProblemC::setUserFun(snFunC usrfun) " ";
 
 %feature("docstring")  snoptProblem::setIntParameter(const char *stropt, int
-opt) " [INTERNAL] ";
+opt) " ";
 
 %feature("docstring")  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2,
-isqLog sqLog) " [INTERNAL] ";
+isqLog sqLog) " ";
 
-%feature("docstring")  snoptProblem::setUserI(int *iu, int leniu) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setUserI(int *iu, int leniu) " ";
 
 %feature("docstring")  snoptProblemC::setJ(int ne, double *Jval, int *indJ,
-int *locJ) " [INTERNAL] ";
+int *locJ) " ";
 
-%feature("docstring")  snoptProblem::setProbName(const char *Prob) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setProbName(const char *Prob) " ";
 
-%feature("docstring")  snoptProblem::setUserR(double *ru, int lenru) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setUserR(double *ru, int lenru) " ";
 
-%feature("docstring") snoptProblemB "[INTERNAL] C++ includes:
-snoptProblem.hpp ";
+%feature("docstring") snoptProblemB "C++ includes: snoptProblem.hpp ";
 
 %feature("docstring")  snoptProblemC::setProblemSize(int m, int n, int
-nnCon, int nnJac, int nnObj) " [INTERNAL] ";
+nnCon, int nnJac, int nnObj) " ";
 
 %feature("docstring")  snoptProblemC::setX(double *bl, double *bu, double
-*x, double *pi, double *rc, int *hs) " [INTERNAL] ";
+*x, double *pi, double *rc, int *hs) " ";
 
-%feature("docstring")  snoptProblem::setSpecsFile(const char *specname) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setSpecsFile(const char *specname) " ";
 
 %feature("docstring")  snoptProblem::setRealParameter(const char *stropt,
-double opt) " [INTERNAL] ";
+double opt) " ";
 
-%feature("docstring")  snoptProblemB::solve(int starttype) " [INTERNAL] ";
+%feature("docstring")  snoptProblemB::solve(int starttype) " ";
 
-%feature("docstring") snoptProblemB::~snoptProblemB "[INTERNAL] ";
+%feature("docstring") snoptProblemB::~snoptProblemB "";
 
 
 // File: classsnoptProblemC.xml
-%feature("docstring")  snoptProblem::setPrintFile(const char *prtname) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setPrintFile(const char *prtname) " ";
 
-%feature("docstring") snoptProblemC "[INTERNAL] C++ includes:
-snoptProblem.hpp ";
+%feature("docstring") snoptProblemC "C++ includes: snoptProblem.hpp ";
 
 %feature("docstring")  snoptProblem::getRealParameter(const char *stropt,
-double &opt) " [INTERNAL] ";
+double &opt) " ";
 
 %feature("docstring")  snoptProblem::setRealParameter(const char *stropt,
-double opt) " [INTERNAL] ";
+double opt) " ";
 
-%feature("docstring")  snoptProblemC::solve(int starttype) " [INTERNAL] ";
+%feature("docstring")  snoptProblemC::solve(int starttype) " ";
 
-%feature("docstring")  snoptProblem::setParameter(const char *stroptin) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setParameter(const char *stroptin) " ";
 
-%feature("docstring")  snoptProblem::setUserR(double *ru, int lenru) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setUserR(double *ru, int lenru) " ";
 
 %feature("docstring")  snoptProblem::getIntParameter(const char *stropt, int
-&opt) " [INTERNAL] ";
+&opt) " ";
 
 %feature("docstring")  snoptProblem::getParameter(const char *stroptin, char
-*stroptout) " [INTERNAL] ";
+*stroptout) " ";
 
-%feature("docstring") snoptProblemC::snoptProblemC() "[INTERNAL] ";
+%feature("docstring") snoptProblemC::snoptProblemC() "";
 
-%feature("docstring") snoptProblemC::snoptProblemC(const char *name) "
-[INTERNAL] ";
+%feature("docstring") snoptProblemC::snoptProblemC(const char *name) " ";
 
 %feature("docstring") snoptProblemC::snoptProblemC(const char *name, const
-char *prtfile) " [INTERNAL] ";
+char *prtfile) " ";
 
 %feature("docstring")  snoptProblem::setUserspace(int *iu, int leniu, double
-*ru, int lenru) " [INTERNAL] ";
+*ru, int lenru) " ";
 
-%feature("docstring")  snoptProblem::setUserI(int *iu, int leniu) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setUserI(int *iu, int leniu) " ";
 
-%feature("docstring")  snoptProblemC::setWorkspace() "[INTERNAL] ";
+%feature("docstring")  snoptProblemC::setWorkspace() "";
 
 %feature("docstring")  snoptProblemC::setJ(int ne, double *Jval, int *indJ,
-int *locJ) " [INTERNAL] ";
+int *locJ) " ";
 
-%feature("docstring")  snoptProblem::setProbName(const char *Prob) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setProbName(const char *Prob) " ";
 
-%feature("docstring")  snoptProblem::setSpecsFile(const char *specname) "
-[INTERNAL] ";
+%feature("docstring")  snoptProblem::setSpecsFile(const char *specname) " ";
 
-%feature("docstring")  snoptProblem::setSTOP(isnSTOP snSTOP) " [INTERNAL] ";
+%feature("docstring")  snoptProblem::setSTOP(isnSTOP snSTOP) " ";
 
 %feature("docstring")  snoptProblemC::setX(double *bl, double *bu, double
-*x, double *pi, double *rc, int *hs) " [INTERNAL] ";
+*x, double *pi, double *rc, int *hs) " ";
 
-%feature("docstring")  snoptProblemC::setUserFun(snFunC usrfun) " [INTERNAL]
-";
+%feature("docstring")  snoptProblemC::setUserFun(snFunC usrfun) " ";
 
-%feature("docstring") snoptProblemC::~snoptProblemC "[INTERNAL] ";
+%feature("docstring") snoptProblemC::~snoptProblemC "";
 
 %feature("docstring")  snoptProblemC::setObjective(int iObj, double ObjAdd)
-" [INTERNAL] ";
+" ";
 
 %feature("docstring")  snoptProblem::setLog(isnLog snLog, isnLog2 snLog2,
-isqLog sqLog) " [INTERNAL] ";
+isqLog sqLog) " ";
 
 %feature("docstring")  snoptProblemC::setProblemSize(int m, int n, int
-nnCon, int nnJac, int nnObj) " [INTERNAL] ";
+nnCon, int nnJac, int nnObj) " ";
 
 %feature("docstring")  snoptProblem::setIntParameter(const char *stropt, int
-opt) " [INTERNAL] ";
+opt) " ";
 
 
 // File: classcasadi_1_1Solve.xml
