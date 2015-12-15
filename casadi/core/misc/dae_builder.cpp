@@ -1718,6 +1718,9 @@ namespace casadi {
       }
     }
 
+    // Determine which Jacobian blocks to transpose
+    vector<bool> trans(s_out.size(), false);
+
     // Determine which Jacobian blocks to generate
     vector<vector<int> > wanted(DAE_BUILDER_NUM_OUT, vector<int>(DAE_BUILDER_NUM_IN, -1));
     for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
@@ -1729,7 +1732,8 @@ namespace casadi {
 
       // Get operation
       string s = i->substr(0, pos);
-      if (s!="jac") continue;
+      if (s!="jac" && s!="jact") continue;
+      trans[i-s_out.begin()] = s=="jact";
 
       // Get expression to be differentiated
       size_t pos1 = i->find('_', pos+1);
@@ -1792,6 +1796,7 @@ namespace casadi {
           for (int ko=0; ko<ob.size(); ++ko) {
             int& ind=wanted[ob[ko]][ib[ki]];
             ret_out[ind] = J_all[ko][ki];
+            if (trans[ind]) ret_out[ind] = ret_out[ind].T();
             assigned[ind] = true;
             ind = -1;
           }
@@ -1812,7 +1817,8 @@ namespace casadi {
         size_t pos = i->find('_');
         if (pos>=i->size()) continue;
         string s = i->substr(0, pos);
-        if (s!="hes") continue;
+        if (s!="hes" && s!="hest") continue;
+        trans[i-s_out.begin()] = s=="hest";
 
         // Get expression to be differentiated
         size_t pos1 = i->find('_', pos+1);
@@ -1891,6 +1897,7 @@ namespace casadi {
               int& ind=wanted[ib1[k1]][ib2[k2]];
               if (ind>=0) {
                 ret_out[ind] = H_all[k1][k2];
+                if (trans[ind]) ret_out[ind] = ret_out[ind].T();
                 assigned[ind] = true;
                 ind = -1;
               }
