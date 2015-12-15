@@ -564,6 +564,7 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Type of variables, Each entry can be one of: 'continuous', 'binary', 'integer', 'semicont', 'semiint'</td><td>casadi::GurobiInterface</td></tr>
 </table>
 */
 /// \endcond
@@ -573,6 +574,7 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Type of variables, Each entry can be one of: 'continuous', 'binary', 'integer', 'semicont', 'semiint'</td></tr>
 </table>
 */
 /// \cond INTERNAL
