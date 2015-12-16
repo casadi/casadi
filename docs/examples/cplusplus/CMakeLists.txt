@@ -19,6 +19,8 @@ target_link_libraries(propagating_sparsity casadi)
 if(IPOPT_FOUND)
   add_executable(rocket_ipopt rocket_ipopt.cpp)
   target_link_libraries(rocket_ipopt casadi)
+  add_executable(callback_nlp callback_nlp.cpp)
+  target_link_libraries(callback_nlp casadi)
 endif()
 
 # basic snopt example
