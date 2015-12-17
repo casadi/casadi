@@ -574,8 +574,16 @@ namespace casadi {
     }
 
     /** \brief Returns a reshaped version of the matrix
+    *
+    *
+    *  If ncol equals -1, it will becomputed from nrow to be consistent, and vica versa.
      */
     inline friend MatType reshape(const MatType& a, int nrow, int ncol) {
+      casadi_assert_message((nrow>=0 || ncol>=0) && (nrow>=-1 || ncol>=-1),
+        "reshape arguments must be positive, except that one of both can be -1." <<
+        " Got " << nrow << " and " << ncol << " instead.");
+      if (nrow==-1) nrow = a.numel()/ncol;
+      if (ncol==-1) ncol = a.numel()/nrow;
       return a.zz_reshape(nrow, ncol);
     }
 
