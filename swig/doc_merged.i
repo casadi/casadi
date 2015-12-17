@@ -47511,6 +47511,9 @@ Creates a block matrix in which each element (i, j) is a_ij*b
 
 Returns a reshaped version of the matrix.
 
+If ncol equals -1, it will becomputed from nrow to be consistent, and vica
+versa.
+
 >  MatType reshape(MatType a,(int,int) rc)
 ------------------------------------------------------------------------
 
