@@ -28,8 +28,9 @@
 
 #include "casadi/core/function/nlpsol.hpp"
 #include "casadi/interfaces/snopt/casadi_nlpsol_snopt_export.h"
-#include "casadi/interfaces/snopt/snopt.h"
-#include "snoptProblem.hpp"
+extern "C" {
+#include "snopt_cwrap.h" // NOLINT(build/include)
+}
 
 /** \defgroup plugin_Nlpsol_snopt
   SNOPT interface
@@ -89,21 +90,8 @@ namespace casadi {
     int nnObj_;
     int nnCon_;
 
-    /// sorted variable index -> original variable index
-    std::vector<int> x_order_;
-    /// sorted constraint index -> original constraint index
-    std::vector<int> g_order_;
-
     IM A_structure_;
     std::vector<double> A_data_;
-
-
-    std::vector<double> bl_;
-    std::vector<double> bu_;
-    std::vector<int> hs_;
-    std::vector<double> xk_;
-    std::vector<double> pi_;
-    std::vector<double> rc_;
 
     // Do detection of linear substructure
     bool detect_linear_;
@@ -140,7 +128,7 @@ namespace casadi {
       std::map<std::string, std::pair<std::string, std::string> > strOpts_;
 
       /// Pass the supplied options to Snopt
-      void passOptions(snoptProblemC &probC);
+      void passOptions(snProblem &prob);
 
       // Accumulated time in last evaluate():
       double t_eval_grad_f_; // time spent in eval_grad_f

@@ -291,12 +291,6 @@ namespace casadi {
     casadi_assert(!(dummyrow_ && jacF_row_));
 
     // Allocate data structures needed in evaluate
-    bl_.resize(nx_+m_);
-    bu_.resize(nx_+m_);
-    hs_.resize(nx_+m_);
-    xk_.resize(nx_+m_);
-    pi_.resize(m_);
-    rc_.resize(nx_+m_);
     A_data_.resize(A_structure_.nnz());
 
     // Reset the counters
@@ -314,13 +308,13 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::passOptions(snoptProblemC &probC) {
+  void SnoptInterface::passOptions(snProblem &prob) {
     for (std::map<std::string, std::string>::const_iterator it = intOpts_.begin();
          it != intOpts_.end(); ++it)
       if (hasSetOption(it->first)) {
         int value = option(it->first);
         casadi_assert(it->first.size() <= 55);
-        int Error = probC.setIntParameter(it->first.c_str(), value);
+        int Error = setIntParameter(&prob, const_cast<char*>(it->first.c_str()), value);
         casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
       }
     for (std::map<std::string, std::string>::const_iterator it = realOpts_.begin();
@@ -328,7 +322,7 @@ namespace casadi {
       if (hasSetOption(it->first)) {
         double value = option(it->first);
         casadi_assert(it->first.size() <= 55);
-        int Error = probC.setRealParameter(it->first.c_str(), value);
+        int Error = setRealParameter(&prob, const_cast<char*>(it->first.c_str()), value);
         casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
       }
     for (std::map<std::string, std::pair<std::string, std::string> >::const_iterator
@@ -339,7 +333,7 @@ namespace casadi {
         buffer.append(" ");
         buffer.append(value);
         casadi_assert(buffer.size() <= 72);
-        int Error = probC.setParameter(buffer.c_str());
+        int Error = setParameter(&prob, const_cast<char*>(buffer.c_str()));
         casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
       }
   } // passOptions()
@@ -373,6 +367,9 @@ namespace casadi {
     // Check the provided inputs
     checkInputs(mem);
 
+    // Memory object
+    snProblem prob;
+
     // Evaluate gradF and jacG at initial value
     if (!jacG_.isNull()) {
       std::fill_n(arg_, jacG_.n_in(), nullptr);
@@ -403,42 +400,6 @@ namespace casadi {
       }
     }
 
-    // Obtain sparsity pattern of A (Fortran is Index-1 based, but the C++ wrappers are Index-0)
-    std::vector<int> row(A_structure_.nnz());
-    for (int k = 0; k < A_structure_.nnz(); ++k) {
-      row[k] = A_structure_.row()[k];
-    }
-
-    std::vector<int> col(nx_+1);
-    for (int k = 0; k < nx_+1; ++k) {
-      col[k] = A_structure_.colind()[k];
-    }
-
-    // Obtain initial guess and bounds through the mapping
-    casadi_copy(lbx_, nx_, getPtr(bl_));
-    casadi_copy(ubx_, nx_, getPtr(bu_));
-    casadi_copy(x0_, nx_, getPtr(xk_));
-    for (int k = 0; k < nx_; ++k) {
-      bl_[k] = bl_[k];
-      bu_[k] = bu_[k];
-      xk_[k] = xk_[k];
-    }
-    casadi_copy(lbg_, ng_, getPtr(bl_)+nx_);
-    casadi_copy(ubg_, ng_, getPtr(bu_)+nx_);
-    casadi_copy(lam_g0_, ng_, getPtr(xk_)+nx_);
-
-    for (int k = 0; k < ng_; ++k) {
-      bl_[nx_+k] = bl_[nx_+k];
-      bu_[nx_+k] = bu_[nx_+k];
-      xk_[nx_+k] = xk_[nx_+k];
-    }
-
-    // Objective row / dummy row should be unbounded
-    if (dummyrow_ || jacF_row_) {
-      bl_.back() = -1e20;  // -std::numeric_limits<double>::infinity();
-      bu_.back() = 1e20;  // std::numeric_limits<double>::infinity();
-    }
-
     int n = nx_;
     int nea = A_structure_.nnz();
     double ObjAdd = 0;
@@ -446,16 +407,7 @@ namespace casadi {
     casadi_assert(m_ > 0);
     casadi_assert(n > 0);
     casadi_assert(nea > 0);
-    casadi_assert(row.size() == nea);
-    casadi_assert(hs_.size() == n+m_);
-    casadi_assert(col.size() == n+1);
     casadi_assert(A_structure_.nnz() == nea);
-    casadi_assert(bl_.size() == n+m_);
-    casadi_assert(bu_.size() == n+m_);
-    casadi_assert(pi_.size() == m_);
-    casadi_assert(xk_.size() == n+m_);
-    casadi_assert(col.at(0) == 0);
-    casadi_assert(col.at(n) == nea);
 
     // Pointer magic, courtesy of Greg
     casadi_assert_message(!jacF_.isNull(), "blaasssshc");
@@ -463,61 +415,80 @@ namespace casadi {
     // Outputs
     double Obj = 0; // TODO(Greg): get this from snopt
 
-    if (option("summary"))
-      summaryOn();
-    else
-      summaryOff();
-    snoptProblemC snoptProbC = snoptProblemC();
-    if (hasSetOption("specs file")) {
-      std::string specs_file = option("specs file");
-      snoptProbC.setSpecsFile(specs_file.c_str());
-    }
-    if (hasSetOption("print file")) {
-      std::string print_file = option("print file");
-      snoptProbC.setPrintFile(print_file.c_str());
-    }
+    // if (option("summary")) {
+    //   summaryOn();
+    // } else {
+    //   summaryOff();
+    // }
 
-    snoptProbC.setProblemSize(m_, nx_, nnCon_, nnJac_, nnObj_);
-    snoptProbC.setObjective(iObj_, ObjAdd);
-    snoptProbC.setJ(nea, getPtr(A_data_), getPtr(row), getPtr(col));
-    snoptProbC.setX(getPtr(bl_), getPtr(bu_), getPtr(xk_), getPtr(pi_), getPtr(rc_), getPtr(hs_));
-    snoptProbC.setUserFun(userfunPtr);
-    passOptions(snoptProbC);
+    // snInit must be called first.
+    //   9, 6 are print and summary unit numbers (for Fortran).
+    //   6 == standard out
+    int iprint = 9;
+    int isumm = 6;
+    std::string outname = name_ + ".out";
+    snInit(&prob, const_cast<char*>(name_.c_str()),
+           const_cast<char*>(outname.c_str()), iprint, isumm);
+
+    // snoptProblemC snoptProbC = snoptProblemC();
+    // if (hasSetOption("specs file")) {
+    //   std::string specs_file = option("specs file");
+    //   snoptProbC.setSpecsFile(specs_file.c_str());
+    // }
+    // if (hasSetOption("print file")) {
+    //   std::string print_file = option("print file");
+    //   snoptProbC.setPrintFile(print_file.c_str());
+    // }
+
+    // Set the problem size and other data.
+    // This will allocate arrays inside snProblem struct.
+    setProblemSize(&prob, m_, nx_, nea, nnCon_, nnJac_, nnObj_);
+    setObjective(&prob, iObj_, ObjAdd);
+    setUserfun(&prob, userfunPtr);
 
     // user data
     auto mem_it = std::find(mempool_.begin(), mempool_.end(), this);
     casadi_assert(mem_it!=mempool_.end());
     int mem_ind = mem_it-mempool_.begin();
-    snoptProbC.setUserI(&mem_ind, 1);
+    prob.leniu = 1;
+    prob.iu = &mem_ind;
+
+    // Pass bounds
+    casadi_copy(lbx_, nx_, prob.bl);
+    casadi_copy(ubx_, nx_, prob.bu);
+    casadi_copy(lbg_, ng_, prob.bl + nx_);
+    casadi_copy(ubg_, ng_, prob.bu + nx_);
+
+    // Initialize states and slack
+    casadi_fill(prob.hs, ng_ + nx_, 0);
+    casadi_copy(x0_, nx_, prob.x);
+    casadi_fill(prob.x + nx_, ng_, 0.);
+
+    // Initialize multipliers
+    casadi_copy(lam_g0_, ng_, prob.pi);
+
+    // Set up Jacobian matrix
+    casadi_copy(A_structure_.colind(), A_structure_.size2()+1, prob.locJ);
+    casadi_copy(A_structure_.row(), A_structure_.nnz(), prob.indJ);
+    casadi_copy(getPtr(A_data_), A_structure_.nnz(), prob.valJ);
+
+    // Pass options
+    passOptions(prob);
 
     // Run SNOPT
-    double time0 = clock();
-    int info = snoptProbC.solve(optionEnumValue("start"));
+    int Cold = 0;
+    int info = solveC(&prob, Cold, &fk_);
     casadi_assert_message(99 != info, "snopt problem set up improperly");
-    t_mainloop_ = static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
-
-    stats_["return_status"] = info;
 
     // Negate rc to match CasADi's definition
-    casadi_scal(nx_ + ng_, -1., getPtr(rc_));
+    casadi_scal(nx_ + ng_, -1., prob.rc);
 
     // Get primal solution
-    casadi_copy(getPtr(xk_), nx_, x_);
+    casadi_copy(prob.x, nx_, x_);
 
     // Get dual solution
-    casadi_copy(getPtr(rc_), nx_, lam_x_);
-    casadi_copy(getPtr(rc_)+nx_, ng_, lam_g_);
-
-    // todo(Greg): get these from snopt
-    // we overwrite F and G for now because the current snopt interface
-    // doesn't provide F, and the above comment suggests that G is wrong
-    std::fill_n(arg_, nlp_.n_in(), nullptr);
-    arg_[NL_X] = getPtr(xk_);
-    arg_[NL_P] = p_;
-    std::fill_n(res_, nlp_.n_out(), nullptr);
-    res_[NL_F] = &fk_;
-    res_[NL_G] = gk_;
-    nlp_(arg_, res_, iw_, w_, 0);
+    casadi_copy(prob.rc, nx_, lam_x_);
+    casadi_copy(prob.rc+nx_, ng_, lam_g_);
 
     // Copy optimal cost to output
     if (f_) *f_ = fk_;
@@ -525,22 +496,8 @@ namespace casadi {
     // Copy optimal constraint values to output
     casadi_copy(gk_, ng_, g_);
 
-    // print timing information
-    // save state
-    std::ios state(NULL);
-    state.copyfmt(userOut());
-    const int w_time = 7;
-    const int p_time = 3;
-    const int w_ms = 7;
-    const int p_ms = 2;
-    const int w_n = 5;
-
-    // restore state
-    userOut().copyfmt(state);
-
-    // Reset the counters
-    t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
-    n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
+    // Free memory
+    deleteSNOPT(&prob);
   }
 
   void SnoptInterface::setOptionsFromFile(const std::string & file) {

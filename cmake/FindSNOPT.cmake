@@ -1,31 +1,35 @@
-# libraries
-set(SNOPT_LIBS_LIST snopt7 snopt7_cpp)
+# C headers
+find_path(SNOPT_INCLUDE_DIR
+snopt_cwrap.h
+HINTS $ENV{SNOPT}/include
+)
 
-set(SNOPT_LIBRARIES)
-set(SNOPT_HAS_EVERYTHING TRUE)
-foreach(LIB ${SNOPT_LIBS_LIST})
-  find_library(SNOPT_LIB_${LIB}
-    NAMES ${LIB}
-    HINTS $ENV{SNOPT}/lib)
-  if(SNOPT_LIB_${LIB})
-    message(STATUS "Found ${LIB}: ${SNOPT_LIB_${LIB}}")
-    set(SNOPT_LIBRARIES ${SNOPT_LIBRARIES} ${SNOPT_LIB_${LIB}})
-  else()
-    set(SNOPT_HAS_EVERYTHING FALSE)
-    message(STATUS "Could not find lib${LIB}")
-  endif()
-endforeach()
-
-if(SNOPT_LIBRARIES)
-  set(SNOPT_LIBRARIES ${SNOPT_LIBRARIES})
-  message(STATUS "Found Snopt libs")
-  set(SNOPT_FOUND_LIBS TRUE)
+if(SNOPT_INCLUDE_DIR)
+   set(SNOPT_FOUND_INCLUDE TRUE)
+   message(STATUS "Found SNOPT include dir: ${SNOPT_INCLUDE_DIR}")
 else()
-  message(STATUS "Could not find Snopt libs")
+   message(STATUS "Could not find SNOPT include dir")
 endif()
 
-if(SNOPT_FOUND_LIBS)
-  if(SNOPT_HAS_EVERYTHING)
-    set(SNOPT_FOUND TRUE)
-  endif()
+# Library
+find_library(SNOPT_LIBRARY_C
+snopt7
+HINTS $ENV{SNOPT}/lib
+)
+
+# Library
+find_library(SNOPT_LIBRARY
+snopt7_c
+HINTS $ENV{SNOPT}/lib
+)
+
+if(SNOPT_LIBRARY AND SNOPT_LIBRARY_C)
+  set(SNOPT_LIBRARIES ${SNOPT_LIBRARY} ${SNOPT_LIBRARY_C})
+  message(STATUS "Found SNOPT library: ${SNOPT_LIBRARY}")
+else()
+  message(STATUS "Could not find SNOPT libs")
+endif()
+
+if(SNOPT_FOUND_INCLUDE AND SNOPT_LIBRARIES)
+  set(SNOPT_FOUND TRUE)
 endif()
