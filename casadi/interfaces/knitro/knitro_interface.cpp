@@ -176,34 +176,27 @@ namespace casadi {
     /*  casadi_assert(kc_handle_==0);
         kc_handle_ = KTR_new();*/
 
+    // Allocate memory
+    alloc_w(nx_, true); // wx_
+    alloc_w(nx_, true); // wlbx_
+    alloc_w(nx_, true); // wubx_
+    alloc_w(ng_, true); // wlbg_
+    alloc_w(ng_, true); // wubg_
   }
 
   void KnitroInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
     // Reset the base classes
     Nlpsol::reset(mem, arg, res, iw, w);
+
+    // Copy inputs to temporary arrays
+    wx_ = w; w += nx_;
+    wlbx_ = w; w += nx_;
+    wubx_ = w; w += nx_;
+    wlbg_ = w; w += ng_;
+    wubg_ = w; w += ng_;
   }
 
   void KnitroInterface::solve(void* mem) {
-    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
-      const double *v;
-      switch (i) {
-      case NLPSOL_X0: v = x0_; break;
-      case NLPSOL_P: v = p_; break;
-      case NLPSOL_LBX: v = lbx_; break;
-      case NLPSOL_UBX: v = ubx_; break;
-      case NLPSOL_LBG: v = lbg_; break;
-      case NLPSOL_UBG: v = ubg_; break;
-      case NLPSOL_LAM_X0: v = lam_x0_; break;
-      case NLPSOL_LAM_G0: v = lam_g0_; break;
-      default: casadi_assert(0);
-      }
-      if (v) {
-        setInputNZ(v, i);
-      } else {
-        setInput(0., i);
-      }
-    }
-
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert(kc_handle_==0);
     kc_handle_ = KTR_new();
@@ -275,34 +268,21 @@ namespace casadi {
     }
 
     // "Correct" upper and lower bounds
-    for (auto it=input(NLPSOL_LBX)->begin(); it!=input(NLPSOL_LBX)->end(); ++it)
-      if (isinf(*it)) *it = -KTR_INFBOUND;
-    for (auto it=input(NLPSOL_UBX)->begin(); it!=input(NLPSOL_UBX)->end(); ++it)
-      if (isinf(*it)) *it =  KTR_INFBOUND;
-    for (auto it=input(NLPSOL_LBG)->begin(); it!=input(NLPSOL_LBG)->end(); ++it)
-      if (isinf(*it)) *it = -KTR_INFBOUND;
-    for (auto it=input(NLPSOL_UBG)->begin(); it!=input(NLPSOL_UBG)->end(); ++it)
-      if (isinf(*it)) *it =  KTR_INFBOUND;
+    casadi_copy(x0_, nx_, wx_);
+    casadi_copy(lbx_, nx_, wlbx_);
+    casadi_copy(ubx_, nx_, wubx_);
+    casadi_copy(lbg_, ng_, wlbg_);
+    casadi_copy(ubg_, ng_, wubg_);
+    for (int i=0; i<nx_; ++i) if (isinf(wlbx_[i])) wlbx_[i] = -KTR_INFBOUND;
+    for (int i=0; i<nx_; ++i) if (isinf(wubx_[i])) wubx_[i] =  KTR_INFBOUND;
+    for (int i=0; i<ng_; ++i) if (isinf(wlbg_[i])) wlbg_[i] = -KTR_INFBOUND;
+    for (int i=0; i<ng_; ++i) if (isinf(wubg_[i])) wubg_[i] =  KTR_INFBOUND;
 
     // Initialize KNITRO
-    status = KTR_init_problem(kc_handle_,
-                              nx_,
-                              KTR_OBJGOAL_MINIMIZE,
-                              KTR_OBJTYPE_GENERAL,
-                              input(NLPSOL_LBX).ptr(),
-                              input(NLPSOL_UBX).ptr(),
-                              ng_,
-                              getPtr(cType),
-                              input(NLPSOL_LBG).ptr(),
-                              input(NLPSOL_UBG).ptr(),
-                              Jcol.size(),
-                              getPtr(Jcol),
-                              getPtr(Jrow),
-                              nnzH,
-                              getPtr(Hrow),
-                              getPtr(Hcol),
-                              input(NLPSOL_X0).ptr(),
-                              0); // initial lambda
+    status = KTR_init_problem(kc_handle_, nx_, KTR_OBJGOAL_MINIMIZE,
+                              KTR_OBJTYPE_GENERAL, wlbx_, wubx_, ng_, getPtr(cType),
+                              wlbg_, wubg_, Jcol.size(), getPtr(Jcol), getPtr(Jrow),
+                              nnzH, getPtr(Hrow), getPtr(Hcol), wx_, 0); // initial lambda
     casadi_assert_message(status==0, "KTR_init_problem failed");
 
     // Register callback functions
@@ -321,43 +301,28 @@ namespace casadi {
     vector<double> lambda(nx_+ng_);
 
     // Solve NLP
-    status = KTR_solve(kc_handle_,
-                       output(NLPSOL_X).ptr(),
-                       getPtr(lambda),
-                       0,  // not used
-                       output(NLPSOL_F).ptr(),
-                       0,  // not used
-                       0,  // not used
-                       0,  // not used
-                       0,  // not used
-                       0,  // not used
-                       static_cast<void*>(this)); // to be retrieved in the callback function
+    double f;
+    status = KTR_solve(kc_handle_, wx_, getPtr(lambda), 0, &f,
+                       0, 0, 0, 0, 0, static_cast<void*>(this));
+
+    // Output primal solution
+    casadi_copy(wx_, nx_, x_);
+
+    // Output dual solution
+    casadi_copy(getPtr(lambda), ng_, lam_g_);
+    casadi_copy(getPtr(lambda)+ng_, nx_, lam_x_);
+
+    // Output optimal cost
+    if (f_) *f_ = f;
+
     stats_["return_status"] = status;
 
     // Copy constraints
-    nlp_.output(NL_G).get(output(NLPSOL_G));
-
-    // Copy lagrange multipliers
-    output(NLPSOL_LAM_G).setNZ(getPtr(lambda));
-    output(NLPSOL_LAM_X).setNZ(getPtr(lambda)+ng_);
+    casadi_copy(nlp_.output(NL_G).ptr(), ng_, g_);
 
     // Free memory (move to destructor!)
     KTR_free(&kc_handle_);
     kc_handle_ = 0;
-
-    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-      double **v;
-      switch (i) {
-      case NLPSOL_X: v = &x_; break;
-      case NLPSOL_F: v = &f_; break;
-      case NLPSOL_G: v = &g_; break;
-      case NLPSOL_LAM_X: v = &lam_x_; break;
-      case NLPSOL_LAM_G: v = &lam_g_; break;
-      case NLPSOL_LAM_P: v = &lam_p_; break;
-      default: casadi_assert(0);
-      }
-      if (*v) getOutputNZ(*v, i);
-    }
   }
 
 
@@ -389,7 +354,11 @@ namespace casadi {
   void KnitroInterface::evalfc(const double* x, double& obj, double *c) {
     // Pass the argument to the function
     nlp_.setInputNZ(x, NL_X);
-    nlp_.setInput(input(NLPSOL_P), NL_P);
+    if (p_) {
+      nlp_.setInputNZ(p_, NL_P);
+    } else {
+      nlp_.setInput(0., NL_P);
+    }
 
     // Evaluate the function
     nlp_.evaluate();
@@ -412,7 +381,11 @@ namespace casadi {
   void KnitroInterface::evalga(const double* x, double* objGrad, double* jac) {
     // Pass the argument to the function
     gradF_.setInputNZ(x, NL_X);
-    gradF_.setInput(input(NLPSOL_P), NL_P);
+    if (p_) {
+      gradF_.setInputNZ(p_, NL_P);
+    } else {
+      gradF_.setInput(0., NL_P);
+    }
 
     // Evaluate the function using adjoint mode AD
     gradF_.evaluate();
@@ -429,7 +402,11 @@ namespace casadi {
     if (!jacG_.isNull()) {
       // Pass the argument to the Jacobian function
       jacG_.setInputNZ(x, NL_X);
-      jacG_.setInput(input(NLPSOL_P), NL_P);
+      if (p_) {
+        jacG_.setInputNZ(p_, NL_P);
+      } else {
+        jacG_.setInput(0., NL_P);
+      }
 
       // Evaluate the Jacobian function
       jacG_.evaluate();
@@ -448,7 +425,11 @@ namespace casadi {
   void KnitroInterface::evalh(const double* x, const double* lambda, double* hessian) {
     // Pass the argument to the function
     hessLag_.setInputNZ(x, NL_X);
-    hessLag_.setInput(input(NLPSOL_P), NL_P);
+    if (p_) {
+      hessLag_.setInputNZ(p_, NL_P);
+    } else {
+      hessLag_.setInput(0., NL_P);
+    }
     hessLag_.setInput(1.0, NL_NUM_IN+NL_F);
     hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
 

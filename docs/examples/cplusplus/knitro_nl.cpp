@@ -23,7 +23,8 @@
  */
 
 #include <casadi/casadi.hpp>
- 
+#include <iomanip>
+
 /**
  * This example demonstrates how NL-files, which can be generated
  * by AMPl or Pyomo, can be imported in CasADi and solved using
@@ -64,6 +65,9 @@ int main(int argc, char **argv){
 
   // Solve the NLP
   res = solver(arg);
+  for (auto&& s : res) {
+    std::cout << std::setw(10) << s.first << ": " << s.second.nonzeros() << std::endl;
+  }
 
   return 0;
 }

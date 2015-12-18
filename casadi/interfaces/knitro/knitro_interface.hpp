@@ -93,6 +93,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Inputs
+    double *wx_, *wlbx_, *wubx_, *wlbg_, *wubg_;
   };
 
 } // namespace casadi
