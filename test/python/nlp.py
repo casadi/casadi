@@ -41,8 +41,8 @@ if has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"tol": 1e-10, "derivative_test":"second-order"}))
   solvers.append(("ipopt",{"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory"}))
 
-if has_nlpsol("snopt"):
-  solvers.append(("snopt",{"Verify level": 3,"detect_linear": True,"Major optimality tolerance":1e-12,"Minor feasibility tolerance":1e-12,"Major feasibility tolerance":1e-12}))
+#if has_nlpsol("snopt"):
+#  solvers.append(("snopt",{"Verify level": 3,"detect_linear": True,"Major optimality tolerance":1e-12,"Minor feasibility tolerance":1e-12,"Major feasibility tolerance":1e-12}))
 
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"tol": 1e-12} }
