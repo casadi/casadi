@@ -375,6 +375,32 @@ namespace casadi {
       return v.zz_horzsplit(incr);
     }
 
+    /** \brief  split horizontally in two (possibly unequal) parts
+     * \param loc Where the splitting should occur
+     *
+      \doctest
+      a,b = horzsplit2(DMatrix.ones(2, 10), 4)
+      print a.shape
+      print b.shape
+      \doctestout
+      (2,4)
+      (2,6)
+      \enddoctest
+      
+      \doctest
+      a,b = horzsplit2(DMatrix.ones(2, 10), -3)
+      print a.shape
+      print b.shape
+      \doctestout
+      (2,7)
+      (2,3)
+      \enddoctest
+     */
+    inline friend std::vector<MatType > horzsplit2(const MatType &v, int loc) {
+      if (loc<0) loc+=v.size2();
+      return horzsplit(v, {0, loc, v.size2()});
+    }
+
     /** * \brief  split vertically, retaining groups of rows
      * \param output_offset List of all start rows for each group
      *      the last row group will run to the end.
@@ -421,6 +447,33 @@ namespace casadi {
      */
     inline friend std::vector<MatType > vertsplit(const MatType &v, int incr=1) {
       return v.zz_vertsplit(incr);
+    }
+
+    /** \brief  split vertically in two (possibly unequal) parts
+     * \param loc Where the splitting should occur
+     *
+      \doctest
+      a,b = vertsplit2(DMatrix.ones(10, 2), 4)
+      print a.shape
+      print b.shape
+      \doctestout
+      (4,2)
+      (6,2)
+      \enddoctest
+
+      \doctest
+      a,b = vertsplit2(DMatrix.ones(2, 10), -3)
+      print a.shape
+      print b.shape
+      \doctestout
+      (7,2)
+      (3,2)
+      \enddoctest
+
+     */
+    inline friend std::vector<MatType > vertsplit2(const MatType &v, int loc) {
+      if (loc<0) loc+=v.size2();
+      return vertsplit(v, {0, loc, v.size1()});
     }
 
     /** \brief Construct a matrix from a list of list of blocks.

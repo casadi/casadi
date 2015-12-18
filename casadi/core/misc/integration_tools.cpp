@@ -247,6 +247,61 @@ namespace casadi {
     }
   }
 
+  MXFunction collocationResidual(Function f, const std::vector<double> & tau_root) {
+    int order = tau_root.size()-1;
+
+    // Retrieve collocation interpolating matrices
+    std::vector < std::vector <double> > C;
+    std::vector < double > D;
+    collocationInterpolators(tau_root, C, D);
+
+    // Inputs of constructed function
+    MX x0 = MX::sym("x0", f.input(0).sparsity());
+    MX h = MX::sym("h");
+
+    // Implicitly defined variables
+    MX v = MX::sym("v", repmat(x0.sparsity(), order));
+    std::vector<MX> x = vertsplit(v, x0.size1());
+    x.insert(x.begin(), x0);
+
+    std::vector<MX> f_in_mx = f.symbolicInput();
+
+    // Collect the equations that implicitly define v
+    std::vector<MX> V_eq, f_out;
+    std::vector<MX> f_in = f_in_mx;
+
+    for (int j=1; j<order+1; ++j) {
+      // Expression for the state derivative at the collocation point
+      MX xp_j = 0;
+      for (int r=0; r<=order; ++r) xp_j+= C[j][r]*x[r];
+
+      // Collocation equations
+      f_in[0] = x[j];
+      f_out = f(f_in);
+      V_eq.push_back(h*f_out.at(0)-xp_j);
+    }
+
+    MX xf = x0;
+
+    x = vertsplit(v, x0.size1());
+
+    // State at end of step
+    xf = D[0]*x0;
+    for (int i=1; i<=order; ++i) {
+      xf += D[i]*x[i-1];
+    }
+
+    // List inputs for residual function
+    std::vector<MX> rftp_in = {v, x0};
+    rftp_in.insert(rftp_in.end(), f_in_mx.begin()+1, f_in_mx.end());
+    rftp_in.push_back(h);
+
+    // Residual function
+    MXFunction rfp("rfp", rftp_in, make_vector(vertcat(V_eq), xf));
+
+    return rfp;
+  }
+
   MXFunction simpleIRK(Function f, int N, int order, const std::string& scheme,
                        const std::string& solver,
                        const Dict& solver_options) {
@@ -259,43 +314,19 @@ namespace casadi {
     casadi_assert_message(f.nIn()==2, "Function must have two inputs: x and p");
     casadi_assert_message(f.nOut()==1, "Function must have one outputs: dot(x)");
 
-    // Obtain collocation points
-    std::vector<double> tau_root = collocationPoints(order, scheme);
-
-    // Retrieve collocation interpolating matrices
-    std::vector < std::vector <double> > C;
-    std::vector < double > D;
-    collocationInterpolators(tau_root, C, D);
-
     // Inputs of constructed function
     MX x0 = MX::sym("x0", f.input(0).sparsity());
     MX p = MX::sym("p", f.input(1).sparsity());
     MX h = MX::sym("h");
 
-    // Time step
+    // Timestep
     MX dt = h/N;
 
-    // Implicitly defined variables
-    MX v = MX::sym("v", repmat(x0.sparsity(), order));
-    std::vector<MX> x = vertsplit(v, x0.size1());
-    x.insert(x.begin(), x0);
+    // Obtain collocation points
+    std::vector<double> tau_root = collocationPoints(order, scheme);
 
-    // Collect the equations that implicitly define v
-    std::vector<MX> V_eq, f_in(2), f_out;
-    for (int j=1; j<order+1; ++j) {
-      // Expression for the state derivative at the collocation point
-      MX xp_j = 0;
-      for (int r=0; r<=order; ++r) xp_j+= C[j][r]*x[r];
-
-      // Collocation equations
-      f_in[0] = x[j];
-      f_in[1] = p;
-      f_out = f(f_in);
-      V_eq.push_back(dt*f_out.at(0)-xp_j);
-    }
-
-    // Root-finding function
-    MXFunction rfp("rfp", make_vector(v, x0, p, h), make_vector(vertcat(V_eq)));
+    // Obtain residual function for the rootfinding problem
+    Function rfp = collocationResidual(f, tau_root);
 
     // Create a implicit function instance to solve the system of equations
     ImplicitFunction ifcn("ifcn", solver, rfp, solver_options);
@@ -303,14 +334,8 @@ namespace casadi {
     // Get state at end time
     MX xf = x0;
     for (int k=0; k<N; ++k) {
-      std::vector<MX> ifcn_out = ifcn(make_vector(repmat(xf, order), xf, p, h));
-      x = vertsplit(ifcn_out[0], x0.size1());
-
-      // State at end of step
-      xf = D[0]*x0;
-      for (int i=1; i<=order; ++i) {
-        xf += D[i]*x[i-1];
-      }
+      std::vector<MX> ifcn_out = ifcn(make_vector(repmat(xf, order), xf, p, dt));
+      xf = ifcn_out[1];
     }
 
     // Form discrete-time dynamics
