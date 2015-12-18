@@ -47317,6 +47317,39 @@ is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
 
 ";
 
+%feature("docstring") friendwrap_horzsplit2 "
+
+split horizontally in two (possibly unequal) parts
+
+Parameters:
+-----------
+
+loc:  Where the splitting should occur
+
+
+
+::
+
+  >>> a,b = horzsplit2(DMatrix.ones(2, 10), 4)
+  >>> print a.shape, b.shape
+  (2, 4) (2, 6)
+  
+
+
+
+
+
+::
+
+  >>> a,b = horzsplit2(DMatrix.ones(2, 10), -3)
+  >>> print a.shape, b.shape
+  (2, 7) (2, 3)
+  
+
+
+
+";
+
 %feature("docstring") friendwrap_transpose "
 
 Transpose.
@@ -47422,6 +47455,39 @@ horzcat(horzsplit(x, ...)) = x
 %feature("docstring") friendwrap_veccat "
 
 concatenate vertically while vectorizing all arguments with vec
+
+";
+
+%feature("docstring") friendwrap_vertsplit2 "
+
+split vertically in two (possibly unequal) parts
+
+Parameters:
+-----------
+
+loc:  Where the splitting should occur
+
+
+
+::
+
+  >>> a,b = vertsplit2(DMatrix.ones(10, 2), 4)
+  >>> print a.shape, b.shape
+  (4, 2) (6, 2)
+  
+
+
+
+
+
+::
+
+  >>> a,b = vertsplit2(DMatrix.ones(10, 2), -3)
+  >>> print a.shape, b.shape
+  (7, 2) (3, 2)
+  
+
+
 
 ";
 
@@ -52353,6 +52419,12 @@ Output arguments of an ODE/DAE backward integration function
 
 ";
 
+%feature("docstring") casadi::matrixName< int > "
+
+Get typename.
+
+";
+
 %feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
 scaling.
 
@@ -52911,48 +52983,19 @@ return.
 
 ";
 
-%feature("docstring") casadi::nlpSolverIn "
+%feature("docstring") casadi::collocationResidual "
 
-Input arguments of an NLP Solver
+Construct a residual function for a collocation scheme and an ode.
 
->Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
+Parameters:
+-----------
 
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLP_SOLVER_X0          | x0                     | Decision variables,    |
-|                        |                        | initial guess (nx x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_P           | p                      | Value of fixed         |
-|                        |                        | parameters (np x 1) .  |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LBX         | lbx                    | Decision variables     |
-|                        |                        | lower bound (nx x 1),  |
-|                        |                        | default -inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_UBX         | ubx                    | Decision variables     |
-|                        |                        | upper bound (nx x 1),  |
-|                        |                        | default +inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LBG         | lbg                    | Constraints lower      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default -inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_UBG         | ubg                    | Constraints upper      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default +inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_X0      | lam_x0                 | Lagrange multipliers   |
-|                        |                        | for bounds on X,       |
-|                        |                        | initial guess (nx x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_G0      | lam_g0                 | Lagrange multipliers   |
-|                        |                        | for bounds on G,       |
-|                        |                        | initial guess (ng x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+The constructed function (which is of type MXFunction), has three inputs,
+corresponding to helper states (shape n-by- order), initial state (x0),
+parameter (p) and integration time (h) and two outputs, corresponding to
+collocation residual and the final state.
 
 ";
 
@@ -53090,9 +53133,48 @@ Input arguments of a dle solver
 
 ";
 
-%feature("docstring") casadi::matrixName< int > "
+%feature("docstring") casadi::nlpSolverIn "
 
-Get typename.
+Input arguments of an NLP Solver
+
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLP_SOLVER_X0          | x0                     | Decision variables,    |
+|                        |                        | initial guess (nx x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_P           | p                      | Value of fixed         |
+|                        |                        | parameters (np x 1) .  |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LBX         | lbx                    | Decision variables     |
+|                        |                        | lower bound (nx x 1),  |
+|                        |                        | default -inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_UBX         | ubx                    | Decision variables     |
+|                        |                        | upper bound (nx x 1),  |
+|                        |                        | default +inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LBG         | lbg                    | Constraints lower      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default -inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_UBG         | ubg                    | Constraints upper      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default +inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_X0      | lam_x0                 | Lagrange multipliers   |
+|                        |                        | for bounds on X,       |
+|                        |                        | initial guess (nx x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_G0      | lam_g0                 | Lagrange multipliers   |
+|                        |                        | for bounds on G,       |
+|                        |                        | initial guess (ng x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
 
 ";
 
