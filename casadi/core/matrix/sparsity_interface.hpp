@@ -380,20 +380,16 @@ namespace casadi {
      *
       \doctest
       a,b = horzsplit2(DMatrix.ones(2, 10), 4)
-      print a.shape
-      print b.shape
+      print a.shape, b.shape
       \doctestout
-      (2,4)
-      (2,6)
+      (2, 4) (2, 6)
       \enddoctest
       
       \doctest
       a,b = horzsplit2(DMatrix.ones(2, 10), -3)
-      print a.shape
-      print b.shape
+      print a.shape, b.shape
       \doctestout
-      (2,7)
-      (2,3)
+      (2, 7) (2, 3)
       \enddoctest
      */
     inline friend std::vector<MatType > horzsplit2(const MatType &v, int loc) {
@@ -454,25 +450,21 @@ namespace casadi {
      *
       \doctest
       a,b = vertsplit2(DMatrix.ones(10, 2), 4)
-      print a.shape
-      print b.shape
+      print a.shape, b.shape
       \doctestout
-      (4,2)
-      (6,2)
+      (4, 2) (6, 2)
       \enddoctest
 
       \doctest
-      a,b = vertsplit2(DMatrix.ones(2, 10), -3)
-      print a.shape
-      print b.shape
+      a,b = vertsplit2(DMatrix.ones(10, 2), -3)
+      print a.shape, b.shape
       \doctestout
-      (7,2)
-      (3,2)
+      (7, 2) (3, 2)
       \enddoctest
 
      */
     inline friend std::vector<MatType > vertsplit2(const MatType &v, int loc) {
-      if (loc<0) loc+=v.size2();
+      if (loc<0) loc+=v.size1();
       return vertsplit(v, {0, loc, v.size1()});
     }
 
