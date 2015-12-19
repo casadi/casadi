@@ -66,9 +66,6 @@ namespace casadi {
     // Solve the NLP
     virtual void solve(void* mem);
 
-    // KNITRO callback functions
-    void evalh(const double* x, const double* lambda, double* hessian);
-
     // KNITRO callback wrapper
     static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
                         const int nnzH, const double * const x, const double * const lambda,

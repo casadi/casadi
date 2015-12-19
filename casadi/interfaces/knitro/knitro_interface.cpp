@@ -344,10 +344,22 @@ namespace casadi {
 
       // Direct to the correct function
       switch (evalRequestCode) {
-      case KTR_RC_EVALFC: this_->calc_fg(x, this_->p_, obj, c); break;
-      case KTR_RC_EVALGA: this_->calc_gf_jg(x, this_->p_, objGrad, jac); break;
-      case KTR_RC_EVALH:  this_->evalh(x, lambda, hessian); break;
-      default: casadi_assert_message(0, "KnitroInterface::callback: unknown method");
+      case KTR_RC_EVALFC:
+        this_->calc_fg(x, this_->p_, obj, c);
+        break;
+      case KTR_RC_EVALGA:
+        this_->calc_gf_jg(x, this_->p_, objGrad, jac);
+        break;
+      case KTR_RC_EVALH:
+        {
+          double sigma = 1.;
+          if (this_->calc_hess_l(x, this_->p_, &sigma, lambda, hessian)) {
+            casadi_error("calc_hess_l failed");
+          }
+        }
+        break;
+      default:
+        casadi_error("KnitroInterface::callback: unknown method");
       }
 
       return 0;
@@ -358,33 +370,6 @@ namespace casadi {
     }
   }
 
-  void KnitroInterface::evalh(const double* x, const double* lambda, double* hessian) {
-    // Pass the argument to the function
-    hessLag_.setInputNZ(x, NL_X);
-    if (p_) {
-      hessLag_.setInputNZ(p_, NL_P);
-    } else {
-      hessLag_.setInput(0., NL_P);
-    }
-    hessLag_.setInput(1.0, NL_NUM_IN+NL_F);
-    hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
-
-    // Evaluate
-    hessLag_.evaluate();
-
-    // Get results
-    hessLag_.output().getSym(hessian);
-
-    // Printing
-    if (monitored("eval_h")) {
-      userOut() << "eval_h" << endl;
-      userOut() << "x = " << hessLag_.input(0) << endl;
-      userOut() << "lambda = " << hessLag_.input(1) << endl;
-      userOut() << "scale = " << hessLag_.input(2) << endl;
-      userOut() << "H = " << hessLag_ << endl;
-    }
-  }
-
   template<typename M>
   void KnitroInterface::setup() {
     // Objective and constraints
@@ -392,6 +377,9 @@ namespace casadi {
     
     // Objective gradient and Jacobian of constraints
     setup_gf_jg<M>();
+
+    // Hessian of the Lagrangian
+    setup_hess_l<M>();
   }
 
 } // namespace casadi
