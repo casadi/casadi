@@ -23,6 +23,7 @@
  */
 
 #include <casadi/casadi.hpp>
+#include <iomanip>
 
 /**
 * This example demonstrates how NL-files, which can be generated
@@ -63,6 +64,9 @@ int main(int argc, char **argv){
   arg["ubg"] = nl.g_ub;
   arg["x0"] = nl.x_init;
   res = solver(arg);
+  for (auto&& s : res) {
+    std::cout << std::setw(10) << s.first << ": " << s.second.nonzeros() << std::endl;
+  }
 
   return 0;
 }
