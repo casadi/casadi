@@ -82,6 +82,7 @@ namespace casadi {
 
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
+    solver->set_x(x);
     return solver->calc_f(x, solver->p_, &obj_value)==0;
   }
 
@@ -93,8 +94,7 @@ namespace casadi {
 
   // return the value of the constraints: g(x)
   bool IpoptUserClass::eval_g(Index n, const Number* x, bool new_x, Index m, Number* g) {
-    solver->set_x(x);
-    return solver->calc_g(g)==0;
+    return solver->calc_g(x, solver->p_, g)==0;
   }
 
   // return the structure or values of the jacobian

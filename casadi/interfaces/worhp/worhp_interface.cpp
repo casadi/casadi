@@ -605,7 +605,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, evalG)) {
-        eval_g(worhp_o_.X, worhp_o_.G);
+        calc_g(worhp_o_.X, p_, worhp_o_.G);
         DoneUserAction(&worhp_c_, evalG);
       }
 
@@ -822,43 +822,6 @@ namespace casadi {
     }
   }
 
-  bool WorhpInterface::eval_g(const double* x, double* g) {
-    try {
-      log("eval_g started");
-      double time1 = clock();
-
-      if (worhp_o_.m>0) {
-        // Pass the argument to the function
-        nlp_.setInputNZ(x, NL_X);
-        nlp_.setInput(input(NLPSOL_P), NL_P);
-
-        // Evaluate the function and tape
-        nlp_.evaluate();
-
-        // Ge the result
-        nlp_.getOutputNZ(g, NL_G);
-
-        // Printing
-        if (monitored("eval_g")) {
-          userOut() << "x = " << nlp_.input(NL_X) << endl;
-          userOut() << "g = " << nlp_.output(NL_G) << endl;
-        }
-      }
-
-      if (regularity_check_ && !is_regular(nlp_.output(NL_G).data()))
-          casadi_error("WorhpInterface::eval_g: NaN or Inf detected.");
-
-      double time2 = clock();
-      t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_g_ += 1;
-      log("eval_g ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
   bool WorhpInterface::eval_grad_f(const double* x, double scale , double* grad_f) {
     try {
       log("eval_grad_f started");
@@ -1018,6 +981,9 @@ map<int, string> WorhpInterface::flagmap = WorhpInterface::calc_flagmap();
   void WorhpInterface::setup() {
     // Objective
     setup_f<M>();
+
+    // Constraints
+    setup_g<M>();
   }
 
 } // namespace casadi

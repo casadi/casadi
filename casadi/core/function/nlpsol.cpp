@@ -528,16 +528,17 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_g(double* g) {
+  int Nlpsol::calc_g(const double* x, const double* p, double* g) {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
+    casadi_assert(g!=0);
 
     // Evaluate User function
     fill_n(arg_, g_fcn_.n_in(), nullptr);
-    arg_[G_X] = xk_;
-    arg_[G_P] = p_;
+    arg_[G_X] = x;
+    arg_[G_P] = p;
     fill_n(res_, g_fcn_.n_out(), nullptr);
-    res_[G_G] = gk_;
+    res_[G_G] = g;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
       g_fcn_(arg_, res_, iw_, w_, 0);
@@ -549,7 +550,7 @@ namespace casadi {
     auto t_stop = chrono::system_clock::now(); // stop timer
 
     // Make sure not NaN or Inf
-    if (!all_of(gk_, gk_+ng_, [](double v) { return isfinite(v);})) {
+    if (!all_of(g, g+ng_, [](double v) { return isfinite(v);})) {
       userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN or Inf detected" << endl;
       return -1;
     }
@@ -557,9 +558,6 @@ namespace casadi {
     // Update stats
     n_calc_g_ += 1;
     t_calc_g_ += chrono::duration<double>(t_stop - t_start).count();
-
-    // Return to user
-    casadi_copy(gk_, ng_, g);
 
     // Success
     return 0;

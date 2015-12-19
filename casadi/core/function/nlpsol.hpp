@@ -201,7 +201,7 @@ namespace casadi {
     enum GOut { G_G, G_NUM_OUT};
     Function g_fcn_;
     template<typename M> void setup_g();
-    int calc_g(double* g=0);
+    int calc_g(const double* x, const double* p, double* g);
 
     // Calculate both objective and constraints
     Function fg_fcn_;

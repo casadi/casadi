@@ -101,7 +101,6 @@ namespace casadi {
 
     // Worhp callback functions
     bool eval_grad_f(const double* x, double scale , double* grad_f);
-    bool eval_g(const double* x, double* g);
     bool eval_jac_g(const double* x, double* values);
     bool eval_h(const double* x, double obj_factor, const double* lambda, double* values);
 
