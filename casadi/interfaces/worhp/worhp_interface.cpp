@@ -395,12 +395,9 @@ namespace casadi {
     }
 
     if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {
-      // Get sparsity pattern. Note WORHP is column major
-      const DM & J = jacG_.output(JACG_JAC);
-
       int nz=0;
-      const int* colind = J.colind();
-      const int* row = J.row();
+      const int* colind = jacg_sp_.colind();
+      const int* row = jacg_sp_.row();
       for (int c=0; c<nx_; ++c) {
         for (int el=colind[c]; el<colind[c+1]; ++el) {
           int r = row[el];
@@ -536,19 +533,26 @@ namespace casadi {
             t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
             time1 = clock();
 
-            for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-              fcallback_.setInput(output(i), i);
-            }
-            fcallback_.evaluate();
+            // Inputs
+            fill_n(arg_, fcallback_.n_in(), nullptr);
+            arg_[NLPSOL_X] = worhp_o_.X;
+            arg_[NLPSOL_F] = &worhp_o_.F;
+            arg_[NLPSOL_G] = worhp_o_.G;
+            arg_[NLPSOL_LAM_P] = 0;
+            arg_[NLPSOL_LAM_X] = worhp_o_.Lambda;
+            arg_[NLPSOL_LAM_G] = worhp_o_.Mu;
+
+            // Outputs
+            fill_n(res_, fcallback_.n_out(), nullptr);
             double ret_double;
-            fcallback_.getOutput(ret_double);
+            res_[0] = &ret_double;
+
+            // Evaluate the callback function
+            n_eval_callback_ += 1;
+            fcallback_(arg_, res_, iw_, w_, 0);
             int ret = static_cast<int>(ret_double);
 
-            time2 = clock();
-            t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
-
             if (ret) worhp_c_.status = TerminatedByUser;
-
           }
         }
 
@@ -614,11 +618,11 @@ namespace casadi {
     t_mainloop_ += (time2-time1)/CLOCKS_PER_SEC;
 
     // Copy outputs
-    output(NLPSOL_X).set(worhp_o_.X);
-    output(NLPSOL_F).set(worhp_o_.F);
-    output(NLPSOL_G).set(worhp_o_.G);
-    output(NLPSOL_LAM_X).setNZ(worhp_o_.Lambda);
-    output(NLPSOL_LAM_G).set(worhp_o_.Mu);
+    casadi_copy(worhp_o_.X, nx_, x_);
+    if (f_) *f_ = worhp_o_.F;
+    casadi_copy(worhp_o_.G, ng_, g_);
+    casadi_copy(worhp_o_.Lambda, nx_, lam_x_);
+    casadi_copy(worhp_o_.Mu, ng_, lam_g_);
 
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
 
@@ -671,20 +675,6 @@ namespace casadi {
 
     stats_["return_code"] = worhp_c_.status;
     stats_["return_status"] = flagmap[worhp_c_.status];
-
-    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-      double **v;
-      switch (i) {
-      case NLPSOL_X: v = &x_; break;
-      case NLPSOL_F: v = &f_; break;
-      case NLPSOL_G: v = &g_; break;
-      case NLPSOL_LAM_X: v = &lam_x_; break;
-      case NLPSOL_LAM_G: v = &lam_g_; break;
-      case NLPSOL_LAM_P: v = &lam_p_; break;
-      default: casadi_assert(0);
-      }
-      casadi_copy(output(i).ptr(), nnz_out(i), *v);
-    }
   }
 
   void WorhpInterface::setOptionsFromFile(const std::string & file) {
