@@ -507,19 +507,6 @@ namespace casadi {
 
           if (!fcallback_.isNull()) {
             double time1 = clock();
-            // Copy outputs
-            if (!output(NLPSOL_X).is_empty()) {
-              output(NLPSOL_X).setNZ(worhp_o_.X);
-            }
-            if (!output(NLPSOL_F).is_empty())
-              output(NLPSOL_F).set(worhp_o_.F);
-            if (!output(NLPSOL_G).is_empty())
-              output(NLPSOL_G).setNZ(worhp_o_.G);
-            if (!output(NLPSOL_LAM_X).is_empty())
-              output(NLPSOL_LAM_X).setNZ(worhp_o_.Lambda);
-            if (!output(NLPSOL_LAM_G).is_empty())
-              output(NLPSOL_LAM_G).setNZ(worhp_o_.Mu);
-
             Dict iteration;
             iteration["iter"] = worhp_w_.MajorIter;
             iteration["iter_sqp"] = worhp_w_.MinorIter;

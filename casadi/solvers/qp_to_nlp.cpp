@@ -62,9 +62,9 @@ namespace casadi {
     SX X = SX::sym("X", n_, 1);
 
     // Parameters to the problem
-    SX H = SX::sym("H", input(QPSOL_H).sparsity());
-    SX G = SX::sym("G", input(QPSOL_G).sparsity());
-    SX A = SX::sym("A", input(QPSOL_A).sparsity());
+    SX H = SX::sym("H", sparsity_in(QPSOL_H));
+    SX G = SX::sym("G", sparsity_in(QPSOL_G));
+    SX A = SX::sym("A", sparsity_in(QPSOL_A));
 
     // Put parameters in a vector
     std::vector<SX> par;

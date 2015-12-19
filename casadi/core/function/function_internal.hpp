@@ -68,8 +68,7 @@ namespace casadi {
       A regular user should never work with any Node class. Use Function directly.
   */
   class CASADI_EXPORT FunctionInternal
-    : public OptionsFunctionalityNode,
-      public IOInterface<FunctionInternal> {
+    : public OptionsFunctionalityNode {
     friend class Function;
 
   protected:
@@ -642,6 +641,7 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int ind) const = 0;
     /// @}
 
+  private:
     /// Access input argument by index
     inline Matrix<double>& input(int i=0) {
       try {
@@ -695,6 +695,7 @@ namespace casadi {
     inline const Matrix<double>& output(const std::string &oname) const {
       return const_cast<FunctionInternal*>(this)->output(oname);
     }
+  public:
 
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;

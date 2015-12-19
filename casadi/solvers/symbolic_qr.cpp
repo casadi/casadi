@@ -216,7 +216,7 @@ namespace casadi {
     casadi_assert(res[0]!=0);
 
     // Get A and factorize it
-    SX A = SX::zeros(input(LINSOL_A).sparsity());
+    SX A = SX::zeros(sparsity_in(LINSOL_A));
     copy(arg[1], arg[1]+A.nnz(), A->begin());
     vector<SX> v = fact_fcn_(A);
 
@@ -245,39 +245,6 @@ namespace casadi {
 
   void SymbolicQr::generateBody(CodeGenerator& g) const {
     casadi_error("Code generation for SymbolicQR still experimental");
-#if 0
-    // Data structures to hold A, Q and R
-    g.body
-       << "  static int prepared = 0;" << endl
-       << "  static d A[" << input(LINSOL_A).nnz() << "];" << endl
-       << "  static d Q[" << Q_.nnz() << "];" << endl
-       << "  static d R[" << R_.nnz() << "];" << endl;
-
-    // Check if the factorization is up-to-date
-    g.body
-      << "  int i;" << endl
-      << "  for (i=0; prepared && i<" << input(LINSOL_A).nnz()
-      << "; ++i) prepared=A[i]!=x0[i];" << endl;
-
-    // Factorize if needed
-    int fact_ind = g.getDependency(fact_fcn_);
-    g.body
-      << "  if (!prepared) {" << endl
-      << "    for (i=0; i<" << input(LINSOL_A).nnz() << "; ++i) A[i]=x0[i];" << endl
-      << "    f" << fact_ind << "(A, Q, R);" << endl
-      << "    prepared = 1;" << endl
-      << "  }" << endl;
-
-    // Solve
-    int solv_ind_N = g.getDependency(solv_fcn_N_);
-    int neq = input(LINSOL_B).size1();
-    int nrhs = input(LINSOL_B).size2();
-    g.body
-      << "  for (i=0; i<" << nrhs << "; ++i) {" << endl
-      << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl
-      << "    x1+=" << neq << "; r0+=" << neq << ";" << endl
-      << "  }" << endl;
-#endif
   }
 
 } // namespace casadi

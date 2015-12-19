@@ -59,7 +59,7 @@ namespace casadi {
     Rootfinder::init();
 
     // Free variable in the NLP
-    MX u = MX::sym("u", input(iin_).sparsity());
+    MX u = MX::sym("u", sparsity_in(iin_));
 
     // So that we can pass it on to createParent
     std::vector<MX> inputs;
