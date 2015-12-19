@@ -374,7 +374,7 @@ namespace casadi {
   void KnitroInterface::setup() {
     // Objective and constraints
     setup_fg<M>();
-    
+
     // Objective gradient and Jacobian of constraints
     setup_gf_jg<M>();
 
