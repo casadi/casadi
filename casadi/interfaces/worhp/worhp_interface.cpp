@@ -251,6 +251,9 @@ namespace casadi {
     } else {
       setup<MX>();
     }
+
+    // Temporary vectors
+    alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
   void WorhpInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
@@ -621,7 +624,28 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, evalHM)) {
-        eval_h(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.Mu, worhp_w_.HM.val);
+        calc_hess_l(worhp_o_.X, p_, &worhp_w_.ScaleObj, worhp_o_.Mu,
+                    worhp_w_.HM.val);
+        // Diagonal values
+        double *dval = w_;
+        casadi_fill(dval, nx_, 0.);
+
+        // Remove diagonal
+        const int* colind = hesslag_sp_.colind();
+        const int* row = hesslag_sp_.row();
+        int ind=0;
+        for (int c=0; c<nx_; ++c) {
+          for (int el=colind[c]; el<colind[c+1]; ++el) {
+            if (row[el]==c) {
+              dval[c] = worhp_w_.HM.val[el];
+            } else {
+              worhp_w_.HM.val[ind++] = worhp_w_.HM.val[el];
+            }
+          }
+        }
+
+        // Add diagonal entries at the end
+        casadi_copy(dval, nx_, worhp_w_.HM.val+ind);
         DoneUserAction(&worhp_c_, evalHM);
       }
 
@@ -704,76 +728,6 @@ namespace casadi {
       default: casadi_assert(0);
       }
       casadi_copy(output(i).ptr(), nnz_out(i), *v);
-    }
-  }
-
-  bool WorhpInterface::eval_h(const double* x, double obj_factor,
-                              const double* lambda, double* values) {
-    try {
-      log("eval_h started");
-      double time1 = clock();
-
-      // Make sure generated
-      casadi_assert_warning(!hessLag_.isNull(), "Hessian function not pregenerated");
-
-      // Get Hessian
-      Function& hessLag = this->hessLag();
-
-      // Pass input
-      hessLag.setInputNZ(x, HESSLAG_X);
-      hessLag.setInput(input(NLPSOL_P), HESSLAG_P);
-      hessLag.setInput(obj_factor, HESSLAG_LAM_F);
-      hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
-
-      // Evaluate
-      hessLag.evaluate();
-
-      // Get results
-      const DM& H = hessLag.output();
-      const int* colind = H.colind();
-      const int* row = H.row();
-      const vector<double>& data = H.data();
-
-      // The Hessian values are divided into strictly upper (in WORHP lower) triangular and diagonal
-      double* values_upper = values;
-      double* values_diagonal = values + (worhp_w_.HM.nnz-nx_);
-
-      // Initialize diagonal to zero
-      for (int r=0; r<nx_; ++r) {
-        values_diagonal[r] = 0.;
-      }
-
-      // Upper triangular part of the Hessian (note CCS -> CRS format change)
-      for (int c=0; c<nx_; ++c) {
-        for (int el=colind[c]; el<colind[c+1]; ++el) {
-          if (row[el]>c) {
-            // Strictly upper triangular
-            *values_upper++ = data[el];
-          } else if (row[el]==c) {
-            // Diagonal separately
-            values_diagonal[c] = data[el];
-          }
-        }
-      }
-
-      if (monitored("eval_h")) {
-        userOut() << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
-        userOut() << "obj_factor= " << obj_factor << std::endl;
-        userOut() << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
-        userOut() << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
-      }
-
-      if (regularity_check_ && !is_regular(hessLag.output(HESSLAG_HESS).data()))
-          casadi_error("WorhpInterface::eval_h: NaN or Inf detected.");
-
-      double time2 = clock();
-      t_eval_h_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_h_ += 1;
-      log("eval_h ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
-      return false;
     }
   }
 
@@ -898,6 +852,9 @@ map<int, string> WorhpInterface::flagmap = WorhpInterface::calc_flagmap();
 
     // Jacobian of the constraints
     setup_jac_g<M>();
+
+    // Hessian of the Lagrangian
+    setup_hess_l<M>(true);
   }
 
 } // namespace casadi

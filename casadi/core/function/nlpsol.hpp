@@ -233,7 +233,7 @@ namespace casadi {
     enum HessLagOut { HL_HL, HL_NUM_OUT};
     Function hess_l_fcn_;
     Sparsity hesslag_sp_;
-    template<typename M> void setup_hess_l();
+    template<typename M> void setup_hess_l(bool tr=false);
     int calc_hess_l(const double* x, const double* p,
                     const double* sigma, const double* lambda,
                     double* hl);
@@ -422,7 +422,7 @@ namespace casadi {
   }
 
   template<typename M>
-  void Nlpsol::setup_hess_l() {
+  void Nlpsol::setup_hess_l(bool tr) {
     const Problem<M>& nlp = nlp2_;
     std::vector<M> arg(HL_NUM_IN);
     M x = arg[HL_X] = nlp.in[NL_X];
@@ -433,6 +433,7 @@ namespace casadi {
     M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
     std::vector<M> res(HL_NUM_OUT);
     res[HL_HL] = triu(M::hessian(dot(lam_f, f) + dot(lam_g, g), x));
+    if (tr) res[HL_HL] = res[HL_HL].T();
     hess_l_fcn_ = Function("nlp_hess_l", arg, res);
     hesslag_sp_ = res[HL_HL].sparsity();
     alloc(hess_l_fcn_);
