@@ -25,6 +25,7 @@
 
 #include "nlpsol.hpp"
 #include "casadi/core/timing.hpp"
+#include <chrono>
 
 using namespace std;
 namespace casadi {
