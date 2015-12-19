@@ -189,6 +189,78 @@ namespace casadi {
     // No static functions exposed
     struct Exposed{ };
 
+    // Calculate objective
+    enum FIn { F_X, F_P, F_NUM_IN };
+    enum FOut { F_F, F_NUM_OUT};
+    Function f_fcn_;
+    template<typename M> void setup_f();
+    int calc_f(double* f=0);
+
+    // Calculate constraints
+    enum GIn { G_X, G_P, G_NUM_IN };
+    enum GOut { G_G, G_NUM_OUT};
+    Function g_fcn_;
+    template<typename M> void setup_g();
+    int calc_g(double* g=0);
+
+    // Calculate gradient of the objective
+    enum GradFIn { GF_X, GF_P, GF_NUM_IN };
+    enum GradFOut { GF_GF, GF_NUM_OUT};
+    Function grad_f_fcn_;
+    template<typename M> void setup_grad_f();
+    int calc_grad_f(double* grad_f=0);
+
+    // Calculate Jacobian of constraints
+    enum JacGIn { JG_X, JG_P, JG_NUM_IN };
+    enum JacGOut { JG_JG, JG_NUM_OUT};
+    Function jac_g_fcn_;
+    Sparsity jacg_sp_;
+    template<typename M> void setup_jac_g();
+    int calc_jac_g(double* jac_g=0);
+
+    // Calculate Hessian of the Lagrangian constraints
+    enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
+    enum HessLagOut { HL_HL, HL_NUM_OUT};
+    Function hess_l_fcn_;
+    Sparsity hesslag_sp_;
+    template<typename M> void setup_hess_l();
+    int calc_hess_l(double* hess_l=0);
+
+    // Current solution
+    double *xk_, lam_fk_, *lam_gk_, *lam_xk_;
+
+    // Trigger recalculation?
+    bool new_x_, new_lam_f_, new_lam_g_;
+
+    // Current calculated quantities
+    double fk_, *gk_, *grad_fk_, *jac_gk_, *hess_lk_, *grad_lk_;
+
+    // Set primal variable
+    void set_x(const double *x);
+
+    // Set dual variable
+    void set_lam_f(double lam_f);
+    void set_lam_g(const double *lam_g);
+
+    // What is up-to-date?
+    bool have_fk_, have_gk_, have_grad_fk_, have_jac_gk_, have_hess_lk_, have_grad_lk_;
+
+    // Accumulated counts since last reset:
+    int n_calc_f_; // number of calls to calc_f
+    int n_calc_g_; // number of calls to calc_g
+    int n_calc_grad_f_; // number of calls to calc_grad_f
+    int n_calc_jac_g_; // number of calls to calc_jac_g
+    int n_calc_hess_l_; // number of calls to calc_hess_l
+    int n_eval_callback_; // number of calls to callback
+    int n_iter_; // number of iterations
+
+    // Accumulated time since last reset:
+    double t_calc_f_; // time spent in calc_f
+    double t_calc_g_; // time spent in calc_g
+    double t_calc_grad_f_; // time spent in calc_grad_f
+    double t_calc_jac_g_; // time spent in calc_jac_g
+    double t_calc_hess_l_; // time spent in calc_hess_l
+
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
@@ -270,6 +342,72 @@ namespace casadi {
     p.out = nlp(p.in);
     casadi_assert(p.out.size()==NL_NUM_OUT);
     return p;
+  }
+
+  template<typename M>
+  void Nlpsol::setup_f() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(F_NUM_IN);
+    arg[F_X] = nlp.in[NL_X];
+    arg[F_P] = nlp.in[NL_P];
+    std::vector<M> res(F_NUM_OUT);
+    res[F_F] = nlp.out[NL_F];
+    f_fcn_ = Function("nlp_f", arg, res);
+    alloc(f_fcn_);
+  }
+
+  template<typename M>
+  void Nlpsol::setup_g() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(G_NUM_IN);
+    arg[G_X] = nlp.in[NL_X];
+    arg[G_P] = nlp.in[NL_P];
+    std::vector<M> res(G_NUM_OUT);
+    res[G_G] = nlp.out[NL_G];
+    g_fcn_ = Function("nlp_g", arg, res);
+    alloc(g_fcn_);
+  }
+
+  template<typename M>
+  void Nlpsol::setup_grad_f() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(GF_NUM_IN);
+    arg[GF_X] = nlp.in[NL_X];
+    arg[GF_P] = nlp.in[NL_P];
+    std::vector<M> res(GF_NUM_OUT);
+    res[GF_GF] = M::gradient(nlp.out[NL_F], nlp.in[NL_X]);
+    grad_f_fcn_ = Function("nlp_grad_f", arg, res);
+    alloc(grad_f_fcn_);
+  }
+
+  template<typename M>
+  void Nlpsol::setup_jac_g() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(JG_NUM_IN);
+    arg[JG_X] = nlp.in[NL_X];
+    arg[JG_P] = nlp.in[NL_P];
+    std::vector<M> res(JG_NUM_OUT);
+    res[JG_JG] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
+    jac_g_fcn_ = Function("nlp_jac_g", arg, res);
+    jacg_sp_ = res[JG_JG].sparsity();
+    alloc(jac_g_fcn_);
+  }
+
+  template<typename M>
+  void Nlpsol::setup_hess_l() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(HL_NUM_IN);
+    M x = arg[HL_X] = nlp.in[NL_X];
+    arg[HL_P] = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M g = nlp.out[NL_G];
+    M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
+    M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
+    std::vector<M> res(HL_NUM_OUT);
+    res[HL_HL] = M::hessian(dot(lam_f, f) + dot(lam_g, g), x);
+    hess_l_fcn_ = Function("nlp_hess_l", arg, res);
+    hesslag_sp_ = res[HL_HL].sparsity();
+    alloc(hess_l_fcn_);
   }
 
 } // namespace casadi
