@@ -575,6 +575,19 @@ namespace casadi {
     return 0;
   }
 
+  int Nlpsol::calc_fg(const double* x, const double* p, double* f, double* g) {
+    fill_n(arg_, fg_fcn_.n_in(), nullptr);
+    arg_[0] = x;
+    arg_[1] = p;
+    fill_n(res_, fg_fcn_.n_out(), nullptr);
+    res_[0] = f;
+    res_[1] = g;
+    fg_fcn_(arg_, res_, iw_, w_, 0);
+
+    // Success
+    return 0;
+  }
+
   int Nlpsol::calc_grad_f(double* grad_f) {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();

@@ -176,6 +176,13 @@ namespace casadi {
     /*  casadi_assert(kc_handle_==0);
         kc_handle_ = KTR_new();*/
 
+    // Setup NLP functions
+    if (nlp2_.is_sx) {
+      setup<SX>();
+    } else {
+      setup<MX>();
+    }
+
     // Allocate memory
     alloc_w(nx_, true); // wx_
     alloc_w(nx_, true); // wlbx_
@@ -317,8 +324,8 @@ namespace casadi {
 
     stats_["return_status"] = status;
 
-    // Copy constraints
-    casadi_copy(nlp_.output(NL_G).ptr(), ng_, g_);
+    // Calculate constraints
+    if (g_) calc_fg(wx_, p_, 0, g_);
 
     // Free memory (move to destructor!)
     KTR_free(&kc_handle_);
@@ -337,7 +344,7 @@ namespace casadi {
 
       // Direct to the correct function
       switch (evalRequestCode) {
-      case KTR_RC_EVALFC: this_->evalfc(x, *obj, c); break;
+      case KTR_RC_EVALFC: this_->calc_fg(x, this_->p_, obj, c); break;
       case KTR_RC_EVALGA: this_->evalga(x, objGrad, jac); break;
       case KTR_RC_EVALH:  this_->evalh(x, lambda, hessian); break;
       default: casadi_assert_message(0, "KnitroInterface::callback: unknown method");
@@ -348,33 +355,6 @@ namespace casadi {
       userOut<true, PL_WARN>() << "KnitroInterface::callback caugth exception: "
                                << ex.what() << endl;
       return -1;
-    }
-  }
-
-  void KnitroInterface::evalfc(const double* x, double& obj, double *c) {
-    // Pass the argument to the function
-    nlp_.setInputNZ(x, NL_X);
-    if (p_) {
-      nlp_.setInputNZ(p_, NL_P);
-    } else {
-      nlp_.setInput(0., NL_P);
-    }
-
-    // Evaluate the function
-    nlp_.evaluate();
-
-    // Get the result
-    nlp_.output(NL_F).get(obj);
-    nlp_.output(NL_G).get(c);
-
-    // Printing
-    if (monitored("eval_f")) {
-      userOut() << "x = " << nlp_.input(NL_X) << endl;
-      userOut() << "f = " << nlp_.output(NL_F) << endl;
-    }
-    if (monitored("eval_g")) {
-      userOut() << "x = " << nlp_.input(NL_X) << endl;
-      userOut() << "g = " << nlp_.output(NL_G) << endl;
     }
   }
 
@@ -447,6 +427,12 @@ namespace casadi {
       userOut() << "scale = " << hessLag_.input(2) << endl;
       userOut() << "H = " << hessLag_ << endl;
     }
+  }
+
+  template<typename M>
+  void KnitroInterface::setup() {
+    // Objective and constraints
+    setup_fg<M>();
   }
 
 } // namespace casadi

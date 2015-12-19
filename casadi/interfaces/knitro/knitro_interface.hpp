@@ -67,7 +67,6 @@ namespace casadi {
     virtual void solve(void* mem);
 
     // KNITRO callback functions
-    void evalfc(const double* x, double& obj, double *c);
     void evalga(const double* x, double* objGrad, double* jac);
     void evalh(const double* x, const double* lambda, double* hessian);
 
@@ -95,6 +94,9 @@ namespace casadi {
 
     // Inputs
     double *wx_, *wlbx_, *wubx_, *wlbg_, *wubg_;
+
+    // Setup all functions
+    template<typename M> void setup();
   };
 
 } // namespace casadi

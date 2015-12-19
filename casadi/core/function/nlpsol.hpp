@@ -203,6 +203,11 @@ namespace casadi {
     template<typename M> void setup_g();
     int calc_g(double* g=0);
 
+    // Calculate both objective and constraints
+    Function fg_fcn_;
+    template<typename M> void setup_fg();
+    int calc_fg(const double* x, const double* p, double* f, double* g);
+
     // Calculate gradient of the objective
     enum GradFIn { GF_X, GF_P, GF_NUM_IN };
     enum GradFOut { GF_GF, GF_NUM_OUT};
@@ -366,6 +371,15 @@ namespace casadi {
     res[G_G] = nlp.out[NL_G];
     g_fcn_ = Function("nlp_g", arg, res);
     alloc(g_fcn_);
+  }
+
+  template<typename M>
+  void Nlpsol::setup_fg() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
+    std::vector<M> res = {nlp.out[NL_F], nlp.out[NL_G]};
+    fg_fcn_ = Function("nlp_fg", arg, res);
+    alloc(fg_fcn_);
   }
 
   template<typename M>
