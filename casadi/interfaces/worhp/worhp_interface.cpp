@@ -610,7 +610,8 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, evalDF)) {
-        eval_grad_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_w_.DF.val);
+        calc_grad_f(worhp_o_.X, p_, worhp_w_.DF.val);
+        casadi_scal(nx_, worhp_w_.ScaleObj, worhp_w_.DF.val);
         DoneUserAction(&worhp_c_, evalDF);
       }
 
@@ -822,53 +823,6 @@ namespace casadi {
     }
   }
 
-  bool WorhpInterface::eval_grad_f(const double* x, double scale , double* grad_f) {
-    try {
-      log("eval_grad_f started");
-      double time1 = clock();
-
-      // Pass the argument to the function
-      gradF_.setInputNZ(x, NL_X);
-      gradF_.setInput(input(NLPSOL_P), NL_P);
-
-      // Evaluate, adjoint mode
-      gradF_.evaluate();
-
-      // Get the result
-      gradF_.output().get(grad_f);
-
-      // Scale
-      for (int i=0; i<nx_; ++i) {
-        grad_f[i] *= scale;
-      }
-
-      // Printing
-      if (monitored("eval_grad_f")) {
-        userOut() << "grad_f = " << gradF_.output() << endl;
-      }
-
-      if (regularity_check_ && !is_regular(gradF_.output().data()))
-          casadi_error("WorhpInterface::eval_grad_f: NaN or Inf detected.");
-
-      double time2 = clock();
-      t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_grad_f_ += 1;
-      // Check the result for regularity
-      for (int i=0; i<nx_; ++i) {
-        if (isnan(grad_f[i]) || isinf(grad_f[i])) {
-          log("eval_grad_f: result not regular");
-          return false;
-        }
-      }
-
-      log("eval_grad_f ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_jac_f failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
   void WorhpInterface::setOptionsFromFile(const std::string & file) {
     int status;
     char *cpy = new char[file.size()+1] ;
@@ -984,6 +938,9 @@ map<int, string> WorhpInterface::flagmap = WorhpInterface::calc_flagmap();
 
     // Constraints
     setup_g<M>();
+
+    // Gradient of objective
+    setup_grad_f<M>();
   }
 
 } // namespace casadi

@@ -100,7 +100,6 @@ namespace casadi {
     std::map<std::string, TypeID> ops_;
 
     // Worhp callback functions
-    bool eval_grad_f(const double* x, double scale , double* grad_f);
     bool eval_jac_g(const double* x, double* values);
     bool eval_h(const double* x, double obj_factor, const double* lambda, double* values);
 

@@ -213,7 +213,7 @@ namespace casadi {
     enum GradFOut { GF_GF, GF_NUM_OUT};
     Function grad_f_fcn_;
     template<typename M> void setup_grad_f();
-    int calc_grad_f(double* grad_f=0);
+    int calc_grad_f(const double* x, const double* p, double* grad_f);
 
     // Calculate Jacobian of constraints
     enum JacGIn { JG_X, JG_P, JG_NUM_IN };

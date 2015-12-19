@@ -82,14 +82,12 @@ namespace casadi {
 
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
-    solver->set_x(x);
     return solver->calc_f(x, solver->p_, &obj_value)==0;
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
   bool IpoptUserClass::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f) {
-    solver->set_x(x);
-    return solver->calc_grad_f(grad_f)==0;
+    return solver->calc_grad_f(x, solver->p_, grad_f)==0;
   }
 
   // return the value of the constraints: g(x)
