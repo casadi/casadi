@@ -223,6 +223,11 @@ namespace casadi {
     template<typename M> void setup_jac_g();
     int calc_jac_g(double* jac_g=0);
 
+    // Calculate both gradient of the objective and Jacobian of constraints
+    Function gf_jg_fcn_;
+    template<typename M> void setup_gf_jg();
+    int calc_gf_jg(const double* x, const double* p, double* gf, double* jg);
+
     // Calculate Hessian of the Lagrangian constraints
     enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
     enum HessLagOut { HL_HL, HL_NUM_OUT};
@@ -380,6 +385,16 @@ namespace casadi {
     std::vector<M> res = {nlp.out[NL_F], nlp.out[NL_G]};
     fg_fcn_ = Function("nlp_fg", arg, res);
     alloc(fg_fcn_);
+  }
+
+  template<typename M>
+  void Nlpsol::setup_gf_jg() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
+    std::vector<M> res = {M::gradient(nlp.out[NL_F], nlp.in[NL_X]),
+                          M::jacobian(nlp.out[NL_G], nlp.in[NL_X])};
+    gf_jg_fcn_ = Function("nlp_gf_jg", arg, res);
+    alloc(gf_jg_fcn_);
   }
 
   template<typename M>

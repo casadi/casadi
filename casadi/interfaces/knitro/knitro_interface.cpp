@@ -345,7 +345,7 @@ namespace casadi {
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC: this_->calc_fg(x, this_->p_, obj, c); break;
-      case KTR_RC_EVALGA: this_->evalga(x, objGrad, jac); break;
+      case KTR_RC_EVALGA: this_->calc_gf_jg(x, this_->p_, objGrad, jac); break;
       case KTR_RC_EVALH:  this_->evalh(x, lambda, hessian); break;
       default: casadi_assert_message(0, "KnitroInterface::callback: unknown method");
       }
@@ -355,50 +355,6 @@ namespace casadi {
       userOut<true, PL_WARN>() << "KnitroInterface::callback caugth exception: "
                                << ex.what() << endl;
       return -1;
-    }
-  }
-
-  void KnitroInterface::evalga(const double* x, double* objGrad, double* jac) {
-    // Pass the argument to the function
-    gradF_.setInputNZ(x, NL_X);
-    if (p_) {
-      gradF_.setInputNZ(p_, NL_P);
-    } else {
-      gradF_.setInput(0., NL_P);
-    }
-
-    // Evaluate the function using adjoint mode AD
-    gradF_.evaluate();
-
-    // Get the result
-    gradF_.output().get(objGrad);
-
-    // Printing
-    if (monitored("eval_grad_f")) {
-      userOut() << "x = " << gradF_.input(NL_X) << endl;
-      userOut() << "grad_f = " << gradF_.output() << endl;
-    }
-
-    if (!jacG_.isNull()) {
-      // Pass the argument to the Jacobian function
-      jacG_.setInputNZ(x, NL_X);
-      if (p_) {
-        jacG_.setInputNZ(p_, NL_P);
-      } else {
-        jacG_.setInput(0., NL_P);
-      }
-
-      // Evaluate the Jacobian function
-      jacG_.evaluate();
-
-      // Get the result
-      jacG_.output().getNZ(jac);
-
-      // Printing
-      if (monitored("eval_jac_g")) {
-        userOut() << "x = " << jacG_.input(NL_X) << endl;
-        userOut() << "jac_g = " << jacG_.output() << endl;
-      }
     }
   }
 
@@ -433,6 +389,9 @@ namespace casadi {
   void KnitroInterface::setup() {
     // Objective and constraints
     setup_fg<M>();
+    
+    // Objective gradient and Jacobian of constraints
+    setup_gf_jg<M>();
   }
 
 } // namespace casadi

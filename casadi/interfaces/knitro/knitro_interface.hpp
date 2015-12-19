@@ -67,7 +67,6 @@ namespace casadi {
     virtual void solve(void* mem);
 
     // KNITRO callback functions
-    void evalga(const double* x, double* objGrad, double* jac);
     void evalh(const double* x, const double* lambda, double* hessian);
 
     // KNITRO callback wrapper
