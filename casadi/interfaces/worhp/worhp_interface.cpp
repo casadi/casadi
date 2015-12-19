@@ -616,7 +616,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, evalDG)) {
-        eval_jac_g(worhp_o_.X, worhp_w_.DG.val);
+        calc_jac_g(worhp_o_.X, p_, worhp_w_.DG.val);
         DoneUserAction(&worhp_c_, evalDG);
       }
 
@@ -777,52 +777,6 @@ namespace casadi {
     }
   }
 
-  bool WorhpInterface::eval_jac_g(const double* x, double* values) {
-    try {
-      log("eval_jac_g started");
-
-      // Quich finish if no constraints
-      if (worhp_o_.m==0) {
-        log("eval_jac_g quick return (m==0)");
-        return true;
-      }
-
-      // Make sure generated
-      casadi_assert(!jacG_.isNull());
-
-      // Get Jacobian
-      Function& jacG = this->jacG();
-
-      double time1 = clock();
-
-      // Pass the argument to the function
-      jacG.setInputNZ(x, JACG_X);
-      jacG.setInput(input(NLPSOL_P), JACG_P);
-
-      // Evaluate the function
-      jacG.evaluate();
-
-      const DM& J = jacG.output(JACG_JAC);
-
-      std::copy(J.data().begin(), J.data().end(), values);
-
-      if (monitored("eval_jac_g")) {
-        userOut() << "x = " << jacG_.input().data() << endl;
-        userOut() << "J = " << endl;
-        jacG_.output().printSparse();
-      }
-
-      double time2 = clock();
-      t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_jac_g_ += 1;
-      log("eval_jac_g ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
   void WorhpInterface::setOptionsFromFile(const std::string & file) {
     int status;
     char *cpy = new char[file.size()+1] ;
@@ -941,6 +895,9 @@ map<int, string> WorhpInterface::flagmap = WorhpInterface::calc_flagmap();
 
     // Gradient of objective
     setup_grad_f<M>();
+
+    // Jacobian of the constraints
+    setup_jac_g<M>();
   }
 
 } // namespace casadi

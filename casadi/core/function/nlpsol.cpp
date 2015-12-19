@@ -624,16 +624,17 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_jac_g(double* jac_g) {
+  int Nlpsol::calc_jac_g(const double* x, const double* p, double* jac_g) {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
+    casadi_assert(jac_g!=0);
 
     // Evaluate User function
     fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-    arg_[JG_X] = xk_;
-    arg_[JG_P] = p_;
+    arg_[JG_X] = x;
+    arg_[JG_P] = p;
     fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-    res_[JG_JG] = jac_gk_;
+    res_[JG_JG] = jac_g;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
       jac_g_fcn_(arg_, res_, iw_, w_, 0);
@@ -645,7 +646,7 @@ namespace casadi {
     auto t_stop = chrono::system_clock::now(); // stop timer
 
     // Make sure not NaN or Inf
-    if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
+    if (!all_of(jac_g, jac_g+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
       userOut<true, PL_WARN>() << name() << ":calc_jac_g failed: NaN or Inf detected" << endl;
       return -1;
     }
@@ -653,9 +654,6 @@ namespace casadi {
     // Update stats
     n_calc_jac_g_ += 1;
     t_calc_jac_g_ += chrono::duration<double>(t_stop - t_start).count();
-
-    // Return to user
-    casadi_copy(jac_gk_, jacg_sp_.nnz(), jac_g);
 
     // Success
     return 0;

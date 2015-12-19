@@ -221,7 +221,7 @@ namespace casadi {
     Function jac_g_fcn_;
     Sparsity jacg_sp_;
     template<typename M> void setup_jac_g();
-    int calc_jac_g(double* jac_g=0);
+    int calc_jac_g(const double* x, const double* p, double* jac_g);
 
     // Calculate both gradient of the objective and Jacobian of constraints
     Function gf_jg_fcn_;
