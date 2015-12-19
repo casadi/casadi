@@ -440,31 +440,6 @@ namespace casadi {
   }
 
   void WorhpInterface::solve(void* mem) {
-    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
-      const double *v;
-      switch (i) {
-      case NLPSOL_X0: v = x0_; break;
-      case NLPSOL_P: v = p_; break;
-      case NLPSOL_LBX: v = lbx_; break;
-      case NLPSOL_UBX: v = ubx_; break;
-      case NLPSOL_LBG: v = lbg_; break;
-      case NLPSOL_UBG: v = ubg_; break;
-      case NLPSOL_LAM_X0: v = lam_x0_; break;
-      case NLPSOL_LAM_G0: v = lam_g0_; break;
-      default: casadi_assert(0);
-      }
-      casadi_copy(v, nnz_in(i), input(i).ptr());
-    }
-
-    if (gather_stats_) {
-      Dict iterations;
-      iterations["iter_sqp"] = std::vector<int>();
-      iterations["inf_pr"] = std::vector<double>();
-      iterations["inf_du"] = std::vector<double>();
-      iterations["obj"] = std::vector<double>();
-      iterations["alpha_pr"] = std::vector<double>();
-      stats_["iterations"] = iterations;
-    }
 
     // Check the provided inputs
     checkInputs(mem);
@@ -475,48 +450,38 @@ namespace casadi {
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
 
-    // Get inputs
-    log("WorhpInterface::evaluate: Reading user inputs");
-    const DM& x0 = input(NLPSOL_X0);
-    const DM& lbx = input(NLPSOL_LBX);
-    const DM& ubx = input(NLPSOL_UBX);
-    const DM& lam_x0 = input(NLPSOL_LAM_X0);
-    const DM& lbg = input(NLPSOL_LBG);
-    const DM& ubg = input(NLPSOL_UBG);
-    const DM& lam_g0 = input(NLPSOL_LAM_G0);
-
     double inf = numeric_limits<double>::infinity();
 
-    for (int i=0;i<nx_;++i) {
-      casadi_assert_message(lbx.at(i)!=ubx.at(i),
-      "WorhpInterface::evaluate: Worhp cannot handle the case when LBX == UBX."
-      "You have that case at non-zero " << i << " , which has value " << ubx.at(i) << "."
-      "Reformulate your problem by using a parameter for the corresponding variable.");
+    if (lbx_ && ubx_) {
+      for (int i=0; i<nx_;++i) {
+        casadi_assert_message(lbx_[i]!=ubx_[i],
+                              "WorhpInterface::evaluate: Worhp cannot handle the case when "
+                              "LBX == UBX."
+                              "You have that case at non-zero " << i << " , which has value " <<
+                              ubx_[i] << ". Reformulate your problem by using a parameter "
+                              "for the corresponding variable.");
+      }
     }
 
-    for (int i=0;i<lbg.nnz();++i) {
-      casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),
-      "WorhpInterface::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
-      "You have that case at non-zero " << i << "."
-      "Reformulate your problem eliminating the corresponding constraint.");
+    if (lbg_ && ubg_) {
+      for (int i=0; i<ng_; ++i) {
+        casadi_assert_message(!(lbg_[i]==-inf && ubg_[i] == inf),
+                              "WorhpInterface::evaluate: Worhp cannot handle the case when both "
+                              "LBG and UBG are infinite."
+                              "You have that case at non-zero " << i << "."
+                              "Reformulate your problem eliminating the corresponding constraint.");
+      }
     }
 
     // Pass inputs to WORHP data structures
-    casadi_assert(x0.nnz()==worhp_o_.n);
-    x0.getNZ(worhp_o_.X);
-    casadi_assert(lbx.nnz()==worhp_o_.n);
-    lbx.getNZ(worhp_o_.XL);
-    casadi_assert(ubx.nnz()==worhp_o_.n);
-    ubx.getNZ(worhp_o_.XU);
-    casadi_assert(lam_x0.nnz()==worhp_o_.n);
-    lam_x0.getNZ(worhp_o_.Lambda);
+    casadi_copy(x0_, nx_, worhp_o_.X);
+    casadi_copy(lbx_, nx_, worhp_o_.XL);
+    casadi_copy(ubx_, nx_, worhp_o_.XU);
+    casadi_copy(lam_x0_, nx_, worhp_o_.Lambda);
     if (worhp_o_.m>0) {
-      casadi_assert(lam_g0.nnz()==worhp_o_.m);
-      lam_g0.getNZ(worhp_o_.Mu);
-      casadi_assert(lbg.nnz()==worhp_o_.m);
-      lbg.getNZ(worhp_o_.GL);
-      casadi_assert(ubg.nnz()==worhp_o_.m);
-      ubg.getNZ(worhp_o_.GU);
+      casadi_copy(lam_g0_, ng_, worhp_o_.Mu);
+      casadi_copy(lbg_, ng_, worhp_o_.GL);
+      casadi_copy(ubg_, ng_, worhp_o_.GU);
     }
 
     // Replace infinite bounds with worhp_p_.Infty
@@ -542,15 +507,6 @@ namespace casadi {
 
         if (!firstIteration) {
           firstIteration = true;
-          if (gather_stats_) {
-            Dict iterations = stats_["iterations"];
-            append_to_vec(iterations["iter_sqp"], static_cast<int>(worhp_w_.MinorIter));
-            append_to_vec(iterations["inf_pr"], static_cast<double>(worhp_w_.NormMax_CV));
-            append_to_vec(iterations["inf_du"], static_cast<double>(worhp_w_.ScaledKKT));
-            append_to_vec(iterations["obj"], static_cast<double>(worhp_o_.F));
-            append_to_vec(iterations["alpha_pr"], static_cast<double>(worhp_w_.ArmijoAlpha));
-            stats_["iterations"] = iterations;
-          }
 
           if (!fcallback_.isNull()) {
             double time1 = clock();
