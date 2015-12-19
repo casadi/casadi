@@ -131,13 +131,7 @@ namespace casadi {
                               Index* jCol, Number* values) {
     if (values) {
       // Evaluate Hessian
-      solver->set_x(x);
-      solver->set_lam_f(obj_factor);
-      solver->set_lam_g(lambda);
-      if (solver->calc_hess_l()!=0) return false;
-
-      // Get the upper triangular half
-      casadi_getu(solver->hess_lk_, solver->hesslag_sp_, values);
+      if (solver->calc_hess_l(x, solver->p_, &obj_factor, lambda, values)) return false;
       return true;
     } else {
       // Get the sparsity pattern
@@ -147,7 +141,7 @@ namespace casadi {
 
       // Pass to IPOPT
       for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
           *iRow++ = row[el];
           *jCol++ = cc;
         }

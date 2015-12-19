@@ -633,7 +633,7 @@ namespace casadi {
       nnz_jac_g = ng_==0 ? 0 : jacg_sp_.nnz();
 
       // Number of Hessian nonzeros (only upper triangular half)
-      nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz_upper() : 0;
+      nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz() : 0;
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_nlp_info failed: " << ex.what() << endl;

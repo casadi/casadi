@@ -497,35 +497,31 @@ namespace casadi {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
-    // Calculate, if needed
-    if (!have_fk_) {
-      fill_n(arg_, f_fcn_.n_in(), nullptr);
-      arg_[F_X] = xk_;
-      arg_[F_P] = p_;
-      fill_n(res_, f_fcn_.n_out(), nullptr);
-      res_[F_F] = &fk_;
-      n_calc_f_ += 1;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        f_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!isfinite(fk_)) {
-        userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf or NaN detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_f_ += 1;
-      t_calc_f_ += chrono::duration<double>(t_stop - t_start).count();
-      have_fk_ = true;
+    fill_n(arg_, f_fcn_.n_in(), nullptr);
+    arg_[F_X] = xk_;
+    arg_[F_P] = p_;
+    fill_n(res_, f_fcn_.n_out(), nullptr);
+    res_[F_F] = &fk_;
+    n_calc_f_ += 1;
+    auto t_start = chrono::system_clock::now(); // start timer
+    try {
+      f_fcn_(arg_, res_, iw_, w_, 0);
+    } catch(exception& ex) {
+      // Fatal error
+      userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
+      return 1;
     }
+    auto t_stop = chrono::system_clock::now(); // stop timer
+
+    // Make sure not NaN or Inf
+    if (!isfinite(fk_)) {
+      userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf or NaN detected" << endl;
+      return -1;
+    }
+
+    // Update stats
+    n_calc_f_ += 1;
+    t_calc_f_ += chrono::duration<double>(t_stop - t_start).count();
 
     // Return to user
     if (f) *f = fk_;
@@ -538,35 +534,31 @@ namespace casadi {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
-    // Calculate, if needed
-    if (!have_gk_) {
-      // Evaluate User function
-      fill_n(arg_, g_fcn_.n_in(), nullptr);
-      arg_[G_X] = xk_;
-      arg_[G_P] = p_;
-      fill_n(res_, g_fcn_.n_out(), nullptr);
-      res_[G_G] = gk_;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        g_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!all_of(gk_, gk_+ng_, [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN or Inf detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_g_ += 1;
-      t_calc_g_ += chrono::duration<double>(t_stop - t_start).count();
-      have_gk_ = true;
+    // Evaluate User function
+    fill_n(arg_, g_fcn_.n_in(), nullptr);
+    arg_[G_X] = xk_;
+    arg_[G_P] = p_;
+    fill_n(res_, g_fcn_.n_out(), nullptr);
+    res_[G_G] = gk_;
+    auto t_start = chrono::system_clock::now(); // start timer
+    try {
+      g_fcn_(arg_, res_, iw_, w_, 0);
+    } catch(exception& ex) {
+      // Fatal error
+      userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
+      return 1;
     }
+    auto t_stop = chrono::system_clock::now(); // stop timer
+
+    // Make sure not NaN or Inf
+    if (!all_of(gk_, gk_+ng_, [](double v) { return isfinite(v);})) {
+      userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN or Inf detected" << endl;
+      return -1;
+    }
+
+    // Update stats
+    n_calc_g_ += 1;
+    t_calc_g_ += chrono::duration<double>(t_stop - t_start).count();
 
     // Return to user
     casadi_copy(gk_, ng_, g);
@@ -605,35 +597,31 @@ namespace casadi {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
-    // Calculate, if needed
-    if (!have_grad_fk_) {
-      // Evaluate User function
-      fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
-      arg_[GF_X] = xk_;
-      arg_[GF_P] = p_;
-      fill_n(res_, grad_f_fcn_.n_out(), nullptr);
-      res_[GF_GF] = grad_fk_;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        grad_f_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_grad_f failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!all_of(grad_fk_, grad_fk_+nx_, [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>() << name() << ":calc_grad_f failed: NaN or Inf detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_grad_f_ += 1;
-      t_calc_grad_f_ += chrono::duration<double>(t_stop - t_start).count();
-      have_grad_fk_ = true;
+    // Evaluate User function
+    fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
+    arg_[GF_X] = xk_;
+    arg_[GF_P] = p_;
+    fill_n(res_, grad_f_fcn_.n_out(), nullptr);
+    res_[GF_GF] = grad_fk_;
+    auto t_start = chrono::system_clock::now(); // start timer
+    try {
+      grad_f_fcn_(arg_, res_, iw_, w_, 0);
+    } catch(exception& ex) {
+      // Fatal error
+      userOut<true, PL_WARN>() << name() << ":calc_grad_f failed:" << ex.what() << endl;
+      return 1;
     }
+    auto t_stop = chrono::system_clock::now(); // stop timer
+
+    // Make sure not NaN or Inf
+    if (!all_of(grad_fk_, grad_fk_+nx_, [](double v) { return isfinite(v);})) {
+      userOut<true, PL_WARN>() << name() << ":calc_grad_f failed: NaN or Inf detected" << endl;
+      return -1;
+    }
+
+    // Update stats
+    n_calc_grad_f_ += 1;
+    t_calc_grad_f_ += chrono::duration<double>(t_stop - t_start).count();
 
     // Return to user
     casadi_copy(grad_fk_, nx_, grad_f);
@@ -646,35 +634,31 @@ namespace casadi {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
-    // Calculate, if needed
-    if (!have_jac_gk_) {
-      // Evaluate User function
-      fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-      arg_[JG_X] = xk_;
-      arg_[JG_P] = p_;
-      fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-      res_[JG_JG] = jac_gk_;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        jac_g_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_jac_g failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>() << name() << ":calc_jac_g failed: NaN or Inf detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_jac_g_ += 1;
-      t_calc_jac_g_ += chrono::duration<double>(t_stop - t_start).count();
-      have_jac_gk_ = true;
+    // Evaluate User function
+    fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
+    arg_[JG_X] = xk_;
+    arg_[JG_P] = p_;
+    fill_n(res_, jac_g_fcn_.n_out(), nullptr);
+    res_[JG_JG] = jac_gk_;
+    auto t_start = chrono::system_clock::now(); // start timer
+    try {
+      jac_g_fcn_(arg_, res_, iw_, w_, 0);
+    } catch(exception& ex) {
+      // Fatal error
+      userOut<true, PL_WARN>() << name() << ":calc_jac_g failed:" << ex.what() << endl;
+      return 1;
     }
+    auto t_stop = chrono::system_clock::now(); // stop timer
+
+    // Make sure not NaN or Inf
+    if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
+      userOut<true, PL_WARN>() << name() << ":calc_jac_g failed: NaN or Inf detected" << endl;
+      return -1;
+    }
+
+    // Update stats
+    n_calc_jac_g_ += 1;
+    t_calc_jac_g_ += chrono::duration<double>(t_stop - t_start).count();
 
     // Return to user
     casadi_copy(jac_gk_, jacg_sp_.nnz(), jac_g);
@@ -683,44 +667,39 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_hess_l(double* hess_l) {
+  int Nlpsol::calc_hess_l(const double* x, const double* p,
+                          const double* sigma, const double* lambda,
+                          double* hl) {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
-    // Calculate, if needed
-    if (!have_hess_lk_) {
-      // Evaluate User function
-      fill_n(arg_, hess_l_fcn_.n_in(), nullptr);
-      arg_[HL_X] = xk_;
-      arg_[HL_P] = p_;
-      arg_[HL_LAM_F] = &lam_fk_;
-      arg_[HL_LAM_G] = lam_gk_;
-      fill_n(res_, hess_l_fcn_.n_out(), nullptr);
-      res_[HL_HL] = hess_lk_;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        hess_l_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
+    // Evaluate User function
+    fill_n(arg_, hess_l_fcn_.n_in(), nullptr);
+    arg_[HL_X] = x;
+    arg_[HL_P] = p;
+    arg_[HL_LAM_F] = sigma;
+    arg_[HL_LAM_G] = lambda;
+    fill_n(res_, hess_l_fcn_.n_out(), nullptr);
+    res_[HL_HL] = hl;
+    auto t_start = chrono::system_clock::now(); // start timer
+    try {
+      hess_l_fcn_(arg_, res_, iw_, w_, 0);
+    } catch(exception& ex) {
+      // Fatal error
+      userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
+      return 1;
+    }
+    auto t_stop = chrono::system_clock::now(); // stop timer
 
-      // Make sure not NaN or Inf
-      if (!all_of(hess_lk_, hess_lk_+hesslag_sp_.nnz(), [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>() << name() << ":calc_hess_l failed: NaN or Inf detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_hess_l_ += 1;
-      t_calc_hess_l_ += chrono::duration<double>(t_stop - t_start).count();
-      have_hess_lk_ = true;
+    // Make sure not NaN or Inf
+    if (!all_of(hl, hl+hesslag_sp_.nnz(), [](double v) { return isfinite(v);})) {
+      userOut<true, PL_WARN>() << name() << ":calc_hess_l failed: NaN or Inf detected" << endl;
+      return -1;
     }
 
-    // Return to user
-    casadi_copy(hess_lk_, hesslag_sp_.nnz(), hess_l);
+    // Update stats
+    n_calc_hess_l_ += 1;
+    t_calc_hess_l_ += chrono::duration<double>(t_stop - t_start).count();
 
     // Success
     return 0;
@@ -730,8 +709,6 @@ namespace casadi {
     // Is a recalculation needed
     if (new_x_ || !equal(x, x+nx_, xk_)) {
       copy_n(x, nx_, xk_);
-      have_fk_ = have_gk_ = have_hess_lk_ = have_grad_lk_ = have_grad_fk_
-        = have_jac_gk_ = false;
       new_x_ = false;
     }
   }
@@ -740,7 +717,6 @@ namespace casadi {
     // Is a recalculation needed
     if (new_lam_f_ || lam_f != lam_fk_) {
       lam_fk_ = lam_f;
-      have_hess_lk_ = have_grad_lk_ = false;
       new_lam_f_ = false;
     }
   }
@@ -749,7 +725,6 @@ namespace casadi {
     // Is a recalculation needed
     if (new_lam_g_ || !equal(lam_g, lam_g+ng_, lam_gk_)) {
       copy_n(lam_g, ng_, lam_gk_);
-      have_hess_lk_ = have_grad_lk_ = false;
       new_lam_g_ = false;
     }
   }

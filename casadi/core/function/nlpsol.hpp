@@ -234,7 +234,9 @@ namespace casadi {
     Function hess_l_fcn_;
     Sparsity hesslag_sp_;
     template<typename M> void setup_hess_l();
-    int calc_hess_l(double* hess_l=0);
+    int calc_hess_l(const double* x, const double* p,
+                    const double* sigma, const double* lambda,
+                    double* hl);
 
     // Current solution
     double *xk_, lam_fk_, *lam_gk_, *lam_xk_;
@@ -251,9 +253,6 @@ namespace casadi {
     // Set dual variable
     void set_lam_f(double lam_f);
     void set_lam_g(const double *lam_g);
-
-    // What is up-to-date?
-    bool have_fk_, have_gk_, have_grad_fk_, have_jac_gk_, have_hess_lk_, have_grad_lk_;
 
     // Accumulated counts since last reset:
     int n_calc_f_; // number of calls to calc_f
@@ -433,7 +432,7 @@ namespace casadi {
     M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
     M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
     std::vector<M> res(HL_NUM_OUT);
-    res[HL_HL] = M::hessian(dot(lam_f, f) + dot(lam_g, g), x);
+    res[HL_HL] = triu(M::hessian(dot(lam_f, f) + dot(lam_g, g), x));
     hess_l_fcn_ = Function("nlp_hess_l", arg, res);
     hesslag_sp_ = res[HL_HL].sparsity();
     alloc(hess_l_fcn_);
