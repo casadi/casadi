@@ -244,6 +244,13 @@ namespace casadi {
     status_[FunctionErrorDF]="FunctionErrorDF";
     status_[FunctionErrorDG]="FunctionErrorDG";
     status_[FunctionErrorHM]="FunctionErrorHM";
+
+    // Setup NLP functions
+    if (nlp2_.is_sx) {
+      setup<SX>();
+    } else {
+      setup<MX>();
+    }
   }
 
   void WorhpInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
@@ -592,7 +599,8 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, evalF)) {
-        eval_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.F);
+        calc_f(worhp_o_.X, p_, &worhp_o_.F);
+        worhp_o_.F *= worhp_w_.ScaleObj;
         DoneUserAction(&worhp_c_, evalF);
       }
 
@@ -814,44 +822,6 @@ namespace casadi {
     }
   }
 
-  bool WorhpInterface::eval_f(const double* x, double scale, double& obj_value) {
-    try {
-      log("eval_f started");
-
-      // Log time
-      double time1 = clock();
-
-      // Pass the argument to the function
-      nlp_.setInputNZ(x, NL_X);
-      nlp_.setInput(input(NLPSOL_P), NL_P);
-
-      // Evaluate the function
-      nlp_.evaluate();
-
-      // Get the result
-      nlp_.getOutput(obj_value, NL_F);
-
-      // Printing
-      if (monitored("eval_f")) {
-        userOut() << "x = " << nlp_.input(NL_X) << endl;
-        userOut() << "obj_value = " << obj_value << endl;
-      }
-      obj_value *= scale;
-
-      if (regularity_check_ && !is_regular(nlp_.output().data()))
-          casadi_error("WorhpInterface::eval_f: NaN or Inf detected.");
-
-      double time2 = clock();
-      t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_f_ += 1;
-      log("eval_f ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
   bool WorhpInterface::eval_g(const double* x, double* g) {
     try {
       log("eval_g started");
@@ -1043,5 +1013,11 @@ namespace casadi {
 }
 
 map<int, string> WorhpInterface::flagmap = WorhpInterface::calc_flagmap();
+
+  template<typename M>
+  void WorhpInterface::setup() {
+    // Objective
+    setup_f<M>();
+  }
 
 } // namespace casadi

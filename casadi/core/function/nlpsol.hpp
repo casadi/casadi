@@ -194,7 +194,7 @@ namespace casadi {
     enum FOut { F_F, F_NUM_OUT};
     Function f_fcn_;
     template<typename M> void setup_f();
-    int calc_f(double* f=0);
+    int calc_f(const double* x, const double* p, double* f);
 
     // Calculate constraints
     enum GIn { G_X, G_P, G_NUM_IN };

@@ -493,15 +493,16 @@ namespace casadi {
     res += NLPSOL_NUM_OUT;
   }
 
-  int Nlpsol::calc_f(double* f) {
+  int Nlpsol::calc_f(const double* x, const double* p, double* f) {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
+    casadi_assert(f!=0);
 
     fill_n(arg_, f_fcn_.n_in(), nullptr);
-    arg_[F_X] = xk_;
-    arg_[F_P] = p_;
+    arg_[F_X] = x;
+    arg_[F_P] = p;
     fill_n(res_, f_fcn_.n_out(), nullptr);
-    res_[F_F] = &fk_;
+    res_[F_F] = f;
     n_calc_f_ += 1;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
@@ -514,7 +515,7 @@ namespace casadi {
     auto t_stop = chrono::system_clock::now(); // stop timer
 
     // Make sure not NaN or Inf
-    if (!isfinite(fk_)) {
+    if (!isfinite(*f)) {
       userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf or NaN detected" << endl;
       return -1;
     }
@@ -522,9 +523,6 @@ namespace casadi {
     // Update stats
     n_calc_f_ += 1;
     t_calc_f_ += chrono::duration<double>(t_stop - t_start).count();
-
-    // Return to user
-    if (f) *f = fk_;
 
     // Success
     return 0;
