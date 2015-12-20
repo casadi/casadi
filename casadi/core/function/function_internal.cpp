@@ -324,7 +324,8 @@ namespace casadi {
     log("FunctionInternal::hessian");
 
     // Assert scalar
-    casadi_assert_message(sparsity_out(oind).is_scalar(), "Only hessians of scalar functions allowed.");
+    casadi_assert_message(sparsity_out(oind).is_scalar(),
+                          "Only hessians of scalar functions allowed.");
 
     // Generate gradient function
     return getHessian(iind, oind);
