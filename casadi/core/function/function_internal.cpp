@@ -251,12 +251,12 @@ namespace casadi {
     stream << " Number of inputs: " << n_in() << endl;
     for (int i=0; i<n_in(); ++i) {
       stream << "  Input " << i  << ", a.k.a. \"" << name_in(i) << "\", "
-             << input(i).dim() << ", " << description_in(i) << endl;
+             << size_in(i) << ", " << description_in(i) << endl;
     }
     stream << " Number of outputs: " << n_out() << endl;
     for (int i=0; i<n_out(); ++i) {
       stream << "  Output " << i  << ", a.k.a. \"" << name_out(i) << "\", "
-             << output(i).dim() << ", " << description_out(i) << endl;
+             << size_out(i) << ", " << description_out(i) << endl;
     }
   }
 
@@ -270,7 +270,7 @@ namespace casadi {
 
   Function FunctionInternal::gradient(int iind, int oind) {
     // Assert scalar
-    casadi_assert_message(output(oind).is_scalar(),
+    casadi_assert_message(sparsity_out(oind).is_scalar(),
                           "Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Give it a suitable name
@@ -296,7 +296,7 @@ namespace casadi {
 
   Function FunctionInternal::tangent(int iind, int oind) {
     // Assert scalar
-    casadi_assert_message(input(iind).is_scalar(),
+    casadi_assert_message(sparsity_in(iind).is_scalar(),
                           "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
     // Give it a suitable name
@@ -324,7 +324,7 @@ namespace casadi {
     log("FunctionInternal::hessian");
 
     // Assert scalar
-    casadi_assert_message(output(oind).is_scalar(), "Only hessians of scalar functions allowed.");
+    casadi_assert_message(sparsity_out(oind).is_scalar(), "Only hessians of scalar functions allowed.");
 
     // Generate gradient function
     return getHessian(iind, oind);
@@ -1146,25 +1146,25 @@ namespace casadi {
         Sparsity sp = sparsity_jac(iind, oind, true, symmetric);
 
         // Enlarge if sparse output
-        if (output(oind).numel()!=sp.size1()) {
-          casadi_assert(sp.size1()==output(oind).nnz());
+        if (numel_out(oind)!=sp.size1()) {
+          casadi_assert(sp.size1()==nnz_out(oind));
 
           // New row for each old row
-          vector<int> row_map = output(oind).sparsity().find();
+          vector<int> row_map = sparsity_out(oind).find();
 
           // Insert rows
-          sp.enlargeRows(output(oind).numel(), row_map);
+          sp.enlargeRows(numel_out(oind), row_map);
         }
 
         // Enlarge if sparse input
-        if (input(iind).numel()!=sp.size2()) {
-          casadi_assert(sp.size2()==input(iind).nnz());
+        if (numel_in(iind)!=sp.size2()) {
+          casadi_assert(sp.size2()==nnz_in(iind));
 
           // New column for each old column
-          vector<int> col_map = input(iind).sparsity().find();
+          vector<int> col_map = sparsity_in(iind).find();
 
           // Insert columns
-          sp.enlargeColumns(input(iind).numel(), col_map);
+          sp.enlargeColumns(numel_in(iind), col_map);
         }
 
         // Save
@@ -1174,7 +1174,7 @@ namespace casadi {
 
     // If still null, not dependent
     if (jsp.isNull()) {
-      jsp = Sparsity(output(oind).nnz(), input(iind).nnz());
+      jsp = Sparsity(nnz_out(oind), nnz_in(iind));
     }
 
     // Return a reference to the block
@@ -1402,7 +1402,7 @@ namespace casadi {
     for (int i=0; i<ret.n_in(); ++i) {
       const Sparsity& sp = i<n_in ? sparsity_in(i) :
         i<n_in+n_out ? sparsity_out(i-n_in) :
-        input((i-n_in-n_out) % n_in).sparsity();
+        sparsity_in((i-n_in-n_out) % n_in);
       casadi_assert_message(ret.size_in(i)==sp.size(),
                             "Incorrect shape for " << ret << " input " << i << " \""
                             << i_names.at(i) << "\". Expected " << sp.size()
@@ -1411,7 +1411,7 @@ namespace casadi {
 
     // Consistency check for outputs
     for (int i=0; i<ret.n_out(); ++i) {
-      const Sparsity& sp = output(i % n_out).sparsity();
+      const Sparsity& sp = sparsity_out(i % n_out);
       casadi_assert_message(ret.size_out(i)==sp.size(),
                             "Incorrect shape for " << ret << " output " << i << " \""
                             << o_names.at(i) << "\". Expected " << sp.size()
@@ -1497,8 +1497,8 @@ namespace casadi {
     // Consistency check for inputs
     for (int i=0; i<ret.n_in(); ++i) {
       const Sparsity& sp = i<n_in ? sparsity_in(i) :
-        i<n_in+n_out ? output(i-n_in).sparsity() :
-        output((i-n_in-n_out) % n_out).sparsity();
+        i<n_in+n_out ? sparsity_out(i-n_in) :
+        sparsity_out((i-n_in-n_out) % n_out);
       casadi_assert_message(ret.size_in(i)==sp.size(),
                             "Incorrect shape for " << ret << " input " << i << " \""
                             << i_names.at(i) << "\". Expected " << sp.size()
@@ -1507,7 +1507,7 @@ namespace casadi {
 
     // Consistency check for outputs
     for (int i=0; i<ret.n_out(); ++i) {
-      const Sparsity& sp = input(i % n_in).sparsity();
+      const Sparsity& sp = sparsity_in(i % n_in);
       casadi_assert_message(ret.size_out(i)==sp.size(),
                             "Incorrect shape for " << ret << " output " << i << " \""
                             << o_names.at(i) << "\". Expected " << sp.size()
@@ -1807,7 +1807,7 @@ namespace casadi {
     // Get the sparsity pattern of all inputs
     for (int i=0; i<n_in+n_out; ++i) {
       // Get the sparsity pattern
-      const Sparsity& sp = i<n_in ? sparsity_in(i) : output(i-n_in).sparsity();
+      const Sparsity& sp = i<n_in ? sparsity_in(i) : sparsity_out(i-n_in);
 
       // Print the sparsity pattern or retrieve the index of an existing pattern
       int ind = g.addSparsity(sp);
@@ -2300,7 +2300,7 @@ namespace casadi {
       // Vertical offsets
       vector<int> offset(n_out+1, 0);
       for (int i=0; i<n_out; ++i) {
-        offset[i+1] = offset[i]+output(i).numel();
+        offset[i+1] = offset[i]+numel_out(i);
       }
 
       // Collect forward sensitivities
@@ -2377,7 +2377,7 @@ namespace casadi {
       // Vertical offsets
       vector<int> offset(n_in+1, 0);
       for (int i=0; i<n_in; ++i) {
-        offset[i+1] = offset[i]+input(i).numel();
+        offset[i+1] = offset[i]+numel_in(i);
       }
 
       // Collect adjoint sensitivities
@@ -2716,7 +2716,7 @@ namespace casadi {
     vector< vector<MX> > ret;
 
     for (int i=0;i<ret_cat.size();++i) {
-      ret.push_back(horzsplit(ret_cat[i], output(i).size2()));
+      ret.push_back(horzsplit(ret_cat[i], size2_out(i)));
     }
     return swapIndices(ret);
   }
@@ -2734,12 +2734,12 @@ namespace casadi {
 
     int n = 1;
     for (int i=0;i<x.size();++i) {
-      n = max(x[i].size2()/input(i).size2(), n);
+      n = max(x[i].size2()/size2_in(i), n);
     }
 
     vector<bool> repeat_n;
     for (int i=0;i<x.size();++i) {
-      repeat_n.push_back(x[i].size2()/input(i).size2()==n);
+      repeat_n.push_back(x[i].size2()/size2_in(i)==n);
     }
 
     bool repeated = true;
@@ -2775,12 +2775,12 @@ namespace casadi {
 
     int n = 1;
     for (int i=0;i<x.size();++i) {
-      n = max(x[i].size2()/input(i).size2(), n);
+      n = max(x[i].size2()/size2_in(i), n);
     }
 
     vector<bool> repeat_n;
     for (int i=0;i<x.size();++i) {
-      repeat_n.push_back(x[i].size2()/input(i).size2()==n);
+      repeat_n.push_back(x[i].size2()/size2_in(i)==n);
     }
 
     Dict options = {{"parallelization", parallelization}};
