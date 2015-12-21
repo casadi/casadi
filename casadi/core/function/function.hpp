@@ -473,44 +473,28 @@ namespace casadi {
     std::vector<const double*> buf_in(VecArg arg) const;
     typedef std::vector<std::vector<double>>& VecRes;
     std::vector<double*> buf_out(VecRes res) const;
+    typedef std::vector<std::vector<double>*> VPrRes;
+    std::vector<double*> buf_out(VPrRes res) const;
 
     typedef const std::map<std::string, std::vector<double>>& MapArg;
     std::vector<const double*> buf_in(MapArg arg) const;
     typedef std::map<std::string, std::vector<double>>& MapRes;
     std::vector<double*> buf_out(MapRes res) const;
-
-    typedef std::initializer_list<std::vector<double>> L1dArg;
-    std::vector<const double*> buf_in(L1dArg arg) const;
-    typedef std::initializer_list<std::vector<double>*> L1dRes;
-    std::vector<double*> buf_out(L1dRes res) const;
-
-    typedef std::initializer_list<std::pair<std::string, std::vector<double>>> L2dArg;
-    std::vector<const double*> buf_in(L2dArg arg) const;
-    typedef std::initializer_list<std::pair<std::string, std::vector<double>*>> L2dRes;
-    std::vector<double*> buf_out(L2dRes res) const;
+    typedef std::map<std::string, std::vector<double>*> MPrRes;
+    std::vector<double*> buf_out(MPrRes res) const;
     ///@}
 
     ///@{
     /** \brief Numerical evaluation */
     void operator()(VecArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
     void operator()(VecArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
 
     void operator()(MapArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
     void operator()(MapArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-
-    void operator()(L1dArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L1dArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L1dArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L1dArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-
-    void operator()(L2dArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L2dArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L2dArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L2dArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
     ///@}
 #endif // SWIG
 

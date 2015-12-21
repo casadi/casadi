@@ -247,17 +247,6 @@ namespace casadi {
     return buf_arg;
   }
 
-  vector<const double*> Function::buf_in(Function::L1dArg arg) const {
-    casadi_assert(arg.size()==n_in());
-    auto arg_it=arg.begin();
-    vector<const double*> buf_arg(sz_arg());
-    for (unsigned int i=0; i<arg.size(); ++i) {
-      casadi_assert(arg_it->size()==nnz_in(i));
-      buf_arg[i] = getPtr(*arg_it++);
-    }
-    return buf_arg;
-  }
-
   vector<double*> Function::buf_out(Function::VecRes res) const {
     res.resize(n_out());
     auto res_it=res.begin();
@@ -269,7 +258,7 @@ namespace casadi {
     return buf_res;
   }
 
-  vector<double*> Function::buf_out(Function::L1dRes res) const {
+  vector<double*> Function::buf_out(Function::VPrRes res) const {
     casadi_assert(res.size()==n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
@@ -309,21 +298,7 @@ namespace casadi {
     return ret;
   }
 
-  vector<const double*> Function::buf_in(Function::L2dArg arg) const {
-    // Return value (RVO)
-    vector<const double*> ret(sz_arg(), 0);
-
-    // Read inputs
-    for (auto i=arg.begin(); i!=arg.end(); ++i) {
-      int ind = index_in(i->first);
-      casadi_assert(i->second.size()==nnz_in(ind));
-      ret[ind] = getPtr(i->second);
-    }
-
-    return ret;
-  }
-
-  vector<double*> Function::buf_out(Function::L2dRes res) const {
+  vector<double*> Function::buf_out(Function::MPrRes res) const {
     // Return value (RVO)
     vector<double*> ret(sz_res(), 0);
 
