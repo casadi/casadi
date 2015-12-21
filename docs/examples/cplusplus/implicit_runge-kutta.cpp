@@ -134,10 +134,10 @@ int main(){
   if (solver=="ipopt") {
     // Use an NLP solver
     Dict nlpsol_options = {{"print_time", false}, {"print_level", 0}};
-    opts = {{"nlpsol", "ipopt"}, {"nlpsol_options", nlpsol_options}};
+    opts = Dict{{"nlpsol", "ipopt"}, {"nlpsol_options", nlpsol_options}};
     solver = "nlpsol";
   } else {
-    opts = {{"linear_solver", "csparse"}};
+    opts = Dict{{"linear_solver", "csparse"}};
   }
   Function ifcn = rootfinder("ifcn", solver, vfcn_sx, opts);
 
