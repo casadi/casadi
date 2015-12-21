@@ -26,6 +26,7 @@
 #include "dae_builder.hpp"
 
 #include <map>
+#include <set>
 #include <string>
 #include <sstream>
 #include <ctime>
@@ -1607,7 +1608,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::add_lc(const std::string& name,
-                                      const std::vector<std::string>& f_out) {
+                        const std::vector<std::string>& f_out) {
     // Make sure object valid
     sanity_check();
 
@@ -1695,62 +1696,101 @@ namespace casadi {
     vector<MX> ret_out(s_out.size());
     vector<bool> assigned(s_out.size(), false);
 
+    // List of valid attributes
+    enum Attributes {
+      ATTR_TRANSPOSE,
+      ATTR_TRIU,
+      ATTR_TRIL,
+      ATTR_DENSIFY};
+
+    // Separarate attributes
+    vector<vector<Attributes> > attr(s_out.size());
+    vector<string> s_out_noatt = s_out;
+    for (int i=0; i<s_out_noatt.size(); ++i) {
+      // Currently processed string
+      string& s = s_out_noatt[i];
+
+      // Loop over attributes
+      while (true) {
+        // Find the first underscore separator
+        size_t pos = s.find('_');
+        if (pos>=s.size()) break; // No more underscore
+        string a = s.substr(0, pos);
+
+        // Abort if not attribute
+        if (a=="transpose") {
+          attr[i].push_back(ATTR_TRANSPOSE);
+        } else if (a=="triu") {
+          attr[i].push_back(ATTR_TRIU);
+        } else if (a=="tril") {
+          attr[i].push_back(ATTR_TRIL);
+        } else if (a=="densify") {
+          attr[i].push_back(ATTR_DENSIFY);
+        } else {
+          // No more attribute
+          break;
+        }
+
+        // Strip attribute
+        s = s.substr(pos+1, string::npos);
+      }
+    }
+
     // Non-differentiated outputs
     fill(output_used.begin(), output_used.end(), false);
-    for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
-      DaeBuilderOut oind = outputEnum(*i);
+    for (int i=0; i<s_out_noatt.size(); ++i) {
+      DaeBuilderOut oind = outputEnum(s_out_noatt[i]);
       if (oind!=DAE_BUILDER_NUM_OUT) {
         casadi_assert_message(!output_used[oind],
-                              "DaeBuilder::function: Duplicate expression " << *i);
+                              "DaeBuilder::function: Duplicate expression " << s_out_noatt[i]);
         output_used[oind] = true;
-        ret_out[i-s_out.begin()] = vertcat(output(oind));
-        assigned[i-s_out.begin()] = true;
+        ret_out[i] = vertcat(output(oind));
+        assigned[i] = true;
       }
     }
 
     // Linear combination of outputs
-    for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
-      if (assigned[i-s_out.begin()]) continue;
-      std::map<std::string, MX>::const_iterator j=lin_comb_.find(*i);
+    for (int i=0; i<s_out_noatt.size(); ++i) {
+      if (assigned[i]) continue;
+      std::map<std::string, MX>::const_iterator j=lin_comb_.find(s_out_noatt[i]);
       if (j!=lin_comb_.end()) {
-        ret_out[i-s_out.begin()] = j->second;
-        assigned[i-s_out.begin()] = true;
+        ret_out[i] = j->second;
+        assigned[i] = true;
       }
     }
 
-    // Determine which Jacobian blocks to transpose
-    vector<bool> trans(s_out.size(), false);
-
     // Determine which Jacobian blocks to generate
     vector<vector<int> > wanted(DAE_BUILDER_NUM_OUT, vector<int>(DAE_BUILDER_NUM_IN, -1));
-    for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
-      if (assigned[i-s_out.begin()]) continue;
+    for (int i=0; i<s_out_noatt.size(); ++i) {
+      if (assigned[i]) continue;
+
+      // Get the string without attributes
+      const string& so = s_out_noatt[i];
 
       // Find the first underscore separator
-      size_t pos = i->find('_');
-      if (pos>=i->size()) continue;
+      size_t pos = so.find('_');
+      if (pos>=so.size()) continue;
 
       // Get operation
-      string s = i->substr(0, pos);
-      if (s!="jac" && s!="jact") continue;
-      trans[i-s_out.begin()] = s=="jact";
+      string s = so.substr(0, pos);
+      if (s!="jac") continue;
 
       // Get expression to be differentiated
-      size_t pos1 = i->find('_', pos+1);
-      if (pos1>=i->size()) continue;
-      s = i->substr(pos+1, pos1-pos-1);
+      size_t pos1 = so.find('_', pos+1);
+      if (pos1>=so.size()) continue;
+      s = so.substr(pos+1, pos1-pos-1);
       DaeBuilderOut oind = outputEnum(s);
       if (oind==DAE_BUILDER_NUM_OUT) continue;
 
       // Jacobian with respect to what variable
-      s = i->substr(pos1+1, string::npos);
+      s = so.substr(pos1+1, string::npos);
       DaeBuilderIn iind = inputEnum(s);
       if (iind==DAE_BUILDER_NUM_IN) continue;
 
       // Check if duplicate
       casadi_assert_message(wanted[oind][iind]==-1,
-                            "DaeBuilder::function: Duplicate Jacobian " << *i);
-      wanted[oind][iind] = i-s_out.begin();
+                            "DaeBuilder::function: Duplicate Jacobian " << so);
+      wanted[oind][iind] = i;
     }
 
     // Generate Jacobian blocks
@@ -1796,7 +1836,6 @@ namespace casadi {
           for (int ko=0; ko<ob.size(); ++ko) {
             int& ind=wanted[ob[ko]][ib[ki]];
             ret_out[ind] = J_all[ko][ki];
-            if (trans[ind]) ret_out[ind] = ret_out[ind].T();
             assigned[ind] = true;
             ind = -1;
           }
@@ -1810,38 +1849,41 @@ namespace casadi {
       // Determine which Hessian blocks to generate
       wanted.resize(DAE_BUILDER_NUM_IN);
       fill(wanted.begin(), wanted.end(), vector<int>(DAE_BUILDER_NUM_IN, -1));
-      for (vector<string>::const_iterator i=s_out.begin(); i!=s_out.end(); ++i) {
-        if (assigned[i-s_out.begin()]) continue;
+
+      for (int i=0; i<s_out_noatt.size(); ++i) {
+        if (assigned[i]) continue;
+
+        // Get the string without attributes
+        const string& so = s_out_noatt[i];
 
         // Get operation
-        size_t pos = i->find('_');
-        if (pos>=i->size()) continue;
-        string s = i->substr(0, pos);
-        if (s!="hes" && s!="hest") continue;
-        trans[i-s_out.begin()] = s=="hest";
+        size_t pos = so.find('_');
+        if (pos>=so.size()) continue;
+        string s = so.substr(0, pos);
+        if (s!="hes") continue;
 
         // Get expression to be differentiated
-        size_t pos1 = i->find('_', pos+1);
-        if (pos1>=i->size()) continue;
-        s = i->substr(pos+1, pos1-pos-1);
+        size_t pos1 = so.find('_', pos+1);
+        if (pos1>=so.size()) continue;
+        s = so.substr(pos+1, pos1-pos-1);
         if (s!=lin_comb_it->first) continue;
 
         // Get first derivative
-        pos = i->find('_', pos1+1);
-        if (pos>=i->size()) continue;
-        s = i->substr(pos1+1, pos-pos1-1);
+        pos = so.find('_', pos1+1);
+        if (pos>=so.size()) continue;
+        s = so.substr(pos1+1, pos-pos1-1);
         DaeBuilderIn iind1 = inputEnum(s);
         if (iind1==DAE_BUILDER_NUM_IN) continue;
 
         // Get second derivative
-        s = i->substr(pos+1, string::npos);
+        s = so.substr(pos+1, string::npos);
         DaeBuilderIn iind2 = inputEnum(s);
         if (iind2==DAE_BUILDER_NUM_IN) continue;
 
         // Check if duplicate
         casadi_assert_message(wanted[iind1][iind2]==-1,
-                              "DaeBuilder::function: Duplicate Hessian " << *i);
-        wanted[iind1][iind2] = i-s_out.begin();
+                              "DaeBuilder::function: Duplicate Hessian " << so);
+        wanted[iind1][iind2] = i;
       }
 
       // Created wanted Hessian blocks
@@ -1897,7 +1939,6 @@ namespace casadi {
               int& ind=wanted[ib1[k1]][ib2[k2]];
               if (ind>=0) {
                 ret_out[ind] = H_all[k1][k2];
-                if (trans[ind]) ret_out[ind] = ret_out[ind].T();
                 assigned[ind] = true;
                 ind = -1;
               }
@@ -1907,10 +1948,22 @@ namespace casadi {
       }
     }
 
-    // Make sure all outputs have been assigned
-    for (int i=0; i<assigned.size(); ++i) {
+    // Check and post-process outputs
+    for (int i=0; i<s_out.size(); ++i) {
+      // Make sure all outputs have been assigned
       if (!assigned[i]) {
         casadi_error("DaeBuilder::function: Cannot treat output expression " << s_out[i]);
+      }
+
+      // Apply attributes starting from the right-most one
+      MX& r = ret_out[i];
+      for (auto a=attr[i].rbegin(); a!=attr[i].rend(); ++a) {
+        switch (*a) {
+        case ATTR_TRANSPOSE: r = r.T(); break;
+        case ATTR_TRIU: r = triu(r); break;
+        case ATTR_TRIL: r = tril(r); break;
+        case ATTR_DENSIFY: r = densify(r); break;
+        }
       }
     }
 
