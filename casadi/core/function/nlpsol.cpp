@@ -327,40 +327,6 @@ namespace casadi {
     return jacG;
   }
 
-  Function& Nlpsol::gradLag() {
-    if (gradLag_.isNull()) {
-      gradLag_ = getGradLag();
-      alloc(gradLag_);
-    }
-    return gradLag_;
-  }
-
-  Function Nlpsol::getGradLag() {
-    Function gradLag;
-    if (hasSetOption("grad_lag")) {
-      gradLag = option("grad_lag");
-    } else {
-      log("Generating/retrieving Lagrangian gradient function");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating/retrieving Lagrangian gradient function...";
-      Timer time0 = getTimerTime();
-      gradLag = nlp_.derivative(0, 1);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["grad lag gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated/retrieved Lagrangien gradient in "
-                  << diff.user << " seconds.";
-      log("Gradient function generated");
-    }
-    if (hasSetOption("grad_lag_options")) {
-      gradLag.setOption(option("grad_lag_options"));
-    }
-    gradLag.init();
-    log("Gradient function initialized");
-    return gradLag;
-  }
-
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
 
   const std::string Nlpsol::infix_ = "nlpsol";

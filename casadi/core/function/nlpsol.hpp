@@ -79,9 +79,6 @@ namespace casadi {
     /// Get or generate a function to calculate the Jacobian of the constraint function
     virtual Function getJacG();
 
-    /// Get or generate a function to calculate the gradient of the Lagrangian function
-    virtual Function getGradLag();
-
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
@@ -93,9 +90,6 @@ namespace casadi {
 
     /// Access the Jacobian of the constraint function
     Function& jacG();
-
-    /// Access the gradient of the Lagrangian function
-    Function& gradLag();
 
     /// Number of variables
     int nx_;
@@ -127,9 +121,6 @@ namespace casadi {
 
     // Jacobian of the constraints
     Function jacG_;
-
-    // Gradient of the Lagrangian
-    Function gradLag_;
 
     /// A reference to this object to be passed to the user functions
     Function ref_;
