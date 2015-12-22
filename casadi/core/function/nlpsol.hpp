@@ -76,9 +76,6 @@ namespace casadi {
     /// Get or generate a function to calculate the jacobian of the objective function
     virtual Function getJacF();
 
-    /// Get or generate a function to calculate the Jacobian of the constraint function
-    virtual Function getJacG();
-
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
@@ -87,9 +84,6 @@ namespace casadi {
 
     // Access the objective jacobian function (sparse)
     Function& jacF();
-
-    /// Access the Jacobian of the constraint function
-    Function& jacG();
 
     /// Number of variables
     int nx_;
@@ -118,9 +112,6 @@ namespace casadi {
 
     // Gradient of the objective
     Function jacF_;
-
-    // Jacobian of the constraints
-    Function jacG_;
 
     /// A reference to this object to be passed to the user functions
     Function ref_;

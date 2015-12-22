@@ -115,14 +115,14 @@ namespace casadi {
 
     // Get/generate required functions
     gradF();
-    jacG();
+    setup_jac_g();
     if (exact_hessian_) {
       setup_hess_l(false, true, true);
     }
 
     // Allocate a QP solver
     Hsp_ = exact_hessian_ ? hesslag_sp_ : Sparsity::dense(nx_, nx_);
-    Asp_ = jacG().isNull() ? Sparsity(0, nx_) : jacG().sparsity_out(0);
+    Asp_ = jac_g_fcn_.isNull() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(0);
 
     // QP solver options
     Dict qpsol_options;
@@ -806,17 +806,17 @@ namespace casadi {
       if (ng_==0) return;
 
       // Inputs
-      fill_n(arg_, jacG_.n_out(), nullptr);
+      fill_n(arg_, jac_g_fcn_.n_out(), nullptr);
       arg_[NL_X] = x;
       arg_[NL_P] = p_;
 
       // Outputs
-      fill_n(res_, jacG_.n_out(), nullptr);
+      fill_n(res_, jac_g_fcn_.n_out(), nullptr);
       res_[0] = J;
       res_[1+NL_G] = g;
 
       // Evaluate the function
-      jacG_(arg_, res_, iw_, w_, 0);
+      jac_g_fcn_(arg_, res_, iw_, w_, 0);
 
       double time2 = clock();
       t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;

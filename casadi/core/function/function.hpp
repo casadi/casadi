@@ -1037,9 +1037,6 @@ namespace casadi {
     /** Access the objective gradient function for an NLP solver */
     Function nlpsol_gradf();
 
-    /** \brief Access the Hessian of the Lagrangian function for an NLP solver */
-    Function nlpsol_jacg();
-
     /** Generate native code in the interfaced language for debugging */
     void qpsol_debug(const std::string &filename) const;
 

@@ -229,7 +229,7 @@ namespace casadi {
 
     // Get/generate required functions
     jacF();
-    jacG();
+    setup_jac_g();
 
     // prepare the mapping for constraints
     nnJac_ = nx_;
@@ -248,8 +248,8 @@ namespace casadi {
     IM mapping_gradF = IM(jacF_.sparsity_out(0),
                           range(-1, -1-jacF_.nnz_out(0), -1));
 
-    if (!jacG_.isNull()) {
-      mapping_jacG = IM(jacG_.sparsity_out(0), range(1, jacG_.nnz_out(0)+1));
+    if (!jac_g_fcn_.isNull()) {
+      mapping_jacG = IM(jacg_sp_, range(1, jacg_sp_.nnz()+1));
     }
 
     // First, remap jacG
@@ -303,8 +303,8 @@ namespace casadi {
     alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
     alloc_w(jacF_.nnz_out(0), true); // jac_fk_
-    if (!jacG_.isNull()) {
-      alloc_w(jacG_.nnz_out(0), true); // jac_gk_
+    if (!jacg_sp_.isNull()) {
+      alloc_w(jacg_sp_.nnz(), true); // jac_gk_
     }
   }
 
@@ -358,8 +358,8 @@ namespace casadi {
     lam_xk_ = w; w += nx_;
     gk_ = w; w += ng_;
     jac_fk_ = w; w += jacF_.nnz_out(0);
-    if (!jacG_.isNull()) {
-      jac_gk_ = w; w += jacG_.nnz_out(0);
+    if (!jacg_sp_.isNull()) {
+      jac_gk_ = w; w += jacg_sp_.nnz();
     }
   }
 
@@ -371,13 +371,13 @@ namespace casadi {
     snProblem prob;
 
     // Evaluate gradF and jacG at initial value
-    if (!jacG_.isNull()) {
-      std::fill_n(arg_, jacG_.n_in(), nullptr);
+    if (!jac_g_fcn_.isNull()) {
+      std::fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
       arg_[JACG_X] = x0_;
       arg_[JACG_P] = p_;
-      std::fill_n(res_, jacG_.n_out(), nullptr);
+      std::fill_n(res_, jac_g_fcn_.n_out(), nullptr);
       res_[0] = jac_gk_;
-      jacG_(arg_, res_, iw_, w_, 0);
+      jac_g_fcn_(arg_, res_, iw_, w_, 0);
     }
     std::fill_n(arg_, jacF_.n_in(), nullptr);
     arg_[GRADF_X] = x0_;
@@ -549,7 +549,7 @@ namespace casadi {
 
 
       time0 = clock();
-      if (!jacG_.isNull()) {
+      if (!jac_g_fcn_.isNull()) {
         // Get reduced decision variables
         casadi_fill(xk2_, nx_, 0.);
         for (int k = 0; k < nnJac; ++k) {
@@ -557,13 +557,13 @@ namespace casadi {
         }
 
         // Evaluate jacG with the linear variabes put to zero
-        std::fill_n(arg_, jacG_.n_in(), nullptr);
+        std::fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
         arg_[JACG_X] = xk2_;
         arg_[JACG_P] = p_;
-        std::fill_n(res_, jacG_.n_out(), nullptr);
+        std::fill_n(res_, jac_g_fcn_.n_out(), nullptr);
         res_[0] = jac_gk_;
         res_[GRADF_G] = gk_;
-        jacG_(arg_, res_, iw_, w_, 0);
+        jac_g_fcn_(arg_, res_, iw_, w_, 0);
 
         // provide nonlinear part of constraint jacobian to SNOPT
         int kk = 0;

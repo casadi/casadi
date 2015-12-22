@@ -284,49 +284,6 @@ namespace casadi {
     return gradF;
   }
 
-  Function& Nlpsol::jacG() {
-    if (jacG_.isNull()) {
-      jacG_ = getJacG();
-      alloc(jacG_);
-    }
-    return jacG_;
-  }
-
-  Function Nlpsol::getJacG() {
-    Function jacG;
-
-    // Return null if no constraints
-    if (ng_==0) return jacG;
-
-    if (hasSetOption("jac_g")) {
-      jacG = option("jac_g");
-    } else {
-      log("Generating constraint Jacobian");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating constraint Jacobian...";
-      Timer time0 = getTimerTime();
-      jacG = nlp_.jacobian(NL_X, NL_G);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["constraint jacobian gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated constraint Jacobian in " << diff.user << " seconds.";
-      log("Jacobian function generated");
-    }
-    if (hasSetOption("jac_g_options")) {
-      jacG.setOption(option("jac_g_options"));
-    }
-    jacG.init();
-    casadi_assert_message(jacG.n_in()==JACG_NUM_IN,
-                          "Wrong number of inputs to the Jacobian function. "
-                          "Note: The Jacobian signature was changed in #544");
-    casadi_assert_message(jacG.n_out()==JACG_NUM_OUT,
-                          "Wrong number of outputs to the Jacobian function. "
-                          "Note: The Jacobian signature was changed in #544");
-    log("Jacobian function initialized");
-    return jacG;
-  }
-
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
 
   const std::string Nlpsol::infix_ = "nlpsol";
@@ -684,6 +641,7 @@ namespace casadi {
     std::vector<M> res = {M::gradient(nlp.out[NL_F], nlp.in[NL_X]),
                           M::jacobian(nlp.out[NL_G], nlp.in[NL_X])};
     gf_jg_fcn_ = Function("nlp_gf_jg", arg, res);
+    jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
     alloc(gf_jg_fcn_);
   }
 

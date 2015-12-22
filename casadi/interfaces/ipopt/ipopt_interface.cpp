@@ -296,11 +296,11 @@ namespace casadi {
       setup_hess_l(); // Hessian of the Lagrangian
     } else if (pass_nonlinear_variables_) {
       if (nlp2_.is_sx) {
-        const Problem<SX>& nlp = nlp2_;        
+        const Problem<SX>& nlp = nlp2_;
         SX fg = veccat(vector<SX>{nlp.out[NL_F], nlp.out[NL_G]});
         nl_ex_ = nl_var(fg, nlp.in[NL_X]);
       } else {
-        const Problem<MX>& nlp = nlp2_;        
+        const Problem<MX>& nlp = nlp2_;
         MX fg = veccat(vector<MX>{nlp.out[NL_F], nlp.out[NL_G]});
         nl_ex_ = nl_var(fg, nlp.in[NL_X]);
       }

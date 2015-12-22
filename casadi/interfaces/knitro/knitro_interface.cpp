@@ -166,7 +166,6 @@ namespace casadi {
 
     // Get/generate required functions
     gradF();
-    jacG();
 
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block
@@ -207,11 +206,9 @@ namespace casadi {
 
     // Jacobian sparsity
     vector<int> Jcol, Jrow;
-    if (!jacG_.isNull()) {
-      Jcol = jacG_.sparsity_out(0).get_col();
-      int sz = jacG_.nnz_out(0);
-      const int* row = jacG_.sparsity_out(0).row();
-      Jrow = vector<int>(row, row+sz);
+    if (!jacg_sp_.isNull()) {
+      Jcol = jacg_sp_.get_col();
+      Jrow = jacg_sp_.get_row();
     }
 
     // Hessian sparsity
