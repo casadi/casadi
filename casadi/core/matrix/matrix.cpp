@@ -668,51 +668,7 @@ namespace casadi {
 
   template<>
   SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr) {
-    Function f("tmp", {arg}, {ex});
-
-    // Split up v
-    vector<SX> vv = horzsplit(v);
-
-    // Make sure well-posed
-    casadi_assert(vv.size() >= 1);
-    casadi_assert(ex.is_column());
-    casadi_assert(arg.is_column());
-    if (tr) {
-      casadi_assert(v.size1()==ex.size1());
-    } else {
-      casadi_assert(v.size1()==arg.size1());
-    }
-
-    // Number of sensitivities
-    int nfsens = tr ? 0 : vv.size();
-    int nasens = tr ? vv.size() : 0;
-
-    // Assemble arguments and directional derivatives
-    vector<SX> argv = f.sx_in();
-    vector<SX> resv = f(argv);
-    vector<vector<SX> > fseed(nfsens, argv), fsens(nfsens, resv),
-        aseed(nasens, resv), asens(nasens, argv);
-
-    for (int dir=0; dir<vv.size(); ++dir) {
-      if (tr) {
-        aseed[dir][0].set(vv[dir]);
-      } else {
-        fseed[dir][0].set(vv[dir]);
-      }
-    }
-
-    // Evaluate with directional derivatives, output is the same as the funciton inputs
-    f.derivative(argv, resv, fseed, fsens, aseed, asens);
-
-    // Get the results
-    for (int dir=0; dir<vv.size(); ++dir) {
-      if (tr) {
-        vv[dir] = asens[dir][0];
-      } else {
-        vv[dir] = fsens[dir][0];
-      }
-    }
-    return horzcat(vv);
+    return _jtimes(ex, arg, v, tr);
   }
 
   template<>

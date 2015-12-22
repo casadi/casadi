@@ -409,6 +409,7 @@ namespace casadi {
     static MX tangent(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x, MX& g);
+    static MX jtimes(const MX &ex, const MX &arg, const MX &v, bool tr=false);
     MX zz_substitute(const MX& v, const MX& vdef) const;
     static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,

@@ -511,7 +511,7 @@ namespace casadi {
     }
 
     ///@{
-    /** \brief Calculate jacobian via source code transformation
+    /** \brief Calculate Jacobian
     */
     inline friend MatType jacobian(const MatType &ex, const MatType &arg, bool symmetric=false) {
       return MatType::jacobian(ex, arg, symmetric);
@@ -523,6 +523,18 @@ namespace casadi {
       return MatType::tangent(ex, arg);
     }
     ///@}
+
+    /** \brief Calculate the Jacobian and multiply by a vector from the right
+        This is equivalent to <tt>mul(jacobian(ex, arg), v)</tt> or
+        <tt>mul(jacobian(ex, arg).T, v)</tt> for
+        tr set to false and true respectively. If contrast to these
+        expressions, it will use directional derivatives which is typically (but
+        not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
+    */
+    friend inline MatType jtimes(const MatType &ex, const MatType &arg,
+                                 const MatType &v, bool tr=false) {
+      return MatType::jtimes(ex, arg, v, tr);
+    }
 
     ///@{
     // Hessian and (optionally) gradient

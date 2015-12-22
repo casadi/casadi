@@ -1738,6 +1738,10 @@ namespace casadi {
     return MX::jac(gfcn, 0, 0, false, true);
   }
 
+  MX MX::jtimes(const MX &ex, const MX &arg, const MX &v, bool tr) {
+    return _jtimes(ex, arg, v, tr);
+  }
+
   MX MX::zz_det() const {
     return (*this)->getDeterminant();
   }

@@ -3144,6 +3144,45 @@ namespace casadi {
   extern template class Matrix<SXElem>;
 #endif // CASADI_MATRIX_CPP
 
+  template<typename MatType>
+  MatType _jtimes(const MatType &ex, const MatType &arg, const MatType &v, bool tr) {
+    Function f("tmp", {arg}, {ex});
+
+    // Split up v
+    std::vector<MatType> vv = horzsplit(v);
+
+    // Make sure well-posed
+    casadi_assert(vv.size() >= 1);
+    casadi_assert(ex.is_column());
+    casadi_assert(arg.is_column());
+    if (tr) {
+      casadi_assert(v.size1()==ex.size1());
+    } else {
+      casadi_assert(v.size1()==arg.size1());
+    }
+
+    // Assemble arguments and directional derivatives
+    std::vector<MatType> argv = MatType::get_input(f);
+    std::vector<MatType> resv = f(argv);
+    std::vector<std::vector<MatType> > seed(vv.size()), sens;
+    for (int dir=0; dir<vv.size(); ++dir) {
+      seed[dir] = { vv[dir]};
+    }
+
+    // Calculate directional derivatives
+    if (tr) {
+      f.reverse(argv, resv, seed, sens);
+    } else {
+      f.forward(argv, resv, seed, sens);
+    }
+
+    // Get the results
+    for (int dir=0; dir<vv.size(); ++dir) {
+      vv[dir] = sens[dir].at(0);
+    }
+    return horzcat(vv);
+  }
+
 } // namespace casadi
 
 /// \endcond

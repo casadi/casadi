@@ -2722,6 +2722,10 @@ DECL M %SHOW(jacobian)(const M &ex, const M &arg) {
   return jacobian(ex, arg);
 }
 
+DECL M %SHOW(jtimes)(const M& ex, const M& arg, const M& v, bool tr=false) {
+  return jtimes(ex, arg, v, tr);
+}
+
 DECL M %SHOW(gradient)(const M &ex, const M &arg) {
   return gradient(ex, arg);
 }
@@ -2919,10 +2923,6 @@ DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
                                const M& a, const M& b,
                                int order, const M& w) {
   return gauss_quadrature(f, x, a, b, order, w);
-}
-
-DECL M %SHOW(jtimes)(const M& ex, const M& arg, const M& v, bool tr=false) {
-  return jtimes(ex, arg, v, tr);
 }
 
 DECL M %SHOW(taylor)(const M& ex, const M& x, const M& a=0, int order=1) {
