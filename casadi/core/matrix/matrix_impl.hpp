@@ -2641,10 +2641,11 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_jmtimes(const Matrix<DataType> &arg,
-                                                const Matrix<DataType> &v,
-                                                bool transpose_jacobian) const {
-    throw CasadiException("\"jmtimes\" not defined for instantiation");
+  Matrix<DataType> Matrix<DataType>::jtimes(const Matrix<DataType> &ex,
+                                            const Matrix<DataType> &arg,
+                                            const Matrix<DataType> &v,
+                                            bool tr) {
+    throw CasadiException("\"jtimes\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
@@ -3091,8 +3092,7 @@ namespace casadi {
   template<> SX SX::tangent(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
-  template<> SX SX::zz_jmtimes(const SX &arg, const SX &v,
-                                           bool transpose_jacobian) const;
+  template<> SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr);
   template<> SX SX::zz_taylor(const SX& x, const SX& a, int order) const;
   template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const;
   template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order,

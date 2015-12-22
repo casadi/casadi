@@ -667,25 +667,25 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_jmtimes(const SX &arg, const SX &v, bool transpose_jacobian) const {
-    Function f("tmp", {arg}, {*this});
+  SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr) {
+    Function f("tmp", {arg}, {ex});
 
     // Split up v
     vector<SX> vv = horzsplit(v);
 
     // Make sure well-posed
     casadi_assert(vv.size() >= 1);
-    casadi_assert(is_column());
+    casadi_assert(ex.is_column());
     casadi_assert(arg.is_column());
-    if (transpose_jacobian) {
-      casadi_assert(v.size1()==size1());
+    if (tr) {
+      casadi_assert(v.size1()==ex.size1());
     } else {
       casadi_assert(v.size1()==arg.size1());
     }
 
     // Number of sensitivities
-    int nfsens = transpose_jacobian ? 0 : vv.size();
-    int nasens = transpose_jacobian ? vv.size() : 0;
+    int nfsens = tr ? 0 : vv.size();
+    int nasens = tr ? vv.size() : 0;
 
     // Assemble arguments and directional derivatives
     vector<SX> argv = f.sx_in();
@@ -694,7 +694,7 @@ namespace casadi {
         aseed(nasens, resv), asens(nasens, argv);
 
     for (int dir=0; dir<vv.size(); ++dir) {
-      if (transpose_jacobian) {
+      if (tr) {
         aseed[dir][0].set(vv[dir]);
       } else {
         fseed[dir][0].set(vv[dir]);
@@ -706,7 +706,7 @@ namespace casadi {
 
     // Get the results
     for (int dir=0; dir<vv.size(); ++dir) {
-      if (transpose_jacobian) {
+      if (tr) {
         vv[dir] = asens[dir][0];
       } else {
         vv[dir] = fsens[dir][0];

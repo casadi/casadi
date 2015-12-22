@@ -512,8 +512,8 @@ namespace casadi {
     Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
                                          const Matrix<DataType> &b, int order,
                                          const Matrix<DataType>& w) const;
-    Matrix<DataType> zz_jmtimes(const Matrix<DataType> &arg, const Matrix<DataType> &v,
-                                            bool transpose_jacobian=false) const;
+    static Matrix<DataType> jtimes(const Matrix<DataType> &ex, const Matrix<DataType> &arg,
+                                   const Matrix<DataType> &v, bool tr=false);
     Matrix<DataType> zz_taylor(const Matrix<DataType>& x,
                                const Matrix<DataType>& a, int order) const;
     Matrix<DataType> zz_mtaylor(const Matrix<DataType>& x,
@@ -728,15 +728,13 @@ namespace casadi {
     /** \brief Calculate the Jacobian and multiply by a vector from the right
         This is equivalent to <tt>mul(jacobian(ex, arg), v)</tt> or
         <tt>mul(jacobian(ex, arg).T, v)</tt> for
-        transpose_jacobian set to false and true respectively. If contrast to these
+        tr set to false and true respectively. If contrast to these
         expressions, it will use directional derivatives which is typically (but
         not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
     */
-    friend inline Matrix<DataType> jmtimes(const Matrix<DataType> &ex,
-                                                       const Matrix<DataType> &arg,
-                                                       const Matrix<DataType> &v,
-                                                       bool transpose_jacobian=false) {
-      return ex.zz_jmtimes(arg, v, transpose_jacobian);
+    friend inline Matrix<DataType> jtimes(const Matrix<DataType> &ex, const Matrix<DataType> &arg,
+                                          const Matrix<DataType> &v, bool tr=false) {
+      return Matrix<DataType>::jtimes(ex, arg, v, tr);
     }
 
     ///@{
