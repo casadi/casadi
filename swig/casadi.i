@@ -370,6 +370,12 @@ import_array();
     // Same as the above, but with reference instead of pointer
     template<typename M> GUESTOBJECT* from_ref(const M& m) { return from_ptr(&m);}
 
+    // Specialization for std::vectors of booleans
+    GUESTOBJECT* from_ref(std::vector<bool>::const_reference m) {
+      bool tmp = m;
+      return from_ptr(&tmp);
+    }
+
     // Same as the above, but with a temporary object
     template<typename M> GUESTOBJECT* from_tmp(M m) { return from_ptr(&m);}
 #ifdef SWIGMATLAB
@@ -2724,6 +2730,10 @@ DECL M %SHOW(jacobian)(const M &ex, const M &arg) {
 
 DECL M %SHOW(jtimes)(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
+}
+
+DECL std::vector<bool> %SHOW(nl_var)(const M& expr, const M& var) {
+  return nl_var(expr, var);
 }
 
 DECL M %SHOW(gradient)(const M &ex, const M &arg) {

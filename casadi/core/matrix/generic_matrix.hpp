@@ -546,6 +546,13 @@ namespace casadi {
     }
     ///@}
 
+    ///@{
+    /** \brief Find out which variables enter nonlinearly */
+    inline friend std::vector<bool> nl_var(const MatType &expr, const MatType &var) {
+      return MatType::nl_var(expr, var);
+    }
+    ///@}
+
     /** Count number of nodes */
     inline friend int countNodes(const MatType& A) {
       return A.zz_countNodes();

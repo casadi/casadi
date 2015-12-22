@@ -514,6 +514,7 @@ namespace casadi {
                                          const Matrix<DataType>& w) const;
     static Matrix<DataType> jtimes(const Matrix<DataType> &ex, const Matrix<DataType> &arg,
                                    const Matrix<DataType> &v, bool tr=false);
+    static std::vector<bool> nl_var(const Matrix<DataType> &expr, const Matrix<DataType> &var);
     Matrix<DataType> zz_taylor(const Matrix<DataType>& x,
                                const Matrix<DataType>& a, int order) const;
     Matrix<DataType> zz_mtaylor(const Matrix<DataType>& x,

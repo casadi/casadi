@@ -672,6 +672,11 @@ namespace casadi {
   }
 
   template<>
+  std::vector<bool> SX::nl_var(const SX &expr, const SX &var) {
+    return _nl_var(expr, var);
+  }
+
+  template<>
   SX SX::zz_taylor(const SX& x,
                    const SX& a, int order) const {
     casadi_assert(x.is_scalar() && a.is_scalar());

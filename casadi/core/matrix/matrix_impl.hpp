@@ -2607,21 +2607,21 @@ namespace casadi {
   Matrix<DataType> Matrix<DataType>::jacobian(const Matrix<DataType> &f,
                                               const Matrix<DataType> &x,
                                               bool symmetric) {
-    throw CasadiException("\"jacobian\" not defined for instantiation");
+    casadi_error("\"jacobian\" not defined for " + className());
     return Matrix<DataType>();
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::gradient(const Matrix<DataType> &f,
                                               const Matrix<DataType> &x) {
-    throw CasadiException("\"gradient\" not defined for instantiation");
+    casadi_error("\"gradient\" not defined for " + className());
     return Matrix<DataType>();
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::tangent(const Matrix<DataType> &f,
                                                 const Matrix<DataType> &x) {
-    throw CasadiException("\"tangent\" not defined for instantiation");
+    casadi_error("\"tangent\" not defined for " + className());
     return Matrix<DataType>();
   }
 
@@ -2636,7 +2636,7 @@ namespace casadi {
   Matrix<DataType> Matrix<DataType>::hessian(const Matrix<DataType> &f,
                                              const Matrix<DataType> &x,
                                              Matrix<DataType> &g) {
-    throw CasadiException("\"hessian\" not defined for instantiation");
+    casadi_error("\"hessian\" not defined for " + className());
     return Matrix<DataType>();
   }
 
@@ -2645,8 +2645,15 @@ namespace casadi {
                                             const Matrix<DataType> &arg,
                                             const Matrix<DataType> &v,
                                             bool tr) {
-    throw CasadiException("\"jtimes\" not defined for instantiation");
+    casadi_error("\"jtimes\" not defined for " + className());
     return Matrix<DataType>();
+  }
+
+  template<typename DataType>
+  std::vector<bool>
+  Matrix<DataType>::nl_var(const Matrix<DataType> &expr, const Matrix<DataType> &var) {
+    casadi_error("\"nl_var\" not defined for " + className());
+    return std::vector<bool>();
   }
 
   template<typename DataType>
@@ -3093,6 +3100,7 @@ namespace casadi {
   template<> SX SX::hessian(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
   template<> SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr);
+  template<> std::vector<bool> SX::nl_var(const SX &expr, const SX &var);
   template<> SX SX::zz_taylor(const SX& x, const SX& a, int order) const;
   template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const;
   template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
@@ -3181,6 +3189,23 @@ namespace casadi {
       vv[dir] = sens[dir].at(0);
     }
     return horzcat(vv);
+  }
+
+  template<typename MatType>
+  std::vector<bool> _nl_var(const MatType &expr, const MatType &var) {
+    // Create a function for calculating a forward-mode derivative
+    MatType v = MatType::sym("v", var.sparsity());
+    Function f("tmp", {var}, {jtimes(expr, var, v)});
+
+    // Propagate sparsities backwards seeding all outputs
+    std::vector<bvec_t> seed(f.nnz_out(0), 1);
+    std::vector<bvec_t> sens(f.nnz_in(0), 0);
+    f.rev({getPtr(sens)}, {getPtr(seed)});
+
+    // Temporaries for evaluation
+    std::vector<bool> ret(sens.size());
+    std::copy(sens.begin(), sens.end(), ret.begin());
+    return ret;
   }
 
 } // namespace casadi

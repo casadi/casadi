@@ -1742,6 +1742,10 @@ namespace casadi {
     return _jtimes(ex, arg, v, tr);
   }
 
+  std::vector<bool> MX::nl_var(const MX &expr, const MX &var) {
+    return _nl_var(expr, var);
+  }
+
   MX MX::zz_det() const {
     return (*this)->getDeterminant();
   }
