@@ -291,12 +291,12 @@ namespace casadi {
     return mapping;
   }
 
-  int Sparsity::nnz_lower() const {
-    return (*this)->nnz_lower();
+  int Sparsity::nnz_lower(bool strictly) const {
+    return (*this)->nnz_lower(strictly);
   }
 
-  int Sparsity::nnz_upper() const {
-    return (*this)->nnz_upper();
+  int Sparsity::nnz_upper(bool strictly) const {
+    return (*this)->nnz_upper(strictly);
   }
 
   int Sparsity::nnz_diag() const {

@@ -400,36 +400,6 @@ namespace casadi {
     return hessLag;
   }
 
-  Sparsity& Nlpsol::spHessLag() {
-    if (spHessLag_.isNull()) {
-      spHessLag_ = getSpHessLag();
-    }
-    return spHessLag_;
-  }
-
-  Sparsity Nlpsol::getSpHessLag() {
-    Sparsity spHessLag;
-    if (false /*hasSetOption("hess_lag_sparsity")*/) {
-      // NOTE: No such option yet, need support for GenericType(Sparsity)
-      //spHessLag = option("hess_lag_sparsity");
-    } else {
-      Function& gradLag = this->gradLag();
-      log("Generating Hessian of the Lagrangian sparsity pattern");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating Hessian of the Lagrangian sparsity pattern...";
-      Timer time0 = getTimerTime();
-      spHessLag = gradLag.sparsity_jac(NL_X, NL_NUM_OUT+NL_X, false, true);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["hess lag sparsity time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated Hessian of the Lagrangian sparsity pattern in "
-                  << diff.user << " seconds.";
-      log("Hessian sparsity pattern generated");
-    }
-    return spHessLag;
-  }
-
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
 
   const std::string Nlpsol::infix_ = "nlpsol";

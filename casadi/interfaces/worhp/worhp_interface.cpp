@@ -204,10 +204,6 @@ namespace casadi {
 
     // Get/generate required functions
     gradF();
-    jacG();
-    if (exact_hessian_) { // does not appear to work
-      hessLag();
-    }
 
     // Update status?
     status_[TerminateSuccess]="TerminateSuccess";
@@ -359,25 +355,13 @@ namespace casadi {
     // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
     worhp_w_.DF.nnz = nx_;
     if (worhp_o_.m>0) {
-      worhp_w_.DG.nnz = jacG_.nnz_out(0);  // Jacobian of G
+      worhp_w_.DG.nnz = jacg_sp_.nnz();  // Jacobian of G
     } else {
       worhp_w_.DG.nnz = 0;
     }
 
     if (exact_hessian_ /*worhp_w_.HM.NeedStructure*/) { // not initialized
-
-      // Get the sparsity pattern of the Hessian
-      const Sparsity& spHessLag = this->spHessLag();
-      const int* colind = spHessLag.colind();
-      const int* row = spHessLag.row();
-
-      // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
-      worhp_w_.HM.nnz = nx_; // diagonal entries
-      for (int c=0; c<nx_; ++c) {
-        for (int el=colind[c]; el<colind[c+1] && row[el]<c; ++el) {
-          worhp_w_.HM.nnz++; // strictly lower triangular part
-        }
-      }
+      worhp_w_.HM.nnz = nx_ + hesslag_sp_.nnz_lower(true);
     } else {
       worhp_w_.HM.nnz = 0;
     }
@@ -410,13 +394,12 @@ namespace casadi {
 
     if (worhp_w_.HM.NeedStructure) {
       // Get the sparsity pattern of the Hessian
-      const Sparsity& spHessLag = this->spHessLag();
-      const int* colind = spHessLag.colind();
-      const int* row = spHessLag.row();
+      const int* colind = hesslag_sp_.colind();
+      const int* row = hesslag_sp_.row();
 
       int nz=0;
 
-      // Upper triangular part of the Hessian (note CCS -> CRS format change)
+      // Strictly lower triangular part of the Hessian (note CCS -> CRS format change)
       for (int c=0; c<nx_; ++c) {
         for (int el=colind[c]; el<colind[c+1]; ++el) {
           if (row[el]>c) {

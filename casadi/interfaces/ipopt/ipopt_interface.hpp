@@ -166,6 +166,9 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Options
+    bool pass_nonlinear_variables_;
+    std::vector<bool> nl_ex_;
   };
 
 } // namespace casadi

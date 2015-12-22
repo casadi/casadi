@@ -203,6 +203,9 @@ namespace casadi {
     }
 #endif // WITH_SIPOPT
 
+    // Identify nonlinear variables
+    pass_nonlinear_variables_ = option("pass_nonlinear_variables");
+
     // Start an IPOPT application
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
     app_ = static_cast<void*>(app);
@@ -642,24 +645,13 @@ namespace casadi {
 
   int IpoptInterface::get_number_of_nonlinear_variables() {
     try {
-      if (!static_cast<bool>(option("pass_nonlinear_variables"))) {
+      if (!pass_nonlinear_variables_) {
         // No Hessian has been interfaced
         return -1;
       } else {
         // Number of variables that appear nonlinearily
         int nv = 0;
-
-        // Loop over the cols
-        const Sparsity& spHessLag = this->spHessLag();
-        const int* colind = spHessLag.colind();
-        int ncol = spHessLag.size2();
-        for (int i=0; i<ncol; ++i) {
-          // If the col contains any non-zeros, the corresponding variable appears nonlinearily
-          if (colind[i]!=colind[i+1])
-            nv++;
-        }
-
-        // Return the number
+        for (auto&& i : nl_ex_) if (i) nv++;
         return nv;
       }
     } catch(exception& ex) {
@@ -670,22 +662,9 @@ namespace casadi {
 
   bool IpoptInterface::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) {
     try {
-      // Running index
-      int el = 0;
-
-      // Loop over the cols
-      const Sparsity& spHessLag = this->spHessLag();
-      const int* colind = spHessLag.colind();
-      int ncol = spHessLag.size2();
-      for (int i=0; i<ncol; ++i) {
-        // If the col contains any non-zeros, the corresponding variable appears nonlinearily
-        if (colind[i]!=colind[i+1]) {
-          pos_nonlin_vars[el++] = i;
-        }
+      for (int i=0; i<nl_ex_.size(); ++i) {
+        if (nl_ex_[i]) *pos_nonlin_vars++ = i;
       }
-
-      // Assert number and return
-      casadi_assert(el==num_nonlin_vars);
       return true;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
@@ -878,6 +857,10 @@ namespace casadi {
     // Hessian of the Lagrangian
     if (exact_hessian_) {
       setup_hess_l<M>();
+    } else if (pass_nonlinear_variables_) {
+      const Problem<M>& nlp = nlp2_;
+      M fg = veccat(vector<M>{nlp.out[NL_F], nlp.out[NL_G]});
+      nl_ex_ = nl_var(fg, nlp.in[NL_X]);
     }
   }
 

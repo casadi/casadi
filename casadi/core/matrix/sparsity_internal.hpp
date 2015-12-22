@@ -239,10 +239,10 @@ namespace casadi {
     int numel() const;
 
     /// Number of non-zeros in the lower triangular half
-    int nnz_lower() const;
+    int nnz_lower(bool strictly=false) const;
 
     /// Number of non-zeros in the upper triangular half
-    int nnz_upper() const;
+    int nnz_upper(bool strictly=false) const;
 
     /// Number of non-zeros on the diagonal
     int nnz_diag() const;

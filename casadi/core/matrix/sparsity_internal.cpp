@@ -2012,12 +2012,14 @@ namespace casadi {
     return is_transpose(*this);
   }
 
-  int SparsityInternal::nnz_lower() const {
+  int SparsityInternal::nnz_lower(bool strictly) const {
     const int* colind = this->colind();
     const int* row = this->row();
     int nnz = 0;
     for (int cc=0; cc<size2(); ++cc) {
-      for (int el = colind[cc+1]-1; el>=colind[cc] && row[el]>=cc; --el) nnz++;
+      for (int el = colind[cc]; el<colind[cc+1]; ++el) {
+        if (cc<row[el] || (!strictly && cc==row[el])) nnz++;
+      }
     }
     return nnz;
   }
@@ -2034,12 +2036,14 @@ namespace casadi {
     return nnz;
   }
 
-  int SparsityInternal::nnz_upper() const {
+  int SparsityInternal::nnz_upper(bool strictly) const {
     const int* colind = this->colind();
     const int* row = this->row();
     int nnz = 0;
     for (int cc=0; cc<size2(); ++cc) {
-      for (int el = colind[cc]; el < colind[cc+1] && row[el]<=cc; ++el) nnz ++;
+      for (int el = colind[cc]; el<colind[cc+1]; ++el) {
+        if (cc<row[el] || (!strictly && cc==row[el])) nnz++;
+      }
     }
     return nnz;
   }

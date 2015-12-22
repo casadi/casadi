@@ -85,9 +85,6 @@ namespace casadi {
     /// Get or generate a function to calculate the Hessian of the Lagrangian function
     virtual Function getHessLag();
 
-    /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
-    virtual Sparsity getSpHessLag();
-
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
@@ -105,9 +102,6 @@ namespace casadi {
 
     /// Access the gradient of the Lagrangian function
     Function& gradLag();
-
-    /// Get the sparsity pattern of the Hessian of the Lagrangian
-    Sparsity& spHessLag();
 
     /// Number of variables
     int nx_;
@@ -145,9 +139,6 @@ namespace casadi {
 
     // Gradient of the Lagrangian
     Function gradLag_;
-
-    // Sparsity pattern of the Hessian of the Lagrangian
-    Sparsity spHessLag_;
 
     /// A reference to this object to be passed to the user functions
     Function ref_;

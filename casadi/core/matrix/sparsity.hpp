@@ -255,11 +255,11 @@ namespace casadi {
 
     /** \brief Number of non-zeros in the upper triangular half,
      * i.e. the number of elements (i, j) with j>=i */
-    int nnz_upper() const;
+    int nnz_upper(bool strictly=false) const;
 
     /** \brief Number of non-zeros in the lower triangular half,
      * i.e. the number of elements (i, j) with j<=i */
-    int nnz_lower() const;
+    int nnz_lower(bool strictly=false) const;
 
     /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i */
     int nnz_diag() const;
