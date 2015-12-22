@@ -129,9 +129,6 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-
-    // Setup all functions
-    template<typename M> void setup();
   };
 
 } // namespace casadi

@@ -361,45 +361,6 @@ namespace casadi {
     return gradLag;
   }
 
-  Function& Nlpsol::hessLag() {
-    if (hessLag_.isNull()) {
-      hessLag_ = getHessLag();
-      alloc(hessLag_);
-    }
-    return hessLag_;
-  }
-
-  Function Nlpsol::getHessLag() {
-    Function hessLag;
-    if (hasSetOption("hess_lag")) {
-      hessLag = option("hess_lag");
-    } else {
-      Function& gradLag = this->gradLag();
-      log("Generating Hessian of the Lagrangian");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating Hessian of the Lagrangian...";
-      Timer time0 = getTimerTime();
-      hessLag = gradLag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["hess lag gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated Hessian of the Lagrangian in "
-                  << diff.user << " seconds.";
-      log("Hessian function generated");
-    }
-    if (hasSetOption("hess_lag_options")) {
-      hessLag.setOption(option("hess_lag_options"));
-    }
-    hessLag.init();
-    casadi_assert_message(hessLag.n_in()==HESSLAG_NUM_IN,
-                          "Wrong number of inputs to the Hessian function. ");
-    casadi_assert_message(hessLag.n_out()==HESSLAG_NUM_OUT,
-                          "Wrong number of outputs to the Hessian function. ");
-    log("Hessian function initialized");
-    return hessLag;
-  }
-
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
 
   const std::string Nlpsol::infix_ = "nlpsol";
@@ -692,5 +653,152 @@ namespace casadi {
     }
   }
 
+
+  template<typename M>
+  void Nlpsol::_setup_f() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(F_NUM_IN);
+    arg[F_X] = nlp.in[NL_X];
+    arg[F_P] = nlp.in[NL_P];
+    std::vector<M> res(F_NUM_OUT);
+    res[F_F] = nlp.out[NL_F];
+    f_fcn_ = Function("nlp_f", arg, res);
+    alloc(f_fcn_);
+  }
+
+  void Nlpsol::Nlpsol::setup_f() {
+    if (nlp2_.is_sx) {
+      _setup_f<SX>();
+    } else {
+      _setup_f<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_g() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(G_NUM_IN);
+    arg[G_X] = nlp.in[NL_X];
+    arg[G_P] = nlp.in[NL_P];
+    std::vector<M> res(G_NUM_OUT);
+    res[G_G] = nlp.out[NL_G];
+    g_fcn_ = Function("nlp_g", arg, res);
+    alloc(g_fcn_);
+  }
+
+  void Nlpsol::setup_g() {
+    if (nlp2_.is_sx) {
+      _setup_g<SX>();
+    } else {
+      _setup_g<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_fg() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
+    std::vector<M> res = {nlp.out[NL_F], nlp.out[NL_G]};
+    fg_fcn_ = Function("nlp_fg", arg, res);
+    alloc(fg_fcn_);
+  }
+
+  void Nlpsol::setup_fg() {
+    if (nlp2_.is_sx) {
+      _setup_fg<SX>();
+    } else {
+      _setup_fg<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_gf_jg() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
+    std::vector<M> res = {M::gradient(nlp.out[NL_F], nlp.in[NL_X]),
+                          M::jacobian(nlp.out[NL_G], nlp.in[NL_X])};
+    gf_jg_fcn_ = Function("nlp_gf_jg", arg, res);
+    alloc(gf_jg_fcn_);
+  }
+
+  void Nlpsol::setup_gf_jg() {
+    if (nlp2_.is_sx) {
+      _setup_gf_jg<SX>();
+    } else {
+      _setup_gf_jg<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_grad_f() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(GF_NUM_IN);
+    arg[GF_X] = nlp.in[NL_X];
+    arg[GF_P] = nlp.in[NL_P];
+    std::vector<M> res(GF_NUM_OUT);
+    res[GF_GF] = M::gradient(nlp.out[NL_F], nlp.in[NL_X]);
+    grad_f_fcn_ = Function("nlp_grad_f", arg, res);
+    alloc(grad_f_fcn_);
+  }
+
+  void Nlpsol::setup_grad_f() {
+    if (nlp2_.is_sx) {
+      _setup_grad_f<SX>();
+    } else {
+      _setup_grad_f<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_jac_g() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(JG_NUM_IN);
+    arg[JG_X] = nlp.in[NL_X];
+    arg[JG_P] = nlp.in[NL_P];
+    std::vector<M> res(JG_NUM_OUT);
+    res[JG_JG] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
+    jac_g_fcn_ = Function("nlp_jac_g", arg, res);
+    jacg_sp_ = res[JG_JG].sparsity();
+    alloc(jac_g_fcn_);
+  }
+
+  void Nlpsol::setup_jac_g() {
+    if (nlp2_.is_sx) {
+      _setup_jac_g<SX>();
+    } else {
+      _setup_jac_g<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_hess_l(bool tr, bool sym, bool diag) {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(HL_NUM_IN);
+    M x = arg[HL_X] = nlp.in[NL_X];
+    arg[HL_P] = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M g = nlp.out[NL_G];
+    M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
+    M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
+    std::vector<M> res(HL_NUM_OUT);
+    res[HL_HL] = triu(M::hessian(dot(lam_f, f) + dot(lam_g, g), x));
+    if (sym) res[HL_HL] = triu2symm(res[HL_HL]);
+    if (tr) res[HL_HL] = res[HL_HL].T();
+    hesslag_sp_ = res[HL_HL].sparsity();
+    if (diag) {
+      hesslag_sp_ = hesslag_sp_ + Sparsity::diag(hesslag_sp_.size1());
+      res[HL_HL] = project(res[HL_HL], hesslag_sp_);
+    }
+    hess_l_fcn_ = Function("nlp_hess_l", arg, res);
+    alloc(hess_l_fcn_);
+  }
+
+  void Nlpsol::setup_hess_l(bool tr, bool sym, bool diag) {
+    if (nlp2_.is_sx) {
+      _setup_hess_l<SX>(tr, sym, diag);
+    } else {
+      _setup_hess_l<MX>(tr, sym, diag);
+    }
+  }
 
 } // namespace casadi

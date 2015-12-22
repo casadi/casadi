@@ -242,11 +242,11 @@ namespace casadi {
     status_[FunctionErrorHM]="FunctionErrorHM";
 
     // Setup NLP functions
-    if (nlp2_.is_sx) {
-      setup<SX>();
-    } else {
-      setup<MX>();
-    }
+    setup_f(); // Objective
+    setup_g(); // Constraints
+    setup_grad_f(); // Gradient of objective
+    setup_jac_g(); // Jacobian of the constraints
+    setup_hess_l(true); // Hessian of the Lagrangian
 
     // Temporary vectors
     alloc_w(nx_); // for fetching diagonal entries form Hessian
@@ -755,22 +755,5 @@ namespace casadi {
 
 map<int, string> WorhpInterface::flagmap = WorhpInterface::calc_flagmap();
 
-  template<typename M>
-  void WorhpInterface::setup() {
-    // Objective
-    setup_f<M>();
-
-    // Constraints
-    setup_g<M>();
-
-    // Gradient of objective
-    setup_grad_f<M>();
-
-    // Jacobian of the constraints
-    setup_jac_g<M>();
-
-    // Hessian of the Lagrangian
-    setup_hess_l<M>(true);
-  }
 
 } // namespace casadi

@@ -1040,9 +1040,6 @@ namespace casadi {
     /** \brief Access the Hessian of the Lagrangian function for an NLP solver */
     Function nlpsol_jacg();
 
-    /** \brief Access the Jacobian of the constraint function for an NLP solver */
-    Function nlpsol_hesslag();
-
     /** Generate native code in the interfaced language for debugging */
     void qpsol_debug(const std::string &filename) const;
 

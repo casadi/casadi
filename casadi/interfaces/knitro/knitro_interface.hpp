@@ -90,9 +90,6 @@ namespace casadi {
 
     // Inputs
     double *wx_, *wlbx_, *wubx_, *wlbg_, *wubg_;
-
-    // Setup all functions
-    template<typename M> void setup();
   };
 
 } // namespace casadi

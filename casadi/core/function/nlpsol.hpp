@@ -82,9 +82,6 @@ namespace casadi {
     /// Get or generate a function to calculate the gradient of the Lagrangian function
     virtual Function getGradLag();
 
-    /// Get or generate a function to calculate the Hessian of the Lagrangian function
-    virtual Function getHessLag();
-
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
@@ -96,9 +93,6 @@ namespace casadi {
 
     /// Access the Jacobian of the constraint function
     Function& jacG();
-
-    /// Access the Hessian of the Lagrangian function
-    Function& hessLag();
 
     /// Access the gradient of the Lagrangian function
     Function& gradLag();
@@ -133,9 +127,6 @@ namespace casadi {
 
     // Jacobian of the constraints
     Function jacG_;
-
-    // Hessian of the Lagrangian
-    Function hessLag_;
 
     // Gradient of the Lagrangian
     Function gradLag_;
@@ -184,26 +175,30 @@ namespace casadi {
     enum FIn { F_X, F_P, F_NUM_IN };
     enum FOut { F_F, F_NUM_OUT};
     Function f_fcn_;
-    template<typename M> void setup_f();
+    template<typename M> void _setup_f();
+    void setup_f();
     int calc_f(const double* x, const double* p, double* f);
 
     // Calculate constraints
     enum GIn { G_X, G_P, G_NUM_IN };
     enum GOut { G_G, G_NUM_OUT};
     Function g_fcn_;
-    template<typename M> void setup_g();
+    template<typename M> void _setup_g();
+    void setup_g();
     int calc_g(const double* x, const double* p, double* g);
 
     // Calculate both objective and constraints
     Function fg_fcn_;
-    template<typename M> void setup_fg();
+    template<typename M> void _setup_fg();
+    void setup_fg();
     int calc_fg(const double* x, const double* p, double* f, double* g);
 
     // Calculate gradient of the objective
     enum GradFIn { GF_X, GF_P, GF_NUM_IN };
     enum GradFOut { GF_GF, GF_NUM_OUT};
     Function grad_f_fcn_;
-    template<typename M> void setup_grad_f();
+    template<typename M> void _setup_grad_f();
+    void setup_grad_f();
     int calc_grad_f(const double* x, const double* p, double* grad_f);
 
     // Calculate Jacobian of constraints
@@ -211,12 +206,14 @@ namespace casadi {
     enum JacGOut { JG_JG, JG_NUM_OUT};
     Function jac_g_fcn_;
     Sparsity jacg_sp_;
-    template<typename M> void setup_jac_g();
+    template<typename M> void _setup_jac_g();
+    void setup_jac_g();
     int calc_jac_g(const double* x, const double* p, double* jac_g);
 
     // Calculate both gradient of the objective and Jacobian of constraints
     Function gf_jg_fcn_;
-    template<typename M> void setup_gf_jg();
+    template<typename M> void _setup_gf_jg();
+    void setup_gf_jg();
     int calc_gf_jg(const double* x, const double* p, double* gf, double* jg);
 
     // Calculate Hessian of the Lagrangian constraints
@@ -224,7 +221,8 @@ namespace casadi {
     enum HessLagOut { HL_HL, HL_NUM_OUT};
     Function hess_l_fcn_;
     Sparsity hesslag_sp_;
-    template<typename M> void setup_hess_l(bool tr=false);
+    template<typename M> void _setup_hess_l(bool tr, bool sym, bool diag);
+    void setup_hess_l(bool tr=false, bool sym=false, bool diag=false);
     int calc_hess_l(const double* x, const double* p,
                     const double* sigma, const double* lambda,
                     double* hl);
@@ -342,92 +340,6 @@ namespace casadi {
     p.out = nlp(p.in);
     casadi_assert(p.out.size()==NL_NUM_OUT);
     return p;
-  }
-
-  template<typename M>
-  void Nlpsol::setup_f() {
-    const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg(F_NUM_IN);
-    arg[F_X] = nlp.in[NL_X];
-    arg[F_P] = nlp.in[NL_P];
-    std::vector<M> res(F_NUM_OUT);
-    res[F_F] = nlp.out[NL_F];
-    f_fcn_ = Function("nlp_f", arg, res);
-    alloc(f_fcn_);
-  }
-
-  template<typename M>
-  void Nlpsol::setup_g() {
-    const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg(G_NUM_IN);
-    arg[G_X] = nlp.in[NL_X];
-    arg[G_P] = nlp.in[NL_P];
-    std::vector<M> res(G_NUM_OUT);
-    res[G_G] = nlp.out[NL_G];
-    g_fcn_ = Function("nlp_g", arg, res);
-    alloc(g_fcn_);
-  }
-
-  template<typename M>
-  void Nlpsol::setup_fg() {
-    const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
-    std::vector<M> res = {nlp.out[NL_F], nlp.out[NL_G]};
-    fg_fcn_ = Function("nlp_fg", arg, res);
-    alloc(fg_fcn_);
-  }
-
-  template<typename M>
-  void Nlpsol::setup_gf_jg() {
-    const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
-    std::vector<M> res = {M::gradient(nlp.out[NL_F], nlp.in[NL_X]),
-                          M::jacobian(nlp.out[NL_G], nlp.in[NL_X])};
-    gf_jg_fcn_ = Function("nlp_gf_jg", arg, res);
-    alloc(gf_jg_fcn_);
-  }
-
-  template<typename M>
-  void Nlpsol::setup_grad_f() {
-    const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg(GF_NUM_IN);
-    arg[GF_X] = nlp.in[NL_X];
-    arg[GF_P] = nlp.in[NL_P];
-    std::vector<M> res(GF_NUM_OUT);
-    res[GF_GF] = M::gradient(nlp.out[NL_F], nlp.in[NL_X]);
-    grad_f_fcn_ = Function("nlp_grad_f", arg, res);
-    alloc(grad_f_fcn_);
-  }
-
-  template<typename M>
-  void Nlpsol::setup_jac_g() {
-    const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg(JG_NUM_IN);
-    arg[JG_X] = nlp.in[NL_X];
-    arg[JG_P] = nlp.in[NL_P];
-    std::vector<M> res(JG_NUM_OUT);
-    res[JG_JG] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
-    jac_g_fcn_ = Function("nlp_jac_g", arg, res);
-    jacg_sp_ = res[JG_JG].sparsity();
-    alloc(jac_g_fcn_);
-  }
-
-  template<typename M>
-  void Nlpsol::setup_hess_l(bool tr) {
-    const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg(HL_NUM_IN);
-    M x = arg[HL_X] = nlp.in[NL_X];
-    arg[HL_P] = nlp.in[NL_P];
-    M f = nlp.out[NL_F];
-    M g = nlp.out[NL_G];
-    M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
-    M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
-    std::vector<M> res(HL_NUM_OUT);
-    res[HL_HL] = triu(M::hessian(dot(lam_f, f) + dot(lam_g, g), x));
-    if (tr) res[HL_HL] = res[HL_HL].T();
-    hess_l_fcn_ = Function("nlp_hess_l", arg, res);
-    hesslag_sp_ = res[HL_HL].sparsity();
-    alloc(hess_l_fcn_);
   }
 
 } // namespace casadi

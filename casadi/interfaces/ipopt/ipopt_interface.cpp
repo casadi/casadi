@@ -288,10 +288,23 @@ namespace casadi {
 #endif // WITH_SIPOPT
 
     // Setup NLP functions
-    if (nlp2_.is_sx) {
-      setup<SX>();
-    } else {
-      setup<MX>();
+    setup_f(); // Objective
+    setup_g(); // Constraints
+    setup_grad_f(); // Gradient of the objective
+    setup_jac_g(); // Jacobian of the constraits
+    if (exact_hessian_) {
+      setup_hess_l(); // Hessian of the Lagrangian
+    } else if (pass_nonlinear_variables_) {
+      if (nlp2_.is_sx) {
+        const Problem<SX>& nlp = nlp2_;        
+        SX fg = veccat(vector<SX>{nlp.out[NL_F], nlp.out[NL_G]});
+        nl_ex_ = nl_var(fg, nlp.in[NL_X]);
+      } else {
+        const Problem<MX>& nlp = nlp2_;        
+        MX fg = veccat(vector<MX>{nlp.out[NL_F], nlp.out[NL_G]});
+        nl_ex_ = nl_var(fg, nlp.in[NL_X]);
+      }
+
     }
 
     // Allocate work vectors
@@ -838,30 +851,6 @@ namespace casadi {
     return red_hess_;
 #endif // WITH_SIPOPT
 #endif // WITH_CASADI_PATCH
-  }
-
-  template<typename M>
-  void IpoptInterface::setup() {
-    // Objective
-    setup_f<M>();
-
-    // Constraints
-    setup_g<M>();
-
-    // Gradient of the objective
-    setup_grad_f<M>();
-
-    // Jacobian of the constraits
-    setup_jac_g<M>();
-
-    // Hessian of the Lagrangian
-    if (exact_hessian_) {
-      setup_hess_l<M>();
-    } else if (pass_nonlinear_variables_) {
-      const Problem<M>& nlp = nlp2_;
-      M fg = veccat(vector<M>{nlp.out[NL_F], nlp.out[NL_G]});
-      nl_ex_ = nl_var(fg, nlp.in[NL_X]);
-    }
   }
 
 } // namespace casadi

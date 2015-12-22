@@ -115,9 +115,6 @@ namespace casadi {
     /// All IPOPT options
     std::map<std::string, TypeID> ops_;
 
-    // Setup all functions
-    template<typename M> void setup();
-
     // Ipopt callback functions
     void finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g,
                            const double* lambda, double obj_value, int iter_count);

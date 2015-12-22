@@ -167,9 +167,6 @@ namespace casadi {
     // Get/generate required functions
     gradF();
     jacG();
-    if (true) { // NOTE: should be only if HessOpt
-      hessLag();
-    }
 
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block
@@ -177,11 +174,9 @@ namespace casadi {
         kc_handle_ = KTR_new();*/
 
     // Setup NLP functions
-    if (nlp2_.is_sx) {
-      setup<SX>();
-    } else {
-      setup<MX>();
-    }
+    setup_fg(); // Objective and constraints
+    setup_gf_jg(); // Objective gradient and Jacobian of constraints
+    setup_hess_l(); // Hessian of the Lagrangian
 
     // Allocate memory
     alloc_w(nx_, true); // wx_
@@ -220,22 +215,11 @@ namespace casadi {
     }
 
     // Hessian sparsity
-    int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().nnz_lower();
-    vector<int> Hcol(nnzH), Hrow(nnzH);
+    int nnzH = hesslag_sp_.isNull() ? 0 : hesslag_sp_.nnz();
+    vector<int> Hcol, Hrow;
     if (nnzH>0) {
-      const int* colind = hessLag_.sparsity_out(0).colind();
-      int ncol = hessLag_.size2_out(0);
-      const int* row = hessLag_.sparsity_out(0).row();
-      int nz=0;
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
-          Hcol[nz] = cc;
-          Hrow[nz] = row[el];
-          nz++;
-        }
-      }
-      casadi_assert(nz==nnzH);
-
+      Hcol = hesslag_sp_.get_col();
+      Hrow = hesslag_sp_.get_row();
       status = KTR_set_int_param_by_name(kc_handle_, "hessopt", KTR_HESSOPT_EXACT);
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     } else {
@@ -368,18 +352,6 @@ namespace casadi {
                                << ex.what() << endl;
       return -1;
     }
-  }
-
-  template<typename M>
-  void KnitroInterface::setup() {
-    // Objective and constraints
-    setup_fg<M>();
-
-    // Objective gradient and Jacobian of constraints
-    setup_gf_jg<M>();
-
-    // Hessian of the Lagrangian
-    setup_hess_l<M>();
   }
 
 } // namespace casadi

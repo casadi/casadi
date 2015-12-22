@@ -117,12 +117,11 @@ namespace casadi {
     gradF();
     jacG();
     if (exact_hessian_) {
-      hessLag();
+      setup_hess_l(false, true, true);
     }
 
     // Allocate a QP solver
-    Hsp_ = exact_hessian_ ? hessLag().sparsity_out(0) : Sparsity::dense(nx_, nx_);
-    Hsp_ = Hsp_ + Sparsity::diag(nx_);
+    Hsp_ = exact_hessian_ ? hesslag_sp_ : Sparsity::dense(nx_, nx_);
     Asp_ = jacG().isNull() ? Sparsity(0, nx_) : jacG().sparsity_out(0);
 
     // QP solver options
@@ -755,22 +754,7 @@ namespace casadi {
 
   void Sqpmethod::eval_h(const double* x, const double* lambda, double sigma, double* H) {
     try {
-      // Get function
-      Function& hessLag = this->hessLag();
-
-      // Inputs
-      fill_n(arg_, hessLag.n_in(), nullptr);
-      arg_[HESSLAG_X] = x;
-      arg_[HESSLAG_P] = p_;
-      arg_[HESSLAG_LAM_F] = &sigma;
-      arg_[HESSLAG_LAM_G] = lambda;
-
-      // Outputs
-      fill_n(res_, hessLag.n_out(), nullptr);
-      res_[0] = H;
-
-      // Evaluate
-      hessLag(arg_, res_, iw_, w_, 0);
+      calc_hess_l(x, p_, &sigma, lambda, H);
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
