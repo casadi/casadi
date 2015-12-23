@@ -84,10 +84,6 @@ namespace casadi {
     ischeme_ = nlpsol_in();
     oscheme_ = nlpsol_out();
 
-    // Make the ref object a non-refence counted pointer to this (as reference counting would
-    // prevent deletion of the object)
-    ref_.assignNodeNoCount(this);
-
     if (nlp.is_sx) {
       nlp_ = Nlpsol::problem2fun<SX>(nlp);
     } else {
@@ -97,8 +93,6 @@ namespace casadi {
   }
 
   Nlpsol::~Nlpsol() {
-    // Explicitly remove the pointer to this (as the counter would otherwise be decreased)
-    ref_.assignNodeNoCount(0);
   }
 
   Sparsity Nlpsol::get_sparsity_in(int ind) const {

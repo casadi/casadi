@@ -113,9 +113,6 @@ namespace casadi {
     // Gradient of the objective
     Function jacF_;
 
-    /// A reference to this object to be passed to the user functions
-    Function ref_;
-
     // Inputs
     const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
 
