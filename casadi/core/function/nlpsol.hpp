@@ -178,7 +178,7 @@ namespace casadi {
     Sparsity jacg_sp_;
     template<typename M> void _setup_jac_g();
     void setup_jac_g();
-    int calc_jac_g(const double* x, const double* p, double* jac_g);
+    int calc_jac_g(const double* x, const double* p, double* g, double* jac_g);
 
     // Calculate Jacobian of gradient (note: sparse!)
     Function jac_f_fcn_;

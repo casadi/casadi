@@ -373,10 +373,11 @@ namespace casadi {
     // Evaluate gradF and jacG at initial value
     if (!jac_g_fcn_.isNull()) {
       std::fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-      arg_[JACG_X] = x0_;
-      arg_[JACG_P] = p_;
+      arg_[0] = x0_;
+      arg_[1] = p_;
       std::fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-      res_[0] = jac_gk_;
+      res_[0] = 0;
+      res_[1] = jac_gk_;
       jac_g_fcn_(arg_, res_, iw_, w_, 0);
     }
     std::fill_n(arg_, jac_f_fcn_.n_in(), nullptr);
@@ -558,11 +559,11 @@ namespace casadi {
 
         // Evaluate jacG with the linear variabes put to zero
         std::fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-        arg_[JACG_X] = xk2_;
-        arg_[JACG_P] = p_;
+        arg_[0] = xk2_;
+        arg_[1] = p_;
         std::fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-        res_[0] = jac_gk_;
-        res_[GRADF_G] = gk_;
+        res_[0] = gk_;
+        res_[1] = jac_gk_;
         jac_g_fcn_(arg_, res_, iw_, w_, 0);
 
         // provide nonlinear part of constraint jacobian to SNOPT

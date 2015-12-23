@@ -101,7 +101,7 @@ namespace casadi {
                                   Number* values) {
     if (values) {
       // Evaluate Jacobian
-      return solver->calc_jac_g(x, solver->p_, values)==0;
+      return solver->calc_jac_g(x, solver->p_, 0, values)==0;
     } else {
       // Get the sparsity pattern
       int ncol = solver->jacg_sp_.size2();

@@ -434,36 +434,19 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_jac_g(const double* x, const double* p, double* jac_g) {
+  int Nlpsol::calc_jac_g(const double* x, const double* p, double* g, double* jac_g) {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(jac_g!=0);
 
     // Evaluate User function
     fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-    arg_[JG_X] = x;
-    arg_[JG_P] = p;
+    arg_[0] = x;
+    arg_[1] = p;
     fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-    res_[JG_JG] = jac_g;
-    auto t_start = chrono::system_clock::now(); // start timer
-    try {
-      jac_g_fcn_(arg_, res_, iw_, w_, 0);
-    } catch(exception& ex) {
-      // Fatal error
-      userOut<true, PL_WARN>() << name() << ":calc_jac_g failed:" << ex.what() << endl;
-      return 1;
-    }
-    auto t_stop = chrono::system_clock::now(); // stop timer
-
-    // Make sure not NaN or Inf
-    if (!all_of(jac_g, jac_g+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
-      userOut<true, PL_WARN>() << name() << ":calc_jac_g failed: NaN or Inf detected" << endl;
-      return -1;
-    }
-
-    // Update stats
-    n_calc_jac_g_ += 1;
-    t_calc_jac_g_ += chrono::duration<double>(t_stop - t_start).count();
+    res_[0] = g;
+    res_[1] = jac_g;
+    jac_g_fcn_(arg_, res_, iw_, w_, 0);
 
     // Success
     return 0;
@@ -648,13 +631,15 @@ namespace casadi {
   template<typename M>
   void Nlpsol::_setup_jac_g() {
     const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg(JG_NUM_IN);
-    arg[JG_X] = nlp.in[NL_X];
-    arg[JG_P] = nlp.in[NL_P];
-    std::vector<M> res(JG_NUM_OUT);
-    res[JG_JG] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
+    M x = nlp.in[NL_X];
+    M p = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M g = nlp.out[NL_G];
+    M J = M::jacobian(g, x);
+    std::vector<M> arg = {x, p};
+    std::vector<M> res = {g, J};
     jac_g_fcn_ = Function("nlp_jac_g", arg, res);
-    jacg_sp_ = res[JG_JG].sparsity();
+    jacg_sp_ = J.sparsity();
     alloc(jac_g_fcn_);
   }
 
