@@ -73,17 +73,11 @@ namespace casadi {
     /// Get or generate a function to calculate the gradient of the objective function
     virtual Function getGradF();
 
-    /// Get or generate a function to calculate the jacobian of the objective function
-    virtual Function getJacF();
-
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
     // Access the objective gradient function
     Function& gradF();
-
-    // Access the objective jacobian function (sparse)
-    Function& jacF();
 
     /// Number of variables
     int nx_;
@@ -109,9 +103,6 @@ namespace casadi {
 
     // Gradient of the objective
     Function gradF_;
-
-    // Gradient of the objective
-    Function jacF_;
 
     // Inputs
     const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
@@ -188,6 +179,12 @@ namespace casadi {
     template<typename M> void _setup_jac_g();
     void setup_jac_g();
     int calc_jac_g(const double* x, const double* p, double* jac_g);
+
+    // Calculate Jacobian of gradient (note: sparse!)
+    Function jac_f_fcn_;
+    template<typename M> void _setup_jac_f();
+    void setup_jac_f();
+    int calc_jac_f(const double* x, const double* p, double* jac_f);
 
     // Calculate both gradient of the objective and Jacobian of constraints
     Function gf_jg_fcn_;

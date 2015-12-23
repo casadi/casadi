@@ -208,45 +208,6 @@ namespace casadi {
     return gradF_;
   }
 
-  Function& Nlpsol::jacF() {
-    if (jacF_.isNull()) {
-      jacF_ = getJacF();
-      alloc(jacF_);
-    }
-    return jacF_;
-  }
-
-  Function Nlpsol::getJacF() {
-    Function jacF;
-    if (hasSetOption("jac_f")) {
-      jacF = option("jac_f");
-    } else {
-      log("Generating objective jacobian");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating objective Jacobian...";
-      Timer time0 = getTimerTime();
-      jacF = nlp_.jacobian(NL_X, NL_F);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["objective jacobian gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated objective Jacobian in " << diff.user << " seconds.";
-      log("Jacobian function generated");
-    }
-    if (hasSetOption("jac_f_options")) {
-      jacF.setOption(option("jac_f_options"));
-    }
-    jacF.init();
-    casadi_assert_message(jacF.n_in()==GRADF_NUM_IN,
-                          "Wrong number of inputs to the gradient function. "
-                          "Note: The gradient signature was changed in #544");
-    casadi_assert_message(jacF.n_out()==GRADF_NUM_OUT,
-                          "Wrong number of outputs to the gradient function. "
-                          "Note: The gradient signature was changed in #544");
-    log("Objective gradient function initialized");
-    return jacF;
-  }
-
   Function Nlpsol::getGradF() {
     Function gradF;
     if (hasSetOption("grad_f")) {
@@ -508,6 +469,23 @@ namespace casadi {
     return 0;
   }
 
+  int Nlpsol::calc_jac_f(const double* x, const double* p, double* jac_f) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+    casadi_assert(jac_f!=0);
+
+    // Evaluate User function
+    fill_n(arg_, jac_f_fcn_.n_in(), nullptr);
+    arg_[0] = x;
+    arg_[1] = p;
+    fill_n(res_, jac_f_fcn_.n_out(), nullptr);
+    res_[0] = jac_f;
+    jac_f_fcn_(arg_, res_, iw_, w_, 0);
+
+    // Success
+    return 0;
+  }
+
   int Nlpsol::calc_hess_l(const double* x, const double* p,
                           const double* sigma, const double* lambda,
                           double* hl) {
@@ -685,6 +663,22 @@ namespace casadi {
       _setup_jac_g<SX>();
     } else {
       _setup_jac_g<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_jac_f() {
+    const Problem<M>& nlp = nlp2_;
+    jac_f_fcn_ = Function("nlp_jac_f", nlp.in,
+                          {M::jacobian(nlp.out[NL_F], nlp.in[NL_X])});
+    alloc(jac_f_fcn_);
+  }
+
+  void Nlpsol::setup_jac_f() {
+    if (nlp2_.is_sx) {
+      _setup_jac_f<SX>();
+    } else {
+      _setup_jac_f<MX>();
     }
   }
 

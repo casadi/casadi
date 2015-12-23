@@ -228,7 +228,7 @@ namespace casadi {
     Nlpsol::init();
 
     // Get/generate required functions
-    jacF();
+    setup_jac_f();
     setup_jac_g();
 
     // prepare the mapping for constraints
@@ -245,8 +245,8 @@ namespace casadi {
     //  "0" is to be interpreted not as an index but as a literal zero
 
     IM mapping_jacG  = IM(0, nx_);
-    IM mapping_gradF = IM(jacF_.sparsity_out(0),
-                          range(-1, -1-jacF_.nnz_out(0), -1));
+    IM mapping_gradF = IM(jac_f_fcn_.sparsity_out(0),
+                          range(-1, -1-jac_f_fcn_.nnz_out(0), -1));
 
     if (!jac_g_fcn_.isNull()) {
       mapping_jacG = IM(jacg_sp_, range(1, jacg_sp_.nnz()+1));
@@ -302,7 +302,7 @@ namespace casadi {
     alloc_w(ng_, true); // lam_gk_
     alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
-    alloc_w(jacF_.nnz_out(0), true); // jac_fk_
+    alloc_w(jac_f_fcn_.nnz_out(0), true); // jac_fk_
     if (!jacg_sp_.isNull()) {
       alloc_w(jacg_sp_.nnz(), true); // jac_gk_
     }
@@ -357,7 +357,7 @@ namespace casadi {
     lam_gk_ = w; w += ng_;
     lam_xk_ = w; w += nx_;
     gk_ = w; w += ng_;
-    jac_fk_ = w; w += jacF_.nnz_out(0);
+    jac_fk_ = w; w += jac_f_fcn_.nnz_out(0);
     if (!jacg_sp_.isNull()) {
       jac_gk_ = w; w += jacg_sp_.nnz();
     }
@@ -379,12 +379,12 @@ namespace casadi {
       res_[0] = jac_gk_;
       jac_g_fcn_(arg_, res_, iw_, w_, 0);
     }
-    std::fill_n(arg_, jacF_.n_in(), nullptr);
+    std::fill_n(arg_, jac_f_fcn_.n_in(), nullptr);
     arg_[GRADF_X] = x0_;
     arg_[GRADF_P] = p_;
-    std::fill_n(res_, jacF_.n_out(), nullptr);
+    std::fill_n(res_, jac_f_fcn_.n_out(), nullptr);
     res_[0] = jac_fk_;
-    jacF_(arg_, res_, iw_, w_, 0);
+    jac_f_fcn_(arg_, res_, iw_, w_, 0);
 
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
@@ -410,7 +410,7 @@ namespace casadi {
     casadi_assert(A_structure_.nnz() == nea);
 
     // Pointer magic, courtesy of Greg
-    casadi_assert_message(!jacF_.isNull(), "blaasssshc");
+    casadi_assert_message(!jac_f_fcn_.isNull(), "blaasssshc");
 
     // Outputs
     double Obj = 0; // TODO(Greg): get this from snopt
@@ -522,26 +522,26 @@ namespace casadi {
       }
 
       // Evaluate gradF with the linear variables put to zero
-      std::fill_n(arg_, jacF_.n_in(), nullptr);
+      std::fill_n(arg_, jac_f_fcn_.n_in(), nullptr);
       arg_[NL_X] = xk2_;
       arg_[NL_P] = p_;
-      std::fill_n(res_, jacF_.n_out(), nullptr);
+      std::fill_n(res_, jac_f_fcn_.n_out(), nullptr);
       res_[0] = jac_fk_;
       res_[1] = fObj;
-      jacF_(arg_, res_, iw_, w_, 0);
+      jac_f_fcn_(arg_, res_, iw_, w_, 0);
 
       // provide nonlinear part of objective gradient to SNOPT
       for (int k = 0; k < nnObj; ++k) {
-        int el = jacF_.sparsity_out(0).colind(k);
-        if (jacF_.sparsity_out(0).colind(k+1) > el) {
+        int el = jac_f_fcn_.sparsity_out(0).colind(k);
+        if (jac_f_fcn_.sparsity_out(0).colind(k+1) > el) {
           gObj[k] = jac_fk_[el];
         } else {
           gObj[k] = 0;
         }
       }
 
-      jacF_.sparsity_out(0).sanity_check(true);
-      jacF_.sparsity_out(0).sanity_check(false);
+      jac_f_fcn_.sparsity_out(0).sanity_check(true);
+      jac_f_fcn_.sparsity_out(0).sanity_check(false);
 
       // timing and counters
       t_eval_grad_f_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
