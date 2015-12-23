@@ -2042,7 +2042,7 @@ namespace casadi {
     int nnz = 0;
     for (int cc=0; cc<size2(); ++cc) {
       for (int el = colind[cc]; el<colind[cc+1]; ++el) {
-        if (cc<row[el] || (!strictly && cc==row[el])) nnz++;
+        if (cc>row[el] || (!strictly && cc==row[el])) nnz++;
       }
     }
     return nnz;
