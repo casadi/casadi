@@ -452,7 +452,7 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_jac_f(const double* x, const double* p, double* jac_f) {
+  int Nlpsol::calc_jac_f(const double* x, const double* p, double* f, double* jac_f) {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(jac_f!=0);
@@ -462,7 +462,8 @@ namespace casadi {
     arg_[0] = x;
     arg_[1] = p;
     fill_n(res_, jac_f_fcn_.n_out(), nullptr);
-    res_[0] = jac_f;
+    res_[0] = f;
+    res_[1] = jac_f;
     jac_f_fcn_(arg_, res_, iw_, w_, 0);
 
     // Success
@@ -655,7 +656,7 @@ namespace casadi {
   void Nlpsol::_setup_jac_f() {
     const Problem<M>& nlp = nlp2_;
     jac_f_fcn_ = Function("nlp_jac_f", nlp.in,
-                          {M::jacobian(nlp.out[NL_F], nlp.in[NL_X])});
+                          {nlp.out[NL_F], M::jacobian(nlp.out[NL_F], nlp.in[NL_X])});
     alloc(jac_f_fcn_);
   }
 

@@ -184,7 +184,7 @@ namespace casadi {
     Function jac_f_fcn_;
     template<typename M> void _setup_jac_f();
     void setup_jac_f();
-    int calc_jac_f(const double* x, const double* p, double* jac_f);
+    int calc_jac_f(const double* x, const double* p, double* f, double* jac_f);
 
     // Calculate both gradient of the objective and Jacobian of constraints
     Function gf_jg_fcn_;
