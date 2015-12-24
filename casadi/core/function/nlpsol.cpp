@@ -493,7 +493,7 @@ namespace casadi {
     alloc(f_fcn_);
   }
 
-  void Nlpsol::Nlpsol::setup_f() {
+  void Nlpsol::setup_f() {
     if (nlp2_.is_sx) {
       _setup_f<SX>();
     } else {
