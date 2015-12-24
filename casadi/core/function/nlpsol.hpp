@@ -93,7 +93,6 @@ namespace casadi {
 
     /// The NLP
     XProblem nlp2_;
-    Function nlp_;
 
     // Inputs
     const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
@@ -258,10 +257,6 @@ namespace casadi {
 
     /// Get the (legacy) dae forward function
     template<typename XType>
-      static Function problem2fun(const Problem<XType>& d);
-
-    /// Get the (legacy) dae forward function
-    template<typename XType>
       static Problem<XType> fun2problem(Function nlp);
   };
 
@@ -292,11 +287,6 @@ namespace casadi {
         {"f", d.out[NL_F]},
         {"g", d.out[NL_G]},
       };
-  }
-
-  template<typename XType>
-  Function Nlpsol::problem2fun(const Problem<XType>& d) {
-    return Function("nlp", d.in, d.out, {"x", "p"}, {"f", "g"});
   }
 
   template<typename XType>

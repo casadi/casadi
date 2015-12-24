@@ -1319,13 +1319,6 @@ namespace casadi {
     return ret;
   }
 
-  Function Function::nlpsol_nlp() {
-    casadi_assert(!isNull());
-    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
-    casadi_assert_message(n!=0, "Not an NLP solver");
-    return n->nlp_;
-  }
-
   vector<string> nlpsol_in() {
     vector<string> ret(nlpsol_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_in(i);

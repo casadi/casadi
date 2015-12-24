@@ -83,13 +83,6 @@ namespace casadi {
     // Enable string notation for IO
     ischeme_ = nlpsol_in();
     oscheme_ = nlpsol_out();
-
-    if (nlp.is_sx) {
-      nlp_ = Nlpsol::problem2fun<SX>(nlp);
-    } else {
-      nlp_ = Nlpsol::problem2fun<MX>(nlp);
-    }
-    alloc(nlp_);
   }
 
   Nlpsol::~Nlpsol() {
@@ -107,7 +100,8 @@ namespace casadi {
     case NLPSOL_LAM_G0:
       return get_sparsity_out(NLPSOL_G);
     case NLPSOL_P:
-      return nlp_.sparsity_in(NL_P);
+      return nlp2_.is_sx ? nlp2_.sx_p->in[NL_P].sparsity()
+        : nlp2_.mx_p->in[NL_P].sparsity();
     case NLPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -119,10 +113,12 @@ namespace casadi {
       return Sparsity::scalar();
     case NLPSOL_X:
     case NLPSOL_LAM_X:
-      return nlp_.sparsity_in(NL_X);
+      return nlp2_.is_sx ? nlp2_.sx_p->in[NL_X].sparsity()
+        : nlp2_.mx_p->in[NL_X].sparsity();
     case NLPSOL_LAM_G:
     case NLPSOL_G:
-      return nlp_.sparsity_out(NL_G);
+      return nlp2_.is_sx ? nlp2_.sx_p->out[NL_G].sparsity()
+        : nlp2_.mx_p->out[NL_G].sparsity();
     case NLPSOL_LAM_P:
       return get_sparsity_in(NLPSOL_P);
     case NLPSOL_NUM_OUT: break;
@@ -138,16 +134,6 @@ namespace casadi {
     nx_ = nnz_out(NLPSOL_X);
     np_ = nnz_in(NLPSOL_P);
     ng_ = nnz_out(NLPSOL_G);
-
-    // Find out if we are to expand the NLP in terms of scalar operations
-    bool expand = option("expand");
-    if (expand) {
-      log("Expanding NLP in scalar operations");
-      Function f = nlp_.expand(nlp_.name());
-      f.copyOptions(nlp_, true);
-      f.init();
-      nlp_ = f;
-    }
 
     if (hasSetOption("iteration_callback")) {
       fcallback_ = option("iteration_callback");

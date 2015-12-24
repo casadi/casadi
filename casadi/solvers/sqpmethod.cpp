@@ -777,17 +777,8 @@ namespace casadi {
       // Quick return if no constraints
       if (ng_==0) return;
 
-      // Inputs
-      fill_n(arg_, nlp_.n_in(), nullptr);
-      arg_[NL_X] = x;
-      arg_[NL_P] = p_;
-
-      // Outputs
-      fill_n(res_, nlp_.n_out(), nullptr);
-      res_[NL_G] = g;
-
       // Evaluate the function
-      nlp_(arg_, res_, iw_, w_, 0);
+      calc_g(x, p_, g);
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -840,18 +831,9 @@ namespace casadi {
        // Log time
       double time1 = clock();
 
-      // Inputs
-      fill_n(arg_, nlp_.n_in(), nullptr);
-      arg_[NL_X] = x;
-      arg_[NL_P] = p_;
-
-      // Outputs
-      fill_n(res_, nlp_.n_out(), nullptr);
-      double f;
-      res_[NL_F] = &f;
-
       // Evaluate the function
-      nlp_(arg_, res_, iw_, w_, 0);
+      double f;
+      calc_f(x, p_, &f);
 
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;

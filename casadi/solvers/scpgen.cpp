@@ -129,11 +129,6 @@ namespace casadi {
     merit_start_ = option("merit_start");
     string compiler = option("compiler");
     gauss_newton_ = option("hessian_approximation") == "gauss-newton";
-    if (gauss_newton_) {
-      casadi_assert(nlp_.nnz_out(NL_F)>1);
-    } else {
-      casadi_assert(nlp_.nnz_out(NL_F)==1);
-    }
 
     // Name the components
     if (hasSetOption("name_x")) {
@@ -156,14 +151,9 @@ namespace casadi {
       print_x_.resize(0);
     }
 
-    Function fg = nlp_;
-    if (!fg.is_a("mx_function")) {
-      vector<MX> nlp_in = nlp_.mx_in();
-      vector<MX> nlp_out = nlp_(nlp_in);
-      fg = Function("fg", nlp_in, nlp_out);
-    }
-
     // Generate lifting functions
+    casadi_assert(!nlp2_.is_sx);
+    Function fg("fg", nlp2_.mx_p->in, nlp2_.mx_p->out);
     Function vdef_fcn, vinit_fcn;
     fg.generate_lifted(vdef_fcn, vinit_fcn);
     vinit_fcn_ = vinit_fcn;

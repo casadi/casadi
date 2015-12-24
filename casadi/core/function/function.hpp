@@ -1031,9 +1031,6 @@ namespace casadi {
     /// Get the DAE for an integrator
     Function integrator_dae();
 
-    /** \brief Access the NLP for an NLP solver */
-    Function nlpsol_nlp();
-
     /** Generate native code in the interfaced language for debugging */
     void qpsol_debug(const std::string &filename) const;
 
