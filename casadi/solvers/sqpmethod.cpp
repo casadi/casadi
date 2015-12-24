@@ -114,7 +114,7 @@ namespace casadi {
     min_step_size_ = option("min_step_size");
 
     // Get/generate required functions
-    gradF();
+    setup_grad_f();
     setup_jac_g();
     if (exact_hessian_) {
       setup_hess_l(false, true, true);
@@ -822,21 +822,8 @@ namespace casadi {
     try {
       double time1 = clock();
 
-      // Get function
-      Function& gradF = this->gradF();
-
-      // Inputs
-      fill_n(arg_, gradF.n_in(), nullptr);
-      arg_[NL_X] = x;
-      arg_[NL_P] = p_;
-
-      // Outputs
-      fill_n(res_, gradF_.n_out(), nullptr);
-      res_[0] = grad_f;
-      res_[1+NL_X] = f;
-
       // Evaluate the function
-      gradF_(arg_, res_, iw_, w_, 0);
+      calc_grad_f(x, p_, f, grad_f);
 
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;

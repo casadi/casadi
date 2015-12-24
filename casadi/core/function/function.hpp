@@ -1034,9 +1034,6 @@ namespace casadi {
     /** \brief Access the NLP for an NLP solver */
     Function nlpsol_nlp();
 
-    /** Access the objective gradient function for an NLP solver */
-    Function nlpsol_gradf();
-
     /** Generate native code in the interfaced language for debugging */
     void qpsol_debug(const std::string &filename) const;
 

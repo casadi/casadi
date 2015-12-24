@@ -200,45 +200,6 @@ namespace casadi {
     }
   }
 
-  Function& Nlpsol::gradF() {
-    if (gradF_.isNull()) {
-      gradF_ = getGradF();
-      alloc(gradF_);
-    }
-    return gradF_;
-  }
-
-  Function Nlpsol::getGradF() {
-    Function gradF;
-    if (hasSetOption("grad_f")) {
-      gradF = option("grad_f");
-    } else {
-      log("Generating objective gradient");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating objective gradient...";
-      Timer time0 = getTimerTime();
-      gradF = nlp_.gradient(NL_X, NL_F);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["objective gradient gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated objective gradient in " << diff.user << " seconds.";
-      log("Gradient function generated");
-    }
-    if (hasSetOption("grad_f_options")) {
-      gradF.setOption(option("grad_f_options"));
-    }
-    gradF.init();
-    casadi_assert_message(gradF.n_in()==GRADF_NUM_IN,
-                          "Wrong number of inputs to the gradient function. "
-                          "Note: The gradient signature was changed in #544");
-    casadi_assert_message(gradF.n_out()==GRADF_NUM_OUT,
-                          "Wrong number of outputs to the gradient function. "
-                          "Note: The gradient signature was changed in #544");
-    log("Objective gradient function initialized");
-    return gradF;
-  }
-
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
 
   const std::string Nlpsol::infix_ = "nlpsol";
@@ -399,17 +360,18 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_grad_f(const double* x, const double* p, double* grad_f) {
+  int Nlpsol::calc_grad_f(const double* x, const double* p, double* f, double* grad_f) {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(grad_f!=0);
 
     // Evaluate User function
     fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
-    arg_[GF_X] = x;
-    arg_[GF_P] = p;
+    arg_[0] = x;
+    arg_[1] = p;
     fill_n(res_, grad_f_fcn_.n_out(), nullptr);
-    res_[GF_GF] = grad_f;
+    res_[0] = f;
+    res_[1] = grad_f;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
       grad_f_fcn_(arg_, res_, iw_, w_, 0);
@@ -612,12 +574,11 @@ namespace casadi {
   template<typename M>
   void Nlpsol::_setup_grad_f() {
     const Problem<M>& nlp = nlp2_;
-    std::vector<M> arg(GF_NUM_IN);
-    arg[GF_X] = nlp.in[NL_X];
-    arg[GF_P] = nlp.in[NL_P];
-    std::vector<M> res(GF_NUM_OUT);
-    res[GF_GF] = M::gradient(nlp.out[NL_F], nlp.in[NL_X]);
-    grad_f_fcn_ = Function("nlp_grad_f", arg, res);
+    M x = nlp.in[NL_X];
+    M p = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M gf = M::gradient(f, x);
+    grad_f_fcn_ = Function("nlp_grad_f", {x, p}, {f, gf});
     alloc(grad_f_fcn_);
   }
 

@@ -70,14 +70,8 @@ namespace casadi {
     /// Set options that make the NLP solver more suitable for solving QPs
     virtual void setDefaultOptions(const std::string& recipe) {}
 
-    /// Get or generate a function to calculate the gradient of the objective function
-    virtual Function getGradF();
-
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
-
-    // Access the objective gradient function
-    Function& gradF();
 
     /// Number of variables
     int nx_;
@@ -100,9 +94,6 @@ namespace casadi {
     /// The NLP
     XProblem nlp2_;
     Function nlp_;
-
-    // Gradient of the objective
-    Function gradF_;
 
     // Inputs
     const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
@@ -169,7 +160,7 @@ namespace casadi {
     Function grad_f_fcn_;
     template<typename M> void _setup_grad_f();
     void setup_grad_f();
-    int calc_grad_f(const double* x, const double* p, double* grad_f);
+    int calc_grad_f(const double* x, const double* p, double* f, double* grad_f);
 
     // Calculate Jacobian of constraints
     enum JacGIn { JG_X, JG_P, JG_NUM_IN };

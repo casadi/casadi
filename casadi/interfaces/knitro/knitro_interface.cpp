@@ -164,9 +164,6 @@ namespace casadi {
     if (hasSetOption("OutLev")) int_param_["outlev"] = option("OutLev");
     if (hasSetOption("Debug")) int_param_["debug"] = option("Debug");
 
-    // Get/generate required functions
-    gradF();
-
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block
     /*  casadi_assert(kc_handle_==0);

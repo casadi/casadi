@@ -202,9 +202,6 @@ namespace casadi {
     // Exact Hessian?
     exact_hessian_ = option("UserHM");
 
-    // Get/generate required functions
-    gradF();
-
     // Update status?
     status_[TerminateSuccess]="TerminateSuccess";
     status_[OptimalSolution]="OptimalSolution";
@@ -543,7 +540,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, evalDF)) {
-        calc_grad_f(worhp_o_.X, p_, worhp_w_.DF.val);
+        calc_grad_f(worhp_o_.X, p_, 0, worhp_w_.DF.val);
         casadi_scal(nx_, worhp_w_.ScaleObj, worhp_w_.DF.val);
         DoneUserAction(&worhp_c_, evalDF);
       }
