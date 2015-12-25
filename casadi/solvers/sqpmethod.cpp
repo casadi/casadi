@@ -114,6 +114,8 @@ namespace casadi {
     min_step_size_ = option("min_step_size");
 
     // Get/generate required functions
+    setup_f();
+    setup_g();
     setup_grad_f();
     setup_jac_g();
     if (exact_hessian_) {
