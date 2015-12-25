@@ -193,22 +193,6 @@ namespace casadi {
                     const double* sigma, const double* lambda,
                     double* hl);
 
-    // Current solution
-    double *xk_, lam_fk_, *lam_gk_, *lam_xk_;
-
-    // Trigger recalculation?
-    bool new_x_, new_lam_f_, new_lam_g_;
-
-    // Current calculated quantities
-    double fk_, *gk_, *grad_fk_, *jac_gk_, *hess_lk_, *grad_lk_;
-
-    // Set primal variable
-    void set_x(const double *x);
-
-    // Set dual variable
-    void set_lam_f(double lam_f);
-    void set_lam_g(const double *lam_g);
-
     // Accumulated counts since last reset:
     int n_calc_f_; // number of calls to calc_f
     int n_calc_g_; // number of calls to calc_g

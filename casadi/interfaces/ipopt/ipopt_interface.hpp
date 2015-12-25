@@ -160,6 +160,12 @@ namespace casadi {
     DM red_hess_;
 #endif // WITH_SIPOPT
 
+    // Current solution
+    double *xk_, lam_fk_, *lam_gk_, *lam_xk_;
+
+    // Current calculated quantities
+    double fk_, *gk_, *grad_fk_, *jac_gk_, *hess_lk_, *grad_lk_;
+
     /// A documentation string
     static const std::string meta_doc;
 

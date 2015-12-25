@@ -333,9 +333,6 @@ namespace casadi {
     if (exact_hessian_) {
       hess_lk_ = w; w += hesslag_sp_.nnz();
     }
-
-    // New iterate
-    new_x_ = new_lam_f_ = new_lam_g_ = true;
   }
 
   void IpoptInterface::solve(void* mem) {

@@ -456,31 +456,6 @@ namespace casadi {
     return 0;
   }
 
-  void Nlpsol::set_x(const double *x) {
-    // Is a recalculation needed
-    if (new_x_ || !equal(x, x+nx_, xk_)) {
-      copy_n(x, nx_, xk_);
-      new_x_ = false;
-    }
-  }
-
-  void Nlpsol::set_lam_f(double lam_f) {
-    // Is a recalculation needed
-    if (new_lam_f_ || lam_f != lam_fk_) {
-      lam_fk_ = lam_f;
-      new_lam_f_ = false;
-    }
-  }
-
-  void Nlpsol::set_lam_g(const double *lam_g) {
-    // Is a recalculation needed
-    if (new_lam_g_ || !equal(lam_g, lam_g+ng_, lam_gk_)) {
-      copy_n(lam_g, ng_, lam_gk_);
-      new_lam_g_ = false;
-    }
-  }
-
-
   template<typename M>
   void Nlpsol::_setup_f() {
     const Problem<M>& nlp = nlp2_;
