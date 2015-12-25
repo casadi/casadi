@@ -520,6 +520,7 @@ namespace casadi {
     M p = nlp.in[NL_P];
     M f = nlp.out[NL_F];
     M gf = M::gradient(f, x);
+    gf = project(gf, x.sparsity());
     grad_f_fcn_ = Function("nlp_grad_f", {x, p}, {f, gf});
     alloc(grad_f_fcn_);
   }
