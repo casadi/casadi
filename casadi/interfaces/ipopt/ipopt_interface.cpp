@@ -39,15 +39,6 @@
 using namespace std;
 #include <IpIpoptApplication.hpp>
 
-// Headers for sIPOPT
-#ifdef WITH_SIPOPT
-#include <SensApplication.hpp>
-#include <IpPDSearchDirCalc.hpp>
-#include <IpIpoptAlg.hpp>
-#include <SensRegOp.hpp>
-#include <SensReducedHessianCalculator.hpp>
-#endif // WITH_SIPOPT
-
 namespace casadi {
   extern "C"
   int CASADI_NLPSOL_IPOPT_EXPORT
@@ -98,22 +89,9 @@ namespace casadi {
     // Set pointers to zero
     app_ = 0;
     userclass_ = 0;
-#ifdef WITH_SIPOPT
-    app_sens_ = 0;
-#endif // WITH_SIPOPT
 
     // Start an application (temporarily)
     Ipopt::IpoptApplication temp_app;
-
-    // Start a sensitivity application (temporarily)
-#ifdef WITH_SIPOPT
-    Ipopt::SensApplication temp_sens_app(temp_app.Jnlst(), temp_app.Options(),
-                                         temp_app.RegOptions());
-
-    // Register sIPOPT options
-    Ipopt::RegisterOptions_sIPOPT(temp_app.RegOptions());
-    temp_app.Options()->SetRegisteredOptions(temp_app.RegOptions());
-#endif // WITH_SIPOPT
 
     // Get all options available in (s)IPOPT
     map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> > regops =
@@ -162,14 +140,6 @@ namespace casadi {
   }
 
   IpoptInterface::~IpoptInterface() {
-    // Free sensitivity application (or rather, the smart pointer holding it)
-#ifdef WITH_SIPOPT
-    if (app_sens_ != 0) {
-      delete static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
-      app_sens_ = 0;
-    }
-#endif // WITH_SIPOPT
-
     // Free Ipopt application instance (or rather, the smart pointer holding it)
     if (app_ != 0) {
       delete static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
@@ -190,18 +160,6 @@ namespace casadi {
     // Read user options
     exact_hessian_ = !hasSetOption("hessian_approximation") ||
         option("hessian_approximation")=="exact";
-#ifdef WITH_SIPOPT
-    if (hasSetOption("run_sens")) {
-      run_sens_ = option("run_sens")=="yes";
-    } else {
-      run_sens_  = false;
-    }
-    if (hasSetOption("compute_red_hessian")) {
-      compute_red_hessian_ = option("compute_red_hessian")=="yes";
-    } else {
-      compute_red_hessian_ = false;
-    }
-#endif // WITH_SIPOPT
 
     // Identify nonlinear variables
     pass_nonlinear_variables_ = option("pass_nonlinear_variables");
@@ -217,21 +175,6 @@ namespace casadi {
     jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
     SmartPtr<Journal> jrnl = jrnl_raw;
     (*app)->Jnlst()->AddJournal(jrnl);
-
-#ifdef WITH_SIPOPT
-    if (run_sens_ || compute_red_hessian_) {
-      // Start an sIPOPT application
-      Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
-          new Ipopt::SmartPtr<Ipopt::SensApplication>();
-      app_sens_ = static_cast<void*>(app_sens);
-      *app_sens =
-          new Ipopt::SensApplication((*app)->Jnlst(), (*app)->Options(), (*app)->RegOptions());
-
-      // Register sIPOPT options
-      Ipopt::RegisterOptions_sIPOPT((*app)->RegOptions());
-      (*app)->Options()->SetRegisteredOptions((*app)->RegOptions());
-    }
-#endif // WITH_SIPOPT
 
     // Create an Ipopt user class -- need to use Ipopts spart pointer class
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass = new Ipopt::SmartPtr<Ipopt::TNLP>();
@@ -267,25 +210,9 @@ namespace casadi {
 
     if (!ret) casadi_error("IpoptInterface::Init: Invalid options were detected by Ipopt.");
 
-    // Extra initialization required by sIPOPT
-    //   #ifdef WITH_SIPOPT
-    //   if (run_sens_ || compute_red_hessian_) {
-    //     Ipopt::ApplicationReturnStatus status = (*app)->Initialize("");
-    //     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
-    //   }
-    //   #endif // WITH_SIPOPT
-
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
-
-#ifdef WITH_SIPOPT
-    if (run_sens_ || compute_red_hessian_) {
-      Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
-          static_cast<Ipopt::SmartPtr<Ipopt::SensApplication> *>(app_sens_);
-      (*app_sens)->Initialize();
-    }
-#endif // WITH_SIPOPT
 
     // Setup NLP functions
     setup_f(); // Objective
@@ -377,32 +304,6 @@ namespace casadi {
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
     t_mainloop_ = diffTimers(getTimerTime(), time0);
-
-#ifdef WITH_SIPOPT
-    if (run_sens_ || compute_red_hessian_) {
-      // Calculate parametric sensitivities
-      Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
-          static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
-      (*app_sens)->SetIpoptAlgorithmObjects(*app, status);
-      (*app_sens)->Run();
-
-      // Access the reduced Hessian calculator
-#ifdef WITH_CASADI_PATCH
-      if (compute_red_hessian_) {
-        // Get the reduced Hessian
-        std::vector<double> red_hess = (*app_sens)->ReducedHessian();
-
-        // Get the dimensions
-        int N;
-        for (N=0; N*N<red_hess.size(); ++N) {}
-        casadi_assert(N*N==red_hess.size());
-
-        // Store to statistics
-        red_hess_ = DM(Sparsity::dense(N, N), red_hess);
-      }
-#endif // WITH_CASADI_PATCH
-    }
-#endif // WITH_SIPOPT
 
     // Save results to outputs
     casadi_copy(&fk_, 1, f_);
@@ -835,19 +736,6 @@ namespace casadi {
         setOption("hessian_constant", "yes");
       }
     }
-  }
-
-  DM IpoptInterface::getReducedHessian() {
-#ifndef WITH_SIPOPT
-    casadi_error("This feature requires sIPOPT support. Please consult the CasADi documentation.");
-#else // WITH_SIPOPT
-#ifndef WITH_CASADI_PATCH
-    casadi_error("Retrieving the Hessian requires the CasADi sIPOPT patch. "
-                 "Please consult the CasADi documentation.");
-#else // WITH_CASADI_PATCH
-    return red_hess_;
-#endif // WITH_SIPOPT
-#endif // WITH_CASADI_PATCH
   }
 
 } // namespace casadi

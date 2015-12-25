@@ -91,9 +91,6 @@ namespace casadi {
     /// Set default options for a given recipe
     virtual void setDefaultOptions(const std::vector<std::string>& recipes);
 
-    // Get reduced Hessian
-    virtual DM getReducedHessian();
-
     /// Exact Hessian?
     bool exact_hessian_;
 
@@ -108,9 +105,6 @@ namespace casadi {
      */
     void *userclass_;
     void* app_;
-#ifdef WITH_SIPOPT
-    void* app_sens_;
-#endif // WITH_SIPOPT
 
     /// All IPOPT options
     std::map<std::string, TypeID> ops_;
@@ -152,13 +146,6 @@ namespace casadi {
     DiffTime t_callback_fun_;  // time spent in callback function
     DiffTime t_callback_prepare_; // time spent in callback preparation
     DiffTime t_mainloop_; // time spent in the main loop of the solver
-
-    // For parametric sensitivities with sIPOPT
-#ifdef WITH_SIPOPT
-    bool run_sens_;
-    bool compute_red_hessian_;
-    DM red_hess_;
-#endif // WITH_SIPOPT
 
     // Current solution
     double *xk_, lam_fk_, *lam_gk_, *lam_xk_;
