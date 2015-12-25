@@ -351,32 +351,13 @@ namespace casadi {
     InterruptHandler::check();
     casadi_assert(grad_f!=0);
 
-    // Evaluate User function
     fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
     arg_[0] = x;
     arg_[1] = p;
     fill_n(res_, grad_f_fcn_.n_out(), nullptr);
     res_[0] = f;
     res_[1] = grad_f;
-    auto t_start = chrono::system_clock::now(); // start timer
-    try {
-      grad_f_fcn_(arg_, res_, iw_, w_, 0);
-    } catch(exception& ex) {
-      // Fatal error
-      userOut<true, PL_WARN>() << name() << ":calc_grad_f failed:" << ex.what() << endl;
-      return 1;
-    }
-    auto t_stop = chrono::system_clock::now(); // stop timer
-
-    // Make sure not NaN or Inf
-    if (!all_of(grad_f, grad_f+nx_, [](double v) { return isfinite(v);})) {
-      userOut<true, PL_WARN>() << name() << ":calc_grad_f failed: NaN or Inf detected" << endl;
-      return -1;
-    }
-
-    // Update stats
-    n_calc_grad_f_ += 1;
-    t_calc_grad_f_ += chrono::duration<double>(t_stop - t_start).count();
+    grad_f_fcn_(arg_, res_, iw_, w_, 0);
 
     // Success
     return 0;
