@@ -507,11 +507,6 @@ namespace casadi {
     res1[0] = jac;
     self.jac_(arg1, res1, iw_, w1, 0);
 
-    // Get sparsity and non-zero elements
-    const int* colind = self.jac_.sparsity_out(0).colind();
-    int ncol = self.jac_.size2_out(0);
-    const int* row = self.jac_.sparsity_out(0).row();
-
     // Log time duration
     time2_ = clock();
     t_lsetup_jac_ += static_cast<double>(time2_ - time1_)/CLOCKS_PER_SEC;
