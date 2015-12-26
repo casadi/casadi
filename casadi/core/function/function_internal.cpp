@@ -1836,11 +1836,13 @@ namespace casadi {
     // Loop over all sparsity patterns
     for (int i=0; i<num_io_patterns; ++i) {
       // Get the range of matching sparsity patterns
-      typedef std::multimap<int, int>::const_iterator it_type;
-      std::pair<it_type, it_type> r = io_sparsity_index.equal_range(i);
+      auto r = io_sparsity_index.equal_range(i);
+
+      // Skip if unused
+      if (r.first==r.second) continue;
 
       // Print the cases covered
-      for (it_type it=r.first; it!=r.second; ++it) {
+      for (auto it=r.first; it!=r.second; ++it) {
         s << "    case " << it->second << ":" << endl;
       }
 
