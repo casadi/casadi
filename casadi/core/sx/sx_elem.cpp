@@ -168,108 +168,15 @@ namespace casadi {
   }
 
   SXElem SXElem::zz_plus(const SXElem& y) const {
-    // NOTE: Only simplifications that do not result in extra nodes area allowed
-
-    if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_ADD, *this, y);
-
-    if (is_zero())
-      return y;
-    else if (y->is_zero()) // term2 is zero
-      return *this;
-    else if (y.isOp(OP_NEG))  // x + (-y) -> x - y
-      return zz_minus(-y);
-    else if (isOp(OP_NEG)) // (-x) + y -> y - x
-      return y.zz_minus(getDep());
-    else if (isOp(OP_MUL) && y.isOp(OP_MUL) &&
-            getDep(0).is_constant() && getDep(0).getValue()==0.5 &&
-            y.getDep(0).is_constant() && y.getDep(0).getValue()==0.5 &&
-             is_equal(y.getDep(1), getDep(1), SXNode::eq_depth_)) // 0.5x+0.5x = x
-      return getDep(1);
-    else if (isOp(OP_DIV) && y.isOp(OP_DIV) &&
-             getDep(1).is_constant() && getDep(1).getValue()==2 &&
-             y.getDep(1).is_constant() && y.getDep(1).getValue()==2 &&
-             is_equal(y.getDep(0), getDep(0), SXNode::eq_depth_)) // x/2+x/2 = x
-      return getDep(0);
-    else if (isOp(OP_SUB) && is_equal(getDep(1), y, SXNode::eq_depth_))
-      return getDep(0);
-    else if (y.isOp(OP_SUB) && is_equal(*this, y.getDep(1), SXNode::eq_depth_))
-      return y.getDep(0);
-    else if (isOp(OP_SQ) && y.isOp(OP_SQ) &&
-             ((getDep().isOp(OP_SIN) && y.getDep().isOp(OP_COS))
-              || (getDep().isOp(OP_COS) && y.getDep().isOp(OP_SIN)))
-             && is_equal(getDep().getDep(), y.getDep().getDep(), SXNode::eq_depth_))
-      return 1; // sin^2 + cos^2 -> 1
-    else // create a new branch
-      return BinarySX::create(OP_ADD, *this, y);
+    return binary(OP_ADD, *this, y);
   }
 
   SXElem SXElem::zz_minus(const SXElem& y) const {
-    // Only simplifications that do not result in extra nodes area allowed
-
-    if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_SUB, *this, y);
-
-    if (y->is_zero()) // term2 is zero
-      return *this;
-    if (is_zero()) // term1 is zero
-      return -y;
-    if (is_equal(*this, y, SXNode::eq_depth_)) // the terms are equal
-      return 0;
-    else if (y.isOp(OP_NEG)) // x - (-y) -> x + y
-      return *this + y.getDep();
-    else if (isOp(OP_ADD) && is_equal(getDep(1), y, SXNode::eq_depth_))
-      return getDep(0);
-    else if (isOp(OP_ADD) && is_equal(getDep(0), y, SXNode::eq_depth_))
-      return getDep(1);
-    else if (y.isOp(OP_ADD) && is_equal(*this, y.getDep(1), SXNode::eq_depth_))
-      return -y.getDep(0);
-    else if (y.isOp(OP_ADD) && is_equal(*this, y.getDep(0), SXNode::eq_depth_))
-      return -y.getDep(1);
-    else if (isOp(OP_NEG))
-      return -(getDep() + y);
-    else // create a new branch
-      return BinarySX::create(OP_SUB, *this, y);
+    return binary(OP_SUB, *this, y);
   }
 
   SXElem SXElem::zz_times(const SXElem& y) const {
-
-    if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_MUL, *this, y);
-
-    // Only simplifications that do not result in extra nodes area allowed
-    if (is_equal(y, *this, SXNode::eq_depth_))
-      return sq();
-    else if (!is_constant() && y.is_constant())
-      return y.zz_times(*this);
-    else if (is_zero() || y->is_zero()) // one of the terms is zero
-      return 0;
-    else if (is_one()) // term1 is one
-      return y;
-    else if (y->is_one()) // term2 is one
-      return *this;
-    else if (y->is_minus_one())
-      return -(*this);
-    else if (is_minus_one())
-      return -y;
-    else if (y.isOp(OP_INV))
-      return (*this)/y.inv();
-    else if (isOp(OP_INV))
-      return y/inv();
-    else if (is_constant() && y.isOp(OP_MUL) && y.getDep(0).is_constant() &&
-            getValue()*y.getDep(0).getValue()==1) // 5*(0.2*x) = x
-      return y.getDep(1);
-    else if (is_constant() && y.isOp(OP_DIV) && y.getDep(1).is_constant() &&
-            getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
-      return y.getDep(0);
-    else if (isOp(OP_DIV) && is_equal(getDep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
-      return getDep(0);
-    else if (y.isOp(OP_DIV) &&
-             is_equal(y.getDep(1), *this, SXNode::eq_depth_)) // ((2/x)*x)
-      return y.getDep(0);
-    else if (isOp(OP_NEG))
-      return -(getDep() * y);
-    else if (y.isOp(OP_NEG))
-      return -(*this * y.getDep());
-    else     // create a new branch
-      return BinarySX::create(OP_MUL, *this, y);
+    return binary(OP_MUL, *this, y);
   }
 
 
@@ -278,55 +185,7 @@ namespace casadi {
   }
 
   SXElem SXElem::zz_rdivide(const SXElem& y) const {
-    // Only simplifications that do not result in extra nodes area allowed
-
-    if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_DIV, *this, y);
-
-    if (y->is_zero()) // term2 is zero
-      return casadi_limits<SXElem>::nan;
-    else if (is_zero()) // term1 is zero
-      return 0;
-    else if (y->is_one()) // term2 is one
-      return *this;
-    else if (y->is_minus_one())
-      return -(*this);
-    else if (is_equal(*this, y, SXNode::eq_depth_)) // terms are equal
-      return 1;
-    else if (isDoubled() && is_equal(y, 2))
-      return getDep(0);
-    else if (isOp(OP_MUL) && is_equal(y, getDep(0), SXNode::eq_depth_))
-      return getDep(1);
-    else if (isOp(OP_MUL) && is_equal(y, getDep(1), SXNode::eq_depth_))
-      return getDep(0);
-    else if (is_one())
-      return y.inv();
-    else if (y.isOp(OP_INV))
-      return (*this)*y.inv();
-    else if (isDoubled() && y.isDoubled())
-      return getDep(0) / y->dep(0);
-    else if (y.is_constant() && isOp(OP_DIV) && getDep(1).is_constant() &&
-            y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2
-      return getDep(0);
-    else if (y.isOp(OP_MUL) &&
-             is_equal(y.getDep(1), *this, SXNode::eq_depth_)) // x/(2*x) = 1/2
-      return BinarySX::create(OP_DIV, 1, y.getDep(0));
-    else if (isOp(OP_NEG) &&
-             is_equal(getDep(0), y, SXNode::eq_depth_))      // (-x)/x = -1
-      return -1;
-    else if (y.isOp(OP_NEG) &&
-             is_equal(y.getDep(0), *this, SXNode::eq_depth_))      // x/(-x) = 1
-      return -1;
-    else if (y.isOp(OP_NEG) && isOp(OP_NEG) &&
-             is_equal(getDep(0), y.getDep(0), SXNode::eq_depth_))  // (-x)/(-x) = 1
-      return 1;
-    else if (isOp(OP_DIV) && is_equal(y, getDep(0), SXNode::eq_depth_))
-      return getDep(1).inv();
-    else if (isOp(OP_NEG))
-      return -(getDep() / y);
-    else if (y.isOp(OP_NEG))
-      return -(*this / y.getDep());
-    else // create a new branch
-      return BinarySX::create(OP_DIV, *this, y);
+    return binary(OP_DIV, *this, y);
   }
 
   SXElem SXElem::inv() const {
@@ -400,6 +259,140 @@ namespace casadi {
   }
 
   SXElem SXElem::binary(int op, const SXElem& x, const SXElem& y) {
+    // Simplifications
+    if (CasadiOptions::simplification_on_the_fly) {
+      switch (op) {
+      case OP_ADD:
+        if (x.is_zero())
+          return y;
+        else if (y->is_zero()) // term2 is zero
+          return x;
+        else if (y.isOp(OP_NEG))  // x + (-y) -> x - y
+          return x - (-y);
+        else if (x.isOp(OP_NEG)) // (-x) + y -> y - x
+          return y - x.getDep();
+        else if (x.isOp(OP_MUL) && y.isOp(OP_MUL) &&
+                 x.getDep(0).is_constant() && x.getDep(0).getValue()==0.5 &&
+                 y.getDep(0).is_constant() && y.getDep(0).getValue()==0.5 &&
+                 is_equal(y.getDep(1), x.getDep(1), SXNode::eq_depth_)) // 0.5x+0.5x = x
+          return x.getDep(1);
+        else if (x.isOp(OP_DIV) && y.isOp(OP_DIV) &&
+                 x.getDep(1).is_constant() && x.getDep(1).getValue()==2 &&
+                 y.getDep(1).is_constant() && y.getDep(1).getValue()==2 &&
+                 is_equal(y.getDep(0), x.getDep(0), SXNode::eq_depth_)) // x/2+x/2 = x
+          return x.getDep(0);
+        else if (x.isOp(OP_SUB) && is_equal(x.getDep(1), y, SXNode::eq_depth_))
+          return x.getDep(0);
+        else if (y.isOp(OP_SUB) && is_equal(x, y.getDep(1), SXNode::eq_depth_))
+          return y.getDep(0);
+        else if (x.isOp(OP_SQ) && y.isOp(OP_SQ) &&
+                 ((x.getDep().isOp(OP_SIN) && y.getDep().isOp(OP_COS))
+                  || (x.getDep().isOp(OP_COS) && y.getDep().isOp(OP_SIN)))
+                 && is_equal(x.getDep().getDep(), y.getDep().getDep(), SXNode::eq_depth_))
+          return 1; // sin^2 + cos^2 -> 1
+        break;
+      case OP_SUB:
+        if (y->is_zero()) // term2 is zero
+          return x;
+        if (x.is_zero()) // term1 is zero
+          return -y;
+        if (is_equal(x, y, SXNode::eq_depth_)) // the terms are equal
+          return 0;
+        else if (y.isOp(OP_NEG)) // x - (-y) -> x + y
+          return x + y.getDep();
+        else if (x.isOp(OP_ADD) && is_equal(x.getDep(1), y, SXNode::eq_depth_))
+          return x.getDep(0);
+        else if (x.isOp(OP_ADD) && is_equal(x.getDep(0), y, SXNode::eq_depth_))
+          return x.getDep(1);
+        else if (y.isOp(OP_ADD) && is_equal(x, y.getDep(1), SXNode::eq_depth_))
+          return -y.getDep(0);
+        else if (y.isOp(OP_ADD) && is_equal(x, y.getDep(0), SXNode::eq_depth_))
+          return -y.getDep(1);
+        else if (x.isOp(OP_NEG))
+          return -(x.getDep() + y);
+        break;
+      case OP_MUL:
+        if (is_equal(y, x, SXNode::eq_depth_))
+          return x.sq();
+        else if (!x.is_constant() && y.is_constant())
+          return y.zz_times(x);
+        else if (x.is_zero() || y->is_zero()) // one of the terms is zero
+          return 0;
+        else if (x.is_one()) // term1 is one
+          return y;
+        else if (y->is_one()) // term2 is one
+          return x;
+        else if (y->is_minus_one())
+          return -x;
+        else if (x.is_minus_one())
+          return -y;
+        else if (y.isOp(OP_INV))
+          return x/y.inv();
+        else if (x.isOp(OP_INV))
+          return y / x.inv();
+        else if (x.is_constant() && y.isOp(OP_MUL) && y.getDep(0).is_constant() &&
+                 x.getValue()*y.getDep(0).getValue()==1) // 5*(0.2*x) = x
+          return y.getDep(1);
+        else if (x.is_constant() && y.isOp(OP_DIV) && y.getDep(1).is_constant() &&
+                 x.getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
+          return y.getDep(0);
+        else if (x.isOp(OP_DIV) && is_equal(x.getDep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
+          return x.getDep(0);
+        else if (y.isOp(OP_DIV) &&
+                 is_equal(y.getDep(1), x, SXNode::eq_depth_)) // ((2/x)*x)
+          return y.getDep(0);
+        else if (x.isOp(OP_NEG))
+          return -(x.getDep() * y);
+        else if (y.isOp(OP_NEG))
+          return -(x * y.getDep());
+        break;
+      case OP_DIV:
+        if (y->is_zero()) // term2 is zero
+          return casadi_limits<SXElem>::nan;
+        else if (x.is_zero()) // term1 is zero
+          return 0;
+        else if (y->is_one()) // term2 is one
+          return x;
+        else if (y->is_minus_one())
+          return -x;
+        else if (is_equal(x, y, SXNode::eq_depth_)) // terms are equal
+          return 1;
+        else if (x.isDoubled() && is_equal(y, 2))
+          return x.getDep(0);
+        else if (x.isOp(OP_MUL) && is_equal(y, x.getDep(0), SXNode::eq_depth_))
+          return x.getDep(1);
+        else if (x.isOp(OP_MUL) && is_equal(y, x.getDep(1), SXNode::eq_depth_))
+          return x.getDep(0);
+        else if (x.is_one())
+          return y.inv();
+        else if (y.isOp(OP_INV))
+          return x*y.inv();
+        else if (x.isDoubled() && y.isDoubled())
+          return x.getDep(0) / y->dep(0);
+        else if (y.is_constant() && x.isOp(OP_DIV) && x.getDep(1).is_constant() &&
+                 y.getValue()*x.getDep(1).getValue()==1) // (x/5)/0.2
+          return x.getDep(0);
+        else if (y.isOp(OP_MUL) &&
+                 is_equal(y.getDep(1), x, SXNode::eq_depth_)) // x/(2*x) = 1/2
+          return BinarySX::create(OP_DIV, 1, y.getDep(0));
+        else if (x.isOp(OP_NEG) &&
+                 is_equal(x.getDep(0), y, SXNode::eq_depth_))      // (-x)/x = -1
+          return -1;
+        else if (y.isOp(OP_NEG) &&
+                 is_equal(y.getDep(0), x, SXNode::eq_depth_))      // x/(-x) = 1
+          return -1;
+        else if (y.isOp(OP_NEG) && x.isOp(OP_NEG) &&
+                 is_equal(x.getDep(0), y.getDep(0), SXNode::eq_depth_))  // (-x)/(-x) = 1
+          return 1;
+        else if (x.isOp(OP_DIV) && is_equal(y, x.getDep(0), SXNode::eq_depth_))
+          return x.getDep(1).inv();
+        else if (x.isOp(OP_NEG))
+          return -(x.getDep() / y);
+        else if (y.isOp(OP_NEG))
+          return -(x / y.getDep());
+        break;
+      }
+    }
     return BinarySX::create(Operation(op), x, y);
   }
 
