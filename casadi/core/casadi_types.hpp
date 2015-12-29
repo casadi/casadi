@@ -65,6 +65,18 @@ namespace casadi {
   class Compiler;
 
 #ifndef SWIG
+  // Workarond for MinGW bug
+#if defined(__MINGW32__) || defined(__MINGW64__)
+  template<typename T>
+  std::string to_string(const T& n) {
+    std::stringstream s;
+    s << n;
+    return s.str();
+  }
+#else
+  using std::to_string;
+#endif
+
   // The number of derivative directions for which the tool has been optimized
   const int optimized_num_dir = 64;
 
