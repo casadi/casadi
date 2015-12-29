@@ -152,7 +152,7 @@ namespace casadi {
     bool isMinusInf() const;
     const std::string& getName() const;
     int op() const;
-    bool isOp(int op) const;
+    bool is_op(int op) const;
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
