@@ -367,44 +367,8 @@ namespace casadi {
     /// \cond CLUTTER
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    Matrix<DataType> zz_plus(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_minus(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_times(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_rdivide(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_lt(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_le(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_eq(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_ne(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_atan2(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_min(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_max(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_and(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_or(const Matrix<DataType>& y) const;
-    Matrix<DataType> zz_abs() const;
-    Matrix<DataType> zz_sqrt() const;
-    Matrix<DataType> zz_sin() const;
-    Matrix<DataType> zz_cos() const;
-    Matrix<DataType> zz_tan() const;
-    Matrix<DataType> zz_asin() const;
-    Matrix<DataType> zz_acos() const;
-    Matrix<DataType> zz_atan() const;
-    Matrix<DataType> zz_sinh() const;
-    Matrix<DataType> zz_cosh() const;
-    Matrix<DataType> zz_tanh() const;
-    Matrix<DataType> zz_asinh() const;
-    Matrix<DataType> zz_acosh() const;
-    Matrix<DataType> zz_atanh() const;
-    Matrix<DataType> zz_exp() const;
-    Matrix<DataType> zz_log() const;
-    Matrix<DataType> zz_log10() const;
-    Matrix<DataType> zz_floor() const;
-    Matrix<DataType> zz_ceil() const;
-    Matrix<DataType> zz_power(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_mod(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_simplify() const;
     bool zz_is_equal(const Matrix<DataType> &ex2, int depth=0) const;
-    Matrix<DataType> zz_constpow(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_not() const;
     ///@}
 
     ///@{

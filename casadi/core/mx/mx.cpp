@@ -617,34 +617,6 @@ namespace casadi {
     return mul(*this, y.T());
   }
 
-  MX MX::zz_power(const MX& n) const {
-    if (n->op()==OP_CONST) {
-      return MX::binary(OP_CONSTPOW, *this, n);
-    } else {
-      return MX::binary(OP_POW, *this, n);
-    }
-  }
-
-  MX MX::zz_constpow(const MX& b) const {
-    return binary(OP_CONSTPOW, *this, b);
-  }
-
-  MX MX::zz_min(const MX& b) const {
-    return binary(OP_FMIN, *this, b);
-  }
-
-  MX MX::zz_max(const MX& b) const {
-    return binary(OP_FMAX, *this, b);
-  }
-
-  MX MX::zz_mod(const MX& b) const {
-    return binary(OP_FMOD, *this, b);
-  }
-
-  MX MX::zz_atan2(const MX& b) const {
-    return binary(OP_ATAN2, *this, b);
-  }
-
   MX MX::printme(const MX& b) const {
     return binary(OP_PRINTME, *this, b);
   }
@@ -660,133 +632,13 @@ namespace casadi {
     return(*this)->getMonitor(comment);
   }
 
-  MX MX::zz_exp() const {
-    return (*this)->getUnary(OP_EXP);
-  }
-
-  MX MX::zz_log() const {
-    return (*this)->getUnary(OP_LOG);
-  }
-
   MX MX::zz_log10() const {
     return log(*this)*(1/std::log(10.));
-  }
-
-  MX MX::zz_sqrt() const {
-    return (*this)->getUnary(OP_SQRT);
-  }
-
-  MX MX::zz_sin() const {
-    return (*this)->getUnary(OP_SIN);
-  }
-
-  MX MX::zz_cos() const {
-    return (*this)->getUnary(OP_COS);
-  }
-
-  MX MX::zz_tan() const {
-    return (*this)->getUnary(OP_TAN);
-  }
-
-  MX MX::zz_asin() const {
-    return (*this)->getUnary(OP_ASIN);
-  }
-
-  MX MX::zz_acos() const {
-    return (*this)->getUnary(OP_ACOS);
-  }
-
-  MX MX::zz_atan() const {
-    return (*this)->getUnary(OP_ATAN);
-  }
-
-  MX MX::zz_sinh() const {
-    return (*this)->getUnary(OP_SINH);
-  }
-
-  MX MX::zz_cosh() const {
-    return (*this)->getUnary(OP_COSH);
-  }
-
-  MX MX::zz_tanh() const {
-    return (*this)->getUnary(OP_TANH);
-  }
-
-  MX MX::zz_asinh() const {
-    return (*this)->getUnary(OP_ASINH);
-  }
-
-  MX MX::zz_acosh() const {
-    return (*this)->getUnary(OP_ACOSH);
-  }
-
-  MX MX::zz_atanh() const {
-    return (*this)->getUnary(OP_ATANH);
-  }
-
-  MX MX::zz_floor() const {
-    return (*this)->getUnary(OP_FLOOR);
-  }
-
-  MX MX::zz_ceil() const {
-    return (*this)->getUnary(OP_CEIL);
-  }
-
-  MX MX::zz_abs() const {
-    return (*this)->getUnary(OP_FABS);
-  }
-
-  MX MX::zz_not() const {
-    return (*this)->getUnary(OP_NOT);
   }
 
   MX MX::zz_lift(const MX& x_guess) const {
     casadi_assert(sparsity()==x_guess.sparsity());
     return (*this)->getBinary(OP_LIFT, x_guess, false, false);
-  }
-
-  MX MX::zz_plus(const MX& y) const {
-    return MX::binary(OP_ADD, *this, y);
-  }
-
-  MX MX::zz_minus(const MX& y) const {
-    return MX::binary(OP_SUB, *this, y);
-  }
-
-  MX MX::zz_times(const MX& y) const {
-    return MX::binary(OP_MUL, *this, y);
-  }
-
-  MX MX::zz_rdivide(const MX& y) const {
-    return MX::binary(OP_DIV, *this, y);
-  }
-
-  MX MX::zz_lt(const MX& y) const {
-    return MX::binary(OP_LT, *this, y);
-  }
-
-  MX MX::zz_le(const MX& y) const {
-    return MX::binary(OP_LE, *this, y);
-  }
-
-  MX MX::zz_eq(const MX& y) const {
-    return MX::binary(OP_EQ, *this, y);
-  }
-
-  MX MX::zz_ne(const MX& y) const {
-    return MX::binary(OP_NE, *this, y);
-  }
-
-  MX MX::zz_and(const MX& y) const {
-    return MX::binary(OP_AND, *this, y);
-  }
-
-  MX MX::zz_or(const MX& y) const {
-    return MX::binary(OP_OR, *this, y);
-  }
-
-  MX MX::zz_if_else_zero(const MX& y) const {
-    return MX::binary(OP_IF_ELSE_ZERO, *this, y);
   }
 
   MX MX::zz_mrdivide(const MX& b) const {

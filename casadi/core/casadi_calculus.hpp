@@ -279,9 +279,6 @@ namespace casadi {
   #endif //HAS_COPYSIGN
 
   /// Conditional assignment
-  template<class T> T if_else_zero(const T &x, const T &y) {return x.zz_if_else_zero(y);}
-
-  /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x ? y : 0;}
 
   /// Inverse of the error function

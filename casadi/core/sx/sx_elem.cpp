@@ -167,34 +167,6 @@ namespace casadi {
     }
   }
 
-  SXElem SXElem::zz_le(const SXElem& y) const {
-    if ((y-(*this)).isNonNegative())
-      return 1;
-    else
-      return BinarySX::create(OP_LE, *this, y);
-  }
-
-  SXElem SXElem::zz_lt(const SXElem& y) const {
-    if (((*this)-y).isNonNegative())
-      return 0;
-    else
-      return BinarySX::create(OP_LT, *this, y);
-  }
-
-  SXElem SXElem::zz_eq(const SXElem& y) const {
-    if (is_equal(*this, y))
-      return 1;
-    else
-      return BinarySX::create(OP_EQ, *this, y);
-  }
-
-  SXElem SXElem::zz_ne(const SXElem& y) const {
-    if (is_equal(*this, y))
-      return 0;
-    else
-      return BinarySX::create(OP_NE, *this, y);
-  }
-
   SXNode* SXElem::get() const {
     return node;
   }
@@ -267,7 +239,7 @@ namespace casadi {
         break;
       case OP_MUL:
         if (is_equal(y, x, SXNode::eq_depth_))
-          return x.sq();
+          return sq(x);
         else if (!x.is_constant() && y.is_constant())
           return y * x;
         else if (x.is_zero() || y->is_zero()) // one of the terms is zero
@@ -345,6 +317,85 @@ namespace casadi {
         else if (y.is_op(OP_NEG))
           return -(x / y.dep());
         break;
+      case OP_POW:
+        if (y->is_constant()) {
+          if (y->is_integer()) {
+            int nn = y->getIntValue();
+            if (nn == 0) {
+              return 1;
+            } else if (nn>100 || nn<-100) { // maximum depth
+              return binary(OP_CONSTPOW, x, nn);
+            } else if (nn<0) { // negative power
+              return 1/pow(x, -nn);
+            } else if (nn%2 == 1) { // odd power
+              return x*pow(x, nn-1);
+            } else { // even power
+              SXElem rt = pow(x, nn/2);
+              return rt*rt;
+            }
+          } else if (y->getValue()==0.5) {
+            return sqrt(x);
+          } else {
+            return binary(OP_CONSTPOW, x, y);
+          }
+        }
+        break;
+        case OP_LE:
+        if ((y-x).isNonNegative())
+          return 1;
+        break;
+      case OP_LT:
+        if (((x)-y).isNonNegative())
+          return 0;
+        break;
+      case OP_EQ:
+        if (is_equal(x, y))
+          return 1;
+        break;
+      case OP_NE:
+        if (is_equal(x, y))
+          return 0;
+        break;
+      case OP_SINH:
+      case OP_TANH:
+      case OP_ATANH:
+      case OP_ACOSH:
+      case OP_ASINH:
+        if (x.is_zero())
+          return 0;
+        break;
+      case OP_COSH:
+        if (x.is_zero())
+          return 1;
+        break;
+      case OP_SQRT:
+        if (x.is_op(OP_SQ))
+          return fabs(x.dep());
+        break;
+      case OP_SQ:
+        if (x.is_op(OP_SQRT))
+          return x.dep();
+        else if (x.is_op(OP_NEG))
+          return sq(x.dep());
+        break;
+      case OP_FABS:
+        if (x.is_op(OP_FABS) || x.is_op(OP_SQ))
+          return x;
+        break;
+      case OP_NOT:
+        if (x.is_op(OP_NOT))
+          return x.dep();
+        break;
+      case OP_IF_ELSE_ZERO:
+        if (y->is_zero()) {
+          return y;
+        } else if (x.is_constant()) {
+          if (x.getValue()!=0) {
+            return y;
+          } else {
+            return 0;
+          }
+        }
       }
     }
     return BinarySX::create(Operation(op), x, y);
@@ -508,194 +559,12 @@ namespace casadi {
     return val.isNan();
   }
 
-  SXElem SXElem::zz_exp() const {
-    return UnarySX::create(OP_EXP, *this);
-  }
-
-  SXElem SXElem::zz_log() const {
-    return UnarySX::create(OP_LOG, *this);
-  }
-
-  SXElem SXElem::zz_log10() const {
-    return log(*this)*(1/std::log(10.));
-  }
-
-  SXElem SXElem::zz_sqrt() const {
-    if (is_op(OP_SQ))
-      return fabs(dep());
-    else
-      return UnarySX::create(OP_SQRT, *this);
-  }
-
-  SXElem SXElem::sq() const {
-    if (is_op(OP_SQRT))
-      return dep();
-    else if (is_op(OP_NEG))
-      return dep().sq();
-    else
-      return UnarySX::create(OP_SQ, *this);
-  }
-
-  SXElem SXElem::zz_sin() const {
-    return UnarySX::create(OP_SIN, *this);
-  }
-
-  SXElem SXElem::zz_cos() const {
-    return UnarySX::create(OP_COS, *this);
-  }
-
-  SXElem SXElem::zz_tan() const {
-    return UnarySX::create(OP_TAN, *this);
-  }
-
-  SXElem SXElem::zz_asin() const {
-    return UnarySX::create(OP_ASIN, *this);
-  }
-
-  SXElem SXElem::zz_acos() const {
-    return UnarySX::create(OP_ACOS, *this);
-  }
-
-  SXElem SXElem::zz_atan() const {
-    return UnarySX::create(OP_ATAN, *this);
-  }
-
-  SXElem SXElem::zz_sinh() const {
-    if (is_zero())
-      return 0;
-    else
-      return UnarySX::create(OP_SINH, *this);
-  }
-
-  SXElem SXElem::zz_cosh() const {
-    if (is_zero())
-      return 1;
-    else
-      return UnarySX::create(OP_COSH, *this);
-  }
-
-  SXElem SXElem::zz_tanh() const {
-    if (is_zero())
-      return 0;
-    else
-      return UnarySX::create(OP_TANH, *this);
-  }
-
-  SXElem SXElem::zz_atanh() const {
-    if (is_zero())
-      return 0;
-    else
-      return UnarySX::create(OP_ATANH, *this);
-  }
-
-  SXElem SXElem::zz_acosh() const {
-    if (is_one())
-      return 0;
-    else
-      return UnarySX::create(OP_ACOSH, *this);
-  }
-
-  SXElem SXElem::zz_asinh() const {
-    if (is_zero())
-      return 0;
-    else
-      return UnarySX::create(OP_ASINH, *this);
-  }
-
-  SXElem SXElem::zz_floor() const {
-    return UnarySX::create(OP_FLOOR, *this);
-  }
-
-  SXElem SXElem::zz_ceil() const {
-    return UnarySX::create(OP_CEIL, *this);
-  }
-
-  SXElem SXElem::zz_mod(const SXElem &b) const {
-    return BinarySX::create(OP_FMOD, *this, b);
-  }
-
-  SXElem SXElem::zz_abs() const {
-    if (is_op(OP_FABS) || is_op(OP_SQ))
-      return *this;
-    else
-      return UnarySX::create(OP_FABS, *this);
-  }
-
   SXElem::operator SX() const {
     return SX(Sparsity::scalar(), *this, false);
   }
 
-  SXElem SXElem::zz_min(const SXElem &b) const {
-    return BinarySX::create(OP_FMIN, *this, b);
-  }
-
-  SXElem SXElem::zz_max(const SXElem &b) const {
-    return BinarySX::create(OP_FMAX, *this, b);
-  }
-
-  SXElem SXElem::zz_atan2(const SXElem &b) const {
-    return BinarySX::create(OP_ATAN2, *this, b);
-  }
-
   SXElem SXElem::printme(const SXElem &b) const {
     return BinarySX::create(OP_PRINTME, *this, b);
-  }
-
-  SXElem SXElem::zz_power(const SXElem& n) const {
-    if (n->is_constant()) {
-      if (n->is_integer()) {
-        int nn = n->getIntValue();
-        if (nn == 0) {
-          return 1;
-        } else if (nn>100 || nn<-100) { // maximum depth
-          return BinarySX::create(OP_CONSTPOW, *this, nn);
-        } else if (nn<0) { // negative power
-          return 1/pow(*this, -nn);
-        } else if (nn%2 == 1) { // odd power
-          return *this*pow(*this, nn-1);
-        } else { // even power
-          SXElem rt = pow(*this, nn/2);
-          return rt*rt;
-        }
-      } else if (n->getValue()==0.5) {
-        return sqrt(*this);
-      } else {
-        return BinarySX::create(OP_CONSTPOW, *this, n);
-      }
-    } else {
-      return BinarySX::create(OP_POW, *this, n);
-    }
-  }
-
-  SXElem SXElem::zz_constpow(const SXElem& n) const {
-    return BinarySX::create(OP_CONSTPOW, *this, n);
-  }
-
-  SXElem SXElem::zz_not() const {
-    if (is_op(OP_NOT)) {
-      return dep();
-    } else {
-      return UnarySX::create(OP_NOT, *this);
-    }
-  }
-
-  SXElem SXElem::zz_and(const SXElem& y) const {
-    return BinarySX::create(OP_AND, *this, y);
-  }
-
-  SXElem SXElem::zz_or(const SXElem& y) const {
-    return BinarySX::create(OP_OR, *this, y);
-  }
-
-  SXElem SXElem::zz_if_else_zero(const SXElem& y) const {
-    if (y->is_zero()) {
-      return y;
-    } else if (is_constant()) {
-      if (getValue()!=0) return y;
-      else              return 0;
-    } else {
-      return BinarySX::create(OP_IF_ELSE_ZERO, *this, y);
-    }
   }
 
   int SXElem::getTemp() const {

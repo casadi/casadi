@@ -184,54 +184,14 @@ namespace casadi {
     /** \brief  Negation */
     SXElem operator-() const;
 
-    //  all binary operations
-    SXElem zz_lt(const SXElem& y) const;
-    SXElem zz_le(const SXElem& y) const;
-    SXElem zz_eq(const SXElem& y) const;
-    SXElem zz_ne(const SXElem& y) const;
-    SXElem zz_power(const SXElem& b) const;
-    SXElem zz_constpow(const SXElem& b) const;
-
     SXElem __mrdivide__(const SXElem& b) const {  return *this / b;}
     SXElem zz_mpower(const SXElem& b) const {return pow(*this, b);}
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
     SXElem zz_mul(const SXElem& y) const { return binary(OP_MUL, *this, y);}
-    SXElem zz_exp() const;
-    SXElem zz_log() const;
-    SXElem zz_sqrt() const;
-    SXElem sq() const;
-    SXElem zz_sin() const;
-    SXElem zz_cos() const;
-    SXElem zz_tan() const;
-    SXElem zz_asin() const;
-    SXElem zz_acos() const;
-    SXElem zz_atan() const;
-    SXElem zz_floor() const;
-    SXElem zz_ceil() const;
-    SXElem zz_mod(const SXElem &y) const;
-    SXElem zz_erf() const;
-    SXElem zz_erfinv() const;
-    SXElem zz_abs() const;
-    SXElem zz_min(const SXElem &y) const;
-    SXElem zz_max(const SXElem &y) const;
     SXElem inv() const;
-    SXElem zz_sinh() const;
-    SXElem zz_cosh() const;
-    SXElem zz_tanh() const;
-    SXElem zz_asinh() const;
-    SXElem zz_acosh() const;
-    SXElem zz_atanh() const;
-    SXElem zz_atan2(const SXElem &y) const;
-    SXElem zz_log10() const;
     SXElem printme(const SXElem &y) const;
-    SXElem zz_sign() const;
-    SXElem zz_copysign(const SXElem &y) const;
-    SXElem zz_not() const;
-    SXElem zz_and(const SXElem& y) const;
-    SXElem zz_or(const SXElem& y) const;
-    SXElem zz_if_else_zero(const SXElem& y) const;
     bool zz_is_equal(const SXElem& scalar, int depth=0) const;
     SXElem zz_simplify() const;
 

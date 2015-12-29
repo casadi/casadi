@@ -617,9 +617,11 @@ namespace casadi {
       case OP_CONST:
         // Make the constant the first argument, if possible
         if (this->op()!=OP_CONST && operation_checker<CommChecker>(op)) {
-              return y->getBinary(op, shared_from_this<MX>(), scY, scX);
+          return y->getBinary(op, shared_from_this<MX>(), scY, scX);
         } else {
           switch (op) {
+          case OP_POW:
+            return getBinary(OP_CONSTPOW, y, scX, scY);
           case OP_CONSTPOW:
             if (y->isValue(-1)) return getUnary(OP_INV);
             else if (y->isValue(0)) return MX::ones(sparsity());

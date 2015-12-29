@@ -358,44 +358,10 @@ namespace casadi {
     /// \cond CLUTTER
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    MX zz_plus(const MX& y) const;
-    MX zz_minus(const MX& y) const;
-    MX zz_times(const MX& y) const;
-    MX zz_rdivide(const MX& y) const;
-    MX zz_lt(const MX& y) const;
-    MX zz_le(const MX& y) const;
-    MX zz_eq(const MX& y) const;
-    MX zz_ne(const MX& y) const;
-    MX zz_atan2(const MX& y) const;
-    MX zz_min(const MX& y) const;
-    MX zz_max(const MX& y) const;
-    MX zz_and(const MX& y) const;
-    MX zz_or(const MX& y) const;
-    MX zz_abs() const;
-    MX zz_sqrt() const;
-    MX zz_sin() const;
-    MX zz_cos() const;
-    MX zz_tan() const;
-    MX zz_asin() const;
-    MX zz_acos() const;
-    MX zz_atan() const;
-    MX zz_sinh() const;
-    MX zz_cosh() const;
-    MX zz_tanh() const;
-    MX zz_asinh() const;
-    MX zz_acosh() const;
-    MX zz_atanh() const;
-    MX zz_exp() const;
-    MX zz_log() const;
     MX zz_log10() const;
-    MX zz_floor() const;
-    MX zz_ceil() const;
-    MX zz_power(const MX& b) const;
-    MX zz_mod(const MX& y) const;
     MX zz_simplify() const;
     bool zz_is_equal(const MX& y, int depth) const;
     bool zz_is_equal(const MXNode* y, int depth) const;
-    MX zz_constpow(const MX& y) const;
     ///@}
 
     ///@{
@@ -456,7 +422,6 @@ namespace casadi {
     MX zz_outer_prod(const MX& y) const;
     MX zz_mrdivide(const MX& b) const;
     MX zz_mldivide(const MX& b) const;
-    MX zz_if_else_zero(const MX& y) const;
     MX zz_norm_2() const;
     MX zz_norm_F() const;
     MX zz_norm_1() const;
