@@ -232,12 +232,6 @@ namespace casadi {
     SXElem zz_and(const SXElem& y) const;
     SXElem zz_or(const SXElem& y) const;
     SXElem zz_if_else_zero(const SXElem& y) const;
-
-    Matrix<SXElem> zz_min(const Matrix<SXElem>& b) const;
-    Matrix<SXElem> zz_max(const Matrix<SXElem>& b) const;
-    Matrix<SXElem> zz_constpow(const Matrix<SXElem>& n) const;
-    Matrix<SXElem> zz_copysign(const Matrix<SXElem>& n) const;
-    Matrix<SXElem> zz_atan2(const Matrix<SXElem>& b) const;
     bool zz_is_equal(const SXElem& scalar, int depth=0) const;
     SXElem zz_simplify() const;
 

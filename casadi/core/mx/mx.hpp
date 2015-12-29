@@ -390,15 +390,11 @@ namespace casadi {
     MX zz_log10() const;
     MX zz_floor() const;
     MX zz_ceil() const;
-    MX zz_erf() const;
-    MX zz_erfinv() const;
-    MX zz_sign() const;
     MX zz_power(const MX& b) const;
     MX zz_mod(const MX& y) const;
     MX zz_simplify() const;
     bool zz_is_equal(const MX& y, int depth) const;
     bool zz_is_equal(const MXNode* y, int depth) const;
-    MX zz_copysign(const MX& y) const;
     MX zz_constpow(const MX& y) const;
     ///@}
 

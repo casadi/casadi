@@ -226,12 +226,12 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 
     /// Error function
     friend inline ExType erf(const ExType& x) {
-      return x.zz_erf();
+      return ExType::unary(OP_ERF, x);
     }
 
     /// Invers error function
     friend inline ExType erfinv(const ExType& x) {
-      return x.zz_erfinv();
+      return ExType::unary(OP_ERFINV, x);
     }
 
     /** Sine function
@@ -241,7 +241,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
         sign(NaN) :=  NaN
      */
     friend inline ExType sign(const ExType& x) {
-      return x.zz_sign();
+      return ExType::unary(OP_SIGN, x);
     }
 
     /// Elementwise power
@@ -291,8 +291,8 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     }
 
     /// Copy sign
-    friend inline ExType copysign(const ExType& x, const ExType& n) {
-      return x.zz_copysign(n);
+    friend inline ExType copysign(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_COPYSIGN, x, y);
     }
 
     /// Elementwise power with const power

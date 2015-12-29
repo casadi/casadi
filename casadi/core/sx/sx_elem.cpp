@@ -150,18 +150,6 @@ namespace casadi {
       return UnarySX::create(OP_NEG, *this);
   }
 
-  SXElem SXElem::zz_sign() const {
-    return UnarySX::create(OP_SIGN, *this);
-  }
-
-  SXElem SXElem::zz_copysign(const SXElem &y) const {
-    return BinarySX::create(OP_COPYSIGN, *this, y);
-  }
-
-  SXElem SXElem::zz_erfinv() const {
-    return UnarySX::create(OP_ERFINV, *this);
-  }
-
   bool SXElem::__nonzero__() const {
     if (is_constant()) return !is_zero();
     casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.")
@@ -177,23 +165,6 @@ namespace casadi {
     } else {
       return UnarySX::create(OP_INV, *this);
     }
-  }
-
-  SX SXElem::zz_min(const SX& b) const {
-    return fmin(SX(*this), b);
-  }
-  SX SXElem::zz_max(const SX& b) const {
-    return fmax(SX(*this), b);
-  }
-  SX SXElem::zz_constpow(const SX& n) const {
-    return SX(*this).zz_constpow(n);
-  }
-  SX SXElem::zz_copysign(const SX& n) const {
-    return SX(*this).zz_copysign(n);
-  }
-
-  SX SXElem::zz_atan2(const SX& b) const {
-    return atan2(SX(*this), b);
   }
 
   SXElem SXElem::zz_le(const SXElem& y) const {
@@ -641,10 +612,6 @@ namespace casadi {
 
   SXElem SXElem::zz_mod(const SXElem &b) const {
     return BinarySX::create(OP_FMOD, *this, b);
-  }
-
-  SXElem SXElem::zz_erf() const {
-    return UnarySX::create(OP_ERF, *this);
   }
 
   SXElem SXElem::zz_abs() const {

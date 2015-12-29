@@ -1065,11 +1065,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_erf() const {
-    return unary(OP_ERF, *this);
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_asin() const {
     return unary(OP_ASIN, *this);
   }
@@ -1152,21 +1147,6 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_abs() const {
     return unary(OP_FABS, *this);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_sign() const {
-    return unary(OP_SIGN, *this);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_copysign(const Matrix<DataType>& y) const {
-    return binary(OP_COPYSIGN, *this, y);
-  }
-
-  template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_erfinv() const {
-    return unary(OP_ERFINV, *this);
   }
 
   template<typename DataType>

@@ -736,22 +736,6 @@ namespace casadi {
     return (*this)->getUnary(OP_FABS);
   }
 
-  MX MX::zz_sign() const {
-    return (*this)->getUnary(OP_SIGN);
-  }
-
-  MX MX::zz_copysign(const MX& y) const {
-    return MX::binary(OP_COPYSIGN, *this, y);
-  }
-
-  MX MX::zz_erfinv() const {
-    return (*this)->getUnary(OP_ERFINV);
-  }
-
-  MX MX::zz_erf() const {
-    return (*this)->getUnary(OP_ERF);
-  }
-
   MX MX::zz_not() const {
     return (*this)->getUnary(OP_NOT);
   }
