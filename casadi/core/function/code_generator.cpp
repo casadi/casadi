@@ -161,9 +161,8 @@ namespace casadi {
     // External function declarations
     if (!added_externals_.empty()) {
       s[0] << "/* External functions */" << endl;
-      for (std::set<std::string>::const_iterator it=added_externals_.begin();
-           it!=added_externals_.end(); ++it) {
-        s[0] << *it << endl;
+      for (auto&& i : added_externals_) {
+        s[0] << i << endl;
       }
       s[0] << endl << endl;
     }
