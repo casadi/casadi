@@ -162,7 +162,7 @@ namespace casadi {
 
     double getValue() const;
     int getIntValue() const;
-    SXElem getDep(int ch=0) const;
+    SXElem dep(int ch=0) const;
 
     /// Type conversion to double
     inline explicit operator double() const { return getValue();}

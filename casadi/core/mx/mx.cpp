@@ -820,7 +820,7 @@ namespace casadi {
     return pow(*this, b);
   }
 
-  MX MX::getDep(int ch) const { return (*this)->dep(ch); }
+  MX MX::dep(int ch) const { return (*this)->dep(ch); }
 
   int MX::getNdeps() const { return (*this)->ndep(); }
 

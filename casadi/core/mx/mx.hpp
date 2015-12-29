@@ -163,7 +163,7 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Get the nth dependency as MX */
-    MX getDep(int ch=0) const;
+    MX dep(int ch=0) const;
 
     /** \brief  Number of outputs */
     int n_out() const;

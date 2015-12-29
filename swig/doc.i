@@ -6364,10 +6364,10 @@ Remove columns and rows Remove/delete rows and/or columns of a matrix.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::getDep(int ch=0) const  "
+%feature("docstring")  casadi::Matrix< DataType >::dep(int ch=0) const  "
 
 Get expressions of the children of the expression Only defined if symbolic
-scalar. Wraps SXElem SXElem::getDep(int ch=0) const.
+scalar. Wraps SXElem SXElem::dep(int ch=0) const.
 
 ";
 
@@ -7993,7 +7993,7 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::MX::getDep(int ch=0) const  "
+%feature("docstring")  casadi::MX::dep(int ch=0) const  "
 
 Get the nth dependency as MX.
 

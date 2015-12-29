@@ -147,12 +147,12 @@ def minimize(f,gl=[],verbose=False):
   g_nsd = []
   for g in gl:
     if g.is_op(OP_LE) or g.is_op(OP_LT):
-      if (min(g.getDep(0).shape) > 1 and g.getDep(0).shape[0]==g.getDep(0).shape[1]) or (min(g.getDep(1).shape) > 1 and g.getDep(1).shape[0]==g.getDep(1).shape[1]):
-        g_nsd.append(g.getDep(0)-g.getDep(1))
+      if (min(g.dep(0).shape) > 1 and g.dep(0).shape[0]==g.dep(0).shape[1]) or (min(g.dep(1).shape) > 1 and g.dep(1).shape[0]==g.dep(1).shape[1]):
+        g_nsd.append(g.dep(0)-g.dep(1))
       else:
-        g_le.append(g.getDep(0)-g.getDep(1))
+        g_le.append(g.dep(0)-g.dep(1))
     elif g.is_op(OP_EQ):
-      g_eq.append(g.getDep(0)-g.getDep(1))
+      g_eq.append(g.dep(0)-g.dep(1))
     else:
       print g
       raise Exception("Constrained type unknown. Use ==, >= or <= .")

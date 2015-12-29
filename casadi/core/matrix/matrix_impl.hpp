@@ -1792,8 +1792,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::getDep(int ch) const {
-    throw CasadiException("\"getDep\" not defined for instantiation");
+  Matrix<DataType> Matrix<DataType>::dep(int ch) const {
+    throw CasadiException("\"dep\" not defined for instantiation");
   }
 
   template<typename DataType>
@@ -3069,7 +3069,7 @@ namespace casadi {
   template<> int SX::getIntValue() const;
   template<> std::vector<double> SX::nonzeros() const;
   template<> std::vector<int> SX::nonzeros_int() const;
-  template<> SX SX::getDep(int ch) const;
+  template<> SX SX::dep(int ch) const;
   template<> int SX::getNdeps() const;
   template<> std::string SX::getName() const;
   template<> void SX::setEqualityCheckingDepth(int eq_depth);

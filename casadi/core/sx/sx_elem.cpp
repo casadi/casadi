@@ -139,7 +139,7 @@ namespace casadi {
 
   SXElem SXElem::operator-() const {
     if (is_op(OP_NEG))
-      return getDep();
+      return dep();
     else if (is_zero())
       return 0;
     else if (is_minus_one())
@@ -168,12 +168,12 @@ namespace casadi {
   }
 
   bool SXElem::isDoubled() const {
-    return is_op(OP_ADD) && is_equal(getDep(0), getDep(1), SXNode::eq_depth_);
+    return is_op(OP_ADD) && is_equal(dep(0), dep(1), SXNode::eq_depth_);
   }
 
   SXElem SXElem::inv() const {
     if (is_op(OP_INV)) {
-      return getDep(0);
+      return dep(0);
     } else {
       return UnarySX::create(OP_INV, *this);
     }
@@ -253,25 +253,25 @@ namespace casadi {
         else if (y.is_op(OP_NEG))  // x + (-y) -> x - y
           return x - (-y);
         else if (x.is_op(OP_NEG)) // (-x) + y -> y - x
-          return y - x.getDep();
+          return y - x.dep();
         else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) &&
-                 x.getDep(0).is_constant() && x.getDep(0).getValue()==0.5 &&
-                 y.getDep(0).is_constant() && y.getDep(0).getValue()==0.5 &&
-                 is_equal(y.getDep(1), x.getDep(1), SXNode::eq_depth_)) // 0.5x+0.5x = x
-          return x.getDep(1);
+                 x.dep(0).is_constant() && x.dep(0).getValue()==0.5 &&
+                 y.dep(0).is_constant() && y.dep(0).getValue()==0.5 &&
+                 is_equal(y.dep(1), x.dep(1), SXNode::eq_depth_)) // 0.5x+0.5x = x
+          return x.dep(1);
         else if (x.is_op(OP_DIV) && y.is_op(OP_DIV) &&
-                 x.getDep(1).is_constant() && x.getDep(1).getValue()==2 &&
-                 y.getDep(1).is_constant() && y.getDep(1).getValue()==2 &&
-                 is_equal(y.getDep(0), x.getDep(0), SXNode::eq_depth_)) // x/2+x/2 = x
-          return x.getDep(0);
-        else if (x.is_op(OP_SUB) && is_equal(x.getDep(1), y, SXNode::eq_depth_))
-          return x.getDep(0);
-        else if (y.is_op(OP_SUB) && is_equal(x, y.getDep(1), SXNode::eq_depth_))
-          return y.getDep(0);
+                 x.dep(1).is_constant() && x.dep(1).getValue()==2 &&
+                 y.dep(1).is_constant() && y.dep(1).getValue()==2 &&
+                 is_equal(y.dep(0), x.dep(0), SXNode::eq_depth_)) // x/2+x/2 = x
+          return x.dep(0);
+        else if (x.is_op(OP_SUB) && is_equal(x.dep(1), y, SXNode::eq_depth_))
+          return x.dep(0);
+        else if (y.is_op(OP_SUB) && is_equal(x, y.dep(1), SXNode::eq_depth_))
+          return y.dep(0);
         else if (x.is_op(OP_SQ) && y.is_op(OP_SQ) &&
-                 ((x.getDep().is_op(OP_SIN) && y.getDep().is_op(OP_COS))
-                  || (x.getDep().is_op(OP_COS) && y.getDep().is_op(OP_SIN)))
-                 && is_equal(x.getDep().getDep(), y.getDep().getDep(), SXNode::eq_depth_))
+                 ((x.dep().is_op(OP_SIN) && y.dep().is_op(OP_COS))
+                  || (x.dep().is_op(OP_COS) && y.dep().is_op(OP_SIN)))
+                 && is_equal(x.dep().dep(), y.dep().dep(), SXNode::eq_depth_))
           return 1; // sin^2 + cos^2 -> 1
         break;
       case OP_SUB:
@@ -282,17 +282,17 @@ namespace casadi {
         if (is_equal(x, y, SXNode::eq_depth_)) // the terms are equal
           return 0;
         else if (y.is_op(OP_NEG)) // x - (-y) -> x + y
-          return x + y.getDep();
-        else if (x.is_op(OP_ADD) && is_equal(x.getDep(1), y, SXNode::eq_depth_))
-          return x.getDep(0);
-        else if (x.is_op(OP_ADD) && is_equal(x.getDep(0), y, SXNode::eq_depth_))
-          return x.getDep(1);
-        else if (y.is_op(OP_ADD) && is_equal(x, y.getDep(1), SXNode::eq_depth_))
-          return -y.getDep(0);
-        else if (y.is_op(OP_ADD) && is_equal(x, y.getDep(0), SXNode::eq_depth_))
-          return -y.getDep(1);
+          return x + y.dep();
+        else if (x.is_op(OP_ADD) && is_equal(x.dep(1), y, SXNode::eq_depth_))
+          return x.dep(0);
+        else if (x.is_op(OP_ADD) && is_equal(x.dep(0), y, SXNode::eq_depth_))
+          return x.dep(1);
+        else if (y.is_op(OP_ADD) && is_equal(x, y.dep(1), SXNode::eq_depth_))
+          return -y.dep(0);
+        else if (y.is_op(OP_ADD) && is_equal(x, y.dep(0), SXNode::eq_depth_))
+          return -y.dep(1);
         else if (x.is_op(OP_NEG))
-          return -(x.getDep() + y);
+          return -(x.dep() + y);
         break;
       case OP_MUL:
         if (is_equal(y, x, SXNode::eq_depth_))
@@ -313,21 +313,21 @@ namespace casadi {
           return x/y.inv();
         else if (x.is_op(OP_INV))
           return y / x.inv();
-        else if (x.is_constant() && y.is_op(OP_MUL) && y.getDep(0).is_constant() &&
-                 x.getValue()*y.getDep(0).getValue()==1) // 5*(0.2*x) = x
-          return y.getDep(1);
-        else if (x.is_constant() && y.is_op(OP_DIV) && y.getDep(1).is_constant() &&
-                 x.getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
-          return y.getDep(0);
-        else if (x.is_op(OP_DIV) && is_equal(x.getDep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
-          return x.getDep(0);
+        else if (x.is_constant() && y.is_op(OP_MUL) && y.dep(0).is_constant() &&
+                 x.getValue()*y.dep(0).getValue()==1) // 5*(0.2*x) = x
+          return y.dep(1);
+        else if (x.is_constant() && y.is_op(OP_DIV) && y.dep(1).is_constant() &&
+                 x.getValue()==y.dep(1).getValue()) // 5*(x/5) = x
+          return y.dep(0);
+        else if (x.is_op(OP_DIV) && is_equal(x.dep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
+          return x.dep(0);
         else if (y.is_op(OP_DIV) &&
-                 is_equal(y.getDep(1), x, SXNode::eq_depth_)) // ((2/x)*x)
-          return y.getDep(0);
+                 is_equal(y.dep(1), x, SXNode::eq_depth_)) // ((2/x)*x)
+          return y.dep(0);
         else if (x.is_op(OP_NEG))
-          return -(x.getDep() * y);
+          return -(x.dep() * y);
         else if (y.is_op(OP_NEG))
-          return -(x * y.getDep());
+          return -(x * y.dep());
         break;
       case OP_DIV:
         if (y->is_zero()) // term2 is zero
@@ -341,38 +341,38 @@ namespace casadi {
         else if (is_equal(x, y, SXNode::eq_depth_)) // terms are equal
           return 1;
         else if (x.isDoubled() && is_equal(y, 2))
-          return x.getDep(0);
-        else if (x.is_op(OP_MUL) && is_equal(y, x.getDep(0), SXNode::eq_depth_))
-          return x.getDep(1);
-        else if (x.is_op(OP_MUL) && is_equal(y, x.getDep(1), SXNode::eq_depth_))
-          return x.getDep(0);
+          return x.dep(0);
+        else if (x.is_op(OP_MUL) && is_equal(y, x.dep(0), SXNode::eq_depth_))
+          return x.dep(1);
+        else if (x.is_op(OP_MUL) && is_equal(y, x.dep(1), SXNode::eq_depth_))
+          return x.dep(0);
         else if (x.is_one())
           return y.inv();
         else if (y.is_op(OP_INV))
           return x*y.inv();
         else if (x.isDoubled() && y.isDoubled())
-          return x.getDep(0) / y->dep(0);
-        else if (y.is_constant() && x.is_op(OP_DIV) && x.getDep(1).is_constant() &&
-                 y.getValue()*x.getDep(1).getValue()==1) // (x/5)/0.2
-          return x.getDep(0);
+          return x.dep(0) / y->dep(0);
+        else if (y.is_constant() && x.is_op(OP_DIV) && x.dep(1).is_constant() &&
+                 y.getValue()*x.dep(1).getValue()==1) // (x/5)/0.2
+          return x.dep(0);
         else if (y.is_op(OP_MUL) &&
-                 is_equal(y.getDep(1), x, SXNode::eq_depth_)) // x/(2*x) = 1/2
-          return BinarySX::create(OP_DIV, 1, y.getDep(0));
+                 is_equal(y.dep(1), x, SXNode::eq_depth_)) // x/(2*x) = 1/2
+          return BinarySX::create(OP_DIV, 1, y.dep(0));
         else if (x.is_op(OP_NEG) &&
-                 is_equal(x.getDep(0), y, SXNode::eq_depth_))      // (-x)/x = -1
+                 is_equal(x.dep(0), y, SXNode::eq_depth_))      // (-x)/x = -1
           return -1;
         else if (y.is_op(OP_NEG) &&
-                 is_equal(y.getDep(0), x, SXNode::eq_depth_))      // x/(-x) = 1
+                 is_equal(y.dep(0), x, SXNode::eq_depth_))      // x/(-x) = 1
           return -1;
         else if (y.is_op(OP_NEG) && x.is_op(OP_NEG) &&
-                 is_equal(x.getDep(0), y.getDep(0), SXNode::eq_depth_))  // (-x)/(-x) = 1
+                 is_equal(x.dep(0), y.dep(0), SXNode::eq_depth_))  // (-x)/(-x) = 1
           return 1;
-        else if (x.is_op(OP_DIV) && is_equal(y, x.getDep(0), SXNode::eq_depth_))
-          return x.getDep(1).inv();
+        else if (x.is_op(OP_DIV) && is_equal(y, x.dep(0), SXNode::eq_depth_))
+          return x.dep(1).inv();
         else if (x.is_op(OP_NEG))
-          return -(x.getDep() / y);
+          return -(x.dep() / y);
         else if (y.is_op(OP_NEG))
-          return -(x / y.getDep());
+          return -(x / y.dep());
         break;
       }
     }
@@ -475,7 +475,7 @@ namespace casadi {
     return node->getIntValue();
   }
 
-  SXElem SXElem::getDep(int ch) const {
+  SXElem SXElem::dep(int ch) const {
     casadi_assert(ch==0 || ch==1;)
       return node->dep(ch);
   }
@@ -551,16 +551,16 @@ namespace casadi {
 
   SXElem SXElem::zz_sqrt() const {
     if (is_op(OP_SQ))
-      return fabs(getDep());
+      return fabs(dep());
     else
       return UnarySX::create(OP_SQRT, *this);
   }
 
   SXElem SXElem::sq() const {
     if (is_op(OP_SQRT))
-      return getDep();
+      return dep();
     else if (is_op(OP_NEG))
-      return getDep().sq();
+      return dep().sq();
     else
       return UnarySX::create(OP_SQ, *this);
   }
@@ -706,7 +706,7 @@ namespace casadi {
 
   SXElem SXElem::zz_not() const {
     if (is_op(OP_NOT)) {
-      return getDep();
+      return dep();
     } else {
       return UnarySX::create(OP_NOT, *this);
     }

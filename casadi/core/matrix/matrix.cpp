@@ -247,8 +247,8 @@ namespace casadi {
   }
 
   template<>
-  SX SX::getDep(int ch) const {
-    return toScalar().getDep(ch);
+  SX SX::dep(int ch) const {
+    return toScalar().dep(ch);
   }
 
   template<>

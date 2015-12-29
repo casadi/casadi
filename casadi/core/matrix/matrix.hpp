@@ -1121,9 +1121,9 @@ namespace casadi {
 
     /** \brief Get expressions of the children of the expression
         Only defined if symbolic scalar.
-        Wraps SXElem SXElem::getDep(int ch=0) const.
+        Wraps SXElem SXElem::dep(int ch=0) const.
      */
-    Matrix<DataType> getDep(int ch=0) const;
+    Matrix<DataType> dep(int ch=0) const;
 
     /** \brief Get the number of dependencies of a binary SXElem
         Only defined if symbolic scalar.
