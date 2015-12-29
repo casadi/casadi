@@ -170,9 +170,9 @@ namespace casadi {
     // Pre-C99
     s[0] << "/* Pre-c99 compatibility */" << endl
          << "#if __STDC_VERSION__ < 199901L" << endl
-         << "inline real_t CASADI_PREFIX(fmin)(real_t x, real_t y) { return x<y ? x : y;}" << endl
+         << "real_t CASADI_PREFIX(fmin)(real_t x, real_t y) { return x<y ? x : y;}" << endl
          << "#define fmin(x,y) CASADI_PREFIX(fmin)(x,y)" << endl
-         << "inline real_t CASADI_PREFIX(fmax)(real_t x, real_t y) { return x>y ? x : y;}" << endl
+         << "real_t CASADI_PREFIX(fmax)(real_t x, real_t y) { return x>y ? x : y;}" << endl
          << "#define fmax(x,y) CASADI_PREFIX(fmax)(x,y)" << endl
          << "#endif" << endl << endl;
 
