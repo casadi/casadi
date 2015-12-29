@@ -60,22 +60,22 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 */
     /// Addition
     friend inline ExType operator+(const ExType &x, const ExType &y) {
-      return x.zz_plus(y);
+      return ExType::binary(OP_ADD, x, y);
     }
 
     /// Subtraction
     friend inline ExType operator-(const ExType &x, const ExType &y) {
-      return x.zz_minus(y);
+      return ExType::binary(OP_SUB, x, y);
     }
 
     /// Elementwise multiplication
     friend inline ExType operator*(const ExType &x, const ExType &y) {
-      return x.zz_times(y);
+      return ExType::binary(OP_MUL, x, y);
     }
 
     /// Elementwise division
     friend inline ExType operator/(const ExType &x, const ExType &y) {
-      return x.zz_rdivide(y);
+      return ExType::binary(OP_DIV, x, y);
     }
 
     /// Logic less than
@@ -301,16 +301,16 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     }
 
     /// In-place addition
-    inline ExType& operator+=(const ExType &y) { return self() = self().zz_plus(y); }
+    inline ExType& operator+=(const ExType &y) { return self() = self() + y; }
 
     /// In-place subtraction
-    inline ExType& operator-=(const ExType &y) { return self() = self().zz_minus(y); }
+    inline ExType& operator-=(const ExType &y) { return self() = self() - y; }
 
     /// In-place elementwise multiplication
-    inline ExType& operator*=(const ExType &y) {return self() = self().zz_times(y);}
+    inline ExType& operator*=(const ExType &y) {return self() = self() * y;}
 
     /// In-place elementwise division
-    inline ExType& operator/=(const ExType &y) {return self() = self().zz_rdivide(y);}
+    inline ExType& operator/=(const ExType &y) {return self() = self() / y;}
 
     /** \brief  Logical `not`
      * Returns (an expression evaluating to) 1 if

@@ -167,25 +167,8 @@ namespace casadi {
     casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.")
   }
 
-  SXElem SXElem::zz_plus(const SXElem& y) const {
-    return binary(OP_ADD, *this, y);
-  }
-
-  SXElem SXElem::zz_minus(const SXElem& y) const {
-    return binary(OP_SUB, *this, y);
-  }
-
-  SXElem SXElem::zz_times(const SXElem& y) const {
-    return binary(OP_MUL, *this, y);
-  }
-
-
   bool SXElem::isDoubled() const {
     return isOp(OP_ADD) && is_equal(getDep(0), getDep(1), SXNode::eq_depth_);
-  }
-
-  SXElem SXElem::zz_rdivide(const SXElem& y) const {
-    return binary(OP_DIV, *this, y);
   }
 
   SXElem SXElem::inv() const {
@@ -315,7 +298,7 @@ namespace casadi {
         if (is_equal(y, x, SXNode::eq_depth_))
           return x.sq();
         else if (!x.is_constant() && y.is_constant())
-          return y.zz_times(x);
+          return y * x;
         else if (x.is_zero() || y->is_zero()) // one of the terms is zero
           return 0;
         else if (x.is_one()) // term1 is one

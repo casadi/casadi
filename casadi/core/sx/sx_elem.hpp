@@ -56,7 +56,7 @@ namespace casadi {
       \date 2010-2014
   */
   class CASADI_EXPORT SXElem : public GenericExpression<SXElem>,
-                                  public PrintableObject<SXElem> {
+                               public PrintableObject<SXElem> {
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElem>;
@@ -185,10 +185,6 @@ namespace casadi {
     SXElem operator-() const;
 
     //  all binary operations
-    SXElem zz_plus(const SXElem& y) const;
-    SXElem zz_minus(const SXElem& y) const;
-    SXElem zz_times(const SXElem& y) const;
-    SXElem zz_rdivide(const SXElem& y) const;
     SXElem zz_lt(const SXElem& y) const;
     SXElem zz_le(const SXElem& y) const;
     SXElem zz_eq(const SXElem& y) const;
@@ -201,7 +197,7 @@ namespace casadi {
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
-    SXElem zz_mul(const SXElem& y) const { return zz_times(y);}
+    SXElem zz_mul(const SXElem& y) const { return binary(OP_MUL, *this, y);}
     SXElem zz_exp() const;
     SXElem zz_log() const;
     SXElem zz_sqrt() const;
