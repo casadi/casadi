@@ -1063,9 +1063,9 @@ namespace casadi {
     return (*this)->getNormInf();
   }
 
-  MX MX::zz_simplify() const {
-    MX ret = *this;
-    if (!is_empty(true)) ret->simplifyMe(ret);
+  MX MX::simplify(const MX& x) {
+    MX ret = x;
+    if (!ret.is_empty(true)) ret->simplifyMe(ret);
     return ret;
   }
 

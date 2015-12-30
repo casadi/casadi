@@ -2363,9 +2363,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_simplify() const {
-    throw CasadiException("\"simplify\" not defined for instantiation");
-    return Matrix<DataType>();
+  Matrix<DataType> Matrix<DataType>::simplify(const Matrix<DataType> &x) {
+    return x;
   }
 
   template<typename DataType>
@@ -2878,7 +2877,7 @@ namespace casadi {
   template<> SX SX::zz_gauss_quadrature(const SX &x, const SX &a,
                                         const SX &b, int order,
                                         const SX& w) const;
-  template<> SX SX::zz_simplify() const;
+  template<> SX SX::simplify(const SX& x);
   template<> SX SX::zz_substitute(const SX& v, const SX& vdef) const;
   template<> std::vector<SX > SX::zz_substitute(const std::vector<SX >& ex,
                                                 const std::vector<SX >& v,

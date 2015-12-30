@@ -279,11 +279,6 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return ExType::binary(OP_FMAX, x, y);
     }
 
-    /// Simplify an expression
-    friend inline ExType simplify(const ExType &x) {
-      return x.zz_simplify();
-    }
-
     /** \brief Check if two nodes are equivalent up to a given depth.
      * Depth=0 checks if the expressions are identical, i.e. points to the same node.
      *

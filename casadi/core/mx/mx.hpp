@@ -359,7 +359,6 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericExpression
     MX zz_log10() const;
-    MX zz_simplify() const;
     bool zz_is_equal(const MX& y, int depth) const;
     bool zz_is_equal(const MXNode* y, int depth) const;
     ///@}
@@ -417,6 +416,7 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
+    static MX simplify(const MX& x);
     MX zz_mpower(const MX& b) const;
     static MX dot(const MX& x, const MX& y);
     MX zz_outer_prod(const MX& y) const;

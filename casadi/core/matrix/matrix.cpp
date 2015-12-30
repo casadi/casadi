@@ -486,10 +486,17 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_simplify() const {
-    SX ex = *this;
-    for (int el=0; el<ex.nnz(); ++el) ex.at(el) = simplify(ex.at(el));
-    return ex;
+  SX SX::simplify(const SX& x) {
+    SX r = x;
+    for (int el=0; el<r.nnz(); ++el) {
+      // Start by expanding the node to a weighted sum
+      SX terms, weights;
+      expand(r[el], weights, terms);
+
+      // Make a scalar product to get the simplified expression
+      r[el] = mul(terms.T(), weights);
+    }
+    return r;
   }
 
   template<>
@@ -1022,16 +1029,6 @@ namespace casadi {
     }
 
     return vertcat(ret);
-  }
-
-  SXElem SXElem::zz_simplify() const {
-    // Start by expanding the node to a weighted sum
-    SX terms, weights;
-    expand(*this, weights, terms);
-
-    // Make a scalar product to get the simplified expression
-    SX s = mul(terms.T(), weights);
-    return s.toScalar();
   }
 
   template<>

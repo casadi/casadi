@@ -367,12 +367,12 @@ namespace casadi {
     /// \cond CLUTTER
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    Matrix<DataType> zz_simplify() const;
     bool zz_is_equal(const Matrix<DataType> &ex2, int depth=0) const;
     ///@}
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
+    static Matrix<DataType> simplify(const Matrix<DataType> &x);
     static Matrix<DataType> jacobian(const Matrix<DataType> &f, const Matrix<DataType> &x,
                                      bool symmetric=false);
     static Matrix<DataType> gradient(const Matrix<DataType> &f, const Matrix<DataType> &x);

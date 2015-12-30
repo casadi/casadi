@@ -558,6 +558,11 @@ namespace casadi {
       return A.zz_countNodes();
     }
 
+    /// Simplify an expression
+    friend inline MatType simplify(const MatType &x) {
+      return MatType::simplify(x);
+    }
+
     /** \brief Get a string representation for a binary MatType, using custom arguments */
     inline friend std::string
       print_operator(const MatType& xb, const std::vector<std::string>& args) {

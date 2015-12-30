@@ -193,7 +193,6 @@ namespace casadi {
     SXElem inv() const;
     SXElem printme(const SXElem &y) const;
     bool zz_is_equal(const SXElem& scalar, int depth=0) const;
-    SXElem zz_simplify() const;
 
     /// \cond INTERNAL
     /// Get the temporary variable
