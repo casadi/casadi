@@ -18,7 +18,7 @@ set(CASADI_SRCS
   casadi_types.hpp
   casadi_logger.hpp           casadi_logger.cpp
   casadi_interrupt.hpp        casadi_interrupt.cpp
-  casadi_exception.hpp
+  exception.hpp
   calculus.hpp
   casadi_options.hpp          casadi_options.cpp
   casadi_meta.hpp             ${PROJECT_BINARY_DIR}/casadi_meta.cpp

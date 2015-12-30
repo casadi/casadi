@@ -28,7 +28,7 @@
 
 #include <vector>
 #include <typeinfo>
-#include "../casadi_exception.hpp"
+#include "../exception.hpp"
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
 #include "../std_vector_tools.hpp"

@@ -32,7 +32,7 @@
 
 #include <limits>
 #include <algorithm>
-#include "casadi_exception.hpp"
+#include "exception.hpp"
 
 // Define pi if the compiler fails to do so
 #ifndef M_PI

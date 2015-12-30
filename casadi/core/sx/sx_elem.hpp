@@ -28,7 +28,7 @@
 
 // exception class
 #include "../printable_object.hpp"
-#include "../casadi_exception.hpp"
+#include "../exception.hpp"
 #include "../casadi_limits.hpp"
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"

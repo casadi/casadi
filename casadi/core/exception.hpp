@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CASADI_EXCEPTION_HPP
-#define CASADI_CASADI_EXCEPTION_HPP
+#ifndef CASADI_EXCEPTION_HPP
+#define CASADI_EXCEPTION_HPP
 
 #include <exception>
 #include <string>
@@ -171,4 +171,4 @@ class CASADI_EXPORT CasadiException : public std::exception {
 
 } // namespace casadi
 
-#endif // CASADI_CASADI_EXCEPTION_HPP
+#endif // CASADI_EXCEPTION_HPP

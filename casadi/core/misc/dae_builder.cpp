@@ -33,7 +33,7 @@
 #include <cctype>
 
 #include "../std_vector_tools.hpp"
-#include "../casadi_exception.hpp"
+#include "../exception.hpp"
 #include "../function/code_generator.hpp"
 #include "../calculus.hpp"
 #include "xml_file.hpp"
