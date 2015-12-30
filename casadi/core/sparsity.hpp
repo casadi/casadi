@@ -26,14 +26,14 @@
 #ifndef CASADI_SPARSITY_HPP
 #define CASADI_SPARSITY_HPP
 
-#include "../shared_object.hpp"
-#include "../casadi_types.hpp"
+#include "shared_object.hpp"
+#include "casadi_types.hpp"
 #include "sparsity_interface.hpp"
 #include <vector>
 #include <list>
 #include <limits>
 #include <unordered_map>
-#include "../weak_ref.hpp"
+#include "weak_ref.hpp"
 
 namespace casadi {
 

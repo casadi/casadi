@@ -31,7 +31,7 @@
 #include <string>
 #include <locale>
 
-#include "matrix/matrix.hpp"
+#include "matrix.hpp"
 
 using namespace std;
 

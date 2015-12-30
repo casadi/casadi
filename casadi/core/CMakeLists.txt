@@ -33,15 +33,15 @@ set(CASADI_SRCS
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
-  matrix/generic_expression.hpp                         # Base class for SXElem MX and Matrix<>
-  matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
-  matrix/matrix.hpp           matrix/matrix_impl.hpp   matrix/matrix.cpp    # The Matrix template class
-  matrix/sparse_storage.hpp   matrix/sparse_storage_impl.hpp
-  matrix/sparsity_interface.hpp
-  matrix/sparsity.hpp         matrix/sparsity.cpp  matrix/sparsity_internal.hpp   matrix/sparsity_internal.cpp    # reference counted sparsity pattern
-  matrix/slice.hpp            matrix/slice.cpp          # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
-  matrix/submatrix.hpp                                  # A reference to a block of the matrix to allow operations such as A(:,3) = ...
-  matrix/nonzeros.hpp                                   # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
+  generic_expression.hpp                                # Base class for SXElem MX and Matrix<>
+  generic_matrix.hpp                                    # Base class for Matrix<> and MX
+  matrix.hpp           matrix_impl.hpp   matrix.cpp     # The Matrix template class
+  sparse_storage.hpp   sparse_storage_impl.hpp
+  sparsity_interface.hpp
+  sparsity.hpp         sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp    # reference counted sparsity pattern
+  slice.hpp            slice.cpp                        # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
+  submatrix.hpp                                         # A reference to a block of the matrix to allow operations such as A(:,3) = ...
+  nonzeros.hpp                                          # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
 
   # Directed, acyclic graph representation with scalar expressions
   sx/sx_elem.hpp             sx/sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)

@@ -2371,10 +2371,10 @@ namespace casadi {
 
 %include <casadi/core/calculus.hpp>
 
-%include <casadi/core/matrix/sparsity_interface.hpp>
+%include <casadi/core/sparsity_interface.hpp>
 
 %template(SpSparsity) casadi::SparsityInterface<casadi::Sparsity>;
-%include <casadi/core/matrix/sparsity.hpp>
+%include <casadi/core/sparsity.hpp>
 
 // Logic for pickling
 #ifdef SWIGPYTHON
@@ -2399,7 +2399,7 @@ namespace casadi{
 /* There is no reason to expose the Slice class to e.g. Python or MATLAB. Only if an interfaced language
    lacks a slice type, the type should be exposed here */
 // #if !(defined(SWIGPYTHON) || defined(SWIGMATLAB))
-%include <casadi/core/matrix/slice.hpp>
+%include <casadi/core/slice.hpp>
  //#endif
 
 %template(SpIM)        casadi::SparsityInterface<casadi::Matrix<int> >;
@@ -2407,14 +2407,14 @@ namespace casadi{
 %template(SpSX)             casadi::SparsityInterface<casadi::Matrix<casadi::SXElem> >;
 %template(SpMX)             casadi::SparsityInterface<casadi::MX>;
 
-%include <casadi/core/matrix/generic_matrix.hpp>
+%include <casadi/core/generic_matrix.hpp>
 
 %template(GenIM)        casadi::GenericMatrix<casadi::Matrix<int> >;
 %template(GenDM)        casadi::GenericMatrix<casadi::Matrix<double> >;
 %template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElem> >;
 %template(GenMX)             casadi::GenericMatrix<casadi::MX>;
 
-%include <casadi/core/matrix/generic_expression.hpp>
+%include <casadi/core/generic_expression.hpp>
 
 %template(ExpIM)        casadi::GenericExpression<casadi::Matrix<int> >;
 %template(ExpDM)        casadi::GenericExpression<casadi::Matrix<double> >;
@@ -3012,7 +3012,7 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElem> >;
 
-%include <casadi/core/matrix/matrix.hpp>
+%include <casadi/core/matrix.hpp>
 
 %template(IM)           casadi::Matrix<int>;
 %template(DM)           casadi::Matrix<double>;

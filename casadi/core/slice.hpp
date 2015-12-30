@@ -27,8 +27,8 @@
 #define CASADI_SLICE_HPP
 
 #include <vector>
-#include "../exception.hpp"
-#include "../printable_object.hpp"
+#include "exception.hpp"
+#include "printable_object.hpp"
 #include <limits>
 #include <iostream>
 

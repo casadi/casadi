@@ -1400,6 +1400,6 @@ namespace casadi {
 
 } // namespace casadi
 
-#include "../matrix/matrix_impl.hpp"
+#include "../matrix_impl.hpp"
 
 #endif // CASADI_FUNCTION_HPP

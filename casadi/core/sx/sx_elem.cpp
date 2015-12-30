@@ -24,7 +24,7 @@
 
 
 #include "sx_elem.hpp"
-#include "../matrix/matrix.hpp"
+#include "../matrix.hpp"
 #include <stack>
 #include <cassert>
 #include "../calculus.hpp"

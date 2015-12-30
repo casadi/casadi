@@ -30,9 +30,9 @@
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
 #include "sparsity.hpp"
-#include "../calculus.hpp"
+#include "calculus.hpp"
 #include "sparsity_interface.hpp"
-#include "../generic_type.hpp"
+#include "generic_type.hpp"
 
 namespace casadi {
   /** \brief Empty Base

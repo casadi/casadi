@@ -24,8 +24,8 @@
 
 
 #include "sparsity_internal.hpp"
-#include "../matrix/matrix.hpp"
-#include "../std_vector_tools.hpp"
+#include "matrix.hpp"
+#include "std_vector_tools.hpp"
 #include <climits>
 
 using namespace std;

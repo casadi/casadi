@@ -26,7 +26,7 @@
 #ifndef CASADI_GENERIC_EXPRESSION_HPP
 #define CASADI_GENERIC_EXPRESSION_HPP
 
-#include "../calculus.hpp"
+#include "calculus.hpp"
 
 namespace casadi {
 

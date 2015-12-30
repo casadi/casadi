@@ -31,7 +31,7 @@
 #include <set>
 #include "code_generator.hpp"
 #include "compiler.hpp"
-#include "../matrix/sparse_storage.hpp"
+#include "../sparse_storage.hpp"
 
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)

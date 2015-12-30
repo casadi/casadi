@@ -28,7 +28,7 @@
 
 #include <vector>
 #include <typeinfo>
-#include "../exception.hpp"
+#include "exception.hpp"
 
 /// \cond INTERNAL
 

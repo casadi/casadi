@@ -28,11 +28,11 @@
 
 #include <vector>
 #include <typeinfo>
-#include "../exception.hpp"
-#include "../printable_object.hpp"
-#include "../casadi_limits.hpp"
-#include "../std_vector_tools.hpp"
-#include "../runtime/runtime.hpp"
+#include "exception.hpp"
+#include "printable_object.hpp"
+#include "casadi_limits.hpp"
+#include "std_vector_tools.hpp"
+#include "runtime/runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
 

@@ -26,9 +26,9 @@
 #ifndef CASADI_MATRIX_IMPL_HPP
 #define CASADI_MATRIX_IMPL_HPP
 
-#include "../function/function.hpp"
+#include "function/function.hpp"
 
-#include "../casadi_interrupt.hpp"
+#include "casadi_interrupt.hpp"
 
 /// \cond INTERNAL
 

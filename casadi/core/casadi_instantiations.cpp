@@ -26,8 +26,8 @@
 #include "function/function.hpp"
 
 #include "sx/sx_elem.hpp"
-#include "matrix/matrix.hpp"
-#include "matrix/sparse_storage.hpp"
+#include "matrix.hpp"
+#include "sparse_storage.hpp"
 #include "mx/mx.hpp"
 
 #include "casadi_limits.hpp"
@@ -35,7 +35,7 @@
 #include "weak_ref.hpp"
 #include <iostream>
 
-#include "matrix/sparse_storage_impl.hpp"
+#include "sparse_storage_impl.hpp"
 
 using namespace std;
 namespace casadi {

@@ -36,7 +36,7 @@
 #include "casadi_meta.hpp"
 
 // Matrices
-#include "matrix/matrix.hpp"
+#include "matrix.hpp"
 
 // Matrix expressions
 #include "mx/mx.hpp"

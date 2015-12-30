@@ -33,7 +33,7 @@
 #include "../std_vector_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
-#include "../matrix/sparsity_internal.hpp"
+#include "../sparsity_internal.hpp"
 #include "../casadi_options.hpp"
 #include "../casadi_interrupt.hpp"
 

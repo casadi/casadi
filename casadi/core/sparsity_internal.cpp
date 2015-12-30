@@ -24,7 +24,7 @@
 
 
 #include "sparsity_internal.hpp"
-#include "../std_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 #include <climits>
 #include <cstdlib>
 #include <cmath>

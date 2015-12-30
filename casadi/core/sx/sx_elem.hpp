@@ -30,8 +30,8 @@
 #include "../printable_object.hpp"
 #include "../exception.hpp"
 #include "../casadi_limits.hpp"
-#include "../matrix/matrix.hpp"
-#include "../matrix/generic_expression.hpp"
+#include "../matrix.hpp"
+#include "../generic_expression.hpp"
 
 /** \brief  C/C++ */
 #include <iostream>

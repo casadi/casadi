@@ -26,7 +26,7 @@
 #ifndef CASADI_SPARSITY_INTERFACE_HPP
 #define CASADI_SPARSITY_INTERFACE_HPP
 
-#include "../std_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 
 namespace casadi {
   /** \brief Empty Base
