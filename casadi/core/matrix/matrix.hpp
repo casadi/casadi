@@ -434,7 +434,6 @@ namespace casadi {
     Matrix<DataType> zz_diag() const;
     Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
     Matrix<DataType> zz_project(const Sparsity& sp, bool intersect) const;
-    Matrix<DataType> zz_if_else_zero(const Matrix<DataType>& y) const;
     Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
     Matrix<DataType> zz_densify(const Matrix<DataType>& val) const;
     Matrix<DataType> zz_densify() const;
