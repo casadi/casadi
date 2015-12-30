@@ -1069,7 +1069,7 @@ namespace casadi {
     /** \brief Print */
     static inline void print(unsigned char op, std::ostream &stream, const std::string& x,
                              const std::string& y);
-    static inline void printName(unsigned char op, std::ostream &stream);
+    static inline const char* name(unsigned char op);
     static inline void printPre(unsigned char op, std::ostream &stream);
     static inline void printSep(unsigned char op, std::ostream &stream);
     static inline void printPost(unsigned char op, std::ostream &stream);
@@ -1130,19 +1130,27 @@ namespace casadi {
     }
 
     /** \brief Number of dependencies */
-    static inline int ndeps(unsigned char op) { return casadi_math<double>::ndeps(op);}
+    static inline int ndeps(unsigned char op) {
+      return casadi_math<double>::ndeps(op);
+    }
 
     /** \brief Print */
     static inline void print(unsigned char op, std::ostream &stream, const std::string& x,
-                             const std::string& y) { casadi_math<double>::print(op, stream, x, y);}
+                             const std::string& y) {
+      casadi_math<double>::print(op, stream, x, y);
+    }
     static inline void printPre(unsigned char op, std::ostream &stream) {
-      casadi_math<double>::printPre(op, stream);}
-    static inline void printName(unsigned char op, std::ostream &stream) {
-      casadi_math<double>::printName(op, stream);}
+      casadi_math<double>::printPre(op, stream);
+    }
+    static inline const char* name(unsigned char op) {
+      return casadi_math<double>::name(op);
+    }
     static inline void printSep(unsigned char op, std::ostream &stream) {
-      casadi_math<double>::printSep(op, stream);}
+      casadi_math<double>::printSep(op, stream);
+    }
     static inline void printPost(unsigned char op, std::ostream &stream) {
-      casadi_math<double>::printPost(op, stream);}
+      casadi_math<double>::printPost(op, stream);
+    }
   };
 
   // Template implementations
@@ -1383,101 +1391,104 @@ namespace casadi {
   }
 
     template<typename T>
-      inline void casadi_math<T>::print(unsigned char op, std::ostream &stream, const std::string& x,
-      const std::string& y) {
-    if (ndeps(op)==2) {
-    printPre(op, stream);
-    stream << x;
-    printSep(op, stream);
-    stream << y;
-    printPost(op, stream);
-  } else {
-    printPre(op, stream);
-    stream << x;
-    printPost(op, stream);
-  }
-  }
+      inline void
+    casadi_math<T>::print(unsigned char op, std::ostream &stream,
+                          const std::string& x,
+                          const std::string& y) {
+      if (ndeps(op)==2) {
+        printPre(op, stream);
+        stream << x;
+        printSep(op, stream);
+        stream << y;
+        printPost(op, stream);
+      } else {
+        printPre(op, stream);
+        stream << x;
+        printPost(op, stream);
+      }
+    }
 
     template<typename T>
-      inline void casadi_math<T>::printName(unsigned char op, std::ostream &stream) {
-    switch (op) {
-  case OP_ASSIGN:              stream << "assign";              break;
-  case OP_ADD:                 stream << "add";                 break;
-  case OP_SUB:                 stream << "sub";                 break;
-  case OP_MUL:                 stream << "mul";                 break;
-  case OP_DIV:                 stream << "div";                 break;
-  case OP_NEG:                 stream << "neg";                 break;
-  case OP_EXP:                 stream << "exp";                 break;
-  case OP_LOG:                 stream << "log";                 break;
-  case OP_CONSTPOW:
-  case OP_POW:                 stream << "pow";                 break;
-  case OP_SQRT:                stream << "sqrt";                break;
-  case OP_SQ:                  stream << "sq";                  break;
-  case OP_TWICE:               stream << "twice";               break;
-  case OP_SIN:                 stream << "sin";                 break;
-  case OP_COS:                 stream << "cos";                 break;
-  case OP_TAN:                 stream << "tan";                 break;
-  case OP_ASIN:                stream << "asin";                break;
-  case OP_ACOS:                stream << "acos";                break;
-  case OP_ATAN:                stream << "atan";                break;
-  case OP_LT:                  stream << "lt";                  break;
-  case OP_LE:                  stream << "le";                  break;
-  case OP_EQ:                  stream << "eq";                  break;
-  case OP_NE:                  stream << "ne";                  break;
-  case OP_NOT:                 stream << "not";                 break;
-  case OP_AND:                 stream << "and";                 break;
-  case OP_OR:                  stream << "or";                  break;
-  case OP_FLOOR:               stream << "floor";               break;
-  case OP_CEIL:                stream << "ceil";                break;
-  case OP_FMOD:                stream << "fmod";                break;
-  case OP_FABS:                stream << "fabs";                break;
-  case OP_SIGN:                stream << "sign";                break;
-  case OP_COPYSIGN:            stream << "copysign";            break;
-  case OP_IF_ELSE_ZERO:        stream << "if_else_zero";        break;
-  case OP_ERF:                 stream << "erf";                 break;
-  case OP_FMIN:                stream << "fmin";                break;
-  case OP_FMAX:                stream << "fmax";                break;
-  case OP_INV:                 stream << "inv";                 break;
-  case OP_SINH:                stream << "sinh";                break;
-  case OP_COSH:                stream << "cosh";                break;
-  case OP_TANH:                stream << "tanh";                break;
-  case OP_ASINH:               stream << "asinh";               break;
-  case OP_ACOSH:               stream << "acosh";               break;
-  case OP_ATANH:               stream << "atanh";               break;
-  case OP_ATAN2:               stream << "atan2";               break;
-  case OP_CONST:               stream << "const";               break;
-  case OP_INPUT:               stream << "input";               break;
-  case OP_OUTPUT:              stream << "output";              break;
-  case OP_PARAMETER:           stream << "parameter";           break;
-  case OP_CALL:                stream << "call";                break;
-  case OP_MATMUL:              stream << "matmul";              break;
-  case OP_SOLVE:               stream << "solve";               break;
-  case OP_TRANSPOSE:           stream << "transpose";           break;
-  case OP_DETERMINANT:         stream << "determinant";         break;
-  case OP_INVERSE:             stream << "inverse";             break;
-  case OP_DOT:          stream << "dot";          break;
-  case OP_HORZCAT:             stream << "horzcat";             break;
-  case OP_VERTCAT:             stream << "vertcat";             break;
-  case OP_DIAGCAT:             stream << "diagcat";             break;
-  case OP_HORZSPLIT:           stream << "horzsplit";           break;
-  case OP_VERTSPLIT:           stream << "vertsplit";           break;
-  case OP_DIAGSPLIT:           stream << "diagsplit";           break;
-  case OP_RESHAPE:             stream << "reshape";             break;
-  case OP_SUBREF:              stream << "subref";              break;
-  case OP_SUBASSIGN:           stream << "subassign";           break;
-  case OP_GETNONZEROS:         stream << "getnonzeros";         break;
-  case OP_ADDNONZEROS:         stream << "addnonzeros";         break;
-  case OP_SETNONZEROS:         stream << "setnonzeros";         break;
-  case OP_PROJECT:             stream << "project";             break;
-  case OP_ASSERTION:           stream << "assertion";           break;
-  case OP_NORM2:               stream << "norm2";               break;
-  case OP_NORM1:               stream << "norm1";               break;
-  case OP_NORMINF:             stream << "norminf";             break;
-  case OP_NORMF:               stream << "normf";               break;
-  case OP_ERFINV:              stream << "erfinv";              break;
-  case OP_PRINTME:             stream << "printme";             break;
-  case OP_LIFT:                stream << "lift";                break;
-  }
+    inline const char* casadi_math<T>::name(unsigned char op) {
+      switch (op) {
+      case OP_ASSIGN:         return "assign";
+      case OP_ADD:            return "add";
+      case OP_SUB:            return "sub";
+      case OP_MUL:            return "mul";
+      case OP_DIV:            return "div";
+      case OP_NEG:            return "neg";
+      case OP_EXP:            return "exp";
+      case OP_LOG:            return "log";
+      case OP_CONSTPOW:
+      case OP_POW:            return "pow";
+      case OP_SQRT:           return "sqrt";
+      case OP_SQ:             return "sq";
+      case OP_TWICE:          return "twice";
+      case OP_SIN:            return "sin";
+      case OP_COS:            return "cos";
+      case OP_TAN:            return "tan";
+      case OP_ASIN:           return "asin";
+      case OP_ACOS:           return "acos";
+      case OP_ATAN:           return "atan";
+      case OP_LT:             return "lt";
+      case OP_LE:             return "le";
+      case OP_EQ:             return "eq";
+      case OP_NE:             return "ne";
+      case OP_NOT:            return "not";
+      case OP_AND:            return "and";
+      case OP_OR:             return "or";
+      case OP_FLOOR:          return "floor";
+      case OP_CEIL:           return "ceil";
+      case OP_FMOD:           return "fmod";
+      case OP_FABS:           return "fabs";
+      case OP_SIGN:           return "sign";
+      case OP_COPYSIGN:       return "copysign";
+      case OP_IF_ELSE_ZERO:   return "if_else_zero";
+      case OP_ERF:            return "erf";
+      case OP_FMIN:           return "fmin";
+      case OP_FMAX:           return "fmax";
+      case OP_INV:            return "inv";
+      case OP_SINH:           return "sinh";
+      case OP_COSH:           return "cosh";
+      case OP_TANH:           return "tanh";
+      case OP_ASINH:          return "asinh";
+      case OP_ACOSH:          return "acosh";
+      case OP_ATANH:          return "atanh";
+      case OP_ATAN2:          return "atan2";
+      case OP_CONST:          return "const";
+      case OP_INPUT:          return "input";
+      case OP_OUTPUT:         return "output";
+      case OP_PARAMETER:      return "parameter";
+      case OP_CALL:           return "call";
+      case OP_MATMUL:         return "matmul";
+      case OP_SOLVE:          return "solve";
+      case OP_TRANSPOSE:      return "transpose";
+      case OP_DETERMINANT:    return "determinant";
+      case OP_INVERSE:        return "inverse";
+      case OP_DOT:            return "dot";
+      case OP_HORZCAT:        return "horzcat";
+      case OP_VERTCAT:        return "vertcat";
+      case OP_DIAGCAT:        return "diagcat";
+      case OP_HORZSPLIT:      return "horzsplit";
+      case OP_VERTSPLIT:      return "vertsplit";
+      case OP_DIAGSPLIT:      return "diagsplit";
+      case OP_RESHAPE:        return "reshape";
+      case OP_SUBREF:         return "subref";
+      case OP_SUBASSIGN:      return "subassign";
+      case OP_GETNONZEROS:    return "getnonzeros";
+      case OP_ADDNONZEROS:    return "addnonzeros";
+      case OP_SETNONZEROS:    return "setnonzeros";
+      case OP_PROJECT:        return "project";
+      case OP_ASSERTION:      return "assertion";
+      case OP_NORM2:          return "norm2";
+      case OP_NORM1:          return "norm1";
+      case OP_NORMINF:        return "norminf";
+      case OP_NORMF:          return "normf";
+      case OP_ERFINV:         return "erfinv";
+      case OP_PRINTME:        return "printme";
+      case OP_LIFT:           return "lift";
+      }
+      return 0;
     }
 
   template<typename T>
@@ -1499,7 +1510,7 @@ namespace casadi {
     case OP_OR:        stream << "(";        break;
     case OP_IF_ELSE_ZERO: stream << "(";        break;
     case OP_INV:       stream << "(1./";     break;
-    default:           printName(op, stream); stream << "("; break;
+    default: stream << name(op) << "("; break;
     }
   }
 
