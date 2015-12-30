@@ -32,7 +32,6 @@
 
 #include <limits>
 #include <algorithm>
-#include "exception.hpp"
 
 // Define pi if the compiler fails to do so
 #ifndef M_PI
@@ -160,9 +159,9 @@ namespace casadi {
 
     OP_ERFINV,
     OP_PRINTME,
-    OP_LIFT,
-    NUM_BUILT_IN_OPS
+    OP_LIFT
   };
+  #define NUM_BUILT_IN_OPS (OP_LIFT+1)
 
 #ifndef SWIG
 
@@ -561,6 +560,7 @@ namespace casadi {
   template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_ATAN2>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_FMOD>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_COPYSIGN>{ static const bool check=true;};
   ///@}
 
@@ -947,9 +947,9 @@ namespace casadi {
         d[0] = 1; d[1] = 0; }
   };
 
-  template<template<int> class F>
-  bool operation_checker(unsigned int op) {
-    switch (op) {
+  template<template<int> class F, typename T>
+  T operation_getter(unsigned int op) {
+    switch (static_cast<Operation>(op)) {
     case OP_ASSIGN:        return F<OP_ASSIGN>::check;
     case OP_ADD:           return F<OP_ADD>::check;
     case OP_SUB:           return F<OP_SUB>::check;
@@ -976,13 +976,13 @@ namespace casadi {
     case OP_NOT:           return F<OP_NOT>::check;
     case OP_AND:           return F<OP_AND>::check;
     case OP_OR:            return F<OP_OR>::check;
-    case OP_IF_ELSE_ZERO:   return F<OP_IF_ELSE_ZERO>::check;
     case OP_FLOOR:         return F<OP_FLOOR>::check;
     case OP_CEIL:          return F<OP_CEIL>::check;
     case OP_FMOD:          return F<OP_FMOD>::check;
     case OP_FABS:          return F<OP_FABS>::check;
     case OP_SIGN:          return F<OP_SIGN>::check;
     case OP_COPYSIGN:      return F<OP_COPYSIGN>::check;
+    case OP_IF_ELSE_ZERO:  return F<OP_IF_ELSE_ZERO>::check;
     case OP_ERF:           return F<OP_ERF>::check;
     case OP_FMIN:          return F<OP_FMIN>::check;
     case OP_FMAX:          return F<OP_FMAX>::check;
@@ -993,20 +993,53 @@ namespace casadi {
     case OP_ASINH:         return F<OP_ASINH>::check;
     case OP_ACOSH:         return F<OP_ACOSH>::check;
     case OP_ATANH:         return F<OP_ATANH>::check;
+    case OP_ATAN2:         return F<OP_ATAN2>::check;
     case OP_CONST:         return F<OP_CONST>::check;
-    case OP_CALL:          return F<OP_CALL>::check;
     case OP_INPUT:         return F<OP_INPUT>::check;
     case OP_OUTPUT:        return F<OP_OUTPUT>::check;
+    case OP_PARAMETER:     return F<OP_PARAMETER>::check;
+    case OP_CALL:          return F<OP_CALL>::check;
+    case OP_FIND:          return F<OP_FIND>::check;
+    case OP_MAP:           return F<OP_MAP>::check;
+    case OP_MATMUL:        return F<OP_MATMUL>::check;
+    case OP_SOLVE:         return F<OP_SOLVE>::check;
+    case OP_TRANSPOSE:     return F<OP_TRANSPOSE>::check;
+    case OP_DETERMINANT:   return F<OP_DETERMINANT>::check;
+    case OP_INVERSE:       return F<OP_INVERSE>::check;
+    case OP_DOT:           return F<OP_DOT>::check;
+    case OP_BILIN:         return F<OP_BILIN>::check;
+    case OP_RANK1:         return F<OP_RANK1>::check;
+    case OP_HORZCAT:       return F<OP_HORZCAT>::check;
+    case OP_VERTCAT:       return F<OP_VERTCAT>::check;
+    case OP_DIAGCAT:       return F<OP_DIAGCAT>::check;
+    case OP_HORZSPLIT:     return F<OP_HORZSPLIT>::check;
+    case OP_VERTSPLIT:     return F<OP_VERTSPLIT>::check;
+    case OP_DIAGSPLIT:     return F<OP_DIAGSPLIT>::check;
+    case OP_RESHAPE:       return F<OP_RESHAPE>::check;
+    case OP_SUBREF:        return F<OP_SUBREF>::check;
+    case OP_SUBASSIGN:     return F<OP_SUBASSIGN>::check;
+    case OP_GETNONZEROS:   return F<OP_GETNONZEROS>::check;
+    case OP_ADDNONZEROS:   return F<OP_ADDNONZEROS>::check;
+    case OP_SETNONZEROS:   return F<OP_SETNONZEROS>::check;
+    case OP_PROJECT:       return F<OP_PROJECT>::check;
+    case OP_ASSERTION:     return F<OP_ASSERTION>::check;
+    case OP_MONITOR:       return F<OP_MONITOR>::check;
+    case OP_NORM2:         return F<OP_NORM2>::check;
+    case OP_NORM1:         return F<OP_NORM1>::check;
+    case OP_NORMINF:       return F<OP_NORMINF>::check;
+    case OP_NORMF:         return F<OP_NORMF>::check;
+    case OP_HORZREPMAT:    return F<OP_HORZREPMAT>::check;
+    case OP_HORZREPSUM:    return F<OP_HORZREPSUM>::check;
     case OP_ERFINV:        return F<OP_ERFINV>::check;
     case OP_PRINTME:       return F<OP_PRINTME>::check;
-    case OP_ATAN2:         return F<OP_ATAN2>::check;
     case OP_LIFT:          return F<OP_LIFT>::check;
     }
-
-    // False by default
-    return false;
   }
 
+  template<template<int> class F>
+  bool operation_checker(unsigned int op) {
+    return operation_getter<F, bool>(op);
+  }
 
   /// Easy access to all the functions for a particular type
   template<typename T>
@@ -1330,6 +1363,7 @@ namespace casadi {
   case OP_OR:                                   \
   case OP_IF_ELSE_ZERO:                         \
   case OP_COPYSIGN:                             \
+  case OP_FMOD:                                 \
   case OP_FMIN:                                 \
   case OP_FMAX:                                 \
   case OP_ATAN2:                                \
