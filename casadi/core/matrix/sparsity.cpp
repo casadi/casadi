@@ -179,7 +179,8 @@ namespace casadi {
 
     // Quick return if we are adding an element to the end
     if (colind[cc]==nnz || (colind[cc+1]==nnz && row[nnz-1]<rr)) {
-      std::vector<int> rowv=get_row(), colindv=get_colind();
+      std::vector<int> rowv=get_row();
+      std::vector<int> colindv=get_colind();
       rowv.push_back(rr);
       for (int c=cc; c<size2; ++c) colindv[c+1]++;
       assign_cached(size1, size2, colindv, rowv);
