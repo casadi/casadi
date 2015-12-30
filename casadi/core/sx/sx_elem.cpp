@@ -27,7 +27,7 @@
 #include "../matrix/matrix.hpp"
 #include <stack>
 #include <cassert>
-#include "../casadi_math.hpp"
+#include "../calculus.hpp"
 #include "constant_sx.hpp"
 #include "symbolic_sx.hpp"
 #include "unary_sx.hpp"

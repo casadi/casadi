@@ -28,7 +28,7 @@
 
 #include "mx.hpp"
 #include "../sx/sx_elem.hpp"
-#include "../casadi_math.hpp"
+#include "../calculus.hpp"
 #include "../function/code_generator.hpp"
 #include <vector>
 #include <stack>

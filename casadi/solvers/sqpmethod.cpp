@@ -26,7 +26,7 @@
 #include "sqpmethod.hpp"
 
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/casadi_calculus.hpp"
+#include "casadi/core/calculus.hpp"
 
 #include <ctime>
 #include <iomanip>

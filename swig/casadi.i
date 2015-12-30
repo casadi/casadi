@@ -2369,7 +2369,7 @@ namespace casadi {
   }
 } // namespace casadi
 
-%include <casadi/core/casadi_calculus.hpp>
+%include <casadi/core/calculus.hpp>
 
 %include <casadi/core/matrix/sparsity_interface.hpp>
 

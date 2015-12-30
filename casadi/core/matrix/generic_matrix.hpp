@@ -30,7 +30,7 @@
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
 #include "sparsity.hpp"
-#include "../casadi_math.hpp"
+#include "../calculus.hpp"
 #include "sparsity_interface.hpp"
 #include "../generic_type.hpp"
 

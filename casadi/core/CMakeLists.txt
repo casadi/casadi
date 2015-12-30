@@ -19,8 +19,7 @@ set(CASADI_SRCS
   casadi_logger.hpp           casadi_logger.cpp
   casadi_interrupt.hpp        casadi_interrupt.cpp
   casadi_exception.hpp
-  casadi_calculus.hpp
-  casadi_math.hpp
+  calculus.hpp
   casadi_options.hpp          casadi_options.cpp
   casadi_meta.hpp             ${PROJECT_BINARY_DIR}/casadi_meta.cpp
   printable_object.hpp                                  # Interface class enabling printing a Python-style "description" as well as a shorter "representation" of a class
