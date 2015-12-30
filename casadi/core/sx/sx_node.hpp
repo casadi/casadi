@@ -81,7 +81,7 @@ namespace casadi {
     virtual int op() const=0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const SXNode* node, int depth) const;
+    virtual bool is_equal(const SXNode* node, int depth) const;
 
     /** \brief  Number of dependencies */
     virtual int ndep() const { return 0;}

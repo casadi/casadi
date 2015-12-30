@@ -46,6 +46,7 @@ template<class T>
 class CASADI_EXPORT casadi_limits {
   public:
     static bool is_zero(const T& val) { return val==0; }
+    static bool is_equal(const T& x, const T& y, int depth) { return x==y; }
     static bool isAlmostZero(const T& val, double tol) { return val<=tol && val>=-tol; }
     static bool is_one(const T& val) { return val==1;}
     static bool is_minus_one(const T& val) { return val==-1;}

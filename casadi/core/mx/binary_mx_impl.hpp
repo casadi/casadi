@@ -255,12 +255,12 @@ namespace casadi {
 
     switch (op_) {
     case OP_ADD:
-      if (op==OP_SUB && is_equal(y, dep(0), maxDepth())) return dep(1);
-      if (op==OP_SUB && is_equal(y, dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return dep(1);
+      if (op==OP_SUB && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
       break;
     case OP_SUB:
-      if (op==OP_SUB && is_equal(y, dep(0), maxDepth())) return -dep(1);
-      if (op==OP_ADD && is_equal(y, dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return -dep(1);
+      if (op==OP_ADD && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
       break;
     default: break; // no rule
     }

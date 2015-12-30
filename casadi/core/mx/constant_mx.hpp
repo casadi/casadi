@@ -143,7 +143,7 @@ namespace casadi {
     virtual Matrix<double> getMatrixValue() const { return x_;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     /** \brief  data member */
     Matrix<double> x_;

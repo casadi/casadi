@@ -90,7 +90,7 @@ namespace casadi {
     virtual MX getReshape(const Sparsity& sp) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const
+    virtual bool is_equal(const MXNode* node, int depth) const
     { return sameOpAndDeps(node, depth) && sparsity()==node->sparsity();}
 
     /// Transpose (if a dimension is one)

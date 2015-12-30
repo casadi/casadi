@@ -114,7 +114,7 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     /// Operation sequence
     std::vector<int> nz_;
@@ -164,7 +164,7 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     // Data member
     Slice s_;
@@ -209,7 +209,7 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     // Data members
     Slice inner_, outer_;

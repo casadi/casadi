@@ -192,7 +192,7 @@ namespace casadi {
     SXElem zz_mul(const SXElem& y) const { return binary(OP_MUL, *this, y);}
     SXElem inv() const;
     SXElem printme(const SXElem &y) const;
-    bool zz_is_equal(const SXElem& scalar, int depth=0) const;
+    static bool is_equal(const SXElem& x, const SXElem& y, int depth=0);
 
     /// \cond INTERNAL
     /// Get the temporary variable
@@ -238,6 +238,7 @@ namespace casadi {
   class CASADI_EXPORT casadi_limits<SXElem>{
   public:
     static bool is_zero(const SXElem& val);
+    static bool is_equal(const SXElem& x, const SXElem& y, int depth);
     static bool isAlmostZero(const SXElem& val, double tol);
     static bool is_one(const SXElem& val);
     static bool is_minus_one(const SXElem& val);

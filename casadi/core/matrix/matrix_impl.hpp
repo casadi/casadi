@@ -1503,19 +1503,19 @@ namespace casadi {
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::zz_is_equal(const Matrix<DataType> &ex2, int depth) const {
+  bool Matrix<DataType>::is_equal(const Matrix<DataType> &x, const Matrix<DataType> &y, int depth) {
     // Assert matching dimensions
-    casadi_assert_message(size() == ex2.size(), "Dimension mismatch");
+    casadi_assert_message(x.size() == y.size(), "Dimension mismatch");
 
     // Project to union of patterns and call recursively if different sparsity
-    if (sparsity() != ex2.sparsity()) {
-      Sparsity sp = sparsity() + ex2.sparsity();
-      return is_equal(project(*this, sp), project(ex2, sp), depth);
+    if (x.sparsity() != y.sparsity()) {
+      Sparsity sp = x.sparsity() + y.sparsity();
+      return is_equal(project(x, sp), project(y, sp), depth);
     }
 
     // Check individual elements
-    for (int k=0; k<nnz(); ++k) {
-      if (!is_equal(at(k), ex2.at(k), depth)) return false;
+    for (int k=0; k<x.nnz(); ++k) {
+      if (!casadi_limits<DataType>::is_equal(x.at(k), y.at(k), depth)) return false;
     }
 
     // True if reched this point

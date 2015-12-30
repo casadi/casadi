@@ -163,7 +163,7 @@ namespace casadi {
     }
   }
 
-  bool ConstantDM::zz_is_equal(const MXNode* node, int depth) const {
+  bool ConstantDM::is_equal(const MXNode* node, int depth) const {
     // Check if same node
     const ConstantDM* n = dynamic_cast<const ConstantDM*>(node);
     if (n==0) return false;

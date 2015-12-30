@@ -199,7 +199,8 @@ namespace casadi {
     virtual int op() const = 0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const { return false;}
+    static bool is_equal(const MXNode* x, const MXNode* y, int depth);
+    virtual bool is_equal(const MXNode* node, int depth) const { return false;}
 
     /** \brief Get equality checking depth */
     inline static bool maxDepth() { return MX::getEqualityCheckingDepth();}

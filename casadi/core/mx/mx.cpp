@@ -488,6 +488,10 @@ namespace casadi {
     return x->getUnary(Operation(op));
   }
 
+  MXNode* MX::get() const {
+    return static_cast<MXNode*>(SharedObject::get());
+  }
+
   MXNode* MX::operator->() {
     return static_cast<MXNode*>(SharedObject::operator->());
   }
@@ -690,17 +694,8 @@ namespace casadi {
     return (*this)->op();
   }
 
-  bool MX::zz_is_equal(const MX& y, int depth) const {
-    return zz_is_equal(static_cast<const MXNode*>(y.get()), depth);
-  }
-
-  bool MX::zz_is_equal(const MXNode* y, int depth) const {
-    if (get()==y)
-      return true;
-    else if (depth>0)
-      return (*this)->zz_is_equal(y, depth);
-    else
-      return false;
+  bool MX::is_equal(const MX& x, const MX& y, int depth) {
+    return MXNode::is_equal(x.get(), y.get(), depth);
   }
 
   bool MX::is_commutative() const {

@@ -367,7 +367,7 @@ namespace casadi {
     /// \cond CLUTTER
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    bool zz_is_equal(const Matrix<DataType> &ex2, int depth=0) const;
+    static bool is_equal(const Matrix<DataType> &x, const Matrix<DataType> &y, int depth=0);
     ///@}
 
     ///@{

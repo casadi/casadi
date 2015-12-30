@@ -307,8 +307,8 @@ namespace casadi {
     static MX eye(int ncol);
 
 #ifndef SWIG
-    /** \brief Avoid shadowing SharedObject::get() */
-    using SharedObject::get;
+    /// Get a const pointer to the node
+    MXNode* get() const;
 #endif // SWIG
 
     ///@{
@@ -359,8 +359,7 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericExpression
     MX zz_log10() const;
-    bool zz_is_equal(const MX& y, int depth) const;
-    bool zz_is_equal(const MXNode* y, int depth) const;
+    static bool is_equal(const MX& x, const MX& y, int depth=0);
     ///@}
 
     ///@{

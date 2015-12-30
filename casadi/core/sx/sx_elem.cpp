@@ -471,13 +471,15 @@ namespace casadi {
     return hasDep() && op==this->op();
   }
 
-  bool SXElem::zz_is_equal(const SXElem& ex, int depth) const {
-    if (node==ex.get())
+  bool SXElem::is_equal(const SXElem& x, const SXElem& y, int depth) {
+    SXNode *x_node = x.get(), *y_node = y.get();
+    if (x_node==y_node) {
       return true;
-    else if (depth>0)
-      return node->zz_is_equal(ex.get(), depth);
-    else
+    } else if (depth>0) {
+      return x_node->is_equal(y_node, depth);
+    } else {
       return false;
+    }
   }
 
   bool SXElem::isNonNegative() const {
@@ -525,6 +527,10 @@ namespace casadi {
 
   bool casadi_limits<SXElem>::is_zero(const SXElem& val) {
     return val.is_zero();
+  }
+
+  bool casadi_limits<SXElem>::is_equal(const SXElem& x, const SXElem& y, int depth) {
+    return SXElem::is_equal(x, y, depth);
   }
 
   bool casadi_limits<SXElem>::isAlmostZero(const SXElem& val, double tol) {

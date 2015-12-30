@@ -288,7 +288,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
      *  a.is_equal(b, 0)  will return false, but a.is_equal(b, 1) will return true
      */
     friend inline bool is_equal(const ExType& x, const ExType& y, int depth=0) {
-      return x.zz_is_equal(y, depth);
+      return ExType::is_equal(x, y, depth);
     }
 
     friend inline bool iszero(const ExType& x) {
