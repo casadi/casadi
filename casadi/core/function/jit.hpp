@@ -43,6 +43,9 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~Jit();
 
+    /** \brief Initialize */
+    virtual void init();
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() const { return n_in_;}
@@ -61,12 +64,24 @@ namespace casadi {
     /** \brief Generate code for the function body */
     virtual void generateBody(CodeGenerator& g) const;
 
+    ///@{
+    /** \brief Jacobian of all outputs with respect to all inputs */
+    bool hasFullJacobian() const;
+    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
+    ///@}
+
   private:
     // Number of inputs and outputs
     int n_in_, n_out_;
 
     // Function body
     std::string body_;
+
+    // Jacobian function body
+    std::string jac_body_;
+
+    // Hessian function body
+    std::string hess_body_;
   };
 
 
