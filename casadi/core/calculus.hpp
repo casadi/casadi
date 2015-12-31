@@ -158,6 +158,7 @@ namespace casadi {
     OP_HORZREPSUM,
 
     OP_ERFINV,
+    OP_PRINTME,
     OP_LIFT
   };
   #define NUM_BUILT_IN_OPS (OP_LIFT+1)
@@ -225,19 +226,21 @@ namespace casadi {
     return log(x + sqrt(1+x)*sqrt(x-1));
   }
 
+  inline int isnan(double x) throw() { return x!=x;}
+  inline int isinf(double x) throw() { return isnan(x-x);}
+
   /// Sign function, note that sign(nan) == nan
-  inline int sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
+  inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
 
-  /// Constpow, second factor is a constant
-  inline double constpow(double x, double y) { return pow(x, y);}
-
-  // Pre C++11 compatibility
-#if __cplusplus < 201103L
-  inline bool isnan(double x) throw() { return x!=x;}
-  inline bool isinf(double x) throw() { return isnan(x-x);}
+  /// fmin, fmax and erf should be available if C99 and/or C++11 required
   inline double fmin(double x, double y) throw() { return std::min(x, y);}
+  inline int fmin(int x, int y) throw() { return std::min(x, y);}
   inline double fmax(double x, double y) throw() { return std::max(x, y);}
-#endif
+  inline int fmax(int x, int y) throw() { return std::max(x, y);}
+
+  /// fabs(int) was added in C++11
+  inline int fabs(int x) throw() { return std::abs(x);}
+  ///@}
 
 #ifdef HAS_ERF
   using ::erf;
@@ -257,17 +260,25 @@ namespace casadi {
 
   ///@{
   /** \brief  CasADi additions */
-#ifdef HAS_COPYSIGN
+  template<class T> T constpow(const T &x, const T &n) { return x.constpow(n);}
+  template<class T> T printme(const T &x, const T &y) { return x.printme(y);}
+  inline double printme(double x, double y) {
+    std::cout << "|> " << y << " : " << x << std::endl;
+    return x;
+  }
+
+  #ifdef HAS_COPYSIGN
   using std::copysign;
-#else
+  #else
   /// copysign function
   inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
-#endif //HAS_COPYSIGN
+  #endif //HAS_COPYSIGN
 
   /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x ? y : 0;}
 
   /// Inverse of the error function
+  template<class T> T erfinv(const T &x) {return x.zz_erfinv();}
 #ifdef HAS_ERFINV
   using ::erfinv;
 #else // HAS ERFINV
@@ -304,11 +315,13 @@ namespace casadi {
 #endif // HAS_ERFINV
   ///@}
 
-  inline double twice(const double& x) {
+  template<typename T>
+  T twice(const T& x) {
     return x+x;
   }
 
-  inline double sq(const double& x) {
+  template<typename T>
+  T sq(const T& x) {
     return x*x;
   }
 
@@ -544,6 +557,7 @@ namespace casadi {
   template<>      struct NargChecker<OP_OR>{ static const int check=2;};
   template<>      struct NargChecker<OP_FMIN>{ static const int check=2;};
   template<>      struct NargChecker<OP_FMAX>{ static const int check=2;};
+  template<>      struct NargChecker<OP_PRINTME>{ static const int check=2;};
   template<>      struct NargChecker<OP_ATAN2>{ static const int check=2;};
   template<>      struct NargChecker<OP_IF_ELSE_ZERO>{ static const int check=2;};
   template<>      struct NargChecker<OP_FMOD>{ static const int check=2;};
@@ -901,6 +915,14 @@ namespace casadi {
         d[0] = (sqrt(M_PI)/2)*exp(f*f); }
   };
 
+  /// Identity operator with the side effect of printing
+  template<>
+  struct BinaryOperation<OP_PRINTME>{
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) {f = printme(x, y); }
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
+        d[0]=1; d[1]=0;}
+  };
+
   /// Arctan2
   template<>
   struct BinaryOperation<OP_ATAN2>{
@@ -1012,6 +1034,7 @@ namespace casadi {
     case OP_HORZREPMAT:    return F<OP_HORZREPMAT>::check;
     case OP_HORZREPSUM:    return F<OP_HORZREPSUM>::check;
     case OP_ERFINV:        return F<OP_ERFINV>::check;
+    case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_LIFT:          return F<OP_LIFT>::check;
     }
   }
@@ -1185,7 +1208,8 @@ namespace casadi {
   case OP_ATANH:     CNAME<OP_ATANH>::fcn(X, Y, F, N);         break;   \
   case OP_ATAN2:     CNAME<OP_ATAN2>::fcn(X, Y, F, N);         break;   \
   case OP_ERFINV:    CNAME<OP_ERFINV>::fcn(X, Y, F, N);        break;   \
-  case OP_LIFT:      CNAME<OP_LIFT>::fcn(X, Y, F, N);          break;
+  case OP_LIFT:      CNAME<OP_LIFT>::fcn(X, Y, F, N);          break;   \
+  case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X, Y, F, N);       break;
 
 #define CASADI_MATH_FUN_BUILTIN(X, Y, F) CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationSS, X, Y, F, 1)
 
@@ -1266,7 +1290,8 @@ namespace casadi {
   case OP_ATANH:     BinaryOperation<OP_ATANH>::der(X, Y, F, D);      break; \
   case OP_ATAN2:     BinaryOperation<OP_ATAN2>::der(X, Y, F, D);      break; \
   case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X, Y, F, D);     break; \
-  case OP_LIFT:      BinaryOperation<OP_LIFT>::der(X, Y, F, D);       break;
+  case OP_LIFT:      BinaryOperation<OP_LIFT>::der(X, Y, F, D);       break; \
+  case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X, Y, F, D);    break;
 
     switch (op) {
     CASADI_MATH_DER_BUILTIN(x, y, f, d)
@@ -1324,7 +1349,8 @@ namespace casadi {
   case OP_ATANH:     DerBinaryOpertion<OP_ATANH>::derf(X, Y, F, D);      break; \
   case OP_ATAN2:     DerBinaryOpertion<OP_ATAN2>::derf(X, Y, F, D);      break; \
   case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X, Y, F, D);     break; \
-  case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X, Y, F, D);       break;
+  case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X, Y, F, D);       break; \
+  case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X, Y, F, D);    break;
 
     switch (op) {
       CASADI_MATH_DERF_BUILTIN(x, y, f, d)
@@ -1352,6 +1378,7 @@ namespace casadi {
   case OP_FMIN:                                 \
   case OP_FMAX:                                 \
   case OP_ATAN2:                                \
+  case OP_PRINTME:                              \
   case OP_LIFT:
 
     switch (op) {
@@ -1461,6 +1488,7 @@ namespace casadi {
       case OP_NORMINF:        return "norminf";
       case OP_NORMF:          return "normf";
       case OP_ERFINV:         return "erfinv";
+      case OP_PRINTME:        return "printme";
       case OP_LIFT:           return "lift";
       }
       return 0;

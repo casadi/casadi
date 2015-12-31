@@ -191,6 +191,7 @@ namespace casadi {
     // Numpy compatibility and to allow unambiguous access
     SXElem zz_mul(const SXElem& y) const { return binary(OP_MUL, *this, y);}
     SXElem inv() const;
+    SXElem printme(const SXElem &y) const;
     static bool is_equal(const SXElem& x, const SXElem& y, int depth=0);
 
     /// \cond INTERNAL

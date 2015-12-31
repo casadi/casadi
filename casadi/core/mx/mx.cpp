@@ -621,6 +621,10 @@ namespace casadi {
     return mul(*this, y.T());
   }
 
+  MX MX::printme(const MX& b) const {
+    return binary(OP_PRINTME, *this, b);
+  }
+
   MX MX::attachAssert(const MX& y, const std::string &fail_message) const {
     casadi_assert_message(y.is_scalar(),
                           "Error in attachAssert: assertion expression y must be scalar, "
