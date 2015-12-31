@@ -1000,11 +1000,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::printme(const Matrix<DataType>& y) const {
-    return binary(OP_PRINTME, *this, y);
-  }
-
-  template<typename DataType>
   std::vector<DataType>& Matrix<DataType>::data() {
     return data_;
   }
@@ -1271,8 +1266,8 @@ namespace casadi {
     const Sparsity& x_sp = x.sparsity();
     const Sparsity& y_sp = y.sparsity();
     Sparsity r_sp = x_sp.combine(y_sp,
-                                        operation_checker<F0XChecker>(op),
-                                        operation_checker<FX0Checker>(op));
+                                 operation_checker<F0XChecker>(op),
+                                 operation_checker<FX0Checker>(op));
 
     // Return value
     Matrix<DataType> r = zeros(r_sp);

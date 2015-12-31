@@ -460,8 +460,6 @@ namespace casadi {
 
 #endif // SWIG
 
-    MX printme(const MX& y) const;
-
 #if !defined(SWIG) || defined(DOXYGEN)
 /**
 \ingroup expression_tools

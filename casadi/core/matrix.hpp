@@ -496,8 +496,6 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
-    Matrix<DataType> printme(const Matrix<DataType>& y) const;
-
     /// Transpose the matrix
     Matrix<DataType> T() const;
 

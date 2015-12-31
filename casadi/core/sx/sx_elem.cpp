@@ -569,10 +569,6 @@ namespace casadi {
     return SX(Sparsity::scalar(), *this, false);
   }
 
-  SXElem SXElem::printme(const SXElem &b) const {
-    return BinarySX::create(OP_PRINTME, *this, b);
-  }
-
   int SXElem::getTemp() const {
     return (*this)->temp;
   }

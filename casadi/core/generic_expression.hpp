@@ -144,6 +144,11 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return ExType::unary(OP_SQ, x);
     }
 
+    /// Square
+    friend inline ExType twice(const ExType& x) {
+      return ExType::unary(OP_TWICE, x);
+    }
+
     /// Sine
     friend inline ExType sin(const ExType& x) {
       return ExType::unary(OP_SIN, x);
