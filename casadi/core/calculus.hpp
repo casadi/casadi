@@ -175,8 +175,13 @@ namespace casadi {
 
   // Disable some Visual studio warnings
 #ifdef _MSC_VER
+
 #pragma warning(disable:4996)
+
+  // warning C4018: '<' : signed/unsigned mismatch
 #pragma warning(disable:4018)
+
+  // warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
 #pragma warning(disable:4800)
 #endif
 
@@ -227,18 +232,16 @@ namespace casadi {
   inline double constpow(double x, double y) { return pow(x, y);}
 
   // Pre C++11 compatibility
-#if __cplusplus >= 201103L
-  using std::fmin;
-  using std::fmax;
-  using std::fabs;
-  using std::erf;
-  using std::copysign;
-#else
+#if __cplusplus < 201103L
   inline bool isnan(double x) throw() { return x!=x;}
   inline bool isinf(double x) throw() { return isnan(x-x);}
   inline double fmin(double x, double y) throw() { return std::min(x, y);}
   inline double fmax(double x, double y) throw() { return std::max(x, y);}
-  inline int fabs(int x) throw() { return std::abs(x);}
+#endif
+
+#ifdef HAS_ERF
+  using ::erf;
+#else // HAS ERF
   inline double erf(double x) throw() {
     // Approximation found in Sourceforge and modified,
     // originally from numerical recipes in Fortran
@@ -249,14 +252,17 @@ namespace casadi {
                                        t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+
                                                            t*(-0.82215223+t*0.17087277))))))))));
   }
-  inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
-#endif
-  inline int fmin(int x, int y) throw() { return std::min(x, y);}
-  inline int fmax(int x, int y) throw() { return std::max(x, y);}
+#endif // HAS ERF
   ///@}
 
   ///@{
   /** \brief  CasADi additions */
+#ifdef HAS_COPYSIGN
+  using std::copysign;
+#else
+  /// copysign function
+  inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
+#endif //HAS_COPYSIGN
 
   /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x ? y : 0;}
