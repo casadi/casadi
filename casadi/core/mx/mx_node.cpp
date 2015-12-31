@@ -568,7 +568,7 @@ namespace casadi {
         const Sparsity& x_sp = sparsity();
         const Sparsity& y_sp = y.sparsity();
         Sparsity r_sp = x_sp.combine(y_sp, operation_checker<F0XChecker>(op),
-                                            operation_checker<Function0Checker>(op));
+                                            operation_checker<FX0Checker>(op));
 
         // Project the arguments to this sparsity
         MX xx = project(shared_from_this<MX>(), r_sp);
@@ -585,7 +585,7 @@ namespace casadi {
 
       // If identically zero due to one argumebt being zero
       if ((operation_checker<F0XChecker>(op) && is_zero()) ||
-         (operation_checker<Function0Checker>(op) && y->is_zero())) {
+         (operation_checker<FX0Checker>(op) && y->is_zero())) {
         return MX::zeros(sparsity());
       }
 
@@ -669,7 +669,7 @@ namespace casadi {
 
     if (scX) {
       // Check if it is ok to loop over nonzeros only
-      if (y.is_dense() || operation_checker<Function0Checker>(op)) {
+      if (y.is_dense() || operation_checker<FX0Checker>(op)) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<true, false>(Operation(op), shared_from_this<MX>(), y));
       } else {

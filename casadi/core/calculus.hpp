@@ -498,10 +498,10 @@ namespace casadi {
 
   ///@{
   /// If evaluated with the second argument zero, is the result zero?
-  template<int I> struct Function0Checker { static const bool check=false;};
-  template<>      struct Function0Checker<OP_MUL>{ static const bool check=true;};
-  template<>      struct Function0Checker<OP_AND>{ static const bool check=true;};
-  template<>      struct Function0Checker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<int I> struct FX0Checker { static const bool check=false;};
+  template<>      struct FX0Checker<OP_MUL>{ static const bool check=true;};
+  template<>      struct FX0Checker<OP_AND>{ static const bool check=true;};
+  template<>      struct FX0Checker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -544,24 +544,27 @@ namespace casadi {
 
   ///@{
   /// Is the operation binary as opposed to unary
-  template<int I> struct BinaryChecker { static const bool check=false;};
-  template<>      struct BinaryChecker<OP_ADD>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_SUB>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_MUL>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_DIV>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_POW>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_CONSTPOW>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_EQ>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_NE>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_AND>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_OR>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_FMIN>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_FMAX>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_ATAN2>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_FMOD>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_COPYSIGN>{ static const bool check=true;};
+  template<int I> struct NargChecker { static const int check=1;};
+  template<>      struct NargChecker<OP_ADD>{ static const int check=2;};
+  template<>      struct NargChecker<OP_SUB>{ static const int check=2;};
+  template<>      struct NargChecker<OP_MUL>{ static const int check=2;};
+  template<>      struct NargChecker<OP_DIV>{ static const int check=2;};
+  template<>      struct NargChecker<OP_POW>{ static const int check=2;};
+  template<>      struct NargChecker<OP_CONSTPOW>{ static const int check=2;};
+  template<>      struct NargChecker<OP_EQ>{ static const int check=2;};
+  template<>      struct NargChecker<OP_NE>{ static const int check=2;};
+  template<>      struct NargChecker<OP_AND>{ static const int check=2;};
+  template<>      struct NargChecker<OP_OR>{ static const int check=2;};
+  template<>      struct NargChecker<OP_FMIN>{ static const int check=2;};
+  template<>      struct NargChecker<OP_FMAX>{ static const int check=2;};
+  template<>      struct NargChecker<OP_PRINTME>{ static const int check=2;};
+  template<>      struct NargChecker<OP_ATAN2>{ static const int check=2;};
+  template<>      struct NargChecker<OP_IF_ELSE_ZERO>{ static const int check=2;};
+  template<>      struct NargChecker<OP_FMOD>{ static const int check=2;};
+  template<>      struct NargChecker<OP_COPYSIGN>{ static const int check=2;};
+  template<>      struct NargChecker<OP_CONST>{ static const int check=0;};
+  template<>      struct NargChecker<OP_PARAMETER>{ static const int check=0;};
+  template<>      struct NargChecker<OP_INPUT>{ static const int check=0;};
   ///@}
 
   /// Simple assignment

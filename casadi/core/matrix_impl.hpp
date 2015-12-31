@@ -1210,7 +1210,7 @@ namespace casadi {
     }
 
     // Check the value of the structural zero-entries, if there are any
-    if (!y.is_dense() && !operation_checker<Function0Checker>(op)) {
+    if (!y.is_dense() && !operation_checker<FX0Checker>(op)) {
       // Get the value for the structural zeros
       DataType fcn_0;
       casadi_math<DataType>::fun(op, x_val, casadi_limits<DataType>::zero, fcn_0);
@@ -1272,7 +1272,7 @@ namespace casadi {
     const Sparsity& y_sp = y.sparsity();
     Sparsity r_sp = x_sp.combine(y_sp,
                                         operation_checker<F0XChecker>(op),
-                                        operation_checker<Function0Checker>(op));
+                                        operation_checker<FX0Checker>(op));
 
     // Return value
     Matrix<DataType> r = zeros(r_sp);
