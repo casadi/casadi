@@ -460,7 +460,8 @@ namespace casadi {
       }
       for (jj=0; jj<length; ++jj) {
         if (!iszero(sums[head])) {
-          res = fmax(res, fabs(sums[head]));
+          real_t a = fabs(sums[head]);
+          res = fmax(res, a);
           nnz++;
         }
         int temp = head;
