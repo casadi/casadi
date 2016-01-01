@@ -80,7 +80,7 @@ namespace casadi {
     OP_MAP,
 
     // Matrix multiplication
-    OP_MATMUL,
+    OP_MTIMES,
 
     // Solve linear system of equations
     OP_SOLVE,
@@ -1004,7 +1004,7 @@ namespace casadi {
     case OP_CALL:          return F<OP_CALL>::check;
     case OP_FIND:          return F<OP_FIND>::check;
     case OP_MAP:           return F<OP_MAP>::check;
-    case OP_MATMUL:        return F<OP_MATMUL>::check;
+    case OP_MTIMES:        return F<OP_MTIMES>::check;
     case OP_SOLVE:         return F<OP_SOLVE>::check;
     case OP_TRANSPOSE:     return F<OP_TRANSPOSE>::check;
     case OP_DETERMINANT:   return F<OP_DETERMINANT>::check;
@@ -1463,7 +1463,7 @@ namespace casadi {
       case OP_OUTPUT:         return "output";
       case OP_PARAMETER:      return "parameter";
       case OP_CALL:           return "call";
-      case OP_MATMUL:         return "matmul";
+      case OP_MTIMES:         return "matmul";
       case OP_SOLVE:          return "solve";
       case OP_TRANSPOSE:      return "transpose";
       case OP_DETERMINANT:    return "determinant";

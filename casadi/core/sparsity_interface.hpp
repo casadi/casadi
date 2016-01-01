@@ -372,13 +372,13 @@ namespace casadi {
 
     /** \brief Matrix product of two matrices
     */
-    inline friend MatType mul(const MatType &x, const MatType &y) {
+    inline friend MatType mtimes(const MatType &x, const MatType &y) {
       return MatType::mtimes(x, y);
     }
 
     /** \brief Matrix product of n matrices
      */
-    inline friend MatType mul(const std::vector<MatType> &args) {
+    inline friend MatType mtimes(const std::vector<MatType> &args) {
       return MatType::mtimes(args);
     }
 
@@ -632,7 +632,7 @@ namespace casadi {
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");
     MatType ret = args[0];
-    for (int i=1; i<args.size(); ++i) ret = mul(ret, args[i]);
+    for (int i=1; i<args.size(); ++i) ret = MatType::mtimes(ret, args[i]);
     return ret;
   }
 

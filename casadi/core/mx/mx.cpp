@@ -668,7 +668,7 @@ namespace casadi {
   bool         MX::is_output () const { return (*this)->isOutputNode(); }
   int         MX::get_output () const { return (*this)->getFunctionOutput(); }
   bool         MX::is_op (int op) const { return (*this)->op()==op; }
-  bool         MX::is_multiplication () const { return (*this)->op()==OP_MATMUL; }
+  bool         MX::is_multiplication () const { return (*this)->op()==OP_MTIMES; }
   bool         MX::is_norm () const { return dynamic_cast<const Norm*>(get())!=0; }
 
   int MX::numFunctions() const { return (*this)->numFunctions(); }
@@ -1186,11 +1186,11 @@ namespace casadi {
   }
 
   MX MX::zz_sumCols() const {
-    return mul(*this, MX::ones(size2(), 1));
+    return mtimes(*this, MX::ones(size2(), 1));
   }
 
   MX MX::zz_sumRows() const {
-    return mul(MX::ones(1, size1()), *this);
+    return mtimes(MX::ones(1, size1()), *this);
   }
 
   MX MX::zz_polyval(const MX& x) const {
@@ -1645,9 +1645,9 @@ namespace casadi {
 
   MX MX::zz_pinv(const std::string& lsolver, const Dict& dict) const {
     if (size1()>=size2()) {
-      return solve(mul(T(), *this), T(), lsolver, dict);
+      return solve(mtimes(T(), *this), T(), lsolver, dict);
     } else {
-      return solve(mul(*this, T()), *this, lsolver, dict).T();
+      return solve(mtimes(*this, T()), *this, lsolver, dict).T();
     }
   }
 

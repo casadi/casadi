@@ -46,7 +46,7 @@ namespace casadi {
   }
 
   std::string Multiplication::print(const std::vector<std::string>& arg) const {
-    return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
+    return "(" + arg.at(0) + "+mtimes(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
   void Multiplication::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
@@ -60,7 +60,7 @@ namespace casadi {
   template<typename T>
   void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    casadi_mul(arg[1], dep(1).sparsity(),
+    casadi_mtimes(arg[1], dep(1).sparsity(),
                arg[2], dep(2).sparsity(),
                res[0], sparsity(), w, false);
   }
@@ -109,9 +109,9 @@ namespace casadi {
     }
 
     // Perform sparse matrix multiplication
-    g.body << "  " << g.mul(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
-                            g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
-                            g.work(res[0], nnz()), sparsity(), "w", false) << endl;
+    g.body << "  " << g.mtimes(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
+                               g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
+                               g.work(res[0], nnz()), sparsity(), "w", false) << endl;
   }
 
   void DenseMultiplication::

@@ -149,7 +149,7 @@ namespace casadi {
 
       SX sk = x - x_old;
       SX yk = gLag - gLag_old;
-      SX qk = mul(Bk, sk);
+      SX qk = mtimes(Bk, sk);
 
       // Calculating theta
       SX skBksk = dot(sk, qk);
@@ -159,7 +159,7 @@ namespace casadi {
       yk = omega * yk + (1 - omega) * qk;
       SX theta = 1. / dot(sk, yk);
       SX phi = 1. / dot(qk, sk);
-      SX Bk_new = Bk + theta * mul(yk, yk.T()) - phi * mul(qk, qk.T());
+      SX Bk_new = Bk + theta * mtimes(yk, yk.T()) - phi * mtimes(qk, qk.T());
 
       // Inputs of the BFGS update function
       vector<SX> bfgs_in(BFGS_NUM_IN);

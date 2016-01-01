@@ -543,7 +543,7 @@ namespace casadi {
 
     // Allocate a QP solver
     spL_ = mat_fcn_.sparsity_out(mat_hes_);
-    spH_ = mul(spL_.T(), spL_);
+    spH_ = mtimes(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
     qpsol_ = qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
                    qpsol_options);
@@ -986,7 +986,7 @@ namespace casadi {
     if (gauss_newton_) {
       // Gauss-Newton Hessian
       casadi_fill(qpH_, spH_.nnz(), 0.);
-      casadi_mul(qpL_, spL_, qpL_, spL_, qpH_, spH_, w_, true);
+      casadi_mtimes(qpL_, spL_, qpL_, spL_, qpH_, spH_, w_, true);
 
       // Gradient of the objective in Gauss-Newton
       casadi_fill(gfk_, nx_, 0.);

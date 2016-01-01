@@ -114,7 +114,7 @@ rhs["dy"] = F[1]
 # # Jk = states.squared_repeated(J.getOutput())
 # # F = Jk[-1]
 
-# # PF_method1 = mul([F,P0,F.T])
+# # PF_method1 = mtimes([F,P0,F.T])
 
 # # print "State cov (method 1) = ", PF_method1
 
@@ -129,7 +129,7 @@ rhs["dy"] = F[1]
 
 # rhs_aug = struct_SX(states_aug)
 # rhs_aug["orig"]  = rhs
-# rhs_aug["P"]  = mul(A,states_aug["P"]) + mul(states_aug["P"],A.T)
+# rhs_aug["P"]  = mtimes(A,states_aug["P"]) + mtimes(states_aug["P"],A.T)
 
 # f_aug = SX.fun("f_aug", controldaeIn(x=states_aug,p=parameters,u=controls),daeOut(ode=rhs_aug))
 
@@ -170,11 +170,11 @@ rhs["dy"] = F[1]
   
 # simulated_x = vertcat(simulated_x).T
 
-# Xf_mean = mul(simulated_x,W)
+# Xf_mean = mtimes(simulated_x,W)
 
-# x_dev = simulated_x-mul(Xf_mean,DM.ones(1,2*n+1))
+# x_dev = simulated_x-mtimes(Xf_mean,DM.ones(1,2*n+1))
 
-# PF_method3 = mul([x_dev,diag(W),x_dev.T])
+# PF_method3 = mtimes([x_dev,diag(W),x_dev.T])
 # print "State cov (method 3) = ", PF_method3
 
 # show()

@@ -74,7 +74,7 @@ namespace casadi {
 
     // The nlp looks exactly like a mathematical description of the NLP
     SXDict nlp = {{"x", X}, {"p", vertcat(par)},
-                  {"f", mul(G.T(), X) + 0.5*mul(mul(X.T(), H), X)}, {"g", mul(A, X)}};
+                  {"f", mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X)}, {"g", mtimes(A, X)}};
 
     Dict options;
     if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");

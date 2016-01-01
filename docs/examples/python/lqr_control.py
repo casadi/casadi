@@ -60,7 +60,7 @@ R = []
 p = B
 for i in range(ns):
   R.append(p)
-  p = mul([A,p])
+  p = mtimes([A,p])
   
 R = horzcat(R)
 
@@ -83,7 +83,7 @@ u_ = (DM([[ -1, 1 ],[1,-1]]*((N-1)/2))).T
 p = SX.sym('p')
 
 # tn = np.linspace(0,te,N)
-# cdae = SX.fun('cdae', controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
+# cdae = SX.fun('cdae', controldaeIn(x=y,u=u),[mtimes(A,y)+mtimes(B,u)])
 
 # opts = {}
 # opts['integrator'] = 'cvodes'
@@ -127,7 +127,7 @@ p = SX.sym('p')
 
 # # dev_est = []
 # # for i in range(len(tf)):
-# #   dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],x0_pert))
+# #   dev_est.append(mtimes(jacsim.getOutput()[i*ns:(i+1)*ns,:],x0_pert))
 
 # # dev_est = horzcat(dev_est).T
 # # plot(tf,dev_est,'+k')
@@ -169,7 +169,7 @@ p = SX.sym('p')
 
 # # dev_est = []
 # # for i in range(len(tf)):
-# #   dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],vec(u_perturb)))
+# #   dev_est.append(mtimes(jacsim.getOutput()[i*ns:(i+1)*ns,:],vec(u_perturb)))
 
 # # dev_est = horzcat(dev_est).T
 # # plot(tf,dev_est,'+k')
@@ -207,8 +207,8 @@ p = SX.sym('p')
 # states_['Wt'] = 0
 
 # rhs = struct_SX(states)
-# rhs['eAt'] = mul(A,eAt)
-# rhs['Wt']  = mul([eAt,B,B.T,eAt.T])
+# rhs['eAt'] = mtimes(A,eAt)
+# rhs['Wt']  = mtimes([eAt,B,B.T,eAt.T])
 
 # dae = SX.fun('dae', daeIn(x=states),daeOut(ode=rhs))
 
@@ -241,11 +241,11 @@ p = SX.sym('p')
 # states_['y'] = x0
 # states_['eAt'] = eAt_
 
-# u = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
+# u = mtimes([B.T,eAt.T,inv(Wt_),xref_e-mtimes(eAt_,x0)])
 
 # rhs = struct_SX(states)
-# rhs['y']   = mul(A,y)+mul(B,u)
-# rhs['eAt'] = -mul(A,eAt)
+# rhs['y']   = mtimes(A,y)+mtimes(B,u)
+# rhs['eAt'] = -mtimes(A,eAt)
 
 # cdae = SX.fun('cdae', controldaeIn(x=states),[rhs])
 
@@ -287,7 +287,7 @@ p = SX.sym('p')
 # # Continuous Riccati equation
 # P = SX.sym('P',ns,ns)
 
-# ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
+# ric = (Q + mtimes(A.T,P) + mtimes(P,A) - mtimes([P,B,inv(R),B.T,P]))
 
 # dae = SX.fun('dae', daeIn(x=vec(P)),daeOut(ode=vec(ric)))
 
@@ -324,12 +324,12 @@ p = SX.sym('p')
 # assert(max(fabs(dae.getOutput()))<1e-8)
 
 # # From P, obtain a feedback matrix K
-# K = mul([inv(R),B.T,P_])
+# K = mtimes([inv(R),B.T,P_])
 
 # print 'feedback matrix= ', K
 
 # # Inspect closed-loop eigenvalues
-# [D,V] = linalg.eig(A-mul(B,K))
+# [D,V] = linalg.eig(A-mtimes(B,K))
 # print 'Open-loop eigenvalues: ', D
 
 # # Check what happens if we integrate the Riccati equation forward in time
@@ -380,12 +380,12 @@ p = SX.sym('p')
 # figure(6)
 
 # for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-1,sin(t)])]):
-#   u = -mul(K,y) + mul(mul(K,F)+Nm,yref)
-#   rhs = mul(A,y)+mul(B,u)
+#   u = -mtimes(K,y) + mtimes(mtimes(K,F)+Nm,yref)
+#   rhs = mtimes(A,y)+mtimes(B,u)
 #   cdae = SX.fun('cdae', controldaeIn(t=t, x=y),[rhs])
 
 #   # Output function
-#   out = SX.fun('out', controldaeIn(t=t, x=y),[y,mul(C,y),u,yref])
+#   out = SX.fun('out', controldaeIn(t=t, x=y),[y,mtimes(C,y),u,yref])
 
 #   opts = {}
 #   opts['integrator'] = 'cvodes'
@@ -438,13 +438,13 @@ p = SX.sym('p')
 
 # param_ = param(0)
 
-# uref = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
-# u    = uref - mul(param['K'],y-states['yref'])
+# uref = mtimes([B.T,eAt.T,inv(Wt_),xref_e-mtimes(eAt_,x0)])
+# u    = uref - mtimes(param['K'],y-states['yref'])
 
 # rhs = struct_SX(states)
-# rhs['y']      =  mul(A,y)+mul(B,u)
-# rhs['yref']   =  mul(A,states['yref'])+mul(B,uref)
-# rhs['eAt']    = -mul(A,eAt)
+# rhs['y']      =  mtimes(A,y)+mtimes(B,u)
+# rhs['yref']   =  mtimes(A,states['yref'])+mtimes(B,uref)
+# rhs['eAt']    = -mtimes(A,eAt)
 
 # cdae = SX.fun('cdae', controldaeIn(x=states, p=param),[rhs])
 
@@ -498,7 +498,7 @@ p = SX.sym('p')
 
 # print 'Spectral radius of exp((A-BK)*te): '
 
-# [D,V] = linalg.eig(scipy.linalg.expm(numpy.array((A-mul(B,K))*te)))
+# [D,V] = linalg.eig(scipy.linalg.expm(numpy.array((A-mtimes(B,K))*te)))
 # print max(abs(D))
 
 # # Simulation of the controller:
@@ -522,8 +522,8 @@ p = SX.sym('p')
 # yref  = SX.sym('yref',ns)
 # y     = SX.sym('y',ns)
 # dy    = SX.sym('dy',ns)
-# u     = controls['uref']-mul(param['K'],y-controls['yref'])
-# rhs   = mul(A,y)+mul(B,u)
+# u     = controls['uref']-mtimes(param['K'],y-controls['yref'])
+# rhs   = mtimes(A,y)+mtimes(B,u)
 
 # cdae = SX.fun('cdae', controldaeIn(x=y, u=controls, p=param),[rhs])
 
@@ -576,8 +576,8 @@ p = SX.sym('p')
 
 # y0     = SX.sym('y0',ns)
 
-# u     = controls['uref']-mul(param['K'],y0-controls['yref'])
-# rhs   = mul(A,y)+mul(B,u)
+# u     = controls['uref']-mtimes(param['K'],y0-controls['yref'])
+# rhs   = mtimes(A,y)+mtimes(B,u)
 
 # cdae = SX.fun('cdae', controldaeIn(x=y, x_major=y0, u=controls, p=param),[rhs])
 

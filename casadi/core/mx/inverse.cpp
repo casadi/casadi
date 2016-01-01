@@ -48,7 +48,7 @@ namespace casadi {
                         std::vector<std::vector<MX> >& fsens) {
     MX inv_X = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = -mul(inv_X, mul(fseed[d][0], inv_X));
+      fsens[d][0] = -mtimes(inv_X, mtimes(fseed[d][0], inv_X));
     }
   }
 
@@ -57,7 +57,7 @@ namespace casadi {
     MX inv_X = shared_from_this<MX>();
     MX trans_inv_X = inv_X.T();
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0] -= mul(trans_inv_X, mul(aseed[d][0], trans_inv_X));
+      asens[d][0] -= mtimes(trans_inv_X, mtimes(aseed[d][0], trans_inv_X));
     }
   }
 

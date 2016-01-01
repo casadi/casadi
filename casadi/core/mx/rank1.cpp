@@ -59,8 +59,8 @@ namespace casadi {
                       std::vector<std::vector<MX> >& asens) {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += bilin(aseed[d][0], dep(2), dep(3));
-      asens[d][2] += dep(1) * mul(aseed[d][0], dep(3));
-      asens[d][3] += dep(1) * mul(aseed[d][0].T(), dep(2));
+      asens[d][2] += dep(1) * mtimes(aseed[d][0], dep(3));
+      asens[d][3] += dep(1) * mtimes(aseed[d][0].T(), dep(2));
       asens[d][0] += aseed[d][0];
     }
   }

@@ -1698,7 +1698,7 @@ namespace casadi {
     // Get expressions for the solution
     ret_out[NLPSOL_X] = w[QPSOL_X];
     ret_out[NLPSOL_F] = w[QPSOL_COST];
-    ret_out[NLPSOL_G] = mul(v.at(2), w[QPSOL_X]) + v.at(3);
+    ret_out[NLPSOL_G] = mtimes(v.at(2), w[QPSOL_X]) + v.at(3);
     ret_out[NLPSOL_LAM_X] = w[QPSOL_LAM_X];
     ret_out[NLPSOL_LAM_G] = w[QPSOL_LAM_A];
     ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());

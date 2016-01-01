@@ -2199,7 +2199,7 @@ class NZproxy:
       return NZproxy(self)
 
     def prod(self,*args):
-        raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
+        raise Exception("'prod' is not supported anymore in CasADi. Use 'mtimes' to do matrix multiplication.")
 
 %}
 %enddef
@@ -2503,11 +2503,11 @@ namespace casadi{
  DECL M %SHOW(veccat)(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M %SHOW(mul)(const M& X, const M& Y) {
- return mul(X, Y);
+ DECL M %SHOW(mtimes)(const M& x, const M& y) {
+ return mtimes(x, y);
  }
- DECL M %SHOW(mul)(const std::vector< M > &args) {
- return mul(args);
+ DECL M %SHOW(mtimes)(const std::vector< M > &args) {
+ return mtimes(args);
  }
  DECL M %SHOW(mac)(const M& X, const M& Y, const M& Z) {
  return mac(X, Y, Z);

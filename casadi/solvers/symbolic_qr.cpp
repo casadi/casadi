@@ -119,7 +119,7 @@ namespace casadi {
     SX bperm = b(rowperm_, ALL);
 
     // Solve the factorized system
-    SX xperm = R.zz_solve(mul(Q.T(), bperm));
+    SX xperm = R.zz_solve(mtimes(Q.T(), bperm));
 
     // Permute back the solution
     SX x = xperm(inv_colperm, ALL);
@@ -147,7 +147,7 @@ namespace casadi {
     bperm = b(colperm_, ALL);
 
     // Solve the factorized system
-    xperm = mul(Q, R.T().zz_solve(bperm));
+    xperm = mtimes(Q, R.T().zz_solve(bperm));
 
     // Permute back the solution
     x = xperm(inv_rowperm, ALL);

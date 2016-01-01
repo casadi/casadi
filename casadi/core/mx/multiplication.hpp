@@ -80,7 +80,7 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_MATMUL;}
+    virtual int op() const { return OP_MTIMES;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 1;}

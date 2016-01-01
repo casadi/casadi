@@ -131,7 +131,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       const MX& B_hat = fseed[d][0];
       const MX& A_hat = fseed[d][1];
-      rhs[d] = tr ? B_hat - mul(A_hat.T(), X) : B_hat - mul(A_hat, X);
+      rhs[d] = tr ? B_hat - mtimes(A_hat.T(), X) : B_hat - mtimes(A_hat, X);
       col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
     rhs = horzsplit(linsol_solve(A, horzcat(rhs), tr), col_offset);

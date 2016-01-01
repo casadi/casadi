@@ -1089,7 +1089,7 @@ namespace casadi {
       // Use element-wise multiplication if at least one factor scalar
       return x*y;
     } else {
-      Matrix<DataType> z = Matrix<DataType>::zeros(mul(x.sparsity(), y.sparsity()));
+      Matrix<DataType> z = Matrix<DataType>::zeros(Sparsity::mtimes(x.sparsity(), y.sparsity()));
       return mac(x, y, z);
     }
   }
@@ -1109,11 +1109,11 @@ namespace casadi {
 
     casadi_assert_message(y.size2()==z.size2(),
                           "Matrix addition with incompatible dimensions. Lhs is "
-                          << mul(*this, y).dim() << " and rhs is " << z.dim() << ".");
+                          << mtimes(*this, y).dim() << " and rhs is " << z.dim() << ".");
 
     casadi_assert_message(size1()==z.size1(),
                           "Matrix addition with incompatible dimensions. Lhs is "
-                          << mul(*this, y).dim() << " and rhs is " << z.dim() << ".");
+                          << mtimes(*this, y).dim() << " and rhs is " << z.dim() << ".");
 
     // Check if we can simplify the product
     if (is_identity()) {
@@ -1126,8 +1126,8 @@ namespace casadi {
       // Carry out the matrix product
       Matrix<DataType> ret = z;
       std::vector<DataType> work(size1());
-      casadi_mul(ptr(), sparsity(), y.ptr(), y.sparsity(),
-                 ret.ptr(), ret.sparsity(), getPtr(work), false);
+      casadi_mtimes(ptr(), sparsity(), y.ptr(), y.sparsity(),
+                    ret.ptr(), ret.sparsity(), getPtr(work), false);
       return ret;
     }
   }
@@ -1687,12 +1687,12 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_sumCols() const {
-    return mul(*this, Matrix<DataType>::ones(size2(), 1));
+    return mtimes(*this, Matrix<DataType>::ones(size2(), 1));
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_sumRows() const {
-    return mul(Matrix<DataType>::ones(1, size1()), *this);
+    return mtimes(Matrix<DataType>::ones(1, size1()), *this);
   }
 
   template<typename DataType>
@@ -1970,7 +1970,7 @@ namespace casadi {
         // Get the j-th column of Q
         Matrix<DataType> qj = Q(ALL, j);
 
-        ri(j, 0) = mul(qi.T(), qj); // Modified Gram-Schmidt
+        ri(j, 0) = mtimes(qi.T(), qj); // Modified Gram-Schmidt
         // ri[j] = dot(qj, ai); // Classical Gram-Schmidt
 
         // Remove projection in direction j
@@ -2018,14 +2018,14 @@ namespace casadi {
       beta = 1-x0/b;
 
       X(Slice(i, n), Slice(i, m)) -=
-        beta*mul(mul(X(Slice(i, n), Slice(i, m)), u.T()), u);
+        beta*mtimes(mtimes(X(Slice(i, n), Slice(i, m)), u.T()), u);
       us.push_back(u);
       betas.push_back(beta);
     }
 
     for (int i=n-1;i>=0;--i) {
       seed(Slice(i, m), Slice(0, m-n)) -=
-        betas[i]*mul(us[i].T(), mul(us[i], seed(Slice(i, m), Slice(0, m-n))));
+        betas[i]*mtimes(us[i].T(), mtimes(us[i], seed(Slice(i, m), Slice(0, m-n))));
     }
 
     return seed;
@@ -2136,7 +2136,7 @@ namespace casadi {
       } else if (size2()<=3) {
 
         // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
-        xperm = mul(inv(Aperm), bperm);
+        xperm = mtimes(inv(Aperm), bperm);
 
       } else {
 
@@ -2145,7 +2145,7 @@ namespace casadi {
         qr(Aperm, Q, R);
 
         // Solve the factorized system (note that solve will now be fast since it is triangular)
-        xperm = solve(R, mul(Q.T(), bperm));
+        xperm = solve(R, mtimes(Q.T(), bperm));
       }
 
       // get the inverted column permutation
@@ -2170,9 +2170,9 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_pinv() const {
     if (size2()>=size1()) {
-      return solve(mul(*this, T()), *this).T();
+      return solve(mtimes(*this, T()), *this).T();
     } else {
-      return solve(mul(this->T(), *this), this->T());
+      return solve(mtimes(this->T(), *this), this->T());
     }
   }
 

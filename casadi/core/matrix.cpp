@@ -64,9 +64,9 @@ namespace casadi {
           const Dict& dict) const {
     const Matrix<double>& A = *this;
     if (A.size1()>=A.size2()) {
-      return solve(mul(A.T(), A), A.T(), lsolver, dict);
+      return solve(mtimes(A.T(), A), A.T(), lsolver, dict);
     } else {
-      return solve(mul(A, A.T()), A, lsolver, dict).T();
+      return solve(mtimes(A, A.T()), A, lsolver, dict).T();
     }
   }
 
@@ -494,7 +494,7 @@ namespace casadi {
       expand(r[el], weights, terms);
 
       // Make a scalar product to get the simplified expression
-      r[el] = mul(terms.T(), weights);
+      r[el] = mtimes(terms.T(), weights);
     }
     return r;
   }

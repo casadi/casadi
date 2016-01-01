@@ -722,7 +722,7 @@ class NLPtests(casadiTestCase):
     x = SX.sym("x",N)
     x0 = DM(range(N))
     H = diag(range(1,N+1))
-    obj = 0.5*mul([(x-x0).T,H,(x-x0)])
+    obj = 0.5*mtimes([(x-x0).T,H,(x-x0)])
 
     nlp = {'x':x, 'f':obj}
     for Solver, solver_options in solvers:
@@ -748,7 +748,7 @@ class NLPtests(casadiTestCase):
     UBX = DM([0.5,inf])
 
     x=SX.sym("x",2)
-    nlp={'x':x, 'f':0.5*mul([x.T,H,x])+mul(G.T,x), 'g':mul(A,x)}
+    nlp={'x':x, 'f':0.5*mtimes([x.T,H,x])+mtimes(G.T,x), 'g':mtimes(A,x)}
 
     for Solver, solver_options in solvers:
       self.message(Solver)
@@ -811,7 +811,7 @@ class NLPtests(casadiTestCase):
     UBX = DM([inf]*2)
 
     x=SX.sym("x",2)
-    nlp={'x':x, 'f':0.5*mul([x.T,H,x])+mul(G.T,x), 'g':mul(A,x)}
+    nlp={'x':x, 'f':0.5*mtimes([x.T,H,x])+mtimes(G.T,x), 'g':mtimes(A,x)}
 
     for Solver, solver_options in solvers:
       self.message(Solver)

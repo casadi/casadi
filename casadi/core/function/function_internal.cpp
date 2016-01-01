@@ -2298,7 +2298,7 @@ namespace casadi {
 
       // Multiply the Jacobian from the right
       MX J = fullJacobian()(arg).at(0);
-      v = horzsplit(mul(J, horzcat(v)));
+      v = horzsplit(mtimes(J, horzcat(v)));
 
       // Vertical offsets
       vector<int> offset(n_out+1, 0);
@@ -2375,7 +2375,7 @@ namespace casadi {
 
       // Multiply the transposed Jacobian from the right
       MX J = fullJacobian()(arg).at(0);
-      v = horzsplit(mul(J.T(), horzcat(v)));
+      v = horzsplit(mtimes(J.T(), horzcat(v)));
 
       // Vertical offsets
       vector<int> offset(n_in+1, 0);

@@ -58,8 +58,8 @@ namespace casadi {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] = rank1(project(asens[d][0], sparsity()),
                           aseed[d][0], dep(1), dep(2));
-      asens[d][1] += aseed[d][0] * mul(dep(0), dep(2));
-      asens[d][2] += aseed[d][0] * mul(dep(0).T(), dep(1));
+      asens[d][1] += aseed[d][0] * mtimes(dep(0), dep(2));
+      asens[d][2] += aseed[d][0] * mtimes(dep(0).T(), dep(1));
     }
   }
 

@@ -548,9 +548,9 @@ namespace casadi {
         << codegen_str_fill_define << endl
         << endl;
       break;
-    case AUX_MUL:
-      this->auxiliaries << codegen_str_mul
-        << codegen_str_mul_define
+    case AUX_MTIMES:
+      this->auxiliaries << codegen_str_mtimes
+        << codegen_str_mtimes_define
         << endl;
       break;
     case AUX_SQ:
@@ -823,13 +823,13 @@ namespace casadi {
     return dlname;
   }
 
-  std::string CodeGenerator::mul(const std::string& x, const Sparsity& sp_x,
-                                  const std::string& y, const Sparsity& sp_y,
-                                  const std::string& z, const Sparsity& sp_z,
-                                  const std::string& w, bool tr) {
-    addAuxiliary(CodeGenerator::AUX_MUL);
+  std::string CodeGenerator::mtimes(const std::string& x, const Sparsity& sp_x,
+                                    const std::string& y, const Sparsity& sp_y,
+                                    const std::string& z, const Sparsity& sp_z,
+                                    const std::string& w, bool tr) {
+    addAuxiliary(CodeGenerator::AUX_MTIMES);
     stringstream s;
-    s << "mul(" << x << ", " << sparsity(sp_x) << ", " << y << ", " << sparsity(sp_y) << ", "
+    s << "mtimes(" << x << ", " << sparsity(sp_x) << ", " << y << ", " << sparsity(sp_y) << ", "
       << z << ", " << sparsity(sp_z) << ", " << w << ", " <<  (tr ? "1" : "0") << ");";
     return s.str();
   }
