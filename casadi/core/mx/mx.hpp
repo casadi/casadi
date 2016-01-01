@@ -418,7 +418,6 @@ namespace casadi {
     static MX simplify(const MX& x);
     MX zz_mpower(const MX& b) const;
     static MX dot(const MX& x, const MX& y);
-    MX zz_outer_prod(const MX& y) const;
     MX zz_mrdivide(const MX& b) const;
     MX zz_mldivide(const MX& b) const;
     MX zz_norm_2() const;

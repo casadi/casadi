@@ -429,7 +429,6 @@ namespace casadi {
     Matrix<DataType> zz_sumCols() const;
     Matrix<DataType> zz_sumRows() const;
     static Matrix<DataType> dot(const Matrix<DataType> &x, const Matrix<DataType> &y);
-    Matrix<DataType> zz_outer_prod(const Matrix<DataType> &y) const;
     Matrix<DataType> zz_nullspace() const;
     Matrix<DataType> zz_diag() const;
     Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;

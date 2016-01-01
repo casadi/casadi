@@ -65,7 +65,7 @@ print a.T*b.T
 #! ------------------------------
 X = MX(DM([[1,2,3],[4,5,6]]))
 print X
-print outer_prod(X,X)
+print mul(X,X.T)
 print MX(DM([1,2,3]).T)
 print MX([1,2,3])
 #! As before, evaluation is lazy on the matrix level

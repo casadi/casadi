@@ -617,10 +617,6 @@ namespace casadi {
     return x->getDot(y);
   }
 
-  MX MX::zz_outer_prod(const MX& y) const {
-    return mul(*this, y.T());
-  }
-
   MX MX::printme(const MX& b) const {
     return binary(OP_PRINTME, *this, b);
   }

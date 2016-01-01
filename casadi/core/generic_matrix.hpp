@@ -274,7 +274,7 @@ namespace casadi {
 
     ///@{
     /** \brief Make a rank-1 update to a matrix A
-     * Calculates A + 1/2 * alpha * outer_prod(x, x)
+     * Calculates A + 1/2 * alpha * x*y'
      */
     inline friend MatType rank1(const MatType &A, const MatType &alpha,
                                 const MatType &x, const MatType &y) {
@@ -342,17 +342,6 @@ namespace casadi {
     */
     inline friend MatType dot(const MatType &x, const MatType &y) {
       return MatType::dot(x, y);
-    }
-
-    /** \brief  Take the outer product of two vectors
-        Equals
-        \code
-        x*y.T()
-        \endcode
-        with x and y vectors
-    */
-    inline friend MatType outer_prod(const MatType &x, const MatType &y) {
-      return x.zz_outer_prod(y);
     }
 
     /** \brief Computes the nullspace of a matrix A

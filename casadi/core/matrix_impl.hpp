@@ -1903,11 +1903,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_outer_prod(const Matrix<DataType> &y) const {
-    return mul(*this, y.T());
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::zz_all() const {
     if (!is_dense()) return false;
     DataType ret=1;
