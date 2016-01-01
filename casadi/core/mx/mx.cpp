@@ -956,59 +956,59 @@ namespace casadi {
     }
   }
 
-  std::vector<MX> MX::zz_horzsplit(const std::vector<int>& offset) const {
+  std::vector<MX> MX::horzsplit(const MX& x, const std::vector<int>& offset) {
     // Consistency check
     casadi_assert(offset.size()>=1);
     casadi_assert(offset.front()==0);
-    casadi_assert(offset.back()==size2());
+    casadi_assert(offset.back()==x.size2());
     casadi_assert(isMonotone(offset));
 
     // Trivial return if possible
     if (offset.size()==1) {
       return vector<MX>(0);
     } else if (offset.size()==2) {
-      return vector<MX>(1, *this);
+      return vector<MX>(1, x);
     } else {
-      return (*this)->getHorzsplit(offset);
+      return x->getHorzsplit(offset);
     }
   }
 
-  std::vector<MX> MX::zz_diagsplit(const std::vector<int>& offset1,
-                                   const std::vector<int>& offset2) const {
+  std::vector<MX> MX::diagsplit(const MX& x, const std::vector<int>& offset1,
+                                const std::vector<int>& offset2) {
     // Consistency check
     casadi_assert(offset1.size()>=1);
     casadi_assert(offset1.front()==0);
-    casadi_assert(offset1.back()==size1());
+    casadi_assert(offset1.back()==x.size1());
     casadi_assert(isMonotone(offset1));
 
     // Consistency check
     casadi_assert(offset2.size()>=1);
     casadi_assert(offset2.front()==0);
-    casadi_assert(offset2.back()==size2());
+    casadi_assert(offset2.back()==x.size2());
     casadi_assert(isMonotone(offset2));
 
-    return (*this)->get_diagsplit(offset1, offset2);
+    return x->get_diagsplit(offset1, offset2);
   }
 
-  std::vector<MX> MX::zz_vertsplit(const std::vector<int>& offset) const {
-    if (is_column()) {
+  std::vector<MX> MX::vertsplit(const MX& x, const std::vector<int>& offset) {
+    if (x.is_column()) {
       // Consistency check
       casadi_assert(offset.size()>=1);
       casadi_assert(offset.front()==0);
-      casadi_assert(offset.back()==size1());
+      casadi_assert(offset.back()==x.size1());
       casadi_assert(isMonotone(offset));
 
       // Trivial return if possible
       if (offset.size()==1) {
         return vector<MX>();
       } else if (offset.size()==2) {
-        return vector<MX>(1, *this);
+        return vector<MX>(1, x);
       } else {
-        return (*this)->getVertsplit(offset);
+        return x->getVertsplit(offset);
       }
     } else {
-      std::vector<MX> ret = horzsplit(T(), offset);
-      for (std::vector<MX>::iterator it=ret.begin(); it!=ret.end(); ++it) *it = it->T();
+      std::vector<MX> ret = horzsplit(x.T(), offset);
+      for (auto&& e : ret) e = e.T();
       return ret;
     }
   }

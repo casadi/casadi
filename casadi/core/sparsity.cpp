@@ -1200,22 +1200,22 @@ namespace casadi {
     return Sparsity(m, n, colind, row);
   }
 
-  std::vector<Sparsity> Sparsity::zz_horzsplit(const std::vector<int>& offset) const {
+  std::vector<Sparsity> Sparsity::horzsplit(const Sparsity& x, const std::vector<int>& offset) {
     // Consistency check
     casadi_assert(offset.size()>=1);
     casadi_assert(offset.front()==0);
-    casadi_assert_message(offset.back()==size2(),
+    casadi_assert_message(offset.back()==x.size2(),
                           "horzsplit(Sparsity, std::vector<int>): Last elements of offset "
                           "(" << offset.back() << ") must equal the number of columns "
-                          "(" << size2() << ")");
+                          "(" << x.size2() << ")");
     casadi_assert(isMonotone(offset));
 
     // Number of outputs
     int n = offset.size()-1;
 
     // Get the sparsity of the input
-    const int* colind_x = colind();
-    const int* row_x = row();
+    const int* colind_x = x.colind();
+    const int* row_x = x.row();
 
     // Allocate result
     std::vector<Sparsity> ret;
@@ -1223,7 +1223,7 @@ namespace casadi {
 
     // Sparsity pattern as CCS vectors
     vector<int> colind, row;
-    int ncol, nrow = size1();
+    int ncol, nrow = x.size1();
 
     // Get the sparsity patterns of the outputs
     for (int i=0; i<n; ++i) {
@@ -1247,8 +1247,8 @@ namespace casadi {
     return ret;
   }
 
-  std::vector<Sparsity> Sparsity::zz_vertsplit(const std::vector<int>& offset) const {
-    std::vector<Sparsity> ret = horzsplit(T(), offset);
+  std::vector<Sparsity> Sparsity::vertsplit(const Sparsity& x, const std::vector<int>& offset) {
+    std::vector<Sparsity> ret = horzsplit(x.T(), offset);
     for (std::vector<Sparsity>::iterator it=ret.begin(); it!=ret.end(); ++it) {
       *it = it->T();
     }
@@ -1266,19 +1266,19 @@ namespace casadi {
     return Sparsity::dense(nnz());
   }
 
-  std::vector<Sparsity> Sparsity::zz_diagsplit(const std::vector<int>& offset1,
-                                               const std::vector<int>& offset2) const {
+  std::vector<Sparsity> Sparsity::diagsplit(const Sparsity& x, const std::vector<int>& offset1,
+                                            const std::vector<int>& offset2) {
     // Consistency check
     casadi_assert(offset1.size()>=1);
     casadi_assert(offset1.front()==0);
-    casadi_assert_message(offset1.back()==size1(),
+    casadi_assert_message(offset1.back()==x.size1(),
                           "diagsplit(Sparsity, offset1, offset2): Last elements of offset1 "
                           "(" << offset1.back() << ") must equal the number of rows "
-                          "(" << size1() << ")");
-    casadi_assert_message(offset2.back()==size2(),
+                          "(" << x.size1() << ")");
+    casadi_assert_message(offset2.back()==x.size2(),
                           "diagsplit(Sparsity, offset1, offset2): Last elements of offset2 "
                           "(" << offset2.back() << ") must equal the number of rows "
-                          "(" << size2() << ")");
+                          "(" << x.size2() << ")");
     casadi_assert(isMonotone(offset1));
     casadi_assert(isMonotone(offset2));
     casadi_assert(offset1.size()==offset2.size());
@@ -1290,11 +1290,11 @@ namespace casadi {
     std::vector<Sparsity> ret;
 
     // Caveat: this is a very silly implementation
-    IM x = IM::zeros(*this);
+    IM x2 = IM::zeros(x);
 
-    for (int i=0;i<n;++i) {
-      ret.push_back(x(Slice(offset1[i], offset1[i+1]),
-                      Slice(offset2[i], offset2[i+1])).sparsity());
+    for (int i=0; i<n; ++i) {
+      ret.push_back(x2(Slice(offset1[i], offset1[i+1]),
+                       Slice(offset2[i], offset2[i+1])).sparsity());
     }
 
     return ret;

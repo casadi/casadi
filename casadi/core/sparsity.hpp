@@ -100,9 +100,9 @@ namespace casadi {
     typedef SparsityInterface<Sparsity> B;
 
     /// Expose base class functions
-    using B::zz_horzsplit;
-    using B::zz_diagsplit;
-    using B::zz_vertsplit;
+    using B::horzsplit;
+    using B::diagsplit;
+    using B::vertsplit;
 #endif
 
     /** \brief Create a scalar sparsity pattern **/
@@ -448,10 +448,14 @@ namespace casadi {
     static Sparsity vertcat(const std::vector<Sparsity> & sp);
     static Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
     static Sparsity diagcat(const std::vector< Sparsity > &v);
-    std::vector<Sparsity> zz_horzsplit(const std::vector<int>& output_offset) const;
-    std::vector<Sparsity> zz_vertsplit(const std::vector<int>& output_offset) const;
-    std::vector<Sparsity> zz_diagsplit(const std::vector<int>& offset1,
-                                       const std::vector<int>& offset2) const;
+    static std::vector<Sparsity>
+      horzsplit(const Sparsity& x, const std::vector<int>& output_offset);
+    static std::vector<Sparsity>
+      vertsplit(const Sparsity& x, const std::vector<int>& output_offset);
+    static std::vector<Sparsity>
+      diagsplit(const Sparsity& x,
+                const std::vector<int>& offset1,
+                const std::vector<int>& offset2);
     Sparsity zz_mtimes(const Sparsity& y) const;
     Sparsity zz_mac(const Sparsity& Y, const Sparsity& Z) const { return Z;}
     Sparsity zz_vecNZ() const;

@@ -1818,16 +1818,16 @@ namespace casadi {
 
   template<typename DataType>
   std::vector<Matrix<DataType> >
-  Matrix<DataType>::zz_horzsplit(const std::vector<int>& offset) const {
+  Matrix<DataType>::horzsplit(const Matrix<DataType>& x, const std::vector<int>& offset) {
     // Split up the sparsity pattern
-    std::vector<Sparsity> sp = horzsplit(sparsity(), offset);
+    std::vector<Sparsity> sp = Sparsity::horzsplit(x.sparsity(), offset);
 
     // Return object
     std::vector<Matrix<DataType> > ret;
     ret.reserve(sp.size());
 
     // Copy data
-    auto i=data_.begin();
+    auto i=x.data().begin();
     for (auto&& j : sp) {
       auto i_next = i + j.nnz();
       ret.push_back(Matrix<DataType>(j, std::vector<DataType>(i, i_next), false));
@@ -1835,7 +1835,7 @@ namespace casadi {
     }
 
     // Return the assembled matrix
-    casadi_assert(i==data_.end());
+    casadi_assert(i==x.data().end());
     return ret;
   }
 
@@ -1848,29 +1848,26 @@ namespace casadi {
 
   template<typename DataType>
   std::vector< Matrix<DataType> >
-  Matrix<DataType>::zz_vertsplit(const std::vector<int>& offset) const {
-    std::vector< Matrix<DataType> > ret = horzsplit(this->T(), offset);
-    for (typename std::vector< Matrix<DataType> >::iterator it=ret.begin();
-         it!=ret.end(); ++it) {
-      *it = it->T();
-    }
+  Matrix<DataType>::vertsplit(const Matrix<DataType>& x, const std::vector<int>& offset) {
+    std::vector< Matrix<DataType> > ret = horzsplit(x.T(), offset);
+    for (auto&& e : ret) e = e.T();
     return ret;
   }
 
   template<typename DataType>
   std::vector< Matrix<DataType> >
-  Matrix<DataType>::zz_diagsplit(const std::vector<int>& offset1,
-                                 const std::vector<int>& offset2) const {
+  Matrix<DataType>::diagsplit(const Matrix<DataType>& x, const std::vector<int>& offset1,
+                              const std::vector<int>& offset2) {
     // Consistency check
     casadi_assert(offset1.size()>=1);
     casadi_assert(offset1.front()==0);
-    casadi_assert(offset1.back()==size1());
+    casadi_assert(offset1.back()==x.size1());
     casadi_assert(isMonotone(offset1));
 
     // Consistency check
     casadi_assert(offset2.size()>=1);
     casadi_assert(offset2.front()==0);
-    casadi_assert(offset2.back()==size2());
+    casadi_assert(offset2.back()==x.size2());
     casadi_assert(isMonotone(offset2));
 
     // Number of outputs
@@ -1881,7 +1878,7 @@ namespace casadi {
 
     // Caveat: this is a very silly implementation
     for (int i=0; i<n; ++i) {
-      ret.push_back((*this)(Slice(offset1[i], offset1[i+1]), Slice(offset2[i], offset2[i+1])));
+      ret.push_back(x(Slice(offset1[i], offset1[i+1]), Slice(offset2[i], offset2[i+1])));
     }
 
     return ret;

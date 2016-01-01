@@ -124,9 +124,9 @@ namespace casadi {
     typedef GenericMatrix<MX> B;
 
     /// Expose base class functions
-    using B::zz_horzsplit;
-    using B::zz_diagsplit;
-    using B::zz_vertsplit;
+    using B::horzsplit;
+    using B::diagsplit;
+    using B::vertsplit;
 #endif // SWIG
 
     /// Returns the truth value of an MX expression
@@ -399,10 +399,10 @@ namespace casadi {
     static MX horzcat(const std::vector<MX>& x);
     static MX diagcat(const std::vector<MX>& x);
     static MX vertcat(const std::vector<MX>& x);
-    std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
-    std::vector<MX> zz_diagsplit(const std::vector<int>& offset1,
-                                 const std::vector<int>& offset2) const;
-    std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
+    static std::vector<MX> horzsplit(const MX& x, const std::vector<int>& offset);
+    static std::vector<MX> diagsplit(const MX& x, const std::vector<int>& offset1,
+                                     const std::vector<int>& offset2);
+    static std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset);
     static MX blockcat(const std::vector< std::vector<MX > > &v);
     MX zz_mtimes(const MX& y) const;
     MX zz_mac(const MX& y, const MX& z) const;

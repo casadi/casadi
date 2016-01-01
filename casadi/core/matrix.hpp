@@ -182,9 +182,9 @@ namespace casadi {
     using B::ones;
     using B::operator[];
     using B::operator();
-    using B::zz_horzsplit;
-    using B::zz_vertsplit;
-    using B::zz_diagsplit;
+    using B::horzsplit;
+    using B::vertsplit;
+    using B::diagsplit;
 
     /// Get a non-zero element
     inline const DataType& at(int k) const {
@@ -442,11 +442,17 @@ namespace casadi {
     /// Functions called by friend functions defined for SparsityInterface
     static Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
     static Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
-    std::vector<Matrix<DataType> > zz_horzsplit(const std::vector<int>& offset) const;
+    static std::vector<Matrix<DataType> >
+      horzsplit(const Matrix<DataType>& x,
+                const std::vector<int>& offset);
     static Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
-    std::vector< Matrix<DataType> > zz_vertsplit(const std::vector<int>& offset) const;
-    std::vector< Matrix<DataType> > zz_diagsplit(const std::vector<int>& offset1,
-                                                 const std::vector<int>& offset2) const;
+    static std::vector< Matrix<DataType> >
+      vertsplit(const Matrix<DataType>& x,
+                const std::vector<int>& offset);
+    static std::vector< Matrix<DataType> >
+      diagsplit(const Matrix<DataType>& x,
+                const std::vector<int>& offset1,
+                const std::vector<int>& offset2);
     Matrix<DataType> zz_reshape(int nrow, int ncol) const;
     Matrix<DataType> zz_reshape(const Sparsity& sp) const;
     Matrix<DataType> zz_vecNZ() const;
