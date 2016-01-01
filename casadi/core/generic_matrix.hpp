@@ -172,13 +172,15 @@ namespace casadi {
     /// \cond CLUTTER
     /**  @{  */
     /** \brief Accessed by friend functions */
-    int zz_sprank() const { return sprank(sparsity());}
-    int zz_norm_0_mul(const MatType &A) const { return norm_0_mul(sparsity(), A.sparsity());}
-    MatType zz_tril(bool includeDiagonal=true) const {
-      return project(self(), tril(sparsity(), includeDiagonal));
+    static int sprank(const MatType &x) { return Sparsity::sprank(x.sparsity());}
+    static int norm_0_mul(const MatType &x, const MatType &y) {
+      return Sparsity::norm_0_mul(x.sparsity(), y.sparsity());
     }
-    MatType zz_triu(bool includeDiagonal=true) const {
-      return project(self(), triu(sparsity(), includeDiagonal));
+    static MatType tril(const MatType &x, bool includeDiagonal=true) {
+      return project(x, Sparsity::tril(x.sparsity(), includeDiagonal));
+    }
+    static MatType triu(const MatType &x, bool includeDiagonal=true) {
+      return project(x, Sparsity::triu(x.sparsity(), includeDiagonal));
     }
     MatType zz_sum_square() const { return dot(self(), self());}
     MatType zz_linspace(const MatType &b, int nsteps) const;

@@ -590,26 +590,26 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_mac(const MX& y, const MX& z) const {
-    if (is_scalar() || y.is_scalar()) {
+  MX MX::mac(const MX& x, const MX& y, const MX& z) {
+    if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
-      return z + *this*y;
+      return z + x*y;
     }
 
     // Check matching dimensions
-    casadi_assert_message(size2()==y.size1(),
+    casadi_assert_message(x.size2()==y.size1(),
                           "Matrix product with incompatible dimensions. Lhs is "
-                          << dim() << " and rhs is " << y.dim() << ".");
+                          << x.dim() << " and rhs is " << y.dim() << ".");
 
     // Check if we can simplify the product
-    if (is_identity()) {
+    if (x.is_identity()) {
       return y + z;
     } else if (y.is_identity()) {
-      return *this + z;
-    } else if (is_zero() || y.is_zero()) {
+      return x + z;
+    } else if (x.is_zero() || y.is_zero()) {
       return z;
     } else {
-      return (*this)->getMultiplication(y, z);
+      return x->getMultiplication(y, z);
     }
   }
 
@@ -740,7 +740,7 @@ namespace casadi {
     } else if (val->is_zero()) {
       return project(*this, Sparsity::dense(size()));
     } else {
-      MX ret = repmat(val, size());
+      MX ret = MX::repmat(val, size());
       ret(sparsity()) = *this;
       return ret;
     }
@@ -1060,22 +1060,22 @@ namespace casadi {
     return ret;
   }
 
-  MX MX::zz_reshape(int nrow, int ncol) const {
-    if (nrow==size1() && ncol==size2())
-      return *this;
+  MX MX::reshape(const MX& x, int nrow, int ncol) {
+    if (nrow==x.size1() && ncol==x.size2())
+      return x;
     else
-      return reshape(*this, reshape(sparsity(), nrow, ncol));
+      return reshape(x, Sparsity::reshape(x.sparsity(), nrow, ncol));
   }
 
-  MX MX::zz_reshape(const Sparsity& sp) const {
-    return (*this)->getReshape(sp);
+  MX MX::reshape(const MX& x, const Sparsity& sp) {
+    return x->getReshape(sp);
   }
 
-  MX MX::zz_vecNZ() const {
-    if (is_dense()) {
-      return vec(*this);
+  MX MX::vecNZ(const MX& x) {
+    if (x.is_dense()) {
+      return vec(x);
     } else {
-      return (*this)->getGetNonzeros(Sparsity::dense(nnz(), 1), range(nnz()));
+      return x->getGetNonzeros(Sparsity::dense(x.nnz(), 1), range(x.nnz()));
     }
   }
 
@@ -1615,23 +1615,23 @@ namespace casadi {
     return s(graph_substitute(v, syms, boundary), true);
   }
 
-  MX MX::zz_kron(const MX& b) const {
-    const Sparsity &a_sp = sparsity();
+  MX MX::kron(const MX& a, const MX& b) {
+    const Sparsity &a_sp = a.sparsity();
     MX filler(b.size());
-    std::vector< std::vector< MX > > blocks(size1(), std::vector< MX >(size2(), filler));
-    for (int i=0; i<size1(); ++i) {
-      for (int j=0; j<size2(); ++j) {
+    std::vector< std::vector< MX > > blocks(a.size1(), std::vector< MX >(a.size2(), filler));
+    for (int i=0; i<a.size1(); ++i) {
+      for (int j=0; j<a.size2(); ++j) {
         int k = a_sp.getNZ(i, j);
         if (k!=-1) {
-          blocks[i][j] = (*this)[k]*b;
+          blocks[i][j] = a[k]*b;
         }
       }
     }
     return blockcat(blocks);
   }
 
-  MX MX::zz_repmat(int n, int m) const {
-    return (*this)->getRepmat(n, m);
+  MX MX::repmat(const MX& x, int n, int m) {
+    return x->getRepmat(n, m);
   }
 
   MX MX::zz_repsum(int n, int m) const {

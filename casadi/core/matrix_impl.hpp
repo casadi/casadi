@@ -1095,38 +1095,39 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_mac(const Matrix<DataType> &y,
-                                            const Matrix<DataType> &z) const {
-    if (is_scalar() || y.is_scalar()) {
+  Matrix<DataType> Matrix<DataType>::mac(const Matrix<DataType> &x,
+                                         const Matrix<DataType> &y,
+                                         const Matrix<DataType> &z) {
+    if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
-      return z + *this*y;
+      return z + x*y;
     }
 
     // Check matching dimensions
-    casadi_assert_message(size2()==y.size1(),
+    casadi_assert_message(x.size2()==y.size1(),
                           "Matrix product with incompatible dimensions. Lhs is "
-                          << dim() << " and rhs is " << y.dim() << ".");
+                          << x.dim() << " and rhs is " << y.dim() << ".");
 
     casadi_assert_message(y.size2()==z.size2(),
                           "Matrix addition with incompatible dimensions. Lhs is "
-                          << mtimes(*this, y).dim() << " and rhs is " << z.dim() << ".");
+                          << mtimes(x, y).dim() << " and rhs is " << z.dim() << ".");
 
-    casadi_assert_message(size1()==z.size1(),
+    casadi_assert_message(x.size1()==z.size1(),
                           "Matrix addition with incompatible dimensions. Lhs is "
-                          << mtimes(*this, y).dim() << " and rhs is " << z.dim() << ".");
+                          << mtimes(x, y).dim() << " and rhs is " << z.dim() << ".");
 
     // Check if we can simplify the product
-    if (is_identity()) {
+    if (x.is_identity()) {
       return y + z;
     } else if (y.is_identity()) {
-      return *this + z;
-    } else if (is_zero() || y.is_zero()) {
+      return x + z;
+    } else if (x.is_zero() || y.is_zero()) {
       return z;
     } else {
       // Carry out the matrix product
       Matrix<DataType> ret = z;
-      std::vector<DataType> work(size1());
-      casadi_mtimes(ptr(), sparsity(), y.ptr(), y.sparsity(),
+      std::vector<DataType> work(x.size1());
+      casadi_mtimes(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
                     ret.ptr(), ret.sparsity(), getPtr(work), false);
       return ret;
     }
@@ -1760,20 +1761,20 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_reshape(int nrow, int ncol) const {
-    Sparsity sp = reshape(sparsity(), nrow, ncol);
-    return Matrix<DataType>(sp, data(), false);
+  Matrix<DataType> Matrix<DataType>::reshape(const Matrix<DataType>& x, int nrow, int ncol) {
+    Sparsity sp = Sparsity::reshape(x.sparsity(), nrow, ncol);
+    return Matrix<DataType>(sp, x.data(), false);
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_reshape(const Sparsity& sp) const {
+  Matrix<DataType> Matrix<DataType>::reshape(const Matrix<DataType>& x, const Sparsity& sp) {
     // quick return if already the right shape
-    if (sp==sparsity()) return *this;
+    if (sp==x.sparsity()) return x;
 
     // make sure that the patterns match
-    casadi_assert(sp.isReshape(sparsity()));
+    casadi_assert(sp.isReshape(x.sparsity()));
 
-    return Matrix<DataType>(sp, data(), false);
+    return Matrix<DataType>(sp, x.data(), false);
   }
 
   template<typename DataType>
@@ -1787,8 +1788,8 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_vecNZ() const {
-    return Matrix<DataType>(data());
+  Matrix<DataType> Matrix<DataType>::vecNZ(const Matrix<DataType>& x) {
+    return Matrix<DataType>(x.data());
   }
 
   template<typename DataType>
@@ -2184,16 +2185,16 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_kron(const Matrix<DataType>& b) const {
-    const Sparsity &a_sp = sparsity();
+  Matrix<DataType> Matrix<DataType>::kron(const Matrix<DataType>& a, const Matrix<DataType>& b) {
+    const Sparsity &a_sp = a.sparsity();
     Matrix<DataType> filler = Matrix<DataType>(b.size());
     std::vector< std::vector< Matrix<DataType> > >
-      blocks(size1(), std::vector< Matrix<DataType> >(size2(), filler));
-    for (int i=0;i<size1();++i) {
-      for (int j=0;j<size2();++j) {
+      blocks(a.size1(), std::vector< Matrix<DataType> >(a.size2(), filler));
+    for (int i=0; i<a.size1(); ++i) {
+      for (int j=0; j<a.size2(); ++j) {
         int k = a_sp.getNZ(i, j);
         if (k!=-1) {
-          blocks[i][j] = (*this)[k]*b;
+          blocks[i][j] = a[k]*b;
         }
       }
     }

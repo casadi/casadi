@@ -217,13 +217,13 @@ namespace casadi {
     return (*this)->getNZ(rr, cc);
   }
 
-  Sparsity Sparsity::zz_reshape(const Sparsity& sp) const {
-    casadi_assert(isReshape(sp));
+  Sparsity Sparsity::reshape(const Sparsity& x, const Sparsity& sp) {
+    casadi_assert(x.isReshape(sp));
     return sp;
   }
 
-  Sparsity Sparsity::zz_reshape(int nrow, int ncol) const {
-    return (*this)->zz_reshape(nrow, ncol);
+  Sparsity Sparsity::reshape(const Sparsity& x, int nrow, int ncol) {
+    return x->zz_reshape(nrow, ncol);
   }
 
   std::vector<int> Sparsity::getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const {
@@ -727,12 +727,12 @@ namespace casadi {
     }
   }
 
-  Sparsity Sparsity::zz_tril(bool includeDiagonal) const {
-    return (*this)->zz_tril(includeDiagonal);
+  Sparsity Sparsity::tril(const Sparsity& x, bool includeDiagonal) {
+    return x->zz_tril(includeDiagonal);
   }
 
-  Sparsity Sparsity::zz_triu(bool includeDiagonal) const {
-    return (*this)->zz_triu(includeDiagonal);
+  Sparsity Sparsity::triu(const Sparsity& x, bool includeDiagonal) {
+    return x->zz_triu(includeDiagonal);
   }
 
   std::vector<int> Sparsity::get_lower() const {
@@ -1115,14 +1115,13 @@ namespace casadi {
     return Sparsity::triplet(ret_nrow, ret_ncol, ret_row, ret_col);
   }
 
-  Sparsity Sparsity::zz_kron(const Sparsity& b) const {
-    const Sparsity &a_sp = (*this);
+  Sparsity Sparsity::kron(const Sparsity& a, const Sparsity& b) {
     Sparsity filler = Sparsity(b.size());
     std::vector< std::vector< Sparsity > >
-      blocks(size1(), std::vector< Sparsity >(size2(), filler));
-    for (int i=0;i<size1();++i) {
-      for (int j=0;j<size2();++j) {
-        int k = a_sp.getNZ(i, j);
+      blocks(a.size1(), std::vector< Sparsity >(a.size2(), filler));
+    for (int i=0; i<a.size1(); ++i) {
+      for (int j=0; j<a.size2(); ++j) {
+        int k = a.getNZ(i, j);
         if (k!=-1) {
           blocks[i][j] = b;
         }
@@ -1262,8 +1261,8 @@ namespace casadi {
     return vertcat(ret);
   }
 
-  Sparsity Sparsity::zz_vecNZ() const {
-    return Sparsity::dense(nnz());
+  Sparsity Sparsity::vecNZ(const Sparsity& x) {
+    return Sparsity::dense(x.nnz());
   }
 
   std::vector<Sparsity> Sparsity::diagsplit(const Sparsity& x, const std::vector<int>& offset1,
@@ -1300,9 +1299,9 @@ namespace casadi {
     return ret;
   }
 
-  int Sparsity::zz_sprank() const {
+  int Sparsity::sprank(const Sparsity& x) {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    x.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
     return coarse_colblock.at(3);
   }
 
@@ -1310,13 +1309,13 @@ namespace casadi {
     return &(*this)->sp().front();
   }
 
-  int Sparsity::zz_norm_0_mul(const Sparsity& A) const {
+  int Sparsity::norm_0_mul(const Sparsity& x, const Sparsity& A) {
     // Implementation borrowed from Scipy's sparsetools/csr.h
-    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dim()
+    casadi_assert_message(A.size1()==x.size2(), "Dimension error. Got " << x.dim()
                           << " times " << A.dim() << ".");
 
     int n_row = A.size2();
-    int n_col = size1();
+    int n_col = x.size1();
 
     // Allocate work vectors
     std::vector<bool> Bwork(n_col);
@@ -1324,8 +1323,8 @@ namespace casadi {
 
     const int* Aj = A.row();
     const int* Ap = A.colind();
-    const int* Bj = row();
-    const int* Bp = colind();
+    const int* Bj = x.row();
+    const int* Bp = x.colind();
     int *Cp = getPtr(Iwork);
     int *mask = Cp+n_row+1;
 

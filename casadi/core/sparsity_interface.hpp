@@ -165,10 +165,10 @@ namespace casadi {
                  const std::vector<int>& horz_offset);
     static std::vector< std::vector< MatType > >
       blocksplit(const MatType& x, int vert_incr, int horz_incr);
-    static MatType zz_veccat(const std::vector< MatType >& x);
-    MatType zz_vec() const;
-    MatType zz_repmat(int n, int m=1) const;
-    static std::vector<int> zz_offset(const std::vector< MatType > &v, bool vert=true);
+    static MatType veccat(const std::vector< MatType >& x);
+    static MatType vec(const MatType& x);
+    static MatType repmat(const MatType& x, int n, int m=1);
+    static std::vector<int> offset(const std::vector< MatType > &v, bool vert=true);
     static std::vector< MatType > diagsplit(const MatType& x,
                                             const std::vector<int>& output_offset);
     static std::vector< MatType > diagsplit(const MatType& x, int incr);
@@ -176,6 +176,9 @@ namespace casadi {
     static MatType mtimes(const std::vector<MatType> &args);
     static std::vector<MatType > horzsplit(const MatType& x, int incr);
     static std::vector<MatType > vertsplit(const MatType& x, int incr);
+    static MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
+      return MatType::repmat(A, rc.first, rc.second);
+    }
     /// \endcond
 #endif
 
@@ -240,7 +243,7 @@ namespace casadi {
     /** \brief Helper function, get offsets corresponding to a vector of matrices
      */
     inline friend std::vector<int > offset(const std::vector<MatType> &v, bool vert=true) {
-      return MatType::zz_offset(v, vert);
+      return MatType::offset(v, vert);
     }
 
     /** \brief  split vertically, retaining fixed-sized groups of rows
@@ -367,7 +370,7 @@ namespace casadi {
     /** \brief  concatenate vertically while vectorizing all arguments with vec
      */
     inline friend MatType veccat(const std::vector< MatType >& x) {
-      return MatType::zz_veccat(x);
+      return MatType::veccat(x);
     }
 
     /** \brief Matrix product of two matrices
@@ -383,14 +386,14 @@ namespace casadi {
     }
 
     /** \brief Multiply-accumulate operation
-        Matrix product of two matrices (X and Y), adding the result to
-        a third matrix Z. The result has the same sparsity pattern as
-        C meaning that other entries of (X*Y) are ignored.
-        The operation is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
+        Matrix product of two matrices (x and y), adding the result to
+        a third matrix z. The result has the same sparsity pattern as
+        C meaning that other entries of (x*y) are ignored.
+        The operation is equivalent to: z+mtimes(x,y).project(z.sparsity()).
     */
     inline friend MatType
-      mac(const MatType &X, const MatType &Y, const MatType &Z) {
-      return X.zz_mac(Y, Z);
+      mac(const MatType &x, const MatType &y, const MatType &z) {
+      return MatType::mac(x, y, z);
     }
 
     /** \brief Transpose
@@ -414,56 +417,56 @@ namespace casadi {
         c \n
         d \n
     */
-    inline friend MatType vec(const MatType& a) {
-      return a.zz_vec();
+    inline friend MatType vec(const MatType& x) {
+      return MatType::vec(x);
     }
 
     /** \brief Returns a flattened version of the matrix, preserving only nonzeros
      */
-    inline friend MatType vecNZ(const MatType& a) {
-      return a.zz_vecNZ();
+    inline friend MatType vecNZ(const MatType& x) {
+      return MatType::vecNZ(x);
     }
 
     /** \brief Returns a reshaped version of the matrix
      */
-    inline friend MatType reshape(const MatType& a, int nrow, int ncol) {
-      return a.zz_reshape(nrow, ncol);
+    inline friend MatType reshape(const MatType& x, int nrow, int ncol) {
+      return MatType::reshape(x, nrow, ncol);
     }
 
     /** \brief Returns a reshaped version of the matrix, dimensions as a vector
     */
-    inline friend MatType reshape(const MatType& a, std::pair<int, int> rc) {
-      return reshape(a, rc.first, rc.second);
+    inline friend MatType reshape(const MatType& x, std::pair<int, int> rc) {
+      return MatType::reshape(x, rc.first, rc.second);
     }
 
     /** \brief Reshape the matrix
     */
-    inline friend MatType reshape(const MatType& a, const Sparsity& sp) {
-      return a.zz_reshape(sp);
+    inline friend MatType reshape(const MatType& x, const Sparsity& sp) {
+      return MatType::reshape(x, sp);
     }
 
     /** \brief Obtain the structural rank of a sparsity-pattern
     */
-    inline friend int sprank(const MatType& A) {
-      return A.zz_sprank();
+    inline friend int sprank(const MatType& x) {
+      return MatType::sprank(x);
     }
 
     /** \brief 0-norm (nonzero count) of a Matrix-matrix product
     */
     inline friend int norm_0_mul(const MatType &x, const MatType &y) {
-      return x.zz_norm_0_mul(y);
+      return MatType::norm_0_mul(x, y);
     }
 
     /** \brief Get the upper triangular part of a matrix
     */
-    inline friend MatType triu(const MatType& a, bool includeDiagonal=true) {
-      return a.zz_triu(includeDiagonal);
+    inline friend MatType triu(const MatType& x, bool includeDiagonal=true) {
+      return MatType::triu(x, includeDiagonal);
     }
 
     /** \brief Get the lower triangular part of a matrix
     */
-    inline friend MatType tril(const MatType& a, bool includeDiagonal=true) {
-      return a.zz_tril(includeDiagonal);
+    inline friend MatType tril(const MatType& x, bool includeDiagonal=true) {
+      return MatType::tril(x, includeDiagonal);
     }
 
     /** \brief Kronecker tensor product
@@ -471,19 +474,19 @@ namespace casadi {
      * Creates a block matrix in which each element (i, j) is a_ij*b
      */
     inline friend MatType kron(const MatType& a, const MatType& b) {
-      return a.zz_kron(b);
+      return MatType::kron(a, b);
     }
 
     /** \brief Repeat matrix A n times vertically and m times horizontally
      */
     inline friend MatType repmat(const MatType &A, int n, int m=1) {
-      return A.zz_repmat(n, m);
+      return MatType::repmat(A, n, m);
     }
 
     /** \brief Repeat matrix A n times vertically and m times horizontally
      */
     inline friend MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
-      return A.zz_repmat(rc.first, rc.second);
+      return MatType::repmat(A, rc);
     }
 
     /** \brief Concatenate horizontally, two matrices */
@@ -539,13 +542,13 @@ namespace casadi {
 
 #ifndef SWIG
   template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_vec() const {
-    return reshape(self(), self().numel(), 1);
+  MatType SparsityInterface<MatType>::vec(const MatType& x) {
+    return reshape(x, x.numel(), 1);
   }
 
   template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_repmat(int n, int m) const {
-    MatType allrows = vertcat(std::vector<MatType>(n, self()));
+  MatType SparsityInterface<MatType>::repmat(const MatType& x, int n, int m) {
+    MatType allrows = vertcat(std::vector<MatType>(n, x));
     return horzcat(std::vector<MatType>(m, allrows));
   }
 
@@ -576,7 +579,7 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<int>
-  SparsityInterface<MatType>::zz_offset(const std::vector< MatType > &v, bool vert) {
+  SparsityInterface<MatType>::offset(const std::vector< MatType > &v, bool vert) {
     std::vector<int> ret(v.size()+1);
     ret[0]=0;
     for (int i=0; i<v.size(); ++i) {
@@ -586,7 +589,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_veccat(const std::vector< MatType >& x) {
+  MatType SparsityInterface<MatType>::veccat(const std::vector< MatType >& x) {
     std::vector< MatType > x_vec = x;
     for (typename std::vector< MatType >::iterator it=x_vec.begin();
          it!=x_vec.end(); ++it) {

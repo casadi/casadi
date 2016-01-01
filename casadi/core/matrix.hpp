@@ -454,12 +454,14 @@ namespace casadi {
       diagsplit(const Matrix<DataType>& x,
                 const std::vector<int>& offset1,
                 const std::vector<int>& offset2);
-    Matrix<DataType> zz_reshape(int nrow, int ncol) const;
-    Matrix<DataType> zz_reshape(const Sparsity& sp) const;
-    Matrix<DataType> zz_vecNZ() const;
-    Matrix<DataType> zz_kron(const Matrix<DataType>& b) const;
+    static Matrix<DataType> reshape(const Matrix<DataType> &x, int nrow, int ncol);
+    static Matrix<DataType> reshape(const Matrix<DataType> &x, const Sparsity& sp);
+    static Matrix<DataType> vecNZ(const Matrix<DataType> &x);
+    static Matrix<DataType> kron(const Matrix<DataType> &x, const Matrix<DataType>& y);
     static Matrix<DataType> mtimes(const Matrix<DataType> &x, const Matrix<DataType> &y);
-    Matrix<DataType> zz_mac(const Matrix<DataType> &y, const Matrix<DataType> &z) const;
+    static Matrix<DataType> mac(const Matrix<DataType> &x,
+                                const Matrix<DataType> &y,
+                                const Matrix<DataType> &z);
     ///@}
 
     ///@{

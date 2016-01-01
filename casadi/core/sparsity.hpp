@@ -458,15 +458,15 @@ namespace casadi {
                 const std::vector<int>& offset1,
                 const std::vector<int>& offset2);
     static Sparsity mtimes(const Sparsity& x, const Sparsity& y);
-    Sparsity zz_mac(const Sparsity& Y, const Sparsity& Z) const { return Z;}
-    Sparsity zz_vecNZ() const;
-    Sparsity zz_reshape(int nrow, int ncol) const;
-    Sparsity zz_reshape(const Sparsity& sp) const;
-    int zz_sprank() const;
-    int zz_norm_0_mul(const Sparsity& B) const;
-    Sparsity zz_kron(const Sparsity& b) const;
-    Sparsity zz_triu(bool includeDiagonal=true) const;
-    Sparsity zz_tril(bool includeDiagonal=true) const;
+    static Sparsity mac(const Sparsity& x, const Sparsity& y, const Sparsity& z) { return z;}
+    static Sparsity vecNZ(const Sparsity& x);
+    static Sparsity reshape(const Sparsity& x, int nrow, int ncol);
+    static Sparsity reshape(const Sparsity& x, const Sparsity& sp);
+    static int sprank(const Sparsity& x);
+    static int norm_0_mul(const Sparsity& x, const Sparsity& B);
+    static Sparsity kron(const Sparsity& x, const Sparsity& b);
+    static Sparsity triu(const Sparsity& x, bool includeDiagonal=true);
+    static Sparsity tril(const Sparsity& x, bool includeDiagonal=true);
 #endif //SWIG
 
     /** \brief Enlarge matrix
