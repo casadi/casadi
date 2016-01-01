@@ -1774,7 +1774,7 @@ class MXtests(casadiTestCase):
               xx2s = SX.sym("x",sp2.size1(),sp2.size2())
               x2s=xx2s[sp2]
               for (casadiop, numpyop,name, flags) in self.matrixbinarypool.zip():
-                if "mul" in name and (sp.numel()==1 or sp2.numel()==1): continue
+                if ("mul" in name or "mtimes" in name) and (sp.numel()==1 or sp2.numel()==1): continue
                 r = casadiop([x1,x2])
                 f = Function("f", [xx1,xx2],[r])
                 f.setInput(v1,0)
