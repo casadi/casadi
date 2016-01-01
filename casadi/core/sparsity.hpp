@@ -103,6 +103,7 @@ namespace casadi {
     using B::horzsplit;
     using B::diagsplit;
     using B::vertsplit;
+    using B::mtimes;
 #endif
 
     /** \brief Create a scalar sparsity pattern **/
@@ -456,7 +457,7 @@ namespace casadi {
       diagsplit(const Sparsity& x,
                 const std::vector<int>& offset1,
                 const std::vector<int>& offset2);
-    Sparsity zz_mtimes(const Sparsity& y) const;
+    static Sparsity mtimes(const Sparsity& x, const Sparsity& y);
     Sparsity zz_mac(const Sparsity& Y, const Sparsity& Z) const { return Z;}
     Sparsity zz_vecNZ() const;
     Sparsity zz_reshape(int nrow, int ncol) const;

@@ -367,8 +367,8 @@ namespace casadi {
     return (*this)->combine(y, true, true);
   }
 
-  Sparsity Sparsity::zz_mtimes(const Sparsity& y) const {
-    return (*this)->zz_mtimes(y);
+  Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y) {
+    return x->zz_mtimes(y);
   }
 
   bool Sparsity::is_equal(const Sparsity& y) const {

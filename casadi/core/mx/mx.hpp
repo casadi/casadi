@@ -127,6 +127,7 @@ namespace casadi {
     using B::horzsplit;
     using B::diagsplit;
     using B::vertsplit;
+    using B::mtimes;
 #endif // SWIG
 
     /// Returns the truth value of an MX expression
@@ -404,7 +405,7 @@ namespace casadi {
                                      const std::vector<int>& offset2);
     static std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset);
     static MX blockcat(const std::vector< std::vector<MX > > &v);
-    MX zz_mtimes(const MX& y) const;
+    static MX mtimes(const MX& x, const MX& y);
     MX zz_mac(const MX& y, const MX& z) const;
     MX zz_reshape(int nrow, int ncol) const;
     MX zz_reshape(const Sparsity& sp) const;

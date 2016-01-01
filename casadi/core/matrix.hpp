@@ -185,6 +185,7 @@ namespace casadi {
     using B::horzsplit;
     using B::vertsplit;
     using B::diagsplit;
+    using B::mtimes;
 
     /// Get a non-zero element
     inline const DataType& at(int k) const {
@@ -457,7 +458,7 @@ namespace casadi {
     Matrix<DataType> zz_reshape(const Sparsity& sp) const;
     Matrix<DataType> zz_vecNZ() const;
     Matrix<DataType> zz_kron(const Matrix<DataType>& b) const;
-    Matrix<DataType> zz_mtimes(const Matrix<DataType> &y) const;
+    static Matrix<DataType> mtimes(const Matrix<DataType> &x, const Matrix<DataType> &y);
     Matrix<DataType> zz_mac(const Matrix<DataType> &y, const Matrix<DataType> &z) const;
     ///@}
 

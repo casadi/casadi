@@ -173,7 +173,7 @@ namespace casadi {
                                             const std::vector<int>& output_offset);
     static std::vector< MatType > diagsplit(const MatType& x, int incr);
     static std::vector< MatType > diagsplit(const MatType& x, int incr1, int incr2);
-    static MatType zz_mul(const std::vector<MatType> &args);
+    static MatType mtimes(const std::vector<MatType> &args);
     static std::vector<MatType > horzsplit(const MatType& x, int incr);
     static std::vector<MatType > vertsplit(const MatType& x, int incr);
     /// \endcond
@@ -372,14 +372,14 @@ namespace casadi {
 
     /** \brief Matrix product of two matrices
     */
-    inline friend MatType mul(const MatType &X, const MatType &Y) {
-      return X.zz_mtimes(Y);
+    inline friend MatType mul(const MatType &x, const MatType &y) {
+      return MatType::mtimes(x, y);
     }
 
     /** \brief Matrix product of n matrices
      */
     inline friend MatType mul(const std::vector<MatType> &args) {
-      return MatType::zz_mul(args);
+      return MatType::mtimes(args);
     }
 
     /** \brief Multiply-accumulate operation
@@ -627,7 +627,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_mul(const std::vector<MatType> &args) {
+  MatType SparsityInterface<MatType>::mtimes(const std::vector<MatType> &args) {
     casadi_assert_message(args.size()>=1,
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");

@@ -189,7 +189,7 @@ namespace casadi {
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
-    SXElem zz_mul(const SXElem& y) const { return binary(OP_MUL, *this, y);}
+    static SXElem mul(const SXElem& x, const SXElem& y) { return binary(OP_MUL, x, y);}
     SXElem inv() const;
     SXElem printme(const SXElem &y) const;
     static bool is_equal(const SXElem& x, const SXElem& y, int depth=0);
