@@ -99,10 +99,16 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
+    for (auto&& i : mem_) free_mem(i);
+    mem_.clear();
   }
 
   void FunctionInternal::init() {
     setDefaultOptions();
+
+    // Free existing memory object, if any
+    for (auto&& i : mem_) free_mem(i);
+    mem_.clear();
 
     // Get the number of inputs and outputs
     isp_.resize(get_n_in());
@@ -208,6 +214,10 @@ namespace casadi {
         casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
       }
     }
+
+    // Create memory object
+    casadi_assert(mem_.empty());
+    mem_.push_back(alloc_mem());
   }
 
   void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, void* mem) {
@@ -1267,6 +1277,11 @@ namespace casadi {
   }
 
   void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    static_cast<const FunctionInternal*>(this)->eval(arg, res, iw, w, mem);
+  }
+
+  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w,
+                              void* mem) const {
     casadi_error("'eval' not defined for " + type_name());
   }
 

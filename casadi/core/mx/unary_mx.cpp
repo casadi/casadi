@@ -51,12 +51,12 @@ namespace casadi {
     return ss.str();
   }
 
-  void UnaryMX::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void UnaryMX::eval(const double** arg, double** res, int* iw, double* w, int mem) {
     double dummy = numeric_limits<double>::quiet_NaN();
     casadi_math<double>::fun(op_, arg[0], dummy, res[0], nnz());
   }
 
-  void UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     SXElem dummy = 0;
     casadi_math<SXElem>::fun(op_, arg[0], dummy, res[0], nnz());
   }
@@ -92,11 +92,11 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void UnaryMX::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void UnaryMX::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void UnaryMX::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     copyAdj(arg[0], res[0], nnz());
   }
 

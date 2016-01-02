@@ -649,12 +649,12 @@ namespace casadi {
 
   void Function::free_mem(void* mem) { (*this)->free_mem(mem);}
 
-  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    (*this)->spFwd(arg, res, iw, w, mem);
+  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    (*this)->spFwd(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
-  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    (*this)->spAdj(arg, res, iw, w, mem);
+  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    (*this)->spAdj(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
   bool Function::spCanEvaluate(bool fwd) {
@@ -996,12 +996,12 @@ namespace casadi {
     return (*this)->default_in(ind);
   }
 
-  void Function::operator()(const double** arg, double** res, int* iw, double* w, void* mem) {
-    (*this)->eval(arg, res, iw, w, mem);
+  void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) {
+    (*this)->eval(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
-  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    (*this)->eval_sx(arg, res, iw, w, mem);
+  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+    (*this)->eval_sx(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
   const SX Function::sx_in(int ind) const {
@@ -1558,6 +1558,18 @@ namespace casadi {
   Memory::Memory(const Function& _f, const double** _arg, double** _res,
                  int* _iw, double* _w, void* _mem)
     : f(_f.get()), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
+    setup(arg, res, iw, w);
+  }
+
+  Memory::Memory(FunctionInternal *_f, const double** _arg, double** _res,
+                 int* _iw, double* _w, int _mem)
+    : f(_f), arg(_arg), res(_res), iw(_iw), w(_w), mem(_f->mem_.at(_mem)), own_(false) {
+    setup(arg, res, iw, w);
+  }
+
+  Memory::Memory(const Function& _f, const double** _arg, double** _res,
+                 int* _iw, double* _w, int _mem)
+    : f(_f.get()), arg(_arg), res(_res), iw(_iw), w(_w), mem(_f->mem_.at(_mem)), own_(false) {
     setup(arg, res, iw, w);
   }
 

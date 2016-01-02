@@ -529,18 +529,18 @@ namespace casadi {
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
-    void operator()(const double** arg, double** res, int* iw, double* w, void* mem);
+    void operator()(const double** arg, double** res, int* iw, double* w, int mem=0);
 
     /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
      */
-    void operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    void operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem=0);
 
     /** \brief  Propagate sparsity forward */
-    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0);
 
     /** \brief  Propagate sparsity backward */
-    void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0);
 
     /** \brief Propagate sparsity backward with temporary memory allocation */
     void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res);
@@ -1084,6 +1084,14 @@ namespace casadi {
     // Construct non-owning
     Memory(FunctionInternal *f, const double** arg, double** res,
            int* iw, double* w, void* mem);
+
+    // Construct non-owning
+    Memory(const Function& f, const double** arg, double** res,
+           int* iw, double* w, int mem);
+
+    // Construct non-owning
+    Memory(FunctionInternal *f, const double** arg, double** res,
+           int* iw, double* w, int mem);
 
     // Construct owning
     Memory(const Function& f);

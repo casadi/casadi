@@ -470,7 +470,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity forwards
-        it->data->spFwd(arg1, res1, iw, w, mem);
+        it->data->spFwd(arg1, res1, iw, w, 0);
       }
     }
   }
@@ -511,7 +511,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->spAdj(arg1, res1, iw, w, mem);
+        it->data->spAdj(arg1, res1, iw, w, 0);
       }
     }
   }

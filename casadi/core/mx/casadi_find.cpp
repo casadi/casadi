@@ -39,7 +39,7 @@ namespace casadi {
     return "find(" + arg.at(0) + ")";
   }
 
-  void Find::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Find::eval(const double** arg, double** res, int* iw, double* w, int mem) {
     const double* x = arg[0];
     int nnz = dep(0).nnz();
     int k=0;
@@ -62,11 +62,11 @@ namespace casadi {
                      std::vector<std::vector<MX> >& asens) {
   }
 
-  void Find::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Find::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     res[0][0] = 0; // pw constant
   }
 
-  void Find::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Find::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     res[0][0] = 0; // pw constant
   }
 

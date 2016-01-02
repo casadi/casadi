@@ -184,7 +184,7 @@ namespace casadi {
     fill_n(res1, fact_fcn_.n_out(), nullptr);
     res1[0] = getPtr(q_);
     res1[1] = getPtr(r_);
-    fact_fcn_(arg1, res1, m.iw, m.w, m.mem);
+    fact_fcn_(arg1, res1, m.iw, m.w);
   }
 
   void SymbolicQr::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {

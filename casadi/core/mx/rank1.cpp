@@ -65,21 +65,21 @@ namespace casadi {
     }
   }
 
-  void Rank1::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Rank1::eval(const double** arg, double** res, int* iw, double* w, int mem) {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Rank1::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Rank1::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void Rank1::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
+  void Rank1::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
     if (arg[0]!=res[0]) casadi_copy(arg[0], dep(0).nnz(), res[0]);
     casadi_rank1(res[0], sparsity(), *arg[1], arg[2], arg[3]);
   }
 
-  void Rank1::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Rank1::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     /* If not inline, copy to result */
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
@@ -101,7 +101,7 @@ namespace casadi {
     }
   }
 
-  void Rank1::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Rank1::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     /* Get sparsities */
     int ncol_A = sparsity().size2();
     const int *colind_A = sparsity().colind(), *row_A = sparsity().row();

@@ -98,8 +98,11 @@ namespace casadi {
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
-    /** \brief  Evaluate numerically */
+    /** \brief  Evaluate numerically, old non-const */
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+
+    /** \brief  Evaluate numerically */
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res);
@@ -767,6 +770,9 @@ namespace casadi {
     virtual bool fwdViaJac(int nfwd);
     virtual bool adjViaJac(int nadj);
     ///@}
+
+    /// Memory objects
+    std::vector<void*> mem_;
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
