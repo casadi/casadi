@@ -133,6 +133,9 @@ namespace casadi {
     /** \brief  Evaluate numerically */
     virtual void eval(const double** arg, double** res, int* iw, double* w, int mem);
 
+    /** \brief  Evaluate numerically, new */
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+
     /** \brief  Evaluate symbolically (SX) */
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 

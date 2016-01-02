@@ -649,8 +649,8 @@ namespace casadi {
 
   void Function::free_mem(void* mem) { (*this)->free_mem(mem);}
 
-  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    (*this)->spFwd(arg, res, iw, w, (*this)->mem_.at(mem));
+  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    (*const_cast<Function*>(this))->spFwd(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
   void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
@@ -996,12 +996,12 @@ namespace casadi {
     return (*this)->default_in(ind);
   }
 
-  void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) {
-    (*this)->eval(arg, res, iw, w, (*this)->mem_.at(mem));
+  void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
+    (*const_cast<Function*>(this))->eval(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
-  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
-    (*this)->eval_sx(arg, res, iw, w, (*this)->mem_.at(mem));
+  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    (*const_cast<Function*>(this))->eval_sx(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
   const SX Function::sx_in(int ind) const {
