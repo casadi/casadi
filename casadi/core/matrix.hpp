@@ -381,62 +381,70 @@ namespace casadi {
     static Matrix<DataType> hessian(const Matrix<DataType> &f, const Matrix<DataType> &x);
     static Matrix<DataType> hessian(const Matrix<DataType> &f, const Matrix<DataType> &x,
                                     Matrix<DataType>& g);
-    Matrix<DataType> zz_substitute(const Matrix<DataType>& v, const Matrix<DataType>& vdef) const;
+    static Matrix<DataType>
+      substitute(const Matrix<DataType>& ex,
+                 const Matrix<DataType>& v,
+                 const Matrix<DataType>& vdef);
     static std::vector<Matrix<DataType> >
-      zz_substitute(const std::vector<Matrix<DataType> >& ex,
-                    const std::vector<Matrix<DataType> >& v,
-                    const std::vector<Matrix<DataType> >& vdef);
-    static void zz_substituteInPlace(const std::vector<Matrix<DataType> >& v,
-                                     std::vector<Matrix<DataType> >& vdef,
-                                     std::vector<Matrix<DataType> >& ex,
-                                     bool revers);
-    Matrix<DataType> zz_pinv() const;
-    Matrix<DataType> zz_pinv(const std::string& lsolver, const Dict& opts) const;
-    Matrix<DataType> zz_solve(const Matrix<DataType>& b) const;
-    Matrix<DataType> zz_solve(const Matrix<DataType>& b,
-                              const std::string& lsolver, const Dict& opts) const;
-    int zz_countNodes() const;
-    std::string zz_print_operator(const std::vector<std::string>& args) const;
-    static void zz_extractShared(std::vector<Matrix<DataType> >& ex,
-                                 std::vector<Matrix<DataType> >& v,
-                                 std::vector<Matrix<DataType> >& vdef,
-                                 const std::string& v_prefix,
-                                 const std::string& v_suffix);
+      substitute(const std::vector<Matrix<DataType> >& ex,
+                 const std::vector<Matrix<DataType> >& v,
+                 const std::vector<Matrix<DataType> >& vdef);
+    static void substituteInPlace(const std::vector<Matrix<DataType> >& v,
+                                  std::vector<Matrix<DataType> >& vdef,
+                                  std::vector<Matrix<DataType> >& ex,
+                                  bool revers);
+    static Matrix<DataType> pinv(const Matrix<DataType> &x);
+    static Matrix<DataType> pinv(const Matrix<DataType> &A,
+                                 const std::string& lsolver, const Dict& opts);
+    static Matrix<DataType> solve(const Matrix<DataType> &A, const Matrix<DataType>& b);
+    static Matrix<DataType> solve(const Matrix<DataType> &A, const Matrix<DataType>& b,
+                                  const std::string& lsolver, const Dict& opts);
+    static int countNodes(const Matrix<DataType> &x);
+    static std::string print_operator(const Matrix<DataType> &x,
+                                      const std::vector<std::string>& args);
+    static void extractShared(std::vector<Matrix<DataType> >& ex,
+                              std::vector<Matrix<DataType> >& v,
+                              std::vector<Matrix<DataType> >& vdef,
+                              const std::string& v_prefix,
+                              const std::string& v_suffix);
     static Matrix<DataType> _bilin(const Matrix<DataType>& A,
-                                  const Matrix<DataType>& x,
-                                  const Matrix<DataType>& y);
+                                   const Matrix<DataType>& x,
+                                   const Matrix<DataType>& y);
     static Matrix<DataType> _rank1(const Matrix<DataType>& A,
                                    const Matrix<DataType>& alpha,
                                    const Matrix<DataType>& x,
                                    const Matrix<DataType>& y);
-    Matrix<DataType> zz_if_else(const Matrix<DataType> &if_true,
-                                const Matrix<DataType> &if_false,
-                                bool short_circuit) const;
-    Matrix<DataType> zz_conditional(const std::vector<Matrix<DataType> > &x,
-                                    const Matrix<DataType> &x_default,
-                                    bool short_circuit) const;
-    bool zz_dependsOn(const Matrix<DataType> &arg) const;
-    Matrix<DataType> zz_mpower(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_mrdivide(const Matrix<DataType> &y) const;
-    Matrix<DataType> zz_mldivide(const Matrix<DataType> &y) const;
-    std::vector<Matrix<DataType> > zz_symvar() const;
-    Matrix<DataType> zz_det() const;
-    Matrix<DataType> zz_inv() const;
-    Matrix<DataType> zz_trace() const;
-    Matrix<DataType> zz_norm_1() const;
-    Matrix<DataType> zz_norm_2() const;
-    Matrix<DataType> zz_norm_F() const;
-    Matrix<DataType> zz_norm_inf() const;
-    Matrix<DataType> zz_sumCols() const;
-    Matrix<DataType> zz_sumRows() const;
+    static Matrix<DataType> if_else(const Matrix<DataType> &x,
+                                    const Matrix<DataType> &if_true,
+                                    const Matrix<DataType> &if_false,
+                                    bool short_circuit);
+    static Matrix<DataType> conditional(const Matrix<DataType> &ind,
+                                        const std::vector<Matrix<DataType> > &x,
+                                        const Matrix<DataType> &x_default,
+                                        bool short_circuit);
+    static bool dependsOn(const Matrix<DataType> &x, const Matrix<DataType> &arg);
+    static Matrix<DataType> mpower(const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> mrdivide(const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> mldivide(const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static std::vector<Matrix<DataType> > symvar(const Matrix<DataType> &x);
+    static Matrix<DataType> det(const Matrix<DataType> &x);
+    static Matrix<DataType> inv(const Matrix<DataType> &x);
+    static Matrix<DataType> trace(const Matrix<DataType> &x);
+    static Matrix<DataType> norm_1(const Matrix<DataType> &x);
+    static Matrix<DataType> norm_2(const Matrix<DataType> &x);
+    static Matrix<DataType> norm_F(const Matrix<DataType> &x);
+    static Matrix<DataType> norm_inf(const Matrix<DataType> &x);
+    static Matrix<DataType> sumCols(const Matrix<DataType> &x);
+    static Matrix<DataType> sumRows(const Matrix<DataType> &x);
     static Matrix<DataType> dot(const Matrix<DataType> &x, const Matrix<DataType> &y);
-    Matrix<DataType> zz_nullspace() const;
-    Matrix<DataType> zz_diag() const;
-    Matrix<DataType> zz_unite(const Matrix<DataType>& B) const;
-    Matrix<DataType> zz_project(const Sparsity& sp, bool intersect) const;
-    Matrix<DataType> zz_polyval(const Matrix<DataType>& x) const;
-    Matrix<DataType> zz_densify(const Matrix<DataType>& val) const;
-    Matrix<DataType> zz_densify() const;
+    static Matrix<DataType> nullspace(const Matrix<DataType> &x);
+    static Matrix<DataType> diag(const Matrix<DataType> &x);
+    static Matrix<DataType> unite(const Matrix<DataType> &A, const Matrix<DataType>& B);
+    static Matrix<DataType> project(const Matrix<DataType> &x,
+                                    const Sparsity& sp, bool intersect=false);
+    static Matrix<DataType> polyval(const Matrix<DataType> &p, const Matrix<DataType>& x);
+    static Matrix<DataType> densify(const Matrix<DataType> &x, const Matrix<DataType>& val);
+    static Matrix<DataType> densify(const Matrix<DataType> &x);
     ///@}
 
     ///@{
@@ -495,7 +503,7 @@ namespace casadi {
     Matrix<DataType> zz_all() const;
     Matrix<DataType> zz_any() const;
     Matrix<DataType> zz_adj() const;
-    Matrix<DataType> zz_getMinor(int i, int j) const;
+    static Matrix<DataType> getMinor(const Matrix<DataType>& x, int i, int j);
     Matrix<DataType> zz_cofactor(int i, int j) const;
     Matrix<DataType> zz_chol() const;
     Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
@@ -523,7 +531,7 @@ namespace casadi {
     /** \brief Get the (i,j) minor matrix
      */
     friend inline Matrix<DataType> getMinor(const Matrix<DataType> &x, int i, int j) {
-      return x.zz_getMinor(i, j);
+      return Matrix<DataType>::getMinor(x, i, j);
     }
 
     /** \brief Get the (i,j) cofactor matrix

@@ -871,7 +871,7 @@ namespace casadi {
       return MX::create(new HorzRepsum(shared_from_this<MX>(), m));
     } else {
       // Fallback to generic_matrix impl
-      return shared_from_this<MX>().GenericMatrix<MX>::zz_repsum(n, m);
+      return GenericMatrix<MX>::repsum(shared_from_this<MX>(), n, m);
     }
   }
 

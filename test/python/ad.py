@@ -577,7 +577,7 @@ class ADtests(casadiTestCase):
           #(in1,v1,f1([x**2,[]])[1],DM.zeros(2,2)),
           #(in1,v1,f1([[],y])[1],DM.zeros(2,2)),
           (in1,v1,vertcat([x,DM(0,1)]),DM.eye(2)),
-          (in1,v1,(x**2).project(sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
+          (in1,v1,project(x**2, sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
           (in1,v1,c.dot(x,y[:,0]),y[:,0].T),
           (in1,v1,x.nz[IM([[1,0]])].T*y.nz[IM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]])),

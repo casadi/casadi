@@ -48,9 +48,8 @@ namespace casadi {
 
   template<>
   Matrix<double> Matrix<double>::
-  zz_solve(const Matrix<double>& b,
-           const string& lsolver, const Dict& dict) const {
-    const Matrix<double>& A = *this;
+  solve(const Matrix<double>& A, const Matrix<double>& b,
+        const string& lsolver, const Dict& dict) {
     Function mysolver = linsol("tmp", lsolver, A.sparsity(), b.size2(), dict);
     vector<DM> arg(LINSOL_NUM_IN);
     arg.at(LINSOL_A) = A;
@@ -60,9 +59,8 @@ namespace casadi {
 
   template<>
   Matrix<double> Matrix<double>::
-  zz_pinv(const string& lsolver,
-          const Dict& dict) const {
-    const Matrix<double>& A = *this;
+  pinv(const Matrix<double>& A, const string& lsolver,
+       const Dict& dict) {
     if (A.size1()>=A.size2()) {
       return solve(mtimes(A.T(), A), A.T(), lsolver, dict);
     } else {
@@ -432,8 +430,8 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_if_else(const SX &if_true, const SX &if_false, bool short_circuit) const {
-    return if_else_zero(*this, if_true) + if_else_zero(!*this, if_false);
+  SX SX::if_else(const SX &cond, const SX &if_true, const SX &if_false, bool short_circuit) {
+    return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
   }
 
   template<>
@@ -500,16 +498,13 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_substitute(const SX& v,
-                       const SX& vdef) const {
-    return substitute(vector<SX>(1, *this), vector<SX>(1, v), vector<SX>(1, vdef)).front();
+  SX SX::substitute(const SX& ex, const SX& v, const SX& vdef) {
+    return substitute(vector<SX>{ex}, vector<SX>{v}, vector<SX>{vdef}).front();
   }
 
   template<>
-  vector<SX >
-  SX::zz_substitute(const vector<SX >& ex,
-                    const vector<SX >& v,
-                    const vector<SX >& vdef) {
+  vector<SX>
+  SX::substitute(const vector<SX>& ex, const vector<SX>& v, const vector<SX>& vdef) {
 
     // Assert consistent dimensions
     casadi_assert_warning(v.size()==vdef.size(), "subtitute: number of symbols to replace ( "
@@ -548,10 +543,8 @@ namespace casadi {
   }
 
   template<>
-  void SX::zz_substituteInPlace(const vector<SX >& v,
-                                vector<SX >& vdef,
-                                vector<SX >& ex,
-                                bool reverse) {
+  void SX::substituteInPlace(const vector<SX >& v, vector<SX >& vdef,
+                             vector<SX >& ex, bool reverse) {
     // Assert correctness
     casadi_assert(v.size()==vdef.size());
     for (int i=0; i<v.size(); ++i) {
@@ -624,14 +617,14 @@ namespace casadi {
   }
 
   template<>
-  bool SX::zz_dependsOn(const SX &arg) const {
-    if (nnz()==0) return false;
+  bool SX::dependsOn(const SX &x, const SX &arg) {
+    if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp("temp", {arg}, {*this});
+    Function temp("temp", {arg}, {x});
 
     // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(nnz());
+    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
     temp({getPtr(t_in)}, {getPtr(t_out)});
 
     // Loop over results
@@ -744,15 +737,15 @@ namespace casadi {
   }
 
   template<>
-  int SX::zz_countNodes() const {
-    Function f("tmp", {SX()}, {*this});
+  int SX::countNodes(const SX& x) {
+    Function f("tmp", {SX()}, {x});
     return f.countNodes();
   }
 
   template<>
   string
-  SX::zz_print_operator(const vector<string>& args) const {
-    SXElem x = toScalar();
+  SX::print_operator(const SX& X, const vector<string>& args) {
+    SXElem x = X.toScalar();
     if (!x.hasDep())
         throw CasadiException("print_operator: SXElem must be binary operator");
     if (args.size() == 0 || (casadi_math<double>::ndeps(x.op())==2 && args.size() < 2))
@@ -763,8 +756,8 @@ namespace casadi {
   }
 
   template<>
-  vector<SX> SX::zz_symvar() const {
-    Function f("tmp", vector<SX>{}, {*this});
+  vector<SX> SX::symvar(const SX& x) {
+    Function f("tmp", vector<SX>{}, {x});
     vector<SXElem> ret1 = f.free_sx().data();
     vector<SX> ret(ret1.size());
     copy(ret1.begin(), ret1.end(), ret.begin());
@@ -772,11 +765,11 @@ namespace casadi {
   }
 
   template<>
-  void SX::zz_extractShared(vector<SX >& ex,
-                            vector<SX >& v_sx,
-                            vector<SX >& vdef_sx,
-                            const string& v_prefix,
-                            const string& v_suffix) {
+  void SX::extractShared(vector<SX >& ex,
+                         vector<SX >& v_sx,
+                         vector<SX >& vdef_sx,
+                         const string& v_prefix,
+                         const string& v_suffix) {
 
     // Sort the expression
     Function f("tmp", vector<SX>(), ex);

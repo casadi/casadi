@@ -1949,7 +1949,7 @@ class MXtests(casadiTestCase):
     
   def test_project(self):
     x = MX.sym("x",Sparsity.lower(3))
-    y = x.project(Sparsity.lower(3).T)
+    y = project(x, Sparsity.lower(3).T)
     
     f = Function("f", [x],[y])
     

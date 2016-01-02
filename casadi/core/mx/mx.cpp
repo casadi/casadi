@@ -286,7 +286,7 @@ namespace casadi {
         Sparsity sp = rr.sparsity() * m.sparsity();
 
         // Project both matrices to this sparsity
-        return set(project(m, sp), ind1, project(rr, sp));
+        return set(project(m, sp), ind1, Matrix<int>::project(rr, sp));
       } else if (m.is_scalar()) {
         // m scalar means "set all"
         if (m.is_dense()) {
@@ -641,19 +641,19 @@ namespace casadi {
     return (*this)->getBinary(OP_LIFT, x_guess, false, false);
   }
 
-  MX MX::zz_mrdivide(const MX& b) const {
-    casadi_assert_message(is_scalar() || b.is_scalar(), "Not implemented");
-    return *this/b;
+  MX MX::mrdivide(const MX& a, const MX& b) {
+    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
+    return a/b;
   }
 
-  MX MX::zz_mldivide(const MX& b) const {
-    casadi_assert_message(is_scalar() || b.is_scalar(), "Not implemented");
-    return b/ *this;
+  MX MX::mldivide(const MX& a, const MX& b) {
+    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
+    return b/a;
   }
 
-  MX MX::zz_mpower(const MX& b) const {
-    casadi_assert_message(is_scalar() || b.is_scalar(), "Not implemented");
-    return pow(*this, b);
+  MX MX::mpower(const MX& a, const MX& b) {
+    casadi_assert_message(a.is_scalar() || b.is_scalar(), "Not implemented");
+    return pow(a, b);
   }
 
   MX MX::dep(int ch) const { return (*this)->dep(ch); }
@@ -721,27 +721,27 @@ namespace casadi {
     return (*this)->getOutput(oind);
   }
 
-  MX MX::zz_project(const Sparsity& sp, bool intersect) const {
-    if (is_empty() || (sp==sparsity())) {
-      return *this;
+  MX MX::project(const MX& x, const Sparsity& sp, bool intersect) {
+    if (x.is_empty() || (sp==x.sparsity())) {
+      return x;
     } else {
       if (intersect) {
-        return (*this)->getProject(sp.intersect(sparsity()));
+        return x->getProject(sp.intersect(x.sparsity()));
       } else {
-        return (*this)->getProject(sp);
+        return x->getProject(sp);
       }
     }
   }
 
-  MX MX::zz_densify(const MX& val) const {
+  MX MX::densify(const MX& x, const MX& val) {
     casadi_assert(val.is_scalar());
-    if (is_dense()) {
-      return *this; // Already ok
+    if (x.is_dense()) {
+      return x; // Already ok
     } else if (val->is_zero()) {
-      return project(*this, Sparsity::dense(size()));
+      return project(x, Sparsity::dense(x.size()));
     } else {
-      MX ret = MX::repmat(val, size());
-      ret(sparsity()) = *this;
+      MX ret = MX::repmat(val, x.size());
+      ret(x.sparsity()) = x;
       return ret;
     }
   }
@@ -1034,24 +1034,24 @@ namespace casadi {
     return vertcat(rows);
   }
 
-  MX MX::zz_norm_2() const {
-    if (is_column()) {
-      return norm_F(*this);
+  MX MX::norm_2(const MX& x) {
+    if (x.is_column()) {
+      return norm_F(x);
     } else {
-      return (*this)->getNorm2();
+      return x->getNorm2();
     }
   }
 
-  MX MX::zz_norm_F() const {
-    return (*this)->getNormF();
+  MX MX::norm_F(const MX& x) {
+    return x->getNormF();
   }
 
-  MX MX::zz_norm_1() const {
-    return (*this)->getNorm1();
+  MX MX::norm_1(const MX& x) {
+    return x->getNorm1();
   }
 
-  MX MX::zz_norm_inf() const {
-    return (*this)->getNormInf();
+  MX MX::norm_inf(const MX& x) {
+    return x->getNormInf();
   }
 
   MX MX::simplify(const MX& x) {
@@ -1079,7 +1079,7 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_if_else(const MX &x_true, const MX &x_false, bool short_circuit) const {
+  MX MX::if_else(const MX &cond, const MX &x_true, const MX &x_false, bool short_circuit) {
     if (short_circuit) {
       // Get symbolic primitives
       vector<MX> arg = symvar(veccat(vector<MX>{x_true, x_false}));
@@ -1093,15 +1093,16 @@ namespace casadi {
 
       // Call the Switch
       vector<MX> sw_arg;
-      sw_arg.push_back(*this);
+      sw_arg.push_back(cond);
       sw_arg.insert(sw_arg.end(), arg.begin(), arg.end());
       return sw(sw_arg).at(0);
     } else {
-      return if_else_zero(*this, x_true) + if_else_zero(!*this, x_false);
+      return if_else_zero(cond, x_true) + if_else_zero(!cond, x_false);
     }
   }
 
-  MX MX::zz_conditional(const std::vector<MX> &x, const MX &x_default, bool short_circuit) const {
+  MX MX::conditional(const MX& ind, const std::vector<MX>& x,
+                     const MX& x_default, bool short_circuit) {
     if (short_circuit) {
       // Get symbolic primitives
       std::vector<MX> arg = x;
@@ -1122,22 +1123,22 @@ namespace casadi {
 
       // Call the Switch
       vector<MX> sw_arg;
-      sw_arg.push_back(*this);
+      sw_arg.push_back(ind);
       sw_arg.insert(sw_arg.end(), arg.begin(), arg.end());
       return sw(sw_arg).at(0);
     } else {
       MX ret = x_default;
       for (int k=0; k<x.size(); ++k) {
-        ret = if_else(*this==k, x[k], ret);
+        ret = if_else(ind==k, x[k], ret);
       }
       return ret;
     }
   }
 
-  MX MX::zz_unite(const MX& B) const {
+  MX MX::unite(const MX& A, const MX& B) {
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
-    Sparsity sp = sparsity().unite(B.sparsity(), mapping);
+    Sparsity sp = A.sparsity().unite(B.sparsity(), mapping);
 
     // Split up the mapping
     std::vector<int> nzA, nzB;
@@ -1155,60 +1156,60 @@ namespace casadi {
 
     // Create mapping
     MX ret = MX::zeros(sp);
-    ret = (*this)->getSetNonzeros(ret, nzA);
+    ret = A->getSetNonzeros(ret, nzA);
     ret = B->getSetNonzeros(ret, nzB);
     return ret;
   }
 
-  MX MX::zz_trace() const {
-    casadi_assert_message(size2() == size1(), "trace: must be square");
+  MX MX::trace(const MX& x) {
+    casadi_assert_message(x.is_square(), "trace: must be square");
     MX res(0);
-    for (int i=0; i < size2(); i ++) {
-      res+=(*this)(i, i);
+    for (int i=0; i < x.size2(); i ++) {
+      res += x(i, i);
     }
     return res;
   }
 
-  MX MX::zz_diag() const {
+  MX MX::diag(const MX& x) {
     // Nonzero mapping
     std::vector<int> mapping;
 
     // Get the sparsity
-    Sparsity sp = sparsity().get_diag(mapping);
+    Sparsity sp = x.sparsity().get_diag(mapping);
 
     // Create a reference to the nonzeros
-    return (*this)->getGetNonzeros(sp, mapping);
+    return x->getGetNonzeros(sp, mapping);
   }
 
-  int MX::zz_countNodes() const {
-    Function f("tmp", vector<MX>{}, {*this});
+  int MX::countNodes(const MX& x) {
+    Function f("tmp", vector<MX>{}, {x});
     return f.countNodes();
   }
 
-  MX MX::zz_sumCols() const {
-    return mtimes(*this, MX::ones(size2(), 1));
+  MX MX::sumCols(const MX& x) {
+    return mtimes(x, MX::ones(x.size2(), 1));
   }
 
-  MX MX::zz_sumRows() const {
-    return mtimes(MX::ones(1, size1()), *this);
+  MX MX::sumRows(const MX& x) {
+    return mtimes(MX::ones(1, x.size1()), x);
   }
 
-  MX MX::zz_polyval(const MX& x) const {
-    casadi_assert_message(is_dense(), "polynomial coefficients vector must be a vector");
-    casadi_assert_message(is_column() && nnz()>0, "polynomial coefficients must be a vector");
-    MX ret = (*this)[0];
-    for (int i=1; i<nnz(); ++i) {
-      ret = ret*x + (*this)[i];
+  MX MX::polyval(const MX& p, const MX& x) {
+    casadi_assert_message(p.is_dense(), "polynomial coefficients vector must be a vector");
+    casadi_assert_message(p.is_column() && p.nnz()>0, "polynomial coefficients must be a vector");
+    MX ret = p[0];
+    for (int i=1; i<p.nnz(); ++i) {
+      ret = ret*x + p[i];
     }
     return ret;
   }
 
-  std::string MX::zz_print_operator(const std::vector<std::string>& args) const {
-    return (*this)->print(args);
+  std::string MX::print_operator(const MX& x, const std::vector<std::string>& args) {
+    return x->print(args);
   }
 
-  void MX::zz_substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
-                                std::vector<MX>& ex, bool reverse) {
+  void MX::substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
+                             std::vector<MX>& ex, bool reverse) {
     casadi_assert_message(v.size()==vdef.size(),
                           "Mismatch in the number of expression to substitute.");
     for (int k=0; k<v.size(); ++k) {
@@ -1276,12 +1277,12 @@ namespace casadi {
     }
   }
 
-  MX MX::zz_substitute(const MX& v, const MX& vdef) const {
-    return substitute(vector<MX>(1, *this), vector<MX>(1, v), vector<MX>(1, vdef)).front();
+  MX MX::substitute(const MX& ex, const MX& v, const MX& vdef) {
+    return substitute(vector<MX>{ex}, vector<MX>{v}, vector<MX>{vdef}).front();
   }
 
-  std::vector<MX> MX::zz_substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
-                                    const std::vector<MX> &vdef) {
+  std::vector<MX> MX::substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
+                                 const std::vector<MX> &vdef) {
     // Assert consistent dimensions
     casadi_assert(v.size()==vdef.size());
 
@@ -1411,8 +1412,8 @@ namespace casadi {
 
   }
 
-  void MX::zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
-                            const std::string& v_prefix, const std::string& v_suffix) {
+  void MX::extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
+                         const std::string& v_prefix, const std::string& v_suffix) {
 
     // Sort the expression
     Function f("tmp", vector<MX>{}, ex);
@@ -1573,22 +1574,21 @@ namespace casadi {
     return _nl_var(expr, var);
   }
 
-  MX MX::zz_det() const {
-    return (*this)->getDeterminant();
+  MX MX::det(const MX& x) {
+    return x->getDeterminant();
   }
 
-  MX MX::zz_inv() const {
-    return (*this)->getInverse();
+  MX MX::inv(const MX& x) {
+    return x->getInverse();
   }
 
-  std::vector<MX> MX::zz_symvar() const {
-    Function f("f", vector<MX>{}, {*this});
+  std::vector<MX> MX::symvar(const MX& x) {
+    Function f("f", vector<MX>{}, {x});
     return f.free_mx();
   }
 
   MX MX::zz_matrix_expand(const MX& e, const std::vector<MX> &boundary, const Dict &options) {
-    std::vector<MX> e_v(1, e);
-    return matrix_expand(e_v, boundary, options).at(0);
+    return matrix_expand(vector<MX>{e}, boundary, options).at(0);
   }
 
   std::vector<MX> MX::zz_matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary,
@@ -1634,37 +1634,37 @@ namespace casadi {
     return x->getRepmat(n, m);
   }
 
-  MX MX::zz_repsum(int n, int m) const {
-    return (*this)->getRepsum(n, m);
+  MX MX::repsum(const MX& x, int n, int m) {
+    return x->getRepsum(n, m);
   }
 
-  MX MX::zz_solve(const MX& b, const std::string& lsolver, const Dict& dict) const {
-    Function mysolver = linsol("tmp", lsolver, sparsity(), b.size2(), dict);
-    return mysolver.linsol_solve(*this, b, false);
+  MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
+    Function mysolver = linsol("tmp", lsolver, a.sparsity(), b.size2(), dict);
+    return mysolver.linsol_solve(a, b, false);
   }
 
-  MX MX::zz_pinv(const std::string& lsolver, const Dict& dict) const {
-    if (size1()>=size2()) {
-      return solve(mtimes(T(), *this), T(), lsolver, dict);
+  MX MX::pinv(const MX& A, const std::string& lsolver, const Dict& dict) {
+    if (A.size1()>=A.size2()) {
+      return solve(mtimes(A.T(), A), A.T(), lsolver, dict);
     } else {
-      return solve(mtimes(*this, T()), *this, lsolver, dict).T();
+      return solve(mtimes(A, A.T()), A, lsolver, dict).T();
     }
   }
 
-  MX MX::zz_nullspace() const {
-    SX n = SX::sym("A", sparsity());
-    Function f("nullspace", {n}, {nullspace(n)});
-    return f(*this).at(0);
+  MX MX::nullspace(const MX& A) {
+    SX A_sx = SX::sym("A", A.sparsity());
+    Function f("nullspace", {A_sx}, {SX::nullspace(A_sx)});
+    return f(A).at(0);
   }
 
-  bool MX::zz_dependsOn(const MX &arg) const {
-    if (nnz()==0) return false;
+  bool MX::dependsOn(const MX &x, const MX &arg) {
+    if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp("tmp", {arg}, {*this});
+    Function temp("tmp", {arg}, {x});
 
     // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(nnz());
+    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
     temp({getPtr(t_in)}, {getPtr(t_out)});
 
     // Loop over results
