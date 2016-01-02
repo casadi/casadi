@@ -260,8 +260,7 @@ namespace casadi {
 
   ///@{
   /** \brief  CasADi additions */
-  template<class T> T constpow(const T &x, const T &n) { return x.constpow(n);}
-  template<class T> T printme(const T &x, const T &y) { return x.printme(y);}
+  inline double constpow(double x, double y) { return pow(x, y);}
   inline double printme(double x, double y) {
     std::cout << "|> " << y << " : " << x << std::endl;
     return x;
@@ -276,9 +275,6 @@ namespace casadi {
 
   /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x ? y : 0;}
-
-  /// Inverse of the error function
-  template<class T> T erfinv(const T &x) {return x.zz_erfinv();}
 #ifdef HAS_ERFINV
   using ::erfinv;
 #else // HAS ERFINV

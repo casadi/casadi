@@ -184,14 +184,10 @@ namespace casadi {
     /** \brief  Negation */
     SXElem operator-() const;
 
-    SXElem __mrdivide__(const SXElem& b) const {  return *this / b;}
-    SXElem zz_mpower(const SXElem& b) const {return pow(*this, b);}
-
-    // The following functions serves two purposes:
-    // Numpy compatibility and to allow unambiguous access
-    static SXElem mul(const SXElem& x, const SXElem& y) { return binary(OP_MUL, x, y);}
+    /** \brief Elementwise inverse */
     SXElem inv() const;
-    SXElem printme(const SXElem &y) const;
+
+    /** \brief Check equality up to a given depth */
     static bool is_equal(const SXElem& x, const SXElem& y, int depth=0);
 
     /// \cond INTERNAL

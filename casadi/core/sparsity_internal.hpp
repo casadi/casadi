@@ -230,10 +230,10 @@ namespace casadi {
     std::vector<int> get_col() const;
 
     /// Resize
-    Sparsity zz_resize(int nrow, int ncol) const;
+    Sparsity _resize(int nrow, int ncol) const;
 
     /// Reshape a sparsity, order of nonzeros remains the same
-    Sparsity zz_reshape(int nrow, int ncol) const;
+    Sparsity _reshape(int nrow, int ncol) const;
 
     /// Number of elements
     int numel() const;
@@ -294,10 +294,10 @@ namespace casadi {
     bool is_triu() const;
 
     /// Get upper triangular part
-    Sparsity zz_triu(bool includeDiagonal) const;
+    Sparsity _triu(bool includeDiagonal) const;
 
     /// Get lower triangular part
-    Sparsity zz_tril(bool includeDiagonal) const;
+    Sparsity _tril(bool includeDiagonal) const;
 
     /// Get nonzeros in lower triangular part
     std::vector<int> get_lower() const;
@@ -309,7 +309,7 @@ namespace casadi {
     std::string dim() const;
 
     /// Sparsity pattern for a matrix-matrix product (details in public class)
-    Sparsity zz_mtimes(const Sparsity& y) const;
+    Sparsity _mtimes(const Sparsity& y) const;
 
     ///@{
     /// Union of two sparsity patterns
@@ -339,27 +339,27 @@ namespace casadi {
     bool is_equal(int y_nrow, int y_ncol, const int* y_colind, const int* y_row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
-    Sparsity zz_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const;
+    Sparsity _enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const;
 
     /// Enlarge the matrix along the second dimension (i.e. insert columns)
-    Sparsity zz_enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) const;
+    Sparsity _enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) const;
 
     /// Make a patten dense
     Sparsity makeDense(std::vector<int>& mapping) const;
 
     /// Erase rows and/or columns - does bounds checking
-    Sparsity zz_erase(const std::vector<int>& rr, const std::vector<int>& cc,
+    Sparsity _erase(const std::vector<int>& rr, const std::vector<int>& cc,
                       bool ind1, std::vector<int>& mapping) const;
 
     /// Erase elements
-    Sparsity zz_erase(const std::vector<int>& rr, bool ind1,
+    Sparsity _erase(const std::vector<int>& rr, bool ind1,
                       std::vector<int>& mapping) const;
 
     /// Append another sparsity patten vertically (vectors only)
-    Sparsity zz_appendVector(const SparsityInternal& sp) const;
+    Sparsity _appendVector(const SparsityInternal& sp) const;
 
     /// Append another sparsity patten horizontally
-    Sparsity zz_appendColumns(const SparsityInternal& sp) const;
+    Sparsity _appendColumns(const SparsityInternal& sp) const;
 
     /** \brief Get a submatrix
     * Does bounds checking
@@ -392,7 +392,7 @@ namespace casadi {
      * The same indices will be removed from the mapping vector,
      * which must have the same length as the number of nonzeros
      */
-    Sparsity zz_removeDuplicates(std::vector<int>& mapping) const;
+    Sparsity _removeDuplicates(std::vector<int>& mapping) const;
 
     /// Get element index for each nonzero
     void find(std::vector<int>& loc, bool ind1) const;

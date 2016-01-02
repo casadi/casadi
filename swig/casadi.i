@@ -2071,9 +2071,6 @@ except:
 #endif // SWIGPYTHON
 
 %rename("%(regex:/friendwrap_(?!ML)(.*)/\\1/)s") ""; // Strip leading friendwrap_ unless followed by ML
-#ifndef SWIGMATLAB
-%rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
-#endif
 
 %rename(row) get_row;
 %rename(colind) get_colind;

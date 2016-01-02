@@ -1895,7 +1895,7 @@ namespace casadi {
     return ss.str();
   }
 
-  Sparsity SparsityInternal::zz_mtimes(const Sparsity& y) const {
+  Sparsity SparsityInternal::_mtimes(const Sparsity& y) const {
     // Dimensions of the result
     int d1 = size1();
     int d2 = y.size2();
@@ -2052,7 +2052,7 @@ namespace casadi {
     return std::pair<int, int>(size1(), size2());
   }
 
-  Sparsity SparsityInternal::zz_erase(const vector<int>& rr, bool ind1,
+  Sparsity SparsityInternal::_erase(const vector<int>& rr, bool ind1,
                                       std::vector<int>& mapping) const {
     // Quick return if nothing to erase
     if (rr.empty()) {
@@ -2075,14 +2075,14 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }
-      return zz_erase(rr_mod, false, mapping); // Call recursively
+      return _erase(rr_mod, false, mapping); // Call recursively
     }
 
     // Sort rr in non-deceasing order, if needed
     if (!isNonDecreasing(rr)) {
       std::vector<int> rr_sorted = rr;
       std::sort(rr_sorted.begin(), rr_sorted.end());
-      return zz_erase(rr_sorted, false, mapping);
+      return _erase(rr_sorted, false, mapping);
     }
 
     // Mapping
@@ -2146,7 +2146,7 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::zz_erase(const vector<int>& rr, const vector<int>& cc,
+  Sparsity SparsityInternal::_erase(const vector<int>& rr, const vector<int>& cc,
                                       bool ind1, std::vector<int>& mapping) const {
     if (!inBounds(rr, -size1()+ind1, size1()+ind1)) {
       casadi_error("Slicing [rr, cc] out of bounds. Your rr contains " <<
@@ -2183,7 +2183,7 @@ namespace casadi {
       std::sort(cc_mod.begin(), cc_mod.end());
 
       // Call recursively
-      return zz_erase(rr_mod, cc_mod, false, mapping);
+      return _erase(rr_mod, cc_mod, false, mapping);
     }
 
     // Mapping
@@ -2681,9 +2681,9 @@ namespace casadi {
     return true;
   }
 
-  Sparsity SparsityInternal::zz_appendVector(const SparsityInternal& sp) const {
+  Sparsity SparsityInternal::_appendVector(const SparsityInternal& sp) const {
     casadi_assert_message(size2() == 1 && sp.size2() == 1,
-      "SparsityInternal::zz_appendVector(sp): Both arguments must be vectors but got "
+      "SparsityInternal::_appendVector(sp): Both arguments must be vectors but got "
        << size2() << " columns for lhs, and " << sp.size2() << " columns for rhs.");
 
     // Get current number of non-zeros
@@ -2702,9 +2702,9 @@ namespace casadi {
     return Sparsity(size1()+sp.size1(), 1, new_colind, new_row);
   }
 
-  Sparsity SparsityInternal::zz_appendColumns(const SparsityInternal& sp) const {
+  Sparsity SparsityInternal::_appendColumns(const SparsityInternal& sp) const {
     casadi_assert_message(size1()== sp.size1(),
-      "SparsityInternal::zz_appendColumns(sp): row sizes must match but got " << size1()
+      "SparsityInternal::_appendColumns(sp): row sizes must match but got " << size1()
                           << " for lhs, and " << sp.size1() << " for rhs.");
 
     // Append rows
@@ -2722,7 +2722,7 @@ namespace casadi {
     return Sparsity(size1(), size2()+sp.size2(), new_colind, new_row);
   }
 
-  Sparsity SparsityInternal::zz_enlargeColumns(int ncol, const std::vector<int>& cc,
+  Sparsity SparsityInternal::_enlargeColumns(int ncol, const std::vector<int>& cc,
                                                bool ind1) const {
     if (!inBounds(cc, -ncol+ind1, ncol+ind1)) {
       casadi_error("enlargeColumns: out of bounds. Your cc contains "
@@ -2738,7 +2738,7 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += ncol;
       }
-      return zz_enlargeColumns(ncol, cc_mod, false); // Call recursively
+      return _enlargeColumns(ncol, cc_mod, false); // Call recursively
     }
 
     // Sparsify the columns
@@ -2767,7 +2767,7 @@ namespace casadi {
     return Sparsity(size1(), ncol, new_colind, get_row());
   }
 
-  Sparsity SparsityInternal::zz_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const {
+  Sparsity SparsityInternal::_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const {
     if (!inBounds(rr, -nrow+ind1, nrow+ind1)) {
       casadi_error("enlargeRows: out of bounds. Your rr contains " <<
                    *std::min_element(rr.begin(), rr.end()) << " up to " <<
@@ -2782,7 +2782,7 @@ namespace casadi {
         if (ind1) (*i)--;
         if (*i<0) *i += nrow;
       }
-      return zz_enlargeRows(nrow, rr_mod, false); // Call recursively
+      return _enlargeRows(nrow, rr_mod, false); // Call recursively
     }
 
     // Assert dimensions
@@ -2840,7 +2840,7 @@ namespace casadi {
     return -1;
   }
 
-  Sparsity SparsityInternal::zz_reshape(int nrow, int ncol) const {
+  Sparsity SparsityInternal::_reshape(int nrow, int ncol) const {
     casadi_assert_message(numel() == nrow*ncol,
                           "reshape: number of elements must remain the same. Old shape is "
                           << dim() << ". New shape is " << nrow << "x" << ncol
@@ -2866,7 +2866,7 @@ namespace casadi {
     return Sparsity::triplet(nrow, ncol, ret_row, ret_col);
   }
 
-  Sparsity SparsityInternal::zz_resize(int nrow, int ncol) const {
+  Sparsity SparsityInternal::_resize(int nrow, int ncol) const {
     // Col and row index of the new
     vector<int> row_new, colind_new(ncol+1, 0);
     const int* colind = this->colind();
@@ -2916,7 +2916,7 @@ namespace casadi {
     return true;
   }
 
-  Sparsity SparsityInternal::zz_removeDuplicates(std::vector<int>& mapping) const {
+  Sparsity SparsityInternal::_removeDuplicates(std::vector<int>& mapping) const {
     casadi_assert(mapping.size()==nnz());
 
     // Return value (to be hashed)
@@ -3807,7 +3807,7 @@ namespace casadi {
     return true;
   }
 
-  Sparsity SparsityInternal::zz_tril(bool includeDiagonal) const {
+  Sparsity SparsityInternal::_tril(bool includeDiagonal) const {
     const int* colind = this->colind();
     const int* row = this->row();
     vector<int> ret_colind, ret_row;
@@ -3825,7 +3825,7 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::zz_triu(bool includeDiagonal) const {
+  Sparsity SparsityInternal::_triu(bool includeDiagonal) const {
     const int* colind = this->colind();
     const int* row = this->row();
     vector<int> ret_colind, ret_row;

@@ -589,7 +589,7 @@ namespace casadi {
     ///@}
 
 #ifndef SWIG
-    /// Construct constant matrix with a given sparsity and all
+    /// Construct constant matrix with a given sparsity and values
     MX(const Sparsity& sp, int val, bool dummy);
     MX(const Sparsity& sp, double val, bool dummy);
   private:

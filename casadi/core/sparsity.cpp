@@ -157,7 +157,7 @@ namespace casadi {
 
   void Sparsity::resize(int nrow, int ncol) {
     if (size1()!=nrow || size2() != ncol) {
-      *this = (*this)->zz_resize(nrow, ncol);
+      *this = (*this)->_resize(nrow, ncol);
     }
   }
 
@@ -223,7 +223,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::reshape(const Sparsity& x, int nrow, int ncol) {
-    return x->zz_reshape(nrow, ncol);
+    return x->_reshape(nrow, ncol);
   }
 
   std::vector<int> Sparsity::getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const {
@@ -283,13 +283,13 @@ namespace casadi {
   std::vector<int> Sparsity::erase(const std::vector<int>& rr, const std::vector<int>& cc,
                                    bool ind1) {
     vector<int> mapping;
-    *this = (*this)->zz_erase(rr, cc, ind1, mapping);
+    *this = (*this)->_erase(rr, cc, ind1, mapping);
     return mapping;
   }
 
   std::vector<int> Sparsity::erase(const std::vector<int>& rr, bool ind1) {
     vector<int> mapping;
-    *this = (*this)->zz_erase(rr, ind1, mapping);
+    *this = (*this)->_erase(rr, ind1, mapping);
     return mapping;
   }
 
@@ -368,7 +368,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y) {
-    return x->zz_mtimes(y);
+    return x->_mtimes(y);
   }
 
   bool Sparsity::is_equal(const Sparsity& y) const {
@@ -418,7 +418,7 @@ namespace casadi {
         *this = sp;
       } else if (is_column()) {
         // Append to vector (inefficient)
-        *this = (*this)->zz_appendVector(*sp);
+        *this = (*this)->_appendVector(*sp);
       } else {
         // Append to matrix (inefficient)
         *this = vertcat({*this, sp});
@@ -446,7 +446,7 @@ namespace casadi {
         *this = sp;
       } else {
         // Append to matrix (expensive)
-        *this = (*this)->zz_appendColumns(*sp);
+        *this = (*this)->_appendColumns(*sp);
       }
     }
   }
@@ -482,7 +482,7 @@ namespace casadi {
     if (cc.empty()) {
       *this = Sparsity(size1(), ncol);
     } else {
-      *this = (*this)->zz_enlargeColumns(ncol, cc, ind1);
+      *this = (*this)->_enlargeColumns(ncol, cc, ind1);
     }
   }
 
@@ -491,7 +491,7 @@ namespace casadi {
     if (rr.empty()) {
       *this = Sparsity(nrow, size2());
     } else {
-      *this = (*this)->zz_enlargeRows(nrow, rr, ind1);
+      *this = (*this)->_enlargeRows(nrow, rr, ind1);
     }
   }
 
@@ -549,7 +549,7 @@ namespace casadi {
   }
 
   void Sparsity::removeDuplicates(std::vector<int>& mapping) {
-    *this = (*this)->zz_removeDuplicates(mapping);
+    *this = (*this)->_removeDuplicates(mapping);
   }
 
   std::vector<int> Sparsity::find(bool ind1) const {
@@ -728,11 +728,11 @@ namespace casadi {
   }
 
   Sparsity Sparsity::tril(const Sparsity& x, bool includeDiagonal) {
-    return x->zz_tril(includeDiagonal);
+    return x->_tril(includeDiagonal);
   }
 
   Sparsity Sparsity::triu(const Sparsity& x, bool includeDiagonal) {
-    return x->zz_triu(includeDiagonal);
+    return x->_triu(includeDiagonal);
   }
 
   std::vector<int> Sparsity::get_lower() const {

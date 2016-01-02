@@ -305,6 +305,11 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return ExType::binary(OP_CONSTPOW, x, y);
     }
 
+    /// Debug printing
+    friend inline ExType printme(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_PRINTME, x, y);
+    }
+
     /// In-place addition
     inline ExType& operator+=(const ExType &y) { return self() = self() + y; }
 
