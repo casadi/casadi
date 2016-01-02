@@ -1731,10 +1731,10 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_cofactor(int i, int j) const {
+  Matrix<DataType> Matrix<DataType>::cofactor(const Matrix<DataType>& A, int i, int j) {
 
     // Calculate the i, j minor
-    Matrix<DataType> minor_ij = getMinor(*this, i, j);
+    Matrix<DataType> minor_ij = getMinor(A, i, j);
     // Calculate the cofactor
     int sign_i = 1-2*((i+j) % 2);
 
@@ -1742,9 +1742,9 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_adj() const {
-    int n = size2();
-    casadi_assert_message(n == size1(), "adj: matrix must be square");
+  Matrix<DataType> Matrix<DataType>::adj(const Matrix<DataType>& x) {
+    int n = x.size2();
+    casadi_assert_message(n == x.size1(), "adj: matrix must be square");
 
     // Temporary placeholder
     Matrix<DataType> temp;
@@ -1753,7 +1753,7 @@ namespace casadi {
     Matrix<DataType> C = Matrix<DataType>(n, n);
     for (int i=0; i<n; ++i)
       for (int j=0; j<n; ++j) {
-        temp = cofactor(*this, i, j);
+        temp = cofactor(x, i, j);
         if (!temp.is_zero()) C(j, i) = temp;
       }
 
@@ -1907,21 +1907,21 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_all() const {
-    if (!is_dense()) return false;
+  Matrix<DataType> Matrix<DataType>::all(const Matrix<DataType>& x) {
+    if (!x.is_dense()) return false;
     DataType ret=1;
-    for (int i=0;i<nnz();++i) {
-      ret = ret && at(i)==1;
+    for (int i=0; i<x.nnz(); ++i) {
+      ret = ret && x.at(i)==1;
     }
     return ret;
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_any() const {
-    if (!is_dense()) return false;
+  Matrix<DataType> Matrix<DataType>::any(const Matrix<DataType>& x) {
+    if (!x.is_dense()) return false;
     DataType ret=0;
-    for (int i=0;i<nnz();++i) {
-      ret = ret || at(i)==1;
+    for (int i=0; i<x.nnz(); ++i) {
+      ret = ret || x.at(i)==1;
     }
     return ret;
   }
@@ -1957,19 +1957,20 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::zz_qr(Matrix<DataType>& Q, Matrix<DataType> &R) const {
+  void Matrix<DataType>::qr(const Matrix<DataType>& A,
+                            Matrix<DataType>& Q, Matrix<DataType> &R) {
     // The following algorithm is taken from J. Demmel:
     // Applied Numerical Linear Algebra (algorithm 3.1.)
-    casadi_assert_message(size1()>=size2(), "qr: fewer rows than columns");
+    casadi_assert_message(A.size1()>=A.size2(), "qr: fewer rows than columns");
 
     // compute Q and R column by column
     Q = R = Matrix<DataType>();
-    for (int i=0; i<size2(); ++i) {
+    for (int i=0; i<A.size2(); ++i) {
       // Initialize qi to be the i-th column of *this
-      Matrix<DataType> ai = (*this)(ALL, i);
+      Matrix<DataType> ai = A(ALL, i);
       Matrix<DataType> qi = ai;
       // The i-th column of R
-      Matrix<DataType> ri = Matrix<DataType>(size2(), 1);
+      Matrix<DataType> ri = Matrix<DataType>(A.size2(), 1);
 
       // subtract the projection of qi in the previous directions from ai
       for (int j=0; j<i; ++j) {
@@ -2038,24 +2039,24 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_chol() const {
+  Matrix<DataType> Matrix<DataType>::chol(const Matrix<DataType>& A) {
     // Cholesky-Banachiewicz algorithm
     // Naive, dense implementation O(n^3)
 
     // check dimensions
-    casadi_assert_message(size1() == size2(), "Cholesky decomposition requires square matrix."
-                                              "Got " << dim() << " instead.");
+    casadi_assert_message(A.size1() == A.size2(), "Cholesky decomposition requires square matrix."
+                                              "Got " << A.dim() << " instead.");
 
-    Matrix<DataType> ret = Matrix<DataType>(Sparsity::lower(size1()));
+    Matrix<DataType> ret = Matrix<DataType>(Sparsity::lower(A.size1()));
 
-    for (int i=0; i<size1(); ++i) { // loop over rows
+    for (int i=0; i<A.size1(); ++i) { // loop over rows
       for (int j=0; j<i; ++j) {
         // Loop over columns before diagonal
         Matrix<DataType> sum=0;
         for (int k=0;k<j;++k) {
           sum += ret(i, k)*ret(j, k);
         }
-        ret(i, j) = ((*this)(i, j)-sum)/ret(j, j);
+        ret(i, j) = (A(i, j)-sum)/ret(j, j);
       }
 
       // Treat the diagonal element separately
@@ -2064,7 +2065,7 @@ namespace casadi {
       for (int k=0;k<j;++k) {
         sum += pow(ret(j, k), 2);
       }
-      ret(j, j) = sqrt((*this)(j, j)-sum);
+      ret(j, j) = sqrt(A(j, j)-sum);
     }
     return ret.T();
   }
@@ -2271,36 +2272,38 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_norm_inf_mul(const Matrix<DataType> &A) const {
-    int n_row = A.size2();
-    int n_col = size1();
-    casadi_assert_message(A.size1()==size2(), "Dimension error. Got " << dim()
-                          << " times " << A.dim() << ".");
+  Matrix<DataType> Matrix<DataType>::norm_inf_mul(const Matrix<DataType>& x,
+                                                  const Matrix<DataType>& y) {
+    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got " << x.dim()
+                          << " times " << y.dim() << ".");
 
     // Allocate work vectors
-    std::vector<DataType> dwork(n_col);
-    std::vector<int> iwork(n_row+1+n_col);
+    std::vector<DataType> dwork(x.size1());
+    std::vector<int> iwork(x.size1()+1+y.size2());
 
     // Call C runtime
-    return casadi_norm_inf_mul(ptr(), sparsity(), A.ptr(), A.sparsity(),
+    return casadi_norm_inf_mul(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
                                getPtr(dwork), getPtr(iwork));
   }
 
   template<typename DataType>
-  void Matrix<DataType>::zz_expand(Matrix<DataType> &weights, Matrix<DataType>& terms) const {
+  void Matrix<DataType>::expand(const Matrix<DataType>& ex,
+                                Matrix<DataType> &weights, Matrix<DataType>& terms) {
     throw CasadiException("\"expand\" not defined for instantiation");
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_pw_const(const Matrix<DataType> &tval,
-                                                 const Matrix<DataType> &val) const {
+  Matrix<DataType> Matrix<DataType>::pw_const(const Matrix<DataType>& ex,
+                                              const Matrix<DataType>& tval,
+                                              const Matrix<DataType>& val) {
     throw CasadiException("\"pw_const\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_pw_lin(const Matrix<DataType> &tval,
-                                               const Matrix<DataType> &val) const {
+  Matrix<DataType> Matrix<DataType>::pw_lin(const Matrix<DataType>& ex,
+                                            const Matrix<DataType>& tval,
+                                            const Matrix<DataType>& val) {
     throw CasadiException("\"pw_lin\" not defined for instantiation");
     return Matrix<DataType>();
   }
@@ -2326,37 +2329,39 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_heaviside() const {
-    return (1+sign(*this))/2;
+  Matrix<DataType> Matrix<DataType>::heaviside(const Matrix<DataType>& x) {
+    return (1+sign(x))/2;
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_rectangle() const {
-    return 0.5*(sign(*this+0.5)-sign(*this-0.5));
+  Matrix<DataType> Matrix<DataType>::rectangle(const Matrix<DataType>& x) {
+    return 0.5*(sign(x+0.5)-sign(x-0.5));
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_triangle() const {
-    return rectangle(*this/2)*(1-fabs(*this));
+  Matrix<DataType> Matrix<DataType>::triangle(const Matrix<DataType>& x) {
+    return rectangle(x/2)*(1-fabs(x));
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_ramp() const {
-    return *this*heaviside(*this);
+  Matrix<DataType> Matrix<DataType>::ramp(const Matrix<DataType>& x) {
+    return x*heaviside(x);
   }
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::
-  zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
-                      const Matrix<DataType> &b, int order) const {
-    return zz_gauss_quadrature(x, a, b, order, Matrix<DataType>());
+  gauss_quadrature(const Matrix<DataType> &f,
+                   const Matrix<DataType> &x, const Matrix<DataType> &a,
+                   const Matrix<DataType> &b, int order) {
+    return gauss_quadrature(f, x, a, b, order, Matrix<DataType>());
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_gauss_quadrature(const Matrix<DataType> &x,
-                                                         const Matrix<DataType> &a,
-                                                         const Matrix<DataType> &b, int order,
-                                                         const Matrix<DataType>& w) const {
+  Matrix<DataType> Matrix<DataType>::gauss_quadrature(const Matrix<DataType>& f,
+                                                      const Matrix<DataType>& x,
+                                                      const Matrix<DataType>& a,
+                                                      const Matrix<DataType>& b, int order,
+                                                      const Matrix<DataType>& w) {
     throw CasadiException("\"gauss_quadrature\" not defined for instantiation");
     return Matrix<DataType>();
   }
@@ -2451,23 +2456,26 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_taylor(const Matrix<DataType>& x,
-                                               const Matrix<DataType>& a, int order) const {
+  Matrix<DataType> Matrix<DataType>::taylor(const Matrix<DataType>& f,
+                                            const Matrix<DataType>& x,
+                                            const Matrix<DataType>& a, int order) {
     throw CasadiException("\"taylor\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_mtaylor(const Matrix<DataType>& x,
-                                                const Matrix<DataType>& a, int order) const {
+  Matrix<DataType> Matrix<DataType>::mtaylor(const Matrix<DataType>& f,
+                                             const Matrix<DataType>& x,
+                                             const Matrix<DataType>& a, int order) {
     throw CasadiException("\"mtaylor\" not defined for instantiation");
     return Matrix<DataType>();
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_mtaylor(const Matrix<DataType>& x,
-                                                const Matrix<DataType>& a, int order,
-                                                const std::vector<int>&order_contributions) const {
+  Matrix<DataType> Matrix<DataType>::mtaylor(const Matrix<DataType>& f,
+                                             const Matrix<DataType>& x,
+                                             const Matrix<DataType>& a, int order,
+                                             const std::vector<int>&order_contributions) {
     throw CasadiException("\"mtaylor\" not defined for instantiation");
     return Matrix<DataType>();
   }
@@ -2502,34 +2510,35 @@ namespace casadi {
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_poly_coeff(const Matrix<DataType>&x) const {
+  Matrix<DataType> Matrix<DataType>::poly_coeff(const Matrix<DataType>& f,
+                                                const Matrix<DataType>&x) {
     throw CasadiException("\"poly_coeff\" not defined for instantiation");
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_poly_roots() const {
+  Matrix<DataType> Matrix<DataType>::poly_roots(const Matrix<DataType>& p) {
     throw CasadiException("\"poly_roots\" not defined for instantiation");
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_eig_symbolic() const {
+  Matrix<DataType> Matrix<DataType>::eig_symbolic(const Matrix<DataType>& m) {
     throw CasadiException("\"eig_symbolic\" not defined for instantiation");
   }
 
   template<typename DataType>
-  Matrix<DataType> Matrix<DataType>::zz_sparsify(double tol) const {
+  Matrix<DataType> Matrix<DataType>::sparsify(const Matrix<DataType>& x, double tol) {
     // Quick return if there are no entries to be removed
     bool remove_nothing = true;
-    for (auto it=data_.begin(); it!=data_.end() && remove_nothing; ++it) {
+    for (auto it=x.data().begin(); it!=x.data().end() && remove_nothing; ++it) {
       remove_nothing = !casadi_limits<DataType>::isAlmostZero(*it, tol);
     }
-    if (remove_nothing) return *this;
+    if (remove_nothing) return x;
 
     // Get the current sparsity pattern
-    int size1 = this->size1();
-    int size2 = this->size2();
-    const int* colind = this->colind();
-    const int* row = this->row();
+    int size1 = x.size1();
+    int size2 = x.size2();
+    const int* colind = x.colind();
+    const int* row = x.row();
 
     // Construct the new sparsity pattern
     std::vector<int> new_colind(1, 0), new_row;
@@ -2540,9 +2549,9 @@ namespace casadi {
       // Loop over existing nonzeros
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         // If it is not known to be a zero
-        if (!casadi_limits<DataType>::isAlmostZero(data_[el], tol)) {
+        if (!casadi_limits<DataType>::isAlmostZero(x.at(el), tol)) {
           // Save the nonzero in its new location
-          new_data.push_back(data_[el]);
+          new_data.push_back(x.at(el));
 
           // Add to pattern
           new_row.push_back(row[el]);
@@ -2870,14 +2879,14 @@ namespace casadi {
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
   template<> size_t SX::element_hash() const;
-  template<> void SX::zz_expand(SX &weights, SX& terms) const;
-  template<> SX SX::zz_pw_const(const SX &tval, const SX &val) const;
-  template<> SX SX::zz_pw_lin(const SX &tval, const SX &val) const;
+  template<> void SX::expand(const SX& f, SX& weights, SX& terms);
+  template<> SX SX::pw_const(const SX& t, const SX& tval, const SX& val);
+  template<> SX SX::pw_lin(const SX& t, const SX &tval, const SX &val);
   template<> SX SX::if_else(const SX &cond, const SX &if_true, const SX &if_false,
                             bool short_circuit);
-  template<> SX SX::zz_gauss_quadrature(const SX &x, const SX &a,
-                                        const SX &b, int order,
-                                        const SX& w) const;
+  template<> SX SX::gauss_quadrature(const SX& f, const SX &x, const SX &a,
+                                     const SX &b, int order,
+                                     const SX& w);
   template<> SX SX::simplify(const SX& x);
   template<> SX SX::substitute(const SX& ex, const SX& v, const SX& vdef);
   template<> std::vector<SX > SX::substitute(const std::vector<SX >& ex,
@@ -2896,10 +2905,10 @@ namespace casadi {
   template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
   template<> SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr);
   template<> std::vector<bool> SX::nl_var(const SX &expr, const SX &var);
-  template<> SX SX::zz_taylor(const SX& x, const SX& a, int order) const;
-  template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const;
-  template<> SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
-                               const std::vector<int>& order_contributions) const;
+  template<> SX SX::taylor(const SX& f, const SX& x, const SX& a, int order);
+  template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order);
+  template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
+                            const std::vector<int>& order_contributions);
   template<> int SX::countNodes(const SX& x);
   template<> std::string
   SX::print_operator(const SX& x, const std::vector<std::string>& args);
@@ -2908,9 +2917,9 @@ namespace casadi {
                                     std::vector<SX >& vdef,
                                     const std::string& v_prefix,
                                     const std::string& v_suffix);
-  template<> SX SX::zz_poly_coeff(const SX&x) const;
-  template<> SX SX::zz_poly_roots() const;
-  template<> SX SX::zz_eig_symbolic() const;
+  template<> SX SX::poly_coeff(const SX& f, const SX& x);
+  template<> SX SX::poly_roots(const SX& p);
+  template<> SX SX::eig_symbolic(const SX& m);
   template<> void SX::printSplit(std::vector<std::string>& nz,
                                  std::vector<std::string>& inter) const;
 

@@ -255,8 +255,7 @@ namespace casadi {
   }
 
   template<>
-  void SX::zz_expand(SX &ww, SX& tt) const {
-    const SX& ex2 = *this;
+  void SX::expand(const SX& ex2, SX& ww, SX& tt) {
     casadi_assert(ex2.is_scalar());
     SXElem ex = ex2.toScalar();
 
@@ -385,9 +384,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_pw_const(const SX &tval,
-                     const SX &val) const {
-    const SX &t = *this;
+  SX SX::pw_const(const SX& t, const SX& tval, const SX& val) {
     // number of intervals
     int n = val.numel();
 
@@ -403,10 +400,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_pw_lin(const SX &tval,
-                   const SX &val) const {
-    const SX &t = *this;
-
+  SX SX::pw_lin(const SX& t, const SX& tval, const SX& val) {
     // Number of points
     int N = tval.numel();
     casadi_assert_message(N>=2, "pw_lin: N>=2");
@@ -435,11 +429,8 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_gauss_quadrature(const SX &x,
-                             const SX &a,
-                             const SX &b, int order,
-                             const SX& w) const {
-    const SX &f = *this;
+  SX SX::gauss_quadrature(const SX& f, const SX& x, const SX& a, const SX& b, int order,
+                          const SX& w) {
     casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
     casadi_assert_message(w.is_empty(), "gauss_quadrature: empty weights");
 
@@ -677,29 +668,29 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_taylor(const SX& x,
-                   const SX& a, int order) const {
+  SX SX::taylor(const SX& f, const SX& x,
+                const SX& a, int order) {
     casadi_assert(x.is_scalar() && a.is_scalar());
-    if (nnz()!=numel())
+    if (f.nnz()!=f.numel())
       throw CasadiException("taylor: not implemented for sparse matrices");
-    SX ff = vec(T());
+    SX ff = vec(f.T());
 
     SX result = substitute(ff, x, a);
     double nf=1;
     SX dx = (x-a);
     SX dxa = (x-a);
-    for (int i=1;i<=order;i++) {
+    for (int i=1; i<=order; i++) {
       ff = jacobian(ff, x);
       nf*=i;
       result+=1/nf * substitute(ff, x, a) * dxa;
       dxa*=dx;
     }
-    return reshape(result, size2(), size1()).T();
+    return reshape(result, f.size2(), f.size1()).T();
   }
 
   template<>
-  SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const {
-    return mtaylor(*this, x, a, order, vector<int>(x.nnz(), 1));
+  SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order) {
+    return mtaylor(f, x, a, order, vector<int>(x.nnz(), 1));
   }
 
   SX mtaylor_recursive(const SX& ex, const SX& x, const SX& a, int order,
@@ -721,9 +712,9 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
-                    const vector<int>& order_contributions) const {
-    casadi_assert_message(nnz()==numel() && x.nnz()==x.numel(),
+  SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
+                 const vector<int>& order_contributions) {
+    casadi_assert_message(f.nnz()==f.numel() && x.nnz()==x.numel(),
                           "mtaylor: not implemented for sparse matrices");
 
     casadi_assert_message(x.nnz()==order_contributions.size(),
@@ -731,9 +722,9 @@ namespace casadi {
                           << ") must match size of order_contributions ("
                           << order_contributions.size() << ")");
 
-    return reshape(mtaylor_recursive(vec(*this), x, a, order,
+    return reshape(mtaylor_recursive(vec(f), x, a, order,
                                      order_contributions),
-                   size2(), size1()).T();
+                   f.size2(), f.size1()).T();
   }
 
   template<>
@@ -889,14 +880,14 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_poly_coeff(const SX& x) const {
-    casadi_assert(is_scalar());
+  SX SX::poly_coeff(const SX& ex, const SX& x) {
+    casadi_assert(ex.is_scalar());
     casadi_assert(x.is_scalar());
     casadi_assert(x.is_symbolic());
 
     vector<SXElem> r;
 
-    Function f("tmp", {x}, {*this});
+    Function f("tmp", {x}, {ex});
     int mult = 1;
     bool success = false;
     for (int i=0; i<1000; ++i) {
@@ -918,8 +909,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_poly_roots() const {
-    const SX& p = *this;
+  SX SX::poly_roots(const SX& p) {
     casadi_assert_message(p.size2()==1,
                           "poly_root(): supplied parameter must be column vector but got "
                           << p.dim() << ".");
@@ -1000,8 +990,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_eig_symbolic() const {
-    const SX& m = *this;
+  SX SX::eig_symbolic(const SX& m) {
     casadi_assert_message(m.size1()==m.size2(), "eig(): supplied matrix must be square");
 
     vector<SX> ret;

@@ -474,39 +474,46 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined here
-    Matrix<DataType> zz_sparsify(double tol=0) const;
-    void zz_expand(Matrix<DataType> &weights, Matrix<DataType>& terms) const;
-    Matrix<DataType> zz_pw_const(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;
-    Matrix<DataType> zz_pw_lin(const Matrix<DataType> &tval, const Matrix<DataType> &val) const;
-    Matrix<DataType> zz_heaviside() const;
-    Matrix<DataType> zz_rectangle() const;
-    Matrix<DataType> zz_triangle() const;
-    Matrix<DataType> zz_ramp() const;
-    Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
-                                         const Matrix<DataType> &b, int order=5) const;
-    Matrix<DataType> zz_gauss_quadrature(const Matrix<DataType> &x, const Matrix<DataType> &a,
-                                         const Matrix<DataType> &b, int order,
-                                         const Matrix<DataType>& w) const;
+    static Matrix<DataType> sparsify(const Matrix<DataType> &x, double tol=0);
+    static void expand(const Matrix<DataType>& x,
+                       Matrix<DataType>& weights,
+                       Matrix<DataType>& terms);
+    static Matrix<DataType> pw_const(const Matrix<DataType> &t,
+                                     const Matrix<DataType> &tval, const Matrix<DataType> &val);
+    static Matrix<DataType> pw_lin(const Matrix<DataType> &t,
+                                   const Matrix<DataType> &tval, const Matrix<DataType> &val);
+    static Matrix<DataType> heaviside(const Matrix<DataType> &x);
+    static Matrix<DataType> rectangle(const Matrix<DataType> &x);
+    static Matrix<DataType> triangle(const Matrix<DataType> &x);
+    static Matrix<DataType> ramp(const Matrix<DataType> &x);
+    static Matrix<DataType> gauss_quadrature(const Matrix<DataType> &f,
+                                             const Matrix<DataType> &x, const Matrix<DataType> &a,
+                                             const Matrix<DataType> &b, int order=5);
+    static Matrix<DataType> gauss_quadrature(const Matrix<DataType> &f,
+                                             const Matrix<DataType> &x, const Matrix<DataType> &a,
+                                             const Matrix<DataType> &b, int order,
+                                             const Matrix<DataType>& w);
     static Matrix<DataType> jtimes(const Matrix<DataType> &ex, const Matrix<DataType> &arg,
                                    const Matrix<DataType> &v, bool tr=false);
     static std::vector<bool> nl_var(const Matrix<DataType> &expr, const Matrix<DataType> &var);
-    Matrix<DataType> zz_taylor(const Matrix<DataType>& x,
-                               const Matrix<DataType>& a, int order) const;
-    Matrix<DataType> zz_mtaylor(const Matrix<DataType>& x,
-                                const Matrix<DataType>& a, int order) const;
-    Matrix<DataType> zz_mtaylor(const Matrix<DataType>& x, const Matrix<DataType>& a, int order,
-                                const std::vector<int>& order_contributions) const;
-    Matrix<DataType> zz_poly_coeff(const Matrix<DataType>&x) const;
-    Matrix<DataType> zz_poly_roots() const;
-    Matrix<DataType> zz_eig_symbolic() const;
-    void zz_qr(Matrix<DataType>& Q, Matrix<DataType>& R) const;
-    Matrix<DataType> zz_all() const;
-    Matrix<DataType> zz_any() const;
-    Matrix<DataType> zz_adj() const;
+    static Matrix<DataType> taylor(const Matrix<DataType>& ex, const Matrix<DataType>& x,
+                                   const Matrix<DataType>& a, int order);
+    static Matrix<DataType> mtaylor(const Matrix<DataType>& ex, const Matrix<DataType>& x,
+                                    const Matrix<DataType>& a, int order);
+    static Matrix<DataType> mtaylor(const Matrix<DataType>& ex,
+                                    const Matrix<DataType>& x, const Matrix<DataType>& a, int order,
+                                    const std::vector<int>& order_contributions);
+    static Matrix<DataType> poly_coeff(const Matrix<DataType>& ex, const Matrix<DataType>&x);
+    static Matrix<DataType> poly_roots(const Matrix<DataType>& p);
+    static Matrix<DataType> eig_symbolic(const Matrix<DataType>& m);
+    static void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R);
+    static Matrix<DataType> all(const Matrix<DataType>& x);
+    static Matrix<DataType> any(const Matrix<DataType>& x);
+    static Matrix<DataType> adj(const Matrix<DataType>& x);
     static Matrix<DataType> getMinor(const Matrix<DataType>& x, int i, int j);
-    Matrix<DataType> zz_cofactor(int i, int j) const;
-    Matrix<DataType> zz_chol() const;
-    Matrix<DataType> zz_norm_inf_mul(const Matrix<DataType> &y) const;
+    static Matrix<DataType> cofactor(const Matrix<DataType>& A, int i, int j);
+    static Matrix<DataType> chol(const Matrix<DataType>& A);
+    static Matrix<DataType> norm_inf_mul(const Matrix<DataType>& x, const Matrix<DataType> &y);
     static Matrix<DataType> diagcat(const std::vector< Matrix<DataType> > &A);
     ///@}
     /// \endcond
@@ -525,7 +532,7 @@ namespace casadi {
     /** \brief Matrix adjoint
     */
     friend inline Matrix<DataType> adj(const Matrix<DataType>& A) {
-      return A.zz_adj();
+      return Matrix<DataType>::adj(A);
     }
 
     /** \brief Get the (i,j) minor matrix
@@ -537,7 +544,7 @@ namespace casadi {
     /** \brief Get the (i,j) cofactor matrix
     */
     friend inline Matrix<DataType> cofactor(const Matrix<DataType> &x, int i, int j) {
-      return x.zz_cofactor(i, j);
+      return Matrix<DataType>::cofactor(x, i, j);
     }
 
     /** \brief  QR factorization using the modified Gram-Schmidt algorithm
@@ -547,7 +554,7 @@ namespace casadi {
      * Note that in SWIG, Q and R are returned by value.
      */
     friend inline void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R) {
-      return A.zz_qr(Q, R);
+      return Matrix<DataType>::qr(A, Q, R);
     }
 
     /** \brief Obtain a Cholesky factorisation of a matrix
@@ -558,40 +565,40 @@ namespace casadi {
      * There is an open ticket #1212 to make it sparse.
      */
     friend inline Matrix<DataType> chol(const Matrix<DataType>& A) {
-      return A.zz_chol();
+      return Matrix<DataType>::chol(A);
     }
 
     /** \brief Returns true only if any element in the matrix is true
      */
     friend inline Matrix<DataType> any(const Matrix<DataType> &x) {
-      return x.zz_any();
+      return Matrix<DataType>::any(x);
     }
 
     /** \brief Returns true only if every element in the matrix is true
      */
     friend inline Matrix<DataType> all(const Matrix<DataType> &x) {
-      return x.zz_all();
+      return Matrix<DataType>::all(x);
     }
 
     /** \brief Inf-norm of a Matrix-Matrix product
     */
     friend inline Matrix<DataType>
       norm_inf_mul(const Matrix<DataType> &x, const Matrix<DataType> &y) {
-      return x.zz_norm_inf_mul(y);
+      return Matrix<DataType>::norm_inf_mul(x, y);
     }
 
     /** \brief  Make a matrix sparse by removing numerical zeros
     */
     friend inline Matrix<DataType>
       sparsify(const Matrix<DataType>& A, double tol=0) {
-      return A.zz_sparsify(tol);
+      return Matrix<DataType>::sparsify(A, tol);
     }
 
     /** \brief  Expand the expression as a weighted sum (with constant weights)
      */
     friend inline void expand(const Matrix<DataType>& ex, Matrix<DataType> &weights,
                               Matrix<DataType>& terms) {
-      ex.zz_expand(weights, terms);
+      Matrix<DataType>::expand(ex, weights, terms);
     }
 
     /** \brief Create a piecewise constant function
@@ -605,7 +612,7 @@ namespace casadi {
     friend inline Matrix<DataType> pw_const(const Matrix<DataType> &t,
                                             const Matrix<DataType> &tval,
                                             const Matrix<DataType> &val) {
-      return t.zz_pw_const(tval, val);
+      return Matrix<DataType>::pw_const(t, tval, val);
     }
 
     /** Create a piecewise linear function
@@ -619,7 +626,7 @@ namespace casadi {
     friend inline Matrix<DataType>
       pw_lin(const Matrix<DataType> &t, const Matrix<DataType> &tval,
              const Matrix<DataType> &val) {
-      return t.zz_pw_lin(tval, val);
+      return Matrix<DataType>::pw_lin(t, tval, val);
     }
 
     /**  \brief Heaviside function
@@ -633,7 +640,7 @@ namespace casadi {
      * \f]
      */
     friend inline Matrix<DataType> heaviside(const Matrix<DataType> &x) {
-      return x.zz_heaviside();
+      return Matrix<DataType>::heaviside(x);
     }
 
     /**
@@ -650,7 +657,7 @@ namespace casadi {
      * Also called: gate function, block function, band function, pulse function, window function
      */
     friend inline Matrix<DataType> rectangle(const Matrix<DataType> &x) {
-      return x.zz_rectangle();
+      return Matrix<DataType>::rectangle(x);
     }
 
     /**
@@ -665,7 +672,7 @@ namespace casadi {
      *
      */
     friend inline Matrix<DataType> triangle(const Matrix<DataType> &x) {
-      return x.zz_triangle();
+      return Matrix<DataType>::triangle(x);
     }
 
     /**
@@ -682,7 +689,7 @@ namespace casadi {
      * Also called: slope function
      */
     friend inline Matrix<DataType> ramp(const Matrix<DataType> &x) {
-      return x.zz_ramp();
+      return Matrix<DataType>::ramp(x);
     }
 
     ///@{
@@ -691,13 +698,13 @@ namespace casadi {
       gauss_quadrature(const Matrix<DataType> &f, const Matrix<DataType> &x,
                        const Matrix<DataType> &a, const Matrix<DataType> &b,
                        int order=5) {
-      return f.zz_gauss_quadrature(x, a, b, order);
+      return Matrix<DataType>::gauss_quadrature(f, x, a, b, order);
     }
     friend inline Matrix<DataType>
       gauss_quadrature(const Matrix<DataType> &f, const Matrix<DataType> &x,
                        const Matrix<DataType> &a, const Matrix<DataType> &b,
                        int order, const Matrix<DataType>& w) {
-      return f.zz_gauss_quadrature(x, a, b, order, w);
+      return Matrix<DataType>::gauss_quadrature(f, x, a, b, order, w);
     }
     ///@}
 
@@ -718,10 +725,10 @@ namespace casadi {
      */
     friend inline Matrix<DataType> taylor(const Matrix<DataType>& ex, const Matrix<DataType>& x,
                                           const Matrix<DataType>& a, int order=1) {
-      return ex.zz_taylor(x, a, order);
+      return Matrix<DataType>::taylor(ex, x, a, order);
     }
     friend inline Matrix<DataType> taylor(const Matrix<DataType>& ex, const Matrix<DataType>& x) {
-      return ex.zz_taylor(x, 0, 1);
+      return Matrix<DataType>::taylor(ex, x, 0, 1);
     }
     ///@}
 
@@ -734,7 +741,7 @@ namespace casadi {
      */
     friend inline Matrix<DataType> mtaylor(const Matrix<DataType>& ex, const Matrix<DataType>& x,
                                            const Matrix<DataType>& a, int order=1) {
-      return ex.zz_mtaylor(x, a, order);
+      return Matrix<DataType>::mtaylor(ex, x, a, order);
     }
 
     /**
@@ -766,7 +773,7 @@ namespace casadi {
     friend inline Matrix<DataType> mtaylor(const Matrix<DataType>& ex, const Matrix<DataType>& x,
                                            const Matrix<DataType>& a, int order,
                                            const std::vector<int>& order_contributions) {
-      return ex.zz_mtaylor(x, a, order, order_contributions);
+      return Matrix<DataType>::mtaylor(ex, x, a, order, order_contributions);
     }
 
     /** \brief extracts polynomial coefficients from an expression
@@ -774,9 +781,9 @@ namespace casadi {
      * \param ex Scalar expression that represents a polynomial
      * \param x  Scalar symbol that the polynomial is build up with
      */
-    friend inline Matrix<DataType> poly_coeff(const Matrix<DataType>& ex,
-                                              const Matrix<DataType>&x) {
-      return ex.zz_poly_coeff(x);
+    friend inline Matrix<DataType> poly_coeff(const Matrix<DataType>& f,
+                                              const Matrix<DataType>& x) {
+      return Matrix<DataType>::poly_coeff(f, x);
     }
 
     /** \brief Attempts to find the roots of a polynomial
@@ -786,14 +793,14 @@ namespace casadi {
      *
      */
     friend inline Matrix<DataType> poly_roots(const Matrix<DataType>& p) {
-      return p.zz_poly_roots();
+      return Matrix<DataType>::poly_roots(p);
     }
 
     /** \brief Attempts to find the eigenvalues of a symbolic matrix
      *  This will only work for up to 3x3 matrices
      */
     friend inline Matrix<DataType> eig_symbolic(const Matrix<DataType>& m) {
-      return m.zz_eig_symbolic();
+      return Matrix<DataType>::eig_symbolic(m);
     }
 /** @} */
 #endif
