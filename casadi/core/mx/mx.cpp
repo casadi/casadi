@@ -632,13 +632,9 @@ namespace casadi {
     return(*this)->getMonitor(comment);
   }
 
-  MX MX::zz_log10() const {
-    return log(*this)*(1/std::log(10.));
-  }
-
-  MX MX::zz_lift(const MX& x_guess) const {
-    casadi_assert(sparsity()==x_guess.sparsity());
-    return (*this)->getBinary(OP_LIFT, x_guess, false, false);
+  MX MX::lift(const MX& x, const MX& x_guess) {
+    casadi_assert(x.sparsity()==x_guess.sparsity());
+    return x->getBinary(OP_LIFT, x_guess, false, false);
   }
 
   MX MX::mrdivide(const MX& a, const MX& b) {
@@ -1301,13 +1297,14 @@ namespace casadi {
     return F(vdef, true);
   }
 
-  MX MX::zz_graph_substitute(const std::vector<MX> &v, const std::vector<MX> &vdef) const {
-    return graph_substitute(std::vector<MX>(1, *this), v, vdef).at(0);
+  MX MX::graph_substitute(const MX& x, const std::vector<MX> &v,
+                          const std::vector<MX> &vdef) {
+    return graph_substitute(std::vector<MX>{x}, v, vdef).at(0);
   }
 
-  std::vector<MX> MX::zz_graph_substitute(const std::vector<MX> &ex,
-                                          const std::vector<MX> &expr,
-                                          const std::vector<MX> &exprs) {
+  std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
+                                       const std::vector<MX>& expr,
+                                       const std::vector<MX>& exprs) {
     casadi_assert_message(expr.size()==exprs.size(),
                           "Mismatch in the number of expression to substitute: "
                           << expr.size() << " <-> " << exprs.size() << ".");
@@ -1587,12 +1584,13 @@ namespace casadi {
     return f.free_mx();
   }
 
-  MX MX::zz_matrix_expand(const MX& e, const std::vector<MX> &boundary, const Dict &options) {
+  MX MX::matrix_expand(const MX& e, const std::vector<MX> &boundary, const Dict &options) {
     return matrix_expand(vector<MX>{e}, boundary, options).at(0);
   }
 
-  std::vector<MX> MX::zz_matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary,
-     const Dict &options) {
+  std::vector<MX> MX::matrix_expand(const std::vector<MX>& e,
+                                    const std::vector<MX> &boundary,
+                                    const Dict &options) {
 
     // Create symbols for boundary nodes
     std::vector<MX> syms(boundary.size());
@@ -1675,8 +1673,8 @@ namespace casadi {
     return false;
   }
 
-  MX MX::zz_find() const {
-    return (*this)->getFind();
+  MX MX::find(const MX& x) {
+    return x->getFind();
   }
 
   std::vector<MX> MX::get_input(const Function& f) {

@@ -360,7 +360,6 @@ namespace casadi {
     /// \cond CLUTTER
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    MX zz_log10() const;
     static bool is_equal(const MX& x, const MX& y, int depth=0);
     ///@}
 
@@ -442,18 +441,18 @@ namespace casadi {
 
     ///@{
     /// Functions called by friend functions defined for this class
-    MX zz_find() const;
-
-    MX zz_graph_substitute(const std::vector<MX> &v, const std::vector<MX> &vdef) const;
-    static std::vector<MX> zz_graph_substitute(const std::vector<MX> &ex,
-                                               const std::vector<MX> &expr,
-                                               const std::vector<MX> &exprs);
-    static MX zz_matrix_expand(const MX& e, const std::vector<MX> &boundary,
-                                            const Dict& options);
-    static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,
-                                            const std::vector<MX>& boundary,
-                                            const Dict& options);
-    MX zz_lift(const MX& x_guess) const;
+    static MX find(const MX& x);
+    static MX graph_substitute(const MX& x, const std::vector<MX> &v,
+                               const std::vector<MX> &vdef);
+    static std::vector<MX> graph_substitute(const std::vector<MX> &ex,
+                                            const std::vector<MX> &expr,
+                                            const std::vector<MX> &exprs);
+    static MX matrix_expand(const MX& e, const std::vector<MX> &boundary,
+                            const Dict& options);
+    static std::vector<MX> matrix_expand(const std::vector<MX>& e,
+                                         const std::vector<MX>& boundary,
+                                         const Dict& options);
+    static MX lift(const MX& x, const MX& x_guess);
     ///@}
     /// \endcond
 
@@ -470,7 +469,7 @@ namespace casadi {
      * If failed, returns the number of rows
      */
     inline friend MX find(const MX& x) {
-      return x.zz_find();
+      return MX::find(x);
     }
 
     /** \brief Substitute single expression in graph
@@ -478,7 +477,7 @@ namespace casadi {
      */
     inline friend MX graph_substitute(const MX& ex, const std::vector<MX> &v,
                                       const std::vector<MX> &vdef) {
-      return ex.zz_graph_substitute(v, vdef);
+      return MX::graph_substitute(ex, v, vdef);
     }
 
     /** \brief Substitute multiple expressions in graph
@@ -489,7 +488,7 @@ namespace casadi {
       graph_substitute(const std::vector<MX> &ex,
                        const std::vector<MX> &v,
                        const std::vector<MX> &vdef) {
-      return MX::zz_graph_substitute(ex, v, vdef);
+      return MX::graph_substitute(ex, v, vdef);
     }
 
     /** \brief Expand MX graph to SXFunction call
@@ -501,7 +500,7 @@ namespace casadi {
     inline friend MX
       matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>(),
         const Dict& options = Dict()) {
-      return MX::zz_matrix_expand(e, boundary, options);
+      return MX::matrix_expand(e, boundary, options);
     }
 
     /** \brief Expand MX graph to SXFunction call
@@ -514,7 +513,7 @@ namespace casadi {
       matrix_expand(const std::vector<MX>& e,
                     const std::vector<MX> &boundary = std::vector<MX>(),
                     const Dict& options = Dict()) {
-      return MX::zz_matrix_expand(e, boundary, options);
+      return MX::matrix_expand(e, boundary, options);
     }
 
     /** \brief Lift the expression
@@ -522,7 +521,7 @@ namespace casadi {
      *
      */
     inline friend MX lift(const MX& x, const MX& x_guess) {
-      return x.zz_lift(x_guess);
+      return MX::lift(x, x_guess);
     }
 /** @} */
 #endif // SWIG
