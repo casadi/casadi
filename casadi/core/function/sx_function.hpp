@@ -95,7 +95,7 @@ class CASADI_EXPORT SXFunction :
   virtual ~SXFunction();
 
   /** \brief  Evaluate numerically, work vectors given */
-  virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+  virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
