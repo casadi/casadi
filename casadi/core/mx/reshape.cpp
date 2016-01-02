@@ -36,7 +36,7 @@ namespace casadi {
     setSparsity(sp);
   }
 
-  void Reshape::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Reshape::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
@@ -45,7 +45,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void Reshape::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void Reshape::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
   }
 

@@ -38,7 +38,7 @@ namespace casadi {
     return "||" + arg.at(0) + "||_F";
   }
 
-  void NormF::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void NormF::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
@@ -47,7 +47,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void NormF::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void NormF::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     *res[0] = sqrt(casadi_dot(dep().nnz(), arg[0], arg[0]));
   }
 

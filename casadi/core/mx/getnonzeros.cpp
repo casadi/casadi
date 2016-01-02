@@ -36,7 +36,7 @@ namespace casadi {
   }
 
   void GetNonzerosVector::
-  eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
@@ -47,7 +47,7 @@ namespace casadi {
 
   template<typename T>
   void GetNonzerosVector::
-  evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
+  evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     const T* idata = arg[0];
     T* odata = res[0];
     for (vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k) {
@@ -56,7 +56,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice::
-  eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
@@ -67,7 +67,7 @@ namespace casadi {
 
   template<typename T>
   void GetNonzerosSlice::evalGen(const T* const* arg, T* const* res,
-                                 int* iw, T* w) {
+                                 int* iw, T* w) const {
     const T* idata = arg[0] + s_.start_;
     const T* idata_stop = arg[0] + s_.stop_;
     T* odata = res[0];
@@ -77,7 +77,7 @@ namespace casadi {
   }
 
   void GetNonzerosSlice2::
-  eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
@@ -88,7 +88,7 @@ namespace casadi {
 
   template<typename T>
   void GetNonzerosSlice2::
-  evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
+  evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     const T* outer = arg[0] + outer_.start_;
     const T* outer_stop = arg[0] + outer_.stop_;
     T* odata = res[0];

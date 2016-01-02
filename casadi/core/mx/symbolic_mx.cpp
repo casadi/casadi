@@ -42,7 +42,7 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void SymbolicMX::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
   }
 
   void SymbolicMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {

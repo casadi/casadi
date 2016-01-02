@@ -83,7 +83,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Call::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Call::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     fcn_(arg, res, iw, w, mem);
   }
 

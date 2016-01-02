@@ -992,10 +992,10 @@ namespace casadi {
 
 #ifndef SWIG
     // Factorize linear system of equations
-    void linsol_factorize(Memory& m, const double* A);
+    void linsol_factorize(Memory& m, const double* A) const;
 
     // Solver linear system of equations
-    void linsol_solve(Memory& m, double* x, int nrhs=1, bool tr=false);
+    void linsol_solve(Memory& m, double* x, int nrhs=1, bool tr=false) const;
 
     ///@{
     /// Propagate sparsity through a linear solve

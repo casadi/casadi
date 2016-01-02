@@ -174,7 +174,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
@@ -187,7 +187,7 @@ namespace casadi {
   template<bool ScX, bool ScY>
   template<typename T>
   void BinaryMX<ScX, ScY>::
-  evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
+  evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     // Get data
     T* output0 = res[0];
     const T* input0 = arg[0];

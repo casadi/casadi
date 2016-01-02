@@ -37,7 +37,7 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Concat::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
@@ -46,7 +46,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void Concat::evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
+  void Concat::evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     T* r = res[0];
     for (int i=0; i<ndep(); ++i) {
       int n = dep(i).nnz();

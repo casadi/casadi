@@ -60,7 +60,7 @@ namespace casadi {
     }
   }
 
-  void Dot::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Dot::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
@@ -69,7 +69,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void Dot::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void Dot::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     *res[0] = casadi_dot(dep(0).nnz(), arg[0], arg[1]);
   }
 

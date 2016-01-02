@@ -49,7 +49,7 @@ namespace casadi {
     return "(" + arg.at(0) + "+mtimes(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
-  void Multiplication::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Multiplication::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
@@ -58,7 +58,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     casadi_mtimes(arg[1], dep(1).sparsity(),
                arg[2], dep(2).sparsity(),

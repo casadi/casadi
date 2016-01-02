@@ -46,7 +46,7 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w, int mem);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Destructor
     virtual ~HorzRepmat() {}
@@ -55,7 +55,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
@@ -99,7 +99,7 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T, typename R>
-    void evalGen(const T** arg, T** res, int* iw, T* w, int mem, R reduction);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem, R reduction) const;
 
     /// Destructor
     virtual ~HorzRepsum() {}
@@ -108,7 +108,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);

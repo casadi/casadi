@@ -34,7 +34,7 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void SubAssign::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
@@ -43,7 +43,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void SubAssign::evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
+  void SubAssign::evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     casadi_error("not ready");
   }
 

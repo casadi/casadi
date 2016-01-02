@@ -63,7 +63,7 @@ namespace casadi {
     }
   }
 
-  void Bilin::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Bilin::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
@@ -72,7 +72,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void Bilin::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void Bilin::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     *res[0] = casadi_bilin(arg[0], dep(0).sparsity(), arg[1], arg[2]);
   }
 

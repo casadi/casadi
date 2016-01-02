@@ -46,11 +46,11 @@ namespace casadi {
   }
 
   template<typename T>
-  void Project::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void Project::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     casadi_project(arg[0], dep().sparsity(), res[0], sparsity(), w);
   }
 
-  void Project::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Project::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 

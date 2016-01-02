@@ -308,10 +308,6 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::eval(const double** arg, double** res, int* iw, double* w, int mem) {
-    static_cast<const MXNode*>(this)->eval(arg, res, iw, w, mem);
-  }
-
   void MXNode::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     throw CasadiException(string("MXNode::eval_sx not defined for class ")
                           + typeid(*this).name());

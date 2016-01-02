@@ -47,7 +47,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);

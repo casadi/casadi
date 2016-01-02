@@ -65,7 +65,7 @@ namespace casadi {
     }
   }
 
-  void Rank1::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Rank1::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
@@ -74,7 +74,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void Rank1::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void Rank1::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     if (arg[0]!=res[0]) casadi_copy(arg[0], dep(0).nnz(), res[0]);
     casadi_rank1(res[0], sparsity(), *arg[1], arg[2], arg[3]);
   }

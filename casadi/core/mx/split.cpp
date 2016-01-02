@@ -39,7 +39,7 @@ namespace casadi {
   Split::~Split() {
   }
 
-  void Split::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Split::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
@@ -48,7 +48,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void Split::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void Split::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     // Number of derivatives
     int nx = offset_.size()-1;
 

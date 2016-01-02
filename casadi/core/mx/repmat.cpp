@@ -42,14 +42,14 @@ namespace casadi {
   }
 
   template<typename T>
-  void HorzRepmat::evalGen(const T** arg, T** res, int* iw, T* w, int mem) {
+  void HorzRepmat::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     int nnz = dep(0).nnz();
     for (int i=0; i<n_; ++i) {
       std::copy(arg[0], arg[0]+nnz, res[0]+i*nnz);
     }
   }
 
-  void HorzRepmat::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void HorzRepmat::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
@@ -121,7 +121,7 @@ namespace casadi {
 
   template<typename T, typename R>
   void HorzRepsum::evalGen(const T** arg, T** res, int* iw, T* w, int mem,
-                           R reduction) {
+                           R reduction) const {
     int nnz = sparsity().nnz();
     fill_n(res[0], nnz, 0);
     for (int i=0;i<n_;++i) {
@@ -129,7 +129,7 @@ namespace casadi {
     }
   }
 
-  void HorzRepsum::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void HorzRepsum::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem, std::plus<double>());
   }
 

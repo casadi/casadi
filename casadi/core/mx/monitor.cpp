@@ -67,7 +67,7 @@ namespace casadi {
     }
   }
 
-  void Monitor::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Monitor::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     // Print comment
     userOut() << comment_ << ":" << endl;
     userOut() << "[";

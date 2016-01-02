@@ -131,9 +131,6 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem);
-
-    /** \brief  Evaluate numerically, new */
     virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /** \brief  Evaluate symbolically (SX) */

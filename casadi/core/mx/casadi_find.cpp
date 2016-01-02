@@ -39,7 +39,7 @@ namespace casadi {
     return "find(" + arg.at(0) + ")";
   }
 
-  void Find::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void Find::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     const double* x = arg[0];
     int nnz = dep(0).nnz();
     int k=0;
