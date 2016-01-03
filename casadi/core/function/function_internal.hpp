@@ -68,6 +68,18 @@ namespace casadi {
     virtual ~Memory() {}
   };
 
+  /** \brief Function memory with temporary work vectors */
+  struct CASADI_EXPORT WorkMemory : public Memory {
+    /** \brief Destructor */
+    virtual ~WorkMemory() {}
+
+    // Work vectors
+    const double** arg;
+    double** res;
+    int* iw;
+    double* w;
+  };
+
   /** \brief Internal class for Function
       \author Joel Andersson
       \date 2010-2015

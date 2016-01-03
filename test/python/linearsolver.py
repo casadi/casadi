@@ -50,11 +50,11 @@ try:
 except:
   pass
   
-# try:
-#   load_linsol("symbolicqr")
-#   lsolvers.append(("symbolicqr",{}))
-# except:
-#   pass
+try:
+  load_linsol("symbolicqr")
+  lsolvers.append(("symbolicqr",{}))
+except:
+  pass
 
 nsolvers = []
   
