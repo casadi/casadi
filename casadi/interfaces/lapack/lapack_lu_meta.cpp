@@ -23,10 +23,10 @@
  */
 
 
-      #include "lapack_lu_dense.hpp"
+      #include "lapack_lu.hpp"
       #include <string>
 
-      const std::string casadi::LapackLuDense::meta_doc=
+      const std::string casadi::LapackLu::meta_doc=
       "\n"
 "This class solves the linear system A.x=b by making an LU factorization of A: A = L.U, with L lower and U upper triangular\n"
 "\n"

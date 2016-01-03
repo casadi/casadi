@@ -23,10 +23,10 @@
  */
 
 
-      #include "lapack_qr_dense.hpp"
+      #include "lapack_qr.hpp"
       #include <string>
 
-      const std::string casadi::LapackQrDense::meta_doc=
+      const std::string casadi::LapackQr::meta_doc=
       "\n"
 "This class solves the linear system A.x=b by making an QR factorization of A: A = Q.R, with Q orthogonal and R upper triangular\n"
 "\n"

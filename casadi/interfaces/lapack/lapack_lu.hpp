@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_LAPACK_LU_DENSE_HPP
-#define CASADI_LAPACK_LU_DENSE_HPP
+#ifndef CASADI_LAPACK_LU_HPP
+#define CASADI_LAPACK_LU_HPP
 
 #include "casadi/core/function/linsol.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
@@ -63,19 +63,19 @@ namespace casadi {
    * @copydoc plugin_Linsol_lapacklu
    *
    */
-  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLuDense : public Linsol {
+  class CASADI_LINSOL_LAPACKLU_EXPORT LapackLu : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLuDense(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LapackLu(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /** \brief  Create a new Linsol */
     static Linsol* creator(const std::string& name,
                                          const Sparsity& sp, int nrhs) {
-      return new LapackLuDense(name, sp, nrhs);
+      return new LapackLu(name, sp, nrhs);
     }
 
     /// Destructor
-    virtual ~LapackLuDense();
+    virtual ~LapackLu();
 
     /// Initialize the solver
     virtual void init();
@@ -126,4 +126,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_LAPACK_LU_DENSE_HPP
+#endif // CASADI_LAPACK_LU_HPP

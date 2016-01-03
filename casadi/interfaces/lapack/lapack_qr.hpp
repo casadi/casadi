@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_LAPACK_QR_DENSE_HPP
-#define CASADI_LAPACK_QR_DENSE_HPP
+#ifndef CASADI_LAPACK_QR_HPP
+#define CASADI_LAPACK_QR_HPP
 
 #include "casadi/core/function/linsol.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
@@ -59,18 +59,18 @@ namespace casadi {
    @copydoc plugin_Linsol_lapackqr
    *
    */
-  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQrDense : public Linsol {
+  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQr : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQrDense(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LapackQr(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /** \brief  Create a new Linsol */
     static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new LapackQrDense(name, sp, nrhs);
+      return new LapackQr(name, sp, nrhs);
     }
 
     // Destructor
-    virtual ~LapackQrDense();
+    virtual ~LapackQr();
 
     // Initialize the solver
     virtual void init();
@@ -105,4 +105,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_LAPACK_QR_DENSE_HPP
+#endif // CASADI_LAPACK_QR_HPP

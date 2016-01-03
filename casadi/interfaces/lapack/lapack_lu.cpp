@@ -23,7 +23,7 @@
  */
 
 
-#include "lapack_lu_dense.hpp"
+#include "lapack_lu.hpp"
 #include "../../core/std_vector_tools.hpp"
 
 using namespace std;
@@ -32,9 +32,9 @@ namespace casadi {
   extern "C"
   int CASADI_LINSOL_LAPACKLU_EXPORT
   casadi_register_linsol_lapacklu(Linsol::Plugin* plugin) {
-    plugin->creator = LapackLuDense::creator;
+    plugin->creator = LapackLu::creator;
     plugin->name = "lapacklu";
-    plugin->doc = LapackLuDense::meta_doc.c_str();
+    plugin->doc = LapackLu::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
@@ -44,7 +44,7 @@ namespace casadi {
     Linsol::registerPlugin(casadi_register_linsol_lapacklu);
   }
 
-  LapackLuDense::LapackLuDense(const std::string& name,
+  LapackLu::LapackLu(const std::string& name,
                                const Sparsity& sparsity, int nrhs)
     : Linsol(name, sparsity, nrhs) {
 
@@ -53,10 +53,10 @@ namespace casadi {
     addOption("allow_equilibration_failure", OT_BOOLEAN, false);
   }
 
-  LapackLuDense::~LapackLuDense() {
+  LapackLu::~LapackLu() {
   }
 
-  void LapackLuDense::init() {
+  void LapackLu::init() {
     // Call the base class initializer
     Linsol::init();
 
@@ -66,7 +66,7 @@ namespace casadi {
 
     // Currently only square matrices tested
     if (ncol_!=nrow_) throw CasadiException(
-      "LapackLuDense::LapackLuDense: currently only square matrices implemented.");
+      "LapackLu::LapackLu: currently only square matrices implemented.");
 
     // Allocate matrix
     mat_.resize(ncol_*ncol_);
@@ -84,8 +84,8 @@ namespace casadi {
     allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
   }
 
-  void LapackLuDense::linsol_factorize(Memory& mem, const double* A) const {
-    LapackLuDense& m = const_cast<LapackLuDense&>(*this);
+  void LapackLu::linsol_factorize(Memory& mem, const double* A) const {
+    LapackLu& m = const_cast<LapackLu&>(*this);
 
     // Get the elements of the matrix, dense format
     casadi_densify(A, sparsity_, getPtr(m.mat_), false);
@@ -102,7 +102,7 @@ namespace casadi {
                                 "dgeequ_ failed to calculate the scaling factors");
       if (info>0) {
         stringstream ss;
-        ss << "LapackLuDense::prepare: ";
+        ss << "LapackLu::prepare: ";
         if (info<=ncol_)  ss << (info-1) << "-th row (zero-based) is exactly zero";
         else             ss << (info-1-ncol_) << "-th col (zero-based) is exactly zero";
 
@@ -125,12 +125,12 @@ namespace casadi {
     // Factorize the matrix
     int info = -100;
     dgetrf_(&m.ncol_, &m.ncol_, getPtr(m.mat_), &m.ncol_, getPtr(m.ipiv_), &info);
-    casadi_assert_message(info==0, "LapackLuDense::prepare: "
+    casadi_assert_message(info==0, "LapackLu::prepare: "
                           "dgetrf_ failed to factorize the Jacobian");
   }
 
-  void LapackLuDense::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
-    LapackLuDense& m = const_cast<LapackLuDense&>(*this);
+  void LapackLu::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
+    LapackLu& m = const_cast<LapackLu&>(*this);
 
     // Scale the right hand side
     if (tr) {
@@ -143,7 +143,7 @@ namespace casadi {
     int info = 100;
     char trans = tr ? 'T' : 'N';
     dgetrs_(&trans, &m.ncol_, &nrhs, getPtr(m.mat_), &m.ncol_, getPtr(m.ipiv_), x, &m.ncol_, &info);
-    if (info != 0) throw CasadiException("LapackLuDense::solve: "
+    if (info != 0) throw CasadiException("LapackLu::solve: "
                                         "failed to solve the linear system");
 
     // Scale the solution
@@ -154,7 +154,7 @@ namespace casadi {
     }
   }
 
-  void LapackLuDense::colScaling(double* x, int nrhs) {
+  void LapackLu::colScaling(double* x, int nrhs) {
     // Scale result if this was done to the matrix
     if (equed_=='R' || equed_=='B')
       for (int rhs=0; rhs<nrhs; ++rhs)
@@ -162,7 +162,7 @@ namespace casadi {
           x[i+rhs*nrow_] *= r_[i];
   }
 
-  void LapackLuDense::rowScaling(double* x, int nrhs) {
+  void LapackLu::rowScaling(double* x, int nrhs) {
     // Scale right hand side if this was done to the matrix
     if (equed_=='C' || equed_=='B')
       for (int rhs=0; rhs<nrhs; ++rhs)
