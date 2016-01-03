@@ -56,37 +56,49 @@ namespace casadi {
     // Call the base class initializer
     Linsol::init();
 
-    // Get dimensions
-    ncol_ = ncol();
-    nrow_ = nrow();
-
     // Currently only square matrices tested
-    if (ncol_!=nrow_) throw CasadiException("LapackQr::init: currently only "
-                                           "square matrices implemented.");
+    if (ncol()!=nrow()) throw CasadiException("LapackQr::init: currently only "
+                                              "square matrices implemented.");
+  }
 
-    // Allocate matrix
-    mat_.resize(ncol_*ncol_);
-    tau_.resize(ncol_);
-    work_.resize(10*ncol_);
+  Memory* LapackQr::memory() const {
+    LapackQrMemory* m = new LapackQrMemory();
+    try {
+      m->mat.resize(ncol()*ncol());
+      m->tau.resize(ncol());
+      m->work.resize(10*ncol());
+      return m;
+    } catch (...) {
+      delete m;
+      return 0;
+    }
   }
 
   void LapackQr::linsol_factorize(Memory& mem, const double* A) const {
-    LapackQr& m = const_cast<LapackQr&>(*this);
+    LapackQrMemory& m = dynamic_cast<LapackQrMemory&>(mem);
+
+    // Dimensions
+    int nrow = this->nrow();
+    int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, getPtr(m.mat_), false);
+    casadi_densify(A, sparsity_, getPtr(m.mat), false);
 
     // Factorize the matrix
     int info = -100;
-    int lwork = work_.size();
-    dgeqrf_(&m.ncol_, &m.ncol_, getPtr(m.mat_), &m.ncol_, getPtr(m.tau_),
-            getPtr(m.work_), &lwork, &info);
+    int lwork = m.work.size();
+    dgeqrf_(&ncol, &ncol, getPtr(m.mat), &ncol, getPtr(m.tau),
+            getPtr(m.work), &lwork, &info);
     if (info != 0) throw CasadiException("LapackQr::prepare: dgeqrf_ "
                                          "failed to factorize the Jacobian");
   }
 
   void LapackQr::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
-    LapackQr& m = const_cast<LapackQr&>(*this);
+    LapackQrMemory& m = dynamic_cast<LapackQrMemory&>(mem);
+
+    // Dimensions
+    int nrow = this->nrow();
+    int ncol = this->ncol();
 
     // Properties of R
     char uploR = 'U';
@@ -98,19 +110,19 @@ namespace casadi {
     // Properties of Q
     char transQ = tr ? 'N' : 'T';
     char sideQ = 'L';
-    int k = tau_.size(); // minimum of ncol_ and nrow_
-    int lwork = work_.size();
+    int k = m.tau.size(); // minimum of ncol and nrow
+    int lwork = m.work.size();
 
     if (tr) {
 
       // Solve for transpose(R)
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &m.ncol_, &nrhs, &alphaR,
-             getPtr(m.mat_), &m.ncol_, x, &m.ncol_);
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
+             getPtr(m.mat), &ncol, x, &ncol);
 
       // Multiply by Q
       int info = 100;
-      dormqr_(&sideQ, &transQ, &m.ncol_, &nrhs, &k, getPtr(m.mat_), &m.ncol_, getPtr(m.tau_), x,
-              &m.ncol_, getPtr(m.work_), &lwork, &info);
+      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, getPtr(m.mat), &ncol, getPtr(m.tau), x,
+              &ncol, getPtr(m.work), &lwork, &info);
       if (info != 0) throw CasadiException("LapackQr::solve: dormqr_ failed "
                                           "to solve the linear system");
 
@@ -118,14 +130,14 @@ namespace casadi {
 
       // Multiply by transpose(Q)
       int info = 100;
-      dormqr_(&sideQ, &transQ, &m.ncol_, &nrhs, &k, getPtr(m.mat_), &m.ncol_, getPtr(m.tau_), x,
-              &m.ncol_, getPtr(m.work_), &lwork, &info);
+      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, getPtr(m.mat), &ncol, getPtr(m.tau), x,
+              &ncol, getPtr(m.work), &lwork, &info);
       if (info != 0) throw CasadiException("LapackQr::solve: dormqr_ failed to "
                                           "solve the linear system");
 
       // Solve for R
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &m.ncol_, &nrhs, &alphaR,
-             getPtr(m.mat_), &m.ncol_, x, &m.ncol_);
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
+             getPtr(m.mat), &ncol, x, &ncol);
     }
   }
 

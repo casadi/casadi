@@ -75,6 +75,9 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const;
+
     // Factorize the linear system
     virtual void linsol_factorize(Memory& mem, const double* A) const;
 
@@ -86,20 +89,20 @@ namespace casadi {
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "lapackqr";}
-  protected:
+  };
+
+  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory : public Memory {
+    // Destructor
+    virtual ~LapackQrMemory() {}
 
     // Matrix
-    std::vector<double> mat_;
+    std::vector<double> mat;
 
     // The scalar factors of the elementary reflectors
-    std::vector<double> tau_;
+    std::vector<double> tau;
 
     // qr work array
-    std::vector<double> work_;
-
-    // Dimensions
-    int ncol_, nrow_;
-
+    std::vector<double> work;
   };
 
 } // namespace casadi
