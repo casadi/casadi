@@ -76,10 +76,10 @@ namespace casadi {
     virtual void init();
 
     // Factorize the linear system
-    virtual void linsol_factorize(Memory& m, const double* A);
+    virtual void linsol_factorize(Memory& mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
+    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;

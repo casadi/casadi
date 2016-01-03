@@ -514,8 +514,8 @@ namespace casadi {
     // Prepare the solution of the linear system (e.g. factorize)
     fill_n(arg_, self.linsol_.n_in(), nullptr);
     fill_n(res_, self.linsol_.n_out(), nullptr);
-    linsol_mem_ = Memory(self.linsol_, arg_, res_, iw_, w1, 0);
-    self.linsol_.linsol_factorize(linsol_mem_, jac);
+    self.linsol_.setup(arg_, res_, iw_, w1);
+    self.linsol_.linsol_factorize(jac);
 
     // Log time duration
     time1_ = clock();
@@ -541,7 +541,7 @@ namespace casadi {
     time1_ = clock();
 
     // Solve the factorized system
-    self.linsol_.linsol_solve(linsol_mem_, NV_DATA_S(v));
+    self.linsol_.linsol_solve(NV_DATA_S(v));
 
     // Log time duration
     time2_ = clock();
@@ -853,7 +853,7 @@ namespace casadi {
     if (mem_) KINFree(&mem_);
   }
 
-  Memory2* KinsolInterface::alloc_mem() {
+  Memory* KinsolInterface::alloc_mem() {
     return new KinsolMemory(*this);
   }
 

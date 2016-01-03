@@ -57,7 +57,7 @@ namespace casadi {
     Linsol::init();
   }
 
-  Memory2* CsparseInterface::alloc_mem() {
+  Memory* CsparseInterface::alloc_mem() {
     CsparseMemory* m = new CsparseMemory();
     try {
       m->N = 0;
@@ -84,25 +84,25 @@ namespace casadi {
     }
   }
 
-  void CsparseInterface::linsol_factorize(const double* A, Memory2* mem) const {
-    CsparseMemory* m = static_cast<CsparseMemory*>(mem);
+  void CsparseInterface::linsol_factorize(Memory& mem, const double* A) const {
+    CsparseMemory& m = dynamic_cast<CsparseMemory&>(mem);
     casadi_assert(A!=0);
 
     // Set the nonzeros of the matrix
-    m->A.x = const_cast<double*>(A);
+    m.A.x = const_cast<double*>(A);
 
-    if (!m->called_once_) {
+    if (!m.called_once_) {
       if (verbose()) {
         userOut() << "CsparseInterface::prepare: symbolic factorization" << endl;
       }
 
       // ordering and symbolic analysis
       int order = 0; // ordering?
-      if (m->S) cs_sfree(m->S);
-      m->S = cs_sqr(order, &m->A, 0) ;
+      if (m.S) cs_sfree(m.S);
+      m.S = cs_sqr(order, &m.A, 0) ;
     }
 
-    m->called_once_ = true;
+    m.called_once_ = true;
 
     // Make sure that all entries of the linear system are valid
     for (int k=0; k<sparsity_.nnz(); ++k) {
@@ -118,9 +118,9 @@ namespace casadi {
 
     double tol = 1e-8;
 
-    if (m->N) cs_nfree(m->N);
-    m->N = cs_lu(&m->A, m->S, tol) ;                 // numeric LU factorization
-    if (m->N==0) {
+    if (m.N) cs_nfree(m.N);
+    m.N = cs_lu(&m.A, m.S, tol) ;                 // numeric LU factorization
+    if (m.N==0) {
       DM temp(sparsity_, vector<double>(A, A+sparsity_.nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
@@ -146,27 +146,27 @@ namespace casadi {
         throw CasadiException(ss.str());
       }
     }
-    casadi_assert(m->N!=0);
+    casadi_assert(m.N!=0);
   }
 
-  void CsparseInterface::linsol_solve(double* x, int nrhs, bool tr, Memory2* mem) const {
-    CsparseMemory* m = static_cast<CsparseMemory*>(mem);
-    casadi_assert(m->N!=0);
+  void CsparseInterface::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
+    CsparseMemory& m = dynamic_cast<CsparseMemory&>(mem);
+    casadi_assert(m.N!=0);
 
-    double *t = &m->temp_.front();
+    double *t = &m.temp_.front();
 
     for (int k=0; k<nrhs; ++k) {
       if (tr) {
-        cs_pvec(m->S->q, x, t, m->A.n) ;       // t = P2*b
-        casadi_assert(m->N->U!=0);
-        cs_utsolve(m->N->U, t) ;              // t = U'\t
-        cs_ltsolve(m->N->L, t) ;              // t = L'\t
-        cs_pvec(m->N->pinv, t, x, m->A.n) ;    // x = P1*t
+        cs_pvec(m.S->q, x, t, m.A.n) ;       // t = P2*b
+        casadi_assert(m.N->U!=0);
+        cs_utsolve(m.N->U, t) ;              // t = U'\t
+        cs_ltsolve(m.N->L, t) ;              // t = L'\t
+        cs_pvec(m.N->pinv, t, x, m.A.n) ;    // x = P1*t
       } else {
-        cs_ipvec(m->N->pinv, x, t, m->A.n) ;   // t = P1\b
-        cs_lsolve(m->N->L, t) ;               // t = L\t
-        cs_usolve(m->N->U, t) ;               // t = U\t
-        cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
+        cs_ipvec(m.N->pinv, x, t, m.A.n) ;   // t = P1\b
+        cs_lsolve(m.N->L, t) ;               // t = L\t
+        cs_usolve(m.N->U, t) ;               // t = U\t
+        cs_ipvec(m.S->q, t, x, m.A.n) ;      // x = P2\t
       }
       x += ncol();
     }

@@ -92,17 +92,18 @@ namespace casadi {
     virtual void initAdj();
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(Memory& m, double t, const double* x,
+    virtual void reset(IntegratorMemory& mem, double t, const double* x,
                        const double* z, const double* p);
 
     /** \brief  Advance solution in time */
-    virtual void advance(Memory& m, double t, double* x, double* z, double* q);
+    virtual void advance(IntegratorMemory& mem, double t, double* x, double* z, double* q);
 
     /** \brief  Reset the backward problem and take time to tf */
-    virtual void resetB(Memory& m, double t, const double* rx, const double* rz, const double* rp);
+    virtual void resetB(IntegratorMemory& mem, double t,
+                        const double* rx, const double* rz, const double* rp);
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(Memory& m, double t, double* rx, double* rz, double* rq);
+    virtual void retreat(IntegratorMemory& mem, double t, double* rx, double* rz, double* rq);
 
     /** \brief  Set the stop time of the forward integration */
     virtual void setStopTime(double tf);
@@ -291,7 +292,7 @@ namespace casadi {
   };
 
   // CvodesMemory
-  struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory {
+  struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory : public Memory {
     /// Shared memory
     CvodesInterface& self;
 
@@ -299,7 +300,7 @@ namespace casadi {
     CvodesMemory(CvodesInterface& s);
 
     /// Destructor
-    ~CvodesMemory();
+    virtual ~CvodesMemory();
   };
 
 } // namespace casadi

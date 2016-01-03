@@ -645,10 +645,6 @@ namespace casadi {
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
-  void* Function::alloc_mem() { return (*this)->alloc_mem();}
-
-  void Function::free_mem(void* mem) { (*this)->free_mem(mem);}
-
   void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
     (*const_cast<Function*>(this))->spFwd(arg, res, iw, w, (*this)->mem_.at(mem));
   }
@@ -657,9 +653,9 @@ namespace casadi {
     (*this)->spAdj(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
-  void Function::set_work(const double** arg, double** res, int* iw, double* w,
+  void Function::setup(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->set_work(arg, res, iw, w, (*this)->mem_.at(mem));
+    (*this)->setup(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
   bool Function::spCanEvaluate(bool fwd) {
@@ -1454,18 +1450,6 @@ namespace casadi {
     return ret;
   }
 
-  bool Function::has_mem() const {
-    return (*this)->has_mem();
-  }
-
-  void Function::linsol_factorize(Memory& m, const double* A) const {
-    (*const_cast<Function*>(this))->linsol_factorize(m, A);
-  }
-
-  void Function::linsol_solve(Memory& m, double* x, int nrhs, bool tr) const {
-    (*const_cast<Function*>(this))->linsol_solve(m, x, nrhs, tr);
-  }
-
   MX Function::linsol_solve(const MX& A, const MX& B, bool tr) {
     return (*this)->linsol_solve(A, B, tr);
   }
@@ -1475,11 +1459,11 @@ namespace casadi {
   }
 
   void Function::linsol_factorize(const double* A, int mem) const {
-    (*this)->linsol_factorize(A, (*this)->mem_.at(mem));
+    (*this)->linsol_factorize(*(*this)->mem_.at(mem), A);
   }
 
   void Function::linsol_solve(double* x, int nrhs, bool tr, int mem) const {
-    (*this)->linsol_solve(x, nrhs, tr, (*this)->mem_.at(mem));
+    (*this)->linsol_solve(*(*this)->mem_.at(mem), x, nrhs, tr);
   }
 
   Sparsity Function::linsol_cholesky_sparsity(bool tr) const {
@@ -1556,103 +1540,6 @@ namespace casadi {
   XProblem::operator const MXProblem&() const {
     casadi_assert(!is_sx);
     return *mx_p;
-  }
-
-  Memory::Memory()
-    : f(0), arg(0), res(0), iw(0), w(0), mem(0), own_(false) {
-  }
-
-  Memory::Memory(FunctionInternal *_f, const double** _arg, double** _res,
-                 int* _iw, double* _w, void* _mem)
-    : f(_f), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
-    setup(arg, res, iw, w);
-  }
-
-  Memory::Memory(const Function& _f, const double** _arg, double** _res,
-                 int* _iw, double* _w, void* _mem)
-    : f(_f.get()), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
-    setup(arg, res, iw, w);
-  }
-
-  Memory::Memory(FunctionInternal *_f, const double** _arg, double** _res,
-                 int* _iw, double* _w, int _mem)
-    : f(_f), arg(_arg), res(_res), iw(_iw), w(_w), mem(_f->mem_.at(_mem)), own_(false) {
-    setup(arg, res, iw, w);
-  }
-
-  Memory::Memory(const Function& _f, const double** _arg, double** _res,
-                 int* _iw, double* _w, int _mem)
-    : f(_f.get()), arg(_arg), res(_res), iw(_iw), w(_w), mem(_f->mem_.at(_mem)), own_(false) {
-    setup(arg, res, iw, w);
-  }
-
-  Memory::Memory(const Function& _f)
-    : f(_f.get()), arg(0), res(0), iw(0), w(0), mem(0), own_(true) {
-    // Make an owning reference
-    casadi_assert(f!=0);
-    f->count++; // prevent object from being deleted
-
-    // Allocate work vectors
-    arg = new const double*[f->sz_arg()];
-    res = new double*[f->sz_res()];
-    iw = new int[f->sz_iw()];
-    w = new double[f->sz_w()];
-
-    // Allocate memory
-    mem = f->alloc_mem();
-
-    // Set up memory object
-    setup(arg, res, iw, w);
-  }
-
-  Memory::Memory(Memory&& obj)
-    : f(obj.f), arg(obj.arg), res(obj.res), iw(obj.iw), w(obj.w), mem(obj.mem),
-        own_(obj.own_) {
-  }
-
-  Memory::~Memory() {
-    if (own_) {
-      // Free work vectors
-      if (arg) delete[] arg;
-      if (res) delete[] res;
-      if (iw) delete[] iw;
-      if (w) delete[] w;
-
-      // Free memory object
-      if (mem) f->free_mem(mem);
-      if (--f->count==0) delete f;
-      f = 0;
-    }
-  }
-
-  void Memory::setup(const double** arg1, double** res1, int* iw1, double* w1) {
-    casadi_assert(f!=0);
-    arg1 += f->n_in();
-    res1 += f->n_out();
-    f->set_work(*this, arg1, res1, iw1, w1);
-    f->set_temp(*this, arg1, res1, iw1, w1);
-  }
-
-  Memory& Memory::operator=(Memory&& obj) {
-    if (&obj != this) {
-      // Copy the members
-      f = obj.f;
-      arg = obj.arg;
-      res = obj.res;
-      iw = obj.iw;
-      w = obj.w;
-      mem = obj.mem;
-      own_ = obj.own_;
-      // Clear from assigning object
-      obj.f = 0;
-      obj.arg = 0;
-      obj.res = 0;
-      obj.iw = 0;
-      obj.w = 0;
-      obj.mem = 0;
-      obj.own_ = 0;
-    }
-    return *this;
   }
 
   template<typename M>

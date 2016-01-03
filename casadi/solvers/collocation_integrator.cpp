@@ -282,10 +282,10 @@ namespace casadi {
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
-  void CollocationIntegrator::reset(Memory& m, double t, const double* x,
+  void CollocationIntegrator::reset(IntegratorMemory& mem, double t, const double* x,
                                 const double* z, const double* p) {
     // Reset the base classes
-    ImplicitFixedStepIntegrator::reset(m, t, x, z, p);
+    ImplicitFixedStepIntegrator::reset(mem, t, x, z, p);
 
     // Initial guess for Z
     double* Z = Z_.ptr();
@@ -297,10 +297,10 @@ namespace casadi {
     }
   }
 
-  void CollocationIntegrator::resetB(Memory& m, double t, const double* rx,
+  void CollocationIntegrator::resetB(IntegratorMemory& mem, double t, const double* rx,
                                const double* rz, const double* rp) {
     // Reset the base classes
-    ImplicitFixedStepIntegrator::resetB(m, t, rx, rz, rp);
+    ImplicitFixedStepIntegrator::resetB(mem, t, rx, rz, rp);
 
     // Initial guess for RZ
     double* RZ = RZ_.ptr();

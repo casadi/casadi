@@ -137,7 +137,7 @@ namespace casadi {
     return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInternal::linsol_factorize(Memory& m, const double* A) {
+  void CSparseCholeskyInternal::linsol_factorize(const double* A, Memory* mem) {
     // Set the nonzeros of the matrix
     casadi_assert(A!=0);
     A_.x = const_cast<double*>(A);
@@ -154,7 +154,7 @@ namespace casadi {
     casadi_assert(L_!=0);
   }
 
-  void CSparseCholeskyInternal::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
+  void CSparseCholeskyInternal::linsol_solve(double* x, int nrhs, bool tr, Memory* mem) {
     casadi_assert(L_!=0);
 
     double *t = &temp_.front();

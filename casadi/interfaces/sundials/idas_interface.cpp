@@ -571,12 +571,12 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::reset(Memory& m, double t, const double* _x,
+  void IdasInterface::reset(IntegratorMemory& mem, double t, const double* _x,
                             const double* _z, const double* _p) {
     log("IdasInterface::reset", "begin");
 
     // Reset the base classes
-    SundialsInterface::reset(m, t, _x, _z, _p);
+    SundialsInterface::reset(mem, t, _x, _z, _p);
 
     if (nrx_>0 && !isInitTaping_)
       initTaping();
@@ -642,7 +642,7 @@ namespace casadi {
     log("IdasInterface::correctInitialConditions", "end");
   }
 
-  void IdasInterface::advance(Memory& m, double t, double* x, double* z, double* q) {
+  void IdasInterface::advance(IntegratorMemory& mem, double t, double* x, double* z, double* q) {
     casadi_assert_message(t>=grid_.front(), "IdasInterface::integrate(" << t << "): "
                           "Cannot integrate to a time earlier than t0 (" << grid_.front() << ")");
     casadi_assert_message(t<=grid_.back() || !stop_at_end_, "IdasInterface::integrate("
@@ -693,12 +693,12 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::resetB(Memory& m, double t, const double* rx,
+  void IdasInterface::resetB(IntegratorMemory& mem, double t, const double* rx,
                              const double* rz, const double* rp) {
     log("IdasInterface::resetB", "begin");
 
     // Reset the base classes
-    SundialsInterface::resetB(m, t, rx, rz, rp);
+    SundialsInterface::resetB(mem, t, rx, rz, rp);
 
     int flag;
 
@@ -735,7 +735,7 @@ namespace casadi {
 
   }
 
-  void IdasInterface::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
+  void IdasInterface::retreat(IntegratorMemory& mem, double t, double* rx, double* rz, double* rq) {
     // Integrate, unless already at desired time
     if (t<t_) {
       int flag = IDASolveB(mem_, t, IDA_NORMAL);
@@ -1325,7 +1325,7 @@ namespace casadi {
     // Solve the (possibly factorized) system
     casadi_assert_message(linsol_.nnz_out(0) == NV_LENGTH_S(zvec), "Assertion error: "
                           << linsol_.nnz_out(0) << " == " << NV_LENGTH_S(zvec));
-    linsol_.linsol_solve(linsol_mem_, NV_DATA_S(zvec));
+    linsol_.linsol_solve(NV_DATA_S(zvec));
 
     // Log time duration
     time2 = clock();
@@ -1361,7 +1361,7 @@ namespace casadi {
       userOut() << endl;
     }
 
-    linsolB_.linsol_solve(linsolB_mem_, NV_DATA_S(zvecB));
+    linsolB_.linsol_solve(NV_DATA_S(zvecB));
 
     if (monitored("psolveB")) {
       userOut() << "zvecB sol = " << std::endl;
@@ -1401,10 +1401,8 @@ namespace casadi {
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsol_mem_ = Memory(linsol_, arg_, res_, iw_, w2, 0);
-    linsol_.linsol_factorize(linsol_mem_, val);
+    linsol_.setup(arg_+LINSOL_NUM_IN, res_+LINSOL_NUM_OUT, iw_, w2);
+    linsol_.linsol_factorize(val);
 
     // Log time duration
     time1 = clock();
@@ -1443,10 +1441,8 @@ namespace casadi {
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsolB_mem_ = Memory(linsolB_, arg_, res_, iw_, w2, 0);
-    linsolB_.linsol_factorize(linsolB_mem_, val);
+    linsolB_.setup(arg_+LINSOL_NUM_IN, res_+LINSOL_NUM_OUT, iw_, w2);
+    linsolB_.linsol_factorize(val);
 
     // Log time duration
     time1 = clock();

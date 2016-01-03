@@ -70,20 +70,24 @@ namespace casadi {
     work_.resize(10*ncol_);
   }
 
-  void LapackQrDense::linsol_factorize(Memory& m, const double* A) {
+  void LapackQrDense::linsol_factorize(Memory& mem, const double* A) const {
+    LapackQrDense& m = const_cast<LapackQrDense&>(*this);
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, getPtr(mat_), false);
+    casadi_densify(A, sparsity_, getPtr(m.mat_), false);
 
     // Factorize the matrix
     int info = -100;
     int lwork = work_.size();
-    dgeqrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(tau_), getPtr(work_), &lwork, &info);
+    dgeqrf_(&m.ncol_, &m.ncol_, getPtr(m.mat_), &m.ncol_, getPtr(m.tau_),
+            getPtr(m.work_), &lwork, &info);
     if (info != 0) throw CasadiException("LapackQrDense::prepare: dgeqrf_ "
                                          "failed to factorize the Jacobian");
   }
 
-  void LapackQrDense::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
+  void LapackQrDense::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
+    LapackQrDense& m = const_cast<LapackQrDense&>(*this);
+
     // Properties of R
     char uploR = 'U';
     char diagR = 'N';
@@ -100,13 +104,13 @@ namespace casadi {
     if (tr) {
 
       // Solve for transpose(R)
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,
-             getPtr(mat_), &ncol_, x, &ncol_);
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &m.ncol_, &nrhs, &alphaR,
+             getPtr(m.mat_), &m.ncol_, x, &m.ncol_);
 
       // Multiply by Q
       int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
-              &ncol_, getPtr(work_), &lwork, &info);
+      dormqr_(&sideQ, &transQ, &m.ncol_, &nrhs, &k, getPtr(m.mat_), &m.ncol_, getPtr(m.tau_), x,
+              &m.ncol_, getPtr(m.work_), &lwork, &info);
       if (info != 0) throw CasadiException("LapackQrDense::solve: dormqr_ failed "
                                           "to solve the linear system");
 
@@ -114,14 +118,14 @@ namespace casadi {
 
       // Multiply by transpose(Q)
       int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
-              &ncol_, getPtr(work_), &lwork, &info);
+      dormqr_(&sideQ, &transQ, &m.ncol_, &nrhs, &k, getPtr(m.mat_), &m.ncol_, getPtr(m.tau_), x,
+              &m.ncol_, getPtr(m.work_), &lwork, &info);
       if (info != 0) throw CasadiException("LapackQrDense::solve: dormqr_ failed to "
                                           "solve the linear system");
 
       // Solve for R
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,
-             getPtr(mat_), &ncol_, x, &ncol_);
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &m.ncol_, &nrhs, &alphaR,
+             getPtr(m.mat_), &m.ncol_, x, &m.ncol_);
     }
   }
 

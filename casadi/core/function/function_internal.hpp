@@ -63,9 +63,9 @@ namespace casadi {
   ///@}
 
   /** \brief Base class for Function memory */
-  struct CASADI_EXPORT Memory2 {
+  struct CASADI_EXPORT Memory {
     /** \brief Destructor */
-    virtual ~Memory2() {}
+    virtual ~Memory() {}
   };
 
   /** \brief Internal class for Function
@@ -751,23 +751,11 @@ namespace casadi {
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f, bool persistent=false);
 
-    /** \brief Does the solver require the allocation of a memory block */
-    virtual bool has_mem() const {return false;}
-
     /** \brief Allocate memory block */
-    virtual Memory2* alloc_mem() {return new Memory2();}
-
-    /** \brief Free allocated memory block */
-    virtual void free_mem(void* mem) {}
+    virtual Memory* alloc_mem() {return new Memory();}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {}
-
-    /** \brief Set the (temporary) work vectors */
-    virtual void set_temp(Memory& m, const double** arg, double** res, int* iw, double* w) {}
-
-    /** \brief Set the (persistent) work vectors */
-    virtual void set_work(const double** arg, double** res, int* iw, double* w,
+    virtual void setup(const double** arg, double** res, int* iw, double* w,
                           void* mem) const {}
 
     ///@{
@@ -777,7 +765,7 @@ namespace casadi {
     ///@}
 
     /// Memory objects
-    std::vector<Memory2*> mem_;
+    std::vector<Memory*> mem_;
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
@@ -862,10 +850,8 @@ namespace casadi {
 
     ///@{
     /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_factorize(const double* A, Memory2* mem) const;
-    virtual void linsol_solve(double* x, int nrhs, bool tr, Memory2* mem) const;
-    virtual void linsol_factorize(Memory& m, const double* A);
-    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
+    virtual void linsol_factorize(Memory& mem, const double* A) const;
+    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
     virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
     virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;

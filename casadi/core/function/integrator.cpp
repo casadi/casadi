@@ -130,8 +130,10 @@ namespace casadi {
   }
 
   void Integrator::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    // Create memory reference
-    Memory m(this, arg, res, iw, w, mem);
+    IntegratorMemory& m = *static_cast<IntegratorMemory*>(mem);
+
+    // Setup memory object
+    setup(arg + INTEGRATOR_NUM_IN, res + INTEGRATOR_NUM_OUT, iw, w, mem);
 
     // Reset solver, take time to t0
     reset(m, grid_.front(), arg[INTEGRATOR_X0], arg[INTEGRATOR_Z0], arg[INTEGRATOR_P]);
@@ -1217,10 +1219,7 @@ namespace casadi {
     return Function(name, ret_in, ret_out, opts);
   }
 
-  void Integrator::set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {
-  }
-
-  void Integrator::set_temp(Memory& m, const double** arg, double** res, int* iw, double* w) {
+  void Integrator::setup(const double** arg, double** res, int* iw, double* w, void* mem) {
     arg_ = arg;
     res_ = res;
     iw_ = iw;
@@ -1326,7 +1325,8 @@ namespace casadi {
     rq_prev_.resize(nrq_);
   }
 
-  void FixedStepIntegrator::advance(Memory& m, double t, double* x, double* z, double* q) {
+  void FixedStepIntegrator::advance(IntegratorMemory& mem, double t,
+                                    double* x, double* z, double* q) {
     // Get discrete time sought
     int k_out = std::ceil((t - grid_.front())/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
@@ -1376,7 +1376,8 @@ namespace casadi {
     casadi_copy(getPtr(q_), nq_, q);
   }
 
-  void FixedStepIntegrator::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
+  void FixedStepIntegrator::retreat(IntegratorMemory& mem, double t,
+                                    double* rx, double* rz, double* rq) {
     // Get discrete time sought
     int k_out = std::floor((t - grid_.front())/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
@@ -1423,8 +1424,8 @@ namespace casadi {
     casadi_copy(getPtr(rq_), nrq_, rq);
   }
 
-  void FixedStepIntegrator::reset(Memory& m, double t, const double* x,
-                              const double* z, const double* p) {
+  void FixedStepIntegrator::reset(IntegratorMemory& mem, double t,
+                                  const double* x, const double* z, const double* p) {
     // Update time
     t_ = t;
 
@@ -1450,8 +1451,8 @@ namespace casadi {
     }
   }
 
-  void FixedStepIntegrator::resetB(Memory& m, double t, const double* rx,
-                               const double* rz, const double* rp) {
+  void FixedStepIntegrator::resetB(IntegratorMemory& mem, double t, const double* rx,
+                                   const double* rz, const double* rp) {
     // Update time
     t_ = t;
 

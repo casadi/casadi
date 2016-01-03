@@ -72,9 +72,6 @@ namespace casadi {
   /** Forward declaration of internal class */
   class FunctionInternal;
 
-  /** Forward declaration of memory block class */
-  class Memory;
-
 #endif // SWIG
 
   /** \brief General function
@@ -936,17 +933,8 @@ namespace casadi {
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
-    /** \brief Does the solver require the allocation of a memory block */
-    bool has_mem() const;
-
-    /** \brief Allocate memory block */
-    void* alloc_mem();
-
-    /** \brief Free allocated memory block */
-    void free_mem(void* mem);
-
     /** \brief Set the (persistent) work vectors */
-    void set_work(const double** arg, double** res, int* iw, double* w, int mem=0) const;
+    void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 #endif // SWIG
 
     /// \endcond
@@ -994,12 +982,6 @@ namespace casadi {
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
 
 #ifndef SWIG
-    // Factorize linear system of equations
-    void linsol_factorize(Memory& m, const double* A) const;
-
-    // Solve factorized linear system of equations
-    void linsol_solve(Memory& m, double* x, int nrhs=1, bool tr=false) const;
-
     // Factorize linear system of equations
     void linsol_factorize(const double* A, int mem=0) const;
 
@@ -1069,65 +1051,6 @@ namespace casadi {
     ///@}
 #endif // SWIG
   };
-
-
-#ifndef SWIG
-  /** Struct holding memory */
-  class CASADI_EXPORT Memory {
-    public:
-    // Public data members
-    FunctionInternal *f;
-    const double **arg;
-    double **res;
-    int *iw;
-    double *w;
-    void *mem;
-
-    // Default constructor
-    Memory();
-
-    // Construct non-owning
-    Memory(const Function& f, const double** arg, double** res,
-           int* iw, double* w, void* mem);
-
-    // Construct non-owning
-    Memory(FunctionInternal *f, const double** arg, double** res,
-           int* iw, double* w, void* mem);
-
-    // Construct non-owning
-    Memory(const Function& f, const double** arg, double** res,
-           int* iw, double* w, int mem);
-
-    // Construct non-owning
-    Memory(FunctionInternal *f, const double** arg, double** res,
-           int* iw, double* w, int mem);
-
-    // Construct owning
-    Memory(const Function& f);
-
-    /// Move constructor
-    Memory(Memory&& obj);
-
-    /// Move assignment operator
-    Memory& operator=(Memory&& obj);
-
-    /// Copy constructor (undefined)
-    Memory(const Memory& obj);
-
-    /// Assignment operator (undefined)
-    Memory& operator=(const Memory& obj);
-
-    // Destructor
-    ~Memory();
-
-  private:
-    // Set up memory object
-    void setup(const double** arg1, double** res1, int* iw1, double* w1);
-
-    // Own the data ?
-    bool own_;
-  };
-#endif // SWIG
 
   /** \brief  Load an external function
    * File name is assumed to be ./<f_name>.so

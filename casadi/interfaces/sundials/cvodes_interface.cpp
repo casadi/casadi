@@ -291,12 +291,12 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::reset(Memory& m, double t, const double* x,
+  void CvodesInterface::reset(IntegratorMemory& mem, double t, const double* x,
                               const double* z, const double* _p) {
     casadi_msg("CvodesInterface::reset begin");
 
     // Reset the base classes
-    SundialsInterface::reset(m, t, x, z, _p);
+    SundialsInterface::reset(mem, t, x, z, _p);
 
     // Reset timers
     t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
@@ -327,7 +327,7 @@ namespace casadi {
     casadi_msg("CvodesInterface::reset end");
   }
 
-  void CvodesInterface::advance(Memory& m, double t, double* x, double* z, double* q) {
+  void CvodesInterface::advance(IntegratorMemory& mem, double t, double* x, double* z, double* q) {
     casadi_assert_message(t>=grid_.front(),
                           "CvodesInterface::integrate(" << t << "): "
                           "Cannot integrate to a time earlier than t0 ("
@@ -380,10 +380,10 @@ namespace casadi {
     casadi_msg("CvodesInterface::integrate(" << t << ") end");
   }
 
-  void CvodesInterface::resetB(Memory& m, double t, const double* rx,
+  void CvodesInterface::resetB(IntegratorMemory& mem, double t, const double* rx,
                                const double* rz, const double* rp) {
     // Reset the base classes
-    SundialsInterface::resetB(m, t, rx, rz, rp);
+    SundialsInterface::resetB(mem, t, rx, rz, rp);
 
     int flag;
     if (isInitAdj_) {
@@ -401,7 +401,8 @@ namespace casadi {
     casadi_msg("CvodesInterface::resetB end");
   }
 
-  void CvodesInterface::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
+  void CvodesInterface::retreat(IntegratorMemory& mem, double t,
+                                double* rx, double* rz, double* rq) {
     // Integrate, unless already at desired time
     if (t<t_) {
       int flag = CVodeB(mem_, t, CV_NORMAL);
@@ -1151,7 +1152,7 @@ namespace casadi {
 
     // Solve the (possibly factorized) system
     casadi_assert(linsol_.nnz_out(0) == NV_LENGTH_S(z));
-    linsol_.linsol_solve(linsol_mem_, NV_DATA_S(z));
+    linsol_.linsol_solve(NV_DATA_S(z));
 
     // Log time duration
     time2 = clock();
@@ -1171,7 +1172,7 @@ namespace casadi {
 
     // Solve the (possibly factorized) system
     casadi_assert(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
-    linsolB_.linsol_solve(linsolB_mem_, NV_DATA_S(zvecB), 1);
+    linsolB_.linsol_solve(NV_DATA_S(zvecB), 1);
 
     // Log time duration
     time2 = clock();
@@ -1204,10 +1205,8 @@ namespace casadi {
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsol_mem_ = Memory(linsol_, arg_, res_, iw_, w2, 0);
-    linsol_.linsol_factorize(linsol_mem_, val);
+    linsol_.setup(arg_+LINSOL_NUM_IN, res_+LINSOL_NUM_OUT, iw_, w2);
+    linsol_.linsol_factorize(val);
 
     // Log time duration
     time1 = clock();
@@ -1245,10 +1244,8 @@ namespace casadi {
     t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsolB_mem_ = Memory(linsolB_, arg_, res_, iw_, w2, 0);
-    linsolB_.linsol_factorize(linsolB_mem_, val);
+    linsolB_.setup(arg_+LINSOL_NUM_IN, res_+LINSOL_NUM_OUT, iw_, w2);
+    linsolB_.linsol_factorize(val);
 
     // Log time duration
     time1 = clock();

@@ -60,13 +60,13 @@ namespace casadi {
     virtual void init();
 
     // Factorize the linear system
-    virtual void linsol_factorize(const double* A, Memory2* mem) const;
+    virtual void linsol_factorize(Memory& mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(double* x, int nrhs, bool tr, Memory2* mem) const;
+    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
 
     /** \brief Allocate memory block */
-    virtual Memory2* alloc_mem();
+    virtual Memory* alloc_mem();
 
     /// A documentation string
     static const std::string meta_doc;
@@ -75,7 +75,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "csparse";}
   };
 
-  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory : public Memory2 {
+  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory : public Memory {
     // Destructor
     virtual ~CsparseMemory();
 
