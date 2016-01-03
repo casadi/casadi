@@ -59,14 +59,14 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
+    /** \brief Allocate memory block */
+    virtual Memory* alloc_mem();
+
     // Factorize the linear system
     virtual void linsol_factorize(Memory& mem, const double* A) const;
 
     // Solve the linear system
     virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
-
-    /** \brief Allocate memory block */
-    virtual Memory* alloc_mem();
 
     /// A documentation string
     static const std::string meta_doc;

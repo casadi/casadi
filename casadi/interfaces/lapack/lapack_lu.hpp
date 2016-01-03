@@ -69,8 +69,7 @@ namespace casadi {
     LapackLu(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /** \brief  Create a new Linsol */
-    static Linsol* creator(const std::string& name,
-                                         const Sparsity& sp, int nrhs) {
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
       return new LapackLu(name, sp, nrhs);
     }
 
@@ -79,6 +78,9 @@ namespace casadi {
 
     /// Initialize the solver
     virtual void init();
+
+    /** \brief Allocate memory block */
+    virtual Memory* alloc_mem();
 
     // Factorize the linear system
     virtual void linsol_factorize(Memory& mem, const double* A) const;
@@ -91,35 +93,31 @@ namespace casadi {
 
   protected:
 
-    /// Scale columns
-    void colScaling(double* x, int nrhs);
-
-    /// Scale rows
-    void rowScaling(double* x, int nrhs);
-
-    // Matrix
-    std::vector<double> mat_;
-
-    /// Pivoting elements
-    std::vector<int> ipiv_;
-
-    /// Col and row scaling
-    std::vector<double> r_, c_;
-
-    /// Type of scaling during the last equilibration
-    char equed_;
-
     /// Equilibrate?
     bool equilibriate_;
 
     /// Allow the equilibration to fail
     bool allow_equilibration_failure_;
 
-    /// Dimensions
-    int ncol_, nrow_;
-
     // Get name of the plugin
     virtual const char* plugin_name() const { return "lapacklu";}
+  };
+
+  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory : public Memory {
+    // Destructor
+    virtual ~LapackLuMemory() {}
+
+    // Matrix
+    std::vector<double> mat;
+
+    /// Pivoting elements
+    std::vector<int> ipiv;
+
+    /// Col and row scaling
+    std::vector<double> r, c;
+
+    /// Type of scaling during the last equilibration
+    char equed;
   };
 
 /// \endcond
