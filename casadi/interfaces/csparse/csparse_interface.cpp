@@ -57,7 +57,7 @@ namespace casadi {
     Linsol::init();
   }
 
-  Memory* CsparseInterface::alloc_mem() {
+  Memory* CsparseInterface::memory() const {
     CsparseMemory* m = new CsparseMemory();
     try {
       m->N = 0;

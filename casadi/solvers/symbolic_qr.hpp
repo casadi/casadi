@@ -70,7 +70,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief Allocate memory block */
-    virtual Memory* alloc_mem();
+    virtual Memory* memory() const;
 
     // Setup memory block
     virtual void setup(Memory& mem, const double** arg, double** res,

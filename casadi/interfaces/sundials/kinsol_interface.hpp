@@ -120,7 +120,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Allocate memory block */
-    virtual Memory* alloc_mem();
+    virtual Memory* memory() const;
 
     /** \brief Free allocated memory block */
     virtual void free_mem(void* mem);

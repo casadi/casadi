@@ -204,7 +204,7 @@ namespace casadi {
 
   void KinsolInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     if (mem==0) {
-      mem = alloc_mem();
+      mem = memory();
       try {
         eval(arg, res, iw, w, mem);
       } catch (...) {
@@ -853,8 +853,8 @@ namespace casadi {
     if (mem_) KINFree(&mem_);
   }
 
-  Memory* KinsolInterface::alloc_mem() {
-    return new KinsolMemory(*this);
+  Memory* KinsolInterface::memory() const {
+    return new KinsolMemory(const_cast<KinsolInterface&>(*this));
   }
 
   void KinsolInterface::free_mem(void* mem) {

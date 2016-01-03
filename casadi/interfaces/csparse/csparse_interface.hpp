@@ -60,7 +60,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief Allocate memory block */
-    virtual Memory* alloc_mem();
+    virtual Memory* memory() const;
 
     // Factorize the linear system
     virtual void linsol_factorize(Memory& mem, const double* A) const;

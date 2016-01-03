@@ -217,7 +217,7 @@ namespace casadi {
 
     // Create memory object
     casadi_assert(mem_.empty());
-    Memory* m = alloc_mem();
+    Memory* m = memory();
     casadi_assert(m!=0);
     mem_.push_back(m);
   }

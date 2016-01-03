@@ -764,7 +764,7 @@ namespace casadi {
     void alloc(const Function& f, bool persistent=false);
 
     /** \brief Allocate memory block */
-    virtual Memory* alloc_mem() {return new Memory();}
+    virtual Memory* memory() const {return new Memory();}
 
     /** \brief Set the (persistent) work vectors */
     virtual void setup(Memory& mem, const double** arg, double** res,

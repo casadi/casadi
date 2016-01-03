@@ -70,7 +70,7 @@ namespace casadi {
     allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
   }
 
-  Memory* LapackLu::alloc_mem() {
+  Memory* LapackLu::memory() const {
     LapackLuMemory* m = new LapackLuMemory();
     try {
       // Allocate matrix
