@@ -59,24 +59,29 @@ namespace casadi {
 
   void* CsparseInterface::alloc_mem() {
     Memory* m = new Memory();
-    m->N = 0;
-    m->S = 0;
-    m->A.nzmax = nnz_in(0);  // maximum number of entries
-    m->A.m = size1_in(0); // number of rows
-    m->A.n = size2_in(0); // number of columns
-    m->A.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
-                                                     // or column indices (size nzmax)
-    m->A.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
-    m->A.x = 0; // numerical values, size nzmax
-    m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-col
+    try {
+      m->N = 0;
+      m->S = 0;
+      m->A.nzmax = nnz_in(0);  // maximum number of entries
+      m->A.m = size1_in(0); // number of rows
+      m->A.n = size2_in(0); // number of columns
+      m->A.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
+      // or column indices (size nzmax)
+      m->A.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
+      m->A.x = 0; // numerical values, size nzmax
+      m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-col
 
-    // Temporary
-    m->temp_.resize(m->A.n);
+      // Temporary
+      m->temp_.resize(m->A.n);
 
-    // Has the routine been called once
-    m->called_once_ = false;
+      // Has the routine been called once
+      m->called_once_ = false;
 
-    return m;
+      return m;
+    } catch (...) {
+      delete m;
+      throw;
+    }
   }
 
   void CsparseInterface::linsol_factorize(const double* A, void* mem) const {

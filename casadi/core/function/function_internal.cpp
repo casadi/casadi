@@ -217,7 +217,8 @@ namespace casadi {
 
     // Create memory object
     casadi_assert(mem_.empty());
-    mem_.push_back(alloc_mem());
+    void *m = alloc_mem();
+    mem_.push_back(m);
   }
 
   void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, void* mem) {
