@@ -61,25 +61,33 @@ namespace casadi {
     virtual void init();
 
     // Factorize the linear system
-    virtual void linsol_factorize(Memory& m, const double* A);
+    virtual void linsol_factorize(const double* A, void* mem) const;
 
     // Solve the linear system
-    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
+    virtual void linsol_solve(double* x, int nrhs, bool tr, void* mem) const;
 
-    // Has the solve function been called once
-    bool called_once_;
+    struct Memory {
+      // The linear system CSparse form (CCS)
+      cs A;
 
-    // The linear system CSparse form (CCS)
-    cs A_;
+      // The symbolic factorization
+      css *S;
 
-    // The symbolic factorization
-    css *S_;
+      // The numeric factorization
+      csn *N;
 
-    // The numeric factorization
-    csn *N_;
+      // Temporary
+      std::vector<double> temp_;
 
-    // Temporary
-    std::vector<double> temp_;
+      // Has the solve function been called once
+      bool called_once_;
+    };
+
+    /** \brief Allocate memory block */
+    virtual void* alloc_mem();
+
+    /** \brief Free allocated memory block */
+    virtual void free_mem(void* mem);
 
     /// A documentation string
     static const std::string meta_doc;

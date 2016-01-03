@@ -657,6 +657,11 @@ namespace casadi {
     (*this)->spAdj(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
+  void Function::set_work(const double** arg, double** res, int* iw, double* w,
+                          int mem) const {
+    (*this)->set_work(arg, res, iw, w, (*this)->mem_.at(mem));
+  }
+
   bool Function::spCanEvaluate(bool fwd) {
     return (*this)->spCanEvaluate(fwd);
   }
@@ -1467,6 +1472,14 @@ namespace casadi {
 
   void Function::linsol_solveL(double* x, int nrhs, bool tr) {
     (*this)->linsol_solveL(x, nrhs, tr);
+  }
+
+  void Function::linsol_factorize(const double* A, int mem) const {
+    (*this)->linsol_factorize(A, (*this)->mem_.at(mem));
+  }
+
+  void Function::linsol_solve(double* x, int nrhs, bool tr, int mem) const {
+    (*this)->linsol_solve(x, nrhs, tr, (*this)->mem_.at(mem));
   }
 
   Sparsity Function::linsol_cholesky_sparsity(bool tr) const {

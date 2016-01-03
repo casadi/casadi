@@ -710,9 +710,6 @@ namespace casadi {
     Function dynamicCompilation(Function f, std::string fname, std::string fdescr,
                                 std::string compiler);
 
-    /// The following functions are called internally from EvaluateMX.
-    /// For documentation, see the MXNode class
-    ///@{
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
@@ -763,7 +760,10 @@ namespace casadi {
 
     /** \brief Set the (temporary) work vectors */
     virtual void set_temp(Memory& m, const double** arg, double** res, int* iw, double* w) {}
-    ///@}
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(const double** arg, double** res, int* iw, double* w,
+                          void* mem) const {}
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
@@ -857,6 +857,8 @@ namespace casadi {
 
     ///@{
     /// Linear solver specific (cf. Linsol class)
+    virtual void linsol_factorize(const double* A, void* mem) const;
+    virtual void linsol_solve(double* x, int nrhs, bool tr, void* mem) const;
     virtual void linsol_factorize(Memory& m, const double* A);
     virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);

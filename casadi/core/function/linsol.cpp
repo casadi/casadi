@@ -85,6 +85,9 @@ namespace casadi {
   }
 
   void Linsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+    // Setup memory object
+    set_work(arg + LINSOL_NUM_IN, res + LINSOL_NUM_OUT, iw, w, mem);
+
     // Get inputs and outputs
     const double *A = arg[LINSOL_A];
     const double *b = arg[LINSOL_B];
