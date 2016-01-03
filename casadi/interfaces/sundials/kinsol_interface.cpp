@@ -853,7 +853,7 @@ namespace casadi {
     if (mem_) KINFree(&mem_);
   }
 
-  void* KinsolInterface::alloc_mem() {
+  Memory2* KinsolInterface::alloc_mem() {
     return new KinsolMemory(*this);
   }
 

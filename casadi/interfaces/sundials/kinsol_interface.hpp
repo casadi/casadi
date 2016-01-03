@@ -120,14 +120,14 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Allocate memory block */
-    virtual void* alloc_mem();
+    virtual Memory2* alloc_mem();
 
     /** \brief Free allocated memory block */
     virtual void free_mem(void* mem);
   };
 
   // Memory
-  struct CASADI_ROOTFINDER_KINSOL_EXPORT KinsolMemory {
+  struct CASADI_ROOTFINDER_KINSOL_EXPORT KinsolMemory : public Memory2 {
     /// Shared memory
     KinsolInterface& self;
 
@@ -135,7 +135,7 @@ namespace casadi {
     KinsolMemory(KinsolInterface& s);
 
     /// Destructor
-    ~KinsolMemory();
+    virtual ~KinsolMemory();
 
     /// KINSOL memory block
     void* mem_;

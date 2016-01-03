@@ -99,7 +99,7 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
-    for (auto&& i : mem_) free_mem(i);
+    for (auto&& i : mem_) delete i;
     mem_.clear();
   }
 
@@ -107,7 +107,7 @@ namespace casadi {
     setDefaultOptions();
 
     // Free existing memory object, if any
-    for (auto&& i : mem_) free_mem(i);
+    for (auto&& i : mem_) delete i;
     mem_.clear();
 
     // Get the number of inputs and outputs
@@ -217,7 +217,8 @@ namespace casadi {
 
     // Create memory object
     casadi_assert(mem_.empty());
-    void *m = alloc_mem();
+    Memory2* m = alloc_mem();
+    casadi_assert(m!=0);
     mem_.push_back(m);
   }
 
@@ -2641,11 +2642,11 @@ namespace casadi {
     casadi_error("'countNodes' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_factorize(const double* A, void* mem) const {
+  void FunctionInternal::linsol_factorize(const double* A, Memory2* mem) const {
     casadi_error("'linsol_factorize' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_solve(double* x, int nrhs, bool tr, void* mem) const {
+  void FunctionInternal::linsol_solve(double* x, int nrhs, bool tr, Memory2* mem) const {
     casadi_error("'linsol_solve' not defined for " + type_name());
   }
 

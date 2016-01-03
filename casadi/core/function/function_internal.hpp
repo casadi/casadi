@@ -62,10 +62,15 @@ namespace casadi {
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
+  /** \brief Base class for Function memory */
+  struct CASADI_EXPORT Memory2 {
+    /** \brief Destructor */
+    virtual ~Memory2() {}
+  };
+
   /** \brief Internal class for Function
       \author Joel Andersson
-      \date 2010
-      A regular user should never work with any Node class. Use Function directly.
+      \date 2010-2015
   */
   class CASADI_EXPORT FunctionInternal
     : public OptionsFunctionalityNode {
@@ -750,7 +755,7 @@ namespace casadi {
     virtual bool has_mem() const {return false;}
 
     /** \brief Allocate memory block */
-    virtual void* alloc_mem() {return 0;}
+    virtual Memory2* alloc_mem() {return new Memory2();}
 
     /** \brief Free allocated memory block */
     virtual void free_mem(void* mem) {}
@@ -772,7 +777,7 @@ namespace casadi {
     ///@}
 
     /// Memory objects
-    std::vector<void*> mem_;
+    std::vector<Memory2*> mem_;
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
@@ -857,8 +862,8 @@ namespace casadi {
 
     ///@{
     /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_factorize(const double* A, void* mem) const;
-    virtual void linsol_solve(double* x, int nrhs, bool tr, void* mem) const;
+    virtual void linsol_factorize(const double* A, Memory2* mem) const;
+    virtual void linsol_solve(double* x, int nrhs, bool tr, Memory2* mem) const;
     virtual void linsol_factorize(Memory& m, const double* A);
     virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);

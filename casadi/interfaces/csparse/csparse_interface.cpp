@@ -57,8 +57,8 @@ namespace casadi {
     Linsol::init();
   }
 
-  void* CsparseInterface::alloc_mem() {
-    Memory* m = new Memory();
+  Memory2* CsparseInterface::alloc_mem() {
+    CsparseMemory* m = new CsparseMemory();
     try {
       m->N = 0;
       m->S = 0;
@@ -80,12 +80,12 @@ namespace casadi {
       return m;
     } catch (...) {
       delete m;
-      throw;
+      return 0;
     }
   }
 
-  void CsparseInterface::linsol_factorize(const double* A, void* mem) const {
-    Memory* m = static_cast<Memory*>(mem);
+  void CsparseInterface::linsol_factorize(const double* A, Memory2* mem) const {
+    CsparseMemory* m = static_cast<CsparseMemory*>(mem);
     casadi_assert(A!=0);
 
     // Set the nonzeros of the matrix
@@ -149,8 +149,8 @@ namespace casadi {
     casadi_assert(m->N!=0);
   }
 
-  void CsparseInterface::linsol_solve(double* x, int nrhs, bool tr, void* mem) const {
-    Memory* m = static_cast<Memory*>(mem);
+  void CsparseInterface::linsol_solve(double* x, int nrhs, bool tr, Memory2* mem) const {
+    CsparseMemory* m = static_cast<CsparseMemory*>(mem);
     casadi_assert(m->N!=0);
 
     double *t = &m->temp_.front();
@@ -172,11 +172,9 @@ namespace casadi {
     }
   }
 
-  void CsparseInterface::free_mem(void* mem) {
-    Memory* m = static_cast<Memory*>(mem);
-    if (m->S) cs_sfree(m->S);
-    if (m->N) cs_nfree(m->N);
-    delete m;
+  CsparseMemory::~CsparseMemory() {
+    if (this->S) cs_sfree(this->S);
+    if (this->N) cs_nfree(this->N);
   }
 
 } // namespace casadi
