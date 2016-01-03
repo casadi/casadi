@@ -107,7 +107,7 @@ namespace casadi {
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
     /** \brief  Evaluate numerically */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res);
@@ -755,8 +755,8 @@ namespace casadi {
     virtual Memory* alloc_mem() {return new Memory();}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void setup(const double** arg, double** res, int* iw, double* w,
-                          void* mem) const {}
+    virtual void setup(Memory& mem, const double** arg, double** res,
+                       int* iw, double* w) const {}
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */

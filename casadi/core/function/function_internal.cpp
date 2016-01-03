@@ -1279,11 +1279,11 @@ namespace casadi {
   }
 
   void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    static_cast<const FunctionInternal*>(this)->eval(arg, res, iw, w, mem);
+    eval(*mem_.at(0), arg, res, iw, w);
   }
 
-  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w,
-                              void* mem) const {
+  void FunctionInternal::eval(Memory& mem,
+                              const double** arg, double** res, int* iw, double* w) const {
     casadi_error("'eval' not defined for " + type_name());
   }
 

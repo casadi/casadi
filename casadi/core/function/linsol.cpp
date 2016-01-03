@@ -84,7 +84,8 @@ namespace casadi {
 
   }
 
-  void Linsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Linsol::eval(Memory& mem, const double** arg, double** res,
+                    int* iw, double* w) const {
     // Get inputs and outputs
     const double *A = arg[LINSOL_A];
     const double *b = arg[LINSOL_B];
@@ -94,7 +95,7 @@ namespace casadi {
     if (!x) return;
 
     // Setup memory object
-    setup(arg + LINSOL_NUM_IN, res + LINSOL_NUM_OUT, iw, w, mem);
+    setup(mem, arg + LINSOL_NUM_IN, res + LINSOL_NUM_OUT, iw, w);
 
     // A zero linear system would be singular
     if (A==0) {
@@ -109,11 +110,11 @@ namespace casadi {
     }
 
     // Factorize the linear system
-    linsol_factorize(*mem_.at(0), A);
+    linsol_factorize(mem, A);
 
     // Solve the factorized system
     casadi_copy(b, neq_*nrhs_, x);
-    linsol_solve(*mem_.at(0), x, nrhs_, false);
+    linsol_solve(mem, x, nrhs_, false);
   }
 
   void Linsol::

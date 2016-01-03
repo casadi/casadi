@@ -655,7 +655,7 @@ namespace casadi {
 
   void Function::setup(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->setup(arg, res, iw, w, (*this)->mem_.at(mem));
+    (*this)->setup(*(*this)->mem_.at(mem), arg, res, iw, w);
   }
 
   bool Function::spCanEvaluate(bool fwd) {
