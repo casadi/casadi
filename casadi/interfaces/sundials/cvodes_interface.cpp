@@ -477,7 +477,9 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::printStats(CvodesMemory& m, std::ostream &stream) const {
+  void CvodesInterface::printStats(IntegratorMemory& mem, std::ostream &stream) const {
+    CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
+
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
@@ -1117,8 +1119,9 @@ namespace casadi {
     log("CvodesInterface::bjacB", "end");
   }
 
-  void CvodesInterface::setStopTime(CvodesMemory& m, double tf) {
+  void CvodesInterface::setStopTime(IntegratorMemory& mem, double tf) {
     // Set the stop time of the integration -- don't integrate past this point
+    CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
     int flag = CVodeSetStopTime(m.mem, tf);
     if (flag != CV_SUCCESS) cvodes_error("CVodeSetStopTime", flag);
   }

@@ -167,7 +167,7 @@ namespace casadi {
     }
 
     // Print statistics
-    if (print_stats_) printStats(userOut());
+    if (print_stats_) printStats(m, userOut());
   }
 
   void Integrator::init() {
@@ -1277,7 +1277,7 @@ namespace casadi {
 
   const std::string Integrator::infix_ = "integrator";
 
-  void Integrator::setStopTime(double tf) {
+  void Integrator::setStopTime(IntegratorMemory& mem, double tf) {
     casadi_error("Integrator::setStopTime not defined for class "
                  << typeid(*this).name());
   }

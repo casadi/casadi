@@ -96,7 +96,7 @@ namespace casadi {
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Print solver statistics */
-    virtual void printStats(std::ostream &stream) const {}
+    virtual void printStats(IntegratorMemory& mem, std::ostream &stream) const {}
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
@@ -120,7 +120,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Set stop time for the integration */
-    virtual void setStopTime(double tf);
+    virtual void setStopTime(IntegratorMemory& mem, double tf);
 
     // Helper structure
     struct AugOffset {

@@ -137,10 +137,10 @@ namespace casadi {
     virtual void retreat(IntegratorMemory& mem, double t, double* rx, double* rz, double* rq);
 
     /** \brief  Set the stop time of the forward integration */
-    virtual void setStopTime(CvodesMemory& m, double tf);
+    virtual void setStopTime(IntegratorMemory& mem, double tf);
 
     /** \brief  Print solver statistics */
-    virtual void printStats(CvodesMemory& m, std::ostream &stream) const;
+    virtual void printStats(IntegratorMemory& mem, std::ostream &stream) const;
 
     /** \brief  Get the integrator Jacobian for the forward problem (generic) */
     template<typename MatType> Function getJacGen();

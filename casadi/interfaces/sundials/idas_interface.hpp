@@ -62,6 +62,20 @@ namespace casadi {
     /// Function object
     IdasInterface& self;
 
+    // Idas memory block
+    void* mem;
+
+    // For timings
+    clock_t time1, time2;
+
+    // Accumulated time since last reset:
+    double t_res; // time spent in the DAE residual
+    double t_fres; // time spent in the forward sensitivity residual
+    double t_jac, t_jacB; // time spent in the Jacobian, or Jacobian times vector function
+    double t_lsolve; // preconditioner/linear solver solve function
+    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
+    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
+
     /// Constructor
     IdasMemory(const IdasInterface& s);
 
@@ -102,7 +116,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief Initialize the taping */
-    virtual void initTaping();
+    void initTaping(IdasMemory& m);
 
     /** \brief Initialize the backward problem (can only be called after the first integration) */
     virtual void initAdj(IdasMemory& m);
@@ -127,10 +141,10 @@ namespace casadi {
                          double* rz, double* rq);
 
     /** \brief  Set the stop time of the forward integration */
-    virtual void setStopTime(double tf);
+    virtual void setStopTime(IntegratorMemory& mem, double tf);
 
     /** \brief  Print solver statistics */
-    virtual void printStats(std::ostream &stream) const;
+    virtual void printStats(IntegratorMemory& mem, std::ostream &stream) const;
 
     /** \brief  Get the integrator Jacobian for the forward problem (generic) */
     template<typename MatType> Function getJacGen();
@@ -152,7 +166,7 @@ namespace casadi {
     virtual Function getJacB();
 
     /// Correct the initial conditions, i.e. calculate
-    void correctInitialConditions();
+    void correctInitialConditions(IdasMemory& m);
 
     /// A documentation string
     static const std::string meta_doc;
@@ -266,9 +280,6 @@ namespace casadi {
                                N_Vector xzdotcur, N_Vector rescur);
   public:
 
-    // Idas memory block
-    void* mem_;
-
     // sensitivity method
     int ism_;
 
@@ -301,17 +312,6 @@ namespace casadi {
 
     // Ids of backward problem
     int whichB_;
-
-    // For timings
-    clock_t time1, time2;
-
-    // Accumulated time since last reset:
-    double t_res; // time spent in the DAE residual
-    double t_fres; // time spent in the forward sensitivity residual
-    double t_jac, t_jacB; // time spent in the Jacobian, or Jacobian times vector function
-    double t_lsolve; // preconditioner/linear solver solve function
-    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
-    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
 
     // Has the adjoint problem been initialized
     bool isInitAdj_;
