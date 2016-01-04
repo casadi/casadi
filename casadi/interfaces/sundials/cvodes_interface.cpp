@@ -649,7 +649,8 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rxdot) const {
+  void CvodesInterface::
+  rhsB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rxdot) const {
     log("CvodesInterface::rhsB", "begin");
 
     // Debug output
