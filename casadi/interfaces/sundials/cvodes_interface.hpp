@@ -64,7 +64,7 @@ namespace casadi {
 
   // CvodesMemory
   struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory : public IntegratorMemory {
-    /// Shared memory
+    /// Function object
     CvodesInterface& self;
 
     // CVodes memory block
