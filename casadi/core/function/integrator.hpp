@@ -66,11 +66,11 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
     /** \brief  Initialize */
     virtual void init();
-
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const { return new IntegratorMemory();}
 
     /** \brief Set the work vectors */
     virtual void setup(Memory& mem, const double** arg, double** res,
@@ -323,6 +323,29 @@ namespace casadi {
     return dae;
   }
 
+  struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
+    // Current time
+    double t;
+
+    // Discrete time
+    int k;
+
+    // Current state
+    std::vector<double> x, z, p, q, rx, rz, rp, rq;
+
+    // Previous state
+    std::vector<double> x_prev, Z_prev, q_prev, rx_prev, RZ_prev, rq_prev;
+
+    /// Algebraic variables for the discrete time integration
+    DM Z, RZ;
+
+    // Tape
+    std::vector<std::vector<double> > x_tape, Z_tape;
+
+    /** \brief  Destructor */
+    virtual ~FixedStepMemory() {}
+  };
+
   class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   public:
 
@@ -334,6 +357,12 @@ namespace casadi {
 
     /// Initialize stage
     virtual void init();
+
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const { return new FixedStepMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
 
     /// Setup F and G
     virtual void setupFG() = 0;
@@ -366,29 +395,11 @@ namespace casadi {
     // Number of finite elements
     int nk_;
 
-    // Discrete time
-    int k_;
-
     // Time step size
     double h_;
 
     /// Number of algebraic variables for the discrete time integration
     int nZ_, nRZ_;
-
-    // Current time
-    double t_;
-
-    // Current state
-    std::vector<double> x_, z_, p_, q_, rx_, rz_, rp_, rq_;
-
-    // Previous state
-    std::vector<double> x_prev_, Z_prev_, q_prev_, rx_prev_, RZ_prev_, rq_prev_;
-
-    /// Algebraic variables for the discrete time integration
-    DM Z_, RZ_;
-
-    // Tape
-    std::vector<std::vector<double> > x_tape_, Z_tape_;
   };
 
   class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {

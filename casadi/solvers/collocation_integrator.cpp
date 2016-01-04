@@ -284,11 +284,13 @@ namespace casadi {
 
   void CollocationIntegrator::reset(IntegratorMemory& mem, double t, const double* x,
                                 const double* z, const double* p) {
+    FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
+
     // Reset the base classes
     ImplicitFixedStepIntegrator::reset(mem, t, x, z, p);
 
     // Initial guess for Z
-    double* Z = Z_.ptr();
+    double* Z = m.Z.ptr();
     for (int d=0; d<deg_; ++d) {
       casadi_copy(x, nx_, Z);
       Z += nx_;
@@ -299,11 +301,13 @@ namespace casadi {
 
   void CollocationIntegrator::resetB(IntegratorMemory& mem, double t, const double* rx,
                                const double* rz, const double* rp) {
+    FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
+
     // Reset the base classes
     ImplicitFixedStepIntegrator::resetB(mem, t, rx, rz, rp);
 
     // Initial guess for RZ
-    double* RZ = RZ_.ptr();
+    double* RZ = m.RZ.ptr();
     for (int d=0; d<deg_; ++d) {
       casadi_copy(rx, nrx_, RZ);
       RZ += nrx_;

@@ -295,6 +295,7 @@ namespace casadi {
   }
 
   void SundialsInterface::init_memory(Memory& mem) const {
+    Integrator::init_memory(mem);
     SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
 
     // Allocate n-vectors

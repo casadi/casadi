@@ -247,6 +247,9 @@ namespace casadi {
     alloc_w(sz_w + nx_ + nz_ + nrx_ + nrz_);
   }
 
+  void Integrator::init_memory(Memory& mem) const {
+  }
+
   template<typename MatType>
   map<string, MatType> Integrator::aug_fwd(int nfwd, AugOffset& offset) {
     log("Integrator::aug_fwd", "call");
@@ -1303,36 +1306,45 @@ namespace casadi {
     setupFG();
 
     // Get discrete time dimensions
-    Z_ = DM::zeros(F_.sparsity_in(DAE_Z));
-    nZ_ = Z_.nnz();
-    RZ_ = G_.isNull() ? DM() : DM::zeros(G_.sparsity_in(RDAE_RZ));
-    nRZ_ =  RZ_.nnz();
+    nZ_ = F_.nnz_in(DAE_Z);
+    nRZ_ =  G_.isNull() ? 0 : G_.nnz_in(RDAE_RZ);
+  }
+
+  void FixedStepIntegrator::init_memory(Memory& mem) const {
+    Integrator::init_memory(mem);
+    FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
+
+    // Discrete time algebraic variable
+    m.Z = DM::zeros(F_.sparsity_in(DAE_Z));
+    m.RZ = G_.isNull() ? DM() : DM::zeros(G_.sparsity_in(RDAE_RZ));
 
     // Allocate tape if backward states are present
     if (nrx_>0) {
-      x_tape_.resize(nk_+1, vector<double>(nx_));
-      Z_tape_.resize(nk_, vector<double>(nZ_));
+      m.x_tape.resize(nk_+1, vector<double>(nx_));
+      m.Z_tape.resize(nk_, vector<double>(nZ_));
     }
 
     // Allocate state
-    x_.resize(nx_);
-    z_.resize(nz_);
-    p_.resize(np_);
-    q_.resize(nq_);
-    rx_.resize(nrx_);
-    rz_.resize(nrz_);
-    rp_.resize(nrp_);
-    rq_.resize(nrq_);
-    x_prev_.resize(nx_);
-    Z_prev_.resize(nZ_);
-    q_prev_.resize(nq_);
-    rx_prev_.resize(nrx_);
-    RZ_prev_.resize(nRZ_);
-    rq_prev_.resize(nrq_);
+    m.x.resize(nx_);
+    m.z.resize(nz_);
+    m.p.resize(np_);
+    m.q.resize(nq_);
+    m.rx.resize(nrx_);
+    m.rz.resize(nrz_);
+    m.rp.resize(nrp_);
+    m.rq.resize(nrq_);
+    m.x_prev.resize(nx_);
+    m.Z_prev.resize(nZ_);
+    m.q_prev.resize(nq_);
+    m.rx_prev.resize(nrx_);
+    m.RZ_prev.resize(nRZ_);
+    m.rq_prev.resize(nrq_);
   }
 
   void FixedStepIntegrator::advance(IntegratorMemory& mem, double t,
                                     double* x, double* z, double* q) {
+    FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
+
     // Get discrete time sought
     int k_out = std::ceil((t - grid_.front())/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
@@ -1343,47 +1355,49 @@ namespace casadi {
 
     // Discrete dynamics function inputs ...
     fill_n(arg_, F.n_in(), nullptr);
-    arg_[DAE_T] = &t_;
-    arg_[DAE_X] = getPtr(x_prev_);
-    arg_[DAE_Z] = getPtr(Z_prev_);
-    arg_[DAE_P] = getPtr(p_);
+    arg_[DAE_T] = &m.t;
+    arg_[DAE_X] = getPtr(m.x_prev);
+    arg_[DAE_Z] = getPtr(m.Z_prev);
+    arg_[DAE_P] = getPtr(m.p);
 
     // ... and outputs
     fill_n(res_, F.n_out(), nullptr);
-    res_[DAE_ODE] = getPtr(x_);
-    res_[DAE_ALG] = getPtr(Z_);
-    res_[DAE_QUAD] = getPtr(q_);
+    res_[DAE_ODE] = getPtr(m.x);
+    res_[DAE_ALG] = getPtr(m.Z);
+    res_[DAE_QUAD] = getPtr(m.q);
 
     // Take time steps until end time has been reached
-    while (k_<k_out) {
+    while (m.k<k_out) {
       // Update the previous step
-      casadi_copy(getPtr(x_), nx_, getPtr(x_prev_));
-      casadi_copy(getPtr(Z_), nZ_, getPtr(Z_prev_));
-      casadi_copy(getPtr(q_), nq_, getPtr(q_prev_));
+      casadi_copy(getPtr(m.x), nx_, getPtr(m.x_prev));
+      casadi_copy(getPtr(m.Z), nZ_, getPtr(m.Z_prev));
+      casadi_copy(getPtr(m.q), nq_, getPtr(m.q_prev));
 
       // Take step
       F(arg_, res_, iw_, w_, 0);
-      casadi_axpy(nq_, 1., getPtr(q_prev_), getPtr(q_));
+      casadi_axpy(nq_, 1., getPtr(m.q_prev), getPtr(m.q));
 
       // Tape
       if (nrx_>0) {
-        casadi_copy(getPtr(x_), nx_, getPtr(x_tape_.at(k_+1)));
-        casadi_copy(getPtr(Z_), Z_.nnz(), getPtr(Z_tape_.at(k_)));
+        casadi_copy(getPtr(m.x), nx_, getPtr(m.x_tape.at(m.k+1)));
+        casadi_copy(getPtr(m.Z), m.Z.nnz(), getPtr(m.Z_tape.at(m.k)));
       }
 
       // Advance time
-      k_++;
-      t_ = grid_.front() + k_*h_;
+      m.k++;
+      m.t = grid_.front() + m.k*h_;
     }
 
     // Return to user TODO(@jaeandersson): interpolate
-    casadi_copy(getPtr(x_), nx_, x);
-    casadi_copy(getPtr(Z_)+Z_.nnz()-nz_, nz_, z);
-    casadi_copy(getPtr(q_), nq_, q);
+    casadi_copy(getPtr(m.x), nx_, x);
+    casadi_copy(getPtr(m.Z)+m.Z.nnz()-nz_, nz_, z);
+    casadi_copy(getPtr(m.q), nq_, q);
   }
 
   void FixedStepIntegrator::retreat(IntegratorMemory& mem, double t,
                                     double* rx, double* rz, double* rq) {
+    FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
+
     // Get discrete time sought
     int k_out = std::floor((t - grid_.front())/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
@@ -1394,89 +1408,93 @@ namespace casadi {
 
     // Discrete dynamics function inputs ...
     fill_n(arg_, G.n_in(), nullptr);
-    arg_[RDAE_T] = &t_;
-    arg_[RDAE_P] = getPtr(p_);
-    arg_[RDAE_RX] = getPtr(rx_prev_);
-    arg_[RDAE_RZ] = getPtr(RZ_prev_);
-    arg_[RDAE_RP] = getPtr(rp_);
+    arg_[RDAE_T] = &m.t;
+    arg_[RDAE_P] = getPtr(m.p);
+    arg_[RDAE_RX] = getPtr(m.rx_prev);
+    arg_[RDAE_RZ] = getPtr(m.RZ_prev);
+    arg_[RDAE_RP] = getPtr(m.rp);
 
     // ... and outputs
     fill_n(res_, G.n_out(), nullptr);
-    res_[RDAE_ODE] = getPtr(rx_);
-    res_[RDAE_ALG] = getPtr(RZ_);
-    res_[RDAE_QUAD] = getPtr(rq_);
+    res_[RDAE_ODE] = getPtr(m.rx);
+    res_[RDAE_ALG] = getPtr(m.RZ);
+    res_[RDAE_QUAD] = getPtr(m.rq);
 
     // Take time steps until end time has been reached
-    while (k_>k_out) {
+    while (m.k>k_out) {
       // Advance time
-      k_--;
-      t_ = grid_.front() + k_*h_;
+      m.k--;
+      m.t = grid_.front() + m.k*h_;
 
       // Update the previous step
-      casadi_copy(getPtr(rx_), nrx_, getPtr(rx_prev_));
-      casadi_copy(getPtr(RZ_), nRZ_, getPtr(RZ_prev_));
-      casadi_copy(getPtr(rq_), nrq_, getPtr(rq_prev_));
+      casadi_copy(getPtr(m.rx), nrx_, getPtr(m.rx_prev));
+      casadi_copy(getPtr(m.RZ), nRZ_, getPtr(m.RZ_prev));
+      casadi_copy(getPtr(m.rq), nrq_, getPtr(m.rq_prev));
 
       // Take step
-      arg_[RDAE_X] = getPtr(x_tape_.at(k_));
-      arg_[RDAE_Z] = getPtr(Z_tape_.at(k_));
+      arg_[RDAE_X] = getPtr(m.x_tape.at(m.k));
+      arg_[RDAE_Z] = getPtr(m.Z_tape.at(m.k));
       G(arg_, res_, iw_, w_, 0);
-      casadi_axpy(nrq_, 1., getPtr(rq_prev_), getPtr(rq_));
+      casadi_axpy(nrq_, 1., getPtr(m.rq_prev), getPtr(m.rq));
     }
 
     // Return to user TODO(@jaeandersson): interpolate
-    casadi_copy(getPtr(rx_), nrx_, rx);
-    casadi_copy(getPtr(RZ_)+RZ_.nnz()-nrz_, nrz_, rz);
-    casadi_copy(getPtr(rq_), nrq_, rq);
+    casadi_copy(getPtr(m.rx), nrx_, rx);
+    casadi_copy(getPtr(m.RZ)+m.RZ.nnz()-nrz_, nrz_, rz);
+    casadi_copy(getPtr(m.rq), nrq_, rq);
   }
 
   void FixedStepIntegrator::reset(IntegratorMemory& mem, double t,
                                   const double* x, const double* z, const double* p) {
+    FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
+
     // Update time
-    t_ = t;
+    m.t = t;
 
     // Set parameters
-    casadi_copy(p, np_, getPtr(p_));
+    casadi_copy(p, np_, getPtr(m.p));
 
     // Update the state
-    casadi_copy(x, nx_, getPtr(x_));
-    casadi_copy(z, nz_, getPtr(z_));
+    casadi_copy(x, nx_, getPtr(m.x));
+    casadi_copy(z, nz_, getPtr(m.z));
 
     // Reset summation states
-    casadi_fill(getPtr(q_), nq_, 0.);
+    casadi_fill(getPtr(m.q), nq_, 0.);
 
     // Bring discrete time to the beginning
-    k_ = 0;
+    m.k = 0;
 
     // Get consistent initial conditions
-    Z_.set(numeric_limits<double>::quiet_NaN());
+    m.Z.set(numeric_limits<double>::quiet_NaN());
 
     // Add the first element in the tape
     if (nrx_>0) {
-      casadi_copy(x, nx_, getPtr(x_tape_.at(0)));
+      casadi_copy(x, nx_, getPtr(m.x_tape.at(0)));
     }
   }
 
   void FixedStepIntegrator::resetB(IntegratorMemory& mem, double t, const double* rx,
                                    const double* rz, const double* rp) {
+    FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
+
     // Update time
-    t_ = t;
+    m.t = t;
 
     // Set parameters
-    casadi_copy(rp, nrp_, getPtr(rp_));
+    casadi_copy(rp, nrp_, getPtr(m.rp));
 
     // Update the state
-    casadi_copy(rx, nrx_, getPtr(rx_));
-    casadi_copy(rz, nrz_, getPtr(rz_));
+    casadi_copy(rx, nrx_, getPtr(m.rx));
+    casadi_copy(rz, nrz_, getPtr(m.rz));
 
     // Reset summation states
-    casadi_fill(getPtr(rq_), nrq_, 0.);
+    casadi_fill(getPtr(m.rq), nrq_, 0.);
 
     // Bring discrete time to the end
-    k_ = nk_;
+    m.k = nk_;
 
     // Get consistent initial conditions
-    RZ_.set(numeric_limits<double>::quiet_NaN());
+    m.RZ.set(numeric_limits<double>::quiet_NaN());
   }
 
   ImplicitFixedStepIntegrator::
