@@ -129,15 +129,16 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Integrator::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void Integrator::
+  eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     IntegratorMemory& m = dynamic_cast<IntegratorMemory&>(mem);
     Integrator* this_ = const_cast<Integrator*>(this);
 
     // Setup memory object
-    this_->setup(m, arg + INTEGRATOR_NUM_IN, res + INTEGRATOR_NUM_OUT, iw, w);
+    setup(m, arg + INTEGRATOR_NUM_IN, res + INTEGRATOR_NUM_OUT, iw, w);
 
     // Reset solver, take time to t0
-    this_->reset(m, grid_.front(), arg[INTEGRATOR_X0], arg[INTEGRATOR_Z0], arg[INTEGRATOR_P]);
+    reset(m, grid_.front(), arg[INTEGRATOR_X0], arg[INTEGRATOR_Z0], arg[INTEGRATOR_P]);
 
     // Where to store outputs
     double* x = res[INTEGRATOR_XF];
@@ -1340,7 +1341,7 @@ namespace casadi {
   }
 
   void FixedStepIntegrator::advance(IntegratorMemory& mem, double t,
-                                    double* x, double* z, double* q) {
+                                    double* x, double* z, double* q) const {
     FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
 
     // Get discrete time sought
@@ -1349,7 +1350,7 @@ namespace casadi {
     casadi_assert(k_out>=0);
 
     // Explicit discrete time dynamics
-    Function& F = getExplicit();
+    const Function& F = getExplicit();
 
     // Discrete dynamics function inputs ...
     fill_n(m.arg, F.n_in(), nullptr);
@@ -1402,7 +1403,7 @@ namespace casadi {
     casadi_assert(k_out<=nk_);
 
     // Explicit discrete time dynamics
-    Function& G = getExplicitB();
+    const Function& G = getExplicitB();
 
     // Discrete dynamics function inputs ...
     fill_n(m.arg, G.n_in(), nullptr);
@@ -1442,8 +1443,9 @@ namespace casadi {
     casadi_copy(getPtr(m.rq), nrq_, rq);
   }
 
-  void FixedStepIntegrator::reset(IntegratorMemory& mem, double t,
-                                  const double* x, const double* z, const double* p) {
+  void FixedStepIntegrator::
+  reset(IntegratorMemory& mem, double t,
+        const double* x, const double* z, const double* p) const {
     FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
 
     // Update time

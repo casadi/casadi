@@ -310,7 +310,7 @@ namespace casadi {
   }
 
   void SundialsInterface::reset(IntegratorMemory& mem, double t, const double* x,
-                                const double* z, const double* p) {
+                                const double* z, const double* p) const {
     SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
 
     // Update time

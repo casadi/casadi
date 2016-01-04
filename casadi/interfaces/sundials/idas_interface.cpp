@@ -96,9 +96,6 @@ namespace casadi {
     // Call the base class init
     SundialsInterface::init();
 
-    // Reset checkpoints counter
-    ncheck_ = 0;
-
     // Get initial conditions for the state derivatives
     if (hasSetOption("init_xdot") && !option("init_xdot").isNull()) {
       init_xdot_ = option("init_xdot").toDoubleVector();
@@ -144,7 +141,7 @@ namespace casadi {
     log("IdasInterface::init", "end");
   }
 
-  void IdasInterface::initTaping(IdasMemory& m) {
+  void IdasInterface::initTaping(IdasMemory& m) const {
     casadi_assert(!m.isInitTaping);
     int flag;
 
@@ -589,7 +586,7 @@ namespace casadi {
   }
 
   void IdasInterface::reset(IntegratorMemory& mem, double t, const double* _x,
-                            const double* _z, const double* _p) {
+                            const double* _z, const double* _p) const {
     log("IdasInterface::reset", "begin");
     IdasMemory& m = dynamic_cast<IdasMemory&>(mem);
 
@@ -641,7 +638,7 @@ namespace casadi {
   }
 
 
-  void IdasInterface::correctInitialConditions(IdasMemory& m) {
+  void IdasInterface::correctInitialConditions(IdasMemory& m) const {
     log("IdasInterface::correctInitialConditions", "begin");
 
     int icopt = IDA_YA_YDP_INIT; // calculate z and xdot given x
@@ -660,7 +657,8 @@ namespace casadi {
     log("IdasInterface::correctInitialConditions", "end");
   }
 
-  void IdasInterface::advance(IntegratorMemory& mem, double t, double* x, double* z, double* q) {
+  void IdasInterface::
+  advance(IntegratorMemory& mem, double t, double* x, double* z, double* q) const {
     IdasMemory& m = dynamic_cast<IdasMemory&>(mem);
 
     casadi_assert_message(t>=grid_.front(), "IdasInterface::integrate(" << t << "): "
@@ -676,7 +674,7 @@ namespace casadi {
       // Integrate forward ...
       if (nrx_>0) {
         // ... with taping
-        int flag = IDASolveF(m.mem, t, &m.t, m.xz, m.xzdot, IDA_NORMAL, &ncheck_);
+        int flag = IDASolveF(m.mem, t, &m.t, m.xz, m.xzdot, IDA_NORMAL, &m.ncheck);
         if (flag != IDA_SUCCESS && flag != IDA_TSTOP_RETURN) idas_error("IDASolveF", flag);
       } else {
         // ... without taping
@@ -701,15 +699,10 @@ namespace casadi {
     if (option("print_stats")) printStats(m, userOut());
 
     if (gather_stats_) {
-      long nsteps, nfevals, nlinsetups, netfails;
-      int qlast, qcur;
-      double hinused, hlast, hcur, tcur;
-      int flag = IDAGetIntegratorStats(m.mem, &nsteps, &nfevals, &nlinsetups, &netfails,
-                                       &qlast, &qcur, &hinused, &hlast, &hcur, &tcur);
+      int flag = IDAGetIntegratorStats(m.mem, &m.nsteps, &m.nfevals, &m.nlinsetups,
+                                       &m.netfails, &m.qlast, &m.qcur, &m.hinused,
+                                       &m.hlast, &m.hcur, &m.tcur);
       if (flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats", flag);
-
-      stats_["nsteps"] = 1.0*nsteps;
-      stats_["nlinsetups"] = 1.0*nlinsetups;
     }
   }
 
@@ -840,7 +833,7 @@ namespace casadi {
     stream << "current internal time reached: " << tcur << std::endl;
     stream << std::endl;
 
-    stream << "number of checkpoints stored: " << ncheck_ << endl;
+    stream << "number of checkpoints stored: " << m.ncheck << endl;
     stream << std::endl;
 
     stream << "Time spent in the DAE residual: " << m.t_res << " s." << endl;
@@ -1998,6 +1991,9 @@ namespace casadi {
     this->rxzdot = 0;
     this->isInitAdj = false;
     this->isInitTaping = false;
+
+    // Reset checkpoints counter
+    this->ncheck = 0;
   }
 
   IdasMemory::~IdasMemory() {

@@ -80,6 +80,14 @@ namespace casadi {
     bool isInitAdj;
     bool isInitTaping;
 
+    /// number of checkpoints stored so far
+    int ncheck;
+
+    /// Stats
+    long nsteps, nfevals, nlinsetups, netfails;
+    int qlast, qcur;
+    double hinused, hlast, hcur, tcur;
+
     /// Constructor
     IdasMemory(const IdasInterface& s);
 
@@ -120,7 +128,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief Initialize the taping */
-    void initTaping(IdasMemory& m);
+    void initTaping(IdasMemory& m) const;
 
     /** \brief Initialize the backward problem (can only be called after the first integration) */
     virtual void initAdj(IdasMemory& m);
@@ -133,11 +141,11 @@ namespace casadi {
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory& mem, double t, const double* x,
-                       const double* z, const double* p);
+                       const double* z, const double* p) const;
 
     /** \brief  Advance solution in time */
     virtual void advance(IntegratorMemory& mem, double t, double* x,
-                         double* z, double* q);
+                         double* z, double* q) const;
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB(IntegratorMemory& mem, double t, const double* rx,
@@ -173,7 +181,7 @@ namespace casadi {
     virtual Function getJacB();
 
     /// Correct the initial conditions, i.e. calculate
-    void correctInitialConditions(IdasMemory& m);
+    void correctInitialConditions(IdasMemory& m) const;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -331,9 +339,6 @@ namespace casadi {
 
     //  Initial values for \p xdot and \p z
     std::vector<double> init_xdot_;
-
-    /// number of checkpoints stored so far
-    int ncheck_;
   };
 
 } // namespace casadi

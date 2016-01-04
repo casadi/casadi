@@ -83,6 +83,14 @@ namespace casadi {
 
     bool isInitAdj;
 
+    /// number of checkpoints stored so far
+    int ncheck;
+
+    // Stats
+    long nsteps, nfevals, nlinsetups, netfails;
+    int qlast, qcur;
+    double hinused, hlast, hcur, tcur;
+
     /// Constructor
     CvodesMemory(const CvodesInterface& s);
 
@@ -129,10 +137,11 @@ namespace casadi {
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory& mem, double t, const double* x,
-                       const double* z, const double* p);
+                       const double* z, const double* p) const;
 
     /** \brief  Advance solution in time */
-    virtual void advance(IntegratorMemory& mem, double t, double* x, double* z, double* q);
+    virtual void advance(IntegratorMemory& mem, double t, double* x,
+                         double* z, double* q) const;
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB(IntegratorMemory& mem, double t,
@@ -311,9 +320,6 @@ namespace casadi {
     bool monitor_rhsQB_;
 
     bool disable_internal_warnings_;
-
-    /// number of checkpoints stored so far
-    int ncheck_;
   };
 
 } // namespace casadi

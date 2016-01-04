@@ -78,11 +78,11 @@ namespace casadi {
 
     /** \brief Reset the forward problem */
     virtual void reset(IntegratorMemory& mem, double t,
-                       const double* x, const double* z, const double* p) = 0;
+                       const double* x, const double* z, const double* p) const = 0;
 
     /** \brief  Advance solution in time */
     virtual void advance(IntegratorMemory& mem, double t,
-                         double* x, double* z, double* q) = 0;
+                         double* x, double* z, double* q) const = 0;
 
     /** \brief Reset the backward problem */
     virtual void resetB(IntegratorMemory& mem, double t,
@@ -363,11 +363,11 @@ namespace casadi {
 
     /** \brief Reset the forward problem */
     virtual void reset(IntegratorMemory& mem, double t,
-                       const double* x, const double* z, const double* p);
+                       const double* x, const double* z, const double* p) const;
 
     /** \brief  Advance solution in time */
     virtual void advance(IntegratorMemory& mem, double t,
-                         double* x, double* z, double* q);
+                         double* x, double* z, double* q) const;
 
     /// Reset the backward problem and take time to tf
     virtual void resetB(IntegratorMemory& mem, double t,
@@ -378,10 +378,10 @@ namespace casadi {
                          double* rx, double* rz, double* rq);
 
     /// Get explicit dynamics
-    virtual Function& getExplicit() { return F_;}
+    virtual const Function& getExplicit() const { return F_;}
 
     /// Get explicit dynamics (backward problem)
-    virtual Function& getExplicitB() { return G_;}
+    virtual const Function& getExplicitB() const { return G_;}
 
     // Discrete time dynamics
     Function F_, G_;
@@ -409,10 +409,10 @@ namespace casadi {
     virtual void init();
 
     /// Get explicit dynamics
-    virtual Function& getExplicit() { return implicit_solver_;}
+    virtual const Function& getExplicit() const { return implicit_solver_;}
 
     /// Get explicit dynamics (backward problem)
-    virtual Function& getExplicitB() { return backward_implicit_solver_;}
+    virtual const Function& getExplicitB() const { return backward_implicit_solver_;}
 
     // Implicit function solver
     Function implicit_solver_, backward_implicit_solver_;

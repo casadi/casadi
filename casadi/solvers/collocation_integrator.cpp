@@ -283,7 +283,7 @@ namespace casadi {
   }
 
   void CollocationIntegrator::reset(IntegratorMemory& mem, double t, const double* x,
-                                const double* z, const double* p) {
+                                const double* z, const double* p) const {
     FixedStepMemory& m = dynamic_cast<FixedStepMemory&>(mem);
 
     // Reset the base classes

@@ -79,9 +79,6 @@ namespace casadi {
     // Initialize the base classes
     SundialsInterface::init();
 
-    // Reset checkpoints counter
-    ncheck_ = 0;
-
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
                           "CVODES does not support algebraic variables");
@@ -312,7 +309,7 @@ namespace casadi {
   }
 
   void CvodesInterface::reset(IntegratorMemory& mem, double t, const double* x,
-                              const double* z, const double* _p) {
+                              const double* z, const double* _p) const {
     casadi_msg("CvodesInterface::reset begin");
     CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
 
@@ -348,7 +345,8 @@ namespace casadi {
     casadi_msg("CvodesInterface::reset end");
   }
 
-  void CvodesInterface::advance(IntegratorMemory& mem, double t, double* x, double* z, double* q) {
+  void CvodesInterface::advance(IntegratorMemory& mem, double t, double* x,
+                                double* z, double* q) const {
     CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
 
     casadi_assert_message(t>=grid_.front(),
@@ -366,7 +364,7 @@ namespace casadi {
       // Integrate forward ...
       if (nrx_>0) {
         // ... with taping
-        int flag = CVodeF(m.mem, t, m.xz, &m.t, CV_NORMAL, &ncheck_);
+        int flag = CVodeF(m.mem, t, m.xz, &m.t, CV_NORMAL, &m.ncheck);
         if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVodeF", flag);
       } else {
         // ... without taping
@@ -390,14 +388,10 @@ namespace casadi {
     if (option("print_stats")) printStats(m, userOut());
 
     if (gather_stats_) {
-      long nsteps, nfevals, nlinsetups, netfails;
-      int qlast, qcur;
-      double hinused, hlast, hcur, tcur;
-      int flag = CVodeGetIntegratorStats(m.mem, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
-                                         &qcur, &hinused, &hlast, &hcur, &tcur);
+      int flag = CVodeGetIntegratorStats(m.mem, &m.nsteps, &m.nfevals, &m.nlinsetups,
+                                         &m.netfails, &m.qlast, &m.qcur, &m.hinused,
+                                         &m.hlast, &m.hcur, &m.tcur);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
-      stats_["nsteps"] = 1.0*nsteps;
-      stats_["nlinsetups"] = 1.0*nlinsetups;
     }
 
     casadi_msg("CvodesInterface::integrate(" << t << ") end");
@@ -511,7 +505,7 @@ namespace casadi {
     stream << "current internal time reached: " << tcur << std::endl;
     stream << std::endl;
 
-    stream << "number of checkpoints stored: " << ncheck_ << endl;
+    stream << "number of checkpoints stored: " << m.ncheck << endl;
     stream << std::endl;
 
     stream << "Time spent in the ODE residual: " << m.t_res << " s." << endl;
@@ -1663,6 +1657,9 @@ namespace casadi {
   CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
     this->mem = 0;
     this->isInitAdj = false;
+
+    // Reset checkpoints counter
+    this->ncheck = 0;
   }
 
   CvodesMemory::~CvodesMemory() {
