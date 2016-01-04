@@ -21,8 +21,6 @@
 
 /*  Simple Getters & Setters  */
 
-/*  Advanced Getters  */
-
 /*  Option Functionality  */ %feature("docstring")
 casadi::Callback::copyOptions "
 
@@ -73,12 +71,6 @@ Get input dimension.
 
 Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
-
-";
-
-%feature("docstring") casadi::Callback::nlpsol_jacg "
-
-Access the Hessian of the Lagrangian function for an NLP solver.
 
 ";
 
@@ -331,30 +323,6 @@ Parameters:
 
 oname:  output name. Only allowed when an output scheme is set.
 
->  void IOInterface< Function  >.getOutput(T val, int oind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0..n_out()-1]
-
->  void IOInterface< Function  >.getOutput(T val, str oname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
 ";
 
 %feature("docstring") casadi::Callback::set_reverse "
@@ -513,12 +481,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Callback::nlpsol_hesslag "
-
-Access the Jacobian of the constraint function for an NLP solver.
-
-";
-
 %feature("docstring") casadi::Callback::get_input_shape "
 
 Specify input shape.
@@ -539,36 +501,6 @@ Get the dictionary.
 %feature("docstring") casadi::Callback::rootfinder_fun "
 
 Access rhs function for a rootfinder.
-
-";
-
-%feature("docstring") casadi::Callback::setOutput "
-
->  void IOInterface< Function  >.setOutput(T val, int oind=0)
-------------------------------------------------------------------------
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0..n_out()-1]
-
->  void IOInterface< Function  >.setOutput(T val, str oname)
-------------------------------------------------------------------------
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -899,36 +831,6 @@ Get the type name of a certain option.
 %feature("docstring") casadi::Callback::printDimensions "
 
 Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Callback::setInput "
-
->  void IOInterface< Function  >.setInput(T val, int iind=0)
-------------------------------------------------------------------------
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0..n_in()-1]
-
->  void IOInterface< Function  >.setInput(T val, str iname)
-------------------------------------------------------------------------
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
@@ -1351,12 +1253,6 @@ the output elements).
 
 ";
 
-%feature("docstring") casadi::Callback::nlpsol_gradf "
-
-Access the objective gradient function for an NLP solver
-
-";
-
 %feature("docstring") casadi::Callback::getInput "
 
 >  DM  IOInterface< Function  >.getInput(int iind=0) const
@@ -1379,41 +1275,11 @@ Parameters:
 
 iname:  input name. Only allowed when an input scheme is set.
 
->  void IOInterface< Function  >.getInput(T val, int iind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0..n_in()-1]
-
->  void IOInterface< Function  >.getInput(T val, str iname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
-
 ";
 
 %feature("docstring") casadi::Callback::mx_out "
 
 Get symbolic primitives equivalent to the output expressions.
-
-";
-
-%feature("docstring") casadi::Callback::nlpsol_nlp "
-
-Access the NLP for an NLP solver.
 
 ";
 
@@ -1457,7 +1323,7 @@ Casadi exception class.
 
 Joel Andersson
 
-C++ includes: casadi_exception.hpp ";
+C++ includes: exception.hpp ";
 
 %feature("docstring") casadi::CasadiException::~CasadiException "throw ()
 Destructor.
@@ -2385,8 +2251,6 @@ Add an ordinary differential equation.
 
 /*  Simple Getters & Setters  */
 
-/*  Advanced Getters  */
-
 /*  Option Functionality  */ %feature("docstring") casadi::Function::repr "
 
 Print a representation of the object.
@@ -2418,12 +2282,6 @@ the inputs.
 
 %feature("docstring") casadi::Function::sz_res "[INTERNAL]  Get required
 length of res field.
-
-";
-
-%feature("docstring") casadi::Function::nlpsol_nlp "
-
-Access the NLP for an NLP solver.
 
 ";
 
@@ -2490,12 +2348,6 @@ Set a certain option by giving its index into the allowed values.
 
 ";
 
-%feature("docstring") casadi::Function::nlpsol_jacg "
-
-Access the Hessian of the Lagrangian function for an NLP solver.
-
-";
-
 %feature("docstring") casadi::Function::integrator_dae "
 
 Get the DAE for an integrator.
@@ -2539,30 +2391,6 @@ Get an output by name.
 
 Parameters:
 -----------
-
-oname:  output name. Only allowed when an output scheme is set.
-
->  void IOInterface< Function  >.getOutput(T val, int oind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-oind:  index within the range [0..n_out()-1]
-
->  void IOInterface< Function  >.getOutput(T val, str oname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an output by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
 
 oname:  output name. Only allowed when an output scheme is set.
 
@@ -2905,36 +2733,6 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
-%feature("docstring") casadi::Function::setOutput "
-
->  void IOInterface< Function  >.setOutput(T val, int oind=0)
-------------------------------------------------------------------------
-
-Set an output by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oind:  index within the range [0..n_out()-1]
-
->  void IOInterface< Function  >.setOutput(T val, str oname)
-------------------------------------------------------------------------
-
-Set an output by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-oname:  output name. Only allowed when an output scheme is set.
-
-";
-
 %feature("docstring") casadi::Function::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
@@ -2983,12 +2781,6 @@ Access Jacobian of the ths function for a rootfinder.
 %feature("docstring") casadi::Function::copyOptions "
 
 Copy all options from another object.
-
-";
-
-%feature("docstring") casadi::Function::nlpsol_hesslag "
-
-Access the Jacobian of the constraint function for an NLP solver.
 
 ";
 
@@ -3120,30 +2912,6 @@ Get an input by name.
 
 Parameters:
 -----------
-
-iname:  input name. Only allowed when an input scheme is set.
-
->  void IOInterface< Function  >.getInput(T val, int iind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0..n_in()-1]
-
->  void IOInterface< Function  >.getInput(T val, str iname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
 
 iname:  input name. Only allowed when an input scheme is set.
 
@@ -3518,12 +3286,6 @@ of the outputs.
 
 ";
 
-%feature("docstring") casadi::Function::nlpsol_gradf "
-
-Access the objective gradient function for an NLP solver
-
-";
-
 %feature("docstring") casadi::Function::dictionary "
 
 Get the dictionary.
@@ -3556,36 +3318,6 @@ Get the type name of a certain option.
 %feature("docstring") casadi::Function::optionNames "
 
 Get a list of all option names.
-
-";
-
-%feature("docstring") casadi::Function::setInput "
-
->  void IOInterface< Function  >.setInput(T val, int iind=0)
-------------------------------------------------------------------------
-
-Set an input by index.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iind:  index within the range [0..n_in()-1]
-
->  void IOInterface< Function  >.setInput(T val, str iname)
-------------------------------------------------------------------------
-
-Set an input by name.
-
-Parameters:
------------
-
-val:  can be double, const std::vector<double>&, const Matrix<double>&,
-double *
-
-iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
@@ -3701,9 +3433,9 @@ Arc cosine.
 
 ";
 
-%feature("docstring") friendwrap_copysign "
+%feature("docstring") friendwrap_if_else_zero "
 
-Copy sign.
+Conditional assignment.
 
 ";
 
@@ -3716,6 +3448,12 @@ Exponential function.
 %feature("docstring") friendwrap_ceil "
 
 Round up to nearest integer.
+
+";
+
+%feature("docstring") friendwrap_printme "
+
+Debug printing.
 
 ";
 
@@ -3767,6 +3505,12 @@ Remainder after division.
 
 ";
 
+%feature("docstring") friendwrap_constpow "
+
+Elementwise power with const power.
+
+";
+
 %feature("docstring") friendwrap_log "
 
 Natural logarithm.
@@ -3779,9 +3523,9 @@ Base-10 logarithm.
 
 ";
 
-%feature("docstring") friendwrap_constpow "
+%feature("docstring") friendwrap_copysign "
 
-Elementwise power with const power.
+Copy sign.
 
 ";
 
@@ -3852,9 +3596,9 @@ Absolute value.
 
 ";
 
-%feature("docstring") friendwrap_simplify "
+%feature("docstring") friendwrap_sq "
 
-Simplify an expression.
+Square.
 
 ";
 
@@ -3958,11 +3702,28 @@ Infinity-norm.
 
 ";
 
-%feature("docstring") friendwrap_outer_prod "
+%feature("docstring") friendwrap_pinv "
 
-Take the outer product of two vectors Equals.
+>  MatType pinv(MatType A)
+------------------------------------------------------------------------
 
-with x and y vectors
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+
+pinv(A)' = (AA')^(-1) A
+
+If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+
+pinv(A) = (A'A)^(-1) A'
+
+>  MatType pinv(MatType A, str lsolver, Dict dict=Dict())
+------------------------------------------------------------------------
+
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 
 ";
 
@@ -4066,6 +3827,12 @@ Solve a system of equations: A*x = b.
 %feature("docstring") friendwrap_det "
 
 Matrix determinant (experimental)
+
+";
+
+%feature("docstring") friendwrap_nl_var "
+
+Find out which variables enter nonlinearly.
 
 ";
 
@@ -4180,8 +3947,7 @@ Get get the number of non-zeros on the diagonal.
 
 %feature("docstring") friendwrap_rank1 "
 
-Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
-outer_prod(x, x)
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
@@ -4196,6 +3962,16 @@ Get the shape.
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
+
+";
+
+%feature("docstring") friendwrap_jtimes "
+
+Calculate the Jacobian and multiply by a vector from the right This is
+equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
+tr set to false and true respectively. If contrast to these expressions, it
+will use directional derivatives which is typically (but not necessarily)
+more efficient if the complete Jacobian is not needed and v has few rows.
 
 ";
 
@@ -4221,7 +3997,7 @@ C++ includes: generic_matrix.hpp ";
 
 %feature("docstring") friendwrap_tangent "
 
-Calculate jacobian via source code transformation.
+Calculate Jacobian.
 
 ";
 
@@ -4301,7 +4077,7 @@ Matrix trace.
 
 %feature("docstring") friendwrap_gradient "
 
-Calculate jacobian via source code transformation.
+Calculate Jacobian.
 
 ";
 
@@ -4317,9 +4093,9 @@ Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring") friendwrap_extractShared "
+%feature("docstring") friendwrap_simplify "
 
-Extract shared subexpressions from an set of expressions.
+Simplify an expression.
 
 ";
 
@@ -4372,7 +4148,7 @@ Substitute variable var with expression expr in multiple expressions.
 
 %feature("docstring") friendwrap_jacobian "
 
-Calculate jacobian via source code transformation.
+Calculate Jacobian.
 
 ";
 
@@ -4498,28 +4274,9 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") friendwrap_pinv "
+%feature("docstring") friendwrap_extractShared "
 
->  MatType pinv(MatType A)
-------------------------------------------------------------------------
-
-Computes the Moore-Penrose pseudo-inverse.
-
-If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
-
-pinv(A)' = (AA')^(-1) A
-
-If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
-
-pinv(A) = (A'A)^(-1) A'
-
->  MatType pinv(MatType A, str lsolver, Dict dict=Dict())
-------------------------------------------------------------------------
-
-Computes the Moore-Penrose pseudo-inverse.
-
-If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
-matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -4532,8 +4289,7 @@ one.
 
 %feature("docstring") casadi::GenericMatrix::rank1 "
 
-Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
-outer_prod(x, x)
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
@@ -4693,10 +4449,10 @@ NULL)
 // File: classcasadi_1_1KernelSum.xml
 
 
-// File: classcasadi_1_1LapackLuDense.xml
+// File: classcasadi_1_1LapackLu.xml
 
 
-// File: classcasadi_1_1LapackQrDense.xml
+// File: classcasadi_1_1LapackQr.xml
 
 
 // File: classcasadi_1_1LibInfo.xml
@@ -4802,9 +4558,8 @@ Get a set of nonzeros
 
 ";
 
-%feature("docstring") friendwrap_expand "
-
-Expand the expression as a weighted sum (with constant weights)
+%feature("docstring") friendwrap_expand "[INTERNAL]  Expand the expression
+as a weighted sum (with constant weights)
 
 ";
 
@@ -4817,17 +4572,17 @@ possible)
 
 %feature("docstring") friendwrap_mtaylor "
 
->  array(DataType)  mtaylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order=1)
+>  array(DataType)  array(DataType) .mtaylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order=1)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 multivariate Taylor series expansion
 
 Do Taylor expansions until the aggregated order of a term is equal to
 'order'. The aggregated order of $x^n y^m$ equals $n+m$.
 
->  array(DataType)  mtaylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order, [int ] order_contributions)
+>  array(DataType)  array(DataType) .mtaylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order, [int ] order_contributions)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 multivariate Taylor series expansion
 
 Do Taylor expansions until the aggregated order of a term is equal to
@@ -4906,13 +4661,6 @@ Remove columns and rows Remove/delete rows and/or columns of a matrix.
 
 ";
 
-%feature("docstring") casadi::Matrix::dep "
-
-Get expressions of the children of the expression Only defined if symbolic
-scalar. Wraps SXElem SXElem::dep(int ch=0) const.
-
-";
-
 %feature("docstring") casadi::Matrix::get "
 
 >  void array(DataType) .get([double ] output_m) const 
@@ -4942,18 +4690,14 @@ Get a submatrix, two arguments
 
 ";
 
-%feature("docstring") friendwrap_triangle "
-
-triangle function
+%feature("docstring") friendwrap_triangle "[INTERNAL]  triangle function
 
 \\\\[ \\\\begin {cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x)
 = 1-|x| & |x| < 1 \\\\end {cases} \\\\]
 
 ";
 
-%feature("docstring") friendwrap_adj "
-
-Matrix adjoint.
+%feature("docstring") friendwrap_adj "[INTERNAL]   Matrix adjoint.
 
 ";
 
@@ -5026,9 +4770,8 @@ Check if the matrix is lower triangular.
 
 ";
 
-%feature("docstring") friendwrap_norm_inf_mul "
-
-Inf-norm of a Matrix-Matrix product.
+%feature("docstring") friendwrap_norm_inf_mul "[INTERNAL]  Inf-norm of a
+Matrix-Matrix product.
 
 ";
 
@@ -5059,9 +4802,8 @@ Check if the matrix is upper triangular.
 
 ";
 
-%feature("docstring") friendwrap_all "
-
-Returns true only if every element in the matrix is true.
+%feature("docstring") friendwrap_all "[INTERNAL]  Returns true only if
+every element in the matrix is true.
 
 ";
 
@@ -5127,9 +4869,8 @@ Transpose the matrix.
 
 ";
 
-%feature("docstring") friendwrap_any "
-
-Returns true only if any element in the matrix is true.
+%feature("docstring") friendwrap_any "[INTERNAL]  Returns true only if any
+element in the matrix is true.
 
 ";
 
@@ -5153,9 +4894,8 @@ check if the matrix is -1 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring") friendwrap_poly_roots "
-
-Attempts to find the roots of a polynomial.
+%feature("docstring") friendwrap_poly_roots "[INTERNAL]  Attempts to find
+the roots of a polynomial.
 
 This will only work for polynomials up to order 3 It is assumed that the
 roots are real.
@@ -5259,9 +4999,7 @@ nodes by their ID.
 
 ";
 
-%feature("docstring") friendwrap_ramp "
-
-ramp function
+%feature("docstring") friendwrap_ramp "[INTERNAL]  ramp function
 
 \\\\[ \\\\begin {cases} R(x) = 0 & x <= 1 \\\\\\\\ R(x) = x & x > 1 \\\\\\\\
 \\\\end {cases} \\\\]
@@ -5291,12 +5029,11 @@ Check if the matrix is a column vector (i.e. size2()==1)
 
 %feature("docstring") casadi::Matrix::resize "";
 
-%feature("docstring") friendwrap_qr "
-
-QR factorization using the modified Gram-Schmidt algorithm More stable than
-the classical Gram-Schmidt, but may break down if the rows of A are nearly
-linearly dependent See J. Demmel: Applied Numerical Linear Algebra
-(algorithm 3.1.). Note that in SWIG, Q and R are returned by value.
+%feature("docstring") friendwrap_qr "[INTERNAL]  QR factorization using the
+modified Gram-Schmidt algorithm More stable than the classical Gram-Schmidt,
+but may break down if the rows of A are nearly linearly dependent See J.
+Demmel: Applied Numerical Linear Algebra (algorithm 3.1.). Note that in
+SWIG, Q and R are returned by value.
 
 ";
 
@@ -5315,8 +5052,7 @@ zero.
 
 %feature("docstring") casadi::Matrix::rank1 "
 
-Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
-outer_prod(x, x)
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
@@ -5426,9 +5162,8 @@ Jacobian expression.
 
 ";
 
-%feature("docstring") friendwrap_sparsify "
-
-Make a matrix sparse by removing numerical zeros.
+%feature("docstring") friendwrap_sparsify "[INTERNAL]  Make a matrix sparse
+by removing numerical zeros.
 
 ";
 
@@ -5438,9 +5173,8 @@ Get all nonzeros.
 
 ";
 
-%feature("docstring") friendwrap_cofactor "
-
-Get the (i,j) cofactor matrix.
+%feature("docstring") friendwrap_cofactor "[INTERNAL]  Get the (i,j)
+cofactor matrix.
 
 ";
 
@@ -5482,15 +5216,12 @@ return true if all non-zero elements are symbolic.
 
 ";
 
-%feature("docstring") friendwrap_getMinor "
-
-Get the (i,j) minor matrix.
+%feature("docstring") friendwrap_getMinor "[INTERNAL]  Get the (i,j) minor
+matrix.
 
 ";
 
-%feature("docstring") friendwrap_heaviside "
-
-Heaviside function.
+%feature("docstring") friendwrap_heaviside "[INTERNAL]  Heaviside function.
 
 \\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
 H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
@@ -5536,9 +5267,8 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
-%feature("docstring") friendwrap_poly_coeff "
-
-extracts polynomial coefficients from an expression
+%feature("docstring") friendwrap_poly_coeff "[INTERNAL]  extracts
+polynomial coefficients from an expression
 
 Parameters:
 -----------
@@ -5561,7 +5291,31 @@ Returns the truth value of a Matrix.
 [INTERNAL] 
 ";
 
+%feature("docstring") casadi::Matrix::solve "[INTERNAL] ";
+
 %feature("docstring") friendwrap_taylor "
+
+>  array(DataType)  array(DataType) .taylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order=1)
+------------------------------------------------------------------------
+[INTERNAL] 
+univariate Taylor series expansion
+
+Calculate the Taylor expansion of expression 'ex' up to order 'order' with
+respect to variable 'x' around the point 'a'
+
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
+{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+
+Example usage:
+
+::
+
+>>   x
+
+
+
+>  array(DataType)  taylor(array(DataType) ex, array(DataType) x)
+------------------------------------------------------------------------
 
 univariate Taylor series expansion
 
@@ -5613,24 +5367,19 @@ are possible)
 
 ";
 
-%feature("docstring") friendwrap_chol "
-
-Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
-such that R'R = A. Matrix A must be positive definite.
+%feature("docstring") friendwrap_chol "[INTERNAL]  Obtain a Cholesky
+factorisation of a matrix Returns an upper triangular R such that R'R = A.
+Matrix A must be positive definite.
 
 At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
 open ticket #1212 to make it sparse.
 
 ";
 
-%feature("docstring") friendwrap_jmtimes "
+%feature("docstring") casadi::Matrix::dep "
 
-Calculate the Jacobian and multiply by a vector from the right This is
-equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
-transpose_jacobian set to false and true respectively. If contrast to these
-expressions, it will use directional derivatives which is typically (but not
-necessarily) more efficient if the complete Jacobian is not needed and v has
-few rows.
+Get expressions of the children of the expression Only defined if symbolic
+scalar. Wraps SXElem SXElem::dep(int ch=0) const.
 
 ";
 
@@ -5644,17 +5393,19 @@ Get name (only if symbolic scalar)
 
 %feature("docstring") friendwrap_gauss_quadrature "
 
->  array(DataType)  gauss_quadrature(array(DataType) f, array(DataType) x, array(DataType) a, array(DataType) b, int order=5)
+>  array(DataType)  array(DataType) .gauss_quadrature(array(DataType) f, array(DataType) x, array(DataType) a, array(DataType) b, int order=5)
 ------------------------------------------------------------------------
-
+[INTERNAL] 
 Integrate f from a to b using Gaussian quadrature with n points.
 
->  array(DataType)  gauss_quadrature(array(DataType) f, array(DataType) x, array(DataType) a, array(DataType) b, int order, array(DataType) w)
+>  array(DataType)  array(DataType) .gauss_quadrature(array(DataType) f, array(DataType) x, array(DataType) a, array(DataType) b, int order, array(DataType) w)
 ------------------------------------------------------------------------
-
-Matrix adjoint.
+[INTERNAL] 
+ Matrix adjoint.
 
 ";
+
+%feature("docstring") casadi::Matrix::pinv "[INTERNAL] ";
 
 %feature("docstring") casadi::Matrix::get_row "
 
@@ -5662,10 +5413,9 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") friendwrap_pw_const "
-
-Create a piecewise constant function Create a piecewise constant function
-with n=val.size() intervals.
+%feature("docstring") friendwrap_pw_const "[INTERNAL]  Create a piecewise
+constant function Create a piecewise constant function with n=val.size()
+intervals.
 
 Inputs:
 
@@ -5694,9 +5444,8 @@ Check if symbolic (Dense) Sparse matrices invariable return false.
 
 ";
 
-%feature("docstring") friendwrap_pw_lin "
-
-t a scalar variable (e.g. time)
+%feature("docstring") friendwrap_pw_lin "[INTERNAL]  t a scalar variable
+(e.g. time)
 
 Create a piecewise linear function Create a piecewise linear function:
 
@@ -5775,16 +5524,13 @@ Create an expression from a vector.
 [INTERNAL] 
 ";
 
-%feature("docstring") friendwrap_eig_symbolic "
-
-Attempts to find the eigenvalues of a symbolic matrix This will only work
-for up to 3x3 matrices.
+%feature("docstring") friendwrap_eig_symbolic "[INTERNAL]  Attempts to find
+the eigenvalues of a symbolic matrix This will only work for up to 3x3
+matrices.
 
 ";
 
-%feature("docstring") friendwrap_rectangle "
-
-rectangle function
+%feature("docstring") friendwrap_rectangle "[INTERNAL]  rectangle function
 
 \\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
 |x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
@@ -6154,12 +5900,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::MX::dep "
-
-Get the nth dependency as MX.
-
-";
-
 %feature("docstring") casadi::MX::is_multiplication "
 
 Check if multiplication.
@@ -6490,12 +6230,6 @@ Tangent expression.
 
 ";
 
-%feature("docstring") casadi::MX::zz_project "
-
-Set sparse.
-
-";
-
 %feature("docstring") casadi::MX::MX "
 
 >  MX()
@@ -6542,8 +6276,7 @@ Create sparse matrix constant (also implicit type conversion)
 
 %feature("docstring") casadi::MX::rank1 "
 
-Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha *
-outer_prod(x, x)
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
@@ -6609,6 +6342,12 @@ Get operation type.
 %feature("docstring") casadi::MX::n_primitives "
 
 Get the number of symbolic primitive Assumes is_valid_input() returns true.
+
+";
+
+%feature("docstring") casadi::MX::dep "
+
+Get the nth dependency as MX.
 
 ";
 
@@ -7242,200 +6981,6 @@ Print a representation of the object.
 Return a string with a representation (for SWIG)
 
 ";
-
-
-// File: classsnoptProblem.xml
-%feature("docstring") snoptProblem::setParameter "";
-
-%feature("docstring") snoptProblem::setLog "";
-
-%feature("docstring") snoptProblem::getIntParameter "";
-
-%feature("docstring") snoptProblem::setSpecsFile "";
-
-%feature("docstring") snoptProblem::setIntParameter "";
-
-%feature("docstring") snoptProblem::getRealParameter "";
-
-%feature("docstring") snoptProblem::setPrintFile "";
-
-%feature("docstring") snoptProblem::getParameter "";
-
-%feature("docstring") snoptProblem::setUserR "";
-
-%feature("docstring") snoptProblem::setSTOP "";
-
-%feature("docstring") snoptProblem::setRealParameter "";
-
-%feature("docstring") snoptProblem::setUserI "";
-
-%feature("docstring") snoptProblem::setProbName "";
-
-%feature("docstring") snoptProblem::solve "";
-
-%feature("docstring") snoptProblem::setUserspace "";
-
-%feature("docstring") snoptProblem "C++ includes: snoptProblem.hpp ";
-
-
-// File: classsnoptProblemA.xml
-%feature("docstring") snoptProblemA::getIntParameter "";
-
-%feature("docstring") snoptProblemA::computeJac "";
-
-%feature("docstring") snoptProblemA::snoptProblemA "";
-
-%feature("docstring") snoptProblemA::getRealParameter "";
-
-%feature("docstring") snoptProblemA::setSpecsFile "";
-
-%feature("docstring") snoptProblemA::setRealParameter "";
-
-%feature("docstring") snoptProblemA::setWorkspace "";
-
-%feature("docstring") snoptProblemA::setSTOP "";
-
-%feature("docstring") snoptProblemA::setUserspace "";
-
-%feature("docstring") snoptProblemA::setIntParameter "";
-
-%feature("docstring") snoptProblemA::setG "";
-
-%feature("docstring") snoptProblemA::setF "";
-
-%feature("docstring") snoptProblemA::~snoptProblemA "";
-
-%feature("docstring") snoptProblemA::setPrintFile "";
-
-%feature("docstring") snoptProblemA::setA "";
-
-%feature("docstring") snoptProblemA::solve "";
-
-%feature("docstring") snoptProblemA "C++ includes: snoptProblem.hpp ";
-
-%feature("docstring") snoptProblemA::setX "";
-
-%feature("docstring") snoptProblemA::setUserFun "";
-
-%feature("docstring") snoptProblemA::getParameter "";
-
-%feature("docstring") snoptProblemA::setProblemSize "";
-
-%feature("docstring") snoptProblemA::setParameter "";
-
-%feature("docstring") snoptProblemA::setLog "";
-
-%feature("docstring") snoptProblemA::setUserI "";
-
-%feature("docstring") snoptProblemA::setObjective "";
-
-%feature("docstring") snoptProblemA::setUserR "";
-
-%feature("docstring") snoptProblemA::setProbName "";
-
-
-// File: classsnoptProblemB.xml
-%feature("docstring") snoptProblemB::setPrintFile "";
-
-%feature("docstring") snoptProblemB::getRealParameter "";
-
-%feature("docstring") snoptProblemB::setFuncon "";
-
-%feature("docstring") snoptProblemB::setParameter "";
-
-%feature("docstring") snoptProblemB::setObjective "";
-
-%feature("docstring") snoptProblemB::setWorkspace "";
-
-%feature("docstring") snoptProblemB::setSTOP "";
-
-%feature("docstring") snoptProblemB::getIntParameter "";
-
-%feature("docstring") snoptProblemB::setFunobj "";
-
-%feature("docstring") snoptProblemB::setUserspace "";
-
-%feature("docstring") snoptProblemB::snoptProblemB "";
-
-%feature("docstring") snoptProblemB::getParameter "";
-
-%feature("docstring") snoptProblemB::setUserFun "";
-
-%feature("docstring") snoptProblemB::setIntParameter "";
-
-%feature("docstring") snoptProblemB::setLog "";
-
-%feature("docstring") snoptProblemB::setUserI "";
-
-%feature("docstring") snoptProblemB::setJ "";
-
-%feature("docstring") snoptProblemB::setProbName "";
-
-%feature("docstring") snoptProblemB::setUserR "";
-
-%feature("docstring") snoptProblemB "C++ includes: snoptProblem.hpp ";
-
-%feature("docstring") snoptProblemB::setProblemSize "";
-
-%feature("docstring") snoptProblemB::setX "";
-
-%feature("docstring") snoptProblemB::setSpecsFile "";
-
-%feature("docstring") snoptProblemB::setRealParameter "";
-
-%feature("docstring") snoptProblemB::solve "";
-
-%feature("docstring") snoptProblemB::~snoptProblemB "";
-
-
-// File: classsnoptProblemC.xml
-%feature("docstring") snoptProblemC::setPrintFile "";
-
-%feature("docstring") snoptProblemC "C++ includes: snoptProblem.hpp ";
-
-%feature("docstring") snoptProblemC::getRealParameter "";
-
-%feature("docstring") snoptProblemC::setRealParameter "";
-
-%feature("docstring") snoptProblemC::solve "";
-
-%feature("docstring") snoptProblemC::setParameter "";
-
-%feature("docstring") snoptProblemC::setUserR "";
-
-%feature("docstring") snoptProblemC::getIntParameter "";
-
-%feature("docstring") snoptProblemC::getParameter "";
-
-%feature("docstring") snoptProblemC::snoptProblemC "";
-
-%feature("docstring") snoptProblemC::setUserspace "";
-
-%feature("docstring") snoptProblemC::setUserI "";
-
-%feature("docstring") snoptProblemC::setWorkspace "";
-
-%feature("docstring") snoptProblemC::setJ "";
-
-%feature("docstring") snoptProblemC::setProbName "";
-
-%feature("docstring") snoptProblemC::setSpecsFile "";
-
-%feature("docstring") snoptProblemC::setSTOP "";
-
-%feature("docstring") snoptProblemC::setX "";
-
-%feature("docstring") snoptProblemC::setUserFun "";
-
-%feature("docstring") snoptProblemC::~snoptProblemC "";
-
-%feature("docstring") snoptProblemC::setObjective "";
-
-%feature("docstring") snoptProblemC::setLog "";
-
-%feature("docstring") snoptProblemC::setProblemSize "";
-
-%feature("docstring") snoptProblemC::setIntParameter "";
 
 
 // File: classcasadi_1_1Solve.xml
@@ -8302,10 +7847,24 @@ Get the upper triangular part of a matrix.
 
 %feature("docstring") friendwrap_mac "
 
-Multiply-accumulate operation Matrix product of two matrices (X and Y),
-adding the result to a third matrix Z. The result has the same sparsity
-pattern as C meaning that other entries of (X*Y) are ignored. The operation
-is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
+Multiply-accumulate operation Matrix product of two matrices (x and y),
+adding the result to a third matrix z. The result has the same sparsity
+pattern as C meaning that other entries of (x*y) are ignored. The operation
+is equivalent to: z+mtimes(x,y).project(z.sparsity()).
+
+";
+
+%feature("docstring") friendwrap_mtimes "
+
+>  MatType mtimes(MatType x, MatType y)
+------------------------------------------------------------------------
+
+Matrix product of two matrices.
+
+>  MatType mtimes([MatType ] args)
+------------------------------------------------------------------------
+
+Matrix product of n matrices.
 
 ";
 
@@ -8384,7 +7943,7 @@ C++ includes: sparsity_interface.hpp ";
 
 %feature("docstring") friendwrap_horzsplit "
 
->  [MatType ] horzsplit(MatType v, [int ] offset)
+>  [MatType ] horzsplit(MatType x, [int ] offset)
 ------------------------------------------------------------------------
 
 split horizontally, retaining groups of columns
@@ -8397,7 +7956,7 @@ run to the end.
 
 horzcat(horzsplit(x, ...)) = x
 
->  [MatType ] horzsplit(MatType v, int incr=1)
+>  [MatType ] horzsplit(MatType x, int incr=1)
 ------------------------------------------------------------------------
 
 split horizontally, retaining fixed-sized groups of columns
@@ -8498,17 +8057,17 @@ Creates a block matrix in which each element (i, j) is a_ij*b
 
 %feature("docstring") friendwrap_reshape "
 
->  MatType reshape(MatType a, int nrow, int ncol)
+>  MatType reshape(MatType x, int nrow, int ncol)
 ------------------------------------------------------------------------
 
 Returns a reshaped version of the matrix.
 
->  MatType reshape(MatType a,(int,int) rc)
+>  MatType reshape(MatType x,(int,int) rc)
 ------------------------------------------------------------------------
 
 Returns a reshaped version of the matrix, dimensions as a vector.
 
->  MatType reshape(MatType a, Sparsity sp)
+>  MatType reshape(MatType x, Sparsity sp)
 ------------------------------------------------------------------------
 
 Reshape the matrix.
@@ -8547,7 +8106,7 @@ Concatenate along diagonal, four matrices.
 
 %feature("docstring") friendwrap_vertsplit "
 
->  [MatType ] vertsplit(MatType v, [int ] offset)
+>  [MatType ] vertsplit(MatType x, [int ] offset)
 ------------------------------------------------------------------------
 
 split vertically, retaining groups of rows
@@ -8562,7 +8121,7 @@ will run to the end.
 
 vertcat(vertsplit(x, ...)) = x
 
->  [MatType ] vertsplit(MatType v, int incr=1)
+>  [MatType ] vertsplit(MatType x, int incr=1)
 ------------------------------------------------------------------------
 
 split vertically, retaining fixed-sized groups of rows
@@ -8606,20 +8165,6 @@ will have a size smaller than incr.
   
 
 
-
-";
-
-%feature("docstring") friendwrap_mul "
-
->  MatType mul(MatType X, MatType Y)
-------------------------------------------------------------------------
-
-Matrix product of two matrices.
-
->  MatType mul([MatType ] args)
-------------------------------------------------------------------------
-
-Matrix product of n matrices.
 
 ";
 
@@ -9200,8 +8745,6 @@ with Q-transpose (lapack)
 
 ";
 
-%feature("docstring") casadi::operation_checker "[INTERNAL] ";
-
 %feature("docstring") casadi::has_integrator "
 
 Check if a particular plugin is available
@@ -9461,6 +9004,8 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
+%feature("docstring") casadi::_nl_var "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_norm_inf "[INTERNAL]  Inf-norm of a
 vector * Returns the largest element in absolute value
 
@@ -9506,6 +9051,11 @@ Get the documentation string for a plugin
 
 ";
 
+%feature("docstring") casadi::casadi_mtimes "[INTERNAL]  Sparse matrix-
+matrix multiplication: z <- z + x*y.
+
+";
+
 %feature("docstring") casadi::jit "
 
 Create a just-in-time compiled function from a C/C++ language string The
@@ -9529,13 +9079,8 @@ Explicitly load a plugin dynamically
 
 %feature("docstring") casadi::diffToDict "[INTERNAL] ";
 
-%feature("docstring") casadi::casadi_mul "[INTERNAL]  Sparse matrix-matrix
-multiplication: z <- z + x*y.
-
-";
-
-%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
-multiplication: z <- z + x*y.
+%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
+trans(x)
 
 ";
 
@@ -9544,13 +9089,15 @@ equation using an LU-factorized matrix (lapack)
 
 ";
 
+%feature("docstring") casadi::_jtimes "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_bilin "[INTERNAL]  Calculates dot(x,
 mul(A, y))
 
 ";
 
-%feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
-trans(x)
+%feature("docstring") casadi::casadi_mv "[INTERNAL]  Sparse matrix-vector
+multiplication: z <- z + x*y.
 
 ";
 

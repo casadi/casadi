@@ -1,5 +1,5 @@
 /// \cond INTERNAL
-/** \class casadi::CSparseCholeskyInternal
+/** \class casadi::CSparseCholeskyInterface
 \n
 \par
 <a name='options'></a><table>
@@ -1425,8 +1425,10 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>hess</td><td>OT_STRING</td><td>GenericType()</td><td>Function body for Hessian</td><td>casadi::Jit</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac</td><td>OT_STRING</td><td>GenericType()</td><td>Function body for Jacobian</td><td>casadi::Jit</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit</td><td>OT_BOOLEAN</td><td>false</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
@@ -1638,7 +1640,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::LapackLuDense
+/** \class casadi::LapackLu
 \n
 \par
 <a name='options'></a><table>
@@ -1646,10 +1648,10 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>allow_equilibration_failure</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>casadi::LapackLuDense</td></tr>
+<tr><td>allow_equilibration_failure</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>casadi::LapackLu</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>casadi::LapackLuDense</td></tr>
+<tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>casadi::LapackLu</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
@@ -1675,7 +1677,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::LapackQrDense
+/** \class casadi::LapackQr
 \n
 \par
 <a name='options'></a><table>
@@ -2429,69 +2431,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>Backup basis file</td><td>OT_INTEGER</td><td>None</td><td>0 * output extra basis map</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Central difference interval</td><td>OT_REAL</td><td>None</td><td>6.7e-5 * (Function precision)^1/3</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Check frequency</td><td>OT_INTEGER</td><td>None</td><td>60 * test row residuals kAx - sk</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Crash option</td><td>OT_INTEGER</td><td>None</td><td>3 * first basis is essentially triangular</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Crash tolerance</td><td>OT_REAL</td><td>None</td><td>0.1</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Debug level</td><td>OT_INTEGER</td><td>None</td><td>0 * for developers</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Derivative level</td><td>OT_INTEGER</td><td>None</td><td>3</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Difference interval</td><td>OT_REAL</td><td>None</td><td>5.5e-7 * (Function precision)^1/2</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Dump file</td><td>OT_INTEGER</td><td>None</td><td>0 * output Load data</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Elastic weight</td><td>OT_REAL</td><td>None</td><td>1.0e+4 * used only during elastic mode</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Expand frequency</td><td>OT_INTEGER</td><td>None</td><td>10000 * for anti-cycling procedure</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Factorization frequency</td><td>OT_INTEGER</td><td>None</td><td>50 * 100 for LPs</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Function precision</td><td>OT_REAL</td><td>None</td><td>3.0e-13 * e^0.8 (almost full accuracy)</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Hessian</td><td>OT_STRING</td><td>None</td><td>   full memory * default if n1 ≤ 75<br />limited memory * default if n1 &gt; 75</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Hessian flush</td><td>OT_INTEGER</td><td>None</td><td>999999 * no flushing</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Hessian frequency</td><td>OT_INTEGER</td><td>None</td><td>999999 * for full Hessian (never reset)</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Hessian updates</td><td>OT_INTEGER</td><td>None</td><td>10 * for limited memory Hessian</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Insert file</td><td>OT_INTEGER</td><td>None</td><td>0 * input in industry format</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Iterations limit</td><td>OT_INTEGER</td><td>None</td><td>10000 * or 20m if that is more</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>LU</td><td>OT_STRING</td><td>None</td><td>LU partial pivoting * default threshold pivoting strategy<br />LU rook pivoting * threshold rook pivoting<br />LU complete pivoting * threshold complete pivoting</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>LU factor tolerance</td><td>OT_REAL</td><td>None</td><td>3.99 * for NP (100.0 for LP)</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>LU singularity tolerance</td><td>OT_REAL</td><td>None</td><td>3.2e-11</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>LU update tolerance</td><td>OT_REAL</td><td>None</td><td>3.99 * for NP ( 10.0 for LP)</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Linesearch tolerance</td><td>OT_REAL</td><td>None</td><td>0.9 * smaller for more accurate search</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Load file</td><td>OT_INTEGER</td><td>None</td><td>0 * input names and values</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Major feasibility tolerance</td><td>OT_REAL</td><td>None</td><td>1.0e-6 * target nonlinear constraint violation</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Major iterations limit</td><td>OT_INTEGER</td><td>None</td><td>1000 * or m if that is more</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Major optimality tolerance</td><td>OT_REAL</td><td>None</td><td>1.0e-6 * target complementarity gap</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Major print level</td><td>OT_INTEGER</td><td>None</td><td>1 * 1-line major iteration log</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Major step limit</td><td>OT_REAL</td><td>None</td><td>2.0</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Minor feasibility tolerance</td><td>OT_REAL</td><td>None</td><td>1.0e-6 * for satisfying the QP bounds</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Minor iterations limit</td><td>OT_INTEGER</td><td>None</td><td>500 * or 3m if that is more</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Minor print level</td><td>OT_INTEGER</td><td>None</td><td>1 * 1-line minor iteration log</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>New basis file</td><td>OT_INTEGER</td><td>None</td><td>0 * output basis map</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>New superbasics limit</td><td>OT_INTEGER</td><td>None</td><td>99 * controls early termination of QPs</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Old basis file</td><td>OT_INTEGER</td><td>None</td><td>0 * input basis map</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Partial price</td><td>OT_INTEGER</td><td>None</td><td>1 * 10 for large LPs</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Penalty parameter</td><td>OT_REAL</td><td>None</td><td>0.0 * initial penalty parameter</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Pivot tolerance</td><td>OT_REAL</td><td>None</td><td>3.7e-11 * e^2/3</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Print frequency</td><td>OT_INTEGER</td><td>None</td><td>100 * minor iterations log on Print file</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Proximal point method</td><td>OT_INTEGER</td><td>None</td><td>1 * satisfies linear constraints near x0</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Punch file</td><td>OT_INTEGER</td><td>None</td><td>0 * output Insert data</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>QPSolver</td><td>OT_STRING</td><td>None</td><td>Cholesky * default</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Reduced Hessian dimension</td><td>OT_INTEGER</td><td>None</td><td>2000 * or Superbasics limit if that is less</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Save frequency</td><td>OT_INTEGER</td><td>None</td><td>100 * save basis map</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Scale option</td><td>OT_INTEGER</td><td>None</td><td>1 * linear constraints and variables</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Scale tolerance</td><td>OT_REAL</td><td>None</td><td>0.9</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Solution</td><td>OT_STRING</td><td>None</td><td>Yes * on the Print file</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Solution file</td><td>OT_INTEGER</td><td>None</td><td>0 * different from printed solution</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Sticky parameters</td><td>OT_STRING</td><td>None</td><td>No * Yes makes parameter values persist</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Summary frequency</td><td>OT_INTEGER</td><td>None</td><td>100 * minor iterations log on Summary file</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Superbasics limit</td><td>OT_INTEGER</td><td>None</td><td>n1 + 1 * n1 = number of nonlinear variables</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>System information</td><td>OT_STRING</td><td>None</td><td>No * Yes prints more system information</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Timing level</td><td>OT_INTEGER</td><td>None</td><td>3 * print cpu times</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Unbounded objective</td><td>OT_REAL</td><td>None</td><td>1.0e+15</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Unbounded step size</td><td>OT_REAL</td><td>None</td><td>1.0e+18</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Verify level</td><td>OT_INTEGER</td><td>None</td><td>0 * cheap check on gradients</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>Violation limit</td><td>OT_REAL</td><td>None</td><td>10.0 * unscaled constraint violation limit</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)<br />(qp)</td><td>casadi::OptionsFunctionalityNode<br />casadi::Nlpsol</td></tr>
-<tr><td>detect_linear</td><td>OT_BOOLEAN</td><td>True</td><td>Make an effort to treat linear constraints and linear variables specially.</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>detect_linear</td><td>OT_BOOLEAN</td><td>true</td><td>Make an effort to treat linear constraints and linear variables specially.</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOLEAN</td><td>false</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
@@ -2516,12 +2460,12 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>print file</td><td>OT_STRING</td><td>None</td><td>n/a</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>print file</td><td>OT_STRING</td><td></td><td></td><td>casadi::SnoptInterface</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>print information about execution time</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>specs file</td><td>OT_STRING</td><td>None</td><td>n/a</td><td>casadi::SnoptInterface</td></tr>
-<tr><td>start</td><td>OT_STRING</td><td>Cold</td><td></td><td>casadi::SnoptInterface</td></tr>
-<tr><td>summary</td><td>OT_BOOLEAN</td><td>True</td><td>n/a</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>specs file</td><td>OT_STRING</td><td></td><td></td><td>casadi::SnoptInterface</td></tr>
+<tr><td>start</td><td>OT_STRING</td><td>"Cold"</td><td>(Cold|Basis|Warm)</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>summary</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>casadi::SnoptInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -2535,70 +2479,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>Backup basis file</td><td>OT_INTEGER</td><td>None</td><td>0 * output extra basis map</td></tr>
-<tr><td>Central difference interval</td><td>OT_REAL</td><td>None</td><td>6.7e-5 * (Function precision)^1/3</td></tr>
-<tr><td>Check frequency</td><td>OT_INTEGER</td><td>None</td><td>60 * test row residuals kAx - sk</td></tr>
-<tr><td>Crash option</td><td>OT_INTEGER</td><td>None</td><td>3 * first basis is essentially triangular</td></tr>
-<tr><td>Crash tolerance</td><td>OT_REAL</td><td>None</td><td>0.1</td></tr>
-<tr><td>Debug level</td><td>OT_INTEGER</td><td>None</td><td>0 * for developers</td></tr>
-<tr><td>Derivative level</td><td>OT_INTEGER</td><td>None</td><td>3</td></tr>
-<tr><td>Difference interval</td><td>OT_REAL</td><td>None</td><td>5.5e-7 * (Function precision)^1/2</td></tr>
-<tr><td>Dump file</td><td>OT_INTEGER</td><td>None</td><td>0 * output Load data</td></tr>
-<tr><td>Elastic weight</td><td>OT_REAL</td><td>None</td><td>1.0e+4 * used only during elastic mode</td></tr>
-<tr><td>Expand frequency</td><td>OT_INTEGER</td><td>None</td><td>10000 * for anti-cycling procedure</td></tr>
-<tr><td>Factorization frequency</td><td>OT_INTEGER</td><td>None</td><td>50 * 100 for LPs</td></tr>
-<tr><td>Function precision</td><td>OT_REAL</td><td>None</td><td>3.0e-13 * e^0.8 (almost full accuracy)</td></tr>
-<tr><td>Hessian</td><td>OT_STRING</td><td>None</td><td>   full memory * default if n1 ≤ 75<br />limited memory * default if n1 &gt; 75</td></tr>
-<tr><td>Hessian flush</td><td>OT_INTEGER</td><td>None</td><td>999999 * no flushing</td></tr>
-<tr><td>Hessian frequency</td><td>OT_INTEGER</td><td>None</td><td>999999 * for full Hessian (never reset)</td></tr>
-<tr><td>Hessian updates</td><td>OT_INTEGER</td><td>None</td><td>10 * for limited memory Hessian</td></tr>
-<tr><td>Insert file</td><td>OT_INTEGER</td><td>None</td><td>0 * input in industry format</td></tr>
-<tr><td>Iterations limit</td><td>OT_INTEGER</td><td>None</td><td>10000 * or 20m if that is more</td></tr>
-<tr><td>LU</td><td>OT_STRING</td><td>None</td><td>LU partial pivoting * default threshold pivoting strategy<br />LU rook pivoting * threshold rook pivoting<br />LU complete pivoting * threshold complete pivoting</td></tr>
-<tr><td>LU factor tolerance</td><td>OT_REAL</td><td>None</td><td>3.99 * for NP (100.0 for LP)</td></tr>
-<tr><td>LU singularity tolerance</td><td>OT_REAL</td><td>None</td><td>3.2e-11</td></tr>
-<tr><td>LU update tolerance</td><td>OT_REAL</td><td>None</td><td>3.99 * for NP ( 10.0 for LP)</td></tr>
-<tr><td>Linesearch tolerance</td><td>OT_REAL</td><td>None</td><td>0.9 * smaller for more accurate search</td></tr>
-<tr><td>Load file</td><td>OT_INTEGER</td><td>None</td><td>0 * input names and values</td></tr>
-<tr><td>Major feasibility tolerance</td><td>OT_REAL</td><td>None</td><td>1.0e-6 * target nonlinear constraint violation</td></tr>
-<tr><td>Major iterations limit</td><td>OT_INTEGER</td><td>None</td><td>1000 * or m if that is more</td></tr>
-<tr><td>Major optimality tolerance</td><td>OT_REAL</td><td>None</td><td>1.0e-6 * target complementarity gap</td></tr>
-<tr><td>Major print level</td><td>OT_INTEGER</td><td>None</td><td>1 * 1-line major iteration log</td></tr>
-<tr><td>Major step limit</td><td>OT_REAL</td><td>None</td><td>2.0</td></tr>
-<tr><td>Minor feasibility tolerance</td><td>OT_REAL</td><td>None</td><td>1.0e-6 * for satisfying the QP bounds</td></tr>
-<tr><td>Minor iterations limit</td><td>OT_INTEGER</td><td>None</td><td>500 * or 3m if that is more</td></tr>
-<tr><td>Minor print level</td><td>OT_INTEGER</td><td>None</td><td>1 * 1-line minor iteration log</td></tr>
-<tr><td>New basis file</td><td>OT_INTEGER</td><td>None</td><td>0 * output basis map</td></tr>
-<tr><td>New superbasics limit</td><td>OT_INTEGER</td><td>None</td><td>99 * controls early termination of QPs</td></tr>
-<tr><td>Old basis file</td><td>OT_INTEGER</td><td>None</td><td>0 * input basis map</td></tr>
-<tr><td>Partial price</td><td>OT_INTEGER</td><td>None</td><td>1 * 10 for large LPs</td></tr>
-<tr><td>Penalty parameter</td><td>OT_REAL</td><td>None</td><td>0.0 * initial penalty parameter</td></tr>
-<tr><td>Pivot tolerance</td><td>OT_REAL</td><td>None</td><td>3.7e-11 * e^2/3</td></tr>
-<tr><td>Print frequency</td><td>OT_INTEGER</td><td>None</td><td>100 * minor iterations log on Print file</td></tr>
-<tr><td>Proximal point method</td><td>OT_INTEGER</td><td>None</td><td>1 * satisfies linear constraints near x0</td></tr>
-<tr><td>Punch file</td><td>OT_INTEGER</td><td>None</td><td>0 * output Insert data</td></tr>
-<tr><td>QPSolver</td><td>OT_STRING</td><td>None</td><td>Cholesky * default</td></tr>
-<tr><td>Reduced Hessian dimension</td><td>OT_INTEGER</td><td>None</td><td>2000 * or Superbasics limit if that is less</td></tr>
-<tr><td>Save frequency</td><td>OT_INTEGER</td><td>None</td><td>100 * save basis map</td></tr>
-<tr><td>Scale option</td><td>OT_INTEGER</td><td>None</td><td>1 * linear constraints and variables</td></tr>
-<tr><td>Scale tolerance</td><td>OT_REAL</td><td>None</td><td>0.9</td></tr>
-<tr><td>Solution</td><td>OT_STRING</td><td>None</td><td>Yes * on the Print file</td></tr>
-<tr><td>Solution file</td><td>OT_INTEGER</td><td>None</td><td>0 * different from printed solution</td></tr>
-<tr><td>Sticky parameters</td><td>OT_STRING</td><td>None</td><td>No * Yes makes parameter values persist</td></tr>
-<tr><td>Summary frequency</td><td>OT_INTEGER</td><td>None</td><td>100 * minor iterations log on Summary file</td></tr>
-<tr><td>Superbasics limit</td><td>OT_INTEGER</td><td>None</td><td>n1 + 1 * n1 = number of nonlinear variables</td></tr>
-<tr><td>System information</td><td>OT_STRING</td><td>None</td><td>No * Yes prints more system information</td></tr>
-<tr><td>Timing level</td><td>OT_INTEGER</td><td>None</td><td>3 * print cpu times</td></tr>
-<tr><td>Unbounded objective</td><td>OT_REAL</td><td>None</td><td>1.0e+15</td></tr>
-<tr><td>Unbounded step size</td><td>OT_REAL</td><td>None</td><td>1.0e+18</td></tr>
-<tr><td>Verify level</td><td>OT_INTEGER</td><td>None</td><td>0 * cheap check on gradients</td></tr>
-<tr><td>Violation limit</td><td>OT_REAL</td><td>None</td><td>10.0 * unscaled constraint violation limit</td></tr>
-<tr><td>detect_linear</td><td>OT_BOOLEAN</td><td>True</td><td>Make an effort to treat linear constraints and linear variables specially.</td></tr>
-<tr><td>print file</td><td>OT_STRING</td><td>None</td><td>n/a</td></tr>
-<tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td></tr>
-<tr><td>specs file</td><td>OT_STRING</td><td>None</td><td>n/a</td></tr>
-<tr><td>start</td><td>OT_STRING</td><td>Cold</td><td></td></tr>
-<tr><td>summary</td><td>OT_BOOLEAN</td><td>True</td><td>n/a</td></tr>
+<tr><td>detect_linear</td><td>OT_BOOLEAN</td><td>true</td><td>Make an effort to treat linear constraints and linear variables specially.</td></tr>
+<tr><td>print file</td><td>OT_STRING</td><td></td><td></td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>print information about execution time</td></tr>
+<tr><td>specs file</td><td>OT_STRING</td><td></td><td></td></tr>
+<tr><td>start</td><td>OT_STRING</td><td>"Cold"</td><td>(Cold|Basis|Warm)</td></tr>
+<tr><td>summary</td><td>OT_BOOLEAN</td><td>true</td><td></td></tr>
 </table>
 */
 /// \cond INTERNAL
