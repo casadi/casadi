@@ -80,7 +80,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    virtual Memory* memory() const { return new NewtonMemory();}
 
     /// Solve the system of equations and calculate derivatives
     virtual void eval(Memory& mem, const double** arg, double** res,

@@ -89,10 +89,6 @@ namespace casadi {
     alloc_w(jac_.nnz_out(0), true); // J
   }
 
-  Memory* Newton::memory() const {
-    return new NewtonMemory();
-  }
-
   void Newton::eval(Memory& mem, const double** arg, double** res,
                     int* iw, double* w) const {
     NewtonMemory& m = dynamic_cast<NewtonMemory&>(mem);
