@@ -34,7 +34,7 @@
 namespace casadi {
 
   /** \brief Integrator memory */
-  struct CASADI_EXPORT IntegratorMemory : public Memory {
+  struct CASADI_EXPORT IntegratorMemory : public WorkMemory {
     /** \brief  Destructor */
     virtual ~IntegratorMemory() {}
   };
@@ -153,12 +153,6 @@ namespace casadi {
 
     /// Get the (legacy) dae backward function
     template<typename MatType> Function get_g() const;
-
-    // Work vectors
-    const double **arg_;
-    double **res_;
-    int *iw_;
-    double *w_;
 
     // Sparities
     Sparsity t_, x_, z_, p_, q_, rx_, rz_, rp_, rq_;

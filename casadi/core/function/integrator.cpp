@@ -1227,12 +1227,10 @@ namespace casadi {
   void Integrator::setup(Memory& mem, const double** arg, double** res,
                          int* iw, double* w) const {
     IntegratorMemory& m = dynamic_cast<IntegratorMemory&>(mem);
-    Integrator* this_ = const_cast<Integrator*>(this);
-
-    this_->arg_ = arg;
-    this_->res_ = res;
-    this_->iw_ = iw;
-    this_->w_ = w;
+    m.arg = arg;
+    m.res = res;
+    m.iw = iw;
+    m.w = w;
   }
 
   Dict Integrator::getDerivativeOptions(bool fwd) {
@@ -1354,17 +1352,17 @@ namespace casadi {
     Function& F = getExplicit();
 
     // Discrete dynamics function inputs ...
-    fill_n(arg_, F.n_in(), nullptr);
-    arg_[DAE_T] = &m.t;
-    arg_[DAE_X] = getPtr(m.x_prev);
-    arg_[DAE_Z] = getPtr(m.Z_prev);
-    arg_[DAE_P] = getPtr(m.p);
+    fill_n(m.arg, F.n_in(), nullptr);
+    m.arg[DAE_T] = &m.t;
+    m.arg[DAE_X] = getPtr(m.x_prev);
+    m.arg[DAE_Z] = getPtr(m.Z_prev);
+    m.arg[DAE_P] = getPtr(m.p);
 
     // ... and outputs
-    fill_n(res_, F.n_out(), nullptr);
-    res_[DAE_ODE] = getPtr(m.x);
-    res_[DAE_ALG] = getPtr(m.Z);
-    res_[DAE_QUAD] = getPtr(m.q);
+    fill_n(m.res, F.n_out(), nullptr);
+    m.res[DAE_ODE] = getPtr(m.x);
+    m.res[DAE_ALG] = getPtr(m.Z);
+    m.res[DAE_QUAD] = getPtr(m.q);
 
     // Take time steps until end time has been reached
     while (m.k<k_out) {
@@ -1374,7 +1372,7 @@ namespace casadi {
       casadi_copy(getPtr(m.q), nq_, getPtr(m.q_prev));
 
       // Take step
-      F(arg_, res_, iw_, w_, 0);
+      F(m.arg, m.res, m.iw, m.w, 0);
       casadi_axpy(nq_, 1., getPtr(m.q_prev), getPtr(m.q));
 
       // Tape
@@ -1407,18 +1405,18 @@ namespace casadi {
     Function& G = getExplicitB();
 
     // Discrete dynamics function inputs ...
-    fill_n(arg_, G.n_in(), nullptr);
-    arg_[RDAE_T] = &m.t;
-    arg_[RDAE_P] = getPtr(m.p);
-    arg_[RDAE_RX] = getPtr(m.rx_prev);
-    arg_[RDAE_RZ] = getPtr(m.RZ_prev);
-    arg_[RDAE_RP] = getPtr(m.rp);
+    fill_n(m.arg, G.n_in(), nullptr);
+    m.arg[RDAE_T] = &m.t;
+    m.arg[RDAE_P] = getPtr(m.p);
+    m.arg[RDAE_RX] = getPtr(m.rx_prev);
+    m.arg[RDAE_RZ] = getPtr(m.RZ_prev);
+    m.arg[RDAE_RP] = getPtr(m.rp);
 
     // ... and outputs
-    fill_n(res_, G.n_out(), nullptr);
-    res_[RDAE_ODE] = getPtr(m.rx);
-    res_[RDAE_ALG] = getPtr(m.RZ);
-    res_[RDAE_QUAD] = getPtr(m.rq);
+    fill_n(m.res, G.n_out(), nullptr);
+    m.res[RDAE_ODE] = getPtr(m.rx);
+    m.res[RDAE_ALG] = getPtr(m.RZ);
+    m.res[RDAE_QUAD] = getPtr(m.rq);
 
     // Take time steps until end time has been reached
     while (m.k>k_out) {
@@ -1432,9 +1430,9 @@ namespace casadi {
       casadi_copy(getPtr(m.rq), nrq_, getPtr(m.rq_prev));
 
       // Take step
-      arg_[RDAE_X] = getPtr(m.x_tape.at(m.k));
-      arg_[RDAE_Z] = getPtr(m.Z_tape.at(m.k));
-      G(arg_, res_, iw_, w_, 0);
+      m.arg[RDAE_X] = getPtr(m.x_tape.at(m.k));
+      m.arg[RDAE_Z] = getPtr(m.Z_tape.at(m.k));
+      G(m.arg, m.res, m.iw, m.w, 0);
       casadi_axpy(nrq_, 1., getPtr(m.rq_prev), getPtr(m.rq));
     }
 
