@@ -129,14 +129,15 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Integrator::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    IntegratorMemory& m = *static_cast<IntegratorMemory*>(mem);
+  void Integrator::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+    IntegratorMemory& m = dynamic_cast<IntegratorMemory&>(mem);
+    Integrator* this_ = const_cast<Integrator*>(this);
 
     // Setup memory object
-    setup(arg + INTEGRATOR_NUM_IN, res + INTEGRATOR_NUM_OUT, iw, w, mem);
+    this_->setup(m, arg + INTEGRATOR_NUM_IN, res + INTEGRATOR_NUM_OUT, iw, w);
 
     // Reset solver, take time to t0
-    reset(m, grid_.front(), arg[INTEGRATOR_X0], arg[INTEGRATOR_Z0], arg[INTEGRATOR_P]);
+    this_->reset(m, grid_.front(), arg[INTEGRATOR_X0], arg[INTEGRATOR_Z0], arg[INTEGRATOR_P]);
 
     // Where to store outputs
     double* x = res[INTEGRATOR_XF];
@@ -149,7 +150,7 @@ namespace casadi {
       if (k==0 && !output_t0_) continue;
 
       // Integrate forward
-      advance(m, grid_[k], x, z, q);
+      this_->advance(m, grid_[k], x, z, q);
       if (x) x += x_.nnz();
       if (z) z += z_.nnz();
       if (q) q += q_.nnz();
@@ -158,10 +159,11 @@ namespace casadi {
     // If backwards integration is needed
     if (nrx_>0) {
       // Integrate backward
-      resetB(m, grid_.back(), arg[INTEGRATOR_RX0], arg[INTEGRATOR_RZ0], arg[INTEGRATOR_RP]);
+      this_->resetB(m, grid_.back(), arg[INTEGRATOR_RX0], arg[INTEGRATOR_RZ0], arg[INTEGRATOR_RP]);
 
       // Proceed to t0
-      retreat(m, grid_.front(), res[INTEGRATOR_RXF], res[INTEGRATOR_RZF], res[INTEGRATOR_RQF]);
+      this_->retreat(m, grid_.front(), res[INTEGRATOR_RXF], res[INTEGRATOR_RZF],
+                     res[INTEGRATOR_RQF]);
     }
 
     // Print statistics
@@ -1219,11 +1221,15 @@ namespace casadi {
     return Function(name, ret_in, ret_out, opts);
   }
 
-  void Integrator::setup(const double** arg, double** res, int* iw, double* w, void* mem) {
-    arg_ = arg;
-    res_ = res;
-    iw_ = iw;
-    w_ = w;
+  void Integrator::setup(Memory& mem, const double** arg, double** res,
+                         int* iw, double* w) const {
+    IntegratorMemory& m = dynamic_cast<IntegratorMemory&>(mem);
+    Integrator* this_ = const_cast<Integrator*>(this);
+
+    this_->arg_ = arg;
+    this_->res_ = res;
+    this_->iw_ = iw;
+    this_->w_ = w;
   }
 
   Dict Integrator::getDerivativeOptions(bool fwd) {

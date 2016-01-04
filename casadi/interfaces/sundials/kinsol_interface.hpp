@@ -48,7 +48,7 @@
 /// \cond INTERNAL
 namespace casadi {
   /// Forward declaration
-  struct KinsolInterface;
+  class KinsolInterface;
 
   // Memory
   struct CASADI_ROOTFINDER_KINSOL_EXPORT KinsolMemory : public WorkMemory {

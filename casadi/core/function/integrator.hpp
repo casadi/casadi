@@ -69,8 +69,12 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const { return new IntegratorMemory();}
+
     /** \brief Set the work vectors */
-    virtual void setup(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void setup(Memory& mem, const double** arg, double** res,
+                       int* iw, double* w) const;
 
     /** \brief Reset the forward problem */
     virtual void reset(IntegratorMemory& mem, double t,
@@ -89,7 +93,7 @@ namespace casadi {
                          double* rx, double* rz, double* rq) = 0;
 
     /** \brief  evaluate */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

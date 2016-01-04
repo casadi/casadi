@@ -59,6 +59,20 @@
 
 /// \cond INTERNAL
 namespace casadi {
+  // Forward declaration
+  class CvodesInterface;
+
+  // CvodesMemory
+  struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory : public IntegratorMemory {
+    /// Shared memory
+    CvodesInterface& self;
+
+    /// Constructor
+    CvodesMemory(const CvodesInterface& s);
+
+    /// Destructor
+    virtual ~CvodesMemory();
+  };
 
   /** \brief \pluginbrief{Integrator,cvodes}
 
@@ -89,7 +103,10 @@ namespace casadi {
     virtual void init();
 
     /** \brief Initialize the adjoint problem (can only be called after the first integration) */
-    virtual void initAdj();
+    virtual void initAdj(CvodesMemory& m);
+
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory& mem, double t, const double* x,
@@ -129,50 +146,56 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void rhs(double t, N_Vector x, N_Vector xdot);
-    void ehfun(int error_code, const char *module, const char *function, char *msg);
-    void rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF,
+    void rhs(CvodesMemory& m, double t, N_Vector x, N_Vector xdot);
+    void ehfun(CvodesMemory& m, int error_code, const char *module, const char *function,
+               char *msg);
+    void rhsS(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
+              N_Vector *xdotF,
               N_Vector tmp1, N_Vector tmp2);
-    void rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF,
-               N_Vector tmp1, N_Vector tmp2);
-    void rhsQ(double t, N_Vector x, N_Vector qdot);
-    void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot,
-               N_Vector tmp1, N_Vector tmp2);
-    void rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot);
-    void rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xB, N_Vector xdotB);
-    void rhsQB(double t, N_Vector x, N_Vector rx, N_Vector rqdot);
-    void jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, N_Vector tmp);
-    void jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector rx,
+    void rhsS1(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF,
+               N_Vector xdotF, N_Vector tmp1, N_Vector tmp2);
+    void rhsQ(CvodesMemory& m, double t, N_Vector x, N_Vector qdot);
+    void rhsQS(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
+               N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2);
+    void rhsB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rxdot);
+    void rhsBS(CvodesMemory& m, double t, N_Vector x, N_Vector *xF, N_Vector xB,
+               N_Vector xdotB);
+    void rhsQB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rqdot);
+    void jtimes(CvodesMemory& m, N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
+                N_Vector tmp);
+    void jtimesB(CvodesMemory& m, N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector rx,
                  N_Vector rxdot, N_Vector tmpB);
-    void djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
+    void djac(CvodesMemory& m, long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    void djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB,
-               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-    void bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
-              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    void bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB,
-               N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+    void djacB(CvodesMemory& m, long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+               DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+    void bjac(CvodesMemory& m, long N, long mupper, long mlower, double t, N_Vector x,
+              N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+    void bjacB(CvodesMemory& m, long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
+               N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
+               N_Vector tmp3B);
     /// <tt>z = M^(-1).r</tt>
-    void psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
+    void psolve(CvodesMemory& m, double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
                 double gamma, double delta, int lr, N_Vector tmp);
-    void psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB, N_Vector zvecB,
-                 double gammaB, double deltaB, int lr, N_Vector tmpB);
+    void psolveB(CvodesMemory& m, double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
+                 N_Vector zvecB, double gammaB, double deltaB, int lr, N_Vector tmpB);
     /// <tt>M = I-gamma*df/dx</tt>, factorize
-    void psetup(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr,
-                double gamma,
+    void psetup(CvodesMemory& m, double t, N_Vector x, N_Vector xdot, booleantype jok,
+                booleantype *jcurPtr, double gamma,
                 N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    void psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+    void psetupB(CvodesMemory& m, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                  booleantype jokB, booleantype *jcurPtrB, double gammaB,
                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
     /// <tt>M = I-gamma*df/dx</tt>, factorize
-    void lsetup(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr,
-                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-    void lsetupB(double t, double gamma, int convfail, N_Vector x, N_Vector xB, N_Vector xdotB,
-                 booleantype *jcurPtr,
+    void lsetup(CvodesMemory& m, CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred,
+                booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+    void lsetupB(CvodesMemory& m, double t, double gamma, int convfail, N_Vector x, N_Vector xB,
+                 N_Vector xdotB, booleantype *jcurPtr,
                  N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
     /// <tt>b = M^(-1).b</tt>
-    void lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
-    void lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x,
+    void lsolve(CvodesMemory& m, CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur,
+                N_Vector fcur);
+    void lsolveB(CvodesMemory& m, double t, double gamma, N_Vector b, N_Vector weight, N_Vector x,
                  N_Vector xB, N_Vector xdotB);
 
     // Static wrappers to be passed to Sundials
@@ -255,28 +278,28 @@ namespace casadi {
     int whichB_;
 
     // Initialize the dense linear solver
-    void initDenseLinsol();
+    void initDenseLinsol(CvodesMemory& m) const;
 
     // Initialize the banded linear solver
-    void initBandedLinsol();
+    void initBandedLinsol(CvodesMemory& m) const;
 
     // Initialize the iterative linear solver
-    void initIterativeLinsol();
+    void initIterativeLinsol(CvodesMemory& m) const;
 
     // Initialize the user defined linear solver
-    void initUserDefinedLinsol();
+    void initUserDefinedLinsol(CvodesMemory& m) const;
 
     // Initialize the dense linear solver (backward integration)
-    void initDenseLinsolB();
+    void initDenseLinsolB(CvodesMemory& m) const;
 
     // Initialize the banded linear solver (backward integration)
-    void initBandedLinsolB();
+    void initBandedLinsolB(CvodesMemory& m) const;
 
     // Initialize the iterative linear solver (backward integration)
-    void initIterativeLinsolB();
+    void initIterativeLinsolB(CvodesMemory& m) const;
 
     // Initialize the user defined linear solver (backward integration)
-    void initUserDefinedLinsolB();
+    void initUserDefinedLinsolB(CvodesMemory& m) const;
 
     int lmm_; // linear multistep method
     int iter_; // nonlinear solver iteration
@@ -289,18 +312,6 @@ namespace casadi {
 
     /// number of checkpoints stored so far
     int ncheck_;
-  };
-
-  // CvodesMemory
-  struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory : public Memory {
-    /// Shared memory
-    CvodesInterface& self;
-
-    /// Constructor
-    CvodesMemory(CvodesInterface& s);
-
-    /// Destructor
-    virtual ~CvodesMemory();
   };
 
 } // namespace casadi
