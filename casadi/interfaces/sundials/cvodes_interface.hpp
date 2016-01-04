@@ -67,6 +67,20 @@ namespace casadi {
     /// Shared memory
     CvodesInterface& self;
 
+    // CVodes memory block
+    void* mem;
+
+    // For timings
+    clock_t time1, time2;
+
+    // Accumulated time since last reset:
+    double t_res; // time spent in the DAE residual
+    double t_fres; // time spent in the forward sensitivity residual
+    double t_jac; // time spent in the Jacobian, or Jacobian times vector function
+    double t_lsolve; // preconditioner/linear solver solve function
+    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
+    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
+
     /// Constructor
     CvodesMemory(const CvodesInterface& s);
 
@@ -123,10 +137,10 @@ namespace casadi {
     virtual void retreat(IntegratorMemory& mem, double t, double* rx, double* rz, double* rq);
 
     /** \brief  Set the stop time of the forward integration */
-    virtual void setStopTime(double tf);
+    virtual void setStopTime(CvodesMemory& m, double tf);
 
     /** \brief  Print solver statistics */
-    virtual void printStats(std::ostream &stream) const;
+    virtual void printStats(CvodesMemory& m, std::ostream &stream) const;
 
     /** \brief  Get the integrator Jacobian for the forward problem (generic) */
     template<typename MatType> Function getJacGen();
@@ -252,20 +266,6 @@ namespace casadi {
                                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
     static int lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                N_Vector x, N_Vector xdot);
-
-    // CVodes memory block
-    void* mem_;
-
-    // For timings
-    clock_t time1, time2;
-
-    // Accumulated time since last reset:
-    double t_res; // time spent in the DAE residual
-    double t_fres; // time spent in the forward sensitivity residual
-    double t_jac; // time spent in the Jacobian, or Jacobian times vector function
-    double t_lsolve; // preconditioner/linear solver solve function
-    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
-    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
 
     bool isInitAdj_;
 

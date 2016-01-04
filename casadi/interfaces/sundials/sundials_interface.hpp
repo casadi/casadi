@@ -56,9 +56,6 @@ namespace casadi {
     virtual void resetB(IntegratorMemory& mem, double t, const double* rx,
                         const double* rz, const double* rp);
 
-    /** \brief  Set stop time for the integration */
-    virtual void setStopTime(double tf) = 0;
-
     /// Linear solver forward, backward
     Function linsol_, linsolB_;
 
