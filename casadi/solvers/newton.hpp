@@ -39,6 +39,19 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  // Memory
+  struct CASADI_ROOTFINDER_NEWTON_EXPORT NewtonMemory : public Memory {
+    /// Constructor
+    NewtonMemory();
+
+    /// Destructor
+    virtual ~NewtonMemory() {}
+
+    /// Stats
+    const char* return_status;
+    int iter;
+  };
+
   /** \brief \pluginbrief{Rootfinder,newton}
 
       @copydoc Rootfinder_doc
@@ -66,8 +79,12 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const;
+
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res,
+                      int* iw, double* w) const;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -86,10 +103,11 @@ namespace casadi {
     bool print_iteration_;
 
     /// Print iteration header
-    void printIteration(std::ostream &stream);
+    void printIteration(std::ostream &stream) const;
 
     /// Print iteration
-    void printIteration(std::ostream &stream, int iter, double abstol, double abstolStep);
+    void printIteration(std::ostream &stream, int iter,
+                        double abstol, double abstolStep) const;
   };
 
 } // namespace casadi

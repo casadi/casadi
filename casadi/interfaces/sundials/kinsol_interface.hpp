@@ -152,9 +152,6 @@ namespace casadi {
     /** \brief Allocate memory block */
     virtual Memory* memory() const;
 
-    /** \brief Free allocated memory block */
-    virtual void free_mem(void* mem);
-
     /** \brief Callback functions */
     void func(KinsolMemory& m, N_Vector u, N_Vector fval) const;
     void djac(KinsolMemory& m, long N, N_Vector u, N_Vector fu,

@@ -848,8 +848,4 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::free_mem(void* mem) {
-    delete static_cast<KinsolMemory*>(mem);
-  }
-
 } // namespace casadi
