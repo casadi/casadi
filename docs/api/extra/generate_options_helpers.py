@@ -65,10 +65,13 @@ def addExtra(metadata):
   i = nlpsol("mysolver", "worhp", f)
   extra(metadata,i,"WorhpInterface")
 
-  x=SX.sym("x")
-  i = nlpsol("mysolver", "snopt", f)
-  extra(metadata,i,"SnoptInterface")
-
+  try:
+    x=SX.sym("x")
+    i = nlpsol("mysolver", "snopt", f)
+    extra(metadata,i,"SnoptInterface")
+  except:
+    pass
+  
   i = qpsol("mysolver", "qpoases", {"h": Sparsity.dense(3,3),"a":Sparsity.dense(1,3)})
   extra(metadata,i,"QpoasesInterface")
  
