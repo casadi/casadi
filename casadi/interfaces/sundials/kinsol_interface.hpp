@@ -149,8 +149,11 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new KinsolMemory(*this);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
 
     /** \brief Callback functions */
     void func(KinsolMemory& m, N_Vector u, N_Vector fval) const;

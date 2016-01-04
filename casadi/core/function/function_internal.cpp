@@ -219,6 +219,7 @@ namespace casadi {
     casadi_assert(mem_.empty());
     Memory* m = memory();
     casadi_assert(m!=0);
+    init_memory(*m);
     mem_.push_back(m);
   }
 

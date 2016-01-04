@@ -121,32 +121,14 @@ namespace casadi {
     addOption("linear_solver_optionsB",      OT_DICT,       GenericType(),
               "Options to be passed to the linear solver for backwards integration "
               "[default: equal to linear_solver_options]");
-    xz_  = 0;
-    q_ = 0;
-    rxz_ = 0;
-    rq_ = 0;
   }
 
   SundialsInterface::~SundialsInterface() {
-    if (xz_) { N_VDestroy_Serial(xz_); xz_ = 0; }
-    if (q_) { N_VDestroy_Serial(q_); q_ = 0; }
-    if (rxz_) { N_VDestroy_Serial(rxz_); rxz_ = 0; }
-    if (rq_) { N_VDestroy_Serial(rq_); rq_ = 0; }
   }
 
   void SundialsInterface::init() {
     // Call the base class method
     Integrator::init();
-
-    // Allocate n-vectors
-    xz_ = N_VNew_Serial(nx_+nz_);
-    q_ = N_VNew_Serial(nq_);
-    rxz_ = N_VNew_Serial(nrx_+nrz_);
-    rq_ = N_VNew_Serial(nrq_);
-
-    // Allocate memory
-    p_.resize(np_);
-    rp_.resize(nrp_);
 
     // Read options
     abstol_ = option("abstol");
@@ -312,35 +294,53 @@ namespace casadi {
     //alloc_w(nrp_, true); // rp_
   }
 
+  void SundialsInterface::init_memory(Memory& mem) const {
+    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+
+    // Allocate n-vectors
+    m.xz = N_VNew_Serial(nx_+nz_);
+    m.q = N_VNew_Serial(nq_);
+    m.rxz = N_VNew_Serial(nrx_+nrz_);
+    m.rq = N_VNew_Serial(nrq_);
+
+    // Allocate memory
+    m.p.resize(np_);
+    m.rp.resize(nrp_);
+  }
+
   void SundialsInterface::reset(IntegratorMemory& mem, double t, const double* x,
                                 const double* z, const double* p) {
+    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+
     // Update time
-    t_ = t;
+    m.t = t;
 
     // Set parameters
-    casadi_copy(p, np_, getPtr(p_));
+    casadi_copy(p, np_, getPtr(m.p));
 
     // Set the state
-    casadi_copy(x, nx_, NV_DATA_S(xz_));
-    casadi_copy(z, nz_, NV_DATA_S(xz_)+nx_);
+    casadi_copy(x, nx_, NV_DATA_S(m.xz));
+    casadi_copy(z, nz_, NV_DATA_S(m.xz)+nx_);
 
     // Reset summation states
-    N_VConst(0., q_);
+    N_VConst(0., m.q);
   }
 
   void SundialsInterface::resetB(IntegratorMemory& mem, double t, const double* rx,
                                  const double* rz, const double* rp) {
+    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+
     // Update time
-    t_ = t;
+    m.t = t;
 
     // Set parameters
-    casadi_copy(rp, nrp_, getPtr(rp_));
+    casadi_copy(rp, nrp_, getPtr(m.rp));
 
     // Get the backward state
-    casadi_copy(rx, nrx_, NV_DATA_S(rxz_));
+    casadi_copy(rx, nrx_, NV_DATA_S(m.rxz));
 
     // Reset summation states
-    N_VConst(0., rq_);
+    N_VConst(0., m.rq);
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {
@@ -393,6 +393,20 @@ namespace casadi {
     }
 
     return bw;
+  }
+
+  SundialsMemory::SundialsMemory() {
+    this->xz  = 0;
+    this->q = 0;
+    this->rxz = 0;
+    this->rq = 0;
+  }
+
+  SundialsMemory::~SundialsMemory() {
+    if (this->xz) N_VDestroy_Serial(this->xz);
+    if (this->q) N_VDestroy_Serial(this->q);
+    if (this->rxz) N_VDestroy_Serial(this->rxz);
+    if (this->rq) N_VDestroy_Serial(this->rq);
   }
 
 } // namespace casadi

@@ -37,6 +37,27 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  // IdasMemory
+  struct CASADI_SUNDIALS_COMMON_EXPORT SundialsMemory : public IntegratorMemory {
+    // Current time
+    double t;
+
+    // N-vectors for the forward integration
+    N_Vector xz, xzdot, q;
+
+    // N-vectors for the backward integration
+    N_Vector rxz, rxzdot, rq;
+
+    // Parameters
+    std::vector<double> p, rp;
+
+    /// Constructor
+    SundialsMemory();
+
+    /// Destructor
+    virtual ~SundialsMemory();
+  };
+
   class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
   public:
     /** \brief  Constructor */
@@ -48,6 +69,9 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory& mem, double t, const double* x,
                        const double* z, const double* p);
@@ -58,18 +82,6 @@ namespace casadi {
 
     /// Linear solver forward, backward
     Function linsol_, linsolB_;
-
-    // Current time
-    double t_;
-
-    // N-vectors for the forward integration
-    N_Vector xz_, xzdot_, q_;
-
-    // N-vectors for the backward integration
-    N_Vector rxz_, rxzdot_, rq_;
-
-    // Parameters
-    std::vector<double> p_, rp_;
 
     ///@{
     /// options

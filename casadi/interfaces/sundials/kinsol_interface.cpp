@@ -735,117 +735,111 @@ namespace casadi {
     if (this->mem) KINFree(&this->mem);
   }
 
-  Memory* KinsolInterface::memory() const {
-    KinsolMemory* m = new KinsolMemory(*this);
-    try {
-      // Current solution
-      m->u = N_VNew_Serial(n_);
+  void KinsolInterface::init_memory(Memory& mem) const {
+    KinsolMemory& m = dynamic_cast<KinsolMemory&>(mem);
 
-      // Create KINSOL memory block
-      m->mem = KINCreate();
+    // Current solution
+    m.u = N_VNew_Serial(n_);
 
-      // KINSOL bugfix
-      KINMem kin_mem = KINMem(m->mem);
-      kin_mem->kin_inexact_ls = FALSE;
+    // Create KINSOL memory block
+    m.mem = KINCreate();
 
-      // Set optional inputs
-      int flag = KINSetUserData(m->mem, m);
-      casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
+    // KINSOL bugfix
+    KINMem kin_mem = KINMem(m.mem);
+    kin_mem->kin_inexact_ls = FALSE;
 
-      // Set error handler function
-      flag = KINSetErrHandlerFn(m->mem, ehfun_wrapper, m);
-      casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
+    // Set optional inputs
+    int flag = KINSetUserData(m.mem, &m);
+    casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
 
-      // Initialize KINSOL
-      flag = KINInit(m->mem, func_wrapper, m->u);
+    // Set error handler function
+    flag = KINSetErrHandlerFn(m.mem, ehfun_wrapper, &m);
+    casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
+
+    // Initialize KINSOL
+    flag = KINInit(m.mem, func_wrapper, m.u);
+    casadi_assert(flag==KIN_SUCCESS);
+
+    // Setting maximum number of Newton iterations
+    flag = KINSetMaxNewtonStep(m.mem, max_iter_);
+    casadi_assert(flag==KIN_SUCCESS);
+
+    // Set constraints
+    if (!u_c_.empty()) {
+      N_Vector domain  = N_VNew_Serial(n_);
+      copy(u_c_.begin(), u_c_.end(), NV_DATA_S(domain));
+
+      // Pass to KINSOL
+      flag = KINSetConstraints(m.mem, domain);
       casadi_assert(flag==KIN_SUCCESS);
 
-      // Setting maximum number of Newton iterations
-      flag = KINSetMaxNewtonStep(m->mem, max_iter_);
-      casadi_assert(flag==KIN_SUCCESS);
-
-      // Set constraints
-      if (!u_c_.empty()) {
-        N_Vector domain  = N_VNew_Serial(n_);
-        copy(u_c_.begin(), u_c_.end(), NV_DATA_S(domain));
-
-        // Pass to KINSOL
-        flag = KINSetConstraints(m->mem, domain);
-        casadi_assert(flag==KIN_SUCCESS);
-
-        // Free the temporary vector
-        N_VDestroy_Serial(domain);
-      }
-
-      switch (linear_solver_type_) {
-      case KinsolInterface::DENSE:
-        // Dense Jacobian
-        flag = KINDense(m->mem, n_);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
-
-        if (exact_jacobian_) {
-          flag = KINDlsSetDenseJacFn(m->mem, djac_wrapper);
-          casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
-        }
-        break;
-      case KinsolInterface::BANDED:
-        // Banded Jacobian
-        flag = KINBand(m->mem, n_, upper_bandwidth_, lower_bandwidth_);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
-
-        if (exact_jacobian_) {
-          flag = KINDlsSetBandJacFn(m->mem, bjac_wrapper);
-          casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
-        }
-        break;
-      case KinsolInterface::ITERATIVE:
-        // Attach the sparse solver
-        switch (iterative_solver_) {
-        case KinsolInterface::GMRES:
-          flag = KINSpgmr(m->mem, maxl_);
-          casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
-          break;
-        case KinsolInterface::BCGSTAB:
-          flag = KINSpbcg(m->mem, maxl_);
-          casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
-          break;
-        case KinsolInterface::TFQMR:
-          flag = KINSptfqmr(m->mem, maxl_);
-          casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
-          break;
-        }
-
-        // Attach functions for Jacobian information
-        if (exact_jacobian_) {
-          flag = KINSpilsSetJacTimesVecFn(m->mem, jtimes_wrapper);
-          casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
-        }
-
-        // Add a preconditioner
-        if (use_preconditioner_) {
-          flag = KINSpilsSetPreconditioner(m->mem, psetup_wrapper, psolve_wrapper);
-          casadi_assert(flag==KIN_SUCCESS);
-        }
-        break;
-      case KinsolInterface::USER_DEFINED:
-        // Set fields in the IDA memory
-        KINMem kin_mem = KINMem(m->mem);
-        kin_mem->kin_lmem   = m;
-        kin_mem->kin_lsetup = lsetup_wrapper;
-        kin_mem->kin_lsolve = lsolve_wrapper;
-        kin_mem->kin_setupNonNull = TRUE;
-        break;
-      }
-
-      // Set stop criterion
-      flag = KINSetFuncNormTol(m->mem, abstol_);
-      casadi_assert(flag==KIN_SUCCESS);
-
-      return m;
-    } catch (...) {
-      delete m;
-      return 0;
+      // Free the temporary vector
+      N_VDestroy_Serial(domain);
     }
+
+    switch (linear_solver_type_) {
+    case KinsolInterface::DENSE:
+      // Dense Jacobian
+      flag = KINDense(m.mem, n_);
+      casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
+
+      if (exact_jacobian_) {
+        flag = KINDlsSetDenseJacFn(m.mem, djac_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
+      }
+      break;
+    case KinsolInterface::BANDED:
+      // Banded Jacobian
+      flag = KINBand(m.mem, n_, upper_bandwidth_, lower_bandwidth_);
+      casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
+
+      if (exact_jacobian_) {
+        flag = KINDlsSetBandJacFn(m.mem, bjac_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
+      }
+      break;
+    case KinsolInterface::ITERATIVE:
+      // Attach the sparse solver
+      switch (iterative_solver_) {
+      case KinsolInterface::GMRES:
+        flag = KINSpgmr(m.mem, maxl_);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
+        break;
+      case KinsolInterface::BCGSTAB:
+        flag = KINSpbcg(m.mem, maxl_);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
+        break;
+      case KinsolInterface::TFQMR:
+        flag = KINSptfqmr(m.mem, maxl_);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
+        break;
+      }
+
+      // Attach functions for Jacobian information
+      if (exact_jacobian_) {
+        flag = KINSpilsSetJacTimesVecFn(m.mem, jtimes_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
+      }
+
+      // Add a preconditioner
+      if (use_preconditioner_) {
+        flag = KINSpilsSetPreconditioner(m.mem, psetup_wrapper, psolve_wrapper);
+        casadi_assert(flag==KIN_SUCCESS);
+      }
+      break;
+    case KinsolInterface::USER_DEFINED:
+      // Set fields in the IDA memory
+      KINMem kin_mem = KINMem(m.mem);
+      kin_mem->kin_lmem   = &m;
+      kin_mem->kin_lsetup = lsetup_wrapper;
+      kin_mem->kin_lsolve = lsolve_wrapper;
+      kin_mem->kin_setupNonNull = TRUE;
+      break;
+    }
+
+    // Set stop criterion
+    flag = KINSetFuncNormTol(m.mem, abstol_);
+    casadi_assert(flag==KIN_SUCCESS);
   }
 
 } // namespace casadi

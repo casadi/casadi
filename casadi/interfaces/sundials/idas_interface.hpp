@@ -58,9 +58,9 @@ namespace casadi {
   class IdasInterface;
 
   // IdasMemory
-  struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory : public IntegratorMemory {
+  struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory : public SundialsMemory {
     /// Function object
-    IdasInterface& self;
+    const IdasInterface& self;
 
     // Idas memory block
     void* mem;
@@ -75,6 +75,10 @@ namespace casadi {
     double t_lsolve; // preconditioner/linear solver solve function
     double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
     double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
+
+    // Has the adjoint problem been initialized
+    bool isInitAdj;
+    bool isInitTaping;
 
     /// Constructor
     IdasMemory(const IdasInterface& s);
@@ -121,8 +125,11 @@ namespace casadi {
     /** \brief Initialize the backward problem (can only be called after the first integration) */
     virtual void initAdj(IdasMemory& m);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new IdasMemory(*this);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory& mem, double t, const double* x,
@@ -141,7 +148,7 @@ namespace casadi {
                          double* rz, double* rq);
 
     /** \brief  Set the stop time of the forward integration */
-    virtual void setStopTime(IntegratorMemory& mem, double tf);
+    virtual void setStopTime(IntegratorMemory& mem, double tf) const;
 
     /** \brief  Print solver statistics */
     virtual void printStats(IntegratorMemory& mem, std::ostream &stream) const;
@@ -174,54 +181,55 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void res(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr);
-    void ehfun(IdasMemory& m, int error_code, const char *module, const char *function, char *msg);
+    void res(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr) const;
+    void ehfun(IdasMemory& m, int error_code, const char *module, const char *function,
+               char *msg) const;
     void jtimes(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
-                N_Vector v, N_Vector Jv, double cj, N_Vector tmp1, N_Vector tmp2);
+                N_Vector v, N_Vector Jv, double cj, N_Vector tmp1, N_Vector tmp2) const;
     void jtimesB(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                  N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
-                 double cjB, N_Vector tmp1B, N_Vector tmp2B);
+                 double cjB, N_Vector tmp1B, N_Vector tmp2B) const;
     void resS(IdasMemory& m, int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval,
               N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF,
-              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    void rhsQ(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector qdot);
+              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
+    void rhsQ(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector qdot) const;
     void rhsQS(IdasMemory& m, int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF,
                N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2,
-               N_Vector tmp3);
+               N_Vector tmp3) const;
     void resB(IdasMemory& m, double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotB,
-              N_Vector rrB);
+              N_Vector rrB) const;
     void rhsQB(IdasMemory& m, double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotB,
-               N_Vector qdotA);
+               N_Vector qdotA) const;
     void psolve(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
-                N_Vector zvec, double cj, double delta, N_Vector tmp);
+                N_Vector zvec, double cj, double delta, N_Vector tmp) const;
     void psolveB(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                  N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB,
-                 double deltaB, N_Vector tmpB);
+                 double deltaB, N_Vector tmpB) const;
     void psetup(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
-                N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+                N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
     void psetupB(IdasMemory& m, double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
                  N_Vector xzdotB, N_Vector resvalB, double cjB,
-                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
     void djac(IdasMemory& m, long Neq, double t, double cj, N_Vector xz, N_Vector xzdot,
-              N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+              N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
     void djacB(IdasMemory& m, long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot,
                N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB,
-               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
     void bjac(IdasMemory& m, long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz,
               N_Vector xzdot, N_Vector rr, DlsMat Jac,
-              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
     void bjacB(IdasMemory& m, long NeqB, long mupperB, long mlowerB, double tt, double cjB,
                N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB,
-               DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+               DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
     void lsetup(IdasMemory& m, IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
-                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const;
     void lsetupB(IdasMemory& m, double t, double cj, N_Vector xz, N_Vector xzdot,
                  N_Vector xzB, N_Vector xzdotB,
-                 N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+                 N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const;
     void lsolve(IdasMemory& m, IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
-                N_Vector xzdot, N_Vector rr);
+                N_Vector xzdot, N_Vector rr) const;
     void lsolveB(IdasMemory& m, double t, double cj, double cjratio, N_Vector b, N_Vector weight,
-                 N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rr);
+                 N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rr) const;
 
     // Static wrappers to be passed to Sundials
     static int res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
@@ -312,10 +320,6 @@ namespace casadi {
 
     // Ids of backward problem
     int whichB_;
-
-    // Has the adjoint problem been initialized
-    bool isInitAdj_;
-    bool isInitTaping_;
 
     // Options
     bool cj_scaling_;

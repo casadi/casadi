@@ -63,9 +63,9 @@ namespace casadi {
   class CvodesInterface;
 
   // CvodesMemory
-  struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory : public IntegratorMemory {
+  struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory : public SundialsMemory {
     /// Function object
-    CvodesInterface& self;
+    const CvodesInterface& self;
 
     // CVodes memory block
     void* mem;
@@ -80,6 +80,8 @@ namespace casadi {
     double t_lsolve; // preconditioner/linear solver solve function
     double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
     double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
+
+    bool isInitAdj;
 
     /// Constructor
     CvodesMemory(const CvodesInterface& s);
@@ -119,8 +121,11 @@ namespace casadi {
     /** \brief Initialize the adjoint problem (can only be called after the first integration) */
     virtual void initAdj(CvodesMemory& m);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new CvodesMemory(*this);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory& mem, double t, const double* x,
@@ -137,7 +142,7 @@ namespace casadi {
     virtual void retreat(IntegratorMemory& mem, double t, double* rx, double* rz, double* rq);
 
     /** \brief  Set the stop time of the forward integration */
-    virtual void setStopTime(IntegratorMemory& mem, double tf);
+    virtual void setStopTime(IntegratorMemory& mem, double tf) const;
 
     /** \brief  Print solver statistics */
     virtual void printStats(IntegratorMemory& mem, std::ostream &stream) const;
@@ -160,57 +165,56 @@ namespace casadi {
   protected:
 
     // Sundials callback functions
-    void rhs(CvodesMemory& m, double t, N_Vector x, N_Vector xdot);
+    void rhs(CvodesMemory& m, double t, N_Vector x, N_Vector xdot) const;
     void ehfun(CvodesMemory& m, int error_code, const char *module, const char *function,
-               char *msg);
+               char *msg) const;
     void rhsS(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
-              N_Vector *xdotF,
-              N_Vector tmp1, N_Vector tmp2);
+              N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2) const;
     void rhsS1(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF,
-               N_Vector xdotF, N_Vector tmp1, N_Vector tmp2);
-    void rhsQ(CvodesMemory& m, double t, N_Vector x, N_Vector qdot);
+               N_Vector xdotF, N_Vector tmp1, N_Vector tmp2) const;
+    void rhsQ(CvodesMemory& m, double t, N_Vector x, N_Vector qdot) const;
     void rhsQS(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
-               N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2);
-    void rhsB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rxdot);
+               N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2) const;
+    void rhsB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rxdot) const;
     void rhsBS(CvodesMemory& m, double t, N_Vector x, N_Vector *xF, N_Vector xB,
-               N_Vector xdotB);
-    void rhsQB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rqdot);
+               N_Vector xdotB) const;
+    void rhsQB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rqdot) const;
     void jtimes(CvodesMemory& m, N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
-                N_Vector tmp);
+                N_Vector tmp) const;
     void jtimesB(CvodesMemory& m, N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector rx,
-                 N_Vector rxdot, N_Vector tmpB);
+                 N_Vector rxdot, N_Vector tmpB) const;
     void djac(CvodesMemory& m, long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
-              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
     void djacB(CvodesMemory& m, long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
-               DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+               DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
     void bjac(CvodesMemory& m, long N, long mupper, long mlower, double t, N_Vector x,
-              N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+              N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
     void bjacB(CvodesMemory& m, long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
                N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
-               N_Vector tmp3B);
+               N_Vector tmp3B) const;
     /// <tt>z = M^(-1).r</tt>
     void psolve(CvodesMemory& m, double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
-                double gamma, double delta, int lr, N_Vector tmp);
+                double gamma, double delta, int lr, N_Vector tmp) const;
     void psolveB(CvodesMemory& m, double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
-                 N_Vector zvecB, double gammaB, double deltaB, int lr, N_Vector tmpB);
+                 N_Vector zvecB, double gammaB, double deltaB, int lr, N_Vector tmpB) const;
     /// <tt>M = I-gamma*df/dx</tt>, factorize
     void psetup(CvodesMemory& m, double t, N_Vector x, N_Vector xdot, booleantype jok,
                 booleantype *jcurPtr, double gamma,
-                N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+                N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) const;
     void psetupB(CvodesMemory& m, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                  booleantype jokB, booleantype *jcurPtrB, double gammaB,
-                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+                 N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) const;
     /// <tt>M = I-gamma*df/dx</tt>, factorize
     void lsetup(CvodesMemory& m, CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred,
-                booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+                booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) const;
     void lsetupB(CvodesMemory& m, double t, double gamma, int convfail, N_Vector x, N_Vector xB,
-                 N_Vector xdotB, booleantype *jcurPtr,
-                 N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+                 N_Vector xdotB, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2,
+                 N_Vector vtemp3) const;
     /// <tt>b = M^(-1).b</tt>
     void lsolve(CvodesMemory& m, CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur,
-                N_Vector fcur);
+                N_Vector fcur) const;
     void lsolveB(CvodesMemory& m, double t, double gamma, N_Vector b, N_Vector weight, N_Vector x,
-                 N_Vector xB, N_Vector xdotB);
+                 N_Vector xB, N_Vector xdotB) const;
 
     // Static wrappers to be passed to Sundials
     static int rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data);
@@ -266,8 +270,6 @@ namespace casadi {
                                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
     static int lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                N_Vector x, N_Vector xdot);
-
-    bool isInitAdj_;
 
     int ism_;
 

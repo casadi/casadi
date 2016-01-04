@@ -120,7 +120,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Set stop time for the integration */
-    virtual void setStopTime(IntegratorMemory& mem, double tf);
+    virtual void setStopTime(IntegratorMemory& mem, double tf) const;
 
     // Helper structure
     struct AugOffset {
