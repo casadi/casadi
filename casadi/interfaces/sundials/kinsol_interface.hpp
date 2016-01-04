@@ -100,7 +100,7 @@ namespace casadi {
     virtual void init();
 
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "kinsol";}
@@ -144,7 +144,7 @@ namespace casadi {
     Function f_fwd_;
 
     // Raise an error specific to KinSol
-    void kinsol_error(const std::string& module, int flag, bool fatal=true);
+    void kinsol_error(const std::string& module, int flag, bool fatal=true) const;
 
     /// A documentation string
     static const std::string meta_doc;

@@ -69,7 +69,7 @@ namespace casadi {
     virtual bool spCanEvaluate(bool fwd) { return true;}
 
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) = 0;
+    //virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) = 0;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
