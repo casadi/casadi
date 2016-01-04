@@ -103,14 +103,14 @@ H = h.jacobian()
 # Build the objective
 obj = 0
 # First the arrival cost
-obj += mul([(shooting["X",0]-parameters["x0"]).T,S,(shooting["X",0]-parameters["x0"])])
+obj += mtimes([(shooting["X",0]-parameters["x0"]).T,S,(shooting["X",0]-parameters["x0"])])
 #Next the cost for the measurement noise
 for i in range(N):
   vm = h([shooting["X",i]])[0]-parameters["Y",i]
-  obj += mul([vm.T,R,vm])
+  obj += mtimes([vm.T,R,vm])
 #And also the cost for the process noise
 for i in range(N-1):
-  obj += mul([shooting["W",i].T,Q,shooting["W",i]])
+  obj += mtimes([shooting["W",i].T,Q,shooting["W",i]])
 
 # Build the multiple shooting constraints
 g = []
@@ -183,11 +183,11 @@ for i in range(1,Nsimulation-N+1):
   H.setInput(solution["X",0],0)
   H.evaluate()
   H0 = H.getOutput(0)
-  K = mul([P,H0.T,linalg.inv(mul([H0,P,H0.T])+R)])
-  P = mul((DM.eye(Nstates)-mul(K,H0)),P)
+  K = mtimes([P,H0.T,linalg.inv(mtimes([H0,P,H0.T])+R)])
+  P = mtimes((DM.eye(Nstates)-mtimes(K,H0)),P)
   h.setInput(solution["X",0],0)
   h.evaluate()
-  x0 = x0 + mul(K, current_parameters["Y",0]-h.getOutput(0)-mul(H0,x0-solution["X",0]) )
+  x0 = x0 + mtimes(K, current_parameters["Y",0]-h.getOutput(0)-mtimes(H0,x0-solution["X",0]) )
   phi.setInput(x0,0)
   phi.setInput(current_parameters["U",0],1)
   phi.setInput(solution["W",0],2)
@@ -199,7 +199,7 @@ for i in range(1,Nsimulation-N+1):
   PHI.evaluate()
   F = PHI.getOutput(0)
   PHI.evaluate()
-  P = mul([F,P,F.T]) + linalg.inv(Q)
+  P = mtimes([F,P,F.T]) + linalg.inv(Q)
   # Get the measurements and control inputs 
   current_parameters["U",horzcat] = simulated_U[:,i:i+N-1]
   current_parameters["Y",horzcat] = simulated_Y[:,i:i+N]
@@ -246,5 +246,5 @@ plt.grid()
 plt.show()
 
 error = estimated_X[0,:]-simulated_X[0,:]
-print mul(error,error.T)
-assert(mul(error,error.T)<0.01)
+print mtimes(error,error.T)
+assert(mtimes(error,error.T)<0.01)

@@ -26,8 +26,8 @@
 #ifndef CASADI_MX_HPP
 #define CASADI_MX_HPP
 #include "../shared_object.hpp"
-#include "../matrix/matrix.hpp"
-#include "../matrix/generic_expression.hpp"
+#include "../matrix.hpp"
+#include "../generic_expression.hpp"
 #include "../generic_type.hpp"
 #include <vector>
 namespace casadi {
@@ -124,9 +124,11 @@ namespace casadi {
     typedef GenericMatrix<MX> B;
 
     /// Expose base class functions
-    using B::zz_horzsplit;
-    using B::zz_diagsplit;
-    using B::zz_vertsplit;
+    using B::horzsplit;
+    using B::diagsplit;
+    using B::vertsplit;
+    using B::mtimes;
+    using B::repmat;
 #endif // SWIG
 
     /// Returns the truth value of an MX expression
@@ -163,7 +165,7 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Get the nth dependency as MX */
-    MX getDep(int ch=0) const;
+    MX dep(int ch=0) const;
 
     /** \brief  Number of outputs */
     int n_out() const;
@@ -307,8 +309,8 @@ namespace casadi {
     static MX eye(int ncol);
 
 #ifndef SWIG
-    /** \brief Avoid shadowing SharedObject::get() */
-    using SharedObject::get;
+    /// Get a const pointer to the node
+    MXNode* get() const;
 #endif // SWIG
 
     ///@{
@@ -358,78 +360,7 @@ namespace casadi {
     /// \cond CLUTTER
     ///@{
     /// Functions called by friend functions defined for GenericExpression
-    MX zz_plus(const MX& y) const;
-    MX zz_minus(const MX& y) const;
-    MX zz_times(const MX& y) const;
-    MX zz_rdivide(const MX& y) const;
-    MX zz_lt(const MX& y) const;
-    MX zz_le(const MX& y) const;
-    MX zz_eq(const MX& y) const;
-    MX zz_ne(const MX& y) const;
-    MX zz_atan2(const MX& y) const;
-    MX zz_min(const MX& y) const;
-    MX zz_max(const MX& y) const;
-    MX zz_and(const MX& y) const;
-    MX zz_or(const MX& y) const;
-    MX zz_abs() const;
-    MX zz_sqrt() const;
-    MX zz_sin() const;
-    MX zz_cos() const;
-    MX zz_tan() const;
-    MX zz_asin() const;
-    MX zz_acos() const;
-    MX zz_atan() const;
-    MX zz_sinh() const;
-    MX zz_cosh() const;
-    MX zz_tanh() const;
-    MX zz_asinh() const;
-    MX zz_acosh() const;
-    MX zz_atanh() const;
-    MX zz_exp() const;
-    MX zz_log() const;
-    MX zz_log10() const;
-    MX zz_floor() const;
-    MX zz_ceil() const;
-    MX zz_erf() const;
-    MX zz_erfinv() const;
-    MX zz_sign() const;
-    MX zz_power(const MX& b) const;
-    MX zz_mod(const MX& y) const;
-    MX zz_simplify() const;
-    bool zz_is_equal(const MX& y, int depth) const;
-    bool zz_is_equal(const MXNode* y, int depth) const;
-    MX zz_copysign(const MX& y) const;
-    MX zz_constpow(const MX& y) const;
-    ///@}
-
-    ///@{
-    /// Functions called by friend functions defined for GenericExpression
-    static MX jacobian(const MX& f, const MX& x, bool symmetric=false);
-    static MX gradient(const MX& f, const MX& x);
-    static MX tangent(const MX& f, const MX& x);
-    static MX hessian(const MX& f, const MX& x);
-    static MX hessian(const MX& f, const MX& x, MX& g);
-    MX zz_substitute(const MX& v, const MX& vdef) const;
-    static std::vector<MX> zz_substitute(const std::vector<MX> &ex,
-                                         const std::vector<MX> &v,
-                                         const std::vector<MX> &vdef);
-    static void zz_substituteInPlace(const std::vector<MX>& v,
-                                     std::vector<MX>& vdef,
-                                     std::vector<MX>& ex, bool reverse);
-    MX zz_solve(const MX& b, const std::string& lsolver="symbolicqr",
-                const Dict& dict = Dict()) const;
-    MX zz_pinv(const std::string& lsolver="symbolicqr",
-               const Dict& dict = Dict()) const;
-    int zz_countNodes() const;
-    std::string zz_print_operator(const std::vector<std::string>& args) const;
-    static void zz_extractShared(std::vector<MX>& ex, std::vector<MX>& v,
-                                 std::vector<MX>& vdef, const std::string& v_prefix,
-                                 const std::string& v_suffix);
-    MX zz_if_else(const MX& if_true, const MX& if_false, bool short_circuit=true) const;
-    MX zz_conditional(const std::vector<MX> &x, const MX& x_default,
-                      bool short_circuit=true) const;
-    bool zz_dependsOn(const MX& arg) const;
-    MX zz_not() const;
+    static bool is_equal(const MX& x, const MX& y, int depth=0);
     ///@}
 
     ///@{
@@ -437,62 +368,91 @@ namespace casadi {
     static MX horzcat(const std::vector<MX>& x);
     static MX diagcat(const std::vector<MX>& x);
     static MX vertcat(const std::vector<MX>& x);
-    std::vector<MX> zz_horzsplit(const std::vector<int>& offset) const;
-    std::vector<MX> zz_diagsplit(const std::vector<int>& offset1,
-                                 const std::vector<int>& offset2) const;
-    std::vector<MX> zz_vertsplit(const std::vector<int>& offset) const;
+    static std::vector<MX> horzsplit(const MX& x, const std::vector<int>& offset);
+    static std::vector<MX> diagsplit(const MX& x, const std::vector<int>& offset1,
+                                     const std::vector<int>& offset2);
+    static std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset);
     static MX blockcat(const std::vector< std::vector<MX > > &v);
-    MX zz_mtimes(const MX& y) const;
-    MX zz_mac(const MX& y, const MX& z) const;
-    MX zz_reshape(int nrow, int ncol) const;
-    MX zz_reshape(const Sparsity& sp) const;
-    MX zz_vecNZ() const;
-    MX zz_kron(const MX& b) const;
-    MX zz_repmat(int n, int m=1) const;
+    static MX mtimes(const MX& x, const MX& y);
+    static MX mac(const MX& x, const MX& y, const MX& z);
+    static MX reshape(const MX& x, int nrow, int ncol);
+    static MX reshape(const MX& x, const Sparsity& sp);
+    static MX vecNZ(const MX& x);
+    static MX kron(const MX& x, const MX& b);
+    static MX repmat(const MX& x, int n, int m=1);
     ///@}
 
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
-    MX zz_mpower(const MX& b) const;
+    static MX jacobian(const MX& f, const MX& x, bool symmetric=false);
+    static MX gradient(const MX& f, const MX& x);
+    static MX tangent(const MX& f, const MX& x);
+    static MX hessian(const MX& f, const MX& x);
+    static MX hessian(const MX& f, const MX& x, MX& g);
+    static MX jtimes(const MX &ex, const MX &arg, const MX &v, bool tr=false);
+    static std::vector<bool> nl_var(const MX &expr, const MX &var);
+    static MX substitute(const MX& ex, const MX& v, const MX& vdef);
+    static std::vector<MX> substitute(const std::vector<MX> &ex,
+                                         const std::vector<MX> &v,
+                                         const std::vector<MX> &vdef);
+    static void substituteInPlace(const std::vector<MX>& v,
+                                  std::vector<MX>& vdef,
+                                  std::vector<MX>& ex, bool reverse);
+    static MX solve(const MX& A, const MX& b, const std::string& lsolver="symbolicqr",
+                    const Dict& dict = Dict());
+    static MX pinv(const MX& A, const std::string& lsolver="symbolicqr",
+               const Dict& dict = Dict());
+    static int countNodes(const MX& x);
+    static std::string print_operator(const MX& x, const std::vector<std::string>& args);
+    static void extractShared(std::vector<MX>& ex, std::vector<MX>& v,
+                              std::vector<MX>& vdef, const std::string& v_prefix,
+                              const std::string& v_suffix);
+    static MX if_else(const MX& cond, const MX& if_true,
+                      const MX& if_false, bool short_circuit=true);
+    static MX conditional(const MX& ind, const std::vector<MX> &x, const MX& x_default,
+                          bool short_circuit=true);
+    static bool dependsOn(const MX& x, const MX& arg);
+    static MX logic_not(const MX& x);
+    static MX simplify(const MX& x);
+    static MX mpower(const MX& a, const MX& b);
     static MX dot(const MX& x, const MX& y);
-    MX zz_outer_prod(const MX& y) const;
-    MX zz_mrdivide(const MX& b) const;
-    MX zz_mldivide(const MX& b) const;
-    MX zz_if_else_zero(const MX& y) const;
-    MX zz_norm_2() const;
-    MX zz_norm_F() const;
-    MX zz_norm_1() const;
-    MX zz_norm_inf() const;
-    MX zz_unite(const MX& B) const;
-    MX zz_trace() const;
-    MX zz_diag() const;
-    MX zz_sumCols() const;
-    MX zz_sumRows() const;
-    MX zz_polyval(const MX& x) const;
-    MX zz_det() const;
-    MX zz_inv() const;
-    std::vector<MX> zz_symvar() const;
-    MX zz_nullspace() const;
-    MX zz_repsum(int n, int m=1) const;
-    MX zz_densify(const MX& val=0) const;
+    static MX mrdivide(const MX& a, const MX& b);
+    static MX mldivide(const MX& a, const MX& b);
+    static MX norm_2(const MX& x);
+    static MX norm_F(const MX& x);
+    static MX norm_1(const MX& x);
+    static MX norm_inf(const MX& x);
+    static MX unite(const MX& A, const MX& B);
+    static MX trace(const MX& x);
+    static MX diag(const MX& x);
+    static MX sumCols(const MX& x);
+    static MX sumRows(const MX& x);
+    static MX polyval(const MX& p, const MX& x);
+    static MX det(const MX& x);
+    static MX inv(const MX& x);
+    static std::vector<MX> symvar(const MX& x);
+    static MX nullspace(const MX& A);
+    static MX repsum(const MX& x, int n, int m=1);
+    static MX densify(const MX& x, const MX& val=0);
     static MX _bilin(const MX& A, const MX& x, const MX& y);
     static MX _rank1(const MX& A, const MX& alpha, const MX& x, const MX& y);
+    static MX project(const MX& x, const Sparsity& sp, bool intersect=false);
     ///@}
 
     ///@{
     /// Functions called by friend functions defined for this class
-    MX zz_find() const;
-
-    MX zz_graph_substitute(const std::vector<MX> &v, const std::vector<MX> &vdef) const;
-    static std::vector<MX> zz_graph_substitute(const std::vector<MX> &ex,
-                                               const std::vector<MX> &expr,
-                                               const std::vector<MX> &exprs);
-    static MX zz_matrix_expand(const MX& e, const std::vector<MX> &boundary,
-                                            const Dict& options);
-    static std::vector<MX> zz_matrix_expand(const std::vector<MX>& e,
-                                            const std::vector<MX>& boundary,
-                                            const Dict& options);
-    MX zz_lift(const MX& x_guess) const;
+    static MX find(const MX& x);
+    static MX graph_substitute(const MX& x, const std::vector<MX> &v,
+                               const std::vector<MX> &vdef);
+    static std::vector<MX> graph_substitute(const std::vector<MX> &ex,
+                                            const std::vector<MX> &expr,
+                                            const std::vector<MX> &exprs);
+    static MX matrix_expand(const MX& e, const std::vector<MX> &boundary,
+                            const Dict& options);
+    static std::vector<MX> matrix_expand(const std::vector<MX>& e,
+                                         const std::vector<MX>& boundary,
+                                         const Dict& options);
+    static MX lift(const MX& x, const MX& x_guess);
     ///@}
     /// \endcond
 
@@ -509,7 +469,7 @@ namespace casadi {
      * If failed, returns the number of rows
      */
     inline friend MX find(const MX& x) {
-      return x.zz_find();
+      return MX::find(x);
     }
 
     /** \brief Substitute single expression in graph
@@ -517,7 +477,7 @@ namespace casadi {
      */
     inline friend MX graph_substitute(const MX& ex, const std::vector<MX> &v,
                                       const std::vector<MX> &vdef) {
-      return ex.zz_graph_substitute(v, vdef);
+      return MX::graph_substitute(ex, v, vdef);
     }
 
     /** \brief Substitute multiple expressions in graph
@@ -528,7 +488,7 @@ namespace casadi {
       graph_substitute(const std::vector<MX> &ex,
                        const std::vector<MX> &v,
                        const std::vector<MX> &vdef) {
-      return MX::zz_graph_substitute(ex, v, vdef);
+      return MX::graph_substitute(ex, v, vdef);
     }
 
     /** \brief Expand MX graph to SXFunction call
@@ -540,7 +500,7 @@ namespace casadi {
     inline friend MX
       matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>(),
         const Dict& options = Dict()) {
-      return MX::zz_matrix_expand(e, boundary, options);
+      return MX::matrix_expand(e, boundary, options);
     }
 
     /** \brief Expand MX graph to SXFunction call
@@ -553,7 +513,7 @@ namespace casadi {
       matrix_expand(const std::vector<MX>& e,
                     const std::vector<MX> &boundary = std::vector<MX>(),
                     const Dict& options = Dict()) {
-      return MX::zz_matrix_expand(e, boundary, options);
+      return MX::matrix_expand(e, boundary, options);
     }
 
     /** \brief Lift the expression
@@ -561,7 +521,7 @@ namespace casadi {
      *
      */
     inline friend MX lift(const MX& x, const MX& x_guess) {
-      return x.zz_lift(x_guess);
+      return MX::lift(x, x_guess);
     }
 /** @} */
 #endif // SWIG
@@ -576,13 +536,6 @@ namespace casadi {
     * Returns itself, but with the side effect of printing the nonzeros along with a comment
     */
     MX monitor(const std::string& comment) const;
-
-#if !defined(SWIG) || !defined(SWIGMATLAB)
-
-    /** \brief Set sparse */
-    MX zz_project(const Sparsity& sp, bool intersect=false) const;
-
-#endif // !defined(SWIG) || !defined(SWIGMATLAB)
 
     /// Transpose the matrix
     MX T() const;
@@ -636,7 +589,7 @@ namespace casadi {
     ///@}
 
 #ifndef SWIG
-    /// Construct constant matrix with a given sparsity and all
+    /// Construct constant matrix with a given sparsity and values
     MX(const Sparsity& sp, int val, bool dummy);
     MX(const Sparsity& sp, double val, bool dummy);
   private:

@@ -37,7 +37,7 @@
 #include <algorithm>
 #include <map>
 #include <cmath>
-#include "casadi_exception.hpp"
+#include "exception.hpp"
 #include "casadi_types.hpp"
 
 /** \brief Convenience tools for C++ Standard Library vectors

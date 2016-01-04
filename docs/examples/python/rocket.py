@@ -67,7 +67,7 @@ for k in range(nu):
   [X] = F([X,U[k]])
 
 # Objective function and constraints
-J = mul(U.T,U) # u'*u in Matlab
+J = mtimes(U.T,U) # u'*u in Matlab
 G = X[0:2]     # x(1:2) in Matlab
 
 # NLP

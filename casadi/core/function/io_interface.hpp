@@ -104,179 +104,41 @@ namespace casadi {
      */
     Matrix<double> getOutput(const std::string &oname) const  { return self().output(oname); }
 
-#ifdef DOXYGENPROC
-    /** \brief Set an input by index
-    *
-    *  @copydoc Tvalset
-    *  @copydoc iind
-    */
-
-    void setInput(T val, int iind=0);
-
-     /** \brief Set an output by index
-     *
-     * @copydoc Tvalset
-     * @copydoc oind
-     */
-    void setOutput(T val, int oind=0);
-
-    /** \brief Set an input by name
-    *
-    *  @copydoc Tvalset
-    *  @copydoc iname
-    *
-     */
-    void setInput(T val, const std::string &iname);
-
-    /** \brief Set an output by name
-    *
-    *  @copydoc Tvalset
-    *  @copydoc oname
-    *
-     */
-    void setOutput(T val, const std::string &oname);
-#endif
-
-    /// @}
-
-/// \cond INTERNAL
-#ifdef DOXYGENPROC
-    /// \name Advanced Getters
-    ///
-    /// @{
-
-    /** \brief Get an input by index
-    *
-    *  @copydoc Tvalget
-    *  @copydoc iind
-    */
-
-    void getInput(T val, int iind=0);
-
-     /** \brief Get an output by index
-     *
-     * @copydoc Tvalget
-     * @copydoc oind
-     */
-    void getOutput(T val, int oind=0);
-
-    /** \brief Get an input by name
-    *
-    *  @copydoc Tvalget
-    *  @copydoc iname
-    *
-     */
-    void getInput(T val, const std::string &iname);
-
-    /** \brief Get an output by name
-    *
-    *  @copydoc Tvalget
-    *  @copydoc oname
-    *
-     */
-    void getOutput(T val, const std::string &oname);
-    /// @}
-#endif
-/// \endcond
-
-
-#define SETTERS_SUB_DUMMY(T) \
-    void setInput(T val, int iind=0);                                   \
-    void setOutput(T val, int oind=0);                                  \
-    void setInput(T val, const std::string &iname);                     \
-    void setOutput(T val, const std::string &oname);
-
-#define SETTERS_NZ(T) \
-    void setInputNZ(T val, int iind=0) {                                \
-      try {                                                             \
-        self().input(iind).setNZ(val);                                  \
-      } catch(std::exception& e) {                                      \
-        casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
-      }                                                                 \
-    }                                                                   \
-    void setOutputNZ(T val, int oind=0) {                               \
-      self().output(oind).setNZ(val);              \
-    }                                                                   \
-    void setInputNZ(T val, const std::string &iname) {                  \
-      setInputNZ(val, self().index_in(iname));                        \
-    }                                                                   \
-    void setOutputNZ(T val, const std::string &oname) {                 \
-      setOutputNZ(val, self().index_out(oname));                      \
+#ifndef DOXYGENPROC
+    void setInputNZ(const Matrix<double>& val, int iind=0) {
+      try {
+        self().input(iind).setNZ(val);
+      } catch(std::exception& e) {
+        casadi_error(e.what() << "Occurred at iind = " << iind << ".");
+      }
+    }
+    void setOutputNZ(const Matrix<double>& val, int oind=0) {
+      self().output(oind).setNZ(val);
+    }
+    void setInputNZ(const Matrix<double>& val, const std::string &iname) {
+      setInputNZ(val, self().index_in(iname));
+    }
+    void setOutputNZ(const Matrix<double>& val, const std::string &oname) {
+      setOutputNZ(val, self().index_out(oname));
     }
 
-#define SETTERS_SUB(T)                                                  \
-    void setInput(T val, int iind=0) {                                  \
-      try {                                                             \
-        self().input(iind).set(val);                                    \
-      } catch(std::exception& e) {                                      \
-        casadi_error(e.what() << "Occurred at iind = " << iind << "."); \
-      }                                                                 \
-    }                                                                   \
-    void setOutput(T val, int oind=0) {                                 \
-      self().output(oind).set(val);                \
-    }                                                                   \
-    void setInput(T val, const std::string &iname) {                    \
-      setInput(val, self().index_in(iname));                          \
-    }                                                                   \
-    void setOutput(T val, const std::string &oname) {                   \
-      setOutput(val, self().index_out(oname));                        \
+    void setInput(const Matrix<double>& val, int iind=0) {
+      try {
+        self().input(iind).set(val);
+      } catch(std::exception& e) {
+        casadi_error(e.what() << "Occurred at iind = " << iind << ".");
+      }
     }
-
-#ifndef DOXYGENPROC
-#ifndef SWIG
-    SETTERS_SUB_DUMMY(const double*)
-    SETTERS_SUB_DUMMY(const std::vector<double>&)
-    SETTERS_NZ(const double*) // NOLINT(readability/casting) - false positive
-#endif // SWIG
-    SETTERS_SUB(const Matrix<double>&)
-    SETTERS_NZ(const Matrix<double>&)
+    void setOutput(const Matrix<double>& val, int oind=0) {
+      self().output(oind).set(val);
+    }
+    void setInput(const Matrix<double>& val, const std::string &iname) {
+      setInput(val, self().index_in(iname));
+    }
+    void setOutput(const Matrix<double>& val, const std::string &oname) {
+      setOutput(val, self().index_out(oname));
+    }
 #endif // DOXYGENPROC
-
-#undef SETTERS_NZ
-#undef SETTERS_SUB
-#undef SETTERS_SUB_DUMMY
-
-#define GETTERS_NZ(T)                                           \
-      void getInputNZ(T val, int iind=0) const {                \
-        self().input(iind).getNZ(val);     \
-      }                                                         \
-      void getOutputNZ(T val, int oind=0) const {               \
-        self().output(oind).getNZ(val);    \
-      }                                                         \
-      void getInputNZ(T val, const std::string &iname) const {  \
-        getInputNZ(val, self().index_in(iname));              \
-      }                                                         \
-      void getOutputNZ(T val, const std::string &oname) const { \
-        getOutputNZ(val, self().index_out(oname));            \
-      }
-
-#define GETTERS_SUB(T)                                                  \
-      void getInput(T val, int iind=0) const {                          \
-        self().input(iind).get(val);               \
-      }                                                                 \
-      void getOutput(T val, int oind=0) const {                         \
-        self().output(oind).get(val);              \
-      }                                                                 \
-      void getInput(T val, const std::string &iname) const {            \
-        getInput(val, self().index_in(iname));                        \
-      }                                                                 \
-      void getOutput(T val, const std::string &oname) const {           \
-        getOutput(val, self().index_out(oname));                      \
-      }
-
-#ifndef DOXYGENPROC
-#ifndef SWIG
-GETTERS_SUB(double&)
-#ifndef SWIG
-GETTERS_NZ(double*) // NOLINT(readability/casting) - false positive
-GETTERS_NZ(std::vector<double>&)
-#endif // SWIG
-GETTERS_SUB(Matrix<double>&)
-#endif // SWIG
-#endif // DOXYGENPROC
-#undef GETTERS_NZ
-#undef GETTERS_SUB
-
   };
 
 

@@ -23,7 +23,7 @@
  */
 
 
-#include "lapack_lu_dense.hpp"
+#include "lapack_lu.hpp"
 #include "../../core/std_vector_tools.hpp"
 
 using namespace std;
@@ -32,9 +32,9 @@ namespace casadi {
   extern "C"
   int CASADI_LINSOL_LAPACKLU_EXPORT
   casadi_register_linsol_lapacklu(Linsol::Plugin* plugin) {
-    plugin->creator = LapackLuDense::creator;
+    plugin->creator = LapackLu::creator;
     plugin->name = "lapacklu";
-    plugin->doc = LapackLuDense::meta_doc.c_str();
+    plugin->doc = LapackLu::meta_doc.c_str();
     plugin->version = 23;
     return 0;
   }
@@ -44,7 +44,7 @@ namespace casadi {
     Linsol::registerPlugin(casadi_register_linsol_lapacklu);
   }
 
-  LapackLuDense::LapackLuDense(const std::string& name,
+  LapackLu::LapackLu(const std::string& name,
                                const Sparsity& sparsity, int nrhs)
     : Linsol(name, sparsity, nrhs) {
 
@@ -53,57 +53,69 @@ namespace casadi {
     addOption("allow_equilibration_failure", OT_BOOLEAN, false);
   }
 
-  LapackLuDense::~LapackLuDense() {
+  LapackLu::~LapackLu() {
   }
 
-  void LapackLuDense::init() {
+  void LapackLu::init() {
     // Call the base class initializer
     Linsol::init();
 
     // Get dimensions
-    ncol_ = ncol();
-    nrow_ = nrow();
-
-    // Currently only square matrices tested
-    if (ncol_!=nrow_) throw CasadiException(
-      "LapackLuDense::LapackLuDense: currently only square matrices implemented.");
-
-    // Allocate matrix
-    mat_.resize(ncol_*ncol_);
-    ipiv_.resize(ncol_);
+    casadi_assert(nrow()==ncol());
 
     // Equilibrate?
     equilibriate_ = option("equilibration").toInt();
-    if (equilibriate_) {
-      r_.resize(ncol_);
-      c_.resize(nrow_);
-    }
-    equed_ = 'N'; // No equilibration
 
     // Allow equilibration failures
     allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
   }
 
-  void LapackLuDense::linsol_factorize(Memory& m, const double* A) {
+  Memory* LapackLu::memory() const {
+    LapackLuMemory* m = new LapackLuMemory();
+    try {
+      // Allocate matrix
+      m->mat.resize(nrow() * ncol());
+      m->ipiv.resize(ncol());
+
+      // Equilibration
+      if (equilibriate_) {
+        m->r.resize(nrow());
+        m->c.resize(ncol());
+      }
+      m->equed = 'N'; // No equilibration
+
+      return m;
+    } catch (...) {
+      delete m;
+      return 0;
+    }
+  }
+
+  void LapackLu::linsol_factorize(Memory& mem, const double* A) const {
+    LapackLuMemory& m = dynamic_cast<LapackLuMemory&>(mem);
+
+    // Dimensions
+    int nrow = this->nrow();
+    int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, getPtr(mat_), false);
+    casadi_densify(A, sparsity_, getPtr(m.mat), false);
 
     if (equilibriate_) {
       // Calculate the col and row scaling factors
       double colcnd, rowcnd; // ratio of the smallest to the largest col/row scaling factor
       double amax; // absolute value of the largest matrix element
       int info = -100;
-      dgeequ_(&ncol_, &nrow_, getPtr(mat_), &ncol_, getPtr(r_),
-              getPtr(c_), &colcnd, &rowcnd, &amax, &info);
+      dgeequ_(&ncol, &nrow, getPtr(m.mat), &ncol, getPtr(m.r),
+              getPtr(m.c), &colcnd, &rowcnd, &amax, &info);
       if (info < 0)
           throw CasadiException("LapackQrDense::prepare: "
                                 "dgeequ_ failed to calculate the scaling factors");
       if (info>0) {
         stringstream ss;
-        ss << "LapackLuDense::prepare: ";
-        if (info<=ncol_)  ss << (info-1) << "-th row (zero-based) is exactly zero";
-        else             ss << (info-1-ncol_) << "-th col (zero-based) is exactly zero";
+        ss << "LapackLu::prepare: ";
+        if (info<=ncol)  ss << (info-1) << "-th row (zero-based) is exactly zero";
+        else             ss << (info-1-ncol) << "-th col (zero-based) is exactly zero";
 
         userOut() << "Warning: " << ss.str() << endl;
 
@@ -115,56 +127,58 @@ namespace casadi {
 
       // Equilibrate the matrix if scaling was successful
       if (info!=0)
-        dlaqge_(&ncol_, &nrow_, getPtr(mat_), &ncol_, getPtr(r_), getPtr(c_),
-                &colcnd, &rowcnd, &amax, &equed_);
+        dlaqge_(&ncol, &nrow, getPtr(m.mat), &ncol, getPtr(m.r), getPtr(m.c),
+                &colcnd, &rowcnd, &amax, &m.equed);
       else
-        equed_ = 'N';
+        m.equed = 'N';
     }
 
     // Factorize the matrix
     int info = -100;
-    dgetrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(ipiv_), &info);
-    casadi_assert_message(info==0, "LapackLuDense::prepare: "
+    dgetrf_(&ncol, &ncol, getPtr(m.mat), &ncol, getPtr(m.ipiv), &info);
+    casadi_assert_message(info==0, "LapackLu::prepare: "
                           "dgetrf_ failed to factorize the Jacobian");
   }
 
-  void LapackLuDense::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
+  void LapackLu::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
+    LapackLuMemory& m = dynamic_cast<LapackLuMemory&>(mem);
+
+    // Dimensions
+    int nrow = this->nrow();
+    int ncol = this->ncol();
+
     // Scale the right hand side
     if (tr) {
-      rowScaling(x, nrhs);
+      if (m.equed=='C' || m.equed=='B')
+        for (int rhs=0; rhs<nrhs; ++rhs)
+          for (int i=0; i<nrow; ++i)
+            x[i+rhs*nrow] *= m.c[i];
     } else {
-      colScaling(x, nrhs);
+      if (m.equed=='R' || m.equed=='B')
+        for (int rhs=0; rhs<nrhs; ++rhs)
+          for (int i=0; i<ncol; ++i)
+            x[i+rhs*nrow] *= m.r[i];
     }
 
     // Solve the system of equations
     int info = 100;
     char trans = tr ? 'T' : 'N';
-    dgetrs_(&trans, &ncol_, &nrhs, getPtr(mat_), &ncol_, getPtr(ipiv_), x, &ncol_, &info);
-    if (info != 0) throw CasadiException("LapackLuDense::solve: "
+    dgetrs_(&trans, &ncol, &nrhs, getPtr(m.mat), &ncol, getPtr(m.ipiv), x, &ncol, &info);
+    if (info != 0) throw CasadiException("LapackLu::solve: "
                                         "failed to solve the linear system");
 
     // Scale the solution
     if (tr) {
-      colScaling(x, nrhs);
+      if (m.equed=='R' || m.equed=='B')
+        for (int rhs=0; rhs<nrhs; ++rhs)
+          for (int i=0; i<ncol; ++i)
+            x[i+rhs*nrow] *= m.r[i];
     } else {
-      rowScaling(x, nrhs);
+      if (m.equed=='C' || m.equed=='B')
+        for (int rhs=0; rhs<nrhs; ++rhs)
+          for (int i=0; i<nrow; ++i)
+            x[i+rhs*nrow] *= m.c[i];
     }
-  }
-
-  void LapackLuDense::colScaling(double* x, int nrhs) {
-    // Scale result if this was done to the matrix
-    if (equed_=='R' || equed_=='B')
-      for (int rhs=0; rhs<nrhs; ++rhs)
-        for (int i=0; i<ncol_; ++i)
-          x[i+rhs*nrow_] *= r_[i];
-  }
-
-  void LapackLuDense::rowScaling(double* x, int nrhs) {
-    // Scale right hand side if this was done to the matrix
-    if (equed_=='C' || equed_=='B')
-      for (int rhs=0; rhs<nrhs; ++rhs)
-        for (int i=0; i<nrow_; ++i)
-          x[i+rhs*nrow_] *= c_[i];
   }
 
 } // namespace casadi

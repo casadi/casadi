@@ -8,8 +8,8 @@ casadi_plugin(Linsol csparse
 casadi_plugin_link_libraries(Linsol csparse ${CSPARSE_LIBRARIES})
 
 casadi_plugin(Linsol csparsecholesky
-  csparse_cholesky_internal.hpp
-  csparse_cholesky_internal.cpp
-  csparse_cholesky_internal_meta.cpp
+  csparse_cholesky_interface.hpp
+  csparse_cholesky_interface.cpp
+  csparse_cholesky_interface_meta.cpp
   )
 casadi_plugin_link_libraries(Linsol csparsecholesky ${CSPARSE_LIBRARIES})

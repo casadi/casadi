@@ -62,9 +62,9 @@ namespace casadi {
     SX X = SX::sym("X", n_, 1);
 
     // Parameters to the problem
-    SX H = SX::sym("H", input(QPSOL_H).sparsity());
-    SX G = SX::sym("G", input(QPSOL_G).sparsity());
-    SX A = SX::sym("A", input(QPSOL_A).sparsity());
+    SX H = SX::sym("H", sparsity_in(QPSOL_H));
+    SX G = SX::sym("G", sparsity_in(QPSOL_G));
+    SX A = SX::sym("A", sparsity_in(QPSOL_A));
 
     // Put parameters in a vector
     std::vector<SX> par;
@@ -74,7 +74,7 @@ namespace casadi {
 
     // The nlp looks exactly like a mathematical description of the NLP
     SXDict nlp = {{"x", X}, {"p", vertcat(par)},
-                  {"f", mul(G.T(), X) + 0.5*mul(mul(X.T(), H), X)}, {"g", mul(A, X)}};
+                  {"f", mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X)}, {"g", mtimes(A, X)}};
 
     Dict options;
     if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");

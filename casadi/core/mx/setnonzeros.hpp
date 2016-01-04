@@ -92,19 +92,19 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -114,7 +114,7 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     /// Operation sequence
     std::vector<int> nz_;
@@ -141,20 +141,20 @@ namespace casadi {
     virtual void simplifyMe(MX& ex);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -164,7 +164,7 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     // Data member
     Slice s_;
@@ -186,20 +186,20 @@ namespace casadi {
     virtual std::vector<int> getAll() const { return inner_.getAll(outer_, outer_.stop_);}
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
@@ -209,7 +209,7 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     // Data members
     Slice inner_, outer_;

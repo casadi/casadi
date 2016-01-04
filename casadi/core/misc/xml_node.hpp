@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../casadi_exception.hpp"
+#include "../exception.hpp"
 
 /// \cond INTERNAL
 

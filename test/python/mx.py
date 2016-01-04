@@ -128,10 +128,10 @@ class MXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: fmax(a[0],a[1]),lambda a: fmax(a[0],a[1]),"fmin")
 
     self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
-    self.matrixbinarypool.append(lambda a: mul(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"mtimes(Matrix,Matrix.T)")
     self.matrixbinarypool.append(lambda a: arctan2(a[0],a[1]),lambda a: arctan2(a[0],a[1]),"arctan2")
     #self.matrixbinarypool.append(lambda a: inner_mul(a[0],trans(a[1])),lambda a: c.dot(a[0].T,a[1]),name="inner_mul(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: mul(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"mtimes(Matrix,Matrix.T)")
     
   def test_MX1(self):
     self.message("MX constructor")
@@ -758,9 +758,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX.sym("x",n,1)
     
-    Axb = mul(A,x)+b
-    Dxe = mul(D,x)+e
-    a = mul(mul(Axb.T,C),Dxe)
+    Axb = mtimes(A,x)+b
+    Dxe = mtimes(D,x)+e
+    a = mtimes(mtimes(Axb.T,C),Dxe)
     
     f = Function("f", [x,A,b,C,D,e],[a])
     f.setInput(x_,0)
@@ -823,9 +823,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX.sym("x",n,1)
     
-    Axb = mul(A,x)+b
-    Dxe = mul(D,x)+e
-    a = mul(mul(Axb.T,C),Dxe)
+    Axb = mtimes(A,x)+b
+    Dxe = mtimes(D,x)+e
+    a = mtimes(mtimes(Axb.T,C),Dxe)
     
     f = Function("f", [x,A,b,C,D,e],[a])
     f.setInput(x_,0)
@@ -897,9 +897,9 @@ class MXtests(casadiTestCase):
     x_ = numpy.random.random((n,1))
     x = MX.sym("x",n,1)
     
-    Axb = mul(A,x)+b
-    Dxe = mul(D,x)+e
-    a = mul(mul(Axb.T,C),Dxe)
+    Axb = mtimes(A,x)+b
+    Dxe = mtimes(D,x)+e
+    a = mtimes(mtimes(Axb.T,C),Dxe)
     
     f = Function("f", [x,A,b,C,D,e],[a])
     f.setInput(x_,0)
@@ -1061,30 +1061,30 @@ class MXtests(casadiTestCase):
     def eye(n):
       return DM(numpy.eye(n))
     
-    Axb = mul(A,x)-b
-    ab = mul(a,b.T)
+    Axb = mtimes(A,x)-b
+    ab = mtimes(a,b.T)
     tests = [
     (grad(x,x),eye(k)),
     (grad(x,x.T),eye(k)),
     (grad(x,Axb),A.T),
     #(grad(x,Axb.T),A)   incorrect?
-    (grad(x,mul(Axb.T,Axb)),2*mul(A.T,Axb)),
-    #(grad(x,norm_2(Axb)),mul(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
-    (grad(x,mul(mul(x.T,A),x)+2*mul(mul(x.T,B),y)+mul(mul(y.T,C),y)),mul((A+A.T),x)+2*mul(B,y)),
-    #(grad(x,mul(a.T,mul(x.T,x)*b)),2*mul(mul(x,a.T),b))
+    (grad(x,mtimes(Axb.T,Axb)),2*mtimes(A.T,Axb)),
+    #(grad(x,norm_2(Axb)),mtimes(A.T,Axb)/norm_2(Axb)), #  norm_2 not implemented
+    (grad(x,mtimes(mtimes(x.T,A),x)+2*mtimes(mtimes(x.T,B),y)+mtimes(mtimes(y.T,C),y)),mtimes((A+A.T),x)+2*mtimes(B,y)),
+    #(grad(x,mtimes(a.T,mtimes(x.T,x)*b)),2*mtimes(mtimes(x,a.T),b))
     (grad(X,X),eye(k**2)),
     #(grad(X,X.T),eye(k**2))
-    (grad(X,mul(a.T,mul(X,b))),ab),
-    (grad(X,mul(b.T,mul(X.T,a))),ab),
-    (grad(X,mul(a.T,mul(mul(X,X),b))),mul(X.T,ab)+mul(ab,X.T)),
-    (grad(X,mul(a.T,mul(mul(X.T,X),b))),mul(X,ab + ab.T)),
+    (grad(X,mtimes(a.T,mtimes(X,b))),ab),
+    (grad(X,mtimes(b.T,mtimes(X.T,a))),ab),
+    (grad(X,mtimes(a.T,mtimes(mtimes(X,X),b))),mtimes(X.T,ab)+mtimes(ab,X.T)),
+    (grad(X,mtimes(a.T,mtimes(mtimes(X.T,X),b))),mtimes(X,ab + ab.T)),
     (grad(x,x*mu),MX(eye(k))*mu),
     (grad(X,c.trace(X*mu)),MX(eye(k))*mu),
-    (grad(X,c.trace(mul(X.T,Y))),Y),
-    (grad(X,c.trace(mul(Y,X.T))),Y),
-    (grad(X,c.trace(mul(Y.T,X))),Y),
-    (grad(X,c.trace(mul(X,Y.T))),Y),
-    (grad(X,c.trace(mul(a.T,mul(X,b)))),ab)
+    (grad(X,c.trace(mtimes(X.T,Y))),Y),
+    (grad(X,c.trace(mtimes(Y,X.T))),Y),
+    (grad(X,c.trace(mtimes(Y.T,X))),Y),
+    (grad(X,c.trace(mtimes(X,Y.T))),Y),
+    (grad(X,c.trace(mtimes(a.T,mtimes(X,b)))),ab)
     #(grad(X,log(c.det(X))),c.inv(X_)),
     ]
 
@@ -1189,24 +1189,24 @@ class MXtests(casadiTestCase):
     y[[0, 2]]
     y[[0, 2]] = MX.sym("a")
     
-  def test_mul(self):
+  def test_mtimes(self):
     A = MX(DM.ones((4,3)))
     B = MX(DM.ones((3,8)))
     C = MX(DM.ones((8,7)))
     
-    self.assertRaises(RuntimeError,lambda : mul([]))
+    self.assertRaises(RuntimeError,lambda : mtimes([]))
     
-    D = mul([A])
+    D = mtimes([A])
     
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],3)
 
-    D = mul([A,B])
+    D = mtimes([A,B])
     
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],8)
     
-    D = mul([A,B,C])
+    D = mtimes([A,B,C])
     
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],7)
@@ -1421,7 +1421,7 @@ class MXtests(casadiTestCase):
     self.assertTrue(hash(vec(x))==hash(x))
     self.assertTrue(hash(vecNZ(x))==hash(x))
     
-  def test_constmxmul(self):
+  def test_constmxmtimes(self):
     0.1*MX.ones(2)
 
   def test_is_regular(self):
@@ -1529,7 +1529,7 @@ class MXtests(casadiTestCase):
 
     filt = Sparsity.diag(N)+Sparsity.triplet(N,N,[1],[3])
 
-    f = Function("f", [x,y],[mul(x,y)])
+    f = Function("f", [x,y],[mtimes(x,y)])
     f.setInput(x_,0)
     f.setInput(y_,1)
     g = Function("g", [x,y],[mac(x,y,MX.zeros(filt))])
@@ -1545,7 +1545,7 @@ class MXtests(casadiTestCase):
     
   def test_mul_zero_wrong(self):
     with self.assertRaises(RuntimeError):
-      mul(MX.sym("X",4,5),MX.zeros(3,2))
+      mtimes(MX.sym("X",4,5),MX.zeros(3,2))
       
   def test_vertsplit(self):
     a = MX.sym("X",Sparsity.lower(5))
@@ -1707,14 +1707,14 @@ class MXtests(casadiTestCase):
      a = MX(5,0)
      b = MX(0,3)
      
-     c = mul(a,b)
+     c = mtimes(a,b)
      
      self.assertEqual(c.nnz(),0)
      
      a = MX(5,3)
      b = MX(3,4)
      
-     c = mul(a,b)
+     c = mtimes(a,b)
      
      self.assertEqual(c.nnz(),0)
      
@@ -1774,7 +1774,7 @@ class MXtests(casadiTestCase):
               xx2s = SX.sym("x",sp2.size1(),sp2.size2())
               x2s=xx2s[sp2]
               for (casadiop, numpyop,name, flags) in self.matrixbinarypool.zip():
-                if "mul" in name and (sp.numel()==1 or sp2.numel()==1): continue
+                if ("mul" in name or "mtimes" in name) and (sp.numel()==1 or sp2.numel()==1): continue
                 r = casadiop([x1,x2])
                 f = Function("f", [xx1,xx2],[r])
                 f.setInput(v1,0)
@@ -1837,14 +1837,14 @@ class MXtests(casadiTestCase):
               x2_ = DM(sp2,v2)
               x2=MX(sp2,v2)
               for (casadiop, numpyop,name, flags) in self.matrixbinarypool.zip():
-                if "mul" in name and (sp.numel()==1 or sp2.numel()==1): continue
+                if ("mul" in name or "mtimes" in name) and (sp.numel()==1 or sp2.numel()==1): continue
                 r = casadiop([x1,x2])
                 f = Function("f", [],[r]) # Should not be needed -> constant folding
                 f.evaluate()
                
                 
                 self.checkarray(f.getOutput(),numpyop([x1_,x2_]),str([sp,sp2,v1,v2,name]))
-                if "mul" not in name:
+                if "mul" not in name and "mtimes" not in name:
                   a = IM.ones(f.sparsity_out(0))
                   b = IM.ones(DM(numpyop([x1_,x2_])).sparsity())
                   
@@ -1949,7 +1949,7 @@ class MXtests(casadiTestCase):
     
   def test_project(self):
     x = MX.sym("x",Sparsity.lower(3))
-    y = x.project(Sparsity.lower(3).T)
+    y = project(x, Sparsity.lower(3).T)
     
     f = Function("f", [x],[y])
     

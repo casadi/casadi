@@ -33,7 +33,7 @@
 #include "../std_vector_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
-#include "../matrix/sparsity_internal.hpp"
+#include "../sparsity_internal.hpp"
 #include "../casadi_options.hpp"
 #include "../casadi_interrupt.hpp"
 
@@ -72,15 +72,10 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    double time_start=0;
-    double time_stop=0;
-
+  void SXFunction::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     casadi_msg("SXFunction::eval():begin  " << name_);
 
-    // NOTE: The implementation of this function is very delicate. Small changes in the
-    // class structure can cause large performance losses. For this reason,
-    // the preprocessor macros are used below
+    // Make sure no free parameters
     if (!free_vars_.empty()) {
       std::stringstream ss;
       repr(ss);
@@ -88,23 +83,20 @@ namespace casadi {
                    << free_vars_ << " are free.");
     }
 
-#ifdef WITH_OPENCL
-    if (just_in_time_opencl_) {
-      // Evaluate with OpenCL
-      return evaluateOpenCL();
-    }
-#endif // WITH_OPENCL
+    // NOTE: The implementation of this function is very delicate. Small changes in the
+    // class structure can cause large performance losses. For this reason,
+    // the preprocessor macros are used below
 
     // Evaluate the algorithm
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      switch (it->op) {
-        CASADI_MATH_FUN_BUILTIN(w[it->i1], w[it->i2], w[it->i0])
+    for (auto&& e : algorithm_) {
+      switch (e.op) {
+        CASADI_MATH_FUN_BUILTIN(w[e.i1], w[e.i2], w[e.i0])
 
-      case OP_CONST: w[it->i0] = it->d; break;
-      case OP_INPUT: w[it->i0] = arg[it->i1]==0 ? 0 : arg[it->i1][it->i2]; break;
-      case OP_OUTPUT: if (res[it->i0]!=0) res[it->i0][it->i2] = w[it->i1]; break;
+      case OP_CONST: w[e.i0] = e.d; break;
+      case OP_INPUT: w[e.i0] = arg[e.i1]==0 ? 0 : arg[e.i1][e.i2]; break;
+      case OP_OUTPUT: if (res[e.i0]!=0) res[e.i0][e.i2] = w[e.i1]; break;
       default:
-        casadi_error("SXFunction::eval: Unknown operation" << it->op);
+        casadi_error("SXFunction::eval: Unknown operation" << e.op);
       }
     }
 

@@ -26,14 +26,14 @@
 #ifndef CASADI_SPARSITY_HPP
 #define CASADI_SPARSITY_HPP
 
-#include "../shared_object.hpp"
-#include "../casadi_types.hpp"
+#include "shared_object.hpp"
+#include "casadi_types.hpp"
 #include "sparsity_interface.hpp"
 #include <vector>
 #include <list>
 #include <limits>
 #include <unordered_map>
-#include "../weak_ref.hpp"
+#include "weak_ref.hpp"
 
 namespace casadi {
 
@@ -100,9 +100,10 @@ namespace casadi {
     typedef SparsityInterface<Sparsity> B;
 
     /// Expose base class functions
-    using B::zz_horzsplit;
-    using B::zz_diagsplit;
-    using B::zz_vertsplit;
+    using B::horzsplit;
+    using B::diagsplit;
+    using B::vertsplit;
+    using B::mtimes;
 #endif
 
     /** \brief Create a scalar sparsity pattern **/
@@ -255,11 +256,11 @@ namespace casadi {
 
     /** \brief Number of non-zeros in the upper triangular half,
      * i.e. the number of elements (i, j) with j>=i */
-    int nnz_upper() const;
+    int nnz_upper(bool strictly=false) const;
 
     /** \brief Number of non-zeros in the lower triangular half,
      * i.e. the number of elements (i, j) with j<=i */
-    int nnz_lower() const;
+    int nnz_lower(bool strictly=false) const;
 
     /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i */
     int nnz_diag() const;
@@ -448,20 +449,24 @@ namespace casadi {
     static Sparsity vertcat(const std::vector<Sparsity> & sp);
     static Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
     static Sparsity diagcat(const std::vector< Sparsity > &v);
-    std::vector<Sparsity> zz_horzsplit(const std::vector<int>& output_offset) const;
-    std::vector<Sparsity> zz_vertsplit(const std::vector<int>& output_offset) const;
-    std::vector<Sparsity> zz_diagsplit(const std::vector<int>& offset1,
-                                       const std::vector<int>& offset2) const;
-    Sparsity zz_mtimes(const Sparsity& y) const;
-    Sparsity zz_mac(const Sparsity& Y, const Sparsity& Z) const { return Z;}
-    Sparsity zz_vecNZ() const;
-    Sparsity zz_reshape(int nrow, int ncol) const;
-    Sparsity zz_reshape(const Sparsity& sp) const;
-    int zz_sprank() const;
-    int zz_norm_0_mul(const Sparsity& B) const;
-    Sparsity zz_kron(const Sparsity& b) const;
-    Sparsity zz_triu(bool includeDiagonal=true) const;
-    Sparsity zz_tril(bool includeDiagonal=true) const;
+    static std::vector<Sparsity>
+      horzsplit(const Sparsity& x, const std::vector<int>& output_offset);
+    static std::vector<Sparsity>
+      vertsplit(const Sparsity& x, const std::vector<int>& output_offset);
+    static std::vector<Sparsity>
+      diagsplit(const Sparsity& x,
+                const std::vector<int>& offset1,
+                const std::vector<int>& offset2);
+    static Sparsity mtimes(const Sparsity& x, const Sparsity& y);
+    static Sparsity mac(const Sparsity& x, const Sparsity& y, const Sparsity& z) { return z;}
+    static Sparsity vecNZ(const Sparsity& x);
+    static Sparsity reshape(const Sparsity& x, int nrow, int ncol);
+    static Sparsity reshape(const Sparsity& x, const Sparsity& sp);
+    static int sprank(const Sparsity& x);
+    static int norm_0_mul(const Sparsity& x, const Sparsity& B);
+    static Sparsity kron(const Sparsity& x, const Sparsity& b);
+    static Sparsity triu(const Sparsity& x, bool includeDiagonal=true);
+    static Sparsity tril(const Sparsity& x, bool includeDiagonal=true);
 #endif //SWIG
 
     /** \brief Enlarge matrix

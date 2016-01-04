@@ -39,15 +39,6 @@
 using namespace std;
 #include <IpIpoptApplication.hpp>
 
-// Headers for sIPOPT
-#ifdef WITH_SIPOPT
-#include <SensApplication.hpp>
-#include <IpPDSearchDirCalc.hpp>
-#include <IpIpoptAlg.hpp>
-#include <SensRegOp.hpp>
-#include <SensReducedHessianCalculator.hpp>
-#endif // WITH_SIPOPT
-
 namespace casadi {
   extern "C"
   int CASADI_NLPSOL_IPOPT_EXPORT
@@ -98,22 +89,9 @@ namespace casadi {
     // Set pointers to zero
     app_ = 0;
     userclass_ = 0;
-#ifdef WITH_SIPOPT
-    app_sens_ = 0;
-#endif // WITH_SIPOPT
 
     // Start an application (temporarily)
     Ipopt::IpoptApplication temp_app;
-
-    // Start a sensitivity application (temporarily)
-#ifdef WITH_SIPOPT
-    Ipopt::SensApplication temp_sens_app(temp_app.Jnlst(), temp_app.Options(),
-                                         temp_app.RegOptions());
-
-    // Register sIPOPT options
-    Ipopt::RegisterOptions_sIPOPT(temp_app.RegOptions());
-    temp_app.Options()->SetRegisteredOptions(temp_app.RegOptions());
-#endif // WITH_SIPOPT
 
     // Get all options available in (s)IPOPT
     map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> > regops =
@@ -162,14 +140,6 @@ namespace casadi {
   }
 
   IpoptInterface::~IpoptInterface() {
-    // Free sensitivity application (or rather, the smart pointer holding it)
-#ifdef WITH_SIPOPT
-    if (app_sens_ != 0) {
-      delete static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
-      app_sens_ = 0;
-    }
-#endif // WITH_SIPOPT
-
     // Free Ipopt application instance (or rather, the smart pointer holding it)
     if (app_ != 0) {
       delete static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
@@ -190,18 +160,9 @@ namespace casadi {
     // Read user options
     exact_hessian_ = !hasSetOption("hessian_approximation") ||
         option("hessian_approximation")=="exact";
-#ifdef WITH_SIPOPT
-    if (hasSetOption("run_sens")) {
-      run_sens_ = option("run_sens")=="yes";
-    } else {
-      run_sens_  = false;
-    }
-    if (hasSetOption("compute_red_hessian")) {
-      compute_red_hessian_ = option("compute_red_hessian")=="yes";
-    } else {
-      compute_red_hessian_ = false;
-    }
-#endif // WITH_SIPOPT
+
+    // Identify nonlinear variables
+    pass_nonlinear_variables_ = option("pass_nonlinear_variables");
 
     // Start an IPOPT application
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
@@ -214,21 +175,6 @@ namespace casadi {
     jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
     SmartPtr<Journal> jrnl = jrnl_raw;
     (*app)->Jnlst()->AddJournal(jrnl);
-
-#ifdef WITH_SIPOPT
-    if (run_sens_ || compute_red_hessian_) {
-      // Start an sIPOPT application
-      Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
-          new Ipopt::SmartPtr<Ipopt::SensApplication>();
-      app_sens_ = static_cast<void*>(app_sens);
-      *app_sens =
-          new Ipopt::SensApplication((*app)->Jnlst(), (*app)->Options(), (*app)->RegOptions());
-
-      // Register sIPOPT options
-      Ipopt::RegisterOptions_sIPOPT((*app)->RegOptions());
-      (*app)->Options()->SetRegisteredOptions((*app)->RegOptions());
-    }
-#endif // WITH_SIPOPT
 
     // Create an Ipopt user class -- need to use Ipopts spart pointer class
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass = new Ipopt::SmartPtr<Ipopt::TNLP>();
@@ -264,31 +210,28 @@ namespace casadi {
 
     if (!ret) casadi_error("IpoptInterface::Init: Invalid options were detected by Ipopt.");
 
-    // Extra initialization required by sIPOPT
-    //   #ifdef WITH_SIPOPT
-    //   if (run_sens_ || compute_red_hessian_) {
-    //     Ipopt::ApplicationReturnStatus status = (*app)->Initialize("");
-    //     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
-    //   }
-    //   #endif // WITH_SIPOPT
-
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
 
-#ifdef WITH_SIPOPT
-    if (run_sens_ || compute_red_hessian_) {
-      Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
-          static_cast<Ipopt::SmartPtr<Ipopt::SensApplication> *>(app_sens_);
-      (*app_sens)->Initialize();
-    }
-#endif // WITH_SIPOPT
-
     // Setup NLP functions
-    if (nlp2_.is_sx) {
-      setup<SX>();
-    } else {
-      setup<MX>();
+    setup_f(); // Objective
+    setup_g(); // Constraints
+    setup_grad_f(); // Gradient of the objective
+    setup_jac_g(); // Jacobian of the constraits
+    if (exact_hessian_) {
+      setup_hess_l(); // Hessian of the Lagrangian
+    } else if (pass_nonlinear_variables_) {
+      if (nlp2_.is_sx) {
+        const Problem<SX>& nlp = nlp2_;
+        SX fg = veccat(vector<SX>{nlp.out[NL_F], nlp.out[NL_G]});
+        nl_ex_ = nl_var(fg, nlp.in[NL_X]);
+      } else {
+        const Problem<MX>& nlp = nlp2_;
+        MX fg = veccat(vector<MX>{nlp.out[NL_F], nlp.out[NL_G]});
+        nl_ex_ = nl_var(fg, nlp.in[NL_X]);
+      }
+
     }
 
     // Allocate work vectors
@@ -317,9 +260,6 @@ namespace casadi {
     if (exact_hessian_) {
       hess_lk_ = w; w += hesslag_sp_.nnz();
     }
-
-    // New iterate
-    new_x_ = new_lam_f_ = new_lam_g_ = true;
   }
 
   void IpoptInterface::solve(void* mem) {
@@ -364,32 +304,6 @@ namespace casadi {
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
     t_mainloop_ = diffTimers(getTimerTime(), time0);
-
-#ifdef WITH_SIPOPT
-    if (run_sens_ || compute_red_hessian_) {
-      // Calculate parametric sensitivities
-      Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
-          static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
-      (*app_sens)->SetIpoptAlgorithmObjects(*app, status);
-      (*app_sens)->Run();
-
-      // Access the reduced Hessian calculator
-#ifdef WITH_CASADI_PATCH
-      if (compute_red_hessian_) {
-        // Get the reduced Hessian
-        std::vector<double> red_hess = (*app_sens)->ReducedHessian();
-
-        // Get the dimensions
-        int N;
-        for (N=0; N*N<red_hess.size(); ++N) {}
-        casadi_assert(N*N==red_hess.size());
-
-        // Store to statistics
-        red_hess_ = DM(Sparsity::dense(N, N), red_hess);
-      }
-#endif // WITH_CASADI_PATCH
-    }
-#endif // WITH_SIPOPT
 
     // Save results to outputs
     casadi_copy(&fk_, 1, f_);
@@ -633,7 +547,7 @@ namespace casadi {
       nnz_jac_g = ng_==0 ? 0 : jacg_sp_.nnz();
 
       // Number of Hessian nonzeros (only upper triangular half)
-      nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz_upper() : 0;
+      nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz() : 0;
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_nlp_info failed: " << ex.what() << endl;
@@ -642,24 +556,13 @@ namespace casadi {
 
   int IpoptInterface::get_number_of_nonlinear_variables() {
     try {
-      if (!static_cast<bool>(option("pass_nonlinear_variables"))) {
+      if (!pass_nonlinear_variables_) {
         // No Hessian has been interfaced
         return -1;
       } else {
         // Number of variables that appear nonlinearily
         int nv = 0;
-
-        // Loop over the cols
-        const Sparsity& spHessLag = this->spHessLag();
-        const int* colind = spHessLag.colind();
-        int ncol = spHessLag.size2();
-        for (int i=0; i<ncol; ++i) {
-          // If the col contains any non-zeros, the corresponding variable appears nonlinearily
-          if (colind[i]!=colind[i+1])
-            nv++;
-        }
-
-        // Return the number
+        for (auto&& i : nl_ex_) if (i) nv++;
         return nv;
       }
     } catch(exception& ex) {
@@ -670,22 +573,9 @@ namespace casadi {
 
   bool IpoptInterface::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) {
     try {
-      // Running index
-      int el = 0;
-
-      // Loop over the cols
-      const Sparsity& spHessLag = this->spHessLag();
-      const int* colind = spHessLag.colind();
-      int ncol = spHessLag.size2();
-      for (int i=0; i<ncol; ++i) {
-        // If the col contains any non-zeros, the corresponding variable appears nonlinearily
-        if (colind[i]!=colind[i+1]) {
-          pos_nonlin_vars[el++] = i;
-        }
+      for (int i=0; i<nl_ex_.size(); ++i) {
+        if (nl_ex_[i]) *pos_nonlin_vars++ = i;
       }
-
-      // Assert number and return
-      casadi_assert(el==num_nonlin_vars);
       return true;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
@@ -845,340 +735,6 @@ namespace casadi {
         setOption("jac_d_constant", "yes");
         setOption("hessian_constant", "yes");
       }
-    }
-  }
-
-  DM IpoptInterface::getReducedHessian() {
-#ifndef WITH_SIPOPT
-    casadi_error("This feature requires sIPOPT support. Please consult the CasADi documentation.");
-#else // WITH_SIPOPT
-#ifndef WITH_CASADI_PATCH
-    casadi_error("Retrieving the Hessian requires the CasADi sIPOPT patch. "
-                 "Please consult the CasADi documentation.");
-#else // WITH_CASADI_PATCH
-    return red_hess_;
-#endif // WITH_SIPOPT
-#endif // WITH_CASADI_PATCH
-  }
-
-  void IpoptInterface::set_x(const double *x) {
-    // Is a recalculation needed
-    if (new_x_ || !equal(x, x+nx_, xk_)) {
-      copy_n(x, nx_, xk_);
-      have_fk_ = have_gk_ = have_hess_lk_ = have_grad_lk_ = have_grad_fk_
-        = have_jac_gk_ = false;
-      new_x_ = false;
-    }
-  }
-
-  void IpoptInterface::set_lam_f(double lam_f) {
-    // Is a recalculation needed
-    if (new_lam_f_ || lam_f != lam_fk_) {
-      lam_fk_ = lam_f;
-      have_hess_lk_ = have_grad_lk_ = false;
-      new_lam_f_ = false;
-    }
-  }
-
-  void IpoptInterface::set_lam_g(const double *lam_g) {
-    // Is a recalculation needed
-    if (new_lam_g_ || !equal(lam_g, lam_g+ng_, lam_gk_)) {
-      copy_n(lam_g, ng_, lam_gk_);
-      have_hess_lk_ = have_grad_lk_ = false;
-      new_lam_g_ = false;
-    }
-  }
-
-  int IpoptInterface::calc_f(double* f) {
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    // Calculate, if needed
-    if (!have_fk_) {
-      fill_n(arg_, f_fcn_.n_in(), nullptr);
-      arg_[F_X] = xk_;
-      arg_[F_P] = p_;
-      fill_n(res_, f_fcn_.n_out(), nullptr);
-      res_[F_F] = &fk_;
-      n_calc_f_ += 1;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        f_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!isfinite(fk_)) {
-        userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf or NaN detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_f_ += 1;
-      t_calc_f_ += chrono::duration<double>(t_stop - t_start).count();
-      have_fk_ = true;
-    }
-
-    // Return to user
-    if (f) *f = fk_;
-
-    // Success
-    return 0;
-  }
-
-  template<typename M>
-  void IpoptInterface::setup_f() {
-    const Problem<M>& nlp = nlp2_;
-    vector<M> arg(F_NUM_IN);
-    arg[F_X] = nlp.in[NL_X];
-    arg[F_P] = nlp.in[NL_P];
-    vector<M> res(F_NUM_OUT);
-    res[F_F] = nlp.out[NL_F];
-    f_fcn_ = Function("nlp_f", arg, res);
-    alloc(f_fcn_);
-  }
-
-  int IpoptInterface::calc_g(double* g) {
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    // Calculate, if needed
-    if (!have_gk_) {
-      // Evaluate User function
-      fill_n(arg_, g_fcn_.n_in(), nullptr);
-      arg_[G_X] = xk_;
-      arg_[G_P] = p_;
-      fill_n(res_, g_fcn_.n_out(), nullptr);
-      res_[G_G] = gk_;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        g_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!all_of(gk_, gk_+ng_, [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN or Inf detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_g_ += 1;
-      t_calc_g_ += chrono::duration<double>(t_stop - t_start).count();
-      have_gk_ = true;
-    }
-
-    // Return to user
-    casadi_copy(gk_, ng_, g);
-
-    // Success
-    return 0;
-  }
-
-  template<typename M>
-  void IpoptInterface::setup_g() {
-    const Problem<M>& nlp = nlp2_;
-    vector<M> arg(G_NUM_IN);
-    arg[G_X] = nlp.in[NL_X];
-    arg[G_P] = nlp.in[NL_P];
-    vector<M> res(G_NUM_OUT);
-    res[G_G] = nlp.out[NL_G];
-    g_fcn_ = Function("nlp_g", arg, res);
-    alloc(g_fcn_);
-  }
-
-  int IpoptInterface::calc_grad_f(double* grad_f) {
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    // Calculate, if needed
-    if (!have_grad_fk_) {
-      // Evaluate User function
-      fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
-      arg_[GF_X] = xk_;
-      arg_[GF_P] = p_;
-      fill_n(res_, grad_f_fcn_.n_out(), nullptr);
-      res_[GF_GF] = grad_fk_;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        grad_f_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_grad_f failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!all_of(grad_fk_, grad_fk_+nx_, [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>() << name() << ":calc_grad_f failed: NaN or Inf detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_grad_f_ += 1;
-      t_calc_grad_f_ += chrono::duration<double>(t_stop - t_start).count();
-      have_grad_fk_ = true;
-    }
-
-    // Return to user
-    casadi_copy(grad_fk_, nx_, grad_f);
-
-    // Success
-    return 0;
-  }
-
-  template<typename M>
-  void IpoptInterface::setup_grad_f() {
-    const Problem<M>& nlp = nlp2_;
-    vector<M> arg(GF_NUM_IN);
-    arg[GF_X] = nlp.in[NL_X];
-    arg[GF_P] = nlp.in[NL_P];
-    vector<M> res(GF_NUM_OUT);
-    res[GF_GF] = M::gradient(nlp.out[NL_F], nlp.in[NL_X]);
-    grad_f_fcn_ = Function("nlp_grad_f", arg, res);
-    alloc(grad_f_fcn_);
-  }
-
-  int IpoptInterface::calc_jac_g(double* jac_g) {
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    // Calculate, if needed
-    if (!have_jac_gk_) {
-      // Evaluate User function
-      fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-      arg_[JG_X] = xk_;
-      arg_[JG_P] = p_;
-      fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-      res_[JG_JG] = jac_gk_;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        jac_g_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_jac_g failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!all_of(jac_gk_, jac_gk_+jacg_sp_.nnz(), [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>() << name() << ":calc_jac_g failed: NaN or Inf detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_jac_g_ += 1;
-      t_calc_jac_g_ += chrono::duration<double>(t_stop - t_start).count();
-      have_jac_gk_ = true;
-    }
-
-    // Return to user
-    casadi_copy(jac_gk_, jacg_sp_.nnz(), jac_g);
-
-    // Success
-    return 0;
-  }
-
-  template<typename M>
-  void IpoptInterface::setup_jac_g() {
-    const Problem<M>& nlp = nlp2_;
-    vector<M> arg(JG_NUM_IN);
-    arg[JG_X] = nlp.in[NL_X];
-    arg[JG_P] = nlp.in[NL_P];
-    vector<M> res(JG_NUM_OUT);
-    res[JG_JG] = M::jacobian(nlp.out[NL_G], nlp.in[NL_X]);
-    jac_g_fcn_ = Function("nlp_jac_g", arg, res);
-    jacg_sp_ = res[JG_JG].sparsity();
-    alloc(jac_g_fcn_);
-  }
-
-  int IpoptInterface::calc_hess_l(double* hess_l) {
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    // Calculate, if needed
-    if (!have_hess_lk_) {
-      // Evaluate User function
-      fill_n(arg_, hess_l_fcn_.n_in(), nullptr);
-      arg_[HL_X] = xk_;
-      arg_[HL_P] = p_;
-      arg_[HL_LAM_F] = &lam_fk_;
-      arg_[HL_LAM_G] = lam_gk_;
-      fill_n(res_, hess_l_fcn_.n_out(), nullptr);
-      res_[HL_HL] = hess_lk_;
-      auto t_start = chrono::system_clock::now(); // start timer
-      try {
-        hess_l_fcn_(arg_, res_, iw_, w_, 0);
-      } catch(exception& ex) {
-        // Fatal error
-        userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
-        return 1;
-      }
-      auto t_stop = chrono::system_clock::now(); // stop timer
-
-      // Make sure not NaN or Inf
-      if (!all_of(hess_lk_, hess_lk_+hesslag_sp_.nnz(), [](double v) { return isfinite(v);})) {
-        userOut<true, PL_WARN>() << name() << ":calc_hess_l failed: NaN or Inf detected" << endl;
-        return -1;
-      }
-
-      // Update stats
-      n_calc_hess_l_ += 1;
-      t_calc_hess_l_ += chrono::duration<double>(t_stop - t_start).count();
-      have_hess_lk_ = true;
-    }
-
-    // Return to user
-    casadi_copy(hess_lk_, hesslag_sp_.nnz(), hess_l);
-
-    // Success
-    return 0;
-  }
-
-  template<typename M>
-  void IpoptInterface::setup_hess_l() {
-    const Problem<M>& nlp = nlp2_;
-    vector<M> arg(HL_NUM_IN);
-    M x = arg[HL_X] = nlp.in[NL_X];
-    arg[HL_P] = nlp.in[NL_P];
-    M f = nlp.out[NL_F];
-    M g = nlp.out[NL_G];
-    M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
-    M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
-    vector<M> res(HL_NUM_OUT);
-    res[HL_HL] = M::hessian(dot(lam_f, f) + dot(lam_g, g), x);
-    hess_l_fcn_ = Function("nlp_hess_l", arg, res);
-    hesslag_sp_ = res[HL_HL].sparsity();
-    alloc(hess_l_fcn_);
-  }
-
-  template<typename M>
-  void IpoptInterface::setup() {
-    // Objective
-    setup_f<M>();
-
-    // Constraints
-    setup_g<M>();
-
-    // Gradient of the objective
-    setup_grad_f<M>();
-
-    // Jacobian of the constraits
-    setup_jac_g<M>();
-
-    // Hessian of the Lagrangian
-    if (exact_hessian_) {
-      setup_hess_l<M>();
     }
   }
 

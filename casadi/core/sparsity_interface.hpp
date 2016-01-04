@@ -26,7 +26,7 @@
 #ifndef CASADI_SPARSITY_INTERFACE_HPP
 #define CASADI_SPARSITY_INTERFACE_HPP
 
-#include "../std_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 
 namespace casadi {
   /** \brief Empty Base
@@ -160,21 +160,25 @@ namespace casadi {
 #ifndef SWIG
 
     /// \cond CLUTTER
-    std::vector< std::vector< MatType > >
-      zz_blocksplit(const std::vector<int>& vert_offset,
-                    const std::vector<int>& horz_offset) const;
-    std::vector< std::vector< MatType > >
-      zz_blocksplit(int vert_incr, int horz_incr) const;
-    static MatType zz_veccat(const std::vector< MatType >& x);
-    MatType zz_vec() const;
-    MatType zz_repmat(int n, int m=1) const;
-    static std::vector<int> zz_offset(const std::vector< MatType > &v, bool vert=true);
-    std::vector< MatType > zz_diagsplit(const std::vector<int>& output_offset) const;
-    std::vector< MatType > zz_diagsplit(int incr) const;
-    std::vector< MatType > zz_diagsplit(int incr1, int incr2) const;
-    static MatType zz_mul(const std::vector<MatType> &args);
-    std::vector<MatType > zz_horzsplit(int incr) const;
-    std::vector<MatType > zz_vertsplit(int incr) const;
+    static std::vector< std::vector< MatType > >
+      blocksplit(const MatType& x, const std::vector<int>& vert_offset,
+                 const std::vector<int>& horz_offset);
+    static std::vector< std::vector< MatType > >
+      blocksplit(const MatType& x, int vert_incr, int horz_incr);
+    static MatType veccat(const std::vector< MatType >& x);
+    static MatType vec(const MatType& x);
+    static MatType repmat(const MatType& x, int n, int m=1);
+    static std::vector<int> offset(const std::vector< MatType > &v, bool vert=true);
+    static std::vector< MatType > diagsplit(const MatType& x,
+                                            const std::vector<int>& output_offset);
+    static std::vector< MatType > diagsplit(const MatType& x, int incr);
+    static std::vector< MatType > diagsplit(const MatType& x, int incr1, int incr2);
+    static MatType mtimes(const std::vector<MatType> &args);
+    static std::vector<MatType > horzsplit(const MatType& x, int incr);
+    static std::vector<MatType > vertsplit(const MatType& x, int incr);
+    static MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
+      return MatType::repmat(A, rc.first, rc.second);
+    }
     /// \endcond
 #endif
 
@@ -212,8 +216,8 @@ namespace casadi {
      *   horzcat(horzsplit(x, ...)) = x
      */
     inline friend std::vector<MatType >
-      horzsplit(const MatType &v, const std::vector<int>& offset) {
-      return v.zz_horzsplit(offset);
+      horzsplit(const MatType &x, const std::vector<int>& offset) {
+      return MatType::horzsplit(x, offset);
     }
 
     /** \brief  split horizontally, retaining fixed-sized groups of columns
@@ -221,8 +225,8 @@ namespace casadi {
      *
      *   horzcat(horzsplit(x, ...)) = x
      */
-    inline friend std::vector<MatType > horzsplit(const MatType &v, int incr=1) {
-      return v.zz_horzsplit(incr);
+    inline friend std::vector<MatType > horzsplit(const MatType& x, int incr=1) {
+      return MatType::horzsplit(x, incr);
     }
 
     /** * \brief  split vertically, retaining groups of rows
@@ -232,14 +236,14 @@ namespace casadi {
      *   vertcat(vertsplit(x, ...)) = x
      */
     friend std::vector<MatType >
-      vertsplit(const MatType &v, const std::vector<int>& offset) {
-      return v.zz_vertsplit(offset);
+      vertsplit(const MatType& x, const std::vector<int>& offset) {
+      return MatType::vertsplit(x, offset);
     }
 
     /** \brief Helper function, get offsets corresponding to a vector of matrices
      */
     inline friend std::vector<int > offset(const std::vector<MatType> &v, bool vert=true) {
-      return MatType::zz_offset(v, vert);
+      return MatType::offset(v, vert);
     }
 
     /** \brief  split vertically, retaining fixed-sized groups of rows
@@ -269,8 +273,8 @@ namespace casadi {
      \enddoctest
      *
      */
-    inline friend std::vector<MatType > vertsplit(const MatType &v, int incr=1) {
-      return v.zz_vertsplit(incr);
+    inline friend std::vector<MatType > vertsplit(const MatType &x, int incr=1) {
+      return MatType::vertsplit(x, incr);
     }
 
     /** \brief Construct a matrix from a list of list of blocks.
@@ -296,7 +300,7 @@ namespace casadi {
       blocksplit(const MatType& x,
                  const std::vector<int>& vert_offset,
                  const std::vector<int>& horz_offset) {
-      return x.zz_blocksplit(vert_offset, horz_offset);
+      return MatType::blocksplit(x, vert_offset, horz_offset);
     }
 
     /** \brief  chop up into blocks
@@ -307,7 +311,7 @@ namespace casadi {
      */
     inline friend std::vector< std::vector< MatType > >
       blocksplit(const MatType& x, int vert_incr=1, int horz_incr=1) {
-      return x.zz_blocksplit(vert_incr, horz_incr);
+      return MatType::blocksplit(x, vert_incr, horz_incr);
     }
 
     /** \brief Construct a matrix with given block on the diagonal
@@ -328,7 +332,7 @@ namespace casadi {
       diagsplit(const MatType& x,
                 const std::vector<int>& output_offset1,
                 const std::vector<int>& output_offset2) {
-      return x.zz_diagsplit(output_offset1, output_offset2);
+      return MatType::diagsplit(x, output_offset1, output_offset2);
     }
 
     /** \brief  split diagonally, retaining square matrices
@@ -339,7 +343,7 @@ namespace casadi {
      */
     inline friend std::vector< MatType >
       diagsplit(const MatType& x, const std::vector<int>& output_offset) {
-      return x.zz_diagsplit(output_offset);
+      return MatType::diagsplit(x, output_offset);
     }
 
     /** \brief  split diagonally, retaining groups of square matrices
@@ -349,7 +353,7 @@ namespace casadi {
      */
     inline friend std::vector< MatType >
       diagsplit(const MatType& x, int incr=1) {
-      return x.zz_diagsplit(incr);
+      return MatType::diagsplit(x, incr);
     }
 
     /** \brief  split diagonally, retaining fixed-sized matrices
@@ -360,36 +364,36 @@ namespace casadi {
      */
     inline friend std::vector< MatType >
       diagsplit(const MatType& x, int incr1, int incr2) {
-      return x.zz_diagsplit(incr1, incr2);
+      return MatType::diagsplit(x, incr1, incr2);
     }
 
     /** \brief  concatenate vertically while vectorizing all arguments with vec
      */
     inline friend MatType veccat(const std::vector< MatType >& x) {
-      return MatType::zz_veccat(x);
+      return MatType::veccat(x);
     }
 
     /** \brief Matrix product of two matrices
     */
-    inline friend MatType mul(const MatType &X, const MatType &Y) {
-      return X.zz_mtimes(Y);
+    inline friend MatType mtimes(const MatType &x, const MatType &y) {
+      return MatType::mtimes(x, y);
     }
 
     /** \brief Matrix product of n matrices
      */
-    inline friend MatType mul(const std::vector<MatType> &args) {
-      return MatType::zz_mul(args);
+    inline friend MatType mtimes(const std::vector<MatType> &args) {
+      return MatType::mtimes(args);
     }
 
     /** \brief Multiply-accumulate operation
-        Matrix product of two matrices (X and Y), adding the result to
-        a third matrix Z. The result has the same sparsity pattern as
-        C meaning that other entries of (X*Y) are ignored.
-        The operation is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
+        Matrix product of two matrices (x and y), adding the result to
+        a third matrix z. The result has the same sparsity pattern as
+        C meaning that other entries of (x*y) are ignored.
+        The operation is equivalent to: z+mtimes(x,y).project(z.sparsity()).
     */
     inline friend MatType
-      mac(const MatType &X, const MatType &Y, const MatType &Z) {
-      return X.zz_mac(Y, Z);
+      mac(const MatType &x, const MatType &y, const MatType &z) {
+      return MatType::mac(x, y, z);
     }
 
     /** \brief Transpose
@@ -413,56 +417,56 @@ namespace casadi {
         c \n
         d \n
     */
-    inline friend MatType vec(const MatType& a) {
-      return a.zz_vec();
+    inline friend MatType vec(const MatType& x) {
+      return MatType::vec(x);
     }
 
     /** \brief Returns a flattened version of the matrix, preserving only nonzeros
      */
-    inline friend MatType vecNZ(const MatType& a) {
-      return a.zz_vecNZ();
+    inline friend MatType vecNZ(const MatType& x) {
+      return MatType::vecNZ(x);
     }
 
     /** \brief Returns a reshaped version of the matrix
      */
-    inline friend MatType reshape(const MatType& a, int nrow, int ncol) {
-      return a.zz_reshape(nrow, ncol);
+    inline friend MatType reshape(const MatType& x, int nrow, int ncol) {
+      return MatType::reshape(x, nrow, ncol);
     }
 
     /** \brief Returns a reshaped version of the matrix, dimensions as a vector
     */
-    inline friend MatType reshape(const MatType& a, std::pair<int, int> rc) {
-      return reshape(a, rc.first, rc.second);
+    inline friend MatType reshape(const MatType& x, std::pair<int, int> rc) {
+      return MatType::reshape(x, rc.first, rc.second);
     }
 
     /** \brief Reshape the matrix
     */
-    inline friend MatType reshape(const MatType& a, const Sparsity& sp) {
-      return a.zz_reshape(sp);
+    inline friend MatType reshape(const MatType& x, const Sparsity& sp) {
+      return MatType::reshape(x, sp);
     }
 
     /** \brief Obtain the structural rank of a sparsity-pattern
     */
-    inline friend int sprank(const MatType& A) {
-      return A.zz_sprank();
+    inline friend int sprank(const MatType& x) {
+      return MatType::sprank(x);
     }
 
     /** \brief 0-norm (nonzero count) of a Matrix-matrix product
     */
     inline friend int norm_0_mul(const MatType &x, const MatType &y) {
-      return x.zz_norm_0_mul(y);
+      return MatType::norm_0_mul(x, y);
     }
 
     /** \brief Get the upper triangular part of a matrix
     */
-    inline friend MatType triu(const MatType& a, bool includeDiagonal=true) {
-      return a.zz_triu(includeDiagonal);
+    inline friend MatType triu(const MatType& x, bool includeDiagonal=true) {
+      return MatType::triu(x, includeDiagonal);
     }
 
     /** \brief Get the lower triangular part of a matrix
     */
-    inline friend MatType tril(const MatType& a, bool includeDiagonal=true) {
-      return a.zz_tril(includeDiagonal);
+    inline friend MatType tril(const MatType& x, bool includeDiagonal=true) {
+      return MatType::tril(x, includeDiagonal);
     }
 
     /** \brief Kronecker tensor product
@@ -470,19 +474,19 @@ namespace casadi {
      * Creates a block matrix in which each element (i, j) is a_ij*b
      */
     inline friend MatType kron(const MatType& a, const MatType& b) {
-      return a.zz_kron(b);
+      return MatType::kron(a, b);
     }
 
     /** \brief Repeat matrix A n times vertically and m times horizontally
      */
     inline friend MatType repmat(const MatType &A, int n, int m=1) {
-      return A.zz_repmat(n, m);
+      return MatType::repmat(A, n, m);
     }
 
     /** \brief Repeat matrix A n times vertically and m times horizontally
      */
     inline friend MatType repmat(const MatType &A, const std::pair<int, int>& rc) {
-      return A.zz_repmat(rc.first, rc.second);
+      return MatType::repmat(A, rc);
     }
 
     /** \brief Concatenate horizontally, two matrices */
@@ -538,45 +542,44 @@ namespace casadi {
 
 #ifndef SWIG
   template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_vec() const {
-    return reshape(self(), self().numel(), 1);
+  MatType SparsityInterface<MatType>::vec(const MatType& x) {
+    return reshape(x, x.numel(), 1);
   }
 
   template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_repmat(int n, int m) const {
-    MatType allrows = vertcat(std::vector<MatType>(n, self()));
+  MatType SparsityInterface<MatType>::repmat(const MatType& x, int n, int m) {
+    MatType allrows = vertcat(std::vector<MatType>(n, x));
     return horzcat(std::vector<MatType>(m, allrows));
   }
 
   template<typename MatType>
   std::vector< std::vector< MatType > >
-  SparsityInterface<MatType>::zz_blocksplit(const std::vector<int>& vert_offset,
-                                            const std::vector<int>& horz_offset) const {
-    std::vector< MatType > rows = vertsplit(self(), vert_offset);
+  SparsityInterface<MatType>::blocksplit(const MatType& x,
+                                         const std::vector<int>& vert_offset,
+                                         const std::vector<int>& horz_offset) {
+    std::vector<MatType> rows = MatType::vertsplit(x, vert_offset);
     std::vector< std::vector< MatType > > ret;
-    for (int i=0;i<rows.size();++i) {
-      ret.push_back(horzsplit(rows[i], horz_offset));
-    }
+    for (auto&& r : rows) ret.push_back(MatType::horzsplit(r, horz_offset));
     return ret;
   }
 
   template<typename MatType>
   std::vector< std::vector< MatType > >
-  SparsityInterface<MatType>::zz_blocksplit(int vert_incr, int horz_incr) const {
+  SparsityInterface<MatType>::blocksplit(const MatType& x, int vert_incr, int horz_incr) {
     casadi_assert(horz_incr>=1);
     casadi_assert(vert_incr>=1);
-    int sz1 = self().size1();
+    int sz1 = x.size1();
     std::vector<int> offset1 = range(0, sz1, vert_incr);
     offset1.push_back(sz1);
-    int sz2 = self().size2();
+    int sz2 = x.size2();
     std::vector<int> offset2 = range(0, sz2, horz_incr);
     offset2.push_back(sz2);
-    return blocksplit(self(), offset1, offset2);
+    return blocksplit(x, offset1, offset2);
   }
 
   template<typename MatType>
   std::vector<int>
-  SparsityInterface<MatType>::zz_offset(const std::vector< MatType > &v, bool vert) {
+  SparsityInterface<MatType>::offset(const std::vector< MatType > &v, bool vert) {
     std::vector<int> ret(v.size()+1);
     ret[0]=0;
     for (int i=0; i<v.size(); ++i) {
@@ -586,7 +589,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_veccat(const std::vector< MatType >& x) {
+  MatType SparsityInterface<MatType>::veccat(const std::vector< MatType >& x) {
     std::vector< MatType > x_vec = x;
     for (typename std::vector< MatType >::iterator it=x_vec.begin();
          it!=x_vec.end(); ++it) {
@@ -597,61 +600,61 @@ namespace casadi {
 
   template<typename MatType>
   std::vector< MatType >
-  SparsityInterface<MatType>::zz_diagsplit(const std::vector<int>& output_offset) const {
-    casadi_assert_message(self().is_square(), "diagsplit(x,incr)::input must be square but got "
-                          << self().dim()  << ".");
-    return diagsplit(self(), output_offset, output_offset);
+  SparsityInterface<MatType>::diagsplit(const MatType& x, const std::vector<int>& output_offset) {
+    casadi_assert_message(x.is_square(), "diagsplit(x,incr)::input must be square but got "
+                          << x.dim()  << ".");
+    return MatType::diagsplit(x, output_offset, output_offset);
   }
 
   template<typename MatType>
   std::vector< MatType >
-  SparsityInterface<MatType>::zz_diagsplit(int incr) const {
+  SparsityInterface<MatType>::diagsplit(const MatType& x, int incr) {
     casadi_assert(incr>=1);
-    casadi_assert_message(self().is_square(), "diagsplit(x,incr)::input must be square but got "
-                          << self().dim()  << ".");
-    std::vector<int> offset2 = range(0, self().size2(), incr);
-    offset2.push_back(self().size2());
-    return diagsplit(self(), offset2);
+    casadi_assert_message(x.is_square(), "diagsplit(x,incr)::input must be square but got "
+                          << x.dim()  << ".");
+    std::vector<int> offset2 = range(0, x.size2(), incr);
+    offset2.push_back(x.size2());
+    return MatType::diagsplit(x, offset2);
   }
 
   template<typename MatType>
   std::vector< MatType >
-  SparsityInterface<MatType>::zz_diagsplit(int incr1, int incr2) const {
+  SparsityInterface<MatType>::diagsplit(const MatType& x, int incr1, int incr2) {
     casadi_assert(incr1>=1);
     casadi_assert(incr2>=1);
-    std::vector<int> offset1 = range(0, self().size1(), incr1);
-    offset1.push_back(self().size1());
-    std::vector<int> offset2 = range(0, self().size2(), incr2);
-    offset2.push_back(self().size2());
-    return diagsplit(self(), offset1, offset2);
+    std::vector<int> offset1 = range(0, x.size1(), incr1);
+    offset1.push_back(x.size1());
+    std::vector<int> offset2 = range(0, x.size2(), incr2);
+    offset2.push_back(x.size2());
+    return MatType::diagsplit(x, offset1, offset2);
   }
 
   template<typename MatType>
-  MatType SparsityInterface<MatType>::zz_mul(const std::vector<MatType> &args) {
+  MatType SparsityInterface<MatType>::mtimes(const std::vector<MatType> &args) {
     casadi_assert_message(args.size()>=1,
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");
     MatType ret = args[0];
-    for (int i=1; i<args.size(); ++i) ret = mul(ret, args[i]);
+    for (int i=1; i<args.size(); ++i) ret = MatType::mtimes(ret, args[i]);
     return ret;
   }
 
   template<typename MatType>
-  std::vector<MatType > SparsityInterface<MatType>::zz_horzsplit(int incr) const {
+  std::vector<MatType > SparsityInterface<MatType>::horzsplit(const MatType& x, int incr) {
     casadi_assert(incr>=1);
-    int sz2 = self().size2();
+    int sz2 = x.size2();
     std::vector<int> offset2 = range(0, sz2, incr);
     offset2.push_back(sz2);
-    return horzsplit(self(), offset2);
+    return MatType::horzsplit(x, offset2);
   }
 
   template<typename MatType>
-  std::vector<MatType > SparsityInterface<MatType>::zz_vertsplit(int incr) const {
+  std::vector<MatType > SparsityInterface<MatType>::vertsplit(const MatType& x, int incr) {
     casadi_assert(incr>=1);
-    int sz1 = self().size1();
+    int sz1 = x.size1();
     std::vector<int> offset1 = range(0, sz1, incr);
     offset1.push_back(sz1);
-    return vertsplit(self(), offset1);
+    return MatType::vertsplit(x, offset1);
   }
 #endif // SWIG
 

@@ -202,13 +202,6 @@ namespace casadi {
     // Exact Hessian?
     exact_hessian_ = option("UserHM");
 
-    // Get/generate required functions
-    gradF();
-    jacG();
-    if (exact_hessian_) { // does not appear to work
-      hessLag();
-    }
-
     // Update status?
     status_[TerminateSuccess]="TerminateSuccess";
     status_[OptimalSolution]="OptimalSolution";
@@ -244,6 +237,16 @@ namespace casadi {
     status_[FunctionErrorDF]="FunctionErrorDF";
     status_[FunctionErrorDG]="FunctionErrorDG";
     status_[FunctionErrorHM]="FunctionErrorHM";
+
+    // Setup NLP functions
+    setup_f(); // Objective
+    setup_g(); // Constraints
+    setup_grad_f(); // Gradient of objective
+    setup_jac_g(); // Jacobian of the constraints
+    setup_hess_l(true); // Hessian of the Lagrangian
+
+    // Temporary vectors
+    alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
   void WorhpInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
@@ -349,25 +352,13 @@ namespace casadi {
     // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
     worhp_w_.DF.nnz = nx_;
     if (worhp_o_.m>0) {
-      worhp_w_.DG.nnz = jacG_.nnz_out(0);  // Jacobian of G
+      worhp_w_.DG.nnz = jacg_sp_.nnz();  // Jacobian of G
     } else {
       worhp_w_.DG.nnz = 0;
     }
 
     if (exact_hessian_ /*worhp_w_.HM.NeedStructure*/) { // not initialized
-
-      // Get the sparsity pattern of the Hessian
-      const Sparsity& spHessLag = this->spHessLag();
-      const int* colind = spHessLag.colind();
-      const int* row = spHessLag.row();
-
-      // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
-      worhp_w_.HM.nnz = nx_; // diagonal entries
-      for (int c=0; c<nx_; ++c) {
-        for (int el=colind[c]; el<colind[c+1] && row[el]<c; ++el) {
-          worhp_w_.HM.nnz++; // strictly lower triangular part
-        }
-      }
+      worhp_w_.HM.nnz = nx_ + hesslag_sp_.nnz_lower(true);
     } else {
       worhp_w_.HM.nnz = 0;
     }
@@ -385,12 +376,9 @@ namespace casadi {
     }
 
     if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {
-      // Get sparsity pattern. Note WORHP is column major
-      const DM & J = jacG_.output(JACG_JAC);
-
       int nz=0;
-      const int* colind = J.colind();
-      const int* row = J.row();
+      const int* colind = jacg_sp_.colind();
+      const int* row = jacg_sp_.row();
       for (int c=0; c<nx_; ++c) {
         for (int el=colind[c]; el<colind[c+1]; ++el) {
           int r = row[el];
@@ -403,13 +391,12 @@ namespace casadi {
 
     if (worhp_w_.HM.NeedStructure) {
       // Get the sparsity pattern of the Hessian
-      const Sparsity& spHessLag = this->spHessLag();
-      const int* colind = spHessLag.colind();
-      const int* row = spHessLag.row();
+      const int* colind = hesslag_sp_.colind();
+      const int* row = hesslag_sp_.row();
 
       int nz=0;
 
-      // Upper triangular part of the Hessian (note CCS -> CRS format change)
+      // Strictly lower triangular part of the Hessian (note CCS -> CRS format change)
       for (int c=0; c<nx_; ++c) {
         for (int el=colind[c]; el<colind[c+1]; ++el) {
           if (row[el]>c) {
@@ -430,31 +417,6 @@ namespace casadi {
   }
 
   void WorhpInterface::solve(void* mem) {
-    for (int i=0; i<NLPSOL_NUM_IN; ++i) {
-      const double *v;
-      switch (i) {
-      case NLPSOL_X0: v = x0_; break;
-      case NLPSOL_P: v = p_; break;
-      case NLPSOL_LBX: v = lbx_; break;
-      case NLPSOL_UBX: v = ubx_; break;
-      case NLPSOL_LBG: v = lbg_; break;
-      case NLPSOL_UBG: v = ubg_; break;
-      case NLPSOL_LAM_X0: v = lam_x0_; break;
-      case NLPSOL_LAM_G0: v = lam_g0_; break;
-      default: casadi_assert(0);
-      }
-      casadi_copy(v, nnz_in(i), input(i).ptr());
-    }
-
-    if (gather_stats_) {
-      Dict iterations;
-      iterations["iter_sqp"] = std::vector<int>();
-      iterations["inf_pr"] = std::vector<double>();
-      iterations["inf_du"] = std::vector<double>();
-      iterations["obj"] = std::vector<double>();
-      iterations["alpha_pr"] = std::vector<double>();
-      stats_["iterations"] = iterations;
-    }
 
     // Check the provided inputs
     checkInputs(mem);
@@ -465,48 +427,38 @@ namespace casadi {
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
 
-    // Get inputs
-    log("WorhpInterface::evaluate: Reading user inputs");
-    const DM& x0 = input(NLPSOL_X0);
-    const DM& lbx = input(NLPSOL_LBX);
-    const DM& ubx = input(NLPSOL_UBX);
-    const DM& lam_x0 = input(NLPSOL_LAM_X0);
-    const DM& lbg = input(NLPSOL_LBG);
-    const DM& ubg = input(NLPSOL_UBG);
-    const DM& lam_g0 = input(NLPSOL_LAM_G0);
-
     double inf = numeric_limits<double>::infinity();
 
-    for (int i=0;i<nx_;++i) {
-      casadi_assert_message(lbx.at(i)!=ubx.at(i),
-      "WorhpInterface::evaluate: Worhp cannot handle the case when LBX == UBX."
-      "You have that case at non-zero " << i << " , which has value " << ubx.at(i) << "."
-      "Reformulate your problem by using a parameter for the corresponding variable.");
+    if (lbx_ && ubx_) {
+      for (int i=0; i<nx_;++i) {
+        casadi_assert_message(lbx_[i]!=ubx_[i],
+                              "WorhpInterface::evaluate: Worhp cannot handle the case when "
+                              "LBX == UBX."
+                              "You have that case at non-zero " << i << " , which has value " <<
+                              ubx_[i] << ". Reformulate your problem by using a parameter "
+                              "for the corresponding variable.");
+      }
     }
 
-    for (int i=0;i<lbg.nnz();++i) {
-      casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),
-      "WorhpInterface::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
-      "You have that case at non-zero " << i << "."
-      "Reformulate your problem eliminating the corresponding constraint.");
+    if (lbg_ && ubg_) {
+      for (int i=0; i<ng_; ++i) {
+        casadi_assert_message(!(lbg_[i]==-inf && ubg_[i] == inf),
+                              "WorhpInterface::evaluate: Worhp cannot handle the case when both "
+                              "LBG and UBG are infinite."
+                              "You have that case at non-zero " << i << "."
+                              "Reformulate your problem eliminating the corresponding constraint.");
+      }
     }
 
     // Pass inputs to WORHP data structures
-    casadi_assert(x0.nnz()==worhp_o_.n);
-    x0.getNZ(worhp_o_.X);
-    casadi_assert(lbx.nnz()==worhp_o_.n);
-    lbx.getNZ(worhp_o_.XL);
-    casadi_assert(ubx.nnz()==worhp_o_.n);
-    ubx.getNZ(worhp_o_.XU);
-    casadi_assert(lam_x0.nnz()==worhp_o_.n);
-    lam_x0.getNZ(worhp_o_.Lambda);
+    casadi_copy(x0_, nx_, worhp_o_.X);
+    casadi_copy(lbx_, nx_, worhp_o_.XL);
+    casadi_copy(ubx_, nx_, worhp_o_.XU);
+    casadi_copy(lam_x0_, nx_, worhp_o_.Lambda);
     if (worhp_o_.m>0) {
-      casadi_assert(lam_g0.nnz()==worhp_o_.m);
-      lam_g0.getNZ(worhp_o_.Mu);
-      casadi_assert(lbg.nnz()==worhp_o_.m);
-      lbg.getNZ(worhp_o_.GL);
-      casadi_assert(ubg.nnz()==worhp_o_.m);
-      ubg.getNZ(worhp_o_.GU);
+      casadi_copy(lam_g0_, ng_, worhp_o_.Mu);
+      casadi_copy(lbg_, ng_, worhp_o_.GL);
+      casadi_copy(ubg_, ng_, worhp_o_.GU);
     }
 
     // Replace infinite bounds with worhp_p_.Infty
@@ -532,31 +484,9 @@ namespace casadi {
 
         if (!firstIteration) {
           firstIteration = true;
-          if (gather_stats_) {
-            Dict iterations = stats_["iterations"];
-            append_to_vec(iterations["iter_sqp"], static_cast<int>(worhp_w_.MinorIter));
-            append_to_vec(iterations["inf_pr"], static_cast<double>(worhp_w_.NormMax_CV));
-            append_to_vec(iterations["inf_du"], static_cast<double>(worhp_w_.ScaledKKT));
-            append_to_vec(iterations["obj"], static_cast<double>(worhp_o_.F));
-            append_to_vec(iterations["alpha_pr"], static_cast<double>(worhp_w_.ArmijoAlpha));
-            stats_["iterations"] = iterations;
-          }
 
           if (!fcallback_.isNull()) {
             double time1 = clock();
-            // Copy outputs
-            if (!output(NLPSOL_X).is_empty()) {
-              output(NLPSOL_X).setNZ(worhp_o_.X);
-            }
-            if (!output(NLPSOL_F).is_empty())
-              output(NLPSOL_F).set(worhp_o_.F);
-            if (!output(NLPSOL_G).is_empty())
-              output(NLPSOL_G).setNZ(worhp_o_.G);
-            if (!output(NLPSOL_LAM_X).is_empty())
-              output(NLPSOL_LAM_X).setNZ(worhp_o_.Lambda);
-            if (!output(NLPSOL_LAM_G).is_empty())
-              output(NLPSOL_LAM_G).setNZ(worhp_o_.Mu);
-
             Dict iteration;
             iteration["iter"] = worhp_w_.MajorIter;
             iteration["iter_sqp"] = worhp_w_.MinorIter;
@@ -570,19 +500,26 @@ namespace casadi {
             t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
             time1 = clock();
 
-            for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-              fcallback_.setInput(output(i), i);
-            }
-            fcallback_.evaluate();
+            // Inputs
+            fill_n(arg_, fcallback_.n_in(), nullptr);
+            arg_[NLPSOL_X] = worhp_o_.X;
+            arg_[NLPSOL_F] = &worhp_o_.F;
+            arg_[NLPSOL_G] = worhp_o_.G;
+            arg_[NLPSOL_LAM_P] = 0;
+            arg_[NLPSOL_LAM_X] = worhp_o_.Lambda;
+            arg_[NLPSOL_LAM_G] = worhp_o_.Mu;
+
+            // Outputs
+            fill_n(res_, fcallback_.n_out(), nullptr);
             double ret_double;
-            fcallback_.getOutput(ret_double);
+            res_[0] = &ret_double;
+
+            // Evaluate the callback function
+            n_eval_callback_ += 1;
+            fcallback_(arg_, res_, iw_, w_, 0);
             int ret = static_cast<int>(ret_double);
 
-            time2 = clock();
-            t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
-
             if (ret) worhp_c_.status = TerminatedByUser;
-
           }
         }
 
@@ -592,27 +529,50 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, evalF)) {
-        eval_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.F);
+        calc_f(worhp_o_.X, p_, &worhp_o_.F);
+        worhp_o_.F *= worhp_w_.ScaleObj;
         DoneUserAction(&worhp_c_, evalF);
       }
 
       if (GetUserAction(&worhp_c_, evalG)) {
-        eval_g(worhp_o_.X, worhp_o_.G);
+        calc_g(worhp_o_.X, p_, worhp_o_.G);
         DoneUserAction(&worhp_c_, evalG);
       }
 
-      if (GetUserAction(&worhp_c_, evalF)) {
-        eval_grad_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_w_.DF.val);
-        DoneUserAction(&worhp_c_, evalF);
+      if (GetUserAction(&worhp_c_, evalDF)) {
+        calc_grad_f(worhp_o_.X, p_, 0, worhp_w_.DF.val);
+        casadi_scal(nx_, worhp_w_.ScaleObj, worhp_w_.DF.val);
+        DoneUserAction(&worhp_c_, evalDF);
       }
 
-      if (GetUserAction(&worhp_c_, evalG)) {
-        eval_jac_g(worhp_o_.X, worhp_w_.DG.val);
-        DoneUserAction(&worhp_c_, evalG);
+      if (GetUserAction(&worhp_c_, evalDG)) {
+        calc_jac_g(worhp_o_.X, p_, 0, worhp_w_.DG.val);
+        DoneUserAction(&worhp_c_, evalDG);
       }
 
       if (GetUserAction(&worhp_c_, evalHM)) {
-        eval_h(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.Mu, worhp_w_.HM.val);
+        calc_hess_l(worhp_o_.X, p_, &worhp_w_.ScaleObj, worhp_o_.Mu,
+                    worhp_w_.HM.val);
+        // Diagonal values
+        double *dval = w_;
+        casadi_fill(dval, nx_, 0.);
+
+        // Remove diagonal
+        const int* colind = hesslag_sp_.colind();
+        const int* row = hesslag_sp_.row();
+        int ind=0;
+        for (int c=0; c<nx_; ++c) {
+          for (int el=colind[c]; el<colind[c+1]; ++el) {
+            if (row[el]==c) {
+              dval[c] = worhp_w_.HM.val[el];
+            } else {
+              worhp_w_.HM.val[ind++] = worhp_w_.HM.val[el];
+            }
+          }
+        }
+
+        // Add diagonal entries at the end
+        casadi_copy(dval, nx_, worhp_w_.HM.val+ind);
         DoneUserAction(&worhp_c_, evalHM);
       }
 
@@ -625,11 +585,11 @@ namespace casadi {
     t_mainloop_ += (time2-time1)/CLOCKS_PER_SEC;
 
     // Copy outputs
-    output(NLPSOL_X).set(worhp_o_.X);
-    output(NLPSOL_F).set(worhp_o_.F);
-    output(NLPSOL_G).set(worhp_o_.G);
-    output(NLPSOL_LAM_X).setNZ(worhp_o_.Lambda);
-    output(NLPSOL_LAM_G).set(worhp_o_.Mu);
+    casadi_copy(worhp_o_.X, nx_, x_);
+    if (f_) *f_ = worhp_o_.F;
+    casadi_copy(worhp_o_.G, ng_, g_);
+    casadi_copy(worhp_o_.Lambda, nx_, lam_x_);
+    casadi_copy(worhp_o_.Mu, ng_, lam_g_);
 
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
 
@@ -682,258 +642,6 @@ namespace casadi {
 
     stats_["return_code"] = worhp_c_.status;
     stats_["return_status"] = flagmap[worhp_c_.status];
-
-    for (int i=0; i<NLPSOL_NUM_OUT; ++i) {
-      double **v;
-      switch (i) {
-      case NLPSOL_X: v = &x_; break;
-      case NLPSOL_F: v = &f_; break;
-      case NLPSOL_G: v = &g_; break;
-      case NLPSOL_LAM_X: v = &lam_x_; break;
-      case NLPSOL_LAM_G: v = &lam_g_; break;
-      case NLPSOL_LAM_P: v = &lam_p_; break;
-      default: casadi_assert(0);
-      }
-      casadi_copy(output(i).ptr(), nnz_out(i), *v);
-    }
-  }
-
-  bool WorhpInterface::eval_h(const double* x, double obj_factor,
-                              const double* lambda, double* values) {
-    try {
-      log("eval_h started");
-      double time1 = clock();
-
-      // Make sure generated
-      casadi_assert_warning(!hessLag_.isNull(), "Hessian function not pregenerated");
-
-      // Get Hessian
-      Function& hessLag = this->hessLag();
-
-      // Pass input
-      hessLag.setInputNZ(x, HESSLAG_X);
-      hessLag.setInput(input(NLPSOL_P), HESSLAG_P);
-      hessLag.setInput(obj_factor, HESSLAG_LAM_F);
-      hessLag.setInputNZ(lambda, HESSLAG_LAM_G);
-
-      // Evaluate
-      hessLag.evaluate();
-
-      // Get results
-      const DM& H = hessLag.output();
-      const int* colind = H.colind();
-      const int* row = H.row();
-      const vector<double>& data = H.data();
-
-      // The Hessian values are divided into strictly upper (in WORHP lower) triangular and diagonal
-      double* values_upper = values;
-      double* values_diagonal = values + (worhp_w_.HM.nnz-nx_);
-
-      // Initialize diagonal to zero
-      for (int r=0; r<nx_; ++r) {
-        values_diagonal[r] = 0.;
-      }
-
-      // Upper triangular part of the Hessian (note CCS -> CRS format change)
-      for (int c=0; c<nx_; ++c) {
-        for (int el=colind[c]; el<colind[c+1]; ++el) {
-          if (row[el]>c) {
-            // Strictly upper triangular
-            *values_upper++ = data[el];
-          } else if (row[el]==c) {
-            // Diagonal separately
-            values_diagonal[c] = data[el];
-          }
-        }
-      }
-
-      if (monitored("eval_h")) {
-        userOut() << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
-        userOut() << "obj_factor= " << obj_factor << std::endl;
-        userOut() << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
-        userOut() << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
-      }
-
-      if (regularity_check_ && !is_regular(hessLag.output(HESSLAG_HESS).data()))
-          casadi_error("WorhpInterface::eval_h: NaN or Inf detected.");
-
-      double time2 = clock();
-      t_eval_h_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_h_ += 1;
-      log("eval_h ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
-  bool WorhpInterface::eval_jac_g(const double* x, double* values) {
-    try {
-      log("eval_jac_g started");
-
-      // Quich finish if no constraints
-      if (worhp_o_.m==0) {
-        log("eval_jac_g quick return (m==0)");
-        return true;
-      }
-
-      // Make sure generated
-      casadi_assert(!jacG_.isNull());
-
-      // Get Jacobian
-      Function& jacG = this->jacG();
-
-      double time1 = clock();
-
-      // Pass the argument to the function
-      jacG.setInputNZ(x, JACG_X);
-      jacG.setInput(input(NLPSOL_P), JACG_P);
-
-      // Evaluate the function
-      jacG.evaluate();
-
-      const DM& J = jacG.output(JACG_JAC);
-
-      std::copy(J.data().begin(), J.data().end(), values);
-
-      if (monitored("eval_jac_g")) {
-        userOut() << "x = " << jacG_.input().data() << endl;
-        userOut() << "J = " << endl;
-        jacG_.output().printSparse();
-      }
-
-      double time2 = clock();
-      t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_jac_g_ += 1;
-      log("eval_jac_g ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
-  bool WorhpInterface::eval_f(const double* x, double scale, double& obj_value) {
-    try {
-      log("eval_f started");
-
-      // Log time
-      double time1 = clock();
-
-      // Pass the argument to the function
-      nlp_.setInputNZ(x, NL_X);
-      nlp_.setInput(input(NLPSOL_P), NL_P);
-
-      // Evaluate the function
-      nlp_.evaluate();
-
-      // Get the result
-      nlp_.getOutput(obj_value, NL_F);
-
-      // Printing
-      if (monitored("eval_f")) {
-        userOut() << "x = " << nlp_.input(NL_X) << endl;
-        userOut() << "obj_value = " << obj_value << endl;
-      }
-      obj_value *= scale;
-
-      if (regularity_check_ && !is_regular(nlp_.output().data()))
-          casadi_error("WorhpInterface::eval_f: NaN or Inf detected.");
-
-      double time2 = clock();
-      t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_f_ += 1;
-      log("eval_f ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
-  bool WorhpInterface::eval_g(const double* x, double* g) {
-    try {
-      log("eval_g started");
-      double time1 = clock();
-
-      if (worhp_o_.m>0) {
-        // Pass the argument to the function
-        nlp_.setInputNZ(x, NL_X);
-        nlp_.setInput(input(NLPSOL_P), NL_P);
-
-        // Evaluate the function and tape
-        nlp_.evaluate();
-
-        // Ge the result
-        nlp_.getOutputNZ(g, NL_G);
-
-        // Printing
-        if (monitored("eval_g")) {
-          userOut() << "x = " << nlp_.input(NL_X) << endl;
-          userOut() << "g = " << nlp_.output(NL_G) << endl;
-        }
-      }
-
-      if (regularity_check_ && !is_regular(nlp_.output(NL_G).data()))
-          casadi_error("WorhpInterface::eval_g: NaN or Inf detected.");
-
-      double time2 = clock();
-      t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_g_ += 1;
-      log("eval_g ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
-      return false;
-    }
-  }
-
-  bool WorhpInterface::eval_grad_f(const double* x, double scale , double* grad_f) {
-    try {
-      log("eval_grad_f started");
-      double time1 = clock();
-
-      // Pass the argument to the function
-      gradF_.setInputNZ(x, NL_X);
-      gradF_.setInput(input(NLPSOL_P), NL_P);
-
-      // Evaluate, adjoint mode
-      gradF_.evaluate();
-
-      // Get the result
-      gradF_.output().get(grad_f);
-
-      // Scale
-      for (int i=0; i<nx_; ++i) {
-        grad_f[i] *= scale;
-      }
-
-      // Printing
-      if (monitored("eval_grad_f")) {
-        userOut() << "grad_f = " << gradF_.output() << endl;
-      }
-
-      if (regularity_check_ && !is_regular(gradF_.output().data()))
-          casadi_error("WorhpInterface::eval_grad_f: NaN or Inf detected.");
-
-      double time2 = clock();
-      t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_grad_f_ += 1;
-      // Check the result for regularity
-      for (int i=0; i<nx_; ++i) {
-        if (isnan(grad_f[i]) || isinf(grad_f[i])) {
-          log("eval_grad_f: result not regular");
-          return false;
-        }
-      }
-
-      log("eval_grad_f ok");
-      return true;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_jac_f failed: " << ex.what() << endl;
-      return false;
-    }
   }
 
   void WorhpInterface::setOptionsFromFile(const std::string & file) {
@@ -1043,5 +751,6 @@ namespace casadi {
 }
 
 map<int, string> WorhpInterface::flagmap = WorhpInterface::calc_flagmap();
+
 
 } // namespace casadi

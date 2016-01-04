@@ -24,7 +24,6 @@
 
 
 #include "shared_object.hpp"
-#include "casadi_exception.hpp"
 #include "weak_ref.hpp"
 
 #include <typeinfo>

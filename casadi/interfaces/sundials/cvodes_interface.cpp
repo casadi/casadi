@@ -60,14 +60,11 @@ namespace casadi {
     addOption("monitor",                          OT_STRINGVECTOR,        GenericType(),
               "", "res|resB|resQB|reset|psetupB|djacB", true);
 
-    mem_ = 0;
-
     isInitAdj_ = false;
     disable_internal_warnings_ = false;
   }
 
   void CvodesInterface::freeCVodes() {
-    if (mem_) { CVodeFree(&mem_); mem_ = 0;}
   }
 
   CvodesInterface::~CvodesInterface() {
@@ -108,135 +105,75 @@ namespace casadi {
     else
       throw CasadiException("Unknown nonlinear solver iteration");
 
-    // Create CVodes memory block
-    mem_ = CVodeCreate(lmm_, iter_);
-    if (mem_==0) throw CasadiException("CVodeCreate: Creation failed");
-
     // Disable internal warning messages?
     disable_internal_warnings_ = option("disable_internal_warnings");
 
-    // Set error handler function
-    flag = CVodeSetErrHandlerFn(mem_, ehfun_wrapper, this);
-    if (flag != CV_SUCCESS) cvodes_error("CVodeSetErrHandlerFn", flag);
-
-    // Initialize CVodes
-    double t0 = 0;
-    flag = CVodeInit(mem_, rhs_wrapper, t0, xz_);
-    if (flag!=CV_SUCCESS) cvodes_error("CVodeInit", flag);
-
-    // Set tolerances
-    flag = CVodeSStolerances(mem_, reltol_, abstol_);
-    if (flag!=CV_SUCCESS) cvodes_error("CVodeInit", flag);
-
-    // Maximum number of steps
-    CVodeSetMaxNumSteps(mem_, option("max_num_steps").toInt());
-    if (flag != CV_SUCCESS) cvodes_error("CVodeSetMaxNumSteps", flag);
-
-    // attach a linear solver
-    switch (linsol_f_) {
-    case SD_DENSE:
-      initDenseLinsol();
-      break;
-    case SD_BANDED:
-      initBandedLinsol();
-      break;
-    case SD_ITERATIVE:
-      initIterativeLinsol();
-      break;
-    case SD_USER_DEFINED:
-      initUserDefinedLinsol();
-      break;
-    }
-
-    // Set user data
-    flag = CVodeSetUserData(mem_, this);
-    if (flag!=CV_SUCCESS) cvodes_error("CVodeSetUserData", flag);
-
-    // Quadrature equations
-    if (nq_>0) {
-      // Initialize quadratures in CVodes
-      flag = CVodeQuadInit(mem_, rhsQ_wrapper, q_);
-      if (flag != CV_SUCCESS) cvodes_error("CVodeQuadInit", flag);
-
-      // Should the quadrature errors be used for step size control?
-      if (option("quad_err_con").toInt()) {
-        flag = CVodeSetQuadErrCon(mem_, true);
-        if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrCon", flag);
-
-        // Quadrature error tolerances
-        // TODO(Joel): vector absolute tolerances
-        flag = CVodeQuadSStolerances(mem_, reltol_, abstol_);
-        if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerances", flag);
+    // Attach functions for jacobian information
+    if (exact_jacobian_) {
+      switch (linsol_f_) {
+      case SD_ITERATIVE:
+        f_fwd_ = f_.derivative(1, 0);
+        alloc(f_fwd_);
+        break;
+      default: break;
       }
     }
 
-    // Adjoint sensitivity problem
-    if (!g_.isNull()) {
-      // Get the number of steos per checkpoint
-      int Nd = option("steps_per_checkpoint");
-
-      // Get the interpolation type
-      int interpType;
-      if (option("interpolation_type")=="hermite")
-        interpType = CV_HERMITE;
-      else if (option("interpolation_type")=="polynomial")
-        interpType = CV_POLYNOMIAL;
-      else
-        throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
-
-      // Initialize adjoint sensitivities
-      flag = CVodeAdjInit(mem_, Nd, interpType);
-      if (flag != CV_SUCCESS) cvodes_error("CVodeAdjInit", flag);
-
-      isInitAdj_ = false;
+    if (exact_jacobianB_) {
+      switch (linsol_g_) {
+      case SD_ITERATIVE:
+        g_fwd_ = g_.derivative(1, 0);
+        alloc(g_fwd_);
+        break;
+      default: break;
+      }
     }
   }
 
-
-  void CvodesInterface::initAdj() {
+  void CvodesInterface::initAdj(CvodesMemory& m) {
 
     // Create backward problem (use the same lmm and iter)
-    int flag = CVodeCreateB(mem_, lmm_, iter_, &whichB_);
+    int flag = CVodeCreateB(m.mem, lmm_, iter_, &whichB_);
     if (flag != CV_SUCCESS) cvodes_error("CVodeCreateB", flag);
 
     // Initialize the backward problem
     double tB0 = grid_.back();
-    flag = CVodeInitB(mem_, whichB_, rhsB_wrapper, tB0, rxz_);
+    flag = CVodeInitB(m.mem, whichB_, rhsB_wrapper, tB0, rxz_);
     if (flag != CV_SUCCESS) cvodes_error("CVodeInitB", flag);
 
     // Set tolerances
-    flag = CVodeSStolerancesB(mem_, whichB_, reltolB_, abstolB_);
+    flag = CVodeSStolerancesB(m.mem, whichB_, reltolB_, abstolB_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeSStolerancesB", flag);
 
     // User data
-    flag = CVodeSetUserDataB(mem_, whichB_, this);
+    flag = CVodeSetUserDataB(m.mem, whichB_, &m);
     if (flag != CV_SUCCESS) cvodes_error("CVodeSetUserDataB", flag);
 
     // attach linear solver to backward problem
     switch (linsol_g_) {
     case SD_DENSE:
-      initDenseLinsolB();
+      initDenseLinsolB(m);
       break;
     case SD_BANDED:
-      initBandedLinsolB();
+      initBandedLinsolB(m);
       break;
     case SD_ITERATIVE:
-      initIterativeLinsolB();
+      initIterativeLinsolB(m);
       break;
     case SD_USER_DEFINED:
-      initUserDefinedLinsolB();
+      initUserDefinedLinsolB(m);
       break;
     }
 
     // Quadratures for the backward problem
-    flag = CVodeQuadInitB(mem_, whichB_, rhsQB_wrapper, rq_);
+    flag = CVodeQuadInitB(m.mem, whichB_, rhsQB_wrapper, rq_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB", flag);
 
     if (option("quad_err_con").toInt()) {
-      flag = CVodeSetQuadErrConB(mem_, whichB_, true);
+      flag = CVodeSetQuadErrConB(m.mem, whichB_, true);
       if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB", flag);
 
-      flag = CVodeQuadSStolerancesB(mem_, whichB_, reltolB_, abstolB_);
+      flag = CVodeQuadSStolerancesB(m.mem, whichB_, reltolB_, abstolB_);
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB", flag);
     }
 
@@ -244,11 +181,102 @@ namespace casadi {
     isInitAdj_ = true;
   }
 
-  void CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot) {
+  Memory* CvodesInterface::memory() const {
+    CvodesMemory* m = new CvodesMemory(*this);
+    CvodesInterface* m2 = const_cast<CvodesInterface*>(this);
+    try {
+
+      // Create CVodes memory block
+      m->mem = CVodeCreate(lmm_, iter_);
+      casadi_assert_message(m->mem!=0, "CVodeCreate: Creation failed");
+
+      // Set error handler function
+      int flag = CVodeSetErrHandlerFn(m->mem, ehfun_wrapper, m);
+      if (flag != CV_SUCCESS) cvodes_error("CVodeSetErrHandlerFn", flag);
+
+      // Initialize CVodes
+      double t0 = 0;
+      flag = CVodeInit(m->mem, rhs_wrapper, t0, xz_);
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeInit", flag);
+
+      // Set tolerances
+      flag = CVodeSStolerances(m->mem, reltol_, abstol_);
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeInit", flag);
+
+      // Maximum number of steps
+      CVodeSetMaxNumSteps(m->mem, option("max_num_steps").toInt());
+      if (flag != CV_SUCCESS) cvodes_error("CVodeSetMaxNumSteps", flag);
+
+      // attach a linear solver
+      switch (linsol_f_) {
+      case SD_DENSE:
+        initDenseLinsol(*m);
+        break;
+      case SD_BANDED:
+        initBandedLinsol(*m);
+        break;
+      case SD_ITERATIVE:
+        initIterativeLinsol(*m);
+        break;
+      case SD_USER_DEFINED:
+        initUserDefinedLinsol(*m);
+        break;
+      }
+
+      // Set user data
+      flag = CVodeSetUserData(m->mem, m);
+      if (flag!=CV_SUCCESS) cvodes_error("CVodeSetUserData", flag);
+
+      // Quadrature equations
+      if (nq_>0) {
+        // Initialize quadratures in CVodes
+        flag = CVodeQuadInit(m->mem, rhsQ_wrapper, q_);
+        if (flag != CV_SUCCESS) cvodes_error("CVodeQuadInit", flag);
+
+        // Should the quadrature errors be used for step size control?
+        if (option("quad_err_con").toInt()) {
+          flag = CVodeSetQuadErrCon(m->mem, true);
+          if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrCon", flag);
+
+          // Quadrature error tolerances
+          // TODO(Joel): vector absolute tolerances
+          flag = CVodeQuadSStolerances(m->mem, reltol_, abstol_);
+          if (flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerances", flag);
+        }
+      }
+
+      // Adjoint sensitivity problem
+      if (!g_.isNull()) {
+        // Get the number of steos per checkpoint
+        int Nd = option("steps_per_checkpoint");
+
+        // Get the interpolation type
+        int interpType;
+        if (option("interpolation_type")=="hermite")
+          interpType = CV_HERMITE;
+        else if (option("interpolation_type")=="polynomial")
+          interpType = CV_POLYNOMIAL;
+        else
+          throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
+
+        // Initialize adjoint sensitivities
+        flag = CVodeAdjInit(m->mem, Nd, interpType);
+        if (flag != CV_SUCCESS) cvodes_error("CVodeAdjInit", flag);
+        m2->isInitAdj_ = false;
+      }
+
+      return m;
+    } catch (...) {
+      delete m;
+      return 0;
+    }
+  }
+
+  void CvodesInterface::rhs(CvodesMemory& m, double t, N_Vector x, N_Vector xdot) {
     log("CvodesInterface::rhs", "begin");
 
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Debug output
     if (monitor_rhs_) {
@@ -272,8 +300,8 @@ namespace casadi {
     }
 
     // Log time
-    time2 = clock();
-    t_res += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_res += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::rhs", "end");
 
@@ -282,8 +310,8 @@ namespace casadi {
   int CvodesInterface::rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhs(t, x, xdot);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.rhs(*m, t, x, xdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhs failed: " << e.what() << endl;
@@ -291,43 +319,46 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::reset(Memory& m, double t, const double* x,
+  void CvodesInterface::reset(IntegratorMemory& mem, double t, const double* x,
                               const double* z, const double* _p) {
     casadi_msg("CvodesInterface::reset begin");
+    CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
 
     // Reset the base classes
-    SundialsInterface::reset(m, t, x, z, _p);
+    SundialsInterface::reset(mem, t, x, z, _p);
 
     // Reset timers
-    t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
+    m.t_res = m.t_fres = m.t_jac = m.t_lsolve = m.t_lsetup_jac = m.t_lsetup_fac = 0;
 
     // Re-initialize
-    int flag = CVodeReInit(mem_, t, xz_);
+    int flag = CVodeReInit(m.mem, t, xz_);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeReInit", flag);
 
     // Re-initialize quadratures
     if (nq_>0) {
       N_VConst(0.0, q_);
-      flag = CVodeQuadReInit(mem_, q_);
+      flag = CVodeQuadReInit(m.mem, q_);
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadReInit", flag);
     }
 
     // Turn off sensitivities
-    flag = CVodeSensToggleOff(mem_);
+    flag = CVodeSensToggleOff(m.mem);
     if (flag != CV_SUCCESS) cvodes_error("CVodeSensToggleOff", flag);
 
     // Re-initialize backward integration
     if (nrx_>0) {
-      flag = CVodeAdjReInit(mem_);
+      flag = CVodeAdjReInit(m.mem);
       if (flag != CV_SUCCESS) cvodes_error("CVodeAdjReInit", flag);
     }
 
     // Set the stop time of the integration -- don't integrate past this point
-    if (stop_at_end_) setStopTime(grid_.back());
+    if (stop_at_end_) setStopTime(m, grid_.back());
     casadi_msg("CvodesInterface::reset end");
   }
 
-  void CvodesInterface::advance(Memory& m, double t, double* x, double* z, double* q) {
+  void CvodesInterface::advance(IntegratorMemory& mem, double t, double* x, double* z, double* q) {
+    CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
+
     casadi_assert_message(t>=grid_.front(),
                           "CvodesInterface::integrate(" << t << "): "
                           "Cannot integrate to a time earlier than t0 ("
@@ -343,18 +374,18 @@ namespace casadi {
       // Integrate forward ...
       if (nrx_>0) {
         // ... with taping
-        int flag = CVodeF(mem_, t, xz_, &t_, CV_NORMAL, &ncheck_);
+        int flag = CVodeF(m.mem, t, xz_, &t_, CV_NORMAL, &ncheck_);
         if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVodeF", flag);
       } else {
         // ... without taping
-        int flag = CVode(mem_, t, xz_, &t_, CV_NORMAL);
+        int flag = CVode(m.mem, t, xz_, &t_, CV_NORMAL);
         if (flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVode", flag);
       }
 
       // Get quadratures
       if (nq_>0) {
         double tret;
-        int flag = CVodeGetQuad(mem_, &tret, q_);
+        int flag = CVodeGetQuad(m.mem, &tret, q_);
         if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad", flag);
       }
     }
@@ -364,13 +395,13 @@ namespace casadi {
     casadi_copy(NV_DATA_S(q_), nq_, q);
 
     // Print statistics
-    if (option("print_stats")) printStats(userOut());
+    if (option("print_stats")) printStats(m, userOut());
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;
       int qlast, qcur;
       double hinused, hlast, hcur, tcur;
-      int flag = CVodeGetIntegratorStats(mem_, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
+      int flag = CVodeGetIntegratorStats(m.mem, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
                                          &qcur, &hinused, &hlast, &hcur, &tcur);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
       stats_["nsteps"] = 1.0*nsteps;
@@ -380,40 +411,45 @@ namespace casadi {
     casadi_msg("CvodesInterface::integrate(" << t << ") end");
   }
 
-  void CvodesInterface::resetB(Memory& m, double t, const double* rx,
+  void CvodesInterface::resetB(IntegratorMemory& mem, double t, const double* rx,
                                const double* rz, const double* rp) {
+    CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
+
     // Reset the base classes
-    SundialsInterface::resetB(m, t, rx, rz, rp);
+    SundialsInterface::resetB(mem, t, rx, rz, rp);
 
     int flag;
     if (isInitAdj_) {
-      flag = CVodeReInitB(mem_, whichB_, grid_.back(), rxz_);
+      flag = CVodeReInitB(m.mem, whichB_, grid_.back(), rxz_);
       if (flag != CV_SUCCESS) cvodes_error("CVodeReInitB", flag);
 
-      flag = CVodeQuadReInitB(mem_, whichB_, rq_);
+      flag = CVodeQuadReInitB(m.mem, whichB_, rq_);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB", flag);
 
     } else {
 
       // Initialize the adjoint integration
-      initAdj();
+      initAdj(m);
     }
     casadi_msg("CvodesInterface::resetB end");
   }
 
-  void CvodesInterface::retreat(Memory& m, double t, double* rx, double* rz, double* rq) {
+  void CvodesInterface::retreat(IntegratorMemory& mem, double t,
+                                double* rx, double* rz, double* rq) {
+    CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
+
     // Integrate, unless already at desired time
     if (t<t_) {
-      int flag = CVodeB(mem_, t, CV_NORMAL);
+      int flag = CVodeB(m.mem, t, CV_NORMAL);
       if (flag<CV_SUCCESS) cvodes_error("CVodeB", flag);
 
       // Get backward state
-      flag = CVodeGetB(mem_, whichB_, &t_, rxz_);
+      flag = CVodeGetB(m.mem, whichB_, &t_, rxz_);
       if (flag!=CV_SUCCESS) cvodes_error("CVodeGetB", flag);
 
       // Get backward qudratures
       if (nrq_>0) {
-        flag = CVodeGetQuadB(mem_, whichB_, &t_, rq_);
+        flag = CVodeGetQuadB(m.mem, whichB_, &t_, rq_);
         if (flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB", flag);
       }
     }
@@ -426,7 +462,7 @@ namespace casadi {
       long nsteps, nfevals, nlinsetups, netfails;
       int qlast, qcur;
       double hinused, hlast, hcur, tcur;
-      CVodeMem cv_mem = static_cast<CVodeMem>(mem_);
+      CVodeMem cv_mem = static_cast<CVodeMem>(m.mem);
       CVadjMem ca_mem = cv_mem->cv_adj_mem;
       CVodeBMem cvB_mem = ca_mem->cvB_mem;
 
@@ -441,11 +477,13 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::printStats(std::ostream &stream) const {
+  void CvodesInterface::printStats(IntegratorMemory& mem, std::ostream &stream) const {
+    CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
+
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
-    int flag = CVodeGetIntegratorStats(mem_, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
+    int flag = CVodeGetIntegratorStats(m.mem, &nsteps, &nfevals, &nlinsetups, &netfails, &qlast,
                                        &qcur, &hinused, &hlast, &hcur, &tcur);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats", flag);
 
@@ -454,11 +492,11 @@ namespace casadi {
     switch (linsol_f_) {
     case SD_DENSE:
     case SD_BANDED:
-      flag = CVDlsGetNumRhsEvals(mem_, &nfevals_linsol);
+      flag = CVDlsGetNumRhsEvals(m.mem, &nfevals_linsol);
       if (flag!=CV_SUCCESS) cvodes_error("CVDlsGetNumRhsEvals", flag);
       break;
     case SD_ITERATIVE:
-      flag = CVSpilsGetNumRhsEvals(mem_, &nfevals_linsol);
+      flag = CVSpilsGetNumRhsEvals(m.mem, &nfevals_linsol);
       if (flag!=CV_SUCCESS) cvodes_error("CVSpilsGetNumRhsEvals", flag);
       break;
     default:
@@ -484,15 +522,15 @@ namespace casadi {
     stream << "number of checkpoints stored: " << ncheck_ << endl;
     stream << std::endl;
 
-    stream << "Time spent in the ODE residual: " << t_res << " s." << endl;
-    stream << "Time spent in the forward sensitivity residual: " << t_fres << " s." << endl;
+    stream << "Time spent in the ODE residual: " << m.t_res << " s." << endl;
+    stream << "Time spent in the forward sensitivity residual: " << m.t_fres << " s." << endl;
     stream << "Time spent in the jacobian function or jacobian times vector function: "
-           << t_jac << " s." << endl;
-    stream << "Time spent in the linear solver solve function: " << t_lsolve << " s." << endl;
+           << m.t_jac << " s." << endl;
+    stream << "Time spent in the linear solver solve function: " << m.t_lsolve << " s." << endl;
     stream << "Time spent to generate the jacobian in the linear solver setup function: "
-           << t_lsetup_jac << " s." << endl;
+           << m.t_lsetup_jac << " s." << endl;
     stream << "Time spent to factorize the jacobian in the linear solver setup function: "
-           << t_lsetup_fac << " s." << endl;
+           << m.t_lsetup_fac << " s." << endl;
     stream << std::endl;
   }
 
@@ -508,32 +546,33 @@ namespace casadi {
                                      char *msg, void *user_data) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->ehfun(error_code, module, function, msg);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.ehfun(*m, error_code, module, function, msg);
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
     }
   }
 
-  void CvodesInterface::ehfun(int error_code, const char *module, const char *function, char *msg) {
+  void CvodesInterface::ehfun(CvodesMemory& m, int error_code, const char *module,
+                              const char *function, char *msg) {
     if (!disable_internal_warnings_) {
       userOut<true, PL_WARN>() << msg << endl;
     }
   }
 
-  void CvodesInterface::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
-                            N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2) {
+  void CvodesInterface::rhsS(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector xdot,
+                             N_Vector *xF, N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2) {
     //    casadi_assert(Ns==nfdir_);
 
     // Record the current cpu time
-    time1 = clock();
+    m.time1 = clock();
 
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
 
     // Record timings
-    time2 = clock();
-    t_fres += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_fres += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
   }
 
   int CvodesInterface::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
@@ -541,8 +580,8 @@ namespace casadi {
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsS(Ns, t, x, xdot, xF, xdotF, tmp1, tmp2);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.rhsS(*m, Ns, t, x, xdot, xF, xdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
@@ -550,8 +589,8 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF,
-                             N_Vector xdotF, N_Vector tmp1, N_Vector tmp2) {
+  void CvodesInterface::rhsS1(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector xdot, int iS,
+                              N_Vector xF, N_Vector xdotF, N_Vector tmp1, N_Vector tmp2) {
 
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
@@ -562,8 +601,8 @@ namespace casadi {
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsS1(Ns, t, x, xdot, iS, xF, xdotF, tmp1, tmp2);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.rhsS1(*m, Ns, t, x, xdot, iS, xF, xdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "fs failed: " << e.what() << endl;
@@ -574,8 +613,8 @@ namespace casadi {
   int CvodesInterface::rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsQ(t, x, qdot);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.rhsQ(*m, t, x, qdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;;
@@ -583,7 +622,7 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot) {
+  void CvodesInterface::rhsQ(CvodesMemory& m, double t, N_Vector x, N_Vector qdot) {
     // Evaluate f_
     arg_[DAE_T] = &t;
     arg_[DAE_X] = NV_DATA_S(x);
@@ -595,8 +634,8 @@ namespace casadi {
     f_(arg_, res_, iw_, w_, 0);
   }
 
-  void CvodesInterface::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
-                             N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2) {
+  void CvodesInterface::rhsQS(CvodesMemory& m, int Ns, double t, N_Vector x, N_Vector *xF,
+                              N_Vector qdot, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2) {
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
   }
@@ -605,13 +644,13 @@ namespace casadi {
                                     N_Vector *qdotF, void *user_data,
                                     N_Vector tmp1, N_Vector tmp2) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      if (!this_) {
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      if (!m) {
         // SUNDIALS BUG!!!
         for (int i=0; i<Ns; ++i) N_VConst(0.0, qdotF[i]);
         return 0;
       }
-      this_->rhsQS(Ns, t, x, xF, qdot, qdotF, tmp1, tmp2);
+      m->self.rhsQS(*m, Ns, t, x, xF, qdot, qdotF, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQS failed: " << e.what() << endl;;
@@ -619,7 +658,7 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot) {
+  void CvodesInterface::rhsB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rxdot) {
     log("CvodesInterface::rhsB", "begin");
 
     // Debug output
@@ -653,7 +692,8 @@ namespace casadi {
     log("CvodesInterface::rhsB", "end");
   }
 
-  void CvodesInterface::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector rx, N_Vector rxdot) {
+  void CvodesInterface::rhsBS(CvodesMemory& m, double t, N_Vector x, N_Vector *xF, N_Vector rx,
+                              N_Vector rxdot) {
 
     // Commented out since a new implementation currently cannot be tested
     casadi_error("Commented out, #884, #794.");
@@ -663,8 +703,8 @@ namespace casadi {
                                    void *user_data) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsB(t, x, rx, rxdot);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.rhsB(*m, t, x, rx, rxdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsB failed: " << e.what() << endl;;
@@ -676,8 +716,8 @@ namespace casadi {
                                     N_Vector xdotB, void *user_data) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsBS(t, x, xF, xB, xdotB);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.rhsBS(*m, t, x, xF, xB, xdotB);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsBS failed: " << e.what() << endl;;
@@ -689,8 +729,8 @@ namespace casadi {
                                     N_Vector rqdot, void *user_data) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->rhsQB(t, x, rx, rqdot);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.rhsQB(*m, t, x, rx, rqdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;;
@@ -698,7 +738,7 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector rqdot) {
+  void CvodesInterface::rhsQB(CvodesMemory& m, double t, N_Vector x, N_Vector rx, N_Vector rqdot) {
     if (monitor_rhsQB_) {
       userOut() << "CvodesInterface::rhsQB: begin" << endl;
     }
@@ -740,8 +780,8 @@ namespace casadi {
                                      N_Vector xdot, void *user_data, N_Vector tmp) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->jtimes(v, Jv, t, x, xdot, tmp);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.jtimes(*m, v, Jv, t, x, xdot, tmp);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
@@ -754,8 +794,8 @@ namespace casadi {
                                       N_Vector tmpB) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->jtimesB(vB, JvB, t, x, xB, xdotB, tmpB);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.jtimesB(*m, vB, JvB, t, x, xB, xdotB, tmpB);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
@@ -763,11 +803,11 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
+  void CvodesInterface::jtimes(CvodesMemory& m, N_Vector v, N_Vector Jv, double t, N_Vector x,
                               N_Vector xdot, N_Vector tmp) {
     log("CvodesInterface::jtimes", "begin");
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Evaluate f_fwd_
     arg_[DAE_T] = &t;
@@ -787,17 +827,17 @@ namespace casadi {
     f_fwd_(arg_, res_, iw_, w_, 0);
 
     // Log time duration
-    time2 = clock();
-    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::jtimes", "end");
   }
 
-  void CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector rx,
-                               N_Vector rxdot, N_Vector tmpB) {
+  void CvodesInterface::jtimesB(CvodesMemory& m, N_Vector v, N_Vector Jv, double t, N_Vector x,
+                                N_Vector rx, N_Vector rxdot, N_Vector tmpB) {
     log("CvodesInterface::jtimesB", "begin");
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Hack:
     vector<const double*> arg1(g_fwd_.sz_arg());
@@ -833,8 +873,8 @@ namespace casadi {
     g_fwd_(arg1_, res1_, iw_, w_, 0);
 
     // Log time duration
-    time2 = clock();
-    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
     log("CvodesInterface::jtimesB", "end");
   }
 
@@ -842,8 +882,8 @@ namespace casadi {
                                    void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->djac(N, t, x, xdot, Jac, tmp1, tmp2, tmp3);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.djac(*m, N, t, x, xdot, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djac failed: " << e.what() << endl;;
@@ -856,8 +896,8 @@ namespace casadi {
                                     N_Vector tmp3B) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->djacB(NeqB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.djacB(*m, NeqB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djacB failed: " << e.what() << endl;;
@@ -865,12 +905,12 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
-                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
+  void CvodesInterface::djac(CvodesMemory& m, long N, double t, N_Vector x, N_Vector xdot,
+                             DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     log("CvodesInterface::djac", "begin");
 
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Evaluate jac_
     arg_[DAE_T] = &t;
@@ -903,17 +943,18 @@ namespace casadi {
     }
 
     // Log time duration
-    time2 = clock();
-    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::djac", "end");
   }
 
-  void CvodesInterface::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
-                             DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+  void CvodesInterface::djacB(CvodesMemory& m, long NeqB, double t, N_Vector x, N_Vector xB,
+                              N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B,
+                              N_Vector tmp3B) {
     log("CvodesInterface::djacB", "begin");
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Evaluate jacB_
     arg_[RDAE_T] = &t;
@@ -949,8 +990,8 @@ namespace casadi {
     }
 
     // Log time duration
-    time2 = clock();
-    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
     log("CvodesInterface::djacB", "end");
   }
 
@@ -959,8 +1000,8 @@ namespace casadi {
                                    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->bjac(N, mupper, mlower, t, x, xdot, Jac, tmp1, tmp2, tmp3);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.bjac(*m, N, mupper, mlower, t, x, xdot, Jac, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "bjac failed: " << e.what() << endl;;
@@ -973,8 +1014,8 @@ namespace casadi {
                                     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try {
       casadi_assert(user_data);
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      this_->bjacB(NeqB, mupperB, mlowerB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      m->self.bjacB(*m, NeqB, mupperB, mlowerB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "bjacB failed: " << e.what() << endl;;
@@ -982,12 +1023,13 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot,
-                            DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
+  void CvodesInterface::bjac(CvodesMemory& m, long N, long mupper, long mlower, double t,
+                             N_Vector x, N_Vector xdot,
+                             DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     log("CvodesInterface::bjac", "begin");
 
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Evaluate jac_
     arg_[DAE_T] = &t;
@@ -1021,19 +1063,20 @@ namespace casadi {
     }
 
     // Log time duration
-    time2 = clock();
-    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::bjac", "end");
   }
 
-  void CvodesInterface::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
-                             N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B,
-                             N_Vector tmp2B, N_Vector tmp3B) {
+  void CvodesInterface::bjacB(CvodesMemory& m,
+                              long NeqB, long mupperB, long mlowerB, double t, N_Vector x,
+                              N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B,
+                              N_Vector tmp2B, N_Vector tmp3B) {
     log("CvodesInterface::bjacB", "begin");
 
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Evaluate jacB_
     arg_[RDAE_T] = &t;
@@ -1070,25 +1113,26 @@ namespace casadi {
     }
 
     // Log time duration
-    time2 = clock();
-    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::bjacB", "end");
   }
 
-  void CvodesInterface::setStopTime(double tf) {
+  void CvodesInterface::setStopTime(IntegratorMemory& mem, double tf) {
     // Set the stop time of the integration -- don't integrate past this point
-    int flag = CVodeSetStopTime(mem_, tf);
+    CvodesMemory& m = dynamic_cast<CvodesMemory&>(mem);
+    int flag = CVodeSetStopTime(m.mem, tf);
     if (flag != CV_SUCCESS) cvodes_error("CVodeSetStopTime", flag);
   }
 
   int CvodesInterface::psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r,
-                                     N_Vector z, double gamma, double delta, int lr,
-                                     void *user_data, N_Vector tmp) {
+                                      N_Vector z, double gamma, double delta, int lr,
+                                      void *user_data, N_Vector tmp) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      casadi_assert(this_);
-      this_->psolve(t, x, xdot, r, z, gamma, delta, lr, tmp);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      casadi_assert(m);
+      m->self.psolve(*m, t, x, xdot, r, z, gamma, delta, lr, tmp);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;;
@@ -1100,9 +1144,9 @@ namespace casadi {
                                       N_Vector rvecB, N_Vector zvecB, double gammaB,
                                       double deltaB, int lr, void *user_data, N_Vector tmpB) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      casadi_assert(this_);
-      this_->psolveB(t, x, xB, xdotB, rvecB, zvecB, gammaB, deltaB, lr, tmpB);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      casadi_assert(m);
+      m->self.psolveB(*m, t, x, xB, xdotB, rvecB, zvecB, gammaB, deltaB, lr, tmpB);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;;
@@ -1114,9 +1158,9 @@ namespace casadi {
                                      booleantype *jcurPtr, double gamma, void *user_data,
                                      N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      casadi_assert(this_);
-      this_->psetup(t, x, xdot, jok, jcurPtr, gamma, tmp1, tmp2, tmp3);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      casadi_assert(m);
+      m->self.psetup(*m, t, x, xdot, jok, jcurPtr, gamma, tmp1, tmp2, tmp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetup failed: " << e.what() << endl;;
@@ -1129,9 +1173,9 @@ namespace casadi {
                                       void *user_data, N_Vector tmp1B, N_Vector tmp2B,
                                       N_Vector tmp3B) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(user_data);
-      casadi_assert(this_);
-      this_->psetupB(t, x, xB, xdotB, jokB, jcurPtrB, gammaB, tmp1B, tmp2B, tmp3B);
+      CvodesMemory* m = static_cast<CvodesMemory*>(user_data);
+      casadi_assert(m);
+      m->self.psetupB(*m, t, x, xB, xdotB, jokB, jcurPtrB, gammaB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;;
@@ -1139,10 +1183,11 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
-                              double gamma, double delta, int lr, N_Vector tmp) {
+  void CvodesInterface::psolve(CvodesMemory& m,
+                               double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
+                               double gamma, double delta, int lr, N_Vector tmp) {
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Copy input to output, if necessary
     if (r!=z) {
@@ -1151,18 +1196,19 @@ namespace casadi {
 
     // Solve the (possibly factorized) system
     casadi_assert(linsol_.nnz_out(0) == NV_LENGTH_S(z));
-    linsol_.linsol_solve(linsol_mem_, NV_DATA_S(z));
+    linsol_.linsol_solve(NV_DATA_S(z));
 
     // Log time duration
-    time2 = clock();
-    t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_lsolve += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
   }
 
-  void CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
-                               N_Vector zvecB, double gammaB, double deltaB,
-                               int lr, N_Vector tmpB) {
+  void CvodesInterface::psolveB(CvodesMemory& m,
+                                double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
+                                N_Vector zvecB, double gammaB, double deltaB,
+                                int lr, N_Vector tmpB) {
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Copy input to output, if necessary
     if (rvecB!=zvecB) {
@@ -1171,19 +1217,20 @@ namespace casadi {
 
     // Solve the (possibly factorized) system
     casadi_assert(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB));
-    linsolB_.linsol_solve(linsolB_mem_, NV_DATA_S(zvecB), 1);
+    linsolB_.linsol_solve(NV_DATA_S(zvecB), 1);
 
     // Log time duration
-    time2 = clock();
-    t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_lsolve += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
   }
 
-  void CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
-                              booleantype *jcurPtr, double gamma, N_Vector tmp1,
-                              N_Vector tmp2, N_Vector tmp3) {
+  void CvodesInterface::psetup(CvodesMemory& m,
+                               double t, N_Vector x, N_Vector xdot, booleantype jok,
+                               booleantype *jcurPtr, double gamma, N_Vector tmp1,
+                               N_Vector tmp2, N_Vector tmp3) {
     log("CvodesInterface::psetup", "begin");
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Evaluate jac_
     arg_[DAE_T] = &t;
@@ -1200,28 +1247,27 @@ namespace casadi {
     jac_(arg_, res_, iw_, w2, 0);
 
     // Log time duration
-    time2 = clock();
-    t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_lsetup_jac += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsol_mem_ = Memory(linsol_, arg_, res_, iw_, w2, 0);
-    linsol_.linsol_factorize(linsol_mem_, val);
+    linsol_.setup(arg_+LINSOL_NUM_IN, res_+LINSOL_NUM_OUT, iw_, w2);
+    linsol_.linsol_factorize(val);
 
     // Log time duration
-    time1 = clock();
-    t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
+    m.time1 = clock();
+    m.t_lsetup_fac += static_cast<double>(m.time1-m.time2)/CLOCKS_PER_SEC;
 
     log("CvodesInterface::psetup", "end");
   }
 
-  void CvodesInterface::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
-                               booleantype jokB, booleantype *jcurPtrB, double gammaB,
-                               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+  void CvodesInterface::psetupB(CvodesMemory& m,
+                                double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+                                booleantype jokB, booleantype *jcurPtrB, double gammaB,
+                                N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     log("CvodesInterface::psetupB", "begin");
     // Get time
-    time1 = clock();
+    m.time1 = clock();
 
     // Evaluate jacB_
     arg_[RDAE_T] = &t;
@@ -1241,24 +1287,23 @@ namespace casadi {
     jacB_(arg_, res_, iw_, w2, 0);
 
     // Log time duration
-    time2 = clock();
-    t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_lsetup_jac += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    fill(arg_, arg_+LINSOL_NUM_IN, static_cast<const double*>(0));
-    fill(res_, res_+LINSOL_NUM_OUT, static_cast<double*>(0));
-    linsolB_mem_ = Memory(linsolB_, arg_, res_, iw_, w2, 0);
-    linsolB_.linsol_factorize(linsolB_mem_, val);
+    linsolB_.setup(arg_+LINSOL_NUM_IN, res_+LINSOL_NUM_OUT, iw_, w2);
+    linsolB_.linsol_factorize(val);
 
     // Log time duration
-    time1 = clock();
-    t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
+    m.time1 = clock();
+    m.t_lsetup_fac += static_cast<double>(m.time1-m.time2)/CLOCKS_PER_SEC;
     log("CvodesInterface::psetupB", "end");
   }
 
-  void CvodesInterface::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                              booleantype *jcurPtr,
-                              N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+  void CvodesInterface::lsetup(CvodesMemory& m,
+                               CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+                               booleantype *jcurPtr,
+                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     // Current time
     double t = cv_mem->cv_tn;
 
@@ -1266,23 +1311,24 @@ namespace casadi {
     double gamma = cv_mem->cv_gamma;
 
     // Call the preconditioner setup function (which sets up the linear solver)
-    psetup(t, x, xdot, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
+    psetup(m, t, x, xdot, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
   }
 
-  void CvodesInterface::lsetupB(double t, double gamma, int convfail,
-                               N_Vector x, N_Vector xB, N_Vector xdotB, booleantype *jcurPtr,
-                               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+  void CvodesInterface::lsetupB(CvodesMemory& m,
+                                double t, double gamma, int convfail,
+                                N_Vector x, N_Vector xB, N_Vector xdotB, booleantype *jcurPtr,
+                                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     // Call the preconditioner setup function (which sets up the linear solver)
-    psetupB(t, x, xB, xdotB, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
+    psetupB(m, t, x, xB, xdotB, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
   }
 
   int CvodesInterface::lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
                                      booleantype *jcurPtr,
                                      N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(cv_mem->cv_lmem);
-      casadi_assert(this_);
-      this_->lsetup(cv_mem, convfail, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
+      CvodesMemory* m = static_cast<CvodesMemory*>(cv_mem->cv_lmem);
+      casadi_assert(m);
+      m->self.lsetup(*m, cv_mem, convfail, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;;
@@ -1294,8 +1340,8 @@ namespace casadi {
                                       booleantype *jcurPtr,
                                       N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(cv_mem->cv_lmem);
-      casadi_assert(this_);
+      CvodesMemory* m = static_cast<CvodesMemory*>(cv_mem->cv_lmem);
+      casadi_assert(m);
       CVadjMem ca_mem;
       //CVodeBMem cvB_mem;
 
@@ -1314,7 +1360,8 @@ namespace casadi {
       flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
       if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
-      this_->lsetupB(t, gamma, convfail, ca_mem->ca_ytmp, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
+      m->self.lsetupB(*m, t, gamma, convfail, ca_mem->ca_ytmp, x, xdot,
+                          jcurPtr, vtemp1, vtemp2, vtemp3);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetupB failed: " << e.what() << endl;;
@@ -1322,8 +1369,9 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
-                              N_Vector x, N_Vector xdot) {
+  void CvodesInterface::lsolve(CvodesMemory& m,
+                               CVodeMem cv_mem, N_Vector b, N_Vector weight,
+                               N_Vector x, N_Vector xdot) {
     log("CvodesInterface::lsolve", "begin");
 
     // Current time
@@ -1339,13 +1387,14 @@ namespace casadi {
     int lr = 1;
 
     // Call the preconditioner solve function (which solves the linear system)
-    psolve(t, x, xdot, b, b, gamma, delta, lr, 0);
+    psolve(m, t, x, xdot, b, b, gamma, delta, lr, 0);
 
     log("CvodesInterface::lsolve", "end");
   }
 
-  void CvodesInterface::lsolveB(double t, double gamma, N_Vector b, N_Vector weight,
-                               N_Vector x, N_Vector xB, N_Vector xdotB) {
+  void CvodesInterface::lsolveB(CvodesMemory& m,
+                                double t, double gamma, N_Vector b, N_Vector weight,
+                                N_Vector x, N_Vector xB, N_Vector xdotB) {
     log("CvodesInterface::lsolveB", "begin");
     // Accuracy
     double delta = 0.0;
@@ -1354,7 +1403,7 @@ namespace casadi {
     int lr = 1;
 
     // Call the preconditioner solve function (which solves the linear system)
-    psolveB(t, x, xB, xdotB, b, b, gamma, delta, lr, 0);
+    psolveB(m, t, x, xB, xdotB, b, b, gamma, delta, lr, 0);
 
     log("CvodesInterface::lsolveB", "end");
   }
@@ -1362,9 +1411,9 @@ namespace casadi {
   int CvodesInterface::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                      N_Vector x, N_Vector xdot) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(cv_mem->cv_lmem);
-      casadi_assert(this_);
-      this_->lsolve(cv_mem, b, weight, x, xdot);
+      CvodesMemory* m = static_cast<CvodesMemory*>(cv_mem->cv_lmem);
+      casadi_assert(m);
+      m->self.lsolve(*m, cv_mem, b, weight, x, xdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;;
@@ -1375,8 +1424,8 @@ namespace casadi {
   int CvodesInterface::lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
                                       N_Vector x, N_Vector xdot) {
     try {
-      CvodesInterface *this_ = static_cast<CvodesInterface*>(cv_mem->cv_lmem);
-      casadi_assert(this_);
+      CvodesMemory* m = static_cast<CvodesMemory*>(cv_mem->cv_lmem);
+      casadi_assert(m);
       CVadjMem ca_mem;
       //CVodeBMem cvB_mem;
 
@@ -1395,7 +1444,7 @@ namespace casadi {
       flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
       if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
-      this_->lsolveB(t, gamma, b, weight, ca_mem->ca_ytmp, x, xdot);
+      m->self.lsolveB(*m, t, gamma, b, weight, ca_mem->ca_ytmp, x, xdot);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsolveB failed: " << e.what() << endl;;
@@ -1403,50 +1452,46 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::initDenseLinsol() {
-    int flag = CVDense(mem_, nx_);
+  void CvodesInterface::initDenseLinsol(CvodesMemory& m) const {
+    int flag = CVDense(m.mem, nx_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDense", flag);
     if (exact_jacobian_) {
-      flag = CVDlsSetDenseJacFn(mem_, djac_wrapper);
+      flag = CVDlsSetDenseJacFn(m.mem, djac_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVDlsSetDenseJacFn", flag);
     }
   }
 
-  void CvodesInterface::initBandedLinsol() {
+  void CvodesInterface::initBandedLinsol(CvodesMemory& m) const {
     pair<int, int> bw = getBandwidth();
-    int flag = CVBand(mem_, nx_, bw.first, bw.second);
+    int flag = CVBand(m.mem, nx_, bw.first, bw.second);
     if (flag!=CV_SUCCESS) cvodes_error("CVBand", flag);
     if (exact_jacobian_) {
-      flag = CVDlsSetBandJacFn(mem_, bjac_wrapper);
+      flag = CVDlsSetBandJacFn(m.mem, bjac_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVDlsSetBandJacFn", flag);
     }
   }
 
-  void CvodesInterface::initIterativeLinsol() {
+  void CvodesInterface::initIterativeLinsol(CvodesMemory& m) const {
     // Attach the sparse solver
     int flag;
     switch (itsol_f_) {
     case SD_GMRES:
-      flag = CVSpgmr(mem_, pretype_f_, max_krylov_);
+      flag = CVSpgmr(m.mem, pretype_f_, max_krylov_);
       if (flag!=CV_SUCCESS) cvodes_error("CVBand", flag);
       break;
     case SD_BCGSTAB:
-      flag = CVSpbcg(mem_, pretype_f_, max_krylov_);
+      flag = CVSpbcg(m.mem, pretype_f_, max_krylov_);
       if (flag!=CV_SUCCESS) cvodes_error("CVSpbcg", flag);
       break;
     case SD_TFQMR:
-      flag = CVSptfqmr(mem_, pretype_f_, max_krylov_);
+      flag = CVSptfqmr(m.mem, pretype_f_, max_krylov_);
       if (flag!=CV_SUCCESS) cvodes_error("CVSptfqmr", flag);
       break;
     }
 
     // Attach functions for jacobian information
     if (exact_jacobian_) {
-      // Form the Jacobian-times-vector function
-      f_fwd_ = f_.derivative(1, 0);
-      alloc(f_fwd_);
-
-      flag = CVSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
+      flag = CVSpilsSetJacTimesVecFn(m.mem, jtimes_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVSpilsSetJacTimesVecFn", flag);
     }
 
@@ -1462,12 +1507,12 @@ namespace casadi {
                                 "No user defined linear solver has been provided.");
 
       // Pass to IDA
-      flag = CVSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
+      flag = CVSpilsSetPreconditioner(m.mem, psetup_wrapper, psolve_wrapper);
       if (flag != CV_SUCCESS) cvodes_error("CVSpilsSetPreconditioner", flag);
     }
   }
 
-  void CvodesInterface::initUserDefinedLinsol() {
+  void CvodesInterface::initUserDefinedLinsol(CvodesMemory& m) const {
     // Make sure that a Jacobian has been provided
     if (jac_.isNull())
         throw CasadiException("CvodesInterface::initUserDefinedLinsol(): "
@@ -1479,57 +1524,53 @@ namespace casadi {
                               "No user defined linear solver has been provided.");
 
     //  Set fields in the IDA memory
-    CVodeMem cv_mem = static_cast<CVodeMem>(mem_);
-    cv_mem->cv_lmem   = this;
+    CVodeMem cv_mem = static_cast<CVodeMem>(m.mem);
+    cv_mem->cv_lmem   = &m;
     cv_mem->cv_lsetup = lsetup_wrapper;
     cv_mem->cv_lsolve = lsolve_wrapper;
     cv_mem->cv_setupNonNull = TRUE;
   }
 
-  void CvodesInterface::initDenseLinsolB() {
-    int flag = CVDenseB(mem_, whichB_, nrx_);
+  void CvodesInterface::initDenseLinsolB(CvodesMemory& m) const {
+    int flag = CVDenseB(m.mem, whichB_, nrx_);
     if (flag!=CV_SUCCESS) cvodes_error("CVDenseB", flag);
     if (exact_jacobianB_) {
-      flag = CVDlsSetDenseJacFnB(mem_, whichB_, djacB_wrapper);
+      flag = CVDlsSetDenseJacFnB(m.mem, whichB_, djacB_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVDlsSetDenseJacFnB", flag);
     }
   }
 
-  void CvodesInterface::initBandedLinsolB() {
+  void CvodesInterface::initBandedLinsolB(CvodesMemory& m) const {
     pair<int, int> bw = getBandwidthB();
-    int flag = CVBandB(mem_, whichB_, nrx_, bw.first, bw.second);
+    int flag = CVBandB(m.mem, whichB_, nrx_, bw.first, bw.second);
     if (flag!=CV_SUCCESS) cvodes_error("CVBandB", flag);
 
     if (exact_jacobianB_) {
-      flag = CVDlsSetBandJacFnB(mem_, whichB_, bjacB_wrapper);
+      flag = CVDlsSetBandJacFnB(m.mem, whichB_, bjacB_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVDlsSetBandJacFnB", flag);
     }
   }
 
-  void CvodesInterface::initIterativeLinsolB() {
+  void CvodesInterface::initIterativeLinsolB(CvodesMemory& m) const {
     int flag;
     switch (itsol_g_) {
     case SD_GMRES:
-      flag = CVSpgmrB(mem_, whichB_, pretype_g_, max_krylovB_);
+      flag = CVSpgmrB(m.mem, whichB_, pretype_g_, max_krylovB_);
       if (flag!=CV_SUCCESS) cvodes_error("CVSpgmrB", flag);
       break;
     case SD_BCGSTAB:
-      flag = CVSpbcgB(mem_, whichB_, pretype_g_, max_krylovB_);
+      flag = CVSpbcgB(m.mem, whichB_, pretype_g_, max_krylovB_);
       if (flag!=CV_SUCCESS) cvodes_error("CVSpbcgB", flag);
       break;
     case SD_TFQMR:
-      flag = CVSptfqmrB(mem_, whichB_, pretype_g_, max_krylovB_);
+      flag = CVSptfqmrB(m.mem, whichB_, pretype_g_, max_krylovB_);
       if (flag!=CV_SUCCESS) cvodes_error("CVSptfqmrB", flag);
       break;
     }
 
     // Attach functions for jacobian information
     if (exact_jacobianB_) {
-      // Form the Jacobian-times-vector function
-      g_fwd_ = g_.derivative(1, 0);
-      alloc(g_fwd_);
-
-      flag = CVSpilsSetJacTimesVecFnB(mem_, whichB_, jtimesB_wrapper);
+      flag = CVSpilsSetJacTimesVecFnB(m.mem, whichB_, jtimesB_wrapper);
       if (flag!=CV_SUCCESS) cvodes_error("CVSpilsSetJacTimesVecFnB", flag);
     }
 
@@ -1545,13 +1586,13 @@ namespace casadi {
                      "No user defined backwards  linear solver has been provided.");
 
       // Pass to IDA
-      flag = CVSpilsSetPreconditionerB(mem_, whichB_, psetupB_wrapper, psolveB_wrapper);
+      flag = CVSpilsSetPreconditionerB(m.mem, whichB_, psetupB_wrapper, psolveB_wrapper);
       if (flag != CV_SUCCESS) cvodes_error("CVSpilsSetPreconditionerB", flag);
     }
 
   }
 
-  void CvodesInterface::initUserDefinedLinsolB() {
+  void CvodesInterface::initUserDefinedLinsolB(CvodesMemory& m) const {
     // Make sure that a Jacobian has been provided
     if (jacB_.isNull())
         throw CasadiException("CvodesInterface::initUserDefinedLinsolB(): "
@@ -1562,12 +1603,12 @@ namespace casadi {
         throw CasadiException("CvodesInterface::initUserDefinedLinsolB(): "
                               "No user defined backward linear solver has been provided.");
 
-    CVodeMem cv_mem = static_cast<CVodeMem>(mem_);
+    CVodeMem cv_mem = static_cast<CVodeMem>(m.mem);
     CVadjMem ca_mem = cv_mem->cv_adj_mem;
     CVodeBMem cvB_mem = ca_mem->cvB_mem;
-    cvB_mem->cv_lmem   = this;
+    cvB_mem->cv_lmem   = &m;
 
-    cvB_mem->cv_mem->cv_lmem = this;
+    cvB_mem->cv_mem->cv_lmem = &m;
     cvB_mem->cv_mem->cv_lsetup = lsetupB_wrapper;
     cvB_mem->cv_mem->cv_lsolve = lsolveB_wrapper;
     cvB_mem->cv_mem->cv_setupNonNull = TRUE;
@@ -1626,10 +1667,13 @@ namespace casadi {
     }
   }
 
-  CvodesMemory::CvodesMemory(CvodesInterface& s) : self(s) {
+  CvodesMemory::CvodesMemory(const CvodesInterface& s)
+    : self(const_cast<CvodesInterface&>(s)) {
+    this->mem = 0;
   }
 
   CvodesMemory::~CvodesMemory() {
+    if (this->mem) CVodeFree(&this->mem);
   }
 
 

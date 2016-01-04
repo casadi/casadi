@@ -66,7 +66,7 @@ namespace casadi {
     // Create arguments of the right dimensions and sparsity
     vector<MX> arg1(num_in);
     for (int i=0; i<num_in; ++i) {
-      arg1[i] = projectArg(arg[i], fcn_.input(i).sparsity(), i);
+      arg1[i] = projectArg(arg[i], fcn_.sparsity_in(i), i);
     }
     setDependencies(arg1);
     setSparsity(Sparsity::scalar());
@@ -83,7 +83,7 @@ namespace casadi {
     return ss.str();
   }
 
-  void Call::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Call::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     fcn_(arg, res, iw, w, mem);
   }
 
@@ -92,10 +92,10 @@ namespace casadi {
   }
 
   const Sparsity& Call::sparsity(int oind) const {
-    return fcn_.output(oind).sparsity();
+    return fcn_.sparsity_out(oind);
   }
 
-  void Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     fcn_(arg, res, iw, w, mem);
   }
 
@@ -135,11 +135,11 @@ namespace casadi {
     }
   }
 
-  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Call::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     fcn_.rev(arg, res, iw, w, mem);
   }
 

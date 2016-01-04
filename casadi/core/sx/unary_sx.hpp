@@ -67,9 +67,9 @@ class CASADI_EXPORT UnarySX : public SXNode {
     virtual bool hasDep() const { return true; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const SXNode* node, int depth) const {
+    virtual bool is_equal(const SXNode* node, int depth) const {
       const UnarySX* n = dynamic_cast<const UnarySX*>(node);
-      return n && n->op_ == op_ &&  n->dep_.zz_is_equal(dep_, depth-1);
+      return n && n->op_ == op_ &&  SXElem::is_equal(n->dep_, dep_, depth-1);
     }
 
     /** \brief  Number of dependencies */

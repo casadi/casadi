@@ -114,10 +114,10 @@ namespace casadi {
     T** res1 = res+this->n_out();
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
-        arg1[j] = arg[j] ? arg[j]+i*f_.input(j).nnz(): 0;
+        arg1[j] = arg[j] ? arg[j]+i*f_.nnz_in(j): 0;
       }
       for (int j=0; j<n_out; ++j) {
-        res1[j]= res[j] ? res[j]+i*f_.output(j).nnz(): 0;
+        res1[j]= res[j] ? res[j]+i*f_.nnz_out(j): 0;
       }
       f_(arg1, res1, iw, w, 0);
     }
@@ -141,10 +141,10 @@ namespace casadi {
     bvec_t** res1 = res+this->n_out();
     for (int i=0; i<n_; ++i) {
       for (int j=0; j<n_in; ++j) {
-        arg1[j] = arg[j] ? arg[j]+i*f_.input(j).nnz(): 0;
+        arg1[j] = arg[j] ? arg[j]+i*f_.nnz_in(j): 0;
       }
       for (int j=0; j<n_out; ++j) {
-        res1[j]= res[j] ? res[j]+i*f_.output(j).nnz(): 0;
+        res1[j]= res[j] ? res[j]+i*f_.nnz_out(j): 0;
       }
       f_->spAdj(arg1, res1, iw, w, 0);
     }
@@ -163,11 +163,11 @@ namespace casadi {
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
     for (int j=0; j<n_in_; ++j) {
       g.body << "    arg1[" << j << "] = arg[" << j << "]? " <<
-        "arg[" << j << "]+i*" << f_.input(j).nnz() << " : 0;" << endl;
+        "arg[" << j << "]+i*" << f_.nnz_in(j) << " : 0;" << endl;
     }
     for (int j=0; j<n_out_; ++j) {
       g.body << "    res1[" << j << "] = res[" << j << "]? " <<
-        "res[" << j << "]+i*" << f_.output(j).nnz() << " : 0;" << endl;
+        "res[" << j << "]+i*" << f_.nnz_out(j) << " : 0;" << endl;
     }
     g.body << "    if (" << g(f_, "arg1", "res1", "iw", "w", "0") << ") return 1;" << endl;
     g.body << "  }" << std::endl;

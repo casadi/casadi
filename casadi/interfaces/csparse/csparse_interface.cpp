@@ -47,53 +47,67 @@ namespace casadi {
   CsparseInterface::CsparseInterface(const std::string& name,
                                      const Sparsity& sparsity, int nrhs)
     : Linsol(name, sparsity, nrhs) {
-    N_ = 0;
-    S_ = 0;
   }
 
   CsparseInterface::~CsparseInterface() {
-    if (S_) cs_sfree(S_);
-    if (N_) cs_nfree(N_);
+  }
+
+  CsparseMemory::~CsparseMemory() {
+    if (this->S) cs_sfree(this->S);
+    if (this->N) cs_nfree(this->N);
   }
 
   void CsparseInterface::init() {
     // Call the init method of the base class
     Linsol::init();
-
-    A_.nzmax = nnz_in(0);  // maximum number of entries
-    A_.m = size1_in(0); // number of rows
-    A_.n = size2_in(0); // number of columns
-    A_.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
-                                                     // or column indices (size nzmax)
-    A_.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
-    A_.x = 0; // numerical values, size nzmax
-    A_.nz = -1; // of entries in triplet matrix, -1 for compressed-col
-
-    // Temporary
-    temp_.resize(A_.n);
-
-    // Has the routine been called once
-    called_once_ = false;
   }
 
-  void CsparseInterface::linsol_factorize(Memory& m, const double* A) {
+  Memory* CsparseInterface::memory() const {
+    CsparseMemory* m = new CsparseMemory();
+    try {
+      m->N = 0;
+      m->S = 0;
+      m->A.nzmax = nnz_in(0);  // maximum number of entries
+      m->A.m = size1_in(0); // number of rows
+      m->A.n = size2_in(0); // number of columns
+      m->A.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
+      // or column indices (size nzmax)
+      m->A.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
+      m->A.x = 0; // numerical values, size nzmax
+      m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-col
+
+      // Temporary
+      m->temp_.resize(m->A.n);
+
+      // Has the routine been called once
+      m->called_once_ = false;
+
+      return m;
+    } catch (...) {
+      delete m;
+      return 0;
+    }
+  }
+
+  void CsparseInterface::linsol_factorize(Memory& mem, const double* A) const {
+    CsparseMemory& m = dynamic_cast<CsparseMemory&>(mem);
     casadi_assert(A!=0);
 
     // Set the nonzeros of the matrix
-    A_.x = const_cast<double*>(A);
+    m.A.x = const_cast<double*>(A);
 
-    if (!called_once_) {
+    if (!m.called_once_) {
       if (verbose()) {
         userOut() << "CsparseInterface::prepare: symbolic factorization" << endl;
       }
 
       // ordering and symbolic analysis
       int order = 0; // ordering?
-      if (S_) cs_sfree(S_);
-      S_ = cs_sqr(order, &A_, 0) ;
+      if (m.S) cs_sfree(m.S);
+      m.S = cs_sqr(order, &m.A, 0) ;
     }
 
-    called_once_ = true;
+    m.called_once_ = true;
 
     // Make sure that all entries of the linear system are valid
     for (int k=0; k<sparsity_.nnz(); ++k) {
@@ -109,9 +123,9 @@ namespace casadi {
 
     double tol = 1e-8;
 
-    if (N_) cs_nfree(N_);
-    N_ = cs_lu(&A_, S_, tol) ;                 // numeric LU factorization
-    if (N_==0) {
+    if (m.N) cs_nfree(m.N);
+    m.N = cs_lu(&m.A, m.S, tol) ;                 // numeric LU factorization
+    if (m.N==0) {
       DM temp(sparsity_, vector<double>(A, A+sparsity_.nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
@@ -137,26 +151,27 @@ namespace casadi {
         throw CasadiException(ss.str());
       }
     }
-    casadi_assert(N_!=0);
+    casadi_assert(m.N!=0);
   }
 
-  void CsparseInterface::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
-    casadi_assert(N_!=0);
+  void CsparseInterface::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
+    CsparseMemory& m = dynamic_cast<CsparseMemory&>(mem);
+    casadi_assert(m.N!=0);
 
-    double *t = &temp_.front();
+    double *t = &m.temp_.front();
 
     for (int k=0; k<nrhs; ++k) {
       if (tr) {
-        cs_pvec(S_->q, x, t, A_.n) ;       // t = P2*b
-        casadi_assert(N_->U!=0);
-        cs_utsolve(N_->U, t) ;              // t = U'\t
-        cs_ltsolve(N_->L, t) ;              // t = L'\t
-        cs_pvec(N_->pinv, t, x, A_.n) ;    // x = P1*t
+        cs_pvec(m.S->q, x, t, m.A.n) ;       // t = P2*b
+        casadi_assert(m.N->U!=0);
+        cs_utsolve(m.N->U, t) ;              // t = U'\t
+        cs_ltsolve(m.N->L, t) ;              // t = L'\t
+        cs_pvec(m.N->pinv, t, x, m.A.n) ;    // x = P1*t
       } else {
-        cs_ipvec(N_->pinv, x, t, A_.n) ;   // t = P1\b
-        cs_lsolve(N_->L, t) ;               // t = L\t
-        cs_usolve(N_->U, t) ;               // t = U\t
-        cs_ipvec(S_->q, t, x, A_.n) ;      // x = P2\t
+        cs_ipvec(m.N->pinv, x, t, m.A.n) ;   // t = P1\b
+        cs_lsolve(m.N->L, t) ;               // t = L\t
+        cs_usolve(m.N->U, t) ;               // t = U\t
+        cs_ipvec(m.S->q, t, x, m.A.n) ;      // x = P2\t
       }
       x += ncol();
     }

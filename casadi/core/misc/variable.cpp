@@ -23,7 +23,7 @@
  */
 
 
-#include "../casadi_exception.hpp"
+#include "../exception.hpp"
 #include "variable.hpp"
 
 using namespace std;

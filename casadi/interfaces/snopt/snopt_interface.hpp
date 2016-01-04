@@ -28,8 +28,9 @@
 
 #include "casadi/core/function/nlpsol.hpp"
 #include "casadi/interfaces/snopt/casadi_nlpsol_snopt_export.h"
-#include "casadi/interfaces/snopt/snopt.h"
-#include "snoptProblem.hpp"
+extern "C" {
+#include "snopt_cwrap.h" // NOLINT(build/include)
+}
 
 /** \defgroup plugin_Nlpsol_snopt
   SNOPT interface
@@ -85,45 +86,12 @@ namespace casadi {
                  double* x, double* fObj, double*gObj, double* fCon, double* gCon,
                  int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru);
 
-    void callback(int* iAbort, int* info, int HQNType, int* KTcond, int MjrPrt, int minimz,
-        int m, int maxS, int n, int nb, int nnCon0, int nnCon, int nnObj0, int nnObj, int nS,
-        int itn, int nMajor, int nMinor, int nSwap,
-        double condHz, int iObj, double sclObj, double ObjAdd,
-        double fMrt,  double PenNrm, double step,
-        double prInf,  double duInf,  double vimax,  double virel, int* hs,
-        int ne, int nlocJ, int* locJ, int* indJ, double* Jcol, int negCon,
-        double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
-        double* yCon, double* pi, double* rc, double* rg, double* x,
-        char* cu, int lencu, int* iu, int leniu, double* ru, int lenru,
-        char* cw, int lencw, int* iw, int leniw, double* rw, int lenrw);
-
     int nnJac_;
     int nnObj_;
     int nnCon_;
 
-    /// Classification arrays
-    /// original variable index -> category w.r.t. f
-    std::vector<int> x_type_g_;
-    /// original variable index -> category w.r.t. g
-    std::vector<int> x_type_f_;
-    /// original constraint index -> category
-    std::vector<int> g_type_;
-
-    /// sorted variable index -> original variable index
-    std::vector<int> x_order_;
-    /// sorted constraint index -> original constraint index
-    std::vector<int> g_order_;
-
     IM A_structure_;
     std::vector<double> A_data_;
-
-
-    std::vector<double> bl_;
-    std::vector<double> bu_;
-    std::vector<int> hs_;
-    std::vector<double> xk_;
-    std::vector<double> pi_;
-    std::vector<double> rc_;
 
     // Do detection of linear substructure
     bool detect_linear_;
@@ -135,19 +103,6 @@ namespace casadi {
                            double *x, double *fObj, double *gObj, double * fCon, double* gCon,
                            int* nState, char* cu, int* lencu, int* iu, int* leniu,
                            double* ru, int *lenru);
-    static void snStopPtr(
-        int* iAbort, int* info, int* HQNType, int* KTcond, int* MjrPrt, int* minimz,
-        int* m, int* maxS, int* n, int* nb,
-        int* nnCon0, int* nnCon, int* nnObj0, int* nnObj, int* nS,
-        int* itn, int* nMajor, int* nMinor, int* nSwap,
-        double * condHz, int* iObj, double * sclObj,  double *ObjAdd,
-        double * fMrt,  double * PenNrm,  double * step,
-        double *prInf,  double *duInf,  double *vimax,  double *virel, int* hs,
-        int* ne, int* nlocJ, int* locJ, int* indJ, double* Jcol, int* negCon,
-        double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
-        double* yCon, double* pi, double* rc, double* rg, double* x,
-        char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru,
-        char* cw, int* lencw, int* iw, int *leniw, double* rw, int* lenrw);
 
     // Matrix A has a linear objective row
     bool jacF_row_;
@@ -157,6 +112,15 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Current solution
+    double *xk2_, *lam_gk_, *lam_xk_;
+
+    // Current calculated quantities
+    double fk_, *gk_, *jac_fk_, *jac_gk_;
+
+    // Memory bool
+    static std::vector<SnoptInterface*> mempool_;
+
   private:
       // options
       std::map<std::string, std::string> intOpts_;
@@ -164,7 +128,7 @@ namespace casadi {
       std::map<std::string, std::pair<std::string, std::string> > strOpts_;
 
       /// Pass the supplied options to Snopt
-      void passOptions(snoptProblemC &probC);
+      void passOptions(snProblem &prob);
 
       // Accumulated time in last evaluate():
       double t_eval_grad_f_; // time spent in eval_grad_f

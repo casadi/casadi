@@ -34,25 +34,25 @@ namespace casadi {
     setSparsity(x.sparsity().T());
   }
 
-  void Transpose::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Transpose::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
- void DenseTranspose::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+ void DenseTranspose::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void Transpose::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Transpose::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
-  void DenseTranspose::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void DenseTranspose::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
   void Transpose::evalGen(const T* const* arg, T* const* res,
-                          int* iw, T* w) {
+                          int* iw, T* w) const {
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
     const int* x_row = dep(0).row();
@@ -72,7 +72,7 @@ namespace casadi {
 
   template<typename T>
   void DenseTranspose::evalGen(const T* const* arg, T* const* res,
-                               int* iw, T* w) {
+                               int* iw, T* w) const {
     // Get sparsity patterns
     int x_nrow = dep().size1();
     int x_ncol = dep().size2();
@@ -86,7 +86,7 @@ namespace casadi {
     }
   }
 
-  void Transpose::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Transpose::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Shortands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -104,7 +104,7 @@ namespace casadi {
     }
   }
 
-  void Transpose::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Transpose::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Shortands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -124,7 +124,7 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void DenseTranspose::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Shorthands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -139,7 +139,7 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void DenseTranspose::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Shorthands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];

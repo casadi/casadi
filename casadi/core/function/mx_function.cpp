@@ -336,7 +336,7 @@ namespace casadi {
     log("MXFunction::init end");
   }
 
-  void MXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void MXFunction::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     casadi_msg("MXFunction::eval():begin "  << name_);
     // Work vector and temporaries to hold pointers to operation input and outputs
     const double** arg1 = arg+n_in();
@@ -352,33 +352,32 @@ namespace casadi {
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
-    int alg_counter = 0;
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
-      if (it->op==OP_INPUT) {
+    for (auto&& e : algorithm_) {
+      if (e.op==OP_INPUT) {
         // Pass an input
-        double *w1 = w+workloc_[it->res.front()];
-        int nnz=it->data.nnz();
-        int i=it->arg.at(0);
-        int nz_offset=it->arg.at(2);
+        double *w1 = w+workloc_[e.res.front()];
+        int nnz=e.data.nnz();
+        int i=e.arg.at(0);
+        int nz_offset=e.arg.at(2);
         if (arg[i]==0) {
           fill(w1, w1+nnz, 0);
         } else {
           copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
         }
-      } else if (it->op==OP_OUTPUT) {
+      } else if (e.op==OP_OUTPUT) {
         // Get an output
-        double *w1 = w+workloc_[it->arg.front()];
-        int i=it->res.front();
+        double *w1 = w+workloc_[e.arg.front()];
+        int i=e.res.front();
         if (res[i]!=0) copy(w1, w1+nnz_out(i), res[i]);
       } else {
         // Point pointers to the data corresponding to the element
-        for (int i=0; i<it->arg.size(); ++i)
-          arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
-        for (int i=0; i<it->res.size(); ++i)
-          res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+        for (int i=0; i<e.arg.size(); ++i)
+          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : 0;
+        for (int i=0; i<e.res.size(); ++i)
+          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
 
         // Evaluate
-        it->data->eval(arg1, res1, iw, w, 0);
+        e.data->eval(arg1, res1, iw, w, 0);
       }
     }
 
@@ -470,7 +469,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity forwards
-        it->data->spFwd(arg1, res1, iw, w, mem);
+        it->data->spFwd(arg1, res1, iw, w, 0);
       }
     }
   }
@@ -511,7 +510,7 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->spAdj(arg1, res1, iw, w, mem);
+        it->data->spAdj(arg1, res1, iw, w, 0);
       }
     }
   }

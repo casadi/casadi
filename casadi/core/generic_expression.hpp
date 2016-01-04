@@ -26,7 +26,7 @@
 #ifndef CASADI_GENERIC_EXPRESSION_HPP
 #define CASADI_GENERIC_EXPRESSION_HPP
 
-#include "../casadi_math.hpp"
+#include "calculus.hpp"
 
 namespace casadi {
 
@@ -60,52 +60,52 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
 */
     /// Addition
     friend inline ExType operator+(const ExType &x, const ExType &y) {
-      return x.zz_plus(y);
+      return ExType::binary(OP_ADD, x, y);
     }
 
     /// Subtraction
     friend inline ExType operator-(const ExType &x, const ExType &y) {
-      return x.zz_minus(y);
+      return ExType::binary(OP_SUB, x, y);
     }
 
     /// Elementwise multiplication
     friend inline ExType operator*(const ExType &x, const ExType &y) {
-      return x.zz_times(y);
+      return ExType::binary(OP_MUL, x, y);
     }
 
     /// Elementwise division
     friend inline ExType operator/(const ExType &x, const ExType &y) {
-      return x.zz_rdivide(y);
+      return ExType::binary(OP_DIV, x, y);
     }
 
     /// Logic less than
     friend inline ExType operator<(const ExType &x, const ExType &y) {
-      return x.zz_lt(y);
+      return ExType::binary(OP_LT, x, y);
     }
 
     /// Logic less or equal to
     friend inline ExType operator<=(const ExType &x, const ExType &y) {
-      return x.zz_le(y);
+      return ExType::binary(OP_LE, x, y);
     }
 
     /// Logic greater than
     friend inline ExType operator>(const ExType &x, const ExType &y) {
-      return y.zz_lt(x);
+      return ExType::binary(OP_LT, y, x);
     }
 
     /// Logic greater or equal to
     friend inline ExType operator>=(const ExType &x, const ExType &y) {
-      return y.zz_le(x);
+      return ExType::binary(OP_LE, y, x);
     }
 
     /// Logic equal to
     friend inline ExType operator==(const ExType &x, const ExType &y) {
-      return x.zz_eq(y);
+      return ExType::binary(OP_EQ, x, y);
     }
 
     /// Logic not equal to
     friend inline ExType operator!=(const ExType &x, const ExType &y) {
-      return x.zz_ne(y);
+      return ExType::binary(OP_NE, x, y);
     }
 
     /** \brief Logical `and`
@@ -113,7 +113,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
      * expressions are nonzero and 0 otherwise
      */
     friend inline ExType operator&&(const ExType &x, const ExType &y) {
-      return x.zz_and(y);
+      return ExType::binary(OP_AND, x, y);
     }
 
     /** \brief  Logical `or`
@@ -121,117 +121,122 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
      * least one expression is nonzero and 0 otherwise
      */
     friend inline ExType operator||(const ExType &x, const ExType &y) {
-      return x.zz_or(y);
+      return ExType::binary(OP_OR, x, y);
     }
 
     /// Absolute value
     friend inline ExType fabs(const ExType& x) {
-      return x.zz_abs();
+      return ExType::unary(OP_FABS, x);
     }
 
     /// Absolute value
     friend inline ExType abs(const ExType& x) {
-      return x.zz_abs();
+      return ExType::unary(OP_FABS, x);
     }
 
     /// Square root
     friend inline ExType sqrt(const ExType& x) {
-      return x.zz_sqrt();
+      return ExType::unary(OP_SQRT, x);
+    }
+
+    /// Square
+    friend inline ExType sq(const ExType& x) {
+      return ExType::unary(OP_SQ, x);
     }
 
     /// Sine
     friend inline ExType sin(const ExType& x) {
-      return x.zz_sin();
+      return ExType::unary(OP_SIN, x);
     }
 
     /// Cosine
     friend inline ExType cos(const ExType& x) {
-      return x.zz_cos();
+      return ExType::unary(OP_COS, x);
     }
 
     /// Tangent
     friend inline ExType tan(const ExType& x) {
-      return x.zz_tan();
+      return ExType::unary(OP_TAN, x);
     }
 
     /// Arc tangent
     friend inline ExType atan(const ExType& x) {
-      return x.zz_atan();
+      return ExType::unary(OP_ATAN, x);
     }
 
     /// Arc sine
     friend inline ExType asin(const ExType& x) {
-      return x.zz_asin();
+      return ExType::unary(OP_ASIN, x);
     }
 
     /// Arc cosine
     friend inline ExType acos(const ExType& x) {
-      return x.zz_acos();
+      return ExType::unary(OP_ACOS, x);
     }
 
     /// Hyperbolic tangent
     friend inline ExType tanh(const ExType& x) {
-      return x.zz_tanh();
+      return ExType::unary(OP_TANH, x);
     }
 
     /// Hyperbolic sine
     friend inline ExType sinh(const ExType& x) {
-      return x.zz_sinh();
+      return ExType::unary(OP_SINH, x);
     }
 
     /// Hyperbolic cosine
     friend inline ExType cosh(const ExType& x) {
-      return x.zz_cosh();
+      return ExType::unary(OP_COSH, x);
     }
 
     /// Inverse hyperbolic tangent
     friend inline ExType atanh(const ExType& x) {
-      return x.zz_atanh();
+      return ExType::unary(OP_ATANH, x);
     }
 
     /// Inverse hyperbolic sine
     friend inline ExType asinh(const ExType& x) {
-      return x.zz_asinh();
+      return ExType::unary(OP_ASINH, x);
     }
 
     /// Inverse hyperbolic cosine
     friend inline ExType acosh(const ExType& x) {
-      return x.zz_acosh();
+      return ExType::unary(OP_ACOSH, x);
     }
 
     /// Exponential function
     friend inline ExType exp(const ExType& x) {
-      return x.zz_exp();
+      return ExType::unary(OP_EXP, x);
     }
 
     /// Natural logarithm
     friend inline ExType log(const ExType& x) {
-      return x.zz_log();
+      return ExType::unary(OP_LOG, x);
     }
 
     /// Base-10 logarithm
     friend inline ExType log10(const ExType& x) {
-      return x.zz_log10();
+      return log(x)*(1/std::log(10.));
     }
 
     /// Round down to nearest integer
     friend inline ExType floor(const ExType& x) {
-      return x.zz_floor();
+      return ExType::unary(OP_FLOOR, x);
     }
 
     /// Round up to nearest integer
     friend inline ExType ceil(const ExType& x) {
-      return x.zz_ceil();
+      return ExType::unary(OP_CEIL, x);
     }
 
     /// Error function
     friend inline ExType erf(const ExType& x) {
-      return x.zz_erf();
+      return ExType::unary(OP_ERF, x);
     }
 
     /// Invers error function
     friend inline ExType erfinv(const ExType& x) {
-      return x.zz_erfinv();
+      return ExType::unary(OP_ERFINV, x);
     }
 
     /** Sine function
@@ -241,37 +246,37 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
         sign(NaN) :=  NaN
      */
     friend inline ExType sign(const ExType& x) {
-      return x.zz_sign();
+      return ExType::unary(OP_SIGN, x);
     }
 
     /// Elementwise power
-    friend inline ExType pow(const ExType& x, const ExType& n) {
-      return x.zz_power(n);
+    friend inline ExType pow(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_POW, x, y);
     }
 
     /// Remainder after division
     friend inline ExType fmod(const ExType& x, const ExType& y) {
-      return x.zz_mod(y);
+      return ExType::binary(OP_FMOD, x, y);
     }
 
     /// Two argument arc tangent
     friend inline ExType atan2(const ExType& x, const ExType& y) {
-      return x.zz_atan2(y);
+      return ExType::binary(OP_ATAN2, x, y);
+    }
+
+    /// Conditional assignment
+    friend inline ExType if_else_zero(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_IF_ELSE_ZERO, x, y);
     }
 
     /// Smallest of two values
     friend inline ExType fmin(const ExType& x, const ExType& y) {
-      return x.zz_min(y);
+      return ExType::binary(OP_FMIN, x, y);
     }
 
     /// Largest of two values
     friend inline ExType fmax(const ExType& x, const ExType& y) {
-      return x.zz_max(y);
-    }
-
-    /// Simplify an expression
-    friend inline ExType simplify(const ExType &x) {
-      return x.zz_simplify();
+      return ExType::binary(OP_FMAX, x, y);
     }
 
     /** \brief Check if two nodes are equivalent up to a given depth.
@@ -283,7 +288,7 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
      *  a.is_equal(b, 0)  will return false, but a.is_equal(b, 1) will return true
      */
     friend inline bool is_equal(const ExType& x, const ExType& y, int depth=0) {
-      return x.zz_is_equal(y, depth);
+      return ExType::is_equal(x, y, depth);
     }
 
     friend inline bool iszero(const ExType& x) {
@@ -291,32 +296,39 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
     }
 
     /// Copy sign
-    friend inline ExType copysign(const ExType& x, const ExType& n) {
-      return x.zz_copysign(n);
+    friend inline ExType copysign(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_COPYSIGN, x, y);
     }
 
     /// Elementwise power with const power
-    friend inline ExType constpow(const ExType& x, const ExType& n) {
-      return x.zz_constpow(n);
+    friend inline ExType constpow(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_CONSTPOW, x, y);
+    }
+
+    /// Debug printing
+    friend inline ExType printme(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_PRINTME, x, y);
     }
 
     /// In-place addition
-    inline ExType& operator+=(const ExType &y) { return self() = self().zz_plus(y); }
+    inline ExType& operator+=(const ExType &y) { return self() = self() + y; }
 
     /// In-place subtraction
-    inline ExType& operator-=(const ExType &y) { return self() = self().zz_minus(y); }
+    inline ExType& operator-=(const ExType &y) { return self() = self() - y; }
 
     /// In-place elementwise multiplication
-    inline ExType& operator*=(const ExType &y) {return self() = self().zz_times(y);}
+    inline ExType& operator*=(const ExType &y) {return self() = self() * y;}
 
     /// In-place elementwise division
-    inline ExType& operator/=(const ExType &y) {return self() = self().zz_rdivide(y);}
+    inline ExType& operator/=(const ExType &y) {return self() = self() / y;}
 
     /** \brief  Logical `not`
      * Returns (an expression evaluating to) 1 if
      * expression is zero and 0 otherwise
      */
-    inline ExType operator!() const { return self().zz_not(); }
+    inline ExType operator!() const {
+      return ExType::unary(OP_NOT, self());
+    }
 
     /// Logical not, alternative syntax
     friend inline ExType logic_not(const ExType& x) {

@@ -28,7 +28,7 @@
 
 #include <vector>
 #include <typeinfo>
-#include "../casadi_exception.hpp"
+#include "exception.hpp"
 
 /// \cond INTERNAL
 

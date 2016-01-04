@@ -70,44 +70,8 @@ namespace casadi {
     /// Set options that make the NLP solver more suitable for solving QPs
     virtual void setDefaultOptions(const std::string& recipe) {}
 
-    /// Get or generate a function to calculate the gradient of the objective function
-    virtual Function getGradF();
-
-    /// Get or generate a function to calculate the jacobian of the objective function
-    virtual Function getJacF();
-
-    /// Get or generate a function to calculate the Jacobian of the constraint function
-    virtual Function getJacG();
-
-    /// Get or generate a function to calculate the gradient of the Lagrangian function
-    virtual Function getGradLag();
-
-    /// Get or generate a function to calculate the Hessian of the Lagrangian function
-    virtual Function getHessLag();
-
-    /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
-    virtual Sparsity getSpHessLag();
-
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
-
-    // Access the objective gradient function
-    Function& gradF();
-
-    // Access the objective jacobian function (sparse)
-    Function& jacF();
-
-    /// Access the Jacobian of the constraint function
-    Function& jacG();
-
-    /// Access the Hessian of the Lagrangian function
-    Function& hessLag();
-
-    /// Access the gradient of the Lagrangian function
-    Function& gradLag();
-
-    /// Get the sparsity pattern of the Hessian of the Lagrangian
-    Sparsity& spHessLag();
 
     /// Number of variables
     int nx_;
@@ -129,28 +93,6 @@ namespace casadi {
 
     /// The NLP
     XProblem nlp2_;
-    Function nlp_;
-
-    // Gradient of the objective
-    Function gradF_;
-
-    // Gradient of the objective
-    Function jacF_;
-
-    // Jacobian of the constraints
-    Function jacG_;
-
-    // Hessian of the Lagrangian
-    Function hessLag_;
-
-    // Gradient of the Lagrangian
-    Function gradLag_;
-
-    // Sparsity pattern of the Hessian of the Lagrangian
-    Sparsity spHessLag_;
-
-    /// A reference to this object to be passed to the user functions
-    Function ref_;
 
     // Inputs
     const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
@@ -189,6 +131,84 @@ namespace casadi {
     // No static functions exposed
     struct Exposed{ };
 
+    // Calculate objective
+    enum FIn { F_X, F_P, F_NUM_IN };
+    enum FOut { F_F, F_NUM_OUT};
+    Function f_fcn_;
+    template<typename M> void _setup_f();
+    void setup_f();
+    int calc_f(const double* x, const double* p, double* f);
+
+    // Calculate constraints
+    enum GIn { G_X, G_P, G_NUM_IN };
+    enum GOut { G_G, G_NUM_OUT};
+    Function g_fcn_;
+    template<typename M> void _setup_g();
+    void setup_g();
+    int calc_g(const double* x, const double* p, double* g);
+
+    // Calculate both objective and constraints
+    Function fg_fcn_;
+    template<typename M> void _setup_fg();
+    void setup_fg();
+    int calc_fg(const double* x, const double* p, double* f, double* g);
+
+    // Calculate gradient of the objective
+    enum GradFIn { GF_X, GF_P, GF_NUM_IN };
+    enum GradFOut { GF_GF, GF_NUM_OUT};
+    Function grad_f_fcn_;
+    template<typename M> void _setup_grad_f();
+    void setup_grad_f();
+    int calc_grad_f(const double* x, const double* p, double* f, double* grad_f);
+
+    // Calculate Jacobian of constraints
+    enum JacGIn { JG_X, JG_P, JG_NUM_IN };
+    enum JacGOut { JG_JG, JG_NUM_OUT};
+    Function jac_g_fcn_;
+    Sparsity jacg_sp_;
+    template<typename M> void _setup_jac_g();
+    void setup_jac_g();
+    int calc_jac_g(const double* x, const double* p, double* g, double* jac_g);
+
+    // Calculate Jacobian of gradient (note: sparse!)
+    Function jac_f_fcn_;
+    template<typename M> void _setup_jac_f();
+    void setup_jac_f();
+    int calc_jac_f(const double* x, const double* p, double* f, double* jac_f);
+
+    // Calculate both gradient of the objective and Jacobian of constraints
+    Function gf_jg_fcn_;
+    template<typename M> void _setup_gf_jg();
+    void setup_gf_jg();
+    int calc_gf_jg(const double* x, const double* p, double* gf, double* jg);
+
+    // Calculate Hessian of the Lagrangian constraints
+    enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
+    enum HessLagOut { HL_HL, HL_NUM_OUT};
+    Function hess_l_fcn_;
+    Sparsity hesslag_sp_;
+    template<typename M> void _setup_hess_l(bool tr, bool sym, bool diag);
+    void setup_hess_l(bool tr=false, bool sym=false, bool diag=false);
+    int calc_hess_l(const double* x, const double* p,
+                    const double* sigma, const double* lambda,
+                    double* hl);
+
+    // Accumulated counts since last reset:
+    int n_calc_f_; // number of calls to calc_f
+    int n_calc_g_; // number of calls to calc_g
+    int n_calc_grad_f_; // number of calls to calc_grad_f
+    int n_calc_jac_g_; // number of calls to calc_jac_g
+    int n_calc_hess_l_; // number of calls to calc_hess_l
+    int n_eval_callback_; // number of calls to callback
+    int n_iter_; // number of iterations
+
+    // Accumulated time since last reset:
+    double t_calc_f_; // time spent in calc_f
+    double t_calc_g_; // time spent in calc_g
+    double t_calc_grad_f_; // time spent in calc_grad_f
+    double t_calc_jac_g_; // time spent in calc_jac_g
+    double t_calc_hess_l_; // time spent in calc_hess_l
+
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 
@@ -218,10 +238,6 @@ namespace casadi {
     /// Convert Problem to dictionary
     template<typename XType>
       static std::map<std::string, XType> problem2map(const Problem<XType>& d);
-
-    /// Get the (legacy) dae forward function
-    template<typename XType>
-      static Function problem2fun(const Problem<XType>& d);
 
     /// Get the (legacy) dae forward function
     template<typename XType>
@@ -255,11 +271,6 @@ namespace casadi {
         {"f", d.out[NL_F]},
         {"g", d.out[NL_G]},
       };
-  }
-
-  template<typename XType>
-  Function Nlpsol::problem2fun(const Problem<XType>& d) {
-    return Function("nlp", d.in, d.out, {"x", "p"}, {"f", "g"});
   }
 
   template<typename XType>

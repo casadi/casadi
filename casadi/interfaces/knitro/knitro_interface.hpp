@@ -66,11 +66,6 @@ namespace casadi {
     // Solve the NLP
     virtual void solve(void* mem);
 
-    // KNITRO callback functions
-    void evalfc(const double* x, double& obj, double *c);
-    void evalga(const double* x, double* objGrad, double* jac);
-    void evalh(const double* x, const double* lambda, double* hessian);
-
     // KNITRO callback wrapper
     static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
                         const int nnzH, const double * const x, const double * const lambda,
@@ -93,6 +88,8 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    // Inputs
+    double *wx_, *wlbx_, *wubx_, *wlbg_, *wubg_;
   };
 
 } // namespace casadi

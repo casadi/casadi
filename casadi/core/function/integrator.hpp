@@ -33,6 +33,12 @@
 
 namespace casadi {
 
+  /** \brief Integrator memory */
+  struct CASADI_EXPORT IntegratorMemory : public Memory {
+    /** \brief  Destructor */
+    virtual ~IntegratorMemory() {}
+  };
+
   /** \brief Internal storage for integrator related data
 
       @copydoc DAE_doc
@@ -63,33 +69,34 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w);
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const { return new IntegratorMemory();}
 
-    /** \brief Set the (temporary) work vectors */
-    virtual void set_temp(Memory& m, const double** arg, double** res, int* iw, double* w);
+    /** \brief Set the work vectors */
+    virtual void setup(Memory& mem, const double** arg, double** res,
+                       int* iw, double* w) const;
 
     /** \brief Reset the forward problem */
-    virtual void reset(Memory& m, double t, const double* x,
-                       const double* z, const double* p) = 0;
+    virtual void reset(IntegratorMemory& mem, double t,
+                       const double* x, const double* z, const double* p) = 0;
 
     /** \brief  Advance solution in time */
-    virtual void advance(Memory& m, double t, double* x,
-                         double* z, double* q) = 0;
+    virtual void advance(IntegratorMemory& mem, double t,
+                         double* x, double* z, double* q) = 0;
 
     /** \brief Reset the backward problem */
-    virtual void resetB(Memory& m, double t, const double* rx,
-                        const double* rz, const double* rp) = 0;
+    virtual void resetB(IntegratorMemory& mem, double t,
+                        const double* rx, const double* rz, const double* rp) = 0;
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(Memory& m, double t, double* rx,
-                         double* rz, double* rq) = 0;
+    virtual void retreat(IntegratorMemory& mem, double t,
+                         double* rx, double* rz, double* rq) = 0;
 
     /** \brief  evaluate */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Print solver statistics */
-    virtual void printStats(std::ostream &stream) const {}
+    virtual void printStats(IntegratorMemory& mem, std::ostream &stream) const {}
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
@@ -113,7 +120,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Set stop time for the integration */
-    virtual void setStopTime(double tf);
+    virtual void setStopTime(IntegratorMemory& mem, double tf);
 
     // Helper structure
     struct AugOffset {
@@ -229,7 +236,6 @@ namespace casadi {
       static Problem<XType> fun2problem(Function f, Function g=Function());
   };
 
-
   template<typename XType>
   Problem<XType> Integrator::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
@@ -333,20 +339,20 @@ namespace casadi {
     virtual void setupFG() = 0;
 
     /** \brief Reset the forward problem */
-    virtual void reset(Memory& m, double t, const double* x,
-                       const double* z, const double* p);
+    virtual void reset(IntegratorMemory& mem, double t,
+                       const double* x, const double* z, const double* p);
 
     /** \brief  Advance solution in time */
-    virtual void advance(Memory& m, double t, double* x,
-                         double* z, double* q);
+    virtual void advance(IntegratorMemory& mem, double t,
+                         double* x, double* z, double* q);
 
     /// Reset the backward problem and take time to tf
-    virtual void resetB(Memory& m, double t, const double* rx,
-                        const double* rz, const double* rp);
+    virtual void resetB(IntegratorMemory& mem, double t,
+                        const double* rx, const double* rz, const double* rp);
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(Memory& m, double t, double* rx,
-                         double* rz, double* rq);
+    virtual void retreat(IntegratorMemory& mem, double t,
+                         double* rx, double* rz, double* rq);
 
     /// Get explicit dynamics
     virtual Function& getExplicit() { return F_;}

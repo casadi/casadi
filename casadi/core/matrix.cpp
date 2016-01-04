@@ -24,8 +24,8 @@
 
 #define CASADI_MATRIX_CPP
 #include "matrix_impl.hpp"
-#include "../function/sx_function.hpp"
-#include "../sx/sx_node.hpp"
+#include "function/sx_function.hpp"
+#include "sx/sx_node.hpp"
 
 using namespace std;
 
@@ -48,9 +48,8 @@ namespace casadi {
 
   template<>
   Matrix<double> Matrix<double>::
-  zz_solve(const Matrix<double>& b,
-           const string& lsolver, const Dict& dict) const {
-    const Matrix<double>& A = *this;
+  solve(const Matrix<double>& A, const Matrix<double>& b,
+        const string& lsolver, const Dict& dict) {
     Function mysolver = linsol("tmp", lsolver, A.sparsity(), b.size2(), dict);
     vector<DM> arg(LINSOL_NUM_IN);
     arg.at(LINSOL_A) = A;
@@ -60,13 +59,12 @@ namespace casadi {
 
   template<>
   Matrix<double> Matrix<double>::
-  zz_pinv(const string& lsolver,
-          const Dict& dict) const {
-    const Matrix<double>& A = *this;
+  pinv(const Matrix<double>& A, const string& lsolver,
+       const Dict& dict) {
     if (A.size1()>=A.size2()) {
-      return solve(mul(A.T(), A), A.T(), lsolver, dict);
+      return solve(mtimes(A.T(), A), A.T(), lsolver, dict);
     } else {
-      return solve(mul(A, A.T()), A, lsolver, dict).T();
+      return solve(mtimes(A, A.T()), A, lsolver, dict).T();
     }
   }
 
@@ -247,8 +245,8 @@ namespace casadi {
   }
 
   template<>
-  SX SX::getDep(int ch) const {
-    return toScalar().getDep(ch);
+  SX SX::dep(int ch) const {
+    return toScalar().dep(ch);
   }
 
   template<>
@@ -257,8 +255,7 @@ namespace casadi {
   }
 
   template<>
-  void SX::zz_expand(SX &ww, SX& tt) const {
-    const SX& ex2 = *this;
+  void SX::expand(const SX& ex2, SX& ww, SX& tt) {
     casadi_assert(ex2.is_scalar());
     SXElem ex = ex2.toScalar();
 
@@ -387,9 +384,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_pw_const(const SX &tval,
-                     const SX &val) const {
-    const SX &t = *this;
+  SX SX::pw_const(const SX& t, const SX& tval, const SX& val) {
     // number of intervals
     int n = val.numel();
 
@@ -405,10 +400,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_pw_lin(const SX &tval,
-                   const SX &val) const {
-    const SX &t = *this;
-
+  SX SX::pw_lin(const SX& t, const SX& tval, const SX& val) {
     // Number of points
     int N = tval.numel();
     casadi_assert_message(N>=2, "pw_lin: N>=2");
@@ -432,16 +424,13 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_if_else(const SX &if_true, const SX &if_false, bool short_circuit) const {
-    return if_else_zero(*this, if_true) + if_else_zero(!*this, if_false);
+  SX SX::if_else(const SX &cond, const SX &if_true, const SX &if_false, bool short_circuit) {
+    return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
   }
 
   template<>
-  SX SX::zz_gauss_quadrature(const SX &x,
-                             const SX &a,
-                             const SX &b, int order,
-                             const SX& w) const {
-    const SX &f = *this;
+  SX SX::gauss_quadrature(const SX& f, const SX& x, const SX& a, const SX& b, int order,
+                          const SX& w) {
     casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
     casadi_assert_message(w.is_empty(), "gauss_quadrature: empty weights");
 
@@ -486,23 +475,27 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_simplify() const {
-    SX ex = *this;
-    for (int el=0; el<ex.nnz(); ++el) ex.at(el) = simplify(ex.at(el));
-    return ex;
+  SX SX::simplify(const SX& x) {
+    SX r = x;
+    for (int el=0; el<r.nnz(); ++el) {
+      // Start by expanding the node to a weighted sum
+      SX terms, weights;
+      expand(r[el], weights, terms);
+
+      // Make a scalar product to get the simplified expression
+      r[el] = mtimes(terms.T(), weights);
+    }
+    return r;
   }
 
   template<>
-  SX SX::zz_substitute(const SX& v,
-                       const SX& vdef) const {
-    return substitute(vector<SX>(1, *this), vector<SX>(1, v), vector<SX>(1, vdef)).front();
+  SX SX::substitute(const SX& ex, const SX& v, const SX& vdef) {
+    return substitute(vector<SX>{ex}, vector<SX>{v}, vector<SX>{vdef}).front();
   }
 
   template<>
-  vector<SX >
-  SX::zz_substitute(const vector<SX >& ex,
-                    const vector<SX >& v,
-                    const vector<SX >& vdef) {
+  vector<SX>
+  SX::substitute(const vector<SX>& ex, const vector<SX>& v, const vector<SX>& vdef) {
 
     // Assert consistent dimensions
     casadi_assert_warning(v.size()==vdef.size(), "subtitute: number of symbols to replace ( "
@@ -541,10 +534,8 @@ namespace casadi {
   }
 
   template<>
-  void SX::zz_substituteInPlace(const vector<SX >& v,
-                                vector<SX >& vdef,
-                                vector<SX >& ex,
-                                bool reverse) {
+  void SX::substituteInPlace(const vector<SX >& v, vector<SX >& vdef,
+                             vector<SX >& ex, bool reverse) {
     // Assert correctness
     casadi_assert(v.size()==vdef.size());
     for (int i=0; i<v.size(); ++i) {
@@ -617,14 +608,14 @@ namespace casadi {
   }
 
   template<>
-  bool SX::zz_dependsOn(const SX &arg) const {
-    if (nnz()==0) return false;
+  bool SX::dependsOn(const SX &x, const SX &arg) {
+    if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp("temp", {arg}, {*this});
+    Function temp("temp", {arg}, {x});
 
     // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(nnz());
+    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
     temp({getPtr(t_in)}, {getPtr(t_out)});
 
     // Loop over results
@@ -667,78 +658,39 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_jmtimes(const SX &arg, const SX &v, bool transpose_jacobian) const {
-    Function f("tmp", {arg}, {*this});
-
-    // Split up v
-    vector<SX> vv = horzsplit(v);
-
-    // Make sure well-posed
-    casadi_assert(vv.size() >= 1);
-    casadi_assert(is_column());
-    casadi_assert(arg.is_column());
-    if (transpose_jacobian) {
-      casadi_assert(v.size1()==size1());
-    } else {
-      casadi_assert(v.size1()==arg.size1());
-    }
-
-    // Number of sensitivities
-    int nfsens = transpose_jacobian ? 0 : vv.size();
-    int nasens = transpose_jacobian ? vv.size() : 0;
-
-    // Assemble arguments and directional derivatives
-    vector<SX> argv = f.sx_in();
-    vector<SX> resv = f(argv);
-    vector<vector<SX> > fseed(nfsens, argv), fsens(nfsens, resv),
-        aseed(nasens, resv), asens(nasens, argv);
-
-    for (int dir=0; dir<vv.size(); ++dir) {
-      if (transpose_jacobian) {
-        aseed[dir][0].set(vv[dir]);
-      } else {
-        fseed[dir][0].set(vv[dir]);
-      }
-    }
-
-    // Evaluate with directional derivatives, output is the same as the funciton inputs
-    f.derivative(argv, resv, fseed, fsens, aseed, asens);
-
-    // Get the results
-    for (int dir=0; dir<vv.size(); ++dir) {
-      if (transpose_jacobian) {
-        vv[dir] = asens[dir][0];
-      } else {
-        vv[dir] = fsens[dir][0];
-      }
-    }
-    return horzcat(vv);
+  SX SX::jtimes(const SX &ex, const SX &arg, const SX &v, bool tr) {
+    return _jtimes(ex, arg, v, tr);
   }
 
   template<>
-  SX SX::zz_taylor(const SX& x,
-                   const SX& a, int order) const {
+  std::vector<bool> SX::nl_var(const SX &expr, const SX &var) {
+    return _nl_var(expr, var);
+  }
+
+  template<>
+  SX SX::taylor(const SX& f, const SX& x,
+                const SX& a, int order) {
     casadi_assert(x.is_scalar() && a.is_scalar());
-    if (nnz()!=numel())
+    if (f.nnz()!=f.numel())
       throw CasadiException("taylor: not implemented for sparse matrices");
-    SX ff = vec(T());
+    SX ff = vec(f.T());
 
     SX result = substitute(ff, x, a);
     double nf=1;
     SX dx = (x-a);
     SX dxa = (x-a);
-    for (int i=1;i<=order;i++) {
+    for (int i=1; i<=order; i++) {
       ff = jacobian(ff, x);
       nf*=i;
       result+=1/nf * substitute(ff, x, a) * dxa;
       dxa*=dx;
     }
-    return reshape(result, size2(), size1()).T();
+    return reshape(result, f.size2(), f.size1()).T();
   }
 
   template<>
-  SX SX::zz_mtaylor(const SX& x, const SX& a, int order) const {
-    return mtaylor(*this, x, a, order, vector<int>(x.nnz(), 1));
+  SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order) {
+    return mtaylor(f, x, a, order, vector<int>(x.nnz(), 1));
   }
 
   SX mtaylor_recursive(const SX& ex, const SX& x, const SX& a, int order,
@@ -760,9 +712,9 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_mtaylor(const SX& x, const SX& a, int order,
-                    const vector<int>& order_contributions) const {
-    casadi_assert_message(nnz()==numel() && x.nnz()==x.numel(),
+  SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
+                 const vector<int>& order_contributions) {
+    casadi_assert_message(f.nnz()==f.numel() && x.nnz()==x.numel(),
                           "mtaylor: not implemented for sparse matrices");
 
     casadi_assert_message(x.nnz()==order_contributions.size(),
@@ -770,21 +722,21 @@ namespace casadi {
                           << ") must match size of order_contributions ("
                           << order_contributions.size() << ")");
 
-    return reshape(mtaylor_recursive(vec(*this), x, a, order,
+    return reshape(mtaylor_recursive(vec(f), x, a, order,
                                      order_contributions),
-                   size2(), size1()).T();
+                   f.size2(), f.size1()).T();
   }
 
   template<>
-  int SX::zz_countNodes() const {
-    Function f("tmp", {SX()}, {*this});
+  int SX::countNodes(const SX& x) {
+    Function f("tmp", {SX()}, {x});
     return f.countNodes();
   }
 
   template<>
   string
-  SX::zz_print_operator(const vector<string>& args) const {
-    SXElem x = toScalar();
+  SX::print_operator(const SX& X, const vector<string>& args) {
+    SXElem x = X.toScalar();
     if (!x.hasDep())
         throw CasadiException("print_operator: SXElem must be binary operator");
     if (args.size() == 0 || (casadi_math<double>::ndeps(x.op())==2 && args.size() < 2))
@@ -795,8 +747,8 @@ namespace casadi {
   }
 
   template<>
-  vector<SX> SX::zz_symvar() const {
-    Function f("tmp", vector<SX>{}, {*this});
+  vector<SX> SX::symvar(const SX& x) {
+    Function f("tmp", vector<SX>{}, {x});
     vector<SXElem> ret1 = f.free_sx().data();
     vector<SX> ret(ret1.size());
     copy(ret1.begin(), ret1.end(), ret.begin());
@@ -804,11 +756,11 @@ namespace casadi {
   }
 
   template<>
-  void SX::zz_extractShared(vector<SX >& ex,
-                            vector<SX >& v_sx,
-                            vector<SX >& vdef_sx,
-                            const string& v_prefix,
-                            const string& v_suffix) {
+  void SX::extractShared(vector<SX >& ex,
+                         vector<SX >& v_sx,
+                         vector<SX >& vdef_sx,
+                         const string& v_prefix,
+                         const string& v_suffix) {
 
     // Sort the expression
     Function f("tmp", vector<SX>(), ex);
@@ -928,14 +880,14 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_poly_coeff(const SX& x) const {
-    casadi_assert(is_scalar());
+  SX SX::poly_coeff(const SX& ex, const SX& x) {
+    casadi_assert(ex.is_scalar());
     casadi_assert(x.is_scalar());
     casadi_assert(x.is_symbolic());
 
     vector<SXElem> r;
 
-    Function f("tmp", {x}, {*this});
+    Function f("tmp", {x}, {ex});
     int mult = 1;
     bool success = false;
     for (int i=0; i<1000; ++i) {
@@ -957,8 +909,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_poly_roots() const {
-    const SX& p = *this;
+  SX SX::poly_roots(const SX& p) {
     casadi_assert_message(p.size2()==1,
                           "poly_root(): supplied parameter must be column vector but got "
                           << p.dim() << ".");
@@ -1039,8 +990,7 @@ namespace casadi {
   }
 
   template<>
-  SX SX::zz_eig_symbolic() const {
-    const SX& m = *this;
+  SX SX::eig_symbolic(const SX& m) {
     casadi_assert_message(m.size1()==m.size2(), "eig(): supplied matrix must be square");
 
     vector<SX> ret;
@@ -1061,16 +1011,6 @@ namespace casadi {
     }
 
     return vertcat(ret);
-  }
-
-  SXElem SXElem::zz_simplify() const {
-    // Start by expanding the node to a weighted sum
-    SX terms, weights;
-    expand(*this, weights, terms);
-
-    // Make a scalar product to get the simplified expression
-    SX s = mul(terms.T(), weights);
-    return s.toScalar();
   }
 
   template<>

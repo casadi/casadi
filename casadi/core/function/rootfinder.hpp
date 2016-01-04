@@ -68,9 +68,6 @@ namespace casadi {
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd) { return true;}
 
-    /// Solve the system of equations and calculate derivatives
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) = 0;
-
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
     virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);

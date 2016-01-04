@@ -35,20 +35,14 @@ if has_nlpsol("ipopt"):
 if has_nlpsol("ipopt"):
   qpsols.append(("nlpsol.ipopt",{"nlpsol_options": {"tol": 1e-12}},{}))
 
-# if has_nlpsol("worhp") and not args.ignore_memory_heavy:
-#   qpsols.append(("nlpsol",{"nlpsol": "worhp", "nlpsol_options": {"TolOpti": 1e-12}},{}))
-
-# if has_nlpsol("worhp") and not args.ignore_memory_heavy:
-#   qpsols.append(("nlpsol.worhp",{"nlpsol_options": {"TolOpti": 1e-12}},{}))
-
-# if has_qpsol("ooqp"):
-#   qpsols.append(("ooqp",{},{}))
+if has_qpsol("ooqp"):
+  qpsols.append(("ooqp",{},{"less_digits":1}))
 
 if has_qpsol("qpoases"):
   qpsols.append(("qpoases",{},{}))
 
-# if has_qpsol("cplex"):
-#   qpsols.append(("cplex",{},{}))
+if has_qpsol("cplex"):
+  qpsols.append(("cplex",{},{}))
 
 # if has_qpsol("sqic"):
 #   qpsols.append(("sqic",{},{}))
@@ -593,7 +587,7 @@ class QpsolTests(casadiTestCase):
     H = c.diag(range(1,N+1))
     x0 = DM(range(N))
     
-    G = -1.0*mul(H,x0)
+    G = -1.0*mtimes(H,x0)
 
     A =  DM(0,N)
 
@@ -621,7 +615,7 @@ class QpsolTests(casadiTestCase):
       solver.evaluate()
 
       self.checkarray(solver.getOutput(),x0,str(qpsol)+str(qp_options),digits=max(1,2-less_digits))
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5*mul([x0.T,H,x0]),max(1,3-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5*mtimes([x0.T,H,x0]),max(1,3-less_digits),str(qpsol))
       self.checkarray(solver.getOutput("lam_x"),DM.zeros(N,1),str(qpsol),digits=max(1,4-less_digits))
       
   def test_redundant(self):
@@ -665,7 +659,7 @@ class QpsolTests(casadiTestCase):
         self.checkarray(solver.getOutput(),DM([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsol),digits=max(1,6-less_digits))
         self.assertAlmostEqual(solver.getOutput("cost")[0],-5.850384678537,max(1,5-less_digits),str(qpsol))
         self.checkarray(solver.getOutput("lam_x"),DM([0,0,0]),str(qpsol),digits=max(1,6-less_digits))
-        self.checkarray(mul(A.T,solver.getOutput("lam_a")),DM([3.876923073076,2.4384615365384965,-1]),str(qpsol),digits=max(1,6-less_digits))
+        self.checkarray(mtimes(A.T,solver.getOutput("lam_a")),DM([3.876923073076,2.4384615365384965,-1]),str(qpsol),digits=max(1,6-less_digits))
         
   def test_linear(self):
     H = DM(2,2)

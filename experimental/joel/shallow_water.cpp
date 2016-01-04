@@ -352,7 +352,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   }
 
   // Create NLP solver instance
-  nlpsol_ = Function::nlpsol("nlpsol", "scpgen", nlp, opts);
+  nlpsol_ = nlpsol("nlpsol", "scpgen", nlp, opts);
 }
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){

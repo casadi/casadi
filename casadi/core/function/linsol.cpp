@@ -84,17 +84,18 @@ namespace casadi {
 
   }
 
-  void Linsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Linsol::eval(Memory& mem, const double** arg, double** res,
+                    int* iw, double* w) const {
     // Get inputs and outputs
     const double *A = arg[LINSOL_A];
     const double *b = arg[LINSOL_B];
     double *x = res[LINSOL_X];
 
-    // Create memory reference
-    Memory m(this, arg, res, iw, w, mem);
-
     // If output not requested, nothing to do
     if (!x) return;
+
+    // Setup memory object
+    setup(mem, arg + LINSOL_NUM_IN, res + LINSOL_NUM_OUT, iw, w);
 
     // A zero linear system would be singular
     if (A==0) {
@@ -109,11 +110,11 @@ namespace casadi {
     }
 
     // Factorize the linear system
-    linsol_factorize(m, A);
+    linsol_factorize(mem, A);
 
     // Solve the factorized system
     casadi_copy(b, neq_*nrhs_, x);
-    linsol_solve(m, x, nrhs_, false);
+    linsol_solve(mem, x, nrhs_, false);
   }
 
   void Linsol::
@@ -131,7 +132,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) {
       const MX& B_hat = fseed[d][0];
       const MX& A_hat = fseed[d][1];
-      rhs[d] = tr ? B_hat - mul(A_hat.T(), X) : B_hat - mul(A_hat, X);
+      rhs[d] = tr ? B_hat - mtimes(A_hat.T(), X) : B_hat - mtimes(A_hat, X);
       col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
     rhs = horzsplit(linsol_solve(A, horzcat(rhs), tr), col_offset);

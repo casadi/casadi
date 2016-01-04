@@ -98,21 +98,21 @@ namespace casadi {
         num_out=fk.n_out();
         // Output sparsity
         sp_out.resize(num_out);
-        for (int i=0; i<num_out; ++i) sp_out[i] = fk.output(i).sparsity();
+        for (int i=0; i<num_out; ++i) sp_out[i] = fk.sparsity_out(i);
         // Input sparsity
         sp_in.resize(num_in);
-        for (int i=0; i<num_in; ++i) sp_in[i] = fk.input(i).sparsity();
+        for (int i=0; i<num_in; ++i) sp_in[i] = fk.sparsity_in(i);
       } else {
         // Assert matching number of inputs and outputs
         casadi_assert(num_in==fk.n_in());
         casadi_assert(num_out==fk.n_out());
         // Intersect with output sparsity
         for (int i=0; i<num_out; ++i) {
-          sp_out[i] = sp_out[i].intersect(fk.output(i).sparsity());
+          sp_out[i] = sp_out[i].intersect(fk.sparsity_out(i));
         }
         // Intersect with input sparsity
         for (int i=0; i<num_in; ++i) {
-          sp_in[i] = sp_in[i].intersect(fk.input(i).sparsity());
+          sp_in[i] = sp_in[i].intersect(fk.sparsity_in(i));
         }
       }
     }

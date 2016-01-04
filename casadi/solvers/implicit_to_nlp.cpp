@@ -59,7 +59,7 @@ namespace casadi {
     Rootfinder::init();
 
     // Free variable in the NLP
-    MX u = MX::sym("u", input(iin_).sparsity());
+    MX u = MX::sym("u", sparsity_in(iin_));
 
     // So that we can pass it on to createParent
     std::vector<MX> inputs;
@@ -67,7 +67,7 @@ namespace casadi {
       if (i!=iin_) {
         stringstream ss;
         ss << "p" << i;
-        inputs.push_back(MX::sym(ss.str(), input(i).sparsity()));
+        inputs.push_back(MX::sym(ss.str(), sparsity_in(i)));
       }
     }
     MX p = veccat(inputs);
@@ -102,7 +102,10 @@ namespace casadi {
     alloc_w(n_, true);
   }
 
-  void ImplicitToNlp::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void ImplicitToNlp::eval(Memory& mem, const double** arg, double** res,
+                           int* iw, double* w) const {
+    ImplicitToNlpMemory& m = dynamic_cast<ImplicitToNlpMemory&>(mem);
+
     // Buffers for calling the NLP solver
     const double** arg1 = arg + n_in();
     double** res1 = res + n_out();
@@ -148,7 +151,7 @@ namespace casadi {
 
     // Solve the NLP
     solver_(arg1, res1, iw, w, 0);
-    stats_["solver_stats"] = solver_.getStats();
+    m.solver_stats = solver_.getStats();
 
     // Get the implicit variable
     if (res[iout_]) {

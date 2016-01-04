@@ -69,11 +69,18 @@ namespace casadi {
     // Initialize
     virtual void init();
 
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const;
+
+    // Setup memory block
+    virtual void setup(Memory& mem, const double** arg, double** res,
+                       int* iw, double* w) const;
+
     // Factorize the linear system
-    virtual void linsol_factorize(Memory& m, const double* A);
+    virtual void linsol_factorize(Memory& mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
+    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -91,12 +98,17 @@ namespace casadi {
     // Solve function
     Function solv_fcn_N_, solv_fcn_T_;
 
-    // Storage for QR factorization
-    std::vector<double> q_, r_;
-
     /// A documentation string
     static const std::string meta_doc;
+  };
 
+  /** \brief Memory for SymbolicQR  */
+  struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public WorkMemory {
+    // Destructor
+    virtual ~SymbolicQrMemory() {}
+
+    // Storage for QR factorization
+    std::vector<double> q, r;
   };
 
 } // namespace casadi

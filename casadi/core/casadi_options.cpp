@@ -24,7 +24,7 @@
 
 
 #include "casadi_options.hpp"
-#include "casadi_exception.hpp"
+#include "exception.hpp"
 
 namespace casadi {
 

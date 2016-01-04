@@ -35,6 +35,9 @@ namespace casadi {
   Jit::Jit(const std::string& name, int n_in, int n_out,
            const std::string& body, const Dict& opts)
   : FunctionInternal(name), n_in_(n_in), n_out_(n_out), body_(body) {
+    addOption("jac", OT_STRING, GenericType(), "Function body for Jacobian");
+    addOption("hess", OT_STRING, GenericType(), "Function body for Hessian");
+
     // Jit by default
     setOption("jit", true);
 
@@ -42,11 +45,37 @@ namespace casadi {
     alloc_w(n_in + n_out);
   }
 
+  void Jit::init() {
+    // Call the initialization method of the base class
+    FunctionInternal::init();
+
+    // Read options
+    if (hasSetOption("jac")) jac_body_ = option("jac").toString();
+    if (hasSetOption("hess")) hess_body_ = option("hess").toString();
+  }
+
   Jit::~Jit() {
   }
 
   void Jit::generateBody(CodeGenerator& g) const {
     g.body << body_;
+  }
+
+  bool Jit::hasFullJacobian() const {
+    return !jac_body_.empty();
+  }
+
+  Function Jit::getFullJacobian(const std::string& name, const Dict& opts) {
+    // Create a JIT-function for the Jacobian
+    Dict jit_opts;
+    if (!hess_body_.empty()) jit_opts["jac"] = hess_body_;
+    Function fcn = jit(name + "_jit", n_in_, n_in_*n_out_, jac_body_, jit_opts);
+
+    // Wrap in an MX function
+    std::vector<MX> arg = fcn.mx_in();
+    std::vector<MX> res = fcn(arg);
+    MX J = reshape(vertcat(res), n_in_, n_out_);
+    return Function(name, arg, {J}, opts);
   }
 
 } // namespace casadi

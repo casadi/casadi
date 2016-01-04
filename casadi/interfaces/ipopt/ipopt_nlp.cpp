@@ -82,20 +82,17 @@ namespace casadi {
 
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
-    solver->set_x(x);
-    return solver->calc_f(&obj_value)==0;
+    return solver->calc_f(x, solver->p_, &obj_value)==0;
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
   bool IpoptUserClass::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f) {
-    solver->set_x(x);
-    return solver->calc_grad_f(grad_f)==0;
+    return solver->calc_grad_f(x, solver->p_, 0, grad_f)==0;
   }
 
   // return the value of the constraints: g(x)
   bool IpoptUserClass::eval_g(Index n, const Number* x, bool new_x, Index m, Number* g) {
-    solver->set_x(x);
-    return solver->calc_g(g)==0;
+    return solver->calc_g(x, solver->p_, g)==0;
   }
 
   // return the structure or values of the jacobian
@@ -104,8 +101,7 @@ namespace casadi {
                                   Number* values) {
     if (values) {
       // Evaluate Jacobian
-      solver->set_x(x);
-      return solver->calc_jac_g(values)==0;
+      return solver->calc_jac_g(x, solver->p_, 0, values)==0;
     } else {
       // Get the sparsity pattern
       int ncol = solver->jacg_sp_.size2();
@@ -131,13 +127,7 @@ namespace casadi {
                               Index* jCol, Number* values) {
     if (values) {
       // Evaluate Hessian
-      solver->set_x(x);
-      solver->set_lam_f(obj_factor);
-      solver->set_lam_g(lambda);
-      if (solver->calc_hess_l()!=0) return false;
-
-      // Get the upper triangular half
-      casadi_getu(solver->hess_lk_, solver->hesslag_sp_, values);
+      if (solver->calc_hess_l(x, solver->p_, &obj_factor, lambda, values)) return false;
       return true;
     } else {
       // Get the sparsity pattern
@@ -147,7 +137,7 @@ namespace casadi {
 
       // Pass to IPOPT
       for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
+        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
           *iRow++ = row[el];
           *jCol++ = cc;
         }

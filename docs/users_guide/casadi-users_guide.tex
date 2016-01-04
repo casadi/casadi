@@ -704,11 +704,11 @@ print sin(y)-x
 \end{pytexoutput}
 
 In C++ and Python (but not in MATLAB), the standard multiplication operation (using \verb|*|) is reserved for elementwise multiplication (in MATLAB \verb|.*|). For \textbf{matrix multiplication}, use
-\lstinline[language=Python]{mul(A,B)}:
+\lstinline[language=Python]{mtimes(A,B)}:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print y*y, mul(y,y)
+print y*y, mtimes(y,y)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -717,7 +717,7 @@ disp y.*y, y*y
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-print y*y, mul(y,y)
+print y*y, mtimes(y,y)
 \end{pytexoutput}
 
 As is customary in MATLAB, multiplication using \verb|*| and \verb|.*| are equivalent when either of the arguments is a scalar.
@@ -948,7 +948,7 @@ Basic calculus operations are also possibly and implemented very efficiently usi
 \begin{lstlisting}[language=Python]
 A = SX.sym('A',3,3)
 x = SX.sym('x',3)
-print jacobian(mul(A,x),x)
+print jacobian(mtimes(A,x),x)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -961,7 +961,7 @@ print jacobian(A*x,x)
 \begin{pytexoutput}
 A = SX.sym('A',3,3)
 x = SX.sym('x',3)
-print jacobian(mul(A,x),x)
+print jacobian(mtimes(A,x),x)
 \end{pytexoutput}
 
 \chapter{Function objects} \label{ch:function}
@@ -1637,7 +1637,7 @@ each operation. Further information is available in the API documentation.
     If-then-else
     & \verb|if_else(c, x, y)| & \verb|if_else(c, x, y)| & \verb|if_else(c, x, y)| \\ \hline
     *Matrix multiplication
-    & \verb|mul(x,y)| & \verb|mul(x,y)| & \verb|mul(x,y)| or \verb|x*y| \\ \hline
+    & \verb|mtimes(x,y)| & \verb|mtimes(x,y)| & \verb|mtimes(x,y)| or \verb|x*y| \\ \hline
     *Transpose
     & \verb|transpose(A)| or \verb|A.T| & \verb|transpose(A)| or \verb|A.T()|& \verb|transpose(A)| or \verb|A'| or \verb|A.'| \\ \hline
     Inner product

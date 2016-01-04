@@ -370,6 +370,12 @@ import_array();
     // Same as the above, but with reference instead of pointer
     template<typename M> GUESTOBJECT* from_ref(const M& m) { return from_ptr(&m);}
 
+    // Specialization for std::vectors of booleans
+    GUESTOBJECT* from_ref(std::vector<bool>::const_reference m) {
+      bool tmp = m;
+      return from_ptr(&tmp);
+    }
+
     // Same as the above, but with a temporary object
     template<typename M> GUESTOBJECT* from_tmp(M m) { return from_ptr(&m);}
 #ifdef SWIGMATLAB
@@ -2065,9 +2071,6 @@ except:
 #endif // SWIGPYTHON
 
 %rename("%(regex:/friendwrap_(?!ML)(.*)/\\1/)s") ""; // Strip leading friendwrap_ unless followed by ML
-#ifndef SWIGMATLAB
-%rename("%(regex:/zz_(?!ML)(.*)/\\1/)s") ""; // Strip leading zz_ unless followed by ML
-#endif
 
 %rename(row) get_row;
 %rename(colind) get_colind;
@@ -2193,7 +2196,7 @@ class NZproxy:
       return NZproxy(self)
 
     def prod(self,*args):
-        raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
+        raise Exception("'prod' is not supported anymore in CasADi. Use 'mtimes' to do matrix multiplication.")
 
 %}
 %enddef
@@ -2363,12 +2366,12 @@ namespace casadi {
   }
 } // namespace casadi
 
-%include <casadi/core/casadi_calculus.hpp>
+%include <casadi/core/calculus.hpp>
 
-%include <casadi/core/matrix/sparsity_interface.hpp>
+%include <casadi/core/sparsity_interface.hpp>
 
 %template(SpSparsity) casadi::SparsityInterface<casadi::Sparsity>;
-%include <casadi/core/matrix/sparsity.hpp>
+%include <casadi/core/sparsity.hpp>
 
 // Logic for pickling
 #ifdef SWIGPYTHON
@@ -2393,7 +2396,7 @@ namespace casadi{
 /* There is no reason to expose the Slice class to e.g. Python or MATLAB. Only if an interfaced language
    lacks a slice type, the type should be exposed here */
 // #if !(defined(SWIGPYTHON) || defined(SWIGMATLAB))
-%include <casadi/core/matrix/slice.hpp>
+%include <casadi/core/slice.hpp>
  //#endif
 
 %template(SpIM)        casadi::SparsityInterface<casadi::Matrix<int> >;
@@ -2401,14 +2404,14 @@ namespace casadi{
 %template(SpSX)             casadi::SparsityInterface<casadi::Matrix<casadi::SXElem> >;
 %template(SpMX)             casadi::SparsityInterface<casadi::MX>;
 
-%include <casadi/core/matrix/generic_matrix.hpp>
+%include <casadi/core/generic_matrix.hpp>
 
 %template(GenIM)        casadi::GenericMatrix<casadi::Matrix<int> >;
 %template(GenDM)        casadi::GenericMatrix<casadi::Matrix<double> >;
 %template(GenSX)             casadi::GenericMatrix<casadi::Matrix<casadi::SXElem> >;
 %template(GenMX)             casadi::GenericMatrix<casadi::MX>;
 
-%include <casadi/core/matrix/generic_expression.hpp>
+%include <casadi/core/generic_expression.hpp>
 
 %template(ExpIM)        casadi::GenericExpression<casadi::Matrix<int> >;
 %template(ExpDM)        casadi::GenericExpression<casadi::Matrix<double> >;
@@ -2497,11 +2500,11 @@ namespace casadi{
  DECL M %SHOW(veccat)(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M %SHOW(mul)(const M& X, const M& Y) {
- return mul(X, Y);
+ DECL M %SHOW(mtimes)(const M& x, const M& y) {
+ return mtimes(x, y);
  }
- DECL M %SHOW(mul)(const std::vector< M > &args) {
- return mul(args);
+ DECL M %SHOW(mtimes)(const std::vector< M > &args) {
+ return mtimes(args);
  }
  DECL M %SHOW(mac)(const M& X, const M& Y, const M& Z) {
  return mac(X, Y, Z);
@@ -2657,10 +2660,6 @@ DECL M %SHOW(dot)(const M& x, const M& y) {
   return dot(x, y);
 }
 
-DECL M %SHOW(outer_prod)(const M& x, const M& y) {
-  return outer_prod(x, y);
-}
-
 DECL M %SHOW(nullspace)(const M& A) {
   return nullspace(A);
 }
@@ -2720,6 +2719,14 @@ DECL M %SHOW(pinv)(const M& A, const std::string& lsolver,
 
 DECL M %SHOW(jacobian)(const M &ex, const M &arg) {
   return jacobian(ex, arg);
+}
+
+DECL M %SHOW(jtimes)(const M& ex, const M& arg, const M& v, bool tr=false) {
+  return jtimes(ex, arg, v, tr);
+}
+
+DECL std::vector<bool> %SHOW(nl_var)(const M& expr, const M& var) {
+  return nl_var(expr, var);
 }
 
 DECL M %SHOW(gradient)(const M &ex, const M &arg) {
@@ -2921,11 +2928,6 @@ DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
   return gauss_quadrature(f, x, a, b, order, w);
 }
 
-DECL M %SHOW(jmtimes)(const M& ex, const M& arg, const M& v,
-                                  bool transpose_jacobian=false) {
-  return jmtimes(ex, arg, v, transpose_jacobian);
-}
-
 DECL M %SHOW(taylor)(const M& ex, const M& x, const M& a=0, int order=1) {
   return taylor(ex, x, a, order);
 }
@@ -3003,7 +3005,7 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 
 %template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElem> >;
 
-%include <casadi/core/matrix/matrix.hpp>
+%include <casadi/core/matrix.hpp>
 
 %template(IM)           casadi::Matrix<int>;
 %template(DM)           casadi::Matrix<double>;

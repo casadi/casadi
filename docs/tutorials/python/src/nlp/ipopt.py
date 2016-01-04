@@ -51,7 +51,7 @@ q = MX(DM(q))
 A = MX(DM(A))
 
 #! Objective
-F = 0.5*mul([X.T,P,X]) + mul(q.T,X)
+F = 0.5*mtimes([X.T,P,X]) + mtimes(q.T,X)
 
 #! Constraint
 G = X+X

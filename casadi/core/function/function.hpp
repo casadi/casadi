@@ -72,9 +72,6 @@ namespace casadi {
   /** Forward declaration of internal class */
   class FunctionInternal;
 
-  /** Forward declaration of memory block class */
-  class Memory;
-
 #endif // SWIG
 
   /** \brief General function
@@ -332,14 +329,14 @@ namespace casadi {
 
     /** \brief Get sparsity of a given input */
     /// @{
-    Sparsity sparsity_in(int ind) const;
-    Sparsity sparsity_in(const std::string& iname) const;
+    const Sparsity& sparsity_in(int ind) const;
+    const Sparsity& sparsity_in(const std::string& iname) const;
     /// @}
 
     /** \brief Get sparsity of a given output */
     /// @{
-    Sparsity sparsity_out(int ind) const;
-    Sparsity sparsity_out(const std::string& iname) const;
+    const Sparsity& sparsity_out(int ind) const;
+    const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
     /** \brief  Evaluate */
@@ -473,44 +470,28 @@ namespace casadi {
     std::vector<const double*> buf_in(VecArg arg) const;
     typedef std::vector<std::vector<double>>& VecRes;
     std::vector<double*> buf_out(VecRes res) const;
+    typedef std::vector<std::vector<double>*> VPrRes;
+    std::vector<double*> buf_out(VPrRes res) const;
 
     typedef const std::map<std::string, std::vector<double>>& MapArg;
     std::vector<const double*> buf_in(MapArg arg) const;
     typedef std::map<std::string, std::vector<double>>& MapRes;
     std::vector<double*> buf_out(MapRes res) const;
-
-    typedef std::initializer_list<std::vector<double>> L1dArg;
-    std::vector<const double*> buf_in(L1dArg arg) const;
-    typedef std::initializer_list<std::vector<double>*> L1dRes;
-    std::vector<double*> buf_out(L1dRes res) const;
-
-    typedef std::initializer_list<std::pair<std::string, std::vector<double>>> L2dArg;
-    std::vector<const double*> buf_in(L2dArg arg) const;
-    typedef std::initializer_list<std::pair<std::string, std::vector<double>*>> L2dRes;
-    std::vector<double*> buf_out(L2dRes res) const;
+    typedef std::map<std::string, std::vector<double>*> MPrRes;
+    std::vector<double*> buf_out(MPrRes res) const;
     ///@}
 
     ///@{
     /** \brief Numerical evaluation */
     void operator()(VecArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
     void operator()(VecArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(VecArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
 
     void operator()(MapArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
     void operator()(MapArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(MapArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-
-    void operator()(L1dArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L1dArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L1dArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L1dArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-
-    void operator()(L2dArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L2dArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L2dArg arg, L1dRes res) { (*this)(buf_in(arg), buf_out(res)); }
-    void operator()(L2dArg arg, L2dRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
     ///@}
 #endif // SWIG
 
@@ -545,18 +526,18 @@ namespace casadi {
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
-    void operator()(const double** arg, double** res, int* iw, double* w, void* mem);
+    void operator()(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 
     /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
      */
-    void operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    void operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem=0) const;
 
     /** \brief  Propagate sparsity forward */
-    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief  Propagate sparsity backward */
-    void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0);
 
     /** \brief Propagate sparsity backward with temporary memory allocation */
     void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res);
@@ -936,11 +917,6 @@ namespace casadi {
      * (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);
 
-    /** \brief Propagate the sparsity pattern through a set of directional
-     *
-     * derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
-    void spEvaluate(bool fwd);
-
     /** \brief Get required length of arg field */
     size_t sz_arg() const;
 
@@ -954,17 +930,11 @@ namespace casadi {
     size_t sz_w() const;
 
 #ifndef SWIG
-    /** \brief Does the solver require the allocation of a memory block */
-    bool has_mem() const;
-
-    /** \brief Allocate memory block */
-    void* alloc_mem();
-
-    /** \brief Free allocated memory block */
-    void free_mem(void* mem);
-
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
+
+    /** \brief Set the (persistent) work vectors */
+    void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 #endif // SWIG
 
     /// \endcond
@@ -1013,10 +983,10 @@ namespace casadi {
 
 #ifndef SWIG
     // Factorize linear system of equations
-    void linsol_factorize(Memory& m, const double* A);
+    void linsol_factorize(const double* A, int mem=0) const;
 
-    // Solver linear system of equations
-    void linsol_solve(Memory& m, double* x, int nrhs=1, bool tr=false);
+    // Solve factorized linear system of equations
+    void linsol_solve(double* x, int nrhs=1, bool tr=false, int mem=0) const;
 
     ///@{
     /// Propagate sparsity through a linear solve
@@ -1027,18 +997,18 @@ namespace casadi {
     /** \brief Solve the system of equations <tt>Lx = b</tt>
         Only when a Cholesky factorization is available
     */
-    void linsol_solveL(double* x, int nrhs, bool tr);
+    void linsol_solveL(double* x, int nrhs, bool tr, int mem=0) const;
 #endif // SWIG
 
     /** \brief Obtain a symbolic Cholesky factorization
         Only for Cholesky solvers
     */
-    Sparsity linsol_cholesky_sparsity(bool tr=false) const;
+    Sparsity linsol_cholesky_sparsity(bool tr=false, int mem=0) const;
 
     /** \brief Obtain a numeric Cholesky factorization
         Only for Cholesky solvers
      */
-    DM linsol_cholesky(bool tr=false) const;
+    DM linsol_cholesky(bool tr=false, int mem=0) const;
 
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();
@@ -1051,18 +1021,6 @@ namespace casadi {
 
     /// Get the DAE for an integrator
     Function integrator_dae();
-
-    /** \brief Access the NLP for an NLP solver */
-    Function nlpsol_nlp();
-
-    /** Access the objective gradient function for an NLP solver */
-    Function nlpsol_gradf();
-
-    /** \brief Access the Hessian of the Lagrangian function for an NLP solver */
-    Function nlpsol_jacg();
-
-    /** \brief Access the Jacobian of the constraint function for an NLP solver */
-    Function nlpsol_hesslag();
 
     /** Generate native code in the interfaced language for debugging */
     void qpsol_debug(const std::string &filename) const;
@@ -1093,57 +1051,6 @@ namespace casadi {
     ///@}
 #endif // SWIG
   };
-
-
-#ifndef SWIG
-  /** Struct holding memory */
-  class CASADI_EXPORT Memory {
-    public:
-    // Public data members
-    FunctionInternal *f;
-    const double **arg;
-    double **res;
-    int *iw;
-    double *w;
-    void *mem;
-
-    // Default constructor
-    Memory();
-
-    // Construct non-owning
-    Memory(const Function& f, const double** arg, double** res,
-           int* iw, double* w, void* mem);
-
-    // Construct non-owning
-    Memory(FunctionInternal *f, const double** arg, double** res,
-           int* iw, double* w, void* mem);
-
-    // Construct owning
-    Memory(const Function& f);
-
-    /// Move constructor
-    Memory(Memory&& obj);
-
-    /// Move assignment operator
-    Memory& operator=(Memory&& obj);
-
-    /// Copy constructor (undefined)
-    Memory(const Memory& obj);
-
-    /// Assignment operator (undefined)
-    Memory& operator=(const Memory& obj);
-
-    // Destructor
-    ~Memory();
-
-  private:
-    // Set up memory object
-    void setup(const double** arg1, double** res1, int* iw1, double* w1);
-
-    // Own the data ?
-    bool own_;
-  };
-#endif // SWIG
 
   /** \brief  Load an external function
    * File name is assumed to be ./<f_name>.so
@@ -1433,6 +1340,6 @@ namespace casadi {
 
 } // namespace casadi
 
-#include "../matrix/matrix_impl.hpp"
+#include "../matrix_impl.hpp"
 
 #endif // CASADI_FUNCTION_HPP

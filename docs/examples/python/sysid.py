@@ -90,7 +90,7 @@ opts = {'jit':True, "jit_options":{"flags":['-O3']}}
 def gauss_newton(e,nlp,V):
   J = jacobian(e,V)
   sigma = MX.sym("sigma")
-  hessLag = Function('H',{'x':V,'lam_f':sigma, 'hess':sigma*mul(J.T,J)},
+  hessLag = Function('H',{'x':V,'lam_f':sigma, 'hess':sigma*mtimes(J.T,J)},
                      ['x','p','lam_f','lam_g'], ['hess','f','g','grad_x','grad_p'], opts)
   return nlpsol("solver","ipopt", nlp, {"hess_lag":hessLag})
 

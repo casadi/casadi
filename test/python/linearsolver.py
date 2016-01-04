@@ -85,8 +85,8 @@ class LinearSolverTests(casadiTestCase):
 
         solver.evaluate()
         
-        self.checkarray(mul(A.T,solver.getOutput()),DM.zeros(m,n-m))
-        self.checkarray(mul(solver.getOutput().T,solver.getOutput()),DM.eye(n-m))
+        self.checkarray(mtimes(A.T,solver.getOutput()),DM.zeros(m,n-m))
+        self.checkarray(mtimes(solver.getOutput().T,solver.getOutput()),DM.eye(n-m))
         
         options["ad_weight"] = 0
         options["ad_weight_sp"] = 0
@@ -135,17 +135,17 @@ class LinearSolverTests(casadiTestCase):
         
         #print numpy.linalg.svd(horzcat([exact, fd]).T)[1]
         
-        #print "fd:", mul(fd.T,fd), numpy.linalg.eig(mul(fd.T,fd))[0]
-        #print "exact:", mul(exact.T,exact), numpy.linalg.eig(mul(exact.T,exact))[0]
-        #print "fd:", mul(fd,fd.T), numpy.linalg.eig(mul(fd,fd.T))[0]
-        #print "exact:", mul(exact,exact.T), numpy.linalg.eig(mul(exact,exact.T))[0]
+        #print "fd:", mtimes(fd.T,fd), numpy.linalg.eig(mtimes(fd.T,fd))[0]
+        #print "exact:", mtimes(exact.T,exact), numpy.linalg.eig(mtimes(exact.T,exact))[0]
+        #print "fd:", mtimes(fd,fd.T), numpy.linalg.eig(mtimes(fd,fd.T))[0]
+        #print "exact:", mtimes(exact,exact.T), numpy.linalg.eig(mtimes(exact,exact.T))[0]
         
         V = numpy.random.rand(A.shape[0]-A.shape[1],A.shape[0]-A.shape[1])
         V = V+V.T
         print V
         #V = DM.eye(A.shape[0]-A.shape[1])
-        a = mul([nom,V,fd.T])+mul([fd,V,nom.T])
-        b = mul([nom,V,exact.T])+mul([exact,V,nom.T])
+        a = mtimes([nom,V,fd.T])+mtimes([fd,V,nom.T])
+        b = mtimes([nom,V,exact.T])+mtimes([exact,V,nom.T])
         
         print "here:", a-b
         
@@ -154,8 +154,8 @@ class LinearSolverTests(casadiTestCase):
         V = numpy.random.rand(A.shape[0],A.shape[0])
         V = V+V.T
         V = DM.eye(A.shape[0])
-        a = mul([nom.T,V,fd])+mul([fd.T,V,nom])
-        b = mul([nom.T,V,exact])+mul([exact.T,V,nom])
+        a = mtimes([nom.T,V,fd])+mtimes([fd.T,V,nom])
+        b = mtimes([nom.T,V,exact])+mtimes([exact.T,V,nom])
         
         self.checkarray(a,b,digits=5)
   
@@ -176,7 +176,7 @@ class LinearSolverTests(casadiTestCase):
       f.evaluate()
       
       self.checkarray(f.getOutput(),DM([1.5,-0.5]))
-      self.checkarray(mul(A_,f.getOutput()),b_)
+      self.checkarray(mtimes(A_,f.getOutput()),b_)
 
   def test_pseudo_inverse(self):
     numpy.random.seed(0)
@@ -193,18 +193,18 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.getOutput()),DM.eye(4))
+      self.checkarray(mtimes(A_,f.getOutput()),DM.eye(4))
       
       f = Function("f", [As],[pinv(As)])
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.getOutput()),DM.eye(4))
+      self.checkarray(mtimes(A_,f.getOutput()),DM.eye(4))
       
-      solve(mul(A,A.T),A,Solver,options)
+      solve(mtimes(A,A.T),A,Solver,options)
       pinv(A_,Solver,options)
       
-      #self.checkarray(mul(A_,pinv(A_,Solver,options)),DM.eye(4))
+      #self.checkarray(mtimes(A_,pinv(A_,Solver,options)),DM.eye(4))
       
     A_ = DM(numpy.random.rand(3,5))
     
@@ -219,15 +219,15 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.getOutput()),DM.eye(3)) 
+      self.checkarray(mtimes(A_,f.getOutput()),DM.eye(3)) 
       
       f = Function("f", [As],[pinv(As)])
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.getOutput()),DM.eye(3))
+      self.checkarray(mtimes(A_,f.getOutput()),DM.eye(3))
       
-      #self.checkarray(mul(pinv(A_,Solver,options),A_),DM.eye(3))
+      #self.checkarray(mtimes(pinv(A_,Solver,options),A_),DM.eye(3))
       
   def test_simple_solve_dmatrix(self):
     A = DM([[3,7],[1,2]])
@@ -237,7 +237,7 @@ class LinearSolverTests(casadiTestCase):
       C = solve(A,b,Solver,options)
       
       self.checkarray(C,DM([1.5,-0.5]))
-      self.checkarray(mul(A,DM([1.5,-0.5])),b)
+      self.checkarray(mtimes(A,DM([1.5,-0.5])),b)
 
   def test_simple_trans(self):
     A = DM([[3,1],[7,2]])
@@ -379,7 +379,7 @@ class LinearSolverTests(casadiTestCase):
     n = 10
     L = self.randDM(n,n,sparsity=0.2) +  1.5*c.diag(range(1,n+1))
     L = L[Sparsity.lower(n)]
-    M = mul(L,L.T)
+    M = mtimes(L,L.T)
     b = self.randDM(n,1)
     
     M.sparsity().spy()
@@ -391,7 +391,7 @@ class LinearSolverTests(casadiTestCase):
     self.checkarray(M,M.T)
     
     C = S.linsol_cholesky()
-    self.checkarray(mul(C,C.T),M)
+    self.checkarray(mtimes(C,C.T),M)
     self.checkarray(C,L)
     
     print C
@@ -399,7 +399,7 @@ class LinearSolverTests(casadiTestCase):
     S.linsol_cholesky_sparsity().spy()
 
     C = solve(M,b,"csparsecholesky")
-    self.checkarray(mul(M,C),b)
+    self.checkarray(mtimes(M,C),b)
     
 
   @known_bug()
@@ -408,7 +408,7 @@ class LinearSolverTests(casadiTestCase):
     numpy.random.seed(0)
     n = 10
     L = c.diag(range(1,n+1))
-    M = mul(L,L.T)
+    M = mtimes(L,L.T)
 
     print L
     S = casadi.linsol("S", "csparsecholesky", M.sparsity(), 1)
@@ -418,7 +418,7 @@ class LinearSolverTests(casadiTestCase):
     S.linsol_prepare()
 
     C = S.linsol_cholesky()
-    self.checkarray(mul(C,C.T),M)
+    self.checkarray(mtimes(C,C.T),M)
     
   def test_large_sparse(self):
     numpy.random.seed(1)
@@ -432,14 +432,14 @@ class LinearSolverTests(casadiTestCase):
       print Solver.creator
       C = solve(A,b,Solver,options)
       
-      self.checkarray(mul(A,C),b)
+      self.checkarray(mtimes(A,C),b)
       
       f = Function("f", [As,bs],[solve(As,bs,Solver,options)])
       f.setInput(A,0)
       f.setInput(b,1)
       f.evaluate()
       
-      self.checkarray(mul(A,f.getOutput()),b)
+      self.checkarray(mtimes(A,f.getOutput()),b)
       
   def test_large_sparse(self):
     numpy.random.seed(1)
@@ -453,7 +453,7 @@ class LinearSolverTests(casadiTestCase):
       print Solver
       C = solve(A,b,Solver,options)
       
-      self.checkarray(mul(A,C),b)
+      self.checkarray(mtimes(A,C),b)
       
       for As_,A_ in [(As,A),(densify(As),densify(A)),(densify(As).T,densify(A).T),(densify(As.T),densify(A.T)),(As.T,A.T)]:
         f = Function("f", [As,bs],[solve(As_,bs,Solver,options)])
@@ -461,7 +461,7 @@ class LinearSolverTests(casadiTestCase):
         f.setInput(b,1)
         f.evaluate()
 
-        self.checkarray(mul(A_,f.getOutput()),b)
+        self.checkarray(mtimes(A_,f.getOutput()),b)
       
 if __name__ == '__main__':
     unittest.main()

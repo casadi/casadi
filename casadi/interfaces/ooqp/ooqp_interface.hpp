@@ -78,27 +78,17 @@ namespace casadi {
     static std::string printBounds(const std::vector<double>& b,
                                    const std::vector<char>& ib, int n, const char *sign);
 
-    /// Problem data (vectors)
-    std::vector<double> c_, bA_, xlow_, xupp_, clow_, cupp_, x_, gamma_, phi_, y_, z_, lambda_, pi_;
-
-    /// Type of bounds
-    std::vector<char> ixlow_, ixupp_, iclow_, icupp_;
-
-    /// Problem data (matrices)
-    std::vector<double> dQ_, dA_, dC_;
-
-    /// Sparsities of matrices
-    std::vector<int> irowQ_, jcolQ_, irowA_, jcolA_, irowC_, jcolC_;
-
-    // Variable/constraint index
-    std::vector<int> x_index_, c_index_;
-
-    // Parameters
-    std::vector<double> p_;
-
     // Transpose of linear constraints
-    DM AT_;
-    std::vector<int> AT_tmp_;
+    Sparsity spAT_;
+
+    // Number of nonzeros in upper triangular half of Hessian
+    int nQ_;
+
+    // Number of nonzeros in Hessian
+    int nH_;
+
+    // Number of nonzeros in constraint matrix
+    int nA_;
 
     // Print level
     int print_level_;

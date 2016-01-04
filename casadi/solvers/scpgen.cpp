@@ -129,11 +129,6 @@ namespace casadi {
     merit_start_ = option("merit_start");
     string compiler = option("compiler");
     gauss_newton_ = option("hessian_approximation") == "gauss-newton";
-    if (gauss_newton_) {
-      casadi_assert(nlp_.nnz_out(NL_F)>1);
-    } else {
-      casadi_assert(nlp_.nnz_out(NL_F)==1);
-    }
 
     // Name the components
     if (hasSetOption("name_x")) {
@@ -156,14 +151,9 @@ namespace casadi {
       print_x_.resize(0);
     }
 
-    Function fg = nlp_;
-    if (!fg.is_a("mx_function")) {
-      vector<MX> nlp_in = nlp_.mx_in();
-      vector<MX> nlp_out = nlp_(nlp_in);
-      fg = Function("fg", nlp_in, nlp_out);
-    }
-
     // Generate lifting functions
+    casadi_assert(!nlp2_.is_sx);
+    Function fg("fg", nlp2_.mx_p->in, nlp2_.mx_p->out);
     Function vdef_fcn, vinit_fcn;
     fg.generate_lifted(vdef_fcn, vinit_fcn);
     vinit_fcn_ = vinit_fcn;
@@ -553,7 +543,7 @@ namespace casadi {
 
     // Allocate a QP solver
     spL_ = mat_fcn_.sparsity_out(mat_hes_);
-    spH_ = mul(spL_.T(), spL_);
+    spH_ = mtimes(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
     qpsol_ = qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
                    qpsol_options);
@@ -996,7 +986,7 @@ namespace casadi {
     if (gauss_newton_) {
       // Gauss-Newton Hessian
       casadi_fill(qpH_, spH_.nnz(), 0.);
-      casadi_mul(qpL_, spL_, qpL_, spL_, qpH_, spH_, w_, true);
+      casadi_mtimes(qpL_, spL_, qpL_, spL_, qpH_, spH_, w_, true);
 
       // Gradient of the objective in Gauss-Newton
       casadi_fill(gfk_, nx_, 0.);

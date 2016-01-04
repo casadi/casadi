@@ -26,7 +26,7 @@
 #include "sqpmethod.hpp"
 
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/casadi_calculus.hpp"
+#include "casadi/core/calculus.hpp"
 
 #include <ctime>
 #include <iomanip>
@@ -114,16 +114,17 @@ namespace casadi {
     min_step_size_ = option("min_step_size");
 
     // Get/generate required functions
-    gradF();
-    jacG();
+    setup_f();
+    setup_g();
+    setup_grad_f();
+    setup_jac_g();
     if (exact_hessian_) {
-      hessLag();
+      setup_hess_l(false, true, true);
     }
 
     // Allocate a QP solver
-    Hsp_ = exact_hessian_ ? hessLag().sparsity_out(0) : Sparsity::dense(nx_, nx_);
-    Hsp_ = Hsp_ + Sparsity::diag(nx_);
-    Asp_ = jacG().isNull() ? Sparsity(0, nx_) : jacG().sparsity_out(0);
+    Hsp_ = exact_hessian_ ? hesslag_sp_ : Sparsity::dense(nx_, nx_);
+    Asp_ = jac_g_fcn_.isNull() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(1);
 
     // QP solver options
     Dict qpsol_options;
@@ -148,7 +149,7 @@ namespace casadi {
 
       SX sk = x - x_old;
       SX yk = gLag - gLag_old;
-      SX qk = mul(Bk, sk);
+      SX qk = mtimes(Bk, sk);
 
       // Calculating theta
       SX skBksk = dot(sk, qk);
@@ -158,7 +159,7 @@ namespace casadi {
       yk = omega * yk + (1 - omega) * qk;
       SX theta = 1. / dot(sk, yk);
       SX phi = 1. / dot(qk, sk);
-      SX Bk_new = Bk + theta * mul(yk, yk.T()) - phi * mul(qk, qk.T());
+      SX Bk_new = Bk + theta * mtimes(yk, yk.T()) - phi * mtimes(qk, qk.T());
 
       // Inputs of the BFGS update function
       vector<SX> bfgs_in(BFGS_NUM_IN);
@@ -755,22 +756,7 @@ namespace casadi {
 
   void Sqpmethod::eval_h(const double* x, const double* lambda, double sigma, double* H) {
     try {
-      // Get function
-      Function& hessLag = this->hessLag();
-
-      // Inputs
-      fill_n(arg_, hessLag.n_in(), nullptr);
-      arg_[HESSLAG_X] = x;
-      arg_[HESSLAG_P] = p_;
-      arg_[HESSLAG_LAM_F] = &sigma;
-      arg_[HESSLAG_LAM_G] = lambda;
-
-      // Outputs
-      fill_n(res_, hessLag.n_out(), nullptr);
-      res_[0] = H;
-
-      // Evaluate
-      hessLag(arg_, res_, iw_, w_, 0);
+      calc_hess_l(x, p_, &sigma, lambda, H);
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
@@ -793,17 +779,8 @@ namespace casadi {
       // Quick return if no constraints
       if (ng_==0) return;
 
-      // Inputs
-      fill_n(arg_, nlp_.n_in(), nullptr);
-      arg_[NL_X] = x;
-      arg_[NL_P] = p_;
-
-      // Outputs
-      fill_n(res_, nlp_.n_out(), nullptr);
-      res_[NL_G] = g;
-
       // Evaluate the function
-      nlp_(arg_, res_, iw_, w_, 0);
+      calc_g(x, p_, g);
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -821,18 +798,8 @@ namespace casadi {
       // Quich finish if no constraints
       if (ng_==0) return;
 
-      // Inputs
-      fill_n(arg_, jacG_.n_out(), nullptr);
-      arg_[NL_X] = x;
-      arg_[NL_P] = p_;
-
-      // Outputs
-      fill_n(res_, jacG_.n_out(), nullptr);
-      res_[0] = J;
-      res_[1+NL_G] = g;
-
       // Evaluate the function
-      jacG_(arg_, res_, iw_, w_, 0);
+      calc_jac_g(x, p_, g, J);
 
       double time2 = clock();
       t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -848,21 +815,8 @@ namespace casadi {
     try {
       double time1 = clock();
 
-      // Get function
-      Function& gradF = this->gradF();
-
-      // Inputs
-      fill_n(arg_, gradF.n_in(), nullptr);
-      arg_[NL_X] = x;
-      arg_[NL_P] = p_;
-
-      // Outputs
-      fill_n(res_, gradF_.n_out(), nullptr);
-      res_[0] = grad_f;
-      res_[1+NL_X] = f;
-
       // Evaluate the function
-      gradF_(arg_, res_, iw_, w_, 0);
+      calc_grad_f(x, p_, f, grad_f);
 
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -879,18 +833,9 @@ namespace casadi {
        // Log time
       double time1 = clock();
 
-      // Inputs
-      fill_n(arg_, nlp_.n_in(), nullptr);
-      arg_[NL_X] = x;
-      arg_[NL_P] = p_;
-
-      // Outputs
-      fill_n(res_, nlp_.n_out(), nullptr);
-      double f;
-      res_[NL_F] = &f;
-
       // Evaluate the function
-      nlp_(arg_, res_, iw_, w_, 0);
+      double f;
+      calc_f(x, p_, &f);
 
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;

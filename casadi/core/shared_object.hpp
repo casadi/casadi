@@ -27,7 +27,7 @@
 #define CASADI_SHARED_OBJECT_HPP
 
 #include "printable_object.hpp"
-#include "casadi_exception.hpp"
+#include "exception.hpp"
 #include <map>
 #include <vector>
 

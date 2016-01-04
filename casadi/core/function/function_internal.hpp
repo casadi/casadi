@@ -31,7 +31,7 @@
 #include <set>
 #include "code_generator.hpp"
 #include "compiler.hpp"
-#include "../matrix/sparse_storage.hpp"
+#include "../sparse_storage.hpp"
 
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)
@@ -62,14 +62,30 @@ namespace casadi {
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
+  /** \brief Base class for Function memory */
+  struct CASADI_EXPORT Memory {
+    /** \brief Destructor */
+    virtual ~Memory() {}
+  };
+
+  /** \brief Function memory with temporary work vectors */
+  struct CASADI_EXPORT WorkMemory : public Memory {
+    /** \brief Destructor */
+    virtual ~WorkMemory() {}
+
+    // Work vectors
+    const double** arg;
+    double** res;
+    int* iw;
+    double* w;
+  };
+
   /** \brief Internal class for Function
       \author Joel Andersson
-      \date 2010
-      A regular user should never work with any Node class. Use Function directly.
+      \date 2010-2015
   */
   class CASADI_EXPORT FunctionInternal
-    : public OptionsFunctionalityNode,
-      public IOInterface<FunctionInternal> {
+    : public OptionsFunctionalityNode {
     friend class Function;
 
   protected:
@@ -96,15 +112,14 @@ namespace casadi {
     */
     virtual void finalize();
 
-    /** \brief  Propagate the sparsity pattern through a set of directional
-        derivatives forward or backward */
-    virtual void spEvaluate(bool fwd);
-
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
-    /** \brief  Evaluate numerically */
+    /** \brief  Evaluate numerically, old non-const */
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+
+    /** \brief  Evaluate numerically */
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res);
@@ -539,13 +554,8 @@ namespace casadi {
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
 
     /// Get the sparsity pattern, forward mode
-    Sparsity getJacSparsityFwd(int iind, int oind);
-
-    /// Get the sparsity pattern, reverse mode
-    Sparsity getJacSparsityAdj(int iind, int oind);
-
-    /// A flavor of getJacSparsity without any magic
-    Sparsity getJacSparsityPlain(int iind, int oind);
+    template<bool fwd>
+    Sparsity getJacSparsityGen(int iind, int oind, bool symmetric, int gr_i=1, int gr_o=1);
 
     /// A flavor of getJacSparsity that does hierarchical block structure recognition
     Sparsity getJacSparsityHierarchical(int iind, int oind);
@@ -651,6 +661,7 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int ind) const = 0;
     /// @}
 
+  private:
     /// Access input argument by index
     inline Matrix<double>& input(int i=0) {
       try {
@@ -704,6 +715,7 @@ namespace casadi {
     inline const Matrix<double>& output(const std::string &oname) const {
       return const_cast<FunctionInternal*>(this)->output(oname);
     }
+  public:
 
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
@@ -715,9 +727,6 @@ namespace casadi {
     Function dynamicCompilation(Function f, std::string fname, std::string fdescr,
                                 std::string compiler);
 
-    /// The following functions are called internally from EvaluateMX.
-    /// For documentation, see the MXNode class
-    ///@{
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
 
@@ -754,27 +763,21 @@ namespace casadi {
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f, bool persistent=false);
 
-    /** \brief Does the solver require the allocation of a memory block */
-    virtual bool has_mem() const {return false;}
-
     /** \brief Allocate memory block */
-    virtual void* alloc_mem() {return 0;}
-
-    /** \brief Free allocated memory block */
-    virtual void free_mem(void* mem) {}
+    virtual Memory* memory() const {return new Memory();}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& m, const double**& arg, double**& res, int*& iw, double*& w) {}
-
-    /** \brief Set the (temporary) work vectors */
-    virtual void set_temp(Memory& m, const double** arg, double** res, int* iw, double* w) {}
-    ///@}
+    virtual void setup(Memory& mem, const double** arg, double** res,
+                       int* iw, double* w) const {}
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
     virtual bool fwdViaJac(int nfwd);
     virtual bool adjViaJac(int nadj);
     ///@}
+
+    /// Memory objects
+    std::vector<Memory*> mem_;
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
@@ -859,14 +862,14 @@ namespace casadi {
 
     ///@{
     /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_factorize(Memory& m, const double* A);
-    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
+    virtual void linsol_factorize(Memory& mem, const double* A) const;
+    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
     virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
     virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;
-    virtual void linsol_solveL(double* x, int nrhs, bool tr);
-    virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
-    virtual DM linsol_cholesky(bool tr) const;
+    virtual void linsol_solveL(Memory& mem, double* x, int nrhs, bool tr) const;
+    virtual Sparsity linsol_cholesky_sparsity(Memory& mem, bool tr) const;
+    virtual DM linsol_cholesky(Memory& mem, bool tr) const;
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                bool tr, int nrhs);
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
@@ -1024,9 +1027,9 @@ namespace casadi {
                             "Incorrect number of forward seeds for direction " << d
                             << ": Expected " << n_in << ", got " << fseed[d].size());
       for (int i=0; i<n_in; ++i) {
-        casadi_assert_message(checkMat(fseed[d][i].sparsity(), input(i).sparsity()),
+        casadi_assert_message(checkMat(fseed[d][i].sparsity(), sparsity_in(i)),
                               "Forward seed " << i << " for direction " << d
-                              << " has mismatching shape. Expected " << input(i).size()
+                              << " has mismatching shape. Expected " << size_in(i)
                               << ", got " << fseed[d][i].size());
       }
     }
@@ -1060,9 +1063,9 @@ namespace casadi {
                             "Incorrect number of adjoint seeds for direction " << d
                             << ": Expected " << n_out << ", got " << aseed[d].size());
       for (int i=0; i<n_out; ++i) {
-        casadi_assert_message(checkMat(aseed[d][i].sparsity(), output(i).sparsity()),
+        casadi_assert_message(checkMat(aseed[d][i].sparsity(), sparsity_out(i)),
                               "Adjoint seed " << i << " for direction " << d
-                              << " has mismatching shape. Expected " << output(i).size()
+                              << " has mismatching shape. Expected " << size_out(i)
                               << ", got " << aseed[d][i].size());
       }
     }

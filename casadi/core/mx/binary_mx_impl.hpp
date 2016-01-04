@@ -174,20 +174,20 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
   template<typename T>
   void BinaryMX<ScX, ScY>::
-  evalGen(const T* const* arg, T* const* res, int* iw, T* w) {
+  evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     // Get data
     T* output0 = res[0];
     const T* input0 = arg[0];
@@ -204,7 +204,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t *r=res[0];
     int n=nnz();
@@ -222,7 +222,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
-  spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
     int n=nnz();
     for (int i=0; i<n; ++i) {
@@ -255,12 +255,12 @@ namespace casadi {
 
     switch (op_) {
     case OP_ADD:
-      if (op==OP_SUB && is_equal(y, dep(0), maxDepth())) return dep(1);
-      if (op==OP_SUB && is_equal(y, dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return dep(1);
+      if (op==OP_SUB && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
       break;
     case OP_SUB:
-      if (op==OP_SUB && is_equal(y, dep(0), maxDepth())) return -dep(1);
-      if (op==OP_ADD && is_equal(y, dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return -dep(1);
+      if (op==OP_ADD && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
       break;
     default: break; // no rule
     }

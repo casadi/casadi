@@ -86,8 +86,8 @@ int main(){
     }
 
     // Create variables for the (y_i, z_i) coordinates
-    y_i = SX::sym("y_" + to_string(i));
-    z_i = SX::sym("z_" + to_string(i));
+    y_i = SX::sym("y_" + casadi::to_string(i));
+    z_i = SX::sym("z_" + casadi::to_string(i));
 
     // Add to the list of variables
     x.push_back(y_i);
@@ -128,6 +128,8 @@ int main(){
 
   // Solve with IPOPT
   Function solver = qpsol("solver", "qpoases", qp);
+  //Function solver = qpsol("solver", "cplex", qp);
+  //Function solver = qpsol("solver", "ooqp", qp);
   //Function solver = qpsol("solver", "gurobi", qp);
   //Function solver = nlpsol("solver", "ipopt", qp)
 

@@ -185,7 +185,7 @@ class Functiontests(casadiTestCase):
     
     def test(sp):
       x = SX.sym("x",sp.size2())
-      sp2 = jacobian(mul(DM.ones(sp),x),x).sparsity()
+      sp2 = jacobian(mtimes(DM.ones(sp),x),x).sparsity()
       self.checkarray(sp.row(),sp2.row());
       self.checkarray(sp.colind(),sp2.colind());   
 
@@ -276,7 +276,7 @@ class Functiontests(casadiTestCase):
     def test(sp):
       x = SX.sym("x",sp.size2())
       self.assertTrue(sp==sp.T)
-      f = Function("f", [x],[mul([x.T,DM.ones(sp),x])])
+      f = Function("f", [x],[mtimes([x.T,DM.ones(sp),x])])
       J = f.hessian()
       sp2 = J.sparsity_out(0)
       self.checkarray(sp.row(),sp2.row())
@@ -401,7 +401,7 @@ class Functiontests(casadiTestCase):
     n = 1
     x = SX.sym("x",n)
 
-    M = Function("M", [x],[mul((x-DM(range(n))),x.T)])
+    M = Function("M", [x],[mtimes((x-DM(range(n))),x.T)])
     M.evaluate()
 
 
@@ -410,7 +410,7 @@ class Functiontests(casadiTestCase):
 
     M_X= M([X])[0]
 
-    Pf = Function("P", [X,P],[mul(M_X,P)])
+    Pf = Function("P", [X,P],[mtimes(M_X,P)])
 
     P_P = Pf.jacobian(1)
 
@@ -574,7 +574,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -629,7 +629,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -678,7 +678,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -738,7 +738,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("z",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
 
     n = 2
 
@@ -884,7 +884,7 @@ class Functiontests(casadiTestCase):
     z = SX.sym("z",2,2)
     v = SX.sym("v",Sparsity.upper(3))
 
-    fun = Function("f",[x,y,z,v],[mul(z,x)+y,sin(y*x).T,v/y])
+    fun = Function("f",[x,y,z,v],[mtimes(z,x)+y,sin(y*x).T,v/y])
 
     n = 2
 
@@ -922,7 +922,7 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,Fref)
       self.check_codegen(f)
 
-    fun = Function("f",[y,x,z,v],[mul(z,x)+y+trace(v)**2,sin(y*x).T,v/y])
+    fun = Function("f",[y,x,z,v],[mtimes(z,x)+y+trace(v)**2,sin(y*x).T,v/y])
 
     F = fun.mapaccum("map",n,[False,True,False,True],[0,2])
 

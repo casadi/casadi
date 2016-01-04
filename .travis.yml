@@ -63,7 +63,7 @@ matrix:
         - sudo make -j2 install
         - popd
         - sudo apt-get install python-ipdb graphviz python-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
-        - sudo pip install --allow-unverified pydot pydot==1.0.28
+        - sudo pip install pydot2
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test && make trunktesterbot_no_unittests_py && popd
         - pushd build && travis_wait make json && popd
@@ -96,7 +96,7 @@ matrix:
         - sudo make -j2 install
         - popd
         - sudo pip install texttable
-        - sudo pip install --allow-unverified pydot pydot==1.0.28
+        - sudo pip install pydot2
         - sudo apt-get install graphviz python-lxml python-ipdb python-docutils doxygen -y
         - pushd docs/api && make doxexport | grep -v "file loc from" && popd
         

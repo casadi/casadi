@@ -63,16 +63,18 @@ namespace casadi {
                           "Implicit input not in range");
     casadi_assert_message(iout_>=0 && iout_<f_.n_out() && f_.n_out()>0,
                           "Implicit output not in range");
-    casadi_assert_message(f_.output(iout_).is_dense() && f_.output(iout_).is_column(),
+    casadi_assert_message(f_.sparsity_out(iout_).is_dense()
+                          && f_.sparsity_out(iout_).is_column(),
                           "Residual must be a dense vector");
-    casadi_assert_message(f_.input(iin_).is_dense() && f_.input(iin_).is_column(),
+    casadi_assert_message(f_.sparsity_in(iin_).is_dense()
+                          && f_.sparsity_in(iin_).is_column(),
                           "Unknown must be a dense vector");
-    n_ = f_.output(iout_).nnz();
-    casadi_assert_message(n_ == f_.input(iin_).nnz(),
+    n_ = f_.nnz_out(iout_);
+    casadi_assert_message(n_ == f_.nnz_in(iin_),
                           "Dimension mismatch. Input size is "
-                          << f_.input(iin_).nnz()
+                          << f_.nnz_in(iin_)
                           << ", while output size is "
-                          << f_.output(iout_).nnz());
+                          << f_.nnz_out(iout_));
 
     // Same input and output schemes
     setOption("input_scheme", f_.name_in());
@@ -93,7 +95,7 @@ namespace casadi {
     casadi_assert_message(
       !jac_.sparsity_out(0).is_singular(),
       "Rootfinder::init: singularity - the jacobian is structurally rank-deficient. "
-      "sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.size1_out(0) << ")");
+      "sprank(J)=" << sprank(jac_.sparsity_out(0)) << " (instead of "<< jac_.size1_out(0) << ")");
 
     // Get the linear solver creator function
     if (linsol_.isNull()) {

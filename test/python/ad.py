@@ -174,12 +174,12 @@ class ADtests(casadiTestCase):
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
               [re] = fe([f_in])
-              self.checkarray(c.vec(re),mul(J,c.vec(seed)),"AD") 
+              self.checkarray(c.vec(re),mtimes(J,c.vec(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
               [re] = fe([f_in])
-              self.checkarray(c.vec(re),mul(J.T,c.vec(seed)),"AD") 
+              self.checkarray(c.vec(re),mtimes(J.T,c.vec(seed)),"AD") 
               
   def test_MXeval_mx(self):
     n=array([1.2,2.3,7,1.4])
@@ -214,12 +214,12 @@ class ADtests(casadiTestCase):
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
               [re] = fe([f_in])
-              self.checkarray(c.vec(re),mul(J,c.vec(seed)),"AD") 
+              self.checkarray(c.vec(re),mtimes(J,c.vec(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
               [re] = fe([f_in])
-              self.checkarray(c.vec(re),mul(J.T,c.vec(seed)),"AD") 
+              self.checkarray(c.vec(re),mtimes(J.T,c.vec(seed)),"AD") 
 
   @known_bug()  # Not implemented
   def test_MXeval_sx(self):
@@ -258,13 +258,13 @@ class ADtests(casadiTestCase):
               fe = Function("fe", [y],[sens])
               fe.setInput(n)
               fe.evaluate()
-              self.checkarray(c.vec(fe.getOutput().T),mul(J,c.vec(seed.T)),"AD") 
+              self.checkarray(c.vec(fe.getOutput().T),mtimes(J,c.vec(seed.T)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
               fe.setInput(n)
               fe.evaluate()
-              self.checkarray(c.vec(fe.getOutput().T),mul(J.T,c.vec(seed.T)),"AD")
+              self.checkarray(c.vec(fe.getOutput().T),mtimes(J.T,c.vec(seed.T)),"AD")
 
   def test_MXeval_sx_reduced(self):
     n=array([1.2,2.3,7,1.4])
@@ -439,13 +439,13 @@ class ADtests(casadiTestCase):
     x = MX.sym("x",2)
     y = MX.sym("y",2,2)
     
-    f1 = Function("f1", [x,y],[x+y[0,0],mul(y,x)])
+    f1 = Function("f1", [x,y],[x+y[0,0],mtimes(y,x)])
     
-    f2 = Function("f2", [x,y],[mul(MX.zeros(0,2),x)])
+    f2 = Function("f2", [x,y],[mtimes(MX.zeros(0,2),x)])
 
-    f3 = Function("f3", [x,y],[MX.zeros(0,0),mul(y,x)])
+    f3 = Function("f3", [x,y],[MX.zeros(0,0),mtimes(y,x)])
     
-    f4 = Function("f4", [x,y],[MX.zeros(0,2),mul(y,x)])
+    f4 = Function("f4", [x,y],[MX.zeros(0,2),mtimes(y,x)])
     
     ndir = 2
     
@@ -549,13 +549,13 @@ class ADtests(casadiTestCase):
           (in1,v1,yy[:,0],DM.eye(2)),
           (in1,v1,yy2[:,0],2*c.diag(x)),
           (in1,v1,yyy[:,0],sparsify(DM([[0,1],[1,0]]))),
-          (in1,v1,mul(y,x),y),
-          (in1,v1,mul(x.T,y.T),y),
+          (in1,v1,mtimes(y,x),y),
+          (in1,v1,mtimes(x.T,y.T),y),
           (in1,v1,mac(y,x,DM.zeros(Sparsity.triplet(2,1,[1],[0]))),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
           (in1,v1,mac(x.T,y.T,DM.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
-          (in1,v1,mul(y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],x),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
-          (in1,v1,mul(x.T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
-          (in1,v1,mul(y,x**2),y*2*vertcat([x.T,x.T])),
+          (in1,v1,mtimes(y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],x),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
+          (in1,v1,mtimes(x.T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
+          (in1,v1,mtimes(y,x**2),y*2*vertcat([x.T,x.T])),
           (in1,v1,sin(x),c.diag(cos(x))),
           (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x)),
           (in1,v1,x*y[:,0],c.diag(y[:,0])),
@@ -577,7 +577,7 @@ class ADtests(casadiTestCase):
           #(in1,v1,f1([x**2,[]])[1],DM.zeros(2,2)),
           #(in1,v1,f1([[],y])[1],DM.zeros(2,2)),
           (in1,v1,vertcat([x,DM(0,1)]),DM.eye(2)),
-          (in1,v1,(x**2).project(sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
+          (in1,v1,project(x**2, sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
           (in1,v1,c.dot(x,y[:,0]),y[:,0].T),
           (in1,v1,x.nz[IM([[1,0]])].T*y.nz[IM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]])),
@@ -663,13 +663,13 @@ class ADtests(casadiTestCase):
               seed = array(fseed[d].T).ravel()
               sens = array(vf.getOutput(offset+0).T).ravel()
               offset+=len(inputss)
-              self.checkarray(sens,mul(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
+              self.checkarray(sens,mtimes(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
 
               seed = array(aseed[d].T).ravel()
               sens = array(vf.getOutput(offset+0).T).ravel()
               offset+=len(inputss)
               
-              self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.getOutput(i) for i in range(vf.n_out())])))
+              self.checkarray(sens,mtimes(J_.T,seed),"eval Adj %d %s" % (d,str([vf.getOutput(i) for i in range(vf.n_out())])))
           
           
             assert(offset==vf.n_out())

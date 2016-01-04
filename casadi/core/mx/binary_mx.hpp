@@ -65,20 +65,20 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
+    void evalGen(const T* const* arg, T* const* res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 2;}
@@ -94,15 +94,17 @@ namespace casadi {
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const {
+    virtual bool is_equal(const MXNode* node, int depth) const {
       if (op_==node->op()) {
-        if (is_equal(dep(0), node->dep(0), depth-1) && is_equal(dep(1), node->dep(1), depth-1)) {
+        if (MX::is_equal(dep(0), node->dep(0), depth-1)
+            && MX::is_equal(dep(1), node->dep(1), depth-1)) {
           // If arguments are equal
           return true;
         } else {
           // If arguments are flipped
-          return operation_checker<CommChecker>(op_) && is_equal(dep(1), node->dep(0), depth-1) &&
-            is_equal(dep(0), node->dep(1), depth-1);
+          return operation_checker<CommChecker>(op_)
+            && MX::is_equal(dep(1), node->dep(0), depth-1)
+            && MX::is_equal(dep(0), node->dep(1), depth-1);
         }
       } else {
         return false;

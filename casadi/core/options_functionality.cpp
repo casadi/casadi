@@ -26,12 +26,12 @@
 #include "options_functionality.hpp"
 
 #include "std_vector_tools.hpp"
-#include "casadi_exception.hpp"
+#include "exception.hpp"
 #include <algorithm>
 #include <string>
 #include <locale>
 
-#include "matrix/matrix.hpp"
+#include "matrix.hpp"
 
 using namespace std;
 

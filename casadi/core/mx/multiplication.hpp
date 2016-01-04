@@ -54,13 +54,13 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -74,19 +74,19 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Get the operation */
-    virtual int op() const { return OP_MATMUL;}
+    virtual int op() const { return OP_MTIMES;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_is_equal(const MXNode* node, int depth) const {
+    virtual bool is_equal(const MXNode* node, int depth) const {
       return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;
     }
 

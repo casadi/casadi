@@ -303,12 +303,12 @@ namespace casadi {
                           typeid(*this).name());
   }
 
-  void MXNode::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void MXNode::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     throw CasadiException(string("MXNode::eval not defined for class ")
                           + typeid(*this).name());
   }
 
-  void MXNode::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void MXNode::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     throw CasadiException(string("MXNode::eval_sx not defined for class ")
                           + typeid(*this).name());
   }
@@ -330,7 +330,7 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  void MXNode::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void MXNode::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -351,7 +351,7 @@ namespace casadi {
     }
   }
 
-  void MXNode::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void MXNode::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // By default, everything depends on everything
     bvec_t all_depend(0);
 
@@ -568,7 +568,7 @@ namespace casadi {
         const Sparsity& x_sp = sparsity();
         const Sparsity& y_sp = y.sparsity();
         Sparsity r_sp = x_sp.combine(y_sp, operation_checker<F0XChecker>(op),
-                                            operation_checker<Function0Checker>(op));
+                                            operation_checker<FX0Checker>(op));
 
         // Project the arguments to this sparsity
         MX xx = project(shared_from_this<MX>(), r_sp);
@@ -585,29 +585,29 @@ namespace casadi {
 
       // If identically zero due to one argumebt being zero
       if ((operation_checker<F0XChecker>(op) && is_zero()) ||
-         (operation_checker<Function0Checker>(op) && y->is_zero())) {
+         (operation_checker<FX0Checker>(op) && y->is_zero())) {
         return MX::zeros(sparsity());
       }
 
       // Handle special operations (independent of type)
       switch (op) {
       case OP_ADD:
-        if (y.zz_is_equal(this, maxDepth())) return getUnary(OP_TWICE);
+        if (MXNode::is_equal(y.get(), this, maxDepth())) return getUnary(OP_TWICE);
         break;
       case OP_SUB:
       case OP_NE:
       case OP_LT:
-        if (y.zz_is_equal(this, maxDepth())) return MX::zeros(sparsity());
+        if (MXNode::is_equal(y.get(), this, maxDepth())) return MX::zeros(sparsity());
         break;
       case OP_DIV:
         if (y->is_zero()) return MX::nan(sparsity());
         // fall-through
       case OP_EQ:
       case OP_LE:
-        if (y.zz_is_equal(this, maxDepth())) return MX::ones(sparsity());
+        if (MXNode::is_equal(y.get(), this, maxDepth())) return MX::ones(sparsity());
         break;
       case OP_MUL:
-        if (y.zz_is_equal(this, maxDepth())) return getUnary(OP_SQ);
+        if (MXNode::is_equal(y.get(), this, maxDepth())) return getUnary(OP_SQ);
         break;
       default: break; // no rule
       }
@@ -617,9 +617,11 @@ namespace casadi {
       case OP_CONST:
         // Make the constant the first argument, if possible
         if (this->op()!=OP_CONST && operation_checker<CommChecker>(op)) {
-              return y->getBinary(op, shared_from_this<MX>(), scY, scX);
+          return y->getBinary(op, shared_from_this<MX>(), scY, scX);
         } else {
           switch (op) {
+          case OP_POW:
+            return getBinary(OP_CONSTPOW, y, scX, scY);
           case OP_CONSTPOW:
             if (y->isValue(-1)) return getUnary(OP_INV);
             else if (y->isValue(0)) return MX::ones(sparsity());
@@ -667,7 +669,7 @@ namespace casadi {
 
     if (scX) {
       // Check if it is ok to loop over nonzeros only
-      if (y.is_dense() || operation_checker<Function0Checker>(op)) {
+      if (y.is_dense() || operation_checker<FX0Checker>(op)) {
         // Loop over nonzeros
         return MX::create(new BinaryMX<true, false>(Operation(op), shared_from_this<MX>(), y));
       } else {
@@ -706,7 +708,7 @@ namespace casadi {
     if (op()!=node->op() || ndep()!=node->ndep())
       return false;
     for (int i=0; i<ndep(); ++i) {
-      if (!is_equal(dep(i), node->dep(i), depth-1))
+      if (!MX::is_equal(dep(i), node->dep(i), depth-1))
         return false;
     }
     return true;
@@ -860,7 +862,7 @@ namespace casadi {
       return MX::create(new HorzRepmat(shared_from_this<MX>(), m));
     } else {
       // Fallback to generic_matrix impl
-      return shared_from_this<MX>().GenericMatrix<MX>::zz_repmat(n, m);
+      return GenericMatrix<MX>::repmat(shared_from_this<MX>(), n, m);
     }
   }
 
@@ -869,7 +871,7 @@ namespace casadi {
       return MX::create(new HorzRepsum(shared_from_this<MX>(), m));
     } else {
       // Fallback to generic_matrix impl
-      return shared_from_this<MX>().GenericMatrix<MX>::zz_repsum(n, m);
+      return GenericMatrix<MX>::repsum(shared_from_this<MX>(), n, m);
     }
   }
 
@@ -933,6 +935,16 @@ namespace casadi {
         *arg++ |= *res;
         *res++ = 0;
       }
+    }
+  }
+
+  bool MXNode::is_equal(const MXNode* x, const MXNode* y, int depth) {
+    if (x==y) {
+      return true;
+    } else if (depth>0) {
+      return x->is_equal(y, depth);
+    } else {
+      return false;
     }
   }
 

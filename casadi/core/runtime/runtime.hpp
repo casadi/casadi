@@ -78,7 +78,7 @@ namespace casadi {
 
   /// Sparse matrix-matrix multiplication: z <- z + x*y
   template<typename real_t>
-  void CASADI_PREFIX(mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w, int tr);
+  void CASADI_PREFIX(mtimes)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w, int tr);
 
   /// Sparse matrix-vector multiplication: z <- z + x*y
   template<typename real_t>
@@ -287,7 +287,7 @@ namespace casadi {
   }
 
   template<typename real_t>
-  void CASADI_PREFIX(mul)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w, int tr) {
+  void CASADI_PREFIX(mtimes)(const real_t* x, const int* sp_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z, real_t* w, int tr) {
     /* Get sparsities */
     int ncol_x = sp_x[1];
     const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
@@ -460,7 +460,8 @@ namespace casadi {
       }
       for (jj=0; jj<length; ++jj) {
         if (!iszero(sums[head])) {
-          res = fmax(res, fabs(sums[head]));
+          real_t a = fabs(sums[head]);
+          res = fmax(res, a);
           nnz++;
         }
         int temp = head;

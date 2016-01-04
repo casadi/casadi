@@ -23,12 +23,12 @@
  */
 
 
-      #include "lapack_qr_dense.hpp"
+      #include "csparse_cholesky_interface.hpp"
       #include <string>
 
-      const std::string casadi::LapackQrDense::meta_doc=
+      const std::string casadi::CSparseCholeskyInterface::meta_doc=
       "\n"
-"This class solves the linear system A.x=b by making an QR factorization of A: A = Q.R, with Q orthogonal and R upper triangular\n"
+"Linsol with CSparseCholesky Interface\n"
 "\n"
 "\n"
 ">List of available options\n"

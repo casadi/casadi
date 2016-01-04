@@ -28,10 +28,10 @@
 
 // exception class
 #include "../printable_object.hpp"
-#include "../casadi_exception.hpp"
+#include "../exception.hpp"
 #include "../casadi_limits.hpp"
-#include "../matrix/matrix.hpp"
-#include "../matrix/generic_expression.hpp"
+#include "../matrix.hpp"
+#include "../generic_expression.hpp"
 
 /** \brief  C/C++ */
 #include <iostream>
@@ -56,7 +56,7 @@ namespace casadi {
       \date 2010-2014
   */
   class CASADI_EXPORT SXElem : public GenericExpression<SXElem>,
-                                  public PrintableObject<SXElem> {
+                               public PrintableObject<SXElem> {
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElem>;
@@ -152,7 +152,7 @@ namespace casadi {
     bool isMinusInf() const;
     const std::string& getName() const;
     int op() const;
-    bool isOp(int op) const;
+    bool is_op(int op) const;
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
@@ -162,7 +162,7 @@ namespace casadi {
 
     double getValue() const;
     int getIntValue() const;
-    SXElem getDep(int ch=0) const;
+    SXElem dep(int ch=0) const;
 
     /// Type conversion to double
     inline explicit operator double() const { return getValue();}
@@ -184,66 +184,11 @@ namespace casadi {
     /** \brief  Negation */
     SXElem operator-() const;
 
-    //  all binary operations
-    SXElem zz_plus(const SXElem& y) const;
-    SXElem zz_minus(const SXElem& y) const;
-    SXElem zz_times(const SXElem& y) const;
-    SXElem zz_rdivide(const SXElem& y) const;
-    SXElem zz_lt(const SXElem& y) const;
-    SXElem zz_le(const SXElem& y) const;
-    SXElem zz_eq(const SXElem& y) const;
-    SXElem zz_ne(const SXElem& y) const;
-    SXElem zz_power(const SXElem& b) const;
-    SXElem zz_constpow(const SXElem& b) const;
-
-    SXElem __mrdivide__(const SXElem& b) const {  return *this / b;}
-    SXElem zz_mpower(const SXElem& b) const {return pow(*this, b);}
-
-    // The following functions serves two purposes:
-    // Numpy compatibility and to allow unambiguous access
-    SXElem zz_mul(const SXElem& y) const { return zz_times(y);}
-    SXElem zz_exp() const;
-    SXElem zz_log() const;
-    SXElem zz_sqrt() const;
-    SXElem sq() const;
-    SXElem zz_sin() const;
-    SXElem zz_cos() const;
-    SXElem zz_tan() const;
-    SXElem zz_asin() const;
-    SXElem zz_acos() const;
-    SXElem zz_atan() const;
-    SXElem zz_floor() const;
-    SXElem zz_ceil() const;
-    SXElem zz_mod(const SXElem &y) const;
-    SXElem zz_erf() const;
-    SXElem zz_erfinv() const;
-    SXElem zz_abs() const;
-    SXElem zz_min(const SXElem &y) const;
-    SXElem zz_max(const SXElem &y) const;
+    /** \brief Elementwise inverse */
     SXElem inv() const;
-    SXElem zz_sinh() const;
-    SXElem zz_cosh() const;
-    SXElem zz_tanh() const;
-    SXElem zz_asinh() const;
-    SXElem zz_acosh() const;
-    SXElem zz_atanh() const;
-    SXElem zz_atan2(const SXElem &y) const;
-    SXElem zz_log10() const;
-    SXElem printme(const SXElem &y) const;
-    SXElem zz_sign() const;
-    SXElem zz_copysign(const SXElem &y) const;
-    SXElem zz_not() const;
-    SXElem zz_and(const SXElem& y) const;
-    SXElem zz_or(const SXElem& y) const;
-    SXElem zz_if_else_zero(const SXElem& y) const;
 
-    Matrix<SXElem> zz_min(const Matrix<SXElem>& b) const;
-    Matrix<SXElem> zz_max(const Matrix<SXElem>& b) const;
-    Matrix<SXElem> zz_constpow(const Matrix<SXElem>& n) const;
-    Matrix<SXElem> zz_copysign(const Matrix<SXElem>& n) const;
-    Matrix<SXElem> zz_atan2(const Matrix<SXElem>& b) const;
-    bool zz_is_equal(const SXElem& scalar, int depth=0) const;
-    SXElem zz_simplify() const;
+    /** \brief Check equality up to a given depth */
+    static bool is_equal(const SXElem& x, const SXElem& y, int depth=0);
 
     /// \cond INTERNAL
     /// Get the temporary variable
@@ -289,6 +234,7 @@ namespace casadi {
   class CASADI_EXPORT casadi_limits<SXElem>{
   public:
     static bool is_zero(const SXElem& val);
+    static bool is_equal(const SXElem& x, const SXElem& y, int depth);
     static bool isAlmostZero(const SXElem& val, double tol);
     static bool is_one(const SXElem& val);
     static bool is_minus_one(const SXElem& val);

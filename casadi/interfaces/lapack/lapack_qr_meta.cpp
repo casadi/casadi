@@ -22,3 +22,23 @@
  *
  */
 
+
+      #include "lapack_qr.hpp"
+      #include <string>
+
+      const std::string casadi::LapackQr::meta_doc=
+      "\n"
+"This class solves the linear system A.x=b by making an QR factorization of A: A = Q.R, with Q orthogonal and R upper triangular\n"
+"\n"
+"\n"
+">List of available options\n"
+"\n"
+"+----+------+---------+-------------+\n"
+"| Id | Type | Default | Description |\n"
+"+====+======+=========+=============+\n"
+"+----+------+---------+-------------+\n"
+"\n"
+"\n"
+"\n"
+"\n"
+;

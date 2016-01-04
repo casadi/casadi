@@ -354,8 +354,8 @@ for k in range(nk):
     for i in range(nicp):
         dQs = h*veccat([LagrangeTerm([0., XD[k][i][j], XA[k][i][j-1], U[k], P])[0] \
                         for j in range(1,deg+1)])
-        Qs = mul( ldInv, dQs)
-        m = mul( Qs.T, lAtOne[1:])
+        Qs = mtimes( ldInv, dQs)
+        m = mtimes( Qs.T, lAtOne[1:])
         lagrangeTerm += m
 
 Obj += lagrangeTerm        

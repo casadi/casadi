@@ -312,7 +312,7 @@ namespace casadi {
     //alloc_w(nrp_, true); // rp_
   }
 
-  void SundialsInterface::reset(Memory& m, double t, const double* x,
+  void SundialsInterface::reset(IntegratorMemory& mem, double t, const double* x,
                                 const double* z, const double* p) {
     // Update time
     t_ = t;
@@ -328,7 +328,7 @@ namespace casadi {
     N_VConst(0., q_);
   }
 
-  void SundialsInterface::resetB(Memory& m, double t, const double* rx,
+  void SundialsInterface::resetB(IntegratorMemory& mem, double t, const double* rx,
                                  const double* rz, const double* rp) {
     // Update time
     t_ = t;
@@ -360,7 +360,7 @@ namespace casadi {
     if (hasSetOption("lower_bandwidth")) {
       bw.second = option("lower_bandwidth");
     } else if (!jac_.isNull()) {
-      bw.second = jac_.getOutput().sparsity().bw_lower();
+      bw.second = jac_.sparsity_out(0).bw_lower();
     } else {
       casadi_error("\"lower_bandwidth\" has not been set and cannot be "
                    "detected since exact Jacobian is not available.");

@@ -47,7 +47,7 @@ class Matrixtests(casadiTestCase):
   def test_inv(self):
     self.message("Matrix inverse")
     a = DM([[1,2],[1,3]])
-    self.checkarray(mul(c.inv(a),a),eye(2),"DM inverse")
+    self.checkarray(mtimes(c.inv(a),a),eye(2),"DM inverse")
 
   def test_iter(self):
     self.message("iterator")
@@ -432,24 +432,24 @@ class Matrixtests(casadiTestCase):
     b = horzcat([a,a])
     self.assertTrue(isinstance(b,IM))
     
-  def test_mul(self):
+  def test_mtimes(self):
     A = DM.ones((4,3))
     B = DM.ones((3,8))
     C = DM.ones((8,7))
     
-    self.assertRaises(RuntimeError,lambda : mul([]))
+    self.assertRaises(RuntimeError,lambda : mtimes([]))
     
-    D = mul([A])
+    D = mtimes([A])
     
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],3)
 
-    D = mul([A,B])
+    D = mtimes([A,B])
     
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],8)
     
-    D = mul([A,B,C])
+    D = mtimes([A,B,C])
     
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],7)
@@ -914,7 +914,7 @@ class Matrixtests(casadiTestCase):
     B = SX.sym("B",4,5)
     P = SX.sym("P",A.size2(),B.size1())
 
-    f = Function("f", [vec(P.T),A,B],[vec(mul([A,P,B]).T)])
+    f = Function("f", [vec(P.T),A,B],[vec(mtimes([A,P,B]).T)])
 
     J = f.jacobian()
     J.setInput(numpy.random.rand(*vec(P.T).shape),0)
@@ -957,8 +957,8 @@ class Matrixtests(casadiTestCase):
     A = numpy.random.random((10,2))
     B = numpy.random.random((2,8))
     
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mul(A,B)))
-    self.checkarray(DM(norm_0_mul(A,B)),mul(A,B).nnz())
+    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
     
     # Sparse
     for i in range(5):
@@ -968,15 +968,15 @@ class Matrixtests(casadiTestCase):
     A = sparsify(A)
     B = sparsify(B)
     
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mul(A,B)))
-    self.checkarray(DM(norm_0_mul(A,B)),mul(A,B).nnz())
+    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
     
     
     A = numpy.random.random((8,2))
     B = numpy.random.random((2,10))
     
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mul(A,B)))
-    self.checkarray(DM(norm_0_mul(A,B)),mul(A,B).nnz())
+    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
     
     # Sparse
     for i in range(5):
@@ -986,26 +986,26 @@ class Matrixtests(casadiTestCase):
     A = sparsify(A)
     B = sparsify(B)
     
-    self.checkarray(norm_inf_mul(A,B),norm_inf(mul(A,B)))
-    self.checkarray(DM(norm_0_mul(A,B)),mul(A,B).nnz())
+    self.checkarray(norm_inf_mul(A,B),norm_inf(mtimes(A,B)))
+    self.checkarray(DM(norm_0_mul(A,B)),mtimes(A,B).nnz())
 
   def  test_mul3_issue_1465(self):
     with self.assertRaises(Exception):
       w = SX.sym("w",2,1)
       Q = np.eye(2)
-      mul(w.T,Q,w)
+      mtimes(w.T,Q,w)
       
   def test_chol(self):
     numpy.random.seed(0)
     
     for i in range(4):
       A = numpy.random.random((3,3))
-      H = mul(A,A.T)
+      H = mtimes(A,A.T)
       
       R = chol(H)
       
       assert R.is_triu()
-      self.checkarray(mul(R.T,R),H)
+      self.checkarray(mtimes(R.T,R),H)
     
 if __name__ == '__main__':
     unittest.main()

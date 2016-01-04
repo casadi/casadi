@@ -89,7 +89,10 @@ namespace casadi {
     alloc_w(jac_.nnz_out(0), true); // J
   }
 
-  void Newton::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Newton::eval(Memory& mem, const double** arg, double** res,
+                    int* iw, double* w) const {
+    NewtonMemory& m = dynamic_cast<NewtonMemory&>(mem);
+
     // IO buffers
     const double** arg1 = arg + n_in();
     double** res1 = res + n_out();
@@ -113,7 +116,7 @@ namespace casadi {
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
         log("eval", "Max. iterations reached.");
-        stats_["return_status"] = "max_iteration_reached";
+        m.return_status = "max_iteration_reached";
         success = false;
         break;
       }
@@ -142,11 +145,9 @@ namespace casadi {
       }
 
       // Factorize the linear solver with J
-      fill_n(arg1, static_cast<int>(LINSOL_NUM_IN), nullptr);
-      fill_n(res1, static_cast<int>(LINSOL_NUM_OUT), nullptr);
-      Memory m(linsol_, arg1, res1, iw, w, 0);
-      linsol_.linsol_factorize(m, jac);
-      linsol_.linsol_solve(m, f, 1, false);
+      linsol_.setup(arg1 + LINSOL_NUM_IN, res1 + LINSOL_NUM_OUT, iw, w);
+      linsol_.linsol_factorize(jac);
+      linsol_.linsol_solve(f, 1, false);
 
       // Check convergence again
       double abstolStep=0;
@@ -180,13 +181,13 @@ namespace casadi {
     }
 
     // Store the iteration count
-    if (gather_stats_) stats_["iter"] = iter;
-    if (success) stats_["return_status"] = "success";
+    if (gather_stats_) m.iter = iter;
+    if (success) m.return_status = "success";
 
     casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
   }
 
-  void Newton::printIteration(std::ostream &stream) {
+  void Newton::printIteration(std::ostream &stream) const {
     stream << setw(5) << "iter";
     stream << setw(10) << "res";
     stream << setw(10) << "step";
@@ -194,7 +195,8 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
-  void Newton::printIteration(std::ostream &stream, int iter, double abstol, double abstolStep) {
+  void Newton::printIteration(std::ostream &stream, int iter,
+                              double abstol, double abstolStep) const {
     stream << setw(5) << iter;
     stream << setw(10) << scientific << setprecision(2) << abstol;
     stream << setw(10) << scientific << setprecision(2) << abstolStep;
@@ -204,5 +206,9 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
+  NewtonMemory::NewtonMemory() {
+    return_status = 0;
+    iter = 0;
+  }
 
 } // namespace casadi

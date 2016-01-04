@@ -25,6 +25,7 @@
 
 #include "nlpsol.hpp"
 #include "casadi/core/timing.hpp"
+#include <chrono>
 
 using namespace std;
 namespace casadi {
@@ -82,22 +83,9 @@ namespace casadi {
     // Enable string notation for IO
     ischeme_ = nlpsol_in();
     oscheme_ = nlpsol_out();
-
-    // Make the ref object a non-refence counted pointer to this (as reference counting would
-    // prevent deletion of the object)
-    ref_.assignNodeNoCount(this);
-
-    if (nlp.is_sx) {
-      nlp_ = Nlpsol::problem2fun<SX>(nlp);
-    } else {
-      nlp_ = Nlpsol::problem2fun<MX>(nlp);
-    }
-    alloc(nlp_);
   }
 
   Nlpsol::~Nlpsol() {
-    // Explicitly remove the pointer to this (as the counter would otherwise be decreased)
-    ref_.assignNodeNoCount(0);
   }
 
   Sparsity Nlpsol::get_sparsity_in(int ind) const {
@@ -112,7 +100,8 @@ namespace casadi {
     case NLPSOL_LAM_G0:
       return get_sparsity_out(NLPSOL_G);
     case NLPSOL_P:
-      return nlp_.sparsity_in(NL_P);
+      return nlp2_.is_sx ? nlp2_.sx_p->in[NL_P].sparsity()
+        : nlp2_.mx_p->in[NL_P].sparsity();
     case NLPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -124,10 +113,12 @@ namespace casadi {
       return Sparsity::scalar();
     case NLPSOL_X:
     case NLPSOL_LAM_X:
-      return nlp_.sparsity_in(NL_X);
+      return nlp2_.is_sx ? nlp2_.sx_p->in[NL_X].sparsity()
+        : nlp2_.mx_p->in[NL_X].sparsity();
     case NLPSOL_LAM_G:
     case NLPSOL_G:
-      return nlp_.sparsity_out(NL_G);
+      return nlp2_.is_sx ? nlp2_.sx_p->out[NL_G].sparsity()
+        : nlp2_.mx_p->out[NL_G].sparsity();
     case NLPSOL_LAM_P:
       return get_sparsity_in(NLPSOL_P);
     case NLPSOL_NUM_OUT: break;
@@ -143,16 +134,6 @@ namespace casadi {
     nx_ = nnz_out(NLPSOL_X);
     np_ = nnz_in(NLPSOL_P);
     ng_ = nnz_out(NLPSOL_G);
-
-    // Find out if we are to expand the NLP in terms of scalar operations
-    bool expand = option("expand");
-    if (expand) {
-      log("Expanding NLP in scalar operations");
-      Function f = nlp_.expand(nlp_.name());
-      f.copyOptions(nlp_, true);
-      f.init();
-      nlp_ = f;
-    }
 
     if (hasSetOption("iteration_callback")) {
       fcallback_ = option("iteration_callback");
@@ -203,230 +184,6 @@ namespace casadi {
       casadi_assert_message(!(lbg(i)==inf || lbg(i)>ubg(i) || ubg(i)==-inf),
                             "Ill-posed problem detected (g bounds)");
     }
-  }
-
-  Function& Nlpsol::gradF() {
-    if (gradF_.isNull()) {
-      gradF_ = getGradF();
-      alloc(gradF_);
-    }
-    return gradF_;
-  }
-
-  Function& Nlpsol::jacF() {
-    if (jacF_.isNull()) {
-      jacF_ = getJacF();
-      alloc(jacF_);
-    }
-    return jacF_;
-  }
-
-  Function Nlpsol::getJacF() {
-    Function jacF;
-    if (hasSetOption("jac_f")) {
-      jacF = option("jac_f");
-    } else {
-      log("Generating objective jacobian");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating objective Jacobian...";
-      Timer time0 = getTimerTime();
-      jacF = nlp_.jacobian(NL_X, NL_F);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["objective jacobian gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated objective Jacobian in " << diff.user << " seconds.";
-      log("Jacobian function generated");
-    }
-    if (hasSetOption("jac_f_options")) {
-      jacF.setOption(option("jac_f_options"));
-    }
-    jacF.init();
-    casadi_assert_message(jacF.n_in()==GRADF_NUM_IN,
-                          "Wrong number of inputs to the gradient function. "
-                          "Note: The gradient signature was changed in #544");
-    casadi_assert_message(jacF.n_out()==GRADF_NUM_OUT,
-                          "Wrong number of outputs to the gradient function. "
-                          "Note: The gradient signature was changed in #544");
-    log("Objective gradient function initialized");
-    return jacF;
-  }
-
-  Function Nlpsol::getGradF() {
-    Function gradF;
-    if (hasSetOption("grad_f")) {
-      gradF = option("grad_f");
-    } else {
-      log("Generating objective gradient");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating objective gradient...";
-      Timer time0 = getTimerTime();
-      gradF = nlp_.gradient(NL_X, NL_F);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["objective gradient gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated objective gradient in " << diff.user << " seconds.";
-      log("Gradient function generated");
-    }
-    if (hasSetOption("grad_f_options")) {
-      gradF.setOption(option("grad_f_options"));
-    }
-    gradF.init();
-    casadi_assert_message(gradF.n_in()==GRADF_NUM_IN,
-                          "Wrong number of inputs to the gradient function. "
-                          "Note: The gradient signature was changed in #544");
-    casadi_assert_message(gradF.n_out()==GRADF_NUM_OUT,
-                          "Wrong number of outputs to the gradient function. "
-                          "Note: The gradient signature was changed in #544");
-    log("Objective gradient function initialized");
-    return gradF;
-  }
-
-  Function& Nlpsol::jacG() {
-    if (jacG_.isNull()) {
-      jacG_ = getJacG();
-      alloc(jacG_);
-    }
-    return jacG_;
-  }
-
-  Function Nlpsol::getJacG() {
-    Function jacG;
-
-    // Return null if no constraints
-    if (ng_==0) return jacG;
-
-    if (hasSetOption("jac_g")) {
-      jacG = option("jac_g");
-    } else {
-      log("Generating constraint Jacobian");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating constraint Jacobian...";
-      Timer time0 = getTimerTime();
-      jacG = nlp_.jacobian(NL_X, NL_G);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["constraint jacobian gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated constraint Jacobian in " << diff.user << " seconds.";
-      log("Jacobian function generated");
-    }
-    if (hasSetOption("jac_g_options")) {
-      jacG.setOption(option("jac_g_options"));
-    }
-    jacG.init();
-    casadi_assert_message(jacG.n_in()==JACG_NUM_IN,
-                          "Wrong number of inputs to the Jacobian function. "
-                          "Note: The Jacobian signature was changed in #544");
-    casadi_assert_message(jacG.n_out()==JACG_NUM_OUT,
-                          "Wrong number of outputs to the Jacobian function. "
-                          "Note: The Jacobian signature was changed in #544");
-    log("Jacobian function initialized");
-    return jacG;
-  }
-
-  Function& Nlpsol::gradLag() {
-    if (gradLag_.isNull()) {
-      gradLag_ = getGradLag();
-      alloc(gradLag_);
-    }
-    return gradLag_;
-  }
-
-  Function Nlpsol::getGradLag() {
-    Function gradLag;
-    if (hasSetOption("grad_lag")) {
-      gradLag = option("grad_lag");
-    } else {
-      log("Generating/retrieving Lagrangian gradient function");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating/retrieving Lagrangian gradient function...";
-      Timer time0 = getTimerTime();
-      gradLag = nlp_.derivative(0, 1);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["grad lag gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated/retrieved Lagrangien gradient in "
-                  << diff.user << " seconds.";
-      log("Gradient function generated");
-    }
-    if (hasSetOption("grad_lag_options")) {
-      gradLag.setOption(option("grad_lag_options"));
-    }
-    gradLag.init();
-    log("Gradient function initialized");
-    return gradLag;
-  }
-
-  Function& Nlpsol::hessLag() {
-    if (hessLag_.isNull()) {
-      hessLag_ = getHessLag();
-      alloc(hessLag_);
-    }
-    return hessLag_;
-  }
-
-  Function Nlpsol::getHessLag() {
-    Function hessLag;
-    if (hasSetOption("hess_lag")) {
-      hessLag = option("hess_lag");
-    } else {
-      Function& gradLag = this->gradLag();
-      log("Generating Hessian of the Lagrangian");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating Hessian of the Lagrangian...";
-      Timer time0 = getTimerTime();
-      hessLag = gradLag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["hess lag gen time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated Hessian of the Lagrangian in "
-                  << diff.user << " seconds.";
-      log("Hessian function generated");
-    }
-    if (hasSetOption("hess_lag_options")) {
-      hessLag.setOption(option("hess_lag_options"));
-    }
-    hessLag.init();
-    casadi_assert_message(hessLag.n_in()==HESSLAG_NUM_IN,
-                          "Wrong number of inputs to the Hessian function. ");
-    casadi_assert_message(hessLag.n_out()==HESSLAG_NUM_OUT,
-                          "Wrong number of outputs to the Hessian function. ");
-    log("Hessian function initialized");
-    return hessLag;
-  }
-
-  Sparsity& Nlpsol::spHessLag() {
-    if (spHessLag_.isNull()) {
-      spHessLag_ = getSpHessLag();
-    }
-    return spHessLag_;
-  }
-
-  Sparsity Nlpsol::getSpHessLag() {
-    Sparsity spHessLag;
-    if (false /*hasSetOption("hess_lag_sparsity")*/) {
-      // NOTE: No such option yet, need support for GenericType(Sparsity)
-      //spHessLag = option("hess_lag_sparsity");
-    } else {
-      Function& gradLag = this->gradLag();
-      log("Generating Hessian of the Lagrangian sparsity pattern");
-      const bool verbose_init = option("verbose_init");
-      if (verbose_init)
-        userOut() << "Generating Hessian of the Lagrangian sparsity pattern...";
-      Timer time0 = getTimerTime();
-      spHessLag = gradLag.sparsity_jac(NL_X, NL_NUM_OUT+NL_X, false, true);
-      DiffTime diff = diffTimers(getTimerTime(), time0);
-      stats_["hess lag sparsity time"] = diffToDict(diff);
-      if (verbose_init)
-        userOut() << "Generated Hessian of the Lagrangian sparsity pattern in "
-                  << diff.user << " seconds.";
-      log("Hessian sparsity pattern generated");
-    }
-    return spHessLag;
   }
 
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
@@ -491,6 +248,359 @@ namespace casadi {
     lam_g_ = res[NLPSOL_LAM_G];
     lam_p_ = res[NLPSOL_LAM_P];
     res += NLPSOL_NUM_OUT;
+  }
+
+  int Nlpsol::calc_f(const double* x, const double* p, double* f) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+    casadi_assert(f!=0);
+
+    fill_n(arg_, f_fcn_.n_in(), nullptr);
+    arg_[F_X] = x;
+    arg_[F_P] = p;
+    fill_n(res_, f_fcn_.n_out(), nullptr);
+    res_[F_F] = f;
+    n_calc_f_ += 1;
+    auto t_start = chrono::system_clock::now(); // start timer
+    try {
+      f_fcn_(arg_, res_, iw_, w_, 0);
+    } catch(exception& ex) {
+      // Fatal error
+      userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
+      return 1;
+    }
+    auto t_stop = chrono::system_clock::now(); // stop timer
+
+    // Make sure not NaN or Inf
+    if (!isfinite(*f)) {
+      userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf or NaN detected" << endl;
+      return -1;
+    }
+
+    // Update stats
+    n_calc_f_ += 1;
+    t_calc_f_ += chrono::duration<double>(t_stop - t_start).count();
+
+    // Success
+    return 0;
+  }
+
+  int Nlpsol::calc_g(const double* x, const double* p, double* g) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+    casadi_assert(g!=0);
+
+    // Evaluate User function
+    fill_n(arg_, g_fcn_.n_in(), nullptr);
+    arg_[G_X] = x;
+    arg_[G_P] = p;
+    fill_n(res_, g_fcn_.n_out(), nullptr);
+    res_[G_G] = g;
+    auto t_start = chrono::system_clock::now(); // start timer
+    try {
+      g_fcn_(arg_, res_, iw_, w_, 0);
+    } catch(exception& ex) {
+      // Fatal error
+      userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
+      return 1;
+    }
+    auto t_stop = chrono::system_clock::now(); // stop timer
+
+    // Make sure not NaN or Inf
+    if (!all_of(g, g+ng_, [](double v) { return isfinite(v);})) {
+      userOut<true, PL_WARN>() << name() << ":calc_g failed: NaN or Inf detected" << endl;
+      return -1;
+    }
+
+    // Update stats
+    n_calc_g_ += 1;
+    t_calc_g_ += chrono::duration<double>(t_stop - t_start).count();
+
+    // Success
+    return 0;
+  }
+
+  int Nlpsol::calc_fg(const double* x, const double* p, double* f, double* g) {
+    fill_n(arg_, fg_fcn_.n_in(), nullptr);
+    arg_[0] = x;
+    arg_[1] = p;
+    fill_n(res_, fg_fcn_.n_out(), nullptr);
+    res_[0] = f;
+    res_[1] = g;
+    fg_fcn_(arg_, res_, iw_, w_, 0);
+
+    // Success
+    return 0;
+  }
+
+  int Nlpsol::calc_gf_jg(const double* x, const double* p, double* gf, double* jg) {
+    fill_n(arg_, gf_jg_fcn_.n_in(), nullptr);
+    arg_[0] = x;
+    arg_[1] = p;
+    fill_n(res_, gf_jg_fcn_.n_out(), nullptr);
+    res_[0] = gf;
+    res_[1] = jg;
+    gf_jg_fcn_(arg_, res_, iw_, w_, 0);
+
+    // Success
+    return 0;
+  }
+
+  int Nlpsol::calc_grad_f(const double* x, const double* p, double* f, double* grad_f) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+    casadi_assert(grad_f!=0);
+
+    fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
+    arg_[0] = x;
+    arg_[1] = p;
+    fill_n(res_, grad_f_fcn_.n_out(), nullptr);
+    res_[0] = f;
+    res_[1] = grad_f;
+    grad_f_fcn_(arg_, res_, iw_, w_, 0);
+
+    // Success
+    return 0;
+  }
+
+  int Nlpsol::calc_jac_g(const double* x, const double* p, double* g, double* jac_g) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+    casadi_assert(jac_g!=0);
+
+    // Evaluate User function
+    fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
+    arg_[0] = x;
+    arg_[1] = p;
+    fill_n(res_, jac_g_fcn_.n_out(), nullptr);
+    res_[0] = g;
+    res_[1] = jac_g;
+    jac_g_fcn_(arg_, res_, iw_, w_, 0);
+
+    // Success
+    return 0;
+  }
+
+  int Nlpsol::calc_jac_f(const double* x, const double* p, double* f, double* jac_f) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+    casadi_assert(jac_f!=0);
+
+    // Evaluate User function
+    fill_n(arg_, jac_f_fcn_.n_in(), nullptr);
+    arg_[0] = x;
+    arg_[1] = p;
+    fill_n(res_, jac_f_fcn_.n_out(), nullptr);
+    res_[0] = f;
+    res_[1] = jac_f;
+    jac_f_fcn_(arg_, res_, iw_, w_, 0);
+
+    // Success
+    return 0;
+  }
+
+  int Nlpsol::calc_hess_l(const double* x, const double* p,
+                          const double* sigma, const double* lambda,
+                          double* hl) {
+    // Respond to a possible Crl+C signals
+    InterruptHandler::check();
+
+    // Evaluate User function
+    fill_n(arg_, hess_l_fcn_.n_in(), nullptr);
+    arg_[HL_X] = x;
+    arg_[HL_P] = p;
+    arg_[HL_LAM_F] = sigma;
+    arg_[HL_LAM_G] = lambda;
+    fill_n(res_, hess_l_fcn_.n_out(), nullptr);
+    res_[HL_HL] = hl;
+    auto t_start = chrono::system_clock::now(); // start timer
+    try {
+      hess_l_fcn_(arg_, res_, iw_, w_, 0);
+    } catch(exception& ex) {
+      // Fatal error
+      userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
+      return 1;
+    }
+    auto t_stop = chrono::system_clock::now(); // stop timer
+
+    // Make sure not NaN or Inf
+    if (!all_of(hl, hl+hesslag_sp_.nnz(), [](double v) { return isfinite(v);})) {
+      userOut<true, PL_WARN>() << name() << ":calc_hess_l failed: NaN or Inf detected" << endl;
+      return -1;
+    }
+
+    // Update stats
+    n_calc_hess_l_ += 1;
+    t_calc_hess_l_ += chrono::duration<double>(t_stop - t_start).count();
+
+    // Success
+    return 0;
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_f() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(F_NUM_IN);
+    arg[F_X] = nlp.in[NL_X];
+    arg[F_P] = nlp.in[NL_P];
+    std::vector<M> res(F_NUM_OUT);
+    res[F_F] = nlp.out[NL_F];
+    f_fcn_ = Function("nlp_f", arg, res);
+    alloc(f_fcn_);
+  }
+
+  void Nlpsol::setup_f() {
+    if (nlp2_.is_sx) {
+      _setup_f<SX>();
+    } else {
+      _setup_f<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_g() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(G_NUM_IN);
+    arg[G_X] = nlp.in[NL_X];
+    arg[G_P] = nlp.in[NL_P];
+    std::vector<M> res(G_NUM_OUT);
+    res[G_G] = nlp.out[NL_G];
+    g_fcn_ = Function("nlp_g", arg, res);
+    alloc(g_fcn_);
+  }
+
+  void Nlpsol::setup_g() {
+    if (nlp2_.is_sx) {
+      _setup_g<SX>();
+    } else {
+      _setup_g<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_fg() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
+    std::vector<M> res = {nlp.out[NL_F], nlp.out[NL_G]};
+    fg_fcn_ = Function("nlp_fg", arg, res);
+    alloc(fg_fcn_);
+  }
+
+  void Nlpsol::setup_fg() {
+    if (nlp2_.is_sx) {
+      _setup_fg<SX>();
+    } else {
+      _setup_fg<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_gf_jg() {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
+    std::vector<M> res = {M::gradient(nlp.out[NL_F], nlp.in[NL_X]),
+                          M::jacobian(nlp.out[NL_G], nlp.in[NL_X])};
+    gf_jg_fcn_ = Function("nlp_gf_jg", arg, res);
+    jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
+    alloc(gf_jg_fcn_);
+  }
+
+  void Nlpsol::setup_gf_jg() {
+    if (nlp2_.is_sx) {
+      _setup_gf_jg<SX>();
+    } else {
+      _setup_gf_jg<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_grad_f() {
+    const Problem<M>& nlp = nlp2_;
+    M x = nlp.in[NL_X];
+    M p = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M gf = M::gradient(f, x);
+    gf = project(gf, x.sparsity());
+    grad_f_fcn_ = Function("nlp_grad_f", {x, p}, {f, gf});
+    alloc(grad_f_fcn_);
+  }
+
+  void Nlpsol::setup_grad_f() {
+    if (nlp2_.is_sx) {
+      _setup_grad_f<SX>();
+    } else {
+      _setup_grad_f<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_jac_g() {
+    const Problem<M>& nlp = nlp2_;
+    M x = nlp.in[NL_X];
+    M p = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M g = nlp.out[NL_G];
+    M J = M::jacobian(g, x);
+    std::vector<M> arg = {x, p};
+    std::vector<M> res = {g, J};
+    jac_g_fcn_ = Function("nlp_jac_g", arg, res);
+    jacg_sp_ = J.sparsity();
+    alloc(jac_g_fcn_);
+  }
+
+  void Nlpsol::setup_jac_g() {
+    if (nlp2_.is_sx) {
+      _setup_jac_g<SX>();
+    } else {
+      _setup_jac_g<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_jac_f() {
+    const Problem<M>& nlp = nlp2_;
+    jac_f_fcn_ = Function("nlp_jac_f", nlp.in,
+                          {nlp.out[NL_F], M::jacobian(nlp.out[NL_F], nlp.in[NL_X])});
+    alloc(jac_f_fcn_);
+  }
+
+  void Nlpsol::setup_jac_f() {
+    if (nlp2_.is_sx) {
+      _setup_jac_f<SX>();
+    } else {
+      _setup_jac_f<MX>();
+    }
+  }
+
+  template<typename M>
+  void Nlpsol::_setup_hess_l(bool tr, bool sym, bool diag) {
+    const Problem<M>& nlp = nlp2_;
+    std::vector<M> arg(HL_NUM_IN);
+    M x = arg[HL_X] = nlp.in[NL_X];
+    arg[HL_P] = nlp.in[NL_P];
+    M f = nlp.out[NL_F];
+    M g = nlp.out[NL_G];
+    M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
+    M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
+    std::vector<M> res(HL_NUM_OUT);
+    res[HL_HL] = triu(M::hessian(dot(lam_f, f) + dot(lam_g, g), x));
+    if (sym) res[HL_HL] = triu2symm(res[HL_HL]);
+    if (tr) res[HL_HL] = res[HL_HL].T();
+    hesslag_sp_ = res[HL_HL].sparsity();
+    if (diag) {
+      hesslag_sp_ = hesslag_sp_ + Sparsity::diag(hesslag_sp_.size1());
+      res[HL_HL] = project(res[HL_HL], hesslag_sp_);
+    }
+    hess_l_fcn_ = Function("nlp_hess_l", arg, res);
+    alloc(hess_l_fcn_);
+  }
+
+  void Nlpsol::setup_hess_l(bool tr, bool sym, bool diag) {
+    if (nlp2_.is_sx) {
+      _setup_hess_l<SX>(tr, sym, diag);
+    } else {
+      _setup_hess_l<MX>(tr, sym, diag);
+    }
   }
 
 } // namespace casadi

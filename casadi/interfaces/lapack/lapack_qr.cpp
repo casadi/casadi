@@ -23,7 +23,7 @@
  */
 
 
-#include "lapack_qr_dense.hpp"
+#include "lapack_qr.hpp"
 #include "../../core/std_vector_tools.hpp"
 
 using namespace std;
@@ -32,9 +32,9 @@ namespace casadi {
   extern "C"
   int CASADI_LINSOL_LAPACKQR_EXPORT
   casadi_register_linsol_lapackqr(Linsol::Plugin* plugin) {
-    plugin->creator = LapackQrDense::creator;
+    plugin->creator = LapackQr::creator;
     plugin->name = "lapackqr";
-    plugin->doc = LapackQrDense::meta_doc.c_str();;
+    plugin->doc = LapackQr::meta_doc.c_str();;
     plugin->version = 23;
     return 0;
   }
@@ -44,46 +44,62 @@ namespace casadi {
     Linsol::registerPlugin(casadi_register_linsol_lapackqr);
   }
 
-  LapackQrDense::LapackQrDense(const std::string& name,
+  LapackQr::LapackQr(const std::string& name,
                                const Sparsity& sparsity, int nrhs) :
     Linsol(name, sparsity, nrhs) {
   }
 
-  LapackQrDense::~LapackQrDense() {
+  LapackQr::~LapackQr() {
   }
 
-  void LapackQrDense::init() {
+  void LapackQr::init() {
     // Call the base class initializer
     Linsol::init();
 
-    // Get dimensions
-    ncol_ = ncol();
-    nrow_ = nrow();
-
     // Currently only square matrices tested
-    if (ncol_!=nrow_) throw CasadiException("LapackQrDense::init: currently only "
-                                           "square matrices implemented.");
-
-    // Allocate matrix
-    mat_.resize(ncol_*ncol_);
-    tau_.resize(ncol_);
-    work_.resize(10*ncol_);
+    if (ncol()!=nrow()) throw CasadiException("LapackQr::init: currently only "
+                                              "square matrices implemented.");
   }
 
-  void LapackQrDense::linsol_factorize(Memory& m, const double* A) {
+  Memory* LapackQr::memory() const {
+    LapackQrMemory* m = new LapackQrMemory();
+    try {
+      m->mat.resize(ncol()*ncol());
+      m->tau.resize(ncol());
+      m->work.resize(10*ncol());
+      return m;
+    } catch (...) {
+      delete m;
+      return 0;
+    }
+  }
+
+  void LapackQr::linsol_factorize(Memory& mem, const double* A) const {
+    LapackQrMemory& m = dynamic_cast<LapackQrMemory&>(mem);
+
+    // Dimensions
+    int nrow = this->nrow();
+    int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, getPtr(mat_), false);
+    casadi_densify(A, sparsity_, getPtr(m.mat), false);
 
     // Factorize the matrix
     int info = -100;
-    int lwork = work_.size();
-    dgeqrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(tau_), getPtr(work_), &lwork, &info);
-    if (info != 0) throw CasadiException("LapackQrDense::prepare: dgeqrf_ "
+    int lwork = m.work.size();
+    dgeqrf_(&ncol, &ncol, getPtr(m.mat), &ncol, getPtr(m.tau),
+            getPtr(m.work), &lwork, &info);
+    if (info != 0) throw CasadiException("LapackQr::prepare: dgeqrf_ "
                                          "failed to factorize the Jacobian");
   }
 
-  void LapackQrDense::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
+  void LapackQr::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
+    LapackQrMemory& m = dynamic_cast<LapackQrMemory&>(mem);
+
+    // Dimensions
+    int nrow = this->nrow();
+    int ncol = this->ncol();
+
     // Properties of R
     char uploR = 'U';
     char diagR = 'N';
@@ -94,34 +110,34 @@ namespace casadi {
     // Properties of Q
     char transQ = tr ? 'N' : 'T';
     char sideQ = 'L';
-    int k = tau_.size(); // minimum of ncol_ and nrow_
-    int lwork = work_.size();
+    int k = m.tau.size(); // minimum of ncol and nrow
+    int lwork = m.work.size();
 
     if (tr) {
 
       // Solve for transpose(R)
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,
-             getPtr(mat_), &ncol_, x, &ncol_);
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
+             getPtr(m.mat), &ncol, x, &ncol);
 
       // Multiply by Q
       int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
-              &ncol_, getPtr(work_), &lwork, &info);
-      if (info != 0) throw CasadiException("LapackQrDense::solve: dormqr_ failed "
+      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, getPtr(m.mat), &ncol, getPtr(m.tau), x,
+              &ncol, getPtr(m.work), &lwork, &info);
+      if (info != 0) throw CasadiException("LapackQr::solve: dormqr_ failed "
                                           "to solve the linear system");
 
     } else {
 
       // Multiply by transpose(Q)
       int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
-              &ncol_, getPtr(work_), &lwork, &info);
-      if (info != 0) throw CasadiException("LapackQrDense::solve: dormqr_ failed to "
+      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, getPtr(m.mat), &ncol, getPtr(m.tau), x,
+              &ncol, getPtr(m.work), &lwork, &info);
+      if (info != 0) throw CasadiException("LapackQr::solve: dormqr_ failed to "
                                           "solve the linear system");
 
       // Solve for R
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,
-             getPtr(mat_), &ncol_, x, &ncol_);
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
+             getPtr(m.mat), &ncol, x, &ncol);
     }
   }
 

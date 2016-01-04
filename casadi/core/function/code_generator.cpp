@@ -161,12 +161,20 @@ namespace casadi {
     // External function declarations
     if (!added_externals_.empty()) {
       s[0] << "/* External functions */" << endl;
-      for (std::set<std::string>::const_iterator it=added_externals_.begin();
-           it!=added_externals_.end(); ++it) {
-        s[0] << *it << endl;
+      for (auto&& i : added_externals_) {
+        s[0] << i << endl;
       }
-      s[0] << endl;
+      s[0] << endl << endl;
     }
+
+    // Pre-C99
+    s[0] << "/* Pre-c99 compatibility */" << endl
+         << "#if __STDC_VERSION__ < 199901L" << endl
+         << "real_t CASADI_PREFIX(fmin)(real_t x, real_t y) { return x<y ? x : y;}" << endl
+         << "#define fmin(x,y) CASADI_PREFIX(fmin)(x,y)" << endl
+         << "real_t CASADI_PREFIX(fmax)(real_t x, real_t y) { return x>y ? x : y;}" << endl
+         << "#define fmax(x,y) CASADI_PREFIX(fmax)(x,y)" << endl
+         << "#endif" << endl << endl;
 
     // Generate the actual function
     generate(s[0]);
@@ -540,9 +548,9 @@ namespace casadi {
         << codegen_str_fill_define << endl
         << endl;
       break;
-    case AUX_MUL:
-      this->auxiliaries << codegen_str_mul
-        << codegen_str_mul_define
+    case AUX_MTIMES:
+      this->auxiliaries << codegen_str_mtimes
+        << codegen_str_mtimes_define
         << endl;
       break;
     case AUX_SQ:
@@ -815,13 +823,13 @@ namespace casadi {
     return dlname;
   }
 
-  std::string CodeGenerator::mul(const std::string& x, const Sparsity& sp_x,
-                                  const std::string& y, const Sparsity& sp_y,
-                                  const std::string& z, const Sparsity& sp_z,
-                                  const std::string& w, bool tr) {
-    addAuxiliary(CodeGenerator::AUX_MUL);
+  std::string CodeGenerator::mtimes(const std::string& x, const Sparsity& sp_x,
+                                    const std::string& y, const Sparsity& sp_y,
+                                    const std::string& z, const Sparsity& sp_z,
+                                    const std::string& w, bool tr) {
+    addAuxiliary(CodeGenerator::AUX_MTIMES);
     stringstream s;
-    s << "mul(" << x << ", " << sparsity(sp_x) << ", " << y << ", " << sparsity(sp_y) << ", "
+    s << "mtimes(" << x << ", " << sparsity(sp_x) << ", " << y << ", " << sparsity(sp_y) << ", "
       << z << ", " << sparsity(sp_z) << ", " << w << ", " <<  (tr ? "1" : "0") << ");";
     return s.str();
   }

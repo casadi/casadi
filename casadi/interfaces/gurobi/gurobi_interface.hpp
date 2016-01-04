@@ -73,6 +73,9 @@ namespace casadi {
     /// Solve the QP
     virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
 
+    // Variable types
+    std::vector<char> vtype_;
+
     // Gurobi environment
     GRBenv *env_;
 

@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_LAPACK_QR_DENSE_HPP
-#define CASADI_LAPACK_QR_DENSE_HPP
+#ifndef CASADI_LAPACK_QR_HPP
+#define CASADI_LAPACK_QR_HPP
 
 #include "casadi/core/function/linsol.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
@@ -59,50 +59,53 @@ namespace casadi {
    @copydoc plugin_Linsol_lapackqr
    *
    */
-  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQrDense : public Linsol {
+  class CASADI_LINSOL_LAPACKQR_EXPORT LapackQr : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQrDense(const std::string& name, const Sparsity& sparsity, int nrhs);
+    LapackQr(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     /** \brief  Create a new Linsol */
     static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new LapackQrDense(name, sp, nrhs);
+      return new LapackQr(name, sp, nrhs);
     }
 
     // Destructor
-    virtual ~LapackQrDense();
+    virtual ~LapackQr();
 
     // Initialize the solver
     virtual void init();
 
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const;
+
     // Factorize the linear system
-    virtual void linsol_factorize(Memory& m, const double* A);
+    virtual void linsol_factorize(Memory& mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(Memory& m, double* x, int nrhs, bool tr);
+    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "lapackqr";}
-  protected:
+  };
+
+  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory : public Memory {
+    // Destructor
+    virtual ~LapackQrMemory() {}
 
     // Matrix
-    std::vector<double> mat_;
+    std::vector<double> mat;
 
     // The scalar factors of the elementary reflectors
-    std::vector<double> tau_;
+    std::vector<double> tau;
 
     // qr work array
-    std::vector<double> work_;
-
-    // Dimensions
-    int ncol_, nrow_;
-
+    std::vector<double> work;
   };
 
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_LAPACK_QR_DENSE_HPP
+#endif // CASADI_LAPACK_QR_HPP

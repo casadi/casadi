@@ -81,7 +81,7 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: fmax(a[0],a[1]),lambda a: fmax(a[0],a[1]),"fmin")
     self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
     #self.matrixbinarypool.append(lambda a: dot(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="dot(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: mul(a[0],a[1].T),lambda a: np.dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: np.dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
     
@@ -208,7 +208,7 @@ class SXtests(casadiTestCase):
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SX")
-      self.assertRaises(RuntimeError, lambda : mul(x,y))
+      self.assertRaises(RuntimeError, lambda : mtimes(x,y))
 
       
   def test_DMbinary(self):
@@ -241,7 +241,7 @@ class SXtests(casadiTestCase):
         y0=DM(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toArray()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="SX",setx0=[x0,y0])
-      self.assertRaises(RuntimeError, lambda : mul(xx,yy))
+      self.assertRaises(RuntimeError, lambda : mtimes(xx,yy))
 
 
   @known_bug()  # Test refactoring, cf. #1436
@@ -1021,7 +1021,7 @@ class SXtests(casadiTestCase):
 
     filt = Sparsity.diag(N)+Sparsity.triplet(N,N,[1],[3])
 
-    f = Function("f", [x,y],[mul(x,y)])
+    f = Function("f", [x,y],[mtimes(x,y)])
     f.setInput(x_,0)
     f.setInput(y_,1)
     g = Function("g", [x,y],[mac(x,y,SX.zeros(filt))])
@@ -1049,7 +1049,7 @@ class SXtests(casadiTestCase):
     
     x = SX.sym("x",H.size1())
     
-    f = Function("f", [x],[mul([x.T,H,x])], {'verbose':True})
+    f = Function("f", [x],[mtimes([x.T,H,x])], {'verbose':True})
     H *= 2
 
     h = f.hessian()
@@ -1093,14 +1093,14 @@ class SXtests(casadiTestCase):
      a = SX(5,0)
      b = SX(0,3)
      
-     c = mul(a,b)
+     c = mtimes(a,b)
      
      self.assertEqual(c.nnz(),0)
      
      a = SX(5,3)
      b = SX(3,4)
      
-     c = mul(a,b)
+     c = mtimes(a,b)
      
      self.assertEqual(c.nnz(),0)
      

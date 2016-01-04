@@ -247,17 +247,6 @@ namespace casadi {
     return buf_arg;
   }
 
-  vector<const double*> Function::buf_in(Function::L1dArg arg) const {
-    casadi_assert(arg.size()==n_in());
-    auto arg_it=arg.begin();
-    vector<const double*> buf_arg(sz_arg());
-    for (unsigned int i=0; i<arg.size(); ++i) {
-      casadi_assert(arg_it->size()==nnz_in(i));
-      buf_arg[i] = getPtr(*arg_it++);
-    }
-    return buf_arg;
-  }
-
   vector<double*> Function::buf_out(Function::VecRes res) const {
     res.resize(n_out());
     auto res_it=res.begin();
@@ -269,7 +258,7 @@ namespace casadi {
     return buf_res;
   }
 
-  vector<double*> Function::buf_out(Function::L1dRes res) const {
+  vector<double*> Function::buf_out(Function::VPrRes res) const {
     casadi_assert(res.size()==n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
@@ -309,21 +298,7 @@ namespace casadi {
     return ret;
   }
 
-  vector<const double*> Function::buf_in(Function::L2dArg arg) const {
-    // Return value (RVO)
-    vector<const double*> ret(sz_arg(), 0);
-
-    // Read inputs
-    for (auto i=arg.begin(); i!=arg.end(); ++i) {
-      int ind = index_in(i->first);
-      casadi_assert(i->second.size()==nnz_in(ind));
-      ret[ind] = getPtr(i->second);
-    }
-
-    return ret;
-  }
-
-  vector<double*> Function::buf_out(Function::L2dRes res) const {
+  vector<double*> Function::buf_out(Function::MPrRes res) const {
     // Return value (RVO)
     vector<double*> ret(sz_res(), 0);
 
@@ -475,12 +450,12 @@ namespace casadi {
     // Get pointers to input arguments
     int n_in = this->n_in();
     vector<const double*> arg(sz_arg());
-    for (int i=0; i<n_in; ++i) arg[i]=input(i).ptr();
+    for (int i=0; i<n_in; ++i) arg[i]=(*this)->input(i).ptr();
 
     // Get pointers to output arguments
     int n_out = this->n_out();
     vector<double*> res(sz_res());
-    for (int i=0; i<n_out; ++i) res[i]=output(i).ptr();
+    for (int i=0; i<n_out; ++i) res[i]=(*this)->output(i).ptr();
 
     // Temporary memory
     std::vector<int> iw(sz_iw());
@@ -642,56 +617,20 @@ namespace casadi {
     return (*this)->description_out(ind);
   }
 
-  const Matrix<double>& Function::input(int i) const {
-    return (*this)->input(i);
-  }
-
-  const Matrix<double>& Function::input(const string &iname) const {
-    return (*this)->input(iname);
-  }
-
-  Sparsity Function::sparsity_in(int ind) const {
+  const Sparsity& Function::sparsity_in(int ind) const {
     return (*this)->sparsity_in(ind);
   }
 
-  Sparsity Function::sparsity_in(const string &iname) const {
+  const Sparsity& Function::sparsity_in(const string &iname) const {
     return (*this)->sparsity_in(iname);
   }
 
-  Sparsity Function::sparsity_out(int ind) const {
+  const Sparsity& Function::sparsity_out(int ind) const {
     return (*this)->sparsity_out(ind);
   }
 
-  Sparsity Function::sparsity_out(const string &iname) const {
+  const Sparsity& Function::sparsity_out(const string &iname) const {
     return (*this)->sparsity_out(iname);
-  }
-
-  Matrix<double>& Function::input(int i) {
-    return (*this)->input(i);
-  }
-
-  Matrix<double>& Function::input(const string &iname) {
-    return (*this)->input(iname);
-  }
-
-  const Matrix<double>& Function::output(int i) const {
-    return (*this)->output(i);
-  }
-
-  const Matrix<double>& Function::output(const string &oname) const {
-    return (*this)->output(oname);
-  }
-
-  Matrix<double>& Function::output(int i) {
-    return (*this)->output(i);
-  }
-
-  Matrix<double>& Function::output(const string &oname) {
-    return (*this)->output(oname);
-  }
-
-  void Function::spEvaluate(bool fwd) {
-    (*this)->spEvaluate(fwd);
   }
 
   void Function::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {
@@ -706,16 +645,17 @@ namespace casadi {
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
-  void* Function::alloc_mem() { return (*this)->alloc_mem();}
-
-  void Function::free_mem(void* mem) { (*this)->free_mem(mem);}
-
-  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    (*this)->spFwd(arg, res, iw, w, mem);
+  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    (*const_cast<Function*>(this))->spFwd(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
-  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    (*this)->spAdj(arg, res, iw, w, mem);
+  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    (*this)->spAdj(arg, res, iw, w, (*this)->mem_.at(mem));
+  }
+
+  void Function::setup(const double** arg, double** res, int* iw, double* w,
+                          int mem) const {
+    (*this)->setup(*(*this)->mem_.at(mem), arg, res, iw, w);
   }
 
   bool Function::spCanEvaluate(bool fwd) {
@@ -746,7 +686,7 @@ namespace casadi {
       vector<MX>::iterator it=res.begin();
       for (int d=0; d<nfwd; ++d)
         for (int i=0; i<num_out; ++i, ++it)
-          *it = project(*it, output(i).sparsity());
+          *it = project(*it, sparsity_out(i));
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 
@@ -761,7 +701,7 @@ namespace casadi {
       vector<MX>::iterator it=res.begin();
       for (int d=0; d<nadj; ++d)
         for (int i=0; i<num_in; ++i, ++it)
-          *it = project(*it, input(i).sparsity());
+          *it = project(*it, sparsity_in(i));
       ret_out.insert(ret_out.end(), res.begin(), res.end());
     }
 
@@ -833,19 +773,19 @@ namespace casadi {
     int ind=0;
     for (int d=-1; d<nfwd; ++d) {
       for (int i=0; i<n_in(); ++i, ++ind) {
-        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=input(i).sparsity()) {
+        if (ret.nnz_in(ind)!=0 && ret.sparsity_in(ind)!=sparsity_in(i)) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \""
-                       << i_names.at(ind) << "\". Expected " << input(i).dim()
-                       << " but got " << ret.input(ind).dim());
+                       << i_names.at(ind) << "\". Expected " << size_in(i)
+                       << " but got " << ret.size_in(ind));
         }
       }
     }
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<n_out(); ++i, ++ind) {
-        if (ret.input(ind).nnz()!=0 && ret.input(ind).sparsity()!=output(i).sparsity()) {
+        if (ret.nnz_in(ind)!=0 && ret.sparsity_in(ind)!=sparsity_out(i)) {
           casadi_error("Incorrect sparsity for " << ret << " input " << ind <<
-                       " \"" << i_names.at(ind) << "\". Expected " << output(i).dim()
-                       << " but got " << ret.input(ind).dim());
+                       " \"" << i_names.at(ind) << "\". Expected " << size_out(i)
+                       << " but got " << ret.size_in(ind));
         }
       }
     }
@@ -854,19 +794,19 @@ namespace casadi {
     ind=0;
     for (int d=-1; d<nfwd; ++d) {
       for (int i=0; i<n_out(); ++i, ++ind) {
-        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=output(i).sparsity()) {
+        if (ret.nnz_out(ind)!=0 && ret.sparsity_out(ind)!=sparsity_out(i)) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind <<
-                       " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dim()
-                       << " but got " << ret.output(ind).dim());
+                       " \"" <<  o_names.at(ind) << "\". Expected " << size_out(i)
+                       << " but got " << ret.size_out(ind));
         }
       }
     }
     for (int d=0; d<nadj; ++d) {
       for (int i=0; i<n_in(); ++i, ++ind) {
-        if (ret.output(ind).nnz()!=0 && ret.output(ind).sparsity()!=input(i).sparsity()) {
+        if (ret.nnz_out(ind)!=0 && ret.sparsity_out(ind)!=sparsity_in(i)) {
           casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \""
-                       << o_names.at(ind) << "\". Expected " << input(i).dim()
-                       << " but got " << ret.output(ind).dim());
+                       << o_names.at(ind) << "\". Expected " << size_in(i)
+                       << " but got " << ret.size_out(ind));
         }
       }
     }
@@ -1057,12 +997,12 @@ namespace casadi {
     return (*this)->default_in(ind);
   }
 
-  void Function::operator()(const double** arg, double** res, int* iw, double* w, void* mem) {
-    (*this)->eval(arg, res, iw, w, mem);
+  void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
+    (*const_cast<Function*>(this))->eval(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
-  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    (*this)->eval_sx(arg, res, iw, w, mem);
+  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    (*const_cast<Function*>(this))->eval_sx(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
   const SX Function::sx_in(int ind) const {
@@ -1380,34 +1320,6 @@ namespace casadi {
     return ret;
   }
 
-  Function Function::nlpsol_nlp() {
-    casadi_assert(!isNull());
-    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
-    casadi_assert_message(n!=0, "Not an NLP solver");
-    return n->nlp_;
-  }
-
-  Function Function::nlpsol_gradf() {
-    casadi_assert(!isNull());
-    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
-    casadi_assert_message(n!=0, "Not an NLP solver");
-    return n->gradF();
-  }
-
-  Function Function::nlpsol_jacg() {
-    casadi_assert(!isNull());
-    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
-    casadi_assert_message(n!=0, "Not an NLP solver");
-    return n->jacG();
-  }
-
-  Function Function::nlpsol_hesslag() {
-    casadi_assert(!isNull());
-    Nlpsol* n = dynamic_cast<Nlpsol*>(get());
-    casadi_assert_message(n!=0, "Not an NLP solver");
-    return n->hessLag();
-  }
-
   vector<string> nlpsol_in() {
     vector<string> ret(nlpsol_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_in(i);
@@ -1538,32 +1450,28 @@ namespace casadi {
     return ret;
   }
 
-  bool Function::has_mem() const {
-    return (*this)->has_mem();
-  }
-
-  void Function::linsol_factorize(Memory& m, const double* A) {
-    (*this)->linsol_factorize(m, A);
-  }
-
-  void Function::linsol_solve(Memory& m, double* x, int nrhs, bool tr) {
-    (*this)->linsol_solve(m, x, nrhs, tr);
-  }
-
   MX Function::linsol_solve(const MX& A, const MX& B, bool tr) {
     return (*this)->linsol_solve(A, B, tr);
   }
 
-  void Function::linsol_solveL(double* x, int nrhs, bool tr) {
-    (*this)->linsol_solveL(x, nrhs, tr);
+  void Function::linsol_solveL(double* x, int nrhs, bool tr, int mem) const {
+    (*this)->linsol_solveL(*(*this)->mem_.at(mem), x, nrhs, tr);
   }
 
-  Sparsity Function::linsol_cholesky_sparsity(bool tr) const {
-    return (*this)->linsol_cholesky_sparsity(tr);
+  void Function::linsol_factorize(const double* A, int mem) const {
+    (*this)->linsol_factorize(*(*this)->mem_.at(mem), A);
   }
 
-  DM Function::linsol_cholesky(bool tr) const {
-    return (*this)->linsol_cholesky(tr);
+  void Function::linsol_solve(double* x, int nrhs, bool tr, int mem) const {
+    (*this)->linsol_solve(*(*this)->mem_.at(mem), x, nrhs, tr);
+  }
+
+  Sparsity Function::linsol_cholesky_sparsity(bool tr, int mem) const {
+    return (*this)->linsol_cholesky_sparsity(*(*this)->mem_.at(mem), tr);
+  }
+
+  DM Function::linsol_cholesky(bool tr, int mem) const {
+    return (*this)->linsol_cholesky(*(*this)->mem_.at(mem), tr);
   }
 
   void Function::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
@@ -1634,91 +1542,6 @@ namespace casadi {
     return *mx_p;
   }
 
-  Memory::Memory()
-    : f(0), arg(0), res(0), iw(0), w(0), mem(0), own_(false) {
-  }
-
-  Memory::Memory(FunctionInternal *_f, const double** _arg, double** _res,
-                 int* _iw, double* _w, void* _mem)
-    : f(_f), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
-    setup(arg, res, iw, w);
-  }
-
-  Memory::Memory(const Function& _f, const double** _arg, double** _res,
-                 int* _iw, double* _w, void* _mem)
-    : f(_f.get()), arg(_arg), res(_res), iw(_iw), w(_w), mem(_mem), own_(false) {
-    setup(arg, res, iw, w);
-  }
-
-  Memory::Memory(const Function& _f)
-    : f(_f.get()), arg(0), res(0), iw(0), w(0), mem(0), own_(true) {
-    // Make an owning reference
-    casadi_assert(f!=0);
-    f->count++; // prevent object from being deleted
-
-    // Allocate work vectors
-    arg = new const double*[f->sz_arg()];
-    res = new double*[f->sz_res()];
-    iw = new int[f->sz_iw()];
-    w = new double[f->sz_w()];
-
-    // Allocate memory
-    mem = f->alloc_mem();
-
-    // Set up memory object
-    setup(arg, res, iw, w);
-  }
-
-  Memory::Memory(Memory&& obj)
-    : f(obj.f), arg(obj.arg), res(obj.res), iw(obj.iw), w(obj.w), mem(obj.mem),
-        own_(obj.own_) {
-  }
-
-  Memory::~Memory() {
-    if (own_) {
-      // Free work vectors
-      if (arg) delete[] arg;
-      if (res) delete[] res;
-      if (iw) delete[] iw;
-      if (w) delete[] w;
-
-      // Free memory object
-      if (mem) f->free_mem(mem);
-      if (--f->count==0) delete f;
-      f = 0;
-    }
-  }
-
-  void Memory::setup(const double** arg1, double** res1, int* iw1, double* w1) {
-    casadi_assert(f!=0);
-    arg1 += f->n_in();
-    res1 += f->n_out();
-    f->set_work(*this, arg1, res1, iw1, w1);
-    f->set_temp(*this, arg1, res1, iw1, w1);
-  }
-
-  Memory& Memory::operator=(Memory&& obj) {
-    if (&obj != this) {
-      // Copy the members
-      f = obj.f;
-      arg = obj.arg;
-      res = obj.res;
-      iw = obj.iw;
-      w = obj.w;
-      mem = obj.mem;
-      own_ = obj.own_;
-      // Clear from assigning object
-      obj.f = 0;
-      obj.arg = 0;
-      obj.res = 0;
-      obj.iw = 0;
-      obj.w = 0;
-      obj.mem = 0;
-      obj.own_ = 0;
-    }
-    return *this;
-  }
-
   template<typename M>
   Function qpsol_nlp(const std::string& name, const std::string& solver,
                      const Problem<M>& qp, const Dict& opts) {
@@ -1787,7 +1610,7 @@ namespace casadi {
     // Get expressions for the solution
     ret_out[NLPSOL_X] = w[QPSOL_X];
     ret_out[NLPSOL_F] = w[QPSOL_COST];
-    ret_out[NLPSOL_G] = mul(v.at(2), w[QPSOL_X]) + v.at(3);
+    ret_out[NLPSOL_G] = mtimes(v.at(2), w[QPSOL_X]) + v.at(3);
     ret_out[NLPSOL_LAM_X] = w[QPSOL_LAM_X];
     ret_out[NLPSOL_LAM_G] = w[QPSOL_LAM_A];
     ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());
@@ -1820,6 +1643,38 @@ namespace casadi {
     ret.setOption(opts);
     ret.init();
     return ret;
+  }
+
+  const Matrix<double>& Function::input(int i) const {
+    return (*this)->input(i);
+  }
+
+  const Matrix<double>& Function::input(const string &iname) const {
+    return (*this)->input(iname);
+  }
+
+  Matrix<double>& Function::input(int i) {
+    return (*this)->input(i);
+  }
+
+  Matrix<double>& Function::input(const string &iname) {
+    return (*this)->input(iname);
+  }
+
+  const Matrix<double>& Function::output(int i) const {
+    return (*this)->output(i);
+  }
+
+  const Matrix<double>& Function::output(const string &oname) const {
+    return (*this)->output(oname);
+  }
+
+  Matrix<double>& Function::output(int i) {
+    return (*this)->output(i);
+  }
+
+  Matrix<double>& Function::output(const string &oname) {
+    return (*this)->output(oname);
   }
 
 } // namespace casadi

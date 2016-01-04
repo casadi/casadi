@@ -46,21 +46,21 @@ namespace casadi {
   }
 
   std::string Multiplication::print(const std::vector<std::string>& arg) const {
-    return "(" + arg.at(0) + "+mul(" + arg.at(1) + ", " + arg.at(2) + "))";
+    return "(" + arg.at(0) + "+mtimes(" + arg.at(1) + ", " + arg.at(2) + "))";
   }
 
-  void Multiplication::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Multiplication::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w, mem);
   }
 
-  void Multiplication::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void Multiplication::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen<SXElem>(arg, res, iw, w, mem);
   }
 
   template<typename T>
-  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
+  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    casadi_mul(arg[1], dep(1).sparsity(),
+    casadi_mtimes(arg[1], dep(1).sparsity(),
                arg[2], dep(2).sparsity(),
                res[0], sparsity(), w, false);
   }
@@ -87,14 +87,14 @@ namespace casadi {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Multiplication::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     copyFwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
   }
 
-  void Multiplication::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void Multiplication::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
@@ -109,9 +109,9 @@ namespace casadi {
     }
 
     // Perform sparse matrix multiplication
-    g.body << "  " << g.mul(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
-                            g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
-                            g.work(res[0], nnz()), sparsity(), "w", false) << endl;
+    g.body << "  " << g.mtimes(g.work(arg[1], dep(1).nnz()), dep(1).sparsity(),
+                               g.work(arg[2], dep(2).nnz()), dep(2).sparsity(),
+                               g.work(res[0], nnz()), sparsity(), "w", false) << endl;
   }
 
   void DenseMultiplication::
