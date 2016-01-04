@@ -52,6 +52,11 @@ namespace casadi {
   CsparseInterface::~CsparseInterface() {
   }
 
+  CsparseMemory::~CsparseMemory() {
+    if (this->S) cs_sfree(this->S);
+    if (this->N) cs_nfree(this->N);
+  }
+
   void CsparseInterface::init() {
     // Call the init method of the base class
     Linsol::init();
@@ -170,11 +175,6 @@ namespace casadi {
       }
       x += ncol();
     }
-  }
-
-  CsparseMemory::~CsparseMemory() {
-    if (this->S) cs_sfree(this->S);
-    if (this->N) cs_nfree(this->N);
   }
 
 } // namespace casadi

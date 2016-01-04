@@ -2662,15 +2662,15 @@ namespace casadi {
     casadi_error("'linsol_spsolve' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_solveL(double* x, int nrhs, bool tr) {
+  void FunctionInternal::linsol_solveL(Memory& mem, double* x, int nrhs, bool tr) const {
     casadi_error("'linsol_solveL' not defined for " + type_name());
   }
 
-  Sparsity FunctionInternal::linsol_cholesky_sparsity(bool tr) const {
+  Sparsity FunctionInternal::linsol_cholesky_sparsity(Memory& mem, bool tr) const {
     casadi_error("'linsol_cholesky_sparsity' not defined for " + type_name());
   }
 
-  DM FunctionInternal::linsol_cholesky(bool tr) const {
+  DM FunctionInternal::linsol_cholesky(Memory& mem, bool tr) const {
     casadi_error("'linsol_cholesky' not defined for " + type_name());
   }
 

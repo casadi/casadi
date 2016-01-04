@@ -23,10 +23,10 @@
  */
 
 
-      #include "csparse_cholesky_internal.hpp"
+      #include "csparse_cholesky_interface.hpp"
       #include <string>
 
-      const std::string casadi::CSparseCholeskyInternal::meta_doc=
+      const std::string casadi::CSparseCholeskyInterface::meta_doc=
       "\n"
 "Linsol with CSparseCholesky Interface\n"
 "\n"

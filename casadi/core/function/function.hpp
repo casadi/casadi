@@ -997,18 +997,18 @@ namespace casadi {
     /** \brief Solve the system of equations <tt>Lx = b</tt>
         Only when a Cholesky factorization is available
     */
-    void linsol_solveL(double* x, int nrhs, bool tr);
+    void linsol_solveL(double* x, int nrhs, bool tr, int mem=0) const;
 #endif // SWIG
 
     /** \brief Obtain a symbolic Cholesky factorization
         Only for Cholesky solvers
     */
-    Sparsity linsol_cholesky_sparsity(bool tr=false) const;
+    Sparsity linsol_cholesky_sparsity(bool tr=false, int mem=0) const;
 
     /** \brief Obtain a numeric Cholesky factorization
         Only for Cholesky solvers
      */
-    DM linsol_cholesky(bool tr=false) const;
+    DM linsol_cholesky(bool tr=false, int mem=0) const;
 
     /// Access rhs function for a rootfinder
     Function rootfinder_fun();

@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
-#define CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
+#ifndef CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP
+#define CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP
 
 /** \defgroup plugin_Linsol_csparsecholesky
    * Linsol with CSparseCholesky Interface
@@ -47,48 +47,39 @@ namespace casadi {
    *
    */
   class CASADI_LINSOL_CSPARSECHOLESKY_EXPORT
-  CSparseCholeskyInternal : public Linsol {
+  CSparseCholeskyInterface : public Linsol {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInternal(const std::string& name, const Sparsity& sp, int nrhs);
+    CSparseCholeskyInterface(const std::string& name, const Sparsity& sp, int nrhs);
 
     /** \brief  Create a new Linsol */
     static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
-      return new CSparseCholeskyInternal(name, sp, nrhs);
+      return new CSparseCholeskyInterface(name, sp, nrhs);
     }
 
     // Destructor
-    virtual ~CSparseCholeskyInternal();
+    virtual ~CSparseCholeskyInterface();
 
     // Initialize the solver
     virtual void init();
 
+    /** \brief Allocate memory block */
+    virtual Memory* memory() const;
+
     // Factorize the linear system
-    virtual void linsol_factorize(const double* A, Memory* mem);
+    virtual void linsol_factorize(Memory& mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(double* x, int nrhs, bool tr, Memory* mem);
+    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
 
     // Solve the system of equations <tt>Lx = b</tt>
-    virtual void linsol_solveL(double* x, int nrhs, bool tr);
+    virtual void linsol_solveL(Memory& mem, double* x, int nrhs, bool tr) const;
 
     /// Obtain a symbolic Cholesky factorization
-    virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
+    virtual Sparsity linsol_cholesky_sparsity(Memory& mem, bool tr) const;
 
     /// Obtain a numeric Cholesky factorization
-    virtual DM linsol_cholesky(bool tr) const;
-
-    // The transpose of linear system in form (CCS)
-    cs A_;
-
-    // The symbolic factorization
-    css *S_;
-
-    // The numeric factorization
-    csn *L_;
-
-    // Temporary
-    std::vector<double> temp_;
+    virtual DM linsol_cholesky(Memory& mem, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -97,7 +88,24 @@ namespace casadi {
     virtual const char* plugin_name() const { return "csparsecholesky";}
   };
 
+  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory : public Memory {
+    // Destructor
+    virtual ~CsparseCholMemory();
+
+    // The transpose of linear system in form (CCS)
+    cs A;
+
+    // The symbolic factorization
+    css *S;
+
+    // The numeric factorization
+    csn *L;
+
+    // Temporary
+    std::vector<double> temp;
+  };
+
 } // namespace casadi
 
 /// \endcond
-#endif // CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
+#endif // CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP

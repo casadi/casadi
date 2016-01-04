@@ -1454,8 +1454,8 @@ namespace casadi {
     return (*this)->linsol_solve(A, B, tr);
   }
 
-  void Function::linsol_solveL(double* x, int nrhs, bool tr) {
-    (*this)->linsol_solveL(x, nrhs, tr);
+  void Function::linsol_solveL(double* x, int nrhs, bool tr, int mem) const {
+    (*this)->linsol_solveL(*(*this)->mem_.at(mem), x, nrhs, tr);
   }
 
   void Function::linsol_factorize(const double* A, int mem) const {
@@ -1466,12 +1466,12 @@ namespace casadi {
     (*this)->linsol_solve(*(*this)->mem_.at(mem), x, nrhs, tr);
   }
 
-  Sparsity Function::linsol_cholesky_sparsity(bool tr) const {
-    return (*this)->linsol_cholesky_sparsity(tr);
+  Sparsity Function::linsol_cholesky_sparsity(bool tr, int mem) const {
+    return (*this)->linsol_cholesky_sparsity(*(*this)->mem_.at(mem), tr);
   }
 
-  DM Function::linsol_cholesky(bool tr) const {
-    return (*this)->linsol_cholesky(tr);
+  DM Function::linsol_cholesky(bool tr, int mem) const {
+    return (*this)->linsol_cholesky(*(*this)->mem_.at(mem), tr);
   }
 
   void Function::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {

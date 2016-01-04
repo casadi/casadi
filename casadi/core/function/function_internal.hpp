@@ -867,9 +867,9 @@ namespace casadi {
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
     virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
     virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;
-    virtual void linsol_solveL(double* x, int nrhs, bool tr);
-    virtual Sparsity linsol_cholesky_sparsity(bool tr) const;
-    virtual DM linsol_cholesky(bool tr) const;
+    virtual void linsol_solveL(Memory& mem, double* x, int nrhs, bool tr) const;
+    virtual Sparsity linsol_cholesky_sparsity(Memory& mem, bool tr) const;
+    virtual DM linsol_cholesky(Memory& mem, bool tr) const;
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                bool tr, int nrhs);
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
