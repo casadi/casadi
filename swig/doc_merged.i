@@ -188,12 +188,6 @@ returned.
 
 ";
 
-%feature("docstring") casadi::Callback::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
 %feature("docstring") casadi::Callback::default_in "
 
 Get default input value (NOTE: constant reference)
@@ -2872,12 +2866,6 @@ Evaluate.
 %feature("docstring") casadi::Function::getRepresentation "
 
 Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::Function::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 

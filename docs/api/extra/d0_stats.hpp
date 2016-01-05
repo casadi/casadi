@@ -1,48 +1,4 @@
 /// \cond INTERNAL
-/** \class casadi::CvodesInterface
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlinsetupsB</td><td>casadi::CvodesInterface</td></tr>
-<tr><td>nstepsB</td><td>casadi::CvodesInterface</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_Integrator_cvodes
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>nlinsetupsB</td></tr>
-<tr><td>nstepsB</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::IdasInterface
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlinsetupsB</td><td>casadi::IdasInterface</td></tr>
-<tr><td>nstepsB</td><td>casadi::IdasInterface</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_Integrator_idas
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>nlinsetupsB</td></tr>
-<tr><td>nstepsB</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::IpoptInterface
 \n
 \par

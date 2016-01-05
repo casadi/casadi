@@ -253,13 +253,6 @@ returned.
 
 ";
 
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
 Get default input value (NOTE: constant reference)
@@ -713,7 +706,7 @@ no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Function::getStats() const  "
+%feature("docstring")  casadi::Function::getStats(int mem=0) const  "
 
 Get all statistics obtained at the end of the last evaluate call.
 
@@ -3705,7 +3698,7 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
-%feature("docstring")  casadi::Function::getStats() const  "
+%feature("docstring")  casadi::Function::getStats(int mem=0) const  "
 
 Get all statistics obtained at the end of the last evaluate call.
 
@@ -3933,13 +3926,6 @@ Evaluate.
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::getStat(const std::string &name)
-const  "
-
-Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
