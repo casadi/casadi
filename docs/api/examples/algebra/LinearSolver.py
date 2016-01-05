@@ -36,7 +36,7 @@ A=DM([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
 x=DM([tan(i) for i in range(n)])
 
 #! We generate the b vector:
-b=mul(A,x)
+b=mtimes(A,x)
 
 # Commented out pendling completion #1615
 

@@ -38,7 +38,7 @@ def hashcompare(self,other):
 def equality(self,other):
   return hash(self)==hash(other)
   
-def deps(s):
+def getDeps(s):
   deps = []
   if not(hasattr(s,'getNdeps')): return deps
   for k in range(s.getNdeps()):
@@ -73,11 +73,11 @@ def dependencyGraph(s,dep = {},invdep = {}):
   if isinstance(s,SX):
     if s.is_scalar(True):
       if not(is_leaf(s)):
-        addDependencies(s,deps(s),dep = dep,invdep = invdep)
+        addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
     else:
       addDependencies(s,list(s),dep = dep,invdep = invdep)
   elif isinstance(s,MX):
-    addDependencies(s,deps(s),dep = dep,invdep = invdep)
+    addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
   return (dep,invdep)
   
 class DotArtist:
@@ -101,7 +101,7 @@ class DotArtist:
     if graph is None:
       graph = self.graph
     sp = s.sparsity()
-    deps = deps(s)
+    deps = getDeps(s)
     if nzlabels is None:
       nzlabels = map(str,range(sp.nnz()))
     nzlabelcounter = 0
@@ -162,7 +162,7 @@ class MXSymbolicArtist(DotArtist):
     
     
 #     # Note: due to Mapping restructuring, this is no longer efficient code
-#     deps = deps(s)
+#     deps = getDeps(s)
     
 #     depind = s.depInd()
 #     nzmap = sum([s.mapping(i) for i in range(len(deps))])
@@ -228,7 +228,7 @@ class MXEvaluationArtist(DotArtist):
     row = sp.row()
     
     
-    deps = deps(s)
+    deps = getDeps(s)
     
     f = s.getFunction()
     
@@ -278,7 +278,7 @@ class MXGenericArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
-    dep = deps(k)
+    dep = getDeps(k)
 
     show_sp = not(all([d.sparsity()==k.sparsity() for d in dep]))
     
@@ -308,7 +308,7 @@ class MXGetNonzerosArtist(DotArtist):
   def draw(self):
     s = self.s
     graph = self.graph
-    n = deps(s)[0]
+    n = getDeps(s)[0]
     
     
     show_sp = not(s.nnz() == s.numel() and s.nnz() == 1)
@@ -347,11 +347,11 @@ class MXSetNonzerosArtist(DotArtist):
   def draw(self):
     s = self.s
     graph = self.graph
-    entry = deps(s)[0]
-    target = deps(s)[1]
+    entry = getDeps(s)[0]
+    target = getDeps(s)[1]
     
     
-    show_sp = not(all([d.sparsity()==s.sparsity() for d in deps(s)]))
+    show_sp = not(all([d.sparsity()==s.sparsity() for d in getDeps(s)]))
     
     if show_sp:
       op = "op"
@@ -389,10 +389,10 @@ class MXAddNonzerosArtist(DotArtist):
   def draw(self):
     s = self.s
     graph = self.graph
-    entry = deps(s)[0]
-    target = deps(s)[1]
+    entry = getDeps(s)[0]
+    target = getDeps(s)[1]
 
-    show_sp = not(all([d.sparsity()==s.sparsity() for d in deps(s)]))
+    show_sp = not(all([d.sparsity()==s.sparsity() for d in getDeps(s)]))
     
     if show_sp:
       op = "op"
@@ -430,7 +430,7 @@ class MXOperationArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
-    dep = deps(k)
+    dep = getDeps(k)
     
     show_sp = True
     
@@ -470,7 +470,7 @@ class MXIfTestArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
-    dep = deps(k)
+    dep = getDeps(k)
     
     show_sp = True
     
@@ -484,7 +484,7 @@ class MXDensificationArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
-    dep = deps(k)
+    dep = getDeps(k)
     
     self.graph.add_node(pydot.Node(str(k.__hash__()),label="densify(.)",shape='oval'))
     self.graph.add_edge(pydot.Edge(str(dep[0].__hash__()),str(k.__hash__())))
@@ -493,7 +493,7 @@ class MXNormArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
-    dep = deps(k)
+    dep = getDeps(k)
     s = print_operator(k,[".", "."])
     self.graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='oval'))
     self.graph.add_edge(pydot.Edge(str(dep[0].__hash__()),str(k.__hash__())))
@@ -509,7 +509,7 @@ class MXMultiplicationArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
-    dep = deps(k)
+    dep = getDeps(k)
 
     # Non-commutative operators are represented by 'record' shapes.
     # The dependencies have different 'ports' where arrows should arrive.
@@ -564,7 +564,7 @@ class SXNonLeafArtist(DotArtist):
   def draw(self):
     k = self.s
     graph = self.graph
-    dep = deps(k)
+    dep = getDeps(k)
     if not(k.is_commutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
