@@ -5,9 +5,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlinsetups</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>nlinsetupsB</td><td>casadi::CvodesInterface</td></tr>
-<tr><td>nsteps</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>nstepsB</td><td>casadi::CvodesInterface</td></tr>
 </table>
 */
@@ -18,9 +16,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th></tr>
-<tr><td>nlinsetups</td></tr>
 <tr><td>nlinsetupsB</td></tr>
-<tr><td>nsteps</td></tr>
 <tr><td>nstepsB</td></tr>
 </table>
 */
@@ -31,9 +27,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlinsetups</td><td>casadi::IdasInterface</td></tr>
 <tr><td>nlinsetupsB</td><td>casadi::IdasInterface</td></tr>
-<tr><td>nsteps</td><td>casadi::IdasInterface</td></tr>
 <tr><td>nstepsB</td><td>casadi::IdasInterface</td></tr>
 </table>
 */
@@ -44,9 +38,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th></tr>
-<tr><td>nlinsetups</td></tr>
 <tr><td>nlinsetupsB</td></tr>
-<tr><td>nsteps</td></tr>
 <tr><td>nstepsB</td></tr>
 </table>
 */
