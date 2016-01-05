@@ -103,7 +103,8 @@ namespace casadi {
     alloc_iw(n_, true); // tr_ind
   }
 
-  void GurobiInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void GurobiInterface::
+  eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     // Inputs
     const double *h=arg[QPSOL_H],
       *g=arg[QPSOL_G],

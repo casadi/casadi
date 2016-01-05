@@ -42,6 +42,45 @@
 
 namespace casadi {
 
+  struct CASADI_QPSOL_CPLEX_EXPORT CplexMemory : public Memory {
+    /// Indicates if we have to warm-start
+    bool is_warm;
+
+    /// Nature of problem (always minimization)
+    int objsen;
+
+    /// Determines relation >,<, = in the linear constraints
+    std::vector<char> sense;
+
+    /// Coefficients of matrix A (constraint Jacobian)
+    std::vector<int> matcnt;
+
+    /// Right-hand side of constraints
+    std::vector<double> rhs;
+
+    /// Range of constraints
+    std::vector<double> rngval;
+
+    /// Coefficients of matrix H (objective Hessian)
+    std::vector<int> qmatcnt;
+
+    /// Storage for basis info of primal variables
+    std::vector<int> cstat;
+
+    /// Storage for basis info of slack variables
+    std::vector<int> rstat;
+
+    /// CPLEX environment
+    CPXENVptr env;
+    CPXLPptr lp;
+
+    /// Constructor
+    CplexMemory();
+
+    /// Destructor
+    virtual ~CplexMemory();
+  };
+
   /** \brief \pluginbrief{Qpsol,cplex}
 
       @copydoc Qpsol_doc
@@ -68,14 +107,17 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "cplex";}
 
-    /// Free Cplex memory
-    void freeCplex();
-
     // Initialize the solver
     virtual void init();
 
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new CplexMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
     // Solve the QP
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     // OPTIONS
     /** Which algorithm to use
@@ -94,39 +136,8 @@ namespace casadi {
     /// Print to file (for later use)
     bool dump_to_file_;
 
-    /// Indicates if we have to warm-start
-    bool is_warm_;
-
     /// Accuracy
     double tol_;
-
-    /// Nature of problem (always minimization)
-    int objsen_;
-
-    /// Determines relation >,<, = in the linear constraints
-    std::vector<char> sense_;
-
-    /// Coefficients of matrix A (constraint Jacobian)
-    std::vector<int> matcnt_;
-
-    /// Right-hand side of constraints
-    std::vector<double> rhs_;
-
-    /// Range of constraints
-    std::vector<double> rngval_;
-
-    /// Coefficients of matrix H (objective Hessian)
-    std::vector<int> qmatcnt_;
-
-    /// Storage for basis info of primal variables
-    std::vector<int> cstat_;
-
-    /// Storage for basis info of slack variables
-    std::vector<int> rstat_;
-
-    /// CPLEX environment
-    CPXENVptr env_;
-    CPXLPptr lp_;
 
     /// A documentation string
     static const std::string meta_doc;

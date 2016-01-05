@@ -127,13 +127,9 @@ namespace casadi {
               "Tolerance for linear independence tests.");
     addOption("epsNZCTests",            OT_REAL, static_cast<double>(ops.epsNZCTests),
               "Tolerance for nonzero curvature tests.");
-
-    called_once_ = false;
-    qp_ = 0;
   }
 
   QpoasesInterface::~QpoasesInterface() {
-    if (qp_!=0) delete qp_;
   }
 
   void QpoasesInterface::init() {
@@ -154,15 +150,28 @@ namespace casadi {
       max_cputime_ = -1;
     }
 
-    // Create qpOASES instance
-    if (qp_) delete qp_;
-    if (nc_==0) {
-      qp_ = new qpOASES::QProblemB(n_);
-    } else {
-      qp_ = new qpOASES::SQProblem(n_, nc_);
-    }
-    called_once_ = false;
+    // Allocate work vectors
+    alloc_w(n_*n_, true); // h
+    alloc_w(n_*nc_, true); // a
+    alloc_w(n_, true); // g
+    alloc_w(n_, true); // lbx
+    alloc_w(n_, true); // ubx
+    alloc_w(nc_, true); // lba
+    alloc_w(nc_, true); // uba
+    alloc_w(n_+nc_, true); // dual
+  }
 
+  void QpoasesInterface::init_memory(Memory& mem) const {
+    QpoasesMemory& m = dynamic_cast<QpoasesMemory&>(mem);
+    m.called_once = false;
+
+    // Create qpOASES instance
+    if (m.qp) delete m.qp;
+    if (nc_==0) {
+      m.qp = new qpOASES::QProblemB(n_);
+    } else {
+      m.qp = new qpOASES::SQProblem(n_, nc_);
+    }
     qpOASES::Options ops;
     ops.setToDefault();
     ops.printLevel = string_to_PrintLevel(option("printLevel"));
@@ -197,21 +206,13 @@ namespace casadi {
     ops.epsNZCTests = option("epsNZCTests");
 
     // Pass to qpOASES
-    qp_->setOptions(ops);
-
-    // Allocate work vectors
-    alloc_w(n_*n_, true); // h
-    alloc_w(n_*nc_, true); // a
-    alloc_w(n_, true); // g
-    alloc_w(n_, true); // lbx
-    alloc_w(n_, true); // ubx
-    alloc_w(nc_, true); // lba
-    alloc_w(nc_, true); // uba
-    alloc_w(n_+nc_, true); // dual
+    m.qp->setOptions(ops);
   }
 
-  void QpoasesInterface::eval(const double** arg,
-                              double** res, int* iw, double* w, void* mem) {
+  void QpoasesInterface::
+  eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+    QpoasesMemory& m = dynamic_cast<QpoasesMemory&>(mem);
+
     if (inputs_check_) {
       checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
     }
@@ -242,21 +243,21 @@ namespace casadi {
     casadi_copy(arg[QPSOL_UBA], nc_, ubA);
 
     int flag;
-    if (!called_once_) {
+    if (!m.called_once) {
       if (nc_==0) {
-        flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
+        flag = static_cast<qpOASES::QProblemB*>(m.qp)->init(h, g, lb, ub, nWSR, cputime_ptr);
       } else {
-        flag = static_cast<qpOASES::SQProblem*>(qp_)->init(h, g, a, lb, ub, lbA, ubA,
+        flag = static_cast<qpOASES::SQProblem*>(m.qp)->init(h, g, a, lb, ub, lbA, ubA,
                                                            nWSR, cputime_ptr);
       }
-      called_once_ = true;
+      m.called_once = true;
     } else {
       if (nc_==0) {
-        static_cast<qpOASES::QProblemB*>(qp_)->reset();
-        flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
-        //flag = static_cast<qpOASES::QProblemB*>(qp_)->hotstart(g, lb, ub, nWSR, cputime_ptr);
+        static_cast<qpOASES::QProblemB*>(m.qp)->reset();
+        flag = static_cast<qpOASES::QProblemB*>(m.qp)->init(h, g, lb, ub, nWSR, cputime_ptr);
+        //flag = static_cast<qpOASES::QProblemB*>(m.qp)->hotstart(g, lb, ub, nWSR, cputime_ptr);
       } else {
-        flag = static_cast<qpOASES::SQProblem*>(qp_)->hotstart(h, g, a, lb, ub, lbA, ubA,
+        flag = static_cast<qpOASES::SQProblem*>(m.qp)->hotstart(h, g, a, lb, ub, lbA, ubA,
                                                                nWSR, cputime_ptr);
       }
     }
@@ -265,15 +266,15 @@ namespace casadi {
     }
 
     // Get optimal cost
-    if (res[QPSOL_COST]) *res[QPSOL_COST] = qp_->getObjVal();
+    if (res[QPSOL_COST]) *res[QPSOL_COST] = m.qp->getObjVal();
 
     // Get the primal solution
-    if (res[QPSOL_X]) qp_->getPrimalSolution(res[QPSOL_X]);
+    if (res[QPSOL_X]) m.qp->getPrimalSolution(res[QPSOL_X]);
 
     // Get the dual solution
     if (res[QPSOL_LAM_X] || res[QPSOL_LAM_A]) {
       double* dual=w; w += n_+nc_;
-      qp_->getDualSolution(dual);
+      m.qp->getDualSolution(dual);
       casadi_scal(n_+nc_, -1., dual);
       casadi_copy(dual, n_, res[QPSOL_LAM_X]);
       casadi_copy(dual+n_, nc_, res[QPSOL_LAM_A]);
@@ -625,6 +626,14 @@ namespace casadi {
     } else {
       casadi_error("not_implemented");
     }
+  }
+
+  QpoasesMemory::QpoasesMemory() {
+    this->qp = 0;
+  }
+
+  QpoasesMemory::~QpoasesMemory() {
+    if (this->qp) delete this->qp;
   }
 
 } // namespace casadi

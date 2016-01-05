@@ -123,7 +123,8 @@ namespace casadi {
     alloc_iw(nc_); // casadi_trans
   }
 
-  void OoqpInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void OoqpInterface::
+  eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     if (inputs_check_) {
       checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
     }

@@ -40,6 +40,20 @@ Interface to QPOases Solver for quadratic programming
 /// \cond INTERNAL
 namespace casadi {
 
+  struct CASADI_QPSOL_QPOASES_EXPORT QpoasesMemory : public Memory {
+    /// QP Solver
+    qpOASES::QProblemB *qp;
+
+    /// Has qpOASES been called once?
+    bool called_once;
+
+    /// Constructor
+    QpoasesMemory();
+
+    /// Destructor
+    virtual ~QpoasesMemory();
+  };
+
   /** \brief \pluginbrief{Qpsol,qpoases}
    *
    * @copydoc QPSolver_doc
@@ -73,18 +87,19 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new QpoasesMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
     /** \brief  Evaluate numerically */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// A documentation string
     static const std::string meta_doc;
 
   protected:
-
-    /// QP Solver
-    union {
-      qpOASES::QProblemB *qp_;
-    };
 
     ///@{
     /// Convert between qpOASES types and standard types
@@ -104,9 +119,6 @@ namespace casadi {
 
     /// Throw error
     static void qpoases_error(const std::string& module, int flag);
-
-    /// Has qpOASES been called once?
-    bool called_once_;
 
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);

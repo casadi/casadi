@@ -70,7 +70,7 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init();
 
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// A documentation string
     static const std::string meta_doc;

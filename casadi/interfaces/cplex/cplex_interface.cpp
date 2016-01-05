@@ -68,18 +68,8 @@ namespace casadi {
               "Use warm start with simplex methods (affects only the simplex methods).");
     addOption("convex",          OT_BOOLEAN,         true,
               "Indicates if the QP is convex or not (affects only the barrier method).");
-
-    // Setting warm-start flag
-    is_warm_ = false;
-
-    // Set pointer to zero to avoid deleting a nonexisting instance
-    env_ = 0;
-    lp_ = 0;
   }
   void CplexInterface::init() {
-    // Free any existing Cplex instance
-    freeCplex();
-
     // Call the init method of the base class
     Qpsol::init();
 
@@ -87,89 +77,6 @@ namespace casadi {
     dump_to_file_  = option("dump_to_file");
     tol_           = option("tol");
     //  dump_filename_ = option("dump_filename");
-
-    int status;
-    casadi_assert(env_==0);
-    env_ = CPXopenCPLEX(&status);
-    casadi_assert_message(env_!=0, "CPLEX: Cannot initialize CPLEX environment. STATUS: "
-                          << status);
-
-    // Turn on some debug messages if requested
-    if (verbose()) {
-      CPXsetintparam(env_, CPX_PARAM_SCRIND, CPX_ON);
-    } else {
-      CPXsetintparam(env_, CPX_PARAM_SCRIND, CPX_OFF);
-    }
-    if (status) {
-      userOut() << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
-    }
-
-    /* SETTING OPTIONS */
-    // Optimality tolerance
-    status = CPXsetdblparam(env_, CPX_PARAM_EPOPT, tol_);
-    // Feasibility tolerance
-    status = CPXsetdblparam(env_, CPX_PARAM_EPRHS, tol_);
-    // We start with barrier if crossover was chosen.
-    if (qp_method_ == 7) {
-      status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 4);
-      // Warm-start is default with this algorithm
-      setOption("warm_start", true);
-    } else { // Otherwise we just chose the algorithm
-      status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, qp_method_);
-    }
-    // Setting dependency check option
-    status = CPXsetintparam(env_, CPX_PARAM_DEPIND, optionEnumValue("dep_check"));
-    // Setting barrier iteration limit
-    status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, option("barrier_maxiter"));
-    // Setting simplex iteration limit
-    status = CPXsetintparam(env_, CPX_PARAM_ITLIM, option("simplex_maxiter"));
-    if (qp_method_ == 7) {
-      // Setting crossover algorithm
-      status = CPXsetintparam(env_, CPX_PARAM_BARCROSSALG, 1);
-    }
-    if (!static_cast<bool>(option("convex"))) {
-      // Enabling non-convex QPs
-      status = CPXsetintparam(env_, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
-    }
-
-    // Exotic parameters, once they might become options...
-
-    // Do careful numerics with numerically unstable problem
-    //status = CPXsetintparam(env_, CPX_PARAM_NUMERICALEMPHASIS, 1);
-    // Set scaling approach
-    //status = CPXsetintparam(env_, CPX_PARAM_SCAIND, 1);
-    // Set Markowitz tolerance
-    //status = CPXsetdblparam(env_, CPX_PARAM_EPMRK, 0.9);
-
-    // Doing allocation of CPLEX data
-    // Objective is to be minimized
-    objsen_ = CPX_MIN;
-
-    // Allocation of data
-    // Type of constraint
-    sense_.resize(nc_);
-    // Right-hand side of constraints
-    rhs_.resize(nc_);
-    // Range value for lower AND  upper bounded constraints
-    rngval_.resize(nc_);
-    // Basis for primal variables
-    cstat_.resize(n_);
-    rstat_.resize(nc_);
-
-    // Matrix A, count the number of elements per column
-    const Sparsity& A_sp = sparsity_in(QPSOL_A);
-    matcnt_.resize(A_sp.size2());
-    transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), matcnt_.begin(),
-              minus<int>());
-
-    // Matrix H, count the number of elements per column
-    const Sparsity& H_sp = sparsity_in(QPSOL_H);
-    qmatcnt_.resize(H_sp.size2());
-    transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), qmatcnt_.begin(),
-              minus<int>());
-
-    casadi_assert(lp_==0);
-    lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
 
     // Allocate work vectors
     alloc_w(n_, true); // g
@@ -184,7 +91,95 @@ namespace casadi {
     alloc_w(nc_, true); // lam_a
   }
 
-  void CplexInterface::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void CplexInterface::init_memory(Memory& mem) const {
+    CplexMemory& m = dynamic_cast<CplexMemory&>(mem);
+
+    int status;
+    casadi_assert(m.env==0);
+    m.env = CPXopenCPLEX(&status);
+    casadi_assert_message(m.env!=0, "CPLEX: Cannot initialize CPLEX environment. STATUS: "
+                          << status);
+
+    // Turn on some debug messages if requested
+    if (verbose()) {
+      CPXsetintparam(m.env, CPX_PARAM_SCRIND, CPX_ON);
+    } else {
+      CPXsetintparam(m.env, CPX_PARAM_SCRIND, CPX_OFF);
+    }
+    if (status) {
+      userOut() << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
+    }
+
+    /* SETTING OPTIONS */
+    // Optimality tolerance
+    status = CPXsetdblparam(m.env, CPX_PARAM_EPOPT, tol_);
+    // Feasibility tolerance
+    status = CPXsetdblparam(m.env, CPX_PARAM_EPRHS, tol_);
+    // We start with barrier if crossover was chosen.
+    if (qp_method_ == 7) {
+      status = CPXsetintparam(m.env, CPX_PARAM_QPMETHOD, 4);
+    } else { // Otherwise we just chose the algorithm
+      status = CPXsetintparam(m.env, CPX_PARAM_QPMETHOD, qp_method_);
+    }
+    // Setting dependency check option
+    status = CPXsetintparam(m.env, CPX_PARAM_DEPIND, optionEnumValue("dep_check"));
+    // Setting barrier iteration limit
+    status = CPXsetintparam(m.env, CPX_PARAM_BARITLIM, option("barrier_maxiter"));
+    // Setting simplex iteration limit
+    status = CPXsetintparam(m.env, CPX_PARAM_ITLIM, option("simplex_maxiter"));
+    if (qp_method_ == 7) {
+      // Setting crossover algorithm
+      status = CPXsetintparam(m.env, CPX_PARAM_BARCROSSALG, 1);
+    }
+    if (!static_cast<bool>(option("convex"))) {
+      // Enabling non-convex QPs
+      status = CPXsetintparam(m.env, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
+    }
+
+    // Exotic parameters, once they might become options...
+
+    // Do careful numerics with numerically unstable problem
+    //status = CPXsetintparam(m.env, CPX_PARAM_NUMERICALEMPHASIS, 1);
+    // Set scaling approach
+    //status = CPXsetintparam(m.env, CPX_PARAM_SCAIND, 1);
+    // Set Markowitz tolerance
+    //status = CPXsetdblparam(m.env, CPX_PARAM_EPMRK, 0.9);
+
+    // Doing allocation of CPLEX data
+    // Objective is to be minimized
+    m.objsen = CPX_MIN;
+
+    // Allocation of data
+    // Type of constraint
+    m.sense.resize(nc_);
+    // Right-hand side of constraints
+    m.rhs.resize(nc_);
+    // Range value for lower AND  upper bounded constraints
+    m.rngval.resize(nc_);
+    // Basis for primal variables
+    m.cstat.resize(n_);
+    m.rstat.resize(nc_);
+
+    // Matrix A, count the number of elements per column
+    const Sparsity& A_sp = sparsity_in(QPSOL_A);
+    m.matcnt.resize(A_sp.size2());
+    transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), m.matcnt.begin(),
+              minus<int>());
+
+    // Matrix H, count the number of elements per column
+    const Sparsity& H_sp = sparsity_in(QPSOL_H);
+    m.qmatcnt.resize(H_sp.size2());
+    transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), m.qmatcnt.begin(),
+              minus<int>());
+
+    casadi_assert(m.lp==0);
+    m.lp = CPXcreateprob(m.env, &status, "QP from CasADi");
+  }
+
+  void CplexInterface::
+  eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+    CplexMemory& m = dynamic_cast<CplexMemory&>(mem);
+
     if (inputs_check_) {
       checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
     }
@@ -215,8 +210,8 @@ namespace casadi {
     int status;
 
     // We change method in crossover
-    if (is_warm_ && qp_method_ == 7) {
-      status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 1);
+    if (m.is_warm && qp_method_ == 7) {
+      status = CPXsetintparam(m.env, CPX_PARAM_QPMETHOD, 1);
     }
 
     for (int i = 0; i < nc_; ++i) {
@@ -224,23 +219,23 @@ namespace casadi {
 
       // Equality
       if (uba[i] - lba[i] < 1e-20) {
-        sense_[i] = 'E';
-        rhs_[i] = lba[i];
-        rngval_[i] = 0.;
+        m.sense[i] = 'E';
+        m.rhs[i] = lba[i];
+        m.rngval[i] = 0.;
       } else if (lba[i] < -CPX_INFBOUND) {
         // Ineq - no lower bound
-        sense_[i] = 'L';
-        rhs_[i] = uba[i];
-        rngval_[i] = 0.;
+        m.sense[i] = 'L';
+        m.rhs[i] = uba[i];
+        m.rngval[i] = 0.;
       } else if (uba[i] > CPX_INFBOUND) {
         // Ineq - no upper bound
-        sense_[i] = 'G';
-        rhs_[i] = lba[i];
-        rngval_[i] = 0.;
+        m.sense[i] = 'G';
+        m.rhs[i] = lba[i];
+        m.rngval[i] = 0.;
       } else { // Inew both upper and lower bounds
-        sense_[i] = 'R';
-        rhs_[i] = lba[i];
-        rngval_[i] = uba[i] - lba[i];
+        m.sense[i] = 'R';
+        m.rhs[i] = lba[i];
+        m.rngval[i] = uba[i] - lba[i];
       }
     }
 
@@ -252,31 +247,31 @@ namespace casadi {
     const double* obj = g;
     const double* lb = lbx;
     const double* ub = ubx;
-    status = CPXcopylp(env_, lp_, n_, nc_, objsen_, obj, getPtr(rhs_), getPtr(sense_),
-                       matbeg, getPtr(matcnt_), matind, matval, lb, ub, getPtr(rngval_));
+    status = CPXcopylp(m.env, m.lp, n_, nc_, m.objsen, obj, getPtr(m.rhs), getPtr(m.sense),
+                       matbeg, getPtr(m.matcnt), matind, matval, lb, ub, getPtr(m.rngval));
 
     // Preparing coefficient matrix Q
     const Sparsity& H_sp = sparsity_in(QPSOL_H);
     const int* qmatbeg = H_sp.colind();
     const int* qmatind = H_sp.row();
     const double* qmatval = H;
-    status = CPXcopyquad(env_, lp_, qmatbeg, getPtr(qmatcnt_), qmatind, qmatval);
+    status = CPXcopyquad(m.env, m.lp, qmatbeg, getPtr(m.qmatcnt), qmatind, qmatval);
 
     if (dump_to_file_) {
       const char* fn = string(option("dump_filename")).c_str();
-      CPXwriteprob(env_, lp_, fn, "LP");
+      CPXwriteprob(m.env, m.lp, fn, "LP");
     }
 
     // Warm-starting if possible
-    if (qp_method_ != 0 && qp_method_ != 4 && is_warm_) {
+    if (qp_method_ != 0 && qp_method_ != 4 && m.is_warm) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
-      CPXcopystart(env_, lp_, getPtr(cstat_), getPtr(rstat_), x, 0, 0, lam_x);
+      CPXcopystart(m.env, m.lp, getPtr(m.cstat), getPtr(m.rstat), x, 0, 0, lam_x);
     } else {
-      status = CPXcopystart(env_, lp_, 0, 0, x, 0, 0, lam_x);
+      status = CPXcopystart(m.env, m.lp, 0, 0, x, 0, 0, lam_x);
     }
 
     // Optimize...
-    status = CPXqpopt(env_, lp_);
+    status = CPXqpopt(m.env, m.lp);
 
     if (status) {
       casadi_error("CPLEX: Failed to solve QP...");
@@ -287,21 +282,21 @@ namespace casadi {
     double f;
     std::vector<double> slack;
     slack.resize(nc_);
-    status = CPXsolution(env_, lp_, &solstat, &f, x, lam_a, getPtr(slack), lam_x);
+    status = CPXsolution(m.env, m.lp, &solstat, &f, x, lam_a, getPtr(slack), lam_x);
     if (status) {
       userOut() << "CPLEX: Failed to get solution.\n";
     }
 
     // Retrieving the basis
     if (qp_method_ != 0 && qp_method_ != 4) {
-      status = CPXgetbase(env_, lp_, getPtr(cstat_), getPtr(rstat_));
+      status = CPXgetbase(m.env, m.lp, getPtr(m.cstat), getPtr(m.rstat));
     }
 
     // Flip the sign of the multipliers
     casadi_scal(nc_, -1., lam_a);
     casadi_scal(n_, -1., lam_x);
 
-    int solnstat = CPXgetstat(env_, lp_);
+    int solnstat = CPXgetstat(m.env, m.lp);
     stringstream errormsg;
     // NOTE: Why not print directly to userOut() and userOut<true, PL_WARN>()?
     if (verbose()) {
@@ -329,7 +324,7 @@ namespace casadi {
 
       // Printing basis condition number
       //double cn;
-      //status = CPXgetdblquality(env_, lp_, &cn, CPX_KAPPA);
+      //status = CPXgetdblquality(m.env, m.lp, &cn, CPX_KAPPA);
       //userOut() << "CPLEX: Basis condition number: " << cn << endl;
     }
     if (solnstat != CPX_STAT_OPTIMAL) {
@@ -338,7 +333,7 @@ namespace casadi {
 
     // Next time we warm start
     if (static_cast<bool>(option("warm_start"))) {
-      is_warm_ = true;
+      m.is_warm = true;
     }
 
     // Get the outputs
@@ -349,29 +344,37 @@ namespace casadi {
   }
 
   CplexInterface::~CplexInterface() {
-    freeCplex();
   }
 
-  void CplexInterface::freeCplex() {
+  CplexMemory::CplexMemory() {
+    // Setting warm-start flag
+    this->is_warm = false;
+
+    // Set pointer to zero to avoid deleting a nonexisting instance
+    this->env = 0;
+    this->lp = 0;
+  }
+
+  CplexMemory::~CplexMemory() {
     // Return flag
     int status;
 
     // Only free if Cplex problem if it has been allocated
-    if (lp_!=0) {
-      status = CPXfreeprob(env_, &lp_);
+    if (this->lp!=0) {
+      status = CPXfreeprob(this->env, &this->lp);
       if (status!=0) {
         userOut<true, PL_WARN>() << "CPXfreeprob failed, error code " << status << ".\n";
       }
-      lp_ = 0;
+      this->lp = 0;
     }
 
     // Closing down license
-    if (env_!=0) {
-      status = CPXcloseCPLEX(&env_);
+    if (this->env!=0) {
+      status = CPXcloseCPLEX(&this->env);
       if (status!=0) {
         userOut<true, PL_WARN>() << "CPXcloseCPLEX failed, error code " << status << ".\n";
       }
-      env_ = 0;
+      this->env = 0;
     }
   }
 

@@ -71,7 +71,7 @@ namespace casadi {
     virtual void init();
 
     /// Solve the QP
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     // Variable types
     std::vector<char> vtype_;
