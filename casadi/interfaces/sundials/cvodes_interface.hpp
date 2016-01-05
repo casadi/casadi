@@ -70,26 +70,16 @@ namespace casadi {
     // CVodes memory block
     void* mem;
 
-    // For timings
-    clock_t time1, time2;
-
-    // Accumulated time since last reset:
-    double t_res; // time spent in the DAE residual
-    double t_fres; // time spent in the forward sensitivity residual
-    double t_jac; // time spent in the Jacobian, or Jacobian times vector function
-    double t_lsolve; // preconditioner/linear solver solve function
-    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
-    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
-
     bool isInitAdj;
 
     /// number of checkpoints stored so far
     int ncheck;
 
-    // Stats
-    long nsteps, nfevals, nlinsetups, netfails;
-    int qlast, qcur;
-    double hinused, hlast, hcur, tcur;
+    // Ids of backward problem
+    int whichB;
+
+    /// Get all statistics
+    virtual Dict getStats() const;
 
     /// Constructor
     CvodesMemory(const CvodesInterface& s);
@@ -127,7 +117,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief Initialize the adjoint problem (can only be called after the first integration) */
-    virtual void initAdj(CvodesMemory& m);
+    virtual void initAdj(CvodesMemory& m) const;
 
     /** \brief Create memory block */
     virtual Memory* memory() const { return new CvodesMemory(*this);}
@@ -145,10 +135,11 @@ namespace casadi {
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB(IntegratorMemory& mem, double t,
-                        const double* rx, const double* rz, const double* rp);
+                        const double* rx, const double* rz, const double* rp) const;
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(IntegratorMemory& mem, double t, double* rx, double* rz, double* rq);
+    virtual void retreat(IntegratorMemory& mem, double t, double* rx,
+                         double* rz, double* rq) const;
 
     /** \brief  Set the stop time of the forward integration */
     virtual void setStopTime(IntegratorMemory& mem, double tf) const;
@@ -284,9 +275,6 @@ namespace casadi {
 
     // Throw error
     static void cvodes_error(const std::string& module, int flag);
-
-    // Ids of backward problem
-    int whichB_;
 
     // Initialize the dense linear solver
     void initDenseLinsol(CvodesMemory& m) const;

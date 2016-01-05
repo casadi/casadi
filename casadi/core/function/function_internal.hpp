@@ -66,6 +66,9 @@ namespace casadi {
   struct CASADI_EXPORT Memory {
     /** \brief Destructor */
     virtual ~Memory() {}
+
+    /// Get all statistics
+    virtual Dict getStats() const { return Dict();}
   };
 
   /** \brief Function memory with temporary work vectors */
@@ -543,12 +546,6 @@ namespace casadi {
 
     /** \brief Name of the function */
     const std::string& name() const { return name_;}
-
-    /// Get all statistics obtained at the end of the last evaluate call
-    const Dict & getStats() const;
-
-    /// Get single statistic obtained at the end of the last evaluate call
-    GenericType getStat(const std::string & name) const;
 
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);

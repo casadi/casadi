@@ -569,12 +569,8 @@ namespace casadi {
     (*this)->monitors_.erase(mon);
   }
 
-  const Dict & Function::getStats() const {
-    return (*this)->getStats();
-  }
-
-  GenericType Function::getStat(const string& name) const {
-    return (*this)->getStat(name);
+  Dict Function::getStats(int mem) const {
+    return (*this)->mem_.at(mem)->getStats();
   }
 
   const Sparsity Function::sparsity_jac(int iind, int oind, bool compact, bool symmetric) {

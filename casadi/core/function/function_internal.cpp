@@ -412,23 +412,6 @@ namespace casadi {
     return monitors_.count(mod)>0;
   }
 
-  const Dict & FunctionInternal::getStats() const {
-    return stats_;
-  }
-
-  GenericType FunctionInternal::getStat(const string & name) const {
-    // Locate the statistic
-    Dict::const_iterator it = stats_.find(name);
-
-    // Check if found
-    if (it == stats_.end()) {
-      casadi_error("Statistic: " << name << " has not been set." << endl <<
-                   "Note: statistcs are only set after an evaluate call");
-    }
-
-    return GenericType(it->second);
-  }
-
   std::vector<MX> FunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
     return shared_from_this<Function>()(arg);
   }

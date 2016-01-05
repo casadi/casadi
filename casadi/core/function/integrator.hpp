@@ -86,11 +86,11 @@ namespace casadi {
 
     /** \brief Reset the backward problem */
     virtual void resetB(IntegratorMemory& mem, double t,
-                        const double* rx, const double* rz, const double* rp) = 0;
+                        const double* rx, const double* rz, const double* rp) const = 0;
 
     /** \brief  Retreat solution in time */
     virtual void retreat(IntegratorMemory& mem, double t,
-                         double* rx, double* rz, double* rq) = 0;
+                         double* rx, double* rz, double* rq) const = 0;
 
     /** \brief  evaluate */
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
@@ -371,11 +371,11 @@ namespace casadi {
 
     /// Reset the backward problem and take time to tf
     virtual void resetB(IntegratorMemory& mem, double t,
-                        const double* rx, const double* rz, const double* rp);
+                        const double* rx, const double* rz, const double* rp) const;
 
     /** \brief  Retreat solution in time */
     virtual void retreat(IntegratorMemory& mem, double t,
-                         double* rx, double* rz, double* rq);
+                         double* rx, double* rz, double* rq) const;
 
     /// Get explicit dynamics
     virtual const Function& getExplicit() const { return F_;}

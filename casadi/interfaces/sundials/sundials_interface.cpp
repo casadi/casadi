@@ -328,7 +328,7 @@ namespace casadi {
   }
 
   void SundialsInterface::resetB(IntegratorMemory& mem, double t, const double* rx,
-                                 const double* rz, const double* rp) {
+                                 const double* rz, const double* rp) const {
     SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
 
     // Update time
@@ -408,6 +408,43 @@ namespace casadi {
     if (this->q) N_VDestroy_Serial(this->q);
     if (this->rxz) N_VDestroy_Serial(this->rxz);
     if (this->rq) N_VDestroy_Serial(this->rq);
+  }
+
+  Dict SundialsMemory::getStats() const {
+    Dict stats = IntegratorMemory::getStats();
+    // Counters, forward problem
+    stats["nsteps"] = static_cast<int>(nsteps);
+    stats["nfevals"] = static_cast<int>(nfevals);
+    stats["nlinsetups"] = static_cast<int>(nlinsetups);
+    stats["netfails"] = static_cast<int>(netfails);
+    stats["qlast"] = qlast;
+    stats["qcur"] = qcur;
+    stats["hinused"] = hinused;
+    stats["hlast"] = hlast;
+    stats["hcur"] = hcur;
+    stats["tcur"] = tcur;
+
+    // Counters, backward problem
+    stats["nstepsB"] = static_cast<int>(nstepsB);
+    stats["nfevalsB"] = static_cast<int>(nfevalsB);
+    stats["nlinsetupsB"] = static_cast<int>(nlinsetupsB);
+    stats["netfailsB"] = static_cast<int>(netfailsB);
+    stats["qlastB"] = qlastB;
+    stats["qcurB"] = qcurB;
+    stats["hinusedB"] = hinusedB;
+    stats["hlastB"] = hlastB;
+    stats["hcurB"] = hcurB;
+    stats["tcurB"] = tcurB;
+
+    // Timers
+    stats["t_res"] = t_res;
+    stats["t_fres"] = t_fres;
+    stats["t_jac"] = t_jac;
+    stats["t_jacB"] = t_jacB;
+    stats["t_lsolve"] = t_lsolve;
+    stats["t_lsetup_jac"] = t_lsetup_jac;
+    stats["t_lsetup_fac"] = t_lsetup_fac;
+    return stats;
   }
 
 } // namespace casadi

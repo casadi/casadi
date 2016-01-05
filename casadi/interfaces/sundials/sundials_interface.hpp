@@ -51,6 +51,32 @@ namespace casadi {
     // Parameters
     std::vector<double> p, rp;
 
+    // For timings
+    clock_t time1, time2;
+
+    // Accumulated time since last reset:
+    double t_res; // time spent in the DAE residual
+    double t_fres; // time spent in the forward sensitivity residual
+    double t_jac, t_jacB; // time spent in the Jacobian, or Jacobian times vector function
+    double t_lsolve; // preconditioner/linear solver solve function
+    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
+    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
+
+    /// Stats
+    long nsteps, nfevals, nlinsetups, netfails;
+    int qlast, qcur;
+    double hinused, hlast, hcur, tcur;
+
+    long nstepsB, nfevalsB, nlinsetupsB, netfailsB;
+    int qlastB, qcurB;
+    double hinusedB, hlastB, hcurB, tcurB;
+
+    /// number of checkpoints stored so far
+    int ncheck;
+
+    /// Get all statistics
+    virtual Dict getStats() const;
+
     /// Constructor
     SundialsMemory();
 
@@ -78,7 +104,7 @@ namespace casadi {
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB(IntegratorMemory& mem, double t, const double* rx,
-                        const double* rz, const double* rp);
+                        const double* rz, const double* rp) const;
 
     /// Linear solver forward, backward
     Function linsol_, linsolB_;

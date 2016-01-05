@@ -86,7 +86,7 @@ namespace casadi {
 
     /// Reset the backward problem and take time to tf
     virtual void resetB(IntegratorMemory& mem, double t, const double* rx,
-                        const double* rz, const double* rp);
+                        const double* rz, const double* rp) const;
 
     // Interpolation order
     int deg_;

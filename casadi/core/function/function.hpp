@@ -847,10 +847,7 @@ namespace casadi {
 #endif // SWIG
 
     /// Get all statistics obtained at the end of the last evaluate call
-    const Dict& getStats() const;
-
-    /// Get a single statistic obtained at the end of the last evaluate call
-    GenericType getStat(const std::string& name) const;
+    Dict getStats(int mem=0) const;
 
     ///@{
     /** \brief Get symbolic primitives equivalent to the input expressions */

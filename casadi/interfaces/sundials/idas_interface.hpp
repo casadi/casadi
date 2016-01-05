@@ -65,28 +65,15 @@ namespace casadi {
     // Idas memory block
     void* mem;
 
-    // For timings
-    clock_t time1, time2;
-
-    // Accumulated time since last reset:
-    double t_res; // time spent in the DAE residual
-    double t_fres; // time spent in the forward sensitivity residual
-    double t_jac, t_jacB; // time spent in the Jacobian, or Jacobian times vector function
-    double t_lsolve; // preconditioner/linear solver solve function
-    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
-    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
-
     // Has the adjoint problem been initialized
     bool isInitAdj;
     bool isInitTaping;
 
-    /// number of checkpoints stored so far
-    int ncheck;
+    // Ids of backward problem
+    int whichB;
 
-    /// Stats
-    long nsteps, nfevals, nlinsetups, netfails;
-    int qlast, qcur;
-    double hinused, hlast, hcur, tcur;
+    /// Get all statistics
+    virtual Dict getStats() const;
 
     /// Constructor
     IdasMemory(const IdasInterface& s);
@@ -131,7 +118,7 @@ namespace casadi {
     void initTaping(IdasMemory& m) const;
 
     /** \brief Initialize the backward problem (can only be called after the first integration) */
-    virtual void initAdj(IdasMemory& m);
+    virtual void initAdj(IdasMemory& m) const;
 
     /** \brief Create memory block */
     virtual Memory* memory() const { return new IdasMemory(*this);}
@@ -149,11 +136,11 @@ namespace casadi {
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB(IntegratorMemory& mem, double t, const double* rx,
-                        const double* rz, const double* rp);
+                        const double* rz, const double* rp) const;
 
     /** \brief  Retreat solution in time */
     virtual void retreat(IntegratorMemory& mem, double t, double* rx,
-                         double* rz, double* rq);
+                         double* rz, double* rq) const;
 
     /** \brief  Set the stop time of the forward integration */
     virtual void setStopTime(IntegratorMemory& mem, double tf) const;
@@ -325,9 +312,6 @@ namespace casadi {
 
     // Initialize the user defined linear solver (backward integration)
     void initUserDefinedLinsolB(IdasMemory& m) const;
-
-    // Ids of backward problem
-    int whichB_;
 
     // Options
     bool cj_scaling_;
