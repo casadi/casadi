@@ -85,26 +85,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::QpToNlp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlpsol_stats</td><td>casadi::QpToNlp</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_Qpsol_nlp
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th></tr>
-<tr><td>nlpsol_stats</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::Scpgen
 \n
 \par
