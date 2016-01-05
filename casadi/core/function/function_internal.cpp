@@ -2802,4 +2802,10 @@ namespace casadi {
       (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
   }
 
+  void FunctionInternal::setup(Memory& mem, const double** arg, double** res,
+                               int* iw, double* w) const {
+    set_work(mem, arg, res, iw, w);
+    set_temp(mem, arg, res, iw, w);
+  }
+
 } // namespace casadi

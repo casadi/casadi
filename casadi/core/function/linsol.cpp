@@ -89,13 +89,12 @@ namespace casadi {
     // Get inputs and outputs
     const double *A = arg[LINSOL_A];
     const double *b = arg[LINSOL_B];
+    arg += LINSOL_NUM_IN;
     double *x = res[LINSOL_X];
+    res += LINSOL_NUM_OUT;
 
     // If output not requested, nothing to do
     if (!x) return;
-
-    // Setup memory object
-    setup(mem, arg + LINSOL_NUM_IN, res + LINSOL_NUM_OUT, iw, w);
 
     // A zero linear system would be singular
     if (A==0) {
@@ -108,6 +107,9 @@ namespace casadi {
       casadi_fill(x, neq_*nrhs_, 0.);
       return;
     }
+
+    // Setup memory object
+    setup(mem, arg, res, iw, w);
 
     // Factorize the linear system
     linsol_factorize(mem, A);

@@ -931,6 +931,12 @@ namespace casadi {
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
     /** \brief Set the (persistent) work vectors */
+    void set_work(const double**& arg, double**& res, int*& iw, double*& w, int mem=0) const;
+
+    /** \brief Set the (temporary) work vectors */
+    void set_temp(const double** arg, double** res, int* iw, double* w, int mem=0) const;
+
+    /** \brief Set the (persistent and temporary) work vectors */
     void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 #endif // SWIG
 

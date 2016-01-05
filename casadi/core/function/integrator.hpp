@@ -73,8 +73,8 @@ namespace casadi {
     virtual void init();
 
     /** \brief Set the work vectors */
-    virtual void setup(Memory& mem, const double** arg, double** res,
-                       int* iw, double* w) const;
+    virtual void set_temp(Memory& mem, const double** arg, double** res,
+                          int* iw, double* w) const;
 
     /** \brief Reset the forward problem */
     virtual void reset(IntegratorMemory& mem, double t,

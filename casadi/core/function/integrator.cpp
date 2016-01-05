@@ -134,16 +134,29 @@ namespace casadi {
     IntegratorMemory& m = dynamic_cast<IntegratorMemory&>(mem);
     Integrator* this_ = const_cast<Integrator*>(this);
 
-    // Setup memory object
-    setup(m, arg + INTEGRATOR_NUM_IN, res + INTEGRATOR_NUM_OUT, iw, w);
+    // Read inputs
+    const double* x0 = arg[INTEGRATOR_X0];
+    const double* z0 = arg[INTEGRATOR_Z0];
+    const double* p = arg[INTEGRATOR_P];
+    const double* rx0 = arg[INTEGRATOR_RX0];
+    const double* rz0 = arg[INTEGRATOR_RZ0];
+    const double* rp = arg[INTEGRATOR_RP];
+    arg += INTEGRATOR_NUM_IN;
 
-    // Reset solver, take time to t0
-    reset(m, grid_.front(), arg[INTEGRATOR_X0], arg[INTEGRATOR_Z0], arg[INTEGRATOR_P]);
-
-    // Where to store outputs
+    // Read outputs
     double* x = res[INTEGRATOR_XF];
     double* z = res[INTEGRATOR_ZF];
     double* q = res[INTEGRATOR_QF];
+    double* rx = res[INTEGRATOR_RXF];
+    double* rz = res[INTEGRATOR_RZF];
+    double* rq = res[INTEGRATOR_RQF];
+    res += INTEGRATOR_NUM_OUT;
+
+    // Setup memory object
+    setup(m, arg, res, iw, w);
+
+    // Reset solver, take time to t0
+    reset(m, grid_.front(), x0, z0, p);
 
     // Integrate forward
     for (int k=0; k<grid_.size(); ++k) {
@@ -160,11 +173,10 @@ namespace casadi {
     // If backwards integration is needed
     if (nrx_>0) {
       // Integrate backward
-      this_->resetB(m, grid_.back(), arg[INTEGRATOR_RX0], arg[INTEGRATOR_RZ0], arg[INTEGRATOR_RP]);
+      this_->resetB(m, grid_.back(), rx0, rz0, rp);
 
       // Proceed to t0
-      this_->retreat(m, grid_.front(), res[INTEGRATOR_RXF], res[INTEGRATOR_RZF],
-                     res[INTEGRATOR_RQF]);
+      this_->retreat(m, grid_.front(), rx, rz, rq);
     }
 
     // Print statistics
@@ -1225,8 +1237,8 @@ namespace casadi {
     return Function(name, ret_in, ret_out, opts);
   }
 
-  void Integrator::setup(Memory& mem, const double** arg, double** res,
-                         int* iw, double* w) const {
+  void Integrator::set_temp(Memory& mem, const double** arg, double** res,
+                            int* iw, double* w) const {
     IntegratorMemory& m = dynamic_cast<IntegratorMemory&>(mem);
     m.arg = arg;
     m.res = res;

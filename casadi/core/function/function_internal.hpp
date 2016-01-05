@@ -767,8 +767,15 @@ namespace casadi {
     virtual void init_memory(Memory& mem) const {}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void setup(Memory& mem, const double** arg, double** res,
-                       int* iw, double* w) const {}
+    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const {}
+
+    /** \brief Set the (temporary) work vectors */
+    virtual void set_temp(Memory& mem, const double** arg, double** res,
+                          int* iw, double* w) const {}
+
+    /** \brief Set the (persistent and temporary) work vectors */
+    void setup(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */

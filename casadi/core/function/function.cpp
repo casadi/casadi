@@ -649,6 +649,16 @@ namespace casadi {
     (*this)->spAdj(arg, res, iw, w, (*this)->mem_.at(mem));
   }
 
+  void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
+                          int mem) const {
+    (*this)->set_work(*(*this)->mem_.at(mem), arg, res, iw, w);
+  }
+
+  void Function::set_temp(const double** arg, double** res, int* iw, double* w,
+                          int mem) const {
+    (*this)->set_temp(*(*this)->mem_.at(mem), arg, res, iw, w);
+  }
+
   void Function::setup(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
     (*this)->setup(*(*this)->mem_.at(mem), arg, res, iw, w);
