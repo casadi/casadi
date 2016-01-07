@@ -570,7 +570,7 @@ namespace casadi {
   }
 
   Dict Function::stats(int mem) const {
-    return (*this)->mem_.at(mem)->stats();
+    return (*this)->mem_.at(mem)->get_stats();
   }
 
   const Sparsity Function::sparsity_jac(int iind, int oind, bool compact, bool symmetric) {

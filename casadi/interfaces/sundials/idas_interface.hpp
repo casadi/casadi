@@ -73,7 +73,7 @@ namespace casadi {
     int whichB;
 
     /// Get all statistics
-    virtual Dict stats() const;
+    virtual Dict get_stats() const;
 
     /// Constructor
     IdasMemory(const IdasInterface& s);

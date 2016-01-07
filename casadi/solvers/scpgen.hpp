@@ -88,6 +88,9 @@ namespace casadi {
 
     // Current iteration
     int iter_count;
+
+    /// Get all statistics
+    virtual Dict get_stats() const;
   };
 
   /**  \brief \pluginbrief{Nlpsol,scpgen}

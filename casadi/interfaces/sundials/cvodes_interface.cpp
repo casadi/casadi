@@ -1659,8 +1659,8 @@ namespace casadi {
     if (this->mem) CVodeFree(&this->mem);
   }
 
-  Dict CvodesMemory::stats() const {
-    Dict stats = SundialsMemory::stats();
+  Dict CvodesMemory::get_stats() const {
+    Dict stats = SundialsMemory::get_stats();
     return stats;
   }
 
