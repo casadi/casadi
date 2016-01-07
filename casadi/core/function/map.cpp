@@ -127,15 +127,15 @@ namespace casadi {
     evalGen(arg, res, iw, w);
   }
 
-  void MapSerial::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void MapSerial::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen(arg, res, iw, w);
   }
 
-  void MapSerial::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void MapSerial::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen(arg, res, iw, w);
   }
 
-  void MapSerial::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void MapSerial::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int n_in = n_in_, n_out = n_out_;
     bvec_t** arg1 = arg+this->n_in();
     bvec_t** res1 = res+this->n_out();
@@ -357,13 +357,13 @@ namespace casadi {
     }
   }
 
-  void MapReduce::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void MapReduce::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen<SXElem>(arg, res, iw, w, std::plus<SXElem>());
   }
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void MapReduce::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void MapReduce::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen<bvec_t>(arg, res, iw, w, &Orring);
   }
 

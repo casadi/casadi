@@ -223,7 +223,7 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+  void SymbolicQr::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                  bool tr, int nrhs) {
     casadi_assert(arg[0]!=0);
     casadi_assert(arg[1]!=0);

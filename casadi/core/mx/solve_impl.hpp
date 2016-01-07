@@ -60,7 +60,7 @@ namespace casadi {
 
   template<bool Tr>
   void Solve<Tr>::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
-    linsol_->linsol_eval_sx(arg, res, iw, w, linsol_->mem_.at(mem), Tr, dep(0).size2());
+    linsol_->linsol_eval_sx(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>
@@ -100,12 +100,12 @@ namespace casadi {
 
   template<bool Tr>
   void Solve<Tr>::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    linsol_->linsol_spFwd(arg, res, iw, w, linsol_->mem_.at(mem), Tr, dep(0).size2());
+    linsol_->linsol_spFwd(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>
   void Solve<Tr>::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    linsol_->linsol_spAdj(arg, res, iw, w, linsol_->mem_.at(mem), Tr, dep(0).size2());
+    linsol_->linsol_spAdj(arg, res, iw, w, mem, Tr, dep(0).size2());
   }
 
   template<bool Tr>

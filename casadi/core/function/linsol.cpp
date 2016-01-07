@@ -193,7 +193,7 @@ namespace casadi {
   }
 
   void Linsol::
-  linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+  linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = sparsity_in(LINSOL_A);
@@ -230,7 +230,7 @@ namespace casadi {
   }
 
   void Linsol::
-  linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+  linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     // Sparsities
     const Sparsity& A_sp = sparsity_in(LINSOL_A);
@@ -340,7 +340,7 @@ namespace casadi {
     }
   }
 
-  void Linsol::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+  void Linsol::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                              bool tr, int nrhs) {
     casadi_error("Linsol::eval_sxLinsol not defined for class "
                  << typeid(*this).name());

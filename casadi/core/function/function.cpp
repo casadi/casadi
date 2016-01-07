@@ -462,7 +462,7 @@ namespace casadi {
     std::vector<double> w(sz_w());
 
     // Call memory-less
-    (*this)->eval(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
+    (*this)->eval(*(*this)->mem_.at(0), getPtr(arg), getPtr(res), getPtr(iw), getPtr(w));
   }
 
   int Function::n_in() const {
@@ -642,11 +642,11 @@ namespace casadi {
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
   void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*const_cast<Function*>(this))->spFwd(arg, res, iw, w, (*this)->mem_.at(mem));
+    (*const_cast<Function*>(this))->spFwd(arg, res, iw, w, mem);
   }
 
   void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    (*this)->spAdj(arg, res, iw, w, (*this)->mem_.at(mem));
+    (*this)->spAdj(arg, res, iw, w, mem);
   }
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
@@ -1004,11 +1004,11 @@ namespace casadi {
   }
 
   void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    (*const_cast<Function*>(this))->eval(arg, res, iw, w, (*this)->mem_.at(mem));
+    (*this)->eval(arg, res, iw, w, mem);
   }
 
   void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    (*const_cast<Function*>(this))->eval_sx(arg, res, iw, w, (*this)->mem_.at(mem));
+    (*this)->eval_sx(arg, res, iw, w, mem);
   }
 
   const SX Function::sx_in(int ind) const {

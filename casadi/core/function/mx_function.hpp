@@ -111,7 +111,7 @@ namespace casadi {
                                         bool compact, bool symmetric, const Dict& opts);
 
     /** \brief Evaluate symbolically, SX type*/
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief Evaluate symbolically, MX type */
     virtual void eval_mx(const MXVector& arg, MXVector& res, bool always_inline, bool never_inline);
@@ -146,10 +146,10 @@ namespace casadi {
     virtual std::vector<MX> create_call(const std::vector<MX>& arg);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd) { return true;}

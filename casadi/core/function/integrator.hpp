@@ -99,10 +99,10 @@ namespace casadi {
     virtual void printStats(IntegratorMemory& mem, std::ostream &stream) const {}
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd) { return true;}

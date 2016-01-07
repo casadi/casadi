@@ -54,11 +54,11 @@ namespace casadi {
   ///@{
   /** \brief  Function pointer types */
   typedef int (*init_t)(void **mem, int *n_in, int *n_out, void *data);
-  typedef int (*freemem_t)(void* mem);
-  typedef int (*work_t)(void* mem, int *sz_arg, int* sz_res, int *sz_iw, int *sz_w);
-  typedef int (*sparsity_t)(void* mem, int i, int *n_row, int *n_col,
+  typedef int (*freemem_t)(int mem);
+  typedef int (*work_t)(int mem, int *sz_arg, int* sz_res, int *sz_iw, int *sz_w);
+  typedef int (*sparsity_t)(int mem, int i, int *n_row, int *n_col,
                             const int **colind, const int **row);
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
@@ -118,17 +118,17 @@ namespace casadi {
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
-    /** \brief  Evaluate numerically, old non-const */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) final;
-
+    ///@{
     /** \brief  Evaluate numerically */
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    ///@}
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res);
 
     /** \brief  Evaluate with symbolic scalars */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     ///@{
     /** \brief  Evaluate with symbolic matrices */
@@ -137,9 +137,9 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate a function, overloaded */
-    void _eval(const double** arg, double** res, int* iw, double* w, void* mem);
-    void _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
-    void _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    void _eval(const double** arg, double** res, int* iw, double* w, int mem);
+    void _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
+    void _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
     ///@}
 
     ///@{
@@ -725,10 +725,10 @@ namespace casadi {
                                 std::string compiler);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
@@ -877,7 +877,7 @@ namespace casadi {
     virtual void linsol_solveL(Memory& mem, double* x, int nrhs, bool tr) const;
     virtual Sparsity linsol_cholesky_sparsity(Memory& mem, bool tr) const;
     virtual DM linsol_cholesky(Memory& mem, bool tr) const;
-    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                bool tr, int nrhs);
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                                 const std::vector<std::vector<MX> >& fseed,
@@ -886,9 +886,9 @@ namespace casadi {
                                 const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens, bool tr);
     virtual void linsol_spFwd(const bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, void* mem, bool tr, int nrhs);
+                              int* iw, bvec_t* w, int mem, bool tr, int nrhs);
     virtual void linsol_spAdj(bvec_t** arg, bvec_t** res,
-                              int* iw, bvec_t* w, void* mem, bool tr, int nrhs);
+                              int* iw, bvec_t* w, int mem, bool tr, int nrhs);
     ///@}
 
   private:

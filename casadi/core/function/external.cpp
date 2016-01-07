@@ -134,7 +134,7 @@ namespace casadi {
     }
 
     // Initialize and get the number of inputs and outputs
-    int flag = init(&mem_, &n_in_, &n_out_, 0);
+    int flag = init(0, &n_in_, &n_out_, 0);
     casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
 
     // Get number of temporaries
@@ -142,7 +142,7 @@ namespace casadi {
     work_t work;
     li_.get(work, name + "_work");
     if (work!=0) {
-      flag = work(mem_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+      flag = work(0, &sz_arg, &sz_res, &sz_iw, &sz_w);
       casadi_assert_message(flag==0, "CommonExternal: \"work\" failed");
     } else {
       // No work vectors
@@ -187,7 +187,7 @@ namespace casadi {
     int nrow, ncol;
     const int *colind, *row;
     casadi_assert(sparsity_!=0);
-    int flag = sparsity_(mem_, ind, &nrow, &ncol, &colind, &row);
+    int flag = sparsity_(0, ind, &nrow, &ncol, &colind, &row);
     casadi_assert_message(flag==0, "External: \"sparsity\" failed");
 
     // Col offsets
@@ -228,7 +228,7 @@ namespace casadi {
   template<typename LibType>
   CommonExternal<LibType>::~CommonExternal() {
     if (freemem_) {
-      freemem_(mem_);
+      freemem_(0);
     }
     li_.clear();
   }
@@ -280,7 +280,7 @@ namespace casadi {
   }
 
   template<typename LibType>
-  int GenericExternal<LibType>::scalarSparsity(void* mem, int i, int *n_row, int *n_col,
+  int GenericExternal<LibType>::scalarSparsity(int mem, int i, int *n_row, int *n_col,
                                                const int **colind, const int **row) {
     // Dense scalar
     static const int colind_scalar[] = {0, 1};

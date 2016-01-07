@@ -106,13 +106,13 @@ namespace casadi {
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return true; }
@@ -202,9 +202,9 @@ namespace casadi {
     virtual bool canEvalSX() const {return true;}
 
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return fwd; }

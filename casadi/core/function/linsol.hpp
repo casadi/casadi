@@ -67,11 +67,11 @@ namespace casadi {
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
 
     /// Evaluate SX, possibly transposed
-    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                bool tr, int nrhs);
 
     /// Evaluate SX
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
       linsol_eval_sx(arg, res, iw, w, 0, false, size2_out(LINSOL_X));
     }
 
@@ -86,11 +86,11 @@ namespace casadi {
                                 std::vector<std::vector<MX> >& asens, bool tr);
 
     /** \brief  Propagate sparsity forward */
-    virtual void linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+    virtual void linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                               bool tr, int nrhs);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+    virtual void linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                               bool tr, int nrhs);
 
     ///@{

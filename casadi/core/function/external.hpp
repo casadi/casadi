@@ -145,9 +145,6 @@ namespace casadi {
     /** \brief Information about the library */
     LibInfo<LibType> li_;
 
-    /** \brief Function */
-    void *mem_;
-
     /** \brief Number of inputs and outputs */
     int n_in_, n_out_;
 
@@ -250,7 +247,7 @@ namespace casadi {
                                      const std::string& iw, const std::string& w) const;
 
     /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
-    static int scalarSparsity(void* mem, int i, int *n_row, int *n_col,
+    static int scalarSparsity(int mem, int i, int *n_row, int *n_col,
                               const int **colind, const int **row);
 
     /** \brief  Function pointers */

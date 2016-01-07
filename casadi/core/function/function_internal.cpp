@@ -223,7 +223,7 @@ namespace casadi {
     mem_.push_back(m);
   }
 
-  void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, int mem) {
     if (simplifiedCall()) {
       // Copy arguments to input buffers
       const double* arg1=w;
@@ -252,11 +252,11 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::_eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void FunctionInternal::_eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     eval_sx(arg, res, iw, w, mem);
   }
 
-  void FunctionInternal::_eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void FunctionInternal::_eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     spFwd(arg, res, iw, w, mem);
   }
 
@@ -442,14 +442,14 @@ namespace casadi {
   template<> struct JacSparsityTraits<true> {
     typedef const bvec_t* arg_t;
     static inline void sp(FunctionInternal *f, const bvec_t** arg, bvec_t** res,
-                          int* iw, bvec_t* w, void* mem) {
+                          int* iw, bvec_t* w, int mem) {
       f->spFwd(arg, res, iw, w, mem);
     }
   };
   template<> struct JacSparsityTraits<false> {
     typedef bvec_t* arg_t;
     static inline void sp(FunctionInternal *f, bvec_t** arg, bvec_t** res,
-                          int* iw, bvec_t* w, void* mem) {
+                          int* iw, bvec_t* w, int mem) {
       f->spAdj(arg, res, iw, w, mem);
     }
   };
@@ -1262,20 +1262,20 @@ namespace casadi {
     log("FunctionInternal::getPartition end");
   }
 
-  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    eval(*mem_.at(0), arg, res, iw, w);
-  }
-
   void FunctionInternal::eval(Memory& mem,
                               const double** arg, double** res, int* iw, double* w) const {
     casadi_error("'eval' not defined for " + type_name());
+  }
+
+  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+    eval(*mem_.at(mem), arg, res, iw, w);
   }
 
   void FunctionInternal::simple(const double* arg, double* res) {
     casadi_error("'simple' not defined for " + type_name());
   }
 
-  void FunctionInternal::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void FunctionInternal::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     casadi_error("'eval_sx' not defined for " + type_name());
   }
 
@@ -1754,7 +1754,7 @@ namespace casadi {
     if (simplifiedCall()) {
       return "void " + fname + "(const real_t* arg, real_t* res)";
     } else {
-      return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, void *mem)";
+      return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, int mem)";
     }
   }
 
@@ -1787,7 +1787,7 @@ namespace casadi {
     }
 
     // Function for freeing memory allocated in init
-    tmp = "int " + fname + "_free(void *mem)";
+    tmp = "int " + fname + "_free(int mem)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1821,7 +1821,7 @@ namespace casadi {
 
     // Function that returns the sparsity pattern
     tmp = "int " + fname + "_sparsity"
-      "(void *mem, int i, int *nrow, int *ncol, const int **colind, const int **row)";
+      "(int mem, int i, int *nrow, int *ncol, const int **colind, const int **row)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1866,7 +1866,7 @@ namespace casadi {
 
     // Function that returns work vector lengths
     tmp = "int " + fname
-      + "_work(void *mem, int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)";
+      + "_work(int mem, int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -2087,7 +2087,7 @@ namespace casadi {
     return external(fname, dlname);
   }
 
-  void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2121,7 +2121,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void FunctionInternal::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Get the number of inputs and outputs
     int n_in = this->n_in();
     int n_out = this->n_out();
@@ -2659,7 +2659,7 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+  linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                 bool tr, int nrhs) {
     casadi_error("'linsol_eval_sx' not defined for " + type_name());
   }
@@ -2679,13 +2679,13 @@ namespace casadi {
   }
 
   void FunctionInternal::
-  linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+  linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     casadi_error("'linsol_spFwd' not defined for " + type_name());
   }
 
   void FunctionInternal::
-  linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem,
+  linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
                bool tr, int nrhs) {
     casadi_error("'linsol_spAdj' not defined for " + type_name());
   }

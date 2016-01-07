@@ -435,7 +435,7 @@ namespace casadi {
     }
   }
 
-  void MXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void MXFunction::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -474,7 +474,7 @@ namespace casadi {
     }
   }
 
-  void MXFunction::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
+  void MXFunction::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -918,7 +918,7 @@ namespace casadi {
     log("MXFunction::evalAdj end");
   }
 
-  void MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
+  void MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElem*> argp(sz_arg());
     vector<SXElem*> resp(sz_res());
