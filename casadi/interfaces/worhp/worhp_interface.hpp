@@ -49,6 +49,45 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  struct CASADI_NLPSOL_WORHP_EXPORT WorhpMemory : public NlpsolMemory {
+    OptVar    worhp_o;
+    Workspace worhp_w;
+    Params    worhp_p;
+    Control   worhp_c;
+
+    // Accumulated time since last reset:
+    double t_eval_f; // time spent in eval_f
+    double t_eval_grad_f; // time spent in eval_grad_f
+    double t_eval_g; // time spent in eval_g
+    double t_eval_jac_g; // time spent in eval_jac_g
+    double t_eval_h; // time spent in eval_h
+    double t_callback_fun;  // time spent in callback function
+    double t_callback_prepare; // time spent in callback preparation
+    double t_mainloop; // time spent in the main loop of the solver
+
+    // Accumulated counts since last reset:
+    int n_eval_f; // number of calls to eval_f
+    int n_eval_grad_f; // number of calls to eval_grad_f
+    int n_eval_g; // number of calls to eval_g
+    int n_eval_jac_g; // number of calls to eval_jac_g
+    int n_eval_h; // number of calls to eval_h
+
+    // Stats
+    int iter;
+    int iter_sqp;
+    double inf_pr;
+    double inf_du;
+    double alpha_pr;
+    int return_code;
+    const char* return_status;
+
+    /// Constructor
+    WorhpMemory();
+
+    /// Destructor
+    virtual ~WorhpMemory();
+  };
+
   /** \brief \pluginbrief{Nlpsol,worhp}
      @copydoc Nlpsol_doc
      @copydoc plugin_Nlpsol_worhp
@@ -76,56 +115,29 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
-    // Reset the solver
-    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new WorhpMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(void* mem);
-
-    /// Set default options for a given recipe
-    virtual void setDefaultOptions(const std::vector<std::string>& recipes);
-
-    /// Read options from worhp parameter xml
-    virtual void setOptionsFromFile(const std::string & file);
+    virtual void solve(Memory& mem) const;
 
     /// Exact Hessian?
     bool exact_hessian_;
 
-    OptVar    worhp_o_;
-    Workspace worhp_w_;
-    Params    worhp_p_;
-    Control   worhp_c_;
-
     std::map<int, std::string> status_;
     std::map<std::string, TypeID> ops_;
 
-    // Accumulated time since last reset:
-    double t_eval_f_; // time spent in eval_f
-    double t_eval_grad_f_; // time spent in eval_grad_f
-    double t_eval_g_; // time spent in eval_g
-    double t_eval_jac_g_; // time spent in eval_jac_g
-    double t_eval_h_; // time spent in eval_h
-    double t_callback_fun_;  // time spent in callback function
-    double t_callback_prepare_; // time spent in callback preparation
-    double t_mainloop_; // time spent in the main loop of the solver
-
-    // Accumulated counts since last reset:
-    int n_eval_f_; // number of calls to eval_f
-    int n_eval_grad_f_; // number of calls to eval_grad_f
-    int n_eval_g_; // number of calls to eval_g
-    int n_eval_jac_g_; // number of calls to eval_jac_g
-    int n_eval_h_; // number of calls to eval_h
-
     std::string formatStatus(int status) const;
 
-    /// Pass the supplied options to Worhp
-    void passOptions();
-
-    // Calculate the status message map
-    static std::map<int, std::string> calc_flagmap();
-
-    // Error status map
-    static std::map<int, std::string> flagmap;
+    // WORHP return codes
+    static const char* return_codes(int flag);
 
     /// A documentation string
     static const std::string meta_doc;

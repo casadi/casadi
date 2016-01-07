@@ -48,8 +48,9 @@
 /// \cond INTERNAL
 using namespace Ipopt;
 namespace casadi {
-  // Forward declaration
+  // Forward declarations
   class IpoptInterface;
+  struct IpoptMemory;
 
   class CASADI_NLPSOL_IPOPT_EXPORT IpoptUserClass : public TNLP {
 #ifdef WITH_IPOPT_CALLBACK
@@ -57,7 +58,7 @@ namespace casadi {
 #endif // WITH_IPOPT_CALLBACK
 
   public:
-    IpoptUserClass(IpoptInterface* ipoptInterface);
+    IpoptUserClass(const IpoptInterface& ipoptInterface, IpoptMemory& mem);
     virtual ~IpoptUserClass();
 
     /** Method to return some info about the nlp */
@@ -145,7 +146,8 @@ namespace casadi {
   private:
     IpoptUserClass(const IpoptUserClass&);
     IpoptUserClass& operator=(const IpoptUserClass&);
-    IpoptInterface* solver;
+    const IpoptInterface& solver_;
+    IpoptMemory& mem_;
 
     double * x_;
     double * z_L_;

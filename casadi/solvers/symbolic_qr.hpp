@@ -73,8 +73,8 @@ namespace casadi {
     virtual Memory* memory() const;
 
     // Setup memory block
-    virtual void setup(Memory& mem, const double** arg, double** res,
-                       int* iw, double* w) const;
+    virtual void set_temp(Memory& mem, const double** arg, double** res,
+                          int* iw, double* w) const;
 
     // Factorize the linear system
     virtual void linsol_factorize(Memory& mem, const double* A) const;

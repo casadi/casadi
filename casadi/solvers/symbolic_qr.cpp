@@ -182,8 +182,8 @@ namespace casadi {
     }
   }
 
-  void SymbolicQr::setup(Memory& mem, const double** arg, double** res,
-                         int* iw, double* w) const {
+  void SymbolicQr::set_temp(Memory& mem, const double** arg, double** res,
+                            int* iw, double* w) const {
     SymbolicQrMemory& m = dynamic_cast<SymbolicQrMemory&>(mem);
     m.arg = arg;
     m.res = res;

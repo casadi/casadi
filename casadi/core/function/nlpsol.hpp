@@ -33,12 +33,40 @@
 /// \cond INTERNAL
 namespace casadi {
 
-/** \brief NLP solver storage class
+  /** \brief Integrator memory */
+  struct CASADI_EXPORT NlpsolMemory : public WorkMemory {
+    // Outputs
+    double *x, *f, *g, *lam_x, *lam_g, *lam_p;
 
-  @copydoc Nlpsol_doc
-  \author Joel Andersson
-  \date 2010-2013
-*/
+    // Inputs
+    const double *x0, *p, *lbx, *ubx, *lbg, *ubg, *lam_x0, *lam_g0;
+
+    // Accumulated counts since last reset:
+    int n_calc_f; // number of calls to calc_f
+    int n_calc_g; // number of calls to calc_g
+    int n_calc_grad_f; // number of calls to calc_grad_f
+    int n_calc_jac_g; // number of calls to calc_jac_g
+    int n_calc_hess_l; // number of calls to calc_hess_l
+    int n_eval_callback; // number of calls to callback
+    int n_iter; // number of iterations
+
+    // Accumulated time since last reset:
+    double t_calc_f; // time spent in calc_f
+    double t_calc_g; // time spent in calc_g
+    double t_calc_grad_f; // time spent in calc_grad_f
+    double t_calc_jac_g; // time spent in calc_jac_g
+    double t_calc_hess_l; // time spent in calc_hess_l
+
+    /** \brief  Destructor */
+    virtual ~NlpsolMemory() {}
+  };
+
+  /** \brief NLP solver storage class
+
+      @copydoc Nlpsol_doc
+      \author Joel Andersson
+      \date 2010-2013
+  */
   class CASADI_EXPORT
   Nlpsol : public FunctionInternal, public PluginInterface<Nlpsol> {
 
@@ -64,8 +92,14 @@ namespace casadi {
     /// Initialize
     virtual void init();
 
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new NlpsolMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
     /** \brief Check if the inputs correspond to a well-posed problem */
-    virtual void checkInputs(void* mem) const;
+    virtual void checkInputs(Memory& mem) const;
 
     /// Set options that make the NLP solver more suitable for solving QPs
     virtual void setDefaultOptions(const std::string& recipe) {}
@@ -94,36 +128,19 @@ namespace casadi {
     /// The NLP
     XProblem nlp2_;
 
-    // Inputs
-    const double *x0_, *p_, *lbx_, *ubx_, *lbg_, *ubg_, *lam_x0_, *lam_g0_;
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
-    // Get an element of the inputs
-    inline double x0(int i) const { return x0_ ? x0_[i] : 0;}
-    inline double p(int i) const { return p_ ? p_[i] : 0;}
-    inline double lbx(int i) const { return lbx_ ? lbx_[i] : 0;}
-    inline double ubx(int i) const { return ubx_ ? ubx_[i] : 0;}
-    inline double lbg(int i) const { return lbg_ ? lbg_[i] : 0;}
-    inline double ubg(int i) const { return ubg_ ? ubg_[i] : 0;}
-    inline double lam_x0(int i) const { return lam_x0_ ? lam_x0_[i] : 0;}
-    inline double lam_g0(int i) const { return lam_g0_ ? lam_g0_[i] : 0;}
-
-    // Outputs
-    double *x_, *f_, *g_, *lam_x_, *lam_g_, *lam_p_;
-
-    // Work vectors
-    const double** arg_;
-    double** res_;
-    int* iw_;
-    double* w_;
+    /** \brief Set the (temporary) work vectors */
+    virtual void set_temp(Memory& mem, const double** arg, double** res,
+                          int* iw, double* w) const;
 
     // Evaluate numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
-
-    // Reset the solver
-    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     // Solve the NLP
-    virtual void solve(void* mem) {}
+    virtual void solve(Memory& mem) const = 0;
 
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const XProblem& nlp);
@@ -137,7 +154,7 @@ namespace casadi {
     Function f_fcn_;
     template<typename M> void _setup_f();
     void setup_f();
-    int calc_f(const double* x, const double* p, double* f);
+    int calc_f(NlpsolMemory& m, const double* x, const double* p, double* f) const;
 
     // Calculate constraints
     enum GIn { G_X, G_P, G_NUM_IN };
@@ -145,13 +162,13 @@ namespace casadi {
     Function g_fcn_;
     template<typename M> void _setup_g();
     void setup_g();
-    int calc_g(const double* x, const double* p, double* g);
+    int calc_g(NlpsolMemory& m, const double* x, const double* p, double* g) const;
 
     // Calculate both objective and constraints
     Function fg_fcn_;
     template<typename M> void _setup_fg();
     void setup_fg();
-    int calc_fg(const double* x, const double* p, double* f, double* g);
+    int calc_fg(NlpsolMemory& m, const double* x, const double* p, double* f, double* g) const;
 
     // Calculate gradient of the objective
     enum GradFIn { GF_X, GF_P, GF_NUM_IN };
@@ -159,7 +176,8 @@ namespace casadi {
     Function grad_f_fcn_;
     template<typename M> void _setup_grad_f();
     void setup_grad_f();
-    int calc_grad_f(const double* x, const double* p, double* f, double* grad_f);
+    int calc_grad_f(NlpsolMemory& m, const double* x,
+                    const double* p, double* f, double* grad_f) const;
 
     // Calculate Jacobian of constraints
     enum JacGIn { JG_X, JG_P, JG_NUM_IN };
@@ -168,19 +186,22 @@ namespace casadi {
     Sparsity jacg_sp_;
     template<typename M> void _setup_jac_g();
     void setup_jac_g();
-    int calc_jac_g(const double* x, const double* p, double* g, double* jac_g);
+    int calc_jac_g(NlpsolMemory& m, const double* x,
+                   const double* p, double* g, double* jac_g) const;
 
     // Calculate Jacobian of gradient (note: sparse!)
     Function jac_f_fcn_;
     template<typename M> void _setup_jac_f();
     void setup_jac_f();
-    int calc_jac_f(const double* x, const double* p, double* f, double* jac_f);
+    int calc_jac_f(NlpsolMemory& m, const double* x,
+                   const double* p, double* f, double* jac_f) const;
 
     // Calculate both gradient of the objective and Jacobian of constraints
     Function gf_jg_fcn_;
     template<typename M> void _setup_gf_jg();
     void setup_gf_jg();
-    int calc_gf_jg(const double* x, const double* p, double* gf, double* jg);
+    int calc_gf_jg(NlpsolMemory& m, const double* x,
+                   const double* p, double* gf, double* jg) const;
 
     // Calculate Hessian of the Lagrangian constraints
     enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
@@ -189,25 +210,9 @@ namespace casadi {
     Sparsity hesslag_sp_;
     template<typename M> void _setup_hess_l(bool tr, bool sym, bool diag);
     void setup_hess_l(bool tr=false, bool sym=false, bool diag=false);
-    int calc_hess_l(const double* x, const double* p,
+    int calc_hess_l(NlpsolMemory& m, const double* x, const double* p,
                     const double* sigma, const double* lambda,
-                    double* hl);
-
-    // Accumulated counts since last reset:
-    int n_calc_f_; // number of calls to calc_f
-    int n_calc_g_; // number of calls to calc_g
-    int n_calc_grad_f_; // number of calls to calc_grad_f
-    int n_calc_jac_g_; // number of calls to calc_jac_g
-    int n_calc_hess_l_; // number of calls to calc_hess_l
-    int n_eval_callback_; // number of calls to callback
-    int n_iter_; // number of iterations
-
-    // Accumulated time since last reset:
-    double t_calc_f_; // time spent in calc_f
-    double t_calc_g_; // time spent in calc_g
-    double t_calc_grad_f_; // time spent in calc_grad_f
-    double t_calc_jac_g_; // time spent in calc_jac_g
-    double t_calc_hess_l_; // time spent in calc_hess_l
+                    double* hl) const;
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

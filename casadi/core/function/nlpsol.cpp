@@ -158,10 +158,14 @@ namespace casadi {
 
     callback_step_ = option("iteration_callback_step");
     eval_errors_fatal_ = option("eval_errors_fatal");
-
   }
 
-  void Nlpsol::checkInputs(void* mem) const {
+  void Nlpsol::init_memory(Memory& mem) const {
+  }
+
+  void Nlpsol::checkInputs(Memory& mem) const {
+    NlpsolMemory& m = dynamic_cast<NlpsolMemory&>(mem);
+
     // Skip check?
     if (!inputs_check_) return;
 
@@ -170,9 +174,12 @@ namespace casadi {
 
     // Detect ill-posed problems (simple bounds)
     for (int i=0; i<nx_; ++i) {
-      casadi_assert_message(!(lbx(i)==inf || lbx(i)>ubx(i) || ubx(i)==-inf),
+      double lbx = m.lbx ? m.lbx[i] : 0;
+      double ubx = m.ubx ? m.ubx[i] : 0;
+      double x0 = m.x0 ? m.x0[i] : 0;
+      casadi_assert_message(!(lbx==inf || lbx>ubx || ubx==-inf),
                             "Ill-posed problem detected (x bounds)");
-      if (warn_initial_bounds && (x0(i)>ubx(i) || x0(i)<lbx(i))) {
+      if (warn_initial_bounds && (x0>ubx || x0<lbx)) {
         casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
                        "Option 'warn_initial_bounds' controls this warning.");
         break;
@@ -181,7 +188,9 @@ namespace casadi {
 
     // Detect ill-posed problems (nonlinear bounds)
     for (int i=0; i<ng_; ++i) {
-      casadi_assert_message(!(lbg(i)==inf || lbg(i)>ubg(i) || ubg(i)==-inf),
+      double lbg = m.lbg ? m.lbg[i] : 0;
+      double ubg = m.ubg ? m.ubg[i] : 0;
+      casadi_assert_message(!(lbg==inf || lbg>ubg || ubg==-inf),
                             "Ill-posed problem detected (g bounds)");
     }
   }
@@ -214,56 +223,62 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Nlpsol::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     // Reset the solver, prepare for solution
-    reset(mem, arg, res, iw, w);
-
-    // Work vectors for evaluation
-    arg_ = arg;
-    res_ = res;
-    iw_ = iw;
-    w_ = w;
+    setup(mem, arg, res, iw, w);
 
     // Solve the NLP
     solve(mem);
   }
 
-  void Nlpsol::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
+  void Nlpsol::set_work(Memory& mem, const double**& arg, double**& res,
+                        int*& iw, double*& w) const {
+    NlpsolMemory& m = dynamic_cast<NlpsolMemory&>(mem);
+
     // Get input pointers
-    x0_ = arg[NLPSOL_X0];
-    p_ = arg[NLPSOL_P];
-    lbx_ = arg[NLPSOL_LBX];
-    ubx_ = arg[NLPSOL_UBX];
-    lbg_ = arg[NLPSOL_LBG];
-    ubg_ = arg[NLPSOL_UBG];
-    lam_x0_ = arg[NLPSOL_LAM_X0];
-    lam_g0_ = arg[NLPSOL_LAM_G0];
+    m.x0 = arg[NLPSOL_X0];
+    m.p = arg[NLPSOL_P];
+    m.lbx = arg[NLPSOL_LBX];
+    m.ubx = arg[NLPSOL_UBX];
+    m.lbg = arg[NLPSOL_LBG];
+    m.ubg = arg[NLPSOL_UBG];
+    m.lam_x0 = arg[NLPSOL_LAM_X0];
+    m.lam_g0 = arg[NLPSOL_LAM_G0];
     arg += NLPSOL_NUM_IN;
 
     // Get output pointers
-    x_ = res[NLPSOL_X];
-    f_ = res[NLPSOL_F];
-    g_ = res[NLPSOL_G];
-    lam_x_ = res[NLPSOL_LAM_X];
-    lam_g_ = res[NLPSOL_LAM_G];
-    lam_p_ = res[NLPSOL_LAM_P];
+    m.x = res[NLPSOL_X];
+    m.f = res[NLPSOL_F];
+    m.g = res[NLPSOL_G];
+    m.lam_x = res[NLPSOL_LAM_X];
+    m.lam_g = res[NLPSOL_LAM_G];
+    m.lam_p = res[NLPSOL_LAM_P];
     res += NLPSOL_NUM_OUT;
   }
 
-  int Nlpsol::calc_f(const double* x, const double* p, double* f) {
+  void Nlpsol::set_temp(Memory& mem, const double** arg, double** res,
+                        int* iw, double* w) const {
+    NlpsolMemory& m = dynamic_cast<NlpsolMemory&>(mem);
+    m.arg = arg;
+    m.res = res;
+    m.iw = iw;
+    m.w = w;
+  }
+
+  int Nlpsol::calc_f(NlpsolMemory& m, const double* x, const double* p, double* f) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(f!=0);
 
-    fill_n(arg_, f_fcn_.n_in(), nullptr);
-    arg_[F_X] = x;
-    arg_[F_P] = p;
-    fill_n(res_, f_fcn_.n_out(), nullptr);
-    res_[F_F] = f;
-    n_calc_f_ += 1;
+    fill_n(m.arg, f_fcn_.n_in(), nullptr);
+    m.arg[F_X] = x;
+    m.arg[F_P] = p;
+    fill_n(m.res, f_fcn_.n_out(), nullptr);
+    m.res[F_F] = f;
+    m.n_calc_f += 1;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
-      f_fcn_(arg_, res_, iw_, w_, 0);
+      f_fcn_(m.arg, m.res, m.iw, m.w, 0);
     } catch(exception& ex) {
       // Fatal error
       userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
@@ -278,27 +293,27 @@ namespace casadi {
     }
 
     // Update stats
-    n_calc_f_ += 1;
-    t_calc_f_ += chrono::duration<double>(t_stop - t_start).count();
+    m.n_calc_f += 1;
+    m.t_calc_f += chrono::duration<double>(t_stop - t_start).count();
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_g(const double* x, const double* p, double* g) {
+  int Nlpsol::calc_g(NlpsolMemory& m, const double* x, const double* p, double* g) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(g!=0);
 
     // Evaluate User function
-    fill_n(arg_, g_fcn_.n_in(), nullptr);
-    arg_[G_X] = x;
-    arg_[G_P] = p;
-    fill_n(res_, g_fcn_.n_out(), nullptr);
-    res_[G_G] = g;
+    fill_n(m.arg, g_fcn_.n_in(), nullptr);
+    m.arg[G_X] = x;
+    m.arg[G_P] = p;
+    fill_n(m.res, g_fcn_.n_out(), nullptr);
+    m.res[G_G] = g;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
-      g_fcn_(arg_, res_, iw_, w_, 0);
+      g_fcn_(m.arg, m.res, m.iw, m.w, 0);
     } catch(exception& ex) {
       // Fatal error
       userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
@@ -313,109 +328,114 @@ namespace casadi {
     }
 
     // Update stats
-    n_calc_g_ += 1;
-    t_calc_g_ += chrono::duration<double>(t_stop - t_start).count();
+    m.n_calc_g += 1;
+    m.t_calc_g += chrono::duration<double>(t_stop - t_start).count();
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_fg(const double* x, const double* p, double* f, double* g) {
-    fill_n(arg_, fg_fcn_.n_in(), nullptr);
-    arg_[0] = x;
-    arg_[1] = p;
-    fill_n(res_, fg_fcn_.n_out(), nullptr);
-    res_[0] = f;
-    res_[1] = g;
-    fg_fcn_(arg_, res_, iw_, w_, 0);
+  int Nlpsol::
+  calc_fg(NlpsolMemory& m, const double* x, const double* p, double* f, double* g) const {
+    fill_n(m.arg, fg_fcn_.n_in(), nullptr);
+    m.arg[0] = x;
+    m.arg[1] = p;
+    fill_n(m.res, fg_fcn_.n_out(), nullptr);
+    m.res[0] = f;
+    m.res[1] = g;
+    fg_fcn_(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_gf_jg(const double* x, const double* p, double* gf, double* jg) {
-    fill_n(arg_, gf_jg_fcn_.n_in(), nullptr);
-    arg_[0] = x;
-    arg_[1] = p;
-    fill_n(res_, gf_jg_fcn_.n_out(), nullptr);
-    res_[0] = gf;
-    res_[1] = jg;
-    gf_jg_fcn_(arg_, res_, iw_, w_, 0);
+  int Nlpsol::
+  calc_gf_jg(NlpsolMemory& m, const double* x, const double* p, double* gf, double* jg) const {
+    fill_n(m.arg, gf_jg_fcn_.n_in(), nullptr);
+    m.arg[0] = x;
+    m.arg[1] = p;
+    fill_n(m.res, gf_jg_fcn_.n_out(), nullptr);
+    m.res[0] = gf;
+    m.res[1] = jg;
+    gf_jg_fcn_(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_grad_f(const double* x, const double* p, double* f, double* grad_f) {
+  int Nlpsol::calc_grad_f(NlpsolMemory& m, const double* x,
+                          const double* p, double* f, double* grad_f) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(grad_f!=0);
 
-    fill_n(arg_, grad_f_fcn_.n_in(), nullptr);
-    arg_[0] = x;
-    arg_[1] = p;
-    fill_n(res_, grad_f_fcn_.n_out(), nullptr);
-    res_[0] = f;
-    res_[1] = grad_f;
-    grad_f_fcn_(arg_, res_, iw_, w_, 0);
+    fill_n(m.arg, grad_f_fcn_.n_in(), nullptr);
+    m.arg[0] = x;
+    m.arg[1] = p;
+    fill_n(m.res, grad_f_fcn_.n_out(), nullptr);
+    m.res[0] = f;
+    m.res[1] = grad_f;
+    grad_f_fcn_(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_jac_g(const double* x, const double* p, double* g, double* jac_g) {
+  int Nlpsol::calc_jac_g(NlpsolMemory& m, const double* x,
+                         const double* p, double* g, double* jac_g) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(jac_g!=0);
 
     // Evaluate User function
-    fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-    arg_[0] = x;
-    arg_[1] = p;
-    fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-    res_[0] = g;
-    res_[1] = jac_g;
-    jac_g_fcn_(arg_, res_, iw_, w_, 0);
+    fill_n(m.arg, jac_g_fcn_.n_in(), nullptr);
+    m.arg[0] = x;
+    m.arg[1] = p;
+    fill_n(m.res, jac_g_fcn_.n_out(), nullptr);
+    m.res[0] = g;
+    m.res[1] = jac_g;
+    jac_g_fcn_(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_jac_f(const double* x, const double* p, double* f, double* jac_f) {
+  int Nlpsol::calc_jac_f(NlpsolMemory& m, const double* x,
+                         const double* p, double* f, double* jac_f) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(jac_f!=0);
 
     // Evaluate User function
-    fill_n(arg_, jac_f_fcn_.n_in(), nullptr);
-    arg_[0] = x;
-    arg_[1] = p;
-    fill_n(res_, jac_f_fcn_.n_out(), nullptr);
-    res_[0] = f;
-    res_[1] = jac_f;
-    jac_f_fcn_(arg_, res_, iw_, w_, 0);
+    fill_n(m.arg, jac_f_fcn_.n_in(), nullptr);
+    m.arg[0] = x;
+    m.arg[1] = p;
+    fill_n(m.res, jac_f_fcn_.n_out(), nullptr);
+    m.res[0] = f;
+    m.res[1] = jac_f;
+    jac_f_fcn_(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_hess_l(const double* x, const double* p,
+  int Nlpsol::calc_hess_l(NlpsolMemory& m, const double* x, const double* p,
                           const double* sigma, const double* lambda,
-                          double* hl) {
+                          double* hl) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
     // Evaluate User function
-    fill_n(arg_, hess_l_fcn_.n_in(), nullptr);
-    arg_[HL_X] = x;
-    arg_[HL_P] = p;
-    arg_[HL_LAM_F] = sigma;
-    arg_[HL_LAM_G] = lambda;
-    fill_n(res_, hess_l_fcn_.n_out(), nullptr);
-    res_[HL_HL] = hl;
+    fill_n(m.arg, hess_l_fcn_.n_in(), nullptr);
+    m.arg[HL_X] = x;
+    m.arg[HL_P] = p;
+    m.arg[HL_LAM_F] = sigma;
+    m.arg[HL_LAM_G] = lambda;
+    fill_n(m.res, hess_l_fcn_.n_out(), nullptr);
+    m.res[HL_HL] = hl;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
-      hess_l_fcn_(arg_, res_, iw_, w_, 0);
+      hess_l_fcn_(m.arg, m.res, m.iw, m.w, 0);
     } catch(exception& ex) {
       // Fatal error
       userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
@@ -430,8 +450,8 @@ namespace casadi {
     }
 
     // Update stats
-    n_calc_hess_l_ += 1;
-    t_calc_hess_l_ += chrono::duration<double>(t_stop - t_start).count();
+    m.n_calc_hess_l += 1;
+    m.t_calc_hess_l += chrono::duration<double>(t_stop - t_start).count();
 
     // Success
     return 0;

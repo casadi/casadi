@@ -59,6 +59,52 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  struct CASADI_NLPSOL_IPOPT_EXPORT IpoptMemory : public NlpsolMemory {
+    /** NOTE:
+     * To allow this header file to be free of IPOPT types
+     * (that are sometimes declared outside their scope!) and after
+     * experiencing problems with working with IPOPT classes without
+     * IPOPT smart pointers, we work with dynamically allocated IPOPT
+     * smart pointers in this interface, that are stored as void
+     * pointers in the interface.
+     *
+     */
+    void* userclass;
+    void* app;
+
+    // Timings for different parts of the main loop
+    DiffTime t_callback_fun;  // time spent in callback function
+    DiffTime t_callback_prepare; // time spent in callback preparation
+    DiffTime t_mainloop; // time spent in the main loop of the solver
+
+    // Current solution
+    double *xk, lam_fk, *lam_gk, *lam_xk;
+
+    // Current calculated quantities
+    double fk, *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
+
+    // Stats
+    std::vector<double> inf_pr, inf_du, mu, d_norm, regularization_size,
+      obj, alpha_pr, alpha_du;
+    std::vector<int> ls_trials;
+    const char* return_status;
+    int iter_count;
+
+    // Meta-data
+    std::map<std::string, std::vector<std::string> > var_string_md;
+    std::map<std::string, std::vector<int> > var_integer_md;
+    std::map<std::string, std::vector<double> > var_numeric_md;
+    std::map<std::string, std::vector<std::string> > con_string_md;
+    std::map<std::string, std::vector<int> > con_integer_md;
+    std::map<std::string, std::vector<double> > con_numeric_md;
+
+    /// Constructor
+    IpoptMemory();
+
+    /// Destructor
+    virtual ~IpoptMemory();
+  };
+
   /** \brief \pluginbrief{Nlpsol,ipopt}
 
       @copydoc Nlpsol_doc
@@ -82,11 +128,18 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
-    // Reset the solver
-    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new IpoptMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(void* mem);
+    virtual void solve(Memory& mem) const;
 
     /// Set default options for a given recipe
     virtual void setDefaultOptions(const std::vector<std::string>& recipes);
@@ -94,64 +147,34 @@ namespace casadi {
     /// Exact Hessian?
     bool exact_hessian_;
 
-    /** NOTE:
-     * To allow this header file to be free of IPOPT types
-     * (that are sometimes declared outside their scope!) and after
-     * experiencing problems with working with IPOPT classes without
-     * IPOPT smart pointers, we work with dynamically allocated IPOPT
-     * smart pointers in this interface, that are stored as void
-     * pointers in the interface.
-     *
-     */
-    void *userclass_;
-    void* app_;
-
     /// All IPOPT options
     std::map<std::string, TypeID> ops_;
 
     // Ipopt callback functions
-    void finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g,
-                           const double* lambda, double obj_value, int iter_count);
-    bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l, double* g_u);
-    bool get_starting_point(int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U,
-                            int m, bool init_lambda, double* lambda);
-    void get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag);
-    int get_number_of_nonlinear_variables();
-    bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars);
-    bool intermediate_callback(const double* x, const double* z_L, const double* z_U,
-                               const double* g,
+    void finalize_solution(IpoptMemory& m, const double* x, const double* z_L, const double* z_U,
+                           const double* g, const double* lambda, double obj_value,
+                           int iter_count) const;
+    bool get_bounds_info(IpoptMemory& m, double* x_l, double* x_u,
+                         double* g_l, double* g_u) const;
+    bool get_starting_point(IpoptMemory& m, bool init_x, double* x,
+                            bool init_z, double* z_L, double* z_U,
+                            bool init_lambda, double* lambda) const;
+    void get_nlp_info(IpoptMemory& m, int& nx, int& ng,
+                      int& nnz_jac_g, int& nnz_h_lag) const;
+    int get_number_of_nonlinear_variables() const;
+    bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const;
+    bool intermediate_callback(IpoptMemory& m, const double* x, const double* z_L,
+                               const double* z_U, const double* g,
                                const double* lambda, double obj_value, int iter,
                                double inf_pr, double inf_du, double mu, double d_norm,
                                double regularization_size, double alpha_du, double alpha_pr,
-                               int ls_trials, bool full_callback);
-    bool get_var_con_metadata(int n,
-                              std::map<std::string, std::vector<std::string> >& var_string_md,
+                               int ls_trials, bool full_callback) const;
+    bool get_var_con_metadata(std::map<std::string, std::vector<std::string> >& var_string_md,
                               std::map<std::string, std::vector<int> >& var_integer_md,
                               std::map<std::string, std::vector<double> >& var_numeric_md,
-                              int m,
                               std::map<std::string, std::vector<std::string> >& con_string_md,
                               std::map<std::string, std::vector<int> >& con_integer_md,
-                              std::map<std::string, std::vector<double> >& con_numeric_md);
-
-    void finalize_metadata(int n,
-                           const std::map<std::string, std::vector<std::string> >& var_string_md,
-                           const std::map<std::string, std::vector<int> >& var_integer_md,
-                           const std::map<std::string, std::vector<double> >& var_numeric_md,
-                           int m,
-                           const std::map<std::string, std::vector<std::string> >& con_string_md,
-                           const std::map<std::string, std::vector<int> >& con_integer_md,
-                           const std::map<std::string, std::vector<double> >& con_numeric_md);
-
-    // Timings for different parts of the main loop
-    DiffTime t_callback_fun_;  // time spent in callback function
-    DiffTime t_callback_prepare_; // time spent in callback preparation
-    DiffTime t_mainloop_; // time spent in the main loop of the solver
-
-    // Current solution
-    double *xk_, lam_fk_, *lam_gk_, *lam_xk_;
-
-    // Current calculated quantities
-    double fk_, *gk_, *grad_fk_, *jac_gk_, *hess_lk_, *grad_lk_;
+                              std::map<std::string, std::vector<double> >& con_numeric_md) const;
 
     /// A documentation string
     static const std::string meta_doc;

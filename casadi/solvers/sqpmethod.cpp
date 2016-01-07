@@ -233,95 +233,90 @@ namespace casadi {
     alloc_w(Asp_.nnz(), true); // Jk_
   }
 
-  void Sqpmethod::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
-    // Reset the base classes
-    Nlpsol::reset(mem, arg, res, iw, w);
+  void Sqpmethod::set_work(Memory& mem, const double**& arg, double**& res,
+                                int*& iw, double*& w) const {
+    SqpmethodMemory& m = dynamic_cast<SqpmethodMemory&>(mem);
+
+    // Set work in base classes
+    Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Lagrange multipliers of the NLP
-    mu_ = w; w += ng_;
-    mu_x_ = w; w += nx_;
+    m.mu = w; w += ng_;
+    m.mu_x = w; w += nx_;
 
     // Current linearization point
-    xk_ = w; w += nx_;
-    x_cand_ = w; w += nx_;
-    x_old_ = w; w += nx_;
+    m.xk = w; w += nx_;
+    m.x_cand = w; w += nx_;
+    m.x_old = w; w += nx_;
 
     // Lagrange gradient in the next iterate
-    gLag_ = w; w += nx_;
-    gLag_old_ = w; w += nx_;
+    m.gLag = w; w += nx_;
+    m.gLag_old = w; w += nx_;
 
     // Constraint function value
-    gk_ = w; w += ng_;
-    gk_cand_ = w; w += ng_;
+    m.gk = w; w += ng_;
+    m.gk_cand = w; w += ng_;
 
     // Gradient of the objective
-    gf_ = w; w += nx_;
+    m.gf = w; w += nx_;
 
     // Bounds of the QP
-    qp_LBA_ = w; w += ng_;
-    qp_UBA_ = w; w += ng_;
-    qp_LBX_ = w; w += nx_;
-    qp_UBX_ = w; w += nx_;
+    m.qp_LBA = w; w += ng_;
+    m.qp_UBA = w; w += ng_;
+    m.qp_LBX = w; w += nx_;
+    m.qp_UBX = w; w += nx_;
 
     // QP solution
-    dx_ = w; w += nx_;
-    qp_DUAL_X_ = w; w += nx_;
-    qp_DUAL_A_ = w; w += ng_;
+    m.dx = w; w += nx_;
+    m.qp_DUAL_X = w; w += nx_;
+    m.qp_DUAL_A = w; w += ng_;
 
     // Hessian approximation
-    Bk_ = w; w += Hsp_.nnz();
+    m.Bk = w; w += Hsp_.nnz();
 
     // Jacobian
-    Jk_ = w; w += Asp_.nnz();
+    m.Jk = w; w += Asp_.nnz();
   }
 
-  void Sqpmethod::solve(void* mem) {
+  void Sqpmethod::solve(Memory& mem) const {
+    SqpmethodMemory& m = dynamic_cast<SqpmethodMemory&>(mem);
+
     // Check the provided inputs
     checkInputs(mem);
 
-    if (gather_stats_) {
-      Dict iterations;
-      iterations["inf_pr"] = std::vector<double>();
-      iterations["inf_du"] = std::vector<double>();
-      iterations["ls_trials"] = std::vector<double>();
-      iterations["d_norm"] = std::vector<double>();
-      iterations["obj"] = std::vector<double>();
-      stats_["iterations"] = iterations;
-    }
-
     // Set linearization point to initial guess
-    copy(x0_, x0_ + nx_, xk_);
+    casadi_copy(m.x0, nx_, m.xk);
 
     // Initialize Lagrange multipliers of the NLP
-    copy(lam_g0_, lam_g0_ + ng_, mu_);
-    copy(lam_x0_, lam_x0_ + nx_, mu_x_);
+    casadi_copy(m.lam_g0, ng_, m.mu);
+    casadi_copy(m.lam_x0, nx_, m.mu_x);
 
-    t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ =
-      t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+    m.t_eval_f = m.t_eval_grad_f = m.t_eval_g = m.t_eval_jac_g = m.t_eval_h =
+      m.t_callback_fun = m.t_callback_prepare = m.t_mainloop = 0;
 
-    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
+    m.n_eval_f = m.n_eval_grad_f = m.n_eval_g = m.n_eval_jac_g = m.n_eval_h = 0;
 
     double time1 = clock();
 
     // Initial constraint Jacobian
-    eval_jac_g(xk_, gk_, Jk_);
+    eval_jac_g(m, m.xk, m.gk, m.Jk);
 
     // Initial objective gradient
-    eval_grad_f(xk_, &fk_, gf_);
+    eval_grad_f(m, m.xk, &m.fk, m.gf);
 
     // Initialize or reset the Hessian or Hessian approximation
-    reg_ = 0;
+    m.reg = 0;
     if (exact_hessian_) {
-      eval_h(xk_, mu_, 1.0, Bk_);
+      eval_h(m, m.xk, m.mu, 1.0, m.Bk);
     } else {
-      reset_h();
+      reset_h(m);
     }
 
     // Evaluate the initial gradient of the Lagrangian
-    copy(gf_, gf_+nx_, gLag_);
-    if (ng_>0) casadi_mv(Jk_, Asp_, mu_, gLag_, true);
+    casadi_copy(m.gf, nx_, m.gLag);
+    if (ng_>0) casadi_mv(m.Jk, Asp_, m.mu, m.gLag, true);
     // gLag += mu_x_;
-    transform(gLag_, gLag_+nx_, mu_x_, gLag_, plus<double>());
+    transform(m.gLag, m.gLag+nx_, m.mu_x, m.gLag, plus<double>());
 
     // Number of SQP iterations
     int iter = 0;
@@ -333,8 +328,8 @@ namespace casadi {
     bool ls_success = true;
 
     // Reset
-    merit_mem_.clear();
-    sigma_ = 0.;    // NOTE: Move this into the main optimization loop
+    m.merit_mem.clear();
+    m.sigma = 0.;    // NOTE: Move this into the main optimization loop
 
     // Default stepsize
     double t = 0;
@@ -343,85 +338,47 @@ namespace casadi {
     while (true) {
 
       // Primal infeasability
-      double pr_inf = primalInfeasibility(xk_, lbx_, ubx_, gk_, lbg_, ubg_);
+      double pr_inf = primalInfeasibility(m.xk, m.lbx, m.ubx, m.gk, m.lbg, m.ubg);
 
       // inf-norm of lagrange gradient
-      double gLag_norminf = casadi_norm_inf(nx_, gLag_);
+      double gLag_norminf = casadi_norm_inf(nx_, m.gLag);
 
       // inf-norm of step
-      double dx_norminf = casadi_norm_inf(nx_, dx_);
+      double dx_norminf = casadi_norm_inf(nx_, m.dx);
 
       // Print header occasionally
       if (iter % 10 == 0) printIteration(userOut());
 
       // Printing information about the actual iterate
-      printIteration(userOut(), iter, fk_, pr_inf, gLag_norminf, dx_norminf,
-                     reg_, ls_iter, ls_success);
-
-      if (gather_stats_) {
-        Dict iterations = stats_["iterations"];
-        std::vector<double> tmp=iterations["inf_pr"];
-        tmp.push_back(pr_inf);
-        iterations["inf_pr"] = tmp;
-
-        tmp=iterations["inf_du"];
-        tmp.push_back(gLag_norminf);
-        iterations["inf_du"] = tmp;
-
-        tmp=iterations["d_norm"];
-        tmp.push_back(dx_norminf);
-        iterations["d_norm"] = tmp;
-
-        std::vector<int> tmp2=iterations["ls_trials"];
-        tmp2.push_back(ls_iter);
-        iterations["ls_trials"] = tmp2;
-
-        tmp=iterations["obj"];
-        tmp.push_back(fk_);
-        iterations["obj"] = tmp;
-
-        stats_["iterations"] = iterations;
-      }
+      printIteration(userOut(), iter, m.fk, pr_inf, gLag_norminf, dx_norminf,
+                     m.reg, ls_iter, ls_success);
 
       // Call callback function if present
       if (!fcallback_.isNull()) {
         double time1 = clock();
 
-        Dict iteration;
-        iteration["iter"] = iter;
-        iteration["inf_pr"] = pr_inf;
-        iteration["inf_du"] = gLag_norminf;
-        iteration["d_norm"] = dx_norminf;
-        iteration["ls_trials"] = ls_iter;
-        iteration["obj"] = fk_;
-        stats_["iteration"] = iteration;
-
-        double time2 = clock();
-        t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
-        time1 = clock();
-
         // Callback inputs
-        fill_n(arg_, fcallback_.n_in(), nullptr);
-        arg_[NLPSOL_F] = &fk_;
-        arg_[NLPSOL_X] = x_;
-        arg_[NLPSOL_LAM_G] = lam_g_;
-        arg_[NLPSOL_LAM_X] = lam_x_;
-        arg_[NLPSOL_G] = g_;
+        fill_n(m.arg, fcallback_.n_in(), nullptr);
+        m.arg[NLPSOL_F] = &m.fk;
+        m.arg[NLPSOL_X] = m.x;
+        m.arg[NLPSOL_LAM_G] = m.lam_g;
+        m.arg[NLPSOL_LAM_X] = m.lam_x;
+        m.arg[NLPSOL_G] = m.g;
 
         // Callback outputs
-        fill_n(res_, fcallback_.n_out(), nullptr);
+        fill_n(m.res, fcallback_.n_out(), nullptr);
         double ret;
-        arg_[0] = &ret;
+        m.arg[0] = &ret;
 
         // Evaluate
-        fcallback_(arg_, res_, iw_, w_, 0);
+        fcallback_(m.arg, m.res, m.iw, m.w, 0);
 
-        time2 = clock();
-        t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
+        double time2 = clock();
+        m.t_callback_fun += (time2-time1)/CLOCKS_PER_SEC;
         if (static_cast<int>(ret)) {
           userOut() << endl;
           userOut() << "casadi::SQPMethod: aborted by callback..." << endl;
-          stats_["return_status"] = "User_Requested_Stop";
+          m.return_status = "User_Requested_Stop";
           break;
         }
       }
@@ -431,14 +388,14 @@ namespace casadi {
         userOut() << endl;
         userOut() << "casadi::SQPMethod: Convergence achieved after "
                   << iter << " iterations." << endl;
-        stats_["return_status"] = "Solve_Succeeded";
+        m.return_status = "Solve_Succeeded";
         break;
       }
 
       if (iter >= max_iter_) {
         userOut() << endl;
         userOut() << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
-        stats_["return_status"] = "Maximum_Iterations_Exceeded";
+        m.return_status = "Maximum_Iterations_Exceeded";
         break;
       }
 
@@ -446,7 +403,7 @@ namespace casadi {
         userOut() << endl;
         userOut() << "casadi::SQPMethod: Search direction becomes too small without "
             "convergence criteria being met." << endl;
-        stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
+        m.return_status = "Search_Direction_Becomes_Too_Small";
         break;
       }
 
@@ -455,38 +412,38 @@ namespace casadi {
 
       log("Formulating QP");
       // Formulate the QP
-      transform(lbx_, lbx_ + nx_, xk_, qp_LBX_, minus<double>());
-      transform(ubx_, ubx_ + nx_, xk_, qp_UBX_, minus<double>());
-      transform(lbg_, lbg_ + ng_, gk_, qp_LBA_, minus<double>());
-      transform(ubg_, ubg_ + ng_, gk_, qp_UBA_, minus<double>());
+      transform(m.lbx, m.lbx + nx_, m.xk, m.qp_LBX, minus<double>());
+      transform(m.ubx, m.ubx + nx_, m.xk, m.qp_UBX, minus<double>());
+      transform(m.lbg, m.lbg + ng_, m.gk, m.qp_LBA, minus<double>());
+      transform(m.ubg, m.ubg + ng_, m.gk, m.qp_UBA, minus<double>());
 
       // Solve the QP
-      solve_QP(Bk_, gf_, qp_LBX_, qp_UBX_, Jk_, qp_LBA_,
-               qp_UBA_, dx_, qp_DUAL_X_, qp_DUAL_A_);
+      solve_QP(m, m.Bk, m.gf, m.qp_LBX, m.qp_UBX, m.Jk, m.qp_LBA,
+               m.qp_UBA, m.dx, m.qp_DUAL_X, m.qp_DUAL_A);
       log("QP solved");
 
       // Detecting indefiniteness
-      double gain = casadi_bilin(Bk_, Hsp_, dx_, dx_);
+      double gain = casadi_bilin(m.Bk, Hsp_, m.dx, m.dx);
       if (gain < 0) {
         casadi_warning("Indefinite Hessian detected...");
       }
 
       // Calculate penalty parameter of merit function
-      sigma_ = std::max(sigma_, 1.01*casadi_norm_inf(nx_, qp_DUAL_X_));
-      sigma_ = std::max(sigma_, 1.01*casadi_norm_inf(ng_, qp_DUAL_A_));
+      m.sigma = std::max(m.sigma, 1.01*casadi_norm_inf(nx_, m.qp_DUAL_X));
+      m.sigma = std::max(m.sigma, 1.01*casadi_norm_inf(ng_, m.qp_DUAL_A));
 
       // Calculate L1-merit function in the actual iterate
-      double l1_infeas = primalInfeasibility(xk_, lbx_, ubx_, gk_, lbg_, ubg_);
+      double l1_infeas = primalInfeasibility(m.xk, m.lbx, m.ubx, m.gk, m.lbg, m.ubg);
 
       // Right-hand side of Armijo condition
-      double F_sens = casadi_dot(nx_, dx_, gf_);
-      double L1dir = F_sens - sigma_ * l1_infeas;
-      double L1merit = fk_ + sigma_ * l1_infeas;
+      double F_sens = casadi_dot(nx_, m.dx, m.gf);
+      double L1dir = F_sens - m.sigma * l1_infeas;
+      double L1merit = m.fk + m.sigma * l1_infeas;
 
       // Storing the actual merit function value in a list
-      merit_mem_.push_back(L1merit);
-      if (merit_mem_.size() > merit_memsize_) {
-        merit_mem_.pop_front();
+      m.merit_mem.push_back(L1merit);
+      if (m.merit_mem.size() > merit_memsize_) {
+        m.merit_mem.pop_front();
       }
       // Stepsize
       t = 1.0;
@@ -504,12 +461,12 @@ namespace casadi {
 
         // Line-search loop
         while (true) {
-          for (int i=0; i<nx_; ++i) x_cand_[i] = xk_[i] + t * dx_[i];
+          for (int i=0; i<nx_; ++i) m.x_cand[i] = m.xk[i] + t * m.dx[i];
 
           try {
             // Evaluating objective and constraints
-            fk_cand = eval_f(x_cand_);
-            eval_g(x_cand_, gk_cand_);
+            fk_cand = eval_f(m, m.x_cand);
+            eval_g(m, m.x_cand, m.gk_cand);
           } catch(const CasadiException& ex) {
             // Silent ignore; line-search failed
             ls_iter++;
@@ -521,11 +478,11 @@ namespace casadi {
           ls_iter++;
 
           // Calculating merit-function in candidate
-          l1_infeas = primalInfeasibility(x_cand_, lbx_, ubx_, gk_cand_, lbg_, ubg_);
+          l1_infeas = primalInfeasibility(m.x_cand, m.lbx, m.ubx, m.gk_cand, m.lbg, m.ubg);
 
-          L1merit_cand = fk_cand + sigma_ * l1_infeas;
+          L1merit_cand = fk_cand + m.sigma * l1_infeas;
           // Calculating maximal merit function value so far
-          double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
+          double meritmax = *max_element(m.merit_mem.begin(), m.merit_mem.end());
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             // Accepting candidate
             log("Line-search completed, candidate accepted");
@@ -544,45 +501,44 @@ namespace casadi {
         }
 
         // Candidate accepted, update dual variables
-        for (int i=0; i<ng_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
-        for (int i=0; i<nx_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
+        for (int i=0; i<ng_; ++i) m.mu[i] = t * m.qp_DUAL_A[i] + (1 - t) * m.mu[i];
+        for (int i=0; i<nx_; ++i) m.mu_x[i] = t * m.qp_DUAL_X[i] + (1 - t) * m.mu_x[i];
 
         // Candidate accepted, update the primal variable
-        copy(xk_, xk_+nx_, x_old_);
-        copy(x_cand_, x_cand_+nx_, xk_);
+        casadi_copy(m.xk, nx_, m.x_old);
+        casadi_copy(m.x_cand, nx_, m.xk);
 
       } else {
         // Full step
-        copy_n(qp_DUAL_A_, ng_, mu_);
-        copy_n(qp_DUAL_X_, nx_, mu_x_);
-
-        copy(xk_, xk_+nx_, x_old_);
+        casadi_copy(m.qp_DUAL_A, ng_, m.mu);
+        casadi_copy(m.qp_DUAL_X, nx_, m.mu_x);
+        casadi_copy(m.xk, nx_, m.x_old);
         // x+=dx
-        transform(xk_, xk_+nx_, dx_, xk_, plus<double>());
+        transform(m.xk, m.xk+nx_, m.dx, m.xk, plus<double>());
       }
 
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
-        copy(gf_, gf_+nx_, gLag_old_);
-        if (ng_>0) casadi_mv(Jk_, Asp_, mu_, gLag_old_, true);
+        casadi_copy(m.gf, nx_, m.gLag_old);
+        if (ng_>0) casadi_mv(m.Jk, Asp_, m.mu, m.gLag_old, true);
         // gLag_old += mu_x_;
-        transform(gLag_old_, gLag_old_+nx_, mu_x_, gLag_old_, plus<double>());
+        transform(m.gLag_old, m.gLag_old+nx_, m.mu_x, m.gLag_old, plus<double>());
       }
 
       // Evaluate the constraint Jacobian
       log("Evaluating jac_g");
-      eval_jac_g(xk_, gk_, Jk_);
+      eval_jac_g(m, m.xk, m.gk, m.Jk);
 
       // Evaluate the gradient of the objective function
       log("Evaluating grad_f");
-      eval_grad_f(xk_, &fk_, gf_);
+      eval_grad_f(m, m.xk, &m.fk, m.gf);
 
       // Evaluate the gradient of the Lagrangian with the new x and new mu
-      copy(gf_, gf_+nx_, gLag_);
-      if (ng_>0) casadi_mv(Jk_, Asp_, mu_, gLag_, true);
+      casadi_copy(m.gf, nx_, m.gLag);
+      if (ng_>0) casadi_mv(m.Jk, Asp_, m.mu, m.gLag, true);
 
       // gLag += mu_x_;
-      transform(gLag_, gLag_+nx_, mu_x_, gLag_, plus<double>());
+      transform(m.gLag, m.gLag+nx_, m.mu_x, m.gLag, plus<double>());
 
       // Updating Lagrange Hessian
       if (!exact_hessian_) {
@@ -596,90 +552,73 @@ namespace casadi {
           for (int cc=0; cc<ncol; ++cc) {     // Loop over the columns of the Hessian
             for (int el=colind[cc]; el<colind[cc+1]; ++el) {
               // Loop over the nonzero elements of the column
-              if (cc!=row[el]) Bk_[el] = 0;               // Remove if off-diagonal entries
+              if (cc!=row[el]) m.Bk[el] = 0;               // Remove if off-diagonal entries
             }
           }
         }
 
         // Update the Hessian approximation
-        fill_n(arg_, bfgs_.n_in(), nullptr);
-        arg_[BFGS_BK] = Bk_;
-        arg_[BFGS_X] = xk_;
-        arg_[BFGS_X_OLD] = x_old_;
-        arg_[BFGS_GLAG] = gLag_;
-        arg_[BFGS_GLAG_OLD] = gLag_old_;
-        fill_n(res_, bfgs_.n_out(), nullptr);
-        res_[0] = Bk_;
-        bfgs_(arg_, res_, iw_, w_, 0);
+        fill_n(m.arg, bfgs_.n_in(), nullptr);
+        m.arg[BFGS_BK] = m.Bk;
+        m.arg[BFGS_X] = m.xk;
+        m.arg[BFGS_X_OLD] = m.x_old;
+        m.arg[BFGS_GLAG] = m.gLag;
+        m.arg[BFGS_GLAG_OLD] = m.gLag_old;
+        fill_n(m.res, bfgs_.n_out(), nullptr);
+        m.res[0] = m.Bk;
+        bfgs_(m.arg, m.res, m.iw, m.w, 0);
 
       } else {
         // Exact Hessian
         log("Evaluating hessian");
-        eval_h(xk_, mu_, 1.0, Bk_);
+        eval_h(m, m.xk, m.mu, 1.0, m.Bk);
       }
     }
 
     double time2 = clock();
-    t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
+    m.t_mainloop = (time2-time1)/CLOCKS_PER_SEC;
 
     // Save results to outputs
-    if (f_) *f_ = fk_;
-    if (x_) copy_n(xk_, nx_, x_);
-    if (lam_g_) copy_n(mu_, ng_, lam_g_);
-    if (lam_x_) copy_n(mu_x_, nx_, lam_x_);
-    if (g_) copy_n(gk_, ng_, g_);
+    if (m.f) *m.f = m.fk;
+    if (m.x) casadi_copy(m.xk, nx_, m.x);
+    if (m.lam_g) casadi_copy(m.mu, ng_, m.lam_g);
+    if (m.lam_x) casadi_copy(m.mu_x, nx_, m.lam_x);
+    if (m.g) casadi_copy(m.gk, ng_, m.g);
 
     if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
       // Write timings
-      userOut() << "time spent in eval_f: " << t_eval_f_ << " s.";
-      if (n_eval_f_>0)
-        userOut() << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000
+      userOut() << "time spent in eval_f: " << m.t_eval_f << " s.";
+      if (m.n_eval_f>0)
+        userOut() << " (" << m.n_eval_f << " calls, " << (m.t_eval_f/m.n_eval_f)*1000
                   << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
-      if (n_eval_grad_f_>0)
-        userOut() << " (" << n_eval_grad_f_ << " calls, "
-             << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
+      userOut() << "time spent in eval_grad_f: " << m.t_eval_grad_f << " s.";
+      if (m.n_eval_grad_f>0)
+        userOut() << " (" << m.n_eval_grad_f << " calls, "
+             << (m.t_eval_grad_f/m.n_eval_grad_f)*1000 << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in eval_g: " << t_eval_g_ << " s.";
-      if (n_eval_g_>0)
-        userOut() << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000
+      userOut() << "time spent in eval_g: " << m.t_eval_g << " s.";
+      if (m.n_eval_g>0)
+        userOut() << " (" << m.n_eval_g << " calls, " << (m.t_eval_g/m.n_eval_g)*1000
                   << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
-      if (n_eval_jac_g_>0)
-        userOut() << " (" << n_eval_jac_g_ << " calls, "
-             << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
+      userOut() << "time spent in eval_jac_g: " << m.t_eval_jac_g << " s.";
+      if (m.n_eval_jac_g>0)
+        userOut() << " (" << m.n_eval_jac_g << " calls, "
+             << (m.t_eval_jac_g/m.n_eval_jac_g)*1000 << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in eval_h: " << t_eval_h_ << " s.";
-      if (n_eval_h_>1)
-        userOut() << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000
+      userOut() << "time spent in eval_h: " << m.t_eval_h << " s.";
+      if (m.n_eval_h>1)
+        userOut() << " (" << m.n_eval_h << " calls, " << (m.t_eval_h/m.n_eval_h)*1000
                   << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in main loop: " << t_mainloop_ << " s." << endl;
-      userOut() << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
-      userOut() << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+      userOut() << "time spent in main loop: " << m.t_mainloop << " s." << endl;
+      userOut() << "time spent in callback function: " << m.t_callback_fun << " s." << endl;
+      userOut() << "time spent in callback preparation: " << m.t_callback_prepare << " s." << endl;
     }
-
-    // Save statistics
-    stats_["iter_count"] = iter;
-
-    stats_["t_eval_f"] = t_eval_f_;
-    stats_["t_eval_grad_f"] = t_eval_grad_f_;
-    stats_["t_eval_g"] = t_eval_g_;
-    stats_["t_eval_jac_g"] = t_eval_jac_g_;
-    stats_["t_eval_h"] = t_eval_h_;
-    stats_["t_mainloop"] = t_mainloop_;
-    stats_["t_callback_fun"] = t_callback_fun_;
-    stats_["t_callback_prepare"] = t_callback_prepare_;
-    stats_["n_eval_f"] = n_eval_f_;
-    stats_["n_eval_grad_f"] = n_eval_grad_f_;
-    stats_["n_eval_g"] = n_eval_g_;
-    stats_["n_eval_jac_g"] = n_eval_jac_g_;
-    stats_["n_eval_h"] = n_eval_h_;
   }
 
-  void Sqpmethod::printIteration(std::ostream &stream) {
+  void Sqpmethod::printIteration(std::ostream &stream) const {
     stream << setw(4)  << "iter";
     stream << setw(15) << "objective";
     stream << setw(10) << "inf_pr";
@@ -692,8 +631,8 @@ namespace casadi {
   }
 
   void Sqpmethod::printIteration(std::ostream &stream, int iter, double obj,
-                                   double pr_inf, double du_inf,
-                                   double dx_norm, double rg, int ls_trials, bool ls_success) {
+                                 double pr_inf, double du_inf,
+                                 double dx_norm, double rg, int ls_trials, bool ls_success) const {
     stream << setw(4) << iter;
     stream << scientific;
     stream << setw(15) << setprecision(6) << obj;
@@ -711,14 +650,14 @@ namespace casadi {
     stream << endl;
   }
 
-  void Sqpmethod::reset_h() {
+  void Sqpmethod::reset_h(SqpmethodMemory& m) const {
     // Initial Hessian approximation of BFGS
     if (!exact_hessian_) {
-      copy_n(B_init_.ptr(), Hsp_.nnz(), Bk_);
+      copy_n(B_init_.ptr(), Hsp_.nnz(), m.Bk);
     }
   }
 
-  double Sqpmethod::getRegularization(const double* H) {
+  double Sqpmethod::getRegularization(const double* H) const {
     const int* colind = Hsp_.colind();
     int ncol = Hsp_.size2();
     const int* row = Hsp_.row();
@@ -738,7 +677,7 @@ namespace casadi {
     return -reg_param;
   }
 
-  void Sqpmethod::regularize(double* H, double reg) {
+  void Sqpmethod::regularize(double* H, double reg) const {
     const int* colind = Hsp_.colind();
     int ncol = Hsp_.size2();
     const int* row = Hsp_.row();
@@ -754,15 +693,16 @@ namespace casadi {
   }
 
 
-  void Sqpmethod::eval_h(const double* x, const double* lambda, double sigma, double* H) {
+  void Sqpmethod::eval_h(SqpmethodMemory& m, const double* x, const double* lambda,
+                         double sigma, double* H) const {
     try {
-      calc_hess_l(x, p_, &sigma, lambda, H);
+      calc_hess_l(m, x, m.p, &sigma, lambda, H);
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
-        reg_ = getRegularization(H);
-        if (reg_ > 0) {
-          regularize(H, reg_);
+        m.reg = getRegularization(H);
+        if (m.reg > 0) {
+          regularize(H, m.reg);
         }
       }
 
@@ -772,7 +712,7 @@ namespace casadi {
     }
   }
 
-  void Sqpmethod::eval_g(const double* x, double* g) {
+  void Sqpmethod::eval_g(SqpmethodMemory& m, const double* x, double* g) const {
     try {
       double time1 = clock();
 
@@ -780,18 +720,18 @@ namespace casadi {
       if (ng_==0) return;
 
       // Evaluate the function
-      calc_g(x, p_, g);
+      calc_g(m, x, m.p, g);
 
       double time2 = clock();
-      t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_g_ += 1;
+      m.t_eval_g += (time2-time1)/CLOCKS_PER_SEC;
+      m.n_eval_g += 1;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
       throw;
     }
   }
 
-  void Sqpmethod::eval_jac_g(const double* x, double* g, double* J) {
+  void Sqpmethod::eval_jac_g(SqpmethodMemory& m, const double* x, double* g, double* J) const {
     try {
       double time1 = clock();
 
@@ -799,11 +739,11 @@ namespace casadi {
       if (ng_==0) return;
 
       // Evaluate the function
-      calc_jac_g(x, p_, g, J);
+      calc_jac_g(m, x, m.p, g, J);
 
       double time2 = clock();
-      t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_jac_g_ += 1;
+      m.t_eval_jac_g += (time2-time1)/CLOCKS_PER_SEC;
+      m.n_eval_jac_g += 1;
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
@@ -811,16 +751,17 @@ namespace casadi {
     }
   }
 
-  void Sqpmethod::eval_grad_f(const double* x, double* f, double* grad_f) {
+  void Sqpmethod::eval_grad_f(SqpmethodMemory& m, const double* x,
+                              double* f, double* grad_f) const {
     try {
       double time1 = clock();
 
       // Evaluate the function
-      calc_grad_f(x, p_, f, grad_f);
+      calc_grad_f(m, x, m.p, f, grad_f);
 
       double time2 = clock();
-      t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_grad_f_ += 1;
+      m.t_eval_grad_f += (time2-time1)/CLOCKS_PER_SEC;
+      m.n_eval_grad_f += 1;
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
@@ -828,18 +769,18 @@ namespace casadi {
     }
   }
 
-  double Sqpmethod::eval_f(const double* x) {
+  double Sqpmethod::eval_f(SqpmethodMemory& m, const double* x) const {
     try {
        // Log time
       double time1 = clock();
 
       // Evaluate the function
       double f;
-      calc_f(x, p_, &f);
+      calc_f(m, x, m.p, &f);
 
       double time2 = clock();
-      t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
-      n_eval_f_ += 1;
+      m.t_eval_f += (time2-time1)/CLOCKS_PER_SEC;
+      m.n_eval_f += 1;
 
       return f;
     } catch(exception& ex) {
@@ -848,32 +789,34 @@ namespace casadi {
     }
   }
 
-  void Sqpmethod::solve_QP(const double* H, const double* g, const double* lbx, const double* ubx,
+  void Sqpmethod::solve_QP(SqpmethodMemory& m, const double* H, const double* g,
+                           const double* lbx, const double* ubx,
                            const double* A, const double* lbA, const double* ubA,
-                           double* x_opt, double* lambda_x_opt, double* lambda_A_opt) {
+                           double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const {
     // Inputs
-    fill_n(arg_, qpsol_.n_in(), nullptr);
-    arg_[QPSOL_H] = H;
-    arg_[QPSOL_G] = g;
-    arg_[QPSOL_X0] = x_opt;
-    arg_[QPSOL_LBX] = lbx;
-    arg_[QPSOL_UBX] = ubx;
-    arg_[QPSOL_A] = A;
-    arg_[QPSOL_LBA] = lbA;
-    arg_[QPSOL_UBA] = ubA;
+    fill_n(m.arg, qpsol_.n_in(), nullptr);
+    m.arg[QPSOL_H] = H;
+    m.arg[QPSOL_G] = g;
+    m.arg[QPSOL_X0] = x_opt;
+    m.arg[QPSOL_LBX] = lbx;
+    m.arg[QPSOL_UBX] = ubx;
+    m.arg[QPSOL_A] = A;
+    m.arg[QPSOL_LBA] = lbA;
+    m.arg[QPSOL_UBA] = ubA;
 
     // Outputs
-    fill_n(res_, qpsol_.n_out(), nullptr);
-    res_[QPSOL_X] = x_opt;
-    res_[QPSOL_LAM_X] = lambda_x_opt;
-    res_[QPSOL_LAM_A] = lambda_A_opt;
+    fill_n(m.res, qpsol_.n_out(), nullptr);
+    m.res[QPSOL_X] = x_opt;
+    m.res[QPSOL_LAM_X] = lambda_x_opt;
+    m.res[QPSOL_LAM_A] = lambda_A_opt;
 
     // Solve the QP
-    qpsol_(arg_, res_, iw_, w_, 0);
+    qpsol_(m.arg, m.res, m.iw, m.w, 0);
   }
 
-  double Sqpmethod::primalInfeasibility(const double* x, const double* lbx, const double* ubx,
-                                        const double* g, const double* lbg, const double* ubg) {
+  double Sqpmethod::
+  primalInfeasibility(const double* x, const double* lbx, const double* ubx,
+                      const double* g, const double* lbg, const double* ubg) const {
     // Linf-norm of the primal infeasibility
     double pr_inf = 0;
 

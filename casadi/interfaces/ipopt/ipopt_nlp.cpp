@@ -29,10 +29,10 @@
 
 namespace casadi {
 
-  IpoptUserClass::IpoptUserClass(IpoptInterface* solver) {
-    this->solver = solver;
-    n_ = solver->nx_;
-    m_ = solver->ng_;
+  IpoptUserClass::IpoptUserClass(const IpoptInterface& solver, IpoptMemory& mem)
+    : solver_(solver), mem_(mem) {
+    n_ = solver_.nx_;
+    m_ = solver_.ng_;
 
 #ifdef WITH_IPOPT_CALLBACK
     x_ = new double[n_];
@@ -52,13 +52,12 @@ namespace casadi {
     if (z_L_) delete [] z_L_;
     if (lambda_) delete [] lambda_;
 #endif // WITH_IPOPT_CALLBACK
-
   }
 
   // returns the size of the problem
   bool IpoptUserClass::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g,
                                     Index& nnz_h_lag, IndexStyleEnum& index_style) {
-    solver->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag);
+    solver_.get_nlp_info(mem_, n, m, nnz_jac_g, nnz_h_lag);
 
     // use the C style indexing (0-based)
     index_style = TNLP::C_STYLE;
@@ -69,7 +68,9 @@ namespace casadi {
   // returns the variable bounds
   bool IpoptUserClass::get_bounds_info(Index n, Number* x_l, Number* x_u,
                                        Index m, Number* g_l, Number* g_u) {
-    return solver->get_bounds_info(n, x_l, x_u, m, g_l, g_u);
+    casadi_assert(n==solver_.nx_);
+    casadi_assert(m==solver_.ng_);
+    return solver_.get_bounds_info(mem_, x_l, x_u, g_l, g_u);
   }
 
   // returns the initial point for the problem
@@ -77,22 +78,24 @@ namespace casadi {
                                           bool init_z, Number* z_L, Number* z_U,
                                           Index m, bool init_lambda,
                                           Number* lambda) {
-    return solver->get_starting_point(n, init_x, x, init_z, z_L, z_U, m, init_lambda, lambda);
+    casadi_assert(n==solver_.nx_);
+    casadi_assert(m==solver_.ng_);
+    return solver_.get_starting_point(mem_, init_x, x, init_z, z_L, z_U, init_lambda, lambda);
   }
 
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
-    return solver->calc_f(x, solver->p_, &obj_value)==0;
+    return solver_.calc_f(mem_, x, mem_.p, &obj_value)==0;
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
   bool IpoptUserClass::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f) {
-    return solver->calc_grad_f(x, solver->p_, 0, grad_f)==0;
+    return solver_.calc_grad_f(mem_, x, mem_.p, 0, grad_f)==0;
   }
 
   // return the value of the constraints: g(x)
   bool IpoptUserClass::eval_g(Index n, const Number* x, bool new_x, Index m, Number* g) {
-    return solver->calc_g(x, solver->p_, g)==0;
+    return solver_.calc_g(mem_, x, mem_.p, g)==0;
   }
 
   // return the structure or values of the jacobian
@@ -101,12 +104,12 @@ namespace casadi {
                                   Number* values) {
     if (values) {
       // Evaluate Jacobian
-      return solver->calc_jac_g(x, solver->p_, 0, values)==0;
+      return solver_.calc_jac_g(mem_, x, mem_.p, 0, values)==0;
     } else {
       // Get the sparsity pattern
-      int ncol = solver->jacg_sp_.size2();
-      const int* colind = solver->jacg_sp_.colind();
-      const int* row = solver->jacg_sp_.row();
+      int ncol = solver_.jacg_sp_.size2();
+      const int* colind = solver_.jacg_sp_.colind();
+      const int* row = solver_.jacg_sp_.row();
       if (nele_jac!=colind[ncol]) return false; // consistency check
 
       // Pass to IPOPT
@@ -127,13 +130,13 @@ namespace casadi {
                               Index* jCol, Number* values) {
     if (values) {
       // Evaluate Hessian
-      if (solver->calc_hess_l(x, solver->p_, &obj_factor, lambda, values)) return false;
+      if (solver_.calc_hess_l(mem_, x, mem_.p, &obj_factor, lambda, values)) return false;
       return true;
     } else {
       // Get the sparsity pattern
-      int ncol = solver->hesslag_sp_.size2();
-      const int* colind = solver->hesslag_sp_.colind();
-      const int* row = solver->hesslag_sp_.row();
+      int ncol = solver_.hesslag_sp_.size2();
+      const int* colind = solver_.hesslag_sp_.colind();
+      const int* row = solver_.hesslag_sp_.row();
 
       // Pass to IPOPT
       for (int cc=0; cc<ncol; ++cc) {
@@ -153,7 +156,8 @@ namespace casadi {
                                          Number obj_value,
                                          const IpoptData* ip_data,
                                          IpoptCalculatedQuantities* ip_cq) {
-    solver->finalize_solution(x, z_L, z_U, g, lambda, obj_value, ip_data? ip_data->iter_count(): 0);
+    solver_.finalize_solution(mem_, x, z_L, z_U, g, lambda, obj_value,
+                              ip_data? ip_data->iter_count(): 0);
   }
 
 
@@ -167,7 +171,7 @@ namespace casadi {
                                              IpoptCalculatedQuantities* ip_cq) {
 
     // Only do the callback every few iterations
-    if (iter % solver->callback_step_!=0) return true;
+    if (iter % solver_.callback_step_!=0) return true;
 
     /// Code copied from TNLPAdapter::FinalizeSolution
     /// See also: http://list.coin-or.org/pipermail/ipopt/2010-July/002078.html
@@ -229,26 +233,22 @@ namespace casadi {
       }
     }
     DiffTime diff = diffTimers(getTimerTime(), time0);
-    timerPlusEq(solver->t_callback_prepare_, diff);
+    timerPlusEq(solver_.t_callback_prepare_, diff);
     full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 
-    return solver->intermediate_callback(x_, z_L_, z_U_, g_, lambda_, obj_value, iter,
+    return solver_.intermediate_callback(mem_, x_, z_L_, z_U_, g_, lambda_, obj_value, iter,
                                          inf_pr, inf_du, mu, d_norm, regularization_size,
                                          alpha_du, alpha_pr, ls_trials, full_callback);
-
-
   }
 
-
-
   Index IpoptUserClass::get_number_of_nonlinear_variables() {
-    return solver->get_number_of_nonlinear_variables();
+    return solver_.get_number_of_nonlinear_variables();
   }
 
   bool IpoptUserClass::get_list_of_nonlinear_variables(Index num_nonlin_vars,
                                                        Index* pos_nonlin_vars) {
-    return solver->get_list_of_nonlinear_variables(num_nonlin_vars, pos_nonlin_vars);
+    return solver_.get_list_of_nonlinear_variables(num_nonlin_vars, pos_nonlin_vars);
   }
 
   bool IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType& var_string_md,
@@ -258,7 +258,7 @@ namespace casadi {
                                             IntegerMetaDataMapType& con_integer_md,
                                             NumericMetaDataMapType& con_numeric_md) {
 
-    return solver->get_var_con_metadata(n, var_string_md, var_integer_md, var_numeric_md, m,
+    return solver_.get_var_con_metadata(var_string_md, var_integer_md, var_numeric_md,
                                         con_string_md, con_integer_md, con_numeric_md);
   }
 
@@ -268,8 +268,14 @@ namespace casadi {
                                          Index m, const StringMetaDataMapType& con_string_md,
                                          const IntegerMetaDataMapType& con_integer_md,
                                          const NumericMetaDataMapType& con_numeric_md) {
-    solver->finalize_metadata(n, var_string_md, var_integer_md, var_numeric_md, m, con_string_md,
-                              con_integer_md, con_numeric_md);
+    casadi_assert(n==solver_.nx_);
+    casadi_assert(m==solver_.ng_);
+    mem_.var_string_md = var_string_md;
+    mem_.var_integer_md = var_integer_md;
+    mem_.var_numeric_md = var_numeric_md;
+    mem_.con_string_md = con_string_md;
+    mem_.con_integer_md = con_integer_md;
+    mem_.con_numeric_md = con_numeric_md;
   }
 
 } // namespace casadi

@@ -43,6 +43,53 @@
 
 namespace casadi {
 
+  struct CASADI_NLPSOL_SCPGEN_EXPORT ScpgenMemory : public NlpsolMemory {
+    // Current objective value
+    double fk;
+
+    // Work vectors, nonlifted problem
+    double *xk, *gk, *dxk, *lam_xk, *dlam_xk, *lam_gk, *dlam_gk, *gfk, *gL, *b_gn;
+
+    // Memory for lifted variables
+    struct VarMem {
+      int n;
+      double *dx, *x0, *x, *lam, *dlam;
+      double *res, *resL;
+    };
+    std::vector<VarMem> lifted_mem;
+
+    // Penalty parameter of merit function
+    double sigma;
+
+    // 1-norm of last primal step
+    double pr_step;
+
+    // 1-norm of last dual step
+    double du_step;
+
+    // Regularization
+    double reg;
+
+    // Message applying to a particular iteration
+    const char* iteration_note;
+
+    // QP
+    double *qpH, *qpA, *qpB, *qpL, *qpG, *qpH_times_du;
+
+    // QP solver
+    double *qp_lbx, *qp_ubx, *qp_lba, *qp_uba;
+
+    // Linesearch parameters
+    std::vector<double> merit_mem;
+    int merit_ind;
+
+    // Timers
+    double t_eval_mat, t_eval_res, t_eval_vec, t_eval_exp, t_solve_qp, t_mainloop;
+
+    // Current iteration
+    int iter_count;
+  };
+
   /**  \brief \pluginbrief{Nlpsol,scpgen}
 
      @copydoc NLPSolver_doc
@@ -67,48 +114,53 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
-    // Reset the solver
-    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new ScpgenMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(void* mem);
+    virtual void solve(Memory& mem) const;
 
     // Calculate the L1-norm of the primal infeasibility
-    double primalInfeasibility();
+    double primalInfeasibility(ScpgenMemory& m) const;
 
     // Calculate the L1-norm of the dual infeasibility
-    double dualInfeasibility();
+    double dualInfeasibility(ScpgenMemory& m) const;
 
     // Print iteration header
-    void printIteration(std::ostream &stream);
+    void printIteration(ScpgenMemory& m, std::ostream &stream) const;
 
     // Print iteration
-    void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf,
-                        double reg, int ls_trials, bool ls_success);
+    void printIteration(ScpgenMemory& m, std::ostream &stream, int iter, double obj,
+                        double pr_inf, double du_inf,
+                        double reg, int ls_trials, bool ls_success) const;
 
     // Evaluate the matrices in the condensed QP
-    void eval_mat();
+    void eval_mat(ScpgenMemory& m) const;
 
     // Evaluate the vectors in the condensed QP
-    void eval_vec();
+    void eval_vec(ScpgenMemory& m) const;
 
     // Evaluate the residual function
-    void eval_res();
+    void eval_res(ScpgenMemory& m) const;
 
     // Regularize the condensed QP
-    void regularize();
+    void regularize(ScpgenMemory& m) const;
 
     // Solve the QP to get the (full) step
-    void solve_qp();
+    void solve_qp(ScpgenMemory& m) const;
 
     // Perform the line-search to take the step
-    void line_search(int& ls_iter, bool& ls_success);
+    void line_search(ScpgenMemory& m, int& ls_iter, bool& ls_success) const;
 
     // Evaluate the step expansion
-    void eval_exp();
-
-    // Timings
-    double t_eval_mat_, t_eval_res_, t_eval_vec_, t_eval_exp_, t_solve_qp_, t_mainloop_;
+    void eval_exp(ScpgenMemory& m) const;
 
     /// QP solver for the subproblems
     Function qpsol_;
@@ -142,10 +194,8 @@ namespace casadi {
     double c1_;
     double beta_;
     int max_iter_ls_;
-    std::vector<double> merit_mem_;
     int merit_memsize_;
     double merit_start_;
-    int merit_ind_;
     ///@}
 
     /// Enable Code generation
@@ -216,41 +266,6 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-
-    // Current objective value
-    double fk_;
-
-    // Work vectors, nonlifted problem
-    double *xk_, *gk_, *dxk_, *lam_xk_, *dlam_xk_, *lam_gk_, *dlam_gk_, *gfk_, *gL_, *b_gn_;
-
-    // Memory for lifted variables
-    struct VarMem {
-      int n;
-      double *dx, *x0, *x, *lam, *dlam;
-      double *res, *resL;
-    };
-    std::vector<VarMem> lifted_mem_;
-
-    // Penalty parameter of merit function
-    double sigma_;
-
-    // 1-norm of last primal step
-    double pr_step_;
-
-    // 1-norm of last dual step
-    double du_step_;
-
-    // Regularization
-    double reg_;
-
-    // Message applying to a particular iteration
-    std::string iteration_note_;
-
-    // QP
-    double *qpH_, *qpA_, *qpB_, *qpL_, *qpG_, *qpH_times_du_;
-
-    // QP solver
-    double *qp_lbx_, *qp_ubx_, *qp_lba_, *qp_uba_;
   };
 
 } // namespace casadi

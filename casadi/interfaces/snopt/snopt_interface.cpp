@@ -49,20 +49,8 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_snopt);
   }
 
-  std::vector<SnoptInterface*> SnoptInterface::mempool_;
-
   SnoptInterface::SnoptInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
-
-    // Add to memory pool
-    auto mem_it = std::find(mempool_.begin(), mempool_.end(), static_cast<SnoptInterface*>(0));
-    if (mem_it==mempool_.end()) {
-      // Add to end
-      mempool_.push_back(this);
-    } else {
-      // Reuse freed element
-      *mem_it = this;
-    }
 
     addOption("detect_linear", OT_BOOLEAN, true,
               "Make an effort to treat linear constraints and linear variables specially.");
@@ -212,12 +200,6 @@ namespace casadi {
   }
 
   SnoptInterface::~SnoptInterface() {
-    auto mem_it = std::find(mempool_.begin(), mempool_.end(), this);
-    if (mem_it!=mempool_.end()) {
-      *mem_it = 0;
-    } else {
-      casadi_warning("SNOPT memory pool failure");
-    }
   }
 
   void SnoptInterface::init() {
@@ -290,13 +272,6 @@ namespace casadi {
     // We don't need a dummy row if a linear objective row is present
     casadi_assert(!(dummyrow_ && jacF_row_));
 
-    // Allocate data structures needed in evaluate
-    A_data_.resize(A_structure_.nnz());
-
-    // Reset the counters
-    t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
-    n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
-
     // Allocate temporary memory
     alloc_w(nx_, true); // xk2_
     alloc_w(ng_, true); // lam_gk_
@@ -308,35 +283,17 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::passOptions(snProblem &prob) {
-    for (std::map<std::string, std::string>::const_iterator it = intOpts_.begin();
-         it != intOpts_.end(); ++it)
-      if (hasSetOption(it->first)) {
-        int value = option(it->first);
-        casadi_assert(it->first.size() <= 55);
-        int Error = setIntParameter(&prob, const_cast<char*>(it->first.c_str()), value);
-        casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
-      }
-    for (std::map<std::string, std::string>::const_iterator it = realOpts_.begin();
-         it != realOpts_.end(); ++it)
-      if (hasSetOption(it->first)) {
-        double value = option(it->first);
-        casadi_assert(it->first.size() <= 55);
-        int Error = setRealParameter(&prob, const_cast<char*>(it->first.c_str()), value);
-        casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
-      }
-    for (std::map<std::string, std::pair<std::string, std::string> >::const_iterator
-           it = strOpts_.begin(); it != strOpts_.end(); ++it)
-      if (hasSetOption(it->first)) {
-        std::string value = option(it->first);
-        std::string buffer = it->first;
-        buffer.append(" ");
-        buffer.append(value);
-        casadi_assert(buffer.size() <= 72);
-        int Error = setParameter(&prob, const_cast<char*>(buffer.c_str()));
-        casadi_assert_message(0 == Error, "snopt error setting option \"" + it->first + "\"");
-      }
-  } // passOptions()
+  void SnoptInterface::init_memory(Memory& mem) const {
+    Nlpsol::init_memory(mem);
+    SnoptMemory& m = dynamic_cast<SnoptMemory&>(mem);
+
+    // Allocate data structures needed in evaluate
+    m.A_data.resize(A_structure_.nnz());
+
+    // Reset the counters
+    m.t_eval_grad_f = m.t_eval_jac_g = m.t_callback_fun = m.t_mainloop = 0;
+    m.n_eval_grad_f = m.n_eval_jac_g = m.n_callback_fun = m.n_iter = 0;
+  }
 
   std::string SnoptInterface::formatStatus(int status) const {
     if (status_.find(status) == status_.end()) {
@@ -348,22 +305,27 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w) {
-    // Reset the base classes
-    Nlpsol::reset(mem, arg, res, iw, w);
+  void SnoptInterface::set_work(Memory& mem, const double**& arg, double**& res,
+                                int*& iw, double*& w) const {
+    SnoptMemory& m = dynamic_cast<SnoptMemory&>(mem);
+
+    // Set work in base classes
+    Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Work vectors
-    xk2_ = w; w += nx_;
-    lam_gk_ = w; w += ng_;
-    lam_xk_ = w; w += nx_;
-    gk_ = w; w += ng_;
-    jac_fk_ = w; w += jac_f_fcn_.nnz_out(1);
+    m.xk2 = w; w += nx_;
+    m.lam_gk = w; w += ng_;
+    m.lam_xk = w; w += nx_;
+    m.gk = w; w += ng_;
+    m.jac_fk = w; w += jac_f_fcn_.nnz_out(1);
     if (!jacg_sp_.isNull()) {
-      jac_gk_ = w; w += jacg_sp_.nnz();
+      m.jac_gk = w; w += jacg_sp_.nnz();
     }
   }
 
-  void SnoptInterface::solve(void* mem) {
+  void SnoptInterface::solve(Memory& mem) const {
+    SnoptMemory& m = dynamic_cast<SnoptMemory&>(mem);
+
     // Check the provided inputs
     checkInputs(mem);
 
@@ -372,15 +334,15 @@ namespace casadi {
 
     // Evaluate gradF and jacG at initial value
     if (!jac_g_fcn_.isNull()) {
-      std::fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-      arg_[0] = x0_;
-      arg_[1] = p_;
-      std::fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-      res_[0] = 0;
-      res_[1] = jac_gk_;
-      jac_g_fcn_(arg_, res_, iw_, w_, 0);
+      std::fill_n(m.arg, jac_g_fcn_.n_in(), nullptr);
+      m.arg[0] = m.x0;
+      m.arg[1] = m.p;
+      std::fill_n(m.res, jac_g_fcn_.n_out(), nullptr);
+      m.res[0] = 0;
+      m.res[1] = m.jac_gk;
+      jac_g_fcn_(m.arg, m.res, m.iw, m.w, 0);
     }
-    calc_jac_f(x0_, p_, 0, jac_fk_);
+    calc_jac_f(m, m.x0, m.p, 0, m.jac_fk);
 
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
@@ -388,11 +350,11 @@ namespace casadi {
     for (int k = 0; k < A_structure_.nnz(); ++k) {
       int i = A_structure_.data()[k];
       if (i == 0) {
-        A_data_[k] = 0;
+        m.A_data[k] = 0;
       } else if (i > 0) {
-        A_data_[k] = jac_gk_[i-1];
+        m.A_data[k] = m.jac_gk[i-1];
       } else {
-        A_data_[k] = jac_fk_[-i-1];
+        m.A_data[k] = m.jac_fk[-i-1];
       }
     }
 
@@ -443,67 +405,86 @@ namespace casadi {
     setUserfun(&prob, userfunPtr);
 
     // user data
-    auto mem_it = std::find(mempool_.begin(), mempool_.end(), this);
-    casadi_assert(mem_it!=mempool_.end());
-    int mem_ind = mem_it-mempool_.begin();
     prob.leniu = 1;
-    prob.iu = &mem_ind;
+    prob.iu = &m.memind;
 
     // Pass bounds
-    casadi_copy(lbx_, nx_, prob.bl);
-    casadi_copy(ubx_, nx_, prob.bu);
-    casadi_copy(lbg_, ng_, prob.bl + nx_);
-    casadi_copy(ubg_, ng_, prob.bu + nx_);
+    casadi_copy(m.lbx, nx_, prob.bl);
+    casadi_copy(m.ubx, nx_, prob.bu);
+    casadi_copy(m.lbg, ng_, prob.bl + nx_);
+    casadi_copy(m.ubg, ng_, prob.bu + nx_);
 
     // Initialize states and slack
     casadi_fill(prob.hs, ng_ + nx_, 0);
-    casadi_copy(x0_, nx_, prob.x);
+    casadi_copy(m.x0, nx_, prob.x);
     casadi_fill(prob.x + nx_, ng_, 0.);
 
     // Initialize multipliers
-    casadi_copy(lam_g0_, ng_, prob.pi);
+    casadi_copy(m.lam_g0, ng_, prob.pi);
 
     // Set up Jacobian matrix
     casadi_copy(A_structure_.colind(), A_structure_.size2()+1, prob.locJ);
     casadi_copy(A_structure_.row(), A_structure_.nnz(), prob.indJ);
-    casadi_copy(getPtr(A_data_), A_structure_.nnz(), prob.valJ);
+    casadi_copy(getPtr(m.A_data), A_structure_.nnz(), prob.valJ);
 
-    // Pass options
-    passOptions(prob);
+    for (auto&& pp : intOpts_) {
+      if (hasSetOption(pp.first)) {
+        int value = option(pp.first);
+        casadi_assert(pp.first.size() <= 55);
+        int Error = setIntParameter(&prob, const_cast<char*>(pp.first.c_str()), value);
+        casadi_assert_message(0 == Error, "snopt error setting option \"" + pp.first + "\"");
+      }
+    }
+    for (auto&& pp : realOpts_) {
+      if (hasSetOption(pp.first)) {
+        double value = option(pp.first);
+        casadi_assert(pp.first.size() <= 55);
+        int Error = setRealParameter(&prob, const_cast<char*>(pp.first.c_str()), value);
+        casadi_assert_message(0 == Error, "snopt error setting option \"" + pp.first + "\"");
+      }
+    }
+    for (auto&& pp : strOpts_) {
+      if (hasSetOption(pp.first)) {
+        std::string value = option(pp.first);
+        std::string buffer = pp.first;
+        buffer.append(" ");
+        buffer.append(value);
+        casadi_assert(buffer.size() <= 72);
+        int Error = setParameter(&prob, const_cast<char*>(buffer.c_str()));
+        casadi_assert_message(0 == Error, "snopt error setting option \"" + pp.first + "\"");
+      }
+    }
 
     // Run SNOPT
     int Cold = 0;
-    int info = solveC(&prob, Cold, &fk_);
+    int info = solveC(&prob, Cold, &m.fk);
     casadi_assert_message(99 != info, "snopt problem set up improperly");
 
     // Negate rc to match CasADi's definition
     casadi_scal(nx_ + ng_, -1., prob.rc);
 
     // Get primal solution
-    casadi_copy(prob.x, nx_, x_);
+    casadi_copy(prob.x, nx_, m.x);
 
     // Get dual solution
-    casadi_copy(prob.rc, nx_, lam_x_);
-    casadi_copy(prob.rc+nx_, ng_, lam_g_);
+    casadi_copy(prob.rc, nx_, m.lam_x);
+    casadi_copy(prob.rc+nx_, ng_, m.lam_g);
 
     // Copy optimal cost to output
-    if (f_) *f_ = fk_;
+    if (m.f) *m.f = m.fk;
 
     // Copy optimal constraint values to output
-    casadi_copy(gk_, ng_, g_);
+    casadi_copy(m.gk, ng_, m.g);
 
     // Free memory
     deleteSNOPT(&prob);
   }
 
-  void SnoptInterface::setOptionsFromFile(const std::string & file) {
-  }
-
   void SnoptInterface::
-  userfun(int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
+  userfun(SnoptMemory &m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
           double* x, double* fObj, double*gObj, double* fCon, double* gCon,
           int nState, char* cu, int lencu, int* iu, int leniu, double* ru,
-          int lenru) {
+          int lenru) const {
     try {
       double time0 = clock();
 
@@ -512,19 +493,17 @@ namespace casadi {
       casadi_assert_message(nnJac_ == nnJac, "Jac " << nnJac_ << " <-> " << nnJac);
 
       // Get reduced decision variables
-      casadi_fill(xk2_, nx_, 0.);
-      for (int k = 0; k < nnObj; ++k) {
-        xk2_[k] = x[k];
-      }
+      casadi_fill(m.xk2, nx_, 0.);
+      for (int k = 0; k < nnObj; ++k) m.xk2[k] = x[k];
 
       // Evaluate gradF with the linear variables put to zero
-      calc_jac_f(xk2_, p_, fObj, jac_fk_);
+      calc_jac_f(m, m.xk2, m.p, fObj, m.jac_fk);
 
       // provide nonlinear part of objective gradient to SNOPT
       for (int k = 0; k < nnObj; ++k) {
         int el = jac_f_fcn_.sparsity_out(1).colind(k);
         if (jac_f_fcn_.sparsity_out(1).colind(k+1) > el) {
-          gObj[k] = jac_fk_[el];
+          gObj[k] = m.jac_fk[el];
         } else {
           gObj[k] = 0;
         }
@@ -534,26 +513,25 @@ namespace casadi {
       jac_f_fcn_.sparsity_out(1).sanity_check(false);
 
       // timing and counters
-      t_eval_grad_f_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
-      n_eval_grad_f_ += 1;
-
+      m.t_eval_grad_f += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
+      m.n_eval_grad_f += 1;
 
       time0 = clock();
       if (!jac_g_fcn_.isNull()) {
         // Get reduced decision variables
-        casadi_fill(xk2_, nx_, 0.);
+        casadi_fill(m.xk2, nx_, 0.);
         for (int k = 0; k < nnJac; ++k) {
-          xk2_[k] = x[k];
+          m.xk2[k] = x[k];
         }
 
         // Evaluate jacG with the linear variabes put to zero
-        std::fill_n(arg_, jac_g_fcn_.n_in(), nullptr);
-        arg_[0] = xk2_;
-        arg_[1] = p_;
-        std::fill_n(res_, jac_g_fcn_.n_out(), nullptr);
-        res_[0] = gk_;
-        res_[1] = jac_gk_;
-        jac_g_fcn_(arg_, res_, iw_, w_, 0);
+        std::fill_n(m.arg, jac_g_fcn_.n_in(), nullptr);
+        m.arg[0] = m.xk2;
+        m.arg[1] = m.p;
+        std::fill_n(m.res, jac_g_fcn_.n_out(), nullptr);
+        m.res[0] = m.gk;
+        m.res[1] = m.jac_gk;
+        jac_g_fcn_(m.arg, m.res, m.iw, m.w, 0);
 
         // provide nonlinear part of constraint jacobian to SNOPT
         int kk = 0;
@@ -562,7 +540,7 @@ namespace casadi {
             if (A_structure_.row(k) >= nnCon) break;
             int i = A_structure_.data()[k];
             if (i > 0) {
-              gCon[kk++] = jac_gk_[i-1];
+              gCon[kk++] = m.jac_gk[i-1];
             }
           }
         }
@@ -571,12 +549,12 @@ namespace casadi {
 
         // provide nonlinear part of objective to SNOPT
         for (int k = 0; k < nnCon; ++k) {
-          fCon[k] = gk_[k];
+          fCon[k] = m.gk[k];
         }
 
         // timing and counters
-        t_eval_jac_g_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
-        n_eval_jac_g_ += 1;
+        m.t_eval_jac_g += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
+        m.n_eval_jac_g += 1;
       }
 
     } catch(std::exception& ex) {
@@ -592,9 +570,36 @@ namespace casadi {
              double *gObj, double * fCon, double* gCon,
              int* nState, char* cu, int* lencu, int* iu,
              int* leniu, double* ru, int *lenru) {
-    SnoptInterface* interface = mempool_.at(iu[0]);
-    interface->userfun(mode, *nnObj, *nnCon, *nJac, *nnL, *neJac,
-                       x, fObj, gObj, fCon, gCon, *nState,
-                       cu, *lencu, iu, *leniu, ru, *lenru);
+    SnoptMemory &m = *SnoptMemory::mempool.at(iu[0]);
+    m.self.userfun(m, mode, *nnObj, *nnCon, *nJac, *nnL, *neJac,
+                   x, fObj, gObj, fCon, gCon, *nState,
+                   cu, *lencu, iu, *leniu, ru, *lenru);
   }
+
+  SnoptMemory::SnoptMemory(const SnoptInterface& self) : self(self) {
+    // Put in memory pool
+    auto mem_it = std::find(mempool.begin(), mempool.end(), nullptr);
+    if (mem_it==mempool.end()) {
+      // Append to end
+      memind = mempool.size();
+      mempool.push_back(this);
+    } else {
+      // Reuse freed element
+      memind = mem_it - mempool.begin();
+      *mem_it = this;
+    }
+  }
+
+  SnoptMemory::~SnoptMemory() {
+    // Remove from memory pool
+    auto mem_it = std::find(mempool.begin(), mempool.end(), this);
+    if (mem_it==mempool.end()) {
+      casadi_warning("SNOPT memory pool failure");
+    } else {
+      *mem_it = nullptr;
+    }
+  }
+
+  std::vector<SnoptMemory*> SnoptMemory::mempool;
+
 }  // namespace casadi

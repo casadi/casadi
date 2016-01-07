@@ -387,7 +387,7 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   const vector<double>& x_opt = nlpsol_.output(NLPSOL_X).data();
   drag_est = x_opt.at(0)*p_scale_[0];
   depth_est = x_opt.at(1)*p_scale_[1];
-  iter_count = nlpsol_.getStat("iter_count");
+  iter_count = nlpsol_.getStats().at("iter_count");
 }
 
 int main(){

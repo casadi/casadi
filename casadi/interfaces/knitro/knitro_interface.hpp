@@ -38,6 +38,28 @@
 
 /// \cond INTERNAL
 namespace casadi {
+  // Forward declaration
+  class KnitroInterface;
+
+  struct CASADI_NLPSOL_KNITRO_EXPORT KnitroMemory : public NlpsolMemory {
+    /// Function object
+    const KnitroInterface& self;
+
+    // KNITRO context pointer
+    KTR_context_ptr kc_handle;
+
+    // Inputs
+    double *wx, *wlbx, *wubx, *wlbg, *wubg;
+
+    // Stats
+    const char* return_status;
+
+    /// Constructor
+    KnitroMemory(const KnitroInterface& self);
+
+    /// Destructor
+    virtual ~KnitroMemory();
+  };
 
   /** \brief \pluginbrief{Nlpsol,knitro}
      @copydoc Nlpsol_doc
@@ -60,11 +82,18 @@ namespace casadi {
     // Initialize the solver
     virtual void init();
 
-    // Reset the solver
-    virtual void reset(void* mem, const double**& arg, double**& res, int*& iw, double*& w);
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new KnitroMemory(*this);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(void* mem);
+    virtual void solve(Memory& mem) const;
 
     // KNITRO callback wrapper
     static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
@@ -73,8 +102,8 @@ namespace casadi {
                         double * const jac, double * const hessian,
                         double * const hessVector, void *userParams);
 
-    // KNITRO context pointer
-    KTR_context_ptr kc_handle_;
+    // KNITRO return codes
+    static const char* return_codes(int flag);
 
     // KNITRO double parameter
     std::map<std::string, double> double_param_;
@@ -87,9 +116,6 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-
-    // Inputs
-    double *wx_, *wlbx_, *wubx_, *wlbg_, *wubg_;
   };
 
 } // namespace casadi
