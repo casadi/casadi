@@ -49,6 +49,9 @@ namespace casadi {
     virtual void init();
 
   protected:
+    /// Type of parallellization
+    virtual std::string parallelization() const=0;
+
     // Constructor (protected, use create function above)
     MapBase(const Function& f, int n);
 
@@ -63,30 +66,34 @@ namespace casadi {
 
     // Number of times to evaluate this function
     int n_;
+
+    /// Nonzero step for inputs
+    std::vector<int> step_in_;
+
+    /// Nonzero step for outputs
+    std::vector<int> step_out_;
+
+    // This should belong in the OCL class, but then we cannot have it copied in fwd/der
+    int opencl_select_;
+
   };
 
-  /** A map Map for evaluating a function serially
-      \author Joel Andersson
+  /** A map Base class for pure maps (no reduced in/out)
+      \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT MapSerial : public MapBase {
+  class CASADI_EXPORT PureMap : public MapBase {
     friend class MapBase;
   protected:
     // Constructor (protected, use create function in MapBase)
-    MapSerial(const Function& f, int n) : MapBase(f, n) {}
+    PureMap(const Function& f, int n) : MapBase(f, n) {}
 
-    /** \brief  Destructor */
-    virtual ~MapSerial();
-
-    /** \brief  clone function */
-    virtual MapSerial* clone() const { return new MapSerial(*this);}
-
-    /** \brief  Evaluate or propagate sparsities */
+   /** \brief  Evaluate or propagate sparsities */
     template<typename T>
     void evalGen(const T** arg, T** res, int* iw, T* w);
 
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    /** \brief Quickfix to avoid segfault, #1552 */
+    virtual bool canEvalSX() const {return true;}
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
     virtual void evalSX(const SXElement** arg, SXElement** res,
@@ -98,57 +105,51 @@ namespace casadi {
     /** \brief  Propagate sparsity backwards */
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
 
-    /** \brief  Initialize */
-    virtual void init();
-  };
+    /** \brief  Is the class able to propagate seeds through the algorithm? */
+    virtual bool spCanEvaluate(bool fwd) { return true; }
 
-#ifdef WITH_OPENMP
-  /** A map Evaluate in parallel using OpenMP
-      Inherits from MapSerial to allow fallback to serial methods
-      \author Joel Andersson
-      \date 2015
-  */
-  class CASADI_EXPORT MapOmp : public MapSerial {
-    friend class MapBase;
-  protected:
-    // Constructor (protected, use create function in MapBase)
-    MapOmp(const Function& f, int n) : MapSerial(f, n) {}
+    ///@{
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function getDerForward(const std::string& name, int nfwd, Dict& opts);
+    virtual int numDerForward() const { return 64;}
+    ///@}
 
-    /** \brief  clone function */
-    virtual MapOmp* clone() const { return new MapOmp(*this);}
+    ///@{
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function getDerReverse(const std::string& name, int nadj, Dict& opts);
+    virtual int numDerReverse() const { return 64;}
+    ///@}
 
-    /** \brief  Destructor */
-    virtual ~MapOmp();
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
 
-    /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
+
+  public:
 
     /** \brief  Initialize */
     virtual void init();
+
   };
-#endif // WITH_OPENMP
 
   /** A map operation that can also reduce certain arguments
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT MapReduce : public MapBase {
+  class CASADI_EXPORT MapSum : public MapBase {
+    friend class MapBase;
+  protected:
+
+
   public:
-    /** Types of parallelization supported */
-    enum ParallelizationType {
-      PARALLELIZATION_SERIAL,
-      PARALLELIZATION_OMP
-    };
 
     /** \brief Constructor (generic map) */
-    MapReduce(const Function& f, int n,
+    MapSum(const Function& f, int n,
       const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out);
 
-    /** \brief  clone function */
-    virtual MapReduce* clone() const { return new MapReduce(*this);}
-
     /** \brief  Destructor */
-    virtual ~MapReduce();
+    virtual ~MapSum();
 
     /** \brief  Initialize */
     virtual void init();
@@ -158,9 +159,6 @@ namespace casadi {
       void evalGen(const T** arg, T** res, int* iw, T* w,
                    void (FunctionInternal::*ptrEval)(const T** arg, T** res, int* iw, T* w),
                    R reduction);
-
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}
@@ -206,15 +204,206 @@ namespace casadi {
     /// Indicate which outputs are repeated
     std::vector<bool> repeat_out_;
 
-    /// Nonzero step for inputs
-    std::vector<int> step_in_;
-
-    /// Nonzero step for outputs
-    std::vector<int> step_out_;
-
     int nnz_out_;
 
-    ParallelizationType parallelization_;
+  };
+
+  /** A map Map for evaluating a function serially
+      \author Joel Andersson
+      \date 2015
+  */
+  class CASADI_EXPORT MapSerial : public PureMap {
+    friend class PureMap;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapSerial(const Function& f, int n) : PureMap(f, n) {}
+
+    /** \brief  Destructor */
+    virtual ~MapSerial();
+
+    /** \brief  clone function */
+    virtual MapSerial* clone() const { return new MapSerial(*this);}
+
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  Initialize */
+    virtual void init();
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "serial"; }
+  };
+
+  /** A mapsum evaluation in serial
+
+      \author Joris Gillis
+      \date 2015
+  */
+  class CASADI_EXPORT MapSumSerial : public MapSum {
+    friend class MapSum;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapSumSerial(const Function& f, int n,
+  const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out) :
+    MapSum(f, n, repeat_in, repeat_out) {}
+
+    /** \brief  clone function */
+    virtual MapSumSerial* clone() const { return new MapSumSerial(*this);}
+
+    /** \brief  Destructor */
+    virtual ~MapSumSerial();
+
+    /// Evaluate the function numerically
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  Initialize */
+    virtual void init();
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "serial"; }
+  };
+
+#ifdef WITH_OPENMP
+  /** A map Evaluate in parallel using OpenMP
+
+      \author Joel Andersson
+      \date 2015
+  */
+  class CASADI_EXPORT MapOmp : public PureMap {
+    friend class PureMap;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapOmp(const Function& f, int n) : PureMap(f, n) {}
+
+    /** \brief  clone function */
+    virtual MapOmp* clone() const { return new MapOmp(*this);}
+
+    /** \brief  Destructor */
+    virtual ~MapOmp();
+
+    /// Evaluate the function numerically
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  Initialize */
+    virtual void init();
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "omp"; }
+  };
+
+  /** A map Evaluate in parallel using OpenMP
+
+      \author Joris Gillis
+      \date 2015
+  */
+  class CASADI_EXPORT MapSumOmp : public MapSum {
+    friend class MapSum;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapSumOmp(const Function& f, int n,
+  const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out) :
+    MapSum(f, n, repeat_in, repeat_out) {}
+
+    /** \brief  clone function */
+    virtual MapSumOmp* clone() const { return new MapSumOmp(*this);}
+
+    /** \brief  Destructor */
+    virtual ~MapSumOmp();
+
+    /// Evaluate the function numerically
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  Initialize */
+    virtual void init();
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "opencl"; }
+  };
+
+#endif // WITH_OPENMP
+
+  /** A map Evaluate in parallel using OpenCL
+
+      \author Joris Gillis
+      \date 2015
+  */
+  class CASADI_EXPORT MapOcl : public PureMap {
+    friend class PureMap;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapOcl(const Function& f, int n);
+
+    /** \brief  clone function */
+    virtual MapOcl* clone() const { return new MapOcl(*this);}
+
+    /** \brief  Destructor */
+    virtual ~MapOcl();
+
+    /// Evaluate the function numerically
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  Initialize */
+    virtual void init();
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "opencl"; }
+
+    /// Obtain code for the kernel
+    std::string kernelCode() const;
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
+
+  };
+
+  /** A map Evaluate in parallel using OpenCL
+
+      \author Joris Gillis
+      \date 2015
+  */
+  class CASADI_EXPORT MapSumOcl : public MapSum {
+    friend class MapSum;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapSumOcl(const Function& f, int n,
+  const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out);
+
+    /** \brief  clone function */
+    virtual MapSumOcl* clone() const { return new MapSumOcl(*this);}
+
+    /** \brief  Destructor */
+    virtual ~MapSumOcl();
+
+    /// Evaluate the function numerically
+    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+
+    /** \brief  Initialize */
+    virtual void init();
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "opencl"; }
+
+    /// Obtain code for the kernel
+    std::string kernelCode() const;
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
+
+    int nnz_in_;
+    int nnz_fixed_;
+
 
   };
 

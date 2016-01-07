@@ -52,6 +52,7 @@ namespace casadi {
   typedef int (*evalPtr)(const double** arg, double** res, int* iw, double* w);
   typedef void (*simplifiedPtr)(const double* arg, double* res);
   typedef int (*initPtr)(int *f_type, int *n_in, int *n_out, int *sz_arg, int* sz_res);
+  typedef int (*setupPtr)();
   ///@}
 
   class MXFunction;

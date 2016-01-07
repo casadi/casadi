@@ -77,6 +77,7 @@ namespace casadi {
   }
 
   ClangCompiler::~ClangCompiler() {
+    cleanup();
     if (act_) delete act_;
     if (myerr_) delete myerr_;
     if (executionEngine_) delete executionEngine_;

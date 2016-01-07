@@ -202,6 +202,9 @@ namespace casadi {
       compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
       evalD_ = (evalPtr)compiler_.getFunction("jit_tmp");
       casadi_assert_message(evalD_!=0, "Cannot load JIT'ed function.");
+      setupPtr setup = (setupPtr) compiler_.getFunction("jit_setup");
+      casadi_assert_message(setup!=0, "Cannot load setup function.");
+      setup();
     }
   }
 
@@ -2038,6 +2041,7 @@ namespace casadi {
 
     // Add standard math
     g.addInclude("math.h");
+    g.addInclude("sys/time.h");
 
     // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
     g.addAuxiliary(CodeGenerator::AUX_SQ);
@@ -2281,6 +2285,7 @@ namespace casadi {
     if (g.main) {
       // Declare wrapper
       s << "int main_" << fname << "(int argc, char* argv[]) {" << endl;
+      s << "  jit_setup();" << endl;
 
       // Work vectors and input and output buffers
       size_t nr = sz_w() + nnzIn() + nnzOut();
@@ -2313,7 +2318,7 @@ namespace casadi {
              << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
-      s << "  int flag = eval(arg, res, iw, w+" << off << ");" << endl
+      s << "  int flag = " << fname << "(arg, res, iw, w+" << off << ");" << endl
              << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout

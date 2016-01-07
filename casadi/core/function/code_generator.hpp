@@ -94,6 +94,8 @@ namespace casadi {
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
 
+    static std::string multiline_string(const std::string & s);
+
     /** \brief Codegen inner product */
     std::string inner_prod(int n, const std::string& x, const std::string& y);
 
@@ -114,7 +116,9 @@ namespace casadi {
       AUX_PROJECT,
       AUX_TRANS,
       AUX_TO_MEX,
-      AUX_FROM_MEX
+      AUX_FROM_MEX,
+      AUX_ASSERT,
+      AUX_MINMAX
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -130,10 +134,10 @@ namespace casadi {
     std::string workel(int n) const;
 
     /** \brief  Print int vector to a c file */
-    static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
+    void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v) const;
 
     /** \brief  Print real vector to a c file */
-    static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
+    void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v) const;
 
     /** \brief Create a copy_n operation */
     std::string copy_n(const std::string& arg, std::size_t n, const std::string& res);
@@ -194,6 +198,14 @@ namespace casadi {
     // Should we generate a main (allowing evaluation from command line)
     bool main;
 
+
+    // Creating opencl?
+    bool opencl;
+
+
+    // Creating meta?
+    bool meta;
+
     /** \brief Codegen scalar
      * Use the work vector for storing work vector elements of length 1
      * (typically scalar) instead of using local variables
@@ -203,8 +215,11 @@ namespace casadi {
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
+    std::stringstream declarations;
     std::stringstream body;
     std::stringstream header;
+    std::stringstream setup;
+    std::stringstream cleanup;
 
     // Names of exposed functions
     std::vector<std::string> exposed_fname;

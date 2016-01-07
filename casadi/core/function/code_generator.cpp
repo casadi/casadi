@@ -41,6 +41,8 @@ namespace casadi {
     this->real_t = "double";
     this->codegen_scalars = false;
     this->with_header = false;
+    this->opencl = false;
+    this->meta = true;
 
     // Read options
     for (Dict::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
@@ -58,6 +60,10 @@ namespace casadi {
         this->codegen_scalars = it->second;
       } else if (it->first=="with_header") {
         this->with_header = it->second;
+      } else if (it->first=="opencl") {
+        this->opencl = it->second;
+      } else if (it->first=="meta") {
+        this->meta = it->second;
       } else {
         casadi_error("Unrecongnized option: " << it->first);
       }
@@ -95,7 +101,9 @@ namespace casadi {
       this->header
         << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w);" << endl;
     }
-    f->generateMeta(*this, fname);
+    if (this->meta) {
+      f->generateMeta(*this, fname);
+    }
     this->exposed_fname.push_back(fname);
   }
 
@@ -147,6 +155,7 @@ namespace casadi {
     // Real type (usually double)
     for (int i=0; i<s.size(); ++i) {
       s[i]
+        << "#define __constant" << endl
         << "#ifndef real_t" << endl
         << "#define real_t " << this->real_t << endl
         << "#define to_double(x) "
@@ -218,7 +227,7 @@ namespace casadi {
     // Generate main
     if (this->main) {
       s[0] << "int main(int argc, char* argv[]) {" << endl
-           << "  return main_eval(argc, argv);" << endl
+           << "  return main_" << sname << "(argc, argv);" << endl
            << "}" << endl << endl;
     }
 
@@ -258,6 +267,21 @@ namespace casadi {
       s << "#define c" << i << " CASADI_PREFIX(c" << i << ")" << endl;
     }
 
+    s << this->declarations.str() << std::endl;
+
+    // Setup code
+    s << "int jit_setup() {" << std::endl;
+    s << this->setup.str();
+    s << "  return 0;" << std::endl;
+    s << "}" << std::endl;
+
+    // Cleanup code
+    s << "int jit_cleanup() {" << std::endl;
+    s << this->cleanup.str();
+    s << "  return 0;" << std::endl;
+    s << "}" << std::endl;
+
+
     // Codegen body
     s << this->body.str();
 
@@ -293,8 +317,13 @@ namespace casadi {
     s << "  " << lhs << " = " << rhs << ";" << endl;
   }
 
-  void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<int>& v) {
-    s << "static const int " << name << "[] = {";
+  void CodeGenerator::printVector(std::ostream &s, const std::string& name,
+      const vector<int>& v) const {
+    if (this->opencl) {
+      s << "static const __constant int " << name << "[] = {";
+    } else {
+      s << "static const int " << name << "[] = {";
+    }
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << v[i];
@@ -303,8 +332,13 @@ namespace casadi {
   }
 
   void CodeGenerator::printVector(std::ostream &s, const std::string& name,
-                                  const vector<double>& v) {
-    s << "static const real_t " << name << "[] = {";
+                                  const vector<double>& v) const {
+    if (this->opencl) {
+      s << "static const __constant real_t " << name << "[] = {";
+    } else {
+      s << "static const real_t " << name << "[] = {";
+    }
+
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << constant(v[i]);
@@ -459,6 +493,16 @@ namespace casadi {
 
     // Add the appropriate function
     switch (f) {
+    case AUX_ASSERT:
+      this->auxiliaries << "#define assert_action(a, ACTION) if (!a) {";
+      this->auxiliaries << "printf(\"In '%s' on line %d:\\n\",__FILE__,__LINE__);ACTION;exit(a);}";
+      this->auxiliaries << endl;
+      addInclude("stdio.h");
+      break;
+    case AUX_MINMAX:
+      this->auxiliaries << "#define MIN(a,b) (((a)<(b))?(a):(b))" << endl;
+      this->auxiliaries << "#define MAX(a,b) (((a)>(b))?(a):(b))" << endl;
+      break;
     case AUX_COPY_N:
       this->auxiliaries
         << codegen_str_copy_n
@@ -638,6 +682,17 @@ namespace casadi {
       << "real_t CASADI_PREFIX(sign)(real_t x) "
       << "{ return x<0 ? -1 : x>0 ? 1 : x;}" << endl
       << "#define sign(x) CASADI_PREFIX(sign)(x)" << endl << endl;
+  }
+
+  std::string CodeGenerator::multiline_string(const std::string & s) {
+    std::stringstream ss(s);
+    std::string to;
+    std::stringstream out(s);
+
+    while (std::getline(ss, to, '\n')) {
+      out << "\"" << to << "\\n\"" << endl;
+    }
+    return out.str();
   }
 
   std::string CodeGenerator::constant(double v) {

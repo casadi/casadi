@@ -75,6 +75,8 @@ namespace casadi {
     /// Get a function pointer for numerical evaluation
     virtual void* getFunction(const std::string& symname) = 0;
 
+    void cleanup();
+
     protected:
     /// C filename
     std::string name_;

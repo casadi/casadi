@@ -1514,7 +1514,7 @@ namespace casadi {
     const vector<MXAlgEl>& algorithm = f->algorithm_;
     vector<MX> swork(f->workloc_.size()-1);
 
-    // A boolean vector indicated whoch nodes are tainted by substitutions
+    // A boolean vector indicated which nodes are tainted by substitutions
     vector<bool> tainted(swork.size());
 
     // Temporary stringstream
