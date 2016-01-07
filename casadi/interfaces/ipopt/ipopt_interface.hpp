@@ -98,6 +98,9 @@ namespace casadi {
     std::map<std::string, std::vector<int> > con_integer_md;
     std::map<std::string, std::vector<double> > con_numeric_md;
 
+    /// Get all statistics
+    virtual Dict get_stats() const;
+
     /// Constructor
     IpoptMemory();
 

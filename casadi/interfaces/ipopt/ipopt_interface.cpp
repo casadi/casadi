@@ -255,6 +255,50 @@ namespace casadi {
     }
   }
 
+  inline const char* return_status_string(Ipopt::ApplicationReturnStatus status) {
+    switch (status) {
+    case Solve_Succeeded:
+      return "Solve_Succeeded";
+    case Solved_To_Acceptable_Level:
+      return "Solved_To_Acceptable_Level";
+    case Infeasible_Problem_Detected:
+      return "Infeasible_Problem_Detected";
+    case Search_Direction_Becomes_Too_Small:
+      return "Search_Direction_Becomes_Too_Small";
+    case Diverging_Iterates:
+      return "Diverging_Iterates";
+    case User_Requested_Stop:
+      return "User_Requested_Stop";
+    case Maximum_Iterations_Exceeded:
+      return "Maximum_Iterations_Exceeded";
+    case Restoration_Failed:
+      return "Restoration_Failed";
+    case Error_In_Step_Computation:
+      return "Error_In_Step_Computation";
+    case Not_Enough_Degrees_Of_Freedom:
+      return "Not_Enough_Degrees_Of_Freedom";
+    case Invalid_Problem_Definition:
+      return "Invalid_Problem_Definition";
+    case Invalid_Option:
+      return "Invalid_Option";
+    case Invalid_Number_Detected:
+      return "Invalid_Number_Detected";
+    case Unrecoverable_Exception:
+      return "Unrecoverable_Exception";
+    case NonIpopt_Exception_Thrown:
+      return "NonIpopt_Exception_Thrown";
+    case Insufficient_Memory:
+      return "Insufficient_Memory";
+    case Internal_Error:
+      return "Internal_Error";
+    case Maximum_CpuTime_Exceeded:
+      return "Maximum_CpuTime_Exceeded";
+    case Feasible_Point_Found:
+      return "Feasible_Point_Found";
+    }
+    return "Unknown";
+  }
+
   void IpoptInterface::solve(Memory& mem) const {
     IpoptMemory& m = dynamic_cast<IpoptMemory&>(mem);
 
@@ -296,6 +340,7 @@ namespace casadi {
     Timer time0 = getTimerTime();
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
+    m.return_status = return_status_string(status);
     m.t_mainloop = diffTimers(getTimerTime(), time0);
 
     // Save results to outputs
@@ -304,39 +349,6 @@ namespace casadi {
     casadi_copy(m.lam_gk, ng_, m.lam_g);
     casadi_copy(m.lam_xk, nx_, m.lam_x);
     casadi_copy(m.gk, ng_, m.g);
-
-    if (status == Solve_Succeeded)
-      m.return_status = "Solve_Succeeded";
-    if (status == Solved_To_Acceptable_Level)
-      m.return_status = "Solved_To_Acceptable_Level";
-    if (status == Infeasible_Problem_Detected)
-      m.return_status = "Infeasible_Problem_Detected";
-    if (status == Search_Direction_Becomes_Too_Small)
-      m.return_status = "Search_Direction_Becomes_Too_Small";
-    if (status == Diverging_Iterates)
-      m.return_status = "Diverging_Iterates";
-    if (status == User_Requested_Stop)
-      m.return_status = "User_Requested_Stop";
-    if (status == Maximum_Iterations_Exceeded)
-      m.return_status = "Maximum_Iterations_Exceeded";
-    if (status == Restoration_Failed)
-      m.return_status = "Restoration_Failed";
-    if (status == Error_In_Step_Computation)
-      m.return_status = "Error_In_Step_Computation";
-    if (status == Not_Enough_Degrees_Of_Freedom)
-      m.return_status = "Not_Enough_Degrees_Of_Freedom";
-    if (status == Invalid_Problem_Definition)
-      m.return_status = "Invalid_Problem_Definition";
-    if (status == Invalid_Option)
-      m.return_status = "Invalid_Option";
-    if (status == Invalid_Number_Detected)
-      m.return_status = "Invalid_Number_Detected";
-    if (status == Unrecoverable_Exception)
-      m.return_status = "Unrecoverable_Exception";
-    if (status == NonIpopt_Exception_Thrown)
-      m.return_status = "NonIpopt_Exception_Thrown";
-    if (status == Insufficient_Memory)
-      m.return_status = "Insufficient_Memory";
   }
 
   bool IpoptInterface::
@@ -638,6 +650,7 @@ namespace casadi {
   IpoptMemory::IpoptMemory() {
     this->app = 0;
     this->userclass = 0;
+    this->return_status = "Unset";
   }
 
   IpoptMemory::~IpoptMemory() {
@@ -650,6 +663,13 @@ namespace casadi {
     if (this->userclass != 0) {
       delete static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(this->userclass);
     }
+  }
+
+  Dict IpoptMemory::get_stats() const {
+    Dict stats = NlpsolMemory::get_stats();
+    stats["return_status"] = return_status;
+    stats["iter_count"] = iter_count;
+    return stats;
   }
 
 } // namespace casadi
