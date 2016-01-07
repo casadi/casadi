@@ -199,13 +199,16 @@ namespace casadi {
 
       switch (type) {
         case WORHP_BOOL_T:
-          if (hasOption(name) && hasSetOption(name)) WorhpSetBoolParam(&m.worhp_p, name, option(name));
+          if (hasOption(name) && hasSetOption(name))
+            WorhpSetBoolParam(&m.worhp_p, name, option(name));
           break;
         case WORHP_DOUBLE_T:
-          if (hasOption(name) && hasSetOption(name)) WorhpSetDoubleParam(&m.worhp_p, name, option(name));
+          if (hasOption(name) && hasSetOption(name))
+            WorhpSetDoubleParam(&m.worhp_p, name, option(name));
           break;
         case WORHP_INT_T:
-          if (hasOption(name) && hasSetOption(name)) WorhpSetIntParam(&m.worhp_p, name, option(name));
+          if (hasOption(name) && hasSetOption(name))
+            WorhpSetIntParam(&m.worhp_p, name, option(name));
           break;
         default:
           break;// do nothing
