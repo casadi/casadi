@@ -706,12 +706,6 @@ no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Function::getStats(int mem=0) const  "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
 %feature("docstring")  casadi::Function::sparsity_jac(int iind=0, int
 oind=0, bool compact=false, bool symmetric=false) "
 
@@ -1799,6 +1793,12 @@ Get sparsity of a given output.
 &iname) const  "
 
 Get sparsity of a given output.
+
+";
+
+%feature("docstring")  casadi::Function::stats(int mem=0) const  "
+
+Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
@@ -3098,16 +3098,9 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring")  casadi::Function::size1_in(int ind) const  "
+%feature("docstring")  casadi::Function::stats(int mem=0) const  "
 
-Get input dimension.
-
-";
-
-%feature("docstring")  casadi::Function::size1_in(const std::string &iname)
-const  "
-
-Get input dimension.
+Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
@@ -3698,9 +3691,25 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
-%feature("docstring")  casadi::Function::getStats(int mem=0) const  "
+%feature("docstring")  casadi::Function::nnz_out() const  "
 
-Get all statistics obtained at the end of the last evaluate call.
+Get of number of output nonzeros For a particular output or for all for all
+of the outputs.
+
+";
+
+%feature("docstring")  casadi::Function::nnz_out(int ind) const  "
+
+Get of number of output nonzeros For a particular output or for all for all
+of the outputs.
+
+";
+
+%feature("docstring")  casadi::Function::nnz_out(const std::string &oname)
+const  "
+
+Get of number of output nonzeros For a particular output or for all for all
+of the outputs.
 
 ";
 
@@ -3913,6 +3922,19 @@ Get symbolic primitives equivalent to the input expressions.
 %feature("docstring")  casadi::Function::sx_in() const  "
 
 Get symbolic primitives equivalent to the input expressions.
+
+";
+
+%feature("docstring")  casadi::Function::size1_in(int ind) const  "
+
+Get input dimension.
+
+";
+
+%feature("docstring")  casadi::Function::size1_in(const std::string &iname)
+const  "
+
+Get input dimension.
 
 ";
 
@@ -4434,28 +4456,6 @@ Access rhs function for a rootfinder.
 %feature("docstring")  casadi::Function::getAtomicOutput(int k) const  "
 
 Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::Function::nnz_out() const  "
-
-Get of number of output nonzeros For a particular output or for all for all
-of the outputs.
-
-";
-
-%feature("docstring")  casadi::Function::nnz_out(int ind) const  "
-
-Get of number of output nonzeros For a particular output or for all for all
-of the outputs.
-
-";
-
-%feature("docstring")  casadi::Function::nnz_out(const std::string &oname)
-const  "
-
-Get of number of output nonzeros For a particular output or for all for all
-of the outputs.
 
 ";
 
@@ -5805,8 +5805,8 @@ ls_trials, const IpoptData *ip_data, IpoptCalculatedQuantities *ip_cq) "
 
 ";
 
-%feature("docstring") casadi::IpoptUserClass::IpoptUserClass(IpoptInterface
-*ipoptInterface) " [INTERNAL] ";
+%feature("docstring") casadi::IpoptUserClass::IpoptUserClass(const
+IpoptInterface &ipoptInterface, IpoptMemory &mem) " [INTERNAL] ";
 
 
 // File: classcasadi_1_1Jit.xml

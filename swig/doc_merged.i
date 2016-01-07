@@ -463,12 +463,6 @@ no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Callback::getStats "
-
-Get all statistics obtained at the end of the last evaluate call.
-
-";
-
 %feature("docstring") casadi::Callback::sparsity_jac "
 
 Get, if necessary generate, the sparsity of a Jacobian block
@@ -1225,6 +1219,12 @@ Extract the functions needed for the Lifted Newton method.
 %feature("docstring") casadi::Callback::sparsity_out "
 
 Get sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::Callback::stats "
+
+Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
@@ -2317,9 +2317,9 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring") casadi::Function::size1_in "
+%feature("docstring") casadi::Function::stats "
 
-Get input dimension.
+Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
@@ -2727,9 +2727,10 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
-%feature("docstring") casadi::Function::getStats "
+%feature("docstring") casadi::Function::nnz_out "
 
-Get all statistics obtained at the end of the last evaluate call.
+Get of number of output nonzeros For a particular output or for all for all
+of the outputs.
 
 ";
 
@@ -2854,6 +2855,12 @@ Generic map.
 %feature("docstring") casadi::Function::sx_in "
 
 Get symbolic primitives equivalent to the input expressions.
+
+";
+
+%feature("docstring") casadi::Function::size1_in "
+
+Get input dimension.
 
 ";
 
@@ -3264,13 +3271,6 @@ Access rhs function for a rootfinder.
 %feature("docstring") casadi::Function::getAtomicOutput "
 
 Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Function::nnz_out "
-
-Get of number of output nonzeros For a particular output or for all for all
-of the outputs.
 
 ";
 

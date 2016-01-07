@@ -259,6 +259,9 @@
 %exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::IpoptUserClass::IpoptUserClass(const IpoptInterface &ipoptInterface, IpoptMemory &mem) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::LibInfo< Compiler >::LibInfo() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
