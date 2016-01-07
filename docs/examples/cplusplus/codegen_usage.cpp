@@ -59,20 +59,19 @@ int usage_c(){
   dlerror();
 
   /* Initialize and get the number of inputs and outputs */
-  typedef int (*init_t)(void **mem, int *n_in, int *n_out, void *data);
+  typedef int (*init_t)(int* n_in, int* n_out, int* n_mem);
   init_t init = (init_t)dlsym(handle, "f_init");
   if(dlerror()){
     printf("Failed to retrieve \"init\" function.\n");
     return 1;
   }
   int n_in, n_out;
-  void *mem;
-  if (init(&mem, &n_in, &n_out, 0)) return 1;
+  if (init(&n_in, &n_out, 0)) return 1;
   printf("n_in = %d, n_out = %d\n", n_in, n_out);
 
   /* Function for retrieving sparsities */
-  typedef int (*sparsity_t)(void* mem, int ind, int *n_col, int *n_row,
-                             const int** colind, const int** row);
+  typedef int (*sparsity_t)(int ind, int *n_col, int *n_row,
+                            const int** colind, const int** row);
   sparsity_t sparsity = (sparsity_t)dlsym(handle, "f_sparsity");
   if(dlerror()){
     printf("Failed to retrieve \"sparsity\" function.\n");
@@ -90,7 +89,7 @@ int usage_c(){
 
     int nrow,ncol;
     const int *colind, *row;
-    if (sparsity(mem, ind, &nrow, &ncol, &colind, &row)) return 1;
+    if (sparsity(ind, &nrow, &ncol, &colind, &row)) return 1;
 
     printf("  Dimension: %d-by-%d\n", nrow, ncol);
     printf("  Nonzeros: {");
@@ -112,7 +111,7 @@ int usage_c(){
 
   /* Get sizes of the required work vectors */
   int sz_arg, sz_res, sz_iw, sz_w;
-  typedef int (*work_t)(void* mem, int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
+  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
   work_t work = (work_t)dlsym(handle, "f_work");
   if(dlerror()){
     // No work vectors by default
@@ -123,20 +122,29 @@ int usage_c(){
     dlerror();
   } else {
     // Read from functions
-    if (work(mem, &sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;
+    if (work(&sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;
   }
   printf("sz_arg = %d, sz_res = %d, sz_iw = %d, sz_w = %d\n", sz_arg, sz_res, sz_iw, sz_w);
 
   /* Function for numerical evaluation */
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
   eval_t eval = (eval_t)dlsym(handle, "f");
   if(dlerror()){
     printf("Failed to retrieve \"f\" function.\n");
     return 1;
   }
 
+  /* Function for allocating memory */
+  typedef int (*allocmem_t)(int mem);
+  allocmem_t allocmem = (allocmem_t)dlsym(handle, "f_alloc");
+  if(dlerror()){
+    // No alloc function
+    allocmem = 0;
+    dlerror(); // Reset error flags
+  }
+
   /* Function for freeing memory */
-  typedef int (*freemem_t)(void *mem);
+  typedef int (*freemem_t)(int mem);
   freemem_t freemem = (freemem_t)dlsym(handle, "f_free");
   if(dlerror()){
     // No free function
@@ -155,6 +163,10 @@ int usage_c(){
   const double y_val = 5;
   double res0;
   double res1[4];
+
+  // Allocate memory
+  int mem = 0;
+  allocmem(mem);
 
   /* Evaluate the function */
   arg[0] = x_val;

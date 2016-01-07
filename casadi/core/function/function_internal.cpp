@@ -1765,7 +1765,7 @@ namespace casadi {
     stringstream &s = g.body;
 
     // Function that returns the number of inputs and outputs
-    string tmp = "int " + fname + "_init(void **mem, int *n_in, int *n_out, void *data)";
+    string tmp = "int " + fname + "_init(int* n_in, int* n_out, int* n_mem)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1773,10 +1773,9 @@ namespace casadi {
       g.header << tmp << ";" << endl;
     }
     s << tmp << " {" << endl
-      << "  (void)data;" << endl
-      << "  if (mem) *mem = 0;" << endl
       << "  if (n_in) *n_in = " << n_in << ";" << endl
       << "  if (n_out) *n_out = " << n_out << ";" << endl
+      << "  if (n_mem) *n_mem = -1;" << endl
       << "  return 0;" << endl
       << "}" << endl
       << endl;
@@ -1786,7 +1785,21 @@ namespace casadi {
       return;
     }
 
-    // Function for freeing memory allocated in init
+    // Function for allocating memory
+    tmp = "int " + fname + "_alloc(int mem)";
+    if (g.cpp) {
+      tmp = "extern \"C\" " + tmp;  // C linkage
+    }
+    if (g.with_header) {
+      g.header << tmp << ";" << endl;
+    }
+    s << tmp << " {" << endl
+      << "  (void)mem;" << endl
+      << "  return 0;" << endl
+      << "}" << endl
+      << endl;
+
+    // Function for freeing memory
     tmp = "int " + fname + "_free(int mem)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
@@ -1821,7 +1834,7 @@ namespace casadi {
 
     // Function that returns the sparsity pattern
     tmp = "int " + fname + "_sparsity"
-      "(int mem, int i, int *nrow, int *ncol, const int **colind, const int **row)";
+      "(int i, int *nrow, int *ncol, const int **colind, const int **row)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1866,7 +1879,7 @@ namespace casadi {
 
     // Function that returns work vector lengths
     tmp = "int " + fname
-      + "_work(int mem, int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)";
+      + "_work(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }

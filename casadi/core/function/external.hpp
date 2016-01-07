@@ -148,11 +148,17 @@ namespace casadi {
     /** \brief Number of inputs and outputs */
     int n_in_, n_out_;
 
+    /** \brief Maximum number of memory objects */
+    int n_mem_;
+
     /// @{
     /** \brief Retreive sparsities */
     sparsity_t sparsity_;
     virtual Sparsity get_sparsity(int ind) const;
     /// @}
+
+    /** \brief Allocate memory */
+    allocmem_t allocmem_;
 
     /** \brief Free memory */
     freemem_t freemem_;
@@ -247,7 +253,7 @@ namespace casadi {
                                      const std::string& iw, const std::string& w) const;
 
     /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
-    static int scalarSparsity(int mem, int i, int *n_row, int *n_col,
+    static int scalarSparsity(int i, int *n_row, int *n_col,
                               const int **colind, const int **row);
 
     /** \brief  Function pointers */
