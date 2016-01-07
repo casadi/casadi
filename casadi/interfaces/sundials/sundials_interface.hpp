@@ -34,6 +34,8 @@
 #include <sundials/sundials_iterative.h>
 #include <sundials/sundials_types.h>
 
+#include <ctime>
+
 /// \cond INTERNAL
 namespace casadi {
 
