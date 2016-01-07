@@ -97,7 +97,7 @@ matrix:
         - sudo make -j2 install
         - popd
         - sudo pip install texttable
-        - sudo pip install --allow-unverified pydot pydot==1.0.28
+        - sudo pip install pydot2
         - sudo apt-get install graphviz python-lxml python-ipdb python-docutils doxygen -y
         - pushd docs/api && make doxexport | grep -v "file loc from" && popd
         
