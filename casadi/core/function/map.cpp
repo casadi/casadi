@@ -108,7 +108,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void MapSerial::evalGen(const T** arg, T** res, int* iw, T* w, void* mem) {
+  void MapSerial::evalGen(const T** arg, T** res, int* iw, T* w) const {
     int n_in = n_in_, n_out = n_out_;
     const T** arg1 = arg+this->n_in();
     T** res1 = res+this->n_out();
@@ -123,16 +123,16 @@ namespace casadi {
     }
   }
 
-  void MapSerial::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    evalGen(arg, res, iw, w, mem);
+  void MapSerial::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+    evalGen(arg, res, iw, w);
   }
 
   void MapSerial::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    evalGen(arg, res, iw, w, mem);
+    evalGen(arg, res, iw, w);
   }
 
   void MapSerial::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    evalGen(arg, res, iw, w, mem);
+    evalGen(arg, res, iw, w);
   }
 
   void MapSerial::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
@@ -281,7 +281,7 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-  void MapReduce::evalGen(const T** arg, T** res, int* iw, T* w, void* mem, R reduction) {
+  void MapReduce::evalGen(const T** arg, T** res, int* iw, T* w, R reduction) const {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     const T** arg1 = arg+f_.sz_arg();
@@ -328,9 +328,9 @@ namespace casadi {
     }
   }
 
-  void MapReduce::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void MapReduce::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
-      evalGen<double>(arg, res, iw, w, 0, std::plus<double>());
+      evalGen<double>(arg, res, iw, w, std::plus<double>());
     } else {
 #ifndef WITH_OPENMP
       casadi_error("the \"impossible\" happened: " <<
@@ -358,13 +358,13 @@ namespace casadi {
   }
 
   void MapReduce::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    evalGen<SXElem>(arg, res, iw, w, mem, std::plus<SXElem>());
+    evalGen<SXElem>(arg, res, iw, w, std::plus<SXElem>());
   }
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
   void MapReduce::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    evalGen<bvec_t>(arg, res, iw, w, mem, &Orring);
+    evalGen<bvec_t>(arg, res, iw, w, &Orring);
   }
 
   Function MapReduce
@@ -488,18 +488,18 @@ namespace casadi {
   MapOmp::~MapOmp() {
   }
 
-  void MapOmp::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void MapOmp::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for
     for (int i=0; i<n_; ++i) {
       const double** arg_i = arg + n_in_ + sz_arg*i;
       for (int j=0; j<n_in_; ++j) {
-        arg_i[j] = arg[j]+i*f_.input(j).nnz();
+        arg_i[j] = arg[j]+i*f_.nnz_in(j);
       }
       double** res_i = res + n_out_ + sz_res*i;
       for (int j=0; j<n_out_; ++j) {
-        res_i[j] = res[j]? res[j]+i*f_.output(j).nnz() : 0;
+        res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
       }
       int* iw_i = iw + i*sz_iw;
       double* w_i = w + i*sz_w;
@@ -520,12 +520,12 @@ namespace casadi {
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
     g.body << "    const double** arg_i = arg + " << n_in_ << "+" << sz_arg << "*i;" << endl;
     for (int j=0; j<n_in_; ++j) {
-      g.body << "    arg_i[" << j << "] = arg[" << j << "]+i*" << f_.input(j).nnz() << ";" << endl;
+      g.body << "    arg_i[" << j << "] = arg[" << j << "]+i*" << f_.nnz_in(j) << ";" << endl;
     }
     g.body << "    double** res_i = res + " <<  n_out_ << "+" <<  sz_res << "*i;" << endl;
     for (int j=0; j<n_out_; ++j) {
       g.body << "    res_i[" << j << "] = res[" << j << "] ?" <<
-                "res[" << j << "]+i*" << f_.output(j).nnz() << ": 0;" << endl;
+                "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;" << endl;
     }
     g.body << "    int* iw_i = iw + i*" << sz_iw << ";" << endl;
     g.body << "    double* w_i = w + i*" << sz_w << ";" << endl;

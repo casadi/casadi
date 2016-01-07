@@ -100,10 +100,10 @@ namespace casadi {
 
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem);
+    void evalGen(const T** arg, T** res, int* iw, T* w) const;
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem);
@@ -156,7 +156,7 @@ namespace casadi {
     virtual ~MapOmp();
 
     /// Evaluate the function numerically
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -193,10 +193,10 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T, typename R>
-      void evalGen(const T** arg, T** res, int* iw, T* w, void* mem, R reduction);
+      void evalGen(const T** arg, T** res, int* iw, T* w, R reduction) const;
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}

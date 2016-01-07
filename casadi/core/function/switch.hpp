@@ -62,7 +62,7 @@ namespace casadi {
     virtual void init();
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */

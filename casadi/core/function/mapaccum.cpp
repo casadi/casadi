@@ -89,7 +89,7 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-  void Mapaccum::evalGen(const T** arg, T** res, int* iw, T* w, void* mem, R reduction) {
+  void Mapaccum::evalGen(const T** arg, T** res, int* iw, T* w, R reduction) const {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     // Catch: must accomodate scenario where res[j] of the accumulator = 0.
@@ -160,16 +160,16 @@ namespace casadi {
     }
   }
 
-  void Mapaccum::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
-    evalGen(arg, res, iw, w, mem, std::plus<double>());
+  void Mapaccum::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+    evalGen(arg, res, iw, w, std::plus<double>());
   }
 
   void Mapaccum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) {
-    evalGen(arg, res, iw, w, mem, std::plus<SXElem>());
+    evalGen(arg, res, iw, w, std::plus<SXElem>());
   }
 
   void Mapaccum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) {
-    evalGen(arg, res, iw, w, mem, orop);
+    evalGen(arg, res, iw, w, orop);
   }
 
   std::vector<MX> bisect(const MX& a, int b) {

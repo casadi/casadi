@@ -74,13 +74,13 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T, typename R>
-    void evalGen(const T** arg, T** res, int* iw, T* w, void* mem, R reduction);
+    void evalGen(const T** arg, T** res, int* iw, T* w, R reduction) const;
 
     /** \brief Binary or, helper function */
     static inline bvec_t orop(bvec_t x, bvec_t y) { return x | y; }
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}

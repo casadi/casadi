@@ -149,12 +149,12 @@ namespace casadi {
     }
   }
 
-  void Switch::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  void Switch::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
     // Get conditional
     int k = static_cast<int>(*arg[0]);
 
     // Get the function to be evaluated
-    Function& fk = k<f_.size() ? f_[k] : f_def_;
+    const Function& fk = k<f_.size() ? f_[k] : f_def_;
 
     // Input buffers
     for (int i=1; i<n_in(); ++i) {

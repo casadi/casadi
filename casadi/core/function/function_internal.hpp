@@ -119,7 +119,7 @@ namespace casadi {
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
     /** \brief  Evaluate numerically, old non-const */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, void* mem) final;
 
     /** \brief  Evaluate numerically */
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
