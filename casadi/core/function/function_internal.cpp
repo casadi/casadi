@@ -2288,23 +2288,23 @@ namespace casadi {
              << "  real_t w[" << nr << "];" << endl;
 
       // Input buffers
-      s << "  const real_t* arg[" << n_in << "] = {";
+      s << "  const real_t* arg[" << sz_arg() << "];" << std::endl;
       int off=0;
       for (int i=0; i<n_in; ++i) {
-        if (i!=0) s << ", ";
-        s << g.work(off, input(i).nnz());
+        s << "arg[" << i << "] = ";
+        s << "w+" << off;
         off += input(i).nnz();
+        s << ";" << std::endl;
       }
-      s << "};" << endl;
 
       // Output buffers
-      s << "  real_t* res[" << n_out << "] = {";
+      s << "  real_t* res[" << sz_res() <<  "];" << std::endl;
       for (int i=0; i<n_out; ++i) {
-        if (i!=0) s << ", ";
-        s << g.work(off, output(i).nnz());
+        s << "res[" << i << "] = ";
+        s << "w+" << off;
         off += output(i).nnz();
+        s << ";" << std::endl;
       }
-      s << "};" << endl;
 
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
       s << "  int j;" << endl
