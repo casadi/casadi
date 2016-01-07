@@ -77,7 +77,7 @@ namespace casadi {
     int ncheck;
 
     /// Get all statistics
-    virtual Dict getStats() const;
+    virtual Dict stats() const;
 
     /// Constructor
     SundialsMemory();

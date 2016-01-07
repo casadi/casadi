@@ -372,7 +372,7 @@ namespace casadi {
           if (iter==0) {
             userOut<true, PL_WARN>()
               << "Warning: intermediate_callback is disfunctional in your installation. "
-              "You will only be able to use getStats(). "
+              "You will only be able to use stats(). "
               "See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it."
               << endl;
           }

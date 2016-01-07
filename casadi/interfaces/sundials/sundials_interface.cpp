@@ -410,8 +410,8 @@ namespace casadi {
     if (this->rq) N_VDestroy_Serial(this->rq);
   }
 
-  Dict SundialsMemory::getStats() const {
-    Dict stats = IntegratorMemory::getStats();
+  Dict SundialsMemory::stats() const {
+    Dict stats = IntegratorMemory::stats();
     // Counters, forward problem
     stats["nsteps"] = static_cast<int>(nsteps);
     stats["nfevals"] = static_cast<int>(nfevals);

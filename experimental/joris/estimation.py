@@ -219,10 +219,10 @@ class NLPSolutionInspector:
     
   def __call__(self,f,*args):
     if self.i>0:
-      self.log[0,self.i] = log10(f.getStats()['inf_pr'])
-      self.log[1,self.i] = log10(f.getStats()['inf_du'])
+      self.log[0,self.i] = log10(f.stats()['inf_pr'])
+      self.log[1,self.i] = log10(f.stats()['inf_du'])
       self.log[2,self.i] = float(log10(f.getInput("f")))
-      self.log[3,self.i] = f.getStats()['ls_trials']
+      self.log[3,self.i] = f.stats()['ls_trials']
       
     self.i += 1
     sol = f.getInput("x")

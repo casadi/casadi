@@ -847,7 +847,7 @@ namespace casadi {
 #endif // SWIG
 
     /// Get all statistics obtained at the end of the last evaluate call
-    Dict getStats(int mem=0) const;
+    Dict stats(int mem=0) const;
 
     ///@{
     /** \brief Get symbolic primitives equivalent to the input expressions */

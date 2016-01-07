@@ -89,5 +89,5 @@ for i in range(1):
   assert(abs(x_[i]-x[i])<1e-6)
   
 #! Solver statistics
-print s.getStats()
+print s.stats()
 

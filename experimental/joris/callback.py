@@ -40,7 +40,7 @@ class Log:
   def __call__(self,f,*args):
     print "====Hey, I'm an iteration===="
     print "X_OPT = ", f.getInput("x")
-    print f.getStats()
+    print f.stats()
     self.iter = self.iter + 1
     if self.iter > 5:
       print "This is quite enough."

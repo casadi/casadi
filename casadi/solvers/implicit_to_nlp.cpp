@@ -151,7 +151,7 @@ namespace casadi {
 
     // Solve the NLP
     solver_(arg1, res1, iw, w, 0);
-    m.solver_stats = solver_.getStats();
+    m.solver_stats = solver_.stats();
 
     // Get the implicit variable
     if (res[iout_]) {

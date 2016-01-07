@@ -1996,8 +1996,8 @@ namespace casadi {
     if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
   }
 
-  Dict IdasMemory::getStats() const {
-    Dict stats = SundialsMemory::getStats();
+  Dict IdasMemory::stats() const {
+    Dict stats = SundialsMemory::stats();
     return stats;
   }
 

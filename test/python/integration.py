@@ -260,7 +260,7 @@ class Integrationtests(casadiTestCase):
                 print "res=",integrator.getOutput("xf")-fs.getOutput("xf"), fs.getOutput("xf")
                 print "Rres=",integrator.getOutput("rxf")-fs.getOutput("rxf"), fs.getOutput("rxf")
                 # self.checkarray(integrator.getOutput("rxf"),fs.getOutput("rxf"),digits=4)
-                stats = integrator.getStats()
+                stats = integrator.stats()
                 
                 print stats
                 self.assertTrue(stats["nsteps"]<1500)

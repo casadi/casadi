@@ -68,7 +68,7 @@ namespace casadi {
     virtual ~Memory() {}
 
     /// Get all statistics
-    virtual Dict getStats() const { return Dict();}
+    virtual Dict stats() const { return Dict();}
   };
 
   /** \brief Function memory with temporary work vectors */
