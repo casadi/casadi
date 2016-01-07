@@ -233,7 +233,7 @@ namespace casadi {
       }
     }
     DiffTime diff = diffTimers(getTimerTime(), time0);
-    timerPlusEq(solver_.t_callback_prepare_, diff);
+    timerPlusEq(mem_.t_callback_prepare, diff);
     full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 
