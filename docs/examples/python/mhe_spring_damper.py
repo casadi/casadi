@@ -128,17 +128,13 @@ simulated_U = DM(cos(t[0:-1])).T # control input for the simulation
 simulated_U[:,Nsimulation/2:] = 0.0
 simulated_W = DM(sigma_w*NP.random.randn(Ndisturbances,Nsimulation-1)) # Process noise for the simulation
 for i in range(Nsimulation-1):
-  phi.setInput(simulated_X[:,i],0)
-  phi.setInput(simulated_U[:,i],1)
-  phi.setInput(simulated_W[:,i],2)
-  phi.evaluate()
-  simulated_X[:,i+1] = phi.getOutput(0)
+  phires = phi([simulated_X[:,i], simulated_U[:,i], simulated_W[:,i]])
+  simulated_X[:,i+1] = phires[0]
 #Create the measurements from these states
 simulated_Y = DM.zeros(Nmeas,Nsimulation) # Holder for the measurements
 for i in range(Nsimulation):
-  h.setInput(simulated_X[:,i],0)
-  h.evaluate()
-  simulated_Y[:,i] = h.getOutput(0)
+  h_res = h([simulated_X[:,i]])
+  simulated_Y[:,i] = h_res[0]
 # Add noise the the position measurements
 simulated_Y += sigma_p*NP.random.randn(simulated_Y.shape[0],simulated_Y.shape[1])
 
@@ -149,10 +145,6 @@ x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
 opts = {"print_level":0, "print_time": False, 'max_iter':100}
 nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
-
-# Set the bounds for the constraints: we only have the multiple shooting constraints, so all constraints have upper and lower bound of zero
-nlpsol.setInput(0,"lbg")
-nlpsol.setInput(0,"ubg")
 
 # Create a holder for the estimated states and disturbances
 estimated_X= DM.zeros(Nstates,Nsimulation)
@@ -165,13 +157,10 @@ current_parameters["S"] = linalg.inv(P) # Arrival cost is the inverse of the ini
 current_parameters["x0"] = x0
 initialisation_state = shooting(0)
 initialisation_state["X",horzcat] = simulated_X[:,0:N]
+res = nlpsol({"p":current_parameters, "x0":initialisation_state, "lbg":0, "ubg":0})
 
-nlpsol.setInput(current_parameters,"p")
-nlpsol.setInput(initialisation_state,"x0")
-
-nlpsol.evaluate()
 # Get the solution
-solution = shooting(nlpsol.getOutput("x"))
+solution = shooting(res["x"])
 estimated_X[:,0:N] = solution["X",horzcat]
 estimated_W[:,0:N-1] = solution["W",horzcat]
 
@@ -180,25 +169,13 @@ for i in range(1,Nsimulation-N+1):
 
   # Update the arrival cost, using linearisations around the estimate of MHE at the beginning of the horizon (according to the 'Smoothed EKF Update'): first update the state and covariance with the measurement that will be deleted, and next propagate the state and covariance because of the shifting of the horizon
   print "step %d/%d (%s)" % (i, Nsimulation-N , nlpsol.stats()["return_status"])
-  H.setInput(solution["X",0],0)
-  H.evaluate()
-  H0 = H.getOutput(0)
+  H0 = H([solution["X",0]])[0]
   K = mtimes([P,H0.T,linalg.inv(mtimes([H0,P,H0.T])+R)])
   P = mtimes((DM.eye(Nstates)-mtimes(K,H0)),P)
-  h.setInput(solution["X",0],0)
-  h.evaluate()
-  x0 = x0 + mtimes(K, current_parameters["Y",0]-h.getOutput(0)-mtimes(H0,x0-solution["X",0]) )
-  phi.setInput(x0,0)
-  phi.setInput(current_parameters["U",0],1)
-  phi.setInput(solution["W",0],2)
-  phi.evaluate()
-  x0 = phi.getOutput(0)
-  PHI.setInput(solution["X",0],0)
-  PHI.setInput(current_parameters["U",0],1)
-  PHI.setInput(solution["W",0],2)
-  PHI.evaluate()
-  F = PHI.getOutput(0)
-  PHI.evaluate()
+  [h0] = h([solution["X",0]])
+  x0 = x0 + mtimes(K, current_parameters["Y",0]-h0-mtimes(H0,x0-solution["X",0]))
+  [x0] = phi([x0, current_parameters["U",0], solution["W",0]])
+  F = PHI([solution["X",0], current_parameters["U",0], solution["W",0]])[0]
   P = mtimes([F,P,F.T]) + linalg.inv(Q)
   # Get the measurements and control inputs 
   current_parameters["U",horzcat] = simulated_U[:,i:i+N-1]
@@ -210,17 +187,11 @@ for i in range(1,Nsimulation-N+1):
   initialisation_state["W",N-2] = DM.zeros(Ndisturbances,1) # The last node for the disturbances is initialized with zeros
   initialisation_state["X",horzcat,0:N-1] = estimated_X[:,i:i+N-1] # The shifted solution for the state estimates
   # The last node for the state is initialized with a forward simulation
-  phi.setInput(initialisation_state["X",N-1] ,0)
-  phi.setInput(current_parameters["U",-1],1)
-  phi.setInput(initialisation_state["W",-1],2)
-  phi.evaluate()
-  initialisation_state["X",N-1] = phi.getOutput(0)
+  [phi0] = phi([initialisation_state["X",N-1], current_parameters["U",-1], initialisation_state["W",-1]])
+  initialisation_state["X",N-1] = phi0
   # And now initialize the solver and solve the problem
-  nlpsol.setInput(current_parameters,"p")
-  nlpsol.setInput(initialisation_state,"x0")
-  nlpsol.evaluate()
-
-  solution = shooting(nlpsol.getOutput("x"))
+  res = nlpsol({"p":current_parameters, "x0":initialisation_state, "lbg":0, "ubg":0})
+  solution = shooting(res["x"])
 
   # Now get the state estimate. Note that we are only interested in the last node of the horizon
   estimated_X[:,N-1+i] = solution["X",N-1]
