@@ -15,27 +15,21 @@ z = MX.sym('z',3);
 
 
 f = Function('f',{x},{cos(x)})
+r = f({3})
 
-f.setInput(3,0)
+disp(r{1})
 
-f.evaluate()
-
-
-disp(f.getOutput())
-
-res = f.getOutput()-DM(cos(3))
+res = r{1}-DM(cos(3))
 assert(iszero(res))
 
 
 x = SX.sym('x',4);
 
 f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
-
-f.setInput([1,2,3,4])
-f.evaluate()
+r = f({[1,2,3,4]})
 
 for i=1:f.n_out()
-  res = f.getOutput(i-1)-2;
+  res = r{i}-2;
 
   assert(res.is_zero())
 
@@ -63,12 +57,10 @@ assert(flag);
 x = MX.sym('x',4);
 
 f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
-
-f.setInput([1,2,3,4])
-f.evaluate()
+r = f({[1,2,3,4]})
 
 for i=1:f.n_out()
-  res = f.getOutput(i-1)-2;
+  res = r{i}-2;
 
   assert(res.is_zero())
 
@@ -110,7 +102,7 @@ opts = struct
 opts.verbose = true
 
 intg = casadi.integrator('integrator', 'rk', ode, opts);
-intg.evaluate();
+intg(struct);
 diary OFF
 
 logged = fileread('diary');
