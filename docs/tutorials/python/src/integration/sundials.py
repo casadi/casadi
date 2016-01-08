@@ -118,9 +118,8 @@ show()
 #$ We plot the map $\delta x_0 \mapsto \delta x(tend) $
 
 def out(dx0):
-	F.setInput([x0+dx0,y0],"x0")
-	F.evaluate()
-	return F.getOutput().full()
+        res = F({"x0":[x0+dx0,y0]})
+	return res["xf"].full()
 dx0=numpy.linspace(-2,2,100)
 out = array([out(dx) for dx in dx0]).squeeze()
 dxtend=out[:,0]-sol[-1,0]
@@ -135,10 +134,8 @@ show()
 #
 
 dintegrator = F.derivative(1,0)
-dintegrator.setInput([x0,y0],"der_x0")
-dintegrator.setInput([1,0],"fwd0_x0")
-dintegrator.evaluate()
-A = dintegrator.getOutput("fwd0_xf")[0]
+res = dintegrator({"der_x0":[x0,y0], "fwd0_x0":[1,0]})
+A = res["fwd0_xf"][0]
 A = float(A) # FIXME
 
 plot(dx0,A*dx0)
@@ -149,12 +146,10 @@ show()
 #! The interpetation is that a small initial circular patch of phase space evolves into ellipsoid patches at later stages.
 
 def out(t):
-	dintegrator.setInput([1,0],"fwd0_x0")
-        dintegrator.evaluate()
-	A=dintegrator.getOutput("fwd0_xf").full()
-	dintegrator.setInput([0,1],"fwd0_x0")
-	dintegrator.evaluate()
-	B=dintegrator.getOutput("fwd0_xf").full()
+        res = dintegrator({"der_x0":[x0,y0], "fwd0_x0":[1,0]})
+	A=res["fwd0_xf"].full()
+        res = dintegrator({"der_x0":[x0,y0], "fwd0_x0":[0,1]})
+	B=res["fwd0_xf"].full()
 	return array([A,B]).squeeze().T
 
 circle = array([[sin(x),cos(x)] for x in numpy.linspace(0,2*pi,100)]).T
@@ -199,9 +194,8 @@ w = F({'x0':MX([1,0]),'p':u})["xf"]
 f=Function('f', [u],[w])
 
 def out(u):
-	f.setInput(u)
-	f.evaluate()
-	return f.getOutput().full()
+        [w0] = f([u])
+	return w0.full()
 
 print out(0)
 print out(1)
