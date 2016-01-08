@@ -226,30 +226,6 @@ namespace casadi {
     ///  Convert to Slice (only for IM)
     Slice toSlice(bool ind1=false) const;
 
-    /** \brief Set all the entries without changing sparsity pattern */
-    void set(const Matrix<DataType>& val);
-
-#ifndef SWIG
-    /** \brief Get all the entries without changing sparsity pattern */
-    void get(Matrix<DataType>& val) const;
-#endif // SWIG
-
-    ///@{
-    /** \brief Get the elements numerically */
-    void set(double val);
-    void set(const double* val, bool tr=false);
-    void set(const std::vector<double>& val, bool tr=false);
-    ///@}
-
-    ///@{
-    /** \brief Get the elements numerically */
-#ifndef SWIG
-    void get(double& val) const;
-    void get(double* val, bool tr=false) const;
-#endif // SWIG
-    void get(std::vector<double>& SWIG_OUTPUT(m)) const;
-    ///@}
-
     ///@{
     /// Get a submatrix, single argument
     void get(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
@@ -282,14 +258,6 @@ namespace casadi {
     void set(const Matrix<DataType>& m, bool ind1, const Slice& rr, const Matrix<int>& cc);
     void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Slice& cc);
     void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
-    ///@}
-
-    ///@{
-    /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
-    template<typename RR, typename CC>
-    void addSub(const Matrix<DataType>& m, RR rr, CC cc, bool ind1) {
-      set(m+sub(rr, cc, ind1), rr, cc, ind1);
-    }
     ///@}
 
 #ifndef SWIG

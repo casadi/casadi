@@ -1210,7 +1210,10 @@ import_array();
       // Convert to DM
       DM tmp, *tmp_ptr=&tmp;
       if (to_ptr(p, &tmp_ptr) && tmp_ptr->is_column()) {
-        if (m) tmp_ptr->get(**m);
+        if (m) {
+          (**m).resize(tmp_ptr->nnz());
+          casadi_copy(tmp_ptr->ptr(), tmp_ptr->nnz(), getPtr(**m));
+        }
         return true;
       }
 
@@ -3040,12 +3043,12 @@ namespace casadi{
       npy_intp dims[2] = {$self->size1(), $self->size2()};
       PyObject* ret = PyArray_SimpleNew(2, dims, NPY_DOUBLE);
       double* d = static_cast<double*>(array_data(ret));
-      $self->get(d, true); // Row-major
+      casadi_densify($self->ptr(), $self->sparsity(), d, true); // Row-major
       return ret;
 #elif defined(SWIGMATLAB)
       mxArray *p  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
       double* d = static_cast<double*>(mxGetData(p));
-      $self->get(d); // Column-major
+      casadi_densify($self->ptr(), $self->sparsity(), d, false); // Column-major
       return p;
 #else
       return 0;

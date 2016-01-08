@@ -953,11 +953,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::set(const Matrix<DataType>& val) {
-    sparsity().set(getPtr(data()), getPtr(val.data()), val.sparsity());
-  }
-
-  template<typename DataType>
   void Matrix<DataType>::setBV(const Matrix<DataType>& val) {
     bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
     const bvec_t* bw_val = reinterpret_cast<const bvec_t*>(getPtr(val.data()));
@@ -996,11 +991,6 @@ namespace casadi {
     casadi_assert(len==nnz());
     bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
     for (int i=0; i<len; ++i) *bw_this++ |= *val++;
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::get(Matrix<DataType>& val) const {
-    val.set(*this);
   }
 
   template<typename DataType>
@@ -1608,7 +1598,8 @@ namespace casadi {
       return project(x, sp.intersect(x.sparsity()), false);
     } else {
       Matrix<DataType> ret = Matrix<DataType>::zeros(sp);
-      ret.set(x);
+      std::vector<DataType> w(x.size1());
+      casadi_project(x.ptr(), x.sparsity(), ret.ptr(), sp, getPtr(w));
       return ret;
     }
   }
@@ -2577,51 +2568,6 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::getNZ(Matrix<DataType>& val) const {
     getNZ(val, false, Slice());
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::set(double val) {
-    std::fill((*this)->begin(), (*this)->end(), val);
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::set(const double* val, bool tr) {
-    // Get sparsity pattern
-    int size1 = this->size1();
-    int size2 = this->size2();
-    const int* colind = this->colind();
-    const int* row = this->row();
-
-    // Fetch nonzeros
-    for (int cc=0; cc<size2; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        int rr=row[el];
-        setValue(val[tr ? cc + size2*rr : rr + size1*cc], el);
-      }
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::set(const std::vector<double>& val, bool tr) {
-    casadi_assert(val.size()==this->numel());
-    set(getPtr(val), tr);
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::get(double& val) const {
-    casadi_assert(is_scalar());
-    get(&val);
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::get(double* val, bool tr) const {
-    casadi_densify(this->ptr(), this->sparsity(), val, tr);
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::get(std::vector<double>& val) const {
-    val.resize(this->numel());
-    get(getPtr(val), false);
   }
 
   template<typename DataType>

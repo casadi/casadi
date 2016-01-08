@@ -68,8 +68,6 @@ namespace casadi {
       argv[i] = DM::zeros(sparsity_in(i));
       if (arg[i] != 0) {
         argv[i].setNZ(arg[i]);
-      } else {
-        argv[i].set(0.);
       }
     }
 

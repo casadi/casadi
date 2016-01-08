@@ -1477,7 +1477,7 @@ namespace casadi {
     m.k = 0;
 
     // Get consistent initial conditions
-    m.Z.set(numeric_limits<double>::quiet_NaN());
+    casadi_fill(m.Z.ptr(), m.Z.nnz(), numeric_limits<double>::quiet_NaN());
 
     // Add the first element in the tape
     if (nrx_>0) {
@@ -1506,7 +1506,7 @@ namespace casadi {
     m.k = nk_;
 
     // Get consistent initial conditions
-    m.RZ.set(numeric_limits<double>::quiet_NaN());
+    casadi_fill(m.RZ.ptr(), m.RZ.nnz(), numeric_limits<double>::quiet_NaN());
   }
 
   ImplicitFixedStepIntegrator::
