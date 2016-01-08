@@ -206,32 +206,6 @@ namespace casadi {
 #endif // SWIG
     /// \endcond
 
-#ifndef SWIG
-    /// \cond UNSAFE
-    /** \brief [UNSAFE] Obtain reference to inputs
-     * \sa getInput, setInput
-     */
-    ///@{
-    /// Access input argument
-    const Matrix<double>& input(int i=0) const;
-    const Matrix<double>& input(const std::string &iname) const;
-    Matrix<double>& input(int i=0);
-    Matrix<double>& input(const std::string &iname);
-    ///@}
-
-    /** \brief [UNSAFE] Obtain reference to outputs
-     * \sa getOutput, getOutput
-     */
-    ///@{
-    /// Access output argument
-    const Matrix<double>& output(int i=0) const;
-    const Matrix<double>& output(const std::string &oname) const;
-    Matrix<double>& output(int i=0);
-    Matrix<double>& output(const std::string &oname);
-    ///@}
-    /// \endcond
-#endif
-
     /** \brief Get the number of function inputs */
     int n_in() const;
 
@@ -342,9 +316,6 @@ namespace casadi {
     const Sparsity& sparsity_out(int ind) const;
     const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
-
-    /** \brief  Evaluate */
-    void evaluate();
 
     /** \brief  Print dimensions of inputs and outputs */
     void printDimensions(std::ostream &stream=casadi::userOut()) const;

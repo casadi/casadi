@@ -513,9 +513,9 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    inline int n_in() const { return ibuf_.size();}
+    inline int n_in() const { return isp_.size();}
     virtual size_t get_n_in() const = 0;
-    inline int n_out() const { return obuf_.size();}
+    inline int n_out() const { return osp_.size();}
     virtual size_t get_n_out() const = 0;
     ///@}
 
@@ -530,19 +530,19 @@ namespace casadi {
     ///@{
     /** \brief Number of input/output elements */
     int numel_in() const;
-    int numel_in(int ind) const { return input(ind).numel(); }
-    int numel_out(int ind) const { return output(ind).numel(); }
+    int numel_in(int ind) const { return sparsity_in(ind).numel(); }
+    int numel_out(int ind) const { return sparsity_out(ind).numel(); }
     int numel_out() const;
     ///@}
 
     ///@{
     /** \brief Input/output dimensions */
-    int size1_in(int ind) const { return input(ind).size1(); }
-    int size2_in(int ind) const { return input(ind).size2(); }
-    int size1_out(int ind) const { return output(ind).size1(); }
-    int size2_out(int ind) const { return output(ind).size2(); }
-    std::pair<int, int> size_in(int ind) const { return input(ind).size(); }
-    std::pair<int, int> size_out(int ind) const { return output(ind).size(); }
+    int size1_in(int ind) const { return sparsity_in(ind).size1(); }
+    int size2_in(int ind) const { return sparsity_in(ind).size2(); }
+    int size1_out(int ind) const { return sparsity_out(ind).size1(); }
+    int size2_out(int ind) const { return sparsity_out(ind).size2(); }
+    std::pair<int, int> size_in(int ind) const { return sparsity_in(ind).size(); }
+    std::pair<int, int> size_out(int ind) const { return sparsity_out(ind).size(); }
     ///@}
 
     /** \brief Name of the function */
@@ -640,7 +640,7 @@ namespace casadi {
     /** \brief Get sparsity of a given input */
     /// @{
     inline const Sparsity& sparsity_in(int ind) const {
-      return input(ind).sparsity();
+      return isp_.at(ind);
     }
     inline const Sparsity& sparsity_in(const std::string& iname) const {
       return sparsity_in(index_in(iname));
@@ -651,69 +651,13 @@ namespace casadi {
     /** \brief Get sparsity of a given output */
     /// @{
     inline const Sparsity& sparsity_out(int ind) const {
-      return output(ind).sparsity();
+      return osp_.at(ind);
     }
     inline const Sparsity& sparsity_out(const std::string& iname) const {
       return sparsity_out(index_out(iname));
     }
     virtual Sparsity get_sparsity_out(int ind) const = 0;
     /// @}
-
-  private:
-    /// Access input argument by index
-    inline Matrix<double>& input(int i=0) {
-      try {
-        return ibuf_.at(i);
-      } catch(std::out_of_range&) {
-        std::stringstream ss;
-        ss <<  "In function " << name_
-           << ": input " << i << " not in interval [0, " << n_in() << ")";
-        throw CasadiException(ss.str());
-      }
-    }
-
-    /// Access input argument by name
-    inline Matrix<double>& input(const std::string &iname) {
-      return input(index_in(iname));
-    }
-
-    /// Const access input argument by index
-    inline const Matrix<double>& input(int i=0) const {
-      return const_cast<FunctionInternal*>(this)->input(i);
-    }
-
-    /// Const access input argument by name
-    inline const Matrix<double>& input(const std::string &iname) const {
-      return const_cast<FunctionInternal*>(this)->input(iname);
-    }
-
-    /// Access output argument by index
-    inline Matrix<double>& output(int i=0) {
-      try {
-        return obuf_.at(i);
-      } catch(std::out_of_range&) {
-        std::stringstream ss;
-        ss <<  "In function " << name_
-           << ": output " << i << " not in interval [0, " << n_out() << ")";
-        throw CasadiException(ss.str());
-      }
-    }
-
-    /// Access output argument by name
-    inline Matrix<double>& output(const std::string &oname) {
-      return output(index_out(oname));
-    }
-
-    /// Const access output argument by index
-    inline const Matrix<double>& output(int i=0) const {
-      return const_cast<FunctionInternal*>(this)->output(i);
-    }
-
-    /// Const access output argument by name
-    inline const Matrix<double>& output(const std::string &oname) const {
-      return const_cast<FunctionInternal*>(this)->output(oname);
-    }
-  public:
 
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
@@ -789,9 +733,6 @@ namespace casadi {
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
-
-    /// Input and output buffers
-    std::vector<DM> ibuf_, obuf_;
 
     /// Input and output scheme
     std::vector<std::string> ischeme_, oscheme_;

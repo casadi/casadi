@@ -113,22 +113,12 @@ namespace casadi {
     // Get the number of inputs and outputs
     isp_.resize(get_n_in());
     osp_.resize(get_n_out());
-    int n_in = isp_.size();
-    int n_out = osp_.size();
+    int n_in = this->n_in();
+    int n_out = this->n_out();
 
     // Get the input and output sparsities
     for (int i=0; i<n_in; ++i) isp_[i] = get_sparsity_in(i);
     for (int i=0; i<n_out; ++i) osp_[i] = get_sparsity_out(i);
-
-    // Set up input and output buffers
-    if (ibuf_.empty()) {
-      ibuf_.resize(n_in);
-      for (int i=0; i<n_in; ++i) ibuf_[i] = DM(isp_[i], default_in(i));
-    }
-    if (obuf_.empty()) {
-      obuf_.resize(n_out);
-      for (int i=0; i<n_out; ++i) obuf_[i] = DM::zeros(osp_[i]);
-    }
 
     // Allocate memory for function inputs and outputs
     sz_arg_per_ += n_in;

@@ -434,7 +434,6 @@ namespace casadi {
     return ret;
   }
 
-
   Function Function::kernel_sum(const string& name,
                                 const pair<int, int> & size,
                                 double r, int n,
@@ -444,25 +443,6 @@ namespace casadi {
     ret.setOption(opts);
     ret.init();
     return ret;
-  }
-
-  void Function::evaluate() {
-    // Get pointers to input arguments
-    int n_in = this->n_in();
-    vector<const double*> arg(sz_arg());
-    for (int i=0; i<n_in; ++i) arg[i]=(*this)->input(i).ptr();
-
-    // Get pointers to output arguments
-    int n_out = this->n_out();
-    vector<double*> res(sz_res());
-    for (int i=0; i<n_out; ++i) res[i]=(*this)->output(i).ptr();
-
-    // Temporary memory
-    std::vector<int> iw(sz_iw());
-    std::vector<double> w(sz_w());
-
-    // Call memory-less
-    (*this)->eval(*(*this)->mem_.at(0), getPtr(arg), getPtr(res), getPtr(iw), getPtr(w));
   }
 
   int Function::n_in() const {
@@ -1649,38 +1629,6 @@ namespace casadi {
     ret.setOption(opts);
     ret.init();
     return ret;
-  }
-
-  const Matrix<double>& Function::input(int i) const {
-    return (*this)->input(i);
-  }
-
-  const Matrix<double>& Function::input(const string &iname) const {
-    return (*this)->input(iname);
-  }
-
-  Matrix<double>& Function::input(int i) {
-    return (*this)->input(i);
-  }
-
-  Matrix<double>& Function::input(const string &iname) {
-    return (*this)->input(iname);
-  }
-
-  const Matrix<double>& Function::output(int i) const {
-    return (*this)->output(i);
-  }
-
-  const Matrix<double>& Function::output(const string &oname) const {
-    return (*this)->output(oname);
-  }
-
-  Matrix<double>& Function::output(int i) {
-    return (*this)->output(i);
-  }
-
-  Matrix<double>& Function::output(const string &oname) {
-    return (*this)->output(oname);
   }
 
 } // namespace casadi
