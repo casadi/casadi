@@ -68,13 +68,11 @@ f_in = f.sx_in()
 print f_in, type(f_in)
 f_out = f(f_in)
 print f_out, type(f_out)
-f.setInput(2)
-f.evaluate()
-print f.getOutput()
-print type(f.getOutput())
-f.setInput(3)
-f.evaluate()
-print f.getOutput()
+[z0] = f([2])
+print z0
+print type(z0)
+[z0] = f([3])
+print z0
 #! We can evaluate symbolically, too:
 print f([y])
 #! Since numbers get cast to SXConstant object, you can also write the following non-efficient code:
@@ -88,11 +86,9 @@ x = SX.sym("x") # 1 by 1 matrix serves as scalar
 y = SX.sym("y") # 1 by 1 matrix serves as scalar
 f = Function('f', [x , y ], [x*y, x+y])
 print "%d -> %d" % (f.n_in(),f.n_out())
+r = f([2, 3])
 
-f.setInput(2,0)
-f.setInput(3,1)
-
-print [f.getOutput(i) for i in range(2)]
+print [r[i] for i in range(2)]
 print [[SX.grad(f,i,j) for i in range(2)] for j in range(2)]
 
 #! Symbolic function manipulation
@@ -123,9 +119,8 @@ x = SX.sym("x")
 y = SX.sym("y")
 f = Function('f', [vertcat((x , y ))], [vertcat((x*y, x+y))])
 print "%d -> %d" % (f.n_in(),f.n_out())
-f.setInput([2,3])
-f.evaluate()
-print f.getOutput()
+r = f([[2, 3]])
+print z[0]
 G=SX.jac(f).T
 print G
 
@@ -133,10 +128,8 @@ print G
 #$ Let's define $ \vec{v} = {\buildrel\leftrightarrow\over{G}} . \vec{p} $
 #! The evaluation of v can be efficiently achieved by automatic differentiation as follows:
 df = f.derivative(1,0)
-df.setInput([2,3],0)
-df.setInput([7,6],1)
-df.evaluate()
-print df.getOutput(1) # v
+res = df([[2,3], [7,6]])
+print res[1] # v
 
 #! Functions with matrix valued input
 #! ----------------------------------
@@ -146,10 +139,8 @@ print x*y # Not a dot product
 f = Function('f', [x,y], [x*y])
 print "%d -> %d" % (f.n_in(),f.n_out())
 print f([x,y])
-f.setInput(DM([[1,2],[3,4]]),0)
-f.setInput(DM([[4,5],[6,7]]),1)
-f.evaluate()
-print f.getOutput()
+[r] = f([DM([[1,2],[3,4]]), DM([[4,5],[6,7]])])
+print r
 print SX.jac(f,0).T
 print SX.jac(f,1).T
 

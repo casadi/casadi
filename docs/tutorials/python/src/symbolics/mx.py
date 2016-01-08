@@ -51,14 +51,13 @@ f = Function('f', [x,y],[z])
 
 #! Evaluation
 #! ----------------
-f.setInput(DM([[1,2,3],[4,5,6]]),0);
-f.setInput(DM([[1,3],[0,6],[0,9]]),1);
-f.evaluate()
-
-print f.getOutput()
+x0 = DM([[1,2,3],[4,5,6]])
+x1 = DM([[1,3],[0,6],[0,9]])
+[z0] = f([x0, x1])
+print z0
 #! Note how this result is related to a numpy approach:
-a=matrix(f.getInput(0)).reshape(3,2)
-b=matrix(f.getInput(1)).reshape(2,3)
+a=matrix(x0).reshape(3,2)
+b=matrix(x1).reshape(2,3)
 print a.T*b.T
 
 #! Numerical matrices
@@ -71,9 +70,8 @@ print MX([1,2,3])
 #! As before, evaluation is lazy on the matrix level
 Y = MX.sym("Y")
 f = Function('f', [Y],[X])
-f.setInput([2])
-f.evaluate()
-print f.getOutput()
+[X0] = f([[2]])
+print X0
 
 #! Element assignement
 #! -------------------

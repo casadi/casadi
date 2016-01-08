@@ -196,16 +196,11 @@ for k in range(nk):
 #$ Hessian of the Lagrangian function:
 nlp = {'x':v, 'f':J, 'g':vertcat(eq)}
 solver = nlpsol("solver", "ipopt", nlp)
-#$ Pass bounds on the variables and constraints. The upper and lower bounds on the equality constraints are 0:
-solver.setInput(lbv,"lbx")
-solver.setInput(ubv,"ubx")
-solver.setInput(v0,"x0")
-solver.setInput(0,"lbg")
-solver.setInput(0,"ubg")
-#$ Solving the NLP amounts to "evaluating the NLP solver":
-solver.evaluate()
+#$ Solving the NLP amounts to "evaluating the NLP solver"
+#$ The upper and lower bounds on the equality constraints are 0:
+sol = solver({"lbx":lbv, "ubx":ubv, "x0":v0, "lbg":0, "ubg":0})
 #$ After making sure that the solution was successful, we retrieve the solution:
-v_opt  = solver.getOutput("x")
+v_opt  = sol["x"]
 x0_opt = v_opt[[vind['x'][k][0] for k in range(nk+1)]]
 x1_opt = v_opt[[vind['x'][k][1] for k in range(nk+1)]]
 u_opt = v_opt[[vind['u'][k][0] for k in range(nk)]]
