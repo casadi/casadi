@@ -145,15 +145,11 @@ class MyCallback(Callback):
 
 mycallback = MyCallback('mycallback', 2, 1, 0)
 opts = {}
-opts["iteration_callback"] = mycallback
-opts["tol"] = 1e-8
-opts["max_iter"] = 50
-solver = nlpsol("solver", "ipopt", nlp, opts)
-solver.setInput([-10]*2,"lbx")
-solver.setInput([10]*2,"ubx")
-solver.setInput([-10],"lbg")
-solver.setInput([10],"ubg")
-solver.evaluate()
+opts['iteration_callback'] = mycallback
+opts['tol'] = 1e-8
+opts['max_iter'] = 50
+solver = nlpsol('solver', 'ipopt', nlp, opts)
+sol = solver({'lbx':-10, 'ubx':10, 'lbg':-10, 'ubg':10})
 
 #! By setting matplotlib interactivity off, we can inspect the figure at ease
 matplotlib.interactive(False)
