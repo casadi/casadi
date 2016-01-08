@@ -83,7 +83,6 @@ set(CASADI_SRCS
   mx/repmat.hpp              mx/repmat.cpp              # RepMat
 
   # A dynamically created function with AD capabilities
-  function/io_interface.hpp                                         # Input/output interface for Function and FunctionInternal
   function/function.hpp            function/function.cpp            # Function object class (public API)
   function/function_internal.hpp   function/function_internal.cpp   # Function object class (internal API)
   function/callback.cpp            function/callback.hpp            # Interface for user-defined function classes (public API)

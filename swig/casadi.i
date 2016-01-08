@@ -3356,15 +3356,6 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 %}
 #endif
 
-%include <casadi/core/function/io_interface.hpp>
-
-%template(IOInterfaceFunction) casadi::IOInterface<casadi::Function>;
-
-%extend casadi::IOInterface<casadi::Function> {
-  casadi::Matrix<double> getInput(int iind=0) const             { static_cast<const casadi::Function*>(return $self->input(iind);}
-  casadi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputIndex(iname)); }
-  casadi::Matrix<double> getOutput(int oind=0) const            { static_cast<const casadi::Function*>(return $self->output(oind);}
-}
 
 %include <casadi/core/function/function.hpp>
 %feature("copyctor", "0") casadi::CodeGenerator;
@@ -3534,7 +3525,6 @@ def swig_typename_convertor_cpp2python(s):
     s = re.sub(r"(const )? ?std::vector< ?([\w\(\)\[\] ]+) ?(, ?std::allocator< ?\2 ?>)? ?> ?&?",r"[\2] ",s)
   s = re.sub(r"\b(\w+)(< \w+ >)?::\1",r"\1",s)
   s = s.replace("casadi::","")
-  s = s.replace("IOInterface< Function >","Function")
   s = s.replace("::",".")
   s = s.replace(".operator ()","")
   s = re.sub(r"([A-Z]\w+)Vector",r"[\1]",s)

@@ -25,7 +25,11 @@
 #ifndef CASADI_FUNCTION_HPP
 #define CASADI_FUNCTION_HPP
 
-#include "io_interface.hpp"
+#include "../sx/sx_elem.hpp"
+#include "../mx/mx.hpp"
+#include "../options_functionality.hpp"
+
+#include <exception>
 
 /*
   NOTE: The order of includes is as follows:
@@ -127,7 +131,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT Function : public OptionsFunctionality, public IOInterface<Function>{
+  class CASADI_EXPORT Function : public OptionsFunctionality {
   public:
 
     /** \brief Default constructor, null pointer */

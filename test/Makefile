@@ -36,22 +36,21 @@ unittests: unittests_py
 unittests_knownbugs: unittests_py_knownbugs
 
 unittests_py_slow:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
+#	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
 
 unittests_py_valgrind:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -memcheck -passoptions="--ignore_memory_heavy"
-
+#	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -memcheck -passoptions="--ignore_memory_heavy"
 
 unittests_py:
-ifdef MEMCHECK
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="--ignore_memory_heavy  --run_slow"
-else
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
-endif
+#ifdef MEMCHECK
+#	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
+#	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="--ignore_memory_heavy  --run_slow"
+#else
+#	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
+#endif
 
 unittests_py_knownbugs:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--known_bugs"
+#	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--known_bugs"
 
 examples: examples_indoc examples_code
 
