@@ -510,12 +510,6 @@ Get output dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::evaluate "
-
-Evaluate.
-
-";
-
 %feature("docstring") casadi::Callback::mx_in "
 
 Get symbolic primitives equivalent to the input expressions.
@@ -2710,12 +2704,6 @@ the output elements).
 
 ";
 
-%feature("docstring") casadi::Function::isNull "
-
-Is a null pointer?
-
-";
-
 %feature("docstring") casadi::Function::optionAllowed "
 
 Get the allowed values of a certain option.
@@ -2788,9 +2776,9 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Function::evaluate "
+%feature("docstring") casadi::Function::isNull "
 
-Evaluate.
+Is a null pointer?
 
 ";
 

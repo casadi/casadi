@@ -789,12 +789,6 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::evaluate() "
-
-Evaluate.
-
-";
-
 %feature("docstring")  casadi::Function::mx_in(int ind) const  "
 
 Get symbolic primitives equivalent to the input expressions.
@@ -3750,12 +3744,6 @@ the output elements).
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
 %feature("docstring")  casadi::OptionsFunctionality::optionAllowed(const
 std::string &str) const  "
 
@@ -3862,9 +3850,9 @@ Get input dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::evaluate() "
+%feature("docstring")  casadi::SharedObject::isNull() const  "
 
-Evaluate.
+Is a null pointer?
 
 ";
 
