@@ -88,9 +88,6 @@ namespace casadi {
     monitor_rhs_   = monitored("res");
     monitor_rhsQB_ = monitored("resQB");
 
-    // Sundials return flag
-    int flag;
-
     if (option("linear_multistep_method")=="adams")  lmm_ = CV_ADAMS;
     else if (option("linear_multistep_method")=="bdf") lmm_ = CV_BDF;
     else
