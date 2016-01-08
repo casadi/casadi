@@ -19,8 +19,6 @@
 // File: classcasadi_1_1Callback.xml
 
 
-/*  Simple Getters & Setters  */
-
 /*  Option Functionality  */ %feature("docstring")
 casadi::Callback::copyOptions "
 
@@ -292,30 +290,6 @@ the enum value corresponding to th certain option.
 
 %feature("docstring") casadi::Callback::sz_iw "[INTERNAL]  Get required
 length of iw field.
-
-";
-
-%feature("docstring") casadi::Callback::getOutput "
-
->  DM  IOInterface< Function  >.getOutput(int oind=0) const
-------------------------------------------------------------------------
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0..n_out()-1]
-
->  DM  IOInterface< Function  >.getOutput(str oname) const
-------------------------------------------------------------------------
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -1244,30 +1218,6 @@ Get output dimension.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring") casadi::Callback::getInput "
-
->  DM  IOInterface< Function  >.getInput(int iind=0) const
-------------------------------------------------------------------------
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0..n_in()-1]
-
->  DM  IOInterface< Function  >.getInput(str iname) const
-------------------------------------------------------------------------
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
@@ -2243,8 +2193,6 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Function.xml
 
 
-/*  Simple Getters & Setters  */
-
 /*  Option Functionality  */ %feature("docstring") casadi::Function::repr "
 
 Print a representation of the object.
@@ -2363,30 +2311,6 @@ Print options to a stream.
 %feature("docstring") casadi::Function::getAlgorithmSize "
 
 Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::Function::getOutput "
-
->  DM  IOInterface< Function  >.getOutput(int oind=0) const
-------------------------------------------------------------------------
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0..n_out()-1]
-
->  DM  IOInterface< Function  >.getOutput(str oname) const
-------------------------------------------------------------------------
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -2885,30 +2809,6 @@ Get input scheme description by index.
 %feature("docstring") casadi::Function::linsol_cholesky_sparsity "
 
 Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
-
-";
-
-%feature("docstring") casadi::Function::getInput "
-
->  DM  IOInterface< Function  >.getInput(int iind=0) const
-------------------------------------------------------------------------
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0..n_in()-1]
-
->  DM  IOInterface< Function  >.getInput(str iname) const
-------------------------------------------------------------------------
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
 
 ";
 

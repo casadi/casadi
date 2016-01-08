@@ -19,8 +19,6 @@
 // File: classcasadi_1_1Callback.xml
 
 
-/*  Simple Getters & Setters  */
-
 /*  Option Functionality  */ %feature("docstring")
 casadi::OptionsFunctionality::copyOptions(const OptionsFunctionality &obj,
 bool skipUnknown=false) "
@@ -451,30 +449,6 @@ th certain option.
 
 %feature("docstring")  casadi::Function::sz_iw() const  " [INTERNAL]  Get
 required length of iw field.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0..n_out()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -1828,30 +1802,6 @@ the output elements).
 
 ";
 
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0..n_in()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
-";
-
 %feature("docstring")  casadi::Function::mx_out(int ind) const  "
 
 Get symbolic primitives equivalent to the output expressions.
@@ -2885,8 +2835,6 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Function.xml
 
 
-/*  Simple Getters & Setters  */
-
 /*  Option Functionality  */ %feature("docstring")
 casadi::SharedObject::repr(std::ostream &stream=casadi::userOut(), bool
 trailing_newline=true) const  "
@@ -3156,30 +3104,6 @@ Print options to a stream.
 %feature("docstring")  casadi::Function::getAlgorithmSize() const  "
 
 Get the number of atomic operations.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(int
-oind=0) const "
-
-Get an output by index.
-
-Parameters:
------------
-
-oind:  index within the range [0..n_out()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getOutput(const
-std::string &oname) const "
-
-Get an output by name.
-
-Parameters:
------------
-
-oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
@@ -3961,30 +3885,6 @@ Get input scheme description by index.
 tr=false, int mem=0) const  "
 
 Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(int
-iind=0) const "
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0..n_in()-1]
-
-";
-
-%feature("docstring")  casadi::IOInterface< Function  >::getInput(const
-std::string &iname) const "
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
