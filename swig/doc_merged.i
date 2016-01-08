@@ -4489,15 +4489,6 @@ Returns true if the matrix has a non-zero at location rr, cc.
 
 %feature("docstring") casadi::Matrix::set "
 
->  void array(DataType) .set(double val)
-
->  void array(DataType) .set(const double *val, bool tr=false)
-
->  void array(DataType) .set([double ] val, bool tr=false)
-------------------------------------------------------------------------
-
-Get the elements numerically.
-
 >  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr)
 
 >  void array(DataType) .set(array(DataType) m, bool ind1, IM rr)
@@ -4518,11 +4509,6 @@ Set a submatrix, single argument
 
 Set a submatrix, two arguments
 
->  void array(DataType) .set(array(DataType) val)
-------------------------------------------------------------------------
-
-Set all the entries without changing sparsity pattern.
-
 ";
 
 %feature("docstring") casadi::Matrix::nnz "
@@ -4538,11 +4524,6 @@ Remove columns and rows Remove/delete rows and/or columns of a matrix.
 ";
 
 %feature("docstring") casadi::Matrix::get "
-
->  void array(DataType) .get([double ] output_m) const 
-------------------------------------------------------------------------
-
-Get the elements numerically.
 
 >  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr) const
 
@@ -4888,12 +4869,6 @@ Also called: slope function
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 one.
-
-";
-
-%feature("docstring") casadi::Matrix::addSub "
-
-Add a submatrix to an existing matrix (TODO: remove memory allocation)
 
 ";
 

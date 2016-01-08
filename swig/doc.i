@@ -5904,26 +5904,6 @@ Returns true if the matrix has a non-zero at location rr, cc.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::set(double val) "
-
-Get the elements numerically.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::set(const double *val,
-bool tr=false) "
-
-Get the elements numerically.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::set(const std::vector<
-double > &val, bool tr=false) "
-
-Get the elements numerically.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::set(const Matrix<
 DataType > &m, bool ind1, const Slice &rr) "
 
@@ -5974,13 +5954,6 @@ Set a submatrix, two arguments
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::set(const Matrix<
-DataType > &val) "
-
-Set all the entries without changing sparsity pattern.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< DataType >  >::nnz()
 const "
 
@@ -5992,13 +5965,6 @@ Get the number of (structural) non-zero elements.
 int > &rr, const std::vector< int > &cc) "
 
 Remove columns and rows Remove/delete rows and/or columns of a matrix.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::get(std::vector< double >
-&output_m) const  "
-
-Get the elements numerically.
 
 ";
 
@@ -6498,13 +6464,6 @@ one.
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 one.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::addSub(const Matrix<
-DataType > &m, RR rr, CC cc, bool ind1) "
-
-Add a submatrix to an existing matrix (TODO: remove memory allocation)
 
 ";
 
