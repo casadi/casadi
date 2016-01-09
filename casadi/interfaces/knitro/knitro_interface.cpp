@@ -257,9 +257,9 @@ namespace casadi {
 
     // Initialize KNITRO
     status = KTR_init_problem(m.kc_handle, nx_, KTR_OBJGOAL_MINIMIZE,
-                              KTR_OBJTYPE_GENERAL, m.wlbx, m.wubx, ng_, getPtr(cType),
-                              m.wlbg, m.wubg, Jcol.size(), getPtr(Jcol), getPtr(Jrow),
-                              nnzH, getPtr(Hrow), getPtr(Hcol), m.wx, 0); // initial lambda
+                              KTR_OBJTYPE_GENERAL, m.wlbx, m.wubx, ng_, get_ptr(cType),
+                              m.wlbg, m.wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
+                              nnzH, get_ptr(Hrow), get_ptr(Hcol), m.wx, 0); // initial lambda
     casadi_assert_message(status==0, "KTR_init_problem failed");
 
     // Register callback functions
@@ -279,7 +279,7 @@ namespace casadi {
 
     // Solve NLP
     double f;
-    status = KTR_solve(m.kc_handle, m.wx, getPtr(lambda), 0, &f,
+    status = KTR_solve(m.kc_handle, m.wx, get_ptr(lambda), 0, &f,
                        0, 0, 0, 0, 0, static_cast<void*>(&m));
     m.return_status = return_codes(status);
 
@@ -287,8 +287,8 @@ namespace casadi {
     casadi_copy(m.wx, nx_, m.x);
 
     // Output dual solution
-    casadi_copy(getPtr(lambda), ng_, m.lam_g);
-    casadi_copy(getPtr(lambda)+ng_, nx_, m.lam_x);
+    casadi_copy(get_ptr(lambda), ng_, m.lam_g);
+    casadi_copy(get_ptr(lambda)+ng_, nx_, m.lam_x);
 
     // Output optimal cost
     if (m.f) *m.f = f;

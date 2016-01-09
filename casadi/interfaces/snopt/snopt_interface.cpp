@@ -425,7 +425,7 @@ namespace casadi {
     // Set up Jacobian matrix
     casadi_copy(A_structure_.colind(), A_structure_.size2()+1, prob.locJ);
     casadi_copy(A_structure_.row(), A_structure_.nnz(), prob.indJ);
-    casadi_copy(getPtr(m.A_data), A_structure_.nnz(), prob.valJ);
+    casadi_copy(get_ptr(m.A_data), A_structure_.nnz(), prob.valJ);
 
     for (auto&& pp : intOpts_) {
       if (hasSetOption(pp.first)) {

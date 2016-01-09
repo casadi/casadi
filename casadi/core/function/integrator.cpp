@@ -1367,31 +1367,31 @@ namespace casadi {
     // Discrete dynamics function inputs ...
     fill_n(m.arg, F.n_in(), nullptr);
     m.arg[DAE_T] = &m.t;
-    m.arg[DAE_X] = getPtr(m.x_prev);
-    m.arg[DAE_Z] = getPtr(m.Z_prev);
-    m.arg[DAE_P] = getPtr(m.p);
+    m.arg[DAE_X] = get_ptr(m.x_prev);
+    m.arg[DAE_Z] = get_ptr(m.Z_prev);
+    m.arg[DAE_P] = get_ptr(m.p);
 
     // ... and outputs
     fill_n(m.res, F.n_out(), nullptr);
-    m.res[DAE_ODE] = getPtr(m.x);
-    m.res[DAE_ALG] = getPtr(m.Z);
-    m.res[DAE_QUAD] = getPtr(m.q);
+    m.res[DAE_ODE] = get_ptr(m.x);
+    m.res[DAE_ALG] = get_ptr(m.Z);
+    m.res[DAE_QUAD] = get_ptr(m.q);
 
     // Take time steps until end time has been reached
     while (m.k<k_out) {
       // Update the previous step
-      casadi_copy(getPtr(m.x), nx_, getPtr(m.x_prev));
-      casadi_copy(getPtr(m.Z), nZ_, getPtr(m.Z_prev));
-      casadi_copy(getPtr(m.q), nq_, getPtr(m.q_prev));
+      casadi_copy(get_ptr(m.x), nx_, get_ptr(m.x_prev));
+      casadi_copy(get_ptr(m.Z), nZ_, get_ptr(m.Z_prev));
+      casadi_copy(get_ptr(m.q), nq_, get_ptr(m.q_prev));
 
       // Take step
       F(m.arg, m.res, m.iw, m.w, 0);
-      casadi_axpy(nq_, 1., getPtr(m.q_prev), getPtr(m.q));
+      casadi_axpy(nq_, 1., get_ptr(m.q_prev), get_ptr(m.q));
 
       // Tape
       if (nrx_>0) {
-        casadi_copy(getPtr(m.x), nx_, getPtr(m.x_tape.at(m.k+1)));
-        casadi_copy(getPtr(m.Z), m.Z.nnz(), getPtr(m.Z_tape.at(m.k)));
+        casadi_copy(get_ptr(m.x), nx_, get_ptr(m.x_tape.at(m.k+1)));
+        casadi_copy(get_ptr(m.Z), m.Z.nnz(), get_ptr(m.Z_tape.at(m.k)));
       }
 
       // Advance time
@@ -1400,9 +1400,9 @@ namespace casadi {
     }
 
     // Return to user TODO(@jaeandersson): interpolate
-    casadi_copy(getPtr(m.x), nx_, x);
-    casadi_copy(getPtr(m.Z)+m.Z.nnz()-nz_, nz_, z);
-    casadi_copy(getPtr(m.q), nq_, q);
+    casadi_copy(get_ptr(m.x), nx_, x);
+    casadi_copy(get_ptr(m.Z)+m.Z.nnz()-nz_, nz_, z);
+    casadi_copy(get_ptr(m.q), nq_, q);
   }
 
   void FixedStepIntegrator::retreat(IntegratorMemory& mem, double t,
@@ -1420,16 +1420,16 @@ namespace casadi {
     // Discrete dynamics function inputs ...
     fill_n(m.arg, G.n_in(), nullptr);
     m.arg[RDAE_T] = &m.t;
-    m.arg[RDAE_P] = getPtr(m.p);
-    m.arg[RDAE_RX] = getPtr(m.rx_prev);
-    m.arg[RDAE_RZ] = getPtr(m.RZ_prev);
-    m.arg[RDAE_RP] = getPtr(m.rp);
+    m.arg[RDAE_P] = get_ptr(m.p);
+    m.arg[RDAE_RX] = get_ptr(m.rx_prev);
+    m.arg[RDAE_RZ] = get_ptr(m.RZ_prev);
+    m.arg[RDAE_RP] = get_ptr(m.rp);
 
     // ... and outputs
     fill_n(m.res, G.n_out(), nullptr);
-    m.res[RDAE_ODE] = getPtr(m.rx);
-    m.res[RDAE_ALG] = getPtr(m.RZ);
-    m.res[RDAE_QUAD] = getPtr(m.rq);
+    m.res[RDAE_ODE] = get_ptr(m.rx);
+    m.res[RDAE_ALG] = get_ptr(m.RZ);
+    m.res[RDAE_QUAD] = get_ptr(m.rq);
 
     // Take time steps until end time has been reached
     while (m.k>k_out) {
@@ -1438,21 +1438,21 @@ namespace casadi {
       m.t = grid_.front() + m.k*h_;
 
       // Update the previous step
-      casadi_copy(getPtr(m.rx), nrx_, getPtr(m.rx_prev));
-      casadi_copy(getPtr(m.RZ), nRZ_, getPtr(m.RZ_prev));
-      casadi_copy(getPtr(m.rq), nrq_, getPtr(m.rq_prev));
+      casadi_copy(get_ptr(m.rx), nrx_, get_ptr(m.rx_prev));
+      casadi_copy(get_ptr(m.RZ), nRZ_, get_ptr(m.RZ_prev));
+      casadi_copy(get_ptr(m.rq), nrq_, get_ptr(m.rq_prev));
 
       // Take step
-      m.arg[RDAE_X] = getPtr(m.x_tape.at(m.k));
-      m.arg[RDAE_Z] = getPtr(m.Z_tape.at(m.k));
+      m.arg[RDAE_X] = get_ptr(m.x_tape.at(m.k));
+      m.arg[RDAE_Z] = get_ptr(m.Z_tape.at(m.k));
       G(m.arg, m.res, m.iw, m.w, 0);
-      casadi_axpy(nrq_, 1., getPtr(m.rq_prev), getPtr(m.rq));
+      casadi_axpy(nrq_, 1., get_ptr(m.rq_prev), get_ptr(m.rq));
     }
 
     // Return to user TODO(@jaeandersson): interpolate
-    casadi_copy(getPtr(m.rx), nrx_, rx);
-    casadi_copy(getPtr(m.RZ)+m.RZ.nnz()-nrz_, nrz_, rz);
-    casadi_copy(getPtr(m.rq), nrq_, rq);
+    casadi_copy(get_ptr(m.rx), nrx_, rx);
+    casadi_copy(get_ptr(m.RZ)+m.RZ.nnz()-nrz_, nrz_, rz);
+    casadi_copy(get_ptr(m.rq), nrq_, rq);
   }
 
   void FixedStepIntegrator::
@@ -1464,14 +1464,14 @@ namespace casadi {
     m.t = t;
 
     // Set parameters
-    casadi_copy(p, np_, getPtr(m.p));
+    casadi_copy(p, np_, get_ptr(m.p));
 
     // Update the state
-    casadi_copy(x, nx_, getPtr(m.x));
-    casadi_copy(z, nz_, getPtr(m.z));
+    casadi_copy(x, nx_, get_ptr(m.x));
+    casadi_copy(z, nz_, get_ptr(m.z));
 
     // Reset summation states
-    casadi_fill(getPtr(m.q), nq_, 0.);
+    casadi_fill(get_ptr(m.q), nq_, 0.);
 
     // Bring discrete time to the beginning
     m.k = 0;
@@ -1481,7 +1481,7 @@ namespace casadi {
 
     // Add the first element in the tape
     if (nrx_>0) {
-      casadi_copy(x, nx_, getPtr(m.x_tape.at(0)));
+      casadi_copy(x, nx_, get_ptr(m.x_tape.at(0)));
     }
   }
 
@@ -1493,14 +1493,14 @@ namespace casadi {
     m.t = t;
 
     // Set parameters
-    casadi_copy(rp, nrp_, getPtr(m.rp));
+    casadi_copy(rp, nrp_, get_ptr(m.rp));
 
     // Update the state
-    casadi_copy(rx, nrx_, getPtr(m.rx));
-    casadi_copy(rz, nrz_, getPtr(m.rz));
+    casadi_copy(rx, nrx_, get_ptr(m.rx));
+    casadi_copy(rz, nrz_, get_ptr(m.rz));
 
     // Reset summation states
-    casadi_fill(getPtr(m.rq), nrq_, 0.);
+    casadi_fill(get_ptr(m.rq), nrq_, 0.);
 
     // Bring discrete time to the end
     m.k = nk_;

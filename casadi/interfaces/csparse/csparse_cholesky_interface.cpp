@@ -192,7 +192,7 @@ namespace casadi {
 
     casadi_assert(m.L!=0);
 
-    double *t = getPtr(m.temp);
+    double *t = get_ptr(m.temp);
 
     for (int k=0; k<nrhs; ++k) {
       cs_ipvec(m.L->pinv, x, t, m.A.n) ;   // t = P1\b

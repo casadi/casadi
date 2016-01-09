@@ -274,7 +274,7 @@ namespace casadi {
     m.arg[DAE_T] = &t;
     m.arg[DAE_X] = NV_DATA_S(x);
     m.arg[DAE_Z] = 0;
-    m.arg[DAE_P] = getPtr(m.p);
+    m.arg[DAE_P] = get_ptr(m.p);
     m.res[DAE_ODE] = NV_DATA_S(xdot);
     m.res[DAE_ALG] = 0;
     m.res[DAE_QUAD] = 0;
@@ -602,7 +602,7 @@ namespace casadi {
     m.arg[DAE_T] = &t;
     m.arg[DAE_X] = NV_DATA_S(x);
     m.arg[DAE_Z] = 0;
-    m.arg[DAE_P] = getPtr(m.p);
+    m.arg[DAE_P] = get_ptr(m.p);
     m.res[DAE_ODE] = 0;
     m.res[DAE_ALG] = 0;
     m.res[DAE_QUAD] = NV_DATA_S(qdot);
@@ -648,10 +648,10 @@ namespace casadi {
     m.arg[RDAE_T] = &t;
     m.arg[RDAE_X] = NV_DATA_S(x);
     m.arg[RDAE_Z] = 0;
-    m.arg[RDAE_P] = getPtr(m.p);
+    m.arg[RDAE_P] = get_ptr(m.p);
     m.arg[RDAE_RX] = NV_DATA_S(rx);
     m.arg[RDAE_RZ] = 0;
-    m.arg[RDAE_RP] = getPtr(m.rp);
+    m.arg[RDAE_RP] = get_ptr(m.rp);
     m.res[RDAE_ODE] = NV_DATA_S(rxdot);
     m.res[RDAE_ALG] = 0;
     m.res[RDAE_QUAD] = 0;
@@ -731,10 +731,10 @@ namespace casadi {
     m.arg[RDAE_T] = &t;
     m.arg[RDAE_X] = NV_DATA_S(x);
     m.arg[RDAE_Z] = 0;
-    m.arg[RDAE_P] = getPtr(m.p);
+    m.arg[RDAE_P] = get_ptr(m.p);
     m.arg[RDAE_RX] = NV_DATA_S(rx);
     m.arg[RDAE_RZ] = 0;
-    m.arg[RDAE_RP] = getPtr(m.rp);
+    m.arg[RDAE_RP] = get_ptr(m.rp);
     m.res[RDAE_ODE] = 0;
     m.res[RDAE_ALG] = 0;
     m.res[RDAE_QUAD] = NV_DATA_S(rqdot);
@@ -790,7 +790,7 @@ namespace casadi {
     m.arg[DAE_T] = &t;
     m.arg[DAE_X] = NV_DATA_S(x);
     m.arg[DAE_Z] = 0;
-    m.arg[DAE_P] = getPtr(m.p);
+    m.arg[DAE_P] = get_ptr(m.p);
     m.arg[DAE_NUM_IN + DAE_T] = 0;
     m.arg[DAE_NUM_IN + DAE_X] = NV_DATA_S(v);
     m.arg[DAE_NUM_IN + DAE_Z] = 0;
@@ -818,22 +818,22 @@ namespace casadi {
 
     // Hack:
     vector<const double*> arg1(g_fwd_.sz_arg());
-    const double** arg1_ = getPtr(arg1);
+    const double** arg1_ = get_ptr(arg1);
     vector<double*> res1(g_fwd_.sz_res());
-    double** res1_ = getPtr(res1);
+    double** res1_ = get_ptr(res1);
     vector<int> iw(g_fwd_.sz_iw());
-    int* iw_ = getPtr(iw);
+    int* iw_ = get_ptr(iw);
     vector<double> w(g_fwd_.sz_w());
-    double* w_ = getPtr(w);
+    double* w_ = get_ptr(w);
 
     // Evaluate g_fwd_
     arg1_[RDAE_T] = &t;
     arg1_[RDAE_X] = NV_DATA_S(x);
     arg1_[RDAE_Z] = 0;
-    arg1_[RDAE_P] = getPtr(m.p);
+    arg1_[RDAE_P] = get_ptr(m.p);
     arg1_[RDAE_RX] = NV_DATA_S(rx);
     arg1_[RDAE_RZ] = 0;
-    arg1_[RDAE_RP] = getPtr(m.rp);;
+    arg1_[RDAE_RP] = get_ptr(m.rp);;
     arg1_[RDAE_NUM_IN + RDAE_T] = 0;
     arg1_[RDAE_NUM_IN + RDAE_X] = 0;
     arg1_[RDAE_NUM_IN + RDAE_Z] = 0;
@@ -893,7 +893,7 @@ namespace casadi {
     m.arg[DAE_T] = &t;
     m.arg[DAE_X] = NV_DATA_S(x);
     m.arg[DAE_Z] = 0;
-    m.arg[DAE_P] = getPtr(m.p);
+    m.arg[DAE_P] = get_ptr(m.p);
     double one=1, zero=0;
     m.arg[DAE_NUM_IN] = &one;
     m.arg[DAE_NUM_IN+1] = &zero;
@@ -937,10 +937,10 @@ namespace casadi {
     m.arg[RDAE_T] = &t;
     m.arg[RDAE_X] = NV_DATA_S(x);
     m.arg[RDAE_Z] = 0;
-    m.arg[RDAE_P] = getPtr(m.p);
+    m.arg[RDAE_P] = get_ptr(m.p);
     m.arg[RDAE_RX] = NV_DATA_S(xB);
     m.arg[RDAE_RZ] = 0;
-    m.arg[RDAE_RP] = getPtr(m.rp);
+    m.arg[RDAE_RP] = get_ptr(m.rp);
     double minus_one = -1;
     m.arg[RDAE_NUM_IN] = &minus_one;
     m.arg[RDAE_NUM_IN+1] = 0;
@@ -1012,7 +1012,7 @@ namespace casadi {
     m.arg[DAE_T] = &t;
     m.arg[DAE_X] = NV_DATA_S(x);
     m.arg[DAE_Z] = 0;
-    m.arg[DAE_P] = getPtr(m.p);
+    m.arg[DAE_P] = get_ptr(m.p);
     double one=1;
     m.arg[DAE_NUM_IN] = &one;
     m.arg[DAE_NUM_IN+1] = 0;
@@ -1059,10 +1059,10 @@ namespace casadi {
     m.arg[RDAE_T] = &t;
     m.arg[RDAE_X] = NV_DATA_S(x);
     m.arg[RDAE_Z] = 0;
-    m.arg[RDAE_P] = getPtr(m.p);
+    m.arg[RDAE_P] = get_ptr(m.p);
     m.arg[RDAE_RX] = NV_DATA_S(xB);
     m.arg[RDAE_RZ] = 0;
-    m.arg[RDAE_RP] = getPtr(m.rp);
+    m.arg[RDAE_RP] = get_ptr(m.rp);
     double minus_one = -1;
     m.arg[RDAE_NUM_IN] = &minus_one;
     m.arg[RDAE_NUM_IN+1] = 0;
@@ -1213,7 +1213,7 @@ namespace casadi {
     m.arg[DAE_T] = &t;
     m.arg[DAE_X] = NV_DATA_S(x);
     m.arg[DAE_Z] = 0;
-    m.arg[DAE_P] = getPtr(m.p);
+    m.arg[DAE_P] = get_ptr(m.p);
     double d1 = -gamma, d2 = 1.;
     m.arg[DAE_NUM_IN] = &d1;
     m.arg[DAE_NUM_IN+1] = &d2;
@@ -1250,10 +1250,10 @@ namespace casadi {
     m.arg[RDAE_T] = &t;
     m.arg[RDAE_X] = NV_DATA_S(x);
     m.arg[RDAE_Z] = 0;
-    m.arg[RDAE_P] = getPtr(m.p);
+    m.arg[RDAE_P] = get_ptr(m.p);
     m.arg[RDAE_RX] = NV_DATA_S(xB);
     m.arg[RDAE_RZ] = 0;
-    m.arg[RDAE_RP] = getPtr(m.rp);
+    m.arg[RDAE_RP] = get_ptr(m.rp);
     m.arg[RDAE_NUM_IN] = &gammaB;
     double one=1;
     m.arg[RDAE_NUM_IN+1] = &one;

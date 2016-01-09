@@ -99,15 +99,15 @@ namespace casadi {
     int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, getPtr(m.mat), false);
+    casadi_densify(A, sparsity_, get_ptr(m.mat), false);
 
     if (equilibriate_) {
       // Calculate the col and row scaling factors
       double colcnd, rowcnd; // ratio of the smallest to the largest col/row scaling factor
       double amax; // absolute value of the largest matrix element
       int info = -100;
-      dgeequ_(&ncol, &nrow, getPtr(m.mat), &ncol, getPtr(m.r),
-              getPtr(m.c), &colcnd, &rowcnd, &amax, &info);
+      dgeequ_(&ncol, &nrow, get_ptr(m.mat), &ncol, get_ptr(m.r),
+              get_ptr(m.c), &colcnd, &rowcnd, &amax, &info);
       if (info < 0)
           throw CasadiException("LapackQrDense::prepare: "
                                 "dgeequ_ failed to calculate the scaling factors");
@@ -127,7 +127,7 @@ namespace casadi {
 
       // Equilibrate the matrix if scaling was successful
       if (info!=0)
-        dlaqge_(&ncol, &nrow, getPtr(m.mat), &ncol, getPtr(m.r), getPtr(m.c),
+        dlaqge_(&ncol, &nrow, get_ptr(m.mat), &ncol, get_ptr(m.r), get_ptr(m.c),
                 &colcnd, &rowcnd, &amax, &m.equed);
       else
         m.equed = 'N';
@@ -135,7 +135,7 @@ namespace casadi {
 
     // Factorize the matrix
     int info = -100;
-    dgetrf_(&ncol, &ncol, getPtr(m.mat), &ncol, getPtr(m.ipiv), &info);
+    dgetrf_(&ncol, &ncol, get_ptr(m.mat), &ncol, get_ptr(m.ipiv), &info);
     casadi_assert_message(info==0, "LapackLu::prepare: "
                           "dgetrf_ failed to factorize the Jacobian");
   }
@@ -163,7 +163,7 @@ namespace casadi {
     // Solve the system of equations
     int info = 100;
     char trans = tr ? 'T' : 'N';
-    dgetrs_(&trans, &ncol, &nrhs, getPtr(m.mat), &ncol, getPtr(m.ipiv), x, &ncol, &info);
+    dgetrs_(&trans, &ncol, &nrhs, get_ptr(m.mat), &ncol, get_ptr(m.ipiv), x, &ncol, &info);
     if (info != 0) throw CasadiException("LapackLu::solve: "
                                         "failed to solve the linear system");
 

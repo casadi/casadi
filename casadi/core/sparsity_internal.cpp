@@ -2654,7 +2654,7 @@ namespace casadi {
                                  const std::vector<int>& y_row) const {
     casadi_assert(y_colind.size()==y_ncol+1);
     casadi_assert(y_row.size()==y_colind.back());
-    return is_equal(y_nrow, y_ncol, getPtr(y_colind), getPtr(y_row));
+    return is_equal(y_nrow, y_ncol, get_ptr(y_colind), get_ptr(y_row));
   }
 
   bool SparsityInternal::is_equal(int y_nrow, int y_ncol,

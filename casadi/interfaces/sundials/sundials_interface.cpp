@@ -317,7 +317,7 @@ namespace casadi {
     m.t = t;
 
     // Set parameters
-    casadi_copy(p, np_, getPtr(m.p));
+    casadi_copy(p, np_, get_ptr(m.p));
 
     // Set the state
     casadi_copy(x, nx_, NV_DATA_S(m.xz));
@@ -335,7 +335,7 @@ namespace casadi {
     m.t = t;
 
     // Set parameters
-    casadi_copy(rp, nrp_, getPtr(m.rp));
+    casadi_copy(rp, nrp_, get_ptr(m.rp));
 
     // Get the backward state
     casadi_copy(rx, nrx_, NV_DATA_S(m.rxz));

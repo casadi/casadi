@@ -242,7 +242,7 @@ namespace casadi {
     vector<const double*> buf_arg(sz_arg());
     for (unsigned int i=0; i<arg.size(); ++i) {
       casadi_assert(arg_it->size()==nnz_in(i));
-      buf_arg[i] = getPtr(*arg_it++);
+      buf_arg[i] = get_ptr(*arg_it++);
     }
     return buf_arg;
   }
@@ -253,7 +253,7 @@ namespace casadi {
     vector<double*> buf_res(sz_res());
     for (unsigned int i=0; i<res.size(); ++i) {
       res_it->resize(nnz_out(i));
-      buf_res[i] = getPtr(*res_it++);
+      buf_res[i] = get_ptr(*res_it++);
     }
     return buf_res;
   }
@@ -265,7 +265,7 @@ namespace casadi {
     for (unsigned int i=0; i<res.size(); ++i) {
       casadi_assert(*res_it!=0);
       (*res_it)->resize(nnz_out(i));
-      buf_res[i] = getPtr(**res_it++);
+      buf_res[i] = get_ptr(**res_it++);
     }
     return buf_res;
   }
@@ -278,7 +278,7 @@ namespace casadi {
     for (auto i=arg.begin(); i!=arg.end(); ++i) {
       int ind = index_in(i->first);
       casadi_assert(i->second.size()==nnz_in(ind));
-      ret[ind] = getPtr(i->second);
+      ret[ind] = get_ptr(i->second);
     }
 
     return ret;
@@ -292,7 +292,7 @@ namespace casadi {
     for (auto i=res.begin(); i!=res.end(); ++i) {
       int ind = index_out(i->first);
       i->second.resize(nnz_out(ind));
-      ret[ind] = getPtr(i->second);
+      ret[ind] = get_ptr(i->second);
     }
 
     return ret;
@@ -307,7 +307,7 @@ namespace casadi {
       int ind = index_out(i->first);
       casadi_assert(i->second!=0);
       i->second->resize(nnz_out(ind));
-      ret[ind] = getPtr(*i->second);
+      ret[ind] = get_ptr(*i->second);
     }
 
     return ret;
@@ -328,7 +328,7 @@ namespace casadi {
     vector<D> w(sz_w());
 
     // Evaluate memoryless
-    (*this)(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
+    (*this)(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
 
@@ -358,7 +358,7 @@ namespace casadi {
     vector<bvec_t> w(sz_w());
 
     // Evaluate memoryless
-    rev(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
+    rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
   Function Function::mapaccum(const string& name, int N, const Dict& opts) const {

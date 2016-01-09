@@ -1212,7 +1212,7 @@ import_array();
       if (to_ptr(p, &tmp_ptr) && tmp_ptr->is_column()) {
         if (m) {
           (**m).resize(tmp_ptr->nnz());
-          casadi_copy(tmp_ptr->ptr(), tmp_ptr->nnz(), getPtr(**m));
+          casadi_copy(tmp_ptr->ptr(), tmp_ptr->nnz(), get_ptr(**m));
         }
         return true;
       }

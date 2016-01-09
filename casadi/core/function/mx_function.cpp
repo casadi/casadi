@@ -953,7 +953,7 @@ namespace casadi {
           resp[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Evaluate
-        it->data->eval_sx(getPtr(argp), getPtr(resp), iw, w, 0);
+        it->data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w, 0);
       }
     }
   }

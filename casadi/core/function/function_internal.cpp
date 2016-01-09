@@ -459,9 +459,9 @@ namespace casadi {
 
     // Seeds and sensitivities
     vector<bvec_t> seed(nz_in, 0);
-    arg[iind] = getPtr(seed);
+    arg[iind] = get_ptr(seed);
     vector<bvec_t> sens(nz_out, 0);
-    res[oind] = getPtr(sens);
+    res[oind] = get_ptr(sens);
     if (!fwd) std::swap(seed, sens);
 
     // Number of forward sweeps we must make
@@ -505,7 +505,7 @@ namespace casadi {
       }
 
       // Propagate the dependencies
-      JacSparsityTraits<fwd>::sp(this, getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
+      JacSparsityTraits<fwd>::sp(this, get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
 
       // Loop over the nonzeros of the output
       for (int el=0; el<sens.size(); ++el) {
@@ -564,11 +564,11 @@ namespace casadi {
 
     // Seeds
     vector<bvec_t> seed(nz, 0);
-    arg[iind] = getPtr(seed);
+    arg[iind] = get_ptr(seed);
 
     // Sensitivities
     vector<bvec_t> sens(nz, 0);
-    res[oind] = getPtr(sens);
+    res[oind] = get_ptr(sens);
 
     // Sparsity triplet accumulator
     std::vector<int> jcol, jrow;
@@ -672,7 +672,7 @@ namespace casadi {
               }
 
               // Toggle on seeds
-              bvec_toggle(getPtr(seed), fine[fci+fci_start], fine[fci+fci_start+1],
+              bvec_toggle(get_ptr(seed), fine[fci+fci_start], fine[fci+fci_start+1],
                           bvec_i+bvec_i_mod);
               bvec_i_mod++;
             }
@@ -702,7 +702,7 @@ namespace casadi {
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies
-            spFwd(getPtr(arg), getPtr(res), getPtr(iw), getPtr(w), 0);
+            spFwd(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
 
             // Temporary bit work vector
             bvec_t spsens;
@@ -713,7 +713,7 @@ namespace casadi {
               // Loop over the cols of fine blocks within the current coarse block
               for (int fri=fine_lookup[coarse[cri]];fri<fine_lookup[coarse[cri+1]];++fri) {
                 // Lump individual sensitivities together into fine block
-                bvec_or(getPtr(sens), spsens, fine[fri], fine[fri+1]);
+                bvec_or(get_ptr(sens), spsens, fine[fri], fine[fri+1]);
 
                 // Loop over all bvec_bits
                 for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
@@ -786,9 +786,9 @@ namespace casadi {
     // Evaluation buffers
     vector<const bvec_t*> arg_fwd(sz_arg(), 0);
     vector<bvec_t*> arg_adj(sz_arg(), 0);
-    arg_fwd[iind] = arg_adj[iind] = getPtr(s_in);
+    arg_fwd[iind] = arg_adj[iind] = get_ptr(s_in);
     vector<bvec_t*> res(sz_res(), 0);
-    res[oind] = getPtr(s_out);
+    res[oind] = get_ptr(s_out);
     vector<int> iw(sz_iw());
     vector<bvec_t> w(sz_w());
 
@@ -871,8 +871,8 @@ namespace casadi {
       }
 
       // Get seeds and sensitivities
-      bvec_t* seed_v = use_fwd ? getPtr(s_in) : getPtr(s_out);
-      bvec_t* sens_v = use_fwd ? getPtr(s_out) : getPtr(s_in);
+      bvec_t* seed_v = use_fwd ? get_ptr(s_in) : get_ptr(s_out);
+      bvec_t* sens_v = use_fwd ? get_ptr(s_out) : get_ptr(s_in);
 
       // The number of zeros in the seed and sensitivity directions
       int nz_seed = use_fwd ? nz_in  : nz_out;
@@ -987,10 +987,10 @@ namespace casadi {
 
             // Propagate the dependencies
             if (use_fwd) {
-              spFwd(getPtr(arg_fwd), getPtr(res), getPtr(iw), getPtr(w), 0);
+              spFwd(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
             } else {
               fill(w.begin(), w.end(), 0);
-              spAdj(getPtr(arg_adj), getPtr(res), getPtr(iw), getPtr(w), 0);
+              spAdj(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
             }
 
             // Temporary bit work vector

@@ -949,14 +949,14 @@ namespace casadi {
 
     // Get pointers to input arguments
     std::vector<const D*> argp(sz_arg());
-    for (int i=0; i<n_in; ++i) argp[i]=getPtr(arg[i]);
+    for (int i=0; i<n_in; ++i) argp[i]=get_ptr(arg[i]);
 
     // Get pointers to output arguments
     std::vector<D*> resp(sz_res());
-    for (int i=0; i<n_out; ++i) resp[i]=getPtr(res[i]);
+    for (int i=0; i<n_out; ++i) resp[i]=get_ptr(res[i]);
 
     // Call memory-less
-    _eval(getPtr(argp), getPtr(resp), getPtr(iw_tmp), getPtr(w_tmp), 0);
+    _eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), 0);
   }
 
   template<typename M>

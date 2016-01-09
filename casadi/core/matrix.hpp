@@ -819,29 +819,19 @@ namespace casadi {
                  const std::vector<int>& rr, const std::vector<int>& cc, bool ind1=false);
 
 #ifndef SWIG
+    ///@{
     /// Access the non-zero elements
-    std::vector<Scalar>& data();
+    std::vector<Scalar>& data() { return data_;}
+    const std::vector<Scalar>& data() const { return data_;}
+    ///@}
 
-    /// Const access the non-zero elements
-    const std::vector<Scalar>& data() const;
-
-    /// \cond INTERNAL
+    ///@{
     /// Get a pointer to the data
-    Scalar* ptr() {
-      return is_empty() ? static_cast<Scalar*>(0) : &data_.front();
-    }
-    friend inline Scalar* getPtr(Matrix<Scalar>& v) {
-      return v.ptr();
-    }
-
-    /// Get a const pointer to the data
-    const Scalar* ptr() const {
-      return is_empty() ? static_cast<const Scalar*>(0) : &data_.front();
-    }
-    friend inline const Scalar* getPtr(const Matrix<Scalar>& v) {
-      return v.ptr();
-    }
-    /// \endcond
+    Scalar* ptr() { return data_.empty() ? 0 : &data_.front(); }
+    const Scalar* ptr() const { return data_.empty() ? 0 : &data_.front(); }
+    friend inline Scalar* get_ptr(Matrix<Scalar>& v) { return v.ptr(); }
+    friend inline const Scalar* get_ptr(const Matrix<Scalar>& v) { return v.ptr(); }
+    ///@}
 
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const { return sparsity_; }

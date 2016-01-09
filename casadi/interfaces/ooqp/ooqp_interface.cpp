@@ -359,17 +359,17 @@ namespace casadi {
       std::vector<int> krowC(nC+1);
 
       //int status_code = 0;
-      makehb(irowQ_, nnzQ, getPtr(krowQ), nx, &ierr);
-      if (ierr == 0) makehb(irowA_, nnzA, getPtr(krowA), nA, &ierr);
-      if (ierr == 0) makehb(irowC_, nnzC, getPtr(krowC), nC, &ierr);
+      makehb(irowQ_, nnzQ, get_ptr(krowQ), nx, &ierr);
+      if (ierr == 0) makehb(irowA_, nnzA, get_ptr(krowA), nA, &ierr);
+      if (ierr == 0) makehb(irowC_, nnzC, get_ptr(krowC), nC, &ierr);
 
       if (ierr == 0) {
         QpGenContext ctx;
 
-        QpGenHbGondzioSetup(c_, nx, getPtr(krowQ), jcolQ_, dQ_,
+        QpGenHbGondzioSetup(c_, nx, get_ptr(krowQ), jcolQ_, dQ_,
                             xlow_, ixlow_, xupp_, ixupp_,
-                            getPtr(krowA), nA, jcolA_, dA_, bA_,
-                            getPtr(krowC), nC, jcolC_, dC_,
+                            get_ptr(krowA), nA, jcolA_, dA_, bA_,
+                            get_ptr(krowC), nC, jcolC_, dC_,
                             clow_, iclow_, cupp_, icupp_, &ctx,
                             &ierr);
         if (ierr == 0) {

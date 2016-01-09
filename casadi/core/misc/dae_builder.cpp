@@ -1188,7 +1188,7 @@ namespace casadi {
     vector<bvec_t> f_dae(ns, 0);
 
     // Propagate to f_dae
-    f({getPtr(f_sdot)}, {getPtr(f_dae)});
+    f({get_ptr(f_sdot)}, {get_ptr(f_dae)});
 
     // Get the new differential and algebraic equations
     vector<MX> new_dae, new_alg;
@@ -1206,7 +1206,7 @@ namespace casadi {
 
     // Propagate to f_sdot
     std::fill(f_sdot.begin(), f_sdot.end(), 0);
-    f.rev({getPtr(f_sdot)}, {getPtr(f_dae)});
+    f.rev({get_ptr(f_sdot)}, {get_ptr(f_dae)});
 
     // Get the new algebraic variables and new states
     vector<MX> new_s, new_sdot, new_z;

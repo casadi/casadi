@@ -615,7 +615,7 @@ namespace casadi {
                               const std::vector<int>& row) {
     casadi_assert(colind.size()==ncol+1);
     casadi_assert(row.size()==colind.back());
-    assign_cached(nrow, ncol, getPtr(colind), getPtr(row));
+    assign_cached(nrow, ncol, get_ptr(colind), get_ptr(row));
   }
 
   void Sparsity::assign_cached(int nrow, int ncol, const int* colind, const int* row) {
@@ -746,7 +746,7 @@ namespace casadi {
 
   std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& colind,
                             const std::vector<int>& row) {
-    return hash_sparsity(nrow, ncol, getPtr(colind), getPtr(row));
+    return hash_sparsity(nrow, ncol, get_ptr(colind), get_ptr(row));
   }
 
   std::size_t hash_sparsity(int nrow, int ncol, const int* colind, const int* row) {
@@ -1325,7 +1325,7 @@ namespace casadi {
     const int* Ap = A.colind();
     const int* Bj = x.row();
     const int* Bp = x.colind();
-    int *Cp = getPtr(Iwork);
+    int *Cp = get_ptr(Iwork);
     int *mask = Cp+n_row+1;
 
     // Pass 1
@@ -1352,7 +1352,7 @@ namespace casadi {
     }
 
     // Pass 2
-    int *next = getPtr(Iwork) + n_row+1;
+    int *next = get_ptr(Iwork) + n_row+1;
     std::fill(next, next+n_col, -1);
     std::vector<bool> & sums = Bwork;
     std::fill(sums.begin(), sums.end(), false);

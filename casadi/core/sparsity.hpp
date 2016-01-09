@@ -741,7 +741,7 @@ namespace casadi {
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
   inline void hash_combine(std::size_t& seed, const std::vector<int>& v) {
-    hash_combine(seed, getPtr(v), v.size());
+    hash_combine(seed, get_ptr(v), v.size());
   }
 
   /** \brief Hash a sparsity pattern */

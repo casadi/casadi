@@ -198,8 +198,8 @@ namespace casadi {
     fill_n(m.arg, fact_fcn_.n_in(), nullptr);
     m.arg[0] = A;
     fill_n(m.res, fact_fcn_.n_out(), nullptr);
-    m.res[0] = getPtr(m.q);
-    m.res[1] = getPtr(m.r);
+    m.res[0] = get_ptr(m.q);
+    m.res[1] = get_ptr(m.r);
     fact_fcn_(m.arg, m.res, m.iw, m.w);
   }
 
@@ -211,8 +211,8 @@ namespace casadi {
 
     // Solve for all right hand sides
     fill_n(m.arg, solv.n_in(), nullptr);
-    m.arg[0] = getPtr(m.q);
-    m.arg[1] = getPtr(m.r);
+    m.arg[0] = get_ptr(m.q);
+    m.arg[1] = get_ptr(m.r);
     fill_n(m.res, solv.n_out(), nullptr);
     for (int i=0; i<nrhs; ++i) {
       copy_n(x, neq_, m.w); // Copy x to a temporary

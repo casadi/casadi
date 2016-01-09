@@ -247,15 +247,15 @@ namespace casadi {
     const double* obj = g;
     const double* lb = lbx;
     const double* ub = ubx;
-    status = CPXcopylp(m.env, m.lp, n_, nc_, m.objsen, obj, getPtr(m.rhs), getPtr(m.sense),
-                       matbeg, getPtr(m.matcnt), matind, matval, lb, ub, getPtr(m.rngval));
+    status = CPXcopylp(m.env, m.lp, n_, nc_, m.objsen, obj, get_ptr(m.rhs), get_ptr(m.sense),
+                       matbeg, get_ptr(m.matcnt), matind, matval, lb, ub, get_ptr(m.rngval));
 
     // Preparing coefficient matrix Q
     const Sparsity& H_sp = sparsity_in(QPSOL_H);
     const int* qmatbeg = H_sp.colind();
     const int* qmatind = H_sp.row();
     const double* qmatval = H;
-    status = CPXcopyquad(m.env, m.lp, qmatbeg, getPtr(m.qmatcnt), qmatind, qmatval);
+    status = CPXcopyquad(m.env, m.lp, qmatbeg, get_ptr(m.qmatcnt), qmatind, qmatval);
 
     if (dump_to_file_) {
       const char* fn = string(option("dump_filename")).c_str();
@@ -265,7 +265,7 @@ namespace casadi {
     // Warm-starting if possible
     if (qp_method_ != 0 && qp_method_ != 4 && m.is_warm) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
-      CPXcopystart(m.env, m.lp, getPtr(m.cstat), getPtr(m.rstat), x, 0, 0, lam_x);
+      CPXcopystart(m.env, m.lp, get_ptr(m.cstat), get_ptr(m.rstat), x, 0, 0, lam_x);
     } else {
       status = CPXcopystart(m.env, m.lp, 0, 0, x, 0, 0, lam_x);
     }
@@ -282,14 +282,14 @@ namespace casadi {
     double f;
     std::vector<double> slack;
     slack.resize(nc_);
-    status = CPXsolution(m.env, m.lp, &solstat, &f, x, lam_a, getPtr(slack), lam_x);
+    status = CPXsolution(m.env, m.lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x);
     if (status) {
       userOut() << "CPLEX: Failed to get solution.\n";
     }
 
     // Retrieving the basis
     if (qp_method_ != 0 && qp_method_ != 4) {
-      status = CPXgetbase(m.env, m.lp, getPtr(m.cstat), getPtr(m.rstat));
+      status = CPXgetbase(m.env, m.lp, get_ptr(m.cstat), get_ptr(m.rstat));
     }
 
     // Flip the sign of the multipliers

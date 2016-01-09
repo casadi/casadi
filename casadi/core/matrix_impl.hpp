@@ -914,16 +914,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  std::vector<Scalar>& Matrix<Scalar>::data() {
-    return data_;
-  }
-
-  template<typename Scalar>
-  const std::vector<Scalar>& Matrix<Scalar>::data() const {
-    return data_;
-  }
-
-  template<typename Scalar>
   void Matrix<Scalar>::erase(const std::vector<int>& rr, const std::vector<int>& cc, bool ind1) {
     // Erase from sparsity pattern
     std::vector<int> mapping = sparsity_.erase(rr, cc, ind1);
@@ -1037,7 +1027,7 @@ namespace casadi {
       Matrix<Scalar> ret = z;
       std::vector<Scalar> work(x.size1());
       casadi_mtimes(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
-                    ret.ptr(), ret.sparsity(), getPtr(work), false);
+                    ret.ptr(), ret.sparsity(), get_ptr(work), false);
       return ret;
     }
   }
@@ -1190,24 +1180,24 @@ namespace casadi {
     // Perform the operations elementwise
     if (x_sp==y_sp) {
       // Matching sparsities
-      casadi_math<Scalar>::fun(op, getPtr(x.data()), getPtr(y.data()),
-                                 getPtr(r.data()), r_sp.nnz());
+      casadi_math<Scalar>::fun(op, get_ptr(x.data()), get_ptr(y.data()),
+                                 get_ptr(r.data()), r_sp.nnz());
     } else if (y_sp==r_sp) {
       // Project first argument
       Matrix<Scalar> x_mod = x(r_sp);
-      casadi_math<Scalar>::fun(op, getPtr(x_mod.data()), getPtr(y.data()),
-                                 getPtr(r.data()), r_sp.nnz());
+      casadi_math<Scalar>::fun(op, get_ptr(x_mod.data()), get_ptr(y.data()),
+                                 get_ptr(r.data()), r_sp.nnz());
     } else if (x_sp==r_sp) {
       // Project second argument
       Matrix<Scalar> y_mod = y(r_sp);
-      casadi_math<Scalar>::fun(op, getPtr(x.data()),
-                                 getPtr(y_mod.data()), getPtr(r.data()), r_sp.nnz());
+      casadi_math<Scalar>::fun(op, get_ptr(x.data()),
+                                 get_ptr(y_mod.data()), get_ptr(r.data()), r_sp.nnz());
     } else {
       // Project both arguments
       Matrix<Scalar> x_mod = x(r_sp);
       Matrix<Scalar> y_mod = y(r_sp);
-      casadi_math<Scalar>::fun(op, getPtr(x_mod.data()), getPtr(y_mod.data()),
-                                 getPtr(r.data()), r_sp.nnz());
+      casadi_math<Scalar>::fun(op, get_ptr(x_mod.data()), get_ptr(y_mod.data()),
+                                 get_ptr(r.data()), r_sp.nnz());
     }
 
     // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
@@ -1514,7 +1504,7 @@ namespace casadi {
     } else {
       Matrix<Scalar> ret = Matrix<Scalar>::zeros(sp);
       std::vector<Scalar> w(x.size1());
-      casadi_project(x.ptr(), x.sparsity(), ret.ptr(), sp, getPtr(w));
+      casadi_project(x.ptr(), x.sparsity(), ret.ptr(), sp, get_ptr(w));
       return ret;
     }
   }
@@ -2196,7 +2186,7 @@ namespace casadi {
 
     // Call C runtime
     return casadi_norm_inf_mul(x.ptr(), x.sparsity(), y.ptr(), y.sparsity(),
-                               getPtr(dwork), getPtr(iwork));
+                               get_ptr(dwork), get_ptr(iwork));
   }
 
   template<typename Scalar>
@@ -2776,7 +2766,7 @@ namespace casadi {
     // Propagate sparsities backwards seeding all outputs
     std::vector<bvec_t> seed(f.nnz_out(0), 1);
     std::vector<bvec_t> sens(f.nnz_in(0), 0);
-    f.rev({getPtr(sens)}, {getPtr(seed)});
+    f.rev({get_ptr(sens)}, {get_ptr(seed)});
 
     // Temporaries for evaluation
     std::vector<bool> ret(sens.size());

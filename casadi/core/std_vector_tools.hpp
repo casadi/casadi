@@ -237,11 +237,11 @@ namespace casadi {
 
   /// Get a pointer to the data contained in the vector
   template<typename T>
-  T* getPtr(std::vector<T> &v);
+  T* get_ptr(std::vector<T> &v);
 
   /// Get a pointer to the data contained in the vector
   template<typename T>
-  const T* getPtr(const std::vector<T> &v);
+  const T* get_ptr(const std::vector<T> &v);
 
   /// \endcond
 
@@ -563,7 +563,7 @@ namespace casadi {
   }
 
   template<typename T>
-  T* getPtr(std::vector<T> &v) {
+  T* get_ptr(std::vector<T> &v) {
     if (v.empty())
       return 0;
     else
@@ -571,7 +571,7 @@ namespace casadi {
   }
 
   template<typename T>
-  const T* getPtr(const std::vector<T> &v) {
+  const T* get_ptr(const std::vector<T> &v) {
     if (v.empty())
       return 0;
     else

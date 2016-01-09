@@ -616,7 +616,7 @@ namespace casadi {
 
     // Perform a single dependency sweep
     vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
-    temp({getPtr(t_in)}, {getPtr(t_out)});
+    temp({get_ptr(t_in)}, {get_ptr(t_out)});
 
     // Loop over results
     for (int i=0; i<t_out.size(); ++i) {
