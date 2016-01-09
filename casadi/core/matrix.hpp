@@ -851,17 +851,6 @@ namespace casadi {
     /** \brief Get an owning reference to the sparsity pattern */
     Sparsity getSparsity() const { return sparsity();}
 
-#ifndef SWIG
-    /// \cond INTERNAL
-    /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation
-        kl:    The number of subdiagonals in res
-        ku:    The number of superdiagonals in res
-        ldres: The leading dimension in res
-        res:   The number of superdiagonals */
-    void getBand(int kl, int ku, int ldres, Scalar *res) const;
-/// \endcond
-#endif
-
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
      */

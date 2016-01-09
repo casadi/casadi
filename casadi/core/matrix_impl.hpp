@@ -909,35 +909,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::getBand(int kl, int ku, int ldres, Scalar *res) const {
-    // delete the content of the matrix
-    for (int j=0; j<size1(); ++j) // loop over rows
-      for (int s=0; s<kl+ku+1; ++s) // loop over the subdiagonals
-        res[s + ldres*j] = 0;
-
-    // loop over cols
-    for (int i=0; i<size2(); ++i) {
-
-      // loop over the non-zero elements
-      for (int el=colind(i); el<colind(i+1); ++el) {
-        int j=row(el);  // row
-
-        // Check if we have not yet inside the band
-        if (j<i-kl) continue;
-
-        // Check if we are already outside the band
-        if (j>i+ku) break;
-
-        // Get the subdiagonal
-        int s = i - j + ku;
-
-        // Store the element
-        res[s + ldres*j] = data()[el];
-      }
-    }
-  }
-
-  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::printme(const Matrix<Scalar>& y) const {
     return binary(OP_PRINTME, *this, y);
   }
