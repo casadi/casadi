@@ -690,7 +690,7 @@ namespace casadi {
 
             // Construct lookup table
             IM lookup = IM::triplet(lookup_row, lookup_col, lookup_value,
-                                              bvec_size, coarse.size());
+                                    bvec_size, coarse.size());
 
             std::reverse(lookup_col.begin(), lookup_col.end());
             std::reverse(lookup_row.begin(), lookup_row.end());
@@ -719,7 +719,9 @@ namespace casadi {
                 for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
                   if (spsens & (bvec_t(1) << bvec_i)) {
                     // if dependency is found, add it to the new sparsity pattern
-                    int lk = lookup.elem(bvec_i, cri);
+                    int ind = lookup.sparsity().getNZ(bvec_i, cri);
+                    casadi_assert(ind!=-1);
+                    int lk = lookup.at(ind);
                     if (lk>-bvec_size) {
                       jrow.push_back(bvec_i+lk);
                       jcol.push_back(fri);
@@ -981,7 +983,7 @@ namespace casadi {
 
             // Construct lookup table
             IM lookup = IM::triplet(lookup_row, lookup_col, lookup_value, bvec_size,
-                                              coarse_col.size());
+                                    coarse_col.size());
 
             // Propagate the dependencies
             if (use_fwd) {
@@ -1010,7 +1012,9 @@ namespace casadi {
                 for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
                   if (spsens & bvec_lookup[bvec_i]) {
                     // if dependency is found, add it to the new sparsity pattern
-                    jrow.push_back(bvec_i+lookup.elem(bvec_i, cri));
+                    int ind = lookup.sparsity().getNZ(bvec_i, cri);
+                    casadi_assert(ind!=-1);
+                    jrow.push_back(bvec_i+lookup.at(ind));
                     jcol.push_back(fri);
                   }
                 }

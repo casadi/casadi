@@ -203,15 +203,6 @@ namespace casadi {
         throw CasadiException(ss.str());
       }
     }
-
-    /// get an element
-    const DataType& elem(int rr, int cc=0) const;
-
-    /// get a reference to an element
-    DataType& elem(int rr, int cc=0);
-
-    /// get an element, do not allocate
-    const DataType getElement(int rr, int cc=0) const { return elem(rr, cc);}
 #endif // SWIG
 
     /// Returns true if the matrix has a non-zero at location rr, cc

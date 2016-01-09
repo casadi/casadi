@@ -36,29 +36,11 @@ namespace casadi {
   // Implementations
 
   template<typename DataType>
-  const DataType& Matrix<DataType>::elem(int rr, int cc) const {
-    int ind = sparsity().getNZ(rr, cc);
-    if (ind==-1)
-      return casadi_limits<DataType>::zero;
-    else
-      return at(ind);
-  }
-
-  template<typename DataType>
   int Matrix<DataType>::stream_precision_ = 6;
   template<typename DataType>
   int Matrix<DataType>::stream_width_ = 0;
   template<typename DataType>
   bool Matrix<DataType>::stream_scientific_ = false;
-
-  template<typename DataType>
-  DataType& Matrix<DataType>::elem(int rr, int cc) {
-    int oldsize = sparsity().nnz();
-    int ind = sparsity_.addNZ(rr, cc);
-    if (oldsize != sparsity().nnz())
-      data().insert(data_.begin()+ind, DataType(0));
-    return at(ind);
-  }
 
   template<typename DataType>
   bool Matrix<DataType>::__nonzero__() const {
@@ -187,10 +169,14 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
-                                const Slice& rr, const Slice& cc) {
+                             const Slice& rr, const Slice& cc) {
     // Both are scalar
     if (rr.is_scalar(size1()) && cc.is_scalar(size2()) && m.is_dense()) {
-      elem(rr.toScalar(size1()), cc.toScalar(size2())) = m.toScalar();
+      int oldsize = sparsity_.nnz();
+      int ind = sparsity_.addNZ(rr.toScalar(size1()), cc.toScalar(size2()));
+      if (oldsize != sparsity_.nnz()) {
+        data_.insert(data_.begin()+ind, m.toScalar());
+      }
       return;
     }
 
@@ -200,7 +186,7 @@ namespace casadi {
 
   template<typename DataType>
   void Matrix<DataType>::set(const Matrix<DataType>& m, bool ind1,
-                                const Slice& rr, const Matrix<int>& cc) {
+                             const Slice& rr, const Matrix<int>& cc) {
     // Fall back on (IM, IM)
     set(m, ind1, rr.getAll(size1(), ind1), cc);
   }
@@ -294,7 +280,11 @@ namespace casadi {
     // Scalar
     if (rr.is_scalar(numel()) && m.is_dense()) {
       int r = rr.toScalar(numel());
-      elem(r % size1(), r / size1()) = m.toScalar();
+      int oldsize = sparsity_.nnz();
+      int ind = sparsity_.addNZ(r % size1(), r / size1());
+      if (oldsize != sparsity_.nnz()) {
+        data_.insert(data_.begin()+ind, m.toScalar());
+      }
       return;
     }
 
@@ -1771,10 +1761,17 @@ namespace casadi {
 
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::trace(const Matrix<DataType>& x) {
-    casadi_assert_message(x.size2() == x.size1(), "trace: must be square");
+    casadi_assert_message(x.is_square(), "trace: must be square");
     DataType res=0;
-    for (int i=0; i< x.size2(); i ++) {
-      res += x.elem(i, i);
+    const DataType* d=x.ptr();
+    int size2 = x.size2();
+    const int *colind=x.colind(), *row=x.row();
+    for (int c=0; c<size2; c++) {
+      for (int k=colind[c]; k!=colind[c+1]; ++k) {
+        if (row[k]==c) {
+          res += d[k];
+        }
+      }
     }
     return res;
   }
