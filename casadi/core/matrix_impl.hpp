@@ -2554,52 +2554,6 @@ namespace casadi {
     return Matrix<DataType>(sp, new_data);
   }
 
-  template<typename DataType>
-  void Matrix<DataType>::setSym(const std::vector<double>& val) {
-    casadi_assert(val.size()==this->nnz_upper());
-    setSym(getPtr(val));
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::getSym(std::vector<double>& val) const {
-    val.resize(this->nnz_upper());
-    getSym(getPtr(val));
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setSym(const double* val) {
-    const int* colind = this->colind();
-    const int* row = this->row();
-    int size2 = this->size2();
-    for (int cc=0; cc<size2; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
-        setValue(*val++, el);
-      }
-    }
-
-    // Assign strictly lower triangular part
-    std::vector<int> ind = this->get_colind();
-    for (int cc=0; cc<size2; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        int rr=row[el];
-        if (rr>cc) {
-          at(el) = at(ind[rr]++);
-        }
-      }
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::getSym(double* val) const {
-    const int* colind = this->colind();
-    const int* row = this->row();
-    int size2 = this->size2();
-    for (int cc=0; cc<size2; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
-        *val++ = getValue(el);
-      }
-    }
-  }
 
   template<typename DataType>
   std::vector<Matrix<DataType> > Matrix<DataType>::get_input(const Function& f) {

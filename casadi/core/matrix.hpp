@@ -261,20 +261,6 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Set upper triangular elements */
-    void setSym(const double* val);
-    void setSym(const std::vector<double>& val);
-    ///@}
-
-    ///@{
-    /** \brief Get upper triangular elements */
-#ifndef SWIG
-    void getSym(double* val) const;
-#endif // SWIG
-    void getSym(std::vector<double>& SWIG_OUTPUT(m)) const;
-    ///@}
-
-    ///@{
     /// Get a set of nonzeros
     void getNZ(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Slice& k) const;
     void getNZ(Matrix<DataType>& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& k) const;
