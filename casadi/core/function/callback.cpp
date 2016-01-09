@@ -62,22 +62,20 @@ namespace casadi {
 
   void Callback::eval(const double** arg, double** res, int* iw, double* w, int mem) {
     // Allocate input matrices
-    int num_in = n_in();
-    std::vector<DM> argv(num_in);
-    for (int i=0; i<num_in; ++i) {
-      argv[i] = DM::zeros(sparsity_in(i));
-      if (arg[i] != 0) {
-        argv[i].setNZ(arg[i]);
-      }
+    int n_in = this->n_in();
+    std::vector<DM> argv(n_in);
+    for (int i=0; i<n_in; ++i) {
+      argv[i] = DM(sparsity_in(i));
+      casadi_copy(arg[i], argv[i].nnz(), argv[i].ptr());
     }
 
     // Evaluate
     std::vector<DM> resv = eval(argv);
 
     // Get the outputs
-    int num_out = n_out();
-    for (int i=0; i<num_out; ++i) {
-      if (res[i]!=0) resv[i].getNZ(res[i]);
+    int n_out = this->n_out();
+    for (int i=0; i<n_out; ++i) {
+      casadi_copy(resv[i].ptr(), resv[i].nnz(), res[i]);
     }
   }
 

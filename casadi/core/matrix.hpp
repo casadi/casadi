@@ -260,30 +260,6 @@ namespace casadi {
     void set(const Matrix<DataType>& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc);
     ///@}
 
-#ifndef SWIG
-    /** \brief Set all the nonzeros without changing sparsity pattern */
-    void setNZ(const Matrix<DataType>& val);
-
-    /** \brief Get all the nonzeros without changing sparsity pattern */
-    void getNZ(Matrix<DataType>& val) const;
-#endif // SWIG
-
-    ///@{
-    /** \brief Set the elements numerically */
-    void setNZ(double val);
-    void setNZ(const double* val);
-    void setNZ(const std::vector<double>& val);
-    ///@}
-
-    ///@{
-    /** \brief Get the elements numerically */
-#ifndef SWIG
-    void getNZ(double& val) const;
-    void getNZ(double* val) const;
-#endif // SWIG
-    void getNZ(std::vector<double>& SWIG_OUTPUT(m)) const;
-    ///@}
-
     ///@{
     /** \brief Set upper triangular elements */
     void setSym(const double* val);

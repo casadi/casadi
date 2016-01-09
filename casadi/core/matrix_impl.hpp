@@ -2559,60 +2559,10 @@ namespace casadi {
     return Matrix<DataType>(sp, new_data);
   }
 
-
-  template<typename DataType>
-  void Matrix<DataType>::setNZ(const Matrix<DataType>& val) {
-    setNZ(val, false, Slice());
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::getNZ(Matrix<DataType>& val) const {
-    getNZ(val, false, Slice());
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setNZ(double val) {
-    std::fill((*this)->begin(), (*this)->end(), val);
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setNZ(const double* val) {
-    int nnz = this->nnz();
-    for (int el=0; el<nnz; ++el) {
-      setValue(*val++, el);
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::setNZ(const std::vector<double>& val) {
-    casadi_assert(val.size()==this->nnz());
-    setNZ(getPtr(val));
-  }
-
   template<typename DataType>
   void Matrix<DataType>::setSym(const std::vector<double>& val) {
     casadi_assert(val.size()==this->nnz_upper());
     setSym(getPtr(val));
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::getNZ(double& val) const {
-    casadi_assert(1==this->nnz());
-    getNZ(&val);
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::getNZ(double* val) const {
-    int nnz = this->nnz();
-    for (int el=0; el<nnz; ++el) {
-      *val++ = getValue(el);
-    }
-  }
-
-  template<typename DataType>
-  void Matrix<DataType>::getNZ(std::vector<double>& val) const {
-    val.resize(this->nnz());
-    getNZ(getPtr(val));
   }
 
   template<typename DataType>

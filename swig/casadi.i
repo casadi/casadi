@@ -1617,7 +1617,7 @@ import_array();
         if (m) {
           **m = casadi::DM(getSparsity(p));
           double* data = static_cast<double*>(mxGetData(p));
-          (*m)->setNZ(data);
+          casadi_copy(data, (*m)->nnz(), (*m)->ptr());
         }
         return true;
       }
@@ -3059,7 +3059,7 @@ namespace casadi{
     // Convert to a sparse matrix
     GUESTOBJECT* sparse() const {
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
-      $self->getNZ(static_cast<double*>(mxGetData(p)));
+      casadi::casadi_copy($self->ptr(), $self->nnz(), static_cast<double*>(mxGetData(p)));
       std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));
       std::copy($self->row(), $self->row()+$self->nnz(), mxGetIr(p));
       return p;
