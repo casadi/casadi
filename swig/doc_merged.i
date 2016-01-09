@@ -4420,16 +4420,6 @@ Print a representation of the object.
 
 %feature("docstring") casadi::Matrix::getNZ "
 
->  void array(DataType) .getNZ([double ] output_m) const 
-------------------------------------------------------------------------
-
-Get the elements numerically.
-
->  void array(DataType) .getNZ(array(DataType) output_m, bool ind1, Slice k) const
-
->  void array(DataType) .getNZ(array(DataType) output_m, bool ind1, IM k) const 
-------------------------------------------------------------------------
-
 Get a set of nonzeros
 
 ";
@@ -4580,20 +4570,6 @@ Return a string with a representation (for SWIG)
 
 %feature("docstring") casadi::Matrix::setNZ "
 
->  void array(DataType) .setNZ(double val)
-
->  void array(DataType) .setNZ(const double *val)
-
->  void array(DataType) .setNZ([double ] val)
-------------------------------------------------------------------------
-
-Set the elements numerically.
-
->  void array(DataType) .setNZ(array(DataType) m, bool ind1, Slice k)
-
->  void array(DataType) .setNZ(array(DataType) m, bool ind1, IM k)
-------------------------------------------------------------------------
-
 Set a set of nonzeros
 
 ";
@@ -4607,12 +4583,6 @@ Parameters:
 
 complete:  set to true to also check elementwise throws an error as possible
 result
-
-";
-
-%feature("docstring") casadi::Matrix::getSym "
-
-Get upper triangular elements.
 
 ";
 
@@ -5083,12 +5053,6 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 
 Set the 'precision, width & scientific' used in printing and serializing to
 streams.
-
-";
-
-%feature("docstring") casadi::Matrix::setSym "
-
-Set upper triangular elements.
 
 ";
 

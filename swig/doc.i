@@ -5807,13 +5807,6 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::getNZ(std::vector< double
-> &output_m) const  "
-
-Get the elements numerically.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::getNZ(Matrix< DataType >
 &output_m, bool ind1, const Slice &k) const  "
 
@@ -6063,26 +6056,6 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Matrix< DataType >::setNZ(double val) "
-
-Set the elements numerically.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::setNZ(const double *val)
-"
-
-Set the elements numerically.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::setNZ(const std::vector<
-double > &val) "
-
-Set the elements numerically.
-
-";
-
 %feature("docstring")  casadi::Matrix< DataType >::setNZ(const Matrix<
 DataType > &m, bool ind1, const Slice &k) "
 
@@ -6107,13 +6080,6 @@ Parameters:
 
 complete:  set to true to also check elementwise throws an error as possible
 result
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::getSym(std::vector<
-double > &output_m) const  "
-
-Get upper triangular elements.
 
 ";
 
@@ -6757,20 +6723,6 @@ precision) "
 
 Set the 'precision, width & scientific' used in printing and serializing to
 streams.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::setSym(const double *val)
-"
-
-Set upper triangular elements.
-
-";
-
-%feature("docstring")  casadi::Matrix< DataType >::setSym(const std::vector<
-double > &val) "
-
-Set upper triangular elements.
 
 ";
 
