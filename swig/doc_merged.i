@@ -4438,7 +4438,7 @@ possible)
 
 %feature("docstring") friendwrap_mtaylor "
 
->  array(DataType)  array(DataType) .mtaylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order=1)
+>  array(Scalar)  array(Scalar) .mtaylor(array(Scalar) ex, array(Scalar) x, array(Scalar) a, int order=1)
 ------------------------------------------------------------------------
 [INTERNAL] 
 multivariate Taylor series expansion
@@ -4446,7 +4446,7 @@ multivariate Taylor series expansion
 Do Taylor expansions until the aggregated order of a term is equal to
 'order'. The aggregated order of $x^n y^m$ equals $n+m$.
 
->  array(DataType)  array(DataType) .mtaylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order, [int ] order_contributions)
+>  array(Scalar)  array(Scalar) .mtaylor(array(Scalar) ex, array(Scalar) x, array(Scalar) a, int order, [int ] order_contributions)
 ------------------------------------------------------------------------
 [INTERNAL] 
 multivariate Taylor series expansion
@@ -4479,22 +4479,22 @@ Returns true if the matrix has a non-zero at location rr, cc.
 
 %feature("docstring") casadi::Matrix::set "
 
->  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr)
+>  void array(Scalar) .set(array(Scalar) m, bool ind1, Slice rr)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, IM rr)
+>  void array(Scalar) .set(array(Scalar) m, bool ind1, IM rr)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, Sparsity sp)
+>  void array(Scalar) .set(array(Scalar) m, bool ind1, Sparsity sp)
 ------------------------------------------------------------------------
 
 Set a submatrix, single argument
 
->  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr, Slice cc)
+>  void array(Scalar) .set(array(Scalar) m, bool ind1, Slice rr, Slice cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, Slice rr, IM cc)
+>  void array(Scalar) .set(array(Scalar) m, bool ind1, Slice rr, IM cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, IM rr, Slice cc)
+>  void array(Scalar) .set(array(Scalar) m, bool ind1, IM rr, Slice cc)
 
->  void array(DataType) .set(array(DataType) m, bool ind1, IM rr, IM cc)
+>  void array(Scalar) .set(array(Scalar) m, bool ind1, IM rr, IM cc)
 ------------------------------------------------------------------------
 
 Set a submatrix, two arguments
@@ -4515,22 +4515,22 @@ Remove columns and rows Remove/delete rows and/or columns of a matrix.
 
 %feature("docstring") casadi::Matrix::get "
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr) const
+>  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Slice rr) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, IM rr) const
+>  void array(Scalar) .get(array(Scalar) output_m, bool ind1, IM rr) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, Sparsity sp) const 
+>  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Sparsity sp) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, single argument
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr, Slice cc) const
+>  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Slice rr, Slice cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, Slice rr, IM cc) const
+>  void array(Scalar) .get(array(Scalar) output_m, bool ind1, Slice rr, IM cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, IM rr, Slice cc) const
+>  void array(Scalar) .get(array(Scalar) output_m, bool ind1, IM rr, Slice cc) const
 
->  void array(DataType) .get(array(DataType) output_m, bool ind1, IM rr, IM cc) const 
+>  void array(Scalar) .get(array(Scalar) output_m, bool ind1, IM rr, IM cc) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
@@ -4611,12 +4611,12 @@ possible)
 
 %feature("docstring") casadi::Matrix::numel "
 
->  int array(DataType) .numel() const
+>  int array(Scalar) .numel() const
 ------------------------------------------------------------------------
 
 Get the number of elements.
 
->  int array(DataType) .numel(int i) const
+>  int array(Scalar) .numel(int i) const
 ------------------------------------------------------------------------
 
 Get the number of elements in slice (cf. MATLAB)
@@ -4646,7 +4646,7 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 %feature("docstring") casadi::Matrix::toSlice "
 
->  Slice array(DataType) .toSlice(bool ind1=false) const 
+>  Slice array(Scalar) .toSlice(bool ind1=false) const 
 ------------------------------------------------------------------------
 
 Convert to Slice (only for IM)
@@ -4744,12 +4744,12 @@ Hessian expression
 
 %feature("docstring") casadi::Matrix::getValue "
 
->  double array(DataType) .getValue() const 
+>  double array(Scalar) .getValue() const 
 ------------------------------------------------------------------------
 
 Get double value (only if constant)
 
->  double array(DataType) .getValue(int k) const 
+>  double array(Scalar) .getValue(int k) const 
 ------------------------------------------------------------------------
 
 Get double value (particular nonzero)
@@ -4770,7 +4770,7 @@ Get the number of non-zeros in the lower triangular half.
 
 %feature("docstring") casadi::Matrix::isSlice "
 
->  bool array(DataType) .isSlice(bool ind1=false) const 
+>  bool array(Scalar) .isSlice(bool ind1=false) const 
 ------------------------------------------------------------------------
 
 Is the Matrix a Slice (only for IM)
@@ -4793,13 +4793,13 @@ Tangent expression.
 
 %feature("docstring") casadi::Matrix::erase "
 
->  void array(DataType) .erase([int ] rr, [int ] cc, bool ind1=false)
+>  void array(Scalar) .erase([int ] rr, [int ] cc, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase a submatrix (leaving structural zeros in its place) Erase rows and/or
 columns of a matrix.
 
->  void array(DataType) .erase([int ] rr, bool ind1=false)
+>  void array(Scalar) .erase([int ] rr, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase a submatrix (leaving structural zeros in its place) Erase elements of
@@ -4901,20 +4901,20 @@ Index starts with 0. Index vec happens as follows: (rr, cc) -> k =
 rr+cc*size1() Vectors are column vectors.  The storage format is Compressed
 Column Storage (CCS), similar to that used for sparse matrices in Matlab,
 but unlike this format, we do allow for elements to be structurally non-zero
-but numerically zero.  Matrix<DataType> is polymorphic with a
-std::vector<DataType> that contain all non-identical-zero elements. The
+but numerically zero.  Matrix<Scalar> is polymorphic with a
+std::vector<Scalar> that contain all non-identical-zero elements. The
 sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
 C++ includes: casadi_types.hpp ";
 
 %feature("docstring") casadi::Matrix::setValue "
 
->  void array(DataType) .setValue(double m)
+>  void array(Scalar) .setValue(double m)
 ------------------------------------------------------------------------
 
 Set double value (only if constant)
 
->  void array(DataType) .setValue(double m, int k)
+>  void array(Scalar) .setValue(double m, int k)
 ------------------------------------------------------------------------
 
 Set double value (particular nonzero)
@@ -4929,39 +4929,39 @@ Print vector-style.
 
 %feature("docstring") casadi::Matrix::sym "
 
->  static array(DataType)   array(DataType) .sym(str name, int nrow=1, int ncol=1)
+>  static array(Scalar)   array(Scalar) .sym(str name, int nrow=1, int ncol=1)
 ------------------------------------------------------------------------
 
 Create an nrow-by-ncol symbolic primitive.
 
->  static array(DataType)   array(DataType) .sym(str name, (int,int) rc)
+>  static array(Scalar)   array(Scalar) .sym(str name, (int,int) rc)
 ------------------------------------------------------------------------
 
 Construct a symbolic primitive with given dimensions.
 
->  static array(DataType)   array(DataType) .sym(str name, Sparsity sp)
+>  static array(Scalar)   array(Scalar) .sym(str name, Sparsity sp)
 ------------------------------------------------------------------------
 
 Create symbolic primitive with a given sparsity pattern.
 
->  static[array(DataType)   ] array(DataType) .sym(str name, Sparsity sp, int p)
+>  static[array(Scalar)   ] array(Scalar) .sym(str name, Sparsity sp, int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with with matrices with symbolic primitives of
 given sparsity.
 
->  static[array(DataType)   ] array(DataType) .sym(str name, int nrow, int ncol, int p)
+>  static[array(Scalar)   ] array(Scalar) .sym(str name, int nrow, int ncol, int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with nrow-by-ncol symbolic primitives.
 
->  static[[array(DataType)  ] ] array(DataType) .sym(str name, Sparsity sp, int p, int r)
+>  static[[array(Scalar)  ] ] array(Scalar) .sym(str name, Sparsity sp, int p, int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with symbolic primitives
 with given sparsity.
 
->  static[[array(DataType)  ] ] array(DataType) .sym(str name, int nrow, int ncol, int p, int r)
+>  static[[array(Scalar)  ] ] array(Scalar) .sym(str name, int nrow, int ncol, int p, int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
@@ -5058,12 +5058,12 @@ streams.
 
 %feature("docstring") casadi::Matrix::size "
 
->  (int,int) array(DataType) .size() const
+>  (int,int) array(Scalar) .size() const
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int array(DataType) .size(int axis) const
+>  int array(Scalar) .size(int axis) const
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -5096,7 +5096,7 @@ x:  Scalar symbol that the polynomial is build up with
 
 %feature("docstring") casadi::Matrix::__nonzero__ "
 
->  bool array(DataType) .__nonzero__() const 
+>  bool array(Scalar) .__nonzero__() const 
 ------------------------------------------------------------------------
 
 Returns the truth value of a Matrix.
@@ -5110,7 +5110,7 @@ Returns the truth value of a Matrix.
 
 %feature("docstring") friendwrap_taylor "
 
->  array(DataType)  array(DataType) .taylor(array(DataType) ex, array(DataType) x, array(DataType) a, int order=1)
+>  array(Scalar)  array(Scalar) .taylor(array(Scalar) ex, array(Scalar) x, array(Scalar) a, int order=1)
 ------------------------------------------------------------------------
 [INTERNAL] 
 univariate Taylor series expansion
@@ -5129,7 +5129,7 @@ Example usage:
 
 
 
->  array(DataType)  taylor(array(DataType) ex, array(DataType) x)
+>  array(Scalar)  taylor(array(Scalar) ex, array(Scalar) x)
 ------------------------------------------------------------------------
 
 univariate Taylor series expansion
@@ -5208,12 +5208,12 @@ Get name (only if symbolic scalar)
 
 %feature("docstring") friendwrap_gauss_quadrature "
 
->  array(DataType)  array(DataType) .gauss_quadrature(array(DataType) f, array(DataType) x, array(DataType) a, array(DataType) b, int order=5)
+>  array(Scalar)  array(Scalar) .gauss_quadrature(array(Scalar) f, array(Scalar) x, array(Scalar) a, array(Scalar) b, int order=5)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Integrate f from a to b using Gaussian quadrature with n points.
 
->  array(DataType)  array(DataType) .gauss_quadrature(array(DataType) f, array(DataType) x, array(DataType) a, array(DataType) b, int order, array(DataType) w)
+>  array(Scalar)  array(Scalar) .gauss_quadrature(array(Scalar) f, array(Scalar) x, array(Scalar) a, array(Scalar) b, int order, array(Scalar) w)
 ------------------------------------------------------------------------
 [INTERNAL] 
  Matrix adjoint.
@@ -5279,62 +5279,62 @@ streams.
 
 %feature("docstring") casadi::Matrix::Matrix "
 
->  array(DataType) ()
+>  array(Scalar) ()
 ------------------------------------------------------------------------
 
 constructors
 
 empty 0-by-0 matrix constructor
 
->  array(DataType) (array(DataType) m)
+>  array(Scalar) (array(Scalar) m)
 ------------------------------------------------------------------------
 
 Copy constructor.
 
->  array(DataType) (int nrow, int ncol)
+>  array(Scalar) (int nrow, int ncol)
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
 
->  array(DataType) (Sparsity sp)
+>  array(Scalar) (Sparsity sp)
 ------------------------------------------------------------------------
 
 Create a sparse matrix from a sparsity pattern. Same as
 Matrix::ones(sparsity)
 
->  array(DataType) (Sparsity sp, array(DataType) d)
+>  array(Scalar) (Sparsity sp, array(Scalar) d)
 ------------------------------------------------------------------------
 
 Construct matrix with a given sparsity and nonzeros.
 
->  array(DataType) (double val)
+>  array(Scalar) (double val)
 ------------------------------------------------------------------------
 
 This constructor enables implicit type conversion from a numeric type.
 
->  array(DataType) ([[double ] ] m)
+>  array(Scalar) ([[double ] ] m)
 ------------------------------------------------------------------------
 
 Dense matrix constructor with data given as vector of vectors.
 
->  array(DataType) (array(A) x)
+>  array(Scalar) (array(A) x)
 ------------------------------------------------------------------------
 
 Create a matrix from another matrix with a different entry type Assumes that
 the scalar conversion is valid.
 
->  array(DataType) ([A ] x)
+>  array(Scalar) ([A ] x)
 ------------------------------------------------------------------------
 
 Create an expression from a vector.
 
->  array(DataType) ([DataType ] x)
+>  array(Scalar) ([Scalar ] x)
 
->  array(DataType) ((int,int) rc)
+>  array(Scalar) ((int,int) rc)
 
->  array(DataType) (Sparsity sp, DataType val, bool dummy)
+>  array(Scalar) (Sparsity sp, Scalar val, bool dummy)
 
->  array(DataType) (Sparsity sp, [DataType ] d, bool dummy)
+>  array(Scalar) (Sparsity sp, [Scalar ] d, bool dummy)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
