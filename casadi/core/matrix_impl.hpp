@@ -861,11 +861,6 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void Matrix<DataType>::setAll(const DataType& val) {
-    std::fill(data_.begin(), data_.end(), val);
-  }
-
-  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::unary(int op, const Matrix<DataType> &x) {
     // Return value
     Matrix<DataType> ret = Matrix<DataType>::zeros(x.sparsity());

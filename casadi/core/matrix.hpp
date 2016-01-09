@@ -286,11 +286,6 @@ namespace casadi {
     void setNZ(const Matrix<DataType>& m, bool ind1, const Matrix<int>& k);
     ///@}
 
-#ifndef SWIG
-    /// Set all elements to a value
-    void setAll(const DataType& val);
-#endif // SWIG
-
     Matrix<DataType> operator+() const;
     Matrix<DataType> operator-() const;
 
