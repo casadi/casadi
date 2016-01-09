@@ -2162,7 +2162,7 @@ class NZproxy:
 
     def toMatrix(self):
         import numpy as n
-        return n.matrix(self.toArray())
+        return n.matrix(self.full())
 
     def __iter__(self):
       for k in self.nz:
@@ -2243,7 +2243,7 @@ class NZproxy:
       if hasattr(self,'__array_custom__'):
         return self.__array_custom__(*args,**kwargs)
       else:
-        return self.toArray()
+        return self.full()
 
 %}
 %enddef
@@ -3072,14 +3072,6 @@ namespace casadi{
 #ifdef SWIGPYTHON
 namespace casadi{
 %extend Matrix<double> {
-%pythoncode %{
-  def toArray(self):
-    import numpy as n
-    if isinstance(self,IM):
-      return n.array(self.get(),n.int).reshape((self.shape[1],self.shape[0])).T
-    else:
-      return n.array(self.get()).reshape((self.shape[1],self.shape[0])).T
-%}
 
 %python_array_wrappers(999.0)
 
@@ -3092,9 +3084,9 @@ namespace casadi{
 %pythoncode %{
   def __array_custom__(self,*args,**kwargs):
     if "dtype" in kwargs and not(isinstance(kwargs["dtype"],n.double)):
-      return n.array(self.toArray(),dtype=kwargs["dtype"])
+      return n.array(self.full(),dtype=kwargs["dtype"])
     else:
-      return self.toArray()
+      return self.full()
 %}
 
 %pythoncode %{
@@ -3130,18 +3122,6 @@ namespace casadi{
 %extend Matrix<int> {
 
   %python_array_wrappers(998.0)
-
-  %pythoncode %{
-    def toArray(self):
-      import numpy as n
-      r = n.zeros((self.size1(),self.size2()))
-      d = self.nonzeros_int()
-      for j in range(self.size2()):
-        for k in range(self.colind(j),self.colind(j+1)):
-          i = self.row(k)
-          r[i,j] = d[k]
-      return r
-  %}
 
   %pythoncode %{
     def __abs__(self):
@@ -3197,7 +3177,7 @@ namespace casadi{
             return _casadi.transpose(self)
 
         def __array__(self,*args,**kwargs):
-            return DM.ones(self).toArray()
+            return DM.ones(self).full()
     %}
 };
 
@@ -3253,19 +3233,7 @@ namespace casadi {
     %matrix_convertors
     %matrix_helpers(casadi::Matrix<casadi::SXElem>)
 
-    #ifdef SWIGPYTHON
-    %pythoncode %{
-    def toArray(self):
-      import numpy as n
-      r = n.array((),dtype=object)
-      r.resize(self.size1(),self.size2())
-      for j in range(self.size2()):
-        for el in range(self.colind(j),self.colind(j+1)):
-          i=self.row(el)
-          r[i,j] = self.nz[el]
-      return r
-    %}
-
+  #ifdef SWIGPYTHON
   %python_array_wrappers(1001.0)
   #endif // SWIGPYTHON
 
