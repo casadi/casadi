@@ -853,27 +853,6 @@ namespace casadi {
 
 #ifndef SWIG
     /// \cond INTERNAL
-    /** Bitwise set, reinterpreting the data as a bvec_t array */
-    void setZeroBV();
-
-    /** Bitwise set, reinterpreting the data as a bvec_t array */
-    void setBV(const Matrix<Scalar>& val);
-
-    /** Bitwise set, reinterpreting the data as a bvec_t array */
-    void getBV(Matrix<Scalar>& val) const { val.setBV(*this);}
-
-    /** Bitwise or, reinterpreting the data as a bvec_t array */
-    void borBV(const Matrix<Scalar>& val);
-
-    /** \brief Bitwise get the non-zero elements, array */
-    void getArrayBV(bvec_t* val, int len) const;
-
-    /** \brief Bitwise set the non-zero elements, array */
-    void setArrayBV(const bvec_t* val, int len);
-
-    /** \brief Bitwise or the non-zero elements, array */
-    void borArrayBV(const bvec_t* val, int len);
-
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation
         kl:    The number of subdiagonals in res
         ku:    The number of superdiagonals in res

@@ -938,47 +938,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::setBV(const Matrix<Scalar>& val) {
-    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
-    const bvec_t* bw_val = reinterpret_cast<const bvec_t*>(getPtr(val.data()));
-    sparsity().set(bw_this, bw_val, val.sparsity());
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::setZeroBV() {
-    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
-    std::fill(bw_this, bw_this+nnz(), bvec_t(0));
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::borBV(const Matrix<Scalar>& val) {
-    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
-    const bvec_t* bw_val = reinterpret_cast<const bvec_t*>(getPtr(val.data()));
-    sparsity().bor(bw_this, bw_val, val.sparsity());
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::getArrayBV(bvec_t* val, int len) const {
-    casadi_assert(len==nnz());
-    const bvec_t* bw_this = reinterpret_cast<const bvec_t*>(getPtr(data()));
-    std::copy(bw_this, bw_this+len, val);
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::setArrayBV(const bvec_t* val, int len) {
-    casadi_assert(len==nnz());
-    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
-    std::copy(val, val+len, bw_this);
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::borArrayBV(const bvec_t* val, int len) {
-    casadi_assert(len==nnz());
-    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
-    for (int i=0; i<len; ++i) *bw_this++ |= *val++;
-  }
-
-  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::printme(const Matrix<Scalar>& y) const {
     return binary(OP_PRINTME, *this, y);
   }
