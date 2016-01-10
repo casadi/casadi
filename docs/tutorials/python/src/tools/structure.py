@@ -357,7 +357,7 @@ print P
 print P()
 
 #! But often, it will behave like a DM transparantly:
-P0.set(P)
+P0 + P
 
 #! Next we represent the 'squared_repeated' helper construct
 #! Imagine we somehow obtain a matrix that represents a horizontal concatenation of covariance
