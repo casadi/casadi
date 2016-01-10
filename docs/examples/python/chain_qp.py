@@ -127,7 +127,7 @@ Z0 = x_opt[1::2]
 # Plot the result
 import matplotlib.pyplot as plt
 plt.plot(Y0,Z0,'o-')
-ys = linspace(-2,2,100)
+ys = linspace(-2.,2.,100)
 zs = 0.5 + 0.1*ys
 plt.plot(ys,zs,'--')
 plt.xlabel('y [m]')
