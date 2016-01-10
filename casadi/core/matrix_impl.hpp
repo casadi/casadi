@@ -174,7 +174,9 @@ namespace casadi {
     if (rr.is_scalar(size1()) && cc.is_scalar(size2()) && m.is_dense()) {
       int oldsize = sparsity_.nnz();
       int ind = sparsity_.addNZ(rr.toScalar(size1()), cc.toScalar(size2()));
-      if (oldsize != sparsity_.nnz()) {
+      if (oldsize == sparsity_.nnz()) {
+        data_.at(ind) = m.toScalar();
+      } else {
         data_.insert(data_.begin()+ind, m.toScalar());
       }
       return;
@@ -282,7 +284,9 @@ namespace casadi {
       int r = rr.toScalar(numel());
       int oldsize = sparsity_.nnz();
       int ind = sparsity_.addNZ(r % size1(), r / size1());
-      if (oldsize != sparsity_.nnz()) {
+      if (oldsize == sparsity_.nnz()) {
+        data_.at(ind) = m.toScalar();
+      } else {
         data_.insert(data_.begin()+ind, m.toScalar());
       }
       return;
