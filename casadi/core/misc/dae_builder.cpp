@@ -1164,7 +1164,7 @@ namespace casadi {
     casadi_assert(var.is_column() && var.is_symbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
-      ret[i] = der(var.at(i).getName());
+      ret[i] = der(var[i].getName());
     }
     return ret;
   }

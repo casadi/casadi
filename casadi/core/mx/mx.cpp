@@ -469,17 +469,6 @@ namespace casadi {
     *this = simplify(m->getSetNonzeros(*this, kk.data()));
   }
 
-  const MX MX::at(int k) const {
-    MX m;
-    getNZ(m, false, k);
-    return m;
-  }
-
-  /// Access a non-zero element
-  NonZeros<MX, int> MX::at(int k) {
-    return NonZeros<MX, int>(*this, k);
-  }
-
   MX MX::binary(int op, const MX &x, const MX &y) {
     return x->getBinarySwitch(op, y);
   }

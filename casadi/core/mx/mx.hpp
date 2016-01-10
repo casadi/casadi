@@ -106,12 +106,6 @@ namespace casadi {
     static std::vector<MX> createMultipleOutput(MXNode* node);
 /// \endcond
 
-    /// Get a non-zero element, with bounds checking
-    const MX at(int k) const;
-
-    /// Access a non-zero element, with bounds checking
-    NonZeros<MX, int> at(int k);
-
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 

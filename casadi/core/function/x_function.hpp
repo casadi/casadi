@@ -928,7 +928,7 @@ namespace casadi {
             if (anz<0) continue;
 
             // Get the input seed
-            ret.at(elJ) = asens[d][iind].at(anz);
+            ret[elJ] = asens[d][iind][anz];
           }
         }
       }
