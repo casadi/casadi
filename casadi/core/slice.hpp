@@ -95,10 +95,6 @@ namespace casadi {
   /// Check if an index vector can be represented more efficiently as two nested slices
   bool CASADI_EXPORT is_slice2(const std::vector<int>& v);
 
-#ifndef SWIG
-  static Slice ALL;
-#endif // SWIG
-
 } // namespace casadi
 
 #endif // CASADI_SLICE_HPP

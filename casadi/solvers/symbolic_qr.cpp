@@ -116,13 +116,13 @@ namespace casadi {
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
 
     // Permute the right hand sides
-    SX bperm = b(rowperm_, ALL);
+    SX bperm = b(rowperm_, Slice());
 
     // Solve the factorized system
     SX xperm = SX::solve(R, mtimes(Q.T(), bperm));
 
     // Permute back the solution
-    SX x = xperm(inv_colperm, ALL);
+    SX x = xperm(inv_colperm, Slice());
 
     // Generate the QR solve function
     vector<SX> solv_in = {Q, R, b};
@@ -144,13 +144,13 @@ namespace casadi {
     // <=> x = Pb' * Q * inv(R') * Px * b
 
     // Permute the right hand side
-    bperm = b(colperm_, ALL);
+    bperm = b(colperm_, Slice());
 
     // Solve the factorized system
     xperm = mtimes(Q, SX::solve(R.T(), bperm));
 
     // Permute back the solution
-    x = xperm(inv_rowperm, ALL);
+    x = xperm(inv_rowperm, Slice());
 
     // Mofify the QR solve function
     solv_fcn = Function("QR_solv_T", solv_in, {x});

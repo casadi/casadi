@@ -784,13 +784,13 @@ namespace casadi {
     if (dim==1) t = true;
     if (dim==2) t = false;
 
-    MatType a1 = t ? a(0, ALL) : a(ALL, 0);
-    MatType a2 = t ? a(1, ALL) : a(ALL, 1);
-    MatType a3 = t ? a(2, ALL) : a(ALL, 2);
+    MatType a1 = t ? a(0, Slice()) : a(Slice(), 0);
+    MatType a2 = t ? a(1, Slice()) : a(Slice(), 1);
+    MatType a3 = t ? a(2, Slice()) : a(Slice(), 2);
 
-    MatType b1 = t ? b(0, ALL) : b(ALL, 0);
-    MatType b2 = t ? b(1, ALL) : b(ALL, 1);
-    MatType b3 = t ? b(2, ALL) : b(ALL, 2);
+    MatType b1 = t ? b(0, Slice()) : b(Slice(), 0);
+    MatType b2 = t ? b(1, Slice()) : b(Slice(), 1);
+    MatType b3 = t ? b(2, Slice()) : b(Slice(), 2);
 
     ret[0] = a2*b3-a3*b2;
     ret[1] = a3*b1-a1*b3;

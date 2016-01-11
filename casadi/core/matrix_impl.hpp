@@ -1840,7 +1840,7 @@ namespace casadi {
     Q = R = Matrix<Scalar>();
     for (int i=0; i<A.size2(); ++i) {
       // Initialize qi to be the i-th column of *this
-      Matrix<Scalar> ai = A(ALL, i);
+      Matrix<Scalar> ai = A(Slice(), i);
       Matrix<Scalar> qi = ai;
       // The i-th column of R
       Matrix<Scalar> ri = Matrix<Scalar>(A.size2(), 1);
@@ -1849,7 +1849,7 @@ namespace casadi {
       for (int j=0; j<i; ++j) {
 
         // Get the j-th column of Q
-        Matrix<Scalar> qj = Q(ALL, j);
+        Matrix<Scalar> qj = Q(Slice(), j);
 
         ri(j, 0) = mtimes(qi.T(), qj); // Modified Gram-Schmidt
         // ri[j] = dot(qj, ai); // Classical Gram-Schmidt
@@ -1998,7 +1998,7 @@ namespace casadi {
                        coarse_rowblock, coarse_colblock);
 
       // Permute the right hand side
-      Matrix<Scalar> bperm = b(rowperm, ALL);
+      Matrix<Scalar> bperm = b(rowperm, Slice());
 
       // Permute the linear system
       Matrix<Scalar> Aperm = a(rowperm, colperm);
@@ -2033,7 +2033,7 @@ namespace casadi {
         inv_colperm[colperm[k]] = k;
 
       // Permute back the solution and return
-      Matrix<Scalar> x = xperm(inv_colperm, ALL);
+      Matrix<Scalar> x = xperm(inv_colperm, Slice());
       return x;
     }
   }
