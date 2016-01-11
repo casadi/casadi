@@ -128,9 +128,6 @@ namespace casadi {
   }
 
   Function simpleRK(Function f, int N, int order) {
-    // Initialize f, if needed
-    f.init();
-
     // Consistency check
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
                           << N << ".");
@@ -236,9 +233,6 @@ namespace casadi {
   Function simpleIRK(Function f, int N, int order, const std::string& scheme,
                        const std::string& solver,
                        const Dict& solver_options) {
-    // Initialize f, if needed
-    f.init();
-
     // Consistency check
     casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
                           << N << ".");
@@ -305,9 +299,6 @@ namespace casadi {
 
   Function simpleIntegrator(Function f, const std::string& plugin,
                             const Dict& plugin_options) {
-    // Initialize f, if needed
-    f.init();
-
     // Consistency check
     casadi_assert_message(f.n_in()==2, "Function must have two inputs: x and p");
     casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");

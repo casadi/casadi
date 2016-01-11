@@ -951,11 +951,6 @@ namespace casadi {
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     static std::string sanitizeName(const std::string& name);
 
-#ifndef SWIG
-    /** \brief Initialize the object, called from constructor */
-    void init();
-#endif // SWIG
-
     /// Create a solve node
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
 

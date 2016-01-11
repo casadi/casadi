@@ -170,7 +170,8 @@ namespace casadi {
                            const Dict& opts) {
     assignNode(new SXFunction(name, arg, res));
     (*this)->setOption(opts);
-    init();
+    (*this)->init();
+    (*this)->finalize();
   }
 
   void Function::construct(const string& name,
@@ -178,7 +179,8 @@ namespace casadi {
                            const Dict& opts) {
     assignNode(new MXFunction(name, arg, res));
     (*this)->setOption(opts);
-    init();
+    (*this)->init();
+    (*this)->finalize();
   }
 
   template<typename M>
@@ -376,7 +378,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(new Mapaccum(name, *this, n, input_accum, output_accum, reverse));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -384,7 +387,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(MapBase::create(name, *this, n, opts));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -397,7 +401,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(new MapReduce(name, *this, n, repeat_in, repeat_out));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -421,7 +426,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(new Switch(name, f, f_def));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -430,7 +436,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(new Switch(name, vector<Function>(1, f_false), f_true));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -441,7 +448,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(new KernelSum(name, *this, size, r, n));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1071,16 +1079,12 @@ namespace casadi {
     return (*this)->countNodes();
   }
 
-  void Function::init() {
-    (*this)->init();
-    (*this)->finalize();
-  }
-
   Function external(const string& name, const Dict& opts) {
     Function ret;
     ret.assignNode(External::create("./" + name + ".so", name));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1089,7 +1093,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(External::create(bin_name, name));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1098,7 +1103,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(External::create(compiler, name));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1221,7 +1227,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1302,7 +1309,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1359,7 +1367,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(Qpsol::instantiatePlugin(name, solver, qp));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1432,7 +1441,8 @@ namespace casadi {
       ret.assignNode(Linsol::getPlugin(solver).creator(name, sp, nrhs));
     }
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1473,7 +1483,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(Rootfinder::instantiatePlugin(name, solver, f));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
@@ -1627,7 +1638,8 @@ namespace casadi {
     Function ret;
     ret.assignNode(new Jit(name, n_in, n_out, body, opts));
     ret->setOption(opts);
-    ret.init();
+    ret->init();
+    ret->finalize();
     return ret;
   }
 
