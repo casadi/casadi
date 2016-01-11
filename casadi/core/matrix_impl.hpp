@@ -50,18 +50,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  bool Matrix<Scalar>::isSlice(bool ind1) const {
-    throw CasadiException("\"isSlice\" not defined for instantiation");
-    return false;
-  }
-
-  template<typename Scalar>
-  Slice Matrix<Scalar>::toSlice(bool ind1) const {
-    throw CasadiException("\"toSlice\" not defined for instantiation");
-    return Slice();
-  }
-
-  template<typename Scalar>
   void Matrix<Scalar>::get(Matrix<Scalar>& m, bool ind1,
                                 const Slice& rr, const Slice& cc) const {
     // Both are scalar
@@ -98,7 +86,7 @@ namespace casadi {
                              const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Scalar
     if (rr.is_scalar(true) && cc.is_scalar(true)) {
-      return get(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
+      return get(m, ind1, to_slice(rr, ind1), to_slice(cc, ind1));
     }
 
     // Make sure dense vectors
@@ -138,7 +126,7 @@ namespace casadi {
   void Matrix<Scalar>::get(Matrix<Scalar>& m, bool ind1, const Matrix<int>& rr) const {
     // Scalar
     if (rr.is_scalar(true)) {
-      return get(m, ind1, rr.toSlice(ind1));
+      return get(m, ind1, to_slice(rr, ind1));
     }
 
     // If the indexed matrix is dense, use nonzero indexing
@@ -205,7 +193,7 @@ namespace casadi {
                                 const Matrix<int>& rr, const Matrix<int>& cc) {
     // Scalar
     if (rr.is_scalar(true) && cc.is_scalar(true) && m.is_dense()) {
-      return set(m, ind1, rr.toSlice(ind1), cc.toSlice(ind1));
+      return set(m, ind1, to_slice(rr, ind1), to_slice(cc, ind1));
     }
 
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
@@ -300,7 +288,7 @@ namespace casadi {
   void Matrix<Scalar>::set(const Matrix<Scalar>& m, bool ind1, const Matrix<int>& rr) {
     // Scalar
     if (rr.is_scalar(true) && m.is_dense()) {
-      return set(m, ind1, rr.toSlice(ind1));
+      return set(m, ind1, to_slice(rr, ind1));
     }
 
     // Assert dimensions of assigning matrix
@@ -406,7 +394,7 @@ namespace casadi {
   void Matrix<Scalar>::get_nz(Matrix<Scalar>& m, bool ind1, const Matrix<int>& kk) const {
     // Scalar
     if (kk.is_scalar(true)) {
-      return get_nz(m, ind1, kk.toSlice(ind1));
+      return get_nz(m, ind1, to_slice(kk, ind1));
     }
 
     // Get nonzeros of kk
@@ -452,7 +440,7 @@ namespace casadi {
   void Matrix<Scalar>::set_nz(const Matrix<Scalar>& m, bool ind1, const Matrix<int>& kk) {
     // Scalar
     if (kk.is_scalar(true)) {
-      return set_nz(m, ind1, kk.toSlice(ind1));
+      return set_nz(m, ind1, to_slice(kk, ind1));
     }
 
     // Assert dimensions of assigning matrix

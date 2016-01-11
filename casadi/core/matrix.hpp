@@ -194,12 +194,6 @@ namespace casadi {
     /// Returns the truth value of a Matrix
     bool __nonzero__() const;
 
-    /// Is the Matrix a Slice (only for IM)
-    bool isSlice(bool ind1=false) const;
-
-    ///  Convert to Slice (only for IM)
-    Slice toSlice(bool ind1=false) const;
-
     ///@{
     /// Get a submatrix, single argument
     void get(Matrix<Scalar>& SWIG_OUTPUT(m), bool ind1, const Slice& rr) const;
@@ -997,10 +991,6 @@ namespace casadi {
 #endif // SWIG
   };
 
-  // Template specialization declarations
-  template<> bool Matrix<int>::isSlice(bool ind1) const;
-  template<> Slice Matrix<int>::toSlice(bool ind1) const;
-
   ///@{
   /// Readability typedefs
   typedef Matrix<int> IM;
@@ -1009,6 +999,14 @@ namespace casadi {
   typedef std::vector<DMVector> DMVectorVector;
   typedef std::map<std::string, DM> DMDict;
   ///@}
+
+  /// Is the IM a Slice
+  bool CASADI_EXPORT is_slice(const IM& x, bool ind1=false);
+
+  ///  Convert IM to Slice
+  Slice CASADI_EXPORT to_slice(const IM& x, bool ind1=false);
+
+
 } // namespace casadi
 
 #endif // CASADI_MATRIX_HPP

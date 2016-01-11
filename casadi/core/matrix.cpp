@@ -36,14 +36,12 @@ namespace casadi {
   template class Matrix<int>;
   template class Matrix< SXElem >;
 
-  template<>
-  bool Matrix<int>::isSlice(bool ind1) const {
-    return is_scalar() || (is_column() && is_dense() && Slice::isSlice(data(), ind1));
+  bool CASADI_EXPORT is_slice(const IM& x, bool ind1) {
+    return x.is_scalar() || (x.is_column() && x.is_dense() && Slice::isSlice(x.data(), ind1));
   }
 
-  template<>
-  Slice Matrix<int>::toSlice(bool ind1) const {
-    return is_scalar() ? Slice(scalar(), ind1) : Slice(data(), ind1);
+  Slice CASADI_EXPORT to_slice(const IM& x, bool ind1) {
+    return x.is_scalar() ? Slice(x.scalar(), ind1) : Slice(x.data(), ind1);
   }
 
   template<>
