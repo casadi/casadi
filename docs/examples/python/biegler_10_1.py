@@ -124,7 +124,7 @@ for N in range(1,11):
   ## ----
   
   # NLP solver options
-  opts = {"tol" : 1e-10}
+  opts = {"ipopt.tol" : 1e-10}
 
   # Allocate an NLP solver and buffer
   solver = nlpsol("solver", "ipopt", nlp, opts)
