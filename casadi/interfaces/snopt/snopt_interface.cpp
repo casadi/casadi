@@ -64,9 +64,6 @@ namespace casadi {
     addOption("specs file",  OT_STRING);
     addOption("summary", OT_BOOLEAN, true);
 
-    // Snopt options
-    typedef std::pair<std::string, std::string> spair;
-
     // Printing
     intOpts_["Major print level"] = "1 * 1-line major iteration log";
     intOpts_["Minor print level"] = "1 * 1-line minor iteration log";
@@ -74,12 +71,10 @@ namespace casadi {
     // special om["Summary file"] = OT_S; //  * specified by subroutine sn_init
     intOpts_["Print frequency"] = "100 * minor iterations log on Print file";
     intOpts_["Summary frequency"] = "100 * minor iterations log on Summary file";
-    strOpts_["Solution"] = spair("Yes|No|If Optimal|If Infeasible|If Unbounded",
-                                 "Yes * on the Print file");
+    strOpts_["Solution"] = "Yes * on the Print file";
 
     // * Suppress options listing * options are normally listed
-    strOpts_["System information"] =
-      spair("No|Yes", "No * Yes prints more system information");
+    strOpts_["System information"] = "No * Yes prints more system information";
 
     // * Problem specification
     // special Minimize * (opposite of Maximize)
@@ -111,7 +106,7 @@ namespace casadi {
     realOpts_["Pivot tolerance"] = "3.7e-11 * e^2/3";
 
     // * QP subproblems
-    strOpts_["QPSolver"] = spair("Cholesky|CG|QN", "Cholesky * default");
+    strOpts_["QPSolver"] = "Cholesky * default";
     intOpts_["Crash option"] = "3 * first basis is essentially triangular";
     realOpts_["Elastic weight"] = "1.0e+4 * used only during elastic mode";
     intOpts_["Iterations limit"] = "10000 * or 20m if that is more";
@@ -142,9 +137,8 @@ namespace casadi {
     realOpts_["Unbounded objective"] = "1.0e+15";
 
     // * Hessian approximation
-    strOpts_["Hessian"] = spair("full memory|limited memory",
-                                "   full memory * default if n1 ≤ 75\n"
-                                "limited memory * default if n1 > 75");
+    strOpts_["Hessian"] = "full memory * default if n1 ≤ 75\n"
+      "limited memory * default if n1 > 75";
     intOpts_["Hessian frequency"] = "999999 * for full Hessian (never reset)";
     intOpts_["Hessian updates"] = "10 * for limited memory Hessian";
     intOpts_["Hessian flush"] = "999999 * no flushing";
@@ -159,10 +153,9 @@ namespace casadi {
     realOpts_["LU factor tolerance"] = "3.99 * for NP (100.0 for LP)";
     realOpts_["LU update tolerance"] = "3.99 * for NP ( 10.0 for LP)";
     realOpts_["LU singularity tolerance"] = "3.2e-11";
-    strOpts_["LU"] = spair("partial pivoting|rook pivoting|complete pivoting",
-                           "LU partial pivoting * default threshold pivoting strategy\n"
-                           "LU rook pivoting * threshold rook pivoting\n"
-                           "LU complete pivoting * threshold complete pivoting");
+    strOpts_["LU"] = "LU partial pivoting * default threshold pivoting strategy\n"
+      "LU rook pivoting * threshold rook pivoting\n"
+      "LU complete pivoting * threshold complete pivoting";
 
     // * Basis files
     intOpts_["Old basis file"] = "0 * input basis map";
@@ -184,19 +177,16 @@ namespace casadi {
 
     // * Miscellaneous
     intOpts_["Debug level"] = "0 * for developers";
-    strOpts_["Sticky parameters"] = spair("No|Yes", "No * Yes makes parameter values persist");
+    strOpts_["Sticky parameters"] = "No * Yes makes parameter values persist";
     intOpts_["Timing level"] = "3 * print cpu times";
 
     // Add the Snopt Options
-    for (std::map<std::string, std::string>::const_iterator it = intOpts_.begin();
-         it != intOpts_.end(); ++it)
+    for (auto it = intOpts_.begin(); it != intOpts_.end(); ++it)
       addOption(it->first, OT_INTEGER, GenericType(), it->second);
-    for (std::map<std::string, std::string>::const_iterator it = realOpts_.begin();
-         it != realOpts_.end(); ++it)
+    for (auto it = realOpts_.begin(); it != realOpts_.end(); ++it)
       addOption(it->first, OT_REAL, GenericType(), it->second);
-    for (std::map<std::string, std::pair<std::string, std::string> >::const_iterator
-           it = strOpts_.begin(); it != strOpts_.end(); ++it)
-      addOption(it->first, OT_STRING, GenericType(), it->second.second, it->second.first);
+    for (auto it = strOpts_.begin(); it != strOpts_.end(); ++it)
+      addOption(it->first, OT_STRING, GenericType(), it->second);
   }
 
   SnoptInterface::~SnoptInterface() {

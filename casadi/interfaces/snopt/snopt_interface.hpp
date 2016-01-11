@@ -120,7 +120,6 @@ namespace casadi {
     bool exact_hessian_;
 
     std::map<int, std::string> status_;
-    std::map<std::string, TypeID> ops_;
 
     std::string formatStatus(int status) const;
 
@@ -157,7 +156,7 @@ namespace casadi {
       // options
       std::map<std::string, std::string> intOpts_;
       std::map<std::string, std::string> realOpts_;
-      std::map<std::string, std::pair<std::string, std::string> > strOpts_;
+      std::map<std::string, std::string> strOpts_;
   };
 
 } // namespace casadi
