@@ -68,10 +68,10 @@ namespace casadi {
   template<typename T>
   void GetNonzerosSlice::evalGen(const T* const* arg, T* const* res,
                                  int* iw, T* w) const {
-    const T* idata = arg[0] + s_.start_;
-    const T* idata_stop = arg[0] + s_.stop_;
+    const T* idata = arg[0] + s_.start;
+    const T* idata_stop = arg[0] + s_.stop;
     T* odata = res[0];
-    for (; idata != idata_stop; idata += s_.step_) {
+    for (; idata != idata_stop; idata += s_.step) {
       *odata++ = *idata;
     }
   }
@@ -89,13 +89,13 @@ namespace casadi {
   template<typename T>
   void GetNonzerosSlice2::
   evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
-    const T* outer = arg[0] + outer_.start_;
-    const T* outer_stop = arg[0] + outer_.stop_;
+    const T* outer = arg[0] + outer_.start;
+    const T* outer_stop = arg[0] + outer_.stop;
     T* odata = res[0];
-    for (; outer != outer_stop; outer += outer_.step_) {
-      for (const T* inner = outer+inner_.start_;
-          inner != outer+inner_.stop_;
-          inner += inner_.step_) {
+    for (; outer != outer_stop; outer += outer_.step) {
+      for (const T* inner = outer+inner_.start;
+          inner != outer+inner_.stop;
+          inner += inner_.step) {
         *odata++ = *inner;
       }
     }
@@ -124,7 +124,7 @@ namespace casadi {
   spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
-    for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
+    for (int k=s_.start; k!=s_.stop; k+=s_.step) {
       *r++ = a[k];
     }
   }
@@ -133,7 +133,7 @@ namespace casadi {
   spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
-    for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
+    for (int k=s_.start; k!=s_.stop; k+=s_.step) {
       a[k] |= *r;
       *r++ = 0;
     }
@@ -143,8 +143,8 @@ namespace casadi {
   spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     const bvec_t *a = arg[0];
     bvec_t *r = res[0];
-    for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
-      for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
+    for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {
+      for (int k2=k1+inner_.start; k2!=k1+inner_.stop; k2+=inner_.step) {
         *r++ = a[k2];
       }
     }
@@ -154,8 +154,8 @@ namespace casadi {
   spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
-    for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
-      for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
+    for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {
+      for (int k2=k1+inner_.start; k2!=k1+inner_.stop; k2+=inner_.step) {
         a[k2] |= *r;
         *r++ = 0;
       }
@@ -427,9 +427,9 @@ namespace casadi {
       return false;
 
     // Check if the nonzeros follow in increasing order
-    if (s_.start_ != 0) return false;
-    if (s_.step_ != 1) return false;
-    if (s_.stop_ != nnz()) return false;
+    if (s_.start != 0) return false;
+    if (s_.step != 1) return false;
+    if (s_.stop != nnz()) return false;
 
     // True if reached this point
     return true;
@@ -470,20 +470,20 @@ namespace casadi {
   void GetNonzerosSlice::generate(CodeGenerator& g, const std::string& mem,
                                   const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
-           << g.work(arg[0], dep(0).nnz()) << "+" << s_.start_
-           << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop_
-           << "; ss+=" << s_.step_ << ") "
+           << g.work(arg[0], dep(0).nnz()) << "+" << s_.start
+           << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
+           << "; ss+=" << s_.step << ") "
            << "*rr++ = *ss;" << endl;
   }
 
   void GetNonzerosSlice2::generate(CodeGenerator& g, const std::string& mem,
                                    const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "  for (rr=" << g.work(res[0], nnz()) << ", ss="
-           << g.work(arg[0], dep(0).nnz()) << "+" << outer_.start_
-           << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << outer_.stop_ << "; ss+="
-           << outer_.step_ << ") "
-           << "for (tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_
-           << "; tt+=" << inner_.step_ << ") "
+           << g.work(arg[0], dep(0).nnz()) << "+" << outer_.start
+           << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << outer_.stop << "; ss+="
+           << outer_.step << ") "
+           << "for (tt=ss+" << inner_.start << "; tt!=ss+" << inner_.stop
+           << "; tt+=" << inner_.step << ") "
            << "*rr++ = *tt;" << endl;
   }
 

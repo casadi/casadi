@@ -488,8 +488,8 @@ namespace casadi {
     if (idata0 != odata) {
       copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
-    T* odata_stop = odata + s_.stop_;
-    for (odata += s_.start_; odata != odata_stop; odata += s_.step_) {
+    T* odata_stop = odata + s_.stop;
+    for (odata += s_.start; odata != odata_stop; odata += s_.step) {
       if (Add) {
         *odata += *idata++;
       } else {
@@ -520,12 +520,12 @@ namespace casadi {
     if (idata0 != odata) {
       copy(idata0, idata0 + this->dep(0).nnz(), odata);
     }
-    T* outer_stop = odata + outer_.stop_;
-    T* outer = odata + outer_.start_;
-    for (; outer != outer_stop; outer += outer_.step_) {
-      for (T* inner = outer+inner_.start_;
-          inner != outer+inner_.stop_;
-          inner += inner_.step_) {
+    T* outer_stop = odata + outer_.stop;
+    T* outer = odata + outer_.start;
+    for (; outer != outer_stop; outer += outer_.step) {
+      for (T* inner = outer+inner_.start;
+          inner != outer+inner_.stop;
+          inner += inner_.step) {
         if (Add) {
           *inner += *idata++;
         } else {
@@ -580,7 +580,7 @@ namespace casadi {
 
     // Propagate sparsity
     if (r != a0) copy(a0, a0+n, r);
-    for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
+    for (int k=s_.start; k!=s_.stop; k+=s_.step) {
       if (Add) {
         r[k] |= *a++;
       } else {
@@ -594,7 +594,7 @@ namespace casadi {
   spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
-    for (int k=s_.start_; k!=s_.stop_; k+=s_.step_) {
+    for (int k=s_.start; k!=s_.stop; k+=s_.step) {
       *a++ |= r[k];
       if (!Add) {
         r[k] = 0;
@@ -613,8 +613,8 @@ namespace casadi {
 
     // Propagate sparsity
     if (r != a0) copy(a0, a0+n, r);
-    for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
-      for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
+    for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {
+      for (int k2=k1+inner_.start; k2!=k1+inner_.stop; k2+=inner_.step) {
         if (Add) {
           r[k2] |= *a++;
         } else {
@@ -629,8 +629,8 @@ namespace casadi {
   spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
-    for (int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_) {
-      for (int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_) {
+    for (int k1=outer_.start; k1!=outer_.stop; k1+=outer_.step) {
+      for (int k2=k1+inner_.start; k2!=k1+inner_.stop; k2+=inner_.step) {
         *a++ |= r[k2];
         if (!Add) {
           r[k2] = 0;
@@ -730,9 +730,9 @@ namespace casadi {
       return false;
 
     // Check if the nonzeros follow in increasing order
-    if (s_.start_ != 0) return false;
-    if (s_.step_ != 1) return false;
-    if (s_.stop_ != this->nnz()) return false;
+    if (s_.start != 0) return false;
+    if (s_.step != 1) return false;
+    if (s_.stop != this->nnz()) return false;
 
     // True if reached this point
     return true;
@@ -769,10 +769,10 @@ namespace casadi {
     }
 
     // Perform the operation inplace
-    g.body << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start_ << ", ss="
+    g.body << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start << ", ss="
            << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-           << g.work(res[0], this->nnz()) << "+" << s_.stop_
-           << "; rr+=" << s_.step_ << ")";
+           << g.work(res[0], this->nnz()) << "+" << s_.stop
+           << "; rr+=" << s_.step << ")";
     g.body << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 
@@ -787,12 +787,12 @@ namespace casadi {
     }
 
     // Perform the operation inplace
-    g.body << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start_
+    g.body << "  for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start
            << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-           << g.work(res[0], this->nnz()) << "+" << outer_.stop_
-           << "; rr+=" << outer_.step_ << ")";
-    g.body << " for (tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_
-           << "; tt+=" << inner_.step_ << ")";
+           << g.work(res[0], this->nnz()) << "+" << outer_.stop
+           << "; rr+=" << outer_.step << ")";
+    g.body << " for (tt=rr+" << inner_.start << "; tt!=rr+" << inner_.stop
+           << "; tt+=" << inner_.step << ")";
     g.body << " *tt " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 

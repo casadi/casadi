@@ -1017,9 +1017,9 @@ import_array();
       // Python int
       if (PyInt_Check(p)) {
         if (m) {
-          (**m).start_ = PyInt_AsLong(p);
-          (**m).stop_ = (**m).start_+1;
-          if ((**m).stop_==0) (**m).stop_ = std::numeric_limits<int>::max();
+          (**m).start = PyInt_AsLong(p);
+          (**m).stop = (**m).start+1;
+          if ((**m).stop==0) (**m).stop = std::numeric_limits<int>::max();
         }
         return true;
       }
@@ -1027,11 +1027,11 @@ import_array();
       if (PySlice_Check(p)) {
         PySliceObject *r = (PySliceObject*)(p);
         if (m) {
-          (**m).start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min())
+          (**m).start = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min())
             ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
-          (**m).stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
+          (**m).stop  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max())
             ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop);
-          if(r->step !=Py_None) (**m).step_  = PyInt_AsLong(r->step);
+          if(r->step !=Py_None) (**m).step  = PyInt_AsLong(r->step);
         }
         return true;
       }

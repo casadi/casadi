@@ -42,10 +42,10 @@ namespace casadi {
   class CASADI_EXPORT Slice : public PrintableObject<Slice> {
   public:
     /// start value: negative values will get added to length
-    int start_;
+    int start;
     /// stop value: use std::numeric_limits<int>::max() to indicate unboundedness
-    int stop_;
-    int step_;
+    int stop;
+    int step;
 
     /// Default constructor - all elements
     Slice();
@@ -69,8 +69,9 @@ namespace casadi {
     int scalar(int len) const;
 
     /// Check equality
-    bool operator==(const Slice& other) const
-    { return start_==other.start_ && stop_==other.stop_ && step_==other.step_;}
+    bool operator==(const Slice& other) const {
+      return start==other.start && stop==other.stop && step==other.step;
+    }
 
     /// Check inequality
     bool operator!=(const Slice& other) const { return !(*this == other);}

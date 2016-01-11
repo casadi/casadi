@@ -132,7 +132,7 @@ namespace casadi {
     virtual ~SetNonzerosSlice() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> all() const { return s_.all(s_.stop_);}
+    virtual std::vector<int> all() const { return s_.all(s_.stop);}
 
     /// Check if the instance is in fact a simple assignment
     bool isAssignment() const;
@@ -183,7 +183,7 @@ namespace casadi {
     virtual ~SetNonzerosSlice2() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> all() const { return inner_.all(outer_, outer_.stop_);}
+    virtual std::vector<int> all() const { return inner_.all(outer_, outer_.stop);}
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
