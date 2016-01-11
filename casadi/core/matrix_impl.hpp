@@ -66,7 +66,7 @@ namespace casadi {
                                 const Slice& rr, const Slice& cc) const {
     // Both are scalar
     if (rr.is_scalar(size1()) && cc.is_scalar(size2())) {
-      int k = sparsity().get_nz(rr.toScalar(size1()), cc.toScalar(size2()));
+      int k = sparsity().get_nz(rr.scalar(size1()), cc.scalar(size2()));
       if (k>=0) {
         m = data().at(k);
       } else {
@@ -120,7 +120,7 @@ namespace casadi {
   void Matrix<Scalar>::get(Matrix<Scalar>& m, bool ind1, const Slice& rr) const {
     // Scalar
     if (rr.is_scalar(numel())) {
-      int r = rr.toScalar(numel());
+      int r = rr.scalar(numel());
       int k = sparsity().get_nz(r % size1(), r / size1());
       if (k>=0) {
         m = data().at(k);
@@ -173,11 +173,11 @@ namespace casadi {
     // Both are scalar
     if (rr.is_scalar(size1()) && cc.is_scalar(size2()) && m.is_dense()) {
       int oldsize = sparsity_.nnz();
-      int ind = sparsity_.addNZ(rr.toScalar(size1()), cc.toScalar(size2()));
+      int ind = sparsity_.addNZ(rr.scalar(size1()), cc.scalar(size2()));
       if (oldsize == sparsity_.nnz()) {
-        data_.at(ind) = m.toScalar();
+        data_.at(ind) = m.scalar();
       } else {
-        data_.insert(data_.begin()+ind, m.toScalar());
+        data_.insert(data_.begin()+ind, m.scalar());
       }
       return;
     }
@@ -281,13 +281,13 @@ namespace casadi {
   void Matrix<Scalar>::set(const Matrix<Scalar>& m, bool ind1, const Slice& rr) {
     // Scalar
     if (rr.is_scalar(numel()) && m.is_dense()) {
-      int r = rr.toScalar(numel());
+      int r = rr.scalar(numel());
       int oldsize = sparsity_.nnz();
       int ind = sparsity_.addNZ(r % size1(), r / size1());
       if (oldsize == sparsity_.nnz()) {
-        data_.at(ind) = m.toScalar();
+        data_.at(ind) = m.scalar();
       } else {
-        data_.insert(data_.begin()+ind, m.toScalar());
+        data_.insert(data_.begin()+ind, m.scalar());
       }
       return;
     }
@@ -394,7 +394,7 @@ namespace casadi {
   void Matrix<Scalar>::get_nz(Matrix<Scalar>& m, bool ind1, const Slice& kk) const {
     // Scalar
     if (kk.is_scalar(nnz())) {
-      m = data().at(kk.toScalar(nnz()));
+      m = data().at(kk.scalar(nnz()));
       return;
     }
 
@@ -440,7 +440,7 @@ namespace casadi {
   void Matrix<Scalar>::set_nz(const Matrix<Scalar>& m, bool ind1, const Slice& kk) {
     // Scalar
     if (kk.is_scalar(nnz())) {
-      data().at(kk.toScalar(nnz())) = m.toScalar();
+      data().at(kk.scalar(nnz())) = m.scalar();
       return;
     }
 
@@ -520,7 +520,7 @@ namespace casadi {
     auto it = x.data().cbegin();
 
     // New data vector
-    std::vector<Scalar> d(nrow*ncol, val.toScalar());
+    std::vector<Scalar> d(nrow*ncol, val.scalar());
 
     // Copy nonzeros
     for (int cc=0; cc<ncol; ++cc) {
@@ -575,7 +575,7 @@ namespace casadi {
     if (nnz()==0) {
       stream << "00";
     } else {
-      stream << toScalar();
+      stream << scalar();
     }
 
     if (trailing_newline) stream << std::endl;
@@ -841,7 +841,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar>::Matrix(const Sparsity& sp, const Matrix<Scalar>& d) {
     if (d.is_scalar()) {
-      *this = Matrix<Scalar>(sp, d.toScalar(), false);
+      *this = Matrix<Scalar>(sp, d.scalar(), false);
     } else if (d.is_column() || d.size1()==1) {
       casadi_assert(sp.nnz()==d.numel());
       if (d.is_dense()) {
@@ -1072,7 +1072,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  const Scalar Matrix<Scalar>::toScalar() const {
+  const Scalar Matrix<Scalar>::scalar() const {
     // Make sure that the matrix is 1-by-1
     casadi_assert_message(is_scalar(), "Can only convert 1-by-1 matrices to scalars");
 
@@ -1450,7 +1450,7 @@ namespace casadi {
 
   template<typename Scalar>
   int Matrix<Scalar>::getIntValue() const {
-    return static_cast<int>(toScalar());
+    return static_cast<int>(scalar());
   }
 
   template<typename Scalar>

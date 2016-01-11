@@ -241,7 +241,7 @@ namespace casadi {
     return nret==1;
   }
 
-  int Slice::toScalar(int len) const {
+  int Slice::scalar(int len) const {
     casadi_assert(is_scalar(len));
     casadi_assert_message(start_ >= -len && start_ < len, "Slice::getScalar: out of bounds");
     return start_ >= 0 ? start_ : start_+len;

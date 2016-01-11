@@ -43,7 +43,7 @@ namespace casadi {
 
   template<>
   Slice Matrix<int>::toSlice(bool ind1) const {
-    return is_scalar() ? Slice(toScalar(), ind1) : Slice(data(), ind1);
+    return is_scalar() ? Slice(scalar(), ind1) : Slice(data(), ind1);
   }
 
   template<>
@@ -161,17 +161,17 @@ namespace casadi {
 
   template<>
   size_t SX::element_hash() const {
-    return toScalar().__hash__();
+    return scalar().__hash__();
   }
 
   template<>
   bool SX::is_leaf() const {
-    return toScalar().is_leaf();
+    return scalar().is_leaf();
   }
 
   template<>
   bool SX::is_commutative() const {
-    return toScalar().is_commutative();
+    return scalar().is_commutative();
   }
 
   template<>
@@ -218,7 +218,7 @@ namespace casadi {
 
   template<>
   int SX::getIntValue() const {
-    return toScalar().getIntValue();
+    return scalar().getIntValue();
   }
 
   template<>
@@ -241,23 +241,23 @@ namespace casadi {
 
   template<>
   string SX::getName() const {
-    return toScalar().getName();
+    return scalar().getName();
   }
 
   template<>
   SX SX::dep(int ch) const {
-    return toScalar().dep(ch);
+    return scalar().dep(ch);
   }
 
   template<>
   int SX::getNdeps() const {
-    return toScalar().getNdeps();
+    return scalar().getNdeps();
   }
 
   template<>
   void SX::expand(const SX& ex2, SX& ww, SX& tt) {
     casadi_assert(ex2.is_scalar());
-    SXElem ex = ex2.toScalar();
+    SXElem ex = ex2.scalar();
 
     // Terms, weights and indices of the nodes that are already expanded
     vector<vector<SXNode*> > terms;
@@ -435,7 +435,7 @@ namespace casadi {
     casadi_assert_message(w.is_empty(), "gauss_quadrature: empty weights");
 
     // Change variables to [-1, 1]
-    if (!is_equal(a.toScalar(), -1) || !is_equal(b.toScalar(), 1)) {
+    if (!is_equal(a.scalar(), -1) || !is_equal(b.scalar(), 1)) {
       SX q1 = (b-a)/2;
       SX q2 = (b+a)/2;
 
@@ -464,7 +464,7 @@ namespace casadi {
     Function fcn("gauss_quadrature", {x}, {f});
     vector<SXElem> f_val(5);
     for (int i=0; i<5; ++i)
-      f_val[i] = fcn(SX(xi[i])).at(0).toScalar();
+      f_val[i] = fcn(SX(xi[i])).at(0).scalar();
 
     // Weighted sum
     SXElem sum;
@@ -736,7 +736,7 @@ namespace casadi {
   template<>
   string
   SX::print_operator(const SX& X, const vector<string>& args) {
-    SXElem x = X.toScalar();
+    SXElem x = X.scalar();
     if (!x.hasDep())
         throw CasadiException("print_operator: SXElem must be binary operator");
     if (args.size() == 0 || (casadi_math<double>::ndeps(x.op())==2 && args.size() < 2))
@@ -891,7 +891,7 @@ namespace casadi {
     int mult = 1;
     bool success = false;
     for (int i=0; i<1000; ++i) {
-      r.push_back((f(SX(0)).at(0)/mult).toScalar());;
+      r.push_back((f(SX(0)).at(0)/mult).scalar());;
       SX j = SX::jac(f);
       if (j.nnz()==0) {
         success = true;

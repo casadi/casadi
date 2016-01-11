@@ -552,15 +552,15 @@ SXElem NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXEl
 
           // Perform the operation
           switch (i) {
-            // case 11: return min(args).toScalar(); FIXME // rename?
-            // case 12: return max(args).toScalar(); FIXME // rename?
-            // case 54: return sum(args).toScalar(); FIXME // rename?
-            // case 59: return count(args).toScalar(); FIXME // rename?
-            // case 60: return numberof(args).toScalar(); FIXME // rename?
-            // case 61: return numberofs(args).toScalar(); FIXME // rename?
-            // case 70: return all(args).toScalar(); FIXME // and in AMPL // rename?
-            // case 71: return any(args).toScalar(); FIXME // or in AMPL // rename?
-            // case 74: return alldiff(args).toScalar(); FIXME // rename?
+            // case 11: return min(args).scalar(); FIXME // rename?
+            // case 12: return max(args).scalar(); FIXME // rename?
+            // case 54: return sum(args).scalar(); FIXME // rename?
+            // case 59: return count(args).scalar(); FIXME // rename?
+            // case 60: return numberof(args).scalar(); FIXME // rename?
+            // case 61: return numberofs(args).scalar(); FIXME // rename?
+            // case 70: return all(args).scalar(); FIXME // and in AMPL // rename?
+            // case 71: return any(args).scalar(); FIXME // or in AMPL // rename?
+            // case 74: return alldiff(args).scalar(); FIXME // rename?
             case 54:
             {
               SXElem r = 0;

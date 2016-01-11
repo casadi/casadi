@@ -150,7 +150,7 @@ namespace casadi {
     Matrix(const std::vector<Scalar>& x);
 
     /// Convert to scalar type
-    const Scalar toScalar() const;
+    const Scalar scalar() const;
 
     /// Scalar type
     typedef Scalar ScalarType;

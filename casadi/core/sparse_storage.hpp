@@ -54,7 +54,7 @@ namespace casadi {
     SparseStorage<DataType>& operator=(const SparseStorage<DataType>& m);
 
     /// Convert to scalar type
-    const DataType toScalar() const;
+    const DataType scalar() const;
 
     /// Scalar type
     typedef DataType ScalarType;

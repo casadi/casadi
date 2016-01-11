@@ -72,7 +72,7 @@ namespace casadi {
     bool is_scalar(int len) const;
 
     /// Get scalar (if is_scalar)
-    int toScalar(int len) const;
+    int scalar(int len) const;
 
     /// Check equality
     bool operator==(const Slice& other) const

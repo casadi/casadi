@@ -9,7 +9,7 @@ namespace myproject {
   }
 
   double casadi2scalar(const casadi::DM& x) {
-    return x.toScalar();
+    return x.scalar();
   }
 
   casadi::DM scalar2casadi(double x) {

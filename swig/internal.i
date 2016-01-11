@@ -208,7 +208,7 @@
 %exception  casadi::SparseStorage< DataType >::sparsityRef() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparseStorage< DataType >::toScalar() const  {
+%exception  casadi::SparseStorage< DataType >::scalar() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::alive() const  {

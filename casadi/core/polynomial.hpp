@@ -71,7 +71,7 @@ namespace casadi {
     int degree() const;
 
     /// Get scalar value (error if degree()!=0)
-    real_t toScalar() const;
+    real_t scalar() const;
 
     /// Create a new polynomial for the derivative
     Polynomial derivative() const;

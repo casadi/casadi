@@ -108,7 +108,7 @@ namespace casadi {
     if (val.nnz()==0) {
       return create(val.sparsity(), 0);
     } else if (val.is_scalar()) {
-      return create(val.sparsity(), val.toScalar());
+      return create(val.sparsity(), val.scalar());
     } else {
       // Check if all values are the same
       const vector<double> vdata = val.data();

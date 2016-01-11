@@ -246,7 +246,7 @@ int main(){
       iter_count[test][solver] = nlp_solver.getStat("iter_count");
       
       // Print the optimal solution
-  //     cout << "optimal cost:    " << nlp_solver.output(NLP_SOLVER_F).toScalar() << endl;
+  //     cout << "optimal cost:    " << nlp_solver.output(NLP_SOLVER_F).scalar() << endl;
   //     cout << "optimal control: " << nlp_solver.output(NLP_SOLVER_X) << endl;
   //     cout << "multipliers (u): " << nlp_solver.output(NLP_SOLVER_LAM_X) << endl;
   //     cout << "multipliers (gb): " << nlp_solver.output(NLP_SOLVER_LAM_G) << endl;

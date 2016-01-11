@@ -403,7 +403,7 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     if(has_lam_g) rfcn_.setInput(lam_g_k,G_LAM_G);
     rfcn_.evaluate();
     rfcn_.getOutput(d_k_,G_D);
-    f_k = rfcn_.output(G_F).toScalar();
+    f_k = rfcn_.output(G_F).scalar();
     const DM& g_k = rfcn_.output(G_G);
     
     // Construct the QP

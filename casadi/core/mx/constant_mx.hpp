@@ -137,7 +137,7 @@ namespace casadi {
     virtual bool is_identity() const;
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const {return x_.toScalar();}
+    virtual double getValue() const {return x_.scalar();}
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const { return x_;}
