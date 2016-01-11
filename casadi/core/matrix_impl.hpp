@@ -1867,7 +1867,7 @@ namespace casadi {
         // ri[j] = dot(qj, ai); // Classical Gram-Schmidt
 
         // Remove projection in direction j
-        if (ri.hasNZ(j, 0))
+        if (ri.has_nz(j, 0))
           qi -= ri(j, 0) * qj;
       }
 
@@ -1970,7 +1970,7 @@ namespace casadi {
       const std::vector<Scalar> & Adata = a.data();
       for (int i=0; i<a.size2(); ++i) { // loop over columns forwards
         for (int k=0; k<b.size2(); ++k) { // for every right hand side
-          if (!x.hasNZ(i, k)) continue;
+          if (!x.has_nz(i, k)) continue;
           x(i, k) /= a(i, i);
           for (int kk=Acolind[i+1]-1; kk>=Acolind[i] && Arow[kk]>i; --kk) {
             int j = Arow[kk];
@@ -1987,7 +1987,7 @@ namespace casadi {
       const std::vector<Scalar> & Adata = a.data();
       for (int i=a.size2()-1; i>=0; --i) { // loop over columns backwards
         for (int k=0; k<b.size2(); ++k) { // for every right hand side
-          if (!x.hasNZ(i, k)) continue;
+          if (!x.has_nz(i, k)) continue;
           x(i, k) /= a(i, i);
           for (int kk=Acolind[i]; kk<Acolind[i+1] && Arow[kk]<i; ++kk) {
             int j = Arow[kk];

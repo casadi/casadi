@@ -208,7 +208,7 @@ namespace casadi {
     return ind;
   }
 
-  bool Sparsity::hasNZ(int rr, int cc) const {
+  bool Sparsity::has_nz(int rr, int cc) const {
     return getNZ(rr, cc)!=-1;
   }
 

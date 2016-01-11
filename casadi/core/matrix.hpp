@@ -189,7 +189,7 @@ namespace casadi {
 #endif // SWIG
 
     /// Returns true if the matrix has a non-zero at location rr, cc
-    bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr, cc); }
+    bool has_nz(int rr, int cc) const { return sparsity().has_nz(rr, cc); }
 
     /// Returns the truth value of a Matrix
     bool __nonzero__() const;

@@ -63,7 +63,7 @@ namespace casadi {
     DataType& elem(int rr, int cc);
 
     /// Returns true if the matrix has a non-zero at location rr, cc
-    bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr, cc); }
+    bool has_nz(int rr, int cc) const { return sparsity().has_nz(rr, cc); }
 
     // Get the sparsity pattern
     void clear();

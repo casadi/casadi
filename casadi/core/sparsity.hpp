@@ -318,7 +318,7 @@ namespace casadi {
     int getNZ(int rr, int cc) const;
 
     /// Returns true if the pattern has a non-zero at location rr, cc
-    bool hasNZ(int rr, int cc) const;
+    bool has_nz(int rr, int cc) const;
 
     /** \brief Get a set of non-zero element
         return -1 if the element does not exist */
