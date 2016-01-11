@@ -162,7 +162,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
         nlfile >> i;
 
         // Parse and save expression
-        g.at(i) = readExpressionNL(nlfile, v);
+        g->at(i) = readExpressionNL(nlfile, v);
 
         break;
       }
@@ -186,11 +186,11 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
         nlfile >> sigma;
 
         // Parse and save expression
-        f.at(i) = readExpressionNL(nlfile, v);
+        f->at(i) = readExpressionNL(nlfile, v);
 
         // Negate the expression if we maximize
         if (sigma!=0) {
-          f.at(i) = -f.at(i);
+          f->at(i) = -f->at(i);
         }
 
         break;
@@ -211,7 +211,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
           nlfile >> offset >> d;
 
           // Save initial guess
-          lambda_init.at(offset) = d;
+          lambda_init->at(offset) = d;
         }
 
         break;
@@ -232,7 +232,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
           nlfile >> offset >> d;
 
           // Save initial guess
-          x_init.at(offset) = d;
+          x_init->at(offset) = d;
         }
 
         break;
@@ -255,21 +255,21 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
             // Upper and lower bounds
             case 0:
               nlfile >> c;
-              g_lb.at(i) = c;
+              g_lb->at(i) = c;
               nlfile >> c;
-              g_ub.at(i) = c;
+              g_ub->at(i) = c;
               continue;
 
             // Only upper bounds
             case 1:
               nlfile >> c;
-              g_ub.at(i) = c;
+              g_ub->at(i) = c;
               continue;
 
             // Only lower bounds
             case 2:
               nlfile >> c;
-              g_lb.at(i) = c;
+              g_lb->at(i) = c;
               continue;
 
             // No bounds
@@ -279,7 +279,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
             // Equality constraints
             case 4:
               nlfile >> c;
-              g_lb.at(i) = g_ub.at(i) = c;
+              g_lb->at(i) = g_ub->at(i) = c;
               continue;
 
               // Complementary constraints
@@ -319,21 +319,21 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
             // Upper and lower bounds
             case 0:
               nlfile >> c;
-              x_lb.at(i) = c;
+              x_lb->at(i) = c;
               nlfile >> c;
-              x_ub.at(i) = c;
+              x_ub->at(i) = c;
               continue;
 
             // Only upper bounds
             case 1:
               nlfile >> c;
-              x_ub.at(i) = c;
+              x_ub->at(i) = c;
               continue;
 
            // Only lower bounds
            case 2:
               nlfile >> c;
-              x_lb.at(i) = c;
+              x_lb->at(i) = c;
               continue;
 
            // No bounds
@@ -343,7 +343,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
            // Equality constraints
            case 4:
               nlfile >> c;
-              x_lb.at(i) = x_ub.at(i) = c;
+              x_lb->at(i) = x_ub->at(i) = c;
               continue;
 
            default:
@@ -388,7 +388,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
           nlfile >> j >> c;
 
           // Add to constraints
-          g.at(i) += c*v.at(j);
+          g->at(i) += c*v.at(j);
         }
         break;
       }
@@ -408,7 +408,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
           nlfile >> j >> c;
 
           // Add to objective
-          f.at(i) += c*v.at(j);
+          f->at(i) += c*v.at(j);
         }
         break;
       }

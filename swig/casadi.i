@@ -1791,7 +1791,7 @@ import_array();
           if (m) {
             **m = casadi::IM(getSparsity(p));
             for (size_t i=0; i<sz; ++i) {
-              (*m)->at(i) = int(data[i]);
+              (**m)->at(i) = int(data[i]);
             }
           }
           return true;

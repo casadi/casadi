@@ -46,7 +46,7 @@ namespace casadi {
   bool Matrix<Scalar>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
                                   "provided a shape" << dim());}
-    return at(0)!=0;
+    return data().at(0)!=0;
   }
 
   template<typename Scalar>
@@ -68,7 +68,7 @@ namespace casadi {
     if (rr.is_scalar(size1()) && cc.is_scalar(size2())) {
       int k = sparsity().getNZ(rr.toScalar(size1()), cc.toScalar(size2()));
       if (k>=0) {
-        m = at(k);
+        m = data().at(k);
       } else {
         m = Matrix<Scalar>(1, 1);
       }
@@ -113,7 +113,7 @@ namespace casadi {
 
     // Copy nonzeros
     m = Matrix<Scalar>::zeros(sp);
-    for (int k=0; k<mapping.size(); ++k) m.at(k) = at(mapping[k]);
+    for (int k=0; k<mapping.size(); ++k) m->at(k) = data().at(mapping[k]);
   }
 
   template<typename Scalar>
@@ -123,7 +123,7 @@ namespace casadi {
       int r = rr.toScalar(numel());
       int k = sparsity().getNZ(r % size1(), r / size1());
       if (k>=0) {
-        m = at(k);
+        m = data().at(k);
       } else {
         m = Matrix<Scalar>(1, 1);
       }
@@ -155,7 +155,7 @@ namespace casadi {
 
     // Copy nonzeros
     m = Matrix<Scalar>::zeros(tr ? sp.T() : sp);
-    for (int k=0; k<mapping.size(); ++k) m.at(k) = at(mapping[k]);
+    for (int k=0; k<mapping.size(); ++k) m->at(k) = data().at(mapping[k]);
   }
 
   template<typename Scalar>
@@ -265,13 +265,13 @@ namespace casadi {
     // Collect all assignments
     IM el = IM::zeros(m.sparsity());
     for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
-      int this_j = cc.at(j) - ind1; // Corresponding column in this
+      int this_j = cc->at(j) - ind1; // Corresponding column in this
       if (this_j<0) this_j += sz2;
       for (int k=el.colind(j); k<el.colind(j+1); ++k) { // Loop over rows of m
         int i = m.row(k);
-        int this_i = rr.at(i) - ind1; // Corresponding row in this
+        int this_i = rr->at(i) - ind1; // Corresponding row in this
         if (this_i<0) this_i += sz1;
-        el.at(k) = this_i + this_j*sz1;
+        el->at(k) = this_i + this_j*sz1;
       }
     }
     return set(m, false, el);
@@ -372,7 +372,7 @@ namespace casadi {
 
     // Carry out the assignments
     for (int i=0; i<nz.size(); ++i) {
-      at(nz[i]) = m.at(i);
+      data().at(nz[i]) = m->at(i);
     }
   }
 
@@ -394,7 +394,7 @@ namespace casadi {
   void Matrix<Scalar>::getNZ(Matrix<Scalar>& m, bool ind1, const Slice& kk) const {
     // Scalar
     if (kk.is_scalar(nnz())) {
-      m = at(kk.toScalar(nnz()));
+      m = data().at(kk.toScalar(nnz()));
       return;
     }
 
@@ -432,7 +432,7 @@ namespace casadi {
                                                 " disabled in the Matlab interface. " <<
                                                 "Possibly you may want to use 'end'.");
       int k_el = k[el]-ind1;
-      m.at(el) = at(k_el>=0 ? k_el : k_el+sz);
+      m->at(el) = data().at(k_el>=0 ? k_el : k_el+sz);
     }
   }
 
@@ -440,7 +440,7 @@ namespace casadi {
   void Matrix<Scalar>::setNZ(const Matrix<Scalar>& m, bool ind1, const Slice& kk) {
     // Scalar
     if (kk.is_scalar(nnz())) {
-      at(kk.toScalar(nnz())) = m.toScalar();
+      data().at(kk.toScalar(nnz())) = m.toScalar();
       return;
     }
 
@@ -494,7 +494,7 @@ namespace casadi {
                                                 " disabled in the Matlab interface. " <<
                                                 "Possibly you may want to use 'end'.");
       int k_el = k[el]-ind1;
-      at(k_el>=0 ? k_el : k_el+sz) = m.at(el);
+      data().at(k_el>=0 ? k_el : k_el+sz) = m->at(el);
     }
   }
 
@@ -1066,7 +1066,7 @@ namespace casadi {
 
     // Copy the content
     for (int i=0; i<mapping.size(); ++i)
-      ret.at(i) = at(mapping[i]);
+      ret->at(i) = data().at(mapping[i]);
 
     return ret;
   }
@@ -1333,10 +1333,8 @@ namespace casadi {
 
   template<typename Scalar>
   bool Matrix<Scalar>::is_integer() const {
-    // loop over non-zero elements
-    for (int k=0; k<nnz(); ++k)
-      if (!casadi_limits<Scalar>::is_integer(at(k))) // if an element is not integer
-        return false;
+    // Look for non-integers
+    for (auto&& e : data()) if (!casadi_limits<Scalar>::is_integer(e)) return false;
 
     // Integer if reached this point
     return true;
@@ -1344,10 +1342,8 @@ namespace casadi {
 
   template<typename Scalar>
   bool Matrix<Scalar>::is_constant() const {
-    // loop over non-zero elements
-    for (int k=0; k<nnz(); ++k)
-      if (!casadi_limits<Scalar>::is_constant(at(k))) // if an element is not constant
-        return false;
+    // Look for non-constants
+    for (auto&& e : data()) if (!casadi_limits<Scalar>::is_constant(e)) return false;
 
     // Constant if we reach this point
     return true;
@@ -1355,28 +1351,20 @@ namespace casadi {
 
   template<typename Scalar>
   bool Matrix<Scalar>::is_one() const {
-    if (!is_dense()) {
-      return false;
-    }
+    if (!is_dense()) return false;
 
-    // loop over non-zero elements
-    for (int el=0; el<nnz(); ++el)
-      if (!casadi_limits<Scalar>::is_one(at(el)))
-        return false;
+    // Look for non-ones
+    for (auto&& e : data()) if (!casadi_limits<Scalar>::is_one(e)) return false;
 
     return true;
   }
 
   template<typename Scalar>
   bool Matrix<Scalar>::is_minus_one() const {
-    if (!is_dense()) {
-      return false;
-    }
+    if (!is_dense()) return false;
 
-    // loop over non-zero elements
-    for (int el=0; el<nnz(); ++el)
-      if (!casadi_limits<Scalar>::is_minus_one(at(el)))
-        return false;
+    // Look for non-minus-ones
+    for (auto&& e : data()) if (!casadi_limits<Scalar>::is_minus_one(e)) return false;
 
     return true;
   }
@@ -1384,10 +1372,8 @@ namespace casadi {
   template<typename Scalar>
   bool Matrix<Scalar>::is_zero() const {
 
-    // loop over (potentially) non-zero elements
-    for (int el=0; el<nnz(); ++el)
-      if (!casadi_limits<Scalar>::is_zero(at(el)))
-        return false;
+    // Look for non-zeros
+    for (auto&& e : data()) if (!casadi_limits<Scalar>::is_zero(e)) return false;
 
     return true;
   }
@@ -1399,9 +1385,7 @@ namespace casadi {
     if (!sparsity().is_diag()) return false;
 
     // Make sure that all entries are one
-    for (auto&& i : data_) {
-      if (!casadi_limits<Scalar>::is_one(i)) return false;
-    }
+    for (auto&& e : data()) if (!casadi_limits<Scalar>::is_one(e)) return false;
 
     return true;
   }
@@ -1418,8 +1402,9 @@ namespace casadi {
     }
 
     // Check individual elements
-    for (int k=0; k<x.nnz(); ++k) {
-      if (!casadi_limits<Scalar>::is_equal(x.at(k), y.at(k), depth)) return false;
+    auto y_it = y.data().begin();
+    for (auto&& e : x.data()) {
+      if (!casadi_limits<Scalar>::is_equal(e, *y_it++, depth)) return false;
     }
 
     // True if reched this point
@@ -1429,10 +1414,7 @@ namespace casadi {
   template<typename Scalar>
   bool Matrix<Scalar>::has_zeros() const {
     // Check if the structural nonzero is known to be zero
-    for (int el=0; el<nnz(); ++el) {
-      if (casadi_limits<Scalar>::is_zero(at(el)))
-        return true;
-    }
+    for (auto&& e : data()) if (casadi_limits<Scalar>::is_zero(e)) return true;
 
     // No known zeros amongst the structurally nonzero entries
     return false;
@@ -1450,7 +1432,7 @@ namespace casadi {
 
   template<typename Scalar>
   double Matrix<Scalar>::getValue(int k) const {
-    return static_cast<double>(at(k));
+    return static_cast<double>(data().at(k));
   }
 
   template<typename Scalar>
@@ -1463,7 +1445,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::setValue(double m, int k) {
-    at(k) = m;
+    data().at(k) = m;
   }
 
   template<typename Scalar>
@@ -1571,7 +1553,7 @@ namespace casadi {
 
       for (int k=0; k<row.nnz(); ++k) {
         // Sum up the cofactors
-        ret += row.at(k)*cofactor(x, col_i.at(k), j);
+        ret += row->at(k)*cofactor(x, col_i.at(k), j);
       }
       return ret;
     } else {
@@ -1584,7 +1566,7 @@ namespace casadi {
 
       for (int k=0; k<col.nnz(); ++k) {
         // Sum up the cofactors
-        ret += col.at(k)*cofactor(x, i, row_i[k]);
+        ret += col->at(k)*cofactor(x, i, row_i[k]);
       }
       return ret;
     }
@@ -1800,17 +1782,13 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::dot(const Matrix<Scalar> &x,
-                                         const Matrix<Scalar> &y) {
+                                     const Matrix<Scalar> &y) {
     casadi_assert_message(x.size()==y.size(), "dot: Dimension mismatch");
     if (x.sparsity()!=y.sparsity()) {
       Sparsity sp = x.sparsity() * y.sparsity();
       return dot(project(x, sp), project(y, sp));
     }
-    Matrix<Scalar> ret(0);
-    for (int k=0; k<x.nnz(); ++k) {
-      ret.at(0) += x.at(k) * y.at(k);
-    }
-    return ret;
+    return casadi_dot(x.nnz(), x.ptr(), y.ptr());
   }
 
   template<typename Scalar>
@@ -1818,7 +1796,7 @@ namespace casadi {
     if (!x.is_dense()) return false;
     Scalar ret=1;
     for (int i=0; i<x.nnz(); ++i) {
-      ret = ret && x.at(i)==1;
+      ret = ret && x->at(i)==1;
     }
     return ret;
   }
@@ -1828,7 +1806,7 @@ namespace casadi {
     if (!x.is_dense()) return false;
     Scalar ret=0;
     for (int i=0; i<x.nnz(); ++i) {
-      ret = ret || x.at(i)==1;
+      ret = ret || x->at(i)==1;
     }
     return ret;
   }
@@ -2456,9 +2434,9 @@ namespace casadi {
       // Loop over existing nonzeros
       for (int el=colind[cc]; el<colind[cc+1]; ++el) {
         // If it is not known to be a zero
-        if (!casadi_limits<Scalar>::isAlmostZero(x.at(el), tol)) {
+        if (!casadi_limits<Scalar>::isAlmostZero(x->at(el), tol)) {
           // Save the nonzero in its new location
-          new_data.push_back(x.at(el));
+          new_data.push_back(x->at(el));
 
           // Add to pattern
           new_row.push_back(row[el]);

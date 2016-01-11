@@ -72,7 +72,7 @@ namespace casadi {
   bool Matrix<SXElem>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
                                   "provided a shape" << dim());}
-    return at(0).__nonzero__();
+    return data().at(0).__nonzero__();
   }
 
   template<>
@@ -137,14 +137,14 @@ namespace casadi {
   bool SX::is_regular() const {
     // First pass: ignore symbolics
     for (int i=0; i<nnz(); ++i) {
-      const SXElem& x = at(i);
+      const SXElem& x = data().at(i);
       if (x.is_constant()) {
         if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
       }
     }
     // Second pass: don't ignore symbolics
     for (int i=0; i<nnz(); ++i) {
-      if (!at(i).is_regular()) return false;
+      if (!data().at(i).is_regular()) return false;
     }
     return true;
   }
@@ -186,7 +186,7 @@ namespace casadi {
   template<>
   bool SX::is_valid_input() const {
     for (int k=0; k<nnz(); ++k) // loop over non-zero elements
-      if (!at(k)->is_symbolic()) // if an element is not symbolic
+      if (!data().at(k)->is_symbolic()) // if an element is not symbolic
         return false;
 
     return true;
@@ -213,7 +213,7 @@ namespace casadi {
 
   template<>
   double SX::getValue(int k) const {
-    return at(k).getValue();
+    return data().at(k).getValue();
   }
 
   template<>
@@ -225,7 +225,7 @@ namespace casadi {
   vector<double> SX::nonzeros() const {
     vector<double> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = at(i).getValue();
+      ret[i] = data().at(i).getValue();
     }
     return ret;
   }
@@ -234,7 +234,7 @@ namespace casadi {
   vector<int> SX::nonzeros_int() const {
     vector<int> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = at(i).getIntValue();
+      ret[i] = data().at(i).getIntValue();
     }
     return ret;
   }
@@ -391,7 +391,7 @@ namespace casadi {
     casadi_assert_message(t.is_scalar(), "t must be a scalar");
     casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
 
-    SX ret = val.at(0);
+    SX ret = val->at(0);
     for (int i=0; i<n-1; ++i) {
       ret += (val(0, i+1)-val(0, i)) * (t>=tval(0, i));
     }
@@ -518,7 +518,7 @@ namespace casadi {
         // Expand vdef to sparsity of v if vdef is scalar
         if (vdef[k].is_scalar() && vdef[k].nnz()==1) {
           vector<SX> vdef_mod = vdef;
-          vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0), false);
+          vdef_mod[k] = SX(v[k].sparsity(), vdef[k]->at(0), false);
           return substitute(ex, v, vdef_mod);
         } else {
           casadi_error("subsitute(ex, v, vdef): sparsities of v and vdef must match. Got v: "
@@ -577,18 +577,18 @@ namespace casadi {
       switch (it->op) {
       case OP_INPUT:
         // reverse is false, substitute out
-        work[it->i0] = vdef.at(it->i1).at(it->i2);
+        work[it->i0] = vdef.at(it->i1)->at(it->i2);
         break;
       case OP_OUTPUT:
         if (it->i0 < v.size()) {
-          vdef.at(it->i0).at(it->i2) = work[it->i1];
+          vdef.at(it->i0)->at(it->i2) = work[it->i1];
           if (reverse) {
             // Use the new variable henceforth, substitute in
-            work[it->i1] = v.at(it->i0).at(it->i2);
+            work[it->i1] = v.at(it->i0)->at(it->i2);
           }
         } else {
           // Auxillary output
-          ex.at(it->i0 - v.size()).at(it->i2) = work[it->i1];
+          ex.at(it->i0 - v.size())->at(it->i2) = work[it->i1];
         }
         break;
       case OP_CONST:      work[it->i0] = *c_it++; break;
@@ -700,11 +700,11 @@ namespace casadi {
     SX result = substitute(ex, x, a)*current_dx/current_denom;
     for (int i=0;i<x.nnz();i++) {
       if (order_contributions[i]<=order) {
-        result += mtaylor_recursive(jacobian(ex, x.at(i)),
+        result += mtaylor_recursive(jacobian(ex, x->at(i)),
                                     x, a,
                                     order-order_contributions[i],
                                     order_contributions,
-                                    current_dx*(x.at(i)-a.at(i)),
+                                    current_dx*(x->at(i)-a->at(i)),
                                     current_denom*current_order, current_order+1);
       }
     }
@@ -847,7 +847,7 @@ namespace casadi {
     // Evaluate the algorithm
     for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       switch (it->op) {
-      case OP_OUTPUT:     ex.at(it->i0).at(it->i2) = work[it->i1];      break;
+      case OP_OUTPUT:     ex.at(it->i0)->at(it->i2) = work[it->i1];      break;
       case OP_CONST:      work2[it->i0] = work[it->i0] = *c_it++; break;
       case OP_PARAMETER:  work2[it->i0] = work[it->i0] = *p_it++; break;
       default:
@@ -979,7 +979,7 @@ namespace casadi {
             -p + q - r -s,
             -p - q + r -s});
       return ret;
-    } else if (is_equal(p(p.nnz()-1).at(0), 0)) {
+    } else if (is_equal(p(p.nnz()-1)->at(0), 0)) {
       SX ret = SX::vertcat({poly_roots(p(range(p.nnz()-1))), 0});
       return ret;
     } else {

@@ -176,7 +176,7 @@ int main(){
   res = solver(arg);
     
   // Optimal solution of the NLP
-  const Matrix<double>& V_opt = res.at("x");
+  vector<double> V_opt = res.at("x").nonzeros();
   
   // Get the optimal state trajectory
   vector<double> r_opt(ns+1), s_opt(ns+1);

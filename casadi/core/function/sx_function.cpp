@@ -319,7 +319,7 @@ namespace casadi {
         break;
       case OP_OUTPUT: // output instruction
         ae.i0 = curr_oind;
-        ae.i1 = outputv_[curr_oind].at(curr_nz)->temp;
+        ae.i1 = outputv_[curr_oind]->at(curr_nz)->temp;
         ae.i2 = curr_nz;
 
         // Go to the next nonzero

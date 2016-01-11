@@ -258,13 +258,13 @@ namespace casadi {
     // Collect all assignments
     IM el = IM::zeros(m.sparsity());
     for (int j=0; j<el.size2(); ++j) { // Loop over columns of m
-      int this_j = cc.at(j) - ind1; // Corresponding column in this
+      int this_j = cc->at(j) - ind1; // Corresponding column in this
       if (this_j<0) this_j += sz2;
       for (int k=el.colind(j); k<el.colind(j+1); ++k) { // Loop over rows of m
         int i = m.row(k);
-        int this_i = rr.at(i) - ind1; // Corresponding row in this
+        int this_i = rr->at(i) - ind1; // Corresponding row in this
         if (this_i<0) this_i += sz1;
-        el.at(k) = this_i + this_j*sz1;
+        el->at(k) = this_i + this_j*sz1;
       }
     }
     return set(m, false, el);

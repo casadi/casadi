@@ -186,23 +186,6 @@ namespace casadi {
     using B::vertsplit;
     using B::diagsplit;
     using B::mtimes;
-
-    /// Get a non-zero element
-    inline const Scalar& at(int k) const {
-      return const_cast<Matrix<Scalar>*>(this)->at(k);
-    }
-
-    /// Access a non-zero element
-    inline Scalar& at(int k) {
-      try {
-        if (k<0) k+=nnz();
-        return data().at(k);
-      } catch(std::out_of_range& /* unnamed */) {
-        std::stringstream ss;
-        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << nnz() << ")";
-        throw CasadiException(ss.str());
-      }
-    }
 #endif // SWIG
 
     /// Returns true if the matrix has a non-zero at location rr, cc
