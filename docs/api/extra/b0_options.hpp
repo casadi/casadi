@@ -831,85 +831,15 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>accept_after_max_steps</td><td>OT_INTEGER</td><td>-1</td><td>Accept a trial point after maximal this number of steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>accept_every_trial_step</td><td>OT_STRING</td><td>no</td><td>Always accept the first trial step. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>acceptable_compl_inf_tol</td><td>OT_REAL</td><td>0.01</td><td>"Acceptance" threshold for the complementarity conditions. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>acceptable_constr_viol_tol</td><td>OT_REAL</td><td>0.01</td><td>"Acceptance" threshold for the constraint violation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>acceptable_dual_inf_tol</td><td>OT_REAL</td><td>10000000000.0</td><td>"Acceptance" threshold for the dual infeasibility. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>acceptable_iter</td><td>OT_INTEGER</td><td>15</td><td>Number of "acceptable" iterates before triggering termination. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>acceptable_obj_change_tol</td><td>OT_REAL</td><td>1e+20</td><td>"Acceptance" stopping criterion based on objective function change. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>acceptable_tol</td><td>OT_REAL</td><td>1e-06</td><td>"Acceptable" convergence tolerance (relative). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>adaptive_mu_globalization</td><td>OT_STRING</td><td>obj-constr-filter</td><td>Globalization strategy for the adaptive mu selection mode. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>adaptive_mu_kkt_norm_type</td><td>OT_STRING</td><td>2-norm-squared</td><td>Norm used for the KKT error in the adaptive mu globalization strategies. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>adaptive_mu_kkterror_red_fact</td><td>OT_REAL</td><td>0.9999</td><td>Sufficient decrease factor for "kkt-error" globalization strategy. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>adaptive_mu_kkterror_red_iters</td><td>OT_INTEGER</td><td>4</td><td>Maximum number of iterations requiring sufficient progress. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>adaptive_mu_monotone_init_factor</td><td>OT_REAL</td><td>0.8</td><td>Determines the initial value of the barrier parameter when switching to the monotone mode. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>adaptive_mu_restore_previous_iterate</td><td>OT_STRING</td><td>no</td><td>Indicates if the previous iterate should be restored if the monotone mode is entered. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>adaptive_mu_safeguard_factor</td><td>OT_REAL</td><td>0.0</td><td> (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>alpha_for_y</td><td>OT_STRING</td><td>primal</td><td>Method to determine the step size for constraint multipliers. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>alpha_for_y_tol</td><td>OT_REAL</td><td>10.0</td><td>Tolerance for switching to full equality multiplier steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>alpha_min_frac</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for the minimal step size (before switching to restoration phase). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>alpha_red_factor</td><td>OT_REAL</td><td>0.5</td><td>Fractional reduction of the trial step size in the backtracking line search. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>barrier_tol_factor</td><td>OT_REAL</td><td>10.0</td><td>Factor for mu in barrier stop test. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>bound_frac</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum relative distance from the initial point to bound. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>bound_mult_init_method</td><td>OT_STRING</td><td>constant</td><td>Initialization method for bound multipliers (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>bound_mult_init_val</td><td>OT_REAL</td><td>1.0</td><td>Initial value for the bound multipliers. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>bound_mult_reset_threshold</td><td>OT_REAL</td><td>1000.0</td><td>Threshold for resetting bound multipliers after the restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>bound_push</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum absolute distance from the initial point to bound. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>bound_relax_factor</td><td>OT_REAL</td><td>1e-08</td><td>Factor for initial relaxation of the bounds. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>check_derivatives_for_naninf</td><td>OT_STRING</td><td>no</td><td>Indicates whether it is desired to check for Nan/Inf in derivative matrices (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>chi_cup</td><td>OT_REAL</td><td>1.5</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>chi_hat</td><td>OT_REAL</td><td>2.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>chi_tilde</td><td>OT_REAL</td><td>5.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compl_inf_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the complementarity conditions. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>constr_mult_init_max</td><td>OT_REAL</td><td>1000.0</td><td>Maximum allowed least-square guess of constraint multipliers. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>constr_mult_reset_threshold</td><td>OT_REAL</td><td>0.0</td><td>Threshold for resetting equality and inequality multipliers after restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>constr_viol_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the constraint violation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>constraint_violation_norm_type</td><td>OT_STRING</td><td>1-norm</td><td>Norm to be used for the constraint violation in the line search. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>corrector_compl_avrg_red_fact</td><td>OT_REAL</td><td>1.0</td><td>Complementarity tolerance factor for accepting corrector step (unsupported!). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>corrector_type</td><td>OT_STRING</td><td>none</td><td>The type of corrector steps that should be taken (unsupported!). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)<br />(qp)</td><td>casadi::OptionsFunctionalityNode<br />casadi::Nlpsol</td></tr>
-<tr><td>delta</td><td>OT_REAL</td><td>1.0</td><td>Multiplier for constraint violation in the switching rule. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>delta_y_max</td><td>OT_REAL</td><td>1e+12</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>dependency_detection_with_rhs</td><td>OT_STRING</td><td>no</td><td>Indicates if the right hand sides of the constraints should be considered during dependency detection (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>dependency_detector</td><td>OT_STRING</td><td>none</td><td>Indicates which linear solver should be used to detect linearly dependent equality constraints. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>derivative_test</td><td>OT_STRING</td><td>none</td><td>Enable derivative checker (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>derivative_test_first_index</td><td>OT_INTEGER</td><td>-2</td><td>Index of first quantity to be checked by derivative checker (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>derivative_test_perturbation</td><td>OT_REAL</td><td>1e-08</td><td>Size of the finite difference perturbation in derivative test. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>derivative_test_print_all</td><td>OT_STRING</td><td>no</td><td>Indicates whether information for all estimated derivatives should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>derivative_test_tol</td><td>OT_REAL</td><td>0.0001</td><td>Threshold for indicating wrong derivative. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>diverging_iterates_tol</td><td>OT_REAL</td><td>1e+20</td><td>Threshold for maximal value of primal iterates. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>dual_inf_tol</td><td>OT_REAL</td><td>1.0</td><td>Desired threshold for the dual infeasibility. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>epsilon_c</td><td>OT_REAL</td><td>0.01</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>eta_min</td><td>OT_REAL</td><td>10.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>eta_penalty</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the Armijo condition for the penalty function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>eta_phi</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the Armijo condition. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOLEAN</td><td>false</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
-<tr><td>evaluate_orig_obj_at_resto_trial</td><td>OT_STRING</td><td>yes</td><td>Determines if the original objective function should be evaluated at restoration phase trial points. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
-<tr><td>expect_infeasible_problem</td><td>OT_STRING</td><td>no</td><td>Enable heuristics to quickly detect an infeasible problem. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>expect_infeasible_problem_ctol</td><td>OT_REAL</td><td>0.001</td><td>Threshold for disabling "expect_infeasible_problem" option. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>expect_infeasible_problem_ytol</td><td>OT_REAL</td><td>100000000.0</td><td>Multiplier threshold for activating "expect_infeasible_problem" option. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>fast_des_fact</td><td>OT_REAL</td><td>0.1</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>fast_step_computation</td><td>OT_STRING</td><td>no</td><td>Indicates if the linear system should be solved quickly. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>file_print_level</td><td>OT_INTEGER</td><td>5</td><td>Verbosity level for output file. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>filter_margin_fact</td><td>OT_REAL</td><td>1e-05</td><td>Factor determining width of margin for obj-constr-filter adaptive globalization strategy. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>filter_max_margin</td><td>OT_REAL</td><td>1.0</td><td>Maximum width of margin in obj-constr-filter adaptive globalization strategy. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>filter_reset_trigger</td><td>OT_INTEGER</td><td>5</td><td>Number of iterations that trigger the filter reset. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>findiff_perturbation</td><td>OT_REAL</td><td>1e-07</td><td>Size of the finite difference perturbation for derivative approximation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>first_hessian_perturbation</td><td>OT_REAL</td><td>0.0001</td><td>Size of first x-s perturbation tried. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>fixed_mu_oracle</td><td>OT_STRING</td><td>average_compl</td><td>Oracle for the barrier parameter when switching to fixed mode. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>fixed_variable_treatment</td><td>OT_STRING</td><td>make_parameter</td><td>Determines how fixed variables should be handled. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>gamma_hat</td><td>OT_REAL</td><td>0.04</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>gamma_phi</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the filter margin for the barrier function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>gamma_theta</td><td>OT_REAL</td><td>1e-05</td><td>Relaxation factor in the filter margin for the constraint violation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
@@ -917,222 +847,32 @@
 <tr><td>grad_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hess_lag_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>hessian_approximation</td><td>OT_STRING</td><td>exact</td><td>Indicates what Hessian information is to be used. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>hessian_approximation_space</td><td>OT_STRING</td><td>nonlinear-variables</td><td>Indicates in which subspace the Hessian information is to be approximated. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>hessian_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether the problem is a quadratic problem (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>honor_original_bounds</td><td>OT_STRING</td><td>yes</td><td>Indicates whether final points should be projected into original bounds. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>inf_pr_output</td><td>OT_STRING</td><td>original</td><td>Determines what value is printed in the "inf_pr" output column. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ipopt</td><td>OT_DICT</td><td>None</td><td>Options to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>GenericType()</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>jac_c_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all equality constraints are linear (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>jac_d_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all inequality constraints are linear (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>jac_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
 <tr><td>jac_f_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
 <tr><td>jac_g_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jacobian_approximation</td><td>OT_STRING</td><td>exact</td><td>Specifies technique to compute constraint Jacobian (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>jacobian_regularization_exponent</td><td>OT_REAL</td><td>0.25</td><td>Exponent for mu in the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td>1e-08</td><td>Size of the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>jit</td><td>OT_BOOLEAN</td><td>false</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>kappa_d</td><td>OT_REAL</td><td>1e-05</td><td>Weight for linear damping term (to handle one-sided bounds). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>kappa_sigma</td><td>OT_REAL</td><td>10000000000.0</td><td>Factor limiting the deviation of dual variables from primal estimates. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>kappa_soc</td><td>OT_REAL</td><td>0.99</td><td>Factor in the sufficient reduction rule for second order correction. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>kappa_x_dis</td><td>OT_REAL</td><td>100.0</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>kappa_y_dis</td><td>OT_REAL</td><td>10000.0</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>least_square_init_duals</td><td>OT_STRING</td><td>no</td><td>Least square initialization of all dual variables (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>least_square_init_primal</td><td>OT_STRING</td><td>no</td><td>Least square initialization of the primal variables (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_aug_solver</td><td>OT_STRING</td><td>sherman-morrison</td><td>Strategy for solving the augmented system for low-rank Hessian. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_init_val</td><td>OT_REAL</td><td>1.0</td><td>Value for B0 in low-rank update. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_init_val_max</td><td>OT_REAL</td><td>100000000.0</td><td>Upper bound on value for B0 in low-rank update. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_init_val_min</td><td>OT_REAL</td><td>1e-08</td><td>Lower bound on value for B0 in low-rank update. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_initialization</td><td>OT_STRING</td><td>scalar1</td><td>Initialization strategy for the limited memory quasi-Newton approximation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_max_history</td><td>OT_INTEGER</td><td>6</td><td>Maximum size of the history for the limited quasi-Newton Hessian approximation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_max_skipping</td><td>OT_INTEGER</td><td>2</td><td>Threshold for successive iterations where update is skipped. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_special_for_resto</td><td>OT_STRING</td><td>no</td><td>Determines if the quasi-Newton updates should be special during the restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>limited_memory_update_type</td><td>OT_STRING</td><td>bfgs</td><td>Quasi-Newton update formula for the limited memory approximation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>line_search_method</td><td>OT_STRING</td><td>filter</td><td>Globalization method used in backtracking line search (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>linear_scaling_on_demand</td><td>OT_STRING</td><td>yes</td><td>Flag indicating that linear scaling is only done if it seems required. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>mumps</td><td>Linear solver used for step computations. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>linear_system_scaling</td><td>OT_STRING</td><td>none</td><td>Method for scaling the linear system. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_ignore_singularity</td><td>OT_STRING</td><td>no</td><td>Enables MA27's ability to solve a linear system even if the matrix is singular. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Real workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Integer workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>10.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma27_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma28_pivtol</td><td>OT_REAL</td><td>0.01</td><td>Pivot tolerance for linear solver MA28. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>yes</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_block_size</td><td>OT_INTEGER</td><td>16</td><td>Controls block size used by Level 3 BLAS in MA57BD (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td>16</td><td>Node amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td>5</td><td>Controls pivot order in MA57 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td>1.05</td><td>Safety factor for work space memory allocation for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma57_small_pivot_flag</td><td>OT_INTEGER</td><td>0</td><td>If set to 1, then when small entries defined by CNTL(2) are detected they are removed and the corresponding pivots placed at the end of the factorization.  This can be particularly efficient if the matrix is highly rank deficient. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_nemin</td><td>OT_INTEGER</td><td>32</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>ma86_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>magic_steps</td><td>OT_STRING</td><td>no</td><td>Enables magic steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>max_cpu_time</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum number of CPU seconds. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>max_filter_resets</td><td>OT_INTEGER</td><td>5</td><td>Maximal allowed number of filter resets (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>max_hessian_perturbation</td><td>OT_REAL</td><td>1e+20</td><td>Maximum value of regularization parameter for handling negative curvature. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>max_iter</td><td>OT_INTEGER</td><td>3000</td><td>Maximum number of iterations. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>max_refinement_steps</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterative refinement steps per linear system solve. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>max_resto_iter</td><td>OT_INTEGER</td><td>3000000</td><td>Maximum number of successive iterations in restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>max_soc</td><td>OT_INTEGER</td><td>4</td><td>Maximum number of second order correction trial steps at each iteration. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>max_soft_resto_iters</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterations performed successively in soft restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mehrotra_algorithm</td><td>OT_STRING</td><td>no</td><td>Indicates if we want to do Mehrotra's algorithm. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>min_alpha_primal</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>min_hessian_perturbation</td><td>OT_REAL</td><td>1e-20</td><td>Smallest perturbation of the Hessian block. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>min_refinement_steps</td><td>OT_INTEGER</td><td>1</td><td>Minimum number of iterative refinement steps per linear system solve. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::IpoptInterface</td></tr>
-<tr><td>mu_allow_fast_monotone_decrease</td><td>OT_STRING</td><td>yes</td><td>Allow skipping of barrier problem if barrier test is already met. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_init</td><td>OT_REAL</td><td>0.1</td><td>Initial value for the barrier parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_linear_decrease_factor</td><td>OT_REAL</td><td>0.2</td><td>Determines linear decrease rate of barrier parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_max</td><td>OT_REAL</td><td>100000.0</td><td>Maximum value for barrier parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_max_fact</td><td>OT_REAL</td><td>1000.0</td><td>Factor for initialization of maximum value for barrier parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_min</td><td>OT_REAL</td><td>1e-11</td><td>Minimum value for barrier parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_oracle</td><td>OT_STRING</td><td>quality-function</td><td>Oracle for a new barrier parameter in the adaptive strategy. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_strategy</td><td>OT_STRING</td><td>monotone</td><td>Update strategy for barrier parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_superlinear_decrease_power</td><td>OT_REAL</td><td>1.5</td><td>Determines superlinear decrease rate of barrier parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mu_target</td><td>OT_REAL</td><td>0.0</td><td>Desired value of complementarity. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mult_diverg_feasibility_tol</td><td>OT_REAL</td><td>1e-07</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mult_diverg_y_tol</td><td>OT_REAL</td><td>100000000.0</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>-1.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td>1000</td><td>Percentage increase in the estimated working space for MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td>7</td><td>Controls permuting and scaling in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td>7</td><td>Controls pivot order in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_pivtol</td><td>OT_REAL</td><td>1e-06</td><td>Pivot tolerance for the linear solver MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_pivtolmax</td><td>OT_REAL</td><td>0.1</td><td>Maximum pivot tolerance for the linear solver MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>mumps_scaling</td><td>OT_INTEGER</td><td>77</td><td>Controls scaling in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>neg_curv_test_tol</td><td>OT_REAL</td><td>0.0</td><td>Tolerance for heuristic to ignore wrong inertia. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>never_use_fact_cgpen_direction</td><td>OT_STRING</td><td>no</td><td>Toggle to switch off the fast Chen-Goldfarb direction (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>never_use_piecewise_penalty_ls</td><td>OT_STRING</td><td>no</td><td>Toggle to switch off the piecewise penalty method (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nlp_lower_bound_inf</td><td>OT_REAL</td><td>-1e+19</td><td>any bound less or equal this value will be considered -inf (i.e. not lower bounded). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nlp_scaling_constr_target_gradient</td><td>OT_REAL</td><td>0.0</td><td>Target value for constraint function gradient size. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nlp_scaling_max_gradient</td><td>OT_REAL</td><td>100.0</td><td>Maximum gradient after NLP scaling. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nlp_scaling_method</td><td>OT_STRING</td><td>gradient-based</td><td>Select the technique used for scaling the NLP. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nlp_scaling_min_value</td><td>OT_REAL</td><td>1e-08</td><td>Minimum value of gradient-based scaling values. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nlp_scaling_obj_target_gradient</td><td>OT_REAL</td><td>0.0</td><td>Target value for objective function gradient size. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nlp_upper_bound_inf</td><td>OT_REAL</td><td>1e+19</td><td>any bound greater or this value will be considered +inf (i.e. not upper bounded). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nu_inc</td><td>OT_REAL</td><td>0.0001</td><td>Increment of the penalty parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>nu_init</td><td>OT_REAL</td><td>1e-06</td><td>Initial value of the penalty parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>num_linear_variables</td><td>OT_INTEGER</td><td>0</td><td>Number of linear variables (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>obj_max_inc</td><td>OT_REAL</td><td>5.0</td><td>Determines the upper bound on the acceptable increase of barrier objective function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_iter_dropping_schur</td><td>OT_REAL</td><td>0.1</td><td>dropping value for sparsify schur complement factor (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_iter_inverse_norm_factor</td><td>OT_REAL</td><td>5000000.0</td><td> (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_iter_max_levels</td><td>OT_INTEGER</td><td>10</td><td>Maximum Size of Grid Levels (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_iter_max_row_fill</td><td>OT_INTEGER</td><td>10000000</td><td>max fill for each row (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_iter_relative_tol</td><td>OT_REAL</td><td>1e-06</td><td>Relative Residual Convergence (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_iterative</td><td>OT_STRING</td><td>no</td><td>Switch on iterative solver in Pardiso library (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td>complete+2x2</td><td>Matching strategy to be used by Pardiso (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_max_droptol_corrections</td><td>OT_INTEGER</td><td>4</td><td>Maximal number of decreases of drop tolerance during one solve. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_max_iter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of Krylov-Subspace Iteration (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td>0</td><td>Pardiso message level (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td>0</td><td>Enables out-of-core variant of Pardiso (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_redo_symbolic_fact_only_if_inertia_wrong</td><td>OT_STRING</td><td>no</td><td>Toggle for handling case when elements were perturbed by Pardiso. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_repeated_perturbation_means_singular</td><td>OT_STRING</td><td>no</td><td>Interpretation of perturbed elements. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pardiso_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOLEAN</td><td>False</td><td>n/a</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pen_des_fact</td><td>OT_REAL</td><td>0.2</td><td>a parameter used in penalty parameter computation (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pen_init_fac</td><td>OT_REAL</td><td>50.0</td><td>a parameter used to choose initial penalty parameterswhen the regularized Newton method is used. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>pen_theta_max_fact</td><td>OT_REAL</td><td>10000.0</td><td>Determines upper bound for constraint violation in the filter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>penalty_init_max</td><td>OT_REAL</td><td>100000.0</td><td>Maximal value for the intial penalty parameter (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>penalty_init_min</td><td>OT_REAL</td><td>1.0</td><td>Minimal value for the intial penalty parameter for line search(for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>penalty_max</td><td>OT_REAL</td><td>1e+30</td><td>Maximal value for the penalty parameter (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>penalty_update_compl_tol</td><td>OT_REAL</td><td>10.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>penalty_update_infeasibility_tol</td><td>OT_REAL</td><td>1e-09</td><td>Threshold for infeasibility in penalty parameter update test. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>perturb_always_cd</td><td>OT_STRING</td><td>no</td><td>Active permanent perturbation of constraint linearization. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>perturb_dec_fact</td><td>OT_REAL</td><td>0.333333333333</td><td>Decrease factor for x-s perturbation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>perturb_inc_fact</td><td>OT_REAL</td><td>8.0</td><td>Increase factor for x-s perturbation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>perturb_inc_fact_first</td><td>OT_REAL</td><td>100.0</td><td>Increase factor for x-s perturbation for very first perturbation. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>piecewisepenalty_gamma_infeasi</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>piecewisepenalty_gamma_obj</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>point_perturbation_radius</td><td>OT_REAL</td><td>10.0</td><td>Maximal perturbation of an evaluation point. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_info_string</td><td>OT_STRING</td><td>no</td><td>Enables printing of additional info string at end of iteration output. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_level</td><td>OT_INTEGER</td><td>5</td><td>Output verbosity level. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_options_documentation</td><td>OT_STRING</td><td>no</td><td>Switch to print all algorithmic options. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_options_latex_mode</td><td>OT_STRING</td><td>no</td><td>Undocumented (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_timing_statistics</td><td>OT_STRING</td><td>no</td><td>Switch to print timing statistics. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>print_user_options</td><td>OT_STRING</td><td>no</td><td>Print all options set by the user. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>quality_function_balancing_term</td><td>OT_STRING</td><td>none</td><td>The balancing term included in the quality function for centrality. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>quality_function_centrality</td><td>OT_STRING</td><td>none</td><td>The penalty term for centrality that is included in quality function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>quality_function_max_section_steps</td><td>OT_INTEGER</td><td>8</td><td>Maximum number of search steps during direct search procedure determining the optimal centering parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>quality_function_norm_type</td><td>OT_STRING</td><td>2-norm-squared</td><td>Norm used for components of the quality function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>quality_function_section_qf_tol</td><td>OT_REAL</td><td>0.0</td><td>Tolerance for the golden section search procedure determining the optimal centering parameter (in the function value space). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>quality_function_section_sigma_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for the section search procedure determining the optimal centering parameter (in sigma space). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>recalc_y</td><td>OT_STRING</td><td>no</td><td>Tells the algorithm to recalculate the equality and inequality multipliers as least square estimates. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>recalc_y_feas_tol</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility threshold for recomputation of multipliers. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>replace_bounds</td><td>OT_STRING</td><td>no</td><td>Indicates if all variable bounds should be replaced by inequality constraints (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>required_infeasibility_reduction</td><td>OT_REAL</td><td>0.9</td><td>Required reduction of infeasibility before leaving restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>residual_improvement_factor</td><td>OT_REAL</td><td>0.999999999</td><td>Minimal required reduction of residual test ratio in iterative refinement. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>residual_ratio_max</td><td>OT_REAL</td><td>1e-10</td><td>Iterative refinement tolerance (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>residual_ratio_singular</td><td>OT_REAL</td><td>1e-05</td><td>Threshold for declaring linear system singular after failed iterative refinement. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>resto_failure_feasibility_threshold</td><td>OT_REAL</td><td>0.0</td><td>Threshold for primal infeasibility to declare failure of restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>resto_penalty_parameter</td><td>OT_REAL</td><td>1000.0</td><td>Penalty parameter in the restoration phase objective function. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>resto_proximity_weight</td><td>OT_REAL</td><td>1.0</td><td>Weighting factor for the proximity term in restoration phase objective. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>rho</td><td>OT_REAL</td><td>0.1</td><td>Value in penalty parameter update formula. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>s_max</td><td>OT_REAL</td><td>100.0</td><td>Scaling threshold for the NLP error. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>s_phi</td><td>OT_REAL</td><td>2.3</td><td>Exponent for linear barrier function model in the switching rule. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>s_theta</td><td>OT_REAL</td><td>1.1</td><td>Exponent for current constraint violation in the switching rule. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>sb</td><td>OT_STRING</td><td>no</td><td> (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>sigma_max</td><td>OT_REAL</td><td>100.0</td><td>Maximum value of the centering parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>sigma_min</td><td>OT_REAL</td><td>1e-06</td><td>Minimum value of the centering parameter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>skip_corr_if_neg_curv</td><td>OT_STRING</td><td>yes</td><td>Skip the corrector step in negative curvature iteration (unsupported!). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>skip_corr_in_monotone_mode</td><td>OT_STRING</td><td>yes</td><td>Skip the corrector step during monotone barrier parameter mode (unsupported!). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>skip_finalize_solution_call</td><td>OT_STRING</td><td>no</td><td>Indicates if call to NLP::FinalizeSolution after optimization should be suppressed (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>slack_bound_frac</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum relative distance from the initial slack to bound. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>slack_bound_push</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum absolute distance from the initial slack to bound. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>slack_move</td><td>OT_REAL</td><td>1.81898940355e-12</td><td>Correction size for very small slacks. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td>0.9999</td><td>Required reduction in primal-dual error in the soft restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>start_with_resto</td><td>OT_STRING</td><td>no</td><td>Tells algorithm to switch to restoration phase in first iteration. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>suppress_all_output</td><td>OT_STRING</td><td>no</td><td>Undocumented (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>tau_min</td><td>OT_REAL</td><td>0.99</td><td>Lower bound on fraction-to-the-boundary parameter tau. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>theta_max_fact</td><td>OT_REAL</td><td>10000.0</td><td>Determines upper bound for constraint violation in the filter. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>theta_min</td><td>OT_REAL</td><td>1e-06</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>theta_min_fact</td><td>OT_REAL</td><td>0.0001</td><td>Determines constraint violation threshold in the switching rule. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>tiny_step_tol</td><td>OT_REAL</td><td>2.22044604925e-15</td><td>Tolerance for detecting numerically insignificant steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICT</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICT</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOLEAN</td><td>false</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
-<tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_bound_push</td><td>OT_REAL</td><td>0.001</td><td>same as bound_push for the regular initializer. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_entire_iterate</td><td>OT_STRING</td><td>no</td><td>Tells algorithm whether to use the GetWarmStartIterate method in the NLP. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_init_point</td><td>OT_STRING</td><td>no</td><td>Warm-start for initial point (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_mult_bound_push</td><td>OT_REAL</td><td>0.001</td><td>same as mult_bound_push for the regular initializer. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_mult_init_max</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum initial value for the equality multipliers. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_same_structure</td><td>OT_STRING</td><td>no</td><td>Indicates whether a problem with a structure identical to the previous one is to be solved. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_slack_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as slack_bound_frac for the regular initializer. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_slack_bound_push</td><td>OT_REAL</td><td>0.001</td><td>same as slack_bound_push for the regular initializer. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>warm_start_target_mu</td><td>OT_REAL</td><td>0.0</td><td>Unsupported! (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
-<tr><td>watchdog_shortened_iter_trigger</td><td>OT_INTEGER</td><td>10</td><td>Number of shortened iterations that trigger the watchdog. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>watchdog_trial_iter_max</td><td>OT_INTEGER</td><td>3</td><td>Maximum number of watchdog iterations. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
-<tr><td>wsmp_iterative</td><td>OT_STRING</td><td>no</td><td>Switches to iterative solver in WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 </table>
 */
 /// \endcond
@@ -1142,275 +882,15 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
-<tr><td>accept_after_max_steps</td><td>OT_INTEGER</td><td>-1</td><td>Accept a trial point after maximal this number of steps. (see IPOPT documentation)</td></tr>
-<tr><td>accept_every_trial_step</td><td>OT_STRING</td><td>no</td><td>Always accept the first trial step. (see IPOPT documentation)</td></tr>
-<tr><td>acceptable_compl_inf_tol</td><td>OT_REAL</td><td>0.01</td><td>"Acceptance" threshold for the complementarity conditions. (see IPOPT documentation)</td></tr>
-<tr><td>acceptable_constr_viol_tol</td><td>OT_REAL</td><td>0.01</td><td>"Acceptance" threshold for the constraint violation. (see IPOPT documentation)</td></tr>
-<tr><td>acceptable_dual_inf_tol</td><td>OT_REAL</td><td>10000000000.0</td><td>"Acceptance" threshold for the dual infeasibility. (see IPOPT documentation)</td></tr>
-<tr><td>acceptable_iter</td><td>OT_INTEGER</td><td>15</td><td>Number of "acceptable" iterates before triggering termination. (see IPOPT documentation)</td></tr>
-<tr><td>acceptable_obj_change_tol</td><td>OT_REAL</td><td>1e+20</td><td>"Acceptance" stopping criterion based on objective function change. (see IPOPT documentation)</td></tr>
-<tr><td>acceptable_tol</td><td>OT_REAL</td><td>1e-06</td><td>"Acceptable" convergence tolerance (relative). (see IPOPT documentation)</td></tr>
-<tr><td>adaptive_mu_globalization</td><td>OT_STRING</td><td>obj-constr-filter</td><td>Globalization strategy for the adaptive mu selection mode. (see IPOPT documentation)</td></tr>
-<tr><td>adaptive_mu_kkt_norm_type</td><td>OT_STRING</td><td>2-norm-squared</td><td>Norm used for the KKT error in the adaptive mu globalization strategies. (see IPOPT documentation)</td></tr>
-<tr><td>adaptive_mu_kkterror_red_fact</td><td>OT_REAL</td><td>0.9999</td><td>Sufficient decrease factor for "kkt-error" globalization strategy. (see IPOPT documentation)</td></tr>
-<tr><td>adaptive_mu_kkterror_red_iters</td><td>OT_INTEGER</td><td>4</td><td>Maximum number of iterations requiring sufficient progress. (see IPOPT documentation)</td></tr>
-<tr><td>adaptive_mu_monotone_init_factor</td><td>OT_REAL</td><td>0.8</td><td>Determines the initial value of the barrier parameter when switching to the monotone mode. (see IPOPT documentation)</td></tr>
-<tr><td>adaptive_mu_restore_previous_iterate</td><td>OT_STRING</td><td>no</td><td>Indicates if the previous iterate should be restored if the monotone mode is entered. (see IPOPT documentation)</td></tr>
-<tr><td>adaptive_mu_safeguard_factor</td><td>OT_REAL</td><td>0.0</td><td> (see IPOPT documentation)</td></tr>
-<tr><td>alpha_for_y</td><td>OT_STRING</td><td>primal</td><td>Method to determine the step size for constraint multipliers. (see IPOPT documentation)</td></tr>
-<tr><td>alpha_for_y_tol</td><td>OT_REAL</td><td>10.0</td><td>Tolerance for switching to full equality multiplier steps. (see IPOPT documentation)</td></tr>
-<tr><td>alpha_min_frac</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for the minimal step size (before switching to restoration phase). (see IPOPT documentation)</td></tr>
-<tr><td>alpha_red_factor</td><td>OT_REAL</td><td>0.5</td><td>Fractional reduction of the trial step size in the backtracking line search. (see IPOPT documentation)</td></tr>
-<tr><td>barrier_tol_factor</td><td>OT_REAL</td><td>10.0</td><td>Factor for mu in barrier stop test. (see IPOPT documentation)</td></tr>
-<tr><td>bound_frac</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum relative distance from the initial point to bound. (see IPOPT documentation)</td></tr>
-<tr><td>bound_mult_init_method</td><td>OT_STRING</td><td>constant</td><td>Initialization method for bound multipliers (see IPOPT documentation)</td></tr>
-<tr><td>bound_mult_init_val</td><td>OT_REAL</td><td>1.0</td><td>Initial value for the bound multipliers. (see IPOPT documentation)</td></tr>
-<tr><td>bound_mult_reset_threshold</td><td>OT_REAL</td><td>1000.0</td><td>Threshold for resetting bound multipliers after the restoration phase. (see IPOPT documentation)</td></tr>
-<tr><td>bound_push</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum absolute distance from the initial point to bound. (see IPOPT documentation)</td></tr>
-<tr><td>bound_relax_factor</td><td>OT_REAL</td><td>1e-08</td><td>Factor for initial relaxation of the bounds. (see IPOPT documentation)</td></tr>
-<tr><td>check_derivatives_for_naninf</td><td>OT_STRING</td><td>no</td><td>Indicates whether it is desired to check for Nan/Inf in derivative matrices (see IPOPT documentation)</td></tr>
-<tr><td>chi_cup</td><td>OT_REAL</td><td>1.5</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>chi_hat</td><td>OT_REAL</td><td>2.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>chi_tilde</td><td>OT_REAL</td><td>5.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>compl_inf_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the complementarity conditions. (see IPOPT documentation)</td></tr>
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td></tr>
-<tr><td>constr_mult_init_max</td><td>OT_REAL</td><td>1000.0</td><td>Maximum allowed least-square guess of constraint multipliers. (see IPOPT documentation)</td></tr>
-<tr><td>constr_mult_reset_threshold</td><td>OT_REAL</td><td>0.0</td><td>Threshold for resetting equality and inequality multipliers after restoration phase. (see IPOPT documentation)</td></tr>
-<tr><td>constr_viol_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the constraint violation. (see IPOPT documentation)</td></tr>
-<tr><td>constraint_violation_norm_type</td><td>OT_STRING</td><td>1-norm</td><td>Norm to be used for the constraint violation in the line search. (see IPOPT documentation)</td></tr>
-<tr><td>corrector_compl_avrg_red_fact</td><td>OT_REAL</td><td>1.0</td><td>Complementarity tolerance factor for accepting corrector step (unsupported!). (see IPOPT documentation)</td></tr>
-<tr><td>corrector_type</td><td>OT_STRING</td><td>none</td><td>The type of corrector steps that should be taken (unsupported!). (see IPOPT documentation)</td></tr>
-<tr><td>delta</td><td>OT_REAL</td><td>1.0</td><td>Multiplier for constraint violation in the switching rule. (see IPOPT documentation)</td></tr>
-<tr><td>delta_y_max</td><td>OT_REAL</td><td>1e+12</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>dependency_detection_with_rhs</td><td>OT_STRING</td><td>no</td><td>Indicates if the right hand sides of the constraints should be considered during dependency detection (see IPOPT documentation)</td></tr>
-<tr><td>dependency_detector</td><td>OT_STRING</td><td>none</td><td>Indicates which linear solver should be used to detect linearly dependent equality constraints. (see IPOPT documentation)</td></tr>
-<tr><td>derivative_test</td><td>OT_STRING</td><td>none</td><td>Enable derivative checker (see IPOPT documentation)</td></tr>
-<tr><td>derivative_test_first_index</td><td>OT_INTEGER</td><td>-2</td><td>Index of first quantity to be checked by derivative checker (see IPOPT documentation)</td></tr>
-<tr><td>derivative_test_perturbation</td><td>OT_REAL</td><td>1e-08</td><td>Size of the finite difference perturbation in derivative test. (see IPOPT documentation)</td></tr>
-<tr><td>derivative_test_print_all</td><td>OT_STRING</td><td>no</td><td>Indicates whether information for all estimated derivatives should be printed. (see IPOPT documentation)</td></tr>
-<tr><td>derivative_test_tol</td><td>OT_REAL</td><td>0.0001</td><td>Threshold for indicating wrong derivative. (see IPOPT documentation)</td></tr>
-<tr><td>diverging_iterates_tol</td><td>OT_REAL</td><td>1e+20</td><td>Threshold for maximal value of primal iterates. (see IPOPT documentation)</td></tr>
-<tr><td>dual_inf_tol</td><td>OT_REAL</td><td>1.0</td><td>Desired threshold for the dual infeasibility. (see IPOPT documentation)</td></tr>
-<tr><td>epsilon_c</td><td>OT_REAL</td><td>0.01</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>eta_min</td><td>OT_REAL</td><td>10.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>eta_penalty</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the Armijo condition for the penalty function. (see IPOPT documentation)</td></tr>
-<tr><td>eta_phi</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the Armijo condition. (see IPOPT documentation)</td></tr>
-<tr><td>evaluate_orig_obj_at_resto_trial</td><td>OT_STRING</td><td>yes</td><td>Determines if the original objective function should be evaluated at restoration phase trial points. (see IPOPT documentation)</td></tr>
-<tr><td>expect_infeasible_problem</td><td>OT_STRING</td><td>no</td><td>Enable heuristics to quickly detect an infeasible problem. (see IPOPT documentation)</td></tr>
-<tr><td>expect_infeasible_problem_ctol</td><td>OT_REAL</td><td>0.001</td><td>Threshold for disabling "expect_infeasible_problem" option. (see IPOPT documentation)</td></tr>
-<tr><td>expect_infeasible_problem_ytol</td><td>OT_REAL</td><td>100000000.0</td><td>Multiplier threshold for activating "expect_infeasible_problem" option. (see IPOPT documentation)</td></tr>
-<tr><td>fast_des_fact</td><td>OT_REAL</td><td>0.1</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>fast_step_computation</td><td>OT_STRING</td><td>no</td><td>Indicates if the linear system should be solved quickly. (see IPOPT documentation)</td></tr>
-<tr><td>file_print_level</td><td>OT_INTEGER</td><td>5</td><td>Verbosity level for output file. (see IPOPT documentation)</td></tr>
-<tr><td>filter_margin_fact</td><td>OT_REAL</td><td>1e-05</td><td>Factor determining width of margin for obj-constr-filter adaptive globalization strategy. (see IPOPT documentation)</td></tr>
-<tr><td>filter_max_margin</td><td>OT_REAL</td><td>1.0</td><td>Maximum width of margin in obj-constr-filter adaptive globalization strategy. (see IPOPT documentation)</td></tr>
-<tr><td>filter_reset_trigger</td><td>OT_INTEGER</td><td>5</td><td>Number of iterations that trigger the filter reset. (see IPOPT documentation)</td></tr>
-<tr><td>findiff_perturbation</td><td>OT_REAL</td><td>1e-07</td><td>Size of the finite difference perturbation for derivative approximation. (see IPOPT documentation)</td></tr>
-<tr><td>first_hessian_perturbation</td><td>OT_REAL</td><td>0.0001</td><td>Size of first x-s perturbation tried. (see IPOPT documentation)</td></tr>
-<tr><td>fixed_mu_oracle</td><td>OT_STRING</td><td>average_compl</td><td>Oracle for the barrier parameter when switching to fixed mode. (see IPOPT documentation)</td></tr>
-<tr><td>fixed_variable_treatment</td><td>OT_STRING</td><td>make_parameter</td><td>Determines how fixed variables should be handled. (see IPOPT documentation)</td></tr>
-<tr><td>gamma_hat</td><td>OT_REAL</td><td>0.04</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>gamma_phi</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the filter margin for the barrier function. (see IPOPT documentation)</td></tr>
-<tr><td>gamma_theta</td><td>OT_REAL</td><td>1e-05</td><td>Relaxation factor in the filter margin for the constraint violation. (see IPOPT documentation)</td></tr>
-<tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>hessian_approximation</td><td>OT_STRING</td><td>exact</td><td>Indicates what Hessian information is to be used. (see IPOPT documentation)</td></tr>
-<tr><td>hessian_approximation_space</td><td>OT_STRING</td><td>nonlinear-variables</td><td>Indicates in which subspace the Hessian information is to be approximated. (see IPOPT documentation)</td></tr>
-<tr><td>hessian_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether the problem is a quadratic problem (see IPOPT documentation)</td></tr>
-<tr><td>honor_original_bounds</td><td>OT_STRING</td><td>yes</td><td>Indicates whether final points should be projected into original bounds. (see IPOPT documentation)</td></tr>
-<tr><td>inf_pr_output</td><td>OT_STRING</td><td>original</td><td>Determines what value is printed in the "inf_pr" output column. (see IPOPT documentation)</td></tr>
-<tr><td>jac_c_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all equality constraints are linear (see IPOPT documentation)</td></tr>
-<tr><td>jac_d_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all inequality constraints are linear (see IPOPT documentation)</td></tr>
-<tr><td>jacobian_approximation</td><td>OT_STRING</td><td>exact</td><td>Specifies technique to compute constraint Jacobian (see IPOPT documentation)</td></tr>
-<tr><td>jacobian_regularization_exponent</td><td>OT_REAL</td><td>0.25</td><td>Exponent for mu in the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td></tr>
-<tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td>1e-08</td><td>Size of the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td></tr>
-<tr><td>kappa_d</td><td>OT_REAL</td><td>1e-05</td><td>Weight for linear damping term (to handle one-sided bounds). (see IPOPT documentation)</td></tr>
-<tr><td>kappa_sigma</td><td>OT_REAL</td><td>10000000000.0</td><td>Factor limiting the deviation of dual variables from primal estimates. (see IPOPT documentation)</td></tr>
-<tr><td>kappa_soc</td><td>OT_REAL</td><td>0.99</td><td>Factor in the sufficient reduction rule for second order correction. (see IPOPT documentation)</td></tr>
-<tr><td>kappa_x_dis</td><td>OT_REAL</td><td>100.0</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>kappa_y_dis</td><td>OT_REAL</td><td>10000.0</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>least_square_init_duals</td><td>OT_STRING</td><td>no</td><td>Least square initialization of all dual variables (see IPOPT documentation)</td></tr>
-<tr><td>least_square_init_primal</td><td>OT_STRING</td><td>no</td><td>Least square initialization of the primal variables (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_aug_solver</td><td>OT_STRING</td><td>sherman-morrison</td><td>Strategy for solving the augmented system for low-rank Hessian. (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_init_val</td><td>OT_REAL</td><td>1.0</td><td>Value for B0 in low-rank update. (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_init_val_max</td><td>OT_REAL</td><td>100000000.0</td><td>Upper bound on value for B0 in low-rank update. (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_init_val_min</td><td>OT_REAL</td><td>1e-08</td><td>Lower bound on value for B0 in low-rank update. (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_initialization</td><td>OT_STRING</td><td>scalar1</td><td>Initialization strategy for the limited memory quasi-Newton approximation. (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_max_history</td><td>OT_INTEGER</td><td>6</td><td>Maximum size of the history for the limited quasi-Newton Hessian approximation. (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_max_skipping</td><td>OT_INTEGER</td><td>2</td><td>Threshold for successive iterations where update is skipped. (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_special_for_resto</td><td>OT_STRING</td><td>no</td><td>Determines if the quasi-Newton updates should be special during the restoration phase. (see IPOPT documentation)</td></tr>
-<tr><td>limited_memory_update_type</td><td>OT_STRING</td><td>bfgs</td><td>Quasi-Newton update formula for the limited memory approximation. (see IPOPT documentation)</td></tr>
-<tr><td>line_search_method</td><td>OT_STRING</td><td>filter</td><td>Globalization method used in backtracking line search (see IPOPT documentation)</td></tr>
-<tr><td>linear_scaling_on_demand</td><td>OT_STRING</td><td>yes</td><td>Flag indicating that linear scaling is only done if it seems required. (see IPOPT documentation)</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>mumps</td><td>Linear solver used for step computations. (see IPOPT documentation)</td></tr>
-<tr><td>linear_system_scaling</td><td>OT_STRING</td><td>none</td><td>Method for scaling the linear system. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_ignore_singularity</td><td>OT_STRING</td><td>no</td><td>Enables MA27's ability to solve a linear system even if the matrix is singular. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Real workspace memory for MA27. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Integer workspace memory for MA27. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>10.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td></tr>
-<tr><td>ma27_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td></tr>
-<tr><td>ma28_pivtol</td><td>OT_REAL</td><td>0.01</td><td>Pivot tolerance for linear solver MA28. (see IPOPT documentation)</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>yes</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td></tr>
-<tr><td>ma57_block_size</td><td>OT_INTEGER</td><td>16</td><td>Controls block size used by Level 3 BLAS in MA57BD (see IPOPT documentation)</td></tr>
-<tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td>16</td><td>Node amalgamation parameter (see IPOPT documentation)</td></tr>
-<tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td>5</td><td>Controls pivot order in MA57 (see IPOPT documentation)</td></tr>
-<tr><td>ma57_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td></tr>
-<tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td></tr>
-<tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td>1.05</td><td>Safety factor for work space memory allocation for the linear solver MA57. (see IPOPT documentation)</td></tr>
-<tr><td>ma57_small_pivot_flag</td><td>OT_INTEGER</td><td>0</td><td>If set to 1, then when small entries defined by CNTL(2) are detected they are removed and the corresponding pivots placed at the end of the factorization.  This can be particularly efficient if the matrix is highly rank deficient. (see IPOPT documentation)</td></tr>
-<tr><td>ma86_nemin</td><td>OT_INTEGER</td><td>32</td><td>Node Amalgamation parameter (see IPOPT documentation)</td></tr>
-<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td></tr>
-<tr><td>ma86_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma86_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma86_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>ma86_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td></tr>
-<tr><td>magic_steps</td><td>OT_STRING</td><td>no</td><td>Enables magic steps. (see IPOPT documentation)</td></tr>
-<tr><td>max_cpu_time</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum number of CPU seconds. (see IPOPT documentation)</td></tr>
-<tr><td>max_filter_resets</td><td>OT_INTEGER</td><td>5</td><td>Maximal allowed number of filter resets (see IPOPT documentation)</td></tr>
-<tr><td>max_hessian_perturbation</td><td>OT_REAL</td><td>1e+20</td><td>Maximum value of regularization parameter for handling negative curvature. (see IPOPT documentation)</td></tr>
-<tr><td>max_iter</td><td>OT_INTEGER</td><td>3000</td><td>Maximum number of iterations. (see IPOPT documentation)</td></tr>
-<tr><td>max_refinement_steps</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterative refinement steps per linear system solve. (see IPOPT documentation)</td></tr>
-<tr><td>max_resto_iter</td><td>OT_INTEGER</td><td>3000000</td><td>Maximum number of successive iterations in restoration phase. (see IPOPT documentation)</td></tr>
-<tr><td>max_soc</td><td>OT_INTEGER</td><td>4</td><td>Maximum number of second order correction trial steps at each iteration. (see IPOPT documentation)</td></tr>
-<tr><td>max_soft_resto_iters</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterations performed successively in soft restoration phase. (see IPOPT documentation)</td></tr>
-<tr><td>mehrotra_algorithm</td><td>OT_STRING</td><td>no</td><td>Indicates if we want to do Mehrotra's algorithm. (see IPOPT documentation)</td></tr>
-<tr><td>min_alpha_primal</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>min_hessian_perturbation</td><td>OT_REAL</td><td>1e-20</td><td>Smallest perturbation of the Hessian block. (see IPOPT documentation)</td></tr>
-<tr><td>min_refinement_steps</td><td>OT_INTEGER</td><td>1</td><td>Minimum number of iterative refinement steps per linear system solve. (see IPOPT documentation)</td></tr>
-<tr><td>mu_allow_fast_monotone_decrease</td><td>OT_STRING</td><td>yes</td><td>Allow skipping of barrier problem if barrier test is already met. (see IPOPT documentation)</td></tr>
-<tr><td>mu_init</td><td>OT_REAL</td><td>0.1</td><td>Initial value for the barrier parameter. (see IPOPT documentation)</td></tr>
-<tr><td>mu_linear_decrease_factor</td><td>OT_REAL</td><td>0.2</td><td>Determines linear decrease rate of barrier parameter. (see IPOPT documentation)</td></tr>
-<tr><td>mu_max</td><td>OT_REAL</td><td>100000.0</td><td>Maximum value for barrier parameter. (see IPOPT documentation)</td></tr>
-<tr><td>mu_max_fact</td><td>OT_REAL</td><td>1000.0</td><td>Factor for initialization of maximum value for barrier parameter. (see IPOPT documentation)</td></tr>
-<tr><td>mu_min</td><td>OT_REAL</td><td>1e-11</td><td>Minimum value for barrier parameter. (see IPOPT documentation)</td></tr>
-<tr><td>mu_oracle</td><td>OT_STRING</td><td>quality-function</td><td>Oracle for a new barrier parameter in the adaptive strategy. (see IPOPT documentation)</td></tr>
-<tr><td>mu_strategy</td><td>OT_STRING</td><td>monotone</td><td>Update strategy for barrier parameter. (see IPOPT documentation)</td></tr>
-<tr><td>mu_superlinear_decrease_power</td><td>OT_REAL</td><td>1.5</td><td>Determines superlinear decrease rate of barrier parameter. (see IPOPT documentation)</td></tr>
-<tr><td>mu_target</td><td>OT_REAL</td><td>0.0</td><td>Desired value of complementarity. (see IPOPT documentation)</td></tr>
-<tr><td>mult_diverg_feasibility_tol</td><td>OT_REAL</td><td>1e-07</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td></tr>
-<tr><td>mult_diverg_y_tol</td><td>OT_REAL</td><td>100000000.0</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td></tr>
-<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>-1.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td></tr>
-<tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td>1000</td><td>Percentage increase in the estimated working space for MUMPS. (see IPOPT documentation)</td></tr>
-<tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td>7</td><td>Controls permuting and scaling in MUMPS (see IPOPT documentation)</td></tr>
-<tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td>7</td><td>Controls pivot order in MUMPS (see IPOPT documentation)</td></tr>
-<tr><td>mumps_pivtol</td><td>OT_REAL</td><td>1e-06</td><td>Pivot tolerance for the linear solver MUMPS. (see IPOPT documentation)</td></tr>
-<tr><td>mumps_pivtolmax</td><td>OT_REAL</td><td>0.1</td><td>Maximum pivot tolerance for the linear solver MUMPS. (see IPOPT documentation)</td></tr>
-<tr><td>mumps_scaling</td><td>OT_INTEGER</td><td>77</td><td>Controls scaling in MUMPS (see IPOPT documentation)</td></tr>
-<tr><td>neg_curv_test_tol</td><td>OT_REAL</td><td>0.0</td><td>Tolerance for heuristic to ignore wrong inertia. (see IPOPT documentation)</td></tr>
-<tr><td>never_use_fact_cgpen_direction</td><td>OT_STRING</td><td>no</td><td>Toggle to switch off the fast Chen-Goldfarb direction (see IPOPT documentation)</td></tr>
-<tr><td>never_use_piecewise_penalty_ls</td><td>OT_STRING</td><td>no</td><td>Toggle to switch off the piecewise penalty method (see IPOPT documentation)</td></tr>
-<tr><td>nlp_lower_bound_inf</td><td>OT_REAL</td><td>-1e+19</td><td>any bound less or equal this value will be considered -inf (i.e. not lower bounded). (see IPOPT documentation)</td></tr>
-<tr><td>nlp_scaling_constr_target_gradient</td><td>OT_REAL</td><td>0.0</td><td>Target value for constraint function gradient size. (see IPOPT documentation)</td></tr>
-<tr><td>nlp_scaling_max_gradient</td><td>OT_REAL</td><td>100.0</td><td>Maximum gradient after NLP scaling. (see IPOPT documentation)</td></tr>
-<tr><td>nlp_scaling_method</td><td>OT_STRING</td><td>gradient-based</td><td>Select the technique used for scaling the NLP. (see IPOPT documentation)</td></tr>
-<tr><td>nlp_scaling_min_value</td><td>OT_REAL</td><td>1e-08</td><td>Minimum value of gradient-based scaling values. (see IPOPT documentation)</td></tr>
-<tr><td>nlp_scaling_obj_target_gradient</td><td>OT_REAL</td><td>0.0</td><td>Target value for objective function gradient size. (see IPOPT documentation)</td></tr>
-<tr><td>nlp_upper_bound_inf</td><td>OT_REAL</td><td>1e+19</td><td>any bound greater or this value will be considered +inf (i.e. not upper bounded). (see IPOPT documentation)</td></tr>
-<tr><td>nu_inc</td><td>OT_REAL</td><td>0.0001</td><td>Increment of the penalty parameter. (see IPOPT documentation)</td></tr>
-<tr><td>nu_init</td><td>OT_REAL</td><td>1e-06</td><td>Initial value of the penalty parameter. (see IPOPT documentation)</td></tr>
-<tr><td>num_linear_variables</td><td>OT_INTEGER</td><td>0</td><td>Number of linear variables (see IPOPT documentation)</td></tr>
-<tr><td>obj_max_inc</td><td>OT_REAL</td><td>5.0</td><td>Determines the upper bound on the acceptable increase of barrier objective function. (see IPOPT documentation)</td></tr>
-<tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td></tr>
-<tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_iter_dropping_schur</td><td>OT_REAL</td><td>0.1</td><td>dropping value for sparsify schur complement factor (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_iter_inverse_norm_factor</td><td>OT_REAL</td><td>5000000.0</td><td> (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_iter_max_levels</td><td>OT_INTEGER</td><td>10</td><td>Maximum Size of Grid Levels (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_iter_max_row_fill</td><td>OT_INTEGER</td><td>10000000</td><td>max fill for each row (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_iter_relative_tol</td><td>OT_REAL</td><td>1e-06</td><td>Relative Residual Convergence (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_iterative</td><td>OT_STRING</td><td>no</td><td>Switch on iterative solver in Pardiso library (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td>complete+2x2</td><td>Matching strategy to be used by Pardiso (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_max_droptol_corrections</td><td>OT_INTEGER</td><td>4</td><td>Maximal number of decreases of drop tolerance during one solve. (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_max_iter</td><td>OT_INTEGER</td><td>500</td><td>Maximum number of Krylov-Subspace Iteration (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td>0</td><td>Pardiso message level (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td>0</td><td>Enables out-of-core variant of Pardiso (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_redo_symbolic_fact_only_if_inertia_wrong</td><td>OT_STRING</td><td>no</td><td>Toggle for handling case when elements were perturbed by Pardiso. (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_repeated_perturbation_means_singular</td><td>OT_STRING</td><td>no</td><td>Interpretation of perturbed elements. (see IPOPT documentation)</td></tr>
-<tr><td>pardiso_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td></tr>
+<tr><td>ipopt</td><td>OT_DICT</td><td>None</td><td>Options to be passed to IPOPT</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOLEAN</td><td>False</td><td>n/a</td></tr>
-<tr><td>pen_des_fact</td><td>OT_REAL</td><td>0.2</td><td>a parameter used in penalty parameter computation (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>pen_init_fac</td><td>OT_REAL</td><td>50.0</td><td>a parameter used to choose initial penalty parameterswhen the regularized Newton method is used. (see IPOPT documentation)</td></tr>
-<tr><td>pen_theta_max_fact</td><td>OT_REAL</td><td>10000.0</td><td>Determines upper bound for constraint violation in the filter. (see IPOPT documentation)</td></tr>
-<tr><td>penalty_init_max</td><td>OT_REAL</td><td>100000.0</td><td>Maximal value for the intial penalty parameter (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>penalty_init_min</td><td>OT_REAL</td><td>1.0</td><td>Minimal value for the intial penalty parameter for line search(for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>penalty_max</td><td>OT_REAL</td><td>1e+30</td><td>Maximal value for the penalty parameter (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>penalty_update_compl_tol</td><td>OT_REAL</td><td>10.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>penalty_update_infeasibility_tol</td><td>OT_REAL</td><td>1e-09</td><td>Threshold for infeasibility in penalty parameter update test. (see IPOPT documentation)</td></tr>
-<tr><td>perturb_always_cd</td><td>OT_STRING</td><td>no</td><td>Active permanent perturbation of constraint linearization. (see IPOPT documentation)</td></tr>
-<tr><td>perturb_dec_fact</td><td>OT_REAL</td><td>0.333333333333</td><td>Decrease factor for x-s perturbation. (see IPOPT documentation)</td></tr>
-<tr><td>perturb_inc_fact</td><td>OT_REAL</td><td>8.0</td><td>Increase factor for x-s perturbation. (see IPOPT documentation)</td></tr>
-<tr><td>perturb_inc_fact_first</td><td>OT_REAL</td><td>100.0</td><td>Increase factor for x-s perturbation for very first perturbation. (see IPOPT documentation)</td></tr>
-<tr><td>piecewisepenalty_gamma_infeasi</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>piecewisepenalty_gamma_obj</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>point_perturbation_radius</td><td>OT_REAL</td><td>10.0</td><td>Maximal perturbation of an evaluation point. (see IPOPT documentation)</td></tr>
-<tr><td>print_info_string</td><td>OT_STRING</td><td>no</td><td>Enables printing of additional info string at end of iteration output. (see IPOPT documentation)</td></tr>
-<tr><td>print_level</td><td>OT_INTEGER</td><td>5</td><td>Output verbosity level. (see IPOPT documentation)</td></tr>
-<tr><td>print_options_documentation</td><td>OT_STRING</td><td>no</td><td>Switch to print all algorithmic options. (see IPOPT documentation)</td></tr>
-<tr><td>print_options_latex_mode</td><td>OT_STRING</td><td>no</td><td>Undocumented (see IPOPT documentation)</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td></tr>
-<tr><td>print_timing_statistics</td><td>OT_STRING</td><td>no</td><td>Switch to print timing statistics. (see IPOPT documentation)</td></tr>
-<tr><td>print_user_options</td><td>OT_STRING</td><td>no</td><td>Print all options set by the user. (see IPOPT documentation)</td></tr>
-<tr><td>quality_function_balancing_term</td><td>OT_STRING</td><td>none</td><td>The balancing term included in the quality function for centrality. (see IPOPT documentation)</td></tr>
-<tr><td>quality_function_centrality</td><td>OT_STRING</td><td>none</td><td>The penalty term for centrality that is included in quality function. (see IPOPT documentation)</td></tr>
-<tr><td>quality_function_max_section_steps</td><td>OT_INTEGER</td><td>8</td><td>Maximum number of search steps during direct search procedure determining the optimal centering parameter. (see IPOPT documentation)</td></tr>
-<tr><td>quality_function_norm_type</td><td>OT_STRING</td><td>2-norm-squared</td><td>Norm used for components of the quality function. (see IPOPT documentation)</td></tr>
-<tr><td>quality_function_section_qf_tol</td><td>OT_REAL</td><td>0.0</td><td>Tolerance for the golden section search procedure determining the optimal centering parameter (in the function value space). (see IPOPT documentation)</td></tr>
-<tr><td>quality_function_section_sigma_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for the section search procedure determining the optimal centering parameter (in sigma space). (see IPOPT documentation)</td></tr>
-<tr><td>recalc_y</td><td>OT_STRING</td><td>no</td><td>Tells the algorithm to recalculate the equality and inequality multipliers as least square estimates. (see IPOPT documentation)</td></tr>
-<tr><td>recalc_y_feas_tol</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility threshold for recomputation of multipliers. (see IPOPT documentation)</td></tr>
-<tr><td>replace_bounds</td><td>OT_STRING</td><td>no</td><td>Indicates if all variable bounds should be replaced by inequality constraints (see IPOPT documentation)</td></tr>
-<tr><td>required_infeasibility_reduction</td><td>OT_REAL</td><td>0.9</td><td>Required reduction of infeasibility before leaving restoration phase. (see IPOPT documentation)</td></tr>
-<tr><td>residual_improvement_factor</td><td>OT_REAL</td><td>0.999999999</td><td>Minimal required reduction of residual test ratio in iterative refinement. (see IPOPT documentation)</td></tr>
-<tr><td>residual_ratio_max</td><td>OT_REAL</td><td>1e-10</td><td>Iterative refinement tolerance (see IPOPT documentation)</td></tr>
-<tr><td>residual_ratio_singular</td><td>OT_REAL</td><td>1e-05</td><td>Threshold for declaring linear system singular after failed iterative refinement. (see IPOPT documentation)</td></tr>
-<tr><td>resto_failure_feasibility_threshold</td><td>OT_REAL</td><td>0.0</td><td>Threshold for primal infeasibility to declare failure of restoration phase. (see IPOPT documentation)</td></tr>
-<tr><td>resto_penalty_parameter</td><td>OT_REAL</td><td>1000.0</td><td>Penalty parameter in the restoration phase objective function. (see IPOPT documentation)</td></tr>
-<tr><td>resto_proximity_weight</td><td>OT_REAL</td><td>1.0</td><td>Weighting factor for the proximity term in restoration phase objective. (see IPOPT documentation)</td></tr>
-<tr><td>rho</td><td>OT_REAL</td><td>0.1</td><td>Value in penalty parameter update formula. (see IPOPT documentation)</td></tr>
-<tr><td>s_max</td><td>OT_REAL</td><td>100.0</td><td>Scaling threshold for the NLP error. (see IPOPT documentation)</td></tr>
-<tr><td>s_phi</td><td>OT_REAL</td><td>2.3</td><td>Exponent for linear barrier function model in the switching rule. (see IPOPT documentation)</td></tr>
-<tr><td>s_theta</td><td>OT_REAL</td><td>1.1</td><td>Exponent for current constraint violation in the switching rule. (see IPOPT documentation)</td></tr>
-<tr><td>sb</td><td>OT_STRING</td><td>no</td><td> (see IPOPT documentation)</td></tr>
-<tr><td>sigma_max</td><td>OT_REAL</td><td>100.0</td><td>Maximum value of the centering parameter. (see IPOPT documentation)</td></tr>
-<tr><td>sigma_min</td><td>OT_REAL</td><td>1e-06</td><td>Minimum value of the centering parameter. (see IPOPT documentation)</td></tr>
-<tr><td>skip_corr_if_neg_curv</td><td>OT_STRING</td><td>yes</td><td>Skip the corrector step in negative curvature iteration (unsupported!). (see IPOPT documentation)</td></tr>
-<tr><td>skip_corr_in_monotone_mode</td><td>OT_STRING</td><td>yes</td><td>Skip the corrector step during monotone barrier parameter mode (unsupported!). (see IPOPT documentation)</td></tr>
-<tr><td>skip_finalize_solution_call</td><td>OT_STRING</td><td>no</td><td>Indicates if call to NLP::FinalizeSolution after optimization should be suppressed (see IPOPT documentation)</td></tr>
-<tr><td>slack_bound_frac</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum relative distance from the initial slack to bound. (see IPOPT documentation)</td></tr>
-<tr><td>slack_bound_push</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum absolute distance from the initial slack to bound. (see IPOPT documentation)</td></tr>
-<tr><td>slack_move</td><td>OT_REAL</td><td>1.81898940355e-12</td><td>Correction size for very small slacks. (see IPOPT documentation)</td></tr>
-<tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td>0.9999</td><td>Required reduction in primal-dual error in the soft restoration phase. (see IPOPT documentation)</td></tr>
-<tr><td>start_with_resto</td><td>OT_STRING</td><td>no</td><td>Tells algorithm to switch to restoration phase in first iteration. (see IPOPT documentation)</td></tr>
-<tr><td>suppress_all_output</td><td>OT_STRING</td><td>no</td><td>Undocumented (see IPOPT documentation)</td></tr>
-<tr><td>tau_min</td><td>OT_REAL</td><td>0.99</td><td>Lower bound on fraction-to-the-boundary parameter tau. (see IPOPT documentation)</td></tr>
-<tr><td>theta_max_fact</td><td>OT_REAL</td><td>10000.0</td><td>Determines upper bound for constraint violation in the filter. (see IPOPT documentation)</td></tr>
-<tr><td>theta_min</td><td>OT_REAL</td><td>1e-06</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td></tr>
-<tr><td>theta_min_fact</td><td>OT_REAL</td><td>0.0001</td><td>Determines constraint violation threshold in the switching rule. (see IPOPT documentation)</td></tr>
-<tr><td>tiny_step_tol</td><td>OT_REAL</td><td>2.22044604925e-15</td><td>Tolerance for detecting numerically insignificant steps. (see IPOPT documentation)</td></tr>
-<tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td></tr>
-<tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICT</td><td>None</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICT</td><td>None</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td></tr>
 <tr><td>var_string_md</td><td>OT_DICT</td><td>None</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td></tr>
-<tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_bound_push</td><td>OT_REAL</td><td>0.001</td><td>same as bound_push for the regular initializer. (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_entire_iterate</td><td>OT_STRING</td><td>no</td><td>Tells algorithm whether to use the GetWarmStartIterate method in the NLP. (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_init_point</td><td>OT_STRING</td><td>no</td><td>Warm-start for initial point (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_mult_bound_push</td><td>OT_REAL</td><td>0.001</td><td>same as mult_bound_push for the regular initializer. (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_mult_init_max</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum initial value for the equality multipliers. (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_same_structure</td><td>OT_STRING</td><td>no</td><td>Indicates whether a problem with a structure identical to the previous one is to be solved. (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_slack_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as slack_bound_frac for the regular initializer. (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_slack_bound_push</td><td>OT_REAL</td><td>0.001</td><td>same as slack_bound_push for the regular initializer. (see IPOPT documentation)</td></tr>
-<tr><td>warm_start_target_mu</td><td>OT_REAL</td><td>0.0</td><td>Unsupported! (see IPOPT documentation)</td></tr>
-<tr><td>watchdog_shortened_iter_trigger</td><td>OT_INTEGER</td><td>10</td><td>Number of shortened iterations that trigger the watchdog. (see IPOPT documentation)</td></tr>
-<tr><td>watchdog_trial_iter_max</td><td>OT_INTEGER</td><td>3</td><td>Maximum number of watchdog iterations. (see IPOPT documentation)</td></tr>
-<tr><td>wsmp_iterative</td><td>OT_STRING</td><td>no</td><td>Switches to iterative solver in WSMP. (see IPOPT documentation)</td></tr>
 </table>
 */
 /// \cond INTERNAL
