@@ -203,6 +203,15 @@ namespace casadi {
       if (!ret) casadi_error("Invalid options were detected by Ipopt.");
     }
 
+    // Override IPOPT's default linear solver
+    if (opts_.find("linear_solver") == opts_.end()) {
+      char * default_solver = getenv("IPOPT_DEFAULT_LINEAR_SOLVER");
+      if (default_solver) {
+        bool ret = (*app)->Options()->SetStringValue("linear_solver", default_solver, false);
+        casadi_assert_message(ret, "Corrupted IPOPT_DEFAULT_LINEAR_SOLVER environmental variable");
+      }
+    }
+
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
