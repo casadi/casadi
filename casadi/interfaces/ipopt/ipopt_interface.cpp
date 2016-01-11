@@ -305,9 +305,9 @@ namespace casadi {
 
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass =
-        static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(m.userclass);
+      static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(m.userclass);
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app =
-        static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(m.app);
+      static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(m.app);
 
     Timer time0 = getTimerTime();
     // Ask Ipopt to solve the problem

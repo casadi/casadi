@@ -53,7 +53,7 @@ classes = xmlData.findall("//compound[@kind='class']")
 # hierarchy   - the list of ancestors of this class. First element is the parent.
 # file        - the absolute path to the hpp source file
 # xmlsource   - the relative path (wrt to xml) to the xml file describing the class
-# hasInternal - (optional) the internal class of this class (the relative path to the xml file)
+# has_internal - (optional) the internal class of this class (the relative path to the xml file)
 # InternalFor - the list of classes for which this class is internal
 # options     - a list of dicts denoting the class's options
 # monitors    - a list of dicts denoting the class's monitorables
@@ -62,7 +62,7 @@ classes = xmlData.findall("//compound[@kind='class']")
 # outputscheme - the output scheme of the function
 metadata=dict()
 
-# Text-parsing to fill in 'parents','file','hasInternal'
+# Text-parsing to fill in 'parents','file','has_internal'
 for c in classes:
   refid = c.attrib['refid']
   name=c.findtext("name")
@@ -90,7 +90,7 @@ for c in classes:
   # find the internal class of this class, if any
   temp = f.find("//memberdef[name='operator->']/type/ref")
   if not(temp is None):
-    meta['hasInternal']=temp.attrib["refid"]
+    meta['has_internal']=temp.attrib["refid"]
   
   # find the file location of this class
   temp = f.find("//memberdef[definition='%s']/location" % constructor_name)
@@ -121,8 +121,8 @@ def nameByXMLsource(xmlsource):
 
 # Fill in 'internalFor'
 for name,meta in metadata.items():
-  if ('hasInternal' in meta):
-    name2 = nameByXMLsource(meta['hasInternal'])
+  if ('has_internal' in meta):
+    name2 = nameByXMLsource(meta['has_internal'])
     if name2 is None:
       continue
     internalfor = metadata[name2]
@@ -214,7 +214,7 @@ for name,meta in metadata.items():
         linec+=1
         
       try:
-        result = parse_match.parseString(l).asDict()
+        result = parse_match.parseString(l).as_dict()
         for k,v in result.iteritems():
           result[k]=v.strip()
       except:

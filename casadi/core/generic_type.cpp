@@ -227,64 +227,64 @@ namespace casadi {
     assignNode(new FunctionType(f));
   }
 
-  const bool& GenericType::asBool() const {
+  const bool& GenericType::as_bool() const {
     casadi_assert(is_bool());
     return static_cast<const BoolType*>(get())->d_;
   }
 
-  const int& GenericType::asInt() const {
+  const int& GenericType::as_int() const {
     casadi_assert(is_int());
     return static_cast<const IntType*>(get())->d_;
   }
 
-  const double& GenericType::asDouble() const {
+  const double& GenericType::as_double() const {
     casadi_assert(is_double());
     return static_cast<const DoubleType*>(get())->d_;
   }
 
-  const std::string& GenericType::asString() const {
+  const std::string& GenericType::as_string() const {
     casadi_assert(is_string());
     return static_cast<const StringType*>(get())->d_;
   }
 
-  const std::vector<int>& GenericType::asIntVector() const {
+  const std::vector<int>& GenericType::as_int_vector() const {
     casadi_assert(is_int_vector());
     return static_cast<const IntVectorType*>(get())->d_;
   }
 
-  const std::vector<std::vector<int> >& GenericType::asIntVectorVector() const {
+  const std::vector<std::vector<int> >& GenericType::as_int_vector_vector() const {
     casadi_assert(is_int_vector_vector());
     return static_cast<const IntVectorVectorType*>(get())->d_;
   }
 
-  const std::vector<double>& GenericType::asDoubleVector() const {
+  const std::vector<double>& GenericType::as_double_vector() const {
     casadi_assert(is_double_vector());
     return static_cast<const DoubleVectorType*>(get())->d_;
   }
 
-  const std::vector<std::string>& GenericType::asStringVector() const {
+  const std::vector<std::string>& GenericType::as_string_vector() const {
     casadi_assert(is_string_vector());
     return static_cast<const StringVectorType*>(get())->d_;
   }
 
-  const GenericType::Dict& GenericType::asDict() const {
+  const GenericType::Dict& GenericType::as_dict() const {
     casadi_assert(is_dict());
     return static_cast<const DictType*>(get())->d_;
   }
 
-  const Function& GenericType::asFunction() const {
+  const Function& GenericType::as_function() const {
     casadi_assert(is_function());
     return static_cast<const FunctionType*>(get())->d_;
   }
 
-  void* const & GenericType::asVoidPointer() const {
+  void* const & GenericType::as_void_pointer() const {
     casadi_assert(is_void_pointer());
     return static_cast<const VoidPointerType*>(get())->d_;
   }
 
   bool GenericType::to_bool() const {
     if (is_bool()) {
-      return asBool();
+      return as_bool();
     } else if (is_int()) {
       return static_cast<bool>(to_int());
     } else {
@@ -302,7 +302,7 @@ namespace casadi {
       return static_cast<int>(to_bool());
     } else {
       casadi_assert_message(is_int(), "type mismatch");
-      return asInt();
+      return as_int();
     }
   }
 
@@ -311,48 +311,48 @@ namespace casadi {
       return static_cast<double>(to_int());
     } else {
       casadi_assert_message(is_double(), "type mismatch");
-      return asDouble();
+      return as_double();
     }
   }
 
   string GenericType::to_string() const {
     casadi_assert_message(is_string(), "type mismatch");
-    return asString();
+    return as_string();
   }
 
   vector<int> GenericType::to_int_vector() const {
     casadi_assert_message(is_int_vector(), "type mismatch");
-    return asIntVector();
+    return as_int_vector();
   }
 
   vector<vector<int> > GenericType::to_int_vector_vector() const {
     casadi_assert_message(is_int_vector_vector(), "type mismatch");
-    return asIntVectorVector();
+    return as_int_vector_vector();
   }
 
   vector<double> GenericType::to_double_vector() const {
     casadi_assert_message(is_double_vector(), "type mismatch");
-    return asDoubleVector();
+    return as_double_vector();
   }
 
   vector<string> GenericType::to_string_vector() const {
     if (is_string()) {
-      std::string s = asString();
+      std::string s = as_string();
       return vector<string>(1, s);
     } else {
       casadi_assert_message(is_string_vector(), "type mismatch");
-      return asStringVector();
+      return as_string_vector();
     }
   }
 
   Dict GenericType::to_dict() const {
     casadi_assert_message(is_dict(), "type mismatch");
-    return asDict();
+    return as_dict();
   }
 
   Function GenericType::to_function() const {
     casadi_assert_message(is_function(), "type mismatch");
-    return asFunction();
+    return as_function();
   }
 
   bool GenericType::operator==(const GenericType& op2) const {
@@ -413,7 +413,7 @@ namespace casadi {
 
   void* GenericType::to_void_pointer() const {
     casadi_assert_message(getType()==OT_VOIDPTR, "type mismatch");
-    return asVoidPointer();
+    return as_void_pointer();
   }
 
   GenericType::GenericType(void* ptr) {

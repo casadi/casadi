@@ -105,8 +105,8 @@ namespace casadi {
     operator std::vector<std::vector<int> >() const { return to_int_vector_vector();}
     operator std::vector<double>() const { return to_double_vector();}
     operator std::vector<std::string>() const { return to_string_vector();}
-    operator const Function&() const { return asFunction();}
-    operator const Dict&() const { return asDict();}
+    operator const Function&() const { return as_function();}
+    operator const Dict&() const { return as_dict();}
     ///@}
 
     // Get type of object
@@ -133,17 +133,17 @@ namespace casadi {
 
     ///@{
     /** \brief Cast to the internal type */
-    const bool& asBool() const;
-    const int& asInt() const;
-    const double& asDouble() const;
-    const std::string& asString() const;
-    const std::vector<int>& asIntVector() const;
-    const std::vector<std::vector<int> >& asIntVectorVector() const;
-    const std::vector<double>& asDoubleVector() const;
-    const std::vector<std::string>& asStringVector() const;
-    const Dict& asDict() const;
-    const Function& asFunction() const;
-    void* const & asVoidPointer() const;
+    const bool& as_bool() const;
+    const int& as_int() const;
+    const double& as_double() const;
+    const std::string& as_string() const;
+    const std::vector<int>& as_int_vector() const;
+    const std::vector<std::vector<int> >& as_int_vector_vector() const;
+    const std::vector<double>& as_double_vector() const;
+    const std::vector<std::string>& as_string_vector() const;
+    const Dict& as_dict() const;
+    const Function& as_function() const;
+    void* const & as_void_pointer() const;
     ///@}
 
     ///@{
