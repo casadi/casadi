@@ -248,8 +248,8 @@ namespace casadi {
   }
 
   template<>
-  int SX::getNdeps() const {
-    return scalar().getNdeps();
+  int SX::n_dep() const {
+    return scalar().n_dep();
   }
 
   template<>

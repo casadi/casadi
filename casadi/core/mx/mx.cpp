@@ -643,7 +643,7 @@ namespace casadi {
 
   MX MX::dep(int ch) const { return (*this)->dep(ch); }
 
-  int MX::getNdeps() const { return (*this)->ndep(); }
+  int MX::n_dep() const { return (*this)->ndep(); }
 
   std::string MX::name() const { return (*this)->name(); }
 

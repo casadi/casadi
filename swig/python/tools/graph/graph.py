@@ -40,8 +40,8 @@ def equality(self,other):
   
 def getDeps(s):
   deps = []
-  if not(hasattr(s,'getNdeps')): return deps
-  for k in range(s.getNdeps()):
+  if not(hasattr(s,'n_dep')): return deps
+  for k in range(s.n_dep()):
     d = s.dep(k)
     d.__class__.__cmp__ = hashcompare
     d.__class__.__eq__  = equality

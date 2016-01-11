@@ -168,7 +168,7 @@ namespace casadi {
     MX getOutput(int oind=0) const;
 
     /** \brief Get the number of dependencies of a binary SXElem */
-    int getNdeps() const;
+    int n_dep() const;
 
     /// Get the name.
     std::string name() const;

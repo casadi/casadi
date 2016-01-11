@@ -504,8 +504,8 @@ namespace casadi {
       return node->dep(ch);
   }
 
-  int SXElem::getNdeps() const {
-    if (!hasDep()) throw CasadiException("SX::getNdeps: must be binary");
+  int SXElem::n_dep() const {
+    if (!hasDep()) throw CasadiException("SX::n_dep: must be binary");
     return casadi_math<double>::ndeps(op());
   }
 

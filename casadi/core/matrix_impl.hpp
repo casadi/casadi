@@ -1466,8 +1466,8 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  int Matrix<Scalar>::getNdeps() const {
-    throw CasadiException("\"getNdeps\" not defined for instantiation");
+  int Matrix<Scalar>::n_dep() const {
+    throw CasadiException("\"n_dep\" not defined for instantiation");
   }
 
   template<typename Scalar>
@@ -2606,7 +2606,7 @@ namespace casadi {
   template<> std::vector<double> SX::nonzeros() const;
   template<> std::vector<int> SX::nonzeros_int() const;
   template<> SX SX::dep(int ch) const;
-  template<> int SX::getNdeps() const;
+  template<> int SX::n_dep() const;
   template<> std::string SX::name() const;
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();

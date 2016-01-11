@@ -174,7 +174,7 @@ namespace casadi {
     bool isDoubled() const;
 
     /** \brief Get the number of dependencies of a binary SXElem */
-    int getNdeps() const;
+    int n_dep() const;
 
     /** \brief Returns a number that is unique for a given SXNode.
      * If the SXElem does not point to any node, 0 is returned.

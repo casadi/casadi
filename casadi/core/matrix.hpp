@@ -961,7 +961,7 @@ namespace casadi {
     /** \brief Get the number of dependencies of a binary SXElem
         Only defined if symbolic scalar.
     */
-    int getNdeps() const;
+    int n_dep() const;
 
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
