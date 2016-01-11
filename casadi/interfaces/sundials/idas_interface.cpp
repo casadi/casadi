@@ -98,7 +98,7 @@ namespace casadi {
 
     // Get initial conditions for the state derivatives
     if (hasSetOption("init_xdot") && !option("init_xdot").isNull()) {
-      init_xdot_ = option("init_xdot").toDoubleVector();
+      init_xdot_ = option("init_xdot").to_double_vector();
       casadi_assert_message(
         init_xdot_.size()==nx_,
         "Option \"init_xdot\" has incorrect length. Expecting " << nx_
@@ -188,7 +188,7 @@ namespace casadi {
     if (flag != IDA_SUCCESS) idas_error("IDASetUserDataB", flag);
 
     // Maximum number of steps
-    IDASetMaxNumStepsB(m.mem, m.whichB, option("max_num_steps").toInt());
+    IDASetMaxNumStepsB(m.mem, m.whichB, option("max_num_steps").to_int());
     if (flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB", flag);
 
     // Set algebraic components
@@ -225,7 +225,7 @@ namespace casadi {
     if (flag!=IDA_SUCCESS) idas_error("IDAQuadInitB", flag);
 
     // Quadrature error control
-    if (option("quad_err_con").toInt()) {
+    if (option("quad_err_con").to_int()) {
       flag = IDASetQuadErrConB(m.mem, m.whichB, true);
       if (flag != IDA_SUCCESS) idas_error("IDASetQuadErrConB", flag);
 
@@ -489,11 +489,11 @@ namespace casadi {
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetErrHandlerFn");
 
     // Include algebraic variables in error testing
-    flag = IDASetSuppressAlg(m.mem, option("suppress_algebraic").toInt());
+    flag = IDASetSuppressAlg(m.mem, option("suppress_algebraic").to_int());
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetSuppressAlg");
 
     // Maxinum order for the multistep method
-    flag = IDASetMaxOrd(m.mem, option("max_multistep_order").toInt());
+    flag = IDASetMaxOrd(m.mem, option("max_multistep_order").to_int());
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetMaxOrd");
 
     // Set user data
@@ -501,12 +501,12 @@ namespace casadi {
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetUserData");
 
     // Set maximum step size
-    flag = IDASetMaxStep(m.mem, option("max_step_size").toDouble());
+    flag = IDASetMaxStep(m.mem, option("max_step_size").to_double());
     casadi_assert_message(flag == IDA_SUCCESS, "IDASetMaxStep");
 
     if (hasSetOption("abstolv")) {
       // Vector absolute tolerances
-      vector<double> abstolv = option("abstolv").toDoubleVector();
+      vector<double> abstolv = option("abstolv").to_double_vector();
       N_Vector nv_abstol = N_VMake_Serial(abstolv.size(), get_ptr(abstolv));
       flag = IDASVtolerances(m.mem, reltol_, nv_abstol);
       casadi_assert_message(flag == IDA_SUCCESS, "IDASVtolerances");
@@ -518,7 +518,7 @@ namespace casadi {
     }
 
     // Maximum number of steps
-    IDASetMaxNumSteps(m.mem, option("max_num_steps").toInt());
+    IDASetMaxNumSteps(m.mem, option("max_num_steps").to_int());
     if (flag != IDA_SUCCESS) idas_error("IDASetMaxNumSteps", flag);
 
     // Set algebraic components
@@ -558,7 +558,7 @@ namespace casadi {
       if (flag != IDA_SUCCESS) idas_error("IDAQuadInit", flag);
 
       // Should the quadrature errors be used for step size control?
-      if (option("quad_err_con").toInt()) {
+      if (option("quad_err_con").to_int()) {
         flag = IDASetQuadErrCon(m.mem, true);
         casadi_assert_message(flag == IDA_SUCCESS, "IDASetQuadErrCon");
 

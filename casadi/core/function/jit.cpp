@@ -50,8 +50,8 @@ namespace casadi {
     FunctionInternal::init();
 
     // Read options
-    if (hasSetOption("jac")) jac_body_ = option("jac").toString();
-    if (hasSetOption("hess")) hess_body_ = option("hess").toString();
+    if (hasSetOption("jac")) jac_body_ = option("jac").to_string();
+    if (hasSetOption("hess")) hess_body_ = option("hess").to_string();
   }
 
   Jit::~Jit() {

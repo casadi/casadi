@@ -97,14 +97,14 @@ namespace casadi {
 
     ///@{
     /// Implicit typecasting
-    operator bool() const { return toBool();}
-    operator int() const { return toInt();}
-    operator double() const { return toDouble();}
-    operator std::string() const { return toString();}
-    operator std::vector<int>() const { return toIntVector();}
-    operator std::vector<std::vector<int> >() const { return toIntVectorVector();}
-    operator std::vector<double>() const { return toDoubleVector();}
-    operator std::vector<std::string>() const { return toStringVector();}
+    operator bool() const { return to_bool();}
+    operator int() const { return to_int();}
+    operator double() const { return to_double();}
+    operator std::string() const { return to_string();}
+    operator std::vector<int>() const { return to_int_vector();}
+    operator std::vector<std::vector<int> >() const { return to_int_vector_vector();}
+    operator std::vector<double>() const { return to_double_vector();}
+    operator std::vector<std::string>() const { return to_string_vector();}
     operator const Function&() const { return asFunction();}
     operator const Dict&() const { return asDict();}
     ///@}
@@ -148,17 +148,17 @@ namespace casadi {
 
     ///@{
     //! \brief Convert to a type
-    bool toBool() const;
-    int toInt() const;
-    double toDouble() const;
-    std::string toString() const;
-    std::vector<int> toIntVector() const;
-    std::vector< std::vector<int> > toIntVectorVector() const;
-    std::vector<double> toDoubleVector() const;
-    std::vector<std::string> toStringVector() const;
-    Dict toDict() const;
-    Function toFunction() const;
-    void* toVoidPointer() const;
+    bool to_bool() const;
+    int to_int() const;
+    double to_double() const;
+    std::string to_string() const;
+    std::vector<int> to_int_vector() const;
+    std::vector< std::vector<int> > to_int_vector_vector() const;
+    std::vector<double> to_double_vector() const;
+    std::vector<std::string> to_string_vector() const;
+    Dict to_dict() const;
+    Function to_function() const;
+    void* to_void_pointer() const;
     ///@}
 
     //! \brief Equality

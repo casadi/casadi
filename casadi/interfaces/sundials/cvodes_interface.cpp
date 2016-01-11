@@ -162,7 +162,7 @@ namespace casadi {
     flag = CVodeQuadInitB(m.mem, m.whichB, rhsQB_wrapper, m.rq);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB", flag);
 
-    if (option("quad_err_con").toInt()) {
+    if (option("quad_err_con").to_int()) {
       flag = CVodeSetQuadErrConB(m.mem, m.whichB, true);
       if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB", flag);
 
@@ -196,7 +196,7 @@ namespace casadi {
     if (flag!=CV_SUCCESS) cvodes_error("CVodeInit", flag);
 
     // Maximum number of steps
-    CVodeSetMaxNumSteps(m.mem, option("max_num_steps").toInt());
+    CVodeSetMaxNumSteps(m.mem, option("max_num_steps").to_int());
     if (flag != CV_SUCCESS) cvodes_error("CVodeSetMaxNumSteps", flag);
 
     // attach a linear solver
@@ -226,7 +226,7 @@ namespace casadi {
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadInit", flag);
 
       // Should the quadrature errors be used for step size control?
-      if (option("quad_err_con").toInt()) {
+      if (option("quad_err_con").to_int()) {
         flag = CVodeSetQuadErrCon(m.mem, true);
         if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrCon", flag);
 

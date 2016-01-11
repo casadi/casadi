@@ -64,10 +64,10 @@ namespace casadi {
     casadi_assert(nrow()==ncol());
 
     // Equilibrate?
-    equilibriate_ = option("equilibration").toInt();
+    equilibriate_ = option("equilibration").to_int();
 
     // Allow equilibration failures
-    allow_equilibration_failure_ = option("allow_equilibration_failure").toInt();
+    allow_equilibration_failure_ = option("allow_equilibration_failure").to_int();
   }
 
   Memory* LapackLu::memory() const {

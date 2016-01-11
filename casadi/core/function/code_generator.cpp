@@ -53,7 +53,7 @@ namespace casadi {
       } else if (it->first=="main") {
         this->main = it->second;
       } else if (it->first=="real_t") {
-        this->real_t = it->second.toString();
+        this->real_t = it->second.to_string();
       } else if (it->first=="codegen_scalars") {
         this->codegen_scalars = it->second;
       } else if (it->first=="with_header") {

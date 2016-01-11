@@ -126,7 +126,7 @@ namespace casadi {
 
     verbose_ = option("verbose");
     jit_ = option("jit");
-    compilerplugin_ = option("compiler").toString();
+    compilerplugin_ = option("compiler").to_string();
     if (hasSetOption("jit_options")) jit_options_ = option("jit_options");
     regularity_check_ = option("regularity_check");
 
@@ -144,7 +144,7 @@ namespace casadi {
     jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(n_out, n_in));
 
     if (hasSetOption("user_data")) {
-      user_data_ = option("user_data").toVoidPointer();
+      user_data_ = option("user_data").to_void_pointer();
     }
 
     // Pass monitors

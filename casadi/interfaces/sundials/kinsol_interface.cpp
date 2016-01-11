@@ -157,7 +157,7 @@ namespace casadi {
       }
     } else if (option("linear_solver_type")=="iterative") {
       linear_solver_type_ = ITERATIVE;
-      maxl_ = option("max_krylov").toInt();
+      maxl_ = option("max_krylov").to_int();
       if (option("iterative_solver")=="gmres") {
         iterative_solver_ = GMRES;
       } else if (option("iterative_solver")=="bcgstab") {

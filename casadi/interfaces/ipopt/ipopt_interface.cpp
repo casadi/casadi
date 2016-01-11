@@ -187,13 +187,13 @@ namespace casadi {
       bool ret;
       switch (ipopt_type) {
       case Ipopt::OT_Number:
-        ret = (*app)->Options()->SetNumericValue(op.first, op.second.toDouble(), false);
+        ret = (*app)->Options()->SetNumericValue(op.first, op.second.to_double(), false);
         break;
       case Ipopt::OT_Integer:
-        ret = (*app)->Options()->SetIntegerValue(op.first, op.second.toInt(), false);
+        ret = (*app)->Options()->SetIntegerValue(op.first, op.second.to_int(), false);
         break;
       case Ipopt::OT_String:
-        ret = (*app)->Options()->SetStringValue(op.first, op.second.toString(), false);
+        ret = (*app)->Options()->SetStringValue(op.first, op.second.to_string(), false);
         break;
       case Ipopt::OT_Unknown:
       default:

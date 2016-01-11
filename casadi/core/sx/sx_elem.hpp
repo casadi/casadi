@@ -77,7 +77,7 @@ namespace casadi {
     /** \brief Create a symbolic primitive
          \param name Name of the symbolic primitive
 
-        This is the name that will be used by the "operator<<" and "toString" methods.
+        This is the name that will be used by the "operator<<" and "to_string" methods.
         The name is not used as identifier; you may construct distinct
         SXElem objects with non-unique names.
     */

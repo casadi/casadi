@@ -73,8 +73,8 @@ namespace casadi {
 
   void ShellCompiler::init() {
     // Read options
-    string compiler = option("compiler").toString();
-    string compiler_setup = option("compiler_setup").toString();
+    string compiler = option("compiler").to_string();
+    string compiler_setup = option("compiler_setup").to_string();
     vector<string> flags;
     if (hasSetOption("flags")) flags = option("flags");
 

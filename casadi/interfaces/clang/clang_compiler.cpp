@@ -179,7 +179,7 @@ namespace casadi {
 
     // Search path
     std::stringstream paths;
-    paths << option("include_path").toString() << pathsep;
+    paths << option("include_path").to_string() << pathsep;
     std::string path;
     while (std::getline(paths, path, pathsep)) {
       compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);
