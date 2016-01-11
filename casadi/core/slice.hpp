@@ -41,6 +41,12 @@ namespace casadi {
    */
   class CASADI_EXPORT Slice : public PrintableObject<Slice> {
   public:
+    /// start value: negative values will get added to length
+    int start_;
+    /// stop value: use std::numeric_limits<int>::max() to indicate unboundedness
+    int stop_;
+    int step_;
+
     /// Default constructor - all elements
     Slice();
 
@@ -49,18 +55,6 @@ namespace casadi {
 
     /// A slice
     Slice(int start, int stop, int step=1);
-
-    /// Construct from an index vector (requires isSlice(v) to be true)
-    explicit Slice(const std::vector<int>& v, bool ind1=false);
-
-    /// Construct nested slices from an index vector (requires isSlice2(v) to be true)
-    explicit Slice(const std::vector<int>& v, Slice& outer);
-
-    /// Check if an index vector can be represented more efficiently as a slice
-    static bool isSlice(const std::vector<int>& v, bool ind1=false);
-
-    /// Check if an index vector can be represented more efficiently as two nested slices
-    static bool isSlice2(const std::vector<int>& v);
 
     /// Get a vector of indices
     std::vector<int> getAll(int len, bool ind1=false) const;
@@ -86,13 +80,19 @@ namespace casadi {
 
     /// Print a description of the object
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
-
-    /// start value: negative values will get added to length
-    int start_;
-    /// stop value: use std::numeric_limits<int>::max() to indicate unboundedness
-    int stop_;
-    int step_;
   };
+
+  /// Construct from an index vector (requires is_slice(v) to be true)
+  Slice CASADI_EXPORT to_slice(const std::vector<int>& v, bool ind1=false);
+
+  /// Construct nested slices from an index vector (requires is_slice2(v) to be true)
+  std::pair<Slice, Slice> CASADI_EXPORT to_slice2(const std::vector<int>& v);
+
+  /// Check if an index vector can be represented more efficiently as a slice
+  bool CASADI_EXPORT is_slice(const std::vector<int>& v, bool ind1=false);
+
+  /// Check if an index vector can be represented more efficiently as two nested slices
+  bool CASADI_EXPORT is_slice2(const std::vector<int>& v);
 
 #ifndef SWIG
   static Slice ALL;

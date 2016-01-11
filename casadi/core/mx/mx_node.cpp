@@ -452,12 +452,11 @@ namespace casadi {
       return MX::zeros(sp);
     } else {
       MX ret;
-      if (Slice::isSlice(nz)) {
-        ret = MX::create(new GetNonzerosSlice(sp, shared_from_this<MX>(), Slice(nz)));
-      } else if (Slice::isSlice2(nz)) {
-        Slice outer;
-        Slice inner(nz, outer);
-        ret = MX::create(new GetNonzerosSlice2(sp, shared_from_this<MX>(), inner, outer));
+      if (is_slice(nz)) {
+        ret = MX::create(new GetNonzerosSlice(sp, shared_from_this<MX>(), to_slice(nz)));
+      } else if (is_slice2(nz)) {
+        pair<Slice, Slice> sl = to_slice2(nz);
+        ret = MX::create(new GetNonzerosSlice2(sp, shared_from_this<MX>(), sl.first, sl.second));
       } else {
         ret = MX::create(new GetNonzerosVector(sp, shared_from_this<MX>(), nz));
       }
@@ -479,12 +478,11 @@ namespace casadi {
 
     // Check if slice
     MX ret;
-    if (Slice::isSlice(nz)) {
-      ret = MX::create(new SetNonzerosSlice<false>(y, shared_from_this<MX>(), Slice(nz)));
-    } else if (Slice::isSlice2(nz)) {
-      Slice outer;
-      Slice inner(nz, outer);
-      ret = MX::create(new SetNonzerosSlice2<false>(y, shared_from_this<MX>(), inner, outer));
+    if (is_slice(nz)) {
+      ret = MX::create(new SetNonzerosSlice<false>(y, shared_from_this<MX>(), to_slice(nz)));
+    } else if (is_slice2(nz)) {
+      pair<Slice, Slice> sl = to_slice2(nz);
+      ret = MX::create(new SetNonzerosSlice2<false>(y, shared_from_this<MX>(), sl.first, sl.second));
     } else {
       ret = MX::create(new SetNonzerosVector<false>(y, shared_from_this<MX>(), nz));
     }
@@ -497,12 +495,11 @@ namespace casadi {
       return y;
     } else {
       MX ret;
-      if (Slice::isSlice(nz)) {
-        ret = MX::create(new SetNonzerosSlice<true>(y, shared_from_this<MX>(), Slice(nz)));
-      } else if (Slice::isSlice2(nz)) {
-        Slice outer;
-        Slice inner(nz, outer);
-        ret = MX::create(new SetNonzerosSlice2<true>(y, shared_from_this<MX>(), inner, outer));
+      if (is_slice(nz)) {
+        ret = MX::create(new SetNonzerosSlice<true>(y, shared_from_this<MX>(), to_slice(nz)));
+      } else if (is_slice2(nz)) {
+        pair<Slice, Slice> sl = to_slice2(nz);
+        ret = MX::create(new SetNonzerosSlice2<true>(y, shared_from_this<MX>(), sl.first, sl.second));
       } else {
         ret = MX::create(new SetNonzerosVector<true>(y, shared_from_this<MX>(), nz));
       }

@@ -89,23 +89,48 @@ namespace casadi {
     if (trailing_newline) stream << std::endl;
   }
 
-  Slice::Slice(const std::vector<int>& v, bool ind1) {
-    casadi_assert_message(isSlice(v, ind1), "Cannot be represented as a Slice");
-    if (v.size()==0) {
-      start_=stop_=0;
-      step_ = 1;
-    } else if (v.size()==1) {
-      start_ = v.front()-ind1;
-      stop_ = start_ + 1;
-      step_ = 1;
-    } else {
-      start_ = v[0]-ind1;
-      step_ = v[1]-v[0];
-      stop_ = start_ + step_*v.size();
+  std::vector<int> Slice::getAll(const Slice& outer, int len) const {
+    std::vector<int> ret;
+    for (int i=outer.start_; i!=outer.stop_; i+=outer.step_) {
+      for (int j=i+start_; j!=i+stop_; j+=step_) {
+        ret.push_back(j);
+      }
     }
+    return ret;
   }
 
-  bool Slice::isSlice(const std::vector<int>& v, bool ind1) {
+  bool Slice::is_scalar(int len) const {
+    int start = std::min(start_, len);
+    int stop = std::min(stop_, len);
+    int nret = (stop-start)/step_ + ((stop-start)%step_!=0);
+    return nret==1;
+  }
+
+  int Slice::scalar(int len) const {
+    casadi_assert(is_scalar(len));
+    casadi_assert_message(start_ >= -len && start_ < len, "Slice::getScalar: out of bounds");
+    return start_ >= 0 ? start_ : start_+len;
+  }
+
+  Slice CASADI_EXPORT to_slice(const std::vector<int>& v, bool ind1) {
+    Slice r;
+    casadi_assert_message(is_slice(v, ind1), "Cannot be represented as a Slice");
+    if (v.size()==0) {
+      r.start_=r.stop_=0;
+      r.step_ = 1;
+    } else if (v.size()==1) {
+      r.start_ = v.front()-ind1;
+      r.stop_ = r.start_ + 1;
+      r.step_ = 1;
+    } else {
+      r.start_ = v[0]-ind1;
+      r.step_ = v[1]-v[0];
+      r.stop_ = r.start_ + r.step_*v.size();
+    }
+    return r;
+  }
+
+  bool CASADI_EXPORT is_slice(const std::vector<int>& v, bool ind1) {
     // Always false if negative numbers or non-increasing
     int last_v = -1;
     for (int i=0; i<v.size(); ++i) {
@@ -137,9 +162,9 @@ namespace casadi {
     return true;
   }
 
-  bool Slice::isSlice2(const std::vector<int>& v) {
+  bool CASADI_EXPORT is_slice2(const std::vector<int>& v) {
     // Always true if 1D slice
-    if (isSlice(v)) return true;
+    if (is_slice(v)) return true;
 
     // Always false if negative numbers or non-increasing
     int last_v = -1;
@@ -190,28 +215,29 @@ namespace casadi {
     return true;
   }
 
-  Slice::Slice(const std::vector<int>& v, Slice& outer) {
-    casadi_assert_message(isSlice2(v), "Cannot be represented as a nested Slice");
+  std::pair<Slice, Slice> CASADI_EXPORT to_slice2(const std::vector<int>& v) {
+    casadi_assert_message(is_slice2(v), "Cannot be represented as a nested Slice");
+    Slice inner, outer;
 
     // If simple slice
-    if (isSlice(v)) {
-      *this = Slice(v);
+    if (is_slice(v)) {
+      inner = to_slice(v);
       outer.start_ = 0;
-      outer.step_ = outer.stop_ = stop_;
-      return;
+      outer.step_ = outer.stop_ = inner.stop_;
+      return make_pair(inner, outer);
     }
 
     // Get the slices
     outer.start_ = 0;
     outer.step_ = -1;
-    start_ = v.front();
-    step_ = v[1]-v[0];
-    stop_ = -1;
+    inner.start_ = v.front();
+    inner.step_ = v[1]-v[0];
+    inner.stop_ = -1;
     for (int i=2; i<v.size(); ++i) {
-      int predicted_v = start_+i*step_;
+      int predicted_v = inner.start_+i*inner.step_;
       if (v[i]!=predicted_v) {
-        stop_ = predicted_v;
-        outer.step_ = v[i] - start_;
+        inner.stop_ = predicted_v;
+        outer.step_ = v[i] - inner.start_;
         break;
       }
     }
@@ -222,29 +248,7 @@ namespace casadi {
       if (outer.step_>0) outer.stop_++;
       else              outer.stop_--;
     } while (outer.stop_ % outer.step_!=0);
-  }
-
-  std::vector<int> Slice::getAll(const Slice& outer, int len) const {
-    std::vector<int> ret;
-    for (int i=outer.start_; i!=outer.stop_; i+=outer.step_) {
-      for (int j=i+start_; j!=i+stop_; j+=step_) {
-        ret.push_back(j);
-      }
-    }
-    return ret;
-  }
-
-  bool Slice::is_scalar(int len) const {
-    int start = std::min(start_, len);
-    int stop = std::min(stop_, len);
-    int nret = (stop-start)/step_ + ((stop-start)%step_!=0);
-    return nret==1;
-  }
-
-  int Slice::scalar(int len) const {
-    casadi_assert(is_scalar(len));
-    casadi_assert_message(start_ >= -len && start_ < len, "Slice::getScalar: out of bounds");
-    return start_ >= 0 ? start_ : start_+len;
+    return make_pair(inner, outer);
   }
 
 } // namespace casadi
