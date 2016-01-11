@@ -64,21 +64,21 @@ namespace casadi {
     }
 
     // Fall back on IM-IM
-    get(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    get(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
   }
 
   template<typename Scalar>
   void Matrix<Scalar>::get(Matrix<Scalar>& m, bool ind1,
                                 const Slice& rr, const Matrix<int>& cc) const {
     // Fall back on IM-IM
-    get(m, ind1, rr.getAll(size1(), ind1), cc);
+    get(m, ind1, rr.all(size1(), ind1), cc);
   }
 
   template<typename Scalar>
   void Matrix<Scalar>::get(Matrix<Scalar>& m, bool ind1,
                                 const Matrix<int>& rr, const Slice& cc) const {
     // Fall back on IM-IM
-    get(m, ind1, rr, cc.getAll(size2(), ind1));
+    get(m, ind1, rr, cc.all(size2(), ind1));
   }
 
   template<typename Scalar>
@@ -119,7 +119,7 @@ namespace casadi {
     }
 
     // Fall back on IM
-    get(m, ind1, rr.getAll(numel(), ind1));
+    get(m, ind1, rr.all(numel(), ind1));
   }
 
   template<typename Scalar>
@@ -171,21 +171,21 @@ namespace casadi {
     }
 
     // Fall back on (IM, IM)
-    set(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    set(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
   }
 
   template<typename Scalar>
   void Matrix<Scalar>::set(const Matrix<Scalar>& m, bool ind1,
                              const Slice& rr, const Matrix<int>& cc) {
     // Fall back on (IM, IM)
-    set(m, ind1, rr.getAll(size1(), ind1), cc);
+    set(m, ind1, rr.all(size1(), ind1), cc);
   }
 
   template<typename Scalar>
   void Matrix<Scalar>::set(const Matrix<Scalar>& m, bool ind1,
                                 const Matrix<int>& rr, const Slice& cc) {
     // Fall back on (IM, IM)
-    set(m, ind1, rr, cc.getAll(size2(), ind1));
+    set(m, ind1, rr, cc.all(size2(), ind1));
   }
 
   template<typename Scalar>
@@ -281,7 +281,7 @@ namespace casadi {
     }
 
     // Fall back on IM
-    set(m, ind1, rr.getAll(numel(), ind1));
+    set(m, ind1, rr.all(numel(), ind1));
   }
 
   template<typename Scalar>
@@ -387,7 +387,7 @@ namespace casadi {
     }
 
     // Fall back on IM
-    get_nz(m, ind1, kk.getAll(nnz(), ind1));
+    get_nz(m, ind1, kk.all(nnz(), ind1));
   }
 
   template<typename Scalar>
@@ -433,7 +433,7 @@ namespace casadi {
     }
 
     // Fallback on IM
-    set_nz(m, ind1, kk.getAll(nnz(), ind1));
+    set_nz(m, ind1, kk.all(nnz(), ind1));
   }
 
   template<typename Scalar>

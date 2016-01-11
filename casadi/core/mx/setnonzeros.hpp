@@ -49,7 +49,7 @@ namespace casadi {
     virtual ~SetNonzeros() = 0;
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const = 0;
+    virtual std::vector<int> all() const = 0;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
@@ -88,7 +88,7 @@ namespace casadi {
     virtual ~SetNonzerosVector() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return nz_;}
+    virtual std::vector<int> all() const { return nz_;}
 
     /// Evaluate the function (template)
     template<typename T>
@@ -132,7 +132,7 @@ namespace casadi {
     virtual ~SetNonzerosSlice() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return s_.getAll(s_.stop_);}
+    virtual std::vector<int> all() const { return s_.all(s_.stop_);}
 
     /// Check if the instance is in fact a simple assignment
     bool isAssignment() const;
@@ -183,7 +183,7 @@ namespace casadi {
     virtual ~SetNonzerosSlice2() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return inner_.getAll(outer_, outer_.stop_);}
+    virtual std::vector<int> all() const { return inner_.all(outer_, outer_.stop_);}
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);

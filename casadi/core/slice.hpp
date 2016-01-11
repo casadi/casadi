@@ -57,10 +57,10 @@ namespace casadi {
     Slice(int start, int stop, int step=1);
 
     /// Get a vector of indices
-    std::vector<int> getAll(int len, bool ind1=false) const;
+    std::vector<int> all(int len, bool ind1=false) const;
 
     /// Get a vector of indices (nested slice)
-    std::vector<int> getAll(const Slice& outer, int len) const;
+    std::vector<int> all(const Slice& outer, int len) const;
 
     /// Is the slice a scalar
     bool is_scalar(int len) const;

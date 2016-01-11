@@ -43,7 +43,7 @@ namespace casadi {
   Slice::Slice(int start, int stop, int step) : start_(start), stop_(stop), step_(step) {
   }
 
-  std::vector<int> Slice::getAll(int len, bool ind1) const {
+  std::vector<int> Slice::all(int len, bool ind1) const {
     int start;
     int stop;
     if (start_==std::numeric_limits<int>::min()) {
@@ -89,7 +89,7 @@ namespace casadi {
     if (trailing_newline) stream << std::endl;
   }
 
-  std::vector<int> Slice::getAll(const Slice& outer, int len) const {
+  std::vector<int> Slice::all(const Slice& outer, int len) const {
     std::vector<int> ret;
     for (int i=outer.start_; i!=outer.stop_; i+=outer.step_) {
       for (int j=i+start_; j!=i+stop_; j+=step_) {

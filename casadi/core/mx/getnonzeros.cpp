@@ -182,7 +182,7 @@ namespace casadi {
 
   void GetNonzeros::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get all the nonzeros
-    vector<int> nz = getAll();
+    vector<int> nz = all();
 
     // Output sparsity
     const Sparsity& osp = sparsity();
@@ -253,7 +253,7 @@ namespace casadi {
   void GetNonzeros::evalFwd(const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens) {
     // Get all the nonzeros
-    vector<int> nz = getAll();
+    vector<int> nz = all();
 
     // Number of derivative directions
     int nfwd = fsens.size();
@@ -335,7 +335,7 @@ namespace casadi {
   void GetNonzeros::evalAdj(const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens) {
     // Get all the nonzeros
-    vector<int> nz = getAll();
+    vector<int> nz = all();
 
     // Number of derivative directions
     int nadj = aseed.size();
@@ -417,7 +417,7 @@ namespace casadi {
   }
 
   Matrix<int> GetNonzeros::mapping() const {
-    vector<int> nz = getAll();
+    vector<int> nz = all();
     return Matrix<int>(sparsity(), nz, false);
   }
 
@@ -457,7 +457,7 @@ namespace casadi {
 
   MX GetNonzeros::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
     // Get all the nonzeros
-    vector<int> nz_all = getAll();
+    vector<int> nz_all = all();
 
     // Eliminate recursive calls
     vector<int> nz_new(nz);

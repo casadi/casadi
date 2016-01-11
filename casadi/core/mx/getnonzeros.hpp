@@ -61,7 +61,7 @@ namespace casadi {
     virtual Matrix<int> mapping() const;
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const = 0;
+    virtual std::vector<int> all() const = 0;
 
     /** \brief Get the operation */
     virtual int op() const { return OP_GETNONZEROS;}
@@ -80,7 +80,7 @@ namespace casadi {
     virtual ~GetNonzerosVector() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return nz_;}
+    virtual std::vector<int> all() const { return nz_;}
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
@@ -123,7 +123,7 @@ namespace casadi {
     virtual ~GetNonzerosSlice() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return s_.getAll(s_.stop_);}
+    virtual std::vector<int> all() const { return s_.all(s_.stop_);}
 
     /// Check if the instance is in fact an identity mapping (that can be simplified)
     bool is_identity() const;
@@ -173,7 +173,7 @@ namespace casadi {
     virtual ~GetNonzerosSlice2() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return inner_.getAll(outer_, outer_.stop_);}
+    virtual std::vector<int> all() const { return inner_.all(outer_, outer_.stop_);}
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);

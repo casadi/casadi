@@ -126,17 +126,17 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const Slice& cc) const {
     // Fall back on (IM, IM)
-    return get(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    return get(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
   }
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) const {
     // Fall back on (IM, IM)
-    get(m, ind1, rr.getAll(size1(), ind1), cc);
+    get(m, ind1, rr.all(size1(), ind1), cc);
   }
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) const {
     // Fall back on (IM, IM)
-    get(m, ind1, rr, cc.getAll(size2(), ind1));
+    get(m, ind1, rr, cc.all(size2(), ind1));
   }
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
@@ -156,7 +156,7 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Slice& rr) const {
     // Fall back on IM
-    get(m, ind1, rr.getAll(numel(), ind1));
+    get(m, ind1, rr.all(numel(), ind1));
   }
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr) const {
@@ -187,17 +187,17 @@ namespace casadi {
 
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
     // Fall back on (IM, IM)
-    set(m, ind1, rr.getAll(size1(), ind1), cc.getAll(size2(), ind1));
+    set(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Matrix<int>& cc) {
     // Fall back on (IM, IM)
-    set(m, ind1, rr.getAll(size1(), ind1), cc);
+    set(m, ind1, rr.all(size1(), ind1), cc);
   }
 
   void MX::set(const MX& m, bool ind1, const Matrix<int>& rr, const Slice& cc) {
     // Fall back on (IM, IM)
-    set(m, ind1, rr, cc.getAll(size2(), ind1));
+    set(m, ind1, rr, cc.all(size2(), ind1));
   }
 
   void MX::set(const MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) {
@@ -272,7 +272,7 @@ namespace casadi {
 
   void MX::set(const MX& m, bool ind1, const Slice& rr) {
     // Fall back on IM
-    set(m, ind1, rr.getAll(size1(), ind1));
+    set(m, ind1, rr.all(size1(), ind1));
   }
 
   void MX::set(const MX& m, bool ind1, const Matrix<int>& rr) {
@@ -362,7 +362,7 @@ namespace casadi {
 
   void MX::get_nz(MX& m, bool ind1, const Slice& kk) const {
     // Fallback on IM
-    get_nz(m, ind1, kk.getAll(nnz(), ind1));
+    get_nz(m, ind1, kk.all(nnz(), ind1));
   }
 
   void MX::get_nz(MX& m, bool ind1, const Matrix<int>& kk) const {
@@ -405,7 +405,7 @@ namespace casadi {
 
   void MX::set_nz(const MX& m, bool ind1, const Slice& kk) {
     // Fallback on IM
-    set_nz(m, ind1, kk.getAll(nnz(), ind1));
+    set_nz(m, ind1, kk.all(nnz(), ind1));
   }
 
   void MX::set_nz(const MX& m, bool ind1, const Matrix<int>& kk) {

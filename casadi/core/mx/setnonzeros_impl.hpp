@@ -66,7 +66,7 @@ namespace casadi {
   template<bool Add>
   void SetNonzeros<Add>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     // Get all the nonzeros
-    vector<int> nz = getAll();
+    vector<int> nz = all();
 
     // Output sparsity
     const Sparsity &osp = sparsity();
@@ -189,7 +189,7 @@ namespace casadi {
   void SetNonzeros<Add>::evalFwd(const std::vector<std::vector<MX> >& fseed,
                                  std::vector<std::vector<MX> >& fsens) {
     // Get all the nonzeros
-    vector<int> nz = getAll();
+    vector<int> nz = all();
 
     // Number of derivative directions
     int nfwd = fsens.size();
@@ -322,7 +322,7 @@ namespace casadi {
   void SetNonzeros<Add>::evalAdj(const std::vector<std::vector<MX> >& aseed,
                                  std::vector<std::vector<MX> >& asens) {
     // Get all the nonzeros
-    vector<int> nz = getAll();
+    vector<int> nz = all();
 
     // Number of derivative directions
     int nadj = aseed.size();
@@ -664,7 +664,7 @@ namespace casadi {
 
   template<bool Add>
   Matrix<int> SetNonzeros<Add>::mapping() const {
-    vector<int> nz = getAll();
+    vector<int> nz = all();
     return Matrix<int>(this->dep(1).sparsity(), nz, false);
   }
 
