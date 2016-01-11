@@ -38,7 +38,7 @@ using namespace std;
 
 namespace casadi {
   FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
-    addOption("verbose",                  OT_BOOLEAN,             false,
+    addOption("verbose",                  OT_BOOL,             false,
               "Verbose evaluation -- for debugging");
     addOption("ad_weight",                OT_DOUBLE,                GenericType(),
               "Weighting factor for derivative calculation."
@@ -67,15 +67,15 @@ namespace casadi {
               "the function or pass additional information");
     addOption("monitor",                  OT_STRINGVECTOR,        GenericType(),
               "Monitors to be activated", "inputs|outputs");
-    addOption("regularity_check",         OT_BOOLEAN,             true,
+    addOption("regularity_check",         OT_BOOL,             true,
               "Throw exceptions when NaN or Inf appears during evaluation");
-    addOption("inputs_check",             OT_BOOLEAN,             true,
+    addOption("inputs_check",             OT_BOOL,             true,
               "Throw exceptions when the numerical values of the inputs don't make sense");
-    addOption("gather_stats",             OT_BOOLEAN,             false,
+    addOption("gather_stats",             OT_BOOL,             false,
               "Flag to indicate whether statistics must be gathered");
     addOption("input_scheme", OT_STRINGVECTOR, GenericType(), "Custom input scheme");
     addOption("output_scheme", OT_STRINGVECTOR, GenericType(), "Custom output scheme");
-    addOption("jit", OT_BOOLEAN, false, "Use just-in-time compiler to speed up the evaluation");
+    addOption("jit", OT_BOOL, false, "Use just-in-time compiler to speed up the evaluation");
     addOption("compiler", OT_STRING, "clang", "Just-in-time compiler plugin to be used.");
     addOption("jit_options", OT_DICT, GenericType(), "Options to be passed to the jit compiler.");
 

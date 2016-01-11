@@ -78,9 +78,9 @@ namespace casadi {
               "Size of memory to store history of merit function values");
     addOption("lbfgs_memory",      OT_INT,     10,
               "Size of L-BFGS memory.");
-    addOption("regularize",        OT_BOOLEAN,  false,
+    addOption("regularize",        OT_BOOL,  false,
               "Automatic regularization of Lagrange Hessian.");
-    addOption("print_header",      OT_BOOLEAN,   true,
+    addOption("print_header",      OT_BOOL,   true,
               "Print the header with problem statistics");
     addOption("min_step_size",     OT_DOUBLE,   1e-10,
               "The size (inf-norm) of the step size should not become smaller than this.");
@@ -88,7 +88,7 @@ namespace casadi {
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
               "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx|bfgs", true);
-    addOption("print_time",         OT_BOOLEAN,       true,
+    addOption("print_time",         OT_BOOL,       true,
               "Print information about execution time");
   }
 

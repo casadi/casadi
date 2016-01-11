@@ -46,10 +46,10 @@ namespace casadi {
                                          const vector<SX >& inputv,
                                          const vector<SX >& outputv)
     : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv) {
-    addOption("just_in_time_sparsity", OT_BOOLEAN, false,
+    addOption("just_in_time_sparsity", OT_BOOL, false,
               "Propagate sparsity patterns using just-in-time "
               "compilation to a CPU or GPU using OpenCL");
-    addOption("just_in_time_opencl", OT_BOOLEAN, false,
+    addOption("just_in_time_opencl", OT_BOOL, false,
               "Just-in-time compilation for numeric evaluation using OpenCL (experimental)");
 
     casadi_assert(!outputv_.empty()); // NOTE: Remove?

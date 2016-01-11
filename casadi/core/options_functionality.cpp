@@ -182,7 +182,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
     stringstream ss;
     ss << "Option '" << name << "' expects a '" <<
         GenericType::get_type_description(allowed_options[name]) << "' type." << endl;
-    if (op.getType() == OT_BOOLEAN) {
+    if (op.getType() == OT_BOOL) {
       ss << "You supplied another type, possibly boolean." << endl;
       if (allowed_options[name]==OT_DOUBLE || allowed_options[name]==OT_INT) {
         ss << "(A common mistake is to use SX/MX instead of floats/DM in this context)"

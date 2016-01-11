@@ -41,9 +41,9 @@ namespace casadi {
               "Relative tolerence for the IVP solution");
     addOption("abstol",                      OT_DOUBLE,             1e-8,
               "Absolute tolerence  for the IVP solution");
-    addOption("exact_jacobian",              OT_BOOLEAN,          true,
+    addOption("exact_jacobian",              OT_BOOL,          true,
               "Use exact Jacobian information for the forward integration");
-    addOption("exact_jacobianB",             OT_BOOLEAN,          GenericType(),
+    addOption("exact_jacobianB",             OT_BOOL,          GenericType(),
               "Use exact Jacobian information for the backward integration "
               "[default: equal to exact_jacobian]");
     addOption("upper_bandwidth",             OT_INT,          GenericType(),
@@ -61,22 +61,22 @@ namespace casadi {
     addOption("sensitivity_method",          OT_STRING,           "simultaneous", "",
               "simultaneous|staggered");
     addOption("max_multistep_order",         OT_INT,          5);
-    addOption("use_preconditioner",          OT_BOOLEAN,          false,
+    addOption("use_preconditioner",          OT_BOOL,          false,
               "Precondition an iterative solver");
-    addOption("use_preconditionerB",         OT_BOOLEAN,          GenericType(),
+    addOption("use_preconditionerB",         OT_BOOL,          GenericType(),
               "Precondition an iterative solver for the backwards problem "
               "[default: equal to use_preconditioner]");
-    addOption("stop_at_end",                 OT_BOOLEAN,          true,
+    addOption("stop_at_end",                 OT_BOOL,          true,
               "Stop the integrator at the end of the interval");
 
     // Quadratures
-    addOption("quad_err_con",                OT_BOOLEAN,          false,
+    addOption("quad_err_con",                OT_BOOL,          false,
               "Should the quadratures affect the step size control");
 
     // Forward sensitivity problem
-    addOption("fsens_err_con",               OT_BOOLEAN,          true,
+    addOption("fsens_err_con",               OT_BOOL,          true,
               "include the forward sensitivities in all error controls");
-    addOption("finite_difference_fsens",     OT_BOOLEAN,          false,
+    addOption("finite_difference_fsens",     OT_BOOL,          false,
               "Use finite differences to approximate the forward sensitivity equations "
               "(if AD is not available)");
     addOption("fsens_reltol",                OT_DOUBLE,             GenericType(),

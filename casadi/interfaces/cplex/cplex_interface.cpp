@@ -57,16 +57,16 @@ namespace casadi {
 
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
               "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
-    addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format.");
+    addOption("dump_to_file",   OT_BOOL,        false, "Dumps QP to file in CPLEX format.");
     addOption("dump_filename",   OT_STRING,     "qp.dat", "The filename to dump to.");
     addOption("tol",               OT_DOUBLE,         1E-6, "Tolerance of solver");
     addOption("dep_check",      OT_STRING,         "off", "Detect redundant constraints.",
               "automatic:-1|off:0|begin:1|end:2|both:3");
     addOption("simplex_maxiter", OT_INT,   2100000000, "Maximum number of simplex iterations.");
     addOption("barrier_maxiter", OT_INT,   2100000000, "Maximum number of barrier iterations.");
-    addOption("warm_start",      OT_BOOLEAN,        false,
+    addOption("warm_start",      OT_BOOL,        false,
               "Use warm start with simplex methods (affects only the simplex methods).");
-    addOption("convex",          OT_BOOLEAN,         true,
+    addOption("convex",          OT_BOOL,         true,
               "Indicates if the QP is convex or not (affects only the barrier method).");
   }
   void CplexInterface::init() {

@@ -83,11 +83,11 @@ namespace casadi {
               "Lower bound for the merit function parameter");
     addOption("lbfgs_memory",      OT_INT,     10,
               "Size of L-BFGS memory.");
-    addOption("regularize",        OT_BOOLEAN,  false,
+    addOption("regularize",        OT_BOOL,  false,
               "Automatic regularization of Lagrange Hessian.");
-    addOption("print_header",      OT_BOOLEAN,   true,
+    addOption("print_header",      OT_BOOL,   true,
               "Print the header with problem statistics");
-    addOption("codegen",           OT_BOOLEAN,  false,
+    addOption("codegen",           OT_BOOL,  false,
               "C-code generation");
     addOption("reg_threshold",     OT_DOUBLE,      1e-8,
               "Threshold for the regularization.");
@@ -95,7 +95,7 @@ namespace casadi {
               "Names of the variables.");
     addOption("print_x",           OT_INTVECTOR,  GenericType(),
               "Which variables to print.");
-    addOption("print_time",        OT_BOOLEAN, true,
+    addOption("print_time",        OT_BOOL, true,
               "Print information about execution time");
 
     // Monitors

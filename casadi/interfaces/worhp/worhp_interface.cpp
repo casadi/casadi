@@ -54,9 +54,9 @@ namespace casadi {
     // Monitors
     addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions",
               "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
-    addOption("print_time",         OT_BOOLEAN,       true,
+    addOption("print_time",         OT_BOOL,       true,
               "Print information about execution time");
-    addOption("UserHM", OT_BOOLEAN, true, "Use exact Hessian");
+    addOption("UserHM", OT_BOOL, true, "Use exact Hessian");
     addOption("qp_ipBarrier", OT_DOUBLE, GenericType(), "IP barrier parameter.");
     addOption("qp_ipComTol", OT_DOUBLE, GenericType(), "IP complementarity tolerance.");
     addOption("qp_ipFracBound", OT_DOUBLE, GenericType(), "IP fraction-to-the-boundary parameter.");
@@ -71,7 +71,7 @@ namespace casadi {
       "MA97:experimental, only available if provided by the user:8");
     addOption("qp_ipMinAlpha", OT_DOUBLE, GenericType(),
               "IP line search minimum step size.");
-    addOption("qp_ipTryRelax", OT_BOOLEAN, GenericType(),
+    addOption("qp_ipTryRelax", OT_BOOL, GenericType(),
       "Enable relaxation strategy when encountering an error.");
     addOption("qp_ipRelaxDiv", OT_DOUBLE, GenericType(),
       "The relaxation term is divided by this value if successful.");
@@ -92,9 +92,9 @@ namespace casadi {
       "full:Full KKT-matrix.:2");
     addOption("qp_lsRefineMaxIter", OT_INT, GenericType(),
       "Maximum number of iterative refinement steps of the direct linear solvers.");
-    addOption("qp_lsScale", OT_BOOLEAN, GenericType(),
+    addOption("qp_lsScale", OT_BOOL, GenericType(),
               "Enables scaling on linear solver level.");
-    addOption("qp_lsTrySimple", OT_BOOLEAN, GenericType(),
+    addOption("qp_lsTrySimple", OT_BOOL, GenericType(),
       "Some matrices can be solved without calling a linear equation solver."
       "Currently only diagonal matrices are supported."
       "Non-diagonal matrices will besolved with the chosen linear equation solver.");
@@ -109,7 +109,7 @@ namespace casadi {
       "ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|"
       "automatic: Prefer IP and fall back to NSN on error.:12");
     addOption("qp_nsnBeta", OT_DOUBLE, GenericType(), "NSN stepsize decrease factor.");
-    addOption("qp_nsnGradStep", OT_BOOLEAN, GenericType(),
+    addOption("qp_nsnGradStep", OT_BOOL, GenericType(),
       "Enable gradient steps in the NSN method.");
     addOption("qp_nsnKKT", OT_DOUBLE, GenericType(), "NSN KKT tolerance.");
     addOption("qp_nsnLsMethod", OT_STRING, GenericType(),
@@ -121,8 +121,8 @@ namespace casadi {
     addOption("qp_printLevel", OT_STRING, GenericType(),
       "Controls the amount of QP solver output.",
       "none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2");
-    addOption("qp_scaleIntern", OT_BOOLEAN, GenericType(), "Enable scaling on QP level.");
-    addOption("qp_strict", OT_BOOLEAN, GenericType(),
+    addOption("qp_scaleIntern", OT_BOOL, GenericType(), "Enable scaling on QP level.");
+    addOption("qp_strict", OT_BOOL, GenericType(),
               "Use strict termination criteria in IP method.");
     addOption("Ares", OT_INTVECTOR, GenericType(), "Armijo recovery strategies");
   }

@@ -53,9 +53,9 @@ namespace casadi {
               "Integrator scheme", "bdf|adams");
     addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",
               "", "newton|functional");
-    addOption("fsens_all_at_once",                OT_BOOLEAN,             true,
+    addOption("fsens_all_at_once",                OT_BOOL,             true,
               "Calculate all right hand sides of the sensitivity equations at once");
-    addOption("disable_internal_warnings",        OT_BOOLEAN,             false,
+    addOption("disable_internal_warnings",        OT_BOOL,             false,
               "Disable CVodes internal warning messages");
     addOption("monitor",                          OT_STRINGVECTOR,        GenericType(),
               "", "res|resB|resQB|reset|psetupB|djacB", true);

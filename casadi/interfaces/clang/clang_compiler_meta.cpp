@@ -83,7 +83,7 @@
 "|                 |                 |                 | parameter. Must |\n"
 "|                 |                 |                 | be >=1          |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| _use_penalty    | OT_BOOLEAN      | true            | Modifies the    |\n"
+"| _use_penalty    | OT_BOOL      | true            | Modifies the    |\n"
 "|                 |                 |                 | algorithm to    |\n"
 "|                 |                 |                 | use a penality  |\n"
 "|                 |                 |                 | gamma on r.     |\n"

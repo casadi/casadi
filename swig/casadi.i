@@ -935,7 +935,7 @@ import_array();
 
     GUESTOBJECT * from_ptr(const GenericType *a) {
       switch (a->getType()) {
-      case OT_BOOLEAN: return from_tmp(a->as_bool());
+      case OT_BOOL: return from_tmp(a->as_bool());
       case OT_INT: return from_tmp(a->as_int());
       case OT_DOUBLE: return from_tmp(a->as_double());
       case OT_STRING: return from_tmp(a->as_string());

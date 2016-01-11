@@ -73,15 +73,15 @@ namespace casadi {
     addOption("upper_bandwidth",          OT_INT);
     addOption("lower_bandwidth",          OT_INT);
     addOption("max_krylov",               OT_INT, 0);
-    addOption("exact_jacobian",           OT_BOOLEAN, true);
+    addOption("exact_jacobian",           OT_BOOL, true);
     addOption("iterative_solver",         OT_STRING, "gmres", "gmres|bcgstab|tfqmr");
     addOption("f_scale",                  OT_DOUBLEVECTOR);
     addOption("u_scale",                  OT_DOUBLEVECTOR);
     addOption("pretype",                  OT_STRING, "none", "", "none|left|right|both");
-    addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
+    addOption("use_preconditioner",       OT_BOOL, false); // precondition an iterative solver
     addOption("strategy",                 OT_STRING, "none", "Globalization strategy",
               "none|linesearch");
-    addOption("disable_internal_warnings",   OT_BOOLEAN, false,
+    addOption("disable_internal_warnings",   OT_BOOL, false,
               "Disable KINSOL internal warning messages");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
 

@@ -49,8 +49,8 @@ namespace casadi {
     : Linsol(name, sparsity, nrhs) {
 
     // Equilibrate the matrix
-    addOption("equilibration", OT_BOOLEAN, true);
-    addOption("allow_equilibration_failure", OT_BOOLEAN, false);
+    addOption("equilibration", OT_BOOL, true);
+    addOption("allow_equilibration_failure", OT_BOOL, false);
   }
 
   LapackLu::~LapackLu() {

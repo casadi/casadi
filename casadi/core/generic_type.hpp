@@ -38,7 +38,7 @@ namespace casadi {
   /** \brief  Types of options */
   enum TypeID {
     OT_NULL,
-    OT_BOOLEAN,
+    OT_BOOL,
     OT_INT,
     OT_DOUBLE,
     OT_STRING,

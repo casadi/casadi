@@ -65,17 +65,17 @@ namespace casadi {
     addOption("printLevel",             OT_STRING,  PrintLevel_to_string(ops.printLevel),
               "Defines the amount of text output during QP solution, "
               "see Section 5.7", "none|low|medium|high");
-    addOption("enableRamping",          OT_BOOLEAN, BooleanType_to_bool(ops.enableRamping),
+    addOption("enableRamping",          OT_BOOL, BooleanType_to_bool(ops.enableRamping),
               "Enables ramping.");
-    addOption("enableFarBounds",        OT_BOOLEAN, BooleanType_to_bool(ops.enableFarBounds),
+    addOption("enableFarBounds",        OT_BOOL, BooleanType_to_bool(ops.enableFarBounds),
               "Enables the use of  far bounds.");
-    addOption("enableFlippingBounds",   OT_BOOLEAN, BooleanType_to_bool(ops.enableFlippingBounds),
+    addOption("enableFlippingBounds",   OT_BOOL, BooleanType_to_bool(ops.enableFlippingBounds),
               "Enables the use of  flipping bounds.");
-    addOption("enableRegularisation",   OT_BOOLEAN, BooleanType_to_bool(ops.enableRegularisation),
+    addOption("enableRegularisation",   OT_BOOL, BooleanType_to_bool(ops.enableRegularisation),
               "Enables automatic  Hessian regularisation.");
-    addOption("enableFullLITests",      OT_BOOLEAN, BooleanType_to_bool(ops.enableFullLITests),
+    addOption("enableFullLITests",      OT_BOOL, BooleanType_to_bool(ops.enableFullLITests),
               "Enables condition-hardened  (but more expensive) LI test.");
-    addOption("enableNZCTests",         OT_BOOLEAN, BooleanType_to_bool(ops.enableNZCTests),
+    addOption("enableNZCTests",         OT_BOOL, BooleanType_to_bool(ops.enableNZCTests),
               "Enables nonzero curvature  tests.");
     addOption("enableDriftCorrection",  OT_INT, static_cast<int>(ops.enableDriftCorrection),
               "Specifies the frequency of drift corrections: 0: turns them off.");
@@ -83,7 +83,7 @@ namespace casadi {
               static_cast<int>(ops.enableCholeskyRefactorisation),
               "Specifies the frequency of a full re-factorisation of projected "
               "Hessian matrix: 0: turns them off,  1: uses them at each iteration etc.");
-    addOption("enableEqualities",       OT_BOOLEAN, BooleanType_to_bool(ops.enableEqualities),
+    addOption("enableEqualities",       OT_BOOL, BooleanType_to_bool(ops.enableEqualities),
               "Specifies whether equalities should be treated  as always active "
               "(True) or not (False)");
     addOption("terminationTolerance",   OT_DOUBLE, static_cast<double>(ops.terminationTolerance),

@@ -38,7 +38,7 @@ namespace casadi {
   typedef GenericTypeInternal<OT_STRING, std::string> StringType;
   typedef GenericTypeInternal<OT_DOUBLE, double> DoubleType;
   typedef GenericTypeInternal<OT_INT, int> IntType;
-  typedef GenericTypeInternal<OT_BOOLEAN, bool> BoolType;
+  typedef GenericTypeInternal<OT_BOOL, bool> BoolType;
   typedef GenericTypeInternal<OT_DOUBLEVECTOR, std::vector<double> > DoubleVectorType;
   typedef GenericTypeInternal<OT_INTVECTOR, std::vector<int> > IntVectorType;
   typedef GenericTypeInternal<OT_INTVECTORVECTOR,
@@ -51,7 +51,7 @@ namespace casadi {
 
   bool GenericType::can_cast_to(TypeID other) const {
     switch (other) {
-    case OT_BOOLEAN:
+    case OT_BOOL:
       return is_bool() || is_int() || is_double();
     case OT_BOOLVECTOR:
       return is_int_vector() || is_double_vector();
@@ -87,8 +87,8 @@ namespace casadi {
 
   std::string GenericType::get_type_description(TypeID type) {
     switch (type) {
-    case OT_BOOLEAN:
-      return "OT_BOOLEAN";
+    case OT_BOOL:
+      return "OT_BOOL";
     case OT_INT:
       return "OT_INT";
     case OT_DOUBLE:
@@ -119,7 +119,7 @@ namespace casadi {
 
 
   bool GenericType::is_bool() const {
-    return getType()==OT_BOOLEAN;
+    return getType()==OT_BOOL;
   }
 
   bool GenericType::is_int() const {

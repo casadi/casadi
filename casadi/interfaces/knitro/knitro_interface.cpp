@@ -80,13 +80,13 @@ namespace casadi {
 
     //addOption("Alg", OT_INT,0, "Algorithm");
     addOption("BarRule", OT_INT, 0, "Barrier Rule");
-    addOption("NewPoint", OT_BOOLEAN, 0, "Select new-point feature");
+    addOption("NewPoint", OT_BOOL, 0, "Select new-point feature");
     addOption("GradOpt", OT_INT, 1, "Gradient calculation method");
     addOption("HessOpt", OT_INT, 1, "Hessian calculation method");
-    addOption("Feasible", OT_BOOLEAN, 1, "Allow infeasible iterations");
-    addOption("HonorBnds", OT_BOOLEAN, 0, "Enforce bounds");
-    addOption("LpSolver", OT_BOOLEAN, 0, "Use LpSolver");
-    addOption("Multistart", OT_BOOLEAN, 0, "Use multistart");
+    addOption("Feasible", OT_BOOL, 1, "Allow infeasible iterations");
+    addOption("HonorBnds", OT_BOOL, 0, "Enforce bounds");
+    addOption("LpSolver", OT_BOOL, 0, "Use LpSolver");
+    addOption("Multistart", OT_BOOL, 0, "Use multistart");
     //addOption("MsMaxSolves", OT_INT, 1, "Maximum multistart points");
     addOption("MaxCgIt", OT_INT, 0, "Maximum conjugate gradient iterations");
     //addOption("MaxCrossTt", OT_INT, 0, "Maximum crossover iterations");
@@ -94,10 +94,10 @@ namespace casadi {
     //addOption("MaxTimeCPU", OT_DOUBLE, 1e8, "CPU Time limit");
     //addOption("MaxTimeReal", OT_DOUBLE, 1e8, "Time limit");
     addOption("LmSize", OT_INT, 10, "Memory pairsize limit");
-    addOption("Scale", OT_BOOLEAN, 1, "Perform scaling");
-    addOption("ShiftInit", OT_BOOLEAN, 1, "Interior-point shifting initial point");
+    addOption("Scale", OT_BOOL, 1, "Perform scaling");
+    addOption("ShiftInit", OT_BOOL, 1, "Interior-point shifting initial point");
     addOption("Soc", OT_INT, 1, "Second order correction");
-    addOption("InitPt", OT_BOOLEAN, 0, "Use initial point strategy");
+    addOption("InitPt", OT_BOOL, 0, "Use initial point strategy");
     addOption("Delta", OT_DOUBLE, 1.0, "Initial region scaling factor");
     addOption("FeasModeTol", OT_DOUBLE, 1e-4, "Feasible mode tolerance");
     addOption("FeasTol", OT_DOUBLE, 1e-6, "Feasible tolerance");

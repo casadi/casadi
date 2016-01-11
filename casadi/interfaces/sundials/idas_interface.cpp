@@ -52,11 +52,11 @@ namespace casadi {
   IdasInterface::IdasInterface(const std::string& name, const XProblem& dae)
     : SundialsInterface(name, dae) {
 
-    addOption("suppress_algebraic",          OT_BOOLEAN,          false,
+    addOption("suppress_algebraic",          OT_BOOL,          false,
               "Suppress algebraic variables in the error testing");
-    addOption("calc_ic",                     OT_BOOLEAN,          true,
+    addOption("calc_ic",                     OT_BOOL,          true,
               "Use IDACalcIC to get consistent initial conditions.");
-    addOption("calc_icB",                    OT_BOOLEAN,          GenericType(),
+    addOption("calc_icB",                    OT_BOOL,          GenericType(),
               "Use IDACalcIC to get consistent initial conditions for "
               "backwards system [default: equal to calc_ic].");
     addOption("abstolv",                     OT_DOUBLEVECTOR);
@@ -65,11 +65,11 @@ namespace casadi {
               "Maximim step size");
     addOption("first_time",                  OT_DOUBLE,             GenericType(),
               "First requested time as a fraction of the time interval");
-    addOption("cj_scaling",                  OT_BOOLEAN,          false,
+    addOption("cj_scaling",                  OT_BOOL,          false,
               "IDAS scaling on cj for the user-defined linear solver module");
-    addOption("extra_fsens_calc_ic",         OT_BOOLEAN,          false,
+    addOption("extra_fsens_calc_ic",         OT_BOOL,          false,
               "Call calc ic an extra time, with fsens=0");
-    addOption("disable_internal_warnings",   OT_BOOLEAN,          false,
+    addOption("disable_internal_warnings",   OT_BOOL,          false,
               "Disable IDAS internal warning messages");
     addOption("monitor",                     OT_STRINGVECTOR,     GenericType(), "",
               "correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB|psetup",

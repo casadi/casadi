@@ -49,7 +49,7 @@ namespace casadi {
 
   SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs) :
     Linsol(name, sparsity, nrhs) {
-    addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");
+    addOption("codegen",           OT_BOOL,  false,               "C-code generation");
     addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",
               "Compiler command to be used for compiling generated code");
   }

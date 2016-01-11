@@ -52,7 +52,7 @@
 "|                 |                 |                 | perform before  |\n"
 "|                 |                 |                 | returning.      |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
-"| print_iteration | OT_BOOLEAN      | false           | Print           |\n"
+"| print_iteration | OT_BOOL      | false           | Print           |\n"
 "|                 |                 |                 | information     |\n"
 "|                 |                 |                 | about each      |\n"
 "|                 |                 |                 | iteration       |\n"

@@ -55,7 +55,7 @@ namespace casadi {
               "Maximum number of Newton iterations to perform before returning.");
     addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
 
-    addOption("print_iteration", OT_BOOLEAN, false,
+    addOption("print_iteration", OT_BOOL, false,
               "Print information about each iteration");
   }
 

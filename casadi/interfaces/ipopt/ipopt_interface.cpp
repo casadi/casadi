@@ -58,8 +58,8 @@ namespace casadi {
   IpoptInterface::IpoptInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
-    addOption("print_time",               OT_BOOLEAN, true,
+    addOption("pass_nonlinear_variables", OT_BOOL, false);
+    addOption("print_time",               OT_BOOL, true,
               "print information about execution time");
 
     // Monitors

@@ -152,7 +152,7 @@ namespace casadi {
     : FunctionInternal(name), inputv_(inputv),  outputv_(outputv) {
     addOption("topological_sorting", OT_STRING, "depth-first", "Topological sorting algorithm",
               "depth-first|breadth-first");
-    addOption("live_variables", OT_BOOLEAN, true, "Reuse variables in the work vector");
+    addOption("live_variables", OT_BOOL, true, "Reuse variables in the work vector");
 
     // Make sure that inputs are symbolic
     for (int i=0; i<inputv.size(); ++i) {
