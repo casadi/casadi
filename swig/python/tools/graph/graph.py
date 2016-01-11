@@ -113,7 +113,7 @@ class DotArtist:
       for i in range(s.size1()):
         label+="<TR>"
         for j in range(s.size2()):
-          k = sp.getNZ(i,j)
+          k = sp.get_nz(i,j)
           if k==-1:
             label+="<TD>.</TD>"
           else:
@@ -144,7 +144,7 @@ class MXSymbolicArtist(DotArtist):
       for i in range(s.size1()):
         label+="<TR>"
         for j in range(s.size2()):
-          k = sp.getNZ(i,j)
+          k = sp.get_nz(i,j)
           if k==-1:
             label+="<TD>.</TD>"
           else:
@@ -193,7 +193,7 @@ class MXSymbolicArtist(DotArtist):
 #         for i in range(d.size1()):
 #           label+="<TR>"
 #           for j in range(d.size2()):
-#             kk = spd.getNZ(i,j)
+#             kk = spd.get_nz(i,j)
 #             if kk==-1:
 #               label+="<TD>.</TD>"
 #             else:
@@ -210,7 +210,7 @@ class MXSymbolicArtist(DotArtist):
 #     for i in range(s.size1()):
 #       label+="<TR>"
 #       for j in range(s.size2()):
-#         k = sp.getNZ(i,j)
+#         k = sp.get_nz(i,j)
 #         if k==-1:
 #           label+="<TD>.</TD>"
 #         else:
@@ -265,7 +265,7 @@ class MXConstantArtist(DotArtist):
         for i in range(s.size1()):
           label+="<TR>"
           for j in range(s.size2()):
-            k = sp.getNZ(i,j)
+            k = sp.get_nz(i,j)
             if k==-1:
               label+="<TD>.</TD>"
             else:
@@ -333,7 +333,7 @@ class MXGetNonzerosArtist(DotArtist):
         for i in range(s.size1()):
           label+="<TR>"
           for j in range(s.size2()):
-            k = sp.getNZ(i,j)
+            k = sp.get_nz(i,j)
             if k==-1:
               label+="<TD>.</TD>"
             else:
@@ -371,7 +371,7 @@ class MXSetNonzerosArtist(DotArtist):
     for i in range(s.size1()):
       label+="<TR>"
       for j in range(s.size2()):
-        k = entry.sparsity().getNZ(i,j)
+        k = entry.sparsity().get_nz(i,j)
         if k==-1 or Mk>= len(M) or k != M[Mk]:
           label+="<TD>.</TD>"
           if Mk< len(M)-1 and M[Mk]==-1 and k!=-1: Mk+=1
@@ -412,7 +412,7 @@ class MXAddNonzerosArtist(DotArtist):
     for i in range(s.size1()):
       label+="<TR>"
       for j in range(s.size2()):
-        k = sp.getNZ(i,j)
+        k = sp.get_nz(i,j)
         if k==-1 or Mk>= len(M) or k != M[Mk]:
           label+="<TD>.</TD>"
           if Mk< len(M)-1 and M[Mk]==-1 and k!=-1: Mk+=1
@@ -531,7 +531,7 @@ class SXArtist(DotArtist):
     for i in range(s.size1()):
       label+="<TR>"
       for j in range(s.size2()):
-        k = sp.getNZ(i,j)
+        k = sp.get_nz(i,j)
         if k==-1:
           label+="<TD>.</TD>"
         else:

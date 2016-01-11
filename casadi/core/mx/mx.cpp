@@ -162,7 +162,7 @@ namespace casadi {
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr) const {
     // If the indexed matrix is dense, use nonzero indexing
     if (is_dense()) {
-      return getNZ(m, ind1, rr);
+      return get_nz(m, ind1, rr);
     }
 
     // If indexed matrix was a row/column vector, make sure that the result is too
@@ -321,7 +321,7 @@ namespace casadi {
 
     // Dense mode
     if (is_dense() && m.is_dense()) {
-      return setNZ(m, ind1, rr);
+      return set_nz(m, ind1, rr);
     }
 
     // Construct new sparsity pattern
@@ -341,7 +341,7 @@ namespace casadi {
     if (sp != sparsity()) *this = project(*this, sp);
 
     // Find the nonzeros corresponding to rr
-    sparsity().getNZ(nz);
+    sparsity().get_nz(nz);
 
     // Create a nonzero assignment node
     *this = simplify(m->getSetNonzeros(*this, nz));
@@ -360,12 +360,12 @@ namespace casadi {
     }
   }
 
-  void MX::getNZ(MX& m, bool ind1, const Slice& kk) const {
+  void MX::get_nz(MX& m, bool ind1, const Slice& kk) const {
     // Fallback on IM
-    getNZ(m, ind1, kk.getAll(nnz(), ind1));
+    get_nz(m, ind1, kk.getAll(nnz(), ind1));
   }
 
-  void MX::getNZ(MX& m, bool ind1, const Matrix<int>& kk) const {
+  void MX::get_nz(MX& m, bool ind1, const Matrix<int>& kk) const {
     // If indexed matrix was a row/column vector, make sure that the result is too
     bool tr = (is_column() && kk.is_row()) || (is_row() && kk.is_column());
 
@@ -378,7 +378,7 @@ namespace casadi {
     // Check bounds
     int sz = nnz();
     if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
-      casadi_error("getNZ[kk] out of bounds. Your kk contains "
+      casadi_error("get_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
                    << ", which is outside the range [" << -sz+ind1 << "," << sz+ind1 <<  ").");
@@ -395,7 +395,7 @@ namespace casadi {
         if (ind1) i--;
         if (i<0) i += sz;
       }
-      getNZ(m, false, kk_mod); // Call recursively
+      get_nz(m, false, kk_mod); // Call recursively
       return;
     }
 
@@ -403,14 +403,14 @@ namespace casadi {
     m = (*this)->getGetNonzeros(tr ? kk.sparsity().T() : kk.sparsity(), kk.data());
   }
 
-  void MX::setNZ(const MX& m, bool ind1, const Slice& kk) {
+  void MX::set_nz(const MX& m, bool ind1, const Slice& kk) {
     // Fallback on IM
-    setNZ(m, ind1, kk.getAll(nnz(), ind1));
+    set_nz(m, ind1, kk.getAll(nnz(), ind1));
   }
 
-  void MX::setNZ(const MX& m, bool ind1, const Matrix<int>& kk) {
+  void MX::set_nz(const MX& m, bool ind1, const Matrix<int>& kk) {
     casadi_assert_message(kk.nnz()==m.nnz() || m.nnz()==1,
-                          "MX::setNZ: length of non-zero indices (" << kk.nnz() << ") " <<
+                          "MX::set_nz: length of non-zero indices (" << kk.nnz() << ") " <<
                           "must match size of rhs (" << m.nnz() << ").");
 
     // Assert dimensions of assigning matrix
@@ -418,14 +418,14 @@ namespace casadi {
       if (m.is_scalar()) {
         // m scalar means "set all"
         if (!m.is_dense()) return; // Nothing to set
-        return setNZ(MX(kk.sparsity(), m), ind1, kk);
+        return set_nz(MX(kk.sparsity(), m), ind1, kk);
       } else if (kk.size() == m.size()) {
         // Project sparsity if needed
-        return setNZ(project(m, kk.sparsity()), ind1, kk);
+        return set_nz(project(m, kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return setNZ(m.T(), ind1, kk);
+        return set_nz(m.T(), ind1, kk);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << kk.size()
@@ -436,13 +436,13 @@ namespace casadi {
     // Call recursively if points both objects point to the same node
     if (this==&m) {
       MX m_copy = m;
-      return setNZ(m_copy, ind1, kk);
+      return set_nz(m_copy, ind1, kk);
     }
 
     // Check bounds
     int sz = nnz();
     if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
-      casadi_error("setNZ[kk] out of bounds. Your kk contains "
+      casadi_error("set_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
                    << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
@@ -462,7 +462,7 @@ namespace casadi {
         if (ind1) i--;
         if (i<0) i += sz;
       }
-      return setNZ(m, false, kk_mod); // Call recursively
+      return set_nz(m, false, kk_mod); // Call recursively
     }
 
     // Create a nonzero assignment node
@@ -1608,7 +1608,7 @@ namespace casadi {
     std::vector< std::vector< MX > > blocks(a.size1(), std::vector< MX >(a.size2(), filler));
     for (int i=0; i<a.size1(); ++i) {
       for (int j=0; j<a.size2(); ++j) {
-        int k = a_sp.getNZ(i, j);
+        int k = a_sp.get_nz(i, j);
         if (k!=-1) {
           blocks[i][j] = a[k]*b;
         }

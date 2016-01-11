@@ -40,7 +40,7 @@ template<typename M, typename K>
 class CASADI_EXPORT NonZeros : public M {
   public:
     /// Constructor
-    NonZeros(M& mat, const K& k) : mat_(mat), k_(k) { mat.getNZ(*this, false, k); }
+    NonZeros(M& mat, const K& k) : mat_(mat), k_(k) { mat.get_nz(*this, false, k); }
 
     ///@{
     /// Methods that modify a part of the parent object (A[k] = ?, A[k] += ?, etc.)
@@ -63,42 +63,42 @@ class CASADI_EXPORT NonZeros : public M {
 // Implementation
 template<typename M, typename K>
 const M& NonZeros<M, K>::operator=(const NonZeros<M, K> &y) {
-  mat_.setNZ(y, false, k_);
+  mat_.set_nz(y, false, k_);
   return y;
 }
 
 // Implementation
 template<typename M, typename K>
 const M& NonZeros<M, K>::operator=(const M &y) {
-  mat_.setNZ(y, false, k_);
+  mat_.set_nz(y, false, k_);
   return y;
 }
 
 template<typename M, typename K>
 M NonZeros<M, K>::operator+=(const M &y) {
   M s = *this+y;
-  mat_.setNZ(s, false, k_);
+  mat_.set_nz(s, false, k_);
   return s;
 }
 
 template<typename M, typename K>
 M NonZeros<M, K>::operator-=(const M &y) {
   M s = *this-y;
-  mat_.setNZ(s, false, k_);
+  mat_.set_nz(s, false, k_);
   return s;
 }
 
 template<typename M, typename K>
 M NonZeros<M, K>::operator*=(const M &y) {
    M s = *this*y;
-   mat_.setNZ(s, false, k_);
+   mat_.set_nz(s, false, k_);
    return s;
 }
 
 template<typename M, typename K>
 M NonZeros<M, K>::operator/=(const M &y) {
   M s = *this/y;
-  mat_.setNZ(s, false, k_);
+  mat_.set_nz(s, false, k_);
   return s;
 }
 

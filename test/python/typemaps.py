@@ -124,9 +124,9 @@ class typemaptests(casadiTestCase):
       self.checkarray(c,dm,"set(csr_matrix)")
     
       z=n.zeros(3)
-      dm.getNZ(z)
+      dm.get_nz(z)
       self.checkarray(n.matrix(z),n.matrix(data),"get(1Dndarray)")
-      dm.setNZ(z)
+      dm.set_nz(z)
 
       self.checkarray(c,dm,"set(1Dndarray)")
 
@@ -418,7 +418,7 @@ class typemaptests(casadiTestCase):
     self.checkarray(w,goal,"Constructor")
     
     for name, value in test.items():
-      w.setNZ(value)
+      w.set_nz(value)
       self.checkarray(w,goal,"name")
 
     test={

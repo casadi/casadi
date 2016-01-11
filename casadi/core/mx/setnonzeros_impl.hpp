@@ -127,7 +127,7 @@ namespace casadi {
       // Get the nz locations in res corresponding to the output sparsity pattern
       r_nz.resize(with_duplicates.size());
       copy(with_duplicates.begin(), with_duplicates.end(), r_nz.begin());
-      res[0].sparsity().getNZ(r_nz);
+      res[0].sparsity().get_nz(r_nz);
 
       // Zero out the corresponding entries
       res[0] = MX::zeros(isp)->getSetNonzeros(res[0], r_nz);
@@ -135,7 +135,7 @@ namespace casadi {
 
     // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
     arg[1].sparsity().find(r_nz);
-    isp.getNZ(r_nz);
+    isp.get_nz(r_nz);
 
     // Filter out ignored entries and check if there is anything to add at all
     bool elements_to_add = false;
@@ -155,7 +155,7 @@ namespace casadi {
     // Get the nz locations in the argument corresponding to the inputs
     r_ind.resize(el_output.size());
     copy(el_output.begin(), el_output.end(), r_ind.begin());
-    res[0].sparsity().getNZ(r_ind);
+    res[0].sparsity().get_nz(r_ind);
 
     // Enlarge the sparsity pattern of the arguments if not all assignments fit
     for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
@@ -168,7 +168,7 @@ namespace casadi {
 
         // Recalculate the nz locations in the arguments corresponding to the inputs
         copy(el_output.begin(), el_output.end(), r_ind.begin());
-        res[0].sparsity().getNZ(r_ind);
+        res[0].sparsity().get_nz(r_ind);
 
         break;
       }
@@ -259,7 +259,7 @@ namespace casadi {
         // Get the nz locations in res corresponding to the output sparsity pattern
         r_nz.resize(with_duplicates.size());
         copy(with_duplicates.begin(), with_duplicates.end(), r_nz.begin());
-        res.sparsity().getNZ(r_nz);
+        res.sparsity().get_nz(r_nz);
 
         // Zero out the corresponding entries
         res = MX::zeros(isp)->getSetNonzeros(res, r_nz);
@@ -267,7 +267,7 @@ namespace casadi {
 
       // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
       arg.sparsity().find(r_nz);
-      isp.getNZ(r_nz);
+      isp.get_nz(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all
       bool elements_to_add = false;
@@ -287,7 +287,7 @@ namespace casadi {
       // Get the nz locations in the argument corresponding to the inputs
       r_ind.resize(el_output.size());
       copy(el_output.begin(), el_output.end(), r_ind.begin());
-      res.sparsity().getNZ(r_ind);
+      res.sparsity().get_nz(r_ind);
 
       // Enlarge the sparsity pattern of the arguments if not all assignments fit
       for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
@@ -300,7 +300,7 @@ namespace casadi {
 
           // Recalculate the nz locations in the arguments corresponding to the inputs
           copy(el_output.begin(), el_output.end(), r_ind.begin());
-          res.sparsity().getNZ(r_ind);
+          res.sparsity().get_nz(r_ind);
 
           break;
         }
@@ -382,7 +382,7 @@ namespace casadi {
       // Get the matching nonzeros
       r_ind.resize(el_output.size());
       copy(el_output.begin(), el_output.end(), r_ind.begin());
-      aseed[d][0].sparsity().getNZ(r_ind);
+      aseed[d][0].sparsity().get_nz(r_ind);
 
       // Sparsity pattern for the result
       r_colind.resize(isp.size2()+1); // Col count

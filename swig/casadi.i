@@ -2144,10 +2144,10 @@ class NZproxy:
     self.matrix = matrix
 
   def __getitem__(self,s):
-    return self.matrix.getNZ(False, s)
+    return self.matrix.get_nz(False, s)
 
   def __setitem__(self,s,val):
-    return self.matrix.setNZ(val, False, s)
+    return self.matrix.set_nz(val, False, s)
 
   def __len__(self):
     return self.matrix.nnz()
@@ -2312,12 +2312,12 @@ class NZproxy:
     void paren_asgn(const Type& m, const Matrix<int>& rr, const Matrix<int>& cc) { $self->set(m, true, rr, cc);}
 
     // Get nonzeros (index-1)
-    const Type brace(char rr) const { Type m; $self->getNZ(m, true, casadi::char2Slice(rr)); return m;}
-    const Type brace(const Matrix<int>& rr) const { Type m; $self->getNZ(m, true, rr); return m;}
+    const Type brace(char rr) const { Type m; $self->get_nz(m, true, casadi::char2Slice(rr)); return m;}
+    const Type brace(const Matrix<int>& rr) const { Type m; $self->get_nz(m, true, rr); return m;}
 
     // Set nonzeros (index-1)
-    void setbrace(const Type& m, char rr) { $self->setNZ(m, true, casadi::char2Slice(rr));}
-    void setbrace(const Type& m, const Matrix<int>& rr) { $self->setNZ(m, true, rr);}
+    void setbrace(const Type& m, char rr) { $self->set_nz(m, true, casadi::char2Slice(rr));}
+    void setbrace(const Type& m, const Matrix<int>& rr) { $self->set_nz(m, true, rr);}
 
     // 'end' function (needed for end syntax in MATLAB)
     inline int end(int i, int n) const {

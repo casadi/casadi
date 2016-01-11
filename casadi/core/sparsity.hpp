@@ -315,21 +315,21 @@ namespace casadi {
 
     /** \brief Get the index of an existing non-zero element
         return -1 if the element does not exist */
-    int getNZ(int rr, int cc) const;
+    int get_nz(int rr, int cc) const;
 
     /// Returns true if the pattern has a non-zero at location rr, cc
     bool has_nz(int rr, int cc) const;
 
     /** \brief Get a set of non-zero element
         return -1 if the element does not exist */
-    std::vector<int> getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const;
+    std::vector<int> get_nz(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
     /** \brief Get the nonzero index for a set of elements
         The index vector is used both for input and outputs and must be sorted by increasing
         nonzero index, i.e. column-wise.
         Elements not found in the sparsity pattern are set to -1.
     */
-    void getNZ(std::vector<int>& SWIG_INOUT(indices)) const;
+    void get_nz(std::vector<int>& SWIG_INOUT(indices)) const;
 
     /// Get nonzeros in lower triangular part
     std::vector<int> get_lower() const;

@@ -66,7 +66,7 @@ namespace casadi {
                                 const Slice& rr, const Slice& cc) const {
     // Both are scalar
     if (rr.is_scalar(size1()) && cc.is_scalar(size2())) {
-      int k = sparsity().getNZ(rr.toScalar(size1()), cc.toScalar(size2()));
+      int k = sparsity().get_nz(rr.toScalar(size1()), cc.toScalar(size2()));
       if (k>=0) {
         m = data().at(k);
       } else {
@@ -121,7 +121,7 @@ namespace casadi {
     // Scalar
     if (rr.is_scalar(numel())) {
       int r = rr.toScalar(numel());
-      int k = sparsity().getNZ(r % size1(), r / size1());
+      int k = sparsity().get_nz(r % size1(), r / size1());
       if (k>=0) {
         m = data().at(k);
       } else {
@@ -143,7 +143,7 @@ namespace casadi {
 
     // If the indexed matrix is dense, use nonzero indexing
     if (is_dense()) {
-      return getNZ(m, ind1, rr);
+      return get_nz(m, ind1, rr);
     }
 
     // Get the sparsity pattern - does bounds checking
@@ -348,7 +348,7 @@ namespace casadi {
 
     // Dense mode
     if (is_dense() && m.is_dense()) {
-      return setNZ(m, ind1, rr);
+      return set_nz(m, ind1, rr);
     }
 
     // Construct new sparsity pattern
@@ -368,7 +368,7 @@ namespace casadi {
     if (sp != sparsity()) *this = project(*this, sp);
 
     // Find the nonzeros corresponding to rr
-    sparsity().getNZ(nz);
+    sparsity().get_nz(nz);
 
     // Carry out the assignments
     for (int i=0; i<nz.size(); ++i) {
@@ -391,7 +391,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::getNZ(Matrix<Scalar>& m, bool ind1, const Slice& kk) const {
+  void Matrix<Scalar>::get_nz(Matrix<Scalar>& m, bool ind1, const Slice& kk) const {
     // Scalar
     if (kk.is_scalar(nnz())) {
       m = data().at(kk.toScalar(nnz()));
@@ -399,14 +399,14 @@ namespace casadi {
     }
 
     // Fall back on IM
-    getNZ(m, ind1, kk.getAll(nnz(), ind1));
+    get_nz(m, ind1, kk.getAll(nnz(), ind1));
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::getNZ(Matrix<Scalar>& m, bool ind1, const Matrix<int>& kk) const {
+  void Matrix<Scalar>::get_nz(Matrix<Scalar>& m, bool ind1, const Matrix<int>& kk) const {
     // Scalar
     if (kk.is_scalar(true)) {
-      return getNZ(m, ind1, kk.toSlice(ind1));
+      return get_nz(m, ind1, kk.toSlice(ind1));
     }
 
     // Get nonzeros of kk
@@ -415,7 +415,7 @@ namespace casadi {
 
     // Check bounds
     if (!inBounds(k, -sz+ind1, sz+ind1)) {
-      casadi_error("getNZ[kk] out of bounds. Your kk contains "
+      casadi_error("get_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
                    << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
@@ -437,7 +437,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::setNZ(const Matrix<Scalar>& m, bool ind1, const Slice& kk) {
+  void Matrix<Scalar>::set_nz(const Matrix<Scalar>& m, bool ind1, const Slice& kk) {
     // Scalar
     if (kk.is_scalar(nnz())) {
       data().at(kk.toScalar(nnz())) = m.toScalar();
@@ -445,14 +445,14 @@ namespace casadi {
     }
 
     // Fallback on IM
-    setNZ(m, ind1, kk.getAll(nnz(), ind1));
+    set_nz(m, ind1, kk.getAll(nnz(), ind1));
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::setNZ(const Matrix<Scalar>& m, bool ind1, const Matrix<int>& kk) {
+  void Matrix<Scalar>::set_nz(const Matrix<Scalar>& m, bool ind1, const Matrix<int>& kk) {
     // Scalar
     if (kk.is_scalar(true)) {
-      return setNZ(m, ind1, kk.toSlice(ind1));
+      return set_nz(m, ind1, kk.toSlice(ind1));
     }
 
     // Assert dimensions of assigning matrix
@@ -460,14 +460,14 @@ namespace casadi {
       if (m.is_scalar()) {
         // m scalar means "set all"
         if (!m.is_dense()) return; // Nothing to set
-        return setNZ(Matrix<Scalar>(kk.sparsity(), m), ind1, kk);
+        return set_nz(Matrix<Scalar>(kk.sparsity(), m), ind1, kk);
       } else if (kk.size() == m.size()) {
         // Project sparsity if needed
-        return setNZ(project(m, kk.sparsity()), ind1, kk);
+        return set_nz(project(m, kk.sparsity()), ind1, kk);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return setNZ(m.T(), ind1, kk);
+        return set_nz(m.T(), ind1, kk);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch." << "lhs is " << kk.size()
@@ -481,7 +481,7 @@ namespace casadi {
 
     // Check bounds
     if (!inBounds(k, -sz+ind1, sz+ind1)) {
-      casadi_error("setNZ[kk] out of bounds. Your kk contains "
+      casadi_error("set_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(k.begin(), k.end()) << " up to "
                    << *std::max_element(k.begin(), k.end())
                    << ", which is outside the range [" << -sz+ind1 << ","<< sz+ind1 <<  ").");
@@ -2082,7 +2082,7 @@ namespace casadi {
       blocks(a.size1(), std::vector< Matrix<Scalar> >(a.size2(), filler));
     for (int i=0; i<a.size1(); ++i) {
       for (int j=0; j<a.size2(); ++j) {
-        int k = a_sp.getNZ(i, j);
+        int k = a_sp.get_nz(i, j);
         if (k!=-1) {
           blocks[i][j] = a[k]*b;
         }

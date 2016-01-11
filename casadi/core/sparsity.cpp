@@ -209,12 +209,12 @@ namespace casadi {
   }
 
   bool Sparsity::has_nz(int rr, int cc) const {
-    return getNZ(rr, cc)!=-1;
+    return get_nz(rr, cc)!=-1;
   }
 
 
-  int Sparsity::getNZ(int rr, int cc) const {
-    return (*this)->getNZ(rr, cc);
+  int Sparsity::get_nz(int rr, int cc) const {
+    return (*this)->get_nz(rr, cc);
   }
 
   Sparsity Sparsity::reshape(const Sparsity& x, const Sparsity& sp) {
@@ -226,8 +226,8 @@ namespace casadi {
     return x->_reshape(nrow, ncol);
   }
 
-  std::vector<int> Sparsity::getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const {
-    return (*this)->getNZ(rr, cc);
+  std::vector<int> Sparsity::get_nz(const std::vector<int>& rr, const std::vector<int>& cc) const {
+    return (*this)->get_nz(rr, cc);
   }
 
   bool Sparsity::is_scalar(bool scalar_and_dense) const {
@@ -562,8 +562,8 @@ namespace casadi {
     (*this)->find(loc, ind1);
   }
 
-  void Sparsity::getNZ(std::vector<int>& indices) const {
-    (*this)->getNZ(indices);
+  void Sparsity::get_nz(std::vector<int>& indices) const {
+    (*this)->get_nz(indices);
   }
 
   Sparsity Sparsity::uni_coloring(const Sparsity& AT, int cutoff) const {
@@ -1121,7 +1121,7 @@ namespace casadi {
       blocks(a.size1(), std::vector< Sparsity >(a.size2(), filler));
     for (int i=0; i<a.size1(); ++i) {
       for (int j=0; j<a.size2(); ++j) {
-        int k = a.getNZ(i, j);
+        int k = a.get_nz(i, j);
         if (k!=-1) {
           blocks[i][j] = b;
         }

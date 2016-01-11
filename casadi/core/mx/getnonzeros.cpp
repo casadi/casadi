@@ -204,7 +204,7 @@ namespace casadi {
     // Get the matching nonzeros
     r_ind.resize(el_input.size());
     copy(el_input.begin(), el_input.end(), r_ind.begin());
-    arg[0].sparsity().getNZ(r_ind);
+    arg[0].sparsity().get_nz(r_ind);
 
     // Sparsity pattern for the result
     r_colind.resize(osp.size2()+1); // Col count
@@ -285,7 +285,7 @@ namespace casadi {
       // Get the matching nonzeros
       r_ind.resize(el_input.size());
       copy(el_input.begin(), el_input.end(), r_ind.begin());
-      arg.sparsity().getNZ(r_ind);
+      arg.sparsity().get_nz(r_ind);
 
       // Sparsity pattern for the result
       r_colind.resize(osp.size2()+1); // Col count
@@ -366,7 +366,7 @@ namespace casadi {
 
       // Get the corresponding nz locations in the output sparsity pattern
       aseed0.sparsity().find(r_nz);
-      osp.getNZ(r_nz);
+      osp.get_nz(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all
       bool elements_to_add = false;
@@ -386,7 +386,7 @@ namespace casadi {
       // Get the nz locations in the adjoint sensitivity corresponding to the inputs
       r_ind.resize(el_input.size());
       copy(el_input.begin(), el_input.end(), r_ind.begin());
-      asens0.sparsity().getNZ(r_ind);
+      asens0.sparsity().get_nz(r_ind);
 
       // Enlarge the sparsity pattern of the sensitivity if not all additions fit
       for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
@@ -398,7 +398,7 @@ namespace casadi {
 
           // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
           copy(el_input.begin(), el_input.end(), r_ind.begin());
-          asens0.sparsity().getNZ(r_ind);
+          asens0.sparsity().get_nz(r_ind);
 
           break;
         }

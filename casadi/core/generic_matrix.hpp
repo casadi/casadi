@@ -195,7 +195,7 @@ namespace casadi {
     template<typename K>
     const MatType operator[](const K& k) const {
       MatType ret;
-      self().getNZ(ret, false, k);
+      self().get_nz(ret, false, k);
       return ret;
     }
 

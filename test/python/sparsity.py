@@ -88,8 +88,8 @@ class Sparsitytests(casadiTestCase):
       ind = (c.row(k),c.get_col()[k])
       self.assertTrue(ind in nza and ind in nzb)
        
-  def test_getNZDense(self):
-    self.message("getNZDense")
+  def test_get_nzDense(self):
+    self.message("get_nzDense")
     nza = set([  (0,0),(0,1),(2,0),(3,1)])
     
     a = Sparsity(4,5)

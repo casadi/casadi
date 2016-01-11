@@ -719,7 +719,7 @@ namespace casadi {
                 for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
                   if (spsens & (bvec_t(1) << bvec_i)) {
                     // if dependency is found, add it to the new sparsity pattern
-                    int ind = lookup.sparsity().getNZ(bvec_i, cri);
+                    int ind = lookup.sparsity().get_nz(bvec_i, cri);
                     casadi_assert(ind!=-1);
                     int lk = lookup->at(ind);
                     if (lk>-bvec_size) {
@@ -1012,7 +1012,7 @@ namespace casadi {
                 for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
                   if (spsens & bvec_lookup[bvec_i]) {
                     // if dependency is found, add it to the new sparsity pattern
-                    int ind = lookup.sparsity().getNZ(bvec_i, cri);
+                    int ind = lookup.sparsity().get_nz(bvec_i, cri);
                     casadi_assert(ind!=-1);
                     jrow.push_back(bvec_i+lookup->at(ind));
                     jcol.push_back(fri);

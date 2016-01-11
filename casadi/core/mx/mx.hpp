@@ -340,14 +340,14 @@ namespace casadi {
 
     ///@{
     /// Get a set of nonzeros
-    void getNZ(MX& SWIG_OUTPUT(m), bool ind1, const Slice& kk) const;
-    void getNZ(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& kk) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Slice& kk) const;
+    void get_nz(MX& SWIG_OUTPUT(m), bool ind1, const Matrix<int>& kk) const;
     ///@}
 
     ///@{
     /// Set a set of nonzeros
-    void setNZ(const MX& m, bool ind1, const Slice& kk);
-    void setNZ(const MX& m, bool ind1, const Matrix<int>& kk);
+    void set_nz(const MX& m, bool ind1, const Slice& kk);
+    void set_nz(const MX& m, bool ind1, const Matrix<int>& kk);
     ///@}
 
 #ifndef SWIG
