@@ -161,7 +161,7 @@ namespace casadi {
     }
   }
 
-  int Sparsity::addNZ(int rr, int cc) {
+  int Sparsity::add_nz(int rr, int cc) {
     // If negative index, count from the back
     if (rr<0) rr += size1();
     if (cc<0) cc += size2();

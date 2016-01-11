@@ -311,7 +311,7 @@ namespace casadi {
 
     /** \brief Get the index of a non-zero element
         Add the element if it does not exist and copy object if it's not unique */
-    int addNZ(int rr, int cc);
+    int add_nz(int rr, int cc);
 
     /** \brief Get the index of an existing non-zero element
         return -1 if the element does not exist */

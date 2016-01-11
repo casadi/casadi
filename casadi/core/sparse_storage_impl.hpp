@@ -34,7 +34,7 @@ namespace casadi {
   template<typename DataType>
   DataType& SparseStorage<DataType>::elem(int rr, int cc) {
     int oldsize = sparsity().nnz();
-    int ind = sparsityRef().addNZ(rr, cc);
+    int ind = sparsityRef().add_nz(rr, cc);
     if (oldsize != sparsity().nnz())
       data().insert(data().begin()+ind, DataType(0));
     return data().at(ind);
