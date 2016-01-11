@@ -154,9 +154,7 @@ namespace casadi {
 
   private:
       // options
-      std::map<std::string, std::string> intOpts_;
-      std::map<std::string, std::string> realOpts_;
-      std::map<std::string, std::string> strOpts_;
+      Dict opts_;
   };
 
 } // namespace casadi

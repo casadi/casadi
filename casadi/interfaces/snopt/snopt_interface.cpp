@@ -59,145 +59,20 @@ namespace casadi {
     addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
 
     // options which are handled seperately
-    addOption("start",  OT_STRING, "Cold",  "", "Cold|Basis|Warm");
-    addOption("print file",  OT_STRING);
-    addOption("specs file",  OT_STRING);
     addOption("summary", OT_BOOLEAN, true);
-
-    // Printing
-    intOpts_["Major print level"] = "1 * 1-line major iteration log";
-    intOpts_["Minor print level"] = "1 * 1-line minor iteration log";
-    // special om["Print file"] = OT_S; //  * specified by subroutine sn_init
-    // special om["Summary file"] = OT_S; //  * specified by subroutine sn_init
-    intOpts_["Print frequency"] = "100 * minor iterations log on Print file";
-    intOpts_["Summary frequency"] = "100 * minor iterations log on Summary file";
-    strOpts_["Solution"] = "Yes * on the Print file";
-
-    // * Suppress options listing * options are normally listed
-    strOpts_["System information"] = "No * Yes prints more system information";
-
-    // * Problem specification
-    // special Minimize * (opposite of Maximize)
-
-    // * Feasible point * (alternative to Max or Min)
-    // Objective row 1 * has precedence over ObjRow (snOptA)
-    // Infinite bound 1.0e+20 *
-
-    // * Convergence Tolerances
-    realOpts_["Major feasibility tolerance"] = "1.0e-6 * target nonlinear constraint violation";
-    realOpts_["Major optimality tolerance"] = "1.0e-6 * target complementarity gap";
-    realOpts_["Minor feasibility tolerance"] = "1.0e-6 * for satisfying the QP bounds";
-
-    // * Derivative checking
-    intOpts_["Verify level"] = "0 * cheap check on gradients";
-    // Start objective check at col 1 * NOT ALLOWED IN snOptA
-    // Stop objective check at col n'1 * NOT ALLOWED IN snOptA
-    // Start constraint check at col 1 * NOT ALLOWED IN snOptA
-    // Stop constraint check at col n''1 * NOT ALLOWED IN snOptA
-
-    // * Scaling
-    intOpts_["Scale option"] = "1 * linear constraints and variables";
-    realOpts_["Scale tolerance"] = "0.9";
-    // SPECIAL // * Scale Print * default: scales are not printed
-
-    // * Other Tolerances
-    realOpts_["Crash tolerance"] = "0.1";
-    realOpts_["Linesearch tolerance"] = "0.9 * smaller for more accurate search";
-    realOpts_["Pivot tolerance"] = "3.7e-11 * e^2/3";
-
-    // * QP subproblems
-    strOpts_["QPSolver"] = "Cholesky * default";
-    intOpts_["Crash option"] = "3 * first basis is essentially triangular";
-    realOpts_["Elastic weight"] = "1.0e+4 * used only during elastic mode";
-    intOpts_["Iterations limit"] = "10000 * or 20m if that is more";
-    intOpts_["Partial price"] = "1 * 10 for large LPs";
-
-    //* SQP method
-    // special * Cold start * has precedence over argument start
-    // special * Warm start * (alternative to a cold start)
-    intOpts_["Major iterations limit"] = "1000 * or m if that is more";
-    intOpts_["Minor iterations limit"] = "500 * or 3m if that is more";
-    realOpts_["Major step limit"] = "2.0";
-    intOpts_["Superbasics limit"] = "n1 + 1 * n1 = number of nonlinear variables";
-    intOpts_["Derivative level"] = "3";
-    // Derivative option 1 * ONLY FOR snOptA
-    //?????    om["Derivative linesearch"] *
-
-    // * Nonderivative linesearch *
-    realOpts_["Function precision"] = "3.0e-13 * e^0.8 (almost full accuracy)";
-    realOpts_["Difference interval"] = "5.5e-7 * (Function precision)^1/2";
-    realOpts_["Central difference interval"] = "6.7e-5 * (Function precision)^1/3";
-    intOpts_["New superbasics limit"] = "99 * controls early termination of QPs";
-    // Objective row ObjRow * row number of objective in F(x)
-    realOpts_["Penalty parameter"] = "0.0 * initial penalty parameter";
-    intOpts_["Proximal point method"] = "1 * satisfies linear constraints near x0";
-    intOpts_["Reduced Hessian dimension"] = "2000 * or Superbasics limit if that is less";
-    realOpts_["Violation limit"] = "10.0 * unscaled constraint violation limit";
-    realOpts_["Unbounded step size"] = "1.0e+18";
-    realOpts_["Unbounded objective"] = "1.0e+15";
-
-    // * Hessian approximation
-    strOpts_["Hessian"] = "full memory * default if n1 ≤ 75\n"
-      "limited memory * default if n1 > 75";
-    intOpts_["Hessian frequency"] = "999999 * for full Hessian (never reset)";
-    intOpts_["Hessian updates"] = "10 * for limited memory Hessian";
-    intOpts_["Hessian flush"] = "999999 * no flushing";
-
-    // * Frequencies
-    intOpts_["Check frequency"] = "60 * test row residuals kAx - sk";
-    intOpts_["Expand frequency"] = "10000 * for anti-cycling procedure";
-    intOpts_["Factorization frequency"] = "50 * 100 for LPs";
-    intOpts_["Save frequency"] = "100 * save basis map";
-
-    // * LUSOL options
-    realOpts_["LU factor tolerance"] = "3.99 * for NP (100.0 for LP)";
-    realOpts_["LU update tolerance"] = "3.99 * for NP ( 10.0 for LP)";
-    realOpts_["LU singularity tolerance"] = "3.2e-11";
-    strOpts_["LU"] = "LU partial pivoting * default threshold pivoting strategy\n"
-      "LU rook pivoting * threshold rook pivoting\n"
-      "LU complete pivoting * threshold complete pivoting";
-
-    // * Basis files
-    intOpts_["Old basis file"] = "0 * input basis map";
-    intOpts_["New basis file"] = "0 * output basis map";
-    intOpts_["Backup basis file"] = "0 * output extra basis map";
-    intOpts_["Insert file"] = "0 * input in industry format";
-    intOpts_["Punch file"] = "0 * output Insert data";
-    intOpts_["Load file"] = "0 * input names and values";
-    intOpts_["Dump file"] = "0 * output Load data";
-    intOpts_["Solution file"] = "0 * different from printed solution";
-
-    // * Partitions of cw, iw, rw
-    // Total character workspace lencw *
-    // Total integer workspace leniw *
-    // Total real workspace lenrw *
-    // User character workspace 500 *
-    // User integer workspace 500 *
-    // User real workspace 500 *
-
-    // * Miscellaneous
-    intOpts_["Debug level"] = "0 * for developers";
-    strOpts_["Sticky parameters"] = "No * Yes makes parameter values persist";
-    intOpts_["Timing level"] = "3 * print cpu times";
-
-    // Add the Snopt Options
-    for (auto it = intOpts_.begin(); it != intOpts_.end(); ++it)
-      addOption(it->first, OT_INTEGER, GenericType(), it->second);
-    for (auto it = realOpts_.begin(); it != realOpts_.end(); ++it)
-      addOption(it->first, OT_REAL, GenericType(), it->second);
-    for (auto it = strOpts_.begin(); it != strOpts_.end(); ++it)
-      addOption(it->first, OT_STRING, GenericType(), it->second);
+    addOption("snopt", OT_DICT, GenericType(), "Options to be passed to SNOPT");
   }
 
   SnoptInterface::~SnoptInterface() {
   }
 
   void SnoptInterface::init() {
-    // Read in casadi options
-    detect_linear_ = option("detect_linear");
-
     // Call the init method of the base class
     Nlpsol::init();
+
+    // Read user options
+    detect_linear_ = option("detect_linear");
+    if (hasSetOption("snopt")) opts_ = option("snopt");
 
     // Get/generate required functions
     setup_jac_f();
@@ -363,12 +238,6 @@ namespace casadi {
     // Outputs
     double Obj = 0; // TODO(Greg): get this from snopt
 
-    // if (option("summary")) {
-    //   summaryOn();
-    // } else {
-    //   summaryOff();
-    // }
-
     // snInit must be called first.
     //   9, 6 are print and summary unit numbers (for Fortran).
     //   6 == standard out
@@ -377,16 +246,6 @@ namespace casadi {
     std::string outname = name_ + ".out";
     snInit(&prob, const_cast<char*>(name_.c_str()),
            const_cast<char*>(outname.c_str()), iprint, isumm);
-
-    // snoptProblemC snoptProbC = snoptProblemC();
-    // if (hasSetOption("specs file")) {
-    //   std::string specs_file = option("specs file");
-    //   snoptProbC.setSpecsFile(specs_file.c_str());
-    // }
-    // if (hasSetOption("print file")) {
-    //   std::string print_file = option("print file");
-    //   snoptProbC.setPrintFile(print_file.c_str());
-    // }
 
     // Set the problem size and other data.
     // This will allocate arrays inside snProblem struct.
@@ -417,32 +276,37 @@ namespace casadi {
     casadi_copy(A_structure_.row(), A_structure_.nnz(), prob.indJ);
     casadi_copy(get_ptr(m.A_data), A_structure_.nnz(), prob.valJ);
 
-    for (auto&& pp : intOpts_) {
-      if (hasSetOption(pp.first)) {
-        int value = option(pp.first);
-        casadi_assert(pp.first.size() <= 55);
-        int Error = setIntParameter(&prob, const_cast<char*>(pp.first.c_str()), value);
-        casadi_assert_message(0 == Error, "snopt error setting option \"" + pp.first + "\"");
+    for (auto&& op : opts_) {
+      // Replace underscores with spaces
+      std::string opname = op.first;
+      std::replace(opname.begin(), opname.end(), '_', ' ');
+
+      // Try integer
+      if (op.second.can_cast_to(OT_INTEGER)) {
+        casadi_assert(opname.size() <= 55);
+        int flag = setIntParameter(&prob, const_cast<char*>(opname.c_str()),
+                                   op.second.to_int());
+        if (flag==0) continue;
       }
-    }
-    for (auto&& pp : realOpts_) {
-      if (hasSetOption(pp.first)) {
-        double value = option(pp.first);
-        casadi_assert(pp.first.size() <= 55);
-        int Error = setRealParameter(&prob, const_cast<char*>(pp.first.c_str()), value);
-        casadi_assert_message(0 == Error, "snopt error setting option \"" + pp.first + "\"");
+
+      // Try double
+      if (op.second.can_cast_to(OT_REAL)) {
+        casadi_assert(opname.size() <= 55);
+        int flag = setRealParameter(&prob, const_cast<char*>(opname.c_str()),
+                                    op.second.to_double());
+        if (flag==0) continue;
       }
-    }
-    for (auto&& pp : strOpts_) {
-      if (hasSetOption(pp.first)) {
-        std::string value = option(pp.first);
-        std::string buffer = pp.first;
-        buffer.append(" ");
-        buffer.append(value);
+
+      // try string
+      if (op.second.can_cast_to(OT_STRING)) {
+        std::string buffer = opname + " " + op.second.to_string();
         casadi_assert(buffer.size() <= 72);
-        int Error = setParameter(&prob, const_cast<char*>(buffer.c_str()));
-        casadi_assert_message(0 == Error, "snopt error setting option \"" + pp.first + "\"");
+        int flag = setParameter(&prob, const_cast<char*>(buffer.c_str()));
+        if (flag==0) continue;
       }
+
+      // Error if reached this point
+      casadi_error("SNOPT error setting option \"" + opname + "\"");
     }
 
     // Run SNOPT
