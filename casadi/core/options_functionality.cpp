@@ -184,7 +184,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
         GenericType::get_type_description(allowed_options[name]) << "' type." << endl;
     if (op.getType() == OT_BOOLEAN) {
       ss << "You supplied another type, possibly boolean." << endl;
-      if (allowed_options[name]==OT_REAL || allowed_options[name]==OT_INTEGER) {
+      if (allowed_options[name]==OT_DOUBLE || allowed_options[name]==OT_INT) {
         ss << "(A common mistake is to use SX/MX instead of floats/DM in this context)"
            << endl;
       }

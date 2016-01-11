@@ -59,11 +59,11 @@ namespace casadi {
     addOption("calc_icB",                    OT_BOOLEAN,          GenericType(),
               "Use IDACalcIC to get consistent initial conditions for "
               "backwards system [default: equal to calc_ic].");
-    addOption("abstolv",                     OT_REALVECTOR);
-    addOption("fsens_abstolv",               OT_REALVECTOR);
-    addOption("max_step_size",               OT_REAL,             0,
+    addOption("abstolv",                     OT_DOUBLEVECTOR);
+    addOption("fsens_abstolv",               OT_DOUBLEVECTOR);
+    addOption("max_step_size",               OT_DOUBLE,             0,
               "Maximim step size");
-    addOption("first_time",                  OT_REAL,             GenericType(),
+    addOption("first_time",                  OT_DOUBLE,             GenericType(),
               "First requested time as a fraction of the time interval");
     addOption("cj_scaling",                  OT_BOOLEAN,          false,
               "IDAS scaling on cj for the user-defined linear solver module");
@@ -74,7 +74,7 @@ namespace casadi {
     addOption("monitor",                     OT_STRINGVECTOR,     GenericType(), "",
               "correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB|psetup",
               true);
-    addOption("init_xdot",                   OT_REALVECTOR,       GenericType(),
+    addOption("init_xdot",                   OT_DOUBLEVECTOR,       GenericType(),
               "Initial values for the state derivatives");
 
     disable_internal_warnings_ = false;

@@ -40,17 +40,17 @@ LiftedSQPInternal::LiftedSQPInternal(const Function& F, const Function& G) : Nlp
   casadi_warning("casadi::LiftedSQP has been replaced by casadi::SCPgen. This class will be deleted.");
   addOption("qpsol",         OT_QPSOL,   GenericType(), "The QP solver to be used by the SQP method");
   addOption("qpsol_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
-  addOption("max_iter",           OT_INTEGER,    100,           "Maximum number of SQP iterations");
-  addOption("max_iter_ls",        OT_INTEGER,    100,           "Maximum number of linesearch iterations");
-  addOption("toldx",             OT_REAL   ,    1e-12,         "Stopping criterion for the stepsize");
-  addOption("tolgl",             OT_REAL   ,    1e-12,         "Stopping criterion for the Lagrangian gradient");
-  addOption("sigma",             OT_REAL   ,    1.0,           "Linesearch parameter");
-  addOption("rho",               OT_REAL   ,    0.5,           "Linesearch parameter");
-  addOption("mu_safety",         OT_REAL   ,    1.1,           "Safety factor for linesearch mu");
-  addOption("eta",               OT_REAL   ,    0.0001,        "Linesearch parameter: See Nocedal 3.4");
-  addOption("tau",               OT_REAL   ,    0.2,           "Linesearch parameter");
+  addOption("max_iter",           OT_INT,    100,           "Maximum number of SQP iterations");
+  addOption("max_iter_ls",        OT_INT,    100,           "Maximum number of linesearch iterations");
+  addOption("toldx",             OT_DOUBLE   ,    1e-12,         "Stopping criterion for the stepsize");
+  addOption("tolgl",             OT_DOUBLE   ,    1e-12,         "Stopping criterion for the Lagrangian gradient");
+  addOption("sigma",             OT_DOUBLE   ,    1.0,           "Linesearch parameter");
+  addOption("rho",               OT_DOUBLE   ,    0.5,           "Linesearch parameter");
+  addOption("mu_safety",         OT_DOUBLE   ,    1.1,           "Safety factor for linesearch mu");
+  addOption("eta",               OT_DOUBLE   ,    0.0001,        "Linesearch parameter: See Nocedal 3.4");
+  addOption("tau",               OT_DOUBLE   ,    0.2,           "Linesearch parameter");
   addOption("hessian_approximation", OT_STRING, "BFGS",        "BFGS|exact");
-  addOption("num_lifted",        OT_INTEGER,   0,              "Number of variables to lift");
+  addOption("num_lifted",        OT_INT,   0,              "Number of variables to lift");
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp", true);

@@ -936,12 +936,12 @@ import_array();
     GUESTOBJECT * from_ptr(const GenericType *a) {
       switch (a->getType()) {
       case OT_BOOLEAN: return from_tmp(a->as_bool());
-      case OT_INTEGER: return from_tmp(a->as_int());
-      case OT_REAL: return from_tmp(a->as_double());
+      case OT_INT: return from_tmp(a->as_int());
+      case OT_DOUBLE: return from_tmp(a->as_double());
       case OT_STRING: return from_tmp(a->as_string());
-      case OT_INTEGERVECTOR: return from_tmp(a->as_int_vector());
-      case OT_INTEGERVECTORVECTOR: return from_tmp(a->as_int_vector_vector());
-      case OT_REALVECTOR: return from_tmp(a->as_double_vector());
+      case OT_INTVECTOR: return from_tmp(a->as_int_vector());
+      case OT_INTVECTORVECTOR: return from_tmp(a->as_int_vector_vector());
+      case OT_DOUBLEVECTOR: return from_tmp(a->as_double_vector());
       case OT_STRINGVECTOR: return from_tmp(a->as_string_vector());
       case OT_DICT: return from_tmp(a->as_dict());
       case OT_FUNCTION: return from_tmp(a->as_function());

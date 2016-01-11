@@ -61,27 +61,27 @@ namespace casadi {
               "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "gauss-newton|exact");
-    addOption("max_iter",          OT_INTEGER,      50,
+    addOption("max_iter",          OT_INT,      50,
               "Maximum number of SQP iterations");
-    addOption("max_iter_ls",       OT_INTEGER,       1,
+    addOption("max_iter_ls",       OT_INT,       1,
               "Maximum number of linesearch iterations");
-    addOption("tol_pr",            OT_REAL,       1e-6,
+    addOption("tol_pr",            OT_DOUBLE,       1e-6,
               "Stopping criterion for primal infeasibility");
-    addOption("tol_du",            OT_REAL,       1e-6,
+    addOption("tol_du",            OT_DOUBLE,       1e-6,
               "Stopping criterion for dual infeasability");
-    addOption("tol_reg",           OT_REAL,       1e-11,
+    addOption("tol_reg",           OT_DOUBLE,       1e-11,
               "Stopping criterion for regularization");
-    addOption("tol_pr_step",       OT_REAL,       1e-6,
+    addOption("tol_pr_step",       OT_DOUBLE,       1e-6,
               "Stopping criterion for the step size");
-    addOption("c1",                OT_REAL,       1e-4,
+    addOption("c1",                OT_DOUBLE,       1e-4,
               "Armijo condition, coefficient of decrease in merit");
-    addOption("beta",              OT_REAL,       0.8,
+    addOption("beta",              OT_DOUBLE,       0.8,
               "Line-search parameter, restoration factor of stepsize");
-    addOption("merit_memsize",     OT_INTEGER,      4,
+    addOption("merit_memsize",     OT_INT,      4,
               "Size of memory to store history of merit function values");
-    addOption("merit_start",       OT_REAL,      1e-8,
+    addOption("merit_start",       OT_DOUBLE,      1e-8,
               "Lower bound for the merit function parameter");
-    addOption("lbfgs_memory",      OT_INTEGER,     10,
+    addOption("lbfgs_memory",      OT_INT,     10,
               "Size of L-BFGS memory.");
     addOption("regularize",        OT_BOOLEAN,  false,
               "Automatic regularization of Lagrange Hessian.");
@@ -89,11 +89,11 @@ namespace casadi {
               "Print the header with problem statistics");
     addOption("codegen",           OT_BOOLEAN,  false,
               "C-code generation");
-    addOption("reg_threshold",     OT_REAL,      1e-8,
+    addOption("reg_threshold",     OT_DOUBLE,      1e-8,
               "Threshold for the regularization.");
     addOption("name_x",      OT_STRINGVECTOR,  GenericType(),
               "Names of the variables.");
-    addOption("print_x",           OT_INTEGERVECTOR,  GenericType(),
+    addOption("print_x",           OT_INTVECTOR,  GenericType(),
               "Which variables to print.");
     addOption("print_time",        OT_BOOLEAN, true,
               "Print information about execution time");

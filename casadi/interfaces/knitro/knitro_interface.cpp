@@ -57,60 +57,60 @@ namespace casadi {
     // Not yet ready
     //addOption("algorithm",                OT_STRING, GenericType(),
     // "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
-    //addOption("bar_directinterval",       OT_INTEGER, GenericType(),
+    //addOption("bar_directinterval",       OT_INT, GenericType(),
     //  "When using the Interior/Direct algorithm, this parameter controls the maximum number of "
     //  "consecutive CG steps before trying to force the algorithm to take a direct step again. "
     //  "See KNITRO documentation.");
     //addOption("bar_feasible",             OT_STRING, GenericType(),
     //  "Whether feasibility is given special emphasis. See KNITRO documentation.",
     //  "no|stay|get|get_stay");
-    //addOption("bar_feasmodetol",          OT_REAL, GenericType(),
+    //addOption("bar_feasmodetol",          OT_DOUBLE, GenericType(),
     //  "Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.");
-    //addOption("bar_initmu",               OT_INTEGER, GenericType(),
+    //addOption("bar_initmu",               OT_INT, GenericType(),
     //  "Initial value for the barrier parameter. See KNITRO documentation.");
     //addOption("bar_initpt",               OT_STRING, GenericType(),
     //  "Whether to use the initial point strategy with barrier algorithms. "
     //  "See KNITRO documentation.", "auto|yes|no");
-    //addOption("bar_maxbacktrack",         OT_INTEGER, GenericType(),
+    //addOption("bar_maxbacktrack",         OT_INT, GenericType(),
     //  "Maximum allowable number of backtracks during the linesearch of the Interior Direct "
     //  "algorithm before reverting to a CG step. See KNITRO documentation.");
-    //addOption("bar_maxrefactor",          OT_INTEGER, GenericType(),
+    //addOption("bar_maxrefactor",          OT_INT, GenericType(),
     //  "Maximum number of refactorizations of the KKT system per iteration of the Interior "
     //  "Direct algorithm before reverting to a CG step. See KNITRO documentation.");
 
-    //addOption("Alg", OT_INTEGER,0, "Algorithm");
-    addOption("BarRule", OT_INTEGER, 0, "Barrier Rule");
+    //addOption("Alg", OT_INT,0, "Algorithm");
+    addOption("BarRule", OT_INT, 0, "Barrier Rule");
     addOption("NewPoint", OT_BOOLEAN, 0, "Select new-point feature");
-    addOption("GradOpt", OT_INTEGER, 1, "Gradient calculation method");
-    addOption("HessOpt", OT_INTEGER, 1, "Hessian calculation method");
+    addOption("GradOpt", OT_INT, 1, "Gradient calculation method");
+    addOption("HessOpt", OT_INT, 1, "Hessian calculation method");
     addOption("Feasible", OT_BOOLEAN, 1, "Allow infeasible iterations");
     addOption("HonorBnds", OT_BOOLEAN, 0, "Enforce bounds");
     addOption("LpSolver", OT_BOOLEAN, 0, "Use LpSolver");
     addOption("Multistart", OT_BOOLEAN, 0, "Use multistart");
-    //addOption("MsMaxSolves", OT_INTEGER, 1, "Maximum multistart points");
-    addOption("MaxCgIt", OT_INTEGER, 0, "Maximum conjugate gradient iterations");
-    //addOption("MaxCrossTt", OT_INTEGER, 0, "Maximum crossover iterations");
-    addOption("MaxIt", OT_INTEGER, 10000, "Iteration limit");
-    //addOption("MaxTimeCPU", OT_REAL, 1e8, "CPU Time limit");
-    //addOption("MaxTimeReal", OT_REAL, 1e8, "Time limit");
-    addOption("LmSize", OT_INTEGER, 10, "Memory pairsize limit");
+    //addOption("MsMaxSolves", OT_INT, 1, "Maximum multistart points");
+    addOption("MaxCgIt", OT_INT, 0, "Maximum conjugate gradient iterations");
+    //addOption("MaxCrossTt", OT_INT, 0, "Maximum crossover iterations");
+    addOption("MaxIt", OT_INT, 10000, "Iteration limit");
+    //addOption("MaxTimeCPU", OT_DOUBLE, 1e8, "CPU Time limit");
+    //addOption("MaxTimeReal", OT_DOUBLE, 1e8, "Time limit");
+    addOption("LmSize", OT_INT, 10, "Memory pairsize limit");
     addOption("Scale", OT_BOOLEAN, 1, "Perform scaling");
     addOption("ShiftInit", OT_BOOLEAN, 1, "Interior-point shifting initial point");
-    addOption("Soc", OT_INTEGER, 1, "Second order correction");
+    addOption("Soc", OT_INT, 1, "Second order correction");
     addOption("InitPt", OT_BOOLEAN, 0, "Use initial point strategy");
-    addOption("Delta", OT_REAL, 1.0, "Initial region scaling factor");
-    addOption("FeasModeTol", OT_REAL, 1e-4, "Feasible mode tolerance");
-    addOption("FeasTol", OT_REAL, 1e-6, "Feasible tolerance");
-    addOption("FeasTolAbs", OT_REAL, 0, "Absolute feasible tolerance");
-    addOption("OptTol", OT_REAL, 1e-6, "Relative optimality tolerance");
-    addOption("OptTolAbs", OT_REAL, 0, "Absolute optimality tolerance");
-    addOption("Pivot", OT_REAL, 1e-8, "Initial pivot threshold");
-    addOption("XTol", OT_REAL, 1e-15, "Relative solution change tolerance");
-    addOption("Mu", OT_REAL, 0.1, "Initial barrier parameter");
-    addOption("ObjRange", OT_REAL, 1e20, "Maximum objective value");
-    addOption("OutLev", OT_INTEGER, 2, "Log output level");
-    addOption("Debug", OT_INTEGER, 0, "Debug level");
-    addOption("contype", OT_INTEGERVECTOR);
+    addOption("Delta", OT_DOUBLE, 1.0, "Initial region scaling factor");
+    addOption("FeasModeTol", OT_DOUBLE, 1e-4, "Feasible mode tolerance");
+    addOption("FeasTol", OT_DOUBLE, 1e-6, "Feasible tolerance");
+    addOption("FeasTolAbs", OT_DOUBLE, 0, "Absolute feasible tolerance");
+    addOption("OptTol", OT_DOUBLE, 1e-6, "Relative optimality tolerance");
+    addOption("OptTolAbs", OT_DOUBLE, 0, "Absolute optimality tolerance");
+    addOption("Pivot", OT_DOUBLE, 1e-8, "Initial pivot threshold");
+    addOption("XTol", OT_DOUBLE, 1e-15, "Relative solution change tolerance");
+    addOption("Mu", OT_DOUBLE, 0.1, "Initial barrier parameter");
+    addOption("ObjRange", OT_DOUBLE, 1e20, "Maximum objective value");
+    addOption("OutLev", OT_INT, 2, "Log output level");
+    addOption("Debug", OT_INT, 0, "Debug level");
+    addOption("contype", OT_INTVECTOR);
   }
 
 

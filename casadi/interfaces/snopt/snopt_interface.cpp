@@ -282,7 +282,7 @@ namespace casadi {
       std::replace(opname.begin(), opname.end(), '_', ' ');
 
       // Try integer
-      if (op.second.can_cast_to(OT_INTEGER)) {
+      if (op.second.can_cast_to(OT_INT)) {
         casadi_assert(opname.size() <= 55);
         int flag = setIntParameter(&prob, const_cast<char*>(opname.c_str()),
                                    op.second.to_int());
@@ -290,7 +290,7 @@ namespace casadi {
       }
 
       // Try double
-      if (op.second.can_cast_to(OT_REAL)) {
+      if (op.second.can_cast_to(OT_DOUBLE)) {
         casadi_assert(opname.size() <= 55);
         int flag = setRealParameter(&prob, const_cast<char*>(opname.c_str()),
                                     op.second.to_double());

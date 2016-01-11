@@ -81,9 +81,9 @@ namespace casadi {
 
     addOption("parallelization", OT_STRING, "serial",
               "Computational strategy for parallelization", "serial|openmp");
-    addOption("reduced_inputs", OT_INTEGERVECTOR, GenericType(),
+    addOption("reduced_inputs", OT_INTVECTOR, GenericType(),
               "Reduction for certain inputs");
-    addOption("reduced_outputs", OT_INTEGERVECTOR, GenericType(),
+    addOption("reduced_outputs", OT_INTVECTOR, GenericType(),
               "Reduction for certain outputs");
 
     setOption("input_scheme", f_.name_in());

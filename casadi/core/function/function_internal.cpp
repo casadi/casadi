@@ -40,7 +40,7 @@ namespace casadi {
   FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
     addOption("verbose",                  OT_BOOLEAN,             false,
               "Verbose evaluation -- for debugging");
-    addOption("ad_weight",                OT_REAL,                GenericType(),
+    addOption("ad_weight",                OT_DOUBLE,                GenericType(),
               "Weighting factor for derivative calculation."
               "When there is an option of either using forward or reverse mode "
               "directional derivatives, the condition ad_weight*nf<=(1-ad_weight)*na "
@@ -49,11 +49,11 @@ namespace casadi {
               "automatically, but this can be overridden by setting this option. "
               "In particular, 0 means forcing forward mode and 1 forcing reverse mode. "
               "Leave unset for (class specific) heuristics.");
-    addOption("ad_weight_sp",             OT_REAL,                GenericType(),
+    addOption("ad_weight_sp",             OT_DOUBLE,                GenericType(),
               "Weighting factor for sparsity pattern calculation calculation."
               "Overrides default behavior. Set to 0 and 1 to force forward and "
               "reverse mode respectively. Cf. option \"ad_weight\".");
-    addOption("jac_penalty",             OT_REAL,                 2,
+    addOption("jac_penalty",             OT_DOUBLE,                 2,
               "When requested for a number of forward/reverse directions,   "
               "it may be cheaper to compute first the full jacobian and then "
               "multiply with seeds, rather than obtain the requested directions "

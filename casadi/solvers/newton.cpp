@@ -47,11 +47,11 @@ namespace casadi {
   Newton::Newton(const std::string& name, const Function& f)
     : Rootfinder(name, f) {
 
-    addOption("abstol",                      OT_REAL, 1e-12,
+    addOption("abstol",                      OT_DOUBLE, 1e-12,
               "Stopping criterion tolerance on max(|F|)");
-    addOption("abstolStep",                  OT_REAL, 1e-12,
+    addOption("abstolStep",                  OT_DOUBLE, 1e-12,
               "Stopping criterion tolerance on step size");
-    addOption("max_iter",  OT_INTEGER, 1000,
+    addOption("max_iter",  OT_INT, 1000,
               "Maximum number of Newton iterations to perform before returning.");
     addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
 

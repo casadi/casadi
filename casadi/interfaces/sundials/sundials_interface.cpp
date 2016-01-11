@@ -35,20 +35,20 @@ namespace casadi {
 
   SundialsInterface::SundialsInterface(const std::string& name, const XProblem& dae)
     : Integrator(name, dae) {
-    addOption("max_num_steps",               OT_INTEGER,          10000,
+    addOption("max_num_steps",               OT_INT,          10000,
               "Maximum number of integrator steps");
-    addOption("reltol",                      OT_REAL,             1e-6,
+    addOption("reltol",                      OT_DOUBLE,             1e-6,
               "Relative tolerence for the IVP solution");
-    addOption("abstol",                      OT_REAL,             1e-8,
+    addOption("abstol",                      OT_DOUBLE,             1e-8,
               "Absolute tolerence  for the IVP solution");
     addOption("exact_jacobian",              OT_BOOLEAN,          true,
               "Use exact Jacobian information for the forward integration");
     addOption("exact_jacobianB",             OT_BOOLEAN,          GenericType(),
               "Use exact Jacobian information for the backward integration "
               "[default: equal to exact_jacobian]");
-    addOption("upper_bandwidth",             OT_INTEGER,          GenericType(),
+    addOption("upper_bandwidth",             OT_INT,          GenericType(),
               "Upper band-width of banded Jacobian (estimations)");
-    addOption("lower_bandwidth",             OT_INTEGER,          GenericType(),
+    addOption("lower_bandwidth",             OT_INT,          GenericType(),
               "Lower band-width of banded Jacobian (estimations)");
     addOption("linear_solver_type",          OT_STRING,           "dense",
               "", "user_defined|dense|banded|iterative");
@@ -56,11 +56,11 @@ namespace casadi {
               "", "gmres|bcgstab|tfqmr");
     addOption("pretype",                     OT_STRING,           "none",
               "", "none|left|right|both");
-    addOption("max_krylov",                  OT_INTEGER,          10,
+    addOption("max_krylov",                  OT_INT,          10,
               "Maximum Krylov subspace size");
     addOption("sensitivity_method",          OT_STRING,           "simultaneous", "",
               "simultaneous|staggered");
-    addOption("max_multistep_order",         OT_INTEGER,          5);
+    addOption("max_multistep_order",         OT_INT,          5);
     addOption("use_preconditioner",          OT_BOOLEAN,          false,
               "Precondition an iterative solver");
     addOption("use_preconditionerB",         OT_BOOLEAN,          GenericType(),
@@ -79,24 +79,24 @@ namespace casadi {
     addOption("finite_difference_fsens",     OT_BOOLEAN,          false,
               "Use finite differences to approximate the forward sensitivity equations "
               "(if AD is not available)");
-    addOption("fsens_reltol",                OT_REAL,             GenericType(),
+    addOption("fsens_reltol",                OT_DOUBLE,             GenericType(),
               "Relative tolerence for the forward sensitivity solution [default: equal to reltol]");
-    addOption("fsens_abstol",                OT_REAL,             GenericType(),
+    addOption("fsens_abstol",                OT_DOUBLE,             GenericType(),
               "Absolute tolerence for the forward sensitivity solution [default: equal to abstol]");
-    addOption("fsens_scaling_factors",       OT_REALVECTOR,       GenericType(),
+    addOption("fsens_scaling_factors",       OT_DOUBLEVECTOR,       GenericType(),
               "Scaling factor for the components if finite differences is used");
-    addOption("fsens_sensitiviy_parameters", OT_INTEGERVECTOR,    GenericType(),
+    addOption("fsens_sensitiviy_parameters", OT_INTVECTOR,    GenericType(),
               "Specifies which components will be used when estimating the sensitivity equations");
 
     // Adjoint sensivity problem
-    addOption("steps_per_checkpoint",        OT_INTEGER,          20,
+    addOption("steps_per_checkpoint",        OT_INT,          20,
               "Number of steps between two consecutive checkpoints");
     addOption("interpolation_type",          OT_STRING,           "hermite",
               "Type of interpolation for the adjoint sensitivities", "hermite|polynomial");
-    addOption("upper_bandwidthB",            OT_INTEGER,          GenericType(),
+    addOption("upper_bandwidthB",            OT_INT,          GenericType(),
               "Upper band-width of banded jacobians for backward integration "
               "[default: equal to upper_bandwidth]");
-    addOption("lower_bandwidthB",            OT_INTEGER,          GenericType(),
+    addOption("lower_bandwidthB",            OT_INT,          GenericType(),
               "lower band-width of banded jacobians for backward integration "
               "[default: equal to lower_bandwidth]");
     addOption("linear_solver_typeB",         OT_STRING,           GenericType(),
@@ -105,11 +105,11 @@ namespace casadi {
               "", "gmres|bcgstab|tfqmr");
     addOption("pretypeB",                    OT_STRING,           GenericType(),
               "", "none|left|right|both");
-    addOption("max_krylovB",                 OT_INTEGER,          GenericType(),
+    addOption("max_krylovB",                 OT_INT,          GenericType(),
               "Maximum krylov subspace size");
-    addOption("reltolB",                     OT_REAL,             GenericType(),
+    addOption("reltolB",                     OT_DOUBLE,             GenericType(),
               "Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]");
-    addOption("abstolB",                     OT_REAL,             GenericType(),
+    addOption("abstolB",                     OT_DOUBLE,             GenericType(),
               "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]");
     addOption("linear_solver",               OT_STRING,     GenericType(),
               "A custom linear solver creator function");

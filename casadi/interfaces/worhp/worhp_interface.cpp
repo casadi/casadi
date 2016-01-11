@@ -57,9 +57,9 @@ namespace casadi {
     addOption("print_time",         OT_BOOLEAN,       true,
               "Print information about execution time");
     addOption("UserHM", OT_BOOLEAN, true, "Use exact Hessian");
-    addOption("qp_ipBarrier", OT_REAL, GenericType(), "IP barrier parameter.");
-    addOption("qp_ipComTol", OT_REAL, GenericType(), "IP complementarity tolerance.");
-    addOption("qp_ipFracBound", OT_REAL, GenericType(), "IP fraction-to-the-boundary parameter.");
+    addOption("qp_ipBarrier", OT_DOUBLE, GenericType(), "IP barrier parameter.");
+    addOption("qp_ipComTol", OT_DOUBLE, GenericType(), "IP complementarity tolerance.");
+    addOption("qp_ipFracBound", OT_DOUBLE, GenericType(), "IP fraction-to-the-boundary parameter.");
     addOption("qp_ipLsMethod", OT_STRING, GenericType(),
       "Select the direct linear solver used by the IP method.",
       "LAPACK::0|MA57: only available if provided by the user:1|"
@@ -69,18 +69,18 @@ namespace casadi {
       "WSMP: subject to license availability:6|"
       "MA86: experimental, only available if provided by the user:7|"
       "MA97:experimental, only available if provided by the user:8");
-    addOption("qp_ipMinAlpha", OT_REAL, GenericType(),
+    addOption("qp_ipMinAlpha", OT_DOUBLE, GenericType(),
               "IP line search minimum step size.");
     addOption("qp_ipTryRelax", OT_BOOLEAN, GenericType(),
       "Enable relaxation strategy when encountering an error.");
-    addOption("qp_ipRelaxDiv", OT_REAL, GenericType(),
+    addOption("qp_ipRelaxDiv", OT_DOUBLE, GenericType(),
       "The relaxation term is divided by this value if successful.");
-    addOption("qp_ipRelaxMult", OT_REAL, GenericType(),
+    addOption("qp_ipRelaxMult", OT_DOUBLE, GenericType(),
       "The relaxation term is multiplied by this value if unsuccessful.");
-    addOption("qp_ipRelaxMax", OT_REAL, GenericType(), "Maximum relaxation value.");
-    addOption("qp_ipRelaxMin", OT_REAL, GenericType(), "Mimimum relaxation value.");
-    addOption("qp_ipResTol", OT_REAL, GenericType(), "IP residuals tolerance.");
-    addOption("qp_lsItMaxIter", OT_INTEGER, GenericType(),
+    addOption("qp_ipRelaxMax", OT_DOUBLE, GenericType(), "Maximum relaxation value.");
+    addOption("qp_ipRelaxMin", OT_DOUBLE, GenericType(), "Mimimum relaxation value.");
+    addOption("qp_ipResTol", OT_DOUBLE, GenericType(), "IP residuals tolerance.");
+    addOption("qp_lsItMaxIter", OT_INT, GenericType(),
       "Maximum number of iterations of the iterative linear solvers.");
     addOption("qp_lsItMethod", OT_STRING, GenericType(),
       "Select the iterative linear solver.",
@@ -90,7 +90,7 @@ namespace casadi {
       "none:No preconditioner.:0|"
       "static:Static preconditioner (KKT-matrix with constant lower-right block).:1|"
       "full:Full KKT-matrix.:2");
-    addOption("qp_lsRefineMaxIter", OT_INTEGER, GenericType(),
+    addOption("qp_lsRefineMaxIter", OT_INT, GenericType(),
       "Maximum number of iterative refinement steps of the direct linear solvers.");
     addOption("qp_lsScale", OT_BOOLEAN, GenericType(),
               "Enables scaling on linear solver level.");
@@ -98,8 +98,8 @@ namespace casadi {
       "Some matrices can be solved without calling a linear equation solver."
       "Currently only diagonal matrices are supported."
       "Non-diagonal matrices will besolved with the chosen linear equation solver.");
-    addOption("qp_lsTol", OT_REAL, GenericType(), "Tolerance for the linear solver.");
-    addOption("qp_maxIter", OT_INTEGER, GenericType(),
+    addOption("qp_lsTol", OT_DOUBLE, GenericType(), "Tolerance for the linear solver.");
+    addOption("qp_maxIter", OT_INT, GenericType(),
       "Imposes an upper limit on the number of minor solver iterations, "
       " i.e. for the quadratic subproblem solver."
       "If the limit is reached before convergence, "
@@ -108,23 +108,23 @@ namespace casadi {
       "Select the solution method used by the QP solver.",
       "ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|"
       "automatic: Prefer IP and fall back to NSN on error.:12");
-    addOption("qp_nsnBeta", OT_REAL, GenericType(), "NSN stepsize decrease factor.");
+    addOption("qp_nsnBeta", OT_DOUBLE, GenericType(), "NSN stepsize decrease factor.");
     addOption("qp_nsnGradStep", OT_BOOLEAN, GenericType(),
       "Enable gradient steps in the NSN method.");
-    addOption("qp_nsnKKT", OT_REAL, GenericType(), "NSN KKT tolerance.");
+    addOption("qp_nsnKKT", OT_DOUBLE, GenericType(), "NSN KKT tolerance.");
     addOption("qp_nsnLsMethod", OT_STRING, GenericType(),
       "Select the direct linear solver used by the NSN method.",
       "SuperLU::2|MA48: only available if provided by the user:4");
-    addOption("qp_nsnMinAlpha", OT_REAL, GenericType(),
+    addOption("qp_nsnMinAlpha", OT_DOUBLE, GenericType(),
               "NSN line search minimum step size.");
-    addOption("qp_nsnSigma", OT_REAL, GenericType(), "NSN line search slope parameter.");
+    addOption("qp_nsnSigma", OT_DOUBLE, GenericType(), "NSN line search slope parameter.");
     addOption("qp_printLevel", OT_STRING, GenericType(),
       "Controls the amount of QP solver output.",
       "none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2");
     addOption("qp_scaleIntern", OT_BOOLEAN, GenericType(), "Enable scaling on QP level.");
     addOption("qp_strict", OT_BOOLEAN, GenericType(),
               "Use strict termination criteria in IP method.");
-    addOption("Ares", OT_INTEGERVECTOR, GenericType(), "Armijo recovery strategies");
+    addOption("Ares", OT_INTVECTOR, GenericType(), "Armijo recovery strategies");
   }
 
   WorhpInterface::~WorhpInterface() {

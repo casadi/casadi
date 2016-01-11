@@ -62,27 +62,27 @@ namespace casadi {
               "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",
               "limited-memory|exact");
-    addOption("max_iter",           OT_INTEGER,      50,
+    addOption("max_iter",           OT_INT,      50,
               "Maximum number of SQP iterations");
-    addOption("max_iter_ls",        OT_INTEGER,       3,
+    addOption("max_iter_ls",        OT_INT,       3,
               "Maximum number of linesearch iterations");
-    addOption("tol_pr",            OT_REAL,       1e-6,
+    addOption("tol_pr",            OT_DOUBLE,       1e-6,
               "Stopping criterion for primal infeasibility");
-    addOption("tol_du",            OT_REAL,       1e-6,
+    addOption("tol_du",            OT_DOUBLE,       1e-6,
               "Stopping criterion for dual infeasability");
-    addOption("c1",                OT_REAL,       1E-4,
+    addOption("c1",                OT_DOUBLE,       1E-4,
               "Armijo condition, coefficient of decrease in merit");
-    addOption("beta",              OT_REAL,       0.8,
+    addOption("beta",              OT_DOUBLE,       0.8,
               "Line-search parameter, restoration factor of stepsize");
-    addOption("merit_memory",      OT_INTEGER,      4,
+    addOption("merit_memory",      OT_INT,      4,
               "Size of memory to store history of merit function values");
-    addOption("lbfgs_memory",      OT_INTEGER,     10,
+    addOption("lbfgs_memory",      OT_INT,     10,
               "Size of L-BFGS memory.");
     addOption("regularize",        OT_BOOLEAN,  false,
               "Automatic regularization of Lagrange Hessian.");
     addOption("print_header",      OT_BOOLEAN,   true,
               "Print the header with problem statistics");
-    addOption("min_step_size",     OT_REAL,   1e-10,
+    addOption("min_step_size",     OT_DOUBLE,   1e-10,
               "The size (inf-norm) of the step size should not become smaller than this.");
 
     // Monitors

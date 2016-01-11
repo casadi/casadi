@@ -51,10 +51,10 @@ namespace casadi {
                                      const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
 
-    addOption("nWSR",                   OT_INTEGER,     GenericType(),
+    addOption("nWSR",                   OT_INT,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
               "the initial homotopy. Default is 5(nx + nc)");
-    addOption("CPUtime",                OT_REAL,        GenericType(),
+    addOption("CPUtime",                OT_DOUBLE,        GenericType(),
               "The maximum allowed CPU time in seconds for the whole initialisation"
               " (and the actually required one on output). Disabled if unset.");
 
@@ -77,55 +77,55 @@ namespace casadi {
               "Enables condition-hardened  (but more expensive) LI test.");
     addOption("enableNZCTests",         OT_BOOLEAN, BooleanType_to_bool(ops.enableNZCTests),
               "Enables nonzero curvature  tests.");
-    addOption("enableDriftCorrection",  OT_INTEGER, static_cast<int>(ops.enableDriftCorrection),
+    addOption("enableDriftCorrection",  OT_INT, static_cast<int>(ops.enableDriftCorrection),
               "Specifies the frequency of drift corrections: 0: turns them off.");
-    addOption("enableCholeskyRefactorisation", OT_INTEGER,
+    addOption("enableCholeskyRefactorisation", OT_INT,
               static_cast<int>(ops.enableCholeskyRefactorisation),
               "Specifies the frequency of a full re-factorisation of projected "
               "Hessian matrix: 0: turns them off,  1: uses them at each iteration etc.");
     addOption("enableEqualities",       OT_BOOLEAN, BooleanType_to_bool(ops.enableEqualities),
               "Specifies whether equalities should be treated  as always active "
               "(True) or not (False)");
-    addOption("terminationTolerance",   OT_REAL, static_cast<double>(ops.terminationTolerance),
+    addOption("terminationTolerance",   OT_DOUBLE, static_cast<double>(ops.terminationTolerance),
               "Relative termination tolerance to stop homotopy.");
-    addOption("boundTolerance",         OT_REAL, static_cast<double>(ops.boundTolerance),
+    addOption("boundTolerance",         OT_DOUBLE, static_cast<double>(ops.boundTolerance),
               "If upper and lower bounds differ less than this tolerance, they are regarded "
               "equal, i.e. as  equality constraint.");
-    addOption("boundRelaxation",        OT_REAL, static_cast<double>(ops.boundRelaxation),
+    addOption("boundRelaxation",        OT_DOUBLE, static_cast<double>(ops.boundRelaxation),
               "Initial relaxation of bounds to start homotopy  and initial value for far bounds.");
-    addOption("epsNum",                 OT_REAL, static_cast<double>(ops.epsNum),
+    addOption("epsNum",                 OT_DOUBLE, static_cast<double>(ops.epsNum),
               "Numerator tolerance for ratio tests.");
-    addOption("epsDen",                 OT_REAL, static_cast<double>(ops.epsDen),
+    addOption("epsDen",                 OT_DOUBLE, static_cast<double>(ops.epsDen),
               "Denominator tolerance for ratio tests.");
-    addOption("maxPrimalJump",          OT_REAL, static_cast<double>(ops.maxPrimalJump),
+    addOption("maxPrimalJump",          OT_DOUBLE, static_cast<double>(ops.maxPrimalJump),
               "Maximum allowed jump in primal variables in  nonzero curvature tests.");
-    addOption("maxDualJump",            OT_REAL, static_cast<double>(ops.maxDualJump),
+    addOption("maxDualJump",            OT_DOUBLE, static_cast<double>(ops.maxDualJump),
               "Maximum allowed jump in dual variables in  linear independence tests.");
-    addOption("initialRamping",         OT_REAL, static_cast<double>(ops.initialRamping),
+    addOption("initialRamping",         OT_DOUBLE, static_cast<double>(ops.initialRamping),
               "Start value for ramping strategy.");
-    addOption("finalRamping",           OT_REAL, static_cast<double>(ops.finalRamping),
+    addOption("finalRamping",           OT_DOUBLE, static_cast<double>(ops.finalRamping),
               "Final value for ramping strategy.");
-    addOption("initialFarBounds",       OT_REAL, static_cast<double>(ops.initialFarBounds),
+    addOption("initialFarBounds",       OT_DOUBLE, static_cast<double>(ops.initialFarBounds),
               "Initial size for far bounds.");
-    addOption("growFarBounds",          OT_REAL, static_cast<double>(ops.growFarBounds),
+    addOption("growFarBounds",          OT_DOUBLE, static_cast<double>(ops.growFarBounds),
               "Factor to grow far bounds.");
     addOption("initialStatusBounds", OT_STRING, SubjectToStatus_to_string(ops.initialStatusBounds),
               "Initial status of bounds at first iteration.",
               "inactive::all bounds inactive|lower::all bounds active at their "
               "lower bound|upper::all bounds active at their upper bound");
-    addOption("epsFlipping",            OT_REAL, static_cast<double>(ops.epsFlipping),
+    addOption("epsFlipping",            OT_DOUBLE, static_cast<double>(ops.epsFlipping),
               "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound.");
-    addOption("numRegularisationSteps", OT_INTEGER, static_cast<int>(ops.numRegularisationSteps),
+    addOption("numRegularisationSteps", OT_INT, static_cast<int>(ops.numRegularisationSteps),
               "Maximum number of successive regularisation steps.");
-    addOption("epsRegularisation",      OT_REAL, static_cast<double>(ops.epsRegularisation),
+    addOption("epsRegularisation",      OT_DOUBLE, static_cast<double>(ops.epsRegularisation),
               "Scaling factor of identity matrix used for  Hessian regularisation.");
-    addOption("numRefinementSteps",     OT_INTEGER, static_cast<int>(ops.numRefinementSteps),
+    addOption("numRefinementSteps",     OT_INT, static_cast<int>(ops.numRefinementSteps),
               "Maximum number of iterative refinement steps.");
-    addOption("epsIterRef",             OT_REAL, static_cast<double>(ops.epsIterRef),
+    addOption("epsIterRef",             OT_DOUBLE, static_cast<double>(ops.epsIterRef),
               "Early termination tolerance for iterative  refinement.");
-    addOption("epsLITests",             OT_REAL, static_cast<double>(ops.epsLITests),
+    addOption("epsLITests",             OT_DOUBLE, static_cast<double>(ops.epsLITests),
               "Tolerance for linear independence tests.");
-    addOption("epsNZCTests",            OT_REAL, static_cast<double>(ops.epsNZCTests),
+    addOption("epsNZCTests",            OT_DOUBLE, static_cast<double>(ops.epsNZCTests),
               "Tolerance for nonzero curvature tests.");
   }
 

@@ -58,10 +58,10 @@ namespace casadi {
                                const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
 
-    addOption("print_level", OT_INTEGER, 0,
+    addOption("print_level", OT_INT, 0,
               "Print level. OOQP listens to print_level 0, 10 and 100");
-    addOption("mutol", OT_REAL, 1e-8, "tolerance as provided with setMuTol to OOQP");
-    addOption("artol", OT_REAL, 1e-8, "tolerance as provided with setArTol to OOQP");
+    addOption("mutol", OT_DOUBLE, 1e-8, "tolerance as provided with setMuTol to OOQP");
+    addOption("artol", OT_DOUBLE, 1e-8, "tolerance as provided with setArTol to OOQP");
   }
 
   OoqpInterface::~OoqpInterface() {

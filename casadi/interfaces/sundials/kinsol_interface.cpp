@@ -65,18 +65,18 @@ namespace casadi {
   KinsolInterface::KinsolInterface(const std::string& name, const Function& f)
     : Rootfinder(name, f) {
 
-    addOption("max_iter",                 OT_INTEGER, 0,
+    addOption("max_iter",                 OT_INT, 0,
               "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
-    addOption("abstol",                   OT_REAL, 1e-6, "Stopping criterion tolerance");
+    addOption("abstol",                   OT_DOUBLE, 1e-6, "Stopping criterion tolerance");
     addOption("linear_solver_type",       OT_STRING, "dense",
               "dense|banded|iterative|user_defined");
-    addOption("upper_bandwidth",          OT_INTEGER);
-    addOption("lower_bandwidth",          OT_INTEGER);
-    addOption("max_krylov",               OT_INTEGER, 0);
+    addOption("upper_bandwidth",          OT_INT);
+    addOption("lower_bandwidth",          OT_INT);
+    addOption("max_krylov",               OT_INT, 0);
     addOption("exact_jacobian",           OT_BOOLEAN, true);
     addOption("iterative_solver",         OT_STRING, "gmres", "gmres|bcgstab|tfqmr");
-    addOption("f_scale",                  OT_REALVECTOR);
-    addOption("u_scale",                  OT_REALVECTOR);
+    addOption("f_scale",                  OT_DOUBLEVECTOR);
+    addOption("u_scale",                  OT_DOUBLEVECTOR);
     addOption("pretype",                  OT_STRING, "none", "", "none|left|right|both");
     addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
     addOption("strategy",                 OT_STRING, "none", "Globalization strategy",

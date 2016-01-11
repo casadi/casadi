@@ -62,7 +62,7 @@ namespace casadi {
     addOption("iteration_callback", OT_FUNCTION, GenericType(),
               "A function that will be called at each iteration with the solver as input. "
               "Check documentation of Callback.");
-    addOption("iteration_callback_step", OT_INTEGER,         1,
+    addOption("iteration_callback_step", OT_INT,         1,
               "Only call the callback function every few iterations.");
     addOption("iteration_callback_ignore_errors", OT_BOOLEAN, false,
               "If set to true, errors thrown by iteration_callback will be ignored.");

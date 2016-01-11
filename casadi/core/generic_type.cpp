@@ -36,12 +36,12 @@ namespace casadi {
 
   /// \cond INTERNAL
   typedef GenericTypeInternal<OT_STRING, std::string> StringType;
-  typedef GenericTypeInternal<OT_REAL, double> DoubleType;
-  typedef GenericTypeInternal<OT_INTEGER, int> IntType;
+  typedef GenericTypeInternal<OT_DOUBLE, double> DoubleType;
+  typedef GenericTypeInternal<OT_INT, int> IntType;
   typedef GenericTypeInternal<OT_BOOLEAN, bool> BoolType;
-  typedef GenericTypeInternal<OT_REALVECTOR, std::vector<double> > DoubleVectorType;
-  typedef GenericTypeInternal<OT_INTEGERVECTOR, std::vector<int> > IntVectorType;
-  typedef GenericTypeInternal<OT_INTEGERVECTORVECTOR,
+  typedef GenericTypeInternal<OT_DOUBLEVECTOR, std::vector<double> > DoubleVectorType;
+  typedef GenericTypeInternal<OT_INTVECTOR, std::vector<int> > IntVectorType;
+  typedef GenericTypeInternal<OT_INTVECTORVECTOR,
                               std::vector< std::vector<int> > > IntVectorVectorType;
   typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
@@ -55,11 +55,11 @@ namespace casadi {
       return is_bool() || is_int() || is_double();
     case OT_BOOLVECTOR:
       return is_int_vector() || is_double_vector();
-    case OT_INTEGER:
-    case OT_REAL:
+    case OT_INT:
+    case OT_DOUBLE:
       return is_int() || is_double();
-    case OT_INTEGERVECTOR:
-    case OT_REALVECTOR:
+    case OT_INTVECTOR:
+    case OT_DOUBLEVECTOR:
       return is_double_vector() || is_int_vector();
     case OT_STRINGVECTOR:
       return is_string_vector() || is_string();
@@ -70,13 +70,13 @@ namespace casadi {
 
   GenericType GenericType::from_type(TypeID type) {
     switch (type) {
-    case OT_INTEGERVECTOR:
+    case OT_INTVECTOR:
       return std::vector<int>();
-    case OT_INTEGERVECTORVECTOR:
+    case OT_INTVECTORVECTOR:
       return std::vector< std::vector<int> >();
     case OT_BOOLVECTOR:
       return std::vector<bool>();
-    case OT_REALVECTOR:
+    case OT_DOUBLEVECTOR:
       return std::vector<double>();
     case OT_STRINGVECTOR:
       return std::vector<std::string>();
@@ -89,20 +89,20 @@ namespace casadi {
     switch (type) {
     case OT_BOOLEAN:
       return "OT_BOOLEAN";
-    case OT_INTEGER:
-      return "OT_INTEGER";
-    case OT_REAL:
-      return "OT_REAL";
+    case OT_INT:
+      return "OT_INT";
+    case OT_DOUBLE:
+      return "OT_DOUBLE";
     case OT_STRING:
       return "OT_STRING";
-    case OT_INTEGERVECTOR:
-      return "OT_INTEGERVECTOR";
-    case OT_INTEGERVECTORVECTOR:
-      return "OT_INTEGERVECTORVECTOR";
+    case OT_INTVECTOR:
+      return "OT_INTVECTOR";
+    case OT_INTVECTORVECTOR:
+      return "OT_INTVECTORVECTOR";
     case OT_BOOLVECTOR:
       return "OT_BOOLVECTOR";
-    case OT_REALVECTOR:
-      return "OT_REALVECTOR";
+    case OT_DOUBLEVECTOR:
+      return "OT_DOUBLEVECTOR";
     case OT_STRINGVECTOR:
       return "OT_STRINGVECTOR";
     case OT_DICT:
@@ -123,11 +123,11 @@ namespace casadi {
   }
 
   bool GenericType::is_int() const {
-    return getType()==OT_INTEGER;
+    return getType()==OT_INT;
   }
 
   bool GenericType::is_double() const {
-    return getType()==OT_REAL;
+    return getType()==OT_DOUBLE;
   }
 
   bool GenericType::is_string() const {
@@ -142,15 +142,15 @@ namespace casadi {
   }
 
   bool GenericType::is_int_vector() const {
-    return getType()==OT_INTEGERVECTOR;
+    return getType()==OT_INTVECTOR;
   }
 
   bool GenericType::is_int_vector_vector() const {
-    return getType()==OT_INTEGERVECTORVECTOR;
+    return getType()==OT_INTVECTORVECTOR;
   }
 
   bool GenericType::is_double_vector() const {
-    return getType()==OT_REALVECTOR;
+    return getType()==OT_DOUBLEVECTOR;
   }
 
   bool GenericType::is_string_vector() const {

@@ -34,9 +34,9 @@ namespace casadi {
 
     // Additional options
     addOption("print_stats", OT_BOOLEAN, false, "Print out statistics after integration");
-    addOption("t0", OT_REAL, 0.0, "Beginning of the time horizon");
-    addOption("tf", OT_REAL, 1.0, "End of the time horizon");
-    addOption("grid", OT_REALVECTOR, GenericType(), "Time grid");
+    addOption("t0", OT_DOUBLE, 0.0, "Beginning of the time horizon");
+    addOption("tf", OT_DOUBLE, 1.0, "End of the time horizon");
+    addOption("grid", OT_DOUBLEVECTOR, GenericType(), "Time grid");
     addOption("augmented_options", OT_DICT, GenericType(),
               "Options to be passed down to the augmented integrator, if one is constructed.");
     addOption("output_t0", OT_BOOLEAN, false, "Output the state at the initial time");
@@ -1298,7 +1298,7 @@ namespace casadi {
 
   FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
     : Integrator(name, dae) {
-    addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
+    addOption("number_of_finite_elements",     OT_INT,  20, "Number of finite elements");
   }
 
   FixedStepIntegrator::~FixedStepIntegrator() {
