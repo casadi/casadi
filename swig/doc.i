@@ -5807,20 +5807,6 @@ Print a representation of the object.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::getNZ(Matrix< Scalar >
-&output_m, bool ind1, const Slice &k) const  "
-
-Get a set of nonzeros
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::getNZ(Matrix< Scalar >
-&output_m, bool ind1, const Matrix< int > &k) const  "
-
-Get a set of nonzeros
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::expand(const Matrix< Scalar
 > &ex, Matrix< Scalar > &weights, Matrix< Scalar > &terms) " [INTERNAL]
 Expand the expression as a weighted sum (with constant weights)
@@ -5887,13 +5873,6 @@ Gradient expression.
 const std::string &iname, const std::string &oname) "
 
 Gradient expression.
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::hasNZ(int rr, int cc) const
-"
-
-Returns true if the matrix has a non-zero at location rr, cc.
 
 ";
 
@@ -6054,20 +6033,6 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::setNZ(const Matrix< Scalar
-> &m, bool ind1, const Slice &k) "
-
-Set a set of nonzeros
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::setNZ(const Matrix< Scalar
-> &m, bool ind1, const Matrix< int > &k) "
-
-Set a set of nonzeros
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::sanity_check(bool
 complete=false) const  "
 
@@ -6143,18 +6108,23 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::toSlice(bool ind1=false)
-const  "
-
-Convert to Slice (only for IM)
-
-";
-
-%feature("docstring")  casadi::Matrix< int >::toSlice(bool ind1) const " ";
-
 %feature("docstring")  casadi::Matrix< Scalar >::is_regular() const  "
 
 Checks if expression does not contain NaN or Inf.
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::set_nz(const Matrix< Scalar
+> &m, bool ind1, const Slice &k) "
+
+Set a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::set_nz(const Matrix< Scalar
+> &m, bool ind1, const Matrix< int > &k) "
+
+Set a set of nonzeros
 
 ";
 
@@ -6185,6 +6155,20 @@ const "
 
 Get string representation of dimensions. The representation is (nrow x ncol
 = numel | size)
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::get_nz(Matrix< Scalar >
+&output_m, bool ind1, const Slice &k) const  "
+
+Get a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::get_nz(Matrix< Scalar >
+&output_m, bool ind1, const Matrix< int > &k) const  "
+
+Get a set of nonzeros
 
 ";
 
@@ -6242,6 +6226,13 @@ streams.
 
 ";
 
+%feature("docstring")  casadi::Matrix< Scalar >::n_dep() const  "
+
+Get the number of dependencies of a binary SXElem Only defined if symbolic
+scalar.
+
+";
+
 %feature("docstring")  casadi::Matrix< Scalar >::hess(const Function &f, int
 iind=0, int oind=0) "
 
@@ -6296,15 +6287,6 @@ Get the number of non-zeros in the lower triangular half.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::isSlice(bool ind1=false)
-const  "
-
-Is the Matrix a Slice (only for IM)
-
-";
-
-%feature("docstring")  casadi::Matrix< int >::isSlice(bool ind1) const " ";
-
 %feature("docstring")  casadi::Matrix< Scalar >::reserve(int nnz) " ";
 
 %feature("docstring")  casadi::Matrix< Scalar >::reserve(int nnz, int ncol)
@@ -6345,19 +6327,9 @@ Tangent expression.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
-int > &rr, const std::vector< int > &cc, bool ind1=false) "
+%feature("docstring")  casadi::Matrix< Scalar >::is_one() const  "
 
-Erase a submatrix (leaving structural zeros in its place) Erase rows and/or
-columns of a matrix.
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
-int > &rr, bool ind1=false) "
-
-Erase a submatrix (leaving structural zeros in its place) Erase elements of
-a matrix.
+check if the matrix is 1 (note that false negative answers are possible)
 
 ";
 
@@ -6484,13 +6456,6 @@ zero.
 Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
 Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::getNdeps() const  "
-
-Get the number of dependencies of a binary SXElem Only defined if symbolic
-scalar.
 
 ";
 
@@ -6651,6 +6616,13 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
+%feature("docstring")  casadi::Matrix< Scalar >::has_nz(int rr, int cc)
+const  "
+
+Returns true if the matrix has a non-zero at location rr, cc.
+
+";
+
 %feature("docstring")  casadi::Matrix< Scalar >::matrix_scalar(int op, const
 Matrix< Scalar > &x, const Matrix< Scalar > &y) " [INTERNAL]  Create nodes
 by their ID.
@@ -6734,9 +6706,19 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_one() const  "
+%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
+int > &rr, const std::vector< int > &cc, bool ind1=false) "
 
-check if the matrix is 1 (note that false negative answers are possible)
+Erase a submatrix (leaving structural zeros in its place) Erase rows and/or
+columns of a matrix.
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::erase(const std::vector<
+int > &rr, bool ind1=false) "
+
+Erase a submatrix (leaving structural zeros in its place) Erase elements of
+a matrix.
 
 ";
 
@@ -6744,19 +6726,6 @@ check if the matrix is 1 (note that false negative answers are possible)
 const "
 
 Check if the matrix is a row vector (i.e. size1()==1)
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::poly_coeff(const Matrix<
-Scalar > &f, const Matrix< Scalar > &x) " [INTERNAL]  extracts polynomial
-coefficients from an expression
-
-Parameters:
------------
-
-ex:  Scalar expression that represents a polynomial
-
-x:  Scalar symbol that the polynomial is build up with
 
 ";
 
@@ -6865,9 +6834,16 @@ scalar. Wraps SXElem SXElem::dep(int ch=0) const.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::getName() const  "
+%feature("docstring")  casadi::Matrix< Scalar >::poly_coeff(const Matrix<
+Scalar > &f, const Matrix< Scalar > &x) " [INTERNAL]  extracts polynomial
+coefficients from an expression
 
-Get name (only if symbolic scalar)
+Parameters:
+-----------
+
+ex:  Scalar expression that represents a polynomial
+
+x:  Scalar symbol that the polynomial is build up with
 
 ";
 
@@ -7074,6 +7050,12 @@ primitives appearing more than once, the function will return true and the
 names of the duplicate expressions will be printed to userOut<true,
 PL_WARN>(). Note: Will mark the node using SXElem::setTemp. Make sure to
 call resetInput() after usage.
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::name() const  "
+
+Get name (only if symbolic scalar)
 
 ";
 
@@ -7356,6 +7338,20 @@ Check if the matrix is upper triangular.
 
 ";
 
+%feature("docstring")  casadi::MX::set_nz(const MX &m, bool ind1, const
+Slice &kk) "
+
+Set a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::set_nz(const MX &m, bool ind1, const
+Matrix< int > &kk) "
+
+Set a set of nonzeros
+
+";
+
 %feature("docstring")  casadi::PrintableObject< SharedObject
 >::getRepresentation() const "
 
@@ -7387,6 +7383,20 @@ both=false) const "
 
 Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
 optionally both dimensions)
+
+";
+
+%feature("docstring")  casadi::MX::get_nz(MX &output_m, bool ind1, const
+Slice &kk) const  "
+
+Get a set of nonzeros
+
+";
+
+%feature("docstring")  casadi::MX::get_nz(MX &output_m, bool ind1, const
+Matrix< int > &kk) const  "
+
+Get a set of nonzeros
 
 ";
 
@@ -7483,12 +7493,6 @@ Check if symbolic.
 
 ";
 
-%feature("docstring")  casadi::MX::getName() const  "
-
-Get the name.
-
-";
-
 %feature("docstring")  casadi::MX::join_primitives(std::vector< MX > &v)
 const  "
 
@@ -7575,12 +7579,6 @@ expression expr in multiple expressions, preserving nodes.
 %feature("docstring")  casadi::MX::getValue() const  "
 
 Get the value (only for scalar constant nodes)
-
-";
-
-%feature("docstring")  casadi::MX::split_primitives(const MX &x) const  "
-
-Split up an expression along symbolic primitives.
 
 ";
 
@@ -7730,6 +7728,12 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
+%feature("docstring")  casadi::MX::n_dep() const  "
+
+Get the number of dependencies of a binary SXElem.
+
+";
+
 %feature("docstring")  casadi::MX::has_duplicates() "[INTERNAL]  Detect
 duplicate symbolic expressions If there are symbolic primitives appearing
 more than once, the function will return true and the names of the duplicate
@@ -7813,20 +7817,6 @@ with given sparsity.
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
 symbolic primitives.
-
-";
-
-%feature("docstring")  casadi::MX::setNZ(const MX &m, bool ind1, const Slice
-&kk) "
-
-Set a set of nonzeros
-
-";
-
-%feature("docstring")  casadi::MX::setNZ(const MX &m, bool ind1, const
-Matrix< int > &kk) "
-
-Set a set of nonzeros
 
 ";
 
@@ -7949,6 +7939,12 @@ Tangent expression.
 
 ";
 
+%feature("docstring")  casadi::MX::name() const  "
+
+Get the name.
+
+";
+
 %feature("docstring") casadi::MX::MX() "
 
 Default constructor.
@@ -8040,23 +8036,9 @@ Get an IM representation of a GetNonzeros or SetNonzeros node.
 
 ";
 
-%feature("docstring")  casadi::MX::getNZ(MX &output_m, bool ind1, const
-Slice &kk) const  "
+%feature("docstring")  casadi::MX::split_primitives(const MX &x) const  "
 
-Get a set of nonzeros
-
-";
-
-%feature("docstring")  casadi::MX::getNZ(MX &output_m, bool ind1, const
-Matrix< int > &kk) const  "
-
-Get a set of nonzeros
-
-";
-
-%feature("docstring")  casadi::MX::getNdeps() const  "
-
-Get the number of dependencies of a binary SXElem.
+Split up an expression along symbolic primitives.
 
 ";
 
@@ -8460,15 +8442,15 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::Polynomial::degree() const  "
+%feature("docstring")  casadi::Polynomial::scalar() const  "
 
-Degree of the polynomial.
+Get scalar value (error if degree()!=0)
 
 ";
 
-%feature("docstring")  casadi::Polynomial::toScalar() const  "
+%feature("docstring")  casadi::Polynomial::degree() const  "
 
-Get scalar value (error if degree()!=0)
+Degree of the polynomial.
 
 ";
 
@@ -8670,17 +8652,9 @@ Is the slice a scalar.
 
 ";
 
-%feature("docstring")  casadi::Slice::getAll(int len, bool ind1=false) const
-"
+%feature("docstring")  casadi::Slice::scalar(int len) const  "
 
-Get a vector of indices.
-
-";
-
-%feature("docstring")  casadi::Slice::getAll(const Slice &outer, int len)
-const  "
-
-Get a vector of indices (nested slice)
+Get scalar (if is_scalar)
 
 ";
 
@@ -8700,9 +8674,16 @@ slicing utility from the host language ( M[0:6] in Python, M(1:7) )
 
 C++ includes: slice.hpp ";
 
-%feature("docstring")  casadi::Slice::toScalar(int len) const  "
+%feature("docstring")  casadi::Slice::all(int len, bool ind1=false) const  "
 
-Get scalar (if is_scalar)
+Get a vector of indices.
+
+";
+
+%feature("docstring")  casadi::Slice::all(const Slice &outer, int len) const
+"
+
+Get a vector of indices (nested slice)
 
 ";
 
@@ -8722,21 +8703,6 @@ A single element (explicit to avoid ambiguity with IM overload.
 "
 
 A slice.
-
-";
-
-%feature("docstring") casadi::Slice::Slice(const std::vector< int > &v, bool
-ind1=false) "
-
-Construct from an index vector (requires isSlice(v) to be true)
-
-";
-
-%feature("docstring") casadi::Slice::Slice(const std::vector< int > &v,
-Slice &outer) "
-
-Construct nested slices from an index vector (requires isSlice2(v) to be
-true)
 
 ";
 
@@ -8766,7 +8732,7 @@ Return a string with a representation (for SWIG)
 
 
 // File: classcasadi_1_1SparseStorage.xml
-%feature("docstring")  casadi::SparseStorage< DataType >::hasNZ(int rr, int
+%feature("docstring")  casadi::SparseStorage< DataType >::has_nz(int rr, int
 cc) const  " [INTERNAL]  Returns true if the matrix has a non-zero at
 location rr, cc.
 
@@ -8785,11 +8751,6 @@ cc) " [INTERNAL]  get a reference to an element
 
 %feature("docstring")  casadi::SparseStorage< DataType >::reserve(int nnz,
 int ncol) " [INTERNAL] ";
-
-%feature("docstring")  casadi::SparseStorage< DataType >::toScalar() const
-" [INTERNAL]  Convert to scalar type.
-
-";
 
 %feature("docstring")  casadi::SparseStorage< DataType >::resize(int nrow,
 int ncol) " [INTERNAL] ";
@@ -8833,6 +8794,11 @@ empty 0-by-0 matrix constructor
 
 %feature("docstring") casadi::SparseStorage< DataType >::SparseStorage(const
 SparseStorage< DataType > &m) " [INTERNAL]  Copy constructor.
+
+";
+
+%feature("docstring")  casadi::SparseStorage< DataType >::scalar() const  "
+[INTERNAL]  Convert to scalar type.
 
 ";
 
@@ -8898,26 +8864,16 @@ Order the columns by decreasing degree.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getNZ(int rr, int cc) const  "
+%feature("docstring")  casadi::Sparsity::dim() const  "
 
-Get the index of an existing non-zero element return -1 if the element does
-not exist.
-
-";
-
-%feature("docstring")  casadi::Sparsity::getNZ(const std::vector< int > &rr,
-const std::vector< int > &cc) const  "
-
-Get a set of non-zero element return -1 if the element does not exist.
+Get the dimension as a string.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::getNZ(std::vector< int > &INOUT)
-const  "
+%feature("docstring")  casadi::Sparsity::add_nz(int rr, int cc) "
 
-Get the nonzero index for a set of elements The index vector is used both
-for input and outputs and must be sorted by increasing nonzero index, i.e.
-column-wise. Elements not found in the sparsity pattern are set to -1.
+Get the index of a non-zero element Add the element if it does not exist and
+copy object if it's not unique.
 
 ";
 
@@ -8925,13 +8881,6 @@ column-wise. Elements not found in the sparsity pattern are set to -1.
 scalar_and_dense=false) const  "
 
 Is scalar?
-
-";
-
-%feature("docstring")  casadi::Sparsity::addNZ(int rr, int cc) "
-
-Get the index of a non-zero element Add the element if it does not exist and
-copy object if it's not unique.
 
 ";
 
@@ -9096,12 +9045,6 @@ The total number of elements, including structural zeros, i.e.
 size2()*size1()
 
 See:   nnz()
-
-";
-
-%feature("docstring")  casadi::Sparsity::dim() const  "
-
-Get the dimension as a string.
 
 ";
 
@@ -9350,6 +9293,12 @@ Is symmetric?
 
 ";
 
+%feature("docstring")  casadi::Sparsity::has_nz(int rr, int cc) const  "
+
+Returns true if the pattern has a non-zero at location rr, cc.
+
+";
+
 %feature("docstring")  casadi::Sparsity::transpose(std::vector< int >
 &mapping, bool invert_mapping=false) const  "
 
@@ -9379,6 +9328,12 @@ As an alternative, P can be transposed (inverted).
 Is diagonal?
 
 ";
+
+%feature("docstring")  casadi::Sparsity::is_equal(const Sparsity &y) const
+" ";
+
+%feature("docstring")  casadi::Sparsity::is_equal(int nrow, int ncol, const
+std::vector< int > &colind, const std::vector< int > &row) const  " ";
 
 %feature("docstring")  casadi::SharedObject::isNull() const  "
 
@@ -9579,17 +9534,28 @@ true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
 ";
 
-%feature("docstring")  casadi::Sparsity::hasNZ(int rr, int cc) const  "
+%feature("docstring")  casadi::Sparsity::get_nz(int rr, int cc) const  "
 
-Returns true if the pattern has a non-zero at location rr, cc.
+Get the index of an existing non-zero element return -1 if the element does
+not exist.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::is_equal(const Sparsity &y) const
-" ";
+%feature("docstring")  casadi::Sparsity::get_nz(const std::vector< int >
+&rr, const std::vector< int > &cc) const  "
 
-%feature("docstring")  casadi::Sparsity::is_equal(int nrow, int ncol, const
-std::vector< int > &colind, const std::vector< int > &row) const  " ";
+Get a set of non-zero element return -1 if the element does not exist.
+
+";
+
+%feature("docstring")  casadi::Sparsity::get_nz(std::vector< int > &INOUT)
+const  "
+
+Get the nonzero index for a set of elements The index vector is used both
+for input and outputs and must be sorted by increasing nonzero index, i.e.
+column-wise. Elements not found in the sparsity pattern are set to -1.
+
+";
 
 %feature("docstring")  casadi::Sparsity::erase(const std::vector< int > &rr,
 const std::vector< int > &cc, bool ind1=false) "
@@ -10687,6 +10653,13 @@ Hash a sparsity pattern.
 %feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const int
 *colind, const int *row) " ";
 
+%feature("docstring")  casadi::is_slice2(const std::vector< int > &v) "
+
+Check if an index vector can be represented more efficiently as two nested
+slices.
+
+";
+
 %feature("docstring")  casadi::rootfinder(const std::string &name, const
 std::string &solver, const Function &f, const Dict &opts=Dict()) "
 
@@ -10712,6 +10685,19 @@ Joel Andersson
 "
 
 Check if the vector is strictly monotone.
+
+";
+
+%feature("docstring")  casadi::to_slice(const IM &x, bool ind1=false) "
+
+Convert IM to Slice.
+
+";
+
+%feature("docstring")  casadi::to_slice(const std::vector< int > &v, bool
+ind1=false) "
+
+Construct from an index vector (requires is_slice(v) to be true)
 
 ";
 
@@ -10827,6 +10813,13 @@ Convenience function, convert vectors to vectors of pointers.
 %feature("docstring")  casadi::ptrVec(const std::vector< std::vector< T > >
 &v) " [INTERNAL]  Convenience function, convert vectors to vectors of
 pointers.
+
+";
+
+%feature("docstring")  casadi::to_slice2(const std::vector< int > &v) "
+
+Construct nested slices from an index vector (requires is_slice2(v) to be
+true)
 
 ";
 
@@ -11117,6 +11110,19 @@ Get typename.
 
 %feature("docstring")  casadi::diffTimers(const Timer t1, const Timer t0) "
 [INTERNAL] ";
+
+%feature("docstring")  casadi::is_slice(const IM &x, bool ind1=false) "
+
+Is the IM a Slice.
+
+";
+
+%feature("docstring")  casadi::is_slice(const std::vector< int > &v, bool
+ind1=false) "
+
+Check if an index vector can be represented more efficiently as a slice.
+
+";
 
 %feature("docstring")  casadi::isIncreasing(const std::vector< T > &v) "
 

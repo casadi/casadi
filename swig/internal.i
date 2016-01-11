@@ -190,7 +190,7 @@
 %exception  casadi::SparseStorage< DataType >::elem(int rr, int cc) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparseStorage< DataType >::hasNZ(int rr, int cc) const  {
+%exception  casadi::SparseStorage< DataType >::has_nz(int rr, int cc) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::reserve(int nnz) {
@@ -202,13 +202,13 @@
 %exception  casadi::SparseStorage< DataType >::resize(int nrow, int ncol) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SparseStorage< DataType >::scalar() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SparseStorage< DataType >::sparsity() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::sparsityRef() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::scalar() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::alive() const  {
