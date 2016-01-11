@@ -645,7 +645,7 @@ namespace casadi {
 
   int MX::getNdeps() const { return (*this)->ndep(); }
 
-  std::string MX::getName() const { return (*this)->getName(); }
+  std::string MX::name() const { return (*this)->name(); }
 
   bool         MX::is_symbolic () const { return (*this)->op()==OP_PARAMETER; }
   bool         MX::is_constant () const { return (*this)->op()==OP_CONST; }

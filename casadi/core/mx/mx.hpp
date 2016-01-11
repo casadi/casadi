@@ -171,7 +171,7 @@ namespace casadi {
     int getNdeps() const;
 
     /// Get the name.
-    std::string getName() const;
+    std::string name() const;
 
     /// Get the value (only for scalar constant nodes)
     double getValue() const;

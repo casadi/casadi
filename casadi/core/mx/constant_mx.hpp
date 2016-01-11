@@ -232,7 +232,7 @@ namespace casadi {
     virtual void resetInput() {}
 
     /** \brief  Get the name */
-    virtual const std::string& getName() const {
+    virtual const std::string& name() const {
       static std::string dummyname;
       return dummyname;
     }

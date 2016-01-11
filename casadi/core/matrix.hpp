@@ -950,7 +950,7 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Get name (only if symbolic scalar) */
-    std::string getName() const;
+    std::string name() const;
 
     /** \brief Get expressions of the children of the expression
         Only defined if symbolic scalar.

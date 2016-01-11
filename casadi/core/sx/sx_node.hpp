@@ -75,7 +75,7 @@ namespace casadi {
     virtual int getIntValue() const;  // only works for integer nodes
     ///@}
 
-    virtual const std::string& getName() const; // get the name
+    virtual const std::string& name() const; // get the name
 
     /** \brief get the operation */
     virtual int op() const=0;

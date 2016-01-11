@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   string Variable::name() const {
-    return this->v.getName();
+    return this->v.name();
   }
 
   void Variable::repr(ostream &stream, bool trailing_newline) const {

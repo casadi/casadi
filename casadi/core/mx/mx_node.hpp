@@ -154,7 +154,7 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Get the name */
-    virtual const std::string& getName() const;
+    virtual const std::string& name() const;
 
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return false;}

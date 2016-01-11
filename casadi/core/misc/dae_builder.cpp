@@ -326,7 +326,7 @@ namespace casadi {
         } else if (onode.checkName("opt:PathConstraints")) {
           casadi_warning("opt:PointConstraints not supported, ignored");
         } else {
-          casadi_warning("DaeBuilder::addOptimization: Unknown node " << onode.getName());
+          casadi_warning("DaeBuilder::addOptimization: Unknown node " << onode.name());
         }
       }
     }
@@ -350,7 +350,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::readExpr(const XmlNode& node) {
-    const string& fullname = node.getName();
+    const string& fullname = node.name();
     if (fullname.find("exp:")== string::npos) {
       casadi_error("DaeBuilder::readExpr: unknown - expression is supposed to "
                    "start with 'exp:' , got " << fullname);
@@ -1164,7 +1164,7 @@ namespace casadi {
     casadi_assert(var.is_column() && var.is_symbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
-      ret[i] = der(var[i].getName());
+      ret[i] = der(var[i].name());
     }
     return ret;
   }
@@ -1242,9 +1242,9 @@ namespace casadi {
       return "n/a";
     } else {
       std::vector<MX> prim = var.primitives();
-      string ret = unit(prim.at(0).getName());
+      string ret = unit(prim.at(0).name());
       for (int i=1; i<prim.size(); ++i) {
-        casadi_assert_message(ret == unit(prim.at(i).getName()),
+        casadi_assert_message(ret == unit(prim.at(i).name()),
                               "DaeBuilder::unit: Argument has mixed units");
       }
       return ret;
@@ -1270,7 +1270,7 @@ namespace casadi {
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      ret[i] = nominal(prim.at(i).getName());
+      ret[i] = nominal(prim.at(i).name());
     }
     return ret;
   }
@@ -1282,7 +1282,7 @@ namespace casadi {
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      setNominal(prim.at(i).getName(), val.at(i));
+      setNominal(prim.at(i).name(), val.at(i));
     }
   }
 
@@ -1293,7 +1293,7 @@ namespace casadi {
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      ret[i] = (this->*f)(prim[i].getName(), normalized);
+      ret[i] = (this->*f)(prim[i].name(), normalized);
     }
     return ret;
   }
@@ -1305,7 +1305,7 @@ namespace casadi {
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      ret[i] = (this->*f)(prim[i].getName());
+      ret[i] = (this->*f)(prim[i].name());
     }
     return ret;
   }
@@ -1318,7 +1318,7 @@ namespace casadi {
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      (this->*f)(prim[i].getName(), val[i], normalized);
+      (this->*f)(prim[i].name(), val[i], normalized);
     }
   }
 
@@ -1330,7 +1330,7 @@ namespace casadi {
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      (this->*f)(var[i].getName(), val[i]);
+      (this->*f)(var[i].name(), val[i]);
     }
   }
 

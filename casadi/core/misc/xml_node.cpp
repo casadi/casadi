@@ -42,7 +42,7 @@ namespace casadi {
   XmlNode& XmlNode::operator[](int i) {
     casadi_assert_message(i>=0 && i < size(),
                           "XmlNode::operator[]: index out of bounds for element " << i
-                          << " of node " << getName());
+                          << " of node " << name());
 
     return children_.at(i);
   }
@@ -86,7 +86,7 @@ namespace casadi {
     return children_.size();
   }
 
-  const string& XmlNode::getName() const {
+  const string& XmlNode::name() const {
     return name_;
   }
 

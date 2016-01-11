@@ -113,7 +113,7 @@ for k in metadata.keys():
   metadata[k]['hierarchy']=parents(k)
 
 # Get name by specifying xml-source
-def getNameByXMLsource(xmlsource):
+def nameByXMLsource(xmlsource):
   for name,meta in metadata.items():
     if (meta['xmlsource']==xmlsource):
       return name
@@ -122,7 +122,7 @@ def getNameByXMLsource(xmlsource):
 # Fill in 'internalFor'
 for name,meta in metadata.items():
   if ('hasInternal' in meta):
-    name2 = getNameByXMLsource(meta['hasInternal'])
+    name2 = nameByXMLsource(meta['hasInternal'])
     if name2 is None:
       continue
     internalfor = metadata[name2]

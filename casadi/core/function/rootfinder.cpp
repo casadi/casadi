@@ -136,7 +136,7 @@ namespace casadi {
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
-    arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
+    arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
@@ -154,7 +154,7 @@ namespace casadi {
   ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
-    arg[iin_] = MX::sym(arg[iin_].getName() + "_guess",
+    arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;

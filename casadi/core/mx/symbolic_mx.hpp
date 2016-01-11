@@ -76,7 +76,7 @@ namespace casadi {
     virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Get the name */
-    virtual const std::string& getName() const;
+    virtual const std::string& name() const;
 
     /** \brief Get the operation */
     virtual int op() const { return OP_PARAMETER;}

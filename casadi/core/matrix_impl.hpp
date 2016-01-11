@@ -1456,8 +1456,8 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  std::string Matrix<Scalar>::getName() const {
-    throw CasadiException("\"getName\" not defined for instantiation");
+  std::string Matrix<Scalar>::name() const {
+    throw CasadiException("\"name\" not defined for instantiation");
   }
 
   template<typename Scalar>
@@ -2607,7 +2607,7 @@ namespace casadi {
   template<> std::vector<int> SX::nonzeros_int() const;
   template<> SX SX::dep(int ch) const;
   template<> int SX::getNdeps() const;
-  template<> std::string SX::getName() const;
+  template<> std::string SX::name() const;
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
   template<> size_t SX::element_hash() const;

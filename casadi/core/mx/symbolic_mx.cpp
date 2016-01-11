@@ -59,7 +59,7 @@ namespace casadi {
                            std::vector<std::vector<MX> >& asens) {
   }
 
-  const std::string& SymbolicMX::getName() const {
+  const std::string& SymbolicMX::name() const {
     return name_;
   }
 
@@ -91,7 +91,7 @@ namespace casadi {
 
   bool SymbolicMX::has_duplicates() {
     if (this->temp!=0) {
-      userOut<true, PL_WARN>() << "Duplicate expression: " << getName() << endl;
+      userOut<true, PL_WARN>() << "Duplicate expression: " << name() << endl;
       return true;
     } else {
       this->temp = 1;

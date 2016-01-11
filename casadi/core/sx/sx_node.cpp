@@ -102,8 +102,8 @@ namespace casadi {
     return false;
   }
 
-  const std::string& SXNode::getName() const {
-    throw CasadiException("SXNode::getName failed, the node must be symbolic");
+  const std::string& SXNode::name() const {
+    throw CasadiException("SXNode::name failed, the node must be symbolic");
   }
 
   const SXElem& SXNode::dep(int i) const {

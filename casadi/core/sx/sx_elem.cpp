@@ -459,8 +459,8 @@ namespace casadi {
     return node->isMinusInf();
   }
 
-  const std::string& SXElem::getName() const {
-    return node->getName();
+  const std::string& SXElem::name() const {
+    return node->name();
   }
 
   int SXElem::op() const {

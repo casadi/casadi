@@ -152,8 +152,8 @@ namespace casadi {
                           + typeid(*this).name());
   }
 
-  const string& MXNode::getName() const {
-    throw CasadiException(string("MXNode::getName() not defined for class ")
+  const string& MXNode::name() const {
+    throw CasadiException(string("MXNode::name() not defined for class ")
                           + typeid(*this).name());
   }
 

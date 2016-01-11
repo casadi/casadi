@@ -150,7 +150,7 @@ namespace casadi {
     bool isNan() const;
     bool isInf() const;
     bool isMinusInf() const;
-    const std::string& getName() const;
+    const std::string& name() const;
     int op() const;
     bool is_op(int op) const;
 

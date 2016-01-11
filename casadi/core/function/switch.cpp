@@ -202,7 +202,7 @@ namespace casadi {
     v.insert(v.end(), res.begin(), res.end());
     for (int d=0; d<nfwd; ++d) {
       // ignore seed for ind
-      seed[d][0] = MX::sym(seed[d][0].getName(), Sparsity::scalar(false));
+      seed[d][0] = MX::sym(seed[d][0].name(), Sparsity::scalar(false));
       // Add to wrapper input
       w_in.insert(w_in.end(), seed[d].begin(), seed[d].end());
       // Add to sw argument vector

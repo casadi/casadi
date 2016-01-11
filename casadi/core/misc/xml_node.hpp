@@ -88,7 +88,7 @@ namespace casadi {
     int size() const;
 
     /** \brief  Get the name of the node */
-    const std::string& getName() const;
+    const std::string& name() const;
 
     /** \brief  Set the name of the node */
     void setName(const std::string& name);

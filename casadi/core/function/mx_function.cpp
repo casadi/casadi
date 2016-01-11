@@ -971,7 +971,7 @@ namespace casadi {
         auto ait = arg[i]->begin();
         vector<MX> prim = inputv_[i].primitives();
         for (auto pit=prim.begin(); pit!=prim.end(); ++pit) {
-          SX t = SX::sym(pit->getName(), pit->sparsity());
+          SX t = SX::sym(pit->name(), pit->sparsity());
           copy(t->begin(), t->end(), ait);
           ait += t.nnz();
         }
@@ -1094,7 +1094,7 @@ namespace casadi {
           if (g.verbose) {
             s << "  /* #" << k++ << ": Input " << iind;
             s << " (" << ischeme_.at(iind) << ")";
-            s << ", part " << ip << " (" << it->data.getName() << ") */" << endl;
+            s << ", part " << ip << " (" << it->data.name() << ") */" << endl;
           }
           if (n==1) {
             s << "  " << g.workel(i) << " = " << arg << " ? "

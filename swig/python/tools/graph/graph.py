@@ -136,11 +136,11 @@ class MXSymbolicArtist(DotArtist):
     col = "#990000"
     if s.nnz() == s.numel() and s.nnz()==1:
       # The Matrix grid is represented by a html table with 'ports'
-      graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=s.getName(),shape='rectangle',color=col))
+      graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=s.name(),shape='rectangle',color=col))
     else:
        # The Matrix grid is represented by a html table with 'ports'
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
-      label+="<TR><TD COLSPAN='%d'>%s: <font color='#666666'>%s</font></TD></TR>" % (s.size2(),s.getName(), s.dim())
+      label+="<TR><TD COLSPAN='%d'>%s: <font color='#666666'>%s</font></TD></TR>" % (s.size2(),s.name(), s.dim())
       for i in range(s.size1()):
         label+="<TR>"
         for j in range(s.size2()):

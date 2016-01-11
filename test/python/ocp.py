@@ -207,9 +207,9 @@ class OCPtests(casadiTestCase):
     cost = ivp("cost")
     self.assertTrue(isinstance(c,MX))
     
-    self.assertEquals(c.getName(),"cstr.c")
-    self.assertEquals(T.getName(),"cstr.T")
-    self.assertEquals(cost.getName(),"cost")
+    self.assertEquals(c.name(),"cstr.c")
+    self.assertEquals(T.name(),"cstr.T")
+    self.assertEquals(cost.name(),"cost")
     self.assertEquals(ivp.nominal("cstr.c"),1000)
    
     u = ivp("u")

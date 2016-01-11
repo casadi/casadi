@@ -238,8 +238,8 @@ namespace casadi {
   }
 
   template<>
-  string SX::getName() const {
-    return scalar().getName();
+  string SX::name() const {
+    return scalar().name();
   }
 
   template<>
