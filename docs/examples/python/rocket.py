@@ -74,7 +74,7 @@ G = X[0:2]     # x(1:2) in Matlab
 nlp = {'x':U, 'f':J, 'g':G}
  
 # Allocate an NLP solver
-opts = {"tol":1e-10, "expand":True}
+opts = {"ipopt.tol":1e-10, "expand":True}
 solver = nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 

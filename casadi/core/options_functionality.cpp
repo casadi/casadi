@@ -162,14 +162,14 @@ void setAdaptorOptions(Dict& dict, const string &name, const Dict &op) {
 
 void OptionsFunctionalityNode::setOption(const string &name, const GenericType &op) {
 
-  // Check for adaptor-style options
-  std::string::size_type dotpos = name.find(".");
-  if (dotpos != std::string::npos && op.isDict()) {
-    setAdaptorOptions(dictionary_, name, op);
+  assert_exists(name);
+
+  // For options set using dictionary shorthand, no type checking
+  auto dotpos = name.find('.');
+  if (dotpos != string::npos) {
+    dictionary_[name] = op;
     return;
   }
-
-  assert_exists(name);
 
   // If we have an empty vector, than we are not strict about the type
   if (op.is_emptyVector()) {
@@ -246,6 +246,12 @@ GenericType OptionsFunctionality::option(const string &name) const {
 }
 
 void OptionsFunctionalityNode::assert_exists(const std::string &name) const {
+  // If option contains a dot, only check what comes before
+  auto dotpos = name.find('.');
+  if (dotpos != string::npos) {
+    return assert_exists(name.substr(0, dotpos));
+  }
+
   // First check if the option exists
   map<string, TypeID>::const_iterator it = allowed_options.find(name);
   if (it == allowed_options.end()) {
@@ -267,26 +273,40 @@ GenericType OptionsFunctionalityNode::option(const string &name) const {
   // Locate the option
   Dict::const_iterator it = dictionary_.find(name);
 
-  // Check if found
-  if (it == dictionary_.end()) {
-    stringstream ss;
-    if (allowed_options.find(name)!=allowed_options.end()) {
-      ss << "Option: '" << name << "' has not been set." << endl;
-      printOption(name, ss);
-    } else {
-      ss << "Option: '" << name << "' does not exist." << endl << endl;
-      std::vector<std::string> suggestions;
-      getBestMatches(name, suggestions, 5);
-      ss << "Did you mean one of the following?" << endl;
-      for (int i=0;i<suggestions.size();++i)
-        printOption(suggestions[i], ss);
-      ss << "Use printOptions() to get a full list of options." << endl;
-    }
-    casadi_error(ss.str());
+  // Return if found
+  if (it != dictionary_.end()) {
+    return GenericType(it->second);
   }
 
-  // Return the option
-  return GenericType(it->second);
+  // Check if a dictionary
+  string dotname = name + ".";
+  it = dictionary_.upper_bound(dotname);
+  if (it!=dictionary_.end() && it->first.compare(0, dotname.size(), dotname)==0) {
+    // Dictionary option
+    Dict ret;
+    while (it!=dictionary_.end() && it->first.compare(0, dotname.size(), dotname)==0) {
+      ret[it->first.substr(dotname.size())] = it->second;
+      it++;
+    }
+    return ret;
+  }
+
+  // Error
+  stringstream ss;
+  if (allowed_options.find(name)!=allowed_options.end()) {
+    ss << "Option: '" << name << "' has not been set." << endl;
+    printOption(name, ss);
+  } else {
+    ss << "Option: '" << name << "' does not exist." << endl << endl;
+    std::vector<std::string> suggestions;
+    getBestMatches(name, suggestions, 5);
+    ss << "Did you mean one of the following?" << endl;
+    for (int i=0;i<suggestions.size();++i)
+      printOption(suggestions[i], ss);
+    ss << "Use printOptions() to get a full list of options." << endl;
+  }
+  casadi_error(ss.str());
+  return GenericType();
 }
 
 void OptionsFunctionalityNode::addOption(const string &name, const TypeID& type,
@@ -449,9 +469,13 @@ bool OptionsFunctionalityNode::hasSetOption(const string &str) const {
   if (!hasOption(str)) casadi_error("OptionsFunctionalityNode::hasSetOption: no such option '"
                                    << str << "'");
   Dict::const_iterator it = dictionary_.find(str);
-  return it != dictionary_.end();
-}
+  if (it!=dictionary_.end()) return true;
 
+  // Check if a dictionary
+  string dotstr = str + ".";
+  it = dictionary_.upper_bound(dotstr);
+  return it!=dictionary_.end() && it->first.compare(0, dotstr.size(), dotstr)==0;
+}
 
 OptionsFunctionality::OptionsFunctionality() {
 }

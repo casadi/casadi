@@ -81,7 +81,7 @@ for k in range(20):
 
 # Allocate an NLP solver
 nlp = {'x':U, 'f':J, 'g':X}
-opts = {"linear_solver":"ma27"}
+opts = {"ipopt.linear_solver":"ma27"}
 solver = nlpsol("solver", "ipopt", nlp, opts)
 
 # Pass bounds, initial guess and solve NLP

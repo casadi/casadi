@@ -204,8 +204,8 @@ nlp = {'x':V, 'f':f, 'g':g}
 # Set options
 opts = {}
 opts["expand"] = True
-#opts["max_iter"] = 4
-opts["linear_solver"] = 'ma27'
+#opts["ipopt.max_iter"] = 4
+opts["ipopt.linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
 solver = nlpsol("solver", "ipopt", nlp, opts)

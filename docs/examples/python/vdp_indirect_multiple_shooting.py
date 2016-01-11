@@ -120,7 +120,7 @@ Solver = "nlpsol"
 opts = {}
 if Solver=="nlpsol":
     opts["nlpsol"] = "ipopt"
-    opts["nlpsol_options"] = {"hessian_approximation":"limited-memory"}
+    opts["nlpsol_options"] = {"ipopt.hessian_approximation":"limited-memory"}
 elif Solver=="newton":
     opts["linear_solver"] = CSparse
 elif Solver=="kinsol":

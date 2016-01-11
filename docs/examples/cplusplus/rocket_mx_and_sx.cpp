@@ -100,8 +100,8 @@ int main(){
   MXDict nlp = {{"x", U}, {"f", F}, {"g", G}};
 
   // Allocate an NLP solver and buffers
-  Dict opts = {{"tol", 1e-10},
-               {"hessian_approximation", "limited-memory"}};
+  Dict opts = {{"ipopt.tol", 1e-10},
+               {"ipopt.hessian_approximation", "limited-memory"}};
   Function solver = nlpsol("solver", "ipopt", nlp, opts);
   std::map<std::string, DM> arg, res;
 

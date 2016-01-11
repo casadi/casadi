@@ -104,7 +104,7 @@ for k in range(nk):
 
 # Allocate an NLP solver
 nlp = {'x':vertcat(w), 'f':J, 'g':vertcat(G)}
-opts = {'linear_solver':'ma27'}
+opts = {'ipopt.linear_solver':'ma27'}
 solver = nlpsol('solver', 'ipopt', nlp, opts)
 
 # Pass bounds, initial guess and solve NLP

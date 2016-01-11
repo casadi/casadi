@@ -143,7 +143,7 @@ sigma_x0 = 0.01
 P = sigma_x0**2*DM.eye(Nstates)
 x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
-opts = {"print_level":0, "print_time": False, 'max_iter':100}
+opts = {"ipopt.print_level":0, "print_time": False, 'ipopt.max_iter':100}
 nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
 
 # Create a holder for the estimated states and disturbances

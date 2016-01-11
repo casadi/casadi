@@ -66,6 +66,9 @@ namespace casadi {
     addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "",
               "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
 
+    addOption("ipopt",                    OT_DICT, GenericType(),
+              "Options to be passed to IPOPT");
+
     // For passing metadata to IPOPT
     addOption("var_string_md",            OT_DICT, GenericType(),
               "String metadata (a dictionary with lists of strings) "
@@ -85,54 +88,6 @@ namespace casadi {
     addOption("con_numeric_md",           OT_DICT, GenericType(),
               "Numeric metadata (a dictionary with lists of reals) about "
               "constraints to be passed to IPOPT");
-
-    // Start an application (temporarily)
-    Ipopt::IpoptApplication temp_app;
-
-    // Get all options available in (s)IPOPT
-    map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> > regops =
-        temp_app.RegOptions()->RegisteredOptionsList();
-    for (map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> >::const_iterator it=regops.begin();
-        it!=regops.end();
-        ++it) {
-      // Option identifier
-      string opt_name = it->first;
-
-      // Short description goes here, even though we do have a longer description
-      string opt_desc = it->second->ShortDescription() + " (see IPOPT documentation)";
-
-      // Get the type
-      Ipopt::RegisteredOptionType ipopt_type = it->second->Type();
-      TypeID casadi_type;
-
-      // Map Ipopt option category to a CasADi options type
-      switch (ipopt_type) {
-      case Ipopt::OT_Number:    casadi_type = OT_REAL;          break;
-      case Ipopt::OT_Integer:   casadi_type = OT_INTEGER;       break;
-      case Ipopt::OT_String:    casadi_type = OT_STRING;        break;
-      case Ipopt::OT_Unknown:   continue; // NOTE: No mechanism to handle OT_Unknown options
-      default:                  continue; // NOTE: Unknown Ipopt options category
-      }
-
-      addOption(opt_name, casadi_type, GenericType(), opt_desc);
-
-      // Set default values of IPOPT options
-      if (casadi_type == OT_REAL) {
-        setDefault(opt_name, it->second->DefaultNumber());
-      } else if (casadi_type == OT_INTEGER) {
-        setDefault(opt_name, it->second->DefaultInteger());
-      } else if (casadi_type == OT_STRING) {
-        setDefault(opt_name, it->second->DefaultString());
-      }
-
-      // Save to map containing IPOPT specific options
-      ops_[opt_name] = casadi_type;
-    }
-
-    char * default_solver = getenv("IPOPT_DEFAULT_LINEAR_SOLVER");
-    if (default_solver) {
-      setOption("linear_solver", default_solver);
-    }
   }
 
   IpoptInterface::~IpoptInterface() {
@@ -143,8 +98,14 @@ namespace casadi {
     Nlpsol::init();
 
     // Read user options
-    exact_hessian_ = !hasSetOption("hessian_approximation") ||
-        option("hessian_approximation")=="exact";
+    if (hasSetOption("ipopt")) opts_ = option("ipopt");
+
+    // Do we need second order derivatives?
+    exact_hessian_ = true;
+    auto hessian_approximation = opts_.find("hessian_approximation");
+    if (hessian_approximation!=opts_.end()) {
+      exact_hessian_ = hessian_approximation->second == "exact";
+    }
 
     // Identify nonlinear variables
     pass_nonlinear_variables_ = option("pass_nonlinear_variables");
@@ -208,28 +169,39 @@ namespace casadi {
       else             userOut() << "Using limited memory Hessian approximation" << endl;
     }
 
-    bool ret = true;
+    // Get all options available in (s)IPOPT
+    auto regops = (*app)->RegOptions()->RegisteredOptionsList();
 
     // Pass all the options to ipopt
-    for (map<string, TypeID>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
-      if (hasSetOption(it->first)) {
-        GenericType op = option(it->first);
-        switch (it->second) {
-        case OT_REAL:
-          ret &= (*app)->Options()->SetNumericValue(it->first, op.toDouble(), false);
-          break;
-        case OT_INTEGER:
-          ret &= (*app)->Options()->SetIntegerValue(it->first, op.toInt(), false);
-          break;
-        case OT_STRING:
-          ret &= (*app)->Options()->SetStringValue(it->first, op.toString(), false);
-          break;
-        default:
-          throw CasadiException("Illegal type");
-        }
+    for (auto&& op : opts_) {
+      // Find the option
+      auto regops_it = regops.find(op.first);
+      if (regops_it==regops.end()) {
+        casadi_error("No such IPOPT option: " + op.first);
       }
 
-    if (!ret) casadi_error("IpoptInterface::Init: Invalid options were detected by Ipopt.");
+      // Get the type
+      Ipopt::RegisteredOptionType ipopt_type = regops_it->second->Type();
+
+      // Pass to IPOPT
+      bool ret;
+      switch (ipopt_type) {
+      case Ipopt::OT_Number:
+        ret = (*app)->Options()->SetNumericValue(op.first, op.second.toDouble(), false);
+        break;
+      case Ipopt::OT_Integer:
+        ret = (*app)->Options()->SetIntegerValue(op.first, op.second.toInt(), false);
+        break;
+      case Ipopt::OT_String:
+        ret = (*app)->Options()->SetStringValue(op.first, op.second.toString(), false);
+        break;
+      case Ipopt::OT_Unknown:
+      default:
+        casadi_warning("Cannot handle option \"" + op.first + "\", ignored");
+        continue;
+      }
+      if (!ret) casadi_error("Invalid options were detected by Ipopt.");
+    }
 
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();

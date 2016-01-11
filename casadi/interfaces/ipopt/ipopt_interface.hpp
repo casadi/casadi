@@ -151,7 +151,7 @@ namespace casadi {
     bool exact_hessian_;
 
     /// All IPOPT options
-    std::map<std::string, TypeID> ops_;
+    Dict opts_;
 
     // Ipopt callback functions
     void finalize_solution(IpoptMemory& m, const double* x, const double* z_L, const double* z_U,

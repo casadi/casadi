@@ -169,8 +169,8 @@ int main(){
       Dict{{"nlpsol_options", Dict{{"nlpsol", "ipopt"}}}};
   } else {
     solver_name = "ipopt";
-    solver_opts["tol"] = 1e-10;
-    solver_opts["hessian_approximation"] = "limited-memory";
+    solver_opts["ipopt.tol"] = 1e-10;
+    solver_opts["ipopt.hessian_approximation"] = "limited-memory";
   }
 
   // Create NLP solver
