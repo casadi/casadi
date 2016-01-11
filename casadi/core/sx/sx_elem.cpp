@@ -155,7 +155,7 @@ namespace casadi {
     casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.")
   }
 
-  bool SXElem::isDoubled() const {
+  bool SXElem::is_doubled() const {
     return is_op(OP_ADD) && is_equal(dep(0), dep(1), SXNode::eq_depth_);
   }
 
@@ -283,7 +283,7 @@ namespace casadi {
           return -x;
         else if (is_equal(x, y, SXNode::eq_depth_)) // terms are equal
           return 1;
-        else if (x.isDoubled() && is_equal(y, 2))
+        else if (x.is_doubled() && is_equal(y, 2))
           return x.dep(0);
         else if (x.is_op(OP_MUL) && is_equal(y, x.dep(0), SXNode::eq_depth_))
           return x.dep(1);
@@ -293,7 +293,7 @@ namespace casadi {
           return y.inv();
         else if (y.is_op(OP_INV))
           return x*y.inv();
-        else if (x.isDoubled() && y.isDoubled())
+        else if (x.is_doubled() && y.is_doubled())
           return x.dep(0) / y->dep(0);
         else if (y.is_constant() && x.is_op(OP_DIV) && x.dep(1).is_constant() &&
                  y.getValue()*x.dep(1).getValue()==1) // (x/5)/0.2

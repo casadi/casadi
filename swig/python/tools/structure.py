@@ -33,7 +33,7 @@ import __builtin__
 def is_integer(a):
   return isinstance(a,int) or isinstance(a,np.integer)
   
-def isString(a):
+def is_string(a):
   return isinstance(a,str) or isinstance(a,unicode)
   
 def isIterable(a):
@@ -83,7 +83,7 @@ def intersperse(*args):
    
 def canonicalIndexAncestors(ind):
   if len(ind)==0: return []
-  return [ind] + canonicalIndexAncestors(ind[:-(map(isString,ind[::-1]).index(True)+1)])
+  return [ind] + canonicalIndexAncestors(ind[:-(map(is_string,ind[::-1]).index(True)+1)])
 
 def canonical(ind,s):
   if ind < 0:
@@ -140,7 +140,7 @@ nesteddict = NestedDictLiteral()
 # Casadi-independent Structure framework
 
 def payloadUnpack(payload,i):
-  if isString(i):
+  if is_string(i):
     raise Exception("Got string %s where number expected."% i)
   if isIterable(payload):
     if i>=len(payload):
@@ -276,7 +276,7 @@ class Structure(object):
     self.dict = SafeDict([(e.name,e) for e in self.entries])
     
     for e in self.order:
-      if isString(e):
+      if is_string(e):
         if e not in self.dict:
           raise Exception("Order '%s' is invalid." % e)
       elif isinstance(e,tuple):
@@ -318,7 +318,7 @@ class Structure(object):
       return e
       
   def getStructEntryByCanonicalIndex(self,indices):
-    return self.getStructEntryByStructIndex(filter(lambda x: isString(x),indices))
+    return self.getStructEntryByStructIndex(filter(lambda x: is_string(x),indices))
 
   def getStruct(self,name):
     if name not in self.struct.dict:
@@ -333,7 +333,7 @@ class Structure(object):
       try:
         if len(powerIndex)==0: return dispatcher(payload,canonicalIndex)
         p = powerIndex[0]
-        if isString(p):
+        if is_string(p):
           return self.dict[p].traverseByPowerIndex(
             powerIndex[1:],
             canonicalIndex=canonicalIndex+(p,),
@@ -637,7 +637,7 @@ class MasterSettable:
     SetterDispatcher(struct=self.struct,master=self.master,mtype=self.mtype),payload=value)
     
 def delegation(extraIndex,entry,i):
-  if isString(extraIndex) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([isString(e) for e in extraIndex])):
+  if is_string(extraIndex) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([is_string(e) for e in extraIndex])):
     extraIndex = FlatIndexDelegater(extraIndex)
   if isinstance(extraIndex,Delegater):
     if entry is None: raise Exception("Cannot use delayed index without supplied entry.")

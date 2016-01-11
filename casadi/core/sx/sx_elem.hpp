@@ -171,7 +171,7 @@ namespace casadi {
     inline explicit operator int() const { return getIntValue();}
 
     /** \brief Check if the node is the sum of two equal expressions */
-    bool isDoubled() const;
+    bool is_doubled() const;
 
     /** \brief Get the number of dependencies of a binary SXElem */
     int n_dep() const;

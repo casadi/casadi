@@ -138,7 +138,7 @@ void setAdaptorOptions(Dict& dict, const string &name, const Dict &op) {
   if (it == dict.end()) {
     // Create an empty dictionary if not
     dict[adaptor_name] = Dict();
-  } else if (!dict[adaptor_name].isDict()) {
+  } else if (!dict[adaptor_name].is_dict()) {
     // If an entry is found, make sure it is a dictionary
     casadi_error("setAdaptorOptions: Dict expected, but got " << dict[adaptor_name] << ".");
   }
@@ -172,7 +172,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
   }
 
   // If we have an empty vector, than we are not strict about the type
-  if (op.is_emptyVector()) {
+  if (op.is_empty_vector()) {
     dictionary_[name] = GenericType::from_type(allowed_options[name]);
     return;
   }
@@ -206,7 +206,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
   if (!allowed_vals_[name].empty()) {
     bool found;
     GenericType problem = op;
-    if (op.isStringVector()) {
+    if (op.is_string_vector()) {
       found = true;
       const std::vector<std::string> & opv = op.toStringVector();
       for (std::vector<std::string>::const_iterator it=opv.begin();it!=opv.end();it++) {

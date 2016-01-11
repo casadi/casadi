@@ -117,18 +117,18 @@ namespace casadi {
 
     ///@{
     /** \brief Check if a particular type */
-    bool isBool() const;
-    bool isInt() const;
-    bool isDouble() const;
-    bool isString() const;
-    bool is_emptyVector() const;
-    bool isIntVector() const;
-    bool isIntVectorVector() const;
-    bool isDoubleVector() const;
-    bool isStringVector() const;
-    bool isDict() const;
-    bool isFunction() const;
-    bool isVoidPointer() const;
+    bool is_bool() const;
+    bool is_int() const;
+    bool is_double() const;
+    bool is_string() const;
+    bool is_empty_vector() const;
+    bool is_int_vector() const;
+    bool is_int_vector_vector() const;
+    bool is_double_vector() const;
+    bool is_string_vector() const;
+    bool is_dict() const;
+    bool is_function() const;
+    bool is_void_pointer() const;
     ///@}
 
     ///@{

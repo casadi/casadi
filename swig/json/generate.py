@@ -72,13 +72,13 @@ def getDocstring(e):
 def getModule(x):
   return x.xpath('ancestor-or-self::*/module/attributelist/attribute[@name="name"]')[-1].attrib['value']
 
-def isInternal(d,msg=None):
+def is_internal(d,msg=None):
   fd = d.find('attributelist/attribute[@name="feature_docstring"]')
   fn = d.find('attributelist/attribute[@name="name"]')
   name = [fn if fn is None else fn.attrib['value']]
   if fd is None:
     return False
-    #raise Exception("isInternal find fail",d.tag,name,msg)
+    #raise Exception("is_internal find fail",d.tag,name,msg)
   v = fd.attrib['value']
   return v.strip().startswith("[INTERNAL]")
 #  return "[INTERNAL]" in v
@@ -93,7 +93,7 @@ for d in r.findall('*//enum'):
   if getModule(d) != my_module: continue
   sym_name = getAttribute(d,"sym_name")
   docs = getDocstring(d)
-  #if isInternal(d):
+  #if is_internal(d):
   #  continue
 
   assert sym_name not in enums, "overwriting an enum"
@@ -130,7 +130,7 @@ for c in r.findall('*//class'):
   if classModule is None: raise ValueError("class module information missing")
   if classModule != getModule(c): raise ValueError("class module information different than getModule()")
   if classModule != my_module: continue
-  if isInternal(c,msg="class"):
+  if is_internal(c,msg="class"):
     internalClasses.append(name)
     continue
 
@@ -216,7 +216,7 @@ for name,c in classes0.items():
 
     if dname == "ptr": continue # WORKAROUND FOR POTENTIAL SWIG BUG
 
-    #if isInternal(d,msg="methods"):
+    #if is_internal(d,msg="methods"):
     #  numInternalMethods += 1
     #  continue
     numExposedMethods += 1
@@ -236,7 +236,7 @@ for name,c in classes0.items():
     access = getAttribute(d,"access")
     if access=="private": continue
 
-    if isInternal(d,msg="constructors"):
+    if is_internal(d,msg="constructors"):
       numInternalConstructors += 1
       continue
     if internalClass(rettype):
@@ -248,7 +248,7 @@ for name,c in classes0.items():
 
   for d in c.findall('attributelist/baselist/base'):
     base = d.attrib["name"]
-    #if isInternal(d,msg="bases"): continue
+    #if is_internal(d,msg="bases"): continue
     data["bases"].append( getCanonicalType( base ) )
 print "elpased", time.time()-t0
 t0 = time.time()
@@ -289,7 +289,7 @@ for d in r.findall('*//namespace/cdecl'):
     dname= "casadi_" + dname
 
   if my_module != getModule(d): continue
-  if isInternal(d,msg="functions"):
+  if is_internal(d,msg="functions"):
     numInternalFunctions += 1
     continue
 
