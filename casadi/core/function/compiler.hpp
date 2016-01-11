@@ -43,7 +43,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT Compiler : public OptionsFunctionality {
+  class CASADI_EXPORT Compiler : public SharedObject {
   public:
 
     /// Default constructor

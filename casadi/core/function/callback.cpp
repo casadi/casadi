@@ -37,7 +37,7 @@ namespace casadi {
 
   void Callback::construct(const std::string& name, const Dict& opts) {
     assignNode(new CallbackInternal(name, this));
-    setOption(opts);
+    (*this)->setOption(opts);
     Function::init();
   }
 

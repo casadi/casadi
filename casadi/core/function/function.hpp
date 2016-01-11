@@ -131,7 +131,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT Function : public OptionsFunctionality {
+  class CASADI_EXPORT Function : public SharedObject {
   public:
 
     /** \brief Default constructor, null pointer */

@@ -2355,22 +2355,7 @@ class NZproxy:
 %include <casadi/core/weak_ref.hpp>
 %include <casadi/core/casadi_types.hpp>
 %include <casadi/core/generic_type.hpp>
-%include <casadi/core/options_functionality.hpp>
-
-namespace casadi {
-  %extend OptionsFunctionality {
-    void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);}
-    void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);}
-    void setOption(const std::string &name, const std::vector<double>& val){$self->setOption(name,val);}
-    void setOption(const std::string &name, double val){$self->setOption(name,val);}
-    void setOption(const std::string &name, int val){$self->setOption(name,val);}
-    void setOption(const std::string &name, bool val){$self->setOption(name,val);}
-    void setOption(const std::string &name, const std::vector< std::vector<int> >& val){$self->setOption(name,val);}
-  }
-} // namespace casadi
-
 %include <casadi/core/calculus.hpp>
-
 %include <casadi/core/sparsity_interface.hpp>
 
 %template(SpSparsity) casadi::SparsityInterface<casadi::Sparsity>;

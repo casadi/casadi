@@ -78,7 +78,7 @@ namespace casadi {
 
     Dict options;
     if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");
-    options = OptionsFunctionality::addOptionRecipe(options, "qp");
+    //options = OptionsFunctionality::addOptionRecipe(options, "qp");
 
     // Create an Nlpsol instance
     solver_ = nlpsol("nlpsol", option("nlpsol"), nlp, options);

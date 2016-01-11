@@ -36,16 +36,16 @@ namespace casadi {
                            const std::string& compiler,
                            const Dict& opts) {
     assignNode(CompilerInternal::getPlugin(compiler).creator(name));
-    setOption(opts);
+    (*this)->setOption(opts);
     (*this)->init();
   }
 
   CompilerInternal* Compiler::operator->() {
-    return static_cast<CompilerInternal*>(OptionsFunctionality::operator->());
+    return static_cast<CompilerInternal*>(SharedObject::operator->());
   }
 
   const CompilerInternal* Compiler::operator->() const {
-    return static_cast<const CompilerInternal*>(OptionsFunctionality::operator->());
+    return static_cast<const CompilerInternal*>(SharedObject::operator->());
   }
 
   bool Compiler::test_cast(const SharedObjectNode* ptr) {
