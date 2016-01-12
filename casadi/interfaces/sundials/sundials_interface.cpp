@@ -130,66 +130,144 @@ namespace casadi {
     // Call the base class method
     Integrator::init(opts);
 
+    // Default options
+    abstol_ = 1e-8;
+    reltol_ = 1e-6;
+    exact_jacobian_ = true;
+    max_num_steps_ = 10000;
+    finite_difference_fsens_ = false;
+    stop_at_end_ = true;
+    use_preconditioner_ = false;
+    max_krylov_ = 10;
+    string linear_solver_type = "dense";
+    string iterative_solver = "gmres";
+    string pretype = "none";
+    string linear_solver;
+    Dict linear_solver_options;
+    upper_bandwidth_ = -1;
+    lower_bandwidth_ = -1;
+    upper_bandwidthB_ = -1;
+    lower_bandwidthB_ = -1;
+
     // Read options
-    abstol_ = option("abstol");
-    reltol_ = option("reltol");
-    exact_jacobian_ = option("exact_jacobian");
-    exact_jacobianB_ = hasSetOption("exact_jacobianB") ?
-      option("exact_jacobianB") && !g_.isNull() : exact_jacobian_;
-    max_num_steps_ = option("max_num_steps");
-    finite_difference_fsens_ = option("finite_difference_fsens");
-    fsens_abstol_ =
-      hasSetOption("fsens_abstol") ? static_cast<double>(option("fsens_abstol")) : abstol_;
-    fsens_reltol_ =
-      hasSetOption("fsens_reltol") ? static_cast<double>(option("fsens_reltol")) : reltol_;
-    abstolB_ = hasSetOption("abstolB") ? static_cast<double>(option("abstolB")) : abstol_;
-    reltolB_ = hasSetOption("reltolB") ? static_cast<double>(option("reltolB")) : reltol_;
-    stop_at_end_ = option("stop_at_end");
-    use_preconditioner_ = option("use_preconditioner");
-    use_preconditionerB_ =  hasSetOption("use_preconditionerB") ?
-      static_cast<bool>(option("use_preconditionerB")): use_preconditioner_;
-    max_krylov_ = option("max_krylov");
-    max_krylovB_ =
-      hasSetOption("max_krylovB") ? static_cast<int>(option("max_krylovB")): max_krylov_;
+    for (auto&& op : opts) {
+      if (op.first=="abstol") {
+        abstol_ = op.second;
+      } else if (op.first=="reltol") {
+        reltol_ = op.second;
+      } else if (op.first=="exact_jacobian") {
+        exact_jacobian_ = op.second;
+      } else if (op.first=="max_num_steps") {
+        max_num_steps_ = op.second;
+      } else if (op.first=="finite_difference_fsens") {
+        finite_difference_fsens_ = op.second;
+      } else if (op.first=="stop_at_end") {
+        stop_at_end_ = op.second;
+      } else if (op.first=="use_preconditioner") {
+        use_preconditioner_ = op.second;
+      } else if (op.first=="max_krylov") {
+        max_krylov_ = op.second;
+      } else if (op.first=="linear_solver_type") {
+        linear_solver_type = op.second.to_string();
+      } else if (op.first=="iterative_solver") {
+        iterative_solver = op.second.to_string();
+      } else if (op.first=="pretype") {
+        pretype = op.second.to_string();
+      } else if (op.first=="linear_solver") {
+        linear_solver = op.second.to_string();
+      } else if (op.first=="linear_solver_options") {
+        linear_solver_options = op.second;
+      } else if (op.first=="upper_bandwidth") {
+        upper_bandwidth_ = op.second;
+      } else if (op.first=="lower_bandwidth") {
+        lower_bandwidth_ = op.second;
+      } else if (op.first=="upper_bandwidthB") {
+        upper_bandwidthB_ = op.second;
+      } else if (op.first=="lower_bandwidthB") {
+        lower_bandwidthB_ = op.second;
+      }
+    }
+
+    // Default dependent options
+    exact_jacobianB_ = exact_jacobian_;
+    fsens_abstol_ = abstol_;
+    fsens_reltol_ = reltol_;
+    abstolB_ = abstol_;
+    reltolB_ = reltol_;
+    use_preconditionerB_ = use_preconditioner_;
+    max_krylovB_ = max_krylov_;
+    std::string linear_solver_typeB = linear_solver_type;
+    std::string iterative_solverB = iterative_solver;
+    std::string pretypeB = pretype;
+    string linear_solverB = linear_solver;
+    Dict linear_solver_optionsB = linear_solver_options;
+
+    // Read options again
+    for (auto&& op : opts) {
+      if (op.first=="exact_jacobianB") {
+        exact_jacobianB_ = op.second;
+      } else if (op.first=="fsens_abstol") {
+        fsens_abstol_ = op.second;
+      } else if (op.first=="fsens_reltol") {
+        fsens_reltol_ = op.second;
+      } else if (op.first=="abstolB") {
+        abstolB_ = op.second;
+      } else if (op.first=="reltolB") {
+        reltolB_ = op.second;
+      } else if (op.first=="use_preconditionerB") {
+        use_preconditionerB_ = op.second;
+      } else if (op.first=="max_krylovB") {
+        max_krylovB_ = op.second;
+      } else if (op.first=="linear_solver_typeB") {
+        linear_solver_typeB = op.second.to_string();
+      } else if (op.first=="iterative_solverB") {
+        iterative_solverB = op.second.to_string();
+      } else if (op.first=="pretypeB") {
+        pretypeB = op.second.to_string();
+      } else if (op.first=="linear_solverB") {
+        linear_solverB = op.second.to_string();
+      } else if (op.first=="linear_solver_optionsB") {
+        linear_solver_optionsB = op.second;
+      }
+    }
+
+    // No Jacobian of g if g doesn't exist
+    if (g_.isNull()) {
+      exact_jacobianB_ = false;
+    }
 
     // Linear solver for forward integration
-    if (option("linear_solver_type")=="dense") {
+    if (linear_solver_type=="dense") {
       linsol_f_ = SD_DENSE;
-    } else if (option("linear_solver_type")=="banded") {
+    } else if (linear_solver_type=="banded") {
       linsol_f_ = SD_BANDED;
-    } else if (option("linear_solver_type")=="iterative") {
+    } else if (linear_solver_type=="iterative") {
       linsol_f_ = SD_ITERATIVE;
 
       // Iterative solver
-      if (option("iterative_solver")=="gmres") {
+      if (iterative_solver=="gmres") {
         itsol_f_ = SD_GMRES;
-      } else if (option("iterative_solver")=="bcgstab") {
+      } else if (iterative_solver=="bcgstab") {
         itsol_f_ = SD_BCGSTAB;
-      } else if (option("iterative_solver")=="tfqmr") {
+      } else if (iterative_solver=="tfqmr") {
         itsol_f_ = SD_TFQMR;
       } else {
-        throw CasadiException("Unknown sparse solver for forward integration");
+        casadi_error("Unknown iterative solver for forward integration: " + iterative_solver);
       }
 
       // Preconditioning type
-      if (option("pretype")=="none")               pretype_f_ = PREC_NONE;
-      else if (option("pretype")=="left")          pretype_f_ = PREC_LEFT;
-      else if (option("pretype")=="right")         pretype_f_ = PREC_RIGHT;
-      else if (option("pretype")=="both")          pretype_f_ = PREC_BOTH;
-      else
-        throw CasadiException("Unknown preconditioning type for forward integration");
-    } else if (option("linear_solver_type")=="user_defined") {
+      if (pretype=="none")               pretype_f_ = PREC_NONE;
+      else if (pretype=="left")          pretype_f_ = PREC_LEFT;
+      else if (pretype=="right")         pretype_f_ = PREC_RIGHT;
+      else if (pretype=="both")          pretype_f_ = PREC_BOTH;
+      else {
+        casadi_error("Unknown preconditioning type for forward integration: " + pretype);
+      }
+    } else if (linear_solver_type=="user_defined") {
       linsol_f_ = SD_USER_DEFINED;
     } else {
-      throw CasadiException("Unknown linear solver for forward integration");
+      casadi_error("Unknown linear solver for forward integration: " + linear_solver_type);
     }
-
-
-    std::string linear_solver_typeB = hasSetOption("linear_solver_typeB") ?
-      option("linear_solver_typeB") : option("linear_solver_type");
-    std::string iterative_solverB = hasSetOption("iterative_solverB") ?
-      option("iterative_solverB") : option("iterative_solver");
-    std::string pretypeB = hasSetOption("pretypeB") ? option("pretypeB"): option("pretype");
 
     // Linear solver for backward integration
     if (linear_solver_typeB=="dense") {
@@ -207,7 +285,7 @@ namespace casadi {
       } else if (iterative_solverB=="tfqmr") {
         itsol_g_ = SD_TFQMR;
       } else {
-        throw CasadiException("Unknown sparse solver for backward integration");
+        casadi_error("Unknown sparse solver for backward integration: " + iterative_solverB);
       }
 
       // Preconditioning type
@@ -215,12 +293,13 @@ namespace casadi {
       else if (pretypeB=="left")          pretype_g_ = PREC_LEFT;
       else if (pretypeB=="right")         pretype_g_ = PREC_RIGHT;
       else if (pretypeB=="both")          pretype_g_ = PREC_BOTH;
-      else
-        throw CasadiException("Unknown preconditioning type for backward integration");
+      else {
+        casadi_error("Unknown preconditioning type for backward integration: " + pretypeB);
+      }
     } else if (linear_solver_typeB=="user_defined") {
       linsol_g_ = SD_USER_DEFINED;
     } else {
-      casadi_error("Unknown linear solver for backward integration: " << iterative_solverB);
+      casadi_error("Unknown linear solver for backward integration: " + iterative_solverB);
     }
 
     // Create a Jacobian if requested
@@ -259,33 +338,17 @@ namespace casadi {
                             << jacB_.size2_out(0) << ")");
     }
 
-    if (hasSetOption("linear_solver") && !jac_.isNull()) {
-      // Options
-      Dict linear_solver_options;
-      if (hasSetOption("linear_solver_options")) {
-        linear_solver_options = option("linear_solver_options");
-      }
-
-      // Create a linear solver
-      linsol_ = linsol("linsol", option("linear_solver"), jac_.sparsity_out(0),
-                                 1, linear_solver_options);
+    // Create a linear solver
+    if (!linear_solver.empty() && !jac_.isNull()) {
+      linsol_ = linsol("linsol", linear_solver, jac_.sparsity_out(0),
+                       1, linear_solver_options);
       alloc(linsol_);
     }
 
-    if ((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()) {
-      // Linear solver options
-      Dict opts;
-      if (hasSetOption("linear_solver_optionsB")) {
-        opts = option("linear_solver_optionsB");
-      } else if (hasSetOption("linear_solver_options")) {
-        opts = option("linear_solver_options");
-      }
-
-      // Create a linear solver
-      std::string linear_solver_name =
-        hasSetOption("linear_solverB") ? option("linear_solverB") : option("linear_solver");
-      linsolB_ = linsol("linsolB", linear_solver_name, jacB_.sparsity_out(0),
-                                  1, opts);
+    // Create a linear solver
+    if (!linear_solverB.empty() && !jacB_.isNull()) {
+      linsolB_ = linsol("linsolB", linear_solverB, jacB_.sparsity_out(0),
+                        1, linear_solver_optionsB);
       alloc(linsolB_);
     }
 
@@ -348,23 +411,23 @@ namespace casadi {
     std::pair<int, int> bw;
 
     // Get upper bandwidth
-    if (hasSetOption("upper_bandwidth")) {
-      bw.first = option("upper_bandwidth");
-    } else if (!jac_.isNull()) {
-      bw.first = jac_.sparsity_out(0).bw_upper();
+    if (upper_bandwidth_>=0) {
+      bw.first = upper_bandwidth_;
     } else {
-      casadi_error("\"upper_bandwidth\" has not been set and cannot be "
-                   "detected since exact Jacobian is not available.");
+      casadi_assert_message(!jac_.isNull(),
+                            "\"upper_bandwidth\" has not been set and cannot be "
+                            "detected since exact Jacobian is not available.");
+      bw.first = jac_.sparsity_out(0).bw_upper();
     }
 
     // Get lower bandwidth
-    if (hasSetOption("lower_bandwidth")) {
-      bw.second = option("lower_bandwidth");
-    } else if (!jac_.isNull()) {
-      bw.second = jac_.sparsity_out(0).bw_lower();
+    if (lower_bandwidth_>=0) {
+      bw.second = lower_bandwidth_;
     } else {
-      casadi_error("\"lower_bandwidth\" has not been set and cannot be "
-                   "detected since exact Jacobian is not available.");
+      casadi_assert_message(!jac_.isNull(),
+                            "\"lower_bandwidth\" has not been set and cannot be "
+                            "detected since exact Jacobian is not available.");
+      bw.second = jac_.sparsity_out(0).bw_lower();
     }
 
     return bw;
@@ -374,23 +437,25 @@ namespace casadi {
     std::pair<int, int> bw;
 
     // Get upper bandwidth
-    if (hasSetOption("upper_bandwidthB")) {
-      bw.first = option("upper_bandwidthB");
-    } else if (!jacB_.isNull()) {
-      bw.first = jacB_.sparsity_out(0).bw_upper();
+    if (upper_bandwidthB_>=0) {
+      bw.first = upper_bandwidthB_;
     } else {
-      casadi_error("\"upper_bandwidthB\" has not been set and cannot be detected "
-                   "since exact Jacobian for backward problem is not available.");
+      casadi_assert_message(!jacB_.isNull(),
+                            "\"upper_bandwidthB\" has not been set and cannot be "
+                            "detected since exact Jacobian for backward problem "
+                            "is not available.");
+      bw.first = jacB_.sparsity_out(0).bw_upper();
     }
 
     // Get lower bandwidth
-    if (hasSetOption("lower_bandwidthB")) {
-      bw.second = option("lower_bandwidthB");
-    } else if (!jacB_.isNull()) {
-      bw.second = jacB_.sparsity_out(0).bw_lower();
+    if (lower_bandwidthB_>=0) {
+      bw.second = lower_bandwidthB_;
     } else {
-      casadi_error("\"lower_bandwidthB\" has not been set and cannot be detected "
-                   "since exact Jacobian for backward problem is not available.");
+      casadi_assert_message(!jacB_.isNull(),
+                            "\"lower_bandwidthB\" has not been set and cannot be "
+                            "detected since exact Jacobian for backward problem "
+                            "is not available.");
+      bw.second = jacB_.sparsity_out(0).bw_lower();
     }
 
     return bw;

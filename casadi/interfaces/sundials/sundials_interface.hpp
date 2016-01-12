@@ -120,6 +120,8 @@ namespace casadi {
     int max_num_steps_;
     bool finite_difference_fsens_;
     bool stop_at_end_;
+    int upper_bandwidth_, lower_bandwidth_;
+    int upper_bandwidthB_, lower_bandwidthB_;
     ///@}
 
     /// Supported linear solvers in Sundials

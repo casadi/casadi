@@ -87,7 +87,6 @@ namespace casadi {
 
     u_scale_ = 0;
     f_scale_ = 0;
-    disable_internal_warnings_ = false;
 
     // Default options
     exact_jacobian_ = true;
