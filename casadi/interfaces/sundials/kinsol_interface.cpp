@@ -88,6 +88,16 @@ namespace casadi {
     u_scale_ = 0;
     f_scale_ = 0;
     disable_internal_warnings_ = false;
+
+    // Default options
+    exact_jacobian_ = true;
+    disable_internal_warnings_ = false;
+    max_iter_ = 0;
+    maxl_ = 0;
+    upper_bandwidth_ = -1;
+    lower_bandwidth_ = -1;
+    use_preconditioner_ = false;
+    abstol_ = 1e-6;
   }
 
   KinsolInterface::~KinsolInterface() {
@@ -99,16 +109,51 @@ namespace casadi {
     // Initialize the base classes
     Rootfinder::init(opts);
 
+    // Default (temporary) options
+    string strategy = "none";
+    vector<double> u_scale;
+    vector<double> f_scale;
+    string linear_solver_type = "dense";
+    string iterative_solver = "gmres";
+
     // Read options
-    if (option("strategy")=="linesearch") {
-      strategy_ = KIN_LINESEARCH;
-    } else {
-      casadi_assert(option("strategy")=="none");
-      strategy_ = KIN_NONE;
+    for (auto&& op : opts) {
+      if (op.first=="strategy") {
+        strategy = op.second.to_string();
+      } else if (op.first=="exact_jacobian") {
+        exact_jacobian_ = op.second;
+      } else if (op.first=="u_scale") {
+        u_scale = op.second;
+      } else if (op.first=="f_scale") {
+        f_scale = op.second;
+      } else if (op.first=="disable_internal_warnings") {
+        disable_internal_warnings_ = op.second;
+      } else if (op.first=="max_iter") {
+        max_iter_ = op.second;
+      } else if (op.first=="linear_solver_type") {
+        linear_solver_type = op.second.to_string();
+      } else if (op.first=="max_krylov") {
+        maxl_ = op.second;
+      } else if (op.first=="upper_bandwidth") {
+        upper_bandwidth_ = op.second;
+      } else if (op.first=="lower_bandwidth") {
+        lower_bandwidth_ = op.second;
+      } else if (op.first=="iterative_solver") {
+        iterative_solver = op.second.to_string();
+      } else if (op.first=="use_preconditioner") {
+        use_preconditioner_ = op.second;
+      } else if (op.first=="abstol") {
+        abstol_ = op.second;
+      }
     }
 
-    // Use exact Jacobian?
-    exact_jacobian_ = option("exact_jacobian");
+    // Get globalization strategy
+    if (strategy=="linesearch") {
+      strategy_ = KIN_LINESEARCH;
+    } else {
+      casadi_assert(strategy=="none");
+      strategy_ = KIN_NONE;
+    }
 
     // Allocate N_Vectors
     if (u_scale_) N_VDestroy_Serial(u_scale_);
@@ -117,8 +162,7 @@ namespace casadi {
     f_scale_ = N_VNew_Serial(n_);
 
     // Set scaling factors on variables
-    if (hasSetOption("u_scale")) {
-      const vector<double>& u_scale = option("u_scale");
+    if (!u_scale.empty()) {
       casadi_assert(u_scale.size()==NV_LENGTH_S(u_scale_));
       copy(u_scale.begin(), u_scale.end(), NV_DATA_S(u_scale_));
     } else {
@@ -126,43 +170,35 @@ namespace casadi {
     }
 
     // Set scaling factors on equations
-    if (hasSetOption("f_scale")) {
-      const vector<double>& f_scale = option("f_scale");
+    if (!f_scale.empty()) {
       casadi_assert(f_scale.size()==NV_LENGTH_S(f_scale_));
       copy(f_scale.begin(), f_scale.end(), NV_DATA_S(f_scale_));
     } else {
       N_VConst(1.0, f_scale_);
     }
 
-    // Disable internal warning messages?
-    disable_internal_warnings_ = option("disable_internal_warnings");
-
-    // Maximum number of iterations
-    max_iter_ = option("max_iter");
-
     // Type of linear solver
-    if (option("linear_solver_type")=="dense") {
+    if (linear_solver_type=="dense") {
       linear_solver_type_ = DENSE;
       if (exact_jacobian_) {
         // For storing Jacobian nonzeros
         alloc_w(jac_.nnz_out(0), true);
       }
-    } else if (option("linear_solver_type")=="banded") {
+    } else if (linear_solver_type=="banded") {
       linear_solver_type_ = BANDED;
-      upper_bandwidth_ = option("upper_bandwidth");
-      lower_bandwidth_ = option("lower_bandwidth");
+      casadi_assert(upper_bandwidth_>=0);
+      casadi_assert(lower_bandwidth_>=0);
       if (exact_jacobian_) {
         // For storing Jacobian nonzeros
         alloc_w(jac_.nnz_out(0), true);
       }
-    } else if (option("linear_solver_type")=="iterative") {
+    } else if (linear_solver_type=="iterative") {
       linear_solver_type_ = ITERATIVE;
-      maxl_ = option("max_krylov").to_int();
-      if (option("iterative_solver")=="gmres") {
+      if (iterative_solver=="gmres") {
         iterative_solver_ = GMRES;
-      } else if (option("iterative_solver")=="bcgstab") {
+      } else if (iterative_solver=="bcgstab") {
         iterative_solver_ = BCGSTAB;
-      } else if (option("iterative_solver")=="tfqmr") {
+      } else if (iterative_solver=="tfqmr") {
         iterative_solver_ = TFQMR;
       } else {
         casadi_error("KINSOL: Unknown sparse solver");
@@ -172,7 +208,6 @@ namespace casadi {
         f_fwd_ = f_.derivative(1, 0);
         alloc(f_fwd_);
       }
-      use_preconditioner_ = option("use_preconditioner");
       if (use_preconditioner_) {
         // Make sure that a Jacobian has been provided
         casadi_assert_message(!jac_.isNull(), "No Jacobian has been provided");
@@ -180,7 +215,7 @@ namespace casadi {
         // Make sure that a linear solver has been provided
         casadi_assert_message(!linsol_.isNull(), "No linear solver has been provided.");
       }
-    } else if (option("linear_solver_type")=="user_defined") {
+    } else if (linear_solver_type=="user_defined") {
       linear_solver_type_ = USER_DEFINED;
       // Make sure that a Jacobian has been provided
       casadi_assert(!jac_.isNull());
@@ -197,9 +232,6 @@ namespace casadi {
     } else {
       casadi_error("Unknown linear solver");
     }
-
-    // Stop criterion
-    abstol_ = option("abstol");
   }
 
   void KinsolInterface::eval(Memory& mem, const double** arg, double** res,

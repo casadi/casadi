@@ -51,6 +51,10 @@ namespace casadi {
     // Equilibrate the matrix
     addOption("equilibration", OT_BOOL, true);
     addOption("allow_equilibration_failure", OT_BOOL, false);
+
+    // Default options
+    equilibriate_ = true;
+    allow_equilibration_failure_ = false;
   }
 
   LapackLu::~LapackLu() {
@@ -60,14 +64,17 @@ namespace casadi {
     // Call the base class initializer
     Linsol::init(opts);
 
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="equilibration") {
+        equilibriate_ = op.second;
+      } else if (op.first=="allow_equilibration_failure") {
+        allow_equilibration_failure_ = op.second;
+      }
+    }
+
     // Get dimensions
     casadi_assert(nrow()==ncol());
-
-    // Equilibrate?
-    equilibriate_ = option("equilibration").to_int();
-
-    // Allow equilibration failures
-    allow_equilibration_failure_ = option("allow_equilibration_failure").to_int();
   }
 
   Memory* LapackLu::memory() const {
