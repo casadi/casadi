@@ -79,11 +79,19 @@ namespace casadi {
     addOption("compiler", OT_STRING, "clang", "Just-in-time compiler plugin to be used.");
     addOption("jit_options", OT_DICT, GenericType(), "Options to be passed to the jit compiler.");
 
+    // Default options (can be overridden in derived classes)
     verbose_ = false;
+    //ad_weight
+    //ad_weight_sp
+    //jac_penalty = 2
+    user_data_ = 0;
+    regularity_check_ = false;
+    inputs_check_ = true;
+    gather_stats_ = false;
     jit_ = false;
+
     eval_ = 0;
     simple_ = 0;
-    user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
 
@@ -91,7 +99,6 @@ namespace casadi {
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
     sz_w_tmp_ = 0;
-
     sz_arg_per_ = 0;
     sz_res_per_ = 0;
     sz_iw_per_ = 0;
@@ -161,6 +168,33 @@ namespace casadi {
   void FunctionInternal::init(const Dict& opts) {
     setDefaultOptions();
 
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="verbose") {
+        verbose_ = op.second;
+      } else if (op.first=="user_data") {
+        user_data_ = op.second.to_void_pointer();
+      } else if (op.first=="monitor") {
+        for (auto&& m : op.second.to_string_vector()) monitors_.insert(m);
+      } else if (op.first=="regularity_check") {
+        regularity_check_ = op.second;
+      } else if (op.first=="inputs_check") {
+        inputs_check_ = op.second;
+      } else if (op.first=="gather_stats") {
+        gather_stats_ = op.second;
+      } else if (op.first=="input_scheme") {
+        ischeme_ = op.second;
+      } else if (op.first=="output_scheme") {
+        oscheme_ = op.second;
+      } else if (op.first=="jit") {
+        jit_ = op.second;
+      } else if (op.first=="compiler") {
+        compilerplugin_ = op.second.to_string();
+      } else if (op.first=="jit_options") {
+        jit_options_ = op.second;
+      }
+    }
+
     // Free existing memory object, if any
     for (auto&& i : mem_) delete i;
     mem_.clear();
@@ -179,12 +213,6 @@ namespace casadi {
     sz_arg_per_ += n_in;
     sz_res_per_ += n_out;
 
-    verbose_ = option("verbose");
-    jit_ = option("jit");
-    compilerplugin_ = option("compiler").to_string();
-    if (hasSetOption("jit_options")) jit_options_ = option("jit_options");
-    regularity_check_ = option("regularity_check");
-
     // Warn for functions with too many inputs or outputs
     casadi_assert_warning(n_in<10000, "Function " << name_
                           << " has a large number of inputs (" << n_in << "). "
@@ -198,50 +226,32 @@ namespace casadi {
         SparseStorage<Sparsity>(Sparsity(n_out, n_in));
     jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(n_out, n_in));
 
-    if (hasSetOption("user_data")) {
-      user_data_ = option("user_data").to_void_pointer();
-    }
-
-    // Pass monitors
-    if (hasSetOption("monitor")) {
-      const std::vector<std::string>& monitors = option("monitor");
-      for (std::vector<std::string>::const_iterator it=monitors.begin();it!=monitors.end();it++) {
-        monitors_.insert(*it);
-      }
-    }
-
-    // Custom input scheme
-    if (hasSetOption("input_scheme")) {
-      ischeme_ = option("input_scheme");
-    }
-
     // If input scheme empty, provide default names
-    if (ischeme_.empty()) {
-      ischeme_.resize(n_in);
-      for (size_t i=0; i!=ischeme_.size(); ++i) {
-        ischeme_[i] = "i" + CodeGenerator::to_string(i);
-      }
-    }
+    if (ischeme_.empty()) ischeme_ = get_ischeme();
 
-    // Custom output scheme
-    if (hasSetOption("output_scheme")) {
-      oscheme_ = option("output_scheme");
-    }
-
-    // If output scheme null, provide default names
-    if (oscheme_.empty()) {
-      oscheme_.resize(n_out);
-      for (size_t i=0; i!=oscheme_.size(); ++i) {
-        oscheme_[i] = "o" + CodeGenerator::to_string(i);
-      }
-    }
+    // If output scheme empty, provide default names
+    if (oscheme_.empty()) oscheme_ = get_oscheme();
 
     monitor_inputs_ = monitored("inputs");
     monitor_outputs_ = monitored("outputs");
-    gather_stats_ = option("gather_stats");
-    inputs_check_ = option("inputs_check");
     alloc_arg(0);
     alloc_res(0);
+  }
+
+  std::vector<std::string> FunctionInternal::get_ischeme() const {
+    std::vector<std::string> ret(n_in());
+    for (size_t i=0; i!=ret.size(); ++i) {
+      ret[i] = "i" + CodeGenerator::to_string(i);
+    }
+    return ret;
+  }
+
+  std::vector<std::string> FunctionInternal::get_oscheme() const {
+    std::vector<std::string> ret(n_out());
+    for (size_t i=0; i!=ret.size(); ++i) {
+      ret[i] = "o" + CodeGenerator::to_string(i);
+    }
+    return ret;
   }
 
   void FunctionInternal::finalize() {

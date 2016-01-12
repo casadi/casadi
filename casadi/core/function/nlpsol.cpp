@@ -79,10 +79,6 @@ namespace casadi {
 
     addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
                                                        "qp", true);
-
-    // Enable string notation for IO
-    ischeme_ = nlpsol_in();
-    oscheme_ = nlpsol_out();
   }
 
   Nlpsol::~Nlpsol() {

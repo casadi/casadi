@@ -50,9 +50,6 @@ namespace casadi {
 
     // Number of equations
     neq_ = sparsity.size2();
-
-    ischeme_ = {"A", "B"};
-    oscheme_ = {"X"};
   }
 
   Linsol::~Linsol() {

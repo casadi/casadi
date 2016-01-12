@@ -64,9 +64,6 @@ namespace casadi {
       rp_ = g_.sparsity_in(RDAE_RP);
       rq_ = g_.sparsity_out(RDAE_QUAD);
     }
-
-    ischeme_ = integrator_in();
-    oscheme_ = integrator_out();
   }
 
   Integrator::~Integrator() {

@@ -38,11 +38,8 @@ namespace casadi {
     addOption("jac", OT_STRING, GenericType(), "Function body for Jacobian");
     addOption("hess", OT_STRING, GenericType(), "Function body for Hessian");
 
-    // Jit by default
-    setOption("jit", true);
-
-    // Arrays for holding inputs and outputs
-    alloc_w(n_in + n_out);
+    // Default options
+    jit_ = true; // override default
   }
 
   void Jit::init(const Dict& opts) {
@@ -52,6 +49,9 @@ namespace casadi {
     // Read options
     if (hasSetOption("jac")) jac_body_ = option("jac").to_string();
     if (hasSetOption("hess")) hess_body_ = option("hess").to_string();
+
+    // Arrays for holding inputs and outputs
+    alloc_w(n_in() + n_out());
   }
 
   Jit::~Jit() {

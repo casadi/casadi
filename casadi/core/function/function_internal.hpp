@@ -121,6 +121,12 @@ namespace casadi {
     */
     virtual void finalize();
 
+    /** \brief Get input scheme */
+    virtual std::vector<std::string> get_ischeme() const;
+
+    /** \brief Get output scheme */
+    virtual std::vector<std::string> get_oscheme() const;
+
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 

@@ -89,6 +89,12 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
+    ///@{
+    /** \brief Names of function input and outputs */
+    virtual std::vector<std::string> get_ischeme() const { return nlpsol_in();}
+    virtual std::vector<std::string> get_oscheme() const { return nlpsol_out();}
+    /// @}
+
     /// Initialize
     virtual void init(const Dict& opts);
 

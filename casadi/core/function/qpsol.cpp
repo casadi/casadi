@@ -63,9 +63,6 @@ namespace casadi {
     // Sparsity
     Sparsity x_sparsity = Sparsity::dense(n_, 1);
     Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
-
-    ischeme_ = qpsol_in();
-    oscheme_ = qpsol_out();
   }
 
   Sparsity Qpsol::get_sparsity_in(int ind) const {

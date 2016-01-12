@@ -114,8 +114,10 @@ namespace casadi {
     /** \brief  Print all information there is to know about a certain option */
     void printOption(const std::string &name, std::ostream &stream = userOut()) const;
 
+//  private:
     /** \brief  get an option value */
     GenericType option(const std::string &str) const;
+//  public:
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const = 0;
