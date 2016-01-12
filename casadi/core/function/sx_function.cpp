@@ -62,6 +62,10 @@ namespace casadi {
     sp_adj_kernel_ = 0;
     sp_program_ = 0;
 #endif // WITH_OPENCL
+
+    // Default (persistent) options
+    just_in_time_opencl_ = false;
+    just_in_time_sparsity_ = false;
   }
 
   SXFunction::~SXFunction() {
@@ -111,7 +115,7 @@ namespace casadi {
 
     // Create function
     Dict opts;
-    opts["verbose"] = option("verbose");
+    opts["verbose"] = verbose_;
     Function gfcn("gfcn", {inputv_.at(iind)}, {g}, opts);
 
     // Calculate jacobian of gradient
@@ -237,6 +241,20 @@ namespace casadi {
     // Call the init function of the base class
     XFunction<SXFunction, SX, SXNode>::init(opts);
 
+    // Default (temporary) options
+    bool live_variables = true;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="live_variables") {
+        live_variables = op.second;
+      } else if (op.first=="just_in_time_opencl") {
+        just_in_time_opencl_ = op.second;
+      } else if (op.first=="just_in_time_sparsity") {
+        just_in_time_sparsity_ = op.second;
+      }
+    }
+
     // Stack used to sort the computational graph
     stack<SXNode*> s;
 
@@ -276,9 +294,6 @@ namespace casadi {
           operations_.push_back(SXElem::create(t));
       }
     }
-
-    // Use live variables?
-    bool live_variables = option("live_variables");
 
     // Input instructions
     vector<pair<int, SXNode*> > symb_loc;
@@ -460,7 +475,6 @@ namespace casadi {
     }
 
     // Initialize just-in-time compilation for numeric evaluation using OpenCL
-    just_in_time_opencl_ = option("just_in_time_opencl");
     if (just_in_time_opencl_) {
 #ifdef WITH_OPENCL
       freeOpenCL();
@@ -472,7 +486,6 @@ namespace casadi {
     }
 
     // Initialize just-in-time compilation for sparsity propagation using OpenCL
-    just_in_time_sparsity_ = option("just_in_time_sparsity");
     if (just_in_time_sparsity_) {
 #ifdef WITH_OPENCL
       spFreeOpenCL();

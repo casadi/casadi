@@ -36,8 +36,8 @@ using namespace std;
 namespace casadi {
 
   MXFunction::MXFunction(const std::string& name,
-                                         const std::vector<MX>& inputv,
-                                         const std::vector<MX>& outputv) :
+                         const std::vector<MX>& inputv,
+                         const std::vector<MX>& outputv) :
     XFunction<MXFunction, MX, MXNode>(name, inputv, outputv) {
   }
 
@@ -51,6 +51,16 @@ namespace casadi {
 
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
+
+    // Default (temporary) options
+    bool live_variables = true;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="live_variables") {
+        live_variables = op.second;
+      }
+    }
 
     // Stack used to sort the computational graph
     stack<MXNode*> s;
@@ -79,9 +89,6 @@ namespace casadi {
     // Place in the algorithm for each node
     vector<int> place_in_alg;
     place_in_alg.reserve(nodes.size());
-
-    // Use live variables?
-    bool live_variables = option("live_variables");
 
     // Input instructions
     vector<pair<int, MXNode*> > symb_loc;
