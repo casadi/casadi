@@ -76,10 +76,6 @@ namespace casadi {
                           << ", while output size is "
                           << f_.nnz_out(iout_));
 
-    // Same input and output schemes
-    setOption("input_scheme", f_.name_in());
-    setOption("output_scheme", f_.name_out());
-
     // Call the base class initializer
     FunctionInternal::init(opts);
 

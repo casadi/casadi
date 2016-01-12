@@ -64,6 +64,12 @@ namespace casadi {
     }
     /// @}
 
+    ///@{
+    /** \brief Names of function input and outputs */
+    virtual std::vector<std::string> get_ischeme() const { return f_.name_in();}
+    virtual std::vector<std::string> get_oscheme() const { return f_.name_out();}
+    /// @}
+
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 

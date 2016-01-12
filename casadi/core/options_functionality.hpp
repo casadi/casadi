@@ -56,18 +56,10 @@ namespace casadi {
     OptionsFunctionalityNode();
     virtual ~OptionsFunctionalityNode();
 
-    /** \brief  set an option.
-        The setOptions are in general only considered before the init function, if any.
-        If properties changes, the init function should be called again.
-        (Ticket #54)
-    */
+    /** \brief  set an option. */
+  private:
     void setOption(const std::string &str, const GenericType& val);
-
-    /** \brief  set a set of options.
-        The setOptions are in general only considered before the init function, if any.
-        If properties changes, the init function should be called again.
-        (Ticket #54)
-    */
+  public:
     void setOption(const Dict& dict, bool skipUnknown = false);
 
     /** \brief Get a list of all option names */

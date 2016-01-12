@@ -622,17 +622,6 @@ namespace casadi {
   }
 
   void IpoptInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
-    // Can be enabled when a new bugfixed version of Ipopt comes out
-    //setOption("mehrotra_algorithm", "yes");
-    //setOption("mu_oracle", "probing");
-    for (int i=0;i<recipes.size();++i) {
-      if (recipes[i]=="qp") {
-        setOption("fixed_variable_treatment", "relax_bounds");
-        setOption("jac_c_constant", "yes");
-        setOption("jac_d_constant", "yes");
-        setOption("hessian_constant", "yes");
-      }
-    }
   }
 
   IpoptMemory::IpoptMemory() {
