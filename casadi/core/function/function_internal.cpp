@@ -81,9 +81,11 @@ namespace casadi {
 
     // Default options (can be overridden in derived classes)
     verbose_ = false;
-    //ad_weight
-    //ad_weight_sp
-    //jac_penalty = 2
+    // By default, reverse mode is about twice as expensive as forward mode
+    ad_weight_ = 0.33; // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na, forward when tie
+    // Both modes equally expensive by default (no "taping" needed)
+    ad_weight_sp_ = 0.49; // Forward when tie
+    jac_penalty_ = 2;
     user_data_ = 0;
     regularity_check_ = false;
     inputs_check_ = true;
@@ -172,6 +174,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="verbose") {
         verbose_ = op.second;
+      } else if (op.first=="jac_penalty") {
+        jac_penalty_ = op.second;
       } else if (op.first=="user_data") {
         user_data_ = op.second.to_void_pointer();
       } else if (op.first=="monitor") {
@@ -2302,18 +2306,14 @@ namespace casadi {
 
   bool FunctionInternal::fwdViaJac(int nfwd) {
     if (get_n_forward()==0) return true;
-
-    // Jacobian calculation penalty factor
-    const double jac_penalty = option("jac_penalty");
-
-    if (jac_penalty==-1) return false;
+    if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
-    if (jac_penalty*nnz_in()<nfwd) return true;
+    if (jac_penalty_*nnz_in()<nfwd) return true;
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = adWeight();
-    if (get_n_reverse()>0 && jac_penalty*(1-w)*nnz_out()<w*nfwd)
+    if (get_n_reverse()>0 && jac_penalty_*(1-w)*nnz_out()<w*nfwd)
       return true;
 
     return false;
@@ -2321,18 +2321,14 @@ namespace casadi {
 
   bool FunctionInternal::adjViaJac(int nadj) {
     if (get_n_reverse()==0) return true;
-
-    // Jacobian calculation penalty factor
-    const double jac_penalty = option("jac_penalty");
-
-    if (jac_penalty==-1) return false;
+    if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
-    if (jac_penalty*nnz_out()<nadj) return true;
+    if (jac_penalty_*nnz_out()<nadj) return true;
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = adWeight();
-    if (get_n_forward()>0 && jac_penalty*w*nnz_in()<(1-w)*nadj)
+    if (get_n_forward()>0 && jac_penalty_*w*nnz_in()<(1-w)*nadj)
       return true;
 
     return false;
@@ -2550,11 +2546,8 @@ namespace casadi {
     // If forward mode derivatives unavailable, use reverse
     if (get_n_forward()==0) return 1;
 
-    // A user-provided option overrides default value
-    if (hasSetOption("ad_weight")) return option("ad_weight");
-
-    // By default, reverse mode is about twice as expensive as forward mode
-    return 0.33;  // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na, forward when tie
+    // Use the (potentially user set) option
+    return ad_weight_;
   }
 
   double FunctionInternal::adWeightSp() {
@@ -2564,11 +2557,8 @@ namespace casadi {
     // If forward mode propagation unavailable, use reverse
     if (!spCanEvaluate(true)) return 1;
 
-    // A user-provided option overrides default value
-    if (hasSetOption("ad_weight_sp")) return option("ad_weight_sp");
-
-    // Both modes equally expensive by default (no "taping" needed)
-    return 0.49; // Forward when tie
+    // Use the (potentially user set) option
+    return ad_weight_sp_;
   }
 
   MX FunctionInternal::grad_mx(int iind, int oind) {

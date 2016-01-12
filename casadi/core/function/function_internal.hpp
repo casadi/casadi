@@ -788,6 +788,12 @@ namespace casadi {
     Compiler compiler_;
     Dict jit_options_;
 
+    // Penalty factor for using a complete Jacobian to calculate directional derivatives
+    double jac_penalty_;
+
+    // Weighting factor for derivative calculation and sparsity pattern calculation
+    double ad_weight_, ad_weight_sp_;
+
     bool monitor_inputs_, monitor_outputs_;
 
     /// Errors are thrown when NaN is produced
