@@ -71,7 +71,7 @@ namespace casadi {
     }
   }
 
-  void ShellCompiler::init() {
+  void ShellCompiler::init(const Dict& opts) {
     // Read options
     string compiler = option("compiler").to_string();
     string compiler_setup = option("compiler_setup").to_string();

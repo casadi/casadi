@@ -169,18 +169,14 @@ namespace casadi {
                            const vector<SX>& arg, const vector<SX>& res,
                            const Dict& opts) {
     assignNode(new SXFunction(name, arg, res));
-    (*this)->setOption(opts);
-    (*this)->init();
-    (*this)->finalize();
+    (*this)->construct(opts);
   }
 
   void Function::construct(const string& name,
                            const vector<MX>& arg, const vector<MX>& res,
                            const Dict& opts) {
     assignNode(new MXFunction(name, arg, res));
-    (*this)->setOption(opts);
-    (*this)->init();
-    (*this)->finalize();
+    (*this)->construct(opts);
   }
 
   template<typename M>
@@ -377,18 +373,14 @@ namespace casadi {
                               const Dict& opts) const {
     Function ret;
     ret.assignNode(new Mapaccum(name, *this, n, input_accum, output_accum, reverse));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
   Function Function::map(const string& name, int n, const Dict& opts) const {
     Function ret;
     ret.assignNode(MapBase::create(name, *this, n, opts));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -400,9 +392,7 @@ namespace casadi {
 
     Function ret;
     ret.assignNode(new MapReduce(name, *this, n, repeat_in, repeat_out));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -425,9 +415,7 @@ namespace casadi {
                                  const Function& f_def, const Dict& opts) {
     Function ret;
     ret.assignNode(new Switch(name, f, f_def));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -435,9 +423,7 @@ namespace casadi {
                              const Function& f_false, const Dict& opts) {
     Function ret;
     ret.assignNode(new Switch(name, vector<Function>(1, f_false), f_true));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -447,9 +433,7 @@ namespace casadi {
                                 const Dict& opts) const {
     Function ret;
     ret.assignNode(new KernelSum(name, *this, size, r, n));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1082,9 +1066,7 @@ namespace casadi {
   Function external(const string& name, const Dict& opts) {
     Function ret;
     ret.assignNode(External::create("./" + name + ".so", name));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1092,9 +1074,7 @@ namespace casadi {
                               const Dict& opts) {
     Function ret;
     ret.assignNode(External::create(bin_name, name));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1102,9 +1082,7 @@ namespace casadi {
                               const Dict& opts) {
     Function ret;
     ret.assignNode(External::create(compiler, name));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1226,9 +1204,7 @@ namespace casadi {
                                 const XProblem& dae, const Dict& opts) {
     Function ret;
     ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1308,9 +1284,7 @@ namespace casadi {
                                 const XProblem& nlp, const Dict& opts) {
     Function ret;
     ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1366,9 +1340,7 @@ namespace casadi {
                                const SpDict& qp, const Dict& opts) {
     Function ret;
     ret.assignNode(Qpsol::instantiatePlugin(name, solver, qp));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1440,9 +1412,7 @@ namespace casadi {
     } else {
       ret.assignNode(Linsol::getPlugin(solver).creator(name, sp, nrhs));
     }
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1482,9 +1452,7 @@ namespace casadi {
                    const Function& f, const Dict& opts) {
     Function ret;
     ret.assignNode(Rootfinder::instantiatePlugin(name, solver, f));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 
@@ -1637,9 +1605,7 @@ namespace casadi {
                const std::string& body, const Dict& opts) {
     Function ret;
     ret.assignNode(new Jit(name, n_in, n_out, body, opts));
-    ret->setOption(opts);
-    ret->init();
-    ret->finalize();
+    ret->construct(opts);
     return ret;
   }
 

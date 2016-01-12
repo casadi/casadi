@@ -53,7 +53,7 @@ namespace casadi {
     /// @}
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Finalize the object creation */
     virtual void finalize();

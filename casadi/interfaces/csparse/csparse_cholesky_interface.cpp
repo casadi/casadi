@@ -62,9 +62,9 @@ namespace casadi {
     if (this->L) cs_nfree(this->L);
   }
 
-  void CSparseCholeskyInterface::init() {
+  void CSparseCholeskyInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init();
+    Linsol::init(opts);
   }
 
   Memory* CSparseCholeskyInterface::memory() const {

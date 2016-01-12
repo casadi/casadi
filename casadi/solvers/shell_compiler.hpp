@@ -61,7 +61,7 @@ namespace casadi {
     virtual ~ShellCompiler();
 
     /** \brief Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// A documentation string
     static const std::string meta_doc;

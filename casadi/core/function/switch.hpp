@@ -59,7 +59,7 @@ namespace casadi {
     /// @}
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;

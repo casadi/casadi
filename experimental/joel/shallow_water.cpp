@@ -103,7 +103,7 @@ void Tester::model(){
     for(int j=0; j<n_; ++j){
       double spdist = sqrt(pow((x[i]-0.04),2.) + pow((y[j]-0.04),2.));
       if(spdist<sprad/3.0){
-	h0_.elem(i,j) = spheight_ * cos(3.0*M_PI*spdist/(2.0*sprad));
+	h0_(i,j) = spheight_ * cos(3.0*M_PI*spdist/(2.0*sprad));
 	any_point_in_domain = true;
       }
     }
@@ -113,7 +113,7 @@ void Tester::model(){
   if(!any_point_in_domain){
     int i_splash = std::min(int(0.04/dx),n_-1);
     int j_splash = std::min(int(0.04/dy),n_-1);
-    h0_.elem(i_splash,j_splash) = spheight_;
+    h0_(i_splash,j_splash) = spheight_;
   }
   
   // Free parameters (nominal values)
@@ -242,19 +242,16 @@ void Tester::simulate(double drag_true, double depth_true){
   }
 
   // Simulate once to generate "measurements"
-  f_.setInputNZ(p_true,0);
-  f_.setInput(u0_,1);
-  f_.setInput(v0_,2);
-  f_.setInput(h0_,3);
+  vector<DM> arg = {p_true, u0_, v0_, h0_};
   clock_t time1 = clock();
   for(int k=0; k<n_meas_; ++k){
-    f_.evaluate();
-    const DM& u = f_.output(0);
-    const DM& v = f_.output(1);
-    const DM& h = f_.output(2);
-    f_.setInput(u,1);
-    f_.setInput(v,2);
-    f_.setInput(h,3);
+    vector<DM> res = f_(arg);
+    const DM& u = res.at(0);
+    const DM& v = res.at(1);
+    const DM& h = res.at(2);
+    arg.at(1) = u;
+    arg.at(2) = v;
+    arg.at(3) = h;
     
     // Save a copy of h
     H_meas_.push_back(h);
@@ -344,7 +341,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
 
   if(ipopt_as_qpsol){
     opts["qpsol"] = "nlpsol";
-    Dict nlp_opts = {{"tol", 1e-12}, {"print_level", 0}, {"print_time", false}};
+    Dict nlp_opts = {{"ipopt.tol", 1e-12}, {"ipopt.print_level", 0}, {"print_time", false}};
     opts["qpsol_options"] = Dict{{"nlpsol", "ipopt"}, {"nlpsol_options", nlp_opts}};
   } else {
     opts["qpsol"] = "qpoases";
@@ -362,29 +359,26 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   vector<double> p_init(2);
   p_init[0] = drag_guess/p_scale_[0];
   p_init[1] = depth_guess/p_scale_[1];
-  nlpsol_.setInputNZ(p_init,"x0");
 
   // Bounds on the variables
   vector<double> lbu(2), ubu(2);  
   lbu.at(0) = 1.0e-1 / p_scale_[0]; // drag positive
   lbu.at(1) = 5.0e-4 / p_scale_[1]; // depth positive
-  nlpsol_.setInputNZ(lbu,"lbx");
-
   ubu.at(0) = 100.0 / p_scale_[0]; // max drag
   ubu.at(1) =  0.10 / p_scale_[1]; // max depth
-  nlpsol_.setInputNZ(ubu,"ubx");
-
-  // Constraint bounds
-  nlpsol_.setInput(-spheight_, "lbg");
-  nlpsol_.setInput( spheight_, "ubg");
 
   clock_t time1 = clock();
-  nlpsol_.evaluate();
+  map<string, DM> w = {{"x0", p_init},
+                       {"lbx", lbu},
+                       {"ubx", ubu},
+                       {"lbg", -spheight_},
+                       {"ubg",  spheight_}};
+  w = nlpsol_(w);
   clock_t time2 = clock();
   
   // Solution statistics  
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
-  const vector<double>& x_opt = nlpsol_.output(NLPSOL_X).data();
+  const vector<double>& x_opt = w.at("x").data();
   drag_est = x_opt.at(0)*p_scale_[0];
   depth_est = x_opt.at(1)*p_scale_[1];
   iter_count = nlpsol_.stats().at("iter_count");

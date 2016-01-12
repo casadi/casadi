@@ -63,10 +63,10 @@ namespace casadi {
   Mapaccum::~Mapaccum() {
   }
 
-  void Mapaccum::init() {
+  void Mapaccum::init(const Dict& opts) {
 
     // Call the initialization method of the base class
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
     int num_in = f_.n_in(), num_out = f_.n_out();
     step_in_.resize(num_in, 0);

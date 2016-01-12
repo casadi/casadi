@@ -57,7 +57,7 @@ namespace casadi {
     /// @}
 
     /// Initialize
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);

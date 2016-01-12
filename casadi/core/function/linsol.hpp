@@ -57,7 +57,7 @@ namespace casadi {
     /// @}
 
     /// Initialize
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// Solve the system of equations
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;

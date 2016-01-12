@@ -183,7 +183,7 @@ namespace casadi {
     if (print_stats_) printStats(m, userOut());
   }
 
-  void Integrator::init() {
+  void Integrator::init(const Dict& opts) {
     // Read options
     output_t0_ = option("output_t0");
     print_stats_ = option("print_stats");
@@ -196,7 +196,7 @@ namespace casadi {
     ntout_ = output_t0_ ? ngrid_ : ngrid_-1;
 
     // Call the base class method
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
     // Get dimensions
     nx_ = x().nnz();
@@ -1304,9 +1304,9 @@ namespace casadi {
   FixedStepIntegrator::~FixedStepIntegrator() {
   }
 
-  void FixedStepIntegrator::init() {
+  void FixedStepIntegrator::init(const Dict& opts) {
     // Call the base class init
-    Integrator::init();
+    Integrator::init(opts);
 
     // Number of finite elements and time steps
     nk_ = option("number_of_finite_elements");
@@ -1521,9 +1521,9 @@ namespace casadi {
   ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {
   }
 
-  void ImplicitFixedStepIntegrator::init() {
+  void ImplicitFixedStepIntegrator::init(const Dict& opts) {
     // Call the base class init
-    FixedStepIntegrator::init();
+    FixedStepIntegrator::init(opts);
 
     // Get the NLP creator function
     std::string implicit_function_name = option("implicit_solver");

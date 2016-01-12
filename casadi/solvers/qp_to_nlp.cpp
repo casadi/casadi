@@ -54,9 +54,9 @@ namespace casadi {
   QpToNlp::~QpToNlp() {
   }
 
-  void QpToNlp::init() {
+  void QpToNlp::init(const Dict& opts) {
     // Initialize the base classes
-    Qpsol::init();
+    Qpsol::init(opts);
 
     // Create a symbolic matrix for the decision variables
     SX X = SX::sym("X", n_, 1);

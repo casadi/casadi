@@ -70,7 +70,7 @@ namespace casadi {
     virtual void init_memory(Memory& mem) const;
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Set the work vectors */
     virtual void set_temp(Memory& mem, const double** arg, double** res,
@@ -350,7 +350,7 @@ namespace casadi {
     virtual ~FixedStepIntegrator();
 
     /// Initialize stage
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Allocate memory block */
     virtual Memory* memory() const { return new FixedStepMemory();}
@@ -406,7 +406,7 @@ namespace casadi {
     virtual ~ImplicitFixedStepIntegrator();
 
     /// Initialize stage
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// Get explicit dynamics
     virtual const Function& getExplicit() const { return implicit_solver_;}

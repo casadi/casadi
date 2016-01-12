@@ -93,9 +93,9 @@ namespace casadi {
   IpoptInterface::~IpoptInterface() {
   }
 
-  void IpoptInterface::init() {
+  void IpoptInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Nlpsol::init();
+    Nlpsol::init(opts);
 
     // Read user options
     if (hasSetOption("ipopt")) opts_ = option("ipopt");

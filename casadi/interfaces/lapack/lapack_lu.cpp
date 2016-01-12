@@ -56,9 +56,9 @@ namespace casadi {
   LapackLu::~LapackLu() {
   }
 
-  void LapackLu::init() {
+  void LapackLu::init(const Dict& opts) {
     // Call the base class initializer
-    Linsol::init();
+    Linsol::init(opts);
 
     // Get dimensions
     casadi_assert(nrow()==ncol());

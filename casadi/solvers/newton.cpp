@@ -62,10 +62,10 @@ namespace casadi {
   Newton::~Newton() {
   }
 
-  void Newton::init() {
+  void Newton::init(const Dict& opts) {
 
     // Call the base class initializer
-    Rootfinder::init();
+    Rootfinder::init(opts);
 
     casadi_assert_message(f_.n_in()>0,
                           "Newton: the supplied f must have at least one input.");

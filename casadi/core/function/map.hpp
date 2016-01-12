@@ -65,7 +65,7 @@ namespace casadi {
     /// @}
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
   protected:
     // Constructor (protected, use create function above)
@@ -124,7 +124,7 @@ namespace casadi {
     virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -165,7 +165,7 @@ namespace casadi {
     virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
   };
 #endif // WITH_OPENMP
 
@@ -189,7 +189,7 @@ namespace casadi {
     virtual ~MapReduce();
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// Evaluate the function (template)
     template<typename T, typename R>

@@ -102,9 +102,9 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Qpsol::init() {
+  void Qpsol::init(const Dict& opts) {
     // Call the init method of the base class
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
   }
 
   Qpsol::~Qpsol() {

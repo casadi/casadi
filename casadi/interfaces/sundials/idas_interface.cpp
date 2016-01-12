@@ -87,14 +87,14 @@ namespace casadi {
   void IdasInterface::freeIDAS() {
   }
 
-  void IdasInterface::init() {
+  void IdasInterface::init(const Dict& opts) {
     log("IdasInterface::init", "begin");
 
     // Free memory if already initialized
     freeIDAS();
 
     // Call the base class init
-    SundialsInterface::init();
+    SundialsInterface::init(opts);
 
     // Get initial conditions for the state derivatives
     if (hasSetOption("init_xdot") && !option("init_xdot").isNull()) {

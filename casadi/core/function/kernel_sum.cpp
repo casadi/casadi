@@ -48,12 +48,12 @@ namespace casadi {
   KernelSum::~KernelSum() {
   }
 
-  void KernelSum::init() {
+  void KernelSum::init(const Dict& opts) {
 
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     // Call the initialization method of the base class
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
     step_out_.resize(num_out, 0);
 

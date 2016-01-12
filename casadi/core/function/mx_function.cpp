@@ -46,11 +46,11 @@ namespace casadi {
   }
 
 
-  void MXFunction::init() {
+  void MXFunction::init(const Dict& opts) {
     log("MXFunction::init begin");
 
     // Call the init function of the base class
-    XFunction<MXFunction, MX, MXNode>::init();
+    XFunction<MXFunction, MX, MXNode>::init(opts);
 
     // Stack used to sort the computational graph
     stack<MXNode*> s;

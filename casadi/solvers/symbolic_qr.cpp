@@ -57,9 +57,9 @@ namespace casadi {
   SymbolicQr::~SymbolicQr() {
   }
 
-  void SymbolicQr::init() {
+  void SymbolicQr::init(const Dict& opts) {
     // Call the base class initializer
-    Linsol::init();
+    Linsol::init(opts);
 
     // Read options
     bool codegen = option("codegen");

@@ -232,10 +232,10 @@ namespace casadi {
     }
   }
 
-  void SXFunction::init() {
+  void SXFunction::init(const Dict& opts) {
 
     // Call the init function of the base class
-    XFunction<SXFunction, SX, SXNode>::init();
+    XFunction<SXFunction, SX, SXNode>::init(opts);
 
     // Stack used to sort the computational graph
     stack<SXNode*> s;

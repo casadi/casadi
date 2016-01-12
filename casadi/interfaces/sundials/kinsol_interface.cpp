@@ -95,9 +95,9 @@ namespace casadi {
     if (f_scale_) N_VDestroy_Serial(f_scale_);
   }
 
-  void KinsolInterface::init() {
+  void KinsolInterface::init(const Dict& opts) {
     // Initialize the base classes
-    Rootfinder::init();
+    Rootfinder::init(opts);
 
     // Read options
     if (option("strategy")=="linesearch") {

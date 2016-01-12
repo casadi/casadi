@@ -72,7 +72,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "nlpsol";}
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Allocate memory block */
     virtual Memory* memory() const { return new ImplicitToNlpMemory();}

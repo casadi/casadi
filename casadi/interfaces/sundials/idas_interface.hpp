@@ -112,7 +112,7 @@ namespace casadi {
     virtual void freeIDAS();
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Initialize the taping */
     void initTaping(IdasMemory& m) const;

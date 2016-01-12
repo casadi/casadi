@@ -103,7 +103,13 @@ namespace casadi {
     mem_.clear();
   }
 
-  void FunctionInternal::init() {
+  void FunctionInternal::construct(const Dict& opts) {
+    setOption(opts);
+    init(opts);
+    finalize();
+  }
+
+  void FunctionInternal::init(const Dict& opts) {
     setDefaultOptions();
 
     // Free existing memory object, if any

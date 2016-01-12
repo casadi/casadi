@@ -52,9 +52,9 @@ namespace casadi {
   LapackQr::~LapackQr() {
   }
 
-  void LapackQr::init() {
+  void LapackQr::init(const Dict& opts) {
     // Call the base class initializer
-    Linsol::init();
+    Linsol::init(opts);
 
     // Currently only square matrices tested
     if (ncol()!=nrow()) throw CasadiException("LapackQr::init: currently only "

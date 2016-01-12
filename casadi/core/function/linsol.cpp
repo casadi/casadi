@@ -78,9 +78,9 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Linsol::init() {
+  void Linsol::init(const Dict& opts) {
     // Call the base class initializer
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
   }
 

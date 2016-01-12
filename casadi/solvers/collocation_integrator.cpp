@@ -57,10 +57,10 @@ namespace casadi {
   CollocationIntegrator::~CollocationIntegrator() {
   }
 
-  void CollocationIntegrator::init() {
+  void CollocationIntegrator::init(const Dict& opts) {
 
     // Call the base class init
-    ImplicitFixedStepIntegrator::init();
+    ImplicitFixedStepIntegrator::init(opts);
 
   }
 

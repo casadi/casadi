@@ -54,7 +54,7 @@ namespace casadi {
     /// @}
 
     // Initialize
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs(const double* lbx, const double* ubx,

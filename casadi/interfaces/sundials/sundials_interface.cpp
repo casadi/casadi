@@ -126,9 +126,9 @@ namespace casadi {
   SundialsInterface::~SundialsInterface() {
   }
 
-  void SundialsInterface::init() {
+  void SundialsInterface::init(const Dict& opts) {
     // Call the base class method
-    Integrator::init();
+    Integrator::init(opts);
 
     // Read options
     abstol_ = option("abstol");

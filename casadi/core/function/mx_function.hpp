@@ -94,7 +94,7 @@ namespace casadi {
     virtual bool is_a(const std::string& type, bool recursive) const;
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;

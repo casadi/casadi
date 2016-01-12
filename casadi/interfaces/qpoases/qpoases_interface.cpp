@@ -132,8 +132,8 @@ namespace casadi {
   QpoasesInterface::~QpoasesInterface() {
   }
 
-  void QpoasesInterface::init() {
-    Qpsol::init();
+  void QpoasesInterface::init(const Dict& opts) {
+    Qpsol::init(opts);
 
     // Read options
     if (hasSetOption("nWSR")) {

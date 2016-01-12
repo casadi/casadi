@@ -50,9 +50,9 @@ namespace casadi {
   RkIntegrator::~RkIntegrator() {
   }
 
-  void RkIntegrator::init() {
+  void RkIntegrator::init(const Dict& opts) {
     // Call the base class init
-    FixedStepIntegrator::init();
+    FixedStepIntegrator::init(opts);
 
     // Algebraic variables not (yet?) supported
     casadi_assert_message(nz_==0 && nrz_==0,

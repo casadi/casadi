@@ -57,7 +57,7 @@ namespace casadi {
     virtual ~CsparseInterface();
 
     // Initialize the solver
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Allocate memory block */
     virtual Memory* memory() const;

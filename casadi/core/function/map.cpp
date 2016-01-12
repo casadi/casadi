@@ -96,9 +96,9 @@ namespace casadi {
   MapSerial::~MapSerial() {
   }
 
-  void MapSerial::init() {
+  void MapSerial::init(const Dict& opts) {
     // Call the initialization method of the base class
-    MapBase::init();
+    MapBase::init(opts);
 
     // Allocate sufficient memory for serial evaluation
     alloc_arg(f_.sz_arg());
@@ -210,13 +210,13 @@ namespace casadi {
 
   }
 
-  void MapBase::init() {
+  void MapBase::init(const Dict& opts) {
     // Call the initialization method of the base class
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
   }
 
-  void MapReduce::init() {
+  void MapReduce::init(const Dict& opts) {
 
     std::string parallelization = option("parallelization").to_string();
 
@@ -259,7 +259,7 @@ namespace casadi {
     for (int i=0; i<num_out; ++i) step_out_[i] = f_.nnz_out(i);
 
     // Call the initialization method of the base class
-    MapBase::init();
+    MapBase::init(opts);
 
     // Allocate some space to evaluate each function to.
     nnz_out_ = 0;
@@ -533,9 +533,9 @@ namespace casadi {
     g.body << "  }" << std::endl;
   }
 
-  void MapOmp::init() {
+  void MapOmp::init(const Dict& opts) {
     // Call the initialization method of the base class
-    MapSerial::init();
+    MapSerial::init(opts);
 
     // Allocate sufficient memory for parallel evaluation
     alloc_arg(f_.sz_arg() * n_);

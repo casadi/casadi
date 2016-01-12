@@ -69,9 +69,9 @@ namespace casadi {
     addOption("convex",          OT_BOOL,         true,
               "Indicates if the QP is convex or not (affects only the barrier method).");
   }
-  void CplexInterface::init() {
+  void CplexInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Qpsol::init();
+    Qpsol::init(opts);
 
     qp_method_     = optionEnumValue("qp_method");
     dump_to_file_  = option("dump_to_file");

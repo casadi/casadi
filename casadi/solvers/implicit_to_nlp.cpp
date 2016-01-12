@@ -54,9 +54,9 @@ namespace casadi {
   ImplicitToNlp::~ImplicitToNlp() {
   }
 
-  void ImplicitToNlp::init() {
+  void ImplicitToNlp::init(const Dict& opts) {
     // Call the base class initializer
-    Rootfinder::init();
+    Rootfinder::init(opts);
 
     // Free variable in the NLP
     MX u = MX::sym("u", sparsity_in(iin_));

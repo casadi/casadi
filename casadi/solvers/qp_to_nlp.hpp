@@ -68,7 +68,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "nlpsol";}
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 

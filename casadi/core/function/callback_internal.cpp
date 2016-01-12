@@ -62,9 +62,9 @@ namespace casadi {
     return self_->get_output_sparsity(ind);
   }
 
-  void CallbackInternal::init() {
+  void CallbackInternal::init(const Dict& opts) {
     // Initialize the base classes
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
     // Initialize this
     casadi_assert_message(self_!=0, "Callback object has been deleted");

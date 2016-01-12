@@ -77,7 +77,7 @@ namespace casadi {
     }
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Allocate memory block */
     virtual Memory* memory() const { return new NewtonMemory();}

@@ -75,7 +75,7 @@ namespace casadi {
     if (context_) delete context_;
   }
 
-  void ClangCompiler::init() {
+  void ClangCompiler::init(const Dict& opts) {
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
     std::vector<std::string> flags;

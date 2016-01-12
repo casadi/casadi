@@ -44,7 +44,7 @@ namespace casadi {
     virtual ~Jit();
 
     /** \brief Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     ///@{
     /** \brief Number of function inputs and outputs */

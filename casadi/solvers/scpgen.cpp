@@ -107,9 +107,9 @@ namespace casadi {
   Scpgen::~Scpgen() {
   }
 
-  void Scpgen::init() {
+  void Scpgen::init(const Dict& opts) {
     // Call the init method of the base class
-    Nlpsol::init();
+    Nlpsol::init(opts);
 
     // Read options
     max_iter_ = option("max_iter");

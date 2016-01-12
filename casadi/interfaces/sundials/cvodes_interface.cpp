@@ -70,14 +70,14 @@ namespace casadi {
     freeCVodes();
   }
 
-  void CvodesInterface::init() {
+  void CvodesInterface::init(const Dict& opts) {
     log("CvodesInterface::init", "begin");
 
     // Free memory if already initialized
     freeCVodes();
 
     // Initialize the base classes
-    SundialsInterface::init();
+    SundialsInterface::init(opts);
 
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,

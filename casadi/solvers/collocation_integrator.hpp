@@ -72,7 +72,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "collocation";}
 
     /// Initialize stage
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// Setup F and G
     virtual void setupFG();

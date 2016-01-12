@@ -70,7 +70,7 @@ namespace casadi {
     /// @}
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// Evaluate the function (template)
     template<typename T, typename R>

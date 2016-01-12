@@ -130,10 +130,10 @@ namespace casadi {
   WorhpInterface::~WorhpInterface() {
   }
 
-  void WorhpInterface::init() {
+  void WorhpInterface::init(const Dict& opts) {
 
     // Call the init method of the base class
-    Nlpsol::init();
+    Nlpsol::init(opts);
 
     // Exact Hessian?
     exact_hessian_ = option("UserHM");

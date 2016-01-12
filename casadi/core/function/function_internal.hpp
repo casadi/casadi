@@ -103,12 +103,17 @@ namespace casadi {
     /** \brief  Obtain solver name from Adaptor */
     virtual std::string getAdaptorSolverName() const { return ""; }
 
+    /** \brief Construct
+        Prepares the function for evaluation
+     */
+    void construct(const Dict& opts);
+
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation.
         This method is typically called after setting options but before evaluating.
         If passed to another class (in the constructor), this class should invoke
         this function when initialized. */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Finalize the object creation
         This function, which visits the class hierarchy in reverse order is run after

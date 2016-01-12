@@ -42,7 +42,7 @@ namespace casadi {
 */
   class CASADI_EXPORT
   CompilerInternal : public OptionsFunctionalityNode,
-                        public PluginInterface<CompilerInternal> {
+                     public PluginInterface<CompilerInternal> {
 
   public:
     /// Constructor
@@ -61,7 +61,7 @@ namespace casadi {
     typedef CompilerInternal* (*Creator)(const std::string& name);
 
     /** \brief Initialize */
-    virtual void init() = 0;
+    virtual void init(const Dict& opts) = 0;
 
     // No static functions exposed
     struct Exposed{ };

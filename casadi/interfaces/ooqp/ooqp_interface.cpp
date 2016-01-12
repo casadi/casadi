@@ -67,9 +67,9 @@ namespace casadi {
   OoqpInterface::~OoqpInterface() {
   }
 
-  void OoqpInterface::init() {
+  void OoqpInterface::init(const Dict& opts) {
     // Initialize the base classes
-    Qpsol::init();
+    Qpsol::init(opts);
 
     // Read options
     print_level_ = option("print_level");

@@ -57,9 +57,9 @@ namespace casadi {
     if (this->N) cs_nfree(this->N);
   }
 
-  void CsparseInterface::init() {
+  void CsparseInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Linsol::init();
+    Linsol::init(opts);
   }
 
   Memory* CsparseInterface::memory() const {

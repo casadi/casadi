@@ -53,7 +53,7 @@ namespace casadi {
   Rootfinder::~Rootfinder() {
   }
 
-  void Rootfinder::init() {
+  void Rootfinder::init(const Dict& opts) {
     // Which input/output correspond to the root-finding problem?
     iin_ = option("implicit_input");
     iout_ = option("implicit_output");
@@ -81,7 +81,7 @@ namespace casadi {
     setOption("output_scheme", f_.name_out());
 
     // Call the base class initializer
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
     // Get the Jacobian function object, if any
     if (hasSetOption("jacobian_function")) {

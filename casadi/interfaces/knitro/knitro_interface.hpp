@@ -80,7 +80,7 @@ namespace casadi {
     }
 
     // Initialize the solver
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
     virtual Memory* memory() const { return new KnitroMemory(*this);}

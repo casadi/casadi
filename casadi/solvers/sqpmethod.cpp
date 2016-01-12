@@ -96,9 +96,9 @@ namespace casadi {
   Sqpmethod::~Sqpmethod() {
   }
 
-  void Sqpmethod::init() {
+  void Sqpmethod::init(const Dict& opts) {
     // Call the init method of the base class
-    Nlpsol::init();
+    Nlpsol::init(opts);
 
     // Read options
     max_iter_ = option("max_iter");

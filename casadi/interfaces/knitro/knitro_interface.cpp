@@ -117,9 +117,9 @@ namespace casadi {
   KnitroInterface::~KnitroInterface() {
   }
 
-  void KnitroInterface::init() {
+  void KnitroInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Nlpsol::init();
+    Nlpsol::init(opts);
 
     //if (hasSetOption("Alg")) int_param_["alg"] = option("Alg");
     if (hasSetOption("BarRule")) int_param_["barrule"] = option("BarRule");

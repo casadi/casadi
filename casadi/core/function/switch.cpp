@@ -84,7 +84,7 @@ namespace casadi {
     return ret;
   }
 
-  void Switch::init() {
+  void Switch::init(const Dict& opts) {
     // Initialize the functions, get input and output sparsities
     // Input and output sparsities
     std::vector<Sparsity> sp_in, sp_out;
@@ -121,7 +121,7 @@ namespace casadi {
     casadi_assert_message(num_in>=0, "All functions are null");
 
     // Call the initialization method of the base class
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {

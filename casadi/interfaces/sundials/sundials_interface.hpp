@@ -95,7 +95,7 @@ namespace casadi {
     virtual ~SundialsInterface()=0;
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Initalize memory block */
     virtual void init_memory(Memory& mem) const;

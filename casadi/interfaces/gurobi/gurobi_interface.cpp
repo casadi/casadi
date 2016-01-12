@@ -62,9 +62,9 @@ namespace casadi {
     }
   }
 
-  void GurobiInterface::init() {
+  void GurobiInterface::init(const Dict& opts) {
     // Initialize the base classes
-    Qpsol::init();
+    Qpsol::init(opts);
 
     // Read options
     vtype_.resize(n_);

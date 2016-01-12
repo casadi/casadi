@@ -114,7 +114,7 @@ namespace casadi {
     virtual void freeCVodes();
 
     /** \brief  Initialize stage */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Initialize the adjoint problem (can only be called after the first integration) */
     virtual void initAdj(CvodesMemory& m) const;

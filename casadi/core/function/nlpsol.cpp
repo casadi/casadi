@@ -126,9 +126,9 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Nlpsol::init() {
+  void Nlpsol::init(const Dict& opts) {
     // Call the initialization method of the base class
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
     // Get dimensions
     nx_ = nnz_out(NLPSOL_X);

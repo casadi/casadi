@@ -45,9 +45,9 @@ namespace casadi {
     alloc_w(n_in + n_out);
   }
 
-  void Jit::init() {
+  void Jit::init(const Dict& opts) {
     // Call the initialization method of the base class
-    FunctionInternal::init();
+    FunctionInternal::init(opts);
 
     // Read options
     if (hasSetOption("jac")) jac_body_ = option("jac").to_string();

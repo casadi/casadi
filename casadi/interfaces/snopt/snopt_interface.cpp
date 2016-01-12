@@ -66,9 +66,9 @@ namespace casadi {
   SnoptInterface::~SnoptInterface() {
   }
 
-  void SnoptInterface::init() {
+  void SnoptInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Nlpsol::init();
+    Nlpsol::init(opts);
 
     // Read user options
     detect_linear_ = option("detect_linear");

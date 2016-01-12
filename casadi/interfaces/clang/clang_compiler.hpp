@@ -92,7 +92,7 @@ namespace casadi {
     virtual ~ClangCompiler();
 
     /** \brief Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// A documentation string
     static const std::string meta_doc;

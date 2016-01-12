@@ -108,7 +108,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "cplex";}
 
     // Initialize the solver
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
     virtual Memory* memory() const { return new CplexMemory();}
