@@ -64,6 +64,10 @@ namespace casadi {
       rp_ = g_.sparsity_in(RDAE_RP);
       rq_ = g_.sparsity_out(RDAE_QUAD);
     }
+
+    // Default options
+    print_stats_ = false;
+    output_t0_ = false;
   }
 
   Integrator::~Integrator() {
@@ -181,14 +185,31 @@ namespace casadi {
   }
 
   void Integrator::init(const Dict& opts) {
+    // Default (temporary) options
+    double t0=0, tf=1;
+
     // Read options
-    output_t0_ = option("output_t0");
-    print_stats_ = option("print_stats");
-    if (hasSetOption("grid")) {
-      grid_ = option("grid");
-    } else {
-      grid_ = vector<double>{option("t0"), option("tf")};
+    for (auto&& op : opts) {
+      if (op.first=="output_t0") {
+        output_t0_ = op.second;
+      } else if (op.first=="print_stats") {
+        print_stats_ = op.second;
+      } else if (op.first=="grid") {
+        grid_ = op.second;
+      } else if (op.first=="augmented_options") {
+        augmented_options_ = op.second;
+      } else if (op.first=="t0") {
+        t0 = op.second;
+      } else if (op.first=="tf") {
+        tf = op.second;
+      }
     }
+
+    // If grid unset, default to [t0, tf]
+    if (grid_.empty()) {
+      grid_ = {t0, tf};
+    }
+
     ngrid_ = grid_.size();
     ntout_ = output_t0_ ? ngrid_ : ngrid_-1;
 
@@ -910,8 +931,7 @@ namespace casadi {
     // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
     if (hasSetOption("augmented_options")) {
-      Dict aug_opts_user = option("augmented_options");
-      for (auto&& i : aug_opts_user) {
+      for (auto&& i : augmented_options_) {
         aug_opts[i.first] = i.second;
       }
     }
@@ -1056,11 +1076,8 @@ namespace casadi {
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(false);
-    if (hasSetOption("augmented_options")) {
-      Dict aug_opts_user = option("augmented_options");
-      for (auto&& i : aug_opts_user) {
-        aug_opts[i.first] = i.second;
-      }
+    for (auto&& i : augmented_options_) {
+      aug_opts[i.first] = i.second;
     }
 
     // Temp stringstream
@@ -1296,6 +1313,9 @@ namespace casadi {
   FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
     : Integrator(name, dae) {
     addOption("number_of_finite_elements",     OT_INT,  20, "Number of finite elements");
+
+    // Default options
+    nk_ = 20;
   }
 
   FixedStepIntegrator::~FixedStepIntegrator() {
@@ -1305,8 +1325,14 @@ namespace casadi {
     // Call the base class init
     Integrator::init(opts);
 
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="number_of_finite_elements") {
+        nk_ = op.second;
+      }
+    }
+
     // Number of finite elements and time steps
-    nk_ = option("number_of_finite_elements");
     casadi_assert(nk_>0);
     h_ = (grid_.back() - grid_.front())/nk_;
 
@@ -1522,14 +1548,20 @@ namespace casadi {
     // Call the base class init
     FixedStepIntegrator::init(opts);
 
-    // Get the NLP creator function
-    std::string implicit_function_name = option("implicit_solver");
-
-    // Options
+    // Default (temporary) options
+    std::string implicit_function_name;
     Dict implicit_solver_options;
-    if (hasSetOption("implicit_solver_options")) {
-      implicit_solver_options = option("implicit_solver_options");
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="implicit_solver") {
+        implicit_function_name = op.second.to_string();
+      } else if (op.first=="implicit_solver_options") {
+        implicit_solver_options = op.second;
+      }
     }
+
+    // Complete implicit_solver dictionary
     implicit_solver_options["implicit_input"] = DAE_Z;
     implicit_solver_options["implicit_output"] = DAE_ALG;
 
@@ -1540,21 +1572,16 @@ namespace casadi {
 
     // Allocate a root-finding solver for the backward problem
     if (nRZ_>0) {
-
-      // Get the NLP creator function
-      std::string backward_implicit_function_name = option("implicit_solver");
-
       // Options
-      Dict backward_implicit_solver_options;
-      if (hasSetOption("implicit_solver_options")) {
-        backward_implicit_solver_options = option("implicit_solver_options");
-      }
+      Dict backward_implicit_solver_options = implicit_solver_options;
       backward_implicit_solver_options["implicit_input"] = RDAE_RZ;
       backward_implicit_solver_options["implicit_output"] = RDAE_ALG;
+      string backward_implicit_function_name = implicit_function_name;
 
       // Allocate a Newton solver
       backward_implicit_solver_ =
-        rootfinder(name_+ "_backward_implicit_solver", backward_implicit_function_name,
+        rootfinder(name_+ "_backward_implicit_solver",
+                   backward_implicit_function_name,
                    G_, backward_implicit_solver_options);
       alloc(backward_implicit_solver_);
     }

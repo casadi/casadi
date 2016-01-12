@@ -34,7 +34,7 @@ namespace casadi {
 
   Jit::Jit(const std::string& name, int n_in, int n_out,
            const std::string& body, const Dict& opts)
-  : FunctionInternal(name), n_in_(n_in), n_out_(n_out), body_(body) {
+    : FunctionInternal(name), n_in_(n_in), n_out_(n_out), body_(body) {
     addOption("jac", OT_STRING, GenericType(), "Function body for Jacobian");
     addOption("hess", OT_STRING, GenericType(), "Function body for Hessian");
 
@@ -47,8 +47,13 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Read options
-    if (hasSetOption("jac")) jac_body_ = option("jac").to_string();
-    if (hasSetOption("hess")) hess_body_ = option("hess").to_string();
+    for (auto&& op : opts) {
+      if (op.first=="jac") {
+        jac_body_ = op.second.to_string();
+      } else if (op.first=="hess") {
+        hess_body_ = op.second.to_string();
+      }
+    }
 
     // Arrays for holding inputs and outputs
     alloc_w(n_in() + n_out());

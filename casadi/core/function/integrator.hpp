@@ -189,6 +189,9 @@ namespace casadi {
     std::vector<double> grid_;
     int ngrid_;
 
+    // Augmented user option
+    Dict augmented_options_;
+
     // Dae
     XProblem dae_;
 
