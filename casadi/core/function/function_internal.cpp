@@ -103,7 +103,56 @@ namespace casadi {
     mem_.clear();
   }
 
+  inline bool has_dot(const Dict& opts) {
+    for (auto&& op : opts) {
+      if (op.first.find('.') != string::npos) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void FunctionInternal::construct(const Dict& opts) {
+    //  Treat the case where any of the options have a dot (dictionary shorthand)
+    if (has_dot(opts)) {
+      // New options dictionary being constructed
+      Dict mod_opts;
+
+      // Sub-dictionary and corresponding name being constructed
+      Dict sopts;
+      std::string sname;
+
+      // Process options
+      for (auto&& op : opts) {
+        // Find the dot if any
+        string::size_type dotpos = op.first.find('.');
+
+        // Flush last sub-dictionary
+        if (!sname.empty() && (dotpos==string::npos
+                               || op.first.compare(0, dotpos, sname)!=0)) {
+          mod_opts[sname] = sopts;
+          sname.clear();
+          sopts.clear();
+        }
+
+        // Add to dictionary
+        if (dotpos != string::npos) {
+          sname = op.first.substr(0, dotpos);
+          sopts[op.first.substr(dotpos+1)] = op.second;
+        } else {
+          mod_opts[op.first] = op.second;
+        }
+      }
+
+      // Flush trailing sub-dictionary
+      if (!sname.empty()) {
+        mod_opts[sname] = sopts;
+      }
+
+      // Call recursively
+      return construct(mod_opts);
+    }
+
     setOption(opts);
     init(opts);
     finalize();

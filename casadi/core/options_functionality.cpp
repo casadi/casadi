@@ -275,19 +275,6 @@ namespace casadi {
       return GenericType(it->second);
     }
 
-    // Check if a dictionary
-    string dotname = name + ".";
-    it = dictionary_.upper_bound(dotname);
-    if (it!=dictionary_.end() && it->first.compare(0, dotname.size(), dotname)==0) {
-      // Dictionary option
-      Dict ret;
-      while (it!=dictionary_.end() && it->first.compare(0, dotname.size(), dotname)==0) {
-        ret[it->first.substr(dotname.size())] = it->second;
-        it++;
-      }
-      return ret;
-    }
-
     // Error
     stringstream ss;
     if (allowed_options.find(name)!=allowed_options.end()) {

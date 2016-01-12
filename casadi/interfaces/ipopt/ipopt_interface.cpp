@@ -97,8 +97,18 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
+    // Default options
+    opts_ = Dict();
+    pass_nonlinear_variables_ = false;
+
     // Read user options
-    if (hasSetOption("ipopt")) opts_ = option("ipopt");
+    for (auto&& op : opts) {
+      if (op.first=="ipopt") {
+        opts_ = op.second;
+      } else if (op.first=="pass_nonlinear_variables") {
+        pass_nonlinear_variables_ = op.second;
+      }
+    }
 
     // Do we need second order derivatives?
     exact_hessian_ = true;
@@ -106,9 +116,6 @@ namespace casadi {
     if (hessian_approximation!=opts_.end()) {
       exact_hessian_ = hessian_approximation->second == "exact";
     }
-
-    // Identify nonlinear variables
-    pass_nonlinear_variables_ = option("pass_nonlinear_variables");
 
     // Setup NLP functions
     setup_f(); // Objective
