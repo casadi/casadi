@@ -1290,6 +1290,7 @@ import_array();
           || to_generic<casadi::Function>(p, m)
 #ifndef CASADI_NOT_IN_DERIVED
           || to_generic<casadi::DerivativeGenerator>(p, m)
+          || to_generic<casadi::Callback>(p, m)
 #endif
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
