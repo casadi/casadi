@@ -131,6 +131,9 @@ namespace casadi {
     // Evaluation errors are fatal
     bool eval_errors_fatal_;
 
+    // Warn if initial bounds are violated
+    bool warn_initial_bounds_;
+
     /// The NLP
     XProblem nlp2_;
 

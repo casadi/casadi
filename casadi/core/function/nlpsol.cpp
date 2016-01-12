@@ -79,6 +79,10 @@ namespace casadi {
 
     addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
                                                        "qp", true);
+    // Set default options
+    callback_step_ = 1;
+    eval_errors_fatal_ = false;
+    warn_initial_bounds_ = false;
   }
 
   Nlpsol::~Nlpsol() {
@@ -126,14 +130,25 @@ namespace casadi {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="iteration_callback") {
+        fcallback_ = op.second;
+      } else if (op.first=="iteration_callback_step") {
+        callback_step_ = op.second;
+      } else if (op.first=="eval_errors_fatal") {
+        eval_errors_fatal_ = op.second;
+      } else if (op.first=="warn_initial_bounds") {
+        warn_initial_bounds_ = op.second;
+      }
+    }
+
     // Get dimensions
     nx_ = nnz_out(NLPSOL_X);
     np_ = nnz_in(NLPSOL_P);
     ng_ = nnz_out(NLPSOL_G);
 
-    if (hasSetOption("iteration_callback")) {
-      fcallback_ = option("iteration_callback");
-
+    if (!fcallback_.isNull()) {
       // Consistency checks
       casadi_assert(!fcallback_.isNull());
       casadi_assert_message(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
@@ -151,9 +166,6 @@ namespace casadi {
       // Allocate temporary memory
       alloc(fcallback_);
     }
-
-    callback_step_ = option("iteration_callback_step");
-    eval_errors_fatal_ = option("eval_errors_fatal");
   }
 
   void Nlpsol::init_memory(Memory& mem) const {
@@ -166,7 +178,6 @@ namespace casadi {
     if (!inputs_check_) return;
 
     const double inf = std::numeric_limits<double>::infinity();
-    bool warn_initial_bounds = option("warn_initial_bounds");
 
     // Detect ill-posed problems (simple bounds)
     for (int i=0; i<nx_; ++i) {
@@ -175,7 +186,7 @@ namespace casadi {
       double x0 = m.x0 ? m.x0[i] : 0;
       casadi_assert_message(!(lbx==inf || lbx>ubx || ubx==-inf),
                             "Ill-posed problem detected (x bounds)");
-      if (warn_initial_bounds && (x0>ubx || x0<lbx)) {
+      if (warn_initial_bounds_ && (x0>ubx || x0<lbx)) {
         casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
                        "Option 'warn_initial_bounds' controls this warning.");
         break;
