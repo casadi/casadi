@@ -133,9 +133,6 @@ namespace casadi {
 
     IM A_structure_;
 
-    // Do detection of linear substructure
-    bool detect_linear_;
-
     int m_;
     int iObj_;
 

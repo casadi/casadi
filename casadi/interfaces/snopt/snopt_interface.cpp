@@ -52,14 +52,6 @@ namespace casadi {
   SnoptInterface::SnoptInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    addOption("detect_linear", OT_BOOL, true,
-              "Make an effort to treat linear constraints and linear variables specially.");
-
-    // casadi options
-    addOption("print_time", OT_BOOL, true, "print information about execution time");
-
-    // options which are handled seperately
-    addOption("summary", OT_BOOL, true);
     addOption("snopt", OT_DICT, GenericType(), "Options to be passed to SNOPT");
   }
 
@@ -71,8 +63,11 @@ namespace casadi {
     Nlpsol::init(opts);
 
     // Read user options
-    detect_linear_ = option("detect_linear");
-    if (hasSetOption("snopt")) opts_ = option("snopt");
+    for (auto&& op : opts) {
+      if (op.first=="snopt") {
+        opts_ = op.second;
+      }
+    }
 
     // Get/generate required functions
     setup_jac_f();
