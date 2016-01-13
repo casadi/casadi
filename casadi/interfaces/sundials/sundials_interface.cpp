@@ -256,11 +256,15 @@ namespace casadi {
       }
 
       // Preconditioning type
-      if (pretype=="none")               pretype_f_ = PREC_NONE;
-      else if (pretype=="left")          pretype_f_ = PREC_LEFT;
-      else if (pretype=="right")         pretype_f_ = PREC_RIGHT;
-      else if (pretype=="both")          pretype_f_ = PREC_BOTH;
-      else {
+      if (pretype=="none") {
+        pretype_f_ = PREC_NONE;
+      } else if (pretype=="left") {
+        pretype_f_ = PREC_LEFT;
+      } else if (pretype=="right") {
+        pretype_f_ = PREC_RIGHT;
+      } else if (pretype=="both") {
+        pretype_f_ = PREC_BOTH;
+      } else {
         casadi_error("Unknown preconditioning type for forward integration: " + pretype);
       }
     } else if (linear_solver_type=="user_defined") {
@@ -289,11 +293,15 @@ namespace casadi {
       }
 
       // Preconditioning type
-      if (pretypeB=="none")               pretype_g_ = PREC_NONE;
-      else if (pretypeB=="left")          pretype_g_ = PREC_LEFT;
-      else if (pretypeB=="right")         pretype_g_ = PREC_RIGHT;
-      else if (pretypeB=="both")          pretype_g_ = PREC_BOTH;
-      else {
+      if (pretypeB=="none") {
+        pretype_g_ = PREC_NONE;
+      } else if (pretypeB=="left") {
+        pretype_g_ = PREC_LEFT;
+      } else if (pretypeB=="right") {
+        pretype_g_ = PREC_RIGHT;
+      } else if (pretypeB=="both") {
+        pretype_g_ = PREC_BOTH;
+      } else {
         casadi_error("Unknown preconditioning type for backward integration: " + pretypeB);
       }
     } else if (linear_solver_typeB=="user_defined") {
