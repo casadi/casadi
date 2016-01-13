@@ -71,10 +71,21 @@ namespace casadi {
     // Initialize the base classes
     Qpsol::init(opts);
 
+    // Default options
+    print_level_ = 0;
+    mutol_ = 1e-8;
+    artol_ = 1e-8;
+
     // Read options
-    print_level_ = option("print_level");
-    mutol_ = option("mutol");
-    artol_ = option("artol");
+    for (auto&& op : opts) {
+      if (op.first=="print_level") {
+        print_level_ = op.second;
+      } else if (op.first=="mutol") {
+        mutol_ = op.second;
+      } else if (op.first=="artol") {
+        artol_ = op.second;
+      }
+    }
 
     // Allocate memory for problem
     nQ_ = sparsity_in(QPSOL_H).nnz_upper();
