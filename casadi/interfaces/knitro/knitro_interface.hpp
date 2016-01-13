@@ -105,14 +105,8 @@ namespace casadi {
     // KNITRO return codes
     static const char* return_codes(int flag);
 
-    // KNITRO double parameter
-    std::map<std::string, double> double_param_;
-
-    // KNITRO int parameter
-    std::map<std::string, int> int_param_;
-
-    // KNITRO string parameter
-    std::map<std::string, std::string> string_param_;
+    // KNITRO options
+    Dict opts_;
 
     /// A documentation string
     static const std::string meta_doc;

@@ -50,31 +50,6 @@ namespace casadi {
   KnitroInterface::KnitroInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    // Not yet ready
-    //addOption("algorithm",                OT_STRING, GenericType(),
-    // "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
-    //addOption("bar_directinterval",       OT_INT, GenericType(),
-    //  "When using the Interior/Direct algorithm, this parameter controls the maximum number of "
-    //  "consecutive CG steps before trying to force the algorithm to take a direct step again. "
-    //  "See KNITRO documentation.");
-    //addOption("bar_feasible",             OT_STRING, GenericType(),
-    //  "Whether feasibility is given special emphasis. See KNITRO documentation.",
-    //  "no|stay|get|get_stay");
-    //addOption("bar_feasmodetol",          OT_DOUBLE, GenericType(),
-    //  "Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.");
-    //addOption("bar_initmu",               OT_INT, GenericType(),
-    //  "Initial value for the barrier parameter. See KNITRO documentation.");
-    //addOption("bar_initpt",               OT_STRING, GenericType(),
-    //  "Whether to use the initial point strategy with barrier algorithms. "
-    //  "See KNITRO documentation.", "auto|yes|no");
-    //addOption("bar_maxbacktrack",         OT_INT, GenericType(),
-    //  "Maximum allowable number of backtracks during the linesearch of the Interior Direct "
-    //  "algorithm before reverting to a CG step. See KNITRO documentation.");
-    //addOption("bar_maxrefactor",          OT_INT, GenericType(),
-    //  "Maximum number of refactorizations of the KKT system per iteration of the Interior "
-    //  "Direct algorithm before reverting to a CG step. See KNITRO documentation.");
-
-    //addOption("Alg", OT_INT,0, "Algorithm");
     addOption("BarRule", OT_INT, 0, "Barrier Rule");
     addOption("NewPoint", OT_BOOL, 0, "Select new-point feature");
     addOption("GradOpt", OT_INT, 1, "Gradient calculation method");
@@ -117,38 +92,38 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
-    //if (hasSetOption("Alg")) int_param_["alg"] = option("Alg");
-    if (hasSetOption("BarRule")) int_param_["barrule"] = option("BarRule");
-    if (hasSetOption("NewPoint")) int_param_["newpoint"] = option("NewPoint");
-    if (hasSetOption("GradOpt")) int_param_["gradopt"] = option("GradOpt");
-    if (hasSetOption("HessOpt")) int_param_["hessopt"] = option("HessOpt");
-    if (hasSetOption("Feasible")) int_param_["feasible"] = option("Feasible");
-    if (hasSetOption("HonorBnds")) int_param_["honorbnds"] = option("HonorBnds");
-    if (hasSetOption("LpSolver")) int_param_["lpsolver"] = option("LpSolver");
-    if (hasSetOption("Multistart")) int_param_["multistart"] = option("Multistart");
-    //if (hasSetOption("MsMaxSolves")) int_param_["msmaxsolves"] = option("MsMaxSolves");
-    if (hasSetOption("MaxCgIt")) int_param_["maxcgit"] = option("MaxCgIt");
-    //if (hasSetOption("MaxCrossTt")) int_param_["maxcrosstt"] = option("MaxCrossTt");
-    if (hasSetOption("MaxIt")) int_param_["maxit"] = option("MaxIt");
-    //if (hasSetOption("MaxTimeCPU")) double_param_["maxtimecpu"] = option("MaxTimeCPU");
-    //if (hasSetOption("MaxTimeReal")) double_param_["maxtimereal"] = option("MaxTimeReal");
-    if (hasSetOption("LmSize")) int_param_["lmsize"] = option("LmSize");
-    if (hasSetOption("Scale")) int_param_["scale"] = option("Scale");
-    if (hasSetOption("ShiftInit")) int_param_["shiftinit"] = option("ShiftInit");
-    if (hasSetOption("Soc")) int_param_["soc"] = option("Soc");
-    if (hasSetOption("InitPt")) int_param_["initpt"] = option("InitPt");
-    if (hasSetOption("Delta")) double_param_["delta"] = option("Delta");
-    if (hasSetOption("FeasModeTol")) double_param_["feasmodetol"] = option("FeasModeTol");
-    if (hasSetOption("FeasTol")) double_param_["feastol"] = option("FeasTol");
-    if (hasSetOption("FeasTolAbs")) double_param_["feastolabs"] = option("FeasTolAbs");
-    if (hasSetOption("OptTol")) double_param_["opttol"] = option("OptTol");
-    if (hasSetOption("OptTolAbs")) double_param_["opttolabs"] = option("OptTolAbs");
-    if (hasSetOption("Pivot")) double_param_["pivot"] = option("Pivot");
-    if (hasSetOption("XTol")) double_param_["xtol"] = option("XTol");
-    if (hasSetOption("Mu")) double_param_["mu"] = option("Mu");
-    if (hasSetOption("ObjRange")) double_param_["objrange"] = option("ObjRange");
-    if (hasSetOption("OutLev")) int_param_["outlev"] = option("OutLev");
-    if (hasSetOption("Debug")) int_param_["debug"] = option("Debug");
+    //if (hasSetOption("Alg")) opts_["alg"] = option("Alg");
+    if (hasSetOption("BarRule")) opts_["barrule"] = option("BarRule");
+    if (hasSetOption("NewPoint")) opts_["newpoint"] = option("NewPoint");
+    if (hasSetOption("GradOpt")) opts_["gradopt"] = option("GradOpt");
+    if (hasSetOption("HessOpt")) opts_["hessopt"] = option("HessOpt");
+    if (hasSetOption("Feasible")) opts_["feasible"] = option("Feasible");
+    if (hasSetOption("HonorBnds")) opts_["honorbnds"] = option("HonorBnds");
+    if (hasSetOption("LpSolver")) opts_["lpsolver"] = option("LpSolver");
+    if (hasSetOption("Multistart")) opts_["multistart"] = option("Multistart");
+    //if (hasSetOption("MsMaxSolves")) opts_["msmaxsolves"] = option("MsMaxSolves");
+    if (hasSetOption("MaxCgIt")) opts_["maxcgit"] = option("MaxCgIt");
+    //if (hasSetOption("MaxCrossTt")) opts_["maxcrosstt"] = option("MaxCrossTt");
+    if (hasSetOption("MaxIt")) opts_["maxit"] = option("MaxIt");
+    //if (hasSetOption("MaxTimeCPU")) opts_["maxtimecpu"] = option("MaxTimeCPU");
+    //if (hasSetOption("MaxTimeReal")) opts_["maxtimereal"] = option("MaxTimeReal");
+    if (hasSetOption("LmSize")) opts_["lmsize"] = option("LmSize");
+    if (hasSetOption("Scale")) opts_["scale"] = option("Scale");
+    if (hasSetOption("ShiftInit")) opts_["shiftinit"] = option("ShiftInit");
+    if (hasSetOption("Soc")) opts_["soc"] = option("Soc");
+    if (hasSetOption("InitPt")) opts_["initpt"] = option("InitPt");
+    if (hasSetOption("Delta")) opts_["delta"] = option("Delta");
+    if (hasSetOption("FeasModeTol")) opts_["feasmodetol"] = option("FeasModeTol");
+    if (hasSetOption("FeasTol")) opts_["feastol"] = option("FeasTol");
+    if (hasSetOption("FeasTolAbs")) opts_["feastolabs"] = option("FeasTolAbs");
+    if (hasSetOption("OptTol")) opts_["opttol"] = option("OptTol");
+    if (hasSetOption("OptTolAbs")) opts_["opttolabs"] = option("OptTolAbs");
+    if (hasSetOption("Pivot")) opts_["pivot"] = option("Pivot");
+    if (hasSetOption("XTol")) opts_["xtol"] = option("XTol");
+    if (hasSetOption("Mu")) opts_["mu"] = option("Mu");
+    if (hasSetOption("ObjRange")) opts_["objrange"] = option("ObjRange");
+    if (hasSetOption("OutLev")) opts_["outlev"] = option("OutLev");
+    if (hasSetOption("Debug")) opts_["debug"] = option("Debug");
 
     // Setup NLP functions
     setup_fg(); // Objective and constraints
@@ -216,20 +191,29 @@ namespace casadi {
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     }
 
-    // Set user set options
-    for (auto&& pp : double_param_) {
-      status = KTR_set_double_param_by_name(m.kc_handle, pp.first.c_str(), pp.second);
-      casadi_assert_message(status==0, "KnitroInterface::evaluate: cannot set " + pp.first);
-    }
+    // Pass user set options
+    for (auto&& op : opts_) {
+      // Try double
+      if (op.second.can_cast_to(OT_DOUBLE)) {
+        status = KTR_set_double_param_by_name(m.kc_handle, op.first.c_str(), op.second);
+        if (status==0) continue;
+      }
 
-    for (auto&& pp : int_param_) {
-      status = KTR_set_int_param_by_name(m.kc_handle, pp.first.c_str(), pp.second);
-      casadi_assert_message(status==0, "KnitroInterface::evaluate: cannot set " + pp.first);
-    }
+      // Try integer
+      if (op.second.can_cast_to(OT_INT)) {
+        status = KTR_set_int_param_by_name(m.kc_handle, op.first.c_str(), op.second);
+        if (status==0) continue;
+      }
 
-    for (auto&& pp : string_param_) {
-      status = KTR_set_char_param_by_name(m.kc_handle, pp.first.c_str(), pp.second.c_str());
-      casadi_assert_message(status==0, "KnitroInterface::evaluate: cannot set " + pp.first);
+      // try string
+      if (op.second.can_cast_to(OT_STRING)) {
+        string str = op.second.to_string();
+        status = KTR_set_char_param_by_name(m.kc_handle, op.first.c_str(), str.c_str());
+        if (status==0) continue;
+      }
+
+      // Error if reached this point
+      casadi_error("KNITRO error setting option \"" + op.first + "\"");
     }
 
     // Type of constraints

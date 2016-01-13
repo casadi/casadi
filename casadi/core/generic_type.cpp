@@ -295,9 +295,7 @@ namespace casadi {
 
   int GenericType::to_int() const {
     if (is_double()) {
-      double v = to_double();
-      casadi_assert_message(v == std::floor(v), "The value is not an integer");
-      return static_cast<int>(v);
+      return static_cast<int>(to_double());
     } else if (is_bool()) {
       return static_cast<int>(to_bool());
     } else {
