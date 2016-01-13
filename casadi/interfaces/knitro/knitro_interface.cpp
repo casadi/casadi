@@ -50,37 +50,7 @@ namespace casadi {
   KnitroInterface::KnitroInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    addOption("BarRule", OT_INT, 0, "Barrier Rule");
-    addOption("NewPoint", OT_BOOL, 0, "Select new-point feature");
-    addOption("GradOpt", OT_INT, 1, "Gradient calculation method");
-    addOption("HessOpt", OT_INT, 1, "Hessian calculation method");
-    addOption("Feasible", OT_BOOL, 1, "Allow infeasible iterations");
-    addOption("HonorBnds", OT_BOOL, 0, "Enforce bounds");
-    addOption("LpSolver", OT_BOOL, 0, "Use LpSolver");
-    addOption("Multistart", OT_BOOL, 0, "Use multistart");
-    //addOption("MsMaxSolves", OT_INT, 1, "Maximum multistart points");
-    addOption("MaxCgIt", OT_INT, 0, "Maximum conjugate gradient iterations");
-    //addOption("MaxCrossTt", OT_INT, 0, "Maximum crossover iterations");
-    addOption("MaxIt", OT_INT, 10000, "Iteration limit");
-    //addOption("MaxTimeCPU", OT_DOUBLE, 1e8, "CPU Time limit");
-    //addOption("MaxTimeReal", OT_DOUBLE, 1e8, "Time limit");
-    addOption("LmSize", OT_INT, 10, "Memory pairsize limit");
-    addOption("Scale", OT_BOOL, 1, "Perform scaling");
-    addOption("ShiftInit", OT_BOOL, 1, "Interior-point shifting initial point");
-    addOption("Soc", OT_INT, 1, "Second order correction");
-    addOption("InitPt", OT_BOOL, 0, "Use initial point strategy");
-    addOption("Delta", OT_DOUBLE, 1.0, "Initial region scaling factor");
-    addOption("FeasModeTol", OT_DOUBLE, 1e-4, "Feasible mode tolerance");
-    addOption("FeasTol", OT_DOUBLE, 1e-6, "Feasible tolerance");
-    addOption("FeasTolAbs", OT_DOUBLE, 0, "Absolute feasible tolerance");
-    addOption("OptTol", OT_DOUBLE, 1e-6, "Relative optimality tolerance");
-    addOption("OptTolAbs", OT_DOUBLE, 0, "Absolute optimality tolerance");
-    addOption("Pivot", OT_DOUBLE, 1e-8, "Initial pivot threshold");
-    addOption("XTol", OT_DOUBLE, 1e-15, "Relative solution change tolerance");
-    addOption("Mu", OT_DOUBLE, 0.1, "Initial barrier parameter");
-    addOption("ObjRange", OT_DOUBLE, 1e20, "Maximum objective value");
-    addOption("OutLev", OT_INT, 2, "Log output level");
-    addOption("Debug", OT_INT, 0, "Debug level");
+    addOption("knitro", OT_DICT, GenericType(), "Options to be passed to KNITRO");
     addOption("contype", OT_INTVECTOR);
   }
 
@@ -92,38 +62,21 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
-    //if (hasSetOption("Alg")) opts_["alg"] = option("Alg");
-    if (hasSetOption("BarRule")) opts_["barrule"] = option("BarRule");
-    if (hasSetOption("NewPoint")) opts_["newpoint"] = option("NewPoint");
-    if (hasSetOption("GradOpt")) opts_["gradopt"] = option("GradOpt");
-    if (hasSetOption("HessOpt")) opts_["hessopt"] = option("HessOpt");
-    if (hasSetOption("Feasible")) opts_["feasible"] = option("Feasible");
-    if (hasSetOption("HonorBnds")) opts_["honorbnds"] = option("HonorBnds");
-    if (hasSetOption("LpSolver")) opts_["lpsolver"] = option("LpSolver");
-    if (hasSetOption("Multistart")) opts_["multistart"] = option("Multistart");
-    //if (hasSetOption("MsMaxSolves")) opts_["msmaxsolves"] = option("MsMaxSolves");
-    if (hasSetOption("MaxCgIt")) opts_["maxcgit"] = option("MaxCgIt");
-    //if (hasSetOption("MaxCrossTt")) opts_["maxcrosstt"] = option("MaxCrossTt");
-    if (hasSetOption("MaxIt")) opts_["maxit"] = option("MaxIt");
-    //if (hasSetOption("MaxTimeCPU")) opts_["maxtimecpu"] = option("MaxTimeCPU");
-    //if (hasSetOption("MaxTimeReal")) opts_["maxtimereal"] = option("MaxTimeReal");
-    if (hasSetOption("LmSize")) opts_["lmsize"] = option("LmSize");
-    if (hasSetOption("Scale")) opts_["scale"] = option("Scale");
-    if (hasSetOption("ShiftInit")) opts_["shiftinit"] = option("ShiftInit");
-    if (hasSetOption("Soc")) opts_["soc"] = option("Soc");
-    if (hasSetOption("InitPt")) opts_["initpt"] = option("InitPt");
-    if (hasSetOption("Delta")) opts_["delta"] = option("Delta");
-    if (hasSetOption("FeasModeTol")) opts_["feasmodetol"] = option("FeasModeTol");
-    if (hasSetOption("FeasTol")) opts_["feastol"] = option("FeasTol");
-    if (hasSetOption("FeasTolAbs")) opts_["feastolabs"] = option("FeasTolAbs");
-    if (hasSetOption("OptTol")) opts_["opttol"] = option("OptTol");
-    if (hasSetOption("OptTolAbs")) opts_["opttolabs"] = option("OptTolAbs");
-    if (hasSetOption("Pivot")) opts_["pivot"] = option("Pivot");
-    if (hasSetOption("XTol")) opts_["xtol"] = option("XTol");
-    if (hasSetOption("Mu")) opts_["mu"] = option("Mu");
-    if (hasSetOption("ObjRange")) opts_["objrange"] = option("ObjRange");
-    if (hasSetOption("OutLev")) opts_["outlev"] = option("OutLev");
-    if (hasSetOption("Debug")) opts_["debug"] = option("Debug");
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="knitro") {
+        opts_ = op.second;
+      } else if (op.first=="contype") {
+        contype_ = op.second;
+      }
+    }
+
+    // Type of constraints, general by default
+    if (contype_.empty()) {
+      contype_.resize(ng_, KTR_CONTYPE_GENERAL);
+    } else {
+      casadi_assert(contype_.size()==ng_);
+    }
 
     // Setup NLP functions
     setup_fg(); // Objective and constraints
@@ -216,14 +169,6 @@ namespace casadi {
       casadi_error("KNITRO error setting option \"" + op.first + "\"");
     }
 
-    // Type of constraints
-    vector<int> cType(ng_, KTR_CONTYPE_GENERAL);
-    if (hasSetOption("contype")) {
-      vector<int> contype = option("contype");
-      casadi_assert(contype.size()==cType.size());
-      copy(contype.begin(), contype.end(), cType.begin());
-    }
-
     // "Correct" upper and lower bounds
     casadi_copy(m.x0, nx_, m.wx);
     casadi_copy(m.lbx, nx_, m.wlbx);
@@ -237,7 +182,7 @@ namespace casadi {
 
     // Initialize KNITRO
     status = KTR_init_problem(m.kc_handle, nx_, KTR_OBJGOAL_MINIMIZE,
-                              KTR_OBJTYPE_GENERAL, m.wlbx, m.wubx, ng_, get_ptr(cType),
+                              KTR_OBJTYPE_GENERAL, m.wlbx, m.wubx, ng_, get_ptr(contype_),
                               m.wlbg, m.wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
                               nnzH, get_ptr(Hrow), get_ptr(Hcol), m.wx, 0); // initial lambda
     casadi_assert_message(status==0, "KTR_init_problem failed");

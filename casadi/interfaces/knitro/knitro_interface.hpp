@@ -108,6 +108,9 @@ namespace casadi {
     // KNITRO options
     Dict opts_;
 
+    // Type of constraints
+    std::vector<int> contype_;
+
     /// A documentation string
     static const std::string meta_doc;
   };
