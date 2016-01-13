@@ -119,25 +119,17 @@ namespace casadi {
     // Solve the QP
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
-    // OPTIONS
-    /** Which algorithm to use
-     * 0 -> Automatic (default)
-     * 1 -> Primal simplex
-     * 2 -> Dual simplex
-     * 3 -> Network optimizer
-     * 4 -> Barrier
-     * 5 -> Sifting
-     * 6 -> Concurrent
-     * 7 -> Crossover
-     */
-    /// Stores which QP algorithm to use
+    ///@{
+    /// Options
     int qp_method_;
-
-    /// Print to file (for later use)
     bool dump_to_file_;
-
-    /// Accuracy
+    std::string dump_filename_;
     double tol_;
+    int dep_check_;
+    int simplex_maxiter_, barrier_maxiter_;
+    bool warm_start_;
+    bool convex_;
+    ///@}
 
     /// A documentation string
     static const std::string meta_doc;

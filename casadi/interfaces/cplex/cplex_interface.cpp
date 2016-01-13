@@ -71,10 +71,39 @@ namespace casadi {
     // Call the init method of the base class
     Qpsol::init(opts);
 
-    qp_method_     = option("qp_method");
-    dump_to_file_  = option("dump_to_file");
-    tol_           = option("tol");
-    //  dump_filename_ = option("dump_filename");
+    // Default options
+    qp_method_ = 0;
+    dump_to_file_ = false;
+    dump_filename_ = "qp.dat";
+    tol_ = 1e-6;
+    dep_check_ = 0;
+    simplex_maxiter_ = 2100000000;
+    barrier_maxiter_ = 2100000000;
+    warm_start_ = false;
+    convex_ = true;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="qp_method") {
+        qp_method_ = op.second;
+      } else if (op.first=="dump_to_file") {
+        dump_to_file_ = op.second;
+      } else if (op.first=="dump_filename") {
+        dump_filename_ = op.second.to_string();
+      } else if (op.first=="tol") {
+        tol_ = op.second;
+      } else if (op.first=="dep_check") {
+        dep_check_ = op.second;
+      } else if (op.first=="simplex_maxiter") {
+        simplex_maxiter_ = op.second;
+      } else if (op.first=="barrier_maxiter") {
+        barrier_maxiter_ = op.second;
+      } else if (op.first=="warm_start") {
+        warm_start_ = op.second;
+      } else if (op.first=="convex") {
+        convex_ = op.second;
+      }
+    }
 
     // Allocate work vectors
     alloc_w(n_, true); // g
@@ -120,16 +149,16 @@ namespace casadi {
       status = CPXsetintparam(m.env, CPX_PARAM_QPMETHOD, qp_method_);
     }
     // Setting dependency check option
-    status = CPXsetintparam(m.env, CPX_PARAM_DEPIND, option("dep_check"));
+    status = CPXsetintparam(m.env, CPX_PARAM_DEPIND, dep_check_);
     // Setting barrier iteration limit
-    status = CPXsetintparam(m.env, CPX_PARAM_BARITLIM, option("barrier_maxiter"));
+    status = CPXsetintparam(m.env, CPX_PARAM_BARITLIM, barrier_maxiter_);
     // Setting simplex iteration limit
-    status = CPXsetintparam(m.env, CPX_PARAM_ITLIM, option("simplex_maxiter"));
+    status = CPXsetintparam(m.env, CPX_PARAM_ITLIM, simplex_maxiter_);
     if (qp_method_ == 7) {
       // Setting crossover algorithm
       status = CPXsetintparam(m.env, CPX_PARAM_BARCROSSALG, 1);
     }
-    if (!static_cast<bool>(option("convex"))) {
+    if (!convex_) {
       // Enabling non-convex QPs
       status = CPXsetintparam(m.env, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
     }
@@ -256,8 +285,7 @@ namespace casadi {
     status = CPXcopyquad(m.env, m.lp, qmatbeg, get_ptr(m.qmatcnt), qmatind, qmatval);
 
     if (dump_to_file_) {
-      const char* fn = string(option("dump_filename")).c_str();
-      CPXwriteprob(m.env, m.lp, fn, "LP");
+      CPXwriteprob(m.env, m.lp, dump_filename_.c_str(), "LP");
     }
 
     // Warm-starting if possible
@@ -330,7 +358,7 @@ namespace casadi {
     }
 
     // Next time we warm start
-    if (static_cast<bool>(option("warm_start"))) {
+    if (warm_start_) {
       m.is_warm = true;
     }
 
