@@ -98,7 +98,6 @@ namespace casadi {
     Nlpsol::init(opts);
 
     // Default options
-    opts_ = Dict();
     pass_nonlinear_variables_ = false;
 
     // Read user options
@@ -107,6 +106,18 @@ namespace casadi {
         opts_ = op.second;
       } else if (op.first=="pass_nonlinear_variables") {
         pass_nonlinear_variables_ = op.second;
+      } else if (op.first=="var_string_md") {
+        var_string_md_ = op.second;
+      } else if (op.first=="var_integer_md") {
+        var_integer_md_ = op.second;
+      } else if (op.first=="var_numeric_md") {
+        var_numeric_md_ = op.second;
+      } else if (op.first=="con_string_md") {
+        con_string_md_ = op.second;
+      } else if (op.first=="con_integer_md") {
+        con_integer_md_ = op.second;
+      } else if (op.first=="con_numeric_md") {
+        con_numeric_md_ = op.second;
       }
     }
 
@@ -404,7 +415,7 @@ namespace casadi {
         return 1;
       }
     } catch(exception& ex) {
-      if (option("iteration_callback_ignore_errors")) {
+      if (iteration_callback_ignore_errors_) {
         userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
       } else {
         throw ex;
@@ -552,72 +563,12 @@ namespace casadi {
                        map<string, vector<string> >& con_string_md,
                        map<string, vector<int> >& con_integer_md,
                        map<string, vector<double> >& con_numeric_md) const {
-    if (hasSetOption("var_string_md")) {
-      Dict dict = option("var_string_md");
-      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
-        string key = it->first; // Get the key
-        vector<string> entry = it->second; // Get the entry
-        // Check length for consistency
-        casadi_assert_message(entry.size()==nx_, "Inconsistent length of IPOPT metadata.");
-        var_string_md[key] = entry; // Save to IPOPT data structure
-      }
-    }
-
-    if (hasSetOption("var_integer_md")) {
-      Dict dict = option("var_integer_md");
-      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
-        string key = it->first; // Get the key
-        vector<int> entry = it->second; // Get the entry
-        // Check length for consistency
-        casadi_assert_message(entry.size()==nx_, "Inconsistent length of IPOPT metadata.");
-        var_integer_md[key] = entry; // Save to IPOPT data structure
-      }
-    }
-
-    if (hasSetOption("var_numeric_md")) {
-      Dict dict = option("var_numeric_md");
-      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
-        string key = it->first; // Get the key
-        vector<double> entry = it->second; // Get the entry
-        // Check length for consistency
-        casadi_assert_message(entry.size()==nx_, "Inconsistent length of IPOPT metadata.");
-        var_numeric_md[key] = entry; // Save to IPOPT data structure
-      }
-    }
-
-    if (hasSetOption("con_string_md")) {
-      Dict dict = option("con_string_md");
-      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
-        string key = it->first; // Get the key
-        vector<string> entry = it->second; // Get the entry
-        // Check length for consistency
-        casadi_assert_message(entry.size()==ng_, "Inconsistent length of IPOPT metadata.");
-        con_string_md[key] = entry; // Save to IPOPT data structure
-      }
-    }
-
-    if (hasSetOption("con_integer_md")) {
-      Dict dict = option("con_integer_md");
-      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
-        string key = it->first; // Get the key
-        vector<int> entry = it->second; // Get the entry
-        // Check length for consistency
-        casadi_assert_message(entry.size()==ng_, "Inconsistent length of IPOPT metadata.");
-        con_integer_md[key] = entry; // Save to IPOPT data structure
-      }
-    }
-
-    if (hasSetOption("con_numeric_md")) {
-      Dict dict = option("con_numeric_md");
-      for (Dict::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
-        string key = it->first; // Get the key
-        vector<double> entry = it->second; // Get the entry
-        // Check length for consistency
-        casadi_assert_message(entry.size()==ng_, "Inconsistent length of IPOPT metadata.");
-        con_numeric_md[key] = entry; // Save to IPOPT data structure
-      }
-    }
-
+    for (auto&& op : var_string_md_) var_string_md[op.first] = op.second;
+    for (auto&& op : var_integer_md_) var_integer_md[op.first] = op.second;
+    for (auto&& op : var_numeric_md_) var_numeric_md[op.first] = op.second;
+    for (auto&& op : con_string_md_) con_string_md[op.first] = op.second;
+    for (auto&& op : con_integer_md_) con_integer_md[op.first] = op.second;
+    for (auto&& op : con_numeric_md_) con_numeric_md[op.first] = op.second;
     return true;
   }
 

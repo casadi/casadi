@@ -134,6 +134,9 @@ namespace casadi {
     // Warn if initial bounds are violated
     bool warn_initial_bounds_;
 
+    // Ignore errors in the iteration callbacks
+    bool iteration_callback_ignore_errors_;
+
     /// The NLP
     XProblem nlp2_;
 

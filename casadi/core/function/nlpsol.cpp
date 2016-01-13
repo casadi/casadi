@@ -83,6 +83,7 @@ namespace casadi {
     callback_step_ = 1;
     eval_errors_fatal_ = false;
     warn_initial_bounds_ = false;
+    iteration_callback_ignore_errors_ = false;
   }
 
   Nlpsol::~Nlpsol() {
@@ -140,6 +141,8 @@ namespace casadi {
         eval_errors_fatal_ = op.second;
       } else if (op.first=="warn_initial_bounds") {
         warn_initial_bounds_ = op.second;
+      } else if (op.first=="iteration_callback_ignore_errors") {
+        iteration_callback_ignore_errors_ = op.second;
       }
     }
 
