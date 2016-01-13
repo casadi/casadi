@@ -61,7 +61,7 @@ namespace casadi {
 
     // Default (temporary) options
     Dict linear_solver_options;
-    string linear_solver;
+    string linear_solver = "csparse";
 
     // Read options
     for (auto&& op : opts) {
