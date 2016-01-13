@@ -107,42 +107,6 @@ namespace casadi {
       }
     }
 
-    // Update status?
-    status_[TerminateSuccess]="TerminateSuccess";
-    status_[OptimalSolution]="OptimalSolution";
-    status_[SearchDirectionZero]="SearchDirectionZero";
-    status_[SearchDirectionSmall]="SearchDirectionSmall";
-    status_[StationaryPointFound]="StationaryPointFound";
-    status_[AcceptableSolution]="AcceptableSolution";
-    status_[AcceptablePrevious]="AcceptablePrevious";
-    status_[FritzJohn]="FritzJohn";
-    status_[NotDiffable]="NotDiffable";
-    status_[Unbounded]="Unbounded";
-    status_[FeasibleSolution]="FeasibleSolution";
-    status_[LowPassFilterOptimal]="LowPassFilterOptimal";
-    status_[LowPassFilterAcceptable]="LowPassFilterAcceptable";
-    status_[TerminateError]="TerminateError";
-    status_[InitError]="InitError";
-    status_[DataError]="DataError";
-    status_[MaxCalls]="MaxCalls";
-    status_[MaxIter]="MaxIter";
-    status_[MinimumStepsize]="MinimumStepsize";
-    status_[QPerror]="QPerror";
-    status_[ProblemInfeasible]="ProblemInfeasible";
-    status_[GroupsComposition]="GroupsComposition";
-    status_[TooBig]="TooBig";
-    status_[Timeout]="Timeout";
-    status_[FDError]="FDError";
-    status_[LocalInfeas]="LocalInfeas";
-    status_[LicenseError]="LicenseError. Please set the WORHP_LICENSE_FILE environmental "
-        "variable with the full path to the license file";
-    status_[TerminatedByUser]="TerminatedByUser";
-    status_[FunctionErrorF]="FunctionErrorF";
-    status_[FunctionErrorG]="FunctionErrorG";
-    status_[FunctionErrorDF]="FunctionErrorDF";
-    status_[FunctionErrorDG]="FunctionErrorDG";
-    status_[FunctionErrorHM]="FunctionErrorHM";
-
     // Setup NLP functions
     setup_f(); // Objective
     setup_g(); // Constraints
@@ -179,16 +143,6 @@ namespace casadi {
 
     // Mark the parameters as set
     m.worhp_p.initialised = true;
-  }
-
-  std::string WorhpInterface::formatStatus(int status) const {
-    if (status_.find(status)==status_.end()) {
-      std::stringstream ss;
-      ss << "Unknown status: " << status;
-      return ss.str();
-    } else {
-      return (*status_.find(status)).second;
-    }
   }
 
   void WorhpInterface::set_work(Memory& mem, const double**& arg, double**& res,
@@ -234,7 +188,8 @@ namespace casadi {
     /* Data structure initialisation. */
     WorhpInit(&m.worhp_o, &m.worhp_w, &m.worhp_p, &m.worhp_c);
     if (m.worhp_c.status != FirstCall) {
-      casadi_error("Main: Initialisation failed. Status: " << formatStatus(m.worhp_c.status));
+      string msg = return_codes(m.worhp_c.status);
+      casadi_error("Main: Initialisation failed. Status: " + msg);
     }
 
     if (m.worhp_w.DF.NeedStructure) {
@@ -526,7 +481,7 @@ namespace casadi {
     case FunctionErrorDG: return "FunctionErrorDG";
     case FunctionErrorHM: return "FunctionErrorHM";
     }
-    return 0;
+    return "Unknown WORHP return code";
   }
 
   WorhpMemory::WorhpMemory() {

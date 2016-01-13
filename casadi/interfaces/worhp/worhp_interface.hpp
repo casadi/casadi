@@ -134,10 +134,6 @@ namespace casadi {
     std::map<std::string, double> double_opts_;
     bool print_time_;
 
-    std::map<int, std::string> status_;
-
-    std::string formatStatus(int status) const;
-
     // WORHP return codes
     static const char* return_codes(int flag);
 
