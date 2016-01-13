@@ -91,6 +91,7 @@ namespace casadi {
     inputs_check_ = true;
     gather_stats_ = false;
     jit_ = false;
+    compilerplugin_ = "clang";
 
     eval_ = 0;
     simple_ = 0;
