@@ -66,30 +66,35 @@ namespace casadi {
     // Initialize the base classes
     Qpsol::init(opts);
 
+    // Default options
+    vector<string> vtype;
+
     // Read options
-    vtype_.resize(n_);
-    if (hasSetOption("vtype")) {
-      std::vector<std::string> vtype_str = option("vtype");
-      casadi_assert_message(vtype_str.size()==n_, "Option 'vtype' has wrong length");
-      for (auto i=vtype_str.begin(); i!=vtype_str.end(); ++i) {
-        char t;
-        if (*i=="continuous") {
-          t = GRB_CONTINUOUS;
-        } else if (*i=="binary") {
-          t = GRB_BINARY;
-        } else if (*i=="integer") {
-          t = GRB_INTEGER;
-        } else if (*i=="semicont") {
-          t = GRB_SEMICONT;
-        } else if (*i=="semiint") {
-          t = GRB_SEMIINT;
-        } else {
-          casadi_error("No such variable type: " + *i);
-        }
-        vtype_[i-vtype_str.begin()] = t;
+    for (auto&& op : opts) {
+      if (op.first=="vtype") {
+        vtype = op.second;
       }
-    } else {
-      fill(vtype_.begin(), vtype_.end(), GRB_CONTINUOUS);
+    }
+
+    // Variable types
+    vtype_.resize(n_, GRB_CONTINUOUS);
+    if (!vtype.empty()) {
+      casadi_assert_message(vtype.size()==n_, "Option 'vtype' has wrong length");
+      for (int i=0; i<n_; ++i) {
+        if (vtype[i]=="continuous") {
+          vtype_[i] = GRB_CONTINUOUS;
+        } else if (vtype[i]=="binary") {
+          vtype_[i] = GRB_BINARY;
+        } else if (vtype[i]=="integer") {
+          vtype_[i] = GRB_INTEGER;
+        } else if (vtype[i]=="semicont") {
+          vtype_[i] = GRB_SEMICONT;
+        } else if (vtype[i]=="semiint") {
+          vtype_[i] = GRB_SEMIINT;
+        } else {
+          casadi_error("No such variable type: " + vtype[i]);
+        }
+      }
     }
 
     // Load environment
