@@ -68,6 +68,8 @@ namespace casadi {
               "[default: equal to use_preconditioner]");
     addOption("stop_at_end",                 OT_BOOL,          true,
               "Stop the integrator at the end of the interval");
+    addOption("disable_internal_warnings",        OT_BOOL,             false,
+              "Disable SUNDIALS internal warning messages");
 
     // Quadratures
     addOption("quad_err_con",                OT_BOOL,          false,
@@ -148,6 +150,11 @@ namespace casadi {
     lower_bandwidth_ = -1;
     upper_bandwidthB_ = -1;
     lower_bandwidthB_ = -1;
+    quad_err_con_ = false;
+    interpolation_type_ = "hermite";
+    steps_per_checkpoint_ = 20;
+    disable_internal_warnings_ = false;
+    max_multistep_order_ = 5;
 
     // Read options
     for (auto&& op : opts) {
@@ -185,6 +192,16 @@ namespace casadi {
         upper_bandwidthB_ = op.second;
       } else if (op.first=="lower_bandwidthB") {
         lower_bandwidthB_ = op.second;
+      } else if (op.first=="quad_err_con") {
+        quad_err_con_ = op.second;
+      } else if (op.first=="interpolation_type") {
+        interpolation_type_ = op.second.to_string();
+      } else if (op.first=="steps_per_checkpoint") {
+        steps_per_checkpoint_ = op.second;
+      } else if (op.first=="disable_internal_warnings") {
+        disable_internal_warnings_ = op.second;
+      } else if (op.first=="max_multistep_order") {
+        max_multistep_order_ = op.second;
       }
     }
 

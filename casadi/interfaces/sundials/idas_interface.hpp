@@ -108,9 +108,6 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "idas";}
 
-    /** \brief  Free all IDAS memory */
-    virtual void freeIDAS();
-
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 
@@ -317,6 +314,10 @@ namespace casadi {
     bool cj_scaling_;
     bool calc_ic_;
     bool calc_icB_;
+    bool suppress_algebraic_;
+    double max_step_size_;
+    std::vector<double> abstolv_, fsens_abstolv_;
+    double first_time_;
 
     // Disable IDAS internal warning messages
     bool disable_internal_warnings_;

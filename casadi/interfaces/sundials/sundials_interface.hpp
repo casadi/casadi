@@ -122,6 +122,11 @@ namespace casadi {
     bool stop_at_end_;
     int upper_bandwidth_, lower_bandwidth_;
     int upper_bandwidthB_, lower_bandwidthB_;
+    bool quad_err_con_;
+    std::string interpolation_type_;
+    int steps_per_checkpoint_;
+    bool disable_internal_warnings_;
+    int max_multistep_order_;
     ///@}
 
     /// Supported linear solvers in Sundials

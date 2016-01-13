@@ -110,9 +110,6 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "cvodes";}
 
-    /** \brief  Free all CVodes memory */
-    virtual void freeCVodes();
-
     /** \brief  Initialize stage */
     virtual void init(const Dict& opts);
 
@@ -306,8 +303,6 @@ namespace casadi {
     bool monitor_rhsB_;
     bool monitor_rhs_;
     bool monitor_rhsQB_;
-
-    bool disable_internal_warnings_;
   };
 
 } // namespace casadi

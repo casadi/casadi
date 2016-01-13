@@ -55,29 +55,31 @@ namespace casadi {
               "", "newton|functional");
     addOption("fsens_all_at_once",                OT_BOOL,             true,
               "Calculate all right hand sides of the sensitivity equations at once");
-    addOption("disable_internal_warnings",        OT_BOOL,             false,
-              "Disable CVodes internal warning messages");
     addOption("monitor",                          OT_STRINGVECTOR,        GenericType(),
               "", "res|resB|resQB|reset|psetupB|djacB", true);
-
-    disable_internal_warnings_ = false;
-  }
-
-  void CvodesInterface::freeCVodes() {
   }
 
   CvodesInterface::~CvodesInterface() {
-    freeCVodes();
   }
 
   void CvodesInterface::init(const Dict& opts) {
     log("CvodesInterface::init", "begin");
 
-    // Free memory if already initialized
-    freeCVodes();
-
     // Initialize the base classes
     SundialsInterface::init(opts);
+
+    // Default options
+    string linear_multistep_method = "bdf";
+    string nonlinear_solver_iteration = "newton";
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="linear_multistep_method") {
+        linear_multistep_method = op.second.to_string();
+      } else if (op.first=="nonlinear_solver_iteration") {
+        nonlinear_solver_iteration = op.second.to_string();
+      }
+    }
 
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
@@ -88,18 +90,21 @@ namespace casadi {
     monitor_rhs_   = monitored("res");
     monitor_rhsQB_ = monitored("resQB");
 
-    if (option("linear_multistep_method")=="adams")  lmm_ = CV_ADAMS;
-    else if (option("linear_multistep_method")=="bdf") lmm_ = CV_BDF;
-    else
-      throw CasadiException("Unknown linear multistep method");
+    if (linear_multistep_method=="adams") {
+      lmm_ = CV_ADAMS;
+    } else if (linear_multistep_method=="bdf") {
+      lmm_ = CV_BDF;
+    } else {
+      casadi_error("Unknown linear multistep method: " + linear_multistep_method);
+    }
 
-    if (option("nonlinear_solver_iteration")=="newton") iter_ = CV_NEWTON;
-    else if (option("nonlinear_solver_iteration")=="functional") iter_ = CV_FUNCTIONAL;
-    else
-      throw CasadiException("Unknown nonlinear solver iteration");
-
-    // Disable internal warning messages?
-    disable_internal_warnings_ = option("disable_internal_warnings");
+    if (nonlinear_solver_iteration=="newton") {
+      iter_ = CV_NEWTON;
+    } else if (nonlinear_solver_iteration=="functional") {
+      iter_ = CV_FUNCTIONAL;
+    } else {
+      casadi_error("Unknown nonlinear solver iteration: " + nonlinear_solver_iteration);
+    }
 
     // Attach functions for jacobian information
     if (exact_jacobian_) {
@@ -162,7 +167,7 @@ namespace casadi {
     flag = CVodeQuadInitB(m.mem, m.whichB, rhsQB_wrapper, m.rq);
     if (flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB", flag);
 
-    if (option("quad_err_con").to_int()) {
+    if (quad_err_con_) {
       flag = CVodeSetQuadErrConB(m.mem, m.whichB, true);
       if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB", flag);
 
@@ -196,7 +201,7 @@ namespace casadi {
     if (flag!=CV_SUCCESS) cvodes_error("CVodeInit", flag);
 
     // Maximum number of steps
-    CVodeSetMaxNumSteps(m.mem, option("max_num_steps").to_int());
+    CVodeSetMaxNumSteps(m.mem, max_num_steps_);
     if (flag != CV_SUCCESS) cvodes_error("CVodeSetMaxNumSteps", flag);
 
     // attach a linear solver
@@ -226,7 +231,7 @@ namespace casadi {
       if (flag != CV_SUCCESS) cvodes_error("CVodeQuadInit", flag);
 
       // Should the quadrature errors be used for step size control?
-      if (option("quad_err_con").to_int()) {
+      if (quad_err_con_) {
         flag = CVodeSetQuadErrCon(m.mem, true);
         if (flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrCon", flag);
 
@@ -239,20 +244,18 @@ namespace casadi {
 
     // Adjoint sensitivity problem
     if (!g_.isNull()) {
-      // Get the number of steos per checkpoint
-      int Nd = option("steps_per_checkpoint");
-
       // Get the interpolation type
       int interpType;
-      if (option("interpolation_type")=="hermite")
+      if (interpolation_type_=="hermite") {
         interpType = CV_HERMITE;
-      else if (option("interpolation_type")=="polynomial")
+      } else if (interpolation_type_=="polynomial") {
         interpType = CV_POLYNOMIAL;
-      else
-        throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
+      } else {
+        casadi_error("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
+      }
 
       // Initialize adjoint sensitivities
-      flag = CVodeAdjInit(m.mem, Nd, interpType);
+      flag = CVodeAdjInit(m.mem, steps_per_checkpoint_, interpType);
       if (flag != CV_SUCCESS) cvodes_error("CVodeAdjInit", flag);
       m.isInitAdj = false;
     }
@@ -382,7 +385,7 @@ namespace casadi {
     casadi_copy(NV_DATA_S(m.q), nq_, q);
 
     // Print statistics
-    if (option("print_stats")) printStats(m, userOut());
+    if (print_stats_) printStats(m, userOut());
 
     if (gather_stats_) {
       int flag = CVodeGetIntegratorStats(m.mem, &m.nsteps, &m.nfevals, &m.nlinsetups,
