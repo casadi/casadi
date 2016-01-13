@@ -410,7 +410,7 @@ namespace casadi {
 
     StatusMsg(&m.worhp_o, &m.worhp_w, &m.worhp_p, &m.worhp_c);
 
-    if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
+    if (print_time_) {
       // Write timings
       userOut() << "time spent in eval_f: " << m.t_eval_f << " s.";
       if (m.n_eval_f>0)

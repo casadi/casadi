@@ -58,71 +58,67 @@ namespace casadi {
               "The maximum allowed CPU time in seconds for the whole initialisation"
               " (and the actually required one on output). Disabled if unset.");
 
-    // Temporary object
-    qpOASES::Options ops;
-    ops.setToDefault();
-
-    addOption("printLevel",             OT_STRING,  PrintLevel_to_string(ops.printLevel),
+    addOption("printLevel",             OT_STRING,  GenericType(),
               "Defines the amount of text output during QP solution, see Section 5.7");
-    addOption("enableRamping",          OT_BOOL, BooleanType_to_bool(ops.enableRamping),
+    addOption("enableRamping",          OT_BOOL, GenericType(),
               "Enables ramping.");
-    addOption("enableFarBounds",        OT_BOOL, BooleanType_to_bool(ops.enableFarBounds),
+    addOption("enableFarBounds",        OT_BOOL, GenericType(),
               "Enables the use of  far bounds.");
-    addOption("enableFlippingBounds",   OT_BOOL, BooleanType_to_bool(ops.enableFlippingBounds),
+    addOption("enableFlippingBounds",   OT_BOOL, GenericType(),
               "Enables the use of  flipping bounds.");
-    addOption("enableRegularisation",   OT_BOOL, BooleanType_to_bool(ops.enableRegularisation),
+    addOption("enableRegularisation",   OT_BOOL, GenericType(),
               "Enables automatic  Hessian regularisation.");
-    addOption("enableFullLITests",      OT_BOOL, BooleanType_to_bool(ops.enableFullLITests),
+    addOption("enableFullLITests",      OT_BOOL, GenericType(),
               "Enables condition-hardened  (but more expensive) LI test.");
-    addOption("enableNZCTests",         OT_BOOL, BooleanType_to_bool(ops.enableNZCTests),
+    addOption("enableNZCTests",         OT_BOOL, GenericType(),
               "Enables nonzero curvature  tests.");
-    addOption("enableDriftCorrection",  OT_INT, static_cast<int>(ops.enableDriftCorrection),
+    addOption("enableDriftCorrection",  OT_INT, GenericType(),
               "Specifies the frequency of drift corrections: 0: turns them off.");
     addOption("enableCholeskyRefactorisation", OT_INT,
-              static_cast<int>(ops.enableCholeskyRefactorisation),
+              GenericType(),
               "Specifies the frequency of a full re-factorisation of projected "
               "Hessian matrix: 0: turns them off,  1: uses them at each iteration etc.");
-    addOption("enableEqualities",       OT_BOOL, BooleanType_to_bool(ops.enableEqualities),
+    addOption("enableEqualities",       OT_BOOL, GenericType(),
               "Specifies whether equalities should be treated  as always active "
               "(True) or not (False)");
-    addOption("terminationTolerance",   OT_DOUBLE, static_cast<double>(ops.terminationTolerance),
+    addOption("terminationTolerance",   OT_DOUBLE, GenericType(),
               "Relative termination tolerance to stop homotopy.");
-    addOption("boundTolerance",         OT_DOUBLE, static_cast<double>(ops.boundTolerance),
+    addOption("boundTolerance",         OT_DOUBLE, GenericType(),
               "If upper and lower bounds differ less than this tolerance, they are regarded "
               "equal, i.e. as  equality constraint.");
-    addOption("boundRelaxation",        OT_DOUBLE, static_cast<double>(ops.boundRelaxation),
+    addOption("boundRelaxation",        OT_DOUBLE, GenericType(),
               "Initial relaxation of bounds to start homotopy  and initial value for far bounds.");
-    addOption("epsNum",                 OT_DOUBLE, static_cast<double>(ops.epsNum),
+    addOption("epsNum",                 OT_DOUBLE, GenericType(),
               "Numerator tolerance for ratio tests.");
-    addOption("epsDen",                 OT_DOUBLE, static_cast<double>(ops.epsDen),
+    addOption("epsDen",                 OT_DOUBLE, GenericType(),
               "Denominator tolerance for ratio tests.");
-    addOption("maxPrimalJump",          OT_DOUBLE, static_cast<double>(ops.maxPrimalJump),
+    addOption("maxPrimalJump",          OT_DOUBLE, GenericType(),
               "Maximum allowed jump in primal variables in  nonzero curvature tests.");
-    addOption("maxDualJump",            OT_DOUBLE, static_cast<double>(ops.maxDualJump),
+    addOption("maxDualJump",            OT_DOUBLE, GenericType(),
               "Maximum allowed jump in dual variables in  linear independence tests.");
-    addOption("initialRamping",         OT_DOUBLE, static_cast<double>(ops.initialRamping),
+    addOption("initialRamping",         OT_DOUBLE, GenericType(),
               "Start value for ramping strategy.");
-    addOption("finalRamping",           OT_DOUBLE, static_cast<double>(ops.finalRamping),
+    addOption("finalRamping",           OT_DOUBLE, GenericType(),
               "Final value for ramping strategy.");
-    addOption("initialFarBounds",       OT_DOUBLE, static_cast<double>(ops.initialFarBounds),
+    addOption("initialFarBounds",       OT_DOUBLE, GenericType(),
               "Initial size for far bounds.");
-    addOption("growFarBounds",          OT_DOUBLE, static_cast<double>(ops.growFarBounds),
+    addOption("growFarBounds",          OT_DOUBLE, GenericType(),
               "Factor to grow far bounds.");
-    addOption("initialStatusBounds", OT_STRING, SubjectToStatus_to_string(ops.initialStatusBounds),
+    addOption("initialStatusBounds", OT_STRING, GenericType(),
               "Initial status of bounds at first iteration.");
-    addOption("epsFlipping",            OT_DOUBLE, static_cast<double>(ops.epsFlipping),
+    addOption("epsFlipping",            OT_DOUBLE, GenericType(),
               "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound.");
-    addOption("numRegularisationSteps", OT_INT, static_cast<int>(ops.numRegularisationSteps),
+    addOption("numRegularisationSteps", OT_INT, GenericType(),
               "Maximum number of successive regularisation steps.");
-    addOption("epsRegularisation",      OT_DOUBLE, static_cast<double>(ops.epsRegularisation),
+    addOption("epsRegularisation",      OT_DOUBLE, GenericType(),
               "Scaling factor of identity matrix used for  Hessian regularisation.");
-    addOption("numRefinementSteps",     OT_INT, static_cast<int>(ops.numRefinementSteps),
+    addOption("numRefinementSteps",     OT_INT, GenericType(),
               "Maximum number of iterative refinement steps.");
-    addOption("epsIterRef",             OT_DOUBLE, static_cast<double>(ops.epsIterRef),
+    addOption("epsIterRef",             OT_DOUBLE, GenericType(),
               "Early termination tolerance for iterative  refinement.");
-    addOption("epsLITests",             OT_DOUBLE, static_cast<double>(ops.epsLITests),
+    addOption("epsLITests",             OT_DOUBLE, GenericType(),
               "Tolerance for linear independence tests.");
-    addOption("epsNZCTests",            OT_DOUBLE, static_cast<double>(ops.epsNZCTests),
+    addOption("epsNZCTests",            OT_DOUBLE, GenericType(),
               "Tolerance for nonzero curvature tests.");
   }
 
@@ -132,19 +128,74 @@ namespace casadi {
   void QpoasesInterface::init(const Dict& opts) {
     Qpsol::init(opts);
 
-    // Read options
-    if (hasSetOption("nWSR")) {
-      max_nWSR_ = option("nWSR");
-      casadi_assert(max_nWSR_>=0);
-    } else {
-      max_nWSR_ = 5 *(n_ + nc_);
-    }
+    // Default options
+    max_nWSR_ = 5 *(n_ + nc_);
+    max_cputime_ = -1;
+    ops_.setToDefault();
 
-    if (hasSetOption("CPUtime")) {
-      max_cputime_ = option("CPUtime");
-      casadi_assert(max_cputime_>0);
-    } else {
-      max_cputime_ = -1;
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="nWSR") {
+        max_nWSR_ = op.second;
+      } else if (op.first=="CPUtime") {
+        max_cputime_ = op.second;
+      } else if (op.first=="printLevel") {
+        ops_.printLevel = to_PrintLevel(op.second);
+      } else if (op.first=="enableRamping") {
+        ops_.enableRamping = to_BooleanType(op.second);
+      } else if (op.first=="enableFarBounds") {
+        ops_.enableFarBounds = to_BooleanType(op.second);
+      } else if (op.first=="enableFlippingBounds") {
+        ops_.enableFlippingBounds = to_BooleanType(op.second);
+      } else if (op.first=="enableRegularisation") {
+        ops_.enableRegularisation = to_BooleanType(op.second);
+      } else if (op.first=="enableFullLITests") {
+        ops_.enableFullLITests = to_BooleanType(op.second);
+      } else if (op.first=="enableNZCTests") {
+        ops_.enableNZCTests = to_BooleanType(op.second);
+      } else if (op.first=="enableDriftCorrection") {
+        ops_.enableRegularisation = to_BooleanType(op.second);
+      } else if (op.first=="enableCholeskyRefactorisation") {
+        ops_.enableCholeskyRefactorisation = op.second;
+      } else if (op.first=="terminationTolerance") {
+        ops_.terminationTolerance = op.second;
+      } else if (op.first=="boundTolerance") {
+        ops_.boundTolerance = op.second;
+      } else if (op.first=="boundRelaxation") {
+        ops_.boundRelaxation = op.second;
+      } else if (op.first=="epsNum") {
+        ops_.epsNum = op.second;
+      } else if (op.first=="epsDen") {
+        ops_.epsDen = op.second;
+      } else if (op.first=="maxPrimalJump") {
+        ops_.maxPrimalJump = op.second;
+      } else if (op.first=="maxDualJump") {
+        ops_.maxDualJump = op.second;
+      } else if (op.first=="initialRamping") {
+        ops_.initialRamping = op.second;
+      } else if (op.first=="finalRamping") {
+        ops_.finalRamping = op.second;
+      } else if (op.first=="initialFarBounds") {
+        ops_.initialFarBounds = op.second;
+      } else if (op.first=="growFarBounds") {
+        ops_.growFarBounds = op.second;
+      } else if (op.first=="initialStatusBounds") {
+        ops_.initialStatusBounds = to_SubjectToStatus(op.second);
+      } else if (op.first=="epsFlipping") {
+        ops_.epsFlipping = op.second;
+      } else if (op.first=="numRegularisationSteps") {
+        ops_.numRegularisationSteps = op.second;
+      } else if (op.first=="epsRegularisation") {
+        ops_.epsRegularisation = op.second;
+      } else if (op.first=="numRefinementSteps") {
+        ops_.numRefinementSteps = op.second;
+      } else if (op.first=="epsIterRef") {
+        ops_.epsIterRef = op.second;
+      } else if (op.first=="epsLITests") {
+        ops_.epsLITests = op.second;
+      } else if (op.first=="epsNZCTests") {
+        ops_.epsNZCTests = op.second;
+      }
     }
 
     // Allocate work vectors
@@ -169,41 +220,9 @@ namespace casadi {
     } else {
       m.qp = new qpOASES::SQProblem(n_, nc_);
     }
-    qpOASES::Options ops;
-    ops.setToDefault();
-    ops.printLevel = string_to_PrintLevel(option("printLevel"));
-    ops.enableRamping = bool_to_BooleanType(option("enableRamping"));
-    ops.enableFarBounds = bool_to_BooleanType(option("enableFarBounds"));
-    ops.enableFlippingBounds = bool_to_BooleanType(option("enableFlippingBounds"));
-    ops.enableRegularisation = bool_to_BooleanType(option("enableRegularisation"));
-    ops.enableFullLITests = bool_to_BooleanType(option("enableFullLITests"));
-    ops.enableNZCTests = bool_to_BooleanType(option("enableNZCTests"));
-    ops.enableDriftCorrection = static_cast<int>(option("enableDriftCorrection"));
-    ops.enableCholeskyRefactorisation =
-      static_cast<int>(option("enableCholeskyRefactorisation"));
-    ops.enableEqualities = bool_to_BooleanType(option("enableEqualities"));
-    ops.terminationTolerance = option("terminationTolerance");
-    ops.boundTolerance = option("boundTolerance");
-    ops.boundRelaxation = option("boundRelaxation");
-    ops.epsNum = option("epsNum");
-    ops.epsDen = option("epsDen");
-    ops.maxPrimalJump = option("maxPrimalJump");
-    ops.maxDualJump = option("maxDualJump");
-    ops.initialRamping = option("initialRamping");
-    ops.finalRamping = option("finalRamping");
-    ops.initialFarBounds = option("initialFarBounds");
-    ops.growFarBounds = option("growFarBounds");
-    ops.initialStatusBounds = string_to_SubjectToStatus(option("initialStatusBounds"));
-    ops.epsFlipping = option("epsFlipping");
-    ops.numRegularisationSteps = static_cast<int>(option("numRegularisationSteps"));
-    ops.epsRegularisation = option("epsRegularisation");
-    ops.numRefinementSteps = static_cast<int>(option("numRefinementSteps"));
-    ops.epsIterRef = option("epsIterRef");
-    ops.epsLITests = option("epsLITests");
-    ops.epsNZCTests = option("epsNZCTests");
 
     // Pass to qpOASES
-    m.qp->setOptions(ops);
+    m.qp->setOptions(ops_);
   }
 
   void QpoasesInterface::
@@ -559,69 +578,70 @@ namespace casadi {
     return ss.str();
   }
 
-  bool QpoasesInterface::BooleanType_to_bool(qpOASES::BooleanType b) {
+  bool QpoasesInterface::from_BooleanType(qpOASES::BooleanType b) {
     switch (b) {
     case qpOASES::BT_TRUE:              return true;
     case qpOASES::BT_FALSE:             return false;
-    default:                            casadi_error("not_implemented");
     }
+    casadi_error("not_implemented");
   }
 
-  qpOASES::BooleanType QpoasesInterface::bool_to_BooleanType(bool b) {
+  qpOASES::BooleanType QpoasesInterface::to_BooleanType(bool b) {
     return b ? qpOASES::BT_TRUE : qpOASES::BT_FALSE;
   }
 
-  std::string QpoasesInterface::SubjectToStatus_to_string(qpOASES::SubjectToStatus b) {
+  std::string QpoasesInterface::from_SubjectToStatus(qpOASES::SubjectToStatus b) {
     switch (b) {
     case qpOASES::ST_INACTIVE:          return "inactive";
     case qpOASES::ST_LOWER:             return "lower";
+    case qpOASES::ST_UPPER:             return "upper";
     case qpOASES::ST_INFEASIBLE_LOWER:  return "infeasible_lower";
     case qpOASES::ST_INFEASIBLE_UPPER:  return "infeasible_upper";
     case qpOASES::ST_UNDEFINED:         return "undefined";
-    default:                            casadi_error("not_implemented");
     }
+    casadi_error("not_implemented");
   }
 
-  qpOASES::SubjectToStatus QpoasesInterface::string_to_SubjectToStatus(std::string b) {
-    if (b.compare("inactive")==0) {
+  qpOASES::SubjectToStatus QpoasesInterface::to_SubjectToStatus(std::string b) {
+    if (b == "inactive") {
       return qpOASES::ST_INACTIVE;
-    } else if (b.compare("lower")==0) {
+    } else if (b == "lower") {
       return qpOASES::ST_LOWER;
-    } else if (b.compare("infeasible_lower")==0) {
+    } else if (b == "infeasible_lower") {
       return qpOASES::ST_INFEASIBLE_LOWER;
-    } else if (b.compare("infeasible_upper")==0) {
+    } else if (b == "infeasible_upper") {
       return qpOASES::ST_INFEASIBLE_UPPER;
-    } else if (b.compare("undefined")==0) {
+    } else if (b == "undefined") {
       return qpOASES::ST_UNDEFINED;
     } else {
-      casadi_error("not_implemented");
+      casadi_error("No such qpOASES::SubjectToStatus: " + b);
     }
   }
 
-  std::string QpoasesInterface::PrintLevel_to_string(qpOASES::PrintLevel b) {
+  std::string QpoasesInterface::from_PrintLevel(qpOASES::PrintLevel b) {
     switch (b) {
     case qpOASES::PL_TABULAR:           return "tabular";
     case qpOASES::PL_NONE:              return "none";
     case qpOASES::PL_LOW:               return "low";
     case qpOASES::PL_MEDIUM:            return "medium";
     case qpOASES::PL_HIGH:              return "high";
-    default:                            casadi_error("not_implemented");
     }
+    casadi_error("not_implemented");
   }
 
-  qpOASES::PrintLevel QpoasesInterface::string_to_PrintLevel(std::string b) {
-    if (b.compare("tabular")==0) {
+  qpOASES::PrintLevel QpoasesInterface::to_PrintLevel(std::string b) {
+    if (b == "tabular") {
       return qpOASES::PL_TABULAR;
-    } else if (b.compare("none")==0) {
+    } else if (b == "none") {
       return qpOASES::PL_NONE;
-    } else if (b.compare("low")==0) {
+    } else if (b == "low") {
       return qpOASES::PL_LOW;
-    } else if (b.compare("medium")==0) {
+    } else if (b == "medium") {
       return qpOASES::PL_MEDIUM;
-    } else if (b.compare("high")==0) {
+    } else if (b == "high") {
       return qpOASES::PL_HIGH;
     } else {
-      casadi_error("not_implemented");
+      casadi_error("No such qpOASES::PrintLevel: " + b);
     }
   }
 
