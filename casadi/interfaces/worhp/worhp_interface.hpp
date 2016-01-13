@@ -128,11 +128,13 @@ namespace casadi {
     // Solve the NLP
     virtual void solve(Memory& mem) const;
 
-    /// Exact Hessian?
-    bool exact_hessian_;
+    // Options
+    std::map<std::string, bool> bool_opts_;
+    std::map<std::string, int> int_opts_;
+    std::map<std::string, double> double_opts_;
+    bool print_time_;
 
     std::map<int, std::string> status_;
-    std::map<std::string, TypeID> ops_;
 
     std::string formatStatus(int status) const;
 
