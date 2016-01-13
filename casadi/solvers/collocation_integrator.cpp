@@ -51,7 +51,7 @@ namespace casadi {
     addOption("interpolation_order",           OT_INT,  3,
               "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",
-              "Collocation scheme", "radau|legendre");
+              "Collocation scheme: radau|legendre");
   }
 
   CollocationIntegrator::~CollocationIntegrator() {

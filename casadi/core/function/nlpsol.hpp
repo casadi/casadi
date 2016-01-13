@@ -107,9 +107,6 @@ namespace casadi {
     /** \brief Check if the inputs correspond to a well-posed problem */
     virtual void checkInputs(Memory& mem) const;
 
-    /// Set options that make the NLP solver more suitable for solving QPs
-    virtual void setDefaultOptions(const std::string& recipe) {}
-
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 

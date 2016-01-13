@@ -50,16 +50,12 @@ namespace casadi {
               "Upper band-width of banded Jacobian (estimations)");
     addOption("lower_bandwidth",             OT_INT,          GenericType(),
               "Lower band-width of banded Jacobian (estimations)");
-    addOption("linear_solver_type",          OT_STRING,           "dense",
-              "", "user_defined|dense|banded|iterative");
-    addOption("iterative_solver",            OT_STRING,           "gmres",
-              "", "gmres|bcgstab|tfqmr");
-    addOption("pretype",                     OT_STRING,           "none",
-              "", "none|left|right|both");
+    addOption("linear_solver_type",          OT_STRING,           "dense", "");
+    addOption("iterative_solver",            OT_STRING,           "gmres", "");
+    addOption("pretype",                     OT_STRING,           "none", "");
     addOption("max_krylov",                  OT_INT,          10,
               "Maximum Krylov subspace size");
-    addOption("sensitivity_method",          OT_STRING,           "simultaneous", "",
-              "simultaneous|staggered");
+    addOption("sensitivity_method",          OT_STRING,           "simultaneous", "");
     addOption("max_multistep_order",         OT_INT,          5);
     addOption("use_preconditioner",          OT_BOOL,          false,
               "Precondition an iterative solver");
@@ -94,19 +90,16 @@ namespace casadi {
     addOption("steps_per_checkpoint",        OT_INT,          20,
               "Number of steps between two consecutive checkpoints");
     addOption("interpolation_type",          OT_STRING,           "hermite",
-              "Type of interpolation for the adjoint sensitivities", "hermite|polynomial");
+              "Type of interpolation for the adjoint sensitivities");
     addOption("upper_bandwidthB",            OT_INT,          GenericType(),
               "Upper band-width of banded jacobians for backward integration "
               "[default: equal to upper_bandwidth]");
     addOption("lower_bandwidthB",            OT_INT,          GenericType(),
               "lower band-width of banded jacobians for backward integration "
               "[default: equal to lower_bandwidth]");
-    addOption("linear_solver_typeB",         OT_STRING,           GenericType(),
-              "", "user_defined|dense|banded|iterative");
-    addOption("iterative_solverB",           OT_STRING,           GenericType(),
-              "", "gmres|bcgstab|tfqmr");
-    addOption("pretypeB",                    OT_STRING,           GenericType(),
-              "", "none|left|right|both");
+    addOption("linear_solver_typeB",         OT_STRING,           GenericType(), "");
+    addOption("iterative_solverB",           OT_STRING,           GenericType(), "");
+    addOption("pretypeB",                    OT_STRING,           GenericType(), "");
     addOption("max_krylovB",                 OT_INT,          GenericType(),
               "Maximum krylov subspace size");
     addOption("reltolB",                     OT_DOUBLE,             GenericType(),

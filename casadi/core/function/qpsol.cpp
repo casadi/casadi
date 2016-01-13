@@ -43,7 +43,6 @@ namespace casadi {
       }
     }
 
-    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "", "lp", true);
     n_ = H_.size2();
     nc_ = A_.isNull() ? 0 : A_.size1();
 

@@ -66,7 +66,7 @@ namespace casadi {
               "A user-defined field that can be used to identify "
               "the function or pass additional information");
     addOption("monitor",                  OT_STRINGVECTOR,        GenericType(),
-              "Monitors to be activated", "inputs|outputs");
+              "Monitors to be activated");
     addOption("regularity_check",         OT_BOOL,             true,
               "Throw exceptions when NaN or Inf appears during evaluation");
     addOption("inputs_check",             OT_BOOL,             true,
@@ -168,8 +168,6 @@ namespace casadi {
   }
 
   void FunctionInternal::init(const Dict& opts) {
-    setDefaultOptions();
-
     // Read options
     for (auto&& op : opts) {
       if (op.first=="verbose") {

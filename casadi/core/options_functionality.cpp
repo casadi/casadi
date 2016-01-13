@@ -115,8 +115,7 @@ namespace casadi {
     std::vector< std::string> dict;
 
     // Fill it by looping over the allowed_options map
-    for (map<string, TypeID>::const_iterator it=allowed_options.begin();
-         it!=allowed_options.end();it++) {
+    for (auto it=allowed_options.begin(); it!=allowed_options.end(); it++) {
       dict.push_back(it->first);
     }
 
@@ -191,53 +190,9 @@ namespace casadi {
       } else {
         ss << "You supplied a type '" << op.get_description() << "' instead." << endl;
       }
-      if (!allowed_vals_[name].empty()) {
-        ss << "(Allowed values are:";
-        for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();
-             it!=allowed_vals_[name].end();it++) {
-          ss << " '" << *it << "'";
-        }
-        ss << ")" << endl;
-      }
       casadi_error(ss.str());
     }
 
-    // If allowed values are listed, check them.
-    if (!allowed_vals_[name].empty()) {
-      bool found;
-      GenericType problem = op;
-      if (op.is_string_vector()) {
-        found = true;
-        const std::vector<std::string> & opv = op.to_string_vector();
-        for (std::vector<std::string>::const_iterator it=opv.begin();it!=opv.end();it++) {
-          userOut() << "checking " << *it << std::endl;
-          if (std::find(allowed_vals_[name].begin(),
-                        allowed_vals_[name].end(), (*it))==allowed_vals_[name].end()) {
-            problem = (*it);
-            found = false;
-            break;
-          }
-        }
-      } else {
-        found = false;
-        for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();
-             it!=allowed_vals_[name].end();it++) {
-          found = found || (*it) == op;
-        }
-      }
-      // If supplied op is not in allowed values, raise an error.
-      if (!found) {
-        stringstream ss;
-        ss << "Option '" << name << "' does not allow '" << problem  << "'." << endl;
-        ss << "(Allowed values options are:";
-        for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();
-             it!=allowed_vals_[name].end();it++) {
-          ss << " '" << *it << "'";
-        }
-        ss << ")" << endl;
-        casadi_error(ss.str());
-      }
-    }
     // Save the option
     dictionary_[name] = op;
   }
@@ -293,109 +248,18 @@ namespace casadi {
     return GenericType();
   }
 
-  void OptionsFunctionalityNode::addOption(const string &name, const TypeID& type,
-                                           const GenericType &def_val, const string& desc,
-                                           const std::string &allowed_vals, bool inherit) {
-
-    std::vector<GenericType> allowed_vals_vec;
-    std::vector<int> enum_values;
-    std::vector<std::string> enum_descr;
-
-    std::stringstream ss(allowed_vals);
-    std::string item;
-
-    if (allowed_vals=="") allowed_vals_vec.push_back("");
-
-    int val = -1;
-    while (std::getline(ss, item, '|')) {
-      std::stringstream sss(item);
-      std::string name;
-      std::getline(sss, name, ':');
-      allowed_vals_vec.push_back(name);
-      std::string descr="";
-      std::getline(sss, descr, ':');
-      enum_descr.push_back(descr);
-      std::string value;
-      if (std::getline(sss, value, ':')) {
-        std::istringstream(value) >> val;
-      } else {
-        val++;
-      }
-      enum_values.push_back(val);
-    }
-
-    addOption(name, type, def_val, desc, allowed_vals_vec, inherit, enum_values, enum_descr);
-
-  }
-
-
   void OptionsFunctionalityNode::
   addOption(const string &name, const TypeID& type, const GenericType &def_val,
-            const string& desc, const std::vector<GenericType> &allowed_vals,
-            bool inherit, std::vector<int> enum_values,
-            std::vector<std::string> enum_descr) {
-    // If inheriting, check if the type matches
-    if (inherit && allowed_options.find(name)!=allowed_options.end()) {
-      casadi_assert_message(allowed_options[name] == type,
-                            "The option '" << name << "' was indicated to inherit, "
-                            "but the type definition of the ancestor '"
-                            << GenericType::get_type_description(allowed_options[name])
-                            << "' conflicts with the type definition here '"
-                            << GenericType::get_type_description(type) << "'.");
-    }
-
+            const string& desc) {
     defaults_[name] = def_val;
     allowed_options[name] = type;
-
-    std::vector<GenericType> allowed_vals_vec;
-    std::vector<int> enum_values_vec;
-    std::vector<std::string> enum_descr_vec;
-
-    // Inherit
-    if (inherit && allowed_vals_.find(name)!=allowed_vals_.end()) {
-      allowed_vals_vec.insert(allowed_vals_vec.end(), allowed_vals_[name].begin(),
-                              allowed_vals_[name].end());
-    }
-    if (inherit && enum_descr_.find(name)!=enum_descr_.end()) {
-      enum_descr_vec.insert(enum_descr_vec.end(), enum_descr_[name].begin(),
-                            enum_descr_[name].end());
-    }
-    if (inherit && enum_values_.find(name)!=enum_values_.end()) {
-      enum_values_vec.insert(enum_values_vec.end(), enum_values_[name].begin(),
-                             enum_values_[name].end());
-    }
-    // Insert current allowed_vals
-    allowed_vals_vec.insert(allowed_vals_vec.end(), allowed_vals.begin(), allowed_vals.end());
-    enum_descr_vec.insert(enum_descr_vec.end(), enum_descr.begin(), enum_descr.end());
-    enum_values_vec.insert(enum_values_vec.end(), enum_values.begin(), enum_values.end());
-
     if (!def_val.isNull())
       dictionary_[name] = def_val;
-
-    // Inherit description
-    std::stringstream s;
-    if (inherit && description_.find(name)!=description_.end()) {
-      s << description_[name];
-      if (!desc.empty())
-        s << std::endl;
-    }
-    // Insert current description
-    s << desc;
-    description_[name] = s.str();
-
-    allowed_vals_[name] = allowed_vals_vec;
-
-    enum_values_[name] = enum_values_vec;
-
-    enum_descr_[name] = enum_descr_vec;
-
-    casadi_assert(enum_values_vec.empty() || enum_values_vec.size() == allowed_vals_vec.size());
-    casadi_assert(enum_descr_vec.empty() || enum_descr_vec.size() == allowed_vals_vec.size());
-
+    description_[name] = desc;
   }
 
   void OptionsFunctionalityNode::printOption(const std::string &name, ostream &stream) const {
-    map<std::string, TypeID>::const_iterator allowed_option_it = allowed_options.find(name);
+    auto allowed_option_it = allowed_options.find(name);
     if (allowed_option_it!=allowed_options.end()) {
 
       // First print out the datatype
@@ -417,20 +281,6 @@ namespace casadi {
         if (description_it->second != "n/a")
           stream << "     \"" << description_it->second << "\""<< std::endl;
       }
-
-      // Print out the allowed values if applicable
-      map< std::string, std::vector<GenericType> >::const_iterator allowed_it =
-        allowed_vals_.find(name);
-      if (allowed_it!=allowed_vals_.end()) {
-        const std::vector<GenericType> & allowed = allowed_it->second;
-        if (allowed.size()>0) {
-          stream << "     Allowed values: ";
-          for (std::vector<GenericType>::const_iterator it=allowed.begin();it!=allowed.end();it++) {
-            stream << " '" << *it << "'";
-          }
-          stream << std::endl;
-        }
-      }
     } else {
       stream << "  \"" << name << "\" does not exist.";
     }
@@ -438,8 +288,7 @@ namespace casadi {
 
   void OptionsFunctionalityNode::printOptions(ostream &stream) const {
     stream << "\"Option name\" [type] = value" << endl;
-    for (map<string, TypeID>::const_iterator it=allowed_options.begin();
-         it!=allowed_options.end(); ++it) {
+    for (auto it=allowed_options.begin(); it!=allowed_options.end(); ++it) {
       printOption(it->first, stream);
     }
     stream << endl;
@@ -462,8 +311,6 @@ namespace casadi {
   }
 
   OptionsFunctionalityNode::OptionsFunctionalityNode() {
-    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(),
-              "Changes default options according to a given recipe (low-level)");
   }
 
   OptionsFunctionalityNode::~OptionsFunctionalityNode() {
@@ -483,8 +330,7 @@ namespace casadi {
 
   std::vector<std::string> OptionsFunctionalityNode::optionNames() const {
     std::vector<std::string> names;
-    for (map<string, TypeID>::const_iterator it=allowed_options.begin();
-         it!=allowed_options.end(); ++it) {
+    for (auto it=allowed_options.begin(); it!=allowed_options.end(); ++it) {
       names.push_back(it->first);
     }
     return names;
@@ -499,7 +345,7 @@ namespace casadi {
 
   TypeID OptionsFunctionalityNode::optionType(const std::string &name) const {
     assert_exists(name);
-    map<string, TypeID>::const_iterator it = allowed_options.find(name);
+    auto it = allowed_options.find(name);
     if (it!=allowed_options.end()) return it->second;
     return OT_UNKNOWN;
   }
@@ -516,73 +362,9 @@ namespace casadi {
     return GenericType::get_type_description(optionType(name));
   }
 
-  std::vector<GenericType> OptionsFunctionalityNode::optionAllowed(const std::string &name) const {
-    assert_exists(name);
-    map<string, std::vector<GenericType> >::const_iterator it = allowed_vals_.find(name);
-    if (it!=allowed_vals_.end()) return it->second;
-    return std::vector<GenericType>();
-  }
-
-  int OptionsFunctionalityNode::optionAllowedIndex(const std::string &name) const {
-    assert_exists(name);
-    casadi_assert_message(hasSetOption(name), "Option '" << name << "' has not been set.");
-    map<string, std::vector<GenericType> >::const_iterator it = allowed_vals_.find(name);
-    casadi_assert_message(it!=allowed_vals_.end(), "Option '" << name
-                          << "' has no list of allowed values.");
-    const std::vector<GenericType> &vec = it->second;
-    std::vector<GenericType>::const_iterator it2 = std::find(vec.begin(), vec.end(), option(name));
-    return it2-vec.begin();
-  }
-
-  void OptionsFunctionalityNode::setOptionByAllowedIndex(const std::string &name, int i) {
-    assert_exists(name);
-    map<string, std::vector<GenericType> >::const_iterator it = allowed_vals_.find(name);
-    casadi_assert_message(it!=allowed_vals_.end(), "Option '" << name
-                          << "' has no list of allowed values.");
-    const std::vector<GenericType> &vec = it->second;
-    casadi_assert_message(i>=0 && i<= vec.size()-1, "setOptionAllowedIndex('" << name
-                          << "', " << i << "): index out of bounds. There are "
-                          << vec.size() << " allowed values.");
-    setOption(name, vec[i]);
-  }
-
-  int OptionsFunctionalityNode::optionEnumValue(const std::string &name) const {
-    assert_exists(name);
-    int i = optionAllowedIndex(name);
-    map<string, std::vector<int> >::const_iterator it = enum_values_.find(name);
-    casadi_assert_message(it!=enum_values_.end(), "Option '" << name
-                          << "' has no list of enum values.");
-    const std::vector<int> & enum_values = it->second;
-    casadi_assert_message(!enum_values.empty(), "Option '" << name
-                          << "' has an empty enum values list.");
-    return enum_values.at(i);
-  }
-
-  void OptionsFunctionalityNode::setOptionByEnumValue(const std::string &name, int v) {
-    assert_exists(name);
-    map<string, std::vector<int> >::const_iterator it = enum_values_.find(name);
-    casadi_assert_message(it!=enum_values_.end(), "Option '" << name
-                          << "' has no list of enum values.");
-    const std::vector<int> & enum_values = it->second;
-    casadi_assert_message(!enum_values.empty(), "Option '" << name
-                          << "' has an empty enum values list.");
-    std::vector<int>::const_iterator it2 = std::find(enum_values.begin(), enum_values.end(), v);
-    casadi_assert_message(it2!=enum_values.end(), "Option '"
-                          << name << "', entry " << v << " was not found in enum value list.");
-    setOptionByAllowedIndex(name, it2-enum_values.begin());
-  }
-
-
   void OptionsFunctionalityNode::setDefault(const std::string &name, const GenericType &def_val) {
     assert_exists(name);
     defaults_[name] = def_val;
-  }
-
-  void OptionsFunctionalityNode::setDefaultOptions() {
-    if (hasSetOption("defaults_recipes")) {
-      const std::vector<std::string> & recipes = option("defaults_recipes");
-      setDefaultOptions(recipes);
-    }
   }
 
 } // namespace casadi

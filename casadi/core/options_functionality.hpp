@@ -77,23 +77,6 @@ namespace casadi {
     /** \brief Get the default of a certain option */
     GenericType optionDefault(const std::string &str) const;
 
-#ifndef SWIG
-    /** \brief Get the allowed values of a certain option */
-    std::vector<GenericType> optionAllowed(const std::string &str) const;
-#endif // SWIG
-
-    /** \brief Get the index into allowed options of a certain option */
-    int optionAllowedIndex(const std::string &name) const;
-
-    /** \brief Set a certain option by giving its index into the allowed values */
-    void setOptionByAllowedIndex(const std::string &name, int i);
-
-    /** \brief Get the enum value corresponding to th certain option */
-    int optionEnumValue(const std::string &name) const;
-
-    /** \brief Set a certain option by giving an enum value */
-    void setOptionByEnumValue(const std::string &name, int v);
-
     /** \brief  check if there is an option str */
     bool hasOption(const std::string &str) const;
 
@@ -143,29 +126,8 @@ namespace casadi {
     static double wordDistance(const std::string &a, const std::string &b);
 
 
-    void addOption(
-                   const std::string &str, const TypeID& type,
-                   const GenericType &def_val=GenericType(), const std::string& desc="n/a",
-                   const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(),
-                   bool inherit = false, std::vector<int> enum_values= std::vector<int>(),
-                   std::vector<std::string> enum_descr= std::vector<std::string>());
-    /** \brief Add an option
-     *
-     *  allowed_vals can take multiple forms:
-     *    "foo|bar"   ->   specifies that the values "foo" and "bar" are allowed
-     *    "foo:5|bar:6" -> specifies that the values "foo" and "bar" are allowed and map
-     *                     to 5 and 6 respectively
-     *    "foo:5:description_foo|bar:6:description_bar|" -> same as above, but specifies documentation
-     *
-     **/
-    void addOption(const std::string &str, const TypeID& type, const GenericType &def_val,
-                   const std::string& desc, const std::string &allowed_vals, bool inherit = false);
-
-    // Set default options according to defaults_recipe
-    void setDefaultOptions();
-
-    /// Set a recipe to populate default options
-    virtual void setDefaultOptions(const std::vector<std::string>& recipes) {}
+    void addOption(const std::string &str, const TypeID& type,
+                   const GenericType &def_val=GenericType(), const std::string& desc="n/a");
 
   protected:
 
@@ -189,16 +151,6 @@ namespace casadi {
 
     /** \brief  Description for the options */
     std::map<std::string, std::string> description_;
-
-    /** \brief  Allowed values for the options */
-    std::map<std::string, std::vector<GenericType> > allowed_vals_;
-
-    /** \brief  Enum values */
-    std::map<std::string, std::vector<int> > enum_values_;
-
-    /** \brief  Enum descriptions */
-    std::map<std::string, std::vector<std::string> > enum_descr_;
-
   };
 
 #endif // SWIG

@@ -51,24 +51,21 @@ namespace casadi {
   WorhpInterface::WorhpInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    // Monitors
-    addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions",
-              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
     addOption("print_time",         OT_BOOL,       true,
               "Print information about execution time");
     addOption("UserHM", OT_BOOL, true, "Use exact Hessian");
     addOption("qp_ipBarrier", OT_DOUBLE, GenericType(), "IP barrier parameter.");
     addOption("qp_ipComTol", OT_DOUBLE, GenericType(), "IP complementarity tolerance.");
     addOption("qp_ipFracBound", OT_DOUBLE, GenericType(), "IP fraction-to-the-boundary parameter.");
-    addOption("qp_ipLsMethod", OT_STRING, GenericType(),
-      "Select the direct linear solver used by the IP method.",
-      "LAPACK::0|MA57: only available if provided by the user:1|"
-      "SuperLU::2|PARDISO: only available if provided by the user, "
-      "subject to license availability:3|"
-      "MUMPS: currently Linux platforms only:5|"
-      "WSMP: subject to license availability:6|"
-      "MA86: experimental, only available if provided by the user:7|"
-      "MA97:experimental, only available if provided by the user:8");
+    addOption("qp_ipLsMethod", OT_INT, GenericType(),
+              "Select the direct linear solver used by the IP method. "
+              "LAPACK::0|MA57: only available if provided by the user:1|"
+              "SuperLU::2|PARDISO: only available if provided by the user, "
+              "subject to license availability:3|"
+              "MUMPS: currently Linux platforms only:5|"
+              "WSMP: subject to license availability:6|"
+              "MA86: experimental, only available if provided by the user:7|"
+              "MA97:experimental, only available if provided by the user:8");
     addOption("qp_ipMinAlpha", OT_DOUBLE, GenericType(),
               "IP line search minimum step size.");
     addOption("qp_ipTryRelax", OT_BOOL, GenericType(),
@@ -82,14 +79,14 @@ namespace casadi {
     addOption("qp_ipResTol", OT_DOUBLE, GenericType(), "IP residuals tolerance.");
     addOption("qp_lsItMaxIter", OT_INT, GenericType(),
       "Maximum number of iterations of the iterative linear solvers.");
-    addOption("qp_lsItMethod", OT_STRING, GenericType(),
-      "Select the iterative linear solver.",
-      "none:Deactivate; use a direct linear solver.:0|CGNR::1|CGNE::2|CGS::3|BiCGSTAB::4");
-    addOption("qp_lsItPrecondMethod", OT_STRING, GenericType(),
-      "Select preconditioner for the iterative linear solver.",
-      "none:No preconditioner.:0|"
-      "static:Static preconditioner (KKT-matrix with constant lower-right block).:1|"
-      "full:Full KKT-matrix.:2");
+    addOption("qp_lsItMethod", OT_INT, GenericType(),
+              "Select the iterative linear solver. "
+              "none:Deactivate; use a direct linear solver.:0|CGNR::1|CGNE::2|CGS::3|BiCGSTAB::4");
+    addOption("qp_lsItPrecondMethod", OT_INT, GenericType(),
+              "Select preconditioner for the iterative linear solver. "
+              "none:No preconditioner.:0|"
+              "static:Static preconditioner (KKT-matrix with constant lower-right block).:1|"
+              "full:Full KKT-matrix.:2");
     addOption("qp_lsRefineMaxIter", OT_INT, GenericType(),
       "Maximum number of iterative refinement steps of the direct linear solvers.");
     addOption("qp_lsScale", OT_BOOL, GenericType(),
@@ -104,23 +101,23 @@ namespace casadi {
       " i.e. for the quadratic subproblem solver."
       "If the limit is reached before convergence, "
       "WORHP will activate QP recovery strategies to prevent a solver breakdown.");
-    addOption("qp_method", OT_STRING, GenericType(),
-      "Select the solution method used by the QP solver.",
-      "ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|"
-      "automatic: Prefer IP and fall back to NSN on error.:12");
+    addOption("qp_method", OT_INT, GenericType(),
+              "Select the solution method used by the QP solver. "
+              "ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|"
+              "automatic: Prefer IP and fall back to NSN on error.:12");
     addOption("qp_nsnBeta", OT_DOUBLE, GenericType(), "NSN stepsize decrease factor.");
     addOption("qp_nsnGradStep", OT_BOOL, GenericType(),
       "Enable gradient steps in the NSN method.");
     addOption("qp_nsnKKT", OT_DOUBLE, GenericType(), "NSN KKT tolerance.");
-    addOption("qp_nsnLsMethod", OT_STRING, GenericType(),
-      "Select the direct linear solver used by the NSN method.",
-      "SuperLU::2|MA48: only available if provided by the user:4");
+    addOption("qp_nsnLsMethod", OT_INT, GenericType(),
+              "Select the direct linear solver used by the NSN method. "
+              "SuperLU::2|MA48: only available if provided by the user:4");
     addOption("qp_nsnMinAlpha", OT_DOUBLE, GenericType(),
               "NSN line search minimum step size.");
     addOption("qp_nsnSigma", OT_DOUBLE, GenericType(), "NSN line search slope parameter.");
-    addOption("qp_printLevel", OT_STRING, GenericType(),
-      "Controls the amount of QP solver output.",
-      "none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2");
+    addOption("qp_printLevel", OT_INT, GenericType(),
+              "Controls the amount of QP solver output. "
+              "none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2");
     addOption("qp_scaleIntern", OT_BOOL, GenericType(), "Enable scaling on QP level.");
     addOption("qp_strict", OT_BOOL, GenericType(),
               "Use strict termination criteria in IP method.");
@@ -218,7 +215,7 @@ namespace casadi {
     if (hasSetOption("qp_ipBarrier")) m.worhp_p.qp.ipBarrier = option("qp_ipBarrier");
     if (hasSetOption("qp_ipComTol")) m.worhp_p.qp.ipComTol = option("qp_ipComTol");
     if (hasSetOption("qp_ipFracBound")) m.worhp_p.qp.ipFracBound = option("qp_ipFracBound");
-    if (hasSetOption("qp_ipLsMethod")) m.worhp_p.qp.ipLsMethod = optionEnumValue("qp_ipLsMethod");
+    if (hasSetOption("qp_ipLsMethod")) m.worhp_p.qp.ipLsMethod = option("qp_ipLsMethod");
     if (hasSetOption("qp_ipMinAlpha")) m.worhp_p.qp.ipMinAlpha = option("qp_ipMinAlpha");
     if (hasSetOption("qp_ipTryRelax")) m.worhp_p.qp.ipTryRelax = option("qp_ipTryRelax");
     if (hasSetOption("qp_ipRelaxDiv")) m.worhp_p.qp.ipRelaxDiv = option("qp_ipRelaxDiv");
@@ -227,24 +224,24 @@ namespace casadi {
     if (hasSetOption("qp_ipRelaxMin")) m.worhp_p.qp.ipRelaxMin = option("qp_ipRelaxMin");
     if (hasSetOption("qp_ipResTol")) m.worhp_p.qp.ipResTol = option("qp_ipResTol");
     if (hasSetOption("qp_lsItMaxIter")) m.worhp_p.qp.lsItMaxIter = option("qp_lsItMaxIter");
-    if (hasSetOption("qp_lsItMethod")) m.worhp_p.qp.lsItMethod = optionEnumValue("qp_lsItMethod");
+    if (hasSetOption("qp_lsItMethod")) m.worhp_p.qp.lsItMethod = option("qp_lsItMethod");
     if (hasSetOption("qp_lsItPrecondMethod"))
-        m.worhp_p.qp.lsItPrecondMethod = optionEnumValue("qp_lsItPrecondMethod");
+      m.worhp_p.qp.lsItPrecondMethod = option("qp_lsItPrecondMethod");
     if (hasSetOption("qp_lsRefineMaxIter"))
         m.worhp_p.qp.lsRefineMaxIter = option("qp_lsRefineMaxIter");
     if (hasSetOption("qp_lsScale")) m.worhp_p.qp.lsScale = option("qp_lsScale");
     if (hasSetOption("qp_lsTrySimple")) m.worhp_p.qp.lsTrySimple = option("qp_lsTrySimple");
     if (hasSetOption("qp_lsTol")) m.worhp_p.qp.lsTol = option("qp_lsTol");
     if (hasSetOption("qp_maxIter")) m.worhp_p.qp.maxIter = option("qp_maxIter");
-    if (hasSetOption("qp_method")) m.worhp_p.qp.method = optionEnumValue("qp_method");
+    if (hasSetOption("qp_method")) m.worhp_p.qp.method = option("qp_method");
     if (hasSetOption("qp_nsnBeta")) m.worhp_p.qp.nsnBeta = option("qp_nsnBeta");
     if (hasSetOption("qp_nsnGradStep")) m.worhp_p.qp.nsnGradStep = option("qp_nsnGradStep");
     if (hasSetOption("qp_nsnKKT")) m.worhp_p.qp.nsnKKT = option("qp_nsnKKT");
     if (hasSetOption("qp_nsnLsMethod"))
-        m.worhp_p.qp.nsnLsMethod = optionEnumValue("qp_nsnLsMethod");
+      m.worhp_p.qp.nsnLsMethod = option("qp_nsnLsMethod");
     if (hasSetOption("qp_nsnMinAlpha")) m.worhp_p.qp.nsnMinAlpha = option("qp_nsnMinAlpha");
     if (hasSetOption("qp_nsnSigma")) m.worhp_p.qp.nsnSigma = option("qp_nsnSigma");
-    if (hasSetOption("qp_printLevel")) m.worhp_p.qp.printLevel = optionEnumValue("qp_printLevel");
+    if (hasSetOption("qp_printLevel")) m.worhp_p.qp.printLevel = option("qp_printLevel");
     if (hasSetOption("qp_scaleIntern")) m.worhp_p.qp.scaleIntern = option("qp_scaleIntern");
     if (hasSetOption("qp_strict")) m.worhp_p.qp.strict = option("qp_strict");
     if (hasSetOption("Ares")) {

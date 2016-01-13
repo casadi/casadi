@@ -69,9 +69,6 @@ namespace casadi {
               "IDAS scaling on cj for the user-defined linear solver module");
     addOption("extra_fsens_calc_ic",         OT_BOOL,          false,
               "Call calc ic an extra time, with fsens=0");
-    addOption("monitor",                     OT_STRINGVECTOR,     GenericType(), "",
-              "correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB|psetup",
-              true);
     addOption("init_xdot",                   OT_DOUBLEVECTOR,       GenericType(),
               "Initial values for the state derivatives");
   }

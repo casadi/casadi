@@ -97,10 +97,6 @@ namespace casadi {
               "Which variables to print.");
     addOption("print_time",        OT_BOOL, true,
               "Print information about execution time");
-
-    // Monitors
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
-              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
   }
 
 

@@ -63,8 +63,7 @@ namespace casadi {
     ops.setToDefault();
 
     addOption("printLevel",             OT_STRING,  PrintLevel_to_string(ops.printLevel),
-              "Defines the amount of text output during QP solution, "
-              "see Section 5.7", "none|low|medium|high");
+              "Defines the amount of text output during QP solution, see Section 5.7");
     addOption("enableRamping",          OT_BOOL, BooleanType_to_bool(ops.enableRamping),
               "Enables ramping.");
     addOption("enableFarBounds",        OT_BOOL, BooleanType_to_bool(ops.enableFarBounds),
@@ -110,9 +109,7 @@ namespace casadi {
     addOption("growFarBounds",          OT_DOUBLE, static_cast<double>(ops.growFarBounds),
               "Factor to grow far bounds.");
     addOption("initialStatusBounds", OT_STRING, SubjectToStatus_to_string(ops.initialStatusBounds),
-              "Initial status of bounds at first iteration.",
-              "inactive::all bounds inactive|lower::all bounds active at their "
-              "lower bound|upper::all bounds active at their upper bound");
+              "Initial status of bounds at first iteration.");
     addOption("epsFlipping",            OT_DOUBLE, static_cast<double>(ops.epsFlipping),
               "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound.");
     addOption("numRegularisationSteps", OT_INT, static_cast<int>(ops.numRegularisationSteps),

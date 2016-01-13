@@ -55,13 +55,11 @@ namespace casadi {
                                  const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
 
-    addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
-              "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
+    addOption("qp_method",    OT_INT, 0, "Determines which CPLEX algorithm to use.");
     addOption("dump_to_file",   OT_BOOL,        false, "Dumps QP to file in CPLEX format.");
     addOption("dump_filename",   OT_STRING,     "qp.dat", "The filename to dump to.");
     addOption("tol",               OT_DOUBLE,         1E-6, "Tolerance of solver");
-    addOption("dep_check",      OT_STRING,         "off", "Detect redundant constraints.",
-              "automatic:-1|off:0|begin:1|end:2|both:3");
+    addOption("dep_check",      OT_INT,         0, "Detect redundant constraints.");
     addOption("simplex_maxiter", OT_INT,   2100000000, "Maximum number of simplex iterations.");
     addOption("barrier_maxiter", OT_INT,   2100000000, "Maximum number of barrier iterations.");
     addOption("warm_start",      OT_BOOL,        false,
@@ -73,7 +71,7 @@ namespace casadi {
     // Call the init method of the base class
     Qpsol::init(opts);
 
-    qp_method_     = optionEnumValue("qp_method");
+    qp_method_     = option("qp_method");
     dump_to_file_  = option("dump_to_file");
     tol_           = option("tol");
     //  dump_filename_ = option("dump_filename");
@@ -122,7 +120,7 @@ namespace casadi {
       status = CPXsetintparam(m.env, CPX_PARAM_QPMETHOD, qp_method_);
     }
     // Setting dependency check option
-    status = CPXsetintparam(m.env, CPX_PARAM_DEPIND, optionEnumValue("dep_check"));
+    status = CPXsetintparam(m.env, CPX_PARAM_DEPIND, option("dep_check"));
     // Setting barrier iteration limit
     status = CPXsetintparam(m.env, CPX_PARAM_BARITLIM, option("barrier_maxiter"));
     // Setting simplex iteration limit

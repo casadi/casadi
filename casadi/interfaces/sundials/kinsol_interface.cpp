@@ -77,13 +77,11 @@ namespace casadi {
     addOption("iterative_solver",         OT_STRING, "gmres", "gmres|bcgstab|tfqmr");
     addOption("f_scale",                  OT_DOUBLEVECTOR);
     addOption("u_scale",                  OT_DOUBLEVECTOR);
-    addOption("pretype",                  OT_STRING, "none", "", "none|left|right|both");
+    addOption("pretype",                  OT_STRING, "none", "");
     addOption("use_preconditioner",       OT_BOOL, false); // precondition an iterative solver
-    addOption("strategy",                 OT_STRING, "none", "Globalization strategy",
-              "none|linesearch");
+    addOption("strategy",                 OT_STRING, "none", "Globalization strategy");
     addOption("disable_internal_warnings",   OT_BOOL, false,
               "Disable KINSOL internal warning messages");
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
 
     u_scale_ = 0;
     f_scale_ = 0;

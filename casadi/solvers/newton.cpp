@@ -53,8 +53,6 @@ namespace casadi {
               "Stopping criterion tolerance on step size");
     addOption("max_iter",  OT_INT, 1000,
               "Maximum number of Newton iterations to perform before returning.");
-    addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
-
     addOption("print_iteration", OT_BOOL, false,
               "Print information about each iteration");
   }

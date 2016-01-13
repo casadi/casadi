@@ -77,8 +77,6 @@ namespace casadi {
               "Print out timing information about "
               "the different stages of initialization");
 
-    addOption("defaults_recipes",    OT_STRINGVECTOR, GenericType(), "",
-                                                       "qp", true);
     // Set default options
     callback_step_ = 1;
     eval_errors_fatal_ = false;

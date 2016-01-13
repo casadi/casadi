@@ -84,10 +84,6 @@ namespace casadi {
               "Print the header with problem statistics");
     addOption("min_step_size",     OT_DOUBLE,   1e-10,
               "The size (inf-norm) of the step size should not become smaller than this.");
-
-    // Monitors
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
-              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx|bfgs", true);
     addOption("print_time",         OT_BOOL,       true,
               "Print information about execution time");
   }

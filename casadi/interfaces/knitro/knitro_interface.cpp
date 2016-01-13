@@ -50,10 +50,6 @@ namespace casadi {
   KnitroInterface::KnitroInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    // Monitors
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
-              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
-
     // Not yet ready
     //addOption("algorithm",                OT_STRING, GenericType(),
     // "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");

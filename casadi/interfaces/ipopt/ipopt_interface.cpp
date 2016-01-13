@@ -61,11 +61,6 @@ namespace casadi {
     addOption("pass_nonlinear_variables", OT_BOOL, false);
     addOption("print_time",               OT_BOOL, true,
               "print information about execution time");
-
-    // Monitors
-    addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "",
-              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
-
     addOption("ipopt",                    OT_DICT, GenericType(),
               "Options to be passed to IPOPT");
 
@@ -570,9 +565,6 @@ namespace casadi {
     for (auto&& op : con_integer_md_) con_integer_md[op.first] = op.second;
     for (auto&& op : con_numeric_md_) con_numeric_md[op.first] = op.second;
     return true;
-  }
-
-  void IpoptInterface::setDefaultOptions(const std::vector<std::string>& recipes) {
   }
 
   IpoptMemory::IpoptMemory() {

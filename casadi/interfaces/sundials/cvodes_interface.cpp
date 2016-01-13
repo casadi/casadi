@@ -50,13 +50,11 @@ namespace casadi {
     : SundialsInterface(name, dae) {
 
     addOption("linear_multistep_method",          OT_STRING,              "bdf",
-              "Integrator scheme", "bdf|adams");
+              "Integrator scheme");
     addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",
-              "", "newton|functional");
+              "");
     addOption("fsens_all_at_once",                OT_BOOL,             true,
               "Calculate all right hand sides of the sensitivity equations at once");
-    addOption("monitor",                          OT_STRINGVECTOR,        GenericType(),
-              "", "res|resB|resQB|reset|psetupB|djacB", true);
   }
 
   CvodesInterface::~CvodesInterface() {

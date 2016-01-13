@@ -80,7 +80,7 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_in_(f.n_in()), n_out_(f.n_out()), n_(n) {
 
     addOption("parallelization", OT_STRING, "serial",
-              "Computational strategy for parallelization", "serial|openmp");
+              "Computational strategy for parallelization");
     addOption("reduced_inputs", OT_INTVECTOR, GenericType(),
               "Reduction for certain inputs");
     addOption("reduced_outputs", OT_INTVECTOR, GenericType(),

@@ -150,8 +150,7 @@ namespace casadi {
                     const std::vector<MatType>& inputv,
                     const std::vector<MatType>& outputv)
     : FunctionInternal(name), inputv_(inputv),  outputv_(outputv) {
-    addOption("topological_sorting", OT_STRING, "depth-first", "Topological sorting algorithm",
-              "depth-first|breadth-first");
+    addOption("topological_sorting", OT_STRING, "depth-first", "Topological sorting algorithm");
     addOption("live_variables", OT_BOOL, true, "Reuse variables in the work vector");
 
     // Make sure that inputs are symbolic

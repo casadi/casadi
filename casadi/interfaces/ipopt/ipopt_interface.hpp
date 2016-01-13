@@ -144,9 +144,6 @@ namespace casadi {
     // Solve the NLP
     virtual void solve(Memory& mem) const;
 
-    /// Set default options for a given recipe
-    virtual void setDefaultOptions(const std::vector<std::string>& recipes);
-
     /// Exact Hessian?
     bool exact_hessian_;
 
