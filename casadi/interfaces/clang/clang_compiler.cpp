@@ -76,14 +76,19 @@ namespace casadi {
   }
 
   void ClangCompiler::init(const Dict& opts) {
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="include_path") {
+        include_path_ = op.second.to_string();
+      } else if (op.first=="flags") {
+        flags_ = op.second;
+      }
+    }
+
     // Arguments to pass to the clang frontend
     vector<const char *> args(1, name_.c_str());
-    std::vector<std::string> flags;
-    if (hasSetOption("flags")) {
-      flags = option("flags");
-      for (auto i=flags.begin(); i!=flags.end(); ++i) {
-        args.push_back(i->c_str());
-      }
+    for (auto&& f : flags_) {
+      args.push_back(f.c_str());
     }
 
     // Create the compiler instance
@@ -179,7 +184,7 @@ namespace casadi {
 
     // Search path
     std::stringstream paths;
-    paths << option("include_path").to_string() << pathsep;
+    paths << include_path_ << pathsep;
     std::string path;
     while (std::getline(paths, path, pathsep)) {
       compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);
