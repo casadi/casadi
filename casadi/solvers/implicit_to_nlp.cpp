@@ -57,6 +57,19 @@ namespace casadi {
     // Call the base class initializer
     Rootfinder::init(opts);
 
+    // Default options
+    string nlpsol_plugin;
+    Dict nlpsol_options;
+
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="nlpsol") {
+        nlpsol_plugin = op.second.to_string();
+      } else if (op.first=="nlpsol_options") {
+        nlpsol_options = op.second;
+      }
+    }
+
     // Free variable in the NLP
     MX u = MX::sym("u", sparsity_in(iin_));
 
@@ -84,10 +97,9 @@ namespace casadi {
     // We're going to use two-argument objective and constraints to allow the use of parameters
     MXDict nlp = {{"x", u}, {"p", p}, {"f", nlp_f}, {"g", nlp_g}};
 
-    Dict options;
-    if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");
     // Create an Nlpsol instance
-    solver_ = nlpsol("nlpsol", option("nlpsol"), nlp, options);
+    casadi_assert_message(!nlpsol_plugin.empty(), "'nlpsol' option has not been set");
+    solver_ = nlpsol("nlpsol", nlpsol_plugin, nlp, nlpsol_options);
     alloc(solver_);
 
     // Allocate storage for variable bounds

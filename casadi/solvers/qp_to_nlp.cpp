@@ -57,6 +57,19 @@ namespace casadi {
     // Initialize the base classes
     Qpsol::init(opts);
 
+    // Default options
+    string nlpsol_plugin;
+    Dict nlpsol_options;
+
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="nlpsol") {
+        nlpsol_plugin = op.second.to_string();
+      } else if (op.first=="nlpsol_options") {
+        nlpsol_options = op.second;
+      }
+    }
+
     // Create a symbolic matrix for the decision variables
     SX X = SX::sym("X", n_, 1);
 
@@ -73,14 +86,12 @@ namespace casadi {
 
     // The nlp looks exactly like a mathematical description of the NLP
     SXDict nlp = {{"x", X}, {"p", vertcat(par)},
-                  {"f", mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X)}, {"g", mtimes(A, X)}};
-
-    Dict options;
-    if (hasSetOption("nlpsol_options")) options = option("nlpsol_options");
-    //options = OptionsFunctionality::addOptionRecipe(options, "qp");
+                  {"f", mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X)},
+                  {"g", mtimes(A, X)}};
 
     // Create an Nlpsol instance
-    solver_ = nlpsol("nlpsol", option("nlpsol"), nlp, options);
+    casadi_assert_message(!nlpsol_plugin.empty(), "'nlpsol' option has not been set");
+    solver_ = nlpsol("nlpsol", nlpsol_plugin, nlp, nlpsol_options);
     alloc(solver_);
 
     // Allocate storage for NLP solver  parameters
