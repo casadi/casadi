@@ -70,15 +70,22 @@ namespace casadi {
     addOption("abstol",                   OT_DOUBLE, 1e-6, "Stopping criterion tolerance");
     addOption("linear_solver_type",       OT_STRING, "dense",
               "dense|banded|iterative|user_defined");
-    addOption("upper_bandwidth",          OT_INT);
-    addOption("lower_bandwidth",          OT_INT);
-    addOption("max_krylov",               OT_INT, 0);
-    addOption("exact_jacobian",           OT_BOOL, true);
+    addOption("upper_bandwidth",          OT_INT, GenericType(),
+              "Upper bandwidth for banded linear solvers");
+    addOption("lower_bandwidth",          OT_INT, GenericType(),
+              "Lower bandwidth for banded linear solvers");
+    addOption("max_krylov",               OT_INT, 0,
+              "Maximum Krylov space dimension");
+    addOption("exact_jacobian",           OT_BOOL, true,
+              "Use exact Jacobian information");
     addOption("iterative_solver",         OT_STRING, "gmres", "gmres|bcgstab|tfqmr");
-    addOption("f_scale",                  OT_DOUBLEVECTOR);
-    addOption("u_scale",                  OT_DOUBLEVECTOR);
-    addOption("pretype",                  OT_STRING, "none", "");
-    addOption("use_preconditioner",       OT_BOOL, false); // precondition an iterative solver
+    addOption("f_scale",                  OT_DOUBLEVECTOR, GenericType(),
+              "Equation scaling factors");
+    addOption("u_scale",                  OT_DOUBLEVECTOR, GenericType(),
+              "Variable scaling factors");
+    addOption("pretype",                  OT_STRING, "none", "Type of preconditioner");
+    addOption("use_preconditioner",       OT_BOOL, false,
+              "Precondition an iterative solver");
     addOption("strategy",                 OT_STRING, "none", "Globalization strategy");
     addOption("disable_internal_warnings",   OT_BOOL, false,
               "Disable KINSOL internal warning messages");

@@ -107,7 +107,7 @@ namespace casadi {
 
 
     void addOption(const std::string &str, const TypeID& type,
-                   const GenericType &def_val=GenericType(), const std::string& desc="n/a");
+                   const GenericType &def_val, const std::string& desc);
 
   protected:
 

@@ -51,7 +51,7 @@ namespace casadi {
     : Nlpsol(name, nlp) {
 
     addOption("knitro", OT_DICT, GenericType(), "Options to be passed to KNITRO");
-    addOption("contype", OT_INTVECTOR);
+    addOption("contype", OT_INTVECTOR, GenericType(), "Type of constraint");
   }
 
 

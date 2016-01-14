@@ -58,7 +58,8 @@ namespace casadi {
   IpoptInterface::IpoptInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    addOption("pass_nonlinear_variables", OT_BOOL, false);
+    addOption("pass_nonlinear_variables", OT_BOOL, false,
+              "Pass list of variables entering nonlinearly to IPOPT");
     addOption("print_time",               OT_BOOL, true,
               "print information about execution time");
     addOption("ipopt",                    OT_DICT, GenericType(),

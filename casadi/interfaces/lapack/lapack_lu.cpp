@@ -49,8 +49,9 @@ namespace casadi {
     : Linsol(name, sparsity, nrhs) {
 
     // Equilibrate the matrix
-    addOption("equilibration", OT_BOOL, true);
-    addOption("allow_equilibration_failure", OT_BOOL, false);
+    addOption("equilibration", OT_BOOL, true, "Equilibrate the matrix");
+    addOption("allow_equilibration_failure", OT_BOOL, false,
+              "Non-fatal error when equilibration fails");
 
     // Default options
     equilibriate_ = true;

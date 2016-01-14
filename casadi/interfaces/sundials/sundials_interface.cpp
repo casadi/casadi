@@ -56,7 +56,8 @@ namespace casadi {
     addOption("max_krylov",                  OT_INT,          10,
               "Maximum Krylov subspace size");
     addOption("sensitivity_method",          OT_STRING,           "simultaneous", "");
-    addOption("max_multistep_order",         OT_INT,          5);
+    addOption("max_multistep_order",         OT_INT,          5,
+              "Maximum order for the (variable-order) multistep method");
     addOption("use_preconditioner",          OT_BOOL,          false,
               "Precondition an iterative solver");
     addOption("use_preconditionerB",         OT_BOOL,          GenericType(),
