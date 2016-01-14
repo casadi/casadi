@@ -61,9 +61,18 @@ namespace casadi {
     // Call the base class initializer
     Linsol::init(opts);
 
+    // Default options
+    bool codegen = false;
+    string compiler = "gcc -fPIC -O2";
+
     // Read options
-    bool codegen = option("codegen");
-    string compiler = option("compiler");
+    for (auto&& op : opts) {
+      if (op.first=="codegen") {
+        codegen = op.second;
+      } else if (op.first=="compiler") {
+        compiler = op.second.to_string();
+      }
+    }
 
     // Make sure that command processor is available
     if (codegen) {
