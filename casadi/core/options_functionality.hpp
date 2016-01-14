@@ -56,12 +56,6 @@ namespace casadi {
     OptionsFunctionalityNode();
     virtual ~OptionsFunctionalityNode();
 
-    /** \brief  set an option. */
-  private:
-    void setOption(const std::string &str, const GenericType& val);
-  public:
-    void setOption(const Dict& dict, bool skipUnknown = false);
-
     /** \brief Get a list of all option names */
     std::vector<std::string> optionNames() const;
 
@@ -74,14 +68,8 @@ namespace casadi {
     /** \brief Get the type name of a certain option */
     std::string optionTypeName(const std::string &str) const;
 
-    /** \brief Get the default of a certain option */
-    GenericType optionDefault(const std::string &str) const;
-
     /** \brief  check if there is an option str */
     bool hasOption(const std::string &str) const;
-
-    /** \brief  check if the user has there is an option str */
-    bool hasSetOption(const std::string &str) const;
 
     /** \brief  Print options to a stream */
     void printOptions(std::ostream &stream=casadi::userOut()) const;
@@ -89,19 +77,11 @@ namespace casadi {
     /** \brief  Print all information there is to know about a certain option */
     void printOption(const std::string &name, std::ostream &stream = userOut()) const;
 
-//  private:
-    /** \brief  get an option value */
-    GenericType option(const std::string &str) const;
-//  public:
-
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const = 0;
 
     /** \brief  Print representation */
     virtual void repr(std::ostream &stream) const = 0;
-
-    /** \brief  Get the dictionary */
-    const Dict& dictionary() const;
 
     /** \brief Get the best suggestions for a misspelled word using a dictionary
      *
@@ -133,21 +113,10 @@ namespace casadi {
 
     void assert_exists(const std::string &str) const;
 
-
-    /** \brief Sets the default value for an option without changing the current value
-     */
-    void setDefault(const std::string &str, const GenericType &def_val);
-
   private:
 
     /** \brief  Allowed options  */
     std::map<std::string, TypeID> allowed_options;
-
-    /** \brief  User-set options */
-    Dict dictionary_;
-
-    /** \brief  Option defaults */
-    Dict defaults_;
 
     /** \brief  Description for the options */
     std::map<std::string, std::string> description_;

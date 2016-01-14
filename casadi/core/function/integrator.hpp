@@ -192,6 +192,9 @@ namespace casadi {
     // Augmented user option
     Dict augmented_options_;
 
+    // Copy of the options
+    Dict opts_;
+
     // Dae
     XProblem dae_;
 

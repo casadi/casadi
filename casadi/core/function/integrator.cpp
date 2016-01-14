@@ -205,6 +205,9 @@ namespace casadi {
       }
     }
 
+    // Store a copy of the options, for creating augmented integrators
+    opts_ = opts;
+
     // If grid unset, default to [t0, tf]
     if (grid_.empty()) {
       grid_ = {t0, tf};
@@ -930,10 +933,8 @@ namespace casadi {
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
-    if (hasSetOption("augmented_options")) {
-      for (auto&& i : augmented_options_) {
-        aug_opts[i.first] = i.second;
-      }
+    for (auto&& i : augmented_options_) {
+      aug_opts[i.first] = i.second;
     }
 
     // Temp stringstream
@@ -1262,7 +1263,7 @@ namespace casadi {
 
   Dict Integrator::getDerivativeOptions(bool fwd) {
     // Copy all options
-    return dictionary();
+    return opts_;
   }
 
   Sparsity Integrator::spJacF() {

@@ -163,7 +163,6 @@ namespace casadi {
       return construct(mod_opts);
     }
 
-    setOption(opts);
     init(opts);
     finalize();
   }
