@@ -108,9 +108,11 @@ namespace casadi {
      */
     void construct(const Dict& opts);
 
+    ///@{
     /** \brief Options */
     static Options options_;
     virtual const Options& get_options() const { return options_;}
+    ///@}
 
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation.
