@@ -37,6 +37,23 @@ using namespace std;
 
 namespace casadi {
 
+  const Options::Entry* Options::find(const std::string& name) const {
+    // Check if in one of the bases
+    for (auto&& b : bases) {
+      // Call recursively
+      const Options::Entry* entry = b->find(name);
+      if (entry) return entry;
+    }
+
+    // Lookup in this class
+    auto it = entries.find(name);
+    if (it!=entries.end()) {
+      return &it->second;
+    } else {
+      return 0;
+    }
+  }
+
   double OptionsFunctionality::wordDistance(const std::string &a, const std::string &b) {
     /// Levenshtein edit distance
     if (a == b) return 0;

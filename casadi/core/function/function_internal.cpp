@@ -38,10 +38,6 @@ using namespace std;
 
 namespace casadi {
   FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
-    for (auto&& op : options_.entries) {
-      addOption(op.first, op.second.type, op.second.description);
-    }
-
     // Default options (can be overridden in derived classes)
     verbose_ = false;
     // By default, reverse mode is about twice as expensive as forward mode
@@ -126,9 +122,20 @@ namespace casadi {
       return construct(mod_opts);
     }
 
+    // Get a reference to the options structure
+    const Options& options = get_options();
+
     // Make sure all options exist and have the correct type
     for (auto&& op : opts) {
-      // Lookup option
+      // Find an option
+      const Options::Entry* entry = options.find(op.first);
+      if (entry) {
+        casadi_assert_message(op.second.can_cast_to(entry->type),
+                              "Illegal type for " + op.first);
+        continue;
+      }
+
+      // Legacy design
       casadi_assert_message(hasOption(op.first), "No such option: " + op.first);
       casadi_assert_message(op.second.can_cast_to(optionType(op.first)),
                             "Illegal type for " + op.first);

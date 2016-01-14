@@ -47,6 +47,9 @@ namespace casadi {
 
     // Lookup for options
     std::map<std::string, Entry> entries;
+
+    // Locate an entry
+    const Options::Entry* find(const std::string& name) const;
   };
 
   /** \brief Provides options functionality to a derived class
