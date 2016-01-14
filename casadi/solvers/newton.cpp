@@ -65,21 +65,29 @@ namespace casadi {
     // Call the base class initializer
     Rootfinder::init(opts);
 
+    // Default options
+    max_iter_ = 1000;
+    abstol_ = 1e-12;
+    abstolStep_ = 1e-12;
+    print_iteration_ = false;
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="max_iter") {
+        max_iter_ = op.second;
+      } else if (op.first=="abstol") {
+        abstol_ = op.second;
+      } else if (op.first=="abstolStep") {
+        abstolStep_ = op.second;
+      } else if (op.first=="print_iteration") {
+        print_iteration_ = op.second;
+      }
+    }
+
     casadi_assert_message(f_.n_in()>0,
                           "Newton: the supplied f must have at least one input.");
     casadi_assert_message(!linsol_.isNull(),
                           "Newton::init: linear_solver must be supplied");
-
-    if (hasSetOption("max_iter"))
-      max_iter_ = option("max_iter");
-
-    if (hasSetOption("abstol"))
-      abstol_ = option("abstol");
-
-    if (hasSetOption("abstolStep"))
-      abstolStep_ = option("abstolStep");
-
-    print_iteration_ = option("print_iteration");
 
     // Allocate memory
     alloc_w(n_, true); // x
