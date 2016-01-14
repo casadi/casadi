@@ -72,11 +72,21 @@ namespace casadi {
   }
 
   void ShellCompiler::init(const Dict& opts) {
-    // Read options
-    string compiler = option("compiler").to_string();
-    string compiler_setup = option("compiler_setup").to_string();
+    // Default options
+    string compiler = "gcc";
+    string compiler_setup = "-fPIC -shared";
     vector<string> flags;
-    if (hasSetOption("flags")) flags = option("flags");
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="compiler") {
+        compiler = op.second.to_string();
+      } else if (op.first=="compiler_setup") {
+        compiler_setup = op.second.to_string();
+      } else if (op.first=="flags") {
+        flags = op.second;
+      }
+    }
 
     // Construct the compiler command
     stringstream cmd;
