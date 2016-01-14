@@ -107,44 +107,87 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
-    // Read options
-    max_iter_ = option("max_iter");
-    max_iter_ls_ = option("max_iter_ls");
-    c1_ = option("c1");
-    beta_ = option("beta");
-    lbfgs_memory_ = option("lbfgs_memory");
-    tol_pr_ = option("tol_pr");
-    tol_du_ = option("tol_du");
-    tol_reg_ = option("tol_reg");
-    regularize_ = option("regularize");
-    codegen_ = option("codegen");
-    reg_threshold_ = option("reg_threshold");
-    print_time_ = option("print_time");
-    tol_pr_step_ = option("tol_pr_step");
-    merit_memsize_ = option("merit_memsize");
-    merit_start_ = option("merit_start");
-    string compiler = option("compiler");
-    gauss_newton_ = option("hessian_approximation") == "gauss-newton";
+    // Default options
+    max_iter_ = 50;
+    max_iter_ls_ = 1;
+    c1_ = 1e-4;
+    beta_ = 0.8;
+    lbfgs_memory_ = 10;
+    tol_pr_ = 1e-6;
+    tol_du_ = 1e-6;
+    tol_reg_ = 1e-11;
+    regularize_ = false;
+    codegen_ = false;
+    reg_threshold_ = 1e-8;
+    print_time_ = true;
+    tol_pr_step_ = 1e-6;
+    merit_memsize_ = 4;
+    merit_start_ = 1e-8;
+    string hessian_approximation = "exact";
+    string qpsol_plugin;
+    Dict qpsol_options;
+    print_header_ = true;
 
-    // Name the components
-    if (hasSetOption("name_x")) {
-      name_x_ = option("name_x");
-      casadi_assert(name_x_.size()==nx_);
-    } else {
-      stringstream ss;
-      name_x_.resize(nx_);
-      for (int i=0; i<nx_; ++i) {
-        ss.str(string());
-        ss << "x" << i;
-        name_x_[i] = ss.str();
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="max_iter") {
+        max_iter_ = op.second;
+      } else if (op.first=="max_iter_ls") {
+        max_iter_ls_ = op.second;
+      } else if (op.first=="c1") {
+        c1_ = op.second;
+      } else if (op.first=="beta") {
+        beta_ = op.second;
+      } else if (op.first=="lbfgs_memory") {
+        lbfgs_memory_ = op.second;
+      } else if (op.first=="tol_pr") {
+        tol_pr_ = op.second;
+      } else if (op.first=="tol_du") {
+        tol_du_ = op.second;
+      } else if (op.first=="tol_reg") {
+        tol_reg_ = op.second;
+      } else if (op.first=="regularize") {
+        regularize_ = op.second;
+      } else if (op.first=="codegen") {
+        codegen_ = op.second;
+      } else if (op.first=="reg_threshold") {
+        reg_threshold_ = op.second;
+      } else if (op.first=="print_time") {
+        print_time_ = op.second;
+      } else if (op.first=="tol_pr_step") {
+        tol_pr_step_ = op.second;
+      } else if (op.first=="merit_memsize") {
+        merit_memsize_ = op.second;
+      } else if (op.first=="merit_start") {
+        merit_start_ = op.second;
+      } else if (op.first=="hessian_approximation") {
+        hessian_approximation = op.second.to_string();
+      } else if (op.first=="name_x") {
+        name_x_ = op.second;
+      } else if (op.first=="print_x") {
+        print_x_ = op.second;
+      } else if (op.first=="qpsol") {
+        qpsol_plugin = op.second.to_string();
+      } else if (op.first=="qpsol_options") {
+        qpsol_options = op.second;
+      } else if (op.first=="print_header") {
+        print_header_ = op.second;
       }
     }
 
-    // Components to print
-    if (hasSetOption("print_x")) {
-      print_x_ = option("print_x");
+    // Gauss-Newton Hessian?
+    gauss_newton_ = hessian_approximation == "gauss-newton";
+
+    // Name the components
+    if (name_x_.empty()) {
+      name_x_.resize(nx_);
+      for (int i=0; i<nx_; ++i) {
+        stringstream ss;
+        ss << "x" << i;
+        name_x_[i] = ss.str();
+      }
     } else {
-      print_x_.resize(0);
+      casadi_assert(name_x_.size()==nx_);
     }
 
     // Generate lifting functions
@@ -528,17 +571,11 @@ namespace casadi {
       exp_fcn_ = exp_fcn;
     }
 
-    // QP solver options
-    Dict qpsol_options;
-    if (hasSetOption("qpsol_options")) {
-      qpsol_options = option("qpsol_options");
-    }
-
     // Allocate a QP solver
     spL_ = mat_fcn_.sparsity_out(mat_hes_);
     spH_ = mtimes(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
-    qpsol_ = qpsol("qpsol", option("qpsol"), {{"h", spH_}, {"a", spA_}},
+    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
                    qpsol_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
@@ -549,7 +586,7 @@ namespace casadi {
     }
 
     // Header
-    if (static_cast<bool>(option("print_header"))) {
+    if (print_header_) {
       userOut() << "-------------------------------------------" << endl;
       userOut() << "This is casadi::SCPgen." << endl;
       if (gauss_newton_) {

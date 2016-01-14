@@ -267,6 +267,9 @@ namespace casadi {
     // QP sparsity
     Sparsity spH_, spA_, spL_;
 
+    // Print options
+    bool print_header_;
+
     /// A documentation string
     static const std::string meta_doc;
   };
