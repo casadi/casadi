@@ -108,6 +108,9 @@ namespace casadi {
      */
     void construct(const Dict& opts);
 
+    /** \brief Options */
+    static Options options_;
+
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation.
         This method is typically called after setting options but before evaluating.

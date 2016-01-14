@@ -35,6 +35,20 @@ namespace casadi {
 /// \cond INTERNAL
 #ifndef SWIG
 
+  struct CASADI_EXPORT Options {
+    // Base classes, whose options are also valid for the derived class
+    std::vector<Options*> bases;
+
+    // Information for a particular options entry
+    struct Entry {
+      TypeID type;
+      std::string description;
+    };
+
+    // Lookup for options
+    std::map<std::string, Entry> entries;
+  };
+
   /** \brief Provides options functionality to a derived class
       \author Joel Andersson
       \date 2010-2015
