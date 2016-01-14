@@ -126,7 +126,18 @@ namespace casadi {
       return construct(mod_opts);
     }
 
+    // Make sure all options exist and have the correct type
+    for (auto&& op : opts) {
+      // Lookup option
+      casadi_assert_message(hasOption(op.first), "No such option: " + op.first);
+      casadi_assert_message(op.second.can_cast_to(optionType(op.first)),
+                            "Illegal type for " + op.first);
+    }
+
+    // Initialize the class hierarchy
     init(opts);
+
+    // Revisit class hierarchy in reverse order
     finalize();
   }
 
