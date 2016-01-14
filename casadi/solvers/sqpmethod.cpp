@@ -55,7 +55,6 @@ namespace casadi {
   Sqpmethod::Sqpmethod(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    casadi_warning("The SQP method is under development");
     addOption("qpsol",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
     addOption("qpsol_options", OT_DICT, GenericType(),
@@ -96,18 +95,58 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
-    // Read options
-    max_iter_ = option("max_iter");
-    max_iter_ls_ = option("max_iter_ls");
-    c1_ = option("c1");
-    beta_ = option("beta");
-    merit_memsize_ = option("merit_memory");
-    lbfgs_memory_ = option("lbfgs_memory");
-    tol_pr_ = option("tol_pr");
-    tol_du_ = option("tol_du");
-    regularize_ = option("regularize");
-    exact_hessian_ = option("hessian_approximation")=="exact";
-    min_step_size_ = option("min_step_size");
+    // Default options
+    max_iter_ = 50;
+    max_iter_ls_ = 3;
+    c1_ = 1e-4;
+    beta_ = 0.8;
+    merit_memsize_ = 4;
+    lbfgs_memory_ = 10;
+    tol_pr_ = 1e-6;
+    tol_du_ = 1e-6;
+    regularize_ = false;
+    string hessian_approximation = "exact";
+    min_step_size_ = 1e-10;
+    string qpsol_plugin;
+    Dict qpsol_options;
+    print_header_ = true;
+    print_time_ = true;
+
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="max_iter") {
+        max_iter_ = op.second;
+      } else if (op.first=="max_iter_ls") {
+        max_iter_ls_ = op.second;
+      } else if (op.first=="c1") {
+        c1_ = op.second;
+      } else if (op.first=="beta") {
+        beta_ = op.second;
+      } else if (op.first=="merit_memory") {
+        merit_memsize_ = op.second;
+      } else if (op.first=="lbfgs_memory") {
+        lbfgs_memory_ = op.second;
+      } else if (op.first=="tol_pr") {
+        tol_pr_ = op.second;
+      } else if (op.first=="tol_du") {
+        tol_du_ = op.second;
+      } else if (op.first=="hessian_approximation") {
+        hessian_approximation = op.second.to_string();
+      } else if (op.first=="min_step_size") {
+        min_step_size_ = op.second;
+      } else if (op.first=="qpsol") {
+        qpsol_plugin = op.second.to_string();
+      } else if (op.first=="qpsol_options") {
+        qpsol_options = op.second;
+      } else if (op.first=="print_header") {
+        print_header_ = op.second;
+      } else if (op.first=="print_time") {
+        print_time_ = op.second;
+      }
+    }
+
+    // Use exact Hessian?
+    exact_hessian_ = hessian_approximation =="exact";
 
     // Get/generate required functions
     setup_f();
@@ -122,15 +161,8 @@ namespace casadi {
     Hsp_ = exact_hessian_ ? hesslag_sp_ : Sparsity::dense(nx_, nx_);
     Asp_ = jac_g_fcn_.isNull() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(1);
 
-    // QP solver options
-    Dict qpsol_options;
-    if (hasSetOption("qpsol_options")) {
-      qpsol_options = option("qpsol_options");
-    }
-
     // Allocate a QP solver
-    qpsol_ = qpsol("qpsol", option("qpsol"),
-                   {{"h", Hsp_}, {"a", Asp_}},
+    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);
 
@@ -172,7 +204,7 @@ namespace casadi {
     }
 
     // Header
-    if (static_cast<bool>(option("print_header"))) {
+    if (print_header_) {
       userOut()
         << "-------------------------------------------" << endl
         << "This is casadi::SQPMethod." << endl;
@@ -580,7 +612,7 @@ namespace casadi {
     if (m.lam_x) casadi_copy(m.mu_x, nx_, m.lam_x);
     if (m.g) casadi_copy(m.gk, ng_, m.g);
 
-    if (hasOption("print_time") && static_cast<bool>(option("print_time"))) {
+    if (print_time_) {
       // Write timings
       userOut() << "time spent in eval_f: " << m.t_eval_f << " s.";
       if (m.n_eval_f>0)

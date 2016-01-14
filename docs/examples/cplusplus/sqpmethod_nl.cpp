@@ -57,10 +57,9 @@ int main(int argc, char **argv){
 
   // Specify QP solver
   opts["qpsol"]  = "nlpsol";
-  opts["qpsol_options"] =
-    Dict{{"nlpsol", "ipopt"},
-         {"nlpsol_options", Dict{{"print_level", 0},
-                                     {"print_time", 0}}}};
+  opts["qpsol_options.nlpsol"] = "ipopt";
+  opts["qpsol_options.nlpsol_options.ipopt.print_level"] = 0;
+  opts["qpsol_options.nlpsol_options.print_time"] = 0;
 
   // Allocate NLP solver and buffers
   Function solver = nlpsol("nlpsol", "sqpmethod", nlp, opts);
