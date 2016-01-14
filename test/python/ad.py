@@ -230,9 +230,9 @@ class ADtests(casadiTestCase):
           for outputtype in ["dense","sparse"]:
             self.message("eval_sx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f.setInput(n)
-            f.evaluate()
-            r = f.getOutput()
+            f_in = [0]*f.n_in();f_in[0]=n
+            f_out = f(f_in)
+            r = f_out[0]
             J = self.jacobians[inputtype][outputtype](*n)
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
@@ -249,22 +249,22 @@ class ADtests(casadiTestCase):
             
             fe = Function("fe", [y],res)
             
-            fe.setInput(n)
-            fe.evaluate()
+            fe_in = [0]*fe.n_in();fe_in[0]=n
+            fe_out = fe(fe_in)
             
-            self.checkarray(r,fe.getOutput())
+            self.checkarray(r,fe_out[0])
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
-              fe.setInput(n)
-              fe.evaluate()
-              self.checkarray(c.vec(fe.getOutput().T),mtimes(J,c.vec(seed.T)),"AD") 
+              fe_in = [0]*fe.n_in();fe_in[0]=n
+              fe_out = fe(fe_in)
+              self.checkarray(c.vec(fe_out[0].T),mtimes(J,c.vec(seed.T)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
-              fe.setInput(n)
-              fe.evaluate()
-              self.checkarray(c.vec(fe.getOutput().T),mtimes(J.T,c.vec(seed.T)),"AD")
+              fe_in = [0]*fe.n_in();fe_in[0]=n
+              fe_out = fe(fe_in)
+              self.checkarray(c.vec(fe_out[0].T),mtimes(J.T,c.vec(seed.T)),"AD")
 
   def test_MXeval_sx_reduced(self):
     n=array([1.2,2.3,7,1.4])
@@ -389,14 +389,13 @@ class ADtests(casadiTestCase):
     m=MX.sym("m",3,1)
     JT,_ = J([m])
     JT = Function("JT", [m],[JT.T])
-    JT.setInput(n)
-    JT.evaluate()
+    JT([n])
     H = JT.jacobian(0,0)
-    H.setInput(n)
-    #H.evaluate()
+    H([n])
+    #H_out = H(H_in)
     
-    #print array(JT.getOutput())
-    #print array(H.getOutput())
+    #print array(JT_out[0])
+    #print array(H_out[0])
     
   def test_bugshape(self):
     self.message("shape bug")
@@ -409,8 +408,7 @@ class ADtests(casadiTestCase):
 
     f=Function("f", [inp],[vertcat([x+y,x,y])])
     J=f.jacobian(0,0)
-    J.setInputNZ([2,7])
-    J.evaluate()
+    J([DM(f.sparsity_in(0),[2,7])])
 
     self.assertEqual(f.size1_out(0),3,"Jacobian shape bug")
     self.assertEqual(f.size2_out(0),1,"Jacobian shape bug")
@@ -488,15 +486,15 @@ class ADtests(casadiTestCase):
       ret = DM(x)
       if ret.numel()>0:
         ret[0,0] = DM(1,1)
-        return ret
+        return ret.sparsity()
       else:
-        return ret
+        return ret.sparsity()
 
     def remove_last(x):
       ret = DM(x)
       if ret.nnz()>0:
         ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DM(1,1)
-        return ret
+        return ret.sparsity()
       else:
         return x
       
@@ -587,19 +585,16 @@ class ADtests(casadiTestCase):
       funsx = fun.expand("expand_fun")
       fun_ad = [Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
       funsx_ad = [f.expand('expand_'+f.name()) for f in fun_ad]
-      
-      for i,v in enumerate(values):
-        fun.setInput(v,i)
-        funsx.setInput(v,i)
         
-      fun.evaluate()
-      funsx.evaluate()
-      self.checkarray(fun.getOutput(0),funsx.getOutput(0))
-      self.checkarray(fun.getOutput(1),funsx.getOutput(1))
+      fun_out = fun(values)
+      funsx_out = funsx(values)
       
-      self.check_codegen(fun)
+      self.checkarray(fun_out[0],funsx_out[0])
+      self.checkarray(fun_out[1],funsx_out[1])
+      
+      self.check_codegen(fun,inputs=values)
 
-      J_ = fun.getOutput(1)
+      J_ = fun_out[1]
       
       def vec(l):
         ret = []
@@ -626,8 +621,8 @@ class ADtests(casadiTestCase):
 
           # dense
           for spmod,spmod2 in itertools.product(spmods,repeat=2):
-            fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.n_in())]  for d in range(ndir)]
-            aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.n_out())] for d in range(ndir)]
+            fseeds = [[sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]  for d in range(ndir)]
+            aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
             inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
         
             res = f(inputss,True)
@@ -638,53 +633,48 @@ class ADtests(casadiTestCase):
             aseed = [DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
             vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
             
-            for i,v in enumerate(values):
-              vf.setInput(v,i)
+            vf_in = list(values)
             offset = len(inputss)
               
             for d in range(ndir):
-              vf.setInput(fseed[d],offset+0)
+              vf_in.append(fseed[d])
               for i in range(len(values)-1):
-                vf.setInput(0,offset+i+1)
+                vf_in.append(0)
                 
-              offset += len(inputss)
-
-              vf.setInput(aseed[d],offset+0)
-              vf.setInput(0,offset+1)
-              offset+=2
+              vf_in.append(aseed[d])
+              vf_in.append(0)
               
-            assert(offset==vf.n_in())
-            
-            vf.evaluate()
-            self.check_codegen(vf)
+            vf_out = vf(vf_in)
+            self.check_codegen(vf,inputs=vf_in)
               
             offset = len(res)
             for d in range(ndir):
               seed = array(fseed[d].T).ravel()
-              sens = array(vf.getOutput(offset+0).T).ravel()
+              sens = array(vf_out[offset+0].T).ravel()
               offset+=len(inputss)
               self.checkarray(sens,mtimes(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
 
               seed = array(aseed[d].T).ravel()
-              sens = array(vf.getOutput(offset+0).T).ravel()
+              sens = array(vf_out[offset+0].T).ravel()
               offset+=len(inputss)
               
-              self.checkarray(sens,mtimes(J_.T,seed),"eval Adj %d %s" % (d,str([vf.getOutput(i) for i in range(vf.n_out())])))
+              self.checkarray(sens,mtimes(J_.T,seed),"eval Adj %d %s" % (d,str([vf_out[i] for i in range(vf.n_out())])))
           
           
             assert(offset==vf.n_out())
           
             # Complete random seeding
             random.seed(1)
+            vf_in = []
             for i in range(vf.n_in()):
-              vf.setInput(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))),i)
+              vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
             
-            vf.evaluate()
-            self.check_codegen(vf)
+            vf_out = vf(vf_in)
+            self.check_codegen(vf,inputs=vf_in)
             storagekey = (spmod,spmod2)
             if not(storagekey in storage):
               storage[storagekey] = []
-            storage[storagekey].append([vf.getOutput(i) for i in range(vf.n_out())])
+            storage[storagekey].append(vf_out)
             
             # Added to make sure that the same seeds are used for SX and MX
             if sym is MX.sym:
@@ -698,7 +688,7 @@ class ADtests(casadiTestCase):
 
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
               fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
-              aseeds2 = [[sym2("a",vf_mx.getOutput(i).sparsity())  for i in range(vf.n_out()) ] for d in range(ndir)]
+              aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
               inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
            
               res2 = vf(inputss2,True)
@@ -708,15 +698,16 @@ class ADtests(casadiTestCase):
               vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
                 
               random.seed(1)
+              vf2_in = []
               for i in range(vf2.n_in()):
-                vf2.setInput(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))),i)
+                vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
               
-              vf2.evaluate()
-              self.check_codegen(vf2)
+              vf2_out = vf2(vf2_in)
+              self.check_codegen(vf2,inputs=vf2_in)
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
                 storage2[storagekey] = []
-              storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.n_out())])
+              storage2[storagekey].append(vf2_out)
 
       # Remainder of eval testing
       for store,order in [(storage,"first-order"),(storage2,"second-order")]:
@@ -725,7 +716,7 @@ class ADtests(casadiTestCase):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
               if b.numel()==0 and sparsify(a).nnz()==0: continue
               if a.numel()==0 and sparsify(b).nnz()==0: continue
-              self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)))
+              self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k)))
               
       for expand in [False, True]:
         #  jacobian()
@@ -734,12 +725,10 @@ class ADtests(casadiTestCase):
           f = fun_ad[ind] if expand  else funsx_ad[ind]
 
           Jf=f.jacobian(0,0)
-          for i,v in enumerate(values):
-            Jf.setInput(v,i)
-          Jf.evaluate()
+          Jf_out = Jf(values)
           
-          self.check_codegen(Jf)
-          self.checkarray(Jf.getOutput(),J_)
+          self.check_codegen(Jf,inputs=values)
+          self.checkarray(Jf_out[0],J_)
           self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
           self.checkarray(DM.ones(f.sparsity_jac()),DM.ones(J_.sparsity()))
                 
@@ -755,27 +744,22 @@ class ADtests(casadiTestCase):
           w = 0 if mode=='forward' else 1
           f = Function("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
           if expand: f=f.expand('expand_'+f.name())
-          for i,v in enumerate(values):
-            f.setInput(v,i)
-            f.evaluate()
-            J_ = f.getOutput(1)
+          f_out = f(values)
+          J_ = f_out[1]
 
           Gf=f.gradient(0,0)
-          for i,v in enumerate(values):
-            Gf.setInput(v,i)
-          Gf.evaluate()
-          self.check_codegen(Gf)
-          self.checkarray(Gf.getOutput(),J_,failmessage=("mode: %s" % mode))
+          Gf_out = Gf(values)
+          self.check_codegen(Gf,inputs=values)
+          
+          self.checkarray(Gf_out[0],J_,failmessage=("mode: %s" % mode))
           #self.checkarray(DM(Gf.sparsity_out(0),1),DM(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
 
           Hf=f.hessian(0,0)
-          for i,v in enumerate(values):
-            Hf.setInput(v,i)
-          Hf.evaluate()
-          self.check_codegen(Hf)
+          Hf_out = Hf(values)
+          self.check_codegen(Hf,inputs=values)
           if H_ is None:
-            H_ = Hf.getOutput()
-          self.checkarray(Hf.getOutput(),H_,failmessage=("mode: %s" % mode))
+            H_ = Hf_out[0]
+          self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
           #self.checkarray(DM(Gf.sparsity_out(0),1),DM(J_.sparsity(),1),str(mode)+str(out)+str(type(fun)))
     
 if __name__ == '__main__':

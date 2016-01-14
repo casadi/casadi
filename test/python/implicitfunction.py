@@ -30,22 +30,25 @@ from helpers import *
 
 solvers= []
 try:
-  LinearSolver.loadPlugin("csparse")
+  load_linsol("csparse")
   load_rootfinder("kinsol")
   solvers.append(("kinsol",{"linear_solver": "csparse","abstol":1e-10}))
 except:
   pass
 try:
-  LinearSolver.loadPlugin("csparse")
+  load_linsol("csparse")
   load_nlpsol("ipopt")
   solvers.append(("nlpsol",{"linear_solver": "csparse", "nlpsol": "ipopt"}))
 except:
   pass
 try:
-  LinearSolver.loadPlugin("csparse")
+  load_linsol("csparse")
   solvers.append(("newton",{"linear_solver": "csparse"}))
 except:
   pass
+
+
+print solvers
 
 class ImplicitFunctiontests(casadiTestCase):
   
@@ -57,30 +60,28 @@ class ImplicitFunctiontests(casadiTestCase):
       A_ = DM([[1,2],[3,2.1]])
       C_ = DM([[1.6,2.1],[1,1.3]])
       b_ = DM([0.7,0.6])
-      f=Function("f", [x],[mul(A_,x)-b_, mul(C_,x)])
+      f=Function("f", [x],[mtimes(A_,x)-b_, mtimes(C_,x)])
       solver=rootfinder("solver", Solver, f, options)
-      solver.evaluate()
+      solver_out = solver([0])
       
-      refsol = Function("refsol", [x],[solve(A_,b_), mul(C_,solve(A_,b_))])
-      self.checkfunction(solver,refsol,digits=10)         
+      refsol = Function("refsol", [x],[solve(A_,b_), mtimes(C_,solve(A_,b_))])
+      self.checkfunction(solver,refsol,inputs=[0],digits=10)         
       
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
-      f=Function("f", [x,A,b],[mul(A,x)-b])
+      f=Function("f", [x,A,b],[mtimes(A,x)-b])
       solver=rootfinder("solver", Solver, f, options)
-      solver.setInput(A_,1)
-      solver.setInput(b_,2)
-      solver.evaluate()
-      
+      solver_in = [0]*3
+      solver_in[1]=A_
+      solver_in[2]=b_
+
       refsol = Function("refsol", [x,A,b],[solve(A,b)])      
-      refsol.setInput(A_,1)
-      refsol.setInput(b_,2)      
-      self.checkfunction(solver,refsol,digits=10)
+      self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
       
       
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
-      f=Function("f", [x,A,b],[mul(A,x)-b,mul(C_,x)])
+      f=Function("f", [x,A,b],[mtimes(A,x)-b,mtimes(C_,x)])
       for ad_weight_sp in [0,1]:
         for ad_weight in [0,1]:
           print ad_weight, ad_weight_sp
@@ -88,15 +89,12 @@ class ImplicitFunctiontests(casadiTestCase):
           options2["ad_weight_sp"] = ad_weight_sp
           options2["ad_weight"] = ad_weight
           solver=rootfinder("solver", Solver, f, options2)
-          solver.setInput(0,0)
-          solver.setInput(A_,1)
-          solver.setInput(b_,2)
+          solver_in = [0]*3
+          solver_in[1]=A_
+          solver_in[2]=b_
       
-          refsol = Function("refsol", [x,A,b],[solve(A,b),mul(C_,solve(A,b))])      
-          refsol.setInput(0,0)
-          refsol.setInput(A_,1)
-          refsol.setInput(b_,2)      
-          self.checkfunction(solver,refsol,digits=10)         
+          refsol = Function("refsol", [x,A,b],[solve(A,b),mtimes(C_,solve(A,b))])           
+          self.checkfunction(solver,refsol,inputs=solver_in,digits=10)         
 
   def test_scalar1(self):
     self.message("Scalar implicit problem, n=0")
@@ -105,12 +103,10 @@ class ImplicitFunctiontests(casadiTestCase):
       x=SX.sym("x")
       f=Function("f", [x], [sin(x)])
       solver=rootfinder("solver", Solver, f, options)
-      solver.setInput(6)
-      solver.evaluate()
+      solver_out = solver([0])
       
       refsol = Function("refsol", [x], [ceil(x/pi-0.5)*pi])
-      refsol.setInput(6)
-      self.checkfunction(solver,refsol,digits=10)         
+      self.checkfunction(solver,refsol,inputs=[6],digits=10)         
       
   def test_scalar2(self):
     self.message("Scalar implicit problem, n=1")
@@ -122,11 +118,8 @@ class ImplicitFunctiontests(casadiTestCase):
       n=0.2
       f=Function("f", [y,x], [x-arcsin(y)])
       solver=rootfinder("solver", Solver, f, options)
-      solver.setInput(n,1)
-
       refsol = Function("refsol", [y,x], [sin(x)])
-      refsol.setInput(n,1)
-      self.checkfunction(solver,refsol,digits=6,sens_der=False,failmessage=message)
+      self.checkfunction(solver,refsol,inputs=[0,n],digits=6,sens_der=False,failmessage=message)
 
   def test_scalar2_indirect(self):
     for Solver, options in solvers:
@@ -142,11 +135,8 @@ class ImplicitFunctiontests(casadiTestCase):
       [R] = solver([MX(),X])
       
       trial = Function("trial", [X], [R])
-      trial.setInput(n)
-      
       refsol = Function("refsol", [x],[sin(x)])
-      refsol.setInput(n)
-      self.checkfunction(trial,refsol,digits=6,sens_der=False,failmessage=message)
+      self.checkfunction(trial,refsol,inputs=[n],digits=6,sens_der=False,failmessage=message)
       
   def test_large(self):
     for Solver, options in solvers:
@@ -161,7 +151,7 @@ class ImplicitFunctiontests(casadiTestCase):
       y=SX.sym("y",s)
       y0 = DM(Sparsity.diag(N),0.1)
 
-      f=Function("f", [vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
+      f=Function("f", [vecNZ(y),vecNZ(x)],[vecNZ((mtimes((x+y0),(x+y0).T)-mtimes((y+y0),(y+y0).T))[s])])
       options2 = dict(options)
       options2["constraints"] = [1]*s.nnz()
       solver=rootfinder("options2", Solver, f, options2)
@@ -170,21 +160,21 @@ class ImplicitFunctiontests(casadiTestCase):
       [R] = solver([MX(),vecNZ(X)])
       
       trial = Function("trial", [X],[R])
-      trial.setInputNZ([abs(cos(i)) for i in range(x.nnz())])
-      trial.evaluate()
+      trial_in = [0]*trial.n_in();trial_in[0]=DM(trial.sparsity_in(0),[abs(cos(i)) for i in range(x.nnz())])
+      trial_out = trial(trial_in)
 
-      f.setInput(trial.getOutput(),0)
-      f.setInput(vecNZ(trial.getInput()),1)
-      f.evaluate()
+      f_in = [0]*f.n_in();f_in[0]=trial_out[0]
+      f_in[1]=vecNZ(trial_in[0])
+      f_out = f(f_in)
 
-      f.setInput(vecNZ(trial.getInput()),0)
-      f.setInput(vecNZ(trial.getInput()),1)
-      f.evaluate()
+      f_in = [0]*f.n_in();f_in[0]=vecNZ(trial_in[0])
+      f_in[1]=vecNZ(trial_in[0])
+      f_out = f(f_in)
       
       refsol = Function("refsol", [X],[vecNZ(X)])
-      refsol.setInput(trial.getInput())
+      refsol_in = [0]*refsol.n_in();refsol_in[0]=trial_in[0]
 
-      self.checkfunction(trial,refsol,digits=6,sens_der=False,evals=1,failmessage=message)
+      self.checkfunction(trial,refsol,inputs=refsol_in,digits=6,sens_der=False,evals=1,failmessage=message)
       
   @known_bug()  
   def test_vector2(self):
@@ -199,11 +189,11 @@ class ImplicitFunctiontests(casadiTestCase):
       n=0.2
       f=Function("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
       solver=rootfinder("solver", Solver, f, options)
-      solver.setInput(n)
-      solver.evaluate()
+      solver_in = [0]*solver.n_in();solver_in[0]=n
+      solver_out = solver(solver_in)
       
       refsol = Function("refsol", [y,x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
-      refsol.setInput(n)
+      refsol_in = [0]*refsol.n_in();refsol_in[0]=n
       self.checkfunction(solver,refsol,digits=5,sens_der=False,failmessage=message)
       
   def testKINSol1c(self):
@@ -211,30 +201,30 @@ class ImplicitFunctiontests(casadiTestCase):
     x=SX.sym("x")
     f=Function("f", [x],[sin(x)])
     solver=rootfinder("solver", "kinsol", f, {"constraints":[-1]})
-    solver.setInput(-6)
-    solver.evaluate()
-    self.assertAlmostEqual(solver.getOutput()[0],-2*pi,5)
+    solver_in = [0]*solver.n_in();solver_in[0]=-6
+    solver_out = solver(solver_in)
+    self.assertAlmostEqual(solver_out[0][0],-2*pi,5)
     
   def test_constraints(self):
     for Solver, options in solvers:
       if 'kinsol' in str(Solver): continue
       if 'newton' in str(Solver): continue
       x=SX.sym("x",2)
-      f=Function("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
+      f=Function("f", [x],[vertcat([mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [-1,0]
       solver=rootfinder("solver", Solver, f, options2)
-      solver.evaluate()
+      solver_out = solver([0])
       
-      self.checkarray(solver.getOutput(),DM([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
+      self.checkarray(solver_out[0],DM([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
-      f=Function("f", [x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
+      f=Function("f", [x],[vertcat([mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [1,0]
       solver=rootfinder("solver", Solver, f, options2)
-      solver.evaluate()
+      solver_out = solver([0])
       
-      self.checkarray(solver.getOutput(),DM([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
+      self.checkarray(solver_out[0],DM([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
 
   def test_implicitbug(self):
     # Total number of variables for one finite element
@@ -263,19 +253,19 @@ class ImplicitFunctiontests(casadiTestCase):
     x0_val  = 1
 
     G = F.gradient(0,0)
-    G.setInput(x0_val)
-    G.evaluate()
-    print G.getOutput()
+    G_in = [0]*G.n_in();G_in[0]=x0_val
+    G_out = G(G_in)
+    print G_out[0]
     print G
 
     J = F.jacobian(0,0)
-    J.setInput(x0_val)
-    J.evaluate()
-    print J.getOutput()
+    J_in = [0]*J.n_in();J_in[0]=x0_val
+    J_out = J(J_in)
+    print J_out[0]
     print J
     
-    self.checkarray(G.getOutput(),DM([2]))
-    self.checkarray(J.getOutput(),DM([2]))
+    self.checkarray(G_out[0],DM([2]))
+    self.checkarray(J_out[0],DM([2]))
     
   def test_extra_outputs(self):
     x = SX.sym("x")
@@ -285,14 +275,10 @@ class ImplicitFunctiontests(casadiTestCase):
       options2 = dict(options)
       options2["ad_weight_sp"] = 1
       solver=rootfinder("solver", Solver, f, options2)
-      solver.setInput(0.3,1)
-      solver.setInput(0.1,0)
-      solver.evaluate()
+      solver_in = [0.1,0.3]
       
       refsol = Function("refsol", [x,a],[arctan(a),sqrt(a)*arctan(a)**2]) 
-      refsol.setInput(0.3,1)
-      refsol.setInput(0.1,0)
-      self.checkfunction(solver,refsol,digits=5)
+      self.checkfunction(solver,refsol,inputs=solver_in,digits=5)
 
     x = SX.sym("x",2)
     a = SX.sym("a",2)

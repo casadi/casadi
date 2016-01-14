@@ -30,10 +30,10 @@ from helpers import *
 
 qpsols = []
 if has_nlpsol("ipopt"):
-  qpsols.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options": {"tol": 1e-12}},{}))
+  qpsols.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options": {"ipopt.tol": 1e-12}},{}))
 
 if has_nlpsol("ipopt"):
-  qpsols.append(("nlpsol.ipopt",{"nlpsol_options": {"tol": 1e-12}},{}))
+  qpsols.append(("nlpsol.ipopt",{"nlpsol_options": {"ipopt.tol": 1e-12}},{}))
 
 if has_qpsol("ooqp"):
   qpsols.append(("ooqp",{},{"less_digits":1}))
@@ -73,17 +73,17 @@ class QpsolTests(casadiTestCase):
         less_digits=aux_options["less_digits"]
       except:
         less_digits=0
-
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
       with self.assertRaises(Exception):
-        solver.evaluate()
+        solver_out = solver(solver_in)
 
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -107,16 +107,16 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
       with self.assertRaises(Exception):
-        solver.evaluate()
+        solver_out = solver(solver_in)
         
   def test_scalar(self):
     # 1/2 x H x + G' x
@@ -143,23 +143,24 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.assertAlmostEqual(solver.getOutput()[0],-1,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],-1,max(1,6-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([0]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-0.5,max(1,6-less_digits),str(qpsol))
 
   def test_general_convex_dense(self):
     self.message("Convex dense QP with solvers: " + str([qpsol for qpsol,options,aux_options in qpsols]))
@@ -185,72 +186,73 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([3+1.0/9,4.0/9,0]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([3+1.0/9,4.0/9,0]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-8-2.0/9,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-8-2.0/9,max(1,6-less_digits),str(qpsol))
       
-      solver.setInput(H*4,"h")
+      solver_in["h"]=H*4
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.assertAlmostEqual(solver.getOutput()[0],1,max(1,3-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput()[1],1,max(1,3-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("cost"),-6,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],1,max(1,3-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][1],1,max(1,3-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"],-6,max(1,6-less_digits),str(qpsol))
       
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([2,0,0]),str(qpsol),digits=max(1,2-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(qpsol),digits=max(1,2-less_digits))
       
-      solver.setInput(0,"h")
+      solver_in["h"]=0
       
       if 'qcqp' in str(qpsol): continue # Singular hessian
 
-      solver.evaluate()
-      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("cost"),-9-1.0/3,max(1,6-less_digits),str(qpsol))
+      solver_out = solver(solver_in)
+      self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"],-9-1.0/3,max(1,6-less_digits),str(qpsol))
       
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([10.0/3,4.0/3,0]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([10.0/3,4.0/3,0]),str(qpsol),digits=max(1,4-less_digits))
 
-      solver.setInput([-inf]*3,"lba") #  Upper _and_ lower 
-      solver.setInput([inf]*3,"uba")  #  bounds infinite?
+      solver_in["lba"]=[-inf]*3 #  Upper _and_ lower 
+      solver_in["uba"]=[inf]*3  #  bounds infinite?
 
-      solver.setInput(5,"ubx")
+      solver_in["ubx"]=5
 
       if "worhp" in str(qp_options):
         with self.assertRaises(Exception):
-          solver.evaluate()
+          solver_out = solver(solver_in)
         return
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.assertAlmostEqual(solver.getOutput()[0],5,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput()[1],5,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("cost"),-40,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][1],5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"],-40,max(1,5-less_digits),str(qpsol))
       
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],2,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],6,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],2,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][1],6,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([0,0,0]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0,0,0]),str(qpsol),digits=max(1,4-less_digits))
 
   @memory_heavy()
   def test_general_convex_sparse(self):
@@ -281,23 +283,24 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.checkarray(solver.getOutput(),DM([0.873908,0.95630465,0,0,0]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["x"],DM([0.873908,0.95630465,0,0,0]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.checkarray(solver.getOutput("lam_x"),DM([0,0,-0.339076,-10.0873907,-0.252185]),6,str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0,-0.339076,-10.0873907,-0.252185]),6,str(qpsol),digits=max(1,6-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([0,2.52184767]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0,2.52184767]),str(qpsol),digits=max(1,6-less_digits))
 
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-6.264669320767,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-6.264669320767,max(1,6-less_digits),str(qpsol))
 
   def test_general_nonconvex_dense(self):
     self.message("Non convex dense QP with solvers: " + str([qpsol for qpsol,options,aux_options in qpsols]))
@@ -317,15 +320,15 @@ class QpsolTests(casadiTestCase):
         continue
       solver = casadi.qpsol("mysolver",qpsol, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      self.assertRaises(Exception,lambda : solver.evaluate())
+      self.assertRaises(Exception,lambda : solver(solver_in))
 
   def test_equality(self):
     self.message("Regression 452 test: equality constraints give wrong multipliers")
@@ -353,29 +356,30 @@ class QpsolTests(casadiTestCase):
       LBX = DM([0.5,0])
       UBX = DM([0.5,inf])
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
       if 'worhp' in str(qp_options):
         with self.assertRaises(Exception):
-          solver.evaluate()
+          solver_out = solver(solver_in)
         return
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.assertAlmostEqual(solver.getOutput()[0],0.5,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput()[1],1.25,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],0.5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][1],1.25,max(1,6-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],4.75,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([0,2,0]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0,2,0]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-7.4375,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-7.4375,max(1,6-less_digits),str(qpsol))
     
       A =  DM([[1, 1],[-1, 2],[2, 1]])
       LBA = DM([2,-inf,-inf])
@@ -385,25 +389,25 @@ class QpsolTests(casadiTestCase):
       UBX = DM([inf]*2)
 
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.assertAlmostEqual(solver.getOutput()[0],0.4,max(1,4-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput()[1],1.6,max(1,4-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],0.4,max(1,4-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][1],1.6,max(1,4-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,5-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,5-less_digits),str(qpsol))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([3.2,0,0]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([3.2,0,0]),str(qpsol),digits=max(1,5-less_digits))
        
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-8.4,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-8.4,max(1,5-less_digits),str(qpsol))
 
   @memory_heavy()
   def test_degenerate_hessian(self):
@@ -433,23 +437,24 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0 
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.checkarray(solver.getOutput(),DM([5.5,5,-10]),str(qpsol),digits=max(1,4-less_digits)) 
+      self.checkarray(solver_out["x"],DM([5.5,5,-10]),str(qpsol),digits=max(1,4-less_digits)) 
       
-      self.checkarray(solver.getOutput("lam_x"),DM([0,0,-2.5]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(qpsol),digits=max(1,4-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([1.5]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([1.5]),str(qpsol),digits=max(1,4-less_digits))
        
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-38.375,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(qpsol))
         
     
   def test_no_inequality(self):
@@ -477,26 +482,27 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.assertAlmostEqual(solver.getOutput()[0],-0.5,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput()[1],1,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][0],-0.5,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["x"][1],1,max(1,6-less_digits),str(qpsol))
     
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,max(1,6-less_digits),str(qpsol))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(qpsol))
 
 
-      self.checkarray(solver.getOutput("lam_a"),DM([3.5]),str(qpsol),digits=max(1,6-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([3.5]),str(qpsol),digits=max(1,6-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-3.375,max(1,6-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-3.375,max(1,6-less_digits),str(qpsol))
 
   def test_no_A(self):
     self.message("No A present")
@@ -523,23 +529,24 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.checkarray(solver.getOutput(),DM([10,8]),str(qpsol),digits=max(1,3-less_digits))
+      self.checkarray(solver_out["x"],DM([10,8]),str(qpsol),digits=max(1,3-less_digits))
       
-      self.checkarray(solver.getOutput("lam_x"),DM([0,0]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0]),str(qpsol),digits=max(1,4-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([]),str(qpsol),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-34,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-34,max(1,5-less_digits),str(qpsol))
       
   def test_standard_form(self):
     H = DM([[1,-1],[-1,2]])
@@ -561,23 +568,24 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.checkarray(solver.getOutput(),DM([-0.2,1.2]),str(qpsol),digits=max(1,3-less_digits))
+      self.checkarray(solver_out["x"],DM([-0.2,1.2]),str(qpsol),digits=max(1,3-less_digits))
       
-      self.checkarray(solver.getOutput("lam_x"),DM([0,0]),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0]),str(qpsol),digits=max(1,4-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([3.4]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([3.4]),str(qpsol),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-5.1,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],-5.1,max(1,5-less_digits),str(qpsol))
   
   @memory_heavy()
   def test_badscaling(self):
@@ -606,17 +614,18 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.checkarray(solver.getOutput(),x0,str(qpsol)+str(qp_options),digits=max(1,2-less_digits))
-      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5*mtimes([x0.T,H,x0]),max(1,3-less_digits),str(qpsol))
-      self.checkarray(solver.getOutput("lam_x"),DM.zeros(N,1),str(qpsol),digits=max(1,4-less_digits))
+      self.checkarray(solver_out["x"],x0,str(qpsol)+str(qp_options),digits=max(1,2-less_digits))
+      self.assertAlmostEqual(solver_out["cost"][0],-0.5*mtimes([x0.T,H,x0]),max(1,3-less_digits),str(qpsol))
+      self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(qpsol),digits=max(1,4-less_digits))
       
   def test_redundant(self):
     self.message("Redundant constraints")
@@ -646,20 +655,21 @@ class QpsolTests(casadiTestCase):
           less_digits=aux_options["less_digits"]
         except:
           less_digits=0
-        
-        solver.setInput(H,"h")
-        solver.setInput(G,"g")
-        solver.setInput(A,"a")
-        solver.setInput(LBX,"lbx")
-        solver.setInput(UBX,"ubx")
-        solver.setInput(LBA,"lba")
-        solver.setInput(UBA,"uba")
-        solver.evaluate()
 
-        self.checkarray(solver.getOutput(),DM([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsol),digits=max(1,6-less_digits))
-        self.assertAlmostEqual(solver.getOutput("cost")[0],-5.850384678537,max(1,5-less_digits),str(qpsol))
-        self.checkarray(solver.getOutput("lam_x"),DM([0,0,0]),str(qpsol),digits=max(1,6-less_digits))
-        self.checkarray(mtimes(A.T,solver.getOutput("lam_a")),DM([3.876923073076,2.4384615365384965,-1]),str(qpsol),digits=max(1,6-less_digits))
+        solver_in = {}        
+        solver_in["h"]=H
+        solver_in["g"]=G
+        solver_in["a"]=A
+        solver_in["lbx"]=LBX
+        solver_in["ubx"]=UBX
+        solver_in["lba"]=LBA
+        solver_in["uba"]=UBA
+        solver_out = solver(solver_in)
+
+        self.checkarray(solver_out["x"],DM([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsol),digits=max(1,6-less_digits))
+        self.assertAlmostEqual(solver_out["cost"][0],-5.850384678537,max(1,5-less_digits),str(qpsol))
+        self.checkarray(solver_out["lam_x"],DM([0,0,0]),str(qpsol),digits=max(1,6-less_digits))
+        self.checkarray(mtimes(A.T,solver_out["lam_a"]),DM([3.876923073076,2.4384615365384965,-1]),str(qpsol),digits=max(1,6-less_digits))
         
   def test_linear(self):
     H = DM(2,2)
@@ -680,22 +690,23 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.checkarray(solver.getOutput(),DM([0.5,1.5]),str(qpsol),digits=max(1,5-less_digits))
-      self.checkarray(solver.getOutput("lam_x"),DM([0,0]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["x"],DM([0.5,1.5]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,0]),str(qpsol),digits=max(1,5-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([0.5,-1.5,0]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([0.5,-1.5,0]),str(qpsol),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],2.5,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(qpsol))
       
   def test_linear2(self):
     H = DM(2,2)
@@ -717,22 +728,23 @@ class QpsolTests(casadiTestCase):
       except:
         less_digits=0
 
-      solver.setInput(H,"h")
-      solver.setInput(G,"g")
-      solver.setInput(A,"a")
-      solver.setInput(LBX,"lbx")
-      solver.setInput(UBX,"ubx")
-      solver.setInput(LBA,"lba")
-      solver.setInput(UBA,"uba")
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
 
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
-      self.checkarray(solver.getOutput(),DM([2,3]),str(qpsol),digits=max(1,5-less_digits))
-      self.checkarray(solver.getOutput("lam_x"),DM([0,-3]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["x"],DM([2,3]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_x"],DM([0,-3]),str(qpsol),digits=max(1,5-less_digits))
 
-      self.checkarray(solver.getOutput("lam_a"),DM([2,0,0]),str(qpsol),digits=max(1,5-less_digits))
+      self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(qpsol),digits=max(1,5-less_digits))
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],7,max(1,5-less_digits),str(qpsol))
+      self.assertAlmostEqual(solver_out["cost"][0],7,max(1,5-less_digits),str(qpsol))
       
 if __name__ == '__main__':
     unittest.main()

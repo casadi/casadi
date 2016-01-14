@@ -285,10 +285,11 @@ class Toolstests(casadiTestCase):
     self.assertTrue(isinstance(V.cat,MX)) 
     def is_equalV(a,b):
       ft = Function("ft", [x,m],[a-b])
+      ft_in = [0]*ft.n_in()
       for i in range(ft.n_in()):
-        ft.setInput(numpy.random.rand(*ft.size_in(i)),i)
-      ft.evaluate()
-      self.checkarray(ft.getOutput(),DM.zeros(*ft.size_out(0)))
+        ft_in[i]=numpy.random.rand(*ft.size_in(i))
+      ft_out = ft(ft_in)
+      self.checkarray(ft_out[0],DM.zeros(*ft.size_out(0)))
     
     is_equalV(V["x"],x)
     is_equalV(V["y",0],y0)
@@ -302,10 +303,11 @@ class Toolstests(casadiTestCase):
     
     def is_equalV(a,b):
       ft = Function("ft", [x,m,abc],[a-b])
+      ft_in = [0]*ft.n_in()
       for i in range(ft.n_in()):
-        ft.setInput(numpy.random.rand(*ft.size_in(i)),i)
-      ft.evaluate()
-      self.checkarray(ft.getOutput(),DM.zeros(*ft.size_out(0)))
+        ft_in[i]=numpy.random.rand(*ft.size_in(i))
+      ft_out = ft(ft_in)
+      self.checkarray(ft_out[0],DM.zeros(*ft.size_out(0)))
       
     is_equalV(V["y",0],abc)
 
@@ -526,10 +528,10 @@ class Toolstests(casadiTestCase):
     self.checkarray(a["P"].shape,(3,3))
     
     f = Function("f", [a],[a["P"]])
-    f.setInput(range(6))
-    f.evaluate()
+    f_in = [0]*f.n_in();f_in[0]=range(6)
+    f_out = f(f_in)
     
-    self.checkarray(f.getOutput(),DM([[0,1,3],[1,2,4],[3,4,5]]))
+    self.checkarray(f_out[0],DM([[0,1,3],[1,2,4],[3,4,5]]))
     self.checkarray(b["P"],DM([[0,3,6],[3,4,7],[6,7,8]]))
     self.checkarray(b.cat,DM([0,3,4,6,7,8]))
     
@@ -746,12 +748,12 @@ class Toolstests(casadiTestCase):
     s_["a"] = 1
     s_["b"] = DM([2,3])
     s_["c"] = DM([[4,5],[6,7]])
-    f.setInput(s_)
-    f.evaluate()
+    f_in = [0]*f.n_in();f_in[0]=s_
+    f_out = f(f_in)
     
-    self.checkarray(f.getOutput(0),s_["a"])
-    self.checkarray(f.getOutput(1),s_["b"])
-    self.checkarray(f.getOutput(2),s_["c"])
+    self.checkarray(f_out[0],s_["a"])
+    self.checkarray(f_out[1],s_["b"])
+    self.checkarray(f_out[2],s_["c"])
    
   def test_issue1116(self):
     S = struct([entry("A",shape=(4,4),type="symm")])
@@ -780,14 +782,14 @@ class Toolstests(casadiTestCase):
       J = states.product(controls,J)
 
       f = Function("f", [J],[J["x","v"], J["x",:] , J["y",["v","w"]],  J[:,"u"] ])
-      f.setInputNZ(range(1,7))
+      f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,7))
 
-      f.evaluate()
+      f_out = f(f_in)
 
-      self.checkarray(f.getOutput(0),DM([3]))
-      self.checkarray(f.getOutput(1),DM([1,3,5]).T)
-      self.checkarray(f.getOutput(2),DM([4,6]).T)
-      self.checkarray(f.getOutput(3),DM([1,2]))
+      self.checkarray(f_out[0],DM([3]))
+      self.checkarray(f_out[1],DM([1,3,5]).T)
+      self.checkarray(f_out[2],DM([4,6]).T)
+      self.checkarray(f_out[3],DM([1,2]))
    
   def test_empty_bug(self):
     

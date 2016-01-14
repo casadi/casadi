@@ -81,12 +81,12 @@ class LinearSolverTests(casadiTestCase):
       n ,m = A.shape
       for Solver, options in nsolvers:
         solver = Solver("solver", A.T.sparsity(), options)
-        solver.setInput(A.T)
+        solver_in = [0]*solver.n_in();solver_in[0]=A.T
 
-        solver.evaluate()
+        solver_out = solver(solver_in)
         
-        self.checkarray(mtimes(A.T,solver.getOutput()),DM.zeros(m,n-m))
-        self.checkarray(mtimes(solver.getOutput().T,solver.getOutput()),DM.eye(n-m))
+        self.checkarray(mtimes(A.T,solver_out[0]),DM.zeros(m,n-m))
+        self.checkarray(mtimes(solver_out[0].T,solver_out[0]),DM.eye(n-m))
         
         options["ad_weight"] = 0
         options["ad_weight_sp"] = 0
@@ -100,34 +100,34 @@ class LinearSolverTests(casadiTestCase):
         
         Jb = solver.jacobian()
         
-        Jf.setInput(A.T)
-        Jb.setInput(A.T)
+        Jf_in = [0]*Jf.n_in();Jf_in[0]=A.T
+        Jb_in = [0]*Jb.n_in();Jb_in[0]=A.T
         
-        Jf.evaluate()
-        Jb.evaluate()
+        Jf_out = Jf(Jf_in)
+        Jb_out = Jb(Jb_in)
 
-        self.checkarray(Jf.getOutput(),Jb.getOutput())
-        self.checkarray(Jf.getOutput(1),Jb.getOutput(1))
+        self.checkarray(Jf_out[0],Jb_out[0])
+        self.checkarray(Jf_out[1],Jb_out[1])
         
         d = solver.derivative(1,0)
         
         r = numpy.random.rand(*A.shape)
         
-        d.setInput(A.T,0)
-        d.setInput(r.T,1)
+        d_in = [0]*d.n_in();d_in[0]=A.T
+        d_in[1]=r.T
         
-        d.evaluate()
+        d_out = d(d_in)
         
-        exact = d.getOutput(1)
+        exact = d_out[1]
         
-        solver.setInput(A.T,0)
-        solver.evaluate()
-        nom = solver.getOutput()
+        solver_in = [0]*solver.n_in();solver_in[0]=A.T
+        solver_out = solver(solver_in)
+        nom = solver_out[0]
         
         eps = 1e-6
-        solver.setInput((A+eps*r).T,0)
-        solver.evaluate()
-        pert = solver.getOutput()
+        solver_in = [0]*solver.n_in();solver_in[0]=(A+eps*r).T
+        solver_out = solver(solver_in)
+        pert = solver_out[0]
         
         fd = (pert-nom)/eps
         
@@ -171,12 +171,12 @@ class LinearSolverTests(casadiTestCase):
       C = solve(A,b,Solver,options)
       
       f = Function("f", [A,b],[C])
-      f.setInput(A_,0)
-      f.setInput(b_,1)
-      f.evaluate()
+      f_in = [0]*f.n_in();f_in[0]=A_
+      f_in[1]=b_
+      f_out = f(f_in)
       
-      self.checkarray(f.getOutput(),DM([1.5,-0.5]))
-      self.checkarray(mtimes(A_,f.getOutput()),b_)
+      self.checkarray(f_out[0],DM([1.5,-0.5]))
+      self.checkarray(mtimes(A_,f_out[0]),b_)
 
   def test_pseudo_inverse(self):
     numpy.random.seed(0)
@@ -190,16 +190,16 @@ class LinearSolverTests(casadiTestCase):
       B = pinv(A,Solver,options)
       
       f = Function("f", [A],[B])
-      f.setInput(A_,0)
-      f.evaluate()
+      f_in = [0]*f.n_in();f_in[0]=A_
+      f_out = f(f_in)
       
-      self.checkarray(mtimes(A_,f.getOutput()),DM.eye(4))
+      self.checkarray(mtimes(A_,f_out[0]),DM.eye(4))
       
       f = Function("f", [As],[pinv(As)])
-      f.setInput(A_,0)
-      f.evaluate()
+      f_in = [0]*f.n_in();f_in[0]=A_
+      f_out = f(f_in)
       
-      self.checkarray(mtimes(A_,f.getOutput()),DM.eye(4))
+      self.checkarray(mtimes(A_,f_out[0]),DM.eye(4))
       
       solve(mtimes(A,A.T),A,Solver,options)
       pinv(A_,Solver,options)
@@ -216,16 +216,16 @@ class LinearSolverTests(casadiTestCase):
       B = pinv(A,Solver,options)
       
       f = Function("f", [A],[B])
-      f.setInput(A_,0)
-      f.evaluate()
+      f_in = [0]*f.n_in();f_in[0]=A_
+      f_out = f(f_in)
       
-      self.checkarray(mtimes(A_,f.getOutput()),DM.eye(3)) 
+      self.checkarray(mtimes(A_,f_out[0]),DM.eye(3)) 
       
       f = Function("f", [As],[pinv(As)])
-      f.setInput(A_,0)
-      f.evaluate()
+      f_in = [0]*f.n_in();f_in[0]=A_
+      f_out = f(f_in)
       
-      self.checkarray(mtimes(A_,f.getOutput()),DM.eye(3))
+      self.checkarray(mtimes(A_,f_out[0]),DM.eye(3))
       
       #self.checkarray(mtimes(pinv(A_,Solver,options),A_),DM.eye(3))
       
@@ -267,8 +267,9 @@ class LinearSolverTests(casadiTestCase):
     for Solver, options in lsolvers:
       print Solver
       solver = casadi.linsol("solver", Solver, A.sparsity(), 1, options)
-      solver.setInput(A_,"A")
-      solver.setInput(b_,"B")
+      solver_in = {}
+      solver_in["A"]=A_
+      solver_in["B"]=b_
       
       A_0 = A[0,0]
       A_1 = A[0,1]
@@ -280,10 +281,7 @@ class LinearSolverTests(casadiTestCase):
       
       solution = Function("solution", {"A":A, "B":b, "X":vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])}, ["A","B"], ["X"])
       
-      solution.setInput(A_,"A")
-      solution.setInput(b_,"B")
-      
-      self.checkfunction(solver,solution,jacobian=False,evals=False)
+      self.checkfunction(solver,solution,inputs=solver_in,jacobian=False,evals=False)
       
        
   def test_simple_function_indirect(self):
@@ -295,17 +293,15 @@ class LinearSolverTests(casadiTestCase):
     for Solver, options in lsolvers:
       print Solver
       solver = casadi.linsol("solver", Solver, A.sparsity(), 1, options)
-      solver.setInput(A_,"A")
-      solver.setInput(b_,"B")
+      solver_in = {}
+      solver_in["A"]=A_
+      solver_in["B"]=b_
 
       sol = solver({'A':A,'B':b})
       sol["A"] = A
       sol["B"] = b
       relay = Function("relay", sol, ["A","B"], ["X"])
 
-      relay.setInput(A_,"A")
-      relay.setInput(b_,"B")
-      
       A_0 = A[0,0]
       A_1 = A[0,1]
       A_2 = A[1,0]
@@ -316,10 +312,7 @@ class LinearSolverTests(casadiTestCase):
       
       solution = Function("solution", {"A":A, "B":b, "X":vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])}, ["A", "B"], ["X"])
       
-      solution.setInput(A_,"A")
-      solution.setInput(b_,"B")
-      
-      self.checkfunction(relay,solution,jacobian=False,evals=False)
+      self.checkfunction(relay,solution,inputs=solver_in,jacobian=False,evals=False)
   
   @memory_heavy()
   def test_simple_solve_node(self):
@@ -337,9 +330,9 @@ class LinearSolverTests(casadiTestCase):
         for tr in [True, False]:
           x = solver.linsol_solve(A,b,tr)
           f = Function("f", [A,b],[x])
-          f.setInput(A_,0)
-          f.setInput(b_,1)
-          f.evaluate()
+          f_in = [0]*f.n_in();f_in[0]=A_
+          f_in[1]=b_
+          f_out = f(f_in)
 
           if tr:
             A_0 = A[0,0]
@@ -360,15 +353,15 @@ class LinearSolverTests(casadiTestCase):
           
           solution = Function("solution", [A,b],[blockcat([[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),(((A_3/((A_0*A_3)-(A_2*A_1)))*c_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*c_1))],[((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*c_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*c_1))]])])
           
-          solution.setInput(A_,0)
-          solution.setInput(b_,1)
+          solution_in = [0]*solution.n_in();solution_in[0]=A_
+          solution_in[1]=b_
           
-          self.checkfunction(f,solution)
+          self.checkfunction(f,solution,inputs=solution_in)
           
           if "SymbolicQR" not in str(Solver) : continue
           solversx = f.expand('expand_'+f.name())
-          solversx.setInput(A_,0)
-          solversx.setInput(b_,1)
+          solversx_in = [0]*solversx.n_in();solversx_in[0]=A_
+          solversx_in[1]=b_
    
           self.checkfunction(solversx,solution,digits_sens = 7)
         
@@ -385,7 +378,7 @@ class LinearSolverTests(casadiTestCase):
     M.sparsity().spy()
 
     S = casadi.linsol("S", "csparsecholesky", M.sparsity(), 1)
-    S.setInput(M)
+    S_in = [0]*S.n_in();S_in[0]=M
     S.linsol_prepare()
     
     self.checkarray(M,M.T)
@@ -414,7 +407,7 @@ class LinearSolverTests(casadiTestCase):
     S = casadi.linsol("S", "csparsecholesky", M.sparsity(), 1)
     
     S.linsol_cholesky_sparsity().spy()
-    S.setInput(M)
+    S_in = [0]*S.n_in();S_in[0]=M
     S.linsol_prepare()
 
     C = S.linsol_cholesky()
@@ -435,11 +428,11 @@ class LinearSolverTests(casadiTestCase):
       self.checkarray(mtimes(A,C),b)
       
       f = Function("f", [As,bs],[solve(As,bs,Solver,options)])
-      f.setInput(A,0)
-      f.setInput(b,1)
-      f.evaluate()
+      f_in = [0]*f.n_in();f_in[0]=A
+      f_in[1]=b
+      f_out = f(f_in)
       
-      self.checkarray(mtimes(A,f.getOutput()),b)
+      self.checkarray(mtimes(A,f_out[0]),b)
       
   def test_large_sparse(self):
     numpy.random.seed(1)
@@ -457,11 +450,11 @@ class LinearSolverTests(casadiTestCase):
       
       for As_,A_ in [(As,A),(densify(As),densify(A)),(densify(As).T,densify(A).T),(densify(As.T),densify(A.T)),(As.T,A.T)]:
         f = Function("f", [As,bs],[solve(As_,bs,Solver,options)])
-        f.setInput(A,0)
-        f.setInput(b,1)
-        f.evaluate()
+        f_in = [0]*f.n_in();f_in[0]=A
+        f_in[1]=b
+        f_out = f(f_in)
 
-        self.checkarray(mtimes(A_,f.getOutput()),b)
+        self.checkarray(mtimes(A_,f_out[0]),b)
       
 if __name__ == '__main__':
     unittest.main()

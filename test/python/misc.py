@@ -89,22 +89,6 @@ class Misctests(casadiTestCase):
     self.checkarray(x.shape,(2,8),"shape")
     self.checkarray(y.shape,(4,4),"shape")
     
-
-  def test_copyconstr_refcount_lazy(self):
-    self.message("Copy constructor for refcounted classes - lazy")
-    x = SX.sym("x")
-
-    f = Function('f', [x],[2*x])
-    f.setInput(2,0)
-    g = Function(f)
-
-    f.setInput(5,0)
-    f.evaluate()
-
-    self.assertEqual(g.getInput(0),5)
-    self.assertEqual(g.getOutput(),10)
-
-    
   def test_copy_norefcount(self):
     self.message("Shallow copy for non-refcounted classes")
     import copy
@@ -131,21 +115,6 @@ class Misctests(casadiTestCase):
     self.assertTrue(x.numel(),y.numel())
     self.checkarray(x.shape,(2,8),"shape")
     self.checkarray(y.shape,(4,4),"shape")
-    
-  def test_copy_refcount_lazy(self):
-    self.message("Shallow copy for refcounted classes - lazy")
-    import copy
-    x = SX.sym("x")
-
-    f = Function('f', [x],[2*x])
-    f.setInput(2,0)
-    g = copy.copy(f)
-
-    f.setInput(5,0)
-    f.evaluate()
-
-    self.assertEqual(g.getInput(0),5)
-    self.assertEqual(g.getOutput(),10)
     
   def test_deepcopy_norefcount(self):
     self.message("Deep copy for non-refcounted classes")
@@ -346,13 +315,13 @@ class Misctests(casadiTestCase):
     
     print f
     
-    f.setInput(-6)
-    f.evaluate()
+    f_in = [0]*f.n_in();f_in[0]=-6
+    f_out = f(f_in)
     
-    f.setInput(1)
+    f_in = [0]*f.n_in();f_in[0]=1
     
     try :
-      f.evaluate()
+      f_out = f(f_in)
     except Exception as e:
       print str(e)
       self.assertTrue("x must be larger than 3" in str(e))
@@ -368,7 +337,7 @@ class Misctests(casadiTestCase):
     f = {'x':x, 'f':x**2}
     solver = nlpsol("solver", "ipopt",f)
     with capture_stdout() as result:
-      solver.evaluate()
+      solver_out = solver(solver_in)
 
     assert "Number of nonzeros in equality constraint" in result[0]
     assert "iter    objective    inf_pr" in result[0]

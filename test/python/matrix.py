@@ -111,7 +111,7 @@ class Matrixtests(casadiTestCase):
 
     for f in [fMX,fSX]:
       for i in range(3):
-        f.setInput(range(f.nnz_in(i)),i)
+        f_in[i]=range(f.nnz_in(i))
       
     self.checkfunction(fMX,fSX)
     
@@ -619,6 +619,8 @@ class Matrixtests(casadiTestCase):
     check(d,[0,1,3],[0,2,3])
 
   def test_sparsesym(self):
+    # feature removed in 73f407e
+    return
     self.message("sparsesym")
     D = DM([[1,2,-3],[2,-1,0],[-3,0,5]])
     D = sparsify(D)
@@ -871,16 +873,12 @@ class Matrixtests(casadiTestCase):
         
         f = Function("f", [A,B],[C])
         
-        f.setInput(a,0)
-        f.setInput(b,1)
-       
-        f.evaluate()
+
+        [c] = f([a,b])
             
         c_ref = DM(linalg.solve(a,b))
         c_ref = sparsify(c_ref)
-        
-        c = f.getOutput()
-        
+                
         print sA.dim(), sB.dim()
 
         try:
@@ -917,15 +915,14 @@ class Matrixtests(casadiTestCase):
     f = Function("f", [vec(P.T),A,B],[vec(mtimes([A,P,B]).T)])
 
     J = f.jacobian()
-    J.setInput(numpy.random.rand(*vec(P.T).shape),0)
-    J.setInput(numpy.random.rand(*A.shape),1)
-    J.setInput(numpy.random.rand(*B.shape),2)
+    J_in = []
+    J_in.append(numpy.random.rand(*vec(P.T).shape))
+    J_in.append(numpy.random.rand(*A.shape))
+    J_in.append(numpy.random.rand(*B.shape))
 
-    J.evaluate()
+    [res, _ ] =  J(J_in)
 
-    res =  J.getOutput()
-
-    ref =  kron(J.getInput(1),J.getInput(2).T)
+    ref =  kron(J_in[1],J_in[2].T)
 
     self.checkarray(res,ref)
     

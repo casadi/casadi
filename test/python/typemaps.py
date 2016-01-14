@@ -50,7 +50,7 @@ class typemaptests(casadiTestCase):
       zt=c.transpose(c.transpose(m))
       self.assertTrue(isinstance(zt,IM),"IM expected")
       self.checkarray(m,zt,"IM(numpy.ndarray)")
-      self.checkarray(m,zt.toArray(),"IM(numpy.ndarray).toArray()")
+      self.checkarray(m,zt.full(),"IM(numpy.ndarray).full()")
       #if scipy_available:
       #  self.checkarray(m,zt.toCsc_matrix(),"IM(numpy.ndarray).toCsc_matrix()")
       
@@ -62,7 +62,7 @@ class typemaptests(casadiTestCase):
       zt=c.transpose(c.transpose(m))
       self.assertTrue(isinstance(zt,DM),"DM expected")
       self.checkarray(m,zt,"DM(numpy.ndarray)")
-      self.checkarray(m,zt.toArray(),"DM(numpy.ndarray).toArray()")
+      self.checkarray(m,zt.full(),"DM(numpy.ndarray).full()")
       if scipy_available:
         self.checkarray(m,zt.toCsc_matrix(),"DM(numpy.ndarray).toCsc_matrix()")
       
@@ -74,7 +74,7 @@ class typemaptests(casadiTestCase):
       zt=c.transpose(c.transpose(m))
       self.assertTrue(isinstance(zt,DM),"DM expected")
       self.checkarray(m,zt,"DM(DM)")
-      self.checkarray(m,zt.toArray(),"DM(DM).toArray()")
+      self.checkarray(m,zt.full(),"DM(DM).full()")
       if scipy_available:
         self.checkarray(m,zt.toCsc_matrix(),"DM(DM).toCsc_matrix()")
    
@@ -90,7 +90,7 @@ class typemaptests(casadiTestCase):
       zt=c.transpose(c.transpose(m))
       self.assertTrue(isinstance(zt,DM),"DM expected")
       self.checkarray(m,zt,"DM(crs_matrix)")
-      self.checkarray(m,zt.toArray(),"DM(crs_matrix).toArray()")
+      self.checkarray(m,zt.full(),"DM(crs_matrix).full()")
       if scipy_available:
         self.checkarray(m,zt.toCsc_matrix(),"DM(crs_matrix).toCsc_matrix()")
       
@@ -113,10 +113,10 @@ class typemaptests(casadiTestCase):
     self.assertRaises(TypeError,lambda : dm.get(z),"get(wrong size ndarray)")
     z=ones((3,4))
     dm.set(z)
-    self.checkarray(dm.toArray() > 0,dm,"set(2Dndarray)")
+    self.checkarray(dm.full() > 0,dm,"set(2Dndarray)")
     z=n.matrix(ones((3,4)))
     dm.set(z)
-    self.checkarray(dm.toArray() > 0,dm,"set(2Dmatrix)")
+    self.checkarray(dm.full() > 0,dm,"set(2Dmatrix)")
     z=n.zeros((12,5))
     
     if scipy_available:
@@ -147,7 +147,7 @@ class typemaptests(casadiTestCase):
     
     list(w.nonzeros())
     tuple(w.nonzeros())
-    w.toArray()
+    w.full()
     array(w)
     w.toMatrix()
     matrix(w)
@@ -157,9 +157,9 @@ class typemaptests(casadiTestCase):
     self.checkarray(DM(d),d,"DM(numpy.ndarray)")
     #self.checkarray(DM(array([1,2,3,4,5,6])),d.ravel(),"DM(numpy.ndarray)")
     #print DM(array([1,2,3,4,5,6]))
-    #print DM(array([1,2,3,6]),2,2).toArray()
+    #print DM(array([1,2,3,6]),2,2).full()
 
-    #print DM(array([1,2,3,6]),2,2).toArray()
+    #print DM(array([1,2,3,6]),2,2).full()
     
   def test_autoconversion(self):
     self.message("Auto conversion DM")
@@ -255,30 +255,30 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
 
         f=Function("f", [z],[r])
-        f.setInputNZ(dummy[0:f.nnz_in(0)])
-        f.evaluate()
+        f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f_out = f(f_in)
         
         f_=Function("f", [z],[z])
-        f_.setInputNZ(dummy[0:f.nnz_in(0)])
-        f_.evaluate()
+        f__in = [0]*f_.n_in();f__in[0]=DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f__out = f_(f__in)
         
 
-        self.checkarray(fun(f_.getOutput(),DM(s)),f.getOutput(),"operation",str(f_.getOutput(0))+str(s)+":"+str(fun(f_.getOutput(),DM(s)))+"->"+str(f.getOutput())+":"+str(s)+str(z)+"->"+str(r))
+        self.checkarray(fun(f__out[0],DM(s)),f_out[0],"operation",str(f__out[0])+str(s)+":"+str(fun(f__out[0],DM(s)))+"->"+str(f_out[0])+":"+str(s)+str(z)+"->"+str(r))
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
         f=Function("f", [z,s],[r])
-        f.setInputNZ(dummy[0:f.nnz_in(0)],0)
-        f.setInputNZ(dummy2[0:f.nnz_in(1)],1)
-        f.evaluate()
+        f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f_in[1]=DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])
+        f_out = f(f_in)
         
         f_=Function("f", [z,s],[z,s])
-        f_.setInputNZ(dummy[0:f.nnz_in(0)],0)
-        f_.setInputNZ(dummy2[0:f.nnz_in(1)],1)
-        f_.evaluate()
+        f__in = [0]*f_.n_in();f__in[0]=DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f__in[1]=DM(f_.sparsity_in(1),dummy2[0:f.nnz_in(1)])
+        f__out = f_(f__in)
 
-        self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation"+str(f_.getOutput(0))+","+str(f_.getOutput(1))+":"+str(f.getOutput()))
+        self.checkarray(fun(f__out[0],f__out[1]),f_out[0],"operation"+str(f__out[0])+","+str(f__out[1])+":"+str(f_out[0]))
     
     
     def tests(z,s):
@@ -586,26 +586,25 @@ class typemaptests(casadiTestCase):
     class Foo:
       def __DM__(self):
         return DM([4])
-        
-    f.setInput(Foo())
-    self.assertEqual(f.getInput(),4)
+    
+    self.assertEqual(f([Foo()])[0],4)
 
     class Foo:
       def __DM__(self):
         return SX([4])
         
-    self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
+    self.assertRaises(NotImplementedError,lambda :f([Foo()]))
     
     class Foo:
       def __DM__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
+    self.assertRaises(NotImplementedError,lambda :f([Foo()]))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
+    self.assertRaises(NotImplementedError,lambda :f([Foo()]))
 
   def test_casting_IM(self):
     self.message("casting IM")
@@ -712,8 +711,8 @@ class typemaptests(casadiTestCase):
 
     def val(a):
       f = Function("f", [],[a])
-      f.evaluate()
-      return f.getOutput()
+      f_out = f([])
+      return f_out[0]
       
     for i in [SX(1),1,1.0]:
       a = numpy.array([[1,2],[3,4]])
@@ -761,7 +760,8 @@ class typemaptests(casadiTestCase):
       
       x = SX.sym("x",d.sparsity())
       f = Function("f", [x],[x])
-      f.setInput(D)
+      fin = DM(d.sparsity(),0)
+      fin.set(D)
 
       self.checkarray(f.getInput(),DM([[1,2],[3,4]]))
       d.set(D)

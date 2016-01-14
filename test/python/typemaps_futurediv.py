@@ -167,30 +167,30 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
 
         f=Function('f', [z],[r])
-        f.setInputNZ(dummy[0:f.nnz_in(0)])
-        f.evaluate()
+        f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f_out = f(f_in)
         
         f_=Function('f', [z],[z])
-        f_.setInputNZ(dummy[0:f.nnz_in(0)])
-        f_.evaluate()
+        f__in = [0]*f_.n_in();f__in[0]=DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f__out = f_(f__in)
         
 
-        self.checkarray(fun(f_.getOutput(),DM(s)),f.getOutput(),"operation")
+        self.checkarray(fun(f__out[0],DM(s)),f_out[0],"operation")
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
         f=Function('f',[z,s],[r])
-        f.setInputNZ(dummy[0:f.nnz_in(0)],0)
-        f.setInputNZ(dummy2[0:f.nnz_in(1)],1)
-        f.evaluate()
+        f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f_in[1]=DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])
+        f_out = f(f_in)
         
         f_=Function('f', [z,s],[z,s])
-        f_.setInputNZ(dummy[0:f.nnz_in(0)],0)
-        f_.setInputNZ(dummy2[0:f.nnz_in(1)],1)
-        f_.evaluate()
+        f__in = [0]*f_.n_in();f__in[0]=DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f__in[1]=DM(f_.sparsity_in(1),dummy2[0:f.nnz_in(1)])
+        f__out = f_(f__in)
 
-        self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation")
+        self.checkarray(fun(f__out[0],f__out[1]),f_out[0],"operation")
     
     
     def tests(z,s):

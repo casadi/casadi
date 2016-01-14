@@ -54,17 +54,18 @@ class OCPtests(casadiTestCase):
     
     nlp = {'x':V, 'f':cost, 'g':vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])}
     opts = {}
-    opts["tol"] = 1e-5
-    opts["hessian_approximation"] = "limited-memory"
-    opts["max_iter"] = 100
-    opts["print_level"] = 0
+    opts["ipopt.tol"] = 1e-5
+    opts["ipopt.hessian_approximation"] = "limited-memory"
+    opts["ipopt.max_iter"] = 100
+    opts["ipopt.print_level"] = 0
     solver = nlpsol("solver", "ipopt", nlp, opts)
-    solver.setInput([-1000 for i in range(V.nnz())],"lbx")
-    solver.setInput([1000 for i in range(V.nnz())],"ubx")
-    solver.setInput([0 for i in range(N+1)],"lbg")
-    solver.setInput([0 for i in range(N+1)],"ubg")
-    solver.evaluate()
-    ocp_sol=solver.getOutput("f")[0]
+    solver_in = {}
+    solver_in["lbx"]=[-1000 for i in range(V.nnz())]
+    solver_in["ubx"]=[1000 for i in range(V.nnz())]
+    solver_in["lbg"]=[0 for i in range(N+1)]
+    solver_in["ubg"]=[0 for i in range(N+1)]
+    solver_out = solver(solver_in)
+    ocp_sol=solver_out["f"][0]
     # solve the ricatti equation exactly
     K = q+0.0
     for i in range(N):
@@ -108,23 +109,24 @@ class OCPtests(casadiTestCase):
     f = Function('f', [var,parMX],[qend[0]])
     nlp = {'x':var, 'f':-f([var,parc])[0]}
     opts = {}
-    opts["tol"] = 1e-12
-    opts["hessian_approximation"] = "limited-memory"
-    opts["max_iter"] = 10
-    opts["derivative_test"] = "first-order"
-    opts["print_level"] = 0
+    opts["ipopt.tol"] = 1e-12
+    opts["ipopt.hessian_approximation"] = "limited-memory"
+    opts["ipopt.max_iter"] = 10
+    opts["ipopt.derivative_test"] = "first-order"
+    opts["ipopt.print_level"] = 0
     solver = nlpsol("solver", "ipopt", nlp, opts)
-    solver.setInput([-1, -1],"lbx")
-    solver.setInput([1, 0.2],"ubx")
-    solver.evaluate()
-    self.assertAlmostEqual(solver.getOutput("x")[0],1,8,"X_opt")
-    self.assertAlmostEqual(solver.getOutput("x")[1],0.2,8,"X_opt")
+    solver_in = {}
+    solver_in["lbx"]=[-1, -1]
+    solver_in["ubx"]=[1, 0.2]
+    solver_out = solver(solver_in)
+    self.assertAlmostEqual(solver_out["x"][0],1,8,"X_opt")
+    self.assertAlmostEqual(solver_out["x"][1],0.2,8,"X_opt")
     
-    self.assertAlmostEqual(fmax(solver.getOutput("lam_x"),0)[0],1,8,"Cost should be linear in y0")
-    self.assertAlmostEqual(fmax(solver.getOutput("lam_x"),0)[1],(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2),8,"Cost should be linear in y0")
-    self.assertAlmostEqual(-solver.getOutput("f")[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
-    self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
-    self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[1],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[0],1,8,"Cost should be linear in y0")
+    self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[1],(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2),8,"Cost should be linear in y0")
+    self.assertAlmostEqual(-solver_out["f"][0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
+    self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[1],0,8,"Constraint is supposed to be unactive")
 
   @requires_nlpsol("ipopt")
   def test_singleshooting2(self):
@@ -161,28 +163,29 @@ class OCPtests(casadiTestCase):
     f = Function('f', [var,par],[qend[0]])
     nlp = {'x':var, 'f':-f([var,parc])[0], 'g':var[0]-var[1]}
     opts = {}
-    opts["tol"] = 1e-12
-    opts["hessian_approximation"] = "limited-memory"
-    opts["max_iter"] = 10
-    opts["derivative_test"] = "first-order"
-    #opts["print_level"] = 0
+    opts["ipopt.tol"] = 1e-12
+    opts["ipopt.hessian_approximation"] = "limited-memory"
+    opts["ipopt.max_iter"] = 10
+    opts["ipopt.derivative_test"] = "first-order"
+    #opts["ipopt.print_level"] = 0
     solver = nlpsol("solver", "ipopt", nlp, opts)
-    solver.setInput([-1, -1],"lbx")
-    solver.setInput([1, 0.2],"ubx")
-    solver.setInput([-1],"lbg")
-    solver.setInput([0],"ubg")
-    solver.evaluate()
+    solver_in = {}
+    solver_in["lbx"]=[-1, -1]
+    solver_in["ubx"]=[1, 0.2]
+    solver_in["lbg"]=[-1]
+    solver_in["ubg"]=[0]
+    solver_out = solver(solver_in)
 
-    self.assertAlmostEqual(solver.getOutput("x")[0],0.2,6,"X_opt")
-    self.assertAlmostEqual(solver.getOutput("x")[1],0.2,6,"X_opt")
+    self.assertAlmostEqual(solver_out["x"][0],0.2,6,"X_opt")
+    self.assertAlmostEqual(solver_out["x"][1],0.2,6,"X_opt")
     
-    self.assertAlmostEqual(fmax(solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[0],0,8,"Constraint is supposed to be unactive")
     dfdp0 = (sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)
-    self.assertAlmostEqual(fmax(solver.getOutput("lam_x"),0)[1],1+dfdp0,8)
-    self.assertAlmostEqual(solver.getOutput("lam_g")[0],1,8)
-    self.assertAlmostEqual(-solver.getOutput("f")[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
-    self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
-    self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[1],0,8,"Constraint is supposed to be unactive") 
+    self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[1],1+dfdp0,8)
+    self.assertAlmostEqual(solver_out["lam_g"][0],1,8)
+    self.assertAlmostEqual(-solver_out["f"][0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
+    self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[1],0,8,"Constraint is supposed to be unactive") 
     
   @requiresPlugin(XmlFile,"tinyxml")
   def test_XML(self):
@@ -230,8 +233,8 @@ class OCPtests(casadiTestCase):
     #print c.atTime(0)
     f=Function('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
     return 
-    f.evaluate()
-    self.checkarray(f.getOutput(),matrix([-956.271065,-250.051971,0]).T,"initeq")
+    f_out = f(f_in)
+    self.checkarray(f_out[0],matrix([-956.271065,-250.051971,0]).T,"initeq")
 
     
     mystates = []

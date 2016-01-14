@@ -28,6 +28,7 @@ import unittest
 from types import *
 from helpers import *
 
+#@run_only(["setjacsparsity"])
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
@@ -38,13 +39,13 @@ class Functiontests(casadiTestCase):
     fmx2 = Function("fmx2", [x,[]],[x])
     
     for f in [fsx,fmx1,fmx2]:
-      f.evaluate()
+      f([0,0])
 
       X = MX.sym("X",2)
       F = f([X,MX()])[0]
       g = Function("g", [X],[F])
 
-      g.evaluate()
+      g([0])
     
     x = SX.sym("x",2)
     fsx = Function("fsx", [x],[x,[]])
@@ -53,13 +54,13 @@ class Functiontests(casadiTestCase):
     fmx2 = Function("fmx2", [x],[x,[]])
     
     for f in [fsx,fmx1,]:
-      f.evaluate()
+      f([0])
 
       X = MX.sym("X",2)
       F = f([X])[0]
       g = Function("g", [X],[F])
 
-      g.evaluate()
+      g([0])
   
   def test_Map(self):
     self.message("Map")
@@ -161,18 +162,12 @@ class Functiontests(casadiTestCase):
     
     f = Function("f", [x,y],[x**2,y,x*y[0]])
     
-    f.setInput([0.1,0.7,1.3],0)
-    f.setInput([7.1,2.9],1)
-    
     X = MX.sym("x",3,1)
     Y = MX.sym("y",2,1)
     
     F = Function("F", [X,Y],[X**2,Y,X*Y[0]])
     
-    F.setInput([0.1,0.7,1.3],0)
-    F.setInput([7.1,2.9],1)
-    
-    self.checkfunction(f,F,sens_der=False,evals=False)
+    self.checkfunction(f,F,inputs=[[0.1,0.7,1.3],[7.1,2.9]],sens_der=False,evals=False)
     
   
   @memory_heavy()
@@ -370,7 +365,7 @@ class Functiontests(casadiTestCase):
 
     
     with self.assertRaises(Exception):
-      f.getOutput("baz")
+      f_out["baz"]
       
     ret = f({'i0':SX(12)})
     self.checkarray(ret["foo"],DM([144]))
@@ -382,19 +377,21 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x",4)
           
     f = Function("f", [x],[x])
-    
+    x0 = DM([1,2,3,4])
     J = f.jacobian()
-    J.evaluate()
+    [out,_] = J([x0])
     
-    self.assertEqual(J.nnz_out(0),4)
+    self.assertEqual(out.nnz(),4)
     
     f = Function("f", [x],[x])
     f.set_jac_sparsity(Sparsity.dense(4,4),0,0,True)
     
-    J = f.jacobian()
-    J.evaluate()
+    J2 = f.jacobian()
+    [out2,_] = J2([x0])
     
-    self.assertEqual(J.nnz_out(0),16)
+    self.assertEqual(out2.nnz(),16)
+    self.checkfunction(J,J2,inputs=[x0])
+    
 
   def test_derivative_simplifications(self):
   
@@ -402,8 +399,6 @@ class Functiontests(casadiTestCase):
     x = SX.sym("x",n)
 
     M = Function("M", [x],[mtimes((x-DM(range(n))),x.T)])
-    M.evaluate()
-
 
     P = MX.sym("P",n,n)
     X = MX.sym("X",n)
@@ -411,9 +406,8 @@ class Functiontests(casadiTestCase):
     M_X= M([X])[0]
 
     Pf = Function("P", [X,P],[mtimes(M_X,P)])
-
+    
     P_P = Pf.jacobian(1)
-
     
     self.assertFalse("derivative" in str(P_P))
       
@@ -611,14 +605,8 @@ class Functiontests(casadiTestCase):
         V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
         for f in [F, F.expand('expand_'+F.name())]:
-          for i,e in enumerate(X_+Y_+Z_+V_):
-            f.setInput(e,i)
-            Fref.setInput(e,i)
-
-          f.evaluate()
-          Fref.evaluate()
           
-          self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
+          self.checkfunction(f,Fref,inputs=X_+Y_+Z_+V_,sparsity_mod=args.run_slow)
 
 
   @memory_heavy()
@@ -662,14 +650,8 @@ class Functiontests(casadiTestCase):
         V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
         for f in [F, F.expand('expand_'+F.name())]:
-          for i,e in enumerate(X_+Y_+Z_+V_):
-            f.setInput(e,i)
-            Fref.setInput(e,i)
-
-          f.evaluate()
-          Fref.evaluate()
           
-          self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
+          self.checkfunction(f,Fref,inputs=X_+Y_+Z_+V_,sparsity_mod=args.run_slow)
 
   @memory_heavy()
   def test_mapsum(self):
@@ -709,26 +691,12 @@ class Functiontests(casadiTestCase):
         Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
         V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-        name = "trial_%s_%d" % (parallelization,zi)
-        F.generate(name)
-
-        import subprocess
-        p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name),shell=True).wait()
-        Fcgen = external(name)
-        for i,e in enumerate(X_+Y_+Z_+V_):
-          Fcgen.setInput(e,i)
-          Fref.setInput(e,i)
-
-        self.checkfunction(Fcgen,Fref,jacobian=False,hessian=False,evals=False)
-        del Fcgen
+        inputs = X_+Y_+Z_+V_
+        
+        self.check_codegen(F,inputs=inputs)
 
         for f in [F,toSX_fun(F)]:
-          for i,e in enumerate(X_+Y_+Z_+V_):
-            f.setInput(e,i)
-            Fref.setInput(e,i)
-
-          self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
-
+          self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
 
 
   @memory_heavy()
@@ -771,27 +739,12 @@ class Functiontests(casadiTestCase):
         Z_ = DM(Z.sparsity(),np.random.random(Z.nnz()))
         V_ = DM(V.sparsity(),np.random.random(V.nnz()))
 
-
-        name = "trial2_%s" % parallelization
-        F.generate(name)
-
-        import subprocess
-        p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
-        Fcgen = external(name)
-        for i,e in enumerate([horzcat(X_),horzcat(Y_),Z_,V_]):
-          Fcgen.setInput(e,i)
-          Fref.setInput(e,i)
-
-        self.checkfunction(Fcgen,Fref,jacobian=False,hessian=False,evals=False)
-        del Fcgen
+        inputs = [horzcat(X_),horzcat(Y_),Z_,V_]
+        
+        self.check_codegen(F,inputs=inputs)
 
         for f in [F,toSX_fun(F)]:
-          for i,e in enumerate([horzcat(X_),horzcat(Y_),Z_,V_]):
-            f.setInput(e,i)
-            Fref.setInput(e,i)
-
-
-          self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
+          self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
 
   def test_issue1522(self):
     V = MX.sym("X",2)
@@ -844,13 +797,9 @@ class Functiontests(casadiTestCase):
     
     x0 = DM([1,7])
     x1 = DM([[3,0],[2,4]])
-    F.setInput(x0)
-    Fref.setInput(x0)
-    F.setInput(x1,1)
-    Fref.setInput(x1,1)
 
-    self.check_codegen(F)
-    self.checkfunction(F,Fref)
+    self.check_codegen(F,inputs=[x0,x1])
+    self.checkfunction(F,Fref,inputs=[x0,x1])
 
   def test_repsumnode(self):
 
@@ -867,14 +816,9 @@ class Functiontests(casadiTestCase):
 
     x0 = DM([1,7])
     x1 = DM([[3,0],[2,4]])
-    F.setInput(x0)
-    Fref.setInput(x0)
-    F.setInput(x1,1)
-    Fref.setInput(x1,1)
-
-    self.check_codegen(F)
-
-    self.checkfunction(F,Fref)
+    
+    self.check_codegen(F,inputs=[x0,x1])
+    self.checkfunction(F,Fref,inputs=[x0,x1])
 
   @memory_heavy()
   def test_mapaccum(self):
@@ -912,17 +856,14 @@ class Functiontests(casadiTestCase):
       Y1s.append(Y1)
       Xps.append(XP)
     Fref = Function("f",[X,horzcat(Y),horzcat(Z),horzcat(V)],[horzcat(Xps),horzcat(Y0s),horzcat(Y1s)])
-    print Fref([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)])
+    inputs = [X_,horzcat(Y_),horzcat(Z_),horzcat(V_)]
 
     for f in [F,toSX_fun(F)]:
-      for i,e in enumerate([X_,horzcat(Y_),horzcat(Z_),horzcat(V_)]):
-        f.setInput(e,i)
-        Fref.setInput(e,i)
 
-      self.checkfunction(f,Fref)
-      self.check_codegen(f)
+      self.checkfunction(f,Fref,inputs=inputs)
+      self.check_codegen(f,inputs=inputs)
 
-    fun = Function("f",[y,x,z,v],[mtimes(z,x)+y+trace(v)**2,sin(y*x).T,v/y])
+    fun = Function("f",[y,x,z,v],[mtimes(z,x)+y+c.trace(v)**2,sin(y*x).T,v/y])
 
     F = fun.mapaccum("map",n,[False,True,False,True],[0,2])
 
@@ -940,14 +881,11 @@ class Functiontests(casadiTestCase):
       Vps.append(VP)
 
     Fref = Function("f",[horzcat(Y),X,horzcat(Z),V[0]],[horzcat(Xps),horzcat(Y0s),horzcat(Vps)])
-
+    inputs = [horzcat(Y_),X_,horzcat(Z_),V_[0]]
+    
     for f in [F,toSX_fun(F)]:
-      for i,e in enumerate([horzcat(Y_),X_,horzcat(Z_),V_[0]]):
-        f.setInput(e,i)
-        Fref.setInput(e,i)
-
-      self.checkfunction(f,Fref)
-      self.check_codegen(f)
+      self.checkfunction(f,Fref,inputs=inputs)
+      self.check_codegen(f,inputs=inputs)
 
   # @requiresPlugin(Compiler,"clang")
   # def test_jitfunction_clang(self):
@@ -1020,14 +958,8 @@ class Functiontests(casadiTestCase):
     xs = MX.sym("x",2)
     Fref = Function("Fref",[zs,xs],Fref([horzcat([vec(xx),vec(yy)]).T,vec(zs),xs]))
     
-    F.setInput(z,0)
-    Fref.setInput(z,0)
-    
-    F.setInput(x0,1)
-    Fref.setInput(x0,1)
-    
-    self.checkfunction(F,Fref,digits=5,allow_nondiff=True,evals=False)
-    self.check_codegen(F)
+    self.checkfunction(F,Fref,inputs=[z,x0],digits=5,allow_nondiff=True,evals=False)
+    self.check_codegen(F,inputs=[z,x0])
 
 if __name__ == '__main__':
     unittest.main()

@@ -177,8 +177,8 @@ class Sparsitytests(casadiTestCase):
     for i in nza:
       a.add_nz(i[0],i[1])
       
-    A=self.tomatrix(a).toArray()
-    B=self.tomatrix(casadi.reshape(a,2,10)).toArray()
+    A=self.tomatrix(a).full()
+    B=self.tomatrix(casadi.reshape(a,2,10)).full()
     B_=numpy.reshape(A.T,(10,2)).T
     
     self.checkarray(B,B_,"reshape")
@@ -197,8 +197,8 @@ class Sparsitytests(casadiTestCase):
     for i in nza:
       a.add_nz(i[0],i[1])
       
-    A=self.tomatrix(a).toArray()
-    B=self.tomatrix(vec(a)).toArray()
+    A=self.tomatrix(a).full()
+    B=self.tomatrix(vec(a)).full()
     B_=numpy.reshape(A,(20,1))
     
     self.checkarray(B,B_,"reshape")
@@ -270,38 +270,6 @@ class Sparsitytests(casadiTestCase):
     for i in nza:
       a.add_nz(i[0],i[1])
       
-    b = SX.sym("b",a)
-    
-    self.assertRaises(Exception,lambda: b[Sparsity.diag(3)])
-    
-    d = Sparsity.diag(5)
-    c = b[d]
-
-    self.assertTrue(c.sparsity()==d)
-    
-    f = Function('f', [b],[c])
-    f.setInput(range(1,len(nza)+1))
-    f.evaluate()
-    
-    self.checkarray(DM(f.getOutput().nonzeros()),DM([1,0,0,7,0]),"sparsity index")
-    
-    self.assertTrue(f.getOutput().nonzeros()[1]==0)
-    
-  def test_sparsityindex(self):
-    self.message("sparsity indexing")
-    nza = set([  (0,0),
-             (0,1),
-             (2,0),
-             (2,3),
-             (3,3),
-             (2,4),
-             (3,1),
-             (4,1)])
-    
-    a = Sparsity(5,5)
-    for i in nza:
-      a.add_nz(i[0],i[1])
-      
     b = MX.sym("b",a)
     
     self.assertRaises(Exception,lambda: b[Sparsity.diag(3)])
@@ -312,10 +280,10 @@ class Sparsitytests(casadiTestCase):
     self.assertTrue(c.sparsity()==d)
     
     f = Function('f', [b],[c])
-    f.setInputNZ(range(1,len(nza)+1))
-    f.evaluate()
+    fin = DM(b.sparsity(),range(1,len(nza)+1))
+    f_out = f([fin])
     
-    self.checkarray(DM(f.getOutput().nonzeros()),DM([1,0,0,7,0]),"sparsity index")
+    self.checkarray(DM(f_out[0].nonzeros()),DM([1,0,0,7,0]),"sparsity index")
     
   def test_get_ccs(self):
     self.message("CCS format")
@@ -490,7 +458,7 @@ class Sparsitytests(casadiTestCase):
 
     J = g.jacobian()
     
-    self.assertTrue(J.getOutput()[:,:X.nnz()].sparsity()==Sparsity.diag(100))
+    self.assertTrue(DM(J.sparsity_out(0))[:,:X.nnz()].sparsity()==Sparsity.diag(100))
 
     X = SX.sym("X",100)
     P = SX.sym("P",1000)
@@ -500,8 +468,8 @@ class Sparsitytests(casadiTestCase):
     g = Function('g', [X,p],[vertcat([X*p,P])], {'verbose':True})
 
     J = g.jacobian()
-    
-    self.assertTrue(J.getOutput()[:X.nnz(),:].sparsity()==Sparsity.diag(100))
+        
+    self.assertTrue(DM(J.sparsity_out(0))[:X.nnz(),:].sparsity()==Sparsity.diag(100))
     
   def test_rowcol(self):
     n = 3
