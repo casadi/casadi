@@ -38,9 +38,9 @@ using namespace std;
 
 namespace casadi {
   FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
-    addOption("verbose",                  OT_BOOL,             false,
+    addOption("verbose", OT_BOOL,
               "Verbose evaluation -- for debugging");
-    addOption("ad_weight",                OT_DOUBLE,                GenericType(),
+    addOption("ad_weight", OT_DOUBLE,
               "Weighting factor for derivative calculation."
               "When there is an option of either using forward or reverse mode "
               "directional derivatives, the condition ad_weight*nf<=(1-ad_weight)*na "
@@ -49,11 +49,11 @@ namespace casadi {
               "automatically, but this can be overridden by setting this option. "
               "In particular, 0 means forcing forward mode and 1 forcing reverse mode. "
               "Leave unset for (class specific) heuristics.");
-    addOption("ad_weight_sp",             OT_DOUBLE,                GenericType(),
+    addOption("ad_weight_sp", OT_DOUBLE,
               "Weighting factor for sparsity pattern calculation calculation."
               "Overrides default behavior. Set to 0 and 1 to force forward and "
               "reverse mode respectively. Cf. option \"ad_weight\".");
-    addOption("jac_penalty",             OT_DOUBLE,                 2,
+    addOption("jac_penalty", OT_DOUBLE,
               "When requested for a number of forward/reverse directions,   "
               "it may be cheaper to compute first the full jacobian and then "
               "multiply with seeds, rather than obtain the requested directions "
@@ -62,22 +62,27 @@ namespace casadi {
               "A high value of 'jac_penalty' makes it less likely for the heurstic "
               "to chose the full Jacobian strategy. "
               "The special value -1 indicates never to use the full Jacobian strategy");
-    addOption("user_data",                OT_VOIDPTR,             GenericType(),
+    addOption("user_data", OT_VOIDPTR,
               "A user-defined field that can be used to identify "
               "the function or pass additional information");
-    addOption("monitor",                  OT_STRINGVECTOR,        GenericType(),
+    addOption("monitor", OT_STRINGVECTOR,
               "Monitors to be activated");
-    addOption("regularity_check",         OT_BOOL,             true,
+    addOption("regularity_check", OT_BOOL,
               "Throw exceptions when NaN or Inf appears during evaluation");
-    addOption("inputs_check",             OT_BOOL,             true,
+    addOption("inputs_check", OT_BOOL,
               "Throw exceptions when the numerical values of the inputs don't make sense");
-    addOption("gather_stats",             OT_BOOL,             false,
+    addOption("gather_stats", OT_BOOL,
               "Flag to indicate whether statistics must be gathered");
-    addOption("input_scheme", OT_STRINGVECTOR, GenericType(), "Custom input scheme");
-    addOption("output_scheme", OT_STRINGVECTOR, GenericType(), "Custom output scheme");
-    addOption("jit", OT_BOOL, false, "Use just-in-time compiler to speed up the evaluation");
-    addOption("compiler", OT_STRING, "clang", "Just-in-time compiler plugin to be used.");
-    addOption("jit_options", OT_DICT, GenericType(), "Options to be passed to the jit compiler.");
+    addOption("input_scheme", OT_STRINGVECTOR,
+              "Custom input scheme");
+    addOption("output_scheme", OT_STRINGVECTOR,
+              "Custom output scheme");
+    addOption("jit", OT_BOOL,
+              "Use just-in-time compiler to speed up the evaluation");
+    addOption("compiler", OT_STRING,
+              "Just-in-time compiler plugin to be used.");
+    addOption("jit_options", OT_DICT,
+              "Options to be passed to the jit compiler.");
 
     // Default options (can be overridden in derived classes)
     verbose_ = false;

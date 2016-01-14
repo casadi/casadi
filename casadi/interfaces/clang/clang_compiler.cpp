@@ -57,10 +57,11 @@ namespace casadi {
 
   ClangCompiler::ClangCompiler(const std::string& name) :
     CompilerInternal(name) {
-    addOption("include_path", OT_STRING, "", "Include paths for the JIT compiler."
-      " The include directory shipped with CasADi will be automatically appended.");
-    addOption("flags", OT_STRINGVECTOR, GenericType(),
-      "Compile flags for the JIT compiler. Default: None");
+    addOption("include_path", OT_STRING,
+              "Include paths for the JIT compiler. "
+              "The include directory shipped with CasADi will be automatically appended.");
+    addOption("flags", OT_STRINGVECTOR,
+              "Compile flags for the JIT compiler. Default: None");
 
     myerr_ = 0;
     executionEngine_ = 0;

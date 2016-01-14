@@ -55,47 +55,47 @@ namespace casadi {
 
   Scpgen::Scpgen(const std::string& name, const XProblem& nlp) : Nlpsol(name, nlp) {
     casadi_warning("SCPgen is under development");
-    addOption("qpsol",         OT_STRING,   GenericType(),
+    addOption("qpsol", OT_STRING,
               "The QP solver to be used by the SQP method");
-    addOption("qpsol_options", OT_DICT, GenericType(),
+    addOption("qpsol_options", OT_DICT,
               "Options to be passed to the QP solver");
-    addOption("hessian_approximation", OT_STRING, "exact",
+    addOption("hessian_approximation", OT_STRING,
               "gauss-newton|exact");
-    addOption("max_iter",          OT_INT,      50,
+    addOption("max_iter", OT_INT,
               "Maximum number of SQP iterations");
-    addOption("max_iter_ls",       OT_INT,       1,
+    addOption("max_iter_ls", OT_INT,
               "Maximum number of linesearch iterations");
-    addOption("tol_pr",            OT_DOUBLE,       1e-6,
+    addOption("tol_pr", OT_DOUBLE,
               "Stopping criterion for primal infeasibility");
-    addOption("tol_du",            OT_DOUBLE,       1e-6,
+    addOption("tol_du", OT_DOUBLE,
               "Stopping criterion for dual infeasability");
-    addOption("tol_reg",           OT_DOUBLE,       1e-11,
+    addOption("tol_reg", OT_DOUBLE,
               "Stopping criterion for regularization");
-    addOption("tol_pr_step",       OT_DOUBLE,       1e-6,
+    addOption("tol_pr_step", OT_DOUBLE,
               "Stopping criterion for the step size");
-    addOption("c1",                OT_DOUBLE,       1e-4,
+    addOption("c1", OT_DOUBLE,
               "Armijo condition, coefficient of decrease in merit");
-    addOption("beta",              OT_DOUBLE,       0.8,
+    addOption("beta", OT_DOUBLE,
               "Line-search parameter, restoration factor of stepsize");
-    addOption("merit_memsize",     OT_INT,      4,
+    addOption("merit_memsize", OT_INT,
               "Size of memory to store history of merit function values");
-    addOption("merit_start",       OT_DOUBLE,      1e-8,
+    addOption("merit_start", OT_DOUBLE,
               "Lower bound for the merit function parameter");
-    addOption("lbfgs_memory",      OT_INT,     10,
+    addOption("lbfgs_memory", OT_INT,
               "Size of L-BFGS memory.");
-    addOption("regularize",        OT_BOOL,  false,
+    addOption("regularize", OT_BOOL,
               "Automatic regularization of Lagrange Hessian.");
-    addOption("print_header",      OT_BOOL,   true,
+    addOption("print_header", OT_BOOL,
               "Print the header with problem statistics");
-    addOption("codegen",           OT_BOOL,  false,
+    addOption("codegen", OT_BOOL,
               "C-code generation");
-    addOption("reg_threshold",     OT_DOUBLE,      1e-8,
+    addOption("reg_threshold", OT_DOUBLE,
               "Threshold for the regularization.");
-    addOption("name_x",      OT_STRINGVECTOR,  GenericType(),
+    addOption("name_x", OT_STRINGVECTOR,
               "Names of the variables.");
-    addOption("print_x",           OT_INTVECTOR,  GenericType(),
+    addOption("print_x", OT_INTVECTOR,
               "Which variables to print.");
-    addOption("print_time",        OT_BOOL, true,
+    addOption("print_time", OT_BOOL,
               "Print information about execution time");
   }
 

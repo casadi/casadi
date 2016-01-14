@@ -106,8 +106,7 @@ namespace casadi {
     static double wordDistance(const std::string &a, const std::string &b);
 
 
-    void addOption(const std::string &str, const TypeID& type,
-                   const GenericType &def_val, const std::string& desc);
+    void addOption(const std::string &str, const TypeID& type, const std::string& desc);
 
   protected:
 

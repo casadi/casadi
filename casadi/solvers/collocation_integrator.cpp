@@ -48,9 +48,9 @@ namespace casadi {
   CollocationIntegrator::CollocationIntegrator(const std::string& name, const XProblem& dae)
     : ImplicitFixedStepIntegrator(name, dae) {
 
-    addOption("interpolation_order",           OT_INT,  3,
+    addOption("interpolation_order", OT_INT,
               "Order of the interpolating polynomials");
-    addOption("collocation_scheme",            OT_STRING,  "radau",
+    addOption("collocation_scheme", OT_STRING,
               "Collocation scheme: radau|legendre");
   }
 

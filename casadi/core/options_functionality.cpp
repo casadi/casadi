@@ -182,8 +182,7 @@ namespace casadi {
   }
 
   void OptionsFunctionalityNode::
-  addOption(const string &name, const TypeID& type, const GenericType &def_val,
-            const string& desc) {
+  addOption(const string &name, const TypeID& type, const string& desc) {
     allowed_options[name] = type;
     description_[name] = desc;
   }

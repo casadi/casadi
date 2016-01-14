@@ -51,74 +51,72 @@ namespace casadi {
                                      const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
 
-    addOption("nWSR",                   OT_INT,     GenericType(),
+    addOption("nWSR", OT_INT,
               "The maximum number of working set recalculations to be performed during "
               "the initial homotopy. Default is 5(nx + nc)");
-    addOption("CPUtime",                OT_DOUBLE,        GenericType(),
+    addOption("CPUtime", OT_DOUBLE,
               "The maximum allowed CPU time in seconds for the whole initialisation"
               " (and the actually required one on output). Disabled if unset.");
-
-    addOption("printLevel",             OT_STRING,  GenericType(),
+    addOption("printLevel", OT_STRING,
               "Defines the amount of text output during QP solution, see Section 5.7");
-    addOption("enableRamping",          OT_BOOL, GenericType(),
+    addOption("enableRamping", OT_BOOL,
               "Enables ramping.");
-    addOption("enableFarBounds",        OT_BOOL, GenericType(),
+    addOption("enableFarBounds", OT_BOOL,
               "Enables the use of  far bounds.");
-    addOption("enableFlippingBounds",   OT_BOOL, GenericType(),
+    addOption("enableFlippingBounds", OT_BOOL,
               "Enables the use of  flipping bounds.");
-    addOption("enableRegularisation",   OT_BOOL, GenericType(),
+    addOption("enableRegularisation", OT_BOOL,
               "Enables automatic  Hessian regularisation.");
-    addOption("enableFullLITests",      OT_BOOL, GenericType(),
+    addOption("enableFullLITests", OT_BOOL,
               "Enables condition-hardened  (but more expensive) LI test.");
-    addOption("enableNZCTests",         OT_BOOL, GenericType(),
+    addOption("enableNZCTests", OT_BOOL,
               "Enables nonzero curvature  tests.");
-    addOption("enableDriftCorrection",  OT_INT, GenericType(),
+    addOption("enableDriftCorrection", OT_INT,
               "Specifies the frequency of drift corrections: 0: turns them off.");
     addOption("enableCholeskyRefactorisation", OT_INT,
-              GenericType(),
               "Specifies the frequency of a full re-factorisation of projected "
               "Hessian matrix: 0: turns them off,  1: uses them at each iteration etc.");
-    addOption("enableEqualities",       OT_BOOL, GenericType(),
+    addOption("enableEqualities", OT_BOOL,
               "Specifies whether equalities should be treated  as always active "
               "(True) or not (False)");
-    addOption("terminationTolerance",   OT_DOUBLE, GenericType(),
+    addOption("terminationTolerance", OT_DOUBLE,
               "Relative termination tolerance to stop homotopy.");
-    addOption("boundTolerance",         OT_DOUBLE, GenericType(),
+    addOption("boundTolerance", OT_DOUBLE,
               "If upper and lower bounds differ less than this tolerance, they are regarded "
               "equal, i.e. as  equality constraint.");
-    addOption("boundRelaxation",        OT_DOUBLE, GenericType(),
+    addOption("boundRelaxation", OT_DOUBLE,
               "Initial relaxation of bounds to start homotopy  and initial value for far bounds.");
-    addOption("epsNum",                 OT_DOUBLE, GenericType(),
+    addOption("epsNum", OT_DOUBLE,
               "Numerator tolerance for ratio tests.");
-    addOption("epsDen",                 OT_DOUBLE, GenericType(),
+    addOption("epsDen", OT_DOUBLE,
               "Denominator tolerance for ratio tests.");
-    addOption("maxPrimalJump",          OT_DOUBLE, GenericType(),
+    addOption("maxPrimalJump", OT_DOUBLE,
               "Maximum allowed jump in primal variables in  nonzero curvature tests.");
-    addOption("maxDualJump",            OT_DOUBLE, GenericType(),
+    addOption("maxDualJump", OT_DOUBLE,
               "Maximum allowed jump in dual variables in  linear independence tests.");
-    addOption("initialRamping",         OT_DOUBLE, GenericType(),
+    addOption("initialRamping", OT_DOUBLE,
               "Start value for ramping strategy.");
-    addOption("finalRamping",           OT_DOUBLE, GenericType(),
+    addOption("finalRamping", OT_DOUBLE,
               "Final value for ramping strategy.");
-    addOption("initialFarBounds",       OT_DOUBLE, GenericType(),
+    addOption("initialFarBounds", OT_DOUBLE,
               "Initial size for far bounds.");
-    addOption("growFarBounds",          OT_DOUBLE, GenericType(),
+    addOption("growFarBounds", OT_DOUBLE,
               "Factor to grow far bounds.");
-    addOption("initialStatusBounds", OT_STRING, GenericType(),
+    addOption("initialStatusBounds", OT_STRING,
               "Initial status of bounds at first iteration.");
-    addOption("epsFlipping",            OT_DOUBLE, GenericType(),
+    addOption("epsFlipping", OT_DOUBLE,
               "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound.");
-    addOption("numRegularisationSteps", OT_INT, GenericType(),
+    addOption("numRegularisationSteps", OT_INT,
               "Maximum number of successive regularisation steps.");
-    addOption("epsRegularisation",      OT_DOUBLE, GenericType(),
+    addOption("epsRegularisation", OT_DOUBLE,
               "Scaling factor of identity matrix used for  Hessian regularisation.");
-    addOption("numRefinementSteps",     OT_INT, GenericType(),
+    addOption("numRefinementSteps", OT_INT,
               "Maximum number of iterative refinement steps.");
-    addOption("epsIterRef",             OT_DOUBLE, GenericType(),
+    addOption("epsIterRef", OT_DOUBLE,
               "Early termination tolerance for iterative  refinement.");
-    addOption("epsLITests",             OT_DOUBLE, GenericType(),
+    addOption("epsLITests", OT_DOUBLE,
               "Tolerance for linear independence tests.");
-    addOption("epsNZCTests",            OT_DOUBLE, GenericType(),
+    addOption("epsNZCTests", OT_DOUBLE,
               "Tolerance for nonzero curvature tests.");
   }
 

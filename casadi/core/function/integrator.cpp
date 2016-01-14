@@ -33,13 +33,18 @@ namespace casadi {
     : FunctionInternal(name), dae_(dae) {
 
     // Additional options
-    addOption("print_stats", OT_BOOL, false, "Print out statistics after integration");
-    addOption("t0", OT_DOUBLE, 0.0, "Beginning of the time horizon");
-    addOption("tf", OT_DOUBLE, 1.0, "End of the time horizon");
-    addOption("grid", OT_DOUBLEVECTOR, GenericType(), "Time grid");
-    addOption("augmented_options", OT_DICT, GenericType(),
+    addOption("print_stats", OT_BOOL,
+              "Print out statistics after integration");
+    addOption("t0", OT_DOUBLE,
+              "Beginning of the time horizon");
+    addOption("tf", OT_DOUBLE,
+              "End of the time horizon");
+    addOption("grid", OT_DOUBLEVECTOR,
+              "Time grid");
+    addOption("augmented_options", OT_DICT,
               "Options to be passed down to the augmented integrator, if one is constructed.");
-    addOption("output_t0", OT_BOOL, false, "Output the state at the initial time");
+    addOption("output_t0", OT_BOOL,
+              "Output the state at the initial time");
 
     if (dae.is_sx) {
       f_ = get_f<SX>();
@@ -1313,7 +1318,8 @@ namespace casadi {
 
   FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
     : Integrator(name, dae) {
-    addOption("number_of_finite_elements",     OT_INT,  20, "Number of finite elements");
+    addOption("number_of_finite_elements", OT_INT,
+              "Number of finite elements");
 
     // Default options
     nk_ = 20;
@@ -1536,9 +1542,9 @@ namespace casadi {
   ImplicitFixedStepIntegrator::
   ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae)
     : FixedStepIntegrator(name, dae) {
-    addOption("implicit_solver",               OT_STRING,  GenericType(),
+    addOption("implicit_solver", OT_STRING,
               "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICT, GenericType(),
+    addOption("implicit_solver_options", OT_DICT,
               "Options to be passed to the NLP Solver");
   }
 

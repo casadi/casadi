@@ -50,8 +50,10 @@ namespace casadi {
   KnitroInterface::KnitroInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
 
-    addOption("knitro", OT_DICT, GenericType(), "Options to be passed to KNITRO");
-    addOption("contype", OT_INTVECTOR, GenericType(), "Type of constraint");
+    addOption("knitro", OT_DICT,
+              "Options to be passed to KNITRO");
+    addOption("contype", OT_INTVECTOR,
+              "Type of constraint");
   }
 
 

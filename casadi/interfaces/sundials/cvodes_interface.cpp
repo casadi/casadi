@@ -49,11 +49,11 @@ namespace casadi {
   CvodesInterface::CvodesInterface(const std::string& name, const XProblem& dae)
     : SundialsInterface(name, dae) {
 
-    addOption("linear_multistep_method",          OT_STRING,              "bdf",
+    addOption("linear_multistep_method", OT_STRING,
               "Integrator scheme");
-    addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",
+    addOption("nonlinear_solver_iteration", OT_STRING,
               "");
-    addOption("fsens_all_at_once",                OT_BOOL,             true,
+    addOption("fsens_all_at_once", OT_BOOL,
               "Calculate all right hand sides of the sensitivity equations at once");
   }
 

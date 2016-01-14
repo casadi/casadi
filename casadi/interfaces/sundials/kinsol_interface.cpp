@@ -65,29 +65,33 @@ namespace casadi {
   KinsolInterface::KinsolInterface(const std::string& name, const Function& f)
     : Rootfinder(name, f) {
 
-    addOption("max_iter",                 OT_INT, 0,
+    addOption("max_iter", OT_INT,
               "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
-    addOption("abstol",                   OT_DOUBLE, 1e-6, "Stopping criterion tolerance");
-    addOption("linear_solver_type",       OT_STRING, "dense",
+    addOption("abstol", OT_DOUBLE,
+              "Stopping criterion tolerance");
+    addOption("linear_solver_type", OT_STRING,
               "dense|banded|iterative|user_defined");
-    addOption("upper_bandwidth",          OT_INT, GenericType(),
+    addOption("upper_bandwidth", OT_INT,
               "Upper bandwidth for banded linear solvers");
-    addOption("lower_bandwidth",          OT_INT, GenericType(),
+    addOption("lower_bandwidth", OT_INT,
               "Lower bandwidth for banded linear solvers");
-    addOption("max_krylov",               OT_INT, 0,
+    addOption("max_krylov", OT_INT,
               "Maximum Krylov space dimension");
-    addOption("exact_jacobian",           OT_BOOL, true,
+    addOption("exact_jacobian", OT_BOOL,
               "Use exact Jacobian information");
-    addOption("iterative_solver",         OT_STRING, "gmres", "gmres|bcgstab|tfqmr");
-    addOption("f_scale",                  OT_DOUBLEVECTOR, GenericType(),
+    addOption("iterative_solver", OT_STRING,
+              "gmres|bcgstab|tfqmr");
+    addOption("f_scale", OT_DOUBLEVECTOR,
               "Equation scaling factors");
-    addOption("u_scale",                  OT_DOUBLEVECTOR, GenericType(),
+    addOption("u_scale", OT_DOUBLEVECTOR,
               "Variable scaling factors");
-    addOption("pretype",                  OT_STRING, "none", "Type of preconditioner");
-    addOption("use_preconditioner",       OT_BOOL, false,
+    addOption("pretype", OT_STRING,
+              "Type of preconditioner");
+    addOption("use_preconditioner", OT_BOOL,
               "Precondition an iterative solver");
-    addOption("strategy",                 OT_STRING, "none", "Globalization strategy");
-    addOption("disable_internal_warnings",   OT_BOOL, false,
+    addOption("strategy", OT_STRING,
+              "Globalization strategy");
+    addOption("disable_internal_warnings", OT_BOOL,
               "Disable KINSOL internal warning messages");
 
     u_scale_ = 0;

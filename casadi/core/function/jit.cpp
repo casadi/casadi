@@ -35,8 +35,10 @@ namespace casadi {
   Jit::Jit(const std::string& name, int n_in, int n_out,
            const std::string& body, const Dict& opts)
     : FunctionInternal(name), n_in_(n_in), n_out_(n_out), body_(body) {
-    addOption("jac", OT_STRING, GenericType(), "Function body for Jacobian");
-    addOption("hess", OT_STRING, GenericType(), "Function body for Hessian");
+    addOption("jac", OT_STRING,
+              "Function body for Jacobian");
+    addOption("hess", OT_STRING,
+              "Function body for Hessian");
 
     // Default options
     jit_ = true; // override default

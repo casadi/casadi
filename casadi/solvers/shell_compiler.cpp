@@ -51,12 +51,13 @@ namespace casadi {
 
   ShellCompiler::ShellCompiler(const std::string& name) :
     CompilerInternal(name) {
-    addOption("compiler", OT_STRING, "gcc", "Compiler command");
-    addOption("compiler_setup", OT_STRING, "-fPIC -shared",
+    addOption("compiler", OT_STRING,
+              "Compiler command");
+    addOption("compiler_setup", OT_STRING,
         "Compiler setup command. Intended to be fixed."
         " The 'flag' option is the prefered way to set"
         " custom flags.");
-    addOption("flags", OT_STRINGVECTOR, GenericType(),
+    addOption("flags", OT_STRINGVECTOR,
       "Compile flags for the JIT compiler. Default: None");
   }
 

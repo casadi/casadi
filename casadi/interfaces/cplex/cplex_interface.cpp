@@ -55,16 +55,23 @@ namespace casadi {
                                  const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
 
-    addOption("qp_method",    OT_INT, 0, "Determines which CPLEX algorithm to use.");
-    addOption("dump_to_file",   OT_BOOL,        false, "Dumps QP to file in CPLEX format.");
-    addOption("dump_filename",   OT_STRING,     "qp.dat", "The filename to dump to.");
-    addOption("tol",               OT_DOUBLE,         1E-6, "Tolerance of solver");
-    addOption("dep_check",      OT_INT,         0, "Detect redundant constraints.");
-    addOption("simplex_maxiter", OT_INT,   2100000000, "Maximum number of simplex iterations.");
-    addOption("barrier_maxiter", OT_INT,   2100000000, "Maximum number of barrier iterations.");
-    addOption("warm_start",      OT_BOOL,        false,
+    addOption("qp_method", OT_INT,
+              "Determines which CPLEX algorithm to use.");
+    addOption("dump_to_file", OT_BOOL,
+              "Dumps QP to file in CPLEX format.");
+    addOption("dump_filename", OT_STRING,
+              "The filename to dump to.");
+    addOption("tol", OT_DOUBLE,
+              "Tolerance of solver");
+    addOption("dep_check", OT_INT,
+              "Detect redundant constraints.");
+    addOption("simplex_maxiter", OT_INT,
+              "Maximum number of simplex iterations.");
+    addOption("barrier_maxiter", OT_INT,
+              "Maximum number of barrier iterations.");
+    addOption("warm_start", OT_BOOL,
               "Use warm start with simplex methods (affects only the simplex methods).");
-    addOption("convex",          OT_BOOL,         true,
+    addOption("convex", OT_BOOL,
               "Indicates if the QP is convex or not (affects only the barrier method).");
   }
   void CplexInterface::init(const Dict& opts) {

@@ -49,7 +49,7 @@ namespace casadi {
                                    const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
 
-    addOption("vtype", OT_STRINGVECTOR, GenericType(),
+    addOption("vtype", OT_STRINGVECTOR,
               "Type of variables, Each entry can be one of: "
               "'continuous', 'binary', 'integer', 'semicont', 'semiint'");
     env_ = 0;

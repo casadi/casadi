@@ -79,11 +79,11 @@ namespace casadi {
   MapBase::MapBase(const std::string& name, const Function& f, int n)
     : FunctionInternal(name), f_(f), n_in_(f.n_in()), n_out_(f.n_out()), n_(n) {
 
-    addOption("parallelization", OT_STRING, "serial",
+    addOption("parallelization", OT_STRING,
               "Computational strategy for parallelization");
-    addOption("reduced_inputs", OT_INTVECTOR, GenericType(),
+    addOption("reduced_inputs", OT_INTVECTOR,
               "Reduction for certain inputs");
-    addOption("reduced_outputs", OT_INTVECTOR, GenericType(),
+    addOption("reduced_outputs", OT_INTVECTOR,
               "Reduction for certain outputs");
   }
 
