@@ -146,8 +146,8 @@ class MyCallback(Callback):
 mycallback = MyCallback('mycallback', 2, 1, 0)
 opts = {}
 opts['iteration_callback'] = mycallback
-opts['tol'] = 1e-8
-opts['max_iter'] = 50
+opts['ipopt.tol'] = 1e-8
+opts['ipopt.max_iter'] = 50
 solver = nlpsol('solver', 'ipopt', nlp, opts)
 sol = solver({'lbx':-10, 'ubx':10, 'lbg':-10, 'ubg':10})
 

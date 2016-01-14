@@ -40,6 +40,6 @@ sol = solver({'lbx':-10, 'ubx':10, 'lbg':0, 'ubg':1})
 print 'Optimal solution (exact Hessian): %s' % sol['x']
 
 #! Same problem but with limited memory BFSG
-solver = nlpsol('solver', 'ipopt', nlp, {'hessian_approximation':'limited-memory'})
+solver = nlpsol('solver', 'ipopt', nlp, {'ipopt.hessian_approximation':'limited-memory'})
 sol = solver({'lbx':-10, 'ubx':10, 'lbg':0, 'ubg':1})
 print 'Optimal solution (BFGS): %s' % sol['x']
