@@ -37,7 +37,7 @@ using namespace std;
 
 namespace casadi {
 
-  double OptionsFunctionalityNode::wordDistance(const std::string &a, const std::string &b) {
+  double OptionsFunctionality::wordDistance(const std::string &a, const std::string &b) {
     /// Levenshtein edit distance
     if (a == b) return 0;
     int na = a.size();
@@ -74,14 +74,14 @@ namespace casadi {
   }
 
   /// \cond INTERNAL
-  /// A helper class to use stl::sort in OptionsFunctionalityNode::getBestMatches
+  /// A helper class to use stl::sort in OptionsFunctionality::getBestMatches
   struct mysortclass {
     bool operator()(std::pair<std::string, double> a, std::pair<std::string, double> b) {
       return (a.second<b.second);}
   } mysorter;
   /// \endcond
 
-  double OptionsFunctionalityNode::
+  double OptionsFunctionality::
   getBestMatches(const std::string & word,
                  const std::vector<std::string> &dictionary,
                  std::vector<std::string> &suggestions, int amount) {
@@ -108,7 +108,7 @@ namespace casadi {
     return -1; // No score metric yet
   }
 
-  double OptionsFunctionalityNode::getBestMatches(const std::string &name,
+  double OptionsFunctionality::getBestMatches(const std::string &name,
                                                   std::vector<std::string> &suggestions,
                                                   int amount) const {
     // Work towards a vector of option names
@@ -158,7 +158,7 @@ namespace casadi {
     }
   }
 
-  void OptionsFunctionalityNode::assert_exists(const std::string &name) const {
+  void OptionsFunctionality::assert_exists(const std::string &name) const {
     // If option contains a dot, only check what comes before
     auto dotpos = name.find('.');
     if (dotpos != string::npos) {
@@ -181,13 +181,13 @@ namespace casadi {
     }
   }
 
-  void OptionsFunctionalityNode::
+  void OptionsFunctionality::
   addOption(const string &name, const TypeID& type, const string& desc) {
     allowed_options[name] = type;
     description_[name] = desc;
   }
 
-  void OptionsFunctionalityNode::printOption(const std::string &name, ostream &stream) const {
+  void OptionsFunctionality::printOption(const std::string &name, ostream &stream) const {
     auto allowed_option_it = allowed_options.find(name);
     if (allowed_option_it!=allowed_options.end()) {
 
@@ -207,7 +207,7 @@ namespace casadi {
     }
   }
 
-  void OptionsFunctionalityNode::printOptions(ostream &stream) const {
+  void OptionsFunctionality::printOptions(ostream &stream) const {
     stream << "\"Option name\" [type] = value" << endl;
     for (auto it=allowed_options.begin(); it!=allowed_options.end(); ++it) {
       printOption(it->first, stream);
@@ -215,17 +215,11 @@ namespace casadi {
     stream << endl;
   }
 
-  bool OptionsFunctionalityNode::hasOption(const string &str) const {
+  bool OptionsFunctionality::hasOption(const string &str) const {
     return allowed_options.find(str) != allowed_options.end();
   }
 
-  OptionsFunctionalityNode::OptionsFunctionalityNode() {
-  }
-
-  OptionsFunctionalityNode::~OptionsFunctionalityNode() {
-  }
-
-  std::vector<std::string> OptionsFunctionalityNode::optionNames() const {
+  std::vector<std::string> OptionsFunctionality::optionNames() const {
     std::vector<std::string> names;
     for (auto it=allowed_options.begin(); it!=allowed_options.end(); ++it) {
       names.push_back(it->first);
@@ -233,21 +227,21 @@ namespace casadi {
     return names;
   }
 
-  std::string OptionsFunctionalityNode::optionDescription(const std::string &name) const {
+  std::string OptionsFunctionality::optionDescription(const std::string &name) const {
     assert_exists(name);
     map<string, string>::const_iterator it = description_.find(name);
     if (it!=description_.end()) return it->second;
     return "N/A";
   }
 
-  TypeID OptionsFunctionalityNode::optionType(const std::string &name) const {
+  TypeID OptionsFunctionality::optionType(const std::string &name) const {
     assert_exists(name);
     auto it = allowed_options.find(name);
     if (it!=allowed_options.end()) return it->second;
     return OT_UNKNOWN;
   }
 
-  std::string OptionsFunctionalityNode::optionTypeName(const std::string &name) const {
+  std::string OptionsFunctionality::optionTypeName(const std::string &name) const {
     return GenericType::get_type_description(optionType(name));
   }
 

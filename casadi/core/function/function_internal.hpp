@@ -88,8 +88,8 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT FunctionInternal
-    : public OptionsFunctionalityNode {
+  class CASADI_EXPORT FunctionInternal : public SharedObjectNode,
+                                         public OptionsFunctionality {
     friend class Function;
 
   protected:

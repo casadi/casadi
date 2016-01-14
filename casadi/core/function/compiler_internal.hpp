@@ -41,7 +41,8 @@ namespace casadi {
   \date 2010-2013
 */
   class CASADI_EXPORT
-  CompilerInternal : public OptionsFunctionalityNode,
+  CompilerInternal : public SharedObjectNode,
+                     public OptionsFunctionality,
                      public PluginInterface<CompilerInternal> {
 
   public:

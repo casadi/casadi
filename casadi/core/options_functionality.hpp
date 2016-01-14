@@ -35,27 +35,12 @@ namespace casadi {
 /// \cond INTERNAL
 #ifndef SWIG
 
-  /** \brief Provides options setting/getting functionality
-
-      Gives a derived class the ability to set and retrieve options in a convenient way.
-      It also contains error checking, making sure that the option exists
-      and that the value type is correct.
-
-      A derived class should add option names, types and default values to the corresponding vectors.
-
-
+  /** \brief Provides options functionality to a derived class
       \author Joel Andersson
       \date 2010-2015
-      Joel Andersson, K.U. Leuven 2010
-      joel.andersson@esat.kuleuven.be
   */
-  class CASADI_EXPORT OptionsFunctionalityNode : public SharedObjectNode {
+  class CASADI_EXPORT OptionsFunctionality {
   public:
-
-    /// Constructor, destructor
-    OptionsFunctionalityNode();
-    virtual ~OptionsFunctionalityNode();
-
     /** \brief Get a list of all option names */
     std::vector<std::string> optionNames() const;
 
@@ -76,12 +61,6 @@ namespace casadi {
 
     /** \brief  Print all information there is to know about a certain option */
     void printOption(const std::string &name, std::ostream &stream = userOut()) const;
-
-    /** \brief  Print description */
-    virtual void print(std::ostream &stream) const = 0;
-
-    /** \brief  Print representation */
-    virtual void repr(std::ostream &stream) const = 0;
 
     /** \brief Get the best suggestions for a misspelled word using a dictionary
      *
