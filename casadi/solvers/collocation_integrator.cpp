@@ -58,19 +58,27 @@ namespace casadi {
   }
 
   void CollocationIntegrator::init(const Dict& opts) {
+    // Default options
+    deg_ = 3;
+    collocation_scheme_ = "radau";
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="interpolation_order") {
+        deg_ = op.second;
+      } else if (op.first=="collocation_scheme") {
+        collocation_scheme_ = op.second.to_string();
+      }
+    }
 
     // Call the base class init
     ImplicitFixedStepIntegrator::init(opts);
-
   }
 
   void CollocationIntegrator::setupFG() {
 
-    // Interpolation order
-    deg_ = option("interpolation_order");
-
     // All collocation time points
-    std::vector<long double> tau_root = collocationPointsL(deg_, option("collocation_scheme"));
+    std::vector<long double> tau_root = collocationPointsL(deg_, collocation_scheme_);
 
     // Coefficients of the collocation equation
     vector<vector<double> > C(deg_+1, vector<double>(deg_+1, 0));

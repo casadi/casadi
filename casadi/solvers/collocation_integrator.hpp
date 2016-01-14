@@ -91,6 +91,9 @@ namespace casadi {
     // Interpolation order
     int deg_;
 
+    // Collocation scheme
+    std::string collocation_scheme_;
+
     /// A documentation string
     static const std::string meta_doc;
 
