@@ -45,15 +45,21 @@ namespace casadi {
 
   ImplicitToNlp::ImplicitToNlp(const std::string& name, const Function& f)
     : Rootfinder(name, f) {
-
-    addOption("nlpsol", OT_STRING,
-              "Name of solver.");
-    addOption("nlpsol_options", OT_DICT,
-              "Options to be passed to solver.");
   }
 
   ImplicitToNlp::~ImplicitToNlp() {
   }
+
+  Options ImplicitToNlp::options_
+  = {{&Rootfinder::options_},
+     {{"nlpsol",
+       {OT_STRING,
+        "Name of solver."}},
+      {"nlpsol_options",
+       {OT_DICT,
+        "Options to be passed to solver."}}
+     }
+  };
 
   void ImplicitToNlp::init(const Dict& opts) {
     // Call the base class initializer

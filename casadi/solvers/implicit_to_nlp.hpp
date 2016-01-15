@@ -71,6 +71,12 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const { return "nlpsol";}
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 

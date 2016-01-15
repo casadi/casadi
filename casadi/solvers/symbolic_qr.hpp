@@ -66,6 +66,12 @@ namespace casadi {
       return new SymbolicQr(name, sp, nrhs);
     }
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     // Initialize
     virtual void init(const Dict& opts);
 

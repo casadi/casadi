@@ -55,53 +55,78 @@ namespace casadi {
 
   Scpgen::Scpgen(const std::string& name, const XProblem& nlp) : Nlpsol(name, nlp) {
     casadi_warning("SCPgen is under development");
-    addOption("qpsol", OT_STRING,
-              "The QP solver to be used by the SQP method");
-    addOption("qpsol_options", OT_DICT,
-              "Options to be passed to the QP solver");
-    addOption("hessian_approximation", OT_STRING,
-              "gauss-newton|exact");
-    addOption("max_iter", OT_INT,
-              "Maximum number of SQP iterations");
-    addOption("max_iter_ls", OT_INT,
-              "Maximum number of linesearch iterations");
-    addOption("tol_pr", OT_DOUBLE,
-              "Stopping criterion for primal infeasibility");
-    addOption("tol_du", OT_DOUBLE,
-              "Stopping criterion for dual infeasability");
-    addOption("tol_reg", OT_DOUBLE,
-              "Stopping criterion for regularization");
-    addOption("tol_pr_step", OT_DOUBLE,
-              "Stopping criterion for the step size");
-    addOption("c1", OT_DOUBLE,
-              "Armijo condition, coefficient of decrease in merit");
-    addOption("beta", OT_DOUBLE,
-              "Line-search parameter, restoration factor of stepsize");
-    addOption("merit_memsize", OT_INT,
-              "Size of memory to store history of merit function values");
-    addOption("merit_start", OT_DOUBLE,
-              "Lower bound for the merit function parameter");
-    addOption("lbfgs_memory", OT_INT,
-              "Size of L-BFGS memory.");
-    addOption("regularize", OT_BOOL,
-              "Automatic regularization of Lagrange Hessian.");
-    addOption("print_header", OT_BOOL,
-              "Print the header with problem statistics");
-    addOption("codegen", OT_BOOL,
-              "C-code generation");
-    addOption("reg_threshold", OT_DOUBLE,
-              "Threshold for the regularization.");
-    addOption("name_x", OT_STRINGVECTOR,
-              "Names of the variables.");
-    addOption("print_x", OT_INTVECTOR,
-              "Which variables to print.");
-    addOption("print_time", OT_BOOL,
-              "Print information about execution time");
   }
-
 
   Scpgen::~Scpgen() {
   }
+
+  Options Scpgen::options_
+  = {{&Nlpsol::options_},
+     {{"qpsol",
+       {OT_STRING,
+        "The QP solver to be used by the SQP method"}},
+      {"qpsol_options",
+       {OT_DICT,
+        "Options to be passed to the QP solver"}},
+      {"hessian_approximation",
+       {OT_STRING,
+        "gauss-newton|exact"}},
+      {"max_iter",
+       {OT_INT,
+        "Maximum number of SQP iterations"}},
+      {"max_iter_ls",
+       {OT_INT,
+        "Maximum number of linesearch iterations"}},
+      {"tol_pr",
+       {OT_DOUBLE,
+        "Stopping criterion for primal infeasibility"}},
+      {"tol_du",
+       {OT_DOUBLE,
+        "Stopping criterion for dual infeasability"}},
+      {"tol_reg",
+       {OT_DOUBLE,
+        "Stopping criterion for regularization"}},
+      {"tol_pr_step",
+       {OT_DOUBLE,
+        "Stopping criterion for the step size"}},
+      {"c1",
+       {OT_DOUBLE,
+        "Armijo condition, coefficient of decrease in merit"}},
+      {"beta",
+       {OT_DOUBLE,
+        "Line-search parameter, restoration factor of stepsize"}},
+      {"merit_memsize",
+       {OT_INT,
+        "Size of memory to store history of merit function values"}},
+      {"merit_start",
+       {OT_DOUBLE,
+        "Lower bound for the merit function parameter"}},
+      {"lbfgs_memory",
+       {OT_INT,
+        "Size of L-BFGS memory."}},
+      {"regularize",
+       {OT_BOOL,
+        "Automatic regularization of Lagrange Hessian."}},
+      {"print_header",
+       {OT_BOOL,
+        "Print the header with problem statistics"}},
+      {"codegen",
+       {OT_BOOL,
+        "C-code generation"}},
+      {"reg_threshold",
+       {OT_DOUBLE,
+        "Threshold for the regularization."}},
+      {"name_x",
+       {OT_STRINGVECTOR,
+        "Names of the variables."}},
+      {"print_x",
+       {OT_INTVECTOR,
+        "Which variables to print."}},
+      {"print_time",
+       {OT_BOOL,
+        "Print information about execution time"}}
+     }
+  };
 
   void Scpgen::init(const Dict& opts) {
     // Call the init method of the base class

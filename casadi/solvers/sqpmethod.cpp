@@ -54,42 +54,61 @@ namespace casadi {
 
   Sqpmethod::Sqpmethod(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
-
-    addOption("qpsol", OT_STRING,
-              "The QP solver to be used by the SQP method");
-    addOption("qpsol_options", OT_DICT,
-              "Options to be passed to the QP solver");
-    addOption("hessian_approximation", OT_STRING,
-              "limited-memory|exact");
-    addOption("max_iter", OT_INT,
-              "Maximum number of SQP iterations");
-    addOption("max_iter_ls", OT_INT,
-              "Maximum number of linesearch iterations");
-    addOption("tol_pr", OT_DOUBLE,
-              "Stopping criterion for primal infeasibility");
-    addOption("tol_du", OT_DOUBLE,
-              "Stopping criterion for dual infeasability");
-    addOption("c1", OT_DOUBLE,
-              "Armijo condition, coefficient of decrease in merit");
-    addOption("beta", OT_DOUBLE,
-              "Line-search parameter, restoration factor of stepsize");
-    addOption("merit_memory", OT_INT,
-              "Size of memory to store history of merit function values");
-    addOption("lbfgs_memory", OT_INT,
-              "Size of L-BFGS memory.");
-    addOption("regularize", OT_BOOL,
-              "Automatic regularization of Lagrange Hessian.");
-    addOption("print_header", OT_BOOL,
-              "Print the header with problem statistics");
-    addOption("min_step_size", OT_DOUBLE,
-              "The size (inf-norm) of the step size should not become smaller than this.");
-    addOption("print_time", OT_BOOL,
-              "Print information about execution time");
   }
 
 
   Sqpmethod::~Sqpmethod() {
   }
+
+  Options Sqpmethod::options_
+  = {{&Nlpsol::options_},
+     {{"qpsol",
+       {OT_STRING,
+        "The QP solver to be used by the SQP method"}},
+      {"qpsol_options",
+       {OT_DICT,
+        "Options to be passed to the QP solver"}},
+      {"hessian_approximation",
+       {OT_STRING,
+        "limited-memory|exact"}},
+      {"max_iter",
+       {OT_INT,
+        "Maximum number of SQP iterations"}},
+      {"max_iter_ls",
+       {OT_INT,
+        "Maximum number of linesearch iterations"}},
+      {"tol_pr",
+       {OT_DOUBLE,
+        "Stopping criterion for primal infeasibility"}},
+      {"tol_du",
+       {OT_DOUBLE,
+        "Stopping criterion for dual infeasability"}},
+      {"c1",
+       {OT_DOUBLE,
+        "Armijo condition, coefficient of decrease in merit"}},
+      {"beta",
+       {OT_DOUBLE,
+        "Line-search parameter, restoration factor of stepsize"}},
+      {"merit_memory",
+       {OT_INT,
+        "Size of memory to store history of merit function values"}},
+      {"lbfgs_memory",
+       {OT_INT,
+        "Size of L-BFGS memory."}},
+      {"regularize",
+       {OT_BOOL,
+        "Automatic regularization of Lagrange Hessian."}},
+      {"print_header",
+       {OT_BOOL,
+        "Print the header with problem statistics"}},
+      {"min_step_size",
+       {OT_DOUBLE,
+        "The size (inf-norm) of the step size should not become smaller than this."}},
+      {"print_time",
+       {OT_BOOL,
+        "Print information about execution time"}}
+     }
+  };
 
   void Sqpmethod::init(const Dict& opts) {
     // Call the init method of the base class

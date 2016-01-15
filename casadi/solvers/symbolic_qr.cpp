@@ -49,14 +49,21 @@ namespace casadi {
 
   SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs) :
     Linsol(name, sparsity, nrhs) {
-    addOption("codegen", OT_BOOL,
-              "C-code generation");
-    addOption("compiler", OT_STRING,
-              "Compiler command to be used for compiling generated code");
   }
 
   SymbolicQr::~SymbolicQr() {
   }
+
+  Options SymbolicQr::options_
+  = {{&FunctionInternal::options_},
+    {{"codegen",
+      {OT_BOOL,
+       "C-code generation"}},
+     {"compiler",
+      {OT_STRING,
+       "Compiler command to be used for compiling generated code"}}
+    }
+  };
 
   void SymbolicQr::init(const Dict& opts) {
     // Call the base class initializer
