@@ -43,6 +43,9 @@ namespace casadi {
     struct Entry {
       TypeID type;
       std::string description;
+
+      // Print entry
+      void print(const std::string& name, std::ostream &stream) const;
     };
 
     // Lookup for options
@@ -50,56 +53,19 @@ namespace casadi {
 
     // Locate an entry
     const Options::Entry* find(const std::string& name) const;
-  };
 
-  /** \brief Provides options functionality to a derived class
-      \author Joel Andersson
-      \date 2010-2015
-  */
-  class CASADI_EXPORT OptionsFunctionality {
-  public:
-    /** \brief Get a list of all option names */
-    std::vector<std::string> optionNames() const;
-
-    /** \brief  Print options to a stream */
-    void printOptions(std::ostream &stream=casadi::userOut()) const;
-
-    /** \brief  Print all information there is to know about a certain option */
-    void printOption(const std::string &name, std::ostream &stream = userOut()) const;
-
-    /** \brief Get the best suggestions for a misspelled word using a dictionary
-     *
-     *  \param[in] word  The word that is misspelled
-     *  \param[in] dictionary  A list of correct words
-     *  \param[out] suggestions The list of suggestions generated. This list will be cleared and filled.
-     *  \param[in] amount Maximum number of suggestions
-     *
-     * \return Some metric for confidence about the best match
-     */
-    static double getBestMatches(const std::string & word,
-                                 const std::vector<std::string> &dictionary,
-                                 std::vector<std::string> &suggestions, int amount = 5);
-
-    /** \brief Get th ebest suggestions of option names
-     */
-    double getBestMatches(const std::string & name, std::vector<std::string> &suggestions,
-                          int amount = 5) const;
-
+    // Print all entries
+    void print(std::ostream &stream) const;
 
     /** \brief A distance metric between two words */
-    static double wordDistance(const std::string &a, const std::string &b);
+    static double word_distance(const std::string &a, const std::string &b);
 
-  protected:
+    /** \brief Get the best suggestions for a misspelled word */
+    std::vector<std::string> suggestions(const std::string& word, int amount=5) const;
 
-    void assert_exists(const std::string &str) const;
-
-  private:
-
-    /** \brief  Allowed options  */
-    std::map<std::string, TypeID> allowed_options;
-
-    /** \brief  Description for the options */
-    std::map<std::string, std::string> description_;
+    /** \brief Find best matches */
+    void best_matches(const std::string& word,
+                      std::vector<std::pair<double, std::string> >& best) const;
   };
 
 #endif // SWIG

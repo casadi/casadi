@@ -811,6 +811,14 @@ namespace casadi {
     (*this)->printDimensions(stream);
   }
 
+  void Function::printOptions(ostream &stream) const {
+    (*this)->printOptions(stream);
+  }
+
+  void Function::printOption(const std::string &name, std::ostream &stream) const {
+    (*this)->printOption(name, stream);
+  }
+
   void Function::generate(const Dict& opts) {
     generate(getSanitizedName(), opts);
   }

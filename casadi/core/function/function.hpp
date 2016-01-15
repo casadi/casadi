@@ -317,8 +317,14 @@ namespace casadi {
     const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
-    /** \brief  Print dimensions of inputs and outputs */
+    /** \brief Print dimensions of inputs and outputs */
     void printDimensions(std::ostream &stream=casadi::userOut()) const;
+
+    /** \brief Print options to a stream */
+    void printOptions(std::ostream &stream=casadi::userOut()) const;
+
+    /** \brief Print all information there is to know about a certain option */
+    void printOption(const std::string &name, std::ostream &stream = casadi::userOut()) const;
 
     ///@{
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind

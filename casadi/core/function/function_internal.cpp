@@ -128,7 +128,21 @@ namespace casadi {
     // Make sure all options exist and have the correct type
     for (auto&& op : opts) {
       const Options::Entry* entry = options.find(op.first);
-      casadi_assert_message(entry!=0, "No such option: " + op.first);
+
+      // Informative error message if option does not exist
+      if (entry==0) {
+        stringstream ss;
+        ss << "Unknown option: " << op.first << endl;
+        ss << endl;
+        ss << "Did you mean one of the following?" << endl;
+        for (auto&& s : options.suggestions(op.first)) {
+          printOption(s, ss);
+        }
+        ss << "Use printOptions() to get a full list of options." << endl;
+        casadi_error(ss.str());
+      }
+
+      // Check type
       casadi_assert_message(op.second.can_cast_to(entry->type),
                             "Illegal type for " + op.first);
     }
@@ -364,6 +378,21 @@ namespace casadi {
     for (int i=0; i<n_out(); ++i) {
       stream << "  Output " << i  << ", a.k.a. \"" << name_out(i) << "\", "
              << size_out(i) << ", " << description_out(i) << endl;
+    }
+  }
+
+  void FunctionInternal::printOptions(std::ostream &stream) const {
+    stream << "\"Option name\" [type] = value" << endl;
+    get_options().print(stream);
+    stream << endl;
+  }
+
+  void FunctionInternal::printOption(const std::string &name, std::ostream &stream) const {
+    const Options::Entry* entry = get_options().find(name);
+    if (entry!=0) {
+      entry->print(name, stream);
+    } else {
+      stream << "  \"" << name << "\" does not exist.";
     }
   }
 

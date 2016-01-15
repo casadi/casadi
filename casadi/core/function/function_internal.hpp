@@ -88,8 +88,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT FunctionInternal : public SharedObjectNode,
-                                         public OptionsFunctionality {
+  class CASADI_EXPORT FunctionInternal : public SharedObjectNode {
     friend class Function;
 
   protected:
@@ -516,8 +515,14 @@ namespace casadi {
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const {}
 
-    /** \brief  Print dimensions of inputs and outputs */
+    /** \brief Print dimensions of inputs and outputs */
     void printDimensions(std::ostream &stream) const;
+
+    /** \brief Print list of options */
+    void printOptions(std::ostream &stream) const;
+
+    /** \brief Print all information there is to know about a certain option */
+    void printOption(const std::string &name, std::ostream &stream) const;
 
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);

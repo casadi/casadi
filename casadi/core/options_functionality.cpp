@@ -40,7 +40,6 @@ namespace casadi {
   const Options::Entry* Options::find(const std::string& name) const {
     // Check if in one of the bases
     for (auto&& b : bases) {
-      // Call recursively
       const Options::Entry* entry = b->find(name);
       if (entry) return entry;
     }
@@ -54,7 +53,28 @@ namespace casadi {
     }
   }
 
-  double OptionsFunctionality::wordDistance(const std::string &a, const std::string &b) {
+  void Options::Entry::print(const std::string& name, std::ostream &stream) const {
+    stream << "> \"" << name << "\"          ["
+           << GenericType::get_type_description(this->type)
+           << "] ";
+
+    // Print out the description on a new line.
+    stream << "     \"" << this->description << "\""<< std::endl;
+  }
+
+  void Options::print(std::ostream &stream) const {
+    // Print bases
+    for (auto&& b : bases) {
+      b->print(stream);
+    }
+
+    // Print all entries
+    for (auto&& e : entries) {
+      e.second.print(e.first, stream);
+    }
+  }
+
+  double Options::word_distance(const std::string &a, const std::string &b) {
     /// Levenshtein edit distance
     if (a == b) return 0;
     int na = a.size();
@@ -90,113 +110,50 @@ namespace casadi {
     return v1[nb];
   }
 
-  /// \cond INTERNAL
-  /// A helper class to use stl::sort in OptionsFunctionality::getBestMatches
-  struct mysortclass {
-    bool operator()(std::pair<std::string, double> a, std::pair<std::string, double> b) {
-      return (a.second<b.second);}
-  } mysorter;
-  /// \endcond
+  vector<string> Options::suggestions(const string& word, int amount) const {
+    // Best distances so far
+    const double inf = numeric_limits<double>::infinity();
+    vector<pair<double, string> > best(amount, {inf, ""});
 
-  double OptionsFunctionality::
-  getBestMatches(const std::string & word,
-                 const std::vector<std::string> &dictionary,
-                 std::vector<std::string> &suggestions, int amount) {
-    // Make a list of (word, score) tuples
-    std::vector< std::pair<std::string, double> > candidates(dictionary.size());
+    // Iterate over elements
+    best_matches(word, best);
 
-    // Fill this list
-    for (int i=0;i<dictionary.size();i++) {
-      candidates[i].first  = dictionary[i];
-      candidates[i].second = wordDistance(word, dictionary[i]);
-    }
+    // Sort the elements in ascending order
+    stable_sort(best.begin(), best.end());
 
-    // Sort it
-    sort(candidates.begin(), candidates.end(), mysorter);
-
-    // Put the first 'amount' of them in suggestions
-    suggestions.clear();
-    for (int i=0;i<amount;i++) {
-      if (i<candidates.size()) {
-        suggestions.push_back(candidates[i].first);
+    // Collect the values that are non-infinite
+    vector<string> ret;
+    ret.reserve(amount);
+    for (auto&& e : best) {
+      if (e.first!=inf) {
+        ret.push_back(e.second);
       }
     }
-
-    return -1; // No score metric yet
+    return ret;
   }
 
-  double OptionsFunctionality::getBestMatches(const std::string &name,
-                                                  std::vector<std::string> &suggestions,
-                                                  int amount) const {
-    // Work towards a vector of option names
-    std::vector< std::string> dict;
-
-    // Fill it by looping over the allowed_options map
-    for (auto it=allowed_options.begin(); it!=allowed_options.end(); it++) {
-      dict.push_back(it->first);
+  void Options::best_matches(const std::string& word,
+                             vector<pair<double, string> >& best) const {
+    // Iterate over bases
+    for (auto&& b : bases) {
+      b->best_matches(word, best);
     }
 
-    // Pass the work on to the more general method
-    return getBestMatches(name, dict, suggestions, amount);
-  }
+    // Worst match so far
+    auto worst = max_element(best.begin(), best.end());
 
-  void OptionsFunctionality::assert_exists(const std::string &name) const {
-    // If option contains a dot, only check what comes before
-    auto dotpos = name.find('.');
-    if (dotpos != string::npos) {
-      return assert_exists(name.substr(0, dotpos));
-    }
+    // Loop over entries
+    for (auto&& e : entries) {
+      // Get word distance
+      double d = word_distance(e.first, word);
 
-    // First check if the option exists
-    map<string, TypeID>::const_iterator it = allowed_options.find(name);
-    if (it == allowed_options.end()) {
-      stringstream ss;
-      ss << "Unknown option: " << name << endl;
-      std::vector<std::string> suggestions;
-      getBestMatches(name, suggestions, 5);
-      ss << endl;
-      ss << "Did you mean one of the following?" << endl;
-      for (int i=0;i<suggestions.size();++i)
-        printOption(suggestions[i], ss);
-      ss << "Use printOptions() to get a full list of options." << endl;
-      casadi_error(ss.str());
-    }
-  }
-
-  void OptionsFunctionality::printOption(const std::string &name, ostream &stream) const {
-    auto allowed_option_it = allowed_options.find(name);
-    if (allowed_option_it!=allowed_options.end()) {
-
-      // First print out the datatype
-      stream << "> \"" << name << "\"          ["
-             << GenericType::get_type_description(allowed_option_it->second)
-             << "] ";
-
-      // Print out the description on a new line.
-      map<std::string, std::string>::const_iterator description_it =description_.find(name);
-      if (description_it!=description_.end()) {
-        if (description_it->second != "n/a")
-          stream << "     \"" << description_it->second << "\""<< std::endl;
+      // Keep if better than the worst amongst the suggestions
+      if (d < worst->first) {
+        worst->first = d;
+        worst->second = e.first;
+        worst = max_element(best.begin(), best.end());
       }
-    } else {
-      stream << "  \"" << name << "\" does not exist.";
     }
-  }
-
-  void OptionsFunctionality::printOptions(ostream &stream) const {
-    stream << "\"Option name\" [type] = value" << endl;
-    for (auto it=allowed_options.begin(); it!=allowed_options.end(); ++it) {
-      printOption(it->first, stream);
-    }
-    stream << endl;
-  }
-
-  std::vector<std::string> OptionsFunctionality::optionNames() const {
-    std::vector<std::string> names;
-    for (auto it=allowed_options.begin(); it!=allowed_options.end(); ++it) {
-      names.push_back(it->first);
-    }
-    return names;
   }
 
 } // namespace casadi
