@@ -32,6 +32,7 @@
 #include "code_generator.hpp"
 #include "compiler.hpp"
 #include "../sparse_storage.hpp"
+#include "../options.hpp"
 
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)

@@ -27,7 +27,7 @@ set(CASADI_SRCS
   weak_ref.hpp                weak_ref.cpp              # Provides weak reference functionality (non-owning smart pointers)
   generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
   generic_type_internal.hpp                             # Internal class for the same
-  options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
+  options.cpp                 options.hpp               # Functionality for passing options to a class
   std_vector_tools.hpp        std_vector_tools.cpp      # Set of useful functions for the vector template class in STL
   timing.hpp                  timing.cpp
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials

@@ -27,7 +27,6 @@
 
 #include "../sx/sx_elem.hpp"
 #include "../mx/mx.hpp"
-#include "../options_functionality.hpp"
 
 #include <exception>
 

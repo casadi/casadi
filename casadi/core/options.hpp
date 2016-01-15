@@ -23,18 +23,19 @@
  */
 
 
-#ifndef CASADI_OPTIONS_FUNCTIONALITY_HPP
-#define CASADI_OPTIONS_FUNCTIONALITY_HPP
+#ifndef CASADI_OPTIONS_HPP
+#define CASADI_OPTIONS_HPP
 
 #include "generic_type.hpp"
-#include "shared_object.hpp"
-#include <map>
 
 namespace casadi {
-
 /// \cond INTERNAL
 #ifndef SWIG
 
+  /** \brief Options metadata for a class
+      \author Joel Andersson, Joris Gillis
+      \date 2010-2016
+  */
   struct CASADI_EXPORT Options {
     // Base classes, whose options are also valid for the derived class
     std::vector<Options*> bases;
@@ -69,10 +70,8 @@ namespace casadi {
   };
 
 #endif // SWIG
-
   /// \endcond
-
 } // namespace casadi
 
 
-#endif // OPTIONS_FUNCTIONALITY
+#endif // CASADI_OPTIONS_HPP

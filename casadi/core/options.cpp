@@ -23,15 +23,8 @@
  */
 
 
-#include "options_functionality.hpp"
-
-#include "std_vector_tools.hpp"
-#include "exception.hpp"
+#include "options.hpp"
 #include <algorithm>
-#include <string>
-#include <locale>
-
-#include "matrix.hpp"
 
 using namespace std;
 
