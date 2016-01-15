@@ -65,35 +65,6 @@ namespace casadi {
   KinsolInterface::KinsolInterface(const std::string& name, const Function& f)
     : Rootfinder(name, f) {
 
-    addOption("max_iter", OT_INT,
-              "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
-    addOption("abstol", OT_DOUBLE,
-              "Stopping criterion tolerance");
-    addOption("linear_solver_type", OT_STRING,
-              "dense|banded|iterative|user_defined");
-    addOption("upper_bandwidth", OT_INT,
-              "Upper bandwidth for banded linear solvers");
-    addOption("lower_bandwidth", OT_INT,
-              "Lower bandwidth for banded linear solvers");
-    addOption("max_krylov", OT_INT,
-              "Maximum Krylov space dimension");
-    addOption("exact_jacobian", OT_BOOL,
-              "Use exact Jacobian information");
-    addOption("iterative_solver", OT_STRING,
-              "gmres|bcgstab|tfqmr");
-    addOption("f_scale", OT_DOUBLEVECTOR,
-              "Equation scaling factors");
-    addOption("u_scale", OT_DOUBLEVECTOR,
-              "Variable scaling factors");
-    addOption("pretype", OT_STRING,
-              "Type of preconditioner");
-    addOption("use_preconditioner", OT_BOOL,
-              "Precondition an iterative solver");
-    addOption("strategy", OT_STRING,
-              "Globalization strategy");
-    addOption("disable_internal_warnings", OT_BOOL,
-              "Disable KINSOL internal warning messages");
-
     u_scale_ = 0;
     f_scale_ = 0;
 
@@ -112,6 +83,53 @@ namespace casadi {
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
   }
+
+  Options KinsolInterface::options_
+  = {{&Rootfinder::options_},
+     {{"max_iter",
+       {OT_INT,
+        "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol."}},
+      {"abstol",
+       {OT_DOUBLE,
+        "Stopping criterion tolerance"}},
+      {"linear_solver_type",
+       {OT_STRING,
+        "dense|banded|iterative|user_defined"}},
+      {"upper_bandwidth",
+       {OT_INT,
+        "Upper bandwidth for banded linear solvers"}},
+      {"lower_bandwidth",
+       {OT_INT,
+        "Lower bandwidth for banded linear solvers"}},
+      {"max_krylov",
+       {OT_INT,
+        "Maximum Krylov space dimension"}},
+      {"exact_jacobian",
+       {OT_BOOL,
+        "Use exact Jacobian information"}},
+      {"iterative_solver",
+       {OT_STRING,
+        "gmres|bcgstab|tfqmr"}},
+      {"f_scale",
+       {OT_DOUBLEVECTOR,
+        "Equation scaling factors"}},
+      {"u_scale",
+       {OT_DOUBLEVECTOR,
+        "Variable scaling factors"}},
+      {"pretype",
+       {OT_STRING,
+        "Type of preconditioner"}},
+      {"use_preconditioner",
+       {OT_BOOL,
+        "Precondition an iterative solver"}},
+      {"strategy",
+       {OT_STRING,
+        "Globalization strategy"}},
+      {"disable_internal_warnings",
+       {OT_BOOL,
+        "Disable KINSOL internal warning messages"}}
+     }
+  };
 
   void KinsolInterface::init(const Dict& opts) {
     // Initialize the base classes

@@ -51,32 +51,46 @@ namespace casadi {
 
   IdasInterface::IdasInterface(const std::string& name, const XProblem& dae)
     : SundialsInterface(name, dae) {
-
-    addOption("suppress_algebraic", OT_BOOL,
-              "Suppress algebraic variables in the error testing");
-    addOption("calc_ic", OT_BOOL,
-              "Use IDACalcIC to get consistent initial conditions.");
-    addOption("calc_icB", OT_BOOL,
-              "Use IDACalcIC to get consistent initial conditions for "
-              "backwards system [default: equal to calc_ic].");
-    addOption("abstolv", OT_DOUBLEVECTOR,
-              "Absolute tolerarance for each component");
-    addOption("fsens_abstolv", OT_DOUBLEVECTOR,
-              "Absolute tolerarance for each component, forward sensitivities");
-    addOption("max_step_size", OT_DOUBLE,
-              "Maximim step size");
-    addOption("first_time", OT_DOUBLE,
-              "First requested time as a fraction of the time interval");
-    addOption("cj_scaling", OT_BOOL,
-              "IDAS scaling on cj for the user-defined linear solver module");
-    addOption("extra_fsens_calc_ic", OT_BOOL,
-              "Call calc ic an extra time, with fsens=0");
-    addOption("init_xdot", OT_DOUBLEVECTOR,
-              "Initial values for the state derivatives");
   }
 
   IdasInterface::~IdasInterface() {
   }
+
+  Options IdasInterface::options_
+  = {{&SundialsInterface::options_},
+     {{"suppress_algebraic",
+       {OT_BOOL,
+        "Suppress algebraic variables in the error testing"}},
+      {"calc_ic",
+       {OT_BOOL,
+        "Use IDACalcIC to get consistent initial conditions."}},
+      {"calc_icB",
+       {OT_BOOL,
+        "Use IDACalcIC to get consistent initial conditions for "
+        "backwards system [default: equal to calc_ic]."}},
+      {"abstolv",
+       {OT_DOUBLEVECTOR,
+        "Absolute tolerarance for each component"}},
+      {"fsens_abstolv",
+       {OT_DOUBLEVECTOR,
+        "Absolute tolerarance for each component, forward sensitivities"}},
+      {"max_step_size",
+       {OT_DOUBLE,
+        "Maximim step size"}},
+      {"first_time",
+       {OT_DOUBLE,
+        "First requested time as a fraction of the time interval"}},
+      {"cj_scaling",
+       {OT_BOOL,
+        "IDAS scaling on cj for the user-defined linear solver module"}},
+      {"extra_fsens_calc_ic",
+       {OT_BOOL,
+        "Call calc ic an extra time, with fsens=0"}},
+      {"init_xdot",
+       {OT_DOUBLEVECTOR,
+        "Initial values for the state derivatives"}}
+     }
+  };
 
   void IdasInterface::init(const Dict& opts) {
     log("IdasInterface::init", "begin");
