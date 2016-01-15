@@ -76,6 +76,12 @@ namespace casadi {
     /// Destructor
     virtual ~LapackLu();
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /// Initialize the solver
     virtual void init(const Dict& opts);
 

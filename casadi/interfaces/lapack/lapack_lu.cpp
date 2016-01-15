@@ -48,12 +48,6 @@ namespace casadi {
                                const Sparsity& sparsity, int nrhs)
     : Linsol(name, sparsity, nrhs) {
 
-    // Equilibrate the matrix
-    addOption("equilibration", OT_BOOL,
-              "Equilibrate the matrix");
-    addOption("allow_equilibration_failure", OT_BOOL,
-              "Non-fatal error when equilibration fails");
-
     // Default options
     equilibriate_ = true;
     allow_equilibration_failure_ = false;
@@ -61,6 +55,17 @@ namespace casadi {
 
   LapackLu::~LapackLu() {
   }
+
+  Options LapackLu::options_
+  = {{&FunctionInternal::options_},
+     {{"equilibration",
+       {OT_BOOL,
+        "Equilibrate the matrix"}},
+      {"allow_equilibration_failure",
+       {OT_BOOL,
+        "Non-fatal error when equilibration fails"}}
+     }
+  };
 
   void LapackLu::init(const Dict& opts) {
     // Call the base class initializer
