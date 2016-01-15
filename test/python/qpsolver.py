@@ -30,10 +30,12 @@ from helpers import *
 
 qpsols = []
 if has_nlpsol("ipopt"):
-  qpsols.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options": {"ipopt.tol": 1e-12}},{}))
-
-if has_nlpsol("ipopt"):
-  qpsols.append(("nlpsol.ipopt",{"nlpsol_options": {"ipopt.tol": 1e-12}},{}))
+  ipopt_options = {"fixed_variable_treatment":"relax_bounds",
+                   "jac_c_constant":"yes",
+                   "jac_d_constant":"yes",
+                   "hessian_constant":"yes",
+                   "tol":1e-12}
+  qpsols.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{}))
 
 if has_qpsol("ooqp"):
   qpsols.append(("ooqp",{},{"less_digits":1}))
@@ -320,6 +322,7 @@ class QpsolTests(casadiTestCase):
         continue
       solver = casadi.qpsol("mysolver",qpsol, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
+      solver_in = {}
       solver_in["h"]=H
       solver_in["g"]=G
       solver_in["a"]=A
