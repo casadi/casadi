@@ -3051,6 +3051,39 @@ namespace casadi{
     }
 #endif
   }
+
+  %extend Matrix<int> {
+    // Convert to a dense matrix
+    GUESTOBJECT* full() const {
+#ifdef SWIGPYTHON
+      npy_intp dims[2] = {$self->size1(), $self->size2()};
+      PyObject* ret = PyArray_SimpleNew(2, dims, NPY_INT);
+      int* d = static_cast<int*>(array_data(ret));
+      casadi_densify($self->ptr(), $self->sparsity(), d, true); // Row-major
+      return ret;
+#elif defined(SWIGMATLAB)
+      mxArray *p  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
+      std::vector<double> nz = $self->nonzeros();
+      double* d = static_cast<double*>(mxGetData(p));
+      if (!nz.empty()) casadi_densify(&nz[0], $self->sparsity(), d, false); // Column-major
+      return p;
+#else
+      return 0;
+#endif
+    }
+
+#ifdef SWIGMATLAB
+    // Convert to a sparse matrix
+    GUESTOBJECT* sparse() const {
+      mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
+      std::vector<double> nz = $self->nonzeros();
+      if (!nz.empty()) casadi::casadi_copy(&nz[0], $self->nnz(), static_cast<double*>(mxGetData(p)));
+      std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));
+      std::copy($self->row(), $self->row()+$self->nnz(), mxGetIr(p));
+      return p;
+    }
+#endif
+  }
 } // namespace casadi
 
 
