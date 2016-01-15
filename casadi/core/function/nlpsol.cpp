@@ -83,7 +83,7 @@ namespace casadi {
 
   Options Nlpsol::options_
   = {{&FunctionInternal::options_},
-     {{"expand", 
+     {{"expand",
        {OT_BOOL,
         "Expand the NLP function in terms of scalar operations, i.e. MX->SX"}},
       {"hess_lag",

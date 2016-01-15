@@ -500,7 +500,7 @@ class Integrationtests(casadiTestCase):
               opts["reltol"] = 1e-9
             opts["tf"] = tend_
             if Integrator=='idas':
-              opts["init_xdot"] = list(DM(point["x0"]))
+              opts["init_xdot"] = DM(point["x0"]).nonzeros()
               opts["calc_icB"] = True
               opts["augmented_options"] = {"init_xdot":None, "abstol":1e-9,"reltol":1e-9}
             integrator = casadi.integrator("integrator", Integrator, dae, opts)

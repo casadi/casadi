@@ -81,7 +81,26 @@ namespace casadi {
     return false;
   }
 
+  inline bool has_null(const Dict& opts) {
+    for (auto&& op : opts) {
+      if (op.second.isNull()) return true;
+    }
+    return false;
+  }
+
   void FunctionInternal::construct(const Dict& opts) {
+    // Drop nulls
+    if (has_null(opts)) {
+      // Create a new dictionary without the null entries
+      Dict mod_opts;
+      for (auto&& op : opts) {
+        if (!op.second.isNull()) mod_opts[op.first] = op.second;
+      }
+
+      // Call recursively
+      return construct(mod_opts);
+    }
+
     //  Treat the case where any of the options have a dot (dictionary shorthand)
     if (has_dot(opts)) {
       // New options dictionary being constructed
