@@ -75,6 +75,12 @@ namespace casadi {
     /** \brief Initalize memory block */
     virtual void init_memory(Memory& mem) const;
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 
@@ -361,6 +367,12 @@ namespace casadi {
     /// Destructor
     virtual ~FixedStepIntegrator();
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /// Initialize stage
     virtual void init(const Dict& opts);
 
@@ -416,6 +428,12 @@ namespace casadi {
 
     /// Destructor
     virtual ~ImplicitFixedStepIntegrator();
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
 
     /// Initialize stage
     virtual void init(const Dict& opts);

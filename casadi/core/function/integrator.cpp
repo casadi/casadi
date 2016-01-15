@@ -32,20 +32,6 @@ namespace casadi {
   Integrator::Integrator(const std::string& name, const XProblem& dae)
     : FunctionInternal(name), dae_(dae) {
 
-    // Additional options
-    addOption("print_stats", OT_BOOL,
-              "Print out statistics after integration");
-    addOption("t0", OT_DOUBLE,
-              "Beginning of the time horizon");
-    addOption("tf", OT_DOUBLE,
-              "End of the time horizon");
-    addOption("grid", OT_DOUBLEVECTOR,
-              "Time grid");
-    addOption("augmented_options", OT_DICT,
-              "Options to be passed down to the augmented integrator, if one is constructed.");
-    addOption("output_t0", OT_BOOL,
-              "Output the state at the initial time");
-
     if (dae.is_sx) {
       f_ = get_f<SX>();
       g_ = get_g<SX>();
@@ -188,6 +174,29 @@ namespace casadi {
     // Print statistics
     if (print_stats_) printStats(m, userOut());
   }
+
+  Options Integrator::options_
+  = {{&FunctionInternal::options_},
+     {{"print_stats",
+       {OT_BOOL,
+        "Print out statistics after integration"}},
+      {"t0",
+       {OT_DOUBLE,
+        "Beginning of the time horizon"}},
+      {"tf",
+       {OT_DOUBLE,
+        "End of the time horizon"}},
+      {"grid",
+       {OT_DOUBLEVECTOR,
+        "Time grid"}},
+      {"augmented_options",
+       {OT_DICT,
+        "Options to be passed down to the augmented integrator, if one is constructed."}},
+      {"output_t0",
+       {OT_BOOL,
+        "Output the state at the initial time"}}
+     }
+  };
 
   void Integrator::init(const Dict& opts) {
     // Default (temporary) options
@@ -1318,8 +1327,6 @@ namespace casadi {
 
   FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
     : Integrator(name, dae) {
-    addOption("number_of_finite_elements", OT_INT,
-              "Number of finite elements");
 
     // Default options
     nk_ = 20;
@@ -1327,6 +1334,14 @@ namespace casadi {
 
   FixedStepIntegrator::~FixedStepIntegrator() {
   }
+
+  Options FixedStepIntegrator::options_
+  = {{&Integrator::options_},
+     {{"number_of_finite_elements",
+       {OT_INT,
+        "Number of finite elements"}}
+     }
+  };
 
   void FixedStepIntegrator::init(const Dict& opts) {
     // Call the base class init
@@ -1542,14 +1557,21 @@ namespace casadi {
   ImplicitFixedStepIntegrator::
   ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae)
     : FixedStepIntegrator(name, dae) {
-    addOption("implicit_solver", OT_STRING,
-              "An implicit function solver");
-    addOption("implicit_solver_options", OT_DICT,
-              "Options to be passed to the NLP Solver");
   }
 
   ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {
   }
+
+  Options ImplicitFixedStepIntegrator::options_
+  = {{&FixedStepIntegrator::options_},
+     {{"implicit_solver",
+       {OT_STRING,
+        "An implicit function solver"}},
+      {"implicit_solver_options",
+       {OT_DICT,
+        "Options to be passed to the NLP Solver"}}
+     }
+  };
 
   void ImplicitFixedStepIntegrator::init(const Dict& opts) {
     // Call the base class init
