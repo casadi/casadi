@@ -25,6 +25,7 @@
 
 #include "options.hpp"
 #include <algorithm>
+#include <locale>
 
 using namespace std;
 
