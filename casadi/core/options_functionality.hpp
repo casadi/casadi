@@ -61,18 +61,6 @@ namespace casadi {
     /** \brief Get a list of all option names */
     std::vector<std::string> optionNames() const;
 
-    /** \brief Get the description of a certain option */
-    std::string optionDescription(const std::string &str) const;
-
-    /** \brief Get the type of a certain option */
-    TypeID optionType(const std::string &str) const;
-
-    /** \brief Get the type name of a certain option */
-    std::string optionTypeName(const std::string &str) const;
-
-    /** \brief  check if there is an option str */
-    bool hasOption(const std::string &str) const;
-
     /** \brief  Print options to a stream */
     void printOptions(std::ostream &stream=casadi::userOut()) const;
 
@@ -100,9 +88,6 @@ namespace casadi {
 
     /** \brief A distance metric between two words */
     static double wordDistance(const std::string &a, const std::string &b);
-
-
-    void addOption(const std::string &str, const TypeID& type, const std::string& desc);
 
   protected:
 

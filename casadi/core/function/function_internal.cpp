@@ -127,17 +127,9 @@ namespace casadi {
 
     // Make sure all options exist and have the correct type
     for (auto&& op : opts) {
-      // Find an option
       const Options::Entry* entry = options.find(op.first);
-      if (entry) {
-        casadi_assert_message(op.second.can_cast_to(entry->type),
-                              "Illegal type for " + op.first);
-        continue;
-      }
-
-      // Legacy design
-      casadi_assert_message(hasOption(op.first), "No such option: " + op.first);
-      casadi_assert_message(op.second.can_cast_to(optionType(op.first)),
+      casadi_assert_message(entry!=0, "No such option: " + op.first);
+      casadi_assert_message(op.second.can_cast_to(entry->type),
                             "Illegal type for " + op.first);
     }
 

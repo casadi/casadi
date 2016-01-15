@@ -140,41 +140,6 @@ namespace casadi {
     return getBestMatches(name, dict, suggestions, amount);
   }
 
-  void setAdaptorOptions(Dict& dict, const string &name, const Dict &op) {
-
-    // Find position of '.' separator
-    std::string::size_type dotpos = name.find(".");
-
-    // Get the adaptor name (before '.', or the entire name if '.' not found)
-    std::string adaptor_name = name.substr(0, dotpos);
-
-    // Check if adaptor name already occurs in the dictionary of options
-    Dict::const_iterator it = dict.find(adaptor_name);
-
-    if (it == dict.end()) {
-      // Create an empty dictionary if not
-      dict[adaptor_name] = Dict();
-    } else if (!dict[adaptor_name].is_dict()) {
-      // If an entry is found, make sure it is a dictionary
-      casadi_error("setAdaptorOptions: Dict expected, but got " << dict[adaptor_name] << ".");
-    }
-
-    if (dotpos==std::string::npos) {
-      // We reached the end of the dotted adaptor string
-      Dict target = dict[adaptor_name];
-      // Merge the contents of the supplied dictionary
-      for (Dict::const_iterator it=op.begin(); it!=op.end(); ++it) {
-        target[it->first] = it->second;
-      }
-      dict[adaptor_name] = target;
-    } else {
-      // Descend one level down
-      Dict dict_adaptor = dict[adaptor_name];
-      setAdaptorOptions(dict_adaptor, name.substr(dotpos+1), op);
-      dict[adaptor_name] = dict_adaptor;
-    }
-  }
-
   void OptionsFunctionality::assert_exists(const std::string &name) const {
     // If option contains a dot, only check what comes before
     auto dotpos = name.find('.');
@@ -196,12 +161,6 @@ namespace casadi {
       ss << "Use printOptions() to get a full list of options." << endl;
       casadi_error(ss.str());
     }
-  }
-
-  void OptionsFunctionality::
-  addOption(const string &name, const TypeID& type, const string& desc) {
-    allowed_options[name] = type;
-    description_[name] = desc;
   }
 
   void OptionsFunctionality::printOption(const std::string &name, ostream &stream) const {
@@ -232,34 +191,12 @@ namespace casadi {
     stream << endl;
   }
 
-  bool OptionsFunctionality::hasOption(const string &str) const {
-    return allowed_options.find(str) != allowed_options.end();
-  }
-
   std::vector<std::string> OptionsFunctionality::optionNames() const {
     std::vector<std::string> names;
     for (auto it=allowed_options.begin(); it!=allowed_options.end(); ++it) {
       names.push_back(it->first);
     }
     return names;
-  }
-
-  std::string OptionsFunctionality::optionDescription(const std::string &name) const {
-    assert_exists(name);
-    map<string, string>::const_iterator it = description_.find(name);
-    if (it!=description_.end()) return it->second;
-    return "N/A";
-  }
-
-  TypeID OptionsFunctionality::optionType(const std::string &name) const {
-    assert_exists(name);
-    auto it = allowed_options.find(name);
-    if (it!=allowed_options.end()) return it->second;
-    return OT_UNKNOWN;
-  }
-
-  std::string OptionsFunctionality::optionTypeName(const std::string &name) const {
-    return GenericType::get_type_description(optionType(name));
   }
 
 } // namespace casadi
