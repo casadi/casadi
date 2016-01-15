@@ -93,6 +93,12 @@ namespace casadi {
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 

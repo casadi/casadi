@@ -207,6 +207,12 @@ class CASADI_EXPORT SXFunction :
   /// The expressions corresponding to each constant
   std::vector<SXElem> constants_;
 
+  ///@{
+  /** \brief Options */
+  static Options options_;
+  virtual const Options& get_options() const { return options_;}
+  ///@}
+
   /** \brief  Initialize */
   virtual void init(const Dict& opts);
 

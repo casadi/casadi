@@ -45,6 +45,13 @@ namespace casadi {
   MXFunction::~MXFunction() {
   }
 
+  Options MXFunction::options_
+  = {{&FunctionInternal::options_},
+     {{"live_variables",
+       {OT_BOOL,
+        "Reuse variables in the work vector"}}
+     }
+  };
 
   void MXFunction::init(const Dict& opts) {
     log("MXFunction::init begin");
