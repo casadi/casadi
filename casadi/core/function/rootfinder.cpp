@@ -27,7 +27,7 @@
 #include "../mx/mx_node.hpp"
 #include <iterator>
 
-#include "../casadi_options.hpp"
+#include "../global_options.hpp"
 
 using namespace std;
 namespace casadi {

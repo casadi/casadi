@@ -29,7 +29,7 @@ from types import *
 from helpers import *
 import itertools
 
-#CasadiOptions.setCatchErrorsPython(False)
+#GlobalOptions.setCatchErrorsPython(False)
 
 solvers= []
  

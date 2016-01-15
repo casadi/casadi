@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CASADI_OPTIONS_HPP
-#define CASADI_CASADI_OPTIONS_HPP
+#ifndef CASADI_GLOBAL_OPTIONS_HPP
+#define CASADI_GLOBAL_OPTIONS_HPP
 
 #include <iostream>
 #include <fstream>
@@ -44,10 +44,10 @@ namespace casadi {
   *  \author Joris Gillis
   *  \date 2012
   */
-  class CASADI_EXPORT CasadiOptions {
+  class CASADI_EXPORT GlobalOptions {
     private:
       /// No instances are allowed
-      CasadiOptions();
+      GlobalOptions();
     public:
 
 #ifndef SWIG
@@ -71,4 +71,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_CASADI_OPTIONS_HPP
+#endif // CASADI_GLOBAL_OPTIONS_HPP

@@ -34,7 +34,7 @@
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
 #include "../sparsity_internal.hpp"
-#include "../casadi_options.hpp"
+#include "../global_options.hpp"
 #include "../casadi_interrupt.hpp"
 
 namespace casadi {

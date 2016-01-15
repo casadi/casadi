@@ -25,7 +25,7 @@
 
 #include "split.hpp"
 #include "../std_vector_tools.hpp"
-#include "../casadi_options.hpp"
+#include "../global_options.hpp"
 
 using namespace std;
 

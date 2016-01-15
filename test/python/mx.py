@@ -1486,7 +1486,7 @@ class MXtests(casadiTestCase):
     e = cos(a*b) + c
     w = symvar(e)
     self.assertEqual(len(w),3)
-    if CasadiOptions.getSimplificationOnTheFly():
+    if GlobalOptions.getSimplificationOnTheFly():
       self.assertTrue(is_equal(w[0],a))
       self.assertTrue(is_equal(w[1],b))
       self.assertTrue(is_equal(w[2],c))

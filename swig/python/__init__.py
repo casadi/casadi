@@ -31,7 +31,7 @@ from casadi import *
 import casadi
 
 # For plugin loading
-CasadiOptions.setCasadiPath(os.path.dirname(__file__))
+GlobalOptions.setCasadiPath(os.path.dirname(__file__))
 
 import types
   

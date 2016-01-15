@@ -327,7 +327,7 @@ class SXtests(casadiTestCase):
 
     # Create function
     f = fun(x,y)
-    if CasadiOptions.getSimplificationOnTheFly():
+    if GlobalOptions.getSimplificationOnTheFly():
       self.assertEqual(str(f),'[SX(((3-sin(sq(x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong')
     else:
       self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong'+str(f))
@@ -485,7 +485,7 @@ class SXtests(casadiTestCase):
       cnt+=1
     self.checkarray(y,z,"nonzero range assignment")
     
-  @skip(not CasadiOptions.getSimplificationOnTheFly())
+  @skip(not GlobalOptions.getSimplificationOnTheFly())
   def test_substitute(self):
     self.message("Basic symbolic algebra: substitute")
     x=SX.sym("x")
@@ -533,7 +533,7 @@ class SXtests(casadiTestCase):
     self.message("univariate taylor expansion")
     x=SX.sym("x")
     
-    if CasadiOptions.getSimplificationOnTheFly():
+    if GlobalOptions.getSimplificationOnTheFly():
       self.assertTrue(is_equal(taylor(sin(x),x),x))
       
     a_=0.13
@@ -687,7 +687,7 @@ class SXtests(casadiTestCase):
     b = x*x
     self.assertTrue(a.is_equal(b,1))
     
-  @skip(not CasadiOptions.getSimplificationOnTheFly())
+  @skip(not GlobalOptions.getSimplificationOnTheFly())
   def test_SXsimplifications(self):
     self.message("simplifications")
     x = SX.sym("x")
@@ -851,7 +851,7 @@ class SXtests(casadiTestCase):
     e = cos(a*b) + c
     w = symvar(e)
     self.assertEqual(len(w),3)
-    if CasadiOptions.getSimplificationOnTheFly():
+    if GlobalOptions.getSimplificationOnTheFly():
       self.assertTrue(is_equal(w[0],a))
       self.assertTrue(is_equal(w[1],b))
       self.assertTrue(is_equal(w[2],c))

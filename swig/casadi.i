@@ -110,7 +110,7 @@
   path = path.substr(0, path.rfind(sep));
 
   // Set library path
-  casadi::CasadiOptions::setCasadiPath(path);
+  casadi::GlobalOptions::setCasadiPath(path);
 
   // @jgillis: please document
   mxArray *warning_rhs[] = {mxCreateString("error"),
@@ -3447,7 +3447,7 @@ namespace casadi {
 
 %include <casadi/core/function/compiler.hpp>
 %include <casadi/core/function/callback.hpp>
-%include <casadi/core/casadi_options.hpp>
+%include <casadi/core/global_options.hpp>
 %include <casadi/core/casadi_meta.hpp>
 %include <casadi/core/misc/integration_tools.hpp>
 %include <casadi/core/misc/nlp_builder.hpp>

@@ -384,7 +384,7 @@ class Matrixtests(casadiTestCase):
 
     self.checkarray(det(a)/npy_det(a),1,"det()")
    
-  @skip(not CasadiOptions.getSimplificationOnTheFly()) 
+  @skip(not GlobalOptions.getSimplificationOnTheFly()) 
   def test_inv_sparsity(self):
     self.message("sparsity pattern of inverse")
 

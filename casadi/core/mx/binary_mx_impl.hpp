@@ -30,7 +30,7 @@
 #include <vector>
 #include <sstream>
 #include "../std_vector_tools.hpp"
-#include "../casadi_options.hpp"
+#include "../global_options.hpp"
 
 using namespace std;
 
@@ -251,7 +251,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   MX BinaryMX<ScX, ScY>::getBinary(int op, const MX& y, bool scX, bool scY) const {
-    if (!CasadiOptions::simplification_on_the_fly) return MXNode::getBinary(op, y, scX, scY);
+    if (!GlobalOptions::simplification_on_the_fly) return MXNode::getBinary(op, y, scX, scY);
 
     switch (op_) {
     case OP_ADD:

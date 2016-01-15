@@ -32,7 +32,7 @@
 #include "symbolic_sx.hpp"
 #include "unary_sx.hpp"
 #include "binary_sx.hpp"
-#include "../casadi_options.hpp"
+#include "../global_options.hpp"
 #include "../function/sx_function.hpp"
 
 using namespace std;
@@ -186,7 +186,7 @@ namespace casadi {
 
   SXElem SXElem::binary(int op, const SXElem& x, const SXElem& y) {
     // Simplifications
-    if (CasadiOptions::simplification_on_the_fly) {
+    if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
       case OP_ADD:
         if (x.is_zero())

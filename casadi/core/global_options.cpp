@@ -23,13 +23,13 @@
  */
 
 
-#include "casadi_options.hpp"
+#include "global_options.hpp"
 #include "exception.hpp"
 
 namespace casadi {
 
-  bool CasadiOptions::simplification_on_the_fly = true;
+  bool GlobalOptions::simplification_on_the_fly = true;
 
-  std::string CasadiOptions::casadipath = "";
+  std::string GlobalOptions::casadipath = "";
 
 } // namespace casadi

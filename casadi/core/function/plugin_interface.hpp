@@ -24,7 +24,7 @@
 #define CASADI_PLUGIN_INTERFACE_HPP
 
 #include "../function/function_internal.hpp"
-#include "../casadi_options.hpp"
+#include "../global_options.hpp"
 
 #include <stdlib.h>
 
@@ -179,7 +179,7 @@ namespace casadi {
     #endif
 
     // Search path: global casadipath option
-    std::stringstream casadipaths(CasadiOptions::getCasadiPath());
+    std::stringstream casadipaths(GlobalOptions::getCasadiPath());
     std::string casadipath;
     while (std::getline(casadipaths, casadipath, pathsep)) {
       search_paths.push_back(casadipath);
@@ -214,7 +214,7 @@ namespace casadi {
     errors << "PluginInterface::loadPlugin: Cannot load shared library '"
            << lib << "': " << std::endl;
     errors << "   (\n"
-           << "    Searched directories: 1. casadipath from CasadiOptions\n"
+           << "    Searched directories: 1. casadipath from GlobalOptions\n"
            << "                          2. CASADIPATH env var\n"
            << "                          3. PATH env var (Windows)\n"
            << "                          4. LD_LIBRARY_PATH env var (Linux)\n"

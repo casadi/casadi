@@ -334,7 +334,7 @@ class Toolstests(casadiTestCase):
     self.assertTrue(isinstance(s[0][0],dict))
     self.assertTrue('x' in s[0][0])
     self.assertEqual(len(s[0][0]),7)
-    if CasadiOptions.getSimplificationOnTheFly():
+    if GlobalOptions.getSimplificationOnTheFly():
       self.assertTrue(is_equal(s[0][0]["x"],shooting["X",0,0,"x"]))
     
     

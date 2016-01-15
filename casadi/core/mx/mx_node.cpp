@@ -580,7 +580,7 @@ namespace casadi {
   MX MXNode::getBinary(int op, const MX& y, bool scX, bool scY) const {
     casadi_assert(sparsity()==y.sparsity() || scX || scY);
 
-    if (CasadiOptions::simplification_on_the_fly) {
+    if (GlobalOptions::simplification_on_the_fly) {
 
       // If identically zero due to one argumebt being zero
       if ((operation_checker<F0XChecker>(op) && is_zero()) ||
@@ -836,7 +836,7 @@ namespace casadi {
     vector<MX> ret =
         MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(), output_offset));
 
-    if (CasadiOptions::simplification_on_the_fly) {
+    if (GlobalOptions::simplification_on_the_fly) {
       // Simplify horzsplit(horzcat)
       if (op()==OP_HORZCAT) {
         int offset_deps = 0;
@@ -902,7 +902,7 @@ namespace casadi {
     vector<MX> ret =
         MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(), output_offset));
 
-    if (CasadiOptions::simplification_on_the_fly) {
+    if (GlobalOptions::simplification_on_the_fly) {
       // Simplify vertsplit(vertcat)
       if (op()==OP_VERTCAT) {
         int offset_deps = 0;
