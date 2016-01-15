@@ -120,7 +120,7 @@ namespace casadi {
       g.body << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
              << "; i<" << sparsity().nnz() << "; ++i) ";
       r = "*rr++";
-      x = "*cs++";
+      x = "(*cs++)";
     }
 
     // Output the operation
