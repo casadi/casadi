@@ -49,7 +49,6 @@ print "nonzeros: ", w.nonzeros()
 print w.nonzeros()
 print w.full()
 print array(w)
-print w.toMatrix()
 print matrix(w)
 print w.toCsc_matrix()
 

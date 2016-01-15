@@ -149,7 +149,6 @@ class typemaptests(casadiTestCase):
     tuple(w.nonzeros())
     w.full()
     array(w)
-    w.toMatrix()
     matrix(w)
     if scipy_available:
       w.toCsc_matrix()

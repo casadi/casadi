@@ -2160,10 +2160,6 @@ class NZproxy:
 %define %matrix_convertors
 %pythoncode %{
 
-    def toMatrix(self):
-        import numpy as n
-        return n.matrix(self.full())
-
     def __iter__(self):
       for k in self.nz:
         yield k
