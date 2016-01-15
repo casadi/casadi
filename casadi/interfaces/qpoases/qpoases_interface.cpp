@@ -50,78 +50,113 @@ namespace casadi {
   QpoasesInterface::QpoasesInterface(const std::string& name,
                                      const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
-
-    addOption("nWSR", OT_INT,
-              "The maximum number of working set recalculations to be performed during "
-              "the initial homotopy. Default is 5(nx + nc)");
-    addOption("CPUtime", OT_DOUBLE,
-              "The maximum allowed CPU time in seconds for the whole initialisation"
-              " (and the actually required one on output). Disabled if unset.");
-    addOption("printLevel", OT_STRING,
-              "Defines the amount of text output during QP solution, see Section 5.7");
-    addOption("enableRamping", OT_BOOL,
-              "Enables ramping.");
-    addOption("enableFarBounds", OT_BOOL,
-              "Enables the use of  far bounds.");
-    addOption("enableFlippingBounds", OT_BOOL,
-              "Enables the use of  flipping bounds.");
-    addOption("enableRegularisation", OT_BOOL,
-              "Enables automatic  Hessian regularisation.");
-    addOption("enableFullLITests", OT_BOOL,
-              "Enables condition-hardened  (but more expensive) LI test.");
-    addOption("enableNZCTests", OT_BOOL,
-              "Enables nonzero curvature  tests.");
-    addOption("enableDriftCorrection", OT_INT,
-              "Specifies the frequency of drift corrections: 0: turns them off.");
-    addOption("enableCholeskyRefactorisation", OT_INT,
-              "Specifies the frequency of a full re-factorisation of projected "
-              "Hessian matrix: 0: turns them off,  1: uses them at each iteration etc.");
-    addOption("enableEqualities", OT_BOOL,
-              "Specifies whether equalities should be treated  as always active "
-              "(True) or not (False)");
-    addOption("terminationTolerance", OT_DOUBLE,
-              "Relative termination tolerance to stop homotopy.");
-    addOption("boundTolerance", OT_DOUBLE,
-              "If upper and lower bounds differ less than this tolerance, they are regarded "
-              "equal, i.e. as  equality constraint.");
-    addOption("boundRelaxation", OT_DOUBLE,
-              "Initial relaxation of bounds to start homotopy  and initial value for far bounds.");
-    addOption("epsNum", OT_DOUBLE,
-              "Numerator tolerance for ratio tests.");
-    addOption("epsDen", OT_DOUBLE,
-              "Denominator tolerance for ratio tests.");
-    addOption("maxPrimalJump", OT_DOUBLE,
-              "Maximum allowed jump in primal variables in  nonzero curvature tests.");
-    addOption("maxDualJump", OT_DOUBLE,
-              "Maximum allowed jump in dual variables in  linear independence tests.");
-    addOption("initialRamping", OT_DOUBLE,
-              "Start value for ramping strategy.");
-    addOption("finalRamping", OT_DOUBLE,
-              "Final value for ramping strategy.");
-    addOption("initialFarBounds", OT_DOUBLE,
-              "Initial size for far bounds.");
-    addOption("growFarBounds", OT_DOUBLE,
-              "Factor to grow far bounds.");
-    addOption("initialStatusBounds", OT_STRING,
-              "Initial status of bounds at first iteration.");
-    addOption("epsFlipping", OT_DOUBLE,
-              "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound.");
-    addOption("numRegularisationSteps", OT_INT,
-              "Maximum number of successive regularisation steps.");
-    addOption("epsRegularisation", OT_DOUBLE,
-              "Scaling factor of identity matrix used for  Hessian regularisation.");
-    addOption("numRefinementSteps", OT_INT,
-              "Maximum number of iterative refinement steps.");
-    addOption("epsIterRef", OT_DOUBLE,
-              "Early termination tolerance for iterative  refinement.");
-    addOption("epsLITests", OT_DOUBLE,
-              "Tolerance for linear independence tests.");
-    addOption("epsNZCTests", OT_DOUBLE,
-              "Tolerance for nonzero curvature tests.");
   }
 
   QpoasesInterface::~QpoasesInterface() {
   }
+
+  Options QpoasesInterface::options_
+  = {{&FunctionInternal::options_},
+     {{"nWSR",
+       {OT_INT,
+        "The maximum number of working set recalculations to be performed during "
+        "the initial homotopy. Default is 5(nx + nc)"}},
+      {"CPUtime",
+       {OT_DOUBLE,
+        "The maximum allowed CPU time in seconds for the whole initialisation"
+        " (and the actually required one on output). Disabled if unset."}},
+      {"printLevel",
+       {OT_STRING,
+        "Defines the amount of text output during QP solution, see Section 5.7"}},
+      {"enableRamping",
+       {OT_BOOL,
+        "Enables ramping."}},
+      {"enableFarBounds",
+       {OT_BOOL,
+        "Enables the use of  far bounds."}},
+      {"enableFlippingBounds",
+       {OT_BOOL,
+        "Enables the use of  flipping bounds."}},
+      {"enableRegularisation",
+       {OT_BOOL,
+        "Enables automatic  Hessian regularisation."}},
+      {"enableFullLITests",
+       {OT_BOOL,
+        "Enables condition-hardened  (but more expensive) LI test."}},
+      {"enableNZCTests",
+       {OT_BOOL,
+        "Enables nonzero curvature  tests."}},
+      {"enableDriftCorrection",
+       {OT_INT,
+        "Specifies the frequency of drift corrections: 0: turns them off."}},
+      {"enableCholeskyRefactorisation",
+       {OT_INT,
+        "Specifies the frequency of a full re-factorisation of projected "
+        "Hessian matrix: 0: turns them off,  1: uses them at each iteration etc."}},
+      {"enableEqualities",
+       {OT_BOOL,
+        "Specifies whether equalities should be treated  as always active "
+        "(True) or not (False)"}},
+      {"terminationTolerance",
+       {OT_DOUBLE,
+        "Relative termination tolerance to stop homotopy."}},
+      {"boundTolerance",
+       {OT_DOUBLE,
+        "If upper and lower bounds differ less than this tolerance, they are regarded "
+        "equal, i.e. as  equality constraint."}},
+      {"boundRelaxation",
+       {OT_DOUBLE,
+        "Initial relaxation of bounds to start homotopy  and initial value for far bounds."}},
+      {"epsNum",
+       {OT_DOUBLE,
+        "Numerator tolerance for ratio tests."}},
+      {"epsDen",
+       {OT_DOUBLE,
+        "Denominator tolerance for ratio tests."}},
+      {"maxPrimalJump",
+       {OT_DOUBLE,
+        "Maximum allowed jump in primal variables in  nonzero curvature tests."}},
+      {"maxDualJump",
+       {OT_DOUBLE,
+        "Maximum allowed jump in dual variables in  linear independence tests."}},
+      {"initialRamping",
+       {OT_DOUBLE,
+        "Start value for ramping strategy."}},
+      {"finalRamping",
+       {OT_DOUBLE,
+        "Final value for ramping strategy."}},
+      {"initialFarBounds",
+       {OT_DOUBLE,
+        "Initial size for far bounds."}},
+      {"growFarBounds",
+       {OT_DOUBLE,
+        "Factor to grow far bounds."}},
+      {"initialStatusBounds",
+       {OT_STRING,
+        "Initial status of bounds at first iteration."}},
+      {"epsFlipping",
+       {OT_DOUBLE,
+        "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound."}},
+      {"numRegularisationSteps",
+       {OT_INT,
+        "Maximum number of successive regularisation steps."}},
+      {"epsRegularisation",
+       {OT_DOUBLE,
+        "Scaling factor of identity matrix used for  Hessian regularisation."}},
+      {"numRefinementSteps",
+       {OT_INT,
+        "Maximum number of iterative refinement steps."}},
+      {"epsIterRef",
+       {OT_DOUBLE,
+        "Early termination tolerance for iterative  refinement."}},
+      {"epsLITests",
+       {OT_DOUBLE,
+        "Tolerance for linear independence tests."}},
+      {"epsNZCTests",
+       {OT_DOUBLE,
+        "Tolerance for nonzero curvature tests."}}
+     }
+  };
 
   void QpoasesInterface::init(const Dict& opts) {
     Qpsol::init(opts);

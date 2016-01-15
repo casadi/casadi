@@ -48,11 +48,7 @@ namespace casadi {
   GurobiInterface::GurobiInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
-
-    addOption("vtype", OT_STRINGVECTOR,
-              "Type of variables, Each entry can be one of: "
-              "'continuous', 'binary', 'integer', 'semicont', 'semiint'");
-    env_ = 0;
+   env_ = 0;
   }
 
   GurobiInterface::~GurobiInterface() {
@@ -61,6 +57,15 @@ namespace casadi {
       env_ = 0;
     }
   }
+
+  Options GurobiInterface::options_
+  = {{&FunctionInternal::options_},
+     {{"vtype",
+       {OT_STRINGVECTOR,
+        "Type of variables, Each entry can be one of: "
+        "'continuous', 'binary', 'integer', 'semicont', 'semiint'"}}
+     }
+  };
 
   void GurobiInterface::init(const Dict& opts) {
     // Initialize the base classes

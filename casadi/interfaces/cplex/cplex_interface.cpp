@@ -54,26 +54,40 @@ namespace casadi {
   CplexInterface::CplexInterface(const std::string& name,
                                  const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
-
-    addOption("qp_method", OT_INT,
-              "Determines which CPLEX algorithm to use.");
-    addOption("dump_to_file", OT_BOOL,
-              "Dumps QP to file in CPLEX format.");
-    addOption("dump_filename", OT_STRING,
-              "The filename to dump to.");
-    addOption("tol", OT_DOUBLE,
-              "Tolerance of solver");
-    addOption("dep_check", OT_INT,
-              "Detect redundant constraints.");
-    addOption("simplex_maxiter", OT_INT,
-              "Maximum number of simplex iterations.");
-    addOption("barrier_maxiter", OT_INT,
-              "Maximum number of barrier iterations.");
-    addOption("warm_start", OT_BOOL,
-              "Use warm start with simplex methods (affects only the simplex methods).");
-    addOption("convex", OT_BOOL,
-              "Indicates if the QP is convex or not (affects only the barrier method).");
   }
+
+  Options CplexInterface::options_
+  = {{&FunctionInternal::options_},
+     {{"qp_method",
+       {OT_INT,
+        "Determines which CPLEX algorithm to use."}},
+      {"dump_to_file",
+       {OT_BOOL,
+        "Dumps QP to file in CPLEX format."}},
+      {"dump_filename",
+       {OT_STRING,
+        "The filename to dump to."}},
+      {"tol",
+       {OT_DOUBLE,
+        "Tolerance of solver"}},
+      {"dep_check",
+       {OT_INT,
+        "Detect redundant constraints."}},
+      {"simplex_maxiter",
+       {OT_INT,
+        "Maximum number of simplex iterations."}},
+      {"barrier_maxiter",
+       {OT_INT,
+        "Maximum number of barrier iterations."}},
+      {"warm_start",
+       {OT_BOOL,
+        "Use warm start with simplex methods (affects only the simplex methods)."}},
+      {"convex",
+       {OT_BOOL,
+        "Indicates if the QP is convex or not (affects only the barrier method)."}}
+     }
+  };
+
   void CplexInterface::init(const Dict& opts) {
     // Call the init method of the base class
     Qpsol::init(opts);

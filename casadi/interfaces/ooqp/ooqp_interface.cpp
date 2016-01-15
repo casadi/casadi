@@ -57,17 +57,24 @@ namespace casadi {
   OoqpInterface::OoqpInterface(const std::string& name,
                                const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
-
-    addOption("print_level", OT_INT,
-              "Print level. OOQP listens to print_level 0, 10 and 100");
-    addOption("mutol", OT_DOUBLE,
-              "tolerance as provided with setMuTol to OOQP");
-    addOption("artol", OT_DOUBLE,
-              "tolerance as provided with setArTol to OOQP");
   }
 
   OoqpInterface::~OoqpInterface() {
   }
+
+  Options OoqpInterface::options_
+  = {{&FunctionInternal::options_},
+     {{"print_level",
+       {OT_INT,
+        "Print level. OOQP listens to print_level 0, 10 and 100"}},
+      {"mutol",
+       {OT_DOUBLE,
+        "tolerance as provided with setMuTol to OOQP"}},
+      {"artol",
+       {OT_DOUBLE,
+        "tolerance as provided with setArTol to OOQP"}}
+     }
+  };
 
   void OoqpInterface::init(const Dict& opts) {
     // Initialize the base classes
