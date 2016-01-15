@@ -446,7 +446,7 @@ class CasadiStructureDerivable:
     if isinstance(arg,DM):
       a = arg
       mtype = DM
-    else:
+    elif not isinstance(arg,MX) and not isinstance(arg,SX):
       try:
         a = DM(arg)
         mtype = DM
