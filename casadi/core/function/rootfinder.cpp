@@ -113,7 +113,7 @@ namespace casadi {
 
 
     // Generate Jacobian if not provided
-    if (jac_.isNull()) jac_ = f_.jacobian(iin_, iout_);
+    if (jac_.is_null()) jac_ = f_.jacobian(iin_, iout_);
 
     // Check for structural singularity in the Jacobian
     casadi_assert_message(
@@ -122,7 +122,7 @@ namespace casadi {
       "sprank(J)=" << sprank(jac_.sparsity_out(0)) << " (instead of "<< jac_.size1_out(0) << ")");
 
     // Get the linear solver creator function
-    if (linsol_.isNull()) {
+    if (linsol_.is_null()) {
       linsol_ = linsol("linsol", linear_solver,
                        jac_.sparsity_out(0), 1, linear_solver_options);
     } else {
@@ -138,7 +138,7 @@ namespace casadi {
     // Allocate sufficiently large work vectors
     alloc(f_);
     size_t sz_w = f_.sz_w();
-    if (!jac_.isNull()) {
+    if (!jac_.is_null()) {
       alloc(jac_);
       sz_w = max(sz_w, jac_.sz_w());
     }

@@ -283,14 +283,14 @@ namespace casadi {
       i=0;
 
       gL_defL = asens[0].at(i++);
-      if (gL_defL.isNull()) gL_defL = MX::zeros(x.sparsity()); // Needed?
+      if (gL_defL.is_null()) gL_defL = MX::zeros(x.sparsity()); // Needed?
 
       p_defL = asens[0].at(i++);
-      if (p_defL.isNull()) p_defL = MX::zeros(p.sparsity()); // Needed?
+      if (p_defL.is_null()) p_defL = MX::zeros(p.sparsity()); // Needed?
 
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         it->v_defL = asens[0].at(i++);
-        if (it->v_defL.isNull()) {
+        if (it->v_defL.is_null()) {
           it->v_defL = MX::zeros(it->v.sparsity());
         }
       }

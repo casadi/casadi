@@ -134,7 +134,7 @@ namespace casadi {
     /// \endcond
 
     /// Is a null pointer?
-    bool isNull() const;
+    bool is_null() const;
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -253,7 +253,7 @@ namespace casadi {
   template<class A>
   A getcopy(const A& a, std::map<SharedObjectNode*, SharedObject>& already_copied) {
     A ret;
-    if (!a.isNull()) {
+    if (!a.is_null()) {
       std::map<SharedObjectNode*, SharedObject>::iterator it =
           already_copied.find(const_cast<SharedObjectNode*>(a.get()));
       if (it!=already_copied.end()) {

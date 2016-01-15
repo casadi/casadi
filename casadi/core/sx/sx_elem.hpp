@@ -213,7 +213,7 @@ namespace casadi {
     /// \endcond
 
     /** \brief SXElem nodes are not allowed to be null */
-    inline bool isNull() {return false;}
+    inline bool is_null() {return false;}
 
   private:
     /// Pointer to node (SXElem is only a reference class)

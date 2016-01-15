@@ -83,7 +83,7 @@ namespace casadi {
 
   inline bool has_null(const Dict& opts) {
     for (auto&& op : opts) {
-      if (op.second.isNull()) return true;
+      if (op.second.is_null()) return true;
     }
     return false;
   }
@@ -94,7 +94,7 @@ namespace casadi {
       // Create a new dictionary without the null entries
       Dict mod_opts;
       for (auto&& op : opts) {
-        if (!op.second.isNull()) mod_opts[op.first] = op.second;
+        if (!op.second.is_null()) mod_opts[op.first] = op.second;
       }
 
       // Call recursively
@@ -1277,7 +1277,7 @@ namespace casadi {
         : jac_sparsity_.elem(oind, iind);
 
     // Generate, if null
-    if (jsp.isNull()) {
+    if (jsp.is_null()) {
       if (compact) {
 
         // Use internal routine to determine sparsity
@@ -1316,7 +1316,7 @@ namespace casadi {
     }
 
     // If still null, not dependent
-    if (jsp.isNull()) {
+    if (jsp.is_null()) {
       jsp = Sparsity(nnz_out(oind), nnz_in(iind));
     }
 
@@ -1375,7 +1375,7 @@ namespace casadi {
           int max_colorings_to_test = best_coloring>=w*A.size1() ? A.size1() :
             floor(best_coloring/w);
           D1 = AT.uni_coloring(A, max_colorings_to_test);
-          if (D1.isNull()) {
+          if (D1.is_null()) {
             if (verbose()) userOut() << "Forward mode coloring interrupted (more than "
                                << max_colorings_to_test << " needed)." << endl;
           } else {
@@ -1391,7 +1391,7 @@ namespace casadi {
             floor(best_coloring/(1-w));
 
           D2 = A.uni_coloring(AT, max_colorings_to_test);
-          if (D2.isNull()) {
+          if (D2.is_null()) {
             if (verbose()) userOut() << "Adjoint mode coloring interrupted (more than "
                                << max_colorings_to_test << " needed)." << endl;
           } else {
@@ -2266,7 +2266,7 @@ namespace casadi {
 
         // Get the sparsity of the Jacobian block
         Sparsity sp = sparsity_jac(iind, oind, true, false);
-        if (sp.isNull() || sp.nnz() == 0) continue; // Skip if zero
+        if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
         int d1 = sp.size2();
@@ -2297,7 +2297,7 @@ namespace casadi {
 
         // Get the sparsity of the Jacobian block
         Sparsity sp = sparsity_jac(iind, oind, true, false);
-        if (sp.isNull() || sp.nnz() == 0) continue; // Skip if zero
+        if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
         int d1 = sp.size2();
@@ -2355,7 +2355,7 @@ namespace casadi {
   }
 
   void FunctionInternal::alloc(const Function& f, bool persistent) {
-    if (f.isNull()) return;
+    if (f.is_null()) return;
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     alloc_arg(sz_arg, persistent);

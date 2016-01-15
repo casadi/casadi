@@ -1330,7 +1330,7 @@ namespace casadi {
 
     for (vector<MXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
 
-      if (!(it->data).isNull()) {
+      if (!(it->data).is_null()) {
         // Check if it->data points to a supplied expr
         it_lookup = expr_lookup.find((it->data).operator->());
 

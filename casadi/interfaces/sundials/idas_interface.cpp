@@ -601,7 +601,7 @@ namespace casadi {
     log("IdasInterface::init", "attached linear solver");
 
     // Adjoint sensitivity problem
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
 
       // Allocate n-vectors
       m.rxzdot = N_VNew_Serial(nrx_+nrz_);
@@ -1391,7 +1391,7 @@ namespace casadi {
       N_VScale(1.0, rvecB, zvecB);
     }
 
-    casadi_assert(!linsolB_.isNull());
+    casadi_assert(!linsolB_.is_null());
 
     // Solve the (possibly factorized) system
     casadi_assert_message(linsolB_.nnz_out(0) == NV_LENGTH_S(zvecB),
@@ -1723,11 +1723,11 @@ namespace casadi {
     // Add a preconditioner
     if (use_preconditioner_) {
       // Make sure that a Jacobian has been provided
-      if (jac_.isNull())
+      if (jac_.is_null())
           throw CasadiException("IdasInterface::init(): No Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
-      if (linsol_.isNull())
+      if (linsol_.is_null())
           throw CasadiException("IdasInterface::init(): "
                                 "No user defined linear solver has been provided.");
 
@@ -1739,10 +1739,10 @@ namespace casadi {
 
   void IdasInterface::initUserDefinedLinsol(IdasMemory& m) const {
     // Make sure that a Jacobian has been provided
-    casadi_assert(!jac_.isNull());
+    casadi_assert(!jac_.is_null());
 
     // Make sure that a linear solver has been provided
-    casadi_assert(!linsol_.isNull());
+    casadi_assert(!linsol_.is_null());
 
     //  Set fields in the IDA memory
     IDAMem IDA_mem = IDAMem(m.mem);
@@ -1910,11 +1910,11 @@ namespace casadi {
     // Add a preconditioner
     if (use_preconditionerB_) {
       // Make sure that a Jacobian has been provided
-      if (jacB_.isNull())
+      if (jacB_.is_null())
           throw CasadiException("IdasInterface::init(): No backwards Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
-      if (linsolB_.isNull())
+      if (linsolB_.is_null())
           throw CasadiException("IdasInterface::init(): No backwards user "
                                 "defined linear solver has been provided.");
 
@@ -1927,10 +1927,10 @@ namespace casadi {
 
   void IdasInterface::initUserDefinedLinsolB(IdasMemory& m) const {
     // Make sure that a Jacobian has been provided
-    casadi_assert(!jacB_.isNull());
+    casadi_assert(!jacB_.is_null());
 
     // Make sure that a linear solver has been provided
-    casadi_assert(!linsolB_.isNull());
+    casadi_assert(!linsolB_.is_null());
 
     //  Set fields in the IDA memory
     IDAMem IDA_mem = IDAMem(m.mem);

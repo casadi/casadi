@@ -130,7 +130,7 @@ namespace casadi {
     }
 
     // Backward integration
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       // Symbolic inputs
       MX rx0 = MX::sym("rx0", this->rx());
       MX rp = MX::sym("rp", this->rp());

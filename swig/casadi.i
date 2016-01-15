@@ -2373,7 +2373,7 @@ namespace casadi{
           self.__init__()
 
     def __getstate__(self):
-        if self.isNull(): return {}
+        if self.is_null(): return {}
         return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
   %}
 }

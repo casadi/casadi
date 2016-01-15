@@ -567,7 +567,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::uni_coloring(const Sparsity& AT, int cutoff) const {
-    if (AT.isNull()) {
+    if (AT.is_null()) {
       return (*this)->uni_coloring(T(), cutoff);
     } else {
       return (*this)->uni_coloring(AT, cutoff);

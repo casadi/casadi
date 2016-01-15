@@ -35,7 +35,7 @@ namespace casadi {
     : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
 
     // Make sure arguments are consistent
-    casadi_assert(!sparsity.isNull());
+    casadi_assert(!sparsity.is_null());
     casadi_assert_message(sparsity.size2()==sparsity.size1(),
                           "Linsol::init: the matrix must be square but got "
                           << sparsity.dim());

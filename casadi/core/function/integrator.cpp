@@ -49,7 +49,7 @@ namespace casadi {
     z_ = f_.sparsity_in(DAE_Z);
     p_ = f_.sparsity_in(DAE_P);
     q_ = f_.sparsity_out(DAE_QUAD);
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       rx_ = g_.sparsity_in(RDAE_RX);
       rz_ = g_.sparsity_in(RDAE_RZ);
       rp_ = g_.sparsity_in(RDAE_RP);
@@ -244,12 +244,12 @@ namespace casadi {
     nrq_ = rq().nnz();
 
     // Consistency checks
-    casadi_assert(!f_.isNull());
+    casadi_assert(!f_.is_null());
     casadi_assert_message(f_.n_in()==DAE_NUM_IN,
                           "Wrong number of inputs for the DAE callback function");
     casadi_assert_message(f_.n_out()==DAE_NUM_OUT,
                           "Wrong number of outputs for the DAE callback function");
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       casadi_assert_message(g_.n_in()==RDAE_NUM_IN,
                             "Wrong number of inputs for the backwards DAE callback function");
       casadi_assert_message(g_.n_out()==RDAE_NUM_OUT,
@@ -265,7 +265,7 @@ namespace casadi {
                           << z().size() << ", but got "
                           << f_.size_out(DAE_ALG) << " instead.");
     casadi_assert(f_.sparsity_out(DAE_ALG)==z());
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       casadi_assert(g_.sparsity_in(RDAE_P)==p());
       casadi_assert(g_.sparsity_in(RDAE_X)==x());
       casadi_assert(g_.sparsity_in(RDAE_Z)==z());
@@ -279,14 +279,14 @@ namespace casadi {
 
     // Form a linear solver for the sparsity propagation
     linsol_f_ = linsol("linsol_f", "none", spJacF(), 1);
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       linsol_g_ = linsol("linsol_g", "none", spJacG(), 1);
     }
 
     // Allocate sufficiently large work vectors
     size_t sz_w = f_.sz_w();
     alloc(f_);
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       alloc(g_);
       sz_w = max(sz_w, g_.sz_w());
     }
@@ -375,7 +375,7 @@ namespace casadi {
     casadi_assert(res_it==res.end());
 
     vector<MatType> g_arg;
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
 
       // Forward derivatives of g
       d = g_.derivative(nfwd, 0);
@@ -523,7 +523,7 @@ namespace casadi {
     casadi_assert(res_it==res.end());
 
     vector<MatType> g_arg;
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
 
       // Forward derivatives of g
       d = g_.derivative(0, 0);
@@ -600,7 +600,7 @@ namespace casadi {
     // Consistency check
     casadi_assert(res_it==res.end());
 
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
 
       // Adjoint derivatives of g
       d = g_.derivative(0, nadj);
@@ -717,7 +717,7 @@ namespace casadi {
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
     copy(tmp_x, tmp_x+nx_+nz_, w);
     fill_n(tmp_x, nx_+nz_, 0);
-    casadi_assert(!linsol_f_.isNull());
+    casadi_assert(!linsol_f_.is_null());
     linsol_f_.linsol_spsolve(tmp_x, w, false);
 
     // Get xf and zf
@@ -735,7 +735,7 @@ namespace casadi {
       f_(arg1, res1, iw, w, 0);
     }
 
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       // Propagate through g
       fill(arg1, arg1+RDAE_NUM_IN, static_cast<bvec_t*>(0));
       arg1[RDAE_X] = tmp_x;
@@ -756,7 +756,7 @@ namespace casadi {
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
       copy(tmp_rx, tmp_rx+nrx_+nrz_, w);
       fill_n(tmp_rx, nrx_+nrz_, 0);
-      casadi_assert(!linsol_g_.isNull());
+      casadi_assert(!linsol_g_.is_null());
       linsol_g_.linsol_spsolve(tmp_rx, w, false);
 
       // Get rxf and rzf
@@ -807,7 +807,7 @@ namespace casadi {
       fill_n(tmp_z, nz_, 0);
     }
 
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       // Work vectors
       bvec_t *tmp_rx = w; w += nrx_;
       bvec_t *tmp_rz = w; w += nrz_;
@@ -846,7 +846,7 @@ namespace casadi {
       g_.rev(arg1, res1, iw, w, 0);
 
       // Propagate interdependencies
-      casadi_assert(!linsol_g_.isNull());
+      casadi_assert(!linsol_g_.is_null());
       fill_n(w, nrx_+nrz_, 0);
       linsol_g_.linsol_spsolve(w, tmp_rx, true);
       copy(w, w+nrx_+nrz_, tmp_rx);
@@ -873,7 +873,7 @@ namespace casadi {
     if (qf && nq_>0) f_.rev(arg1, res1, iw, w, 0);
 
     // Propagate interdependencies
-    casadi_assert(!linsol_f_.isNull());
+    casadi_assert(!linsol_f_.is_null());
     fill_n(w, nx_+nz_, 0);
     linsol_f_.linsol_spsolve(w, tmp_x, true);
     copy(w, w+nx_+nz_, tmp_x);
@@ -1363,7 +1363,7 @@ namespace casadi {
 
     // Get discrete time dimensions
     nZ_ = F_.nnz_in(DAE_Z);
-    nRZ_ =  G_.isNull() ? 0 : G_.nnz_in(RDAE_RZ);
+    nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(RDAE_RZ);
   }
 
   void FixedStepIntegrator::init_memory(Memory& mem) const {
@@ -1372,7 +1372,7 @@ namespace casadi {
 
     // Discrete time algebraic variable
     m.Z = DM::zeros(F_.sparsity_in(DAE_Z));
-    m.RZ = G_.isNull() ? DM() : DM::zeros(G_.sparsity_in(RDAE_RZ));
+    m.RZ = G_.is_null() ? DM() : DM::zeros(G_.sparsity_in(RDAE_RZ));
 
     // Allocate tape if backward states are present
     if (nrx_>0) {

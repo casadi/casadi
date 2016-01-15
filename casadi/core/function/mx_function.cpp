@@ -1028,7 +1028,7 @@ namespace casadi {
 
     // Generate code for the embedded functions
     for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      if (it->data.isNull()) continue;
+      if (it->data.is_null()) continue;
       it->data->addDependency(g);
     }
   }

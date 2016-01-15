@@ -134,13 +134,13 @@ namespace casadi {
 
     // Jacobian sparsity
     vector<int> Jcol, Jrow;
-    if (!jacg_sp_.isNull()) {
+    if (!jacg_sp_.is_null()) {
       Jcol = jacg_sp_.get_col();
       Jrow = jacg_sp_.get_row();
     }
 
     // Hessian sparsity
-    int nnzH = hesslag_sp_.isNull() ? 0 : hesslag_sp_.nnz();
+    int nnzH = hesslag_sp_.is_null() ? 0 : hesslag_sp_.nnz();
     vector<int> Hcol, Hrow;
     if (nnzH>0) {
       Hcol = hesslag_sp_.get_col();

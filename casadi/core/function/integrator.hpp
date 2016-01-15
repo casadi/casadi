@@ -318,7 +318,7 @@ namespace casadi {
     dae.out[DE_ODE] = v[DAE_ODE];
     dae.out[DE_ALG] = v[DAE_ALG];
     dae.out[DE_QUAD] = v[DAE_QUAD];
-    if (!g.isNull()) {
+    if (!g.is_null()) {
       v = XType::get_input(g);
       dae.in[DE_RX] = v[RDAE_RX];
       dae.in[DE_RZ] = v[RDAE_RZ];

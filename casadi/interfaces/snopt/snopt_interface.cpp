@@ -96,7 +96,7 @@ namespace casadi {
     IM mapping_gradF = IM(jac_f_fcn_.sparsity_out(1),
                           range(-1, -1-jac_f_fcn_.nnz_out(1), -1));
 
-    if (!jac_g_fcn_.isNull()) {
+    if (!jac_g_fcn_.is_null()) {
       mapping_jacG = IM(jacg_sp_, range(1, jacg_sp_.nnz()+1));
     }
 
@@ -144,7 +144,7 @@ namespace casadi {
     alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
     alloc_w(jac_f_fcn_.nnz_out(1), true); // jac_fk_
-    if (!jacg_sp_.isNull()) {
+    if (!jacg_sp_.is_null()) {
       alloc_w(jacg_sp_.nnz(), true); // jac_gk_
     }
   }
@@ -184,7 +184,7 @@ namespace casadi {
     m.lam_xk = w; w += nx_;
     m.gk = w; w += ng_;
     m.jac_fk = w; w += jac_f_fcn_.nnz_out(1);
-    if (!jacg_sp_.isNull()) {
+    if (!jacg_sp_.is_null()) {
       m.jac_gk = w; w += jacg_sp_.nnz();
     }
   }
@@ -199,7 +199,7 @@ namespace casadi {
     snProblem prob;
 
     // Evaluate gradF and jacG at initial value
-    if (!jac_g_fcn_.isNull()) {
+    if (!jac_g_fcn_.is_null()) {
       std::fill_n(m.arg, jac_g_fcn_.n_in(), nullptr);
       m.arg[0] = m.x0;
       m.arg[1] = m.p;
@@ -234,7 +234,7 @@ namespace casadi {
     casadi_assert(A_structure_.nnz() == nea);
 
     // Pointer magic, courtesy of Greg
-    casadi_assert_message(!jac_f_fcn_.isNull(), "blaasssshc");
+    casadi_assert_message(!jac_f_fcn_.is_null(), "blaasssshc");
 
     // Outputs
     double Obj = 0; // TODO(Greg): get this from snopt
@@ -372,7 +372,7 @@ namespace casadi {
       m.n_eval_grad_f += 1;
 
       time0 = clock();
-      if (!jac_g_fcn_.isNull()) {
+      if (!jac_g_fcn_.is_null()) {
         // Get reduced decision variables
         casadi_fill(m.xk2, nx_, 0.);
         for (int k = 0; k < nnJac; ++k) {

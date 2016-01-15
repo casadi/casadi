@@ -44,9 +44,9 @@ namespace casadi {
     }
 
     n_ = H_.size2();
-    nc_ = A_.isNull() ? 0 : A_.size1();
+    nc_ = A_.is_null() ? 0 : A_.size1();
 
-    if (!A_.isNull()) {
+    if (!A_.is_null()) {
       casadi_assert_message(A_.size2()==n_,
         "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
         << std::endl <<

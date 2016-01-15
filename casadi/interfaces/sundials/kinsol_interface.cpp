@@ -236,18 +236,18 @@ namespace casadi {
       }
       if (use_preconditioner_) {
         // Make sure that a Jacobian has been provided
-        casadi_assert_message(!jac_.isNull(), "No Jacobian has been provided");
+        casadi_assert_message(!jac_.is_null(), "No Jacobian has been provided");
 
         // Make sure that a linear solver has been provided
-        casadi_assert_message(!linsol_.isNull(), "No linear solver has been provided.");
+        casadi_assert_message(!linsol_.is_null(), "No linear solver has been provided.");
       }
     } else if (linear_solver_type=="user_defined") {
       linear_solver_type_ = USER_DEFINED;
       // Make sure that a Jacobian has been provided
-      casadi_assert(!jac_.isNull());
+      casadi_assert(!jac_.is_null());
 
       // Make sure that a linear solver has been provided
-      casadi_assert(!linsol_.isNull());
+      casadi_assert(!linsol_.is_null());
 
       // Form the Jacobian-times-vector function
       f_fwd_ = f_.derivative(1, 0);

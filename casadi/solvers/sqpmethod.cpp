@@ -178,7 +178,7 @@ namespace casadi {
 
     // Allocate a QP solver
     Hsp_ = exact_hessian_ ? hesslag_sp_ : Sparsity::dense(nx_, nx_);
-    Asp_ = jac_g_fcn_.isNull() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(1);
+    Asp_ = jac_g_fcn_.is_null() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(1);
 
     // Allocate a QP solver
     casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
@@ -401,7 +401,7 @@ namespace casadi {
                      m.reg, ls_iter, ls_success);
 
       // Call callback function if present
-      if (!fcallback_.isNull()) {
+      if (!fcallback_.is_null()) {
         double time1 = clock();
 
         // Callback inputs

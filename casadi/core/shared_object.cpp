@@ -81,7 +81,7 @@ namespace casadi {
     return node;
   }
 
-  bool SharedObject::isNull() const {
+  bool SharedObject::is_null() const {
     return node==0;
   }
 
@@ -97,7 +97,7 @@ namespace casadi {
   }
 
   SharedObjectNode* SharedObject::operator->() const {
-    casadi_assert(!isNull());
+    casadi_assert(!is_null());
     return node;
   }
 
@@ -119,7 +119,7 @@ namespace casadi {
   }
 
   void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {
-    if (isNull()) {
+    if (is_null()) {
       stream << 0;
     } else {
       (*this)->repr(stream);
@@ -133,7 +133,7 @@ namespace casadi {
   }
 
   void SharedObject::print(std::ostream &stream, bool trailing_newline) const {
-    if (isNull()) {
+    if (is_null()) {
       stream << "Null pointer of class \"" << typeid(this).name() << "\"";
     } else {
       (*this)->print(stream);

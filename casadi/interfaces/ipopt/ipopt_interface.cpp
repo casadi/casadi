@@ -378,7 +378,7 @@ namespace casadi {
         m.obj.push_back(obj_value);
       }
       Timer time0 = getTimerTime();
-      if (!fcallback_.isNull()) {
+      if (!fcallback_.is_null()) {
         if (full_callback) {
           casadi_copy(x, nx_, m.xk);
           for (int i=0; i<nx_; ++i) {

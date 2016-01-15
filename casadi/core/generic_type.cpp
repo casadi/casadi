@@ -173,7 +173,7 @@ namespace casadi {
   }
 
   ostream& operator<<(ostream &stream, const GenericType& ref) {
-    if (ref.isNull()) {
+    if (ref.is_null()) {
       stream << "None";
     } else {
       ref->print(stream);
@@ -419,7 +419,7 @@ namespace casadi {
   }
 
   TypeID GenericType::getType() const {
-    if (isNull()) {
+    if (is_null()) {
       return OT_NULL;
     } else {
       return static_cast<const GenericTypeBase*>(get())->getType();

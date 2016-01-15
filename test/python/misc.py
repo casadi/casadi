@@ -177,7 +177,7 @@ class Misctests(casadiTestCase):
     a = Sparsity()
     s = pickle.dumps(a)
     b = pickle.loads(s)
-    self.assertTrue(a.isNull())
+    self.assertTrue(a.is_null())
     
     a = IM(Sparsity.lower(4),range(10))
     s = pickle.dumps(a)

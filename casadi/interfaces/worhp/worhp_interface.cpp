@@ -315,7 +315,7 @@ namespace casadi {
         if (!firstIteration) {
           firstIteration = true;
 
-          if (!fcallback_.isNull()) {
+          if (!fcallback_.is_null()) {
             m.iter = m.worhp_w.MajorIter;
             m.iter_sqp = m.worhp_w.MinorIter;
             m.inf_pr = m.worhp_w.NormMax_CV;

@@ -42,7 +42,7 @@ namespace casadi {
 
   Callback::~Callback() {
     // Make sure that this object isn't used after its deletion
-    if (!isNull()) {
+    if (!is_null()) {
       (*this)->self_ = 0;
     }
   }
@@ -111,7 +111,7 @@ namespace casadi {
   }
 
   void Callback::transfer_ownership() {
-    casadi_assert_message(!isNull(), "Null pointer.");
+    casadi_assert_message(!is_null(), "Null pointer.");
     casadi_assert_message(!(*this)->own_, "Ownership has already been transferred.");
     casadi_assert_message(getCount()>1, "There are no owning references");
     // Decrease the reference counter to offset the effect of the owning reference

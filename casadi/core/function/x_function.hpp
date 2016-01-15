@@ -626,8 +626,8 @@ namespace casadi {
     if (verbose()) userOut() << "XFunction::jac graph coloring completed" << std::endl;
 
     // Get the number of forward and adjoint sweeps
-    int nfdir = D1.isNull() ? 0 : D1.size2();
-    int nadir = D2.isNull() ? 0 : D2.size2();
+    int nfdir = D1.is_null() ? 0 : D1.size2();
+    int nadir = D2.is_null() ? 0 : D2.size2();
 
     // Number of derivative directions supported by the function
     int max_nfdir = optimized_num_dir;

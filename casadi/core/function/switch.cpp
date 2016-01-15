@@ -41,14 +41,14 @@ namespace casadi {
   }
 
   size_t Switch::get_n_in() const {
-    for (auto&& i : f_) if (!i.isNull()) return 1+i.n_in();
-    casadi_assert(!f_def_.isNull());
+    for (auto&& i : f_) if (!i.is_null()) return 1+i.n_in();
+    casadi_assert(!f_def_.is_null());
     return 1+f_def_.n_in();
   }
 
   size_t Switch::get_n_out() const {
-    for (auto&& i : f_) if (!i.isNull()) return i.n_out();
-    casadi_assert(!f_def_.isNull());
+    for (auto&& i : f_) if (!i.is_null()) return i.n_out();
+    casadi_assert(!f_def_.is_null());
     return f_def_.n_out();
   }
 
@@ -58,14 +58,14 @@ namespace casadi {
     } else {
       Sparsity ret;
       for (auto&& i : f_) {
-        if (!i.isNull()) {
+        if (!i.is_null()) {
           const Sparsity& s = i.sparsity_in(ind-1);
-          ret = ret.isNull() ? s : ret.unite(s);
+          ret = ret.is_null() ? s : ret.unite(s);
         }
       }
-      casadi_assert(!f_def_.isNull());
+      casadi_assert(!f_def_.is_null());
       const Sparsity& s = f_def_.sparsity_in(ind-1);
-      ret = ret.isNull() ? s : ret.unite(s);
+      ret = ret.is_null() ? s : ret.unite(s);
       return ret;
     }
   }
@@ -73,14 +73,14 @@ namespace casadi {
   Sparsity Switch::get_sparsity_out(int ind) const {
     Sparsity ret;
     for (auto&& i : f_) {
-      if (!i.isNull()) {
+      if (!i.is_null()) {
         const Sparsity& s = i.sparsity_out(ind);
-        ret = ret.isNull() ? s : ret.unite(s);
+        ret = ret.is_null() ? s : ret.unite(s);
       }
     }
-    casadi_assert(!f_def_.isNull());
+    casadi_assert(!f_def_.is_null());
     const Sparsity& s = f_def_.sparsity_out(ind);
-    ret = ret.isNull() ? s : ret.unite(s);
+    ret = ret.is_null() ? s : ret.unite(s);
     return ret;
   }
 
@@ -91,7 +91,7 @@ namespace casadi {
     int num_in = -1, num_out=-1;
     for (int k=0; k<=f_.size(); ++k) {
       Function& fk = k<f_.size() ? f_[k] : f_def_;
-      if (fk.isNull()) continue;
+      if (fk.is_null()) continue;
       if (num_in<0) {
         // Number of inputs and outputs
         num_in=fk.n_in();
@@ -126,7 +126,7 @@ namespace casadi {
     // Get required work
     for (int k=0; k<=f_.size(); ++k) {
       const Function& fk = k<f_.size() ? f_[k] : f_def_;
-      if (fk.isNull()) continue;
+      if (fk.is_null()) continue;
 
       // Get local work vector sizes
       alloc(fk);
@@ -177,12 +177,12 @@ namespace casadi {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].isNull()) der[k] = f_[k].forward(nfwd);
+      if (!f_[k].is_null()) der[k] = f_[k].forward(nfwd);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.isNull()) der_def = f_def_.forward(nfwd);
+    if (!f_def_.is_null()) der_def = f_def_.forward(nfwd);
 
     // New Switch for derivatives
     stringstream ss;
@@ -219,12 +219,12 @@ namespace casadi {
     // Derivative of each case
     vector<Function> der(f_.size());
     for (int k=0; k<f_.size(); ++k) {
-      if (!f_[k].isNull()) der[k] = f_[k].reverse(nadj);
+      if (!f_[k].is_null()) der[k] = f_[k].reverse(nadj);
     }
 
     // Default case
     Function der_def;
-    if (!f_def_.isNull()) der_def = f_def_.reverse(nadj);
+    if (!f_def_.is_null()) der_def = f_def_.reverse(nadj);
 
     // New Switch for derivatives
     stringstream ss;
@@ -315,7 +315,7 @@ namespace casadi {
 
       // Get the function:
       const Function& fk = k1<f_.size() ? f_[k1] : f_def_;
-      if (fk.isNull()) {
+      if (fk.is_null()) {
         g.body << "    return 1;" << endl;
       } else {
         // Call function

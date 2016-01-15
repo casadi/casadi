@@ -170,9 +170,9 @@ namespace casadi {
     np_ = nnz_in(NLPSOL_P);
     ng_ = nnz_out(NLPSOL_G);
 
-    if (!fcallback_.isNull()) {
+    if (!fcallback_.is_null()) {
       // Consistency checks
-      casadi_assert(!fcallback_.isNull());
+      casadi_assert(!fcallback_.is_null());
       casadi_assert_message(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
                             "Callback function must return a scalar");
       casadi_assert_message(fcallback_.n_in()==n_out(),

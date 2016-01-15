@@ -287,7 +287,7 @@ namespace casadi {
     }
 
     // No Jacobian of g if g doesn't exist
-    if (g_.isNull()) {
+    if (g_.is_null()) {
       exact_jacobianB_ = false;
     }
 
@@ -372,7 +372,7 @@ namespace casadi {
       alloc_w(jac_.nnz_out(0), true);
     }
 
-    if (!jac_.isNull()) {
+    if (!jac_.is_null()) {
       casadi_assert_message(jac_.size2_out(0)==jac_.size1_out(0),
                             "SundialsInterface::init: the jacobian of the forward problem must "
                             "be square but got " << jac_.sparsity_out(0).dim());
@@ -385,9 +385,9 @@ namespace casadi {
     }
 
     // Create a backwards Jacobian if requested
-    if (exact_jacobianB_ && !g_.isNull()) jacB_ = getJacB();
+    if (exact_jacobianB_ && !g_.is_null()) jacB_ = getJacB();
 
-    if (!jacB_.isNull()) {
+    if (!jacB_.is_null()) {
       alloc(jacB_);
       alloc_w(jacB_.nnz_out(0), true);
       casadi_assert_message(jacB_.size2_out(0)==jacB_.size1_out(0),
@@ -402,14 +402,14 @@ namespace casadi {
     }
 
     // Create a linear solver
-    if (!linear_solver.empty() && !jac_.isNull()) {
+    if (!linear_solver.empty() && !jac_.is_null()) {
       linsol_ = linsol("linsol", linear_solver, jac_.sparsity_out(0),
                        1, linear_solver_options);
       alloc(linsol_);
     }
 
     // Create a linear solver
-    if (!linear_solverB.empty() && !jacB_.isNull()) {
+    if (!linear_solverB.empty() && !jacB_.is_null()) {
       linsolB_ = linsol("linsolB", linear_solverB, jacB_.sparsity_out(0),
                         1, linear_solver_optionsB);
       alloc(linsolB_);
@@ -477,7 +477,7 @@ namespace casadi {
     if (upper_bandwidth_>=0) {
       bw.first = upper_bandwidth_;
     } else {
-      casadi_assert_message(!jac_.isNull(),
+      casadi_assert_message(!jac_.is_null(),
                             "\"upper_bandwidth\" has not been set and cannot be "
                             "detected since exact Jacobian is not available.");
       bw.first = jac_.sparsity_out(0).bw_upper();
@@ -487,7 +487,7 @@ namespace casadi {
     if (lower_bandwidth_>=0) {
       bw.second = lower_bandwidth_;
     } else {
-      casadi_assert_message(!jac_.isNull(),
+      casadi_assert_message(!jac_.is_null(),
                             "\"lower_bandwidth\" has not been set and cannot be "
                             "detected since exact Jacobian is not available.");
       bw.second = jac_.sparsity_out(0).bw_lower();
@@ -503,7 +503,7 @@ namespace casadi {
     if (upper_bandwidthB_>=0) {
       bw.first = upper_bandwidthB_;
     } else {
-      casadi_assert_message(!jacB_.isNull(),
+      casadi_assert_message(!jacB_.is_null(),
                             "\"upper_bandwidthB\" has not been set and cannot be "
                             "detected since exact Jacobian for backward problem "
                             "is not available.");
@@ -514,7 +514,7 @@ namespace casadi {
     if (lower_bandwidthB_>=0) {
       bw.second = lower_bandwidthB_;
     } else {
-      casadi_assert_message(!jacB_.isNull(),
+      casadi_assert_message(!jacB_.is_null(),
                             "\"lower_bandwidthB\" has not been set and cannot be "
                             "detected since exact Jacobian for backward problem "
                             "is not available.");

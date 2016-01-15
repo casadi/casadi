@@ -207,7 +207,7 @@ namespace casadi {
     // Backwards dynamics
     // NOTE: The following is derived so that it will give the exact adjoint
     // sensitivities whenever g is the reverse mode derivative of f.
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
 
       // Symbolic inputs
       MX rx0 = MX::sym("rx0", this->rx());

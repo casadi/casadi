@@ -248,7 +248,7 @@ namespace casadi {
     }
 
     // Adjoint sensitivity problem
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
       // Get the interpolation type
       int interpType;
       if (interpolation_type_=="hermite") {
@@ -1483,11 +1483,11 @@ namespace casadi {
     // Add a preconditioner
     if (use_preconditioner_) {
       // Make sure that a Jacobian has been provided
-      if (jac_.isNull())
+      if (jac_.is_null())
           throw CasadiException("CvodesInterface::init(): No Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
-      if (linsol_.isNull())
+      if (linsol_.is_null())
           throw CasadiException("CvodesInterface::init(): "
                                 "No user defined linear solver has been provided.");
 
@@ -1499,12 +1499,12 @@ namespace casadi {
 
   void CvodesInterface::initUserDefinedLinsol(CvodesMemory& m) const {
     // Make sure that a Jacobian has been provided
-    if (jac_.isNull())
+    if (jac_.is_null())
         throw CasadiException("CvodesInterface::initUserDefinedLinsol(): "
                               "No Jacobian has been provided.");
 
     // Make sure that a linear solver has been provided
-    if (linsol_.isNull())
+    if (linsol_.is_null())
         throw CasadiException("CvodesInterface::initUserDefinedLinsol(): "
                               "No user defined linear solver has been provided.");
 
@@ -1562,11 +1562,11 @@ namespace casadi {
     // Add a preconditioner
     if (use_preconditionerB_) {
       // Make sure that a Jacobian has been provided
-      if (jacB_.isNull())
+      if (jacB_.is_null())
         casadi_error("CvodesInterface::init(): No backwards Jacobian has been provided.");
 
       // Make sure that a linear solver has been provided
-      if (linsolB_.isNull())
+      if (linsolB_.is_null())
         casadi_error("CvodesInterface::init(): "
                      "No user defined backwards  linear solver has been provided.");
 
@@ -1579,12 +1579,12 @@ namespace casadi {
 
   void CvodesInterface::initUserDefinedLinsolB(CvodesMemory& m) const {
     // Make sure that a Jacobian has been provided
-    if (jacB_.isNull())
+    if (jacB_.is_null())
         throw CasadiException("CvodesInterface::initUserDefinedLinsolB(): "
                               "No backwards Jacobian has been provided.");
 
     // Make sure that a linear solver has been provided
-    if (linsolB_.isNull())
+    if (linsolB_.is_null())
         throw CasadiException("CvodesInterface::initUserDefinedLinsolB(): "
                               "No user defined backward linear solver has been provided.");
 

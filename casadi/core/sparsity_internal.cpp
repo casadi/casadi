@@ -528,7 +528,7 @@ namespace casadi {
     for (int i=0; i<size1(); ++i) m2 += w[i];
 
     // transpose if needed
-    if (m2 < n2 && trans.isNull())
+    if (m2 < n2 && trans.is_null())
       trans = T();
 
     // Get pointer to sparsity

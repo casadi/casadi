@@ -861,7 +861,7 @@ namespace casadi {
   }
 
   string Function::name() const {
-    if (isNull()) {
+    if (is_null()) {
       return "NULL";
     } else {
       return (*this)->name();
@@ -1155,21 +1155,21 @@ namespace casadi {
   }
 
   Function Function::rootfinder_fun() {
-    casadi_assert(!isNull());
+    casadi_assert(!is_null());
     Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->f_;
   }
 
   Function Function::rootfinder_jac() {
-    casadi_assert(!isNull());
+    casadi_assert(!is_null());
     Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->jac_;
   }
 
   Function Function::rootfinder_linsol() {
-    casadi_assert(!isNull());
+    casadi_assert(!is_null());
     Rootfinder* n = dynamic_cast<Rootfinder*>(get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->linsol_;
@@ -1217,7 +1217,7 @@ namespace casadi {
   }
 
   Function Function::integrator_dae() {
-    casadi_assert(!isNull());
+    casadi_assert(!is_null());
     Integrator* n = dynamic_cast<Integrator*>(get());
     casadi_assert_message(n!=0, "Not an integrator");
     return n->f_;
@@ -1359,7 +1359,7 @@ namespace casadi {
   }
 
   void Function::qpsol_debug(ostream &file) const {
-    casadi_assert(!isNull());
+    casadi_assert(!is_null());
     const Qpsol* n = dynamic_cast<const Qpsol*>(get());
     casadi_assert_message(n!=0, "Not a QP solver");
     return n->generateNativeCode(file);

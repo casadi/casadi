@@ -90,9 +90,9 @@ void LiftedSQPInternal::init(){
     
   // Assume SXFunction for now
   SXFunction ffcn = shared_cast<SXFunction>(F_);
-  casadi_assert(!ffcn.isNull());
+  casadi_assert(!ffcn.is_null());
   SXFunction gfcn = shared_cast<SXFunction>(G_);
-  casadi_assert(!gfcn.isNull());
+  casadi_assert(!gfcn.is_null());
   
   // Extract the free variables and split into independent and dependent variables
   SX x = ffcn.inputExpr(0);
