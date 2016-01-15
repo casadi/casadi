@@ -2995,11 +2995,16 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 
 %include <casadi/core/matrix.hpp>
 
-%template(IM)           casadi::Matrix<int>;
-%template(DM)           casadi::Matrix<double>;
-
+%template(DM) casadi::Matrix<double>;
 %extend casadi::Matrix<double> {
    %template(DM) Matrix<int>;
+   %template(DM) Matrix<SXElem>;
+};
+
+%template(IM) casadi::Matrix<int>;
+%extend casadi::Matrix<int> {
+   %template(IM) Matrix<double>;
+   %template(IM) Matrix<SXElem>;
 };
 
 namespace casadi{

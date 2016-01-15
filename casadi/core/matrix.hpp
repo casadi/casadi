@@ -135,14 +135,16 @@ namespace casadi {
      */
     template<typename A>
     Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<Scalar>(x.nnz())) {
-      copy(x->begin(), x->end(), data_.begin());
+      auto x_it = x->begin();
+      for (auto&& d : data_) d = static_cast<Scalar>(*x_it++);
     }
 
     /** \brief  Create an expression from a vector  */
     template<typename A>
     Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
       data_(std::vector<Scalar>(x.size())) {
-        copy(x.begin(), x.end(), data_.begin());
+        auto x_it = x.begin();
+        for (auto&& d : data_) d = static_cast<Scalar>(*x_it++);
     }
 
 #ifndef SWIG

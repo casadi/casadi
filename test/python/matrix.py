@@ -301,7 +301,8 @@ class Matrixtests(casadiTestCase):
     self.assertTrue(isinstance(b,DM))
     
     a = DM(4,1)
-    self.assertRaises(RuntimeError,lambda : IM(a))
+    b = IM(a)
+    self.assertTrue(isinstance(b,IM))
     
   def test_det(self):
     self.message("Determinant")

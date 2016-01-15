@@ -378,7 +378,7 @@ class SXtests(casadiTestCase):
     SX(y)
     SX(x)
     c.det(x)
-    y=array(x)
+    y=array(DM(x))
     c.det(y)
     
   def test_SXbool(self):
@@ -773,14 +773,14 @@ class SXtests(casadiTestCase):
       f = Function("f", [x],[y])
       f_in = [0]*f.n_in();f_in[0]=0.3
       f_out = f(f_in)
-      self.checkarray(f_out[0],array(op(0.3)),"simplifications")
+      self.checkarray(f_out[0],array(DM(op(0.3))),"simplifications")
       self.assertEqual(str(y),"x")
       
       y = op(-x)
       f = Function("f", [x],[y])
       f_in = [0]*f.n_in();f_in[0]=0.3
       f_out = f(f_in)
-      self.checkarray(f_out[0],array(op(-0.3)),"simplifications")
+      self.checkarray(f_out[0],array(DM(op(-0.3))),"simplifications")
       self.assertEqual(str(y),"(-x)")
   
   def test_truth(self):
@@ -823,12 +823,6 @@ class SXtests(casadiTestCase):
     self.checkarray(f_out[0],x0**3,"if_else sens")
 
     
-  def test_issue548(self):
-    x = SX.sym('x',100)
-    f = Function("f", [x],[sum(x)**2])
-    h = f.hessian()
-
-
   def test_is_regular(self):
     x = SX.sym("x")
     
