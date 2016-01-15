@@ -42,7 +42,7 @@ if has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory"}}))
 
 #if has_nlpsol("snopt"):
-#  solvers.append(("snopt",{"Verify level": 3,"detect_linear": True,"Major optimality tolerance":1e-12,"Minor feasibility tolerance":1e-12,"Major feasibility tolerance":1e-12}))
+#  solvers.append(("snopt",{"snopt.Verify_level": 3,"detect_linear": True,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}))
 
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint"} }
@@ -1026,8 +1026,9 @@ class NLPtests(casadiTestCase):
     y=SX.sym("y")
     nlp={'x':vertcat([x,y]), 'f':(1-x)**2+7.7*y, 'g':y**2}
 
-    solver = nlpsol("mysolver","snopt", nlp,{"Verify level" :3})
-    
+    solver = nlpsol("mysolver","snopt", nlp,{"snopt.Verify_level" :3})
+
+    solver_in = {}
     solver_in["x0"]=[1,1]
     solver_in["lbx"]=[-10,0]
     solver_in["ubx"]=[10,2]
