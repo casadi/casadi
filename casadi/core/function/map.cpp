@@ -78,14 +78,21 @@ namespace casadi {
 
   MapBase::MapBase(const std::string& name, const Function& f, int n)
     : FunctionInternal(name), f_(f), n_in_(f.n_in()), n_out_(f.n_out()), n_(n) {
-
-    addOption("parallelization", OT_STRING,
-              "Computational strategy for parallelization");
-    addOption("reduced_inputs", OT_INTVECTOR,
-              "Reduction for certain inputs");
-    addOption("reduced_outputs", OT_INTVECTOR,
-              "Reduction for certain outputs");
   }
+
+  Options MapBase::options_
+  = {{&FunctionInternal::options_},
+     {{"parallelization",
+       {OT_STRING,
+        "Computational strategy for parallelization"}},
+      {"reduced_inputs",
+       {OT_INTVECTOR,
+        "Reduction for certain inputs"}},
+      {"reduced_outputs",
+       {OT_INTVECTOR,
+        "Reduction for certain outputs"}}
+     }
+  };
 
   MapBase::~MapBase() {
   }

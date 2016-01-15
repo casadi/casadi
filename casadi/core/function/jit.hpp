@@ -43,6 +43,12 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~Jit();
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief Initialize */
     virtual void init(const Dict& opts);
 
