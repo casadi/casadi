@@ -418,7 +418,7 @@ class typemaptests(casadiTestCase):
     self.checkarray(w,goal,"Constructor")
     
     for name, value in test.items():
-      w.set_nz(value)
+      w.nz[:] = value
       self.checkarray(w,goal,"name")
 
     test={
@@ -429,7 +429,7 @@ class typemaptests(casadiTestCase):
     self.checkarray(w,goal,"Constructor")
     
     for name, value in test.items():
-      w.set(value)
+      w[:,:] = value
       self.checkarray(w,goal,"name")
 
   def test_DMSXcast(self):
@@ -471,21 +471,6 @@ class typemaptests(casadiTestCase):
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
 
-  def test_setgetslicetransp(self):
-    self.message("set/get on DM using tranpose")
-    
-    w = DM([[0,0],[0,0]])
-
-    A = matrix([[1.0,2],[3,4]])
-    B = matrix([[4.0,5],[6,7]])
-    
-    w.set(A)
-
-    B = np.array(w.get()).reshape(B.shape)
-    
-    self.checkarray(B.T,A,"get")
-    
-
   def test_setgetslice(self):
     self.message("set/get on DM using slices")
     
@@ -494,7 +479,7 @@ class typemaptests(casadiTestCase):
     A = matrix([[1.0,2],[3,4]])
     B = matrix([[4.0,5],[6,7]])
     
-    w.set(A[0,:])
+    w[:,:] = A[0,:]
     self.checkarray(w,A[0,:],"set")
     B[0,:] = w
     self.checkarray(B[0,:],A[0,:],"get")
@@ -502,7 +487,7 @@ class typemaptests(casadiTestCase):
     w = DM([[0],[0]])
 
 
-    w.set(A[:,0])
+    w[:,:] = A[:,0]
     self.checkarray(w,A[:,0],"set")
     B[:,0] = w
     self.checkarray(B[:,0],A[:,0],"get")
@@ -565,10 +550,11 @@ class typemaptests(casadiTestCase):
     SX(Sparsity.diag(3),[1,2,3])
   def test_setAll_365(self):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
-    m = DM.ones(5,5)
-    m.set(DM(4))
-    m.set(IM(4))
-        
+    for i in [DM(4),IM(4),4,4.0]:
+      m = DM.ones(5,5)
+      m[:,:] = DM(4)
+      self.checkarray(m,DM.ones(5,5)*4)
+      
   def test_issue570(self):
     self.message("Issue #570: long int")
     longint = 10**50
@@ -761,10 +747,10 @@ class typemaptests(casadiTestCase):
       x = SX.sym("x",d.sparsity())
       f = Function("f", [x],[x])
       fin = DM(d.sparsity(),0)
-      fin.set(D)
+      fin[:,:] = D
 
-      self.checkarray(f.getInput(),DM([[1,2],[3,4]]))
-      d.set(D)
+      self.checkarray(fin,DM([[1,2],[3,4]]))
+      d[:,:] = D
       self.checkarray(d,DM([[1,2],[3,4]]))
 
   def test_issue1217(self):
