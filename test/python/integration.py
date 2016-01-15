@@ -707,6 +707,7 @@ class Integrationtests(casadiTestCase):
     outB=J_out[0].full()
     print outA-outB
     
+  @known_bug()
   def test_hess3(self):
     self.message('CVodes integration: hessian to p: Jacobian of integrator.jacobian')
     num=self.num
