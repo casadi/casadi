@@ -582,7 +582,7 @@ class MXtests(casadiTestCase):
       
       x=MX.sym("x",sp)
       if scipy_available:
-        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
+        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).sparse()
         
         self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="MX",setx0=x0,excludeflags={'nozero'})
         self.numpyEvaluationCheckPool(self.matrixpool,[x],array(x0.todense()),name="MX",setx0=x0)
@@ -599,8 +599,8 @@ class MXtests(casadiTestCase):
       xx=MX.sym("x",spx)
       yy=MX.sym("y",spy)
       if scipy_available:
-        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
-        y0=DM(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toCsc_matrix()
+        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).sparse()
+        y0=DM(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).sparse()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="MX",setx0=[x0,y0])
       else:
@@ -814,7 +814,7 @@ class MXtests(casadiTestCase):
       for k in range(As.nnz()):
         A_.nz[k]= numpy.random.rand()
       A = MX.sym("A",As)
-      return (A_.toCsc_matrix(),A)
+      return (A_.sparse(),A)
     
     (A_,A)=gentest(m,n)
     (b_,b)=gentest(m,1)
@@ -888,7 +888,7 @@ class MXtests(casadiTestCase):
       for k in range(As.nnz()):
         A_.nz[k]= numpy.random.rand()
       A = MX.sym("A",As)
-      return (A_.toCsc_matrix(),A)
+      return (A_.sparse(),A)
     
     (A_,A)=gentest(m,n)
     (b_,b)=gentest(m,1)

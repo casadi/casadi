@@ -193,7 +193,7 @@ class SXtests(casadiTestCase):
       z=SX.sym("z")
       x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([x,y,z]))
       if scipy_available:
-        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
+        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).sparse()
       
         self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SX",setx0=x0,excludeflags={'nozero'})
       else:
@@ -232,8 +232,8 @@ class SXtests(casadiTestCase):
       yy=SX(Sparsity(4,3,[0,2,2,3],[0,2,3]),vertcat([x2,z2,y2]))
       
       if scipy_available:
-        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).toCsc_matrix()
-        y0=DM(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).toCsc_matrix()
+        x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).sparse()
+        y0=DM(Sparsity(4,3,[0,2,2,3],[0,2,3]),[1.738,0.7,-6]).sparse()
         
         self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SX",setx0=[x0,y0])
       else:

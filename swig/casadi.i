@@ -3109,7 +3109,7 @@ namespace casadi{
 %}
 
 %pythoncode %{
-  def toCsc_matrix(self):
+  def sparse(self):
     import numpy as n
     import warnings
     with warnings.catch_warnings():
@@ -3118,7 +3118,7 @@ namespace casadi{
     return csc_matrix( (self.nonzeros(),self.row(),self.colind()), shape = self.shape, dtype=n.double )
 
   def tocsc(self):
-    return self.toCsc_matrix()
+    return self.sparse()
 
 %}
 

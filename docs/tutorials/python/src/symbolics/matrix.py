@@ -50,5 +50,5 @@ print w.nonzeros()
 print w.full()
 print array(w)
 print matrix(w)
-print w.toCsc_matrix()
+print w.sparse()
 

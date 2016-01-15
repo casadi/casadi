@@ -52,7 +52,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"IM(numpy.ndarray)")
       self.checkarray(m,zt.full(),"IM(numpy.ndarray).full()")
       #if scipy_available:
-      #  self.checkarray(m,zt.toCsc_matrix(),"IM(numpy.ndarray).toCsc_matrix()")
+      #  self.checkarray(m,zt.sparse(),"IM(numpy.ndarray).sparse()")
       
   def test_0(self):
     self.message("Typemap array -> DM")
@@ -64,7 +64,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DM(numpy.ndarray)")
       self.checkarray(m,zt.full(),"DM(numpy.ndarray).full()")
       if scipy_available:
-        self.checkarray(m,zt.toCsc_matrix(),"DM(numpy.ndarray).toCsc_matrix()")
+        self.checkarray(m,zt.sparse(),"DM(numpy.ndarray).sparse()")
       
   def test_1(self):
     self.message("DM -> DM")
@@ -76,7 +76,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DM(DM)")
       self.checkarray(m,zt.full(),"DM(DM).full()")
       if scipy_available:
-        self.checkarray(m,zt.toCsc_matrix(),"DM(DM).toCsc_matrix()")
+        self.checkarray(m,zt.sparse(),"DM(DM).sparse()")
    
   def test_2(self):
     self.message("crs_matrix -> DM")
@@ -92,7 +92,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DM(crs_matrix)")
       self.checkarray(m,zt.full(),"DM(crs_matrix).full()")
       if scipy_available:
-        self.checkarray(m,zt.toCsc_matrix(),"DM(crs_matrix).toCsc_matrix()")
+        self.checkarray(m,zt.sparse(),"DM(crs_matrix).sparse()")
       
       
   def test_setget(self):
@@ -102,7 +102,7 @@ class typemaptests(casadiTestCase):
     dm=DM(Sparsity(3,4,[0,0,2,3,3],[0,2,0]),[3,2.3,8])
     
     if scipy_available:
-      c=dm.toCsc_matrix()
+      c=dm.sparse()
     z=n.zeros((3,4))
     dm.get(z)
     self.checkarray(z,dm,"get(2Dndarray)")
@@ -151,7 +151,7 @@ class typemaptests(casadiTestCase):
     array(w)
     matrix(w)
     if scipy_available:
-      w.toCsc_matrix()
+      w.sparse()
 
     self.checkarray(DM(d),d,"DM(numpy.ndarray)")
     #self.checkarray(DM(array([1,2,3,4,5,6])),d.ravel(),"DM(numpy.ndarray)")
@@ -735,7 +735,7 @@ class typemaptests(casadiTestCase):
       Ds+=[
           csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
           csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.int),
-          DM([[1,2],[3,4]]).toCsc_matrix()
+          DM([[1,2],[3,4]]).sparse()
       ]
 
 
