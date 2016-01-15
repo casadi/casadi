@@ -1443,7 +1443,7 @@ namespace casadi {
       // Output names
       std::vector<std::string> ionames;
       ionames.reserve(1 + n_out());
-      ionames.push_back("jac");
+      ionames.push_back("d" + name_out(oind) + "_d" + name_in(iind));
       for (int i=0; i<n_out(); ++i) {
         ionames.push_back(oscheme_.at(i));
       }

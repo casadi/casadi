@@ -775,7 +775,7 @@ class Functiontests(casadiTestCase):
     for n in [nlp, nlp.expand('nlp_expanded')]:
         H = n.derivative(0,1).jacobian(0,2,False,True)
 
-        h = H(der_x=1,adj0_f=1)["jac"]
+        h = H(der_x=1,adj0_f=1)[H.name_out(0)]
         hs.append(h)
     self.checkarray(*hs)
 
