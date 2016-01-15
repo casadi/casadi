@@ -50,15 +50,21 @@ namespace casadi {
 
   WorhpInterface::WorhpInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
-
-    addOption("worhp", OT_DICT,
-              "Options to be passed to WORHP");
-    addOption("print_time", OT_BOOL,
-              "Print information about execution time");
   }
 
   WorhpInterface::~WorhpInterface() {
   }
+
+  Options WorhpInterface::options_
+  = {{&Nlpsol::options_},
+     {{"worhp",
+       {OT_DICT,
+        "Options to be passed to WORHP"}},
+      {"print_time",
+       {OT_BOOL,
+        "Print information about execution time"}}
+     }
+  };
 
   void WorhpInterface::init(const Dict& opts) {
 

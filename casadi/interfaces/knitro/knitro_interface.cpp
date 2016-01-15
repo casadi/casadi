@@ -49,16 +49,22 @@ namespace casadi {
 
   KnitroInterface::KnitroInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
-
-    addOption("knitro", OT_DICT,
-              "Options to be passed to KNITRO");
-    addOption("contype", OT_INTVECTOR,
-              "Type of constraint");
   }
 
 
   KnitroInterface::~KnitroInterface() {
   }
+
+  Options KnitroInterface::options_
+  = {{&Nlpsol::options_},
+     {{"knitro",
+       {OT_DICT,
+        "Options to be passed to KNITRO"}},
+      {"contype",
+       {OT_INTVECTOR,
+        "Type of constraint"}}
+     }
+  };
 
   void KnitroInterface::init(const Dict& opts) {
     // Call the init method of the base class

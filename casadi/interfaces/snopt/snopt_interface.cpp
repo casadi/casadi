@@ -51,13 +51,18 @@ namespace casadi {
 
   SnoptInterface::SnoptInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
-
-    addOption("snopt", OT_DICT,
-              "Options to be passed to SNOPT");
   }
 
   SnoptInterface::~SnoptInterface() {
   }
+
+  Options SnoptInterface::options_
+  = {{&Nlpsol::options_},
+     {{"snopt",
+       {OT_DICT,
+        "Options to be passed to SNOPT"}}
+     }
+  };
 
   void SnoptInterface::init(const Dict& opts) {
     // Call the init method of the base class

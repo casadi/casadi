@@ -57,37 +57,48 @@ namespace casadi {
 
   IpoptInterface::IpoptInterface(const std::string& name, const XProblem& nlp)
     : Nlpsol(name, nlp) {
-
-    addOption("pass_nonlinear_variables", OT_BOOL,
-              "Pass list of variables entering nonlinearly to IPOPT");
-    addOption("print_time", OT_BOOL,
-              "print information about execution time");
-    addOption("ipopt", OT_DICT,
-              "Options to be passed to IPOPT");
-
-    // For passing metadata to IPOPT
-    addOption("var_string_md", OT_DICT,
-              "String metadata (a dictionary with lists of strings) "
-              "about variables to be passed to IPOPT");
-    addOption("var_integer_md", OT_DICT,
-              "Integer metadata (a dictionary with lists of integers) "
-              "about variables to be passed to IPOPT");
-    addOption("var_numeric_md", OT_DICT,
-              "Numeric metadata (a dictionary with lists of reals) about "
-              "variables to be passed to IPOPT");
-    addOption("con_string_md", OT_DICT,
-              "String metadata (a dictionary with lists of strings) about "
-              "constraints to be passed to IPOPT");
-    addOption("con_integer_md", OT_DICT,
-              "Integer metadata (a dictionary with lists of integers) "
-              "about constraints to be passed to IPOPT");
-    addOption("con_numeric_md", OT_DICT,
-              "Numeric metadata (a dictionary with lists of reals) about "
-              "constraints to be passed to IPOPT");
   }
 
   IpoptInterface::~IpoptInterface() {
   }
+
+  Options IpoptInterface::options_
+  = {{&Nlpsol::options_},
+     {{"pass_nonlinear_variables",
+       {OT_BOOL,
+        "Pass list of variables entering nonlinearly to IPOPT"}},
+      {"print_time",
+       {OT_BOOL,
+        "print information about execution time"}},
+      {"ipopt",
+       {OT_DICT,
+        "Options to be passed to IPOPT"}},
+      {"var_string_md",
+       {OT_DICT,
+        "String metadata (a dictionary with lists of strings) "
+        "about variables to be passed to IPOPT"}},
+      {"var_integer_md",
+       {OT_DICT,
+        "Integer metadata (a dictionary with lists of integers) "
+        "about variables to be passed to IPOPT"}},
+      {"var_numeric_md",
+       {OT_DICT,
+        "Numeric metadata (a dictionary with lists of reals) about "
+        "variables to be passed to IPOPT"}},
+      {"con_string_md",
+       {OT_DICT,
+        "String metadata (a dictionary with lists of strings) about "
+        "constraints to be passed to IPOPT"}},
+      {"con_integer_md",
+       {OT_DICT,
+        "Integer metadata (a dictionary with lists of integers) "
+        "about constraints to be passed to IPOPT"}},
+      {"con_numeric_md",
+       {OT_DICT,
+        "Numeric metadata (a dictionary with lists of reals) about "
+        "constraints to be passed to IPOPT"}}
+     }
+  };
 
   void IpoptInterface::init(const Dict& opts) {
     // Call the init method of the base class
