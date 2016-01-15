@@ -51,14 +51,6 @@ namespace casadi {
 
   ShellCompiler::ShellCompiler(const std::string& name) :
     CompilerInternal(name) {
-    addOption("compiler", OT_STRING,
-              "Compiler command");
-    addOption("compiler_setup", OT_STRING,
-        "Compiler setup command. Intended to be fixed."
-        " The 'flag' option is the prefered way to set"
-        " custom flags.");
-    addOption("flags", OT_STRINGVECTOR,
-      "Compile flags for the JIT compiler. Default: None");
   }
 
   ShellCompiler::~ShellCompiler() {
@@ -71,6 +63,22 @@ namespace casadi {
       casadi_warning("Failed to delete temporary file:" + bin_name_);
     }
   }
+
+  Options ShellCompiler::options_
+  = {{&CompilerInternal::options_},
+     {{"compiler",
+       {OT_STRING,
+        "Compiler command"}},
+      {"compiler_setup",
+       {OT_STRING,
+        "Compiler setup command. Intended to be fixed."
+        " The 'flag' option is the prefered way to set"
+        " custom flags."}},
+      {"flags",
+       {OT_STRINGVECTOR,
+      "Compile flags for the JIT compiler. Default: None"}}
+     }
+  };
 
   void ShellCompiler::init(const Dict& opts) {
     // Default options

@@ -61,6 +61,17 @@ namespace casadi {
     // Creator function for internal class
     typedef CompilerInternal* (*Creator)(const std::string& name);
 
+    /** \brief Construct
+        Prepares the function for evaluation
+     */
+    void construct(const Dict& opts);
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief Initialize */
     virtual void init(const Dict& opts) = 0;
 
