@@ -17,16 +17,6 @@
 
 
 // File: classcasadi_1_1Callback.xml
-
-
-/*  Option Functionality  */ %feature("docstring")
-casadi::OptionsFunctionality::copyOptions(const OptionsFunctionality &obj,
-bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
 %feature("docstring")  casadi::Function::size2_in(int ind) const  "
 
 Get input dimension.
@@ -48,12 +38,6 @@ Specify the shape corresponding to a given output. The shape must not be
 changed over the lifetime of the object
 
 Default implementation: scalar (1,1)
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::optionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
@@ -92,20 +76,6 @@ ownership, only weak references to the derivatives are kept internally.
 %feature("docstring")  casadi::Function::getWorkSize() const  "
 
 Get the length of the work vector.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
 
 ";
 
@@ -318,9 +288,10 @@ Get the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
+%feature("docstring")  casadi::Function::printOption(const std::string
+&name, std::ostream &stream=casadi::userOut()) const  "
+
+Print all information there is to know about a certain option.
 
 ";
 
@@ -332,6 +303,12 @@ Get the floating point output argument of an atomic operation.
 
 %feature("docstring")  casadi::Function::checkInputs() const  " [INTERNAL]
 Check if the numerical values of the supplied bounds make sense.
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
 
 ";
 
@@ -438,12 +415,6 @@ exploited by the algorithm.
 
 The generated Jacobian has one more output than the calling function
 corresponding to the Jacobian and the same number of inputs.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionEnumValue(const
-std::string &name) const  " [INTERNAL]  Get the enum value corresponding to
-th certain option.
 
 ";
 
@@ -716,12 +687,6 @@ Specify the shape corresponding to a given input. The shape must not be
 changed over the lifetime of the object
 
 Default implementation: scalar (1,1)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
 
 ";
 
@@ -1171,12 +1136,6 @@ internal class
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::optionNames() const  "
-
-Get a list of all option names.
-
-";
-
 %feature("docstring")  casadi::Function::kernel_sum(const std::string &name,
 const std::pair< int, int > &size, double r, int n, const Dict &opts=Dict())
 const  "
@@ -1257,8 +1216,7 @@ required length of res field.
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::printOptions(std::ostream
+%feature("docstring")  casadi::Function::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
@@ -1271,13 +1229,6 @@ Number of nodes in the algorithm.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::optionDescription(const
-std::string &str) const  "
-
-Get the description of a certain option.
-
-";
-
 %feature("docstring")  casadi::Callback::get_jacobian(const std::string
 &name, const Dict &opts) "
 
@@ -1285,23 +1236,10 @@ Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::optionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
 %feature("docstring")  casadi::Function::printDimensions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
 
 ";
 
@@ -1490,214 +1428,12 @@ internal function object.
 
 Joris Gillis, Joel Andersson
 
->List of available options
-
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | derivative c |              |
-|              |              |              | alculation.W |              |
-|              |              |              | hen there is |              |
-|              |              |              | an option of |              |
-|              |              |              | either using |              |
-|              |              |              | forward or   |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives, |              |
-|              |              |              | the          |              |
-|              |              |              | condition ad |              |
-|              |              |              | _weight*nf<= |              |
-|              |              |              | (1-ad_weight |              |
-|              |              |              | )*na is used |              |
-|              |              |              | where nf and |              |
-|              |              |              | na are       |              |
-|              |              |              | estimates of |              |
-|              |              |              | the number   |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse mode  |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives  |              |
-|              |              |              | needed. By   |              |
-|              |              |              | default,     |              |
-|              |              |              | ad_weight is |              |
-|              |              |              | calculated a |              |
-|              |              |              | utomatically |              |
-|              |              |              | , but this   |              |
-|              |              |              | can be       |              |
-|              |              |              | overridden   |              |
-|              |              |              | by setting   |              |
-|              |              |              | this option. |              |
-|              |              |              | In           |              |
-|              |              |              | particular,  |              |
-|              |              |              | 0 means      |              |
-|              |              |              | forcing      |              |
-|              |              |              | forward mode |              |
-|              |              |              | and 1        |              |
-|              |              |              | forcing      |              |
-|              |              |              | reverse      |              |
-|              |              |              | mode. Leave  |              |
-|              |              |              | unset for    |              |
-|              |              |              | (class       |              |
-|              |              |              | specific)    |              |
-|              |              |              | heuristics.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | sparsity     |              |
-|              |              |              | pattern      |              |
-|              |              |              | calculation  |              |
-|              |              |              | calculation. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | behavior.    |              |
-|              |              |              | Set to 0 and |              |
-|              |              |              | 1 to force   |              |
-|              |              |              | forward and  |              |
-|              |              |              | reverse mode |              |
-|              |              |              | respectively |              |
-|              |              |              | . Cf. option |              |
-|              |              |              | \"ad_weight\". |              |
-+--------------+--------------+--------------+--------------+--------------+
-| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
-| ipes         | TOR          | )            | default      | onsFunctiona |
-|              |              |              | options      | lityNode     |
-|              |              |              | according to |              |
-|              |              |              | a given      |              |
-|              |              |              | recipe (low- |              |
-|              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
-|              |              |              | indicate     | tionInternal |
-|              |              |              | whether      |              |
-|              |              |              | statistics   |              |
-|              |              |              | must be      |              |
-|              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
-|              | TOR          | )            | scheme       | tionInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-|              |              |              | exceptions   | tionInternal |
-|              |              |              | when the     |              |
-|              |              |              | numerical    |              |
-|              |              |              | values of    |              |
-|              |              |              | the inputs   |              |
-|              |              |              | don't make   |              |
-|              |              |              | sense        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
-|              |              |              | requested    | tionInternal |
-|              |              |              | for a number |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse       |              |
-|              |              |              | directions,  |              |
-|              |              |              | it may be    |              |
-|              |              |              | cheaper to   |              |
-|              |              |              | compute      |              |
-|              |              |              | first the    |              |
-|              |              |              | full         |              |
-|              |              |              | jacobian and |              |
-|              |              |              | then         |              |
-|              |              |              | multiply     |              |
-|              |              |              | with seeds,  |              |
-|              |              |              | rather than  |              |
-|              |              |              | obtain the   |              |
-|              |              |              | requested    |              |
-|              |              |              | directions   |              |
-|              |              |              | in a straigh |              |
-|              |              |              | tforward     |              |
-|              |              |              | manner.      |              |
-|              |              |              | Casadi uses  |              |
-|              |              |              | a heuristic  |              |
-|              |              |              | to decide    |              |
-|              |              |              | which is     |              |
-|              |              |              | cheaper. A   |              |
-|              |              |              | high value   |              |
-|              |              |              | of 'jac_pena |              |
-|              |              |              | lty' makes   |              |
-|              |              |              | it less      |              |
-|              |              |              | likely for   |              |
-|              |              |              | the heurstic |              |
-|              |              |              | to chose the |              |
-|              |              |              | full         |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy.    |              |
-|              |              |              | The special  |              |
-|              |              |              | value -1     |              |
-|              |              |              | indicates    |              |
-|              |              |              | never to use |              |
-|              |              |              | the full     |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
-|              |              |              | time         | tionInternal |
-|              |              |              | compiler to  |              |
-|              |              |              | speed up the |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
-|              |              | )            | be passed to | tionInternal |
-|              |              |              | the jit      |              |
-|              |              |              | compiler.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
-|              | TOR          | )            | be activated | tionInternal |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
-| e            | TOR          | )            | output       | tionInternal |
-|              |              |              | scheme       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-| heck         |              |              | exceptions   | tionInternal |
-|              |              |              | when NaN or  |              |
-|              |              |              | Inf appears  |              |
-|              |              |              | during       |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
-|              |              | )            | defined      | tionInternal |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
-|              |              |              | evaluation   | tionInternal |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
-
 C++ includes: callback.hpp ";
 
 %feature("docstring")  casadi::Function::addMonitor(const std::string &mon)
 "
 
 Add modules to be monitored.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionDefault(const
-std::string &str) const  "
-
-Get the default of a certain option.
 
 ";
 
@@ -1872,20 +1608,6 @@ Joris Gillis
 C++ includes: casadi_meta.hpp ";
 
 
-// File: classcasadi_1_1CasadiOptions.xml
-%feature("docstring") casadi::CasadiOptions "
-
-Collects global CasADi options.
-
-Note to developers: use sparingly. Global options are - in general - a
-rather bad idea
-
-this class must never be instantiated. Access its static members directly
-Joris Gillis
-
-C++ includes: casadi_options.hpp ";
-
-
 // File: classcasadi_1_1ClangCompiler.xml
 
 
@@ -1950,14 +1672,6 @@ Generate a file, return code as string.
 
 
 // File: classcasadi_1_1Compiler.xml
-
-
-/*  Option Functionality  */ %feature("docstring")
-casadi::OptionsFunctionality::optionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
 %feature("docstring")  casadi::Compiler::plugin_name() const  "
 
 Query plugin name.
@@ -1968,33 +1682,6 @@ Query plugin name.
 >::getDescription() const "
 
 Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::Compiler::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::printOptions(std::ostream
-&stream=casadi::userOut()) const  "
-
-Print options to a stream.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
 
 ";
 
@@ -2011,6 +1698,20 @@ internal class
 
 ";
 
+%feature("docstring")  casadi::PrintableObject< SharedObject
+>::getRepresentation() const "
+
+Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print a representation of the object.
+
+";
+
 %feature("docstring") casadi::Compiler "
 
 Compiler.
@@ -2021,20 +1722,6 @@ General information
 ===================
 
 
-
->List of available options
-
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
-| ipes         | TOR          | )            | default      | onsFunctiona |
-|              |              |              | options      | lityNode     |
-|              |              |              | according to |              |
-|              |              |              | a given      |              |
-|              |              |              | recipe (low- |              |
-|              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
 
 List of plugins
 ===============
@@ -2061,28 +1748,9 @@ clang
 
 Interface to the JIT compiler CLANG
 
->List of available options
-
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
-|                 |                 |                 | for the JIT     |
-|                 |                 |                 | compiler.       |
-|                 |                 |                 | Default: None   |
-+-----------------+-----------------+-----------------+-----------------+
-| include_path    | OT_STRING       | \"\"              | Include paths   |
-|                 |                 |                 | for the JIT     |
-|                 |                 |                 | compiler. The   |
-|                 |                 |                 | include         |
-|                 |                 |                 | directory       |
-|                 |                 |                 | shipped with    |
-|                 |                 |                 | CasADi will be  |
-|                 |                 |                 | automatically   |
-|                 |                 |                 | appended.       |
-+-----------------+-----------------+-----------------+-----------------+
-
 --------------------------------------------------------------------------------
+
+
 
 
 
@@ -2095,72 +1763,24 @@ shell
 
 Interface to the JIT compiler SHELL
 
->List of available options
-
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| compiler        | OT_STRING       | \"gcc\"           | Compiler        |
-|                 |                 |                 | command         |
-+-----------------+-----------------+-----------------+-----------------+
-| compiler_setup  | OT_STRING       | \"-fPIC -shared\" | Compiler setup  |
-|                 |                 |                 | command.        |
-|                 |                 |                 | Intended to be  |
-|                 |                 |                 | fixed. The      |
-|                 |                 |                 | 'flag' option   |
-|                 |                 |                 | is the prefered |
-|                 |                 |                 | way to set      |
-|                 |                 |                 | custom flags.   |
-+-----------------+-----------------+-----------------+-----------------+
-| flags           | OT_STRINGVECTOR | GenericType()   | Compile flags   |
-|                 |                 |                 | for the JIT     |
-|                 |                 |                 | compiler.       |
-|                 |                 |                 | Default: None   |
-+-----------------+-----------------+-----------------+-----------------+
-
 --------------------------------------------------------------------------------
 
 
 
 Joris Gillis
-Diagrams
---------
-
-
 
 C++ includes: compiler.hpp ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::optionEnumValue(const
-std::string &name) const  " [INTERNAL]  Get the enum value corresponding to
-th certain option.
+%feature("docstring") casadi::Compiler::__hash__ "
 
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionDefault(const
-std::string &str) const  "
-
-Get the default of a certain option.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -2174,46 +1794,6 @@ Default constructor.
 const std::string &compiler, const Dict &opts=Dict()) "
 
 Compiler factory (new syntax, includes initialization)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionDescription(const
-std::string &str) const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionNames() const  "
-
-Get a list of all option names.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
 
 ";
 
@@ -2827,11 +2407,8 @@ Add an ordinary differential equation.
 
 
 // File: classcasadi_1_1Function.xml
-
-
-/*  Option Functionality  */ %feature("docstring")
-casadi::SharedObject::repr(std::ostream &stream=casadi::userOut(), bool
-trailing_newline=true) const  "
+%feature("docstring")  casadi::SharedObject::repr(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print a representation of the object.
 
@@ -3068,13 +2645,6 @@ Get sparsity of a given output.
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
 %feature("docstring")  casadi::Function::integrator_dae() "
 
 Get the DAE for an integrator.
@@ -3087,8 +2657,7 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring")
-casadi::OptionsFunctionality::printOptions(std::ostream
+%feature("docstring")  casadi::Function::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
@@ -3464,6 +3033,19 @@ the inputs.
 
 ";
 
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::Function::printOption(const std::string
+&name, std::ostream &stream=casadi::userOut()) const  "
+
+Print all information there is to know about a certain option.
+
+";
+
 %feature("docstring")  casadi::Function::set_forward(const Function &fcn,
 int nfwd) "
 
@@ -3638,12 +3220,6 @@ Print a description of the object.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::optionEnumValue(const
-std::string &name) const  " [INTERNAL]  Get the enum value corresponding to
-th certain option.
-
-";
-
 %feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
 
 Generate a Hessian function of output oind with respect to input iind.
@@ -3730,24 +3306,10 @@ Access Jacobian of the ths function for a rootfinder.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
 %feature("docstring")  casadi::Function::fullJacobian() "
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
 
 ";
 
@@ -3847,12 +3409,6 @@ Get input dimension.
 const  "
 
 Get input dimension.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
 
 ";
 
@@ -3999,218 +3555,7 @@ this.
 
 Joel Andersson
 
->List of available options
-
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_weight    | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | derivative c |              |
-|              |              |              | alculation.W |              |
-|              |              |              | hen there is |              |
-|              |              |              | an option of |              |
-|              |              |              | either using |              |
-|              |              |              | forward or   |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives, |              |
-|              |              |              | the          |              |
-|              |              |              | condition ad |              |
-|              |              |              | _weight*nf<= |              |
-|              |              |              | (1-ad_weight |              |
-|              |              |              | )*na is used |              |
-|              |              |              | where nf and |              |
-|              |              |              | na are       |              |
-|              |              |              | estimates of |              |
-|              |              |              | the number   |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse mode  |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives  |              |
-|              |              |              | needed. By   |              |
-|              |              |              | default,     |              |
-|              |              |              | ad_weight is |              |
-|              |              |              | calculated a |              |
-|              |              |              | utomatically |              |
-|              |              |              | , but this   |              |
-|              |              |              | can be       |              |
-|              |              |              | overridden   |              |
-|              |              |              | by setting   |              |
-|              |              |              | this option. |              |
-|              |              |              | In           |              |
-|              |              |              | particular,  |              |
-|              |              |              | 0 means      |              |
-|              |              |              | forcing      |              |
-|              |              |              | forward mode |              |
-|              |              |              | and 1        |              |
-|              |              |              | forcing      |              |
-|              |              |              | reverse      |              |
-|              |              |              | mode. Leave  |              |
-|              |              |              | unset for    |              |
-|              |              |              | (class       |              |
-|              |              |              | specific)    |              |
-|              |              |              | heuristics.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| ad_weight_sp | OT_REAL      | GenericType( | Weighting    | casadi::Func |
-|              |              | )            | factor for   | tionInternal |
-|              |              |              | sparsity     |              |
-|              |              |              | pattern      |              |
-|              |              |              | calculation  |              |
-|              |              |              | calculation. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | behavior.    |              |
-|              |              |              | Set to 0 and |              |
-|              |              |              | 1 to force   |              |
-|              |              |              | forward and  |              |
-|              |              |              | reverse mode |              |
-|              |              |              | respectively |              |
-|              |              |              | . Cf. option |              |
-|              |              |              | \"ad_weight\". |              |
-+--------------+--------------+--------------+--------------+--------------+
-| compiler     | OT_STRING    | \"clang\"      | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
-| ipes         | TOR          | )            | default      | onsFunctiona |
-|              |              |              | options      | lityNode     |
-|              |              |              | according to |              |
-|              |              |              | a given      |              |
-|              |              |              | recipe (low- |              |
-|              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
-|              |              |              | indicate     | tionInternal |
-|              |              |              | whether      |              |
-|              |              |              | statistics   |              |
-|              |              |              | must be      |              |
-|              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
-|              | TOR          | )            | scheme       | tionInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-|              |              |              | exceptions   | tionInternal |
-|              |              |              | when the     |              |
-|              |              |              | numerical    |              |
-|              |              |              | values of    |              |
-|              |              |              | the inputs   |              |
-|              |              |              | don't make   |              |
-|              |              |              | sense        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_penalty  | OT_REAL      | 2            | When         | casadi::Func |
-|              |              |              | requested    | tionInternal |
-|              |              |              | for a number |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse       |              |
-|              |              |              | directions,  |              |
-|              |              |              | it may be    |              |
-|              |              |              | cheaper to   |              |
-|              |              |              | compute      |              |
-|              |              |              | first the    |              |
-|              |              |              | full         |              |
-|              |              |              | jacobian and |              |
-|              |              |              | then         |              |
-|              |              |              | multiply     |              |
-|              |              |              | with seeds,  |              |
-|              |              |              | rather than  |              |
-|              |              |              | obtain the   |              |
-|              |              |              | requested    |              |
-|              |              |              | directions   |              |
-|              |              |              | in a straigh |              |
-|              |              |              | tforward     |              |
-|              |              |              | manner.      |              |
-|              |              |              | Casadi uses  |              |
-|              |              |              | a heuristic  |              |
-|              |              |              | to decide    |              |
-|              |              |              | which is     |              |
-|              |              |              | cheaper. A   |              |
-|              |              |              | high value   |              |
-|              |              |              | of 'jac_pena |              |
-|              |              |              | lty' makes   |              |
-|              |              |              | it less      |              |
-|              |              |              | likely for   |              |
-|              |              |              | the heurstic |              |
-|              |              |              | to chose the |              |
-|              |              |              | full         |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy.    |              |
-|              |              |              | The special  |              |
-|              |              |              | value -1     |              |
-|              |              |              | indicates    |              |
-|              |              |              | never to use |              |
-|              |              |              | the full     |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit          | OT_BOOLEAN   | false        | Use just-in- | casadi::Func |
-|              |              |              | time         | tionInternal |
-|              |              |              | compiler to  |              |
-|              |              |              | speed up the |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_options  | OT_DICT      | GenericType( | Options to   | casadi::Func |
-|              |              | )            | be passed to | tionInternal |
-|              |              |              | the jit      |              |
-|              |              |              | compiler.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
-|              | TOR          | )            | be activated | tionInternal |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
-| e            | TOR          | )            | output       | tionInternal |
-|              |              |              | scheme       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
-| heck         |              |              | exceptions   | tionInternal |
-|              |              |              | when NaN or  |              |
-|              |              |              | Inf appears  |              |
-|              |              |              | during       |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
-|              |              | )            | defined      | tionInternal |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
-|              |              |              | evaluation   | tionInternal |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-
-+---------+--------------------------+
-|   Id    |         Used in          |
-+=========+==========================+
-| inputs  | casadi::FunctionInternal |
-+---------+--------------------------+
-| outputs | casadi::FunctionInternal |
-+---------+--------------------------+
-
-Diagrams
---------
-
-
-
 C++ includes: function.hpp ";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
 
 %feature("docstring")  casadi::Function::set_jac_sparsity(const Sparsity
 &sp, int iind, int oind, bool compact=false) "
@@ -4347,12 +3692,6 @@ Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
-
-";
-
 %feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
 required length of w field.
 
@@ -4381,19 +3720,6 @@ Get output dimension.
 const  "
 
 Get output dimension.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionNames() const  "
-
-Get a list of all option names.
 
 ";
 
@@ -4427,13 +3753,6 @@ Get sparsity of a given input.
 &iname) const  "
 
 Get sparsity of a given input.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionDefault(const
-std::string &str) const  "
-
-Get the default of a certain option.
 
 ";
 
@@ -4480,12 +3799,6 @@ Get the length of the work vector.
 
 %feature("docstring")  casadi::Function::sz_arg() const  " [INTERNAL]  Get
 required length of arg field.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::optionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
@@ -4538,13 +3851,6 @@ Get symbolic primitives equivalent to the output expressions.
 %feature("docstring")  casadi::Function::default_in(int ind) const  "
 
 Get default input value (NOTE: constant reference)
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionDescription(const
-std::string &str) const  "
-
-Get the description of a certain option.
 
 ";
 
@@ -5540,6 +4846,20 @@ C++ includes: generic_type.hpp ";
 
 
 // File: classcasadi_1_1GetNonzerosVector.xml
+
+
+// File: classcasadi_1_1GlobalOptions.xml
+%feature("docstring") casadi::GlobalOptions "
+
+Collects global CasADi options.
+
+Note to developers: use sparingly. Global options are - in general - a
+rather bad idea
+
+this class must never be instantiated. Access its static members directly
+Joris Gillis
+
+C++ includes: global_options.hpp ";
 
 
 // File: classcasadi_1_1Horzcat.xml
@@ -7500,6 +6820,12 @@ Join an expression along symbolic primitives.
 
 ";
 
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MX  >::get_colind() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -8066,12 +7392,6 @@ Get the nth dependency as MX.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::nnz_diag() const "
 
 Get get the number of non-zeros on the diagonal.
@@ -8195,183 +7515,6 @@ C++ includes: nonzeros.hpp ";
 
 
 // File: classcasadi_1_1OneSX.xml
-
-
-// File: classcasadi_1_1OptionsFunctionality.xml
-
-
-/*  Option Functionality  */ %feature("docstring")
-casadi::OptionsFunctionality::optionEnumValue(const std::string &name) const
-" [INTERNAL]  Get the enum value corresponding to th certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionAllowed(const
-std::string &str) const  "
-
-Get the allowed values of a certain option.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string
-&name, int i) " [INTERNAL]  Set a certain option by giving its index into
-the allowed values.
-
-";
-
-%feature("docstring")  casadi::SharedObject::print(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a description of the object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionDefault(const
-std::string &str) const  "
-
-Get the default of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::dictionary() const  "
-
-Get the dictionary.
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getDescription() const "
-
-Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring")  casadi::PrintableObject< SharedObject
->::getRepresentation() const "
-
-Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::SharedObject::printPtr(std::ostream
-&stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
-internal class
-
-";
-
-%feature("docstring") casadi::OptionsFunctionality::OptionsFunctionality() "
-
-Default constructor.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionTypeName(const
-std::string &str) const  "
-
-Get the type name of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
-%feature("docstring") casadi::OptionsFunctionality "
-
-Provides options setting/getting functionality.
-
-Gives a derived class the ability to set and retrieve options in a
-convenient way. It also contains error checking, making sure that the option
-exists and that the value type is correct.
-
-A derived class should add option names, types and default values to the
-corresponding vectors.
-
-Joel Andersson
-
->List of available options
-
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| defaults_rec | OT_STRINGVEC | GenericType( | Changes      | casadi::Opti |
-| ipes         | TOR          | )            | default      | onsFunctiona |
-|              |              |              | options      | lityNode     |
-|              |              |              | according to |              |
-|              |              |              | a given      |              |
-|              |              |              | recipe (low- |              |
-|              |              |              | level)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
-
-C++ includes: options_functionality.hpp ";
-
-%feature("docstring") casadi::OptionsFunctionality::__hash__ "
-
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionDescription(const
-std::string &str) const  "
-
-Get the description of a certain option.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::copyOptions(const
-OptionsFunctionality &obj, bool skipUnknown=false) "
-
-Copy all options from another object.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name,
-int v) " [INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::optionAllowedIndex(const std::string &name)
-const  " [INTERNAL]  Get the index into allowed options of a certain option.
-
-";
-
-%feature("docstring")  casadi::SharedObject::repr(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print a representation of the object.
-
-";
-
-%feature("docstring")  casadi::OptionsFunctionality::optionNames() const  "
-
-Get a list of all option names.
-
-";
-
-%feature("docstring")
-casadi::OptionsFunctionality::printOptions(std::ostream
-&stream=casadi::userOut()) const  "
-
-Print options to a stream.
-
-";
-
-%feature("docstring") casadi::OptionsFunctionality::~OptionsFunctionality "
-
-Destructor.
-
-";
 
 
 // File: classcasadi_1_1Polynomial.xml
@@ -8552,16 +7695,16 @@ Return a string with a description (for SWIG)
 
 
 // File: classcasadi_1_1SharedObject.xml
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
-
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print a description of the object.
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
 
 ";
 
@@ -9054,14 +8197,6 @@ Union of two sparsity patterns.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::nnz_lower(bool strictly=false)
-const  "
-
-Number of non-zeros in the lower triangular half, i.e. the number of
-elements (i, j) with j<=i.
-
-";
-
 %feature("docstring")  casadi::Sparsity::get_ccs(std::vector< int >
 &output_colind, std::vector< int > &output_row) const  "
 
@@ -9209,6 +8344,12 @@ position el.
 
 ";
 
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
 %feature("docstring")  casadi::Sparsity::append(const Sparsity &sp) "
 
 Append another sparsity patten vertically (NOTE: only efficient if vector)
@@ -9335,9 +8476,11 @@ Is diagonal?
 %feature("docstring")  casadi::Sparsity::is_equal(int nrow, int ncol, const
 std::vector< int > &colind, const std::vector< int > &row) const  " ";
 
-%feature("docstring")  casadi::SharedObject::isNull() const  "
+%feature("docstring")  casadi::Sparsity::nnz_lower(bool strictly=false)
+const  "
 
-Is a null pointer?
+Number of non-zeros in the lower triangular half, i.e. the number of
+elements (i, j) with j<=i.
 
 ";
 
@@ -10098,11 +9241,6 @@ Constructor.
 
 
 // File: classcasadi_1_1WeakRef.xml
-%feature("docstring")  casadi::SharedObject::isNull() const  " [INTERNAL]
-Is a null pointer?
-
-";
-
 %feature("docstring") casadi::WeakRef "[INTERNAL]  Weak reference type A
 weak reference to a SharedObject.
 
@@ -10146,6 +9284,11 @@ Default constructor.
 %feature("docstring")  casadi::SharedObject::printPtr(std::ostream
 &stream=casadi::userOut()) const  " [INTERNAL]  Print the pointer to the
 internal class
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  " [INTERNAL]
+Is a null pointer?
 
 ";
 
@@ -10213,17 +9356,17 @@ point to any node, \"0\" is returned.
 
 ";
 
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
 %feature("docstring") casadi::XmlFile::XmlFile() "";
 
 %feature("docstring") casadi::XmlFile::XmlFile(const std::string &name) " ";
 
 %feature("docstring") casadi::XmlFile::~XmlFile "";
-
-%feature("docstring")  casadi::SharedObject::isNull() const  "
-
-Is a null pointer?
-
-";
 
 %feature("docstring")  casadi::SharedObject::repr(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "

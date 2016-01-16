@@ -163,18 +163,6 @@
 %exception  casadi::Matrix< double >::solve(const Matrix< double > &a, const Matrix< double > &b, const std::string &lsolver, const Dict &dict) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptionsFunctionality::optionAllowedIndex(const std::string &name) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::OptionsFunctionality::optionEnumValue(const std::string &name) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::OptionsFunctionality::setOptionByAllowedIndex(const std::string &name, int i) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::OptionsFunctionality::setOptionByEnumValue(const std::string &name, int v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SharedObject::printPtr(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
