@@ -78,7 +78,7 @@ namespace casadi {
     LapackQrMemory& m = dynamic_cast<LapackQrMemory&>(mem);
 
     // Dimensions
-    int nrow = this->nrow();
+    //int nrow = this->nrow();
     int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format

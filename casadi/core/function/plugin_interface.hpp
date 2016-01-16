@@ -120,8 +120,7 @@ namespace casadi {
 
     // Try loading the plugin
     try {
-      Plugin plugin = loadPlugin(pname, false);
-      // Do a recursion if the name contains dots
+      (void)loadPlugin(pname, false);
       return true;
     } catch (CasadiException& ex) {
       if (verbose) {

@@ -50,20 +50,18 @@ namespace casadi {
 
   void KernelSum::init(const Dict& opts) {
 
-    int num_in = f_.n_in(), num_out = f_.n_out();
-
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
+    int num_out = f_.n_out();
     step_out_.resize(num_out, 0);
-
     for (int i=0; i<num_out; ++i) {
       step_out_[i] = f_.nnz_out(i);
     }
 
     // Allocate some space to evaluate each function to.
     nnz_out_ = 0;
-    for (int i=0;i<num_out;++i) {
+    for (int i=0; i<num_out; ++i) {
       nnz_out_+= step_out_[i];
     }
 

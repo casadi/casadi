@@ -114,7 +114,7 @@ print res['alg'] # This should be all zeros
 #! Let's check our jacobian:
 J = f.jacobian('z', 'alg')
 res = J({'p':P_, 'x':X_, 'z':Z_})
-print array(res["jac"])
+print array(res["dalg_dz"])
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
