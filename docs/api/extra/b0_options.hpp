@@ -103,25 +103,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::FixedStepIntegrator
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>augmented_options</td><td>OT_DICT</td><td></td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td></td><td>Time grid</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>implicit_solver</td><td>OT_STRING</td><td></td><td>An implicit function solver</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICT</td><td></td><td>Options to be passed to the NLP Solver</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>number_of_finite_elements</td><td>OT_INT</td><td></td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>output_t0</td><td>OT_BOOL</td><td></td><td>Output the state at the initial time</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>print_stats</td><td>OT_BOOL</td><td></td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>t0</td><td>OT_DOUBLE</td><td></td><td>Beginning of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
-<tr><td>tf</td><td>OT_DOUBLE</td><td></td><td>End of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
-</table>
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::FunctionInternal
 \n
 \par
@@ -226,25 +207,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::ImplicitFixedStepIntegrator
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>augmented_options</td><td>OT_DICT</td><td></td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td></td><td>Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>implicit_solver</td><td>OT_STRING</td><td></td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICT</td><td></td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>number_of_finite_elements</td><td>OT_INT</td><td></td><td>Number of finite elements</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>output_t0</td><td>OT_BOOL</td><td></td><td>Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>print_stats</td><td>OT_BOOL</td><td></td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>t0</td><td>OT_DOUBLE</td><td></td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-<tr><td>tf</td><td>OT_DOUBLE</td><td></td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
-</table>
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::ImplicitToNlp
 \n
 \par
@@ -266,25 +228,6 @@
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td></td><td>Options to be passed to solver.</td></tr>
 </table>
 */
-/// \cond INTERNAL
-/** \class casadi::Integrator
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>augmented_options</td><td>OT_DICT</td><td></td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
-<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td></td><td>Time grid</td><td>casadi::Integrator</td></tr>
-<tr><td>implicit_solver</td><td>OT_STRING</td><td></td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICT</td><td></td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
-<tr><td>number_of_finite_elements</td><td>OT_INT</td><td></td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
-<tr><td>output_t0</td><td>OT_BOOL</td><td></td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
-<tr><td>print_stats</td><td>OT_BOOL</td><td></td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
-<tr><td>t0</td><td>OT_DOUBLE</td><td></td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
-<tr><td>tf</td><td>OT_DOUBLE</td><td></td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
-</table>
-*/
-/// \endcond
 /// \cond INTERNAL
 /** \class casadi::IpoptInterface
 \n
@@ -500,34 +443,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::Nlpsol
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td></td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
-<tr><td>expand</td><td>OT_BOOL</td><td></td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
-<tr><td>grad_f</td><td>OT_FUNCTION</td><td></td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
-<tr><td>grad_f_options</td><td>OT_DICT</td><td></td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>grad_lag</td><td>OT_FUNCTION</td><td></td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
-<tr><td>grad_lag_options</td><td>OT_DICT</td><td></td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>hess_lag</td><td>OT_FUNCTION</td><td></td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
-<tr><td>hess_lag_options</td><td>OT_DICT</td><td></td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td></td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td></td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td></td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>iteration_callback_step</td><td>OT_INT</td><td></td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>jac_f</td><td>OT_FUNCTION</td><td></td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
-<tr><td>jac_f_options</td><td>OT_DICT</td><td></td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>jac_g</td><td>OT_FUNCTION</td><td></td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
-<tr><td>jac_g_options</td><td>OT_DICT</td><td></td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
-<tr><td>verbose_init</td><td>OT_BOOL</td><td></td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
-<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td></td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
-</table>
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::OoqpInterface
 \n
 \par
@@ -653,22 +568,6 @@
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td></td><td>Relative termination tolerance to stop homotopy.</td></tr>
 </table>
 */
-/// \cond INTERNAL
-/** \class casadi::Rootfinder
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>constraints</td><td>OT_INTVECTOR</td><td></td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
-<tr><td>implicit_input</td><td>OT_INT</td><td></td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>implicit_output</td><td>OT_INT</td><td></td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
-<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td></td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td></td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICT</td><td></td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
-</table>
-*/
-/// \endcond
 /// \cond INTERNAL
 /** \class casadi::SXFunction
 \n
