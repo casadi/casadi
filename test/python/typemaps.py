@@ -776,7 +776,14 @@ class typemaptests(casadiTestCase):
         self.checkarray(a,np.array([[2,2]]))
         a = np.array([i,j])
         self.checkarray(a,np.array([2,2]))
-    
+
+  @requires_nlpsol("ipopt")
+  def testGenericTypeBoolean(self):
+    x=SX.sym("x")
+    with self.assertRaises(RuntimeError):
+      solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": SX.sym("x")}})
+      
+    nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": DM(1)}})
     
 if __name__ == '__main__':
     unittest.main()

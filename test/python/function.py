@@ -819,6 +819,25 @@ class Functiontests(casadiTestCase):
     
     self.check_codegen(F,inputs=[x0,x1])
     self.checkfunction(F,Fref,inputs=[x0,x1])
+    
+  def test_unknown_options(self):
+    x = SX.sym("x")
+
+    with self.assertRaises(Exception):
+      f = SXFunction("f", [x],[x],{"fooo": False})
+
+    with self.assertRaises(Exception):
+      f = SXFunction("f", [x],[x],{"ad_weight": "foo"})
+      
+    if not has_nlpsol("ipopt"):
+      return
+
+  @known_bug()
+  def test_unknown_options_stringvector(self):
+    x = SX.sym("x")
+    solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"monitor": ["eval_f"]})
+    with self.assertRaises(Exception):
+      solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"monitor": ["abc"]})
 
   @memory_heavy()
   def test_mapaccum(self):
