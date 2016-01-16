@@ -766,5 +766,17 @@ class typemaptests(casadiTestCase):
     b = atleast_2d(None)
     with self.assertRaises(NotImplementedError):
       c = repmat(b, 1, 1)
-  if __name__ == '__main__':
+      
+  @known_bug()
+  def test_IMDMarray(self):
+    num = [2,2.0,IM(2),DM(2)]
+    for i in num:
+      for j in num:
+        a = np.array([[i,j]])
+        self.checkarray(a,np.array([[2,2]]))
+        a = np.array([i,j])
+        self.checkarray(a,np.array([2,2]))
+    
+    
+if __name__ == '__main__':
     unittest.main()
