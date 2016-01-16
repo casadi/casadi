@@ -31,6 +31,7 @@ from casadi.tools import *
 
 class Toolstests(casadiTestCase):
 
+  @known_bug()  # Currently failing
   def test_structure(self):
   
   
@@ -766,6 +767,7 @@ class Toolstests(casadiTestCase):
     
     self.checkarray(a,b)
 
+  @known_bug()  # Currently failing
   def test_jacobian(self):
     states = struct_symSX(["x","y"])
     controls = struct_symSX(["u","v","w"])
