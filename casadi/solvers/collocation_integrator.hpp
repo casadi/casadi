@@ -26,7 +26,7 @@
 #ifndef CASADI_COLLOCATION_INTEGRATOR_HPP
 #define CASADI_COLLOCATION_INTEGRATOR_HPP
 
-#include "casadi/core/function/integrator.hpp"
+#include "casadi/core/function/integrator_impl.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
 #include <casadi/solvers/casadi_integrator_collocation_export.h>
 

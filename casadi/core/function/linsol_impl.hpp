@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_LINSOL_HPP
-#define CASADI_LINSOL_HPP
+#ifndef CASADI_LINSOL_IMPL_HPP
+#define CASADI_LINSOL_IMPL_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -144,5 +144,5 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_LINSOL_HPP
+#endif // CASADI_LINSOL_IMPL_HPP
 

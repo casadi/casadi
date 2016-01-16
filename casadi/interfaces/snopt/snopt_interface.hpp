@@ -26,7 +26,7 @@
 #ifndef CASADI_SNOPT_INTERFACE_HPP
 #define CASADI_SNOPT_INTERFACE_HPP
 
-#include "casadi/core/function/nlpsol.hpp"
+#include "casadi/core/function/nlpsol_impl.hpp"
 #include "casadi/interfaces/snopt/casadi_nlpsol_snopt_export.h"
 extern "C" {
 #include "snopt_cwrap.h" // NOLINT(build/include)

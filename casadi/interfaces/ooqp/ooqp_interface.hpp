@@ -26,7 +26,7 @@
 #ifndef CASADI_OOQP_INTERFACE_HPP
 #define CASADI_OOQP_INTERFACE_HPP
 
-#include "casadi/core/function/qpsol.hpp"
+#include "casadi/core/function/qpsol_impl.hpp"
 #include <casadi/interfaces/ooqp/casadi_qpsol_ooqp_export.h>
 
 /** \defgroup plugin_Qpsol_ooqp

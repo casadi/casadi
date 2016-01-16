@@ -26,9 +26,7 @@
 #ifndef CASADI_QP_TO_NLP_HPP
 #define CASADI_QP_TO_NLP_HPP
 
-#include "casadi/core/function/qpsol.hpp"
-#include "casadi/core/function/nlpsol.hpp"
-
+#include "casadi/core/function/qpsol_impl.hpp"
 #include <casadi/solvers/casadi_qpsol_nlpsol_export.h>
 
 
