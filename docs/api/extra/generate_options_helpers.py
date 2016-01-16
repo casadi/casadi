@@ -52,6 +52,8 @@ def extra(metadata,i,iname):
     print meta
 
 def addExtra(metadata):
+  # This is not possible anymore
+  return
   
   print "Adding extra"
 
