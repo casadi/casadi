@@ -871,8 +871,10 @@ class SXtests(casadiTestCase):
     r = poly_roots(p)
     
     f = Function("f", [p],[r])
-    f_in = [0]*f.n_in();f_in[0]=DM([2,7])
-    a_,b_ = f_in[0]
+    f_in = [0]*f.n_in()
+    f_in[0]=DM([2,7])
+    a_ = f_in[0][0]
+    b_ = f_in[0][1]
     f_out = f(f_in)
     f_out[0]
     self.checkarray(f_out[0],vertcat([-b_/a_]))
@@ -882,7 +884,8 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [p],[r])
     f_in = [0]*f.n_in();f_in[0]=DM([2,7])
-    a_,b_ = f_in[0]
+    a_ = f_in[0][0]
+    b_ = f_in[0][1]
     f_out = f(f_in)
     f_out[0]
     self.checkarray(f_out[0],vertcat([-b_/a_,0]))
@@ -892,7 +895,9 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [p],[r])
     f_in = [0]*f.n_in();f_in[0]=DM([1.13,7,3])
-    a_,b_,c_ = f_in[0]
+    a_ = f_in[0][0]
+    b_ = f_in[0][1]
+    c_ = f_in[0][2]
     d = b_**2-4*a_*c_
     f_out = f(f_in)
     x0 = (-b_-sqrt(d))/2/a_

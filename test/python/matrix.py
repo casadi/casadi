@@ -48,25 +48,7 @@ class Matrixtests(casadiTestCase):
     self.message("Matrix inverse")
     a = DM([[1,2],[1,3]])
     self.checkarray(mtimes(c.inv(a),a),eye(2),"DM inverse")
-
-  def test_iter(self):
-    self.message("iterator")
-    L = []
-    for i in DM([5,6,7,8]):
-      L.append(i)
-    self.assertEquals(L[0],5)
-    self.assertEquals(L[1],6)
-    self.assertEquals(L[2],7)
-    self.assertEquals(L[3],8)
-    
-  def test_tuple_unpacking(self):
-    self.message("tuple unpacking")
-    (a,b,c,d) = DM([5,6,7,8])
-    self.assertEquals(a,5)
-    self.assertEquals(b,6)
-    self.assertEquals(c,7)
-    self.assertEquals(d,8)
-    
+        
   def test_trans(self):
     self.message("trans")
     a = DM(0,1)
@@ -884,7 +866,7 @@ class Matrixtests(casadiTestCase):
 
         try:
           self.checkarray(c,c_ref)
-          self.assertTrue(min(IM.ones(c_ref.sparsity())-IM.ones(c.sparsity()))==0)
+          self.assertTrue(min((IM.ones(c_ref.sparsity())-IM.ones(c.sparsity())).nz)==0)
         except Exception as e:
           c.printDense()
           print "sol:"

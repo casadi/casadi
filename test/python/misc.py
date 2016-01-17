@@ -290,9 +290,9 @@ class Misctests(casadiTestCase):
     F = Function('F', [x, p], [x+p, x**2], ['x', 'p'], ['f', 'g'])
     
     fc = F({'x':3,'p':4})
-    [f] = fc['f']
+    f = fc['f']
     self.checkarray(f,DM([7]))
-    [g] = fc['g']
+    g = fc['g']
     self.checkarray(g,DM([9]))
     [f,g] = itemgetter('f','g')(fc)
     self.checkarray(f,DM([7]))
