@@ -2014,13 +2014,9 @@ try:
 except:
   pass
 
-sin = lambda x: casadi_sin(x)
-cos = lambda x: casadi_cos(x)
-tan = lambda x: casadi_tan(x)
-arcsin = lambda x: casadi_asin(x)
-arccos = lambda x: casadi_acos(x)
-arctan = lambda x: casadi_atan(x)
-sqrt = lambda x: casadi_sqrt(x)
+arcsin = lambda x: _casadi.asin(x)
+arccos = lambda x: _casadi.acos(x)
+arctan = lambda x: _casadi.atan(x)
 log = lambda x: casadi_log(x)
 log10 = lambda x: casadi_log10(x)
 exp = lambda x: casadi_exp(x)
@@ -2028,15 +2024,12 @@ floor = lambda x: casadi_floor(x)
 ceil = lambda x: casadi_ceil(x)
 fmin = lambda x,y: casadi_min(x, y)
 fmax = lambda x,y: casadi_max(x, y)
-sinh = lambda x: casadi_sinh(x)
-cosh = lambda x: casadi_cosh(x)
-tanh = lambda x: casadi_tanh(x)
 fabs = lambda x: casadi_abs(x)
 sign = lambda x: casadi_sign(x)
-arctan2 = lambda x,y: casadi_atan2(x, y)
-arctanh = lambda x: casadi_atanh(x)
-arcsinh = lambda x: casadi_asinh(x)
-arccosh = lambda x: casadi_acosh(x)
+arctan2 = lambda x,y: _casadi.atan2(x, y)
+arctanh = lambda x: _casadi.atanh(x)
+arcsinh = lambda x: _casadi.asinh(x)
+arccosh = lambda x: _casadi.acosh(x)
 copysign = lambda x,y: casadi_copysign(x, y)
 %}
 #endif // SWIGPYTHON
@@ -2748,19 +2741,19 @@ DECL M %SHOW(and)(const M& x, const M& y) { return x&&y; }
 DECL M %SHOW(or)(const M& x, const M& y) { return x||y; }
 DECL M %SHOW(not)(const M& x) { return !x; }
 DECL M %HIDE(abs)(const M& x) { return fabs(x); }
-DECL M %HIDE(sqrt)(const M& x) { return sqrt(x); }
-DECL M %HIDE(sin)(const M& x) { return sin(x); }
-DECL M %HIDE(cos)(const M& x) { return cos(x); }
-DECL M %HIDE(tan)(const M& x) { return tan(x); }
-DECL M %HIDE(atan)(const M& x) { return atan(x); }
-DECL M %HIDE(asin)(const M& x) { return asin(x); }
-DECL M %HIDE(acos)(const M& x) { return acos(x); }
-DECL M %HIDE(tanh)(const M& x) { return tanh(x); }
-DECL M %HIDE(sinh)(const M& x) { return sinh(x); }
-DECL M %HIDE(cosh)(const M& x) { return cosh(x); }
-DECL M %HIDE(atanh)(const M& x) { return atanh(x); }
-DECL M %HIDE(asinh)(const M& x) { return asinh(x); }
-DECL M %HIDE(acosh)(const M& x) { return acosh(x); }
+DECL M %SHOW(sqrt)(const M& x) { return sqrt(x); }
+DECL M %SHOW(sin)(const M& x) { return sin(x); }
+DECL M %SHOW(cos)(const M& x) { return cos(x); }
+DECL M %SHOW(tan)(const M& x) { return tan(x); }
+DECL M %SHOW(atan)(const M& x) { return atan(x); }
+DECL M %SHOW(asin)(const M& x) { return asin(x); }
+DECL M %SHOW(acos)(const M& x) { return acos(x); }
+DECL M %SHOW(tanh)(const M& x) { return tanh(x); }
+DECL M %SHOW(sinh)(const M& x) { return sinh(x); }
+DECL M %SHOW(cosh)(const M& x) { return cosh(x); }
+DECL M %SHOW(atanh)(const M& x) { return atanh(x); }
+DECL M %SHOW(asinh)(const M& x) { return asinh(x); }
+DECL M %SHOW(acosh)(const M& x) { return acosh(x); }
 DECL M %HIDE(exp)(const M& x) { return exp(x); }
 DECL M %HIDE(log)(const M& x) { return log(x); }
 DECL M %HIDE(log10)(const M& x) { return log10(x); }
@@ -2771,7 +2764,7 @@ DECL M %SHOW(erfinv)(const M& x) { using casadi::erfinv; return erfinv(x); }
 DECL M %HIDE(sign)(const M& x) { using casadi::sign; return sign(x); }
 DECL M %HIDE(power)(const M& x, const M& n) { return pow(x, n); }
 DECL M %HIDE(mod)(const M& x, const M& y) { return fmod(x, y); }
-DECL M %HIDE(atan2)(const M& x, const M& y) { return atan2(x, y); }
+DECL M %SHOW(atan2)(const M& x, const M& y) { return atan2(x, y); }
 DECL M %HIDE(min)(const M& x, const M& y) { return fmin(x, y); }
 DECL M %HIDE(max)(const M& x, const M& y) { return fmax(x, y); }
 DECL M %SHOW(simplify)(const M& x) { using casadi::simplify; return simplify(x); }
@@ -3334,8 +3327,8 @@ namespace casadi {
       def __rne__(x, y): return casadi_ne(y, x)
       def __pow__(x, n): return casadi_power(x, n)
       def __rpow__(n, x): return casadi_power(x, n)
-      def __arctan2__(x, y): return casadi_atan2(x, y)
-      def __rarctan2__(y, x): return casadi_atan2(x, y)
+      def __arctan2__(x, y): return _casadi.atan2(x, y)
+      def __rarctan2__(y, x): return _casadi.atan2(x, y)
       def fmin(x, y): return casadi_min(x, y)
       def fmax(x, y): return casadi_max(x, y)
       def __fmin__(x, y): return casadi_min(x, y)
@@ -3345,19 +3338,19 @@ namespace casadi {
       def logic_and(x, y): return casadi_and(x, y)
       def logic_or(x, y): return casadi_or(x, y)
       def fabs(x): return casadi_abs(x)
-      def sqrt(x): return casadi_sqrt(x)
-      def sin(x): return casadi_sin(x)
-      def cos(x): return casadi_cos(x)
-      def tan(x): return casadi_tan(x)
-      def arcsin(x): return casadi_asin(x)
-      def arccos(x): return casadi_acos(x)
-      def arctan(x): return casadi_atan(x)
-      def sinh(x): return casadi_sinh(x)
-      def cosh(x): return casadi_cosh(x)
-      def tanh(x): return casadi_tanh(x)
-      def arcsinh(x): return casadi_asinh(x)
-      def arccosh(x): return casadi_acosh(x)
-      def arctanh(x): return casadi_atanh(x)
+      def sqrt(x): return _casadi.sqrt(x)
+      def sin(x): return _casadi.sin(x)
+      def cos(x): return _casadi.cos(x)
+      def tan(x): return _casadi.tan(x)
+      def arcsin(x): return _casadi.asin(x)
+      def arccos(x): return _casadi.acos(x)
+      def arctan(x): return _casadi.atan(x)
+      def sinh(x): return _casadi.sinh(x)
+      def cosh(x): return _casadi.cosh(x)
+      def tanh(x): return _casadi.tanh(x)
+      def arcsinh(x): return _casadi.asinh(x)
+      def arccosh(x): return _casadi.acosh(x)
+      def arctanh(x): return _casadi.atanh(x)
       def exp(x): return casadi_exp(x)
       def log(x): return casadi_log(x)
       def log10(x): return casadi_log10(x)
