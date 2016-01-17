@@ -1160,24 +1160,20 @@ Interface to the JIT compiler CLANG
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| flags           | OT_STRINGVECTOR |                 | Compile flags   |
-|                 |                 |                 | for the JIT     |
-|                 |                 |                 | compiler.       |
-|                 |                 |                 | Default: None   |
-+-----------------+-----------------+-----------------+-----------------+
-| include_path    | OT_STRING       |                 | Include paths   |
-|                 |                 |                 | for the JIT     |
-|                 |                 |                 | compiler. The   |
-|                 |                 |                 | include         |
-|                 |                 |                 | directory       |
-|                 |                 |                 | shipped with    |
-|                 |                 |                 | CasADi will be  |
-|                 |                 |                 | automatically   |
-|                 |                 |                 | appended.       |
-+-----------------+-----------------+-----------------+-----------------+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
+|                        |                        | JIT compiler. Default: |
+|                        |                        | None                   |
++------------------------+------------------------+------------------------+
+| include_path           | OT_STRING              | Include paths for the  |
+|                        |                        | JIT compiler. The      |
+|                        |                        | include directory      |
+|                        |                        | shipped with CasADi    |
+|                        |                        | will be automatically  |
+|                        |                        | appended.              |
++------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -1194,26 +1190,22 @@ Interface to the JIT compiler SHELL
 
 >List of available options
 
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |     Default     |   Description   |
-+=================+=================+=================+=================+
-| compiler        | OT_STRING       |                 | Compiler        |
-|                 |                 |                 | command         |
-+-----------------+-----------------+-----------------+-----------------+
-| compiler_setup  | OT_STRING       |                 | Compiler setup  |
-|                 |                 |                 | command.        |
-|                 |                 |                 | Intended to be  |
-|                 |                 |                 | fixed. The      |
-|                 |                 |                 | 'flag' option   |
-|                 |                 |                 | is the prefered |
-|                 |                 |                 | way to set      |
-|                 |                 |                 | custom flags.   |
-+-----------------+-----------------+-----------------+-----------------+
-| flags           | OT_STRINGVECTOR |                 | Compile flags   |
-|                 |                 |                 | for the JIT     |
-|                 |                 |                 | compiler.       |
-|                 |                 |                 | Default: None   |
-+-----------------+-----------------+-----------------+-----------------+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| compiler               | OT_STRING              | Compiler command       |
++------------------------+------------------------+------------------------+
+| compiler_setup         | OT_STRING              | Compiler setup         |
+|                        |                        | command. Intended to   |
+|                        |                        | be fixed. The 'flag'   |
+|                        |                        | option is the prefered |
+|                        |                        | way to set custom      |
+|                        |                        | flags.                 |
++------------------------+------------------------+------------------------+
+| flags                  | OT_STRINGVECTOR        | Compile flags for the  |
+|                        |                        | JIT compiler. Default: |
+|                        |                        | None                   |
++------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -2520,191 +2512,6 @@ when evaluating: implicitFunction, IDAS solver Further releases may disallow
 this.
 
 Joel Andersson
-
->List of available options
-
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_weight    | OT_DOUBLE    |              | Weighting    | casadi::Func |
-|              |              |              | factor for   | tionInternal |
-|              |              |              | derivative c |              |
-|              |              |              | alculation.W |              |
-|              |              |              | hen there is |              |
-|              |              |              | an option of |              |
-|              |              |              | either using |              |
-|              |              |              | forward or   |              |
-|              |              |              | reverse mode |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives, |              |
-|              |              |              | the          |              |
-|              |              |              | condition ad |              |
-|              |              |              | _weight*nf<= |              |
-|              |              |              | (1-ad_weight |              |
-|              |              |              | )*na is used |              |
-|              |              |              | where nf and |              |
-|              |              |              | na are       |              |
-|              |              |              | estimates of |              |
-|              |              |              | the number   |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse mode  |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives  |              |
-|              |              |              | needed. By   |              |
-|              |              |              | default,     |              |
-|              |              |              | ad_weight is |              |
-|              |              |              | calculated a |              |
-|              |              |              | utomatically |              |
-|              |              |              | , but this   |              |
-|              |              |              | can be       |              |
-|              |              |              | overridden   |              |
-|              |              |              | by setting   |              |
-|              |              |              | this option. |              |
-|              |              |              | In           |              |
-|              |              |              | particular,  |              |
-|              |              |              | 0 means      |              |
-|              |              |              | forcing      |              |
-|              |              |              | forward mode |              |
-|              |              |              | and 1        |              |
-|              |              |              | forcing      |              |
-|              |              |              | reverse      |              |
-|              |              |              | mode. Leave  |              |
-|              |              |              | unset for    |              |
-|              |              |              | (class       |              |
-|              |              |              | specific)    |              |
-|              |              |              | heuristics.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| ad_weight_sp | OT_DOUBLE    |              | Weighting    | casadi::Func |
-|              |              |              | factor for   | tionInternal |
-|              |              |              | sparsity     |              |
-|              |              |              | pattern      |              |
-|              |              |              | calculation  |              |
-|              |              |              | calculation. |              |
-|              |              |              | Overrides    |              |
-|              |              |              | default      |              |
-|              |              |              | behavior.    |              |
-|              |              |              | Set to 0 and |              |
-|              |              |              | 1 to force   |              |
-|              |              |              | forward and  |              |
-|              |              |              | reverse mode |              |
-|              |              |              | respectively |              |
-|              |              |              | . Cf. option |              |
-|              |              |              | \"ad_weight\". |              |
-+--------------+--------------+--------------+--------------+--------------+
-| compiler     | OT_STRING    |              | Just-in-time | casadi::Func |
-|              |              |              | compiler     | tionInternal |
-|              |              |              | plugin to be |              |
-|              |              |              | used.        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gather_stats | OT_BOOL      |              | Flag to      | casadi::Func |
-|              |              |              | indicate     | tionInternal |
-|              |              |              | whether      |              |
-|              |              |              | statistics   |              |
-|              |              |              | must be      |              |
-|              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| input_scheme | OT_STRINGVEC |              | Custom input | casadi::Func |
-|              | TOR          |              | scheme       | tionInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| inputs_check | OT_BOOL      |              | Throw        | casadi::Func |
-|              |              |              | exceptions   | tionInternal |
-|              |              |              | when the     |              |
-|              |              |              | numerical    |              |
-|              |              |              | values of    |              |
-|              |              |              | the inputs   |              |
-|              |              |              | don't make   |              |
-|              |              |              | sense        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_penalty  | OT_DOUBLE    |              | When         | casadi::Func |
-|              |              |              | requested    | tionInternal |
-|              |              |              | for a number |              |
-|              |              |              | of forward/r |              |
-|              |              |              | everse       |              |
-|              |              |              | directions,  |              |
-|              |              |              | it may be    |              |
-|              |              |              | cheaper to   |              |
-|              |              |              | compute      |              |
-|              |              |              | first the    |              |
-|              |              |              | full         |              |
-|              |              |              | jacobian and |              |
-|              |              |              | then         |              |
-|              |              |              | multiply     |              |
-|              |              |              | with seeds,  |              |
-|              |              |              | rather than  |              |
-|              |              |              | obtain the   |              |
-|              |              |              | requested    |              |
-|              |              |              | directions   |              |
-|              |              |              | in a straigh |              |
-|              |              |              | tforward     |              |
-|              |              |              | manner.      |              |
-|              |              |              | Casadi uses  |              |
-|              |              |              | a heuristic  |              |
-|              |              |              | to decide    |              |
-|              |              |              | which is     |              |
-|              |              |              | cheaper. A   |              |
-|              |              |              | high value   |              |
-|              |              |              | of 'jac_pena |              |
-|              |              |              | lty' makes   |              |
-|              |              |              | it less      |              |
-|              |              |              | likely for   |              |
-|              |              |              | the heurstic |              |
-|              |              |              | to chose the |              |
-|              |              |              | full         |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy.    |              |
-|              |              |              | The special  |              |
-|              |              |              | value -1     |              |
-|              |              |              | indicates    |              |
-|              |              |              | never to use |              |
-|              |              |              | the full     |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | strategy     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit          | OT_BOOL      |              | Use just-in- | casadi::Func |
-|              |              |              | time         | tionInternal |
-|              |              |              | compiler to  |              |
-|              |              |              | speed up the |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jit_options  | OT_DICT      |              | Options to   | casadi::Func |
-|              |              |              | be passed to | tionInternal |
-|              |              |              | the jit      |              |
-|              |              |              | compiler.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC |              | Monitors to  | casadi::Func |
-|              | TOR          |              | be activated | tionInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| output_schem | OT_STRINGVEC |              | Custom       | casadi::Func |
-| e            | TOR          |              | output       | tionInternal |
-|              |              |              | scheme       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| regularity_c | OT_BOOL      |              | Throw        | casadi::Func |
-| heck         |              |              | exceptions   | tionInternal |
-|              |              |              | when NaN or  |              |
-|              |              |              | Inf appears  |              |
-|              |              |              | during       |              |
-|              |              |              | evaluation   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   |              | A user-      | casadi::Func |
-|              |              |              | defined      | tionInternal |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOL      |              | Verbose      | casadi::Func |
-|              |              |              | evaluation   | tionInternal |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-Diagrams
---------
-
-
 
 C++ includes: function.hpp ";
 
@@ -8417,24 +8224,7 @@ Get the documentation string for a plugin
 
 %feature("docstring") casadi::nlpsol "
 
-Create an NLP solver Creates a solver for the following parametric nonlinear
-program (NLP):
-
-::
-
-  min          F(x, p)
-  x
-  
-  subject to
-  LBX <=   x    <= UBX
-  LBG <= G(x, p) <= UBG
-  p  == P
-  
-  nx: number of decision variables
-  ng: number of constraints
-  np: number of parameters
-
-Joel Andersson
+Create an NLP solver
 
 ";
 
