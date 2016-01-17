@@ -24,7 +24,7 @@
 from casadi import *
 from casadi.tools import capture_stdout
 import casadi as c
-from numpy import *
+import numpy
 import unittest
 from types import *
 from helpers import *

@@ -23,7 +23,8 @@
 #
 from casadi import *
 import casadi
-from numpy import *
+import numpy
+from numpy import random, array
 import unittest
 import sys
 from math import isnan, isinf
@@ -280,7 +281,7 @@ class casadiTestCase(unittest.TestCase):
     
         x: the symbolic seed for the test. It should be of a form accepted as first argument of Function
         ft: the test function. This function should operate on the casadi matrix x and return MX or SX.
-        fr: the reference function. This function works on the numpy array x0.
+        fr: the reference function. This function works on the array x0.
         
         name - a descriptor that will be included in error messages
     """

@@ -2045,7 +2045,7 @@ except:
   pass
 
 try:
-  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmod, fmin, fmax, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, fabs, sign, arctanh, arcsinh, arccosh, copysign
+  from numpy import sin, cos, tan, sqrt, log, log10, exp, floor, ceil, fmod, fmin, fmax, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, fabs, sign, arctanh, arcsinh, arccosh, copysign
 except:
   sin = lambda x: x.sin()
   cos = lambda x: x.cos()
@@ -2055,6 +2055,7 @@ except:
   arctan = lambda x: x.arctan()
   sqrt = lambda x: x.sqrt()
   log = lambda x: x.log()
+  log10 = lambda x: x.log10()
   exp = lambda x: x.exp()
   floor = lambda x: x.floor()
   ceil = lambda x: x.ceil()

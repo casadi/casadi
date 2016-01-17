@@ -23,7 +23,8 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
+from numpy import random, array, linalg, matrix, zeros, ones, ndarray, eye
 import unittest
 from types import *
 from helpers import *
@@ -128,10 +129,10 @@ class MXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: fmax(a[0],a[1]),lambda a: fmax(a[0],a[1]),"fmin")
 
     self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
-    self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"mtimes(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: numpy.dot(a[0],a[1].T),"mtimes(Matrix,Matrix.T)")
     self.matrixbinarypool.append(lambda a: arctan2(a[0],a[1]),lambda a: arctan2(a[0],a[1]),"arctan2")
     #self.matrixbinarypool.append(lambda a: inner_mul(a[0],trans(a[1])),lambda a: c.dot(a[0].T,a[1]),name="inner_mul(Matrix,Matrix)") 
-    self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: dot(a[0],a[1].T),"mtimes(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: numpy.dot(a[0],a[1].T),"mtimes(Matrix,Matrix.T)")
     
   def test_MX1(self):
     self.message("MX constructor")
@@ -240,8 +241,8 @@ class MXtests(casadiTestCase):
     
     z1=zt1[0,0]
     z2=zt2[0,0]
-    self.assertEqual(type(z1),float64,"Output of Function is expected to be numpy.ndarray of floats")
-    self.assertEqual(type(z2),float64,"Output of Function is expected to be numpy.ndarray of floats")
+    self.assertEqual(type(z1),numpy.float64,"Output of Function is expected to be numpy.ndarray of floats")
+    self.assertEqual(type(z2),numpy.float64,"Output of Function is expected to be numpy.ndarray of floats")
     self.assertAlmostEqual(z2, 21,10)
     self.assertAlmostEqual(z1, 10,10)
 
@@ -263,8 +264,8 @@ class MXtests(casadiTestCase):
     self.assertEqual(zt.shape[1],1,"Output of Function is of wrong shape.")
     z1=zt[0,0]
     z2=zt[1,0]
-    self.assertEqual(type(z1),float64,"Output of Function is expected to be numpy.ndarray of floats")
-    self.assertEqual(type(z2),float64,"Output of Function is expected to be numpy.ndarray of floats")
+    self.assertEqual(type(z1),numpy.float64,"Output of Function is expected to be numpy.ndarray of floats")
+    self.assertEqual(type(z2),numpy.float64,"Output of Function is expected to be numpy.ndarray of floats")
     self.assertAlmostEqual(z2, 21,10)
     self.assertAlmostEqual(z1, 10,10)
 
@@ -286,8 +287,8 @@ class MXtests(casadiTestCase):
     self.assertEqual(zt.shape[1],2,"Output of Function is of wrong shape.")
     z1=zt[0,0]
     z2=zt[0,1]
-    self.assertEqual(type(z1),float64,"Output of Function is expected to be numpy.ndarray of floats")
-    self.assertEqual(type(z2),float64,"Output of Function is expected to be numpy.ndarray of floats")
+    self.assertEqual(type(z1),numpy.float64,"Output of Function is expected to be numpy.ndarray of floats")
+    self.assertEqual(type(z2),numpy.float64,"Output of Function is expected to be numpy.ndarray of floats")
     self.assertAlmostEqual(z2, 21,10)
     self.assertAlmostEqual(z1, 10,10)
     
@@ -345,7 +346,7 @@ class MXtests(casadiTestCase):
     self.assertEqual(zt.shape[0],2,"Output of Function is of wrong shape.")
     self.assertEqual(zt.shape[1],3,"Output of Function is of wrong shape.")
       
-    Lr=reshape(L,(2,3),'F')
+    Lr=numpy.reshape(L,(2,3),'F')
     for i in range(2):
       for j in range(3):
         self.assertAlmostEqual(Lr[i,j]*2, zt[i,j],10)
@@ -371,8 +372,8 @@ class MXtests(casadiTestCase):
     f_out = f(f_in)
     zt = f_out[0].full()
     
-    ztr=reshape(zt,(3,2))
-    Lr=reshape(L,(2,3),'F')
+    ztr=numpy.reshape(zt,(3,2))
+    Lr=numpy.reshape(L,(2,3),'F')
     for i in range(2):
       for j in range(3):
         self.assertAlmostEqual(Lr[i,j], ztr[j,i],10)
@@ -427,50 +428,50 @@ class MXtests(casadiTestCase):
     checkMXoperations(self,lambda x: x,lambda x: x,'vertcat')
     checkMXoperations(self,lambda x: x.T,lambda x: x.T,'trans(vertcat)')
     checkMXoperations(self,lambda x: x.T.T,lambda x: x,'trans(trans(vertcat))')
-    checkMXoperations(self,lambda x: vec(x.T),lambda x: reshape(x,(prod(x.shape),1)),'vec(trans(vertcat))')
-    checkMXoperations(self,lambda x: vec(x).T,lambda x: reshape(x.T,(prod(x.shape),1)).T,'vec(trans(vertcat))')
-    checkMXoperations(self,lambda x: c.reshape(x.T,(6,4)).T,lambda x: reshape(x,(4,6)),'reshape(vertcat)')
-    checkMXoperations(self,lambda x: c.reshape(x,(6,4)).T,lambda x: reshape(x.T,(4,6)),'reshape(trans(vertcat))') 
-    checkMXoperations(self,lambda x: c.reshape(x.T,(6,4)),lambda x: reshape(x,(4,6)).T,'trans(reshape(vertcat))') 
+    checkMXoperations(self,lambda x: vec(x.T),lambda x: numpy.reshape(x,(numpy.prod(x.shape),1)),'vec(trans(vertcat))')
+    checkMXoperations(self,lambda x: vec(x).T,lambda x: numpy.reshape(x.T,(numpy.prod(x.shape),1)).T,'vec(trans(vertcat))')
+    checkMXoperations(self,lambda x: c.reshape(x.T,(6,4)).T,lambda x: numpy.reshape(x,(4,6)),'reshape(vertcat)')
+    checkMXoperations(self,lambda x: c.reshape(x,(6,4)).T,lambda x: numpy.reshape(x.T,(4,6)),'reshape(trans(vertcat))') 
+    checkMXoperations(self,lambda x: c.reshape(x.T,(6,4)),lambda x: numpy.reshape(x,(4,6)).T,'trans(reshape(vertcat))') 
 
   def test_MXcompose2(self):
     self.message("compositions of vec, trans, reshape with horzcat")
     checkMXoperations2(self,lambda x: x,lambda x: x,'horzcat')
     checkMXoperations2(self,lambda x: x.T,lambda x: x.T,'trans(horzcat)')
     checkMXoperations2(self,lambda x: x.T.T,lambda x: x,'trans(trans(horzcat))')
-    checkMXoperations2(self,lambda x: vec(x.T),lambda x: reshape(x,(prod(x.shape),1)),'vec(trans(horzcat))')
-    checkMXoperations2(self,lambda x: vec(x).T,lambda x: reshape(x.T,(prod(x.shape),1)).T,'vec(trans(horzcat))')
-    checkMXoperations2(self,lambda x: c.reshape(x.T,(6,4)).T,lambda x: reshape(x,(4,6)),'reshape(horzcat)')
-    checkMXoperations2(self,lambda x: c.reshape(x,(6,4)).T,lambda x: reshape(x.T,(4,6)),'reshape(trans(horzcat))') 
-    checkMXoperations2(self,lambda x: c.reshape(x.T,(6,4)),lambda x: reshape(x,(4,6)).T,'trans(reshape(horzcat))') 
+    checkMXoperations2(self,lambda x: vec(x.T),lambda x: numpy.reshape(x,(numpy.prod(x.shape),1)),'vec(trans(horzcat))')
+    checkMXoperations2(self,lambda x: vec(x).T,lambda x: numpy.reshape(x.T,(numpy.prod(x.shape),1)).T,'vec(trans(horzcat))')
+    checkMXoperations2(self,lambda x: c.reshape(x.T,(6,4)).T,lambda x: numpy.reshape(x,(4,6)),'reshape(horzcat)')
+    checkMXoperations2(self,lambda x: c.reshape(x,(6,4)).T,lambda x: numpy.reshape(x.T,(4,6)),'reshape(trans(horzcat))') 
+    checkMXoperations2(self,lambda x: c.reshape(x.T,(6,4)),lambda x: numpy.reshape(x,(4,6)).T,'trans(reshape(horzcat))') 
 
   def test_MXcompose3(self):
     self.message("compositions of vec, trans, reshape with vertcat")
     checkMXoperations3(self,lambda x: x,lambda x: x,'snippet')
     checkMXoperations3(self,lambda x: x.T,lambda x: x.T,'trans(snippet)')
     checkMXoperations3(self,lambda x: x.T.T,lambda x: x,'trans(trans(snippet))')
-    checkMXoperations3(self,lambda x: vec(x.T),lambda x: reshape(x,(prod(x.shape),1)),'vec(trans(snippet))')
-    checkMXoperations3(self,lambda x: vec(x).T,lambda x: reshape(x.T,(prod(x.shape),1)).T,'vec(trans(snippet))')
-    checkMXoperations3(self,lambda x: c.reshape(x.T,(6,4)).T,lambda x: reshape(x,(4,6)),'reshape(snippet)')
-    checkMXoperations3(self,lambda x: c.reshape(x,(6,4)).T,lambda x: reshape(x.T,(4,6)),'reshape(trans(snippet))') 
-    checkMXoperations3(self,lambda x: c.reshape(x.T,(6,4)),lambda x: reshape(x,(4,6)).T,'trans(reshape(snippet))') 
+    checkMXoperations3(self,lambda x: vec(x.T),lambda x: numpy.reshape(x,(numpy.prod(x.shape),1)),'vec(trans(snippet))')
+    checkMXoperations3(self,lambda x: vec(x).T,lambda x: numpy.reshape(x.T,(numpy.prod(x.shape),1)).T,'vec(trans(snippet))')
+    checkMXoperations3(self,lambda x: c.reshape(x.T,(6,4)).T,lambda x: numpy.reshape(x,(4,6)),'reshape(snippet)')
+    checkMXoperations3(self,lambda x: c.reshape(x,(6,4)).T,lambda x: numpy.reshape(x.T,(4,6)),'reshape(trans(snippet))') 
+    checkMXoperations3(self,lambda x: c.reshape(x.T,(6,4)),lambda x: numpy.reshape(x,(4,6)).T,'trans(reshape(snippet))') 
 
   def test_MXcompose4(self):
     self.message("compositions of horzcat + vertcat")
     checkMXoperations(self,lambda x: vertcat([x]),lambda x: x,'vertcat(vertcat)')
-    checkMXoperations(self,lambda x: vertcat([x,x*2]),lambda x: vstack((x,x*2)),'vertcat(vertcat,vertcat)')
+    checkMXoperations(self,lambda x: vertcat([x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(vertcat,vertcat)')
     checkMXoperations(self,lambda x: horzcat([x]),lambda x: x,'horzcat(vertcat)')
-    checkMXoperations(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(vertcat,vertcat)')
+    checkMXoperations(self,lambda x: horzcat([x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(vertcat,vertcat)')
     
     checkMXoperations2(self,lambda x: vertcat([x]),lambda x: x,'vertcat(horzcat)')
-    checkMXoperations2(self,lambda x: vertcat([x,x*2]),lambda x: vstack((x,x*2)),'vertcat(horzcat,horzcat)')
+    checkMXoperations2(self,lambda x: vertcat([x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(horzcat,horzcat)')
     checkMXoperations2(self,lambda x: horzcat([x]),lambda x: x,'horzcat(horzcat)')
-    checkMXoperations2(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(horzcat,horzcat)')
+    checkMXoperations2(self,lambda x: horzcat([x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(horzcat,horzcat)')
     
     checkMXoperations3(self,lambda x: vertcat([x]),lambda x: x,'vertcat(snippet)')
-    checkMXoperations3(self,lambda x: vertcat([x,x*2]),lambda x: vstack((x,x*2)),'vertcat(snippet,snippet)')
+    checkMXoperations3(self,lambda x: vertcat([x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(snippet,snippet)')
     checkMXoperations3(self,lambda x: horzcat([x]),lambda x: x,'horzcat(snippet)')
-    checkMXoperations3(self,lambda x: horzcat([x,x*2]),lambda x: hstack((x,x*2)),'horzcat(snippet,snippet)')
+    checkMXoperations3(self,lambda x: horzcat([x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(snippet,snippet)')
     
   @known_bug()  # Test refactoring, cf. #1436
   def test_MXslicingnew(self):
@@ -772,12 +773,12 @@ class MXtests(casadiTestCase):
     f_in[5]=e_
     f_out = f(f_in)
     
-    f_ = dot(dot((dot(A_,x_)+b_).T,C_),(dot(D_,x_)+e_))
+    f_ = numpy.dot(numpy.dot((numpy.dot(A_,x_)+b_).T,C_),(numpy.dot(D_,x_)+e_))
     
     self.checkarray(f_out[0],f_,"evaluation")
     
     
-    J_ = dot(dot((dot(D_,x_)+e_).T,C_.T),A_) + dot(dot((dot(A_,x_)+b_).T,C_),D_)
+    J_ = numpy.dot(numpy.dot((numpy.dot(D_,x_)+e_).T,C_.T),A_) + numpy.dot(numpy.dot((numpy.dot(A_,x_)+b_).T,C_),D_)
     
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
@@ -1024,10 +1025,10 @@ class MXtests(casadiTestCase):
     f = Function("f", [X,Y],[vertcat([X,Y])])
     J = MX.jac(f, 0,0)
     JJ = DM.ones(J.sparsity())
-    self.checkarray(JJ,vstack((eye(3),zeros((2,3)))),"diag")
+    self.checkarray(JJ,numpy.vstack((eye(3),zeros((2,3)))),"diag")
     J = MX.jac(f, 1,0)
     JJ = DM.ones(J.sparsity())
-    self.checkarray(JJ,vstack((zeros((3,2)),eye(2))),"diag")
+    self.checkarray(JJ,numpy.vstack((zeros((3,2)),eye(2))),"diag")
     
     
   def test_MatrixAlgebraTableDense(self):
@@ -1427,7 +1428,7 @@ class MXtests(casadiTestCase):
 
   def test_is_regular(self):
     self.assertTrue(MX(DM([0,1])).is_regular())
-    self.assertFalse(MX(DM([0,Inf])).is_regular())
+    self.assertFalse(MX(DM([0,inf])).is_regular())
     with self.assertRaises(Exception):
       self.assertFalse(MX.sym("x",2).is_regular())
 
