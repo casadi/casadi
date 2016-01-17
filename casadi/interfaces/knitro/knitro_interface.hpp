@@ -28,7 +28,7 @@
 
 #include <casadi/interfaces/knitro/casadi_nlpsol_knitro_export.h>
 #include <knitro.h>
-#include "casadi/core/function/nlpsol_impl.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 
 /** \defgroup plugin_Nlpsol_knitro
   KNITRO interface

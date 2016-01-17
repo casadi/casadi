@@ -24,6 +24,7 @@
 
 
 #include "ooqp_interface.hpp"
+#include "casadi/core/function/qpsol.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 
 // OOQP headers

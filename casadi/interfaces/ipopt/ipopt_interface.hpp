@@ -27,7 +27,7 @@
 #define CASADI_IPOPT_INTERFACE_HPP
 
 #include <casadi/interfaces/ipopt/casadi_nlpsol_ipopt_export.h>
-#include "casadi/core/function/nlpsol_impl.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 #include "casadi/core/timing.hpp"
 
 /** \defgroup plugin_Nlpsol_ipopt

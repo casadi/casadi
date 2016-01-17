@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_QPSOL_IMPL_HPP
-#define CASADI_QPSOL_IMPL_HPP
+#ifndef CASADI_QPSOL_HPP
+#define CASADI_QPSOL_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -103,5 +103,5 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_QPSOL_IMPL_HPP
+#endif // CASADI_QPSOL_HPP
 

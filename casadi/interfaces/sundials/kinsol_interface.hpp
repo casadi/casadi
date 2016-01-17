@@ -27,7 +27,7 @@
 #define CASADI_KINSOL_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_rootfinder_kinsol_export.h>
-#include "casadi/core/function/rootfinder_impl.hpp"
+#include "casadi/core/function/rootfinder.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
 #include <sundials/sundials_types.h>  /* definition of type double */

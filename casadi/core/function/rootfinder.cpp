@@ -23,7 +23,7 @@
  */
 
 
-#include "rootfinder_impl.hpp"
+#include "rootfinder.hpp"
 #include "../mx/mx_node.hpp"
 #include <iterator>
 

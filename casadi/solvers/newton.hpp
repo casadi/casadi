@@ -26,7 +26,8 @@
 #ifndef CASADI_NEWTON_HPP
 #define CASADI_NEWTON_HPP
 
-#include "casadi/core/function/rootfinder_impl.hpp"
+#include "casadi/core/function/rootfinder.hpp"
+
 #include <casadi/solvers/casadi_rootfinder_newton_export.h>
 
 /** \defgroup plugin_Rootfinder_newton

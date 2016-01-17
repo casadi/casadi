@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_ROOTFINDER_IMPL_HPP
-#define CASADI_ROOTFINDER_IMPL_HPP
+#ifndef CASADI_ROOTFINDER_HPP
+#define CASADI_ROOTFINDER_HPP
 
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
@@ -143,4 +143,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CASADI_ROOTFINDER_IMPL_HPP
+#endif // CASADI_ROOTFINDER_HPP

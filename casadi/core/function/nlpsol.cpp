@@ -23,7 +23,7 @@
  */
 
 
-#include "nlpsol_impl.hpp"
+#include "nlpsol.hpp"
 #include "casadi/core/timing.hpp"
 #include <chrono>
 

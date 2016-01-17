@@ -23,7 +23,7 @@
  */
 
 
-#include "integrator_impl.hpp"
+#include "integrator.hpp"
 #include "../std_vector_tools.hpp"
 
 using namespace std;

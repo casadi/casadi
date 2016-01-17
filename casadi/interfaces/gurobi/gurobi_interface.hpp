@@ -26,7 +26,7 @@
 #ifndef CASADI_GUROBI_INTERFACE_HPP
 #define CASADI_GUROBI_INTERFACE_HPP
 
-#include "casadi/core/function/qpsol_impl.hpp"
+#include "casadi/core/function/qpsol.hpp"
 #include <casadi/interfaces/gurobi/casadi_qpsol_gurobi_export.h>
 
 // GUROBI header
