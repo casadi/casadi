@@ -7631,6 +7631,193 @@ General information
 
 
 
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| ad_weight       | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | derivative calc |                 |
+|                 |                 | ulation.When    |                 |
+|                 |                 | there is an     |                 |
+|                 |                 | option of       |                 |
+|                 |                 | either using    |                 |
+|                 |                 | forward or      |                 |
+|                 |                 | reverse mode    |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives,    |                 |
+|                 |                 | the condition a |                 |
+|                 |                 | d_weight*nf<=(1 |                 |
+|                 |                 | -ad_weight)*na  |                 |
+|                 |                 | is used where   |                 |
+|                 |                 | nf and na are   |                 |
+|                 |                 | estimates of    |                 |
+|                 |                 | the number of   |                 |
+|                 |                 | forward/reverse |                 |
+|                 |                 | mode            |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives     |                 |
+|                 |                 | needed. By      |                 |
+|                 |                 | default,        |                 |
+|                 |                 | ad_weight is    |                 |
+|                 |                 | calculated      |                 |
+|                 |                 | automatically,  |                 |
+|                 |                 | but this can be |                 |
+|                 |                 | overridden by   |                 |
+|                 |                 | setting this    |                 |
+|                 |                 | option. In      |                 |
+|                 |                 | particular, 0   |                 |
+|                 |                 | means forcing   |                 |
+|                 |                 | forward mode    |                 |
+|                 |                 | and 1 forcing   |                 |
+|                 |                 | reverse mode.   |                 |
+|                 |                 | Leave unset for |                 |
+|                 |                 | (class          |                 |
+|                 |                 | specific)       |                 |
+|                 |                 | heuristics.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ad_weight_sp    | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | sparsity        |                 |
+|                 |                 | pattern         |                 |
+|                 |                 | calculation cal |                 |
+|                 |                 | culation.Overri |                 |
+|                 |                 | des default     |                 |
+|                 |                 | behavior. Set   |                 |
+|                 |                 | to 0 and 1 to   |                 |
+|                 |                 | force forward   |                 |
+|                 |                 | and reverse     |                 |
+|                 |                 | mode            |                 |
+|                 |                 | respectively.   |                 |
+|                 |                 | Cf. option      |                 |
+|                 |                 | \"ad_weight\".    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| augmented_optio | OT_DICT         | Options to be   | casadi::Integra |
+| ns              |                 | passed down to  | tor             |
+|                 |                 | the augmented   |                 |
+|                 |                 | integrator, if  |                 |
+|                 |                 | one is          |                 |
+|                 |                 | constructed.    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
+|                 |                 | compiler plugin | nInternal       |
+|                 |                 | to be used.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
+|                 |                 | indicate        | nInternal       |
+|                 |                 | whether         |                 |
+|                 |                 | statistics must |                 |
+|                 |                 | be gathered     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| grid            | OT_DOUBLEVECTOR | Time grid       | casadi::Integra |
+|                 |                 |                 | tor             |
++-----------------+-----------------+-----------------+-----------------+
+| implicit_solver | OT_STRING       | An implicit     | casadi::Integra |
+|                 |                 | function solver | tor             |
++-----------------+-----------------+-----------------+-----------------+
+| implicit_solver | OT_DICT         | Options to be   | casadi::Integra |
+| _options        |                 | passed to the   | tor             |
+|                 |                 | NLP Solver      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| inputs_check    | OT_BOOL         | Throw           | casadi::Functio |
+|                 |                 | exceptions when | nInternal       |
+|                 |                 | the numerical   |                 |
+|                 |                 | values of the   |                 |
+|                 |                 | inputs don't    |                 |
+|                 |                 | make sense      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_penalty     | OT_DOUBLE       | When requested  | casadi::Functio |
+|                 |                 | for a number of | nInternal       |
+|                 |                 | forward/reverse |                 |
+|                 |                 | directions, it  |                 |
+|                 |                 | may be cheaper  |                 |
+|                 |                 | to compute      |                 |
+|                 |                 | first the full  |                 |
+|                 |                 | jacobian and    |                 |
+|                 |                 | then multiply   |                 |
+|                 |                 | with seeds,     |                 |
+|                 |                 | rather than     |                 |
+|                 |                 | obtain the      |                 |
+|                 |                 | requested       |                 |
+|                 |                 | directions in a |                 |
+|                 |                 | straightforward |                 |
+|                 |                 | manner. Casadi  |                 |
+|                 |                 | uses a          |                 |
+|                 |                 | heuristic to    |                 |
+|                 |                 | decide which is |                 |
+|                 |                 | cheaper. A high |                 |
+|                 |                 | value of        |                 |
+|                 |                 | 'jac_penalty'   |                 |
+|                 |                 | makes it less   |                 |
+|                 |                 | likely for the  |                 |
+|                 |                 | heurstic to     |                 |
+|                 |                 | chose the full  |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy. The   |                 |
+|                 |                 | special value   |                 |
+|                 |                 | -1 indicates    |                 |
+|                 |                 | never to use    |                 |
+|                 |                 | the full        |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit             | OT_BOOL         | Use just-in-    | casadi::Functio |
+|                 |                 | time compiler   | nInternal       |
+|                 |                 | to speed up the |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit_options     | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | jit compiler.   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| monitor         | OT_STRINGVECTOR | Monitors to be  | casadi::Functio |
+|                 |                 | activated       | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| number_of_finit | OT_INT          | Number of       | casadi::Integra |
+| e_elements      |                 | finite elements | tor             |
++-----------------+-----------------+-----------------+-----------------+
+| output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| output_t0       | OT_BOOL         | Output the      | casadi::Integra |
+|                 |                 | state at the    | tor             |
+|                 |                 | initial time    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| print_stats     | OT_BOOL         | Print out       | casadi::Integra |
+|                 |                 | statistics      | tor             |
+|                 |                 | after           |                 |
+|                 |                 | integration     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
+| k               |                 | exceptions when | nInternal       |
+|                 |                 | NaN or Inf      |                 |
+|                 |                 | appears during  |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| t0              | OT_DOUBLE       | Beginning of    | casadi::Integra |
+|                 |                 | the time        | tor             |
+|                 |                 | horizon         |                 |
++-----------------+-----------------+-----------------+-----------------+
+| tf              | OT_DOUBLE       | End of the time | casadi::Integra |
+|                 |                 | horizon         | tor             |
++-----------------+-----------------+-----------------+-----------------+
+| user_data       | OT_VOIDPTR      | A user-defined  | casadi::Functio |
+|                 |                 | field that can  | nInternal       |
+|                 |                 | be used to      |                 |
+|                 |                 | identify the    |                 |
+|                 |                 | function or     |                 |
+|                 |                 | pass additional |                 |
+|                 |                 | information     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose         | OT_BOOL         | Verbose         | casadi::Functio |
+|                 |                 | evaluation  for | nInternal       |
+|                 |                 | debugging       |                 |
++-----------------+-----------------+-----------------+-----------------+
+
 >Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) []
 
 +------------------------+------------------------+------------------------+
@@ -8166,13 +8353,44 @@ The method is still under development
 
 >List of available options
 
-+---------------------+-----------+----------------------------------------+
-|         Id          |   Type    |              Description               |
-+=====================+===========+========================================+
-| collocation_scheme  | OT_STRING | Collocation scheme: radau|legendre     |
-+---------------------+-----------+----------------------------------------+
-| interpolation_order | OT_INT    | Order of the interpolating polynomials |
-+---------------------+-----------+----------------------------------------+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| augmented_options      | OT_DICT                | Options to be passed   |
+|                        |                        | down to the augmented  |
+|                        |                        | integrator, if one is  |
+|                        |                        | constructed.           |
++------------------------+------------------------+------------------------+
+| collocation_scheme     | OT_STRING              | Collocation scheme:    |
+|                        |                        | radau|legendre         |
++------------------------+------------------------+------------------------+
+| grid                   | OT_DOUBLEVECTOR        | Time grid              |
++------------------------+------------------------+------------------------+
+| implicit_solver        | OT_STRING              | An implicit function   |
+|                        |                        | solver                 |
++------------------------+------------------------+------------------------+
+| implicit_solver_option | OT_DICT                | Options to be passed   |
+| s                      |                        | to the NLP Solver      |
++------------------------+------------------------+------------------------+
+| interpolation_order    | OT_INT                 | Order of the           |
+|                        |                        | interpolating          |
+|                        |                        | polynomials            |
++------------------------+------------------------+------------------------+
+| number_of_finite_eleme | OT_INT                 | Number of finite       |
+| nts                    |                        | elements               |
++------------------------+------------------------+------------------------+
+| output_t0              | OT_BOOL                | Output the state at    |
+|                        |                        | the initial time       |
++------------------------+------------------------+------------------------+
+| print_stats            | OT_BOOL                | Print out statistics   |
+|                        |                        | after integration      |
++------------------------+------------------------+------------------------+
+| t0                     | OT_DOUBLE              | Beginning of the time  |
+|                        |                        | horizon                |
++------------------------+------------------------+------------------------+
+| tf                     | OT_DOUBLE              | End of the time        |
+|                        |                        | horizon                |
++------------------------+------------------------+------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -8305,6 +8523,195 @@ General information
 ===================
 
 
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| ad_weight       | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | derivative calc |                 |
+|                 |                 | ulation.When    |                 |
+|                 |                 | there is an     |                 |
+|                 |                 | option of       |                 |
+|                 |                 | either using    |                 |
+|                 |                 | forward or      |                 |
+|                 |                 | reverse mode    |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives,    |                 |
+|                 |                 | the condition a |                 |
+|                 |                 | d_weight*nf<=(1 |                 |
+|                 |                 | -ad_weight)*na  |                 |
+|                 |                 | is used where   |                 |
+|                 |                 | nf and na are   |                 |
+|                 |                 | estimates of    |                 |
+|                 |                 | the number of   |                 |
+|                 |                 | forward/reverse |                 |
+|                 |                 | mode            |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives     |                 |
+|                 |                 | needed. By      |                 |
+|                 |                 | default,        |                 |
+|                 |                 | ad_weight is    |                 |
+|                 |                 | calculated      |                 |
+|                 |                 | automatically,  |                 |
+|                 |                 | but this can be |                 |
+|                 |                 | overridden by   |                 |
+|                 |                 | setting this    |                 |
+|                 |                 | option. In      |                 |
+|                 |                 | particular, 0   |                 |
+|                 |                 | means forcing   |                 |
+|                 |                 | forward mode    |                 |
+|                 |                 | and 1 forcing   |                 |
+|                 |                 | reverse mode.   |                 |
+|                 |                 | Leave unset for |                 |
+|                 |                 | (class          |                 |
+|                 |                 | specific)       |                 |
+|                 |                 | heuristics.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ad_weight_sp    | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | sparsity        |                 |
+|                 |                 | pattern         |                 |
+|                 |                 | calculation cal |                 |
+|                 |                 | culation.Overri |                 |
+|                 |                 | des default     |                 |
+|                 |                 | behavior. Set   |                 |
+|                 |                 | to 0 and 1 to   |                 |
+|                 |                 | force forward   |                 |
+|                 |                 | and reverse     |                 |
+|                 |                 | mode            |                 |
+|                 |                 | respectively.   |                 |
+|                 |                 | Cf. option      |                 |
+|                 |                 | \"ad_weight\".    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
+|                 |                 | compiler plugin | nInternal       |
+|                 |                 | to be used.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| constraints     | OT_INTVECTOR    | Constrain the   | casadi::Rootfin |
+|                 |                 | unknowns. 0     | der             |
+|                 |                 | (default): no   |                 |
+|                 |                 | constraint on   |                 |
+|                 |                 | ui, 1: ui >=    |                 |
+|                 |                 | 0.0, -1: ui <=  |                 |
+|                 |                 | 0.0, 2: ui >    |                 |
+|                 |                 | 0.0, -2: ui <   |                 |
+|                 |                 | 0.0.            |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
+|                 |                 | indicate        | nInternal       |
+|                 |                 | whether         |                 |
+|                 |                 | statistics must |                 |
+|                 |                 | be gathered     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| implicit_input  | OT_INT          | Index of the    | casadi::Rootfin |
+|                 |                 | input that      | der             |
+|                 |                 | corresponds to  |                 |
+|                 |                 | the actual      |                 |
+|                 |                 | root-finding    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| implicit_output | OT_INT          | Index of the    | casadi::Rootfin |
+|                 |                 | output that     | der             |
+|                 |                 | corresponds to  |                 |
+|                 |                 | the actual      |                 |
+|                 |                 | root-finding    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| inputs_check    | OT_BOOL         | Throw           | casadi::Functio |
+|                 |                 | exceptions when | nInternal       |
+|                 |                 | the numerical   |                 |
+|                 |                 | values of the   |                 |
+|                 |                 | inputs don't    |                 |
+|                 |                 | make sense      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_penalty     | OT_DOUBLE       | When requested  | casadi::Functio |
+|                 |                 | for a number of | nInternal       |
+|                 |                 | forward/reverse |                 |
+|                 |                 | directions, it  |                 |
+|                 |                 | may be cheaper  |                 |
+|                 |                 | to compute      |                 |
+|                 |                 | first the full  |                 |
+|                 |                 | jacobian and    |                 |
+|                 |                 | then multiply   |                 |
+|                 |                 | with seeds,     |                 |
+|                 |                 | rather than     |                 |
+|                 |                 | obtain the      |                 |
+|                 |                 | requested       |                 |
+|                 |                 | directions in a |                 |
+|                 |                 | straightforward |                 |
+|                 |                 | manner. Casadi  |                 |
+|                 |                 | uses a          |                 |
+|                 |                 | heuristic to    |                 |
+|                 |                 | decide which is |                 |
+|                 |                 | cheaper. A high |                 |
+|                 |                 | value of        |                 |
+|                 |                 | 'jac_penalty'   |                 |
+|                 |                 | makes it less   |                 |
+|                 |                 | likely for the  |                 |
+|                 |                 | heurstic to     |                 |
+|                 |                 | chose the full  |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy. The   |                 |
+|                 |                 | special value   |                 |
+|                 |                 | -1 indicates    |                 |
+|                 |                 | never to use    |                 |
+|                 |                 | the full        |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jacobian_functi | OT_FUNCTION     | Function object | casadi::Rootfin |
+| on              |                 | for calculating | der             |
+|                 |                 | the Jacobian    |                 |
+|                 |                 | (autogenerated  |                 |
+|                 |                 | by default)     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit             | OT_BOOL         | Use just-in-    | casadi::Functio |
+|                 |                 | time compiler   | nInternal       |
+|                 |                 | to speed up the |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit_options     | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | jit compiler.   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver   | OT_STRING       | User-defined    | casadi::Rootfin |
+|                 |                 | linear solver   | der             |
+|                 |                 | class. Needed   |                 |
+|                 |                 | for             |                 |
+|                 |                 | sensitivities.  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| linear_solver_o | OT_DICT         | Options to be   | casadi::Rootfin |
+| ptions          |                 | passed to the   | der             |
+|                 |                 | linear solver.  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| monitor         | OT_STRINGVECTOR | Monitors to be  | casadi::Functio |
+|                 |                 | activated       | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
+| k               |                 | exceptions when | nInternal       |
+|                 |                 | NaN or Inf      |                 |
+|                 |                 | appears during  |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| user_data       | OT_VOIDPTR      | A user-defined  | casadi::Functio |
+|                 |                 | field that can  | nInternal       |
+|                 |                 | be used to      |                 |
+|                 |                 | identify the    |                 |
+|                 |                 | function or     |                 |
+|                 |                 | pass additional |                 |
+|                 |                 | information     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose         | OT_BOOL         | Verbose         | casadi::Functio |
+|                 |                 | evaluation  for | nInternal       |
+|                 |                 | debugging       |                 |
++-----------------+-----------------+-----------------+-----------------+
 
 List of plugins
 ===============
@@ -9472,6 +9879,270 @@ General information
 ===================
 
 
+
+>List of available options
+
++-----------------+-----------------+-----------------+-----------------+
+|       Id        |      Type       |   Description   |     Used in     |
++=================+=================+=================+=================+
+| ad_weight       | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | derivative calc |                 |
+|                 |                 | ulation.When    |                 |
+|                 |                 | there is an     |                 |
+|                 |                 | option of       |                 |
+|                 |                 | either using    |                 |
+|                 |                 | forward or      |                 |
+|                 |                 | reverse mode    |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives,    |                 |
+|                 |                 | the condition a |                 |
+|                 |                 | d_weight*nf<=(1 |                 |
+|                 |                 | -ad_weight)*na  |                 |
+|                 |                 | is used where   |                 |
+|                 |                 | nf and na are   |                 |
+|                 |                 | estimates of    |                 |
+|                 |                 | the number of   |                 |
+|                 |                 | forward/reverse |                 |
+|                 |                 | mode            |                 |
+|                 |                 | directional     |                 |
+|                 |                 | derivatives     |                 |
+|                 |                 | needed. By      |                 |
+|                 |                 | default,        |                 |
+|                 |                 | ad_weight is    |                 |
+|                 |                 | calculated      |                 |
+|                 |                 | automatically,  |                 |
+|                 |                 | but this can be |                 |
+|                 |                 | overridden by   |                 |
+|                 |                 | setting this    |                 |
+|                 |                 | option. In      |                 |
+|                 |                 | particular, 0   |                 |
+|                 |                 | means forcing   |                 |
+|                 |                 | forward mode    |                 |
+|                 |                 | and 1 forcing   |                 |
+|                 |                 | reverse mode.   |                 |
+|                 |                 | Leave unset for |                 |
+|                 |                 | (class          |                 |
+|                 |                 | specific)       |                 |
+|                 |                 | heuristics.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ad_weight_sp    | OT_DOUBLE       | Weighting       | casadi::Functio |
+|                 |                 | factor for      | nInternal       |
+|                 |                 | sparsity        |                 |
+|                 |                 | pattern         |                 |
+|                 |                 | calculation cal |                 |
+|                 |                 | culation.Overri |                 |
+|                 |                 | des default     |                 |
+|                 |                 | behavior. Set   |                 |
+|                 |                 | to 0 and 1 to   |                 |
+|                 |                 | force forward   |                 |
+|                 |                 | and reverse     |                 |
+|                 |                 | mode            |                 |
+|                 |                 | respectively.   |                 |
+|                 |                 | Cf. option      |                 |
+|                 |                 | \"ad_weight\".    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
+|                 |                 | compiler plugin | nInternal       |
+|                 |                 | to be used.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| eval_errors_fat | OT_BOOL         | When errors     | casadi::Nlpsol  |
+| al              |                 | occur during    |                 |
+|                 |                 | evaluation of   |                 |
+|                 |                 | f,g,...,stop    |                 |
+|                 |                 | the iterations  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| expand          | OT_BOOL         | Expand the NLP  | casadi::Nlpsol  |
+|                 |                 | function in     |                 |
+|                 |                 | terms of scalar |                 |
+|                 |                 | operations,     |                 |
+|                 |                 | i.e. MX->SX     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
+|                 |                 | indicate        | nInternal       |
+|                 |                 | whether         |                 |
+|                 |                 | statistics must |                 |
+|                 |                 | be gathered     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| grad_f          | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
+|                 |                 | calculating the |                 |
+|                 |                 | gradient of the |                 |
+|                 |                 | objective       |                 |
+|                 |                 | (column,        |                 |
+|                 |                 | autogenerated   |                 |
+|                 |                 | by default)     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| grad_f_options  | OT_DICT         | Options for the | casadi::Nlpsol  |
+|                 |                 | autogenerated   |                 |
+|                 |                 | gradient of the |                 |
+|                 |                 | objective.      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| grad_lag        | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
+|                 |                 | calculating the |                 |
+|                 |                 | gradient of the |                 |
+|                 |                 | Lagrangian      |                 |
+|                 |                 | (autogenerated  |                 |
+|                 |                 | by default)     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| grad_lag_option | OT_DICT         | Options for the | casadi::Nlpsol  |
+| s               |                 | autogenerated   |                 |
+|                 |                 | gradient of the |                 |
+|                 |                 | Lagrangian.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| hess_lag        | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
+|                 |                 | calculating the |                 |
+|                 |                 | Hessian of the  |                 |
+|                 |                 | Lagrangian      |                 |
+|                 |                 | (autogenerated  |                 |
+|                 |                 | by default)     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| hess_lag_option | OT_DICT         | Options for the | casadi::Nlpsol  |
+| s               |                 | autogenerated   |                 |
+|                 |                 | Hessian of the  |                 |
+|                 |                 | Lagrangian.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| ignore_check_ve | OT_BOOL         | If set to true, | casadi::Nlpsol  |
+| c               |                 | the input shape |                 |
+|                 |                 | of F will not   |                 |
+|                 |                 | be checked.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| input_scheme    | OT_STRINGVECTOR | Custom input    | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| inputs_check    | OT_BOOL         | Throw           | casadi::Functio |
+|                 |                 | exceptions when | nInternal       |
+|                 |                 | the numerical   |                 |
+|                 |                 | values of the   |                 |
+|                 |                 | inputs don't    |                 |
+|                 |                 | make sense      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_FUNCTION     | A function that | casadi::Nlpsol  |
+| ack             |                 | will be called  |                 |
+|                 |                 | at each         |                 |
+|                 |                 | iteration with  |                 |
+|                 |                 | the solver as   |                 |
+|                 |                 | input. Check    |                 |
+|                 |                 | documentation   |                 |
+|                 |                 | of Callback .   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_BOOL         | If set to true, | casadi::Nlpsol  |
+| ack_ignore_erro |                 | errors thrown   |                 |
+| rs              |                 | by iteration_ca |                 |
+|                 |                 | llback will be  |                 |
+|                 |                 | ignored.        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| iteration_callb | OT_INT          | Only call the   | casadi::Nlpsol  |
+| ack_step        |                 | callback        |                 |
+|                 |                 | function every  |                 |
+|                 |                 | few iterations. |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_f           | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
+|                 |                 | calculating the |                 |
+|                 |                 | Jacobian of the |                 |
+|                 |                 | objective       |                 |
+|                 |                 | (sparse row,    |                 |
+|                 |                 | autogenerated   |                 |
+|                 |                 | by default)     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_f_options   | OT_DICT         | Options for the | casadi::Nlpsol  |
+|                 |                 | autogenerated   |                 |
+|                 |                 | Jacobian of the |                 |
+|                 |                 | objective.      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_g           | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
+|                 |                 | calculating the |                 |
+|                 |                 | Jacobian of the |                 |
+|                 |                 | constraints     |                 |
+|                 |                 | (autogenerated  |                 |
+|                 |                 | by default)     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_g_options   | OT_DICT         | Options for the | casadi::Nlpsol  |
+|                 |                 | autogenerated   |                 |
+|                 |                 | Jacobian of the |                 |
+|                 |                 | constraints.    |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jac_penalty     | OT_DOUBLE       | When requested  | casadi::Functio |
+|                 |                 | for a number of | nInternal       |
+|                 |                 | forward/reverse |                 |
+|                 |                 | directions, it  |                 |
+|                 |                 | may be cheaper  |                 |
+|                 |                 | to compute      |                 |
+|                 |                 | first the full  |                 |
+|                 |                 | jacobian and    |                 |
+|                 |                 | then multiply   |                 |
+|                 |                 | with seeds,     |                 |
+|                 |                 | rather than     |                 |
+|                 |                 | obtain the      |                 |
+|                 |                 | requested       |                 |
+|                 |                 | directions in a |                 |
+|                 |                 | straightforward |                 |
+|                 |                 | manner. Casadi  |                 |
+|                 |                 | uses a          |                 |
+|                 |                 | heuristic to    |                 |
+|                 |                 | decide which is |                 |
+|                 |                 | cheaper. A high |                 |
+|                 |                 | value of        |                 |
+|                 |                 | 'jac_penalty'   |                 |
+|                 |                 | makes it less   |                 |
+|                 |                 | likely for the  |                 |
+|                 |                 | heurstic to     |                 |
+|                 |                 | chose the full  |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy. The   |                 |
+|                 |                 | special value   |                 |
+|                 |                 | -1 indicates    |                 |
+|                 |                 | never to use    |                 |
+|                 |                 | the full        |                 |
+|                 |                 | Jacobian        |                 |
+|                 |                 | strategy        |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit             | OT_BOOL         | Use just-in-    | casadi::Functio |
+|                 |                 | time compiler   | nInternal       |
+|                 |                 | to speed up the |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| jit_options     | OT_DICT         | Options to be   | casadi::Functio |
+|                 |                 | passed to the   | nInternal       |
+|                 |                 | jit compiler.   |                 |
++-----------------+-----------------+-----------------+-----------------+
+| monitor         | OT_STRINGVECTOR | Monitors to be  | casadi::Functio |
+|                 |                 | activated       | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
+|                 |                 | scheme          | nInternal       |
++-----------------+-----------------+-----------------+-----------------+
+| regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
+| k               |                 | exceptions when | nInternal       |
+|                 |                 | NaN or Inf      |                 |
+|                 |                 | appears during  |                 |
+|                 |                 | evaluation      |                 |
++-----------------+-----------------+-----------------+-----------------+
+| user_data       | OT_VOIDPTR      | A user-defined  | casadi::Functio |
+|                 |                 | field that can  | nInternal       |
+|                 |                 | be used to      |                 |
+|                 |                 | identify the    |                 |
+|                 |                 | function or     |                 |
+|                 |                 | pass additional |                 |
+|                 |                 | information     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose         | OT_BOOL         | Verbose         | casadi::Functio |
+|                 |                 | evaluation  for | nInternal       |
+|                 |                 | debugging       |                 |
++-----------------+-----------------+-----------------+-----------------+
+| verbose_init    | OT_BOOL         | Print out       | casadi::Nlpsol  |
+|                 |                 | timing          |                 |
+|                 |                 | information     |                 |
+|                 |                 | about the       |                 |
+|                 |                 | different       |                 |
+|                 |                 | stages of       |                 |
+|                 |                 | initialization  |                 |
++-----------------+-----------------+-----------------+-----------------+
+| warn_initial_bo | OT_BOOL         | Warn if the     | casadi::Nlpsol  |
+| unds            |                 | initial guess   |                 |
+|                 |                 | does not        |                 |
+|                 |                 | satisfy LBX and |                 |
+|                 |                 | UBX             |                 |
++-----------------+-----------------+-----------------+-----------------+
 
 >Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
 

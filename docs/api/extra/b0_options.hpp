@@ -37,8 +37,17 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>Collocation scheme: radau|legendre</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 </table>
 */
 /// \endcond
@@ -48,8 +57,17 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>Collocation scheme: radau|legendre</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td></tr>
 <tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td></tr>
 </table>
 */
 /** \addtogroup general_CollocationIntegrator
@@ -58,8 +76,17 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>Collocation scheme: radau|legendre</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::CollocationIntegrator</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -290,6 +317,70 @@
 <tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditionerB</td><td>OT_BOOL</td><td>Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]</td><td>casadi::SundialsInterface</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::FixedStepIntegrator
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_FixedStepIntegrator
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -544,12 +635,82 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::ImplicitFixedStepIntegrator
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_ImplicitFixedStepIntegrator
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::ImplicitToNlp
 \n
 \par
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::ImplicitToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::ImplicitToNlp</td></tr>
 </table>
@@ -571,8 +732,78 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::ImplicitToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::ImplicitToNlp</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::Integrator
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::Integrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_Integrator
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::Integrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -585,12 +816,30 @@
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ipopt</td><td>OT_DICT</td><td>Options to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \endcond
@@ -620,12 +869,30 @@
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ipopt</td><td>OT_DICT</td><td>Options to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>pass_nonlinear_variables</td><td>OT_BOOL</td><td>Pass list of variables entering nonlinearly to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>var_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -662,10 +929,16 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable KINSOL internal warning messages</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>f_scale</td><td>OT_DOUBLEVECTOR</td><td>Equation scaling factors</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>gmres|bcgstab|tfqmr</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>dense|banded|iterative|user_defined</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower bandwidth for banded linear solvers</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.</td><td>casadi::KinsolInterface</td></tr>
@@ -707,10 +980,16 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable KINSOL internal warning messages</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>f_scale</td><td>OT_DOUBLEVECTOR</td><td>Equation scaling factors</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>gmres|bcgstab|tfqmr</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>dense|banded|iterative|user_defined</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INT</td><td>Lower bandwidth for banded linear solvers</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.</td><td>casadi::KinsolInterface</td></tr>
@@ -730,7 +1009,25 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>contype</td><td>OT_INTVECTOR</td><td>Type of constraint</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>knitro</td><td>OT_DICT</td><td>Options to be passed to KNITRO</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \endcond
@@ -751,7 +1048,25 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>contype</td><td>OT_INTVECTOR</td><td>Type of constraint</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>knitro</td><td>OT_DICT</td><td>Options to be passed to KNITRO</td><td>casadi::KnitroInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -929,6 +1244,12 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on max(|F|)</td><td>casadi::Newton</td></tr>
 <tr><td>abstolStep</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on step size</td><td>casadi::Newton</td></tr>
+<tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of Newton iterations to perform before returning.</td><td>casadi::Newton</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print information about each iteration</td><td>casadi::Newton</td></tr>
 </table>
@@ -954,8 +1275,96 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on max(|F|)</td><td>casadi::Newton</td></tr>
 <tr><td>abstolStep</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on step size</td><td>casadi::Newton</td></tr>
+<tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of Newton iterations to perform before returning.</td><td>casadi::Newton</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print information about each iteration</td><td>casadi::Newton</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::Nlpsol
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_Nlpsol
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1229,6 +1638,64 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::Rootfinder
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_Rootfinder
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::SXFunction
 \n
 \par
@@ -1265,7 +1732,23 @@
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Scpgen</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Scpgen</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INT</td><td>Size of L-BFGS memory.</td><td>casadi::Scpgen</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>casadi::Scpgen</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INT</td><td>Maximum number of linesearch iterations</td><td>casadi::Scpgen</td></tr>
@@ -1283,6 +1766,8 @@
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_pr_step</td><td>OT_DOUBLE</td><td>Stopping criterion for the step size</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_reg</td><td>OT_DOUBLE</td><td>Stopping criterion for regularization</td><td>casadi::Scpgen</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \endcond
@@ -1324,7 +1809,23 @@
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Scpgen</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Scpgen</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INT</td><td>Size of L-BFGS memory.</td><td>casadi::Scpgen</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>casadi::Scpgen</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INT</td><td>Maximum number of linesearch iterations</td><td>casadi::Scpgen</td></tr>
@@ -1342,6 +1843,8 @@
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_pr_step</td><td>OT_DOUBLE</td><td>Stopping criterion for the step size</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_reg</td><td>OT_DOUBLE</td><td>Stopping criterion for regularization</td><td>casadi::Scpgen</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1386,7 +1889,25 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>snopt</td><td>OT_DICT</td><td>Options to be passed to SNOPT</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \endcond
@@ -1405,7 +1926,25 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>snopt</td><td>OT_DICT</td><td>Options to be passed to SNOPT</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1417,7 +1956,23 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INT</td><td>Size of L-BFGS memory.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INT</td><td>Maximum number of linesearch iterations</td><td>casadi::Sqpmethod</td></tr>
@@ -1430,6 +1985,8 @@
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \endcond
@@ -1464,7 +2021,23 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INT</td><td>Size of L-BFGS memory.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INT</td><td>Maximum number of linesearch iterations</td><td>casadi::Sqpmethod</td></tr>
@@ -1477,6 +2050,8 @@
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1488,6 +2063,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Absolute tolerence  for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>abstolB</td><td>OT_DOUBLE</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information for the forward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOL</td><td>Use exact Jacobian information for the backward integration [default: equal to exact_jacobian]</td><td>casadi::SundialsInterface</td></tr>
@@ -1497,6 +2073,9 @@
 <tr><td>fsens_reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_scaling_factors</td><td>OT_DOUBLEVECTOR</td><td>Scaling factor for the components if finite differences is used</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTVECTOR</td><td>Specifies which components will be used when estimating the sensitivity equations</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::Integrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
@@ -1512,14 +2091,19 @@
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_DOUBLE</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
@@ -1535,6 +2119,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Absolute tolerence  for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>abstolB</td><td>OT_DOUBLE</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information for the forward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOL</td><td>Use exact Jacobian information for the backward integration [default: equal to exact_jacobian]</td><td>casadi::SundialsInterface</td></tr>
@@ -1544,6 +2129,9 @@
 <tr><td>fsens_reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_scaling_factors</td><td>OT_DOUBLEVECTOR</td><td>Scaling factor for the components if finite differences is used</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTVECTOR</td><td>Specifies which components will be used when estimating the sensitivity equations</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::Integrator</td></tr>
+<tr><td>implicit_solver</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>Iterative solver: GMRES|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>iterative_solverB</td><td>OT_STRING</td><td>Iterative solver for backward integration</td><td>casadi::SundialsInterface</td></tr>
@@ -1559,14 +2147,19 @@
 <tr><td>max_krylovB</td><td>OT_INT</td><td>Maximum krylov subspace size for backward integration</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_num_steps</td><td>OT_INT</td><td>Maximum number of integrator steps</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Number of finite elements</td><td>casadi::Integrator</td></tr>
+<tr><td>output_t0</td><td>OT_BOOL</td><td>Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>Type of preconditioning: NONE|left|right|both</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>pretypeB</td><td>OT_STRING</td><td>Preconditioner for backward integration</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_DOUBLE</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INT</td><td>Upper band-width of banded Jacobian (estimations)</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>upper_bandwidthB</td><td>OT_INT</td><td>Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition an iterative solver</td><td>casadi::SundialsInterface</td></tr>
@@ -1638,7 +2231,25 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>Print information about execution time</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>worhp</td><td>OT_DICT</td><td>Options to be passed to WORHP</td><td>casadi::WorhpInterface</td></tr>
 </table>
 */
@@ -1659,7 +2270,25 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_f_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>grad_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated gradient of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag</td><td>OT_FUNCTION</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>hess_lag_options</td><td>OT_DICT</td><td>Options for the autogenerated Hessian of the Lagrangian.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the objective (sparse row, autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_f_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the objective.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g</td><td>OT_FUNCTION</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::Nlpsol</td></tr>
+<tr><td>jac_g_options</td><td>OT_DICT</td><td>Options for the autogenerated Jacobian of the constraints.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>Print information about execution time</td><td>casadi::WorhpInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>worhp</td><td>OT_DICT</td><td>Options to be passed to WORHP</td><td>casadi::WorhpInterface</td></tr>
 </table>
 */
