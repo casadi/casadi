@@ -7485,7 +7485,7 @@ Check if the vector is non-increasing.
 
 %feature("docstring") casadi::doc_linsol "
 
-Get the documentation string for a plugin
+Get the documentation string for a plugin.
 
 ";
 
@@ -7533,13 +7533,13 @@ Check if the vector is strictly decreasing.
 
 %feature("docstring") casadi::load_integrator "
 
-Explicitly load a plugin dynamically
+Explicitly load a plugin dynamically.
 
 ";
 
 %feature("docstring") casadi::load_nlpsol "
 
-Explicitly load a plugin dynamically
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -7551,7 +7551,7 @@ Explicitly load a plugin dynamically
 
 %feature("docstring") casadi::load_linsol "
 
-Explicitly load a plugin dynamically
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -7633,7 +7633,7 @@ Check if the vector has negative entries.
 
 %feature("docstring") casadi::doc_qpsol "
 
-Get the documentation string for a plugin
+Get the documentation string for a plugin.
 
 ";
 
@@ -7780,7 +7780,7 @@ with Q-transpose (lapack)
 
 %feature("docstring") casadi::has_integrator "
 
-Check if a particular plugin is available
+Check if a particular plugin is available.
 
 ";
 
@@ -7790,23 +7790,24 @@ Check if the vector is non-decreasing.
 
 ";
 
-%feature("docstring") casadi::integrator_out "
+%feature("docstring") casadi::jit "
 
->  CASADI_EXPORT[str] integrator_out()
-------------------------------------------------------------------------
+Create a just-in-time compiled function from a C/C++ language string The
+function can an arbitrary number of inputs and outputs that must all be
+scalar-valued. Only specify the function body, assuming that the inputs are
+stored in an array named 'arg' and the outputs stored in an array named
+'res'. The data type used must be 'real_t', which is typically equal to
+'double` or another data type with the same API as 'double'.
 
-Get integrator output scheme of integrators.
+The final generated function will have a structure similar to:
 
->  str integrator_out(int ind)
-------------------------------------------------------------------------
-
-Get output scheme name by index.
+void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 
 ";
 
 %feature("docstring") casadi::load_rootfinder "
 
-Explicitly load a plugin dynamically
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -7864,7 +7865,7 @@ system (lapack)
 
 %feature("docstring") casadi::has_nlpsol "
 
-Check if a particular plugin is available
+Check if a particular plugin is available.
 
 ";
 
@@ -7875,7 +7876,7 @@ the upper triangular half.
 
 %feature("docstring") casadi::doc_nlpsol "
 
-Get the documentation string for a plugin
+Get the documentation string for a plugin.
 
 ";
 
@@ -7920,11 +7921,7 @@ corresponding to the entry with the largest absolute value.
 
 ";
 
-%feature("docstring") casadi::matrixName "
-
-Get typename.
-
-";
+%feature("docstring") casadi::replaceMat "[INTERNAL] ";
 
 %feature("docstring") casadi::collocationInterpolators "
 
@@ -7960,7 +7957,11 @@ Get the number of NLP solver inputs.
 
 ";
 
-%feature("docstring") casadi::replaceMat "[INTERNAL] ";
+%feature("docstring") casadi::matrixName "
+
+Get typename.
+
+";
 
 %feature("docstring") casadi::integrator_in "
 
@@ -8058,7 +8059,7 @@ matrix (lapack)
 
 %feature("docstring") casadi::has_rootfinder "
 
-Check if a particular plugin is available
+Check if a particular plugin is available.
 
 ";
 
@@ -8097,7 +8098,7 @@ Check if the vector is strictly increasing.
 
 %feature("docstring") casadi::doc_integrator "
 
-Get the documentation string for a plugin
+Get the documentation string for a plugin.
 
 ";
 
@@ -8110,24 +8111,23 @@ matrix multiplication: z <- z + x*y.
 
 ";
 
-%feature("docstring") casadi::jit "
+%feature("docstring") casadi::integrator_out "
 
-Create a just-in-time compiled function from a C/C++ language string The
-function can an arbitrary number of inputs and outputs that must all be
-scalar-valued. Only specify the function body, assuming that the inputs are
-stored in an array named 'arg' and the outputs stored in an array named
-'res'. The data type used must be 'real_t', which is typically equal to
-'double` or another data type with the same API as 'double'.
+>  CASADI_EXPORT[str] integrator_out()
+------------------------------------------------------------------------
 
-The final generated function will have a structure similar to:
+Get integrator output scheme of integrators.
 
-void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+>  str integrator_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
 
 ";
 
 %feature("docstring") casadi::load_qpsol "
 
-Explicitly load a plugin dynamically
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -8162,76 +8162,16 @@ multiplication: z <- z + x*y.
 
 Get NLP solver output scheme of NLP solvers.
 
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
-|                        |                        | the optimal solution   |
-|                        |                        | (nx x 1)               |
-+------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
-|                        |                        | the optimal solution   |
-|                        |                        | (1 x 1)                |
-+------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
-|                        |                        | at the optimal         |
-|                        |                        | solution (ng x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on X at the |
-|                        |                        | solution (nx x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on G at the |
-|                        |                        | solution (ng x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on P at the |
-|                        |                        | solution (np x 1)      |
-+------------------------+------------------------+------------------------+
-
 >  str nlpsol_out(int ind)
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
 
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
-|                        |                        | the optimal solution   |
-|                        |                        | (nx x 1)               |
-+------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
-|                        |                        | the optimal solution   |
-|                        |                        | (1 x 1)                |
-+------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
-|                        |                        | at the optimal         |
-|                        |                        | solution (ng x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on X at the |
-|                        |                        | solution (nx x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on G at the |
-|                        |                        | solution (ng x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on P at the |
-|                        |                        | solution (np x 1)      |
-+------------------------+------------------------+------------------------+
-
 ";
 
 %feature("docstring") casadi::has_linsol "
 
-Check if a particular plugin is available
+Check if a particular plugin is available.
 
 ";
 
@@ -8264,82 +8204,10 @@ order:  Order of interpolating polynomials
 
 Get input scheme of NLP solvers.
 
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
-|                        |                        | initial guess (nx x 1) |
-+------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
-|                        |                        | parameters (np x 1)    |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
-|                        |                        | lower bound (nx x 1),  |
-|                        |                        | default -inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
-|                        |                        | upper bound (nx x 1),  |
-|                        |                        | default +inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default -inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default +inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
-|                        |                        | for bounds on X,       |
-|                        |                        | initial guess (nx x 1) |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
-|                        |                        | for bounds on G,       |
-|                        |                        | initial guess (ng x 1) |
-+------------------------+------------------------+------------------------+
-
 >  str nlpsol_in(int ind)
 ------------------------------------------------------------------------
 
 Get NLP solver input scheme name by index.
-
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
-|                        |                        | initial guess (nx x 1) |
-+------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
-|                        |                        | parameters (np x 1)    |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
-|                        |                        | lower bound (nx x 1),  |
-|                        |                        | default -inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
-|                        |                        | upper bound (nx x 1),  |
-|                        |                        | default +inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default -inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default +inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
-|                        |                        | for bounds on X,       |
-|                        |                        | initial guess (nx x 1) |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
-|                        |                        | for bounds on G,       |
-|                        |                        | initial guess (ng x 1) |
-+------------------------+------------------------+------------------------+
 
 ";
 
@@ -8350,14 +8218,11 @@ dense.
 
 %feature("docstring") casadi::doc_rootfinder "
 
-Get the documentation string for a plugin
+Get the documentation string for a plugin.
 
 ";
 
 %feature("docstring") casadi::nlpsol "
-
->  Function nlpsol(str name, str solver, const str:SX &nlp, Dict opts=Dict())
-------------------------------------------------------------------------
 
 Create an NLP solver Creates a solver for the following parametric nonlinear
 program (NLP):
@@ -8376,531 +8241,13 @@ program (NLP):
   ng: number of constraints
   np: number of parameters
 
-
-
-General information
-===================
-
-
-
->List of available options
-
-+-----------------+-----------------+-----------------+-----------------+
-|       Id        |      Type       |   Description   |     Used in     |
-+=================+=================+=================+=================+
-| eval_errors_fat | OT_BOOL         | When errors     | casadi::Nlpsol  |
-| al              |                 | occur during    |                 |
-|                 |                 | evaluation of   |                 |
-|                 |                 | f,g,...,stop    |                 |
-|                 |                 | the iterations  |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| expand          | OT_BOOL         | Expand the NLP  | casadi::Nlpsol  |
-|                 |                 | function in     |                 |
-|                 |                 | terms of scalar |                 |
-|                 |                 | operations,     |                 |
-|                 |                 | i.e. MX->SX     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| grad_f          | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
-|                 |                 | calculating the |                 |
-|                 |                 | gradient of the |                 |
-|                 |                 | objective       |                 |
-|                 |                 | (column,        |                 |
-|                 |                 | autogenerated   |                 |
-|                 |                 | by default)     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| grad_f_options  | OT_DICT         | Options for the | casadi::Nlpsol  |
-|                 |                 | autogenerated   |                 |
-|                 |                 | gradient of the |                 |
-|                 |                 | objective.      |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| grad_lag        | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
-|                 |                 | calculating the |                 |
-|                 |                 | gradient of the |                 |
-|                 |                 | Lagrangian      |                 |
-|                 |                 | (autogenerated  |                 |
-|                 |                 | by default)     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| grad_lag_option | OT_DICT         | Options for the | casadi::Nlpsol  |
-| s               |                 | autogenerated   |                 |
-|                 |                 | gradient of the |                 |
-|                 |                 | Lagrangian.     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| hess_lag        | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
-|                 |                 | calculating the |                 |
-|                 |                 | Hessian of the  |                 |
-|                 |                 | Lagrangian      |                 |
-|                 |                 | (autogenerated  |                 |
-|                 |                 | by default)     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| hess_lag_option | OT_DICT         | Options for the | casadi::Nlpsol  |
-| s               |                 | autogenerated   |                 |
-|                 |                 | Hessian of the  |                 |
-|                 |                 | Lagrangian.     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| ignore_check_ve | OT_BOOL         | If set to true, | casadi::Nlpsol  |
-| c               |                 | the input shape |                 |
-|                 |                 | of F will not   |                 |
-|                 |                 | be checked.     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| iteration_callb | OT_FUNCTION     | A function that | casadi::Nlpsol  |
-| ack             |                 | will be called  |                 |
-|                 |                 | at each         |                 |
-|                 |                 | iteration with  |                 |
-|                 |                 | the solver as   |                 |
-|                 |                 | input. Check    |                 |
-|                 |                 | documentation   |                 |
-|                 |                 | of Callback .   |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| iteration_callb | OT_BOOL         | If set to true, | casadi::Nlpsol  |
-| ack_ignore_erro |                 | errors thrown   |                 |
-| rs              |                 | by iteration_ca |                 |
-|                 |                 | llback will be  |                 |
-|                 |                 | ignored.        |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| iteration_callb | OT_INT          | Only call the   | casadi::Nlpsol  |
-| ack_step        |                 | callback        |                 |
-|                 |                 | function every  |                 |
-|                 |                 | few iterations. |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| jac_f           | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
-|                 |                 | calculating the |                 |
-|                 |                 | Jacobian of the |                 |
-|                 |                 | objective       |                 |
-|                 |                 | (sparse row,    |                 |
-|                 |                 | autogenerated   |                 |
-|                 |                 | by default)     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| jac_f_options   | OT_DICT         | Options for the | casadi::Nlpsol  |
-|                 |                 | autogenerated   |                 |
-|                 |                 | Jacobian of the |                 |
-|                 |                 | objective.      |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| jac_g           | OT_FUNCTION     | Function for    | casadi::Nlpsol  |
-|                 |                 | calculating the |                 |
-|                 |                 | Jacobian of the |                 |
-|                 |                 | constraints     |                 |
-|                 |                 | (autogenerated  |                 |
-|                 |                 | by default)     |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| jac_g_options   | OT_DICT         | Options for the | casadi::Nlpsol  |
-|                 |                 | autogenerated   |                 |
-|                 |                 | Jacobian of the |                 |
-|                 |                 | constraints.    |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| verbose_init    | OT_BOOL         | Print out       | casadi::Nlpsol  |
-|                 |                 | timing          |                 |
-|                 |                 | information     |                 |
-|                 |                 | about the       |                 |
-|                 |                 | different       |                 |
-|                 |                 | stages of       |                 |
-|                 |                 | initialization  |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| warn_initial_bo | OT_BOOL         | Warn if the     | casadi::Nlpsol  |
-| unds            |                 | initial guess   |                 |
-|                 |                 | does not        |                 |
-|                 |                 | satisfy LBX and |                 |
-|                 |                 | UBX             |                 |
-+-----------------+-----------------+-----------------+-----------------+
-
->Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLPSOL_X0              |                        | Decision variables,    |
-|                        |                        | initial guess (nx x 1) |
-+------------------------+------------------------+------------------------+
-| NLPSOL_P               |                        | Value of fixed         |
-|                        |                        | parameters (np x 1)    |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LBX             |                        | Decision variables     |
-|                        |                        | lower bound (nx x 1),  |
-|                        |                        | default -inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_UBX             |                        | Decision variables     |
-|                        |                        | upper bound (nx x 1),  |
-|                        |                        | default +inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LBG             |                        | Constraints lower      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default -inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_UBG             |                        | Constraints upper      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default +inf.          |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
-|                        |                        | for bounds on X,       |
-|                        |                        | initial guess (nx x 1) |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
-|                        |                        | for bounds on G,       |
-|                        |                        | initial guess (ng x 1) |
-+------------------------+------------------------+------------------------+
-
->Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
-
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLPSOL_X               |                        | Decision variables at  |
-|                        |                        | the optimal solution   |
-|                        |                        | (nx x 1)               |
-+------------------------+------------------------+------------------------+
-| NLPSOL_F               |                        | Cost function value at |
-|                        |                        | the optimal solution   |
-|                        |                        | (1 x 1)                |
-+------------------------+------------------------+------------------------+
-| NLPSOL_G               |                        | Constraints function   |
-|                        |                        | at the optimal         |
-|                        |                        | solution (ng x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on X at the |
-|                        |                        | solution (nx x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on G at the |
-|                        |                        | solution (ng x 1)      |
-+------------------------+------------------------+------------------------+
-| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
-|                        |                        | for bounds on P at the |
-|                        |                        | solution (np x 1)      |
-+------------------------+------------------------+------------------------+
-
-List of plugins
-===============
-
-
-
-- ipopt
-
-- knitro
-
-- snopt
-
-- worhp
-
-- scpgen
-
-- sqpmethod
-
-Note: some of the plugins in this list might not be available on your
-system. Also, there might be extra plugins available to you that are not
-listed here. You can obtain their documentation with
-Nlpsol.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-ipopt
------
-
-
-
-When in warmstart mode, output NLPSOL_LAM_X may be used as input
-
-NOTE: Even when max_iter == 0, it is not guaranteed that input(NLPSOL_X0) ==
-output(NLPSOL_X). Indeed if bounds on X or constraints are unmet, they will
-differ.
-
-For a good tutorial on IPOPT,
-seehttp://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
-
-A good resource about the algorithms in IPOPT is: Wachter and L. T. Biegler,
-On the Implementation of an Interior-Point Filter Line-Search Algorithm for
-Large-Scale Nonlinear Programming, Mathematical Programming 106(1), pp.
-25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson Research Center,
-Yorktown, USA
-
-Caveats: with default options, multipliers for the decision variables are
-wrong for equality constraints. Change the 'fixed_variable_treatment' to
-'make_constraint' or 'relax_bounds' to obtain correct results.
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| con_integer_md         | OT_DICT                | Integer metadata (a    |
-|                        |                        | dictionary with lists  |
-|                        |                        | of integers) about     |
-|                        |                        | constraints to be      |
-|                        |                        | passed to IPOPT        |
-+------------------------+------------------------+------------------------+
-| con_numeric_md         | OT_DICT                | Numeric metadata (a    |
-|                        |                        | dictionary with lists  |
-|                        |                        | of reals) about        |
-|                        |                        | constraints to be      |
-|                        |                        | passed to IPOPT        |
-+------------------------+------------------------+------------------------+
-| con_string_md          | OT_DICT                | String metadata (a     |
-|                        |                        | dictionary with lists  |
-|                        |                        | of strings) about      |
-|                        |                        | constraints to be      |
-|                        |                        | passed to IPOPT        |
-+------------------------+------------------------+------------------------+
-| ipopt                  | OT_DICT                | Options to be passed   |
-|                        |                        | to IPOPT               |
-+------------------------+------------------------+------------------------+
-| pass_nonlinear_variabl | OT_BOOL                | Pass list of variables |
-| es                     |                        | entering nonlinearly   |
-|                        |                        | to IPOPT               |
-+------------------------+------------------------+------------------------+
-| print_time             | OT_BOOL                | print information      |
-|                        |                        | about execution time   |
-+------------------------+------------------------+------------------------+
-| var_integer_md         | OT_DICT                | Integer metadata (a    |
-|                        |                        | dictionary with lists  |
-|                        |                        | of integers) about     |
-|                        |                        | variables to be passed |
-|                        |                        | to IPOPT               |
-+------------------------+------------------------+------------------------+
-| var_numeric_md         | OT_DICT                | Numeric metadata (a    |
-|                        |                        | dictionary with lists  |
-|                        |                        | of reals) about        |
-|                        |                        | variables to be passed |
-|                        |                        | to IPOPT               |
-+------------------------+------------------------+------------------------+
-| var_string_md          | OT_DICT                | String metadata (a     |
-|                        |                        | dictionary with lists  |
-|                        |                        | of strings) about      |
-|                        |                        | variables to be passed |
-|                        |                        | to IPOPT               |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-knitro
-------
-
-
-
-KNITRO interface
-
->List of available options
-
-+---------+--------------+--------------------------------+
-|   Id    |     Type     |          Description           |
-+=========+==============+================================+
-| contype | OT_INTVECTOR | Type of constraint             |
-+---------+--------------+--------------------------------+
-| knitro  | OT_DICT      | Options to be passed to KNITRO |
-+---------+--------------+--------------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-snopt
------
-
-
-
-SNOPT interface
-
->List of available options
-
-+-------+---------+-------------------------------+
-|  Id   |  Type   |          Description          |
-+=======+=========+===============================+
-| snopt | OT_DICT | Options to be passed to SNOPT |
-+-------+---------+-------------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-worhp
------
-
-
-
-WORHP interface
-
->List of available options
-
-+------------+---------+----------------------------------------+
-|     Id     |  Type   |              Description               |
-+============+=========+========================================+
-| print_time | OT_BOOL | Print information about execution time |
-+------------+---------+----------------------------------------+
-| worhp      | OT_DICT | Options to be passed to WORHP          |
-+------------+---------+----------------------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-scpgen
-------
-
-
-
-A structure-exploiting sequential quadratic programming (to be come
-sequential convex programming) method for nonlinear programming.
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| beta                   | OT_DOUBLE              | Line-search parameter, |
-|                        |                        | restoration factor of  |
-|                        |                        | stepsize               |
-+------------------------+------------------------+------------------------+
-| c1                     | OT_DOUBLE              | Armijo condition,      |
-|                        |                        | coefficient of         |
-|                        |                        | decrease in merit      |
-+------------------------+------------------------+------------------------+
-| codegen                | OT_BOOL                | C-code generation      |
-+------------------------+------------------------+------------------------+
-| hessian_approximation  | OT_STRING              | gauss-newton|exact     |
-+------------------------+------------------------+------------------------+
-| lbfgs_memory           | OT_INT                 | Size of L-BFGS memory. |
-+------------------------+------------------------+------------------------+
-| max_iter               | OT_INT                 | Maximum number of SQP  |
-|                        |                        | iterations             |
-+------------------------+------------------------+------------------------+
-| max_iter_ls            | OT_INT                 | Maximum number of      |
-|                        |                        | linesearch iterations  |
-+------------------------+------------------------+------------------------+
-| merit_memsize          | OT_INT                 | Size of memory to      |
-|                        |                        | store history of merit |
-|                        |                        | function values        |
-+------------------------+------------------------+------------------------+
-| merit_start            | OT_DOUBLE              | Lower bound for the    |
-|                        |                        | merit function         |
-|                        |                        | parameter              |
-+------------------------+------------------------+------------------------+
-| name_x                 | OT_STRINGVECTOR        | Names of the           |
-|                        |                        | variables.             |
-+------------------------+------------------------+------------------------+
-| print_header           | OT_BOOL                | Print the header with  |
-|                        |                        | problem statistics     |
-+------------------------+------------------------+------------------------+
-| print_time             | OT_BOOL                | Print information      |
-|                        |                        | about execution time   |
-+------------------------+------------------------+------------------------+
-| print_x                | OT_INTVECTOR           | Which variables to     |
-|                        |                        | print.                 |
-+------------------------+------------------------+------------------------+
-| qpsol                  | OT_STRING              | The QP solver to be    |
-|                        |                        | used by the SQP method |
-+------------------------+------------------------+------------------------+
-| qpsol_options          | OT_DICT                | Options to be passed   |
-|                        |                        | to the QP solver       |
-+------------------------+------------------------+------------------------+
-| reg_threshold          | OT_DOUBLE              | Threshold for the      |
-|                        |                        | regularization.        |
-+------------------------+------------------------+------------------------+
-| regularize             | OT_BOOL                | Automatic              |
-|                        |                        | regularization of      |
-|                        |                        | Lagrange Hessian.      |
-+------------------------+------------------------+------------------------+
-| tol_du                 | OT_DOUBLE              | Stopping criterion for |
-|                        |                        | dual infeasability     |
-+------------------------+------------------------+------------------------+
-| tol_pr                 | OT_DOUBLE              | Stopping criterion for |
-|                        |                        | primal infeasibility   |
-+------------------------+------------------------+------------------------+
-| tol_pr_step            | OT_DOUBLE              | Stopping criterion for |
-|                        |                        | the step size          |
-+------------------------+------------------------+------------------------+
-| tol_reg                | OT_DOUBLE              | Stopping criterion for |
-|                        |                        | regularization         |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------------------
-
-sqpmethod
----------
-
-
-
-A textbook SQPMethod
-
->List of available options
-
-+------------------------+------------------------+------------------------+
-|           Id           |          Type          |      Description       |
-+========================+========================+========================+
-| beta                   | OT_DOUBLE              | Line-search parameter, |
-|                        |                        | restoration factor of  |
-|                        |                        | stepsize               |
-+------------------------+------------------------+------------------------+
-| c1                     | OT_DOUBLE              | Armijo condition,      |
-|                        |                        | coefficient of         |
-|                        |                        | decrease in merit      |
-+------------------------+------------------------+------------------------+
-| hessian_approximation  | OT_STRING              | limited-memory|exact   |
-+------------------------+------------------------+------------------------+
-| lbfgs_memory           | OT_INT                 | Size of L-BFGS memory. |
-+------------------------+------------------------+------------------------+
-| max_iter               | OT_INT                 | Maximum number of SQP  |
-|                        |                        | iterations             |
-+------------------------+------------------------+------------------------+
-| max_iter_ls            | OT_INT                 | Maximum number of      |
-|                        |                        | linesearch iterations  |
-+------------------------+------------------------+------------------------+
-| merit_memory           | OT_INT                 | Size of memory to      |
-|                        |                        | store history of merit |
-|                        |                        | function values        |
-+------------------------+------------------------+------------------------+
-| min_step_size          | OT_DOUBLE              | The size (inf-norm) of |
-|                        |                        | the step size should   |
-|                        |                        | not become smaller     |
-|                        |                        | than this.             |
-+------------------------+------------------------+------------------------+
-| print_header           | OT_BOOL                | Print the header with  |
-|                        |                        | problem statistics     |
-+------------------------+------------------------+------------------------+
-| print_time             | OT_BOOL                | Print information      |
-|                        |                        | about execution time   |
-+------------------------+------------------------+------------------------+
-| qpsol                  | OT_STRING              | The QP solver to be    |
-|                        |                        | used by the SQP method |
-+------------------------+------------------------+------------------------+
-| qpsol_options          | OT_DICT                | Options to be passed   |
-|                        |                        | to the QP solver       |
-+------------------------+------------------------+------------------------+
-| regularize             | OT_BOOL                | Automatic              |
-|                        |                        | regularization of      |
-|                        |                        | Lagrange Hessian.      |
-+------------------------+------------------------+------------------------+
-| tol_du                 | OT_DOUBLE              | Stopping criterion for |
-|                        |                        | dual infeasability     |
-+------------------------+------------------------+------------------------+
-| tol_pr                 | OT_DOUBLE              | Stopping criterion for |
-|                        |                        | primal infeasibility   |
-+------------------------+------------------------+------------------------+
-
---------------------------------------------------------------------------------
-
-
-
 Joel Andersson
 
 ";
 
 %feature("docstring") casadi::has_qpsol "
 
-Check if a particular plugin is available
+Check if a particular plugin is available.
 
 ";
 
