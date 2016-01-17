@@ -26,7 +26,7 @@
 #ifndef CASADI_WORHP_INTERFACE_HPP
 #define CASADI_WORHP_INTERFACE_HPP
 
-#include "casadi/core/function/nlpsol.hpp"
+#include "casadi/core/function/nlpsol_impl.hpp"
 #include <casadi/interfaces/worhp/casadi_nlpsol_worhp_export.h>
 
 // GCC_VERSION is defined in 'worhp.h'

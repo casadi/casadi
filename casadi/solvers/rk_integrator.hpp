@@ -26,7 +26,7 @@
 #ifndef CASADI_RK_INTEGRATOR_HPP
 #define CASADI_RK_INTEGRATOR_HPP
 
-#include "casadi/core/function/integrator.hpp"
+#include "casadi/core/function/integrator_impl.hpp"
 #include <casadi/solvers/casadi_integrator_rk_export.h>
 
 /** \defgroup plugin_Integrator_rk

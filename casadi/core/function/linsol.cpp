@@ -23,7 +23,7 @@
  */
 
 
-#include "linsol.hpp"
+#include "linsol_impl.hpp"
 #include "../std_vector_tools.hpp"
 #include "../mx/mx_node.hpp"
 #include <typeinfo>

@@ -26,7 +26,7 @@
 #ifndef CASADI_LAPACK_QR_HPP
 #define CASADI_LAPACK_QR_HPP
 
-#include "casadi/core/function/linsol.hpp"
+#include "casadi/core/function/linsol_impl.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapackqr_export.h>
 
 /** \defgroup plugin_Linsol_lapackqr

@@ -34,7 +34,7 @@
 
 /// \cond INTERNAL
 #include <cs.h>
-#include "casadi/core/function/linsol.hpp"
+#include "casadi/core/function/linsol_impl.hpp"
 #include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {

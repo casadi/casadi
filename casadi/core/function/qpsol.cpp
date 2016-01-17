@@ -23,7 +23,7 @@
  */
 
 
-#include "qpsol.hpp"
+#include "qpsol_impl.hpp"
 #include <typeinfo>
 
 using namespace std;

@@ -27,7 +27,7 @@
 #define CASADI_SUNDIALS_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_sundials_common_export.h>
-#include "casadi/core/function/integrator.hpp"
+#include "casadi/core/function/integrator_impl.hpp"
 
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_dense.h>

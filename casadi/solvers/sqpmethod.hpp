@@ -26,7 +26,7 @@
 #ifndef CASADI_SQPMETHOD_HPP
 #define CASADI_SQPMETHOD_HPP
 
-#include "casadi/core/function/nlpsol.hpp"
+#include "casadi/core/function/nlpsol_impl.hpp"
 #include <deque>
 
 #include <casadi/solvers/casadi_nlpsol_sqpmethod_export.h>

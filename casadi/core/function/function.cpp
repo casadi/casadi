@@ -32,11 +32,11 @@
 #include "external.hpp"
 #include "switch.hpp"
 #include "kernel_sum.hpp"
-#include "integrator.hpp"
-#include "qpsol.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
+#include "integrator_impl.hpp"
+#include "qpsol_impl.hpp"
+#include "nlpsol_impl.hpp"
+#include "rootfinder_impl.hpp"
+#include "linsol_impl.hpp"
 #include "jit.hpp"
 
 #include <typeinfo>
