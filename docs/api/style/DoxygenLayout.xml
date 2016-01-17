@@ -1,11 +1,17 @@
 <doxygenlayout version="1.0">
   <!-- Navigation index tabs for HTML output -->
   <navindex>
-    <tab type="mainpage" visible="yes" title="Function overview"/>
-    <tab type="user" url="@ref casadi::Matrix" title="SX/DM" intro=""/>
-    <tab type="user" url="@ref casadi::MX" title="MX" intro=""/>
-    <tab type="user" url="@ref casadi::Sparsity" title="Sparsity" intro=""/>
-    <tab type="user" url="@ref expression_tools" title="Expression tools" intro=""/>
+    <tab type="mainpage" visible="no" title="Function overview"/>
+    <tab type="user" url="@ref casadi::Function" title="Function" intro=""/>
+    <tab type="usergroup" title="Expression graphs">
+      <tab type="user" url="@ref casadi::Matrix" title="SX/DM" intro=""/>
+      <tab type="user" url="@ref casadi::MX" title="MX" intro=""/>
+      <tab type="user" url="@ref casadi::Sparsity" title="Sparsity" intro=""/>
+      <tab type="user" url="@ref expression_tools" title="Expression tools" intro=""/>
+    </tab>
+    <tab type="usergroup" title="Solvers">
+      <tab type="user" url="@ref nlpsol" title="NLP"/>
+    </tab>
     <tab type="pages" visible="no" title="" intro=""/>
     <tab type="classes" visible="yes" title="">
       <tab type="classes" visible="no" title="" intro=""/>

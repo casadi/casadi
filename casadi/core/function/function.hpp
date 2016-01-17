@@ -1158,8 +1158,8 @@ namespace casadi {
   /** \brief Get the number of integrator outputs */
   CASADI_EXPORT int integrator_n_out();
 
-  ///@{
-  /** Create an NLP solver
+  /** \defgroup nlpsol
+      Create an NLP solver
       Creates a solver for the following parametric nonlinear program (NLP):
       \verbatim
 
@@ -1174,11 +1174,22 @@ namespace casadi {
       nx: number of decision variables
       ng: number of constraints
       np: number of parameters
-
+      
       \endverbatim
+      
+      
+      \generalsection{Nlpsol}
+      \pluginssection{Nlpsol}
+
       \author Joel Andersson
       \date 2011-2015
   */
+  /** \ingroup nlpsol
+  *  @{
+  */
+  /** Create an NLP solver
+  */
+  ///@{
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
                                 const SXDict& nlp, const Dict& opts=Dict());
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
@@ -1208,6 +1219,8 @@ namespace casadi {
 
   /** \brief Get the number of NLP solver outputs */
   CASADI_EXPORT int nlpsol_n_out();
+
+  /** @} */
 
   ///@{
   /** Create a QP solver

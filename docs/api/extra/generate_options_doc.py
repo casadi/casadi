@@ -277,9 +277,9 @@ def newline2br(a):
   
 def optionsashtml(option,used=True):
   if used:
-    return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(htmlescape(option['description'])),newline2br(option['used']))
+    return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],newline2br(htmlescape(option['description'])),newline2br(option['used']))
   else:
-    return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(htmlescape(option['description'])))
+    return "<tr><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],newline2br(htmlescape(option['description'])))
 
 def statsashtml(stat,used=True):
   if used:
@@ -351,7 +351,7 @@ for name,meta in sorted(metadata.items()):
     f.write("/** \class %s\n\\n\n\\par\n" % t)
     f.write("<a name='options'></a><table>\n")
     f.write("<caption>List of available options</caption>\n")
-    f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
+    f.write("<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>\n")
     for k in myoptionskeys :
       f.write(optionsashtml(alloptions[k])+"\n")
     f.write( "</table>\n")
@@ -364,8 +364,8 @@ for name,meta in sorted(metadata.items()):
     fdiagram.write( "*/\n")
     fdiagram.write("/// \endcond\n")
     
-  if "casadi::PluginInterface" in meta["hierarchy"] and 'casadi::FunctionInternal' not in meta["parents"]:
-        
+
+  if "casadi::PluginInterface" in meta["hierarchy"]:
     m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
     if not m:
       print "This plugin is undocumented. add \\pluginbrief{class,name} to it: " + meta["file"]
@@ -374,7 +374,7 @@ for name,meta in sorted(metadata.items()):
       f.write("/** \\addtogroup plugin_%s_%s\n\\n\n\\par\n" % (m.group(2),m.group(1)))
       f.write("<a name='options'></a><table>\n")
       f.write("<caption>List of available options</caption>\n")
-      f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>\n")
+      f.write("<tr><th>Id</th><th>Type</th><th>Description</th></tr>\n")
       for k in myoptionskeys :
         #if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[alloptions[k]["used"]]["parents"]:
         if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[metadata[alloptions[k]["used"]]["parents"][0]]["hierarchy"]:
@@ -382,23 +382,20 @@ for name,meta in sorted(metadata.items()):
       f.write( "</table>\n")
       f.write( "*/\n")
     
-  if 'InternalFor' in meta:
-    for t in meta['InternalFor']:
-      if "casadi::PluginInterface" in meta["parents"]:
-        f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
-      else:
-        f.write("/** \class %s\n\\n\n\\par\n" % t)
-      f.write("<a name='options'></a><table>\n")
-      f.write("<caption>List of available options</caption>\n")
-      f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
-      for k in myoptionskeys :
-        f.write(optionsashtml(alloptions[k])+"\n")
-      f.write( "</table>\n")
-      f.write( "*/\n")
-      
-      fdiagram.write("/** \class %s\n" % t)
-      fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
-      fdiagram.write( "*/\n")
+    t = name
+    print "test", name, myoptionskeys
+    f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
+    f.write("<a name='options'></a><table>\n")
+    f.write("<caption>List of available options</caption>\n")
+    f.write("<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>\n")
+    for k in myoptionskeys :
+      f.write(optionsashtml(alloptions[k])+"\n")
+    f.write( "</table>\n")
+    f.write( "*/\n")
+    
+    fdiagram.write("/** \class %s\n" % t)
+    fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
+    fdiagram.write( "*/\n")
     
 f.close()
 
