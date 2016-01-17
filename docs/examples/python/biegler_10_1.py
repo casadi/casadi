@@ -78,7 +78,7 @@ for N in range(1,11):
   # Get the coefficients of the continuity equation
   D = DM.zeros(K+1)
   for j in range(K+1):
-    [D[j]] = l[j]([1.])[0]
+    [D[j]] = l[j]([1.])
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
