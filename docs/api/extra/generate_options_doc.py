@@ -238,7 +238,9 @@ for name,meta in metadata.items():
           if isinstance(optiongroup,str):
             m = re.search("(.*?)::options_",optiongroup)
             assert m
-            meta['optionproviders'].append(m.group(1))
+            op = m.group(1)
+            if "casadi" not in op: op = "casadi::" + op
+            meta['optionproviders'].append(op)
             continue
           if len(optiongroup[0])==0:
             continue
@@ -376,9 +378,12 @@ for name,meta in sorted(metadata.items()):
       f.write("<caption>List of available options</caption>\n")
       f.write("<tr><th>Id</th><th>Type</th><th>Description</th></tr>\n")
       for k in myoptionskeys :
-        #if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[alloptions[k]["used"]]["parents"]:
-        if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[metadata[alloptions[k]["used"]]["parents"][0]]["hierarchy"]:
-          f.write(optionsashtml(alloptions[k],used=False)+"\n")
+        try:
+          #if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[alloptions[k]["used"]]["parents"]:
+          if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[metadata[alloptions[k]["used"]]["parents"][0]]["hierarchy"]:
+            f.write(optionsashtml(alloptions[k],used=False)+"\n")
+        except:
+          pass
       f.write( "</table>\n")
       f.write( "*/\n")
     
