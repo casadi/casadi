@@ -113,7 +113,7 @@ sol = solver(x0=param_guess)
 
 print sol["x"]*scale
 
-assert(max(fabs(sol["x"]*scale-param_truth))<1e-8)
+assert(norm_inf(sol["x"]*scale-param_truth)<1e-8)
 
 ############ Identifying the simulated system: multiple shooting strategy ##########
 
@@ -142,4 +142,4 @@ sol = solver(x0=x0,lbg=0,ubg=0)
 
 print sol["x"][:4]*scale
 
-assert(max(fabs(sol["x"][:4]*scale-param_truth))<1e-8)
+assert(norm_inf(sol["x"][:4]*scale-param_truth)<1e-8)
