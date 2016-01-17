@@ -2157,15 +2157,6 @@ class NZproxy:
       yield self[k]
 %}
 
-%define %matrix_convertors
-%pythoncode %{
-
-    def __iter__(self):
-      for k in self.nz:
-        yield k
-
-%}
-%enddef
 %define %matrix_helpers(Type)
 %pythoncode %{
     @property
@@ -2323,11 +2314,6 @@ class NZproxy:
     // Transpose using the A' syntax in addition to A.'
     Type ctranspose() const { return $self->T();}
 
-%enddef
-#endif
-
-#ifndef SWIGPYTHON
-%define %matrix_convertors
 %enddef
 #endif
 
@@ -3005,16 +2991,12 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 
 namespace casadi{
   %extend Matrix<double> {
-
     void assign(const casadi::Matrix<double>&rhs) { (*$self)=rhs; }
-    %matrix_convertors
     %matrix_helpers(casadi::Matrix<double>)
 
   }
   %extend Matrix<int> {
-
     void assign(const casadi::Matrix<int>&rhs) { (*$self)=rhs; }
-    %matrix_convertors
     %matrix_helpers(casadi::Matrix<int>)
 
   }
@@ -3219,8 +3201,6 @@ except:
 
 namespace casadi {
 %extend Matrix<SXElem>{
-
-    %matrix_convertors
     %matrix_helpers(casadi::Matrix<casadi::SXElem>)
 
   #ifdef SWIGPYTHON
