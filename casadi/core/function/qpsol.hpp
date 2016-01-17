@@ -54,19 +54,19 @@ namespace casadi {
       If H is not positive-definite, the solver should throw an error.
 
       \endverbatim
-      
+
       \generalsection{Qpsol}
       \pluginssection{Qpsol}
-      
+
       \author Joel Andersson
       \date 2011-2015
   */
-  
+
   /** \defgroup qpsol
   * @copydoc main_qpsol
   *  @{
   */
-  
+
   /** \if EXPANDED
   * @copydoc main_qpsol
   * \endif

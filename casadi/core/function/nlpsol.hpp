@@ -48,19 +48,19 @@ namespace casadi {
       np: number of parameters
 
       \endverbatim
-      
+
       \generalsection{Nlpsol}
       \pluginssection{Nlpsol}
 
       \author Joel Andersson
       \date 2011-2015
   */
-  
+
   /** \defgroup nlpsol
   * @copydoc main_nlpsol
   *  @{
   */
-  
+
   /** \if EXPANDED
   * @copydoc main_nlpsol
   * \endif
@@ -120,7 +120,7 @@ namespace casadi {
 
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_nlpsol(const std::string& name);
-  
+
   /** @} */
 
 } // namespace casadi

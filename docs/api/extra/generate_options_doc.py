@@ -208,7 +208,7 @@ for name,meta in metadata.items():
     meta['monitors']={}
     meta['optionproviders'] = []
     continue
-  source = re.sub(r'\.hpp$',r'.cpp',meta['file'])
+  source = re.sub(r'(_impl)?\.hpp$',r'.cpp',meta['file'])
   meta['options']={}
   meta['stats']={}
   meta['monitors']={}

@@ -47,21 +47,21 @@ namespace casadi {
    *
    * By default, the first input is unknown and the first output is the residual.
    *
-   *       
+   *
    * \generalsection{Rootfinder}
    * \pluginssection{Rootfinder}
    *
    * \author Joel Andersson
    * \date 2011-2015
    */
-   
-    
+
+
   /** \defgroup rootfinder
   * @copydoc main_rootfinder
   *  @{
   */
-  
-   
+
+
   /** \if EXPANDED
   * @copydoc main_rootfinder
   * \endif
@@ -79,9 +79,9 @@ namespace casadi {
 
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_rootfinder(const std::string& name);
-  
+
   /** @} */
-  
+
 } // namespace casadi
 
 #endif // CASADI_ROOTFINDER_HPP

@@ -62,10 +62,10 @@ namespace casadi {
       gx, gz and gq have a linear dependency on rx, rz and rp.
 
       \endverbatim
-      
+
       \generalsection{Integrator}
       \pluginssection{Integrator}
-      
+
       \author Joel Andersson
       \date 2011-2015
   */
@@ -73,7 +73,7 @@ namespace casadi {
   * @copydoc main_integrator
   *  @{
   */
-  
+
   /** \if EXPANDED
   * @copydoc main_integrator
   * \endif
@@ -121,7 +121,7 @@ namespace casadi {
   /** \brief Get the number of integrator outputs */
   CASADI_EXPORT int integrator_n_out();
   /** @} */
-  
+
 } // namespace casadi
 
 #endif // CASADI_INTEGRATOR_HPP

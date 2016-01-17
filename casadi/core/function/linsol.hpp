@@ -31,7 +31,7 @@
 namespace casadi {
 
 
-  /** \defgroup main_linsol 
+  /** \defgroup main_linsol
    * Create a solver for linear systems of equations
    * Solves the linear system A*X = B or A^T*X = B for X
    * with A square and non-singular
@@ -55,12 +55,12 @@ namespace casadi {
    * \author Joel Andersson
    * \date 2011-2015
    */
-  
+
   /** \defgroup linsol
   * @copydoc main_linsol
   *  @{
   */
-  
+
   /** \if EXPANDED
   * @copydoc main_linsol
   * \endif
@@ -80,7 +80,7 @@ namespace casadi {
   CASADI_EXPORT std::string doc_linsol(const std::string& name);
 
   /** @} */
-  
+
 } // namespace casadi
 
 #endif // CASADI_LINSOL_HPP
