@@ -584,16 +584,6 @@ import_array();
         }
       }
 
-      // Scalar IM
-      {
-        IM *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
-            && m2->is_scalar()) {
-          if (m) **m = m2->getIntValue();
-          return true;
-        }
-      }
-
       // No match
       return false;
     }
@@ -618,26 +608,6 @@ import_array();
 
       // Standard typemaps
       if (SWIG_IsOK(SWIG_AsVal(double)(p, m ? *m : 0))) return true;
-
-      // Scalar DM
-      {
-        DM *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<double>*), 0))
-            && m2->is_scalar()) {
-          if (m) **m = m2->getValue();
-          return true;
-        }
-      }
-
-      // Scalar IM
-      {
-        IM *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2), $descriptor(casadi::Matrix<int>*), 0))
-            && m2->is_scalar()) {
-          if (m) **m = m2->getValue();
-          return true;
-        }
-      }
 
       // No match
       return false;

@@ -2200,21 +2200,21 @@ class MXtests(casadiTestCase):
 
     s= evalvertsplit(vertcat([y]+dvars+[z]),2)
     
-    self.checkarray(s[0],DM([y_,dvars_[0]]))
-    self.checkarray(s[1],DM([dvars_[1],dvars_[2]]))
-    self.checkarray(s[2],DM([dvars_[3],dvars_[4]]))
-    self.checkarray(s[3],DM([z_]))
+    self.checkarray(s[0],vertcat([y_,dvars_[0]]))
+    self.checkarray(s[1],vertcat([dvars_[1],dvars_[2]]))
+    self.checkarray(s[2],vertcat([dvars_[3],dvars_[4]]))
+    self.checkarray(s[3],vertcat([z_]))
     
     s= evalvertsplit(vertcat([y,zz,z,zz]),2)
     
-    self.checkarray(s[0],DM([y_,zz_[0]]))
-    self.checkarray(s[1],DM([zz_[1],z_]))
+    self.checkarray(s[0],vertcat([y_,zz_[0]]))
+    self.checkarray(s[1],vertcat([zz_[1],z_]))
     self.checkarray(s[2],zz_)
     
     s= evalvertsplit(vertcat([y,zz,z,zz]),3)
     
-    self.checkarray(s[0],DM([y_,zz_[0],zz_[1]]))
-    self.checkarray(s[1],DM([z_,zz_[0],zz_[1]]))
+    self.checkarray(s[0],vertcat([y_,zz_[0],zz_[1]]))
+    self.checkarray(s[1],vertcat([z_,zz_[0],zz_[1]]))
     
     s= evalvertsplit(vertcat([zz,zz]),2)
     self.checkarray(s[0],zz_)
@@ -2279,21 +2279,21 @@ class MXtests(casadiTestCase):
 
     s= evalhorzsplit(horzcat([y]+dvars+[z]),2)
     
-    self.checkarray(s[0],DM([y_,dvars_[0]]).T)
-    self.checkarray(s[1],DM([dvars_[1],dvars_[2]]).T)
-    self.checkarray(s[2],DM([dvars_[3],dvars_[4]]).T)
-    self.checkarray(s[3],DM([z_]).T)
+    self.checkarray(s[0],vertcat([y_,dvars_[0]]).T)
+    self.checkarray(s[1],vertcat([dvars_[1],dvars_[2]]).T)
+    self.checkarray(s[2],vertcat([dvars_[3],dvars_[4]]).T)
+    self.checkarray(s[3],vertcat([z_]).T)
     
     s= evalhorzsplit(horzcat([y,zz,z,zz]),2)
     
-    self.checkarray(s[0],DM([y_,zz_[0,0]]).T)
-    self.checkarray(s[1],DM([zz_[0,1],z_]).T)
+    self.checkarray(s[0],vertcat([y_,zz_[0,0]]).T)
+    self.checkarray(s[1],vertcat([zz_[0,1],z_]).T)
     self.checkarray(s[2],zz_)
     
     s= evalhorzsplit(horzcat([y,zz,z,zz]),3)
     
-    self.checkarray(s[0],DM([y_,zz_[0,0],zz_[0,1]]).T)
-    self.checkarray(s[1],DM([z_,zz_[0,0],zz_[0,1]]).T)
+    self.checkarray(s[0],vertcat([y_,zz_[0,0],zz_[0,1]]).T)
+    self.checkarray(s[1],vertcat([z_,zz_[0,0],zz_[0,1]]).T)
     
     s= evalhorzsplit(horzcat([zz,zz]),2)
     self.checkarray(s[0],zz_)

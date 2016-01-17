@@ -783,7 +783,7 @@ class typemaptests(casadiTestCase):
     with self.assertRaises(RuntimeError):
       solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": SX.sym("x")}})
       
-    nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": DM(1)}})
+    nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": 1}})
     
 if __name__ == '__main__':
     unittest.main()
