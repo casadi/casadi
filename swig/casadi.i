@@ -2052,16 +2052,16 @@ copysign = lambda x,y: casadi_copysign(x, y)
 %rename(logic_any) friendwrap_any;
 
 // Non-fatal errors (returning NotImplemented singleton)
-%feature("python:maybecall") casadi_plus;
-%feature("python:maybecall") casadi_minus;
-%feature("python:maybecall") casadi_times;
-%feature("python:maybecall") casadi_rdivide;
-%feature("python:maybecall") casadi_lt;
-%feature("python:maybecall") casadi_le;
-%feature("python:maybecall") casadi_eq;
-%feature("python:maybecall") casadi_ne;
-%feature("python:maybecall") casadi_power;
-%feature("python:maybecall") casadi_atan2;
+%feature("python:maybecall") friendwrap_plus;
+%feature("python:maybecall") friendwrap_minus;
+%feature("python:maybecall") friendwrap_times;
+%feature("python:maybecall") friendwrap_rdivide;
+%feature("python:maybecall") friendwrap_lt;
+%feature("python:maybecall") friendwrap_le;
+%feature("python:maybecall") friendwrap_eq;
+%feature("python:maybecall") friendwrap_ne;
+%feature("python:maybecall") friendwrap_power;
+%feature("python:maybecall") friendwrap_atan2;
 %feature("python:maybecall") casadi_min;
 %feature("python:maybecall") casadi_max;
 %feature("python:maybecall") casadi_and;
@@ -2726,17 +2726,17 @@ GENERIC_MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 
 %define GENERIC_EXPRESSION_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M %HIDE(plus)(const M& x, const M& y) { return x+y; }
-DECL M %HIDE(minus)(const M& x, const M& y) { return x-y; }
-DECL M %HIDE(times)(const M& x, const M& y) { return x*y; }
-DECL M %HIDE(rdivide)(const M& x, const M& y) { return x/y; }
-DECL M %HIDE(ldivide)(const M& x, const M& y) { return y/x; }
-DECL M %HIDE(lt)(const M& x, const M& y) { return x<y; }
-DECL M %HIDE(le)(const M& x, const M& y) { return x<=y; }
-DECL M %HIDE(gt)(const M& x, const M& y) { return x>y; }
-DECL M %HIDE(ge)(const M& x, const M& y) { return x>=y; }
-DECL M %HIDE(eq)(const M& x, const M& y) { return x==y; }
-DECL M %HIDE(ne)(const M& x, const M& y) { return x!=y; }
+DECL M %SHOW(plus)(const M& x, const M& y) { return x+y; }
+DECL M %SHOW(minus)(const M& x, const M& y) { return x-y; }
+DECL M %SHOW(times)(const M& x, const M& y) { return x*y; }
+DECL M %SHOW(rdivide)(const M& x, const M& y) { return x/y; }
+DECL M %SHOW(ldivide)(const M& x, const M& y) { return y/x; }
+DECL M %SHOW(lt)(const M& x, const M& y) { return x<y; }
+DECL M %SHOW(le)(const M& x, const M& y) { return x<=y; }
+DECL M %SHOW(gt)(const M& x, const M& y) { return x>y; }
+DECL M %SHOW(ge)(const M& x, const M& y) { return x>=y; }
+DECL M %SHOW(eq)(const M& x, const M& y) { return x==y; }
+DECL M %SHOW(ne)(const M& x, const M& y) { return x!=y; }
 DECL M %SHOW(and)(const M& x, const M& y) { return x&&y; }
 DECL M %SHOW(or)(const M& x, const M& y) { return x||y; }
 DECL M %SHOW(not)(const M& x) { return !x; }
@@ -2762,7 +2762,7 @@ DECL M %HIDE(ceil)(const M& x) { return ceil(x); }
 DECL M %HIDE(erf)(const M& x) { return erf(x); }
 DECL M %SHOW(erfinv)(const M& x) { using casadi::erfinv; return erfinv(x); }
 DECL M %HIDE(sign)(const M& x) { using casadi::sign; return sign(x); }
-DECL M %HIDE(power)(const M& x, const M& n) { return pow(x, n); }
+DECL M %SHOW(power)(const M& x, const M& n) { return pow(x, n); }
 DECL M %HIDE(mod)(const M& x, const M& y) { return fmod(x, y); }
 DECL M %SHOW(atan2)(const M& x, const M& y) { return atan2(x, y); }
 DECL M %HIDE(min)(const M& x, const M& y) { return fmin(x, y); }
@@ -3303,30 +3303,30 @@ namespace casadi {
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
-      def __add__(x, y): return casadi_plus(x, y)
-      def __radd__(x, y): return casadi_plus(y, x)
-      def __sub__(x, y): return casadi_minus(x, y)
-      def __rsub__(x, y): return casadi_minus(y, x)
-      def __mul__(x, y): return casadi_times(x, y)
-      def __rmul__(x, y): return casadi_times(y, x)
-      def __div__(x, y): return casadi_rdivide(x, y)
-      def __rdiv__(x, y): return casadi_rdivide(y, x)
-      def __truediv__(x, y): return casadi_rdivide(x, y)
-      def __rtruediv__(x, y): return casadi_rdivide(y, x)
-      def __lt__(x, y): return casadi_lt(x, y)
-      def __rlt__(x, y): return casadi_lt(y, x)
-      def __le__(x, y): return casadi_le(x, y)
-      def __rle__(x, y): return casadi_le(y, x)
-      def __gt__(x, y): return casadi_lt(y, x)
-      def __rgt__(x, y): return casadi_lt(x, y)
-      def __ge__(x, y): return casadi_le(y, x)
-      def __rge__(x, y): return casadi_le(x, y)
-      def __eq__(x, y): return casadi_eq(x, y)
-      def __req__(x, y): return casadi_eq(y, x)
-      def __ne__(x, y): return casadi_ne(x, y)
-      def __rne__(x, y): return casadi_ne(y, x)
-      def __pow__(x, n): return casadi_power(x, n)
-      def __rpow__(n, x): return casadi_power(x, n)
+      def __add__(x, y): return _casadi.plus(x, y)
+      def __radd__(x, y): return _casadi.plus(y, x)
+      def __sub__(x, y): return _casadi.minus(x, y)
+      def __rsub__(x, y): return _casadi.minus(y, x)
+      def __mul__(x, y): return _casadi.times(x, y)
+      def __rmul__(x, y): return _casadi.times(y, x)
+      def __div__(x, y): return _casadi.rdivide(x, y)
+      def __rdiv__(x, y): return _casadi.rdivide(y, x)
+      def __truediv__(x, y): return _casadi.rdivide(x, y)
+      def __rtruediv__(x, y): return _casadi.rdivide(y, x)
+      def __lt__(x, y): return _casadi.lt(x, y)
+      def __rlt__(x, y): return _casadi.lt(y, x)
+      def __le__(x, y): return _casadi.le(x, y)
+      def __rle__(x, y): return _casadi.le(y, x)
+      def __gt__(x, y): return _casadi.lt(y, x)
+      def __rgt__(x, y): return _casadi.lt(x, y)
+      def __ge__(x, y): return _casadi.le(y, x)
+      def __rge__(x, y): return _casadi.le(x, y)
+      def __eq__(x, y): return _casadi.eq(x, y)
+      def __req__(x, y): return _casadi.eq(y, x)
+      def __ne__(x, y): return _casadi.ne(x, y)
+      def __rne__(x, y): return _casadi.ne(y, x)
+      def __pow__(x, n): return _casadi.power(x, n)
+      def __rpow__(n, x): return _casadi.power(x, n)
       def __arctan2__(x, y): return _casadi.atan2(x, y)
       def __rarctan2__(y, x): return _casadi.atan2(x, y)
       def fmin(x, y): return casadi_min(x, y)
