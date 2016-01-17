@@ -59,8 +59,8 @@ p = substitute(p,u,0) # replace u with zero: gives us p
 u_opt = -p/2
 
 # We must constrain u to the interval [-0.75, 1.0], convexity of H ensures that the optimum is obtain at the bound when u_opt is outside the interval
-u_opt = min(u_opt, 1.0)
-u_opt = max(u_opt, -0.75)
+u_opt = fmin(u_opt, 1.0)
+u_opt = fmax(u_opt, -0.75)
 print 'optimal control: ', u_opt
 
 # Augment f with lam_dot and substitute in the value for the optimal control
