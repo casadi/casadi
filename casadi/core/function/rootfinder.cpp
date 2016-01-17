@@ -26,11 +26,53 @@
 #include "rootfinder.hpp"
 #include "../mx/mx_node.hpp"
 #include <iterator>
+#include "linsol.hpp"
 
 #include "../global_options.hpp"
 
 using namespace std;
 namespace casadi {
+
+  bool has_rootfinder(const string& name) {
+    return Rootfinder::hasPlugin(name);
+  }
+
+  void load_rootfinder(const string& name) {
+    Rootfinder::loadPlugin(name);
+  }
+
+  string doc_rootfinder(const string& name) {
+    return Rootfinder::getPlugin(name).doc;
+  }
+
+  Function Function::rootfinder_fun() {
+    casadi_assert(!is_null());
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+    casadi_assert_message(n!=0, "Not a rootfinder");
+    return n->f_;
+  }
+
+  Function Function::rootfinder_jac() {
+    casadi_assert(!is_null());
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+    casadi_assert_message(n!=0, "Not a rootfinder");
+    return n->jac_;
+  }
+
+  Function Function::rootfinder_linsol() {
+    casadi_assert(!is_null());
+    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+    casadi_assert_message(n!=0, "Not a rootfinder");
+    return n->linsol_;
+  }
+
+  Function rootfinder(const std::string& name, const std::string& solver,
+                   const Function& f, const Dict& opts) {
+    Function ret;
+    ret.assignNode(Rootfinder::instantiatePlugin(name, solver, f));
+    ret->construct(opts);
+    return ret;
+  }
 
   Rootfinder::Rootfinder(const std::string& name, const Function& f)
     : FunctionInternal(name), f_(f) {

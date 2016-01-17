@@ -3319,6 +3319,12 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 
 
 %include <casadi/core/function/function.hpp>
+%include <casadi/core/function/integrator.hpp>
+%include <casadi/core/function/qpsol.hpp>
+%include <casadi/core/function/nlpsol.hpp>
+%include <casadi/core/function/rootfinder.hpp>
+%include <casadi/core/function/linsol.hpp>
+
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/function/code_generator.hpp>
 

@@ -26,6 +26,7 @@
 #ifndef CASADI_INTEGRATOR_HPP
 #define CASADI_INTEGRATOR_HPP
 
+#include "integrator.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 

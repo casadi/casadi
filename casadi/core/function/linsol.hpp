@@ -26,6 +26,7 @@
 #ifndef CASADI_LINSOL_HPP
 #define CASADI_LINSOL_HPP
 
+#include "linsol.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 

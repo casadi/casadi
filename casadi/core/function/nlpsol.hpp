@@ -26,9 +26,9 @@
 #ifndef CASADI_NLPSOL_HPP
 #define CASADI_NLPSOL_HPP
 
+#include "nlpsol.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
-
 
 /// \cond INTERNAL
 namespace casadi {

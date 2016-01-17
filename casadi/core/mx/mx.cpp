@@ -31,6 +31,7 @@
 #include "norm.hpp"
 #include "../calculus.hpp"
 #include "../function/mx_function.hpp"
+#include "../function/linsol.hpp"
 
 using namespace std;
 namespace casadi {

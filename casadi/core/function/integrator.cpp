@@ -29,6 +29,112 @@
 using namespace std;
 namespace casadi {
 
+  bool has_integrator(const string& name) {
+    return Integrator::hasPlugin(name);
+  }
+
+  void load_integrator(const string& name) {
+    Integrator::loadPlugin(name);
+  }
+
+  string doc_integrator(const string& name) {
+    return Integrator::getPlugin(name).doc;
+  }
+
+  Function integrator(const string& name, const string& solver,
+                            const SXDict& dae, const Dict& opts) {
+    return integrator(name, solver, Integrator::map2problem(dae), opts);
+  }
+
+  Function integrator(const string& name, const string& solver,
+                            const MXDict& dae, const Dict& opts) {
+    return integrator(name, solver, Integrator::map2problem(dae), opts);
+  }
+
+  Function integrator(const string& name, const string& solver,
+                            const Function& dae, const Dict& opts) {
+    if (dae.is_a("sxfunction")) {
+      SXProblem p = Integrator::fun2problem<SX>(dae);
+      return integrator(name, solver, p, opts);
+    } else {
+      MXProblem p = Integrator::fun2problem<MX>(dae);
+      return integrator(name, solver, p, opts);
+    }
+  }
+
+  Function integrator(const string& name, const string& solver,
+                                const pair<Function, Function>& dae,
+                                const Dict& opts) {
+    if (dae.first.is_a("sxfunction")) {
+      SXProblem p = Integrator::fun2problem<SX>(dae.first, dae.second);
+      return integrator(name, solver, p, opts);
+    } else {
+      MXProblem p = Integrator::fun2problem<MX>(dae.first, dae.second);
+      return integrator(name, solver, p, opts);
+    }
+  }
+
+  Function integrator(const string& name, const string& solver,
+                                const XProblem& dae, const Dict& opts) {
+    Function ret;
+    ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
+    ret->construct(opts);
+    return ret;
+  }
+
+  Function Function::integrator_dae() {
+    casadi_assert(!is_null());
+    Integrator* n = dynamic_cast<Integrator*>(get());
+    casadi_assert_message(n!=0, "Not an integrator");
+    return n->f_;
+  }
+
+  vector<string> integrator_in() {
+    vector<string> ret(integrator_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=integrator_in(i);
+    return ret;
+  }
+
+  vector<string> integrator_out() {
+    vector<string> ret(integrator_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=integrator_out(i);
+    return ret;
+  }
+
+  string integrator_in(int ind) {
+    switch (static_cast<IntegratorInput>(ind)) {
+    case INTEGRATOR_X0:  return "x0";
+    case INTEGRATOR_P:   return "p";
+    case INTEGRATOR_Z0:  return "z0";
+    case INTEGRATOR_RX0: return "rx0";
+    case INTEGRATOR_RP:  return "rp";
+    case INTEGRATOR_RZ0: return "rz0";
+    case INTEGRATOR_NUM_IN: break;
+    }
+    return string();
+  }
+
+  string integrator_out(int ind) {
+    switch (static_cast<IntegratorOutput>(ind)) {
+    case INTEGRATOR_XF:  return "xf";
+    case INTEGRATOR_QF:  return "qf";
+    case INTEGRATOR_ZF:  return "zf";
+    case INTEGRATOR_RXF: return "rxf";
+    case INTEGRATOR_RQF: return "rqf";
+    case INTEGRATOR_RZF: return "rzf";
+    case INTEGRATOR_NUM_OUT: break;
+    }
+    return string();
+  }
+
+  int integrator_n_in() {
+    return INTEGRATOR_NUM_IN;
+  }
+
+  int integrator_n_out() {
+    return INTEGRATOR_NUM_OUT;
+  }
+
   Integrator::Integrator(const std::string& name, const XProblem& dae)
     : FunctionInternal(name), dae_(dae) {
 
