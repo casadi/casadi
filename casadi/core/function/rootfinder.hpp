@@ -140,6 +140,15 @@ namespace casadi {
   };
 
 
+  /// Access rhs function for a rootfinder
+  CASADI_EXPORT Function rootfinder_fun(const Function& f);
+
+  /// Access Jacobian of the ths function for a rootfinder
+  CASADI_EXPORT Function rootfinder_jac(const Function& f);
+
+  /// Access linear solver of a rootfinder
+  CASADI_EXPORT Function rootfinder_linsol(const Function& f);
+
 
 } // namespace casadi
 /// \endcond

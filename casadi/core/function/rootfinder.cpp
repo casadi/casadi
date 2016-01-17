@@ -45,23 +45,23 @@ namespace casadi {
     return Rootfinder::getPlugin(name).doc;
   }
 
-  Function Function::rootfinder_fun() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+  Function rootfinder_fun(const Function& f) {
+    casadi_assert(!f.is_null());
+    const Rootfinder* n = dynamic_cast<const Rootfinder*>(f.get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->f_;
   }
 
-  Function Function::rootfinder_jac() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+  Function rootfinder_jac(const Function& f) {
+    casadi_assert(!f.is_null());
+    const Rootfinder* n = dynamic_cast<const Rootfinder*>(f.get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->jac_;
   }
 
-  Function Function::rootfinder_linsol() {
-    casadi_assert(!is_null());
-    Rootfinder* n = dynamic_cast<Rootfinder*>(get());
+  Function rootfinder_linsol(const Function& f) {
+    casadi_assert(!f.is_null());
+    const Rootfinder* n = dynamic_cast<const Rootfinder*>(f.get());
     casadi_assert_message(n!=0, "Not a rootfinder");
     return n->linsol_;
   }

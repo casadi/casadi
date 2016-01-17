@@ -988,15 +988,6 @@ namespace casadi {
      */
     DM linsol_cholesky(bool tr=false, int mem=0) const;
 
-    /// Access rhs function for a rootfinder
-    Function rootfinder_fun();
-
-    /// Access Jacobian of the ths function for a rootfinder
-    Function rootfinder_jac();
-
-    /// Access linear solver of a rootfinder
-    Function rootfinder_linsol();
-
     /// Get the DAE for an integrator
     Function integrator_dae();
 
