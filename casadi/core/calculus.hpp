@@ -260,11 +260,13 @@ namespace casadi {
 
   ///@{
   /** \brief  CasADi additions */
+  inline double simplify(double x) { return x;}
   inline double constpow(double x, double y) { return pow(x, y);}
   inline double printme(double x, double y) {
     std::cout << "|> " << y << " : " << x << std::endl;
     return x;
   }
+  inline bool is_equal(double x, double y, int depth=0) { return x==y;}
 
   #ifdef HAS_COPYSIGN
   using std::copysign;

@@ -2375,6 +2375,7 @@ namespace casadi{
 #define IS_IMATRIX  0x10000
 #define IS_SX       0x100000
 #define IS_MX       0x1000000
+#define IS_DOUBLE   0x10000000
 
 %define SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
@@ -2769,18 +2770,18 @@ DECL M %HIDE(log10)(const M& x) { return log10(x); }
 DECL M %HIDE(floor)(const M& x) { return floor(x); }
 DECL M %HIDE(ceil)(const M& x) { return ceil(x); }
 DECL M %HIDE(erf)(const M& x) { return erf(x); }
-DECL M %SHOW(erfinv)(const M& x) { return erfinv(x); }
-DECL M %HIDE(sign)(const M& x) { return sign(x); }
+DECL M %SHOW(erfinv)(const M& x) { using casadi::erfinv; return erfinv(x); }
+DECL M %HIDE(sign)(const M& x) { using casadi::sign; return sign(x); }
 DECL M %HIDE(power)(const M& x, const M& n) { return pow(x, n); }
 DECL M %HIDE(mod)(const M& x, const M& y) { return fmod(x, y); }
 DECL M %HIDE(atan2)(const M& x, const M& y) { return atan2(x, y); }
 DECL M %HIDE(min)(const M& x, const M& y) { return fmin(x, y); }
 DECL M %HIDE(max)(const M& x, const M& y) { return fmax(x, y); }
-DECL M %SHOW(simplify)(const M& x) { return simplify(x); }
-DECL bool %SHOW(is_equal)(const M& x, const M& y, int depth=0) { return is_equal(x, y, depth); }
-DECL bool %SHOW(iszero)(const M& x) { return iszero(x); }
+DECL M %SHOW(simplify)(const M& x) { using casadi::simplify; return simplify(x); }
+DECL bool %SHOW(is_equal)(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
+DECL bool %SHOW(iszero)(const M& x) { using casadi::iszero; return iszero(x); }
 DECL M %HIDE(copysign)(const M& x, const M& y) { return copysign(x, y); }
-DECL M %HIDE(constpow)(const M& x, const M& y) { return constpow(x, y); }
+DECL M %HIDE(constpow)(const M& x, const M& y) { using casadi::constpow; return constpow(x, y); }
 #endif // FLAG & IS_MEMBER
 %enddef
 
@@ -2789,6 +2790,7 @@ GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_MX), MX)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_IMATRIX), Matrix<int>)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DMATRIX), Matrix<double>)
 GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
+GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DOUBLE), double)
 %enddef
 
 %define MATRIX_FUN(DECL, FLAG, M)
