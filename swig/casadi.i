@@ -3227,21 +3227,8 @@ namespace casadi {
 
 %extend casadi::MX{
   %matrix_helpers(casadi::MX)
-
   #ifdef SWIGPYTHON
   %python_array_wrappers(1002.0)
-
-  %pythoncode %{
-  def __array_custom__(self,*args,**kwargs):
-    import numpy as np
-    if np.__version__=="1.8.1": #1083
-      return np.array(np.nan)
-    raise Exception("MX cannot be converted to an array. MX.__array__ purely exists to allow ufunc/numpy goodies")
-
-  def __iter__(self):
-    return self.nz.__iter__()
-
-  %}
   #endif //SWIGPYTHON
 };
 

@@ -1492,9 +1492,6 @@ class MXtests(casadiTestCase):
       self.assertTrue(is_equal(w[1],b))
       self.assertTrue(is_equal(w[2],c))
     
-  def test_iter(self):
-    self.assertEqual(len(list(MX.sym("x",2))),2)
-
   @known_bug()
   def test_vertcat_empty(self):
     a = MX(DM(0,2))
