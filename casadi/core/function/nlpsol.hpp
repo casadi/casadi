@@ -30,8 +30,8 @@
 
 namespace casadi {
 
-  ///@{
-  /** Create an NLP solver
+  /** \defgroup main_nlpsol
+      Create an NLP solver
       Creates a solver for the following parametric nonlinear program (NLP):
       \verbatim
 
@@ -48,9 +48,24 @@ namespace casadi {
       np: number of parameters
 
       \endverbatim
+      
+      \generalsection{Nlpsol}
+      \pluginssection{Nlpsol}
+
       \author Joel Andersson
       \date 2011-2015
   */
+  
+  /** \defgroup nlpsol
+  * @copydoc main_nlpsol
+  *  @{
+  */
+  
+  /** \if EXPANDED
+  * @copydoc main_nlpsol
+  * \endif
+  */
+  ///@{
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
                                 const SXDict& nlp, const Dict& opts=Dict());
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
@@ -63,16 +78,32 @@ namespace casadi {
 #endif // SWIG
   ///@}
 
-  /** \brief Get input scheme of NLP solvers */
+  /** \brief Get input scheme of NLP solvers
+  * \if EXPANDED
+  * @copydoc scheme_NlpsolInput
+  * \endif
+  */
   CASADI_EXPORT std::vector<std::string> nlpsol_in();
 
-  /** \brief Get NLP solver output scheme of NLP solvers */
+  /** \brief Get NLP solver output scheme of NLP solvers
+  * \if EXPANDED
+  * @copydoc scheme_NlpsolOutput
+  * \endif
+  */
   CASADI_EXPORT std::vector<std::string> nlpsol_out();
 
-  /** \brief Get NLP solver input scheme name by index */
+  /** \brief Get NLP solver input scheme name by index
+  * \if EXPANDED
+  * @copydoc scheme_NlpsolInput
+  * \endif
+  */
   CASADI_EXPORT std::string nlpsol_in(int ind);
 
-  /** \brief Get output scheme name by index */
+  /** \brief Get output scheme name by index
+  * \if EXPANDED
+  * @copydoc scheme_NlpsolOutput
+  * \endif
+  */
   CASADI_EXPORT std::string nlpsol_out(int ind);
 
   /** \brief Get the number of NLP solver inputs */
@@ -89,6 +120,8 @@ namespace casadi {
 
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_nlpsol(const std::string& name);
+  
+  /** @} */
 
 } // namespace casadi
 

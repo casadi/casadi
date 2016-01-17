@@ -10,7 +10,11 @@
       <tab type="user" url="@ref expression_tools" title="Expression tools" intro=""/>
     </tab>
     <tab type="usergroup" title="Solvers">
-      <tab type="user" url="@ref nlpsol" title="NLP"/>
+      <tab type="user" url="@ref nlpsol" title="nlpsol"/>
+      <tab type="user" url="@ref integrator" title="integrator"/>
+      <tab type="user" url="@ref qpsol" title="qpsol"/>
+      <tab type="user" url="@ref linsol" title="linsol"/>
+      <tab type="user" url="@ref rootfinder" title="rootfinder"/>
     </tab>
     <tab type="pages" visible="no" title="" intro=""/>
     <tab type="classes" visible="yes" title="">

@@ -31,8 +31,8 @@
 
 namespace casadi {
 
-  ///@{
-  /** Create a solver for rootfinding problems
+  /** \defgroup main_rootfinder
+   * Create a solver for rootfinding problems
    * Takes a function where one of the inputs is unknown and one of the outputs
    * is a residual function that is always zero, defines a new function where
    * the the unknown input has been replaced by a _guess_ for the unknown and the
@@ -47,9 +47,26 @@ namespace casadi {
    *
    * By default, the first input is unknown and the first output is the residual.
    *
+   *       
+   * \generalsection{Rootfinder}
+   * \pluginssection{Rootfinder}
+   *
    * \author Joel Andersson
    * \date 2011-2015
    */
+   
+    
+  /** \defgroup rootfinder
+  * @copydoc main_rootfinder
+  *  @{
+  */
+  
+   
+  /** \if EXPANDED
+  * @copydoc main_rootfinder
+  * \endif
+  */
+  ///@{
   CASADI_EXPORT Function rootfinder(const std::string& name, const std::string& solver,
                                const Function& f, const Dict& opts=Dict());
   ///@}
@@ -62,7 +79,9 @@ namespace casadi {
 
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_rootfinder(const std::string& name);
-
+  
+  /** @} */
+  
 } // namespace casadi
 
 #endif // CASADI_ROOTFINDER_HPP

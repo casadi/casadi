@@ -30,8 +30,9 @@
 
 namespace casadi {
 
-  ///@{
-  /** Create a solver for linear systems of equations
+
+  /** \defgroup main_linsol 
+   * Create a solver for linear systems of equations
    * Solves the linear system A*X = B or A^T*X = B for X
    * with A square and non-singular
    *
@@ -49,9 +50,22 @@ namespace casadi {
    * The standard evaluation combines the prepare() and solve() step and may
    * therefore more expensive if A is invariant.
    *
+   *  \generalsection{Linsol}
+   *  \pluginssection{Linsol}
    * \author Joel Andersson
    * \date 2011-2015
    */
+  
+  /** \defgroup linsol
+  * @copydoc main_linsol
+  *  @{
+  */
+  
+  /** \if EXPANDED
+  * @copydoc main_linsol
+  * \endif
+  */
+  ///@{
   CASADI_EXPORT Function linsol(const std::string& name, const std::string& solver,
                                 const Sparsity& sp, int nrhs, const Dict& opts=Dict());
   ///@}
@@ -65,6 +79,8 @@ namespace casadi {
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_linsol(const std::string& name);
 
+  /** @} */
+  
 } // namespace casadi
 
 #endif // CASADI_LINSOL_HPP

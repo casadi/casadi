@@ -30,8 +30,8 @@
 
 namespace casadi {
 
-  ///@{
-  /** Create a QP solver
+  /** \defgroup main_qpsol
+      Create a QP solver
       Solves the following strictly convex problem:
 
       \verbatim
@@ -54,9 +54,24 @@ namespace casadi {
       If H is not positive-definite, the solver should throw an error.
 
       \endverbatim
+      
+      \generalsection{Qpsol}
+      \pluginssection{Qpsol}
+      
       \author Joel Andersson
       \date 2011-2015
   */
+  
+  /** \defgroup qpsol
+  * @copydoc main_qpsol
+  *  @{
+  */
+  
+  /** \if EXPANDED
+  * @copydoc main_qpsol
+  * \endif
+  */
+  ///@{
   CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
                                const SpDict& qp, const Dict& opts=Dict());
   CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
@@ -96,6 +111,7 @@ namespace casadi {
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_qpsol(const std::string& name);
 
+  /** @} */
 } // namespace casadi
 
 #endif // CASADI_QPSOL_HPP

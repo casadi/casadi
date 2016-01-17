@@ -32,8 +32,8 @@
 
 namespace casadi {
 
-  ///@{
-  /** Create an ODE/DAE integrator
+  /** \defgroup main_integrator
+      Create an ODE/DAE integrator
       Solves an initial value problem (IVP) coupled to a terminal value problem
       with differential equation given as an implicit ODE coupled to an algebraic
       equation and a set of quadratures:
@@ -62,9 +62,23 @@ namespace casadi {
       gx, gz and gq have a linear dependency on rx, rz and rp.
 
       \endverbatim
+      
+      \generalsection{Integrator}
+      \pluginssection{Integrator}
+      
       \author Joel Andersson
       \date 2011-2015
   */
+  /** \defgroup integrator
+  * @copydoc main_integrator
+  *  @{
+  */
+  
+  /** \if EXPANDED
+  * @copydoc main_integrator
+  * \endif
+  */
+  ///@{
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
                                     const SXDict& dae, const Dict& opts=Dict());
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
@@ -106,7 +120,8 @@ namespace casadi {
 
   /** \brief Get the number of integrator outputs */
   CASADI_EXPORT int integrator_n_out();
-
+  /** @} */
+  
 } // namespace casadi
 
 #endif // CASADI_INTEGRATOR_HPP
