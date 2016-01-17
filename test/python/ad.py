@@ -23,7 +23,8 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
+from numpy import random, array
 import unittest
 from types import *
 from helpers import *

@@ -23,7 +23,8 @@
 #
 
 import casadi as c
-from numpy import *
+import numpy
+from numpy import random, array, linalg, matrix, zeros, ones
 import unittest
 from types import *
 from helpers import *
@@ -827,13 +828,13 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     
     self.assertTrue(SX(0).is_regular())
-    self.assertFalse(SX(Inf).is_regular())
+    self.assertFalse(SX(inf).is_regular())
     with self.assertRaises(Exception):
       self.assertTrue(x.nz[0])
       
     self.assertTrue(SX(DM([0,1])).is_regular())
-    self.assertFalse(SX(DM([0,Inf])).is_regular())
-    self.assertFalse(vertcat([x,Inf]).is_regular())
+    self.assertFalse(SX(DM([0,inf])).is_regular())
+    self.assertFalse(vertcat([x,inf]).is_regular())
     with self.assertRaises(Exception):
       self.assertFalse(vertcat([x,x]).is_regular())
       

@@ -46,7 +46,7 @@ from __future__ import division
 
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import numpy as n
 import unittest
 from types import *

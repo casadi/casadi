@@ -24,7 +24,7 @@
 
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import numpy as n
 import unittest
 from types import *
@@ -857,7 +857,7 @@ class Integrationtests(casadiTestCase):
     qe_in = [0]*qe.n_in();qe_in[0]=A
     qe_in[1]=vec(B)
     qe_out = qe(qe_in)
-    self.checkarray(dot(Be,A)/1e3,qe_out[0]/1e3,"jacobian('x0','xf')")
+    self.checkarray(numpy.dot(Be,A)/1e3,qe_out[0]/1e3,"jacobian('x0','xf')")
     qeJ_in = [0]*qeJ.n_in();qeJ_in[0]=A
     qeJ_in[1]=vec(B)
     qeJ_out = qeJ(qeJ_in)
@@ -980,7 +980,7 @@ class Integrationtests(casadiTestCase):
     Jf_out = Jf(Jf_in)
     self.checkarray(Jf_out[0],Jr,"Jacobian of Nonlin ODE")
     
-    Jr = matrix([[(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)],[(sqrt(p0)*((te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)**2+te*yc0**2-yc0+p0*te)+(yc0**2+p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te))/(sqrt(p0)*(2*yc0**2+2*p0))]])  
+    Jr = numpy.matrix([[(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)],[(sqrt(p0)*((te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)**2+te*yc0**2-yc0+p0*te)+(yc0**2+p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te))/(sqrt(p0)*(2*yc0**2+2*p0))]])  
     
     Jf=qe.jacobian(1,0)
     Jf_in = [0]*Jf.n_in();Jf_in[0]=A

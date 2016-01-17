@@ -23,7 +23,8 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
+from numpy import eye, linalg, arange, matrix
 import unittest
 from types import *
 from helpers import *
@@ -538,19 +539,6 @@ class Matrixtests(casadiTestCase):
           self.checkarray(c==A,m([[0,0],[0,0]]),"==")
           self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
 
-  def test_all_any(self):
-    for m in [DM,IM]:
-      A = m([[1,1],[1,1]])
-      self.assertTrue(all(A))
-      self.assertTrue(any(A))
-      
-      A = m([[1,0],[1,1]])
-      self.assertFalse(all(A))
-      self.assertTrue(any(A))
-
-      A = m([[0,0],[0,0]])
-      self.assertFalse(all(A))
-      self.assertFalse(any(A))
   def test_truth(self):
     self.assertTrue(bool(DM([1])))
     self.assertFalse(bool(DM([0])))
@@ -687,7 +675,7 @@ class Matrixtests(casadiTestCase):
     
   def test_is_regular(self):
     self.assertTrue(DM([1,2]).is_regular())
-    self.assertFalse(DM([1,Inf]).is_regular())
+    self.assertFalse(DM([1,inf]).is_regular())
     self.assertFalse(DM.nan(2).is_regular())
     
   def test_sizes(self):

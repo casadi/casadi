@@ -23,7 +23,7 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import numpy as n
 import unittest
 from types import *
@@ -514,11 +514,11 @@ class typemaptests(casadiTestCase):
   def test_issue190(self):
     self.message("regression test issue #190")
     x=SX.sym("x")
-    x * numpy.array(1)
-    x * numpy.array(1.2)
+    x * array(1)
+    x * array(1.2)
 
-    SX.sym("x") * numpy.array(1.0) 
-    MX.sym("x") * numpy.array(1.0)
+    SX.sym("x") * array(1.0) 
+    MX.sym("x") * array(1.0)
     
   def test_array_cat(self):
     horzcat((SX.sym("x",4,3),ones((4,3))))
@@ -700,7 +700,7 @@ class typemaptests(casadiTestCase):
       return f_out[0]
       
     for i in [SX(1),1,1.0]:
-      a = numpy.array([[1,2],[3,4]])
+      a = array([[1,2],[3,4]])
       print val(SX(a))
       print val(SX(a.T))
 
@@ -727,8 +727,8 @@ class typemaptests(casadiTestCase):
     Ds = [    
           numpy.matrix([[1,2],[3,4]]),
           numpy.matrix([[1,2],[3,4.0]]),
-          numpy.array([[1,2],[3,4]]),
-          numpy.array([[1,2],[3,4.0]]),
+          array([[1,2],[3,4]]),
+          array([[1,2],[3,4.0]]),
         ]
         
     if scipy_available:
