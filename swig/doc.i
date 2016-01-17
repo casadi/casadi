@@ -9631,121 +9631,588 @@ ODE coupled to an algebraic equation and a set of quadratures:
   (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
   gx, gz and gq have a linear dependency on rx, rz and rp.
 
-Joel Andersson
 
-";
 
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const MXDict &dae, const Dict &opts=Dict()) "
+General information
+===================
 
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
+
+
+>Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 6) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| INTEGRATOR_X0          |                        | Differential state at  |
+|                        |                        | the initial time.      |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_P           |                        | Parameters.            |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_Z0          |                        | Initial guess for the  |
+|                        |                        | algebraic variable.    |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RX0         |                        | Backward differential  |
+|                        |                        | state at the final     |
+|                        |                        | time.                  |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RP          |                        | Backward parameter     |
+|                        |                        | vector.                |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RZ0         |                        | Initial guess for the  |
+|                        |                        | backwards algebraic    |
+|                        |                        | variable.              |
++------------------------+------------------------+------------------------+
+
+>Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 6) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| INTEGRATOR_XF          |                        | Differential state at  |
+|                        |                        | the final time.        |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_QF          |                        | Quadrature state at    |
+|                        |                        | the final time.        |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_ZF          |                        | Algebraic variable at  |
+|                        |                        | the final time.        |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RXF         |                        | Backward differential  |
+|                        |                        | state at the initial   |
+|                        |                        | time.                  |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RQF         |                        | Backward quadrature    |
+|                        |                        | state at the initial   |
+|                        |                        | time.                  |
++------------------------+------------------------+------------------------+
+| INTEGRATOR_RZF         |                        | Backward algebraic     |
+|                        |                        | variable at the        |
+|                        |                        | initial time.          |
++------------------------+------------------------+------------------------+
+
+List of plugins
+===============
+
+
+
+- cvodes
+
+- idas
+
+- collocation
+
+- rk
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Integrator.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+cvodes
+------
+
+
+
+Interface to CVodes from the Sundials suite.
+
+A call to evaluate will integrate to the end.
+
+You can retrieve the entire state trajectory as follows, after the evaluate
+call: Call reset. Then call integrate(t_i) and getOuput for a series of
+times t_i.
+
+Note: depending on the dimension and structure of your problem, you may
+experience a dramatic speed-up by using a sparse linear solver:
 
 
 
 ::
 
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
+     intg.setOption(\"linear_solver\",\"csparse\")
+     intg.setOption(\"linear_solver_type\",\"user_defined\")
+
+
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| abstol                 | OT_DOUBLE              | Absolute tolerence for |
+|                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| abstolB                | OT_DOUBLE              | Absolute tolerence for |
+|                        |                        | the adjoint            |
+|                        |                        | sensitivity solution   |
+|                        |                        | [default: equal to     |
+|                        |                        | abstol]                |
++------------------------+------------------------+------------------------+
+| disable_internal_warni | OT_BOOL                | Disable SUNDIALS       |
+| ngs                    |                        | internal warning       |
+|                        |                        | messages               |
++------------------------+------------------------+------------------------+
+| exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
+|                        |                        | information for the    |
+|                        |                        | forward integration    |
++------------------------+------------------------+------------------------+
+| exact_jacobianB        | OT_BOOL                | Use exact Jacobian     |
+|                        |                        | information for the    |
+|                        |                        | backward integration   |
+|                        |                        | [default: equal to     |
+|                        |                        | exact_jacobian]        |
++------------------------+------------------------+------------------------+
+| finite_difference_fsen | OT_BOOL                | Use finite differences |
+| s                      |                        | to approximate the     |
+|                        |                        | forward sensitivity    |
+|                        |                        | equations (if AD is    |
+|                        |                        | not available)         |
++------------------------+------------------------+------------------------+
+| fsens_abstol           | OT_DOUBLE              | Absolute tolerence for |
+|                        |                        | the forward            |
+|                        |                        | sensitivity solution   |
+|                        |                        | [default: equal to     |
+|                        |                        | abstol]                |
++------------------------+------------------------+------------------------+
+| fsens_all_at_once      | OT_BOOL                | Calculate all right    |
+|                        |                        | hand sides of the      |
+|                        |                        | sensitivity equations  |
+|                        |                        | at once                |
++------------------------+------------------------+------------------------+
+| fsens_err_con          | OT_BOOL                | include the forward    |
+|                        |                        | sensitivities in all   |
+|                        |                        | error controls         |
++------------------------+------------------------+------------------------+
+| fsens_reltol           | OT_DOUBLE              | Relative tolerence for |
+|                        |                        | the forward            |
+|                        |                        | sensitivity solution   |
+|                        |                        | [default: equal to     |
+|                        |                        | reltol]                |
++------------------------+------------------------+------------------------+
+| fsens_scaling_factors  | OT_DOUBLEVECTOR        | Scaling factor for the |
+|                        |                        | components if finite   |
+|                        |                        | differences is used    |
++------------------------+------------------------+------------------------+
+| fsens_sensitiviy_param | OT_INTVECTOR           | Specifies which        |
+| eters                  |                        | components will be     |
+|                        |                        | used when estimating   |
+|                        |                        | the sensitivity        |
+|                        |                        | equations              |
++------------------------+------------------------+------------------------+
+| interpolation_type     | OT_STRING              | Type of interpolation  |
+|                        |                        | for the adjoint        |
+|                        |                        | sensitivities          |
++------------------------+------------------------+------------------------+
+| iterative_solver       | OT_STRING              | Iterative solver:      |
+|                        |                        | GMRES|bcgstab|tfqmr    |
++------------------------+------------------------+------------------------+
+| iterative_solverB      | OT_STRING              | Iterative solver for   |
+|                        |                        | backward integration   |
++------------------------+------------------------+------------------------+
+| linear_multistep_metho | OT_STRING              | Integrator scheme:     |
+| d                      |                        | BDF|adams              |
++------------------------+------------------------+------------------------+
+| linear_solver          | OT_STRING              | A custom linear solver |
+|                        |                        | creator function       |
++------------------------+------------------------+------------------------+
+| linear_solverB         | OT_STRING              | A custom linear solver |
+|                        |                        | creator function for   |
+|                        |                        | backwards integration  |
+|                        |                        | [default: equal to     |
+|                        |                        | linear_solver]         |
++------------------------+------------------------+------------------------+
+| linear_solver_options  | OT_DICT                | Options to be passed   |
+|                        |                        | to the linear solver   |
++------------------------+------------------------+------------------------+
+| linear_solver_optionsB | OT_DICT                | Options to be passed   |
+|                        |                        | to the linear solver   |
+|                        |                        | for backwards          |
+|                        |                        | integration [default:  |
+|                        |                        | equal to               |
+|                        |                        | linear_solver_options] |
++------------------------+------------------------+------------------------+
+| linear_solver_type     | OT_STRING              | Type of iterative      |
+|                        |                        | solver: user_defined|D |
+|                        |                        | ENSE|banded|iterative  |
++------------------------+------------------------+------------------------+
+| linear_solver_typeB    | OT_STRING              | Linear solver for      |
+|                        |                        | backward integration   |
++------------------------+------------------------+------------------------+
+| lower_bandwidth        | OT_INT                 | Lower band-width of    |
+|                        |                        | banded Jacobian        |
+|                        |                        | (estimations)          |
++------------------------+------------------------+------------------------+
+| lower_bandwidthB       | OT_INT                 | lower band-width of    |
+|                        |                        | banded jacobians for   |
+|                        |                        | backward integration   |
+|                        |                        | [default: equal to     |
+|                        |                        | lower_bandwidth]       |
++------------------------+------------------------+------------------------+
+| max_krylov             | OT_INT                 | Maximum Krylov         |
+|                        |                        | subspace size          |
++------------------------+------------------------+------------------------+
+| max_krylovB            | OT_INT                 | Maximum krylov         |
+|                        |                        | subspace size for      |
+|                        |                        | backward integration   |
++------------------------+------------------------+------------------------+
+| max_multistep_order    | OT_INT                 | Maximum order for the  |
+|                        |                        | (variable-order)       |
+|                        |                        | multistep method       |
++------------------------+------------------------+------------------------+
+| max_num_steps          | OT_INT                 | Maximum number of      |
+|                        |                        | integrator steps       |
++------------------------+------------------------+------------------------+
+| nonlinear_solver_itera | OT_STRING              | Nonlinear solver type: |
+| tion                   |                        | NEWTON|functional      |
++------------------------+------------------------+------------------------+
+| pretype                | OT_STRING              | Type of                |
+|                        |                        | preconditioning:       |
+|                        |                        | NONE|left|right|both   |
++------------------------+------------------------+------------------------+
+| pretypeB               | OT_STRING              | Preconditioner for     |
+|                        |                        | backward integration   |
++------------------------+------------------------+------------------------+
+| quad_err_con           | OT_BOOL                | Should the quadratures |
+|                        |                        | affect the step size   |
+|                        |                        | control                |
++------------------------+------------------------+------------------------+
+| reltol                 | OT_DOUBLE              | Relative tolerence for |
+|                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| reltolB                | OT_DOUBLE              | Relative tolerence for |
+|                        |                        | the adjoint            |
+|                        |                        | sensitivity solution   |
+|                        |                        | [default: equal to     |
+|                        |                        | reltol]                |
++------------------------+------------------------+------------------------+
+| sensitivity_method     | OT_STRING              | Sensitivity method:    |
+|                        |                        | SIMULTANEOUS|staggered |
++------------------------+------------------------+------------------------+
+| steps_per_checkpoint   | OT_INT                 | Number of steps        |
+|                        |                        | between two            |
+|                        |                        | consecutive            |
+|                        |                        | checkpoints            |
++------------------------+------------------------+------------------------+
+| stop_at_end            | OT_BOOL                | Stop the integrator at |
+|                        |                        | the end of the         |
+|                        |                        | interval               |
++------------------------+------------------------+------------------------+
+| upper_bandwidth        | OT_INT                 | Upper band-width of    |
+|                        |                        | banded Jacobian        |
+|                        |                        | (estimations)          |
++------------------------+------------------------+------------------------+
+| upper_bandwidthB       | OT_INT                 | Upper band-width of    |
+|                        |                        | banded jacobians for   |
+|                        |                        | backward integration   |
+|                        |                        | [default: equal to     |
+|                        |                        | upper_bandwidth]       |
++------------------------+------------------------+------------------------+
+| use_preconditioner     | OT_BOOL                | Precondition an        |
+|                        |                        | iterative solver       |
++------------------------+------------------------+------------------------+
+| use_preconditionerB    | OT_BOOL                | Precondition an        |
+|                        |                        | iterative solver for   |
+|                        |                        | the backwards problem  |
+|                        |                        | [default: equal to     |
+|                        |                        | use_preconditioner]    |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+idas
+----
+
+
+
+Interface to IDAS from the Sundials suite.
+
+Note: depending on the dimension and structure of your problem, you may
+experience a dramatic speed-up by using a sparse linear solver:
+
+
+
+::
+
+     intg.setOption(\"linear_solver\",\"csparse\")
+     intg.setOption(\"linear_solver_type\",\"user_defined\")
+
+
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| abstol                 | OT_DOUBLE              | Absolute tolerence for |
+|                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| abstolB                | OT_DOUBLE              | Absolute tolerence for |
+|                        |                        | the adjoint            |
+|                        |                        | sensitivity solution   |
+|                        |                        | [default: equal to     |
+|                        |                        | abstol]                |
++------------------------+------------------------+------------------------+
+| abstolv                | OT_DOUBLEVECTOR        | Absolute tolerarance   |
+|                        |                        | for each component     |
++------------------------+------------------------+------------------------+
+| calc_ic                | OT_BOOL                | Use IDACalcIC to get   |
+|                        |                        | consistent initial     |
+|                        |                        | conditions.            |
++------------------------+------------------------+------------------------+
+| calc_icB               | OT_BOOL                | Use IDACalcIC to get   |
+|                        |                        | consistent initial     |
+|                        |                        | conditions for         |
+|                        |                        | backwards system       |
+|                        |                        | [default: equal to     |
+|                        |                        | calc_ic].              |
++------------------------+------------------------+------------------------+
+| cj_scaling             | OT_BOOL                | IDAS scaling on cj for |
+|                        |                        | the user-defined       |
+|                        |                        | linear solver module   |
++------------------------+------------------------+------------------------+
+| disable_internal_warni | OT_BOOL                | Disable SUNDIALS       |
+| ngs                    |                        | internal warning       |
+|                        |                        | messages               |
++------------------------+------------------------+------------------------+
+| exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
+|                        |                        | information for the    |
+|                        |                        | forward integration    |
++------------------------+------------------------+------------------------+
+| exact_jacobianB        | OT_BOOL                | Use exact Jacobian     |
+|                        |                        | information for the    |
+|                        |                        | backward integration   |
+|                        |                        | [default: equal to     |
+|                        |                        | exact_jacobian]        |
++------------------------+------------------------+------------------------+
+| extra_fsens_calc_ic    | OT_BOOL                | Call calc ic an extra  |
+|                        |                        | time, with fsens=0     |
++------------------------+------------------------+------------------------+
+| finite_difference_fsen | OT_BOOL                | Use finite differences |
+| s                      |                        | to approximate the     |
+|                        |                        | forward sensitivity    |
+|                        |                        | equations (if AD is    |
+|                        |                        | not available)         |
++------------------------+------------------------+------------------------+
+| first_time             | OT_DOUBLE              | First requested time   |
+|                        |                        | as a fraction of the   |
+|                        |                        | time interval          |
++------------------------+------------------------+------------------------+
+| fsens_abstol           | OT_DOUBLE              | Absolute tolerence for |
+|                        |                        | the forward            |
+|                        |                        | sensitivity solution   |
+|                        |                        | [default: equal to     |
+|                        |                        | abstol]                |
++------------------------+------------------------+------------------------+
+| fsens_abstolv          | OT_DOUBLEVECTOR        | Absolute tolerarance   |
+|                        |                        | for each component,    |
+|                        |                        | forward sensitivities  |
++------------------------+------------------------+------------------------+
+| fsens_err_con          | OT_BOOL                | include the forward    |
+|                        |                        | sensitivities in all   |
+|                        |                        | error controls         |
++------------------------+------------------------+------------------------+
+| fsens_reltol           | OT_DOUBLE              | Relative tolerence for |
+|                        |                        | the forward            |
+|                        |                        | sensitivity solution   |
+|                        |                        | [default: equal to     |
+|                        |                        | reltol]                |
++------------------------+------------------------+------------------------+
+| fsens_scaling_factors  | OT_DOUBLEVECTOR        | Scaling factor for the |
+|                        |                        | components if finite   |
+|                        |                        | differences is used    |
++------------------------+------------------------+------------------------+
+| fsens_sensitiviy_param | OT_INTVECTOR           | Specifies which        |
+| eters                  |                        | components will be     |
+|                        |                        | used when estimating   |
+|                        |                        | the sensitivity        |
+|                        |                        | equations              |
++------------------------+------------------------+------------------------+
+| init_xdot              | OT_DOUBLEVECTOR        | Initial values for the |
+|                        |                        | state derivatives      |
++------------------------+------------------------+------------------------+
+| interpolation_type     | OT_STRING              | Type of interpolation  |
+|                        |                        | for the adjoint        |
+|                        |                        | sensitivities          |
++------------------------+------------------------+------------------------+
+| iterative_solver       | OT_STRING              | Iterative solver:      |
+|                        |                        | GMRES|bcgstab|tfqmr    |
++------------------------+------------------------+------------------------+
+| iterative_solverB      | OT_STRING              | Iterative solver for   |
+|                        |                        | backward integration   |
++------------------------+------------------------+------------------------+
+| linear_solver          | OT_STRING              | A custom linear solver |
+|                        |                        | creator function       |
++------------------------+------------------------+------------------------+
+| linear_solverB         | OT_STRING              | A custom linear solver |
+|                        |                        | creator function for   |
+|                        |                        | backwards integration  |
+|                        |                        | [default: equal to     |
+|                        |                        | linear_solver]         |
++------------------------+------------------------+------------------------+
+| linear_solver_options  | OT_DICT                | Options to be passed   |
+|                        |                        | to the linear solver   |
++------------------------+------------------------+------------------------+
+| linear_solver_optionsB | OT_DICT                | Options to be passed   |
+|                        |                        | to the linear solver   |
+|                        |                        | for backwards          |
+|                        |                        | integration [default:  |
+|                        |                        | equal to               |
+|                        |                        | linear_solver_options] |
++------------------------+------------------------+------------------------+
+| linear_solver_type     | OT_STRING              | Type of iterative      |
+|                        |                        | solver: user_defined|D |
+|                        |                        | ENSE|banded|iterative  |
++------------------------+------------------------+------------------------+
+| linear_solver_typeB    | OT_STRING              | Linear solver for      |
+|                        |                        | backward integration   |
++------------------------+------------------------+------------------------+
+| lower_bandwidth        | OT_INT                 | Lower band-width of    |
+|                        |                        | banded Jacobian        |
+|                        |                        | (estimations)          |
++------------------------+------------------------+------------------------+
+| lower_bandwidthB       | OT_INT                 | lower band-width of    |
+|                        |                        | banded jacobians for   |
+|                        |                        | backward integration   |
+|                        |                        | [default: equal to     |
+|                        |                        | lower_bandwidth]       |
++------------------------+------------------------+------------------------+
+| max_krylov             | OT_INT                 | Maximum Krylov         |
+|                        |                        | subspace size          |
++------------------------+------------------------+------------------------+
+| max_krylovB            | OT_INT                 | Maximum krylov         |
+|                        |                        | subspace size for      |
+|                        |                        | backward integration   |
++------------------------+------------------------+------------------------+
+| max_multistep_order    | OT_INT                 | Maximum order for the  |
+|                        |                        | (variable-order)       |
+|                        |                        | multistep method       |
++------------------------+------------------------+------------------------+
+| max_num_steps          | OT_INT                 | Maximum number of      |
+|                        |                        | integrator steps       |
++------------------------+------------------------+------------------------+
+| max_step_size          | OT_DOUBLE              | Maximim step size      |
++------------------------+------------------------+------------------------+
+| pretype                | OT_STRING              | Type of                |
+|                        |                        | preconditioning:       |
+|                        |                        | NONE|left|right|both   |
++------------------------+------------------------+------------------------+
+| pretypeB               | OT_STRING              | Preconditioner for     |
+|                        |                        | backward integration   |
++------------------------+------------------------+------------------------+
+| quad_err_con           | OT_BOOL                | Should the quadratures |
+|                        |                        | affect the step size   |
+|                        |                        | control                |
++------------------------+------------------------+------------------------+
+| reltol                 | OT_DOUBLE              | Relative tolerence for |
+|                        |                        | the IVP solution       |
++------------------------+------------------------+------------------------+
+| reltolB                | OT_DOUBLE              | Relative tolerence for |
+|                        |                        | the adjoint            |
+|                        |                        | sensitivity solution   |
+|                        |                        | [default: equal to     |
+|                        |                        | reltol]                |
++------------------------+------------------------+------------------------+
+| sensitivity_method     | OT_STRING              | Sensitivity method:    |
+|                        |                        | SIMULTANEOUS|staggered |
++------------------------+------------------------+------------------------+
+| steps_per_checkpoint   | OT_INT                 | Number of steps        |
+|                        |                        | between two            |
+|                        |                        | consecutive            |
+|                        |                        | checkpoints            |
++------------------------+------------------------+------------------------+
+| stop_at_end            | OT_BOOL                | Stop the integrator at |
+|                        |                        | the end of the         |
+|                        |                        | interval               |
++------------------------+------------------------+------------------------+
+| suppress_algebraic     | OT_BOOL                | Suppress algebraic     |
+|                        |                        | variables in the error |
+|                        |                        | testing                |
++------------------------+------------------------+------------------------+
+| upper_bandwidth        | OT_INT                 | Upper band-width of    |
+|                        |                        | banded Jacobian        |
+|                        |                        | (estimations)          |
++------------------------+------------------------+------------------------+
+| upper_bandwidthB       | OT_INT                 | Upper band-width of    |
+|                        |                        | banded jacobians for   |
+|                        |                        | backward integration   |
+|                        |                        | [default: equal to     |
+|                        |                        | upper_bandwidth]       |
++------------------------+------------------------+------------------------+
+| use_preconditioner     | OT_BOOL                | Precondition an        |
+|                        |                        | iterative solver       |
++------------------------+------------------------+------------------------+
+| use_preconditionerB    | OT_BOOL                | Precondition an        |
+|                        |                        | iterative solver for   |
+|                        |                        | the backwards problem  |
+|                        |                        | [default: equal to     |
+|                        |                        | use_preconditioner]    |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+collocation
+-----------
+
+
+
+Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
+collocation schemes
+
+The method is still under development
+
+>List of available options
+
++---------------------+-----------+----------------------------------------+
+|         Id          |   Type    |              Description               |
++=====================+===========+========================================+
+| collocation_scheme  | OT_STRING | Collocation scheme: radau|legendre     |
++---------------------+-----------+----------------------------------------+
+| interpolation_order | OT_INT    | Order of the interpolating polynomials |
++---------------------+-----------+----------------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+rk --
+
+
+
+Fixed-step explicit Runge-Kutta integrator for ODEs Currently implements
+RK4.
+
+The method is still under development
+
+--------------------------------------------------------------------------------
+
+
 
 Joel Andersson
 
 ";
 
 %feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const Function &dae, const Dict &opts=Dict()) "
+std::string &solver, const MXDict &dae, const Dict &opts=Dict()) " ";
 
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
-
-";
+%feature("docstring")  casadi::integrator(const std::string &name, const
+std::string &solver, const Function &dae, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::integrator(const std::string &name, const
 std::string &solver, const std::pair< Function, Function > &dae, const Dict
-&opts=Dict()) "
-
-Create an ODE/DAE integrator Solves an initial value problem (IVP) coupled
-to a terminal value problem with differential equation given as an implicit
-ODE coupled to an algebraic equation and a set of quadratures:
-
-
-
-::
-
-  Initial conditions at t=t0
-  x(t0)  = x0
-  q(t0)  = 0
-  
-  Forward integration from t=t0 to t=tf
-  der(x) = function(x, z, p, t)                  Forward ODE
-  0 = fz(x, z, p, t)                  Forward algebraic equations
-  der(q) = fq(x, z, p, t)                  Forward quadratures
-  
-  Terminal conditions at t=tf
-  rx(tf)  = rx0
-  rq(tf)  = 0
-  
-  Backward integration from t=tf to t=t0
-  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-  0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-  der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-  
-  where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-  gx, gz and gq have a linear dependency on rx, rz and rp.
-
-Joel Andersson
-
-";
+&opts=Dict()) " ";
 
 %feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
 
@@ -9853,6 +10320,147 @@ G(x0, x1, ..., xj_guess, ..., xm),
 xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
 
 By default, the first input is unknown and the first output is the residual.
+
+General information
+===================
+
+
+
+List of plugins
+===============
+
+
+
+- kinsol
+
+- nlp
+
+- newton
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Rootfinder.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+kinsol
+------
+
+
+
+KINSOL interface from the Sundials suite
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| abstol                 | OT_DOUBLE              | Stopping criterion     |
+|                        |                        | tolerance              |
++------------------------+------------------------+------------------------+
+| disable_internal_warni | OT_BOOL                | Disable KINSOL         |
+| ngs                    |                        | internal warning       |
+|                        |                        | messages               |
++------------------------+------------------------+------------------------+
+| exact_jacobian         | OT_BOOL                | Use exact Jacobian     |
+|                        |                        | information            |
++------------------------+------------------------+------------------------+
+| f_scale                | OT_DOUBLEVECTOR        | Equation scaling       |
+|                        |                        | factors                |
++------------------------+------------------------+------------------------+
+| iterative_solver       | OT_STRING              | gmres|bcgstab|tfqmr    |
++------------------------+------------------------+------------------------+
+| linear_solver_type     | OT_STRING              | dense|banded|iterative |
+|                        |                        | |user_defined          |
++------------------------+------------------------+------------------------+
+| lower_bandwidth        | OT_INT                 | Lower bandwidth for    |
+|                        |                        | banded linear solvers  |
++------------------------+------------------------+------------------------+
+| max_iter               | OT_INT                 | Maximum number of      |
+|                        |                        | Newton iterations.     |
+|                        |                        | Putting 0 sets the     |
+|                        |                        | default value of       |
+|                        |                        | KinSol.                |
++------------------------+------------------------+------------------------+
+| max_krylov             | OT_INT                 | Maximum Krylov space   |
+|                        |                        | dimension              |
++------------------------+------------------------+------------------------+
+| pretype                | OT_STRING              | Type of preconditioner |
++------------------------+------------------------+------------------------+
+| strategy               | OT_STRING              | Globalization strategy |
++------------------------+------------------------+------------------------+
+| u_scale                | OT_DOUBLEVECTOR        | Variable scaling       |
+|                        |                        | factors                |
++------------------------+------------------------+------------------------+
+| upper_bandwidth        | OT_INT                 | Upper bandwidth for    |
+|                        |                        | banded linear solvers  |
++------------------------+------------------------+------------------------+
+| use_preconditioner     | OT_BOOL                | Precondition an        |
+|                        |                        | iterative solver       |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+nlp
+---
+
+
+
+Use an Nlpsol as Rootfinder solver
+
+>List of available options
+
++----------------+-----------+---------------------------------+
+|       Id       |   Type    |           Description           |
++================+===========+=================================+
+| nlpsol         | OT_STRING | Name of solver.                 |
++----------------+-----------+---------------------------------+
+| nlpsol_options | OT_DICT   | Options to be passed to solver. |
++----------------+-----------+---------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+newton
+------
+
+
+
+Implements simple newton iterations to solve an implicit function.
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| abstol                 | OT_DOUBLE              | Stopping criterion     |
+|                        |                        | tolerance on max(|F|)  |
++------------------------+------------------------+------------------------+
+| abstolStep             | OT_DOUBLE              | Stopping criterion     |
+|                        |                        | tolerance on step size |
++------------------------+------------------------+------------------------+
+| max_iter               | OT_INT                 | Maximum number of      |
+|                        |                        | Newton iterations to   |
+|                        |                        | perform before         |
+|                        |                        | returning.             |
++------------------------+------------------------+------------------------+
+| print_iteration        | OT_BOOL                | Print information      |
+|                        |                        | about each iteration   |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
 
 Joel Andersson
 
@@ -10065,71 +10673,389 @@ Create a QP solver Solves the following strictly convex problem:
 
 If H is not positive-definite, the solver should throw an error.
 
+General information
+===================
+
+
+
+>Input scheme: casadi::QpsolInput (QPSOL_NUM_IN = 9) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| QPSOL_H                |                        | The square matrix H:   |
+|                        |                        | sparse, (n x n). Only  |
+|                        |                        | the lower triangular   |
+|                        |                        | part is actually used. |
+|                        |                        | The matrix is assumed  |
+|                        |                        | to be symmetrical.     |
++------------------------+------------------------+------------------------+
+| QPSOL_G                |                        | The vector g: dense,   |
+|                        |                        | (n x 1)                |
++------------------------+------------------------+------------------------+
+| QPSOL_A                |                        | The matrix A: sparse,  |
+|                        |                        | (nc x n) - product     |
+|                        |                        | with x must be dense.  |
++------------------------+------------------------+------------------------+
+| QPSOL_LBA              |                        | dense, (nc x 1)        |
++------------------------+------------------------+------------------------+
+| QPSOL_UBA              |                        | dense, (nc x 1)        |
++------------------------+------------------------+------------------------+
+| QPSOL_LBX              |                        | dense, (n x 1)         |
++------------------------+------------------------+------------------------+
+| QPSOL_UBX              |                        | dense, (n x 1)         |
++------------------------+------------------------+------------------------+
+| QPSOL_X0               |                        | dense, (n x 1)         |
++------------------------+------------------------+------------------------+
+| QPSOL_LAM_X0           |                        | dense                  |
++------------------------+------------------------+------------------------+
+
+>Output scheme: casadi::QpsolOutput (QPSOL_NUM_OUT = 4) []
+
++-------------+-------+---------------------------------------------------+
+|  Full name  | Short |                    Description                    |
++=============+=======+===================================================+
+| QPSOL_X     |       | The primal solution.                              |
++-------------+-------+---------------------------------------------------+
+| QPSOL_COST  |       | The optimal cost.                                 |
++-------------+-------+---------------------------------------------------+
+| QPSOL_LAM_A |       | The dual solution corresponding to linear bounds. |
++-------------+-------+---------------------------------------------------+
+| QPSOL_LAM_X |       | The dual solution corresponding to simple bounds. |
++-------------+-------+---------------------------------------------------+
+
+List of plugins
+===============
+
+
+
+- cplex
+
+- gurobi
+
+- ooqp
+
+- qpoases
+
+- sqic
+
+- nlp
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Qpsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+cplex
+-----
+
+
+
+Interface to Cplex solver for sparse Quadratic Programs
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| barrier_maxiter        | OT_INT                 | Maximum number of      |
+|                        |                        | barrier iterations.    |
++------------------------+------------------------+------------------------+
+| convex                 | OT_BOOL                | Indicates if the QP is |
+|                        |                        | convex or not (affects |
+|                        |                        | only the barrier       |
+|                        |                        | method).               |
++------------------------+------------------------+------------------------+
+| dep_check              | OT_INT                 | Detect redundant       |
+|                        |                        | constraints.           |
++------------------------+------------------------+------------------------+
+| dump_filename          | OT_STRING              | The filename to dump   |
+|                        |                        | to.                    |
++------------------------+------------------------+------------------------+
+| dump_to_file           | OT_BOOL                | Dumps QP to file in    |
+|                        |                        | CPLEX format.          |
++------------------------+------------------------+------------------------+
+| qp_method              | OT_INT                 | Determines which CPLEX |
+|                        |                        | algorithm to use.      |
++------------------------+------------------------+------------------------+
+| simplex_maxiter        | OT_INT                 | Maximum number of      |
+|                        |                        | simplex iterations.    |
++------------------------+------------------------+------------------------+
+| tol                    | OT_DOUBLE              | Tolerance of solver    |
++------------------------+------------------------+------------------------+
+| warm_start             | OT_BOOL                | Use warm start with    |
+|                        |                        | simplex methods        |
+|                        |                        | (affects only the      |
+|                        |                        | simplex methods).      |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+gurobi
+------
+
+
+
+Interface to the GUROBI Solver for quadratic programming
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| vtype                  | OT_STRINGVECTOR        | Type of variables,     |
+|                        |                        | Each entry can be one  |
+|                        |                        | of: 'continuous',      |
+|                        |                        | 'binary', 'integer',   |
+|                        |                        | 'semicont', 'semiint'  |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+ooqp
+----
+
+
+
+Interface to the OOQP Solver for quadratic programming The current
+implementation assumes that OOQP is configured with the MA27 sparse linear
+solver.
+
+NOTE: when doing multiple calls to evaluate(), check if you need to
+reInit();
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| artol                  | OT_DOUBLE              | tolerance as provided  |
+|                        |                        | with setArTol to OOQP  |
++------------------------+------------------------+------------------------+
+| mutol                  | OT_DOUBLE              | tolerance as provided  |
+|                        |                        | with setMuTol to OOQP  |
++------------------------+------------------------+------------------------+
+| print_level            | OT_INT                 | Print level. OOQP      |
+|                        |                        | listens to print_level |
+|                        |                        | 0, 10 and 100          |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+qpoases
+-------
+
+
+
+Interface to QPOases Solver for quadratic programming
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| CPUtime                | OT_DOUBLE              | The maximum allowed    |
+|                        |                        | CPU time in seconds    |
+|                        |                        | for the whole          |
+|                        |                        | initialisation (and    |
+|                        |                        | the actually required  |
+|                        |                        | one on output).        |
+|                        |                        | Disabled if unset.     |
++------------------------+------------------------+------------------------+
+| boundRelaxation        | OT_DOUBLE              | Initial relaxation of  |
+|                        |                        | bounds to start        |
+|                        |                        | homotopy and initial   |
+|                        |                        | value for far bounds.  |
++------------------------+------------------------+------------------------+
+| boundTolerance         | OT_DOUBLE              | If upper and lower     |
+|                        |                        | bounds differ less     |
+|                        |                        | than this tolerance,   |
+|                        |                        | they are regarded      |
+|                        |                        | equal, i.e. as         |
+|                        |                        | equality constraint.   |
++------------------------+------------------------+------------------------+
+| enableCholeskyRefactor | OT_INT                 | Specifies the          |
+| isation                |                        | frequency of a full    |
+|                        |                        | re-factorisation of    |
+|                        |                        | projected Hessian      |
+|                        |                        | matrix: 0: turns them  |
+|                        |                        | off, 1: uses them at   |
+|                        |                        | each iteration etc.    |
++------------------------+------------------------+------------------------+
+| enableDriftCorrection  | OT_INT                 | Specifies the          |
+|                        |                        | frequency of drift     |
+|                        |                        | corrections: 0: turns  |
+|                        |                        | them off.              |
++------------------------+------------------------+------------------------+
+| enableEqualities       | OT_BOOL                | Specifies whether      |
+|                        |                        | equalities should be   |
+|                        |                        | treated as always      |
+|                        |                        | active (True) or not   |
+|                        |                        | (False)                |
++------------------------+------------------------+------------------------+
+| enableFarBounds        | OT_BOOL                | Enables the use of far |
+|                        |                        | bounds.                |
++------------------------+------------------------+------------------------+
+| enableFlippingBounds   | OT_BOOL                | Enables the use of     |
+|                        |                        | flipping bounds.       |
++------------------------+------------------------+------------------------+
+| enableFullLITests      | OT_BOOL                | Enables condition-     |
+|                        |                        | hardened (but more     |
+|                        |                        | expensive) LI test.    |
++------------------------+------------------------+------------------------+
+| enableNZCTests         | OT_BOOL                | Enables nonzero        |
+|                        |                        | curvature tests.       |
++------------------------+------------------------+------------------------+
+| enableRamping          | OT_BOOL                | Enables ramping.       |
++------------------------+------------------------+------------------------+
+| enableRegularisation   | OT_BOOL                | Enables automatic      |
+|                        |                        | Hessian                |
+|                        |                        | regularisation.        |
++------------------------+------------------------+------------------------+
+| epsDen                 | OT_DOUBLE              | Denominator tolerance  |
+|                        |                        | for ratio tests.       |
++------------------------+------------------------+------------------------+
+| epsFlipping            | OT_DOUBLE              | Tolerance of squared   |
+|                        |                        | Cholesky diagonal      |
+|                        |                        | factor which triggers  |
+|                        |                        | flipping bound.        |
++------------------------+------------------------+------------------------+
+| epsIterRef             | OT_DOUBLE              | Early termination      |
+|                        |                        | tolerance for          |
+|                        |                        | iterative refinement.  |
++------------------------+------------------------+------------------------+
+| epsLITests             | OT_DOUBLE              | Tolerance for linear   |
+|                        |                        | independence tests.    |
++------------------------+------------------------+------------------------+
+| epsNZCTests            | OT_DOUBLE              | Tolerance for nonzero  |
+|                        |                        | curvature tests.       |
++------------------------+------------------------+------------------------+
+| epsNum                 | OT_DOUBLE              | Numerator tolerance    |
+|                        |                        | for ratio tests.       |
++------------------------+------------------------+------------------------+
+| epsRegularisation      | OT_DOUBLE              | Scaling factor of      |
+|                        |                        | identity matrix used   |
+|                        |                        | for Hessian            |
+|                        |                        | regularisation.        |
++------------------------+------------------------+------------------------+
+| finalRamping           | OT_DOUBLE              | Final value for        |
+|                        |                        | ramping strategy.      |
++------------------------+------------------------+------------------------+
+| growFarBounds          | OT_DOUBLE              | Factor to grow far     |
+|                        |                        | bounds.                |
++------------------------+------------------------+------------------------+
+| initialFarBounds       | OT_DOUBLE              | Initial size for far   |
+|                        |                        | bounds.                |
++------------------------+------------------------+------------------------+
+| initialRamping         | OT_DOUBLE              | Start value for        |
+|                        |                        | ramping strategy.      |
++------------------------+------------------------+------------------------+
+| initialStatusBounds    | OT_STRING              | Initial status of      |
+|                        |                        | bounds at first        |
+|                        |                        | iteration.             |
++------------------------+------------------------+------------------------+
+| maxDualJump            | OT_DOUBLE              | Maximum allowed jump   |
+|                        |                        | in dual variables in   |
+|                        |                        | linear independence    |
+|                        |                        | tests.                 |
++------------------------+------------------------+------------------------+
+| maxPrimalJump          | OT_DOUBLE              | Maximum allowed jump   |
+|                        |                        | in primal variables in |
+|                        |                        | nonzero curvature      |
+|                        |                        | tests.                 |
++------------------------+------------------------+------------------------+
+| nWSR                   | OT_INT                 | The maximum number of  |
+|                        |                        | working set            |
+|                        |                        | recalculations to be   |
+|                        |                        | performed during the   |
+|                        |                        | initial homotopy.      |
+|                        |                        | Default is 5(nx + nc)  |
++------------------------+------------------------+------------------------+
+| numRefinementSteps     | OT_INT                 | Maximum number of      |
+|                        |                        | iterative refinement   |
+|                        |                        | steps.                 |
++------------------------+------------------------+------------------------+
+| numRegularisationSteps | OT_INT                 | Maximum number of      |
+|                        |                        | successive             |
+|                        |                        | regularisation steps.  |
++------------------------+------------------------+------------------------+
+| printLevel             | OT_STRING              | Defines the amount of  |
+|                        |                        | text output during QP  |
+|                        |                        | solution, see Section  |
+|                        |                        | 5.7                    |
++------------------------+------------------------+------------------------+
+| terminationTolerance   | OT_DOUBLE              | Relative termination   |
+|                        |                        | tolerance to stop      |
+|                        |                        | homotopy.              |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+sqic
+----
+
+
+
+Interface to the SQIC solver for quadratic programming
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+nlp
+---
+
+
+
+Solve QPs using an Nlpsol
+
+>List of available options
+
++----------------+-----------+---------------------------------+
+|       Id       |   Type    |           Description           |
++================+===========+=================================+
+| nlpsol         | OT_STRING | Name of solver.                 |
++----------------+-----------+---------------------------------+
+| nlpsol_options | OT_DICT   | Options to be passed to solver. |
++----------------+-----------+---------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
 Joel Andersson
 
 ";
 
 %feature("docstring")  casadi::qpsol(const std::string &name, const
-std::string &solver, const SXDict &qp, const Dict &opts=Dict()) "
-
-Create a QP solver Solves the following strictly convex problem:
-
-
-
-::
-
-  min          1/2 x' H x + g' x
-  x
-  
-  subject to
-  LBA <= A x <= UBA
-  LBX <= x   <= UBX
-  
-  with :
-  H sparse (n x n) positive definite
-  g dense  (n x 1)
-  
-  n: number of decision variables (x)
-  nc: number of constraints (A)
-
-
-
-If H is not positive-definite, the solver should throw an error.
-
-Joel Andersson
-
-";
+std::string &solver, const SXDict &qp, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::qpsol(const std::string &name, const
-std::string &solver, const MXDict &qp, const Dict &opts=Dict()) "
-
-Create a QP solver Solves the following strictly convex problem:
-
-
-
-::
-
-  min          1/2 x' H x + g' x
-  x
-  
-  subject to
-  LBA <= A x <= UBA
-  LBX <= x   <= UBX
-  
-  with :
-  H sparse (n x n) positive definite
-  g dense  (n x 1)
-  
-  n: number of decision variables (x)
-  nc: number of constraints (A)
-
-
-
-If H is not positive-definite, the solver should throw an error.
-
-Joel Andersson
-
-";
+std::string &solver, const MXDict &qp, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
 inc_x) " [INTERNAL]  IAMAX: index corresponding to the entry with the
@@ -10379,11 +11305,71 @@ multiplication: z <- z + x*y.
 
 Get NLP solver output scheme of NLP solvers.
 
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLPSOL_X               |                        | Decision variables at  |
+|                        |                        | the optimal solution   |
+|                        |                        | (nx x 1)               |
++------------------------+------------------------+------------------------+
+| NLPSOL_F               |                        | Cost function value at |
+|                        |                        | the optimal solution   |
+|                        |                        | (1 x 1)                |
++------------------------+------------------------+------------------------+
+| NLPSOL_G               |                        | Constraints function   |
+|                        |                        | at the optimal         |
+|                        |                        | solution (ng x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on X at the |
+|                        |                        | solution (nx x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on G at the |
+|                        |                        | solution (ng x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on P at the |
+|                        |                        | solution (np x 1)      |
++------------------------+------------------------+------------------------+
+
 ";
 
 %feature("docstring")  casadi::nlpsol_out(int ind) "
 
 Get output scheme name by index.
+
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLPSOL_X               |                        | Decision variables at  |
+|                        |                        | the optimal solution   |
+|                        |                        | (nx x 1)               |
++------------------------+------------------------+------------------------+
+| NLPSOL_F               |                        | Cost function value at |
+|                        |                        | the optimal solution   |
+|                        |                        | (1 x 1)                |
++------------------------+------------------------+------------------------+
+| NLPSOL_G               |                        | Constraints function   |
+|                        |                        | at the optimal         |
+|                        |                        | solution (ng x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on X at the |
+|                        |                        | solution (nx x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on G at the |
+|                        |                        | solution (ng x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on P at the |
+|                        |                        | solution (np x 1)      |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -10419,11 +11405,83 @@ order:  Order of interpolating polynomials
 
 Get input scheme of NLP solvers.
 
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLPSOL_X0              |                        | Decision variables,    |
+|                        |                        | initial guess (nx x 1) |
++------------------------+------------------------+------------------------+
+| NLPSOL_P               |                        | Value of fixed         |
+|                        |                        | parameters (np x 1)    |
++------------------------+------------------------+------------------------+
+| NLPSOL_LBX             |                        | Decision variables     |
+|                        |                        | lower bound (nx x 1),  |
+|                        |                        | default -inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_UBX             |                        | Decision variables     |
+|                        |                        | upper bound (nx x 1),  |
+|                        |                        | default +inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_LBG             |                        | Constraints lower      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default -inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_UBG             |                        | Constraints upper      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default +inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+|                        |                        | for bounds on X,       |
+|                        |                        | initial guess (nx x 1) |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+|                        |                        | for bounds on G,       |
+|                        |                        | initial guess (ng x 1) |
++------------------------+------------------------+------------------------+
+
 ";
 
 %feature("docstring")  casadi::nlpsol_in(int ind) "
 
 Get NLP solver input scheme name by index.
+
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLPSOL_X0              |                        | Decision variables,    |
+|                        |                        | initial guess (nx x 1) |
++------------------------+------------------------+------------------------+
+| NLPSOL_P               |                        | Value of fixed         |
+|                        |                        | parameters (np x 1)    |
++------------------------+------------------------+------------------------+
+| NLPSOL_LBX             |                        | Decision variables     |
+|                        |                        | lower bound (nx x 1),  |
+|                        |                        | default -inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_UBX             |                        | Decision variables     |
+|                        |                        | upper bound (nx x 1),  |
+|                        |                        | default +inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_LBG             |                        | Constraints lower      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default -inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_UBG             |                        | Constraints upper      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default +inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+|                        |                        | for bounds on X,       |
+|                        |                        | initial guess (nx x 1) |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+|                        |                        | for bounds on G,       |
+|                        |                        | initial guess (ng x 1) |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -10458,57 +11516,414 @@ program (NLP):
   ng: number of constraints
   np: number of parameters
 
+
+
+General information
+===================
+
+
+
+>Input scheme: casadi::NlpsolInput (NLPSOL_NUM_IN = 8) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLPSOL_X0              |                        | Decision variables,    |
+|                        |                        | initial guess (nx x 1) |
++------------------------+------------------------+------------------------+
+| NLPSOL_P               |                        | Value of fixed         |
+|                        |                        | parameters (np x 1)    |
++------------------------+------------------------+------------------------+
+| NLPSOL_LBX             |                        | Decision variables     |
+|                        |                        | lower bound (nx x 1),  |
+|                        |                        | default -inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_UBX             |                        | Decision variables     |
+|                        |                        | upper bound (nx x 1),  |
+|                        |                        | default +inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_LBG             |                        | Constraints lower      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default -inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_UBG             |                        | Constraints upper      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default +inf.          |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_X0          |                        | Lagrange multipliers   |
+|                        |                        | for bounds on X,       |
+|                        |                        | initial guess (nx x 1) |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_G0          |                        | Lagrange multipliers   |
+|                        |                        | for bounds on G,       |
+|                        |                        | initial guess (ng x 1) |
++------------------------+------------------------+------------------------+
+
+>Output scheme: casadi::NlpsolOutput (NLPSOL_NUM_OUT = 6) []
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLPSOL_X               |                        | Decision variables at  |
+|                        |                        | the optimal solution   |
+|                        |                        | (nx x 1)               |
++------------------------+------------------------+------------------------+
+| NLPSOL_F               |                        | Cost function value at |
+|                        |                        | the optimal solution   |
+|                        |                        | (1 x 1)                |
++------------------------+------------------------+------------------------+
+| NLPSOL_G               |                        | Constraints function   |
+|                        |                        | at the optimal         |
+|                        |                        | solution (ng x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_X           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on X at the |
+|                        |                        | solution (nx x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_G           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on G at the |
+|                        |                        | solution (ng x 1)      |
++------------------------+------------------------+------------------------+
+| NLPSOL_LAM_P           |                        | Lagrange multipliers   |
+|                        |                        | for bounds on P at the |
+|                        |                        | solution (np x 1)      |
++------------------------+------------------------+------------------------+
+
+List of plugins
+===============
+
+
+
+- ipopt
+
+- knitro
+
+- snopt
+
+- worhp
+
+- scpgen
+
+- sqpmethod
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Nlpsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+ipopt
+-----
+
+
+
+When in warmstart mode, output NLPSOL_LAM_X may be used as input
+
+NOTE: Even when max_iter == 0, it is not guaranteed that input(NLPSOL_X0) ==
+output(NLPSOL_X). Indeed if bounds on X or constraints are unmet, they will
+differ.
+
+For a good tutorial on IPOPT,
+seehttp://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
+
+A good resource about the algorithms in IPOPT is: Wachter and L. T. Biegler,
+On the Implementation of an Interior-Point Filter Line-Search Algorithm for
+Large-Scale Nonlinear Programming, Mathematical Programming 106(1), pp.
+25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson Research Center,
+Yorktown, USA
+
+Caveats: with default options, multipliers for the decision variables are
+wrong for equality constraints. Change the 'fixed_variable_treatment' to
+'make_constraint' or 'relax_bounds' to obtain correct results.
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| con_integer_md         | OT_DICT                | Integer metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of integers) about     |
+|                        |                        | constraints to be      |
+|                        |                        | passed to IPOPT        |
++------------------------+------------------------+------------------------+
+| con_numeric_md         | OT_DICT                | Numeric metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of reals) about        |
+|                        |                        | constraints to be      |
+|                        |                        | passed to IPOPT        |
++------------------------+------------------------+------------------------+
+| con_string_md          | OT_DICT                | String metadata (a     |
+|                        |                        | dictionary with lists  |
+|                        |                        | of strings) about      |
+|                        |                        | constraints to be      |
+|                        |                        | passed to IPOPT        |
++------------------------+------------------------+------------------------+
+| ipopt                  | OT_DICT                | Options to be passed   |
+|                        |                        | to IPOPT               |
++------------------------+------------------------+------------------------+
+| pass_nonlinear_variabl | OT_BOOL                | Pass list of variables |
+| es                     |                        | entering nonlinearly   |
+|                        |                        | to IPOPT               |
++------------------------+------------------------+------------------------+
+| print_time             | OT_BOOL                | print information      |
+|                        |                        | about execution time   |
++------------------------+------------------------+------------------------+
+| var_integer_md         | OT_DICT                | Integer metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of integers) about     |
+|                        |                        | variables to be passed |
+|                        |                        | to IPOPT               |
++------------------------+------------------------+------------------------+
+| var_numeric_md         | OT_DICT                | Numeric metadata (a    |
+|                        |                        | dictionary with lists  |
+|                        |                        | of reals) about        |
+|                        |                        | variables to be passed |
+|                        |                        | to IPOPT               |
++------------------------+------------------------+------------------------+
+| var_string_md          | OT_DICT                | String metadata (a     |
+|                        |                        | dictionary with lists  |
+|                        |                        | of strings) about      |
+|                        |                        | variables to be passed |
+|                        |                        | to IPOPT               |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+knitro
+------
+
+
+
+KNITRO interface
+
+>List of available options
+
++---------+--------------+--------------------------------+
+|   Id    |     Type     |          Description           |
++=========+==============+================================+
+| contype | OT_INTVECTOR | Type of constraint             |
++---------+--------------+--------------------------------+
+| knitro  | OT_DICT      | Options to be passed to KNITRO |
++---------+--------------+--------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+snopt
+-----
+
+
+
+SNOPT interface
+
+>List of available options
+
++-------+---------+-------------------------------+
+|  Id   |  Type   |          Description          |
++=======+=========+===============================+
+| snopt | OT_DICT | Options to be passed to SNOPT |
++-------+---------+-------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+worhp
+-----
+
+
+
+WORHP interface
+
+>List of available options
+
++------------+---------+----------------------------------------+
+|     Id     |  Type   |              Description               |
++============+=========+========================================+
+| print_time | OT_BOOL | Print information about execution time |
++------------+---------+----------------------------------------+
+| worhp      | OT_DICT | Options to be passed to WORHP          |
++------------+---------+----------------------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+scpgen
+------
+
+
+
+A structure-exploiting sequential quadratic programming (to be come
+sequential convex programming) method for nonlinear programming.
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| beta                   | OT_DOUBLE              | Line-search parameter, |
+|                        |                        | restoration factor of  |
+|                        |                        | stepsize               |
++------------------------+------------------------+------------------------+
+| c1                     | OT_DOUBLE              | Armijo condition,      |
+|                        |                        | coefficient of         |
+|                        |                        | decrease in merit      |
++------------------------+------------------------+------------------------+
+| codegen                | OT_BOOL                | C-code generation      |
++------------------------+------------------------+------------------------+
+| hessian_approximation  | OT_STRING              | gauss-newton|exact     |
++------------------------+------------------------+------------------------+
+| lbfgs_memory           | OT_INT                 | Size of L-BFGS memory. |
++------------------------+------------------------+------------------------+
+| max_iter               | OT_INT                 | Maximum number of SQP  |
+|                        |                        | iterations             |
++------------------------+------------------------+------------------------+
+| max_iter_ls            | OT_INT                 | Maximum number of      |
+|                        |                        | linesearch iterations  |
++------------------------+------------------------+------------------------+
+| merit_memsize          | OT_INT                 | Size of memory to      |
+|                        |                        | store history of merit |
+|                        |                        | function values        |
++------------------------+------------------------+------------------------+
+| merit_start            | OT_DOUBLE              | Lower bound for the    |
+|                        |                        | merit function         |
+|                        |                        | parameter              |
++------------------------+------------------------+------------------------+
+| name_x                 | OT_STRINGVECTOR        | Names of the           |
+|                        |                        | variables.             |
++------------------------+------------------------+------------------------+
+| print_header           | OT_BOOL                | Print the header with  |
+|                        |                        | problem statistics     |
++------------------------+------------------------+------------------------+
+| print_time             | OT_BOOL                | Print information      |
+|                        |                        | about execution time   |
++------------------------+------------------------+------------------------+
+| print_x                | OT_INTVECTOR           | Which variables to     |
+|                        |                        | print.                 |
++------------------------+------------------------+------------------------+
+| qpsol                  | OT_STRING              | The QP solver to be    |
+|                        |                        | used by the SQP method |
++------------------------+------------------------+------------------------+
+| qpsol_options          | OT_DICT                | Options to be passed   |
+|                        |                        | to the QP solver       |
++------------------------+------------------------+------------------------+
+| reg_threshold          | OT_DOUBLE              | Threshold for the      |
+|                        |                        | regularization.        |
++------------------------+------------------------+------------------------+
+| regularize             | OT_BOOL                | Automatic              |
+|                        |                        | regularization of      |
+|                        |                        | Lagrange Hessian.      |
++------------------------+------------------------+------------------------+
+| tol_du                 | OT_DOUBLE              | Stopping criterion for |
+|                        |                        | dual infeasability     |
++------------------------+------------------------+------------------------+
+| tol_pr                 | OT_DOUBLE              | Stopping criterion for |
+|                        |                        | primal infeasibility   |
++------------------------+------------------------+------------------------+
+| tol_pr_step            | OT_DOUBLE              | Stopping criterion for |
+|                        |                        | the step size          |
++------------------------+------------------------+------------------------+
+| tol_reg                | OT_DOUBLE              | Stopping criterion for |
+|                        |                        | regularization         |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+sqpmethod
+---------
+
+
+
+A textbook SQPMethod
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| beta                   | OT_DOUBLE              | Line-search parameter, |
+|                        |                        | restoration factor of  |
+|                        |                        | stepsize               |
++------------------------+------------------------+------------------------+
+| c1                     | OT_DOUBLE              | Armijo condition,      |
+|                        |                        | coefficient of         |
+|                        |                        | decrease in merit      |
++------------------------+------------------------+------------------------+
+| hessian_approximation  | OT_STRING              | limited-memory|exact   |
++------------------------+------------------------+------------------------+
+| lbfgs_memory           | OT_INT                 | Size of L-BFGS memory. |
++------------------------+------------------------+------------------------+
+| max_iter               | OT_INT                 | Maximum number of SQP  |
+|                        |                        | iterations             |
++------------------------+------------------------+------------------------+
+| max_iter_ls            | OT_INT                 | Maximum number of      |
+|                        |                        | linesearch iterations  |
++------------------------+------------------------+------------------------+
+| merit_memory           | OT_INT                 | Size of memory to      |
+|                        |                        | store history of merit |
+|                        |                        | function values        |
++------------------------+------------------------+------------------------+
+| min_step_size          | OT_DOUBLE              | The size (inf-norm) of |
+|                        |                        | the step size should   |
+|                        |                        | not become smaller     |
+|                        |                        | than this.             |
++------------------------+------------------------+------------------------+
+| print_header           | OT_BOOL                | Print the header with  |
+|                        |                        | problem statistics     |
++------------------------+------------------------+------------------------+
+| print_time             | OT_BOOL                | Print information      |
+|                        |                        | about execution time   |
++------------------------+------------------------+------------------------+
+| qpsol                  | OT_STRING              | The QP solver to be    |
+|                        |                        | used by the SQP method |
++------------------------+------------------------+------------------------+
+| qpsol_options          | OT_DICT                | Options to be passed   |
+|                        |                        | to the QP solver       |
++------------------------+------------------------+------------------------+
+| regularize             | OT_BOOL                | Automatic              |
+|                        |                        | regularization of      |
+|                        |                        | Lagrange Hessian.      |
++------------------------+------------------------+------------------------+
+| tol_du                 | OT_DOUBLE              | Stopping criterion for |
+|                        |                        | dual infeasability     |
++------------------------+------------------------+------------------------+
+| tol_pr                 | OT_DOUBLE              | Stopping criterion for |
+|                        |                        | primal infeasibility   |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
 Joel Andersson
 
 ";
 
 %feature("docstring")  casadi::nlpsol(const std::string &name, const
-std::string &solver, const MXDict &nlp, const Dict &opts=Dict()) "
-
-Create an NLP solver Creates a solver for the following parametric nonlinear
-program (NLP):
-
-::
-
-  min          F(x, p)
-  x
-  
-  subject to
-  LBX <=   x    <= UBX
-  LBG <= G(x, p) <= UBG
-  p  == P
-  
-  nx: number of decision variables
-  ng: number of constraints
-  np: number of parameters
-
-Joel Andersson
-
-";
+std::string &solver, const MXDict &nlp, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::nlpsol(const std::string &name, const
-std::string &solver, const Function &nlp, const Dict &opts=Dict()) "
-
-Create an NLP solver Creates a solver for the following parametric nonlinear
-program (NLP):
-
-::
-
-  min          F(x, p)
-  x
-  
-  subject to
-  LBX <=   x    <= UBX
-  LBG <= G(x, p) <= UBG
-  p  == P
-  
-  nx: number of decision variables
-  ng: number of constraints
-  np: number of parameters
-
-Joel Andersson
-
-";
+std::string &solver, const Function &nlp, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::has_qpsol(const std::string &name) "
 
@@ -10540,6 +11955,148 @@ Repeat steps 4 and 5 to work with other b vectors.
 
 The standard evaluation combines the prepare() and solve() step and may
 therefore more expensive if A is invariant.
+
+General information
+===================
+
+
+
+>Input scheme: casadi::LinsolInput (LINSOL_NUM_IN = 2) []
+
++-----------+-------+----------------------------------------------+
+| Full name | Short |                 Description                  |
++===========+=======+==============================================+
+| LINSOL_A  |       | The square matrix A: sparse, (n x n)         |
++-----------+-------+----------------------------------------------+
+| LINSOL_B  |       | The right-hand-side matrix b: dense, (n x m) |
++-----------+-------+----------------------------------------------+
+
+>Output scheme: casadi::LinsolOutput (LINSOL_NUM_OUT = 1) []
+
++-----------+-------+---------------------------------------------+
+| Full name | Short |                 Description                 |
++===========+=======+=============================================+
+| LINSOL_X  |       | Solution to the linear system of equations. |
++-----------+-------+---------------------------------------------+
+
+List of plugins
+===============
+
+
+
+- csparsecholesky
+
+- csparse
+
+- lapacklu
+
+- lapackqr
+
+- symbolicqr
+
+Note: some of the plugins in this list might not be available on your
+system. Also, there might be extra plugins available to you that are not
+listed here. You can obtain their documentation with
+Linsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+csparsecholesky
+---------------
+
+
+
+Linsol with CSparseCholesky Interface
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+csparse
+-------
+
+
+
+Linsol with CSparse Interface
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+lapacklu
+--------
+
+
+
+This class solves the linear system A.x=b by making an LU factorization of
+A: A = L.U, with L lower and U upper triangular
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| allow_equilibration_fa | OT_BOOL                | Non-fatal error when   |
+| ilure                  |                        | equilibration fails    |
++------------------------+------------------------+------------------------+
+| equilibration          | OT_BOOL                | Equilibrate the matrix |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+lapackqr
+--------
+
+
+
+This class solves the linear system A.x=b by making an QR factorization of
+A: A = Q.R, with Q orthogonal and R upper triangular
+
+--------------------------------------------------------------------------------
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+symbolicqr
+----------
+
+
+
+Linsol based on QR factorization with sparsity pattern based reordering
+without partial pivoting
+
+>List of available options
+
++------------------------+------------------------+------------------------+
+|           Id           |          Type          |      Description       |
++========================+========================+========================+
+| codegen                | OT_BOOL                | C-code generation      |
++------------------------+------------------------+------------------------+
+| compiler               | OT_STRING              | Compiler command to be |
+|                        |                        | used for compiling     |
+|                        |                        | generated code         |
++------------------------+------------------------+------------------------+
+
+--------------------------------------------------------------------------------
+
+
 
 Joel Andersson
 
