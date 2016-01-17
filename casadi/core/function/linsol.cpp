@@ -31,6 +31,62 @@
 using namespace std;
 namespace casadi {
 
+  bool has_linsol(const string& name) {
+    return Linsol::hasPlugin(name);
+  }
+
+  void load_linsol(const string& name) {
+    Linsol::loadPlugin(name);
+  }
+
+  string doc_linsol(const string& name) {
+    return Linsol::getPlugin(name).doc;
+  }
+
+  Function linsol(const std::string& name, const std::string& solver,
+                  const Sparsity& sp, int nrhs, const Dict& opts) {
+    Function ret;
+    if (solver=="none") {
+      ret.assignNode(new Linsol(name, sp, nrhs));
+    } else {
+      ret.assignNode(Linsol::getPlugin(solver).creator(name, sp, nrhs));
+    }
+    ret->construct(opts);
+    return ret;
+  }
+
+  MX Function::linsol_solve(const MX& A, const MX& B, bool tr) {
+    return (*this)->linsol_solve(A, B, tr);
+  }
+
+  void Function::linsol_solveL(double* x, int nrhs, bool tr, int mem) const {
+    (*this)->linsol_solveL(*(*this)->mem_.at(mem), x, nrhs, tr);
+  }
+
+  void Function::linsol_factorize(const double* A, int mem) const {
+    (*this)->linsol_factorize(*(*this)->mem_.at(mem), A);
+  }
+
+  void Function::linsol_solve(double* x, int nrhs, bool tr, int mem) const {
+    (*this)->linsol_solve(*(*this)->mem_.at(mem), x, nrhs, tr);
+  }
+
+  Sparsity Function::linsol_cholesky_sparsity(bool tr, int mem) const {
+    return (*this)->linsol_cholesky_sparsity(*(*this)->mem_.at(mem), tr);
+  }
+
+  DM Function::linsol_cholesky(bool tr, int mem) const {
+    return (*this)->linsol_cholesky(*(*this)->mem_.at(mem), tr);
+  }
+
+  void Function::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+    (*this)->linsol_spsolve(X, B, tr);
+  }
+
+  void Function::linsol_spsolve(DM& X, const DM& B, bool tr) const {
+    (*this)->linsol_spsolve(X, B, tr);
+  }
+
   Linsol::Linsol(const std::string& name, const Sparsity& sparsity, int nrhs)
     : FunctionInternal(name), sparsity_(sparsity), nrhs_(nrhs) {
 

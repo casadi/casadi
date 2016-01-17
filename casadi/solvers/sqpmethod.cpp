@@ -27,6 +27,7 @@
 
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/calculus.hpp"
+#include "casadi/core/function/qpsol.hpp"
 
 #include <ctime>
 #include <iomanip>

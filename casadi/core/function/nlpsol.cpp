@@ -30,6 +30,93 @@
 using namespace std;
 namespace casadi {
 
+  bool has_nlpsol(const string& name) {
+    return Nlpsol::hasPlugin(name);
+  }
+
+  void load_nlpsol(const string& name) {
+    Nlpsol::loadPlugin(name);
+  }
+
+  string doc_nlpsol(const string& name) {
+    return Nlpsol::getPlugin(name).doc;
+  }
+
+  Function nlpsol(const string& name, const string& solver,
+                                const SXDict& nlp, const Dict& opts) {
+    return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
+  }
+
+  Function nlpsol(const string& name, const string& solver,
+                                const MXDict& nlp, const Dict& opts) {
+    return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
+  }
+
+  Function nlpsol(const string& name, const string& solver,
+                                const Function& nlp, const Dict& opts) {
+    if (nlp.is_a("sxfunction")) {
+      return nlpsol(name, solver, Nlpsol::fun2problem<SX>(nlp), opts);
+    } else {
+      return nlpsol(name, solver, Nlpsol::fun2problem<MX>(nlp), opts);
+    }
+  }
+
+  Function nlpsol(const string& name, const string& solver,
+                                const XProblem& nlp, const Dict& opts) {
+    Function ret;
+    ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
+    ret->construct(opts);
+    return ret;
+  }
+
+  vector<string> nlpsol_in() {
+    vector<string> ret(nlpsol_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_in(i);
+    return ret;
+  }
+
+  vector<string> nlpsol_out() {
+    vector<string> ret(nlpsol_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_out(i);
+    return ret;
+  }
+
+  string nlpsol_in(int ind) {
+    switch (static_cast<NlpsolInput>(ind)) {
+    case NLPSOL_X0:     return "x0";
+    case NLPSOL_P:      return "p";
+    case NLPSOL_LBX:    return "lbx";
+    case NLPSOL_UBX:    return "ubx";
+    case NLPSOL_LBG:    return "lbg";
+    case NLPSOL_UBG:    return "ubg";
+    case NLPSOL_LAM_X0: return "lam_x0";
+    case NLPSOL_LAM_G0: return "lam_g0";
+    case NLPSOL_NUM_IN: break;
+    }
+    return string();
+  }
+
+  string nlpsol_out(int ind) {
+    switch (static_cast<NlpsolOutput>(ind)) {
+    case NLPSOL_X:     return "x";
+    case NLPSOL_F:     return "f";
+    case NLPSOL_G:     return "g";
+    case NLPSOL_LAM_X: return "lam_x";
+    case NLPSOL_LAM_G: return "lam_g";
+    case NLPSOL_LAM_P: return "lam_p";
+    case NLPSOL_NUM_OUT: break;
+    }
+    return string();
+  }
+
+  int nlpsol_n_in() {
+    return NLPSOL_NUM_IN;
+  }
+
+  int nlpsol_n_out() {
+    return NLPSOL_NUM_OUT;
+  }
+
   Nlpsol::Nlpsol(const std::string& name, const XProblem& nlp)
     : FunctionInternal(name), nlp2_(nlp) {
 

@@ -26,6 +26,7 @@
 #ifndef CASADI_QPSOL_IMPL_HPP
 #define CASADI_QPSOL_IMPL_HPP
 
+#include "qpsol.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 

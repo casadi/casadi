@@ -26,6 +26,7 @@
 #ifndef CASADI_ROOTFINDER_IMPL_HPP
 #define CASADI_ROOTFINDER_IMPL_HPP
 
+#include "rootfinder.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 

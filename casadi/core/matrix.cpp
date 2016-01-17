@@ -26,6 +26,7 @@
 #include "matrix_impl.hpp"
 #include "function/sx_function.hpp"
 #include "sx/sx_node.hpp"
+#include "function/linsol.hpp"
 
 using namespace std;
 
