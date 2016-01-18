@@ -2017,20 +2017,20 @@ except:
 arcsin = lambda x: _casadi.asin(x)
 arccos = lambda x: _casadi.acos(x)
 arctan = lambda x: _casadi.atan(x)
-log = lambda x: casadi_log(x)
-log10 = lambda x: casadi_log10(x)
-exp = lambda x: casadi_exp(x)
-floor = lambda x: casadi_floor(x)
-ceil = lambda x: casadi_ceil(x)
+log = lambda x: _casadi.log(x)
+log10 = lambda x: _casadi.log10(x)
+exp = lambda x: _casadi.exp(x)
+floor = lambda x: _casadi.floor(x)
+ceil = lambda x: _casadi.ceil(x)
 fmin = lambda x,y: casadi_min(x, y)
 fmax = lambda x,y: casadi_max(x, y)
 fabs = lambda x: casadi_abs(x)
-sign = lambda x: casadi_sign(x)
+sign = lambda x: _casadi.sign(x)
 arctan2 = lambda x,y: _casadi.atan2(x, y)
 arctanh = lambda x: _casadi.atanh(x)
 arcsinh = lambda x: _casadi.asinh(x)
 arccosh = lambda x: _casadi.acosh(x)
-copysign = lambda x,y: casadi_copysign(x, y)
+copysign = lambda x,y: _casadi.copysign(x, y)
 %}
 #endif // SWIGPYTHON
 
@@ -2062,13 +2062,13 @@ copysign = lambda x,y: casadi_copysign(x, y)
 %feature("python:maybecall") friendwrap_ne;
 %feature("python:maybecall") friendwrap_power;
 %feature("python:maybecall") friendwrap_atan2;
-%feature("python:maybecall") casadi_min;
-%feature("python:maybecall") casadi_max;
-%feature("python:maybecall") casadi_and;
-%feature("python:maybecall") casadi_or;
-%feature("python:maybecall") casadi_mod;
-%feature("python:maybecall") casadi_copysign;
-%feature("python:maybecall") casadi_constpow;
+%feature("python:maybecall") friendwrap_min;
+%feature("python:maybecall") friendwrap_max;
+%feature("python:maybecall") friendwrap_and;
+%feature("python:maybecall") friendwrap_or;
+%feature("python:maybecall") friendwrap_mod;
+%feature("python:maybecall") friendwrap_copysign;
+%feature("python:maybecall") friendwrap_constpow;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
@@ -2095,11 +2095,6 @@ if (!$1) {
 
 #ifdef SWIGPYTHON
 %pythoncode %{
-def prod(self,*args):
-    raise Exception("'prod' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
-def dot(self,*args):
-    raise Exception("'dot' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
-
 class NZproxy:
   def __init__(self,matrix):
     self.matrix = matrix
@@ -2512,11 +2507,11 @@ DECL M %SHOW(mpower)(const M& x, const M& n) {
   return mpower(x, n);
 }
 
-DECL M %HIDE(mrdivide)(const M& x, const M& y) {
+DECL M %SHOW(mrdivide)(const M& x, const M& y) {
   return mrdivide(x, y);
 }
 
-DECL M %HIDE(mldivide)(const M& x, const M& y) {
+DECL M %SHOW(mldivide)(const M& x, const M& y) {
   return mldivide(x, y);
 }
 
@@ -2754,24 +2749,24 @@ DECL M %SHOW(cosh)(const M& x) { return cosh(x); }
 DECL M %SHOW(atanh)(const M& x) { return atanh(x); }
 DECL M %SHOW(asinh)(const M& x) { return asinh(x); }
 DECL M %SHOW(acosh)(const M& x) { return acosh(x); }
-DECL M %HIDE(exp)(const M& x) { return exp(x); }
-DECL M %HIDE(log)(const M& x) { return log(x); }
-DECL M %HIDE(log10)(const M& x) { return log10(x); }
-DECL M %HIDE(floor)(const M& x) { return floor(x); }
-DECL M %HIDE(ceil)(const M& x) { return ceil(x); }
-DECL M %HIDE(erf)(const M& x) { return erf(x); }
+DECL M %SHOW(exp)(const M& x) { return exp(x); }
+DECL M %SHOW(log)(const M& x) { return log(x); }
+DECL M %SHOW(log10)(const M& x) { return log10(x); }
+DECL M %SHOW(floor)(const M& x) { return floor(x); }
+DECL M %SHOW(ceil)(const M& x) { return ceil(x); }
+DECL M %SHOW(erf)(const M& x) { return erf(x); }
 DECL M %SHOW(erfinv)(const M& x) { using casadi::erfinv; return erfinv(x); }
-DECL M %HIDE(sign)(const M& x) { using casadi::sign; return sign(x); }
+DECL M %SHOW(sign)(const M& x) { using casadi::sign; return sign(x); }
 DECL M %SHOW(power)(const M& x, const M& n) { return pow(x, n); }
-DECL M %HIDE(mod)(const M& x, const M& y) { return fmod(x, y); }
+DECL M %SHOW(mod)(const M& x, const M& y) { return fmod(x, y); }
 DECL M %SHOW(atan2)(const M& x, const M& y) { return atan2(x, y); }
 DECL M %HIDE(min)(const M& x, const M& y) { return fmin(x, y); }
 DECL M %HIDE(max)(const M& x, const M& y) { return fmax(x, y); }
 DECL M %SHOW(simplify)(const M& x) { using casadi::simplify; return simplify(x); }
 DECL bool %SHOW(is_equal)(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
 DECL bool %SHOW(iszero)(const M& x) { using casadi::iszero; return iszero(x); }
-DECL M %HIDE(copysign)(const M& x, const M& y) { return copysign(x, y); }
-DECL M %HIDE(constpow)(const M& x, const M& y) { using casadi::constpow; return constpow(x, y); }
+DECL M %SHOW(copysign)(const M& x, const M& y) { return copysign(x, y); }
+DECL M %SHOW(constpow)(const M& x, const M& y) { using casadi::constpow; return constpow(x, y); }
 #endif // FLAG & IS_MEMBER
 %enddef
 
@@ -3335,8 +3330,8 @@ namespace casadi {
       def __rfmin__(y, x): return casadi_min(x, y)
       def __fmax__(x, y): return casadi_max(x, y)
       def __rfmax__(y, x): return casadi_max(x, y)
-      def logic_and(x, y): return casadi_and(x, y)
-      def logic_or(x, y): return casadi_or(x, y)
+      def logic_and(x, y): return _casadi.logic_and(x, y)
+      def logic_or(x, y): return _casadi.logic_or(x, y)
       def fabs(x): return casadi_abs(x)
       def sqrt(x): return _casadi.sqrt(x)
       def sin(x): return _casadi.sin(x)
@@ -3351,33 +3346,33 @@ namespace casadi {
       def arcsinh(x): return _casadi.asinh(x)
       def arccosh(x): return _casadi.acosh(x)
       def arctanh(x): return _casadi.atanh(x)
-      def exp(x): return casadi_exp(x)
-      def log(x): return casadi_log(x)
-      def log10(x): return casadi_log10(x)
-      def floor(x): return casadi_floor(x)
-      def ceil(x): return casadi_ceil(x)
-      def erf(x): return casadi_erf(x)
-      def sign(x): return casadi_sign(x)
-      def fmod(x, y): return casadi_mod(x, y)
-      def __copysign__(x, y): return casadi_copysign(x, y)
-      def __rcopysign__(y, x): return casadi_copysign(x, y)
-      def copysign(x, y): return casadi_copysign(x, y)
-      def rcopysign(y, x): return casadi_copysign(x, y)
-      def __constpow__(x, y): return casadi_constpow(x, y)
-      def __rconstpow__(y, x): return casadi_constpow(x, y)
-      def constpow(x, y): return casadi_constpow(x, y)
-      def rconstpow(y, x): return casadi_constpow(x, y)
+      def exp(x): return _casadi.exp(x)
+      def log(x): return _casadi.log(x)
+      def log10(x): return _casadi.log10(x)
+      def floor(x): return _casadi.floor(x)
+      def ceil(x): return _casadi.ceil(x)
+      def erf(x): return _casadi.erf(x)
+      def sign(x): return _casadi.sign(x)
+      def fmod(x, y): return _casadi.mod(x, y)
+      def __copysign__(x, y): return _casadi.copysign(x, y)
+      def __rcopysign__(y, x): return _casadi.copysign(x, y)
+      def copysign(x, y): return _casadi.copysign(x, y)
+      def rcopysign(y, x): return _casadi.copysign(x, y)
+      def __constpow__(x, y): return _casadi.constpow(x, y)
+      def __rconstpow__(y, x): return _casadi.constpow(x, y)
+      def constpow(x, y): return _casadi.constpow(x, y)
+      def rconstpow(y, x): return _casadi.constpow(x, y)
     %}
   }
 
   %extend GenericMatrixCommon {
     %pythoncode %{
-      def __mldivide__(x, y): return casadi_mldivide(x, y)
-      def __rmldivide__(y, x): return casadi_mldivide(x, y)
-      def __mrdivide__(x, y): return casadi_mrdivide(x, y)
-      def __rmrdivide__(y, x): return casadi_mrdivide(x, y)
-      def __mpower__(x, y): return casadi_mpower(x, y)
-      def __rmpower__(y, x): return casadi_mpower(x, y)
+      def __mldivide__(x, y): return _casadi.mldivide(x, y)
+      def __rmldivide__(y, x): return _casadi.mldivide(x, y)
+      def __mrdivide__(x, y): return _casadi.mrdivide(x, y)
+      def __rmrdivide__(y, x): return _casadi.mrdivide(x, y)
+      def __mpower__(x, y): return _casadi.mpower(x, y)
+      def __rmpower__(y, x): return _casadi.mpower(x, y)
     %}
   }
 
