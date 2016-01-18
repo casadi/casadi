@@ -20,7 +20,7 @@ r = f({3})
 disp(r{1})
 
 res = r{1}-DM(cos(3))
-assert(is_zero(res))
+assert(iszero(res))
 
 
 x = SX.sym('x',4);
@@ -132,7 +132,7 @@ end
 
 % Check mixing DM and MX
 res = (DM(1)+MX(1)) - (MX(1)+DM(1))
-assert(is_zero(res))
+assert(iszero(res))
 
 % Try substitute (non-member function)
 a = SX.sym('a');
@@ -164,8 +164,8 @@ res_vec = nlp({1.1, 3.3});
 
 % Evaluate with named inputs and outputs
 res_struct = nlp(struct('x',1.1,'p',3.3));
-assert(is_zero(res_vec{1}-res_struct.f))
-assert(is_zero(res_vec{2}-res_struct.g))
+assert(iszero(res_vec{1}-res_struct.f))
+assert(iszero(res_vec{2}-res_struct.g))
 
 u = SX.sym('u',1,5);
 

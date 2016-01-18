@@ -2753,7 +2753,7 @@ DECL M casadi_min(const M& x, const M& y) { return fmin(x, y); }
 DECL M casadi_max(const M& x, const M& y) { return fmax(x, y); }
 DECL M casadi_simplify(const M& x) { using casadi::simplify; return simplify(x); }
 DECL bool casadi_is_equal(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
-DECL bool casadi_is_zero(const M& x) { using casadi::is_zero; return is_zero(x); }
+DECL bool casadi_iszero(const M& x) { using casadi::iszero; return iszero(x); }
 DECL M casadi_copysign(const M& x, const M& y) { return copysign(x, y); }
 DECL M casadi_constpow(const M& x, const M& y) { using casadi::constpow; return constpow(x, y); }
 #endif // FLAG & IS_MEMBER

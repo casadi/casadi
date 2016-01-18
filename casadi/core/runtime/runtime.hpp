@@ -124,7 +124,7 @@ namespace casadi {
 // Helper functions
 namespace casadi {
   /// Check if entry is zero (false negative allowed)
-  inline bool is_zero(double x) { return x==0;}
+  inline bool iszero(double x) { return x==0;}
 }
 
 // Implementations
@@ -459,7 +459,7 @@ namespace casadi {
         }
       }
       for (jj=0; jj<length; ++jj) {
-        if (!is_zero(sums[head])) {
+        if (!iszero(sums[head])) {
           real_t a = fabs(sums[head]);
           res = fmax(res, a);
           nnz++;

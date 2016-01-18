@@ -126,7 +126,7 @@ namespace casadi {
   }
 
   bool ConstantDM::is_zero() const {
-    return DM::is_zero(x_);
+    return x_.is_zero();
   }
 
   bool ConstantDM::is_one() const {

@@ -731,7 +731,7 @@ namespace casadi {
             } else {
               seed[i] = dwork[el][d];
             }
-            if (skip[d] && !is_zero(seed[i])) skip[d] = false;
+            if (skip[d] && !seed[i].is_zero()) skip[d] = false;
           }
           if (!skip[d]) oseed.push_back(seed);
         }
@@ -869,7 +869,7 @@ namespace casadi {
             if (seed[i].is_empty(true)) seed[i] = MX(it->data->sparsity(i).size());
 
             // If nonzero seeds, keep direction
-            if (skip[d] && !is_zero(seed[i])) skip[d] = false;
+            if (skip[d] && !seed[i].is_zero()) skip[d] = false;
           }
           // Add to list of derivatives
           if (!skip[d]) oseed.push_back(seed);

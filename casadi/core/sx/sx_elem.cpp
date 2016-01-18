@@ -140,7 +140,7 @@ namespace casadi {
   SXElem SXElem::operator-() const {
     if (is_op(OP_NEG))
       return dep();
-    else if (is_zero(*this))
+    else if (is_zero())
       return 0;
     else if (is_minus_one())
       return 1;
@@ -151,7 +151,7 @@ namespace casadi {
   }
 
   bool SXElem::__nonzero__() const {
-    if (is_constant()) return !is_zero(*this);
+    if (is_constant()) return !is_zero();
     casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.")
   }
 
@@ -189,9 +189,9 @@ namespace casadi {
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
       case OP_ADD:
-        if (is_zero(x))
+        if (x.is_zero())
           return y;
-        else if (is_zero(y)) // term2 is zero
+        else if (y->is_zero()) // term2 is zero
           return x;
         else if (y.is_op(OP_NEG))  // x + (-y) -> x - y
           return x - (-y);
@@ -218,9 +218,9 @@ namespace casadi {
           return 1; // sin^2 + cos^2 -> 1
         break;
       case OP_SUB:
-        if (is_zero(y)) // term2 is zero
+        if (y->is_zero()) // term2 is zero
           return x;
-        if (is_zero(x)) // term1 is zero
+        if (x.is_zero()) // term1 is zero
           return -y;
         if (is_equal(x, y, SXNode::eq_depth_)) // the terms are equal
           return 0;
@@ -242,7 +242,7 @@ namespace casadi {
           return sq(x);
         else if (!x.is_constant() && y.is_constant())
           return y * x;
-        else if (is_zero(x) || is_zero(y)) // one of the terms is zero
+        else if (x.is_zero() || y->is_zero()) // one of the terms is zero
           return 0;
         else if (x.is_one()) // term1 is one
           return y;
@@ -273,9 +273,9 @@ namespace casadi {
           return -(x * y.dep());
         break;
       case OP_DIV:
-        if (is_zero(y)) // term2 is zero
+        if (y->is_zero()) // term2 is zero
           return casadi_limits<SXElem>::nan;
-        else if (is_zero(x)) // term1 is zero
+        else if (x.is_zero()) // term1 is zero
           return 0;
         else if (y->is_one()) // term2 is one
           return x;
@@ -361,11 +361,11 @@ namespace casadi {
       case OP_ATANH:
       case OP_ACOSH:
       case OP_ASINH:
-        if (is_zero(x))
+        if (x.is_zero())
           return 0;
         break;
       case OP_COSH:
-        if (is_zero(x))
+        if (x.is_zero())
           return 1;
         break;
       case OP_SQRT:
@@ -387,7 +387,7 @@ namespace casadi {
           return x.dep();
         break;
       case OP_IF_ELSE_ZERO:
-        if (is_zero(y)) {
+        if (y->is_zero()) {
           return y;
         } else if (x.is_constant()) {
           if (static_cast<double>(x)!=0) {
@@ -431,8 +431,8 @@ namespace casadi {
     return node->hasDep();
   }
 
-  bool SXElem::is_zero(const SXElem& x) {
-    return x->is_zero();
+  bool SXElem::is_zero() const {
+    return node->is_zero();
   }
 
   bool SXElem::isAlmostZero(double tol) const {
@@ -526,7 +526,7 @@ namespace casadi {
   const SXElem casadi_limits<SXElem>::minus_inf(new MinusInfSX(), false);
 
   bool casadi_limits<SXElem>::is_zero(const SXElem& val) {
-    return SXElem::is_zero(val);
+    return val.is_zero();
   }
 
   bool casadi_limits<SXElem>::is_equal(const SXElem& x, const SXElem& y, int depth) {

@@ -65,7 +65,7 @@ namespace casadi {
 
   template<bool Tr>
   void Solve<Tr>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
-    if (MX::is_zero(arg[0])) {
+    if (arg[0].is_zero()) {
       res[0] = MX(arg[0].size());
     } else {
       res[0] = linsol_->linsol_solve(arg[1], arg[0], Tr);

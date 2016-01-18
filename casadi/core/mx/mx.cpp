@@ -596,7 +596,7 @@ namespace casadi {
       return y + z;
     } else if (y.is_identity()) {
       return x + z;
-    } else if (is_zero(x) || is_zero(y)) {
+    } else if (x.is_zero() || y.is_zero()) {
       return z;
     } else {
       return x->getMultiplication(y, z);
@@ -792,11 +792,11 @@ namespace casadi {
     return (*this)->is_identity();
   }
 
-  bool MX::is_zero(const MX& x) {
-    if (x.nnz()==0) {
+  bool MX::is_zero() const {
+    if (nnz()==0) {
       return true;
     } else {
-      return x->is_zero();
+      return (*this)->is_zero();
     }
   }
 
