@@ -2336,14 +2336,6 @@ namespace casadi{
 %template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElem> >;
 %template(ExpMX)             casadi::GenericExpression<casadi::MX>;
 
-// Prefix symbols
-#if defined(SWIGMATLAB) || defined(SWIGXML)
-%define %HIDE(SYM) friendwrap_ ## SYM %enddef
-#else
-%define %HIDE(SYM) casadi_ ## SYM %enddef
-#endif
-%define %SHOW(SYM) friendwrap_ ## SYM %enddef
-
 // Flags to allow differentiating the wrapping by type
 #define IS_GLOBAL   0x1
 #define IS_MEMBER   0x10
@@ -2357,114 +2349,114 @@ namespace casadi{
 %define SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
 
- DECL M %SHOW(horzcat)(const std::vector< M > &v) {
+ DECL M friendwrap_horzcat(const std::vector< M > &v) {
   return horzcat(v);
  }
- DECL M %SHOW(vertcat)(const std::vector< M > &v) {
+ DECL M friendwrap_vertcat(const std::vector< M > &v) {
  return vertcat(v);
  }
  DECL std::vector< M >
- %SHOW(horzsplit)(const M& v, const std::vector<int>& offset) {
+ friendwrap_horzsplit(const M& v, const std::vector<int>& offset) {
  return horzsplit(v, offset);
  }
- DECL std::vector< M > %SHOW(horzsplit)(const M& v, int incr=1) {
+ DECL std::vector< M > friendwrap_horzsplit(const M& v, int incr=1) {
  return horzsplit(v, incr);
  }
  DECL std::vector< M >
- %SHOW(vertsplit)(const M& v, const std::vector<int>& offset) {
+ friendwrap_vertsplit(const M& v, const std::vector<int>& offset) {
  return vertsplit(v, offset);
  }
  DECL std::vector<int >
- %SHOW(offset)(const std::vector< M > &v, bool vert=true) {
+ friendwrap_offset(const std::vector< M > &v, bool vert=true) {
  return offset(v, vert);
  }
  DECL std::vector< M >
- %SHOW(vertsplit)(const M& v, int incr=1) {
+ friendwrap_vertsplit(const M& v, int incr=1) {
  return vertsplit(v, incr);
  }
- DECL M %SHOW(blockcat)(const std::vector< std::vector< M > > &v) {
+ DECL M friendwrap_blockcat(const std::vector< std::vector< M > > &v) {
  return blockcat(v);
  }
- DECL M %SHOW(blockcat)(const M& A, const M& B, const M& C, const M& D) {
+ DECL M friendwrap_blockcat(const M& A, const M& B, const M& C, const M& D) {
  return vertcat(horzcat(A, B), horzcat(C, D));
  }
  DECL std::vector< std::vector< M > >
- %SHOW(blocksplit)(const M& x, const std::vector<int>& vert_offset,
+ friendwrap_blocksplit(const M& x, const std::vector<int>& vert_offset,
  const std::vector<int>& horz_offset) {
  return blocksplit(x, vert_offset, horz_offset);
  }
  DECL std::vector< std::vector< M > >
- %SHOW(blocksplit)(const M& x, int vert_incr=1, int horz_incr=1) {
+ friendwrap_blocksplit(const M& x, int vert_incr=1, int horz_incr=1) {
  return blocksplit(x, vert_incr, horz_incr);
  }
- DECL M %SHOW(diagcat)(const std::vector< M > &A) {
+ DECL M friendwrap_diagcat(const std::vector< M > &A) {
  return diagcat(A);
  }
  DECL std::vector< M >
- %SHOW(diagsplit)(const M& x, const std::vector<int>& output_offset1,
+ friendwrap_diagsplit(const M& x, const std::vector<int>& output_offset1,
  const std::vector<int>& output_offset2) {
  return diagsplit(x, output_offset1, output_offset2);
  }
  DECL std::vector< M >
- %SHOW(diagsplit)(const M& x, const std::vector<int>& output_offset) {
+ friendwrap_diagsplit(const M& x, const std::vector<int>& output_offset) {
  return diagsplit(x, output_offset);
  }
- DECL std::vector< M > %SHOW(diagsplit)(const M& x, int incr=1) {
+ DECL std::vector< M > friendwrap_diagsplit(const M& x, int incr=1) {
  return diagsplit(x, incr);
  }
  DECL std::vector< M >
- %SHOW(diagsplit)(const M& x, int incr1, int incr2) {
+ friendwrap_diagsplit(const M& x, int incr1, int incr2) {
  return diagsplit(x, incr1, incr2);
  }
- DECL M %SHOW(veccat)(const std::vector< M >& x) {
+ DECL M friendwrap_veccat(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M %SHOW(mtimes)(const M& x, const M& y) {
+ DECL M friendwrap_mtimes(const M& x, const M& y) {
  return mtimes(x, y);
  }
- DECL M %SHOW(mtimes)(const std::vector< M > &args) {
+ DECL M friendwrap_mtimes(const std::vector< M > &args) {
  return mtimes(args);
  }
- DECL M %SHOW(mac)(const M& X, const M& Y, const M& Z) {
+ DECL M friendwrap_mac(const M& X, const M& Y, const M& Z) {
  return mac(X, Y, Z);
  }
- DECL M %SHOW(transpose)(const M& X) {
+ DECL M friendwrap_transpose(const M& X) {
  return X.T();
  }
- DECL M %SHOW(vec)(const M& a) {
+ DECL M friendwrap_vec(const M& a) {
  return vec(a);
  }
- DECL M %SHOW(vecNZ)(const M& a) {
+ DECL M friendwrap_vecNZ(const M& a) {
  return vecNZ(a);
  }
- DECL M %SHOW(reshape)(const M& a, int nrow, int ncol) {
+ DECL M friendwrap_reshape(const M& a, int nrow, int ncol) {
  return reshape(a, nrow, ncol);
  }
- DECL M %SHOW(reshape)(const M& a, std::pair<int, int> rc) {
+ DECL M friendwrap_reshape(const M& a, std::pair<int, int> rc) {
  return reshape(a, rc.first, rc.second);
  }
- DECL M %SHOW(reshape)(const M& a, const Sparsity& sp) {
+ DECL M friendwrap_reshape(const M& a, const Sparsity& sp) {
  return reshape(a, sp);
  }
- DECL int %SHOW(sprank)(const M& A) {
+ DECL int friendwrap_sprank(const M& A) {
  return sprank(A);
  }
- DECL int %SHOW(norm_0_mul)(const M& x, const M& y) {
+ DECL int friendwrap_norm_0_mul(const M& x, const M& y) {
  return norm_0_mul(x, y);
  }
- DECL M %SHOW(triu)(const M& a, bool includeDiagonal=true) {
+ DECL M friendwrap_triu(const M& a, bool includeDiagonal=true) {
  return triu(a, includeDiagonal);
  }
- DECL M %SHOW(tril)(const M& a, bool includeDiagonal=true) {
+ DECL M friendwrap_tril(const M& a, bool includeDiagonal=true) {
  return tril(a, includeDiagonal);
  }
- DECL M %SHOW(kron)(const M& a, const M& b) {
+ DECL M friendwrap_kron(const M& a, const M& b) {
  return kron(a, b);
  }
- DECL M %SHOW(repmat)(const M& A, int n, int m=1) {
+ DECL M friendwrap_repmat(const M& A, int n, int m=1) {
  return repmat(A, n, m);
  }
- DECL M %SHOW(repmat)(const M& A, const std::pair<int, int>& rc) {
+ DECL M friendwrap_repmat(const M& A, const std::pair<int, int>& rc) {
  return repmat(A, rc.first, rc.second);
  }
 #endif
@@ -2482,7 +2474,7 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
   %define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
     SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
     #if FLAG & IS_MEMBER
-     DECL int %SHOW(length)(const M &v) {
+     DECL int friendwrap_length(const M &v) {
       return std::max(v.size1(), v.size2());
      }
     #endif
@@ -2495,204 +2487,204 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 
 %define GENERIC_MATRIX_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M %SHOW(mpower)(const M& x, const M& n) {
+DECL M friendwrap_mpower(const M& x, const M& n) {
   return mpower(x, n);
 }
 
-DECL M %SHOW(mrdivide)(const M& x, const M& y) {
+DECL M friendwrap_mrdivide(const M& x, const M& y) {
   return mrdivide(x, y);
 }
 
-DECL M %SHOW(mldivide)(const M& x, const M& y) {
+DECL M friendwrap_mldivide(const M& x, const M& y) {
   return mldivide(x, y);
 }
 
-DECL std::vector< M > %SHOW(symvar)(const M& x) {
+DECL std::vector< M > friendwrap_symvar(const M& x) {
   return symvar(x);
 }
 
-DECL M %SHOW(bilin)(const M& A, const M& x, const M& y) {
+DECL M friendwrap_bilin(const M& A, const M& x, const M& y) {
   return bilin(A, x, y);
 }
 
-DECL M %SHOW(rank1)(const M& A, const M& alpha, const M& x, const M& y) {
+DECL M friendwrap_rank1(const M& A, const M& alpha, const M& x, const M& y) {
   return rank1(A, alpha, x, y);
 }
 
-DECL M %SHOW(sum_square)(const M& X) {
+DECL M friendwrap_sum_square(const M& X) {
   return sum_square(X);
 }
 
-DECL M %SHOW(linspace)(const M& a, const M& b, int nsteps) {
+DECL M friendwrap_linspace(const M& a, const M& b, int nsteps) {
   return linspace(a, b, nsteps);
 }
 
-DECL M %SHOW(cross)(const M& a, const M& b, int dim = -1) {
+DECL M friendwrap_cross(const M& a, const M& b, int dim = -1) {
   return cross(a, b, dim);
 }
 
-DECL M %SHOW(det)(const M& A) {
+DECL M friendwrap_det(const M& A) {
   return det(A);
 }
 
-DECL M %SHOW(inv)(const M& A) {
+DECL M friendwrap_inv(const M& A) {
   return inv(A);
 }
 
-DECL M %SHOW(trace)(const M& a) {
+DECL M friendwrap_trace(const M& a) {
   return trace(a);
 }
 
-DECL M %SHOW(tril2symm)(const M& a) {
+DECL M friendwrap_tril2symm(const M& a) {
   return tril2symm(a);
 }
 
-DECL M %SHOW(triu2symm)(const M& a) {
+DECL M friendwrap_triu2symm(const M& a) {
   return triu2symm(a);
 }
 
-DECL M %SHOW(norm_F)(const M& x) {
+DECL M friendwrap_norm_F(const M& x) {
   return norm_F(x);
 }
 
-DECL M %SHOW(norm_2)(const M& x) {
+DECL M friendwrap_norm_2(const M& x) {
   return norm_2(x);
 }
 
-DECL M %SHOW(norm_1)(const M& x) {
+DECL M friendwrap_norm_1(const M& x) {
   return norm_1(x);
 }
 
-DECL M %SHOW(norm_inf)(const M& x) {
+DECL M friendwrap_norm_inf(const M& x) {
   return norm_inf(x);
 }
 
-DECL M %SHOW(sumCols)(const M& x) {
+DECL M friendwrap_sumCols(const M& x) {
   return sumCols(x);
 }
 
-DECL M %SHOW(sumRows)(const M& x) {
+DECL M friendwrap_sumRows(const M& x) {
   return sumRows(x);
 }
 
-DECL M %SHOW(dot)(const M& x, const M& y) {
+DECL M friendwrap_dot(const M& x, const M& y) {
   return dot(x, y);
 }
 
-DECL M %SHOW(nullspace)(const M& A) {
+DECL M friendwrap_nullspace(const M& A) {
   return nullspace(A);
 }
 
-DECL M %SHOW(polyval)(const M& p, const M& x) {
+DECL M friendwrap_polyval(const M& p, const M& x) {
   return polyval(p, x);
 }
 
-DECL M %SHOW(diag)(const M& A) {
+DECL M friendwrap_diag(const M& A) {
   return diag(A);
 }
 
-DECL M %SHOW(unite)(const M& A, const M& B) {
+DECL M friendwrap_unite(const M& A, const M& B) {
   return unite(A, B);
 }
 
-DECL M %SHOW(densify)(const M& x) {
+DECL M friendwrap_densify(const M& x) {
   return densify(x);
 }
 
-DECL M %SHOW(project)(const M& A, const Sparsity& sp, bool intersect=false) {
+DECL M friendwrap_project(const M& A, const Sparsity& sp, bool intersect=false) {
   return project(A, sp, intersect);
 }
 
-DECL M %SHOW(if_else)(const M& cond, const M& if_true,
+DECL M friendwrap_if_else(const M& cond, const M& if_true,
                     const M& if_false, bool short_circuit=true) {
   return if_else(cond, if_true, if_false, short_circuit);
 }
 
-DECL M %SHOW(conditional)(const M& ind, const std::vector< M > &x,
+DECL M friendwrap_conditional(const M& ind, const std::vector< M > &x,
                         const M& x_default, bool short_circuit=true) {
   return conditional(ind, x, x_default, short_circuit);
 }
 
-DECL bool %SHOW(dependsOn)(const M& f, const M& arg) {
+DECL bool friendwrap_dependsOn(const M& f, const M& arg) {
   return dependsOn(f, arg);
 }
 
-DECL M %SHOW(solve)(const M& A, const M& b) {
+DECL M friendwrap_solve(const M& A, const M& b) {
   return solve(A, b);
 }
 
-DECL M %SHOW(solve)(const M& A, const M& b,
+DECL M friendwrap_solve(const M& A, const M& b,
                        const std::string& lsolver,
                        const casadi::Dict& opts = casadi::Dict()) {
   return solve(A, b, lsolver, opts);
 }
 
-DECL M %SHOW(pinv)(const M& A) {
+DECL M friendwrap_pinv(const M& A) {
   return pinv(A);
 }
 
-DECL M %SHOW(pinv)(const M& A, const std::string& lsolver,
+DECL M friendwrap_pinv(const M& A, const std::string& lsolver,
                       const casadi::Dict& opts = casadi::Dict()) {
   return pinv(A, lsolver, opts);
 }
 
-DECL M %SHOW(jacobian)(const M &ex, const M &arg) {
+DECL M friendwrap_jacobian(const M &ex, const M &arg) {
   return jacobian(ex, arg);
 }
 
-DECL M %SHOW(jtimes)(const M& ex, const M& arg, const M& v, bool tr=false) {
+DECL M friendwrap_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
 }
 
-DECL std::vector<bool> %SHOW(nl_var)(const M& expr, const M& var) {
+DECL std::vector<bool> friendwrap_nl_var(const M& expr, const M& var) {
   return nl_var(expr, var);
 }
 
-DECL M %SHOW(gradient)(const M &ex, const M &arg) {
+DECL M friendwrap_gradient(const M &ex, const M &arg) {
   return gradient(ex, arg);
 }
 
-DECL M %SHOW(tangent)(const M &ex, const M &arg) {
+DECL M friendwrap_tangent(const M &ex, const M &arg) {
   return tangent(ex, arg);
 }
 
-DECL M %SHOW(hessian)(const M& ex, const M& arg, M& OUTPUT1) {
+DECL M friendwrap_hessian(const M& ex, const M& arg, M& OUTPUT1) {
   return hessian(ex, arg, OUTPUT1);
 }
 
-DECL int %SHOW(countNodes)(const M& A) {
+DECL int friendwrap_countNodes(const M& A) {
   return countNodes(A);
 }
 
-DECL std::string %SHOW(print_operator)(const M& xb,
+DECL std::string friendwrap_print_operator(const M& xb,
                                                   const std::vector<std::string>& args) {
   return print_operator(xb, args);
 }
-DECL M %SHOW(repsum)(const M& A, int n, int m=1) {
+DECL M friendwrap_repsum(const M& A, int n, int m=1) {
   return repsum(A, n, m);
 }
 
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
-DECL M %SHOW(substitute)(const M& ex, const M& v, const M& vdef) {
+DECL M friendwrap_substitute(const M& ex, const M& v, const M& vdef) {
   return substitute(ex, v, vdef);
 }
 
-DECL std::vector< M > %SHOW(substitute)(const std::vector< M >& ex,
+DECL std::vector< M > friendwrap_substitute(const std::vector< M >& ex,
                                          const std::vector< M >& v,
                                          const std::vector< M >& vdef) {
   return substitute(ex, v, vdef);
 }
 
-DECL void %SHOW(substituteInPlace)(const std::vector< M >& v,
+DECL void friendwrap_substituteInPlace(const std::vector< M >& v,
                                       std::vector< M >& INOUT1,
                                       std::vector< M >& INOUT2,
                                       bool reverse=false) {
   return substituteInPlace(v, INOUT1, INOUT2, reverse);
 }
 
-DECL void %SHOW(extractShared)(const std::vector< M >& ex,
+DECL void friendwrap_extractShared(const std::vector< M >& ex,
                                std::vector< M >& OUTPUT1,
                                std::vector< M >& OUTPUT2,
                                std::vector< M >& OUTPUT3,
@@ -2713,52 +2705,52 @@ GENERIC_MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 
 %define GENERIC_EXPRESSION_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M %SHOW(plus)(const M& x, const M& y) { return x+y; }
-DECL M %SHOW(minus)(const M& x, const M& y) { return x-y; }
-DECL M %SHOW(times)(const M& x, const M& y) { return x*y; }
-DECL M %SHOW(rdivide)(const M& x, const M& y) { return x/y; }
-DECL M %SHOW(ldivide)(const M& x, const M& y) { return y/x; }
-DECL M %SHOW(lt)(const M& x, const M& y) { return x<y; }
-DECL M %SHOW(le)(const M& x, const M& y) { return x<=y; }
-DECL M %SHOW(gt)(const M& x, const M& y) { return x>y; }
-DECL M %SHOW(ge)(const M& x, const M& y) { return x>=y; }
-DECL M %SHOW(eq)(const M& x, const M& y) { return x==y; }
-DECL M %SHOW(ne)(const M& x, const M& y) { return x!=y; }
-DECL M %SHOW(and)(const M& x, const M& y) { return x&&y; }
-DECL M %SHOW(or)(const M& x, const M& y) { return x||y; }
-DECL M %SHOW(not)(const M& x) { return !x; }
-DECL M %SHOW(abs)(const M& x) { return fabs(x); }
-DECL M %SHOW(sqrt)(const M& x) { return sqrt(x); }
-DECL M %SHOW(sin)(const M& x) { return sin(x); }
-DECL M %SHOW(cos)(const M& x) { return cos(x); }
-DECL M %SHOW(tan)(const M& x) { return tan(x); }
-DECL M %SHOW(atan)(const M& x) { return atan(x); }
-DECL M %SHOW(asin)(const M& x) { return asin(x); }
-DECL M %SHOW(acos)(const M& x) { return acos(x); }
-DECL M %SHOW(tanh)(const M& x) { return tanh(x); }
-DECL M %SHOW(sinh)(const M& x) { return sinh(x); }
-DECL M %SHOW(cosh)(const M& x) { return cosh(x); }
-DECL M %SHOW(atanh)(const M& x) { return atanh(x); }
-DECL M %SHOW(asinh)(const M& x) { return asinh(x); }
-DECL M %SHOW(acosh)(const M& x) { return acosh(x); }
-DECL M %SHOW(exp)(const M& x) { return exp(x); }
-DECL M %SHOW(log)(const M& x) { return log(x); }
-DECL M %SHOW(log10)(const M& x) { return log10(x); }
-DECL M %SHOW(floor)(const M& x) { return floor(x); }
-DECL M %SHOW(ceil)(const M& x) { return ceil(x); }
-DECL M %SHOW(erf)(const M& x) { return erf(x); }
-DECL M %SHOW(erfinv)(const M& x) { using casadi::erfinv; return erfinv(x); }
-DECL M %SHOW(sign)(const M& x) { using casadi::sign; return sign(x); }
-DECL M %SHOW(power)(const M& x, const M& n) { return pow(x, n); }
-DECL M %SHOW(mod)(const M& x, const M& y) { return fmod(x, y); }
-DECL M %SHOW(atan2)(const M& x, const M& y) { return atan2(x, y); }
-DECL M %SHOW(min)(const M& x, const M& y) { return fmin(x, y); }
-DECL M %SHOW(max)(const M& x, const M& y) { return fmax(x, y); }
-DECL M %SHOW(simplify)(const M& x) { using casadi::simplify; return simplify(x); }
-DECL bool %SHOW(is_equal)(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
-DECL bool %SHOW(iszero)(const M& x) { using casadi::iszero; return iszero(x); }
-DECL M %SHOW(copysign)(const M& x, const M& y) { return copysign(x, y); }
-DECL M %SHOW(constpow)(const M& x, const M& y) { using casadi::constpow; return constpow(x, y); }
+DECL M friendwrap_plus(const M& x, const M& y) { return x+y; }
+DECL M friendwrap_minus(const M& x, const M& y) { return x-y; }
+DECL M friendwrap_times(const M& x, const M& y) { return x*y; }
+DECL M friendwrap_rdivide(const M& x, const M& y) { return x/y; }
+DECL M friendwrap_ldivide(const M& x, const M& y) { return y/x; }
+DECL M friendwrap_lt(const M& x, const M& y) { return x<y; }
+DECL M friendwrap_le(const M& x, const M& y) { return x<=y; }
+DECL M friendwrap_gt(const M& x, const M& y) { return x>y; }
+DECL M friendwrap_ge(const M& x, const M& y) { return x>=y; }
+DECL M friendwrap_eq(const M& x, const M& y) { return x==y; }
+DECL M friendwrap_ne(const M& x, const M& y) { return x!=y; }
+DECL M friendwrap_and(const M& x, const M& y) { return x&&y; }
+DECL M friendwrap_or(const M& x, const M& y) { return x||y; }
+DECL M friendwrap_not(const M& x) { return !x; }
+DECL M friendwrap_abs(const M& x) { return fabs(x); }
+DECL M friendwrap_sqrt(const M& x) { return sqrt(x); }
+DECL M friendwrap_sin(const M& x) { return sin(x); }
+DECL M friendwrap_cos(const M& x) { return cos(x); }
+DECL M friendwrap_tan(const M& x) { return tan(x); }
+DECL M friendwrap_atan(const M& x) { return atan(x); }
+DECL M friendwrap_asin(const M& x) { return asin(x); }
+DECL M friendwrap_acos(const M& x) { return acos(x); }
+DECL M friendwrap_tanh(const M& x) { return tanh(x); }
+DECL M friendwrap_sinh(const M& x) { return sinh(x); }
+DECL M friendwrap_cosh(const M& x) { return cosh(x); }
+DECL M friendwrap_atanh(const M& x) { return atanh(x); }
+DECL M friendwrap_asinh(const M& x) { return asinh(x); }
+DECL M friendwrap_acosh(const M& x) { return acosh(x); }
+DECL M friendwrap_exp(const M& x) { return exp(x); }
+DECL M friendwrap_log(const M& x) { return log(x); }
+DECL M friendwrap_log10(const M& x) { return log10(x); }
+DECL M friendwrap_floor(const M& x) { return floor(x); }
+DECL M friendwrap_ceil(const M& x) { return ceil(x); }
+DECL M friendwrap_erf(const M& x) { return erf(x); }
+DECL M friendwrap_erfinv(const M& x) { using casadi::erfinv; return erfinv(x); }
+DECL M friendwrap_sign(const M& x) { using casadi::sign; return sign(x); }
+DECL M friendwrap_power(const M& x, const M& n) { return pow(x, n); }
+DECL M friendwrap_mod(const M& x, const M& y) { return fmod(x, y); }
+DECL M friendwrap_atan2(const M& x, const M& y) { return atan2(x, y); }
+DECL M friendwrap_min(const M& x, const M& y) { return fmin(x, y); }
+DECL M friendwrap_max(const M& x, const M& y) { return fmax(x, y); }
+DECL M friendwrap_simplify(const M& x) { using casadi::simplify; return simplify(x); }
+DECL bool friendwrap_is_equal(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
+DECL bool friendwrap_iszero(const M& x) { using casadi::iszero; return iszero(x); }
+DECL M friendwrap_copysign(const M& x, const M& y) { return copysign(x, y); }
+DECL M friendwrap_constpow(const M& x, const M& y) { using casadi::constpow; return constpow(x, y); }
 #endif // FLAG & IS_MEMBER
 %enddef
 
@@ -2772,105 +2764,105 @@ GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DOUBLE), double)
 
 %define MATRIX_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M %SHOW(all)(const M& x) {
+DECL M friendwrap_all(const M& x) {
   return all(x);
 }
 
-DECL M %SHOW(any)(const M& x) {
+DECL M friendwrap_any(const M& x) {
   return any(x);
 }
 
-DECL M %SHOW(adj)(const M& A) {
+DECL M friendwrap_adj(const M& A) {
   return adj(A);
 }
 
-DECL M %SHOW(getMinor)(const M& x, int i, int j) {
+DECL M friendwrap_getMinor(const M& x, int i, int j) {
   return getMinor(x, i, j);
 }
 
-DECL M %SHOW(cofactor)(const M& x, int i, int j) {
+DECL M friendwrap_cofactor(const M& x, int i, int j) {
   return cofactor(x, i, j);
 }
 
-DECL void %SHOW(qr)(const M& A, M& OUTPUT1, M& OUTPUT2) {
+DECL void friendwrap_qr(const M& A, M& OUTPUT1, M& OUTPUT2) {
   return qr(A, OUTPUT1, OUTPUT2);
 }
 
-DECL M %SHOW(chol)(const M& A) {
+DECL M friendwrap_chol(const M& A) {
   return chol(A);
 }
 
-DECL M %SHOW(norm_inf_mul)(const M& x, const M& y) {
+DECL M friendwrap_norm_inf_mul(const M& x, const M& y) {
   return norm_inf_mul(x, y);
 }
 
-DECL M %SHOW(sparsify)(const M& A, double tol=0) {
+DECL M friendwrap_sparsify(const M& A, double tol=0) {
   return sparsify(A, tol);
 }
 
-DECL void %SHOW(expand)(const M& ex, M& OUTPUT1, M& OUTPUT2) {
+DECL void friendwrap_expand(const M& ex, M& OUTPUT1, M& OUTPUT2) {
   expand(ex, OUTPUT1, OUTPUT2);
 }
 
-DECL M %SHOW(pw_const)(const M &t, const M& tval, const M& val) {
+DECL M friendwrap_pw_const(const M &t, const M& tval, const M& val) {
   return pw_const(t, tval, val);
 }
 
-DECL M %SHOW(pw_lin)(const M& t, const M& tval, const M& val) {
+DECL M friendwrap_pw_lin(const M& t, const M& tval, const M& val) {
   return pw_lin(t, tval, val);
 }
 
-DECL M %SHOW(heaviside)(const M& x) {
+DECL M friendwrap_heaviside(const M& x) {
   return heaviside(x);
 }
 
-DECL M %SHOW(rectangle)(const M& x) {
+DECL M friendwrap_rectangle(const M& x) {
   return rectangle(x);
 }
 
-DECL M %SHOW(triangle)(const M& x) {
+DECL M friendwrap_triangle(const M& x) {
   return triangle(x);
 }
 
-DECL M %SHOW(ramp)(const M& x) {
+DECL M friendwrap_ramp(const M& x) {
   return ramp(x);
 }
 
-DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
+DECL M friendwrap_gauss_quadrature(const M& f, const M& x,
                                const M& a, const M& b,
                                int order=5) {
   return gauss_quadrature(f, x, a, b, order);
 }
 
-DECL M %SHOW(gauss_quadrature)(const M& f, const M& x,
+DECL M friendwrap_gauss_quadrature(const M& f, const M& x,
                                const M& a, const M& b,
                                int order, const M& w) {
   return gauss_quadrature(f, x, a, b, order, w);
 }
 
-DECL M %SHOW(taylor)(const M& ex, const M& x, const M& a=0, int order=1) {
+DECL M friendwrap_taylor(const M& ex, const M& x, const M& a=0, int order=1) {
   return taylor(ex, x, a, order);
 }
 
-DECL M %SHOW(mtaylor)(const M& ex, const M& x, const M& a, int order=1) {
+DECL M friendwrap_mtaylor(const M& ex, const M& x, const M& a, int order=1) {
   return mtaylor(ex, x, a, order);
 }
 
-DECL M %SHOW(mtaylor)(const M& ex, const M& x, const M& a, int order,
+DECL M friendwrap_mtaylor(const M& ex, const M& x, const M& a, int order,
                       const std::vector<int>& order_contributions) {
   return mtaylor(ex, x, a, order, order_contributions);
 }
 
-DECL M %SHOW(poly_coeff)(const M& ex,
+DECL M friendwrap_poly_coeff(const M& ex,
                          const M&x) {
   return poly_coeff(ex, x);
 }
 
-DECL M %SHOW(poly_roots)(const M& p) {
+DECL M friendwrap_poly_roots(const M& p) {
   return poly_roots(p);
 }
 
-DECL M %SHOW(eig_symbolic)(const M& m) {
+DECL M friendwrap_eig_symbolic(const M& m) {
   return eig_symbolic(m);
 }
 
@@ -2885,32 +2877,32 @@ MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 
 %define MX_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M %SHOW(find)(const M& x) {
+DECL M friendwrap_find(const M& x) {
   return find(x);
 }
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
 DECL std::vector< M >
-%SHOW(matrix_expand)(const std::vector< M >& e,
+friendwrap_matrix_expand(const std::vector< M >& e,
                      const std::vector< M > &boundary = std::vector< M >(),
                      const Dict& options = Dict()) {
   return matrix_expand(e, boundary, options);
 }
 
-DECL M %SHOW(matrix_expand)(const M& e,
+DECL M friendwrap_matrix_expand(const M& e,
                             const std::vector< M > &boundary = std::vector< M >(),
                             const Dict& options = Dict()) {
   return matrix_expand(e, boundary, options);
 }
 
-DECL M %SHOW(graph_substitute)(const M& ex, const std::vector< M >& v,
+DECL M friendwrap_graph_substitute(const M& ex, const std::vector< M >& v,
                          const std::vector< M > &vdef) {
   return graph_substitute(ex, v, vdef);
 }
 
 DECL std::vector< M >
-%SHOW(graph_substitute)(const std::vector< M > &ex,
+friendwrap_graph_substitute(const std::vector< M > &ex,
                  const std::vector< M > &v,
                  const std::vector< M > &vdef) {
   return graph_substitute(ex, v, vdef);
