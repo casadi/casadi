@@ -3954,12 +3954,6 @@ Inverse hyperbolic tangent.
 
 ";
 
-%feature("docstring")  iszero(const ExType &x) "
-
-Addition.
-
-";
-
 %feature("docstring")  tan(const ExType &x) "
 
 Tangent.
@@ -4130,6 +4124,12 @@ expressions are identical, i.e. points to the same node.
 a = x*x b = x*x
 
 a.is_equal(b, 0) will return false, but a.is_equal(b, 1) will return true
+
+";
+
+%feature("docstring")  is_zero(const ExType &x) "
+
+Addition.
 
 ";
 
@@ -5368,12 +5368,6 @@ Print dense matrix-stype.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::getSparsity() const  "
-
-Get an owning reference to the sparsity pattern.
-
-";
-
 %feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
 >::getRepresentation() const "
 
@@ -5487,6 +5481,12 @@ Get get the number of non-zeros on the diagonal.
 >::sparsity() const "
 
 Get the sparsity pattern.
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::get_sparsity() const  "
+
+Get an owning reference to the sparsity pattern.
 
 ";
 
@@ -5713,12 +5713,6 @@ Also called: slope function
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::to_double() const  "
-
-Get double value (only if constant)
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::to_double(int k) const  "
 
 Get double value (particular nonzero)
@@ -5847,58 +5841,6 @@ Set double value (particular nonzero)
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print vector-style.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, int nrow=1, int ncol=1) "
-
-Create an nrow-by-ncol symbolic primitive.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, const std::pair< int, int > &rc) "
-
-Construct a symbolic primitive with given dimensions.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, const Sparsity &sp) "
-
-Create symbolic primitive with a given sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, const Sparsity &sp, int p) "
-
-Create a vector of length p with with matrices with symbolic primitives of
-given sparsity.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, int nrow, int ncol, int p) "
-
-Create a vector of length p with nrow-by-ncol symbolic primitives.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, const Sparsity &sp, int p, int r) "
-
-Create a vector of length r of vectors of length p with symbolic primitives
-with given sparsity.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, int nrow, int ncol, int p, int r) "
-
-Create a vector of length r of vectors of length p with nrow-by-ncol
-symbolic primitives.
 
 ";
 
@@ -6222,12 +6164,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::to_int() const  "
-
-Get double value (only if integer constant)
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::pw_const(const Matrix<
 Scalar > &t, const Matrix< Scalar > &tval, const Matrix< Scalar > &val) "
 [INTERNAL]  Create a piecewise constant function Create a piecewise constant
@@ -6373,9 +6309,55 @@ window function
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::is_zero() const  "
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, int nrow=1, int ncol=1) "
 
-check if the matrix is 0 (note that false negative answers are possible)
+Create an nrow-by-ncol symbolic primitive.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, const std::pair< int, int > &rc) "
+
+Construct a symbolic primitive with given dimensions.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, const Sparsity &sp) "
+
+Create symbolic primitive with a given sparsity pattern.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, const Sparsity &sp, int p) "
+
+Create a vector of length p with with matrices with symbolic primitives of
+given sparsity.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, int nrow, int ncol, int p) "
+
+Create a vector of length p with nrow-by-ncol symbolic primitives.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, const Sparsity &sp, int p, int r) "
+
+Create a vector of length r of vectors of length p with symbolic primitives
+with given sparsity.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, int nrow, int ncol, int p, int r) "
+
+Create a vector of length r of vectors of length p with nrow-by-ncol
+symbolic primitives.
 
 ";
 
@@ -6790,12 +6772,6 @@ Is binary operation.
 
 ";
 
-%feature("docstring")  casadi::MX::getSparsity() const  "
-
-Get an owning reference to the sparsity pattern.
-
-";
-
 %feature("docstring")  casadi::MX::inf(const Sparsity &sp) "
 
 create a matrix with all inf
@@ -7023,12 +6999,6 @@ int, int > &rc) "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
-
-";
-
-%feature("docstring")  casadi::MX::is_zero() const  "
-
-check if zero (note that false negative answers are possible)
 
 ";
 
@@ -7423,6 +7393,12 @@ Get the number of symbolic primitive Assumes is_valid_input() returns true.
 %feature("docstring")  casadi::MX::dep(int ch=0) const  "
 
 Get the nth dependency as MX.
+
+";
+
+%feature("docstring")  casadi::MX::get_sparsity() const  "
+
+Get an owning reference to the sparsity pattern.
 
 ";
 
@@ -9479,20 +9455,14 @@ Check if the vector is non-increasing.
 
 ";
 
-%feature("docstring")  casadi::dlaqge_(int *m, int *n, double *a, int *lda,
-double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
-*equed) " [INTERNAL]  Equilibrate the system.
+%feature("docstring")  casadi::is_zero(double x) " [INTERNAL]  Check if
+entry is zero (false negative allowed)
 
 ";
 
 %feature("docstring")  casadi::doc_linsol(const std::string &name) "
 
 Get the documentation string for a plugin.
-
-";
-
-%feature("docstring")  casadi::iszero(double x) " [INTERNAL]  Check if entry
-is zero (false negative allowed)
 
 ";
 
@@ -10877,6 +10847,12 @@ Joel Andersson
 "
 
 Check if the vector is strictly monotone.
+
+";
+
+%feature("docstring")  casadi::dlaqge_(int *m, int *n, double *a, int *lda,
+double *r, double *c, double *colcnd, double *rowcnd, double *amax, char
+*equed) " [INTERNAL]  Equilibrate the system.
 
 ";
 

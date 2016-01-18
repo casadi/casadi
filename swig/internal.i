@@ -220,7 +220,7 @@
 %exception  casadi::is_regular(N_Vector v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::iszero(double x) {
+%exception  casadi::is_zero(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::matrixName< SXElem >() {

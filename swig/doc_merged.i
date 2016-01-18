@@ -2723,12 +2723,6 @@ Inverse hyperbolic tangent.
 
 ";
 
-%feature("docstring") friendwrap_iszero "
-
-Addition.
-
-";
-
 %feature("docstring") friendwrap_tan "
 
 Tangent.
@@ -2898,6 +2892,12 @@ expressions are identical, i.e. points to the same node.
 a = x*x b = x*x
 
 a.is_equal(b, 0) will return false, but a.is_equal(b, 1) will return true
+
+";
+
+%feature("docstring") friendwrap_is_zero "
+
+Addition.
 
 ";
 
@@ -3924,12 +3924,6 @@ Print dense matrix-stype.
 
 ";
 
-%feature("docstring") casadi::Matrix::getSparsity "
-
-Get an owning reference to the sparsity pattern.
-
-";
-
 %feature("docstring") casadi::Matrix::getRepresentation "
 
 Return a string with a representation (for SWIG)
@@ -4027,6 +4021,12 @@ Get get the number of non-zeros on the diagonal.
 %feature("docstring") casadi::Matrix::sparsity "
 
 Get the sparsity pattern.
+
+";
+
+%feature("docstring") casadi::Matrix::get_sparsity "
+
+Get an owning reference to the sparsity pattern.
 
 ";
 
@@ -4176,14 +4176,6 @@ Also called: slope function
 
 %feature("docstring") casadi::Matrix::to_double "
 
->  double array(Scalar) .to_double() const 
-------------------------------------------------------------------------
-
-Get double value (only if constant)
-
->  double array(Scalar) .to_double(int k) const 
-------------------------------------------------------------------------
-
 Get double value (particular nonzero)
 
 ";
@@ -4270,48 +4262,6 @@ Set double value (particular nonzero)
 %feature("docstring") casadi::Matrix::printVector "
 
 Print vector-style.
-
-";
-
-%feature("docstring") casadi::Matrix::sym "
-
->  static array(Scalar)   array(Scalar) .sym(str name, int nrow=1, int ncol=1)
-------------------------------------------------------------------------
-
-Create an nrow-by-ncol symbolic primitive.
-
->  static array(Scalar)   array(Scalar) .sym(str name, (int,int) rc)
-------------------------------------------------------------------------
-
-Construct a symbolic primitive with given dimensions.
-
->  static array(Scalar)   array(Scalar) .sym(str name, Sparsity sp)
-------------------------------------------------------------------------
-
-Create symbolic primitive with a given sparsity pattern.
-
->  static[array(Scalar)   ] array(Scalar) .sym(str name, Sparsity sp, int p)
-------------------------------------------------------------------------
-
-Create a vector of length p with with matrices with symbolic primitives of
-given sparsity.
-
->  static[array(Scalar)   ] array(Scalar) .sym(str name, int nrow, int ncol, int p)
-------------------------------------------------------------------------
-
-Create a vector of length p with nrow-by-ncol symbolic primitives.
-
->  static[[array(Scalar)  ] ] array(Scalar) .sym(str name, Sparsity sp, int p, int r)
-------------------------------------------------------------------------
-
-Create a vector of length r of vectors of length p with symbolic primitives
-with given sparsity.
-
->  static[[array(Scalar)  ] ] array(Scalar) .sym(str name, int nrow, int ncol, int p, int r)
-------------------------------------------------------------------------
-
-Create a vector of length r of vectors of length p with nrow-by-ncol
-symbolic primitives.
 
 ";
 
@@ -4584,12 +4534,6 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring") casadi::Matrix::to_int "
-
-Get double value (only if integer constant)
-
-";
-
 %feature("docstring") friendwrap_pw_const "[INTERNAL]  Create a piecewise
 constant function Create a piecewise constant function with n=val.size()
 intervals.
@@ -4717,9 +4661,45 @@ window function
 
 ";
 
-%feature("docstring") casadi::Matrix::is_zero "
+%feature("docstring") casadi::Matrix::sym "
 
-check if the matrix is 0 (note that false negative answers are possible)
+>  static array(Scalar)   array(Scalar) .sym(str name, int nrow=1, int ncol=1)
+------------------------------------------------------------------------
+
+Create an nrow-by-ncol symbolic primitive.
+
+>  static array(Scalar)   array(Scalar) .sym(str name, (int,int) rc)
+------------------------------------------------------------------------
+
+Construct a symbolic primitive with given dimensions.
+
+>  static array(Scalar)   array(Scalar) .sym(str name, Sparsity sp)
+------------------------------------------------------------------------
+
+Create symbolic primitive with a given sparsity pattern.
+
+>  static[array(Scalar)   ] array(Scalar) .sym(str name, Sparsity sp, int p)
+------------------------------------------------------------------------
+
+Create a vector of length p with with matrices with symbolic primitives of
+given sparsity.
+
+>  static[array(Scalar)   ] array(Scalar) .sym(str name, int nrow, int ncol, int p)
+------------------------------------------------------------------------
+
+Create a vector of length p with nrow-by-ncol symbolic primitives.
+
+>  static[[array(Scalar)  ] ] array(Scalar) .sym(str name, Sparsity sp, int p, int r)
+------------------------------------------------------------------------
+
+Create a vector of length r of vectors of length p with symbolic primitives
+with given sparsity.
+
+>  static[[array(Scalar)  ] ] array(Scalar) .sym(str name, int nrow, int ncol, int p, int r)
+------------------------------------------------------------------------
+
+Create a vector of length r of vectors of length p with nrow-by-ncol
+symbolic primitives.
 
 ";
 
@@ -5044,12 +5024,6 @@ Is binary operation.
 
 ";
 
-%feature("docstring") casadi::MX::getSparsity "
-
-Get an owning reference to the sparsity pattern.
-
-";
-
 %feature("docstring") casadi::MX::inf "
 
 create a matrix with all inf
@@ -5210,12 +5184,6 @@ Get an output.
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
-
-";
-
-%feature("docstring") casadi::MX::is_zero "
-
-check if zero (note that false negative answers are possible)
 
 ";
 
@@ -5537,6 +5505,12 @@ Get the number of symbolic primitive Assumes is_valid_input() returns true.
 %feature("docstring") casadi::MX::dep "
 
 Get the nth dependency as MX.
+
+";
+
+%feature("docstring") casadi::MX::get_sparsity "
+
+Get an owning reference to the sparsity pattern.
 
 ";
 
@@ -7479,18 +7453,14 @@ Check if the vector is non-increasing.
 
 ";
 
-%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
+%feature("docstring") casadi::is_zero "[INTERNAL]  Check if entry is zero
+(false negative allowed)
 
 ";
 
 %feature("docstring") casadi::doc_linsol "
 
 Get the documentation string for a plugin.
-
-";
-
-%feature("docstring") casadi::iszero "[INTERNAL]  Check if entry is zero
-(false negative allowed)
 
 ";
 
@@ -8856,6 +8826,10 @@ Joel Andersson
 %feature("docstring") casadi::isStrictlyMonotone "
 
 Check if the vector is strictly monotone.
+
+";
+
+%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
 
 ";
 
