@@ -121,12 +121,6 @@ namespace casadi {
   void CASADI_PREFIX(getu)(const real_t* x, const int* sp_x, real_t* v);
 }
 
-// Helper functions
-namespace casadi {
-  /// Check if entry is zero (false negative allowed)
-  inline bool iszero(double x) { return x==0;}
-}
-
 // Implementations
 
 // Note: due to restrictions of cmake IO processing, make sure that
@@ -459,7 +453,7 @@ namespace casadi {
         }
       }
       for (jj=0; jj<length; ++jj) {
-        if (!iszero(sums[head])) {
+        if (!is_zero(sums[head])) {
           real_t a = fabs(sums[head]);
           res = fmax(res, a);
           nnz++;
