@@ -380,7 +380,7 @@ import_array();
     template<typename M> GUESTOBJECT* from_tmp(M m) { return from_ptr(&m);}
 #ifdef SWIGMATLAB
     // Get sparsity pattern
-    Sparsity getSparsity(const mxArray* p);
+    Sparsity get_sparsity(const mxArray* p);
 
     // Number of nonzeros
     size_t getNNZ(const mxArray* p);
@@ -487,7 +487,7 @@ import_array();
     }
 
 #ifdef SWIGMATLAB
-    Sparsity getSparsity(const mxArray* p) {
+    Sparsity get_sparsity(const mxArray* p) {
       // Get sparsity pattern
       size_t nrow = mxGetM(p);
       size_t ncol = mxGetN(p);
@@ -1585,7 +1585,7 @@ import_array();
       // MATLAB double matrix (sparse or dense)
       if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2) {
         if (m) {
-          **m = casadi::DM(getSparsity(p));
+          **m = casadi::DM(get_sparsity(p));
           double* data = static_cast<double*>(mxGetData(p));
           casadi_copy(data, (*m)->nnz(), (*m)->ptr());
         }
@@ -1759,7 +1759,7 @@ import_array();
         // If successful
         if (all_integers) {
           if (m) {
-            **m = casadi::IM(getSparsity(p));
+            **m = casadi::IM(get_sparsity(p));
             for (size_t i=0; i<sz; ++i) {
               (**m)->at(i) = int(data[i]);
             }
@@ -2029,7 +2029,7 @@ arccosh = lambda x: _casadi.acosh(x)
 
 %rename(row) get_row;
 %rename(colind) get_colind;
-%rename(sparsity) getSparsity;
+%rename(sparsity) get_sparsity;
 
 // Explicit conversion to double and int
 #ifdef SWIGPYTHON

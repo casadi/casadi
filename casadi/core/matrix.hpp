@@ -818,7 +818,7 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Get an owning reference to the sparsity pattern */
-    Sparsity getSparsity() const { return sparsity();}
+    Sparsity get_sparsity() const { return sparsity();}
 
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)

@@ -129,7 +129,7 @@ namespace casadi {
     bool __nonzero__() const;
 
     /** \brief Get an owning reference to the sparsity pattern */
-    Sparsity getSparsity() const { return sparsity();}
+    Sparsity get_sparsity() const { return sparsity();}
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)
         Erase rows and/or columns of a matrix */

@@ -406,7 +406,7 @@ namespace casadi {
     return "s" + to_string(addSparsity(sp));
   }
 
-  int CodeGenerator::getSparsity(const Sparsity& sp) const {
+  int CodeGenerator::get_sparsity(const Sparsity& sp) const {
     const void* h = static_cast<const void*>(sp.get());
     PointerMap::const_iterator it=added_sparsities_.find(h);
     casadi_assert(it!=added_sparsities_.end());

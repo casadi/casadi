@@ -73,7 +73,7 @@ namespace casadi {
     int addSparsity(const Sparsity& sp);
 
     /** \brief Get the index of an existing sparsity pattern */
-    int getSparsity(const Sparsity& sp) const;
+    int get_sparsity(const Sparsity& sp) const;
 
     /** \brief Get or add a constant */
     int getConstant(const std::vector<double>& v, bool allow_adding=false);
