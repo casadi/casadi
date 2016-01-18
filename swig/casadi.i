@@ -2141,9 +2141,6 @@ class NZproxy:
     def nz(self):
       return NZproxy(self)
 
-    def prod(self,*args):
-        raise Exception("'prod' is not supported anymore in CasADi. Use 'mtimes' to do matrix multiplication.")
-
 %}
 %enddef
 
