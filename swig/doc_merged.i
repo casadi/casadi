@@ -23830,6 +23830,34 @@ Map Joris Gillis
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| enable_flag_ | OT_INTEGER   | -1           | This is part | casadi::MapB |
+| input        |              |              | of an        | ase          |
+|              |              |              | experimental |              |
+|              |              |              | feature to c |              |
+|              |              |              | onditionally |              |
+|              |              |              | skip computa |              |
+|              |              |              | tions. The   |              |
+|              |              |              | default      |              |
+|              |              |              | value -1     |              |
+|              |              |              | disables     |              |
+|              |              |              | this         |              |
+|              |              |              | feature. Use |              |
+|              |              |              | this to      |              |
+|              |              |              | specify the  |              |
+|              |              |              | index of an  |              |
+|              |              |              | input which  |              |
+|              |              |              | will be      |              |
+|              |              |              | interpreted  |              |
+|              |              |              | as a         |              |
+|              |              |              | boolean. If  |              |
+|              |              |              | that value   |              |
+|              |              |              | is true, the |              |
+|              |              |              | computation  |              |
+|              |              |              | is enabled.  |              |
+|              |              |              | If false,the |              |
+|              |              |              | computation  |              |
+|              |              |              | is skipped   |              |
++--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
 |              |              |              | outputs with |              |

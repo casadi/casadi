@@ -3229,6 +3229,7 @@
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>enable_flag_input</td><td>OT_INTEGER</td><td>-1</td><td>This is part of an experimental feature to conditionally skip computations. The default value -1 disables this feature. Use this to specify the index of an input which will be interpreted as a boolean. If that value is true, the computation is enabled. If false,the computation is skipped</td><td>casadi::MapBase</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3261,6 +3262,7 @@
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>enable_flag_input</td><td>OT_INTEGER</td><td>-1</td><td>This is part of an experimental feature to conditionally skip computations. The default value -1 disables this feature. Use this to specify the index of an input which will be interpreted as a boolean. If that value is true, the computation is enabled. If false,the computation is skipped</td><td>casadi::MapBase</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3293,6 +3295,7 @@
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>enable_flag_input</td><td>OT_INTEGER</td><td>-1</td><td>This is part of an experimental feature to conditionally skip computations. The default value -1 disables this feature. Use this to specify the index of an input which will be interpreted as a boolean. If that value is true, the computation is enabled. If false,the computation is skipped</td><td>casadi::MapOcl</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3326,6 +3329,7 @@
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>enable_flag_input</td><td>OT_INTEGER</td><td>-1</td><td>This is part of an experimental feature to conditionally skip computations. The default value -1 disables this feature. Use this to specify the index of an input which will be interpreted as a boolean. If that value is true, the computation is enabled. If false,the computation is skipped</td><td>casadi::MapSerial</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3359,6 +3363,7 @@
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>enable_flag_input</td><td>OT_INTEGER</td><td>-1</td><td>This is part of an experimental feature to conditionally skip computations. The default value -1 disables this feature. Use this to specify the index of an input which will be interpreted as a boolean. If that value is true, the computation is enabled. If false,the computation is skipped</td><td>casadi::MapSum</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3392,6 +3397,7 @@
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>enable_flag_input</td><td>OT_INTEGER</td><td>-1</td><td>This is part of an experimental feature to conditionally skip computations. The default value -1 disables this feature. Use this to specify the index of an input which will be interpreted as a boolean. If that value is true, the computation is enabled. If false,the computation is skipped</td><td>casadi::MapSumOcl</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -3425,6 +3431,7 @@
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>enable_flag_input</td><td>OT_INTEGER</td><td>-1</td><td>This is part of an experimental feature to conditionally skip computations. The default value -1 disables this feature. Use this to specify the index of an input which will be interpreted as a boolean. If that value is true, the computation is enabled. If false,the computation is skipped</td><td>casadi::MapSumSerial</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
@@ -4480,6 +4487,7 @@
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>enable_flag_input</td><td>OT_INTEGER</td><td>-1</td><td>This is part of an experimental feature to conditionally skip computations. The default value -1 disables this feature. Use this to specify the index of an input which will be interpreted as a boolean. If that value is true, the computation is enabled. If false,the computation is skipped</td><td>casadi::PureMap</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
