@@ -2613,8 +2613,8 @@ DECL M casadi_conditional(const M& ind, const std::vector< M > &x,
   return conditional(ind, x, x_default, short_circuit);
 }
 
-DECL bool casadi_dependsOn(const M& f, const M& arg) {
-  return dependsOn(f, arg);
+DECL bool casadi_depends_on(const M& f, const M& arg) {
+  return depends_on(f, arg);
 }
 
 DECL M casadi_solve(const M& A, const M& b) {

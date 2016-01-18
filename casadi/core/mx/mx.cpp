@@ -1645,7 +1645,7 @@ namespace casadi {
     return f(A).at(0);
   }
 
-  bool MX::dependsOn(const MX &x, const MX &arg) {
+  bool MX::depends_on(const MX &x, const MX &arg) {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm

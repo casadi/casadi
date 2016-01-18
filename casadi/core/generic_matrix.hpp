@@ -419,8 +419,8 @@ namespace casadi {
     /** \brief Check if expression depends on the argument
         The argument must be symbolic
     */
-    inline friend bool dependsOn(const MatType& f, const MatType &arg) {
-      return MatType::dependsOn(f, arg);
+    inline friend bool depends_on(const MatType& f, const MatType &arg) {
+      return MatType::depends_on(f, arg);
     }
 
     /** \brief  Substitute variable v with expression vdef in an expression ex */

@@ -2259,8 +2259,8 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  bool Matrix<Scalar>::dependsOn(const Matrix<Scalar> &x, const Matrix<Scalar> &arg) {
-    throw CasadiException("\"dependsOn\" not defined for instantiation");
+  bool Matrix<Scalar>::depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg) {
+    throw CasadiException("\"depends_on\" not defined for instantiation");
     return false;
   }
 
@@ -2605,7 +2605,7 @@ namespace casadi {
                                         std::vector<SX >& vdef,
                                         std::vector<SX >& ex,
                                         bool reverse);
-  template<> bool SX::dependsOn(const SX &x, const SX &arg);
+  template<> bool SX::depends_on(const SX &x, const SX &arg);
   template<> std::vector<SX > SX::symvar(const SX &x);
   template<> SX SX::jacobian(const SX &f, const SX &x, bool symmetric);
   template<> SX SX::gradient(const SX &f, const SX &x);

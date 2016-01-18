@@ -635,7 +635,7 @@ namespace casadi {
     substituteInPlace(this->d, this->ddef, ex);
 
     // Make sure that the interdependencies have been properly eliminated
-    casadi_assert(!dependsOn(vertcat(this->ddef), vertcat(this->d)));
+    casadi_assert(!depends_on(vertcat(this->ddef), vertcat(this->d)));
   }
 
   void DaeBuilder::eliminate_d() {
@@ -787,7 +787,7 @@ namespace casadi {
 
       // If Jb depends on xb, then the state derivative does not enter linearly
       // in the ODE and we cannot solve for the state derivative
-      casadi_assert_message(!dependsOn(Jb, vertcat(xdotb)),
+      casadi_assert_message(!depends_on(Jb, vertcat(xdotb)),
                             "Cannot find an explicit expression for variable(s) " << xb);
 
       // Divide fb into a part which depends on vb and a part which doesn't according to
@@ -867,7 +867,7 @@ namespace casadi {
       MX Jb = jacobian(vertcat(fb), vertcat(zb));
 
       // If Jb depends on zb, then we cannot (currently) solve for it explicitly
-      if (dependsOn(Jb, vertcat(zb))) {
+      if (depends_on(Jb, vertcat(zb))) {
 
         // Add the equations to the new list of algebraic equations
         f_imp.insert(f_imp.end(), fb.begin(), fb.end());

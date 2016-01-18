@@ -317,7 +317,7 @@ namespace casadi {
                                         const std::vector<Matrix<Scalar> > &x,
                                         const Matrix<Scalar> &x_default,
                                         bool short_circuit);
-    static bool dependsOn(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
+    static bool depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
     static Matrix<Scalar> mpower(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mrdivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mldivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);

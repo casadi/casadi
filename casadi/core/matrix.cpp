@@ -579,7 +579,7 @@ namespace casadi {
   }
 
   template<>
-  bool SX::dependsOn(const SX &x, const SX &arg) {
+  bool SX::depends_on(const SX &x, const SX &arg) {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
