@@ -5141,13 +5141,7 @@ C++ includes: casadi_logger.hpp ";
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  casadi::Matrix< Scalar >::getIntValue() const  "
-
-Get double value (only if integer constant)
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
+*/ %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::nnz_upper() const "
 
 Get the number of non-zeros in the upper triangular half.
@@ -5615,18 +5609,6 @@ Hessian expression
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::getValue() const  "
-
-Get double value (only if constant)
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::getValue(int k) const  "
-
-Get double value (particular nonzero)
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::is_dense() const "
 
@@ -5728,6 +5710,18 @@ by their ID.
 \\\\end {cases} \\\\]
 
 Also called: slope function
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::to_double() const  "
+
+Get double value (only if constant)
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::to_double(int k) const  "
+
+Get double value (particular nonzero)
 
 ";
 
@@ -6225,6 +6219,12 @@ const Matrix< Scalar > &b, int order, const Matrix< Scalar > &w) "
 const "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::to_int() const  "
+
+Get double value (only if integer constant)
 
 ";
 
@@ -6936,12 +6936,6 @@ expression expr in multiple expressions, preserving nodes.
 
 ";
 
-%feature("docstring")  casadi::MX::getValue() const  "
-
-Get the value (only for scalar constant nodes)
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MX  >::get_row() const "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -7257,6 +7251,12 @@ Number of functions.
 %feature("docstring")  casadi::GenericMatrix< MX  >::is_column() const "
 
 Check if the matrix is a column vector (i.e. size2()==1)
+
+";
+
+%feature("docstring")  casadi::MX::to_double() const  "
+
+Get the value (only for scalar constant nodes)
 
 ";
 

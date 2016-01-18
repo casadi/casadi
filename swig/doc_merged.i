@@ -3786,13 +3786,7 @@ C++ includes: casadi_logger.hpp ";
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::Matrix::getIntValue "
-
-Get double value (only if integer constant)
-
-";
-
-%feature("docstring") casadi::Matrix::nnz_upper "
+*/ %feature("docstring") casadi::Matrix::nnz_upper "
 
 Get the number of non-zeros in the upper triangular half.
 
@@ -4120,20 +4114,6 @@ Hessian expression
 
 ";
 
-%feature("docstring") casadi::Matrix::getValue "
-
->  double array(Scalar) .getValue() const 
-------------------------------------------------------------------------
-
-Get double value (only if constant)
-
->  double array(Scalar) .getValue(int k) const 
-------------------------------------------------------------------------
-
-Get double value (particular nonzero)
-
-";
-
 %feature("docstring") casadi::Matrix::is_dense "
 
 Check if the matrix expression is dense.
@@ -4191,6 +4171,20 @@ nodes by their ID.
 \\\\end {cases} \\\\]
 
 Also called: slope function
+
+";
+
+%feature("docstring") casadi::Matrix::to_double "
+
+>  double array(Scalar) .to_double() const 
+------------------------------------------------------------------------
+
+Get double value (only if constant)
+
+>  double array(Scalar) .to_double(int k) const 
+------------------------------------------------------------------------
+
+Get double value (particular nonzero)
 
 ";
 
@@ -4587,6 +4581,12 @@ Integrate f from a to b using Gaussian quadrature with n points.
 %feature("docstring") casadi::Matrix::get_row "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") casadi::Matrix::to_int "
+
+Get double value (only if integer constant)
 
 ";
 
@@ -5163,12 +5163,6 @@ expression expr in multiple expressions, preserving nodes.
 
 ";
 
-%feature("docstring") casadi::MX::getValue "
-
-Get the value (only for scalar constant nodes)
-
-";
-
 %feature("docstring") casadi::MX::get_row "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -5399,6 +5393,12 @@ Number of functions.
 %feature("docstring") casadi::MX::is_column "
 
 Check if the matrix is a column vector (i.e. size2()==1)
+
+";
+
+%feature("docstring") casadi::MX::to_double "
+
+Get the value (only for scalar constant nodes)
 
 ";
 
@@ -7447,12 +7447,12 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 %feature("docstring") casadi::casadi_rank1 "
 
->  void casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x)
+>  void rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 
->  void casadi_rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x, const real_t *y)
+>  void rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x, const real_t *y)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
