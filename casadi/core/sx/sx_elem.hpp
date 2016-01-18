@@ -159,16 +159,13 @@ namespace casadi {
 
     /** \brief Check if a value is always nonnegative (false negatives are allowed) */
     bool isNonNegative() const;
-
-    double to_double() const;
-    int to_int() const;
     SXElem dep(int ch=0) const;
 
     /// Type conversion to double
-    inline explicit operator double() const { return to_double();}
+    explicit operator double() const;
 
     /// Type conversion to int
-    inline explicit operator int() const { return to_int();}
+    explicit operator int() const;
 
     /** \brief Check if the node is the sum of two equal expressions */
     bool is_doubled() const;

@@ -919,9 +919,6 @@ namespace casadi {
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;
 
-    /** \brief Get double value (only if constant) */
-    double to_double() const;
-
     /** \brief Get double value (particular nonzero) */
     double to_double(int k) const;
 
@@ -931,24 +928,21 @@ namespace casadi {
     /** \brief Set double value (particular nonzero) */
     void setValue(double m, int k);
 
-    /** \brief Get double value (only if integer constant) */
-    int to_int() const;
-
     /** \brief Get all nonzeros */
     std::vector<double> nonzeros() const;
 
     /** \brief Get all nonzeros */
     std::vector<int> nonzeros_int() const;
 
-#ifndef SWIG
     /** \brief Type conversion to double */
     explicit operator double() const;
 
-    /** \brief Type conversion to double vector */
-    explicit operator std::vector<double>() const;
-
     /** \brief Type conversion to int */
     explicit operator int() const;
+
+#ifndef SWIG
+    /** \brief Type conversion to double vector */
+    explicit operator std::vector<double>() const;
 #endif // SWIG
 
     /** \brief Get name (only if symbolic scalar) */

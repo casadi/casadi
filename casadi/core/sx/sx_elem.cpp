@@ -198,13 +198,13 @@ namespace casadi {
         else if (x.is_op(OP_NEG)) // (-x) + y -> y - x
           return y - x.dep();
         else if (x.is_op(OP_MUL) && y.is_op(OP_MUL) &&
-                 x.dep(0).is_constant() && x.dep(0).to_double()==0.5 &&
-                 y.dep(0).is_constant() && y.dep(0).to_double()==0.5 &&
+                 x.dep(0).is_constant() && double(x.dep(0))==0.5 &&
+                 y.dep(0).is_constant() && double(y.dep(0))==0.5 &&
                  is_equal(y.dep(1), x.dep(1), SXNode::eq_depth_)) // 0.5x+0.5x = x
           return x.dep(1);
         else if (x.is_op(OP_DIV) && y.is_op(OP_DIV) &&
-                 x.dep(1).is_constant() && x.dep(1).to_double()==2 &&
-                 y.dep(1).is_constant() && y.dep(1).to_double()==2 &&
+                 x.dep(1).is_constant() && double(x.dep(1))==2 &&
+                 y.dep(1).is_constant() && double(y.dep(1))==2 &&
                  is_equal(y.dep(0), x.dep(0), SXNode::eq_depth_)) // x/2+x/2 = x
           return x.dep(0);
         else if (x.is_op(OP_SUB) && is_equal(x.dep(1), y, SXNode::eq_depth_))
@@ -257,10 +257,10 @@ namespace casadi {
         else if (x.is_op(OP_INV))
           return y / x.inv();
         else if (x.is_constant() && y.is_op(OP_MUL) && y.dep(0).is_constant() &&
-                 x.to_double()*y.dep(0).to_double()==1) // 5*(0.2*x) = x
+                 double(x)*double(y.dep(0))==1) // 5*(0.2*x) = x
           return y.dep(1);
         else if (x.is_constant() && y.is_op(OP_DIV) && y.dep(1).is_constant() &&
-                 x.to_double()==y.dep(1).to_double()) // 5*(x/5) = x
+                 double(x)==double(y.dep(1))) // 5*(x/5) = x
           return y.dep(0);
         else if (x.is_op(OP_DIV) && is_equal(x.dep(1), y, SXNode::eq_depth_)) // ((2/x)*x)
           return x.dep(0);
@@ -296,7 +296,7 @@ namespace casadi {
         else if (x.is_doubled() && y.is_doubled())
           return x.dep(0) / y->dep(0);
         else if (y.is_constant() && x.is_op(OP_DIV) && x.dep(1).is_constant() &&
-                 y.to_double()*x.dep(1).to_double()==1) // (x/5)/0.2
+                 double(y)*double(x.dep(1))==1) // (x/5)/0.2
           return x.dep(0);
         else if (y.is_op(OP_MUL) &&
                  is_equal(y.dep(1), x, SXNode::eq_depth_)) // x/(2*x) = 1/2
@@ -390,7 +390,7 @@ namespace casadi {
         if (y->is_zero()) {
           return y;
         } else if (x.is_constant()) {
-          if (x.to_double()!=0) {
+          if (double(x)!=0) {
             return y;
           } else {
             return 0;
@@ -484,18 +484,18 @@ namespace casadi {
 
   bool SXElem::isNonNegative() const {
     if (is_constant())
-      return to_double()>=0;
+      return double(*this)>=0;
     else if (is_op(OP_SQ) || is_op(OP_FABS))
       return true;
     else
       return false;
   }
 
-  double SXElem::to_double() const {
+  SXElem::operator double() const {
     return node->to_double();
   }
 
-  int SXElem::to_int() const {
+  SXElem::operator int() const {
     return node->to_int();
   }
 

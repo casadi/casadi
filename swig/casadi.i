@@ -2031,10 +2031,17 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(colind) get_colind;
 %rename(sparsity) getSparsity;
 
+// Explicit conversion to double and int
+#ifdef SWIGPYTHON
+%rename(__float__) operator double;
+%rename(__int__) operator int;
+#else
+%rename(to_double) operator double;
+%rename(to_int) operator int;
+#endif
+
 #ifdef SWIGPYTHON
 %ignore T;
-%rename(__float__) to_double;
-%rename(__int__) to_int;
 
 %rename(logic_and) casadi_and;
 %rename(logic_or) casadi_or;

@@ -1409,16 +1409,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  double Matrix<Scalar>::to_double() const {
-    casadi_assert(is_scalar());
-    if (nnz()==0) {
-      return 0;
-    } else {
-      return to_double(0);
-    }
-  }
-
-  template<typename Scalar>
   double Matrix<Scalar>::to_double(int k) const {
     return static_cast<double>(data().at(k));
   }
@@ -1437,21 +1427,20 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  int Matrix<Scalar>::to_int() const {
-    return static_cast<int>(scalar());
-  }
-
-  template<typename Scalar>
   std::vector<double> Matrix<Scalar>::nonzeros() const {
     std::vector<double> ret(nnz());
-    std::copy(data_.begin(), data_.end(), ret.begin());
+    for (size_t i=0; i<ret.size(); ++i) {
+      ret[i] = double(data().at(i));
+    }
     return ret;
   }
 
   template<typename Scalar>
   std::vector<int> Matrix<Scalar>::nonzeros_int() const {
     std::vector<int> ret(nnz());
-    std::copy(data_.begin(), data_.end(), ret.begin());
+    for (size_t i=0; i<ret.size(); ++i) {
+      ret[i] = int(data().at(i));
+    }
     return ret;
   }
 
@@ -2542,11 +2531,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar>::operator double() const {
     casadi_assert(is_scalar());
-    if (is_dense()) {
-      return nonzeros().at(0);
-    } else {
-      return 0;
-    }
+    return double(scalar());
   }
 
   template<typename Scalar>
@@ -2570,11 +2555,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar>::operator int() const {
     casadi_assert(is_scalar());
-    if (is_dense()) {
-      return nonzeros_int().at(0);
-    } else {
-      return 0;
-    }
+    return int(scalar());
   }
 
   // Template specializations
@@ -2601,10 +2582,6 @@ namespace casadi {
   template<> bool SX::is_valid_input() const;
   template<> bool SX::has_duplicates();
   template<> void SX::resetInput();
-  template<> double SX::to_double(int k) const;
-  template<> int SX::to_int() const;
-  template<> std::vector<double> SX::nonzeros() const;
-  template<> std::vector<int> SX::nonzeros_int() const;
   template<> SX SX::dep(int ch) const;
   template<> int SX::n_dep() const;
   template<> std::string SX::name() const;

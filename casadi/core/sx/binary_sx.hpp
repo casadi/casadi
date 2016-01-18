@@ -50,8 +50,8 @@ class CASADI_EXPORT BinarySX : public SXNode {
     inline static SXElem create(unsigned char op, const SXElem& dep0, const SXElem& dep1) {
       if (dep0.is_constant() && dep1.is_constant()) {
         // Evaluate constant
-        double dep0_val = dep0.to_double();
-        double dep1_val = dep1.to_double();
+        double dep0_val(dep0);
+        double dep1_val(dep1);
         double ret_val;
         casadi_math<double>::fun(op, dep0_val, dep1_val, ret_val);
         return ret_val;

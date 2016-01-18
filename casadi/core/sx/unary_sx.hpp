@@ -49,7 +49,7 @@ class CASADI_EXPORT UnarySX : public SXNode {
     inline static SXElem create(unsigned char op, const SXElem& dep) {
       if (dep.is_constant()) {
         // Evaluate constant
-        double dep_val = dep.to_double();
+        double dep_val(dep);
         double ret_val;
         casadi_math<double>::fun(op, dep_val, dep_val, ret_val);
         return ret_val;
