@@ -19,14 +19,12 @@ env:
     - MATLABRELEASE=R2014b
     - CLANG=/home/travis/build/clang
 
-before_script:
-  - set -e
-  - set -o pipefail  # otherwise, piping with grep discards exit statuses
-
 matrix:
   include:
     - compiler: gcc
       os: linux
+      install:
+        - setup_precise
       env: TESTMODE=full_valgrind
       script:
         - sudo apt-get install valgrind -y
@@ -41,6 +39,8 @@ matrix:
         - pushd test && make unittests_py_valgrind && popd
     - compiler: gcc
       os: linux
+      install:
+        - setup_precise
       env: TESTMODE=full_valgrind
       script:
         - sudo apt-get install valgrind -y
@@ -55,6 +55,8 @@ matrix:
         - pushd test && make unittests_py_valgrind && popd
     - compiler: gcc
       os: linux
+      install:
+        - setup_precise
       env: TESTMODE=full_remainder
       script:
         - mkdir build
@@ -71,6 +73,8 @@ matrix:
 
     - compiler: gcc
       os: linux
+      install:
+        - setup_precise
       env: TESTMODE=full_slow
       script:
         - mkdir build
@@ -87,6 +91,8 @@ matrix:
         - pushd test && make unittests_py_slow && popd
     - compiler: gcc
       os: linux
+      install:
+        - setup_precise
       env: TESTMODE=docs
       script:
         - set -e
@@ -107,6 +113,8 @@ matrix:
         - git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
     - compiler: clang
       os: linux
+      install:
+        - setup_precise
       env: TESTMODE=minimal
       script:
         - mkdir build
@@ -119,6 +127,46 @@ matrix:
         - pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
+      dist: trusty
+      language: generic
+      install:
+        - setup_trusty
+      env: TESTMODE=minimal
+      script:
+        - |
+          cat <<EOF | sudo tee --append  /etc/apt/sources.list
+          deb-src http://archive.ubuntu.com/ubuntu vivid main restricted universe multiverse
+          deb http://archive.ubuntu.com/ubuntu vivid main restricted universe multiverse
+        - |
+          cat <<EOF | sudo tee /etc/apt/preferences.d/mytest
+          Package: *
+          Pin: release n=trusty
+          Pin-priority: 700
+          Package: *
+          Pin: release n=vivid
+          Pin-priority: 600
+        - sudo apt-get update -q
+        - sudo apt-get install -q -y opencl-headers ocl-icd-opencl-dev ocl-icd-libopencl1
+        - sudo apt-get -t vivid install pocl-opencl-icd
+        - mkdir build
+        - pushd build
+        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - make
+        - sudo make install
+        - popd
+        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        #- source /home/travis/build/testbot/restricted/env.sh
+        #- ssh-keyscan $GATE_SERVER >> ~/.ssh/known_hosts
+        #- whoami
+        #- echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA3mEl1i8wiojyJdJnwrmC3RTWCIGgUM4lmtWNWu4p4QyiBry2iB7y2qno48pZqkV/EFRsyWWeEDvbdA4etYlceKZaGJFAdqJig/247qPbamU5W5++d7zkGwA5nQDH147/+JMYk4na9RoGl2iOHMyxi7Wq0WkN11u0Slp2awluvV9UXpBl/XD74eYmUfOFop6y+Hkg/K2hyytg8vAkp33x/vy8JxSK93vbnLGsrVOVjp6Epf7Jo2C8ZHX9eVL2sfi7icjNbt6s9AnU076tBURBIEQbg+Sa8nK7v6zzJNZbn9G85t0M64BKMvcRH1BXf0VvIeBQs/yv9uZLaC9SFvj+4Q== u0052373@xen-vm03.mech.kuleuven.be" >> ~/.ssh/authorized_keys
+        #- (while true ; do sleep 60 ; echo "ping" ; done ) &
+        #- ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -R 19922:localhost:22 -N
+        - pushd test/python && python function.py && popd
+        - pushd test && make unittests_py examples_code_py && popd
+    - compiler: gcc
+      os: linux
+      install:
+        - setup_precise
       env: TESTMODE=minimal
       script:
         - mkdir build
@@ -131,6 +179,8 @@ matrix:
         - pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
+      install:
+        - setup_precise
       env: TESTMODE=quick
       script:
         - sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
@@ -161,7 +211,7 @@ matrix:
     - os: osx
       env: TESTMODE=minimal
       compiler: clang
-      before_install:
+      before_script:
         - brew update
         - brew tap homebrew/science
         - brew outdated swig ; brew install swig
@@ -182,6 +232,8 @@ matrix:
     - compiler: gcc
       os: linux
       env: NEEDMATLAB=1
+      install:
+        - setup_precise
       script:
 
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
@@ -209,21 +261,53 @@ matrix:
 branches:
   except:
     - /.*appveyor.*/
-
+    
 before_install:
-  - sudo /etc/init.d/mysql stop
-  - sudo /etc/init.d/postgresql stop
-  - sync
-  - free -t -m
+  - set -e
+  - set -o pipefail  # otherwise, piping with grep discards exit statuses
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
-  - pushd testbot && recipes/setup.sh && popd
   - source testbot/shellhelpers
-  - sudo apt-get install p7zip-full -y
-  - travis_retry testbot/recipes/fetch.sh libhsl.tar.gz && mkdir libhsl && tar -xf libhsl.tar.gz -C libhsl && rm libhsl.tar.gz
-  - travis_retry testbot/recipes/fetch.sh clang.tar.gz && mkdir clang && tar -xf clang.tar.gz -C clang && rm clang.tar.gz
+  - popd
+  - |
+    function unpack {
+      if [ "$1"==*.tar.gz ]; then
+        tar -xf $1 -C $2
+      elif [ "$1"==*7z ]; then
+        7za e $1 -o$2 -y
+      fi
+    }
+    function obtain {
+      travis_retry testbot/recipes/fetch.sh $1 && mkdir $2 && tar -xf $1 -C $2 && rm $1
+    }
+  - |
+    function setup_precise {
+      sudo /etc/init.d/mysql stop
+      sudo /etc/init.d/postgresql stop
+      
+      # We need some more recent packages
+      sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
+      sudo add-apt-repository ppa:baltix-members/ppa -y #  for libslicot-dev
+      sudo add-apt-repository ppa:nodakai/valgrind -y
+      sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
+      sudo add-apt-repository ppa:webupd8team/java -y
+      sync
+      free -t -m
+    }
+  - |
+    function setup_trusty {
+      echo 12
+    }
+    
+before_script:
+  - pushd ../../
+  - sudo apt-get update -qq
+  - sudo apt-get install p7zip-full python-dev -y
+  - pushd testbot && recipes/setup.sh && popd
+  - obtain libhsl.tar.gz libhsl
+  - obtain clang.tar.gz clang
   - travis_retry testbot/recipes/fetch.sh mosek7.tar.bz2 && tar -xf mosek7.tar.bz2 && rm mosek7.tar.bz2
   - git clone https://github.com/embotech/ecos.git && pushd ecos && make && popd
-  - travis_retry testbot/recipes/fetch.sh snopt7.tar.gz && mkdir snopt7 && tar -xf snopt7.tar.gz -C snopt7 && rm snopt7.tar.gz
+  - obtain snopt7.tar.gz snopt7
   - mkdir -p /home/travis/build/casadi/testbot
   - |
     if [ $NEEDMATLAB ]
@@ -239,11 +323,6 @@ before_install:
   - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xf cplex12.4-concert.tar.gz -C concert && rm cplex12.4-concert.tar.gz && popd
   - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y && popd
   - popd
-  - sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
-  - sudo add-apt-repository ppa:baltix-members/ppa -y #  for libslicot-dev
-  - sudo add-apt-repository ppa:nodakai/valgrind -y
-  - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
-  - sudo add-apt-repository ppa:webupd8team/java -y
   - sudo apt-get update -qq
   - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev libslicot-dev libxml2-dev
   - sudo pip install github3.py
@@ -253,3 +332,4 @@ after_failure:
 
 
 language: cpp
+
