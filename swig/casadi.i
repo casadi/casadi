@@ -2024,7 +2024,8 @@ arccosh = lambda x: _casadi.acosh(x)
 %}
 #endif // SWIGPYTHON
 
-%rename("%(regex:/friendwrap_(?!ML)(.*)/\\1/)s") ""; // Strip leading friendwrap_ unless followed by ML
+// Strip leading casadi_ unless followed by ML
+%rename("%(regex:/casadi_(?!ML)(.*)/\\1/)s") "";
 
 %rename(row) get_row;
 %rename(colind) get_colind;
@@ -2035,41 +2036,41 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(__float__) getValue;
 %rename(__int__) getIntValue;
 
-%rename(logic_and) friendwrap_and;
-%rename(logic_or) friendwrap_or;
-%rename(logic_not) friendwrap_not;
-%rename(logic_all) friendwrap_all;
-%rename(logic_any) friendwrap_any;
-%rename(fabs) friendwrap_abs;
-%rename(fmin) friendwrap_min;
-%rename(fmax) friendwrap_max;
+%rename(logic_and) casadi_and;
+%rename(logic_or) casadi_or;
+%rename(logic_not) casadi_not;
+%rename(logic_all) casadi_all;
+%rename(logic_any) casadi_any;
+%rename(fabs) casadi_abs;
+%rename(fmin) casadi_min;
+%rename(fmax) casadi_max;
 
 // Non-fatal errors (returning NotImplemented singleton)
-%feature("python:maybecall") friendwrap_plus;
-%feature("python:maybecall") friendwrap_minus;
-%feature("python:maybecall") friendwrap_times;
-%feature("python:maybecall") friendwrap_rdivide;
-%feature("python:maybecall") friendwrap_lt;
-%feature("python:maybecall") friendwrap_le;
-%feature("python:maybecall") friendwrap_eq;
-%feature("python:maybecall") friendwrap_ne;
-%feature("python:maybecall") friendwrap_power;
-%feature("python:maybecall") friendwrap_atan2;
-%feature("python:maybecall") friendwrap_min;
-%feature("python:maybecall") friendwrap_max;
-%feature("python:maybecall") friendwrap_and;
-%feature("python:maybecall") friendwrap_or;
-%feature("python:maybecall") friendwrap_mod;
-%feature("python:maybecall") friendwrap_copysign;
-%feature("python:maybecall") friendwrap_constpow;
+%feature("python:maybecall") casadi_plus;
+%feature("python:maybecall") casadi_minus;
+%feature("python:maybecall") casadi_times;
+%feature("python:maybecall") casadi_rdivide;
+%feature("python:maybecall") casadi_lt;
+%feature("python:maybecall") casadi_le;
+%feature("python:maybecall") casadi_eq;
+%feature("python:maybecall") casadi_ne;
+%feature("python:maybecall") casadi_power;
+%feature("python:maybecall") casadi_atan2;
+%feature("python:maybecall") casadi_min;
+%feature("python:maybecall") casadi_max;
+%feature("python:maybecall") casadi_and;
+%feature("python:maybecall") casadi_or;
+%feature("python:maybecall") casadi_mod;
+%feature("python:maybecall") casadi_copysign;
+%feature("python:maybecall") casadi_constpow;
 #endif // SWIGPYTHON
 
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 %rename(uplus) operator+;
-%feature("varargin","1") friendwrap_vertcat;
-%feature("varargin","1") friendwrap_horzcat;
-%feature("varargin","1") friendwrap_veccat;
+%feature("varargin","1") casadi_vertcat;
+%feature("varargin","1") casadi_horzcat;
+%feature("varargin","1") casadi_veccat;
 %feature("optionalunpack","1") size;
 
 // Raise an error if "this" not correct
@@ -2349,114 +2350,114 @@ namespace casadi{
 %define SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
 
- DECL M friendwrap_horzcat(const std::vector< M > &v) {
+ DECL M casadi_horzcat(const std::vector< M > &v) {
   return horzcat(v);
  }
- DECL M friendwrap_vertcat(const std::vector< M > &v) {
+ DECL M casadi_vertcat(const std::vector< M > &v) {
  return vertcat(v);
  }
  DECL std::vector< M >
- friendwrap_horzsplit(const M& v, const std::vector<int>& offset) {
+ casadi_horzsplit(const M& v, const std::vector<int>& offset) {
  return horzsplit(v, offset);
  }
- DECL std::vector< M > friendwrap_horzsplit(const M& v, int incr=1) {
+ DECL std::vector< M > casadi_horzsplit(const M& v, int incr=1) {
  return horzsplit(v, incr);
  }
  DECL std::vector< M >
- friendwrap_vertsplit(const M& v, const std::vector<int>& offset) {
+ casadi_vertsplit(const M& v, const std::vector<int>& offset) {
  return vertsplit(v, offset);
  }
  DECL std::vector<int >
- friendwrap_offset(const std::vector< M > &v, bool vert=true) {
+ casadi_offset(const std::vector< M > &v, bool vert=true) {
  return offset(v, vert);
  }
  DECL std::vector< M >
- friendwrap_vertsplit(const M& v, int incr=1) {
+ casadi_vertsplit(const M& v, int incr=1) {
  return vertsplit(v, incr);
  }
- DECL M friendwrap_blockcat(const std::vector< std::vector< M > > &v) {
+ DECL M casadi_blockcat(const std::vector< std::vector< M > > &v) {
  return blockcat(v);
  }
- DECL M friendwrap_blockcat(const M& A, const M& B, const M& C, const M& D) {
+ DECL M casadi_blockcat(const M& A, const M& B, const M& C, const M& D) {
  return vertcat(horzcat(A, B), horzcat(C, D));
  }
  DECL std::vector< std::vector< M > >
- friendwrap_blocksplit(const M& x, const std::vector<int>& vert_offset,
+ casadi_blocksplit(const M& x, const std::vector<int>& vert_offset,
  const std::vector<int>& horz_offset) {
  return blocksplit(x, vert_offset, horz_offset);
  }
  DECL std::vector< std::vector< M > >
- friendwrap_blocksplit(const M& x, int vert_incr=1, int horz_incr=1) {
+ casadi_blocksplit(const M& x, int vert_incr=1, int horz_incr=1) {
  return blocksplit(x, vert_incr, horz_incr);
  }
- DECL M friendwrap_diagcat(const std::vector< M > &A) {
+ DECL M casadi_diagcat(const std::vector< M > &A) {
  return diagcat(A);
  }
  DECL std::vector< M >
- friendwrap_diagsplit(const M& x, const std::vector<int>& output_offset1,
+ casadi_diagsplit(const M& x, const std::vector<int>& output_offset1,
  const std::vector<int>& output_offset2) {
  return diagsplit(x, output_offset1, output_offset2);
  }
  DECL std::vector< M >
- friendwrap_diagsplit(const M& x, const std::vector<int>& output_offset) {
+ casadi_diagsplit(const M& x, const std::vector<int>& output_offset) {
  return diagsplit(x, output_offset);
  }
- DECL std::vector< M > friendwrap_diagsplit(const M& x, int incr=1) {
+ DECL std::vector< M > casadi_diagsplit(const M& x, int incr=1) {
  return diagsplit(x, incr);
  }
  DECL std::vector< M >
- friendwrap_diagsplit(const M& x, int incr1, int incr2) {
+ casadi_diagsplit(const M& x, int incr1, int incr2) {
  return diagsplit(x, incr1, incr2);
  }
- DECL M friendwrap_veccat(const std::vector< M >& x) {
+ DECL M casadi_veccat(const std::vector< M >& x) {
  return veccat(x);
  }
- DECL M friendwrap_mtimes(const M& x, const M& y) {
+ DECL M casadi_mtimes(const M& x, const M& y) {
  return mtimes(x, y);
  }
- DECL M friendwrap_mtimes(const std::vector< M > &args) {
+ DECL M casadi_mtimes(const std::vector< M > &args) {
  return mtimes(args);
  }
- DECL M friendwrap_mac(const M& X, const M& Y, const M& Z) {
+ DECL M casadi_mac(const M& X, const M& Y, const M& Z) {
  return mac(X, Y, Z);
  }
- DECL M friendwrap_transpose(const M& X) {
+ DECL M casadi_transpose(const M& X) {
  return X.T();
  }
- DECL M friendwrap_vec(const M& a) {
+ DECL M casadi_vec(const M& a) {
  return vec(a);
  }
- DECL M friendwrap_vecNZ(const M& a) {
+ DECL M casadi_vecNZ(const M& a) {
  return vecNZ(a);
  }
- DECL M friendwrap_reshape(const M& a, int nrow, int ncol) {
+ DECL M casadi_reshape(const M& a, int nrow, int ncol) {
  return reshape(a, nrow, ncol);
  }
- DECL M friendwrap_reshape(const M& a, std::pair<int, int> rc) {
+ DECL M casadi_reshape(const M& a, std::pair<int, int> rc) {
  return reshape(a, rc.first, rc.second);
  }
- DECL M friendwrap_reshape(const M& a, const Sparsity& sp) {
+ DECL M casadi_reshape(const M& a, const Sparsity& sp) {
  return reshape(a, sp);
  }
- DECL int friendwrap_sprank(const M& A) {
+ DECL int casadi_sprank(const M& A) {
  return sprank(A);
  }
- DECL int friendwrap_norm_0_mul(const M& x, const M& y) {
+ DECL int casadi_norm_0_mul(const M& x, const M& y) {
  return norm_0_mul(x, y);
  }
- DECL M friendwrap_triu(const M& a, bool includeDiagonal=true) {
+ DECL M casadi_triu(const M& a, bool includeDiagonal=true) {
  return triu(a, includeDiagonal);
  }
- DECL M friendwrap_tril(const M& a, bool includeDiagonal=true) {
+ DECL M casadi_tril(const M& a, bool includeDiagonal=true) {
  return tril(a, includeDiagonal);
  }
- DECL M friendwrap_kron(const M& a, const M& b) {
+ DECL M casadi_kron(const M& a, const M& b) {
  return kron(a, b);
  }
- DECL M friendwrap_repmat(const M& A, int n, int m=1) {
+ DECL M casadi_repmat(const M& A, int n, int m=1) {
  return repmat(A, n, m);
  }
- DECL M friendwrap_repmat(const M& A, const std::pair<int, int>& rc) {
+ DECL M casadi_repmat(const M& A, const std::pair<int, int>& rc) {
  return repmat(A, rc.first, rc.second);
  }
 #endif
@@ -2474,7 +2475,7 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
   %define SPARSITY_INTERFACE_FUN(DECL, FLAG, M)
     SPARSITY_INTERFACE_FUN_BASE(DECL, FLAG, M)
     #if FLAG & IS_MEMBER
-     DECL int friendwrap_length(const M &v) {
+     DECL int casadi_length(const M &v) {
       return std::max(v.size1(), v.size2());
      }
     #endif
@@ -2487,204 +2488,204 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 
 %define GENERIC_MATRIX_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M friendwrap_mpower(const M& x, const M& n) {
+DECL M casadi_mpower(const M& x, const M& n) {
   return mpower(x, n);
 }
 
-DECL M friendwrap_mrdivide(const M& x, const M& y) {
+DECL M casadi_mrdivide(const M& x, const M& y) {
   return mrdivide(x, y);
 }
 
-DECL M friendwrap_mldivide(const M& x, const M& y) {
+DECL M casadi_mldivide(const M& x, const M& y) {
   return mldivide(x, y);
 }
 
-DECL std::vector< M > friendwrap_symvar(const M& x) {
+DECL std::vector< M > casadi_symvar(const M& x) {
   return symvar(x);
 }
 
-DECL M friendwrap_bilin(const M& A, const M& x, const M& y) {
+DECL M casadi_bilin(const M& A, const M& x, const M& y) {
   return bilin(A, x, y);
 }
 
-DECL M friendwrap_rank1(const M& A, const M& alpha, const M& x, const M& y) {
+DECL M casadi_rank1(const M& A, const M& alpha, const M& x, const M& y) {
   return rank1(A, alpha, x, y);
 }
 
-DECL M friendwrap_sum_square(const M& X) {
+DECL M casadi_sum_square(const M& X) {
   return sum_square(X);
 }
 
-DECL M friendwrap_linspace(const M& a, const M& b, int nsteps) {
+DECL M casadi_linspace(const M& a, const M& b, int nsteps) {
   return linspace(a, b, nsteps);
 }
 
-DECL M friendwrap_cross(const M& a, const M& b, int dim = -1) {
+DECL M casadi_cross(const M& a, const M& b, int dim = -1) {
   return cross(a, b, dim);
 }
 
-DECL M friendwrap_det(const M& A) {
+DECL M casadi_det(const M& A) {
   return det(A);
 }
 
-DECL M friendwrap_inv(const M& A) {
+DECL M casadi_inv(const M& A) {
   return inv(A);
 }
 
-DECL M friendwrap_trace(const M& a) {
+DECL M casadi_trace(const M& a) {
   return trace(a);
 }
 
-DECL M friendwrap_tril2symm(const M& a) {
+DECL M casadi_tril2symm(const M& a) {
   return tril2symm(a);
 }
 
-DECL M friendwrap_triu2symm(const M& a) {
+DECL M casadi_triu2symm(const M& a) {
   return triu2symm(a);
 }
 
-DECL M friendwrap_norm_F(const M& x) {
+DECL M casadi_norm_F(const M& x) {
   return norm_F(x);
 }
 
-DECL M friendwrap_norm_2(const M& x) {
+DECL M casadi_norm_2(const M& x) {
   return norm_2(x);
 }
 
-DECL M friendwrap_norm_1(const M& x) {
+DECL M casadi_norm_1(const M& x) {
   return norm_1(x);
 }
 
-DECL M friendwrap_norm_inf(const M& x) {
+DECL M casadi_norm_inf(const M& x) {
   return norm_inf(x);
 }
 
-DECL M friendwrap_sumCols(const M& x) {
+DECL M casadi_sumCols(const M& x) {
   return sumCols(x);
 }
 
-DECL M friendwrap_sumRows(const M& x) {
+DECL M casadi_sumRows(const M& x) {
   return sumRows(x);
 }
 
-DECL M friendwrap_dot(const M& x, const M& y) {
+DECL M casadi_dot(const M& x, const M& y) {
   return dot(x, y);
 }
 
-DECL M friendwrap_nullspace(const M& A) {
+DECL M casadi_nullspace(const M& A) {
   return nullspace(A);
 }
 
-DECL M friendwrap_polyval(const M& p, const M& x) {
+DECL M casadi_polyval(const M& p, const M& x) {
   return polyval(p, x);
 }
 
-DECL M friendwrap_diag(const M& A) {
+DECL M casadi_diag(const M& A) {
   return diag(A);
 }
 
-DECL M friendwrap_unite(const M& A, const M& B) {
+DECL M casadi_unite(const M& A, const M& B) {
   return unite(A, B);
 }
 
-DECL M friendwrap_densify(const M& x) {
+DECL M casadi_densify(const M& x) {
   return densify(x);
 }
 
-DECL M friendwrap_project(const M& A, const Sparsity& sp, bool intersect=false) {
+DECL M casadi_project(const M& A, const Sparsity& sp, bool intersect=false) {
   return project(A, sp, intersect);
 }
 
-DECL M friendwrap_if_else(const M& cond, const M& if_true,
+DECL M casadi_if_else(const M& cond, const M& if_true,
                     const M& if_false, bool short_circuit=true) {
   return if_else(cond, if_true, if_false, short_circuit);
 }
 
-DECL M friendwrap_conditional(const M& ind, const std::vector< M > &x,
+DECL M casadi_conditional(const M& ind, const std::vector< M > &x,
                         const M& x_default, bool short_circuit=true) {
   return conditional(ind, x, x_default, short_circuit);
 }
 
-DECL bool friendwrap_dependsOn(const M& f, const M& arg) {
+DECL bool casadi_dependsOn(const M& f, const M& arg) {
   return dependsOn(f, arg);
 }
 
-DECL M friendwrap_solve(const M& A, const M& b) {
+DECL M casadi_solve(const M& A, const M& b) {
   return solve(A, b);
 }
 
-DECL M friendwrap_solve(const M& A, const M& b,
+DECL M casadi_solve(const M& A, const M& b,
                        const std::string& lsolver,
                        const casadi::Dict& opts = casadi::Dict()) {
   return solve(A, b, lsolver, opts);
 }
 
-DECL M friendwrap_pinv(const M& A) {
+DECL M casadi_pinv(const M& A) {
   return pinv(A);
 }
 
-DECL M friendwrap_pinv(const M& A, const std::string& lsolver,
+DECL M casadi_pinv(const M& A, const std::string& lsolver,
                       const casadi::Dict& opts = casadi::Dict()) {
   return pinv(A, lsolver, opts);
 }
 
-DECL M friendwrap_jacobian(const M &ex, const M &arg) {
+DECL M casadi_jacobian(const M &ex, const M &arg) {
   return jacobian(ex, arg);
 }
 
-DECL M friendwrap_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
+DECL M casadi_jtimes(const M& ex, const M& arg, const M& v, bool tr=false) {
   return jtimes(ex, arg, v, tr);
 }
 
-DECL std::vector<bool> friendwrap_nl_var(const M& expr, const M& var) {
+DECL std::vector<bool> casadi_nl_var(const M& expr, const M& var) {
   return nl_var(expr, var);
 }
 
-DECL M friendwrap_gradient(const M &ex, const M &arg) {
+DECL M casadi_gradient(const M &ex, const M &arg) {
   return gradient(ex, arg);
 }
 
-DECL M friendwrap_tangent(const M &ex, const M &arg) {
+DECL M casadi_tangent(const M &ex, const M &arg) {
   return tangent(ex, arg);
 }
 
-DECL M friendwrap_hessian(const M& ex, const M& arg, M& OUTPUT1) {
+DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1) {
   return hessian(ex, arg, OUTPUT1);
 }
 
-DECL int friendwrap_countNodes(const M& A) {
+DECL int casadi_countNodes(const M& A) {
   return countNodes(A);
 }
 
-DECL std::string friendwrap_print_operator(const M& xb,
+DECL std::string casadi_print_operator(const M& xb,
                                                   const std::vector<std::string>& args) {
   return print_operator(xb, args);
 }
-DECL M friendwrap_repsum(const M& A, int n, int m=1) {
+DECL M casadi_repsum(const M& A, int n, int m=1) {
   return repsum(A, n, m);
 }
 
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
-DECL M friendwrap_substitute(const M& ex, const M& v, const M& vdef) {
+DECL M casadi_substitute(const M& ex, const M& v, const M& vdef) {
   return substitute(ex, v, vdef);
 }
 
-DECL std::vector< M > friendwrap_substitute(const std::vector< M >& ex,
+DECL std::vector< M > casadi_substitute(const std::vector< M >& ex,
                                          const std::vector< M >& v,
                                          const std::vector< M >& vdef) {
   return substitute(ex, v, vdef);
 }
 
-DECL void friendwrap_substituteInPlace(const std::vector< M >& v,
+DECL void casadi_substituteInPlace(const std::vector< M >& v,
                                       std::vector< M >& INOUT1,
                                       std::vector< M >& INOUT2,
                                       bool reverse=false) {
   return substituteInPlace(v, INOUT1, INOUT2, reverse);
 }
 
-DECL void friendwrap_extractShared(const std::vector< M >& ex,
+DECL void casadi_extractShared(const std::vector< M >& ex,
                                std::vector< M >& OUTPUT1,
                                std::vector< M >& OUTPUT2,
                                std::vector< M >& OUTPUT3,
@@ -2705,52 +2706,52 @@ GENERIC_MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 
 %define GENERIC_EXPRESSION_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M friendwrap_plus(const M& x, const M& y) { return x+y; }
-DECL M friendwrap_minus(const M& x, const M& y) { return x-y; }
-DECL M friendwrap_times(const M& x, const M& y) { return x*y; }
-DECL M friendwrap_rdivide(const M& x, const M& y) { return x/y; }
-DECL M friendwrap_ldivide(const M& x, const M& y) { return y/x; }
-DECL M friendwrap_lt(const M& x, const M& y) { return x<y; }
-DECL M friendwrap_le(const M& x, const M& y) { return x<=y; }
-DECL M friendwrap_gt(const M& x, const M& y) { return x>y; }
-DECL M friendwrap_ge(const M& x, const M& y) { return x>=y; }
-DECL M friendwrap_eq(const M& x, const M& y) { return x==y; }
-DECL M friendwrap_ne(const M& x, const M& y) { return x!=y; }
-DECL M friendwrap_and(const M& x, const M& y) { return x&&y; }
-DECL M friendwrap_or(const M& x, const M& y) { return x||y; }
-DECL M friendwrap_not(const M& x) { return !x; }
-DECL M friendwrap_abs(const M& x) { return fabs(x); }
-DECL M friendwrap_sqrt(const M& x) { return sqrt(x); }
-DECL M friendwrap_sin(const M& x) { return sin(x); }
-DECL M friendwrap_cos(const M& x) { return cos(x); }
-DECL M friendwrap_tan(const M& x) { return tan(x); }
-DECL M friendwrap_atan(const M& x) { return atan(x); }
-DECL M friendwrap_asin(const M& x) { return asin(x); }
-DECL M friendwrap_acos(const M& x) { return acos(x); }
-DECL M friendwrap_tanh(const M& x) { return tanh(x); }
-DECL M friendwrap_sinh(const M& x) { return sinh(x); }
-DECL M friendwrap_cosh(const M& x) { return cosh(x); }
-DECL M friendwrap_atanh(const M& x) { return atanh(x); }
-DECL M friendwrap_asinh(const M& x) { return asinh(x); }
-DECL M friendwrap_acosh(const M& x) { return acosh(x); }
-DECL M friendwrap_exp(const M& x) { return exp(x); }
-DECL M friendwrap_log(const M& x) { return log(x); }
-DECL M friendwrap_log10(const M& x) { return log10(x); }
-DECL M friendwrap_floor(const M& x) { return floor(x); }
-DECL M friendwrap_ceil(const M& x) { return ceil(x); }
-DECL M friendwrap_erf(const M& x) { return erf(x); }
-DECL M friendwrap_erfinv(const M& x) { using casadi::erfinv; return erfinv(x); }
-DECL M friendwrap_sign(const M& x) { using casadi::sign; return sign(x); }
-DECL M friendwrap_power(const M& x, const M& n) { return pow(x, n); }
-DECL M friendwrap_mod(const M& x, const M& y) { return fmod(x, y); }
-DECL M friendwrap_atan2(const M& x, const M& y) { return atan2(x, y); }
-DECL M friendwrap_min(const M& x, const M& y) { return fmin(x, y); }
-DECL M friendwrap_max(const M& x, const M& y) { return fmax(x, y); }
-DECL M friendwrap_simplify(const M& x) { using casadi::simplify; return simplify(x); }
-DECL bool friendwrap_is_equal(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
-DECL bool friendwrap_iszero(const M& x) { using casadi::iszero; return iszero(x); }
-DECL M friendwrap_copysign(const M& x, const M& y) { return copysign(x, y); }
-DECL M friendwrap_constpow(const M& x, const M& y) { using casadi::constpow; return constpow(x, y); }
+DECL M casadi_plus(const M& x, const M& y) { return x+y; }
+DECL M casadi_minus(const M& x, const M& y) { return x-y; }
+DECL M casadi_times(const M& x, const M& y) { return x*y; }
+DECL M casadi_rdivide(const M& x, const M& y) { return x/y; }
+DECL M casadi_ldivide(const M& x, const M& y) { return y/x; }
+DECL M casadi_lt(const M& x, const M& y) { return x<y; }
+DECL M casadi_le(const M& x, const M& y) { return x<=y; }
+DECL M casadi_gt(const M& x, const M& y) { return x>y; }
+DECL M casadi_ge(const M& x, const M& y) { return x>=y; }
+DECL M casadi_eq(const M& x, const M& y) { return x==y; }
+DECL M casadi_ne(const M& x, const M& y) { return x!=y; }
+DECL M casadi_and(const M& x, const M& y) { return x&&y; }
+DECL M casadi_or(const M& x, const M& y) { return x||y; }
+DECL M casadi_not(const M& x) { return !x; }
+DECL M casadi_abs(const M& x) { return fabs(x); }
+DECL M casadi_sqrt(const M& x) { return sqrt(x); }
+DECL M casadi_sin(const M& x) { return sin(x); }
+DECL M casadi_cos(const M& x) { return cos(x); }
+DECL M casadi_tan(const M& x) { return tan(x); }
+DECL M casadi_atan(const M& x) { return atan(x); }
+DECL M casadi_asin(const M& x) { return asin(x); }
+DECL M casadi_acos(const M& x) { return acos(x); }
+DECL M casadi_tanh(const M& x) { return tanh(x); }
+DECL M casadi_sinh(const M& x) { return sinh(x); }
+DECL M casadi_cosh(const M& x) { return cosh(x); }
+DECL M casadi_atanh(const M& x) { return atanh(x); }
+DECL M casadi_asinh(const M& x) { return asinh(x); }
+DECL M casadi_acosh(const M& x) { return acosh(x); }
+DECL M casadi_exp(const M& x) { return exp(x); }
+DECL M casadi_log(const M& x) { return log(x); }
+DECL M casadi_log10(const M& x) { return log10(x); }
+DECL M casadi_floor(const M& x) { return floor(x); }
+DECL M casadi_ceil(const M& x) { return ceil(x); }
+DECL M casadi_erf(const M& x) { return erf(x); }
+DECL M casadi_erfinv(const M& x) { using casadi::erfinv; return erfinv(x); }
+DECL M casadi_sign(const M& x) { using casadi::sign; return sign(x); }
+DECL M casadi_power(const M& x, const M& n) { return pow(x, n); }
+DECL M casadi_mod(const M& x, const M& y) { return fmod(x, y); }
+DECL M casadi_atan2(const M& x, const M& y) { return atan2(x, y); }
+DECL M casadi_min(const M& x, const M& y) { return fmin(x, y); }
+DECL M casadi_max(const M& x, const M& y) { return fmax(x, y); }
+DECL M casadi_simplify(const M& x) { using casadi::simplify; return simplify(x); }
+DECL bool casadi_is_equal(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
+DECL bool casadi_iszero(const M& x) { using casadi::iszero; return iszero(x); }
+DECL M casadi_copysign(const M& x, const M& y) { return copysign(x, y); }
+DECL M casadi_constpow(const M& x, const M& y) { using casadi::constpow; return constpow(x, y); }
 #endif // FLAG & IS_MEMBER
 %enddef
 
@@ -2764,105 +2765,105 @@ GENERIC_EXPRESSION_FUN(DECL, (FLAG | IS_DOUBLE), double)
 
 %define MATRIX_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M friendwrap_all(const M& x) {
+DECL M casadi_all(const M& x) {
   return all(x);
 }
 
-DECL M friendwrap_any(const M& x) {
+DECL M casadi_any(const M& x) {
   return any(x);
 }
 
-DECL M friendwrap_adj(const M& A) {
+DECL M casadi_adj(const M& A) {
   return adj(A);
 }
 
-DECL M friendwrap_getMinor(const M& x, int i, int j) {
+DECL M casadi_getMinor(const M& x, int i, int j) {
   return getMinor(x, i, j);
 }
 
-DECL M friendwrap_cofactor(const M& x, int i, int j) {
+DECL M casadi_cofactor(const M& x, int i, int j) {
   return cofactor(x, i, j);
 }
 
-DECL void friendwrap_qr(const M& A, M& OUTPUT1, M& OUTPUT2) {
+DECL void casadi_qr(const M& A, M& OUTPUT1, M& OUTPUT2) {
   return qr(A, OUTPUT1, OUTPUT2);
 }
 
-DECL M friendwrap_chol(const M& A) {
+DECL M casadi_chol(const M& A) {
   return chol(A);
 }
 
-DECL M friendwrap_norm_inf_mul(const M& x, const M& y) {
+DECL M casadi_norm_inf_mul(const M& x, const M& y) {
   return norm_inf_mul(x, y);
 }
 
-DECL M friendwrap_sparsify(const M& A, double tol=0) {
+DECL M casadi_sparsify(const M& A, double tol=0) {
   return sparsify(A, tol);
 }
 
-DECL void friendwrap_expand(const M& ex, M& OUTPUT1, M& OUTPUT2) {
+DECL void casadi_expand(const M& ex, M& OUTPUT1, M& OUTPUT2) {
   expand(ex, OUTPUT1, OUTPUT2);
 }
 
-DECL M friendwrap_pw_const(const M &t, const M& tval, const M& val) {
+DECL M casadi_pw_const(const M &t, const M& tval, const M& val) {
   return pw_const(t, tval, val);
 }
 
-DECL M friendwrap_pw_lin(const M& t, const M& tval, const M& val) {
+DECL M casadi_pw_lin(const M& t, const M& tval, const M& val) {
   return pw_lin(t, tval, val);
 }
 
-DECL M friendwrap_heaviside(const M& x) {
+DECL M casadi_heaviside(const M& x) {
   return heaviside(x);
 }
 
-DECL M friendwrap_rectangle(const M& x) {
+DECL M casadi_rectangle(const M& x) {
   return rectangle(x);
 }
 
-DECL M friendwrap_triangle(const M& x) {
+DECL M casadi_triangle(const M& x) {
   return triangle(x);
 }
 
-DECL M friendwrap_ramp(const M& x) {
+DECL M casadi_ramp(const M& x) {
   return ramp(x);
 }
 
-DECL M friendwrap_gauss_quadrature(const M& f, const M& x,
+DECL M casadi_gauss_quadrature(const M& f, const M& x,
                                const M& a, const M& b,
                                int order=5) {
   return gauss_quadrature(f, x, a, b, order);
 }
 
-DECL M friendwrap_gauss_quadrature(const M& f, const M& x,
+DECL M casadi_gauss_quadrature(const M& f, const M& x,
                                const M& a, const M& b,
                                int order, const M& w) {
   return gauss_quadrature(f, x, a, b, order, w);
 }
 
-DECL M friendwrap_taylor(const M& ex, const M& x, const M& a=0, int order=1) {
+DECL M casadi_taylor(const M& ex, const M& x, const M& a=0, int order=1) {
   return taylor(ex, x, a, order);
 }
 
-DECL M friendwrap_mtaylor(const M& ex, const M& x, const M& a, int order=1) {
+DECL M casadi_mtaylor(const M& ex, const M& x, const M& a, int order=1) {
   return mtaylor(ex, x, a, order);
 }
 
-DECL M friendwrap_mtaylor(const M& ex, const M& x, const M& a, int order,
+DECL M casadi_mtaylor(const M& ex, const M& x, const M& a, int order,
                       const std::vector<int>& order_contributions) {
   return mtaylor(ex, x, a, order, order_contributions);
 }
 
-DECL M friendwrap_poly_coeff(const M& ex,
+DECL M casadi_poly_coeff(const M& ex,
                          const M&x) {
   return poly_coeff(ex, x);
 }
 
-DECL M friendwrap_poly_roots(const M& p) {
+DECL M casadi_poly_roots(const M& p) {
   return poly_roots(p);
 }
 
-DECL M friendwrap_eig_symbolic(const M& m) {
+DECL M casadi_eig_symbolic(const M& m) {
   return eig_symbolic(m);
 }
 
@@ -2877,32 +2878,32 @@ MATRIX_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 
 %define MX_FUN(DECL, FLAG, M)
 #if FLAG & IS_MEMBER
-DECL M friendwrap_find(const M& x) {
+DECL M casadi_find(const M& x) {
   return find(x);
 }
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
 DECL std::vector< M >
-friendwrap_matrix_expand(const std::vector< M >& e,
+casadi_matrix_expand(const std::vector< M >& e,
                      const std::vector< M > &boundary = std::vector< M >(),
                      const Dict& options = Dict()) {
   return matrix_expand(e, boundary, options);
 }
 
-DECL M friendwrap_matrix_expand(const M& e,
+DECL M casadi_matrix_expand(const M& e,
                             const std::vector< M > &boundary = std::vector< M >(),
                             const Dict& options = Dict()) {
   return matrix_expand(e, boundary, options);
 }
 
-DECL M friendwrap_graph_substitute(const M& ex, const std::vector< M >& v,
+DECL M casadi_graph_substitute(const M& ex, const std::vector< M >& v,
                          const std::vector< M > &vdef) {
   return graph_substitute(ex, v, vdef);
 }
 
 DECL std::vector< M >
-friendwrap_graph_substitute(const std::vector< M > &ex,
+casadi_graph_substitute(const std::vector< M > &ex,
                  const std::vector< M > &v,
                  const std::vector< M > &vdef) {
   return graph_substitute(ex, v, vdef);
@@ -3386,7 +3387,7 @@ def swig_typename_convertor_cpp2python(s):
   s = s.replace("SXDict","str:SX")
   s = s.replace("std::string","str")
   s = s.replace(" const &","")
-  s = s.replace("friendwrap_","")
+  s = s.replace("casadi_","")
   s = re.sub(r"\b((\w+)(< \w+ >)?)::\2\b",r"\1",s)
   s = re.sub("(const )?Matrix< ?SXElem *>( &)?",r"SX",s)
   s = re.sub("(const )?GenericMatrix< ?(\w+) *>( ?&)?",r"\2 ",s)
