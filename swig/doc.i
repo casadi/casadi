@@ -4127,12 +4127,6 @@ a.is_equal(b, 0) will return false, but a.is_equal(b, 1) will return true
 
 ";
 
-%feature("docstring")  is_zero(const ExType &x) "
-
-Addition.
-
-";
-
 %feature("docstring")  sin(const ExType &x) "
 
 Sine.
@@ -4183,27 +4177,9 @@ Infinity-norm.
 
 ";
 
-%feature("docstring")  pinv(const MatType &A) "
+%feature("docstring")  depends_on(const MatType &f, const MatType &arg) "
 
-Computes the Moore-Penrose pseudo-inverse.
-
-If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
-
-pinv(A)' = (AA')^(-1) A
-
-If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
-
-pinv(A) = (A'A)^(-1) A'
-
-";
-
-%feature("docstring")  pinv(const MatType &A, const std::string &lsolver,
-const Dict &dict=Dict()) "
-
-Computes the Moore-Penrose pseudo-inverse.
-
-If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
-matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+Check if expression depends on the argument The argument must be symbolic.
 
 ";
 
@@ -4589,6 +4565,23 @@ Return a col-wise summation of elements.
 
 ";
 
+%feature("docstring")  extractShared(std::vector< MatType > &ex,
+std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
+&v_prefix="v_", const std::string &v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
+
+";
+
+%feature("docstring")  extractShared(const std::vector< MatType > &ex,
+std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
+MatType > &vdef, const std::string &v_prefix="v_", const std::string
+&v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
+
+";
+
 %feature("docstring")  simplify(const MatType &x) "
 
 Simplify an expression.
@@ -4795,12 +4788,6 @@ taken from an existing matrix.
 
 ";
 
-%feature("docstring")  dependsOn(const MatType &f, const MatType &arg) "
-
-Check if expression depends on the argument The argument must be symbolic.
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< MatType >::row(int el) const
 "
 
@@ -4808,20 +4795,27 @@ Get the sparsity pattern. See the Sparsity class for details.
 
 ";
 
-%feature("docstring")  extractShared(std::vector< MatType > &ex,
-std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
-&v_prefix="v_", const std::string &v_suffix="") "
+%feature("docstring")  pinv(const MatType &A) "
 
-Extract shared subexpressions from an set of expressions.
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+
+pinv(A)' = (AA')^(-1) A
+
+If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+
+pinv(A) = (A'A)^(-1) A'
 
 ";
 
-%feature("docstring")  extractShared(const std::vector< MatType > &ex,
-std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
-MatType > &vdef, const std::string &v_prefix="v_", const std::string
-&v_suffix="") "
+%feature("docstring")  pinv(const MatType &A, const std::string &lsolver,
+const Dict &dict=Dict()) "
 
-Extract shared subexpressions from an set of expressions.
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 
 ";
 
@@ -5713,12 +5707,6 @@ Also called: slope function
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::to_double(int k) const  "
-
-Get double value (particular nonzero)
-
-";
-
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::ones(int
 nrow=1, int ncol=1) "
 
@@ -5825,15 +5813,10 @@ sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
 C++ includes: casadi_types.hpp ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::setValue(double m) "
+%feature("docstring")  casadi::Matrix< Scalar >::dep(int ch=0) const  "
 
-Set double value (only if constant)
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::setValue(double m, int k) "
-
-Set double value (particular nonzero)
+Get expressions of the children of the expression Only defined if symbolic
+scalar. Wraps SXElem SXElem::dep(int ch=0) const.
 
 ";
 
@@ -5841,6 +5824,58 @@ Set double value (particular nonzero)
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
 Print vector-style.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, int nrow=1, int ncol=1) "
+
+Create an nrow-by-ncol symbolic primitive.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, const std::pair< int, int > &rc) "
+
+Construct a symbolic primitive with given dimensions.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, const Sparsity &sp) "
+
+Create symbolic primitive with a given sparsity pattern.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, const Sparsity &sp, int p) "
+
+Create a vector of length p with with matrices with symbolic primitives of
+given sparsity.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, int nrow, int ncol, int p) "
+
+Create a vector of length p with nrow-by-ncol symbolic primitives.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, const Sparsity &sp, int p, int r) "
+
+Create a vector of length r of vectors of length p with symbolic primitives
+with given sparsity.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
+std::string &name, int nrow, int ncol, int p, int r) "
+
+Create a vector of length r of vectors of length p with nrow-by-ncol
+symbolic primitives.
 
 ";
 
@@ -6117,13 +6152,6 @@ open ticket #1212 to make it sparse.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::dep(int ch=0) const  "
-
-Get expressions of the children of the expression Only defined if symbolic
-scalar. Wraps SXElem SXElem::dep(int ch=0) const.
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::poly_coeff(const Matrix<
 Scalar > &f, const Matrix< Scalar > &x) " [INTERNAL]  extracts polynomial
 coefficients from an expression
@@ -6309,55 +6337,9 @@ window function
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, int nrow=1, int ncol=1) "
+%feature("docstring")  casadi::Matrix< Scalar >::is_zero() const  "
 
-Create an nrow-by-ncol symbolic primitive.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, const std::pair< int, int > &rc) "
-
-Construct a symbolic primitive with given dimensions.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, const Sparsity &sp) "
-
-Create symbolic primitive with a given sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, const Sparsity &sp, int p) "
-
-Create a vector of length p with with matrices with symbolic primitives of
-given sparsity.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, int nrow, int ncol, int p) "
-
-Create a vector of length p with nrow-by-ncol symbolic primitives.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, const Sparsity &sp, int p, int r) "
-
-Create a vector of length r of vectors of length p with symbolic primitives
-with given sparsity.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const
-std::string &name, int nrow, int ncol, int p, int r) "
-
-Create a vector of length r of vectors of length p with nrow-by-ncol
-symbolic primitives.
+check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
@@ -6999,6 +6981,12 @@ int, int > &rc) "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
+
+";
+
+%feature("docstring")  casadi::MX::is_zero() const  "
+
+check if zero (note that false negative answers are possible)
 
 ";
 
@@ -9455,10 +9443,7 @@ Check if the vector is non-increasing.
 
 ";
 
-%feature("docstring")  casadi::is_zero(double x) " [INTERNAL]  Check if
-entry is zero (false negative allowed)
-
-";
+%feature("docstring")  casadi::is_zero(const T &x) " ";
 
 %feature("docstring")  casadi::doc_linsol(const std::string &name) "
 
