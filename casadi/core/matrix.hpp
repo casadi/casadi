@@ -932,8 +932,9 @@ namespace casadi {
     explicit operator int() const;
 
 #ifndef SWIG
-    /** \brief Type conversion to double vector */
-    explicit operator std::vector<double>() const;
+    /** \brief Type conversion to a vector */
+    template<typename A>
+    explicit operator std::vector<A>() const;
 #endif // SWIG
 
     /** \brief Get name (only if symbolic scalar) */

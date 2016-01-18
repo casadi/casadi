@@ -2517,21 +2517,21 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar>::operator std::vector<double>() const {
+  template<typename A>
+  Matrix<Scalar>::operator std::vector<A>() const {
     casadi_assert(is_vector());
-    if (is_dense()) {
-      return nonzeros();
-    } else {
-      std::vector<double> ret(numel(), 0), nz=nonzeros();
-      int size1 = this->size1(), size2 = this->size2();
-      const int *colind = this->colind(), *row = this->row();
-      for (int cc=0; cc<size2; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-          ret[row[el] + cc*size1] = nz[el];
-        }
+    // Get sparsity pattern
+    int size1 = this->size1(), size2 = this->size2();
+    const int *colind = this->colind(), *row = this->row();
+    // Copy the nonzeros
+    auto it = data().begin();
+    std::vector<A> ret(numel(), 0);
+    for (int cc=0; cc<size2; ++cc) {
+      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+        ret[row[el] + cc*size1] = static_cast<A>(*it++);
       }
-      return ret;
     }
+    return ret;
   }
 
   template<typename Scalar>
