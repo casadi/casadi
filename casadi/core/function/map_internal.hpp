@@ -73,8 +73,11 @@ namespace casadi {
     /// Nonzero step for outputs
     std::vector<int> step_out_;
 
-    // This should belong in the OCL class, but then we cannot have it copied in fwd/der
+    /// This should belong in the OCL class, but then we cannot have it copied in fwd/der
     int opencl_select_;
+
+    /// Index into inputs for the computation skipping feature
+    int enable_flag_input_;
 
   };
 

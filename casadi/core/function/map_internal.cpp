@@ -121,6 +121,13 @@ namespace casadi {
     addOption("reduced_outputs", OT_INTEGERVECTOR, GenericType(),
               "Reduction for certain outputs");
 
+    addOption("enable_flag_input", OT_INTEGER, -1,
+              "This is part of an experimental feature to conditionally skip computations. "
+              "The default value -1 disables this feature. "
+              "Use this to specify the index of an input which will be interpreted as a boolean. "
+              "If that value is true, the computation is enabled. If false,"
+              "the computation is skipped");
+
     setOption("input_scheme", f.inputScheme());
     setOption("output_scheme", f.outputScheme());
 
@@ -137,6 +144,8 @@ namespace casadi {
     FunctionInternal::init();
 
     opencl_select_ = getOption("opencl_select");
+
+    enable_flag_input_ = getOption("enable_flag_input");
 
   }
 
@@ -551,6 +560,10 @@ namespace casadi {
     g.body << "  int i;" << endl;
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
 
+    if (enable_flag_input_ != -1) {
+      g.body << "    if (!arg[" << enable_flag_input_ << "][i]) continue;" << endl;
+    }
+
     g.body << "    real_t* temp_res = w+"  << f_.sz_w() <<  ";" << endl
            << "    if (temp_res!=0)" << g.fill_n("temp_res", nnz_out_, "0") << endl;
 
@@ -558,6 +571,7 @@ namespace casadi {
       g.body << "    arg1[" << j << "] = (arg[" << j << "]==0)? " <<
         "0: arg[" << j << "]+i*" << step_in_[j] << ";" << endl;
     }
+
     for (int j=0; j<num_out; ++j) {
       if (repeat_out_[j]) {
         g.body << "    res1[" << j << "] = (res[" << j << "]==0)? " <<
