@@ -2017,20 +2017,10 @@ except:
 arcsin = lambda x: _casadi.asin(x)
 arccos = lambda x: _casadi.acos(x)
 arctan = lambda x: _casadi.atan(x)
-log = lambda x: _casadi.log(x)
-log10 = lambda x: _casadi.log10(x)
-exp = lambda x: _casadi.exp(x)
-floor = lambda x: _casadi.floor(x)
-ceil = lambda x: _casadi.ceil(x)
-fmin = lambda x,y: casadi_min(x, y)
-fmax = lambda x,y: casadi_max(x, y)
-fabs = lambda x: casadi_abs(x)
-sign = lambda x: _casadi.sign(x)
 arctan2 = lambda x,y: _casadi.atan2(x, y)
 arctanh = lambda x: _casadi.atanh(x)
 arcsinh = lambda x: _casadi.asinh(x)
 arccosh = lambda x: _casadi.acosh(x)
-copysign = lambda x,y: _casadi.copysign(x, y)
 %}
 #endif // SWIGPYTHON
 
@@ -2050,6 +2040,9 @@ copysign = lambda x,y: _casadi.copysign(x, y)
 %rename(logic_not) friendwrap_not;
 %rename(logic_all) friendwrap_all;
 %rename(logic_any) friendwrap_any;
+%rename(fabs) friendwrap_abs;
+%rename(fmin) friendwrap_min;
+%rename(fmax) friendwrap_max;
 
 // Non-fatal errors (returning NotImplemented singleton)
 %feature("python:maybecall") friendwrap_plus;
@@ -2074,7 +2067,6 @@ copysign = lambda x,y: _casadi.copysign(x, y)
 #ifdef SWIGMATLAB
 %rename(uminus) operator-;
 %rename(uplus) operator+;
-%rename(mtimes) friendwrap_mul;
 %feature("varargin","1") friendwrap_vertcat;
 %feature("varargin","1") friendwrap_horzcat;
 %feature("varargin","1") friendwrap_veccat;
@@ -2735,7 +2727,7 @@ DECL M %SHOW(ne)(const M& x, const M& y) { return x!=y; }
 DECL M %SHOW(and)(const M& x, const M& y) { return x&&y; }
 DECL M %SHOW(or)(const M& x, const M& y) { return x||y; }
 DECL M %SHOW(not)(const M& x) { return !x; }
-DECL M %HIDE(abs)(const M& x) { return fabs(x); }
+DECL M %SHOW(abs)(const M& x) { return fabs(x); }
 DECL M %SHOW(sqrt)(const M& x) { return sqrt(x); }
 DECL M %SHOW(sin)(const M& x) { return sin(x); }
 DECL M %SHOW(cos)(const M& x) { return cos(x); }
@@ -2760,8 +2752,8 @@ DECL M %SHOW(sign)(const M& x) { using casadi::sign; return sign(x); }
 DECL M %SHOW(power)(const M& x, const M& n) { return pow(x, n); }
 DECL M %SHOW(mod)(const M& x, const M& y) { return fmod(x, y); }
 DECL M %SHOW(atan2)(const M& x, const M& y) { return atan2(x, y); }
-DECL M %HIDE(min)(const M& x, const M& y) { return fmin(x, y); }
-DECL M %HIDE(max)(const M& x, const M& y) { return fmax(x, y); }
+DECL M %SHOW(min)(const M& x, const M& y) { return fmin(x, y); }
+DECL M %SHOW(max)(const M& x, const M& y) { return fmax(x, y); }
 DECL M %SHOW(simplify)(const M& x) { using casadi::simplify; return simplify(x); }
 DECL bool %SHOW(is_equal)(const M& x, const M& y, int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
 DECL bool %SHOW(iszero)(const M& x) { using casadi::iszero; return iszero(x); }
@@ -3324,15 +3316,15 @@ namespace casadi {
       def __rpow__(n, x): return _casadi.power(x, n)
       def __arctan2__(x, y): return _casadi.atan2(x, y)
       def __rarctan2__(y, x): return _casadi.atan2(x, y)
-      def fmin(x, y): return casadi_min(x, y)
-      def fmax(x, y): return casadi_max(x, y)
-      def __fmin__(x, y): return casadi_min(x, y)
-      def __rfmin__(y, x): return casadi_min(x, y)
-      def __fmax__(x, y): return casadi_max(x, y)
-      def __rfmax__(y, x): return casadi_max(x, y)
+      def fmin(x, y): return _casadi.fmin(x, y)
+      def fmax(x, y): return _casadi.fmax(x, y)
+      def __fmin__(x, y): return _casadi.fmin(x, y)
+      def __rfmin__(y, x): return _casadi.fmin(x, y)
+      def __fmax__(x, y): return _casadi.fmax(x, y)
+      def __rfmax__(y, x): return _casadi.fmax(x, y)
       def logic_and(x, y): return _casadi.logic_and(x, y)
       def logic_or(x, y): return _casadi.logic_or(x, y)
-      def fabs(x): return casadi_abs(x)
+      def fabs(x): return _casadi.fabs(x)
       def sqrt(x): return _casadi.sqrt(x)
       def sin(x): return _casadi.sin(x)
       def cos(x): return _casadi.cos(x)
