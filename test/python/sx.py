@@ -501,7 +501,7 @@ class SXtests(casadiTestCase):
     self.assertTrue(is_equal(w,y))
     r=w-y
     self.assertFalse(r.is_symbolic())     
-    self.assertTrue(r.is_zero())
+    self.assertTrue(is_zero(r))
     self.assertEqual(float(r),0)
     self.assertEqual(float(r),0)
     y = SX.sym("y",2)

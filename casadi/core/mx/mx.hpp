@@ -242,7 +242,7 @@ namespace casadi {
     bool is_identity() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
-    bool is_zero() const;
+    static bool is_zero(const MX& x);
 
     /** \brief  check if zero (note that false negative answers are possible) */
     bool is_one() const;

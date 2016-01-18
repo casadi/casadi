@@ -143,7 +143,7 @@ namespace casadi {
     bool hasDep() const;
     /** \brief Check whether a binary SXElem is commutative*/
     bool is_commutative() const;
-    bool is_zero() const;
+    static bool is_zero(const SXElem& x);
     bool isAlmostZero(double tol) const;
     bool is_one() const;
     bool is_minus_one() const;

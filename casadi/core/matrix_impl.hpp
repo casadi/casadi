@@ -1012,7 +1012,7 @@ namespace casadi {
       return y + z;
     } else if (y.is_identity()) {
       return x + z;
-    } else if (x.is_zero() || y.is_zero()) {
+    } else if (is_zero(x) || is_zero(y)) {
       return z;
     } else {
       // Carry out the matrix product
@@ -1358,10 +1358,10 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  bool Matrix<Scalar>::is_zero() const {
+  bool Matrix<Scalar>::is_zero(const Matrix<Scalar>& x) {
 
     // Look for non-zeros
-    for (auto&& e : data()) if (!casadi_limits<Scalar>::is_zero(e)) return false;
+    for (auto&& e : x.data()) if (!casadi_limits<Scalar>::is_zero(e)) return false;
 
     return true;
   }
@@ -1613,7 +1613,7 @@ namespace casadi {
     for (int i=0; i<n; ++i)
       for (int j=0; j<n; ++j) {
         temp = cofactor(x, i, j);
-        if (!temp.is_zero()) C(j, i) = temp;
+        if (!is_zero(temp)) C(j, i) = temp;
       }
 
     return C.T();

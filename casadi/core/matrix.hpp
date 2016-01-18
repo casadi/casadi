@@ -904,7 +904,7 @@ namespace casadi {
     bool is_integer() const;
 
     /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
-    bool is_zero() const;
+    static bool is_zero(const Matrix<Scalar>& x);
 
     /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
     bool is_one() const;

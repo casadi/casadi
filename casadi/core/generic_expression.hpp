@@ -291,8 +291,8 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return ExType::is_equal(x, y, depth);
     }
 
-    friend inline bool iszero(const ExType& x) {
-      return x.is_zero();
+    friend inline bool is_zero(const ExType& x) {
+      return ExType::is_zero(x);
     }
 
     /// Copy sign
