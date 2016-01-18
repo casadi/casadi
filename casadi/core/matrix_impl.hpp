@@ -1430,7 +1430,7 @@ namespace casadi {
   std::vector<double> Matrix<Scalar>::nonzeros() const {
     std::vector<double> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = double(data().at(i));
+      ret[i] = static_cast<double>(data().at(i));
     }
     return ret;
   }
@@ -1439,7 +1439,7 @@ namespace casadi {
   std::vector<int> Matrix<Scalar>::nonzeros_int() const {
     std::vector<int> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = int(data().at(i));
+      ret[i] = static_cast<int>(data().at(i));
     }
     return ret;
   }
@@ -2531,7 +2531,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar>::operator double() const {
     casadi_assert(is_scalar());
-    return double(scalar());
+    return static_cast<double>(scalar());
   }
 
   template<typename Scalar>
@@ -2555,7 +2555,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar>::operator int() const {
     casadi_assert(is_scalar());
-    return int(scalar());
+    return static_cast<int>(scalar());
   }
 
   // Template specializations
