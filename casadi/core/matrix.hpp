@@ -922,12 +922,6 @@ namespace casadi {
     /** \brief Get double value (particular nonzero) */
     double to_double(int k) const;
 
-    /** \brief Set double value (only if constant) */
-    void setValue(double m);
-
-    /** \brief Set double value (particular nonzero) */
-    void setValue(double m, int k);
-
     /** \brief Get all nonzeros */
     std::vector<double> nonzeros() const;
 

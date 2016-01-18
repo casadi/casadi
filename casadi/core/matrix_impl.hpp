@@ -1414,19 +1414,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::setValue(double m) {
-    casadi_assert(is_scalar());
-    if (nnz()!=0) {
-      setValue(m, 0);
-    }
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::setValue(double m, int k) {
-    data().at(k) = m;
-  }
-
-  template<typename Scalar>
   std::vector<double> Matrix<Scalar>::nonzeros() const {
     std::vector<double> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
