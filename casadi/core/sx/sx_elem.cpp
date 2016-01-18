@@ -505,7 +505,7 @@ namespace casadi {
   }
 
   int SXElem::n_dep() const {
-    if (!hasDep()) throw CasadiException("SX::n_dep: must be binary");
+    if (!hasDep()) return 0;
     return casadi_math<double>::ndeps(op());
   }
 
