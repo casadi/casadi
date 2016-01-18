@@ -919,9 +919,6 @@ namespace casadi {
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;
 
-    /** \brief Get double value (particular nonzero) */
-    double to_double(int k) const;
-
     /** \brief Get all nonzeros */
     std::vector<double> nonzeros() const;
 
