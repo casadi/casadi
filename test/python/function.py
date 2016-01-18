@@ -1653,7 +1653,7 @@ class Functiontests(casadiTestCase):
     else:
       options_fasteval = {"compiler": "shell", "jit": True, "jit_options": {"compiler": "gcc","flags": ["-Ofast"]}}
 
-    for parallelization,opts in [("opencl",options_fasteval),("serial",{}),("serial",{"jit":True}),("openmp",{}),("openmp",{"jit": True})]:
+    for parallelization,opts in [("opencl",options_fasteval),("serial",{}),("serial",options_fasteval),("openmp",{}),("openmp",options_fasteval)]:
       if parallelization == "opencl" and not has_opencl:
         continue
       options = {"parallelization": parallelization}
