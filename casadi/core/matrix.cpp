@@ -211,20 +211,20 @@ namespace casadi {
   }
 
   template<>
-  double SX::getValue(int k) const {
-    return data().at(k).getValue();
+  double SX::to_double(int k) const {
+    return data().at(k).to_double();
   }
 
   template<>
-  int SX::getIntValue() const {
-    return scalar().getIntValue();
+  int SX::to_int() const {
+    return scalar().to_int();
   }
 
   template<>
   vector<double> SX::nonzeros() const {
     vector<double> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = data().at(i).getValue();
+      ret[i] = data().at(i).to_double();
     }
     return ret;
   }
@@ -233,7 +233,7 @@ namespace casadi {
   vector<int> SX::nonzeros_int() const {
     vector<int> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = data().at(i).getIntValue();
+      ret[i] = data().at(i).to_int();
     }
     return ret;
   }
@@ -281,7 +281,7 @@ namespace casadi {
       vector<SXNode*> f; // terms
 
       if (to_be_expanded.top()->is_constant()) { // constant nodes are seen as multiples of one
-        w.push_back(to_be_expanded.top()->getValue());
+        w.push_back(to_be_expanded.top()->to_double());
         f.push_back(casadi_limits<SXElem>::one.get());
       } else if (to_be_expanded.top()->is_symbolic()) {
         // symbolic nodes have weight one and itself as factor
@@ -316,11 +316,11 @@ namespace casadi {
             double fac;
             // Multiplication where the first factor is a constant
             if (node->dep(0)->is_constant()) {
-              fac = node->dep(0)->getValue();
+              fac = node->dep(0)->to_double();
               f = terms[ind2];
               w = weights[ind2];
             } else { // Multiplication where the second factor is a constant
-              fac = node->dep(1)->getValue();
+              fac = node->dep(1)->to_double();
               f = terms[ind1];
               w = weights[ind1];
             }

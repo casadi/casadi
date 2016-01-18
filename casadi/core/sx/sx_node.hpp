@@ -71,8 +71,8 @@ namespace casadi {
 
     ///@{
     /** \brief  Get value of a constant node */
-    virtual double getValue() const;  // only works for constant nodes
-    virtual int getIntValue() const;  // only works for integer nodes
+    virtual double to_double() const;  // only works for constant nodes
+    virtual int to_int() const;  // only works for integer nodes
     ///@}
 
     virtual const std::string& name() const; // get the name

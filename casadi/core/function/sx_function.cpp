@@ -334,7 +334,7 @@ namespace casadi {
       // Get instruction
       switch (ae.op) {
       case OP_CONST: // constant
-        ae.d = n->getValue();
+        ae.d = n->to_double();
         ae.i0 = n->temp;
         break;
       case OP_PARAMETER: // a parameter or input

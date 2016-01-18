@@ -920,10 +920,10 @@ namespace casadi {
     bool has_zeros() const;
 
     /** \brief Get double value (only if constant) */
-    double getValue() const;
+    double to_double() const;
 
     /** \brief Get double value (particular nonzero) */
-    double getValue(int k) const;
+    double to_double(int k) const;
 
     /** \brief Set double value (only if constant) */
     void setValue(double m);
@@ -932,7 +932,7 @@ namespace casadi {
     void setValue(double m, int k);
 
     /** \brief Get double value (only if integer constant) */
-    int getIntValue() const;
+    int to_int() const;
 
     /** \brief Get all nonzeros */
     std::vector<double> nonzeros() const;

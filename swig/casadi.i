@@ -2033,8 +2033,8 @@ arccosh = lambda x: _casadi.acosh(x)
 
 #ifdef SWIGPYTHON
 %ignore T;
-%rename(__float__) getValue;
-%rename(__int__) getIntValue;
+%rename(__float__) to_double;
+%rename(__int__) to_int;
 
 %rename(logic_and) casadi_and;
 %rename(logic_or) casadi_or;

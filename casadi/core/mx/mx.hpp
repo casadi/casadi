@@ -174,7 +174,7 @@ namespace casadi {
     std::string name() const;
 
     /// Get the value (only for scalar constant nodes)
-    double getValue() const;
+    double to_double() const;
 
     /// Get the value (only for constant nodes)
     Matrix<double> getMatrixValue() const;

@@ -44,14 +44,14 @@ namespace casadi {
     }
   }
 
-  double SXNode::getValue() const {
+  double SXNode::to_double() const {
     return numeric_limits<double>::quiet_NaN();
-    /*  userOut<true, PL_WARN>() << "getValue() not defined for class " << typeid(*this).name() << std::endl;
-        throw "SXNode::getValue()";*/
+    /*  userOut<true, PL_WARN>() << "to_double() not defined for class " << typeid(*this).name() << std::endl;
+        throw "SXNode::to_double()";*/
   }
 
-  int SXNode::getIntValue() const {
-    throw CasadiException(string("getIntValue() not defined for class ") + typeid(*this).name());
+  int SXNode::to_int() const {
+    throw CasadiException(string("to_int() not defined for class ") + typeid(*this).name());
   }
 
   bool SXNode::is_zero() const {

@@ -72,7 +72,7 @@ namespace casadi {
       // Dense matrix if val dense
       if (val.is_dense()) {
         if (val.is_constant()) {
-          assignNode(ConstantMX::create(sp, val.getValue()));
+          assignNode(ConstantMX::create(sp, val.to_double()));
         } else {
           *this = val->getGetNonzeros(sp, std::vector<int>(sp.nnz(), 0));
         }
@@ -660,8 +660,8 @@ namespace casadi {
   int MX::numFunctions() const { return (*this)->numFunctions(); }
   Function MX::getFunction (int i) {  return (*this)->getFunction(i); }
 
-  double MX::getValue() const {
-    return (*this)->getValue();
+  double MX::to_double() const {
+    return (*this)->to_double();
   }
 
   Matrix<double> MX::getMatrixValue() const {

@@ -383,13 +383,13 @@ namespace casadi {
     g.body << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }
 
-  double MXNode::getValue() const {
-    throw CasadiException(string("MXNode::getValue not defined for class ") + typeid(*this).name());
+  double MXNode::to_double() const {
+    casadi_error(string("MXNode::to_double not defined for class ") + typeid(*this).name());
   }
 
   Matrix<double> MXNode::getMatrixValue() const {
-    throw CasadiException(string("MXNode::getMatrixValue not defined for class ")
-                          + typeid(*this).name());
+    casadi_error(string("MXNode::getMatrixValue not defined for class ")
+                 + typeid(*this).name());
   }
 
   MX MXNode::getTranspose() const {

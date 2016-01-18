@@ -86,7 +86,7 @@ namespace casadi {
     virtual int op() const { return OP_CONST;}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const = 0;
+    virtual double to_double() const = 0;
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const = 0;
@@ -137,7 +137,7 @@ namespace casadi {
     virtual bool is_identity() const;
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const {return x_.scalar();}
+    virtual double to_double() const {return x_.scalar();}
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const { return x_;}
@@ -184,7 +184,7 @@ namespace casadi {
                           const std::vector<int>& arg, const std::vector<int>& res) const {}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const { return 0;}
+    virtual double to_double() const { return 0;}
 
     /// Get the value (only for constant nodes)
     virtual DM getMatrixValue() const { return DM(); }
@@ -284,7 +284,7 @@ namespace casadi {
     virtual bool isValue(double val) const { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const {
+    virtual double to_double() const {
       return v_.value;
     }
 
@@ -409,7 +409,7 @@ namespace casadi {
       bool grow = true;
       if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==0) {
         double ret;
-        casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->getValue() : 0, ret);
+        casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->to_double() : 0, ret);
         grow = ret!=0;
       }
       if (grow) {
@@ -446,7 +446,7 @@ namespace casadi {
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
     if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==0) {
-      double y_value = y.nnz()>0 ? y->getValue() : 0;
+      double y_value = y.nnz()>0 ? y->to_double() : 0;
       double ret;
       casadi_math<double>::fun(op, nnz()> 0 ? v_.value: 0, y_value, ret);
 

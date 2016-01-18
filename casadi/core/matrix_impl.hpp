@@ -1409,17 +1409,17 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  double Matrix<Scalar>::getValue() const {
+  double Matrix<Scalar>::to_double() const {
     casadi_assert(is_scalar());
     if (nnz()==0) {
       return 0;
     } else {
-      return getValue(0);
+      return to_double(0);
     }
   }
 
   template<typename Scalar>
-  double Matrix<Scalar>::getValue(int k) const {
+  double Matrix<Scalar>::to_double(int k) const {
     return static_cast<double>(data().at(k));
   }
 
@@ -1437,7 +1437,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  int Matrix<Scalar>::getIntValue() const {
+  int Matrix<Scalar>::to_int() const {
     return static_cast<int>(scalar());
   }
 
@@ -2601,8 +2601,8 @@ namespace casadi {
   template<> bool SX::is_valid_input() const;
   template<> bool SX::has_duplicates();
   template<> void SX::resetInput();
-  template<> double SX::getValue(int k) const;
-  template<> int SX::getIntValue() const;
+  template<> double SX::to_double(int k) const;
+  template<> int SX::to_int() const;
   template<> std::vector<double> SX::nonzeros() const;
   template<> std::vector<int> SX::nonzeros_int() const;
   template<> SX SX::dep(int ch) const;
