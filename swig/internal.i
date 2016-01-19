@@ -172,16 +172,16 @@
 %exception  casadi::SparseStorage< DataType >::clear() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparseStorage< DataType >::data() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::data() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SparseStorage< DataType >::elem(int rr, int cc) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::has_nz(int rr, int cc) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SparseStorage< DataType >::nonzeros() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SparseStorage< DataType >::nonzeros() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::reserve(int nnz) {

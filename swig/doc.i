@@ -7886,6 +7886,16 @@ cc) " [INTERNAL]  get a reference to an element
 %feature("docstring")  casadi::SparseStorage< DataType >::reserve(int nnz,
 int ncol) " [INTERNAL] ";
 
+%feature("docstring")  casadi::SparseStorage< DataType >::nonzeros() "
+[INTERNAL]  Access the non-zero elements.
+
+";
+
+%feature("docstring")  casadi::SparseStorage< DataType >::nonzeros() const
+" [INTERNAL]  Const access the non-zero elements.
+
+";
+
 %feature("docstring")  casadi::SparseStorage< DataType >::resize(int nrow,
 int ncol) " [INTERNAL] ";
 
@@ -7897,16 +7907,6 @@ references to it.
 
 %feature("docstring") casadi::SparseStorage "[INTERNAL] C++ includes:
 sparse_storage.hpp ";
-
-%feature("docstring")  casadi::SparseStorage< DataType >::data() "
-[INTERNAL]  Access the non-zero elements.
-
-";
-
-%feature("docstring")  casadi::SparseStorage< DataType >::data() const  "
-[INTERNAL]  Const access the non-zero elements.
-
-";
 
 %feature("docstring")  casadi::SparseStorage< DataType >::sparsity() const
 " [INTERNAL]  Const access the sparsity - reference to data member.
