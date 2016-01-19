@@ -1625,11 +1625,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::vecNZ(const Matrix<Scalar>& x) {
-    return Matrix<Scalar>(x.nonzeros());
-  }
-
-  template<typename Scalar>
   Matrix<Scalar>
   Matrix<Scalar>::blockcat(const std::vector< std::vector<Matrix<Scalar> > > &v) {
     std::vector< Matrix<Scalar> > ret;

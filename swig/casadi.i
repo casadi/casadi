@@ -2457,9 +2457,6 @@ namespace casadi{
  DECL M casadi_vec(const M& a) {
  return vec(a);
  }
- DECL M casadi_vecNZ(const M& a) {
- return vecNZ(a);
- }
  DECL M casadi_reshape(const M& a, int nrow, int ncol) {
  return reshape(a, nrow, ncol);
  }

@@ -1261,10 +1261,6 @@ namespace casadi {
     return vertcat(ret);
   }
 
-  Sparsity Sparsity::vecNZ(const Sparsity& x) {
-    return Sparsity::dense(x.nnz());
-  }
-
   std::vector<Sparsity> Sparsity::diagsplit(const Sparsity& x, const std::vector<int>& offset1,
                                             const std::vector<int>& offset2) {
     // Consistency check

@@ -459,7 +459,6 @@ namespace casadi {
                 const std::vector<int>& offset2);
     static Sparsity mtimes(const Sparsity& x, const Sparsity& y);
     static Sparsity mac(const Sparsity& x, const Sparsity& y, const Sparsity& z) { return z;}
-    static Sparsity vecNZ(const Sparsity& x);
     static Sparsity reshape(const Sparsity& x, int nrow, int ncol);
     static Sparsity reshape(const Sparsity& x, const Sparsity& sp);
     static int sprank(const Sparsity& x);

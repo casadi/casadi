@@ -151,27 +151,27 @@ class ImplicitFunctiontests(casadiTestCase):
       y=SX.sym("y",s)
       y0 = DM(Sparsity.diag(N),0.1)
 
-      f=Function("f", [vecNZ(y),vecNZ(x)],[vecNZ((mtimes((x+y0),(x+y0).T)-mtimes((y+y0),(y+y0).T))[s])])
+      f=Function("f", [y.nz[:],x.nz[:]],[((mtimes((x+y0),(x+y0).T)-mtimes((y+y0),(y+y0).T))[s]).nz[:]])
       options2 = dict(options)
       options2["constraints"] = [1]*s.nnz()
       solver=rootfinder("options2", Solver, f, options2)
       
       X = MX.sym("X",x.sparsity())
-      [R] = solver([MX(),vecNZ(X)])
+      [R] = solver([MX(),X.nz[:]])
       
       trial = Function("trial", [X],[R])
       trial_in = [0]*trial.n_in();trial_in[0]=DM(trial.sparsity_in(0),[abs(cos(i)) for i in range(x.nnz())])
       trial_out = trial(trial_in)
 
       f_in = [0]*f.n_in();f_in[0]=trial_out[0]
-      f_in[1]=vecNZ(trial_in[0])
+      f_in[1]=trial_in[0].nz[:]
       f_out = f(f_in)
 
-      f_in = [0]*f.n_in();f_in[0]=vecNZ(trial_in[0])
-      f_in[1]=vecNZ(trial_in[0])
+      f_in = [0]*f.n_in();f_in[0]=trial_in[0].nz[:]
+      f_in[1]=trial_in[0].nz[:]
       f_out = f(f_in)
       
-      refsol = Function("refsol", [X],[vecNZ(X)])
+      refsol = Function("refsol", [X],[X.nz[:]])
       refsol_in = [0]*refsol.n_in();refsol_in[0]=trial_in[0]
 
       self.checkfunction(trial,refsol,inputs=refsol_in,digits=6,sens_der=False,evals=1,failmessage=message)

@@ -1057,14 +1057,6 @@ namespace casadi {
     return x->getReshape(sp);
   }
 
-  MX MX::vecNZ(const MX& x) {
-    if (x.is_dense()) {
-      return vec(x);
-    } else {
-      return x->getGetNonzeros(Sparsity::dense(x.nnz(), 1), range(x.nnz()));
-    }
-  }
-
   MX MX::if_else(const MX &cond, const MX &x_true, const MX &x_false, bool short_circuit) {
     if (short_circuit) {
       // Get symbolic primitives

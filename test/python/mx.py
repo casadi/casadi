@@ -390,23 +390,6 @@ class MXtests(casadiTestCase):
     
     self.checkarray(vec(u),f_out[0],"vec")
     
-  def test_MXvecNZ(self):
-
-    u = DM(4,3)
-    u[0,0] = 7
-    u[1,1] = 8
-    u[2,2] = 6
-    u[1,0] = 9
-    u[0,1] = 11
-    
-    U = MX.sym("u",u.sparsity())
-
-    f = Function("f", [U],[vecNZ(U)])
-    f_in = [0]*f.n_in();f_in[0]=u
-    f_out = f(f_in)
-    
-    self.checkarray(vecNZ(u),f_out[0],"vec")
-
   def test_MXreshape(self):
     self.message("reshape(MX)")
     x = MX.sym("x",2,3)
@@ -1332,11 +1315,11 @@ class MXtests(casadiTestCase):
     i = IM(Sparsity.lower(3),range(6))
 
     i.print_dense()
-    print vecNZ(i.T)
+    print i.T.nz[:]
 
     T = X.nz[i]
 
-    f = Function("f", [X],[vecNZ(T.T)**2])
+    f = Function("f", [X],[T.T.nz[:]**2])
     f_in = [0]*f.n_in();f_in[0]=range(10)
     f_out = f(f_in)
     
@@ -1359,7 +1342,7 @@ class MXtests(casadiTestCase):
     
     self.checkarray(i,J_out[0])
     
-    f = Function("f", [X],[vecNZ(T.T)**2], {"ad_weight":1, "ad_weight_sp":1})
+    f = Function("f", [X],[(T.T).nz[:]**2], {"ad_weight":1, "ad_weight_sp":1})
     
     J = Function("J", [X],[MX.jac(f)])
     J_in = [0]*J.n_in();J_in[0]=range(10)
@@ -1421,7 +1404,6 @@ class MXtests(casadiTestCase):
   def test_veccats(self):
     x= MX.sym("x",2)
     self.assertTrue(hash(vec(x))==hash(x))
-    self.assertTrue(hash(vecNZ(x))==hash(x))
     
   def test_constmxmtimes(self):
     0.1*MX.ones(2)
