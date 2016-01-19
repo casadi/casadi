@@ -53,7 +53,6 @@ using namespace std;
 int main(){
 
   // Constants
-  const double inf = numeric_limits<double>::infinity();
   int N = 40;
   double m_i = 40.0/N;
   double D_i = 70.0*N;

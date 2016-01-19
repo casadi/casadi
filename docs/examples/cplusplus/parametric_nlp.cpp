@@ -65,9 +65,6 @@ int main(){
     p[1]*x[0] +   x[1] -   x[2] -    1
   );
   
-  // Infinity
-  double inf = numeric_limits<double>::infinity();
-  
   // Initial guess and bounds for the optimization variables
   vector<double> x0  = {0.15, 0.15, 0.00};
   vector<double> lbx = {0.00, 0.00, 0.00};

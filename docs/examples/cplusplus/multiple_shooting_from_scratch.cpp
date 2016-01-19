@@ -46,9 +46,6 @@
 using namespace casadi;
 using namespace std;
 
-// Infinity
-double inf = numeric_limits<double>::infinity();
-
 int main(){
   // Declare variables
   SX u = SX::sym("u"); // control

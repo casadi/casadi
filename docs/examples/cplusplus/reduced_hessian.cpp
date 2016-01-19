@@ -53,9 +53,6 @@ int main(){
   
   // Constraint
   SX g = x[0]+2*x[1]+3*x[2];
-  
-  // Infinity
-  double inf = numeric_limits<double>::infinity();
 
   // Initial guess and bounds for the optimization variables
   vector<double> x0  = {25,0,0};
