@@ -754,7 +754,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
         res = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
         if isinstance(res,IM):
           assert res.is_dense()
-          return map(int,list(res.nonzeros()))
+          return map(int,list(res.nonzeros_double()))
         return list(res)
       else:
         raise Exception("Canonical index %s not found." % str(canonicalIndex))

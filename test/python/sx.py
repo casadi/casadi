@@ -344,7 +344,7 @@ class SXtests(casadiTestCase):
     fcn_out = fcn(fcn_in)
 
     # Get the results
-    res = tuple(fcn_out[0].nonzeros())
+    res = tuple(fcn_out[0].nonzeros_double())
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
     
@@ -1055,7 +1055,7 @@ class SXtests(casadiTestCase):
     
     self.assertTrue(h.sparsity_out(0)==H.sparsity())
     
-    self.checkarray(h_out[0].nonzeros(),H.nonzeros())
+    self.checkarray(h_out[0].nonzeros_double(),H.nonzeros_double())
 
   def test_mxnulloutput(self):
      a = SX(5,0)

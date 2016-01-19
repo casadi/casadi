@@ -1409,7 +1409,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  std::vector<double> Matrix<Scalar>::nonzeros() const {
+  std::vector<double> Matrix<Scalar>::nonzeros_double() const {
     std::vector<double> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
       ret[i] = static_cast<double>(data().at(i));

@@ -159,7 +159,7 @@ for N in range(1,11):
   print "optimal cost: ", float(res["f"])
 
   # Print the optimal solution
-  xopt = res["x"].nonzeros()
+  xopt = res["x"].nonzeros_double()
   print "optimal solution: ", xopt
  
   # plot to screen

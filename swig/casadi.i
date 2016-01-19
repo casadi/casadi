@@ -325,6 +325,7 @@ import_array();
     bool to_ptr(GUESTOBJECT *p, casadi::MX** m);
     bool to_ptr(GUESTOBJECT *p, casadi::Function** m);
     bool to_ptr(GUESTOBJECT *p, casadi::GenericType** m);
+    bool to_ptr(GUESTOBJECT *p, casadi::SXElem** m);
 #ifdef SWIGMATLAB
     bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
 #endif // SWIGMATLAB
@@ -357,6 +358,7 @@ import_array();
     GUESTOBJECT* from_ptr(const casadi::SX *a);
     GUESTOBJECT* from_ptr(const casadi::MX *a);
     GUESTOBJECT* from_ptr(const casadi::Function *a);
+    GUESTOBJECT* from_ptr(const casadi::SXElem *a);
 #ifdef SWIGMATLAB
     GUESTOBJECT* from_ptr(const std::pair<int, int>* a);
 #endif // SWIGMATLAB
@@ -1312,6 +1314,31 @@ import_array();
   } // namespace casadi
  }
 
+%fragment("casadi_sxelem", "header", fragment="casadi_aux") {
+  namespace casadi {
+    bool to_ptr(GUESTOBJECT *p, SXElem** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Try first converting to a temporary SX
+      {
+        SX tmp, *mt=&tmp;
+        if(casadi::to_ptr(p, m ? &mt : 0)) {
+          if (m) **m = mt->scalar();
+          return true;
+        }
+      }
+
+      // No match
+      return false;
+    }
+
+    GUESTOBJECT* from_ptr(const SXElem *a) {
+      return from_ref(SX(*a));
+    }
+  } // namespace casadi
+ }
+
 %fragment("casadi_mx", "header", fragment="casadi_decl") {
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, MX** m) {
@@ -1780,7 +1807,7 @@ import_array();
  }
 
 // Collect all fragments
-%fragment("casadi_all", "header", fragment="casadi_aux,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_dvector,casadi_sx,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
+%fragment("casadi_all", "header", fragment="casadi_aux,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_dvector,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
 
 #endif // SWIGXML
 
@@ -1950,6 +1977,8 @@ import_array();
 %casadi_typemaps("double", SWIG_TYPECHECK_DOUBLE, double)
 %casadi_template("[double]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
 %casadi_template("[[double]]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
+%casadi_typemaps("SXElem", PREC_SX, casadi::SXElem)
+%casadi_template("[SXElem]", PREC_SXVector, std::vector<casadi::SXElem>)
 %casadi_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
 %casadi_template("[SX]", PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElem> >)
 %casadi_template("[[SX]]", PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
@@ -2030,6 +2059,7 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(row) get_row;
 %rename(colind) get_colind;
 %rename(sparsity) get_sparsity;
+%rename(nonzeros) get_nonzeros;
 
 // Explicit conversion to double and int
 #ifdef SWIGPYTHON
@@ -2992,7 +3022,7 @@ namespace casadi{
       return ret;
 #elif defined(SWIGMATLAB)
       mxArray *p  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
-      std::vector<double> nz = $self->nonzeros();
+      std::vector<double> nz = $self->nonzeros_double();
       double* d = static_cast<double*>(mxGetData(p));
       if (!nz.empty()) casadi_densify(&nz[0], $self->sparsity(), d, false); // Column-major
       return p;
@@ -3005,7 +3035,7 @@ namespace casadi{
     // Convert to a sparse matrix
     GUESTOBJECT* sparse() const {
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
-      std::vector<double> nz = $self->nonzeros();
+      std::vector<double> nz = $self->nonzeros_double();
       if (!nz.empty()) casadi::casadi_copy(&nz[0], $self->nnz(), static_cast<double*>(mxGetData(p)));
       std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));
       std::copy($self->row(), $self->row()+$self->nnz(), mxGetIr(p));
@@ -3043,7 +3073,7 @@ namespace casadi{
     with warnings.catch_warnings():
       warnings.simplefilter("ignore")
       from scipy.sparse import csc_matrix
-    return csc_matrix( (self.nonzeros(),self.row(),self.colind()), shape = self.shape, dtype=n.double )
+    return csc_matrix( (self.nonzeros_double(),self.row(),self.colind()), shape = self.shape, dtype=n.double )
 
   def tocsc(self):
     return self.sparse()
@@ -3101,7 +3131,7 @@ namespace casadi{
         self.__init__(sp,state["data"])
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=float)}
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros_double(),dtype=float)}
   %}
 
 }

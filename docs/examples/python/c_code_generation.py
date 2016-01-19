@@ -95,7 +95,7 @@ for f in f_test:
   for r in range(nrep):
     [r] = f([x0])
   t2 = time.time()
-  print "result = ", r.nonzeros()
+  print "result = ", r.nonzeros_double()
   dt = (t2-t1)/nrep
   print "time = ", dt*1e3, " ms"
   
