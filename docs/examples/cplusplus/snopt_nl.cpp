@@ -64,7 +64,7 @@ int main(int argc, char **argv){
   arg["x0"] = nl.x_init;
   res = solver(arg);
   for (auto&& s : res) {
-    std::cout << std::setw(10) << s.first << ": " << s.second.nonzeros() << std::endl;
+    std::cout << std::setw(10) << s.first << ": " << std::vector<double>(s.second) << std::endl;
   }
   return 0;
 }

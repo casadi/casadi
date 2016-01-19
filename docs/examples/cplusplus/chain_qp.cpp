@@ -155,10 +155,10 @@ int main(){
   file << "% Generated " __DATE__ " at " __TIME__ << endl;
   file << endl;
   file << "t = linspace(-2,2," << N << ");"<< endl;
-  file << "f_opt = " << f_opt << ";" << endl;
-  file << "x_opt = " << x_opt.nonzeros() << ";" << endl;
-  file << "y_opt = " << y_opt.nonzeros() << ";" << endl;
-  file << "z_opt = " << z_opt.nonzeros() << ";" << endl;
+  file << "f_opt = " << double(f_opt) << ";" << endl;
+  file << "x_opt = " << vector<double>(x_opt) << ";" << endl;
+  file << "y_opt = " << vector<double>(y_opt) << ";" << endl;
+  file << "z_opt = " << vector<double>(z_opt) << ";" << endl;
 
   // Finalize the results file
   file << endl;

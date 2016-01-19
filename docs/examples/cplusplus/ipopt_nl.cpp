@@ -68,7 +68,7 @@ int main(int argc, char **argv){
   res = solver(arg);
   res = solver(arg);
   for (auto&& s : res) {
-    std::cout << std::setw(10) << s.first << ": " << s.second.nonzeros() << std::endl;
+    std::cout << std::setw(10) << s.first << ": " << std::vector<double>(s.second) << std::endl;
   }
   return 0;
 }
