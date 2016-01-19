@@ -632,7 +632,7 @@ namespace casadi {
 
     // Sort the equations by causality
     vector<MX> ex;
-    replace(this->d, this->ddef, ex);
+    in_place(this->d, this->ddef, ex);
 
     // Make sure that the interdependencies have been properly eliminated
     casadi_assert(!depends_on(vertcat(this->ddef), vertcat(this->d)));
@@ -655,7 +655,7 @@ namespace casadi {
     ex.insert(ex.end(), this->init.begin(), this->init.end());
 
     // Substitute all at once (since they may have common subexpressions)
-    replace(this->d, this->ddef, ex);
+    in_place(this->d, this->ddef, ex);
 
     // Get the modified expressions
     vector<MX>::const_iterator it=ex.begin();
@@ -803,7 +803,7 @@ namespace casadi {
 
     // Eliminate inter-dependencies
     vector<MX> ex;
-    replace(this->sdot, new_ode, ex, false);
+    in_place(this->sdot, new_ode, ex, false);
 
     // Add to explicit differential states and ODE
     this->x.insert(this->x.end(), this->s.begin(), this->s.end());
@@ -892,7 +892,7 @@ namespace casadi {
 
     // Eliminate inter-dependencies in fb_exp
     vector<MX> ex;
-    replace(z_exp, f_exp, ex, false);
+    in_place(z_exp, f_exp, ex, false);
 
     // Add to the beginning of the dependent variables
     // (since the other dependent variable might depend on them)

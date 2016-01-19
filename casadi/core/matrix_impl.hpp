@@ -2211,11 +2211,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::replace(const std::vector<Matrix<Scalar> >& v,
+  void Matrix<Scalar>::in_place(const std::vector<Matrix<Scalar> >& v,
                                            std::vector<Matrix<Scalar> >& vdef,
                                            std::vector<Matrix<Scalar> >& ex,
                                            bool reverse) {
-    throw CasadiException("\"replace\" not defined for instantiation");
+    throw CasadiException("\"in_place\" not defined for instantiation");
   }
 
   template<typename Scalar>
@@ -2569,7 +2569,7 @@ namespace casadi {
   template<> std::vector<SX > SX::substitute(const std::vector<SX >& ex,
                                                 const std::vector<SX >& v,
                                                 const std::vector<SX >& vdef);
-  template<> void SX::replace(const std::vector<SX >& v,
+  template<> void SX::in_place(const std::vector<SX >& v,
                                         std::vector<SX >& vdef,
                                         std::vector<SX >& ex,
                                         bool reverse);
