@@ -727,7 +727,7 @@ namespace casadi {
   }
 
   template<>
-  void SX::extractShared(vector<SX >& ex,
+  void SX::shared(vector<SX >& ex,
                          vector<SX >& v_sx,
                          vector<SX >& vdef_sx,
                          const string& v_prefix,

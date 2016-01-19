@@ -2715,13 +2715,13 @@ DECL void casadi_in_place(const std::vector< M >& v,
   return in_place(v, INOUT1, INOUT2, reverse);
 }
 
-DECL void casadi_extractShared(const std::vector< M >& ex,
+DECL void casadi_shared(const std::vector< M >& ex,
                                std::vector< M >& OUTPUT1,
                                std::vector< M >& OUTPUT2,
                                std::vector< M >& OUTPUT3,
                                const std::string& v_prefix="v_",
                                const std::string& v_suffix="") {
-  extractShared(ex, OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
+  shared(ex, OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
 }
 
 #endif // FLAG & IS_GLOBAL

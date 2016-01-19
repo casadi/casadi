@@ -561,23 +561,23 @@ namespace casadi {
     }
 
     /** \brief Extract shared subexpressions from an set of expressions */
-    inline friend void extractShared(std::vector<MatType>& ex,
+    inline friend void shared(std::vector<MatType>& ex,
                                      std::vector<MatType>& v,
                                      std::vector<MatType>& vdef,
                                      const std::string& v_prefix="v_",
                                      const std::string& v_suffix="") {
-      MatType::extractShared(ex, v, vdef, v_prefix, v_suffix);
+      MatType::shared(ex, v, vdef, v_prefix, v_suffix);
     }
 
     /** \brief Extract shared subexpressions from an set of expressions */
-    inline friend void extractShared(const std::vector<MatType>& ex,
+    inline friend void shared(const std::vector<MatType>& ex,
                                      std::vector<MatType>& ex_output,
                                      std::vector<MatType>& v,
                                      std::vector<MatType>& vdef,
                                      const std::string& v_prefix="v_",
                                      const std::string& v_suffix="") {
       ex_output = ex;
-      extractShared(ex_output, v, vdef, v_prefix, v_suffix);
+      shared(ex_output, v, vdef, v_prefix, v_suffix);
     }
 
     /** \brief Given a repeated matrix, computes the sum of repeated parts

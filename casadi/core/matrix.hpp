@@ -297,7 +297,7 @@ namespace casadi {
     static int countNodes(const Matrix<Scalar> &x);
     static std::string print_operator(const Matrix<Scalar> &x,
                                       const std::vector<std::string>& args);
-    static void extractShared(std::vector<Matrix<Scalar> >& ex,
+    static void shared(std::vector<Matrix<Scalar> >& ex,
                               std::vector<Matrix<Scalar> >& v,
                               std::vector<Matrix<Scalar> >& vdef,
                               const std::string& v_prefix,

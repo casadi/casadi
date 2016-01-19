@@ -2328,12 +2328,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::extractShared(std::vector<Matrix<Scalar> >& ex,
+  void Matrix<Scalar>::shared(std::vector<Matrix<Scalar> >& ex,
                                        std::vector<Matrix<Scalar> >& v,
                                        std::vector<Matrix<Scalar> >& vdef,
                                        const std::string& v_prefix,
                                        const std::string& v_suffix) {
-    throw CasadiException("\"extractShared\" not defined for instantiation");
+    throw CasadiException("\"shared\" not defined for instantiation");
   }
 
   template<typename Scalar>
@@ -2594,7 +2594,7 @@ namespace casadi {
   template<> int SX::countNodes(const SX& x);
   template<> std::string
   SX::print_operator(const SX& x, const std::vector<std::string>& args);
-  template<> void SX::extractShared(std::vector<SX >& ex,
+  template<> void SX::shared(std::vector<SX >& ex,
                                     std::vector<SX >& v,
                                     std::vector<SX >& vdef,
                                     const std::string& v_prefix,

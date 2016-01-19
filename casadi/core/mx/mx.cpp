@@ -1399,7 +1399,7 @@ namespace casadi {
 
   }
 
-  void MX::extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
+  void MX::shared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
                          const std::string& v_prefix, const std::string& v_suffix) {
 
     // Sort the expression
