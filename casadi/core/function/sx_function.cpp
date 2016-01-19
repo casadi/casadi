@@ -637,9 +637,9 @@ namespace casadi {
       for (vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it) {
         switch (it->op) {
         case OP_INPUT:
-          s_work_[it->i0] = fseed[dir][it->i1].data()[it->i2]; break;
+          s_work_[it->i0] = fseed[dir][it->i1].nonzeros()[it->i2]; break;
         case OP_OUTPUT:
-          fsens[dir][it->i0].data()[it->i2] = s_work_[it->i1]; break;
+          fsens[dir][it->i0].nonzeros()[it->i2] = s_work_[it->i1]; break;
         case OP_CONST:
         case OP_PARAMETER:
           s_work_[it->i0] = 0;
@@ -735,11 +735,11 @@ namespace casadi {
         SXElem seed;
         switch (it->op) {
         case OP_INPUT:
-          asens[dir][it->i1].data()[it->i2] = s_work_[it->i0];
+          asens[dir][it->i1].nonzeros()[it->i2] = s_work_[it->i0];
           s_work_[it->i0] = 0;
           break;
         case OP_OUTPUT:
-          s_work_[it->i1] += aseed[dir][it->i0].data()[it->i2];
+          s_work_[it->i1] += aseed[dir][it->i0].nonzeros()[it->i2];
           break;
         case OP_CONST:
         case OP_PARAMETER:

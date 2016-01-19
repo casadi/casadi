@@ -38,11 +38,11 @@ namespace casadi {
   template class Matrix< SXElem >;
 
   bool CASADI_EXPORT is_slice(const IM& x, bool ind1) {
-    return x.is_scalar() || (x.is_column() && x.is_dense() && is_slice(x.data(), ind1));
+    return x.is_scalar() || (x.is_column() && x.is_dense() && is_slice(x.nonzeros(), ind1));
   }
 
   Slice CASADI_EXPORT to_slice(const IM& x, bool ind1) {
-    return x.is_scalar() ? Slice(x.scalar(), ind1) : to_slice(x.data(), ind1);
+    return x.is_scalar() ? Slice(x.scalar(), ind1) : to_slice(x.nonzeros(), ind1);
   }
 
   template<>
@@ -71,7 +71,7 @@ namespace casadi {
   bool Matrix<SXElem>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
                                   "provided a shape" << dim());}
-    return data().at(0).__nonzero__();
+    return nonzeros().at(0).__nonzero__();
   }
 
   template<>
@@ -136,14 +136,14 @@ namespace casadi {
   bool SX::is_regular() const {
     // First pass: ignore symbolics
     for (int i=0; i<nnz(); ++i) {
-      const SXElem& x = data().at(i);
+      const SXElem& x = nonzeros().at(i);
       if (x.is_constant()) {
         if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
       }
     }
     // Second pass: don't ignore symbolics
     for (int i=0; i<nnz(); ++i) {
-      if (!data().at(i).is_regular()) return false;
+      if (!nonzeros().at(i).is_regular()) return false;
     }
     return true;
   }
@@ -185,7 +185,7 @@ namespace casadi {
   template<>
   bool SX::is_valid_input() const {
     for (int k=0; k<nnz(); ++k) // loop over non-zero elements
-      if (!data().at(k)->is_symbolic()) // if an element is not symbolic
+      if (!nonzeros().at(k)->is_symbolic()) // if an element is not symbolic
         return false;
 
     return true;
@@ -720,7 +720,7 @@ namespace casadi {
   template<>
   vector<SX> SX::symvar(const SX& x) {
     Function f("tmp", vector<SX>{}, {x});
-    vector<SXElem> ret1 = f.free_sx().data();
+    vector<SXElem> ret1 = f.free_sx().nonzeros();
     vector<SX> ret(ret1.size());
     copy(ret1.begin(), ret1.end(), ret.begin());
     return ret;

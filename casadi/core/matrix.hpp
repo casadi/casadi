@@ -800,8 +800,8 @@ namespace casadi {
 #ifndef SWIG
     ///@{
     /// Access the non-zero elements
-    std::vector<Scalar>& data() { return nonzeros_;}
-    const std::vector<Scalar>& data() const { return nonzeros_;}
+    std::vector<Scalar>& nonzeros() { return nonzeros_;}
+    const std::vector<Scalar>& nonzeros() const { return nonzeros_;}
     ///@}
 
     ///@{
@@ -926,9 +926,6 @@ namespace casadi {
     /** \brief Get all nonzeros */
     template<typename A>
     std::vector<A> get_nonzeros() const;
-
-    /** \brief Get all nonzeros */
-    const std::vector<Scalar>& nonzeros() const { return nonzeros_;}
 #endif // SWIG
 
     /** \brief Type conversion to double */

@@ -66,7 +66,7 @@ namespace casadi {
   void ConstantDM::generate(CodeGenerator& g, const std::string& mem,
                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print the constant
-    int ind = g.getConstant(x_.data(), true);
+    int ind = g.getConstant(x_.nonzeros(), true);
 
     // Copy the constant to the work vector
     g.body << "  " << g.copy("c"+g.to_string(ind), nnz(), g.work(res[0], nnz())) << endl;
@@ -111,7 +111,7 @@ namespace casadi {
       return create(val.sparsity(), val.scalar());
     } else {
       // Check if all values are the same
-      const vector<double> vdata = val.data();
+      const vector<double> vdata = val.nonzeros();
       double v = vdata[0];
       for (vector<double>::const_iterator i=vdata.begin(); i!=vdata.end(); ++i) {
         if (*i!=v) {

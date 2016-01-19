@@ -36,8 +36,8 @@ namespace casadi {
     int oldsize = sparsity().nnz();
     int ind = sparsityRef().add_nz(rr, cc);
     if (oldsize != sparsity().nnz())
-      data().insert(data().begin()+ind, DataType(0));
-    return data().at(ind);
+      nonzeros().insert(nonzeros().begin()+ind, DataType(0));
+    return nonzeros().at(ind);
   }
 
   template<typename DataType>
@@ -66,7 +66,7 @@ namespace casadi {
 
   template<typename DataType>
   void SparseStorage<DataType>::reserve(int nnz, int ncol) {
-    data().reserve(nnz);
+    nonzeros().reserve(nnz);
   }
 
   template<typename DataType>
@@ -77,16 +77,16 @@ namespace casadi {
   template<typename DataType>
   void SparseStorage<DataType>::clear() {
     sparsity_ = Sparsity(0, 0);
-    data().clear();
+    nonzeros().clear();
   }
 
   template<typename DataType>
-  std::vector<DataType>& SparseStorage<DataType>::data() {
+  std::vector<DataType>& SparseStorage<DataType>::nonzeros() {
     return nonzeros_;
   }
 
   template<typename DataType>
-  const std::vector<DataType>& SparseStorage<DataType>::data() const {
+  const std::vector<DataType>& SparseStorage<DataType>::nonzeros() const {
     return nonzeros_;
   }
 

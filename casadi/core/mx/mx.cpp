@@ -149,7 +149,7 @@ namespace casadi {
 
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
-    Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
+    Sparsity sp = sparsity().sub(rr.nonzeros(), cc.nonzeros(), mapping, ind1);
 
     // Create return MX
     m = (*this)->getGetNonzeros(sp, mapping);
@@ -171,7 +171,7 @@ namespace casadi {
 
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
-    Sparsity sp = sparsity().sub(rr.data(), tr ? rr.sparsity().T() : rr.sparsity(),
+    Sparsity sp = sparsity().sub(rr.nonzeros(), tr ? rr.sparsity().T() : rr.sparsity(),
                                  mapping, ind1);
 
     // Create return MX
@@ -238,13 +238,13 @@ namespace casadi {
     int sz1 = size1(), sz2 = size2();
 
     // Report out-of-bounds
-    if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
+    if (!inBounds(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
       casadi_error("set[., rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr->begin(), rr->end()) << " up to "
                    << *std::max_element(rr->begin(), rr->end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
-    if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
+    if (!inBounds(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
       casadi_error("set [., rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc->begin(), cc->end()) << " up to "
                    << *std::max_element(cc->begin(), cc->end())
@@ -253,7 +253,7 @@ namespace casadi {
 
     // If we are assigning with something sparse, first remove existing entries
     if (!m.is_dense()) {
-      erase(rr.data(), cc.data(), ind1);
+      erase(rr.nonzeros(), cc.nonzeros(), ind1);
     }
 
     // Collect all assignments
@@ -281,7 +281,7 @@ namespace casadi {
     if (rr.sparsity() != m.sparsity()) {
       if (rr.size() == m.size()) {
         // Remove submatrix to be replaced
-        erase(rr.data(), ind1);
+        erase(rr.nonzeros(), ind1);
 
         // Find the intersection between rr's and m's sparsity patterns
         Sparsity sp = rr.sparsity() * m.sparsity();
@@ -313,7 +313,7 @@ namespace casadi {
     if (rrsz==0) return;
 
     // Check bounds
-    if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
+    if (!inBounds(rr.nonzeros(), -nel+ind1, nel+ind1)) {
       casadi_error("set[rr] out of bounds. Your rr contains "
                    << *std::min_element(rr->begin(), rr->end()) << " up to "
                    << *std::max_element(rr->begin(), rr->end())
@@ -326,7 +326,7 @@ namespace casadi {
     }
 
     // Construct new sparsity pattern
-    std::vector<int> new_row=sparsity().get_row(), new_col=sparsity().get_col(), nz(rr.data());
+    std::vector<int> new_row=sparsity().get_row(), new_col=sparsity().get_col(), nz(rr.nonzeros());
     new_row.reserve(sz+rrsz);
     new_col.reserve(sz+rrsz);
     nz.reserve(rrsz);
@@ -378,7 +378,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
+    if (!inBounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
       casadi_error("get_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
@@ -388,7 +388,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
       Matrix<int> kk_mod = kk;
-      for (auto&& i : kk_mod.data()) {
+      for (auto&& i : kk_mod.nonzeros()) {
         casadi_assert_message(!(ind1 && i<=0), "Matlab is 1-based, but requested index " <<
                               i <<  ". Note that negative slices are" <<
                               " disabled in the Matlab interface. " <<
@@ -401,7 +401,7 @@ namespace casadi {
     }
 
     // Return reference to the nonzeros
-    m = (*this)->getGetNonzeros(tr ? kk.sparsity().T() : kk.sparsity(), kk.data());
+    m = (*this)->getGetNonzeros(tr ? kk.sparsity().T() : kk.sparsity(), kk.nonzeros());
   }
 
   void MX::set_nz(const MX& m, bool ind1, const Slice& kk) {
@@ -442,7 +442,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
+    if (!inBounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
       casadi_error("set_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
@@ -455,7 +455,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
       Matrix<int> kk_mod = kk;
-      for (auto&& i : kk_mod.data()) {
+      for (auto&& i : kk_mod.nonzeros()) {
         casadi_assert_message(!(ind1 && i<=0), "Matlab is 1-based, but requested index " <<
                               i <<  ". Note that negative slices are" <<
                               " disabled in the Matlab interface. " <<
@@ -467,7 +467,7 @@ namespace casadi {
     }
 
     // Create a nonzero assignment node
-    *this = simplify(m->getSetNonzeros(*this, kk.data()));
+    *this = simplify(m->getSetNonzeros(*this, kk.nonzeros()));
   }
 
   MX MX::binary(int op, const MX &x, const MX &y) {

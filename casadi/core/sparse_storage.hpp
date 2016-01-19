@@ -72,10 +72,10 @@ namespace casadi {
     void reserve(int nnz, int ncol);
 
     /// Access the non-zero elements
-    std::vector<DataType>& data();
+    std::vector<DataType>& nonzeros();
 
     /// Const access the non-zero elements
-    const std::vector<DataType>& data() const;
+    const std::vector<DataType>& nonzeros() const;
 
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const { return sparsity_; }

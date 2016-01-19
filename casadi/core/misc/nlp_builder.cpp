@@ -93,7 +93,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   lambda_init = DM::zeros(g.sparsity());
 
   // All variables, including dependent
-  vector<SXElem> v = x.data();
+  vector<SXElem> v = x.nonzeros();
 
   // Process segments
   while (true) {

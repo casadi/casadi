@@ -89,9 +89,9 @@ namespace casadi {
 
     // Put parameters in a vector
     std::vector<SX> par;
-    par.push_back(H.data());
-    par.push_back(G.data());
-    par.push_back(A.data());
+    par.push_back(H.nonzeros());
+    par.push_back(G.nonzeros());
+    par.push_back(A.nonzeros());
 
     // The nlp looks exactly like a mathematical description of the NLP
     SXDict nlp = {{"x", X}, {"p", vertcat(par)},

@@ -378,7 +378,7 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   
   // Solution statistics  
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
-  const vector<double>& x_opt = w.at("x").data();
+  const vector<double>& x_opt = w.at("x").nonzeros();
   drag_est = x_opt.at(0)*p_scale_[0];
   depth_est = x_opt.at(1)*p_scale_[1];
   iter_count = nlpsol_.stats().at("iter_count");
