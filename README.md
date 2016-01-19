@@ -1,4 +1,4 @@
-Develop status: [![Build Status](https://travis-ci.org/casadi/casadi.png?branch=develop)](https://travis-ci.org/casadi/casadi) [![Build status](https://ci.appveyor.com/api/projects/status/ysa3763djq9yq0xa?svg=true)](https://ci.appveyor.com/project/jgillis/casadi)
+Develop status: [![Build Status](https://travis-ci.org/casadi/casadi.png?branch=master)](https://travis-ci.org/casadi/casadi) [![Build status](https://ci.appveyor.com/api/projects/status/ysa3763djq9yq0xa?svg=true)](https://ci.appveyor.com/project/jgillis/casadi)
 
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3048371fc8fb8a61361f4536456f535c "githalytics.com")](http://githalytics.com/casadi/casadi)
 <script type="text/javascript">
@@ -17,5 +17,5 @@ Develop status: [![Build Status](https://travis-ci.org/casadi/casadi.png?branch=
 
 Learn all about CasADi at the [homepage](http://casadi.org)...
 
-[![Class diagram](http://docs.casadi.org/api/html/overview.png)](http://docs.casadi.org)
+[![Class diagram](http://docslatest.casadi.org/api/html/overview.png)](http://docslatest.casadi.org/api/html)
 

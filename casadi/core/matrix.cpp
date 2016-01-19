@@ -915,7 +915,7 @@ namespace casadi {
 
       SX phi = acos(-b/2/sqrt(-a3*a3*a3));
 
-      SX ret = SX::vertcat({cos(phi/3), cos((phi+2*M_PI)/3), cos((phi+4*M_PI)/3)});
+      SX ret = SX::vertcat({cos(phi/3), cos((phi+2*pi)/3), cos((phi+4*pi)/3)});
       ret*= 2*sqrt(-a3);
 
       ret-= p_/3;
