@@ -28,9 +28,9 @@ def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolati
   if hasattr(labels,"labels"):
     labels = labels.labels()
 
-  v = list(value.nonzeros_double())
-  lb = list(lowerbound.nonzeros_double())
-  ub = list(upperbound.nonzeros_double())
+  v = list(value.nonzeros())
+  lb = list(lowerbound.nonzeros())
+  ub = list(upperbound.nonzeros())
 
   if labels is None:
     labels = [""] * len(v) 

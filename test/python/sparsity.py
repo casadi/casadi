@@ -283,7 +283,7 @@ class Sparsitytests(casadiTestCase):
     fin = DM(b.sparsity(),range(1,len(nza)+1))
     f_out = f([fin])
     
-    self.checkarray(DM(f_out[0].nonzeros_double()),DM([1,0,0,7,0]),"sparsity index")
+    self.checkarray(DM(f_out[0].nonzeros()),DM([1,0,0,7,0]),"sparsity index")
     
   def test_get_ccs(self):
     self.message("CCS format")

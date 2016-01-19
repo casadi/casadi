@@ -159,7 +159,7 @@ class MXtests(casadiTestCase):
     self.assertEqual(f.n_out(),1,"Function fails to indicate correct number of outputs")
     f_in = [0]*f.n_in();f_in[0]=3;
     f_out = f(f_in)
-    yt = tuple(f_out[0].nonzeros_double())
+    yt = tuple(f_out[0].nonzeros())
     self.assertEqual(type(yt),TupleType,"Output of Function is expected to be tuple of floats")
     self.assertEqual(len(yt),1,"Output of Function was tuple of floats, as expected, but length is incorrect.")
     y=yt[0]
@@ -178,8 +178,8 @@ class MXtests(casadiTestCase):
     f_in = [0]*f.n_in();f_in[0]=3;
     f_in[1]=7;
     f_out = f(f_in)
-    zt1 = tuple(f_out[0].nonzeros_double())
-    zt2 = tuple(f_out[1].nonzeros_double())
+    zt1 = tuple(f_out[0].nonzeros())
+    zt2 = tuple(f_out[1].nonzeros())
     self.assertEqual(type(zt1),TupleType,"Output of Function is expected to be tuple of floats")
     self.assertEqual(type(zt2),TupleType,"Output of Function is expected to be tuple of floats")
     self.assertEqual(len(zt1),1,"Output of Function was tuple of floats, as expected, but length is incorrect.")
@@ -204,8 +204,8 @@ class MXtests(casadiTestCase):
     self.assertEqual(f.n_out(),2,"Function fails to indicate correct number of outputs")
     f_in = [0]*f.n_in();f_in[0]=[3,7];
     f_out = f(f_in)
-    zt1 = tuple(f_out[0].nonzeros_double())
-    zt2 = tuple(f_out[1].nonzeros_double())
+    zt1 = tuple(f_out[0].nonzeros())
+    zt2 = tuple(f_out[1].nonzeros())
     self.assertEqual(type(zt1),TupleType,"Output of Function is expected to be tuple of floats")
     self.assertEqual(type(zt2),TupleType,"Output of Function is expected to be tuple of floats")
     self.assertEqual(len(zt1),1,"Output of Function was tuple of floats, as expected, but length is incorrect.")

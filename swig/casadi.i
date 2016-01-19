@@ -3022,7 +3022,7 @@ namespace casadi{
       return ret;
 #elif defined(SWIGMATLAB)
       mxArray *p  = mxCreateDoubleMatrix($self->size1(), $self->size2(), mxREAL);
-      std::vector<double> nz = $self->nonzeros_double();
+      std::vector<double> nz = $self->get_nonzeros<double>();
       double* d = static_cast<double*>(mxGetData(p));
       if (!nz.empty()) casadi_densify(&nz[0], $self->sparsity(), d, false); // Column-major
       return p;
@@ -3035,7 +3035,7 @@ namespace casadi{
     // Convert to a sparse matrix
     GUESTOBJECT* sparse() const {
       mxArray *p  = mxCreateSparse($self->size1(), $self->size2(), $self->nnz(), mxREAL);
-      std::vector<double> nz = $self->nonzeros_double();
+      std::vector<double> nz = $self->get_nonzeros<double>();
       if (!nz.empty()) casadi::casadi_copy(&nz[0], $self->nnz(), static_cast<double*>(mxGetData(p)));
       std::copy($self->colind(), $self->colind()+$self->size2()+1, mxGetJc(p));
       std::copy($self->row(), $self->row()+$self->nnz(), mxGetIr(p));
@@ -3073,7 +3073,7 @@ namespace casadi{
     with warnings.catch_warnings():
       warnings.simplefilter("ignore")
       from scipy.sparse import csc_matrix
-    return csc_matrix( (self.nonzeros_double(),self.row(),self.colind()), shape = self.shape, dtype=n.double )
+    return csc_matrix( (self.nonzeros(),self.row(),self.colind()), shape = self.shape, dtype=n.double )
 
   def tocsc(self):
     return self.sparse()
@@ -3131,7 +3131,7 @@ namespace casadi{
         self.__init__(sp,state["data"])
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros_double(),dtype=float)}
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=float)}
   %}
 
 }

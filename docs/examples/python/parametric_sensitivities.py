@@ -115,7 +115,7 @@ print "Minimal cost " , res["f"]
 print "----"
 
 print "Nominal solution"
-print "x = " , res["x"].nonzeros_double()
+print "x = " , res["x"].nonzeros()
 print "----"
   
 print "perturbed solution"

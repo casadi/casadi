@@ -343,20 +343,20 @@ class Toolstests(casadiTestCase):
     
     init['X',0,-1,'p',0] = 2
     self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DM.ones(6)*2)
-    self.assertEqual(sum([i!=i for i in init.cat.nonzeros_double()]),1503-6)
+    self.assertEqual(sum([i!=i for i in init.cat.nonzeros()]),1503-6)
     
     init['X',0,-1,'p',0] = [3]*6
     self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DM.ones(6)*3)
-    self.assertEqual(sum([i!=i for i in init.cat.nonzeros_double()]),1503-6)
+    self.assertEqual(sum([i!=i for i in init.cat.nonzeros()]),1503-6)
  
     init['X',0,-1,'p',0] = DM([4]*6)
     self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DM.ones(6)*4)
-    self.assertEqual(sum([i!=i for i in init.cat.nonzeros_double()]),1503-6)
+    self.assertEqual(sum([i!=i for i in init.cat.nonzeros()]),1503-6)
     
     init['X',0,-1,'p',:] = 7
     
     self.checkarray(init.cat[shooting.i['X',0,-1,'p',1]],DM.ones(6)*7)
-    self.assertEqual(sum([i!=i for i in init.cat.nonzeros_double()]),1503-6*9)
+    self.assertEqual(sum([i!=i for i in init.cat.nonzeros()]),1503-6*9)
     
     self.checkarray(init['X',0,-1,'p',horzcat,:],DM.ones(6,9)*7)
 

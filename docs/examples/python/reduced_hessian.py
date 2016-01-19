@@ -85,7 +85,7 @@ print "Minimal cost " , res["f"]
 print "----" 
 
 print "Solution" 
-print "x = " , res["x"].nonzeros_double() 
+print "x = " , res["x"].nonzeros() 
 print "----" 
 
 # Obtain the reduced Hessian

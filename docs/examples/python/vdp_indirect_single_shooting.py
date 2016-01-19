@@ -120,7 +120,7 @@ solver = rootfinder('solver', Solver, rfp, opts)
 
 # Solve the problem
 l_init_opt, = solver([0])
-l_init_opt = NP.array(l_init_opt.nonzeros_double())
+l_init_opt = NP.array(l_init_opt.nonzeros())
 
 # Time grid for visualization
 tgrid = NP.linspace(0, 10, 100)

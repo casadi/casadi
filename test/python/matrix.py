@@ -113,7 +113,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(C.shape,(9,1),"veccat shape")
     self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"veccat size")
     
-    self.checkarray(tuple(C.nonzeros_double()),tuple(arange(1,7)),"numbers shape")
+    self.checkarray(tuple(C.nonzeros()),tuple(arange(1,7)),"numbers shape")
 
   def test_slicestepnegative(self):
     self.message("Slice step negative")

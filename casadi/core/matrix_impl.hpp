@@ -1409,15 +1409,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  std::vector<double> Matrix<Scalar>::nonzeros_double() const {
-    std::vector<double> ret(nnz());
-    for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = static_cast<double>(data().at(i));
-    }
-    return ret;
-  }
-
-  template<typename Scalar>
   std::vector<int> Matrix<Scalar>::nonzeros_int() const {
     std::vector<int> ret(nnz());
     for (size_t i=0; i<ret.size(); ++i) {
@@ -2518,8 +2509,16 @@ namespace casadi {
 
   template<typename Scalar>
   template<typename A>
+  std::vector<A> Matrix<Scalar>::get_nonzeros() const {
+    std::vector<A> ret(nnz());
+    auto r = ret.begin();
+    for (auto&& e : data()) *r++ = static_cast<A>(e);
+    return ret;
+  }
+
+  template<typename Scalar>
+  template<typename A>
   Matrix<Scalar>::operator std::vector<A>() const {
-    casadi_assert(is_vector());
     // Get sparsity pattern
     int size1 = this->size1(), size2 = this->size2();
     const int *colind = this->colind(), *row = this->row();

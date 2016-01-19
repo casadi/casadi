@@ -145,8 +145,8 @@ class typemaptests(casadiTestCase):
     w = DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     
-    list(w.nonzeros_double())
-    tuple(w.nonzeros_double())
+    list(w.nonzeros())
+    tuple(w.nonzeros())
     w.full()
     array(w)
     matrix(w)

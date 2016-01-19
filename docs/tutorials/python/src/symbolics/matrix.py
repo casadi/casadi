@@ -42,11 +42,11 @@ print "column offsets: ", w.colind()
 #! ... the row for each nonzero ...
 print "row: ", w.row()
 #! ... and the nonzero data entries:
-print "nonzeros: ", w.nonzeros_double()
+print "nonzeros: ", w.nonzeros()
 #! Conversion
 #! --------------
 #! DM can easily be converted into other data formats
-print w.nonzeros_double()
+print w.nonzeros()
 print w.full()
 print array(w)
 print matrix(w)
