@@ -542,7 +542,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  std::string Matrix<Scalar>::className() { return matrixName<Scalar>(); }
+  std::string Matrix<Scalar>::type_name() { return matrixName<Scalar>(); }
 
   template<typename Scalar>
   void Matrix<Scalar>::printScalar(std::ostream &stream, bool trailing_newline) const {
@@ -740,7 +740,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::repr(std::ostream &stream, bool trailing_newline) const {
-    stream << className() << "(";
+    stream << type_name() << "(";
     print(stream, false);
     stream << ")";
     if (trailing_newline) stream << std::endl;
@@ -2233,21 +2233,21 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::jacobian(const Matrix<Scalar> &f,
                                               const Matrix<Scalar> &x,
                                               bool symmetric) {
-    casadi_error("\"jacobian\" not defined for " + className());
+    casadi_error("\"jacobian\" not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::gradient(const Matrix<Scalar> &f,
                                               const Matrix<Scalar> &x) {
-    casadi_error("\"gradient\" not defined for " + className());
+    casadi_error("\"gradient\" not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::tangent(const Matrix<Scalar> &f,
                                                 const Matrix<Scalar> &x) {
-    casadi_error("\"tangent\" not defined for " + className());
+    casadi_error("\"tangent\" not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2262,7 +2262,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
                                              const Matrix<Scalar> &x,
                                              Matrix<Scalar> &g) {
-    casadi_error("\"hessian\" not defined for " + className());
+    casadi_error("\"hessian\" not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
@@ -2271,14 +2271,14 @@ namespace casadi {
                                             const Matrix<Scalar> &arg,
                                             const Matrix<Scalar> &v,
                                             bool tr) {
-    casadi_error("\"jtimes\" not defined for " + className());
+    casadi_error("\"jtimes\" not defined for " + type_name());
     return Matrix<Scalar>();
   }
 
   template<typename Scalar>
   std::vector<bool>
   Matrix<Scalar>::nl_var(const Matrix<Scalar> &expr, const Matrix<Scalar> &var) {
-    casadi_error("\"nl_var\" not defined for " + className());
+    casadi_error("\"nl_var\" not defined for " + type_name());
     return std::vector<bool>();
   }
 
@@ -2398,99 +2398,99 @@ namespace casadi {
 
   template<typename Scalar>
   std::vector<Matrix<Scalar> > Matrix<Scalar>::get_input(const Function& f) {
-    throw CasadiException("\"get_input\" not defined for " + className());
+    throw CasadiException("\"get_input\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, int iind, int oind,
                                          bool compact, bool symmetric) {
-    throw CasadiException("\"jac\" not defined for " + className());
+    throw CasadiException("\"jac\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::grad(const Function& f, int iind, int oind) {
-    throw CasadiException("\"grad\" not defined for " + className());
+    throw CasadiException("\"grad\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, int iind, int oind) {
-    throw CasadiException("\"tang\" not defined for " + className());
+    throw CasadiException("\"tang\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, const std::string& iname, int oind,
                                          bool compact, bool symmetric) {
-    throw CasadiException("\"jac\" not defined for " + className());
+    throw CasadiException("\"jac\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, int iind,
                                          const std::string& oname,
                                          bool compact, bool symmetric) {
-    throw CasadiException("\"jac\" not defined for " + className());
+    throw CasadiException("\"jac\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::jac(const Function& f, const std::string& iname,
                                          const std::string& oname,
          bool compact, bool symmetric) {
-    throw CasadiException("\"jac\" not defined for " + className());
+    throw CasadiException("\"jac\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::grad(const Function& f, const std::string& iname, int oind) {
-    throw CasadiException("\"grad\" not defined for " + className());
+    throw CasadiException("\"grad\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::grad(const Function& f, int iind, const std::string& oname) {
-    throw CasadiException("\"grad\" not defined for " + className());
+    throw CasadiException("\"grad\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::grad(const Function& f, const std::string& iname,
                                           const std::string& oname) {
-    throw CasadiException("\"grad\" not defined for " + className());
+    throw CasadiException("\"grad\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, const std::string& iname, int oind) {
-    throw CasadiException("\"tang\" not defined for " + className());
+    throw CasadiException("\"tang\" not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, int iind, const std::string& oname) {
-    throw CasadiException("'tang' not defined for " + className());
+    throw CasadiException("'tang' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::tang(const Function& f, const std::string& iname,
                                           const std::string& oname) {
-    throw CasadiException("'tang' not defined for " + className());
+    throw CasadiException("'tang' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hess(const Function& f,
                                           int iind, int oind) {
-    throw CasadiException("'hess' not defined for " + className());
+    throw CasadiException("'hess' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hess(const Function& f,
                                           const std::string& iname, int oind) {
-    throw CasadiException("'hess' not defined for " + className());
+    throw CasadiException("'hess' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hess(const Function& f, int iind,
                                           const std::string& oname) {
-    throw CasadiException("'hess' not defined for " + className());
+    throw CasadiException("'hess' not defined for " + type_name());
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hess(const Function& f, const std::string& iname,
                                           const std::string& oname) {
-    throw CasadiException("'hess' not defined for " + className());
+    throw CasadiException("'hess' not defined for " + type_name());
   }
 
   template<typename Scalar>

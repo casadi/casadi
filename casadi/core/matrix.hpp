@@ -750,7 +750,7 @@ namespace casadi {
     ///@}
 
     /// Get name of the class
-    static std::string className();
+    static std::string type_name();
 
     /// Print a description of the object
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
