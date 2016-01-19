@@ -72,7 +72,7 @@ namespace casadi {
       // Dense matrix if val dense
       if (val.is_dense()) {
         if (val.is_constant()) {
-          assignNode(ConstantMX::create(sp, val.to_double()));
+          assignNode(ConstantMX::create(sp, static_cast<double>(val)));
         } else {
           *this = val->getGetNonzeros(sp, std::vector<int>(sp.nnz(), 0));
         }
@@ -660,11 +660,11 @@ namespace casadi {
   int MX::numFunctions() const { return (*this)->numFunctions(); }
   Function MX::getFunction (int i) {  return (*this)->getFunction(i); }
 
-  double MX::to_double() const {
+  MX::operator double() const {
     return (*this)->to_double();
   }
 
-  Matrix<double> MX::getMatrixValue() const {
+  MX::operator Matrix<double>() const {
     return (*this)->getMatrixValue();
   }
 
@@ -814,7 +814,7 @@ namespace casadi {
 
   bool MX::is_regular() const {
     if (is_constant()) {
-      return getMatrixValue().is_regular();
+      return static_cast<DM>(*this).is_regular();
     } else {
       casadi_error("Cannot check regularity for symbolic MX");
     }

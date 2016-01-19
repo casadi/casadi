@@ -1795,9 +1795,9 @@ class MXtests(casadiTestCase):
             print r
             self.assertTrue(r.is_constant())
             
-            self.checkarray(r.getMatrixValue(),numpyop(x_),str([x_,name]))
+            self.checkarray(r.to_DM(),numpyop(x_),str([x_,name]))
             
-            a = IM.ones(r.getMatrixValue().sparsity())
+            a = IM.ones(r.to_DM().sparsity())
             b = IM.ones(DM(numpyop(x_)).sparsity())
             
             c = b-a

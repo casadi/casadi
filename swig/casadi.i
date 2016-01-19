@@ -2069,6 +2069,7 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(to_double) operator double;
 %rename(to_int) operator int;
 #endif
+%rename(to_DM) operator Matrix<double>;
 
 #ifdef SWIGPYTHON
 %ignore T;

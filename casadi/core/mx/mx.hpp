@@ -174,10 +174,10 @@ namespace casadi {
     std::string name() const;
 
     /// Get the value (only for scalar constant nodes)
-    double to_double() const;
+    explicit operator double() const;
 
     /// Get the value (only for constant nodes)
-    Matrix<double> getMatrixValue() const;
+    explicit operator Matrix<double>() const;
 
     /// Check if symbolic
     bool is_symbolic() const;
