@@ -4292,16 +4292,6 @@ Solve a system of equations: A*x = b.
 
 ";
 
-%feature("docstring")  replace(const std::vector< MatType > &v, std::vector<
-MatType > &inout_vdef, std::vector< MatType > &inout_ex, bool reverse=false)
-"
-
-Inplace substitution with piggyback expressions Substitute variables v out
-of the expressions vdef sequentially, as well as out of a number of other
-expressions piggyback.
-
-";
-
 %feature("docstring")  det(const MatType &A) "
 
 Matrix determinant (experimental)
@@ -4581,9 +4571,13 @@ Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring")  simplify(const MatType &x) "
+%feature("docstring")  substitute_inplace(const std::vector< MatType > &v,
+std::vector< MatType > &inout_vdef, std::vector< MatType > &inout_ex, bool
+reverse=false) "
 
-Simplify an expression.
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback.
 
 ";
 
@@ -4685,6 +4679,12 @@ Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
 const MatType &if_false, bool short_circuit=true) "
 
 Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
+
+";
+
+%feature("docstring")  simplify(const MatType &x) "
+
+Simplify an expression.
 
 ";
 

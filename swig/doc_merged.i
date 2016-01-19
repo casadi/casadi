@@ -3045,14 +3045,6 @@ Solve a system of equations: A*x = b.
 
 ";
 
-%feature("docstring") friendwrap_replace "
-
-Inplace substitution with piggyback expressions Substitute variables v out
-of the expressions vdef sequentially, as well as out of a number of other
-expressions piggyback.
-
-";
-
 %feature("docstring") friendwrap_det "
 
 Matrix determinant (experimental)
@@ -3322,9 +3314,11 @@ Return a col-wise summation of elements.
 
 ";
 
-%feature("docstring") friendwrap_simplify "
+%feature("docstring") friendwrap_substitute_inplace "
 
-Simplify an expression.
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback.
 
 ";
 
@@ -3408,6 +3402,12 @@ Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
 %feature("docstring") friendwrap_if_else "
 
 Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
+
+";
+
+%feature("docstring") friendwrap_simplify "
+
+Simplify an expression.
 
 ";
 
