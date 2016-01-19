@@ -505,7 +505,7 @@ namespace casadi {
   }
 
   template<>
-  void SX::substituteInPlace(const vector<SX >& v, vector<SX >& vdef,
+  void SX::in_place(const vector<SX >& v, vector<SX >& vdef,
                              vector<SX >& ex, bool reverse) {
     // Assert correctness
     casadi_assert(v.size()==vdef.size());

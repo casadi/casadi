@@ -214,7 +214,7 @@ void LiftedSQPInternal::init(){
   ex[0] = f1;
   ex[1] = f2;
   ex[2] = f;
-  substituteInPlace(v, d_def, ex, false);
+  in_place(v, d_def, ex, false);
   SX f1_z = ex[0];
   SX f2_z = ex[1];
   SX f_z = ex[2];
