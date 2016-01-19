@@ -277,6 +277,12 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::Callback::n_nodes "
+
+Number of nodes in the algorithm.
+
+";
+
 %feature("docstring") casadi::Callback::sx_out "
 
 Get symbolic primitives equivalent to the output expressions.
@@ -722,12 +728,6 @@ length of res field.
 %feature("docstring") casadi::Callback::printOptions "
 
 Print options to a stream.
-
-";
-
-%feature("docstring") casadi::Callback::countNodes "
-
-Number of nodes in the algorithm.
 
 ";
 
@@ -2032,12 +2032,6 @@ Get symbolic primitives equivalent to the output expressions.
 
 ";
 
-%feature("docstring") casadi::Function::countNodes "
-
-Number of nodes in the algorithm.
-
-";
-
 %feature("docstring") casadi::Function::free_sx "
 
 Get all the free variables of the function.
@@ -2408,6 +2402,12 @@ Return a string with a representation (for SWIG)
 %feature("docstring") casadi::Function::description_in "
 
 Get input scheme description by index.
+
+";
+
+%feature("docstring") casadi::Function::n_nodes "
+
+Number of nodes in the algorithm.
 
 ";
 
@@ -2950,7 +2950,7 @@ Check if expression depends on the argument The argument must be symbolic.
 
 ";
 
-%feature("docstring") friendwrap_countNodes "
+%feature("docstring") friendwrap_n_nodes "
 
 Count number of nodes
 
@@ -3004,11 +3004,9 @@ Check if the matrix expression is scalar.
 
 ";
 
-%feature("docstring") friendwrap_substituteInPlace "
+%feature("docstring") friendwrap_shared "
 
-Inplace substitution with piggyback expressions Substitute variables v out
-of the expressions vdef sequentially, as well as out of a number of other
-expressions piggyback.
+Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -3044,6 +3042,14 @@ blocks.
 ------------------------------------------------------------------------
 
 Solve a system of equations: A*x = b.
+
+";
+
+%feature("docstring") friendwrap_replace "
+
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback.
 
 ";
 
@@ -3313,12 +3319,6 @@ Get a string representation for a binary MatType, using custom arguments.
 %feature("docstring") friendwrap_sumCols "
 
 Return a col-wise summation of elements.
-
-";
-
-%feature("docstring") friendwrap_extractShared "
-
-Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -3780,7 +3780,13 @@ C++ includes: casadi_logger.hpp ";
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") casadi::Matrix::nnz_upper "
+*/ %feature("docstring") casadi::Matrix::print_scalar "
+
+Print scalar.
+
+";
+
+%feature("docstring") casadi::Matrix::nnz_upper "
 
 Get the number of non-zeros in the upper triangular half.
 
@@ -3912,12 +3918,6 @@ Get a submatrix, two arguments
 
 %feature("docstring") casadi::Matrix::triplet "";
 
-%feature("docstring") casadi::Matrix::printDense "
-
-Print dense matrix-stype.
-
-";
-
 %feature("docstring") casadi::Matrix::getRepresentation "
 
 Return a string with a representation (for SWIG)
@@ -3933,6 +3933,12 @@ Parameters:
 
 complete:  set to true to also check elementwise throws an error as possible
 result
+
+";
+
+%feature("docstring") casadi::Matrix::print_split "
+
+Get strings corresponding to the nonzeros and the interdependencies.
 
 ";
 
@@ -4043,12 +4049,6 @@ Get a set of nonzeros
 
 ";
 
-%feature("docstring") casadi::Matrix::printSparse "
-
-Print sparse matrix style.
-
-";
-
 %feature("docstring") casadi::Matrix::T "
 
 Transpose the matrix.
@@ -4108,6 +4108,12 @@ Check if the matrix expression is dense.
 
 ";
 
+%feature("docstring") casadi::Matrix::print_sparse "
+
+Print sparse matrix style.
+
+";
+
 %feature("docstring") casadi::Matrix::nnz_lower "
 
 Get the number of non-zeros in the lower triangular half.
@@ -4115,12 +4121,6 @@ Get the number of non-zeros in the lower triangular half.
 ";
 
 %feature("docstring") casadi::Matrix::reserve "";
-
-%feature("docstring") casadi::Matrix::printScalar "
-
-Print scalar.
-
-";
 
 %feature("docstring") casadi::Matrix::tang "
 
@@ -4159,6 +4159,12 @@ nodes by their ID.
 \\\\end {cases} \\\\]
 
 Also called: slope function
+
+";
+
+%feature("docstring") casadi::Matrix::print_vector "
+
+Print vector-style.
 
 ";
 
@@ -4204,12 +4210,6 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
-%feature("docstring") casadi::Matrix::printSplit "
-
-Get strings corresponding to the nonzeros and the interdependencies.
-
-";
-
 %feature("docstring") casadi::Matrix "
 
 Sparse matrix class. SX and DM are specializations.
@@ -4231,12 +4231,6 @@ C++ includes: casadi_types.hpp ";
 
 Get expressions of the children of the expression Only defined if symbolic
 scalar. Wraps SXElem SXElem::dep(int ch=0) const.
-
-";
-
-%feature("docstring") casadi::Matrix::printVector "
-
-Print vector-style.
 
 ";
 
@@ -4309,6 +4303,12 @@ cofactor matrix.
 %feature("docstring") casadi::Matrix::colind "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") casadi::Matrix::print_dense "
+
+Print dense matrix-stype.
 
 ";
 
@@ -5343,12 +5343,6 @@ Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
-%feature("docstring") casadi::MX::to_double "
-
-Get the value (only for scalar constant nodes)
-
-";
-
 %feature("docstring") casadi::MX::__nonzero__ "
 
 Returns the truth value of an MX expression.
@@ -5442,12 +5436,6 @@ Is unary operation.
 
 %feature("docstring") casadi::MX::setTemp "[INTERNAL]  Set the temporary
 variable.
-
-";
-
-%feature("docstring") casadi::MX::getMatrixValue "
-
-Get the value (only for constant nodes)
 
 ";
 
@@ -6887,12 +6875,6 @@ Concatenate horizontally, three matrices.
 ------------------------------------------------------------------------
 
 Concatenate horizontally, four matrices.
-
-";
-
-%feature("docstring") friendwrap_vecNZ "
-
-Returns a flattened version of the matrix, preserving only nonzeros.
 
 ";
 

@@ -431,6 +431,12 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring")  casadi::Function::n_nodes() const  "
+
+Number of nodes in the algorithm.
+
+";
+
 %feature("docstring")  casadi::Function::sx_out(int oind) const  "
 
 Get symbolic primitives equivalent to the output expressions.
@@ -1220,12 +1226,6 @@ required length of res field.
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
-
-";
-
-%feature("docstring")  casadi::Function::countNodes() const  "
-
-Number of nodes in the algorithm.
 
 ";
 
@@ -2838,12 +2838,6 @@ Get symbolic primitives equivalent to the output expressions.
 
 ";
 
-%feature("docstring")  casadi::Function::countNodes() const  "
-
-Number of nodes in the algorithm.
-
-";
-
 %feature("docstring")  casadi::Function::free_sx() const  "
 
 Get all the free variables of the function.
@@ -3456,6 +3450,12 @@ Return a string with a representation (for SWIG)
 %feature("docstring")  casadi::Function::description_in(int ind) const  "
 
 Get input scheme description by index.
+
+";
+
+%feature("docstring")  casadi::Function::n_nodes() const  "
+
+Number of nodes in the algorithm.
 
 ";
 
@@ -4183,7 +4183,7 @@ Check if expression depends on the argument The argument must be symbolic.
 
 ";
 
-%feature("docstring")  countNodes(const MatType &A) "
+%feature("docstring")  n_nodes(const MatType &A) "
 
 Count number of nodes
 
@@ -4242,13 +4242,19 @@ Check if the matrix expression is scalar.
 
 ";
 
-%feature("docstring")  substituteInPlace(const std::vector< MatType > &v,
-std::vector< MatType > &inout_vdef, std::vector< MatType > &inout_ex, bool
-reverse=false) "
+%feature("docstring")  shared(std::vector< MatType > &ex, std::vector<
+MatType > &v, std::vector< MatType > &vdef, const std::string
+&v_prefix="v_", const std::string &v_suffix="") "
 
-Inplace substitution with piggyback expressions Substitute variables v out
-of the expressions vdef sequentially, as well as out of a number of other
-expressions piggyback.
+Extract shared subexpressions from an set of expressions.
+
+";
+
+%feature("docstring")  shared(const std::vector< MatType > &ex, std::vector<
+MatType > &ex_output, std::vector< MatType > &v, std::vector< MatType >
+&vdef, const std::string &v_prefix="v_", const std::string &v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -4283,6 +4289,16 @@ blocks.
 std::string &lsolver, const Dict &dict=Dict()) "
 
 Solve a system of equations: A*x = b.
+
+";
+
+%feature("docstring")  replace(const std::vector< MatType > &v, std::vector<
+MatType > &inout_vdef, std::vector< MatType > &inout_ex, bool reverse=false)
+"
+
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback.
 
 ";
 
@@ -4562,23 +4578,6 @@ Get a string representation for a binary MatType, using custom arguments.
 %feature("docstring")  sumCols(const MatType &x) "
 
 Return a col-wise summation of elements.
-
-";
-
-%feature("docstring")  extractShared(std::vector< MatType > &ex,
-std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string
-&v_prefix="v_", const std::string &v_suffix="") "
-
-Extract shared subexpressions from an set of expressions.
-
-";
-
-%feature("docstring")  extractShared(const std::vector< MatType > &ex,
-std::vector< MatType > &ex_output, std::vector< MatType > &v, std::vector<
-MatType > &vdef, const std::string &v_prefix="v_", const std::string
-&v_suffix="") "
-
-Extract shared subexpressions from an set of expressions.
 
 ";
 
@@ -5135,7 +5134,15 @@ C++ includes: casadi_logger.hpp ";
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
+*/ %feature("docstring")  casadi::Matrix< Scalar
+>::print_scalar(std::ostream &stream=casadi::userOut(), bool
+trailing_newline=true) const  "
+
+Print scalar.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::nnz_upper() const "
 
 Get the number of non-zeros in the upper triangular half.
@@ -5355,13 +5362,6 @@ nrow, int ncol) " ";
 int > &row, const std::vector< int > &col, const Matrix< Scalar > &d, const
 std::pair< int, int > &rc) " ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::printDense(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print dense matrix-stype.
-
-";
-
 %feature("docstring")  casadi::PrintableObject< Matrix< Scalar >
 >::getRepresentation() const "
 
@@ -5379,6 +5379,13 @@ Parameters:
 
 complete:  set to true to also check elementwise throws an error as possible
 result
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::print_split(std::vector<
+std::string > &output_nz, std::vector< std::string > &output_inter) const  "
+
+Get strings corresponding to the nonzeros and the interdependencies.
 
 ";
 
@@ -5514,13 +5521,6 @@ Get a set of nonzeros
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::printSparse(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print sparse matrix style.
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::T() const  "
 
 Transpose the matrix.
@@ -5604,6 +5604,13 @@ Check if the matrix expression is dense.
 
 ";
 
+%feature("docstring")  casadi::Matrix< Scalar >::print_sparse(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print sparse matrix style.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::nnz_lower() const "
 
@@ -5615,13 +5622,6 @@ Get the number of non-zeros in the lower triangular half.
 
 %feature("docstring")  casadi::Matrix< Scalar >::reserve(int nnz, int ncol)
 " ";
-
-%feature("docstring")  casadi::Matrix< Scalar >::printScalar(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print scalar.
-
-";
 
 %feature("docstring")  casadi::Matrix< Scalar >::tang(const Function &f, int
 iind=0, int oind=0) "
@@ -5698,6 +5698,13 @@ by their ID.
 \\\\end {cases} \\\\]
 
 Also called: slope function
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::print_vector(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print vector-style.
 
 ";
 
@@ -5783,13 +5790,6 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::printSplit(std::vector<
-std::string > &output_nz, std::vector< std::string > &output_inter) const  "
-
-Get strings corresponding to the nonzeros and the interdependencies.
-
-";
-
 %feature("docstring") casadi::Matrix "
 
 Sparse matrix class. SX and DM are specializations.
@@ -5811,13 +5811,6 @@ C++ includes: casadi_types.hpp ";
 
 Get expressions of the children of the expression Only defined if symbolic
 scalar. Wraps SXElem SXElem::dep(int ch=0) const.
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::printVector(std::ostream
-&stream=casadi::userOut(), bool trailing_newline=true) const  "
-
-Print vector-style.
 
 ";
 
@@ -5926,6 +5919,13 @@ Scalar > &x, int i, int j) " [INTERNAL]  Get the (i,j) cofactor matrix.
 >::colind(int col) const "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::print_dense(std::ostream
+&stream=casadi::userOut(), bool trailing_newline=true) const  "
+
+Print dense matrix-stype.
 
 ";
 
@@ -7205,12 +7205,6 @@ Check if the matrix is a column vector (i.e. size2()==1)
 
 ";
 
-%feature("docstring")  casadi::MX::to_double() const  "
-
-Get the value (only for scalar constant nodes)
-
-";
-
 %feature("docstring") casadi::MX::__nonzero__ "
 
 Returns the truth value of an MX expression.
@@ -7332,12 +7326,6 @@ Is unary operation.
 
 %feature("docstring")  casadi::MX::setTemp(int t) " [INTERNAL]  Set the
 temporary variable.
-
-";
-
-%feature("docstring")  casadi::MX::getMatrixValue() const  "
-
-Get the value (only for constant nodes)
 
 ";
 
@@ -8873,12 +8861,6 @@ Concatenate horizontally, three matrices.
 MatType &z, const MatType &w) "
 
 Concatenate horizontally, four matrices.
-
-";
-
-%feature("docstring")  vecNZ(const MatType &x) "
-
-Returns a flattened version of the matrix, preserving only nonzeros.
 
 ";
 
