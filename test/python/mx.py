@@ -1821,7 +1821,7 @@ class MXtests(casadiTestCase):
             c = b-a
             if c.nnz()>0:
               # At least as sparse as DM calculus
-              self.assertTrue(min(c.nz)>=0,str([sp,v,name]))
+              self.assertTrue(min(c.nonzeros())>=0,str([sp,v,name]))
         
       for sp in [Sparsity.dense(1,1),Sparsity(1,1),Sparsity(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
         for v1 in [0,1,0.2,-0.2]:
@@ -1846,7 +1846,7 @@ class MXtests(casadiTestCase):
                   c = b-a
                   if c.nnz()>0:
                     # At least as sparse as DM calculus
-                    self.assertTrue(min(c.nz)>=0,str([sp,sp2,v1,v2,name]))
+                    self.assertTrue(min(c.nonzeros())>=0,str([sp,sp2,v1,v2,name]))
 
   def test_graph_substitute(self):
     x=MX.sym("X",4,4)

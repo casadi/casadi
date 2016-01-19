@@ -854,7 +854,7 @@ class Matrixtests(casadiTestCase):
 
         try:
           self.checkarray(c,c_ref)
-          self.assertTrue(min((IM.ones(c_ref.sparsity())-IM.ones(c.sparsity())).nz)==0)
+          self.assertTrue(min((IM.ones(c_ref.sparsity())-IM.ones(c.sparsity())).nonzeros())==0)
         except Exception as e:
           c.printDense()
           print "sol:"

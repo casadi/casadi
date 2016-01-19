@@ -2137,10 +2137,6 @@ class NZproxy:
 
   def __len__(self):
     return self.matrix.nnz()
-
-  def __iter__(self):
-    for k in range(len(self)):
-      yield self[k]
 %}
 
 %define %matrix_helpers(Type)
