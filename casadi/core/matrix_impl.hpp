@@ -1409,15 +1409,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  std::vector<int> Matrix<Scalar>::nonzeros_int() const {
-    std::vector<int> ret(nnz());
-    for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = static_cast<int>(data().at(i));
-    }
-    return ret;
-  }
-
-  template<typename Scalar>
   std::string Matrix<Scalar>::name() const {
     throw CasadiException("\"name\" not defined for instantiation");
   }

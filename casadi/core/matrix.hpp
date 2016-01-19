@@ -920,9 +920,6 @@ namespace casadi {
     bool has_zeros() const;
 
     /** \brief Get all nonzeros */
-    std::vector<int> nonzeros_int() const;
-
-    /** \brief Get all nonzeros */
     std::vector<Scalar> get_nonzeros() const { return data_;}
 
 #ifndef SWIG
