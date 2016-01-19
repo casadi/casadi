@@ -70,7 +70,14 @@ def is_leaf(s):
   #return s.is_scalar(True) and (s.is_constant() or s.is_symbolic())
 
 def dependencyGraph(s,dep = {},invdep = {}):
-  addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
+  if isinstance(s,SX):
+    if s.is_scalar(True):
+      if not(is_leaf(s)):
+        addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
+    else:
+      addDependencies(s,list(s),dep = dep,invdep = invdep)
+  elif isinstance(s,MX):
+    addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
   return (dep,invdep)
   
 class DotArtist:
