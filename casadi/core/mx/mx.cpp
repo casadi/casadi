@@ -1047,13 +1047,18 @@ namespace casadi {
   }
 
   MX MX::reshape(const MX& x, int nrow, int ncol) {
-    if (nrow==x.size1() && ncol==x.size2())
-      return x;
-    else
-      return reshape(x, Sparsity::reshape(x.sparsity(), nrow, ncol));
+    // Quick return if trivial
+    if (nrow==x.size1() && ncol==x.size2()) return x;
+
+    // Reshape the sparsity pattern
+    return reshape(x, Sparsity::reshape(x.sparsity(), nrow, ncol));
   }
 
   MX MX::reshape(const MX& x, const Sparsity& sp) {
+    // Quick return if trivial
+    if (sp==x.sparsity()) return x;
+
+    // Call internal method
     return x->getReshape(sp);
   }
 
