@@ -56,7 +56,7 @@ namespace casadi {
   }
 
   Options QpoasesInterface::options_
-  = {{&FunctionInternal::options_},
+  = {{&Qpsol::options_},
      {{"nWSR",
        {OT_INT,
         "The maximum number of working set recalculations to be performed during "

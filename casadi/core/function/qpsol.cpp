@@ -273,9 +273,33 @@ namespace casadi {
     return Sparsity();
   }
 
+  Options Qpsol::options_
+  = {{&FunctionInternal::options_},
+     {{"discrete",
+       {OT_BOOLVECTOR,
+        "Indicates which of the variables are discrete, i.e. integer-valued"}}
+     }
+  };
+
   void Qpsol::init(const Dict& opts) {
     // Call the init method of the base class
     FunctionInternal::init(opts);
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="discrete") {
+        discrete_ = op.second;
+      }
+    }
+
+    // Check options
+    if (!discrete_.empty()) {
+      casadi_assert_message(discrete_.size()==n_, "\"discrete\" option has wrong length");
+      if (std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end()) {
+        casadi_assert_message(integer_support(),
+                              "Discrete variables require a solver with integer support");
+      }
+    }
   }
 
   Qpsol::~Qpsol() {

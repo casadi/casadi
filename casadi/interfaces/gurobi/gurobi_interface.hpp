@@ -43,6 +43,17 @@ extern "C" {
 /// \cond INTERNAL
 namespace casadi {
 
+  struct CASADI_QPSOL_GUROBI_EXPORT GurobiMemory : public Memory {
+    // Gurobi environment
+    GRBenv *env;
+
+    /// Constructor
+    GurobiMemory();
+
+    /// Destructor
+    virtual ~GurobiMemory();
+  };
+
   /** \brief \pluginbrief{Qpsol,gurobi}
 
       @copydoc Qpsol_doc
@@ -76,17 +87,23 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 
+    /** \brief Create memory block */
+    virtual Memory* memory() const { return new GurobiMemory();}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory& mem) const;
+
     /// Solve the QP
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
-    // Variable types
-    std::vector<char> vtype_;
-
-    // Gurobi environment
-    GRBenv *env_;
+    /// Can discrete variables be treated
+    virtual bool integer_support() const { return true;}
 
     /// A documentation string
     static const std::string meta_doc;
+
+    // Variable types
+    std::vector<char> vtype_;
   };
 
 } // namespace casadi

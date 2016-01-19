@@ -60,6 +60,12 @@ namespace casadi {
     virtual std::vector<std::string> get_oscheme() const { return qpsol_out();}
     /// @}
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     // Initialize
     virtual void init(const Dict& opts);
 
@@ -89,7 +95,12 @@ namespace casadi {
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
+    /// Can discrete variables be treated
+    virtual bool integer_support() const { return false;}
+
   protected:
+    /// Options
+    std::vector<bool> discrete_;
 
     /// Problem structure
     Sparsity H_, A_;

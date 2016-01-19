@@ -52,7 +52,7 @@ namespace casadi {
   }
 
   Options QpToNlp::options_
-  = {{&FunctionInternal::options_},
+  = {{&Qpsol::options_},
      {{"nlpsol",
        {OT_STRING,
         "Name of solver."}},

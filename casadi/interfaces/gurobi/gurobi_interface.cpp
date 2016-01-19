@@ -47,22 +47,16 @@ namespace casadi {
   GurobiInterface::GurobiInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
     : Qpsol(name, st) {
-   env_ = 0;
   }
 
   GurobiInterface::~GurobiInterface() {
-    if (env_) {
-      GRBfreeenv(env_);
-      env_ = 0;
-    }
   }
 
   Options GurobiInterface::options_
-  = {{&FunctionInternal::options_},
+  = {{&Qpsol::options_},
      {{"vtype",
        {OT_STRINGVECTOR,
-        "Type of variables, Each entry can be one of: "
-        "'continuous', 'binary', 'integer', 'semicont', 'semiint'"}}
+        "Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]"}}
      }
   };
 
@@ -71,7 +65,7 @@ namespace casadi {
     Qpsol::init(opts);
 
     // Default options
-    vector<string> vtype;
+    std::vector<std::string> vtype;
 
     // Read options
     for (auto&& op : opts) {
@@ -81,9 +75,9 @@ namespace casadi {
     }
 
     // Variable types
-    vtype_.resize(n_, GRB_CONTINUOUS);
     if (!vtype.empty()) {
       casadi_assert_message(vtype.size()==n_, "Option 'vtype' has wrong length");
+      vtype_.resize(n_);
       for (int i=0; i<n_; ++i) {
         if (vtype[i]=="continuous") {
           vtype_[i] = GRB_CONTINUOUS;
@@ -101,10 +95,6 @@ namespace casadi {
       }
     }
 
-    // Load environment
-    int flag = GRBloadenv(&env_, 0); // no log file
-    casadi_assert_message(!flag && env_, "Failed to create GUROBI environment");
-
     // Temporary memory
     alloc_w(n_, true); // val
     alloc_iw(n_, true); // ind
@@ -112,8 +102,18 @@ namespace casadi {
     alloc_iw(n_, true); // tr_ind
   }
 
+  void GurobiInterface::init_memory(Memory& mem) const {
+    GurobiMemory& m = dynamic_cast<GurobiMemory&>(mem);
+
+    // Load environment
+    int flag = GRBloadenv(&m.env, 0); // no log file
+    casadi_assert_message(!flag && m.env, "Failed to create GUROBI environment");
+  }
+
   void GurobiInterface::
   eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+    GurobiMemory& m = dynamic_cast<GurobiMemory&>(mem);
+
     // Inputs
     const double *h=arg[QPSOL_H],
       *g=arg[QPSOL_G],
@@ -140,8 +140,8 @@ namespace casadi {
     // Greate an empty model
     GRBmodel *model = 0;
     try {
-      int flag = GRBnewmodel(env_, &model, name_.c_str(), 0, 0, 0, 0, 0, 0);
-      casadi_assert_message(!flag, GRBgeterrormsg(env_));
+      int flag = GRBnewmodel(m.env, &model, name_.c_str(), 0, 0, 0, 0, 0, 0);
+      casadi_assert_message(!flag, GRBgeterrormsg(m.env));
 
       // Add variables
       for (int i=0; i<n_; ++i) {
@@ -150,12 +150,25 @@ namespace casadi {
         if (isinf(lb)) lb = -GRB_INFINITY;
         if (isinf(ub)) ub =  GRB_INFINITY;
 
+        // Get variable type
+        char vtype;
+        if (!vtype_.empty()) {
+          // Explicitly set 'vtype' takes precedence
+          vtype = vtype_.at(i);
+        } else if (!discrete_.empty() && discrete_.at(i)) {
+          // Variable marked as discrete (integer or binary)
+          vtype = lb==0 && ub==1 ? GRB_BINARY : GRB_INTEGER;
+        } else {
+          // Continious variable
+          vtype = GRB_CONTINUOUS;
+        }
+
         // Pass to model
-        flag = GRBaddvar(model, 0, 0, 0, g ? g[i] : 0., lb, ub, vtype_.at(i), 0);
-        casadi_assert_message(!flag, GRBgeterrormsg(env_));
+        flag = GRBaddvar(model, 0, 0, 0, g ? g[i] : 0., lb, ub, vtype, 0);
+        casadi_assert_message(!flag, GRBgeterrormsg(m.env));
       }
       flag = GRBupdatemodel(model);
-      casadi_assert_message(!flag, GRBgeterrormsg(env_));
+      casadi_assert_message(!flag, GRBgeterrormsg(m.env));
 
       // Add quadratic terms
       const int *H_colind=sparsity_in(QPSOL_H).colind(), *H_row=sparsity_in(QPSOL_H).row();
@@ -181,7 +194,7 @@ namespace casadi {
 
         // Pass to model
         flag = GRBaddqpterms(model, numqnz, ind, ind2, val);
-        casadi_assert_message(!flag, GRBgeterrormsg(env_));
+        casadi_assert_message(!flag, GRBgeterrormsg(m.env));
       }
 
       // Add constraints
@@ -211,42 +224,42 @@ namespace casadi {
           } else {
             // Only upper bound
             flag = GRBaddconstr(model, numnz, ind, val, GRB_LESS_EQUAL, ub, 0);
-            casadi_assert_message(!flag, GRBgeterrormsg(env_));
+            casadi_assert_message(!flag, GRBgeterrormsg(m.env));
           }
         } else {
           if (isinf(ub)) {
             // Only lower bound
             flag = GRBaddconstr(model, numnz, ind, val, GRB_GREATER_EQUAL, lb, 0);
-            casadi_assert_message(!flag, GRBgeterrormsg(env_));
+            casadi_assert_message(!flag, GRBgeterrormsg(m.env));
           } else if (lb==ub) {
             // Upper and lower bounds equal
             flag = GRBaddconstr(model, numnz, ind, val, GRB_EQUAL, lb, 0);
-            casadi_assert_message(!flag, GRBgeterrormsg(env_));
+            casadi_assert_message(!flag, GRBgeterrormsg(m.env));
           } else {
             // Both upper and lower bounds
             flag = GRBaddrangeconstr(model, numnz, ind, val, lb, ub, 0);
-            casadi_assert_message(!flag, GRBgeterrormsg(env_));
+            casadi_assert_message(!flag, GRBgeterrormsg(m.env));
           }
         }
       }
 
       // Solve the optimization problem
       flag = GRBoptimize(model);
-      casadi_assert_message(!flag, GRBgeterrormsg(env_));
+      casadi_assert_message(!flag, GRBgeterrormsg(m.env));
       int optimstatus;
       flag = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
-      casadi_assert_message(!flag, GRBgeterrormsg(env_));
+      casadi_assert_message(!flag, GRBgeterrormsg(m.env));
 
       // Get the objective value, if requested
       if (cost) {
         flag = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, cost);
-        casadi_assert_message(!flag, GRBgeterrormsg(env_));
+        casadi_assert_message(!flag, GRBgeterrormsg(m.env));
       }
 
       // Get the optimal solution, if requested
       if (x) {
         flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, n_, x);
-        casadi_assert_message(!flag, GRBgeterrormsg(env_));
+        casadi_assert_message(!flag, GRBgeterrormsg(m.env));
       }
 
       // Free memory
@@ -259,5 +272,12 @@ namespace casadi {
     }
   }
 
+  GurobiMemory::GurobiMemory() {
+    this->env = 0;
+  }
+
+  GurobiMemory::~GurobiMemory() {
+    if (this->env) GRBfreeenv(this->env);
+  }
 
 } // namespace casadi

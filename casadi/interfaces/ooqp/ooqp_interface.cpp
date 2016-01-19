@@ -62,7 +62,7 @@ namespace casadi {
   }
 
   Options OoqpInterface::options_
-  = {{&FunctionInternal::options_},
+  = {{&Qpsol::options_},
      {{"print_level",
        {OT_INT,
         "Print level. OOQP listens to print_level 0, 10 and 100"}},

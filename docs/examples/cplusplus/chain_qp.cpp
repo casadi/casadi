@@ -126,7 +126,7 @@ int main(){
   // Formulate QP
   SXDict qp = {{"x", vertcat(x)}, {"f", Vchain}, {"g", vertcat(g)}};
 
-  // Solve with IPOPT
+  // Solve with a QP solver or NLP solver
   Function solver = qpsol("solver", "qpoases", qp);
   //Function solver = qpsol("solver", "cplex", qp);
   //Function solver = qpsol("solver", "ooqp", qp);
