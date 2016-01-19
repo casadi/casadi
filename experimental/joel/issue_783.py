@@ -43,7 +43,7 @@ for f,sym,Function,X in [(fun,msym,MXFunction,MX),]:
   vf.setInput(1.0)
   vf.setAdjSeed([0,1])
   vf.evaluate(0,1)
-  vf.getAdjSens().printDense()
+  vf.getAdjSens().print_dense()
 
 
   a2 = sym("a2",2)
@@ -54,5 +54,5 @@ for f,sym,Function,X in [(fun,msym,MXFunction,MX),]:
 
   vf2.setInput([0,1])
   vf2.evaluate()
-  vf2.getOutput().printDense()
+  vf2.getOutput().print_dense()
 

@@ -121,7 +121,7 @@ int main(){
 
   // Create a matrix
   DM D2(C2,valv);
-//  D2.printSparse();
+//  D2.print_sparse();
     
   // Right hand side
   vector<double> b2(48,1.0);
@@ -141,7 +141,7 @@ int main(){
   int ncol3 = 5;
   CRSSparsity S3(nrow3,ncol3,vector<int>(col3,col3+10),vector<int>(rowind3,rowind3+11));
   
-  IM(S3,1).printDense();
+  IM(S3,1).print_dense();
 
   
   cs AT_;

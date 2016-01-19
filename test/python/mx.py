@@ -1331,7 +1331,7 @@ class MXtests(casadiTestCase):
 
     i = IM(Sparsity.lower(3),range(6))
 
-    i.printDense()
+    i.print_dense()
     print vecNZ(i.T)
 
     T = X.nz[i]

@@ -30,7 +30,7 @@ A = 2*DM.ones(sp_diag(3)); A[1,0] = 1; A[2,0] = 1; A[2,1] = 1 # lower triangular
 A = vertcat((A[1,:],A[2,:],A[0,:]))
 
 print "A = "
-A.printDense()
+A.print_dense()
 
 print "SX"
 AA = ssym("A",A.sparsity())
@@ -39,8 +39,8 @@ r = ssym("r",3)
 x = solve(AA,r)
 f = SXFunction([r,AA],[x])
 f.init()
-DM.ones(f.sparsity_jac(0,0)).printDense()
-DM.ones(f.sparsity_jac(1,0)).printDense()
+DM.ones(f.sparsity_jac(0,0)).print_dense()
+DM.ones(f.sparsity_jac(1,0)).print_dense()
 
 print "SX, implicit function"
 x = ssym("x",3)
@@ -49,8 +49,8 @@ f = NewtonImplicitSolver(res)
 f.setOption("linear_solver",CSparse)
 f.setOption("ad_mode","reverse")
 f.init()
-DM.ones(f.sparsity_jac(0,0)).printDense()
-DM.ones(f.sparsity_jac(1,0)).printDense()
+DM.ones(f.sparsity_jac(0,0)).print_dense()
+DM.ones(f.sparsity_jac(1,0)).print_dense()
 
 print "MX"
 AA = msym("A",A.sparsity())
@@ -62,8 +62,8 @@ x = sol.solve(AA,r.T,True).T
 f = MXFunction([r,AA],[x])
 #f.setOption("ad_mode","reverse")
 f.init()
-DM.ones(f.sparsity_jac(0,0)).printDense()
-DM.ones(f.sparsity_jac(1,0)).printDense()
+DM.ones(f.sparsity_jac(0,0)).print_dense()
+DM.ones(f.sparsity_jac(1,0)).print_dense()
 
 print "MX, implicit function"
 x = msym("x",3)
@@ -72,7 +72,7 @@ f = NewtonImplicitSolver(res)
 f.setOption("linear_solver",CSparse)
 f.setOption("ad_mode","reverse")
 f.init()
-DM.ones(f.sparsity_jac(0,0)).printDense()
-DM.ones(f.sparsity_jac(1,0)).printDense()
+DM.ones(f.sparsity_jac(0,0)).print_dense()
+DM.ones(f.sparsity_jac(1,0)).print_dense()
 
 

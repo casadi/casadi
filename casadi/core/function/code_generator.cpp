@@ -274,7 +274,7 @@ namespace casadi {
     for (int i=0; i<integer_constants_.size(); ++i) {
       name.str(string());
       name << "CASADI_PREFIX(s" << i << ")";
-      printVector(s, name.str(), integer_constants_[i]);
+      print_vector(s, name.str(), integer_constants_[i]);
       s << "#define s" << i << " CASADI_PREFIX(s" << i << ")" << endl;
     }
 
@@ -282,7 +282,7 @@ namespace casadi {
     for (int i=0; i<double_constants_.size(); ++i) {
       name.str(string());
       name << "CASADI_PREFIX(c" << i << ")";
-      printVector(s, name.str(), double_constants_[i]);
+      print_vector(s, name.str(), double_constants_[i]);
       s << "#define c" << i << " CASADI_PREFIX(c" << i << ")" << endl;
     }
 
@@ -321,7 +321,7 @@ namespace casadi {
     s << "  " << lhs << " = " << rhs << ";" << endl;
   }
 
-  void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<int>& v) {
+  void CodeGenerator::print_vector(std::ostream &s, const std::string& name, const vector<int>& v) {
     s << "static const int " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
@@ -330,7 +330,7 @@ namespace casadi {
     s << "};" << endl;
   }
 
-  void CodeGenerator::printVector(std::ostream &s, const std::string& name,
+  void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
                                   const vector<double>& v) {
     s << "static const real_t " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {

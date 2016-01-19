@@ -63,10 +63,10 @@ gff = SXFunction([x],[gf])
 gff.init()
 
 hf = gff.jac(0,0,False,True)
-hf.printDense()
+hf.print_dense()
 
 hff2 = ff.hess()
-hff2.printDense()
+hff2.print_dense()
 
 
 

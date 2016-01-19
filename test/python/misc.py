@@ -329,7 +329,7 @@ class Misctests(casadiTestCase):
   @requiresPlugin(nlpsol,"ipopt")
   def test_output(self):
     with capture_stdout() as result:
-      DM([1,2]).printDense()
+      DM([1,2]).print_dense()
 
     assert "2" in result[0]
 

@@ -856,14 +856,14 @@ class Matrixtests(casadiTestCase):
           self.checkarray(c,c_ref)
           self.assertTrue(min((IM.ones(c_ref.sparsity())-IM.ones(c.sparsity())).nonzeros())==0)
         except Exception as e:
-          c.printDense()
+          c.print_dense()
           print "sol:"
           c.sparsity().spy()
           print "ref:"
           c_ref.sparsity().spy()
-          c_ref.printDense()
+          c_ref.print_dense()
           a.sparsity().sanity_check()
-          a.printDense()
+          a.print_dense()
           raise e
           
   def test_kron(self):

@@ -91,7 +91,7 @@ delete 'diary'
 diary ON
 x = DM.ones(2,2);
 
-x.printDense();
+x.print_dense();
 
 x = SX.sym('x');
 

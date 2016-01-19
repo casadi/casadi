@@ -545,7 +545,7 @@ namespace casadi {
   std::string Matrix<Scalar>::type_name() { return matrixName<Scalar>(); }
 
   template<typename Scalar>
-  void Matrix<Scalar>::printScalar(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_scalar(std::ostream &stream, bool trailing_newline) const {
     casadi_assert_message(numel()==1, "Not a scalar");
 
     std::streamsize precision = stream.precision();
@@ -574,12 +574,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::printVector(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_vector(std::ostream &stream, bool trailing_newline) const {
     casadi_assert_message(is_column(), "Not a vector");
 
     // Get components
     std::vector<std::string> nz, inter;
-    printSplit(nz, inter);
+    print_split(nz, inter);
 
     // Print intermediate expressions
     for (int i=0; i<inter.size(); ++i)
@@ -613,13 +613,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::printDense(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_dense(std::ostream &stream, bool trailing_newline) const {
     // Print as a single line
     bool oneliner=this->size1()<=1;
 
     // Get components
     std::vector<std::string> nz, inter;
-    printSplit(nz, inter);
+    print_split(nz, inter);
 
     // Print intermediate expressions
     for (int i=0; i<inter.size(); ++i)
@@ -668,7 +668,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::printSparse(std::ostream &stream, bool trailing_newline) const {
+  void Matrix<Scalar>::print_sparse(std::ostream &stream, bool trailing_newline) const {
     if (nnz()==0) {
       stream << "all zero sparse: " << size1() << "-by-" << size2();
     } else {
@@ -677,7 +677,7 @@ namespace casadi {
 
       // Get components
       std::vector<std::string> nz, inter;
-      printSplit(nz, inter);
+      print_split(nz, inter);
 
       // Print intermediate expressions
       for (int i=0; i<inter.size(); ++i)
@@ -698,7 +698,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::printSplit(std::vector<std::string>& nz,
+  void Matrix<Scalar>::print_split(std::vector<std::string>& nz,
                                     std::vector<std::string>& inter) const {
     nz.resize(nnz());
     inter.resize(0);
@@ -726,14 +726,14 @@ namespace casadi {
     if (is_empty()) {
       stream << "[]";
     } else if (numel()==1) {
-      printScalar(stream, false);
+      print_scalar(stream, false);
     } else if (is_column()) {
-      printVector(stream, false);
+      print_vector(stream, false);
     } else if (std::max(size1(), size2())<=10 || static_cast<double>(nnz())/numel()>=0.5) {
       // if "small" or "dense"
-      printDense(stream, false);
+      print_dense(stream, false);
     } else {
-      printSparse(stream, false);
+      print_sparse(stream, false);
     }
     if (trailing_newline) stream << std::endl;
   }
@@ -2602,7 +2602,7 @@ namespace casadi {
   template<> SX SX::poly_coeff(const SX& f, const SX& x);
   template<> SX SX::poly_roots(const SX& p);
   template<> SX SX::eig_symbolic(const SX& m);
-  template<> void SX::printSplit(std::vector<std::string>& nz,
+  template<> void SX::print_split(std::vector<std::string>& nz,
                                  std::vector<std::string>& inter) const;
 
   template<> std::vector<SX> SX::get_input(const Function& f);

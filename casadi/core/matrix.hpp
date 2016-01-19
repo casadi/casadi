@@ -756,23 +756,23 @@ namespace casadi {
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Get strings corresponding to the nonzeros and the interdependencies
-    void printSplit(std::vector<std::string>& SWIG_OUTPUT(nz),
+    void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
     /// Print a representation of the object
     void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print scalar
-    void printScalar(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_scalar(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print vector-style
-    void printVector(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_vector(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print dense matrix-stype
-    void printDense(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_dense(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print sparse matrix style
-    void printSparse(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_sparse(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     void clear();
     void resize(int nrow, int ncol);

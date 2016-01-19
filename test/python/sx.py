@@ -963,7 +963,7 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [x],[e])
     f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,8))
-    f_in[0].printDense()
+    f_in[0].print_dense()
     f_out = f(f_in)
     self.checkarray(f_out[0],DM([1,-0.29150,10.29150]),digits=5)
     
@@ -979,7 +979,7 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [x],[e])
     f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,7))
-    f_in[0].printDense()
+    f_in[0].print_dense()
     f_out = f(f_in)
     self.checkarray(f_out[0],DM([1,3,6]),digits=5)
 

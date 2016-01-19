@@ -985,7 +985,7 @@ namespace casadi {
   }
 
   template<>
-  void SX::printSplit(vector<string>& nz,
+  void SX::print_split(vector<string>& nz,
                       vector<string>& inter) const {
     // Find out which noded can be inlined
     map<const SXNode*, int> nodeind;
