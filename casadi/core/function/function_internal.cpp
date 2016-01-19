@@ -2126,7 +2126,7 @@ namespace casadi {
         << "  real_t w[" << nr << "];" << endl;
 
       // Input buffers
-      s << "  const real_t* arg[" << n_in << "] = {";
+      s << "  const real_t* arg[" << sz_arg() << "] = {";
       int off=0;
       for (int i=0; i<n_in; ++i) {
         if (i!=0) s << ", ";
@@ -2136,7 +2136,7 @@ namespace casadi {
       s << "};" << endl;
 
       // Output buffers
-      s << "  real_t* res[" << n_out << "] = {";
+      s << "  real_t* res[" << sz_res() << "] = {";
       for (int i=0; i<n_out; ++i) {
         if (i!=0) s << ", ";
         s << "w+" << off;
