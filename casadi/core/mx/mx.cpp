@@ -1167,9 +1167,9 @@ namespace casadi {
     return x->getGetNonzeros(sp, mapping);
   }
 
-  int MX::countNodes(const MX& x) {
+  int MX::n_nodes(const MX& x) {
     Function f("tmp", vector<MX>{}, {x});
-    return f.countNodes();
+    return f.n_nodes();
   }
 
   MX MX::sumCols(const MX& x) {

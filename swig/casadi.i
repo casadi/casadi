@@ -2683,8 +2683,8 @@ DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1) {
   return hessian(ex, arg, OUTPUT1);
 }
 
-DECL int casadi_countNodes(const M& A) {
-  return countNodes(A);
+DECL int casadi_n_nodes(const M& A) {
+  return n_nodes(A);
 }
 
 DECL std::string casadi_print_operator(const M& xb,

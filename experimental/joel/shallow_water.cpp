@@ -167,12 +167,12 @@ void Tester::model(){
   f_step_out[1] = v;
   f_step_out[2] = h;
   Function f_step("f_step_mx", f_step_in, f_step_out);
-  cout << "generated single step dynamics (" << f_step.countNodes() << " nodes)" << endl;
+  cout << "generated single step dynamics (" << f_step.n_nodes() << " nodes)" << endl;
   
   // Expand the discrete dynamics?
   if(false){
     f_step = f_step.expand();
-    cout << "generated single step dynamics, SX (" << f_step.countNodes() << " nodes)" << endl;
+    cout << "generated single step dynamics, SX (" << f_step.n_nodes() << " nodes)" << endl;
   }
 
   // Integrate over one subinterval
@@ -199,7 +199,7 @@ void Tester::model(){
   
   // Create an integrator function
   f_ = Function("f_mx", f_in, f_out);
-  cout << "generated discrete dynamics for one finite element (" << f_.countNodes() << " MX nodes)" << endl;
+  cout << "generated discrete dynamics for one finite element (" << f_.n_nodes() << " MX nodes)" << endl;
   
   // Integrate over the complete interval
   if(n_finite_elements_>1){
@@ -220,13 +220,13 @@ void Tester::model(){
     
     // Create an integrator function
     f_ = Function("f_mx", f_in, f_out);
-    cout << "generated discrete dynamics for complete interval (" << f_.countNodes() << " MX nodes)" << endl;    
+    cout << "generated discrete dynamics for complete interval (" << f_.n_nodes() << " MX nodes)" << endl;    
   }
     
   // Expand the discrete dynamics
   if(false){
     f_ = f_.expand("f_sx");
-    cout << "generated discrete dynamics, SX (" << f_.countNodes() << " nodes)" << endl;
+    cout << "generated discrete dynamics, SX (" << f_.n_nodes() << " nodes)" << endl;
   }
 }
 

@@ -459,7 +459,7 @@ namespace casadi {
     virtual int getAtomicOutput(int k) const;
 
     /** \brief Number of nodes in the algorithm */
-    virtual int countNodes() const;
+    virtual int n_nodes() const;
 
     /** \brief Create a helper MXFunction with some properties copied
     *

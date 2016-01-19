@@ -1064,8 +1064,8 @@ namespace casadi {
     return (*this)->getAtomicOutput(k);
   }
 
-  int Function::countNodes() const {
-    return (*this)->countNodes();
+  int Function::n_nodes() const {
+    return (*this)->n_nodes();
   }
 
   Function external(const string& name, const Dict& opts) {

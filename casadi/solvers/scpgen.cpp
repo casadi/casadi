@@ -337,7 +337,7 @@ namespace casadi {
     // Generate function
     Function res_fcn("res", res_fcn_in, res_fcn_out);
     if (verbose_) {
-      userOut() << "Generated residual function ( " << res_fcn.countNodes() << " nodes)." << endl;
+      userOut() << "Generated residual function ( " << res_fcn.n_nodes() << " nodes)." << endl;
     }
 
     // Declare difference vector d and substitute out p and v
@@ -486,7 +486,7 @@ namespace casadi {
 
     Function vec_fcn("vec_fcn", mfcn_in, vec_fcn_out);
     if (verbose_) {
-      userOut() << "Generated linearization function ( " << vec_fcn.countNodes()
+      userOut() << "Generated linearization function ( " << vec_fcn.n_nodes()
            << " nodes)." << endl;
     }
 
@@ -536,7 +536,7 @@ namespace casadi {
     // Step expansion function
     Function exp_fcn("exp_fcn", mfcn_in, exp_fcn_out);
     if (verbose_) {
-      userOut() << "Generated step expansion function ( " << exp_fcn.countNodes() << " nodes)."
+      userOut() << "Generated step expansion function ( " << exp_fcn.n_nodes() << " nodes)."
            << endl;
     }
 

@@ -886,7 +886,7 @@ namespace casadi {
     int getAtomicOutput(int k) const;
 
     /** \brief Number of nodes in the algorithm */
-    int countNodes() const;
+    int n_nodes() const;
 
     /// \cond INTERNAL
     /** \brief Is the class able to propagate seeds through the algorithm?

@@ -396,7 +396,7 @@ namespace casadi {
                     const Dict& dict = Dict());
     static MX pinv(const MX& A, const std::string& lsolver="symbolicqr",
                const Dict& dict = Dict());
-    static int countNodes(const MX& x);
+    static int n_nodes(const MX& x);
     static std::string print_operator(const MX& x, const std::vector<std::string>& args);
     static void shared(std::vector<MX>& ex, std::vector<MX>& v,
                               std::vector<MX>& vdef, const std::string& v_prefix,

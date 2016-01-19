@@ -699,9 +699,9 @@ namespace casadi {
   }
 
   template<>
-  int SX::countNodes(const SX& x) {
+  int SX::n_nodes(const SX& x) {
     Function f("tmp", {SX()}, {x});
-    return f.countNodes();
+    return f.n_nodes();
   }
 
   template<>

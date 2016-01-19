@@ -294,7 +294,7 @@ namespace casadi {
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b,
                                   const std::string& lsolver, const Dict& opts);
-    static int countNodes(const Matrix<Scalar> &x);
+    static int n_nodes(const Matrix<Scalar> &x);
     static std::string print_operator(const Matrix<Scalar> &x,
                                       const std::vector<std::string>& args);
     static void shared(std::vector<Matrix<Scalar> >& ex,

@@ -181,7 +181,7 @@ class CASADI_EXPORT SXFunction :
   virtual int getAtomicOutput(int k) const { return algorithm_.at(k).i0;}
 
   /** \brief Number of nodes in the algorithm */
-  virtual int countNodes() const { return algorithm_.size() - nnz_out();}
+  virtual int n_nodes() const { return algorithm_.size() - nnz_out();}
 
   /** \brief  DATA MEMBERS */
 

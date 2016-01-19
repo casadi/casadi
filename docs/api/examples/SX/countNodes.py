@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-#! countNodes
+#! n_nodes
 #!======================
 from casadi import *
 from casadi.tools import *
@@ -30,15 +30,15 @@ from casadi.tools import *
 x = SX.sym("x")
 y = SX.sym("y")
 z = x*y+2*y
-print countNodes(z), " nodes in ", z
+print n_nodes(z), " nodes in ", z
 dotdraw(z)
 
 z += 4*z
-print countNodes(z), " nodes in ", z
+print n_nodes(z), " nodes in ", z
 dotdraw(z)
 
 z *= z+1
-print countNodes(z), " nodes in ", z
+print n_nodes(z), " nodes in ", z
 dotdraw(z)
 
 

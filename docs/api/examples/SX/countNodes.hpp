@@ -23,15 +23,15 @@
  */
 
 /** 
-* This example looks at the countNodes method
+* This example looks at the n_nodes method
 *
 *
-* \pythonexample{SX/countNodes}
+* \pythonexample{SX/n_nodes}
 *
 * \sa
 * \code
-* casadi::countNodes(const SX& A);
-* casadi::countNodesFull(const SX& A);
+* casadi::n_nodes(const SX& A);
+* casadi::n_nodesFull(const SX& A);
 * \endcode
 *
 */

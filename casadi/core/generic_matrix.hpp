@@ -545,8 +545,8 @@ namespace casadi {
     ///@}
 
     /** Count number of nodes */
-    inline friend int countNodes(const MatType& A) {
-      return MatType::countNodes(A);
+    inline friend int n_nodes(const MatType& A) {
+      return MatType::n_nodes(A);
     }
 
     /// Simplify an expression

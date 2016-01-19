@@ -1893,14 +1893,14 @@ class MXtests(casadiTestCase):
     d = a+b
     e = d*c
 
-    self.assertEqual(countNodes(e),6)
+    self.assertEqual(n_nodes(e),6)
 
     t0 = matrix_expand(e)
 
-    self.assertEqual(countNodes(t0),5)
+    self.assertEqual(n_nodes(t0),5)
     
     t1 = matrix_expand(e,[d])
-    self.assertEqual(countNodes(t1),6)
+    self.assertEqual(n_nodes(t1),6)
     
     print e,t0,t1
     

@@ -2308,8 +2308,8 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  int Matrix<Scalar>::countNodes(const Matrix<Scalar>& x) {
-    throw CasadiException("\"countNodes\" not defined for instantiation");
+  int Matrix<Scalar>::n_nodes(const Matrix<Scalar>& x) {
+    throw CasadiException("\"n_nodes\" not defined for instantiation");
     return 0;
   }
 
@@ -2591,7 +2591,7 @@ namespace casadi {
   template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order);
   template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
                             const std::vector<int>& order_contributions);
-  template<> int SX::countNodes(const SX& x);
+  template<> int SX::n_nodes(const SX& x);
   template<> std::string
   SX::print_operator(const SX& x, const std::vector<std::string>& args);
   template<> void SX::shared(std::vector<SX >& ex,
