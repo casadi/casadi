@@ -380,7 +380,7 @@ namespace casadi {
     ex[2] = gL_defL;
     ex[3] = p_defL;
 
-    in_place(svar, sdef, ex, false);
+    replace(svar, sdef, ex, false);
     i=0;
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       it->d_def = sdef[i++];

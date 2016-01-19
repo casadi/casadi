@@ -440,10 +440,10 @@ namespace casadi {
      * Substitute variables v out of the expressions vdef sequentially,
      * as well as out of a number of other expressions piggyback */
     inline friend void
-      in_place(const std::vector<MatType>& v,
+      replace(const std::vector<MatType>& v,
                         std::vector<MatType>& inout_vdef,
                         std::vector<MatType>& inout_ex, bool reverse=false) {
-      return MatType::in_place(v, inout_vdef, inout_ex, reverse);
+      return MatType::replace(v, inout_vdef, inout_ex, reverse);
     }
 
     /** \brief  Solve a system of equations: A*x = b

@@ -34,6 +34,6 @@ dd = SX([5,sin(x),x+y])
 print var
 print dd
 
-in_place(var,dd,True)
+replace(var,dd,True)
 
 print dd
