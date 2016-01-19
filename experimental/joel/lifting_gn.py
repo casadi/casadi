@@ -153,7 +153,7 @@ for (i,x0) in enumerate([0.08]):
 
   # Substitute in the lifted variables x into the expressions for xdef, F1 and F2
   ex = SXVector([f1,f2])
-  in_place(x, xdef, ex, True)
+  substituteInPlace(x, xdef, ex, True)
   [f1,f2] = ex
   
   if gauss_newton: # if Gauss-Newton no multipliers needed
@@ -197,7 +197,7 @@ for (i,x0) in enumerate([0.08]):
   # Substitute out the x from the zdef
   z = xdef-d
   ex = SXVector([f1,f2])
-  in_place(x, z, ex, False)
+  substituteInPlace(x, z, ex, False)
   [f1,f2] = ex
 
   # Modified function Z

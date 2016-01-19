@@ -1186,7 +1186,7 @@ namespace casadi {
     return x->print(args);
   }
 
-  void MX::in_place(const std::vector<MX>& v, std::vector<MX>& vdef,
+  void MX::substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
                              std::vector<MX>& ex, bool reverse) {
     casadi_assert_message(v.size()==vdef.size(),
                           "Mismatch in the number of expression to substitute.");
