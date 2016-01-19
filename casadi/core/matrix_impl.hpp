@@ -163,9 +163,9 @@ namespace casadi {
       int oldsize = sparsity_.nnz();
       int ind = sparsity_.add_nz(rr.scalar(size1()), cc.scalar(size2()));
       if (oldsize == sparsity_.nnz()) {
-        data_.at(ind) = m.scalar();
+        nonzeros_.at(ind) = m.scalar();
       } else {
-        data_.insert(data_.begin()+ind, m.scalar());
+        nonzeros_.insert(nonzeros_.begin()+ind, m.scalar());
       }
       return;
     }
@@ -273,9 +273,9 @@ namespace casadi {
       int oldsize = sparsity_.nnz();
       int ind = sparsity_.add_nz(r % size1(), r / size1());
       if (oldsize == sparsity_.nnz()) {
-        data_.at(ind) = m.scalar();
+        nonzeros_.at(ind) = m.scalar();
       } else {
-        data_.insert(data_.begin()+ind, m.scalar());
+        nonzeros_.insert(nonzeros_.begin()+ind, m.scalar());
       }
       return;
     }
@@ -526,18 +526,18 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar>::Matrix(const Matrix<Scalar>& m) : sparsity_(m.sparsity_), data_(m.data_) {
+  Matrix<Scalar>::Matrix(const Matrix<Scalar>& m) : sparsity_(m.sparsity_), nonzeros_(m.nonzeros_) {
   }
 
   template<typename Scalar>
   Matrix<Scalar>::Matrix(const std::vector<Scalar>& x) :
-      sparsity_(Sparsity::dense(x.size(), 1)), data_(x) {
+      sparsity_(Sparsity::dense(x.size(), 1)), nonzeros_(x) {
   }
 
   template<typename Scalar>
   Matrix<Scalar>& Matrix<Scalar>::operator=(const Matrix<Scalar>& m) {
     sparsity_ = m.sparsity_;
-    data_ = m.data_;
+    nonzeros_ = m.nonzeros_;
     return *this;
   }
 
@@ -770,7 +770,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar>::Matrix(double val) :
-      sparsity_(Sparsity::dense(1, 1)), data_(std::vector<Scalar>(1, val)) {
+      sparsity_(Sparsity::dense(1, 1)), nonzeros_(std::vector<Scalar>(1, val)) {
   }
 
   template<typename Scalar>
@@ -793,7 +793,7 @@ namespace casadi {
     // Form matrix
     sparsity_ = Sparsity::dense(nrow, ncol);
     data().resize(nrow*ncol);
-    typename std::vector<Scalar>::iterator it=data_.begin();
+    typename std::vector<Scalar>::iterator it=nonzeros_.begin();
     for (int cc=0; cc<ncol; ++cc) {
       for (int rr=0; rr<nrow; ++rr) {
         *it++ = d[rr][cc];
@@ -802,7 +802,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar>::Matrix(const Sparsity& sp) : sparsity_(sp), data_(sp.nnz(), 1) {
+  Matrix<Scalar>::Matrix(const Sparsity& sp) : sparsity_(sp), nonzeros_(sp.nnz(), 1) {
   }
 
   template<typename Scalar>
@@ -815,12 +815,12 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar>::Matrix(const Sparsity& sp, const Scalar& val, bool dummy) :
-      sparsity_(sp), data_(sp.nnz(), val) {
+      sparsity_(sp), nonzeros_(sp.nnz(), val) {
   }
 
   template<typename Scalar>
   Matrix<Scalar>::Matrix(const Sparsity& sp, const std::vector<Scalar>& d, bool dummy) :
-      sparsity_(sp), data_(d) {
+      sparsity_(sp), nonzeros_(d) {
     casadi_assert_message(sp.nnz()==d.size(), "Size mismatch." << std::endl
                           << "You supplied a sparsity of " << sp.dim()
                           << ", but the supplied vector is of length " << d.size());
@@ -965,10 +965,10 @@ namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::sanity_check(bool complete) const {
     sparsity_.sanity_check(complete);
-    if (data_.size()!=sparsity_.nnz()) {
+    if (nonzeros_.size()!=sparsity_.nnz()) {
       std::stringstream s;
       s << "Matrix is not sane. The following must hold:" << std::endl;
-      s << "  data().size() = sparsity().nnz(), but got data().size()  = " << data_.size()
+      s << "  data().size() = sparsity().nnz(), but got data().size()  = " << nonzeros_.size()
         << "   and sparsity().nnz() = "  << sparsity_.nnz() << std::endl;
       casadi_error(s.str());
     }
@@ -1276,7 +1276,7 @@ namespace casadi {
 
   template<typename Scalar>
   bool Matrix<Scalar>::is_regular() const {
-    return casadi::is_regular(data_);
+    return casadi::is_regular(nonzeros_);
   }
 
   template<typename Scalar>

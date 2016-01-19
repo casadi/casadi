@@ -88,7 +88,7 @@ namespace casadi {
     Sparsity sparsity_;
 
     /// Nonzero elements
-    std::vector<DataType> data_;
+    std::vector<DataType> nonzeros_;
 
   };
 

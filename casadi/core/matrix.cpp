@@ -193,7 +193,7 @@ namespace casadi {
 
   template<> bool SX::has_duplicates() {
     bool has_duplicates = false;
-    for (auto&& i : data_) {
+    for (auto&& i : nonzeros_) {
       bool is_duplicate = i.getTemp()!=0;
       if (is_duplicate) {
         userOut<true, PL_WARN>() << "Duplicate expression: " << i << endl;
@@ -205,7 +205,7 @@ namespace casadi {
   }
 
   template<> void SX::resetInput() {
-    for (auto&& i : data_) {
+    for (auto&& i : nonzeros_) {
       i.setTemp(0);
     }
   }
@@ -989,13 +989,13 @@ namespace casadi {
                       vector<string>& inter) const {
     // Find out which noded can be inlined
     map<const SXNode*, int> nodeind;
-    for (auto&& i : data_) i->can_inline(nodeind);
+    for (auto&& i : nonzeros_) i->can_inline(nodeind);
 
     // Print expression
     nz.resize(0);
     nz.reserve(nnz());
     inter.resize(0);
-    for (auto&& i : data_) nz.push_back(i->print_compact(nodeind, inter));
+    for (auto&& i : nonzeros_) nz.push_back(i->print_compact(nodeind, inter));
   }
 
   template<> vector<SX> SX::get_input(const Function& f) {
