@@ -96,28 +96,15 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>barrier_maxiter</td><td>OT_INT</td><td>Maximum number of barrier iterations.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>convex</td><td>OT_BOOL</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dep_check</td><td>OT_INT</td><td>Detect redundant constraints.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simplex_maxiter</td><td>OT_INT</td><td>Maximum number of simplex iterations.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm start with simplex methods (affects only the simplex methods).</td><td>casadi::CplexInterface</td></tr>
 </table>
 */
@@ -145,28 +132,15 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>barrier_maxiter</td><td>OT_INT</td><td>Maximum number of barrier iterations.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>convex</td><td>OT_BOOL</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dep_check</td><td>OT_INT</td><td>Detect redundant constraints.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simplex_maxiter</td><td>OT_INT</td><td>Maximum number of simplex iterations.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm start with simplex methods (affects only the simplex methods).</td><td>casadi::CplexInterface</td></tr>
 </table>
 */
@@ -414,21 +388,8 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables, Each entry can be one of: 'continuous', 'binary', 'integer', 'semicont', 'semiint'</td><td>casadi::GurobiInterface</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
+<tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]</td><td>casadi::GurobiInterface</td></tr>
 </table>
 */
 /// \endcond
@@ -438,7 +399,7 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
-<tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables, Each entry can be one of: 'continuous', 'binary', 'integer', 'semicont', 'semiint'</td></tr>
+<tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]</td></tr>
 </table>
 */
 /** \addtogroup general_GurobiInterface
@@ -447,21 +408,8 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables, Each entry can be one of: 'continuous', 'binary', 'integer', 'semicont', 'semiint'</td><td>casadi::GurobiInterface</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
+<tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]</td><td>casadi::GurobiInterface</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1374,23 +1322,10 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>artol</td><td>OT_DOUBLE</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>mutol</td><td>OT_DOUBLE</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OoqpInterface</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
 /// \endcond
@@ -1411,23 +1346,10 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>artol</td><td>OT_DOUBLE</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>mutol</td><td>OT_DOUBLE</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OoqpInterface</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1437,22 +1359,9 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::QpToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::QpToNlp</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
 /// \endcond
@@ -1472,22 +1381,9 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::QpToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::QpToNlp</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -1498,11 +1394,9 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>CPUtime</td><td>OT_DOUBLE</td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>boundRelaxation</td><td>OT_DOUBLE</td><td>Initial relaxation of bounds to start homotopy  and initial value for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>boundTolerance</td><td>OT_DOUBLE</td><td>If upper and lower bounds differ less than this tolerance, they are regarded equal, i.e. as  equality constraint.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>enableCholeskyRefactorisation</td><td>OT_INT</td><td>Specifies the frequency of a full re-factorisation of projected Hessian matrix: 0: turns them off,  1: uses them at each iteration etc.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableDriftCorrection</td><td>OT_INT</td><td>Specifies the frequency of drift corrections: 0: turns them off.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableEqualities</td><td>OT_BOOL</td><td>Specifies whether equalities should be treated  as always active (True) or not (False)</td><td>casadi::QpoasesInterface</td></tr>
@@ -1520,28 +1414,17 @@
 <tr><td>epsNum</td><td>OT_DOUBLE</td><td>Numerator tolerance for ratio tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>growFarBounds</td><td>OT_DOUBLE</td><td>Factor to grow far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
 /// \endcond
@@ -1591,11 +1474,9 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>CPUtime</td><td>OT_DOUBLE</td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>boundRelaxation</td><td>OT_DOUBLE</td><td>Initial relaxation of bounds to start homotopy  and initial value for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>boundTolerance</td><td>OT_DOUBLE</td><td>If upper and lower bounds differ less than this tolerance, they are regarded equal, i.e. as  equality constraint.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>enableCholeskyRefactorisation</td><td>OT_INT</td><td>Specifies the frequency of a full re-factorisation of projected Hessian matrix: 0: turns them off,  1: uses them at each iteration etc.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableDriftCorrection</td><td>OT_INT</td><td>Specifies the frequency of drift corrections: 0: turns them off.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>enableEqualities</td><td>OT_BOOL</td><td>Specifies whether equalities should be treated  as always active (True) or not (False)</td><td>casadi::QpoasesInterface</td></tr>
@@ -1613,26 +1494,63 @@
 <tr><td>epsNum</td><td>OT_DOUBLE</td><td>Numerator tolerance for ratio tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>growFarBounds</td><td>OT_DOUBLE</td><td>Factor to grow far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialFarBounds</td><td>OT_DOUBLE</td><td>Initial size for far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialRamping</td><td>OT_DOUBLE</td><td>Start value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>initialStatusBounds</td><td>OT_STRING</td><td>Initial status of bounds at first iteration.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::Qpsol
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>maxDualJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in dual variables in  linear independence tests.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>maxPrimalJump</td><td>OT_DOUBLE</td><td>Maximum allowed jump in primal variables in  nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>nWSR</td><td>OT_INT</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
-<tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup general_Qpsol
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>compiler</td><td>OT_STRING</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOL</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit</td><td>OT_BOOL</td><td>Use just-in-time compiler to speed up the evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>jit_options</td><td>OT_DICT</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Monitors to be activated</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
