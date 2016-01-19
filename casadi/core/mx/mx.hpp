@@ -388,7 +388,7 @@ namespace casadi {
     static std::vector<MX> substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,
                                          const std::vector<MX> &vdef);
-    static void substituteInPlace(const std::vector<MX>& v,
+    static void substitute_inplace(const std::vector<MX>& v,
                                   std::vector<MX>& vdef,
                                   std::vector<MX>& ex, bool reverse);
     static MX solve(const MX& A, const MX& b, const std::string& lsolver="symbolicqr",

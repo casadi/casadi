@@ -284,7 +284,7 @@ namespace casadi {
       substitute(const std::vector<Matrix<Scalar> >& ex,
                  const std::vector<Matrix<Scalar> >& v,
                  const std::vector<Matrix<Scalar> >& vdef);
-    static void substituteInPlace(const std::vector<Matrix<Scalar> >& v,
+    static void substitute_inplace(const std::vector<Matrix<Scalar> >& v,
                                   std::vector<Matrix<Scalar> >& vdef,
                                   std::vector<Matrix<Scalar> >& ex,
                                   bool revers);

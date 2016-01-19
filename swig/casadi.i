@@ -2706,11 +2706,11 @@ DECL std::vector< M > casadi_substitute(const std::vector< M >& ex,
   return substitute(ex, v, vdef);
 }
 
-DECL void casadi_substituteInPlace(const std::vector< M >& v,
+DECL void casadi_substitute_inplace(const std::vector< M >& v,
                                       std::vector< M >& INOUT1,
                                       std::vector< M >& INOUT2,
                                       bool reverse=false) {
-  return substituteInPlace(v, INOUT1, INOUT2, reverse);
+  return substitute_inplace(v, INOUT1, INOUT2, reverse);
 }
 
 DECL void casadi_shared(const std::vector< M >& ex,
