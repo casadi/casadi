@@ -1734,7 +1734,7 @@ class MXtests(casadiTestCase):
             c = b-a
             if c.nnz()>0:
               # At least as sparse as DM calculus
-              self.assertTrue(min(c.nz)>=0,str([sp,v,name]))
+              self.assertTrue(min(c.nonzeros())>=0,str([sp,v,name]))
 
       for sp in [Sparsity(1,1),Sparsity.dense(1,1),Sparsity(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
         for v1 in [0,1,0.2,-0.2]:
@@ -1772,7 +1772,7 @@ class MXtests(casadiTestCase):
                   c = b-a
                   if c.nnz()>0:
                     # At least as sparse as DM calculus
-                    self.assertTrue(min(c.nz)>=0,str([sp,sp2,v1,v2,name,a,b]))
+                    self.assertTrue(min(c.nonzeros())>=0,str([sp,sp2,v1,v2,name,a,b]))
                 
                 if sp.nnz()>0 and sp2.nnz()>0 and v1!=0 and v2!=0:
                   self.checkfunction(f,g,inputs=f_in,hessian=False,failmessage=str([sp,sp2,v1,v2,x1_,x2_,name]))
