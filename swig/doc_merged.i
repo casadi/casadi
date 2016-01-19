@@ -4068,12 +4068,6 @@ Check if smooth.
 
 %feature("docstring") casadi::Matrix::clear "";
 
-%feature("docstring") casadi::Matrix::nonzeros_int "
-
-Get all nonzeros.
-
-";
-
 %feature("docstring") casadi::Matrix::is_minus_one "
 
 check if the matrix is -1 (note that false negative answers are possible)
@@ -4304,12 +4298,6 @@ Jacobian expression.
 
 %feature("docstring") friendwrap_sparsify "[INTERNAL]  Make a matrix sparse
 by removing numerical zeros.
-
-";
-
-%feature("docstring") casadi::Matrix::nonzeros "
-
-Get all nonzeros.
 
 ";
 
@@ -4696,6 +4684,11 @@ nodes by their ID.
 
 %feature("docstring") casadi::Matrix::binary "[INTERNAL]  Create nodes by
 their ID.
+
+";
+
+%feature("docstring") casadi::Matrix::get_nonzeros "[INTERNAL]  Get all
+nonzeros.
 
 ";
 

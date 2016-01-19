@@ -5540,12 +5540,6 @@ Check if smooth.
 
 %feature("docstring")  casadi::Matrix< Scalar >::clear() " ";
 
-%feature("docstring")  casadi::Matrix< Scalar >::nonzeros_int() const  "
-
-Get all nonzeros.
-
-";
-
 %feature("docstring")  casadi::Matrix< Scalar >::is_minus_one() const  "
 
 check if the matrix is -1 (note that false negative answers are possible)
@@ -5920,12 +5914,6 @@ Jacobian expression.
 %feature("docstring")  casadi::Matrix< Scalar >::sparsify(const Matrix<
 Scalar > &A, double tol=0) " [INTERNAL]  Make a matrix sparse by removing
 numerical zeros.
-
-";
-
-%feature("docstring")  casadi::Matrix< Scalar >::nonzeros() const  "
-
-Get all nonzeros.
 
 ";
 
@@ -6359,6 +6347,11 @@ by their ID.
 %feature("docstring")  casadi::Matrix< Scalar >::binary(int op, const
 Matrix< Scalar > &x, const Matrix< Scalar > &y) " [INTERNAL]  Create nodes
 by their ID.
+
+";
+
+%feature("docstring")  casadi::Matrix< Scalar >::get_nonzeros() const  "
+[INTERNAL]  Get all nonzeros.
 
 ";
 

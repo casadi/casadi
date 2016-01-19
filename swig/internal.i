@@ -97,6 +97,9 @@
 %exception  casadi::Matrix< Scalar >::getMinor(const Matrix< Scalar > &x, int i, int j) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< Scalar >::get_nonzeros() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< Scalar >::has_duplicates() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
