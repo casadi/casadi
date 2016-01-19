@@ -1611,7 +1611,13 @@ namespace casadi {
   }
 
   MX MX::repmat(const MX& x, int n, int m) {
-    return x->getRepmat(n, m);
+    if (n==0 || m==0) {
+      return MX();
+    } else if (n==1 && m==1) {
+      return x;
+    } else {
+      return x->getRepmat(n, m);
+    }
   }
 
   MX MX::repsum(const MX& x, int n, int m) {
