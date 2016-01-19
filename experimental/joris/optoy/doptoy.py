@@ -125,8 +125,8 @@ def ocp(f,gl=[],verbose=False,N=20,T=1.0):
   
   intg=explicitRK(ode,1,4)
 
-  h_out = MXFunction(syms["x"]+syms["u"]+syms["p"]+syms["w"],[a for a in gl_pure if dependsOn(a,syms["x"]+syms["u"])])
-  g_out = MXFunction(syms["p"]+syms["w"]+lims,[a for a in gl_pure if not dependsOn(a,syms["x"]+syms["u"])])
+  h_out = MXFunction(syms["x"]+syms["u"]+syms["p"]+syms["w"],[a for a in gl_pure if depends_on(a,syms["x"]+syms["u"])])
+  g_out = MXFunction(syms["p"]+syms["w"]+lims,[a for a in gl_pure if not depends_on(a,syms["x"]+syms["u"])])
   f_out = MXFunction(syms["p"]+syms["w"]+lims,[f])
   
   for i in [h_out, g_out, f_out, intg]:i.init()
@@ -183,7 +183,7 @@ def ocp(f,gl=[],verbose=False,N=20,T=1.0):
   ubg = G(solver.input("ubg"))
   
   # Set normal constraints bounds
-  for i,eq in enumerate([e for g,e in zip(gl,gl_equality) if not dependsOn(g,syms["x"]+syms["u"])]):
+  for i,eq in enumerate([e for g,e in zip(gl,gl_equality) if not depends_on(g,syms["x"]+syms["u"])]):
     if eq:
       lbg[str(i)] = ubg[str(i)] = 0
     else:
@@ -191,7 +191,7 @@ def ocp(f,gl=[],verbose=False,N=20,T=1.0):
       ubg[str(i)] = 0
 
   # Set path constraints bounds
-  for i,eq in enumerate([e for g,e in zip(gl,gl_equality) if dependsOn(g,syms["x"]+syms["u"])]):
+  for i,eq in enumerate([e for g,e in zip(gl,gl_equality) if depends_on(g,syms["x"]+syms["u"])]):
     if eq:
       lbg["path",:,i] = ubg["path",:,i] = 0
     else:

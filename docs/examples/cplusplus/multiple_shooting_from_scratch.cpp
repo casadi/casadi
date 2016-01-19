@@ -46,9 +46,6 @@
 using namespace casadi;
 using namespace std;
 
-// Infinity
-double inf = numeric_limits<double>::infinity();
-
 int main(){
   // Declare variables
   SX u = SX::sym("u"); // control
@@ -176,7 +173,7 @@ int main(){
   res = solver(arg);
     
   // Optimal solution of the NLP
-  vector<double> V_opt = res.at("x").nonzeros();
+  vector<double> V_opt(res.at("x"));
   
   // Get the optimal state trajectory
   vector<double> r_opt(ns+1), s_opt(ns+1);

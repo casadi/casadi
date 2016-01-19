@@ -34,13 +34,24 @@
 #include <algorithm>
 
 // Define pi if the compiler fails to do so
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif // M_PI
 
 /// \cond INTERNAL
 
 namespace casadi {
+#ifndef SWIG
+  /// Define pi
+#ifdef M_PI
+  const double pi = M_PI;
+#else
+  const double pi = 3.14159265358979323846;
+#endif
+
+  /// infinity
+  const double inf = std::numeric_limits<double>::infinity();
+
+  /// Not a number
+  const double nan = std::numeric_limits<double>::quiet_NaN();
+#endif // SWIG
 
   /// Enum for quick access to any node
   enum Operation {
@@ -213,8 +224,8 @@ namespace casadi {
   ///@{
   // Implement "missing" operations
   inline double atanh(double x) throw() {
-    if (x==-1) return -std::numeric_limits<double>::infinity();
-    if (x==1) return std::numeric_limits<double>::infinity();
+    if (x==-1) return -inf;
+    if (x==1) return inf;
     return 0.5*log((1+x)/(1-x));
   }
 
@@ -260,11 +271,13 @@ namespace casadi {
 
   ///@{
   /** \brief  CasADi additions */
+  inline double simplify(double x) { return x;}
   inline double constpow(double x, double y) { return pow(x, y);}
   inline double printme(double x, double y) {
     std::cout << "|> " << y << " : " << x << std::endl;
     return x;
   }
+  inline bool is_equal(double x, double y, int depth=0) { return x==y;}
 
   #ifdef HAS_COPYSIGN
   using std::copysign;
@@ -281,11 +294,9 @@ namespace casadi {
   inline double erfinv(double x) throw() {
     // Approximation found in Sourceforge and modified: Not very efficient
     if (x>=1) {
-      return x==1 ? std::numeric_limits<double>::infinity() :
-          std::numeric_limits<double>::quiet_NaN();
+      return x==1 ? inf : nan;
     } else if (x<=-1) {
-      return x==-1 ? -std::numeric_limits<double>::infinity() :
-          std::numeric_limits<double>::quiet_NaN();
+      return x==-1 ? -inf : nan;
     } else if (x<-0.7) {
       double z = sqrt(-log((1.0+x)/2.0));
       return -(((1.641345311*z+3.429567803)*z-1.624906493)*z-1.970840454)/
@@ -303,8 +314,8 @@ namespace casadi {
       }
 
       //polish x to full accuracy
-      y = y - (erf(y) - x) / (2.0/sqrt(M_PI) * exp(-y*y));
-      y = y - (erf(y) - x) / (2.0/sqrt(M_PI) * exp(-y*y));
+      y = y - (erf(y) - x) / (2.0/sqrt(pi) * exp(-y*y));
+      y = y - (erf(y) - x) / (2.0/sqrt(pi) * exp(-y*y));
       return y;
     }
   }
@@ -810,7 +821,7 @@ namespace casadi {
   struct UnaryOperation<OP_ERF>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = erf(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) {
-        d[0] = (2/sqrt(M_PI))*exp(-x*x);}
+        d[0] = (2/sqrt(pi))*exp(-x*x);}
   };
 
   /// Absolute value
@@ -908,7 +919,7 @@ namespace casadi {
   struct UnaryOperation<OP_ERFINV>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = erfinv(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) {
-        d[0] = (sqrt(M_PI)/2)*exp(f*f); }
+        d[0] = (sqrt(pi)/2)*exp(f*f); }
   };
 
   /// Identity operator with the side effect of printing

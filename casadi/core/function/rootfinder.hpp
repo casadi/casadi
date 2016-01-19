@@ -26,121 +26,62 @@
 #ifndef CASADI_ROOTFINDER_HPP
 #define CASADI_ROOTFINDER_HPP
 
-#include "function_internal.hpp"
-#include "plugin_interface.hpp"
+#include "function.hpp"
+#include "linsol.hpp"
 
-/// \cond INTERNAL
 namespace casadi {
 
-  /// Internal class
-  class CASADI_EXPORT
-  Rootfinder : public FunctionInternal, public PluginInterface<Rootfinder> {
-  public:
-    /** \brief Constructor
-     *
-     * \param f   Function mapping from (n+1) inputs to 1 output.
-     */
-    Rootfinder(const std::string& name, const Function& f);
-
-    /// Destructor
-    virtual ~Rootfinder() = 0;
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return f_.n_in();}
-    virtual size_t get_n_out() const { return f_.n_out();}
-    ///@}
-
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const { return f_.sparsity_in(ind);}
-    virtual Sparsity get_sparsity_out(int ind) const { return f_.sparsity_out(ind);}
-    /// @}
-
-    ///@{
-    /** \brief Names of function input and outputs */
-    virtual std::vector<std::string> get_ischeme() const { return f_.name_in();}
-    virtual std::vector<std::string> get_oscheme() const { return f_.name_out();}
-    /// @}
-
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    virtual const Options& get_options() const { return options_;}
-    ///@}
-
-    /// Initialize
-    virtual void init(const Dict& opts);
-
-    /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
-
-    /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
-
-    /// Is the class able to propagate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd) { return true;}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
-    virtual int get_n_forward() const { return 64;}
-    ///@}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
-    virtual int get_n_reverse() const { return 64;}
-    ///@}
-
-    /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                         const std::vector<std::vector<MX> >& fseed,
-                         std::vector<std::vector<MX> >& fsens,
-                         bool always_inline, bool never_inline);
-
-    /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                         const std::vector<std::vector<MX> >& aseed,
-                         std::vector<std::vector<MX> >& asens,
-                         bool always_inline, bool never_inline);
-
-    /// Number of equations
-    int n_;
-
-    /// The function f(z, x1, x2, ..., xn) == 0
-    Function f_;
-
-    /// Jacobian of f with respect to z
-    Function jac_;
-
-    /// Linear solver
-    Function linsol_;
-
-    /// Constraints on decision variables
-    std::vector<int> u_c_;
-
-    /// Indices of the input and output that correspond to the actual root-finding
-    int iin_, iout_;
-
-    // Creator function for internal class
-    typedef Rootfinder* (*Creator)(const std::string& name, const Function& f);
-
-    // No static functions exposed
-    struct Exposed{ };
-
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
-
-    /// Short name
-    static std::string shortname() { return "rootfinder";}
-
-    /// Infix
-    static const std::string infix_;
-  };
+  /** \defgroup main_rootfinder
+   * Create a solver for rootfinding problems
+   * Takes a function where one of the inputs is unknown and one of the outputs
+   * is a residual function that is always zero, defines a new function where
+   * the the unknown input has been replaced by a _guess_ for the unknown and the
+   * residual output has been replaced by the calculated value for the input.
+   *
+   * For a function
+   * [y0, y1, ...,yi, .., yn] = F(x0, x1, ..., xj, ..., xm),
+   * where xj is unknown and yi=0, defines a new function
+   * [y0, y1, ...,xj, .., yn] = G(x0, x1, ..., xj_guess, ..., xm),
+   *
+   * xj and yi must have the same dimension and d(yi)/d(xj) must be invertable.
+   *
+   * By default, the first input is unknown and the first output is the residual.
+   *
+   *
+   * \generalsection{Rootfinder}
+   * \pluginssection{Rootfinder}
+   *
+   * \author Joel Andersson
+   * \date 2011-2015
+   */
 
 
+  /** \defgroup rootfinder
+  * @copydoc main_rootfinder
+  *  @{
+  */
+
+
+  /** \if EXPANDED
+  * @copydoc main_rootfinder
+  * \endif
+  */
+  ///@{
+  CASADI_EXPORT Function rootfinder(const std::string& name, const std::string& solver,
+                               const Function& f, const Dict& opts=Dict());
+  ///@}
+
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_rootfinder(const std::string& name);
+
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_rootfinder(const std::string& name);
+
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_rootfinder(const std::string& name);
+
+  /** @} */
 
 } // namespace casadi
-/// \endcond
 
 #endif // CASADI_ROOTFINDER_HPP

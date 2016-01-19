@@ -751,7 +751,11 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
   class FlatIndexDispatcher(Dispatcher):
     def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
       if canonicalIndex in self.struct.map:
-        return list(performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry))
+        res = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
+        if isinstance(res,IM):
+          assert res.is_dense()
+          return map(int,list(res.nonzeros()))
+        return list(res)
       else:
         raise Exception("Canonical index %s not found." % str(canonicalIndex))
 

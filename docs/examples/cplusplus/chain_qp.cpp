@@ -53,7 +53,6 @@ using namespace std;
 int main(){
 
   // Constants
-  const double inf = numeric_limits<double>::infinity();
   int N = 40;
   double m_i = 40.0/N;
   double D_i = 70.0*N;
@@ -126,7 +125,7 @@ int main(){
   // Formulate QP
   SXDict qp = {{"x", vertcat(x)}, {"f", Vchain}, {"g", vertcat(g)}};
 
-  // Solve with IPOPT
+  // Solve with a QP solver or NLP solver
   Function solver = qpsol("solver", "qpoases", qp);
   //Function solver = qpsol("solver", "cplex", qp);
   //Function solver = qpsol("solver", "ooqp", qp);
@@ -155,10 +154,10 @@ int main(){
   file << "% Generated " __DATE__ " at " __TIME__ << endl;
   file << endl;
   file << "t = linspace(-2,2," << N << ");"<< endl;
-  file << "f_opt = " << f_opt << ";" << endl;
-  file << "x_opt = " << x_opt.nonzeros() << ";" << endl;
-  file << "y_opt = " << y_opt.nonzeros() << ";" << endl;
-  file << "z_opt = " << z_opt.nonzeros() << ";" << endl;
+  file << "f_opt = " << double(f_opt) << ";" << endl;
+  file << "x_opt = " << vector<double>(x_opt) << ";" << endl;
+  file << "y_opt = " << vector<double>(y_opt) << ";" << endl;
+  file << "z_opt = " << vector<double>(z_opt) << ";" << endl;
 
   // Finalize the results file
   file << endl;

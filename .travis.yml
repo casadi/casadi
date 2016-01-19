@@ -26,64 +26,24 @@ matrix:
   include:
     - compiler: gcc
       os: linux
-      env: TESTMODE=full_valgrind
+      env: TESTMODE=full
       script:
         - sudo apt-get install valgrind -y
         - mkdir build
         - pushd build
-        - cmake -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF  ..
+        - cmake -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make -j2
         - sudo make -j2 install
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test/python && ls -1 [n-z]*.py | grep -v helpers.py | xargs rm && popd
         - pushd test && make unittests_py_valgrind && popd
-    - compiler: gcc
-      os: linux
-      env: TESTMODE=full_valgrind
-      script:
-        - sudo apt-get install valgrind -y
-        - mkdir build
-        - pushd build
-        - cmake -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF ..
-        - make -j2
-        - sudo make -j2 install
-        - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test/python && ls -1 [a-m]*.py | grep -v helpers.py | xargs rm && popd
-        - pushd test && make unittests_py_valgrind && popd
-    - compiler: gcc
-      os: linux
-      env: TESTMODE=full_remainder
-      script:
-        - mkdir build
-        - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
-        - make -j2
-        - sudo make -j2 install
-        - popd
         - sudo apt-get install python-ipdb graphviz python-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         - sudo pip install pydot2
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make trunktesterbot_no_unittests_py && popd
-        - pushd build && travis_wait make json && popd
-
-    - compiler: gcc
-      os: linux
-      env: TESTMODE=full_slow
-      script:
-        - mkdir build
-        - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF -DWITH_EXTRA_WARNINGS=ON ..
-        - make -j2
-        - sudo make -j2 install
-        - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
-        
+        - pushd test && make trunktesterbot_no_unittests_py && popd
         - pushd test && make unittests_py_slow && popd
+        - pushd build && make json && popd
     - compiler: gcc
       os: linux
       env: TESTMODE=docs

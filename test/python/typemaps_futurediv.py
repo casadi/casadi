@@ -46,7 +46,7 @@ from __future__ import division
 
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import numpy as n
 import unittest
 from types import *
@@ -207,8 +207,6 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s**z)
       doit(z,s,lambda z,s: fmin(s,z))
       doit(z,s,lambda z,s: fmax(s,z))
-      doit(z,s,lambda z,s: min(s,z))
-      doit(z,s,lambda z,s: max(s,z))
       doit(z,s,lambda z,s: constpow(s,z))
       doit(z,s,lambda z,s: constpow(z,s))
       

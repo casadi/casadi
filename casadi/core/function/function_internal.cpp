@@ -2767,8 +2767,8 @@ namespace casadi {
     casadi_error("'getAtomicOutput' not defined for " + type_name());
   }
 
-  int FunctionInternal::countNodes() const {
-    casadi_error("'countNodes' not defined for " + type_name());
+  int FunctionInternal::n_nodes() const {
+    casadi_error("'n_nodes' not defined for " + type_name());
   }
 
   void FunctionInternal::linsol_factorize(Memory& mem, const double* A) const {

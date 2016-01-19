@@ -291,10 +291,6 @@ class CASADI_EXPORT GenericExpression : public GenericExpressionCommon {
       return ExType::is_equal(x, y, depth);
     }
 
-    friend inline bool iszero(const ExType& x) {
-      return x.is_zero();
-    }
-
     /// Copy sign
     friend inline ExType copysign(const ExType& x, const ExType& y) {
       return ExType::binary(OP_COPYSIGN, x, y);

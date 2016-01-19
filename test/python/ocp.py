@@ -23,7 +23,7 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import unittest
 from types import *
 from helpers import *
@@ -223,11 +223,11 @@ class OCPtests(casadiTestCase):
     #self.assertTrue(ivp.cfcn[1].is_equal(u)) 
     #self.assertTrue(ivp.cfcn[2].is_equal(u)) 
     #self.assertTrue(ivp.cfcn_lb[0].isMinusInf()) 
-    #self.assertEquals(ivp.cfcn_lb[1].getValue(),230) 
+    #self.assertEquals(ivp.cfcn_lb[1].to_double(),230) 
     #self.assertTrue(ivp.cfcn_lb[2].isMinusInf()) 
-    #self.assertEquals(ivp.cfcn_ub[0].getValue(),350) 
+    #self.assertEquals(ivp.cfcn_ub[0].to_double(),350) 
     #self.assertTrue(ivp.cfcn_ub[1].isInf())
-    #self.assertEquals(ivp.cfcn_ub[2].getValue(),370) 
+    #self.assertEquals(ivp.cfcn_ub[2].to_double(),370) 
     print ivp.init
     print c,T,cost
     #print c.atTime(0)

@@ -45,6 +45,11 @@
 #include "function/code_generator.hpp"
 #include "function/compiler.hpp"
 #include "function/callback.hpp"
+#include "function/integrator.hpp"
+#include "function/qpsol.hpp"
+#include "function/nlpsol.hpp"
+#include "function/rootfinder.hpp"
+#include "function/linsol.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

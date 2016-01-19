@@ -26,6 +26,7 @@
 #include "matrix_impl.hpp"
 #include "function/sx_function.hpp"
 #include "sx/sx_node.hpp"
+#include "function/linsol.hpp"
 
 using namespace std;
 
@@ -37,11 +38,11 @@ namespace casadi {
   template class Matrix< SXElem >;
 
   bool CASADI_EXPORT is_slice(const IM& x, bool ind1) {
-    return x.is_scalar() || (x.is_column() && x.is_dense() && is_slice(x.data(), ind1));
+    return x.is_scalar() || (x.is_column() && x.is_dense() && is_slice(x.nonzeros(), ind1));
   }
 
   Slice CASADI_EXPORT to_slice(const IM& x, bool ind1) {
-    return x.is_scalar() ? Slice(x.scalar(), ind1) : to_slice(x.data(), ind1);
+    return x.is_scalar() ? Slice(x.scalar(), ind1) : to_slice(x.nonzeros(), ind1);
   }
 
   template<>
@@ -70,7 +71,7 @@ namespace casadi {
   bool Matrix<SXElem>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
                                   "provided a shape" << dim());}
-    return data().at(0).__nonzero__();
+    return nonzeros().at(0).__nonzero__();
   }
 
   template<>
@@ -135,14 +136,14 @@ namespace casadi {
   bool SX::is_regular() const {
     // First pass: ignore symbolics
     for (int i=0; i<nnz(); ++i) {
-      const SXElem& x = data().at(i);
+      const SXElem& x = nonzeros().at(i);
       if (x.is_constant()) {
         if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
       }
     }
     // Second pass: don't ignore symbolics
     for (int i=0; i<nnz(); ++i) {
-      if (!data().at(i).is_regular()) return false;
+      if (!nonzeros().at(i).is_regular()) return false;
     }
     return true;
   }
@@ -184,7 +185,7 @@ namespace casadi {
   template<>
   bool SX::is_valid_input() const {
     for (int k=0; k<nnz(); ++k) // loop over non-zero elements
-      if (!data().at(k)->is_symbolic()) // if an element is not symbolic
+      if (!nonzeros().at(k)->is_symbolic()) // if an element is not symbolic
         return false;
 
     return true;
@@ -192,7 +193,7 @@ namespace casadi {
 
   template<> bool SX::has_duplicates() {
     bool has_duplicates = false;
-    for (auto&& i : data_) {
+    for (auto&& i : nonzeros_) {
       bool is_duplicate = i.getTemp()!=0;
       if (is_duplicate) {
         userOut<true, PL_WARN>() << "Duplicate expression: " << i << endl;
@@ -204,37 +205,9 @@ namespace casadi {
   }
 
   template<> void SX::resetInput() {
-    for (auto&& i : data_) {
+    for (auto&& i : nonzeros_) {
       i.setTemp(0);
     }
-  }
-
-  template<>
-  double SX::getValue(int k) const {
-    return data().at(k).getValue();
-  }
-
-  template<>
-  int SX::getIntValue() const {
-    return scalar().getIntValue();
-  }
-
-  template<>
-  vector<double> SX::nonzeros() const {
-    vector<double> ret(nnz());
-    for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = data().at(i).getValue();
-    }
-    return ret;
-  }
-
-  template<>
-  vector<int> SX::nonzeros_int() const {
-    vector<int> ret(nnz());
-    for (size_t i=0; i<ret.size(); ++i) {
-      ret[i] = data().at(i).getIntValue();
-    }
-    return ret;
   }
 
   template<>
@@ -280,7 +253,7 @@ namespace casadi {
       vector<SXNode*> f; // terms
 
       if (to_be_expanded.top()->is_constant()) { // constant nodes are seen as multiples of one
-        w.push_back(to_be_expanded.top()->getValue());
+        w.push_back(to_be_expanded.top()->to_double());
         f.push_back(casadi_limits<SXElem>::one.get());
       } else if (to_be_expanded.top()->is_symbolic()) {
         // symbolic nodes have weight one and itself as factor
@@ -315,11 +288,11 @@ namespace casadi {
             double fac;
             // Multiplication where the first factor is a constant
             if (node->dep(0)->is_constant()) {
-              fac = node->dep(0)->getValue();
+              fac = node->dep(0)->to_double();
               f = terms[ind2];
               w = weights[ind2];
             } else { // Multiplication where the second factor is a constant
-              fac = node->dep(1)->getValue();
+              fac = node->dep(1)->to_double();
               f = terms[ind1];
               w = weights[ind1];
             }
@@ -532,7 +505,7 @@ namespace casadi {
   }
 
   template<>
-  void SX::substituteInPlace(const vector<SX >& v, vector<SX >& vdef,
+  void SX::substitute_inplace(const vector<SX >& v, vector<SX >& vdef,
                              vector<SX >& ex, bool reverse) {
     // Assert correctness
     casadi_assert(v.size()==vdef.size());
@@ -606,7 +579,7 @@ namespace casadi {
   }
 
   template<>
-  bool SX::dependsOn(const SX &x, const SX &arg) {
+  bool SX::depends_on(const SX &x, const SX &arg) {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
@@ -726,9 +699,9 @@ namespace casadi {
   }
 
   template<>
-  int SX::countNodes(const SX& x) {
+  int SX::n_nodes(const SX& x) {
     Function f("tmp", {SX()}, {x});
-    return f.countNodes();
+    return f.n_nodes();
   }
 
   template<>
@@ -747,14 +720,14 @@ namespace casadi {
   template<>
   vector<SX> SX::symvar(const SX& x) {
     Function f("tmp", vector<SX>{}, {x});
-    vector<SXElem> ret1 = f.free_sx().data();
+    vector<SXElem> ret1 = f.free_sx().nonzeros();
     vector<SX> ret(ret1.size());
     copy(ret1.begin(), ret1.end(), ret.begin());
     return ret;
   }
 
   template<>
-  void SX::extractShared(vector<SX >& ex,
+  void SX::shared(vector<SX >& ex,
                          vector<SX >& v_sx,
                          vector<SX >& vdef_sx,
                          const string& v_prefix,
@@ -1012,17 +985,17 @@ namespace casadi {
   }
 
   template<>
-  void SX::printSplit(vector<string>& nz,
+  void SX::print_split(vector<string>& nz,
                       vector<string>& inter) const {
     // Find out which noded can be inlined
     map<const SXNode*, int> nodeind;
-    for (auto&& i : data_) i->can_inline(nodeind);
+    for (auto&& i : nonzeros_) i->can_inline(nodeind);
 
     // Print expression
     nz.resize(0);
     nz.reserve(nnz());
     inter.resize(0);
-    for (auto&& i : data_) nz.push_back(i->print_compact(nodeind, inter));
+    for (auto&& i : nonzeros_) nz.push_back(i->print_compact(nodeind, inter));
   }
 
   template<> vector<SX> SX::get_input(const Function& f) {

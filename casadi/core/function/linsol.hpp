@@ -26,123 +26,61 @@
 #ifndef CASADI_LINSOL_HPP
 #define CASADI_LINSOL_HPP
 
-#include "function_internal.hpp"
-#include "plugin_interface.hpp"
-
-/// \cond INTERNAL
+#include "function.hpp"
 
 namespace casadi {
 
-  /** Internal class
-      @copydoc Linsol_doc
+
+  /** \defgroup main_linsol
+   * Create a solver for linear systems of equations
+   * Solves the linear system A*X = B or A^T*X = B for X
+   * with A square and non-singular
+   *
+   *  If A is structurally singular, an error will be thrown during init.
+   *  If A is numerically singular, the prepare step will fail.
+   *
+   *  The usual procedure to use Linsol is: \n
+   *  -# init()
+   *  -# set the first input (A)
+   *  -# prepare()
+   *  -# set the second input (b)
+   *  -# solve()
+   *  -# Repeat steps 4 and 5 to work with other b vectors.
+   *
+   * The standard evaluation combines the prepare() and solve() step and may
+   * therefore more expensive if A is invariant.
+   *
+   *  \generalsection{Linsol}
+   *  \pluginssection{Linsol}
+   * \author Joel Andersson
+   * \date 2011-2015
+   */
+
+  /** \defgroup linsol
+  * @copydoc main_linsol
+  *  @{
   */
-  class CASADI_EXPORT Linsol : public FunctionInternal, public PluginInterface<Linsol> {
-  public:
-    /// Constructor
-    Linsol(const std::string& name, const Sparsity& sparsity, int nrhs);
 
-    /// Destructor
-    virtual ~Linsol();
+  /** \if EXPANDED
+  * @copydoc main_linsol
+  * \endif
+  */
+  ///@{
+  CASADI_EXPORT Function linsol(const std::string& name, const std::string& solver,
+                                const Sparsity& sp, int nrhs, const Dict& opts=Dict());
+  ///@}
 
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return LINSOL_NUM_IN;}
-    virtual size_t get_n_out() const { return LINSOL_NUM_OUT;}
-    ///@}
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_linsol(const std::string& name);
 
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const;
-    virtual Sparsity get_sparsity_out(int ind) const;
-    /// @}
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_linsol(const std::string& name);
 
-    ///@{
-    /** \brief Names of function input and outputs */
-    virtual std::vector<std::string> get_ischeme() const { return {"A", "B"};}
-    virtual std::vector<std::string> get_oscheme() const { return {"X"};}
-    /// @}
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_linsol(const std::string& name);
 
-    /// Initialize
-    virtual void init(const Dict& opts);
-
-    /// Solve the system of equations
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
-
-    /// Create a solve node
-    using FunctionInternal::linsol_solve;
-    virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
-
-    /// Evaluate SX, possibly transposed
-    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                               bool tr, int nrhs);
-
-    /// Evaluate SX
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
-      linsol_eval_sx(arg, res, iw, w, 0, false, size2_out(LINSOL_X));
-    }
-
-    /** \brief Calculate forward mode directional derivatives */
-    virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& fseed,
-                                std::vector<std::vector<MX> >& fsens, bool tr);
-
-    /** \brief Calculate reverse mode directional derivatives */
-    virtual void linsol_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
-                                const std::vector<std::vector<MX> >& aseed,
-                                std::vector<std::vector<MX> >& asens, bool tr);
-
-    /** \brief  Propagate sparsity forward */
-    virtual void linsol_spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
-                              bool tr, int nrhs);
-
-    /** \brief  Propagate sparsity backwards */
-    virtual void linsol_spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem,
-                              bool tr, int nrhs);
-
-    ///@{
-    /// Propagate sparsity through a linear solve
-    virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
-    virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;
-    ///@}
-
-    /// Dulmage-Mendelsohn decomposition
-    std::vector<int> rowperm_, colperm_, rowblock_, colblock_;
-
-    /// Get sparsity pattern
-    int nrow() const { return size1_in(LINSOL_A);}
-    int ncol() const { return size2_in(LINSOL_A);}
-    int nnz() const { return nnz_in(LINSOL_A);}
-    const int* row() const { return sparsity_in(LINSOL_A).row();}
-    const int* colind() const { return sparsity_in(LINSOL_A).colind();}
-
-    // Creator function for internal class
-    typedef Linsol* (*Creator)(const std::string& name, const Sparsity& sp, int nrhs);
-
-    // No static functions exposed
-    struct Exposed{ };
-
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
-
-    /// Infix
-    static const std::string infix_;
-
-    // Get name of the plugin
-    virtual const char* plugin_name() const { return "none";}
-
-    // Sparsity of the linear system
-    Sparsity sparsity_;
-
-    // Number of equations
-    int neq_;
-
-    // Number of right-hand-sides
-    int nrhs_;
-  };
-
+  /** @} */
 
 } // namespace casadi
-/// \endcond
 
 #endif // CASADI_LINSOL_HPP
-

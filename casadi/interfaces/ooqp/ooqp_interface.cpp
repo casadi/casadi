@@ -24,7 +24,6 @@
 
 
 #include "ooqp_interface.hpp"
-#include "casadi/core/function/qpsol.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 
 // OOQP headers
@@ -63,7 +62,7 @@ namespace casadi {
   }
 
   Options OoqpInterface::options_
-  = {{&FunctionInternal::options_},
+  = {{&Qpsol::options_},
      {{"print_level",
        {OT_INT,
         "Print level. OOQP listens to print_level 0, 10 and 100"}},

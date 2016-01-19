@@ -97,6 +97,9 @@
 %exception  casadi::Matrix< Scalar >::getMinor(const Matrix< Scalar > &x, int i, int j) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< Scalar >::get_nonzeros() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< Scalar >::has_duplicates() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -169,16 +172,16 @@
 %exception  casadi::SparseStorage< DataType >::clear() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SparseStorage< DataType >::data() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SparseStorage< DataType >::data() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SparseStorage< DataType >::elem(int rr, int cc) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::has_nz(int rr, int cc) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SparseStorage< DataType >::nonzeros() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SparseStorage< DataType >::nonzeros() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparseStorage< DataType >::reserve(int nnz) {
@@ -218,9 +221,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::is_regular(N_Vector v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::iszero(double x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::matrixName< SXElem >() {

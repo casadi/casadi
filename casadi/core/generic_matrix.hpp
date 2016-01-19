@@ -419,8 +419,8 @@ namespace casadi {
     /** \brief Check if expression depends on the argument
         The argument must be symbolic
     */
-    inline friend bool dependsOn(const MatType& f, const MatType &arg) {
-      return MatType::dependsOn(f, arg);
+    inline friend bool depends_on(const MatType& f, const MatType &arg) {
+      return MatType::depends_on(f, arg);
     }
 
     /** \brief  Substitute variable v with expression vdef in an expression ex */
@@ -440,10 +440,10 @@ namespace casadi {
      * Substitute variables v out of the expressions vdef sequentially,
      * as well as out of a number of other expressions piggyback */
     inline friend void
-      substituteInPlace(const std::vector<MatType>& v,
+      substitute_inplace(const std::vector<MatType>& v,
                         std::vector<MatType>& inout_vdef,
                         std::vector<MatType>& inout_ex, bool reverse=false) {
-      return MatType::substituteInPlace(v, inout_vdef, inout_ex, reverse);
+      return MatType::substitute_inplace(v, inout_vdef, inout_ex, reverse);
     }
 
     /** \brief  Solve a system of equations: A*x = b
@@ -545,8 +545,8 @@ namespace casadi {
     ///@}
 
     /** Count number of nodes */
-    inline friend int countNodes(const MatType& A) {
-      return MatType::countNodes(A);
+    inline friend int n_nodes(const MatType& A) {
+      return MatType::n_nodes(A);
     }
 
     /// Simplify an expression
@@ -561,23 +561,23 @@ namespace casadi {
     }
 
     /** \brief Extract shared subexpressions from an set of expressions */
-    inline friend void extractShared(std::vector<MatType>& ex,
+    inline friend void shared(std::vector<MatType>& ex,
                                      std::vector<MatType>& v,
                                      std::vector<MatType>& vdef,
                                      const std::string& v_prefix="v_",
                                      const std::string& v_suffix="") {
-      MatType::extractShared(ex, v, vdef, v_prefix, v_suffix);
+      MatType::shared(ex, v, vdef, v_prefix, v_suffix);
     }
 
     /** \brief Extract shared subexpressions from an set of expressions */
-    inline friend void extractShared(const std::vector<MatType>& ex,
+    inline friend void shared(const std::vector<MatType>& ex,
                                      std::vector<MatType>& ex_output,
                                      std::vector<MatType>& v,
                                      std::vector<MatType>& vdef,
                                      const std::string& v_prefix="v_",
                                      const std::string& v_suffix="") {
       ex_output = ex;
-      extractShared(ex_output, v, vdef, v_prefix, v_suffix);
+      shared(ex_output, v, vdef, v_prefix, v_suffix);
     }
 
     /** \brief Given a repeated matrix, computes the sum of repeated parts

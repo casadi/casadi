@@ -23,7 +23,8 @@
 #
 
 import casadi as c
-from numpy import *
+import numpy
+from numpy import random, array, linalg, matrix, zeros, ones
 import unittest
 from types import *
 from helpers import *
@@ -491,12 +492,12 @@ class SXtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
     z = cos(x)*y
-    self.assertTrue(dependsOn(z,y))
-    self.assertTrue(dependsOn(z,x))
+    self.assertTrue(depends_on(z,y))
+    self.assertTrue(depends_on(z,x))
     w = substitute(z,x,0)
     self.assertTrue(w.is_symbolic())
-    self.assertTrue(dependsOn(w,y))
-    self.assertFalse(dependsOn(w,x))
+    self.assertTrue(depends_on(w,y))
+    self.assertFalse(depends_on(w,x))
     self.assertTrue(is_equal(w,y))
     r=w-y
     self.assertFalse(r.is_symbolic())     
@@ -827,13 +828,13 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     
     self.assertTrue(SX(0).is_regular())
-    self.assertFalse(SX(Inf).is_regular())
+    self.assertFalse(SX(inf).is_regular())
     with self.assertRaises(Exception):
       self.assertTrue(x.nz[0])
       
     self.assertTrue(SX(DM([0,1])).is_regular())
-    self.assertFalse(SX(DM([0,Inf])).is_regular())
-    self.assertFalse(vertcat([x,Inf]).is_regular())
+    self.assertFalse(SX(DM([0,inf])).is_regular())
+    self.assertFalse(vertcat([x,inf]).is_regular())
     with self.assertRaises(Exception):
       self.assertFalse(vertcat([x,x]).is_regular())
       
@@ -871,8 +872,10 @@ class SXtests(casadiTestCase):
     r = poly_roots(p)
     
     f = Function("f", [p],[r])
-    f_in = [0]*f.n_in();f_in[0]=DM([2,7])
-    a_,b_ = f_in[0]
+    f_in = [0]*f.n_in()
+    f_in[0]=DM([2,7])
+    a_ = f_in[0][0]
+    b_ = f_in[0][1]
     f_out = f(f_in)
     f_out[0]
     self.checkarray(f_out[0],vertcat([-b_/a_]))
@@ -882,7 +885,8 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [p],[r])
     f_in = [0]*f.n_in();f_in[0]=DM([2,7])
-    a_,b_ = f_in[0]
+    a_ = f_in[0][0]
+    b_ = f_in[0][1]
     f_out = f(f_in)
     f_out[0]
     self.checkarray(f_out[0],vertcat([-b_/a_,0]))
@@ -892,7 +896,9 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [p],[r])
     f_in = [0]*f.n_in();f_in[0]=DM([1.13,7,3])
-    a_,b_,c_ = f_in[0]
+    a_ = f_in[0][0]
+    b_ = f_in[0][1]
+    c_ = f_in[0][2]
     d = b_**2-4*a_*c_
     f_out = f(f_in)
     x0 = (-b_-sqrt(d))/2/a_
@@ -957,7 +963,7 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [x],[e])
     f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,8))
-    f_in[0].printDense()
+    f_in[0].print_dense()
     f_out = f(f_in)
     self.checkarray(f_out[0],DM([1,-0.29150,10.29150]),digits=5)
     
@@ -973,7 +979,7 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [x],[e])
     f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,7))
-    f_in[0].printDense()
+    f_in[0].print_dense()
     f_out = f(f_in)
     self.checkarray(f_out[0],DM([1,3,6]),digits=5)
 
@@ -1192,27 +1198,27 @@ class SXtests(casadiTestCase):
     J_out = J(J_in)
     self.checkarray(J_out[0],DM([0]))
     
-  def test_dependsOn(self):
+  def test_depends_on(self):
     a = SX.sym("a")
     b = SX.sym("b")
     
-    self.assertTrue(dependsOn(a**2,a))
-    self.assertTrue(dependsOn(a,a))
-    self.assertFalse(dependsOn(0,a))
-    self.assertTrue(dependsOn(a**2,vertcat([a,b])))
-    self.assertTrue(dependsOn(a,vertcat([a,b])))
-    self.assertFalse(dependsOn(0,vertcat([a,b])))
-    self.assertTrue(dependsOn(b**2,vertcat([a,b])))
-    self.assertTrue(dependsOn(b,vertcat([a,b])))
-    self.assertTrue(dependsOn(a**2+b**2,vertcat([a,b])))
-    self.assertTrue(dependsOn(a+b,vertcat([a,b])))
-    self.assertTrue(dependsOn(vertcat([0,a]),a))
-    self.assertTrue(dependsOn(vertcat([a,0]),a))
-    self.assertTrue(dependsOn(vertcat([a**2,b**2]),vertcat([a,b])))
-    self.assertTrue(dependsOn(vertcat([a,0]),vertcat([a,b])))
-    self.assertTrue(dependsOn(vertcat([0,b]),vertcat([a,b])))
-    self.assertTrue(dependsOn(vertcat([b,0]),vertcat([a,b])))
-    self.assertFalse(dependsOn(vertcat([0,0]),vertcat([a,b])))
+    self.assertTrue(depends_on(a**2,a))
+    self.assertTrue(depends_on(a,a))
+    self.assertFalse(depends_on(0,a))
+    self.assertTrue(depends_on(a**2,vertcat([a,b])))
+    self.assertTrue(depends_on(a,vertcat([a,b])))
+    self.assertFalse(depends_on(0,vertcat([a,b])))
+    self.assertTrue(depends_on(b**2,vertcat([a,b])))
+    self.assertTrue(depends_on(b,vertcat([a,b])))
+    self.assertTrue(depends_on(a**2+b**2,vertcat([a,b])))
+    self.assertTrue(depends_on(a+b,vertcat([a,b])))
+    self.assertTrue(depends_on(vertcat([0,a]),a))
+    self.assertTrue(depends_on(vertcat([a,0]),a))
+    self.assertTrue(depends_on(vertcat([a**2,b**2]),vertcat([a,b])))
+    self.assertTrue(depends_on(vertcat([a,0]),vertcat([a,b])))
+    self.assertTrue(depends_on(vertcat([0,b]),vertcat([a,b])))
+    self.assertTrue(depends_on(vertcat([b,0]),vertcat([a,b])))
+    self.assertFalse(depends_on(vertcat([0,0]),vertcat([a,b])))
     
   @requires("is_smooth")
   def test_is_smooth(self):

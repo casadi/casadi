@@ -23,7 +23,7 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import unittest
 from types import *
 from helpers import *
@@ -492,9 +492,9 @@ class Sparsitytests(casadiTestCase):
       
       trial = IM.ones(sp.pattern_inverse())
       
-      d.printDense()
-      dt.printDense()
-      trial.printDense()
+      d.print_dense()
+      dt.print_dense()
+      trial.print_dense()
       
       self.checkarray(trial,dt)
       

@@ -73,7 +73,7 @@ namespace casadi {
     int addSparsity(const Sparsity& sp);
 
     /** \brief Get the index of an existing sparsity pattern */
-    int getSparsity(const Sparsity& sp) const;
+    int get_sparsity(const Sparsity& sp) const;
 
     /** \brief Get or add a constant */
     int getConstant(const std::vector<double>& v, bool allow_adding=false);
@@ -147,10 +147,12 @@ namespace casadi {
     std::string workel(int n) const;
 
     /** \brief  Print int vector to a c file */
-    static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
+    static void print_vector(std::ostream &s, const std::string& name,
+                             const std::vector<int>& v);
 
     /** \brief  Print real vector to a c file */
-    static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
+    static void print_vector(std::ostream &s, const std::string& name,
+                             const std::vector<double>& v);
 
     /** \brief Create a copy operation */
     std::string copy(const std::string& arg, std::size_t n, const std::string& res);

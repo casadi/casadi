@@ -200,3 +200,30 @@
 <tr><td>HESSLAG_LAM_G</td><td></td><td>Multiplier for g.</td></tr>
 </table>
 */
+/// \cond INTERNAL
+/** \class casadi::CvodesInterface
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::IdasInterface
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::SundialsInterface
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond

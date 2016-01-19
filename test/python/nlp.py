@@ -23,7 +23,7 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import unittest
 from types import *
 from helpers import *
@@ -137,10 +137,10 @@ class NLPtests(casadiTestCase):
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
-      solver_in["lbx"]=[-Inf]
-      solver_in["ubx"]=[Inf]
-      solver_in["lbg"]=[-Inf]
-      solver_in["ubg"]=[Inf]
+      solver_in["lbx"]=[-inf]
+      solver_in["ubx"]=[inf]
+      solver_in["lbg"]=[-inf]
+      solver_in["ubg"]=[inf]
 
       if Solver in ("worhp","knitro"):
         with self.assertRaises(Exception):

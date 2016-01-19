@@ -75,7 +75,7 @@ def dependencyGraph(s,dep = {},invdep = {}):
       if not(is_leaf(s)):
         addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
     else:
-      addDependencies(s,list(s),dep = dep,invdep = invdep)
+      addDependencies(s,s.nonzeros(),dep = dep,invdep = invdep)
   elif isinstance(s,MX):
     addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
   return (dep,invdep)

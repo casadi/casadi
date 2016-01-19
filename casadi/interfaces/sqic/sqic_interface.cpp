@@ -85,7 +85,7 @@ namespace casadi {
     formatA_.setInput(input(QPSOL_G), 1);
     formatA_.evaluate();
 
-    sqicSolve(&output(QPSOL_COST).data()[0]);
+    sqicSolve(&output(QPSOL_COST).nonzeros()[0]);
 
     std::copy(x_.begin(), x_.begin()+n_, output(QPSOL_X)->begin());
     std::transform(rc_.begin(), rc_.begin()+n_, output(QPSOL_LAM_X)->begin(),
@@ -151,9 +151,9 @@ namespace casadi {
 
     std::fill(hEtype_.begin()+n_, hEtype_.end(), 3);
 
-    sqic(&m , &n, &nnzA, &indA_[0], &locA_[0], &formatA_.output().data()[0], &bl_[0], &bu_[0],
+    sqic(&m , &n, &nnzA, &indA_[0], &locA_[0], &formatA_.output().nonzeros()[0], &bl_[0], &bu_[0],
          &hEtype_[0], &hs_[0], &x_[0], &pi_[0], &rc_[0], &nnzH, &indH_[0], &locH_[0],
-         &input(QPSOL_H).data()[0]);
+         &input(QPSOL_H).nonzeros()[0]);
 
   }
 

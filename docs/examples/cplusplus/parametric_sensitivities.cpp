@@ -68,9 +68,6 @@ int main(){
   // Fix the parameters by additional equations
   g = vertcat(g,p);
   
-  // Infinity
-  double inf = numeric_limits<double>::infinity();
-  
   // Original parameter values
   vector<double> p_a = {5.00, 1.00};
   

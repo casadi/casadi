@@ -129,7 +129,7 @@ namespace casadi {
     bool __nonzero__() const;
 
     /** \brief Get an owning reference to the sparsity pattern */
-    Sparsity getSparsity() const { return sparsity();}
+    Sparsity get_sparsity() const { return sparsity();}
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)
         Erase rows and/or columns of a matrix */
@@ -174,10 +174,10 @@ namespace casadi {
     std::string name() const;
 
     /// Get the value (only for scalar constant nodes)
-    double getValue() const;
+    explicit operator double() const;
 
     /// Get the value (only for constant nodes)
-    Matrix<double> getMatrixValue() const;
+    explicit operator Matrix<double>() const;
 
     /// Check if symbolic
     bool is_symbolic() const;
@@ -371,7 +371,6 @@ namespace casadi {
     static MX mac(const MX& x, const MX& y, const MX& z);
     static MX reshape(const MX& x, int nrow, int ncol);
     static MX reshape(const MX& x, const Sparsity& sp);
-    static MX vecNZ(const MX& x);
     static MX kron(const MX& x, const MX& b);
     static MX repmat(const MX& x, int n, int m=1);
     ///@}
@@ -389,23 +388,23 @@ namespace casadi {
     static std::vector<MX> substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,
                                          const std::vector<MX> &vdef);
-    static void substituteInPlace(const std::vector<MX>& v,
+    static void substitute_inplace(const std::vector<MX>& v,
                                   std::vector<MX>& vdef,
                                   std::vector<MX>& ex, bool reverse);
     static MX solve(const MX& A, const MX& b, const std::string& lsolver="symbolicqr",
                     const Dict& dict = Dict());
     static MX pinv(const MX& A, const std::string& lsolver="symbolicqr",
                const Dict& dict = Dict());
-    static int countNodes(const MX& x);
+    static int n_nodes(const MX& x);
     static std::string print_operator(const MX& x, const std::vector<std::string>& args);
-    static void extractShared(std::vector<MX>& ex, std::vector<MX>& v,
+    static void shared(std::vector<MX>& ex, std::vector<MX>& v,
                               std::vector<MX>& vdef, const std::string& v_prefix,
                               const std::string& v_suffix);
     static MX if_else(const MX& cond, const MX& if_true,
                       const MX& if_false, bool short_circuit=true);
     static MX conditional(const MX& ind, const std::vector<MX> &x, const MX& x_default,
                           bool short_circuit=true);
-    static bool dependsOn(const MX& x, const MX& arg);
+    static bool depends_on(const MX& x, const MX& arg);
     static MX logic_not(const MX& x);
     static MX simplify(const MX& x);
     static MX mpower(const MX& a, const MX& b);

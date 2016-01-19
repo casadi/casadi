@@ -26,7 +26,7 @@
 #ifndef CASADI_LAPACK_LU_HPP
 #define CASADI_LAPACK_LU_HPP
 
-#include "casadi/core/function/linsol.hpp"
+#include "casadi/core/function/linsol_impl.hpp"
 #include <casadi/interfaces/lapack/casadi_linsol_lapacklu_export.h>
 
 namespace casadi {

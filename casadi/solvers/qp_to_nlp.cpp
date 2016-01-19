@@ -24,6 +24,7 @@
 
 
 #include "qp_to_nlp.hpp"
+#include "casadi/core/function/nlpsol.hpp"
 
 using namespace std;
 namespace casadi {
@@ -51,7 +52,7 @@ namespace casadi {
   }
 
   Options QpToNlp::options_
-  = {{&FunctionInternal::options_},
+  = {{&Qpsol::options_},
      {{"nlpsol",
        {OT_STRING,
         "Name of solver."}},
@@ -88,9 +89,9 @@ namespace casadi {
 
     // Put parameters in a vector
     std::vector<SX> par;
-    par.push_back(H.data());
-    par.push_back(G.data());
-    par.push_back(A.data());
+    par.push_back(H.nonzeros());
+    par.push_back(G.nonzeros());
+    par.push_back(A.nonzeros());
 
     // The nlp looks exactly like a mathematical description of the NLP
     SXDict nlp = {{"x", X}, {"p", vertcat(par)},

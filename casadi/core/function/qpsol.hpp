@@ -26,82 +26,92 @@
 #ifndef CASADI_QPSOL_HPP
 #define CASADI_QPSOL_HPP
 
-#include "function_internal.hpp"
-#include "plugin_interface.hpp"
+#include "function.hpp"
 
-/// \cond INTERNAL
 namespace casadi {
-  /// Internal class
-  class CASADI_EXPORT Qpsol : public FunctionInternal, public PluginInterface<Qpsol> {
-  public:
 
-    // Constructor
-    Qpsol(const std::string& name, const std::map<std::string, Sparsity> &st);
+  /** \defgroup main_qpsol
+      Create a QP solver
+      Solves the following strictly convex problem:
 
-    // Destructor
-    virtual ~Qpsol() = 0;
+      \verbatim
+      min          1/2 x' H x + g' x
+      x
 
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return QPSOL_NUM_IN;}
-    virtual size_t get_n_out() const { return QPSOL_NUM_OUT;}
-    ///@}
+      subject to
+      LBA <= A x <= UBA
+      LBX <= x   <= UBX
 
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const;
-    virtual Sparsity get_sparsity_out(int ind) const;
-    /// @}
+      with :
+      H sparse (n x n) positive definite
+      g dense  (n x 1)
 
-    ///@{
-    /** \brief Names of function input and outputs */
-    virtual std::vector<std::string> get_ischeme() const { return qpsol_in();}
-    virtual std::vector<std::string> get_oscheme() const { return qpsol_out();}
-    /// @}
+      n: number of decision variables (x)
+      nc: number of constraints (A)
 
-    // Initialize
-    virtual void init(const Dict& opts);
+      \endverbatim
 
-    /// \brief Check if the numerical values of the supplied bounds make sense
-    virtual void checkInputs(const double* lbx, const double* ubx,
-                             const double* lba, const double* uba) const;
+      If H is not positive-definite, the solver should throw an error.
 
-    /** Generate native code in the interfaced language for debugging */
-    virtual void generateNativeCode(std::ostream& file) const;
+      \endverbatim
 
-    // Creator function for internal class
-    typedef Qpsol* (*Creator)(const std::string& name,
-                              const std::map<std::string, Sparsity>& st);
+      \generalsection{Qpsol}
+      \pluginssection{Qpsol}
 
-    // No static functions exposed
-    struct Exposed{ };
+      \author Joel Andersson
+      \date 2011-2015
+  */
 
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
+  /** \defgroup qpsol
+  * @copydoc main_qpsol
+  *  @{
+  */
 
-    /// Infix
-    static const std::string infix_;
+  /** \if EXPANDED
+  * @copydoc main_qpsol
+  * \endif
+  */
+  ///@{
+  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+                               const SpDict& qp, const Dict& opts=Dict());
+  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+                               const SXDict& qp, const Dict& opts=Dict());
+  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+                               const MXDict& qp, const Dict& opts=Dict());
+#ifndef SWIG
+  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+                               const XProblem& qp, const Dict& opts=Dict());
+#endif // SWIG
+  ///@}
 
-    /// Short name
-    static std::string shortname() { return "qpsol";}
+  /** \brief Get input scheme of QP solvers */
+  CASADI_EXPORT std::vector<std::string> qpsol_in();
 
-    /** \brief Get default input value */
-    virtual double default_in(int ind) const;
+  /** \brief Get QP solver output scheme of QP solvers */
+  CASADI_EXPORT std::vector<std::string> qpsol_out();
 
-  protected:
+  /** \brief Get QP solver input scheme name by index */
+  CASADI_EXPORT std::string qpsol_in(int ind);
 
-    /// Problem structure
-    Sparsity H_, A_;
+  /** \brief Get output scheme name by index */
+  CASADI_EXPORT std::string qpsol_out(int ind);
 
-    /// Number of decision variables
-    int n_;
+  /** \brief Get the number of QP solver inputs */
+  CASADI_EXPORT int qpsol_n_in();
 
-    /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc_;
-  };
+  /** \brief Get the number of QP solver outputs */
+  CASADI_EXPORT int qpsol_n_out();
 
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_qpsol(const std::string& name);
 
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_qpsol(const std::string& name);
+
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_qpsol(const std::string& name);
+
+  /** @} */
 } // namespace casadi
-/// \endcond
-#endif // CASADI_QPSOL_HPP
 
+#endif // CASADI_QPSOL_HPP

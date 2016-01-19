@@ -214,7 +214,7 @@ namespace casadi {
     // populate A_data_ (the nonzeros of A)
     // with numbers pulled from jacG and gradF
     for (int k = 0; k < A_structure_.nnz(); ++k) {
-      int i = A_structure_.data()[k];
+      int i = A_structure_.nonzeros()[k];
       if (i == 0) {
         m.A_data[k] = 0;
       } else if (i > 0) {
@@ -393,7 +393,7 @@ namespace casadi {
         for (int j = 0; j < nnJac; ++j) {
           for (int k = A_structure_.colind(j); k < A_structure_.sparsity().colind(j+1); ++k) {
             if (A_structure_.row(k) >= nnCon) break;
-            int i = A_structure_.data()[k];
+            int i = A_structure_.nonzeros()[k];
             if (i > 0) {
               gCon[kk++] = m.jac_gk[i-1];
             }

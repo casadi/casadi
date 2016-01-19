@@ -104,10 +104,10 @@ namespace casadi {
     explicit Matrix(const std::pair<int, int>& rc);
 
     /** \brief  Access functions of the node */
-    std::vector<Scalar>* operator->() { return &data_;}
+    std::vector<Scalar>* operator->() { return &nonzeros_;}
 
     /** \brief  Const access functions of the node */
-    const std::vector<Scalar>* operator->() const { return &data_;}
+    const std::vector<Scalar>* operator->() const { return &nonzeros_;}
 #endif // SWIG
 
     /** \brief Create a sparse matrix from a sparsity pattern.
@@ -134,17 +134,17 @@ namespace casadi {
      *  Assumes that the scalar conversion is valid.
      */
     template<typename A>
-    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<Scalar>(x.nnz())) {
+    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), nonzeros_(std::vector<Scalar>(x.nnz())) {
       auto x_it = x->begin();
-      for (auto&& d : data_) d = static_cast<Scalar>(*x_it++);
+      for (auto&& d : nonzeros_) d = static_cast<Scalar>(*x_it++);
     }
 
     /** \brief  Create an expression from a vector  */
     template<typename A>
     Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
-      data_(std::vector<Scalar>(x.size())) {
+      nonzeros_(std::vector<Scalar>(x.size())) {
         auto x_it = x.begin();
-        for (auto&& d : data_) d = static_cast<Scalar>(*x_it++);
+        for (auto&& d : nonzeros_) d = static_cast<Scalar>(*x_it++);
     }
 
 #ifndef SWIG
@@ -284,7 +284,7 @@ namespace casadi {
       substitute(const std::vector<Matrix<Scalar> >& ex,
                  const std::vector<Matrix<Scalar> >& v,
                  const std::vector<Matrix<Scalar> >& vdef);
-    static void substituteInPlace(const std::vector<Matrix<Scalar> >& v,
+    static void substitute_inplace(const std::vector<Matrix<Scalar> >& v,
                                   std::vector<Matrix<Scalar> >& vdef,
                                   std::vector<Matrix<Scalar> >& ex,
                                   bool revers);
@@ -294,10 +294,10 @@ namespace casadi {
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b,
                                   const std::string& lsolver, const Dict& opts);
-    static int countNodes(const Matrix<Scalar> &x);
+    static int n_nodes(const Matrix<Scalar> &x);
     static std::string print_operator(const Matrix<Scalar> &x,
                                       const std::vector<std::string>& args);
-    static void extractShared(std::vector<Matrix<Scalar> >& ex,
+    static void shared(std::vector<Matrix<Scalar> >& ex,
                               std::vector<Matrix<Scalar> >& v,
                               std::vector<Matrix<Scalar> >& vdef,
                               const std::string& v_prefix,
@@ -317,7 +317,7 @@ namespace casadi {
                                         const std::vector<Matrix<Scalar> > &x,
                                         const Matrix<Scalar> &x_default,
                                         bool short_circuit);
-    static bool dependsOn(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
+    static bool depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
     static Matrix<Scalar> mpower(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mrdivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mldivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
@@ -359,7 +359,6 @@ namespace casadi {
                 const std::vector<int>& offset2);
     static Matrix<Scalar> reshape(const Matrix<Scalar> &x, int nrow, int ncol);
     static Matrix<Scalar> reshape(const Matrix<Scalar> &x, const Sparsity& sp);
-    static Matrix<Scalar> vecNZ(const Matrix<Scalar> &x);
     static Matrix<Scalar> kron(const Matrix<Scalar> &x, const Matrix<Scalar>& y);
     static Matrix<Scalar> mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mac(const Matrix<Scalar> &x,
@@ -750,29 +749,29 @@ namespace casadi {
     ///@}
 
     /// Get name of the class
-    static std::string className();
+    static std::string type_name();
 
     /// Print a description of the object
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Get strings corresponding to the nonzeros and the interdependencies
-    void printSplit(std::vector<std::string>& SWIG_OUTPUT(nz),
+    void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
     /// Print a representation of the object
     void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print scalar
-    void printScalar(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_scalar(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print vector-style
-    void printVector(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_vector(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print dense matrix-stype
-    void printDense(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_dense(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Print sparse matrix style
-    void printSparse(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_sparse(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     void clear();
     void resize(int nrow, int ncol);
@@ -800,14 +799,14 @@ namespace casadi {
 #ifndef SWIG
     ///@{
     /// Access the non-zero elements
-    std::vector<Scalar>& data() { return data_;}
-    const std::vector<Scalar>& data() const { return data_;}
+    std::vector<Scalar>& nonzeros() { return nonzeros_;}
+    const std::vector<Scalar>& nonzeros() const { return nonzeros_;}
     ///@}
 
     ///@{
     /// Get a pointer to the data
-    Scalar* ptr() { return data_.empty() ? 0 : &data_.front(); }
-    const Scalar* ptr() const { return data_.empty() ? 0 : &data_.front(); }
+    Scalar* ptr() { return nonzeros_.empty() ? 0 : &nonzeros_.front(); }
+    const Scalar* ptr() const { return nonzeros_.empty() ? 0 : &nonzeros_.front(); }
     friend inline Scalar* get_ptr(Matrix<Scalar>& v) { return v.ptr(); }
     friend inline const Scalar* get_ptr(const Matrix<Scalar>& v) { return v.ptr(); }
     ///@}
@@ -818,7 +817,7 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Get an owning reference to the sparsity pattern */
-    Sparsity getSparsity() const { return sparsity();}
+    Sparsity get_sparsity() const { return sparsity();}
 
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
@@ -919,36 +918,25 @@ namespace casadi {
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;
 
-    /** \brief Get double value (only if constant) */
-    double getValue() const;
-
-    /** \brief Get double value (particular nonzero) */
-    double getValue(int k) const;
-
-    /** \brief Set double value (only if constant) */
-    void setValue(double m);
-
-    /** \brief Set double value (particular nonzero) */
-    void setValue(double m, int k);
-
-    /** \brief Get double value (only if integer constant) */
-    int getIntValue() const;
-
     /** \brief Get all nonzeros */
-    std::vector<double> nonzeros() const;
-
-    /** \brief Get all nonzeros */
-    std::vector<int> nonzeros_int() const;
+    std::vector<Scalar> get_nonzeros() const { return nonzeros_;}
 
 #ifndef SWIG
+    /** \brief Get all nonzeros */
+    template<typename A>
+    std::vector<A> get_nonzeros() const;
+#endif // SWIG
+
     /** \brief Type conversion to double */
     explicit operator double() const;
 
-    /** \brief Type conversion to double vector */
-    explicit operator std::vector<double>() const;
-
     /** \brief Type conversion to int */
     explicit operator int() const;
+
+#ifndef SWIG
+    /** \brief Type conversion to a vector */
+    template<typename A>
+    explicit operator std::vector<A>() const;
 #endif // SWIG
 
     /** \brief Get name (only if symbolic scalar) */
@@ -984,7 +972,7 @@ namespace casadi {
     Sparsity sparsity_;
 
     /// Nonzero elements
-    std::vector<Scalar> data_;
+    std::vector<Scalar> nonzeros_;
 
     /// Precision used in streams
     static int stream_precision_;

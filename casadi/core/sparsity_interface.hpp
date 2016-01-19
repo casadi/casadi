@@ -421,12 +421,6 @@ namespace casadi {
       return MatType::vec(x);
     }
 
-    /** \brief Returns a flattened version of the matrix, preserving only nonzeros
-     */
-    inline friend MatType vecNZ(const MatType& x) {
-      return MatType::vecNZ(x);
-    }
-
     /** \brief Returns a reshaped version of the matrix
      */
     inline friend MatType reshape(const MatType& x, int nrow, int ncol) {

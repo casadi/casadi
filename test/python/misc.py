@@ -24,7 +24,7 @@
 from casadi import *
 from casadi.tools import capture_stdout
 import casadi as c
-from numpy import *
+import numpy
 import unittest
 from types import *
 from helpers import *
@@ -290,9 +290,9 @@ class Misctests(casadiTestCase):
     F = Function('F', [x, p], [x+p, x**2], ['x', 'p'], ['f', 'g'])
     
     fc = F({'x':3,'p':4})
-    [f] = fc['f']
+    f = fc['f']
     self.checkarray(f,DM([7]))
-    [g] = fc['g']
+    g = fc['g']
     self.checkarray(g,DM([9]))
     [f,g] = itemgetter('f','g')(fc)
     self.checkarray(f,DM([7]))
@@ -329,7 +329,7 @@ class Misctests(casadiTestCase):
   @requiresPlugin(nlpsol,"ipopt")
   def test_output(self):
     with capture_stdout() as result:
-      DM([1,2]).printDense()
+      DM([1,2]).print_dense()
 
     assert "2" in result[0]
 

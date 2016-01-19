@@ -64,5 +64,8 @@ class CASADI_EXPORT casadi_limits {
     static const T minus_one;
 };
 
+template<class T>
+inline bool is_zero(const T& x) { return casadi_limits<T>::is_zero(x);}
+
 } // namespace casadi
 #endif // CASADI_CASADI_LIMITS_HPP

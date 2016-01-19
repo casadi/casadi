@@ -2841,6 +2841,13 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_reshape(int nrow, int ncol) const {
+    // If a dimension is negative, call recursively
+    if (nrow<0 && ncol>0) {
+      return _reshape(numel()/ncol, ncol);
+    } else if (nrow>0 && ncol<0) {
+      return _reshape(nrow, numel()/nrow);
+    }
+
     casadi_assert_message(numel() == nrow*ncol,
                           "reshape: number of elements must remain the same. Old shape is "
                           << dim() << ". New shape is " << nrow << "x" << ncol

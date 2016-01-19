@@ -48,7 +48,7 @@ public:
 virtual ~ConstantSX() {}
 
 /** \brief  Get the value must be defined */
-virtual double getValue() const = 0;
+virtual double to_double() const = 0;
 
 /** \brief  Properties */
 virtual bool is_constant() const { return true; }
@@ -59,7 +59,7 @@ virtual int op() const { return OP_CONST;}
 /** \brief Check if two nodes are equivalent up to a given depth */
 virtual bool is_equal(const SXNode* node, int depth) const {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
-  return n && n->getValue()==getValue();
+  return n && n->to_double()==to_double();
 }
 
 protected:
@@ -67,7 +67,7 @@ protected:
 /** \brief  Print expression */
  virtual std::string print(const std::string& arg1, const std::string& arg2) const {
    std::stringstream ss;
-   ss << getValue();
+   ss << to_double();
    return ss.str();
  }
 
@@ -115,8 +115,8 @@ class CASADI_EXPORT RealtypeSX : public ConstantSX {
 
     ///@{
     /** \brief  Get the value */
-    virtual double getValue() const { return value;}
-    virtual int getIntValue() const { return static_cast<int>(value);}
+    virtual double to_double() const { return value;}
+    virtual int to_int() const { return static_cast<int>(value);}
     ///@}
 
     virtual bool isAlmostZero(double tol) const { return fabs(value)<=tol; }
@@ -171,8 +171,8 @@ class CASADI_EXPORT IntegerSX : public ConstantSX {
 
     ///@{
     /** \brief  evaluate function */
-    virtual double getValue() const {  return value; }
-    virtual int getIntValue() const {  return value; }
+    virtual double to_double() const {  return value; }
+    virtual int to_int() const {  return value; }
     ///@}
 
     /** \brief  Properties */
@@ -200,8 +200,8 @@ public:
 
   ///@{
   /** \brief  Get the value */
-  virtual double getValue() const { return 0;}
-  virtual int getIntValue() const { return 0;}
+  virtual double to_double() const { return 0;}
+  virtual int to_int() const { return 0;}
   ///@}
 
   ///@{
@@ -224,8 +224,8 @@ public:
   virtual ~OneSX() {}
 
   /** \brief  Get the value */
-  virtual double getValue() const { return 1;}
-  virtual int getIntValue() const { return 1;}
+  virtual double to_double() const { return 1;}
+  virtual int to_int() const { return 1;}
 
   /** \brief  Properties */
   virtual bool is_integer() const { return true; }
@@ -246,8 +246,8 @@ public:
 
   ///@{
   /** \brief  Get the value */
-  virtual double getValue() const { return -1;}
-  virtual int getIntValue() const { return -1;}
+  virtual double to_double() const { return -1;}
+  virtual int to_int() const { return -1;}
   ///@}
 
   ///@{
@@ -270,7 +270,7 @@ public:
   virtual ~InfSX() {}
 
   /** \brief  Get the value */
-  virtual double getValue() const { return std::numeric_limits<double>::infinity();}
+  virtual double to_double() const { return std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
   virtual bool isInf() const { return true; }
@@ -289,7 +289,7 @@ public:
   virtual ~MinusInfSX() {}
 
   /** \brief  Get the value */
-  virtual double getValue() const { return -std::numeric_limits<double>::infinity();}
+  virtual double to_double() const { return -std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
   virtual bool isMinusInf() const { return true; }
@@ -308,7 +308,7 @@ public:
   virtual ~NanSX() {this->count--;}
 
   /** \brief  Get the value */
-  virtual double getValue() const { return std::numeric_limits<double>::quiet_NaN();}
+  virtual double to_double() const { return std::numeric_limits<double>::quiet_NaN();}
 
   /** \brief  Properties */
   virtual bool isNan() const { return true; }

@@ -31,6 +31,7 @@
 #include "norm.hpp"
 #include "../calculus.hpp"
 #include "../function/mx_function.hpp"
+#include "../function/linsol.hpp"
 
 using namespace std;
 namespace casadi {
@@ -71,7 +72,7 @@ namespace casadi {
       // Dense matrix if val dense
       if (val.is_dense()) {
         if (val.is_constant()) {
-          assignNode(ConstantMX::create(sp, val.getValue()));
+          assignNode(ConstantMX::create(sp, static_cast<double>(val)));
         } else {
           *this = val->getGetNonzeros(sp, std::vector<int>(sp.nnz(), 0));
         }
@@ -148,7 +149,7 @@ namespace casadi {
 
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
-    Sparsity sp = sparsity().sub(rr.data(), cc.data(), mapping, ind1);
+    Sparsity sp = sparsity().sub(rr.nonzeros(), cc.nonzeros(), mapping, ind1);
 
     // Create return MX
     m = (*this)->getGetNonzeros(sp, mapping);
@@ -170,7 +171,7 @@ namespace casadi {
 
     // Get the sparsity pattern - does bounds checking
     std::vector<int> mapping;
-    Sparsity sp = sparsity().sub(rr.data(), tr ? rr.sparsity().T() : rr.sparsity(),
+    Sparsity sp = sparsity().sub(rr.nonzeros(), tr ? rr.sparsity().T() : rr.sparsity(),
                                  mapping, ind1);
 
     // Create return MX
@@ -237,13 +238,13 @@ namespace casadi {
     int sz1 = size1(), sz2 = size2();
 
     // Report out-of-bounds
-    if (!inBounds(rr.data(), -sz1+ind1, sz1+ind1)) {
+    if (!inBounds(rr.nonzeros(), -sz1+ind1, sz1+ind1)) {
       casadi_error("set[., rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr->begin(), rr->end()) << " up to "
                    << *std::max_element(rr->begin(), rr->end())
                    << ", which is outside the range [" << -sz1+ind1 << ","<< sz1+ind1 <<  ").");
     }
-    if (!inBounds(cc.data(), -sz2+ind1, sz2+ind1)) {
+    if (!inBounds(cc.nonzeros(), -sz2+ind1, sz2+ind1)) {
       casadi_error("set [., rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc->begin(), cc->end()) << " up to "
                    << *std::max_element(cc->begin(), cc->end())
@@ -252,7 +253,7 @@ namespace casadi {
 
     // If we are assigning with something sparse, first remove existing entries
     if (!m.is_dense()) {
-      erase(rr.data(), cc.data(), ind1);
+      erase(rr.nonzeros(), cc.nonzeros(), ind1);
     }
 
     // Collect all assignments
@@ -280,7 +281,7 @@ namespace casadi {
     if (rr.sparsity() != m.sparsity()) {
       if (rr.size() == m.size()) {
         // Remove submatrix to be replaced
-        erase(rr.data(), ind1);
+        erase(rr.nonzeros(), ind1);
 
         // Find the intersection between rr's and m's sparsity patterns
         Sparsity sp = rr.sparsity() * m.sparsity();
@@ -312,7 +313,7 @@ namespace casadi {
     if (rrsz==0) return;
 
     // Check bounds
-    if (!inBounds(rr.data(), -nel+ind1, nel+ind1)) {
+    if (!inBounds(rr.nonzeros(), -nel+ind1, nel+ind1)) {
       casadi_error("set[rr] out of bounds. Your rr contains "
                    << *std::min_element(rr->begin(), rr->end()) << " up to "
                    << *std::max_element(rr->begin(), rr->end())
@@ -325,7 +326,7 @@ namespace casadi {
     }
 
     // Construct new sparsity pattern
-    std::vector<int> new_row=sparsity().get_row(), new_col=sparsity().get_col(), nz(rr.data());
+    std::vector<int> new_row=sparsity().get_row(), new_col=sparsity().get_col(), nz(rr.nonzeros());
     new_row.reserve(sz+rrsz);
     new_col.reserve(sz+rrsz);
     nz.reserve(rrsz);
@@ -377,7 +378,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
+    if (!inBounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
       casadi_error("get_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
@@ -387,7 +388,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
       Matrix<int> kk_mod = kk;
-      for (auto&& i : kk_mod.data()) {
+      for (auto&& i : kk_mod.nonzeros()) {
         casadi_assert_message(!(ind1 && i<=0), "Matlab is 1-based, but requested index " <<
                               i <<  ". Note that negative slices are" <<
                               " disabled in the Matlab interface. " <<
@@ -400,7 +401,7 @@ namespace casadi {
     }
 
     // Return reference to the nonzeros
-    m = (*this)->getGetNonzeros(tr ? kk.sparsity().T() : kk.sparsity(), kk.data());
+    m = (*this)->getGetNonzeros(tr ? kk.sparsity().T() : kk.sparsity(), kk.nonzeros());
   }
 
   void MX::set_nz(const MX& m, bool ind1, const Slice& kk) {
@@ -441,7 +442,7 @@ namespace casadi {
 
     // Check bounds
     int sz = nnz();
-    if (!inBounds(kk.data(), -sz+ind1, sz+ind1)) {
+    if (!inBounds(kk.nonzeros(), -sz+ind1, sz+ind1)) {
       casadi_error("set_nz[kk] out of bounds. Your kk contains "
                    << *std::min_element(kk->begin(), kk->end()) << " up to "
                    << *std::max_element(kk->begin(), kk->end())
@@ -454,7 +455,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
       Matrix<int> kk_mod = kk;
-      for (auto&& i : kk_mod.data()) {
+      for (auto&& i : kk_mod.nonzeros()) {
         casadi_assert_message(!(ind1 && i<=0), "Matlab is 1-based, but requested index " <<
                               i <<  ". Note that negative slices are" <<
                               " disabled in the Matlab interface. " <<
@@ -466,7 +467,7 @@ namespace casadi {
     }
 
     // Create a nonzero assignment node
-    *this = simplify(m->getSetNonzeros(*this, kk.data()));
+    *this = simplify(m->getSetNonzeros(*this, kk.nonzeros()));
   }
 
   MX MX::binary(int op, const MX &x, const MX &y) {
@@ -659,11 +660,11 @@ namespace casadi {
   int MX::numFunctions() const { return (*this)->numFunctions(); }
   Function MX::getFunction (int i) {  return (*this)->getFunction(i); }
 
-  double MX::getValue() const {
-    return (*this)->getValue();
+  MX::operator double() const {
+    return (*this)->to_double();
   }
 
-  Matrix<double> MX::getMatrixValue() const {
+  MX::operator Matrix<double>() const {
     return (*this)->getMatrixValue();
   }
 
@@ -813,7 +814,7 @@ namespace casadi {
 
   bool MX::is_regular() const {
     if (is_constant()) {
-      return getMatrixValue().is_regular();
+      return static_cast<DM>(*this).is_regular();
     } else {
       casadi_error("Cannot check regularity for symbolic MX");
     }
@@ -1046,22 +1047,19 @@ namespace casadi {
   }
 
   MX MX::reshape(const MX& x, int nrow, int ncol) {
-    if (nrow==x.size1() && ncol==x.size2())
-      return x;
-    else
-      return reshape(x, Sparsity::reshape(x.sparsity(), nrow, ncol));
+    // Quick return if trivial
+    if (nrow==x.size1() && ncol==x.size2()) return x;
+
+    // Reshape the sparsity pattern
+    return reshape(x, Sparsity::reshape(x.sparsity(), nrow, ncol));
   }
 
   MX MX::reshape(const MX& x, const Sparsity& sp) {
-    return x->getReshape(sp);
-  }
+    // Quick return if trivial
+    if (sp==x.sparsity()) return x;
 
-  MX MX::vecNZ(const MX& x) {
-    if (x.is_dense()) {
-      return vec(x);
-    } else {
-      return x->getGetNonzeros(Sparsity::dense(x.nnz(), 1), range(x.nnz()));
-    }
+    // Call internal method
+    return x->getReshape(sp);
   }
 
   MX MX::if_else(const MX &cond, const MX &x_true, const MX &x_false, bool short_circuit) {
@@ -1166,9 +1164,9 @@ namespace casadi {
     return x->getGetNonzeros(sp, mapping);
   }
 
-  int MX::countNodes(const MX& x) {
+  int MX::n_nodes(const MX& x) {
     Function f("tmp", vector<MX>{}, {x});
-    return f.countNodes();
+    return f.n_nodes();
   }
 
   MX MX::sumCols(const MX& x) {
@@ -1193,7 +1191,7 @@ namespace casadi {
     return x->print(args);
   }
 
-  void MX::substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
+  void MX::substitute_inplace(const std::vector<MX>& v, std::vector<MX>& vdef,
                              std::vector<MX>& ex, bool reverse) {
     casadi_assert_message(v.size()==vdef.size(),
                           "Mismatch in the number of expression to substitute.");
@@ -1398,7 +1396,7 @@ namespace casadi {
 
   }
 
-  void MX::extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
+  void MX::shared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
                          const std::string& v_prefix, const std::string& v_suffix) {
 
     // Sort the expression
@@ -1618,7 +1616,13 @@ namespace casadi {
   }
 
   MX MX::repmat(const MX& x, int n, int m) {
-    return x->getRepmat(n, m);
+    if (n==0 || m==0) {
+      return MX();
+    } else if (n==1 && m==1) {
+      return x;
+    } else {
+      return x->getRepmat(n, m);
+    }
   }
 
   MX MX::repsum(const MX& x, int n, int m) {
@@ -1644,7 +1648,7 @@ namespace casadi {
     return f(A).at(0);
   }
 
-  bool MX::dependsOn(const MX &x, const MX &arg) {
+  bool MX::depends_on(const MX &x, const MX &arg) {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm

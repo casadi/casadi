@@ -57,7 +57,7 @@ namespace casadi {
   }
 
   Options CplexInterface::options_
-  = {{&FunctionInternal::options_},
+  = {{&Qpsol::options_},
      {{"qp_method",
        {OT_INT,
         "Determines which CPLEX algorithm to use."}},

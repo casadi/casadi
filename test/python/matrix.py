@@ -23,7 +23,8 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
+from numpy import eye, linalg, arange, matrix
 import unittest
 from types import *
 from helpers import *
@@ -48,25 +49,7 @@ class Matrixtests(casadiTestCase):
     self.message("Matrix inverse")
     a = DM([[1,2],[1,3]])
     self.checkarray(mtimes(c.inv(a),a),eye(2),"DM inverse")
-
-  def test_iter(self):
-    self.message("iterator")
-    L = []
-    for i in DM([5,6,7,8]):
-      L.append(i)
-    self.assertEquals(L[0],5)
-    self.assertEquals(L[1],6)
-    self.assertEquals(L[2],7)
-    self.assertEquals(L[3],8)
-    
-  def test_tuple_unpacking(self):
-    self.message("tuple unpacking")
-    (a,b,c,d) = DM([5,6,7,8])
-    self.assertEquals(a,5)
-    self.assertEquals(b,6)
-    self.assertEquals(c,7)
-    self.assertEquals(d,8)
-    
+        
   def test_trans(self):
     self.message("trans")
     a = DM(0,1)
@@ -556,19 +539,6 @@ class Matrixtests(casadiTestCase):
           self.checkarray(c==A,m([[0,0],[0,0]]),"==")
           self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
 
-  def test_all_any(self):
-    for m in [DM,IM]:
-      A = m([[1,1],[1,1]])
-      self.assertTrue(all(A))
-      self.assertTrue(any(A))
-      
-      A = m([[1,0],[1,1]])
-      self.assertFalse(all(A))
-      self.assertTrue(any(A))
-
-      A = m([[0,0],[0,0]])
-      self.assertFalse(all(A))
-      self.assertFalse(any(A))
   def test_truth(self):
     self.assertTrue(bool(DM([1])))
     self.assertFalse(bool(DM([0])))
@@ -705,7 +675,7 @@ class Matrixtests(casadiTestCase):
     
   def test_is_regular(self):
     self.assertTrue(DM([1,2]).is_regular())
-    self.assertFalse(DM([1,Inf]).is_regular())
+    self.assertFalse(DM([1,inf]).is_regular())
     self.assertFalse(DM.nan(2).is_regular())
     
   def test_sizes(self):
@@ -884,16 +854,16 @@ class Matrixtests(casadiTestCase):
 
         try:
           self.checkarray(c,c_ref)
-          self.assertTrue(min(IM.ones(c_ref.sparsity())-IM.ones(c.sparsity()))==0)
+          self.assertTrue(min((IM.ones(c_ref.sparsity())-IM.ones(c.sparsity())).nonzeros())==0)
         except Exception as e:
-          c.printDense()
+          c.print_dense()
           print "sol:"
           c.sparsity().spy()
           print "ref:"
           c_ref.sparsity().spy()
-          c_ref.printDense()
+          c_ref.print_dense()
           a.sparsity().sanity_check()
-          a.printDense()
+          a.print_dense()
           raise e
           
   def test_kron(self):

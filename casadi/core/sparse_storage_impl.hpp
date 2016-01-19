@@ -36,13 +36,13 @@ namespace casadi {
     int oldsize = sparsity().nnz();
     int ind = sparsityRef().add_nz(rr, cc);
     if (oldsize != sparsity().nnz())
-      data().insert(data().begin()+ind, DataType(0));
-    return data().at(ind);
+      nonzeros().insert(nonzeros().begin()+ind, DataType(0));
+    return nonzeros().at(ind);
   }
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const DataType& val) :
-    sparsity_(sparsity), data_(sparsity.nnz(), val) {}
+    sparsity_(sparsity), nonzeros_(sparsity.nnz(), val) {}
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage() : sparsity_(Sparsity(0, 0)) {
@@ -50,12 +50,12 @@ namespace casadi {
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage(const SparseStorage<DataType>& m) :
-    sparsity_(m.sparsity_), data_(m.data_) {}
+    sparsity_(m.sparsity_), nonzeros_(m.nonzeros_) {}
 
   template<typename DataType>
   SparseStorage<DataType>& SparseStorage<DataType>::operator=(const SparseStorage<DataType>& m) {
     sparsity_ = m.sparsity_;
-    data_ = m.data_;
+    nonzeros_ = m.nonzeros_;
     return *this;
   }
 
@@ -66,7 +66,7 @@ namespace casadi {
 
   template<typename DataType>
   void SparseStorage<DataType>::reserve(int nnz, int ncol) {
-    data().reserve(nnz);
+    nonzeros().reserve(nnz);
   }
 
   template<typename DataType>
@@ -77,17 +77,17 @@ namespace casadi {
   template<typename DataType>
   void SparseStorage<DataType>::clear() {
     sparsity_ = Sparsity(0, 0);
-    data().clear();
+    nonzeros().clear();
   }
 
   template<typename DataType>
-  std::vector<DataType>& SparseStorage<DataType>::data() {
-    return data_;
+  std::vector<DataType>& SparseStorage<DataType>::nonzeros() {
+    return nonzeros_;
   }
 
   template<typename DataType>
-  const std::vector<DataType>& SparseStorage<DataType>::data() const {
-    return data_;
+  const std::vector<DataType>& SparseStorage<DataType>::nonzeros() const {
+    return nonzeros_;
   }
 
   template<typename DataType>

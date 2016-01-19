@@ -288,7 +288,7 @@ namespace casadi {
     }
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const;
+    virtual double to_double() const;
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const;
