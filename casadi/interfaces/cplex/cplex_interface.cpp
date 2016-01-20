@@ -58,7 +58,10 @@ namespace casadi {
 
   Options CplexInterface::options_
   = {{&Qpsol::options_},
-     {{"qp_method",
+     {{"cplex",
+       {OT_DICT,
+        "Options to be passed to CPLEX"}},
+      {"qp_method",
        {OT_INT,
         "Determines which CPLEX algorithm to use."}},
       {"dump_to_file",
@@ -73,18 +76,9 @@ namespace casadi {
       {"dep_check",
        {OT_INT,
         "Detect redundant constraints."}},
-      {"simplex_maxiter",
-       {OT_INT,
-        "Maximum number of simplex iterations."}},
-      {"barrier_maxiter",
-       {OT_INT,
-        "Maximum number of barrier iterations."}},
       {"warm_start",
        {OT_BOOL,
-        "Use warm start with simplex methods (affects only the simplex methods)."}},
-      {"convex",
-       {OT_BOOL,
-        "Indicates if the QP is convex or not (affects only the barrier method)."}}
+        "Use warm start with simplex methods (affects only the simplex methods)."}}
      }
   };
 
@@ -98,14 +92,14 @@ namespace casadi {
     dump_filename_ = "qp.dat";
     tol_ = 1e-6;
     dep_check_ = 0;
-    simplex_maxiter_ = 2100000000;
-    barrier_maxiter_ = 2100000000;
     warm_start_ = false;
     convex_ = true;
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="qp_method") {
+      if (op.first=="cplex") {
+        opts_ = op.second;
+      } else if (op.first=="qp_method") {
         qp_method_ = op.second;
       } else if (op.first=="dump_to_file") {
         dump_to_file_ = op.second;
@@ -115,10 +109,6 @@ namespace casadi {
         tol_ = op.second;
       } else if (op.first=="dep_check") {
         dep_check_ = op.second;
-      } else if (op.first=="simplex_maxiter") {
-        simplex_maxiter_ = op.second;
-      } else if (op.first=="barrier_maxiter") {
-        barrier_maxiter_ = op.second;
       } else if (op.first=="warm_start") {
         warm_start_ = op.second;
       } else if (op.first=="convex") {
@@ -142,56 +132,94 @@ namespace casadi {
   void CplexInterface::init_memory(Memory& mem) const {
     CplexMemory& m = dynamic_cast<CplexMemory&>(mem);
 
+    // Start CPLEX
     int status;
     casadi_assert(m.env==0);
     m.env = CPXopenCPLEX(&status);
-    casadi_assert_message(m.env!=0, "CPLEX: Cannot initialize CPLEX environment. STATUS: "
-                          << status);
-
-    // Turn on some debug messages if requested
-    if (verbose()) {
-      CPXsetintparam(m.env, CPX_PARAM_SCRIND, CPX_ON);
-    } else {
-      CPXsetintparam(m.env, CPX_PARAM_SCRIND, CPX_OFF);
-    }
-    if (status) {
-      userOut() << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
+    if (m.env==0) {
+      char errmsg[CPXMESSAGEBUFSIZE];
+      CPXgeterrorstring(m.env, status, errmsg);
+      casadi_error(string("Cannot initialize CPLEX environment: ") + errmsg);
     }
 
-    /* SETTING OPTIONS */
+    // Set parameters to their default values
+    if (CPXsetdefaults(m.env)) {
+      casadi_error("CPXsetdefaults failed");
+    }
+
+    // Enable output by default
+    if (CPXsetintparam(m.env, CPX_PARAM_SCRIND, CPX_ON)) {
+      casadi_error("Failure setting CPX_PARAM_SCRIND");
+    }
+
     // Optimality tolerance
-    status = CPXsetdblparam(m.env, CPX_PARAM_EPOPT, tol_);
+    if (CPXsetdblparam(m.env, CPX_PARAM_EPOPT, tol_)) {
+      casadi_error("Failure setting CPX_PARAM_EPOPT");
+    }
+
     // Feasibility tolerance
-    status = CPXsetdblparam(m.env, CPX_PARAM_EPRHS, tol_);
+    if (CPXsetdblparam(m.env, CPX_PARAM_EPRHS, tol_)) {
+      casadi_error("Failure setting CPX_PARAM_EPRHS");
+    }
+
     // We start with barrier if crossover was chosen.
-    if (qp_method_ == 7) {
-      status = CPXsetintparam(m.env, CPX_PARAM_QPMETHOD, 4);
-    } else { // Otherwise we just chose the algorithm
-      status = CPXsetintparam(m.env, CPX_PARAM_QPMETHOD, qp_method_);
+    if (CPXsetintparam(m.env, CPX_PARAM_QPMETHOD, qp_method_ == 7 ? 4 : qp_method_)) {
+      casadi_error("Failure setting CPX_PARAM_QPMETHOD");
     }
+
     // Setting dependency check option
-    status = CPXsetintparam(m.env, CPX_PARAM_DEPIND, dep_check_);
-    // Setting barrier iteration limit
-    status = CPXsetintparam(m.env, CPX_PARAM_BARITLIM, barrier_maxiter_);
-    // Setting simplex iteration limit
-    status = CPXsetintparam(m.env, CPX_PARAM_ITLIM, simplex_maxiter_);
+    if (CPXsetintparam(m.env, CPX_PARAM_DEPIND, dep_check_)) {
+      casadi_error("Failure setting CPX_PARAM_DEPIND");
+    }
+
+    // Setting crossover algorithm
     if (qp_method_ == 7) {
-      // Setting crossover algorithm
-      status = CPXsetintparam(m.env, CPX_PARAM_BARCROSSALG, 1);
-    }
-    if (!convex_) {
-      // Enabling non-convex QPs
-      status = CPXsetintparam(m.env, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
+      if (CPXsetintparam(m.env, CPX_PARAM_BARCROSSALG, 1)) {
+        casadi_error("Failure setting CPX_PARAM_BARCROSSALG");
+      }
     }
 
-    // Exotic parameters, once they might become options...
+    // Set parameters
+    for (auto&& op : opts_) {
+      // Get parameter index
+      int whichparam;
+      if (CPXgetparamnum(m.env, op.first.c_str(), &whichparam)) {
+        casadi_error("No such CPLEX parameter: " + op.first);
+      }
 
-    // Do careful numerics with numerically unstable problem
-    //status = CPXsetintparam(m.env, CPX_PARAM_NUMERICALEMPHASIS, 1);
-    // Set scaling approach
-    //status = CPXsetintparam(m.env, CPX_PARAM_SCAIND, 1);
-    // Set Markowitz tolerance
-    //status = CPXsetdblparam(m.env, CPX_PARAM_EPMRK, 0.9);
+      // Get type of parameter
+      int paramtype;
+      if (CPXgetparamtype(m.env, whichparam, &paramtype)) {
+        casadi_error("CPXgetparamtype failed");
+      }
+
+      // Pass to CPLEX
+      switch (paramtype) {
+      case CPX_PARAMTYPE_NONE:
+        casadi_error("CPX_PARAMTYPE_NONE unsupported");
+        break;
+      case CPX_PARAMTYPE_INT:
+        status = CPXsetintparam(m.env, whichparam, op.second);
+        break;
+      case CPX_PARAMTYPE_DOUBLE:
+        status = CPXsetdblparam(m.env, whichparam, op.second);
+        break;
+      case CPX_PARAMTYPE_STRING:
+        status = CPXsetstrparam(m.env, whichparam,
+                                static_cast<string>(op.second).c_str());
+        break;
+      case CPX_PARAMTYPE_LONG:
+        status = CPXsetlongparam(m.env, whichparam,
+                                 static_cast<CPXLONG>(static_cast<int>(op.second)));
+        break;
+        default:
+          casadi_error("Unknown CPLEX parameter type (" << paramtype << ") for " + op.first);
+      }
+      // Error handling
+      if (status) {
+        casadi_error("Failure setting option " + op.first);
+      }
+    }
 
     // Doing allocation of CPLEX data
     // Objective is to be minimized

@@ -125,6 +125,9 @@ namespace casadi {
     // Solve the QP
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
+    /// All CPLEX options
+    Dict opts_;
+
     ///@{
     /// Options
     int qp_method_;
@@ -132,7 +135,6 @@ namespace casadi {
     std::string dump_filename_;
     double tol_;
     int dep_check_;
-    int simplex_maxiter_, barrier_maxiter_;
     bool warm_start_;
     bool convex_;
     ///@}
