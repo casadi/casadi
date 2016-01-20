@@ -93,7 +93,6 @@ namespace casadi {
     tol_ = 1e-6;
     dep_check_ = 0;
     warm_start_ = false;
-    convex_ = true;
 
     // Read options
     for (auto&& op : opts) {
@@ -111,8 +110,18 @@ namespace casadi {
         dep_check_ = op.second;
       } else if (op.first=="warm_start") {
         warm_start_ = op.second;
-      } else if (op.first=="convex") {
-        convex_ = op.second;
+      }
+    }
+
+    // Are we solving a mixed-integer problem?
+    mip_ = !discrete_.empty()
+      && find(discrete_.begin(), discrete_.end(), true)!=discrete_.end();
+
+    // Type of variable
+    if (mip_) {
+      ctype_.resize(n_);
+      for (int i=0; i<n_; ++i) {
+        ctype_[i] = discrete_[i] ? 'I' : 'C';
       }
     }
 
@@ -248,8 +257,10 @@ namespace casadi {
     transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), m.qmatcnt.begin(),
               minus<int>());
 
+    // Create problem object
     casadi_assert(m.lp==0);
     m.lp = CPXcreateprob(m.env, &status, "QP from CasADi");
+    casadi_assert_message(m.lp!=0, "CPXcreateprob failed");
   }
 
   void CplexInterface::
@@ -323,43 +334,83 @@ namespace casadi {
     const double* obj = g;
     const double* lb = lbx;
     const double* ub = ubx;
-    status = CPXcopylp(m.env, m.lp, n_, nc_, m.objsen, obj, get_ptr(m.rhs), get_ptr(m.sense),
-                       matbeg, get_ptr(m.matcnt), matind, matval, lb, ub, get_ptr(m.rngval));
+    if (CPXcopylp(m.env, m.lp, n_, nc_, m.objsen, obj, get_ptr(m.rhs), get_ptr(m.sense),
+                  matbeg, get_ptr(m.matcnt), matind, matval, lb, ub, get_ptr(m.rngval))) {
+      casadi_error("CPXcopylp failed");
+    }
 
     // Preparing coefficient matrix Q
     const Sparsity& H_sp = sparsity_in(QPSOL_H);
     const int* qmatbeg = H_sp.colind();
     const int* qmatind = H_sp.row();
     const double* qmatval = H;
-    status = CPXcopyquad(m.env, m.lp, qmatbeg, get_ptr(m.qmatcnt), qmatind, qmatval);
+    if (CPXcopyquad(m.env, m.lp, qmatbeg, get_ptr(m.qmatcnt), qmatind, qmatval)) {
+    }
 
     if (dump_to_file_) {
       CPXwriteprob(m.env, m.lp, dump_filename_.c_str(), "LP");
+      casadi_error("CPXwriteprob failed");
     }
 
     // Warm-starting if possible
     if (qp_method_ != 0 && qp_method_ != 4 && m.is_warm) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
-      CPXcopystart(m.env, m.lp, get_ptr(m.cstat), get_ptr(m.rstat), x, 0, 0, lam_x);
+      if (CPXcopystart(m.env, m.lp, get_ptr(m.cstat), get_ptr(m.rstat), x, 0, 0, lam_x)) {
+        casadi_error("CPXcopystart failed");
+      }
     } else {
-      status = CPXcopystart(m.env, m.lp, 0, 0, x, 0, 0, lam_x);
+      if (CPXcopystart(m.env, m.lp, 0, 0, x, 0, 0, lam_x)) {
+        casadi_error("CPXcopystart failed");
+      }
     }
 
-    // Optimize...
-    status = CPXqpopt(m.env, m.lp);
-
-    if (status) {
-      casadi_error("CPLEX: Failed to solve QP...");
-    }
-    // Retrieving solution
+    // Solution
+    double f;
+    std::vector<double> slack(nc_);
     int solstat;
 
-    double f;
-    std::vector<double> slack;
-    slack.resize(nc_);
-    status = CPXsolution(m.env, m.lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x);
-    if (status) {
-      userOut() << "CPLEX: Failed to get solution.\n";
+    if (mip_) {
+      // Pass type of variables
+      if (CPXcopyctype(m.env, m.lp, &ctype_[0])) {
+        casadi_error("CPXcopyctype failed");
+      }
+
+      // Optimize
+      if (CPXmipopt(m.env, m.lp)) {
+        casadi_error("CPXmipopt failed");
+      }
+
+      // Get objective value
+      if (CPXgetobjval(m.env, m.lp, &f)) {
+        casadi_error("CPXgetobjval failed");
+      }
+
+      // Get primal solution
+      int cur_numcols = CPXgetnumcols(m.env, m.lp);
+      if (CPXgetx(m.env, m.lp, x, 0, cur_numcols-1)) {
+        casadi_error("CPXgetx failed");
+      }
+
+      // Get slacks
+      int cur_numrows = CPXgetnumrows(m.env, m.lp);
+      if (CPXgetslack(m.env, m.lp, get_ptr(slack), 0, cur_numrows-1)) {
+        casadi_error("CPXgetslack failed");
+      }
+
+      // Not a number as dual variables (not calculated with MIQP algorithm)
+      casadi_fill(lam_a, nc_, nan);
+      casadi_fill(lam_x, n_, nan);
+
+    } else {
+      // Optimize
+      if (CPXqpopt(m.env, m.lp)) {
+        casadi_error("CPXqpopt failed");
+      }
+
+      // Retrieving solution
+      if (CPXsolution(m.env, m.lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
+        casadi_error("CPXsolution failed");
+      }
     }
 
     // Retrieving the basis

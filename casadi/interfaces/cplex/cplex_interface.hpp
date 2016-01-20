@@ -125,6 +125,9 @@ namespace casadi {
     // Solve the QP
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
 
+    /// Can discrete variables be treated
+    virtual bool integer_support() const { return true;}
+
     /// All CPLEX options
     Dict opts_;
 
@@ -136,8 +139,11 @@ namespace casadi {
     double tol_;
     int dep_check_;
     bool warm_start_;
-    bool convex_;
     ///@}
+
+    // Are we solving a mixed-integer problem?
+    bool mip_;
+    std::vector<char> ctype_;
 
     /// A documentation string
     static const std::string meta_doc;
