@@ -2069,7 +2069,7 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(to_double) operator double;
 %rename(to_int) operator int;
 #endif
-%ignore operator Matrix<double>;
+%rename(to_DM) operator Matrix<double>;
 
 #ifdef SWIGPYTHON
 %ignore T;
@@ -2949,14 +2949,8 @@ MX_FUN(DECL, (FLAG | IS_MX), MX)
 
 %template(DM) casadi::Matrix<double>;
 %extend casadi::Matrix<double> {
-  // Instantiate template constructors
    %template(DM) Matrix<int>;
    %template(DM) Matrix<SXElem>;
-
-  // Wrap MX::operator DM
-   explicit Matrix(const MX& x) {
-    return new casadi::DM(x);
-  }
 };
 
 %template(IM) casadi::Matrix<int>;
