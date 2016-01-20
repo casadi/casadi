@@ -96,14 +96,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>barrier_maxiter</td><td>OT_INT</td><td>Maximum number of barrier iterations.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>convex</td><td>OT_BOOL</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::CplexInterface</td></tr>
+<tr><td>cplex</td><td>OT_DICT</td><td>Options to be passed to CPLEX</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dep_check</td><td>OT_INT</td><td>Detect redundant constraints.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>simplex_maxiter</td><td>OT_INT</td><td>Maximum number of simplex iterations.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm start with simplex methods (affects only the simplex methods).</td><td>casadi::CplexInterface</td></tr>
 </table>
@@ -115,13 +113,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
-<tr><td>barrier_maxiter</td><td>OT_INT</td><td>Maximum number of barrier iterations.</td></tr>
-<tr><td>convex</td><td>OT_BOOL</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td></tr>
+<tr><td>cplex</td><td>OT_DICT</td><td>Options to be passed to CPLEX</td></tr>
 <tr><td>dep_check</td><td>OT_INT</td><td>Detect redundant constraints.</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td></tr>
-<tr><td>simplex_maxiter</td><td>OT_INT</td><td>Maximum number of simplex iterations.</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm start with simplex methods (affects only the simplex methods).</td></tr>
 </table>
@@ -132,14 +128,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>barrier_maxiter</td><td>OT_INT</td><td>Maximum number of barrier iterations.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>convex</td><td>OT_BOOL</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::CplexInterface</td></tr>
+<tr><td>cplex</td><td>OT_DICT</td><td>Options to be passed to CPLEX</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dep_check</td><td>OT_INT</td><td>Detect redundant constraints.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Qpsol</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
-<tr><td>simplex_maxiter</td><td>OT_INT</td><td>Maximum number of simplex iterations.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
 <tr><td>warm_start</td><td>OT_BOOL</td><td>Use warm start with simplex methods (affects only the simplex methods).</td><td>casadi::CplexInterface</td></tr>
 </table>

@@ -11262,13 +11262,8 @@ Interface to Cplex solver for sparse Quadratic Programs
 +------------------------+------------------------+------------------------+
 |           Id           |          Type          |      Description       |
 +========================+========================+========================+
-| barrier_maxiter        | OT_INT                 | Maximum number of      |
-|                        |                        | barrier iterations.    |
-+------------------------+------------------------+------------------------+
-| convex                 | OT_BOOL                | Indicates if the QP is |
-|                        |                        | convex or not (affects |
-|                        |                        | only the barrier       |
-|                        |                        | method).               |
+| cplex                  | OT_DICT                | Options to be passed   |
+|                        |                        | to CPLEX               |
 +------------------------+------------------------+------------------------+
 | dep_check              | OT_INT                 | Detect redundant       |
 |                        |                        | constraints.           |
@@ -11281,9 +11276,6 @@ Interface to Cplex solver for sparse Quadratic Programs
 +------------------------+------------------------+------------------------+
 | qp_method              | OT_INT                 | Determines which CPLEX |
 |                        |                        | algorithm to use.      |
-+------------------------+------------------------+------------------------+
-| simplex_maxiter        | OT_INT                 | Maximum number of      |
-|                        |                        | simplex iterations.    |
 +------------------------+------------------------+------------------------+
 | tol                    | OT_DOUBLE              | Tolerance of solver    |
 +------------------------+------------------------+------------------------+
