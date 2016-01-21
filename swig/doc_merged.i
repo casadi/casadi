@@ -99,12 +99,6 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
-%feature("docstring") casadi::Callback::description_in "
-
-Get input scheme description by index.
-
-";
-
 %feature("docstring") casadi::Callback::free_sx "
 
 Get all the free variables of the function.
@@ -328,12 +322,6 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring") casadi::Callback::description_out "
-
-Get output scheme description by index.
 
 ";
 
@@ -2262,12 +2250,6 @@ Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::Function::description_out "
-
-Get output scheme description by index.
-
-";
-
 %feature("docstring") casadi::Function::mapsum "
 
 Evaluate symbolically in parallel and sum (matrix graph)
@@ -2396,12 +2378,6 @@ Get input dimension.
 %feature("docstring") casadi::Function::getRepresentation "
 
 Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring") casadi::Function::description_in "
-
-Get input scheme description by index.
 
 ";
 
