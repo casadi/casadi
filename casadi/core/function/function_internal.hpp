@@ -621,38 +621,12 @@ namespace casadi {
 
     /** \brief Get input scheme name by index */
     virtual std::string name_in(int ind) const {
-      const std::string& s=ischeme_.at(ind);
-      size_t col = s.find(':'); // Colon seprates name from description
-      return s.substr(0, col);
+      return ischeme_.at(ind);
     }
 
     /** \brief Get output scheme name by index */
     virtual std::string name_out(int ind) const {
-      const std::string& s=oscheme_.at(ind);
-      size_t col = s.find(':'); // Colon seprates name from description
-      return s.substr(0, col);
-    }
-
-    /** \brief Get input scheme description by index */
-    virtual std::string description_in(int ind) const {
-      const std::string& s=ischeme_.at(ind);
-      size_t col = s.find(':'); // Colon seprates name from description
-      if (col==std::string::npos) {
-        return std::string("No description available");
-      } else {
-        return s.substr(col+1);
-      }
-    }
-
-    /** \brief Get output scheme description by index */
-    virtual std::string description_out(int ind) const {
-      const std::string& s=oscheme_.at(ind);
-      size_t col = s.find(':'); // Colon seprates name from description
-      if (col==std::string::npos) {
-        return std::string("No description available");
-      } else {
-        return s.substr(col+1);
-      }
+      return oscheme_.at(ind);
     }
 
     /** \brief Get default input value */
