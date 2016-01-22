@@ -48,6 +48,7 @@ from casadi import *
 import casadi as c
 import numpy
 import numpy as n
+from numpy import array, matrix
 import unittest
 from types import *
 from helpers import *
