@@ -25,7 +25,7 @@ from casadi import *
 import casadi as c
 import numpy
 import numpy as n
-from numpy import array, double, int32, atleast_2d, ones, matrix
+from numpy import array, double, int32, atleast_2d, ones, matrix, zeros
 import unittest
 from types import *
 from helpers import *
