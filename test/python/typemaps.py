@@ -25,6 +25,7 @@ from casadi import *
 import casadi as c
 import numpy
 import numpy as n
+from numpy import array, double, int32, atleast_2d, ones, matrix
 import unittest
 from types import *
 from helpers import *
@@ -690,7 +691,7 @@ class typemaptests(casadiTestCase):
   def test_ufuncsum(self):
     self.message("ufunc.add")
     
-    self.checkarray(DM(sum(DM([1,2,3]))),DM(6))
+    self.checkarray(DM(sum(DM([1,2,3]).nonzeros())),DM(6))
     
   def test_sxmatrix(self):
 
