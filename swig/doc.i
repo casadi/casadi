@@ -131,12 +131,6 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 
 ";
 
-%feature("docstring")  casadi::Function::description_in(int ind) const  "
-
-Get input scheme description by index.
-
-";
-
 %feature("docstring")  casadi::Function::free_sx() const  "
 
 Get all the free variables of the function.
@@ -544,12 +538,6 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring")  casadi::Function::description_out(int ind) const  "
-
-Get output scheme description by index.
 
 ";
 
@@ -3201,12 +3189,6 @@ Add modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::Function::description_out(int ind) const  "
-
-Get output scheme description by index.
-
-";
-
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
 &arg, const std::string &parallelization="serial") "
 
@@ -3444,12 +3426,6 @@ Get input dimension.
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::Function::description_in(int ind) const  "
-
-Get input scheme description by index.
 
 ";
 
@@ -11262,13 +11238,8 @@ Interface to Cplex solver for sparse Quadratic Programs
 +------------------------+------------------------+------------------------+
 |           Id           |          Type          |      Description       |
 +========================+========================+========================+
-| barrier_maxiter        | OT_INT                 | Maximum number of      |
-|                        |                        | barrier iterations.    |
-+------------------------+------------------------+------------------------+
-| convex                 | OT_BOOL                | Indicates if the QP is |
-|                        |                        | convex or not (affects |
-|                        |                        | only the barrier       |
-|                        |                        | method).               |
+| cplex                  | OT_DICT                | Options to be passed   |
+|                        |                        | to CPLEX               |
 +------------------------+------------------------+------------------------+
 | dep_check              | OT_INT                 | Detect redundant       |
 |                        |                        | constraints.           |
@@ -11281,9 +11252,6 @@ Interface to Cplex solver for sparse Quadratic Programs
 +------------------------+------------------------+------------------------+
 | qp_method              | OT_INT                 | Determines which CPLEX |
 |                        |                        | algorithm to use.      |
-+------------------------+------------------------+------------------------+
-| simplex_maxiter        | OT_INT                 | Maximum number of      |
-|                        |                        | simplex iterations.    |
 +------------------------+------------------------+------------------------+
 | tol                    | OT_DOUBLE              | Tolerance of solver    |
 +------------------------+------------------------+------------------------+

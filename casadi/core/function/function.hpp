@@ -295,12 +295,6 @@ namespace casadi {
      */
     int index_out(const std::string &name) const;
 
-    /** \brief Get input scheme description by index */
-    std::string description_in(int ind) const;
-
-    /** \brief Get output scheme description by index */
-    std::string description_out(int ind) const;
-
     /** \brief Get default input value (NOTE: constant reference) */
     double default_in(int ind) const;
 

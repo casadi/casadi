@@ -574,14 +574,6 @@ namespace casadi {
     return (*this)->name_out(ind);
   }
 
-  string Function::description_in(int ind) const {
-    return (*this)->description_in(ind);
-  }
-
-  string Function::description_out(int ind) const {
-    return (*this)->description_out(ind);
-  }
-
   const Sparsity& Function::sparsity_in(int ind) const {
     return (*this)->sparsity_in(ind);
   }
