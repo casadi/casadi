@@ -68,6 +68,12 @@ namespace casadi {
     addOption("opencl_select", OT_INTEGER, 0,
       "Index into OpenCL-compatible devices, to select which one to use.");
 
+    addOption("pointer_input", OT_BOOLEAN, false,
+      "Instead of the image as input, use a pointer to an image");
+
+    addOption("image_float", OT_BOOLEAN, false,
+      "Indicate that the image defined with pointer_input=True is in float.");
+
     casadi_assert(n>=1);
 
     casadi_assert_message(n==1, "Vectorized form of KernelSum2D not yet implemented.");
@@ -87,13 +93,15 @@ namespace casadi {
   void KernelSum2DBase::init() {
 
     opencl_select_ = getOption("opencl_select");
+    image_float_ = getOption("image_float");
+    pointer_input_ = getOption("pointer_input");
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
     ibuf_.resize(num_in-1);
     obuf_.resize(num_out);
 
-    input(0) = DMatrix::zeros(size_);
+    input(0) = pointer_input_ ? DMatrix::zeros(1) : DMatrix::zeros(size_);
     input(1) = DMatrix::zeros(2, n_);
 
     for (int i=0;i<num_in-3;++i) {
@@ -198,7 +206,13 @@ namespace casadi {
                                 int* iw, double* w) {
     int num_in = f_.nIn(), num_out = f_.nOut();
 
-    const double* V = arg[0];
+    const double* V;
+    if (pointer_input_) {
+      V = reinterpret_cast<const double *>(*(reinterpret_cast<const uint64_t *>(arg[0])));
+    } else {
+      V = arg[0];
+    }
+
     const double* X = arg[1];
 
     // Clear the accumulators
@@ -316,6 +330,12 @@ namespace casadi {
     if (options.find("opencl_select")==options.end()) {
       options["opencl_select"] = opencl_select_;
     }
+    if (options.find("pointer_input")==options.end()) {
+      options["pointer_input"] = pointer_input_;
+    }
+    if (options.find("image_float")==options.end()) {
+      options["image_float"] = image_float_;
+    }
 
     Function ret = KernelSum2D(name, f_forward, size_, r_, n_, options);
 
@@ -331,7 +351,11 @@ namespace casadi {
 
     for (int i=0;i<nfwd;++i) {
       // Construct dummy matrix for capturing the V_dot argument.
-      der_inputs.push_back(MX::sym("x", Sparsity(size_) ));
+      if (pointer_input_) {
+        der_inputs.push_back(MX::sym("x", Sparsity(1, 1) ));
+      } else {
+        der_inputs.push_back(MX::sym("x", Sparsity(size_) ));
+      }
       std::vector<MX> inputs = symbolicInput();
       der_inputs.insert(der_inputs.end(), inputs.begin()+1, inputs.end());
       ret_inputs.insert(ret_inputs.end(), inputs.begin()+1, inputs.end());
@@ -407,6 +431,12 @@ namespace casadi {
     if (options.find("opencl_select")==options.end()) {
       options["opencl_select"] = opencl_select_;
     }
+    if (options.find("pointer_input")==options.end()) {
+      options["pointer_input"] = pointer_input_;
+    }
+    if (options.find("image_float")==options.end()) {
+      options["image_float"] = image_float_;
+    }
 
     Function kn = KernelSum2D(name, f_reverse, size_, r_, n_, options);
 
@@ -434,7 +464,11 @@ namespace casadi {
     offset = 0;
     for (int i=0;i<nadj;++i) {
       // Use sparse zero as V_bar output
-      ret_outputs.push_back(MX::zeros(Sparsity(size_)));
+      if (pointer_input_) {
+        ret_outputs.push_back(MX::zeros(Sparsity(1, 1)));
+      } else {
+        ret_outputs.push_back(MX::zeros(Sparsity(size_)));
+      }
       ret_outputs.insert(ret_outputs.end(), kn_outputs.begin()+offset,
         kn_outputs.begin()+offset+num_in-2);
       offset+= num_in-2;
@@ -565,20 +599,27 @@ namespace casadi {
     // Call the initialization method of the base class
     KernelSum2DBase::init();
 
-    s_ = round(r_)*2+1;
-    ss_ = 2;
+    int s = round(r_)*2+1;
 
-    sfrac_ = static_cast<double>(s_)/ss_;
+
+    s_i_ = min(s, size_.first);
+    s_j_ = min(s, size_.second);
+    ss_ = 1;
 
     arg_length_ = 0;
     for (int i=2; i<num_in; ++i) {
       arg_length_+= f_.inputSparsity(i).nnz();
     }
 
-    // Allocate space for float host buffers
-    alloc_w(f_.sz_w() + nnz_out_+3 +
-      sizeof(float)*(s_*s_+arg_length_+f_.nnzOut()*s_*ss_)/sizeof(double));
-
+    if (pointer_input_ && image_float_) {
+      // Allocate space for float host buffers
+      alloc_w(f_.sz_w() + nnz_out_+3 +
+        sizeof(float)*(arg_length_+f_.nnzOut()*s_j_*ss_+2)/sizeof(double));
+    } else {
+      // Allocate space for float host buffers
+      alloc_w(f_.sz_w() + nnz_out_+3 +
+        sizeof(float)*(s_i_*s_j_+arg_length_+f_.nnzOut()*s_j_*ss_+3)/sizeof(double));
+    }
   }
 
   std::string KernelSum2DOcl::kernelCode() const {
@@ -603,13 +644,14 @@ namespace casadi {
     code << "   __global float* sum_out," << endl;
     code << "   __global float* args," << endl;
     code << "   int i_offset," << endl;
-    code << "   int j_offset) {" << endl;
-
+    code << "   int j_offset," << endl;
+    code << "   int idelta) {" << endl;
     code << "  float args_local[" << arg_length_ << "];" << endl;
     code << "  float p[2];" << endl;
     code << "  float value;" << endl;
     code << "  int jj = get_global_id(0);" << endl;
     code << "  int j = jj / " << ss_ << ";" << endl;
+
     code << "  int jk = jj % " << ss_ << ";" << endl;
     code << "  for (int k=0;k<"<< arg_length_ << ";++k) { args_local[k] = args[k]; }" << endl;
 
@@ -632,14 +674,14 @@ namespace casadi {
       code << "  res[" << i << "] = res_local+" << offset << ";"  << endl;
       offset+= f_.outputSparsity(i).nnz();
     }
-    code << "  p[1] = j_offset + j;" << endl;
+
     code << "  for (int k=0;k<" << f_.nnzOut() << ";++k) { sum[k]= 0; }" << endl;
-    std::stringstream ss;
-    ss << std::scientific << sfrac_;
-    code << "  int upper = (int) ceil((jk+1)*" << ss.str() << " );" << endl;
-    code << "  int lower = (int) ceil(jk*" << ss.str() << ");" << endl;
+    code << "  float sfrac = idelta/" << ss_ << ".0;" << endl;
+    code << "  int upper = (int) ceil((jk+1)*sfrac);" << endl;
+    code << "  int lower = (int) ceil(jk*sfrac);" << endl;
     code << "  for (int i=lower;i<upper;++i) {" << endl;
-    code << "    value = im_in[j*" << s_ <<" + i];" << endl;
+    code << "    value = im_in[j*idelta+i];" << endl;
+    code << "    p[1] = j_offset + j;" << endl;
     code << "    p[0] = i_offset + i;" << endl;
     code << "    F(arg, res, iw, w); " << endl;
     code << "    for (int k=0;k<" << f_.nnzOut() << ";++k) { sum[k]+= res_local[k]; }" << endl;
@@ -647,8 +689,6 @@ namespace casadi {
     code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) { sum_out[k+jj*" <<
       f_.nnzOut() << "] = sum[k]; }" << endl;
     code << "}   " << endl;
-
-
 
     return code.str();
 
@@ -668,8 +708,9 @@ namespace casadi {
     g.addAuxiliary(CodeGenerator::AUX_ASSERT);
 
     g.addInclude("CL/cl.h");
+    g.auxiliaries << "#define CL_USE_DEPRECATED_OPENCL_1_2_APIS" << endl;
 
-    // Get a unique index for thsi function
+    // Get a unique index for this function
     int& ind = g.added_dependencies_[this];
 
     // Static global memory (will not be needed in CasADi 3.0)
@@ -727,7 +768,7 @@ namespace casadi {
     g.setup << "        check_cl_error(err);" << endl;
     g.setup << "        printf(\"Detected device %d: %s\", k, device_name);" << endl;
     g.setup << "        if (k== " << opencl_select_ << ") {" << endl;
-    g.setup << "          mydevice = device_id[j];" << std::endl;
+    g.setup << "          mydevice = device_id[j];" << endl;
     g.setup << "          printf(\" (selected)\");" << endl;
     g.setup << "        }" << endl;
     g.setup << "        printf(\"\\n\");" << endl;
@@ -778,10 +819,10 @@ namespace casadi {
     g.setup << " sizeof(float)*" <<  arg_length_ << ", NULL, &err);" << endl;
     g.setup << "    check_cl_error(err);" << endl;
     g.setup << "    d_im" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_READ_ONLY,";
-    g.setup << " sizeof(float)*" << s_*s_ << ", NULL, &err);" << endl;
+    g.setup << " sizeof(float)*" << s_i_*s_j_ << ", NULL, &err);" << endl;
     g.setup << "    check_cl_error(err);" << endl;
     g.setup << "    d_sum" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_WRITE_ONLY,";
-    g.setup << " sizeof(float)*" << f_.nnzOut()*s_*ss_ << ", NULL, &err);" << endl;
+    g.setup << " sizeof(float)*" << f_.nnzOut()*s_j_*ss_ << ", NULL, &err);" << endl;
     g.setup << "    check_cl_error(err);" << endl;
 
     // Prepare kernel arguments
@@ -807,7 +848,6 @@ namespace casadi {
 
     g.body << "  int i_offset;" << endl;
     g.body << "  int j_offset;" << endl;
-    g.body << "  size_t num = " << s_*ss_ << ";" << endl;
 
     // Reset
     for (int i=0;i<f_.nOut();++i) {
@@ -818,56 +858,99 @@ namespace casadi {
       g.body << "    }" << endl;
     }
 
-    g.body << "  const real_t* V = arg[0];" << endl;
+    const double* V;
+    if (pointer_input_) {
+      if (image_float_) {
+        g.body << "  const float* V =  (float *) *((uint64_t *) arg[0]);" << endl;
+      } else {
+        g.body << "  const real_t* V =  (double *) *((uint64_t *) arg[0]);" << endl;
+      }
+    } else {
+      g.body << "  const real_t* V = arg[0];" << endl;
+    }
     g.body << "  const real_t* X = arg[1];" << endl;
 
     g.body << "  int u = round(X[0]);" << endl;
     g.body << "  int v = round(X[1]);" << endl;
-    g.body << "  int r = round(" << r_ << ");" << endl;
+    g.body << "  int r = " << round(r_) << ";" << endl;
 
     // Obtain pointers to float host buffers
-    g.body << "  float *h_args_ = (float*) (w+" << f_.sz_w() + nnz_out_+3 << ");" << endl;
-    g.body << "  float *h_im_ = (float*) (w+" << f_.sz_w() + nnz_out_+3 << "+sizeof(float)*(";
-    g.body << arg_length_ << ")/sizeof(double));" << endl;
-    g.body << "  float *h_sum_ = (float*) (w+" << f_.sz_w() + nnz_out_+3 << "+sizeof(float)*(";
-    g.body << arg_length_ + s_*s_ << ")/sizeof(double));" << endl;
+    g.body << "  float *h_args = (float*) (w+" << f_.sz_w() + nnz_out_+3 << ");" << endl;
 
-    g.body << "  for (i =0;i<" << s_*s_ << ";++i) h_im_[i] = 0;" << endl;
-
-    g.body << "  j_offset = v-r;" << endl;
-    g.body << "  i_offset = u-r;" << endl;
-
-    g.body << "  for (j = MAX(v-r, 0); j<= MIN(v+r, " << size_.second-1 << "); ++j) {" << endl;
-    g.body << "    for (i = MAX(u-r, 0); i<= MIN(u+r, " <<  size_.first-1 << "); ++i) {" << endl;
-
-    // Set the pixel value input
-    g.body << "      h_im_[(i-i_offset)+(j-j_offset)*" << s_ << "] = V[i+j*" << size_.first << "];";
-    g.body << endl;
-    g.body << "    }" << endl;
-    g.body << "  }" << endl;
+    if (pointer_input_ && image_float_) {
+      g.body << "  float *h_sum = (float*) (w+" << f_.sz_w() + nnz_out_+3 << "+sizeof(float)*(";
+      g.body << arg_length_ +1<< ")/sizeof(double));" << endl;
+    } else {
+      g.body << "  float *h_im = (float*) (w+" << f_.sz_w() + nnz_out_+3 << "+sizeof(float)*(";
+      g.body << arg_length_+1 << ")/sizeof(double));" << endl;
+      g.body << "  float *h_sum = (float*) (w+" << f_.sz_w() + nnz_out_+3 << "+sizeof(float)*(";
+      g.body << arg_length_ + s_i_*s_j_ +2<< ")/sizeof(double));" << endl;
+    }
 
     g.body << "  int kk = 0;" << endl;
     for (int i=2;i<f_.nIn();++i) {
       g.body << "  for (k=0;k<" << f_.inputSparsity(i).nnz() << ";++k) {" << endl;
-      g.body << "    h_args_[kk] = arg[" << i-1 << "][k];" << endl;
+      g.body << "    h_args[kk] = arg[" << i-1 << "][k];" << endl;
       g.body << "    kk++;" << endl;
       g.body << "  }" << endl;
     }
 
     g.body << "  int err;" << endl;
 
+    g.body << "  j_offset = v-r;" << endl;
+    g.body << "  i_offset = u-r;" << endl;
+
+    g.body << "  int jmin = MAX(v-r, 0);" << endl;
+    g.body << "  int jmax = MIN(v+r+1, " << size_.second << ");" << endl;
+    g.body << "  jmin = MIN(jmin, jmax);" << endl;
+    g.body << "  jmax = MAX(jmin, jmax);" << endl;
+    g.body << "  int jdelta = jmax - jmin;" << endl;
+
+    g.body << "  int imin = MAX(u-r, 0);" << endl;
+    g.body << "  int imax = MIN(u+r+1, " << size_.first << ");" << endl;
+    g.body << "  imin = MIN(imin, imax);" << endl;
+    g.body << "  imax = MAX(imin, imax);" << endl;
+    g.body << "  int idelta = imax - imin;" << endl;
+
+    g.body << "  if (idelta==0 || jdelta==0) return 0;" << endl;
+
+    if (pointer_input_ && image_float_) {
+      g.body << "  size_t buffer_origin[3] = {0, 0, 0};" << endl;
+      g.body << "  size_t host_origin[3] = {sizeof(float)*imin, jmin, 0};" << endl;
+      g.body << "  size_t region[3] = {sizeof(float)*idelta, jdelta, 1};" << endl;
+
+      g.body << "  err = clEnqueueWriteBufferRect(commands" << ind << "_,";
+      g.body << " d_im" << ind << "_, CL_TRUE, ";
+      g.body << " buffer_origin, host_origin, region, sizeof(float)*idelta, 0, sizeof(float)*";
+      g.body << size_.first << ", 0, V, 0, NULL, NULL);" << endl;
+      g.body << "  check_cl_error(err);" << endl;
+    } else {
+      g.body << "  int offset = imin + jmin*" << size_.first << ";" << endl;
+
+      g.body << "  for (j = 0; j< jdelta; ++j) {" << endl;
+      g.body << "    for (i = 0; i< idelta; ++i) {" << endl;
+      // Set the pixel value input
+      g.body << "      h_im[i+j*idelta] = V[offset + i+j*" << size_.first << "];";
+      g.body << endl;
+      g.body << "    }" << endl;
+      g.body << "  }" << endl;
+
+      g.body << "  err = clEnqueueWriteBuffer(commands" << ind << "_, d_im" << ind << "_, CL_TRUE,";
+      g.body << " 0, sizeof(float)*idelta*jdelta, h_im, 0, NULL, NULL);" << endl;
+      g.body << "  check_cl_error(err);" << endl;
+    }
     // Copy data from host to buffer
     g.body << "  err = clEnqueueWriteBuffer(commands" << ind << "_, d_args" << ind << "_, CL_TRUE,";
-    g.body << " 0, sizeof(float) * " << arg_length_ << ",h_args_, 0, NULL, NULL);" << endl;
-    g.body << "  check_cl_error(err);" << endl;
-    g.body << "  err = clEnqueueWriteBuffer(commands" << ind << "_, d_im" << ind << "_, CL_TRUE,";
-    g.body << " 0, sizeof(float) * " << s_*s_ << ",h_im_, 0, NULL, NULL);" << endl;
+    g.body << " 0, sizeof(float)*" << arg_length_ << ", h_args, 0, NULL, NULL);" << endl;
     g.body << "  check_cl_error(err);" << endl;
 
     // Set two integer kernel arguments
-    g.body << "  err  = clSetKernelArg(kernel" << ind << "_, 3, sizeof(int), &i_offset);" << endl;
-    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 4, sizeof(int), &j_offset);" << endl;
+    g.body << "  err  = clSetKernelArg(kernel" << ind << "_, 3, sizeof(int), &imin);" << endl;
+    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 4, sizeof(int), &jmin);" << endl;
+    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 5, sizeof(int), &idelta);" << endl;
     g.body << "  check_cl_error(err);" << endl;
+
+    g.body << "  size_t num = jdelta*" << ss_ << ";" << endl;
 
     // Run the kernel
     g.body << "  err = clEnqueueNDRangeKernel(commands" << ind << "_, kernel" << ind << "_, 1,";
@@ -878,17 +961,17 @@ namespace casadi {
 
     // Read back the output
     g.body << "  err = clEnqueueReadBuffer(commands" << ind << "_, d_sum" << ind << "_, CL_TRUE,";
-    g.body << " 0, sizeof(float) *" <<  (f_.nnzOut()*s_*ss_) << ", h_sum_,";
+    g.body << " 0, sizeof(float) *jdelta*" <<  (f_.nnzOut()*ss_) << ", h_sum,";
     g.body << " 0, NULL, NULL ); " << endl;
     g.body << "  check_cl_error(err);" << endl;
 
     // Sum up the results
     g.body << "  kk = 0;" << endl;
-    g.body << "  for (j=0;j<" << s_*ss_ << ";++j) {" << endl;
+    g.body << "  for (j=0;j<num;++j) {" << endl;
     for (int i=0;i<f_.nOut();++i) {
       g.body << "    if (res[" << i << "]) {" <<endl;
       g.body << "      for (k=0;k<" << f_.outputSparsity(i).nnz() << ";++k) {" <<endl;
-      g.body << "        res[" << i << "][k] += h_sum_[kk];" <<endl;
+      g.body << "        res[" << i << "][k] += h_sum[kk];" <<endl;
       g.body << "        kk++;" <<endl;
       g.body << "      }" <<endl;
       g.body << "    } else {" <<endl;

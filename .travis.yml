@@ -215,6 +215,10 @@ matrix:
         - brew update
         - brew tap homebrew/science
         - brew outdated swig ; brew install swig
+        - sudo sysctl kern.maxfiles
+        - sudo sysctl kern.maxfilesperproc
+        - sudo sysctl -w kern.maxfiles=20480
+        - sudo sysctl -w kern.maxfilesperproc=18000
         #- brew install swig pkg-config
         #- brew doctor
         - sudo easy_install pip

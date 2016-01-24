@@ -91,9 +91,14 @@ namespace casadi {
     /// Nonzero step for outputs
     std::vector<int> step_out_;
 
-    // This should belong in the OCL class, but then we cannot have it copied in fwd/der
+    /// This should belong in the OCL class, but then we cannot have it copied in fwd/der
+    /// @{
     int opencl_select_;
 
+    bool pointer_input_;
+
+    bool image_float_;
+    /// @}
   };
 
   /** KernelSum2D statement
@@ -169,10 +174,10 @@ namespace casadi {
     int nnz_in_;
     int nnz_fixed_;
 
-    int s_;
+    int s_i_;
+    int s_j_;
     int ss_;
 
-    double sfrac_;
     int arg_length_;
 
     /** \brief Generate code for the declarations of the C function */
