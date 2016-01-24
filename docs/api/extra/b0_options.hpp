@@ -2251,6 +2251,7 @@
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>image_float</td><td>OT_BOOLEAN</td><td>false</td><td>Indicate that the image defined with pointer_input=True is in float.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
@@ -2261,6 +2262,7 @@
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2281,6 +2283,7 @@
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>image_float</td><td>OT_BOOLEAN</td><td>false</td><td>Indicate that the image defined with pointer_input=True is in float.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
@@ -2291,6 +2294,7 @@
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2311,6 +2315,7 @@
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>image_float</td><td>OT_BOOLEAN</td><td>false</td><td>Indicate that the image defined with pointer_input=True is in float.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
@@ -2321,6 +2326,7 @@
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DOcl</td></tr>
+<tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -2342,6 +2348,7 @@
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>full_jacobian</td><td>OT_FUNCTION</td><td>GenericType()</td><td>The Jacobian of all outputs with respect to all inputs.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>image_float</td><td>OT_BOOLEAN</td><td>false</td><td>Indicate that the image defined with pointer_input=True is in float.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom input scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_REAL</td><td>2</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
@@ -2352,6 +2359,7 @@
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DSerial</td></tr>
+<tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>

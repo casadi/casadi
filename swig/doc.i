@@ -22388,6 +22388,14 @@ Joris Gillis
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| image_float  | OT_BOOLEAN   | false        | Indicate     | casadi::Kern |
+|              |              |              | that the     | elSum2DBase  |
+|              |              |              | image        |              |
+|              |              |              | defined with |              |
+|              |              |              | pointer_inpu |              |
+|              |              |              | t=True is in |              |
+|              |              |              | float.       |              |
++--------------+--------------+--------------+--------------+--------------+
 | input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
 |              | TOR          | )            | scheme       | tionInternal |
 +--------------+--------------+--------------+--------------+--------------+
@@ -22482,6 +22490,12 @@ Joris Gillis
 |              |              |              | ization (ser |              |
 |              |              |              | ial|openmp|o |              |
 |              |              |              | pencl)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| pointer_inpu | OT_BOOLEAN   | false        | Instead of   | casadi::Kern |
+| t            |              |              | the image as | elSum2DBase  |
+|              |              |              | input, use a |              |
+|              |              |              | pointer to   |              |
+|              |              |              | an image     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
