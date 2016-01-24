@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file src/Flipper.cpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of the Flipper class designed to manage working sets of
  *	constraints and bounds within a QProblem.
@@ -60,8 +60,8 @@ Flipper::Flipper( )
 /*
  *	F l i p p e r
  */
-Flipper::Flipper(	int _nV,
-					int _nC
+Flipper::Flipper(	uint_t _nV,
+					uint_t _nC
 					)
 {
 	R = 0;
@@ -113,28 +113,14 @@ Flipper& Flipper::operator=( const Flipper& rhs )
 /*
  *	i n i t
  */
-returnValue Flipper::init(	int _nV,
-							int _nC
+returnValue Flipper::init(	uint_t _nV,
+							uint_t _nC
 							)
 {
-	if ( ( _nV < 0 ) || ( _nC < 0 ) )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
 	clear( );
 
 	nV = _nV;
 	nC = _nC;
-
-	/*if ( nV > 0 )
-	{
-		R = new real_t[nV*nV];
-	
-		if ( nC > 0 )
-		{
-			Q = new real_t[nV*nV];
-			T = new real_t[getDimT()];
-		}
-	}*/
 
 	return SUCCESSFUL_RETURN;
 }
@@ -256,7 +242,7 @@ returnValue Flipper::copy(	const Flipper& rhs
 }
 
 
-int Flipper::getDimT( ) const
+uint_t Flipper::getDimT( ) const
 {
 	if ( nV > nC )
 		return nC*nC;

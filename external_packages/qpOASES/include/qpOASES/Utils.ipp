@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -26,14 +26,46 @@
 /**
  *	\file include/qpOASES/Utils.ipp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of some inlined utilities for working with the different QProblem classes.
  */
 
 
+#include <math.h>
+
+
 BEGIN_NAMESPACE_QPOASES
+
+
+/*
+ *   i s E q u a l
+ */
+inline BooleanType isEqual(	real_t x,
+							real_t y,
+							real_t TOL
+							)
+{
+    if ( getAbs(x-y) <= TOL )
+		return BT_TRUE;
+	else
+		return BT_FALSE;
+}
+
+
+/*
+ *   i s Z e r o
+ */
+inline BooleanType isZero(	real_t x,
+							real_t TOL
+							)
+{
+    if ( getAbs(x) <= TOL )
+		return BT_TRUE;
+	else
+		return BT_FALSE;
+}
 
 
 /*
@@ -53,9 +85,9 @@ inline real_t getSign(	real_t arg
 /*
  *   g e t M a x
  */
-inline int getMax(	int x,
-					int y
-					)
+inline int_t getMax(	int_t x,
+						int_t y
+						)
 {
     return (y<x) ? x : y;
 }
@@ -64,9 +96,9 @@ inline int getMax(	int x,
 /*
  *   g e t M i n
  */
-inline int getMin(	int x,
-					int y
-					)
+inline int_t getMin(	int_t x,
+						int_t y
+						)
 {
     return (y>x) ? x : y;
 }
@@ -80,7 +112,12 @@ inline real_t getMax(	real_t x,
 						real_t y
 						)
 {
+	#ifdef __NO_FMATH__
     return (y<x) ? x : y;
+	#else
+	return (y<x) ? x : y;
+	//return fmax(x,y); /* seems to be slower */
+	#endif
 }
 
 
@@ -91,7 +128,12 @@ inline real_t getMin(	real_t x,
 						real_t y
 						)
 {
+	#ifdef __NO_FMATH__
     return (y>x) ? x : y;
+	#else
+	return (y>x) ? x : y;
+	//return fmin(x,y); /* seems to be slower */
+	#endif
 }
 
 
@@ -101,7 +143,25 @@ inline real_t getMin(	real_t x,
 inline real_t getAbs(	real_t x
 						)
 {
-    return (x>=0) ? x : -x;
+	#ifdef __NO_FMATH__
+	return (x>=0.0) ? x : -x;
+	#else
+	return fabs(x);
+	#endif
+}
+
+
+/*
+ *   g e t S q r t
+ */
+inline real_t getSqrt(	real_t x
+						)
+{
+	#ifdef __NO_FMATH__
+	return sqrt(x); /* put your custom sqrt-replacement here */
+	#else
+	return sqrt(x);
+	#endif
 }
 
 

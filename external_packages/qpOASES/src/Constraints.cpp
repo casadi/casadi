@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file src/Constraints.cpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of the Constraints class designed to manage working sets of
  *	constraints within a QProblem.
@@ -55,7 +55,7 @@ Constraints::Constraints( ) : SubjectTo( )
 /*
  *	C o n s t r a i n t s
  */
-Constraints::Constraints( int _n ) : SubjectTo( _n )
+Constraints::Constraints( int_t _n ) : SubjectTo( _n )
 {
 	init( _n );
 }
@@ -98,7 +98,7 @@ Constraints& Constraints::operator=( const Constraints& rhs )
 /*
  *	i n i t
  */
-returnValue Constraints::init(	int _n
+returnValue Constraints::init(	int_t _n
 								)
 {
 	if ( _n < 0 )
@@ -106,7 +106,7 @@ returnValue Constraints::init(	int _n
 
 	clear( );
 
-	if ( _n > 0 )
+	if ( _n >= 0 )
 	{
 		active.init(   _n );
 		inactive.init( _n );
@@ -120,7 +120,7 @@ returnValue Constraints::init(	int _n
 /*
  *	s e t u p C o n s t r a i n t
  */
-returnValue Constraints::setupConstraint(	int number, SubjectToStatus _status
+returnValue Constraints::setupConstraint(	int_t number, SubjectToStatus _status
 											)
 {
 	/* consistency check */
@@ -183,7 +183,7 @@ returnValue Constraints::setupAllUpper( )
 /*
  *	m o v e A c t i v e T o I n a c t i v e
  */
-returnValue Constraints::moveActiveToInactive( int number )
+returnValue Constraints::moveActiveToInactive( int_t number )
 {
 	/* consistency check */
 	if ( ( number < 0 ) || ( number >= n ) )
@@ -203,7 +203,7 @@ returnValue Constraints::moveActiveToInactive( int number )
 /*
  *	m o v e I n a c t i v e T o A c t i v e
  */
-returnValue Constraints::moveInactiveToActive(	int number, SubjectToStatus _status
+returnValue Constraints::moveInactiveToActive(	int_t number, SubjectToStatus _status
 												)
 {
 	/* consistency check */
@@ -224,7 +224,7 @@ returnValue Constraints::moveInactiveToActive(	int number, SubjectToStatus _stat
 /*
  *	f l i p F i x e d
  */
-returnValue Constraints::flipFixed( int number )
+returnValue Constraints::flipFixed( int_t number )
 {
 	/* consistency check */
 	if ( ( number < 0 ) || ( number >= n ) )
@@ -245,9 +245,9 @@ returnValue Constraints::flipFixed( int number )
 /*
  *	s h i f t
  */
-returnValue Constraints::shift( int offset )
+returnValue Constraints::shift( int_t offset )
 {
-	int i;
+	int_t i;
 
 	/* consistency check */
 	if ( ( offset == 0 ) || ( n <= 1 ) )
@@ -306,9 +306,9 @@ returnValue Constraints::shift( int offset )
 /*
  *	r o t a t e
  */
-returnValue Constraints::rotate( int offset )
+returnValue Constraints::rotate( int_t offset )
 {
-	int i;
+	int_t i;
 
 	/* consistency check */
 	if ( ( offset == 0 ) || ( offset == n ) || ( n <= 1 ) )
@@ -386,27 +386,26 @@ returnValue Constraints::print( )
 	if ( n == 0 )
 		return SUCCESSFUL_RETURN;
 
-	#ifndef __XPCTARGET__
-	#ifndef __DSPACE__
-	char myPrintfString[160];
+	#ifndef __SUPPRESSANYOUTPUT__
 
-	int nIAC = getNIAC( );
-	int nAC  = getNAC( );
+	char myPrintfString[MAX_STRING_LENGTH];
 
-	int* IAC_idx;
+	int_t nIAC = getNIAC( );
+	int_t nAC  = getNAC( );
+
+	int_t* IAC_idx;
 	getInactive( )->getNumberArray( &IAC_idx );
 
-	int* AC_idx;
+	int_t* AC_idx;
 	getActive( )->getNumberArray( &AC_idx );
 
-	snprintf( myPrintfString,160,"Constraints object comprising %d constraints (%d inactive, %d active):\n",n,nIAC,nAC );
+	snprintf( myPrintfString,MAX_STRING_LENGTH,"Constraints object comprising %d constraints (%d inactive, %d active):\n",(int)n,(int)nIAC,(int)nAC );
 	myPrintf( myPrintfString );
 
 	REFER_NAMESPACE_QPOASES print( IAC_idx,nIAC,"inactive" );
 	REFER_NAMESPACE_QPOASES print( AC_idx, nAC, "active  " );
 
-	#endif
-	#endif
+	#endif /* __SUPPRESSANYOUTPUT__ */
 
 	return SUCCESSFUL_RETURN;
 }
@@ -445,7 +444,7 @@ returnValue Constraints::copy(	const Constraints& rhs
  */
 returnValue Constraints::setupAll( SubjectToStatus _status )
 {
-	int i;
+	int_t i;
 
 	/* 1) Place unbounded constraints at the beginning of the index list of inactive constraints. */
 	for( i=0; i<n; ++i )

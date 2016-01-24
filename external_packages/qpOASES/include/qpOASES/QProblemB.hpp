@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file include/qpOASES/QProblemB.hpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Declaration of the QProblemB class which is able to use the newly
  *	developed online active set strategy for parametric quadratic programming
@@ -49,7 +49,7 @@ BEGIN_NAMESPACE_QPOASES
 
 class SolutionAnalysis;
 
-/** 
+/**
  *	\brief Implements the online active set strategy for box-constrained QPs.
  *
  *	Class for setting up and solving quadratic programs with bounds (= box constraints) only.
@@ -57,8 +57,8 @@ class SolutionAnalysis;
  *	for parametric quadratic programming.
  *
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  */
 class QProblemB
 {
@@ -77,7 +77,7 @@ class QProblemB
 		 *  identity matrix (i.e. HST_IDENTITY), respectively, no memory
 		 *  is allocated for it and a NULL pointer can be passed for it
 		 *  to the init() functions. */
-		QProblemB(	int _nV,								/**< Number of variables. */
+		QProblemB(	int_t _nV,								/**< Number of variables. */
 					HessianType _hessianType = HST_UNKNOWN	/**< Type of Hessian matrix. */
 					);
 
@@ -89,7 +89,7 @@ class QProblemB
 		virtual ~QProblemB( );
 
 		/** Assignment operator (deep copy). */
-		QProblemB& operator=(	const QProblemB& rhs	/**< Rhs object. */
+		virtual QProblemB& operator=(	const QProblemB& rhs	/**< Rhs object. */
 								);
 
 
@@ -99,9 +99,18 @@ class QProblemB
 		virtual returnValue reset( );
 
 
-		/** Initialises a QProblemB with given QP data and solves it
-		 *	using an initial homotopy with empty working set (at most nWSR iterations).
+		/** Initialises a simply bounded QP problem with given QP data and tries to solve it
+		 *	using at most nWSR iterations. Depending on the parameter constellation it: \n
+		 *	1. 0,    0,    0 : starts with xOpt = 0, yOpt = 0 and gB empty (or all implicit equality bounds), \n
+		 *	2. xOpt, 0,    0 : starts with xOpt, yOpt = 0 and obtain gB by "clipping", \n
+		 *	3. 0,    yOpt, 0 : starts with xOpt = 0, yOpt and obtain gB from yOpt != 0, \n
+		 *	4. 0,    0,    gB: starts with xOpt = 0, yOpt = 0 and gB, \n
+		 *	5. xOpt, yOpt, 0 : starts with xOpt, yOpt and obtain gB from yOpt != 0, \n
+		 *	6. xOpt, 0,    gB: starts with xOpt, yOpt = 0 and gB, \n
+		 *	7. xOpt, yOpt, gB: starts with xOpt, yOpt and gB (assume them to be consistent!)
+		 *
 		 *  Note: This function internally calls solveInitialQP for initialisation!
+		 *
 		 *	\return SUCCESSFUL_RETURN \n
 					RET_INIT_FAILED \n
 					RET_INIT_FAILED_CHOLESKY \n
@@ -110,21 +119,40 @@ class QProblemB
 					RET_INIT_FAILED_UNBOUNDEDNESS \n
 					RET_MAX_NWSR_REACHED \n
 					RET_INVALID_ARGUMENTS */
-		returnValue init(	SymmetricMatrix *_H,	 	/**< Hessian matrix. */
-							const real_t* const _g,		/**< Gradient vector. */
-							const real_t* const _lb,	/**< Lower bounds (on variables). \n
-															 If no lower bounds exist, a NULL pointer can be passed. */
-							const real_t* const _ub,	/**< Upper bounds (on variables). \n
-															 If no upper bounds exist, a NULL pointer can be passed. */
-							int& nWSR, 					/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
-															 Output: Number of performed working set recalculations. */
-				 			real_t* const cputime = 0	/**< Input: Maximum CPU time allowed for QP initialisation. \n
-															 Output: CPU time spend for QP initialisation (if pointer passed). */
+		returnValue init(	SymmetricMatrix *_H,					/**< Hessian matrix (a shallow copy is made). */
+							const real_t* const _g,					/**< Gradient vector. */
+							const real_t* const _lb,				/**< Lower bounds (on variables). \n
+																		 If no lower bounds exist, a NULL pointer can be passed. */
+							const real_t* const _ub,				/**< Upper bounds (on variables). \n
+																		 If no upper bounds exist, a NULL pointer can be passed. */
+							int_t& nWSR, 							/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
+																		 Output: Number of performed working set recalculations. */
+				 			real_t* const cputime = 0,				/**< Input: Maximum CPU time allowed for QP initialisation. \n
+																		 Output: CPU time spent for QP initialisation (if pointer passed). */
+							const real_t* const xOpt = 0,			/**< Optimal primal solution vector. A NULL pointer can be passed. \n
+																		 (If a null pointer is passed, the old primal solution is kept!) */
+							const real_t* const yOpt = 0,			/**< Optimal dual solution vector. A NULL pointer can be passed. \n
+																		 (If a null pointer is passed, the old dual solution is kept!) */
+							const Bounds* const guessedBounds = 0,	/**< Optimal working set of bounds for solution (xOpt,yOpt). \n
+																		 (If a null pointer is passed, all bounds are assumed inactive!) */
+							const real_t* const _R = 0				/**< Pre-computed (upper triangular) Cholesky factor of Hessian matrix.
+																	 	 The Cholesky factor must be stored in a real_t array of size nV*nV
+																		 in row-major format. Note: Only used if xOpt/yOpt and gB are NULL! \n
+																		 (If a null pointer is passed, Cholesky decomposition is computed internally!) */
 							);
 
-		/** Initialises a QProblemB with given QP data and solves it
-		 *	using an initial homotopy with empty working set (at most nWSR iterations).
+		/** Initialises a simply bounded QP problem with given QP data and tries to solve it
+		 *	using at most nWSR iterations. Depending on the parameter constellation it: \n
+		 *	1. 0,    0,    0 : starts with xOpt = 0, yOpt = 0 and gB empty (or all implicit equality bounds), \n
+		 *	2. xOpt, 0,    0 : starts with xOpt, yOpt = 0 and obtain gB by "clipping", \n
+		 *	3. 0,    yOpt, 0 : starts with xOpt = 0, yOpt and obtain gB from yOpt != 0, \n
+		 *	4. 0,    0,    gB: starts with xOpt = 0, yOpt = 0 and gB, \n
+		 *	5. xOpt, yOpt, 0 : starts with xOpt, yOpt and obtain gB from yOpt != 0, \n
+		 *	6. xOpt, 0,    gB: starts with xOpt, yOpt = 0 and gB, \n
+		 *	7. xOpt, yOpt, gB: starts with xOpt, yOpt and gB (assume them to be consistent!)
+		 *
 		 *  Note: This function internally calls solveInitialQP for initialisation!
+		 *
 		 *	\return SUCCESSFUL_RETURN \n
 					RET_INIT_FAILED \n
 					RET_INIT_FAILED_CHOLESKY \n
@@ -133,22 +161,41 @@ class QProblemB
 					RET_INIT_FAILED_UNBOUNDEDNESS \n
 					RET_MAX_NWSR_REACHED \n
 					RET_INVALID_ARGUMENTS */
-		returnValue init(	const real_t* const _H, 	/**< Hessian matrix. \n
-															 If Hessian matrix is trivial, a NULL pointer can be passed. */
-							const real_t* const _g,		/**< Gradient vector. */
-							const real_t* const _lb,	/**< Lower bounds (on variables). \n
-															 If no lower bounds exist, a NULL pointer can be passed. */
-							const real_t* const _ub,	/**< Upper bounds (on variables). \n
-															 If no upper bounds exist, a NULL pointer can be passed. */
-							int& nWSR, 					/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
-															 Output: Number of performed working set recalculations. */
-				 			real_t* const cputime = 0	/**< Input: Maximum CPU time allowed for QP initialisation. \n
-															 Output: CPU time spend for QP initialisation (if pointer passed). */
+		returnValue init(	const real_t* const _H, 				/**< Hessian matrix (a shallow copy is made). \n
+																		 If Hessian matrix is trivial, a NULL pointer can be passed. */
+							const real_t* const _g,					/**< Gradient vector. */
+							const real_t* const _lb,				/**< Lower bounds (on variables). \n
+																		 If no lower bounds exist, a NULL pointer can be passed. */
+							const real_t* const _ub,				/**< Upper bounds (on variables). \n
+																		 If no upper bounds exist, a NULL pointer can be passed. */
+							int_t& nWSR, 							/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
+																		 Output: Number of performed working set recalculations. */
+				 			real_t* const cputime = 0,				/**< Input: Maximum CPU time allowed for QP initialisation. \n
+																		 Output: CPU time spent for QP initialisation (if pointer passed). */
+							const real_t* const xOpt = 0,			/**< Optimal primal solution vector. A NULL pointer can be passed. \n
+																		 (If a null pointer is passed, the old primal solution is kept!) */
+							const real_t* const yOpt = 0,			/**< Optimal dual solution vector. A NULL pointer can be passed. \n
+																		 (If a null pointer is passed, the old dual solution is kept!) */
+							const Bounds* const guessedBounds = 0,	/**< Optimal working set of bounds for solution (xOpt,yOpt). \n
+																		 (If a null pointer is passed, all bounds are assumed inactive!) */
+							const real_t* const _R = 0				/**< Pre-computed (upper triangular) Cholesky factor of Hessian matrix.
+																	 	 The Cholesky factor must be stored in a real_t array of size nV*nV
+																		 in row-major format. Note: Only used if xOpt/yOpt and gB are NULL! \n
+																		 (If a null pointer is passed, Cholesky decomposition is computed internally!) */
 							);
 
-		/** Initialises a QProblemB with given QP data to be read from files and solves it
-		 *	using an initial homotopy with empty working set (at most nWSR iterations).
+		/** Initialises a simply bounded QP problem with given QP data to be read from files and solves it
+		 *	using at most nWSR iterations. Depending on the parameter constellation it: \n
+		 *	1. 0,    0,    0 : starts with xOpt = 0, yOpt = 0 and gB empty (or all implicit equality bounds), \n
+		 *	2. xOpt, 0,    0 : starts with xOpt, yOpt = 0 and obtain gB by "clipping", \n
+		 *	3. 0,    yOpt, 0 : starts with xOpt = 0, yOpt and obtain gB from yOpt != 0, \n
+		 *	4. 0,    0,    gB: starts with xOpt = 0, yOpt = 0 and gB, \n
+		 *	5. xOpt, yOpt, 0 : starts with xOpt, yOpt and obtain gB from yOpt != 0, \n
+		 *	6. xOpt, 0,    gB: starts with xOpt, yOpt = 0 and gB, \n
+		 *	7. xOpt, yOpt, gB: starts with xOpt, yOpt and gB (assume them to be consistent!)
+		 *
 		 *  Note: This function internally calls solveInitialQP for initialisation!
+		 *
 		 *	\return SUCCESSFUL_RETURN \n
 					RET_INIT_FAILED \n
 					RET_INIT_FAILED_CHOLESKY \n
@@ -157,184 +204,36 @@ class QProblemB
 					RET_INIT_FAILED_UNBOUNDEDNESS \n
 					RET_MAX_NWSR_REACHED \n
 					RET_UNABLE_TO_READ_FILE */
-		returnValue init(	const char* const H_file, 	/**< Name of file where Hessian matrix is stored. \n
-															 If Hessian matrix is trivial, a NULL pointer can be passed. */
-							const char* const g_file,  	/**< Name of file where gradient vector is stored. */
-							const char* const lb_file, 	/**< Name of file where lower bound vector. \n
-															 If no lower bounds exist, a NULL pointer can be passed. */
-							const char* const ub_file, 	/**< Name of file where upper bound vector. \n
-															 If no upper bounds exist, a NULL pointer can be passed. */
-							int& nWSR, 					/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
-															 Output: Number of performed working set recalculations. */
-				 			real_t* const cputime = 0	/**< Input: Maximum CPU time allowed for QP initialisation. \n
-															 Output: CPU time spend for QP initialisation (if pointer passed). */
-							);
-
-		/** Initialises a QProblemB with given QP data and solves it
-		 *  depending on the parameter constellation: \n
-		 *	1. 0,    0,    0 : start with xOpt = 0, yOpt = 0 and IB empty (or all implicit equality bounds), \n
-		 *	2. xOpt, 0,    0 : start with xOpt, yOpt = 0 and obtain IB by "clipping", \n
-		 *	3. 0,    yOpt, 0 : start with xOpt = 0, yOpt and obtain IB from yOpt != 0, \n
-		 *	4. 0,    0,    IB: start with xOpt = 0, yOpt = 0 and IB, \n
-		 *	5. xOpt, yOpt, 0 : start with xOpt, yOpt and obtain IB from yOpt != 0, \n
-		 *	6. xOpt, 0,    IB: start with xOpt, yOpt = 0 and IB, \n
-		 *	7. xOpt, yOpt, IB: start with xOpt, yOpt and IB (assume them to be consistent!)
-		 *  Note: This function internally calls solveInitialQP for initialisation!
-		 *	\return SUCCESSFUL_RETURN \n
-					RET_INIT_FAILED \n
-					RET_INIT_FAILED_CHOLESKY \n
-					RET_INIT_FAILED_HOTSTART \n
-					RET_INIT_FAILED_INFEASIBILITY \n
-					RET_INIT_FAILED_UNBOUNDEDNESS \n
-					RET_MAX_NWSR_REACHED \n
-					RET_INVALID_ARGUMENTS */
-		returnValue init(	SymmetricMatrix *_H,				/**< Hessian matrix. */
-							const real_t* const _g,				/**< Gradient vector. */
-							const real_t* const _lb,			/**< Lower bounds (on variables). \n
-																	 If no lower bounds exist, a NULL pointer can be passed. */
-							const real_t* const _ub,			/**< Upper bounds (on variables). \n
-																	 If no upper bounds exist, a NULL pointer can be passed. */
-							int& nWSR, 							/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
-																	 Output: Number of performed working set recalculations. */
-				 			real_t* const cputime,				/**< Input: Maximum CPU time allowed for QP initialisation. \n
-															 		 Output: CPU time spend for QP initialisation. */
-							const real_t* const xOpt,			/**< Optimal primal solution vector.
-																	 A NULL pointer can be passed. */
-							const real_t* const yOpt,			/**< Optimal dual solution vector.
-																	 A NULL pointer can be passed. */
-							const Bounds* const guessedBounds	/**< Optimal working set for solution (xOpt,yOpt).
-																	 A NULL pointer can be passed. */
-							);
-
-		/** Initialises a QProblemB with given QP data and solves it
-		 *  depending on the parameter constellation: \n
-		 *	1. 0,    0,    0 : start with xOpt = 0, yOpt = 0 and IB empty (or all implicit equality bounds), \n
-		 *	2. xOpt, 0,    0 : start with xOpt, yOpt = 0 and obtain IB by "clipping", \n
-		 *	3. 0,    yOpt, 0 : start with xOpt = 0, yOpt and obtain IB from yOpt != 0, \n
-		 *	4. 0,    0,    IB: start with xOpt = 0, yOpt = 0 and IB, \n
-		 *	5. xOpt, yOpt, 0 : start with xOpt, yOpt and obtain IB from yOpt != 0, \n
-		 *	6. xOpt, 0,    IB: start with xOpt, yOpt = 0 and IB, \n
-		 *	7. xOpt, yOpt, IB: start with xOpt, yOpt and IB (assume them to be consistent!)
-		 *  Note: This function internally calls solveInitialQP for initialisation!
-		 *	\return SUCCESSFUL_RETURN \n
-					RET_INIT_FAILED \n
-					RET_INIT_FAILED_CHOLESKY \n
-					RET_INIT_FAILED_HOTSTART \n
-					RET_INIT_FAILED_INFEASIBILITY \n
-					RET_INIT_FAILED_UNBOUNDEDNESS \n
-					RET_MAX_NWSR_REACHED \n
-					RET_INVALID_ARGUMENTS */
-		returnValue init(	const real_t* const _H, 			/**< Hessian matrix. \n
-																     If Hessian matrix is trivial, a NULL pointer can be passed. */
-							const real_t* const _g,				/**< Gradient vector. */
-							const real_t* const _lb,			/**< Lower bounds (on variables). \n
-																	 If no lower bounds exist, a NULL pointer can be passed. */
-							const real_t* const _ub,			/**< Upper bounds (on variables). \n
-																	 If no upper bounds exist, a NULL pointer can be passed. */
-							int& nWSR, 							/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
-																	 Output: Number of performed working set recalculations. */
-				 			real_t* const cputime,				/**< Input: Maximum CPU time allowed for QP initialisation. \n
-															 		 Output: CPU time spend for QP initialisation. */
-							const real_t* const xOpt,			/**< Optimal primal solution vector.
-																	 A NULL pointer can be passed. */
-							const real_t* const yOpt,			/**< Optimal dual solution vector.
-																	 A NULL pointer can be passed. */
-							const Bounds* const guessedBounds	/**< Optimal working set for solution (xOpt,yOpt).
-																	 A NULL pointer can be passed. */
-							);
-
-		/** Initialises a QProblemB with given QP data to be read from files and solves it
-		 *  depending on the parameter constellation: \n
-		 *	1. 0,    0,    0 : start with xOpt = 0, yOpt = 0 and IB empty (or all implicit equality bounds), \n
-		 *	2. xOpt, 0,    0 : start with xOpt, yOpt = 0 and obtain IB by "clipping", \n
-		 *	3. 0,    yOpt, 0 : start with xOpt = 0, yOpt and obtain IB from yOpt != 0, \n
-		 *	4. 0,    0,    IB: start with xOpt = 0, yOpt = 0 and IB, \n
-		 *	5. xOpt, yOpt, 0 : start with xOpt, yOpt and obtain IB from yOpt != 0, \n
-		 *	6. xOpt, 0,    IB: start with xOpt, yOpt = 0 and IB, \n
-		 *	7. xOpt, yOpt, IB: start with xOpt, yOpt and IB (assume them to be consistent!)
-		 *  Note: This function internally calls solveInitialQP for initialisation!
-		 *	\return SUCCESSFUL_RETURN \n
-					RET_INIT_FAILED \n
-					RET_INIT_FAILED_CHOLESKY \n
-					RET_INIT_FAILED_HOTSTART \n
-					RET_INIT_FAILED_INFEASIBILITY \n
-					RET_INIT_FAILED_UNBOUNDEDNESS \n
-					RET_MAX_NWSR_REACHED \n
-					RET_UNABLE_TO_READ_FILE */
-		returnValue init(	const char* const H_file, 			/**< Name of file where Hessian matrix is stored. \n
-																     If Hessian matrix is trivial, a NULL pointer can be passed. */
-							const char* const g_file,  			/**< Name of file where gradient vector is stored. */
-							const char* const lb_file, 			/**< Name of file where lower bound vector. \n
-																	 If no lower bounds exist, a NULL pointer can be passed. */
-							const char* const ub_file, 			/**< Name of file where upper bound vector. \n
-																	 If no upper bounds exist, a NULL pointer can be passed. */
-							int& nWSR, 							/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
-																	 Output: Number of performed working set recalculations. */
-				 			real_t* const cputime,				/**< Input: Maximum CPU time allowed for QP initialisation. \n
-															 		 Output: CPU time spend for QP initialisation. */
-							const real_t* const xOpt,			/**< Optimal primal solution vector.
-																	 A NULL pointer can be passed. */
-							const real_t* const yOpt,			/**< Optimal dual solution vector.
-																	 A NULL pointer can be passed. */
-							const Bounds* const guessedBounds	/**< Optimal working set for solution (xOpt,yOpt).
-																	 A NULL pointer can be passed. */
+		returnValue init(	const char* const H_file,				/**< Name of file where Hessian matrix is stored. \n
+																		 If Hessian matrix is trivial, a NULL pointer can be passed. */
+							const char* const g_file,				/**< Name of file where gradient vector is stored. */
+							const char* const lb_file,				/**< Name of file where lower bound vector. \n
+																		 If no lower bounds exist, a NULL pointer can be passed. */
+							const char* const ub_file,				/**< Name of file where upper bound vector. \n
+																		 If no upper bounds exist, a NULL pointer can be passed. */
+							int_t& nWSR, 							/**< Input: Maximum number of working set recalculations when using initial homotopy. \n
+																		 Output: Number of performed working set recalculations. */
+				 			real_t* const cputime = 0,				/**< Input: Maximum CPU time allowed for QP initialisation. \n
+																		 Output: CPU time spent for QP initialisation (if pointer passed). */
+							const real_t* const xOpt = 0,			/**< Optimal primal solution vector. A NULL pointer can be passed. \n
+																		 (If a null pointer is passed, the old primal solution is kept!) */
+							const real_t* const yOpt = 0,			/**< Optimal dual solution vector. A NULL pointer can be passed. \n
+																		 (If a null pointer is passed, the old dual solution is kept!) */
+							const Bounds* const guessedBounds = 0,	/**< Optimal working set of bounds for solution (xOpt,yOpt). \n
+																		 (If a null pointer is passed, all bounds are assumed inactive!) */
+							const char* const R_file = 0			/**< Name of the file where a pre-computed (upper triangular) Cholesky factor
+																		 of the Hessian matrix is stored. \n
+																		 (If a null pointer is passed, Cholesky decomposition is computed internally!) */
 							);
 
 
-		/** Solves an initialised QProblemB using online active set strategy.
+		/** Solves an initialised QP sequence using the online active set strategy.
+		 *	By default, QP solution is started from previous solution. If a guess
+		 *	for the working set is provided, an initialised homotopy is performed.
+		 *
 		 *  Note: This function internally calls solveQP/solveRegularisedQP
 		 *        for solving an initialised QP!
-		 *	\return SUCCESSFUL_RETURN \n
-					RET_MAX_NWSR_REACHED \n
-					RET_HOTSTART_FAILED_AS_QP_NOT_INITIALISED \n
-					RET_HOTSTART_FAILED \n
-					RET_SHIFT_DETERMINATION_FAILED \n
-					RET_STEPDIRECTION_DETERMINATION_FAILED \n
-					RET_STEPLENGTH_DETERMINATION_FAILED \n
-					RET_HOMOTOPY_STEP_FAILED \n
-					RET_HOTSTART_STOPPED_INFEASIBILITY \n
-					RET_HOTSTART_STOPPED_UNBOUNDEDNESS */
-		returnValue hotstart(	const real_t* const g_new,	/**< Gradient of neighbouring QP to be solved. */
-								const real_t* const lb_new,	/**< Lower bounds of neighbouring QP to be solved. \n
-													 			 If no lower bounds exist, a NULL pointer can be passed. */
-								const real_t* const ub_new,	/**< Upper bounds of neighbouring QP to be solved. \n
-													 			 If no upper bounds exist, a NULL pointer can be passed. */
-								int& nWSR,					/**< Input: Maximum number of working set recalculations; \n
-																 Output: Number of performed working set recalculations. */
-								real_t* const cputime = 0	/**< Input: Maximum CPU time allowed for QP solution. \n
-																 Output: CPU time spend for QP solution (or to perform nWSR iterations). */
-								);
-
-		/** Solves an initialised QProblemB online active set strategy
-		 *  reading QP data from files.
-		 *  Note: This function internally calls solveQP/solveRegularisedQP
-		 *        for solving an initialised QP!
-		 *	\return SUCCESSFUL_RETURN \n
-		 			RET_MAX_NWSR_REACHED \n
-		 			RET_HOTSTART_FAILED_AS_QP_NOT_INITIALISED \n
-					RET_HOTSTART_FAILED \n
-					RET_SHIFT_DETERMINATION_FAILED \n
-					RET_STEPDIRECTION_DETERMINATION_FAILED \n
-					RET_STEPLENGTH_DETERMINATION_FAILED \n
-					RET_HOMOTOPY_STEP_FAILED \n
-					RET_HOTSTART_STOPPED_INFEASIBILITY \n
-					RET_HOTSTART_STOPPED_UNBOUNDEDNESS \n
-					RET_UNABLE_TO_READ_FILE \n
-					RET_INVALID_ARGUMENTS */
-		returnValue hotstart(	const char* const g_file, 	/**< Name of file where gradient, of neighbouring QP to be solved, is stored. */
-								const char* const lb_file, 	/**< Name of file where lower bounds, of neighbouring QP to be solved, is stored. \n
-													 			 If no lower bounds exist, a NULL pointer can be passed. */
-								const char* const ub_file, 	/**< Name of file where upper bounds, of neighbouring QP to be solved, is stored. \n
-													 			 If no upper bounds exist, a NULL pointer can be passed. */
-								int& nWSR, 					/**< Input: Maximum number of working set recalculations; \n
-																 Output: Number of performed working set recalculations. */
-								real_t* const cputime = 0 	/**< Input: Maximum CPU time allowed for QP solution. \n
-																 Output: CPU time spend for QP solution (or to perform nWSR iterations). */
-								);
-
-		/** Solves an initialised QProblemB using online active set strategy (using an initialised homotopy).
-		 *  Note: This function internally calls solveQP/solveRegularisedQP
-		 *        for solving an initialised QP!
+		 *
 		 *	\return SUCCESSFUL_RETURN \n
 					RET_MAX_NWSR_REACHED \n
 					RET_HOTSTART_FAILED_AS_QP_NOT_INITIALISED \n
@@ -346,23 +245,27 @@ class QProblemB
 					RET_HOTSTART_STOPPED_INFEASIBILITY \n
 					RET_HOTSTART_STOPPED_UNBOUNDEDNESS \n
 					RET_SETUP_AUXILIARYQP_FAILED */
-		returnValue hotstart(	const real_t* const g_new,			/**< Gradient of neighbouring QP to be solved. */
-								const real_t* const lb_new,			/**< Lower bounds of neighbouring QP to be solved. \n
-													 					 If no lower bounds exist, a NULL pointer can be passed. */
-								const real_t* const ub_new,			/**< Upper bounds of neighbouring QP to be solved. \n
-													 					 If no upper bounds exist, a NULL pointer can be passed. */
-								int& nWSR,							/**< Input: Maximum number of working set recalculations; \n
-																		 Output: Number of performed working set recalculations. */
-								real_t* const cputime,				/**< Input: Maximum CPU time allowed for QP solution. \n
-																 		 Output: CPU time spend for QP solution (or to perform nWSR iterations). */
-								const Bounds* const guessedBounds	/**< Initial guess for working set of bounds.
-																	 *   A null pointer corresponds to an empty working set! */
+		returnValue hotstart(	const real_t* const g_new,				/**< Gradient of neighbouring QP to be solved. */
+								const real_t* const lb_new,				/**< Lower bounds of neighbouring QP to be solved. \n
+													 						 If no lower bounds exist, a NULL pointer can be passed. */
+								const real_t* const ub_new,				/**< Upper bounds of neighbouring QP to be solved. \n
+													 						 If no upper bounds exist, a NULL pointer can be passed. */
+								int_t& nWSR,							/**< Input: Maximum number of working set recalculations; \n
+																			 Output: Number of performed working set recalculations. */
+								real_t* const cputime = 0,				/**< Input: Maximum CPU time allowed for QP solution. \n
+																			 Output: CPU time spent for QP solution (or to perform nWSR iterations). */
+								const Bounds* const guessedBounds = 0	/**< Optimal working set of bounds for solution (xOpt,yOpt). \n
+																			 (If a null pointer is passed, the previous working set is kept!) */
 								);
 
-		/** Solves an initialised QProblemB using online active set strategy (using an initialised homotopy)
-		 *  reading QP data from files.
+		/** Solves an initialised QP sequence using the online active set strategy,
+		 *  where QP data is read from files.
+		 *	By default, QP solution is started from previous solution. If a guess
+		 *	for the working set is provided, an initialised homotopy is performed.
+		 *
 		 *  Note: This function internally calls solveQP/solveRegularisedQP
 		 *        for solving an initialised QP!
+		 *
 		 *	\return SUCCESSFUL_RETURN \n
 		 			RET_MAX_NWSR_REACHED \n
 		 			RET_HOTSTART_FAILED_AS_QP_NOT_INITIALISED \n
@@ -374,20 +277,39 @@ class QProblemB
 					RET_HOTSTART_STOPPED_INFEASIBILITY \n
 					RET_HOTSTART_STOPPED_UNBOUNDEDNESS \n
 					RET_UNABLE_TO_READ_FILE \n
-					RET_INVALID_ARGUMENTS \n
-					RET_SETUP_AUXILIARYQP_FAILED */
-		returnValue hotstart(	const char* const g_file,			/**< Name of file where gradient, of neighbouring QP to be solved, is stored. */
-								const char* const lb_file,			/**< Name of file where lower bounds, of neighbouring QP to be solved, is stored. \n
-													 					 If no lower bounds exist, a NULL pointer can be passed. */
-								const char* const ub_file, 			/**< Name of file where upper bounds, of neighbouring QP to be solved, is stored. \n
-													 					 If no upper bounds exist, a NULL pointer can be passed. */
-								int& nWSR,							/**< Input: Maximum number of working set recalculations; \n
-																		 Output: Number of performed working set recalculations. */
-								real_t* const cputime,				/**< Input: Maximum CPU time allowed for QP solution. \n
-																 		 Output: CPU time spend for QP solution (or to perform nWSR iterations). */
-								const Bounds* const guessedBounds	/**< Initial guess for working set of bounds.
-																	 *   A null pointer corresponds to an empty working set! */
+					RET_SETUP_AUXILIARYQP_FAILED \n
+					RET_INVALID_ARGUMENTS */
+		returnValue hotstart(	const char* const g_file, 				/**< Name of file where gradient, of neighbouring QP to be solved, is stored. */
+								const char* const lb_file,				/**< Name of file where lower bounds, of neighbouring QP to be solved, is stored. \n
+													 						 If no lower bounds exist, a NULL pointer can be passed. */
+								const char* const ub_file,				/**< Name of file where upper bounds, of neighbouring QP to be solved, is stored. \n
+													 						 If no upper bounds exist, a NULL pointer can be passed. */
+								int_t& nWSR, 							/**< Input: Maximum number of working set recalculations; \n
+																			 Output: Number of performed working set recalculations. */
+								real_t* const cputime = 0,			 	/**< Input: Maximum CPU time allowed for QP solution. \n
+																			 Output: CPU time spent for QP solution (or to perform nWSR iterations). */
+								const Bounds* const guessedBounds = 0	/**< Optimal working set of bounds for solution (xOpt,yOpt). \n
+																			 (If a null pointer is passed, the previous working set is kept!) */
 								);
+
+
+		/** Writes a vector with the state of the working set
+		 *	\return SUCCESSFUL_RETURN \n
+		 *	        RET_INVALID_ARGUMENTS */
+		virtual returnValue getWorkingSet(	real_t* workingSet				/** Output: array containing state of the working set. */
+											);
+
+		/** Writes a vector with the state of the working set of bounds
+		 *	\return SUCCESSFUL_RETURN \n
+		 *	        RET_INVALID_ARGUMENTS */
+		virtual returnValue getWorkingSetBounds(	real_t* workingSetB		/** Output: array containing state of the working set of bounds. */
+													);
+
+		/** Writes a vector with the state of the working set of constraints
+		 *	\return SUCCESSFUL_RETURN \n
+		 *	        RET_INVALID_ARGUMENTS */
+		virtual returnValue getWorkingSetConstraints(	real_t* workingSetC	/** Output: array containing state of the working set of constraints. */
+														);
 
 
 		/** Returns current bounds object of the QP (deep copy).
@@ -399,23 +321,23 @@ class QProblemB
 
 		/** Returns the number of variables.
 		 *	\return Number of variables. */
-		inline int getNV( ) const;
+		inline int_t getNV( ) const;
 
 		/** Returns the number of free variables.
 		 *	\return Number of free variables. */
-		inline int getNFR( ) const;
+		inline int_t getNFR( ) const;
 
 		/** Returns the number of fixed variables.
 		 *	\return Number of fixed variables. */
-		inline int getNFX( ) const;
+		inline int_t getNFX( ) const;
 
 		/** Returns the number of implicitly fixed variables.
 		 *	\return Number of implicitly fixed variables. */
-		inline int getNFV( ) const;
+		inline int_t getNFV( ) const;
 
 		/** Returns the dimension of null space.
 		 *	\return Dimension of null space. */
-		virtual int getNZ( ) const;
+		virtual int_t getNZ( ) const;
 
 
 		/** Returns the optimal objective function value.
@@ -500,6 +422,15 @@ class QProblemB
 									);
 
 
+		/** Returns the current number of QP problems solved.
+		 *	\return Number of QP problems solved. */
+		inline uint_t getCount( ) const;
+
+		/** Resets QP problem counter (to zero).
+		 *	\return SUCCESSFUL_RETURN. */
+		inline returnValue resetCounter( );
+
+
 		/** Prints concise list of properties of the current QP.
 		 *	\return  SUCCESSFUL_RETURN \n */
 		virtual returnValue printProperties( );
@@ -516,12 +447,12 @@ class QProblemB
 		/** Frees all allocated memory.
 		 *  \return SUCCESSFUL_RETURN */
 		returnValue clear( );
-		
+
 		/** Copies all members from given rhs object.
 		 *  \return SUCCESSFUL_RETURN */
 		returnValue copy(	const QProblemB& rhs	/**< Rhs object. */
 							);
-		
+
 		/** If Hessian type has been set by the user, nothing is done.
 		 *  Otherwise the Hessian type is set to HST_IDENTITY, HST_ZERO, or
 		 *  HST_POSDEF (default), respectively.
@@ -549,8 +480,15 @@ class QProblemB
 		 *	\return SUCCESSFUL_RETURN \n
 		 *			RET_HESSIAN_NOT_SPD \n
 		 *			RET_INDEXLIST_CORRUPTED */
-		returnValue setupCholeskyDecomposition( );
+		virtual returnValue computeCholesky( );
 
+
+		/** Computes initial Cholesky decomposition of the (simply projected) Hessian
+		 *  making use of the function computeCholesky().
+		 *	\return SUCCESSFUL_RETURN \n
+		 *			RET_HESSIAN_NOT_SPD \n
+		 *			RET_INDEXLIST_CORRUPTED */
+		virtual returnValue setupInitialCholesky( );
 
 		/** Obtains the desired working set for the auxiliary initial QP in
 		 *  accordance with the user specifications
@@ -563,14 +501,22 @@ class QProblemB
 																					 *	 If a NULL pointer is passed, all entries are assumed to be zero. */
 												const Bounds* const guessedBounds,	/**< Guessed working set for solution (xOpt,yOpt). */
 												Bounds* auxiliaryBounds				/**< Input: Allocated bound object. \n
-																					 *	 Ouput: Working set for auxiliary QP. */
+																					 *	 Output: Working set for auxiliary QP. */
 												) const;
 
+		/** Decides if lower bounds are smaller than upper bounds
+		 *
+		 * \return SUCCESSFUL_RETURN \n
+		 * 		   RET_QP_INFEASIBLE */
+
+		returnValue areBoundsConsistent(const real_t* const lb, /**< Vector of lower bounds*/
+										const real_t* const ub  /**< Vector of upper bounds*/
+										) const;
 
 		/** Solves the system Ra = b or R^Ta = b where R is an upper triangular matrix.
 		 *	\return SUCCESSFUL_RETURN \n
 					RET_DIV_BY_ZERO */
-		returnValue backsolveR(	const real_t* const b,	/**< Right hand side vector. */
+		virtual returnValue backsolveR(	const real_t* const b,	/**< Right hand side vector. */
 								BooleanType transposed,	/**< Indicates if the transposed system shall be solved. */
 								real_t* const a 		/**< Output: Solution vector */
 								) const;
@@ -579,7 +525,7 @@ class QProblemB
 		 *  Special variant for the case that this function is called from within "removeBound()".
 		 *	\return SUCCESSFUL_RETURN \n
 					RET_DIV_BY_ZERO */
-		returnValue backsolveR(	const real_t* const b,		/**< Right hand side vector. */
+		virtual returnValue backsolveR(	const real_t* const b,		/**< Right hand side vector. */
 								BooleanType transposed,		/**< Indicates if the transposed system shall be solved. */
 								BooleanType removingBound,	/**< Indicates if function is called from "removeBound()". */
 								real_t* const a 			/**< Output: Solution vector */
@@ -598,7 +544,7 @@ class QProblemB
 										);
 
 
-		/** Setups internal QP data. 
+		/** Sets up internal QP data.
 		 *	\return SUCCESSFUL_RETURN \n
 					RET_INVALID_ARGUMENTS */
 		returnValue setupQPdata(	SymmetricMatrix *_H,	 	/**< Hessian matrix.*/
@@ -609,7 +555,7 @@ class QProblemB
 																	 If no upper bounds exist, a NULL pointer can be passed. */
 									);
 
-		/** Setups internal QP data. If the current Hessian is trivial
+		/** Sets up internal QP data. If the current Hessian is trivial
 		 *  (i.e. HST_ZERO or HST_IDENTITY) but a non-trivial one is given,
 		 *  memory for Hessian is allocated and it is set to the given one.
 		 *	\return SUCCESSFUL_RETURN \n
@@ -624,7 +570,7 @@ class QProblemB
 																	 If no upper bounds exist, a NULL pointer can be passed. */
 									);
 
-		/** Setups internal QP data by loading it from files. If the current Hessian
+		/** Sets up internal QP data by loading it from files. If the current Hessian
 		 *  is trivial (i.e. HST_ZERO or HST_IDENTITY) but a non-trivial one is given,
 		 *  memory for Hessian is allocated and it is set to the given one.
 		 *	\return SUCCESSFUL_RETURN \n
@@ -662,7 +608,8 @@ class QProblemB
 		 *	\return RET_HOTSTART_STOPPED_INFEASIBILITY \n
 					RET_ENSURELI_FAILED_CYCLING \n
 					RET_ENSURELI_FAILED_NOINDEX */
-		returnValue setInfeasibilityFlag(	returnValue returnvalue
+		returnValue setInfeasibilityFlag(	returnValue returnvalue,			/**< Returnvalue to be tunneled. */
+											BooleanType doThrowError = BT_FALSE	/**< Flag forcing to throw an error. */
 											);
 
 
@@ -671,7 +618,7 @@ class QProblemB
 					BT_FALSE: Sufficient CPU time for next QP iteration. */
 		BooleanType isCPUtimeLimitExceeded(	const real_t* const cputime,	/**< Maximum CPU time allowed for QP solution. */
 											real_t starttime,				/**< Start time of current QP solution. */
-											int nWSR						/**< Number of working set recalculations performed so far. */
+											int_t nWSR						/**< Number of working set recalculations performed so far. */
 											) const;
 
 
@@ -683,15 +630,15 @@ class QProblemB
 
 		/** Sets Hessian matrix of the QP.
 		 *	\return SUCCESSFUL_RETURN */
-		inline returnValue setH(	SymmetricMatrix* H_new	/**< New Hessian matrix. */
+		inline returnValue setH(	SymmetricMatrix* H_new	/**< New Hessian matrix (a shallow copy is made). */
 									);
-									
+
 		/** Sets dense Hessian matrix of the QP.
 		 *  If a null pointer is passed and
 		 *  a) hessianType is HST_IDENTITY, nothing is done,
 		 *  b) hessianType is not HST_IDENTITY, Hessian matrix is set to zero.
 		 *	\return SUCCESSFUL_RETURN */
-		inline returnValue setH(	const real_t* const H_new	/**< New dense Hessian matrix (with correct dimension!). */
+		inline returnValue setH(	const real_t* const H_new	/**< New dense Hessian matrix (with correct dimension!), a shallow copy is made. */
 									);
 
 		/** Changes gradient vector of the QP.
@@ -702,27 +649,29 @@ class QProblemB
 
 		/** Changes lower bound vector of the QP.
 		 *	\return SUCCESSFUL_RETURN \n
-		 *			RET_INVALID_ARGUMENTS */
+		 *			RET_QPOBJECT_NOT_SETUP */
 		inline returnValue setLB(	const real_t* const lb_new	/**< New lower bound vector (with correct dimension!). */
 									);
 
 		/** Changes single entry of lower bound vector of the QP.
-		 *	\return SUCCESSFUL_RETURN  \n
-					RET_INDEX_OUT_OF_BOUNDS */
-		inline returnValue setLB(	int number,		/**< Number of entry to be changed. */
+		 *	\return SUCCESSFUL_RETURN \n
+		 *			RET_QPOBJECT_NOT_SETUP \n
+		 *			RET_INDEX_OUT_OF_BOUNDS */
+		inline returnValue setLB(	int_t number,	/**< Number of entry to be changed. */
 									real_t value	/**< New value for entry of lower bound vector. */
 									);
 
 		/** Changes upper bound vector of the QP.
 		 *	\return SUCCESSFUL_RETURN \n
-		 *			RET_INVALID_ARGUMENTS */
+		 *			RET_QPOBJECT_NOT_SETUP */
 		inline returnValue setUB(	const real_t* const ub_new	/**< New upper bound vector (with correct dimension!). */
 									);
 
 		/** Changes single entry of upper bound vector of the QP.
-		 *	\return SUCCESSFUL_RETURN  \n
-					RET_INDEX_OUT_OF_BOUNDS */
-		inline returnValue setUB(	int number,		/**< Number of entry to be changed. */
+		 *	\return SUCCESSFUL_RETURN \n
+		 *			RET_QPOBJECT_NOT_SETUP \n
+		 *			RET_INDEX_OUT_OF_BOUNDS */
+		inline returnValue setUB(	int_t number,	/**< Number of entry to be changed. */
 									real_t value	/**< New value for entry of upper bound vector. */
 									);
 
@@ -757,10 +706,10 @@ class QProblemB
 		/** Compute relative length of homotopy in data space for termination
 		 *  criterion.
 		 *  \return Relative length in data space. */
-		real_t relativeHomotopyLength(	const real_t* const g_new,		/**< Final gradient. */
-										const real_t* const lb_new,		/**< Final lower variable bounds. */
-										const real_t* const ub_new		/**< Final upper variable bounds. */
-										);
+		real_t getRelativeHomotopyLength(	const real_t* const g_new,		/**< Final gradient. */
+											const real_t* const lb_new,		/**< Final lower variable bounds. */
+											const real_t* const ub_new		/**< Final upper variable bounds. */
+											);
 
 		/** Ramping Strategy to avoid ties. Modifies homotopy start without
 		 *  changing current active set.
@@ -768,18 +717,28 @@ class QProblemB
 		virtual returnValue performRamping( );
 
 
+		/** ... */
+		returnValue updateFarBounds(	real_t curFarBound,					/**< ... */
+                                        int_t nRamp,						/**< ... */
+                                        const real_t* const lb_new,			/**< ... */
+                                        real_t* const lb_new_far,			/**< ... */
+                                        const real_t* const ub_new,			/**< ... */
+                                        real_t* const ub_new_far			/**< ... */
+                                        ) const;
+
+
 		/** Performs robustified ratio test yield the maximum possible step length
 		 *  along the homotopy path.
 		 *	\return  SUCCESSFUL_RETURN */
-		returnValue performRatioTest(	int nIdx, 							/**< Number of ratios to be checked. */
-										const int* const idxList, 			/**< Array containing the indices of all ratios to be checked. */
+		returnValue performRatioTest(	int_t nIdx, 						/**< Number of ratios to be checked. */
+										const int_t* const idxList, 		/**< Array containing the indices of all ratios to be checked. */
 										const SubjectTo* const subjectTo,	/**< Bound/Constraint object corresponding to ratios to be checked. */
 										const real_t* const num,	 		/**< Array containing all numerators for performing the ratio test. */
 										const real_t* const den,		 	/**< Array containing all denominators for performing the ratio test. */
 										real_t epsNum,						/**< Numerator tolerance. */
 										real_t epsDen,						/**< Denominator tolerance. */
 										real_t& t,							/**< Output: Maximum possible step length along the homotopy path. */
-										int& BC_idx 						/**< Output: Index of blocking constraint. */
+										int_t& BC_idx 						/**< Output: Index of blocking constraint. */
 										) const;
 
 		/** Checks whether given ratio is blocking, i.e. limits the maximum step length
@@ -792,6 +751,16 @@ class QProblemB
 										real_t& t							/**< Input: Current maximum step length along the homotopy path,
 																			 *   Output: Updated maximum possible step length along the homotopy path. */
 										) const;
+
+
+		/** Creates a sparse diagonal (square-)matrix which is a given
+		 *  multiple of the identity matrix.
+		 *  \return Diagonal matrix \n
+		 */
+		SymSparseMat* createDiagSparseMat(	int_t n,				/**< Row/column dimension of matrix to be created. */
+											real_t diagVal = 1.0	/**< Value of all diagonal entries. */
+											);
+
 
 	/*
 	 *	PRIVATE MEMBER FUNCTIONS
@@ -808,16 +777,14 @@ class QProblemB
 					RET_INIT_FAILED_INFEASIBILITY \n
 					RET_INIT_FAILED_UNBOUNDEDNESS \n
 					RET_MAX_NWSR_REACHED */
-		returnValue solveInitialQP(	const real_t* const xOpt,			/**< Optimal primal solution vector.
-																		 *	 A NULL pointer can be passed. */
-									const real_t* const yOpt,			/**< Optimal dual solution vector.
-																		 *	 A NULL pointer can be passed. */
-									const Bounds* const guessedBounds,	/**< Guessed working set for solution (xOpt,yOpt).
-																		 *	 A NULL pointer can be passed. */
-									int& nWSR, 							/**< Input: Maximum number of working set recalculations; \n
+		returnValue solveInitialQP(	const real_t* const xOpt,			/**< Optimal primal solution vector.*/
+									const real_t* const yOpt,			/**< Optimal dual solution vector. */
+									const Bounds* const guessedBounds,	/**< Optimal working set of bounds for solution (xOpt,yOpt). */
+									const real_t* const _R,				/**< Pre-computed (upper triangular) Cholesky factor of Hessian matrix. */
+									int_t& nWSR, 						/**< Input: Maximum number of working set recalculations; \n
 																 		 *	 Output: Number of performed working set recalculations. */
 									real_t* const cputime				/**< Input: Maximum CPU time allowed for QP solution. \n
-																 			 Output: CPU time spend for QP solution (or to perform nWSR iterations). */
+																 			 Output: CPU time spent for QP solution (or to perform nWSR iterations). */
 									);
 
 		/** Solves an initialised QProblemB using online active set strategy.
@@ -832,19 +799,20 @@ class QProblemB
 					RET_HOMOTOPY_STEP_FAILED \n
 					RET_HOTSTART_STOPPED_INFEASIBILITY \n
 					RET_HOTSTART_STOPPED_UNBOUNDEDNESS */
-		returnValue solveQP(	const real_t* const g_new,	/**< Gradient of neighbouring QP to be solved. */
-								const real_t* const lb_new,	/**< Lower bounds of neighbouring QP to be solved. \n
-													 			 If no lower bounds exist, a NULL pointer can be passed. */
-								const real_t* const ub_new,	/**< Upper bounds of neighbouring QP to be solved. \n
-													 			 If no upper bounds exist, a NULL pointer can be passed. */
-								int& nWSR,					/**< Input: Maximum number of working set recalculations; \n
-																 Output: Number of performed working set recalculations. */
-								real_t* const cputime,		/**< Input: Maximum CPU time allowed for QP solution. \n
-																 Output: CPU time spend for QP solution (or to perform nWSR iterations). */
-								int  nWSRperformed = 0		/**< Number of working set recalculations already performed to solve
-																 this QP within previous solveQP() calls. This number is
-																 always zero, except for successive calls from solveRegularisedQP()
-																 or when using the far bound strategy. */
+		returnValue solveQP(	const real_t* const g_new,			/**< Gradient of neighbouring QP to be solved. */
+								const real_t* const lb_new,			/**< Lower bounds of neighbouring QP to be solved. \n
+													 					 If no lower bounds exist, a NULL pointer can be passed. */
+								const real_t* const ub_new,			/**< Upper bounds of neighbouring QP to be solved. \n
+													 					 If no upper bounds exist, a NULL pointer can be passed. */
+								int_t& nWSR,						/**< Input: Maximum number of working set recalculations; \n
+																		 Output: Number of performed working set recalculations. */
+								real_t* const cputime,				/**< Input: Maximum CPU time allowed for QP solution. \n
+																		 Output: CPU time spent for QP solution (or to perform nWSR iterations). */
+								int_t  nWSRperformed = 0,			/**< Number of working set recalculations already performed to solve
+																		 this QP within previous solveQP() calls. This number is
+																		 always zero, except for successive calls from solveRegularisedQP()
+																		 or when using the far bound strategy. */
+								BooleanType isFirstCall = BT_TRUE	/**< Indicating whether this is the first call for current QP. */
 								);
 
 
@@ -860,22 +828,23 @@ class QProblemB
 					RET_HOMOTOPY_STEP_FAILED \n
 					RET_HOTSTART_STOPPED_INFEASIBILITY \n
 					RET_HOTSTART_STOPPED_UNBOUNDEDNESS */
-		returnValue solveRegularisedQP(	const real_t* const g_new,	/**< Gradient of neighbouring QP to be solved. */
-										const real_t* const lb_new,	/**< Lower bounds of neighbouring QP to be solved. \n
-															 			 If no lower bounds exist, a NULL pointer can be passed. */
-										const real_t* const ub_new,	/**< Upper bounds of neighbouring QP to be solved. \n
-															 			 If no upper bounds exist, a NULL pointer can be passed. */
-										int& nWSR,					/**< Input: Maximum number of working set recalculations; \n
-																		 Output: Number of performed working set recalculations. */
-										real_t* const cputime,		/**< Input: Maximum CPU time allowed for QP solution. \n
-																		 Output: CPU time spend for QP solution (or to perform nWSR iterations). */
-										int  nWSRperformed = 0		/**< Number of working set recalculations already performed to solve
-																		 this QP within previous solveRegularisedQP() calls. This number is
-																		 always zero, except for successive calls when using the far bound strategy. */
+		returnValue solveRegularisedQP(	const real_t* const g_new,			/**< Gradient of neighbouring QP to be solved. */
+										const real_t* const lb_new,			/**< Lower bounds of neighbouring QP to be solved. \n
+															 					 If no lower bounds exist, a NULL pointer can be passed. */
+										const real_t* const ub_new,			/**< Upper bounds of neighbouring QP to be solved. \n
+															 					 If no upper bounds exist, a NULL pointer can be passed. */
+										int_t& nWSR,						/**< Input: Maximum number of working set recalculations; \n
+																				 Output: Number of performed working set recalculations. */
+										real_t* const cputime,				/**< Input: Maximum CPU time allowed for QP solution. \n
+																				 Output: CPU time spent for QP solution (or to perform nWSR iterations). */
+										int_t nWSRperformed = 0,			/**< Number of working set recalculations already performed to solve
+																				 this QP within previous solveRegularisedQP() calls. This number is
+																				 always zero, except for successive calls when using the far bound strategy. */
+										BooleanType isFirstCall = BT_TRUE	/**< Indicating whether this is the first call for current QP. */
 										);
 
 
-		/** Setups bound data structure according to auxiliaryBounds.
+		/** Sets up bound data structure according to auxiliaryBounds.
 		 *  (If the working set shall be setup afresh, make sure that
 		 *  bounds data structure has been resetted!)
 		 *	\return SUCCESSFUL_RETURN \n
@@ -887,7 +856,7 @@ class QProblemB
 																						 *    setup afresh or by updating the current one. */
 												);
 
-		/** Setups the optimal primal/dual solution of the auxiliary initial QP.
+		/** Sets up the optimal primal/dual solution of the auxiliary initial QP.
 		 *	\return SUCCESSFUL_RETURN */
 		returnValue setupAuxiliaryQPsolution(	const real_t* const xOpt,			/**< Optimal primal solution vector.
 																				 	*	 If a NULL pointer is passed, all entries are set to zero. */
@@ -895,13 +864,13 @@ class QProblemB
 																					 *	 If a NULL pointer is passed, all entries are set to zero. */
 												);
 
-		/** Setups gradient of the auxiliary initial QP for given
+		/** Sets up gradient of the auxiliary initial QP for given
 		 *  optimal primal/dual solution and given initial working set
 		 *  (assumes that members X, Y and BOUNDS have already been initialised!).
 		 *	\return SUCCESSFUL_RETURN */
 		returnValue setupAuxiliaryQPgradient( );
 
-		/** Setups bounds of the auxiliary initial QP for given
+		/** Sets up bounds of the auxiliary initial QP for given
 		 *  optimal primal/dual solution and given initial working set
 		 *  (assumes that members X, Y and BOUNDS have already been initialised!).
 		 *	\return SUCCESSFUL_RETURN \n
@@ -910,14 +879,16 @@ class QProblemB
 											);
 
 
+	protected:
 		/** Updates QP vectors, working sets and internal data structures in order to
 			start from an optimal solution corresponding to initial guesses of the working
 			set for bounds
 		 *	\return SUCCESSFUL_RETURN \n
 		 *			RET_SETUP_AUXILIARYQP_FAILED */
-		returnValue setupAuxiliaryQP(	const Bounds* const guessedBounds	/**< Initial guess for working set of bounds. */
-										);
+		virtual returnValue setupAuxiliaryQP(	const Bounds* const guessedBounds	/**< Initial guess for working set of bounds. */
+												);
 
+	private:
 		/** Determines step direction of the homotopy path.
 		 *	\return SUCCESSFUL_RETURN \n
 		 			RET_STEPDIRECTION_FAILED_CHOLESKY */
@@ -941,7 +912,7 @@ class QProblemB
 									const real_t* const delta_xFX, 	/**< Primal homotopy step direction of fixed variables. */
 									const real_t* const delta_xFR,	/**< Primal homotopy step direction of free variables. */
 									const real_t* const delta_yFX,	/**< Dual homotopy step direction of fixed variables' multiplier. */
-									int& BC_idx, 					/**< Output: Index of blocking constraint. */
+									int_t& BC_idx, 					/**< Output: Index of blocking constraint. */
 									SubjectToStatus& BC_status		/**< Output: Status of blocking constraint. */
 									);
 
@@ -949,13 +920,13 @@ class QProblemB
 		 *	\return  SUCCESSFUL_RETURN \n
 		 			 RET_REMOVE_FROM_ACTIVESET_FAILED \n
 					 RET_ADD_TO_ACTIVESET_FAILED */
-		returnValue changeActiveSet(	int BC_idx, 						/**< Index of blocking constraint. */
+		returnValue changeActiveSet(	int_t BC_idx, 						/**< Index of blocking constraint. */
 										SubjectToStatus BC_status 			/**< Status of blocking constraint. */
 										);
 
 		/** Drift correction at end of each active set iteration
 		 *  \return SUCCESSFUL_RETURN */
-		returnValue performDriftCorrection( );
+		virtual returnValue performDriftCorrection( );
 
 		/** Determines if it is more efficient to refactorise the matrices when
 		 *  hotstarting or not (i.e. better to update the existing factorisations).
@@ -968,7 +939,7 @@ class QProblemB
 		/** Adds a bound to active set (specialised version for the case where no constraints exist).
 		 *	\return SUCCESSFUL_RETURN \n
 		 			RET_ADDBOUND_FAILED */
-		returnValue addBound(	int number,					/**< Number of bound to be added to active set. */
+		returnValue addBound(	int_t number,				/**< Number of bound to be added to active set. */
 								SubjectToStatus B_status,	/**< Status of new active bound. */
 								BooleanType updateCholesky	/**< Flag indicating if Cholesky decomposition shall be updated. */
 								);
@@ -977,16 +948,18 @@ class QProblemB
 		 *	\return SUCCESSFUL_RETURN \n
 					RET_HESSIAN_NOT_SPD \n
 					RET_REMOVEBOUND_FAILED */
-		returnValue removeBound(	int number,					/**< Number of bound to be removed from active set. */
+		returnValue removeBound(	int_t number,				/**< Number of bound to be removed from active set. */
 									BooleanType updateCholesky	/**< Flag indicating if Cholesky decomposition shall be updated. */
 									);
 
 
 		/** Prints concise information on the current iteration.
 		 *	\return  SUCCESSFUL_RETURN \n */
-		returnValue printIteration(	int iteration,				/**< Number of current iteration. */
-									int BC_idx, 				/**< Index of blocking bound. */
-									SubjectToStatus BC_status	/**< Status of blocking bound. */
+		returnValue printIteration(	int_t iter,							/**< Number of current iteration. */
+									int_t BC_idx, 						/**< Index of blocking bound. */
+									SubjectToStatus BC_status,			/**< Status of blocking bound. */
+									real_t homotopyLength,				/**< Current homotopy distance. */
+									BooleanType isFirstCall = BT_TRUE	/**< Indicating whether this is the first call for current QP. */
 									);
 
 
@@ -1017,19 +990,21 @@ class QProblemB
 		BooleanType unbounded;		/**< QP unbounded? */
 
 		HessianType hessianType;	/**< Type of Hessian matrix. */
-		BooleanType isRegularised;	/**< Flag indicating whether Hessian matrix has been regularised. */
+		real_t regVal;				/**< Holds the offset used to regularise Hessian matrix (zero by default). */
 
-		int count;					/**< Counts the number of hotstart function calls (internal usage only!). */
+		uint_t count;				/**< Counts the number of hotstart function calls. */
 
 		real_t *delta_xFR_TMP;		/**< Temporary for determineStepDirection */
 
 		real_t ramp0;				/**< Start value for Ramping Strategy. */
 		real_t ramp1;				/**< Final value for Ramping Strategy. */
-		int rampOffset;				/**< Offset index for Ramping. */
+		int_t rampOffset;			/**< Offset index for Ramping. */
 
 		Options options;			/**< Struct containing all user-defined options for solving QPs. */
-		
+
 		Flipper flipper;			/**< Struct for making a temporary copy of the matrix factorisations. */
+
+		TabularOutput tabularOutput;	/**< Struct storing information for tabular output (printLevel == PL_TABULAR). */
 };
 
 

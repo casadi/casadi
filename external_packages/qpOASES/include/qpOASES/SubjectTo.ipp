@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file include/qpOASES/SubjectTo.ipp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of the inlined member functions of the SubjectTo class
  *	designed to manage working sets of constraints and bounds within a QProblem.
@@ -44,10 +44,10 @@ BEGIN_NAMESPACE_QPOASES
 /*
  *	g e t N u m b e r O f T y p e
  */
-inline int SubjectTo::getNumberOfType( SubjectToType _type ) const
+inline int_t SubjectTo::getNumberOfType( SubjectToType _type ) const
 {
-	int i;
-	int numberOfType = 0;
+	int_t i;
+	int_t numberOfType = 0;
 
 	if ( type != 0 )
 	{
@@ -63,7 +63,7 @@ inline int SubjectTo::getNumberOfType( SubjectToType _type ) const
 /*
  *	g e t T y p e
  */
-inline SubjectToType SubjectTo::getType( int i ) const
+inline SubjectToType SubjectTo::getType( int_t i ) const
 {
 	if ( ( i >= 0 ) && ( i < n ) )
 		return type[i];
@@ -75,7 +75,7 @@ inline SubjectToType SubjectTo::getType( int i ) const
 /*
  *	g e t S t a t u s
  */
-inline SubjectToStatus SubjectTo::getStatus( int i ) const
+inline SubjectToStatus SubjectTo::getStatus( int_t i ) const
 {
 	if ( ( i >= 0 ) && ( i < n ) )
 		return status[i];
@@ -87,7 +87,7 @@ inline SubjectToStatus SubjectTo::getStatus( int i ) const
 /*
  *	s e t T y p e
  */
-inline returnValue SubjectTo::setType( int i, SubjectToType value )
+inline returnValue SubjectTo::setType( int_t i, SubjectToType value )
 {
 	if ( ( i >= 0 ) && ( i < n ) )
 	{
@@ -102,7 +102,7 @@ inline returnValue SubjectTo::setType( int i, SubjectToType value )
 /*
  *	s e t S t a t u s
  */
-inline returnValue SubjectTo::setStatus( int i, SubjectToStatus value )
+inline returnValue SubjectTo::setStatus( int_t i, SubjectToStatus value )
 {
 	if ( ( i >= 0 ) && ( i < n ) )
 	{

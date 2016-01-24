@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file src/SQProblem.cpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of the SQProblem class which is able to use the newly
  *	developed online active set strategy for parametric quadratic programming
@@ -56,7 +56,7 @@ SQProblem::SQProblem( ) : QProblem( )
 /*
  *	S Q P r o b l e m
  */
-SQProblem::SQProblem( int _nV, int _nC, HessianType _hessianType ) : QProblem( _nV,_nC,_hessianType )
+SQProblem::SQProblem( int_t _nV, int_t _nC, HessianType _hessianType ) : QProblem( _nV,_nC,_hessianType )
 {
 }
 
@@ -91,13 +91,67 @@ SQProblem& SQProblem::operator=( const SQProblem& rhs )
 }
 
 
+
+/*
+ * h o t s t a r t
+ */
+returnValue SQProblem::hotstart(	SymmetricMatrix *H_new, const real_t* const g_new, Matrix *A_new,
+									const real_t* const lb_new, const real_t* const ub_new,
+									const real_t* const lbA_new, const real_t* const ubA_new,
+									int_t& nWSR, real_t* const cputime,
+									const Bounds* const guessedBounds, const Constraints* const guessedConstraints
+									)
+{
+	if ( ( getStatus( ) == QPS_NOTINITIALISED )       ||
+		 ( getStatus( ) == QPS_PREPARINGAUXILIARYQP ) ||
+		 ( getStatus( ) == QPS_PERFORMINGHOMOTOPY )   )
+	{
+		return THROWERROR( RET_HOTSTART_FAILED_AS_QP_NOT_INITIALISED );
+	}
+
+
+	real_t starttime = 0.0;
+	real_t auxTime = 0.0;
+
+    if ( cputime != 0 )
+        starttime = getCPUtime( );
+
+
+	/* I) UPDATE QP MATRICES AND VECTORS */
+	if ( setupNewAuxiliaryQP( H_new,A_new,lb_new,ub_new,lbA_new,ubA_new ) != SUCCESSFUL_RETURN )
+		return THROWERROR( RET_SETUP_AUXILIARYQP_FAILED );
+
+
+	/* II) PERFORM USUAL HOMOTOPY */
+
+	/* Allow only remaining CPU time for usual hotstart. */
+	if ( cputime != 0 )
+	{
+		auxTime = getCPUtime( ) - starttime;
+		*cputime -= auxTime;
+	}
+
+	returnValue returnvalue = QProblem::hotstart(	g_new,lb_new,ub_new,lbA_new,ubA_new,
+													nWSR,cputime,
+													guessedBounds,guessedConstraints
+													);
+	
+	if ( cputime != 0 )
+		*cputime += auxTime;
+
+	return returnvalue;
+}
+
+
 /*
  *	h o t s t a r t
  */
 returnValue SQProblem::hotstart(	const real_t* const H_new, const real_t* const g_new, const real_t* const A_new,
 									const real_t* const lb_new, const real_t* const ub_new,
 									const real_t* const lbA_new, const real_t* const ubA_new,
-									int& nWSR, real_t* const cputime )
+									int_t& nWSR, real_t* const cputime,
+									const Bounds* const guessedBounds, const Constraints* const guessedConstraints
+									)
 {
 	if ( ( getStatus( ) == QPS_NOTINITIALISED )       ||
 		 ( getStatus( ) == QPS_PREPARINGAUXILIARYQP ) ||
@@ -113,7 +167,7 @@ returnValue SQProblem::hotstart(	const real_t* const H_new, const real_t* const 
 
 
 	/* I) UPDATE QP MATRICES AND VECTORS */
-	if ( setupAuxiliaryQP( H_new,A_new,lb_new,ub_new,lbA_new,ubA_new ) != SUCCESSFUL_RETURN )
+	if ( setupNewAuxiliaryQP( H_new,A_new,lb_new,ub_new,lbA_new,ubA_new ) != SUCCESSFUL_RETURN )
 		return THROWERROR( RET_SETUP_AUXILIARYQP_FAILED );
 
 
@@ -123,7 +177,10 @@ returnValue SQProblem::hotstart(	const real_t* const H_new, const real_t* const 
 	if ( cputime != 0 )
 		*cputime -= getCPUtime( ) - starttime;
 
-	returnValue returnvalue = QProblem::hotstart( g_new,lb_new,ub_new,lbA_new,ubA_new, nWSR,cputime );
+	returnValue returnvalue = QProblem::hotstart(	g_new,lb_new,ub_new,lbA_new,ubA_new,
+													nWSR,cputime,
+													guessedBounds,guessedConstraints
+													);
 
 
 	/* stop runtime measurement */
@@ -140,11 +197,12 @@ returnValue SQProblem::hotstart(	const real_t* const H_new, const real_t* const 
 returnValue SQProblem::hotstart(	const char* const H_file, const char* const g_file, const char* const A_file,
 									const char* const lb_file, const char* const ub_file,
 									const char* const lbA_file, const char* const ubA_file,
-									int& nWSR, real_t* const cputime
+									int_t& nWSR, real_t* const cputime,
+									const Bounds* const guessedBounds, const Constraints* const guessedConstraints
 									)
 {
-	int nV = getNV( );
-	int nC = getNC( );
+	int_t nV = getNV( );
+	int_t nC = getNC( );
 
 	returnValue returnvalue;
 
@@ -161,26 +219,25 @@ returnValue SQProblem::hotstart(	const char* const H_file, const char* const g_f
 	real_t* A_new  = new real_t[nC*nV];
 
 	if ( readFromFile( H_new, nV,nV, H_file ) != SUCCESSFUL_RETURN )
+	{
+		delete[] A_new;
+		delete[] H_new;
 		return THROWERROR( RET_UNABLE_TO_READ_FILE );
+	}
 
 	if ( readFromFile( A_new, nC,nV, A_file ) != SUCCESSFUL_RETURN )
+	{
+		delete[] A_new;
+		delete[] H_new;
 		return THROWERROR( RET_UNABLE_TO_READ_FILE );
+	}
 
 	/* 2) Load new QP vectors from files. */
-	real_t* g_new  = new real_t[nV];
-	real_t* lb_new = 0;
-	real_t* ub_new = 0;
-	real_t* lbA_new = 0;
-	real_t* ubA_new = 0;
-
-	if ( lb_file != 0 )
-		lb_new = new real_t[nV];
-	if ( ub_file != 0 )
-		ub_new = new real_t[nV];
-	if ( lbA_file != 0 )
-		lbA_new = new real_t[nC];
-	if ( ubA_file != 0 )
-		ubA_new = new real_t[nC];
+	real_t* g_new   = new real_t[nV];
+	real_t* lb_new  = ( lb_file != 0 )  ? new real_t[nV] : 0;
+	real_t* ub_new  = ( ub_file != 0 )  ? new real_t[nV] : 0;
+	real_t* lbA_new = ( lbA_file != 0 ) ? new real_t[nC] : 0;
+	real_t* ubA_new = ( ubA_file != 0 ) ? new real_t[nC] : 0;
 
 	returnvalue = loadQPvectorsFromFile(	g_file,lb_file,ub_file,lbA_file,ubA_file,
 											g_new,lb_new,ub_new,lbA_new,ubA_new
@@ -203,7 +260,10 @@ returnValue SQProblem::hotstart(	const char* const H_file, const char* const g_f
 	}
 
 	/* 3) Actually perform hotstart. */
-	returnvalue = hotstart(	H_new,g_new,A_new,lb_new,ub_new,lbA_new,ubA_new, nWSR,cputime );
+	returnvalue = hotstart(	H_new,g_new,A_new,lb_new,ub_new,lbA_new,ubA_new,
+							nWSR,cputime,
+							guessedBounds,guessedConstraints
+							);
 
 	if ( ubA_file != 0 )
 		delete[] ubA_new;
@@ -220,54 +280,6 @@ returnValue SQProblem::hotstart(	const char* const H_file, const char* const g_f
 	return returnvalue;
 }
 
-/*
- * h o t s t a r t
- */
-returnValue SQProblem::hotstart(	SymmetricMatrix *H_new,
-									const real_t* const g_new,
-									Matrix *A_new,
-									const real_t* const lb_new,
-									const real_t* const ub_new,
-									const real_t* const lbA_new,
-									const real_t* const ubA_new,
-									int& nWSR,
-									real_t* const cputime
-									)
-{
-	if ( ( getStatus( ) == QPS_NOTINITIALISED )       ||
-		 ( getStatus( ) == QPS_PREPARINGAUXILIARYQP ) ||
-		 ( getStatus( ) == QPS_PERFORMINGHOMOTOPY )   )
-	{
-		return THROWERROR( RET_HOTSTART_FAILED_AS_QP_NOT_INITIALISED );
-	}
-
-	/* start runtime measurement */
-	real_t starttime = 0.0;
-    if ( cputime != 0 )
-        starttime = getCPUtime( );
-
-
-	/* I) UPDATE QP MATRICES AND VECTORS */
-	if ( setupAuxiliaryQP( H_new,A_new,lb_new,ub_new,lbA_new,ubA_new ) != SUCCESSFUL_RETURN )
-		return THROWERROR( RET_SETUP_AUXILIARYQP_FAILED );
-
-
-	/* II) PERFORM USUAL HOMOTOPY */
-
-	/* Allow only remaining CPU time for usual hotstart. */
-	if ( cputime != 0 )
-		*cputime -= getCPUtime( ) - starttime;
-
-	returnValue returnvalue = QProblem::hotstart( g_new,lb_new,ub_new,lbA_new,ubA_new, nWSR,cputime );
-
-
-	/* stop runtime measurement */
-	if ( cputime != 0 )
-		*cputime = getCPUtime( ) - starttime;
-
-	return returnvalue;
-}
-
 
 /*
  *	h o t s t a r t
@@ -275,35 +287,7 @@ returnValue SQProblem::hotstart(	SymmetricMatrix *H_new,
 returnValue SQProblem::hotstart(	const real_t* const g_new,
 									const real_t* const lb_new, const real_t* const ub_new,
 									const real_t* const lbA_new, const real_t* const ubA_new,
-									int& nWSR, real_t* const cputime
-									)
-{
-	/* Call to hotstart function for fixed QP matrices. */
-	return QProblem::hotstart( g_new,lb_new,ub_new,lbA_new,ubA_new, nWSR,cputime );
-}
-
-
-/*
- *	h o t s t a r t
- */
-returnValue SQProblem::hotstart(	const char* const g_file,
-									const char* const lb_file, const char* const ub_file,
-									const char* const lbA_file, const char* const ubA_file,
-									int& nWSR, real_t* const cputime
-									)
-{
-	/* Call to hotstart function for fixed QP matrices. */
-	return QProblem::hotstart( g_file,lb_file,ub_file,lbA_file,ubA_file, nWSR,cputime );
-}
-
-
-/*
- *	h o t s t a r t
- */
-returnValue SQProblem::hotstart(	const real_t* const g_new,
-									const real_t* const lb_new, const real_t* const ub_new,
-									const real_t* const lbA_new, const real_t* const ubA_new,
-									int& nWSR, real_t* const cputime,
+									int_t& nWSR, real_t* const cputime,
 									const Bounds* const guessedBounds, const Constraints* const guessedConstraints
 									)
 {
@@ -318,7 +302,7 @@ returnValue SQProblem::hotstart(	const real_t* const g_new,
 returnValue SQProblem::hotstart(	const char* const g_file,
 									const char* const lb_file, const char* const ub_file,
 									const char* const lbA_file, const char* const ubA_file,
-									int& nWSR, real_t* const cputime,
+									int_t& nWSR, real_t* const cputime,
 									const Bounds* const guessedBounds, const Constraints* const guessedConstraints
 									)
 {
@@ -345,38 +329,15 @@ returnValue SQProblem::resetMatrixPointers( )
  *****************************************************************************/
 
 /*
- *	s e t u p A u x i l i a r y Q P
+ *	s e t u p N e w A u x i l i a r y Q P
  */
-returnValue SQProblem::setupAuxiliaryQP( const real_t* const H_new, const real_t* const A_new,
-    const real_t *lb_new, const real_t *ub_new, const real_t *lbA_new, const real_t *ubA_new )
+returnValue SQProblem::setupNewAuxiliaryQP(	SymmetricMatrix *H_new, Matrix *A_new,
+											const real_t *lb_new, const real_t *ub_new, const real_t *lbA_new, const real_t *ubA_new
+											)
 {
-	int nV = getNV( );
-	int nC = getNC( );
-
-	DenseMatrix *dA = new DenseMatrix(nC, nV, nV, (real_t*) A_new);
-	SymDenseMat *sH = new SymDenseMat(nV, nV, nV, (real_t*) H_new);
-
-	returnValue returnvalue = setupAuxiliaryQP ( sH, dA, lb_new, ub_new, lbA_new, ubA_new );
-
-	if ( H_new != 0 )
-		freeHessian = BT_TRUE;
-	freeConstraintMatrix = BT_TRUE;
-
-	return returnvalue;
-}
-
-
-/*
- *	s e t u p A u x i l i a r y Q P
- */
-returnValue SQProblem::setupAuxiliaryQP ( SymmetricMatrix *H_new, Matrix *A_new,
-    const real_t *lb_new, const real_t *ub_new, const real_t *lbA_new, const real_t *ubA_new
-)
-{
-
-	int i;
-	int nV = getNV( );
-	int nC = getNC( );
+	int_t i;
+	int_t nV = getNV( );
+	int_t nC = getNC( );
 	returnValue returnvalue;
 
 	if ( ( getStatus( ) == QPS_NOTINITIALISED )       ||
@@ -422,7 +383,7 @@ returnValue SQProblem::setupAuxiliaryQP ( SymmetricMatrix *H_new, Matrix *A_new,
 		}
 	}
 
-	/* 2) Set new Hessian matrix,determine Hessian type and
+	/* 2) Set new Hessian matrix, determine Hessian type and
 	 *    regularise new Hessian matrix if necessary. */
 	/* a) Setup new Hessian matrix and determine its type. */
 	if ( H_new != 0 )
@@ -438,7 +399,7 @@ returnValue SQProblem::setupAuxiliaryQP ( SymmetricMatrix *H_new, Matrix *A_new,
 			 ( hessianType == HST_SEMIDEF ) ||
 			 ( usingRegularisation( ) == BT_TRUE ) )
 		{
-			isRegularised = BT_FALSE; /* reset previous regularisation */
+			regVal = 0.0; /* reset previous regularisation */
 
 			if ( regulariseHessian( ) != SUCCESSFUL_RETURN )
 				return THROWERROR( RET_SETUP_AUXILIARYQP_FAILED );
@@ -446,6 +407,8 @@ returnValue SQProblem::setupAuxiliaryQP ( SymmetricMatrix *H_new, Matrix *A_new,
 	}
 	else
 	{
+		/* if no Hessian is specified, keep previous trivial Hessian (HST_ZERO or HST_IDENTITY),
+		   otherwise abort */
 		if ( H != 0 )
 			return THROWERROR( RET_NO_HESSIAN_SPECIFIED );
 	}
@@ -467,13 +430,13 @@ returnValue SQProblem::setupAuxiliaryQP ( SymmetricMatrix *H_new, Matrix *A_new,
      *   (depending on Options). This creates an empty null space and
      *   is guaranteed to succeed. Thus this loop will exit after n_try=1.
      */
-    int n_try;
+    int_t n_try;
     for (n_try = 0; n_try < 2; ++n_try) {
 
         if (n_try > 0) {
             // the current active set leaves an indefinite null space Hessian
             // move all inactive variables to a bound, creating an empty null space
-            for (int ii = 0; ii < nV; ++ii)
+            for (int_t ii = 0; ii < nV; ++ii)
                 if (oldBounds.getStatus (ii) == ST_INACTIVE)
                     oldBounds.setStatus (ii, options.initialStatusBounds);
         }
@@ -496,14 +459,26 @@ returnValue SQProblem::setupAuxiliaryQP ( SymmetricMatrix *H_new, Matrix *A_new,
         if ( setupTQfactorisation( ) != SUCCESSFUL_RETURN )
             return THROWERROR( RET_SETUP_AUXILIARYQP_FAILED );
 
-		// check for equality that have become bounds
-		for (int ii = 0; ii < nC; ++ii)
+		// check for equalities that have become bounds ...
+		for (int_t ii = 0; ii < nC; ++ii) {
 			if (oldConstraints.getType (ii) == ST_EQUALITY && constraints.getType (ii) == ST_BOUNDED) {
 				if (oldConstraints.getStatus (ii) == ST_LOWER && y[nV+ii] < 0.0)
 					oldConstraints.setStatus (ii, ST_UPPER);
 				else if (oldConstraints.getStatus (ii) == ST_UPPER && y[nV+ii] > 0.0)
 					oldConstraints.setStatus (ii, ST_LOWER);
 			}
+		}
+
+		// ... and do the same also for the bounds!
+		for (int_t ii = 0; ii < nV; ++ii) {
+			if (oldBounds.getType(ii) == ST_EQUALITY
+					&& bounds.getType(ii) == ST_BOUNDED) {
+				if (oldBounds.getStatus(ii) == ST_LOWER && y[ii] < 0.0)
+					oldBounds.setStatus(ii, ST_UPPER);
+				else if (oldBounds.getStatus(ii) == ST_UPPER && y[ii] > 0.0)
+					oldBounds.setStatus(ii, ST_LOWER);
+			}
+		}
 
         /* 3) Setup old working sets afresh (updating TQ factorisation). */
         if ( setupAuxiliaryWorkingSet( &oldBounds,&oldConstraints,BT_TRUE ) != SUCCESSFUL_RETURN )
@@ -511,7 +486,7 @@ returnValue SQProblem::setupAuxiliaryQP ( SymmetricMatrix *H_new, Matrix *A_new,
 
         /* Factorise projected Hessian
         * this now handles all special cases (no active bounds/constraints, no nullspace) */
-        returnvalue = setupCholeskyDecompositionProjected( );
+        returnvalue = computeProjectedCholesky( );
 
         /* leave the loop if decomposition was successful, i.e. we have
          * found an active set with positive definite null space Hessian */
@@ -523,15 +498,52 @@ returnValue SQProblem::setupAuxiliaryQP ( SymmetricMatrix *H_new, Matrix *A_new,
      */
     if (n_try > 0) {
 		// as per setupAuxiliaryQPbounds assumptions ... oh the troubles
-		for (int ii = 0; ii < nC; ++ii)
+		for (int_t ii = 0; ii < nC; ++ii)
 			Ax_l[ii] = Ax_u[ii] = Ax[ii];
-        setupAuxiliaryQPbounds (&bounds, &constraints, BT_FALSE);
+        setupAuxiliaryQPbounds( &bounds, &constraints, BT_FALSE );
 	}
 
 	status = QPS_AUXILIARYQPSOLVED;
 
 	return SUCCESSFUL_RETURN;
 }
+
+
+/*
+ *	s e t u p N e w A u x i l i a r y Q P
+ */
+returnValue SQProblem::setupNewAuxiliaryQP(	const real_t* const H_new, const real_t* const A_new,
+											const real_t *lb_new, const real_t *ub_new, const real_t *lbA_new, const real_t *ubA_new
+											)
+{
+	int_t nV = getNV( );
+	int_t nC = getNC( );
+
+	DenseMatrix *dA = 0;
+	SymDenseMat *sH = 0;
+
+	if ( A_new != 0 )
+	{
+		dA = new DenseMatrix(nC, nV, nV, (real_t*) A_new);
+	}
+	else
+	{
+		if ( nC > 0 )
+			return THROWERROR( RET_INVALID_ARGUMENTS );
+	}
+
+	if ( H_new != 0 )
+		sH = new SymDenseMat(nV, nV, nV, (real_t*) H_new);
+
+	returnValue returnvalue = setupNewAuxiliaryQP( sH,dA, lb_new,ub_new,lbA_new,ubA_new );
+
+	if ( H_new != 0 )
+		freeHessian = BT_TRUE;
+	freeConstraintMatrix = BT_TRUE;
+
+	return returnvalue;
+}
+
 
 END_NAMESPACE_QPOASES
 

@@ -658,6 +658,7 @@ namespace casadi {
     case qpOASES::PL_LOW:               return "low";
     case qpOASES::PL_MEDIUM:            return "medium";
     case qpOASES::PL_HIGH:              return "high";
+    case qpOASES::PL_DEBUG_ITER:        return "debug_iter";
     }
     casadi_error("not_implemented");
   }
@@ -673,6 +674,8 @@ namespace casadi {
       return qpOASES::PL_MEDIUM;
     } else if (b == "high") {
       return qpOASES::PL_HIGH;
+    } else if (b == "debug_iter") {
+      return qpOASES::PL_DEBUG_ITER;
     } else {
       casadi_error("No such qpOASES::PrintLevel: " + b);
     }

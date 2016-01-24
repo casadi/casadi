@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,23 +25,17 @@
 /**
  *	\file src/Matrices.cpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of the matrix classes.
  */
 
 
-#include <qpOASES.hpp>
+#include <qpOASES/Matrices.hpp>
 
 
 BEGIN_NAMESPACE_QPOASES
-
-/** String for calling LAPACK/BLAS routines with transposed matrices. */
-const char * const TRANS = "TRANS";
-
-/** String for calling LAPACK/BLAS routines without transposing the matrix. */
-const char * const NOTRANS = "NOTRANS";
 
 
 
@@ -49,6 +43,58 @@ const char * const NOTRANS = "NOTRANS";
  *  P U B L I C                                                              *
  *****************************************************************************/
 
+returnValue Matrix::getSparseSubmatrix(
+				const Indexlist* const irows,
+				const Indexlist* const icols,
+				int_t rowoffset,
+				int_t coloffset,
+				int_t& numNonzeros,
+				int_t* irn,
+				int_t* jcn,
+				real_t* avals,
+				BooleanType only_lower_triangular) const
+{
+	int_t* rowsNumbers;
+	irows->getNumberArray( &rowsNumbers );
+	int_t* colsNumbers;
+	icols->getNumberArray( &colsNumbers );
+
+	return getSparseSubmatrix(irows->getLength(), rowsNumbers, icols->getLength(), colsNumbers, rowoffset, coloffset, numNonzeros, irn, jcn, avals, only_lower_triangular);
+}
+
+returnValue Matrix::getSparseSubmatrix(
+				const Indexlist* const irows,
+				int_t idx_icol,
+				int_t rowoffset,
+				int_t coloffset,
+				int_t& numNonzeros,
+				int_t* irn,
+				int_t* jcn,
+				real_t* avals,
+				BooleanType only_lower_triangular) const
+{
+	int_t* rowsNumbers;
+	irows->getNumberArray( &rowsNumbers );
+
+	return getSparseSubmatrix(irows->getLength(), rowsNumbers, 1, &idx_icol, rowoffset, coloffset, numNonzeros, irn, jcn, avals, only_lower_triangular);
+}
+
+returnValue Matrix::getSparseSubmatrix(
+				int_t idx_row,
+				const Indexlist* const icols,
+				int_t rowoffset,
+				int_t coloffset,
+				int_t& numNonzeros,
+				int_t* irn,
+				int_t* jcn,
+				real_t* avals,
+				BooleanType only_lower_triangular) const
+{
+	int_t* colsNumbers;
+	icols->getNumberArray( &colsNumbers );
+
+	return getSparseSubmatrix(1, &idx_row, icols->getLength(), colsNumbers, rowoffset, coloffset, numNonzeros, irn, jcn, avals, only_lower_triangular);
+}
 
 
 DenseMatrix::~DenseMatrix()
@@ -71,7 +117,7 @@ Matrix *DenseMatrix::duplicate( ) const
 	if ( needToFreeMemory( ) == BT_TRUE )
 	{
 		real_t* val_new = new real_t[nRows*nCols];
-		memcpy( val_new,val, nRows*nCols*sizeof(real_t) );
+		memcpy( val_new,val, ((uint_t)(nRows*nCols))*sizeof(real_t) );
 		dupl = new DenseMatrix(nRows, nCols, nCols, val_new);
 		dupl->doFreeMemory( );
 	}
@@ -83,7 +129,7 @@ Matrix *DenseMatrix::duplicate( ) const
 	return dupl;
 }
 
-real_t DenseMatrix::diag(	int i
+real_t DenseMatrix::diag(	int_t i
 							) const
 {
 	return val[i*(leaDim+1)];
@@ -91,48 +137,41 @@ real_t DenseMatrix::diag(	int i
 
 BooleanType DenseMatrix::isDiag( ) const
 {
-	int i, j;
+	int_t i, j;
 
 	if (nRows != nCols)
 		return BT_FALSE;
 
 	for ( i=0; i<nRows; ++i )
 		for ( j=0; j<i; ++j )
-			if ( ( fabs( val[i*leaDim+j] ) > EPS ) || ( fabs( val[j*leaDim+i] ) > EPS ) )
+			if ( ( getAbs( val[i*leaDim+j] ) > EPS ) || ( getAbs( val[j*leaDim+i] ) > EPS ) )
 				return BT_FALSE;
 
 	return BT_TRUE;
 }
 
 
-real_t DenseMatrix::getNorm() const
+real_t DenseMatrix::getNorm(	int_t type
+								) const
 {
-    int j;
-    real_t norm = 0.0;
-    for ( j=0; j < nCols*nRows; ++j )
-        norm += val[j];
-    return sqrt (norm);
+	return REFER_NAMESPACE_QPOASES getNorm( val,nCols*nRows,type );
 }
 
 
-real_t DenseMatrix::get_rowNorm (int rNum) const
+real_t DenseMatrix::getRowNorm( int_t rNum, int_t type ) const
 {
-    int j;
-    real_t norm = 0.0;
-    for ( j=0; j < nCols; ++j )
-        norm += val[rNum*leaDim+j]*val[rNum*leaDim+j];
-    return sqrt (norm);
+	return REFER_NAMESPACE_QPOASES getNorm( &(val[rNum*leaDim]),nCols,type );
 }
 
-returnValue DenseMatrix::get_row(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
+returnValue DenseMatrix::getRow(int_t rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
 {
-	int i;
+	int_t i;
     if (icols != 0)
     {
-	    if (alpha == 1.0)
+	    if ( isEqual(alpha,1.0) == BT_TRUE )
 		    for (i = 0; i < icols->length; i++)
 			    row[i] = val[rNum*leaDim+icols->number[i]];
-	    else if (alpha == -1.0)
+	    else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		    for (i = 0; i < icols->length; i++)
 			    row[i] = -val[rNum*leaDim+icols->number[i]];
 	    else
@@ -141,10 +180,10 @@ returnValue DenseMatrix::get_row(int rNum, const Indexlist* const icols, real_t 
     }
     else
     {
-	    if (alpha == 1.0)
+	    if ( isEqual(alpha,1.0) == BT_TRUE )
 		    for (i = 0; i < nCols; i++)
 			    row[i] = val[rNum*leaDim+i];
-	    else if (alpha == -1.0)
+	    else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		    for (i = 0; i < nCols; i++)
 			    row[i] = -val[rNum*leaDim+i];
 	    else
@@ -154,14 +193,15 @@ returnValue DenseMatrix::get_row(int rNum, const Indexlist* const icols, real_t 
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue DenseMatrix::get_col(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
-{
-	int i;
 
-	if (alpha == 1.0)
+returnValue DenseMatrix::getCol(int_t cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
+{
+	int_t i;
+
+	if ( isEqual(alpha,1.0) == BT_TRUE )
 		for (i = 0; i < irows->length; i++)
 			col[i] = val[irows->number[i]*leaDim+cNum];
-	else if (alpha == -1.0)
+	else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		for (i = 0; i < irows->length; i++)
 			col[i] = -val[irows->number[i]*leaDim+cNum];
 	else
@@ -171,45 +211,136 @@ returnValue DenseMatrix::get_col(int cNum, const Indexlist* const irows, real_t 
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue DenseMatrix::times(int xN, real_t alpha, const real_t *x, int xLD, real_t beta, real_t *y, int yLD) const
+returnValue DenseMatrix::getSparseSubmatrix (int_t irowsLength, const int_t* const irowsNumber,
+											 int_t icolsLength, const int_t* const icolsNumber,
+											 int_t rowoffset, int_t coloffset, int_t& numNonzeros,	int_t* irn,
+											 int_t* jcn, real_t* avals,
+											 BooleanType only_lower_triangular /*= BT_FALSE */) const
 {
-	unsigned long _xN=xN, _nRows=nRows, _nCols=nCols, _leaDim=getMax(1,_nCols), _xLD=getMax(1,xLD), _yLD=getMax(1,yLD);
-	/* Call BLAS. Mind row major format! */
-	GEMM(TRANS, NOTRANS, &_nRows, &_xN, &_nCols, &alpha, val, &_leaDim, x, &_xLD, &beta, y, &_yLD);
+	int_t i, j, irA;
+	real_t v;
+	numNonzeros = 0;
+	if ( only_lower_triangular == BT_FALSE )
+	{
+		if (irn == 0)
+		{
+			if (jcn != 0 || avals != 0)
+				return THROWERROR( RET_INVALID_ARGUMENTS );
+			for (j = 0; j<irowsLength; j++)
+			{
+				irA = irowsNumber[j] * leaDim;
+				for (i = 0; i<icolsLength; i++)
+					if (isZero( val[irA+icolsNumber[i]] ) == BT_FALSE)
+						numNonzeros++;
+			}
+		}
+		else
+		{
+			for (j = 0; j<irowsLength; j++)
+			{
+				irA = irowsNumber[j] * leaDim;
+				for (i = 0; i<icolsLength; i++)
+				{
+					v = val[irA+icolsNumber[i]];
+					if (isZero( v ) == BT_FALSE)
+					{
+						irn[numNonzeros] = j+rowoffset;
+						jcn[numNonzeros] = i+coloffset;
+						avals[numNonzeros] = v;
+						numNonzeros++;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if (irn == 0)
+		{
+			if (jcn != 0 || avals != 0)
+				return THROWERROR( RET_INVALID_ARGUMENTS );
+			for (j = 0; j<irowsLength; j++)
+			{
+				irA = irowsNumber[j] * leaDim;
+				for (i = 0; i<=j; i++)
+					if (isZero( val[irA+irowsNumber[i]] ) == BT_FALSE)
+						numNonzeros++;
+			}
+		}
+		else
+		{
+			for (j = 0; j<irowsLength; j++)
+			{
+				irA = irowsNumber[j] * leaDim;
+				for (i = 0; i<=j; i++)
+				{
+					v = val[irA+irowsNumber[i]];
+					if (isZero( v ) == BT_FALSE)
+					{
+						irn[numNonzeros] = j+rowoffset;
+						jcn[numNonzeros] = i+coloffset;
+						avals[numNonzeros] = v;
+						numNonzeros++;
+					}
+				}
+			}
+		}
+	}
+
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue DenseMatrix::transTimes(int xN, real_t alpha, const real_t *x, int xLD, real_t beta, real_t *y, int yLD) const
+returnValue DenseMatrix::times(	int_t xN, real_t alpha, const real_t *x, int_t xLD, real_t beta, real_t *y, int_t yLD) const
 {
+	unsigned long _xN     = (unsigned long)xN;
+	unsigned long _nRows  = (unsigned long)nRows;
+	unsigned long _nCols  = (unsigned long)nCols;
+	unsigned long _leaDim = (unsigned long)getMax(1,nCols);
+	unsigned long _xLD    = (unsigned long)getMax(1,xLD);
+	unsigned long _yLD    = (unsigned long)getMax(1,yLD);
+
 	/* Call BLAS. Mind row major format! */
-	unsigned long _xN=xN, _nRows=nRows, _nCols=nCols, _leaDim=getMax(1,_nCols), _xLD=getMax(1,xLD), _yLD=getMax(1,yLD);
-	GEMM(NOTRANS, NOTRANS, &_nCols, &_xN, &_nRows, &alpha, val, &_leaDim, x, &_xLD, &beta, y, &_yLD);
+	GEMM("TRANS", "NOTRANS", &_nRows, &_xN, &_nCols, &alpha, val, &_leaDim, x, &_xLD, &beta, y, &_yLD);
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* const icols,
-		int xN, real_t alpha, const real_t *x, int xLD, real_t beta, real_t *y, int yLD,
-		BooleanType yCompr) const
+returnValue DenseMatrix::transTimes( int_t xN, real_t alpha, const real_t *x, int_t xLD, real_t beta, real_t *y, int_t yLD) const
 {
-	int i, j, k, row, col, iy, irA;
+	unsigned long _xN     = (unsigned long)xN;
+	unsigned long _nRows  = (unsigned long)nRows;
+	unsigned long _nCols  = (unsigned long)nCols;
+	unsigned long _leaDim = (unsigned long)getMax(1,nCols);
+	unsigned long _xLD    = (unsigned long)getMax(1,xLD);
+	unsigned long _yLD    = (unsigned long)getMax(1,yLD);
+
+	/* Call BLAS. Mind row major format! */
+	GEMM("NOTRANS", "NOTRANS", &_nCols, &_xN, &_nRows, &alpha, val, &_leaDim, x, &_xLD, &beta, y, &_yLD);
+	return SUCCESSFUL_RETURN;
+}
+
+returnValue DenseMatrix::times(	const Indexlist* const irows, const Indexlist* const icols,
+								int_t xN, real_t alpha, const real_t *x, int_t xLD, real_t beta, real_t *y, int_t yLD,
+								BooleanType yCompr) const
+{
+	int_t i, j, k, row, col, iy, irA;
 
 	if (yCompr == BT_TRUE)
 	{
-		if (beta == 0.0)
+		if ( isZero(beta) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[j+k*yLD] = 0.0;
-		else if (beta == -1.0)
+		else if ( isEqual(beta,-1.0) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[j+k*yLD] = -y[j+k*yLD];
-		else if (beta != 1.0)
+		else if ( isEqual(beta,1.0) == BT_FALSE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[j+k*yLD] *= beta;
 
 		if (icols == 0)
-			if (alpha == 1.0)
+			if ( isEqual(alpha,1.0) == BT_TRUE )
 				for (k = 0; k < xN; k++)
 					for (j = 0; j < irows->length; j++)
 					{
@@ -219,7 +350,7 @@ returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* co
 						for (i = 0; i < nCols; i++)
 							y[iy] += val[irA+i] * x[k*xLD+i];
 					}
-			else if (alpha == -1.0)
+			else if ( isEqual(alpha,-1.0) == BT_TRUE )
 				for (k = 0; k < xN; k++)
 					for (j = 0; j < irows->length; j++)
 					{
@@ -240,7 +371,7 @@ returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* co
 							y[iy] += alpha * val[irA+i] * x[k*xLD+i];
 					}
 		else /* icols != 0 */
-			if (alpha == 1.0)
+			if ( isEqual(alpha,1.0) == BT_TRUE )
 				for (k = 0; k < xN; k++)
 					for (j = 0; j < irows->length; j++)
 					{
@@ -253,7 +384,7 @@ returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* co
 							y[iy] += val[irA+icols->number[col]] * x[k*xLD+col];
 						}
 					}
-			else if (alpha == -1.0)
+			else if ( isEqual(alpha,-1.0) == BT_TRUE )
 				for (k = 0; k < xN; k++)
 					for (j = 0; j < irows->length; j++)
 					{
@@ -282,21 +413,21 @@ returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* co
 	}
 	else /* y not compressed */
 	{
-		if (beta == 0.0)
+		if ( isZero(beta) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[irows->number[j]+k*yLD] = 0.0;
-		else if (beta == -1.0)
+		else if ( isEqual(beta,-1.0) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[irows->number[j]+k*yLD] = -y[j+k*yLD];
-		else if (beta != 1.0)
+		else if ( isEqual(beta,1.0) == BT_FALSE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[irows->number[j]+k*yLD] *= beta;
 
 		if (icols == 0)
-			if (alpha == 1.0)
+			if ( isEqual(alpha,1.0) == BT_TRUE )
 				for (k = 0; k < xN; k++)
 					for (j = 0; j < irows->length; j++)
 					{
@@ -306,7 +437,7 @@ returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* co
 						for (i = 0; i < nCols; i++)
 							y[iy] += val[irA+i] * x[k*xLD+i];
 					}
-			else if (alpha == -1.0)
+			else if ( isEqual(alpha,-1.0) == BT_TRUE )
 				for (k = 0; k < xN; k++)
 					for (j = 0; j < irows->length; j++)
 					{
@@ -327,7 +458,7 @@ returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* co
 							y[iy] += alpha * val[irA+i] * x[k*xLD+i];
 					}
 		else /* icols != 0 */
-			if (alpha == 1.0)
+			if ( isEqual(alpha,1.0) == BT_TRUE )
 				for (k = 0; k < xN; k++)
 					for (j = 0; j < irows->length; j++)
 					{
@@ -340,7 +471,7 @@ returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* co
 							y[iy] += val[irA+icols->number[col]] * x[k*xLD+col];
 						}
 					}
-			else if (alpha == -1.0)
+			else if ( isEqual(alpha,-1.0) == BT_TRUE )
 				for (k = 0; k < xN; k++)
 					for (j = 0; j < irows->length; j++)
 					{
@@ -371,25 +502,25 @@ returnValue DenseMatrix::times(const Indexlist* const irows, const Indexlist* co
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue DenseMatrix::transTimes(const Indexlist* const irows, const Indexlist* const icols,
-		int xN, real_t alpha, const real_t *x, int xLD, real_t beta, real_t *y, int yLD) const
+returnValue DenseMatrix::transTimes(	const Indexlist* const irows, const Indexlist* const icols,
+										int_t xN, real_t alpha, const real_t *x, int_t xLD, real_t beta, real_t *y, int_t yLD) const
 {
-	int i, j, k, row, col;
+	int_t i, j, k, row, col;
 
-	if (beta == 0.0)
+	if ( isZero(beta) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] = 0.0;
-	else if (beta == -1.0)
+	else if ( isEqual(beta,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] = -y[j+k*yLD];
-	else if (beta != 1.0)
+	else if ( isEqual(beta,1.0) == BT_FALSE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] *= beta;
 
-	if (alpha == 1.0)
+	if ( isEqual(alpha,1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < irows->length; j++)
 			{
@@ -400,7 +531,7 @@ returnValue DenseMatrix::transTimes(const Indexlist* const irows, const Indexlis
 					y[col+k*yLD] += val[irows->number[row]*leaDim+icols->number[col]] * x[row+k*xLD];
 				}
 			}
-	else if (alpha == -1.0)
+	else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < irows->length; j++)
 			{
@@ -426,9 +557,10 @@ returnValue DenseMatrix::transTimes(const Indexlist* const irows, const Indexlis
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue DenseMatrix::addToDiag(real_t alpha)
+
+returnValue DenseMatrix::addToDiag( real_t alpha )
 {
-	int i;
+	int_t i;
 	for (i = 0; i < nRows && i < nCols; i++)
 		val[i*(leaDim+1)] += alpha;
 
@@ -436,14 +568,34 @@ returnValue DenseMatrix::addToDiag(real_t alpha)
 }
 
 
-returnValue DenseMatrix::print( ) const
+returnValue DenseMatrix::writeToFile( FILE* output_file, const char* prefix ) const
 {
-	return qpOASES::print( val,nRows,nCols );
+	return THROWERROR( RET_NOT_YET_IMPLEMENTED );
+}
+
+
+real_t* DenseMatrix::full() const
+{
+	real_t* v = new real_t[nRows*nCols];
+	memcpy( v,val, ((uint_t)(nRows*nCols))*sizeof(real_t) );
+	return v;
+}
+
+
+returnValue DenseMatrix::print( const char* name ) const
+{
+	return REFER_NAMESPACE_QPOASES print( val,nRows,nCols,name );
 }
 
 
 
 Matrix *SymDenseMat::duplicate( ) const
+{
+	return duplicateSym();
+}
+
+
+SymmetricMatrix *SymDenseMat::duplicateSym( ) const
 {
 	/* "same" as duplicate() in DenseMatrix */
 	SymDenseMat *dupl = 0;
@@ -451,7 +603,7 @@ Matrix *SymDenseMat::duplicate( ) const
 	if ( needToFreeMemory( ) == BT_TRUE )
 	{
 		real_t* val_new = new real_t[nRows*nCols];
-		memcpy( val_new,val, nRows*nCols*sizeof(real_t) );
+		memcpy( val_new,val, ((uint_t)(nRows*nCols))*sizeof(real_t) );
 		dupl = new SymDenseMat(nRows, nCols, nCols, val_new);
 		dupl->doFreeMemory( );
 	}
@@ -464,11 +616,11 @@ Matrix *SymDenseMat::duplicate( ) const
 }
 
 
-returnValue SymDenseMat::bilinear(const Indexlist* const icols,
-		int xN, const real_t *x, int xLD, real_t *y, int yLD) const
+returnValue SymDenseMat::bilinear(	const Indexlist* const icols,
+									int_t xN, const real_t *x, int_t xLD, real_t *y, int_t yLD) const
 {
-	int ii, jj, kk, col;
-	int i,j,k,irA;
+	int_t ii, jj, kk, col;
+	int_t i,j,k,irA;
 
 	for (ii = 0; ii < xN; ii++)
 		for (jj = 0; jj < xN; jj++)
@@ -504,14 +656,16 @@ returnValue SymDenseMat::bilinear(const Indexlist* const icols,
 }
 
 
+
 SparseMatrix::SparseMatrix() : nRows(0), nCols(0), ir(0), jc(0), jd(0), val(0) {}
 
-SparseMatrix::SparseMatrix(int nr, int nc, sparse_int_t *r, sparse_int_t *c, real_t *v, sparse_int_t *d)
-	: nRows(nr), nCols(nc), ir(r), jc(c), jd(d), val(v) { doNotFreeMemory(); }
+SparseMatrix::SparseMatrix(	int_t nr, int_t nc, sparse_int_t *r, sparse_int_t *c, real_t *v)
+								: nRows(nr), nCols(nc), ir(r), jc(c), jd(0), val(v) { doNotFreeMemory(); }
 
-SparseMatrix::SparseMatrix(int nr, int nc, int ld, const real_t * const v) : nRows(nr), nCols(nc), jd(0)
+SparseMatrix::SparseMatrix(	int_t nr, int_t nc, int_t ld, const real_t * const v)
+								: nRows(nr), nCols(nc), jd(0)
 {
-	int i, j, nnz;
+	int_t i, j, nnz;
 
 	jc = new sparse_int_t[nc+1];
 	ir = new sparse_int_t[nr*nc];
@@ -522,7 +676,7 @@ SparseMatrix::SparseMatrix(int nr, int nc, int ld, const real_t * const v) : nRo
 	{
 		jc[j] = nnz;
 		for (i = 0; i < nRows; i++)
-			if (v[i*ld+j] != 0.0)
+			if ( ( isZero( v[i*ld+j],0.0 ) == BT_FALSE ) || ( i == j ) ) /* also include zero diagonal elemets! */
 			{
 				ir[nnz] = i;
 				val[nnz++] = v[i*ld+j];
@@ -533,11 +687,19 @@ SparseMatrix::SparseMatrix(int nr, int nc, int ld, const real_t * const v) : nRo
 	doFreeMemory( );
 }
 
+
 SparseMatrix::~SparseMatrix()
 {
+	if (jd != 0)
+	{
+		delete[] jd;
+		jd = 0;
+	}
+
 	if ( needToFreeMemory() == BT_TRUE )
 		free( );
 }
+
 
 void SparseMatrix::free( )
 {
@@ -545,10 +707,9 @@ void SparseMatrix::free( )
 	ir = 0;
 	if (jc != 0) delete[] jc;
 	jc = 0;
-	if (jd != 0) delete[] jd;
-	jd = 0;
 	if (val != 0) delete[] val;
 	val = 0;
+
 	doNotFreeMemory( );
 }
 
@@ -561,61 +722,111 @@ Matrix *SparseMatrix::duplicate() const
 	dupl->nCols = nCols;
 	dupl->ir = new sparse_int_t[length];
 	dupl->jc = new sparse_int_t[nCols+1];
-	dupl->jd = new sparse_int_t[nCols];
 	dupl->val = new real_t[length];
 
 	for (i = 0; i < length; i++) dupl->ir[i] = ir[i];
 	for (i = 0; i <= nCols; i++) dupl->jc[i] = jc[i];
-	for (i = 0; i < nCols; i++) dupl->jd[i] = jd[i];
 	for (i = 0; i < length; i++) dupl->val[i] = val[i];
+
+	if ( jd != 0 )
+	{
+		dupl->jd = new sparse_int_t[nCols];
+		for (i = 0; i < nCols; i++) dupl->jd[i] = jd[i];
+	}
+	else
+		dupl->jd = 0;
 
 	dupl->doFreeMemory( );
 
 	return dupl;
 }
 
-real_t SparseMatrix::diag(int i) const
+
+
+real_t SparseMatrix::diag(int_t i) const
 {
-	int entry = jd[i];
+	if ( jd == 0 )
+	{
+		THROWERROR( RET_DIAGONAL_NOT_INITIALISED );
+		return INFTY;
+	}
+
+	int_t entry = jd[i];
 	return (entry < jc[i+1] && ir[entry] == i) ? val[entry] : 0.0;
 }
 
+
 BooleanType SparseMatrix::isDiag() const
 {
-	return BT_FALSE;
+	int_t j;
+
+	if ( nCols != nRows )
+		return BT_FALSE;
+
+	for (j = 0; j < nCols; ++j)
+	{
+		if ( jc[j+1] > jc[j]+1 )
+			return BT_FALSE;
+
+		if ( ( jc[j+1] == jc[j]+1 ) && ( ir[jc[j]] != j ) )
+			return BT_FALSE;
+	}
+
+	return BT_TRUE;
 }
 
-real_t SparseMatrix::getNorm() const
+
+
+real_t SparseMatrix::getNorm(	int_t type
+								) const
 {
-	/* TODO: Implement this! */
-    return 1.0;
+	int_t length = jc[nCols];
+	return REFER_NAMESPACE_QPOASES getNorm( val,length,type );
 }
 
-real_t SparseMatrix::get_rowNorm (int rNum) const
+
+real_t SparseMatrix::getRowNorm( int_t rNum, int_t type ) const
 {
-    int i,j;
+    int_t i,j;
     real_t norm = 0.0;
-    for ( j=0; j < nCols; ++j ) {
-        for (i = jc[j]; i < jc[j+1] && ir[i] < rNum; i++) {};
-        norm += (i < jc[j+1] && ir[i] == rNum) ? val[i]*val[i] : 0.0;
-    }
-    return sqrt (norm);
+
+	switch( type )
+	{
+		case 2:
+			for ( j=0; j < nCols; ++j ) {
+				for (i = jc[j]; i < jc[j+1] && ir[i] < rNum; i++) {};
+				norm += (i < jc[j+1] && ir[i] == rNum) ? val[i]*val[i] : 0.0;
+			}
+			return getSqrt(norm);
+
+		case 1:
+			for ( j=0; j < nCols; ++j ) {
+				for (i = jc[j]; i < jc[j+1] && ir[i] < rNum; i++) {};
+				norm += (i < jc[j+1] && ir[i] == rNum) ? REFER_NAMESPACE_QPOASES getAbs( val[i] ) : 0.0;
+			}
+			return norm;
+
+		default:
+			THROWERROR( RET_INVALID_ARGUMENTS );
+			return -INFTY;
+	}
 }
 
-returnValue SparseMatrix::get_row(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
+
+returnValue SparseMatrix::getRow(int_t rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
 {
 	long i, j, k;
 
     if (icols != 0)
     {
-	    if (alpha == 1.0)
+	    if ( isEqual(alpha,1.0) == BT_TRUE )
 		    for (k = 0; k < icols->length; k++)
 		    {
 			    j = icols->number[icols->iSort[k]];
 			    for (i = jc[j]; i < jc[j+1] && ir[i] < rNum; i++);
 			    row[icols->iSort[k]] = (i < jc[j+1] && ir[i] == rNum) ? val[i] : 0.0;
 		    }
-	    else if (alpha == -1.0)
+	    else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		    for (k = 0; k < icols->length; k++)
 		    {
 			    j = icols->number[icols->iSort[k]];
@@ -632,13 +843,13 @@ returnValue SparseMatrix::get_row(int rNum, const Indexlist* const icols, real_t
     }
     else
     {
-	    if (alpha == 1.0)
+	    if ( isEqual(alpha,1.0) == BT_TRUE )
 		    for (j = 0; j < nCols; j++)
 		    {
 			    for (i = jc[j]; i < jc[j+1] && ir[i] < rNum; i++);
 			    row[j] = (i < jc[j+1] && ir[i] == rNum) ? val[i] : 0.0;
 		    }
-	    else if (alpha == -1.0)
+	    else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		    for (j = 0; j < icols->length; j++)
 		    {
 			    for (i = jc[j]; i < jc[j+1] && ir[i] < rNum; i++);
@@ -654,13 +865,14 @@ returnValue SparseMatrix::get_row(int rNum, const Indexlist* const icols, real_t
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue SparseMatrix::get_col(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
+
+returnValue SparseMatrix::getCol(int_t cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
 {
 	long i, j;
 
 	i = jc[cNum];
 	j = 0;
-	if (alpha == 1.0)
+	if ( isEqual(alpha,1.0) == BT_TRUE )
 		while (i < jc[cNum+1] && j < irows->length)
 			if (ir[i] == irows->number[irows->iSort[j]])
 				col[irows->iSort[j++]] = val[i++];
@@ -668,7 +880,7 @@ returnValue SparseMatrix::get_col(int cNum, const Indexlist* const irows, real_t
 				col[irows->iSort[j++]] = 0.0;
 			else
 				i++;
-	else if (alpha == -1.0)
+	else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		while (i < jc[cNum+1] && j < irows->length)
 			if (ir[i] == irows->number[irows->iSort[j]])
 				col[irows->iSort[j++]] = -val[i++];
@@ -692,30 +904,124 @@ returnValue SparseMatrix::get_col(int cNum, const Indexlist* const irows, real_t
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue SparseMatrix::times(int xN, real_t alpha, const real_t *x, int xLD,
-		real_t beta, real_t *y, int yLD) const
+returnValue SparseMatrix::getSparseSubmatrix (int_t irowsLength, const int_t* const irowsNumber,
+											  int_t icolsLength, const int_t* const icolsNumber,
+											  int_t rowoffset, int_t coloffset, int_t& numNonzeros,	int_t* irn,
+											  int_t* jcn, real_t* avals,
+											  BooleanType only_lower_triangular /*= BT_FALSE */) const
+{
+	int_t i, j, k, l;
+
+	// Compute the "inverse" of the irows->number array
+	// TODO: Ideally this should be a part of Indexlist
+	int_t* rowNumberInv = new int_t[nRows];
+	for (i=0; i<nRows; i++)
+		rowNumberInv[i] = -1;
+	for (i=0; i<irowsLength; i++)
+		rowNumberInv[irowsNumber[i]] = i;
+
+	numNonzeros = 0;
+	if ( only_lower_triangular == BT_FALSE )
+	{
+		if (irn == 0)
+		{
+			if (jcn != 0 || avals != 0)
+				return THROWERROR( RET_INVALID_ARGUMENTS );
+			for (k = 0; k < icolsLength; k++)
+			{
+				j = icolsNumber[k];
+				for (i = jc[j]; i < jc[j+1]; i++)
+				{
+					l = rowNumberInv[ir[i]];
+					if (l >= 0)
+						numNonzeros++;
+				}
+			}
+		}
+		else
+		{
+			for (k = 0; k < icolsLength; k++)
+			{
+				j = icolsNumber[k];
+				for (i = jc[j]; i < jc[j+1]; i++)
+				{
+					l = rowNumberInv[ir[i]];
+					if (l >= 0)
+					{
+						irn[numNonzeros] = l+rowoffset;
+						jcn[numNonzeros] = k+coloffset;
+						avals[numNonzeros] = val[i];
+						numNonzeros++;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if (irn == 0)
+		{
+			if (jcn != 0 || avals != 0)
+				return THROWERROR( RET_INVALID_ARGUMENTS );
+			for (k = 0; k < icolsLength; k++)
+			{
+				j = icolsNumber[k];
+				for (i = jc[j]; i < jc[j+1]; i++)
+				{
+					l = rowNumberInv[ir[i]];
+					if (l >= k)
+						numNonzeros++;
+				}
+			}
+		}
+		else
+		{
+			for (k = 0; k < icolsLength; k++)
+			{
+				j = icolsNumber[k];
+				for (i = jc[j]; i < jc[j+1]; i++)
+				{
+					l = rowNumberInv[ir[i]];
+					if (l >= k)
+					{
+						irn[numNonzeros] = l+rowoffset;
+						jcn[numNonzeros] = k+coloffset;
+						avals[numNonzeros] = val[i];
+						numNonzeros++;
+					}
+				}
+			}
+		}
+	}
+	delete [] rowNumberInv;
+
+	return SUCCESSFUL_RETURN;
+}
+
+returnValue SparseMatrix::times(int_t xN, real_t alpha, const real_t *x, int_t xLD,
+		real_t beta, real_t *y, int_t yLD) const
 {
 	long i, j, k;
 
-	if (beta == 0.0)
+	if ( isZero(beta) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nRows; j++)
 				y[j+k*yLD] = 0.0;
-	else if (beta == -1.0)
+	else if ( isEqual(beta,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nRows; j++)
 				y[j+k*yLD] = -y[j+k*yLD];
-	else if (beta != 1.0)
+	else if ( isEqual(beta,1.0) == BT_FALSE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nRows; j++)
 				y[j+k*yLD] *= beta;
 
-	if (alpha == 1.0)
+	if ( isEqual(alpha,1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				for (i = jc[j]; i < jc[j+1]; i++)
 					y[ir[i]+k*yLD] += val[i] * x[j+k*xLD];
-	else if (alpha == -1.0)
+	else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				for (i = jc[j]; i < jc[j+1]; i++)
@@ -729,30 +1035,31 @@ returnValue SparseMatrix::times(int xN, real_t alpha, const real_t *x, int xLD,
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue SparseMatrix::transTimes(int xN, real_t alpha, const real_t *x, int xLD,
-		real_t beta, real_t *y, int yLD) const
+
+returnValue SparseMatrix::transTimes(int_t xN, real_t alpha, const real_t *x, int_t xLD,
+		real_t beta, real_t *y, int_t yLD) const
 {
 	long i, j, k;
 
-	if (beta == 0.0)
+	if ( isZero(beta) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				y[j+k*yLD] = 0.0;
-	else if (beta == -1.0)
+	else if ( isEqual(beta,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				y[j+k*yLD] = -y[j+k*yLD];
-	else if (beta != 1.0)
+	else if ( isEqual(beta,1.0) == BT_FALSE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				y[j+k*yLD] *= beta;
 
-	if (alpha == 1.0)
+	if ( isEqual(alpha,1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				for (i = jc[j]; i < jc[j+1]; i++)
 					y[j+k*yLD] += val[i] * x[ir[i]+k*xLD];
-	else if (alpha == -1.0)
+	else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				for (i = jc[j]; i < jc[j+1]; i++)
@@ -766,326 +1073,247 @@ returnValue SparseMatrix::transTimes(int xN, real_t alpha, const real_t *x, int 
 	return SUCCESSFUL_RETURN;
 }
 
+
 returnValue SparseMatrix::times(const Indexlist* const irows, const Indexlist* const icols,
-		int xN, real_t alpha, const real_t *x, int xLD, real_t beta, real_t *y, int yLD,
+		int_t xN, real_t alpha, const real_t *x, int_t xLD, real_t beta, real_t *y, int_t yLD,
 		BooleanType yCompr) const
 {
 	long i, j, k, l, col;
+	real_t xcol;
+
+	if ( isEqual(alpha,0.0) == BT_TRUE )
+	{
+		if (yCompr == BT_TRUE)
+		{
+			if ( isZero(beta) == BT_TRUE )
+				for (k = 0; k < xN; k++)
+					for (j = 0; j < irows->length; j++)
+						y[j+k*yLD] = 0.0;
+			else if ( isEqual(beta,-1.0) == BT_TRUE )
+				for (k = 0; k < xN; k++)
+					for (j = 0; j < irows->length; j++)
+						y[j+k*yLD] = -y[j+k*yLD];
+			else if ( isEqual(beta,1.0) == BT_FALSE )
+				for (k = 0; k < xN; k++)
+					for (j = 0; j < irows->length; j++)
+						y[j+k*yLD] *= beta;
+		}
+		else
+		{
+			if (isZero( beta ) == BT_TRUE)
+				for (k = 0; k < xN; k++)
+					for (j = 0; j < irows->length; j++)
+						y[irows->number[j]+k*yLD] = 0.0;
+			else if (isEqual( beta, -1.0 ) == BT_TRUE)
+				for (k = 0; k < xN; k++)
+					for (j = 0; j < irows->length; j++)
+						y[irows->number[j]+k*yLD] = -y[irows->number[j]+k*yLD];
+			else if (isEqual( beta, 1.0 ) == BT_FALSE)
+				for (k = 0; k < xN; k++)
+					for (j = 0; j < irows->length; j++)
+						y[irows->number[j]+k*yLD] *= beta;
+		}
+		return SUCCESSFUL_RETURN;
+	}
+
+	// First, work with full, unordered copy of y and store matrix times x in there
+	const int_t yfullLength = nRows;
+	real_t* ytmp = new real_t[xN*yfullLength];
+	for (k = 0; k < xN*yfullLength; k++)
+		ytmp[k] = 0.0;
+
+	if (icols!=0)
+	{
+		if (xN==1)
+		{
+			for (l = 0; l < icols->length; l++)
+			{
+				col = icols->iSort[l];
+				xcol = x[col];
+				if (isZero( xcol ) == BT_FALSE)
+				{
+					j = icols->number[col];
+					for (i = jc[j]; i < jc[j+1]; i++)
+						ytmp[ir[i]] += val[i] * xcol;
+				}
+			}
+		}
+		else
+		{
+			// AW: I didn't test the case xN>1, but I hope it is working
+			real_t* xcols = new real_t[xN];
+			for (l = 0; l < icols->length; l++)
+			{
+				col = icols->iSort[l];
+				real_t xmax = 0.0;
+				for (k=0; k<xN; k++)
+				{
+					xcols[k] = x[k*xLD+col];
+					xmax = getMax(xmax,getAbs(xcols[k]));
+				}
+				if (isZero( xmax ) == BT_FALSE)
+				{
+					j = icols->number[col];
+					for (i = jc[j]; i < jc[j+1]; i++)
+						for (k=0; k<xN; k++)
+						  // AW: Maybe it makes more sense to order ytmp by vectors, not vector entries, for better cache peformance?
+							ytmp[k*yfullLength+ir[i]] += val[i] * xcols[k];
+				}
+			}
+			delete [] xcols;
+		}
+	}
+	else /* icols == 0 */
+	{
+		if (xN==1)
+		{
+			for (col = 0; col < nCols; col++)
+			{
+				xcol = x[col];
+				if (isZero( xcol ) == BT_FALSE)
+					for (i = jc[col]; i < jc[col+1]; i++)
+						ytmp[ir[i]] += val[i] * xcol;
+			}
+		}
+		else
+		{
+			// AW: I didn't test the case xN>1, but I hope it is working
+			real_t* xcols = new real_t[xN];
+			for (col = 0; col < nCols; col++)
+			{
+				real_t xmax = 0.0;
+				for (k=0; k<xN; k++)
+				{
+					xcols[k] = x[k*xLD+col];
+					xmax = getMax(xmax,getAbs(xcols[k]));
+				}
+				if (isZero( xmax ) == BT_FALSE)
+					for (i = jc[col]; i < jc[col+1]; i++)
+						for (k=0; k<xN; k++)
+							ytmp[k*yfullLength+ir[i]] += val[i] * xcols[k];
+				delete [] xcols;
+			}
+		}
+	}
 
 	if (yCompr == BT_TRUE)
 	{
-		if (beta == 0.0)
+		if ( isZero(beta) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
-					y[j+k*yLD] = 0.0;
-		else if (beta == -1.0)
+					y[j+k*yLD] = alpha*ytmp[irows->number[j]+k*yfullLength];
+		else if (isEqual( beta, 1.0 ) == BT_TRUE)
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
-					y[j+k*yLD] = -y[j+k*yLD];
-		else if (beta != 1.0)
+					y[j+k*yLD] += alpha*ytmp[irows->number[j]+k*yfullLength];
+		else if (isEqual( beta, -1.0 ) == BT_TRUE)
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
-					y[j+k*yLD] *= beta;
-
-		if (icols == 0)
-			if (alpha == 1.0)
-				for (l = 0; l < nCols; l++)
-				{
-					i = jc[l];
-					j = 0;
-					while (i < jc[l+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->iSort[j]] += val[i] * x[k*xLD+l];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-			else if (alpha == -1.0)
-				for (l = 0; l < nCols; l++)
-				{
-					i = jc[l];
-					j = 0;
-					while (i < jc[l+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->iSort[j]] -= val[i] * x[k*xLD+l];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-			else
-				for (l = 0; l < nCols; l++)
-				{
-					i = jc[l];
-					j = 0;
-					while (i < jc[l+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->iSort[j]] += alpha * val[i] * x[k*xLD+l];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-		else /* icols != 0 */
-			if (alpha == 1.0)
-				for (l = 0; l < icols->length; l++)
-				{
-					col = icols->iSort[l];
-					i = jc[icols->number[col]];
-					j = 0;
-					while (i < jc[icols->number[col]+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->iSort[j]] += val[i] * x[k*xLD+col];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-			else if (alpha == -1.0)
-				for (l = 0; l < icols->length; l++)
-				{
-					col = icols->iSort[l];
-					i = jc[icols->number[col]];
-					j = 0;
-					while (i < jc[icols->number[col]+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->iSort[j]] -= val[i] * x[k*xLD+col];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-			else
-				for (l = 0; l < icols->length; l++)
-				{
-					col = icols->iSort[l];
-					i = jc[icols->number[col]];
-					j = 0;
-					while (i < jc[icols->number[col]+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->iSort[j]] += alpha * val[i] * x[k*xLD+col];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
+					y[j+k*yLD] = alpha*ytmp[irows->number[j]+k*yfullLength]-y[j+k*yLD];
+		else if (isEqual( beta, 1.0 ) == BT_FALSE)
+			for (k = 0; k < xN; k++)
+				for (j = 0; j < irows->length; j++)
+					y[j+k*yLD] = alpha*ytmp[irows->number[j]+k*yfullLength]+beta*y[j+k*yLD];
 	}
-	else /* y not compressed */
+	else
 	{
-		if (beta == 0.0)
+		if (isZero( beta ) == BT_TRUE)
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
-					y[irows->number[j]+k*yLD] = 0.0;
-		else if (beta == -1.0)
+					y[irows->number[j]+k*yLD] = alpha*ytmp[irows->number[j]+k*yfullLength];
+		else if (isEqual( beta, 1.0 ) == BT_TRUE)
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
-					y[irows->number[j]+k*yLD] = -y[j+k*yLD];
-		else if (beta != 1.0)
+					y[irows->number[j]+k*yLD] = alpha*ytmp[irows->number[j]+k*yfullLength]+y[j+k*yLD];
+		else if (isEqual( beta, -1.0 ) == BT_TRUE)
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
-					y[irows->number[j]+k*yLD] *= beta;
-
-		if (icols == 0)
-			if (alpha == 1.0)
-				for (l = 0; l < nCols; l++)
-				{
-					i = jc[l];
-					j = 0;
-					while (i < jc[l+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->number[irows->iSort[j]]] += val[i] * x[k*xLD+l];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-			else if (alpha == -1.0)
-				for (l = 0; l < nCols; l++)
-				{
-					i = jc[l];
-					j = 0;
-					while (i < jc[l+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->number[irows->iSort[j]]] -= val[i] * x[k*xLD+l];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-			else
-				for (l = 0; l < nCols; l++)
-				{
-					i = jc[l];
-					j = 0;
-					while (i < jc[l+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->number[irows->iSort[j]]] += alpha * val[i] * x[k*xLD+l];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-		else /* icols != 0 */
-			if (alpha == 1.0)
-				for (l = 0; l < icols->length; l++)
-				{
-					col = icols->iSort[l];
-					i = jc[icols->number[col]];
-					j = 0;
-					while (i < jc[icols->number[col]+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->number[irows->iSort[j]]] += val[i] * x[k*xLD+col];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-			else if (alpha == -1.0)
-				for (l = 0; l < icols->length; l++)
-				{
-					col = icols->iSort[l];
-					i = jc[icols->number[col]];
-					j = 0;
-					while (i < jc[icols->number[col]+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->number[irows->iSort[j]]] -= val[i] * x[k*xLD+col];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
-			else
-				for (l = 0; l < icols->length; l++)
-				{
-					col = icols->iSort[l];
-					i = jc[icols->number[col]];
-					j = 0;
-					while (i < jc[icols->number[col]+1] && j < irows->length)
-						if (ir[i] == irows->number[irows->iSort[j]])
-						{
-							for (k = 0; k < xN; k++)
-								y[k*yLD+irows->number[irows->iSort[j]]] += alpha * val[i] * x[k*xLD+col];
-							i++, j++;
-						}
-						else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-						else i++;
-				}
+					y[irows->number[j]+k*yLD] = alpha*ytmp[irows->number[j]+k*yfullLength]-y[j+k*yLD];
+		else if (isEqual( beta, 1.0 ) == BT_FALSE)
+			for (k = 0; k < xN; k++)
+				for (j = 0; j < irows->length; j++)
+					y[irows->number[j]+k*yLD] = alpha*ytmp[irows->number[j]+k*yfullLength]+beta*y[j+k*yLD];
 	}
+
+	delete [] ytmp;
 	return SUCCESSFUL_RETURN;
 }
 
+
 returnValue SparseMatrix::transTimes(const Indexlist* const irows, const Indexlist* const icols,
-		int xN, real_t alpha, const real_t *x, int xLD, real_t beta, real_t *y, int yLD) const
+		int_t xN, real_t alpha, const real_t *x, int_t xLD, real_t beta, real_t *y, int_t yLD) const
 {
 	long i, j, k, l, col;
+	real_t yadd;
 
-	if (beta == 0.0)
+	if ( isZero(beta) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] = 0.0;
-	else if (beta == -1.0)
+	else if ( isEqual(beta,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] = -y[j+k*yLD];
-	else if (beta != 1.0)
+	else if ( isEqual(beta,1.0) == BT_FALSE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] *= beta;
+	if ( isEqual(alpha,0.0) == BT_TRUE )
+		return SUCCESSFUL_RETURN;
 
-	if (alpha == 1.0)
+	// work with full, unordered copy of x
+	const int_t xfullLength = nRows;
+	real_t* xtmp = new real_t[xfullLength];
+	for (k = 0; k < xN; k++)
+	{
+		for (i = 0; i < xfullLength; i++)
+			xtmp[i] = 0.0;
+		for (i = 0; i < irows->length; i++)
+			xtmp[irows->number[i]] = x[k*xLD+i];
 		for (l = 0; l < icols->length; l++)
 		{
 			col = icols->iSort[l];
-			i = jc[icols->number[col]];
-			j = 0;
-			while (i < jc[icols->number[col]+1] && j < irows->length)
-				if (ir[i] == irows->number[irows->iSort[j]])
-				{
-					for (k = 0; k < xN; k++)
-						y[k*yLD+col] += val[i] * x[k*xLD+irows->iSort[j]];
-					i++, j++;
-				}
-				else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-				else i++;
+			yadd = 0.0;
+			j = icols->number[col];
+			for (i = jc[j]; i < jc[j+1]; i++)
+				yadd += val[i] * xtmp[ir[i]];
+			y[col] += alpha*yadd;
 		}
-	else if (alpha == -1.0)
-		for (l = 0; l < icols->length; l++)
-		{
-			col = icols->iSort[l];
-			i = jc[icols->number[col]];
-			j = 0;
-			while (i < jc[icols->number[col]+1] && j < irows->length)
-				if (ir[i] == irows->number[irows->iSort[j]])
-				{
-					for (k = 0; k < xN; k++)
-						y[k*yLD+col] -= val[i] * x[k*xLD+irows->iSort[j]];
-					i++, j++;
-				}
-				else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-				else i++;
-		}
-	else
-		for (l = 0; l < icols->length; l++)
-		{
-			col = icols->iSort[l];
-			i = jc[icols->number[col]];
-			j = 0;
-			while (i < jc[icols->number[col]+1] && j < irows->length)
-				if (ir[i] == irows->number[irows->iSort[j]])
-				{
-					for (k = 0; k < xN; k++)
-						y[k*yLD+col] += alpha * val[i] * x[k*xLD+irows->iSort[j]];
-					i++, j++;
-				}
-				else if (ir[i] > irows->number[irows->iSort[j]]) j++;
-				else i++;
-		}
+		y += yLD; // move on to next RHS
+	}
+
+	delete [] xtmp;
 
 	return SUCCESSFUL_RETURN;
 }
+
+
 
 returnValue SparseMatrix::addToDiag(real_t alpha)
 {
 	long i;
 
-	if (alpha != 0.0) {
-		for (i = 0; i < nRows && i < nCols; i++) {
-			if (ir[jd[i]] == i) {
-			  val[jd[i]] += alpha;
-			} else {
-			  return RET_NO_DIAGONAL_AVAILABLE;
-			}
-	  }
-  }
+	if ( jd == 0 )
+		return THROWERROR( RET_DIAGONAL_NOT_INITIALISED );
+
+	if ( isZero( alpha ) == BT_FALSE )
+	{
+		for (i = 0; i < nRows && i < nCols; i++)
+		{
+			if (ir[jd[i]] == i)
+				val[jd[i]] += alpha;
+			else
+				return RET_NO_DIAGONAL_AVAILABLE;
+		}
+	}
+
 	return SUCCESSFUL_RETURN;
 }
 
+
 sparse_int_t *SparseMatrix::createDiagInfo()
 {
-	long i, j;
+	sparse_int_t i, j;
 
 	if (jd == 0) {
 		jd = new sparse_int_t[nCols];
@@ -1100,9 +1328,11 @@ sparse_int_t *SparseMatrix::createDiagInfo()
 	return jd;
 }
 
+
+
 real_t *SparseMatrix::full() const
 {
-	long i, j;
+	sparse_int_t i, j;
 	real_t *v = new real_t[nRows*nCols];
 
 	for (i = 0; i < nCols*nRows; i++)
@@ -1116,20 +1346,39 @@ real_t *SparseMatrix::full() const
 }
 
 
-returnValue SparseMatrix::print( ) const
+returnValue SparseMatrix::print( const char* name ) const
 {
-	return THROWERROR( RET_NOT_YET_IMPLEMENTED );
+	real_t* tmp = this->full();
+	returnValue retVal = REFER_NAMESPACE_QPOASES print( tmp,nRows,nCols,name );
+	delete[] tmp;
+
+	return retVal;
+}
+
+returnValue SparseMatrix::writeToFile( FILE* output_file, const char* prefix ) const
+{
+	for (int_t i=0; i<=nCols; i++) {
+		fprintf( output_file,"%sjc[%d] = %d\n",prefix,(int)i,(int)(jc[i]) );
+	}
+	for (int_t i=0; i<jc[nCols]; i++) {
+		fprintf( output_file,"%sir[%d] = %d\n",prefix,(int)i,(int)(ir[i]) );
+	}
+	for (int_t i=0; i<jc[nCols]; i++) {
+		fprintf( output_file,"%sval[%d] = %23.16e\n",prefix,(int)i,val[i] );
+	}
+
+	return SUCCESSFUL_RETURN;
 }
 
 
 SparseMatrixRow::SparseMatrixRow() : nRows(0), nCols(0), jr(0), ic(0), jd(0), val(0) {}
 
-SparseMatrixRow::SparseMatrixRow(int nr, int nc, sparse_int_t *r, sparse_int_t *c, real_t *v, sparse_int_t *d)
-	: nRows(nr), nCols(nc), jr(r), ic(c), jd(d), val(v) { doNotFreeMemory(); }
+SparseMatrixRow::SparseMatrixRow(int_t nr, int_t nc, sparse_int_t *r, sparse_int_t *c, real_t *v)
+	: nRows(nr), nCols(nc), jr(r), ic(c), jd(0), val(v) { doNotFreeMemory(); }
 
-SparseMatrixRow::SparseMatrixRow(int nr, int nc, int ld, const real_t * const v) : nRows(nr), nCols(nc), jd(0)
+SparseMatrixRow::SparseMatrixRow(int_t nr, int_t nc, int_t ld, const real_t * const v) : nRows(nr), nCols(nc), jd(0)
 {
-	int i, j, nnz;
+	int_t i, j, nnz;
 
 	jr = new sparse_int_t[nr+1];
 	ic = new sparse_int_t[nr*nc];
@@ -1140,7 +1389,7 @@ SparseMatrixRow::SparseMatrixRow(int nr, int nc, int ld, const real_t * const v)
 	{
 		jr[j] = nnz;
 		for (i = 0; i < nCols; i++)
-			if (v[j*ld+i] != 0.0)
+			if ( ( isZero( v[j*ld+i],0.0 ) == BT_FALSE ) || ( j == i ) )
 			{
 				ic[nnz] = i;
 				val[nnz++] = v[j*ld+i];
@@ -1151,11 +1400,19 @@ SparseMatrixRow::SparseMatrixRow(int nr, int nc, int ld, const real_t * const v)
 	doFreeMemory( );
 }
 
+
 SparseMatrixRow::~SparseMatrixRow()
 {
+	if (jd != 0)
+	{
+		delete[] jd;
+		jd = 0;
+	}
+
 	if ( needToFreeMemory() == BT_TRUE )
 		free( );
 }
+
 
 void SparseMatrixRow::free( )
 {
@@ -1163,12 +1420,12 @@ void SparseMatrixRow::free( )
 	jr = 0;
 	if (ic != 0) delete[] ic;
 	ic = 0;
-	if (jd != 0) delete[] jd;
-	jd = 0;
 	if (val != 0) delete[] val;
 	val = 0;
+
 	doNotFreeMemory( );
 }
+
 
 Matrix *SparseMatrixRow::duplicate() const
 {
@@ -1179,52 +1436,79 @@ Matrix *SparseMatrixRow::duplicate() const
 	dupl->nCols = nCols;
 	dupl->jr = new sparse_int_t[nRows+1];
 	dupl->ic = new sparse_int_t[length];
-	if (jd)
-		dupl->jd = new sparse_int_t[nRows];
 	dupl->val = new real_t[length];
 
 	for (i = 0; i < length; i++) dupl->jr[i] = jr[i];
 	for (i = 0; i <= nCols; i++) dupl->ic[i] = ic[i];
-	if (jd)
-		for (i = 0; i < nCols; i++) dupl->jd[i] = jd[i];
 	for (i = 0; i < length; i++) dupl->val[i] = val[i];
+
+	if ( jd != 0 )
+	{
+		dupl->jd = new sparse_int_t[nRows];
+		for (i = 0; i < nCols; i++) dupl->jd[i] = jd[i];
+	}
+	else
+		dupl->jd = 0;
 
 	dupl->doFreeMemory( );
 
 	return dupl;
 }
 
-real_t SparseMatrixRow::diag(int i) const
+
+
+real_t SparseMatrixRow::diag(int_t i) const
 {
-	/* TODO: Throw an error if jd == 0 */
-	int entry = jd[i];
+	if ( jd == 0 )
+	{
+		THROWERROR( RET_DIAGONAL_NOT_INITIALISED );
+		return INFTY;
+	}
+
+	int_t entry = jd[i];
 	return (entry < jr[i+1] && ic[entry] == i) ? val[entry] : 0.0;
 }
 
+
 BooleanType SparseMatrixRow::isDiag() const
 {
-	return BT_FALSE;
+	int_t i;
+
+	if ( nCols != nRows )
+		return BT_FALSE;
+
+	for (i = 0; i < nRows; ++i)
+	{
+		if ( jr[i+1] > jr[i]+1 )
+			return BT_FALSE;
+
+		if ( ( jr[i+1] == jr[i]+1 ) && ( ic[jr[i]] != i ) )
+			return BT_FALSE;
+	}
+
+	return BT_TRUE;
 }
 
 
-real_t SparseMatrixRow::getNorm() const
+
+real_t SparseMatrixRow::getNorm(	int_t type
+									) const
 {
-	/* TODO: Implement this! */
-    return 1.0;
+	int_t length = jr[nRows];
+	return REFER_NAMESPACE_QPOASES getNorm( val,length,type );
+
 }
 
 
-real_t SparseMatrixRow::get_rowNorm (int rNum) const
+real_t SparseMatrixRow::getRowNorm( int_t rNum, int_t type ) const
 {
-    int j;
-    real_t norm = 0.0;
-    for (j=jr[rNum]; j < jr[rNum+1]; ++j)
-        norm += val[j]*val[j];
-    return sqrt (norm);
+	int_t length = jr[rNum+1] - jr[rNum];
+	return REFER_NAMESPACE_QPOASES getNorm( &(val[jr[rNum]]),length,type );
 }
 
 
-returnValue SparseMatrixRow::get_row(int rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
+
+returnValue SparseMatrixRow::getRow(int_t rNum, const Indexlist* const icols, real_t alpha, real_t *row) const
 {
 	long i, j;
 
@@ -1232,7 +1516,7 @@ returnValue SparseMatrixRow::get_row(int rNum, const Indexlist* const icols, rea
 	{
 		j = jr[rNum];
 		i = 0;
-		if (alpha == 1.0)
+		if ( isEqual(alpha,1.0) == BT_TRUE )
 			while (j < jr[rNum+1] && i < icols->length)
 				if (ic[j] == icols->number[icols->iSort[i]])
 					row[icols->iSort[i++]] = val[j++];
@@ -1240,7 +1524,7 @@ returnValue SparseMatrixRow::get_row(int rNum, const Indexlist* const icols, rea
 					row[icols->iSort[i++]] = 0.0;
 				else
 					j++;
-		else if (alpha == -1.0)
+		else if ( isEqual(alpha,-1.0) == BT_TRUE )
 			while (j < jr[rNum+1] && i < icols->length)
 				if (ic[j] == icols->number[icols->iSort[i]])
 					row[icols->iSort[i++]] = -val[j++];
@@ -1266,10 +1550,10 @@ returnValue SparseMatrixRow::get_row(int rNum, const Indexlist* const icols, rea
 		for (i = 0; i < nCols; i++)
 			row[i] = 0;
 
-		if (alpha == 1.0)
+		if ( isEqual(alpha,1.0) == BT_TRUE )
 			for (j = jr[rNum]; j < jr[rNum+1]; j++)
 				row[ic[j]] = val[j];
-		else if (alpha == -1.0)
+		else if ( isEqual(alpha,-1.0) == BT_TRUE )
 			for (j = jr[rNum]; j < jr[rNum+1]; j++)
 				row[ic[j]] = -val[j];
 		else
@@ -1280,13 +1564,14 @@ returnValue SparseMatrixRow::get_row(int rNum, const Indexlist* const icols, rea
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue SparseMatrixRow::get_col(int cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
+
+returnValue SparseMatrixRow::getCol(int_t cNum, const Indexlist* const irows, real_t alpha, real_t *col) const
 {
 	long i, j, k, srt;
 
     if (irows != 0)
     {
-	    if (alpha == 1.0)
+	    if ( isEqual(alpha,1.0) == BT_TRUE )
 		    for (k = 0; k < irows->length; k++)
 		    {
 				srt = irows->iSort[k];
@@ -1294,7 +1579,7 @@ returnValue SparseMatrixRow::get_col(int cNum, const Indexlist* const irows, rea
 			    for (i = jr[j]; i < jr[j+1] && ic[i] < cNum; i++);
 			    col[srt] = (i < jr[j+1] && ic[i] == cNum) ? val[i] : 0.0;
 		    }
-	    else if (alpha == -1.0)
+	    else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		    for (k = 0; k < irows->length; k++)
 		    {
 				srt = irows->iSort[k];
@@ -1313,13 +1598,13 @@ returnValue SparseMatrixRow::get_col(int cNum, const Indexlist* const irows, rea
     }
     else
     {
-	    if (alpha == 1.0)
+	    if ( isEqual(alpha,1.0) == BT_TRUE )
 		    for (j = 0; j < nCols; j++)
 		    {
 			    for (i = jr[j]; i < jr[j+1] && ic[i] < cNum; i++);
 			    col[j] = (i < jr[j+1] && ic[i] == cNum) ? val[i] : 0.0;
 		    }
-	    else if (alpha == -1.0)
+	    else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		    for (j = 0; j < irows->length; j++)
 		    {
 			    for (i = jr[j]; i < jr[j+1] && ic[i] < cNum; i++);
@@ -1335,30 +1620,41 @@ returnValue SparseMatrixRow::get_col(int cNum, const Indexlist* const irows, rea
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue SparseMatrixRow::times(int xN, real_t alpha, const real_t *x, int xLD,
-		real_t beta, real_t *y, int yLD) const
+returnValue SparseMatrixRow::getSparseSubmatrix (
+				int_t irowsLength, const int_t* const irowsNumber,
+				int_t icolsLength, const int_t* const icolsNumber,
+				int_t rowoffset, int_t coloffset, int_t& numNonzeros,	int_t* irn,
+				int_t* jcn, real_t* avals, BooleanType only_lower_triangular /*= BT_FALSE */) const
+{
+	fprintf(stderr, "SparseMatrixRow::getSparseSubmatrix not implemented!\n");
+
+	return THROWERROR(RET_NOT_YET_IMPLEMENTED);
+}
+
+returnValue SparseMatrixRow::times(int_t xN, real_t alpha, const real_t *x, int_t xLD,
+		real_t beta, real_t *y, int_t yLD) const
 {
 	long i, j, k;
 
-	if (beta == 0.0)
+	if ( isZero(beta) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nRows; j++)
 				y[j+k*yLD] = 0.0;
-	else if (beta == -1.0)
+	else if ( isEqual(beta,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nRows; j++)
 				y[j+k*yLD] = -y[j+k*yLD];
-	else if (beta != 1.0)
+	else if ( isEqual(beta,1.0) == BT_FALSE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nRows; j++)
 				y[j+k*yLD] *= beta;
 
-	if (alpha == 1.0)
+	if ( isEqual(alpha,1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nRows; j++)
 				for (i = jr[j]; i < jr[j+1]; i++)
 					y[j+k*yLD] += val[i] * x[ic[i]+k*xLD];
-	else if (alpha == -1.0)
+	else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nRows; j++)
 				for (i = jr[j]; i < jr[j+1]; i++)
@@ -1372,30 +1668,31 @@ returnValue SparseMatrixRow::times(int xN, real_t alpha, const real_t *x, int xL
 	return SUCCESSFUL_RETURN;
 }
 
-returnValue SparseMatrixRow::transTimes(int xN, real_t alpha, const real_t *x, int xLD,
-		real_t beta, real_t *y, int yLD) const
+
+returnValue SparseMatrixRow::transTimes(int_t xN, real_t alpha, const real_t *x, int_t xLD,
+		real_t beta, real_t *y, int_t yLD) const
 {
 	long i, j, k;
 
-	if (beta == 0.0)
+	if ( isZero(beta) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				y[j+k*yLD] = 0.0;
-	else if (beta == -1.0)
+	else if ( isEqual(beta,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				y[j+k*yLD] = -y[j+k*yLD];
-	else if (beta != 1.0)
+	else if ( isEqual(beta,1.0) == BT_FALSE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < nCols; j++)
 				y[j+k*yLD] *= beta;
 
-	if (alpha == 1.0)
+	if ( isEqual(alpha,1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (i = 0; i < nRows; i++)
 				for (j = jr[i]; j < jr[i+1]; j++)
 					y[ic[j]+k*yLD] += val[j] * x[i+k*xLD];
-	else if (alpha == -1.0)
+	else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (i = 0; i < nRows; i++)
 				for (j = jr[i]; j < jr[i+1]; j++)
@@ -1409,29 +1706,30 @@ returnValue SparseMatrixRow::transTimes(int xN, real_t alpha, const real_t *x, i
 	return SUCCESSFUL_RETURN;
 }
 
+
 returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist* const icols,
-		int xN, real_t alpha, const real_t *x, int xLD, real_t beta, real_t *y, int yLD,
+		int_t xN, real_t alpha, const real_t *x, int_t xLD, real_t beta, real_t *y, int_t yLD,
 		BooleanType yCompr) const
 {
 	long i, j, k, l, srt, row;
 
 	if (yCompr == BT_TRUE)
 	{
-		if (beta == 0.0)
+		if ( isZero(beta) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[j+k*yLD] = 0.0;
-		else if (beta == -1.0)
+		else if ( isEqual(beta,-1.0) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[j+k*yLD] = -y[j+k*yLD];
-		else if (beta != 1.0)
+		else if ( isEqual(beta,1.0) == BT_FALSE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[j+k*yLD] *= beta;
 
 		if (icols == 0)
-			if (alpha == 1.0)
+			if ( isEqual(alpha,1.0) == BT_TRUE )
 				for (l = 0; l < irows->length; l++)
 				{
 					srt = irows->iSort[l];
@@ -1440,7 +1738,7 @@ returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist
 						for (k = 0; k < xN; k++)
 							y[k*yLD+srt] += val[j] * x[k*xLD+ic[j]];
 				}
-			else if (alpha == -1.0)
+			else if ( isEqual(alpha,-1.0) == BT_TRUE )
 				for (l = 0; l < irows->length; l++)
 				{
 					srt = irows->iSort[l];
@@ -1459,7 +1757,7 @@ returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist
 							y[k*yLD+srt] += alpha * val[j] * x[k*xLD+ic[j]];
 				}
 		else /* icols != 0 */
-			if (alpha == 1.0)
+			if ( isEqual(alpha,1.0) == BT_TRUE )
 				for (l = 0; l < irows->length; l++)
 				{
 					srt = irows->iSort[l];
@@ -1476,7 +1774,7 @@ returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist
 						else if (ic[j] > icols->number[icols->iSort[i]]) i++;
 						else j++;
 				}
-			else if (alpha == -1.0)
+			else if ( isEqual(alpha,-1.0) == BT_TRUE )
 				for (l = 0; l < irows->length; l++)
 				{
 					srt = irows->iSort[l];
@@ -1513,21 +1811,21 @@ returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist
 	}
 	else /* y not compressed */
 	{
-		if (beta == 0.0)
+		if ( isZero(beta) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[irows->number[j]+k*yLD] = 0.0;
-		else if (beta == -1.0)
+		else if ( isEqual(beta,-1.0) == BT_TRUE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[irows->number[j]+k*yLD] = -y[j+k*yLD];
-		else if (beta != 1.0)
+		else if ( isEqual(beta,1.0) == BT_FALSE )
 			for (k = 0; k < xN; k++)
 				for (j = 0; j < irows->length; j++)
 					y[irows->number[j]+k*yLD] *= beta;
 
 		if (icols == 0)
-			if (alpha == 1.0)
+			if ( isEqual(alpha,1.0) == BT_TRUE )
 				for (l = 0; l < irows->length; l++)
 				{
 					row = irows->number[irows->iSort[l]];
@@ -1535,7 +1833,7 @@ returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist
 						for (k = 0; k < xN; k++)
 							y[k*yLD+row] += val[j] * x[k*xLD+ic[j]];
 				}
-			else if (alpha == -1.0)
+			else if ( isEqual(alpha,-1.0) == BT_TRUE )
 				for (l = 0; l < irows->length; l++)
 				{
 					row = irows->number[irows->iSort[l]];
@@ -1552,7 +1850,7 @@ returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist
 							y[k*yLD+row] += alpha * val[j] * x[k*xLD+ic[j]];
 				}
 		else /* icols != 0 */
-			if (alpha == 1.0)
+			if ( isEqual(alpha,1.0) == BT_TRUE )
 				for (l = 0; l < irows->length; l++)
 				{
 					row = irows->iSort[l];
@@ -1568,7 +1866,7 @@ returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist
 						else if (ic[j] > icols->number[icols->iSort[i]]) i++;
 						else j++;
 				}
-			else if (alpha == -1.0)
+			else if ( isEqual(alpha,-1.0) == BT_TRUE )
 				for (l = 0; l < irows->length; l++)
 				{
 					row = irows->iSort[l];
@@ -1604,25 +1902,26 @@ returnValue SparseMatrixRow::times(const Indexlist* const irows, const Indexlist
 	return SUCCESSFUL_RETURN;
 }
 
+
 returnValue SparseMatrixRow::transTimes(const Indexlist* const irows, const Indexlist* const icols,
-		int xN, real_t alpha, const real_t *x, int xLD, real_t beta, real_t *y, int yLD) const
+		int_t xN, real_t alpha, const real_t *x, int_t xLD, real_t beta, real_t *y, int_t yLD) const
 {
 	long i, j, k, l, row, srt;
 
-	if (beta == 0.0)
+	if ( isZero(beta) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] = 0.0;
-	else if (beta == -1.0)
+	else if ( isEqual(beta,-1.0) == BT_TRUE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] = -y[j+k*yLD];
-	else if (beta != 1.0)
+	else if ( isEqual(beta,1.0) == BT_FALSE )
 		for (k = 0; k < xN; k++)
 			for (j = 0; j < icols->length; j++)
 				y[j+k*yLD] *= beta;
 
-	if (alpha == 1.0)
+	if ( isEqual(alpha,1.0) == BT_TRUE )
 		for (l = 0; l < irows->length; l++)
 		{
 			srt = irows->iSort[l];
@@ -1639,7 +1938,7 @@ returnValue SparseMatrixRow::transTimes(const Indexlist* const irows, const Inde
 				else if (ic[j] > icols->number[icols->iSort[i]]) i++;
 				else j++;
 		}
-	else if (alpha == -1.0)
+	else if ( isEqual(alpha,-1.0) == BT_TRUE )
 		for (l = 0; l < irows->length; l++)
 		{
 			srt = irows->iSort[l];
@@ -1677,25 +1976,33 @@ returnValue SparseMatrixRow::transTimes(const Indexlist* const irows, const Inde
 	return SUCCESSFUL_RETURN;
 }
 
+
+
 returnValue SparseMatrixRow::addToDiag(real_t alpha)
 {
 	long i;
 
-	if (alpha != 0.0) {
-		for (i = 0; i < nRows && i < nCols; i++) {
-			if (ic[jd[i]] == i) {
-			  val[jd[i]] += alpha;
-			} else { 
-			  return RET_NO_DIAGONAL_AVAILABLE;
-			}
-	  }
-  }
+	if ( jd == 0 )
+		return THROWERROR( RET_DIAGONAL_NOT_INITIALISED );
+
+	if ( isZero(alpha) == BT_FALSE )
+	{
+		for (i = 0; i < nRows && i < nCols; i++)
+		{
+			if (ic[jd[i]] == i)
+				val[jd[i]] += alpha;
+			else
+				return RET_NO_DIAGONAL_AVAILABLE;
+		}
+	}
+
 	return SUCCESSFUL_RETURN;
 }
 
+
 sparse_int_t *SparseMatrixRow::createDiagInfo()
 {
-	long i, j;
+	sparse_int_t i, j;
 
 	if (jd == 0) {
 		jd = new sparse_int_t[nRows];
@@ -1710,9 +2017,10 @@ sparse_int_t *SparseMatrixRow::createDiagInfo()
 	return jd;
 }
 
+
 real_t *SparseMatrixRow::full() const
 {
-	long i, j;
+	sparse_int_t i, j;
 	real_t *v = new real_t[nRows*nCols];
 
 	for (i = 0; i < nCols*nRows; i++)
@@ -1726,14 +2034,27 @@ real_t *SparseMatrixRow::full() const
 }
 
 
-returnValue SparseMatrixRow::print( ) const
+returnValue SparseMatrixRow::print( const char* name ) const
+{
+	real_t* tmp = this->full();
+	returnValue retVal = REFER_NAMESPACE_QPOASES print( tmp,nRows,nCols,name );
+	delete[] tmp;
+
+	return retVal;
+}
+
+returnValue SparseMatrixRow::writeToFile( FILE* output_file, const char* prefix ) const
 {
 	return THROWERROR( RET_NOT_YET_IMPLEMENTED );
 }
 
-
-
 Matrix *SymSparseMat::duplicate() const
+{
+	return duplicateSym();
+}
+
+
+SymmetricMatrix *SymSparseMat::duplicateSym() const
 {
 	/* "same" as duplicate() in SparseMatrix */
 	long i, length = jc[nCols];
@@ -1743,23 +2064,33 @@ Matrix *SymSparseMat::duplicate() const
 	dupl->nCols = nCols;
 	dupl->ir = new sparse_int_t[length];
 	dupl->jc = new sparse_int_t[nCols+1];
-	dupl->jd = new sparse_int_t[nCols];
 	dupl->val = new real_t[length];
 
 	for (i = 0; i < length; i++) dupl->ir[i] = ir[i];
 	for (i = 0; i <= nCols; i++) dupl->jc[i] = jc[i];
-	for (i = 0; i < nCols; i++) dupl->jd[i] = jd[i];
 	for (i = 0; i < length; i++) dupl->val[i] = val[i];
+
+	if ( jd != 0 )
+	{
+		dupl->jd = new sparse_int_t[nCols];
+		for (i = 0; i < nCols; i++) dupl->jd[i] = jd[i];
+	}
+	else
+		dupl->jd = 0;
 
 	dupl->doFreeMemory( );
 
 	return dupl;
 }
 
+
 returnValue SymSparseMat::bilinear(const Indexlist* const icols,
-		int xN, const real_t *x, int xLD, real_t *y, int yLD) const
+		int_t xN, const real_t *x, int_t xLD, real_t *y, int_t yLD) const
 {
-	int i, j, k, l, idx, row, col;
+	int_t i, j, k, l, idx, row, col;
+
+	if ( jd == 0 )
+		return THROWERROR( RET_DIAGONAL_NOT_INITIALISED );
 
 	/* clear output */
 	for (i = 0; i < xN*xN; i++)

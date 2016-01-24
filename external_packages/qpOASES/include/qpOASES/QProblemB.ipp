@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,16 +25,14 @@
 /**
  *	\file include/qpOASES/QProblemB.ipp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of inlined member functions of the QProblemB class which
  *	is able to use the newly developed online active set strategy for
  *	parametric quadratic programming.
  */
 
-
-#include <math.h>
 
 
 BEGIN_NAMESPACE_QPOASES
@@ -49,7 +47,7 @@ BEGIN_NAMESPACE_QPOASES
  */
 inline returnValue QProblemB::getBounds( Bounds& _bounds ) const
 {
-	int nV = getNV( );
+	int_t nV = getNV( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
@@ -63,7 +61,7 @@ inline returnValue QProblemB::getBounds( Bounds& _bounds ) const
 /*
  *	g e t N V
  */
-inline int QProblemB::getNV( ) const
+inline int_t QProblemB::getNV( ) const
 {
 	return bounds.getNV( );
 }
@@ -72,7 +70,7 @@ inline int QProblemB::getNV( ) const
 /*
  *	g e t N F R
  */
-inline int QProblemB::getNFR( ) const
+inline int_t QProblemB::getNFR( ) const
 {
 	return bounds.getNFR( );
 }
@@ -81,7 +79,7 @@ inline int QProblemB::getNFR( ) const
 /*
  *	g e t N F X
  */
-inline int QProblemB::getNFX( ) const
+inline int_t QProblemB::getNFX( ) const
 {
 	return bounds.getNFX( );
 }
@@ -90,7 +88,7 @@ inline int QProblemB::getNFX( ) const
 /*
  *	g e t N F V
  */
-inline int QProblemB::getNFV( ) const
+inline int_t QProblemB::getNFV( ) const
 {
 	return bounds.getNFV( );
 }
@@ -171,7 +169,10 @@ inline returnValue QProblemB::setHessianType( HessianType _hessianType )
  */
 inline BooleanType QProblemB::usingRegularisation( ) const
 {
-	return isRegularised;
+	if ( regVal > ZERO )
+		return BT_TRUE;
+	else
+		return BT_FALSE;
 }
 
 
@@ -209,6 +210,25 @@ inline PrintLevel QProblemB::getPrintLevel( ) const
 
 
 
+/*
+ *	g e t C o u n t
+ */
+inline uint_t QProblemB::getCount( ) const
+{
+	return count;
+}
+
+
+/*
+ *	r e s e t C o u n t e r
+ */
+inline returnValue QProblemB::resetCounter( )
+{
+	count = 0;
+	return SUCCESSFUL_RETURN;
+}
+
+
 /*****************************************************************************
  *  P R O T E C T E D                                                        *
  *****************************************************************************/
@@ -236,7 +256,7 @@ inline returnValue QProblemB::setH( SymmetricMatrix* H_new )
  */
 inline returnValue QProblemB::setH( const real_t* const H_new )
 {
-	int nV = getNV();
+	int_t nV = getNV();
 	SymDenseMat* dH;
 
 	/* if null pointer is passed, Hessian is set to zero matrix
@@ -250,6 +270,7 @@ inline returnValue QProblemB::setH( const real_t* const H_new )
 
 		if ( ( freeHessian == BT_TRUE ) && ( H != 0 ) )
 			delete H;
+
 		H = 0;
 		freeHessian = BT_FALSE;
 	}
@@ -271,7 +292,7 @@ inline returnValue QProblemB::setH( const real_t* const H_new )
  */
 inline returnValue QProblemB::setG( const real_t* const g_new )
 {
-	int nV = getNV( );
+	uint_t nV = (uint_t)getNV( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
@@ -290,15 +311,22 @@ inline returnValue QProblemB::setG( const real_t* const g_new )
  */
 inline returnValue QProblemB::setLB( const real_t* const lb_new )
 {
-	int nV = getNV( );
+	uint_t i;
+	uint_t nV = (uint_t)getNV( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
 
-	if ( lb_new == 0 )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
-	memcpy( lb,lb_new,nV*sizeof(real_t) );
+	if ( lb_new != 0 )
+	{
+		memcpy( lb,lb_new,nV*sizeof(real_t) );
+	}
+	else
+	{
+		/* if no lower bounds are specified, set them to -infinity */
+		for( i=0; i<nV; ++i )
+			lb[i] = -INFTY;
+	}
 
 	return SUCCESSFUL_RETURN;
 }
@@ -307,9 +335,9 @@ inline returnValue QProblemB::setLB( const real_t* const lb_new )
 /*
  *	s e t L B
  */
-inline returnValue QProblemB::setLB( int number, real_t value )
+inline returnValue QProblemB::setLB( int_t number, real_t value )
 {
-	int nV = getNV( );
+	int_t nV = getNV( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
@@ -331,15 +359,22 @@ inline returnValue QProblemB::setLB( int number, real_t value )
  */
 inline returnValue QProblemB::setUB( const real_t* const ub_new )
 {
-	int nV = getNV( );
+	uint_t i;
+	uint_t nV = (uint_t)getNV( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
 
-	if ( ub_new == 0 )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
-	memcpy( ub,ub_new,nV*sizeof(real_t) );
+	if ( ub_new != 0 )
+	{
+		memcpy( ub,ub_new,nV*sizeof(real_t) );
+	}
+	else
+	{
+		/* if no upper bounds are specified, set them to infinity */
+		for( i=0; i<nV; ++i )
+			ub[i] = INFTY;
+	}
 
 	return SUCCESSFUL_RETURN;
 }
@@ -348,9 +383,9 @@ inline returnValue QProblemB::setUB( const real_t* const ub_new )
 /*
  *	s e t U B
  */
-inline returnValue QProblemB::setUB( int number, real_t value )
+inline returnValue QProblemB::setUB( int_t number, real_t value )
 {
-	int nV = getNV( );
+	int_t nV = getNV( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
@@ -377,7 +412,7 @@ inline void QProblemB::computeGivens(	real_t xold, real_t yold, real_t& xnew, re
 {
 	real_t t, mu;
 
-	if ( fabs( yold ) <= ZERO )
+	if ( isZero( yold ) == BT_TRUE )
 	{
 		c = 1.0;
 		s = 0.0;
@@ -387,11 +422,11 @@ inline void QProblemB::computeGivens(	real_t xold, real_t yold, real_t& xnew, re
 	}
 	else
 	{
-		mu = fabs( xold );
-		if ( fabs( yold ) > mu )
-			mu = fabs( yold );
+		mu = getAbs( xold );
+		if ( getAbs( yold ) > mu )
+			mu = getAbs( yold );
 
-		t = mu * sqrt( (xold/mu)*(xold/mu) + (yold/mu)*(yold/mu) );
+		t = mu * getSqrt( (xold/mu)*(xold/mu) + (yold/mu)*(yold/mu) );
 
 		if ( xold < 0.0 )
 		t = -t;

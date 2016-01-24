@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file src/Bounds.cpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of the Bounds class designed to manage working sets of
  *	bounds within a QProblem.
@@ -55,7 +55,7 @@ Bounds::Bounds( ) : SubjectTo( )
 /*
  *	B o u n d s
  */
-Bounds::Bounds( int _n ) : SubjectTo( _n )
+Bounds::Bounds( int_t _n ) : SubjectTo( _n )
 {
 	init( _n );
 }
@@ -99,7 +99,7 @@ Bounds& Bounds::operator=( const Bounds& rhs )
 /*
  *	i n i t
  */
-returnValue Bounds::init(	int _n
+returnValue Bounds::init(	int_t _n
 							)
 {
 	if ( _n < 0 )
@@ -107,7 +107,7 @@ returnValue Bounds::init(	int _n
 
 	clear( );
 
-	if ( _n > 0 )
+	if ( _n >= 0 )
 	{
 		freee.init( _n );
 		fixed.init( _n );
@@ -121,7 +121,7 @@ returnValue Bounds::init(	int _n
 /*
  *	s e t u p B o u n d
  */
-returnValue Bounds::setupBound(	int number, SubjectToStatus _status
+returnValue Bounds::setupBound(	int_t number, SubjectToStatus _status
 								)
 {
 	/* consistency check */
@@ -184,7 +184,7 @@ returnValue Bounds::setupAllUpper( )
 /*
  *	m o v e F i x e d T o F r e e
  */
-returnValue Bounds::moveFixedToFree( int number )
+returnValue Bounds::moveFixedToFree( int_t number )
 {
 	/* consistency check */
 	if ( ( number < 0 ) || ( number >= n ) )
@@ -204,7 +204,7 @@ returnValue Bounds::moveFixedToFree( int number )
 /*
  *	m o v e F r e e T o F i x e d
  */
-returnValue Bounds::moveFreeToFixed(	int number, SubjectToStatus _status
+returnValue Bounds::moveFreeToFixed(	int_t number, SubjectToStatus _status
 										)
 {
 	/* consistency check */
@@ -225,7 +225,7 @@ returnValue Bounds::moveFreeToFixed(	int number, SubjectToStatus _status
 /*
  *	f l i p F i x e d
  */
-returnValue Bounds::flipFixed( int number )
+returnValue Bounds::flipFixed( int_t number )
 {
 	/* consistency check */
 	if ( ( number < 0 ) || ( number >= n ) )
@@ -246,7 +246,7 @@ returnValue Bounds::flipFixed( int number )
 /*
  *	s w a p F r e e
  */
-returnValue Bounds::swapFree(	int number1, int number2
+returnValue Bounds::swapFree(	int_t number1, int_t number2
 								)
 {
 	/* consistency check */
@@ -261,9 +261,9 @@ returnValue Bounds::swapFree(	int number1, int number2
 /*
  *	s h i f t
  */
-returnValue Bounds::shift(	int offset )
+returnValue Bounds::shift(	int_t offset )
 {
-	int i;
+	int_t i;
 
 	/* consistency check */
 	if ( ( offset == 0 ) || ( n <= 1 ) )
@@ -322,9 +322,9 @@ returnValue Bounds::shift(	int offset )
 /*
  *	r o t a t e
  */
-returnValue Bounds::rotate( int offset )
+returnValue Bounds::rotate( int_t offset )
 {
-	int i;
+	int_t i;
 
 	/* consistency check */
 	if ( ( offset == 0 ) || ( offset == n ) || ( n <= 1 ) )
@@ -402,27 +402,26 @@ returnValue Bounds::print( )
 	if ( n == 0 )
 		return SUCCESSFUL_RETURN;
 
-	#ifndef __XPCTARGET__
-	#ifndef __DSPACE__
-	char myPrintfString[160];
+	#ifndef __SUPPRESSANYOUTPUT__
 
-	int nFR = getNFR( );
-	int nFX = getNFX( );
+	char myPrintfString[MAX_STRING_LENGTH];
 
-	int* FR_idx;
+	int_t nFR = getNFR( );
+	int_t nFX = getNFX( );
+
+	int_t* FR_idx;
 	getFree( )->getNumberArray( &FR_idx );
 
-	int* FX_idx;
+	int_t* FX_idx;
 	getFixed( )->getNumberArray( &FX_idx );
 
-	snprintf( myPrintfString,160,"Bounds object comprising %d variables (%d free, %d fixed):\n",n,nFR,nFX );
+	snprintf( myPrintfString,MAX_STRING_LENGTH,"Bounds object comprising %d variables (%d free, %d fixed):\n",(int)n,(int)nFR,(int)nFX );
 	myPrintf( myPrintfString );
 
 	REFER_NAMESPACE_QPOASES print( FR_idx,nFR,"free " );
 	REFER_NAMESPACE_QPOASES print( FX_idx,nFX,"fixed" );
 
-	#endif
-	#endif
+	#endif /* __SUPPRESSANYOUTPUT__ */
 
 	return SUCCESSFUL_RETURN;
 }
@@ -461,7 +460,7 @@ returnValue Bounds::copy(	const Bounds& rhs
  */
 returnValue Bounds::setupAll( SubjectToStatus _status )
 {
-	int i;
+	int_t i;
 
 	/* 1) Place unbounded variables at the beginning of the index list of free variables. */
 	for( i=0; i<n; ++i )

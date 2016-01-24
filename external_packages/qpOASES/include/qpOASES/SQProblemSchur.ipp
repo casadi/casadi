@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2013 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -23,25 +23,31 @@
 
 
 /**
- *	\file include/qpOASES/extras/SolutionAnalysis.ipp
- *	\author Hans Joachim Ferreau (thanks to Boris Houska)
+ *	\file include/qpOASES/SQProblemSchur.ipp
+ *	\author Andreas Waechter, Dennis Janka
  *	\version 3.2
- *	\date 2008-2015
+ *	\date 2012-2015
  *
- *	Implementation of inlined member functions of the SolutionAnalysis class
- *	designed to perform additional analysis after solving a QP with qpOASES.
- *
+ *	Implementation of inlined member functions of the SQProblemSchur class which
+ *	is able to use the newly developed online active set strategy for
+ *	parametric quadratic programming.
  */
 
+
+BEGIN_NAMESPACE_QPOASES
 
 
 /*****************************************************************************
  *  P U B L I C                                                              *
  *****************************************************************************/
 
-
-BEGIN_NAMESPACE_QPOASES
-
+/*
+ *	g e t N u m F a c t o r i z a t i o n s
+ */
+inline int_t SQProblemSchur::getNumFactorizations( ) const
+{
+	return numFactorizations;
+}
 
 END_NAMESPACE_QPOASES
 

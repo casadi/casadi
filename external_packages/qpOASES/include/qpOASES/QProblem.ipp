@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file include/qpOASES/QProblem.ipp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of inlined member functions of the QProblem class which
  *	is able to use the newly developed online active set strategy for
@@ -47,7 +47,7 @@ BEGIN_NAMESPACE_QPOASES
  */
 inline returnValue QProblem::getConstraints( Constraints& _constraints ) const
 {
-	int nV = getNV( );
+	int_t nV = getNV( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
@@ -62,7 +62,7 @@ inline returnValue QProblem::getConstraints( Constraints& _constraints ) const
 /*
  *	g e t N C
  */
-inline int QProblem::getNC( ) const
+inline int_t QProblem::getNC( ) const
 {
 	return constraints.getNC( );
 }
@@ -71,7 +71,7 @@ inline int QProblem::getNC( ) const
 /*
  *	g e t N E C
  */
-inline int QProblem::getNEC( ) const
+inline int_t QProblem::getNEC( ) const
 {
 	return constraints.getNEC( );
 }
@@ -80,7 +80,7 @@ inline int QProblem::getNEC( ) const
 /*
  *	g e t N A C
  */
-inline int QProblem::getNAC( ) const
+inline int_t QProblem::getNAC( ) const
 {
 	return constraints.getNAC( );
 }
@@ -89,7 +89,7 @@ inline int QProblem::getNAC( ) const
 /*
  *	g e t N I A C
  */
-inline int QProblem::getNIAC( ) const
+inline int_t QProblem::getNIAC( ) const
 {
 	return constraints.getNIAC( );
 }
@@ -106,9 +106,9 @@ inline int QProblem::getNIAC( ) const
  */
 inline returnValue QProblem::setA( Matrix *A_new )
 {
-	int j;
-	int nV = getNV( );
-	int nC = getNC( );
+	int_t j;
+	int_t nV = getNV( );
+	int_t nC = getNC( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
@@ -131,9 +131,10 @@ inline returnValue QProblem::setA( Matrix *A_new )
 	{
 		Ax_u[j] = ubA[j] - Ax[j];
 		Ax_l[j] = Ax[j] - lbA[j];
-		
+		/* AW: TODO: Takes too much time - could be implemented differently
 		// (ckirches) disable constraints with empty rows	
-		if (A->get_rowNorm (j) == 0.0)
+		*/
+		if ( isZero( A->getRowNorm (j) ) == BT_TRUE )
 			constraints.setType ( j, ST_DISABLED );
 	}
 
@@ -147,9 +148,9 @@ inline returnValue QProblem::setA( Matrix *A_new )
  */
 inline returnValue QProblem::setA( const real_t* const A_new )
 {
-	int j;
-	int nV = getNV( );
-	int nC = getNC( );
+	int_t j;
+	int_t nV = getNV( );
+	int_t nC = getNC( );
 	DenseMatrix* dA;
 
 	if ( nV == 0 )
@@ -184,18 +185,23 @@ inline returnValue QProblem::setA( const real_t* const A_new )
  */
 inline returnValue QProblem::setLBA( const real_t* const lbA_new )
 {
-	int i;
-	int nV = getNV( );
-	int nC = getNC( );
+	uint_t i;
+	uint_t nV = (uint_t)getNV( );
+	uint_t nC = (uint_t)getNC( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
 
-	if ( lbA_new == 0 )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
-	for( i=0; i<nC; ++i )
-		lbA[i] = lbA_new[i];
+	if ( lbA_new != 0 )
+	{	
+		memcpy( lbA,lbA_new,nC*sizeof(real_t) );
+	}
+	else
+	{
+		/* if no lower constraints' bounds are specified, set them to -infinity */
+		for( i=0; i<nC; ++i )
+			lbA[i] = -INFTY;
+	}
 
 	return SUCCESSFUL_RETURN;
 }
@@ -204,10 +210,10 @@ inline returnValue QProblem::setLBA( const real_t* const lbA_new )
 /*
  *	s e t L B A
  */
-inline returnValue QProblem::setLBA( int number, real_t value )
+inline returnValue QProblem::setLBA( int_t number, real_t value )
 {
-	int nV = getNV( );
-	int nC = getNC( );
+	int_t nV = getNV( );
+	int_t nC = getNC( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
@@ -227,18 +233,23 @@ inline returnValue QProblem::setLBA( int number, real_t value )
  */
 inline returnValue QProblem::setUBA( const real_t* const ubA_new )
 {
-	int i;
-	int nV = getNV( );
-	int nC = getNC( );
+	uint_t i;
+	uint_t nV = (uint_t)getNV( );
+	uint_t nC = (uint_t)getNC( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );
 
-	if ( ubA_new == 0 )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
-
-	for( i=0; i<nC; ++i )
-		ubA[i] = ubA_new[i];
+	if ( ubA_new != 0 )
+	{
+		memcpy( ubA,ubA_new,nC*sizeof(real_t) );
+	}
+	else
+	{
+		/* if no upper constraints' bounds are specified, set them to infinity */
+		for( i=0; i<nC; ++i )
+			ubA[i] = INFTY;
+	}
 
 	return SUCCESSFUL_RETURN;
 }
@@ -247,10 +258,10 @@ inline returnValue QProblem::setUBA( const real_t* const ubA_new )
 /*
  *	s e t U B A
  */
-inline returnValue QProblem::setUBA( int number, real_t value )
+inline returnValue QProblem::setUBA( int_t number, real_t value )
 {
-	int nV = getNV( );
-	int nC = getNC( );
+	int_t nV = getNV( );
+	int_t nC = getNC( );
 
 	if ( nV == 0 )
 		return THROWERROR( RET_QPOBJECT_NOT_SETUP );

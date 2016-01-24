@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file include/qpOASES/Constraints.ipp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Declaration of inlined member functions of the Constraints class designed
  *	to manage working sets of constraints within a QProblem.
@@ -44,7 +44,7 @@ BEGIN_NAMESPACE_QPOASES
 /*
  *	g e t N C
  */
-inline int Constraints::getNC( ) const
+inline int_t Constraints::getNC( ) const
 {
  	return n;
 }
@@ -53,7 +53,7 @@ inline int Constraints::getNC( ) const
 /*
  *	g e t N E C
  */
-inline int Constraints::getNEC( ) const
+inline int_t Constraints::getNEC( ) const
 {
 	return getNumberOfType( ST_EQUALITY );
 }
@@ -62,7 +62,7 @@ inline int Constraints::getNEC( ) const
 /*
  *	g e t N I C
  */
-inline int Constraints::getNIC( ) const
+inline int_t Constraints::getNIC( ) const
 {
  	return getNumberOfType( ST_BOUNDED );
 }
@@ -71,7 +71,7 @@ inline int Constraints::getNIC( ) const
 /*
  *	g e t N U C
  */
-inline int Constraints::getNUC( ) const
+inline int_t Constraints::getNUC( ) const
 {
  	return getNumberOfType( ST_UNBOUNDED );
 }
@@ -80,7 +80,7 @@ inline int Constraints::getNUC( ) const
 /*
  *	g e t N A C
  */
-inline int Constraints::getNAC( ) const
+inline int_t Constraints::getNAC( ) const
 {
  	return active.getLength( );
 }
@@ -89,7 +89,7 @@ inline int Constraints::getNAC( ) const
 /*
  *	g e t N I A C
  */
-inline int Constraints::getNIAC( ) const
+inline int_t Constraints::getNIAC( ) const
 {
 	return inactive.getLength( );
 }

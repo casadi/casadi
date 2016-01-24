@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file include/qpOASES/SubjectTo.hpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Declaration of the SubjectTo class designed to manage working sets of
  *	constraints and bounds within a QProblem.
@@ -50,8 +50,8 @@ BEGIN_NAMESPACE_QPOASES
  *	index sets and other status information.
  *
  *	\author Hans Joachim Ferreau
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  */
 class SubjectTo
 {
@@ -63,7 +63,7 @@ class SubjectTo
 		SubjectTo( );
 
 		/** Constructor which takes the number of constraints or bounds. */
-		SubjectTo(	int _n 								/**< Number of constraints or bounds. */
+		SubjectTo(	int_t _n 							/**< Number of constraints or bounds. */
 					);
 
 		/** Copy constructor (deep copy). */
@@ -81,40 +81,40 @@ class SubjectTo
 		/** Initialises object with given number of constraints or bounds.
 		 *	\return SUCCESSFUL_RETURN \n
 		 			RET_INVALID_ARGUMENTS */
-		returnValue init(	int _n = 0					/**< Number of constraints or bounds. */
+		returnValue init(	int_t _n = 0				/**< Number of constraints or bounds. */
 							);
 
 
 		/** Returns number of constraints/bounds with given SubjectTo type.
 		 *	\return Number of constraints/bounds with given type. */
-		inline int getNumberOfType(	SubjectToType _type	/**< Type of (constraints') bound. */
-									) const;
+		inline int_t getNumberOfType(	SubjectToType _type	/**< Type of (constraints') bound. */
+										) const;
 
 
 		/** Returns type of (constraints') bound.
 		 *	\return Type of (constraints') bound \n
 		 			RET_INDEX_OUT_OF_BOUNDS */
-		inline SubjectToType getType(	int i			/**< Number of (constraints') bound. */
+		inline SubjectToType getType(	int_t i			/**< Number of (constraints') bound. */
 										) const;
 
 		/** Returns status of (constraints') bound.
 		 *	\return Status of (constraints') bound \n
 		 			ST_UNDEFINED */
-		inline SubjectToStatus getStatus(	int i		/**< Number of (constraints') bound. */
+		inline SubjectToStatus getStatus(	int_t i		/**< Number of (constraints') bound. */
 											) const;
 
 
 		/** Sets type of (constraints') bound.
 		 *	\return SUCCESSFUL_RETURN \n
 		 			RET_INDEX_OUT_OF_BOUNDS */
-		inline returnValue setType(	int i,				/**< Number of (constraints') bound. */
+		inline returnValue setType(	int_t i,			/**< Number of (constraints') bound. */
 									SubjectToType value	/**< Type of (constraints') bound. */
 									);
 
 		/** Sets status of (constraints') bound.
 		 *	\return SUCCESSFUL_RETURN \n
 		 			RET_INDEX_OUT_OF_BOUNDS */
-		inline returnValue setStatus(	int i,					/**< Number of (constraints') bound. */
+		inline returnValue setStatus(	int_t i,				/**< Number of (constraints') bound. */
 										SubjectToStatus value	/**< Status of (constraints') bound. */
 										);
 
@@ -141,14 +141,14 @@ class SubjectTo
 		 *  offset. This offset has to lie within the range [0,n/2] and has to
 		 *  be an integer divisor of the total number of constraints/bounds n.
 		 *  Type and status of the first \<offset\> constraints/bounds is thrown away,
-		 *  type and status of the last \<offset\> constraints/bounds is real_td,
+		 *  type and status of the last \<offset\> constraints/bounds is doubled,
 		 *  e.g. for offset = 2: \n
 		 *  shift( {c/b1,c/b2,c/b3,c/b4,c/b5,c/b6} ) = {c/b3,c/b4,c/b5,c/b6,c/b5,c/b6}
 		 *	\return SUCCESSFUL_RETURN \n
 		 			RET_INDEX_OUT_OF_BOUNDS \n
 		 			RET_INVALID_ARGUMENTS \n
 		 			RET_SHIFTING_FAILED */
-		virtual returnValue shift(	int offset		/**< Shift offset within the range [0,n/2] and integer divisor of n. */
+		virtual returnValue shift(	int_t offset	/**< Shift offset within the range [0,n/2] and integer divisor of n. */
 									) = 0;
 
 		/** Rotates forward type and status of all constraints/bounds by a given
@@ -158,7 +158,7 @@ class SubjectTo
 		 *	\return SUCCESSFUL_RETURN \n
 		 			RET_INDEX_OUT_OF_BOUNDS \n
 		 			RET_ROTATING_FAILED */
-		virtual returnValue rotate(	int offset		/**< Rotation offset within the range [0,n]. */
+		virtual returnValue rotate(	int_t offset	/**< Rotation offset within the range [0,n]. */
 									) = 0;
 
 
@@ -181,7 +181,7 @@ class SubjectTo
 		 			RET_ADDINDEX_FAILED \n
 					RET_INVALID_ARGUMENTS */
 		returnValue addIndex(	Indexlist* const indexlist,	/**< Index list to which the new index shall be added. */
-								int newnumber,				/**< Number of new constraint or bound. */
+								int_t newnumber,			/**< Number of new constraint or bound. */
 								SubjectToStatus newstatus	/**< Status of new constraint or bound. */
 								);
 
@@ -190,7 +190,7 @@ class SubjectTo
 		 			RET_REMOVEINDEX_FAILED \n
 					RET_INVALID_ARGUMENTS */
 		returnValue removeIndex(	Indexlist* const indexlist,	/**< Index list from which the new index shall be removed. */
-									int removenumber			/**< Number of constraint or bound to be removed. */
+									int_t removenumber			/**< Number of constraint or bound to be removed. */
 									);
 
 		/** Swaps the indices of two constraints or bounds within the index set.
@@ -198,8 +198,8 @@ class SubjectTo
 		 			RET_SWAPINDEX_FAILED \n
 					RET_INVALID_ARGUMENTS */
 		returnValue swapIndex(	Indexlist* const indexlist,	/**< Index list in which the indices shold be swapped. */
-								int number1,				/**< Number of first constraint or bound. */
-								int number2					/**< Number of second constraint or bound. */
+								int_t number1,				/**< Number of first constraint or bound. */
+								int_t number2				/**< Number of second constraint or bound. */
 								);
 
 
@@ -207,7 +207,7 @@ class SubjectTo
 	 *	PROTECTED MEMBER VARIABLES
 	 */
 	protected:
-		int n;						/**< Total number of constraints/bounds. */
+		int_t n;					/**< Total number of constraints/bounds. */
 
 		SubjectToType* type; 		/**< Type of constraints/bounds. */
 		SubjectToStatus* status;	/**< Status of constraints/bounds. */

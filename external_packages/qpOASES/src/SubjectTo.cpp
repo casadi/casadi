@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file src/SubjectTo.cpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of the SubjectTo class designed to manage working sets of
  *	constraints and bounds within a QProblem.
@@ -59,7 +59,7 @@ SubjectTo::SubjectTo( )
 /*
  *	S u b j e c t T o
  */
-SubjectTo::SubjectTo( int _n )
+SubjectTo::SubjectTo( int_t _n )
 {
 	type   = 0;
 	status = 0;
@@ -104,10 +104,10 @@ SubjectTo& SubjectTo::operator=( const SubjectTo& rhs )
 /*
  *	i n i t
  */
-returnValue SubjectTo::init(	int _n
+returnValue SubjectTo::init(	int_t _n
 								)
 {
-	int i;
+	int_t i;
 
 	if ( _n < 0 )
 		return THROWERROR( RET_INVALID_ARGUMENTS );
@@ -166,7 +166,7 @@ returnValue SubjectTo::clear( )
 returnValue SubjectTo::copy(	const SubjectTo& rhs
 								)
 {
-	int i;
+	int_t i;
 
 	n = rhs.n;
 	noLower = rhs.noLower;
@@ -197,7 +197,7 @@ returnValue SubjectTo::copy(	const SubjectTo& rhs
  *	a d d I n d e x
  */
 returnValue SubjectTo::addIndex(	Indexlist* const indexlist,
-									int newnumber, SubjectToStatus newstatus
+									int_t newnumber, SubjectToStatus newstatus
 									)
 {
 	if ( status != 0 )
@@ -227,7 +227,7 @@ returnValue SubjectTo::addIndex(	Indexlist* const indexlist,
  *	r e m o v e I n d e x
  */
 returnValue SubjectTo::removeIndex(	Indexlist* const indexlist,
-									int removenumber
+									int_t removenumber
 									)
 {
 	if ( status != 0 )
@@ -251,7 +251,7 @@ returnValue SubjectTo::removeIndex(	Indexlist* const indexlist,
  *	s w a p I n d e x
  */
 returnValue SubjectTo::swapIndex(	Indexlist* const indexlist,
-									int number1, int number2
+									int_t number1, int_t number2
 									)
 {
 	/* consistency checks */

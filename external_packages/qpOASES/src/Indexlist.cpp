@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file src/Indexlist.cpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of the Indexlist class designed to manage index lists of
  *	constraints and bounds within a QProblem_SubjectTo.
@@ -49,8 +49,8 @@ BEGIN_NAMESPACE_QPOASES
  */
 Indexlist::Indexlist( )
 {
-	number   = 0;
-	iSort = 0;
+	number = 0;
+	iSort  = 0;
 
 	init( );
 }
@@ -59,10 +59,10 @@ Indexlist::Indexlist( )
 /*
  *	I n d e x l i s t
  */
-Indexlist::Indexlist( int n )
+Indexlist::Indexlist( int_t n )
 {
-	number   = 0;
-	iSort = 0;
+	number = 0;
+	iSort  = 0;
 
 	init( n );
 }
@@ -105,7 +105,7 @@ Indexlist& Indexlist::operator=( const Indexlist& rhs )
 /*
  *	i n i t
  */
-returnValue Indexlist::init(	int n
+returnValue Indexlist::init(	int_t n
 								)
 {
 	if ( n < 0 )
@@ -118,8 +118,8 @@ returnValue Indexlist::init(	int n
 
 	if ( n > 0 )
 	{
-		number   = new int[n];
-		iSort = new int[n];
+		number = new int_t[n];
+		iSort  = new int_t[n];
 	}
 
 	return SUCCESSFUL_RETURN;
@@ -129,7 +129,7 @@ returnValue Indexlist::init(	int n
 /*
  *	g e t N u m b e r A r r a y
  */
-returnValue Indexlist::getNumberArray( int** const numberarray ) const
+returnValue Indexlist::getNumberArray( int_t** const numberarray ) const
 {
 	if (numberarray == 0)
 		return THROWERROR( RET_INVALID_ARGUMENTS );
@@ -141,11 +141,22 @@ returnValue Indexlist::getNumberArray( int** const numberarray ) const
 
 
 /*
+ *	g e t I S o r t A r r a y
+ */
+returnValue Indexlist::getISortArray( int_t** const iSortArray ) const
+{
+	*iSortArray = iSort;
+
+	return SUCCESSFUL_RETURN;
+}
+
+
+/*
  *	g e t I n d e x
  */
-int Indexlist::getIndex( int givennumber ) const
+int_t Indexlist::getIndex( int_t givennumber ) const
 {
-	int index = findInsert(givennumber);
+	int_t index = findInsert(givennumber);
 	return number[iSort[index]] == givennumber ? iSort[index] : -1;
 }
 
@@ -153,12 +164,12 @@ int Indexlist::getIndex( int givennumber ) const
 /*
  *	a d d N u m b e r
  */
-returnValue Indexlist::addNumber( int addnumber )
+returnValue Indexlist::addNumber( int_t addnumber )
 {
 	if ( length >= physicallength )
 		return THROWERROR( RET_INDEXLIST_EXCEEDS_MAX_LENGTH );
 
-	int i, j;
+	int_t i, j;
 	number[length] = addnumber;
 	j = findInsert(addnumber);
 	for (i = length; i > j+1; i--)
@@ -173,11 +184,11 @@ returnValue Indexlist::addNumber( int addnumber )
 /*
  *	r e m o v e N u m b e r
  */
-returnValue Indexlist::removeNumber( int removenumber )
+returnValue Indexlist::removeNumber( int_t removenumber )
 {
-	int i;
-	int idx = findInsert( removenumber );
-	int iSidx = iSort[idx];
+	int_t i;
+	int_t idx = findInsert( removenumber );
+	int_t iSidx = iSort[idx];
 
 	/* nothing to be done if number is not contained in index set */
 	if ( number[iSidx] != removenumber )
@@ -203,16 +214,16 @@ returnValue Indexlist::removeNumber( int removenumber )
 /*
  *	s w a p N u m b e r s
  */
-returnValue Indexlist::swapNumbers( int number1, int number2 )
+returnValue Indexlist::swapNumbers( int_t number1, int_t number2 )
 {
-	int index1 = findInsert( number1 );
-	int index2 = findInsert( number2 );
+	int_t index1 = findInsert( number1 );
+	int_t index2 = findInsert( number2 );
 
 	/* consistency check */
 	if ( ( number[iSort[index1]] != number1 ) || ( number[iSort[index2]] != number2 ) )
 		return THROWERROR( RET_INDEXLIST_CORRUPTED );
 
-	int tmp;
+	int_t tmp;
 	/* swap numbers */
 	tmp = number[iSort[index1]];
 	number[iSort[index1]] = number[iSort[index2]];
@@ -258,17 +269,17 @@ returnValue Indexlist::clear( )
 returnValue Indexlist::copy(	const Indexlist& rhs
 								)
 {
-	int i;
+	int_t i;
 
 	length = rhs.length;
 	physicallength = rhs.physicallength;
 
 	if ( rhs.number != 0 )
 	{
-		number = new int[physicallength];
+		number = new int_t[physicallength];
 		for( i=0; i<physicallength; ++i )
 			number[i] = rhs.number[i];
-		iSort = new int[physicallength];
+		iSort = new int_t[physicallength];
 		for( i=0; i<physicallength; ++i )
 			iSort[i] = rhs.iSort[i];
 	}
@@ -281,14 +292,14 @@ returnValue Indexlist::copy(	const Indexlist& rhs
 	return SUCCESSFUL_RETURN;
 }
 
-int Indexlist::findInsert(int i) const
+int_t Indexlist::findInsert(int_t i) const
 {
 	/* quick check if index can be appended */
 	if (length == 0 || i < number[iSort[0]]) return -1;
 	if (i >= number[iSort[length-1]]) return length-1;
 
 	/* otherwise, perform bisection search */
-	int fst = 0, lst = length-1, mid;
+	int_t fst = 0, lst = length-1, mid;
 
 	while (fst < lst - 1)
 	{

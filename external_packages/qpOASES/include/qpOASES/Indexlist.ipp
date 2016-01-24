@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file include/qpOASES/Indexlist.ipp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of inlined member functions of the Indexlist class designed
  *	to manage index lists of constraints and bounds within a QProblem_SubjectTo.
@@ -44,7 +44,7 @@ BEGIN_NAMESPACE_QPOASES
 /*
  *	g e t N u m b e r
  */
-inline int Indexlist::getNumber( int physicalindex ) const
+inline int_t Indexlist::getNumber( int_t physicalindex ) const
 {
 	/* consistency check */
 	if ( ( physicalindex < 0 ) || ( physicalindex > length ) )
@@ -57,7 +57,7 @@ inline int Indexlist::getNumber( int physicalindex ) const
 /*
  *	g e t L e n g t h
  */
-inline int Indexlist::getLength( ) const
+inline int_t Indexlist::getLength( ) const
 {
 	return length;
 }
@@ -66,7 +66,7 @@ inline int Indexlist::getLength( ) const
 /*
  *	g e t L a s t N u m b e r
  */
-inline int Indexlist::getLastNumber( ) const
+inline int_t Indexlist::getLastNumber( ) const
 {
 	return number[length-1];
 }
@@ -75,7 +75,7 @@ inline int Indexlist::getLastNumber( ) const
 /*
  *	g e t L a s t N u m b e r
  */
-inline BooleanType Indexlist::isMember( int _number ) const
+inline BooleanType Indexlist::isMember( int_t _number ) const
 {
 	if ( getIndex( _number ) >= 0 )
 		return BT_TRUE;

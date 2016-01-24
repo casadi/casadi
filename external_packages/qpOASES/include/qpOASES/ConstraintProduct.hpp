@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file include/qpOASES/ConstraintProduct.hpp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2009-2012
+ *	\version 3.2
+ *	\date 2009-2015
  *
  *	Declaration of the ConstraintProduct class which allows to specify a
  *	user-defined function for evaluating the constraint product at the 
@@ -51,8 +51,8 @@ BEGIN_NAMESPACE_QPOASES
  *	of a specially structured constraint matrix.
  *
  *	\author Hans Joachim Ferreau
- *	\version 3.0beta
- *	\date 2009-2012
+ *	\version 3.2
+ *	\date 2009-2015
  */
 class ConstraintProduct
 {
@@ -79,7 +79,7 @@ class ConstraintProduct
 		 *	user-defined constraint product function.
 		 *	\return 0:         successful \n
 					otherwise: not successful */
-		virtual int operator() (	int constrIndex,			/**< Number of constraint to be evaluated. */
+		virtual int_t operator() (	int_t constrIndex,			/**< Number of constraint to be evaluated. */
 									const real_t* const x,		/**< Array containing current primal iterate. */
 									real_t* const constrValue	/**< Output: Scalar value of the evaluated constraint. */
 									) const = 0;

@@ -2,7 +2,7 @@
  *	This file is part of qpOASES.
  *
  *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
+ *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
  *	Christian Kirches et al. All rights reserved.
  *
  *	qpOASES is free software; you can redistribute it and/or
@@ -25,8 +25,8 @@
 /**
  *	\file include/qpOASES/MessageHandling.ipp
  *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *	\version 3.2
+ *	\date 2007-2015
  *
  *	Implementation of inlined member functions of the MessageHandling class.
  */
@@ -79,7 +79,7 @@ inline FILE* MessageHandling::getOutputFile( ) const
 /*
  *	g e t E r r o r C o u n t
  */
-inline int MessageHandling::getErrorCount( ) const
+inline int_t MessageHandling::getErrorCount( ) const
 {
  	return errorCount;
 }
@@ -124,9 +124,9 @@ inline void MessageHandling::setOutputFile( FILE* _outputFile )
 /*
  *	s e t E r r o r C o u n t
  */
-inline returnValue MessageHandling::setErrorCount( int _errorCount )
+inline returnValue MessageHandling::setErrorCount( int_t _errorCount )
 {
-	if ( _errorCount >= 0 )
+	if ( _errorCount >= -1 )
 	{
 		errorCount = _errorCount;
 		return SUCCESSFUL_RETURN;
