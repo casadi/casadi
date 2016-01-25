@@ -100,14 +100,11 @@ returnValue Matrix::getSparseSubmatrix(
 DenseMatrix::~DenseMatrix()
 {
     if ( needToFreeMemory( ) == BT_TRUE )
-        free( );
-}
-
-void DenseMatrix::free( )
-{
-    if (val != 0)
+    {
+      if (val != 0)
         delete[] val;
-    val = 0;
+      val = 0;
+    }
 }
 
 Matrix *DenseMatrix::duplicate( ) const
@@ -697,20 +694,16 @@ SparseMatrix::~SparseMatrix()
     }
 
     if ( needToFreeMemory() == BT_TRUE )
-        free( );
-}
+    {
+      if (ir != 0) delete[] ir;
+      ir = 0;
+      if (jc != 0) delete[] jc;
+      jc = 0;
+      if (val != 0) delete[] val;
+      val = 0;
 
-
-void SparseMatrix::free( )
-{
-    if (ir != 0) delete[] ir;
-    ir = 0;
-    if (jc != 0) delete[] jc;
-    jc = 0;
-    if (val != 0) delete[] val;
-    val = 0;
-
-    doNotFreeMemory( );
+      doNotFreeMemory( );
+    }
 }
 
 Matrix *SparseMatrix::duplicate() const
@@ -1410,20 +1403,16 @@ SparseMatrixRow::~SparseMatrixRow()
     }
 
     if ( needToFreeMemory() == BT_TRUE )
-        free( );
-}
+    {
+      if (jr != 0) delete[] jr;
+      jr = 0;
+      if (ic != 0) delete[] ic;
+      ic = 0;
+      if (val != 0) delete[] val;
+      val = 0;
 
-
-void SparseMatrixRow::free( )
-{
-    if (jr != 0) delete[] jr;
-    jr = 0;
-    if (ic != 0) delete[] ic;
-    ic = 0;
-    if (val != 0) delete[] val;
-    val = 0;
-
-    doNotFreeMemory( );
+      doNotFreeMemory( );
+    }
 }
 
 

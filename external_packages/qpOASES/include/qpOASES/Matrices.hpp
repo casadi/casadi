@@ -392,9 +392,6 @@ class DenseMatrix : public virtual Matrix
         /** Destructor. */
         virtual ~DenseMatrix( );
 
-        /** Frees all internal memory. */
-        void free( );
-
         /** Returns a deep-copy of the Matrix object.
          *  \return Deep-copy of Matrix object */
         virtual Matrix *duplicate( ) const;
@@ -620,9 +617,6 @@ class SparseMatrix : public virtual Matrix
         /** Destructor. */
         virtual ~SparseMatrix( );
 
-        /** Frees all internal memory. */
-            void free( );
-
         /** Returns a deep-copy of the Matrix object.
          *  \return Deep-copy of Matrix object */
         virtual Matrix *duplicate( ) const;
@@ -799,9 +793,6 @@ class SparseMatrixRow : public virtual Matrix
 
         /** Destructor. */
         virtual ~SparseMatrixRow( );
-
-        /** Frees all internal memory. */
-            void free( );
 
         /** Returns a deep-copy of the Matrix object.
          *  \return Deep-copy of Matrix object */
