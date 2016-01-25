@@ -1,4 +1,4 @@
-﻿##
+##
 ##	This file is part of qpOASES.
 ##
 ##	qpOASES -- An Implementation of the Online Active Set Strategy.
