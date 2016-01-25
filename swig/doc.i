@@ -11466,6 +11466,10 @@ Interface to QPOases Solver for quadratic programming
 |                        |                        | solution, see Section  |
 |                        |                        | 5.7                    |
 +------------------------+------------------------+------------------------+
+| sparse                 | OT_BOOL                | Formulate the QP using |
+|                        |                        | sparse matrices.       |
+|                        |                        | Default: false         |
++------------------------+------------------------+------------------------+
 | terminationTolerance   | OT_DOUBLE              | Relative termination   |
 |                        |                        | tolerance to stop      |
 |                        |                        | homotopy.              |

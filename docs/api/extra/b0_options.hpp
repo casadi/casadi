@@ -1418,6 +1418,7 @@
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. Default: false</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 </table>
 */
@@ -1458,6 +1459,7 @@
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td></tr>
+<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. Default: false</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td></tr>
 </table>
 */
@@ -1498,6 +1500,7 @@
 <tr><td>numRefinementSteps</td><td>OT_INT</td><td>Maximum number of iterative refinement steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>numRegularisationSteps</td><td>OT_INT</td><td>Maximum number of successive regularisation steps.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. Default: false</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 </table>
 */
