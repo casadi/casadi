@@ -1,34 +1,34 @@
 /*
- *	This file is part of qpOASES.
+ *  This file is part of qpOASES.
  *
- *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
- *	Christian Kirches et al. All rights reserved.
+ *  qpOASES -- An Implementation of the Online Active Set Strategy.
+ *  Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
+ *  Christian Kirches et al. All rights reserved.
  *
- *	qpOASES is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU Lesser General Public
- *	License as published by the Free Software Foundation; either
- *	version 2.1 of the License, or (at your option) any later version.
+ *  qpOASES is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
  *
- *	qpOASES is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *	See the GNU Lesser General Public License for more details.
+ *  qpOASES is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
  *
- *	You should have received a copy of the GNU Lesser General Public
- *	License along with qpOASES; if not, write to the Free Software
- *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with qpOASES; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
 
 
 /**
- *	\file include/qpOASES/Types.hpp
- *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.2
- *	\date 2007-2015
+ *  \file include/qpOASES/Types.hpp
+ *  \author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
+ *  \version 3.2
+ *  \date 2007-2015
  *
- *	Declaration of all non-built-in types (except for classes).
+ *  Declaration of all non-built-in types (except for classes).
  */
 
 
@@ -89,31 +89,31 @@
 
 #ifdef __DSPACE__
 
-	/** Macro for switching on/off the beginning of the qpOASES namespace definition. */
-	#define BEGIN_NAMESPACE_QPOASES
+    /** Macro for switching on/off the beginning of the qpOASES namespace definition. */
+    #define BEGIN_NAMESPACE_QPOASES
 
-	/** Macro for switching on/off the end of the qpOASES namespace definition. */
-	#define END_NAMESPACE_QPOASES
+    /** Macro for switching on/off the end of the qpOASES namespace definition. */
+    #define END_NAMESPACE_QPOASES
 
-	/** Macro for switching on/off the use of the qpOASES namespace. */
-	#define USING_NAMESPACE_QPOASES
+    /** Macro for switching on/off the use of the qpOASES namespace. */
+    #define USING_NAMESPACE_QPOASES
 
-	/** Macro for switching on/off references to the qpOASES namespace. */
-	#define REFER_NAMESPACE_QPOASES ::
+    /** Macro for switching on/off references to the qpOASES namespace. */
+    #define REFER_NAMESPACE_QPOASES ::
 
 #else
 
-	/** Macro for switching on/off the beginning of the qpOASES namespace definition. */
-	#define BEGIN_NAMESPACE_QPOASES  namespace qpOASES {
+    /** Macro for switching on/off the beginning of the qpOASES namespace definition. */
+    #define BEGIN_NAMESPACE_QPOASES  namespace qpOASES {
 
-	/** Macro for switching on/off the end of the qpOASES namespace definition. */
-	#define END_NAMESPACE_QPOASES    }
+    /** Macro for switching on/off the end of the qpOASES namespace definition. */
+    #define END_NAMESPACE_QPOASES    }
 
-	/** Macro for switching on/off the use of the qpOASES namespace. */
-	#define USING_NAMESPACE_QPOASES  using namespace qpOASES;
+    /** Macro for switching on/off the use of the qpOASES namespace. */
+    #define USING_NAMESPACE_QPOASES  using namespace qpOASES;
 
-	/** Macro for switching on/off references to the qpOASES namespace. */
-	#define REFER_NAMESPACE_QPOASES  qpOASES::
+    /** Macro for switching on/off references to the qpOASES namespace. */
+    #define REFER_NAMESPACE_QPOASES  qpOASES::
 
 #endif
 
@@ -130,7 +130,7 @@
     /* If snprintf is not available, provide an empty implementation... */
     int snprintf( char* s, size_t n, const char* format, ... );
   #else
-	/* ... or substitute snprintf by _snprintf for Microsoft compilers. */
+    /* ... or substitute snprintf by _snprintf for Microsoft compilers. */
     #define snprintf _snprintf
   #endif
 #endif /* __NO_SNPRINTF__ */
@@ -189,29 +189,29 @@ typedef int_t sparse_int_t;
 /** Summarises all possible logical values. */
 enum BooleanType
 {
-	BT_FALSE,					/**< Logical value for "false". */
-	BT_TRUE						/**< Logical value for "true". */
+    BT_FALSE,                   /**< Logical value for "false". */
+    BT_TRUE                     /**< Logical value for "true". */
 };
 
 
 /** Summarises all possible print levels. Print levels are used to describe
- *	the desired amount of output during runtime of qpOASES. */
+ *  the desired amount of output during runtime of qpOASES. */
 enum PrintLevel
 {
-	PL_DEBUG_ITER = -2,			/**< Full tabular debugging output. */
-	PL_TABULAR,					/**< Normal tabular output. */
-	PL_NONE,					/**< No output. */
-	PL_LOW,						/**< Print error messages only. */
-	PL_MEDIUM,					/**< Print error and warning messages as well as concise info messages. */
-	PL_HIGH						/**< Print all messages with full details. */
+    PL_DEBUG_ITER = -2,         /**< Full tabular debugging output. */
+    PL_TABULAR,                 /**< Normal tabular output. */
+    PL_NONE,                    /**< No output. */
+    PL_LOW,                     /**< Print error messages only. */
+    PL_MEDIUM,                  /**< Print error and warning messages as well as concise info messages. */
+    PL_HIGH                     /**< Print all messages with full details. */
 };
 
 
 /** Defines visibility status of a message. */
 enum VisibilityStatus
 {
-	VS_HIDDEN,					/**< Message not visible. */
-	VS_VISIBLE					/**< Message visible. */
+    VS_HIDDEN,                  /**< Message not visible. */
+    VS_VISIBLE                  /**< Message visible. */
 };
 
 
@@ -219,106 +219,106 @@ enum VisibilityStatus
 solution process of a QP sequence. */
 enum QProblemStatus
 {
-	QPS_NOTINITIALISED,			/**< QProblem object is freshly instantiated or reset. */
-	QPS_PREPARINGAUXILIARYQP,	/**< An auxiliary problem is currently setup, either at the very beginning
-								 *   via an initial homotopy or after changing the QP matrices. */
-	QPS_AUXILIARYQPSOLVED,		/**< An auxilary problem was solved, either at the very beginning
-								 *   via an initial homotopy or after changing the QP matrices. */
-	QPS_PERFORMINGHOMOTOPY,		/**< A homotopy according to the main idea of the online active
-								 *   set strategy is performed. */
-	QPS_HOMOTOPYQPSOLVED,		/**< An intermediate QP along the homotopy path was solved. */
-	QPS_SOLVED					/**< The solution of the actual QP was found. */
+    QPS_NOTINITIALISED,         /**< QProblem object is freshly instantiated or reset. */
+    QPS_PREPARINGAUXILIARYQP,   /**< An auxiliary problem is currently setup, either at the very beginning
+                                 *   via an initial homotopy or after changing the QP matrices. */
+    QPS_AUXILIARYQPSOLVED,      /**< An auxilary problem was solved, either at the very beginning
+                                 *   via an initial homotopy or after changing the QP matrices. */
+    QPS_PERFORMINGHOMOTOPY,     /**< A homotopy according to the main idea of the online active
+                                 *   set strategy is performed. */
+    QPS_HOMOTOPYQPSOLVED,       /**< An intermediate QP along the homotopy path was solved. */
+    QPS_SOLVED                  /**< The solution of the actual QP was found. */
 };
 
 
 /** Summarises all possible types of the QP's Hessian matrix. */
 enum HessianType
 {
-	HST_ZERO,				/**< Hessian is zero matrix (i.e. LP formulation). */
-	HST_IDENTITY,			/**< Hessian is identity matrix. */
-	HST_POSDEF,				/**< Hessian is (strictly) positive definite. */
-	HST_POSDEF_NULLSPACE,	/**< Hessian is positive definite on null space of active bounds/constraints. */
-	HST_SEMIDEF,			/**< Hessian is positive semi-definite. */
-	HST_INDEF,				/**< Hessian is indefinite. */
-	HST_UNKNOWN				/**< Hessian type is unknown. */
+    HST_ZERO,               /**< Hessian is zero matrix (i.e. LP formulation). */
+    HST_IDENTITY,           /**< Hessian is identity matrix. */
+    HST_POSDEF,             /**< Hessian is (strictly) positive definite. */
+    HST_POSDEF_NULLSPACE,   /**< Hessian is positive definite on null space of active bounds/constraints. */
+    HST_SEMIDEF,            /**< Hessian is positive semi-definite. */
+    HST_INDEF,              /**< Hessian is indefinite. */
+    HST_UNKNOWN             /**< Hessian type is unknown. */
 };
 
 
 /** Summarises all possible types of bounds and constraints. */
 enum SubjectToType
 {
-	ST_UNBOUNDED,		/**< Bound/constraint is unbounded. */
-	ST_BOUNDED,			/**< Bound/constraint is bounded but not fixed. */
-	ST_EQUALITY,		/**< Bound/constraint is fixed (implicit equality bound/constraint). */
-	ST_DISABLED,		/**< Bound/constraint is disabled (i.e. ignored when solving QP). */
-	ST_UNKNOWN			/**< Type of bound/constraint unknown. */
+    ST_UNBOUNDED,       /**< Bound/constraint is unbounded. */
+    ST_BOUNDED,         /**< Bound/constraint is bounded but not fixed. */
+    ST_EQUALITY,        /**< Bound/constraint is fixed (implicit equality bound/constraint). */
+    ST_DISABLED,        /**< Bound/constraint is disabled (i.e. ignored when solving QP). */
+    ST_UNKNOWN          /**< Type of bound/constraint unknown. */
 };
 
 
 /** Summarises all possible states of bounds and constraints. */
 enum SubjectToStatus
 {
-	ST_LOWER = -1,			/**< Bound/constraint is at its lower bound. */
-	ST_INACTIVE,			/**< Bound/constraint is inactive. */
-	ST_UPPER,				/**< Bound/constraint is at its upper bound. */
-	ST_INFEASIBLE_LOWER,	/**< (to be documented) */
-	ST_INFEASIBLE_UPPER,	/**< (to be documented) */
-	ST_UNDEFINED			/**< Status of bound/constraint undefined. */
+    ST_LOWER = -1,          /**< Bound/constraint is at its lower bound. */
+    ST_INACTIVE,            /**< Bound/constraint is inactive. */
+    ST_UPPER,               /**< Bound/constraint is at its upper bound. */
+    ST_INFEASIBLE_LOWER,    /**< (to be documented) */
+    ST_INFEASIBLE_UPPER,    /**< (to be documented) */
+    ST_UNDEFINED            /**< Status of bound/constraint undefined. */
 };
 
 /** Flag indicating which type of update generated column in Schur complement. */
 enum SchurUpdateType
 {
-	SUT_VarFixed,			/**< Free variable gets fixed. */
-	SUT_VarFreed,			/**< Fixed variable gets freed. */
-	SUT_ConAdded,			/**< Constraint becomes active. */
-	SUT_ConRemoved,			/**< Constraint becomes inactive. */
-	SUT_UNDEFINED			/**< Type of Schur update is undefined. */
+    SUT_VarFixed,           /**< Free variable gets fixed. */
+    SUT_VarFreed,           /**< Fixed variable gets freed. */
+    SUT_ConAdded,           /**< Constraint becomes active. */
+    SUT_ConRemoved,         /**< Constraint becomes inactive. */
+    SUT_UNDEFINED           /**< Type of Schur update is undefined. */
 };
 
 /**
- *	\brief Stores internal information for tabular (debugging) output.
+ *  \brief Stores internal information for tabular (debugging) output.
  *
- *	Struct storing internal information for tabular (debugging) output
- *	when using the (S)QProblem(B) objects.
+ *  Struct storing internal information for tabular (debugging) output
+ *  when using the (S)QProblem(B) objects.
  *
- *	\author Hans Joachim Ferreau
- *	\version 3.2
- *	\date 2013-2015
+ *  \author Hans Joachim Ferreau
+ *  \version 3.2
+ *  \date 2013-2015
  */
 struct TabularOutput {
-	int_t idxAddB;		/**< Index of bound that has been added to working set. */
-	int_t idxRemB;		/**< Index of bound that has been removed from working set. */
-	int_t idxAddC;		/**< Index of constraint that has been added to working set. */
-	int_t idxRemC;		/**< Index of constraint that has been removed from working set. */
-	int_t excAddB;		/**< Flag indicating whether a bound has been added to working set to keep a regular projected Hessian. */
-	int_t excRemB;		/**< Flag indicating whether a bound has been removed from working set to keep a regular projected Hessian. */
-	int_t excAddC;		/**< Flag indicating whether a constraint has been added to working set to keep a regular projected Hessian. */
-	int_t excRemC;		/**< Flag indicating whether a constraint has been removed from working set to keep a regular projected Hessian. */
+    int_t idxAddB;      /**< Index of bound that has been added to working set. */
+    int_t idxRemB;      /**< Index of bound that has been removed from working set. */
+    int_t idxAddC;      /**< Index of constraint that has been added to working set. */
+    int_t idxRemC;      /**< Index of constraint that has been removed from working set. */
+    int_t excAddB;      /**< Flag indicating whether a bound has been added to working set to keep a regular projected Hessian. */
+    int_t excRemB;      /**< Flag indicating whether a bound has been removed from working set to keep a regular projected Hessian. */
+    int_t excAddC;      /**< Flag indicating whether a constraint has been added to working set to keep a regular projected Hessian. */
+    int_t excRemC;      /**< Flag indicating whether a constraint has been removed from working set to keep a regular projected Hessian. */
 };
 
 
 
 /**
- *	\brief Struct containing the variable header for mat file.
+ *  \brief Struct containing the variable header for mat file.
  *
- *	Struct storing the header of a variable to be stored in
- *	Matlab's binary format (using the outdated Level 4 variant
+ *  Struct storing the header of a variable to be stored in
+ *  Matlab's binary format (using the outdated Level 4 variant
  *  for simplictiy).
  *
  *  Note, this code snippet has been inspired from the document
  *  "Matlab(R) MAT-file Format, R2013b" by MathWorks
  *
- *	\author Hans Joachim Ferreau
- *	\version 3.2
- *	\date 2013-2015
+ *  \author Hans Joachim Ferreau
+ *  \version 3.2
+ *  \date 2013-2015
  */
 typedef struct {
-	long numericFormat;		/**< Flag indicating numerical format. */
-	long nRows;				/**< Number of rows. */
-	long nCols;				/**< Number of rows. */
-	long imaginaryPart;		/**< (to be documented) */
-	long nCharName;			/**< Number of character in name. */
+    long numericFormat;     /**< Flag indicating numerical format. */
+    long nRows;             /**< Number of rows. */
+    long nCols;             /**< Number of rows. */
+    long imaginaryPart;     /**< (to be documented) */
+    long nCharName;         /**< Number of character in name. */
 } MatMatrixHeader;
 
 
@@ -327,9 +327,9 @@ typedef struct {
 END_NAMESPACE_QPOASES
 
 
-#endif	/* QPOASES_TYPES_HPP */
+#endif  /* QPOASES_TYPES_HPP */
 
 
 /*
- *	end of file
+ *  end of file
  */

@@ -1,35 +1,35 @@
 /*
- *	This file is part of qpOASES.
+ *  This file is part of qpOASES.
  *
- *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
- *	Christian Kirches et al. All rights reserved.
+ *  qpOASES -- An Implementation of the Online Active Set Strategy.
+ *  Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
+ *  Christian Kirches et al. All rights reserved.
  *
- *	qpOASES is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU Lesser General Public
- *	License as published by the Free Software Foundation; either
- *	version 2.1 of the License, or (at your option) any later version.
+ *  qpOASES is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
  *
- *	qpOASES is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *	See the GNU Lesser General Public License for more details.
+ *  qpOASES is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
  *
- *	You should have received a copy of the GNU Lesser General Public
- *	License along with qpOASES; if not, write to the Free Software
- *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with qpOASES; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
 
 
 /**
- *	\file src/SolutionAnalysis.cpp
- *	\author Hans Joachim Ferreau (thanks to Boris Houska)
- *	\version 3.2
- *	\date 2008-2015
+ *  \file src/SolutionAnalysis.cpp
+ *  \author Hans Joachim Ferreau (thanks to Boris Houska)
+ *  \version 3.2
+ *  \date 2008-2015
  *
- *	Implementation of the SolutionAnalysis class designed to perform
- *	additional analysis after solving a QP with qpOASES.
+ *  Implementation of the SolutionAnalysis class designed to perform
+ *  additional analysis after solving a QP with qpOASES.
  *
  */
 
@@ -46,7 +46,7 @@ BEGIN_NAMESPACE_QPOASES
 
 
 /*
- *	S o l u t i o n A n a l y s i s
+ *  S o l u t i o n A n a l y s i s
  */
 SolutionAnalysis::SolutionAnalysis( )
 {
@@ -55,7 +55,7 @@ SolutionAnalysis::SolutionAnalysis( )
 
 
 /*
- *	S o l u t i o n A n a l y s i s
+ *  S o l u t i o n A n a l y s i s
  */
 SolutionAnalysis::SolutionAnalysis( const SolutionAnalysis& rhs )
 {
@@ -64,7 +64,7 @@ SolutionAnalysis::SolutionAnalysis( const SolutionAnalysis& rhs )
 
 
 /*
- *	~ S o l u t i o n A n a l y s i s
+ *  ~ S o l u t i o n A n a l y s i s
  */
 SolutionAnalysis::~SolutionAnalysis( )
 {
@@ -73,209 +73,209 @@ SolutionAnalysis::~SolutionAnalysis( )
 
 
 /*
- *	o p e r a t o r =
+ *  o p e r a t o r =
  */
 SolutionAnalysis& SolutionAnalysis::operator=( const SolutionAnalysis& rhs )
 {
-	if ( this != &rhs )
-	{
+    if ( this != &rhs )
+    {
 
-	}
+    }
 
-	return *this;
+    return *this;
 }
 
 
 
 /*
- *	g e t K k t V i o l a t i o n
+ *  g e t K k t V i o l a t i o n
  */
-real_t SolutionAnalysis::getKktViolation(	QProblemB* const qp,
-											real_t* const maxStat, real_t* const maxFeas, real_t* const maxCmpl
-											) const
+real_t SolutionAnalysis::getKktViolation(   QProblemB* const qp,
+                                            real_t* const maxStat, real_t* const maxFeas, real_t* const maxCmpl
+                                            ) const
 {
-	int_t i;
-	int_t nV = qp->getNV();
+    int_t i;
+    int_t nV = qp->getNV();
 
-	if ( qp == 0 )
-		return INFTY;
+    if ( qp == 0 )
+        return INFTY;
 
-	/* setup Hessian matrix array (or pass NULL pointer) */
-	real_t* H_ptr = 0;
-	BooleanType hasIdentityHessian = BT_FALSE;
+    /* setup Hessian matrix array (or pass NULL pointer) */
+    real_t* H_ptr = 0;
+    BooleanType hasIdentityHessian = BT_FALSE;
 
-	switch( qp->getHessianType() )
-	{
-		case HST_ZERO:
-			break;
+    switch( qp->getHessianType() )
+    {
+        case HST_ZERO:
+            break;
 
-		case HST_IDENTITY:
-			hasIdentityHessian = BT_TRUE;
-			break;
+        case HST_IDENTITY:
+            hasIdentityHessian = BT_TRUE;
+            break;
 
-		default:
-			H_ptr = qp->H->full();
-			if ( qp->usingRegularisation() == BT_TRUE )
-				for( i=0; i<nV; ++i )
-					H_ptr[i*nV+i] -= qp->regVal;
-	}
+        default:
+            H_ptr = qp->H->full();
+            if ( qp->usingRegularisation() == BT_TRUE )
+                for( i=0; i<nV; ++i )
+                    H_ptr[i*nV+i] -= qp->regVal;
+    }
 
-	real_t* workingSetB = new real_t[nV];
-	qp->getWorkingSetBounds( workingSetB );
+    real_t* workingSetB = new real_t[nV];
+    qp->getWorkingSetBounds( workingSetB );
 
-	/* determine maximum KKT violation */
-	real_t maxKktViolation=0.0, stat=0.0, feas=0.0, cmpl=0.0;
+    /* determine maximum KKT violation */
+    real_t maxKktViolation=0.0, stat=0.0, feas=0.0, cmpl=0.0;
 
-	returnValue returnvalue = REFER_NAMESPACE_QPOASES getKktViolation(	nV,
-																		H_ptr,qp->g,
-																		qp->lb,qp->ub,
-																		qp->x,qp->y,
-																		stat,feas,cmpl,
-																		workingSetB,hasIdentityHessian
-																		);
-	if ( workingSetB != 0 )
-		delete[] workingSetB;
+    returnValue returnvalue = REFER_NAMESPACE_QPOASES getKktViolation(  nV,
+                                                                        H_ptr,qp->g,
+                                                                        qp->lb,qp->ub,
+                                                                        qp->x,qp->y,
+                                                                        stat,feas,cmpl,
+                                                                        workingSetB,hasIdentityHessian
+                                                                        );
+    if ( workingSetB != 0 )
+        delete[] workingSetB;
 
-	if ( H_ptr != 0 )
-		delete[] H_ptr;
+    if ( H_ptr != 0 )
+        delete[] H_ptr;
 
-	if ( returnvalue != SUCCESSFUL_RETURN )
-		THROWERROR( returnvalue );
+    if ( returnvalue != SUCCESSFUL_RETURN )
+        THROWERROR( returnvalue );
 
-	/* assign return values */
-	if ( maxStat != 0 )
-		*maxStat = stat;
+    /* assign return values */
+    if ( maxStat != 0 )
+        *maxStat = stat;
 
-	if ( maxFeas != 0 )
-		*maxFeas = feas;
+    if ( maxFeas != 0 )
+        *maxFeas = feas;
 
-	if ( maxCmpl != 0 )
-		*maxCmpl = cmpl;
+    if ( maxCmpl != 0 )
+        *maxCmpl = cmpl;
 
-	maxKktViolation = getMax( maxKktViolation,stat );
-	maxKktViolation = getMax( maxKktViolation,feas );
-	maxKktViolation = getMax( maxKktViolation,cmpl );
+    maxKktViolation = getMax( maxKktViolation,stat );
+    maxKktViolation = getMax( maxKktViolation,feas );
+    maxKktViolation = getMax( maxKktViolation,cmpl );
 
-	return maxKktViolation;
+    return maxKktViolation;
 }
 
 
 /*
- *	g e t K k t V i o l a t i o n
+ *  g e t K k t V i o l a t i o n
  */
-real_t SolutionAnalysis::getKktViolation(	QProblem* const qp,
-											real_t* const maxStat, real_t* const maxFeas, real_t* const maxCmpl
-											) const
+real_t SolutionAnalysis::getKktViolation(   QProblem* const qp,
+                                            real_t* const maxStat, real_t* const maxFeas, real_t* const maxCmpl
+                                            ) const
 {
-	int_t i;
-	int_t nV = qp->getNV();
-	int_t nC = qp->getNC();
+    int_t i;
+    int_t nV = qp->getNV();
+    int_t nC = qp->getNC();
 
-	if ( qp == 0 )
-		return INFTY;
+    if ( qp == 0 )
+        return INFTY;
 
-	/* setup Hessian matrix array (or pass NULL pointer) */
-	real_t* H_ptr = 0;
-	BooleanType hasIdentityHessian = BT_FALSE;
+    /* setup Hessian matrix array (or pass NULL pointer) */
+    real_t* H_ptr = 0;
+    BooleanType hasIdentityHessian = BT_FALSE;
 
-	switch( qp->getHessianType() )
-	{
-		case HST_ZERO:
-			break;
+    switch( qp->getHessianType() )
+    {
+        case HST_ZERO:
+            break;
 
-		case HST_IDENTITY:
-			hasIdentityHessian = BT_TRUE;
-			break;
+        case HST_IDENTITY:
+            hasIdentityHessian = BT_TRUE;
+            break;
 
-		default:
-			H_ptr = qp->H->full();
-			if ( qp->usingRegularisation() == BT_TRUE )
-				for( i=0; i<nV; ++i )
-					H_ptr[i*nV+i] -= qp->regVal;
-	}
+        default:
+            H_ptr = qp->H->full();
+            if ( qp->usingRegularisation() == BT_TRUE )
+                for( i=0; i<nV; ++i )
+                    H_ptr[i*nV+i] -= qp->regVal;
+    }
 
-	/* setup constraint matrix array */
-	real_t* A_ptr = qp->A->full();
+    /* setup constraint matrix array */
+    real_t* A_ptr = qp->A->full();
 
-	real_t* workingSetB = new real_t[nV];
-	qp->getWorkingSetBounds( workingSetB );
+    real_t* workingSetB = new real_t[nV];
+    qp->getWorkingSetBounds( workingSetB );
 
-	real_t* workingSetC = new real_t[nC];
-	qp->getWorkingSetConstraints( workingSetC );
+    real_t* workingSetC = new real_t[nC];
+    qp->getWorkingSetConstraints( workingSetC );
 
-	/* determine maximum KKT violation */
-	real_t maxKktViolation=0.0, stat=0.0, feas=0.0, cmpl=0.0;
+    /* determine maximum KKT violation */
+    real_t maxKktViolation=0.0, stat=0.0, feas=0.0, cmpl=0.0;
 
-	returnValue returnvalue = REFER_NAMESPACE_QPOASES getKktViolation(	nV,nC,
-																		H_ptr,qp->g,A_ptr,
-																		qp->lb,qp->ub,qp->lbA,qp->ubA,
-																		qp->x,qp->y,
-																		stat,feas,cmpl,
-																		workingSetB,workingSetC,hasIdentityHessian
-																		);
+    returnValue returnvalue = REFER_NAMESPACE_QPOASES getKktViolation(  nV,nC,
+                                                                        H_ptr,qp->g,A_ptr,
+                                                                        qp->lb,qp->ub,qp->lbA,qp->ubA,
+                                                                        qp->x,qp->y,
+                                                                        stat,feas,cmpl,
+                                                                        workingSetB,workingSetC,hasIdentityHessian
+                                                                        );
 
-	if ( workingSetC != 0 )
-		delete[] workingSetC;
+    if ( workingSetC != 0 )
+        delete[] workingSetC;
 
-	if ( workingSetB != 0 )
-		delete[] workingSetB;
+    if ( workingSetB != 0 )
+        delete[] workingSetB;
 
-	if ( A_ptr != 0 )
-		delete[] A_ptr;
+    if ( A_ptr != 0 )
+        delete[] A_ptr;
 
-	if ( H_ptr != 0 )
-		delete[] H_ptr;
+    if ( H_ptr != 0 )
+        delete[] H_ptr;
 
-	if ( returnvalue != SUCCESSFUL_RETURN )
-		THROWERROR( returnvalue );
+    if ( returnvalue != SUCCESSFUL_RETURN )
+        THROWERROR( returnvalue );
 
-	/* assign return values */
-	if ( maxStat != 0 )
-		*maxStat = stat;
+    /* assign return values */
+    if ( maxStat != 0 )
+        *maxStat = stat;
 
-	if ( maxFeas != 0 )
-		*maxFeas = feas;
+    if ( maxFeas != 0 )
+        *maxFeas = feas;
 
-	if ( maxCmpl != 0 )
-		*maxCmpl = cmpl;
+    if ( maxCmpl != 0 )
+        *maxCmpl = cmpl;
 
-	maxKktViolation = getMax( maxKktViolation,stat );
-	maxKktViolation = getMax( maxKktViolation,feas );
-	maxKktViolation = getMax( maxKktViolation,cmpl );
+    maxKktViolation = getMax( maxKktViolation,stat );
+    maxKktViolation = getMax( maxKktViolation,feas );
+    maxKktViolation = getMax( maxKktViolation,cmpl );
 
-	return maxKktViolation;
+    return maxKktViolation;
 }
 
 
 /*
- *	g e t K k t V i o l a t i o n
+ *  g e t K k t V i o l a t i o n
  */
-real_t SolutionAnalysis::getKktViolation(	SQProblem* const qp,
-											real_t* const maxStat, real_t* const maxFeas, real_t* const maxCmpl
-											) const
+real_t SolutionAnalysis::getKktViolation(   SQProblem* const qp,
+                                            real_t* const maxStat, real_t* const maxFeas, real_t* const maxCmpl
+                                            ) const
 {
-	return getKktViolation( (QProblem*)qp, maxStat,maxFeas,maxCmpl );
+    return getKktViolation( (QProblem*)qp, maxStat,maxFeas,maxCmpl );
 }
 
 
 
 /*
- *	g e t V a r i a n c e C o v a r i a n c e
+ *  g e t V a r i a n c e C o v a r i a n c e
  */
-returnValue SolutionAnalysis::getVarianceCovariance(	QProblemB* const qp,
-														const real_t* const g_b_bA_VAR, real_t* const Primal_Dual_VAR
-														) const
+returnValue SolutionAnalysis::getVarianceCovariance(    QProblemB* const qp,
+                                                        const real_t* const g_b_bA_VAR, real_t* const Primal_Dual_VAR
+                                                        ) const
 {
-	return THROWERROR( RET_NOT_YET_IMPLEMENTED );
+    return THROWERROR( RET_NOT_YET_IMPLEMENTED );
 }
 
 
 /*
- *	g e t V a r i a n c e C o v a r i a n c e
+ *  g e t V a r i a n c e C o v a r i a n c e
  */
-returnValue SolutionAnalysis::getVarianceCovariance(	QProblem* qp,
-														const real_t* const g_b_bA_VAR, real_t* const Primal_Dual_VAR
-														) const
+returnValue SolutionAnalysis::getVarianceCovariance(    QProblem* qp,
+                                                        const real_t* const g_b_bA_VAR, real_t* const Primal_Dual_VAR
+                                                        ) const
 {
 
   /* DEFINITION OF THE DIMENSIONS nV AND nC:
@@ -507,19 +507,19 @@ returnValue SolutionAnalysis::getVarianceCovariance(	QProblem* qp,
 
 
 /*
- *	g e t V a r i a n c e C o v a r i a n c e
+ *  g e t V a r i a n c e C o v a r i a n c e
  */
-returnValue SolutionAnalysis::getVarianceCovariance(	SQProblem* const qp,
-														const real_t* const g_b_bA_VAR, real_t* const Primal_Dual_VAR
-														) const
+returnValue SolutionAnalysis::getVarianceCovariance(    SQProblem* const qp,
+                                                        const real_t* const g_b_bA_VAR, real_t* const Primal_Dual_VAR
+                                                        ) const
 {
-	/* Call QProblem variant. */
-	return getVarianceCovariance( (QProblem*)qp,g_b_bA_VAR,Primal_Dual_VAR );
+    /* Call QProblem variant. */
+    return getVarianceCovariance( (QProblem*)qp,g_b_bA_VAR,Primal_Dual_VAR );
 }
 
 
 /*
- *	c h e c k C u r v a t u r e O n S e t S
+ *  c h e c k C u r v a t u r e O n S e t S
  */
 returnValue SolutionAnalysis::checkCurvatureOnStronglyActiveConstraints( SQProblem* qp )
 {
@@ -529,7 +529,7 @@ returnValue SolutionAnalysis::checkCurvatureOnStronglyActiveConstraints( SQProbl
 
 
 /*
- *	c h e c k C u r v a t u r e O n S t r o n g l y A c t i v e C o n s t r a i n t s
+ *  c h e c k C u r v a t u r e O n S t r o n g l y A c t i v e C o n s t r a i n t s
  */
 returnValue SolutionAnalysis::checkCurvatureOnStronglyActiveConstraints( SQProblemSchur* qp )
 {
@@ -558,7 +558,7 @@ returnValue SolutionAnalysis::checkCurvatureOnStronglyActiveConstraints( SQProbl
   for( k=0; k<nFX; k++ )
     if( getAbs(qp->x[FX_idx[k]]) > eps )
       if ( qp->bounds.moveFixedToFree( FX_idx[k] ) != SUCCESSFUL_RETURN )
-	return THROWERROR( RET_REMOVEBOUND_FAILED );
+    return THROWERROR( RET_REMOVEBOUND_FAILED );
 
   // Do a new factorization and check the inertia
   ret = qp->resetSchurComplement( BT_FALSE );
@@ -614,8 +614,8 @@ returnValue SolutionAnalysis::checkCurvatureOnStronglyActiveConstraints( SQProbl
       //ret = qp->removeBound( FX_idx[k], BT_TRUE, BT_FALSE, BT_FALSE );
       //if( ret != SUCCESSFUL_RETURN )
       //{
-	//fail = 1;
-	//break;
+    //fail = 1;
+    //break;
       //}
 
       //newDet = qp->detS;
@@ -624,38 +624,38 @@ returnValue SolutionAnalysis::checkCurvatureOnStronglyActiveConstraints( SQProbl
       //// Case 1: S has grown by 1 row and column
       //if( qp->nS == oldNS + 1 )
       //{
-	//// If the determinant does not change sign, then S has gained a positive eigenvalue.
-	//// That means there is a negative eigenvalue in the (extended) reduced Hessian!
-	//if ( ( oldDet <= 0.0 && newDet <= 0.0 ) || ( oldDet >= 0.0 && newDet >= 0.0 ) )
-	//{
-	  //fail = 1;
-	  //break;
-	//}
+    //// If the determinant does not change sign, then S has gained a positive eigenvalue.
+    //// That means there is a negative eigenvalue in the (extended) reduced Hessian!
+    //if ( ( oldDet <= 0.0 && newDet <= 0.0 ) || ( oldDet >= 0.0 && newDet >= 0.0 ) )
+    //{
+      //fail = 1;
+      //break;
+    //}
       //}
       //// Case 2: S has shrunk by 1 row and column
       //else if( qp->nS == oldNS - 1 )
       //{
-	//// If the determinant changes sign, then S has lost a negative eigenvalue.
-	//// That means there is a negative eigenvalue in the (extended) reduced Hessian!
-	//if ( ( oldDet <= 0.0 && newDet > 0.0 ) || ( oldDet >= 0.0 && newDet < 0.0 ) )
-	//{
-	  //fail = 1;
-	  //break;
-	//}
+    //// If the determinant changes sign, then S has lost a negative eigenvalue.
+    //// That means there is a negative eigenvalue in the (extended) reduced Hessian!
+    //if ( ( oldDet <= 0.0 && newDet > 0.0 ) || ( oldDet >= 0.0 && newDet < 0.0 ) )
+    //{
+      //fail = 1;
+      //break;
+    //}
       //}
       //// Case 3: S was reset
       //else if( qp->nS == 0 )
       //{
-	//// Check inertia of KKT matrix
-	//neig = qp->sparseSolver->getNegativeEigenvalues( );
-	//if( neig > nAC )
-	//{
-	  //fail = 1;
-	  //break;
-	//}
+    //// Check inertia of KKT matrix
+    //neig = qp->sparseSolver->getNegativeEigenvalues( );
+    //if( neig > nAC )
+    //{
+      //fail = 1;
+      //break;
+    //}
       //}
       //else
-	//printf("ERROR!\n");
+    //printf("ERROR!\n");
     //}
 
   //// If test is successful, add all bounds that have been removed
@@ -665,7 +665,7 @@ returnValue SolutionAnalysis::checkCurvatureOnStronglyActiveConstraints( SQProbl
     //{
       //ret = qp->addBound( FX_idx[k], saveBounds.getStatus( FX_idx[k] ), BT_TRUE, BT_FALSE );
       //if( ret != SUCCESSFUL_RETURN && ret != RET_BOUND_ALREADY_ACTIVE )
-	//printf( "addBound() in checkCurvatureOnStronglyActiveConstraints(): %s\n", getGlobalMessageHandler()->getErrorCodeMessage( ret ) );
+    //printf( "addBound() in checkCurvatureOnStronglyActiveConstraints(): %s\n", getGlobalMessageHandler()->getErrorCodeMessage( ret ) );
     //}
 
   //qp->status = saveStatus;
@@ -677,5 +677,5 @@ END_NAMESPACE_QPOASES
 
 
 /*
- *	end of file
+ *  end of file
  */
