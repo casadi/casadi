@@ -42,7 +42,10 @@ namespace casadi {
 
   struct CASADI_QPSOL_QPOASES_EXPORT QpoasesMemory : public Memory {
     /// QP Solver
-    qpOASES::QProblemB *qp;
+    union {
+      qpOASES::SQProblem *sqp;
+      qpOASES::QProblemB *qp;
+    };
 
     /// Has qpOASES been called once?
     bool called_once;
@@ -122,6 +125,7 @@ namespace casadi {
     int max_nWSR_;
     double max_cputime_;
     qpOASES::Options ops_;
+    bool sparse_;
     ///@}
 
     /// Throw error

@@ -42,6 +42,9 @@ where y=[y_1,...,y_N] and z=[z_1,...,z_N]
 We wish to solve
 minimize{y,z} Vchain(y, z)
 
+Subject to the piecewise linear ground constraints:
+z_i >= zin
+z_i - 0.1*y_i >= 0.5
 """
 
 from casadi import *
@@ -110,7 +113,7 @@ for i in range(1, N+1):
 qp = {'x':vertcat(x), 'f':Vchain, 'g':vertcat(g)}
 
 # Solve with IPOPT
-solver = qpsol('solver', 'qpoases', qp)
+solver = qpsol('solver', 'qpoases', qp, {'sparse':True})
 #solver = qpsol('solver', 'gurobi', qp)
 #solver = nlpsol('solver', 'ipopt', qp)
 

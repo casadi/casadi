@@ -44,6 +44,10 @@
     We wish to solve
     minimize{y,z} Vchain(y, z)
 
+    Subject to the piecewise linear ground constraints:
+    z_i >= zin
+    z_i - 0.1*y_i >= 0.5
+
     Joel Andersson, 2015
 */
 
@@ -126,7 +130,7 @@ int main(){
   SXDict qp = {{"x", vertcat(x)}, {"f", Vchain}, {"g", vertcat(g)}};
 
   // Solve with a QP solver or NLP solver
-  Function solver = qpsol("solver", "qpoases", qp);
+  Function solver = qpsol("solver", "qpoases", qp, {{"sparse", true}});
   //Function solver = qpsol("solver", "cplex", qp);
   //Function solver = qpsol("solver", "ooqp", qp);
   //Function solver = qpsol("solver", "gurobi", qp);

@@ -57,7 +57,10 @@ namespace casadi {
 
   Options QpoasesInterface::options_
   = {{&Qpsol::options_},
-     {{"nWSR",
+     {{"sparse",
+       {OT_BOOL,
+        "Formulate the QP using sparse matrices. Default: false"}},
+      {"nWSR",
        {OT_INT,
         "The maximum number of working set recalculations to be performed during "
         "the initial homotopy. Default is 5(nx + nc)"}},
@@ -162,13 +165,16 @@ namespace casadi {
     Qpsol::init(opts);
 
     // Default options
+    sparse_ = false;
     max_nWSR_ = 5 *(n_ + nc_);
     max_cputime_ = -1;
     ops_.setToDefault();
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="nWSR") {
+      if (op.first=="sparse") {
+        sparse_ = op.second;
+      } else if (op.first=="nWSR") {
         max_nWSR_ = op.second;
       } else if (op.first=="CPUtime") {
         max_cputime_ = op.second;
@@ -232,8 +238,13 @@ namespace casadi {
     }
 
     // Allocate work vectors
-    alloc_w(n_*n_, true); // h
-    alloc_w(n_*nc_, true); // a
+    if (sparse_) {
+      alloc_w(nnz_in(QPSOL_H), true); // h
+      alloc_w(nnz_in(QPSOL_A), true); // a
+    } else {
+      alloc_w(n_*n_, true); // h
+      alloc_w(n_*nc_, true); // a
+    }
     alloc_w(n_, true); // g
     alloc_w(n_, true); // lbx
     alloc_w(n_, true); // ubx
@@ -251,7 +262,7 @@ namespace casadi {
     if (nc_==0) {
       m.qp = new qpOASES::QProblemB(n_);
     } else {
-      m.qp = new qpOASES::SQProblem(n_, nc_);
+      m.sqp = new qpOASES::SQProblem(n_, nc_);
     }
 
     // Pass to qpOASES
@@ -265,14 +276,6 @@ namespace casadi {
     if (inputs_check_) {
       checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
     }
-
-    // Get quadratic term
-    double* h=w; w += n_*n_;
-    casadi_densify(arg[QPSOL_H], sparsity_in(QPSOL_H), h, false);
-
-    // Get linear term
-    double* a = w; w += n_*nc_;
-    casadi_densify(arg[QPSOL_A], sparsity_in(QPSOL_A), a, true);
 
     // Maxiumum number of working set changes
     int nWSR = max_nWSR_;
@@ -291,25 +294,68 @@ namespace casadi {
     double* ubA=w; w += nc_;
     casadi_copy(arg[QPSOL_UBA], nc_, ubA);
 
+    // Return flag
     int flag;
-    if (!m.called_once) {
-      if (nc_==0) {
-        flag = static_cast<qpOASES::QProblemB*>(m.qp)->init(h, g, lb, ub, nWSR, cputime_ptr);
+
+    // QP matrices sparsities
+    const Sparsity& hsp = sparsity_in(QPSOL_H);
+    const Sparsity& asp = sparsity_in(QPSOL_A);
+
+    // Sparse or dense mode?
+    if (sparse_) {
+      // Get quadratic term
+      int* h_colind = const_cast<int*>(hsp.colind());
+      int* h_row = const_cast<int*>(hsp.row());
+      double* h=w; w += hsp.nnz();
+      casadi_copy(arg[QPSOL_H], hsp.nnz(), h);
+      qpOASES::SymSparseMat h_m(hsp.size1(), hsp.size2(), h_row, h_colind, h);
+      h_m.createDiagInfo();
+
+      // Get linear term
+      int* a_colind = const_cast<int*>(asp.colind());
+      int* a_row = const_cast<int*>(asp.row());
+      double* a=w; w += asp.nnz();
+      casadi_copy(arg[QPSOL_A], asp.nnz(), a);
+      qpOASES::SparseMatrix a_m(asp.size1(), asp.size2(), a_row, a_colind, a);
+
+      // Solve sparse
+      if (m.called_once) {
+        flag = m.sqp->hotstart(&h_m, g, &a_m, lb, ub, lbA, ubA, nWSR, cputime_ptr);
       } else {
-        flag = static_cast<qpOASES::SQProblem*>(m.qp)->init(h, g, a, lb, ub, lbA, ubA,
-                                                           nWSR, cputime_ptr);
+        flag = m.sqp->init(&h_m, g, &a_m, lb, ub, lbA, ubA, nWSR, cputime_ptr);
       }
-      m.called_once = true;
+
     } else {
+      // Get quadratic term
+      double* h=w; w += n_*n_;
+      casadi_densify(arg[QPSOL_H], hsp, h, false);
+
+      // Get linear term
+      double* a = w; w += n_*nc_;
+      casadi_densify(arg[QPSOL_A], asp, a, true);
+
+      // Solve dense
       if (nc_==0) {
-        static_cast<qpOASES::QProblemB*>(m.qp)->reset();
-        flag = static_cast<qpOASES::QProblemB*>(m.qp)->init(h, g, lb, ub, nWSR, cputime_ptr);
-        //flag = static_cast<qpOASES::QProblemB*>(m.qp)->hotstart(g, lb, ub, nWSR, cputime_ptr);
+        if (m.called_once) {
+          // Broken?
+          //flag = m.qp->hotstart(g, lb, ub, nWSR, cputime_ptr);
+          m.qp->reset();
+          flag = m.qp->init(h, g, lb, ub, nWSR, cputime_ptr);
+        } else {
+          flag = m.qp->init(h, g, lb, ub, nWSR, cputime_ptr);
+        }
       } else {
-        flag = static_cast<qpOASES::SQProblem*>(m.qp)->hotstart(h, g, a, lb, ub, lbA, ubA,
-                                                               nWSR, cputime_ptr);
+        if (m.called_once) {
+          flag = m.sqp->hotstart(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+        } else {
+          flag = m.sqp->init(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+        }
       }
     }
+
+    // Solver is "warm" now
+    m.called_once = true;
+
     if (flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {
       throw CasadiException("qpOASES failed: " + getErrorMessage(flag));
     }
