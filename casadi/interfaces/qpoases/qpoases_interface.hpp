@@ -47,6 +47,10 @@ namespace casadi {
       qpOASES::QProblemB *qp;
     };
 
+    // Sparse QP matrices
+    qpOASES::SymSparseMat *h;
+    qpOASES::SparseMatrix *a;
+
     /// Has qpOASES been called once?
     bool called_once;
 

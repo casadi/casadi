@@ -308,21 +308,23 @@ namespace casadi {
       int* h_row = const_cast<int*>(hsp.row());
       double* h=w; w += hsp.nnz();
       casadi_copy(arg[QPSOL_H], hsp.nnz(), h);
-      qpOASES::SymSparseMat h_m(hsp.size1(), hsp.size2(), h_row, h_colind, h);
-      h_m.createDiagInfo();
+      if (m.h) delete m.h;
+      m.h = new qpOASES::SymSparseMat(hsp.size1(), hsp.size2(), h_row, h_colind, h);
+      m.h->createDiagInfo();
 
       // Get linear term
       int* a_colind = const_cast<int*>(asp.colind());
       int* a_row = const_cast<int*>(asp.row());
       double* a=w; w += asp.nnz();
       casadi_copy(arg[QPSOL_A], asp.nnz(), a);
-      qpOASES::SparseMatrix a_m(asp.size1(), asp.size2(), a_row, a_colind, a);
+      if (m.a) delete m.a;
+      m.a = new qpOASES::SparseMatrix(asp.size1(), asp.size2(), a_row, a_colind, a);
 
       // Solve sparse
       if (m.called_once) {
-        flag = m.sqp->hotstart(&h_m, g, &a_m, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+        flag = m.sqp->hotstart(m.h, g, m.a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
       } else {
-        flag = m.sqp->init(&h_m, g, &a_m, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+        flag = m.sqp->init(m.h, g, m.a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
       }
 
     } else {
@@ -729,10 +731,14 @@ namespace casadi {
 
   QpoasesMemory::QpoasesMemory() {
     this->qp = 0;
+    this->h = 0;
+    this->a = 0;
   }
 
   QpoasesMemory::~QpoasesMemory() {
     if (this->qp) delete this->qp;
+    if (this->h) delete this->h;
+    if (this->a) delete this->a;
   }
 
 } // namespace casadi
