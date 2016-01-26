@@ -248,6 +248,14 @@ namespace casadi {
 
     // Read line-by-line
     std::ifstream setup_file(path + sep + file);
+
+    // Skip on read error
+    // NOTE: possibly fixes a random segfault on Windows
+    if (!setup_file) {
+      casadi_warning("Error reading '" << path + sep + file << "', skipped.");
+      return ret;
+    }
+
     std::string line;
     while (std::getline(setup_file, line)) {
       // Skip empty lines
