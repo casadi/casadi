@@ -28,19 +28,15 @@ tf = 10.0    # End time
 
 # Declare variables (use scalar graph)
 u  = SX.sym('u')    # control
-x  = SX.sym('x',3)  # state
+x  = SX.sym('x',2)  # state
 
-# ODE rhs function
-ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
-       x[0], \
-       x[0]*x[0] + x[1]*x[1] + u*u])
-dae = {'x':x, 'p':u, 'ode':ode}
+# ODE rhs function and quadratures
+xdot = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]])
+qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
 # Create an integrator
+dae = {'x':x, 'p':u, 'ode':xdot, 'quad':qdot}
 opts = {'tf':tf/nk} # final time
-opts['abstol'] = 1e-8 # tolerance
-opts['reltol'] = 1e-8 # tolerance
-opts['steps_per_checkpoint'] = 1000
 F = integrator('F', 'cvodes', dae, opts)
 
 # Path constraints
@@ -48,30 +44,33 @@ u_min = [-0.75]
 u_max = [ 1.00]
 
 # Path constraints
-x_min = [-inf, -inf, -inf]
-x_max = [ inf,  inf,  inf]
+x_min = [-inf, -inf]
+x_max = [ inf,  inf]
 
 # Initial and terminal constraints
-x0_min = [0., 1., 0.]
-x0_max = [0., 1., 0.]
-xf_min = [0., 0., -inf]
-xf_max = [0., 0.,  inf]
+x0_min = [0., 1.]
+x0_max = [0., 1.]
+xf_min = [0., 0.]
+xf_max = [0., 0.]
 
 # Initial guess
 u_init = [0.]
-x_init = [0., 0., 0.]
+x_init = [0., 0.]
 
 # All local controls
 U = [MX.sym('u' + str(k)) for k in range(nk)]
 
 # State at shooting nodes
-X = [MX.sym('x' + str(k), 3) for k in range(nk+1)]
+X = [MX.sym('x' + str(k), 2) for k in range(nk+1)]
 
 # NLP variables with bounds and initial guess
 w = []; w_min = []; w_max = []; w_init = []
 
 # NLP constraints with bounds
 g = [];  g_min = []; g_max = []
+
+# NLP objective
+J = 0.
 
 # Treat initial state as a decision variable
 w += [X[0]]
@@ -100,11 +99,14 @@ for k in range(nk):
   # Add continuity constraints to NLP
   Fk = F({'x0':X[k],'p':U[k]})
   g.append(X[k+1] - Fk['xf'])
-  g_min += [0., 0., 0.]
-  g_max += [0., 0., 0.]
+  g_min += [0., 0.]
+  g_max += [0., 0.]
+
+  # Add contribution to the objective
+  J += Fk['qf']
 
 # Formulate the NLP
-nlp = {'x':vertcat(w), 'f':X[-1][2], 'g':vertcat(g)}
+nlp = {'x':vertcat(w), 'f':J, 'g':vertcat(g)}
 
 # Create NLP solver instance
 solver = nlpsol('solver', 'ipopt', nlp)
@@ -118,23 +120,20 @@ sol = solver({'lbx' : w_min,
 
 # Retrieve the solution
 w_opt = sol['x']
-x0_opt = w_opt[0::3+1]
-x1_opt = w_opt[1::3+1]
-x2_opt = w_opt[2::3+1]
-u_opt = w_opt[3::3+1]
+x0_opt = w_opt[0::2+1]
+x1_opt = w_opt[1::2+1]
+u_opt = w_opt[2::2+1]
 
 # Time grid for printing
-import numpy
-tgrid_x = numpy.linspace(0, 10, nk+1)
-tgrid_u = numpy.linspace(0, 10, nk)
+tgrid = [tf/nk*k for k in range(nk+1)]
 
 # Plot the results
 import matplotlib.pyplot as plt
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid_x, x0_opt, '--')
-plt.plot(tgrid_x, x1_opt, '-')
-plt.plot(tgrid_u, u_opt, '-.')
+plt.plot(tgrid, x0_opt, '--')
+plt.plot(tgrid, x1_opt, '-')
+plt.step(tgrid, vertcat((DM.nan(1), u_opt)), '-.') # Note: first entry is ignored
 plt.title('Van der Pol optimization - multiple shooting')
 plt.xlabel('time')
 plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])

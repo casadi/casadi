@@ -22,8 +22,6 @@
 #
 #
 from casadi import *
-import numpy as NP
-import matplotlib.pyplot as plt
 
 nk = 20    # Control discretization
 tf = 10.0  # End time
@@ -36,17 +34,16 @@ x  = SX.sym('x',2)  # states
 xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]] )
 qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
-# DAE residual function
-dae = {'x':x, 'p':u, 'ode':xdot, 'quad':qdot}
-
 # Create an integrator
+dae = {'x':x, 'p':u, 'ode':xdot, 'quad':qdot}
 F = integrator('F', 'cvodes', dae, {'tf':tf/nk})
 
 # All controls (use matrix graph)
 U = [MX.sym('u' + str(k)) for k in range(nk)]
 
 # The initial state (x_0=0, x_1=1)
-X  = MX([0,1])
+x0 = [0,1]
+X  = MX(x0)
 
 # Objective function
 f = 0
@@ -72,19 +69,29 @@ sol = solver({'lbx' : -0.75,
               'ubg' : 0})
               
 # Retrieve the solution
-u_opt = NP.array(sol['x'])
+u_opt = sol['x']
 
-# Time grid
-tgrid_x = NP.linspace(0,10,nk+1)
-tgrid_u = NP.linspace(0,10,nk)
+# Simulate to get optimal X trajectory
+x_opt = [x0]
+for k in range(nk):
+  res = F({'x0':x_opt[-1],'p':u_opt[k]})
+  x_opt.append(res['xf'])
+x0_opt = [xk[0] for xk in x_opt]
+x1_opt = [xk[1] for xk in x_opt]
+
+# Time grid for printing
+tgrid = [tf/nk*k for k in range(nk+1)]
 
 # Plot the results
+import matplotlib.pyplot as plt
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid_u,u_opt,'-.')
+plt.plot(tgrid, x0_opt, '--')
+plt.plot(tgrid, x1_opt, '-')
+plt.step(tgrid, vertcat((DM.nan(1), u_opt)), '-.') # Note: first entry is ignored
 plt.title('Van der Pol optimization - single shooting')
 plt.xlabel('time')
-plt.legend(['u trajectory'])
+plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])
 plt.grid()
 plt.show()
 
