@@ -1072,7 +1072,7 @@ namespace casadi {
       Function f_false("f_false", arg, {x_false});
 
       // Form Switch
-      Function sw = Function::if_else("if_else", f_true, f_false);
+      Function sw = Function::if_else("switch", f_true, f_false);
 
       // Call the Switch
       vector<MX> sw_arg;
@@ -1102,7 +1102,7 @@ namespace casadi {
       Function f_default("f_default", arg, {x_default});
 
       // Form Switch
-      Function sw = Function::conditional("conditional", f, f_default);
+      Function sw = Function::conditional("switch", f, f_default);
 
       // Call the Switch
       vector<MX> sw_arg;
