@@ -22,6 +22,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -60,6 +62,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -116,6 +120,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::CleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -147,6 +153,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::CleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -183,6 +191,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -227,6 +237,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -282,6 +294,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -326,6 +340,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simulator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -361,6 +377,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simulator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>casadi::ControlSimulatorInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -396,6 +414,8 @@
 <tr><td>qp_method</td><td>OT_STRING</td><td>"automatic"</td><td>Determines which CPLEX algorithm to use. (automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover)</td><td>casadi::CplexInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simplex_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of simplex iterations.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1E-6</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -444,6 +464,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -481,6 +503,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -509,6 +533,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -575,6 +601,8 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -664,6 +692,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -695,6 +725,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -726,6 +758,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -766,6 +800,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -807,6 +843,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -839,6 +877,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -871,6 +911,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -923,6 +965,8 @@
 <tr><td>primalTol</td><td>OT_REAL</td><td>1e-4</td><td>Tolerance for primal infeasibility (translates to dual infeasibility in dsdp terms)</td><td>casadi::DsdpInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SdpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>stepTol</td><td>OT_REAL</td><td>5e-2</td><td>Terminate the solver if the step length in the primal is below this tolerance.</td><td>casadi::DsdpInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -988,6 +1032,8 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>RELTOL</td><td>Relative tolerance on duality gap</td><td>casadi::EcosInterface</td></tr>
 <tr><td>reltol_inacc</td><td>OT_REAL</td><td>RTOL_INACC</td><td>Relative relaxed tolerance on duality gap</td><td>casadi::EcosInterface</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_INTEGER</td><td>VERBOSE</td><td>Verbosity bool for PRINTLEVEL &lt; 3</td><td>casadi::EcosInterface</td></tr>
 </table>
@@ -1037,6 +1083,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1065,6 +1113,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1098,6 +1148,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1141,6 +1193,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1183,6 +1237,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -1214,6 +1270,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1242,6 +1300,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1270,6 +1330,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1300,6 +1362,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1329,6 +1393,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1401,6 +1467,8 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
@@ -1501,6 +1569,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -1539,6 +1609,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1574,6 +1646,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1605,6 +1679,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -1638,6 +1714,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -1927,6 +2005,8 @@
 <tr><td>slack_bound_push</td><td>OT_REAL</td><td>0.01</td><td>Desired minimum absolute distance from the initial slack to bound. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>slack_move</td><td>OT_REAL</td><td>1.81898940355e-12</td><td>Correction size for very small slacks. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td>0.9999</td><td>Required reduction in primal-dual error in the soft restoration phase. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>start_with_resto</td><td>OT_STRING</td><td>no</td><td>Tells algorithm to switch to restoration phase in first iteration. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>suppress_all_output</td><td>OT_STRING</td><td>no</td><td>Undocumented (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>tau_min</td><td>OT_REAL</td><td>0.99</td><td>Lower bound on fraction-to-the-boundary parameter tau. (see IPOPT documentation)</td><td>casadi::IpoptInterface</td></tr>
@@ -2264,6 +2344,8 @@
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2296,6 +2378,8 @@
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2328,6 +2412,8 @@
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2361,6 +2447,8 @@
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2407,6 +2495,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>strategy</td><td>OT_STRING</td><td>"none"</td><td>Globalization strategy (none|linesearch)</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>u_scale</td><td>OT_REALVECTOR</td><td></td><td></td><td>casadi::KinsolInterface</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td></td><td>casadi::KinsolInterface</td></tr>
@@ -2506,6 +2596,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
@@ -2574,6 +2666,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2613,6 +2707,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2655,6 +2751,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2698,6 +2796,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2736,6 +2836,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2764,6 +2866,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2792,6 +2896,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2820,6 +2926,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2848,6 +2956,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2888,6 +2998,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2919,6 +3031,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2950,6 +3064,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -2991,6 +3107,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3023,6 +3141,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3055,6 +3175,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3097,6 +3219,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::LrDleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3136,6 +3260,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3164,6 +3290,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3192,6 +3320,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3220,6 +3350,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3253,6 +3385,8 @@
 <tr><td>reduced_inputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain inputs</td><td>casadi::MapBase</td></tr>
 <tr><td>reduced_outputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain outputs</td><td>casadi::MapBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3286,6 +3420,8 @@
 <tr><td>reduced_inputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain inputs</td><td>casadi::MapBase</td></tr>
 <tr><td>reduced_outputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain outputs</td><td>casadi::MapBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3319,6 +3455,8 @@
 <tr><td>reduced_inputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain inputs</td><td>casadi::MapOcl</td></tr>
 <tr><td>reduced_outputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain outputs</td><td>casadi::MapOcl</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3353,6 +3491,8 @@
 <tr><td>reduced_inputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain inputs</td><td>casadi::MapSerial</td></tr>
 <tr><td>reduced_outputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain outputs</td><td>casadi::MapSerial</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3387,6 +3527,8 @@
 <tr><td>reduced_inputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain inputs</td><td>casadi::MapSum</td></tr>
 <tr><td>reduced_outputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain outputs</td><td>casadi::MapSum</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3421,6 +3563,8 @@
 <tr><td>reduced_inputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain inputs</td><td>casadi::MapSumOcl</td></tr>
 <tr><td>reduced_outputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain outputs</td><td>casadi::MapSumOcl</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3455,6 +3599,8 @@
 <tr><td>reduced_inputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain inputs</td><td>casadi::MapSumSerial</td></tr>
 <tr><td>reduced_outputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain outputs</td><td>casadi::MapSumSerial</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -3791,6 +3937,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4143,6 +4291,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOLEAN</td><td>false</td><td>Print information about each iteration</td><td>casadi::Newton</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4200,6 +4350,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
@@ -4245,6 +4397,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
@@ -4275,6 +4429,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4304,6 +4460,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4343,6 +4501,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>startup_integrator</td><td>OT_STRING</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>startup_integrator_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td><td>casadi::OldCollocationIntegrator</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -4397,6 +4557,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>0</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4466,6 +4628,8 @@
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>psd_num_zero</td><td>OT_REAL</td><td>1e-12</td><td>Numerical zero used in Periodic Schur decomposition with slicot.This option is needed when your systems has Floquet multiplierszero or close to zero</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4511,6 +4675,8 @@
 <tr><td>reduced_inputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain inputs</td><td>casadi::PureMap</td></tr>
 <tr><td>reduced_outputs</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Reduction for certain outputs</td><td>casadi::PureMap</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4540,6 +4706,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4568,6 +4736,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4596,6 +4766,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4633,6 +4805,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4661,6 +4835,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4696,6 +4872,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4733,6 +4911,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4770,6 +4950,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4837,6 +5019,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>medium</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>terminationTolerance</td><td>OT_REAL</td><td>2.221e-09</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4910,6 +5094,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -4952,6 +5138,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -4982,6 +5170,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5043,6 +5233,8 @@
 <tr><td>reg_threshold</td><td>OT_REAL</td><td>1e-8</td><td>Threshold for the regularization.</td><td>casadi::Scpgen</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Scpgen</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>tol_du</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for dual infeasability</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_pr</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_pr_step</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for the step size</td><td>casadi::Scpgen</td></tr>
@@ -5110,6 +5302,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SdpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5141,6 +5335,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SdpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5171,6 +5367,8 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5201,6 +5399,8 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5231,6 +5431,8 @@
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>sdp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The SdqpSolver used to solve the SDPs.</td><td>casadi::SdqpSolverInternal</td></tr>
 <tr><td>sdp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>casadi::SdqpSolverInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5298,6 +5500,8 @@
 <tr><td>num_steps</td><td>OT_INTEGER</td><td>10</td><td>Take this many steps to go from tau=0 to tau=1.</td><td>casadi::SimpleHomotopyNlp</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5343,6 +5547,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::CleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5388,6 +5594,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5434,6 +5642,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5473,6 +5683,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5502,6 +5714,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5530,6 +5744,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5636,6 +5852,8 @@
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>specs file</td><td>OT_STRING</td><td>None</td><td>n/a</td><td>casadi::SnoptInterface</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>start</td><td>OT_STRING</td><td>Cold</td><td></td><td>casadi::SnoptInterface</td></tr>
 <tr><td>summary</td><td>OT_BOOLEAN</td><td>True</td><td>n/a</td><td>casadi::SnoptInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -5743,6 +5961,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5774,6 +5994,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5805,6 +6027,8 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SocpSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5842,6 +6066,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5908,6 +6134,8 @@
 <tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>tol_du</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for dual infeasability</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_pr</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -5963,6 +6191,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -5991,6 +6221,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -6021,6 +6253,8 @@
 <tr><td>qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QP solver used to solve the stabilized QPs.</td><td>casadi::StabilizedQpToQp</td></tr>
 <tr><td>qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the QP solver instance</td><td>casadi::StabilizedQpToQp</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -6060,6 +6294,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -6137,6 +6373,8 @@
 <tr><td>regularize</td><td>OT_BOOLEAN</td><td>false</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>stabilized_qp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The Stabilized QP solver to be used by the SQP method</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>stabilized_qp_solver_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the Stabilized QP solver</td><td>casadi::StabilizedSqp</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>tau0</td><td>OT_REAL</td><td>1e-2</td><td>Initial parameter for the merit function optimality threshold.</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>tol_du</td><td>OT_REAL</td><td>1e-5</td><td>Stopping criterion for dual infeasability</td><td>casadi::StabilizedSqp</td></tr>
 <tr><td>tol_pr</td><td>OT_REAL</td><td>1e-5</td><td>Stopping criterion for primal infeasibility</td><td>casadi::StabilizedSqp</td></tr>
@@ -6241,6 +6479,8 @@
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>casadi::IntegratorInternal</td></tr>
@@ -6278,6 +6518,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -6306,6 +6548,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -6335,6 +6579,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -6440,6 +6686,8 @@
 <tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::WorhpInterface</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NlpSolverInternal</td></tr>
@@ -6508,6 +6756,8 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>

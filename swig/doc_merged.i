@@ -1337,6 +1337,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -2633,6 +2653,26 @@ Joris Gillis
 | tions        |              | )            | be passed to | rolSimulator |
 |              |              |              | the          | Internal     |
 |              |              |              | simulator    |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -4239,6 +4279,26 @@ Joel Andersson
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -6591,6 +6651,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -7900,6 +7980,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -8918,6 +9018,26 @@ Joel Andersson
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -10448,6 +10568,26 @@ Joel Andersson
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -12881,6 +13021,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -13738,6 +13898,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -15456,6 +15636,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
 |              |              |              | the time     | gratorIntern |
@@ -17687,6 +17887,26 @@ Joris Gillis
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -19047,6 +19267,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -20535,6 +20775,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -22026,6 +22286,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -23489,6 +23769,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -23995,6 +24295,26 @@ Map Joris Gillis
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -25782,6 +26102,26 @@ Joris Gillis
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -28747,6 +29087,26 @@ Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -30344,6 +30704,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -34967,6 +35347,26 @@ basis Joris Gillis
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -35963,6 +36363,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -37813,6 +38233,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -39484,6 +39924,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -40627,6 +41087,26 @@ General information
 | ptions       |              | )            | be passed to | SolverIntern |
 |              |              |              | the          | al           |
 |              |              |              | SDPSOlver    |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -42270,6 +42750,26 @@ Joel Andersson
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -44143,6 +44643,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -46400,12 +46920,7 @@ the spy command.
 
 %feature("docstring") casadi::Sparsity::starColoring "
 
-Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring
-algorithm Algorithm 4.1 in What Color Is Your Jacobian? Graph Coloring for
-Computing Derivatives A. H. GEBREMEDHIN, F. MANNE, A. POTHEN SIAM Rev.,
-47(4), 629705 (2006)
-
-Ordering options: None (0), largest first (1)
+Perform a star coloring of a symmetric matrix.
 
 ";
 
@@ -46459,6 +46974,19 @@ WITH APPLICATION TO COMPUTING HESSIANS A. H. GEBREMEDHIN, A. TARAFDAR, F.
 MANNE, A. POTHEN SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 10421072 (2007)
 
 Ordering options: None (0), largest first (1)
+
+";
+
+%feature("docstring") casadi::Sparsity::starColoring1 "
+
+Perform a star coloring of a symmetric matrix: A greedy distance-3 coloring
+algorithm Algorithm 4.1 in What Color Is Your Jacobian? Graph Coloring for
+Computing Derivatives A. H. GEBREMEDHIN, F. MANNE, A. POTHEN SIAM Rev.,
+47(4), 629705 (2006)
+
+Ordering options: None (0), largest first (1)
+
+S = H.starColoring()
 
 ";
 
@@ -47837,6 +48365,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -49569,6 +50117,26 @@ Switch statement Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -50799,6 +51367,26 @@ Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -51360,12 +51948,12 @@ Output arguments of a dple solver
 
 %feature("docstring") casadi::inBounds "
 
->  bool inBounds([T ] v, int upper)
+>  bool inBounds([T ] v, S upper)
 ------------------------------------------------------------------------
 
 Check if for each element of v holds: v_i < upper.
 
->  bool inBounds([T ] v, int lower, int upper)
+>  bool inBounds([T ] v, S lower, S upper)
 ------------------------------------------------------------------------
 
 Check if for each element of v holds: lower <= v_i < upper.
