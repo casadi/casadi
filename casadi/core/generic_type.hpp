@@ -241,6 +241,33 @@ namespace casadi {
     return ret;
   }
 
+  // Create dictionary with 7 elements
+  inline Dict make_dict(const std::string& n0, const GenericType& x0,
+                        const std::string& n1, const GenericType& x1,
+                        const std::string& n2, const GenericType& x2,
+                        const std::string& n3, const GenericType& x3,
+                        const std::string& n4, const GenericType& x4,
+                        const std::string& n5, const GenericType& x5,
+                        const std::string& n6, const GenericType& x6) {
+    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4, n5, x5);
+    ret[n6]=x6;
+    return ret;
+  }
+
+  // Create dictionary with 8 elements
+  inline Dict make_dict(const std::string& n0, const GenericType& x0,
+                        const std::string& n1, const GenericType& x1,
+                        const std::string& n2, const GenericType& x2,
+                        const std::string& n3, const GenericType& x3,
+                        const std::string& n4, const GenericType& x4,
+                        const std::string& n5, const GenericType& x5,
+                        const std::string& n6, const GenericType& x6,
+                        const std::string& n7, const GenericType& x7) {
+    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4, n5, x5, n6, x6);
+    ret[n7]=x7;
+    return ret;
+  }
+
 #endif // SWIG
 
 

@@ -92,6 +92,12 @@ namespace casadi {
     addOption("jit", OT_BOOLEAN, false, "Use just-in-time compiler to speed up the evaluation");
     addOption("compiler", OT_STRING, "clang", "Just-in-time compiler plugin to be used.");
     addOption("jit_options", OT_DICT, GenericType(), "Options to be passed to the jit compiler.");
+    addOption("starcoloring_mode", OT_INTEGER, 1, "Sets coloring strategy for starcoloring. "
+                                                  "1: distance-3 algorithm,"
+                                                  "2: distance-2 algorithm.");
+    addOption("starcoloring_threshold", OT_INTEGER, -1, "Sets the maximum amount of nonzeros "
+                                                        "in a row for which coloring will be "
+                                                        "attempted.");
 
     verbose_ = false;
     jit_ = false;
@@ -131,6 +137,9 @@ namespace casadi {
     if (hasSetOption("jit_options")) jit_options_ = getOption("jit_options");
     regularity_check_ = getOption("regularity_check");
     name_ = getOption("name").toString();
+
+    starcoloring_threshold_ = getOption("starcoloring_threshold");
+    starcoloring_mode_ = getOption("starcoloring_mode");
 
     // Warn for functions with too many inputs or outputs
     casadi_assert_warning(nIn()<10000, "Function " << getOption("name")
@@ -258,6 +267,8 @@ namespace casadi {
     // Generate gradient function
     Dict opts = make_dict("input_scheme", ischeme_,
                           "output_scheme", ionames,
+                          "starcoloring_mode", starcoloring_mode_,
+                          "starcoloring_threshold", starcoloring_threshold_,
                           "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
     return getGradient(ss.str(), iind, oind, opts);
   }
@@ -282,6 +293,8 @@ namespace casadi {
     // Generate gradient function
     Dict opts = make_dict("input_scheme", ischeme_,
                           "output_scheme", ionames,
+                          "starcoloring_mode", starcoloring_mode_,
+                          "starcoloring_threshold", starcoloring_threshold_,
                           "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
     return getTangent(ss.str(), iind, oind, opts);
   }
@@ -340,6 +353,9 @@ namespace casadi {
     // Propagate AD parameters
     opts["ad_weight"] = adWeight();
     opts["ad_weight_sp"] = adWeightSp();
+
+    opts["starcoloring_mode"]      = starcoloring_mode_;
+    opts["starcoloring_threshold"] = starcoloring_threshold_;
 
     // Propagate AD rules (options to be deprecated)
     const char* oname[] = {"custom_forward", "custom_reverse",  "full_jacobian"};
@@ -652,7 +668,9 @@ namespace casadi {
       // Clear the fine block structure
       fine.clear();
 
-      Sparsity D = r.starColoring();
+
+      Sparsity D = r.starColoring(1, std::numeric_limits<int>::max(),
+                                     starcoloring_mode_, starcoloring_threshold_);
 
       casadi_msg("Star coloring on " << r.dimString() << ": " << D.size2() << " <-> " << D.size1());
 
@@ -1242,7 +1260,8 @@ namespace casadi {
 
       // Star coloring if symmetric
       log("FunctionInternal::getPartition starColoring");
-      D1 = A.starColoring();
+      D1 = A.starColoring(1, std::numeric_limits<int>::max(),
+                             starcoloring_mode_, starcoloring_threshold_);
       casadi_msg("Star coloring completed: " << D1.size2() << " directional derivatives needed ("
                  << A.size1() << " without coloring).");
 
@@ -1581,6 +1600,8 @@ namespace casadi {
       // Generate a Jacobian
       Dict opts = make_dict("verbose", verbose_,
                             "input_scheme", ischeme_, "output_scheme", ionames,
+                            "starcoloring_mode", starcoloring_mode_,
+                            "starcoloring_threshold", starcoloring_threshold_,
                             "jit", jit_, "compiler", compilerplugin_,
                             "jit_options", jit_options_);
       Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
@@ -1665,6 +1686,8 @@ namespace casadi {
 
     // Options
     Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names,
+                          "starcoloring_mode", starcoloring_mode_,
+                          "starcoloring_threshold", starcoloring_threshold_,
                           "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
 
     // Return value
@@ -1770,6 +1793,8 @@ namespace casadi {
 
     // Options
     Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names,
+                          "starcoloring_mode", starcoloring_mode_,
+                          "starcoloring_threshold", starcoloring_threshold_,
                           "jit", jit_, "compiler", compilerplugin_, "jit_options", jit_options_);
 
     // Return value
@@ -1951,6 +1976,8 @@ namespace casadi {
       Dict opts;
       opts["input_scheme"] = ischeme_;
       opts["output_scheme"] = std::vector<std::string>(1, "jac");
+      opts["starcoloring_mode"] = starcoloring_mode_;
+      opts["starcoloring_threshold"] = starcoloring_threshold_;
 
       Function ret;
       if (hasSetOption("full_jacobian")) {

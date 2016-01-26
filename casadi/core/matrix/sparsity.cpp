@@ -587,8 +587,12 @@ namespace casadi {
     }
   }
 
-  Sparsity Sparsity::starColoring(int ordering, int cutoff) const {
-    return (*this)->starColoring(ordering, cutoff);
+  Sparsity Sparsity::starColoring(int ordering, int cutoff, int mode, int threshold) const {
+    return (*this)->starColoring(ordering, cutoff, mode, threshold);
+  }
+
+  Sparsity Sparsity::starColoring1(int ordering, int cutoff) const {
+    return (*this)->starColoring1(ordering, cutoff);
   }
 
   Sparsity Sparsity::starColoring2(int ordering, int cutoff) const {

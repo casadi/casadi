@@ -642,6 +642,9 @@ namespace casadi {
     /// Errors are thrown if numerical values of inputs look bad
     bool inputs_check_;
 
+    int starcoloring_threshold_;
+    int starcoloring_mode_;
+
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
 

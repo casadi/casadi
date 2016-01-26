@@ -506,9 +506,12 @@ namespace casadi {
       }
     }
 
+    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names);
+    opts["starcoloring_mode"] = getOption("starcoloring_mode");
+    opts["starcoloring_threshold"] = getOption("starcoloring_threshold");
+
     // Construct return function
-    MXFunction ret(ss.str(), ret_in, ret_out,
-                   make_dict("input_scheme", i_names, "output_scheme", o_names));
+    MXFunction ret(ss.str(), ret_in, ret_out, opts);
 
     // Consistency check for inputs
     int ind=0;
