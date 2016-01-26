@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "2.4.0+")
-set(PACKAGE_SO_VERSION "2.5")
+set(PACKAGE_VERSION "3.0.0+")
+set(PACKAGE_SO_VERSION "3.0")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
-set(PACKAGE_AUTHOR "Joel Andersson")
-set(PACKAGE_MAINTAINER "Joris Gillis")
+set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
+set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
 set(PACKAGE_URL "http://casadi.org")
 
 
