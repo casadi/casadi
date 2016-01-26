@@ -43,8 +43,7 @@ dae = {'x':x, 'p':u, 'ode':xdot, 'quad':qdot}
 F = integrator('F', 'cvodes', dae, {'tf':tf/nk})
 
 # All controls (use matrix graph)
-x = MX.sym('x',nk) # nk-by-1 symbolic variable
-U = vertsplit(x) # cheaper than x[0], x[1], ...
+U = [MX.sym('u' + str(k)) for k in range(nk)]
 
 # The initial state (x_0=0, x_1=1)
 X  = MX([0,1])
@@ -62,7 +61,7 @@ for k in range(nk):
 g = X
 
 # Allocate an NLP solver
-nlp = {'x':x, 'f':f, 'g':g}
+nlp = {'x':vertcat(U), 'f':f, 'g':g}
 solver = nlpsol('solver', 'ipopt', nlp)
 
 # Solve the problem
