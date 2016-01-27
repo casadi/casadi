@@ -5,17 +5,16 @@
 #include <math.h>
 #include <stddef.h>
 
-#ifdef __cplusplus  /* wrapper to enable C++ usage */
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 /* --- primary CSparse routines and data structures ------------------------- */
-typedef struct cs_sparse    /* matrix in compressed-column or triplet form */
-{
+typedef struct cs_sparse {
     int nzmax ;     /* maximum number of entries */
     int m ;         /* number of rows */
     int n ;         /* number of columns */
-    int *p ;        /* column pointers (size n+1) or col indices (size nzmax) */
+    int *p ;        /* column pointers (size n+1) */
     int *i ;        /* row indices, size nzmax */
     double *x ;     /* numerical values, size nzmax */
 } cs ;
@@ -32,10 +31,10 @@ cs *cs_transpose (const cs *A, int values) ;
 /* utilities */
 void *cs_calloc (int n, size_t size) ;
 void *cs_free (void *p) ;
-void *cs_realloc (void *p, int n, size_t size, int *ok) ;
+void *cs_realloc (void *p, int n, size_t size) ;
 cs *cs_spalloc (int m, int n, int nzmax, int values) ;
 cs *cs_spfree (cs *A) ;
-int cs_sprealloc (cs *A, int nzmax) ;
+void cs_sprealloc (cs *A, int nzmax) ;
 void *cs_malloc (int n, size_t size) ;
 
 /* --- secondary CSparse routines and data structures ----------------------- */

@@ -87,7 +87,7 @@ int *cs_amd (int order, const cs *A) {
   P = cs_malloc (n+1, sizeof (int)) ;     /* allocate result */
   W = cs_malloc (8*(n+1), sizeof (int)) ; /* get workspace */
   t = cnz + cnz/5 + 2*n ;                 /* add elbow room to C */
-  if (!P || !W || !cs_sprealloc (C, t)) return (cs_idone (P, C, W, 0)) ;
+  cs_sprealloc (C, t);
   len  = W           ; nv     = W +   (n+1) ; next   = W + 2*(n+1) ;
   head = W + 3*(n+1) ; elen   = W + 4*(n+1) ; degree = W + 5*(n+1) ;
   w    = W + 6*(n+1) ; hhead  = W + 7*(n+1) ;
@@ -723,7 +723,8 @@ int cs_dupl (cs *A) {
   }
   Ap [n] = nz ;                               /* finalize A */
   cs_free (w) ;                               /* free workspace */
-  return (cs_sprealloc (A, 0)) ;              /* remove extra space from A */
+  cs_sprealloc(A, 0);              /* remove extra space from A */
+  return 1;
 }
 
 /* find nonzero pattern of Cholesky L(k,1:k-1) using etree and triu(A(:,k)) */
@@ -923,9 +924,10 @@ csn *cs_lu (const cs *A, const css *S, double tol) {
     /* --- Triangular solve --------------------------------------------- */
     Lp [k] = lnz ;              /* L(:,k) starts here */
     Up [k] = unz ;              /* U(:,k) starts here */
-    if ((lnz + n > L->nzmax && !cs_sprealloc (L, 2*L->nzmax + n)) ||
-        (unz + n > U->nzmax && !cs_sprealloc (U, 2*U->nzmax + n))) {
-      return (cs_ndone (N, NULL, xi, x, 0)) ;
+    if (lnz + n > L->nzmax) {
+      cs_sprealloc(L, 2*L->nzmax + n);
+    } else if (unz + n > U->nzmax) {
+      cs_sprealloc(U, 2*U->nzmax + n);
     }
     Li = L->i ; Lx = L->x ; Ui = U->i ; Ux = U->x ;
     col = q ? (q [k]) : k ;
@@ -1019,11 +1021,8 @@ void *cs_free (void *p) {
 }
 
 /* wrapper for realloc */
-void *cs_realloc (void *p, int n, size_t size, int *ok) {
-  void *pnew ;
-  pnew = realloc (p, CS_MAX (n,1) * size) ; /* realloc the block */
-  *ok = (pnew != NULL) ;                  /* realloc fails if pnew is NULL */
-  return ((*ok) ? pnew : p) ;             /* return original p if failure */
+void *cs_realloc (void *p, int n, size_t size) {
+  return realloc(p, CS_MAX (n,1) * size);
 }
 
 /* find an augmenting path starting at column k and extend the match if found */
@@ -1130,10 +1129,9 @@ cs *cs_multiply (const cs *A, const cs *B) {
   Cp = C->p ;
   for (j = 0 ; j < n ; j++)
     {
-      if (nz + m > C->nzmax && !cs_sprealloc (C, 2*(C->nzmax)+m))
-        {
-          return (cs_done (C, w, x, 0)) ;             /* out of memory */
-        } 
+      if (nz + m > C->nzmax) {
+        cs_sprealloc (C, 2*(C->nzmax)+m);
+      }
       Ci = C->i ; Cx = C->x ;         /* C->i and C->x may be reallocated */
       Cp [j] = nz ;                   /* column j of C starts here */
       for (p = Bp [j] ; p < Bp [j+1] ; p++)
@@ -1685,9 +1683,9 @@ int cs_usolve (const cs *U, double *x) {
   return (1) ;
 }
 
-/* allocate a sparse matrix (triplet form or compressed-column form) */
+/* allocate a sparse matrix */
 cs *cs_spalloc (int m, int n, int nzmax, int values) {
-  cs *A = cs_calloc (1, sizeof (cs)) ;    /* allocate the cs struct */
+  cs *A = cs_calloc(1, sizeof (cs)) ;    /* allocate the cs struct */
   A->m = m ;                              /* define dimensions and nzmax */
   A->n = n ;
   A->nzmax = nzmax = CS_MAX (nzmax, 1) ;
@@ -1698,15 +1696,11 @@ cs *cs_spalloc (int m, int n, int nzmax, int values) {
 }
 
 /* change the max # of entries sparse matrix */
-int cs_sprealloc (cs *A, int nzmax) {
-  int ok, oki, okj = 1, okx = 1 ;
-  if (!A) return (0) ;
+void cs_sprealloc (cs *A, int nzmax) {
   if (nzmax <= 0) nzmax = A->p[A->n];
-  A->i = cs_realloc (A->i, nzmax, sizeof (int), &oki) ;
-  if (A->x) A->x = cs_realloc (A->x, nzmax, sizeof (double), &okx) ;
-  ok = (oki && okj && okx) ;
-  if (ok) A->nzmax = nzmax ;
-  return (ok) ;
+  A->i = cs_realloc(A->i, nzmax, sizeof (int));
+  if (A->x) A->x = cs_realloc (A->x, nzmax, sizeof (double));
+  A->nzmax = nzmax ;
 }
 
 /* free a sparse matrix */
