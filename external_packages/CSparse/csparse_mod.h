@@ -117,9 +117,6 @@ int cs_tdfs (int j, int k, int *head, const int *next, int *post,
     int *stack) ;
 /* utilities */
 csd *cs_dalloc (int m, int n) ;
-csd *cs_ddone (csd *D, cs *C, void *w, int ok) ;
-cs *cs_done (cs *C, void *w, void *x, int ok) ;
-int *cs_idone (int *p, cs *C, void *w, int ok) ;
 csn *cs_ndone (csn *N, cs *C, void *w, void *x, int ok) ;
 
 #ifdef __cplusplus
