@@ -626,14 +626,13 @@ static int cs_rprune (int i, int j, double aij, void *other) {
 }
 
 /* Given A, compute coarse and then fine dmperm */
-csd *cs_dmperm (const cs *A, int seed) {
+void cs_dmperm (csd *D, const cs *A, int seed) {
   int m, n, i, j, k, cnz, nc, *jmatch, *imatch, *wi, *wj, *pinv, *Cp, *Ci,
     *ps, *rs, nb1, nb2, *p, *q, *cc, *rr, *r, *s, ok ;
   cs *C ;
-  csd *D, *scc ;
+  csd *scc ;
   /* --- Maximum matching ------------------------------------------------- */
   m = A->m ; n = A->n ;
-  D = cs_calloc (1, sizeof (csd));
   cs_dalloc(D, m, n) ;                      /* allocate result */
   p = D->p ; q = D->q ; r = D->r ; s = D->s ; cc = D->cc ; rr = D->rr ;
   jmatch = cs_maxtrans (A, seed) ;            /* max transversal */
@@ -694,7 +693,6 @@ csd *cs_dmperm (const cs *A, int seed) {
   D->nb = nb2 ;
   cs_dfree (scc) ;
   cs_spfree (C) ;                     /* free temporary matrix */
-  return D;
 }
 
 static int cs_tol (int i, int j, double aij, void *tol) {
