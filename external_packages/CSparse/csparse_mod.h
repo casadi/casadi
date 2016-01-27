@@ -18,14 +18,11 @@ typedef struct cs_sparse    /* matrix in compressed-column or triplet form */
     int *p ;        /* column pointers (size n+1) or col indices (size nzmax) */
     int *i ;        /* row indices, size nzmax */
     double *x ;     /* numerical values, size nzmax */
-    int nz ;        /* # of entries in triplet matrix, -1 for compressed-col */
 } cs ;
 
 cs *cs_add (const cs *A, const cs *B, double alpha, double beta) ;
 int cs_cholsol (int order, const cs *A, double *b) ;
-cs *cs_compress (const cs *T) ;
 int cs_dupl (cs *A) ;
-int cs_entry (cs *T, int i, int j, double x) ;
 int cs_gaxpy (const cs *A, const double *x, double *y) ;
 int cs_lusol (int order, const cs *A, double *b, double tol) ;
 cs *cs_multiply (const cs *A, const cs *B) ;
@@ -36,7 +33,7 @@ cs *cs_transpose (const cs *A, int values) ;
 void *cs_calloc (int n, size_t size) ;
 void *cs_free (void *p) ;
 void *cs_realloc (void *p, int n, size_t size, int *ok) ;
-cs *cs_spalloc (int m, int n, int nzmax, int values, int triplet) ;
+cs *cs_spalloc (int m, int n, int nzmax, int values) ;
 cs *cs_spfree (cs *A) ;
 int cs_sprealloc (cs *A, int nzmax) ;
 void *cs_malloc (int n, size_t size) ;

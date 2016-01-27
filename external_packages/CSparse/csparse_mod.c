@@ -6,8 +6,6 @@
 #define CS_UNFLIP(i) (((i) < 0) ? CS_FLIP(i) : (i))
 #define CS_MARKED(w,j) (w [j] < 0)
 #define CS_MARK(w,j) { w [j] = CS_FLIP (w [j]) ; }
-#define CS_CSC(A) (A && (A->nz == -1))
-#define CS_TRIPLET(A) (A && (A->nz >= 0))
 
 /* C = alpha*A + beta*B */
 cs *cs_add (const cs *A, const cs *B, double alpha, double beta) {
@@ -23,7 +21,7 @@ cs *cs_add (const cs *A, const cs *B, double alpha, double beta) {
   w = cs_calloc (m, sizeof (int)) ;                       /* get workspace */
   values = (A->x != NULL) && (Bx != NULL) ;
   x = values ? cs_malloc (m, sizeof (double)) : NULL ;    /* get workspace */
-  C = cs_spalloc (m, n, anz + bnz, values, 0) ;           /* allocate result*/
+  C = cs_spalloc (m, n, anz + bnz, values) ;           /* allocate result*/
   if (!C || !w || (values && !x)) return (cs_done (C, w, x, 0)) ;
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
   for (j = 0 ; j < n ; j++) {
@@ -386,7 +384,7 @@ csn *cs_chol (const cs *A, const css *S) {
   if (!N || !c || !x || !C) return (cs_ndone (N, E, c, x, 0)) ;
   s = c + n ;
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
-  N->L = L = cs_spalloc (n, n, cp [n], 1, 0) ;    /* allocate result */
+  N->L = L = cs_spalloc (n, n, cp [n], 1) ;    /* allocate result */
   if (!L) return (cs_ndone (N, E, c, x, 0)) ;
   Lp = L->p ; Li = L->i ; Lx = L->x ;
   for (k = 0 ; k < n ; k++) Lp [k] = c [k] = cp [k] ;
@@ -446,25 +444,6 @@ int cs_cholsol (int order, const cs *A, double *b) {
   cs_sfree (S) ;
   cs_nfree (N) ;
   return (ok) ;
-}
-
-/* C = compressed-column form of a triplet matrix T */
-cs *cs_compress (const cs *T) {
-  int m, n, nz, p, k, *Cp, *Ci, *w, *Ti, *Tj ;
-  double *Cx, *Tx ;
-  cs *C ;
-  m = T->m ; n = T->n ; Ti = T->i ; Tj = T->p ; Tx = T->x ; nz = T->nz ;
-  C = cs_spalloc (m, n, nz, Tx != NULL, 0) ;          /* allocate result */
-  w = cs_calloc (n, sizeof (int)) ;                   /* get workspace */
-  if (!C || !w) return (cs_done (C, w, NULL, 0)) ;    /* out of memory */
-  Cp = C->p ; Ci = C->i ; Cx = C->x ;
-  for (k = 0 ; k < nz ; k++) w [Tj [k]]++ ;           /* column counts */
-  cs_cumsum (Cp, w, n) ;                              /* column pointers */
-  for (k = 0 ; k < nz ; k++) {
-    Ci [p = w [Tj [k]]++] = Ti [k] ;    /* A(i,j) is the pth entry in C */
-    if (Cx) Cx [p] = Tx [k] ;
-  }
-  return (cs_done (C, w, NULL, 1)) ;      /* success; free w and return C */
 }
 
 /* column counts of LL'=A or LL'=A'A, given parent & post ordering */
@@ -747,18 +726,6 @@ int cs_dupl (cs *A) {
   return (cs_sprealloc (A, 0)) ;              /* remove extra space from A */
 }
 
-/* add an entry to a triplet matrix; return 1 if ok, 0 otherwise */
-int cs_entry (cs *T, int i, int j, double x) {
-  if (!CS_TRIPLET (T) || i < 0 || j < 0) return (0) ;     /* check inputs */
-  if (T->nz >= T->nzmax && !cs_sprealloc (T,2*(T->nzmax))) return (0) ;
-  if (T->x) T->x [T->nz] = x ;
-  T->i [T->nz] = i ;
-  T->p [T->nz++] = j ;
-  T->m = CS_MAX (T->m, i+1) ;
-  T->n = CS_MAX (T->n, j+1) ;
-  return (1) ;
-}
-
 /* find nonzero pattern of Cholesky L(k,1:k-1) using etree and triu(A(:,k)) */
 int cs_ereach (const cs *A, int k, const int *parent, int *s, int *w) {
   int i, p, n, len, top, *Ap, *Ai ;
@@ -942,8 +909,8 @@ csn *cs_lu (const cs *A, const css *S, double tol) {
   xi = cs_malloc (2*n, sizeof (int)) ;            /* get int workspace */
   N = cs_calloc (1, sizeof (csn)) ;               /* allocate result */
   if (!x || !xi || !N) return (cs_ndone (N, NULL, xi, x, 0)) ;
-  N->L = L = cs_spalloc (n, n, lnz, 1, 0) ;       /* allocate result L */
-  N->U = U = cs_spalloc (n, n, unz, 1, 0) ;       /* allocate result U */
+  N->L = L = cs_spalloc (n, n, lnz, 1) ;       /* allocate result L */
+  N->U = U = cs_spalloc (n, n, unz, 1) ;       /* allocate result U */
   N->pinv = pinv = cs_malloc (n, sizeof (int)) ;  /* allocate result pinv */
   if (!L || !U || !pinv) return (cs_ndone (N, NULL, xi, x, 0)) ;
   Lp = L->p ; Up = U->p ;
@@ -1158,7 +1125,7 @@ cs *cs_multiply (const cs *A, const cs *B) {
   w = cs_calloc (m, sizeof (int)) ;                    /* get workspace */
   values = (A->x != NULL) && (Bx != NULL) ;
   x = values ? cs_malloc (m, sizeof (double)) : NULL ; /* get workspace */
-  C = cs_spalloc (m, n, anz + bnz, values, 0) ;        /* allocate result */
+  C = cs_spalloc (m, n, anz + bnz, values) ;        /* allocate result */
   if (!C || !w || (values && !x)) return (cs_done (C, w, x, 0)) ;
   Cp = C->p ;
   for (j = 0 ; j < n ; j++)
@@ -1199,7 +1166,7 @@ cs *cs_permute (const cs *A, const int *pinv, const int *q, int values) {
   double *Cx, *Ax ;
   cs *C ;
   m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
-  C = cs_spalloc (m, n, Ap [n], values && Ax != NULL, 0) ;  /* alloc result */
+  C = cs_spalloc (m, n, Ap [n], values && Ax != NULL) ;  /* alloc result */
   if (!C) return (cs_done (C, NULL, NULL, 0)) ;   /* out of memory */
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
   for (k = 0 ; k < n ; k++)
@@ -1271,8 +1238,8 @@ csn *cs_qr (const cs *A, const css *S) {
   if (!w || !x || !N) return (cs_ndone (N, NULL, w, x, 0)) ;
   s = w + m2 ;                                    /* s is size n */
   for (k = 0 ; k < m2 ; k++) x [k] = 0 ;          /* clear workspace x */
-  N->L = V = cs_spalloc (m2, n, vnz, 1, 0) ;      /* allocate result V */
-  N->U = R = cs_spalloc (m2, n, rnz, 1, 0) ;      /* allocate result R */
+  N->L = V = cs_spalloc (m2, n, vnz, 1) ;      /* allocate result V */
+  N->U = R = cs_spalloc (m2, n, rnz, 1) ;      /* allocate result R */
   N->B = Beta = cs_malloc (n, sizeof (double)) ;  /* allocate result Beta */
   if (!R || !V || !Beta) return (cs_ndone (N, NULL, w, x, 0)) ;
   Rp = R->p ; Ri = R->i ; Rx = R->x ;
@@ -1601,7 +1568,7 @@ cs *cs_symperm (const cs *A, const int *pinv, int values) {
   double *Cx, *Ax ;
   cs *C ;
   n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
-  C = cs_spalloc (n, n, Ap [n], values && (Ax != NULL), 0) ; /* alloc result*/
+  C = cs_spalloc (n, n, Ap [n], values && (Ax != NULL)) ; /* alloc result*/
   w = cs_calloc (n, sizeof (int)) ;                   /* get workspace */
   if (!C || !w) return (cs_done (C, w, NULL, 0)) ;    /* out of memory */
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
@@ -1655,7 +1622,7 @@ cs *cs_transpose (const cs *A, int values) {
   double *Cx, *Ax ;
   cs *C ;
   m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
-  C = cs_spalloc (n, m, Ap [n], values && Ax, 0) ;       /* allocate result */
+  C = cs_spalloc (n, m, Ap [n], values && Ax) ;       /* allocate result */
   w = cs_calloc (m, sizeof (int)) ;                      /* get workspace */
   if (!C || !w) return (cs_done (C, w, NULL, 0)) ;       /* out of memory */
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
@@ -1719,14 +1686,13 @@ int cs_usolve (const cs *U, double *x) {
 }
 
 /* allocate a sparse matrix (triplet form or compressed-column form) */
-cs *cs_spalloc (int m, int n, int nzmax, int values, int triplet) {
+cs *cs_spalloc (int m, int n, int nzmax, int values) {
   cs *A = cs_calloc (1, sizeof (cs)) ;    /* allocate the cs struct */
   A->m = m ;                              /* define dimensions and nzmax */
   A->n = n ;
   A->nzmax = nzmax = CS_MAX (nzmax, 1) ;
-  A->nz = triplet ? 0 : -1 ;              /* allocate triplet or comp.col */
-  A->p = cs_malloc (triplet ? nzmax : n+1, sizeof (int)) ;
-  A->i = cs_malloc (nzmax, sizeof (int)) ;
+  A->p = cs_malloc(n+1, sizeof (int));
+  A->i = cs_malloc(nzmax, sizeof (int)) ;
   A->x = values ? cs_malloc (nzmax, sizeof (double)) : NULL ;
   return ((!A->p || !A->i || (values && !A->x)) ? cs_spfree (A) : A) ;
 }
@@ -1735,9 +1701,8 @@ cs *cs_spalloc (int m, int n, int nzmax, int values, int triplet) {
 int cs_sprealloc (cs *A, int nzmax) {
   int ok, oki, okj = 1, okx = 1 ;
   if (!A) return (0) ;
-  if (nzmax <= 0) nzmax = (CS_CSC (A)) ? (A->p [A->n]) : A->nz ;
+  if (nzmax <= 0) nzmax = A->p[A->n];
   A->i = cs_realloc (A->i, nzmax, sizeof (int), &oki) ;
-  if (CS_TRIPLET (A)) A->p = cs_realloc (A->p, nzmax, sizeof (int), &okj) ;
   if (A->x) A->x = cs_realloc (A->x, nzmax, sizeof (double), &okx) ;
   ok = (oki && okj && okx) ;
   if (ok) A->nzmax = nzmax ;

@@ -74,7 +74,6 @@ namespace casadi {
       // or column indices (size nzmax)
       m->A.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
       m->A.x = 0; // numerical values, size nzmax
-      m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-col
 
       // Temporary
       m->temp_.resize(m->A.n);
