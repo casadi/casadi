@@ -30,7 +30,6 @@ int cs_gaxpy (const cs *A, const double *x, double *y) ;
 int cs_lusol (int order, const cs *A, double *b, double tol) ;
 cs *cs_multiply (const cs *A, const cs *B) ;
 double cs_norm (const cs *A) ;
-int cs_print (const cs *A, int brief) ;
 int cs_qrsol (int order, const cs *A, double *b) ;
 cs *cs_transpose (const cs *A, int values) ;
 /* utilities */
