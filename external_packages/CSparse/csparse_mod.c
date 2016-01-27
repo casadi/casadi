@@ -651,7 +651,8 @@ void cs_dmperm (csd *D, const cs *A, int seed) {
   cs_free (jmatch) ;
   /* --- Fine decomposition ----------------------------------------------- */
   pinv = cs_pinv (p, m) ;         /* pinv=p' */
-  C = cs_permute (A, pinv, q, 0) ;/* C=A(p,q) (it will hold A(R2,C2)) */
+  C = cs_calloc(1, sizeof (cs));
+  cs_permute (C, A, pinv, q, 0) ;/* C=A(p,q) (it will hold A(R2,C2)) */
   cs_free (pinv) ;
   Cp = C->p ;
   nc = cc [3] - cc [2] ;          /* delete cols C0, C1, and C3 from C */
@@ -1176,12 +1177,10 @@ double cs_norm (const cs *A) {
 }
 
 /* C = A(p,q) where p and q are permutations of 0..m-1 and 0..n-1. */
-cs *cs_permute (const cs *A, const int *pinv, const int *q, int values) {
+void cs_permute (cs *C, const cs *A, const int *pinv, const int *q, int values) {
   int t, j, k, nz = 0, m, n, *Ap, *Ai, *Cp, *Ci ;
   double *Cx, *Ax ;
-  cs *C ;
   m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
-  C = cs_calloc(1, sizeof (cs));
   cs_spalloc (C, m, n, Ap [n], values && Ax != NULL) ;  /* alloc result */
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
   for (k = 0 ; k < n ; k++) {
@@ -1193,7 +1192,6 @@ cs *cs_permute (const cs *A, const int *pinv, const int *q, int values) {
     }
   }
   Cp [n] = nz ;                       /* finalize the last column of C */
-  return C;
 }
 
 /* pinv = p', or p = pinv' */
@@ -1574,7 +1572,13 @@ css *cs_sqr (int order, const cs *A, int qr) {
   }
   /* QR symbolic analysis */
   if (qr) {
-    cs *C = order ? cs_permute (A, NULL, S->q, 0) : ((cs *) A) ;
+    cs *C;
+    if (order) {
+      C = cs_calloc(1, sizeof (cs));
+      cs_permute(C, A, NULL, S->q, 0);
+    } else {
+      C = (cs *) A;
+    }
     S->parent = cs_etree (C, 1) ;       /* etree of C'*C, where C=A(:,q) */
     post = cs_post (S->parent, n) ;
     S->cp = cs_counts (C, S->parent, post, 1) ;  /* col counts chol(C'*C) */
