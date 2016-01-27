@@ -33,7 +33,7 @@
 /** \pluginsection{Linsol,csparsecholesky} */
 
 /// \cond INTERNAL
-#include <cs.h>
+#include <csparse_mod.h>
 #include "casadi/core/function/linsol_impl.hpp"
 #include <casadi/interfaces/csparse/casadi_linsol_csparsecholesky_export.h>
 

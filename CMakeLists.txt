@@ -408,7 +408,7 @@ add_feature_info(sundials-interface SUNDIALS_FOUND "Interface to the ODE/DAE int
 if(WITH_CSPARSE)
   if(WITH_BUILD_CSPARSE)
     # build the included csparse
-    set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
+    set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse)
     set(CSPARSE_LIBRARIES casadi_csparse)
     set(CSPARSE_FOUND ON)
   else()
