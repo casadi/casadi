@@ -104,7 +104,11 @@ namespace casadi {
       // ordering and symbolic analysis
       int order = 0; // ordering?
       if (m.S) cs_sfree(m.S);
-      m.S = cs_sqr(order, &m.A, 0) ;
+      int n = m.A.n ;
+      m.S = static_cast<css*>(calloc(1, sizeof(css)));
+      m.S->q = cs_amd(order, &m.A);              /* fill-reducing ordering */
+      m.S->unz = 4*(m.A.p[n]) + n;         /* for LU factorization only, */
+      m.S->lnz = m.S->unz;                   /* guess nnz(L) and nnz(U) */
     }
 
     m.called_once_ = true;
