@@ -57,7 +57,8 @@ int *cs_amd (int order, const cs *A) {
     ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q, n, m, t ;
   int h ;
   /* --- Construct matrix C ----------------------------------------------- */
-  AT = cs_transpose (A, 0) ;              /* compute A' */
+  AT = cs_calloc(1, sizeof (cs));
+  cs_transpose (A, AT, 0) ;              /* compute A' */
   m = A->m ; n = A->n ;
   dense = CS_MAX (16, 10 * sqrt ((double) n)) ;   /* find dense threshold */
   dense = CS_MIN (n-2, dense) ;
@@ -74,7 +75,8 @@ int *cs_amd (int order, const cs *A) {
       for ( ; p < ATp [j+1] ; p++) ATi [p2++] = ATi [p] ;
     }
     ATp [m] = p2 ;                      /* finalize AT */
-    A2 = cs_transpose (AT, 0) ;         /* A2 = AT' */
+    A2 = cs_calloc(1, sizeof (cs));
+    cs_transpose(AT, A2, 0) ;         /* A2 = AT' */
     cs_multiply (C, AT, A2); /* C=A'*A with no dense rows */
     cs_spfree (A2) ;
   } else {
@@ -478,7 +480,8 @@ int *cs_counts (const cs *A, const int *parent, const int *post, int ata) {
   s = 4*n + (ata ? (n+m+1) : 0) ;
   delta = colcount = cs_malloc (n, sizeof (int)) ;    /* allocate result */
   w = cs_malloc (s, sizeof (int)) ;                   /* get workspace */
-  AT = cs_transpose (A, 0) ;                          /* AT = A' */
+  AT = cs_calloc(1, sizeof (cs));
+  cs_transpose(A, AT, 0) ;                          /* AT = A' */
   ancestor = w ; maxfirst = w+n ; prevleaf = w+2*n ; first = w+3*n ;
   for (k = 0 ; k < s ; k++) w [k] = -1 ;      /* clear workspace w [0..s-1] */
   /* find first [j] */
@@ -573,8 +576,12 @@ static int cs_bfs (const cs *A, int n, int *wi, int *wj, int *queue,
     queue [tail++] = j ;            /* place unmatched col j in queue */
   }
   if (tail == 0) return (1) ;         /* quick return if no unmatched nodes */
-  C = (mark == 1) ? ((cs *) A) : cs_transpose (A, 0) ;
-  if (!C) return (0) ;                /* bfs of C=A' to find R3,C3 from R0 */
+  if (mark == 1) {
+    C = (cs *)A;
+  } else {
+    C = cs_calloc(1, sizeof (cs));
+    cs_transpose(A, C, 0);
+  }
   Ap = C->p ; Ai = C->i ;
   /* while queue is not empty */
   while (head < tail) {
@@ -1104,7 +1111,12 @@ int *cs_maxtrans (const cs *A, int seed) {
     return jimatch;
   }
   for (i = 0 ; i < m ; i++) m2 += w [i] ;
-  C = (m2 < n2) ? cs_transpose (A,0) : ((cs *) A) ; /* transpose if needed */
+  if (m2 < n2) {
+    C = cs_calloc(1, sizeof (cs));
+    cs_transpose (A, C, 0);
+  } else {
+    C = (cs *)A;
+  }
   n = C->n ; m = C->m ; Cp = C->p ;
   jmatch = (m2 < n2) ? jimatch + n : jimatch ;
   imatch = (m2 < n2) ? jimatch : jimatch + m ;
@@ -1327,7 +1339,8 @@ int cs_qrsol (int order, const cs *A, double *b) {
         cs_ipvec (S->q, x, b, n) ;      /* b(q(0:n-1)) = x(0:n-1) */
       }
   } else {
-    AT = cs_transpose (A, 1) ;          /* Ax=b is underdetermined */
+    AT = cs_calloc(1, sizeof (cs));
+    cs_transpose (A, AT, 1) ;          /* Ax=b is underdetermined */
     S = cs_sqr (order, AT, 1) ;         /* ordering and symbolic analysis */
     N = cs_qr (AT, S) ;                 /* numeric QR factorization of A' */
     x = cs_calloc (S ? S->m2 : 1, sizeof (double)) ;    /* get workspace */
@@ -1411,7 +1424,8 @@ csd *cs_scc (cs *A) {
   n = A->n ; Ap = A->p ;
   D = cs_calloc (1, sizeof (csd));
   cs_dalloc(D, n, 0) ;                          /* allocate result */
-  AT = cs_transpose (A, 0) ;                      /* AT = A' */
+  AT = cs_calloc(1, sizeof (cs));
+  cs_transpose (A, AT, 0) ;                      /* AT = A' */
   xi = cs_malloc (2*n+1, sizeof (int)) ;          /* get workspace */
   Blk = xi ; rcopy = pstack = xi + n ;
   p = D->p ; r = D->r ; ATp = AT->p ;
@@ -1640,12 +1654,10 @@ int cs_tdfs (int j, int k, int *head, const int *next, int *post, int *stack) {
 }
 
 /* C = A' */
-cs *cs_transpose (const cs *A, int values) {
+void cs_transpose (const cs *A, cs *C, int values) {
   int p, q, j, *Cp, *Ci, n, m, *Ap, *Ai, *w ;
   double *Cx, *Ax ;
-  cs *C ;
   m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
-  C = cs_calloc(1, sizeof (cs));
   cs_spalloc(C, n, m, Ap [n], values && Ax) ;       /* allocate result */
   w = cs_calloc (m, sizeof (int)) ;                      /* get workspace */
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
@@ -1658,7 +1670,6 @@ cs *cs_transpose (const cs *A, int values) {
     }
   }
   cs_free(w);
-  return C;
 }
 
 /* sparse Cholesky update/downdate, L*L' + sigma*w*w' (sigma = +1 or -1) */
