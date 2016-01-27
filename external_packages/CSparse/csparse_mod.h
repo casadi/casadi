@@ -32,8 +32,8 @@ cs *cs_transpose (const cs *A, int values) ;
 void *cs_calloc (int n, size_t size) ;
 void *cs_free (void *p) ;
 void *cs_realloc (void *p, int n, size_t size) ;
-cs *cs_spalloc (int m, int n, int nzmax, int values) ;
-cs *cs_spfree (cs *A) ;
+void cs_spalloc (cs *A, int m, int n, int nzmax, int values) ;
+void cs_spfree (cs *A) ;
 void cs_sprealloc (cs *A, int nzmax) ;
 void *cs_malloc (int n, size_t size) ;
 
@@ -90,9 +90,9 @@ int cs_updown (cs *L, int sigma, const cs *C, const int *parent) ;
 int cs_usolve (const cs *U, double *x) ;
 int cs_utsolve (const cs *U, double *x) ;
 /* utilities */
-css *cs_sfree (css *S) ;
-csn *cs_nfree (csn *N) ;
-csd *cs_dfree (csd *D) ;
+void cs_sfree (css *S) ;
+void cs_nfree (csn *N) ;
+void cs_dfree (csd *D) ;
 
 /* --- tertiary CSparse routines -------------------------------------------- */
 int *cs_counts (const cs *A, const int *parent, const int *post, int ata) ;
