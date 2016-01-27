@@ -70,7 +70,7 @@ typedef struct cs_dmperm_results    /* cs_dmperm or cs_scc output */
 } csd ;
 
 int *cs_amd (int order, const cs *A) ;
-csn *cs_chol (const cs *A, const css *S) ;
+int cs_chol (csn *N, const cs *A, const css *S) ;
 csd *cs_dmperm (const cs *A, int seed) ;
 int cs_droptol (cs *A, double tol) ;
 int cs_dropzeros (cs *A) ;

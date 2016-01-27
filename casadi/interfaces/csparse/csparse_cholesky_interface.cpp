@@ -160,8 +160,11 @@ namespace casadi {
     }
 
     if (m.L) cs_nfree(m.L);
-    m.L = cs_chol(&m.A, m.S) ;                 // numeric Cholesky factorization
-    casadi_assert(m.L!=0);
+    m.L = static_cast<csn*>(cs_calloc (1, sizeof (csn)));
+    // numeric Cholesky factorization
+    if (cs_chol(m.L, &m.A, m.S)) {
+      casadi_error("Numeric Cholesky factorization failed");
+    }
   }
 
   void CSparseCholeskyInterface::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {

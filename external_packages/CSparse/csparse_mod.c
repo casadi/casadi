@@ -373,13 +373,11 @@ int *cs_amd (int order, const cs *A) {
 }
 
 /* L = chol (A, [pinv parent cp]), pinv is optional */
-csn *cs_chol (const cs *A, const css *S) {
+int cs_chol(csn *N, const cs *A, const css *S) {
   double d, lki, *Lx, *x, *Cx ;
   int top, i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci ;
   cs *L, *C, *E ;
-  csn *N ;
-  n = A->n ;
-  N = cs_calloc (1, sizeof (csn)) ;       /* allocate result */
+  n = A->n;
   c = cs_malloc (2*n, sizeof (int)) ;     /* get int workspace */
   x = cs_malloc (n, sizeof (double)) ;    /* get double workspace */
   cp = S->cp ; pinv = S->pinv ; parent = S->parent ;
@@ -421,8 +419,7 @@ csn *cs_chol (const cs *A, const css *S) {
       cs_spfree(E);
       cs_free (c);
       cs_free (x);
-      cs_nfree(N);
-      return NULL; /* not pos def */
+      return 1; /* not pos def */
     }
     p = c [k]++ ;
     Li [p] = k ;                /* store L(k,k) = sqrt (d) in column k */
@@ -432,7 +429,7 @@ csn *cs_chol (const cs *A, const css *S) {
   cs_spfree(E);
   cs_free(c);
   cs_free(x);
-  return N;
+  return 0;
 }
 
 /* x=A\b where A is symmetric positive definite; b overwritten with solution */
@@ -440,12 +437,13 @@ int cs_cholsol (int order, const cs *A, double *b) {
   double *x ;
   css *S ;
   csn *N ;
-  int n, ok ;
+  int n, ok, flag;
   n = A->n ;
   S = cs_schol (order, A) ;               /* ordering and symbolic analysis */
-  N = cs_chol (A, S) ;                    /* numeric Cholesky factorization */
+  N = cs_calloc(1, sizeof (csn));
+  flag = cs_chol(N, A, S) ;                    /* numeric Cholesky factorization */
   x = cs_malloc (n, sizeof (double)) ;    /* get workspace */
-  ok = (S && N && x) ;
+  ok = (S && !flag && x) ;
   if (ok) {
     cs_ipvec (S->pinv, b, x, n) ;   /* x = P*b */
     cs_lsolve (N->L, x) ;           /* x = L\x */
