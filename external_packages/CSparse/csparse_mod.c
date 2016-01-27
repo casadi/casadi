@@ -8,10 +8,9 @@
 #define CS_MARK(w,j) { w [j] = CS_FLIP (w [j]) ; }
 
 /* C = alpha*A + beta*B */
-cs *cs_add (const cs *A, const cs *B, double alpha, double beta) {
+void cs_add(cs *C, const cs *A, const cs *B, double alpha, double beta) {
   int p, j, nz = 0, anz, *Cp, *Ci, *Bp, m, n, bnz, *w, values ;
   double *x, *Bx, *Cx ;
-  cs *C ;
   m = A->m;
   anz = A->p[A->n] ;
   n = B->n;
@@ -21,7 +20,6 @@ cs *cs_add (const cs *A, const cs *B, double alpha, double beta) {
   w = cs_calloc (m, sizeof (int)) ;                       /* get workspace */
   values = (A->x != NULL) && (Bx != NULL) ;
   x = values ? cs_malloc (m, sizeof (double)) : NULL ;    /* get workspace */
-  C = cs_calloc(1, sizeof (cs));
   cs_spalloc(C, m, n, anz + bnz, values);
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
   for (j = 0 ; j < n ; j++) {
@@ -34,7 +32,6 @@ cs *cs_add (const cs *A, const cs *B, double alpha, double beta) {
   cs_sprealloc (C, 0) ;               /* remove extra space from C */
   cs_free (w) ;                       /* free workspace */
   cs_free (x) ;
-  return C;
 }
 
 /* clear w */
@@ -64,8 +61,9 @@ int *cs_amd (int order, const cs *A) {
   m = A->m ; n = A->n ;
   dense = CS_MAX (16, 10 * sqrt ((double) n)) ;   /* find dense threshold */
   dense = CS_MIN (n-2, dense) ;
+  C = cs_calloc(1, sizeof (cs));
   if (order == 1 && n == m) {
-    C = cs_add (A, AT, 0, 0) ;          /* C = A+A' */
+    cs_add (C, A, AT, 0, 0);          /* C = A+A' */
   } else if (order == 2) {
     ATp = AT->p ;                       /* drop dense columns from AT */
     ATi = AT->i ;
@@ -77,10 +75,10 @@ int *cs_amd (int order, const cs *A) {
     }
     ATp [m] = p2 ;                      /* finalize AT */
     A2 = cs_transpose (AT, 0) ;         /* A2 = AT' */
-    C = A2 ? cs_multiply (AT, A2) : NULL ;  /* C=A'*A with no dense rows */
+    cs_multiply (C, AT, A2); /* C=A'*A with no dense rows */
     cs_spfree (A2) ;
   } else {
-    C = cs_multiply (AT, A) ;           /* C=A'*A */
+    cs_multiply(C, AT, A) ;           /* C=A'*A */
   }
   cs_spfree (AT) ;
   cs_fkeep (C, &cs_diag, NULL) ;          /* drop diagonal entries */
@@ -630,7 +628,8 @@ csd *cs_dmperm (const cs *A, int seed) {
   csd *D, *scc ;
   /* --- Maximum matching ------------------------------------------------- */
   m = A->m ; n = A->n ;
-  D = cs_dalloc (m, n) ;                      /* allocate result */
+  D = cs_calloc (1, sizeof (csd));
+  cs_dalloc(D, m, n) ;                      /* allocate result */
   p = D->p ; q = D->q ; r = D->r ; s = D->s ; cc = D->cc ; rr = D->rr ;
   jmatch = cs_maxtrans (A, seed) ;            /* max transversal */
   imatch = jmatch + m ;                       /* imatch = inverse of jmatch */
@@ -1128,16 +1127,15 @@ int *cs_maxtrans (const cs *A, int seed) {
 }
 
 /* C = A*B */
-cs *cs_multiply (const cs *A, const cs *B) {
+void cs_multiply (cs *C, const cs *A, const cs *B) {
   int p, j, nz = 0, anz, *Cp, *Ci, *Bp, m, n, bnz, *w, values, *Bi ;
   double *x, *Bx, *Cx ;
-  cs *C ;
+   ;
   m = A->m ; anz = A->p [A->n] ;
   n = B->n ; Bp = B->p ; Bi = B->i ; Bx = B->x ; bnz = Bp [n] ;
   w = cs_calloc (m, sizeof (int)) ;                    /* get workspace */
   values = (A->x != NULL) && (Bx != NULL) ;
   x = values ? cs_malloc (m, sizeof (double)) : NULL ; /* get workspace */
-  C = cs_calloc(1, sizeof (cs));
   cs_spalloc (C, m, n, anz + bnz, values) ;        /* allocate result */
   Cp = C->p ;
   for (j = 0 ; j < n ; j++) {
@@ -1155,7 +1153,6 @@ cs *cs_multiply (const cs *A, const cs *B) {
   cs_sprealloc (C, 0) ;               /* remove extra space from C */
   cs_free(w);
   cs_free(x);
-  return C;
 }
 
 /* 1-norm of a sparse matrix = max (sum (abs (A))), largest column sum */
@@ -1412,7 +1409,8 @@ csd *cs_scc (cs *A) {
   cs *AT ;
   csd *D ;
   n = A->n ; Ap = A->p ;
-  D = cs_dalloc (n, 0) ;                          /* allocate result */
+  D = cs_calloc (1, sizeof (csd));
+  cs_dalloc(D, n, 0) ;                          /* allocate result */
   AT = cs_transpose (A, 0) ;                      /* AT = A' */
   xi = cs_malloc (2*n+1, sizeof (int)) ;          /* get workspace */
   Blk = xi ; rcopy = pstack = xi + n ;
@@ -1759,14 +1757,11 @@ void cs_sfree (css *S) {
 }
 
 /* allocate a cs_dmperm or cs_scc result */
-csd *cs_dalloc (int m, int n) {
-  csd *D ;
-  D = cs_calloc (1, sizeof (csd)) ;
+void cs_dalloc (csd *D, int m, int n) {
   D->p = cs_malloc (m, sizeof (int)) ;
   D->r = cs_malloc (m+6, sizeof (int)) ;
   D->q = cs_malloc (n, sizeof (int)) ;
   D->s = cs_malloc (n+6, sizeof (int)) ;
-  return D;
 }
 
 /* free a cs_dmperm or cs_scc result */

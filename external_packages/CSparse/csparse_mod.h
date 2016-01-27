@@ -19,12 +19,12 @@ typedef struct cs_sparse {
     double *x ;     /* numerical values, size nzmax */
 } cs ;
 
-cs *cs_add (const cs *A, const cs *B, double alpha, double beta) ;
+void cs_add (cs *C, const cs *A, const cs *B, double alpha, double beta) ;
 int cs_cholsol (int order, const cs *A, double *b) ;
 int cs_dupl (cs *A) ;
 int cs_gaxpy (const cs *A, const double *x, double *y) ;
 int cs_lusol (int order, const cs *A, double *b, double tol) ;
-cs *cs_multiply (const cs *A, const cs *B) ;
+void cs_multiply (cs *C, const cs *A, const cs *B) ;
 double cs_norm (const cs *A) ;
 int cs_qrsol (int order, const cs *A, double *b) ;
 cs *cs_transpose (const cs *A, int values) ;
@@ -116,8 +116,7 @@ int cs_spsolve (cs *G, const cs *B, int k, int *xi, double *x,
 int cs_tdfs (int j, int k, int *head, const int *next, int *post,
     int *stack) ;
 /* utilities */
-csd *cs_dalloc (int m, int n) ;
-csn *cs_ndone (csn *N, cs *C, void *w, void *x, int ok) ;
+void cs_dalloc (csd* D, int m, int n) ;
 
 #ifdef __cplusplus
 }
