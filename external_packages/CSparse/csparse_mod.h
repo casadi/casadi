@@ -11,12 +11,12 @@ extern "C" {
 
 /* --- primary CSparse routines and data structures ------------------------- */
 typedef struct cs_sparse {
-    int nzmax ;     /* maximum number of entries */
-    int m ;         /* number of rows */
-    int n ;         /* number of columns */
-    int *p ;        /* column pointers (size n+1) */
-    int *i ;        /* row indices, size nzmax */
-    double *x ;     /* numerical values, size nzmax */
+  int nzmax;     /* maximum number of entries */
+  int sp[1];
+  int n ;         /* number of columns */
+  int *p ;        /* column pointers (size n+1) */
+  int *i ;        /* row indices, size nzmax */
+  double *x ;     /* numerical values, size nzmax */
 } cs ;
 
 void cs_add (cs *C, double* Cx, const cs *A, double* Ax, const cs *B, double* Bx, double alpha, double beta) ;

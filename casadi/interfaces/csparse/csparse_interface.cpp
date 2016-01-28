@@ -68,7 +68,7 @@ namespace casadi {
       m->N = 0;
       m->S = 0;
       m->A.nzmax = nnz_in(0);  // maximum number of entries
-      m->A.m = size1_in(0); // number of rows
+      m->A.sp[0] = size1_in(0); // number of rows
       m->A.n = size2_in(0); // number of columns
       m->A.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
       // or column indices (size nzmax)

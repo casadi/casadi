@@ -73,7 +73,7 @@ namespace casadi {
       m->L = 0;
       m->S = 0;
       m->A.nzmax = nnz_in(0);  // maximum number of entries
-      m->A.m = size1_in(0); // number of columns
+      m->A.sp[0] = size1_in(0); // number of columns
       m->A.n = size2_in(0); // number of rows
       m->A.p = const_cast<int*>(sparsity_in(0).colind()); // row pointers (size n+1)
       // or row indices (size nzmax)
@@ -140,13 +140,13 @@ namespace casadi {
     casadi_assert(m.L);
     cs *L = m.L->L;
     int nz = L->nzmax;
-    std::vector< int > colind(L->m+1);
-    std::copy(L->p, L->p+L->m+1, colind.begin());
+    std::vector< int > colind(L->sp[0]+1);
+    std::copy(L->p, L->p+L->sp[0]+1, colind.begin());
     std::vector< int > row(nz);
     std::copy(L->i, L->i+nz, row.begin());
     std::vector< double > data(nz);
     std::copy(L->x, L->x+nz, data.begin());
-    DM ret(Sparsity(L->n, L->m, colind, row), data, false);
+    DM ret(Sparsity(L->n, L->sp[0], colind, row), data, false);
 
     return tr ? ret.T() : ret;
   }
