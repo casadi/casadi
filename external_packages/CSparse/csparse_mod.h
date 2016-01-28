@@ -78,7 +78,7 @@ int cs_happly (const cs *V, int i, double beta, double *x) ;
 int cs_ipvec (const int *p, const double *b, double *x, int n) ;
 int cs_lsolve (const cs *L, double *x) ;
 int cs_ltsolve (const cs *L, double *x) ;
-csn *cs_lu (const cs *A, const css *S, double tol) ;
+int cs_lu(csn *N, const cs *A, const css *S, double tol) ;
 void cs_permute (cs *C, const cs *A, const int *pinv, const int *q, int values) ;
 int *cs_pinv (const int *p, int n) ;
 int cs_pvec (const int *p, const double *b, double *x, int n) ;

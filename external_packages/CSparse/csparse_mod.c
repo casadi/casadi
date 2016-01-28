@@ -916,16 +916,14 @@ int cs_ltsolve (const cs *L, double *x) {
 }
 
 /* [L,U,pinv]=lu(A, [q lnz unz]). lnz and unz can be guess */
-csn *cs_lu (const cs *A, const css *S, double tol) {
+int cs_lu(csn *N, const cs *A, const css *S, double tol) {
   cs *L, *U ;
-  csn *N ;
   double pivot, *Lx, *Ux, *x,  a, t ;
   int *Lp, *Li, *Up, *Ui, *pinv, *xi, *q, n, ipiv, k, top, p, i, col, lnz,unz;
   n = A->n ;
   q = S->q ; lnz = S->lnz ; unz = S->unz ;
   x = cs_malloc (n, sizeof (double)) ;            /* get double workspace */
   xi = cs_malloc (2*n, sizeof (int)) ;            /* get int workspace */
-  N = cs_calloc (1, sizeof (csn)) ;               /* allocate result */
   N->L = L = cs_calloc(1, sizeof (cs));
   cs_spalloc (L, n, n, lnz, 1) ;       /* allocate result L */
   N->U = U = cs_calloc(1, sizeof (cs));
@@ -971,7 +969,7 @@ csn *cs_lu (const cs *A, const css *S, double tol) {
       cs_free(xi);
       cs_free(x);
       cs_nfree(N);
-      return NULL;
+      return 1;
     }
     if (pinv [col] < 0 && fabs (x [col]) >= a*tol) ipiv = col ;
     /* --- Divide by pivot ---------------------------------------------- */
@@ -1001,25 +999,25 @@ csn *cs_lu (const cs *A, const css *S, double tol) {
   cs_sprealloc (U, 0) ;
   cs_free(xi) ;                       /* free workspace */
   cs_free(x) ;
-  return N;
+  return 0;
 }
 
 /* x=A\b where A is unsymmetric; b overwritten with solution */
 int cs_lusol (int order, const cs *A, double *b, double tol) {
-  double *x ;
-  csn *N ;
-  int n, ok ;
-  n = A->n ;
+  csn *N = cs_calloc(1, sizeof (csn));
   css *S = cs_calloc(1, sizeof(css));
-  int flag = cs_sqr(S, order, A, 0) ;              /* ordering and symbolic analysis */
-  N = cs_lu (A, S, tol) ;                 /* numeric LU factorization */
-  x = cs_malloc (n, sizeof (double)) ;    /* get workspace */
-  ok = (!flag && N) ;
-  if (ok) {
-    cs_ipvec (N->pinv, b, x, n) ;       /* x = b(p) */
-    cs_lsolve (N->L, x) ;               /* x = L\x */
-    cs_usolve (N->U, x) ;               /* x = U\x */
-    cs_ipvec (S->q, x, b, n) ;          /* b(q) = x */
+  int n = A->n, ok = 0;
+  double *x = cs_malloc (n, sizeof (double));
+  /* ordering and symbolic analysis */
+  if (!cs_sqr(S, order, A, 0)) {
+    /* numeric LU factorization */
+    if (!cs_lu(N, A, S, tol)) {
+      cs_ipvec (N->pinv, b, x, n) ;       /* x = b(p) */
+      cs_lsolve (N->L, x) ;               /* x = L\x */
+      cs_usolve (N->U, x) ;               /* x = U\x */
+      cs_ipvec (S->q, x, b, n) ;          /* b(q) = x */
+      ok = 1;
+    }
   }
   cs_free(x);
   cs_sfree(S);

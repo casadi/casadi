@@ -122,11 +122,11 @@ namespace casadi {
       DM(sparsity_, vector<double>(A, A+sparsity_.nnz())).print_sparse();
     }
 
-    double tol = 1e-8;
-
+    // numeric LU factorization
     if (m.N) cs_nfree(m.N);
-    m.N = cs_lu(&m.A, m.S, tol) ;                 // numeric LU factorization
-    if (m.N==0) {
+    m.N = static_cast<csn*>(cs_calloc(1, sizeof(csn)));
+    double tol = 1e-8;
+    if (cs_lu(m.N, &m.A, m.S, tol)) {
       DM temp(sparsity_, vector<double>(A, A+sparsity_.nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
