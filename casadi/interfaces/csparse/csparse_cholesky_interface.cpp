@@ -74,14 +74,14 @@ namespace casadi {
       m->S = 0;
       m->A.nzmax = nnz_in(0);  // maximum number of entries
       m->A.sp[0] = size1_in(0); // number of columns
-      m->A.n = size2_in(0); // number of rows
+      m->A.sp[1] = size2_in(0); // number of rows
       m->A.p = const_cast<int*>(sparsity_in(0).colind()); // row pointers (size n+1)
       // or row indices (size nzmax)
       m->A.i = const_cast<int*>(sparsity_in(0).row()); // column indices, size nzmax
       m->A.x = 0; // numerical values, size nzmax
 
       // Temporary
-      m->temp.resize(m->A.n);
+      m->temp.resize(m->A.sp[1]);
 
       // ordering and symbolic analysis
       int order = 0; // ordering?
@@ -99,7 +99,7 @@ namespace casadi {
     CsparseCholMemory& m = dynamic_cast<CsparseCholMemory&>(mem);
 
     casadi_assert(m.S);
-    int n = m.A.n;
+    int n = m.A.sp[1];
     int nzmax = m.S->cp[n];
     std::vector< int > row(n+1);
     std::copy(m.S->cp, m.S->cp+n+1, row.begin());
@@ -146,7 +146,7 @@ namespace casadi {
     std::copy(L->i, L->i+nz, row.begin());
     std::vector< double > data(nz);
     std::copy(L->x, L->x+nz, data.begin());
-    DM ret(Sparsity(L->n, L->sp[0], colind, row), data, false);
+    DM ret(Sparsity(L->sp[1], L->sp[0], colind, row), data, false);
 
     return tr ? ret.T() : ret;
   }
@@ -181,15 +181,15 @@ namespace casadi {
     double *t = &m.temp.front();
     for (int k=0; k<nrhs; ++k) {
       if (tr) {
-        cs_pvec(m.S->q, x, t, m.A.n) ;   // t = P1\b
+        cs_pvec(m.S->q, x, t, m.A.sp[1]) ;   // t = P1\b
         cs_ltsolve(m.L->L, t) ;               // t = L\t
         cs_lsolve(m.L->L, t) ;              // t = U\t
-        cs_pvec(m.L->pinv, t, x, m.A.n) ;      // x = P2\t
+        cs_pvec(m.L->pinv, t, x, m.A.sp[1]) ;      // x = P2\t
       } else {
-        cs_ipvec(m.L->pinv, x, t, m.A.n) ;   // t = P1\b
+        cs_ipvec(m.L->pinv, x, t, m.A.sp[1]) ;   // t = P1\b
         cs_lsolve(m.L->L, t) ;               // t = L\t
         cs_ltsolve(m.L->L, t) ;              // t = U\t
-        cs_ipvec(m.S->q, t, x, m.A.n) ;      // x = P2\t
+        cs_ipvec(m.S->q, t, x, m.A.sp[1]) ;      // x = P2\t
       }
       x += ncol();
     }
@@ -203,10 +203,10 @@ namespace casadi {
     double *t = get_ptr(m.temp);
 
     for (int k=0; k<nrhs; ++k) {
-      cs_ipvec(m.L->pinv, x, t, m.A.n) ;   // t = P1\b
+      cs_ipvec(m.L->pinv, x, t, m.A.sp[1]) ;   // t = P1\b
       if (tr) cs_lsolve(m.L->L, t) ; // t = L\t
       if (!tr) cs_ltsolve(m.L->L, t) ; // t = U\t
-      cs_ipvec(m.S->q, t, x, m.A.n) ;      // x = P2\t
+      cs_ipvec(m.S->q, t, x, m.A.sp[1]) ;      // x = P2\t
       x += ncol();
     }
   }

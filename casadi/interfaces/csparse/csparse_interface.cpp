@@ -69,14 +69,14 @@ namespace casadi {
       m->S = 0;
       m->A.nzmax = nnz_in(0);  // maximum number of entries
       m->A.sp[0] = size1_in(0); // number of rows
-      m->A.n = size2_in(0); // number of columns
+      m->A.sp[1] = size2_in(0); // number of columns
       m->A.p = const_cast<int*>(sparsity_in(0).colind()); // column pointers (size n+1)
       // or column indices (size nzmax)
       m->A.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
       m->A.x = 0; // numerical values, size nzmax
 
       // Temporary
-      m->temp_.resize(m->A.n);
+      m->temp_.resize(m->A.sp[1]);
 
       // Has the routine been called once
       m->called_once_ = false;
@@ -163,16 +163,16 @@ namespace casadi {
 
     for (int k=0; k<nrhs; ++k) {
       if (tr) {
-        cs_pvec(m.S->q, x, t, m.A.n) ;       // t = P2*b
+        cs_pvec(m.S->q, x, t, m.A.sp[1]) ;       // t = P2*b
         casadi_assert(m.N->U!=0);
         cs_utsolve(m.N->U, t) ;              // t = U'\t
         cs_ltsolve(m.N->L, t) ;              // t = L'\t
-        cs_pvec(m.N->pinv, t, x, m.A.n) ;    // x = P1*t
+        cs_pvec(m.N->pinv, t, x, m.A.sp[1]) ;    // x = P1*t
       } else {
-        cs_ipvec(m.N->pinv, x, t, m.A.n) ;   // t = P1\b
+        cs_ipvec(m.N->pinv, x, t, m.A.sp[1]) ;   // t = P1\b
         cs_lsolve(m.N->L, t) ;               // t = L\t
         cs_usolve(m.N->U, t) ;               // t = U\t
-        cs_ipvec(m.S->q, t, x, m.A.n) ;      // x = P2\t
+        cs_ipvec(m.S->q, t, x, m.A.sp[1]) ;      // x = P2\t
       }
       x += ncol();
     }

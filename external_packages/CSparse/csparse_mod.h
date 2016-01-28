@@ -12,8 +12,7 @@ extern "C" {
 /* --- primary CSparse routines and data structures ------------------------- */
 typedef struct cs_sparse {
   int nzmax;     /* maximum number of entries */
-  int sp[1];
-  int n ;         /* number of columns */
+  int sp[2];
   int *p ;        /* column pointers (size n+1) */
   int *i ;        /* row indices, size nzmax */
   double *x ;     /* numerical values, size nzmax */
