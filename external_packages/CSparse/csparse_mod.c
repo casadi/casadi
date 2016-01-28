@@ -671,8 +671,12 @@ void cs_dmperm (csd *D, const cs *A, int seed) {
     Ci = C->i ;
     if (rr [1] > 0) for (k = 0 ; k < cnz ; k++) Ci [k] -= rr [1] ;
   }
-  C->m = nc ;
-  scc = cs_scc (C) ;              /* find strongly connected components of C*/
+  C->m = nc;
+
+  /* find strongly connected components of C */
+  scc = cs_calloc (1, sizeof (csd));
+  cs_scc(scc, C);
+
   /* --- Combine coarse and fine decompositions --------------------------- */
   ps = scc->p ;                   /* C(ps,ps) is the permuted matrix */
   rs = scc->r ;                   /* kth block is rs[k]..rs[k+1]-1 */
@@ -1410,13 +1414,11 @@ int cs_scatter (const cs *A, int j, double beta, int *w, double *x, int mark,
 }
 
 /* find the strongly connected components of a square matrix */
-csd *cs_scc (cs *A) {
+void cs_scc(csd *D, cs *A) {
   /* matrix A temporarily modified, then restored */
   int n, i, k, b, nb = 0, top, *xi, *pstack, *p, *r, *Ap, *ATp, *rcopy, *Blk ;
   cs *AT ;
-  csd *D ;
   n = A->n ; Ap = A->p ;
-  D = cs_calloc (1, sizeof (csd));
   cs_dalloc(D, n, 0) ;                          /* allocate result */
   AT = cs_calloc(1, sizeof (cs));
   cs_transpose (A, AT, 0) ;                      /* AT = A' */
@@ -1449,7 +1451,6 @@ csd *cs_scc (cs *A) {
   for (i = 0 ; i < n ; i++) p [rcopy [Blk [i]]++] = i ;
   cs_spfree (AT) ;                     /* free temporary matrix */
   cs_free (xi) ;                       /* free workspace */
-  return D;
 }
 
 /* ordering and symbolic analysis for a Cholesky factorization */
