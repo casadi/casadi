@@ -1704,6 +1704,7 @@ int cs_usolve (const cs *U, double *x) {
 
 /* allocate a sparse matrix */
 void cs_spalloc(cs *A, int m, int n, int nzmax, int values) {
+  A->sp = cs_malloc(2, sizeof (int));
   A->sp[0] = m;
   A->sp[1] = n;
   A->nzmax = nzmax = CS_MAX (nzmax, 1) ;
@@ -1723,6 +1724,7 @@ void cs_sprealloc (cs *A, int nzmax) {
 /* free a sparse matrix */
 void cs_spfree(cs *A) {
   if (!A) return;
+  cs_free(A->sp);
   cs_free(A->p);
   cs_free(A->i);
   cs_free(A->x);
