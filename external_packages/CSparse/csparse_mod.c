@@ -921,19 +921,19 @@ int cs_ltsolve (const cs *L, double *x) {
 
 /* [L,U,pinv]=lu(A, [q lnz unz]). lnz and unz can be guess */
 int cs_lu(csn *N, const cs *A, const css *S, double tol) {
-  cs *L, *U ;
   double pivot, *Lx, *Ux, *x,  a, t ;
   int *Lp, *Li, *Up, *Ui, *pinv, *xi, *q, n, ipiv, k, top, p, i, col, lnz,unz;
   n = A->n ;
   q = S->q ; lnz = S->lnz ; unz = S->unz ;
   x = cs_malloc (n, sizeof (double)) ;            /* get double workspace */
   xi = cs_malloc (2*n, sizeof (int)) ;            /* get int workspace */
-  N->L = L = cs_calloc(1, sizeof (cs));
-  cs_spalloc (L, n, n, lnz, 1) ;       /* allocate result L */
-  N->U = U = cs_calloc(1, sizeof (cs));
-  cs_spalloc (U, n, n, unz, 1) ;       /* allocate result U */
+  N->L = cs_calloc(1, sizeof (cs));
+  cs_spalloc (N->L, n, n, lnz, 1) ;       /* allocate result L */
+  N->U = cs_calloc(1, sizeof (cs));
+  cs_spalloc (N->U, n, n, unz, 1) ;       /* allocate result U */
   N->pinv = pinv = cs_malloc (n, sizeof (int)) ;  /* allocate result pinv */
-  Lp = L->p ; Up = U->p ;
+  Lp = N->L->p;
+  Up = N->U->p ;
   for (i = 0 ; i < n ; i++) x [i] = 0 ;           /* clear workspace */
   for (i = 0 ; i < n ; i++) pinv [i] = -1 ;       /* no rows pivotal yet */
   for (k = 0 ; k <= n ; k++) Lp [k] = 0 ;         /* no cols of L yet */
@@ -943,14 +943,17 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
     /* --- Triangular solve --------------------------------------------- */
     Lp [k] = lnz ;              /* L(:,k) starts here */
     Up [k] = unz ;              /* U(:,k) starts here */
-    if (lnz + n > L->nzmax) {
-      cs_sprealloc(L, 2*L->nzmax + n);
-    } else if (unz + n > U->nzmax) {
-      cs_sprealloc(U, 2*U->nzmax + n);
+    if (lnz + n > N->L->nzmax) {
+      cs_sprealloc(N->L, 2*N->L->nzmax + n);
+    } else if (unz + n > N->U->nzmax) {
+      cs_sprealloc(N->U, 2*N->U->nzmax + n);
     }
-    Li = L->i ; Lx = L->x ; Ui = U->i ; Ux = U->x ;
+    Li = N->L->i;
+    Lx = N->L->x;
+    Ui = N->U->i;
+    Ux = N->U->x ;
     col = q ? (q [k]) : k ;
-    top = cs_spsolve (L, A, col, xi, x, pinv, 1) ;  /* x = L\A(:,col) */
+    top = cs_spsolve (N->L, A, col, xi, x, pinv, 1) ;  /* x = L\A(:,col) */
     /* --- Find pivot --------------------------------------------------- */
     ipiv = -1 ;
     a = -1 ;
@@ -997,10 +1000,10 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
   /* --- Finalize L and U ------------------------------------------------- */
   Lp [n] = lnz ;
   Up [n] = unz ;
-  Li = L->i ;                     /* fix row indices of L for final pinv */
+  Li = N->L->i ;                     /* fix row indices of L for final pinv */
   for (p = 0 ; p < lnz ; p++) Li [p] = pinv [Li [p]] ;
-  cs_sprealloc (L, 0) ;           /* remove extra space from L and U */
-  cs_sprealloc (U, 0) ;
+  cs_sprealloc(N->L, 0) ;           /* remove extra space from L and U */
+  cs_sprealloc(N->U, 0) ;
   cs_free(xi) ;                       /* free workspace */
   cs_free(x) ;
   return 0;
