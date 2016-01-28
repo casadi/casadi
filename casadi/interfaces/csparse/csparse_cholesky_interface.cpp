@@ -85,8 +85,9 @@ namespace casadi {
 
       // ordering and symbolic analysis
       int order = 0; // ordering?
-      m->S = cs_schol(order, &m->A);
-
+      m->S = static_cast<css*>(cs_calloc (1, sizeof (css)));
+      int flag = cs_schol(m->S, order, &m->A);
+      casadi_assert(flag==0);
       return m;
     } catch (...) {
       delete m;
@@ -105,8 +106,13 @@ namespace casadi {
     std::vector< int > colind(nzmax);
     int *Li = &colind.front();
     int *Lp = &row.front();
-    const cs* C;
-    C = m.S->pinv ? cs_symperm(&m.A, m.S->pinv, 1) : &m.A;
+    cs* C;
+    if (m.S->pinv) {
+      C = static_cast<cs*>(cs_calloc(1, sizeof (cs)));
+      cs_symperm(C, &m.A, m.S->pinv, 1);
+    } else {
+      C = &m.A;
+    }
     std::vector< int > temp(2*n);
     int *c = &temp.front();
     int *s = c+n;

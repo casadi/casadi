@@ -381,7 +381,12 @@ int cs_chol(csn *N, const cs *A, const css *S) {
   c = cs_malloc (2*n, sizeof (int)) ;     /* get int workspace */
   x = cs_malloc (n, sizeof (double)) ;    /* get double workspace */
   cp = S->cp ; pinv = S->pinv ; parent = S->parent ;
-  C = pinv ? cs_symperm (A, pinv, 1) : ((cs *) A) ;
+  if (pinv) {
+    C = cs_calloc(1, sizeof (cs));
+    cs_symperm (C, A, pinv, 1);
+  } else {
+    C = (cs *) A;
+  }
   E = pinv ? C : NULL ;           /* E is alias for A, or a copy E=A(p,p) */
   s = c + n ;
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
@@ -439,7 +444,8 @@ int cs_cholsol (int order, const cs *A, double *b) {
   csn *N ;
   int n, ok, flag;
   n = A->n ;
-  S = cs_schol (order, A) ;               /* ordering and symbolic analysis */
+  S = cs_calloc (1, sizeof (css));
+  cs_schol(S, order, A); /* ordering and symbolic analysis */
   N = cs_calloc(1, sizeof (csn));
   flag = cs_chol(N, A, S) ;                    /* numeric Cholesky factorization */
   x = cs_malloc (n, sizeof (double)) ;    /* get workspace */
@@ -1234,18 +1240,16 @@ int cs_pvec (const int *p, const double *b, double *x, int n) {
 }
 
 /* sparse QR factorization [V,beta,pinv,R] = qr (A) */
-csn *cs_qr (const cs *A, const css *S) {
+void cs_qr (csn *N, const cs *A, const css *S) {
   double *Rx, *Vx, *Ax, *x,  *Beta ;
   int i, k, p, m, n, vnz, p1, top, m2, len, col, rnz, *s, *leftmost, *Ap, *Ai,
     *parent, *Rp, *Ri, *Vp, *Vi, *w, *pinv, *q ;
   cs *R, *V ;
-  csn *N ;
   m = A->m ; n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
   q = S->q ; parent = S->parent ; pinv = S->pinv ; m2 = S->m2 ;
   vnz = S->lnz ; rnz = S->unz ; leftmost = S->leftmost ;
   w = cs_malloc (m2+n, sizeof (int)) ;            /* get int workspace */
   x = cs_malloc (m2, sizeof (double)) ;           /* get double workspace */
-  N = cs_calloc (1, sizeof (csn)) ;               /* allocate result */
   s = w + m2 ;                                    /* s is size n */
   for (k = 0 ; k < m2 ; k++) x [k] = 0 ;          /* clear workspace x */
   N->L = V = cs_calloc(1, sizeof (cs));
@@ -1305,38 +1309,36 @@ csn *cs_qr (const cs *A, const css *S) {
   Vp [n] = vnz ;                          /* finalize V */
   cs_free(w);
   cs_free(x);
-  return N;
 }
 
 /* x=A\b where A can be rectangular; b overwritten with solution */
-int cs_qrsol (int order, const cs *A, double *b) {
+int cs_qrsol(int order, const cs *A, double *b) {
   double *x ;
   css *S ;
-  csn *N ;
+  csn *N = cs_calloc (1, sizeof (csn));
   cs *AT = NULL ;
   int k, m, n, ok ;
   n = A->n ;
   m = A->m ;
   if (m >= n) {
     S = cs_sqr (order, A, 1) ;          /* ordering and symbolic analysis */
-    N = cs_qr (A, S) ;                  /* numeric QR factorization */
+    cs_qr(N, A, S) ;                  /* numeric QR factorization */
     x = cs_calloc (S ? S->m2 : 1, sizeof (double)) ;    /* get workspace */
     ok = (S && N && x) ;
-    if (ok)
-      {
-        cs_ipvec (S->pinv, b, x, m) ;   /* x(0:m-1) = b(p(0:m-1) */
-        for (k = 0 ; k < n ; k++)       /* apply Householder refl. to x */
-          {
-            cs_happly (N->L, k, N->B [k], x) ;
-          }
-        cs_usolve (N->U, x) ;           /* x = R\x */
-        cs_ipvec (S->q, x, b, n) ;      /* b(q(0:n-1)) = x(0:n-1) */
-      }
+    if (ok) {
+      cs_ipvec (S->pinv, b, x, m) ;   /* x(0:m-1) = b(p(0:m-1) */
+      for (k = 0 ; k < n ; k++)       /* apply Householder refl. to x */
+        {
+          cs_happly (N->L, k, N->B [k], x) ;
+        }
+      cs_usolve (N->U, x) ;           /* x = R\x */
+      cs_ipvec (S->q, x, b, n) ;      /* b(q(0:n-1)) = x(0:n-1) */
+    }
   } else {
     AT = cs_calloc(1, sizeof (cs));
     cs_transpose (A, AT, 1) ;          /* Ax=b is underdetermined */
     S = cs_sqr (order, AT, 1) ;         /* ordering and symbolic analysis */
-    N = cs_qr (AT, S) ;                 /* numeric QR factorization of A' */
+    cs_qr(N, AT, S) ;                 /* numeric QR factorization of A' */
     x = cs_calloc (S ? S->m2 : 1, sizeof (double)) ;    /* get workspace */
     ok = (AT && S && N && x) ;
     if (ok) {
@@ -1453,20 +1455,16 @@ csd *cs_scc (cs *A) {
 }
 
 /* ordering and symbolic analysis for a Cholesky factorization */
-css *cs_schol (int order, const cs *A) {
+int cs_schol (css *S, int order, const cs *A) {
   int n, *c, *post, *P ;
   cs *C ;
-  css *S ;
   n = A->n ;
-  S = cs_calloc (1, sizeof (css)) ;       /* allocate result S */
   P = cs_amd (order, A) ;                 /* P = amd(A+A'), or natural */
   S->pinv = cs_pinv (P, n) ;              /* find inverse permutation */
   cs_free (P) ;
-  if (order && !S->pinv) {
-    cs_sfree(S);
-    return NULL;
-  }
-  C = cs_symperm (A, S->pinv, 0) ;        /* C = spones(triu(A(P,P))) */
+  if (order && !S->pinv) return 1;
+  C = cs_calloc(1, sizeof (cs));
+  cs_symperm(C, A, S->pinv, 0) ;        /* C = spones(triu(A(P,P))) */
   S->parent = cs_etree (C, 0) ;           /* find etree of C */
   post = cs_post (S->parent, n) ;         /* postorder the etree */
   c = cs_counts (C, S->parent, post, 0) ; /* find column counts of chol(C) */
@@ -1475,12 +1473,8 @@ css *cs_schol (int order, const cs *A) {
   S->cp = cs_malloc (n+1, sizeof (int)) ; /* allocate result S->cp */
   S->unz = S->lnz = cs_cumsum (S->cp, c, n) ; /* find column pointers for L */
   cs_free (c) ;
-  if (S->lnz >= 0) {
-    return S;
-  } else {
-    cs_sfree(S);
-    return NULL;
-  }
+  if (S->lnz >= 0) return 1;
+  return 0;
 }
 
 /* solve Gx=b(:,k), where G is either upper (lo=0) or lower (lo=1) triangular */
@@ -1560,7 +1554,7 @@ static int cs_vcount (const cs *A, css *S) {
 }
 
 /* symbolic ordering and analysis for QR or LU */
-css *cs_sqr (int order, const cs *A, int qr) {
+css *cs_sqr(int order, const cs *A, int qr) {
   int n, k, ok = 1, *post ;
   css *S ;
   n = A->n ;
@@ -1599,12 +1593,10 @@ css *cs_sqr (int order, const cs *A, int qr) {
 }
 
 /* C = A(p,p) where A and C are symmetric the upper part stored; pinv not p */
-cs *cs_symperm (const cs *A, const int *pinv, int values) {
+void cs_symperm (cs *C, const cs *A, const int *pinv, int values) {
   int i, j, p, q, i2, j2, n, *Ap, *Ai, *Cp, *Ci, *w ;
   double *Cx, *Ax ;
-  cs *C ;
   n = A->n ; Ap = A->p ; Ai = A->i ; Ax = A->x ;
-  C = cs_calloc(1, sizeof (cs));
   cs_spalloc (C, n, n, Ap [n], values && (Ax != NULL)) ; /* alloc result*/
   w = cs_calloc (n, sizeof (int)) ;                   /* get workspace */
   Cp = C->p ; Ci = C->i ; Cx = C->x ;
@@ -1630,7 +1622,6 @@ cs *cs_symperm (const cs *A, const int *pinv, int values) {
     }
   }
   cs_free (w);
-  return C;
 }
 
 /* depth-first search and postorder of a tree rooted at node j */
