@@ -84,7 +84,7 @@ int *cs_pinv (const int *p, int n) ;
 int cs_pvec (const int *p, const double *b, double *x, int n) ;
 void cs_qr (csn *N, const cs *A, const css *S) ;
 int cs_schol (css *S, int order, const cs *A) ;
-css *cs_sqr (int order, const cs *A, int qr) ;
+int cs_sqr(css *S, int order, const cs *A, int qr) ;
 void cs_symperm (cs *C, const cs *A, const int *pinv, int values) ;
 int cs_updown (cs *L, int sigma, const cs *C, const int *parent) ;
 int cs_usolve (const cs *U, double *x) ;

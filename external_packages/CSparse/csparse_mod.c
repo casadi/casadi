@@ -1007,24 +1007,24 @@ csn *cs_lu (const cs *A, const css *S, double tol) {
 /* x=A\b where A is unsymmetric; b overwritten with solution */
 int cs_lusol (int order, const cs *A, double *b, double tol) {
   double *x ;
-  css *S ;
   csn *N ;
   int n, ok ;
   n = A->n ;
-  S = cs_sqr (order, A, 0) ;              /* ordering and symbolic analysis */
+  css *S = cs_calloc(1, sizeof(css));
+  int flag = cs_sqr(S, order, A, 0) ;              /* ordering and symbolic analysis */
   N = cs_lu (A, S, tol) ;                 /* numeric LU factorization */
   x = cs_malloc (n, sizeof (double)) ;    /* get workspace */
-  ok = (S && N && x) ;
+  ok = (!flag && N) ;
   if (ok) {
     cs_ipvec (N->pinv, b, x, n) ;       /* x = b(p) */
     cs_lsolve (N->L, x) ;               /* x = L\x */
     cs_usolve (N->U, x) ;               /* x = U\x */
     cs_ipvec (S->q, x, b, n) ;          /* b(q) = x */
   }
-  cs_free (x) ;
-  cs_sfree (S) ;
-  cs_nfree (N) ;
-  return (ok) ;
+  cs_free(x);
+  cs_sfree(S);
+  cs_nfree(N);
+  return ok;
 }
 
 /* wrapper for malloc */
@@ -1314,17 +1314,17 @@ void cs_qr (csn *N, const cs *A, const css *S) {
 /* x=A\b where A can be rectangular; b overwritten with solution */
 int cs_qrsol(int order, const cs *A, double *b) {
   double *x ;
-  css *S ;
+  css *S = cs_calloc(1, sizeof(css));
   csn *N = cs_calloc (1, sizeof (csn));
   cs *AT = NULL ;
   int k, m, n, ok ;
   n = A->n ;
   m = A->m ;
   if (m >= n) {
-    S = cs_sqr (order, A, 1) ;          /* ordering and symbolic analysis */
+    int flag = cs_sqr(S, order, A, 1) ;          /* ordering and symbolic analysis */
     cs_qr(N, A, S) ;                  /* numeric QR factorization */
     x = cs_calloc (S ? S->m2 : 1, sizeof (double)) ;    /* get workspace */
-    ok = (S && N && x) ;
+    ok = !flag && N;
     if (ok) {
       cs_ipvec (S->pinv, b, x, m) ;   /* x(0:m-1) = b(p(0:m-1) */
       for (k = 0 ; k < n ; k++)       /* apply Householder refl. to x */
@@ -1336,11 +1336,11 @@ int cs_qrsol(int order, const cs *A, double *b) {
     }
   } else {
     AT = cs_calloc(1, sizeof (cs));
-    cs_transpose (A, AT, 1) ;          /* Ax=b is underdetermined */
-    S = cs_sqr (order, AT, 1) ;         /* ordering and symbolic analysis */
+    cs_transpose(A, AT, 1) ;          /* Ax=b is underdetermined */
+    int flag = cs_sqr(S, order, AT, 1) ;         /* ordering and symbolic analysis */
     cs_qr(N, AT, S) ;                 /* numeric QR factorization of A' */
     x = cs_calloc (S ? S->m2 : 1, sizeof (double)) ;    /* get workspace */
-    ok = (AT && S && N && x) ;
+    ok = (!flag && AT && N) ;
     if (ok) {
       cs_pvec (S->q, b, x, m) ;       /* x(q(0:m-1)) = b(0:m-1) */
       cs_utsolve (N->U, x) ;          /* x = R'\x */
@@ -1353,9 +1353,9 @@ int cs_qrsol(int order, const cs *A, double *b) {
   }
   cs_free (x) ;
   cs_sfree (S) ;
-  cs_nfree (N) ;
-  cs_spfree (AT) ;
-  return (ok) ;
+  cs_nfree(N) ;
+  cs_spfree(AT) ;
+  return ok;
 }
 
 /* return a random permutation vector, the identity perm, or p = n-1:-1:0.
@@ -1554,16 +1554,11 @@ static int cs_vcount (const cs *A, css *S) {
 }
 
 /* symbolic ordering and analysis for QR or LU */
-css *cs_sqr(int order, const cs *A, int qr) {
+int cs_sqr(css *S, int order, const cs *A, int qr) {
   int n, k, ok = 1, *post ;
-  css *S ;
   n = A->n ;
-  S = cs_calloc (1, sizeof (css)) ;       /* allocate result S */
   S->q = cs_amd (order, A) ;              /* fill-reducing ordering */
-  if (order && !S->q) {
-    cs_sfree(S);
-    return NULL;
-  }
+  if (order && !S->q) return 1;
   /* QR symbolic analysis */
   if (qr) {
     cs *C;
@@ -1584,12 +1579,7 @@ css *cs_sqr(int order, const cs *A, int qr) {
     S->unz = 4*(A->p [n]) + n ;         /* for LU factorization only, */
     S->lnz = S->unz ;                   /* guess nnz(L) and nnz(U) */
   }
-  if (ok) {
-    return S;
-  } else {
-    cs_sfree(S);
-    return NULL;
-  }
+  return ok ? 0 : 1;
 }
 
 /* C = A(p,p) where A and C are symmetric the upper part stored; pinv not p */

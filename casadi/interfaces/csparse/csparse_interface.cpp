@@ -103,7 +103,9 @@ namespace casadi {
       // ordering and symbolic analysis
       int order = 0; // ordering?
       if (m.S) cs_sfree(m.S);
-      m.S = cs_sqr(order, &m.A, 0) ;
+      m.S = static_cast<css*>(cs_calloc(1, sizeof(css)));
+      int flag = cs_sqr(m.S, order, &m.A, 0) ;
+      casadi_assert(flag==0);
     }
 
     m.called_once_ = true;
