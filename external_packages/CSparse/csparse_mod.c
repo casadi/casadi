@@ -8,20 +8,20 @@
 #define CS_MARK(w,j) { w [j] = CS_FLIP (w [j]) ; }
 
 /* C = alpha*A + beta*B */
-void cs_add(cs *C, const cs *A, const cs *B, double alpha, double beta) {
+void cs_add(cs *C, double* Cx, const cs *A, double* Ax, const cs *B, double* Bx, double alpha, double beta) {
   int p, j, nz = 0, anz, *Cp, *Ci, *Bp, m, n, bnz, *w, values ;
-  double *x, *Bx, *Cx ;
+  double *x;
   m = A->m;
   anz = A->p[A->n] ;
   n = B->n;
   Bp = B->p;
-  Bx = B->x;
   bnz = Bp[n] ;
-  w = cs_calloc (m, sizeof (int)) ;                       /* get workspace */
-  values = (A->x != NULL) && (Bx != NULL) ;
-  x = values ? cs_malloc (m, sizeof (double)) : NULL ;    /* get workspace */
+  w = cs_calloc (m, sizeof (int));
+  values = (Ax != NULL) && (Bx != NULL) ;
+  x = values ? cs_malloc (m, sizeof (double)) : NULL;
   cs_spalloc(C, m, n, anz + bnz, values);
-  Cp = C->p ; Ci = C->i ; Cx = C->x ;
+  Cp = C->p;
+  Ci = C->i;
   for (j = 0 ; j < n ; j++) {
     Cp [j] = nz ;                   /* column j of C starts here */
     nz = cs_scatter (A, j, alpha, w, x, j+1, C, nz) ;   /* alpha*A(:,j)*/
@@ -64,7 +64,7 @@ int *cs_amd (int order, const cs *A) {
   dense = CS_MIN (n-2, dense) ;
   C = cs_calloc(1, sizeof (cs));
   if (order == 1 && n == m) {
-    cs_add (C, A, AT, 0, 0);          /* C = A+A' */
+    cs_add(C, C->x, A, A->x, AT, AT->x, 0, 0);          /* C = A+A' */
   } else if (order == 2) {
     ATp = AT->p ;                       /* drop dense columns from AT */
     ATi = AT->i ;
