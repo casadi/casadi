@@ -17,9 +17,9 @@ static int* cs_row(const cs *A) { return cs_colind(A)+cs_ncol(A)+1;}
 void cs_add(cs *C, double* Cx, const cs *A, double* Ax, const cs *B, double* Bx, double alpha, double beta) {
   int p, j, nz = 0, anz, *Cp, *Ci, *Bp, m, n, bnz, *w, values ;
   double *x;
-  m = A->sp[0];
+  m = cs_nrow(A);
   anz = cs_colind(A)[cs_nrow(A)];
-  n = B->sp[1];
+  n = cs_ncol(B);
   Bp = cs_colind(B);
   bnz = Bp[n] ;
   w = cs_calloc (m, sizeof (int));
@@ -65,7 +65,7 @@ int *cs_amd (int order, const cs *A) {
   /* --- Construct matrix C ----------------------------------------------- */
   AT = cs_calloc(1, sizeof (cs));
   cs_transpose (A, AT, 0) ;              /* compute A' */
-  m = A->sp[0] ; n = A->sp[1] ;
+  m = cs_nrow(A) ; n = cs_ncol(A) ;
   dense = CS_MAX (16, 10 * sqrt ((double) n)) ;   /* find dense threshold */
   dense = CS_MIN (n-2, dense) ;
   C = cs_calloc(1, sizeof (cs));
@@ -384,7 +384,7 @@ int cs_chol(csn *N, const cs *A, const css *S) {
   double d, lki, *Lx, *x, *Cx ;
   int top, i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci ;
   cs *L, *C, *E ;
-  n = A->sp[1];
+  n = cs_ncol(A);
   c = cs_malloc (2*n, sizeof (int)) ;     /* get int workspace */
   x = cs_malloc (n, sizeof (double)) ;    /* get double workspace */
   cp = S->cp ; pinv = S->pinv ; parent = S->parent ;
@@ -454,7 +454,7 @@ int cs_cholsol (int order, const cs *A, double *b) {
   css *S ;
   csn *N ;
   int n, ok, flag;
-  n = A->sp[1] ;
+  n = cs_ncol(A) ;
   S = cs_calloc (1, sizeof (css));
   cs_schol(S, order, A); /* ordering and symbolic analysis */
   N = cs_calloc(1, sizeof (csn));
@@ -477,7 +477,7 @@ int cs_cholsol (int order, const cs *A, double *b) {
 #define HEAD(k,j) (ata ? head [k] : j)
 #define NEXT(J)   (ata ? next [J] : -1)
 static void init_ata (cs *AT, const int *post, int *w, int **head, int **next) {
-  int i, k, p, m = AT->sp[1], n = AT->sp[0], *ATp = cs_colind(AT), *ATi = cs_row(AT);
+  int i, k, p, m = cs_ncol(AT), n = cs_nrow(AT), *ATp = cs_colind(AT), *ATi = cs_row(AT);
   *head = w+4*n, *next = w+5*n+1 ;
   for (k = 0 ; k < n ; k++) w [post [k]] = k ;    /* invert post */
   for (i = 0 ; i < m ; i++) {
@@ -491,7 +491,7 @@ int *cs_counts (const cs *A, const int *parent, const int *post, int ata) {
   int i, j, k, n, m, J, s, p, q, jleaf, *ATp, *ATi, *maxfirst, *prevleaf,
     *ancestor, *head = NULL, *next = NULL, *colcount, *w, *first, *delta ;
   cs *AT ;
-  m = A->sp[0] ; n = A->sp[1] ;
+  m = cs_nrow(A) ; n = cs_ncol(A) ;
   s = 4*n + (ata ? (n+m+1) : 0) ;
   delta = colcount = cs_malloc (n, sizeof (int)) ;    /* allocate result */
   w = cs_malloc (s, sizeof (int)) ;                   /* get workspace */
@@ -652,7 +652,7 @@ void cs_dmperm (csd *D, const cs *A, int seed) {
   cs *C ;
   csd *scc ;
   /* --- Maximum matching ------------------------------------------------- */
-  m = A->sp[0] ; n = A->sp[1] ;
+  m = cs_nrow(A) ; n = cs_ncol(A) ;
   cs_dalloc(D, m, n) ;                      /* allocate result */
   p = D->p ; q = D->q ; r = D->r ; s = D->s ; cc = D->cc ; rr = D->rr ;
   jmatch = cs_maxtrans (A, seed) ;            /* max transversal */
@@ -769,7 +769,7 @@ int cs_dupl (cs *A) {
 /* find nonzero pattern of Cholesky L(k,1:k-1) using etree and triu(A(:,k)) */
 int cs_ereach(const cs *A, int k, const int *parent, int *s, int *w) {
   int i, p, n, len, top, *Ap, *Ai ;
-  top = n = A->sp[1];
+  top = n = cs_ncol(A);
   Ap = cs_colind(A);
   Ai = cs_row(A);
   CS_MARK (w, k) ;                /* mark node k as visited */
@@ -791,8 +791,8 @@ int cs_ereach(const cs *A, int k, const int *parent, int *s, int *w) {
 /* compute the etree of A (using triu(A), or A'A without forming A'A */
 int *cs_etree (const cs *A, int ata) {
   int i, k, p, m, n, inext, *Ap, *Ai, *w, *parent, *ancestor, *prev ;
-  m = A->sp[0];
-  n = A->sp[1];
+  m = cs_nrow(A);
+  n = cs_ncol(A);
   Ap = cs_colind(A);
   Ai = cs_row(A);
   parent = cs_malloc (n, sizeof (int)) ;              /* allocate result */
@@ -960,7 +960,7 @@ int cs_ltsolve (const cs *L, double *x) {
 int cs_lu(csn *N, const cs *A, const css *S, double tol) {
   double pivot, *Lx, *Ux, *x,  a, t ;
   int *Lp, *Li, *Up, *Ui, *pinv, *xi, *q, n, ipiv, k, top, p, i, col, lnz,unz;
-  n = A->sp[1] ;
+  n = cs_ncol(A) ;
   q = S->q ; lnz = S->lnz ; unz = S->unz ;
   x = cs_malloc (n, sizeof (double)) ;            /* get double workspace */
   xi = cs_malloc (2*n, sizeof (int)) ;            /* get int workspace */
@@ -1052,7 +1052,7 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
 int cs_lusol (int order, const cs *A, double *b, double tol) {
   csn *N = cs_calloc(1, sizeof (csn));
   css *S = cs_calloc(1, sizeof(css));
-  int n = A->sp[1], ok = 0;
+  int n = cs_ncol(A), ok = 0;
   double *x = cs_malloc (n, sizeof (double));
   /* ordering and symbolic analysis */
   if (!cs_sqr(S, order, A, 0)) {
@@ -1230,7 +1230,7 @@ void cs_multiply (cs *C, const cs *A, const cs *B) {
 double cs_norm (const cs *A) {
   int p, j, n, *Ap ;
   double *Ax,  norm = 0, s ;
-  n = A->sp[1];
+  n = cs_ncol(A);
   Ap = cs_colind(A);
   Ax = A->x ;
   for (j = 0 ; j < n ; j++) {
@@ -1244,8 +1244,8 @@ double cs_norm (const cs *A) {
 void cs_permute (cs *C, const cs *A, const int *pinv, const int *q, int values) {
   int t, j, k, nz = 0, m, n, *Ap, *Ai, *Cp, *Ci ;
   double *Cx, *Ax ;
-  m = A->sp[0];
-  n = A->sp[1];
+  m = cs_nrow(A);
+  n = cs_ncol(A);
   Ap = cs_colind(A);
   Ai = cs_row(A);
   Ax = A->x;
@@ -1390,8 +1390,8 @@ int cs_qrsol(int order, const cs *A, double *b) {
   csn *N = cs_calloc (1, sizeof (csn));
   cs *AT = NULL ;
   int k, m, n, ok ;
-  n = A->sp[1] ;
-  m = A->sp[0] ;
+  n = cs_ncol(A) ;
+  m = cs_nrow(A) ;
   if (m >= n) {
     int flag = cs_sqr(S, order, A, 1) ;          /* ordering and symbolic analysis */
     cs_qr(N, A, S) ;                  /* numeric QR factorization */
@@ -1453,7 +1453,7 @@ int *cs_randperm (int n, int seed) {
  * xi [n...2n-1] used as workspace */
 int cs_reach (cs *G, const cs *B, int k, int *xi, const int *pinv) {
   int p, n, top, *Bp, *Bi, *Gp ;
-  n = G->sp[1];
+  n = cs_ncol(G);
   Bp = cs_colind(B);
   Bi = cs_row(B);
   Gp = cs_colind(G);
@@ -1494,7 +1494,7 @@ void cs_scc(csd *D, cs *A) {
   /* matrix A temporarily modified, then restored */
   int n, i, k, b, nb = 0, top, *xi, *pstack, *p, *r, *Ap, *ATp, *rcopy, *Blk ;
   cs *AT ;
-  n = A->sp[1];
+  n = cs_ncol(A);
   Ap = cs_colind(A);
   cs_dalloc(D, n, 0) ;                          /* allocate result */
   AT = cs_calloc(1, sizeof (cs));
@@ -1537,7 +1537,7 @@ void cs_scc(csd *D, cs *A) {
 int cs_schol (css *S, int order, const cs *A) {
   int n, *c, *post, *P ;
   cs *C ;
-  n = A->sp[1] ;
+  n = cs_ncol(A) ;
   P = cs_amd (order, A) ;                 /* P = amd(A+A'), or natural */
   S->pinv = cs_pinv (P, n) ;              /* find inverse permutation */
   cs_free (P) ;
@@ -1640,7 +1640,7 @@ static int cs_vcount (const cs *A, css *S) {
 /* symbolic ordering and analysis for QR or LU */
 int cs_sqr(css *S, int order, const cs *A, int qr) {
   int n, k, ok = 1, *post ;
-  n = A->sp[1] ;
+  n = cs_ncol(A) ;
   S->q = cs_amd (order, A) ;              /* fill-reducing ordering */
   if (order && !S->q) return 1;
   /* QR symbolic analysis */
@@ -1660,7 +1660,7 @@ int cs_sqr(css *S, int order, const cs *A, int qr) {
     if (ok) for (S->unz = 0, k = 0 ; k < n ; k++) S->unz += S->cp [k] ;
     if (order) cs_spfree (C) ;
   } else {
-    S->unz = 4*(A->sp[2 + n]) + n ;         /* for LU factorization only, */
+    S->unz = 4*(cs_colind(A)[n]) + n ;         /* for LU factorization only, */
     S->lnz = S->unz ;                   /* guess nnz(L) and nnz(U) */
   }
   return ok ? 0 : 1;
