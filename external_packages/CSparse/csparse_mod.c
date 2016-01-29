@@ -90,6 +90,7 @@ int *cs_amd (int order, const cs *A) {
   W = cs_malloc (8*(n+1), sizeof (int)) ; /* get workspace */
   t = cnz + cnz/5 + 2*n ;                 /* add elbow room to C */
   cs_sprealloc (C, t);
+  Cp = C->sp + 2;
   len  = W           ; nv     = W +   (n+1) ; next   = W + 2*(n+1) ;
   head = W + 3*(n+1) ; elen   = W + 4*(n+1) ; degree = W + 5*(n+1) ;
   w    = W + 6*(n+1) ; hhead  = W + 7*(n+1) ;
@@ -975,8 +976,10 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
     Up [k] = unz ;              /* U(:,k) starts here */
     if (lnz + n > N->L->nzmax) {
       cs_sprealloc(N->L, 2*N->L->nzmax + n);
+      Lp = N->L->sp + 2;
     } else if (unz + n > N->U->nzmax) {
       cs_sprealloc(N->U, 2*N->U->nzmax + n);
+      Up = N->U->sp + 2 ;
     }
     Li = N->L->i;
     Lx = N->L->x;
@@ -1201,6 +1204,7 @@ void cs_multiply (cs *C, const cs *A, const cs *B) {
     if (nz + m > C->nzmax) {
       cs_sprealloc (C, 2*(C->nzmax)+m);
     }
+    Cp = C->sp + 2;
     Ci = C->i ; Cx = C->x ;         /* C->i and C->x may be reallocated */
     Cp [j] = nz ;                   /* column j of C starts here */
     for (p = Bp [j] ; p < Bp [j+1] ; p++) {
@@ -1793,18 +1797,20 @@ int cs_usolve (const cs *U, double *x) {
 
 /* allocate a sparse matrix */
 void cs_spalloc(cs *A, int m, int n, int nzmax, int values) {
-  A->sp = cs_malloc(2 + (n+1), sizeof (int));
+  A->nzmax = nzmax = CS_MAX (nzmax, 1) ;
+  A->sp = cs_malloc(2 + (n+1) + nzmax, sizeof (int));
   A->sp[0] = m;
   A->sp[1] = n;
-  A->nzmax = nzmax = CS_MAX (nzmax, 1) ;
-  A->i = cs_malloc(nzmax, sizeof (int)) ;
+  A->i = A->sp + 2 + (n+1);
   A->x = values ? cs_malloc (nzmax, sizeof (double)) : NULL ;
 }
 
 /* change the max # of entries sparse matrix */
 void cs_sprealloc (cs *A, int nzmax) {
-  if (nzmax <= 0) nzmax = A->sp[2 + A->sp[1]];
-  A->i = cs_realloc(A->i, nzmax, sizeof (int));
+  int n = A->sp[1];
+  if (nzmax <= 0) nzmax = A->sp[2 + n];
+  A->sp = cs_realloc(A->sp, 2 + (n+1) + nzmax, sizeof (int));
+  A->i = A->sp + 2 + (n+1);
   if (A->x) A->x = cs_realloc (A->x, nzmax, sizeof (double));
   A->nzmax = nzmax ;
 }
@@ -1813,7 +1819,6 @@ void cs_sprealloc (cs *A, int nzmax) {
 void cs_spfree(cs *A) {
   if (!A) return;
   cs_free(A->sp);
-  cs_free(A->i);
   cs_free(A->x);
   cs_free(A);
 }
