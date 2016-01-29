@@ -69,7 +69,6 @@ namespace casadi {
       m->S = 0;
       m->A.nzmax = nnz_in(0);  // maximum number of entries
       m->A.sp = const_cast<int*>(static_cast<const int*>(sparsity_in(0)));
-      m->A.i = const_cast<int*>(sparsity_in(0).row()); // row indices, size nzmax
       m->A.x = 0; // numerical values, size nzmax
 
       // Temporary

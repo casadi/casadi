@@ -13,7 +13,6 @@ extern "C" {
 typedef struct cs_sparse {
   int nzmax;     /* maximum number of entries */
   int *sp;
-  int *i ;        /* row indices, size nzmax */
   double *x ;     /* numerical values, size nzmax */
 } cs ;
 
