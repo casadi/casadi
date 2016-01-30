@@ -1800,10 +1800,10 @@ void cs_usolve (const cs *U, const double *Ux, double *x) {
 
 /* allocate a sparse matrix */
 void cs_spalloc(cs *A, int m, int n, int nzmax) {
-  A->nzmax = nzmax = CS_MAX (nzmax, 1) ;
   A->sp = cs_malloc(2 + (n+1) + nzmax, sizeof (int));
   A->sp[0] = m;
   A->sp[1] = n;
+  A->nzmax = nzmax;
 }
 
 /* change the max # of entries sparse matrix */
