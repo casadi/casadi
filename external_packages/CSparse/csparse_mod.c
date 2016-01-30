@@ -35,8 +35,9 @@ void cs_add(cs *C, double* Cx, const cs *A, double* Ax, const cs *B, double* Bx,
     nz = cs_scatter(B, A->x, j, beta, w, x, j+1, C, nz) ;    /* beta*B(:,j) */
     if (values) for (p = Cp[j] ; p < nz ; p++) Cx [p] = x [Ci [p]] ;
   }
-  Cp [n] = nz ;                       /* finalize the last column of C */
+  Cp[n] = nz ;                       /* finalize the last column of C */
   cs_sprealloc (C, 0) ;               /* remove extra space from C */
+  if (C->x) C->x = cs_realloc(C->x, C->nzmax, sizeof (double));
   cs_free (w) ;                       /* free workspace */
   cs_free (x) ;
 }
@@ -97,6 +98,7 @@ int *cs_amd (int order, const cs *A) {
   W = cs_malloc (8*(n+1), sizeof (int)) ; /* get workspace */
   t = cnz + cnz/5 + 2*n ;                 /* add elbow room to C */
   cs_sprealloc (C, t);
+  if (C->x) C->x = cs_realloc(C->x, C->nzmax, sizeof (double));
   Cp = cs_colind(C);
   len  = W           ; nv     = W +   (n+1) ; next   = W + 2*(n+1) ;
   head = W + 3*(n+1) ; elen   = W + 4*(n+1) ; degree = W + 5*(n+1) ;
@@ -765,6 +767,7 @@ int cs_dupl (cs *A) {
   Ap [n] = nz ;                               /* finalize A */
   cs_free (w) ;                               /* free workspace */
   cs_sprealloc(A, 0);              /* remove extra space from A */
+  if (A->x) A->x = cs_realloc(A->x, A->nzmax, sizeof (double));
   return 1;
 }
 
@@ -839,7 +842,8 @@ int cs_fkeep (cs *A, int (*fkeep) (int, int, double, void *), void *other) {
   }
   Ap [n] = nz ;                           /* finalize A */
   cs_sprealloc (A, 0) ;                   /* remove extra space from A */
-  return (nz) ;
+  if (A->x) A->x = cs_realloc(A->x, A->nzmax, sizeof (double));
+  return nz;
 }
 
 /* y = A*x+y */
@@ -977,9 +981,11 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
     Up [k] = unz ;              /* U(:,k) starts here */
     if (lnz + n > N->L->nzmax) {
       cs_sprealloc(N->L, 2*N->L->nzmax + n);
+      N->L->x = cs_realloc(N->L->x, N->L->nzmax, sizeof(double));
       Lp = cs_colind(N->L);
     } else if (unz + n > N->U->nzmax) {
       cs_sprealloc(N->U, 2*N->U->nzmax + n);
+      N->U->x = cs_realloc(N->U->x, N->U->nzmax, sizeof(double));
       Up = cs_colind(N->U);
     }
     Li = cs_row(N->L);
@@ -1037,7 +1043,9 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
   Li = cs_row(N->L);                     /* fix row indices of L for final pinv */
   for (p = 0 ; p < lnz ; p++) Li [p] = pinv [Li [p]] ;
   cs_sprealloc(N->L, 0) ;           /* remove extra space from L and U */
+  N->L->x = cs_realloc(N->L->x, N->L->nzmax, sizeof (double));
   cs_sprealloc(N->U, 0) ;
+  N->L->x = cs_realloc(N->L->x, N->L->nzmax, sizeof (double));
   cs_free(xi) ;                       /* free workspace */
   cs_free(x) ;
   return 0;
@@ -1205,6 +1213,7 @@ void cs_multiply (cs *C, const cs *A, const cs *B) {
   for (j = 0 ; j < n ; j++) {
     if (nz + m > C->nzmax) {
       cs_sprealloc(C, 2*(C->nzmax)+m);
+      if (C->x) C->x = cs_realloc(C->x, C->nzmax, sizeof (double));
     }
     /* C->sp and C->x may be reallocated */
     Cp = cs_colind(C);
@@ -1218,6 +1227,7 @@ void cs_multiply (cs *C, const cs *A, const cs *B) {
   }
   Cp [n] = nz ;                       /* finalize the last column of C */
   cs_sprealloc (C, 0) ;               /* remove extra space from C */
+  if (C->x) C->x = cs_realloc(C->x, C->nzmax, sizeof (double));
   cs_free(w);
   cs_free(x);
 }
@@ -1811,7 +1821,6 @@ void cs_sprealloc (cs *A, int nzmax) {
   int n = cs_ncol(A);
   if (nzmax <= 0) nzmax = cs_colind(A)[n];
   A->sp = cs_realloc(A->sp, 2 + (n+1) + nzmax, sizeof (int));
-  if (A->x) A->x = cs_realloc (A->x, nzmax, sizeof (double));
   A->nzmax = nzmax ;
 }
 
