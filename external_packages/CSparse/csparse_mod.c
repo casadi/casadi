@@ -935,7 +935,7 @@ void cs_ltsolve (const cs *L, const double *Lx, double *x) {
 }
 
 /* [L,U,pinv]=lu(A, [q lnz unz]). lnz and unz can be guess */
-int cs_lu(csn *N, const cs *A, const css *S, double tol) {
+int cs_lu(csn *N, const cs *A, const double* Ax, const css *S, double tol) {
   double pivot, *Lx, *Ux, *x,  a, t ;
   int *Lp, *Li, *Up, *Ui, *pinv, *xi, *q, n, ipiv, k, top, p, i, col, lnz,unz;
   n = cs_ncol(A) ;
@@ -974,7 +974,7 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
     Ui = cs_row(N->U);
     Ux = N->U->x;
     col = q ? (q [k]) : k;
-    top = cs_spsolve(N->L, N->L->x, A, A->x, col, xi, x, pinv, 1);  /* x = L\A(:,col) */
+    top = cs_spsolve(N->L, N->L->x, A, Ax, col, xi, x, pinv, 1);  /* x = L\A(:,col) */
     /* --- Find pivot --------------------------------------------------- */
     ipiv = -1 ;
     a = -1 ;
@@ -1043,7 +1043,7 @@ int cs_lusol(int order, const cs *A, double *b, double tol) {
   /* ordering and symbolic analysis */
   if (!cs_sqr(S, order, A, 0)) {
     /* numeric LU factorization */
-    if (!cs_lu(N, A, S, tol)) {
+    if (!cs_lu(N, A, A->x, S, tol)) {
       cs_ipvec (N->pinv, b, x, n) ;       /* x = b(p) */
       cs_lsolve(N->L, N->L->x, x) ;               /* x = L\x */
       cs_usolve(N->U, N->U->x, x) ;               /* x = U\x */

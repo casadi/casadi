@@ -122,7 +122,7 @@ namespace casadi {
     if (m.N) cs_nfree(m.N);
     m.N = static_cast<csn*>(cs_calloc(1, sizeof(csn)));
     double tol = 1e-8;
-    if (cs_lu(m.N, &m.A, m.S, tol)) {
+    if (cs_lu(m.N, &m.A, m.A.x, m.S, tol)) {
       DM temp(sparsity_, vector<double>(A, A+sparsity_.nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
