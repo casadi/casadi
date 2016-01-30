@@ -18,7 +18,6 @@ typedef struct cs_sparse {
 
 void cs_add(cs *C, const cs *A, const cs *B) ;
 int cs_cholsol (int order, const cs *A, double *b) ;
-int cs_dupl (cs *A) ;
 int cs_gaxpy (const cs *A, const double *Ax, const double *x, double *y) ;
 int cs_lusol (int order, const cs *A, double *b, double tol) ;
 void cs_multiply (cs *C, const cs *A, const cs *B) ;

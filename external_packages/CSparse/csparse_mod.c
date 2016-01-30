@@ -732,38 +732,6 @@ int cs_dropzeros (cs *A) {
   return (cs_fkeep (A, &cs_nonzero, NULL)) ;  /* keep all nonzero entries */
 } 
 
-/* remove duplicate entries from A */
-int cs_dupl (cs *A) {
-  int i, j, p, q, nz = 0, n, m, *Ap, *Ai, *w ;
-  double *Ax ;
-  m = cs_nrow(A);
-  n = cs_ncol(A);
-  Ap = cs_colind(A);
-  Ai = cs_row(A);
-  Ax = A->x;
-  w = cs_malloc (m, sizeof (int)) ;           /* get workspace */
-  for (i = 0 ; i < m ; i++) w [i] = -1 ;      /* row i not yet seen */
-  for (j = 0 ; j < n ; j++) {
-    q = nz ;                                /* column j will start at q */
-    for (p = Ap [j] ; p < Ap [j+1] ; p++) {
-      i = Ai [p] ;                        /* A(i,j) is nonzero */
-      if (w [i] >= q) {
-        Ax [w [i]] += Ax [p] ;          /* A(i,j) is a duplicate */
-      } else {
-        w [i] = nz ;                    /* record where row i occurs */
-        Ai [nz] = i ;                   /* keep A(i,j) */
-        Ax [nz++] = Ax [p] ;
-      }
-    }
-    Ap [j] = q ;                            /* record start of column j */
-  }
-  Ap [n] = nz ;                               /* finalize A */
-  cs_free (w) ;                               /* free workspace */
-  cs_sprealloc(A, 0);              /* remove extra space from A */
-  if (A->x) A->x = cs_realloc(A->x, A->nzmax, sizeof (double));
-  return 1;
-}
-
 /* find nonzero pattern of Cholesky L(k,1:k-1) using etree and triu(A(:,k)) */
 int cs_ereach(const cs *A, int k, const int *parent, int *s, int *w) {
   int i, p, n, len, top, *Ap, *Ai ;
@@ -1860,7 +1828,6 @@ void cs_utsolve (const cs *U, const double *Ux, double *x) {
   n = cs_ncol(U);
   Up = cs_colind(U);
   Ui = cs_row(U);
-  Ux = U->x;
   for (j = 0 ; j < n ; j++) {
     for (p = Up [j] ; p < Up [j+1]-1 ; p++) {
       x[j] -= Ux[p] * x[Ui[p]] ;
