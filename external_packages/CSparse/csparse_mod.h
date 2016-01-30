@@ -16,7 +16,7 @@ typedef struct cs_sparse {
   double *x ;     /* numerical values, size nzmax */
 } cs ;
 
-void cs_add (cs *C, double* Cx, const cs *A, double* Ax, const cs *B, double* Bx, double alpha, double beta) ;
+void cs_add(cs *C, const cs *A, const cs *B) ;
 int cs_cholsol (int order, const cs *A, double *b) ;
 int cs_dupl (cs *A) ;
 int cs_gaxpy (const cs *A, const double *Ax, const double *x, double *y) ;

@@ -13,33 +13,26 @@ static int cs_ncol(const cs *A) { return A->sp[1];}
 static int* cs_colind(const cs *A) { return A->sp+2;}
 static int* cs_row(const cs *A) { return cs_colind(A)+cs_ncol(A)+1;}
 
-/* C = alpha*A + beta*B */
-void cs_add(cs *C, double* Cx, const cs *A, double* Ax, const cs *B, double* Bx, double alpha, double beta) {
-  int p, j, nz = 0, anz, *Cp, *Ci, *Bp, m, n, bnz, *w, values ;
-  double *x;
+/* C = A + B */
+void cs_add(cs *C, const cs *A, const cs *B) {
+  int p, j, nz = 0, anz, *Cp, *Ci, *Bp, m, n, bnz, *w;
   m = cs_nrow(A);
   anz = cs_colind(A)[cs_nrow(A)];
   n = cs_ncol(B);
   Bp = cs_colind(B);
   bnz = Bp[n] ;
   w = cs_calloc (m, sizeof (int));
-  values = (Ax != NULL) && (Bx != NULL) ;
-  x = values ? cs_malloc (m, sizeof(double)) : NULL;
   cs_spalloc(C, m, n, anz + bnz);
-  C->x = values ? cs_malloc(anz + bnz, sizeof(double)) : NULL;
   Cp = cs_colind(C);
   Ci = cs_row(C);
   for (j = 0 ; j < n ; j++) {
     Cp [j] = nz ;                   /* column j of C starts here */
-    nz = cs_scatter(A, A->x, j, alpha, w, x, j+1, C, nz) ;   /* alpha*A(:,j)*/
-    nz = cs_scatter(B, A->x, j, beta, w, x, j+1, C, nz) ;    /* beta*B(:,j) */
-    if (values) for (p = Cp[j] ; p < nz ; p++) Cx [p] = x [Ci [p]] ;
+    nz = cs_scatter(A, 0, j, 0., w, NULL, j+1, C, nz) ;   /* alpha*A(:,j)*/
+    nz = cs_scatter(B, 0, j, 0., w, NULL, j+1, C, nz) ;    /* beta*B(:,j) */
   }
   Cp[n] = nz ;                       /* finalize the last column of C */
-  cs_sprealloc (C, 0) ;               /* remove extra space from C */
-  if (C->x) C->x = cs_realloc(C->x, C->nzmax, sizeof (double));
+  cs_sprealloc(C, 0) ;               /* remove extra space from C */
   cs_free (w) ;                       /* free workspace */
-  cs_free (x) ;
 }
 
 /* clear w */
@@ -66,13 +59,14 @@ int *cs_amd (int order, const cs *A) {
   int h ;
   /* --- Construct matrix C ----------------------------------------------- */
   AT = cs_calloc(1, sizeof (cs));
-  cs_transpose (A, AT, 0) ;              /* compute A' */
+  cs_transpose(A, AT, 0) ;              /* compute A' */
   m = cs_nrow(A) ; n = cs_ncol(A) ;
   dense = CS_MAX (16, 10 * sqrt ((double) n)) ;   /* find dense threshold */
   dense = CS_MIN (n-2, dense) ;
   C = cs_calloc(1, sizeof (cs));
+  C->x = 0;
   if (order == 1 && n == m) {
-    cs_add(C, C->x, A, A->x, AT, AT->x, 0, 0);          /* C = A+A' */
+    cs_add(C, A, AT);          /* C = A+A' */
   } else if (order == 2) {
     ATp = cs_colind(AT); /* drop dense columns from AT */
     ATi = cs_row(AT);
@@ -98,7 +92,6 @@ int *cs_amd (int order, const cs *A) {
   W = cs_malloc (8*(n+1), sizeof (int)) ; /* get workspace */
   t = cnz + cnz/5 + 2*n ;                 /* add elbow room to C */
   cs_sprealloc (C, t);
-  if (C->x) C->x = cs_realloc(C->x, C->nzmax, sizeof (double));
   Cp = cs_colind(C);
   len  = W           ; nv     = W +   (n+1) ; next   = W + 2*(n+1) ;
   head = W + 3*(n+1) ; elen   = W + 4*(n+1) ; degree = W + 5*(n+1) ;
