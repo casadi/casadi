@@ -385,14 +385,15 @@ int *cs_amd (int order, const cs *A) {
 int cs_chol(csn *N, const cs *A, const css *S) {
   double d, lki, *Lx, *x, *Cx ;
   int top, i, p, k, n, *Li, *Lp, *cp, *pinv, *s, *c, *parent, *Cp, *Ci ;
-  cs *L, *C, *E ;
+  cs *L, *C, *E;
   n = cs_ncol(A);
   c = cs_malloc (2*n, sizeof (int)) ;     /* get int workspace */
   x = cs_malloc (n, sizeof (double)) ;    /* get double workspace */
   cp = S->cp ; pinv = S->pinv ; parent = S->parent ;
   if (pinv) {
     C = cs_calloc(1, sizeof (cs));
-    cs_symperm (C, A, pinv, 1);
+    C->x = cs_malloc(cs_colind(A)[n], sizeof(double));
+    cs_symperm (C, A, pinv);
   } else {
     C = (cs *) A;
   }
@@ -1531,7 +1532,8 @@ int cs_schol (css *S, int order, const cs *A) {
   cs_free (P) ;
   if (order && !S->pinv) return 1;
   C = cs_calloc(1, sizeof (cs));
-  cs_symperm(C, A, S->pinv, 0) ;        /* C = spones(triu(A(P,P))) */
+  C->x = NULL;
+  cs_symperm(C, A, S->pinv);        /* C = spones(triu(A(P,P))) */
   S->parent = cs_etree (C, 0) ;           /* find etree of C */
   post = cs_post (S->parent, n) ;         /* postorder the etree */
   c = cs_counts (C, S->parent, post, 0) ; /* find column counts of chol(C) */
@@ -1627,8 +1629,10 @@ static int cs_vcount (const cs *A, css *S) {
 int cs_sqr(css *S, int order, const cs *A, int qr) {
   int n, k, ok = 1, *post ;
   n = cs_ncol(A) ;
-  S->q = cs_amd (order, A) ;              /* fill-reducing ordering */
+  /* fill-reducing ordering */
+  S->q = cs_amd (order, A);
   if (order && !S->q) return 1;
+
   /* QR symbolic analysis */
   if (qr) {
     cs *C;
@@ -1656,15 +1660,14 @@ int cs_sqr(css *S, int order, const cs *A, int qr) {
 }
 
 /* C = A(p,p) where A and C are symmetric the upper part stored; pinv not p */
-void cs_symperm (cs *C, const cs *A, const int *pinv, int values) {
+void cs_symperm(cs *C, const cs *A, const int *pinv) {
   int i, j, p, q, i2, j2, n, *Ap, *Ai, *Cp, *Ci, *w ;
   double *Cx, *Ax ;
   n = cs_ncol(A);
   Ap = cs_colind(A);
   Ai = cs_row(A);
   Ax = A->x;
-  cs_spalloc (C, n, n, Ap[n]) ; /* alloc result*/
-  C->x = values && (Ax != NULL) ? cs_malloc(Ap[n], sizeof(double)) : NULL;
+  cs_spalloc(C, n, n, Ap[n]) ; /* alloc result*/
   w = cs_calloc (n, sizeof (int)) ;                   /* get workspace */
   Cp = cs_colind(C);
   Ci = cs_row(C);
