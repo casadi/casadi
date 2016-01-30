@@ -22,7 +22,7 @@ int cs_dupl (cs *A) ;
 int cs_gaxpy (const cs *A, const double *Ax, const double *x, double *y) ;
 int cs_lusol (int order, const cs *A, double *b, double tol) ;
 void cs_multiply (cs *C, const cs *A, const cs *B) ;
-double cs_norm (const cs *A) ;
+double cs_norm (const cs *A, const double *Ax) ;
 int cs_qrsol (int order, const cs *A, double *b) ;
 void cs_transpose (const cs *A, cs *C, int values) ;
 /* utilities */
@@ -105,8 +105,8 @@ int *cs_maxtrans (const cs *A, int seed) ;
 int *cs_post (const int *parent, int n) ;
 int *cs_randperm (int n, int seed) ;
 int cs_reach (cs *G, const cs *B, int k, int *xi, const int *pinv) ;
-int cs_scatter (const cs *A, int j, double beta, int *w, double *x, int mark,
-    cs *C, int nz) ;
+int cs_scatter(const cs *A, const double *Ax, int j, double beta, int *w,
+               double *x, int mark, cs *C, int nz);
 void cs_scc (csd *D, cs *A) ;
 int cs_spsolve (cs *G, const cs *B, int k, int *xi, double *x,
     const int *pinv, int lo) ;

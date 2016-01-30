@@ -30,9 +30,9 @@ void cs_add(cs *C, double* Cx, const cs *A, double* Ax, const cs *B, double* Bx,
   Ci = cs_row(C);
   for (j = 0 ; j < n ; j++) {
     Cp [j] = nz ;                   /* column j of C starts here */
-    nz = cs_scatter (A, j, alpha, w, x, j+1, C, nz) ;   /* alpha*A(:,j)*/
-    nz = cs_scatter (B, j, beta, w, x, j+1, C, nz) ;    /* beta*B(:,j) */
-    if (values) for (p = Cp [j] ; p < nz ; p++) Cx [p] = x [Ci [p]] ;
+    nz = cs_scatter(A, A->x, j, alpha, w, x, j+1, C, nz) ;   /* alpha*A(:,j)*/
+    nz = cs_scatter(B, A->x, j, beta, w, x, j+1, C, nz) ;    /* beta*B(:,j) */
+    if (values) for (p = Cp[j] ; p < nz ; p++) Cx [p] = x [Ci [p]] ;
   }
   Cp [n] = nz ;                       /* finalize the last column of C */
   cs_sprealloc (C, 0) ;               /* remove extra space from C */
@@ -1199,7 +1199,7 @@ void cs_multiply (cs *C, const cs *A, const cs *B) {
   Cp = cs_colind(C);
   for (j = 0 ; j < n ; j++) {
     if (nz + m > C->nzmax) {
-      cs_sprealloc (C, 2*(C->nzmax)+m);
+      cs_sprealloc(C, 2*(C->nzmax)+m);
     }
     /* C->sp and C->x may be reallocated */
     Cp = cs_colind(C);
@@ -1207,7 +1207,7 @@ void cs_multiply (cs *C, const cs *A, const cs *B) {
     Cx = C->x;
     Cp [j] = nz ;                   /* column j of C starts here */
     for (p = Bp [j] ; p < Bp [j+1] ; p++) {
-      nz = cs_scatter (A, Bi [p], Bx ? Bx [p] : 1, w, x, j+1, C, nz) ;
+      nz = cs_scatter(A, A->x, Bi [p], Bx ? Bx [p] : 1, w, x, j+1, C, nz) ;
     }
     if (values) for (p = Cp [j] ; p < nz ; p++) Cx [p] = x [Ci [p]] ;
   }
@@ -1218,17 +1218,16 @@ void cs_multiply (cs *C, const cs *A, const cs *B) {
 }
 
 /* 1-norm of a sparse matrix = max (sum (abs (A))), largest column sum */
-double cs_norm (const cs *A) {
+double cs_norm (const cs *A, const double *Ax) {
   int p, j, n, *Ap ;
-  double *Ax,  norm = 0, s ;
+  double norm = 0, s ;
   n = cs_ncol(A);
   Ap = cs_colind(A);
-  Ax = A->x ;
   for (j = 0 ; j < n ; j++) {
-    for (s = 0, p = Ap [j] ; p < Ap [j+1] ; p++) s += fabs (Ax [p]) ;
-    norm = CS_MAX (norm, s) ;
+    for (s = 0, p = Ap[j]; p < Ap [j+1]; p++) s += fabs(Ax [p]) ;
+    norm = CS_MAX(norm, s) ;
   }
-  return (norm) ;
+  return norm;
 }
 
 /* C = A(p,q) where p and q are permutations of 0..m-1 and 0..n-1. */
@@ -1357,7 +1356,7 @@ void cs_qr (csn *N, const cs *A, const css *S) {
       Ri [rnz] = i ;                  /* R(i,k) = x(i) */
       Rx [rnz++] = x [i] ;
       x [i] = 0 ;
-      if (parent [i] == k) vnz = cs_scatter (V, i, 0, w, NULL, k, V, vnz);
+      if (parent [i] == k) vnz = cs_scatter (V, V->x, i, 0, w, NULL, k, V, vnz);
     }
 
     /* gather V(:,k) = x */
@@ -1460,13 +1459,11 @@ int cs_reach (cs *G, const cs *B, int k, int *xi, const int *pinv) {
 }
 
 /* x = x + beta * A(:,j), where x is a dense vector and A(:,j) is sparse */
-int cs_scatter (const cs *A, int j, double beta, int *w, double *x, int mark,
-                cs *C, int nz) {
+int cs_scatter (const cs *A, const double *Ax, int j, double beta, int *w,
+                double *x, int mark, cs *C, int nz) {
   int i, p, *Ap, *Ai, *Ci ;
-  double *Ax ;
   Ap = cs_colind(A);
   Ai = cs_row(A);
-  Ax = A->x;
   Ci = cs_row(C);
   for (p = Ap[j]; p<Ap[j+1]; p++) {
     i = Ai[p] ;                            /* A(i,j) is nonzero */
