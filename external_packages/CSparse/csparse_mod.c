@@ -1188,41 +1188,31 @@ int *cs_maxtrans (const cs *A, int seed) {
 
 /* C = A*B */
 void cs_multiply (cs *C, const cs *A, const cs *B) {
-  int p, j, nz = 0, anz, *Cp, *Ci, *Bp, m, n, bnz, *w, values, *Bi ;
-  double *x, *Bx, *Cx ;
+  int p, j, nz = 0, anz, *Cp, *Ci, *Bp, m, n, bnz, *w, *Bi ;
   m = cs_nrow(A);
   anz = cs_colind(A)[cs_ncol(A)];
   n = cs_ncol(B);
   Bp = cs_colind(B);
   Bi = cs_row(B);
-  Bx = B->x;
   bnz = Bp[n] ;
-  w = cs_calloc (m, sizeof (int)) ;                    /* get workspace */
-  values = (A->x != NULL) && (Bx != NULL) ;
-  x = values ? cs_malloc (m, sizeof (double)) : NULL ; /* get workspace */
-  cs_spalloc (C, m, n, anz + bnz) ;        /* allocate result */
-  C->x = values ? cs_malloc(anz + bnz, sizeof(double)) : NULL;
+  w = cs_calloc (m, sizeof (int));    /* get workspace */
+  cs_spalloc(C, m, n, anz + bnz);     /* allocate result */
   Cp = cs_colind(C);
-  for (j = 0 ; j < n ; j++) {
+  for (j = 0; j < n; j++) {
     if (nz + m > C->nzmax) {
       cs_sprealloc(C, 2*(C->nzmax)+m);
-      if (C->x) C->x = cs_realloc(C->x, C->nzmax, sizeof (double));
     }
-    /* C->sp and C->x may be reallocated */
+    /* C->sp may be reallocated */
     Cp = cs_colind(C);
     Ci = cs_row(C);
-    Cx = C->x;
-    Cp [j] = nz ;                   /* column j of C starts here */
-    for (p = Bp [j] ; p < Bp [j+1] ; p++) {
-      nz = cs_scatter(A, A->x, Bi [p], Bx ? Bx [p] : 1, w, x, j+1, C, nz) ;
+    Cp [j] = nz ;                    /* column j of C starts here */
+    for (p = Bp[j] ; p < Bp[j+1] ; p++) {
+      nz = cs_scatter(A, NULL, Bi[p], 1, w, NULL, j+1, C, nz) ;
     }
-    if (values) for (p = Cp [j] ; p < nz ; p++) Cx [p] = x [Ci [p]] ;
   }
-  Cp [n] = nz ;                       /* finalize the last column of C */
-  cs_sprealloc (C, 0) ;               /* remove extra space from C */
-  if (C->x) C->x = cs_realloc(C->x, C->nzmax, sizeof (double));
+  Cp[n] = nz ;                       /* finalize the last column of C */
+  cs_sprealloc(C, 0) ;               /* remove extra space from C */
   cs_free(w);
-  cs_free(x);
 }
 
 /* 1-norm of a sparse matrix = max (sum (abs (A))), largest column sum */
