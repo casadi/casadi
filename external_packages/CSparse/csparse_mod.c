@@ -474,6 +474,8 @@ int cs_cholsol (int order, const cs *A, double *b) {
   }
   cs_free (x) ;
   cs_sfree (S) ;
+  if (N && N->L) cs_free(N->L->x);
+  if (N && N->U) cs_free(N->U->x);
   cs_nfree (N) ;
   return (ok) ;
 }
@@ -972,7 +974,7 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
     Ui = cs_row(N->U);
     Ux = N->U->x;
     col = q ? (q [k]) : k;
-    top = cs_spsolve(N->L, A, col, xi, x, pinv, 1);  /* x = L\A(:,col) */
+    top = cs_spsolve(N->L, N->L->x, A, A->x, col, xi, x, pinv, 1);  /* x = L\A(:,col) */
     /* --- Find pivot --------------------------------------------------- */
     ipiv = -1 ;
     a = -1 ;
@@ -994,6 +996,8 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
     if (ipiv == -1 || a <= 0) {
       cs_free(xi);
       cs_free(x);
+      if (N && N->L) cs_free(N->L->x);
+      if (N && N->U) cs_free(N->U->x);
       cs_nfree(N);
       return 1;
     }
@@ -1031,7 +1035,7 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
 }
 
 /* x=A\b where A is unsymmetric; b overwritten with solution */
-int cs_lusol (int order, const cs *A, double *b, double tol) {
+int cs_lusol(int order, const cs *A, double *b, double tol) {
   csn *N = cs_calloc(1, sizeof (csn));
   css *S = cs_calloc(1, sizeof(css));
   int n = cs_ncol(A), ok = 0;
@@ -1049,6 +1053,8 @@ int cs_lusol (int order, const cs *A, double *b, double tol) {
   }
   cs_free(x);
   cs_sfree(S);
+  if (N && N->L) cs_free(N->L->x);
+  if (N && N->U) cs_free(N->U->x);
   cs_nfree(N);
   return ok;
 }
@@ -1406,6 +1412,8 @@ int cs_qrsol(int order, const cs *A, double *b, int tr) {
   }
   cs_free(x) ;
   cs_sfree(S) ;
+  if (N && N->L) cs_free(N->L->x);
+  if (N && N->U) cs_free(N->U->x);
   cs_nfree(N) ;
   return ok;
 }
@@ -1538,17 +1546,14 @@ int cs_schol (css *S, int order, const cs *A) {
 }
 
 /* solve Gx=b(:,k), where G is either upper (lo=0) or lower (lo=1) triangular */
-int cs_spsolve (cs *G, const cs *B, int k, int *xi, double *x, const int *pinv,
-                int lo) {
+int cs_spsolve (cs *G, const double *Gx, const cs *B, const double *Bx,
+                int k, int *xi, double *x, const int *pinv, int lo) {
   int j, J, p, q, px, top, n, *Gp, *Gi, *Bp, *Bi ;
-  double *Gx, *Bx ;
   Gp = cs_colind(G);
   Gi = cs_row(G);
-  Gx = G->x;
   n = cs_ncol(G);
   Bp = cs_colind(B);
   Bi = cs_row(B);
-  Bx = B->x;
   top = cs_reach (G, B, k, xi, pinv) ;        /* xi[top..n-1]=Reach(B(:,k)) */
   for (p = top ; p < n ; p++) x [xi [p]] = 0 ;    /* clear x */
   for (p = Bp [k] ; p < Bp [k+1] ; p++) x [Bi [p]] = Bx [p] ; /* scatter B */
@@ -1807,9 +1812,7 @@ void cs_spfree(cs *A) {
 /* free a numeric factorization */
 void cs_nfree (csn *N) {
   if (!N) return;
-  if (N->L) cs_free(N->L->x);
   cs_spfree(N->L);
-  if (N->U) cs_free(N->U->x);
   cs_spfree(N->U) ;
   cs_free(N->pinv) ;
   cs_free(N->B) ;

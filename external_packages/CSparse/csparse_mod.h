@@ -107,8 +107,8 @@ int cs_reach (cs *G, const cs *B, int k, int *xi, const int *pinv) ;
 int cs_scatter(const cs *A, const double *Ax, int j, double beta, int *w,
                double *x, int mark, cs *C, int nz);
 void cs_scc (csd *D, cs *A) ;
-int cs_spsolve (cs *G, const cs *B, int k, int *xi, double *x,
-    const int *pinv, int lo) ;
+int cs_spsolve (cs *G, const double *Gx, const cs *B, const double *Bx,
+                int k, int *xi, double *x, const int *pinv, int lo);
 int cs_tdfs (int j, int k, int *head, const int *next, int *post,
     int *stack) ;
 /* utilities */
