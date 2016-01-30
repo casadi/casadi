@@ -172,13 +172,13 @@ namespace casadi {
     for (int k=0; k<nrhs; ++k) {
       if (tr) {
         cs_pvec(m.S->q, x, t, m.A.sp[1]) ;   // t = P1\b
-        cs_ltsolve(m.L->L, t) ;               // t = L\t
-        cs_lsolve(m.L->L, t) ;              // t = U\t
+        cs_ltsolve(m.L->L, m.L->L->x, t) ;               // t = L\t
+        cs_lsolve(m.L->L, m.L->L->x, t) ;              // t = U\t
         cs_pvec(m.L->pinv, t, x, m.A.sp[1]) ;      // x = P2\t
       } else {
         cs_ipvec(m.L->pinv, x, t, m.A.sp[1]) ;   // t = P1\b
-        cs_lsolve(m.L->L, t) ;               // t = L\t
-        cs_ltsolve(m.L->L, t) ;              // t = U\t
+        cs_lsolve(m.L->L, m.L->L->x, t) ;               // t = L\t
+        cs_ltsolve(m.L->L, m.L->L->x, t) ;              // t = U\t
         cs_ipvec(m.S->q, t, x, m.A.sp[1]) ;      // x = P2\t
       }
       x += ncol();
@@ -194,8 +194,8 @@ namespace casadi {
 
     for (int k=0; k<nrhs; ++k) {
       cs_ipvec(m.L->pinv, x, t, m.A.sp[1]) ;   // t = P1\b
-      if (tr) cs_lsolve(m.L->L, t) ; // t = L\t
-      if (!tr) cs_ltsolve(m.L->L, t) ; // t = U\t
+      if (tr) cs_lsolve(m.L->L, m.L->L->x, t) ; // t = L\t
+      if (!tr) cs_ltsolve(m.L->L, m.L->L->x, t) ; // t = U\t
       cs_ipvec(m.S->q, t, x, m.A.sp[1]) ;      // x = P2\t
       x += ncol();
     }

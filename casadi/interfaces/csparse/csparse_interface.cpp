@@ -161,13 +161,13 @@ namespace casadi {
       if (tr) {
         cs_pvec(m.S->q, x, t, m.A.sp[1]) ;       // t = P2*b
         casadi_assert(m.N->U!=0);
-        cs_utsolve(m.N->U, t) ;              // t = U'\t
-        cs_ltsolve(m.N->L, t) ;              // t = L'\t
+        cs_utsolve(m.N->U, m.N->U->x, t) ;              // t = U'\t
+        cs_ltsolve(m.N->L, m.N->L->x, t) ;              // t = L'\t
         cs_pvec(m.N->pinv, t, x, m.A.sp[1]) ;    // x = P1*t
       } else {
         cs_ipvec(m.N->pinv, x, t, m.A.sp[1]) ;   // t = P1\b
-        cs_lsolve(m.N->L, t) ;               // t = L\t
-        cs_usolve(m.N->U, t) ;               // t = U\t
+        cs_lsolve(m.N->L, m.N->L->x, t) ;               // t = L\t
+        cs_usolve(m.N->U, m.N->U->x, t) ;               // t = U\t
         cs_ipvec(m.S->q, t, x, m.A.sp[1]) ;      // x = P2\t
       }
       x += ncol();

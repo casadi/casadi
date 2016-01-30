@@ -463,8 +463,8 @@ int cs_cholsol (int order, const cs *A, double *b) {
   ok = (S && !flag && x) ;
   if (ok) {
     cs_ipvec (S->pinv, b, x, n) ;   /* x = P*b */
-    cs_lsolve (N->L, x) ;           /* x = L\x */
-    cs_ltsolve (N->L, x) ;          /* x = L'\x */
+    cs_lsolve(N->L, N->L->x, x) ;           /* x = L\x */
+    cs_ltsolve(N->L, N->L->x, x) ;          /* x = L'\x */
     cs_pvec (S->pinv, x, b, n) ;    /* b = P'*x */
   }
   cs_free (x) ;
@@ -841,28 +841,25 @@ int cs_fkeep (cs *A, int (*fkeep) (int, int, double, void *), void *other) {
 }
 
 /* y = A*x+y */
-int cs_gaxpy (const cs *A, const double *x, double *y) {
+int cs_gaxpy(const cs *A, const double *Ax, const double *x, double *y) {
   int p, j, n, *Ap, *Ai ;
-  double *Ax ;
   n = cs_ncol(A);
   Ap = cs_colind(A);
   Ai = cs_row(A);
-  Ax = A->x;
   for (j = 0 ; j < n ; j++) {
     for (p = Ap [j] ; p < Ap [j+1] ; p++) {
-      y [Ai [p]] += Ax [p] * x [j] ;
+      y[Ai [p]] += Ax [p] * x [j] ;
     }
   }
   return (1) ;
 }
 
 /* apply the ith Householder vector to x */
-int cs_happly (const cs *V, int i, double beta, double *x) {
+int cs_happly (const cs *V, const double *Vx, int i, double beta, double *x) {
   int p, *Vp, *Vi ;
-  double *Vx, tau = 0 ;
+  double tau = 0 ;
   Vp = cs_colind(V);
   Vi = cs_row(V);
-  Vx = V->x;
   for (p = Vp [i] ; p < Vp [i+1] ; p++) {
     /* tau = v'*x */
     tau += Vx [p] * x [Vi [p]] ;
@@ -923,37 +920,31 @@ int cs_leaf (int i, int j, const int *first, int *maxfirst, int *prevleaf,
 }
 
 /* solve Lx=b where x and b are dense.  x=b on input, solution on output. */
-int cs_lsolve (const cs *L, double *x) {
+void cs_lsolve (const cs *L, const double *Lx, double *x) {
   int p, j, n, *Lp, *Li ;
-  double *Lx ;
   n = cs_ncol(L);
   Lp = cs_colind(L);
   Li = cs_row(L);
-  Lx = L->x ;
   for (j = 0 ; j < n ; j++) {
-    x [j] /= Lx [Lp [j]] ;
-    for (p = Lp [j]+1 ; p < Lp [j+1] ; p++) {
-      x [Li [p]] -= Lx [p] * x [j] ;
+    x [j] /= Lx[Lp [j]] ;
+    for (p = Lp[j]+1 ; p < Lp [j+1] ; p++) {
+      x[Li [p]] -= Lx[p] * x[j] ;
     }
   }
-  return (1) ;
 }
 
 /* solve L'x=b where x and b are dense.  x=b on input, solution on output. */
-int cs_ltsolve (const cs *L, double *x) {
+void cs_ltsolve (const cs *L, const double *Lx, double *x) {
   int p, j, n, *Lp, *Li ;
-  double *Lx ;
   n = cs_ncol(L);
   Lp = cs_colind(L);
   Li = cs_row(L);
-  Lx = L->x;
-  for (j = n-1 ; j >= 0 ; j--) {
-    for (p = Lp [j]+1 ; p < Lp [j+1] ; p++) {
-      x [j] -= Lx [p] * x [Li [p]] ;
+  for (j = n-1; j >= 0; j--) {
+    for (p = Lp[j]+1; p < Lp [j+1]; p++) {
+      x[j] -= Lx[p] * x[Li[p]];
     }
-    x [j] /= Lx [Lp [j]] ;
+    x[j] /= Lx[Lp [j]];
   }
-  return (1) ;
 }
 
 /* [L,U,pinv]=lu(A, [q lnz unz]). lnz and unz can be guess */
@@ -1059,8 +1050,8 @@ int cs_lusol (int order, const cs *A, double *b, double tol) {
     /* numeric LU factorization */
     if (!cs_lu(N, A, S, tol)) {
       cs_ipvec (N->pinv, b, x, n) ;       /* x = b(p) */
-      cs_lsolve (N->L, x) ;               /* x = L\x */
-      cs_usolve (N->U, x) ;               /* x = U\x */
+      cs_lsolve(N->L, N->L->x, x) ;               /* x = L\x */
+      cs_usolve(N->U, N->U->x, x) ;               /* x = U\x */
       cs_ipvec (S->q, x, b, n) ;          /* b(q) = x */
       ok = 1;
     }
@@ -1362,7 +1353,7 @@ void cs_qr (csn *N, const cs *A, const css *S) {
     /* for each i in pattern of R(:,k) */
     for (p = top ; p < n ; p++) {
       i = s [p] ;                     /* R(i,k) is nonzero */
-      cs_happly (V, i, Beta [i], x) ; /* apply (V(i),Beta(i)) to x */
+      cs_happly (V, V->x, i, Beta [i], x) ; /* apply (V(i),Beta(i)) to x */
       Ri [rnz] = i ;                  /* R(i,k) = x(i) */
       Rx [rnz++] = x [i] ;
       x [i] = 0 ;
@@ -1401,9 +1392,9 @@ int cs_qrsol(int order, const cs *A, double *b) {
       cs_ipvec (S->pinv, b, x, m) ;   /* x(0:m-1) = b(p(0:m-1) */
       for (k = 0 ; k < n ; k++)       /* apply Householder refl. to x */
         {
-          cs_happly (N->L, k, N->B [k], x) ;
+          cs_happly(N->L, N->L->x, k, N->B [k], x) ;
         }
-      cs_usolve (N->U, x) ;           /* x = R\x */
+      cs_usolve (N->U, N->U->x, x) ;           /* x = R\x */
       cs_ipvec (S->q, x, b, n) ;      /* b(q(0:n-1)) = x(0:n-1) */
     }
   } else {
@@ -1415,10 +1406,10 @@ int cs_qrsol(int order, const cs *A, double *b) {
     ok = (!flag && AT && N) ;
     if (ok) {
       cs_pvec (S->q, b, x, m) ;       /* x(q(0:m-1)) = b(0:m-1) */
-      cs_utsolve (N->U, x) ;          /* x = R'\x */
+      cs_utsolve(N->U, N->U->x, x) ;          /* x = R'\x */
       for (k = m-1 ; k >= 0 ; k--)    /* apply Householder refl. to x */
         {
-          cs_happly (N->L, k, N->B [k], x) ;
+          cs_happly(N->L, N->L->x, k, N->B [k], x) ;
         }
       cs_pvec (S->pinv, x, b, n) ;    /* b(0:n-1) = x(p(0:n-1)) */
     }
@@ -1787,20 +1778,17 @@ int cs_updown (cs *L, int sigma, const cs *C, const int *parent) {
 }
 
 /* solve Ux=b where x and b are dense.  x=b on input, solution on output. */
-int cs_usolve (const cs *U, double *x) {
+void cs_usolve (const cs *U, const double *Ux, double *x) {
   int p, j, n, *Up, *Ui ;
-  double *Ux;
   n = cs_ncol(U);
   Up = cs_colind(U);
   Ui = cs_row(U);
-  Ux = U->x;
-  for (j = n-1 ; j >= 0 ; j--) {
-    x [j] /= Ux [Up [j+1]-1] ;
-    for (p = Up [j] ; p < Up [j+1]-1 ; p++) {
-      x [Ui [p]] -= Ux [p] * x [j] ;
+  for (j = n-1; j >= 0; j--) {
+    x[j] /= Ux[Up [j+1]-1];
+    for (p = Up[j]; p < Up[j+1]-1; p++) {
+      x[Ui [p]] -= Ux[p] * x[j];
     }
   }
-  return (1) ;
 }
 
 /* allocate a sparse matrix */
@@ -1869,18 +1857,16 @@ void cs_dfree (csd *D) {
 }
 
 /* solve U'x=b where x and b are dense.  x=b on input, solution on output. */
-int cs_utsolve (const cs *U, double *x) {
+void cs_utsolve (const cs *U, const double *Ux, double *x) {
   int p, j, n, *Up, *Ui ;
-  double *Ux ;
   n = cs_ncol(U);
   Up = cs_colind(U);
   Ui = cs_row(U);
   Ux = U->x;
   for (j = 0 ; j < n ; j++) {
     for (p = Up [j] ; p < Up [j+1]-1 ; p++) {
-      x [j] -= Ux [p] * x [Ui [p]] ;
+      x[j] -= Ux[p] * x[Ui[p]] ;
     }
-    x [j] /= Ux [Up [j+1]-1] ;
+    x[j] /= Ux[Up[j+1]-1] ;
   }
-  return (1) ;
 }
