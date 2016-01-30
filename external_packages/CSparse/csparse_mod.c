@@ -80,11 +80,13 @@ int *cs_amd (int order, const cs *A) {
     A2 = cs_calloc(1, sizeof (cs));
     cs_transpose(AT, A2, 0) ;         /* A2 = AT' */
     cs_multiply (C, AT, A2); /* C=A'*A with no dense rows */
-    cs_spfree (A2) ;
+    if (A2) cs_free(A2->x);
+    cs_spfree(A2) ;
   } else {
     cs_multiply(C, AT, A) ;           /* C=A'*A */
   }
-  cs_spfree (AT) ;
+  if (AT) cs_free(AT->x);
+  cs_spfree(AT) ;
   cs_fkeep (C, &cs_diag, NULL) ;          /* drop diagonal entries */
   Cp = cs_colind(C);
   cnz = Cp[n] ;
@@ -370,6 +372,7 @@ int *cs_amd (int order, const cs *A) {
   for (k = 0, i = 0 ; i <= n ; i++) {
     if (Cp [i] == -1) k = cs_tdfs (i, k, head, next, P, w) ;
   }
+  if (C) cs_free(C->x);
   cs_spfree(C);
   cs_free(W);
   return P;
@@ -429,6 +432,7 @@ int cs_chol(csn *N, const cs *A, const css *S) {
     }
     /* --- Compute L(k,k) ----------------------------------------------- */
     if (d <= 0) {
+      if (E) cs_free(E->x);
       cs_spfree(E);
       cs_free (c);
       cs_free (x);
@@ -439,6 +443,7 @@ int cs_chol(csn *N, const cs *A, const css *S) {
     Lx [p] = sqrt (d) ;
   }
   Lp [n] = cp [n] ;               /* finalize L */
+  if (E) cs_free(E->x);
   cs_spfree(E);
   cs_free(c);
   cs_free(x);
@@ -525,6 +530,7 @@ int *cs_counts (const cs *A, const int *parent, const int *post, int ata) {
   for (j = 0 ; j < n ; j++) {
     if (parent [j] != -1) colcount [parent [j]] += colcount [j] ;
   }
+  if (AT) cs_free(AT->x);
   cs_spfree(AT);
   cs_free(w);
   return colcount;
@@ -598,6 +604,7 @@ static int cs_bfs (const cs *A, int n, int *wi, int *wj, int *queue,
   }
   Ap = cs_colind(C);
   Ai = cs_row(C);
+
   /* while queue is not empty */
   while (head < tail) {
     j = queue [head++] ;            /* get the head of the queue */
@@ -611,8 +618,13 @@ static int cs_bfs (const cs *A, int n, int *wi, int *wj, int *queue,
       queue [tail++] = j2 ;       /* add j2 to queue */
     }
   }
-  if (mark != 1) cs_spfree (C) ;      /* free A' if it was created */
-  return (1) ;
+
+  /* free A' if it was created */
+  if (mark != 1) {
+    if (C) cs_free(C->x);
+    cs_spfree(C);
+  }
+  return 1;
 }
 
 /* collect matched rows and columns into p and q */
@@ -714,6 +726,7 @@ void cs_dmperm (csd *D, const cs *A, int seed) {
   s [nb2] = n ;
   D->nb = nb2 ;
   cs_dfree (scc) ;
+  if (C) cs_free(C->x);
   cs_spfree (C) ;                     /* free temporary matrix */
 }
 
@@ -1149,7 +1162,10 @@ int *cs_maxtrans (const cs *A, int seed) {
   cs_free (q) ;
   for (j = 0 ; j < n ; j++) imatch [j] = -1 ;     /* find row match */
   for (i = 0 ; i < m ; i++) if (jmatch [i] >= 0) imatch [jmatch [i]] = i ;
-  if (m2 < n2) cs_spfree(C);
+  if (m2 < n2) {
+    if (C) cs_free(C->x);
+    cs_spfree(C);
+  }
   cs_free(w);
   return jimatch;
 }
@@ -1385,7 +1401,8 @@ int cs_qrsol(int order, const cs *A, double *b) {
   cs_free (x) ;
   cs_sfree (S) ;
   cs_nfree(N) ;
-  cs_spfree(AT) ;
+  if (AT) cs_free(AT->x);
+  cs_spfree(AT);
   return ok;
 }
 
@@ -1486,6 +1503,7 @@ void cs_scc(csd *D, cs *A) {
   }
   for (b = 0 ; b <= nb ; b++) rcopy [b] = r [b] ;
   for (i = 0 ; i < n ; i++) p [rcopy [Blk [i]]++] = i ;
+  if (AT) cs_free(AT->x);
   cs_spfree (AT) ;                     /* free temporary matrix */
   cs_free (xi) ;                       /* free workspace */
 }
@@ -1505,7 +1523,8 @@ int cs_schol (css *S, int order, const cs *A) {
   post = cs_post (S->parent, n) ;         /* postorder the etree */
   c = cs_counts (C, S->parent, post, 0) ; /* find column counts of chol(C) */
   cs_free (post) ;
-  cs_spfree (C) ;
+  if (C) cs_free(C->x);
+  cs_spfree(C) ;
   S->cp = cs_malloc (n+1, sizeof (int)) ; /* allocate result S->cp */
   S->unz = S->lnz = cs_cumsum (S->cp, c, n) ; /* find column pointers for L */
   cs_free (c) ;
@@ -1615,7 +1634,10 @@ int cs_sqr(css *S, int order, const cs *A, int qr) {
     cs_free (post) ;
     ok = C && S->parent && S->cp && cs_vcount (C, S) ;
     if (ok) for (S->unz = 0, k = 0 ; k < n ; k++) S->unz += S->cp [k] ;
-    if (order) cs_spfree (C) ;
+    if (order) {
+      if (C) cs_free(C->x);
+      cs_spfree(C);
+    }
   } else {
     S->unz = 4*(cs_colind(A)[n]) + n ;         /* for LU factorization only, */
     S->lnz = S->unz ;                   /* guess nnz(L) and nnz(U) */
@@ -1779,14 +1801,15 @@ void cs_sprealloc (cs *A, int nzmax) {
 void cs_spfree(cs *A) {
   if (!A) return;
   cs_free(A->sp);
-  cs_free(A->x);
   cs_free(A);
 }
 
 /* free a numeric factorization */
 void cs_nfree (csn *N) {
   if (!N) return;
-  cs_spfree(N->L) ;
+  if (N->L) cs_free(N->L->x);
+  cs_spfree(N->L);
+  if (N->U) cs_free(N->U->x);
   cs_spfree(N->U) ;
   cs_free(N->pinv) ;
   cs_free(N->B) ;
