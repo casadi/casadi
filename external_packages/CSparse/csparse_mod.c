@@ -60,7 +60,8 @@ int *cs_amd (int order, const cs *A) {
   int h ;
   /* --- Construct matrix C ----------------------------------------------- */
   AT = cs_calloc(1, sizeof (cs));
-  cs_transpose(A, AT, 0) ;              /* compute A' */
+  AT->x = NULL;
+  cs_transpose(A, AT);              /* compute A' */
   m = cs_nrow(A) ; n = cs_ncol(A) ;
   dense = CS_MAX (16, 10 * sqrt ((double) n)) ;   /* find dense threshold */
   dense = CS_MIN (n-2, dense) ;
@@ -79,7 +80,8 @@ int *cs_amd (int order, const cs *A) {
     }
     ATp [m] = p2 ;                      /* finalize AT */
     A2 = cs_calloc(1, sizeof (cs));
-    cs_transpose(AT, A2, 0) ;         /* A2 = AT' */
+    A2->x = NULL;
+    cs_transpose(AT, A2) ;         /* A2 = AT' */
     cs_multiply (C, AT, A2); /* C=A'*A with no dense rows */
     if (A2) cs_free(A2->x);
     cs_spfree(A2) ;
@@ -499,7 +501,8 @@ int *cs_counts (const cs *A, const int *parent, const int *post, int ata) {
   delta = colcount = cs_malloc (n, sizeof (int)) ;    /* allocate result */
   w = cs_malloc (s, sizeof (int)) ;                   /* get workspace */
   AT = cs_calloc(1, sizeof (cs));
-  cs_transpose(A, AT, 0) ;                          /* AT = A' */
+  AT->x = NULL;
+  cs_transpose(A, AT) ;                          /* AT = A' */
   ancestor = w ; maxfirst = w+n ; prevleaf = w+2*n ; first = w+3*n ;
   for (k = 0 ; k < s ; k++) w [k] = -1 ;      /* clear workspace w [0..s-1] */
   /* find first [j] */
@@ -601,7 +604,8 @@ static int cs_bfs (const cs *A, int n, int *wi, int *wj, int *queue,
     C = (cs *)A;
   } else {
     C = cs_calloc(1, sizeof (cs));
-    cs_transpose(A, C, 0);
+    C->x = NULL;
+    cs_transpose(A, C);
   }
   Ap = cs_colind(C);
   Ai = cs_row(C);
@@ -1141,7 +1145,8 @@ int *cs_maxtrans (const cs *A, int seed) {
   for (i = 0 ; i < m ; i++) m2 += w [i] ;
   if (m2 < n2) {
     C = cs_calloc(1, sizeof (cs));
-    cs_transpose (A, C, 0);
+    C->x = NULL;
+    cs_transpose(A, C);
   } else {
     C = (cs *)A;
   }
@@ -1471,7 +1476,8 @@ void cs_scc(csd *D, cs *A) {
   Ap = cs_colind(A);
   cs_dalloc(D, n, 0) ;                          /* allocate result */
   AT = cs_calloc(1, sizeof (cs));
-  cs_transpose (A, AT, 0) ;                      /* AT = A' */
+  AT->x = NULL;
+  cs_transpose(A, AT);                          /* AT = A' */
   xi = cs_malloc (2*n+1, sizeof (int)) ;          /* get workspace */
   Blk = xi;
   rcopy = pstack = xi + n;
@@ -1703,26 +1709,21 @@ int cs_tdfs (int j, int k, int *head, const int *next, int *post, int *stack) {
 }
 
 /* C = A' */
-void cs_transpose (const cs *A, cs *C, int values) {
+void cs_transpose(const cs *A, cs *C) {
   int p, q, j, *Cp, *Ci, n, m, *Ap, *Ai, *w ;
-  double *Cx, *Ax ;
   m = cs_nrow(A);
   n = cs_ncol(A);
   Ap = cs_colind(A);
   Ai = cs_row(A);
-  Ax = A->x ;
   cs_spalloc(C, n, m, Ap[n]) ;       /* allocate result */
-  C->x = values && Ax ? cs_malloc(Ap[n], sizeof(double)) : NULL;
   w = cs_calloc (m, sizeof (int)) ;                      /* get workspace */
   Cp = cs_colind(C);
   Ci = cs_row(C);
-  Cx = C->x;
   for (p = 0 ; p < Ap [n] ; p++) w [Ai [p]]++ ;          /* row counts */
   cs_cumsum (Cp, w, m) ;                                 /* row pointers */
   for (j = 0 ; j < n ; j++) {
     for (p = Ap [j] ; p < Ap [j+1] ; p++) {
       Ci [q = w [Ai [p]]++] = j ; /* place A(i,j) as entry C(j,i) */
-      if (Cx) Cx [q] = Ax [p] ;
     }
   }
   cs_free(w);

@@ -23,7 +23,7 @@ int cs_lusol (int order, const cs *A, double *b, double tol) ;
 void cs_multiply (cs *C, const cs *A, const cs *B) ;
 double cs_norm (const cs *A, const double *Ax) ;
 int cs_qrsol (int order, const cs *A, double *b, int tr);
-void cs_transpose (const cs *A, cs *C, int values) ;
+void cs_transpose (const cs *A, cs *C);
 /* utilities */
 void *cs_calloc (int n, size_t size) ;
 void *cs_free (void *p) ;
