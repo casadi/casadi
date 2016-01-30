@@ -1,4 +1,5 @@
 #include "csparse_mod.h"
+#include <assert.h>
 
 #define CS_MAX(a,b) (((a) > (b)) ? (a) : (b))
 #define CS_MIN(a,b) (((a) < (b)) ? (a) : (b))
@@ -1359,50 +1360,48 @@ void cs_qr (csn *N, const cs *A, const css *S) {
 }
 
 /* x=A\b where A can be rectangular; b overwritten with solution */
-int cs_qrsol(int order, const cs *A, double *b) {
-  double *x ;
+int cs_qrsol(int order, const cs *A, double *b, int tr) {
+  int k;
+  int n = cs_ncol(A);
+  int m = cs_nrow(A);
+
+  /* ordering and symbolic analysis */
+  csn *N = cs_calloc(1, sizeof(csn));
   css *S = cs_calloc(1, sizeof(css));
-  csn *N = cs_calloc (1, sizeof (csn));
-  cs *AT = NULL ;
-  int k, m, n, ok ;
-  n = cs_ncol(A) ;
-  m = cs_nrow(A) ;
-  if (m >= n) {
-    int flag = cs_sqr(S, order, A, 1) ;          /* ordering and symbolic analysis */
-    cs_qr(N, A, S) ;                  /* numeric QR factorization */
-    x = cs_calloc (S ? S->m2 : 1, sizeof (double)) ;    /* get workspace */
-    ok = !flag && N;
-    if (ok) {
-      cs_ipvec (S->pinv, b, x, m) ;   /* x(0:m-1) = b(p(0:m-1) */
-      for (k = 0 ; k < n ; k++)       /* apply Householder refl. to x */
-        {
-          cs_happly(N->L, N->L->x, k, N->B [k], x) ;
-        }
-      cs_usolve (N->U, N->U->x, x) ;           /* x = R\x */
-      cs_ipvec (S->q, x, b, n) ;      /* b(q(0:n-1)) = x(0:n-1) */
-    }
-  } else {
-    AT = cs_calloc(1, sizeof (cs));
-    cs_transpose(A, AT, 1) ;          /* Ax=b is underdetermined */
-    int flag = cs_sqr(S, order, AT, 1) ;         /* ordering and symbolic analysis */
-    cs_qr(N, AT, S) ;                 /* numeric QR factorization of A' */
-    x = cs_calloc (S ? S->m2 : 1, sizeof (double)) ;    /* get workspace */
-    ok = (!flag && AT && N) ;
-    if (ok) {
-      cs_pvec (S->q, b, x, m) ;       /* x(q(0:m-1)) = b(0:m-1) */
-      cs_utsolve(N->U, N->U->x, x) ;          /* x = R'\x */
-      for (k = m-1 ; k >= 0 ; k--)    /* apply Householder refl. to x */
-        {
-          cs_happly(N->L, N->L->x, k, N->B [k], x) ;
-        }
-      cs_pvec (S->pinv, x, b, n) ;    /* b(0:n-1) = x(p(0:n-1)) */
+  int flag = cs_sqr(S, order, A, 1);
+  cs_qr(N, A, S) ;                  
+
+  /* numeric QR factorization */
+  double *x = cs_calloc(S ? S->m2 : 1, sizeof (double));
+  int ok = !flag && N;
+  if (ok) {
+    if (!tr) {
+      /* x(0:m-1) = b(p(0:m-1) */
+      cs_ipvec(S->pinv, b, x, m);
+      /* apply Householder refl. to x */
+      for (k = 0 ; k < n ; k++) {
+        cs_happly(N->L, N->L->x, k, N->B [k], x) ;
+      }
+      /* x = R\x */
+      cs_usolve(N->U, N->U->x, x);
+      /* b(q(0:n-1)) = x(0:n-1) */
+      cs_ipvec(S->q, x, b, n);
+    } else {
+      /* x(q(0:m-1)) = b(0:m-1) */
+      cs_pvec (S->q, b, x, n);
+      /* x = R'\x */
+      cs_utsolve(N->U, N->U->x, x);
+      /* apply Householder refl. to x */
+      for (k = n-1 ; k >= 0 ; k--) {
+        cs_happly(N->L, N->L->x, k, N->B [k], x) ;
+      }
+      /* b(0:n-1) = x(p(0:n-1)) */
+      cs_pvec(S->pinv, x, b, m);
     }
   }
-  cs_free (x) ;
-  cs_sfree (S) ;
+  cs_free(x) ;
+  cs_sfree(S) ;
   cs_nfree(N) ;
-  if (AT) cs_free(AT->x);
-  cs_spfree(AT);
   return ok;
 }
 
