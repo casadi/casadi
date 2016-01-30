@@ -29,7 +29,7 @@ void cs_transpose (const cs *A, cs *C, int values) ;
 void *cs_calloc (int n, size_t size) ;
 void *cs_free (void *p) ;
 void *cs_realloc (void *p, int n, size_t size) ;
-void cs_spalloc (cs *A, int m, int n, int nzmax, int values) ;
+void cs_spalloc (cs *A, int m, int n, int nzmax) ;
 void cs_spfree (cs *A) ;
 void cs_sprealloc (cs *A, int nzmax) ;
 void *cs_malloc (int n, size_t size) ;

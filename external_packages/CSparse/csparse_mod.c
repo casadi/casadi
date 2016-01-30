@@ -24,8 +24,9 @@ void cs_add(cs *C, double* Cx, const cs *A, double* Ax, const cs *B, double* Bx,
   bnz = Bp[n] ;
   w = cs_calloc (m, sizeof (int));
   values = (Ax != NULL) && (Bx != NULL) ;
-  x = values ? cs_malloc (m, sizeof (double)) : NULL;
-  cs_spalloc(C, m, n, anz + bnz, values);
+  x = values ? cs_malloc (m, sizeof(double)) : NULL;
+  cs_spalloc(C, m, n, anz + bnz);
+  C->x = values ? cs_malloc(anz + bnz, sizeof(double)) : NULL;
   Cp = cs_colind(C);
   Ci = cs_row(C);
   for (j = 0 ; j < n ; j++) {
@@ -400,7 +401,8 @@ int cs_chol(csn *N, const cs *A, const css *S) {
   Ci = cs_row(C);
   Cx = C->x;
   N->L = L = cs_calloc(1, sizeof (cs));
-  cs_spalloc(L, n, n, cp [n], 1) ;    /* allocate result */
+  cs_spalloc(L, n, n, cp [n]);    /* allocate result */
+  L->x = cs_malloc(cp[n], sizeof(double));
   Lp = cs_colind(L);
   Li = cs_row(L);
   Lx = L->x;
@@ -956,9 +958,11 @@ int cs_lu(csn *N, const cs *A, const css *S, double tol) {
   x = cs_malloc (n, sizeof (double)) ;            /* get double workspace */
   xi = cs_malloc (2*n, sizeof (int)) ;            /* get int workspace */
   N->L = cs_calloc(1, sizeof (cs));
-  cs_spalloc (N->L, n, n, lnz, 1) ;       /* allocate result L */
+  cs_spalloc (N->L, n, n, lnz) ;       /* allocate result L */
+  N->L->x = cs_malloc(lnz, sizeof(double));
   N->U = cs_calloc(1, sizeof (cs));
-  cs_spalloc (N->U, n, n, unz, 1) ;       /* allocate result U */
+  cs_spalloc(N->U, n, n, unz) ;       /* allocate result U */
+  N->U->x = cs_malloc(unz, sizeof(double));
   N->pinv = pinv = cs_malloc (n, sizeof (int)) ;  /* allocate result pinv */
   Lp = cs_colind(N->L);
   Up = cs_colind(N->U);
@@ -1195,7 +1199,8 @@ void cs_multiply (cs *C, const cs *A, const cs *B) {
   w = cs_calloc (m, sizeof (int)) ;                    /* get workspace */
   values = (A->x != NULL) && (Bx != NULL) ;
   x = values ? cs_malloc (m, sizeof (double)) : NULL ; /* get workspace */
-  cs_spalloc (C, m, n, anz + bnz, values) ;        /* allocate result */
+  cs_spalloc (C, m, n, anz + bnz) ;        /* allocate result */
+  C->x = values ? cs_malloc(anz + bnz, sizeof(double)) : NULL;
   Cp = cs_colind(C);
   for (j = 0 ; j < n ; j++) {
     if (nz + m > C->nzmax) {
@@ -1239,7 +1244,8 @@ void cs_permute (cs *C, const cs *A, const int *pinv, const int *q, int values) 
   Ap = cs_colind(A);
   Ai = cs_row(A);
   Ax = A->x;
-  cs_spalloc (C, m, n, Ap [n], values && Ax != NULL) ;  /* alloc result */
+  cs_spalloc (C, m, n, Ap[n]) ;  /* alloc result */
+  C->x = values && Ax != NULL ? cs_malloc(Ap[n], sizeof(double)) : NULL;
   Cp = cs_colind(C);
   Ci = cs_row(C);
   Cx = C->x;
@@ -1311,9 +1317,11 @@ void cs_qr (csn *N, const cs *A, const css *S) {
   s = w + m2 ;                                    /* s is size n */
   for (k = 0 ; k < m2 ; k++) x [k] = 0 ;          /* clear workspace x */
   N->L = V = cs_calloc(1, sizeof (cs));
-  cs_spalloc (V, m2, n, vnz, 1) ;      /* allocate result V */
+  cs_spalloc (V, m2, n, vnz) ;      /* allocate result V */
+  V->x = cs_malloc(vnz, sizeof(double));
   N->U = R = cs_calloc(1, sizeof (cs));
-  cs_spalloc (R, m2, n, rnz, 1) ;      /* allocate result R */
+  cs_spalloc (R, m2, n, rnz) ;      /* allocate result R */
+  R->x = cs_malloc(rnz, sizeof(double));
   N->B = Beta = cs_malloc (n, sizeof (double)) ;  /* allocate result Beta */
   Rp = cs_colind(R);
   Ri = cs_row(R);
@@ -1662,7 +1670,8 @@ void cs_symperm (cs *C, const cs *A, const int *pinv, int values) {
   Ap = cs_colind(A);
   Ai = cs_row(A);
   Ax = A->x;
-  cs_spalloc (C, n, n, Ap [n], values && (Ax != NULL)) ; /* alloc result*/
+  cs_spalloc (C, n, n, Ap[n]) ; /* alloc result*/
+  C->x = values && (Ax != NULL) ? cs_malloc(Ap[n], sizeof(double)) : NULL;
   w = cs_calloc (n, sizeof (int)) ;                   /* get workspace */
   Cp = cs_colind(C);
   Ci = cs_row(C);
@@ -1720,7 +1729,8 @@ void cs_transpose (const cs *A, cs *C, int values) {
   Ap = cs_colind(A);
   Ai = cs_row(A);
   Ax = A->x ;
-  cs_spalloc(C, n, m, Ap[n], values && Ax) ;       /* allocate result */
+  cs_spalloc(C, n, m, Ap[n]) ;       /* allocate result */
+  C->x = values && Ax ? cs_malloc(Ap[n], sizeof(double)) : NULL;
   w = cs_calloc (m, sizeof (int)) ;                      /* get workspace */
   Cp = cs_colind(C);
   Ci = cs_row(C);
@@ -1789,12 +1799,11 @@ void cs_usolve (const cs *U, const double *Ux, double *x) {
 }
 
 /* allocate a sparse matrix */
-void cs_spalloc(cs *A, int m, int n, int nzmax, int values) {
+void cs_spalloc(cs *A, int m, int n, int nzmax) {
   A->nzmax = nzmax = CS_MAX (nzmax, 1) ;
   A->sp = cs_malloc(2 + (n+1) + nzmax, sizeof (int));
   A->sp[0] = m;
   A->sp[1] = n;
-  A->x = values ? cs_malloc (nzmax, sizeof (double)) : NULL ;
 }
 
 /* change the max # of entries sparse matrix */
