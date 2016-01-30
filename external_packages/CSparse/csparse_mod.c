@@ -393,7 +393,7 @@ int cs_chol(csn *N, const cs *A, const css *S) {
   if (pinv) {
     C = cs_calloc(1, sizeof (cs));
     C->x = cs_malloc(cs_colind(A)[n], sizeof(double));
-    cs_symperm (C, A, pinv);
+    cs_symperm(C, C->x, A, A->x, pinv);
   } else {
     C = (cs *) A;
   }
@@ -1533,7 +1533,7 @@ int cs_schol (css *S, int order, const cs *A) {
   if (order && !S->pinv) return 1;
   C = cs_calloc(1, sizeof (cs));
   C->x = NULL;
-  cs_symperm(C, A, S->pinv);        /* C = spones(triu(A(P,P))) */
+  cs_symperm(C, C->x, A, A->x, S->pinv);        /* C = spones(triu(A(P,P))) */
   S->parent = cs_etree (C, 0) ;           /* find etree of C */
   post = cs_post (S->parent, n) ;         /* postorder the etree */
   c = cs_counts (C, S->parent, post, 0) ; /* find column counts of chol(C) */
@@ -1660,18 +1660,15 @@ int cs_sqr(css *S, int order, const cs *A, int qr) {
 }
 
 /* C = A(p,p) where A and C are symmetric the upper part stored; pinv not p */
-void cs_symperm(cs *C, const cs *A, const int *pinv) {
+void cs_symperm(cs *C, double *Cx, const cs *A, const double *Ax, const int *pinv) {
   int i, j, p, q, i2, j2, n, *Ap, *Ai, *Cp, *Ci, *w ;
-  double *Cx, *Ax ;
   n = cs_ncol(A);
   Ap = cs_colind(A);
   Ai = cs_row(A);
-  Ax = A->x;
   cs_spalloc(C, n, n, Ap[n]) ; /* alloc result*/
   w = cs_calloc (n, sizeof (int)) ;                   /* get workspace */
   Cp = cs_colind(C);
   Ci = cs_row(C);
-  Cx = C->x ;
   /* count entries in each column of C */
   for (j = 0 ; j < n ; j++) {
     j2 = pinv ? pinv [j] : j ;      /* column j of A is column j2 of C */

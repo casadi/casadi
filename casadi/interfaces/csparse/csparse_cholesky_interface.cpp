@@ -106,7 +106,7 @@ namespace casadi {
     if (m.S->pinv) {
       C = static_cast<cs*>(cs_calloc(1, sizeof (cs)));
       C->x = static_cast<double*>(cs_malloc(m.A.sp[2 + (1+n)], sizeof(double)));
-      cs_symperm(C, &m.A, m.S->pinv);
+      cs_symperm(C, C->x, &m.A, m.A.x, m.S->pinv);
     } else {
       C = &m.A;
     }
