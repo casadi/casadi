@@ -118,7 +118,7 @@ namespace casadi {
   }
 
   Nlpsol::Nlpsol(const std::string& name, const XProblem& nlp)
-    : FunctionInternal(name), nlp2_(nlp) {
+    : FunctionInternal(name), nlp_(nlp) {
 
     // Set default options
     callback_step_ = 1;
@@ -142,8 +142,8 @@ namespace casadi {
     case NLPSOL_LAM_G0:
       return get_sparsity_out(NLPSOL_G);
     case NLPSOL_P:
-      return nlp2_.is_sx ? nlp2_.sx_p->in[NL_P].sparsity()
-        : nlp2_.mx_p->in[NL_P].sparsity();
+      return nlp_.is_sx ? nlp_.sx_p->in[NL_P].sparsity()
+        : nlp_.mx_p->in[NL_P].sparsity();
     case NLPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -155,12 +155,12 @@ namespace casadi {
       return Sparsity::scalar();
     case NLPSOL_X:
     case NLPSOL_LAM_X:
-      return nlp2_.is_sx ? nlp2_.sx_p->in[NL_X].sparsity()
-        : nlp2_.mx_p->in[NL_X].sparsity();
+      return nlp_.is_sx ? nlp_.sx_p->in[NL_X].sparsity()
+        : nlp_.mx_p->in[NL_X].sparsity();
     case NLPSOL_LAM_G:
     case NLPSOL_G:
-      return nlp2_.is_sx ? nlp2_.sx_p->out[NL_G].sparsity()
-        : nlp2_.mx_p->out[NL_G].sparsity();
+      return nlp_.is_sx ? nlp_.sx_p->out[NL_G].sparsity()
+        : nlp_.mx_p->out[NL_G].sparsity();
     case NLPSOL_LAM_P:
       return get_sparsity_in(NLPSOL_P);
     case NLPSOL_NUM_OUT: break;
@@ -575,7 +575,7 @@ namespace casadi {
 
   template<typename M>
   void Nlpsol::_setup_f() {
-    const Problem<M>& nlp = nlp2_;
+    const Problem<M>& nlp = nlp_;
     std::vector<M> arg(F_NUM_IN);
     arg[F_X] = nlp.in[NL_X];
     arg[F_P] = nlp.in[NL_P];
@@ -586,7 +586,7 @@ namespace casadi {
   }
 
   void Nlpsol::setup_f() {
-    if (nlp2_.is_sx) {
+    if (nlp_.is_sx) {
       _setup_f<SX>();
     } else {
       _setup_f<MX>();
@@ -595,7 +595,7 @@ namespace casadi {
 
   template<typename M>
   void Nlpsol::_setup_g() {
-    const Problem<M>& nlp = nlp2_;
+    const Problem<M>& nlp = nlp_;
     std::vector<M> arg(G_NUM_IN);
     arg[G_X] = nlp.in[NL_X];
     arg[G_P] = nlp.in[NL_P];
@@ -606,7 +606,7 @@ namespace casadi {
   }
 
   void Nlpsol::setup_g() {
-    if (nlp2_.is_sx) {
+    if (nlp_.is_sx) {
       _setup_g<SX>();
     } else {
       _setup_g<MX>();
@@ -615,7 +615,7 @@ namespace casadi {
 
   template<typename M>
   void Nlpsol::_setup_fg() {
-    const Problem<M>& nlp = nlp2_;
+    const Problem<M>& nlp = nlp_;
     std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
     std::vector<M> res = {nlp.out[NL_F], nlp.out[NL_G]};
     fg_fcn_ = Function("nlp_fg", arg, res);
@@ -623,7 +623,7 @@ namespace casadi {
   }
 
   void Nlpsol::setup_fg() {
-    if (nlp2_.is_sx) {
+    if (nlp_.is_sx) {
       _setup_fg<SX>();
     } else {
       _setup_fg<MX>();
@@ -632,7 +632,7 @@ namespace casadi {
 
   template<typename M>
   void Nlpsol::_setup_gf_jg() {
-    const Problem<M>& nlp = nlp2_;
+    const Problem<M>& nlp = nlp_;
     std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
     std::vector<M> res = {M::gradient(nlp.out[NL_F], nlp.in[NL_X]),
                           M::jacobian(nlp.out[NL_G], nlp.in[NL_X])};
@@ -642,7 +642,7 @@ namespace casadi {
   }
 
   void Nlpsol::setup_gf_jg() {
-    if (nlp2_.is_sx) {
+    if (nlp_.is_sx) {
       _setup_gf_jg<SX>();
     } else {
       _setup_gf_jg<MX>();
@@ -651,7 +651,7 @@ namespace casadi {
 
   template<typename M>
   void Nlpsol::_setup_grad_f() {
-    const Problem<M>& nlp = nlp2_;
+    const Problem<M>& nlp = nlp_;
     M x = nlp.in[NL_X];
     M p = nlp.in[NL_P];
     M f = nlp.out[NL_F];
@@ -662,7 +662,7 @@ namespace casadi {
   }
 
   void Nlpsol::setup_grad_f() {
-    if (nlp2_.is_sx) {
+    if (nlp_.is_sx) {
       _setup_grad_f<SX>();
     } else {
       _setup_grad_f<MX>();
@@ -671,7 +671,7 @@ namespace casadi {
 
   template<typename M>
   void Nlpsol::_setup_jac_g() {
-    const Problem<M>& nlp = nlp2_;
+    const Problem<M>& nlp = nlp_;
     M x = nlp.in[NL_X];
     M p = nlp.in[NL_P];
     M f = nlp.out[NL_F];
@@ -685,7 +685,7 @@ namespace casadi {
   }
 
   void Nlpsol::setup_jac_g() {
-    if (nlp2_.is_sx) {
+    if (nlp_.is_sx) {
       _setup_jac_g<SX>();
     } else {
       _setup_jac_g<MX>();
@@ -694,14 +694,14 @@ namespace casadi {
 
   template<typename M>
   void Nlpsol::_setup_jac_f() {
-    const Problem<M>& nlp = nlp2_;
+    const Problem<M>& nlp = nlp_;
     jac_f_fcn_ = Function("nlp_jac_f", nlp.in,
                           {nlp.out[NL_F], M::jacobian(nlp.out[NL_F], nlp.in[NL_X])});
     alloc(jac_f_fcn_);
   }
 
   void Nlpsol::setup_jac_f() {
-    if (nlp2_.is_sx) {
+    if (nlp_.is_sx) {
       _setup_jac_f<SX>();
     } else {
       _setup_jac_f<MX>();
@@ -710,7 +710,7 @@ namespace casadi {
 
   template<typename M>
   void Nlpsol::_setup_hess_l(bool tr, bool sym, bool diag) {
-    const Problem<M>& nlp = nlp2_;
+    const Problem<M>& nlp = nlp_;
     std::vector<M> arg(HL_NUM_IN);
     M x = arg[HL_X] = nlp.in[NL_X];
     arg[HL_P] = nlp.in[NL_P];
@@ -732,7 +732,7 @@ namespace casadi {
   }
 
   void Nlpsol::setup_hess_l(bool tr, bool sym, bool diag) {
-    if (nlp2_.is_sx) {
+    if (nlp_.is_sx) {
       _setup_hess_l<SX>(tr, sym, diag);
     } else {
       _setup_hess_l<MX>(tr, sym, diag);

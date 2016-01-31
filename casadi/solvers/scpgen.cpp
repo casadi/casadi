@@ -216,8 +216,8 @@ namespace casadi {
     }
 
     // Generate lifting functions
-    casadi_assert(!nlp2_.is_sx);
-    Function fg("fg", nlp2_.mx_p->in, nlp2_.mx_p->out);
+    casadi_assert(!nlp_.is_sx);
+    Function fg("fg", nlp_.mx_p->in, nlp_.mx_p->out);
     Function vdef_fcn, vinit_fcn;
     fg.generate_lifted(vdef_fcn, vinit_fcn);
     vinit_fcn_ = vinit_fcn;

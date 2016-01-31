@@ -141,7 +141,7 @@ namespace casadi {
     bool iteration_callback_ignore_errors_;
 
     /// The NLP
-    XProblem nlp2_;
+    XProblem nlp_;
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(Memory& mem, const double**& arg, double**& res,
