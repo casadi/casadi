@@ -809,7 +809,7 @@ namespace casadi {
   }
 
   void Function::generate(const Dict& opts) {
-    generate(getSanitizedName(), opts);
+    generate(name(), opts);
   }
 
   void Function::generate(const string& fname, const Dict& opts) {
@@ -855,10 +855,6 @@ namespace casadi {
     } else {
       return (*this)->name();
     }
-  }
-
-  string Function::getSanitizedName() const {
-    return (*this)->getSanitizedName();
   }
 
   bool Function::check_name(const std::string& name) {

@@ -1850,7 +1850,7 @@ namespace casadi {
     generateDeclarations(g);
 
     // Define function
-    g.body << "/* " << getSanitizedName() << " */" << endl;
+    g.body << "/* " << name_ << " */" << endl;
     if (decl_static) {
       g.body << "static ";
     } else if (g.cpp) {
@@ -2368,10 +2368,6 @@ namespace casadi {
     alloc_res(sz_res, persistent);
     alloc_iw(sz_iw, persistent);
     alloc_w(sz_w, persistent);
-  }
-
-  std::string FunctionInternal::getSanitizedName() const {
-      return Function::fix_name(name_);
   }
 
   bool FunctionInternal::hasFullJacobian() const {

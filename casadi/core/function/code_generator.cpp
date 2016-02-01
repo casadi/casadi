@@ -88,7 +88,7 @@ namespace casadi {
   }
 
   void CodeGenerator::add(const Function& f) {
-    add(f, f.getSanitizedName());
+    add(f, f.name());
   }
 
   void CodeGenerator::add(const Function& f, const std::string& fname) {

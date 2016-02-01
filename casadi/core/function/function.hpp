@@ -944,9 +944,6 @@ namespace casadi {
      */
     bool is_a(const std::string& type, bool recursive=true) const;
 
-    /** \brief get function name with all non alphanumeric characters converted to '_' */
-    std::string getSanitizedName() const;
-
     /** \brief Check if a string is a valid function name 
      * Valid function names consist of
      *
