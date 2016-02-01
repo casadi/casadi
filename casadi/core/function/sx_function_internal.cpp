@@ -232,8 +232,12 @@ namespace casadi {
       g.body << "  ";
 
       if (it->op==OP_OUTPUT) {
-        g.body << "if (res[" << it->i0 << "]!=0) "
+        if (g.null_test) {
+          g.body << "if (res[" << it->i0 << "]!=0) "
                       << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
+        } else {
+          g.body << "res["<< it->i0 << "][" << it->i2 << "]=" << "a" << it->i1;
+        }
       } else {
         // Declare result if not already declared
         if (!declared[it->i0]) {
@@ -248,7 +252,11 @@ namespace casadi {
         if (it->op==OP_CONST) {
           g.body << g.constant(it->d);
         } else if (it->op==OP_INPUT) {
-          g.body << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
+          if (g.null_test) {
+            g.body << "arg[" << it->i1 << "] ? arg[" << it->i1 << "][" << it->i2 << "] : 0";
+          } else {
+            g.body << "arg[" << it->i1 << "][" << it->i2 << "]";
+          }
         } else {
           int ndep = casadi_math<double>::ndeps(it->op);
           casadi_math<double>::printPre(it->op, g.body);

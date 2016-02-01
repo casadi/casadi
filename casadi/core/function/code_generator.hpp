@@ -206,6 +206,8 @@ namespace casadi {
     // Creating meta?
     bool meta;
 
+    bool null_test;
+
     /** \brief Codegen scalar
      * Use the work vector for storing work vector elements of length 1
      * (typically scalar) instead of using local variables

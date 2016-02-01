@@ -43,6 +43,7 @@ namespace casadi {
     this->with_header = false;
     this->opencl = false;
     this->meta = true;
+    this->null_test = true;
 
     // Read options
     for (Dict::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
@@ -64,6 +65,8 @@ namespace casadi {
         this->opencl = it->second;
       } else if (it->first=="meta") {
         this->meta = it->second;
+      } else if (it->first=="null_test") {
+        this->null_test = it->second;
       } else {
         casadi_error("Unrecongnized option: " << it->first);
       }

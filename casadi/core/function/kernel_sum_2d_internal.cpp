@@ -628,6 +628,7 @@ namespace casadi {
     Dict opts;
     opts["opencl"] = true;
     opts["meta"] = false;
+    opts["null_test"] = false;
 
     CodeGenerator cg(opts);
     cg.add(f_, "F");
