@@ -47,7 +47,7 @@ for N in range(1,11):
   
   # Differential equation
   z = SX.sym("z")
-  F = Function("dz/dt", [z],[z*z - 2*z + 1])
+  F = Function("dz_dt", [z],[z*z - 2*z + 1])
   
   z0 = -3
   
