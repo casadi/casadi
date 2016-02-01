@@ -111,7 +111,7 @@ namespace casadi {
     // File(s) being generated, header is optional
     vector<ofstream> s(this->with_header ? 2 : 1);
 
-    std::string sname = Function::sanitizeName(name);
+    std::string sname = Function::fix_name(name);
 
     for (int i=0; i<s.size(); ++i) {
       // Create file(s)

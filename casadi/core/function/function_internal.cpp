@@ -2362,19 +2362,8 @@ namespace casadi {
     alloc_w(sz_w, persistent);
   }
 
-  // helper function for getSanitizedName
-  bool isBadChar(char c) {
-    return !std::isalnum(c);
-  }
-
   std::string FunctionInternal::getSanitizedName() const {
-      return sanitizeName(name_);
-  }
-
-  std::string FunctionInternal::sanitizeName(const std::string &name) {
-    string sname = name;
-    std::replace_if(sname.begin(), sname.end(), isBadChar, '_');
-    return sname;
+      return Function::fix_name(name_);
   }
 
   bool FunctionInternal::hasFullJacobian() const {

@@ -797,9 +797,6 @@ namespace casadi {
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
-    /** \brief get function name with all non alphanumeric characters converted to '_' */
-    static std::string sanitizeName(const std::string& name);
-
     /** \brief Can a derivative direction be skipped */
     template<typename MatType>
     static bool purgable(const std::vector<MatType>& seed);

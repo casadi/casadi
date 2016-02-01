@@ -851,7 +851,7 @@ namespace casadi {
 
   string Function::name() const {
     if (is_null()) {
-      return "NULL";
+      return "null";
     } else {
       return (*this)->name();
     }
@@ -861,8 +861,67 @@ namespace casadi {
     return (*this)->getSanitizedName();
   }
 
-  string Function::sanitizeName(const string& name) {
-    return FunctionInternal::sanitizeName(name);
+  bool Function::check_name(const std::string& name) {
+    // Check if empty
+    if (name.empty()) return false;
+
+    // Check if keyword
+    for (const char* kw : {"null", "jac", "hess"}) {
+      if (name.compare(kw)==0) return false;
+    }
+
+    // Make sure that the first character is a letter
+    auto it=name.begin();
+    if (!std::isalpha(*it++)) return false;
+
+    // Check remaining characters
+    for (; it!=name.end(); ++it) {
+      if (*it=='_') {
+        // Make sure that the next character isn't also an underscore
+        if (it+1!=name.end() && *(it+1)=='_') return false;
+      } else {
+        // Make sure alphanumeric
+        if (!std::isalnum(*it)) return false;
+      }
+    }
+
+    // Valid function name if reached this point
+    return true;
+  }
+
+  string Function::fix_name(const string& name) {
+    // Quick return if already valid name
+    if (check_name(name)) return name;
+
+    // If empty, name it "unnamed"
+    if (name.empty()) return "unnamed";
+
+    // Construct a sane name
+    stringstream ss;
+
+    // If the first character isn't a character, prepend an "a"
+    if (!std::isalpha(name.front())) ss << "a";
+
+    // Treat other characters
+    bool previous_is_underscore = false;
+    for (char c : name) {
+      if (std::isalnum(c)) {
+        // Alphanumeric characters
+        ss << c;
+        previous_is_underscore = false;
+      } else if (!previous_is_underscore) {
+        // Everything else becomes an underscore
+        ss << '_';
+        previous_is_underscore = true;
+      }
+    }
+
+    // If name became a keyword, append 1
+    for (const char* kw : {"null", "jac", "hess"}) {
+      if (ss.str().compare(kw)==0) ss << "1";
+    }
+
+    return ss.str();
   }
 
   void Function::forward(const vector<MX>& arg, const vector<MX>& res,

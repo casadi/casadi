@@ -947,8 +947,23 @@ namespace casadi {
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
 
-    /** \brief get function name with all non alphanumeric characters converted to '_' */
-    static std::string sanitizeName(const std::string& name);
+    /** \brief Check if a string is a valid function name 
+     * Valid function names consist of
+     *
+     * - At least one character
+     * - Upper and lower case letters: a-zA-Z
+     * - Numbers 0-9, but never as first character
+     * - Underscore, but never as first character and never next to another underscore
+     * 
+     * May not be one of the following keywords: "null", "jac", "hess"
+     */
+    static bool check_name(const std::string& name);
+
+    /** \brief Turn a string into a valid function name as defined by "check_name"
+     * Non-alphanumeric characters are converted into underscores and multiple
+     * consecutive undercores are dropped
+     */
+    static std::string fix_name(const std::string& name);
 
     /// Create a solve node
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
