@@ -98,6 +98,10 @@ namespace casadi {
     bool pointer_input_;
 
     bool image_float_;
+
+    int num_threads_;
+
+    bool null_test_;
     /// @}
   };
 
@@ -176,7 +180,6 @@ namespace casadi {
 
     int s_i_;
     int s_j_;
-    int ss_;
 
     int arg_length_;
 

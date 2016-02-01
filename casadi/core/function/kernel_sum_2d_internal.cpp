@@ -74,6 +74,12 @@ namespace casadi {
     addOption("image_float", OT_BOOLEAN, false,
       "Indicate that the image defined with pointer_input=True is in float.");
 
+    addOption("num_threads", OT_INTEGER, 1,
+      "Number of threads to execute in parallel (OpenCL)");
+
+    addOption("null_test", OT_BOOLEAN, true,
+      "If false, null-tests will be omitted from the kernel code.");
+
     casadi_assert(n>=1);
 
     casadi_assert_message(n==1, "Vectorized form of KernelSum2D not yet implemented.");
@@ -95,6 +101,8 @@ namespace casadi {
     opencl_select_ = getOption("opencl_select");
     image_float_ = getOption("image_float");
     pointer_input_ = getOption("pointer_input");
+    num_threads_ = getOption("num_threads");
+    null_test_ = getOption("null_test");
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
@@ -336,7 +344,9 @@ namespace casadi {
     if (options.find("image_float")==options.end()) {
       options["image_float"] = image_float_;
     }
-
+    if (options.find("num_threads")==options.end()) {
+      options["num_threads"] = num_threads_;
+    }
     Function ret = KernelSum2D(name, f_forward, size_, r_, n_, options);
 
     /* Furthermore, we need to return something of signature
@@ -436,6 +446,9 @@ namespace casadi {
     }
     if (options.find("image_float")==options.end()) {
       options["image_float"] = image_float_;
+    }
+    if (options.find("num_threads")==options.end()) {
+      options["num_threads"] = num_threads_;
     }
 
     Function kn = KernelSum2D(name, f_reverse, size_, r_, n_, options);
@@ -592,7 +605,6 @@ namespace casadi {
     stream << "KernelSum2D(" << name(f_) << ", " << n_ << ")";
   }
 
-
   void KernelSum2DOcl::init() {
 
     int num_in = f_.nIn(), num_out = f_.nOut();
@@ -601,10 +613,8 @@ namespace casadi {
 
     int s = round(r_)*2+1;
 
-
     s_i_ = min(s, size_.first);
     s_j_ = min(s, size_.second);
-    ss_ = 1;
 
     arg_length_ = 0;
     for (int i=2; i<num_in; ++i) {
@@ -614,11 +624,11 @@ namespace casadi {
     if (pointer_input_ && image_float_) {
       // Allocate space for float host buffers
       alloc_w(f_.sz_w() + nnz_out_+3 +
-        sizeof(float)*(arg_length_+f_.nnzOut()*s_j_*ss_+2)/sizeof(double));
+        sizeof(float)*(arg_length_+f_.nnzOut()*num_threads_+2)/sizeof(double));
     } else {
       // Allocate space for float host buffers
       alloc_w(f_.sz_w() + nnz_out_+3 +
-        sizeof(float)*(s_i_*s_j_+arg_length_+f_.nnzOut()*s_j_*ss_+3)/sizeof(double));
+        sizeof(float)*(s_i_*s_j_+arg_length_+f_.nnzOut()*num_threads_+3)/sizeof(double));
     }
   }
 
@@ -628,7 +638,7 @@ namespace casadi {
     Dict opts;
     opts["opencl"] = true;
     opts["meta"] = false;
-    opts["null_test"] = false;
+    opts["null_test"] = null_test_;
 
     CodeGenerator cg(opts);
     cg.add(f_, "F");
@@ -646,14 +656,12 @@ namespace casadi {
     code << "   __global float* args," << endl;
     code << "   int i_offset," << endl;
     code << "   int j_offset," << endl;
-    code << "   int idelta) {" << endl;
+    code << "   int idelta," << endl;
+    code << "   int jdelta) {" << endl;
     code << "  float args_local[" << arg_length_ << "];" << endl;
     code << "  float p[2];" << endl;
     code << "  float value;" << endl;
-    code << "  int jj = get_global_id(0);" << endl;
-    code << "  int j = jj / " << ss_ << ";" << endl;
-
-    code << "  int jk = jj % " << ss_ << ";" << endl;
+    code << "  int kk = get_global_id(0);" << endl;
     code << "  for (int k=0;k<"<< arg_length_ << ";++k) { args_local[k] = args[k]; }" << endl;
 
     code << "  int iw[" << f_.sz_iw() << "];" << endl;
@@ -677,17 +685,17 @@ namespace casadi {
     }
 
     code << "  for (int k=0;k<" << f_.nnzOut() << ";++k) { sum[k]= 0; }" << endl;
-    code << "  float sfrac = idelta/" << ss_ << ".0;" << endl;
-    code << "  int upper = (int) ceil((jk+1)*sfrac);" << endl;
-    code << "  int lower = (int) ceil(jk*sfrac);" << endl;
-    code << "  for (int i=lower;i<upper;++i) {" << endl;
-    code << "    value = im_in[j*idelta+i];" << endl;
-    code << "    p[1] = j_offset + j;" << endl;
-    code << "    p[0] = i_offset + i;" << endl;
+    code << "  float sfrac = idelta*jdelta/" << num_threads_ << ".0;" << endl;
+    code << "  int upper = (int) ceil((kk+1)*sfrac);" << endl;
+    code << "  int lower = (int) ceil(kk*sfrac);" << endl;
+    code << "  for (int k=lower;k<upper;++k) {" << endl;
+    code << "    value = im_in[k];" << endl;
+    code << "    p[1] = j_offset + k / idelta;" << endl;
+    code << "    p[0] = i_offset + k % idelta;" << endl;
     code << "    F(arg, res, iw, w); " << endl;
-    code << "    for (int k=0;k<" << f_.nnzOut() << ";++k) { sum[k]+= res_local[k]; }" << endl;
+    code << "    for (int kz=0;kz<" << f_.nnzOut() << ";++kz) { sum[kz]+= res_local[kz]; }" << endl;
     code << "  }" << endl;
-    code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) { sum_out[k+jj*" <<
+    code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) { sum_out[k+kk*" <<
       f_.nnzOut() << "] = sum[k]; }" << endl;
     code << "}   " << endl;
 
@@ -823,7 +831,7 @@ namespace casadi {
     g.setup << " sizeof(float)*" << s_i_*s_j_ << ", NULL, &err);" << endl;
     g.setup << "    check_cl_error(err);" << endl;
     g.setup << "    d_sum" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_WRITE_ONLY,";
-    g.setup << " sizeof(float)*" << f_.nnzOut()*s_j_*ss_ << ", NULL, &err);" << endl;
+    g.setup << " sizeof(float)*" << f_.nnzOut()*num_threads_ << ", NULL, &err);" << endl;
     g.setup << "    check_cl_error(err);" << endl;
 
     // Prepare kernel arguments
@@ -949,9 +957,10 @@ namespace casadi {
     g.body << "  err  = clSetKernelArg(kernel" << ind << "_, 3, sizeof(int), &imin);" << endl;
     g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 4, sizeof(int), &jmin);" << endl;
     g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 5, sizeof(int), &idelta);" << endl;
+    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 6, sizeof(int), &jdelta);" << endl;
     g.body << "  check_cl_error(err);" << endl;
 
-    g.body << "  size_t num = jdelta*" << ss_ << ";" << endl;
+    g.body << "  size_t num = " << num_threads_ << ";" << endl;
 
     // Run the kernel
     g.body << "  err = clEnqueueNDRangeKernel(commands" << ind << "_, kernel" << ind << "_, 1,";
@@ -962,7 +971,7 @@ namespace casadi {
 
     // Read back the output
     g.body << "  err = clEnqueueReadBuffer(commands" << ind << "_, d_sum" << ind << "_, CL_TRUE,";
-    g.body << " 0, sizeof(float) *jdelta*" <<  (f_.nnzOut()*ss_) << ", h_sum,";
+    g.body << " 0, sizeof(float)*" << f_.nnzOut()*num_threads_ << ", h_sum,";
     g.body << " 0, NULL, NULL ); " << endl;
     g.body << "  check_cl_error(err);" << endl;
 
