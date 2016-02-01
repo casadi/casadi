@@ -1438,12 +1438,6 @@ Remove modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
-
-";
-
 %feature("docstring") casadi::Callback::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -2733,12 +2727,6 @@ const  "
 
 Get of number of output elements For a particular output or for all for all
 of the outputs.
-
-";
-
-%feature("docstring")  casadi::Function::getSanitizedName() const  "
-
-get function name with all non alphanumeric characters converted to '_'
 
 ";
 
