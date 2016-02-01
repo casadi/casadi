@@ -1961,7 +1961,7 @@ namespace casadi {
     jac_in.push_back(cj);
 
     // Return generated function
-    return Function("jac", jac_in, {jac});
+    return Function("jacf", jac_in, {jac});
   }
 
   template<typename MatType>
@@ -1981,7 +1981,7 @@ namespace casadi {
     jac_in.push_back(cj);
 
     // return generated function
-    return Function("jacB", jac_in, {jac});
+    return Function("jacg", jac_in, {jac});
   }
 
   Function IdasInterface::getJacB() {

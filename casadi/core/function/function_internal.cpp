@@ -38,6 +38,14 @@ using namespace std;
 
 namespace casadi {
   FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
+    // Make sure valid function name
+    if (!Function::check_name(name_)) {
+      casadi_error("Function name is not valid. A valid function name is a string "
+                   "starting with a letter followed by letters, numbers or "
+                   "non-consecutive underscores. It may also not match the keywords "
+                   "'null', 'jac' or 'hess'. Got '" + name_ + "'");
+    }
+
     // Default options (can be overridden in derived classes)
     verbose_ = false;
     // By default, reverse mode is about twice as expensive as forward mode
