@@ -111,16 +111,24 @@ namespace casadi {
     // File(s) being generated, header is optional
     vector<ofstream> s(this->with_header ? 2 : 1);
 
-    std::string sname = Function::fix_name(name);
+    // Divide name into base and suffix (.c by default)
+    string basename, suffix;
+    string::size_type dotpos = name.rfind('.');
+    if (dotpos==string::npos) {
+      basename = name;
+      suffix = this->cpp ? ".cpp" : ".c";
+    } else {
+      basename = name.substr(0, dotpos);
+      suffix = name.substr(dotpos);
+    }
 
+    // Make sure that the base name is sane
+    casadi_assert(Function::check_name(basename));
+
+    // Create files
     for (int i=0; i<s.size(); ++i) {
       // Create file(s)
-      string fname;
-      if (this->cpp) {
-        fname = sname + (i==0 ? ".cpp" : ".hpp");
-      } else {
-        fname = sname + (i==0 ? ".c" : ".h");
-      }
+      string fname = i==0 ? basename + suffix : basename + ".h";
       s[i].open(fname.c_str());
 
       // Print header
@@ -140,7 +148,7 @@ namespace casadi {
          << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID" << endl
          << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)" << endl
          << "#else /* CODEGEN_PREFIX */" << endl
-         << "  #define CASADI_PREFIX(ID) " << sname << "_ ## ID" << endl
+         << "  #define CASADI_PREFIX(ID) " << basename << "_ ## ID" << endl
          << "#endif /* CODEGEN_PREFIX */" << endl << endl;
 
     s[0] << this->includes.str();
