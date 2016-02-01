@@ -77,6 +77,13 @@ namespace casadi {
     addOption("num_threads", OT_INTEGER, 1,
       "Number of threads to execute in parallel (OpenCL)");
 
+    addOption("num_work_items", OT_INTEGER, 1,
+      "Number of work items in one work-group (OpenCL)");
+
+    addOption("reduction_factor", OT_INTEGER, 1,
+      "Reduce the intermediate results by this factor (OpenCL)."
+      "1 indicates no reduction.");
+
     addOption("null_test", OT_BOOLEAN, true,
       "If false, null-tests will be omitted from the kernel code.");
 
@@ -103,6 +110,8 @@ namespace casadi {
     pointer_input_ = getOption("pointer_input");
     num_threads_ = getOption("num_threads");
     null_test_ = getOption("null_test");
+    num_work_items_ = getOption("num_work_items");
+    reduction_factor_ = getOption("reduction_factor");
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
@@ -616,19 +625,25 @@ namespace casadi {
     s_i_ = min(s, size_.first);
     s_j_ = min(s, size_.second);
 
+    casadi_assert(num_threads_ % num_work_items_==0);
+    casadi_assert(num_work_items_ % reduction_factor_==0);
+
     arg_length_ = 0;
     for (int i=2; i<num_in; ++i) {
       arg_length_+= f_.inputSparsity(i).nnz();
     }
 
+    int results_length = reduction_factor_==1 ? num_threads_ :
+                           num_threads_/num_work_items_*reduction_factor_;
+
     if (pointer_input_ && image_float_) {
       // Allocate space for float host buffers
       alloc_w(f_.sz_w() + nnz_out_+3 +
-        sizeof(float)*(arg_length_+f_.nnzOut()*num_threads_+2)/sizeof(double));
+        sizeof(float)*(arg_length_+f_.nnzOut()*results_length+2)/sizeof(double));
     } else {
       // Allocate space for float host buffers
       alloc_w(f_.sz_w() + nnz_out_+3 +
-        sizeof(float)*(s_i_*s_j_+arg_length_+f_.nnzOut()*num_threads_+3)/sizeof(double));
+        sizeof(float)*(s_i_*s_j_+arg_length_+f_.nnzOut()*results_length+3)/sizeof(double));
     }
   }
 
@@ -661,6 +676,12 @@ namespace casadi {
     code << "  float args_local[" << arg_length_ << "];" << endl;
     code << "  float p[2];" << endl;
     code << "  float value;" << endl;
+
+    if (reduction_factor_ > 1) {
+      code << "  float __local sum_out_local[" << f_.nnzOut()*num_work_items_ << "];" << endl;
+      code << "  int ll = get_local_id(0);" << endl;
+      code << "  int ii = get_group_id(0);" << endl;
+    }
     code << "  int kk = get_global_id(0);" << endl;
     code << "  for (int k=0;k<"<< arg_length_ << ";++k) { args_local[k] = args[k]; }" << endl;
 
@@ -695,8 +716,28 @@ namespace casadi {
     code << "    F(arg, res, iw, w); " << endl;
     code << "    for (int kz=0;kz<" << f_.nnzOut() << ";++kz) { sum[kz]+= res_local[kz]; }" << endl;
     code << "  }" << endl;
-    code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) { sum_out[k+kk*" <<
-      f_.nnzOut() << "] = sum[k]; }" << endl;
+    if (reduction_factor_>1) {
+      code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) { sum_out_local[k+ll*" <<
+        f_.nnzOut() << "] = sum[k]; }" << endl;
+    } else {
+      code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) { sum_out[k+kk*" <<
+        f_.nnzOut() << "] = sum[k]; }" << endl;
+    }
+
+    if (reduction_factor_>1) {
+      code << "  for (int k=0;k<" << f_.nnzOut() << ";++k) { sum[k]=0; }" << endl;
+      code << "  barrier(CLK_LOCAL_MEM_FENCE);" << endl;
+      code << "  if (ll>=" << reduction_factor_ << ") return;" << endl;
+      code << "  for (int i=0;i<" << num_work_items_/reduction_factor_ << ";++i) {" << endl;
+      code << "    int r=ll*" << num_work_items_/reduction_factor_ << "+i;" << endl;
+      code << "    for (int kz=0;kz<" << f_.nnzOut() << ";++kz) { ";
+      code << "      sum[kz]+= sum_out_local[r*" <<  f_.nnzOut() << "+kz]; }" << endl;
+      code << "  }" << endl;
+      code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) {";
+      code << " sum_out[k+(ll*" << num_threads_/num_work_items_ << "+ii)*" <<
+        f_.nnzOut() << "] = sum[k]; }" << endl;
+    }
+
     code << "}   " << endl;
 
     return code.str();
@@ -969,15 +1010,18 @@ namespace casadi {
     g.body << "  err = clFinish(commands" << ind << "_);" << endl;
     g.body << "  check_cl_error(err);" << endl;
 
+    int results_length = reduction_factor_==1 ? num_threads_ :
+                           num_threads_/num_work_items_*reduction_factor_;
+
     // Read back the output
     g.body << "  err = clEnqueueReadBuffer(commands" << ind << "_, d_sum" << ind << "_, CL_TRUE,";
-    g.body << " 0, sizeof(float)*" << f_.nnzOut()*num_threads_ << ", h_sum,";
+    g.body << " 0, sizeof(float)*" << f_.nnzOut()*results_length << ", h_sum,";
     g.body << " 0, NULL, NULL ); " << endl;
     g.body << "  check_cl_error(err);" << endl;
 
     // Sum up the results
     g.body << "  kk = 0;" << endl;
-    g.body << "  for (j=0;j<num;++j) {" << endl;
+    g.body << "  for (j=0;j<" << results_length << ";++j) {" << endl;
     for (int i=0;i<f_.nOut();++i) {
       g.body << "    if (res[" << i << "]) {" <<endl;
       g.body << "      for (k=0;k<" << f_.outputSparsity(i).nnz() << ";++k) {" <<endl;
@@ -988,7 +1032,7 @@ namespace casadi {
       g.body << "      kk += " << f_.outputSparsity(i).nnz() << ";"<< endl;
       g.body << "  }" <<endl;
     }
-   g.body << "  }" <<endl;
+    g.body << "  }" <<endl;
 
    // =========================
    // OpenCL driver code END

@@ -102,6 +102,10 @@ namespace casadi {
     int num_threads_;
 
     bool null_test_;
+
+    int num_work_items_;
+
+    int reduction_factor_;
     /// @}
   };
 
