@@ -22673,6 +22673,19 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
+| null_test    | OT_BOOLEAN   | true         | If false,    | casadi::Kern |
+|              |              |              | null-tests   | elSum2DBase  |
+|              |              |              | will be      |              |
+|              |              |              | omitted from |              |
+|              |              |              | the kernel   |              |
+|              |              |              | code.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| num_threads  | OT_INTEGER   | 1            | Number of    | casadi::Kern |
+|              |              |              | threads to   | elSum2DBase  |
+|              |              |              | execute in   |              |
+|              |              |              | parallel     |              |
+|              |              |              | (OpenCL)     |              |
++--------------+--------------+--------------+--------------+--------------+
 | opencl_selec | OT_INTEGER   | 0            | Index into   | casadi::Kern |
 | t            |              |              | OpenCL-      | elSum2DBase  |
 |              |              |              | compatible   |              |
