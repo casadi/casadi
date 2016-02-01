@@ -2339,6 +2339,8 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>null_test</td><td>OT_BOOLEAN</td><td>true</td><td>If false, null-tests will be omitted from the kernel code.</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to execute in parallel (OpenCL)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
@@ -2373,6 +2375,8 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>null_test</td><td>OT_BOOLEAN</td><td>true</td><td>If false, null-tests will be omitted from the kernel code.</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to execute in parallel (OpenCL)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
@@ -2407,6 +2411,8 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>null_test</td><td>OT_BOOLEAN</td><td>true</td><td>If false, null-tests will be omitted from the kernel code.</td><td>casadi::KernelSum2DOcl</td></tr>
+<tr><td>num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to execute in parallel (OpenCL)</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DOcl</td></tr>
@@ -2442,6 +2448,8 @@
 <tr><td>jit_options</td><td>OT_DICT</td><td>GenericType()</td><td>Options to be passed to the jit compiler.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>null_test</td><td>OT_BOOLEAN</td><td>true</td><td>If false, null-tests will be omitted from the kernel code.</td><td>casadi::KernelSum2DSerial</td></tr>
+<tr><td>num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to execute in parallel (OpenCL)</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DSerial</td></tr>
