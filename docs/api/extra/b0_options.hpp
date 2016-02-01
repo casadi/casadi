@@ -2341,10 +2341,12 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>null_test</td><td>OT_BOOLEAN</td><td>true</td><td>If false, null-tests will be omitted from the kernel code.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to execute in parallel (OpenCL)</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>num_work_items</td><td>OT_INTEGER</td><td>1</td><td>Number of work items in one work-group (OpenCL)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>reduction_factor</td><td>OT_INTEGER</td><td>1</td><td>Reduce the intermediate results by this factor (OpenCL).1 indicates no reduction.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
@@ -2377,10 +2379,12 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>null_test</td><td>OT_BOOLEAN</td><td>true</td><td>If false, null-tests will be omitted from the kernel code.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to execute in parallel (OpenCL)</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>num_work_items</td><td>OT_INTEGER</td><td>1</td><td>Number of work items in one work-group (OpenCL)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>reduction_factor</td><td>OT_INTEGER</td><td>1</td><td>Reduce the intermediate results by this factor (OpenCL).1 indicates no reduction.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
@@ -2413,10 +2417,12 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>null_test</td><td>OT_BOOLEAN</td><td>true</td><td>If false, null-tests will be omitted from the kernel code.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to execute in parallel (OpenCL)</td><td>casadi::KernelSum2DOcl</td></tr>
+<tr><td>num_work_items</td><td>OT_INTEGER</td><td>1</td><td>Number of work items in one work-group (OpenCL)</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DOcl</td></tr>
+<tr><td>reduction_factor</td><td>OT_INTEGER</td><td>1</td><td>Reduce the intermediate results by this factor (OpenCL).1 indicates no reduction.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>
@@ -2450,10 +2456,12 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>null_test</td><td>OT_BOOLEAN</td><td>true</td><td>If false, null-tests will be omitted from the kernel code.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to execute in parallel (OpenCL)</td><td>casadi::KernelSum2DSerial</td></tr>
+<tr><td>num_work_items</td><td>OT_INTEGER</td><td>1</td><td>Number of work items in one work-group (OpenCL)</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>opencl_select</td><td>OT_INTEGER</td><td>0</td><td>Index into OpenCL-compatible devices, to select which one to use.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DSerial</td></tr>
+<tr><td>reduction_factor</td><td>OT_INTEGER</td><td>1</td><td>Reduce the intermediate results by this factor (OpenCL).1 indicates no reduction.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_threshold</td><td>OT_INTEGER</td><td>-1</td><td>Sets the maximum amount of nonzeros in a row for which coloring will be attempted.</td><td>casadi::FunctionInternal</td></tr>

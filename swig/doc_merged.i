@@ -17869,6 +17869,12 @@ Joris Gillis
 |              |              |              | parallel     |              |
 |              |              |              | (OpenCL)     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| num_work_ite | OT_INTEGER   | 1            | Number of    | casadi::Kern |
+| ms           |              |              | work items   | elSum2DBase  |
+|              |              |              | in one work- |              |
+|              |              |              | group        |              |
+|              |              |              | (OpenCL)     |              |
++--------------+--------------+--------------+--------------+--------------+
 | opencl_selec | OT_INTEGER   | 0            | Index into   | casadi::Kern |
 | t            |              |              | OpenCL-      | elSum2DBase  |
 |              |              |              | compatible   |              |
@@ -17892,6 +17898,14 @@ Joris Gillis
 |              |              |              | input, use a |              |
 |              |              |              | pointer to   |              |
 |              |              |              | an image     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reduction_fa | OT_INTEGER   | 1            | Reduce the   | casadi::Kern |
+| ctor         |              |              | intermediate | elSum2DBase  |
+|              |              |              | results by   |              |
+|              |              |              | this factor  |              |
+|              |              |              | (OpenCL).1   |              |
+|              |              |              | indicates no |              |
+|              |              |              | reduction.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
