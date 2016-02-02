@@ -71,8 +71,8 @@ namespace casadi {
     addOption("pointer_input", OT_BOOLEAN, false,
       "Instead of the image as input, use a pointer to an image");
 
-    addOption("image_float", OT_BOOLEAN, false,
-      "Indicate that the image defined with pointer_input=True is in float.");
+    addOption("image_type", OT_INTEGER, 64,
+      "Indicate the number of bits used in the image defined with pointer_input=True.");
 
     addOption("num_threads", OT_INTEGER, 1,
       "Number of threads to execute in parallel (OpenCL)");
@@ -105,7 +105,7 @@ namespace casadi {
   void KernelSum2DBase::init() {
 
     opencl_select_ = getOption("opencl_select");
-    image_float_ = getOption("image_float");
+    image_type_ = getOption("image_type");
     pointer_input_ = getOption("pointer_input");
     num_threads_ = getOption("num_threads");
     null_test_ = getOption("null_test");
@@ -349,8 +349,8 @@ namespace casadi {
     if (options.find("pointer_input")==options.end()) {
       options["pointer_input"] = pointer_input_;
     }
-    if (options.find("image_float")==options.end()) {
-      options["image_float"] = image_float_;
+    if (options.find("image_type")==options.end()) {
+      options["image_type"] = image_type_;
     }
     if (options.find("num_threads")==options.end()) {
       options["num_threads"] = num_threads_;
@@ -452,8 +452,8 @@ namespace casadi {
     if (options.find("pointer_input")==options.end()) {
       options["pointer_input"] = pointer_input_;
     }
-    if (options.find("image_float")==options.end()) {
-      options["image_float"] = image_float_;
+    if (options.find("image_type")==options.end()) {
+      options["image_type"] = image_type_;
     }
     if (options.find("num_threads")==options.end()) {
       options["num_threads"] = num_threads_;
@@ -633,7 +633,7 @@ namespace casadi {
 
     int results_length = reduction_ ? num_threads_/num_work_items_ : num_threads_;
 
-    if (pointer_input_ && image_float_) {
+    if (pointer_input_ && image_type_< 64) {
       // Allocate space for float host buffers
       alloc_w(f_.sz_w() + nnz_out_+3 +
         sizeof(float)*(arg_length_+f_.nnzOut()*results_length+2)/sizeof(double));
@@ -656,6 +656,7 @@ namespace casadi {
     cg.add(f_, "F");
 
     //code << "#pragma OPENCL EXTENSION cl_khr_fp64: enable" << endl;
+    //code << "#pragma OPENCL EXTENSION cl_khr_fp16 : enable" << endl;
     code << "#define d float" << endl;
     code << "#define real_t float" << endl;
     code << "#define CASADI_PREFIX(ID) test_c_ ## ID" << endl;
@@ -663,7 +664,11 @@ namespace casadi {
     code << cg.generate() << endl;
 
     code << "__kernel void mykernel(" << endl;
-    code << "   __global float* im_in," << endl;
+    if (image_type_>16) {
+      code << "   __global float* im_in," << endl;
+    } else {
+      code << "   __global half* im_in," << endl;
+    }
     code << "   __global float* sum_out," << endl;
     code << "   __global float* args," << endl;
     code << "   int i_offset," << endl;
@@ -707,7 +712,11 @@ namespace casadi {
     code << "  int upper = (int) ceil((kk+1)*sfrac);" << endl;
     code << "  int lower = (int) ceil(kk*sfrac);" << endl;
     code << "  for (int k=lower;k<upper;++k) {" << endl;
-    code << "    value = im_in[k];" << endl;
+    if (image_type_==16) {
+      code << "    value = vload_half(k, im_in);" << endl;
+    } else {
+      code << "    value = im_in[k];" << endl;
+    }
     code << "    p[1] = j_offset + k / idelta;" << endl;
     code << "    p[0] = i_offset + k % idelta;" << endl;
     code << "    F(arg, res, iw, w); " << endl;
@@ -887,8 +896,13 @@ namespace casadi {
     g.setup << "    d_args" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_READ_ONLY,";
     g.setup << " sizeof(float)*" <<  arg_length_ << ", NULL, &err);" << endl;
     g.setup << "    check_cl_error(err);" << endl;
-    g.setup << "    d_im" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_READ_ONLY,";
-    g.setup << " sizeof(float)*" << s_i_*s_j_ << ", NULL, &err);" << endl;
+    if (image_type_==16) {
+      g.setup << "    d_im" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_READ_ONLY,";
+      g.setup << " sizeof(float)/2*" << s_i_*s_j_ << ", NULL, &err);" << endl;
+    } else {
+      g.setup << "    d_im" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_READ_ONLY,";
+      g.setup << " sizeof(float)*" << s_i_*s_j_ << ", NULL, &err);" << endl;
+    }
     g.setup << "    check_cl_error(err);" << endl;
     g.setup << "    d_sum" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_WRITE_ONLY,";
     g.setup << " sizeof(float)*" << f_.nnzOut()*num_threads_ << ", NULL, &err);" << endl;
@@ -929,10 +943,12 @@ namespace casadi {
 
     const double* V;
     if (pointer_input_) {
-      if (image_float_) {
-        g.body << "  const float* V =  (float *) *((uint64_t *) arg[0]);" << endl;
-      } else {
+      if (image_type_==64) {
         g.body << "  const real_t* V =  (double *) *((uint64_t *) arg[0]);" << endl;
+      } else if (image_type_==32) {
+        g.body << "  const float* V =  (float *) *((uint64_t *) arg[0]);" << endl;
+      } else if (image_type_==16) {
+        g.body << "  const float* V =  (float *) *((uint64_t *) arg[0]);" << endl;
       }
     } else {
       g.body << "  const real_t* V = arg[0];" << endl;
@@ -946,7 +962,7 @@ namespace casadi {
     // Obtain pointers to float host buffers
     g.body << "  float *h_args = (float*) (w+" << f_.sz_w() + nnz_out_+3 << ");" << endl;
 
-    if (pointer_input_ && image_float_) {
+    if (pointer_input_ && image_type_<64) {
       g.body << "  float *h_sum = (float*) (w+" << f_.sz_w() + nnz_out_+3 << "+sizeof(float)*(";
       g.body << arg_length_ +1<< ")/sizeof(double));" << endl;
     } else {
@@ -983,14 +999,19 @@ namespace casadi {
 
     g.body << "  if (idelta==0 || jdelta==0) return 0;" << endl;
 
-    if (pointer_input_ && image_float_) {
+    if (pointer_input_ && image_type_<64) {
+      if (image_type_==16) {
+        g.body << "  size_t bs = 2;" << endl;
+      } else {
+        g.body << "  size_t bs = 4;" << endl;
+      }
       g.body << "  size_t buffer_origin[3] = {0, 0, 0};" << endl;
-      g.body << "  size_t host_origin[3] = {sizeof(float)*imin, jmin, 0};" << endl;
-      g.body << "  size_t region[3] = {sizeof(float)*idelta, jdelta, 1};" << endl;
+      g.body << "  size_t host_origin[3] = {bs*imin, jmin, 0};" << endl;
+      g.body << "  size_t region[3] = {bs*idelta, jdelta, 1};" << endl;
 
       g.body << "  err = clEnqueueWriteBufferRect(commands" << ind << "_,";
       g.body << " d_im" << ind << "_, CL_TRUE, ";
-      g.body << " buffer_origin, host_origin, region, sizeof(float)*idelta, 0, sizeof(float)*";
+      g.body << " buffer_origin, host_origin, region, bs*idelta, 0, bs*";
       g.body << size_.first << ", 0, V, 0, NULL, NULL);" << endl;
       g.body << "  check_cl_error(err);" << endl;
     } else {

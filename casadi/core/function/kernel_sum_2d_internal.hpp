@@ -97,7 +97,7 @@ namespace casadi {
 
     bool pointer_input_;
 
-    bool image_float_;
+    int image_type_;
 
     int num_threads_;
 
