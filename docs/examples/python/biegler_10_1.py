@@ -70,7 +70,7 @@ for N in range(1,11):
 
     print "l(", j, ") = ", L
 
-    f = Function("l(" + str(j) + ")", [tau],[L])
+    f = Function("l_" + str(j), [tau],[L])
     
     # initialize
     l.append(f)
