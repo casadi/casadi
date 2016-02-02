@@ -42,6 +42,7 @@
 #include "mx/mx.hpp"
 
 // Functions
+#include "function/oracle.hpp"
 #include "function/code_generator.hpp"
 #include "function/compiler.hpp"
 #include "function/callback.hpp"

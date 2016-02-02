@@ -107,6 +107,9 @@ namespace casadi {
     DE_RP,
     DE_NUM_IN};
 
+  /// Shortnames for DAE symbolic representation inputs
+  const std::vector<std::string> DE_INPUTS = {"t", "x", "z", "p", "rx", "rz", "rp"};
+
   /// Inputs of the symbolic representation of the DAE
   enum DeOut {
     DE_ODE,
@@ -116,6 +119,9 @@ namespace casadi {
     DE_RALG,
     DE_RQUAD,
     DE_NUM_OUT};
+
+  /// Shortnames for DAE symbolic representation outputs
+  const std::vector<std::string> DE_OUTPUTS = {"ode", "alg", "quad", "rode", "ralg", "rquad"};
 
   /// Input arguments of an ODE/DAE function
   enum DAEInput {
@@ -221,6 +227,9 @@ namespace casadi {
     NL_NUM_IN
   };
 
+  /// Shortname for onput arguments of an NLP function
+  const std::vector<std::string> NL_INPUTS = {"x", "p"};
+
   /// Output arguments of an NLP function
   enum NLPOutput {
     /// Objective function
@@ -230,6 +239,9 @@ namespace casadi {
     /// Number of NLP outputs
     NL_NUM_OUT
   };
+
+  /// Shortname for output arguments of an NLP function
+  const std::vector<std::string> NL_OUTPUTS = {"f", "g"};
 
   /// Input arguments of an NLP objective gradient function]
   enum GradFInput {

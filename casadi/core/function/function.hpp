@@ -41,66 +41,6 @@
 namespace casadi {
 
 #ifndef SWIG
-  /** Symbolic representation of a problem */
-  template<typename XType>
-  class CASADI_EXPORT Problem {
-  public:
-    std::vector<XType> in;
-    std::vector<XType> out;
-    std::vector<std::string> ischeme;
-    std::vector<std::string> oscheme;
-
-    // Input sparsity
-    const Sparsity& sparsity_in(int i) { return in.at(i).sparsity();}
-
-    // Output sparsity
-    const Sparsity& sparsity_out(int i) { return out.at(i).sparsity();}
-
-    // Constructor (expressions given)
-    Problem(const std::vector<XType>& in, const std::vector<XType>& out,
-            const std::vector<std::string>& ischeme,
-            const std::vector<std::string>& oscheme)
-      : in(in), out(out), ischeme(ischeme), oscheme(oscheme) {
-    }
-
-    // Constructor (only schemes)
-    Problem(const std::vector<std::string>& ischeme,
-            const std::vector<std::string>& oscheme)
-      : in(ischeme.size()), out(oscheme.size()), ischeme(ischeme), oscheme(oscheme) {
-    }
-  };
-  typedef Problem<SX> SXProblem;
-  typedef Problem<MX> MXProblem;
-
-  /** Can be either an SXProblem or MXProblem */
-  class CASADI_EXPORT XProblem {
-  public:
-    union {
-      SXProblem *sx_p;
-      MXProblem *mx_p;
-    };
-    bool is_sx;
-    /// Object is SX
-    XProblem(const SXProblem& d);
-    /// Object is MX
-    XProblem(const MXProblem& d);
-    /// Copy constructor
-    XProblem(const XProblem& d);
-    XProblem& operator=(const XProblem& d);
-    /// Destructor
-    ~XProblem();
-    /// Type cast
-    operator const SXProblem&() const;
-    operator const MXProblem&() const;
-    // Input/output sparsity
-    const Sparsity& sparsity_in(int i) const {
-      return is_sx ? sx_p->sparsity_in(i) : mx_p->sparsity_in(i);
-    }
-    const Sparsity& sparsity_out(int i) const {
-      return is_sx ? sx_p->sparsity_out(i) : mx_p->sparsity_out(i);
-    }
-  };
-
   /** Forward declaration of internal class */
   class FunctionInternal;
 

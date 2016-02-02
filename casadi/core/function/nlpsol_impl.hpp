@@ -167,7 +167,6 @@ namespace casadi {
     enum FIn { F_X, F_P, F_NUM_IN };
     enum FOut { F_F, F_NUM_OUT};
     Function f_fcn_;
-    template<typename M> void _setup_f();
     void setup_f();
     int calc_f(NlpsolMemory& m, const double* x, const double* p, double* f) const;
 
@@ -175,13 +174,11 @@ namespace casadi {
     enum GIn { G_X, G_P, G_NUM_IN };
     enum GOut { G_G, G_NUM_OUT};
     Function g_fcn_;
-    template<typename M> void _setup_g();
     void setup_g();
     int calc_g(NlpsolMemory& m, const double* x, const double* p, double* g) const;
 
     // Calculate both objective and constraints
     Function fg_fcn_;
-    template<typename M> void _setup_fg();
     void setup_fg();
     int calc_fg(NlpsolMemory& m, const double* x, const double* p, double* f, double* g) const;
 
@@ -280,7 +277,7 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
-    return Problem<XType>(nl_in, nl_out, nlpsol_in(), nlpsol_out());
+    return Problem<XType>(nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
   }
 
   template<typename XType>
@@ -295,7 +292,7 @@ namespace casadi {
 
   template<typename XType>
   Problem<XType> Nlpsol::fun2problem(Function nlp) {
-    Problem<XType> p(nlpsol_in(), nlpsol_out());
+    Problem<XType> p(NL_INPUTS, NL_OUTPUTS);
     p.in = XType::get_input(nlp);
     casadi_assert(p.in.size()==NL_NUM_IN);
     p.out = nlp(p.in);

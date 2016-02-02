@@ -26,7 +26,7 @@
 #ifndef CASADI_INTEGRATOR_HPP
 #define CASADI_INTEGRATOR_HPP
 
-#include "function.hpp"
+#include "oracle.hpp"
 #include "linsol.hpp"
 #include "rootfinder.hpp"
 

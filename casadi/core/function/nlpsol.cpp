@@ -571,61 +571,19 @@ namespace casadi {
     return 0;
   }
 
-  template<typename M>
-  void Nlpsol::_setup_f() {
-    const Problem<M>& nlp = nlp_;
-    std::vector<M> arg(F_NUM_IN);
-    arg[F_X] = nlp.in[NL_X];
-    arg[F_P] = nlp.in[NL_P];
-    std::vector<M> res(F_NUM_OUT);
-    res[F_F] = nlp.out[NL_F];
-    f_fcn_ = Function("nlp_f", arg, res);
+  void Nlpsol::setup_f() {
+    f_fcn_ = nlp_.create("nlp_f", {"x", "p"}, {"f"});
     alloc(f_fcn_);
   }
 
-  void Nlpsol::setup_f() {
-    if (nlp_.is_sx) {
-      _setup_f<SX>();
-    } else {
-      _setup_f<MX>();
-    }
-  }
-
-  template<typename M>
-  void Nlpsol::_setup_g() {
-    const Problem<M>& nlp = nlp_;
-    std::vector<M> arg(G_NUM_IN);
-    arg[G_X] = nlp.in[NL_X];
-    arg[G_P] = nlp.in[NL_P];
-    std::vector<M> res(G_NUM_OUT);
-    res[G_G] = nlp.out[NL_G];
-    g_fcn_ = Function("nlp_g", arg, res);
+  void Nlpsol::setup_g() {
+    g_fcn_ = nlp_.create("nlp_g", {"x", "p"}, {"g"});
     alloc(g_fcn_);
   }
 
-  void Nlpsol::setup_g() {
-    if (nlp_.is_sx) {
-      _setup_g<SX>();
-    } else {
-      _setup_g<MX>();
-    }
-  }
-
-  template<typename M>
-  void Nlpsol::_setup_fg() {
-    const Problem<M>& nlp = nlp_;
-    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
-    std::vector<M> res = {nlp.out[NL_F], nlp.out[NL_G]};
-    fg_fcn_ = Function("nlp_fg", arg, res);
-    alloc(fg_fcn_);
-  }
-
   void Nlpsol::setup_fg() {
-    if (nlp_.is_sx) {
-      _setup_fg<SX>();
-    } else {
-      _setup_fg<MX>();
-    }
+    fg_fcn_ = nlp_.create("nlp_fg", {"x", "p"}, {"f", "g"});
+    alloc(fg_fcn_);
   }
 
   template<typename M>

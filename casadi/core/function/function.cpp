@@ -1138,57 +1138,6 @@ namespace casadi {
     return ret;
   }
 
-  XProblem::XProblem(const SXProblem& d) : sx_p(new SXProblem(d)), is_sx(true) {
-  }
-
-  XProblem::XProblem(const MXProblem& d) : mx_p(new MXProblem(d)), is_sx(false) {
-  }
-
-  XProblem::~XProblem() {
-    if (is_sx) {
-      delete sx_p;
-    } else {
-      delete mx_p;
-    }
-  }
-
-  XProblem::XProblem(const XProblem& d) : is_sx(d.is_sx) {
-    if (d.is_sx) {
-      sx_p = new SXProblem(*d.sx_p);
-    } else {
-      mx_p = new MXProblem(*d.mx_p);
-    }
-  }
-
-  XProblem& XProblem::operator=(const XProblem& d) {
-    if (&d!=this) {
-      // Delete the previous object
-      if (is_sx) {
-        delete sx_p;
-      } else {
-        delete mx_p;
-      }
-      // Assign
-      is_sx = d.is_sx;
-      if (is_sx) {
-        sx_p = new SXProblem(*d.sx_p);
-      } else {
-        mx_p = new MXProblem(*d.mx_p);
-      }
-    }
-    return *this;
-  }
-
-  XProblem::operator const SXProblem&() const {
-    casadi_assert(is_sx);
-    return *sx_p;
-  }
-
-  XProblem::operator const MXProblem&() const {
-    casadi_assert(!is_sx);
-    return *mx_p;
-  }
-
   Function jit(const std::string& name, int n_in, int n_out,
                const std::string& body, const Dict& opts) {
     Function ret;

@@ -283,7 +283,7 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
-    return Problem<XType>(de_in, de_out, integrator_in(), integrator_out());
+    return Problem<XType>(de_in, de_out, DE_INPUTS, DE_OUTPUTS);
   }
 
   template<typename XType>
@@ -307,7 +307,7 @@ namespace casadi {
 
   template<typename XType>
   Problem<XType> Integrator::fun2problem(Function f, Function g) {
-    Problem<XType> dae(integrator_in(), integrator_out());
+    Problem<XType> dae(DE_INPUTS, DE_OUTPUTS);
     std::vector<XType> v = XType::get_input(f), vf=v, vg=v;
     dae.in[DE_T] = v[DAE_T];
     dae.in[DE_X] = v[DAE_X];

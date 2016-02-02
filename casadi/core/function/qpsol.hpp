@@ -26,7 +26,7 @@
 #ifndef CASADI_QPSOL_HPP
 #define CASADI_QPSOL_HPP
 
-#include "function.hpp"
+#include "oracle.hpp"
 
 namespace casadi {
 
