@@ -50,6 +50,12 @@ namespace casadi {
     std::vector<std::string> ischeme;
     std::vector<std::string> oscheme;
 
+    // Input sparsity
+    const Sparsity& sparsity_in(int i) { return in.at(i).sparsity();}
+
+    // Output sparsity
+    const Sparsity& sparsity_out(int i) { return out.at(i).sparsity();}
+
     // Constructor (expressions given)
     Problem(const std::vector<XType>& in, const std::vector<XType>& out,
             const std::vector<std::string>& ischeme,
@@ -86,6 +92,13 @@ namespace casadi {
     /// Type cast
     operator const SXProblem&() const;
     operator const MXProblem&() const;
+    // Input/output sparsity
+    const Sparsity& sparsity_in(int i) const {
+      return is_sx ? sx_p->sparsity_in(i) : mx_p->sparsity_in(i);
+    }
+    const Sparsity& sparsity_out(int i) const {
+      return is_sx ? sx_p->sparsity_out(i) : mx_p->sparsity_out(i);
+    }
   };
 
   /** Forward declaration of internal class */
