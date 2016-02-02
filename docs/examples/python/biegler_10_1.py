@@ -52,7 +52,7 @@ for N in range(1,11):
   z0 = -3
   
   # Analytic solution
-  z_analytic = Function("analytic solution", [t], [(4*t-3)/(3*t+1)])
+  z_analytic = Function("z_analytic", [t], [(4*t-3)/(3*t+1)])
   
   # Collocation point
   tau = SX.sym("tau")
