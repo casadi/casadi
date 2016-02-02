@@ -94,93 +94,105 @@ namespace casadi {
                                   const std::vector<std::string>& s_out,
                                   const std::vector<LinComb>& lincomb,
                                   const Dict& opts) const {
-    // Inputs and outputs of function being assembled
+    // Inputs of function being assembled
     vector<XType> ret_in(s_in.size());
+
+    // Handle inputs
+    for (int i=0; i<ret_in.size(); ++i) {
+      // Locate it in the input scheme
+      auto it = std::find(ischeme.begin(), ischeme.end(), s_in[i]);
+      if (it!=ischeme.end()) {
+        ret_in[i] = in.at(it-ischeme.begin());
+        continue;
+      }
+
+      // Not found
+      casadi_error("Cannot treat input \"" + s_in[i] + "\"");
+    }
+
+    // Outputs of function being assembled
     vector<XType> ret_out(s_out.size());
 
-    // Which input and output expressions have been assigned so far
-    vector<bool> assigned_in(s_in.size(), false);
-    vector<bool> assigned_out(s_out.size(), false);
-
     // List of valid attributes
-    enum Attributes {
-      ATTR_TRANSPOSE,
-      ATTR_TRIU,
-      ATTR_TRIL,
-      ATTR_DENSIFY};
+    const vector<string> all_attr = {"transpose", "triu", "tril", "densify"};
 
-    // Separarate attributes
-    vector<vector<Attributes> > attr(s_out.size());
-    vector<string> s_out_noatt = s_out;
-    for (int i=0; i<s_out_noatt.size(); ++i) {
-      // Currently processed string
-      string& s = s_out_noatt[i];
+    // Handle outputs
+    for (int i=0; i<ret_out.size(); ++i) {
+      XType& r = ret_out[i];
 
-      // Loop over attributes
+      // Output name
+      string s = s_out[i];
+
+      // Separarate attributes
+      vector<string> attr;
       while (true) {
         // Find the first underscore separator
         size_t pos = s.find('_');
         if (pos>=s.size()) break; // No more underscore
         string a = s.substr(0, pos);
 
-        // Abort if not attribute
-        if (a=="transpose") {
-          attr[i].push_back(ATTR_TRANSPOSE);
-        } else if (a=="triu") {
-          attr[i].push_back(ATTR_TRIU);
-        } else if (a=="tril") {
-          attr[i].push_back(ATTR_TRIL);
-        } else if (a=="densify") {
-          attr[i].push_back(ATTR_DENSIFY);
-        } else {
-          // No more attribute
-          break;
-        }
+        // Try to match with attributes
+        auto it = std::find(all_attr.begin(), all_attr.end(), a);
+        if (it==all_attr.end()) break; // No more attribute
 
-        // Strip attribute
+        // Save attribute and strip from s
+        attr.push_back(*it);
         s = s.substr(pos+1, string::npos);
       }
-    }
 
-    // Assign non-differentiated inputs
-    for (int i=0; i<ret_in.size(); ++i) {
-      // Locate it in the input scheme
-      auto it = std::find(ischeme.begin(), ischeme.end(), s_in[i]);
-      if (it!=ischeme.end()) {
-        ret_in[i] = in.at(it-ischeme.begin());
-        assigned_in[i] = true;
-      }
-    }
-
-    // Make sure all inputs have been treated
-    for (int i=0; i<ret_in.size(); ++i) {
-      casadi_assert_message(assigned_in[i], "Cannot treat input \"" + s_in[i] + "\"");
-    }
-
-    // Assign non-differentiated outputs
-    for (int i=0; i<ret_out.size(); ++i) {
-      // Locate it in the input scheme
-      auto it = std::find(oscheme.begin(), oscheme.end(), s_out_noatt[i]);
+      // Try to locate in list of outputs
+      auto it = std::find(oscheme.begin(), oscheme.end(), s);
       if (it!=oscheme.end()) {
-        ret_out[i] = out.at(it-oscheme.begin());
-        assigned_out[i] = true;
+        // Non-differentiated output
+        r = out.at(it-oscheme.begin());
+      } else {
+        // Must be an operator
+        size_t pos = s.find('_');
+        casadi_assert_message(pos<s.size(), s_out[i] + " is not an output or operator");
+        string op = s.substr(0, pos);
+        s = s.substr(pos+1);
+
+        // Handle different types of operators
+        if (op=="grad") {
+          // Output
+          pos = s.find('_');
+          casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
+          string res = s.substr(0, pos);
+          int res_i = std::find(oscheme.begin(), oscheme.end(), res) - oscheme.begin();
+          casadi_assert_message(res_i<oscheme.size(),
+                                "Unrecognized output " + res + " in " + s_out[i]);
+          s = s.substr(pos+1);
+
+          // Input
+          pos = s.find('_');
+          casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
+          string arg = s.substr(0, pos);
+          int arg_i = std::find(ischeme.begin(), ischeme.end(), arg) - ischeme.begin();
+          casadi_assert_message(arg_i<ischeme.size(),
+                                "Unrecognized input " + arg + " in " + s_out[i]);
+          s = s.substr(pos+1);
+          casadi_assert_message(s.empty(), s_out[i] + " is ill-posed");
+
+          // Calculate gradient
+          r = gradient(out[res_i], in[arg_i]);
+
+        } else {
+          casadi_error("Unknown operator: " + op);
+        }
       }
-    }
 
-    // Make sure all outputs have been treated
-    for (int i=0; i<ret_out.size(); ++i) {
-      casadi_assert_message(assigned_out[i], "Cannot treat output \"" + s_out[i] + "\"");
-    }
-
-    // Apply attributes (starting from the right-most one)
-    for (int i=0; i<s_out.size(); ++i) {
-      XType& r = ret_out[i];
-      for (auto a=attr[i].rbegin(); a!=attr[i].rend(); ++a) {
-        switch (*a) {
-        case ATTR_TRANSPOSE: r = r.T(); break;
-        case ATTR_TRIU: r = triu(r); break;
-        case ATTR_TRIL: r = tril(r); break;
-        case ATTR_DENSIFY: r = densify(r); break;
+      // Apply attributes (starting from the right-most one)
+      for (auto a=attr.rbegin(); a!=attr.rend(); ++a) {
+        if (*a=="transpose") {
+          r = r = r.T();
+        } else if (*a=="triu") {
+          r = triu(r);
+        } else if (*a=="tril") {
+          r = tril(r);
+        } else if (*a=="densify") {
+          r = densify(r);
+        } else {
+          casadi_assert(0);
         }
       }
     }
