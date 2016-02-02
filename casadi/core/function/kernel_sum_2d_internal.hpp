@@ -105,7 +105,7 @@ namespace casadi {
 
     int num_work_items_;
 
-    int reduction_factor_;
+    bool reduction_;
     /// @}
   };
 

@@ -80,9 +80,8 @@ namespace casadi {
     addOption("num_work_items", OT_INTEGER, 1,
       "Number of work items in one work-group (OpenCL)");
 
-    addOption("reduction_factor", OT_INTEGER, 1,
-      "Reduce the intermediate results by this factor (OpenCL)."
-      "1 indicates no reduction.");
+    addOption("reduction", OT_BOOLEAN, false,
+      "Indicates if a recution is applied on the GPU.");
 
     addOption("null_test", OT_BOOLEAN, true,
       "If false, null-tests will be omitted from the kernel code.");
@@ -111,7 +110,7 @@ namespace casadi {
     num_threads_ = getOption("num_threads");
     null_test_ = getOption("null_test");
     num_work_items_ = getOption("num_work_items");
-    reduction_factor_ = getOption("reduction_factor");
+    reduction_ = getOption("reduction");
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
@@ -626,15 +625,13 @@ namespace casadi {
     s_j_ = min(s, size_.second);
 
     casadi_assert(num_threads_ % num_work_items_==0);
-    casadi_assert(num_work_items_ % reduction_factor_==0);
 
     arg_length_ = 0;
     for (int i=2; i<num_in; ++i) {
       arg_length_+= f_.inputSparsity(i).nnz();
     }
 
-    int results_length = reduction_factor_==1 ? num_threads_ :
-                           num_threads_/num_work_items_*reduction_factor_;
+    int results_length = reduction_ ? num_threads_/num_work_items_ : num_threads_;
 
     if (pointer_input_ && image_float_) {
       // Allocate space for float host buffers
@@ -677,7 +674,7 @@ namespace casadi {
     code << "  float p[2];" << endl;
     code << "  float value;" << endl;
 
-    if (reduction_factor_ > 1) {
+    if (reduction_) {
       code << "  float __local sum_out_local[" << f_.nnzOut()*num_work_items_ << "];" << endl;
       code << "  int ll = get_local_id(0);" << endl;
       code << "  int ii = get_group_id(0);" << endl;
@@ -716,7 +713,7 @@ namespace casadi {
     code << "    F(arg, res, iw, w); " << endl;
     code << "    for (int kz=0;kz<" << f_.nnzOut() << ";++kz) { sum[kz]+= res_local[kz]; }" << endl;
     code << "  }" << endl;
-    if (reduction_factor_>1) {
+    if (reduction_) {
       code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) { sum_out_local[k+ll*" <<
         f_.nnzOut() << "] = sum[k]; }" << endl;
     } else {
@@ -724,18 +721,40 @@ namespace casadi {
         f_.nnzOut() << "] = sum[k]; }" << endl;
     }
 
-    if (reduction_factor_>1) {
-      code << "  for (int k=0;k<" << f_.nnzOut() << ";++k) { sum[k]=0; }" << endl;
-      code << "  barrier(CLK_LOCAL_MEM_FENCE);" << endl;
-      code << "  if (ll>=" << reduction_factor_ << ") return;" << endl;
-      code << "  for (int i=0;i<" << num_work_items_/reduction_factor_ << ";++i) {" << endl;
-      code << "    int r=ll*" << num_work_items_/reduction_factor_ << "+i;" << endl;
-      code << "    for (int kz=0;kz<" << f_.nnzOut() << ";++kz) { ";
-      code << "      sum[kz]+= sum_out_local[r*" <<  f_.nnzOut() << "+kz]; }" << endl;
+    if (reduction_) {
+
+      int R = num_work_items_;
+      std::vector<int> primes = {3, 5, 7, 11, 13};
+      while (R%2==0) {
+        code << "  if (ll>="<< R/2 << ") return;" << endl;
+        code << "  barrier(CLK_LOCAL_MEM_FENCE);" << endl;
+        code << "  for (int kz=0;kz<" << f_.nnzOut() << ";++kz) { " << endl;
+        code << "    sum_out_local[ll*" <<  f_.nnzOut() << "+kz] += sum_out_local[ll*";
+        code <<  f_.nnzOut() << "+" << f_.nnzOut()*R/2 << "+kz];" << endl;
+        code << "  }" << endl;
+        R/= 2;
+      }
+
+      for (int i=0;i<primes.size();++i) {
+        while (R%primes[i]==0) {
+          code << "  if (ll>="<< R/primes[i] << ") return;" << endl;
+          code << "  barrier(CLK_LOCAL_MEM_FENCE);" << endl;
+          code << "  for (int kz=0;kz<" << f_.nnzOut() << ";++kz) { " << endl;
+          code << "    float sum = sum_out_local[ll*" <<  f_.nnzOut() << "+kz];" << endl;
+          for (int j=1;j<primes[i];++j) {
+            code << "    sum+= sum_out_local[ll*" <<  f_.nnzOut() << "+";
+            code << f_.nnzOut()*j*R/primes[i] << "+kz];" << endl;
+          }
+          code << "    sum_out_local[ll*" <<  f_.nnzOut() << "+kz] = sum;" << endl;
+          code << "  }" << endl;
+          R/= primes[i];
+        }
+      }
+
+      code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) {" << endl;
+      code << "    sum_out[k+ii*" <<
+        f_.nnzOut() << "] = sum_out_local[k];" << endl;
       code << "  }" << endl;
-      code << "  for (int k=0;k<"<< f_.nnzOut() << ";++k) {";
-      code << " sum_out[k+(ll*" << num_threads_/num_work_items_ << "+ii)*" <<
-        f_.nnzOut() << "] = sum[k]; }" << endl;
     }
 
     code << "}   " << endl;
@@ -1002,16 +1021,16 @@ namespace casadi {
     g.body << "  check_cl_error(err);" << endl;
 
     g.body << "  size_t num = " << num_threads_ << ";" << endl;
+    g.body << "  size_t num_work_items = " << num_work_items_ << ";" << endl;
 
     // Run the kernel
     g.body << "  err = clEnqueueNDRangeKernel(commands" << ind << "_, kernel" << ind << "_, 1,";
-    g.body << " NULL, &num, NULL, 0, NULL, NULL);" << endl;
+    g.body << " NULL, &num, &num_work_items, 0, NULL, NULL);" << endl;
     g.body << "  check_cl_error(err);" << endl;
     g.body << "  err = clFinish(commands" << ind << "_);" << endl;
     g.body << "  check_cl_error(err);" << endl;
 
-    int results_length = reduction_factor_==1 ? num_threads_ :
-                           num_threads_/num_work_items_*reduction_factor_;
+    int results_length = reduction_ ? num_threads_/num_work_items_ : num_threads_;
 
     // Read back the output
     g.body << "  err = clEnqueueReadBuffer(commands" << ind << "_, d_sum" << ind << "_, CL_TRUE,";
