@@ -92,31 +92,112 @@ namespace casadi {
   Function Problem<XType>::create(const std::string& fname,
                                   const std::vector<std::string>& s_in,
                                   const std::vector<std::string>& s_out,
+                                  const std::vector<LinComb>& lincomb,
                                   const Dict& opts) const {
-    // Assemble inputs
-    std::vector<XType> x_in(s_in.size());
-    for (int i=0; i<x_in.size(); ++i) {
-      x_in[i] = in.at(std::find(ischeme.begin(), ischeme.end(), s_in[i])-ischeme.begin());
+    // Inputs and outputs of function being assembled
+    vector<XType> ret_in(s_in.size());
+    vector<XType> ret_out(s_out.size());
+
+    // Which input and output expressions have been assigned so far
+    vector<bool> assigned_in(s_in.size(), false);
+    vector<bool> assigned_out(s_out.size(), false);
+
+    // List of valid attributes
+    enum Attributes {
+      ATTR_TRANSPOSE,
+      ATTR_TRIU,
+      ATTR_TRIL,
+      ATTR_DENSIFY};
+
+    // Separarate attributes
+    vector<vector<Attributes> > attr(s_out.size());
+    vector<string> s_out_noatt = s_out;
+    for (int i=0; i<s_out_noatt.size(); ++i) {
+      // Currently processed string
+      string& s = s_out_noatt[i];
+
+      // Loop over attributes
+      while (true) {
+        // Find the first underscore separator
+        size_t pos = s.find('_');
+        if (pos>=s.size()) break; // No more underscore
+        string a = s.substr(0, pos);
+
+        // Abort if not attribute
+        if (a=="transpose") {
+          attr[i].push_back(ATTR_TRANSPOSE);
+        } else if (a=="triu") {
+          attr[i].push_back(ATTR_TRIU);
+        } else if (a=="tril") {
+          attr[i].push_back(ATTR_TRIL);
+        } else if (a=="densify") {
+          attr[i].push_back(ATTR_DENSIFY);
+        } else {
+          // No more attribute
+          break;
+        }
+
+        // Strip attribute
+        s = s.substr(pos+1, string::npos);
+      }
     }
 
-    // Assemble outputs
-    std::vector<XType> x_out(s_out.size());
-    for (int i=0; i<x_out.size(); ++i) {
-      x_out[i] = out.at(std::find(oscheme.begin(), oscheme.end(), s_out[i])-oscheme.begin());
+    // Assign non-differentiated inputs
+    for (int i=0; i<ret_in.size(); ++i) {
+      // Locate it in the input scheme
+      auto it = std::find(ischeme.begin(), ischeme.end(), s_in[i]);
+      if (it!=ischeme.end()) {
+        ret_in[i] = in.at(it-ischeme.begin());
+        assigned_in[i] = true;
+      }
+    }
+
+    // Make sure all inputs have been treated
+    for (int i=0; i<ret_in.size(); ++i) {
+      casadi_assert_message(assigned_in[i], "Cannot treat input \"" + s_in[i] + "\"");
+    }
+
+    // Assign non-differentiated outputs
+    for (int i=0; i<ret_out.size(); ++i) {
+      // Locate it in the input scheme
+      auto it = std::find(oscheme.begin(), oscheme.end(), s_out_noatt[i]);
+      if (it!=oscheme.end()) {
+        ret_out[i] = out.at(it-oscheme.begin());
+        assigned_out[i] = true;
+      }
+    }
+
+    // Make sure all outputs have been treated
+    for (int i=0; i<ret_out.size(); ++i) {
+      casadi_assert_message(assigned_out[i], "Cannot treat output \"" + s_out[i] + "\"");
+    }
+
+    // Apply attributes (starting from the right-most one)
+    for (int i=0; i<s_out.size(); ++i) {
+      XType& r = ret_out[i];
+      for (auto a=attr[i].rbegin(); a!=attr[i].rend(); ++a) {
+        switch (*a) {
+        case ATTR_TRANSPOSE: r = r.T(); break;
+        case ATTR_TRIU: r = triu(r); break;
+        case ATTR_TRIL: r = tril(r); break;
+        case ATTR_DENSIFY: r = densify(r); break;
+        }
+      }
     }
 
     // Create function and return
-    return Function(fname, x_in, x_out, s_in, s_out, opts);
+    return Function(fname, ret_in, ret_out, s_in, s_out, opts);
   }
 
   Function XProblem::create(const std::string& fname,
                             const std::vector<std::string>& s_in,
                             const std::vector<std::string>& s_out,
+                            const std::vector<LinComb>& lincomb,
                             const Dict& opts) const {
     if (is_sx) {
-      return sx_p->create(fname, s_in, s_out, opts);
+      return sx_p->create(fname, s_in, s_out, lincomb, opts);
     } else {
-      return mx_p->create(fname, s_in, s_out, opts);
+      return mx_p->create(fname, s_in, s_out, lincomb, opts);
     }
   }
 

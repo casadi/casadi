@@ -30,6 +30,9 @@
 namespace casadi {
 
 #ifndef SWIG
+  // A linear combination of inputs
+  typedef std::pair<std::string, std::vector<std::string> > LinComb;
+
   /** Symbolic representation of a problem */
   template<typename XType>
   class CASADI_EXPORT Problem {
@@ -61,7 +64,9 @@ namespace casadi {
     // Factory
     Function create(const std::string& fname,
                     const std::vector<std::string>& s_in,
-                    const std::vector<std::string>& s_out, const Dict& opts) const;
+                    const std::vector<std::string>& s_out,
+                    const std::vector<LinComb>& lincomb,
+                    const Dict& opts) const;
   };
 
   typedef Problem<SX> SXProblem;
@@ -96,7 +101,9 @@ namespace casadi {
     // Factory function
     Function create(const std::string& fname,
                     const std::vector<std::string>& s_in,
-                    const std::vector<std::string>& s_out, const Dict& opts=Dict()) const;
+                    const std::vector<std::string>& s_out,
+                    const std::vector<LinComb>& lincomb = std::vector<LinComb>(),
+                    const Dict& opts=Dict()) const;
   };
 #endif // SWIG
 
