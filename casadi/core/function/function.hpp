@@ -43,9 +43,25 @@ namespace casadi {
 #ifndef SWIG
   /** Symbolic representation of a problem */
   template<typename XType>
-  struct CASADI_EXPORT Problem {
+  class CASADI_EXPORT Problem {
+  public:
     std::vector<XType> in;
     std::vector<XType> out;
+    std::vector<std::string> ischeme;
+    std::vector<std::string> oscheme;
+
+    // Constructor (expressions given)
+    Problem(const std::vector<XType>& in, const std::vector<XType>& out,
+            const std::vector<std::string>& ischeme,
+            const std::vector<std::string>& oscheme)
+      : in(in), out(out), ischeme(ischeme), oscheme(oscheme) {
+    }
+
+    // Constructor (only schemes)
+    Problem(const std::vector<std::string>& ischeme,
+            const std::vector<std::string>& oscheme)
+      : in(ischeme.size()), out(oscheme.size()), ischeme(ischeme), oscheme(oscheme) {
+    }
   };
   typedef Problem<SX> SXProblem;
   typedef Problem<MX> MXProblem;

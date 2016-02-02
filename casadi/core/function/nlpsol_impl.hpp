@@ -280,7 +280,7 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
-    return {nl_in, nl_out};
+    return Problem<XType>(nl_in, nl_out, nlpsol_in(), nlpsol_out());
   }
 
   template<typename XType>
@@ -295,7 +295,7 @@ namespace casadi {
 
   template<typename XType>
   Problem<XType> Nlpsol::fun2problem(Function nlp) {
-    Problem<XType> p;
+    Problem<XType> p(nlpsol_in(), nlpsol_out());
     p.in = XType::get_input(nlp);
     casadi_assert(p.in.size()==NL_NUM_IN);
     p.out = nlp(p.in);
