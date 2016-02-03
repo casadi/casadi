@@ -134,7 +134,7 @@ namespace casadi {
     vector<XType> ret_out(s_out.size());
 
     // List of valid attributes
-    const vector<string> all_attr = {"transpose", "triu", "tril", "densify"};
+    const vector<string> all_attr = {"transpose", "triu", "tril", "densify", "sym", "withdiag"};
 
     // Handle outputs
     for (int i=0; i<ret_out.size(); ++i) {
@@ -173,7 +173,7 @@ namespace casadi {
         s = s.substr(pos+1);
 
         // Handle different types of operators
-        if (op=="grad" || op=="jac") {
+        if (op=="grad" || op=="jac" || op=="hess") {
           // Output
           pos = s.find('_');
           casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
@@ -184,18 +184,29 @@ namespace casadi {
           s = s.substr(pos+1);
 
           // Input
-          string arg = s;
+          string arg;
+          if (op=="hess") {
+            pos = s.find('_');
+            casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
+            arg = s.substr(0, pos);
+            s = s.substr(pos+1);
+            casadi_assert_message(s==arg, "Mixed Hessian terms not supported");
+          } else {
+            arg = s;
+          }
           auto arg_i = map_in.find(arg);
           casadi_assert_message(arg_i!=map_in.end(),
                                 "Unrecognized input " + arg + " in " + s_out[i]);
 
           // Calculate gradient or Jacobian
-          if (op=="grad") {
+          if (op=="jac") {
+            r = jacobian(res_i->second, arg_i->second);
+          } else if (op=="grad") {
             r = project(gradient(res_i->second, arg_i->second), arg_i->second.sparsity());
           } else {
-            r = jacobian(res_i->second, arg_i->second);
+            casadi_assert(op=="hess");
+            r = triu(hessian(res_i->second, arg_i->second));
           }
-
         } else {
           casadi_error("Unknown operator: " + op);
         }
@@ -211,6 +222,10 @@ namespace casadi {
           r = tril(r);
         } else if (*a=="densify") {
           r = densify(r);
+        } else if (*a=="sym") {
+          r = triu2symm(r);
+        } else if (*a=="withdiag") {
+          r = project(r, r.sparsity() + Sparsity::diag(r.size1()));
         } else {
           casadi_assert(0);
         }

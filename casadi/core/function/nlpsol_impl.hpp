@@ -217,7 +217,6 @@ namespace casadi {
     enum HessLagOut { HL_HL, HL_NUM_OUT};
     Function hess_l_fcn_;
     Sparsity hesslag_sp_;
-    template<typename M> void _setup_hess_l(bool tr, bool sym, bool diag);
     void setup_hess_l(bool tr=false, bool sym=false, bool diag=false);
     int calc_hess_l(NlpsolMemory& m, const double* x, const double* p,
                     const double* sigma, const double* lambda,

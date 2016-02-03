@@ -621,35 +621,16 @@ namespace casadi {
     alloc(jac_f_fcn_);
   }
 
-  template<typename M>
-  void Nlpsol::_setup_hess_l(bool tr, bool sym, bool diag) {
-    const Problem<M>& nlp = nlp_;
-    std::vector<M> arg(HL_NUM_IN);
-    M x = arg[HL_X] = nlp.in[NL_X];
-    arg[HL_P] = nlp.in[NL_P];
-    M f = nlp.out[NL_F];
-    M g = nlp.out[NL_G];
-    M lam_f = arg[HL_LAM_F] = M::sym("lam_f", f.sparsity());
-    M lam_g = arg[HL_LAM_G] = M::sym("lam_g", g.sparsity());
-    std::vector<M> res(HL_NUM_OUT);
-    res[HL_HL] = triu(M::hessian(dot(lam_f, f) + dot(lam_g, g), x));
-    if (sym) res[HL_HL] = triu2symm(res[HL_HL]);
-    if (tr) res[HL_HL] = res[HL_HL].T();
-    hesslag_sp_ = res[HL_HL].sparsity();
-    if (diag) {
-      hesslag_sp_ = hesslag_sp_ + Sparsity::diag(hesslag_sp_.size1());
-      res[HL_HL] = project(res[HL_HL], hesslag_sp_);
-    }
-    hess_l_fcn_ = Function("nlp_hess_l", arg, res);
-    alloc(hess_l_fcn_);
-  }
-
   void Nlpsol::setup_hess_l(bool tr, bool sym, bool diag) {
-    if (nlp_.is_sx) {
-      _setup_hess_l<SX>(tr, sym, diag);
-    } else {
-      _setup_hess_l<MX>(tr, sym, diag);
-    }
+    string attr;
+    if (sym) attr += "sym_";
+    if (tr) attr += "transpose_";
+    if (diag) attr += "withdiag_";
+    hess_l_fcn_ = nlp_.create("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
+                              {attr + "hess_gamma_x_x"},
+                              {{"gamma", {"f", "g"}}});
+    hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
+    alloc(hess_l_fcn_);
   }
 
 } // namespace casadi
