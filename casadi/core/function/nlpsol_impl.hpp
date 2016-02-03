@@ -207,7 +207,6 @@ namespace casadi {
 
     // Calculate both gradient of the objective and Jacobian of constraints
     Function gf_jg_fcn_;
-    template<typename M> void _setup_gf_jg();
     void setup_gf_jg();
     int calc_gf_jg(NlpsolMemory& m, const double* x,
                    const double* p, double* gf, double* jg) const;

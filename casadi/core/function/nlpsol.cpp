@@ -586,23 +586,10 @@ namespace casadi {
     alloc(fg_fcn_);
   }
 
-  template<typename M>
-  void Nlpsol::_setup_gf_jg() {
-    const Problem<M>& nlp = nlp_;
-    std::vector<M> arg = {nlp.in[NL_X], nlp.in[NL_P]};
-    std::vector<M> res = {M::gradient(nlp.out[NL_F], nlp.in[NL_X]),
-                          M::jacobian(nlp.out[NL_G], nlp.in[NL_X])};
-    gf_jg_fcn_ = Function("nlp_gf_jg", arg, res);
-    jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
-    alloc(gf_jg_fcn_);
-  }
-
   void Nlpsol::setup_gf_jg() {
-    if (nlp_.is_sx) {
-      _setup_gf_jg<SX>();
-    } else {
-      _setup_gf_jg<MX>();
-    }
+    gf_jg_fcn_ = nlp_.create("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
+    alloc(gf_jg_fcn_);
+    jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
   }
 
   void Nlpsol::setup_grad_f() {
