@@ -22588,13 +22588,13 @@ Joris Gillis
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| image_float  | OT_BOOLEAN   | false        | Indicate     | casadi::Kern |
-|              |              |              | that the     | elSum2DBase  |
-|              |              |              | image        |              |
+| image_type   | OT_INTEGER   | 64           | Indicate the | casadi::Kern |
+|              |              |              | number of    | elSum2DBase  |
+|              |              |              | bits used in |              |
+|              |              |              | the image    |              |
 |              |              |              | defined with |              |
 |              |              |              | pointer_inpu |              |
-|              |              |              | t=True is in |              |
-|              |              |              | float.       |              |
+|              |              |              | t=True.      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
 |              | TOR          | )            | scheme       | tionInternal |
@@ -22716,13 +22716,10 @@ Joris Gillis
 |              |              |              | pointer to   |              |
 |              |              |              | an image     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| reduction_fa | OT_INTEGER   | 1            | Reduce the   | casadi::Kern |
-| ctor         |              |              | intermediate | elSum2DBase  |
-|              |              |              | results by   |              |
-|              |              |              | this factor  |              |
-|              |              |              | (OpenCL).1   |              |
-|              |              |              | indicates no |              |
-|              |              |              | reduction.   |              |
+| reduction    | OT_BOOLEAN   | false        | Indicates if | casadi::Kern |
+|              |              |              | a recution   | elSum2DBase  |
+|              |              |              | is applied   |              |
+|              |              |              | on the GPU.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
