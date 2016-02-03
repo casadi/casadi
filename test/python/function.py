@@ -1916,7 +1916,7 @@ class Functiontests(casadiTestCase):
       for par,options in [("serial",{}),("opencl",options_fasteval)]:
         if "opencl"==par and not has_opencl:
           continue      
-        for z, z_options in [(Z,{}),(pt,{"pointer_input": True,"image_float":True})]:
+        for z, z_options in [(Z,{}),(pt,{"pointer_input": True,"image_type":16})]:
         
           print par,options,z_options
           if "opencl"!=par and len(z_options)!=0: continue
