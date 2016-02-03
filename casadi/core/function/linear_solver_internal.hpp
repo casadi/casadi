@@ -105,6 +105,9 @@ namespace casadi {
     void spSolve(DMatrix& X, const DMatrix& B, bool transpose) const;
     ///@}
 
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+       CodeGenerator& g, int nrhs, bool transpose) const;
 
     /// Solve the system of equations <tt>Lx = b</tt>
     virtual void solveL(double* x, int nrhs, bool transpose);

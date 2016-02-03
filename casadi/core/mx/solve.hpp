@@ -101,6 +101,10 @@ namespace casadi {
     /** \brief Get required length of w field */
     virtual size_t sz_w() const { return sparsity().size1();}
 
+    /** \brief Generate code for the operation */
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+                          CodeGenerator& g) const;
+
     /// Linear Solver (may be shared between multiple nodes)
     LinearSolver linear_solver_;
   };

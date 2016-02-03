@@ -30,7 +30,37 @@
 #include "../../core/casadi_options.hpp"
 
 using namespace std;
+
+
+
 namespace casadi {
+
+
+  extern "C"
+  CASADI_LINEARSOLVER_LAPACKLU_EXPORT void dgetrf_casadi(int *m, int *n, double *a,
+    int *lda, int *ipiv, int *info) {
+    dgetrf_(m, n, a, lda, ipiv, info);
+  }
+
+  extern "C"
+  CASADI_LINEARSOLVER_LAPACKLU_EXPORT void dgetrs_casadi(char* trans, int *n, int *nrhs, double *a,
+                          int *lda, int *ipiv, double *b, int *ldb, int *info) {
+    dgetrs_(trans, n, nrhs, a, lda, ipiv, b, ldb, info);
+  }
+
+  extern "C"
+  CASADI_LINEARSOLVER_LAPACKLU_EXPORT void dgeequ_casadi(int *m, int *n, double *a, int *lda,
+                          double *r, double *c,
+                          double *colcnd, double *rowcnd, double *amax, int *info) {
+    dgeequ_(m, n, a, lda, r, c, colcnd, rowcnd, amax, info);
+  }
+
+  extern "C"
+  CASADI_LINEARSOLVER_LAPACKLU_EXPORT void dlaqge_casadi(int *m, int *n, double *a, int *lda,
+                          double *r, double *c,
+                          double *colcnd, double *rowcnd, double *amax, char *equed) {
+    dlaqge_(m, n, a, lda, r, c, colcnd, rowcnd, amax, equed);
+  }
 
   extern "C"
   int CASADI_LINEARSOLVER_LAPACKLU_EXPORT
@@ -56,6 +86,8 @@ namespace casadi {
 
   LapackLuDense::~LapackLuDense() {
   }
+
+
 
   void LapackLuDense::init() {
     // Call the base class initializer
@@ -207,6 +239,91 @@ namespace casadi {
 
   LapackLuDense* LapackLuDense::clone() const {
     return new LapackLuDense(*this);
+  }
+
+  void LapackLuDense::generate(const std::vector<int>& arg, const std::vector<int>& res,
+       CodeGenerator& g, int nrhs, bool transpose) const {
+
+    g.declarations << "extern void dlaqge_casadi(int *m, int *n, double *a, int *lda, double *r, ";
+    g.declarations << " double *c, double *colcnd, double *rowcnd, double *amax, char *);" << endl;
+
+    g.declarations << "extern void dgetrf_casadi(int *m, int *, double *, int *, int *, int *);";
+    g.declarations << endl;
+
+    g.declarations << "extern void dgetrs_casadi(char* trans, int *n, int *nrhs, double *a,";
+    g.declarations << "int *lda, int *ipiv, double *b, int *ldb, int *info);" << endl;
+
+    g.declarations << "extern void dgeequ_casadi(int *m, int *n, double *a, int *lda, double *r, "
+                      "double *c, double *colcnd, double *rowcnd, double *amax, int *);" << endl;
+
+    g.body << "int ncol = " << ncol() << ";" << endl;
+    g.body << "int nrow = " << nrow() << ";" << endl;
+    g.body << "double mat[" << ncol()*ncol() <<  "];" << endl;
+    g.body << "for (int i=0;i<" << ncol()*nrow() << ";++i) mat[i]=0;" << endl;
+
+    g.body << "double *A = " << g.work(arg[1], input(LINSOL_A).nnz()) << ";" << endl;
+    g.body << "const int* colind = " << g.sparsity(input(LINSOL_A).sparsity()) << "+2;" << endl;
+    g.body << "const int* row = " << g.sparsity(input(LINSOL_A).sparsity()) << "+" << 3+ncol();
+    g.body << ";" << endl;
+
+    g.body << "for (int cc=0; cc<ncol; ++cc) {" << endl;
+    g.body << "  for (int el=colind[cc]; el<colind[cc+1]; ++el) {" << endl;
+    g.body << "    int rr=row[el];" << endl;
+    g.body << "    mat[rr + nrow*cc] = A[el];" << endl;
+    g.body << "  }" << endl;
+    g.body << "}" << endl;
+
+    g.body << "int ipiv[" << ncol() <<  "];" << endl;
+
+    g.body << "double r[" << ncol() <<  "];" << endl;
+    g.body << "double c[" << nrow() <<  "];" << endl;
+
+    g.body << "double colcnd, rowcnd;" << endl;
+    g.body << "double amax;" << endl;
+    g.body << "int info = -100;" << endl;
+    g.body << "dgeequ_casadi(&ncol, &nrow, mat, &ncol, r, ";
+    g.body << "c, &colcnd, &rowcnd, &amax, &info);" << endl;
+    g.body << "char equed = 'N';" << endl;
+    g.body << "if (info!=0) dlaqge_casadi(&ncol, &nrow, mat, &ncol, r, c,";
+    g.body << " &colcnd, &rowcnd, &amax, &equed);" << endl;
+
+    g.body << "dgetrf_casadi(&ncol, &ncol, mat, &ncol, ipiv, &info);" << endl;
+
+    g.body << "info = -100;" << endl;
+    g.body << "char trans = '" << (transpose ? "T" : "N") << "';" << endl;
+    g.body << "int nrhs = " << nrhs << ";" << endl;
+
+    g.body << "double *x = " << g.work(res[0], input(LINSOL_B).nnz()) << ";" << endl;
+    g.body << "if (x!=" << g.work(arg[0], input(LINSOL_B).nnz()) << ") {" << endl;
+    g.body << "  for (int i=0;i<" <<  input(LINSOL_B).nnz() << ";++i) x[i] = ";
+    g.body << g.work(arg[0], input(LINSOL_B).nnz()) << "[i];" << endl;
+    g.body << "}" << endl;
+    if (transpose) {
+      g.body << "if (equed=='C' || equed=='B')" << endl;
+      g.body << "  for (int rhs=0; rhs<nrhs; ++rhs)" << endl;
+      g.body << "    for (int i=0; i<nrow; ++i)" << endl;
+      g.body << "      x[i+rhs*nrow] *= c[i];" << endl;
+    } else {
+      g.body << "if (equed=='R' || equed=='B')" << endl;
+      g.body << "  for (int rhs=0; rhs<nrhs; ++rhs)" << endl;
+      g.body << "    for (int i=0; i<ncol; ++i)" << endl;
+      g.body << "      x[i+rhs*nrow] *= r[i];" << endl;
+    }
+
+    g.body << "    dgetrs_casadi(&trans, &ncol, &nrhs, mat, &ncol, ipiv, x, &ncol, &info);" << endl;
+
+    if (transpose) {
+      g.body << "if (equed=='R' || equed=='B')" << endl;
+      g.body << "  for (int rhs=0; rhs<nrhs; ++rhs)" << endl;
+      g.body << "    for (int i=0; i<ncol; ++i)" << endl;
+      g.body << "      x[i+rhs*nrow] *= r[i];" << endl;
+    } else {
+      g.body << "if (equed=='C' || equed=='B')" << endl;
+      g.body << "  for (int rhs=0; rhs<nrhs; ++rhs)" << endl;
+      g.body << "    for (int i=0; i<nrow; ++i)" << endl;
+      g.body << "      x[i+rhs*nrow] *= c[i];" << endl;
+    }
+
   }
 
 } // namespace casadi

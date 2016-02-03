@@ -46,8 +46,7 @@ namespace casadi {
 
   void CompilerInternal::cleanup() {
     setupPtr mycleanup = (setupPtr) getFunction("jit_cleanup");
-    casadi_assert_message(mycleanup!=0, "Cannot load cleanup function.");
-    mycleanup();
+    if (mycleanup) mycleanup();
   }
 
 } // namespace casadi

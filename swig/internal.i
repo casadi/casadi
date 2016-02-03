@@ -229,6 +229,9 @@
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::getPluginSearchPaths() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::getRealTime() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

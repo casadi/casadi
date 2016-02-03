@@ -13,7 +13,9 @@
 #define CS_DATE "Nov 30, 2009"     /* CSparse release date */
 #define CS_COPYRIGHT "Copyright (c) Timothy A. Davis, 2006-2009"
 
+#ifndef CASADI_CSPARSE_EXPORT
 #include <external_packages/CSparse/casadi_csparse_export.h>
+#endif
 
 
 /* --- primary CSparse routines and data structures ------------------------- */

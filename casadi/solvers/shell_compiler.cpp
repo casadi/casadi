@@ -129,8 +129,17 @@ namespace casadi {
       casadi_error("Compilation failed. Tried \"" + cmd.str() + "\"");
     }
 
+// Alocate a handle pointer
+#ifndef _WIN32
+    int flag = RTLD_LAZY | RTLD_LOCAL;
+#ifdef WITH_DEEPBIND
+    flag |= RTLD_DEEPBIND;
+#endif
+#endif
+
+
     // Load shared library
-    handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
+    handle_ = dlopen(bin_name_.c_str(), flag);
     casadi_assert_message(handle_!=0, "CommonExternal: Cannot open function: "
                           << bin_name_ << ". error code: "<< dlerror());
     // reset error

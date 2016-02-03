@@ -116,6 +116,15 @@ namespace casadi {
     linear_solver_ = deepcopy(linear_solver_, already_copied);
   }
 
+  template<bool Tr>
+  void Solve<Tr>::generate(const std::vector<int>& arg, const std::vector<int>& res,
+       CodeGenerator& g) const {
+
+    g.body << "  {" << std::endl;
+    linear_solver_->generate(arg, res, g, dep(0).size2(), Tr);
+    g.body << "  }" << std::endl;
+  }
+
 } // namespace casadi
 
 /// \endcond

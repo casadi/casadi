@@ -57,6 +57,7 @@ namespace casadi {
   extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
                           double *colcnd, double *rowcnd, double *amax, char *equed);
 
+
   /** \brief \pluginbrief{LinearSolver,lapacklu}
    *
    * @copydoc LinearSolver_doc
@@ -86,6 +87,9 @@ namespace casadi {
 
     /// Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
+
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+       CodeGenerator& g, int nrhs, bool transpose) const;
 
     /// A documentation string
     static const std::string meta_doc;

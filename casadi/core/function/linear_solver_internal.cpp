@@ -74,6 +74,11 @@ namespace casadi {
   LinearSolverInternal::~LinearSolverInternal() {
   }
 
+  void LinearSolverInternal::generate(const std::vector<int>& arg, const std::vector<int>& res,
+       CodeGenerator& g, int nrhs, bool transpose) const {
+    casadi_error("Not implemented");
+  }
+
   void LinearSolverInternal::evaluate() {
     /*  Factorization fact;
         if (called_once) {

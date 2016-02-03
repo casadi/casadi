@@ -80,6 +80,7 @@
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ClangCompiler</td></tr>
 <tr><td>include_path</td><td>OT_STRING</td><td>""</td><td>Include paths for the JIT compiler. The include directory shipped with CasADi will be automatically appended.</td><td>casadi::ClangCompiler</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
+<tr><td>plugin_libs</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Resolve symbols from the listed casadi plugin libraries</td><td>casadi::ClangCompiler</td></tr>
 </table>
 */
 /// \endcond
@@ -91,6 +92,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Compile flags for the JIT compiler. Default: None</td></tr>
 <tr><td>include_path</td><td>OT_STRING</td><td>""</td><td>Include paths for the JIT compiler. The include directory shipped with CasADi will be automatically appended.</td></tr>
+<tr><td>plugin_libs</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Resolve symbols from the listed casadi plugin libraries</td></tr>
 </table>
 */
 /// \cond INTERNAL

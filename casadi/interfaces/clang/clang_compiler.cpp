@@ -69,6 +69,8 @@ namespace casadi {
       " The include directory shipped with CasADi will be automatically appended.");
     addOption("flags", OT_STRINGVECTOR, GenericType(),
       "Compile flags for the JIT compiler. Default: None");
+    addOption("plugin_libs", OT_STRINGVECTOR, GenericType(),
+      "Resolve symbols from the listed casadi plugin libraries");
 
     myerr_ = 0;
     executionEngine_ = 0;
@@ -85,6 +87,16 @@ namespace casadi {
   }
 
   void ClangCompiler::init() {
+
+
+    #ifdef _WIN32
+    char pathsep = ';';
+    const std::string filesep("\\");
+    #else
+    char pathsep = ':';
+    const std::string filesep("/");
+    #endif
+
     // Initialize the base classes
     CompilerInternal::init();
 
@@ -105,7 +117,7 @@ namespace casadi {
     void *addr = reinterpret_cast<void*>(&casadi_register_compiler_clang);
 
     // Get runtime include path
-    std::string jit_include, filesep;
+    std::string jit_include;
 #ifdef _WIN32
     char buffer[MAX_PATH];
     HMODULE hm = NULL;
@@ -117,7 +129,6 @@ namespace casadi {
     GetModuleFileNameA(hm, buffer, sizeof(buffer));
     PathRemoveFileSpecA(buffer);
     jit_include = buffer;
-    filesep = "\\";
 #else // _WIN32
     Dl_info dl_info;
     if (!dladdr(addr, &dl_info)) {
@@ -125,7 +136,6 @@ namespace casadi {
     }
     jit_include = dl_info.dli_fname;
     jit_include = jit_include.substr(0, jit_include.find_last_of('/'));
-    filesep = "/";
 #endif // _WIN32
     jit_include += filesep + "casadi" + filesep + "jit";
 
@@ -183,11 +193,6 @@ namespace casadi {
                                              clang::frontend::CXXSystem, i->second, false);
     }
 
-#ifdef _WIN32
-    char pathsep = ';';
-#else
-    char pathsep = ':';
-#endif
 
     // Search path
     std::stringstream paths;
@@ -196,6 +201,7 @@ namespace casadi {
     while (std::getline(paths, path, pathsep)) {
       compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);
     }
+    compInst.getCodeGenOpts().StackRealignment = 1;
 
     // Create an LLVM context (NOTE: should use a static context instead?)
     context_ = new llvm::LLVMContext();
@@ -217,6 +223,40 @@ namespace casadi {
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
+    std::vector<std::string> plugin_libs;
+    if (hasSetOption("plugin_libs")) plugin_libs = getOption("plugin_libs");
+
+    std::vector<std::string> search_paths = getPluginSearchPaths();
+
+    userOut() << plugin_libs << endl;
+    userOut() << plugin_libs << endl;
+
+    for (int i=0;i<plugin_libs.size();++i) {
+      std::string lib = SHARED_LIBRARY_PREFIX "casadi_"
+        + plugin_libs[i] + SHARED_LIBRARY_SUFFIX;
+      for (int j=0;j<search_paths.size();++j) {
+        std::string searchpath = search_paths[j];
+        std::string name = searchpath.size()==0 ? lib : searchpath + filesep + lib;
+        userOut() << "attempt:" << name << endl;
+        #ifdef _WIN32
+            userOut() << "windows" << endl;
+            SetDllDirectory(TEXT(searchpath.c_str()));
+            std::string msg;
+            llvm::sys::DynamicLibrary::getPermanentLibrary(TEXT(lib.c_str()), &msg);
+            userOut() << "msg" << endl;
+            userOut() << msg << endl;
+            SetDllDirectory(NULL);
+        #else // _WIN32
+            userOut() << "non-windows" << endl;
+            std::string msg;
+            llvm::sys::DynamicLibrary::getPermanentLibrary(name.c_str(), &msg);
+            userOut() << "msg" << endl;
+            userOut() << msg << endl;
+        #endif // _WIN32
+      }
+    }
+
+
     // Create the JIT.  This takes ownership of the module.
     std::string ErrStr;
     executionEngine_ =
@@ -225,11 +265,15 @@ namespace casadi {
     if (!executionEngine_) {
       casadi_error("Could not create ExecutionEngine: " << ErrStr);
     }
+    userOut() << "executionEngine" << endl;
 
     executionEngine_->finalizeObject();
+
+    userOut() << "finalizeObject" << endl;
   }
 
   void* ClangCompiler::getFunction(const std::string& symname) {
+    if (!executionEngine_) return 0;
     return reinterpret_cast<void*>((intptr_t)executionEngine_
                                    ->getPointerToFunction(module_->getFunction(symname)));
   }
