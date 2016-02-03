@@ -2300,6 +2300,11 @@ Interface to the JIT compiler CLANG
 |                 |                 |                 | automatically   |
 |                 |                 |                 | appended.       |
 +-----------------+-----------------+-----------------+-----------------+
+| plugin_libs     | OT_STRINGVECTOR | GenericType()   | Resolve symbols |
+|                 |                 |                 | from the listed |
+|                 |                 |                 | casadi plugin   |
+|                 |                 |                 | libraries       |
++-----------------+-----------------+-----------------+-----------------+
 
 --------------------------------------------------------------------------------
 
@@ -66182,6 +66187,11 @@ Hash a sparsity pattern.
 %feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const int
 *colind, const int *row) " [INTERNAL] ";
 
+%feature("docstring")  casadi::slicot_mb03wd(char job, char compz, int n,
+int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2,
+double *z, int ldz1, int ldz2, double *wr, double *wi, double *dwork=0, int
+ldwork=0) " [INTERNAL] ";
+
 %feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
 "
 
@@ -66801,10 +66811,7 @@ largest absolute value.
 
 ";
 
-%feature("docstring")  casadi::slicot_mb03wd(char job, char compz, int n,
-int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2,
-double *z, int ldz1, int ldz2, double *wr, double *wi, double *dwork=0, int
-ldwork=0) " [INTERNAL] ";
+%feature("docstring")  casadi::getPluginSearchPaths() "[INTERNAL] ";
 
 %feature("docstring")  casadi::getSchemeEntryNames(InputOutputScheme scheme)
 " ";

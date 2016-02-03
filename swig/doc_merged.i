@@ -1853,6 +1853,11 @@ Interface to the JIT compiler CLANG
 |                 |                 |                 | automatically   |
 |                 |                 |                 | appended.       |
 +-----------------+-----------------+-----------------+-----------------+
+| plugin_libs     | OT_STRINGVECTOR | GenericType()   | Resolve symbols |
+|                 |                 |                 | from the listed |
+|                 |                 |                 | casadi plugin   |
+|                 |                 |                 | libraries       |
++-----------------+-----------------+-----------------+-----------------+
 
 --------------------------------------------------------------------------------
 
@@ -52368,6 +52373,8 @@ Hash a sparsity pattern.
 [INTERNAL] 
 ";
 
+%feature("docstring") casadi::slicot_mb03wd "[INTERNAL] ";
+
 %feature("docstring") casadi::isStrictlyMonotone "
 
 Check if the vector is strictly monotone.
@@ -52901,7 +52908,7 @@ corresponding to the entry with the largest absolute value.
 
 ";
 
-%feature("docstring") casadi::slicot_mb03wd "[INTERNAL] ";
+%feature("docstring") casadi::getPluginSearchPaths "[INTERNAL] ";
 
 %feature("docstring") casadi::getSchemeEntryNames "";
 
