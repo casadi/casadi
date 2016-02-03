@@ -186,7 +186,6 @@ namespace casadi {
     enum GradFIn { GF_X, GF_P, GF_NUM_IN };
     enum GradFOut { GF_GF, GF_NUM_OUT};
     Function grad_f_fcn_;
-    template<typename M> void _setup_grad_f();
     void setup_grad_f();
     int calc_grad_f(NlpsolMemory& m, const double* x,
                     const double* p, double* f, double* grad_f) const;
@@ -196,14 +195,12 @@ namespace casadi {
     enum JacGOut { JG_JG, JG_NUM_OUT};
     Function jac_g_fcn_;
     Sparsity jacg_sp_;
-    template<typename M> void _setup_jac_g();
     void setup_jac_g();
     int calc_jac_g(NlpsolMemory& m, const double* x,
                    const double* p, double* g, double* jac_g) const;
 
     // Calculate Jacobian of gradient (note: sparse!)
     Function jac_f_fcn_;
-    template<typename M> void _setup_jac_f();
     void setup_jac_f();
     int calc_jac_f(NlpsolMemory& m, const double* x,
                    const double* p, double* f, double* jac_f) const;

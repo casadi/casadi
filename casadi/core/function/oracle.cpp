@@ -94,20 +94,40 @@ namespace casadi {
                                   const std::vector<std::string>& s_out,
                                   const std::vector<LinComb>& lincomb,
                                   const Dict& opts) const {
+    // Create maps for all inputs and outputs
+    map<string, XType> map_in, map_out;
+
+    // Non-differentiated inputs
+    for (int i=0; i<in.size(); ++i) {
+      map_in[ischeme[i]] = in[i];
+    }
+
+    // Non-differentiated outputs
+    for (int i=0; i<out.size(); ++i) {
+      map_out[oscheme[i]] = out[i];
+    }
+
+    // Dual variables
+    for (int i=0; i<out.size(); ++i) {
+      string dual_name = "lam_" + oscheme[i];
+      map_in[dual_name] = XType::sym(dual_name, out[i].sparsity());
+    }
+
+    // Add linear combinations
+    for (auto i : lincomb) {
+      XType lc = 0;
+      for (auto j : i.second) {
+        lc += dot(map_in.at("lam_" + j), map_out.at(j));
+      }
+      map_out[i.first] = lc;
+    }
+
     // Inputs of function being assembled
     vector<XType> ret_in(s_in.size());
 
     // Handle inputs
     for (int i=0; i<ret_in.size(); ++i) {
-      // Locate it in the input scheme
-      auto it = std::find(ischeme.begin(), ischeme.end(), s_in[i]);
-      if (it!=ischeme.end()) {
-        ret_in[i] = in.at(it-ischeme.begin());
-        continue;
-      }
-
-      // Not found
-      casadi_error("Cannot treat input \"" + s_in[i] + "\"");
+      ret_in[i] = map_in.at(s_in[i]);
     }
 
     // Outputs of function being assembled
@@ -141,10 +161,10 @@ namespace casadi {
       }
 
       // Try to locate in list of outputs
-      auto it = std::find(oscheme.begin(), oscheme.end(), s);
-      if (it!=oscheme.end()) {
+      auto it = map_out.find(s);
+      if (it!=map_out.end()) {
         // Non-differentiated output
-        r = out.at(it-oscheme.begin());
+        r = it->second;
       } else {
         // Must be an operator
         size_t pos = s.find('_');
@@ -153,28 +173,28 @@ namespace casadi {
         s = s.substr(pos+1);
 
         // Handle different types of operators
-        if (op=="grad") {
+        if (op=="grad" || op=="jac") {
           // Output
           pos = s.find('_');
           casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
           string res = s.substr(0, pos);
-          int res_i = std::find(oscheme.begin(), oscheme.end(), res) - oscheme.begin();
-          casadi_assert_message(res_i<oscheme.size(),
+          auto res_i = map_out.find(res);
+          casadi_assert_message(res_i!=map_out.end(),
                                 "Unrecognized output " + res + " in " + s_out[i]);
           s = s.substr(pos+1);
 
           // Input
-          pos = s.find('_');
-          casadi_assert_message(pos<s.size(), s_out[i] + " is ill-posed");
-          string arg = s.substr(0, pos);
-          int arg_i = std::find(ischeme.begin(), ischeme.end(), arg) - ischeme.begin();
-          casadi_assert_message(arg_i<ischeme.size(),
+          string arg = s;
+          auto arg_i = map_in.find(arg);
+          casadi_assert_message(arg_i!=map_in.end(),
                                 "Unrecognized input " + arg + " in " + s_out[i]);
-          s = s.substr(pos+1);
-          casadi_assert_message(s.empty(), s_out[i] + " is ill-posed");
 
-          // Calculate gradient
-          r = gradient(out[res_i], in[arg_i]);
+          // Calculate gradient or Jacobian
+          if (op=="grad") {
+            r = project(gradient(res_i->second, arg_i->second), arg_i->second.sparsity());
+          } else {
+            r = jacobian(res_i->second, arg_i->second);
+          }
 
         } else {
           casadi_error("Unknown operator: " + op);

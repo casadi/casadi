@@ -605,63 +605,20 @@ namespace casadi {
     }
   }
 
-  template<typename M>
-  void Nlpsol::_setup_grad_f() {
-    const Problem<M>& nlp = nlp_;
-    M x = nlp.in[NL_X];
-    M p = nlp.in[NL_P];
-    M f = nlp.out[NL_F];
-    M gf = M::gradient(f, x);
-    gf = project(gf, x.sparsity());
-    grad_f_fcn_ = Function("nlp_grad_f", {x, p}, {f, gf});
+  void Nlpsol::setup_grad_f() {
+    grad_f_fcn_ = nlp_.create("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
     alloc(grad_f_fcn_);
   }
 
-  void Nlpsol::setup_grad_f() {
-    if (nlp_.is_sx) {
-      _setup_grad_f<SX>();
-    } else {
-      _setup_grad_f<MX>();
-    }
-  }
-
-  template<typename M>
-  void Nlpsol::_setup_jac_g() {
-    const Problem<M>& nlp = nlp_;
-    M x = nlp.in[NL_X];
-    M p = nlp.in[NL_P];
-    M f = nlp.out[NL_F];
-    M g = nlp.out[NL_G];
-    M J = M::jacobian(g, x);
-    std::vector<M> arg = {x, p};
-    std::vector<M> res = {g, J};
-    jac_g_fcn_ = Function("nlp_jac_g", arg, res);
-    jacg_sp_ = J.sparsity();
-    alloc(jac_g_fcn_);
-  }
-
   void Nlpsol::setup_jac_g() {
-    if (nlp_.is_sx) {
-      _setup_jac_g<SX>();
-    } else {
-      _setup_jac_g<MX>();
-    }
-  }
-
-  template<typename M>
-  void Nlpsol::_setup_jac_f() {
-    const Problem<M>& nlp = nlp_;
-    jac_f_fcn_ = Function("nlp_jac_f", nlp.in,
-                          {nlp.out[NL_F], M::jacobian(nlp.out[NL_F], nlp.in[NL_X])});
-    alloc(jac_f_fcn_);
+    jac_g_fcn_ = nlp_.create("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+    alloc(jac_g_fcn_);
+    jacg_sp_ = jac_g_fcn_.sparsity_out(1);
   }
 
   void Nlpsol::setup_jac_f() {
-    if (nlp_.is_sx) {
-      _setup_jac_f<SX>();
-    } else {
-      _setup_jac_f<MX>();
-    }
+    jac_f_fcn_ = nlp_.create("nlp_jac_f", {"x", "p"}, {"f", "jac_f_x"});
+    alloc(jac_f_fcn_);
   }
 
   template<typename M>
