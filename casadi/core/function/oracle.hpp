@@ -36,6 +36,18 @@ namespace casadi {
   /** Oracle abstract base class */
   class CASADI_EXPORT Oracle {
     public:
+    // Construct from SX expression
+    static Oracle* create(const std::vector<SX>& in,
+                          const std::vector<SX>& out,
+                          const std::vector<std::string>& ischeme,
+                          const std::vector<std::string>& oscheme);
+
+    // Construct from MX expression
+    static Oracle* create(const std::vector<MX>& in,
+                          const std::vector<MX>& out,
+                          const std::vector<std::string>& ischeme,
+                          const std::vector<std::string>& oscheme);
+
     // Destructor
     virtual ~Oracle() {}
 
@@ -88,18 +100,12 @@ namespace casadi {
       : in(in), out(out), ischeme(ischeme), oscheme(oscheme) {
     }
 
-    // Constructor (only schemes)
-    Problem(const std::vector<std::string>& ischeme,
-            const std::vector<std::string>& oscheme)
-      : in(ischeme.size()), out(oscheme.size()), ischeme(ischeme), oscheme(oscheme) {
-    }
-
     // Factory
     virtual Function create(const std::string& fname,
-                    const std::vector<std::string>& s_in,
-                    const std::vector<std::string>& s_out,
-                    const std::vector<LinComb>& lincomb,
-                    const Dict& opts) const;
+                            const std::vector<std::string>& s_in,
+                            const std::vector<std::string>& s_out,
+                            const std::vector<LinComb>& lincomb,
+                            const Dict& opts) const;
 
     /** \brief Which variables enter nonlinearly */
     virtual std::vector<bool> nl_var(const std::string& s_in,

@@ -301,31 +301,31 @@ namespace casadi {
 
   template<typename XType>
   Problem<XType> Integrator::fun2problem(Function f, Function g) {
-    Problem<XType> dae(DE_INPUTS, DE_OUTPUTS);
+    std::vector<XType> dae_in(DE_NUM_IN), dae_out(DE_NUM_OUT);
     std::vector<XType> v = XType::get_input(f), vf=v, vg=v;
-    dae.in[DE_T] = v[DAE_T];
-    dae.in[DE_X] = v[DAE_X];
-    dae.in[DE_Z] = v[DAE_Z];
-    dae.in[DE_P] = v[DAE_P];
+    dae_in[DE_T] = v[DAE_T];
+    dae_in[DE_X] = v[DAE_X];
+    dae_in[DE_Z] = v[DAE_Z];
+    dae_in[DE_P] = v[DAE_P];
     v = f(v);
-    dae.out[DE_ODE] = v[DAE_ODE];
-    dae.out[DE_ALG] = v[DAE_ALG];
-    dae.out[DE_QUAD] = v[DAE_QUAD];
+    dae_out[DE_ODE] = v[DAE_ODE];
+    dae_out[DE_ALG] = v[DAE_ALG];
+    dae_out[DE_QUAD] = v[DAE_QUAD];
     if (!g.is_null()) {
       v = XType::get_input(g);
-      dae.in[DE_RX] = v[RDAE_RX];
-      dae.in[DE_RZ] = v[RDAE_RZ];
-      dae.in[DE_RP] = v[RDAE_RP];
+      dae_in[DE_RX] = v[RDAE_RX];
+      dae_in[DE_RZ] = v[RDAE_RZ];
+      dae_in[DE_RP] = v[RDAE_RP];
       vg[DAE_T] = v[RDAE_T];
       vg[DAE_X] = v[RDAE_X];
       vg[DAE_Z] = v[RDAE_Z];
       vg[DAE_P] = v[RDAE_P];
       v = substitute(g(v), vg, vf);
-      dae.out[DE_RODE] = v[RDAE_ODE];
-      dae.out[DE_RALG] = v[RDAE_ALG];
-      dae.out[DE_RQUAD] = v[RDAE_QUAD];
+      dae_out[DE_RODE] = v[RDAE_ODE];
+      dae_out[DE_RALG] = v[RDAE_ALG];
+      dae_out[DE_RQUAD] = v[RDAE_QUAD];
     }
-    return dae;
+    return Problem<XType>(dae_in, dae_out, DE_INPUTS, DE_OUTPUTS);
   }
 
   struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {

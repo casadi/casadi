@@ -242,5 +242,19 @@ namespace casadi {
     return p->nl_var(s_in, s_out);
   }
 
+  Oracle* Oracle::create(const std::vector<SX>& in,
+                         const std::vector<SX>& out,
+                         const std::vector<std::string>& ischeme,
+                         const std::vector<std::string>& oscheme) {
+    return new Problem<SX>(in, out, ischeme, oscheme);
+  }
+
+  Oracle* Oracle::create(const std::vector<MX>& in,
+                         const std::vector<MX>& out,
+                         const std::vector<std::string>& ischeme,
+                         const std::vector<std::string>& oscheme) {
+    return new Problem<MX>(in, out, ischeme, oscheme);
+  }
+
 } // namespace casadi
 

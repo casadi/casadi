@@ -287,12 +287,9 @@ namespace casadi {
 
   template<typename XType>
   Problem<XType> Nlpsol::fun2problem(Function nlp) {
-    Problem<XType> p(NL_INPUTS, NL_OUTPUTS);
-    p.in = XType::get_input(nlp);
-    casadi_assert(p.in.size()==NL_NUM_IN);
-    p.out = nlp(p.in);
-    casadi_assert(p.out.size()==NL_NUM_OUT);
-    return p;
+    std::vector<XType> nl_in = XType::get_input(nlp);
+    std::vector<XType> nl_out = nlp(nl_in);
+    return Problem<XType>(nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
   }
 
 } // namespace casadi
