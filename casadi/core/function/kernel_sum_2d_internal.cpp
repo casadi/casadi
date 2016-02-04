@@ -86,6 +86,12 @@ namespace casadi {
     addOption("null_test", OT_BOOLEAN, true,
       "If false, null-tests will be omitted from the kernel code.");
 
+    addOption("context", OT_VOIDPTR, GenericType(),
+      "You may optionally provide an existing OpenCL context.");
+
+    addOption("queue", OT_VOIDPTR, GenericType(),
+      "You may optionally provide an existing OpenCL queue.");
+
     casadi_assert(n>=1);
 
     casadi_assert_message(n==1, "Vectorized form of KernelSum2D not yet implemented.");
@@ -111,6 +117,17 @@ namespace casadi {
     null_test_ = getOption("null_test");
     num_work_items_ = getOption("num_work_items");
     reduction_ = getOption("reduction");
+
+    context_ = 0;
+    queue_   = 0;
+
+    if (hasSetOption("context")) {
+      context_ = getOption("context").toVoidPointer();
+    }
+
+    if (hasSetOption("queue")) {
+      queue_ = getOption("queue").toVoidPointer();
+    }
 
     int num_in = f_.nIn(), num_out = f_.nOut();
 
@@ -805,8 +822,12 @@ namespace casadi {
     g.cleanup << "clReleaseMemObject(d_args" << ind << "_);" << endl;
     g.cleanup << "clReleaseProgram(program" << ind << "_);" << endl;
     g.cleanup << "clReleaseKernel(kernel" << ind << "_);" << endl;
-    g.cleanup << "clReleaseCommandQueue(commands" << ind << "_);" << endl;
-    g.cleanup << "clReleaseContext(context" << ind << "_);" << endl;
+    if (!queue_) {
+      g.cleanup << "clReleaseCommandQueue(commands" << ind << "_);" << endl;
+    }
+    if (!context_) {
+      g.cleanup << "clReleaseContext(context" << ind << "_);" << endl;
+    }
 
     // Debug OpenCL errors
     g.declarations << "#define check_cl_error(a) ";
@@ -818,52 +839,74 @@ namespace casadi {
     // =========================
 
     g.setup << "  {" << endl;
-
-    // Select the desirable OpenCL devices
-    g.setup << "    cl_uint numPlatforms;" << endl;
-    g.setup << "    int err = clGetPlatformIDs(0, NULL, &numPlatforms);" << endl;
-    g.setup << "    check_cl_error(err);" << endl;
-
-    g.setup << "    cl_platform_id Platform[numPlatforms];" << endl;
-    g.setup << "    err = clGetPlatformIDs(numPlatforms, Platform, NULL);" << endl;
-    g.setup << "    check_cl_error(err);" << endl;
-
+    g.setup << "    int err;" << endl;
     g.setup << "    cl_device_id mydevice;"  << endl;
 
-    g.setup << "    int i,j,k=0;" << endl;
-    g.setup << "    for (i = 0; i < numPlatforms; i++) {" << endl;
-    g.setup << "      cl_uint n = 0;" << endl;
-    g.setup << "      err = clGetDeviceIDs(Platform[i], CL_DEVICE_TYPE_ALL, 0, NULL, &n);" << endl;
-    g.setup << "      check_cl_error(err);" << endl;
-    g.setup << "      cl_device_id device_id[n];" << endl;
-    g.setup << "      err = clGetDeviceIDs(Platform[i], CL_DEVICE_TYPE_ALL, n, device_id, NULL);";
-    g.setup << endl;
-    g.setup << "      check_cl_error(err);" << endl;
-    g.setup << "      for (j=0;j<n;++j) {" << endl;
-    g.setup << "        cl_char device_name[1024] = {0};" << endl;
-    g.setup << "        err = clGetDeviceInfo(device_id[j], CL_DEVICE_NAME, sizeof(device_name),";
-    g.setup << " &device_name, NULL);" << endl;
-    g.setup << "        check_cl_error(err);" << endl;
-    g.setup << "        printf(\"Detected device %d: %s\", k, device_name);" << endl;
-    g.setup << "        if (k== " << opencl_select_ << ") {" << endl;
-    g.setup << "          mydevice = device_id[j];" << endl;
-    g.setup << "          printf(\" (selected)\");" << endl;
-    g.setup << "        }" << endl;
-    g.setup << "        printf(\"\\n\");" << endl;
-    g.setup << "        k+=1;" << endl;
-    g.setup << "      }" << endl;
-    g.setup << "    }" << endl;
+    if (context_) {
+      g.setup << "    context" << ind << "_ = ((cl_context)" << context_ << ");"  << endl;
+    } else {
+
+      // Select the desirable OpenCL devices
+      g.setup << "    cl_uint numPlatforms;" << endl;
+      g.setup << "    err = clGetPlatformIDs(0, NULL, &numPlatforms);" << endl;
+      g.setup << "    check_cl_error(err);" << endl;
+
+      g.setup << "    cl_platform_id Platform[numPlatforms];" << endl;
+      g.setup << "    err = clGetPlatformIDs(numPlatforms, Platform, NULL);" << endl;
+      g.setup << "    check_cl_error(err);" << endl;
 
 
-    // Create a compute context
-    g.setup << "    context" << ind << "_ = clCreateContext(0, 1, &mydevice, NULL, NULL, &err);";
-    g.setup << endl;
-    g.setup << "    check_cl_error(err);" << endl;
 
-    // Create a command queue
-    g.setup << "    commands" << ind << "_ = clCreateCommandQueue(context" << ind << "_,";
-    g.setup << " mydevice, 0, &err);" << endl;
-    g.setup << "    check_cl_error(err);" << endl;
+      g.setup << "    int i,j,k=0;" << endl;
+      g.setup << "    for (i = 0; i < numPlatforms; i++) {" << endl;
+      g.setup << "      cl_uint n = 0;" << endl;
+      g.setup << "      err = clGetDeviceIDs(Platform[i], CL_DEVICE_TYPE_ALL, 0, NULL, &n);";
+      g.setup << endl;
+      g.setup << "      check_cl_error(err);" << endl;
+      g.setup << "      cl_device_id device_id[n];" << endl;
+      g.setup << "      err = clGetDeviceIDs(Platform[i], CL_DEVICE_TYPE_ALL, n, device_id, NULL);";
+      g.setup << endl;
+      g.setup << "      check_cl_error(err);" << endl;
+      g.setup << "      for (j=0;j<n;++j) {" << endl;
+      g.setup << "        cl_char device_name[1024] = {0};" << endl;
+      g.setup << "        err = clGetDeviceInfo(device_id[j], CL_DEVICE_NAME, sizeof(device_name),";
+      g.setup << " &device_name, NULL);" << endl;
+      g.setup << "        check_cl_error(err);" << endl;
+      g.setup << "        printf(\"Detected device %d: %s\", k, device_name);" << endl;
+      g.setup << "        if (k== " << opencl_select_ << ") {" << endl;
+      g.setup << "          mydevice = device_id[j];" << endl;
+      g.setup << "          printf(\" (selected)\");" << endl;
+      g.setup << "        }" << endl;
+      g.setup << "        printf(\"\\n\");" << endl;
+      g.setup << "        k+=1;" << endl;
+      g.setup << "      }" << endl;
+      g.setup << "    }" << endl;
+
+
+      // Create a compute context
+      g.setup << "    context" << ind << "_ = clCreateContext(0, 1, &mydevice, NULL, NULL, &err);";
+      g.setup << endl;
+      g.setup << "    check_cl_error(err);" << endl;
+    }
+
+    if (queue_) {
+      g.setup << "    commands" << ind << "_ = ((cl_command_queue)" << queue_ << ");" << endl;
+      g.setup << "    printf(\"test %d \", commands" << ind << "_);" << endl;
+      g.setup << "    err = clGetCommandQueueInfo (commands" << ind << "_, CL_QUEUE_DEVICE,";
+      g.setup << "    sizeof(cl_device_id), &mydevice, NULL);" << endl;
+      g.setup << "    check_cl_error(err);" << endl;
+
+      g.setup << "        cl_char device_name[1024] = {0};" << endl;
+      g.setup << "        err = clGetDeviceInfo(mydevice, CL_DEVICE_NAME, sizeof(device_name),";
+      g.setup << " &device_name, NULL);" << endl;
+      g.setup << "        check_cl_error(err);" << endl;
+      g.setup << "        printf(\"Using device %s\", device_name);" << endl;
+    } else {
+      // Create a command queue
+      g.setup << "    commands" << ind << "_ = clCreateCommandQueue(context" << ind << "_,";
+      g.setup << " mydevice, 0, &err);" << endl;
+      g.setup << "    check_cl_error(err);" << endl;
+    }
 
     // Obtain the kernel source
     g.setup << "    const char *KernelSource = " << g.multiline_string(kernelCode()+"\n") << ";";
@@ -942,16 +985,18 @@ namespace casadi {
     }
 
     const double* V;
-    if (pointer_input_) {
-      if (image_type_==64) {
-        g.body << "  const real_t* V =  (double *) *((uint64_t *) arg[0]);" << endl;
-      } else if (image_type_==32) {
-        g.body << "  const float* V =  (float *) *((uint64_t *) arg[0]);" << endl;
-      } else if (image_type_==16) {
-        g.body << "  const float* V =  (float *) *((uint64_t *) arg[0]);" << endl;
+    if (!context_) {
+      if (pointer_input_) {
+        if (image_type_==64) {
+          g.body << "  const real_t* V =  (double *) *((uint64_t *) arg[0]);" << endl;
+        } else if (image_type_==32) {
+          g.body << "  const float* V =  (float *) *((uint64_t *) arg[0]);" << endl;
+        } else if (image_type_==16) {
+          g.body << "  const float* V =  (float *) *((uint64_t *) arg[0]);" << endl;
+        }
+      } else {
+        g.body << "  const real_t* V = arg[0];" << endl;
       }
-    } else {
-      g.body << "  const real_t* V = arg[0];" << endl;
     }
     g.body << "  const real_t* X = arg[1];" << endl;
 
@@ -1009,11 +1054,20 @@ namespace casadi {
       g.body << "  size_t host_origin[3] = {bs*imin, jmin, 0};" << endl;
       g.body << "  size_t region[3] = {bs*idelta, jdelta, 1};" << endl;
 
-      g.body << "  err = clEnqueueWriteBufferRect(commands" << ind << "_,";
-      g.body << " d_im" << ind << "_, CL_TRUE, ";
-      g.body << " buffer_origin, host_origin, region, bs*idelta, 0, bs*";
-      g.body << size_.first << ", 0, V, 0, NULL, NULL);" << endl;
-      g.body << "  check_cl_error(err);" << endl;
+      if (queue_) {
+        g.body << "  cl_mem V =  (cl_mem) *((uint64_t *) arg[0]);" << endl;
+        g.body << "  err = clEnqueueCopyBufferRect(commands" << ind << "_,";
+        g.body << " V, d_im" << ind << "_, ";
+        g.body << " host_origin, buffer_origin, region, bs*";
+        g.body << size_.first << ", 0, bs*idelta, 0, 0, NULL, NULL);" << endl;
+        g.body << "  check_cl_error(err);" << endl;
+      } else {
+        g.body << "  err = clEnqueueWriteBufferRect(commands" << ind << "_,";
+        g.body << " d_im" << ind << "_, CL_TRUE, ";
+        g.body << " buffer_origin, host_origin, region, bs*idelta, 0, bs*";
+        g.body << size_.first << ", 0, V, 0, NULL, NULL);" << endl;
+        g.body << "  check_cl_error(err);" << endl;
+      }
     } else {
       g.body << "  int offset = imin + jmin*" << size_.first << ";" << endl;
 

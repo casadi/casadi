@@ -106,6 +106,9 @@ namespace casadi {
     int num_work_items_;
 
     bool reduction_;
+
+    void * context_;
+    void * queue_;
     /// @}
   };
 
