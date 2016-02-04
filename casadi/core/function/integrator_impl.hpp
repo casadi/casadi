@@ -161,12 +161,6 @@ namespace casadi {
     /// Create sparsity pattern of the extended Jacobian (backward problem)
     Sparsity spJacG();
 
-    /// Get the (legacy) dae forward function
-    template<typename MatType> Function get_f() const;
-
-    /// Get the (legacy) dae backward function
-    template<typename MatType> Function get_g() const;
-
     // Sparities
     Sparsity t_, x_, z_, p_, q_, rx_, rz_, rp_, rq_;
 

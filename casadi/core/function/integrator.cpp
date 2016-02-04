@@ -138,13 +138,9 @@ namespace casadi {
   Integrator::Integrator(const std::string& name, const XProblem& dae)
     : FunctionInternal(name), dae_(dae) {
 
-    if (dae.is_sx) {
-      f_ = get_f<SX>();
-      g_ = get_g<SX>();
-    } else {
-      f_ = get_f<MX>();
-      g_ = get_g<MX>();
-    }
+    f_ = dae_.create("dae", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = dae_.create("rdae", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                     {"rode", "ralg", "rquad"});
 
     // Negative number of parameters for consistancy checking
     np_ = -1;
@@ -168,37 +164,6 @@ namespace casadi {
   }
 
   Integrator::~Integrator() {
-  }
-
-  template<typename MatType>
-  Function Integrator::get_f() const {
-    vector<MatType> dae_in(DAE_NUM_IN), dae_out(DAE_NUM_OUT);
-    const Problem<MatType>& dae = this->dae_;
-    dae_in[DAE_T]=dae.in[DE_T];
-    dae_in[DAE_X]=dae.in[DE_X];
-    dae_in[DAE_Z]=dae.in[DE_Z];
-    dae_in[DAE_P]=dae.in[DE_P];
-    dae_out[DAE_ODE]=dae.out[DE_ODE];
-    dae_out[DAE_ALG]=dae.out[DE_ALG];
-    dae_out[DAE_QUAD]=dae.out[DE_QUAD];
-    return Function("dae", dae_in, dae_out);
-  }
-
-  template<typename MatType>
-  Function Integrator::get_g() const {
-    vector<MatType> rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
-    const Problem<MatType>& dae = this->dae_;
-    rdae_in[RDAE_T]=dae.in[DE_T];
-    rdae_in[RDAE_X]=dae.in[DE_X];
-    rdae_in[RDAE_Z]=dae.in[DE_Z];
-    rdae_in[RDAE_P]=dae.in[DE_P];
-    rdae_in[RDAE_RX]=dae.in[DE_RX];
-    rdae_in[RDAE_RZ]=dae.in[DE_RZ];
-    rdae_in[RDAE_RP]=dae.in[DE_RP];
-    rdae_out[RDAE_ODE]=dae.out[DE_RODE];
-    rdae_out[RDAE_ALG]=dae.out[DE_RALG];
-    rdae_out[RDAE_QUAD]=dae.out[DE_RQUAD];
-    return Function("rdae", rdae_in, rdae_out);
   }
 
   Sparsity Integrator::get_sparsity_in(int ind) const {
