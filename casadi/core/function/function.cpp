@@ -29,7 +29,7 @@
 #include "../std_vector_tools.hpp"
 #include "../function/map.hpp"
 #include "../function/mapaccum.hpp"
-
+#include "../function/external_function.hpp"
 
 using namespace std;
 
@@ -585,6 +585,14 @@ namespace casadi {
     CodeGenerator gen(opts);
     gen.add(*this, fname);
     gen.generate(fname);
+  }
+
+  Function Function::wrap(const string& fname, const Dict& opts) {
+    std::vector<MX> in = symbolicInput();
+    Dict options = opts;
+    options["input_scheme"] = (*this)->ischeme_;
+    options["output_scheme"] = (*this)->oscheme_;
+    return MXFunction(fname, in, operator()(in), options);
   }
 
   void Function::checkInputs() const {
