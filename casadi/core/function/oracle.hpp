@@ -73,7 +73,7 @@ namespace casadi {
     virtual Function create(const std::string& fname,
                             const std::vector<std::string>& s_in,
                             const std::vector<std::string>& s_out,
-                            const std::vector<LinComb>& lincomb={},
+                            const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
                             const Dict& opts=Dict()) const = 0;
 
     /** \brief Get type name */
