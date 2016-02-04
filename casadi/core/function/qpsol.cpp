@@ -112,14 +112,24 @@ namespace casadi {
 
   template<typename M>
   Function qpsol_nlp(const std::string& name, const std::string& solver,
-                     const Problem<M>& qp, const Dict& opts) {
+                     const std::map<std::string, M>& qp, const Dict& opts) {
     // We have: minimize    f(x) = 1/2 * x' H x + c'x
     //          subject to  lbx <= x <= ubx
     //                      lbg <= g(x) = A x + b <= ubg
-    M x = qp.in[NL_X];
-    M p = qp.in[NL_P];
-    M f = qp.out[NL_F];
-    M g = qp.out[NL_G];
+    M x, p, f, g;
+    for (auto&& i : qp) {
+      if (i.first=="x") {
+        x = i.second;
+      } else if (i.first=="p") {
+        p = i.second;
+      } else if (i.first=="f") {
+        f = i.second;
+      } else if (i.first=="g") {
+        g = i.second;
+      } else {
+        casadi_error("No such field: " + i.first);
+      }
+    }
     if (g.is_empty(true)) g = M(0, 1); // workaround
 
     // Gradient of the objective: gf == Hx + g
@@ -138,7 +148,7 @@ namespace casadi {
     M A = M::jacobian(g, x);
 
     // Create a function for calculating the required matrices vectors
-    Function prob(name + "_qp", qp.in, {H, c, A, b});
+    Function prob(name + "_qp", {x, p}, {H, c, A, b});
 
     // Create the QP solver
     Function qpsol_f = qpsol(name + "_qpsol", solver,
@@ -186,28 +196,18 @@ namespace casadi {
   }
 
   Function qpsol(const std::string& name, const std::string& solver,
-                 const XProblem& qp, const Dict& opts) {
-    if (qp.is_sx) {
-      return qpsol_nlp<SX>(name, solver, qp, opts);
-    } else {
-      return qpsol_nlp<MX>(name, solver, qp, opts);
-    }
-  }
-
-  Function qpsol(const std::string& name, const std::string& solver,
                  const SXDict& qp, const Dict& opts) {
-    return qpsol(name, solver, Nlpsol::map2problem(qp), opts);
+    return qpsol_nlp(name, solver, qp, opts);
   }
 
   Function qpsol(const std::string& name, const std::string& solver,
                  const MXDict& qp, const Dict& opts) {
-    return qpsol(name, solver, Nlpsol::map2problem(qp), opts);
+    return qpsol_nlp(name, solver, qp, opts);
   }
 
   // Constructor
-  Qpsol::Qpsol(const std::string& name,
-               const std::map<std::string, Sparsity> &st)
-  : FunctionInternal(name) {
+  Qpsol::Qpsol(const std::string& name, const std::map<std::string, Sparsity> &st)
+    : FunctionInternal(name) {
     for (auto i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {
         A_ = i->second;

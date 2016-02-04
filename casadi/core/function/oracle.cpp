@@ -70,16 +70,6 @@ namespace casadi {
     return *this;
   }
 
-  XProblem::operator const SXProblem&() const {
-    casadi_assert(is_sx);
-    return *sx_p;
-  }
-
-  XProblem::operator const MXProblem&() const {
-    casadi_assert(!is_sx);
-    return *mx_p;
-  }
-
   const Sparsity& XProblem::sparsity_in(int i) const {
     return is_sx ? sx_p->sparsity_in(i) : mx_p->sparsity_in(i);
   }
@@ -245,6 +235,35 @@ namespace casadi {
       return sx_p->create(fname, s_in, s_out, lincomb, opts);
     } else {
       return mx_p->create(fname, s_in, s_out, lincomb, opts);
+    }
+  }
+
+  template<typename XType>
+  std::vector<bool> Problem<XType>::nl_var(const std::string& s_in,
+                                           const std::vector<std::string>& s_out) {
+    // Input arguments
+    auto it = find(ischeme.begin(), ischeme.end(), s_in);
+    casadi_assert(it!=ischeme.end());
+    XType arg = in.at(it-ischeme.begin());
+
+    // Output arguments
+    vector<XType> res;
+    for (auto&& s : s_out) {
+      it = find(oscheme.begin(), oscheme.end(), s);
+      casadi_assert(it!=oscheme.end());
+      res.push_back(out.at(it-oscheme.begin()));
+    }
+
+    // Extract variables entering nonlinearly
+    return XType::nl_var(veccat(res), arg);
+  }
+
+  std::vector<bool> XProblem::nl_var(const std::string& s_in,
+                                     const std::vector<std::string>& s_out) {
+    if (is_sx) {
+      return sx_p->nl_var(s_in, s_out);
+    } else {
+      return mx_p->nl_var(s_in, s_out);
     }
   }
 

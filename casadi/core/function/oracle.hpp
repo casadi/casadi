@@ -67,6 +67,10 @@ namespace casadi {
                     const std::vector<std::string>& s_out,
                     const std::vector<LinComb>& lincomb,
                     const Dict& opts) const;
+
+    /** \brief Which variables enter nonlinearly */
+    std::vector<bool> nl_var(const std::string& s_in,
+                             const std::vector<std::string>& s_out);
   };
 
   typedef Problem<SX> SXProblem;
@@ -89,9 +93,6 @@ namespace casadi {
     XProblem& operator=(const XProblem& d);
     /// Destructor
     ~XProblem();
-    /// Type cast
-    operator const SXProblem&() const;
-    operator const MXProblem&() const;
     // Input sparsity
     const Sparsity& sparsity_in(int i) const;
 
@@ -104,6 +105,10 @@ namespace casadi {
                     const std::vector<std::string>& s_out,
                     const std::vector<LinComb>& lincomb = std::vector<LinComb>(),
                     const Dict& opts=Dict()) const;
+
+    /** \brief Which variables enter nonlinearly */
+    std::vector<bool> nl_var(const std::string& s_in,
+                             const std::vector<std::string>& s_out);
   };
 #endif // SWIG
 
