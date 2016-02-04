@@ -548,6 +548,9 @@ namespace casadi {
     /** \brief Get function inputs */
     static std::vector<MX> get_input(const Function& f);
 
+    /// Get name of the class
+    static std::string type_name();
+
     ///@{
     /// Readability typedefs
     typedef std::map<std::string, MX> MXDict;

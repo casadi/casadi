@@ -26,6 +26,7 @@
 #define CASADI_ORACLE_HPP
 
 #include "function.hpp"
+#include "compiler.hpp"
 
 namespace casadi {
 
@@ -48,6 +49,14 @@ namespace casadi {
                              const std::vector<std::string>& ischeme,
                              const std::vector<std::string>& oscheme);
 
+    // Construct from a DLL or C code
+    static Oracle* construct(const std::string& fname,
+                             const std::string& all_io="all_io");
+
+    // Construct using a compiler instance
+    static Oracle* construct(const Compiler& compiler,
+                             const std::string& all_io="all_io");
+
     // Destructor
     virtual ~Oracle() {}
 
@@ -67,9 +76,16 @@ namespace casadi {
                             const std::vector<LinComb>& lincomb={},
                             const Dict& opts=Dict()) const = 0;
 
+    /** \brief Get type name */
+    virtual std::string type_name() const = 0;
+
     /** \brief Which variables enter nonlinearly */
     virtual std::vector<bool> nl_var(const std::string& s_in,
-                                     const std::vector<std::string>& s_out) = 0;
+                                     const std::vector<std::string>& s_out) const;
+
+    /** \brief Generate a function with all inputs and outputs */
+    virtual Function all_io(const std::string& fname="all_io",
+                            const Dict& opts=Dict()) const;
   };
 
   /** Symbolic representation of a problem */
@@ -107,9 +123,48 @@ namespace casadi {
                             const std::vector<LinComb>& lincomb,
                             const Dict& opts) const;
 
+    /** \brief Get type name */
+    virtual std::string type_name() const;
+
     /** \brief Which variables enter nonlinearly */
     virtual std::vector<bool> nl_var(const std::string& s_in,
-                                     const std::vector<std::string>& s_out);
+                                     const std::vector<std::string>& s_out) const;
+
+    /** \brief Generate a function with all inputs and outputs */
+    virtual Function all_io(const std::string& fname, const Dict& opts) const;
+  };
+
+  /** Problem stored externally */
+  template<typename LibType>
+  class CASADI_EXPORT LibOracle : public Oracle {
+  private:
+    LibType libtype_;
+    Function all_io_;
+  public:
+    // Constructor
+    LibOracle(const LibType& libtype, const std::string& all_io);
+
+    // Destructor
+    virtual ~LibOracle() {}
+
+    // Clone
+    virtual Oracle* clone() const { return new LibOracle(*this);}
+
+    // Input sparsity
+    virtual const Sparsity& sparsity_in(int i) const;
+
+    // Output sparsity
+    virtual const Sparsity& sparsity_out(int i) const;
+
+    // Factory
+    virtual Function create(const std::string& fname,
+                            const std::vector<std::string>& s_in,
+                            const std::vector<std::string>& s_out,
+                            const std::vector<LinComb>& lincomb,
+                            const Dict& opts) const;
+
+    /** \brief Get type name */
+    virtual std::string type_name() const;
   };
 
 #endif // SWIG

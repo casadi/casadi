@@ -818,6 +818,10 @@ namespace casadi {
     gen.generate(fname);
   }
 
+  void Function::generate_dependencies(const string& fname, const Dict& opts) {
+    (*this)->generate_dependencies(fname, opts);
+  }
+
   void Function::checkInputs() const {
     return (*this)->checkInputs();
   }

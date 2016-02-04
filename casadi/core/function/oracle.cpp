@@ -178,8 +178,9 @@ namespace casadi {
   }
 
   template<typename XType>
-  std::vector<bool> XOracle<XType>::nl_var(const std::string& s_in,
-                                           const std::vector<std::string>& s_out) {
+  std::vector<bool>
+  XOracle<XType>::nl_var(const std::string& s_in,
+                         const std::vector<std::string>& s_out) const {
     // Input arguments
     auto it = find(ischeme_.begin(), ischeme_.end(), s_in);
     casadi_assert(it!=ischeme_.end());
@@ -209,6 +210,72 @@ namespace casadi {
                             const std::vector<std::string>& ischeme,
                             const std::vector<std::string>& oscheme) {
     return new XOracle<MX>(in, out, ischeme, oscheme);
+  }
+
+  Oracle* Oracle::construct(const Compiler& compiler, const std::string& all_io) {
+    return new LibOracle<Compiler>(compiler, all_io);
+  }
+
+  Oracle* Oracle::construct(const std::string& fname, const std::string& all_io) {
+    // If fname ends with .c, JIT
+    if (fname.size()>2 && fname.compare(fname.size()-2, fname.size(), ".c")==0) {
+      Compiler compiler(fname, "clang");
+      return construct(compiler, all_io);
+    } else {
+      return new LibOracle<std::string>(fname, all_io);
+    }
+  }
+
+  std::vector<bool> Oracle::nl_var(const std::string& s_in,
+                                   const std::vector<std::string>& s_out) const {
+    casadi_error("'nl_var' not defined for " + type_name());
+  }
+
+  template<typename XType>
+  std::string XOracle<XType>::type_name() const {
+    return XType::type_name() + "Oracle";
+  }
+
+  Function Oracle::all_io(const std::string& fname, const Dict& opts) const {
+    casadi_error("'all_io' not defined for " + type_name());
+  }
+
+  template<typename XType>
+  Function XOracle<XType>::all_io(const std::string& fname, const Dict& opts) const {
+    return Function(fname, in_, out_, ischeme_, oscheme_, opts);
+  }
+
+  template<typename LibType>
+  LibOracle<LibType>::LibOracle(const LibType& libtype, const std::string& all_io)
+    : libtype_(libtype) {
+    all_io_ = external(all_io, libtype);
+  }
+
+  template<typename LibType>
+  const Sparsity& LibOracle<LibType>::sparsity_in(int i) const {
+    return all_io_.sparsity_in(i);
+  }
+
+  template<typename LibType>
+  const Sparsity& LibOracle<LibType>::sparsity_out(int i) const {
+    return all_io_.sparsity_out(i);
+  }
+
+  template<typename LibType>
+  Function LibOracle<LibType>::create(const std::string& fname,
+                             const std::vector<std::string>& s_in,
+                             const std::vector<std::string>& s_out,
+                             const std::vector<LinComb>& lincomb,
+                             const Dict& opts) const {
+    Function ret = external(fname, libtype_, opts);
+    casadi_assert(s_in.size()==ret.n_in());
+    casadi_assert(s_out.size()==ret.n_out());
+    return ret;
+  }
+
+  template<typename LibType>
+  std::string LibOracle<LibType>::type_name() const {
+    return "LibOracle";
   }
 
 } // namespace casadi

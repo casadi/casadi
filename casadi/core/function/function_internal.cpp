@@ -2241,6 +2241,10 @@ namespace casadi {
     casadi_error("'generateBody' not defined for " + type_name());
   }
 
+  void FunctionInternal::generate_dependencies(const std::string& fname, const Dict& opts) {
+    casadi_error("'generate_dependencies' not defined for " + type_name());
+  }
+
   Function FunctionInternal::dynamicCompilation(Function f, std::string fname, std::string fdescr,
                                                 std::string compiler) {
     // Codegen and compile

@@ -776,6 +776,9 @@ namespace casadi {
     /** \brief Export / Generate C code for the function */
     void generate(const Dict& opts=Dict());
 
+    /** \brief Export / Generate C code for the dependency function */
+    void generate_dependencies(const std::string& fname, const Dict& opts=Dict());
+
 #ifndef SWIG
     /// \cond INTERNAL
     /// Get a const pointer to the node

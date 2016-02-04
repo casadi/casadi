@@ -33,30 +33,8 @@ using namespace casadi;
 using namespace std;
 /**
  *  Example program demonstrating NLP solution with Ipopt with callback functions as generated code
- *  Joel Andersson, K.U. Leuven 2013
+ *  Joel Andersson, 2013-2016
  */
-
-Function generateCodeAndCompile(Function fcn, const std::string& name, bool expand){
-  cout << "Generating code for " << name << endl;
-
-  // Convert to sx (may or may not improve efficiency)
-  if(expand && fcn.is_a("mxfunction")) {
-    fcn = fcn.expand();
-  }
-
-  // Generate C code
-  fcn.generate(name);
-
-  // Compilation command
-  string compile_command = "gcc -fPIC -shared -O3 " + name + ".c -o " + name + ".so";
-
-  // Compile the c-code
-  int flag = system(compile_command.c_str());
-  casadi_assert_message(flag==0, "Compilation failed");
-
-  // Load the generated function for evaluation
-  return external(name);
-}
 
 int main(){
   /** Test problem 
@@ -66,40 +44,33 @@ int main(){
    */
 
   // Optimization variables
-  MX x = MX::sym("x",2);
+  MX x = MX::sym("x", 2);
 
   // Objective
   MX f = x[0]*x[0] + x[1]*x[1];
 
   // Constraints
   MX g = x[0]+x[1]-10;
-    
-  // Convert mxfunction to sxfunction before code generation (may or may not improve efficiency)
-  bool expand = true;
 
-  // NLP function
-  Function nlp("nlp", {{"x", x}, {"f", f}, {"g", g}}, {"x", "p"}, {"f", "g"});
+  // Create an NLP solver instance
+  Function solver = nlpsol("solver", "ipopt", {{"x", x}, {"f", f}, {"g", g}});
 
-  // Gradient of the objective
-  Function grad_f = nlp.gradient("x", "f");
+  // Generate C code for the NLP functions
+  solver.generate_dependencies("nlp.c");
 
-  // Jacobian of the constraints
-  Function jac_g = nlp.jacobian("x", "g");
+  // Just-in-time compilation?
+  bool jit = false;
+  if (jit) {
+    // Create a new NLP solver instance using just-in-time compilation
+    solver = nlpsol("solver", "ipopt", "nlp.c");
+  } else {
+    // Compile the c-code
+    int flag = system("gcc -fPIC -shared -O3 nlp.c -o nlp.so");
+    casadi_assert_message(flag==0, "Compilation failed");
 
-  // Hessian of the lagrangian
-  Function grad_lag = nlp.derivative(0, 1);
-  Function hess_lag = grad_lag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
-
-  // Codegen and compile
-  nlp = generateCodeAndCompile(nlp,"nlp", expand);
-  grad_f = generateCodeAndCompile(grad_f,"grad_f", expand);
-  jac_g = generateCodeAndCompile(jac_g,"jac_g", expand);
-  hess_lag = generateCodeAndCompile(hess_lag,"hess_lag", expand);
-
-  // Create an NLP solver passing derivative information
-  Function solver =
-    nlpsol("solver", "ipopt", nlp,
-                         {{"grad_f", grad_f}, {"jac_g", jac_g}, {"hess_lag", hess_lag}});
+    // Create a new NLP solver instance from the compiled code
+    solver = nlpsol("solver", "ipopt", "nlp.so");
+  }
 
   // Bounds and initial guess
   std::map<std::string, DM> arg, res;

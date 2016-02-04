@@ -507,6 +507,9 @@ namespace casadi {
     /** \brief Generate code for the function body */
     virtual void generateBody(CodeGenerator& g) const;
 
+    /** \brief Export / Generate C code for the dependency function */
+    virtual void generate_dependencies(const std::string& fname, const Dict& opts);
+
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
 
