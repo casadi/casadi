@@ -372,6 +372,12 @@ namespace casadi {
     if (options.find("num_threads")==options.end()) {
       options["num_threads"] = num_threads_;
     }
+    if (options.find("context")==options.end()) {
+      options["context"] = context_;
+    }
+    if (options.find("queue")==options.end()) {
+      options["queue"] = queue_;
+    }
     Function ret = KernelSum2D(name, f_forward, size_, r_, n_, options);
 
     /* Furthermore, we need to return something of signature
@@ -474,6 +480,12 @@ namespace casadi {
     }
     if (options.find("num_threads")==options.end()) {
       options["num_threads"] = num_threads_;
+    }
+    if (options.find("context")==options.end()) {
+      options["context"] = context_;
+    }
+    if (options.find("queue")==options.end()) {
+      options["queue"] = queue_;
     }
 
     Function kn = KernelSum2D(name, f_reverse, size_, r_, n_, options);
