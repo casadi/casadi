@@ -29,53 +29,36 @@ using namespace std;
 
 namespace casadi {
 
-  XProblem::XProblem(const SXProblem& d) : sx_p(new SXProblem(d)), is_sx(true) {
+  XProblem::XProblem(const SXProblem& d) : p(new SXProblem(d)) {
   }
 
-  XProblem::XProblem(const MXProblem& d) : mx_p(new MXProblem(d)), is_sx(false) {
+  XProblem::XProblem(const MXProblem& d) : p(new MXProblem(d)) {
   }
 
   XProblem::~XProblem() {
-    if (is_sx) {
-      delete sx_p;
-    } else {
-      delete mx_p;
-    }
+    delete p;
   }
 
-  XProblem::XProblem(const XProblem& d) : is_sx(d.is_sx) {
-    if (d.is_sx) {
-      sx_p = new SXProblem(*d.sx_p);
-    } else {
-      mx_p = new MXProblem(*d.mx_p);
-    }
+  XProblem::XProblem(const XProblem& d) {
+    p = d.p->clone();
   }
 
   XProblem& XProblem::operator=(const XProblem& d) {
     if (&d!=this) {
-      // Delete the previous object
-      if (is_sx) {
-        delete sx_p;
-      } else {
-        delete mx_p;
-      }
+      delete p;
+
       // Assign
-      is_sx = d.is_sx;
-      if (is_sx) {
-        sx_p = new SXProblem(*d.sx_p);
-      } else {
-        mx_p = new MXProblem(*d.mx_p);
-      }
+      p = d.p->clone();
     }
     return *this;
   }
 
   const Sparsity& XProblem::sparsity_in(int i) const {
-    return is_sx ? sx_p->sparsity_in(i) : mx_p->sparsity_in(i);
+    return p->sparsity_in(i);
   }
 
   const Sparsity& XProblem::sparsity_out(int i) const {
-    return is_sx ? sx_p->sparsity_out(i) : mx_p->sparsity_out(i);
+    return p->sparsity_out(i);
   }
 
   template<typename XType>
@@ -231,11 +214,7 @@ namespace casadi {
                             const std::vector<std::string>& s_out,
                             const std::vector<LinComb>& lincomb,
                             const Dict& opts) const {
-    if (is_sx) {
-      return sx_p->create(fname, s_in, s_out, lincomb, opts);
-    } else {
-      return mx_p->create(fname, s_in, s_out, lincomb, opts);
-    }
+    return p->create(fname, s_in, s_out, lincomb, opts);
   }
 
   template<typename XType>
@@ -260,11 +239,7 @@ namespace casadi {
 
   std::vector<bool> XProblem::nl_var(const std::string& s_in,
                                      const std::vector<std::string>& s_out) {
-    if (is_sx) {
-      return sx_p->nl_var(s_in, s_out);
-    } else {
-      return mx_p->nl_var(s_in, s_out);
-    }
+    return p->nl_var(s_in, s_out);
   }
 
 } // namespace casadi

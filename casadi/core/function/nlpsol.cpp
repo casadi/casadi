@@ -154,8 +154,7 @@ namespace casadi {
       return Sparsity::scalar();
     case NLPSOL_X:
     case NLPSOL_LAM_X:
-      return nlp_.is_sx ? nlp_.sx_p->in[NL_X].sparsity()
-        : nlp_.mx_p->in[NL_X].sparsity();
+      return nlp_.sparsity_in(NL_X);
     case NLPSOL_LAM_G:
     case NLPSOL_G:
       return nlp_.sparsity_out(NL_G);

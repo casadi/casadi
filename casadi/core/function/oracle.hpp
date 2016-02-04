@@ -33,20 +33,53 @@ namespace casadi {
   // A linear combination of inputs
   typedef std::pair<std::string, std::vector<std::string> > LinComb;
 
+  /** Oracle abstract base class */
+  class CASADI_EXPORT Oracle {
+    public:
+    // Destructor
+    virtual ~Oracle() {}
+
+    // Clone
+    virtual Oracle* clone() const = 0;
+
+    // Input sparsity
+    virtual const Sparsity& sparsity_in(int i) const = 0;
+
+    // Output sparsity
+    virtual const Sparsity& sparsity_out(int i) const = 0;
+
+    // Factory
+    virtual Function create(const std::string& fname,
+                            const std::vector<std::string>& s_in,
+                            const std::vector<std::string>& s_out,
+                            const std::vector<LinComb>& lincomb,
+                            const Dict& opts) const = 0;
+
+    /** \brief Which variables enter nonlinearly */
+    virtual std::vector<bool> nl_var(const std::string& s_in,
+                                     const std::vector<std::string>& s_out) = 0;
+  };
+
   /** Symbolic representation of a problem */
   template<typename XType>
-  class CASADI_EXPORT Problem {
+  class CASADI_EXPORT Problem : public Oracle {
   public:
+    // Destructor
+    virtual ~Problem() {}
+
+    // Clone
+    virtual Oracle* clone() const { return new Problem(*this);}
+
     std::vector<XType> in;
     std::vector<XType> out;
     std::vector<std::string> ischeme;
     std::vector<std::string> oscheme;
 
     // Input sparsity
-    const Sparsity& sparsity_in(int i) { return in.at(i).sparsity();}
+    virtual const Sparsity& sparsity_in(int i) const { return in.at(i).sparsity();}
 
     // Output sparsity
-    const Sparsity& sparsity_out(int i) { return out.at(i).sparsity();}
+    virtual const Sparsity& sparsity_out(int i) const { return out.at(i).sparsity();}
 
     // Constructor (expressions given)
     Problem(const std::vector<XType>& in, const std::vector<XType>& out,
@@ -62,15 +95,15 @@ namespace casadi {
     }
 
     // Factory
-    Function create(const std::string& fname,
+    virtual Function create(const std::string& fname,
                     const std::vector<std::string>& s_in,
                     const std::vector<std::string>& s_out,
                     const std::vector<LinComb>& lincomb,
                     const Dict& opts) const;
 
     /** \brief Which variables enter nonlinearly */
-    std::vector<bool> nl_var(const std::string& s_in,
-                             const std::vector<std::string>& s_out);
+    virtual std::vector<bool> nl_var(const std::string& s_in,
+                                     const std::vector<std::string>& s_out);
   };
 
   typedef Problem<SX> SXProblem;
@@ -79,11 +112,7 @@ namespace casadi {
   /** Can be either an SXProblem or MXProblem */
   class CASADI_EXPORT XProblem {
   public:
-    union {
-      SXProblem *sx_p;
-      MXProblem *mx_p;
-    };
-    bool is_sx;
+    Oracle *p;
     /// Object is SX
     XProblem(const SXProblem& d);
     /// Object is MX
