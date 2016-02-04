@@ -67,7 +67,7 @@ namespace casadi {
     case OT_STRINGVECTOR:
       return isStringVector() || isString();
     case OT_VOIDPTR:
-      return isDouble();
+      return isVoidPointer() || isDouble();
     default:
       return getType() == other;
     }
