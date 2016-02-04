@@ -852,6 +852,12 @@ Get input scheme description by index.
 
 ";
 
+%feature("docstring") casadi::CleSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::CleSolver::inputIndex "
 
 Find the index for a string describing a particular entry of an input
@@ -2765,6 +2771,12 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring") casadi::ControlSimulator::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::ControlSimulator::mapsum "
 
 Evaluate symbolically in parallel and sum (matrix graph)
@@ -4401,18 +4413,6 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::CustomFunction::generate "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring") casadi::CustomFunction::numelIn "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
 %feature("docstring") casadi::CustomFunction::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
@@ -4426,6 +4426,24 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring") casadi::CustomFunction::generate "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring") casadi::CustomFunction::numelIn "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") casadi::CustomFunction::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -5930,6 +5948,12 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
 internally
+
+";
+
+%feature("docstring") casadi::DleSolver::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -7685,6 +7709,12 @@ get function name with all non alphanumeric characters converted to '_'
 
 ";
 
+%feature("docstring") casadi::DpleSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::DpleSolver::outputSparsity "
 
 Get sparsity of a given output.
@@ -9311,6 +9341,12 @@ Is the class able to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::ExternalFunction::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::ExternalFunction::evaluate "
 
 Evaluate.
@@ -9745,6 +9781,12 @@ the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::Function::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -13271,6 +13313,12 @@ the output elements).
 
 ";
 
+%feature("docstring") casadi::HomotopyNlpSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::HomotopyNlpSolver::sz_w "[INTERNAL]  Get
 required length of w field.
 
@@ -14745,6 +14793,12 @@ Get a list of all option names.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
+
+";
+
+%feature("docstring") casadi::ImplicitFunction::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -16536,6 +16590,12 @@ Print options to a stream.
 
 ";
 
+%feature("docstring") casadi::Integrator::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::Integrator::callReverse "
 
 Create call to (cached) derivative function, reverse mode.
@@ -17729,6 +17789,13 @@ Joris Gillis
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| context      | OT_VOIDPTR   | GenericType( | You may      | casadi::Kern |
+|              |              | )            | optionally   | elSum2DBase  |
+|              |              |              | provide an   |              |
+|              |              |              | existing     |              |
+|              |              |              | OpenCL       |              |
+|              |              |              | context.     |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -17904,6 +17971,13 @@ Joris Gillis
 |              |              |              | pointer to   |              |
 |              |              |              | an image     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| queue        | OT_VOIDPTR   | GenericType( | You may      | casadi::Kern |
+|              |              | )            | optionally   | elSum2DBase  |
+|              |              |              | provide an   |              |
+|              |              |              | existing     |              |
+|              |              |              | OpenCL       |              |
+|              |              |              | queue.       |              |
++--------------+--------------+--------------+--------------+--------------+
 | reduction    | OT_BOOLEAN   | false        | Indicates if | casadi::Kern |
 |              |              |              | a recution   | elSum2DBase  |
 |              |              |              | is applied   |              |
@@ -18071,6 +18145,11 @@ Evaluate.
 %feature("docstring") casadi::KernelSum2D::callReverse "
 
 Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring") casadi::KernelSum2D::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -18299,8 +18378,9 @@ Remove modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::KernelSum2D::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::KernelSum2D::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -18737,6 +18817,12 @@ Get the dictionary.
 %feature("docstring") casadi::LinearSolver::nnzOut "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") casadi::LinearSolver::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -20064,6 +20150,12 @@ the output elements).
 
 ";
 
+%feature("docstring") casadi::LpSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::LpSolver::getOptionEnumValue "[INTERNAL]  Get
 the enum value corresponding to th certain option.
 
@@ -21328,6 +21420,12 @@ time. * (n_in = nIn(), n_out = nOut())
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
+
+";
+
+%feature("docstring") casadi::LrDleSolver::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -23435,6 +23533,12 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
+%feature("docstring") casadi::LrDpleSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::LrDpleSolver::nnzIn "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
@@ -25132,6 +25236,12 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
+%feature("docstring") casadi::Map::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 
 // File: classcasadi_1_1MapAccum.xml
 
@@ -25146,9 +25256,9 @@ corresponding to th certain option.
 
 ";
 
-%feature("docstring") casadi::MapAccum::isInit "
+%feature("docstring") casadi::MapAccum::inputName "
 
-Is initialized?
+Get input scheme name by index.
 
 ";
 
@@ -25551,6 +25661,12 @@ check if the user has there is an option str
 %feature("docstring") casadi::MapAccum::getOptionTypeName "
 
 Get the type name of a certain option.
+
+";
+
+%feature("docstring") casadi::MapAccum::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -26258,6 +26374,12 @@ Get input scheme.
 
 ";
 
+%feature("docstring") casadi::MapAccum::isInit "
+
+Is initialized?
+
+";
+
 %feature("docstring") casadi::MapAccum::hessian "
 
 Generate a Hessian function of output oind with respect to input iind.
@@ -26316,12 +26438,6 @@ Get output scheme name by index.
 
 %feature("docstring") casadi::MapAccum::assertInit "[INTERNAL]  Assert that
 it is initialized
-
-";
-
-%feature("docstring") casadi::MapAccum::inputName "
-
-Get input scheme name by index.
 
 ";
 
@@ -29229,6 +29345,12 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
+%feature("docstring") casadi::MXFunction::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::MXFunction::callDerivative "[INTERNAL]
 Evaluate the function symbolically or numerically with directional
 derivatives The first two arguments are the nondifferentiated inputs and
@@ -30052,6 +30174,12 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 %feature("docstring") casadi::NlpSolver::inputDescription "
 
 Get input scheme description by index.
+
+";
+
+%feature("docstring") casadi::NlpSolver::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -34809,6 +34937,12 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring") casadi::Nullspace::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::Nullspace::callReverse "
 
 Create call to (cached) derivative function, reverse mode.
@@ -37252,6 +37386,12 @@ Remove modules to be monitored.
 
 ";
 
+%feature("docstring") casadi::QcqpSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::QcqpSolver::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
@@ -38729,6 +38869,12 @@ point to this new object
 
 ";
 
+%feature("docstring") casadi::QpSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::QpSolver::printOptions "
 
 Print options to a stream.
@@ -39529,6 +39675,12 @@ get function name with all non alphanumeric characters converted to '_'
 %feature("docstring") casadi::SdpSolver::removeMonitor "
 
 Remove modules to be monitored.
+
+";
+
+%feature("docstring") casadi::SdpSolver::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -41612,6 +41764,12 @@ returned.
 
 ";
 
+%feature("docstring") casadi::SdqpSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::SdqpSolver::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
@@ -43138,6 +43296,12 @@ propagating_sparsity.cpp)
 %feature("docstring") casadi::Simulator::getOptionDefault "
 
 Get the default of a certain option.
+
+";
+
+%feature("docstring") casadi::Simulator::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -46109,6 +46273,12 @@ Evaluate.
 
 ";
 
+%feature("docstring") casadi::SocpSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::SocpSolver::makeUnique "
 
 Make unique.
@@ -49013,6 +49183,12 @@ check if the user has there is an option str
 
 ";
 
+%feature("docstring") casadi::StabilizedQpSolver::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::StabilizedQpSolver::spCanEvaluate "[INTERNAL]
 Is the class able to propagate seeds through the algorithm?
 
@@ -50272,6 +50448,12 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
+%feature("docstring") casadi::Switch::wrap "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring") casadi::Switch::makeUnique "
 
 Make unique.
@@ -50507,6 +50689,12 @@ Get the number of function outputs.
 %feature("docstring") casadi::SXFunction::getAtomicInputReal "
 
 Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::SXFunction::wrap "
+
+Wrap a function in an MXFunction package.
 
 ";
 

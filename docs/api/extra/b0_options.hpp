@@ -2328,6 +2328,7 @@
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>context</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>You may optionally provide an existing OpenCL context.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -2348,6 +2349,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>queue</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>You may optionally provide an existing OpenCL queue.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>reduction</td><td>OT_BOOLEAN</td><td>false</td><td>Indicates if a recution is applied on the GPU.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
@@ -2366,6 +2368,7 @@
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>context</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>You may optionally provide an existing OpenCL context.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -2386,6 +2389,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DBase</td></tr>
+<tr><td>queue</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>You may optionally provide an existing OpenCL queue.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>reduction</td><td>OT_BOOLEAN</td><td>false</td><td>Indicates if a recution is applied on the GPU.</td><td>casadi::KernelSum2DBase</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
@@ -2404,6 +2408,7 @@
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>context</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>You may optionally provide an existing OpenCL context.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -2424,6 +2429,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DOcl</td></tr>
+<tr><td>queue</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>You may optionally provide an existing OpenCL queue.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>reduction</td><td>OT_BOOLEAN</td><td>false</td><td>Indicates if a recution is applied on the GPU.</td><td>casadi::KernelSum2DOcl</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>
@@ -2443,6 +2449,7 @@
 <tr><td>ad_weight</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_REAL</td><td>GenericType()</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\".</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>compiler</td><td>OT_STRING</td><td>"clang"</td><td>Just-in-time compiler plugin to be used.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>context</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>You may optionally provide an existing OpenCL context.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>custom_forward</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>custom_reverse</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of reverse mode directional derivatives. Overrides default routines.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>defaults_recipes</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Changes default options according to a given recipe (low-level)</td><td>casadi::OptionsFunctionalityNode</td></tr>
@@ -2463,6 +2470,7 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Custom output scheme</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>Computational strategy for parallelization (serial|openmp|opencl)</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>pointer_input</td><td>OT_BOOLEAN</td><td>false</td><td>Instead of the image as input, use a pointer to an image</td><td>casadi::KernelSum2DSerial</td></tr>
+<tr><td>queue</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>You may optionally provide an existing OpenCL queue.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>reduction</td><td>OT_BOOLEAN</td><td>false</td><td>Indicates if a recution is applied on the GPU.</td><td>casadi::KernelSum2DSerial</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>starcoloring_mode</td><td>OT_INTEGER</td><td>1</td><td>Sets coloring strategy for starcoloring. 1: distance-3 algorithm,2: distance-2 algorithm.</td><td>casadi::FunctionInternal</td></tr>

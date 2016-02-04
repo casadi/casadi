@@ -1052,6 +1052,13 @@ Get input scheme description by index.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::inputIndex(const std::string &name)
 const  "
 
@@ -3521,6 +3528,13 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
 &arg, const std::string &parallelization="serial") "
 
@@ -5524,25 +5538,6 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring")  casadi::Function::generate(const std::string &fname,
-const Dict &opts=Dict()) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::numelIn() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
 %feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
 
 Generate a gradient function of output oind with respect to input iind.
@@ -5607,6 +5602,32 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::generate(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::numelIn() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -7694,6 +7715,13 @@ int iind=0, int oind=0, bool compact=false) "
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
 internally
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -9840,6 +9868,13 @@ get function name with all non alphanumeric characters converted to '_'
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::outputSparsity(int ind=0) const  "
 
 Get sparsity of a given output.
@@ -11958,6 +11993,13 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
@@ -12587,6 +12629,13 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -16970,6 +17019,13 @@ the output elements).
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::sz_w() const  " [INTERNAL]  Get
 required length of w field.
 
@@ -18841,6 +18897,13 @@ Get a list of all option names.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -20944,6 +21007,13 @@ Print options to a stream.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::callReverse(const std::vector< MX >
 &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
 &aseed, std::vector< std::vector< MX > > &output_asens, bool
@@ -22546,6 +22616,13 @@ Joris Gillis
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| context      | OT_VOIDPTR   | GenericType( | You may      | casadi::Kern |
+|              |              | )            | optionally   | elSum2DBase  |
+|              |              |              | provide an   |              |
+|              |              |              | existing     |              |
+|              |              |              | OpenCL       |              |
+|              |              |              | context.     |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -22720,6 +22797,13 @@ Joris Gillis
 |              |              |              | input, use a |              |
 |              |              |              | pointer to   |              |
 |              |              |              | an image     |              |
++--------------+--------------+--------------+--------------+--------------+
+| queue        | OT_VOIDPTR   | GenericType( | You may      | casadi::Kern |
+|              |              | )            | optionally   | elSum2DBase  |
+|              |              |              | provide an   |              |
+|              |              |              | existing     |              |
+|              |              |              | OpenCL       |              |
+|              |              |              | queue.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | reduction    | OT_BOOLEAN   | false        | Indicates if | casadi::Kern |
 |              |              |              | a recution   | elSum2DBase  |
@@ -22995,6 +23079,11 @@ std::vector< DMatrix > > &aseed, std::vector< std::vector< DMatrix > >
 &output_asens, bool always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring")  casadi::Function::sz_arg() const  " [INTERNAL]  Get
+required length of arg field.
 
 ";
 
@@ -23321,8 +23410,10 @@ Remove modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::Function::sz_arg() const  " [INTERNAL]  Get
-required length of arg field.
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -23901,6 +23992,13 @@ Get the dictionary.
 %feature("docstring")  casadi::Function::nnzOut() const  "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -25695,6 +25793,13 @@ the output elements).
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
@@ -27338,6 +27443,13 @@ time. * (n_in = nIn(), n_out = nOut())
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -30195,6 +30307,13 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::nnzIn() const  "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
@@ -32348,6 +32467,13 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 
 // File: classcasadi_1_1MapAccum.xml
 
@@ -32362,9 +32488,9 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
+%feature("docstring")  casadi::Function::inputName(int ind) const  "
 
-Is initialized?
+Get input scheme name by index.
 
 ";
 
@@ -32890,6 +33016,13 @@ check if the user has there is an option str
 std::string &str) const  "
 
 Get the type name of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -33839,6 +33972,12 @@ Get input scheme.
 
 ";
 
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
+
+";
+
 %feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
 
 Generate a Hessian function of output oind with respect to input iind.
@@ -33958,12 +34097,6 @@ Get output scheme name by index.
 
 %feature("docstring")  casadi::SharedObject::assertInit() const  "
 [INTERNAL]  Assert that it is initialized
-
-";
-
-%feature("docstring")  casadi::Function::inputName(int ind) const  "
-
-Get input scheme name by index.
 
 ";
 
@@ -37695,6 +37828,13 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::callDerivative(const DMatrixVector
 &arg, DMatrixVector &output_res, const DMatrixVectorVector &fseed,
 DMatrixVectorVector &output_fsens, const DMatrixVectorVector &aseed,
@@ -38832,6 +38972,13 @@ parallelization:  Type of parallelization used: expand|serial|openmp
 %feature("docstring")  casadi::Function::inputDescription(int ind) const  "
 
 Get input scheme description by index.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -44092,6 +44239,13 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::callReverse(const std::vector< MX >
 &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
 &aseed, std::vector< std::vector< MX > > &output_asens, bool
@@ -47113,6 +47267,13 @@ Remove modules to be monitored.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::getStat(const std::string &name)
 const  "
 
@@ -48877,6 +49038,13 @@ point to this new object
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
@@ -49983,6 +50151,13 @@ get function name with all non alphanumeric characters converted to '_'
 &mon) "
 
 Remove modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -52718,6 +52893,13 @@ returned.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::jacobian(int iind=0, int oind=0,
 bool compact=false, bool symmetric=false) "
 
@@ -54692,6 +54874,13 @@ propagating_sparsity.cpp)
 std::string &str) const  "
 
 Get the default of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -58098,6 +58287,13 @@ Get input scheme.
 %feature("docstring")  casadi::Function::evaluate() "
 
 Evaluate.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -61736,6 +61932,13 @@ check if the user has there is an option str
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::spCanEvaluate(bool fwd) "
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
@@ -63438,6 +63641,13 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::SharedObject::makeUnique(bool
 clone_members=true) "
 
@@ -63784,6 +63994,13 @@ Get the number of function outputs.
 "
 
 Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
