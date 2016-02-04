@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.1)
+set (CMAKE_CXX_STANDARD 11)
 project(casadi-standalone-example CXX)
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../../cmake_modules)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../../cmake)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 find_package(CASADI REQUIRED)
