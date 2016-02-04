@@ -33,7 +33,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-  SundialsInterface::SundialsInterface(const std::string& name, const XProblem& dae)
+  SundialsInterface::SundialsInterface(const std::string& name, Oracle* dae)
     : Integrator(name, dae) {
   }
 

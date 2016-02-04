@@ -62,7 +62,7 @@ namespace casadi {
   }
 
   Function nlpsol(const string& name, const string& solver,
-                                const XProblem& nlp, const Dict& opts) {
+                  Oracle* nlp, const Dict& opts) {
     Function ret;
     ret.assignNode(Nlpsol::instantiatePlugin(name, solver, nlp));
     ret->construct(opts);
@@ -117,7 +117,7 @@ namespace casadi {
     return NLPSOL_NUM_OUT;
   }
 
-  Nlpsol::Nlpsol(const std::string& name, const XProblem& nlp)
+  Nlpsol::Nlpsol(const std::string& name, Oracle* nlp)
     : FunctionInternal(name), nlp_(nlp) {
 
     // Set default options
@@ -128,6 +128,7 @@ namespace casadi {
   }
 
   Nlpsol::~Nlpsol() {
+    if (nlp_) delete nlp_;
   }
 
   Sparsity Nlpsol::get_sparsity_in(int ind) const {
@@ -142,7 +143,7 @@ namespace casadi {
     case NLPSOL_LAM_G0:
       return get_sparsity_out(NLPSOL_G);
     case NLPSOL_P:
-      return nlp_.sparsity_in(NL_P);
+      return nlp_->sparsity_in(NL_P);
     case NLPSOL_NUM_IN: break;
     }
     return Sparsity();
@@ -154,10 +155,10 @@ namespace casadi {
       return Sparsity::scalar();
     case NLPSOL_X:
     case NLPSOL_LAM_X:
-      return nlp_.sparsity_in(NL_X);
+      return nlp_->sparsity_in(NL_X);
     case NLPSOL_LAM_G:
     case NLPSOL_G:
-      return nlp_.sparsity_out(NL_G);
+      return nlp_->sparsity_out(NL_G);
     case NLPSOL_LAM_P:
       return get_sparsity_in(NLPSOL_P);
     case NLPSOL_NUM_OUT: break;
@@ -571,39 +572,39 @@ namespace casadi {
   }
 
   void Nlpsol::setup_f() {
-    f_fcn_ = nlp_.create("nlp_f", {"x", "p"}, {"f"});
+    f_fcn_ = nlp_->create("nlp_f", {"x", "p"}, {"f"});
     alloc(f_fcn_);
   }
 
   void Nlpsol::setup_g() {
-    g_fcn_ = nlp_.create("nlp_g", {"x", "p"}, {"g"});
+    g_fcn_ = nlp_->create("nlp_g", {"x", "p"}, {"g"});
     alloc(g_fcn_);
   }
 
   void Nlpsol::setup_fg() {
-    fg_fcn_ = nlp_.create("nlp_fg", {"x", "p"}, {"f", "g"});
+    fg_fcn_ = nlp_->create("nlp_fg", {"x", "p"}, {"f", "g"});
     alloc(fg_fcn_);
   }
 
   void Nlpsol::setup_gf_jg() {
-    gf_jg_fcn_ = nlp_.create("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
+    gf_jg_fcn_ = nlp_->create("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
     alloc(gf_jg_fcn_);
     jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
   }
 
   void Nlpsol::setup_grad_f() {
-    grad_f_fcn_ = nlp_.create("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
+    grad_f_fcn_ = nlp_->create("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
     alloc(grad_f_fcn_);
   }
 
   void Nlpsol::setup_jac_g() {
-    jac_g_fcn_ = nlp_.create("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+    jac_g_fcn_ = nlp_->create("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
     alloc(jac_g_fcn_);
     jacg_sp_ = jac_g_fcn_.sparsity_out(1);
   }
 
   void Nlpsol::setup_jac_f() {
-    jac_f_fcn_ = nlp_.create("nlp_jac_f", {"x", "p"}, {"f", "jac_f_x"});
+    jac_f_fcn_ = nlp_->create("nlp_jac_f", {"x", "p"}, {"f", "jac_f_x"});
     alloc(jac_f_fcn_);
   }
 
@@ -612,7 +613,7 @@ namespace casadi {
     if (sym) attr += "sym_";
     if (tr) attr += "transpose_";
     if (diag) attr += "withdiag_";
-    hess_l_fcn_ = nlp_.create("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
+    hess_l_fcn_ = nlp_->create("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
                               {attr + "hess_gamma_x_x"},
                               {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);

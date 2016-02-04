@@ -87,7 +87,7 @@ namespace casadi {
 
   public:
     // Constructor
-    explicit SnoptInterface(const std::string& name, const XProblem& nlp);
+    explicit SnoptInterface(const std::string& name, Oracle* nlp);
 
     // Destructor
     virtual ~SnoptInterface();
@@ -96,7 +96,7 @@ namespace casadi {
     virtual const char* plugin_name() const { return "snopt";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
       return new SnoptInterface(name, nlp);
     }
 

@@ -89,7 +89,7 @@ namespace casadi {
   class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
   public:
     /** \brief  Constructor */
-    SundialsInterface(const std::string& name, const XProblem& dae);
+    SundialsInterface(const std::string& name, Oracle* dae);
 
     /** \brief  Destructor */
     virtual ~SundialsInterface()=0;

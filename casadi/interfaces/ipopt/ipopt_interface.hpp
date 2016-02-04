@@ -117,14 +117,14 @@ namespace casadi {
     friend class IpoptUserClass;
 
   public:
-    explicit IpoptInterface(const std::string& name, const XProblem& nlp);
+    explicit IpoptInterface(const std::string& name, Oracle* nlp);
     virtual ~IpoptInterface();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "ipopt";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
       return new IpoptInterface(name, nlp);
     }
 

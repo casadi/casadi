@@ -53,7 +53,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_sqpmethod);
   }
 
-  Sqpmethod::Sqpmethod(const std::string& name, const XProblem& nlp)
+  Sqpmethod::Sqpmethod(const std::string& name, Oracle* nlp)
     : Nlpsol(name, nlp) {
   }
 

@@ -46,7 +46,7 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_cvodes);
   }
 
-  CvodesInterface::CvodesInterface(const std::string& name, const XProblem& dae)
+  CvodesInterface::CvodesInterface(const std::string& name, Oracle* dae)
     : SundialsInterface(name, dae) {
   }
 

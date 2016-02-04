@@ -43,7 +43,7 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_rk);
   }
 
-  RkIntegrator::RkIntegrator(const std::string& name, const XProblem& dae)
+  RkIntegrator::RkIntegrator(const std::string& name, Oracle* dae)
     : FixedStepIntegrator(name, dae) {
   }
 

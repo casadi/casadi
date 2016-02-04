@@ -68,14 +68,14 @@ namespace casadi {
   class CASADI_NLPSOL_KNITRO_EXPORT KnitroInterface : public Nlpsol {
 
   public:
-    explicit KnitroInterface(const std::string& name, const XProblem& nlp);
+    explicit KnitroInterface(const std::string& name, Oracle* nlp);
     virtual ~KnitroInterface();
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "knitro";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
       return new KnitroInterface(name, nlp);
     }
 

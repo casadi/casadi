@@ -29,40 +29,8 @@ using namespace std;
 
 namespace casadi {
 
-  XProblem::XProblem(const SXProblem& d) : p(new SXProblem(d)) {
-  }
-
-  XProblem::XProblem(const MXProblem& d) : p(new MXProblem(d)) {
-  }
-
-  XProblem::~XProblem() {
-    delete p;
-  }
-
-  XProblem::XProblem(const XProblem& d) {
-    p = d.p->clone();
-  }
-
-  XProblem& XProblem::operator=(const XProblem& d) {
-    if (&d!=this) {
-      delete p;
-
-      // Assign
-      p = d.p->clone();
-    }
-    return *this;
-  }
-
-  const Sparsity& XProblem::sparsity_in(int i) const {
-    return p->sparsity_in(i);
-  }
-
-  const Sparsity& XProblem::sparsity_out(int i) const {
-    return p->sparsity_out(i);
-  }
-
   template<typename XType>
-  Function Problem<XType>::create(const std::string& fname,
+  Function XOracle<XType>::create(const std::string& fname,
                                   const std::vector<std::string>& s_in,
                                   const std::vector<std::string>& s_out,
                                   const std::vector<LinComb>& lincomb,
@@ -71,19 +39,19 @@ namespace casadi {
     map<string, XType> map_in, map_out;
 
     // Non-differentiated inputs
-    for (int i=0; i<in.size(); ++i) {
-      map_in[ischeme[i]] = in[i];
+    for (int i=0; i<in_.size(); ++i) {
+      map_in[ischeme_[i]] = in_[i];
     }
 
     // Non-differentiated outputs
-    for (int i=0; i<out.size(); ++i) {
-      map_out[oscheme[i]] = out[i];
+    for (int i=0; i<out_.size(); ++i) {
+      map_out[oscheme_[i]] = out_[i];
     }
 
     // Dual variables
-    for (int i=0; i<out.size(); ++i) {
-      string dual_name = "lam_" + oscheme[i];
-      map_in[dual_name] = XType::sym(dual_name, out[i].sparsity());
+    for (int i=0; i<out_.size(); ++i) {
+      string dual_name = "lam_" + oscheme_[i];
+      map_in[dual_name] = XType::sym(dual_name, out_[i].sparsity());
     }
 
     // Add linear combinations
@@ -209,51 +177,38 @@ namespace casadi {
     return Function(fname, ret_in, ret_out, s_in, s_out, opts);
   }
 
-  Function XProblem::create(const std::string& fname,
-                            const std::vector<std::string>& s_in,
-                            const std::vector<std::string>& s_out,
-                            const std::vector<LinComb>& lincomb,
-                            const Dict& opts) const {
-    return p->create(fname, s_in, s_out, lincomb, opts);
-  }
-
   template<typename XType>
-  std::vector<bool> Problem<XType>::nl_var(const std::string& s_in,
+  std::vector<bool> XOracle<XType>::nl_var(const std::string& s_in,
                                            const std::vector<std::string>& s_out) {
     // Input arguments
-    auto it = find(ischeme.begin(), ischeme.end(), s_in);
-    casadi_assert(it!=ischeme.end());
-    XType arg = in.at(it-ischeme.begin());
+    auto it = find(ischeme_.begin(), ischeme_.end(), s_in);
+    casadi_assert(it!=ischeme_.end());
+    XType arg = in_.at(it-ischeme_.begin());
 
     // Output arguments
     vector<XType> res;
     for (auto&& s : s_out) {
-      it = find(oscheme.begin(), oscheme.end(), s);
-      casadi_assert(it!=oscheme.end());
-      res.push_back(out.at(it-oscheme.begin()));
+      it = find(oscheme_.begin(), oscheme_.end(), s);
+      casadi_assert(it!=oscheme_.end());
+      res.push_back(out_.at(it-oscheme_.begin()));
     }
 
     // Extract variables entering nonlinearly
     return XType::nl_var(veccat(res), arg);
   }
 
-  std::vector<bool> XProblem::nl_var(const std::string& s_in,
-                                     const std::vector<std::string>& s_out) {
-    return p->nl_var(s_in, s_out);
+  Oracle* Oracle::construct(const std::vector<SX>& in,
+                            const std::vector<SX>& out,
+                            const std::vector<std::string>& ischeme,
+                            const std::vector<std::string>& oscheme) {
+    return new XOracle<SX>(in, out, ischeme, oscheme);
   }
 
-  Oracle* Oracle::create(const std::vector<SX>& in,
-                         const std::vector<SX>& out,
-                         const std::vector<std::string>& ischeme,
-                         const std::vector<std::string>& oscheme) {
-    return new Problem<SX>(in, out, ischeme, oscheme);
-  }
-
-  Oracle* Oracle::create(const std::vector<MX>& in,
-                         const std::vector<MX>& out,
-                         const std::vector<std::string>& ischeme,
-                         const std::vector<std::string>& oscheme) {
-    return new Problem<MX>(in, out, ischeme, oscheme);
+  Oracle* Oracle::construct(const std::vector<MX>& in,
+                            const std::vector<MX>& out,
+                            const std::vector<std::string>& ischeme,
+                            const std::vector<std::string>& oscheme) {
+    return new XOracle<MX>(in, out, ischeme, oscheme);
   }
 
 } // namespace casadi

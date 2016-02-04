@@ -53,7 +53,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_scpgen);
   }
 
-  Scpgen::Scpgen(const std::string& name, const XProblem& nlp) : Nlpsol(name, nlp) {
+  Scpgen::Scpgen(const std::string& name, Oracle* nlp) : Nlpsol(name, nlp) {
     casadi_warning("SCPgen is under development");
   }
 
@@ -216,7 +216,7 @@ namespace casadi {
     }
 
     // Generate lifting functions
-    Function fg = nlp_.create("fg", {"x", "p"}, {"f", "g"});
+    Function fg = nlp_->create("fg", {"x", "p"}, {"f", "g"});
     Function vdef_fcn, vinit_fcn;
     fg.generate_lifted(vdef_fcn, vinit_fcn);
     vinit_fcn_ = vinit_fcn;

@@ -90,7 +90,7 @@ namespace casadi {
                                     const Dict& opts=Dict());
 #ifndef SWIG
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
-                                    const XProblem& dae, const Dict& opts=Dict());
+                                    Oracle* dae, const Dict& opts=Dict());
 #endif // SWIG
   ///@}
 

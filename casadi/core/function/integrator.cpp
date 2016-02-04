@@ -42,40 +42,40 @@ namespace casadi {
   }
 
   Function integrator(const string& name, const string& solver,
-                            const SXDict& dae, const Dict& opts) {
+                      const SXDict& dae, const Dict& opts) {
     return integrator(name, solver, Integrator::map2problem(dae), opts);
   }
 
   Function integrator(const string& name, const string& solver,
-                            const MXDict& dae, const Dict& opts) {
+                      const MXDict& dae, const Dict& opts) {
     return integrator(name, solver, Integrator::map2problem(dae), opts);
   }
 
   Function integrator(const string& name, const string& solver,
-                            const Function& dae, const Dict& opts) {
+                      const Function& dae, const Dict& opts) {
+    Oracle* p;
     if (dae.is_a("sxfunction")) {
-      SXProblem p = Integrator::fun2problem<SX>(dae);
-      return integrator(name, solver, p, opts);
+      p = Integrator::fun2problem<SX>(dae);
     } else {
-      MXProblem p = Integrator::fun2problem<MX>(dae);
-      return integrator(name, solver, p, opts);
+      p = Integrator::fun2problem<MX>(dae);
     }
+    return integrator(name, solver, p, opts);
   }
 
   Function integrator(const string& name, const string& solver,
-                                const pair<Function, Function>& dae,
-                                const Dict& opts) {
+                      const pair<Function, Function>& dae,
+                      const Dict& opts) {
+    Oracle* p;
     if (dae.first.is_a("sxfunction")) {
-      SXProblem p = Integrator::fun2problem<SX>(dae.first, dae.second);
-      return integrator(name, solver, p, opts);
+      p = Integrator::fun2problem<SX>(dae.first, dae.second);
     } else {
-      MXProblem p = Integrator::fun2problem<MX>(dae.first, dae.second);
-      return integrator(name, solver, p, opts);
+      p = Integrator::fun2problem<MX>(dae.first, dae.second);
     }
+    return integrator(name, solver, p, opts);
   }
 
   Function integrator(const string& name, const string& solver,
-                                const XProblem& dae, const Dict& opts) {
+                      Oracle* dae, const Dict& opts) {
     Function ret;
     ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
     ret->construct(opts);
@@ -135,12 +135,12 @@ namespace casadi {
     return INTEGRATOR_NUM_OUT;
   }
 
-  Integrator::Integrator(const std::string& name, const XProblem& dae)
+  Integrator::Integrator(const std::string& name, Oracle* dae)
     : FunctionInternal(name), dae_(dae) {
 
-    f_ = dae_.create("dae", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = dae_.create("rdae", {"rx", "rz", "rp", "x", "z", "p", "t"},
-                     {"rode", "ralg", "rquad"});
+    f_ = dae_->create("dae", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
+    g_ = dae_->create("rdae", {"rx", "rz", "rp", "x", "z", "p", "t"},
+                      {"rode", "ralg", "rquad"});
 
     // Negative number of parameters for consistancy checking
     np_ = -1;
@@ -164,6 +164,7 @@ namespace casadi {
   }
 
   Integrator::~Integrator() {
+    if (dae_) delete dae_;
   }
 
   Sparsity Integrator::get_sparsity_in(int ind) const {
@@ -1396,7 +1397,7 @@ namespace casadi {
                  << typeid(*this).name());
   }
 
-  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const XProblem& dae)
+  FixedStepIntegrator::FixedStepIntegrator(const std::string& name, Oracle* dae)
     : Integrator(name, dae) {
 
     // Default options
@@ -1626,7 +1627,7 @@ namespace casadi {
   }
 
   ImplicitFixedStepIntegrator::
-  ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae)
+  ImplicitFixedStepIntegrator(const std::string& name, Oracle* dae)
     : FixedStepIntegrator(name, dae) {
   }
 

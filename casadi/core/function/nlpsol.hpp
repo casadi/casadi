@@ -74,7 +74,7 @@ namespace casadi {
                                 const Function& nlp, const Dict& opts=Dict());
 #ifndef SWIG
   CASADI_EXPORT Function nlpsol(const std::string& name, const std::string& solver,
-                                const XProblem& nlp, const Dict& opts=Dict());
+                                Oracle* nlp, const Dict& opts=Dict());
 #endif // SWIG
   ///@}
 

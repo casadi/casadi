@@ -55,7 +55,7 @@ namespace casadi {
     Nlpsol::registerPlugin(casadi_register_nlpsol_ipopt);
   }
 
-  IpoptInterface::IpoptInterface(const std::string& name, const XProblem& nlp)
+  IpoptInterface::IpoptInterface(const std::string& name, Oracle* nlp)
     : Nlpsol(name, nlp) {
   }
 
@@ -143,7 +143,7 @@ namespace casadi {
     if (exact_hessian_) {
       setup_hess_l(); // Hessian of the Lagrangian
     } else if (pass_nonlinear_variables_) {
-      nl_ex_ = nlp_.nl_var("x", {"f", "g"});
+      nl_ex_ = nlp_->nl_var("x", {"f", "g"});
     }
 
     // Allocate work vectors

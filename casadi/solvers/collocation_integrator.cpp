@@ -45,7 +45,7 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIntegrator::CollocationIntegrator(const std::string& name, const XProblem& dae)
+  CollocationIntegrator::CollocationIntegrator(const std::string& name, Oracle* dae)
     : ImplicitFixedStepIntegrator(name, dae) {
   }
 

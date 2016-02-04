@@ -107,14 +107,14 @@ namespace casadi {
   */
   class CASADI_NLPSOL_SQPMETHOD_EXPORT Sqpmethod : public Nlpsol {
   public:
-    explicit Sqpmethod(const std::string& name, const XProblem& nlp);
+    explicit Sqpmethod(const std::string& name, Oracle* nlp);
     virtual ~Sqpmethod();
 
   // Get name of the plugin
   virtual const char* plugin_name() const { return "sqpmethod";}
 
     /** \brief  Create a new NLP Solver */
-    static Nlpsol* creator(const std::string& name, const XProblem& nlp) {
+    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
       return new Sqpmethod(name, nlp);
     }
 

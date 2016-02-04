@@ -49,7 +49,7 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_idas);
   }
 
-  IdasInterface::IdasInterface(const std::string& name, const XProblem& dae)
+  IdasInterface::IdasInterface(const std::string& name, Oracle* dae)
     : SundialsInterface(name, dae) {
   }
 

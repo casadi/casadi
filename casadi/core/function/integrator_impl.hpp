@@ -50,7 +50,7 @@ namespace casadi {
   Integrator : public FunctionInternal, public PluginInterface<Integrator> {
   public:
     /** \brief  Constructor */
-    Integrator(const std::string& name, const XProblem& dae);
+    Integrator(const std::string& name, Oracle* dae);
 
     /** \brief  Destructor */
     virtual ~Integrator()=0;
@@ -197,7 +197,7 @@ namespace casadi {
     Dict opts_;
 
     // Dae
-    XProblem dae_;
+    Oracle* dae_;
 
     /// One step
     Function onestep_;
@@ -219,7 +219,7 @@ namespace casadi {
     int ntout_;
 
     // Creator function for internal class
-    typedef Integrator* (*Creator)(const std::string& name, const XProblem& dae);
+    typedef Integrator* (*Creator)(const std::string& name, Oracle* dae);
 
     // No static functions exposed
     struct Exposed{ };
@@ -232,19 +232,15 @@ namespace casadi {
 
     /// Convert dictionary to Problem
     template<typename XType>
-      static Problem<XType> map2problem(const std::map<std::string, XType>& d);
-
-    /// Convert Problem to dictionary
-    template<typename XType>
-      static std::map<std::string, XType> problem2map(const Problem<XType>& d);
+      static Oracle* map2problem(const std::map<std::string, XType>& d);
 
     /// Get the (legacy) dae forward function
     template<typename XType>
-      static Problem<XType> fun2problem(Function f, Function g=Function());
+      static Oracle* fun2problem(Function f, Function g=Function());
   };
 
   template<typename XType>
-  Problem<XType> Integrator::map2problem(const std::map<std::string, XType>& d) {
+  Oracle* Integrator::map2problem(const std::map<std::string, XType>& d) {
     std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
     for (auto&& i : d) {
       if (i.first=="t") {
@@ -277,30 +273,11 @@ namespace casadi {
         casadi_error("No such field: " + i.first);
       }
     }
-    return Problem<XType>(de_in, de_out, DE_INPUTS, DE_OUTPUTS);
+    return Oracle::construct(de_in, de_out, DE_INPUTS, DE_OUTPUTS);
   }
 
   template<typename XType>
-  std::map<std::string, XType> Integrator::problem2map(const Problem<XType>& d) {
-    return {
-        {"t", d.in[DE_T]},
-        {"x", d.in[DE_X]},
-        {"z", d.in[DE_Z]},
-        {"p", d.in[DE_P]},
-        {"rx", d.in[DE_RX]},
-        {"rz", d.in[DE_RZ]},
-        {"rp", d.in[DE_RP]},
-        {"ode", d.out[DE_ODE]},
-        {"alg", d.out[DE_ALG]},
-        {"quad", d.out[DE_QUAD]},
-        {"rode", d.out[DE_RODE]},
-        {"ralg", d.out[DE_RALG]},
-        {"rquad", d.out[DE_RQUAD]},
-      };
-  }
-
-  template<typename XType>
-  Problem<XType> Integrator::fun2problem(Function f, Function g) {
+  Oracle* Integrator::fun2problem(Function f, Function g) {
     std::vector<XType> dae_in(DE_NUM_IN), dae_out(DE_NUM_OUT);
     std::vector<XType> v = XType::get_input(f), vf=v, vg=v;
     dae_in[DE_T] = v[DAE_T];
@@ -325,7 +302,7 @@ namespace casadi {
       dae_out[DE_RALG] = v[RDAE_ALG];
       dae_out[DE_RQUAD] = v[RDAE_QUAD];
     }
-    return Problem<XType>(dae_in, dae_out, DE_INPUTS, DE_OUTPUTS);
+    return Oracle::construct(dae_in, dae_out, DE_INPUTS, DE_OUTPUTS);
   }
 
   struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
@@ -355,7 +332,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit FixedStepIntegrator(const std::string& name, const XProblem& dae);
+    explicit FixedStepIntegrator(const std::string& name, Oracle* dae);
 
     /// Destructor
     virtual ~FixedStepIntegrator();
@@ -417,7 +394,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit ImplicitFixedStepIntegrator(const std::string& name, const XProblem& dae);
+    explicit ImplicitFixedStepIntegrator(const std::string& name, Oracle* dae);
 
     /// Destructor
     virtual ~ImplicitFixedStepIntegrator();
