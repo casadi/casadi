@@ -228,34 +228,23 @@ namespace casadi {
 
     std::vector<std::string> search_paths = getPluginSearchPaths();
 
-    userOut() << plugin_libs << endl;
-    userOut() << plugin_libs << endl;
-
     for (int i=0;i<plugin_libs.size();++i) {
       std::string lib = SHARED_LIBRARY_PREFIX "casadi_"
         + plugin_libs[i] + SHARED_LIBRARY_SUFFIX;
       for (int j=0;j<search_paths.size();++j) {
         std::string searchpath = search_paths[j];
         std::string name = searchpath.size()==0 ? lib : searchpath + filesep + lib;
-        userOut() << "attempt:" << name << endl;
         #ifdef _WIN32
-            userOut() << "windows" << endl;
             SetDllDirectory(TEXT(searchpath.c_str()));
             std::string msg;
             llvm::sys::DynamicLibrary::getPermanentLibrary(TEXT(lib.c_str()), &msg);
-            userOut() << "msg" << endl;
-            userOut() << msg << endl;
             SetDllDirectory(NULL);
         #else // _WIN32
-            userOut() << "non-windows" << endl;
             std::string msg;
             llvm::sys::DynamicLibrary::getPermanentLibrary(name.c_str(), &msg);
-            userOut() << "msg" << endl;
-            userOut() << msg << endl;
         #endif // _WIN32
       }
     }
-
 
     // Create the JIT.  This takes ownership of the module.
     std::string ErrStr;
@@ -265,11 +254,9 @@ namespace casadi {
     if (!executionEngine_) {
       casadi_error("Could not create ExecutionEngine: " << ErrStr);
     }
-    userOut() << "executionEngine" << endl;
 
     executionEngine_->finalizeObject();
 
-    userOut() << "finalizeObject" << endl;
   }
 
   void* ClangCompiler::getFunction(const std::string& symname) {
