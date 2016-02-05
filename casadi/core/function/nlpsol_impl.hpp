@@ -52,7 +52,6 @@ namespace casadi {
     std::map<std::string, FStats> fstats;
 
     // Accumulated counts since last reset:
-    int n_calc_g; // number of calls to calc_g
     int n_calc_grad_f; // number of calls to calc_grad_f
     int n_calc_jac_g; // number of calls to calc_jac_g
     int n_calc_hess_l; // number of calls to calc_hess_l
@@ -60,7 +59,6 @@ namespace casadi {
     int n_iter; // number of iterations
 
     // Accumulated time since last reset:
-    double t_calc_g; // time spent in calc_g
     double t_calc_grad_f; // time spent in calc_grad_f
     double t_calc_jac_g; // time spent in calc_jac_g
     double t_calc_hess_l; // time spent in calc_hess_l
@@ -199,8 +197,6 @@ namespace casadi {
     // Calculate constraints
     enum GIn { G_X, G_P, G_NUM_IN };
     enum GOut { G_G, G_NUM_OUT};
-    int calc_g(NlpsolMemory& m, const Function& fcn,
-               const double* x, const double* p, double* g) const;
 
     // Calculate both objective and constraints
     int calc_fg(NlpsolMemory& m, const Function& fcn,

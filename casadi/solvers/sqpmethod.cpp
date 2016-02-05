@@ -772,7 +772,7 @@ namespace casadi {
       if (ng_==0) return;
 
       // Evaluate the function
-      calc_g(m, g_fcn_, x, m.p, g);
+      calc_function(m, g_fcn_, {x, m.p}, {g});
 
       double time2 = clock();
       m.t_eval_g += (time2-time1)/CLOCKS_PER_SEC;

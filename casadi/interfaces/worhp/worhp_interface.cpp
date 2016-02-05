@@ -364,7 +364,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&m.worhp_c, evalG)) {
-        calc_g(m, g_fcn_, m.worhp_o.X, m.p, m.worhp_o.G);
+        calc_function(m, g_fcn_, {m.worhp_o.X, m.p}, {m.worhp_o.G});
         DoneUserAction(&m.worhp_c, evalG);
       }
 
