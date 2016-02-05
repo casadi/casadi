@@ -357,30 +357,30 @@ namespace casadi {
       }
 
       if (GetUserAction(&m.worhp_c, evalF)) {
-        calc_f(m, m.worhp_o.X, m.p, &m.worhp_o.F);
+        calc_f(m, f_fcn_, m.worhp_o.X, m.p, &m.worhp_o.F);
         if (m.f) *m.f = m.worhp_o.F; // Store cost, before scaling
         m.worhp_o.F *= m.worhp_w.ScaleObj;
         DoneUserAction(&m.worhp_c, evalF);
       }
 
       if (GetUserAction(&m.worhp_c, evalG)) {
-        calc_g(m, m.worhp_o.X, m.p, m.worhp_o.G);
+        calc_g(m, g_fcn_, m.worhp_o.X, m.p, m.worhp_o.G);
         DoneUserAction(&m.worhp_c, evalG);
       }
 
       if (GetUserAction(&m.worhp_c, evalDF)) {
-        calc_grad_f(m, m.worhp_o.X, m.p, 0, m.worhp_w.DF.val);
+        calc_grad_f(m, grad_f_fcn_, m.worhp_o.X, m.p, 0, m.worhp_w.DF.val);
         casadi_scal(nx_, m.worhp_w.ScaleObj, m.worhp_w.DF.val);
         DoneUserAction(&m.worhp_c, evalDF);
       }
 
       if (GetUserAction(&m.worhp_c, evalDG)) {
-        calc_jac_g(m, m.worhp_o.X, m.p, 0, m.worhp_w.DG.val);
+        calc_jac_g(m, jac_g_fcn_, m.worhp_o.X, m.p, 0, m.worhp_w.DG.val);
         DoneUserAction(&m.worhp_c, evalDG);
       }
 
       if (GetUserAction(&m.worhp_c, evalHM)) {
-        calc_hess_l(m, m.worhp_o.X, m.p, &m.worhp_w.ScaleObj, m.worhp_o.Mu,
+        calc_hess_l(m, hess_l_fcn_, m.worhp_o.X, m.p, &m.worhp_w.ScaleObj, m.worhp_o.Mu,
                     m.worhp_w.HM.val);
         // Diagonal values
         double *dval = m.w;

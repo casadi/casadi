@@ -356,20 +356,21 @@ namespace casadi {
     m.w = w;
   }
 
-  int Nlpsol::calc_f(NlpsolMemory& m, const double* x, const double* p, double* f) const {
+  int Nlpsol::calc_f(NlpsolMemory& m, const Function& fcn,
+                     const double* x, const double* p, double* f) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(f!=0);
 
-    fill_n(m.arg, f_fcn_.n_in(), nullptr);
+    fill_n(m.arg, fcn.n_in(), nullptr);
     m.arg[F_X] = x;
     m.arg[F_P] = p;
-    fill_n(m.res, f_fcn_.n_out(), nullptr);
+    fill_n(m.res, fcn.n_out(), nullptr);
     m.res[F_F] = f;
     m.n_calc_f += 1;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
-      f_fcn_(m.arg, m.res, m.iw, m.w, 0);
+      fcn(m.arg, m.res, m.iw, m.w, 0);
     } catch(exception& ex) {
       // Fatal error
       userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
@@ -391,20 +392,21 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_g(NlpsolMemory& m, const double* x, const double* p, double* g) const {
+  int Nlpsol::calc_g(NlpsolMemory& m, const Function& fcn,
+                     const double* x, const double* p, double* g) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(g!=0);
 
     // Evaluate User function
-    fill_n(m.arg, g_fcn_.n_in(), nullptr);
+    fill_n(m.arg, fcn.n_in(), nullptr);
     m.arg[G_X] = x;
     m.arg[G_P] = p;
-    fill_n(m.res, g_fcn_.n_out(), nullptr);
+    fill_n(m.res, fcn.n_out(), nullptr);
     m.res[G_G] = g;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
-      g_fcn_(m.arg, m.res, m.iw, m.w, 0);
+      fcn(m.arg, m.res, m.iw, m.w, 0);
     } catch(exception& ex) {
       // Fatal error
       userOut<true, PL_WARN>() << name() << ":calc_g failed:" << ex.what() << endl;
@@ -427,90 +429,98 @@ namespace casadi {
   }
 
   int Nlpsol::
-  calc_fg(NlpsolMemory& m, const double* x, const double* p, double* f, double* g) const {
-    fill_n(m.arg, fg_fcn_.n_in(), nullptr);
+  calc_fg(NlpsolMemory& m, const Function& fcn,
+          const double* x, const double* p,
+          double* f, double* g) const {
+    fill_n(m.arg, fcn.n_in(), nullptr);
     m.arg[0] = x;
     m.arg[1] = p;
-    fill_n(m.res, fg_fcn_.n_out(), nullptr);
+    fill_n(m.res, fcn.n_out(), nullptr);
     m.res[0] = f;
     m.res[1] = g;
-    fg_fcn_(m.arg, m.res, m.iw, m.w, 0);
+    fcn(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
   int Nlpsol::
-  calc_gf_jg(NlpsolMemory& m, const double* x, const double* p, double* gf, double* jg) const {
-    fill_n(m.arg, gf_jg_fcn_.n_in(), nullptr);
+  calc_gf_jg(NlpsolMemory& m, const Function& fcn,
+             const double* x, const double* p,
+             double* gf, double* jg) const {
+    fill_n(m.arg, fcn.n_in(), nullptr);
     m.arg[0] = x;
     m.arg[1] = p;
-    fill_n(m.res, gf_jg_fcn_.n_out(), nullptr);
+    fill_n(m.res, fcn.n_out(), nullptr);
     m.res[0] = gf;
     m.res[1] = jg;
-    gf_jg_fcn_(m.arg, m.res, m.iw, m.w, 0);
+    fcn(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_grad_f(NlpsolMemory& m, const double* x,
-                          const double* p, double* f, double* grad_f) const {
+  int Nlpsol::calc_grad_f(NlpsolMemory& m, const Function& fcn,
+                          const double* x, const double* p,
+                          double* f, double* grad_f) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(grad_f!=0);
 
-    fill_n(m.arg, grad_f_fcn_.n_in(), nullptr);
+    fill_n(m.arg, fcn.n_in(), nullptr);
     m.arg[0] = x;
     m.arg[1] = p;
-    fill_n(m.res, grad_f_fcn_.n_out(), nullptr);
+    fill_n(m.res, fcn.n_out(), nullptr);
     m.res[0] = f;
     m.res[1] = grad_f;
-    grad_f_fcn_(m.arg, m.res, m.iw, m.w, 0);
+    fcn(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_jac_g(NlpsolMemory& m, const double* x,
-                         const double* p, double* g, double* jac_g) const {
+  int Nlpsol::calc_jac_g(NlpsolMemory& m, const Function& fcn,
+                         const double* x, const double* p,
+                         double* g, double* jac_g) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(jac_g!=0);
 
     // Evaluate User function
-    fill_n(m.arg, jac_g_fcn_.n_in(), nullptr);
+    fill_n(m.arg, fcn.n_in(), nullptr);
     m.arg[0] = x;
     m.arg[1] = p;
-    fill_n(m.res, jac_g_fcn_.n_out(), nullptr);
+    fill_n(m.res, fcn.n_out(), nullptr);
     m.res[0] = g;
     m.res[1] = jac_g;
-    jac_g_fcn_(m.arg, m.res, m.iw, m.w, 0);
+    fcn(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_jac_f(NlpsolMemory& m, const double* x,
-                         const double* p, double* f, double* jac_f) const {
+  int Nlpsol::calc_jac_f(NlpsolMemory& m, const Function& fcn,
+                         const double* x, const double* p,
+                         double* f, double* jac_f) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
     casadi_assert(jac_f!=0);
 
     // Evaluate User function
-    fill_n(m.arg, jac_f_fcn_.n_in(), nullptr);
+    fill_n(m.arg, fcn.n_in(), nullptr);
     m.arg[0] = x;
     m.arg[1] = p;
-    fill_n(m.res, jac_f_fcn_.n_out(), nullptr);
+    fill_n(m.res, fcn.n_out(), nullptr);
     m.res[0] = f;
     m.res[1] = jac_f;
-    jac_f_fcn_(m.arg, m.res, m.iw, m.w, 0);
+    fcn(m.arg, m.res, m.iw, m.w, 0);
 
     // Success
     return 0;
   }
 
-  int Nlpsol::calc_hess_l(NlpsolMemory& m, const double* x, const double* p,
+  int Nlpsol::calc_hess_l(NlpsolMemory& m, const Function& fcn,
+                          const double* x, const double* p,
                           const double* sigma, const double* lambda,
                           double* hl) const {
     // Respond to a possible Crl+C signals

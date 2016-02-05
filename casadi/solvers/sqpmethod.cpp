@@ -748,7 +748,7 @@ namespace casadi {
   void Sqpmethod::eval_h(SqpmethodMemory& m, const double* x, const double* lambda,
                          double sigma, double* H) const {
     try {
-      calc_hess_l(m, x, m.p, &sigma, lambda, H);
+      calc_hess_l(m, hess_l_fcn_, x, m.p, &sigma, lambda, H);
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
@@ -772,7 +772,7 @@ namespace casadi {
       if (ng_==0) return;
 
       // Evaluate the function
-      calc_g(m, x, m.p, g);
+      calc_g(m, g_fcn_, x, m.p, g);
 
       double time2 = clock();
       m.t_eval_g += (time2-time1)/CLOCKS_PER_SEC;
@@ -791,7 +791,7 @@ namespace casadi {
       if (ng_==0) return;
 
       // Evaluate the function
-      calc_jac_g(m, x, m.p, g, J);
+      calc_jac_g(m, jac_g_fcn_, x, m.p, g, J);
 
       double time2 = clock();
       m.t_eval_jac_g += (time2-time1)/CLOCKS_PER_SEC;
@@ -809,7 +809,7 @@ namespace casadi {
       double time1 = clock();
 
       // Evaluate the function
-      calc_grad_f(m, x, m.p, f, grad_f);
+      calc_grad_f(m, grad_f_fcn_, x, m.p, f, grad_f);
 
       double time2 = clock();
       m.t_eval_grad_f += (time2-time1)/CLOCKS_PER_SEC;
@@ -828,7 +828,7 @@ namespace casadi {
 
       // Evaluate the function
       double f;
-      calc_f(m, x, m.p, &f);
+      calc_f(m, f_fcn_, x, m.p, &f);
 
       double time2 = clock();
       m.t_eval_f += (time2-time1)/CLOCKS_PER_SEC;
