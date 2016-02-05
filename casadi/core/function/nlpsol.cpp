@@ -369,7 +369,7 @@ namespace casadi {
     InterruptHandler::check();
 
     // Get statistics structure
-    NlpsolMemory::FStats& fstats = m.fstats[fcn.name()];
+    NlpsolMemory::FStats& fstats = m.fstats.at(fcn.name());
 
     // Number of inputs and outputs
     int n_in = fcn.n_in(), n_out = fcn.n_out();
@@ -405,6 +405,7 @@ namespace casadi {
 
     // Make sure not NaN or Inf
     for (int i=0; i<n_out; ++i) {
+      if (!m.res[i]) continue;
       if (!all_of(m.res[i], m.res[i]+fcn.nnz_out(i), [](double v) { return isfinite(v);})) {
         userOut<true, PL_WARN>()
           << name() << ":" << fcn.name() << " failed: NaN or Inf detected for output "
