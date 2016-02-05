@@ -51,13 +51,11 @@ namespace casadi {
     };
     std::map<std::string, FStats> fstats;
 
-    // Accumulated counts since last reset:
-    int n_calc_hess_l; // number of calls to calc_hess_l
-    int n_eval_callback; // number of calls to callback
-    int n_iter; // number of iterations
+    // number of calls to callback
+    int n_eval_callback;
 
-    // Accumulated time since last reset:
-    double t_calc_hess_l; // time spent in calc_hess_l
+    // number of iterations
+    int n_iter;
 
     /** \brief  Destructor */
     virtual ~NlpsolMemory() {}
@@ -207,10 +205,6 @@ namespace casadi {
     enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
     enum HessLagOut { HL_HL, HL_NUM_OUT};
     Sparsity hesslag_sp_;
-    int calc_hess_l(NlpsolMemory& m, const Function& fcn,
-                    const double* x, const double* p,
-                    const double* sigma, const double* lambda,
-                    double* hl) const;
 
     /** \brief Export / Generate C code for the dependency function */
     virtual void generate_dependencies(const std::string& fname, const Dict& opts);

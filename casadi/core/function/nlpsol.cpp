@@ -422,45 +422,6 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_hess_l(NlpsolMemory& m, const Function& fcn,
-                          const double* x, const double* p,
-                          const double* sigma, const double* lambda,
-                          double* hl) const {
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-
-    // Evaluate User function
-    fill_n(m.arg, fcn.n_in(), nullptr);
-    m.arg[HL_X] = x;
-    m.arg[HL_P] = p;
-    m.arg[HL_LAM_F] = sigma;
-    m.arg[HL_LAM_G] = lambda;
-    fill_n(m.res, fcn.n_out(), nullptr);
-    m.res[HL_HL] = hl;
-    auto t_start = chrono::system_clock::now(); // start timer
-    try {
-      fcn(m.arg, m.res, m.iw, m.w, 0);
-    } catch(exception& ex) {
-      // Fatal error
-      userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
-      return 1;
-    }
-    auto t_stop = chrono::system_clock::now(); // stop timer
-
-    // Make sure not NaN or Inf
-    if (!all_of(hl, hl+hesslag_sp_.nnz(), [](double v) { return isfinite(v);})) {
-      userOut<true, PL_WARN>() << name() << ":calc_hess_l failed: NaN or Inf detected" << endl;
-      return -1;
-    }
-
-    // Update stats
-    m.n_calc_hess_l += 1;
-    m.t_calc_hess_l += chrono::duration<double>(t_stop - t_start).count();
-
-    // Success
-    return 0;
-  }
-
   void Nlpsol::generate_dependencies(const std::string& fname, const Dict& opts) {
     CodeGenerator gen(opts);
     gen.add(nlp_->all_io("nlp"));

@@ -380,8 +380,8 @@ namespace casadi {
       }
 
       if (GetUserAction(&m.worhp_c, evalHM)) {
-        calc_hess_l(m, hess_l_fcn_, m.worhp_o.X, m.p, &m.worhp_w.ScaleObj, m.worhp_o.Mu,
-                    m.worhp_w.HM.val);
+        calc_function(m, hess_l_fcn_, {m.worhp_o.X, m.p, &m.worhp_w.ScaleObj, m.worhp_o.Mu},
+                      {m.worhp_w.HM.val});
         // Diagonal values
         double *dval = m.w;
         casadi_fill(dval, nx_, 0.);

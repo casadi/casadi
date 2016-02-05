@@ -130,8 +130,8 @@ namespace casadi {
                               Index* jCol, Number* values) {
     if (values) {
       // Evaluate Hessian
-      if (solver_.calc_hess_l(mem_, solver_.hess_l_fcn_,
-                              x, mem_.p, &obj_factor, lambda, values)) return false;
+      if (solver_.calc_function(mem_, solver_.hess_l_fcn_,
+                                {x, mem_.p, &obj_factor, lambda}, {values})) return false;
       return true;
     } else {
       // Get the sparsity pattern

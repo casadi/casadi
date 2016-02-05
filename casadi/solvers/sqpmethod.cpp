@@ -748,7 +748,7 @@ namespace casadi {
   void Sqpmethod::eval_h(SqpmethodMemory& m, const double* x, const double* lambda,
                          double sigma, double* H) const {
     try {
-      calc_hess_l(m, hess_l_fcn_, x, m.p, &sigma, lambda, H);
+      calc_function(m, hess_l_fcn_, {x, m.p, &sigma, lambda}, {H});
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {

@@ -258,7 +258,7 @@ namespace casadi {
       case KTR_RC_EVALH:
         {
           double sigma = 1.;
-          if (m.self.calc_hess_l(m, m.self.hess_l_fcn_, x, m.p, &sigma, lambda, hessian)) {
+          if (m.self.calc_function(m, m.self.hess_l_fcn_, {x, m.p, &sigma, lambda}, {hessian})) {
             casadi_error("calc_hess_l failed");
           }
         }
