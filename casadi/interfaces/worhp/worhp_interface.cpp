@@ -357,7 +357,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&m.worhp_c, evalF)) {
-        calc_f(m, f_fcn_, {m.worhp_o.X, m.p}, {&m.worhp_o.F});
+        calc_function(m, f_fcn_, {m.worhp_o.X, m.p}, {&m.worhp_o.F});
         if (m.f) *m.f = m.worhp_o.F; // Store cost, before scaling
         m.worhp_o.F *= m.worhp_w.ScaleObj;
         DoneUserAction(&m.worhp_c, evalF);

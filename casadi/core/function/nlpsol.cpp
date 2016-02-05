@@ -253,6 +253,12 @@ namespace casadi {
   }
 
   void Nlpsol::init_memory(Memory& mem) const {
+    NlpsolMemory& m = dynamic_cast<NlpsolMemory&>(mem);
+
+    // Create statistics
+    for (const Function& f : all_functions_) {
+      m.fstats[f.name()] = NlpsolMemory::FStats();
+    }
   }
 
   void Nlpsol::checkInputs(Memory& mem) const {
@@ -356,23 +362,35 @@ namespace casadi {
     m.w = w;
   }
 
-  int Nlpsol::calc_f(NlpsolMemory& m, const Function& fcn,
-                     std::initializer_list<const double*> arg,
-                     std::initializer_list<double*> res) const {
+  int Nlpsol::calc_function(NlpsolMemory& m, const Function& fcn,
+                            std::initializer_list<const double*> arg,
+                            std::initializer_list<double*> res) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
-    fill_n(m.arg, fcn.n_in(), nullptr);
+    // Get statistics structure
+    NlpsolMemory::FStats& fstats = m.fstats[fcn.name()];
+
+    // Number of inputs and outputs
+    int n_in = fcn.n_in(), n_out = fcn.n_out();
+
+    // Input buffers
+    fill_n(m.arg, n_in, nullptr);
     auto arg_it = arg.begin();
-    m.arg[F_X] = *arg_it++;
-    m.arg[F_P] = *arg_it++;
+    for (int i=0; i<n_in; ++i) m.arg[i] = *arg_it++;
     casadi_assert(arg_it==arg.end());
-    fill_n(m.res, fcn.n_out(), nullptr);
+
+    // Output buffers
+    fill_n(m.res, n_out, nullptr);
     auto res_it = res.begin();
-    m.res[F_F] = *res_it++;
+    for (int i=0; i<n_out; ++i) m.res[i] = *res_it++;
     casadi_assert(res_it==res.end());
-    m.n_calc_f += 1;
-    auto t_start = chrono::system_clock::now(); // start timer
+
+    // Prepare stats, start timer
+    fstats.n_calc += 1;
+    auto t_start = chrono::system_clock::now();
+
+    // Evaluate memory-less
     try {
       fcn(m.arg, m.res, m.iw, m.w, 0);
     } catch(exception& ex) {
@@ -381,18 +399,23 @@ namespace casadi {
         << name() << ":" << fcn.name() << " failed:" << ex.what() << endl;
       return 1;
     }
-    auto t_stop = chrono::system_clock::now(); // stop timer
+
+    // Stop timer
+    auto t_stop = chrono::system_clock::now();
 
     // Make sure not NaN or Inf
-    if (!isfinite(*m.res[F_F])) {
-      userOut<true, PL_WARN>()
-        << name() << ":" << fcn.name() << " failed: Inf or NaN detected" << endl;
-      return -1;
+    for (int i=0; i<n_out; ++i) {
+      if (!all_of(m.res[i], m.res[i]+fcn.nnz_out(i), [](double v) { return isfinite(v);})) {
+        userOut<true, PL_WARN>()
+          << name() << ":" << fcn.name() << " failed: NaN or Inf detected for output "
+          << fcn.name_out(i) << endl;
+        return -1;
+      }
     }
 
     // Update stats
-    m.n_calc_f += 1;
-    m.t_calc_f += chrono::duration<double>(t_stop - t_start).count();
+    fstats.n_calc += 1;
+    fstats.t_calc += chrono::duration<double>(t_stop - t_start).count();
 
     // Success
     return 0;

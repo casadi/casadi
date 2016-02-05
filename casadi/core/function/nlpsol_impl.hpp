@@ -41,8 +41,17 @@ namespace casadi {
     // Inputs
     const double *x0, *p, *lbx, *ubx, *lbg, *ubg, *lam_x0, *lam_g0;
 
+    // Function specific statistics
+    struct FStats {
+      // Accumulated counts since last reset:
+      int n_calc;
+
+      // Accumulated time since last reset:
+      double t_calc;
+    };
+    std::map<std::string, FStats> fstats;
+
     // Accumulated counts since last reset:
-    int n_calc_f; // number of calls to calc_f
     int n_calc_g; // number of calls to calc_g
     int n_calc_grad_f; // number of calls to calc_grad_f
     int n_calc_jac_g; // number of calls to calc_jac_g
@@ -51,7 +60,6 @@ namespace casadi {
     int n_iter; // number of iterations
 
     // Accumulated time since last reset:
-    double t_calc_f; // time spent in calc_f
     double t_calc_g; // time spent in calc_g
     double t_calc_grad_f; // time spent in calc_grad_f
     double t_calc_jac_g; // time spent in calc_jac_g
@@ -181,9 +189,9 @@ namespace casadi {
     // Calculate objective
     enum FIn { F_X, F_P, F_NUM_IN };
     enum FOut { F_F, F_NUM_OUT};
-    int calc_f(NlpsolMemory& m, const Function& fcn,
-               std::initializer_list<const double*> arg,
-               std::initializer_list<double*> res) const;
+    int calc_function(NlpsolMemory& m, const Function& fcn,
+                      std::initializer_list<const double*> arg,
+                      std::initializer_list<double*> res) const;
 
     // Calculate constraints
     enum GIn { G_X, G_P, G_NUM_IN };
