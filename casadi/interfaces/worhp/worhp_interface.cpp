@@ -115,11 +115,22 @@ namespace casadi {
     }
 
     // Setup NLP functions
-    setup_f(); // Objective
-    setup_g(); // Constraints
-    setup_grad_f(); // Gradient of objective
-    setup_jac_g(); // Jacobian of the constraints
-    setup_hess_l(true); // Hessian of the Lagrangian
+    f_fcn_ = nlp_->create("nlp_f", {"x", "p"}, {"f"});
+    g_fcn_ = nlp_->create("nlp_g", {"x", "p"}, {"g"});
+    grad_f_fcn_ = nlp_->create("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
+    jac_g_fcn_ = nlp_->create("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+    jacg_sp_ = jac_g_fcn_.sparsity_out(1);
+
+    // Allocate temporary work vectors
+    alloc(f_fcn_);
+    alloc(g_fcn_);
+    alloc(grad_f_fcn_);
+    alloc(jac_g_fcn_);
+    hess_l_fcn_ = nlp_->create("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
+                               {"transpose_hess_gamma_x_x"},
+                               {{"gamma", {"f", "g"}}});
+    hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
+    alloc(hess_l_fcn_);
 
     // Temporary vectors
     alloc_w(nx_); // for fetching diagonal entries form Hessian

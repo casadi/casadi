@@ -167,26 +167,22 @@ namespace casadi {
     enum FIn { F_X, F_P, F_NUM_IN };
     enum FOut { F_F, F_NUM_OUT};
     Function f_fcn_;
-    void setup_f();
     int calc_f(NlpsolMemory& m, const double* x, const double* p, double* f) const;
 
     // Calculate constraints
     enum GIn { G_X, G_P, G_NUM_IN };
     enum GOut { G_G, G_NUM_OUT};
     Function g_fcn_;
-    void setup_g();
     int calc_g(NlpsolMemory& m, const double* x, const double* p, double* g) const;
 
     // Calculate both objective and constraints
     Function fg_fcn_;
-    void setup_fg();
     int calc_fg(NlpsolMemory& m, const double* x, const double* p, double* f, double* g) const;
 
     // Calculate gradient of the objective
     enum GradFIn { GF_X, GF_P, GF_NUM_IN };
     enum GradFOut { GF_GF, GF_NUM_OUT};
     Function grad_f_fcn_;
-    void setup_grad_f();
     int calc_grad_f(NlpsolMemory& m, const double* x,
                     const double* p, double* f, double* grad_f) const;
 
@@ -195,19 +191,16 @@ namespace casadi {
     enum JacGOut { JG_JG, JG_NUM_OUT};
     Function jac_g_fcn_;
     Sparsity jacg_sp_;
-    void setup_jac_g();
     int calc_jac_g(NlpsolMemory& m, const double* x,
                    const double* p, double* g, double* jac_g) const;
 
     // Calculate Jacobian of gradient (note: sparse!)
     Function jac_f_fcn_;
-    void setup_jac_f();
     int calc_jac_f(NlpsolMemory& m, const double* x,
                    const double* p, double* f, double* jac_f) const;
 
     // Calculate both gradient of the objective and Jacobian of constraints
     Function gf_jg_fcn_;
-    void setup_gf_jg();
     int calc_gf_jg(NlpsolMemory& m, const double* x,
                    const double* p, double* gf, double* jg) const;
 
@@ -216,7 +209,6 @@ namespace casadi {
     enum HessLagOut { HL_HL, HL_NUM_OUT};
     Function hess_l_fcn_;
     Sparsity hesslag_sp_;
-    void setup_hess_l(bool tr=false, bool sym=false, bool diag=false);
     int calc_hess_l(NlpsolMemory& m, const double* x, const double* p,
                     const double* sigma, const double* lambda,
                     double* hl) const;

@@ -548,55 +548,6 @@ namespace casadi {
     return 0;
   }
 
-  void Nlpsol::setup_f() {
-    f_fcn_ = nlp_->create("nlp_f", {"x", "p"}, {"f"});
-    alloc(f_fcn_);
-  }
-
-  void Nlpsol::setup_g() {
-    g_fcn_ = nlp_->create("nlp_g", {"x", "p"}, {"g"});
-    alloc(g_fcn_);
-  }
-
-  void Nlpsol::setup_fg() {
-    fg_fcn_ = nlp_->create("nlp_fg", {"x", "p"}, {"f", "g"});
-    alloc(fg_fcn_);
-  }
-
-  void Nlpsol::setup_gf_jg() {
-    gf_jg_fcn_ = nlp_->create("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
-    alloc(gf_jg_fcn_);
-    jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
-  }
-
-  void Nlpsol::setup_grad_f() {
-    grad_f_fcn_ = nlp_->create("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
-    alloc(grad_f_fcn_);
-  }
-
-  void Nlpsol::setup_jac_g() {
-    jac_g_fcn_ = nlp_->create("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
-    alloc(jac_g_fcn_);
-    jacg_sp_ = jac_g_fcn_.sparsity_out(1);
-  }
-
-  void Nlpsol::setup_jac_f() {
-    jac_f_fcn_ = nlp_->create("nlp_jac_f", {"x", "p"}, {"f", "jac_f_x"});
-    alloc(jac_f_fcn_);
-  }
-
-  void Nlpsol::setup_hess_l(bool tr, bool sym, bool diag) {
-    string attr;
-    if (sym) attr += "sym_";
-    if (tr) attr += "transpose_";
-    if (diag) attr += "withdiag_";
-    hess_l_fcn_ = nlp_->create("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
-                              {attr + "hess_gamma_x_x"},
-                              {{"gamma", {"f", "g"}}});
-    hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
-    alloc(hess_l_fcn_);
-  }
-
   void Nlpsol::generate_dependencies(const std::string& fname, const Dict& opts) {
     CodeGenerator gen(opts);
     gen.add(nlp_->all_io("nlp"));

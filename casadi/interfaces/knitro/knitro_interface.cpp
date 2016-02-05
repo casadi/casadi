@@ -87,11 +87,20 @@ namespace casadi {
     }
 
     // Setup NLP functions
-    setup_fg(); // Objective and constraints
-    setup_gf_jg(); // Objective gradient and Jacobian of constraints
-    setup_hess_l(); // Hessian of the Lagrangian
+    fg_fcn_ = nlp_->create("nlp_fg", {"x", "p"}, {"f", "g"});
+    gf_jg_fcn_ = nlp_->create("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
+    jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
+    hess_l_fcn_ = nlp_->create("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
+                               {"hess_gamma_x_x"},
+                               {{"gamma", {"f", "g"}}});
+    hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
+    alloc(hess_l_fcn_);
 
-    // Allocate memory
+    // Allocate temporary
+    alloc(gf_jg_fcn_);
+    alloc(fg_fcn_);
+
+    // Allocate persistent memory
     alloc_w(nx_, true); // wx_
     alloc_w(nx_, true); // wlbx_
     alloc_w(nx_, true); // wubx_
