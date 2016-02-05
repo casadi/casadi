@@ -173,16 +173,14 @@ namespace casadi {
     g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
     grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
     jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
-    jacg_sp_ = jac_g_fcn_.sparsity_out(1);
     if (exact_hessian_) {
       hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
                                     {"sym_hess_gamma_x_x"},
                                     {{"gamma", {"f", "g"}}});
-      hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
     }
 
     // Allocate a QP solver
-    Hsp_ = exact_hessian_ ? hesslag_sp_ : Sparsity::dense(nx_, nx_);
+    Hsp_ = exact_hessian_ ? hess_l_fcn_.sparsity_out(0) : Sparsity::dense(nx_, nx_);
     Asp_ = jac_g_fcn_.is_null() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(1);
 
     // Allocate a QP solver

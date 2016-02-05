@@ -122,6 +122,8 @@ namespace casadi {
     Function grad_f_fcn_;
     Function jac_g_fcn_;
     Function hess_l_fcn_;
+    Sparsity jacg_sp_;
+    Sparsity hesslag_sp_;
 
     explicit IpoptInterface(const std::string& name, Oracle* nlp);
     virtual ~IpoptInterface();

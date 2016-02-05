@@ -92,6 +92,7 @@ namespace casadi {
     Function jac_f_fcn_;
     Function gf_jg_fcn_;
     Function hess_l_fcn_;
+    Sparsity jacg_sp_;
 
     // Constructor
     explicit SnoptInterface(const std::string& name, Oracle* nlp);

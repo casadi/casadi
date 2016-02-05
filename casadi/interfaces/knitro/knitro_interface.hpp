@@ -71,6 +71,8 @@ namespace casadi {
     Function fg_fcn_;
     Function gf_jg_fcn_;
     Function hess_l_fcn_;
+    Sparsity jacg_sp_;
+    Sparsity hesslag_sp_;
 
     explicit KnitroInterface(const std::string& name, Oracle* nlp);
     virtual ~KnitroInterface();

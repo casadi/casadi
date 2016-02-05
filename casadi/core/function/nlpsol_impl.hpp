@@ -181,30 +181,10 @@ namespace casadi {
     // No static functions exposed
     struct Exposed{ };
 
-    // Calculate objective
-    enum FIn { F_X, F_P, F_NUM_IN };
-    enum FOut { F_F, F_NUM_OUT};
+    // Calculate an oracle function
     int calc_function(NlpsolMemory& m, const Function& fcn,
                       std::initializer_list<const double*> arg,
                       std::initializer_list<double*> res) const;
-
-    // Calculate constraints
-    enum GIn { G_X, G_P, G_NUM_IN };
-    enum GOut { G_G, G_NUM_OUT};
-
-    // Calculate gradient of the objective
-    enum GradFIn { GF_X, GF_P, GF_NUM_IN };
-    enum GradFOut { GF_GF, GF_NUM_OUT};
-
-    // Calculate Jacobian of constraints
-    enum JacGIn { JG_X, JG_P, JG_NUM_IN };
-    enum JacGOut { JG_JG, JG_NUM_OUT};
-    Sparsity jacg_sp_;
-
-    // Calculate Hessian of the Lagrangian constraints
-    enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
-    enum HessLagOut { HL_HL, HL_NUM_OUT};
-    Sparsity hesslag_sp_;
 
     /** \brief Export / Generate C code for the dependency function */
     virtual void generate_dependencies(const std::string& fname, const Dict& opts);

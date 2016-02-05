@@ -100,6 +100,8 @@ namespace casadi {
     Function grad_f_fcn_;
     Function jac_g_fcn_;
     Function hess_l_fcn_;
+    Sparsity jacg_sp_;
+    Sparsity hesslag_sp_;
 
     // Constructor
     explicit WorhpInterface(const std::string& name, Oracle* nlp);
