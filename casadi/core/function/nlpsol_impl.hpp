@@ -94,6 +94,9 @@ namespace casadi {
     // Ignore errors in the iteration callbacks
     bool iteration_callback_ignore_errors_;
 
+    // All NLP functions
+    std::vector<Function> all_functions_;
+
   private:
     /// The NLP
     Oracle* nlp_;
@@ -159,9 +162,6 @@ namespace casadi {
                              const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
                              const Dict& opts=Dict(), bool reg=true);
 
-    /** Get all NLP functions */
-    //virtual std::vector<Function> all_functions() const = 0;
-
     /** \brief Which variables enter nonlinearly */
     std::vector<bool> nl_var(const std::string& s_in,
                              const std::vector<std::string>& s_out) const;
@@ -181,26 +181,22 @@ namespace casadi {
     // Calculate objective
     enum FIn { F_X, F_P, F_NUM_IN };
     enum FOut { F_F, F_NUM_OUT};
-    Function f_fcn_;
     int calc_f(NlpsolMemory& m, const Function& fcn,
                const double* x, const double* p, double* f) const;
 
     // Calculate constraints
     enum GIn { G_X, G_P, G_NUM_IN };
     enum GOut { G_G, G_NUM_OUT};
-    Function g_fcn_;
     int calc_g(NlpsolMemory& m, const Function& fcn,
                const double* x, const double* p, double* g) const;
 
     // Calculate both objective and constraints
-    Function fg_fcn_;
     int calc_fg(NlpsolMemory& m, const Function& fcn,
                 const double* x, const double* p, double* f, double* g) const;
 
     // Calculate gradient of the objective
     enum GradFIn { GF_X, GF_P, GF_NUM_IN };
     enum GradFOut { GF_GF, GF_NUM_OUT};
-    Function grad_f_fcn_;
     int calc_grad_f(NlpsolMemory& m, const Function& fcn,
                     const double* x, const double* p,
                     double* f, double* grad_f) const;
@@ -208,20 +204,17 @@ namespace casadi {
     // Calculate Jacobian of constraints
     enum JacGIn { JG_X, JG_P, JG_NUM_IN };
     enum JacGOut { JG_JG, JG_NUM_OUT};
-    Function jac_g_fcn_;
     Sparsity jacg_sp_;
     int calc_jac_g(NlpsolMemory& m, const Function& fcn,
                    const double* x, const double* p,
                    double* g, double* jac_g) const;
 
     // Calculate Jacobian of gradient (note: sparse!)
-    Function jac_f_fcn_;
     int calc_jac_f(NlpsolMemory& m, const Function& fcn,
                    const double* x, const double* p,
                    double* f, double* jac_f) const;
 
     // Calculate both gradient of the objective and Jacobian of constraints
-    Function gf_jg_fcn_;
     int calc_gf_jg(NlpsolMemory& m, const Function& fcn,
                    const double* x, const double* p,
                    double* gf, double* jg) const;
@@ -229,7 +222,6 @@ namespace casadi {
     // Calculate Hessian of the Lagrangian constraints
     enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
     enum HessLagOut { HL_HL, HL_NUM_OUT};
-    Function hess_l_fcn_;
     Sparsity hesslag_sp_;
     int calc_hess_l(NlpsolMemory& m, const Function& fcn,
                     const double* x, const double* p,

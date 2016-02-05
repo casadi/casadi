@@ -66,8 +66,12 @@ namespace casadi {
      @copydoc plugin_Nlpsol_knitro
   */
   class CASADI_NLPSOL_KNITRO_EXPORT KnitroInterface : public Nlpsol {
-
   public:
+    // NLP functions
+    Function fg_fcn_;
+    Function gf_jg_fcn_;
+    Function hess_l_fcn_;
+
     explicit KnitroInterface(const std::string& name, Oracle* nlp);
     virtual ~KnitroInterface();
 

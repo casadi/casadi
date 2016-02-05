@@ -527,16 +527,16 @@ namespace casadi {
     InterruptHandler::check();
 
     // Evaluate User function
-    fill_n(m.arg, hess_l_fcn_.n_in(), nullptr);
+    fill_n(m.arg, fcn.n_in(), nullptr);
     m.arg[HL_X] = x;
     m.arg[HL_P] = p;
     m.arg[HL_LAM_F] = sigma;
     m.arg[HL_LAM_G] = lambda;
-    fill_n(m.res, hess_l_fcn_.n_out(), nullptr);
+    fill_n(m.res, fcn.n_out(), nullptr);
     m.res[HL_HL] = hl;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
-      hess_l_fcn_(m.arg, m.res, m.iw, m.w, 0);
+      fcn(m.arg, m.res, m.iw, m.w, 0);
     } catch(exception& ex) {
       // Fatal error
       userOut<true, PL_WARN>() << name() << ":calc_hess_l failed:" << ex.what() << endl;
@@ -561,10 +561,7 @@ namespace casadi {
   void Nlpsol::generate_dependencies(const std::string& fname, const Dict& opts) {
     CodeGenerator gen(opts);
     gen.add(nlp_->all_io("nlp"));
-    for (const Function& f : {f_fcn_, g_fcn_, fg_fcn_, grad_f_fcn_, jac_g_fcn_,
-          jac_f_fcn_, gf_jg_fcn_, hess_l_fcn_}) {
-      if (!f.is_null()) gen.add(f);
-    }
+    for (const Function& f : all_functions_) gen.add(f);
     gen.generate(fname);
   }
 
@@ -579,6 +576,7 @@ namespace casadi {
 
     // Register the function for evaluation and statistics gathering
     if (reg) {
+      all_functions_.push_back(ret);
       alloc(ret);
     }
     return ret;

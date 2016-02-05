@@ -84,8 +84,15 @@ namespace casadi {
      @copydoc plugin_Nlpsol_snopt
   */
   class CASADI_NLPSOL_SNOPT_EXPORT SnoptInterface : public Nlpsol {
-
   public:
+    // NLP functions
+    Function f_fcn_;
+    Function g_fcn_;
+    Function jac_g_fcn_;
+    Function jac_f_fcn_;
+    Function gf_jg_fcn_;
+    Function hess_l_fcn_;
+
     // Constructor
     explicit SnoptInterface(const std::string& name, Oracle* nlp);
 
