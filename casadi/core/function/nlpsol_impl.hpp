@@ -52,13 +52,11 @@ namespace casadi {
     std::map<std::string, FStats> fstats;
 
     // Accumulated counts since last reset:
-    int n_calc_jac_g; // number of calls to calc_jac_g
     int n_calc_hess_l; // number of calls to calc_hess_l
     int n_eval_callback; // number of calls to callback
     int n_iter; // number of iterations
 
     // Accumulated time since last reset:
-    double t_calc_jac_g; // time spent in calc_jac_g
     double t_calc_hess_l; // time spent in calc_hess_l
 
     /** \brief  Destructor */
@@ -204,9 +202,6 @@ namespace casadi {
     enum JacGIn { JG_X, JG_P, JG_NUM_IN };
     enum JacGOut { JG_JG, JG_NUM_OUT};
     Sparsity jacg_sp_;
-    int calc_jac_g(NlpsolMemory& m, const Function& fcn,
-                   const double* x, const double* p,
-                   double* g, double* jac_g) const;
 
     // Calculate Jacobian of gradient (note: sparse!)
     int calc_jac_f(NlpsolMemory& m, const Function& fcn,

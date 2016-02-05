@@ -422,26 +422,6 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::calc_jac_g(NlpsolMemory& m, const Function& fcn,
-                         const double* x, const double* p,
-                         double* g, double* jac_g) const {
-    // Respond to a possible Crl+C signals
-    InterruptHandler::check();
-    casadi_assert(jac_g!=0);
-
-    // Evaluate User function
-    fill_n(m.arg, fcn.n_in(), nullptr);
-    m.arg[0] = x;
-    m.arg[1] = p;
-    fill_n(m.res, fcn.n_out(), nullptr);
-    m.res[0] = g;
-    m.res[1] = jac_g;
-    fcn(m.arg, m.res, m.iw, m.w, 0);
-
-    // Success
-    return 0;
-  }
-
   int Nlpsol::calc_jac_f(NlpsolMemory& m, const Function& fcn,
                          const double* x, const double* p,
                          double* f, double* jac_f) const {

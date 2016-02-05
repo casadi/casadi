@@ -791,7 +791,7 @@ namespace casadi {
       if (ng_==0) return;
 
       // Evaluate the function
-      calc_jac_g(m, jac_g_fcn_, x, m.p, g, J);
+      calc_function(m, jac_g_fcn_, {x, m.p}, {g, J});
 
       double time2 = clock();
       m.t_eval_jac_g += (time2-time1)/CLOCKS_PER_SEC;
