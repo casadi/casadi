@@ -903,7 +903,6 @@ namespace casadi {
 
     if (queue_) {
       g.setup << "    commands" << ind << "_ = ((cl_command_queue)" << queue_ << ");" << endl;
-      g.setup << "    printf(\"test %d \", commands" << ind << "_);" << endl;
       g.setup << "    err = clGetCommandQueueInfo (commands" << ind << "_, CL_QUEUE_DEVICE,";
       g.setup << "    sizeof(cl_device_id), &mydevice, NULL);" << endl;
       g.setup << "    check_cl_error(err);" << endl;
