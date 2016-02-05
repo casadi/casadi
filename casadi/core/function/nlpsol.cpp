@@ -357,30 +357,36 @@ namespace casadi {
   }
 
   int Nlpsol::calc_f(NlpsolMemory& m, const Function& fcn,
-                     const double* x, const double* p, double* f) const {
+                     std::initializer_list<const double*> arg,
+                     std::initializer_list<double*> res) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
-    casadi_assert(f!=0);
 
     fill_n(m.arg, fcn.n_in(), nullptr);
-    m.arg[F_X] = x;
-    m.arg[F_P] = p;
+    auto arg_it = arg.begin();
+    m.arg[F_X] = *arg_it++;
+    m.arg[F_P] = *arg_it++;
+    casadi_assert(arg_it==arg.end());
     fill_n(m.res, fcn.n_out(), nullptr);
-    m.res[F_F] = f;
+    auto res_it = res.begin();
+    m.res[F_F] = *res_it++;
+    casadi_assert(res_it==res.end());
     m.n_calc_f += 1;
     auto t_start = chrono::system_clock::now(); // start timer
     try {
       fcn(m.arg, m.res, m.iw, m.w, 0);
     } catch(exception& ex) {
       // Fatal error
-      userOut<true, PL_WARN>() << name() << ":calc_f failed:" << ex.what() << endl;
+      userOut<true, PL_WARN>()
+        << name() << ":" << fcn.name() << " failed:" << ex.what() << endl;
       return 1;
     }
     auto t_stop = chrono::system_clock::now(); // stop timer
 
     // Make sure not NaN or Inf
-    if (!isfinite(*f)) {
-      userOut<true, PL_WARN>() << name() << ":calc_f failed: Inf or NaN detected" << endl;
+    if (!isfinite(*m.res[F_F])) {
+      userOut<true, PL_WARN>()
+        << name() << ":" << fcn.name() << " failed: Inf or NaN detected" << endl;
       return -1;
     }
 

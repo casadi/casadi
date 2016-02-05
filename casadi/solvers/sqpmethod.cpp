@@ -828,7 +828,7 @@ namespace casadi {
 
       // Evaluate the function
       double f;
-      calc_f(m, f_fcn_, x, m.p, &f);
+      calc_f(m, f_fcn_, {x, m.p}, {&f});
 
       double time2 = clock();
       m.t_eval_f += (time2-time1)/CLOCKS_PER_SEC;

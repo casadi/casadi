@@ -182,7 +182,8 @@ namespace casadi {
     enum FIn { F_X, F_P, F_NUM_IN };
     enum FOut { F_F, F_NUM_OUT};
     int calc_f(NlpsolMemory& m, const Function& fcn,
-               const double* x, const double* p, double* f) const;
+               std::initializer_list<const double*> arg,
+               std::initializer_list<double*> res) const;
 
     // Calculate constraints
     enum GIn { G_X, G_P, G_NUM_IN };

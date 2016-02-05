@@ -85,7 +85,7 @@ namespace casadi {
 
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
-    return solver_.calc_f(mem_, solver_.f_fcn_, x, mem_.p, &obj_value)==0;
+    return solver_.calc_f(mem_, solver_.f_fcn_, {x, mem_.p}, {&obj_value})==0;
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
