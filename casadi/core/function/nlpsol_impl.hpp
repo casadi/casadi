@@ -170,6 +170,9 @@ namespace casadi {
                              const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
                              const Dict& opts=Dict(), bool reg=true);
 
+    /** Register the function for evaluation and statistics gathering */
+    void register_function(const Function& fcn);
+
     /** \brief Which variables enter nonlinearly */
     std::vector<bool> nl_var(const std::string& s_in,
                              const std::vector<std::string>& s_out) const;

@@ -602,13 +602,13 @@ namespace casadi {
     // Generate the function
     casadi_assert(nlp_!=0);
     Function ret = nlp_->create(fname, s_in, s_out, lincomb, opts);
-
-    // Register the function for evaluation and statistics gathering
-    if (reg) {
-      all_functions_.push_back(ret);
-      alloc(ret);
-    }
+    if (reg) register_function(ret);
     return ret;
+  }
+
+  void Nlpsol::register_function(const Function& fcn) {
+    all_functions_.push_back(fcn);
+    alloc(fcn);
   }
 
   std::vector<bool> Nlpsol::nl_var(const std::string& s_in,
