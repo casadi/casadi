@@ -369,7 +369,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&m.worhp_c, evalDF)) {
-        calc_grad_f(m, grad_f_fcn_, m.worhp_o.X, m.p, 0, m.worhp_w.DF.val);
+        calc_function(m, grad_f_fcn_, {m.worhp_o.X, m.p}, {0, m.worhp_w.DF.val});
         casadi_scal(nx_, m.worhp_w.ScaleObj, m.worhp_w.DF.val);
         DoneUserAction(&m.worhp_c, evalDF);
       }

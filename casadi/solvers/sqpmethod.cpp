@@ -809,7 +809,7 @@ namespace casadi {
       double time1 = clock();
 
       // Evaluate the function
-      calc_grad_f(m, grad_f_fcn_, x, m.p, f, grad_f);
+      calc_function(m, grad_f_fcn_, {x, m.p}, {f, grad_f});
 
       double time2 = clock();
       m.t_eval_grad_f += (time2-time1)/CLOCKS_PER_SEC;

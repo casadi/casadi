@@ -52,14 +52,12 @@ namespace casadi {
     std::map<std::string, FStats> fstats;
 
     // Accumulated counts since last reset:
-    int n_calc_grad_f; // number of calls to calc_grad_f
     int n_calc_jac_g; // number of calls to calc_jac_g
     int n_calc_hess_l; // number of calls to calc_hess_l
     int n_eval_callback; // number of calls to callback
     int n_iter; // number of iterations
 
     // Accumulated time since last reset:
-    double t_calc_grad_f; // time spent in calc_grad_f
     double t_calc_jac_g; // time spent in calc_jac_g
     double t_calc_hess_l; // time spent in calc_hess_l
 
@@ -205,9 +203,6 @@ namespace casadi {
     // Calculate gradient of the objective
     enum GradFIn { GF_X, GF_P, GF_NUM_IN };
     enum GradFOut { GF_GF, GF_NUM_OUT};
-    int calc_grad_f(NlpsolMemory& m, const Function& fcn,
-                    const double* x, const double* p,
-                    double* f, double* grad_f) const;
 
     // Calculate Jacobian of constraints
     enum JacGIn { JG_X, JG_P, JG_NUM_IN };

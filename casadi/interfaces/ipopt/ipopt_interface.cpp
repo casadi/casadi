@@ -379,10 +379,10 @@ namespace casadi {
     }
 
     // Reset function timers
-    m.t_calc_grad_f = m.t_calc_jac_g = m.t_calc_hess_l = 0;
+    m.t_calc_jac_g = m.t_calc_hess_l = 0;
 
     // Reset function counters
-    m.n_calc_grad_f = m.n_calc_jac_g = m.n_calc_hess_l = 0;
+    m.n_calc_jac_g = m.n_calc_hess_l = 0;
 
     // Legacy
     m.t_callback_fun = m.t_callback_prepare = m.t_mainloop = {0, 0};
