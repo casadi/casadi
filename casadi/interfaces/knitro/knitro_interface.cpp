@@ -231,7 +231,7 @@ namespace casadi {
     if (m.f) *m.f = f;
 
     // Calculate constraints
-    if (m.g) calc_fg(m, fg_fcn_, m.wx, m.p, 0, m.g);
+    if (m.g) calc_function(m, fg_fcn_, {m.wx, m.p}, {0, m.g});
 
     // Free memory (move to destructor!)
     KTR_free(&m.kc_handle);
@@ -250,7 +250,7 @@ namespace casadi {
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC:
-        m.self.calc_fg(m, m.self.fg_fcn_, x, m.p, obj, c);
+        m.self.calc_function(m, m.self.fg_fcn_, {x, m.p}, {obj, c});
         break;
       case KTR_RC_EVALGA:
         m.self.calc_gf_jg(m, m.self.gf_jg_fcn_, x, m.p, objGrad, jac);

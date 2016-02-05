@@ -196,10 +196,6 @@ namespace casadi {
     enum GIn { G_X, G_P, G_NUM_IN };
     enum GOut { G_G, G_NUM_OUT};
 
-    // Calculate both objective and constraints
-    int calc_fg(NlpsolMemory& m, const Function& fcn,
-                const double* x, const double* p, double* f, double* g) const;
-
     // Calculate gradient of the objective
     enum GradFIn { GF_X, GF_P, GF_NUM_IN };
     enum GradFOut { GF_GF, GF_NUM_OUT};
