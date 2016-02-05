@@ -209,7 +209,7 @@ namespace casadi {
       m.res[1] = m.jac_gk;
       jac_g_fcn_(m.arg, m.res, m.iw, m.w, 0);
     }
-    calc_jac_f(m, jac_f_fcn_, m.x0, m.p, 0, m.jac_fk);
+    calc_function(m, jac_f_fcn_, {m.x0, m.p}, {0, m.jac_fk});
 
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
@@ -353,7 +353,7 @@ namespace casadi {
       for (int k = 0; k < nnObj; ++k) m.xk2[k] = x[k];
 
       // Evaluate gradF with the linear variables put to zero
-      calc_jac_f(m, jac_f_fcn_, m.xk2, m.p, fObj, m.jac_fk);
+      calc_function(m, jac_f_fcn_, {m.xk2, m.p}, {fObj, m.jac_fk});
 
       // provide nonlinear part of objective gradient to SNOPT
       for (int k = 0; k < nnObj; ++k) {

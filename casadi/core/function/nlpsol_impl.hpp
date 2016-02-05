@@ -203,11 +203,6 @@ namespace casadi {
     enum JacGOut { JG_JG, JG_NUM_OUT};
     Sparsity jacg_sp_;
 
-    // Calculate Jacobian of gradient (note: sparse!)
-    int calc_jac_f(NlpsolMemory& m, const Function& fcn,
-                   const double* x, const double* p,
-                   double* f, double* jac_f) const;
-
     // Calculate Hessian of the Lagrangian constraints
     enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
     enum HessLagOut { HL_HL, HL_NUM_OUT};
