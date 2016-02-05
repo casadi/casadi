@@ -1012,6 +1012,28 @@ class Matrixtests(casadiTestCase):
       
       assert R.istriu()
       self.checkarray(mul(R.T,R),H)
+      
+  @memory_heavy()
+  def test_densestarcoloring(self):
+    N = 40000
+    A = DMatrix.eye(N)
+    A[:5,10:] = 1
+    A[10:,:5] = 1
+    
+    import time
+    
+    t0 = time.time()
+    A.sparsity().starColoring(1, 10000, 1, 1000)
+    assert time.time()-t0 < 10
+    x = MX.sym("x",N)
+    e = mul([x.T,A,x])
+    
+    f = MXFunction('f',[x],[e],{"starcoloring_threshold": 1000})
+    
+    d = f.derivative(0,1)
+    t0 = time.time()
+    H = d.jacobian(0,1,False,True)
+    assert time.time()-t0 < 10
     
 if __name__ == '__main__':
     unittest.main()

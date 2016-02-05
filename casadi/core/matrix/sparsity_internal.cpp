@@ -3398,7 +3398,47 @@ namespace casadi {
     return Sparsity(size2(), forbiddenColors.size(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::starColoring(int ordering, int cutoff) const {
+  Sparsity SparsityInternal::starColoring(int ordering, int cutoff, int mode, int threshold) const {
+    casadi_assert_warning(size2()==size1(), "StarColoring requires a square matrix, but got "
+                          << dimString() << ".");
+
+    if (threshold==-1) {
+      return mode==1 ? starColoring1(ordering, cutoff) : starColoring2(ordering, cutoff);
+    }
+
+    const int* colind = this->colind();
+
+    // Find the indices of densily populated rows/columns
+    std::vector<int> dense_index;
+    for (int i=0;i<size1();++i) {
+      if (colind[i+1]-colind[i]>threshold) {
+        dense_index.push_back(i);
+      }
+    }
+
+    std::vector<int> sparse_index = complement(dense_index, size1());
+    std::vector<int> dummy_mapping;
+
+    Sparsity self = shared_from_this<Sparsity>();
+    Sparsity sub_sparse = self.sub(sparse_index, sparse_index, dummy_mapping);
+    Sparsity sub_dense  = self.sub(dense_index,  dense_index,  dummy_mapping);
+
+    Sparsity col_sparse = mode==1 ? sub_sparse.starColoring1(ordering, cutoff) :
+                                    sub_sparse.starColoring2(ordering, cutoff);
+    Sparsity col_dense  = Sparsity::diag(dense_index.size());//sub_dense.starColoring1();
+
+    Sparsity ret = diagcat(col_sparse, col_dense);
+
+    std::vector<int> index = sparse_index;
+
+    index.insert(index.end(), dense_index.begin(), dense_index.end());
+
+    std::vector<int> index_inv = lookupvector(index, size2());
+
+    return ret.sub(index_inv, range(ret.size2()), dummy_mapping);
+  }
+
+  Sparsity SparsityInternal::starColoring1(int ordering, int cutoff) const {
     casadi_assert_warning(size2()==size1(), "StarColoring requires a square matrix, but got "
                           << dimString() << ".");
     // Reorder, if necessary
@@ -3412,7 +3452,7 @@ namespace casadi {
       Sparsity sp_permuted = pmult(ord, true, true, true);
 
       // Star coloring for the permuted matrix
-      Sparsity ret_permuted = sp_permuted.starColoring(0);
+      Sparsity ret_permuted = sp_permuted.starColoring1(0);
 
       // Permute result back
       return ret_permuted.pmult(ord, true, false, false);

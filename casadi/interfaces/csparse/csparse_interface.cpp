@@ -208,6 +208,92 @@ namespace casadi {
   }
 
 
+  void CsparseInterface::generate(const std::vector<int>& arg, const std::vector<int>& res,
+   CodeGenerator& g, int nrhs, bool transpose) const {
+
+    casadi_error("Not implemented");
+
+    /**
+    int m = input().size1();
+    int n = input().size2();
+
+    g.declarations << "#define CASADI_CSPARSE_EXPORT" << endl;
+
+    g.declarations << "#include \"/home/jgillis/programs/casadi/external_packages/CSparse/Include/cs.h\"" << endl;
+    g.declarations << "typedef cs ns_csparse_cs;" << endl;
+    g.declarations << "typedef css ns_csparse_css;" << endl;
+
+    g.body << "ns_csparse_cs A;" << endl;
+    g.body << "A.nzmax = " << input().nnz() << ";" << endl;
+    g.body << "A.m = " << m << ";" << endl;
+    g.body << "A.n = " << m << ";" << endl;
+
+    g.body << "A.p = " << g.sparsity(input(LINSOL_A).sparsity()) << "+2;" << endl;
+    g.body << "A.i = " << g.sparsity(input(LINSOL_A).sparsity()) << "+" << 3+ncol() << ";" << endl;
+    g.body << "A.x = " << g.work(arg[1], input(LINSOL_A).nnz()) << ";" << endl;
+    g.body << "A.nz = -1;" << endl;
+
+    int order = 0;
+    css *S = cs_sqr(order, &A_, 0);
+    g.body << "ns_csparse_css S;" << endl;
+
+    if (S->pinv) {
+      g.body << "S.pinv = " << g.getConstant(std::vector<int>(S->pinv,S->pinv+m+n),true) << ";" << endl;
+    } else {
+      g.body << "S.pinv = 0;" << endl;
+    }
+    if (S->q) {
+      g.body << "S.q = " << g.getConstant(std::vector<int>(S->q,S->q+n),true) << ";" << endl;
+    } else {
+      g.body << "S.q = 0;" << endl;
+    }
+    if (S->parent) {
+      g.body << "S.parent = " << g.getConstant(std::vector<int>(S->parent,S->parent+n),true) << ";" << endl;
+    } else {
+      g.body << "S.parent = 0;" << endl;
+    }
+    if (S->cp) {
+      g.body << "S.cp = " << g.getConstant(std::vector<int>(S->cp,S->cp+n),true) << ";" << endl;
+    } else {
+      g.body << "S.cp = 0;" << endl;
+    }
+    if (S->leftmost) {
+      g.body << "S.leftmost = " << g.getConstant(std::vector<int>(S->leftmost,S->leftmost+n),true) << ";" << endl;
+    } else {
+      g.body << "S.leftmost = 0;" << endl;
+    }
+    g.body << "S.m2 = " << S->m2 << ";" << endl;
+    g.body << "S.lnz = " << S->lnz << ";" << endl;
+    g.body << "S.unz = " << S->unz << ";" << endl;
+
+    cs_sfree(S);
+
+    g.body << "double t[" << input().size2() << "];" << endl;
+
+    g.body << "csn *N = cs_lu(&A, &S, 1e-8);" << endl;
+
+    g.body << "double *x = " << g.work(arg[0], input(LINSOL_B).nnz()) << ";" << endl;
+
+    for (int k=0; k<input(LINSOL_B).size2(); ++k) {
+      if (transpose) {
+        g.body << "cs_pvec(S.q, x, temp, A.n);" << endl;
+        g.body << "cs_utsolve(N->U, t);" << endl;
+        g.body << "cs_ltsolve(N->L, t);" << endl;
+        g.body << "cs_pvec(N->pinv, t, x, A.n);" << endl;
+      } else {
+        g.body << "cs_ipvec(N->pinv, x, t, A.n);" << endl;
+        g.body << "cs_lsolve(N->L, t) ;" << endl;
+        g.body << "cs_usolve(N->U, t) ;" << endl;
+        g.body << "cs_ipvec(S.q, t, x, A.n) ;" << endl;
+      }
+      g.body << "x += " << ncol() << ";" << endl;
+    }
+
+    g.body << "cs_nfree(N);" << endl;
+    */
+  }
+
+
   CsparseInterface* CsparseInterface::clone() const {
     return new CsparseInterface(input(LINSOL_A).sparsity(), input(LINSOL_B).size2());
   }

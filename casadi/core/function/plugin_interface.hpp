@@ -35,7 +35,9 @@
 // For dynamic loading
 #ifdef WITH_DL
 #ifdef _WIN32 // also for 64-bit
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #else // _WIN32
 #include <dlfcn.h>
@@ -60,6 +62,8 @@ namespace casadi {
     casadi_assert_message(t!=0, "Static function not implemented for plugin");
     return t;
   }
+
+  CASADI_EXPORT std::vector<std::string> getPluginSearchPaths();
 
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
@@ -172,8 +176,7 @@ namespace casadi {
     // Load the dll
     std::string regName = "casadi_register_" + Derived::infix_ + "_" + name;
 
-    // Build up search paths;
-    std::vector<std::string> search_paths;
+    std::vector<std::string> search_paths = getPluginSearchPaths();
 
     #ifdef _WIN32
     char pathsep = ';';
@@ -182,37 +185,6 @@ namespace casadi {
     char pathsep = ':';
     const std::string filesep("/");
     #endif
-
-    // Search path: global casadipath option
-    std::stringstream casadipaths(CasadiOptions::getCasadiPath());
-    std::string casadipath;
-    while (std::getline(casadipaths, casadipath, pathsep)) {
-      search_paths.push_back(casadipath);
-    }
-
-    // Search path: CASADIPATH env variable
-    char* pLIBDIR;
-    pLIBDIR = getenv("CASADIPATH");
-
-    if (pLIBDIR!=0) {
-      std::stringstream casadipaths(pLIBDIR);
-      std::string casadipath;
-      while (std::getline(casadipaths, casadipath, pathsep)) {
-        search_paths.push_back(casadipath);
-      }
-    }
-
-    // Search path: bare
-    search_paths.push_back("");
-
-    // Search path : PLUGIN_EXTRA_SEARCH_PATH
-    #ifdef PLUGIN_EXTRA_SEARCH_PATH
-    search_paths.push_back(
-      std::string("") + PLUGIN_EXTRA_SEARCH_PATH);
-    #endif // PLUGIN_EXTRA_SEARCH_PATH
-
-    // Search path : current directory
-    search_paths.push_back(".");
 
     // Prepare error string
     std::stringstream errors;

@@ -3,12 +3,16 @@ include_directories(${CLANG_INCLUDE_DIR})
 add_definitions(${CLANG_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
 
+# Make the shared library prefix and suffix available in C++
+add_definitions(-DSHARED_LIBRARY_PREFIX="${CMAKE_SHARED_LIBRARY_PREFIX}")
+add_definitions(-DSHARED_LIBRARY_SUFFIX="${CMAKE_SHARED_LIBRARY_SUFFIX}")
+
 casadi_plugin(Compiler clang
   clang_compiler.hpp
   clang_compiler.cpp
   clang_compiler_meta.cpp)
 
-casadi_plugin_link_libraries(Compiler clang ${CLANG_LIBRARIES})
+casadi_plugin_link_libraries(Compiler clang ${CLANG_LIBRARIES} ${LAPACK_LIBRARIES})
 
 if(MINGW)
   find_library(SHLWAPI libshlwapi /usr/${PREFIX}/lib)

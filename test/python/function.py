@@ -28,6 +28,9 @@ import unittest
 from types import *
 from helpers import *
 
+import os
+has_opencl = os.path.exists("/etc/OpenCL/vendors/pocl.icd") or os.path.exists("/etc/OpenCL/vendors/nvidia.icd") or os.path.exists("/etc/OpenCL/vendors/intel-beignet-x86_64-linux-gnu.icd")
+
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
@@ -1627,6 +1630,70 @@ class Functiontests(casadiTestCase):
 
             self.checkfunction(f,Fref,sparsity_mod=args.run_slow)
 
+
+  @memory_heavy()
+  def test_puremap(self):
+    x = SX.sym("x")
+    y = SX.sym("y",2)
+    z = SX.sym("z",2,2)
+    v = SX.sym("z",Sparsity.upper(3))
+
+    fun = SXFunction("f",[x,y,z,v],[mul(z,y)+x,sin(y*x).T,v/x])
+
+    n = 2
+
+    X = [MX.sym("x") for i in range(n)]
+    Y = [MX.sym("y",2) for i in range(n)]
+    Z = [MX.sym("z",2,2) for i in range(n)]
+    V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
+
+
+    if has_opencl:
+      options_fasteval = {"compiler": "shell", "jit": True, "jit_options": {"compiler": "gcc","flags": ["-Ofast","-lOpenCL"]}}
+    else:
+      options_fasteval = {"compiler": "shell", "jit": True, "jit_options": {"compiler": "gcc","flags": ["-Ofast"]}}
+
+    for parallelization,opts in [("opencl",options_fasteval),("serial",{}),("serial",options_fasteval),("openmp",{}),("openmp",options_fasteval)]:
+      if parallelization == "opencl" and not has_opencl:
+        continue
+      options = {"parallelization": parallelization}
+      options.update(opts)
+      for F in [
+          Map("map",fun,n,[True,True,True,True],[True,True,True],options),
+          Map("map",fun,n,options)
+        ]:
+
+        F.generate("foo");
+        for ad_weight_sp in [0,1]:
+
+
+            resref = [0 for i in range(fun.nOut())]
+            acc = 0
+            al = []
+            bl = []
+            cl = []
+            for r in zip(X,Y,Z,V):
+              a,b,c= fun(r)
+              al.append(a)
+              bl.append(b)
+              cl.append(c)
+
+            Fref = MXFunction("F",[horzcat(X),horzcat(Y),horzcat(Z),horzcat(V)],[horzcat(al),horzcat(bl),horzcat(cl)])
+
+            np.random.seed(0)
+            X_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+            Y_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+            Z_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+            V_ = [ DMatrix(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+
+            for f in [F,toSXFunction(F)]:
+              for i,e in enumerate([horzcat(X_),horzcat(Y_),horzcat(Z_),horzcat(V_)]):
+                f.setInput(e,i)
+                Fref.setInput(e,i)
+
+
+              self.checkfunction(f,Fref,sparsity_mod=args.run_slow,digits=5 if parallelization=="opencl" else 9)
+
   def test_issue1522(self):
     V = MX.sym("X",2)
 
@@ -1823,46 +1890,80 @@ class Functiontests(casadiTestCase):
     
   @memory_heavy()
   def test_KernelSum2D(self):
-    n = 20
-    m = 40
- 
-    try:
-      xx, yy = np.meshgrid(range(n), range(m),indexing="ij")
-    except:
-      yy, xx = np.meshgrid(range(m), range(n))
+    for n,m in [(20,40),(5,7),(7,5),(40,20)]:
+      try:
+        xx, yy = np.meshgrid(range(n), range(m),indexing="ij")
+      except:
+        yy, xx = np.meshgrid(range(m), range(n))
 
-    z = np.cos(xx/4.0+yy/3.0)
+      Z = np.cos(xx/4.0+yy/3.0)
+      
+      zf = np.array(Z.T.reshape((-1,1)),dtype=np.float32)
 
-    p = SX.sym("p",2)
-    x = SX.sym("x",2)
+      def ptr2double(ptr):
+        import struct
+        return struct.unpack("d",struct.pack("l",ptr))[0]
+        
+      import ctypes
+      cb = ctypes.c_float*zf.size
+      A = cb.from_buffer(zf)
+      pointer = ctypes.addressof(A)
+      pt = ptr2double(pointer)
+      if has_opencl:
+        options_fasteval = {"compiler": "shell", "jit": True, "jit_options": {"compiler": "gcc","flags": ["-Ofast","-lOpenCL"]}}
+      else:
+        options_fasteval = {"compiler": "shell", "jit": True, "jit_options": {"compiler": "gcc","flags": ["-Ofast"]}}
+      for par,options in [("serial",{}),("opencl",options_fasteval)]:
+        if "opencl"==par and not has_opencl:
+          continue      
+        for z, z_options in [(Z,{}),(pt,{"pointer_input": True,"image_type":32})]:
+        
+          print par,options,z_options
+          if "opencl"!=par and len(z_options)!=0: continue
+          
+          opts = {"parallelization": par}
+          opts.update(options)
+          opts.update(z_options)
+          
+          print opts
+          p = SX.sym("p",2)
+          x = SX.sym("x",2)
 
-    v = SX.sym("v")
+          v = SX.sym("v")
+          
 
-    r = sqrt(sumRows((p-x)**2))
+          r = sqrt(sumRows((p-x)**2))
 
-    f = SXFunction("f",[p,v,x],[v**2*exp(-r**2)/pi])
+          f = SXFunction("f",[p,v,x],[v**2*exp(-r**2)/pi])
 
-    F = KernelSum2D("test",f,(n,m),4,1,{"ad_weight": 1})
+          xs = MX.sym("x",2)
 
-    x0 = DMatrix([n/2,m/2])
 
-    Fref = Map("f",f,n*m,[True,True,False],[False])
-    
-    print Fref([horzcat([vec(xx),vec(yy)]).T,vec(z),x0])
-    print F([z,x0])
-    
-    zs = MX.sym("z", z.shape)
-    xs = MX.sym("x",2)
-    Fref = MXFunction("Fref",[zs,xs],Fref([horzcat([vec(xx),vec(yy)]).T,vec(zs),xs]))
-    
-    F.setInput(z,0)
-    Fref.setInput(z,0)
-    
-    F.setInput(x0,1)
-    Fref.setInput(x0,1)
-    
-    self.checkfunction(F,Fref,digits=5,allow_nondiff=True,evals=False)
-    self.check_codegen(F)
+          for x0 in [DMatrix([n/2,m/2]),DMatrix([0,m-1]),DMatrix([n-2,1])]:
+            print (n,m), x0
+            F = KernelSum2D("test",f,(n,m),4,1,opts)
+
+            Fref = Map("f",f,n*m,[True,True,False],[False])
+            
+            if len(z_options)==0:
+            
+              Fref = MXFunction("Fref",[xs],Fref([horzcat([vec(xx),vec(yy)]).T,vec(Z),xs]))
+              F = MXFunction("F",[xs],F([z,xs]))
+              
+              F.setInput(x0,0)
+              Fref.setInput(x0,0)
+            else:
+              zs = MX.sym("z")
+              Fref = MXFunction("Fref",[zs,xs],Fref([horzcat([vec(xx),vec(yy)]).T,vec(Z),xs]))
+  
+              F.setInput(z,0)
+              Fref.setInput(z,0)
+              
+              F.setInput(x0,1)
+              Fref.setInput(x0,1)
+              
+              self.checkfunction(F,Fref,digits=5)
+              self.check_codegen(F)
 
 if __name__ == '__main__':
     unittest.main()

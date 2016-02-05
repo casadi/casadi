@@ -713,16 +713,27 @@ namespace casadi {
     Sparsity unidirectionalColoring(const Sparsity& AT=Sparsity(),
                                     int cutoff = std::numeric_limits<int>::max()) const;
 
+    /** \brief Perform a star coloring of a symmetric matrix
+
+    */
+    Sparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max(),
+                          int mode = 1, int threshold = -1) const;
+
     /** \brief Perform a star coloring of a symmetric matrix:
-        A greedy distance-2 coloring algorithm
+        A greedy distance-3 coloring algorithm
         Algorithm 4.1 in
           What Color Is Your Jacobian? Graph Coloring for Computing Derivatives
           A. H. GEBREMEDHIN, F. MANNE, A. POTHEN
           SIAM Rev., 47(4), 629–705 (2006)
 
         Ordering options: None (0), largest first (1)
+
+
+        S = H.starColoring()
+
     */
-    Sparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
+    Sparsity starColoring1(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
+
 
     /** \brief Perform a star coloring of a symmetric matrix:
         A new greedy distance-2 coloring algorithm

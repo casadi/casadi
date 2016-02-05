@@ -29,7 +29,7 @@
 #include "../std_vector_tools.hpp"
 #include "../function/map.hpp"
 #include "../function/mapaccum.hpp"
-
+#include "../function/external_function.hpp"
 
 using namespace std;
 
@@ -506,9 +506,12 @@ namespace casadi {
       }
     }
 
+    Dict opts = make_dict("input_scheme", i_names, "output_scheme", o_names);
+    opts["starcoloring_mode"] = getOption("starcoloring_mode");
+    opts["starcoloring_threshold"] = getOption("starcoloring_threshold");
+
     // Construct return function
-    MXFunction ret(ss.str(), ret_in, ret_out,
-                   make_dict("input_scheme", i_names, "output_scheme", o_names));
+    MXFunction ret(ss.str(), ret_in, ret_out, opts);
 
     // Consistency check for inputs
     int ind=0;
@@ -582,6 +585,14 @@ namespace casadi {
     CodeGenerator gen(opts);
     gen.add(*this, fname);
     gen.generate(fname);
+  }
+
+  Function Function::wrap(const string& fname, const Dict& opts) {
+    std::vector<MX> in = symbolicInput();
+    Dict options = opts;
+    options["input_scheme"] = (*this)->ischeme_;
+    options["output_scheme"] = (*this)->oscheme_;
+    return MXFunction(fname, in, operator()(in), options);
   }
 
   void Function::checkInputs() const {

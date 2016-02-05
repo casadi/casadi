@@ -31,34 +31,34 @@
 namespace casadi {
 
   /** \brief  Forward declaration of internal class */
-  class KernelSum2DInternal;
+  class KernelSum2DBase;
 
-  /** KernelSum2D 
-  
+  /** KernelSum2D
+
         Consider a dense matrix V.
-        
-        KernelSum computes     
-  
+
+        KernelSum computes
+
         F(V,X)  = sum_i sum_j  f ( [i;j], V(i,j), X)
-        
+
           with X: [x;y]
-          
+
         where the summation is taken for all entries (i,j)
         that are a distance r away from X.
-        
-        This function assumes that V is fixed: 
+
+        This function assumes that V is fixed:
         sensitivities with respect to it are not computed.
-        
+
         This allows for improved speed of evaluation.
-        
+
         Having V fixed is a common use case:
           V may be a large bitmap (observation),
           onto which a kernel is fitted.
-          
+
         Summation does not occur outside the image.
         Runtime will not grow after distance r grows large enough to contian the whole image.
-        
-  
+
+
       \author Joris Gillis
       \date 2015
   */
@@ -76,10 +76,10 @@ namespace casadi {
 
 
     /** \brief  Access functions of the node */
-    KernelSum2DInternal* operator->();
+    KernelSum2DBase* operator->();
 
     /** \brief  Const access functions of the node */
-    const KernelSum2DInternal* operator->() const;
+    const KernelSum2DBase* operator->() const;
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);

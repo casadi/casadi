@@ -1052,6 +1052,13 @@ Get input scheme description by index.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::inputIndex(const std::string &name)
 const  "
 
@@ -1673,6 +1680,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -2279,6 +2306,11 @@ Interface to the JIT compiler CLANG
 |                 |                 |                 | CasADi will be  |
 |                 |                 |                 | automatically   |
 |                 |                 |                 | appended.       |
++-----------------+-----------------+-----------------+-----------------+
+| plugin_libs     | OT_STRINGVECTOR | GenericType()   | Resolve symbols |
+|                 |                 |                 | from the listed |
+|                 |                 |                 | casadi plugin   |
+|                 |                 |                 | libraries       |
 +-----------------+-----------------+-----------------+-----------------+
 
 --------------------------------------------------------------------------------
@@ -3383,6 +3415,26 @@ Joris Gillis
 |              |              |              | the          | Internal     |
 |              |              |              | simulator    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -3473,6 +3525,13 @@ int nfwd) "
 
 Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -5310,6 +5369,26 @@ Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -5459,25 +5538,6 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring")  casadi::Function::generate(const std::string &fname,
-const Dict &opts=Dict()) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
-
-Export / Generate C code for the function.
-
-";
-
-%feature("docstring")  casadi::Function::numelIn() const  "
-
-Get total number of elements in all of the matrix-valued inputs.
-
-";
-
 %feature("docstring")  casadi::Function::gradient(int iind=0, int oind=0) "
 
 Generate a gradient function of output oind with respect to input iind.
@@ -5542,6 +5602,32 @@ oind:  The index of the output
 
 The default behavior of this class is defined by the derived class. Note
 that the output must be scalar. In other cases, use the Jacobian instead.
+
+";
+
+%feature("docstring")  casadi::Function::generate(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::generate(const Dict &opts=Dict()) "
+
+Export / Generate C code for the function.
+
+";
+
+%feature("docstring")  casadi::Function::numelIn() const  "
+
+Get total number of elements in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -7632,6 +7718,13 @@ internally
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::PrintableObject< SharedObject
 >::getRepresentation() const "
 
@@ -8437,6 +8530,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -9755,6 +9868,13 @@ get function name with all non alphanumeric characters converted to '_'
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::outputSparsity(int ind=0) const  "
 
 Get sparsity of a given output.
@@ -10061,6 +10181,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -11470,6 +11610,26 @@ Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -11830,6 +11990,13 @@ Get input scheme.
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionAllowedIndex(const std::string &name)
 const  " [INTERNAL]  Get the index into allowed options of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -12462,6 +12629,13 @@ Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -13450,6 +13624,26 @@ Joel Andersson
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -16550,6 +16744,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -16802,6 +17016,13 @@ Get the description of a certain option.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -17590,6 +17811,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -18656,6 +18897,13 @@ Get a list of all option names.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -19858,6 +20106,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
 |              |              |              | the time     | gratorIntern |
 |              |              |              | horizon      | al           |
@@ -20736,6 +21004,13 @@ casadi::OptionsFunctionality::printOptions(std::ostream
 &stream=casadi::userOut()) const  "
 
 Print options to a stream.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -22341,6 +22616,13 @@ Joris Gillis
 |              |              |              | plugin to be |              |
 |              |              |              | used.        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| context      | OT_VOIDPTR   | GenericType( | You may      | casadi::Kern |
+|              |              | )            | optionally   | elSum2DBase  |
+|              |              |              | provide an   |              |
+|              |              |              | existing     |              |
+|              |              |              | OpenCL       |              |
+|              |              |              | context.     |              |
++--------------+--------------+--------------+--------------+--------------+
 | custom_forwa | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | rd           | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -22387,6 +22669,14 @@ Joris Gillis
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| image_type   | OT_INTEGER   | 64           | Indicate the | casadi::Kern |
+|              |              |              | number of    | elSum2DBase  |
+|              |              |              | bits used in |              |
+|              |              |              | the image    |              |
+|              |              |              | defined with |              |
+|              |              |              | pointer_inpu |              |
+|              |              |              | t=True.      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | input_scheme | OT_STRINGVEC | GenericType( | Custom input | casadi::Func |
 |              | TOR          | )            | scheme       | tionInternal |
@@ -22465,9 +22755,60 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
+| null_test    | OT_BOOLEAN   | true         | If false,    | casadi::Kern |
+|              |              |              | null-tests   | elSum2DBase  |
+|              |              |              | will be      |              |
+|              |              |              | omitted from |              |
+|              |              |              | the kernel   |              |
+|              |              |              | code.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| num_threads  | OT_INTEGER   | 1            | Number of    | casadi::Kern |
+|              |              |              | threads to   | elSum2DBase  |
+|              |              |              | execute in   |              |
+|              |              |              | parallel     |              |
+|              |              |              | (OpenCL)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| num_work_ite | OT_INTEGER   | 1            | Number of    | casadi::Kern |
+| ms           |              |              | work items   | elSum2DBase  |
+|              |              |              | in one work- |              |
+|              |              |              | group        |              |
+|              |              |              | (OpenCL)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| opencl_selec | OT_INTEGER   | 0            | Index into   | casadi::Kern |
+| t            |              |              | OpenCL-      | elSum2DBase  |
+|              |              |              | compatible   |              |
+|              |              |              | devices, to  |              |
+|              |              |              | select which |              |
+|              |              |              | one to use.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
 |              |              |              | scheme       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parallelizat | OT_STRING    | \"serial\"     | Computationa | casadi::Kern |
+| ion          |              |              | l strategy   | elSum2DBase  |
+|              |              |              | for parallel |              |
+|              |              |              | ization (ser |              |
+|              |              |              | ial|openmp|o |              |
+|              |              |              | pencl)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| pointer_inpu | OT_BOOLEAN   | false        | Instead of   | casadi::Kern |
+| t            |              |              | the image as | elSum2DBase  |
+|              |              |              | input, use a |              |
+|              |              |              | pointer to   |              |
+|              |              |              | an image     |              |
++--------------+--------------+--------------+--------------+--------------+
+| queue        | OT_VOIDPTR   | GenericType( | You may      | casadi::Kern |
+|              |              | )            | optionally   | elSum2DBase  |
+|              |              |              | provide an   |              |
+|              |              |              | existing     |              |
+|              |              |              | OpenCL       |              |
+|              |              |              | queue.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| reduction    | OT_BOOLEAN   | false        | Indicates if | casadi::Kern |
+|              |              |              | a recution   | elSum2DBase  |
+|              |              |              | is applied   |              |
+|              |              |              | on the GPU.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
@@ -22475,6 +22816,26 @@ Joris Gillis
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -22718,6 +23079,11 @@ std::vector< DMatrix > > &aseed, std::vector< std::vector< DMatrix > >
 &output_asens, bool always_inline=false, bool never_inline=false) "
 
 Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring")  casadi::Function::sz_arg() const  " [INTERNAL]  Get
+required length of arg field.
 
 ";
 
@@ -23044,8 +23410,10 @@ Remove modules to be monitored.
 
 ";
 
-%feature("docstring")  casadi::Function::sz_arg() const  " [INTERNAL]  Get
-required length of arg field.
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -23130,6 +23498,15 @@ casadi::OptionsFunctionality::printOptions(std::ostream
 Print options to a stream.
 
 ";
+
+
+// File: classcasadi_1_1KernelSum2DBase.xml
+
+
+// File: classcasadi_1_1KernelSum2DOcl.xml
+
+
+// File: classcasadi_1_1KernelSum2DSerial.xml
 
 
 // File: classcasadi_1_1LapackLuDense.xml
@@ -23615,6 +23992,13 @@ Get the dictionary.
 %feature("docstring")  casadi::Function::nnzOut() const  "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -24379,6 +24763,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -25389,6 +25793,13 @@ the output elements).
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")
 casadi::OptionsFunctionality::getOptionEnumValue(const std::string &name)
 const  " [INTERNAL]  Get the enum value corresponding to th certain option.
@@ -26234,6 +26645,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -27012,6 +27443,13 @@ time. * (n_in = nIn(), n_out = nOut())
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -28315,6 +28753,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -29849,6 +30307,13 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::nnzIn() const  "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
@@ -30215,6 +30680,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -30726,6 +31211,34 @@ Map Joris Gillis
 |              |              |              | recipe (low- |              |
 |              |              |              | level)       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| enable_flag_ | OT_INTEGER   | -1           | This is part | casadi::MapB |
+| input        |              |              | of an        | ase          |
+|              |              |              | experimental |              |
+|              |              |              | feature to c |              |
+|              |              |              | onditionally |              |
+|              |              |              | skip computa |              |
+|              |              |              | tions. The   |              |
+|              |              |              | default      |              |
+|              |              |              | value -1     |              |
+|              |              |              | disables     |              |
+|              |              |              | this         |              |
+|              |              |              | feature. Use |              |
+|              |              |              | this to      |              |
+|              |              |              | specify the  |              |
+|              |              |              | index of an  |              |
+|              |              |              | input which  |              |
+|              |              |              | will be      |              |
+|              |              |              | interpreted  |              |
+|              |              |              | as a         |              |
+|              |              |              | boolean. If  |              |
+|              |              |              | that value   |              |
+|              |              |              | is true, the |              |
+|              |              |              | computation  |              |
+|              |              |              | is enabled.  |              |
+|              |              |              | If false,the |              |
+|              |              |              | computation  |              |
+|              |              |              | is skipped   |              |
++--------------+--------------+--------------+--------------+--------------+
 | full_jacobia | OT_FUNCTION  | GenericType( | The Jacobian | casadi::Func |
 | n            |              | )            | of all       | tionInternal |
 |              |              |              | outputs with |              |
@@ -30816,22 +31329,31 @@ Map Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
+| opencl_selec | OT_INTEGER   | 0            | List with    | casadi::MapB |
+| t            |              |              | indices into | ase          |
+|              |              |              | OpenCL-      |              |
+|              |              |              | compatible   |              |
+|              |              |              | devices, to  |              |
+|              |              |              | select which |              |
+|              |              |              | one to use.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | output_schem | OT_STRINGVEC | GenericType( | Custom       | casadi::Func |
 | e            | TOR          | )            | output       | tionInternal |
 |              |              |              | scheme       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | \"serial\"     | Computationa | casadi::MapR |
-| ion          |              |              | l strategy   | educe        |
+| parallelizat | OT_STRING    | \"serial\"     | Computationa | casadi::MapB |
+| ion          |              |              | l strategy   | ase          |
 |              |              |              | for parallel |              |
 |              |              |              | ization (ser |              |
-|              |              |              | ial|openmp)  |              |
+|              |              |              | ial|openmp|o |              |
+|              |              |              | pencl)       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| reduced_inpu | OT_INTEGERVE | GenericType( | Reduction    | casadi::MapR |
-| ts           | CTOR         | )            | for certain  | educe        |
+| reduced_inpu | OT_INTEGERVE | GenericType( | Reduction    | casadi::MapB |
+| ts           | CTOR         | )            | for certain  | ase          |
 |              |              |              | inputs       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| reduced_outp | OT_INTEGERVE | GenericType( | Reduction    | casadi::MapR |
-| uts          | CTOR         | )            | for certain  | educe        |
+| reduced_outp | OT_INTEGERVE | GenericType( | Reduction    | casadi::MapB |
+| uts          | CTOR         | )            | for certain  | ase          |
 |              |              |              | outputs      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
@@ -30840,6 +31362,26 @@ Map Joris Gillis
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -31925,6 +32467,13 @@ Create call to (cached) derivative function, reverse mode.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 
 // File: classcasadi_1_1MapAccum.xml
 
@@ -31939,9 +32488,9 @@ const  " [INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::isInit() const  "
+%feature("docstring")  casadi::Function::inputName(int ind) const  "
 
-Is initialized?
+Get input scheme name by index.
 
 ";
 
@@ -32467,6 +33016,13 @@ check if the user has there is an option str
 std::string &str) const  "
 
 Get the type name of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -33209,6 +33765,26 @@ Joris Gillis
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -33396,6 +33972,12 @@ Get input scheme.
 
 ";
 
+%feature("docstring")  casadi::SharedObject::isInit() const  "
+
+Is initialized?
+
+";
+
 %feature("docstring")  casadi::Function::hessian(int iind=0, int oind=0) "
 
 Generate a Hessian function of output oind with respect to input iind.
@@ -33518,20 +34100,23 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring")  casadi::Function::inputName(int ind) const  "
-
-Get input scheme name by index.
-
-";
-
 
 // File: classcasadi_1_1MapBase.xml
 
 
-// File: classcasadi_1_1MapReduce.xml
+// File: classcasadi_1_1MapOcl.xml
 
 
 // File: classcasadi_1_1MapSerial.xml
+
+
+// File: classcasadi_1_1MapSum.xml
+
+
+// File: classcasadi_1_1MapSumOcl.xml
+
+
+// File: classcasadi_1_1MapSumSerial.xml
 
 
 // File: singletoncasadi_1_1Matrix.xml
@@ -37120,6 +37705,26 @@ Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -37220,6 +37825,13 @@ Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
 
 There is no guarantee that consecutive calls return identical objects
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -38363,6 +38975,13 @@ Get input scheme description by index.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::inputIndex(const std::string &name)
 const  "
 
@@ -39233,6 +39852,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -41877,818 +42516,134 @@ WORHP interface
 +-----------------+-----------------+-----------------+-----------------+
 |       Id        |      Type       |     Default     |   Description   |
 +=================+=================+=================+=================+
-| AcceptTolFeas   | OT_REAL         | 0.001           | Tolerance for   |
-|                 |                 |                 | acceptable      |
-|                 |                 |                 | feasibility     |
-+-----------------+-----------------+-----------------+-----------------+
-| AcceptTolOpti   | OT_REAL         | 0.001           | Tolerance for   |
-|                 |                 |                 | acceptable      |
-|                 |                 |                 | optimality      |
-+-----------------+-----------------+-----------------+-----------------+
-| AlphaMinConst   | OT_BOOLEAN      | False           | Use a constant  |
-|                 |                 |                 | lower bound on  |
-|                 |                 |                 | Armijo stepsize |
-|                 |                 |                 | in Filter       |
-+-----------------+-----------------+-----------------+-----------------+
-| Ares            | OT_INTEGERVECTO | [42, 41, 42,    | Armijo recovery |
-|                 | R               | 43, 44, 41, 50] | strategies.     |
-|                 |                 |                 | Vector of size  |
-|                 |                 |                 | 7               |
-+-----------------+-----------------+-----------------+-----------------+
-| ArmijoBeta      | OT_REAL         | 0.712           | Trial stepsize  |
-|                 |                 |                 | decrease factor |
-|                 |                 |                 | for Armijo rule |
-+-----------------+-----------------+-----------------+-----------------+
-| ArmijoMaxAlpha  | OT_REAL         | 1               | Initial alpha   |
-|                 |                 |                 | for Armijo rule |
-+-----------------+-----------------+-----------------+-----------------+
-| ArmijoMinAlpha  | OT_REAL         | 0.000           | Lower bound on  |
-|                 |                 |                 | alpha for       |
-|                 |                 |                 | Armijo rule     |
-+-----------------+-----------------+-----------------+-----------------+
-| ArmijoMinAlphaR | OT_REAL         | 0.000           | Lower bound on  |
-| ec              |                 |                 | alpha for       |
-|                 |                 |                 | Armijo rule     |
-|                 |                 |                 | during recovery |
-+-----------------+-----------------+-----------------+-----------------+
-| ArmijoSigma     | OT_REAL         | 0.005           | Scale factor    |
-|                 |                 |                 | for linearised  |
-|                 |                 |                 | descent check   |
-|                 |                 |                 | in Armijo rule  |
-+-----------------+-----------------+-----------------+-----------------+
-| AutoQPRecovery  | OT_BOOLEAN      | True            | Enable          |
-|                 |                 |                 | automatic QP    |
-|                 |                 |                 | recovery        |
-+-----------------+-----------------+-----------------+-----------------+
-| BFGSmaxblockSiz | OT_INTEGER      | 300             | Block size      |
-| e               |                 |                 | parameter used  |
-|                 |                 |                 | by certain BFGS |
-|                 |                 |                 | methods         |
-+-----------------+-----------------+-----------------+-----------------+
-| BFGSmethod      | OT_INTEGER      | 0               | Choose BFGS     |
-|                 |                 |                 | method (0:      |
-|                 |                 |                 | dense, 1-3:     |
-|                 |                 |                 | block, 100+:    |
-|                 |                 |                 | sparse)         |
-+-----------------+-----------------+-----------------+-----------------+
-| BFGSminblockSiz | OT_INTEGER      | 300             | Block size      |
-| e               |                 |                 | parameter used  |
-|                 |                 |                 | by certain BFGS |
-|                 |                 |                 | methods         |
-+-----------------+-----------------+-----------------+-----------------+
-| BFGSrestart     | OT_INTEGER      | 50              | Restart BFGS    |
-|                 |                 |                 | update after    |
-|                 |                 |                 | this many       |
-|                 |                 |                 | iterations      |
-+-----------------+-----------------+-----------------+-----------------+
-| BettsFactor     | OT_REAL         | 2.100           | Update factor   |
-|                 |                 |                 | for Betts'      |
-|                 |                 |                 | Hessian         |
-|                 |                 |                 | regularisation  |
-+-----------------+-----------------+-----------------+-----------------+
-| BettsPoint      | OT_REAL         | 1               | Smallest        |
-|                 |                 |                 | eigenvalue of   |
-|                 |                 |                 | the regularised |
-|                 |                 |                 | Hessian         |
-+-----------------+-----------------+-----------------+-----------------+
-| BoundTolFac     | OT_REAL         | 1000            | Factor in       |
-|                 |                 |                 | determining     |
-|                 |                 |                 | active          |
-|                 |                 |                 | constraints by  |
-|                 |                 |                 | KKT             |
-+-----------------+-----------------+-----------------+-----------------+
-| CheckFJ         | OT_REAL         | 1.000e+12       | Upper bound     |
-|                 |                 |                 | used by Fritz-  |
-|                 |                 |                 | John heuristic  |
-+-----------------+-----------------+-----------------+-----------------+
-| CheckStructureD | OT_BOOLEAN      | True            | Enable          |
-| F               |                 |                 | structural      |
-|                 |                 |                 | checking of DF  |
-+-----------------+-----------------+-----------------+-----------------+
-| CheckStructureD | OT_BOOLEAN      | True            | Enable          |
-| G               |                 |                 | structural      |
-|                 |                 |                 | checking of DG  |
-+-----------------+-----------------+-----------------+-----------------+
-| CheckStructureH | OT_BOOLEAN      | True            | Enable          |
-| M               |                 |                 | structural      |
-|                 |                 |                 | checking of HM  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepBettsSum | OT_REAL         | 0.500           | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepConStop  | OT_REAL         | 0.000           | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepConvio   | OT_REAL         | 1               | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepMaxIter  | OT_INTEGER      | 50              | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepMethod   | OT_INTEGER      | 0               | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepMode     | OT_INTEGER      | 1               | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepPFactor  | OT_REAL         | 1               | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepPMax     | OT_REAL         | 1000000         | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| CorStepRecovery | OT_BOOLEAN      | False           | (experimental)  |
-| DX              |                 |                 |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| CurvBCond       | OT_REAL         | 0.020           | Block BFGS      |
-|                 |                 |                 | curvature       |
-|                 |                 |                 | condition bound |
-+-----------------+-----------------+-----------------+-----------------+
-| CurvBFac        | OT_REAL         | 0.300           | Block BFGS      |
-|                 |                 |                 | curvature       |
-|                 |                 |                 | condition       |
-|                 |                 |                 | regularisation  |
-|                 |                 |                 | factor          |
-+-----------------+-----------------+-----------------+-----------------+
-| CurvCond        | OT_REAL         | 0.020           | BFGS Curvature  |
-|                 |                 |                 | condition bound |
-+-----------------+-----------------+-----------------+-----------------+
-| CurvFac         | OT_REAL         | 0.300           | BFGS curvature  |
-|                 |                 |                 | condition       |
-|                 |                 |                 | regularisation  |
-|                 |                 |                 | factor          |
-+-----------------+-----------------+-----------------+-----------------+
-| DebugMarker05   | OT_INTEGER      | 42              | Debug marker.   |
-|                 |                 |                 | Used to find    |
-|                 |                 |                 | memory alignmen |
-|                 |                 |                 | t/padding       |
-|                 |                 |                 | issues          |
-+-----------------+-----------------+-----------------+-----------------+
-| DebugMarker06   | OT_INTEGER      | 42              | Debug marker.   |
-|                 |                 |                 | Used to find    |
-|                 |                 |                 | memory alignmen |
-|                 |                 |                 | t/padding       |
-|                 |                 |                 | issues          |
-+-----------------+-----------------+-----------------+-----------------+
-| FGtogether      | OT_BOOLEAN      | False           | F and G cannot  |
-|                 |                 |                 | be evaluated    |
-|                 |                 |                 | separately      |
-+-----------------+-----------------+-----------------+-----------------+
-| FJandND         | OT_BOOLEAN      | False           | Enable Fritz-   |
-|                 |                 |                 | John and non-   |
-|                 |                 |                 | differentiable  |
-|                 |                 |                 | check           |
-|                 |                 |                 | heuristics      |
-+-----------------+-----------------+-----------------+-----------------+
-| FeasibleDual    | OT_BOOLEAN      | False           | Activate dual   |
-|                 |                 |                 | feasibility     |
-|                 |                 |                 | mode            |
-+-----------------+-----------------+-----------------+-----------------+
-| FeasibleInit    | OT_BOOLEAN      | False           | Activate        |
-|                 |                 |                 | initial         |
-|                 |                 |                 | feasibility     |
-|                 |                 |                 | mode            |
-+-----------------+-----------------+-----------------+-----------------+
-| FeasibleInitTol | OT_REAL         | 0.001           | Feasibility     |
-|                 |                 |                 | tolerance for   |
-|                 |                 |                 | no-objective    |
-|                 |                 |                 | feasible mode   |
-+-----------------+-----------------+-----------------+-----------------+
-| FeasibleOnly    | OT_BOOLEAN      | False           | Activate        |
-|                 |                 |                 | feasible-only   |
-|                 |                 |                 | mode            |
-+-----------------+-----------------+-----------------+-----------------+
-| FidifEps        | OT_REAL         | 0.000           | Finite          |
-|                 |                 |                 | difference      |
-|                 |                 |                 | perturbation    |
-+-----------------+-----------------+-----------------+-----------------+
-| FidifHM         | OT_BOOLEAN      | False           | Approximate     |
-|                 |                 |                 | Hessian by      |
-|                 |                 |                 | finite          |
-|                 |                 |                 | differences     |
-|                 |                 |                 | (otherwise      |
-|                 |                 |                 | BFGS)           |
-+-----------------+-----------------+-----------------+-----------------+
-| FilterBisecAlph | OT_BOOLEAN      | True            | Filter          |
-| a               |                 |                 | heuristic to    |
-|                 |                 |                 | save Armijo     |
-|                 |                 |                 | iterations      |
-+-----------------+-----------------+-----------------+-----------------+
-| FilterGammaCV   | OT_REAL         | 0.000           | Constraint      |
-|                 |                 |                 | violation       |
-|                 |                 |                 | decrease factor |
-|                 |                 |                 | in Filter       |
-|                 |                 |                 | acceptance      |
-|                 |                 |                 | check           |
-+-----------------+-----------------+-----------------+-----------------+
-| FilterGammaF    | OT_REAL         | 0.000           | Objective       |
-|                 |                 |                 | decrease factor |
-|                 |                 |                 | in Filter       |
-|                 |                 |                 | acceptance      |
-|                 |                 |                 | check           |
-+-----------------+-----------------+-----------------+-----------------+
-| FilterIntersecA | OT_BOOLEAN      | True            | Filter          |
-| lpha            |                 |                 | heuristic to    |
-|                 |                 |                 | save Armijo     |
-|                 |                 |                 | iterations      |
-+-----------------+-----------------+-----------------+-----------------+
-| FirstDifCentral | OT_BOOLEAN      | True            | Use central     |
-|                 |                 |                 | finite          |
-|                 |                 |                 | difference      |
-|                 |                 |                 | quotient for    |
-|                 |                 |                 | first           |
-|                 |                 |                 | derivatives     |
-+-----------------+-----------------+-----------------+-----------------+
-| FocusOnFeas     | OT_BOOLEAN      | True            | Enable Focus-   |
-|                 |                 |                 | on-Feasibility  |
-|                 |                 |                 | mode            |
-+-----------------+-----------------+-----------------+-----------------+
-| FocusOnFeasFact | OT_REAL         | 1.360           | Factor in       |
-| or              |                 |                 | Focus-on-       |
-|                 |                 |                 | Feasibility     |
-|                 |                 |                 | mode            |
-+-----------------+-----------------+-----------------+-----------------+
-| GammaAlpha      | OT_REAL         | 0.050           | Safety factor   |
-|                 |                 |                 | for alphamin    |
-|                 |                 |                 | calculation by  |
-|                 |                 |                 | Filter          |
-+-----------------+-----------------+-----------------+-----------------+
-| GroupMethod     | OT_INTEGER      | 1               | Select method   |
-|                 |                 |                 | to determine    |
-|                 |                 |                 | graph colouring |
-|                 |                 |                 | groups          |
-+-----------------+-----------------+-----------------+-----------------+
-| IgnoreFilterCri | OT_BOOLEAN      | False           | Activate        |
-| t               |                 |                 | accelerating    |
-|                 |                 |                 | heuristics for  |
-|                 |                 |                 | Filter          |
-+-----------------+-----------------+-----------------+-----------------+
-| IncBettsTau     | OT_REAL         | 2               | Increase factor |
-|                 |                 |                 | for Betts'      |
-|                 |                 |                 | update          |
-|                 |                 |                 | dampening term  |
-+-----------------+-----------------+-----------------+-----------------+
-| IncBettsTauMore | OT_REAL         | 100             | Larger increase |
-|                 |                 |                 | factor for      |
-|                 |                 |                 | Betts' update   |
-|                 |                 |                 | dampening term  |
-+-----------------+-----------------+-----------------+-----------------+
-| IncreaseIWS     | OT_REAL         | 1               | Increase factor |
-|                 |                 |                 | for estimated   |
-|                 |                 |                 | integer         |
-|                 |                 |                 | workspace       |
-|                 |                 |                 | requirement     |
-+-----------------+-----------------+-----------------+-----------------+
-| IncreaseRWS     | OT_REAL         | 1               | Increase factor |
-|                 |                 |                 | for estimated   |
-|                 |                 |                 | real workspace  |
-|                 |                 |                 | requirement     |
-+-----------------+-----------------+-----------------+-----------------+
-| Infty           | OT_REAL         | 1.000e+20       | Upper bound for |
-|                 |                 |                 | numbers to be   |
-|                 |                 |                 | regarded as     |
-|                 |                 |                 | finite          |
-+-----------------+-----------------+-----------------+-----------------+
-| InftyUnbounded  | OT_REAL         | 1.000e+20       | Tolerance for   |
-|                 |                 |                 | unboundedness   |
-|                 |                 |                 | detection       |
-|                 |                 |                 | heuristic       |
-+-----------------+-----------------+-----------------+-----------------+
-| InitialLMest    | OT_BOOLEAN      | True            | Enable initial  |
-|                 |                 |                 | Lagrange        |
-|                 |                 |                 | multiplier      |
-|                 |                 |                 | estimate        |
-+-----------------+-----------------+-----------------+-----------------+
-| KeepAcceptableS | OT_BOOLEAN      | True            | Save acceptable |
-| ol              |                 |                 | solutions as    |
-|                 |                 |                 | fallback        |
-+-----------------+-----------------+-----------------+-----------------+
-| LMestQPipComTol | OT_REAL         | 0.003           | IP              |
-|                 |                 |                 | complementarity |
-|                 |                 |                 | tolerance in    |
-|                 |                 |                 | initial         |
-|                 |                 |                 | multiplier      |
-|                 |                 |                 | estimate        |
-+-----------------+-----------------+-----------------+-----------------+
-| LMestQPipResTol | OT_REAL         | 1               | IP residual     |
-|                 |                 |                 | tolerance in    |
-|                 |                 |                 | initial         |
-|                 |                 |                 | multiplier      |
-|                 |                 |                 | estimate        |
-+-----------------+-----------------+-----------------+-----------------+
-| LinMult         | OT_BOOLEAN      | False           | Control         |
-|                 |                 |                 | Lagrange        |
-|                 |                 |                 | multiplier      |
-|                 |                 |                 | update          |
-+-----------------+-----------------+-----------------+-----------------+
-| LogLevel        | OT_INTEGER      | 0               | Enable XML      |
-|                 |                 |                 | logfiles and    |
-|                 |                 |                 | writing         |
-|                 |                 |                 | interval        |
-+-----------------+-----------------+-----------------+-----------------+
-| LogResult       | OT_INTEGER      | 0               | Enable XML      |
-|                 |                 |                 | result logging  |
-|                 |                 |                 | and detail      |
-|                 |                 |                 | level           |
-+-----------------+-----------------+-----------------+-----------------+
-| LowPassAlphaF   | OT_REAL         | 0.950           | Lowpass-filter  |
-|                 |                 |                 | update factor   |
-|                 |                 |                 | for objective   |
-|                 |                 |                 | values          |
-+-----------------+-----------------+-----------------+-----------------+
-| LowPassAlphaG   | OT_REAL         | 0.950           | Lowpass-filter  |
-|                 |                 |                 | update factor   |
-|                 |                 |                 | for constraint  |
-|                 |                 |                 | values          |
-+-----------------+-----------------+-----------------+-----------------+
-| LowPassAlphaMer | OT_REAL         | 0.100           | Lowpass-filter  |
-| it              |                 |                 | update factor   |
-|                 |                 |                 | for merit       |
-|                 |                 |                 | function values |
-+-----------------+-----------------+-----------------+-----------------+
-| LowPassFilter   | OT_BOOLEAN      | True            | Enable lowpass- |
-|                 |                 |                 | filter          |
-|                 |                 |                 | termination     |
-|                 |                 |                 | criterion       |
-+-----------------+-----------------+-----------------+-----------------+
-| MA97blas3       | OT_BOOLEAN      | False           | Use BLAS level  |
-|                 |                 |                 | 3 (dgemm) in    |
-|                 |                 |                 | MA97            |
-+-----------------+-----------------+-----------------+-----------------+
-| MA97mf          | OT_BOOLEAN      | False           | Use             |
-|                 |                 |                 | multifrontal-   |
-|                 |                 |                 | style forward   |
-|                 |                 |                 | solve of MA97   |
-+-----------------+-----------------+-----------------+-----------------+
-| MA97nemin       | OT_INTEGER      | 8               | Node            |
-|                 |                 |                 | amalgation,     |
-|                 |                 |                 | controls        |
-|                 |                 |                 | merging in      |
-|                 |                 |                 | elimination     |
-|                 |                 |                 | tree by MA97    |
-+-----------------+-----------------+-----------------+-----------------+
-| MA97ordering    | OT_INTEGER      | 5               | Ordering used   |
-|                 |                 |                 | by MA97         |
-+-----------------+-----------------+-----------------+-----------------+
-| MA97print       | OT_INTEGER      | -1              | Print level     |
-|                 |                 |                 | used by MA97    |
-+-----------------+-----------------+-----------------+-----------------+
-| MA97scaling     | OT_INTEGER      | 0               | Scaling used by |
-|                 |                 |                 | MA97            |
-+-----------------+-----------------+-----------------+-----------------+
-| MA97small       | OT_REAL         | 0.000           | Any pivot whose |
-|                 |                 |                 | modulus is less |
-|                 |                 |                 | than this is    |
-|                 |                 |                 | treated as zero |
-|                 |                 |                 | by MA97         |
-+-----------------+-----------------+-----------------+-----------------+
-| MA97u           | OT_REAL         | 0.010           | Relative pivot  |
-|                 |                 |                 | tolerance of    |
-|                 |                 |                 | MA97            |
-+-----------------+-----------------+-----------------+-----------------+
-| MatrixCC        | OT_BOOLEAN      | False           | Not to be       |
-|                 |                 |                 | included into a |
-|                 |                 |                 | parameter file! |
-+-----------------+-----------------+-----------------+-----------------+
-| MaxCalls        | OT_INTEGER      | 2.147e+09       | Upper bound to  |
-|                 |                 |                 | Reverse         |
-|                 |                 |                 | Communication   |
-|                 |                 |                 | calls           |
-+-----------------+-----------------+-----------------+-----------------+
-| MaxForce        | OT_INTEGER      | 1000            | Maximum number  |
-|                 |                 |                 | of Force        |
-|                 |                 |                 | recovery        |
-|                 |                 |                 | strategy steps  |
-+-----------------+-----------------+-----------------+-----------------+
-| MaxGPart        | OT_INTEGER      | 1               | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| MaxIter         | OT_INTEGER      | 500             | Upper bound on  |
-|                 |                 |                 | major           |
-|                 |                 |                 | iterations      |
-+-----------------+-----------------+-----------------+-----------------+
-| MaxLScounter    | OT_INTEGER      | 3               | Control         |
-|                 |                 |                 | activation of   |
-|                 |                 |                 | Filter          |
-|                 |                 |                 | acceleration    |
-|                 |                 |                 | heuristics      |
-+-----------------+-----------------+-----------------+-----------------+
-| MaxNorm         | OT_BOOLEAN      | True            | Select max-norm |
-|                 |                 |                 | instead of      |
-|                 |                 |                 | 1-norm in       |
-|                 |                 |                 | Filter          |
-+-----------------+-----------------+-----------------+-----------------+
-| MeritFunction   | OT_INTEGER      | 4               | Select merit    |
-|                 |                 |                 | function and    |
-|                 |                 |                 | penalty update  |
-|                 |                 |                 | [0, 3..5]       |
-+-----------------+-----------------+-----------------+-----------------+
-| MeritGradTol    | OT_REAL         | 0.000           | Threshold of    |
-|                 |                 |                 | meritfunction   |
-|                 |                 |                 | gradient for    |
-|                 |                 |                 | increasing      |
-|                 |                 |                 | Hessian         |
-|                 |                 |                 | regularisation  |
-+-----------------+-----------------+-----------------+-----------------+
-| MinBettsTau     | OT_REAL         | 0.000           | Lower bound for |
-|                 |                 |                 | Betts' update   |
-|                 |                 |                 | dampening term  |
-+-----------------+-----------------+-----------------+-----------------+
-| MoreRelax       | OT_BOOLEAN      | False           | Introduce one   |
-|                 |                 |                 | relaxation      |
-|                 |                 |                 | variable for    |
-|                 |                 |                 | every           |
-|                 |                 |                 | constraint      |
-+-----------------+-----------------+-----------------+-----------------+
-| NLPmethod       | OT_INTEGER      | 1               | Select (1)      |
-|                 |                 |                 | Meritfunction   |
-|                 |                 |                 | or (3) Filter   |
-|                 |                 |                 | globalisation   |
-+-----------------+-----------------+-----------------+-----------------+
-| NLPprint        | OT_INTEGER      | 2               | NLP print level |
-|                 |                 |                 | [-1..4]         |
-+-----------------+-----------------+-----------------+-----------------+
-| PairMethod      | OT_INTEGER      | 1               | Select method   |
-|                 |                 |                 | to determine    |
-|                 |                 |                 | graph colouring |
-|                 |                 |                 | pairgroups      |
-+-----------------+-----------------+-----------------+-----------------+
-| PenUpdEpsBar    | OT_REAL         | 0.900           | Penalty update  |
-|                 |                 |                 | parameter       |
-|                 |                 |                 | factor for      |
-|                 |                 |                 | MeritFunction = |
-|                 |                 |                 | 3               |
-+-----------------+-----------------+-----------------+-----------------+
-| PenUpdEpsKFac   | OT_REAL         | 2               | Penalty update  |
-|                 |                 |                 | parameter       |
-|                 |                 |                 | factor for      |
-|                 |                 |                 | MeritFunction = |
-|                 |                 |                 | 4               |
-+-----------------+-----------------+-----------------+-----------------+
-| PenUpdEpsKSeque | OT_INTEGER      | 2               | Penalty update  |
-| nce             |                 |                 | parameter       |
-+-----------------+-----------------+-----------------+-----------------+
-| PenUpdMaxDeltaK | OT_REAL         | 11              | Max penalty for |
-|                 |                 |                 | MeritFunction = |
-|                 |                 |                 | 4               |
-+-----------------+-----------------+-----------------+-----------------+
-| PenUpdMaxFac    | OT_REAL         | 100000000       | Max factor for  |
-|                 |                 |                 | increasing      |
-|                 |                 |                 | penalty for     |
-|                 |                 |                 | MeritFunction = |
-|                 |                 |                 | 4               |
-+-----------------+-----------------+-----------------+-----------------+
-| PenUpdRBar      | OT_REAL         | 2               | Penalty update  |
-|                 |                 |                 | parameter for   |
-|                 |                 |                 | MeritFunction = |
-|                 |                 |                 | 3               |
-+-----------------+-----------------+-----------------+-----------------+
-| PrecisionF      | OT_REAL         | 0.000           | (currently      |
-|                 |                 |                 | unused)         |
-|                 |                 |                 | Relative        |
-|                 |                 |                 | precision of    |
-|                 |                 |                 | objective       |
-+-----------------+-----------------+-----------------+-----------------+
-| PrecisionG      | OT_REAL         | 0.000           | (currently      |
-|                 |                 |                 | unused)         |
-|                 |                 |                 | Relative        |
-|                 |                 |                 | precision of    |
-|                 |                 |                 | constraints     |
-+-----------------+-----------------+-----------------+-----------------+
-| QPscaleParam    | OT_REAL         | 0               | (currently      |
-|                 |                 |                 | unused) Scaling |
-|                 |                 |                 | factor for QP   |
-+-----------------+-----------------+-----------------+-----------------+
-| QuadraticProble | OT_BOOLEAN      | False           | Not to be       |
-| m               |                 |                 | included into a |
-|                 |                 |                 | parameter file! |
-+-----------------+-----------------+-----------------+-----------------+
-| ReduceBettsTau  | OT_REAL         | 0.300           | Decrease factor |
-|                 |                 |                 | for Betts'      |
-|                 |                 |                 | update          |
-|                 |                 |                 | dampening term  |
-+-----------------+-----------------+-----------------+-----------------+
-| RefineFeasibili | OT_INTEGER      | 0               | 0 -             |
-| ty              |                 |                 | Deactivated, 1  |
-|                 |                 |                 | - After first   |
-|                 |                 |                 | feasible        |
-|                 |                 |                 | iterate, 2 -    |
-|                 |                 |                 | Always on,      |
-|                 |                 |                 | Activates       |
-|                 |                 |                 | iterative       |
-|                 |                 |                 | refinement due  |
-|                 |                 |                 | to perturbation |
-|                 |                 |                 | in constraints  |
-|                 |                 |                 | using           |
-|                 |                 |                 | parametric      |
-|                 |                 |                 | sensitivities   |
-+-----------------+-----------------+-----------------+-----------------+
-| RefineMaxHMReg  | OT_REAL         | 1000            | Maximum allowed |
-|                 |                 |                 | regularisation  |
-|                 |                 |                 | of the hessian  |
-|                 |                 |                 | CAUTION         |
-|                 |                 |                 | absolute value  |
-+-----------------+-----------------+-----------------+-----------------+
-| RefineMaxRelax  | OT_REAL         | 0.750           | Maximum allowed |
-|                 |                 |                 | relaxation to   |
-|                 |                 |                 | apply           |
-|                 |                 |                 | feasibility     |
-|                 |                 |                 | refinement      |
-+-----------------+-----------------+-----------------+-----------------+
-| RefineOnlyOnAlp | OT_BOOLEAN      | True            | Activates new   |
-| ha              |                 |                 | iterative       |
-|                 |                 |                 | refinement of   |
-|                 |                 |                 | constraints     |
-|                 |                 |                 | only when       |
-|                 |                 |                 | Armijo alpha    |
-|                 |                 |                 | equals one      |
-+-----------------+-----------------+-----------------+-----------------+
-| RefineStartTol  | OT_REAL         | 0.000           | Start tolerance |
-|                 |                 |                 | for successful  |
-|                 |                 |                 | termination of  |
-|                 |                 |                 | iterative       |
-|                 |                 |                 | refinement due  |
-|                 |                 |                 | to perturbation |
-|                 |                 |                 | in constraints  |
-+-----------------+-----------------+-----------------+-----------------+
-| RegStrategy     | OT_INTEGER      | 1               | Select Hessian  |
-|                 |                 |                 | regularisation  |
-|                 |                 |                 | strategy in     |
-|                 |                 |                 | Filter          |
-+-----------------+-----------------+-----------------+-----------------+
-| ReinitFilter    | OT_BOOLEAN      | False           | Enables Filter- |
-|                 |                 |                 | reinitialisatio |
-|                 |                 |                 | n accelerating  |
-|                 |                 |                 | heuristic       |
-+-----------------+-----------------+-----------------+-----------------+
-| RelaxMaxDelta   | OT_REAL         | 0.920           | Upper bound for |
-|                 |                 |                 | accepting the   |
-|                 |                 |                 | constraint      |
-|                 |                 |                 | relaxation      |
-|                 |                 |                 | variable        |
-+-----------------+-----------------+-----------------+-----------------+
-| RelaxMaxPen     | OT_REAL         | 50000000        | Upper bound on  |
-|                 |                 |                 | the constraint  |
-|                 |                 |                 | relaxation      |
-|                 |                 |                 | penalty         |
-+-----------------+-----------------+-----------------+-----------------+
-| RelaxRho        | OT_REAL         | 6               | Update factor   |
-|                 |                 |                 | for the         |
-|                 |                 |                 | constraint      |
-|                 |                 |                 | relaxation      |
-|                 |                 |                 | penalty         |
-+-----------------+-----------------+-----------------+-----------------+
-| RelaxStart      | OT_REAL         | 1               | Initial value   |
-|                 |                 |                 | of the          |
-|                 |                 |                 | constraint      |
-|                 |                 |                 | relaxation      |
-|                 |                 |                 | penalty         |
-+-----------------+-----------------+-----------------+-----------------+
-| RestUntilFeas   | OT_BOOLEAN      | False           | Do restoration  |
-|                 |                 |                 | until a         |
-|                 |                 |                 | feasible        |
-|                 |                 |                 | solution is     |
-|                 |                 |                 | found           |
-+-----------------+-----------------+-----------------+-----------------+
-| ScaleConIter    | OT_BOOLEAN      | False           | Scale           |
-|                 |                 |                 | constraints in  |
-|                 |                 |                 | every iteration |
-+-----------------+-----------------+-----------------+-----------------+
-| ScaleFacObj     | OT_REAL         | 10              | Value to scale  |
-|                 |                 |                 | large objective |
-|                 |                 |                 | functions to    |
-+-----------------+-----------------+-----------------+-----------------+
-| ScaleFacQP      | OT_REAL         | 10              | Upper bound on  |
-|                 |                 |                 | resulting       |
-|                 |                 |                 | matrix norm for |
-|                 |                 |                 | QP scaling      |
-+-----------------+-----------------+-----------------+-----------------+
-| ScaledFD        | OT_BOOLEAN      | True            | Use a scaled    |
-|                 |                 |                 | perturbation    |
-|                 |                 |                 | for finite      |
-|                 |                 |                 | differences     |
-+-----------------+-----------------+-----------------+-----------------+
-| ScaledKKT       | OT_BOOLEAN      | True            | Scale KKT       |
-|                 |                 |                 | conditions      |
-+-----------------+-----------------+-----------------+-----------------+
-| ScaledObj       | OT_BOOLEAN      | True            | Scale the       |
-|                 |                 |                 | objective       |
-|                 |                 |                 | function        |
-+-----------------+-----------------+-----------------+-----------------+
-| ScaledQP        | OT_BOOLEAN      | True            | Scale some      |
-|                 |                 |                 | matrices handed |
-|                 |                 |                 | to the QP       |
-+-----------------+-----------------+-----------------+-----------------+
-| StartBettsTau   | OT_REAL         | 0.100           | Initial value   |
-|                 |                 |                 | for Betts'      |
-|                 |                 |                 | update          |
-|                 |                 |                 | dampening term  |
-+-----------------+-----------------+-----------------+-----------------+
-| SteffensenOnRef | OT_BOOLEAN      | False           | Use Steffensen  |
-| ine             |                 |                 | Extrapolation   |
-|                 |                 |                 | during          |
-|                 |                 |                 | Feasibility     |
-|                 |                 |                 | Refinement      |
-+-----------------+-----------------+-----------------+-----------------+
-| SwitchingDelta  | OT_REAL         | 0.010           | Filter          |
-|                 |                 |                 | switching       |
-|                 |                 |                 | condition       |
-|                 |                 |                 | parameter       |
-+-----------------+-----------------+-----------------+-----------------+
-| SwitchingSCV    | OT_REAL         | 1.100           | Filter          |
-|                 |                 |                 | switching       |
-|                 |                 |                 | condition       |
-|                 |                 |                 | parameter       |
-+-----------------+-----------------+-----------------+-----------------+
-| SwitchingSF     | OT_REAL         | 2.300           | Filter          |
-|                 |                 |                 | switching       |
-|                 |                 |                 | condition       |
-|                 |                 |                 | parameter       |
-+-----------------+-----------------+-----------------+-----------------+
-| TakeQPSol       | OT_BOOLEAN      | False           | Evaluate QP     |
-|                 |                 |                 | search          |
-|                 |                 |                 | direction       |
-|                 |                 |                 | regardless of   |
-|                 |                 |                 | convergence     |
-+-----------------+-----------------+-----------------+-----------------+
-| Timeout         | OT_REAL         | 300             | Timeout in      |
-|                 |                 |                 | seconds         |
-+-----------------+-----------------+-----------------+-----------------+
-| TolComp         | OT_REAL         | 0.001           | Complementarity |
-|                 |                 |                 | tolerance       |
-+-----------------+-----------------+-----------------+-----------------+
-| TolFeas         | OT_REAL         | 0.000           | Feasibility     |
-|                 |                 |                 | tolerance       |
-+-----------------+-----------------+-----------------+-----------------+
-| TolOpti         | OT_REAL         | 0.000           | Optimality      |
-|                 |                 |                 | tolerance       |
-+-----------------+-----------------+-----------------+-----------------+
-| TolWeakActive   | OT_REAL         | 1               | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| TooBig          | OT_BOOLEAN      | True            | Enable too-big  |
-|                 |                 |                 | termination     |
-|                 |                 |                 | heuristics      |
-+-----------------+-----------------+-----------------+-----------------+
-| TooBigCV        | OT_REAL         | 1.000e+25       | Upper bound on  |
-|                 |                 |                 | constraint      |
-|                 |                 |                 | violation for   |
-|                 |                 |                 | too-big         |
-|                 |                 |                 | heuristic       |
-+-----------------+-----------------+-----------------+-----------------+
-| TooBigKKT       | OT_REAL         | 1.000e+30       | Upper bound on  |
-|                 |                 |                 | KKT values for  |
-|                 |                 |                 | too-big         |
-|                 |                 |                 | heuristic       |
-+-----------------+-----------------+-----------------+-----------------+
-| UpdateMu        | OT_BOOLEAN      | True            | Activates       |
-|                 |                 |                 | update of       |
-|                 |                 |                 | lagrange        |
-|                 |                 |                 | multipliers     |
-|                 |                 |                 | during          |
-|                 |                 |                 | correction step |
-+-----------------+-----------------+-----------------+-----------------+
-| UseZen          | OT_BOOLEAN      | False           | Run Zen module  |
-|                 |                 |                 | after           |
-|                 |                 |                 | successful      |
-|                 |                 |                 | termination     |
-+-----------------+-----------------+-----------------+-----------------+
-| UserDF          | OT_BOOLEAN      | True            | Objective       |
-|                 |                 |                 | gradient values |
-|                 |                 |                 | supplied by     |
-|                 |                 |                 | caller          |
-+-----------------+-----------------+-----------------+-----------------+
-| UserDG          | OT_BOOLEAN      | True            | Jacobian values |
-|                 |                 |                 | supplied by     |
-|                 |                 |                 | caller          |
-+-----------------+-----------------+-----------------+-----------------+
-| UserHM          | OT_BOOLEAN      | True            | Hessian values  |
-|                 |                 |                 | supplied by     |
-|                 |                 |                 | caller          |
-+-----------------+-----------------+-----------------+-----------------+
-| UserHMstructure | OT_INTEGER      | 2               | Enable          |
-|                 |                 |                 | automatic       |
-|                 |                 |                 | Hessian         |
-|                 |                 |                 | structure       |
-|                 |                 |                 | generation or   |
-|                 |                 |                 | checking        |
-+-----------------+-----------------+-----------------+-----------------+
-| UserZenDGp      | OT_BOOLEAN      | False           | Hessian values  |
-|                 |                 |                 | supplied by     |
-|                 |                 |                 | caller          |
-+-----------------+-----------------+-----------------+-----------------+
-| UserZenDLp      | OT_BOOLEAN      | False           | Gradient values |
-|                 |                 |                 | supplied by     |
-|                 |                 |                 | caller          |
-+-----------------+-----------------+-----------------+-----------------+
-| UserZenDLpp     | OT_BOOLEAN      | False           | Hessian values  |
-|                 |                 |                 | supplied by     |
-|                 |                 |                 | caller          |
-+-----------------+-----------------+-----------------+-----------------+
-| UserZenDLxp     | OT_BOOLEAN      | False           | Hessian values  |
-|                 |                 |                 | supplied by     |
-|                 |                 |                 | caller          |
-+-----------------+-----------------+-----------------+-----------------+
-| WeakActiveSet   | OT_BOOLEAN      | False           | (experimental)  |
-+-----------------+-----------------+-----------------+-----------------+
-| ZenCheckMaxPert | OT_BOOLEAN      | False           | Check maximum   |
-|                 |                 |                 | of secure       |
-|                 |                 |                 | perturbation    |
-|                 |                 |                 | when updating   |
-|                 |                 |                 | solution        |
-+-----------------+-----------------+-----------------+-----------------+
-| ZenFDnewMethod  | OT_BOOLEAN      | True            |                 |
-+-----------------+-----------------+-----------------+-----------------+
-| ZenRenewLU      | OT_BOOLEAN      | False           | false: use LU   |
-|                 |                 |                 | from last QP    |
-|                 |                 |                 | step; true:     |
-|                 |                 |                 | renew LU        |
-|                 |                 |                 | decomposition.  |
-+-----------------+-----------------+-----------------+-----------------+
-| eps             | OT_REAL         | 0.000           | Machine epsilon |
-+-----------------+-----------------+-----------------+-----------------+
-| internalParChan | OT_INTEGER      | 0               | Counter for     |
-| ged             |                 |                 | changed         |
-|                 |                 |                 | parameters.     |
-|                 |                 |                 | Internal use    |
-|                 |                 |                 | only.           |
-+-----------------+-----------------+-----------------+-----------------+
-| print_time      | OT_BOOLEAN      | True            | Print           |
+| print_time      | OT_BOOLEAN      | true            | Print           |
 |                 |                 |                 | information     |
 |                 |                 |                 | about execution |
 |                 |                 |                 | time            |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipBarrier    | OT_REAL         | 7.800           | IP barrier      |
-|                 |                 |                 | parameter.      |
+| qp_ipBarrier    | OT_REAL         | worhp_p_.qp.ipB | IP barrier      |
+|                 |                 | arrier          | parameter.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipComTol     | OT_REAL         | 0.000           | IP              |
-|                 |                 |                 | complementarity |
+| qp_ipComTol     | OT_REAL         | worhp_p_.qp.ipC | IP              |
+|                 |                 | omTol           | complementarity |
 |                 |                 |                 | tolerance.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipFracBound  | OT_REAL         | 0.880           | IP fraction-to- |
-|                 |                 |                 | the-boundary    |
+| qp_ipFracBound  | OT_REAL         | worhp_p_.qp.ipF | IP fraction-to- |
+|                 |                 | racBound        | the-boundary    |
 |                 |                 |                 | parameter.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipLsMethod   | OT_STRING       | None            | Select the      |
+| qp_ipLsMethod   | OT_STRING       | GenericType()   | Select the      |
 |                 |                 |                 | direct linear   |
 |                 |                 |                 | solver used by  |
 |                 |                 |                 | the IP method.  |
+|                 |                 |                 | (LAPACK::0|MA57 |
+|                 |                 |                 | : only          |
+|                 |                 |                 | available if    |
+|                 |                 |                 | provided by the |
+|                 |                 |                 | user:1|SuperLU: |
+|                 |                 |                 | :2|PARDISO:     |
+|                 |                 |                 | only available  |
+|                 |                 |                 | if provided by  |
+|                 |                 |                 | the user,       |
+|                 |                 |                 | subject to      |
+|                 |                 |                 | license availab |
+|                 |                 |                 | ility:3|MUMPS:  |
+|                 |                 |                 | currently Linux |
+|                 |                 |                 | platforms       |
+|                 |                 |                 | only:5|WSMP:    |
+|                 |                 |                 | subject to      |
+|                 |                 |                 | license availab |
+|                 |                 |                 | ility:6|MA86:   |
+|                 |                 |                 | experimental,   |
+|                 |                 |                 | only available  |
+|                 |                 |                 | if provided by  |
+|                 |                 |                 | the user:7|MA97 |
+|                 |                 |                 | :experimental,  |
+|                 |                 |                 | only available  |
+|                 |                 |                 | if provided by  |
+|                 |                 |                 | the user:8)     |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipMinAlpha   | OT_REAL         | 0.000           | IP line search  |
-|                 |                 |                 | minimum step    |
+| qp_ipMinAlpha   | OT_REAL         | worhp_p_.qp.ipM | IP line search  |
+|                 |                 | inAlpha         | minimum step    |
 |                 |                 |                 | size.           |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipRelaxDiv   | OT_REAL         | 2               | The relaxation  |
-|                 |                 |                 | term is divided |
+| qp_ipRelaxDiv   | OT_REAL         | worhp_p_.qp.ipR | The relaxation  |
+|                 |                 | elaxDiv         | term is divided |
 |                 |                 |                 | by this value   |
 |                 |                 |                 | if successful.  |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipRelaxMax   | OT_REAL         | 0.000           | Maximum         |
-|                 |                 |                 | relaxation      |
+| qp_ipRelaxMax   | OT_REAL         | worhp_p_.qp.ipR | Maximum         |
+|                 |                 | elaxMax         | relaxation      |
 |                 |                 |                 | value.          |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipRelaxMin   | OT_REAL         | 0.000           | Mimimum         |
-|                 |                 |                 | relaxation      |
+| qp_ipRelaxMin   | OT_REAL         | worhp_p_.qp.ipR | Mimimum         |
+|                 |                 | elaxMin         | relaxation      |
 |                 |                 |                 | value.          |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipRelaxMult  | OT_REAL         | 10              | The relaxation  |
-|                 |                 |                 | term is         |
+| qp_ipRelaxMult  | OT_REAL         | worhp_p_.qp.ipR | The relaxation  |
+|                 |                 | elaxMult        | term is         |
 |                 |                 |                 | multiplied by   |
 |                 |                 |                 | this value if   |
 |                 |                 |                 | unsuccessful.   |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipResTol     | OT_REAL         | 0.000           | IP residuals    |
-|                 |                 |                 | tolerance.      |
+| qp_ipResTol     | OT_REAL         | worhp_p_.qp.ipR | IP residuals    |
+|                 |                 | esTol           | tolerance.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_ipTryRelax   | OT_BOOLEAN      | True            | Enable          |
-|                 |                 |                 | relaxation      |
+| qp_ipTryRelax   | OT_BOOLEAN      | worhp_p_.qp.ipT | Enable          |
+|                 |                 | ryRelax         | relaxation      |
 |                 |                 |                 | strategy when   |
 |                 |                 |                 | encountering an |
 |                 |                 |                 | error.          |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsItMaxIter  | OT_INTEGER      | 1000            | Maximum number  |
-|                 |                 |                 | of iterations   |
+| qp_lsItMaxIter  | OT_INTEGER      | worhp_p_.qp.lsI | Maximum number  |
+|                 |                 | tMaxIter        | of iterations   |
 |                 |                 |                 | of the          |
 |                 |                 |                 | iterative       |
 |                 |                 |                 | linear solvers. |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsItMethod   | OT_STRING       | None            | Select the      |
+| qp_lsItMethod   | OT_STRING       | GenericType()   | Select the      |
 |                 |                 |                 | iterative       |
 |                 |                 |                 | linear solver.  |
+|                 |                 |                 | (none:Deactivat |
+|                 |                 |                 | e; use a direct |
+|                 |                 |                 | linear solver.: |
+|                 |                 |                 | 0|CGNR::1|CGNE: |
+|                 |                 |                 | :2|CGS::3|BiCGS |
+|                 |                 |                 | TAB::4)         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsItPrecondM | OT_STRING       | None            | Select          |
+| qp_lsItPrecondM | OT_STRING       | GenericType()   | Select          |
 | ethod           |                 |                 | preconditioner  |
 |                 |                 |                 | for the         |
 |                 |                 |                 | iterative       |
 |                 |                 |                 | linear solver.  |
+|                 |                 |                 | (none:No precon |
+|                 |                 |                 | ditioner.:0|sta |
+|                 |                 |                 | tic:Static      |
+|                 |                 |                 | preconditioner  |
+|                 |                 |                 | (KKT-matrix     |
+|                 |                 |                 | with constant   |
+|                 |                 |                 | lower-right blo |
+|                 |                 |                 | ck).:1|full:Ful |
+|                 |                 |                 | l KKT-          |
+|                 |                 |                 | matrix.:2)      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsRefineMaxI | OT_INTEGER      | 10              | Maximum number  |
-| ter             |                 |                 | of iterative    |
+| qp_lsRefineMaxI | OT_INTEGER      | worhp_p_.qp.lsR | Maximum number  |
+| ter             |                 | efineMaxIter    | of iterative    |
 |                 |                 |                 | refinement      |
 |                 |                 |                 | steps of the    |
 |                 |                 |                 | direct linear   |
 |                 |                 |                 | solvers.        |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsScale      | OT_BOOLEAN      | True            | Enables scaling |
-|                 |                 |                 | on linear       |
+| qp_lsScale      | OT_BOOLEAN      | worhp_p_.qp.lsS | Enables scaling |
+|                 |                 | cale            | on linear       |
 |                 |                 |                 | solver level.   |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsTol        | OT_REAL         | 0.000           | Tolerance for   |
-|                 |                 |                 | the linear      |
+| qp_lsTol        | OT_REAL         | worhp_p_.qp.lsT | Tolerance for   |
+|                 |                 | ol              | the linear      |
 |                 |                 |                 | solver.         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_lsTrySimple  | OT_BOOLEAN      | False           | Some matrices   |
-|                 |                 |                 | can be solved   |
+| qp_lsTrySimple  | OT_BOOLEAN      | worhp_p_.qp.lsT | Some matrices   |
+|                 |                 | rySimple        | can be solved   |
 |                 |                 |                 | without calling |
 |                 |                 |                 | a linear        |
 |                 |                 |                 | equation solver |
@@ -42703,8 +42658,8 @@ WORHP interface
 |                 |                 |                 | linear equation |
 |                 |                 |                 | solver.         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_maxIter      | OT_INTEGER      | 80              | Imposes an      |
-|                 |                 |                 | upper limit on  |
+| qp_maxIter      | OT_INTEGER      | worhp_p_.qp.max | Imposes an      |
+|                 |                 | Iter            | upper limit on  |
 |                 |                 |                 | the number of   |
 |                 |                 |                 | minor solver    |
 |                 |                 |                 | iterations,     |
@@ -42723,44 +42678,64 @@ WORHP interface
 |                 |                 |                 | solver          |
 |                 |                 |                 | breakdown.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_method       | OT_STRING       | None            | Select the      |
+| qp_method       | OT_STRING       | GenericType()   | Select the      |
 |                 |                 |                 | solution method |
 |                 |                 |                 | used by the QP  |
-|                 |                 |                 | solver.         |
+|                 |                 |                 | solver. (ip     |
+|                 |                 |                 | :Interior-Point |
+|                 |                 |                 | method.:1|nsn   |
+|                 |                 |                 | :Nonsmooth-     |
+|                 |                 |                 | Newton method.: |
+|                 |                 |                 | 2|automatic:    |
+|                 |                 |                 | Prefer IP and   |
+|                 |                 |                 | fall back to    |
+|                 |                 |                 | NSN on          |
+|                 |                 |                 | error.:12)      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnBeta      | OT_REAL         | 0.900           | NSN stepsize    |
-|                 |                 |                 | decrease        |
+| qp_nsnBeta      | OT_REAL         | worhp_p_.qp.nsn | NSN stepsize    |
+|                 |                 | Beta            | decrease        |
 |                 |                 |                 | factor.         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnGradStep  | OT_BOOLEAN      | True            | Enable gradient |
-|                 |                 |                 | steps in the    |
+| qp_nsnGradStep  | OT_BOOLEAN      | worhp_p_.qp.nsn | Enable gradient |
+|                 |                 | GradStep        | steps in the    |
 |                 |                 |                 | NSN method.     |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnKKT       | OT_REAL         | 0.000           | NSN KKT         |
-|                 |                 |                 | tolerance.      |
+| qp_nsnKKT       | OT_REAL         | worhp_p_.qp.nsn | NSN KKT         |
+|                 |                 | KKT             | tolerance.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnLsMethod  | OT_STRING       | None            | Select the      |
+| qp_nsnLsMethod  | OT_STRING       | GenericType()   | Select the      |
 |                 |                 |                 | direct linear   |
 |                 |                 |                 | solver used by  |
 |                 |                 |                 | the NSN method. |
+|                 |                 |                 | (SuperLU::2|MA4 |
+|                 |                 |                 | 8: only         |
+|                 |                 |                 | available if    |
+|                 |                 |                 | provided by the |
+|                 |                 |                 | user:4)         |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnMinAlpha  | OT_REAL         | 0.000           | NSN line search |
-|                 |                 |                 | minimum step    |
+| qp_nsnMinAlpha  | OT_REAL         | worhp_p_.qp.nsn | NSN line search |
+|                 |                 | MinAlpha        | minimum step    |
 |                 |                 |                 | size.           |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_nsnSigma     | OT_REAL         | 0.010           | NSN line search |
-|                 |                 |                 | slope           |
+| qp_nsnSigma     | OT_REAL         | worhp_p_.qp.nsn | NSN line search |
+|                 |                 | Sigma           | slope           |
 |                 |                 |                 | parameter.      |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_printLevel   | OT_STRING       | None            | Controls the    |
+| qp_printLevel   | OT_STRING       | GenericType()   | Controls the    |
 |                 |                 |                 | amount of QP    |
 |                 |                 |                 | solver output.  |
+|                 |                 |                 | (none:No output |
+|                 |                 |                 | .:0|warn:Print  |
+|                 |                 |                 | warnings and er |
+|                 |                 |                 | rors.:1|iterati |
+|                 |                 |                 | ons:Print       |
+|                 |                 |                 | iterations.:2)  |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_scaleIntern  | OT_BOOLEAN      | False           | Enable scaling  |
-|                 |                 |                 | on QP level.    |
+| qp_scaleIntern  | OT_BOOLEAN      | worhp_p_.qp.sca | Enable scaling  |
+|                 |                 | leIntern        | on QP level.    |
 +-----------------+-----------------+-----------------+-----------------+
-| qp_strict       | OT_BOOLEAN      | True            | Use strict      |
-|                 |                 |                 | termination     |
+| qp_strict       | OT_BOOLEAN      | worhp_p_.qp.str | Use strict      |
+|                 |                 | ict             | termination     |
 |                 |                 |                 | criteria in IP  |
 |                 |                 |                 | method.         |
 +-----------------+-----------------+-----------------+-----------------+
@@ -44264,6 +44239,13 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::callReverse(const std::vector< MX >
 &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
 &aseed, std::vector< std::vector< MX > > &output_asens, bool
@@ -45017,6 +44999,26 @@ basis Joris Gillis
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -45748,6 +45750,9 @@ Return a string with a description (for SWIG)
 // File: classcasadi_1_1Project.xml
 
 
+// File: classcasadi_1_1PureMap.xml
+
+
 // File: classcasadi_1_1QcqpSolver.xml
 
 
@@ -46067,6 +46072,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -47239,6 +47264,13 @@ ownership, only weak references to the derivatives are kept internally.
 &mon) "
 
 Remove modules to be monitored.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -48537,6 +48569,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -48983,6 +49035,13 @@ Make unique.
 
 If there are other references to the object, then make a deep copy of it and
 point to this new object
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -50095,6 +50154,13 @@ Remove modules to be monitored.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::Function::numelIn() const  "
 
 Get total number of elements in all of the matrix-valued inputs.
@@ -50515,6 +50581,26 @@ General information
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -52023,6 +52109,26 @@ General information
 |              |              |              | the          | al           |
 |              |              |              | SDPSOlver    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -52784,6 +52890,13 @@ time. * (n_in = nIn(), n_out = nOut())
 The functions returned are cached, meaning that if called multiple timed
 with the same value, then multiple references to the same function will be
 returned.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -54138,6 +54251,26 @@ Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -54741,6 +54874,13 @@ propagating_sparsity.cpp)
 std::string &str) const  "
 
 Get the default of a certain option.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -56660,6 +56800,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -58130,6 +58290,13 @@ Evaluate.
 
 ";
 
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
+
+";
+
 %feature("docstring")  casadi::SharedObject::makeUnique(bool
 clone_members=true) "
 
@@ -59248,14 +59415,10 @@ the spy command.
 ";
 
 %feature("docstring")  casadi::Sparsity::starColoring(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  "
+cutoff=std::numeric_limits< int >::max(), int mode=1, int threshold=-1)
+const  "
 
-Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring
-algorithm Algorithm 4.1 in What Color Is Your Jacobian? Graph Coloring for
-Computing Derivatives A. H. GEBREMEDHIN, F. MANNE, A. POTHEN SIAM Rev.,
-47(4), 629705 (2006)
-
-Ordering options: None (0), largest first (1)
+Perform a star coloring of a symmetric matrix.
 
 ";
 
@@ -59314,6 +59477,20 @@ WITH APPLICATION TO COMPUTING HESSIANS A. H. GEBREMEDHIN, A. TARAFDAR, F.
 MANNE, A. POTHEN SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 10421072 (2007)
 
 Ordering options: None (0), largest first (1)
+
+";
+
+%feature("docstring")  casadi::Sparsity::starColoring1(int ordering=1, int
+cutoff=std::numeric_limits< int >::max()) const  "
+
+Perform a star coloring of a symmetric matrix: A greedy distance-3 coloring
+algorithm Algorithm 4.1 in What Color Is Your Jacobian? Graph Coloring for
+Computing Derivatives A. H. GEBREMEDHIN, F. MANNE, A. POTHEN SIAM Rev.,
+47(4), 629705 (2006)
+
+Ordering options: None (0), largest first (1)
+
+S = H.starColoring()
 
 ";
 
@@ -59609,6 +59786,39 @@ is equivalent to: Z+mul(X,Y).project(Z.sparsity()).
 
 ";
 
+%feature("docstring")  horzsplit2(const MatType &v, int loc) "
+
+split horizontally in two (possibly unequal) parts
+
+Parameters:
+-----------
+
+loc:  Where the splitting should occur
+
+
+
+::
+
+  >>> a,b = horzsplit2(DMatrix.ones(2, 10), 4)
+  >>> print a.shape, b.shape
+  (2, 4) (2, 6)
+  
+
+
+
+
+
+::
+
+  >>> a,b = horzsplit2(DMatrix.ones(2, 10), -3)
+  >>> print a.shape, b.shape
+  (2, 7) (2, 3)
+  
+
+
+
+";
+
 %feature("docstring")  transpose(const MatType &X) "
 
 Transpose.
@@ -59719,6 +59929,39 @@ concatenate vertically while vectorizing all arguments with vec
 
 ";
 
+%feature("docstring")  vertsplit2(const MatType &v, int loc) "
+
+split vertically in two (possibly unequal) parts
+
+Parameters:
+-----------
+
+loc:  Where the splitting should occur
+
+
+
+::
+
+  >>> a,b = vertsplit2(DMatrix.ones(10, 2), 4)
+  >>> print a.shape, b.shape
+  (4, 2) (6, 2)
+  
+
+
+
+
+
+::
+
+  >>> a,b = vertsplit2(DMatrix.ones(10, 2), -3)
+  >>> print a.shape, b.shape
+  (7, 2) (3, 2)
+  
+
+
+
+";
+
 %feature("docstring")  blocksplit(const MatType &x, const std::vector< int >
 &vert_offset, const std::vector< int > &horz_offset) "
 
@@ -59810,6 +60053,9 @@ Creates a block matrix in which each element (i, j) is a_ij*b
 %feature("docstring")  reshape(const MatType &a, int nrow, int ncol) "
 
 Returns a reshaped version of the matrix.
+
+If ncol equals -1, it will becomputed from nrow to be consistent, and vica
+versa.
 
 ";
 
@@ -60836,6 +61082,26 @@ General information
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -61663,6 +61929,13 @@ propagating_sparsity.cpp)
 std::string &str) const  "
 
 check if the user has there is an option str
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -63088,6 +63361,26 @@ Switch statement Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -63345,6 +63638,13 @@ exploited by the algorithm.
 
 The generated Jacobian has one more output than the calling function
 corresponding to the Jacobian and the same number of inputs.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -63694,6 +63994,13 @@ Get the number of function outputs.
 "
 
 Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::Function::wrap(const std::string &fname,
+const Dict &opts=Dict()) "
+
+Wrap a function in an MXFunction package.
 
 ";
 
@@ -64990,6 +65297,26 @@ Joel Andersson
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | 1            | Sets         | casadi::Func |
+| _mode        |              |              | coloring     | tionInternal |
+|              |              |              | strategy for |              |
+|              |              |              | starcoloring |              |
+|              |              |              | . 1:         |              |
+|              |              |              | distance-3   |              |
+|              |              |              | algorithm,2: |              |
+|              |              |              | distance-2   |              |
+|              |              |              | algorithm.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| starcoloring | OT_INTEGER   | -1           | Sets the     | casadi::Func |
+| _threshold   |              |              | maximum      | tionInternal |
+|              |              |              | amount of    |              |
+|              |              |              | nonzeros in  |              |
+|              |              |              | a row for    |              |
+|              |              |              | which        |              |
+|              |              |              | coloring     |              |
+|              |              |              | will be      |              |
+|              |              |              | attempted.   |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
 |              |              |              | field that   |              |
@@ -65624,15 +65951,15 @@ Output arguments of a dple solver
 
 ";
 
-%feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
-upper) "
+%feature("docstring")  casadi::inBounds(const std::vector< T > &v, S upper)
+"
 
 Check if for each element of v holds: v_i < upper.
 
 ";
 
-%feature("docstring")  casadi::inBounds(const std::vector< T > &v, int
-lower, int upper) "
+%feature("docstring")  casadi::inBounds(const std::vector< T > &v, S lower,
+S upper) "
 
 Check if for each element of v holds: lower <= v_i < upper.
 
@@ -66077,6 +66404,11 @@ Hash a sparsity pattern.
 %feature("docstring")  casadi::hash_sparsity(int nrow, int ncol, const int
 *colind, const int *row) " [INTERNAL] ";
 
+%feature("docstring")  casadi::slicot_mb03wd(char job, char compz, int n,
+int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2,
+double *z, int ldz1, int ldz2, double *wr, double *wi, double *dwork=0, int
+ldwork=0) " [INTERNAL] ";
+
 %feature("docstring")  casadi::isStrictlyMonotone(const std::vector< T > &v)
 "
 
@@ -66183,6 +66515,12 @@ Output arguments of an ODE/DAE backward integration function
 +-----------+-------+-------------------------------------------+
 | RDAE_QUAD | quad  | Right hand side of quadratures. .         |
 +-----------+-------+-------------------------------------------+
+
+";
+
+%feature("docstring")  casadi::matrixName< int >() "
+
+Get typename.
 
 ";
 
@@ -66690,10 +67028,7 @@ largest absolute value.
 
 ";
 
-%feature("docstring")  casadi::slicot_mb03wd(char job, char compz, int n,
-int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2,
-double *z, int ldz1, int ldz2, double *wr, double *wi, double *dwork=0, int
-ldwork=0) " [INTERNAL] ";
+%feature("docstring")  casadi::getPluginSearchPaths() "[INTERNAL] ";
 
 %feature("docstring")  casadi::getSchemeEntryNames(InputOutputScheme scheme)
 " ";
@@ -66821,53 +67156,20 @@ inc_x) " [INTERNAL]  NRM2: ||x||_2 -> return.
 
 ";
 
-%feature("docstring")  casadi::nlpSolverIn(const std::string &n0="", const M
-&x0=M(), const std::string &n1="", const M &x1=M(), const std::string
-&n2="", const M &x2=M(), const std::string &n3="", const M &x3=M(), const
-std::string &n4="", const M &x4=M(), const std::string &n5="", const M
-&x5=M(), const std::string &n6="", const M &x6=M(), const std::string
-&n7="", const M &x7=M()) "
+%feature("docstring")  casadi::collocationResidual(Function f, const
+std::vector< double > &tau_root) "
 
-Input arguments of an NLP Solver
+Construct a residual function for a collocation scheme and an ode.
 
->Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
+Parameters:
+-----------
 
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| NLP_SOLVER_X0          | x0                     | Decision variables,    |
-|                        |                        | initial guess (nx x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_P           | p                      | Value of fixed         |
-|                        |                        | parameters (np x 1) .  |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LBX         | lbx                    | Decision variables     |
-|                        |                        | lower bound (nx x 1),  |
-|                        |                        | default -inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_UBX         | ubx                    | Decision variables     |
-|                        |                        | upper bound (nx x 1),  |
-|                        |                        | default +inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LBG         | lbg                    | Constraints lower      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default -inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_UBG         | ubg                    | Constraints upper      |
-|                        |                        | bound (ng x 1),        |
-|                        |                        | default +inf .         |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_X0      | lam_x0                 | Lagrange multipliers   |
-|                        |                        | for bounds on X,       |
-|                        |                        | initial guess (nx x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
-| NLP_SOLVER_LAM_G0      | lam_g0                 | Lagrange multipliers   |
-|                        |                        | for bounds on G,       |
-|                        |                        | initial guess (ng x 1) |
-|                        |                        | .                      |
-+------------------------+------------------------+------------------------+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+The constructed function (which is of type MXFunction), has three inputs,
+corresponding to helper states (shape n-by- order), initial state (x0),
+parameter (p) and integration time (h) and two outputs, corresponding to
+collocation residual and the final state.
 
 ";
 
@@ -67022,9 +67324,53 @@ Input arguments of a dle solver
 
 ";
 
-%feature("docstring")  casadi::matrixName< int >() "
+%feature("docstring")  casadi::nlpSolverIn(const std::string &n0="", const M
+&x0=M(), const std::string &n1="", const M &x1=M(), const std::string
+&n2="", const M &x2=M(), const std::string &n3="", const M &x3=M(), const
+std::string &n4="", const M &x4=M(), const std::string &n5="", const M
+&x5=M(), const std::string &n6="", const M &x6=M(), const std::string
+&n7="", const M &x7=M()) "
 
-Get typename.
+Input arguments of an NLP Solver
+
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 8) [nlpSolverIn]
+
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| NLP_SOLVER_X0          | x0                     | Decision variables,    |
+|                        |                        | initial guess (nx x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_P           | p                      | Value of fixed         |
+|                        |                        | parameters (np x 1) .  |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LBX         | lbx                    | Decision variables     |
+|                        |                        | lower bound (nx x 1),  |
+|                        |                        | default -inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_UBX         | ubx                    | Decision variables     |
+|                        |                        | upper bound (nx x 1),  |
+|                        |                        | default +inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LBG         | lbg                    | Constraints lower      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default -inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_UBG         | ubg                    | Constraints upper      |
+|                        |                        | bound (ng x 1),        |
+|                        |                        | default +inf .         |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_X0      | lam_x0                 | Lagrange multipliers   |
+|                        |                        | for bounds on X,       |
+|                        |                        | initial guess (nx x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
+| NLP_SOLVER_LAM_G0      | lam_g0                 | Lagrange multipliers   |
+|                        |                        | for bounds on G,       |
+|                        |                        | initial guess (ng x 1) |
+|                        |                        | .                      |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -67142,8 +67488,8 @@ Input arguments of a linear solver
 ";
 
 %feature("docstring")  casadi::casadi_mm_sparse(const real_t *x, const int
-*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
-*w) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
+*sporky_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z,
+real_t *w) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
 
 ";
 

@@ -66,6 +66,8 @@ namespace casadi {
       return isDoubleVector() || isIntVector();
     case OT_STRINGVECTOR:
       return isStringVector() || isString();
+    case OT_VOIDPTR:
+      return isVoidPointer() || isDouble();
     default:
       return getType() == other;
     }
@@ -445,6 +447,10 @@ namespace casadi {
   }
 
   void* GenericType::toVoidPointer() const {
+    if (isDouble()) {
+      double val = asDouble();
+      return reinterpret_cast<void *>(*(reinterpret_cast<uint64_t *>(&val)));
+    }
     casadi_assert_message(getType()==OT_VOIDPTR, "type mismatch");
     return asVoidPointer();
   }

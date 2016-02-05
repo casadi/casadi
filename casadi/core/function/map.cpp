@@ -25,6 +25,7 @@
 
 #include "map_internal.hpp"
 
+
 namespace casadi {
   using namespace std;
 
@@ -43,22 +44,36 @@ namespace casadi {
                  const std::vector<bool> &repeat_in,
                  const std::vector<bool> &repeat_out,
                  const Dict& opts) {
-    assignNode(new MapReduce(f, n, repeat_in, repeat_out));
+    Dict options = opts;
+    std::vector<int> reduced_inputs;
+    std::vector<int> reduced_outputs;
+
+    for (int i=0;i<repeat_in.size();++i) {
+      if (!repeat_in[i]) reduced_inputs.push_back(i);
+    }
+    for (int i=0;i<repeat_out.size();++i) {
+      if (!repeat_out[i]) reduced_outputs.push_back(i);
+    }
+
+    options["reduced_inputs"] = reduced_inputs;
+    options["reduced_outputs"] = reduced_outputs;
+
+    assignNode(MapBase::create(f, n, options));
     setOption("name", name);
     setOption(opts);
     init();
   }
 
-  MapReduce* Map::operator->() {
-    return static_cast<MapReduce*>(Function::operator->());
+  MapBase* Map::operator->() {
+    return static_cast<MapBase*>(Function::operator->());
   }
 
-  const MapReduce* Map::operator->() const {
-    return static_cast<const MapReduce*>(Function::operator->());
+  const MapBase* Map::operator->() const {
+    return static_cast<const MapBase*>(Function::operator->());
   }
 
   bool Map::testCast(const SharedObjectNode* ptr) {
-    return dynamic_cast<const MapReduce*>(ptr)!=0;
+    return dynamic_cast<const MapBase*>(ptr)!=0;
   }
 
 } // namespace casadi

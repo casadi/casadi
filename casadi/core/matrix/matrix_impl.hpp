@@ -340,7 +340,9 @@ namespace casadi {
     }
 
     // Dimensions of this
-    int sz1 = size1(), sz2 = size2(), sz = nnz(), nel = numel(), rrsz = rr.nnz();
+    int sz1 = size1(), sz2 = size2(), sz = nnz(), rrsz = rr.nnz();
+
+    long long int nel = sz1*sz2;
 
     // Quick return if nothing to set
     if (rrsz==0) return;

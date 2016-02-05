@@ -1290,6 +1290,7 @@ import_array();
           || to_generic<casadi::Function>(p, m)
 #ifndef CASADI_NOT_IN_DERIVED
           || to_generic<casadi::DerivativeGenerator>(p, m)
+          || to_generic<casadi::Callback>(p, m)
 #endif
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
@@ -2873,6 +2874,9 @@ namespace casadi{
  DECL std::vector< M > %SHOW(horzsplit)(const M& v, int incr=1) {
  return horzsplit(v, incr);
  }
+ DECL std::vector< M > %SHOW(horzsplit2)(const M& v, int loc) {
+ return horzsplit2(v, loc);
+ }
  DECL std::vector< M >
  %SHOW(vertsplit)(const M& v, const std::vector<int>& offset) {
  return vertsplit(v, offset);
@@ -2884,6 +2888,9 @@ namespace casadi{
  DECL std::vector< M >
  %SHOW(vertsplit)(const M& v, int incr=1) {
  return vertsplit(v, incr);
+ }
+ DECL std::vector< M > %SHOW(vertsplit2)(const M& v, int loc) {
+ return vertsplit2(v, loc);
  }
  DECL M %SHOW(blockcat)(const std::vector< std::vector< M > > &v) {
  return blockcat(v);

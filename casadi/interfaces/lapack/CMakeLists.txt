@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.6)
 include_directories(../)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_FLAGS}")
+
 # Linear solver using dense LU factorization in LAPACK
 casadi_plugin(LinearSolver lapacklu
   lapack_lu_dense.hpp

@@ -66,7 +66,13 @@ struct functionstat {
   std::vector<iostat> outputs;
 };
 
-typedef std::map<long,functionstat> Stats;
+typedef std::map<long, functionstat> Stats;
+
+typedef std::pair<long, functionstat> stats_pair;
+  
+bool sortfun(const stats_pair& a, const stats_pair& b) {
+  return a.second.name < b.second.name;
+}
 
 int main(int argc, char* argv[])
 {
@@ -210,9 +216,11 @@ int main(int argc, char* argv[])
 
   report << "<table><thead><tr><th>Id</th><th>#calls</th><th>Internal (s)</th><th>External (s)</th><th>Overhead (s)</th><th>Algorithm size</th><th>#inputs</th><th>#input nz</th><th>#outputs</th><th>#output nz</th></tr></thead>" << std::endl;
   
-
+  std::vector< stats_pair > bare(data.begin(), data.end());
   
-  for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
+  std::sort(bare.begin(), bare.end(), sortfun);
+  
+  for (std::vector< stats_pair >::const_iterator it = bare.begin();it!=bare.end();++it) {
     const functionstat & f = it->second;
     if (f.count ==0 ) continue;
     int nz_in = 0;

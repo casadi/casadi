@@ -416,10 +416,18 @@ namespace casadi {
      */
     Sparsity unidirectionalColoring(const Sparsity& AT, int cutoff) const;
 
-    /** \brief A greedy distance-2 coloring algorithm
+    /** \brief Perform a star coloring
+     *
+     * This method can efficiently treat arrow-shaped sparsity pattern.
+     * 
+     *
+     */
+    Sparsity starColoring(int ordering, int cutoff, int mode, int threshold) const;
+
+    /** \brief A greedy distance-3 coloring algorithm
      * See description in public class.
      */
-    Sparsity starColoring(int ordering, int cutoff) const;
+    Sparsity starColoring1(int ordering, int cutoff) const;
 
     /** \brief An improved distance-2 coloring algorithm
      * See description in public class.

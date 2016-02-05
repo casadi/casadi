@@ -586,6 +586,9 @@ namespace casadi {
     /** \brief Export / Generate C code for the function */
     void generate(const Dict& opts=Dict());
 
+    /** \brief Wrap a function in an MXFunction package */
+    Function wrap(const std::string& fname, const Dict& opts=Dict());
+
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
     FunctionInternal* operator->();

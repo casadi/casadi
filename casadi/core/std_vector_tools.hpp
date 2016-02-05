@@ -108,12 +108,12 @@ namespace casadi {
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
-  template<typename T>
-  bool inBounds(const std::vector<T> &v, int upper);
+  template<typename T, typename S>
+  bool inBounds(const std::vector<T> &v, S upper);
 
   /// Check if for each element of v holds: lower <= v_i < upper
-  template<typename T>
-  bool inBounds(const std::vector<T> &v, int lower, int upper);
+  template<typename T, typename S>
+  bool inBounds(const std::vector<T> &v, S lower, S upper);
 
   /** \brief swap inner and outer indices of list of lists
   * 
@@ -392,17 +392,17 @@ namespace casadi {
   }
 #endif //SWIG
 
-  template<typename T>
-  bool inBounds(const std::vector<T> &v, int upper) {
+  template<typename T, typename S>
+  bool inBounds(const std::vector<T> &v, S upper) {
     return inBounds(v, 0, upper);
   }
 
-  template<typename T>
-  bool inBounds(const std::vector<T> &v, int lower, int upper) {
+  template<typename T, typename S>
+  bool inBounds(const std::vector<T> &v, S lower, S upper) {
     if (v.size()==0) return true;
-    int max = *std::max_element(v.begin(), v.end());
+    T max = *std::max_element(v.begin(), v.end());
     if (max >= upper) return false;
-    int min = *std::min_element(v.begin(), v.end());
+    T min = *std::min_element(v.begin(), v.end());
     return (min >= lower);
   }
 

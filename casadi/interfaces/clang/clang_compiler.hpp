@@ -58,6 +58,7 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/raw_os_ostream.h>
+#include "llvm/Support/DynamicLibrary.h"
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
 /** \defgroup plugin_Compiler_clang

@@ -71,6 +71,9 @@ namespace casadi {
     // Clone
     virtual CsparseInterface* clone() const;
 
+    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
+       CodeGenerator& g, int nrhs, bool transpose) const;
+
     // Has the solve function been called once
     bool called_once_;
 

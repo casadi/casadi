@@ -61,10 +61,10 @@ def addExtra(metadata):
   i = NlpSolver("mysolver","ipopt", f)
   extra(metadata,i,"IpoptInterface")
 
-  x=SX.sym("x")
+  """x=SX.sym("x")
   f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))
   i = NlpSolver("worhp", f)
-  extra(metadata,i,"WorhpInterface")
+  extra(metadata,i,"WorhpInterface")"""
 
   x=SX.sym("x")
   f = SXFunction("f",nlpIn(x=x),nlpOut(f=x**2))

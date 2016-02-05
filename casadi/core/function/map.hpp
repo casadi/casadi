@@ -31,7 +31,7 @@
 namespace casadi {
 
   /** \brief  Forward declaration of internal class */
-  class MapReduce;
+  class MapBase;
 
   /** Map 
       \author Joris Gillis
@@ -54,10 +54,10 @@ namespace casadi {
            const Dict& opts=Dict());
 
     /** \brief  Access functions of the node */
-    MapReduce* operator->();
+    MapBase* operator->();
 
     /** \brief  Const access functions of the node */
-    const MapReduce* operator->() const;
+    const MapBase* operator->() const;
 
     /// Check if a particular cast is allowed
     static bool testCast(const SharedObjectNode* ptr);

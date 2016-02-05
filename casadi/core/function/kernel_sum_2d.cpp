@@ -28,30 +28,29 @@
 namespace casadi {
   using namespace std;
 
-  KernelSum2D::KernelSum2D() {
-  }
+  KernelSum2D::KernelSum2D() {}
 
   KernelSum2D::KernelSum2D(const std::string& name, const Function& f,
                            const std::pair<int, int> & size,
                            double r,
                            int n,
                  const Dict& opts) {
-    assignNode(new KernelSum2DInternal(f, size, r, n));
+    assignNode(KernelSum2DBase::create(f, size, r, n, opts));
     setOption("name", name);
     setOption(opts);
     init();
   }
 
-  KernelSum2DInternal* KernelSum2D::operator->() {
-    return static_cast<KernelSum2DInternal*>(Function::operator->());
+  KernelSum2DBase* KernelSum2D::operator->() {
+    return static_cast<KernelSum2DBase*>(Function::operator->());
   }
 
-  const KernelSum2DInternal* KernelSum2D::operator->() const {
-    return static_cast<const KernelSum2DInternal*>(Function::operator->());
+  const KernelSum2DBase* KernelSum2D::operator->() const {
+    return static_cast<const KernelSum2DBase*>(Function::operator->());
   }
 
   bool KernelSum2D::testCast(const SharedObjectNode* ptr) {
-    return dynamic_cast<const KernelSum2DInternal*>(ptr)!=0;
+    return dynamic_cast<const KernelSum2DBase*>(ptr)!=0;
   }
 
 } // namespace casadi

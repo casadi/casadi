@@ -66,6 +66,18 @@ namespace casadi {
                                   std::vector< double > &OUTPUT);
 #endif // SWIG
 
+  /** \brief Construct a residual function for a collocation scheme and an ode
+  *
+  * \param f     ODE function with two inputs (x and p) and one output (xdot)
+  *
+  * The constructed function (which is of type MXFunction), has three inputs,
+  * corresponding to helper states (shape n-by-order), initial state (x0),
+  * parameter (p) and integration time (h)
+  * and two outputs, corresponding to collocation residual and the final state.
+  */
+  CASADI_EXPORT
+    MXFunction collocationResidual(Function f, const std::vector<double> & tau_root);
+
   // Type of collocation points
   enum CollocationPoints {LEGENDRE, RADAU};
 

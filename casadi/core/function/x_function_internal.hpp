@@ -889,7 +889,7 @@ namespace casadi {
         tmp.resize(sz);
 
         // Add contribution to the Jacobian
-        ret[adds] = fsens[d][oind][tmp];
+        if (!adds.empty()) ret[adds] = fsens[d][oind][tmp];
 
         if (symmetric) {
           // Get entries in fsens[d][oind] with nonnegative indices
