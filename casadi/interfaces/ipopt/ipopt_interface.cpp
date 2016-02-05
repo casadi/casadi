@@ -174,11 +174,15 @@ namespace casadi {
     if (grad_f_fcn_.is_null()) {
       grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
     } else {
+      casadi_assert(grad_f_fcn_.n_in()==2);
+      casadi_assert(grad_f_fcn_.n_out()==2);
       register_function(grad_f_fcn_);
     }
     if (jac_g_fcn_.is_null()) {
       jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
     } else {
+      casadi_assert(jac_g_fcn_.n_in()==2);
+      casadi_assert(jac_g_fcn_.n_out()==2);
       register_function(jac_g_fcn_);
     }
     jacg_sp_ = jac_g_fcn_.sparsity_out(1);
@@ -190,6 +194,8 @@ namespace casadi {
           create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
                           {"hess_gamma_x_x"}, {{"gamma", {"f", "g"}}});
       } else {
+        casadi_assert(hess_l_fcn_.n_in()==4);
+        casadi_assert(hess_l_fcn_.n_out()==1);
         register_function(hess_l_fcn_);
       }
       hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
