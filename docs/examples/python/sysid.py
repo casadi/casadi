@@ -93,11 +93,11 @@ else:
 ############ Create a Gauss-Newton solver ##########
 def gauss_newton(e,nlp,V):
   J = jacobian(e,V)
+  H = triu(mtimes(J.T, J))
   sigma = MX.sym("sigma")
-  hessLag = Function('H',{'x':V,'lam_f':sigma, 'hess':sigma*mtimes(J.T,J)},
-                     ['x','p','lam_f','lam_g'], ['hess','f','g','grad_x','grad_p'], opts)
-  #return nlpsol("solver","ipopt", nlp, {"hess_lag":hessLag})
-  return nlpsol("solver","ipopt", nlp)
+  hessLag = Function('nlp_hess_l',{'x':V,'lam_f':sigma, 'hess_gamma_x_x':sigma*H},
+                     ['x','p','lam_f','lam_g'], ['hess_gamma_x_x'], opts)
+  return nlpsol("solver","ipopt", nlp, {"hess_lag":hessLag})
 
 
 ############ Identifying the simulated system: single shooting strategy ##########
