@@ -558,4 +558,25 @@ namespace casadi {
     gen.generate(fname);
   }
 
+  Function Nlpsol::create_function(const std::string& fname,
+                                   const std::vector<std::string>& s_in,
+                                   const std::vector<std::string>& s_out,
+                                   const std::vector<LinComb>& lincomb,
+                                   const Dict& opts, bool reg) {
+    // Generate the function
+    casadi_assert(nlp_!=0);
+    Function ret = nlp_->create(fname, s_in, s_out, lincomb, opts);
+
+    // Register the function for evaluation and statistics gathering
+    if (reg) {
+      alloc(ret);
+    }
+    return ret;
+  }
+
+  std::vector<bool> Nlpsol::nl_var(const std::string& s_in,
+                                   const std::vector<std::string>& s_out) const {
+    return nlp_->nl_var(s_in, s_out);
+  }
+
 } // namespace casadi

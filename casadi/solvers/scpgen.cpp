@@ -216,7 +216,7 @@ namespace casadi {
     }
 
     // Generate lifting functions
-    Function fg = nlp_->create("fg", {"x", "p"}, {"f", "g"});
+    Function fg = create_function("fg", {"x", "p"}, {"f", "g"}, {}, Dict(), false);
     Function vdef_fcn, vinit_fcn;
     fg.generate_lifted(vdef_fcn, vinit_fcn);
     vinit_fcn_ = vinit_fcn;

@@ -169,23 +169,16 @@ namespace casadi {
     exact_hessian_ = hessian_approximation =="exact";
 
     // Get/generate required functions
-    f_fcn_ = nlp_->create("nlp_f", {"x", "p"}, {"f"});
-    g_fcn_ = nlp_->create("nlp_g", {"x", "p"}, {"g"});
-    grad_f_fcn_ = nlp_->create("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
-    jac_g_fcn_ = nlp_->create("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
+    f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
+    g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
+    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad_f_x"});
+    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
     jacg_sp_ = jac_g_fcn_.sparsity_out(1);
-
-    // Allocate temporary work vectors
-    alloc(f_fcn_);
-    alloc(g_fcn_);
-    alloc(grad_f_fcn_);
-    alloc(jac_g_fcn_);
     if (exact_hessian_) {
-      hess_l_fcn_ = nlp_->create("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
-                                 {"sym_hess_gamma_x_x"},
-                                 {{"gamma", {"f", "g"}}});
+      hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
+                                    {"sym_hess_gamma_x_x"},
+                                    {{"gamma", {"f", "g"}}});
       hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
-      alloc(hess_l_fcn_);
     }
 
     // Allocate a QP solver

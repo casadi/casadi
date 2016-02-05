@@ -87,18 +87,13 @@ namespace casadi {
     }
 
     // Setup NLP functions
-    fg_fcn_ = nlp_->create("nlp_fg", {"x", "p"}, {"f", "g"});
-    gf_jg_fcn_ = nlp_->create("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
+    fg_fcn_ = create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+    gf_jg_fcn_ = create_function("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
     jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
-    hess_l_fcn_ = nlp_->create("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
-                               {"hess_gamma_x_x"},
-                               {{"gamma", {"f", "g"}}});
+    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
+                                  {"hess_gamma_x_x"},
+                                  {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
-    alloc(hess_l_fcn_);
-
-    // Allocate temporary
-    alloc(gf_jg_fcn_);
-    alloc(fg_fcn_);
 
     // Allocate persistent memory
     alloc_w(nx_, true); // wx_

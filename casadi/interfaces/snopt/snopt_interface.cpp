@@ -76,10 +76,8 @@ namespace casadi {
     }
 
     // Get/generate required functions
-    jac_f_fcn_ = nlp_->create("nlp_jac_f", {"x", "p"}, {"f", "jac_f_x"});
-    alloc(jac_f_fcn_);
-    jac_g_fcn_ = nlp_->create("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
-    alloc(jac_g_fcn_);
+    jac_f_fcn_ = create_function("nlp_jac_f", {"x", "p"}, {"f", "jac_f_x"});
+    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac_g_x"});
     jacg_sp_ = jac_g_fcn_.sparsity_out(1);
 
     // prepare the mapping for constraints

@@ -69,6 +69,34 @@ namespace casadi {
   */
   class CASADI_EXPORT
   Nlpsol : public FunctionInternal, public PluginInterface<Nlpsol> {
+  public:
+    /// Number of variables
+    int nx_;
+
+    /// Number of constraints
+    int ng_;
+
+    /// Number of parameters
+    int np_;
+
+    /// callback function, executed at each iteration
+    Function fcallback_;
+
+    /// Execute the callback function only after this amount of iterations
+    int callback_step_;
+
+    // Evaluation errors are fatal
+    bool eval_errors_fatal_;
+
+    // Warn if initial bounds are violated
+    bool warn_initial_bounds_;
+
+    // Ignore errors in the iteration callbacks
+    bool iteration_callback_ignore_errors_;
+
+  private:
+    /// The NLP
+    Oracle* nlp_;
 
   public:
     /// Constructor
@@ -116,33 +144,6 @@ namespace casadi {
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
-    /// Number of variables
-    int nx_;
-
-    /// Number of constraints
-    int ng_;
-
-    /// Number of parameters
-    int np_;
-
-    /// callback function, executed at each iteration
-    Function fcallback_;
-
-    /// Execute the callback function only after this amount of iterations
-    int callback_step_;
-
-    // Evaluation errors are fatal
-    bool eval_errors_fatal_;
-
-    // Warn if initial bounds are violated
-    bool warn_initial_bounds_;
-
-    // Ignore errors in the iteration callbacks
-    bool iteration_callback_ignore_errors_;
-
-    /// The NLP
-    Oracle* nlp_;
-
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(Memory& mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
@@ -150,6 +151,17 @@ namespace casadi {
     /** \brief Set the (temporary) work vectors */
     virtual void set_temp(Memory& mem, const double** arg, double** res,
                           int* iw, double* w) const;
+
+    /** Create an NLP function */
+    Function create_function(const std::string& fname,
+                             const std::vector<std::string>& s_in,
+                             const std::vector<std::string>& s_out,
+                             const std::vector<LinComb>& lincomb=std::vector<LinComb>(),
+                             const Dict& opts=Dict(), bool reg=true);
+
+    /** \brief Which variables enter nonlinearly */
+    std::vector<bool> nl_var(const std::string& s_in,
+                             const std::vector<std::string>& s_out) const;
 
     // Evaluate numerically
     virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
