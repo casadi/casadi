@@ -442,6 +442,10 @@ namespace casadi {
   }
 
   void Nlpsol::register_function(const Function& fcn) {
+    // Make sure that the function names are unique
+    for (const Function& f : all_functions_) casadi_assert(fcn.name()!=f.name());
+
+    // Add to the list
     all_functions_.push_back(fcn);
     alloc(fcn);
   }

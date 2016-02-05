@@ -191,7 +191,7 @@ namespace casadi {
     if (exact_hessian_) {
       if (hess_l_fcn_.is_null()) {
         hess_l_fcn_ =
-          create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
+          create_function("nlp_hess_l", {"x", "p", "lam_f", "lam_g"},
                           {"hess_gamma_x_x"}, {{"gamma", {"f", "g"}}});
       } else {
         casadi_assert(hess_l_fcn_.n_in()==4);
