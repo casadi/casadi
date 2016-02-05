@@ -213,11 +213,6 @@ namespace casadi {
                    const double* x, const double* p,
                    double* f, double* jac_f) const;
 
-    // Calculate both gradient of the objective and Jacobian of constraints
-    int calc_gf_jg(NlpsolMemory& m, const Function& fcn,
-                   const double* x, const double* p,
-                   double* gf, double* jg) const;
-
     // Calculate Hessian of the Lagrangian constraints
     enum HessLagIn { HL_X, HL_P, HL_LAM_F, HL_LAM_G, HL_NUM_IN };
     enum HessLagOut { HL_HL, HL_NUM_OUT};

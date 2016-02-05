@@ -422,22 +422,6 @@ namespace casadi {
     return 0;
   }
 
-  int Nlpsol::
-  calc_gf_jg(NlpsolMemory& m, const Function& fcn,
-             const double* x, const double* p,
-             double* gf, double* jg) const {
-    fill_n(m.arg, fcn.n_in(), nullptr);
-    m.arg[0] = x;
-    m.arg[1] = p;
-    fill_n(m.res, fcn.n_out(), nullptr);
-    m.res[0] = gf;
-    m.res[1] = jg;
-    fcn(m.arg, m.res, m.iw, m.w, 0);
-
-    // Success
-    return 0;
-  }
-
   int Nlpsol::calc_jac_g(NlpsolMemory& m, const Function& fcn,
                          const double* x, const double* p,
                          double* g, double* jac_g) const {

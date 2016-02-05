@@ -253,7 +253,7 @@ namespace casadi {
         m.self.calc_function(m, m.self.fg_fcn_, {x, m.p}, {obj, c});
         break;
       case KTR_RC_EVALGA:
-        m.self.calc_gf_jg(m, m.self.gf_jg_fcn_, x, m.p, objGrad, jac);
+        m.self.calc_function(m, m.self.gf_jg_fcn_, {x, m.p}, {objGrad, jac});
         break;
       case KTR_RC_EVALH:
         {
