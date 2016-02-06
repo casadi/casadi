@@ -227,6 +227,26 @@ def _swig_repr(self):
 %feature("compactdefaultargs","0") casadi::Function::generateCode; // buggy
 #endif //SWIGXML
 
+#ifdef SWIGMATLAB
+// This is a first iteration for having
+// beautified error messages in the Matlab iterface
+%feature("matlabprepend") %{
+      try
+%}
+
+%feature("matlabappend") %{
+      catch err
+        if (strcmp(err.identifier,'SWIG:RuntimeError') & strfind(err.message,'No matching function for overload function')==1)
+          msg = [swig_typename_convertor_cpp2matlab(err.message) 'You have: ' strjoin(cellfun(@swig_typename_convertor_matlab2cpp,varargin,'UniformOutput',false),', ')];
+          throwAsCaller(MException(err.identifier,msg));
+        else
+          rethrow(err);
+        end
+      end
+%}
+
+#endif // SWIGMATLAB
+
 // STL
 #ifdef SWIGXML
 namespace std {
