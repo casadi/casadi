@@ -1041,7 +1041,7 @@ f = Function('f',[x,y],\
 All derived classes of \texttt{Function} come with a range of options that can be set. The API documentation shows the list of available options for each class, along with their default values and descriptions.
 
 \section{Input-output schemes for function objects}
-Most \texttt{Function}-derived classes have a particular input/output signature with them and/or take as arguments in the constructor other function objects (callback functions) with a particular input/output signature. For example, as we shall see in Chapter~\ref{ch:nlp}, a \emph{nonlinear program} (NLP) is defined by two inputs (the decision variable and a set of parameters) and two outputs (the objective and constraint functions). To make it easier to remember the number and order of the input/output arguments, \CasADi provides helper functions of the form:
+Most \texttt{Function}-derived classes have a particular input/output signature with them and/or take as arguments in the constructor other function objects (callback functions) with a particular input/output signature. For example, as we shall see in Chapter~\ref{ch:nlp}, a \emph{nonlinear program} (NLP) is defined by two inputs (the decision variable and a set of parameters) and two outputs (the objective and constraint functions). When constructing functions from symbolic expressions as above, it is advisable to explicitly name the inputs and outputs:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -1078,11 +1078,11 @@ nlp = Function('nlp',
         ['f','g'])
 \end{pytexoutput}
 
-The last line is essentially equivalent to \lstinline[language=Python]{Function('nlp',[x,p],[f,g])}, but is preferred for a number of reasons:
+Always naming inputs and outputs is preferred for a number of reasons:
 \begin{itemize}
 \item No need to remember the number or order of arguments
 \item Inputs or outputs that are absent can be left unset
-\item The helper functions provide meta-information that allows inputs to be referred to by their names instead of their index. E.g. \verb|nlp.jacobian('x','g')| instead of \verb|nlp.jacobian(0,1)|.
+\item More readable and less error prone syntax. E.g. \verb|nlp.jacobian('x','g')| instead of \verb|nlp.jacobian(0,1)|.
 \end{itemize}
 
 \section{Calling function objects}
