@@ -160,7 +160,7 @@ namespace casadi {
     }
   }
 
-  void Mapaccum::eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+  void Mapaccum::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     evalGen(arg, res, iw, w, std::plus<double>());
   }
 

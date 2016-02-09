@@ -113,7 +113,7 @@ namespace casadi {
     /*  m.kc_handle = KTR_new(); */
   }
 
-  void KnitroInterface::set_work(Memory* mem, const double**& arg, double**& res,
+  void KnitroInterface::set_work(void* mem, const double**& arg, double**& res,
                                  int*& iw, double*& w) const {
     auto m = static_cast<KnitroMemory*>(mem);
 
@@ -128,7 +128,7 @@ namespace casadi {
     m->wubg = w; w += ng_;
   }
 
-  void KnitroInterface::solve(Memory* mem) const {
+  void KnitroInterface::solve(void* mem) const {
     auto m = static_cast<KnitroMemory*>(mem);
 
     // Allocate KNITRO memory block (move back to init!)

@@ -89,7 +89,7 @@ namespace casadi {
     m->S = cs_schol(order, &m->A);
   }
 
-  Sparsity CSparseCholeskyInterface::linsol_cholesky_sparsity(Memory* mem, bool tr) const {
+  Sparsity CSparseCholeskyInterface::linsol_cholesky_sparsity(void* mem, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     casadi_assert(m->S);
@@ -123,7 +123,7 @@ namespace casadi {
 
   }
 
-  DM CSparseCholeskyInterface::linsol_cholesky(Memory* mem, bool tr) const {
+  DM CSparseCholeskyInterface::linsol_cholesky(void* mem, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     casadi_assert(m->L);
@@ -140,7 +140,7 @@ namespace casadi {
     return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInterface::linsol_factorize(Memory* mem, const double* A) const {
+  void CSparseCholeskyInterface::linsol_factorize(void* mem, const double* A) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     // Set the nonzeros of the matrix
@@ -159,7 +159,7 @@ namespace casadi {
     casadi_assert(m->L!=0);
   }
 
-  void CSparseCholeskyInterface::linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const {
+  void CSparseCholeskyInterface::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     casadi_assert(m->L!=0);
@@ -181,7 +181,7 @@ namespace casadi {
     }
   }
 
-  void CSparseCholeskyInterface::linsol_solveL(Memory* mem, double* x, int nrhs, bool tr) const {
+  void CSparseCholeskyInterface::linsol_solveL(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     casadi_assert(m->L!=0);

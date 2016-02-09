@@ -138,7 +138,7 @@ namespace casadi {
 
     ///@{
     /** \brief  Evaluate numerically */
-    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
     virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
     ///@}
 
@@ -718,15 +718,15 @@ namespace casadi {
     void clear_memory();
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory* mem, const double**& arg, double**& res,
+    virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const {}
 
     /** \brief Set the (temporary) work vectors */
-    virtual void set_temp(Memory* mem, const double** arg, double** res,
+    virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const {}
 
     /** \brief Set the (persistent and temporary) work vectors */
-    void setup(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
+    void setup(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
@@ -817,14 +817,14 @@ namespace casadi {
 
     ///@{
     /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_factorize(Memory* mem, const double* A) const;
-    virtual void linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const;
+    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
     virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
     virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;
-    virtual void linsol_solveL(Memory* mem, double* x, int nrhs, bool tr) const;
-    virtual Sparsity linsol_cholesky_sparsity(Memory* mem, bool tr) const;
-    virtual DM linsol_cholesky(Memory* mem, bool tr) const;
+    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
+    virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
+    virtual DM linsol_cholesky(void* mem, bool tr) const;
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                bool tr, int nrhs);
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,

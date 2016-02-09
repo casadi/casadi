@@ -139,11 +139,11 @@ namespace casadi {
     virtual void init_memory(void* mem) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory* mem, const double**& arg, double**& res,
+    virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory* mem) const;
+    virtual void solve(void* mem) const;
 
     // Options
     std::map<std::string, bool> bool_opts_;

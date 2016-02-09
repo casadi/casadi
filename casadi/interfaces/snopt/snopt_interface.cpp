@@ -173,7 +173,7 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::set_work(Memory* mem, const double**& arg, double**& res,
+  void SnoptInterface::set_work(void* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
     auto m = static_cast<SnoptMemory*>(mem);
 
@@ -191,7 +191,7 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::solve(Memory* mem) const {
+  void SnoptInterface::solve(void* mem) const {
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Check the provided inputs

@@ -81,7 +81,7 @@ namespace casadi {
   }
 
   void CallbackInternal::
-  eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
     self_->eval(arg, res, iw, w, 0);
   }

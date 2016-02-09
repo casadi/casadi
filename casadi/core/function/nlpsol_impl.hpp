@@ -145,17 +145,17 @@ namespace casadi {
     virtual void init_memory(void* mem) const;
 
     /** \brief Check if the inputs correspond to a well-posed problem */
-    virtual void checkInputs(Memory* mem) const;
+    virtual void checkInputs(void* mem) const;
 
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory* mem, const double**& arg, double**& res,
+    virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     /** \brief Set the (temporary) work vectors */
-    virtual void set_temp(Memory* mem, const double** arg, double** res,
+    virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const;
 
     /** Create an NLP function */
@@ -173,10 +173,10 @@ namespace casadi {
                              const std::vector<std::string>& s_out) const;
 
     // Evaluate numerically
-    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     // Solve the NLP
-    virtual void solve(Memory* mem) const = 0;
+    virtual void solve(void* mem) const = 0;
 
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, Oracle* nlp);

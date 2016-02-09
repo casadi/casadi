@@ -264,7 +264,7 @@ namespace casadi {
   }
 
   void CplexInterface::
-  eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<CplexMemory*>(mem);
 
     if (inputs_check_) {

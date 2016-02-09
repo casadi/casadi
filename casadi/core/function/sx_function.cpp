@@ -70,7 +70,7 @@ namespace casadi {
 #endif // WITH_OPENCL
   }
 
-  void SXFunction::eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+  void SXFunction::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     casadi_msg("SXFunction::eval():begin  " << name_);
 
     // Make sure no free parameters

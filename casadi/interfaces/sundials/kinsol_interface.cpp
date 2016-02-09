@@ -261,7 +261,7 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::eval(Memory* mem, const double** arg, double** res,
+  void KinsolInterface::eval(void* mem, const double** arg, double** res,
                              int* iw, double* w) const {
     auto m = static_cast<KinsolMemory*>(mem);
 

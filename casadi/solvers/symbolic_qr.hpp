@@ -94,14 +94,14 @@ namespace casadi {
     virtual void init_memory(void* mem) const;
 
     // Setup memory block
-    virtual void set_temp(Memory* mem, const double** arg, double** res,
+    virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const;
 
     // Factorize the linear system
-    virtual void linsol_factorize(Memory* mem, const double* A) const;
+    virtual void linsol_factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const;
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;

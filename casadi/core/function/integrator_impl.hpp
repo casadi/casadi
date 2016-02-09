@@ -86,7 +86,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Set the work vectors */
-    virtual void set_temp(Memory* mem, const double** arg, double** res,
+    virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const;
 
     /** \brief Reset the forward problem */
@@ -106,7 +106,7 @@ namespace casadi {
                          double* rx, double* rz, double* rq) const = 0;
 
     /** \brief  evaluate */
-    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Print solver statistics */
     virtual void printStats(IntegratorMemory* mem, std::ostream &stream) const {}

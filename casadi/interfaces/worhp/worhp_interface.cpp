@@ -157,7 +157,7 @@ namespace casadi {
     m->worhp_p.initialised = true;
   }
 
-  void WorhpInterface::set_work(Memory* mem, const double**& arg, double**& res,
+  void WorhpInterface::set_work(void* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
@@ -251,7 +251,7 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::solve(Memory* mem) const {
+  void WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
     // Check the provided inputs

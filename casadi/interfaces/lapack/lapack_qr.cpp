@@ -69,7 +69,7 @@ namespace casadi {
     m->work.resize(10*ncol());
   }
 
-  void LapackQr::linsol_factorize(Memory* mem, const double* A) const {
+  void LapackQr::linsol_factorize(void* mem, const double* A) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions
@@ -88,7 +88,7 @@ namespace casadi {
                                          "failed to factorize the Jacobian");
   }
 
-  void LapackQr::linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const {
+  void LapackQr::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions

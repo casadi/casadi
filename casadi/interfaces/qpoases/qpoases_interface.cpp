@@ -271,7 +271,7 @@ namespace casadi {
   }
 
   void QpoasesInterface::
-  eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<QpoasesMemory*>(mem);
 
     if (inputs_check_) {

@@ -262,7 +262,7 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::checkInputs(Memory* mem) const {
+  void Nlpsol::checkInputs(void* mem) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
     // Skip check?
@@ -321,7 +321,7 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+  void Nlpsol::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 
@@ -329,7 +329,7 @@ namespace casadi {
     solve(mem);
   }
 
-  void Nlpsol::set_work(Memory* mem, const double**& arg, double**& res,
+  void Nlpsol::set_work(void* mem, const double**& arg, double**& res,
                         int*& iw, double*& w) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
@@ -354,7 +354,7 @@ namespace casadi {
     res += NLPSOL_NUM_OUT;
   }
 
-  void Nlpsol::set_temp(Memory* mem, const double** arg, double** res,
+  void Nlpsol::set_temp(void* mem, const double** arg, double** res,
                         int* iw, double* w) const {
     auto m = static_cast<NlpsolMemory*>(mem);
     m->arg = arg;

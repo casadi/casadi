@@ -82,7 +82,7 @@ namespace casadi {
     virtual ~MXFunction();
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;

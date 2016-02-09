@@ -727,7 +727,7 @@ namespace casadi {
     m->merit_mem.resize(merit_memsize_);
   }
 
-  void Scpgen::set_work(Memory* mem, const double**& arg, double**& res,
+  void Scpgen::set_work(void* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
     auto m = static_cast<ScpgenMemory*>(mem);
 
@@ -786,7 +786,7 @@ namespace casadi {
     }
   }
 
-  void Scpgen::solve(Memory* mem) const {
+  void Scpgen::solve(void* mem) const {
     auto m = static_cast<ScpgenMemory*>(mem);
 
     if (v_.size()>0) {

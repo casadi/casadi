@@ -194,7 +194,7 @@ namespace casadi {
   }
 
   void Integrator::
-  eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<IntegratorMemory*>(mem);
 
     // Read inputs
@@ -1337,7 +1337,7 @@ namespace casadi {
     return Function(name, ret_in, ret_out, opts);
   }
 
-  void Integrator::set_temp(Memory* mem, const double** arg, double** res,
+  void Integrator::set_temp(void* mem, const double** arg, double** res,
                             int* iw, double* w) const {
     auto m = static_cast<IntegratorMemory*>(mem);
     m->arg = arg;

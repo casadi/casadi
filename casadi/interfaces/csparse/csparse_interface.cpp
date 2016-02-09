@@ -83,7 +83,7 @@ namespace casadi {
     m->called_once_ = false;
   }
 
-  void CsparseInterface::linsol_factorize(Memory* mem, const double* A) const {
+  void CsparseInterface::linsol_factorize(void* mem, const double* A) const {
     auto m = static_cast<CsparseMemory*>(mem);
     casadi_assert(A!=0);
 
@@ -148,7 +148,7 @@ namespace casadi {
     casadi_assert(m->N!=0);
   }
 
-  void CsparseInterface::linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const {
+  void CsparseInterface::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseMemory*>(mem);
     casadi_assert(m->N!=0);
 

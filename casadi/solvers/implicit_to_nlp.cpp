@@ -123,7 +123,7 @@ namespace casadi {
     alloc_w(n_, true);
   }
 
-  void ImplicitToNlp::eval(Memory* mem, const double** arg, double** res,
+  void ImplicitToNlp::eval(void* mem, const double** arg, double** res,
                            int* iw, double* w) const {
     auto m = static_cast<ImplicitToNlpMemory*>(mem);
 

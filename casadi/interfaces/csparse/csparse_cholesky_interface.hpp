@@ -90,19 +90,19 @@ namespace casadi {
     virtual void init_memory(void* mem) const;
 
     // Factorize the linear system
-    virtual void linsol_factorize(Memory* mem, const double* A) const;
+    virtual void linsol_factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const;
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
 
     // Solve the system of equations <tt>Lx = b</tt>
-    virtual void linsol_solveL(Memory* mem, double* x, int nrhs, bool tr) const;
+    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
 
     /// Obtain a symbolic Cholesky factorization
-    virtual Sparsity linsol_cholesky_sparsity(Memory* mem, bool tr) const;
+    virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
 
     /// Obtain a numeric Cholesky factorization
-    virtual DM linsol_cholesky(Memory* mem, bool tr) const;
+    virtual DM linsol_cholesky(void* mem, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;

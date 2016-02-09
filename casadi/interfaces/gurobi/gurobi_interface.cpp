@@ -112,7 +112,7 @@ namespace casadi {
   }
 
   void GurobiInterface::
-  eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Inputs

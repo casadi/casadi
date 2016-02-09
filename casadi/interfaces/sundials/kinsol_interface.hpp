@@ -106,7 +106,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "kinsol";}

@@ -141,11 +141,11 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<SqpmethodMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory* mem, const double**& arg, double**& res,
+    virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory* mem) const;
+    virtual void solve(void* mem) const;
 
     /// QP solver for the subproblems
     Function qpsol_;

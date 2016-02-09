@@ -291,7 +291,7 @@ namespace casadi {
     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
   }
 
-  void IpoptInterface::set_work(Memory* mem, const double**& arg, double**& res,
+  void IpoptInterface::set_work(void* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
     auto m = static_cast<IpoptMemory*>(mem);
 
@@ -354,7 +354,7 @@ namespace casadi {
     return "Unknown";
   }
 
-  void IpoptInterface::solve(Memory* mem) const {
+  void IpoptInterface::solve(void* mem) const {
     auto m = static_cast<IpoptMemory*>(mem);
 
     // Check the provided inputs

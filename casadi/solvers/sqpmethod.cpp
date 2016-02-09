@@ -283,7 +283,7 @@ namespace casadi {
     alloc_w(Asp_.nnz(), true); // Jk_
   }
 
-  void Sqpmethod::set_work(Memory* mem, const double**& arg, double**& res,
+  void Sqpmethod::set_work(void* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
@@ -328,7 +328,7 @@ namespace casadi {
     m->Jk = w; w += Asp_.nnz();
   }
 
-  void Sqpmethod::solve(Memory* mem) const {
+  void Sqpmethod::solve(void* mem) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
     // Check the provided inputs

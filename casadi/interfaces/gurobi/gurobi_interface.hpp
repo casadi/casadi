@@ -97,7 +97,7 @@ namespace casadi {
     virtual void init_memory(void* mem) const;
 
     /// Solve the QP
-    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return true;}
