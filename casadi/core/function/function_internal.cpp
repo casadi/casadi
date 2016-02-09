@@ -1936,7 +1936,7 @@ namespace casadi {
     }
 
     // Function for allocating memory
-    tmp = "int " + fname + "_alloc(int mem)";
+    tmp = "int " + fname + "_alloc(void** mem, const int* idata, const double* rdata)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1944,7 +1944,9 @@ namespace casadi {
       g.header << tmp << ";" << endl;
     }
     s << tmp << " {" << endl
-      << "  (void)mem;" << endl
+      << "  if (mem) *mem = 0;" << endl
+      << "  (void)idata;" << endl
+      << "  (void)rdata;" << endl
       << "  return 0;" << endl
       << "}" << endl
       << endl;
