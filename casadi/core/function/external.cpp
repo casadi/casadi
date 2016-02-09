@@ -281,7 +281,7 @@ namespace casadi {
   template<typename LibType>
   void GenericExternal<LibType>::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    int flag = eval_(arg, res, iw, w, 0);
+    int flag = eval_(mem, arg, res, iw, w);
     if (flag) throw CasadiException("CommonExternal: \""+this->name_+"\" failed");
   }
 

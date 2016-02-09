@@ -60,7 +60,7 @@ namespace casadi {
   typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
   typedef int (*sparsity_t)(int i, int* n_row, int* n_col,
                             const int** colind, const int** row);
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
+  typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
@@ -124,11 +124,8 @@ namespace casadi {
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
-    ///@{
     /** \brief  Evaluate numerically */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
-    ///@}
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res);

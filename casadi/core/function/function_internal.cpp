@@ -377,9 +377,9 @@ namespace casadi {
       }
     } else {
       if (eval_) {
-        eval_(arg, res, iw, w, mem);
+        eval_(mem_.at(mem), arg, res, iw, w);
       } else {
-        eval(arg, res, iw, w, mem);
+        eval(mem_.at(mem), arg, res, iw, w);
       }
     }
   }
@@ -1416,10 +1416,6 @@ namespace casadi {
     casadi_error("'eval' not defined for " + type_name());
   }
 
-  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    eval(mem_.at(mem), arg, res, iw, w);
-  }
-
   void FunctionInternal::simple(const double* arg, double* res) {
     casadi_error("'simple' not defined for " + type_name());
   }
@@ -1894,7 +1890,7 @@ namespace casadi {
       }
 
       // Call function
-      g.body << "  if (" << generic_call(g, "arg1", "res1", "iw", "w", "0")
+      g.body << "  if (" << generic_call(g, "0", "arg1", "res1", "iw", "w")
              << ") return 1;" << endl;
     }
   }
@@ -1903,7 +1899,7 @@ namespace casadi {
     if (simplifiedCall()) {
       return "void " + fname + "(const real_t* arg, real_t* res)";
     } else {
-      return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, int mem)";
+      return "int " + fname + "(void* mem, const real_t** arg, real_t** res, int* iw, real_t* w)";
     }
   }
 
@@ -1952,7 +1948,7 @@ namespace casadi {
       << endl;
 
     // Function for freeing memory
-    tmp = "int " + fname + "_free(int mem)";
+    tmp = "int " + fname + "_free(void* mem)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -2174,9 +2170,9 @@ namespace casadi {
     }
   }
 
-  std::string FunctionInternal::generic_call(const CodeGenerator& g, const std::string& arg,
-                                             const std::string& res, const std::string& iw,
-                                             const std::string& w, const std::string& mem) const {
+  std::string FunctionInternal::generic_call(const CodeGenerator& g, const std::string& mem,
+                                             const std::string& arg, const std::string& res,
+                                             const std::string& iw, const std::string& w) const {
     // Get the index of the function
     auto it=g.added_dependencies_.find(this);
     casadi_assert(it!=g.added_dependencies_.end());
@@ -2184,7 +2180,7 @@ namespace casadi {
 
     // Create a function call
     stringstream ss;
-    ss << "f" << f << "(" << arg << ", " << res << ", " << iw << ", " << w << " , " << mem << ")";
+    ss << "f" << f << "(" << mem << ", " << arg << ", " << res << ", " << iw << ", " << w << ")";
     return ss.str();
   }
 

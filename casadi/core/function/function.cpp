@@ -1032,7 +1032,7 @@ namespace casadi {
   }
 
   void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    (*this)->eval(arg, res, iw, w, mem);
+    (*this)->eval((*this)->mem_.at(mem), arg, res, iw, w);
   }
 
   void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
