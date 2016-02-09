@@ -82,7 +82,7 @@ namespace casadi {
     virtual Memory* memory() const { return new ImplicitToNlpMemory();}
 
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(Memory& mem, const double** arg, double** res,
+    virtual void eval(Memory* mem, const double** arg, double** res,
                       int* iw, double* w) const;
 
     /// A documentation string

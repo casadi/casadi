@@ -149,14 +149,14 @@ namespace casadi {
     virtual Memory* memory() const { return new IpoptMemory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(Memory* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const;
+    virtual void solve(Memory* mem) const;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -165,19 +165,19 @@ namespace casadi {
     Dict opts_;
 
     // Ipopt callback functions
-    void finalize_solution(IpoptMemory& m, const double* x, const double* z_L, const double* z_U,
+    void finalize_solution(IpoptMemory* m, const double* x, const double* z_L, const double* z_U,
                            const double* g, const double* lambda, double obj_value,
                            int iter_count) const;
-    bool get_bounds_info(IpoptMemory& m, double* x_l, double* x_u,
+    bool get_bounds_info(IpoptMemory* m, double* x_l, double* x_u,
                          double* g_l, double* g_u) const;
-    bool get_starting_point(IpoptMemory& m, bool init_x, double* x,
+    bool get_starting_point(IpoptMemory* m, bool init_x, double* x,
                             bool init_z, double* z_L, double* z_U,
                             bool init_lambda, double* lambda) const;
-    void get_nlp_info(IpoptMemory& m, int& nx, int& ng,
+    void get_nlp_info(IpoptMemory* m, int& nx, int& ng,
                       int& nnz_jac_g, int& nnz_h_lag) const;
     int get_number_of_nonlinear_variables() const;
     bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const;
-    bool intermediate_callback(IpoptMemory& m, const double* x, const double* z_L,
+    bool intermediate_callback(IpoptMemory* m, const double* x, const double* z_L,
                                const double* z_U, const double* g,
                                const double* lambda, double obj_value, int iter,
                                double inf_pr, double inf_du, double mu, double d_norm,

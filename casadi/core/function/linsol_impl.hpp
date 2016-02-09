@@ -67,7 +67,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /// Solve the system of equations
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// Create a solve node
     using FunctionInternal::linsol_solve;

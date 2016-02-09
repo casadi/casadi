@@ -80,7 +80,7 @@ namespace casadi {
     static inline bvec_t orop(bvec_t x, bvec_t y) { return x | y; }
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief Quickfix to avoid segfault, #1552 */
     virtual bool canEvalSX() const {return true;}

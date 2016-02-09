@@ -91,10 +91,10 @@ namespace casadi {
     virtual Memory* memory() const { return new GurobiMemory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /// Solve the QP
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return true;}

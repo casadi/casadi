@@ -139,20 +139,20 @@ namespace casadi {
     virtual Memory* memory() const { return new NlpsolMemory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /** \brief Check if the inputs correspond to a well-posed problem */
-    virtual void checkInputs(Memory& mem) const;
+    virtual void checkInputs(Memory* mem) const;
 
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(Memory* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     /** \brief Set the (temporary) work vectors */
-    virtual void set_temp(Memory& mem, const double** arg, double** res,
+    virtual void set_temp(Memory* mem, const double** arg, double** res,
                           int* iw, double* w) const;
 
     /** Create an NLP function */
@@ -170,10 +170,10 @@ namespace casadi {
                              const std::vector<std::string>& s_out) const;
 
     // Evaluate numerically
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const = 0;
+    virtual void solve(Memory* mem) const = 0;
 
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, Oracle* nlp);
@@ -182,7 +182,7 @@ namespace casadi {
     struct Exposed{ };
 
     // Calculate an oracle function
-    int calc_function(NlpsolMemory& m, const Function& fcn,
+    int calc_function(NlpsolMemory* m, const Function& fcn,
                       std::initializer_list<const double*> arg,
                       std::initializer_list<double*> res) const;
 

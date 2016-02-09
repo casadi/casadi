@@ -354,7 +354,7 @@ namespace casadi {
     casadi_assert(mem_.empty());
     Memory* m = memory();
     casadi_assert(m!=0);
-    init_memory(*m);
+    init_memory(m);
     mem_.push_back(m);
   }
 
@@ -1414,13 +1414,13 @@ namespace casadi {
     log("FunctionInternal::getPartition end");
   }
 
-  void FunctionInternal::eval(Memory& mem,
+  void FunctionInternal::eval(Memory* mem,
                               const double** arg, double** res, int* iw, double* w) const {
     casadi_error("'eval' not defined for " + type_name());
   }
 
   void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    eval(*mem_.at(mem), arg, res, iw, w);
+    eval(mem_.at(mem), arg, res, iw, w);
   }
 
   void FunctionInternal::simple(const double* arg, double* res) {
@@ -2766,11 +2766,11 @@ namespace casadi {
     casadi_error("'n_nodes' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_factorize(Memory& mem, const double* A) const {
+  void FunctionInternal::linsol_factorize(Memory* mem, const double* A) const {
     casadi_error("'linsol_factorize' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
+  void FunctionInternal::linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const {
     casadi_error("'linsol_solve' not defined for " + type_name());
   }
 
@@ -2786,15 +2786,15 @@ namespace casadi {
     casadi_error("'linsol_spsolve' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_solveL(Memory& mem, double* x, int nrhs, bool tr) const {
+  void FunctionInternal::linsol_solveL(Memory* mem, double* x, int nrhs, bool tr) const {
     casadi_error("'linsol_solveL' not defined for " + type_name());
   }
 
-  Sparsity FunctionInternal::linsol_cholesky_sparsity(Memory& mem, bool tr) const {
+  Sparsity FunctionInternal::linsol_cholesky_sparsity(Memory* mem, bool tr) const {
     casadi_error("'linsol_cholesky_sparsity' not defined for " + type_name());
   }
 
-  DM FunctionInternal::linsol_cholesky(Memory& mem, bool tr) const {
+  DM FunctionInternal::linsol_cholesky(Memory* mem, bool tr) const {
     casadi_error("'linsol_cholesky' not defined for " + type_name());
   }
 
@@ -2942,7 +2942,7 @@ namespace casadi {
       (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
   }
 
-  void FunctionInternal::setup(Memory& mem, const double** arg, double** res,
+  void FunctionInternal::setup(Memory* mem, const double** arg, double** res,
                                int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
     set_temp(mem, arg, res, iw, w);

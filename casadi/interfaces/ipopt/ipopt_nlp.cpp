@@ -29,7 +29,7 @@
 
 namespace casadi {
 
-  IpoptUserClass::IpoptUserClass(const IpoptInterface& solver, IpoptMemory& mem)
+  IpoptUserClass::IpoptUserClass(const IpoptInterface& solver, IpoptMemory* mem)
     : solver_(solver), mem_(mem) {
     n_ = solver_.nx_;
     m_ = solver_.ng_;
@@ -85,17 +85,17 @@ namespace casadi {
 
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
-    return solver_.calc_function(mem_, solver_.f_fcn_, {x, mem_.p}, {&obj_value})==0;
+    return solver_.calc_function(mem_, solver_.f_fcn_, {x, mem_->p}, {&obj_value})==0;
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
   bool IpoptUserClass::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f) {
-    return solver_.calc_function(mem_, solver_.grad_f_fcn_, {x, mem_.p}, {0, grad_f})==0;
+    return solver_.calc_function(mem_, solver_.grad_f_fcn_, {x, mem_->p}, {0, grad_f})==0;
   }
 
   // return the value of the constraints: g(x)
   bool IpoptUserClass::eval_g(Index n, const Number* x, bool new_x, Index m, Number* g) {
-    return solver_.calc_function(mem_, solver_.g_fcn_, {x, mem_.p}, {g})==0;
+    return solver_.calc_function(mem_, solver_.g_fcn_, {x, mem_->p}, {g})==0;
   }
 
   // return the structure or values of the jacobian
@@ -104,7 +104,7 @@ namespace casadi {
                                   Number* values) {
     if (values) {
       // Evaluate Jacobian
-      return solver_.calc_function(mem_, solver_.jac_g_fcn_, {x, mem_.p}, {0, values})==0;
+      return solver_.calc_function(mem_, solver_.jac_g_fcn_, {x, mem_->p}, {0, values})==0;
     } else {
       // Get the sparsity pattern
       int ncol = solver_.jacg_sp_.size2();
@@ -131,7 +131,7 @@ namespace casadi {
     if (values) {
       // Evaluate Hessian
       if (solver_.calc_function(mem_, solver_.hess_l_fcn_,
-                                {x, mem_.p, &obj_factor, lambda}, {values})) return false;
+                                {x, mem_->p, &obj_factor, lambda}, {values})) return false;
       return true;
     } else {
       // Get the sparsity pattern
@@ -234,7 +234,7 @@ namespace casadi {
       }
     }
     DiffTime diff = diffTimers(getTimerTime(), time0);
-    timerPlusEq(mem_.t_callback_prepare, diff);
+    timerPlusEq(mem_->t_callback_prepare, diff);
     full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 
@@ -271,12 +271,12 @@ namespace casadi {
                                          const NumericMetaDataMapType& con_numeric_md) {
     casadi_assert(n==solver_.nx_);
     casadi_assert(m==solver_.ng_);
-    mem_.var_string_md = var_string_md;
-    mem_.var_integer_md = var_integer_md;
-    mem_.var_numeric_md = var_numeric_md;
-    mem_.con_string_md = con_string_md;
-    mem_.con_integer_md = con_integer_md;
-    mem_.con_numeric_md = con_numeric_md;
+    mem_->var_string_md = var_string_md;
+    mem_->var_integer_md = var_integer_md;
+    mem_->var_numeric_md = var_numeric_md;
+    mem_->con_string_md = con_string_md;
+    mem_->con_integer_md = con_integer_md;
+    mem_->con_numeric_md = con_numeric_md;
   }
 
 } // namespace casadi

@@ -74,7 +74,7 @@ namespace casadi {
     /// @}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     ///@{
     /** \brief Options */
@@ -86,30 +86,30 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Set the work vectors */
-    virtual void set_temp(Memory& mem, const double** arg, double** res,
+    virtual void set_temp(Memory* mem, const double** arg, double** res,
                           int* iw, double* w) const;
 
     /** \brief Reset the forward problem */
-    virtual void reset(IntegratorMemory& mem, double t,
+    virtual void reset(IntegratorMemory* mem, double t,
                        const double* x, const double* z, const double* p) const = 0;
 
     /** \brief  Advance solution in time */
-    virtual void advance(IntegratorMemory& mem, double t,
+    virtual void advance(IntegratorMemory* mem, double t,
                          double* x, double* z, double* q) const = 0;
 
     /** \brief Reset the backward problem */
-    virtual void resetB(IntegratorMemory& mem, double t,
+    virtual void resetB(IntegratorMemory* mem, double t,
                         const double* rx, const double* rz, const double* rp) const = 0;
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(IntegratorMemory& mem, double t,
+    virtual void retreat(IntegratorMemory* mem, double t,
                          double* rx, double* rz, double* rq) const = 0;
 
     /** \brief  evaluate */
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Print solver statistics */
-    virtual void printStats(IntegratorMemory& mem, std::ostream &stream) const {}
+    virtual void printStats(IntegratorMemory* mem, std::ostream &stream) const {}
 
     /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
@@ -133,7 +133,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Set stop time for the integration */
-    virtual void setStopTime(IntegratorMemory& mem, double tf) const;
+    virtual void setStopTime(IntegratorMemory* mem, double tf) const;
 
     // Helper structure
     struct AugOffset {
@@ -350,25 +350,25 @@ namespace casadi {
     virtual Memory* memory() const { return new FixedStepMemory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /// Setup F and G
     virtual void setupFG() = 0;
 
     /** \brief Reset the forward problem */
-    virtual void reset(IntegratorMemory& mem, double t,
+    virtual void reset(IntegratorMemory* mem, double t,
                        const double* x, const double* z, const double* p) const;
 
     /** \brief  Advance solution in time */
-    virtual void advance(IntegratorMemory& mem, double t,
+    virtual void advance(IntegratorMemory* mem, double t,
                          double* x, double* z, double* q) const;
 
     /// Reset the backward problem and take time to tf
-    virtual void resetB(IntegratorMemory& mem, double t,
+    virtual void resetB(IntegratorMemory* mem, double t,
                         const double* rx, const double* rz, const double* rp) const;
 
     /** \brief  Retreat solution in time */
-    virtual void retreat(IntegratorMemory& mem, double t,
+    virtual void retreat(IntegratorMemory* mem, double t,
                          double* rx, double* rz, double* rq) const;
 
     /// Get explicit dynamics

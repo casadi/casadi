@@ -104,10 +104,10 @@ namespace casadi {
     virtual Memory* memory() const { return new QpoasesMemory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// A documentation string
     static const std::string meta_doc;

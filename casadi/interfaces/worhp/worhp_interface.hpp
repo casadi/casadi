@@ -133,14 +133,14 @@ namespace casadi {
     virtual Memory* memory() const { return new WorhpMemory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(Memory* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const;
+    virtual void solve(Memory* mem) const;
 
     // Options
     std::map<std::string, bool> bool_opts_;

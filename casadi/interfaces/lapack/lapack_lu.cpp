@@ -105,23 +105,23 @@ namespace casadi {
     }
   }
 
-  void LapackLu::linsol_factorize(Memory& mem, const double* A) const {
-    LapackLuMemory& m = dynamic_cast<LapackLuMemory&>(mem);
+  void LapackLu::linsol_factorize(Memory* mem, const double* A) const {
+    auto m = dynamic_cast<LapackLuMemory*>(mem);
 
     // Dimensions
     int nrow = this->nrow();
     int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, sparsity_, get_ptr(m.mat), false);
+    casadi_densify(A, sparsity_, get_ptr(m->mat), false);
 
     if (equilibriate_) {
       // Calculate the col and row scaling factors
       double colcnd, rowcnd; // ratio of the smallest to the largest col/row scaling factor
       double amax; // absolute value of the largest matrix element
       int info = -100;
-      dgeequ_(&ncol, &nrow, get_ptr(m.mat), &ncol, get_ptr(m.r),
-              get_ptr(m.c), &colcnd, &rowcnd, &amax, &info);
+      dgeequ_(&ncol, &nrow, get_ptr(m->mat), &ncol, get_ptr(m->r),
+              get_ptr(m->c), &colcnd, &rowcnd, &amax, &info);
       if (info < 0)
           throw CasadiException("LapackQrDense::prepare: "
                                 "dgeequ_ failed to calculate the scaling factors");
@@ -141,21 +141,21 @@ namespace casadi {
 
       // Equilibrate the matrix if scaling was successful
       if (info!=0)
-        dlaqge_(&ncol, &nrow, get_ptr(m.mat), &ncol, get_ptr(m.r), get_ptr(m.c),
-                &colcnd, &rowcnd, &amax, &m.equed);
+        dlaqge_(&ncol, &nrow, get_ptr(m->mat), &ncol, get_ptr(m->r), get_ptr(m->c),
+                &colcnd, &rowcnd, &amax, &m->equed);
       else
-        m.equed = 'N';
+        m->equed = 'N';
     }
 
     // Factorize the matrix
     int info = -100;
-    dgetrf_(&ncol, &ncol, get_ptr(m.mat), &ncol, get_ptr(m.ipiv), &info);
+    dgetrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), &info);
     casadi_assert_message(info==0, "LapackLu::prepare: "
                           "dgetrf_ failed to factorize the Jacobian");
   }
 
-  void LapackLu::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
-    LapackLuMemory& m = dynamic_cast<LapackLuMemory&>(mem);
+  void LapackLu::linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const {
+    auto m = dynamic_cast<LapackLuMemory*>(mem);
 
     // Dimensions
     int nrow = this->nrow();
@@ -163,35 +163,35 @@ namespace casadi {
 
     // Scale the right hand side
     if (tr) {
-      if (m.equed=='C' || m.equed=='B')
+      if (m->equed=='C' || m->equed=='B')
         for (int rhs=0; rhs<nrhs; ++rhs)
           for (int i=0; i<nrow; ++i)
-            x[i+rhs*nrow] *= m.c[i];
+            x[i+rhs*nrow] *= m->c[i];
     } else {
-      if (m.equed=='R' || m.equed=='B')
+      if (m->equed=='R' || m->equed=='B')
         for (int rhs=0; rhs<nrhs; ++rhs)
           for (int i=0; i<ncol; ++i)
-            x[i+rhs*nrow] *= m.r[i];
+            x[i+rhs*nrow] *= m->r[i];
     }
 
     // Solve the system of equations
     int info = 100;
     char trans = tr ? 'T' : 'N';
-    dgetrs_(&trans, &ncol, &nrhs, get_ptr(m.mat), &ncol, get_ptr(m.ipiv), x, &ncol, &info);
+    dgetrs_(&trans, &ncol, &nrhs, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), x, &ncol, &info);
     if (info != 0) throw CasadiException("LapackLu::solve: "
                                         "failed to solve the linear system");
 
     // Scale the solution
     if (tr) {
-      if (m.equed=='R' || m.equed=='B')
+      if (m->equed=='R' || m->equed=='B')
         for (int rhs=0; rhs<nrhs; ++rhs)
           for (int i=0; i<ncol; ++i)
-            x[i+rhs*nrow] *= m.r[i];
+            x[i+rhs*nrow] *= m->r[i];
     } else {
-      if (m.equed=='C' || m.equed=='B')
+      if (m->equed=='C' || m->equed=='B')
         for (int rhs=0; rhs<nrhs; ++rhs)
           for (int i=0; i<nrow; ++i)
-            x[i+rhs*nrow] *= m.c[i];
+            x[i+rhs*nrow] *= m->c[i];
     }
   }
 

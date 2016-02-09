@@ -129,101 +129,101 @@ namespace casadi {
     alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
-  void WorhpInterface::init_memory(Memory& mem) const {
+  void WorhpInterface::init_memory(Memory* mem) const {
     Nlpsol::init_memory(mem);
-    WorhpMemory& m = dynamic_cast<WorhpMemory&>(mem);
+    auto m = static_cast<WorhpMemory*>(mem);
 
     // Initialize parameters to default values
     int status;
-    InitParams(&status, &m.worhp_p);
+    InitParams(&status, &m->worhp_p);
 
     // Pass boolean parameters
     for (auto&& op : bool_opts_) {
-      WorhpSetBoolParam(&m.worhp_p, op.first.c_str(), op.second);
+      WorhpSetBoolParam(&m->worhp_p, op.first.c_str(), op.second);
     }
 
     // Pass double parameters
     for (auto&& op : double_opts_) {
-      WorhpSetDoubleParam(&m.worhp_p, op.first.c_str(), op.second);
+      WorhpSetDoubleParam(&m->worhp_p, op.first.c_str(), op.second);
     }
 
     // Pass integer parameters
     for (auto&& op : int_opts_) {
-      WorhpSetIntParam(&m.worhp_p, op.first.c_str(), op.second);
+      WorhpSetIntParam(&m->worhp_p, op.first.c_str(), op.second);
     }
 
     // Mark the parameters as set
-    m.worhp_p.initialised = true;
+    m->worhp_p.initialised = true;
   }
 
-  void WorhpInterface::set_work(Memory& mem, const double**& arg, double**& res,
+  void WorhpInterface::set_work(Memory* mem, const double**& arg, double**& res,
                                 int*& iw, double*& w) const {
-    WorhpMemory& m = dynamic_cast<WorhpMemory&>(mem);
+    auto m = static_cast<WorhpMemory*>(mem);
 
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Number of (free) variables
-    m.worhp_o.n = nx_;
+    m->worhp_o.n = nx_;
 
     // Number of constraints
-    m.worhp_o.m = ng_;
+    m->worhp_o.m = ng_;
 
     // Free existing Worhp memory (except parameters)
-    bool p_init_backup = m.worhp_p.initialised;
-    m.worhp_p.initialised = false; // Avoid freeing the memory for parameters
-    if (m.worhp_o.initialised || m.worhp_w.initialised || m.worhp_c.initialised) {
-      WorhpFree(&m.worhp_o, &m.worhp_w, &m.worhp_p, &m.worhp_c);
+    bool p_init_backup = m->worhp_p.initialised;
+    m->worhp_p.initialised = false; // Avoid freeing the memory for parameters
+    if (m->worhp_o.initialised || m->worhp_w.initialised || m->worhp_c.initialised) {
+      WorhpFree(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
     }
-    m.worhp_p.initialised = p_init_backup;
+    m->worhp_p.initialised = p_init_backup;
 
     /// Control data structure needs to be reset every time
-    m.worhp_c.initialised = false;
-    m.worhp_w.initialised = false;
-    m.worhp_o.initialised = false;
+    m->worhp_c.initialised = false;
+    m->worhp_w.initialised = false;
+    m->worhp_o.initialised = false;
 
     // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
-    m.worhp_w.DF.nnz = nx_;
-    if (m.worhp_o.m>0) {
-      m.worhp_w.DG.nnz = jacg_sp_.nnz();  // Jacobian of G
+    m->worhp_w.DF.nnz = nx_;
+    if (m->worhp_o.m>0) {
+      m->worhp_w.DG.nnz = jacg_sp_.nnz();  // Jacobian of G
     } else {
-      m.worhp_w.DG.nnz = 0;
+      m->worhp_w.DG.nnz = 0;
     }
 
-    if (true /*m.worhp_w.HM.NeedStructure*/) { // not initialized
-      m.worhp_w.HM.nnz = nx_ + hesslag_sp_.nnz_lower(true);
+    if (true /*m->worhp_w.HM.NeedStructure*/) { // not initialized
+      m->worhp_w.HM.nnz = nx_ + hesslag_sp_.nnz_lower(true);
     } else {
-      m.worhp_w.HM.nnz = 0;
+      m->worhp_w.HM.nnz = 0;
     }
 
     /* Data structure initialisation. */
-    WorhpInit(&m.worhp_o, &m.worhp_w, &m.worhp_p, &m.worhp_c);
-    if (m.worhp_c.status != FirstCall) {
-      string msg = return_codes(m.worhp_c.status);
+    WorhpInit(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
+    if (m->worhp_c.status != FirstCall) {
+      string msg = return_codes(m->worhp_c.status);
       casadi_error("Main: Initialisation failed. Status: " + msg);
     }
 
-    if (m.worhp_w.DF.NeedStructure) {
+    if (m->worhp_w.DF.NeedStructure) {
       for (int i=0; i<nx_; ++i) {
-        m.worhp_w.DF.row[i] = i + 1; // Index-1 based
+        m->worhp_w.DF.row[i] = i + 1; // Index-1 based
       }
     }
 
-    if (m.worhp_o.m>0 && m.worhp_w.DG.NeedStructure) {
+    if (m->worhp_o.m>0 && m->worhp_w.DG.NeedStructure) {
       int nz=0;
       const int* colind = jacg_sp_.colind();
       const int* row = jacg_sp_.row();
       for (int c=0; c<nx_; ++c) {
         for (int el=colind[c]; el<colind[c+1]; ++el) {
           int r = row[el];
-          m.worhp_w.DG.col[nz] = c + 1; // Index-1 based
-          m.worhp_w.DG.row[nz] = r + 1;
+          m->worhp_w.DG.col[nz] = c + 1; // Index-1 based
+          m->worhp_w.DG.row[nz] = r + 1;
           nz++;
         }
       }
     }
 
-    if (m.worhp_w.HM.NeedStructure) {
+    if (m->worhp_w.HM.NeedStructure) {
       // Get the sparsity pattern of the Hessian
       const int* colind = hesslag_sp_.colind();
       const int* row = hesslag_sp_.row();
@@ -234,8 +234,8 @@ namespace casadi {
       for (int c=0; c<nx_; ++c) {
         for (int el=colind[c]; el<colind[c+1]; ++el) {
           if (row[el]>c) {
-            m.worhp_w.HM.row[nz] = row[el] + 1;
-            m.worhp_w.HM.col[nz] = c + 1;
+            m->worhp_w.HM.row[nz] = row[el] + 1;
+            m->worhp_w.HM.col[nz] = c + 1;
             nz++;
           }
         }
@@ -243,40 +243,40 @@ namespace casadi {
 
       // Diagonal always included
       for (int r=0; r<nx_; ++r) {
-        m.worhp_w.HM.row[nz] = r + 1;
-        m.worhp_w.HM.col[nz] = r + 1;
+        m->worhp_w.HM.row[nz] = r + 1;
+        m->worhp_w.HM.col[nz] = r + 1;
         nz++;
       }
     }
   }
 
-  void WorhpInterface::solve(Memory& mem) const {
-    WorhpMemory& m = dynamic_cast<WorhpMemory&>(mem);
+  void WorhpInterface::solve(Memory* mem) const {
+    auto m = static_cast<WorhpMemory*>(mem);
 
     // Check the provided inputs
     checkInputs(mem);
 
     // Reset the counters
-    m.t_eval_f = m.t_eval_grad_f = m.t_eval_g = m.t_eval_jac_g = m.t_eval_h = m.t_callback_fun =
-      m.t_callback_prepare = m.t_mainloop = 0;
-    m.n_eval_f = m.n_eval_grad_f = m.n_eval_g = m.n_eval_jac_g = m.n_eval_h = 0;
+    m->t_eval_f = m->t_eval_grad_f = m->t_eval_g = m->t_eval_jac_g = m->t_eval_h =
+      m->t_callback_fun = m->t_callback_prepare = m->t_mainloop = 0;
+    m->n_eval_f = m->n_eval_grad_f = m->n_eval_g = m->n_eval_jac_g = m->n_eval_h = 0;
 
     double inf = numeric_limits<double>::infinity();
 
-    if (m.lbx && m.ubx) {
+    if (m->lbx && m->ubx) {
       for (int i=0; i<nx_;++i) {
-        casadi_assert_message(m.lbx[i]!=m.ubx[i],
+        casadi_assert_message(m->lbx[i]!=m->ubx[i],
                               "WorhpInterface::evaluate: Worhp cannot handle the case when "
                               "LBX == UBX."
                               "You have that case at non-zero " << i << " , which has value " <<
-                              m.ubx[i] << ". Reformulate your problem by using a parameter "
+                              m->ubx[i] << ". Reformulate your problem by using a parameter "
                               "for the corresponding variable.");
       }
     }
 
-    if (m.lbg && m.ubg) {
+    if (m->lbg && m->ubg) {
       for (int i=0; i<ng_; ++i) {
-        casadi_assert_message(!(m.lbg[i]==-inf && m.ubg[i] == inf),
+        casadi_assert_message(!(m->lbg[i]==-inf && m->ubg[i] == inf),
                               "WorhpInterface::evaluate: Worhp cannot handle the case when both "
                               "LBG and UBG are infinite."
                               "You have that case at non-zero " << i << "."
@@ -285,21 +285,21 @@ namespace casadi {
     }
 
     // Pass inputs to WORHP data structures
-    casadi_copy(m.x0, nx_, m.worhp_o.X);
-    casadi_copy(m.lbx, nx_, m.worhp_o.XL);
-    casadi_copy(m.ubx, nx_, m.worhp_o.XU);
-    casadi_copy(m.lam_x0, nx_, m.worhp_o.Lambda);
-    if (m.worhp_o.m>0) {
-      casadi_copy(m.lam_g0, ng_, m.worhp_o.Mu);
-      casadi_copy(m.lbg, ng_, m.worhp_o.GL);
-      casadi_copy(m.ubg, ng_, m.worhp_o.GU);
+    casadi_copy(m->x0, nx_, m->worhp_o.X);
+    casadi_copy(m->lbx, nx_, m->worhp_o.XL);
+    casadi_copy(m->ubx, nx_, m->worhp_o.XU);
+    casadi_copy(m->lam_x0, nx_, m->worhp_o.Lambda);
+    if (m->worhp_o.m>0) {
+      casadi_copy(m->lam_g0, ng_, m->worhp_o.Mu);
+      casadi_copy(m->lbg, ng_, m->worhp_o.GL);
+      casadi_copy(m->ubg, ng_, m->worhp_o.GU);
     }
 
-    // Replace infinite bounds with m.worhp_p.Infty
-    for (int i=0; i<nx_; ++i) if (m.worhp_o.XL[i]==-inf) m.worhp_o.XL[i] = -m.worhp_p.Infty;
-    for (int i=0; i<nx_; ++i) if (m.worhp_o.XU[i]== inf) m.worhp_o.XU[i] =  m.worhp_p.Infty;
-    for (int i=0; i<ng_; ++i) if (m.worhp_o.GL[i]==-inf) m.worhp_o.GL[i] = -m.worhp_p.Infty;
-    for (int i=0; i<ng_; ++i) if (m.worhp_o.GU[i]== inf) m.worhp_o.GU[i] =  m.worhp_p.Infty;
+    // Replace infinite bounds with m->worhp_p.Infty
+    for (int i=0; i<nx_; ++i) if (m->worhp_o.XL[i]==-inf) m->worhp_o.XL[i] = -m->worhp_p.Infty;
+    for (int i=0; i<nx_; ++i) if (m->worhp_o.XU[i]== inf) m->worhp_o.XU[i] =  m->worhp_p.Infty;
+    for (int i=0; i<ng_; ++i) if (m->worhp_o.GL[i]==-inf) m->worhp_o.GL[i] = -m->worhp_p.Infty;
+    for (int i=0; i<ng_; ++i) if (m->worhp_o.GU[i]== inf) m->worhp_o.GU[i] =  m->worhp_p.Infty;
 
     log("WorhpInterface::starting iteration");
 
@@ -308,82 +308,82 @@ namespace casadi {
     bool firstIteration = true;
 
     // Reverse Communication loop
-    while (m.worhp_c.status < TerminateSuccess &&  m.worhp_c.status > TerminateError) {
-      if (GetUserAction(&m.worhp_c, callWorhp)) {
-        Worhp(&m.worhp_o, &m.worhp_w, &m.worhp_p, &m.worhp_c);
+    while (m->worhp_c.status < TerminateSuccess &&  m->worhp_c.status > TerminateError) {
+      if (GetUserAction(&m->worhp_c, callWorhp)) {
+        Worhp(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
       }
 
 
-      if (GetUserAction(&m.worhp_c, iterOutput)) {
+      if (GetUserAction(&m->worhp_c, iterOutput)) {
 
         if (!firstIteration) {
           firstIteration = true;
 
           if (!fcallback_.is_null()) {
-            m.iter = m.worhp_w.MajorIter;
-            m.iter_sqp = m.worhp_w.MinorIter;
-            m.inf_pr = m.worhp_w.NormMax_CV;
-            m.inf_du = m.worhp_w.ScaledKKT;
-            m.alpha_pr = m.worhp_w.ArmijoAlpha;
+            m->iter = m->worhp_w.MajorIter;
+            m->iter_sqp = m->worhp_w.MinorIter;
+            m->inf_pr = m->worhp_w.NormMax_CV;
+            m->inf_du = m->worhp_w.ScaledKKT;
+            m->alpha_pr = m->worhp_w.ArmijoAlpha;
 
             time1 = clock();
 
             // Inputs
-            fill_n(m.arg, fcallback_.n_in(), nullptr);
-            m.arg[NLPSOL_X] = m.worhp_o.X;
-            m.arg[NLPSOL_F] = &m.worhp_o.F;
-            m.arg[NLPSOL_G] = m.worhp_o.G;
-            m.arg[NLPSOL_LAM_P] = 0;
-            m.arg[NLPSOL_LAM_X] = m.worhp_o.Lambda;
-            m.arg[NLPSOL_LAM_G] = m.worhp_o.Mu;
+            fill_n(m->arg, fcallback_.n_in(), nullptr);
+            m->arg[NLPSOL_X] = m->worhp_o.X;
+            m->arg[NLPSOL_F] = &m->worhp_o.F;
+            m->arg[NLPSOL_G] = m->worhp_o.G;
+            m->arg[NLPSOL_LAM_P] = 0;
+            m->arg[NLPSOL_LAM_X] = m->worhp_o.Lambda;
+            m->arg[NLPSOL_LAM_G] = m->worhp_o.Mu;
 
             // Outputs
-            fill_n(m.res, fcallback_.n_out(), nullptr);
+            fill_n(m->res, fcallback_.n_out(), nullptr);
             double ret_double;
-            m.res[0] = &ret_double;
+            m->res[0] = &ret_double;
 
             // Evaluate the callback function
-            m.n_eval_callback += 1;
-            fcallback_(m.arg, m.res, m.iw, m.w, 0);
+            m->n_eval_callback += 1;
+            fcallback_(m->arg, m->res, m->iw, m->w, 0);
             int ret = static_cast<int>(ret_double);
 
-            if (ret) m.worhp_c.status = TerminatedByUser;
+            if (ret) m->worhp_c.status = TerminatedByUser;
           }
         }
 
 
-        IterationOutput(&m.worhp_o, &m.worhp_w, &m.worhp_p, &m.worhp_c);
-        DoneUserAction(&m.worhp_c, iterOutput);
+        IterationOutput(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
+        DoneUserAction(&m->worhp_c, iterOutput);
       }
 
-      if (GetUserAction(&m.worhp_c, evalF)) {
-        calc_function(m, f_fcn_, {m.worhp_o.X, m.p}, {&m.worhp_o.F});
-        if (m.f) *m.f = m.worhp_o.F; // Store cost, before scaling
-        m.worhp_o.F *= m.worhp_w.ScaleObj;
-        DoneUserAction(&m.worhp_c, evalF);
+      if (GetUserAction(&m->worhp_c, evalF)) {
+        calc_function(m, f_fcn_, {m->worhp_o.X, m->p}, {&m->worhp_o.F});
+        if (m->f) *m->f = m->worhp_o.F; // Store cost, before scaling
+        m->worhp_o.F *= m->worhp_w.ScaleObj;
+        DoneUserAction(&m->worhp_c, evalF);
       }
 
-      if (GetUserAction(&m.worhp_c, evalG)) {
-        calc_function(m, g_fcn_, {m.worhp_o.X, m.p}, {m.worhp_o.G});
-        DoneUserAction(&m.worhp_c, evalG);
+      if (GetUserAction(&m->worhp_c, evalG)) {
+        calc_function(m, g_fcn_, {m->worhp_o.X, m->p}, {m->worhp_o.G});
+        DoneUserAction(&m->worhp_c, evalG);
       }
 
-      if (GetUserAction(&m.worhp_c, evalDF)) {
-        calc_function(m, grad_f_fcn_, {m.worhp_o.X, m.p}, {0, m.worhp_w.DF.val});
-        casadi_scal(nx_, m.worhp_w.ScaleObj, m.worhp_w.DF.val);
-        DoneUserAction(&m.worhp_c, evalDF);
+      if (GetUserAction(&m->worhp_c, evalDF)) {
+        calc_function(m, grad_f_fcn_, {m->worhp_o.X, m->p}, {0, m->worhp_w.DF.val});
+        casadi_scal(nx_, m->worhp_w.ScaleObj, m->worhp_w.DF.val);
+        DoneUserAction(&m->worhp_c, evalDF);
       }
 
-      if (GetUserAction(&m.worhp_c, evalDG)) {
-        calc_function(m, jac_g_fcn_, {m.worhp_o.X, m.p}, {0, m.worhp_w.DG.val});
-        DoneUserAction(&m.worhp_c, evalDG);
+      if (GetUserAction(&m->worhp_c, evalDG)) {
+        calc_function(m, jac_g_fcn_, {m->worhp_o.X, m->p}, {0, m->worhp_w.DG.val});
+        DoneUserAction(&m->worhp_c, evalDG);
       }
 
-      if (GetUserAction(&m.worhp_c, evalHM)) {
-        calc_function(m, hess_l_fcn_, {m.worhp_o.X, m.p, &m.worhp_w.ScaleObj, m.worhp_o.Mu},
-                      {m.worhp_w.HM.val});
+      if (GetUserAction(&m->worhp_c, evalHM)) {
+        calc_function(m, hess_l_fcn_, {m->worhp_o.X, m->p, &m->worhp_w.ScaleObj, m->worhp_o.Mu},
+                      {m->worhp_w.HM.val});
         // Diagonal values
-        double *dval = m.w;
+        double *dval = m->w;
         casadi_fill(dval, nx_, 0.);
 
         // Remove diagonal
@@ -393,68 +393,68 @@ namespace casadi {
         for (int c=0; c<nx_; ++c) {
           for (int el=colind[c]; el<colind[c+1]; ++el) {
             if (row[el]==c) {
-              dval[c] = m.worhp_w.HM.val[el];
+              dval[c] = m->worhp_w.HM.val[el];
             } else {
-              m.worhp_w.HM.val[ind++] = m.worhp_w.HM.val[el];
+              m->worhp_w.HM.val[ind++] = m->worhp_w.HM.val[el];
             }
           }
         }
 
         // Add diagonal entries at the end
-        casadi_copy(dval, nx_, m.worhp_w.HM.val+ind);
-        DoneUserAction(&m.worhp_c, evalHM);
+        casadi_copy(dval, nx_, m->worhp_w.HM.val+ind);
+        DoneUserAction(&m->worhp_c, evalHM);
       }
 
-      if (GetUserAction(&m.worhp_c, fidif)) {
-        WorhpFidif(&m.worhp_o, &m.worhp_w, &m.worhp_p, &m.worhp_c);
+      if (GetUserAction(&m->worhp_c, fidif)) {
+        WorhpFidif(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
       }
     }
 
     double time2 = clock();
-    m.t_mainloop += (time2-time1)/CLOCKS_PER_SEC;
+    m->t_mainloop += (time2-time1)/CLOCKS_PER_SEC;
 
     // Copy outputs
-    casadi_copy(m.worhp_o.X, nx_, m.x);
-    casadi_copy(m.worhp_o.G, ng_, m.g);
-    casadi_copy(m.worhp_o.Lambda, nx_, m.lam_x);
-    casadi_copy(m.worhp_o.Mu, ng_, m.lam_g);
+    casadi_copy(m->worhp_o.X, nx_, m->x);
+    casadi_copy(m->worhp_o.G, ng_, m->g);
+    casadi_copy(m->worhp_o.Lambda, nx_, m->lam_x);
+    casadi_copy(m->worhp_o.Mu, ng_, m->lam_g);
 
-    StatusMsg(&m.worhp_o, &m.worhp_w, &m.worhp_p, &m.worhp_c);
+    StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
     if (print_time_) {
       // Write timings
-      userOut() << "time spent in eval_f: " << m.t_eval_f << " s.";
-      if (m.n_eval_f>0)
-        userOut() << " (" << m.n_eval_f << " calls, " <<
-          (m.t_eval_f/m.n_eval_f)*1000 << " ms. average)";
+      userOut() << "time spent in eval_f: " << m->t_eval_f << " s.";
+      if (m->n_eval_f>0)
+        userOut() << " (" << m->n_eval_f << " calls, " <<
+          (m->t_eval_f/m->n_eval_f)*1000 << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in eval_grad_f: " << m.t_eval_grad_f << " s.";
-      if (m.n_eval_grad_f>0)
-        userOut() << " (" << m.n_eval_grad_f << " calls, "
-             << (m.t_eval_grad_f/m.n_eval_grad_f)*1000 << " ms. average)";
+      userOut() << "time spent in eval_grad_f: " << m->t_eval_grad_f << " s.";
+      if (m->n_eval_grad_f>0)
+        userOut() << " (" << m->n_eval_grad_f << " calls, "
+             << (m->t_eval_grad_f/m->n_eval_grad_f)*1000 << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in eval_g: " << m.t_eval_g << " s.";
-      if (m.n_eval_g>0)
-        userOut() << " (" << m.n_eval_g << " calls, " <<
-          (m.t_eval_g/m.n_eval_g)*1000 << " ms. average)";
+      userOut() << "time spent in eval_g: " << m->t_eval_g << " s.";
+      if (m->n_eval_g>0)
+        userOut() << " (" << m->n_eval_g << " calls, " <<
+          (m->t_eval_g/m->n_eval_g)*1000 << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in eval_jac_g: " << m.t_eval_jac_g << " s.";
-      if (m.n_eval_jac_g>0)
-        userOut() << " (" << m.n_eval_jac_g << " calls, "
-                  << (m.t_eval_jac_g/m.n_eval_jac_g)*1000 << " ms. average)";
+      userOut() << "time spent in eval_jac_g: " << m->t_eval_jac_g << " s.";
+      if (m->n_eval_jac_g>0)
+        userOut() << " (" << m->n_eval_jac_g << " calls, "
+                  << (m->t_eval_jac_g/m->n_eval_jac_g)*1000 << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in eval_h: " << m.t_eval_h << " s.";
-      if (m.n_eval_h>1)
-        userOut() << " (" << m.n_eval_h << " calls, " <<
-          (m.t_eval_h/m.n_eval_h)*1000 << " ms. average)";
+      userOut() << "time spent in eval_h: " << m->t_eval_h << " s.";
+      if (m->n_eval_h>1)
+        userOut() << " (" << m->n_eval_h << " calls, " <<
+          (m->t_eval_h/m->n_eval_h)*1000 << " ms. average)";
       userOut() << endl;
-      userOut() << "time spent in main loop: " << m.t_mainloop << " s." << endl;
-      userOut() << "time spent in callback function: " << m.t_callback_fun << " s." << endl;
-      userOut() << "time spent in callback preparation: " << m.t_callback_prepare << " s." << endl;
+      userOut() << "time spent in main loop: " << m->t_mainloop << " s." << endl;
+      userOut() << "time spent in callback function: " << m->t_callback_fun << " s." << endl;
+      userOut() << "time spent in callback preparation: " << m->t_callback_prepare << " s." << endl;
     }
 
-    m.return_code = m.worhp_c.status;
-    m.return_status = return_codes(m.worhp_c.status);
+    m->return_code = m->worhp_c.status;
+    m->return_status = return_codes(m->worhp_c.status);
   }
 
   const char* WorhpInterface::return_codes(int flag) {

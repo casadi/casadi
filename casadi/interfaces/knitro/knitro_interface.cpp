@@ -103,37 +103,37 @@ namespace casadi {
     alloc_w(ng_, true); // wubg_
   }
 
-  void KnitroInterface::init_memory(Memory& mem) const {
+  void KnitroInterface::init_memory(Memory* mem) const {
     Nlpsol::init_memory(mem);
-    KnitroMemory& m = dynamic_cast<KnitroMemory&>(mem);
+    auto m = static_cast<KnitroMemory*>(mem);
 
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block
     /*  m.kc_handle = KTR_new(); */
   }
 
-  void KnitroInterface::set_work(Memory& mem, const double**& arg, double**& res,
+  void KnitroInterface::set_work(Memory* mem, const double**& arg, double**& res,
                                  int*& iw, double*& w) const {
-    KnitroMemory& m = dynamic_cast<KnitroMemory&>(mem);
+    auto m = static_cast<KnitroMemory*>(mem);
 
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Copy inputs to temporary arrays
-    m.wx = w; w += nx_;
-    m.wlbx = w; w += nx_;
-    m.wubx = w; w += nx_;
-    m.wlbg = w; w += ng_;
-    m.wubg = w; w += ng_;
+    m->wx = w; w += nx_;
+    m->wlbx = w; w += nx_;
+    m->wubx = w; w += nx_;
+    m->wlbg = w; w += ng_;
+    m->wubg = w; w += ng_;
   }
 
-  void KnitroInterface::solve(Memory& mem) const {
-    KnitroMemory& m = dynamic_cast<KnitroMemory&>(mem);
+  void KnitroInterface::solve(Memory* mem) const {
+    auto m = static_cast<KnitroMemory*>(mem);
 
     // Allocate KNITRO memory block (move back to init!)
-    casadi_assert(m.kc_handle==0);
-    m.kc_handle = KTR_new();
-    casadi_assert(m.kc_handle!=0);
+    casadi_assert(m->kc_handle==0);
+    m->kc_handle = KTR_new();
+    casadi_assert(m->kc_handle!=0);
     int status;
 
     // Jacobian sparsity
@@ -149,10 +149,10 @@ namespace casadi {
     if (nnzH>0) {
       Hcol = hesslag_sp_.get_col();
       Hrow = hesslag_sp_.get_row();
-      status = KTR_set_int_param_by_name(m.kc_handle, "hessopt", KTR_HESSOPT_EXACT);
+      status = KTR_set_int_param_by_name(m->kc_handle, "hessopt", KTR_HESSOPT_EXACT);
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     } else {
-      status = KTR_set_int_param_by_name(m.kc_handle, "hessopt", KTR_HESSOPT_LBFGS);
+      status = KTR_set_int_param_by_name(m->kc_handle, "hessopt", KTR_HESSOPT_LBFGS);
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     }
 
@@ -160,20 +160,20 @@ namespace casadi {
     for (auto&& op : opts_) {
       // Try double
       if (op.second.can_cast_to(OT_DOUBLE)) {
-        status = KTR_set_double_param_by_name(m.kc_handle, op.first.c_str(), op.second);
+        status = KTR_set_double_param_by_name(m->kc_handle, op.first.c_str(), op.second);
         if (status==0) continue;
       }
 
       // Try integer
       if (op.second.can_cast_to(OT_INT)) {
-        status = KTR_set_int_param_by_name(m.kc_handle, op.first.c_str(), op.second);
+        status = KTR_set_int_param_by_name(m->kc_handle, op.first.c_str(), op.second);
         if (status==0) continue;
       }
 
       // try string
       if (op.second.can_cast_to(OT_STRING)) {
         string str = op.second.to_string();
-        status = KTR_set_char_param_by_name(m.kc_handle, op.first.c_str(), str.c_str());
+        status = KTR_set_char_param_by_name(m->kc_handle, op.first.c_str(), str.c_str());
         if (status==0) continue;
       }
 
@@ -182,32 +182,32 @@ namespace casadi {
     }
 
     // "Correct" upper and lower bounds
-    casadi_copy(m.x0, nx_, m.wx);
-    casadi_copy(m.lbx, nx_, m.wlbx);
-    casadi_copy(m.ubx, nx_, m.wubx);
-    casadi_copy(m.lbg, ng_, m.wlbg);
-    casadi_copy(m.ubg, ng_, m.wubg);
-    for (int i=0; i<nx_; ++i) if (isinf(m.wlbx[i])) m.wlbx[i] = -KTR_INFBOUND;
-    for (int i=0; i<nx_; ++i) if (isinf(m.wubx[i])) m.wubx[i] =  KTR_INFBOUND;
-    for (int i=0; i<ng_; ++i) if (isinf(m.wlbg[i])) m.wlbg[i] = -KTR_INFBOUND;
-    for (int i=0; i<ng_; ++i) if (isinf(m.wubg[i])) m.wubg[i] =  KTR_INFBOUND;
+    casadi_copy(m->x0, nx_, m->wx);
+    casadi_copy(m->lbx, nx_, m->wlbx);
+    casadi_copy(m->ubx, nx_, m->wubx);
+    casadi_copy(m->lbg, ng_, m->wlbg);
+    casadi_copy(m->ubg, ng_, m->wubg);
+    for (int i=0; i<nx_; ++i) if (isinf(m->wlbx[i])) m->wlbx[i] = -KTR_INFBOUND;
+    for (int i=0; i<nx_; ++i) if (isinf(m->wubx[i])) m->wubx[i] =  KTR_INFBOUND;
+    for (int i=0; i<ng_; ++i) if (isinf(m->wlbg[i])) m->wlbg[i] = -KTR_INFBOUND;
+    for (int i=0; i<ng_; ++i) if (isinf(m->wubg[i])) m->wubg[i] =  KTR_INFBOUND;
 
     // Initialize KNITRO
-    status = KTR_init_problem(m.kc_handle, nx_, KTR_OBJGOAL_MINIMIZE,
-                              KTR_OBJTYPE_GENERAL, m.wlbx, m.wubx, ng_, get_ptr(contype_),
-                              m.wlbg, m.wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                              nnzH, get_ptr(Hrow), get_ptr(Hcol), m.wx, 0); // initial lambda
+    status = KTR_init_problem(m->kc_handle, nx_, KTR_OBJGOAL_MINIMIZE,
+                              KTR_OBJTYPE_GENERAL, m->wlbx, m->wubx, ng_, get_ptr(contype_),
+                              m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
+                              nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0); // initial lambda
     casadi_assert_message(status==0, "KTR_init_problem failed");
 
     // Register callback functions
-    status = KTR_set_func_callback(m.kc_handle, &callback);
+    status = KTR_set_func_callback(m->kc_handle, &callback);
     casadi_assert_message(status==0, "KTR_set_func_callback failed");
 
-    status = KTR_set_grad_callback(m.kc_handle, &callback);
+    status = KTR_set_grad_callback(m->kc_handle, &callback);
     casadi_assert_message(status==0, "KTR_set_grad_callbackfailed");
 
     if (nnzH>0) {
-      status = KTR_set_hess_callback(m.kc_handle, &callback);
+      status = KTR_set_hess_callback(m->kc_handle, &callback);
       casadi_assert_message(status==0, "KTR_set_hess_callbackfailed");
     }
 
@@ -216,26 +216,26 @@ namespace casadi {
 
     // Solve NLP
     double f;
-    status = KTR_solve(m.kc_handle, m.wx, get_ptr(lambda), 0, &f,
+    status = KTR_solve(m->kc_handle, m->wx, get_ptr(lambda), 0, &f,
                        0, 0, 0, 0, 0, static_cast<void*>(&m));
-    m.return_status = return_codes(status);
+    m->return_status = return_codes(status);
 
     // Output primal solution
-    casadi_copy(m.wx, nx_, m.x);
+    casadi_copy(m->wx, nx_, m->x);
 
     // Output dual solution
-    casadi_copy(get_ptr(lambda), ng_, m.lam_g);
-    casadi_copy(get_ptr(lambda)+ng_, nx_, m.lam_x);
+    casadi_copy(get_ptr(lambda), ng_, m->lam_g);
+    casadi_copy(get_ptr(lambda)+ng_, nx_, m->lam_x);
 
     // Output optimal cost
-    if (m.f) *m.f = f;
+    if (m->f) *m->f = f;
 
     // Calculate constraints
-    if (m.g) calc_function(m, fg_fcn_, {m.wx, m.p}, {0, m.g});
+    if (m->g) calc_function(m, fg_fcn_, {m->wx, m->p}, {0, m->g});
 
     // Free memory (move to destructor!)
-    KTR_free(&m.kc_handle);
-    m.kc_handle = 0;
+    KTR_free(&m->kc_handle);
+    m->kc_handle = 0;
   }
 
   int KnitroInterface::callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
@@ -245,20 +245,20 @@ namespace casadi {
                                void *userParams) {
     try {
       // Get a pointer to the calling object
-      KnitroMemory& m = *static_cast<KnitroMemory*>(userParams);
+      auto m = static_cast<KnitroMemory*>(userParams);
 
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC:
-        m.self.calc_function(m, m.self.fg_fcn_, {x, m.p}, {obj, c});
+        m->self.calc_function(m, m->self.fg_fcn_, {x, m->p}, {obj, c});
         break;
       case KTR_RC_EVALGA:
-        m.self.calc_function(m, m.self.gf_jg_fcn_, {x, m.p}, {objGrad, jac});
+        m->self.calc_function(m, m->self.gf_jg_fcn_, {x, m->p}, {objGrad, jac});
         break;
       case KTR_RC_EVALH:
         {
           double sigma = 1.;
-          if (m.self.calc_function(m, m.self.hess_l_fcn_, {x, m.p, &sigma, lambda}, {hessian})) {
+          if (m->self.calc_function(m, m->self.hess_l_fcn_, {x, m->p, &sigma, lambda}, {hessian})) {
             casadi_error("calc_hess_l failed");
           }
         }

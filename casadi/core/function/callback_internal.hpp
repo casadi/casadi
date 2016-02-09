@@ -59,7 +59,7 @@ namespace casadi {
     virtual void finalize();
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */

@@ -58,7 +58,7 @@ namespace casadi {
 #endif // WITH_IPOPT_CALLBACK
 
   public:
-    IpoptUserClass(const IpoptInterface& ipoptInterface, IpoptMemory& mem);
+    IpoptUserClass(const IpoptInterface& ipoptInterface, IpoptMemory* mem);
     virtual ~IpoptUserClass();
 
     /** Method to return some info about the nlp */
@@ -147,7 +147,7 @@ namespace casadi {
     IpoptUserClass(const IpoptUserClass&);
     IpoptUserClass& operator=(const IpoptUserClass&);
     const IpoptInterface& solver_;
-    IpoptMemory& mem_;
+    IpoptMemory* mem_;
 
     double * x_;
     double * z_L_;

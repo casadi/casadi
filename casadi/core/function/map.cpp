@@ -127,7 +127,7 @@ namespace casadi {
     }
   }
 
-  void MapSerial::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void MapSerial::eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
     evalGen(arg, res, iw, w);
   }
 
@@ -339,7 +339,7 @@ namespace casadi {
     }
   }
 
-  void MapReduce::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void MapReduce::eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
       evalGen<double>(arg, res, iw, w, std::plus<double>());
     } else {
@@ -499,7 +499,7 @@ namespace casadi {
   MapOmp::~MapOmp() {
   }
 
-  void MapOmp::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void MapOmp::eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for

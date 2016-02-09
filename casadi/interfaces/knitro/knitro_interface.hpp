@@ -98,14 +98,14 @@ namespace casadi {
     virtual Memory* memory() const { return new KnitroMemory(*this);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(Memory* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const;
+    virtual void solve(Memory* mem) const;
 
     // KNITRO callback wrapper
     static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,

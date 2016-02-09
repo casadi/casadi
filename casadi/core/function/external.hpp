@@ -242,7 +242,7 @@ namespace casadi {
     virtual ~GenericExternal() {}
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;

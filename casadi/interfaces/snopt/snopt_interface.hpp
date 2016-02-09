@@ -121,14 +121,14 @@ namespace casadi {
     virtual Memory* memory() const { return new SnoptMemory(*this);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(Memory* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const;
+    virtual void solve(Memory* mem) const;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -137,7 +137,7 @@ namespace casadi {
 
     std::string formatStatus(int status) const;
 
-    void userfun(SnoptMemory &m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
+    void userfun(SnoptMemory* m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
                  double* x, double* fObj, double*gObj, double* fCon, double* gCon,
                  int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) const;
 

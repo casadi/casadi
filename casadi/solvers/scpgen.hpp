@@ -126,49 +126,49 @@ namespace casadi {
     virtual Memory* memory() const { return new ScpgenMemory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(Memory* mem) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(Memory* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const;
+    virtual void solve(Memory* mem) const;
 
     // Calculate the L1-norm of the primal infeasibility
-    double primalInfeasibility(ScpgenMemory& m) const;
+    double primalInfeasibility(ScpgenMemory* m) const;
 
     // Calculate the L1-norm of the dual infeasibility
-    double dualInfeasibility(ScpgenMemory& m) const;
+    double dualInfeasibility(ScpgenMemory* m) const;
 
     // Print iteration header
-    void printIteration(ScpgenMemory& m, std::ostream &stream) const;
+    void printIteration(ScpgenMemory* m, std::ostream &stream) const;
 
     // Print iteration
-    void printIteration(ScpgenMemory& m, std::ostream &stream, int iter, double obj,
+    void printIteration(ScpgenMemory* m, std::ostream &stream, int iter, double obj,
                         double pr_inf, double du_inf,
                         double reg, int ls_trials, bool ls_success) const;
 
     // Evaluate the matrices in the condensed QP
-    void eval_mat(ScpgenMemory& m) const;
+    void eval_mat(ScpgenMemory* m) const;
 
     // Evaluate the vectors in the condensed QP
-    void eval_vec(ScpgenMemory& m) const;
+    void eval_vec(ScpgenMemory* m) const;
 
     // Evaluate the residual function
-    void eval_res(ScpgenMemory& m) const;
+    void eval_res(ScpgenMemory* m) const;
 
     // Regularize the condensed QP
-    void regularize(ScpgenMemory& m) const;
+    void regularize(ScpgenMemory* m) const;
 
     // Solve the QP to get the (full) step
-    void solve_qp(ScpgenMemory& m) const;
+    void solve_qp(ScpgenMemory* m) const;
 
     // Perform the line-search to take the step
-    void line_search(ScpgenMemory& m, int& ls_iter, bool& ls_success) const;
+    void line_search(ScpgenMemory* m, int& ls_iter, bool& ls_success) const;
 
     // Evaluate the step expansion
-    void eval_exp(ScpgenMemory& m) const;
+    void eval_exp(ScpgenMemory* m) const;
 
     /// QP solver for the subproblems
     Function qpsol_;

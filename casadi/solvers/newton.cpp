@@ -103,9 +103,9 @@ namespace casadi {
     alloc_w(jac_.nnz_out(0), true); // J
   }
 
-  void Newton::eval(Memory& mem, const double** arg, double** res,
+  void Newton::eval(Memory* mem, const double** arg, double** res,
                     int* iw, double* w) const {
-    NewtonMemory& m = dynamic_cast<NewtonMemory&>(mem);
+    auto m = static_cast<NewtonMemory*>(mem);
 
     // IO buffers
     const double** arg1 = arg + n_in();
@@ -130,7 +130,7 @@ namespace casadi {
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
         log("eval", "Max. iterations reached.");
-        m.return_status = "max_iteration_reached";
+        m->return_status = "max_iteration_reached";
         success = false;
         break;
       }
@@ -195,8 +195,8 @@ namespace casadi {
     }
 
     // Store the iteration count
-    if (gather_stats_) m.iter = iter;
-    if (success) m.return_status = "success";
+    if (gather_stats_) m->iter = iter;
+    if (success) m->return_status = "success";
 
     casadi_msg("Newton::solveNonLinear():end after " << iter << " steps");
   }

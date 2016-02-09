@@ -420,54 +420,54 @@ namespace casadi {
     //alloc_w(nrp_, true); // rp_
   }
 
-  void SundialsInterface::init_memory(Memory& mem) const {
+  void SundialsInterface::init_memory(Memory* mem) const {
     Integrator::init_memory(mem);
-    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
 
     // Allocate n-vectors
-    m.xz = N_VNew_Serial(nx_+nz_);
-    m.q = N_VNew_Serial(nq_);
-    m.rxz = N_VNew_Serial(nrx_+nrz_);
-    m.rq = N_VNew_Serial(nrq_);
+    m->xz = N_VNew_Serial(nx_+nz_);
+    m->q = N_VNew_Serial(nq_);
+    m->rxz = N_VNew_Serial(nrx_+nrz_);
+    m->rq = N_VNew_Serial(nrq_);
 
     // Allocate memory
-    m.p.resize(np_);
-    m.rp.resize(nrp_);
+    m->p.resize(np_);
+    m->rp.resize(nrp_);
   }
 
-  void SundialsInterface::reset(IntegratorMemory& mem, double t, const double* x,
+  void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,
                                 const double* z, const double* p) const {
-    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
 
     // Update time
-    m.t = t;
+    m->t = t;
 
     // Set parameters
-    casadi_copy(p, np_, get_ptr(m.p));
+    casadi_copy(p, np_, get_ptr(m->p));
 
     // Set the state
-    casadi_copy(x, nx_, NV_DATA_S(m.xz));
-    casadi_copy(z, nz_, NV_DATA_S(m.xz)+nx_);
+    casadi_copy(x, nx_, NV_DATA_S(m->xz));
+    casadi_copy(z, nz_, NV_DATA_S(m->xz)+nx_);
 
     // Reset summation states
-    N_VConst(0., m.q);
+    N_VConst(0., m->q);
   }
 
-  void SundialsInterface::resetB(IntegratorMemory& mem, double t, const double* rx,
+  void SundialsInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
                                  const double* rz, const double* rp) const {
-    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
 
     // Update time
-    m.t = t;
+    m->t = t;
 
     // Set parameters
-    casadi_copy(rp, nrp_, get_ptr(m.rp));
+    casadi_copy(rp, nrp_, get_ptr(m->rp));
 
     // Get the backward state
-    casadi_copy(rx, nrx_, NV_DATA_S(m.rxz));
+    casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
 
     // Reset summation states
-    N_VConst(0., m.rq);
+    N_VConst(0., m->rq);
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {

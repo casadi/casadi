@@ -253,25 +253,25 @@ namespace casadi {
     alloc_w(n_+nc_, true); // dual
   }
 
-  void QpoasesInterface::init_memory(Memory& mem) const {
-    QpoasesMemory& m = dynamic_cast<QpoasesMemory&>(mem);
-    m.called_once = false;
+  void QpoasesInterface::init_memory(Memory* mem) const {
+    auto m = dynamic_cast<QpoasesMemory*>(mem);
+    m->called_once = false;
 
     // Create qpOASES instance
-    if (m.qp) delete m.qp;
+    if (m->qp) delete m->qp;
     if (nc_==0) {
-      m.qp = new qpOASES::QProblemB(n_);
+      m->qp = new qpOASES::QProblemB(n_);
     } else {
-      m.sqp = new qpOASES::SQProblem(n_, nc_);
+      m->sqp = new qpOASES::SQProblem(n_, nc_);
     }
 
     // Pass to qpOASES
-    m.qp->setOptions(ops_);
+    m->qp->setOptions(ops_);
   }
 
   void QpoasesInterface::
-  eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
-    QpoasesMemory& m = dynamic_cast<QpoasesMemory&>(mem);
+  eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const {
+    auto m = static_cast<QpoasesMemory*>(mem);
 
     if (inputs_check_) {
       checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
@@ -308,23 +308,23 @@ namespace casadi {
       int* h_row = const_cast<int*>(hsp.row());
       double* h=w; w += hsp.nnz();
       casadi_copy(arg[QPSOL_H], hsp.nnz(), h);
-      if (m.h) delete m.h;
-      m.h = new qpOASES::SymSparseMat(hsp.size1(), hsp.size2(), h_row, h_colind, h);
-      m.h->createDiagInfo();
+      if (m->h) delete m->h;
+      m->h = new qpOASES::SymSparseMat(hsp.size1(), hsp.size2(), h_row, h_colind, h);
+      m->h->createDiagInfo();
 
       // Get linear term
       int* a_colind = const_cast<int*>(asp.colind());
       int* a_row = const_cast<int*>(asp.row());
       double* a=w; w += asp.nnz();
       casadi_copy(arg[QPSOL_A], asp.nnz(), a);
-      if (m.a) delete m.a;
-      m.a = new qpOASES::SparseMatrix(asp.size1(), asp.size2(), a_row, a_colind, a);
+      if (m->a) delete m->a;
+      m->a = new qpOASES::SparseMatrix(asp.size1(), asp.size2(), a_row, a_colind, a);
 
       // Solve sparse
-      if (m.called_once) {
-        flag = m.sqp->hotstart(m.h, g, m.a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+      if (m->called_once) {
+        flag = m->sqp->hotstart(m->h, g, m->a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
       } else {
-        flag = m.sqp->init(m.h, g, m.a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+        flag = m->sqp->init(m->h, g, m->a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
       }
 
     } else {
@@ -338,40 +338,40 @@ namespace casadi {
 
       // Solve dense
       if (nc_==0) {
-        if (m.called_once) {
+        if (m->called_once) {
           // Broken?
-          //flag = m.qp->hotstart(g, lb, ub, nWSR, cputime_ptr);
-          m.qp->reset();
-          flag = m.qp->init(h, g, lb, ub, nWSR, cputime_ptr);
+          //flag = m->qp->hotstart(g, lb, ub, nWSR, cputime_ptr);
+          m->qp->reset();
+          flag = m->qp->init(h, g, lb, ub, nWSR, cputime_ptr);
         } else {
-          flag = m.qp->init(h, g, lb, ub, nWSR, cputime_ptr);
+          flag = m->qp->init(h, g, lb, ub, nWSR, cputime_ptr);
         }
       } else {
-        if (m.called_once) {
-          flag = m.sqp->hotstart(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+        if (m->called_once) {
+          flag = m->sqp->hotstart(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
         } else {
-          flag = m.sqp->init(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+          flag = m->sqp->init(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
         }
       }
     }
 
     // Solver is "warm" now
-    m.called_once = true;
+    m->called_once = true;
 
     if (flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {
       throw CasadiException("qpOASES failed: " + getErrorMessage(flag));
     }
 
     // Get optimal cost
-    if (res[QPSOL_COST]) *res[QPSOL_COST] = m.qp->getObjVal();
+    if (res[QPSOL_COST]) *res[QPSOL_COST] = m->qp->getObjVal();
 
     // Get the primal solution
-    if (res[QPSOL_X]) m.qp->getPrimalSolution(res[QPSOL_X]);
+    if (res[QPSOL_X]) m->qp->getPrimalSolution(res[QPSOL_X]);
 
     // Get the dual solution
     if (res[QPSOL_LAM_X] || res[QPSOL_LAM_A]) {
       double* dual=w; w += n_+nc_;
-      m.qp->getDualSolution(dual);
+      m->qp->getDualSolution(dual);
       casadi_scal(n_+nc_, -1., dual);
       casadi_copy(dual, n_, res[QPSOL_LAM_X]);
       casadi_copy(dual+n_, nc_, res[QPSOL_LAM_A]);
