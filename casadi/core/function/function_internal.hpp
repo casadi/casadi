@@ -706,7 +706,7 @@ namespace casadi {
     void alloc(const Function& f, bool persistent=false);
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const {return new Memory();}
+    virtual void* alloc_memory() const {return 0;}
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const {}

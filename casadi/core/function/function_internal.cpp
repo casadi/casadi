@@ -356,8 +356,7 @@ namespace casadi {
     // Create memory object
     casadi_assert(mem_.empty());
     Memory* m = static_cast<Memory*>(alloc_memory());
-    casadi_assert(m!=0);
-    init_memory(m);
+    if (m) init_memory(m);
     mem_.push_back(m);
   }
 
