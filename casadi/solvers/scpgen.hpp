@@ -87,9 +87,6 @@ namespace casadi {
 
     // Current iteration
     int iter_count;
-
-    /// Get all statistics
-    virtual Dict get_stats() const;
   };
 
   /**  \brief \pluginbrief{Nlpsol,scpgen}
@@ -130,6 +127,9 @@ namespace casadi {
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
+
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const;
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,

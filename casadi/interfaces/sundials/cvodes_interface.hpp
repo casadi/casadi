@@ -78,9 +78,6 @@ namespace casadi {
     // Ids of backward problem
     int whichB;
 
-    /// Get all statistics
-    virtual Dict get_stats() const;
-
     /// Constructor
     CvodesMemory(const CvodesInterface& s);
 
@@ -130,6 +127,9 @@ namespace casadi {
 
     /** \brief Initalize memory block */
     virtual void init_memory(void* mem) const;
+
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory* mem, double t, const double* x,

@@ -649,10 +649,11 @@ namespace casadi {
     }
   }
 
-  Dict IpoptMemory::get_stats() const {
-    Dict stats = NlpsolMemory::get_stats();
-    stats["return_status"] = return_status;
-    stats["iter_count"] = iter_count;
+  Dict IpoptInterface::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<IpoptMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    stats["iter_count"] = m->iter_count;
     return stats;
   }
 

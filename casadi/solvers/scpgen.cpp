@@ -1359,15 +1359,16 @@ namespace casadi {
     m->t_eval_exp += (time2-time1)/CLOCKS_PER_SEC;
   }
 
-  Dict ScpgenMemory::get_stats() const {
-    Dict stats = NlpsolMemory::get_stats();
-    stats["t_eval_mat"] = t_eval_mat;
-    stats["t_eval_res"] = t_eval_res;
-    stats["t_eval_vec"] = t_eval_vec;
-    stats["t_eval_exp"] = t_eval_exp;
-    stats["t_solve_qp"] = t_solve_qp;
-    stats["t_mainloop"] = t_mainloop;
-    stats["iter_count"] = iter_count;
+  Dict Scpgen::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<ScpgenMemory*>(mem);
+    stats["t_eval_mat"] = m->t_eval_mat;
+    stats["t_eval_res"] = m->t_eval_res;
+    stats["t_eval_vec"] = m->t_eval_vec;
+    stats["t_eval_exp"] = m->t_eval_exp;
+    stats["t_solve_qp"] = m->t_solve_qp;
+    stats["t_mainloop"] = m->t_mainloop;
+    stats["iter_count"] = m->iter_count;
     return stats;
   }
 

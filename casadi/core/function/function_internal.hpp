@@ -68,9 +68,6 @@ namespace casadi {
   struct CASADI_EXPORT Memory {
     /** \brief Destructor */
     virtual ~Memory() {}
-
-    /// Get all statistics
-    virtual Dict get_stats() const { return Dict();}
   };
 
   /** \brief Function memory with temporary work vectors */
@@ -716,6 +713,9 @@ namespace casadi {
 
     /** \brief Clear all memory (called from destructor) */
     void clear_memory();
+
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const { return Dict();}
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
