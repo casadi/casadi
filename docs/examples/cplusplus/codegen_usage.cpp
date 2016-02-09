@@ -59,15 +59,15 @@ int usage_c(){
   dlerror();
 
   /* Initialize and get the number of inputs and outputs */
-  typedef int (*init_t)(int* n_in, int* n_out, int* n_mem);
+  typedef int (*init_t)(int* n_in, int* n_out, int* n_int, int* n_real);
   init_t init = (init_t)dlsym(handle, "f_init");
   if(dlerror()){
     printf("Failed to retrieve \"init\" function.\n");
     return 1;
   }
-  int n_in, n_out;
-  if (init(&n_in, &n_out, 0)) return 1;
-  printf("n_in = %d, n_out = %d\n", n_in, n_out);
+  int n_in, n_out, n_int, n_real;
+  if (init(&n_in, &n_out, &n_int, &n_real)) return 1;
+  printf("n_in = %d, n_out = %d, n_int = %d, n_real = %d\n", n_in, n_out, n_int, n_real);
 
   /* Function for retrieving sparsities */
   typedef int (*sparsity_t)(int ind, int *n_col, int *n_row,

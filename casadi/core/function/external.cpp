@@ -89,6 +89,39 @@ namespace casadi {
     fcnPtr = (FcnPtr)compiler_.getFunction(sym);
   }
 
+  Options External::options_
+  = {{&FunctionInternal::options_},
+     {{"int_data",
+       {OT_INTVECTOR,
+        "Integer data vector to be passed to the external function"}},
+      {"real_data",
+       {OT_DOUBLEVECTOR,
+        "Real data vector to be passed to the external function"}}
+     }
+  };
+
+  void External::init(const Dict& opts) {
+    // Call the initialization method of the base class
+    FunctionInternal::init(opts);
+
+    /** \brief Parameter lengths for consistency check */
+    int n_int = int_data_.size();
+    int n_real = real_data_.size();
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="int_data") {
+        int_data_ = op.second;
+      } else if (op.first=="real_data") {
+        real_data_ = op.second;
+      }
+    }
+
+    // Consistency check
+    casadi_assert_message(int_data_.size()==n_int, "'int_data' has wrong length");
+    casadi_assert_message(real_data_.size()==n_real, "'real_data' has wrong length");
+  }
+
   External*
   External::create(const std::string& bin_name, const std::string& name) {
     return createGeneric(bin_name, name);
@@ -134,8 +167,11 @@ namespace casadi {
     }
 
     // Initialize and get the number of inputs and outputs
-    int flag = init(&n_in_, &n_out_, &n_mem_);
+    int n_int, n_real;
+    int flag = init(&n_in_, &n_out_, &n_int, &n_real);
     casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
+    int_data_.resize(n_int);
+    real_data_.resize(n_real);
 
     // Get number of temporaries
     int sz_arg, sz_res, sz_iw, sz_w;

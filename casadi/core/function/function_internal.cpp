@@ -1914,7 +1914,7 @@ namespace casadi {
     stringstream &s = g.body;
 
     // Function that returns the number of inputs and outputs
-    string tmp = "int " + fname + "_init(int* n_in, int* n_out, int* n_mem)";
+    string tmp = "int " + fname + "_init(int* n_in, int* n_out, int* n_int, int* n_real)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1924,7 +1924,8 @@ namespace casadi {
     s << tmp << " {" << endl
       << "  if (n_in) *n_in = " << n_in << ";" << endl
       << "  if (n_out) *n_out = " << n_out << ";" << endl
-      << "  if (n_mem) *n_mem = -1;" << endl
+      << "  if (n_int) *n_int = 0;" << endl
+      << "  if (n_real) *n_real = 0;" << endl
       << "  return 0;" << endl
       << "}" << endl
       << endl;
