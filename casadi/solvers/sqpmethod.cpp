@@ -57,8 +57,8 @@ namespace casadi {
     : Nlpsol(name, nlp) {
   }
 
-
   Sqpmethod::~Sqpmethod() {
+    clear_memory();
   }
 
   Options Sqpmethod::options_
