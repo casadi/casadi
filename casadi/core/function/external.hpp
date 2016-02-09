@@ -204,6 +204,16 @@ namespace casadi {
     virtual bool hasFullJacobian() const;
     virtual Function getFullJacobian(const std::string& name, const Dict& opts);
     ///@}
+
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const {
+      void* mem;
+      allocmem_(&mem, get_ptr(int_data_), get_ptr(real_data_));
+      return mem;
+    }
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { freemem_(mem);}
   };
 
   template<typename LibType>
