@@ -56,9 +56,6 @@ namespace casadi {
 
     // number of iterations
     int n_iter;
-
-    /** \brief  Destructor */
-    virtual ~NlpsolMemory() {}
   };
 
   /** \brief NLP solver storage class

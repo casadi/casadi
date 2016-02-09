@@ -80,7 +80,7 @@ namespace casadi {
     SundialsMemory();
 
     /// Destructor
-    virtual ~SundialsMemory();
+    ~SundialsMemory();
   };
 
   class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {

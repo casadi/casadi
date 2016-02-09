@@ -37,10 +37,7 @@
 /// \cond INTERNAL
 namespace casadi {
   // Memory
-  struct CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlpMemory : public Memory {
-    /// Destructor
-    virtual ~ImplicitToNlpMemory() {}
-
+  struct CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlpMemory {
     /// Stats
     Dict solver_stats;
   };

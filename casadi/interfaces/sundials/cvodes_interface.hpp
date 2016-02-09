@@ -82,7 +82,7 @@ namespace casadi {
     CvodesMemory(const CvodesInterface& s);
 
     /// Destructor
-    virtual ~CvodesMemory();
+    ~CvodesMemory();
   };
 
   /** \brief \pluginbrief{Integrator,cvodes}

@@ -53,10 +53,7 @@ namespace casadi {
   extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
                          double *alpha, double *a, int *lda, double *b, int *ldb);
 
-  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory : public Memory {
-    // Destructor
-    virtual ~LapackQrMemory() {}
-
+  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory {
     // Matrix
     std::vector<double> mat;
 

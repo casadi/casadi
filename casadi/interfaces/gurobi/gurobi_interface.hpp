@@ -43,7 +43,7 @@ extern "C" {
 /// \cond INTERNAL
 namespace casadi {
 
-  struct CASADI_QPSOL_GUROBI_EXPORT GurobiMemory : public Memory {
+  struct CASADI_QPSOL_GUROBI_EXPORT GurobiMemory {
     // Gurobi environment
     GRBenv *env;
 
@@ -51,7 +51,7 @@ namespace casadi {
     GurobiMemory();
 
     /// Destructor
-    virtual ~GurobiMemory();
+    ~GurobiMemory();
   };
 
   /** \brief \pluginbrief{Qpsol,gurobi}

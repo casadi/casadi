@@ -38,9 +38,9 @@
 #include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {
-  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory : public Memory {
+  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory {
     // Destructor
-    virtual ~CsparseMemory();
+    ~CsparseMemory();
 
     // The linear system CSparse form (CCS)
     cs A;

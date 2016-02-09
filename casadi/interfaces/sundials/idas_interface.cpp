@@ -618,7 +618,7 @@ namespace casadi {
   void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
                             const double* _z, const double* _p) const {
     log("IdasInterface::reset", "begin");
-    IdasMemory* m = dynamic_cast<IdasMemory*>(mem);
+    auto m = static_cast<IdasMemory*>(mem);
 
     // Reset the base classes
     SundialsInterface::reset(mem, t, _x, _z, _p);
@@ -686,7 +686,7 @@ namespace casadi {
 
   void IdasInterface::
   advance(IntegratorMemory* mem, double t, double* x, double* z, double* q) const {
-    IdasMemory* m = dynamic_cast<IdasMemory*>(mem);
+    auto m = static_cast<IdasMemory*>(mem);
 
     casadi_assert_message(t>=grid_.front(), "IdasInterface::integrate(" << t << "): "
                           "Cannot integrate to a time earlier than t0 (" << grid_.front() << ")");
@@ -736,7 +736,7 @@ namespace casadi {
   void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
                              const double* rz, const double* rp) const {
     log("IdasInterface::resetB", "begin");
-    IdasMemory* m = dynamic_cast<IdasMemory*>(mem);
+    auto m = static_cast<IdasMemory*>(mem);
 
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
@@ -778,7 +778,7 @@ namespace casadi {
 
   void IdasInterface::retreat(IntegratorMemory* mem, double t, double* rx,
                               double* rz, double* rq) const {
-    IdasMemory* m = dynamic_cast<IdasMemory*>(mem);
+    auto m = static_cast<IdasMemory*>(mem);
 
     // Integrate, unless already at desired time
     if (t<m->t) {
@@ -815,7 +815,7 @@ namespace casadi {
   }
 
   void IdasInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
-    IdasMemory* m = dynamic_cast<IdasMemory*>(mem);
+    auto m = static_cast<IdasMemory*>(mem);
 
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
@@ -1293,7 +1293,7 @@ namespace casadi {
 
   void IdasInterface::setStopTime(IntegratorMemory* mem, double tf) const {
     // Set the stop time of the integration -- don't integrate past this point
-    IdasMemory* m = dynamic_cast<IdasMemory*>(mem);
+    auto m = static_cast<IdasMemory*>(mem);
     int flag = IDASetStopTime(m->mem, tf);
     if (flag != IDA_SUCCESS) idas_error("IDASetStopTime", flag);
   }

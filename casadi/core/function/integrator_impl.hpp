@@ -36,8 +36,6 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT IntegratorMemory : public WorkMemory {
-    /** \brief  Destructor */
-    virtual ~IntegratorMemory() {}
   };
 
   /** \brief Internal storage for integrator related data
@@ -323,9 +321,6 @@ namespace casadi {
 
     // Tape
     std::vector<std::vector<double> > x_tape, Z_tape;
-
-    /** \brief  Destructor */
-    virtual ~FixedStepMemory() {}
   };
 
   class CASADI_EXPORT FixedStepIntegrator : public Integrator {

@@ -85,7 +85,7 @@ namespace casadi {
     WorhpMemory();
 
     /// Destructor
-    virtual ~WorhpMemory();
+    ~WorhpMemory();
   };
 
   /** \brief \pluginbrief{Nlpsol,worhp}

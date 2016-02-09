@@ -40,7 +40,7 @@ Interface to QPOases Solver for quadratic programming
 /// \cond INTERNAL
 namespace casadi {
 
-  struct CASADI_QPSOL_QPOASES_EXPORT QpoasesMemory : public Memory {
+  struct CASADI_QPSOL_QPOASES_EXPORT QpoasesMemory {
     /// QP Solver
     union {
       qpOASES::SQProblem *sqp;
@@ -58,7 +58,7 @@ namespace casadi {
     QpoasesMemory();
 
     /// Destructor
-    virtual ~QpoasesMemory();
+    ~QpoasesMemory();
   };
 
   /** \brief \pluginbrief{Qpsol,qpoases}

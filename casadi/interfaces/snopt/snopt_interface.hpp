@@ -76,7 +76,7 @@ namespace casadi {
     SnoptMemory(const SnoptInterface& self);
 
     /// Destructor
-    virtual ~SnoptMemory();
+    ~SnoptMemory();
   };
 
   /** \brief \pluginbrief{Nlpsol,snopt}

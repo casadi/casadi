@@ -64,17 +64,8 @@ namespace casadi {
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
-  /** \brief Base class for Function memory */
-  struct CASADI_EXPORT Memory {
-    /** \brief Destructor */
-    virtual ~Memory() {}
-  };
-
   /** \brief Function memory with temporary work vectors */
-  struct CASADI_EXPORT WorkMemory : public Memory {
-    /** \brief Destructor */
-    virtual ~WorkMemory() {}
-
+  struct CASADI_EXPORT WorkMemory {
     // Work vectors
     const double** arg;
     double** res;
@@ -735,7 +726,7 @@ namespace casadi {
     ///@}
 
     /// Memory objects
-    std::vector<Memory*> mem_;
+    std::vector<void*> mem_;
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;

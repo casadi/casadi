@@ -102,7 +102,7 @@ namespace casadi {
     IpoptMemory();
 
     /// Destructor
-    virtual ~IpoptMemory();
+    ~IpoptMemory();
   };
 
   /** \brief \pluginbrief{Nlpsol,ipopt}

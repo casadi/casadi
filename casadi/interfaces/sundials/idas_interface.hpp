@@ -76,7 +76,7 @@ namespace casadi {
     IdasMemory(const IdasInterface& s);
 
     /// Destructor
-    virtual ~IdasMemory();
+    ~IdasMemory();
   };
 
   /** \brief \pluginbrief{Integrator,idas}

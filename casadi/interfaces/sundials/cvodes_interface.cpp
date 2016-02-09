@@ -317,7 +317,7 @@ namespace casadi {
   void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
                               const double* z, const double* _p) const {
     casadi_msg("CvodesInterface::reset begin");
-    CvodesMemory* m = dynamic_cast<CvodesMemory*>(mem);
+    CvodesMemory* m = static_cast<CvodesMemory*>(mem);
 
     // Reset the base classes
     SundialsInterface::reset(mem, t, x, z, _p);
@@ -353,7 +353,7 @@ namespace casadi {
 
   void CvodesInterface::advance(IntegratorMemory* mem, double t, double* x,
                                 double* z, double* q) const {
-    CvodesMemory* m = dynamic_cast<CvodesMemory*>(mem);
+    auto m = static_cast<CvodesMemory*>(mem);
 
     casadi_assert_message(t>=grid_.front(),
                           "CvodesInterface::integrate(" << t << "): "
@@ -405,7 +405,7 @@ namespace casadi {
 
   void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
                                const double* rz, const double* rp) const {
-    CvodesMemory* m = dynamic_cast<CvodesMemory*>(mem);
+    CvodesMemory* m = static_cast<CvodesMemory*>(mem);
 
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
@@ -428,7 +428,7 @@ namespace casadi {
 
   void CvodesInterface::retreat(IntegratorMemory* mem, double t,
                                 double* rx, double* rz, double* rq) const {
-    CvodesMemory* m = dynamic_cast<CvodesMemory*>(mem);
+    auto m = static_cast<CvodesMemory*>(mem);
 
     // Integrate, unless already at desired time
     if (t<m->t) {
@@ -463,7 +463,7 @@ namespace casadi {
   }
 
   void CvodesInterface::printStats(IntegratorMemory* mem, std::ostream &stream) const {
-    CvodesMemory* m = dynamic_cast<CvodesMemory*>(mem);
+    auto m = static_cast<CvodesMemory*>(mem);
 
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;

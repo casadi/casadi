@@ -58,7 +58,7 @@ namespace casadi {
     KnitroMemory(const KnitroInterface& self);
 
     /// Destructor
-    virtual ~KnitroMemory();
+    ~KnitroMemory();
   };
 
   /** \brief \pluginbrief{Nlpsol,knitro}

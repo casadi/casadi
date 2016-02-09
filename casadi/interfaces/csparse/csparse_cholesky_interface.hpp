@@ -39,9 +39,9 @@
 
 namespace casadi {
 
-  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory : public Memory {
+  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory {
     // Destructor
-    virtual ~CsparseCholMemory();
+    ~CsparseCholMemory();
 
     // The transpose of linear system in form (CCS)
     cs A;

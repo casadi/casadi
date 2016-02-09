@@ -57,10 +57,7 @@ namespace casadi {
   extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
                           double *colcnd, double *rowcnd, double *amax, char *equed);
 
-  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory : public Memory {
-    // Destructor
-    virtual ~LapackLuMemory() {}
-
+  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory {
     // Matrix
     std::vector<double> mat;
 

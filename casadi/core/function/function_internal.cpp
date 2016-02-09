@@ -77,8 +77,7 @@ namespace casadi {
 
   FunctionInternal::~FunctionInternal() {
     for (auto&& i : mem_) {
-      if (i) delete static_cast<Memory*>(i);
-      //casadi_assert_warning(i==0, "Memory object has not been properly freed");
+      casadi_assert_warning(i==0, "Memory object has not been properly freed");
     }
     mem_.clear();
   }
@@ -278,10 +277,6 @@ namespace casadi {
       }
     }
 
-    // Free existing memory object, if any
-    for (auto&& i : mem_) delete i;
-    mem_.clear();
-
     // Get the number of inputs and outputs
     isp_.resize(get_n_in());
     osp_.resize(get_n_out());
@@ -355,7 +350,7 @@ namespace casadi {
 
     // Create memory object
     casadi_assert(mem_.empty());
-    Memory* m = static_cast<Memory*>(alloc_memory());
+    void* m = alloc_memory();
     if (m) init_memory(m);
     mem_.push_back(m);
   }

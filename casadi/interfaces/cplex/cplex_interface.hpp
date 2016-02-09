@@ -42,7 +42,7 @@
 
 namespace casadi {
 
-  struct CASADI_QPSOL_CPLEX_EXPORT CplexMemory : public Memory {
+  struct CASADI_QPSOL_CPLEX_EXPORT CplexMemory {
     /// Indicates if we have to warm-start
     bool is_warm;
 
@@ -78,7 +78,7 @@ namespace casadi {
     CplexMemory();
 
     /// Destructor
-    virtual ~CplexMemory();
+    ~CplexMemory();
   };
 
   /** \brief \pluginbrief{Qpsol,cplex}
