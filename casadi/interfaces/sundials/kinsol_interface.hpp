@@ -162,7 +162,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<KinsolMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief Callback functions */
     void func(KinsolMemory& m, N_Vector u, N_Vector fval) const;

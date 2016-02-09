@@ -254,8 +254,8 @@ namespace casadi {
     alloc_w(n_+nc_, true); // dual
   }
 
-  void QpoasesInterface::init_memory(Memory* mem) const {
-    auto m = dynamic_cast<QpoasesMemory*>(mem);
+  void QpoasesInterface::init_memory(void* mem) const {
+    auto m = static_cast<QpoasesMemory*>(mem);
     m->called_once = false;
 
     // Create qpOASES instance

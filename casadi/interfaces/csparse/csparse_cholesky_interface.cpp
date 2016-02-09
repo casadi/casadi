@@ -68,7 +68,7 @@ namespace casadi {
     Linsol::init(opts);
   }
 
-  void CSparseCholeskyInterface::init_memory(Memory* mem) const {
+  void CSparseCholeskyInterface::init_memory(void* mem) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
     m->L = 0;
     m->S = 0;

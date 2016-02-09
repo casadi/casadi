@@ -130,7 +130,7 @@ namespace casadi {
     alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
-  void WorhpInterface::init_memory(Memory* mem) const {
+  void WorhpInterface::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
     auto m = static_cast<WorhpMemory*>(mem);
 

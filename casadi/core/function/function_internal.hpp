@@ -709,7 +709,7 @@ namespace casadi {
     virtual void* alloc_memory() const {return new Memory();}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const {}
+    virtual void init_memory(void* mem) const {}
 
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const;

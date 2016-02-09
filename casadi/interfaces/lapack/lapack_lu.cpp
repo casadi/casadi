@@ -85,7 +85,7 @@ namespace casadi {
     casadi_assert(nrow()==ncol());
   }
 
-  void LapackLu::init_memory(Memory* mem) const {
+  void LapackLu::init_memory(void* mem) const {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Allocate matrix

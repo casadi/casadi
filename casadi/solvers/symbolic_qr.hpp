@@ -91,7 +91,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<SymbolicQrMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     // Setup memory block
     virtual void set_temp(Memory* mem, const double** arg, double** res,

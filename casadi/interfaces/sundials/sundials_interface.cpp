@@ -420,7 +420,7 @@ namespace casadi {
     //alloc_w(nrp_, true); // rp_
   }
 
-  void SundialsInterface::init_memory(Memory* mem) const {
+  void SundialsInterface::init_memory(void* mem) const {
     Integrator::init_memory(mem);
     auto m = static_cast<SundialsMemory*>(mem);
 

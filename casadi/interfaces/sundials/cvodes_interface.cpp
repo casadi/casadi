@@ -185,7 +185,7 @@ namespace casadi {
     m->isInitAdj = true;
   }
 
-  void CvodesInterface::init_memory(Memory* mem) const {
+  void CvodesInterface::init_memory(void* mem) const {
     SundialsInterface::init_memory(mem);
     auto m = static_cast<CvodesMemory*>(mem);
 

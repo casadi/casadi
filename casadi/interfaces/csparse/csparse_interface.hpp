@@ -86,7 +86,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<CsparseMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     // Factorize the linear system
     virtual void linsol_factorize(Memory* mem, const double* A) const;

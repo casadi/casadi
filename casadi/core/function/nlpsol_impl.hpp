@@ -142,7 +142,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<NlpsolMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief Check if the inputs correspond to a well-posed problem */
     virtual void checkInputs(Memory* mem) const;

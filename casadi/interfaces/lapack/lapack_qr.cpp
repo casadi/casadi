@@ -62,7 +62,7 @@ namespace casadi {
                                               "square matrices implemented.");
   }
 
-  void LapackQr::init_memory(Memory* mem) const {
+  void LapackQr::init_memory(void* mem) const {
     auto m = static_cast<LapackQrMemory*>(mem);
     m->mat.resize(ncol()*ncol());
     m->tau.resize(ncol());

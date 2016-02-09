@@ -713,7 +713,7 @@ namespace casadi {
     alloc(qpsol_);
   }
 
-  void Scpgen::init_memory(Memory* mem) const {
+  void Scpgen::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
     auto m = static_cast<ScpgenMemory*>(mem);
 

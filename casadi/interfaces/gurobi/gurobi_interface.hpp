@@ -94,7 +94,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<GurobiMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     /// Solve the QP
     virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;

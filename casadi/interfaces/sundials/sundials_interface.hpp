@@ -104,7 +104,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory* mem, double t, const double* x,

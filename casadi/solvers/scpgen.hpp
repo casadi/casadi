@@ -129,7 +129,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<ScpgenMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(Memory* mem, const double**& arg, double**& res,

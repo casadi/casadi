@@ -130,7 +130,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<IdasMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset(IntegratorMemory* mem, double t, const double* x,

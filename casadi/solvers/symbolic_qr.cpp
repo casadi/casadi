@@ -187,7 +187,7 @@ namespace casadi {
     alloc_w(neq_, true);
   }
 
-  void SymbolicQr::init_memory(Memory* mem) const {
+  void SymbolicQr::init_memory(void* mem) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
     // Allocate storage for QR factorization
     m->q.resize(fact_fcn_.nnz_out(0));

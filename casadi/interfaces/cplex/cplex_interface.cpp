@@ -138,7 +138,7 @@ namespace casadi {
     alloc_w(nc_, true); // lam_a
   }
 
-  void CplexInterface::init_memory(Memory* mem) const {
+  void CplexInterface::init_memory(void* mem) const {
     auto m = static_cast<CplexMemory*>(mem);
 
     // Start CPLEX

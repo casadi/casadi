@@ -493,9 +493,9 @@ namespace casadi {
     }
   }
 
-  void IdasInterface::init_memory(Memory* mem) const {
+  void IdasInterface::init_memory(void* mem) const {
     SundialsInterface::init_memory(mem);
-    IdasMemory* m = dynamic_cast<IdasMemory*>(mem);
+    auto m = static_cast<IdasMemory*>(mem);
 
     // Sundials return flag
     int flag;

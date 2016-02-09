@@ -107,7 +107,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<QpoasesMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief  Evaluate numerically */
     virtual void eval(Memory* mem, const double** arg, double** res, int* iw, double* w) const;

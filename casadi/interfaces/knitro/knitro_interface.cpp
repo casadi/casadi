@@ -104,7 +104,7 @@ namespace casadi {
     alloc_w(ng_, true); // wubg_
   }
 
-  void KnitroInterface::init_memory(Memory* mem) const {
+  void KnitroInterface::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
     auto m = static_cast<KnitroMemory*>(mem);
 

@@ -794,7 +794,7 @@ namespace casadi {
     if (this->mem) KINFree(&this->mem);
   }
 
-  void KinsolInterface::init_memory(Memory* mem) const {
+  void KinsolInterface::init_memory(void* mem) const {
     auto m = static_cast<KinsolMemory*>(mem);
 
     // Current solution

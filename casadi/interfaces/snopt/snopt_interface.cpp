@@ -151,7 +151,7 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::init_memory(Memory* mem) const {
+  void SnoptInterface::init_memory(void* mem) const {
     Nlpsol::init_memory(mem);
     auto m = static_cast<SnoptMemory*>(mem);
 

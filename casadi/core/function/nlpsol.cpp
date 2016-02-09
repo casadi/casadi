@@ -253,7 +253,7 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::init_memory(Memory* mem) const {
+  void Nlpsol::init_memory(void* mem) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
     // Create statistics

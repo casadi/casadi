@@ -366,7 +366,7 @@ namespace casadi {
     alloc_w(sz_w + nx_ + nz_ + nrx_ + nrz_);
   }
 
-  void Integrator::init_memory(Memory* mem) const {
+  void Integrator::init_memory(void* mem) const {
   }
 
   template<typename MatType>
@@ -1438,7 +1438,7 @@ namespace casadi {
     nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(RDAE_RZ);
   }
 
-  void FixedStepIntegrator::init_memory(Memory* mem) const {
+  void FixedStepIntegrator::init_memory(void* mem) const {
     Integrator::init_memory(mem);
     auto m = static_cast<FixedStepMemory*>(mem);
 

@@ -74,7 +74,7 @@ namespace casadi {
     /// @}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     ///@{
     /** \brief Options */
@@ -353,7 +353,7 @@ namespace casadi {
     virtual void free_memory(void *mem) const { delete static_cast<FixedStepMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory* mem) const;
+    virtual void init_memory(void* mem) const;
 
     /// Setup F and G
     virtual void setupFG() = 0;
