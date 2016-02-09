@@ -1404,6 +1404,7 @@ namespace casadi {
   }
 
   FixedStepIntegrator::~FixedStepIntegrator() {
+    clear_memory();
   }
 
   Options FixedStepIntegrator::options_

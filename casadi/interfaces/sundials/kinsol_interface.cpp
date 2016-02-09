@@ -82,6 +82,7 @@ namespace casadi {
   KinsolInterface::~KinsolInterface() {
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
+    clear_memory();
   }
 
   Options KinsolInterface::options_

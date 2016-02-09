@@ -706,10 +706,16 @@ namespace casadi {
     void alloc(const Function& f, bool persistent=false);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const {return new Memory();}
+    virtual void* alloc_memory() const {return new Memory();}
 
     /** \brief Initalize memory block */
     virtual void init_memory(Memory* mem) const {}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const;
+
+    /** \brief Clear all memory (called from destructor) */
+    void clear_memory();
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(Memory* mem, const double**& arg, double**& res,

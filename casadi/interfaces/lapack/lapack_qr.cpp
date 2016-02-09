@@ -50,6 +50,7 @@ namespace casadi {
   }
 
   LapackQr::~LapackQr() {
+    clear_memory();
   }
 
   void LapackQr::init(const Dict& opts) {
@@ -61,17 +62,11 @@ namespace casadi {
                                               "square matrices implemented.");
   }
 
-  Memory* LapackQr::memory() const {
-    LapackQrMemory* m = new LapackQrMemory();
-    try {
-      m->mat.resize(ncol()*ncol());
-      m->tau.resize(ncol());
-      m->work.resize(10*ncol());
-      return m;
-    } catch (...) {
-      delete m;
-      return 0;
-    }
+  void LapackQr::init_memory(Memory* mem) const {
+    auto m = static_cast<LapackQrMemory*>(mem);
+    m->mat.resize(ncol()*ncol());
+    m->tau.resize(ncol());
+    m->work.resize(10*ncol());
   }
 
   void LapackQr::linsol_factorize(Memory* mem, const double* A) const {

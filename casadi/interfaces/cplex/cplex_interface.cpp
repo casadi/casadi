@@ -470,6 +470,7 @@ namespace casadi {
   }
 
   CplexInterface::~CplexInterface() {
+    clear_memory();
   }
 
   CplexMemory::CplexMemory() {

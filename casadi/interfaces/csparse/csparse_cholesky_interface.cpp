@@ -55,6 +55,7 @@ namespace casadi {
   }
 
   CSparseCholeskyInterface::~CSparseCholeskyInterface() {
+    clear_memory();
   }
 
   CsparseCholMemory::~CsparseCholMemory() {
@@ -67,32 +68,25 @@ namespace casadi {
     Linsol::init(opts);
   }
 
-  Memory* CSparseCholeskyInterface::memory() const {
-    CsparseCholMemory* m = new CsparseCholMemory();
-    try {
-      m->L = 0;
-      m->S = 0;
-      m->A.nzmax = nnz_in(0);  // maximum number of entries
-      m->A.m = size1_in(0); // number of columns
-      m->A.n = size2_in(0); // number of rows
-      m->A.p = const_cast<int*>(sparsity_in(0).colind()); // row pointers (size n+1)
-      // or row indices (size nzmax)
-      m->A.i = const_cast<int*>(sparsity_in(0).row()); // column indices, size nzmax
-      m->A.x = 0; // numerical values, size nzmax
-      m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
+  void CSparseCholeskyInterface::init_memory(Memory* mem) const {
+    auto m = static_cast<CsparseCholMemory*>(mem);
+    m->L = 0;
+    m->S = 0;
+    m->A.nzmax = nnz_in(0);  // maximum number of entries
+    m->A.m = size1_in(0); // number of columns
+    m->A.n = size2_in(0); // number of rows
+    m->A.p = const_cast<int*>(sparsity_in(0).colind()); // row pointers (size n+1)
+    // or row indices (size nzmax)
+    m->A.i = const_cast<int*>(sparsity_in(0).row()); // column indices, size nzmax
+    m->A.x = 0; // numerical values, size nzmax
+    m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
-      // Temporary
-      m->temp.resize(m->A.n);
+    // Temporary
+    m->temp.resize(m->A.n);
 
-      // ordering and symbolic analysis
-      int order = 0; // ordering?
-      m->S = cs_schol(order, &m->A);
-
-      return m;
-    } catch (...) {
-      delete m;
-      return 0;
-    }
+    // ordering and symbolic analysis
+    int order = 0; // ordering?
+    m->S = cs_schol(order, &m->A);
   }
 
   Sparsity CSparseCholeskyInterface::linsol_cholesky_sparsity(Memory* mem, bool tr) const {

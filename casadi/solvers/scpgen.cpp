@@ -58,6 +58,7 @@ namespace casadi {
   }
 
   Scpgen::~Scpgen() {
+    clear_memory();
   }
 
   Options Scpgen::options_

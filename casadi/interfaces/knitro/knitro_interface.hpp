@@ -95,7 +95,10 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new KnitroMemory(*this);}
+    virtual void* alloc_memory() const { return new KnitroMemory(*this);}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<KnitroMemory*>(mem);}
 
     /** \brief Initalize memory block */
     virtual void init_memory(Memory* mem) const;

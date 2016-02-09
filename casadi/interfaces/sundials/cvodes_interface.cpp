@@ -51,6 +51,7 @@ namespace casadi {
   }
 
   CvodesInterface::~CvodesInterface() {
+    clear_memory();
   }
 
   Options CvodesInterface::options_

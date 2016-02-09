@@ -49,6 +49,7 @@ namespace casadi {
   }
 
   Newton::~Newton() {
+    clear_memory();
   }
 
   Options Newton::options_

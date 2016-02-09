@@ -50,6 +50,7 @@ namespace casadi {
   }
 
   GurobiInterface::~GurobiInterface() {
+    clear_memory();
   }
 
   Options GurobiInterface::options_

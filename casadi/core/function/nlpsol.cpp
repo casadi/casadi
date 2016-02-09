@@ -139,6 +139,7 @@ namespace casadi {
 
   Nlpsol::~Nlpsol() {
     if (nlp_) delete nlp_;
+    clear_memory();
   }
 
   Sparsity Nlpsol::get_sparsity_in(int ind) const {

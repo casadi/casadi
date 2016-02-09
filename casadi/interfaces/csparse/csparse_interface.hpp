@@ -38,6 +38,26 @@
 #include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {
+  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory : public Memory {
+    // Destructor
+    virtual ~CsparseMemory();
+
+    // The linear system CSparse form (CCS)
+    cs A;
+
+    // The symbolic factorization
+    css *S;
+
+    // The numeric factorization
+    csn *N;
+
+    // Temporary
+    std::vector<double> temp_;
+
+    // Has the solve function been called once
+    bool called_once_;
+  };
+
   /** \brief \pluginbrief{Linsol,csparse}
    * @copydoc Linsol_doc
    * @copydoc plugin_Linsol_csparse
@@ -59,8 +79,14 @@ namespace casadi {
     // Initialize the solver
     virtual void init(const Dict& opts);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new CsparseMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<CsparseMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory* mem) const;
 
     // Factorize the linear system
     virtual void linsol_factorize(Memory* mem, const double* A) const;
@@ -73,26 +99,6 @@ namespace casadi {
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "csparse";}
-  };
-
-  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory : public Memory {
-    // Destructor
-    virtual ~CsparseMemory();
-
-    // The linear system CSparse form (CCS)
-    cs A;
-
-    // The symbolic factorization
-    css *S;
-
-    // The numeric factorization
-    csn *N;
-
-    // Temporary
-    std::vector<double> temp_;
-
-    // Has the solve function been called once
-    bool called_once_;
   };
 
 } // namespace casadi

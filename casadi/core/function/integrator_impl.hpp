@@ -346,8 +346,11 @@ namespace casadi {
     /// Initialize stage
     virtual void init(const Dict& opts);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const { return new FixedStepMemory();}
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new FixedStepMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<FixedStepMemory*>(mem);}
 
     /** \brief Initalize memory block */
     virtual void init_memory(Memory* mem) const;

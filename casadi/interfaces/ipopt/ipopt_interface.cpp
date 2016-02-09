@@ -60,6 +60,7 @@ namespace casadi {
   }
 
   IpoptInterface::~IpoptInterface() {
+    clear_memory();
   }
 
   Options IpoptInterface::options_

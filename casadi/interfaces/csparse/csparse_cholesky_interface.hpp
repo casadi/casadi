@@ -39,6 +39,23 @@
 
 namespace casadi {
 
+  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory : public Memory {
+    // Destructor
+    virtual ~CsparseCholMemory();
+
+    // The transpose of linear system in form (CCS)
+    cs A;
+
+    // The symbolic factorization
+    css *S;
+
+    // The numeric factorization
+    csn *L;
+
+    // Temporary
+    std::vector<double> temp;
+  };
+
   /** \brief \pluginbrief{Linsol,csparsecholesky}
    *
    *
@@ -63,8 +80,14 @@ namespace casadi {
     // Initialize the solver
     virtual void init(const Dict& opts);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new CsparseCholMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<CsparseCholMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory* mem) const;
 
     // Factorize the linear system
     virtual void linsol_factorize(Memory* mem, const double* A) const;
@@ -86,23 +109,6 @@ namespace casadi {
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "csparsecholesky";}
-  };
-
-  struct CASADI_LINSOL_CSPARSECHOLESKY_EXPORT CsparseCholMemory : public Memory {
-    // Destructor
-    virtual ~CsparseCholMemory();
-
-    // The transpose of linear system in form (CCS)
-    cs A;
-
-    // The symbolic factorization
-    css *S;
-
-    // The numeric factorization
-    csn *L;
-
-    // Temporary
-    std::vector<double> temp;
   };
 
 } // namespace casadi

@@ -57,6 +57,23 @@ namespace casadi {
   extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
                           double *colcnd, double *rowcnd, double *amax, char *equed);
 
+  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory : public Memory {
+    // Destructor
+    virtual ~LapackLuMemory() {}
+
+    // Matrix
+    std::vector<double> mat;
+
+    /// Pivoting elements
+    std::vector<int> ipiv;
+
+    /// Col and row scaling
+    std::vector<double> r, c;
+
+    /// Type of scaling during the last equilibration
+    char equed;
+  };
+
   /** \brief \pluginbrief{Linsol,lapacklu}
    *
    * @copydoc Linsol_doc
@@ -85,8 +102,14 @@ namespace casadi {
     /// Initialize the solver
     virtual void init(const Dict& opts);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new LapackLuMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<LapackLuMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(Memory* mem) const;
 
     // Factorize the linear system
     virtual void linsol_factorize(Memory* mem, const double* A) const;
@@ -107,23 +130,6 @@ namespace casadi {
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "lapacklu";}
-  };
-
-  struct CASADI_LINSOL_LAPACKLU_EXPORT LapackLuMemory : public Memory {
-    // Destructor
-    virtual ~LapackLuMemory() {}
-
-    // Matrix
-    std::vector<double> mat;
-
-    /// Pivoting elements
-    std::vector<int> ipiv;
-
-    /// Col and row scaling
-    std::vector<double> r, c;
-
-    /// Type of scaling during the last equilibration
-    char equed;
   };
 
 /// \endcond

@@ -123,7 +123,10 @@ namespace casadi {
     virtual void initAdj(CvodesMemory* m) const;
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new CvodesMemory(*this);}
+    virtual void* alloc_memory() const { return new CvodesMemory(*this);}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<CvodesMemory*>(mem);}
 
     /** \brief Initalize memory block */
     virtual void init_memory(Memory* mem) const;

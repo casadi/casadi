@@ -156,7 +156,10 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new KinsolMemory(*this);}
+    virtual void* alloc_memory() const { return new KinsolMemory(*this);}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<KinsolMemory*>(mem);}
 
     /** \brief Initalize memory block */
     virtual void init_memory(Memory* mem) const;

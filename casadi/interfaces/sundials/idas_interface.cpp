@@ -54,6 +54,7 @@ namespace casadi {
   }
 
   IdasInterface::~IdasInterface() {
+    clear_memory();
   }
 
   Options IdasInterface::options_

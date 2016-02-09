@@ -123,7 +123,10 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new ScpgenMemory();}
+    virtual void* alloc_memory() const { return new ScpgenMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<ScpgenMemory*>(mem);}
 
     /** \brief Initalize memory block */
     virtual void init_memory(Memory* mem) const;

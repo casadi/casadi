@@ -136,7 +136,10 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new NlpsolMemory();}
+    virtual void* alloc_memory() const { return new NlpsolMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<NlpsolMemory*>(mem);}
 
     /** \brief Initalize memory block */
     virtual void init_memory(Memory* mem) const;

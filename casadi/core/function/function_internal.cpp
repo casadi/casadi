@@ -76,7 +76,10 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
-    for (auto&& i : mem_) delete i;
+    for (auto&& i : mem_) {
+      if (i) delete static_cast<Memory*>(i);
+      //casadi_assert_warning(i==0, "Memory object has not been properly freed");
+    }
     mem_.clear();
   }
 
@@ -352,7 +355,7 @@ namespace casadi {
 
     // Create memory object
     casadi_assert(mem_.empty());
-    Memory* m = memory();
+    Memory* m = static_cast<Memory*>(alloc_memory());
     casadi_assert(m!=0);
     init_memory(m);
     mem_.push_back(m);
@@ -2946,6 +2949,17 @@ namespace casadi {
                                int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
     set_temp(mem, arg, res, iw, w);
+  }
+
+  void FunctionInternal::free_memory(void *mem) const {
+    casadi_warning("'free_memory' not defined for " + type_name());
+  }
+
+  void FunctionInternal::clear_memory() {
+    for (auto&& i : mem_) {
+      if (i!=0) free_memory(i);
+    }
+    mem_.clear();
   }
 
 } // namespace casadi

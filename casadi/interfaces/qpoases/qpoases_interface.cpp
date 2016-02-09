@@ -53,6 +53,7 @@ namespace casadi {
   }
 
   QpoasesInterface::~QpoasesInterface() {
+    clear_memory();
   }
 
   Options QpoasesInterface::options_

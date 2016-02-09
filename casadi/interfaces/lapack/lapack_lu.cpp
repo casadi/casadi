@@ -54,6 +54,7 @@ namespace casadi {
   }
 
   LapackLu::~LapackLu() {
+    clear_memory();
   }
 
   Options LapackLu::options_
@@ -84,29 +85,23 @@ namespace casadi {
     casadi_assert(nrow()==ncol());
   }
 
-  Memory* LapackLu::memory() const {
-    LapackLuMemory* m = new LapackLuMemory();
-    try {
-      // Allocate matrix
-      m->mat.resize(nrow() * ncol());
-      m->ipiv.resize(ncol());
+  void LapackLu::init_memory(Memory* mem) const {
+    auto m = static_cast<LapackLuMemory*>(mem);
 
-      // Equilibration
-      if (equilibriate_) {
-        m->r.resize(nrow());
-        m->c.resize(ncol());
-      }
-      m->equed = 'N'; // No equilibration
+    // Allocate matrix
+    m->mat.resize(nrow() * ncol());
+    m->ipiv.resize(ncol());
 
-      return m;
-    } catch (...) {
-      delete m;
-      return 0;
+    // Equilibration
+    if (equilibriate_) {
+      m->r.resize(nrow());
+      m->c.resize(ncol());
     }
+    m->equed = 'N'; // No equilibration
   }
 
   void LapackLu::linsol_factorize(Memory* mem, const double* A) const {
-    auto m = dynamic_cast<LapackLuMemory*>(mem);
+    auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
     int nrow = this->nrow();
@@ -155,7 +150,7 @@ namespace casadi {
   }
 
   void LapackLu::linsol_solve(Memory* mem, double* x, int nrhs, bool tr) const {
-    auto m = dynamic_cast<LapackLuMemory*>(mem);
+    auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
     int nrow = this->nrow();

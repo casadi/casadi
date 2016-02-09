@@ -53,6 +53,7 @@ namespace casadi {
 
 
   KnitroInterface::~KnitroInterface() {
+    clear_memory();
   }
 
   Options KnitroInterface::options_

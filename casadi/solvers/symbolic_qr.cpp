@@ -52,6 +52,7 @@ namespace casadi {
   }
 
   SymbolicQr::~SymbolicQr() {
+    clear_memory();
   }
 
   Options SymbolicQr::options_
@@ -186,17 +187,11 @@ namespace casadi {
     alloc_w(neq_, true);
   }
 
-  Memory* SymbolicQr::memory() const {
-    auto m = new SymbolicQrMemory();
-    try {
-      // Allocate storage for QR factorization
-      m->q.resize(fact_fcn_.nnz_out(0));
-      m->r.resize(fact_fcn_.nnz_out(1));
-      return m;
-    } catch (...) {
-      delete m;
-      return 0;
-    }
+  void SymbolicQr::init_memory(Memory* mem) const {
+    auto m = static_cast<SymbolicQrMemory*>(mem);
+    // Allocate storage for QR factorization
+    m->q.resize(fact_fcn_.nnz_out(0));
+    m->r.resize(fact_fcn_.nnz_out(1));
   }
 
   void SymbolicQr::set_temp(Memory* mem, const double** arg, double** res,

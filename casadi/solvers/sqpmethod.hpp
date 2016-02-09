@@ -135,7 +135,10 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new SqpmethodMemory();}
+    virtual void* alloc_memory() const { return new SqpmethodMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<SqpmethodMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(Memory* mem, const double**& arg, double**& res,

@@ -53,6 +53,7 @@ namespace casadi {
   }
 
   WorhpInterface::~WorhpInterface() {
+    clear_memory();
   }
 
   Options WorhpInterface::options_

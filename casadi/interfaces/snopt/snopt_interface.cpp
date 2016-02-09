@@ -54,6 +54,7 @@ namespace casadi {
   }
 
   SnoptInterface::~SnoptInterface() {
+    clear_memory();
   }
 
   Options SnoptInterface::options_
