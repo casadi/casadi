@@ -9619,6 +9619,12 @@ General information
 |                 |                 | compiler plugin | nInternal       |
 |                 |                 | to be used.     |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| expand          | OT_BOOL         | Replace MX with | casadi::Integra |
+|                 |                 | SX expressions  | tor             |
+|                 |                 | in problem      |                 |
+|                 |                 | formulation     |                 |
+|                 |                 | [false]         |                 |
++-----------------+-----------------+-----------------+-----------------+
 | gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
 |                 |                 | indicate        | nInternal       |
 |                 |                 | whether         |                 |
@@ -10278,6 +10284,10 @@ The method is still under development
 +------------------------+------------------------+------------------------+
 | collocation_scheme     | OT_STRING              | Collocation scheme:    |
 |                        |                        | radau|legendre         |
++------------------------+------------------------+------------------------+
+| expand                 | OT_BOOL                | Replace MX with SX     |
+|                        |                        | expressions in problem |
+|                        |                        | formulation [false]    |
 +------------------------+------------------------+------------------------+
 | grid                   | OT_DOUBLEVECTOR        | Time grid              |
 +------------------------+------------------------+------------------------+
@@ -12067,11 +12077,11 @@ General information
 |                 |                 | f,g,...,stop    |                 |
 |                 |                 | the iterations  |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| expand          | OT_BOOL         | Expand the NLP  | casadi::Nlpsol  |
-|                 |                 | function in     |                 |
-|                 |                 | terms of scalar |                 |
-|                 |                 | operations,     |                 |
-|                 |                 | i.e. MX->SX     |                 |
+| expand          | OT_BOOL         | Replace MX with | casadi::Nlpsol  |
+|                 |                 | SX expressions  |                 |
+|                 |                 | in problem      |                 |
+|                 |                 | formulation     |                 |
+|                 |                 | [false]         |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
 |                 |                 | indicate        | nInternal       |
