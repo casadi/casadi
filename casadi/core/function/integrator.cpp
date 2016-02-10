@@ -248,7 +248,10 @@ namespace casadi {
 
   Options Integrator::options_
   = {{&FunctionInternal::options_},
-     {{"print_stats",
+     {{"expand",
+       {OT_BOOL,
+        "Replace MX with SX expressions in problem formulation [false]"}},
+      {"print_stats",
        {OT_BOOL,
         "Print out statistics after integration"}},
       {"t0",
@@ -272,10 +275,13 @@ namespace casadi {
   void Integrator::init(const Dict& opts) {
     // Default (temporary) options
     double t0=0, tf=1;
+    bool expand = false;
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="output_t0") {
+      if (op.first=="expand") {
+        expand = op.second;
+      } else if (op.first=="output_t0") {
         output_t0_ = op.second;
       } else if (op.first=="print_stats") {
         print_stats_ = op.second;
@@ -288,6 +294,13 @@ namespace casadi {
       } else if (op.first=="tf") {
         tf = op.second;
       }
+    }
+
+    // Replace MX oracle with SX oracle?
+    if (expand && dae_) {
+      Oracle* dae_new = dae_->expand();
+      delete dae_;
+      dae_ = dae_new;
     }
 
     // Store a copy of the options, for creating augmented integrators

@@ -181,7 +181,7 @@ namespace casadi {
   = {{&FunctionInternal::options_},
      {{"expand",
        {OT_BOOL,
-        "Expand the NLP function in terms of scalar operations, i.e. MX->SX"}},
+        "Replace MX with SX expressions in problem formulation [false]"}},
       {"iteration_callback",
        {OT_FUNCTION,
         "A function that will be called at each iteration with the solver as input. "
@@ -213,9 +213,14 @@ namespace casadi {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
+    // Default options
+    bool expand = false;
+
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="iteration_callback") {
+      if (op.first=="expand") {
+        expand = op.second;
+      } else if (op.first=="iteration_callback") {
         fcallback_ = op.second;
       } else if (op.first=="iteration_callback_step") {
         callback_step_ = op.second;
@@ -226,6 +231,13 @@ namespace casadi {
       } else if (op.first=="iteration_callback_ignore_errors") {
         iteration_callback_ignore_errors_ = op.second;
       }
+    }
+
+    // Replace MX oracle with SX oracle?
+    if (expand && nlp_) {
+      Oracle* nlp_new = nlp_->expand();
+      delete nlp_;
+      nlp_ = nlp_new;
     }
 
     // Get dimensions

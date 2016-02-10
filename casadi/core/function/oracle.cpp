@@ -231,6 +231,14 @@ namespace casadi {
     casadi_error("'nl_var' not defined for " + type_name());
   }
 
+  std::string Oracle::name_in(int i) const {
+    casadi_error("'name_in' not defined for " + type_name());
+  }
+
+  std::string Oracle::name_out(int i) const {
+    casadi_error("'name_out' not defined for " + type_name());
+  }
+
   template<typename XType>
   std::string XOracle<XType>::type_name() const {
     return XType::type_name() + "Oracle";
@@ -276,6 +284,23 @@ namespace casadi {
   template<typename LibType>
   std::string LibOracle<LibType>::type_name() const {
     return "LibOracle";
+  }
+
+  Oracle* Oracle::expand() const {
+    // Get a MX function from all inputs to all outputs
+    Function f = all_io();
+
+    // Expand to SX
+    if (!f.is_a("sxfunction")) {
+      f = f.expand();
+    }
+
+    // Get expressions
+    vector<SX> arg = f.sx_in();
+    vector<SX> res = f(arg);
+
+    // Construct SX oracle
+    return construct(arg, res, f.name_in(), f.name_out());
   }
 
 } // namespace casadi

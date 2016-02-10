@@ -63,11 +63,20 @@ namespace casadi {
     // Clone
     virtual Oracle* clone() const = 0;
 
+    // Expand MX -> SX
+    virtual Oracle* expand() const;
+
     // Input sparsity
     virtual const Sparsity& sparsity_in(int i) const = 0;
 
     // Output sparsity
     virtual const Sparsity& sparsity_out(int i) const = 0;
+
+    // Input names
+    virtual std::string name_in(int i) const;
+
+    // Output names
+    virtual std::string name_out(int i) const;
 
     // Factory
     virtual Function create(const std::string& fname,
@@ -115,6 +124,12 @@ namespace casadi {
 
     // Output sparsity
     virtual const Sparsity& sparsity_out(int i) const { return out_.at(i).sparsity();}
+
+    // Input names
+    virtual std::string name_in(int i) const { return ischeme_.at(i);}
+
+    // Output names
+    virtual std::string name_out(int i) const { return oscheme_.at(i);}
 
     // Factory
     virtual Function create(const std::string& fname,
