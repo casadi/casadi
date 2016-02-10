@@ -58,7 +58,7 @@ namespace casadi {
     KnitroMemory(const KnitroInterface& self);
 
     /// Destructor
-    virtual ~KnitroMemory();
+    ~KnitroMemory();
   };
 
   /** \brief \pluginbrief{Nlpsol,knitro}
@@ -95,17 +95,20 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new KnitroMemory(*this);}
+    virtual void* alloc_memory() const { return new KnitroMemory(*this);}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<KnitroMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const;
+    virtual void solve(void* mem) const;
 
     // KNITRO callback wrapper
     static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,

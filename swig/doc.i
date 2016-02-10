@@ -5019,7 +5019,7 @@ ls_trials, const IpoptData *ip_data, IpoptCalculatedQuantities *ip_cq) "
 ";
 
 %feature("docstring") casadi::IpoptUserClass::IpoptUserClass(const
-IpoptInterface &ipoptInterface, IpoptMemory &mem) " [INTERNAL] ";
+IpoptInterface &ipoptInterface, IpoptMemory *mem) " [INTERNAL] ";
 
 
 // File: classcasadi_1_1Jit.xml

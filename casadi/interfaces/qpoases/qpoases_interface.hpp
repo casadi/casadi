@@ -40,7 +40,7 @@ Interface to QPOases Solver for quadratic programming
 /// \cond INTERNAL
 namespace casadi {
 
-  struct CASADI_QPSOL_QPOASES_EXPORT QpoasesMemory : public Memory {
+  struct CASADI_QPSOL_QPOASES_EXPORT QpoasesMemory {
     /// QP Solver
     union {
       qpOASES::SQProblem *sqp;
@@ -58,7 +58,7 @@ namespace casadi {
     QpoasesMemory();
 
     /// Destructor
-    virtual ~QpoasesMemory();
+    ~QpoasesMemory();
   };
 
   /** \brief \pluginbrief{Qpsol,qpoases}
@@ -101,13 +101,16 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new QpoasesMemory();}
+    virtual void* alloc_memory() const { return new QpoasesMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<QpoasesMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// A documentation string
     static const std::string meta_doc;

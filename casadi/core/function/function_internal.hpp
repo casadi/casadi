@@ -54,30 +54,18 @@ namespace casadi {
 
   ///@{
   /** \brief  Function pointer types */
-  typedef int (*init_t)(int *n_in, int *n_out, int *n_mem);
-  typedef int (*allocmem_t)(int mem);
-  typedef int (*freemem_t)(int mem);
-  typedef int (*work_t)(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w);
-  typedef int (*sparsity_t)(int i, int *n_row, int *n_col,
-                            const int **colind, const int **row);
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
+  typedef int (*init_t)(int* n_in, int* n_out, int *n_int, int *n_real);
+  typedef int (*allocmem_t)(void** mem, const int* idata, const double* rdata);
+  typedef int (*freemem_t)(void* mem);
+  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
+  typedef int (*sparsity_t)(int i, int* n_row, int* n_col,
+                            const int** colind, const int** row);
+  typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
-  /** \brief Base class for Function memory */
-  struct CASADI_EXPORT Memory {
-    /** \brief Destructor */
-    virtual ~Memory() {}
-
-    /// Get all statistics
-    virtual Dict get_stats() const { return Dict();}
-  };
-
   /** \brief Function memory with temporary work vectors */
-  struct CASADI_EXPORT WorkMemory : public Memory {
-    /** \brief Destructor */
-    virtual ~WorkMemory() {}
-
+  struct CASADI_EXPORT WorkMemory {
     // Work vectors
     const double** arg;
     double** res;
@@ -136,11 +124,8 @@ namespace casadi {
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
-    ///@{
     /** \brief  Evaluate numerically */
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
-    ///@}
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res);
@@ -706,21 +691,30 @@ namespace casadi {
     void alloc(const Function& f, bool persistent=false);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const {return new Memory();}
+    virtual void* alloc_memory() const {return 0;}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const {}
+    virtual void init_memory(void* mem) const {}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const;
+
+    /** \brief Clear all memory (called from destructor) */
+    void clear_memory();
+
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const { return Dict();}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const {}
 
     /** \brief Set the (temporary) work vectors */
-    virtual void set_temp(Memory& mem, const double** arg, double** res,
+    virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const {}
 
     /** \brief Set the (persistent and temporary) work vectors */
-    void setup(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    void setup(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
@@ -729,7 +723,7 @@ namespace casadi {
     ///@}
 
     /// Memory objects
-    std::vector<Memory*> mem_;
+    std::vector<void*> mem_;
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
@@ -811,14 +805,14 @@ namespace casadi {
 
     ///@{
     /// Linear solver specific (cf. Linsol class)
-    virtual void linsol_factorize(Memory& mem, const double* A) const;
-    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
+    virtual void linsol_factorize(void* mem, const double* A) const;
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
     virtual MX linsol_solve(const MX& A, const MX& B, bool tr);
     virtual void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
     virtual void linsol_spsolve(DM& X, const DM& B, bool tr) const;
-    virtual void linsol_solveL(Memory& mem, double* x, int nrhs, bool tr) const;
-    virtual Sparsity linsol_cholesky_sparsity(Memory& mem, bool tr) const;
-    virtual DM linsol_cholesky(Memory& mem, bool tr) const;
+    virtual void linsol_solveL(void* mem, double* x, int nrhs, bool tr) const;
+    virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
+    virtual DM linsol_cholesky(void* mem, bool tr) const;
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
                                bool tr, int nrhs);
     virtual void linsol_forward(const std::vector<MX>& arg, const std::vector<MX>& res,

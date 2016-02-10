@@ -106,6 +106,12 @@ namespace casadi {
   };
 
   class CASADI_EXPORT External : public FunctionInternal {
+  protected:
+    ///@{
+    /** \brief Data vectors */
+    std::vector<int> int_data_;
+    std::vector<double> real_data_;
+    ///@}
   public:
     /** \brief Creator function, dynamically linked library */
     static External*
@@ -131,6 +137,15 @@ namespace casadi {
     virtual Sparsity get_sparsity(int ind) const = 0;
     /// @}
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
+    /// Initialize
+    virtual void init(const Dict& opts);
+
   private:
     /** \brief Creator function, use this for creating instances of the class */
     template<typename LibType>
@@ -147,9 +162,6 @@ namespace casadi {
 
     /** \brief Number of inputs and outputs */
     int n_in_, n_out_;
-
-    /** \brief Maximum number of memory objects */
-    int n_mem_;
 
     /// @{
     /** \brief Retreive sparsities */
@@ -192,6 +204,16 @@ namespace casadi {
     virtual bool hasFullJacobian() const;
     virtual Function getFullJacobian(const std::string& name, const Dict& opts);
     ///@}
+
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const {
+      void* mem;
+      allocmem_(&mem, get_ptr(int_data_), get_ptr(real_data_));
+      return mem;
+    }
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { freemem_(mem);}
   };
 
   template<typename LibType>
@@ -242,7 +264,7 @@ namespace casadi {
     virtual ~GenericExternal() {}
 
     /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;

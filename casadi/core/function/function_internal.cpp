@@ -76,7 +76,9 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
-    for (auto&& i : mem_) delete i;
+    for (auto&& i : mem_) {
+      casadi_assert_warning(i==0, "Memory object has not been properly freed");
+    }
     mem_.clear();
   }
 
@@ -275,10 +277,6 @@ namespace casadi {
       }
     }
 
-    // Free existing memory object, if any
-    for (auto&& i : mem_) delete i;
-    mem_.clear();
-
     // Get the number of inputs and outputs
     isp_.resize(get_n_in());
     osp_.resize(get_n_out());
@@ -352,9 +350,8 @@ namespace casadi {
 
     // Create memory object
     casadi_assert(mem_.empty());
-    Memory* m = memory();
-    casadi_assert(m!=0);
-    init_memory(*m);
+    void* m = alloc_memory();
+    if (m) init_memory(m);
     mem_.push_back(m);
   }
 
@@ -380,9 +377,9 @@ namespace casadi {
       }
     } else {
       if (eval_) {
-        eval_(arg, res, iw, w, mem);
+        eval_(mem_.at(mem), arg, res, iw, w);
       } else {
-        eval(arg, res, iw, w, mem);
+        eval(mem_.at(mem), arg, res, iw, w);
       }
     }
   }
@@ -1414,13 +1411,9 @@ namespace casadi {
     log("FunctionInternal::getPartition end");
   }
 
-  void FunctionInternal::eval(Memory& mem,
+  void FunctionInternal::eval(void* mem,
                               const double** arg, double** res, int* iw, double* w) const {
     casadi_error("'eval' not defined for " + type_name());
-  }
-
-  void FunctionInternal::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    eval(*mem_.at(mem), arg, res, iw, w);
   }
 
   void FunctionInternal::simple(const double* arg, double* res) {
@@ -1897,7 +1890,7 @@ namespace casadi {
       }
 
       // Call function
-      g.body << "  if (" << generic_call(g, "arg1", "res1", "iw", "w", "0")
+      g.body << "  if (" << generic_call(g, "0", "arg1", "res1", "iw", "w")
              << ") return 1;" << endl;
     }
   }
@@ -1906,7 +1899,7 @@ namespace casadi {
     if (simplifiedCall()) {
       return "void " + fname + "(const real_t* arg, real_t* res)";
     } else {
-      return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, int mem)";
+      return "int " + fname + "(void* mem, const real_t** arg, real_t** res, int* iw, real_t* w)";
     }
   }
 
@@ -1917,7 +1910,7 @@ namespace casadi {
     stringstream &s = g.body;
 
     // Function that returns the number of inputs and outputs
-    string tmp = "int " + fname + "_init(int* n_in, int* n_out, int* n_mem)";
+    string tmp = "int " + fname + "_init(int* n_in, int* n_out, int* n_int, int* n_real)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1927,7 +1920,8 @@ namespace casadi {
     s << tmp << " {" << endl
       << "  if (n_in) *n_in = " << n_in << ";" << endl
       << "  if (n_out) *n_out = " << n_out << ";" << endl
-      << "  if (n_mem) *n_mem = -1;" << endl
+      << "  if (n_int) *n_int = 0;" << endl
+      << "  if (n_real) *n_real = 0;" << endl
       << "  return 0;" << endl
       << "}" << endl
       << endl;
@@ -1938,7 +1932,7 @@ namespace casadi {
     }
 
     // Function for allocating memory
-    tmp = "int " + fname + "_alloc(int mem)";
+    tmp = "int " + fname + "_alloc(void** mem, const int* idata, const double* rdata)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1946,13 +1940,15 @@ namespace casadi {
       g.header << tmp << ";" << endl;
     }
     s << tmp << " {" << endl
-      << "  (void)mem;" << endl
+      << "  if (mem) *mem = 0;" << endl
+      << "  (void)idata;" << endl
+      << "  (void)rdata;" << endl
       << "  return 0;" << endl
       << "}" << endl
       << endl;
 
     // Function for freeing memory
-    tmp = "int " + fname + "_free(int mem)";
+    tmp = "int " + fname + "_free(void* mem)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -2174,9 +2170,9 @@ namespace casadi {
     }
   }
 
-  std::string FunctionInternal::generic_call(const CodeGenerator& g, const std::string& arg,
-                                             const std::string& res, const std::string& iw,
-                                             const std::string& w, const std::string& mem) const {
+  std::string FunctionInternal::generic_call(const CodeGenerator& g, const std::string& mem,
+                                             const std::string& arg, const std::string& res,
+                                             const std::string& iw, const std::string& w) const {
     // Get the index of the function
     auto it=g.added_dependencies_.find(this);
     casadi_assert(it!=g.added_dependencies_.end());
@@ -2184,7 +2180,7 @@ namespace casadi {
 
     // Create a function call
     stringstream ss;
-    ss << "f" << f << "(" << arg << ", " << res << ", " << iw << ", " << w << " , " << mem << ")";
+    ss << "f" << f << "(" << mem << ", " << arg << ", " << res << ", " << iw << ", " << w << ")";
     return ss.str();
   }
 
@@ -2766,11 +2762,11 @@ namespace casadi {
     casadi_error("'n_nodes' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_factorize(Memory& mem, const double* A) const {
+  void FunctionInternal::linsol_factorize(void* mem, const double* A) const {
     casadi_error("'linsol_factorize' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const {
+  void FunctionInternal::linsol_solve(void* mem, double* x, int nrhs, bool tr) const {
     casadi_error("'linsol_solve' not defined for " + type_name());
   }
 
@@ -2786,15 +2782,15 @@ namespace casadi {
     casadi_error("'linsol_spsolve' not defined for " + type_name());
   }
 
-  void FunctionInternal::linsol_solveL(Memory& mem, double* x, int nrhs, bool tr) const {
+  void FunctionInternal::linsol_solveL(void* mem, double* x, int nrhs, bool tr) const {
     casadi_error("'linsol_solveL' not defined for " + type_name());
   }
 
-  Sparsity FunctionInternal::linsol_cholesky_sparsity(Memory& mem, bool tr) const {
+  Sparsity FunctionInternal::linsol_cholesky_sparsity(void* mem, bool tr) const {
     casadi_error("'linsol_cholesky_sparsity' not defined for " + type_name());
   }
 
-  DM FunctionInternal::linsol_cholesky(Memory& mem, bool tr) const {
+  DM FunctionInternal::linsol_cholesky(void* mem, bool tr) const {
     casadi_error("'linsol_cholesky' not defined for " + type_name());
   }
 
@@ -2942,10 +2938,21 @@ namespace casadi {
       (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
   }
 
-  void FunctionInternal::setup(Memory& mem, const double** arg, double** res,
+  void FunctionInternal::setup(void* mem, const double** arg, double** res,
                                int* iw, double* w) const {
     set_work(mem, arg, res, iw, w);
     set_temp(mem, arg, res, iw, w);
+  }
+
+  void FunctionInternal::free_memory(void *mem) const {
+    casadi_warning("'free_memory' not defined for " + type_name());
+  }
+
+  void FunctionInternal::clear_memory() {
+    for (auto&& i : mem_) {
+      if (i!=0) free_memory(i);
+    }
+    mem_.clear();
   }
 
 } // namespace casadi

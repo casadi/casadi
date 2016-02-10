@@ -375,9 +375,9 @@ namespace casadi {
   }
 
   std::string CodeGenerator::
-  operator()(const Function& f, const std::string& arg, const std::string& res,
-             const std::string& iw, const std::string& w, const std::string& mem) const {
-    return f->generic_call(*this, arg, res, iw, w, mem);
+  operator()(const Function& f, const std::string& mem, const std::string& arg,
+             const std::string& res, const std::string& iw, const std::string& w) const {
+    return f->generic_call(*this, mem, arg, res, iw, w);
   }
 
   std::string CodeGenerator::operator()(const Function& f,

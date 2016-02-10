@@ -128,7 +128,7 @@ namespace casadi {
   }
 
   void KernelSum::
-  eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     const double* V = arg[0];
@@ -449,7 +449,7 @@ namespace casadi {
     g.body << "      value[0] = V[I+J*" << size_.first << "];" << std::endl;
 
     // Evaluate the function
-    g.body << "      if (" << g(f_, "arg1", "res1", "iw", "w", "0") << ") return 1;" << endl;
+    g.body << "      if (" << g(f_, "0", "arg1", "res1", "iw", "w") << ") return 1;" << endl;
 
     // Sum results from temporary storage to accumulator
     for (int k=0; k<num_out; ++k) {

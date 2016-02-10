@@ -53,6 +53,17 @@ namespace casadi {
   extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
                          double *alpha, double *a, int *lda, double *b, int *ldb);
 
+  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory {
+    // Matrix
+    std::vector<double> mat;
+
+    // The scalar factors of the elementary reflectors
+    std::vector<double> tau;
+
+    // qr work array
+    std::vector<double> work;
+  };
+
   /** \brief  \pluginbrief{Linsol,lapackqr}
    *
    @copydoc Linsol_doc
@@ -75,34 +86,26 @@ namespace casadi {
     // Initialize the solver
     virtual void init(const Dict& opts);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new LapackQrMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<LapackQrMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
 
     // Factorize the linear system
-    virtual void linsol_factorize(Memory& mem, const double* A) const;
+    virtual void linsol_factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "lapackqr";}
-  };
-
-  struct CASADI_LINSOL_LAPACKQR_EXPORT LapackQrMemory : public Memory {
-    // Destructor
-    virtual ~LapackQrMemory() {}
-
-    // Matrix
-    std::vector<double> mat;
-
-    // The scalar factors of the elementary reflectors
-    std::vector<double> tau;
-
-    // qr work array
-    std::vector<double> work;
   };
 
 } // namespace casadi

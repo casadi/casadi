@@ -87,11 +87,11 @@ namespace casadi {
     static double zeroIfSmall(double x);
 
     /** \brief Reset the forward problem */
-    virtual void reset(IntegratorMemory& mem, double t, const double* x,
+    virtual void reset(IntegratorMemory* mem, double t, const double* x,
                        const double* z, const double* p) const;
 
     /// Reset the backward problem and take time to tf
-    virtual void resetB(IntegratorMemory& mem, double t, const double* rx,
+    virtual void resetB(IntegratorMemory* mem, double t, const double* rx,
                         const double* rz, const double* rp) const;
 
     // Interpolation order

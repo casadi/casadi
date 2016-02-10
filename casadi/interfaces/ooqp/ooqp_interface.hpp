@@ -75,7 +75,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /// Solve the QP
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// Throw error
     static const char* errFlag(int flag);

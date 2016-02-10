@@ -106,7 +106,7 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const;
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     // Get name of the plugin
     virtual const char* plugin_name() const { return "kinsol";}
@@ -156,10 +156,13 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new KinsolMemory(*this);}
+    virtual void* alloc_memory() const { return new KinsolMemory(*this);}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<KinsolMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief Callback functions */
     void func(KinsolMemory& m, N_Vector u, N_Vector fval) const;

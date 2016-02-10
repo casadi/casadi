@@ -76,7 +76,7 @@ namespace casadi {
     SnoptMemory(const SnoptInterface& self);
 
     /// Destructor
-    virtual ~SnoptMemory();
+    ~SnoptMemory();
   };
 
   /** \brief \pluginbrief{Nlpsol,snopt}
@@ -118,17 +118,20 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new SnoptMemory(*this);}
+    virtual void* alloc_memory() const { return new SnoptMemory(*this);}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<SnoptMemory*>(mem);}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(Memory& mem) const;
+    virtual void init_memory(void* mem) const;
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const;
+    virtual void solve(void* mem) const;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -137,7 +140,7 @@ namespace casadi {
 
     std::string formatStatus(int status) const;
 
-    void userfun(SnoptMemory &m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
+    void userfun(SnoptMemory* m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
                  double* x, double* fObj, double*gObj, double* fCon, double* gCon,
                  int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) const;
 

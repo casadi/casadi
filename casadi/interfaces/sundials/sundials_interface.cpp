@@ -420,54 +420,54 @@ namespace casadi {
     //alloc_w(nrp_, true); // rp_
   }
 
-  void SundialsInterface::init_memory(Memory& mem) const {
+  void SundialsInterface::init_memory(void* mem) const {
     Integrator::init_memory(mem);
-    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
 
     // Allocate n-vectors
-    m.xz = N_VNew_Serial(nx_+nz_);
-    m.q = N_VNew_Serial(nq_);
-    m.rxz = N_VNew_Serial(nrx_+nrz_);
-    m.rq = N_VNew_Serial(nrq_);
+    m->xz = N_VNew_Serial(nx_+nz_);
+    m->q = N_VNew_Serial(nq_);
+    m->rxz = N_VNew_Serial(nrx_+nrz_);
+    m->rq = N_VNew_Serial(nrq_);
 
     // Allocate memory
-    m.p.resize(np_);
-    m.rp.resize(nrp_);
+    m->p.resize(np_);
+    m->rp.resize(nrp_);
   }
 
-  void SundialsInterface::reset(IntegratorMemory& mem, double t, const double* x,
+  void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,
                                 const double* z, const double* p) const {
-    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
 
     // Update time
-    m.t = t;
+    m->t = t;
 
     // Set parameters
-    casadi_copy(p, np_, get_ptr(m.p));
+    casadi_copy(p, np_, get_ptr(m->p));
 
     // Set the state
-    casadi_copy(x, nx_, NV_DATA_S(m.xz));
-    casadi_copy(z, nz_, NV_DATA_S(m.xz)+nx_);
+    casadi_copy(x, nx_, NV_DATA_S(m->xz));
+    casadi_copy(z, nz_, NV_DATA_S(m->xz)+nx_);
 
     // Reset summation states
-    N_VConst(0., m.q);
+    N_VConst(0., m->q);
   }
 
-  void SundialsInterface::resetB(IntegratorMemory& mem, double t, const double* rx,
+  void SundialsInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
                                  const double* rz, const double* rp) const {
-    SundialsMemory& m = dynamic_cast<SundialsMemory&>(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
 
     // Update time
-    m.t = t;
+    m->t = t;
 
     // Set parameters
-    casadi_copy(rp, nrp_, get_ptr(m.rp));
+    casadi_copy(rp, nrp_, get_ptr(m->rp));
 
     // Get the backward state
-    casadi_copy(rx, nrx_, NV_DATA_S(m.rxz));
+    casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
 
     // Reset summation states
-    N_VConst(0., m.rq);
+    N_VConst(0., m->rq);
   }
 
   std::pair<int, int> SundialsInterface::getBandwidth() const {
@@ -538,40 +538,42 @@ namespace casadi {
     if (this->rq) N_VDestroy_Serial(this->rq);
   }
 
-  Dict SundialsMemory::get_stats() const {
-    Dict stats = IntegratorMemory::get_stats();
+  Dict SundialsInterface::get_stats(void* mem) const {
+    Dict stats = Integrator::get_stats(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
+
     // Counters, forward problem
-    stats["nsteps"] = static_cast<int>(nsteps);
-    stats["nfevals"] = static_cast<int>(nfevals);
-    stats["nlinsetups"] = static_cast<int>(nlinsetups);
-    stats["netfails"] = static_cast<int>(netfails);
-    stats["qlast"] = qlast;
-    stats["qcur"] = qcur;
-    stats["hinused"] = hinused;
-    stats["hlast"] = hlast;
-    stats["hcur"] = hcur;
-    stats["tcur"] = tcur;
+    stats["nsteps"] = static_cast<int>(m->nsteps);
+    stats["nfevals"] = static_cast<int>(m->nfevals);
+    stats["nlinsetups"] = static_cast<int>(m->nlinsetups);
+    stats["netfails"] = static_cast<int>(m->netfails);
+    stats["qlast"] = m->qlast;
+    stats["qcur"] = m->qcur;
+    stats["hinused"] = m->hinused;
+    stats["hlast"] = m->hlast;
+    stats["hcur"] = m->hcur;
+    stats["tcur"] = m->tcur;
 
     // Counters, backward problem
-    stats["nstepsB"] = static_cast<int>(nstepsB);
-    stats["nfevalsB"] = static_cast<int>(nfevalsB);
-    stats["nlinsetupsB"] = static_cast<int>(nlinsetupsB);
-    stats["netfailsB"] = static_cast<int>(netfailsB);
-    stats["qlastB"] = qlastB;
-    stats["qcurB"] = qcurB;
-    stats["hinusedB"] = hinusedB;
-    stats["hlastB"] = hlastB;
-    stats["hcurB"] = hcurB;
-    stats["tcurB"] = tcurB;
+    stats["nstepsB"] = static_cast<int>(m->nstepsB);
+    stats["nfevalsB"] = static_cast<int>(m->nfevalsB);
+    stats["nlinsetupsB"] = static_cast<int>(m->nlinsetupsB);
+    stats["netfailsB"] = static_cast<int>(m->netfailsB);
+    stats["qlastB"] = m->qlastB;
+    stats["qcurB"] = m->qcurB;
+    stats["hinusedB"] = m->hinusedB;
+    stats["hlastB"] = m->hlastB;
+    stats["hcurB"] = m->hcurB;
+    stats["tcurB"] = m->tcurB;
 
     // Timers
-    stats["t_res"] = t_res;
-    stats["t_fres"] = t_fres;
-    stats["t_jac"] = t_jac;
-    stats["t_jacB"] = t_jacB;
-    stats["t_lsolve"] = t_lsolve;
-    stats["t_lsetup_jac"] = t_lsetup_jac;
-    stats["t_lsetup_fac"] = t_lsetup_fac;
+    stats["t_res"] = m->t_res;
+    stats["t_fres"] = m->t_fres;
+    stats["t_jac"] = m->t_jac;
+    stats["t_jacB"] = m->t_jacB;
+    stats["t_lsolve"] = m->t_lsolve;
+    stats["t_lsetup_jac"] = m->t_lsetup_jac;
+    stats["t_lsetup_fac"] = m->t_lsetup_fac;
     return stats;
   }
 

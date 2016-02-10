@@ -59,15 +59,37 @@ int usage_c(){
   dlerror();
 
   /* Initialize and get the number of inputs and outputs */
-  typedef int (*init_t)(int* n_in, int* n_out, int* n_mem);
+  typedef int (*init_t)(int* n_in, int* n_out, int* n_int, int* n_real);
   init_t init = (init_t)dlsym(handle, "f_init");
   if(dlerror()){
     printf("Failed to retrieve \"init\" function.\n");
     return 1;
   }
-  int n_in, n_out;
-  if (init(&n_in, &n_out, 0)) return 1;
-  printf("n_in = %d, n_out = %d\n", n_in, n_out);
+  int n_in, n_out, n_int, n_real;
+  if (init(&n_in, &n_out, &n_int, &n_real)) return 1;
+  printf("n_in = %d, n_out = %d, n_int = %d, n_real = %d\n", n_in, n_out, n_int, n_real);
+  if (n_int>0 || n_real>0) {
+    printf("Parameter vectors not supported\n"); 
+    return 1;
+  }
+
+  /* Function for allocating memory */
+  typedef int (*allocmem_t)(void** mem, const int* idata, const double* rdata);
+  allocmem_t allocmem = (allocmem_t)dlsym(handle, "f_alloc");
+  if(dlerror()){
+    // No alloc function
+    allocmem = 0;
+    dlerror(); // Reset error flags
+  }
+
+  /* Function for freeing memory */
+  typedef int (*freemem_t)(void* mem);
+  freemem_t freemem = (freemem_t)dlsym(handle, "f_free");
+  if(dlerror()){
+    // No free function
+    freemem = 0;
+    dlerror(); // Reset error flags
+  }
 
   /* Function for retrieving sparsities */
   typedef int (*sparsity_t)(int ind, int *n_col, int *n_row,
@@ -127,29 +149,11 @@ int usage_c(){
   printf("sz_arg = %d, sz_res = %d, sz_iw = %d, sz_w = %d\n", sz_arg, sz_res, sz_iw, sz_w);
 
   /* Function for numerical evaluation */
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
+  typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
   eval_t eval = (eval_t)dlsym(handle, "f");
   if(dlerror()){
     printf("Failed to retrieve \"f\" function.\n");
     return 1;
-  }
-
-  /* Function for allocating memory */
-  typedef int (*allocmem_t)(int mem);
-  allocmem_t allocmem = (allocmem_t)dlsym(handle, "f_alloc");
-  if(dlerror()){
-    // No alloc function
-    allocmem = 0;
-    dlerror(); // Reset error flags
-  }
-
-  /* Function for freeing memory */
-  typedef int (*freemem_t)(int mem);
-  freemem_t freemem = (freemem_t)dlsym(handle, "f_free");
-  if(dlerror()){
-    // No free function
-    freemem = 0;
-    dlerror(); // Reset error flags
   }
 
   /* Allocate input/output buffers and work vectors*/
@@ -165,15 +169,15 @@ int usage_c(){
   double res1[4];
 
   // Allocate memory
-  int mem = 0;
-  allocmem(mem);
+  void* mem;
+  allocmem(&mem, 0, 0);
 
   /* Evaluate the function */
   arg[0] = x_val;
   arg[1] = &y_val;
   res[0] = &res0;
   res[1] = res1;
-  if (eval(arg, res, iw, w, mem)) return 1;
+  if (eval(mem, arg, res, iw, w)) return 1;
 
   /* Print result of evaluation */
   printf("result (0): %g\n",res0);

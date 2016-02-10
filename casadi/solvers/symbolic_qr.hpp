@@ -43,6 +43,15 @@ namespace casadi {
   typedef SX* SXPtr;
   typedef std::vector<SXPtr> SXPtrV;
 
+  /** \brief Memory for SymbolicQR  */
+  struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public WorkMemory {
+    // Destructor
+    virtual ~SymbolicQrMemory() {}
+
+    // Storage for QR factorization
+    std::vector<double> q, r;
+  };
+
   /** \brief \pluginbrief{Linsol,symbolicqr}
 
       @copydoc Linsol_doc
@@ -75,18 +84,24 @@ namespace casadi {
     // Initialize
     virtual void init(const Dict& opts);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const;
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new SymbolicQrMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<SymbolicQrMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
 
     // Setup memory block
-    virtual void set_temp(Memory& mem, const double** arg, double** res,
+    virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const;
 
     // Factorize the linear system
-    virtual void linsol_factorize(Memory& mem, const double* A) const;
+    virtual void linsol_factorize(void* mem, const double* A) const;
 
     // Solve the linear system
-    virtual void linsol_solve(Memory& mem, double* x, int nrhs, bool tr) const;
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -106,15 +121,6 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-  };
-
-  /** \brief Memory for SymbolicQR  */
-  struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public WorkMemory {
-    // Destructor
-    virtual ~SymbolicQrMemory() {}
-
-    // Storage for QR factorization
-    std::vector<double> q, r;
   };
 
 } // namespace casadi

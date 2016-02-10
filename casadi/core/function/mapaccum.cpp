@@ -160,7 +160,7 @@ namespace casadi {
     }
   }
 
-  void Mapaccum::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void Mapaccum::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     evalGen(arg, res, iw, w, std::plus<double>());
   }
 
@@ -639,7 +639,7 @@ namespace casadi {
       }
 
       // Evaluate the function
-      g.body << "    " << g(f_, "arg1", "res1", "iw", "w", "0") << ";" << endl;
+      g.body << "    " << g(f_, "0", "arg1", "res1", "iw", "w") << ";" << endl;
 
       // Copy the temporary storage to the accumulator
       g.body << "    copy(accum+" << nnz_accum_ << ", " << nnz_accum_ << ", accum);" << endl;

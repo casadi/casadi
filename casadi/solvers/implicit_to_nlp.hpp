@@ -37,10 +37,7 @@
 /// \cond INTERNAL
 namespace casadi {
   // Memory
-  struct CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlpMemory : public Memory {
-    /// Destructor
-    virtual ~ImplicitToNlpMemory() {}
-
+  struct CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlpMemory {
     /// Stats
     Dict solver_stats;
   };
@@ -78,11 +75,14 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 
-    /** \brief Allocate memory block */
-    virtual Memory* memory() const { return new ImplicitToNlpMemory();}
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new ImplicitToNlpMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<ImplicitToNlpMemory*>(mem);}
 
     /// Solve the system of equations and calculate derivatives
-    virtual void eval(Memory& mem, const double** arg, double** res,
+    virtual void eval(void* mem, const double** arg, double** res,
                       int* iw, double* w) const;
 
     /// A documentation string

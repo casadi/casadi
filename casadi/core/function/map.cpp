@@ -127,7 +127,7 @@ namespace casadi {
     }
   }
 
-  void MapSerial::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void MapSerial::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     evalGen(arg, res, iw, w);
   }
 
@@ -173,7 +173,7 @@ namespace casadi {
       g.body << "    res1[" << j << "] = res[" << j << "]? " <<
         "res[" << j << "]+i*" << f_.nnz_out(j) << " : 0;" << endl;
     }
-    g.body << "    if (" << g(f_, "arg1", "res1", "iw", "w", "0") << ") return 1;" << endl;
+    g.body << "    if (" << g(f_, "0", "arg1", "res1", "iw", "w") << ") return 1;" << endl;
     g.body << "  }" << std::endl;
   }
 
@@ -339,7 +339,7 @@ namespace casadi {
     }
   }
 
-  void MapReduce::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void MapReduce::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     if (parallelization_ == PARALLELIZATION_SERIAL) {
       evalGen<double>(arg, res, iw, w, std::plus<double>());
     } else {
@@ -476,7 +476,7 @@ namespace casadi {
       }
     }
 
-    g.body << "    " << g(f_, "arg1", "res1", "iw", "w", "0") << ";" << endl;
+    g.body << "    " << g(f_, "0", "arg1", "res1", "iw", "w") << ";" << endl;
 
     g.addAuxiliary(CodeGenerator::AUX_AXPY);
     // Sum results
@@ -499,7 +499,7 @@ namespace casadi {
   MapOmp::~MapOmp() {
   }
 
-  void MapOmp::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void MapOmp::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 #pragma omp parallel for

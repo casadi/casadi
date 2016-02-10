@@ -139,6 +139,7 @@ namespace casadi {
 
   Nlpsol::~Nlpsol() {
     if (nlp_) delete nlp_;
+    clear_memory();
   }
 
   Sparsity Nlpsol::get_sparsity_in(int ind) const {
@@ -252,17 +253,17 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::init_memory(Memory& mem) const {
-    NlpsolMemory& m = dynamic_cast<NlpsolMemory&>(mem);
+  void Nlpsol::init_memory(void* mem) const {
+    auto m = static_cast<NlpsolMemory*>(mem);
 
     // Create statistics
     for (const Function& f : all_functions_) {
-      m.fstats[f.name()] = NlpsolMemory::FStats();
+      m->fstats[f.name()] = NlpsolMemory::FStats();
     }
   }
 
-  void Nlpsol::checkInputs(Memory& mem) const {
-    NlpsolMemory& m = dynamic_cast<NlpsolMemory&>(mem);
+  void Nlpsol::checkInputs(void* mem) const {
+    auto m = static_cast<NlpsolMemory*>(mem);
 
     // Skip check?
     if (!inputs_check_) return;
@@ -271,9 +272,9 @@ namespace casadi {
 
     // Detect ill-posed problems (simple bounds)
     for (int i=0; i<nx_; ++i) {
-      double lbx = m.lbx ? m.lbx[i] : 0;
-      double ubx = m.ubx ? m.ubx[i] : 0;
-      double x0 = m.x0 ? m.x0[i] : 0;
+      double lbx = m->lbx ? m->lbx[i] : 0;
+      double ubx = m->ubx ? m->ubx[i] : 0;
+      double x0 = m->x0 ? m->x0[i] : 0;
       casadi_assert_message(!(lbx==inf || lbx>ubx || ubx==-inf),
                             "Ill-posed problem detected (x bounds)");
       if (warn_initial_bounds_ && (x0>ubx || x0<lbx)) {
@@ -285,8 +286,8 @@ namespace casadi {
 
     // Detect ill-posed problems (nonlinear bounds)
     for (int i=0; i<ng_; ++i) {
-      double lbg = m.lbg ? m.lbg[i] : 0;
-      double ubg = m.ubg ? m.ubg[i] : 0;
+      double lbg = m->lbg ? m->lbg[i] : 0;
+      double ubg = m->ubg ? m->ubg[i] : 0;
       casadi_assert_message(!(lbg==inf || lbg>ubg || ubg==-inf),
                             "Ill-posed problem detected (g bounds)");
     }
@@ -320,7 +321,7 @@ namespace casadi {
     }
   }
 
-  void Nlpsol::eval(Memory& mem, const double** arg, double** res, int* iw, double* w) const {
+  void Nlpsol::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 
@@ -328,62 +329,62 @@ namespace casadi {
     solve(mem);
   }
 
-  void Nlpsol::set_work(Memory& mem, const double**& arg, double**& res,
+  void Nlpsol::set_work(void* mem, const double**& arg, double**& res,
                         int*& iw, double*& w) const {
-    NlpsolMemory& m = dynamic_cast<NlpsolMemory&>(mem);
+    auto m = static_cast<NlpsolMemory*>(mem);
 
     // Get input pointers
-    m.x0 = arg[NLPSOL_X0];
-    m.p = arg[NLPSOL_P];
-    m.lbx = arg[NLPSOL_LBX];
-    m.ubx = arg[NLPSOL_UBX];
-    m.lbg = arg[NLPSOL_LBG];
-    m.ubg = arg[NLPSOL_UBG];
-    m.lam_x0 = arg[NLPSOL_LAM_X0];
-    m.lam_g0 = arg[NLPSOL_LAM_G0];
+    m->x0 = arg[NLPSOL_X0];
+    m->p = arg[NLPSOL_P];
+    m->lbx = arg[NLPSOL_LBX];
+    m->ubx = arg[NLPSOL_UBX];
+    m->lbg = arg[NLPSOL_LBG];
+    m->ubg = arg[NLPSOL_UBG];
+    m->lam_x0 = arg[NLPSOL_LAM_X0];
+    m->lam_g0 = arg[NLPSOL_LAM_G0];
     arg += NLPSOL_NUM_IN;
 
     // Get output pointers
-    m.x = res[NLPSOL_X];
-    m.f = res[NLPSOL_F];
-    m.g = res[NLPSOL_G];
-    m.lam_x = res[NLPSOL_LAM_X];
-    m.lam_g = res[NLPSOL_LAM_G];
-    m.lam_p = res[NLPSOL_LAM_P];
+    m->x = res[NLPSOL_X];
+    m->f = res[NLPSOL_F];
+    m->g = res[NLPSOL_G];
+    m->lam_x = res[NLPSOL_LAM_X];
+    m->lam_g = res[NLPSOL_LAM_G];
+    m->lam_p = res[NLPSOL_LAM_P];
     res += NLPSOL_NUM_OUT;
   }
 
-  void Nlpsol::set_temp(Memory& mem, const double** arg, double** res,
+  void Nlpsol::set_temp(void* mem, const double** arg, double** res,
                         int* iw, double* w) const {
-    NlpsolMemory& m = dynamic_cast<NlpsolMemory&>(mem);
-    m.arg = arg;
-    m.res = res;
-    m.iw = iw;
-    m.w = w;
+    auto m = static_cast<NlpsolMemory*>(mem);
+    m->arg = arg;
+    m->res = res;
+    m->iw = iw;
+    m->w = w;
   }
 
-  int Nlpsol::calc_function(NlpsolMemory& m, const Function& fcn,
+  int Nlpsol::calc_function(NlpsolMemory* m, const Function& fcn,
                             std::initializer_list<const double*> arg,
                             std::initializer_list<double*> res) const {
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
     // Get statistics structure
-    NlpsolMemory::FStats& fstats = m.fstats.at(fcn.name());
+    NlpsolMemory::FStats& fstats = m->fstats.at(fcn.name());
 
     // Number of inputs and outputs
     int n_in = fcn.n_in(), n_out = fcn.n_out();
 
     // Input buffers
-    fill_n(m.arg, n_in, nullptr);
+    fill_n(m->arg, n_in, nullptr);
     auto arg_it = arg.begin();
-    for (int i=0; i<n_in; ++i) m.arg[i] = *arg_it++;
+    for (int i=0; i<n_in; ++i) m->arg[i] = *arg_it++;
     casadi_assert(arg_it==arg.end());
 
     // Output buffers
-    fill_n(m.res, n_out, nullptr);
+    fill_n(m->res, n_out, nullptr);
     auto res_it = res.begin();
-    for (int i=0; i<n_out; ++i) m.res[i] = *res_it++;
+    for (int i=0; i<n_out; ++i) m->res[i] = *res_it++;
     casadi_assert(res_it==res.end());
 
     // Prepare stats, start timer
@@ -392,7 +393,7 @@ namespace casadi {
 
     // Evaluate memory-less
     try {
-      fcn(m.arg, m.res, m.iw, m.w, 0);
+      fcn(m->arg, m->res, m->iw, m->w, 0);
     } catch(exception& ex) {
       // Fatal error
       userOut<true, PL_WARN>()
@@ -405,8 +406,8 @@ namespace casadi {
 
     // Make sure not NaN or Inf
     for (int i=0; i<n_out; ++i) {
-      if (!m.res[i]) continue;
-      if (!all_of(m.res[i], m.res[i]+fcn.nnz_out(i), [](double v) { return isfinite(v);})) {
+      if (!m->res[i]) continue;
+      if (!all_of(m->res[i], m->res[i]+fcn.nnz_out(i), [](double v) { return isfinite(v);})) {
         userOut<true, PL_WARN>()
           << name() << ":" << fcn.name() << " failed: NaN or Inf detected for output "
           << fcn.name_out(i) << endl;

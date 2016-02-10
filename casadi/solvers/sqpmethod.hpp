@@ -135,14 +135,17 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /** \brief Create memory block */
-    virtual Memory* memory() const { return new SqpmethodMemory();}
+    virtual void* alloc_memory() const { return new SqpmethodMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<SqpmethodMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
-    virtual void set_work(Memory& mem, const double**& arg, double**& res,
+    virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void solve(Memory& mem) const;
+    virtual void solve(void* mem) const;
 
     /// QP solver for the subproblems
     Function qpsol_;
@@ -202,23 +205,23 @@ namespace casadi {
                         double dx_norm, double reg, int ls_trials, bool ls_success) const;
 
     // Reset the Hessian or Hessian approximation
-    void reset_h(SqpmethodMemory& m) const;
+    void reset_h(SqpmethodMemory* m) const;
 
     // Evaluate the gradient of the objective
-    virtual double eval_f(SqpmethodMemory& m, const double* x) const;
+    virtual double eval_f(SqpmethodMemory* m, const double* x) const;
 
     // Evaluate the gradient of the objective
-    virtual void eval_grad_f(SqpmethodMemory& m, const double* x, double* f,
+    virtual void eval_grad_f(SqpmethodMemory* m, const double* x, double* f,
                              double* grad_f) const;
 
     // Evaluate the constraints
-    virtual void eval_g(SqpmethodMemory& m, const double* x, double* g) const;
+    virtual void eval_g(SqpmethodMemory* m, const double* x, double* g) const;
 
     // Evaluate the Jacobian of the constraints
-    virtual void eval_jac_g(SqpmethodMemory& m, const double* x, double* g, double* J) const;
+    virtual void eval_jac_g(SqpmethodMemory* m, const double* x, double* g, double* J) const;
 
     // Evaluate the Hessian of the Lagrangian
-    virtual void eval_h(SqpmethodMemory& m, const double* x, const double* lambda,
+    virtual void eval_h(SqpmethodMemory* m, const double* x, const double* lambda,
                         double sigma, double* H) const;
 
     // Calculate the regularization parameter using Gershgorin theorem
@@ -228,7 +231,7 @@ namespace casadi {
     void regularize(double* H, double reg) const;
 
     // Solve the QP subproblem
-    virtual void solve_QP(SqpmethodMemory& m, const double* H, const double* g,
+    virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
                           const double* lbx, const double* ubx,
                           const double* A, const double* lbA, const double* ubA,
                           double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const;

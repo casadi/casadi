@@ -82,6 +82,7 @@ namespace casadi {
   KinsolInterface::~KinsolInterface() {
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
+    clear_memory();
   }
 
   Options KinsolInterface::options_
@@ -260,29 +261,29 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::eval(Memory& mem, const double** arg, double** res,
+  void KinsolInterface::eval(void* mem, const double** arg, double** res,
                              int* iw, double* w) const {
-    KinsolMemory& m = dynamic_cast<KinsolMemory&>(mem);
+    auto m = static_cast<KinsolMemory*>(mem);
 
     // Update IO references
-    m.arg = arg;
-    m.res = res;
-    m.iw = iw;
-    m.w = w;
+    m->arg = arg;
+    m->res = res;
+    m->iw = iw;
+    m->w = w;
 
     // Reset the counters
-    m.t_func = 0;
-    m.t_jac = 0;
+    m->t_func = 0;
+    m->t_jac = 0;
 
     // Get the initial guess
     if (arg[iin_]) {
-      copy(arg[iin_], arg[iin_]+nnz_in(iin_), NV_DATA_S(m.u));
+      copy(arg[iin_], arg[iin_]+nnz_in(iin_), NV_DATA_S(m->u));
     } else {
-      N_VConst(0.0, m.u);
+      N_VConst(0.0, m->u);
     }
 
     // Solve the nonlinear system of equations
-    int flag = KINSol(m.mem, m.u, strategy_, u_scale_, f_scale_);
+    int flag = KINSol(m->mem, m->u, strategy_, u_scale_, f_scale_);
     if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag);
 
     // Warn if not successful return
@@ -292,7 +293,7 @@ namespace casadi {
 
     // Get the solution
     if (res[iout_]) {
-      copy_n(NV_DATA_S(m.u), nnz_out(iout_), res[iout_]);
+      copy_n(NV_DATA_S(m->u), nnz_out(iout_), res[iout_]);
     }
 
     // Evaluate auxiliary outputs
@@ -303,7 +304,7 @@ namespace casadi {
 
       // Evaluate f_
       copy_n(arg, n_in(), arg1);
-      arg1[iin_] = NV_DATA_S(m.u);
+      arg1[iin_] = NV_DATA_S(m->u);
       copy_n(res, n_out(), res1);
       res1[iout_] = 0;
       f_(arg1, res1, iw, w, 0);
@@ -793,33 +794,33 @@ namespace casadi {
     if (this->mem) KINFree(&this->mem);
   }
 
-  void KinsolInterface::init_memory(Memory& mem) const {
-    KinsolMemory& m = dynamic_cast<KinsolMemory&>(mem);
+  void KinsolInterface::init_memory(void* mem) const {
+    auto m = static_cast<KinsolMemory*>(mem);
 
     // Current solution
-    m.u = N_VNew_Serial(n_);
+    m->u = N_VNew_Serial(n_);
 
     // Create KINSOL memory block
-    m.mem = KINCreate();
+    m->mem = KINCreate();
 
     // KINSOL bugfix
-    KINMem kin_mem = KINMem(m.mem);
+    KINMem kin_mem = KINMem(m->mem);
     kin_mem->kin_inexact_ls = FALSE;
 
     // Set optional inputs
-    int flag = KINSetUserData(m.mem, &m);
+    int flag = KINSetUserData(m->mem, m);
     casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
 
     // Set error handler function
-    flag = KINSetErrHandlerFn(m.mem, ehfun_wrapper, &m);
+    flag = KINSetErrHandlerFn(m->mem, ehfun_wrapper, m);
     casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
 
     // Initialize KINSOL
-    flag = KINInit(m.mem, func_wrapper, m.u);
+    flag = KINInit(m->mem, func_wrapper, m->u);
     casadi_assert(flag==KIN_SUCCESS);
 
     // Setting maximum number of Newton iterations
-    flag = KINSetMaxNewtonStep(m.mem, max_iter_);
+    flag = KINSetMaxNewtonStep(m->mem, max_iter_);
     casadi_assert(flag==KIN_SUCCESS);
 
     // Set constraints
@@ -828,7 +829,7 @@ namespace casadi {
       copy(u_c_.begin(), u_c_.end(), NV_DATA_S(domain));
 
       // Pass to KINSOL
-      flag = KINSetConstraints(m.mem, domain);
+      flag = KINSetConstraints(m->mem, domain);
       casadi_assert(flag==KIN_SUCCESS);
 
       // Free the temporary vector
@@ -838,21 +839,21 @@ namespace casadi {
     switch (linear_solver_type_) {
     case KinsolInterface::DENSE:
       // Dense Jacobian
-      flag = KINDense(m.mem, n_);
+      flag = KINDense(m->mem, n_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
 
       if (exact_jacobian_) {
-        flag = KINDlsSetDenseJacFn(m.mem, djac_wrapper);
+        flag = KINDlsSetDenseJacFn(m->mem, djac_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
       }
       break;
     case KinsolInterface::BANDED:
       // Banded Jacobian
-      flag = KINBand(m.mem, n_, upper_bandwidth_, lower_bandwidth_);
+      flag = KINBand(m->mem, n_, upper_bandwidth_, lower_bandwidth_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
 
       if (exact_jacobian_) {
-        flag = KINDlsSetBandJacFn(m.mem, bjac_wrapper);
+        flag = KINDlsSetBandJacFn(m->mem, bjac_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
       }
       break;
@@ -860,35 +861,35 @@ namespace casadi {
       // Attach the sparse solver
       switch (iterative_solver_) {
       case KinsolInterface::GMRES:
-        flag = KINSpgmr(m.mem, maxl_);
+        flag = KINSpgmr(m->mem, maxl_);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
         break;
       case KinsolInterface::BCGSTAB:
-        flag = KINSpbcg(m.mem, maxl_);
+        flag = KINSpbcg(m->mem, maxl_);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
         break;
       case KinsolInterface::TFQMR:
-        flag = KINSptfqmr(m.mem, maxl_);
+        flag = KINSptfqmr(m->mem, maxl_);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
         break;
       }
 
       // Attach functions for Jacobian information
       if (exact_jacobian_) {
-        flag = KINSpilsSetJacTimesVecFn(m.mem, jtimes_wrapper);
+        flag = KINSpilsSetJacTimesVecFn(m->mem, jtimes_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
       }
 
       // Add a preconditioner
       if (use_preconditioner_) {
-        flag = KINSpilsSetPreconditioner(m.mem, psetup_wrapper, psolve_wrapper);
+        flag = KINSpilsSetPreconditioner(m->mem, psetup_wrapper, psolve_wrapper);
         casadi_assert(flag==KIN_SUCCESS);
       }
       break;
     case KinsolInterface::USER_DEFINED:
       // Set fields in the IDA memory
-      KINMem kin_mem = KINMem(m.mem);
-      kin_mem->kin_lmem   = &m;
+      KINMem kin_mem = KINMem(m->mem);
+      kin_mem->kin_lmem   = m;
       kin_mem->kin_lsetup = lsetup_wrapper;
       kin_mem->kin_lsolve = lsolve_wrapper;
       kin_mem->kin_setupNonNull = TRUE;
@@ -896,7 +897,7 @@ namespace casadi {
     }
 
     // Set stop criterion
-    flag = KINSetFuncNormTol(m.mem, abstol_);
+    flag = KINSetFuncNormTol(m->mem, abstol_);
     casadi_assert(flag==KIN_SUCCESS);
   }
 
