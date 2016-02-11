@@ -226,7 +226,7 @@ namespace casadi {
     using CommonExternal<LibType>::li_;
 
     /** \brief  Destructor */
-    virtual ~SimplifiedExternal() {}
+    virtual ~SimplifiedExternal() { this->clear_memory();}
 
     /** \brief  Evaluate numerically */
     virtual void simple(const double* arg, double* res);
@@ -261,7 +261,7 @@ namespace casadi {
     using CommonExternal<LibType>::li_;
 
     /** \brief  Destructor */
-    virtual ~GenericExternal() {}
+    virtual ~GenericExternal() { this->clear_memory();}
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;

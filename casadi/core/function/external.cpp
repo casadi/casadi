@@ -229,17 +229,22 @@ namespace casadi {
     int flag = sparsity_(ind, &nrow, &ncol, &colind, &row);
     casadi_assert_message(flag==0, "External: \"sparsity\" failed");
 
-    // Col offsets
-    vector<int> colindv(colind, colind+ncol+1);
+    if (colind==0 || row==0) {
+      // Dense
+      return Sparsity::dense(nrow, ncol);
+    } else {
+      // Col offsets
+      vector<int> colindv(colind, colind+ncol+1);
 
-    // Number of nonzeros
-    int nnz = colindv.back();
+      // Number of nonzeros
+      int nnz = colindv.back();
 
-    // Rows
-    vector<int> rowv(row, row+nnz);
+      // Rows
+      vector<int> rowv(row, row+nnz);
 
-    // Sparsity
-    return Sparsity(nrow, ncol, colindv, rowv);
+      // Sparsity
+      return Sparsity(nrow, ncol, colindv, rowv);
+    }
   }
 
   template<typename LibType>
