@@ -3274,8 +3274,32 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 %}
 #endif
 
-
 %include <casadi/core/function/function.hpp>
+#ifdef SWIGPYTHON
+namespace casadi{
+%extend Function {
+  %pythoncode %{
+    def newcall(self, *args, **kwargs):
+      # Either named inputs or ordered inputs
+      if len(args)>0 and len(kwargs)>0:
+        raise SyntaxError('Function evaluation requires all arguments to be named or none')
+      if len(args)>0:
+        # Ordered inputs -> return tuple
+        ret = self.call(args)
+        if len(ret)==0:
+          return None
+        elif len(ret)==1:
+          return ret[0]
+        else:
+          return tuple(ret)
+      else:
+        # Named inputs -> return dictionary
+        return self.call(kwargs)
+  %}
+ }
+}
+#endif // SWIGPYTHON
+
 %include <casadi/core/function/integrator.hpp>
 %include <casadi/core/function/qpsol.hpp>
 %include <casadi/core/function/nlpsol.hpp>
@@ -3559,30 +3583,6 @@ def swig_monkeypatch(v,cl=True):
   return foo
 
 import inspect
-
-def swig_improvedcall(v):
-  def newcall(self,*args,**kwargs):
-    if len(args)>0 and len(kwargs)>0:
-      raise Exception("You cannot mix positional and keyword arguments in __call__")
-    if len(kwargs)>0:
-      return v(self,kwargs)
-    else:
-      return v(self,*args)
-
-  newcall.__name__ = v.__name__
-  newcall.__doc__ = v.__doc__ + "\nYou can also call with keyword arguments if the Function has a known scheme\nExample: nlp(x=x)\n"
-  return newcall
-
-for name,cl in locals().items():
-  if not inspect.isclass(cl): continue
-  for k,v in inspect.getmembers(cl, inspect.ismethod):
-    if k == "__del__" or v.__name__ == "<lambda>": continue
-    vv = v
-    if k=="__call__" and issubclass(cl,Function):
-      vv = swig_improvedcall(v)
-    setattr(cl,k,swig_monkeypatch(vv))
-  for k,v in inspect.getmembers(cl, inspect.isfunction):
-    setattr(cl,k,staticmethod(swig_monkeypatch(v,cl=False)))
 
 for name,v in locals().items():
   if not inspect.isfunction(v): continue
