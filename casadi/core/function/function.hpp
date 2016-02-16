@@ -396,9 +396,25 @@ namespace casadi {
               bool always_inline=false, bool never_inline=false);
     void call(const std::vector<MX> &arg, std::vector<MX>& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false);
+    void call(const DMDict& arg, DMDict& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
+    void call(const SXDict& arg, SXDict& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
+    void call(const MXDict& arg, MXDict& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
     ///@}
-#ifndef SWIG
 
+    ///@{
+    /// Functor shorthand for evaluation
+    std::vector<DM> operator()(const std::vector<DM>& arg);
+    std::vector<SX> operator()(const std::vector<SX>& arg);
+    std::vector<MX> operator()(const std::vector<MX>& arg);
+    const DMDict operator()(const DMDict& arg);
+    const SXDict operator()(const SXDict& arg);
+    const MXDict operator()(const MXDict& arg);
+    ///@}
+
+#ifndef SWIG
     ///@{
     /** \brief Evaluate with temporary memory allocation */
     void operator()(std::vector<const double*> arg, std::vector<double*> res);
@@ -436,25 +452,7 @@ namespace casadi {
     void operator()(MapArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
     void operator()(MapArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
     ///@}
-#endif // SWIG
 
-    ///@{
-    /// Functor shorthand for evaluation
-    std::vector<DM> operator()(const std::vector<DM>& arg,
-                                    bool always_inline=false, bool never_inline=false);
-    std::vector<SX> operator()(const std::vector<SX>& arg,
-                               bool always_inline=false, bool never_inline=false);
-    std::vector<MX> operator()(const std::vector<MX>& arg,
-                               bool always_inline=false, bool never_inline=false);
-    const DMDict operator()(const DMDict& arg,
-                                 bool always_inline=false, bool never_inline=false);
-    const SXDict operator()(const SXDict& arg,
-                            bool always_inline=false, bool never_inline=false);
-    const MXDict operator()(const MXDict& arg,
-                            bool always_inline=false, bool never_inline=false);
-    ///@}
-
-#ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
     std::vector<DM> operator()(const DM& arg0) {
@@ -900,8 +898,8 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Call using a map */
     template<typename M>
-    const std::map<std::string, M> callMap(const std::map<std::string, M>& arg,
-                                           bool always_inline, bool never_inline);
+    void _call(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
+               bool always_inline, bool never_inline);
 #endif // SWIG
     /// \endcond
 

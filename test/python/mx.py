@@ -1327,7 +1327,7 @@ class MXtests(casadiTestCase):
 
     Y = MX.sym("Y",10)
 
-    ff = Function("ff", [Y],f([Y],True))
+    ff = Function("ff", [Y],f.call([Y],True))
     ff_in = [0]*ff.n_in();ff_in[0]=range(10)
     ff_out = ff(ff_in)
 
@@ -1367,7 +1367,7 @@ class MXtests(casadiTestCase):
 
     Y = MX.sym("Y",10)
 
-    ff = Function("ff", [Y],f([Y],True))
+    ff = Function("ff", [Y],f.call([Y],True))
     ff_in = [0]*ff.n_in();ff_in[0]=range(10)
     ff_out = ff(ff_in)
 
@@ -1661,7 +1661,7 @@ class MXtests(casadiTestCase):
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
 
-     c = f([b],True)[0]
+     c = f.call([b],True)[0]
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
@@ -1675,7 +1675,7 @@ class MXtests(casadiTestCase):
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)
 
-     c = f([b],True)[0]
+     c = f.call([b],True)[0]
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)

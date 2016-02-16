@@ -243,7 +243,7 @@ class ImplicitFunctiontests(casadiTestCase):
     ifcn = rootfinder("ifcn", "newton", vfcn_sx, {"linear_solver":"csparse"})
 
     #ifcn = Function('I', [X0],[vertcat([X0])])
-    [V] = ifcn([0,X0],True)
+    [V] = ifcn.call([0,X0],True)
 
     f = 1  # fails
 

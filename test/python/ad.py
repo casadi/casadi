@@ -626,7 +626,7 @@ class ADtests(casadiTestCase):
             aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
             inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
         
-            res = f(inputss,True)
+            res = f.call(inputss,True)
             fwdsens = f.forward(inputss,res,fseeds,True)
             adjsens = f.reverse(inputss,res,aseeds,True)
             
@@ -692,7 +692,7 @@ class ADtests(casadiTestCase):
               aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
               inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
            
-              res2 = vf(inputss2,True)
+              res2 = vf.call(inputss2,True)
               fwdsens2 = vf.forward(inputss2,res2,fseeds2,True)
               adjsens2 = vf.reverse(inputss2,res2,aseeds2,True)
 
