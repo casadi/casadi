@@ -388,16 +388,16 @@ namespace casadi {
      NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
     void setFullJacobian(const Function& jac);
 
-#ifndef SWIG
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
-    void call(const std::vector<DM> &arg, std::vector<DM>& res,
+    void call(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false);
-    void call(const std::vector<SX> &arg, std::vector<SX>& res,
+    void call(const std::vector<SX> &arg, std::vector<SX>& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false);
-    void call(const std::vector<MX> &arg, std::vector<MX>& res,
+    void call(const std::vector<MX> &arg, std::vector<MX>& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false);
     ///@}
+#ifndef SWIG
 
     ///@{
     /** \brief Evaluate with temporary memory allocation */
