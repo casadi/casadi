@@ -30,6 +30,51 @@ Get input dimension.
 
 ";
 
+%feature("docstring")  casadi::Function::call(const std::vector< DM > &arg,
+std::vector< DM > &output_res, bool always_inline=false, bool
+never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+std::vector< SX > &output_res, bool always_inline=false, bool
+never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+std::vector< MX > &output_res, bool always_inline=false, bool
+never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const DMDict &arg, DMDict
+&output_res, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const SXDict &arg, SXDict
+&output_res, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const MXDict &arg, MXDict
+&output_res, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
 %feature("docstring")  casadi::Callback::get_output_shape(int i) "
 
 Specify output shape.
@@ -3719,6 +3764,51 @@ Get input dimension.
 const  "
 
 Get input dimension.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< DM > &arg,
+std::vector< DM > &output_res, bool always_inline=false, bool
+never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< SX > &arg,
+std::vector< SX > &output_res, bool always_inline=false, bool
+never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const std::vector< MX > &arg,
+std::vector< MX > &output_res, bool always_inline=false, bool
+never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const DMDict &arg, DMDict
+&output_res, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const SXDict &arg, SXDict
+&output_res, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
+
+";
+
+%feature("docstring")  casadi::Function::call(const MXDict &arg, MXDict
+&output_res, bool always_inline=false, bool never_inline=false) "
+
+Evaluate the function symbolically or numerically.
 
 ";
 

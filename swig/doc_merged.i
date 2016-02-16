@@ -23,6 +23,12 @@ Get input dimension.
 
 ";
 
+%feature("docstring") casadi::Callback::call "
+
+Evaluate the function symbolically or numerically.
+
+";
+
 %feature("docstring") casadi::Callback::get_output_shape "
 
 Specify output shape.
@@ -2553,6 +2559,12 @@ length of w field.
 %feature("docstring") casadi::Function::size_in "
 
 Get input dimension.
+
+";
+
+%feature("docstring") casadi::Function::call "
+
+Evaluate the function symbolically or numerically.
 
 ";
 
