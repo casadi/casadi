@@ -1671,13 +1671,6 @@ Add a function (name generated)
 
 ";
 
-%feature("docstring")  casadi::CodeGenerator::add(const Function &f, const
-std::string &fname) "
-
-Add a function.
-
-";
-
 %feature("docstring") casadi::CodeGenerator::CodeGenerator(const Dict
 &opts=Dict()) "
 

@@ -1041,15 +1041,7 @@ Compile and load function.
 
 %feature("docstring") casadi::CodeGenerator::add "
 
->  void CodeGenerator.add(Function f)
-------------------------------------------------------------------------
-
 Add a function (name generated)
-
->  void CodeGenerator.add(Function f, str fname)
-------------------------------------------------------------------------
-
-Add a function.
 
 ";
 
