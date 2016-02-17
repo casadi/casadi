@@ -335,15 +335,15 @@ namespace casadi {
   void FunctionInternal::finalize() {
     if (jit_) {
       CodeGenerator gen;
-      gen.add(shared_from_this<Function>(), "jit_tmp");
-      gen.generate("jit_tmp");
+      gen.add(shared_from_this<Function>());
+      gen.generate("jit_tmp.c");
       compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
 
       // Try to load with simplified syntax
-      simple_ = (simple_t)compiler_.getFunction("jit_tmp_simple");
+      simple_ = (simple_t)compiler_.getFunction(name() + "_simple");
       // If not succesful, try generic syntax
       if (simple_==0) {
-        eval_ = (eval_t)compiler_.getFunction("jit_tmp");
+        eval_ = (eval_t)compiler_.getFunction(name());
         casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
       }
     }
@@ -2102,7 +2102,7 @@ namespace casadi {
       }
 
       // Call the function
-      s << "  i = " << fname << "(arg, res, iw, " << fw << ", 0);" << endl;
+      s << "  i = " << fname << "(0, arg, res, iw, " << fw << ");" << endl;
       s << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
         << "\\\" failed.\");" << endl;
 
@@ -2153,7 +2153,7 @@ namespace casadi {
         << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
-      s << "  int flag = " << fname << "(arg, res, iw, w+" << off << ", 0);" << endl
+      s << "  int flag = " << fname << "(0, arg, res, iw, w+" << off << ");" << endl
         << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
@@ -2245,11 +2245,11 @@ namespace casadi {
                                                 std::string compiler) {
     // Codegen and compile
     CodeGenerator g;
-    g.add(f, fname);
+    g.add(f);
     string dlname = g.compile(fname, compiler);
 
     // Load it
-    return external(fname, dlname);
+    return external(f.name(), dlname);
   }
 
   void FunctionInternal::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {

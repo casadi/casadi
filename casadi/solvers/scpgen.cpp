@@ -335,7 +335,7 @@ namespace casadi {
     }
 
     // Generate function
-    Function res_fcn("res", res_fcn_in, res_fcn_out);
+    Function res_fcn("res_fcn", res_fcn_in, res_fcn_out);
     if (verbose_) {
       userOut() << "Generated residual function ( " << res_fcn.n_nodes() << " nodes)." << endl;
     }
@@ -444,7 +444,7 @@ namespace casadi {
     vector<MX> mat_out;
     mat_out.push_back(jac);                             mat_jac_ = n++;
     mat_out.push_back(hes);                             mat_hes_ = n++;
-    Function mat_fcn("mfcn", mfcn_in, mat_out);
+    Function mat_fcn("mat_fcn", mfcn_in, mat_out);
 
     // Definition of intermediate variables
     n = mfcn_out.size();
@@ -544,10 +544,10 @@ namespace casadi {
     if (codegen_) {
       // Codegen the functions
       CodeGenerator gen;
-      gen.add(res_fcn, "res_fcn");
-      gen.add(mat_fcn, "mat_fcn");
-      gen.add(vec_fcn, "vec_fcn");
-      gen.add(exp_fcn, "exp_fcn");
+      gen.add(res_fcn);
+      gen.add(mat_fcn);
+      gen.add(vec_fcn);
+      gen.add(exp_fcn);
 
       // Name of temporary file
       string cname;

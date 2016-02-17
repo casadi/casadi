@@ -41,9 +41,6 @@ namespace casadi {
     /// Add a function (name generated)
     void add(const Function& f);
 
-    /// Add a function
-    void add(const Function& f, const std::string& fname);
-
 #ifndef SWIG
     /// Generate the code to a stream
     void generate(std::ostream& s) const;

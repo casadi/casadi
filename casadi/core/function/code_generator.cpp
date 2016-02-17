@@ -88,17 +88,13 @@ namespace casadi {
   }
 
   void CodeGenerator::add(const Function& f) {
-    add(f, f.name());
-  }
-
-  void CodeGenerator::add(const Function& f, const std::string& fname) {
-    f->generateFunction(*this, fname, false);
+    f->generateFunction(*this, f.name(), false);
     if (this->with_header) {
       if (this->cpp) this->header << "extern \"C\" " ; // C linkage
-      this->header << f->signature(fname) << ";" << endl;
+      this->header << f->signature(f.name()) << ";" << endl;
     }
-    f->generateMeta(*this, fname);
-    this->exposed_fname.push_back(fname);
+    f->generateMeta(*this, f.name());
+    this->exposed_fname.push_back(f.name());
   }
 
   std::string CodeGenerator::generate() const {

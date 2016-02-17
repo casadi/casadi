@@ -814,7 +814,7 @@ namespace casadi {
 
   void Function::generate(const string& fname, const Dict& opts) {
     CodeGenerator gen(opts);
-    gen.add(*this, fname);
+    gen.add(*this);
     gen.generate(fname);
   }
 
