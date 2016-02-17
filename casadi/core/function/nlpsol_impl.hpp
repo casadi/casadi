@@ -145,7 +145,7 @@ namespace casadi {
     virtual void checkInputs(void* mem) const;
 
     /** \brief Get default input value */
-    virtual double default_in(int ind) const;
+    virtual double default_in(int ind) const { return nlpsol_default_in(ind);}
 
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,

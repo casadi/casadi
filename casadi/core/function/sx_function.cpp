@@ -232,7 +232,10 @@ namespace casadi {
 
   Options SXFunction::options_
   = {{&FunctionInternal::options_},
-     {{"just_in_time_sparsity",
+     {{"default_in",
+       {OT_DOUBLEVECTOR,
+        "Default input values"}},
+      {"just_in_time_sparsity",
        {OT_BOOL,
         "Propagate sparsity patterns using just-in-time "
         "compilation to a CPU or GPU using OpenCL"}},
@@ -255,13 +258,23 @@ namespace casadi {
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="live_variables") {
+      if (op.first=="default_in") {
+        default_in_ = op.second;
+      } else if (op.first=="live_variables") {
         live_variables = op.second;
       } else if (op.first=="just_in_time_opencl") {
         just_in_time_opencl_ = op.second;
       } else if (op.first=="just_in_time_sparsity") {
         just_in_time_sparsity_ = op.second;
       }
+    }
+
+    // Check/set default inputs
+    if (default_in_.empty()) {
+      default_in_.resize(n_in(), 0);
+    } else {
+      casadi_assert_message(default_in_.size()==n_in(),
+                            "Option 'default_in' has incorrect length");
     }
 
     // Stack used to sort the computational graph

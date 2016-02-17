@@ -207,6 +207,9 @@ class CASADI_EXPORT SXFunction :
   /// The expressions corresponding to each constant
   std::vector<SXElem> constants_;
 
+  /// Default input values
+  std::vector<double> default_in_;
+
   ///@{
   /** \brief Options */
   static Options options_;
@@ -233,6 +236,9 @@ class CASADI_EXPORT SXFunction :
 
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   virtual Function getFullJacobian();
+
+  /** \brief Get default input value */
+  virtual double default_in(int ind) const { return default_in_.at(ind);}
 
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;
@@ -283,7 +289,6 @@ class CASADI_EXPORT SXFunction :
   static SparsityPropagationKernel sparsity_propagation_kernel_;
 
 #endif // WITH_OPENCL
-
 };
 
 

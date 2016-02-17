@@ -47,7 +47,10 @@ namespace casadi {
 
   Options MXFunction::options_
   = {{&FunctionInternal::options_},
-     {{"live_variables",
+     {{"default_in",
+       {OT_DOUBLEVECTOR,
+        "Default input values"}},
+      {"live_variables",
        {OT_BOOL,
         "Reuse variables in the work vector"}}
      }
@@ -64,9 +67,19 @@ namespace casadi {
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="live_variables") {
+      if (op.first=="default_in") {
+        default_in_ = op.second;
+      } else if (op.first=="live_variables") {
         live_variables = op.second;
       }
+    }
+
+    // Check/set default inputs
+    if (default_in_.empty()) {
+      default_in_.resize(n_in(), 0);
+    } else {
+      casadi_assert_message(default_in_.size()==n_in(),
+                            "Option 'default_in' has incorrect length");
     }
 
     // Stack used to sort the computational graph

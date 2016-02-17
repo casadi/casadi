@@ -91,6 +91,25 @@ namespace casadi {
     return ret;
   }
 
+  double nlpsol_default_in(int ind) {
+    switch (ind) {
+    case NLPSOL_LBX:
+    case NLPSOL_LBG:
+      return -std::numeric_limits<double>::infinity();
+    case NLPSOL_UBX:
+    case NLPSOL_UBG:
+      return std::numeric_limits<double>::infinity();
+    default:
+      return 0;
+    }
+  }
+
+  std::vector<double> nlpsol_default_in() {
+    vector<double> ret(nlpsol_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=nlpsol_default_in(i);
+    return ret;
+  }
+
   string nlpsol_in(int ind) {
     switch (static_cast<NlpsolInput>(ind)) {
     case NLPSOL_X0:     return "x0";
@@ -318,19 +337,6 @@ namespace casadi {
   void Nlpsol::setOptionsFromFile(const std::string & file) {
     casadi_error("Nlpsol::setOptionsFromFile not defined for class "
                  << typeid(*this).name());
-  }
-
-  double Nlpsol::default_in(int ind) const {
-    switch (ind) {
-    case NLPSOL_LBX:
-    case NLPSOL_LBG:
-      return -std::numeric_limits<double>::infinity();
-    case NLPSOL_UBX:
-    case NLPSOL_UBG:
-      return std::numeric_limits<double>::infinity();
-    default:
-      return 0;
-    }
   }
 
   void Nlpsol::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {

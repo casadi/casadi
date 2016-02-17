@@ -74,6 +74,9 @@ namespace casadi {
     /// Free variables
     std::vector<MX> free_vars_;
 
+    /// Default input values
+    std::vector<double> default_in_;
+
     /** \brief Constructor */
     MXFunction(const std::string& name, const std::vector<MX>& input,
                        const std::vector<MX>& output);
@@ -184,6 +187,9 @@ namespace casadi {
 
     /** \brief Number of nodes in the algorithm */
     virtual int n_nodes() const { return algorithm_.size();}
+
+    /** \brief Get default input value */
+    virtual double default_in(int ind) const { return default_in_.at(ind);}
   };
 
 } // namespace casadi

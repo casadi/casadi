@@ -116,6 +116,12 @@ namespace casadi {
   /** \brief Get the number of NLP solver outputs */
   CASADI_EXPORT int nlpsol_n_out();
 
+  ///@{
+  /** \brief Default input for an NLP solver */
+  CASADI_EXPORT double nlpsol_default_in(int ind);
+  CASADI_EXPORT std::vector<double> nlpsol_default_in();
+  ///@}
+
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_nlpsol(const std::string& name);
 

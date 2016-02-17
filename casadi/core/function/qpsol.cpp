@@ -192,7 +192,8 @@ namespace casadi {
     ret_out[NLPSOL_LAM_X] = w[QPSOL_LAM_X];
     ret_out[NLPSOL_LAM_G] = w[QPSOL_LAM_A];
     ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());
-    return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out());
+    return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out(),
+                    {{"default_in", nlpsol_default_in()}});
   }
 
   Function qpsol(const std::string& name, const std::string& solver,
