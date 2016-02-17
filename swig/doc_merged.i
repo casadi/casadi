@@ -9623,6 +9623,12 @@ scheme:  Collocation scheme, as excepted by collocationPoints function.
 
 ";
 
+%feature("docstring") casadi::nlpsol_default_in "
+
+Default input for an NLP solver.
+
+";
+
 %feature("docstring") casadi::_nl_var "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_norm_inf "[INTERNAL]  Inf-norm of a
