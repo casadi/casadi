@@ -52,7 +52,7 @@ try:
 except:
   pass
 
-integrators.append(("collocation",["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18}))
+integrators.append(("collocation",["dae","ode"],{"rootfinder":"kinsol","number_of_finite_elements": 18}))
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000}))
 

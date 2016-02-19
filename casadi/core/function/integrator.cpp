@@ -1649,10 +1649,10 @@ namespace casadi {
 
   Options ImplicitFixedStepIntegrator::options_
   = {{&FixedStepIntegrator::options_},
-     {{"implicit_solver",
+     {{"rootfinder",
        {OT_STRING,
         "An implicit function solver"}},
-      {"implicit_solver_options",
+      {"rootfinder_options",
        {OT_DICT,
         "Options to be passed to the NLP Solver"}}
      }
@@ -1664,40 +1664,40 @@ namespace casadi {
 
     // Default (temporary) options
     std::string implicit_function_name = "newton";
-    Dict implicit_solver_options;
+    Dict rootfinder_options;
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="implicit_solver") {
+      if (op.first=="rootfinder") {
         implicit_function_name = op.second.to_string();
-      } else if (op.first=="implicit_solver_options") {
-        implicit_solver_options = op.second;
+      } else if (op.first=="rootfinder_options") {
+        rootfinder_options = op.second;
       }
     }
 
-    // Complete implicit_solver dictionary
-    implicit_solver_options["implicit_input"] = DAE_Z;
-    implicit_solver_options["implicit_output"] = DAE_ALG;
+    // Complete rootfinder dictionary
+    rootfinder_options["implicit_input"] = DAE_Z;
+    rootfinder_options["implicit_output"] = DAE_ALG;
 
     // Allocate a solver
-    implicit_solver_ = rootfinder(name_ + "_implicit_solver", implicit_function_name,
-                                  F_, implicit_solver_options);
-    alloc(implicit_solver_);
+    rootfinder_ = rootfinder(name_ + "_rootfinder", implicit_function_name,
+                                  F_, rootfinder_options);
+    alloc(rootfinder_);
 
     // Allocate a root-finding solver for the backward problem
     if (nRZ_>0) {
       // Options
-      Dict backward_implicit_solver_options = implicit_solver_options;
-      backward_implicit_solver_options["implicit_input"] = RDAE_RZ;
-      backward_implicit_solver_options["implicit_output"] = RDAE_ALG;
+      Dict backward_rootfinder_options = rootfinder_options;
+      backward_rootfinder_options["implicit_input"] = RDAE_RZ;
+      backward_rootfinder_options["implicit_output"] = RDAE_ALG;
       string backward_implicit_function_name = implicit_function_name;
 
       // Allocate a Newton solver
-      backward_implicit_solver_ =
-        rootfinder(name_+ "_backward_implicit_solver",
+      backward_rootfinder_ =
+        rootfinder(name_+ "_backward_rootfinder",
                    backward_implicit_function_name,
-                   G_, backward_implicit_solver_options);
-      alloc(backward_implicit_solver_);
+                   G_, backward_rootfinder_options);
+      alloc(backward_rootfinder_);
     }
   }
 

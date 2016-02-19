@@ -407,13 +407,13 @@ namespace casadi {
     virtual void init(const Dict& opts);
 
     /// Get explicit dynamics
-    virtual const Function& getExplicit() const { return implicit_solver_;}
+    virtual const Function& getExplicit() const { return rootfinder_;}
 
     /// Get explicit dynamics (backward problem)
-    virtual const Function& getExplicitB() const { return backward_implicit_solver_;}
+    virtual const Function& getExplicitB() const { return backward_rootfinder_;}
 
     // Implicit function solver
-    Function implicit_solver_, backward_implicit_solver_;
+    Function rootfinder_, backward_rootfinder_;
   };
 
 } // namespace casadi
