@@ -1663,7 +1663,7 @@ namespace casadi {
     FixedStepIntegrator::init(opts);
 
     // Default (temporary) options
-    std::string implicit_function_name;
+    std::string implicit_function_name = "newton";
     Dict implicit_solver_options;
 
     // Read options
