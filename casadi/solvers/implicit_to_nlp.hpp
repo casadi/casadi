@@ -32,7 +32,7 @@
 /** \defgroup plugin_Rootfinder_nlp
   Use an Nlpsol as Rootfinder solver
 */
-/** \pluginsection{Rootfinder,nlp} */
+/** \pluginsection{Rootfinder,nlpsol} */
 
 /// \cond INTERNAL
 namespace casadi {
