@@ -395,11 +395,11 @@ namespace casadi {
   void FunctionInternal::printDimensions(ostream &stream) const {
     stream << " Number of inputs: " << n_in() << endl;
     for (int i=0; i<n_in(); ++i) {
-      stream << "  Input " << i  << ", a.k.a. \"" << name_in(i) << "\", " << size_in(i) << endl;
+      stream << "  Input " << i  << ", a.k.a. \"" << name_in(i) << "\", " << sparsity_in(i).dim() << endl;
     }
     stream << " Number of outputs: " << n_out() << endl;
     for (int i=0; i<n_out(); ++i) {
-      stream << "  Output " << i  << ", a.k.a. \"" << name_out(i) << "\", " << size_out(i) << endl;
+      stream << "  Output " << i  << ", a.k.a. \"" << name_out(i) << "\", " << sparsity_out(i).dim() << endl;
     }
   }
 
