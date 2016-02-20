@@ -100,8 +100,10 @@ namespace casadi {
     // NLP constraints
     std::vector< MX > args_call(n_in());
     args_call[iin_] = u;
-    for (int i=0, i2=0; i<n_in(); ++i)
-      if (i!=iin_) args_call[i] = inputs[i2++];
+    for (int i=0, i2=0; i<n_in(); ++i) {
+      if (i!=iin_) args_call[i] = inputs.at(i2++);
+      if (args_call[i].is_empty()) args_call[i] = MX();
+    }
     MX nlp_g = f_(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
