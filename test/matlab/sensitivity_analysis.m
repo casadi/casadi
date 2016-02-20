@@ -117,8 +117,8 @@ for ode=0:1
     opts = struct;
     opts.tf = tf;
     if strcmp(MyIntegrator,'collocation')
-      opts.implicit_solver = 'kinsol';
-      opts.implicit_solver_options = struct('linear_solver', 'csparse');
+      opts.rootfinder = 'kinsol';
+      opts.rootfinder_options = struct('linear_solver', 'csparse');
     end
 
     % Integrator
