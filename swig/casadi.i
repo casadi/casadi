@@ -3300,6 +3300,36 @@ namespace casadi{
 }
 #endif // SWIGPYTHON
 
+#ifdef SWIGMATLAB
+namespace casadi{
+%extend Function {
+  %matlabcode %{
+    function varargout = newcall(self, varargin)
+      if nargin==1 || (nargin>=2 && ischar(varargin{1}))
+        % Named inputs: return struct
+        assert(nargout<2, 'Syntax error');
+        assert(mod(nargin,2)==1, 'Syntax error');
+        arg = struct;
+        for i=1:2:nargin-1
+          assert(ischar(varargin{i}), 'Syntax error');
+          arg.(varargin{i}) = varargin{i+1};
+        end
+        res = self.call(arg);
+        varargout{1} = res;
+      else
+        % Ordered inputs: return variable number of outputs
+        res = self.call(varargin);
+        assert(nargout<=numel(res), 'Too many outputs');
+        for i=1:max(min(1,numel(res)),nargout)
+          varargout{i} = res{i};
+        end
+      end
+    end
+  %}
+ }
+}
+#endif // SWIGMATLAB
+
 %include <casadi/core/function/integrator.hpp>
 %include <casadi/core/function/qpsol.hpp>
 %include <casadi/core/function/nlpsol.hpp>
