@@ -104,7 +104,7 @@ for k in range(num_nodes+1):
 G = []
 G.append(X[0][:2] - NP.array([0,1])) # states fixed, costates free at initial time
 for k in range(num_nodes):
-  XF = I({'x0':X[k]})["xf"]
+  XF = I.newcall(x0=X[k])["xf"]
   G.append(XF-X[k+1])
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
@@ -132,7 +132,7 @@ elif Solver=="kinsol":
 solver = rootfinder('solver', Solver, rfp, opts)
 
 # Solve the problem
-V_sol, = solver([0])
+V_sol = solver.newcall(0)
 
 # Time grid for visualization
 tgrid = NP.linspace(0,tf,100)
@@ -141,11 +141,11 @@ tgrid = NP.linspace(0,tf,100)
 simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid,'output_t0':True})
 
 # Simulate to get the trajectories
-sol = simulator({"x0" : V_sol[0:4]})["xf"]
+sol = simulator.newcall(x0 = V_sol[0:4])["xf"]
 
 # Calculate the optimal control
 ufcn_all = u_fcn.map("ufcn_all", len(tgrid))
-[u_opt] = ufcn_all([sol])
+u_opt = ufcn_all.newcall(sol)
 
 # Plot the results
 plt.figure(1)

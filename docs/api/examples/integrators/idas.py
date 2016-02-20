@@ -68,7 +68,7 @@ dae = {'x':x_all, 'z':z_all, 'p':p_all, 'ode':ode, 'alg':alg}
 f = Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
 
 #! Let's check we have consistent initial conditions:
-res = f({'p':P_, 'x':X_, 'z':Z_})
+res = f.newcall(p=P_, x=X_, z=Z_)
 print res['ode'] # This should be same as XDOT_
 print res['alg'] # This should be all zeros
 
@@ -88,7 +88,7 @@ I = integrator('I', 'idas', dae, {'calc_ic':False, 'init_xdot':XDOT_})
 #! It is impossible obtain lambda from the last element of the residual.
 
 try:
-  I({'p':P_, 'x0':X_, 'z0':Z_})
+  I.newcall(p=P_, x0=X_, z0=Z_)
 except Exception as e:
   print e
   
@@ -107,19 +107,19 @@ XDOT_ = [-1.0/3,1147.0/240] # state derivatives
 Z_ = [4,1.0/4,1147.0/720] # algebraic state
 
 #! Let's check we have consistent initial conditions:
-res = f({'p':P_, 'x':X_, 'z':Z_})
+res = f.newcall(p=P_, x=X_, z=Z_)
 print res['ode'] # This should be the same as XDOT_
 print res['alg'] # This should be all zeros
 
 #! Let's check our jacobian:
 J = f.jacobian('z', 'alg')
-res = J({'p':P_, 'x':X_, 'z':Z_})
+res = J.newcall(p=P_, x=X_, z=Z_)
 print array(res["dalg_dz"])
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
 I = integrator('I', 'idas', dae, {'t0':0, 'tf':1, 'init_xdot':XDOT_})
-res = I({'p':P_, 'x0':X_, 'z0':Z_})
+res = I.newcall(p=P_, x0=X_, z0=Z_)
 print res['xf']
 
 #! Possible problems
@@ -131,7 +131,7 @@ X_ = [5,0]  # states
 
 #! You will get an error:
 try:
-  I({'p':P_, 'x0':X_, 'z0':Z_})
+  I.newcall(p=P_, x0=X_, z0=Z_)
 except Exception as e:
   print e 
 

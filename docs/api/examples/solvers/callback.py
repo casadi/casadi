@@ -97,7 +97,7 @@ class MyCallback(Callback):
     
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):
-        [z_[i,j]] = fcn([x_[i,j],y_[i,j]])
+        z_[i,j] = fcn.newcall(x_[i,j],y_[i,j])
     contourf(x_,y_,z_)
     colorbar()
     title('Iterations of Rosenbrock')
@@ -149,7 +149,7 @@ opts['iteration_callback'] = mycallback
 opts['ipopt.tol'] = 1e-8
 opts['ipopt.max_iter'] = 50
 solver = nlpsol('solver', 'ipopt', nlp, opts)
-sol = solver({'lbx':-10, 'ubx':10, 'lbg':-10, 'ubg':10})
+sol = solver.newcall(lbx=-10, ubx=10, lbg=-10, ubg=10)
 
 #! By setting matplotlib interactivity off, we can inspect the figure at ease
 matplotlib.interactive(False)

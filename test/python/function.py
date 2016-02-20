@@ -39,13 +39,13 @@ class Functiontests(casadiTestCase):
     fmx2 = Function("fmx2", [x,[]],[x])
     
     for f in [fsx,fmx1,fmx2]:
-      f([0,0])
+      f.newcall(0,0)
 
       X = MX.sym("X",2)
-      F = f([X,MX()])[0]
+      F = f.newcall(X,MX())
       g = Function("g", [X],[F])
 
-      g([0])
+      g.newcall(0)
     
     x = SX.sym("x",2)
     fsx = Function("fsx", [x],[x,[]])
@@ -54,13 +54,13 @@ class Functiontests(casadiTestCase):
     fmx2 = Function("fmx2", [x],[x,[]])
     
     for f in [fsx,fmx1,]:
-      f([0])
+      f.newcall(0)
 
       X = MX.sym("X",2)
-      F = f([X])[0]
-      g = Function("g", [X],[F])
+      F = f.newcall(X)
+      g = Function("g", [X],F)
 
-      g([0])
+      g.newcall(0)
   
   def test_Map(self):
     self.message("Map")
@@ -85,7 +85,7 @@ class Functiontests(casadiTestCase):
       N2 = 8
       
 
-      out = p([n1,N1,n2,N2])
+      out = p.newcall(n1,N1,n2,N2)
 
       self.checkarray(sin(n1)+N1,out[0],"output")
       self.checkarray(sin(n2)+N2,out[1],"output")
@@ -103,7 +103,7 @@ class Functiontests(casadiTestCase):
     n2 = DM([5,7])
     N2 = 8
     
-    out = p([n1,N1,n2,N2])
+    out = p.newcall(n1,N1,n2,N2)
 
     self.checkarray(sin(n1)+N1,out[0],"output")
     self.checkarray(sin(n2)+N2,out[1],"output")
@@ -139,11 +139,11 @@ class Functiontests(casadiTestCase):
 
     f = Function("f", [x],[x**2,x**3])
 
-    X = [MX.sym("X")]
+    X = MX.sym("X")
 
-    z=f(X)
+    z=f.newcall(X)
 
-    g = Function("g", X,[z[0]]).expand()
+    g = Function("g", [X], z).expand()
   
   def test_jacobian(self):
     x = SX.sym("x",3,1)
@@ -358,7 +358,7 @@ class Functiontests(casadiTestCase):
     x = SX.sym("x")
     f = Function('f',[x],[x*x, x],{'output_scheme':["foo","bar"]})
     
-    ret = f({"i0": 12})
+    ret = f.newcall(i0=12)
 
     self.checkarray(DM([144]),ret["foo"])
     self.checkarray(DM([12]),ret["bar"])
@@ -367,7 +367,7 @@ class Functiontests(casadiTestCase):
     with self.assertRaises(Exception):
       f_out["baz"]
       
-    ret = f({'i0':SX(12)})
+    ret = f.newcall(i0=SX(12))
     self.checkarray(ret["foo"],DM([144]))
     self.checkarray(ret["bar"],DM([12]))
     with self.assertRaises(Exception):
@@ -379,7 +379,7 @@ class Functiontests(casadiTestCase):
     f = Function("f", [x],[x])
     x0 = DM([1,2,3,4])
     J = f.jacobian()
-    [out,_] = J([x0])
+    out,_ = J.newcall(x0)
     
     self.assertEqual(out.nnz(),4)
     
@@ -387,7 +387,7 @@ class Functiontests(casadiTestCase):
     f.set_jac_sparsity(Sparsity.dense(4,4),0,0,True)
     
     J2 = f.jacobian()
-    [out2,_] = J2([x0])
+    out2,_ = J2.newcall(x0)
     
     self.assertEqual(out2.nnz(),16)
     self.checkfunction(J,J2,inputs=[x0])
@@ -403,9 +403,9 @@ class Functiontests(casadiTestCase):
     P = MX.sym("P",n,n)
     X = MX.sym("X",n)
 
-    M_X= M([X])[0]
+    M_X= M.newcall(X)
 
-    Pf = Function("P", [X,P],[mtimes(M_X,P)])
+    Pf = Function("P", [X, P], [mtimes(M_X,P)])
     
     P_P = Pf.jacobian(1)
     
@@ -427,12 +427,12 @@ class Functiontests(casadiTestCase):
     [ DM([3,4.1]).T , 2.7],
     ]
 
-    Fref = blockcat([f(e) for e in r])
+    Fref = blockcat([f.newcall(*e) for e in r])
 
 
     F = Function("F",[],[blockcat(f.map(r))])
 
-    self.checkarray(F([])[0],Fref)
+    self.checkarray(F.call([])[0],Fref)
     
     a = SX.sym("a",1,2)
     c = sin(a)
@@ -448,12 +448,12 @@ class Functiontests(casadiTestCase):
     [ DM([3,4.1]).T],
     ]
 
-    Fref = blockcat([f(e) for e in r])
+    Fref = blockcat([f.call(e) for e in r])
 
 
     F = Function("F",[],[blockcat(f.map(r))])
 
-    self.checkarray(F([])[0],Fref)
+    self.checkarray(F.call([])[0],Fref)
 
     a = SX.sym("a",1,2)
     b = SX.sym("b")
@@ -470,12 +470,12 @@ class Functiontests(casadiTestCase):
     [ DM([3,4.1]).T , 2.7],
     ]
 
-    Fref = blockcat([f(e) for e in r])
+    Fref = blockcat([f.call(e) for e in r])
 
 
     F = Function("F",[],[blockcat(f.map(r))])
 
-    self.checkarray(F([])[0],Fref)
+    self.checkarray(F.call([])[0],Fref)
 
   def test_issue1464(self):
     n = 6
@@ -501,7 +501,7 @@ class Functiontests(casadiTestCase):
 
       for k in range(N):
           
-          [xf] = rk4([VXk[k],VUk[k]])
+          xf = rk4.newcall(VXk[k],VUk[k])
 
           xfp = vertsplit(xf,n/2)
           vp = vertsplit(VXk[k+1],n/2)
@@ -532,13 +532,13 @@ class Functiontests(casadiTestCase):
     foo = mycallback("my_f")
     
     x = MX.sym('x')
-    y = foo([x])
+    y = foo.newcall(x)
 
-    f = Function("f",[x],y)
+    f = Function("f",[x],[y])
 
-    out = f([5])
+    out = f.newcall(5)
     
-    self.checkarray(out[0],25)
+    self.checkarray(out,25)
 
   @known_bug()
   def test_callback_errors(self):
@@ -593,7 +593,7 @@ class Functiontests(casadiTestCase):
 
         resref = [[] for i in range(fun.n_out())]
         for r in zip(X,Y,Z_alt2,V):
-          for i,e in enumerate(map(sin,fun(r))):
+          for i,e in enumerate(map(sin,fun.call(r))):
             resref[i] = resref[i] + [e]
 
         Fref = Function("F",X+Y+Z+V,map(horzcat,resref))
@@ -680,7 +680,7 @@ class Functiontests(casadiTestCase):
 
         resref = [0 for i in range(fun.n_out())]
         for r in zip(X,Y,Z_alt,V):
-          for i,e in enumerate(fun(r)):
+          for i,e in enumerate(fun.call(r)):
             resref[i] = resref[i] + e
 
         Fref = Function("F",X+Y+Z+V,map(sin,resref))
@@ -726,7 +726,7 @@ class Functiontests(casadiTestCase):
         bl = []
         cl = []
         for r in zip(X,Y,[Z_alt]*n,[V]*n):
-          a,b,c= fun(r)
+          a,b,c= fun.newcall(*r)
           acc = acc + a
           bl.append(b)
           cl.append(c)
@@ -870,7 +870,7 @@ class Functiontests(casadiTestCase):
     Y1s = []
     Xps = []
     for k in range(n):
-      XP, Y0,Y1 = fun([XP,Y[k],Z[k],V[k]])
+      XP, Y0,Y1 = fun.newcall(XP,Y[k],Z[k],V[k])
       Y0s.append(Y0)
       Y1s.append(Y1)
       Xps.append(XP)
@@ -894,7 +894,7 @@ class Functiontests(casadiTestCase):
     Xps = []
     Vps = []
     for k in range(n):
-      XP, Y0,VP = fun([Y[k],XP,Z[k],VP])
+      XP, Y0, VP = fun.newcall(Y[k],XP,Z[k],VP)
       Y0s.append(Y0)
       Xps.append(XP)
       Vps.append(VP)
@@ -970,12 +970,12 @@ class Functiontests(casadiTestCase):
 
     Fref = f.map("f",n*m,[True,True,False],[False])
     
-    print Fref([horzcat([vec(xx),vec(yy)]).T,vec(z),x0])
-    print F([z,x0])
+    print Fref.newcall(horzcat([vec(xx),vec(yy)]).T,vec(z),x0)
+    print F.newcall(z,x0)
     
     zs = MX.sym("z", z.shape)
     xs = MX.sym("x",2)
-    Fref = Function("Fref",[zs,xs],Fref([horzcat([vec(xx),vec(yy)]).T,vec(zs),xs]))
+    Fref = Function("Fref",[zs,xs],[Fref.newcall(horzcat([vec(xx),vec(yy)]).T,vec(zs),xs)])
     
     self.checkfunction(F,Fref,inputs=[z,x0],digits=5,allow_nondiff=True,evals=False)
     self.check_codegen(F,inputs=[z,x0])

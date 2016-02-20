@@ -47,7 +47,7 @@ if MySolver=="sqpmethod":
 solver = nlpsol("solver", MySolver, nlp, opts)
 
 # Solve the NLP
-sol = solver({"lbg" : 0})
+sol = solver.newcall(lbg=0)
 
 # Print solution
 print "-----"

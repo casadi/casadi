@@ -3614,6 +3614,16 @@ def swig_monkeypatch(v,cl=True):
 
 import inspect
 
+for name,cl in locals().items():
+  if not inspect.isclass(cl): continue
+  for k,v in inspect.getmembers(cl, inspect.ismethod):
+    if k == "__del__" or v.__name__ == "<lambda>": continue
+    vv = v
+    setattr(cl,k,swig_monkeypatch(vv))
+  for k,v in inspect.getmembers(cl, inspect.isfunction):
+    setattr(cl,k,staticmethod(swig_monkeypatch(v,cl=False)))
+
+
 for name,v in locals().items():
   if not inspect.isfunction(v): continue
   if name.startswith("swig") : continue

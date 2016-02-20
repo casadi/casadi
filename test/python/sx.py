@@ -307,7 +307,7 @@ class SXtests(casadiTestCase):
     f=Function("f", [vertcat([x,y])],[vertcat(fun(x,y))])
     L=[2,3]
     f_in = [0]*f.n_in();f_in[0]=L
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     z=f_out[0].full()
     zr=fun(*L)
     for i in range(3):
@@ -315,7 +315,7 @@ class SXtests(casadiTestCase):
     self.message("SXFunction jacobian evaluation")
     J=f.jacobian()
     J_in = [0]*J.n_in();J_in[0]=L
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     Jr=matrix([[1,1],[3,2],[4,27]])
     self.checkarray(J_out[0],Jr,"SXfunction jacobian evaluates incorrectly")
           
@@ -341,7 +341,7 @@ class SXtests(casadiTestCase):
     fcn_in = [0]*fcn.n_in();fcn_in[0]=L
 
     # Evaluate numerically
-    fcn_out = fcn(fcn_in)
+    fcn_out = fcn.call(fcn_in)
 
     # Get the results
     res = tuple(fcn_out[0].nonzeros())
@@ -370,7 +370,7 @@ class SXtests(casadiTestCase):
     self.message("eval fail test")
     x = SX.sym("x",2,2)
     f = Function("f", [x], [x])
-    self.assertRaises(NotImplementedError,lambda: f(x))
+    self.assertRaises(NotImplementedError,lambda: f.call(x))
 
   def test_SXconversion(self):
     self.message("Conversions from and to SX")
@@ -396,7 +396,7 @@ class SXtests(casadiTestCase):
         T1 = t1!=0
         T2 = t2!=0
         f_in = [0]*f.n_in();f_in[0]=[t1,t2]
-        f_out = f(f_in)
+        f_out = f.call(f_in)
         self.checkarray(f_out[0],DM([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f_out[0])))
 
   def test_SXineq(self):
@@ -413,7 +413,7 @@ class SXtests(casadiTestCase):
         T1 = t1
         T2 = t2
         f_in = [0]*f.n_in();f_in[0]=[t1,t2]
-        f_out = f(f_in)
+        f_out = f.call(f_in)
         self.checkarray(f_out[0],DM([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
 
     
@@ -444,7 +444,7 @@ class SXtests(casadiTestCase):
     x=SX.sym("x",2,2)
     y=SX.sym("y",2,2)
     f  = Function("f", [x,y], [x*y])
-    f([x,y])
+    f.newcall(x,y)
     
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
@@ -520,7 +520,7 @@ class SXtests(casadiTestCase):
       f = Function("f", [x],[fun(x)])
       for n,r in zip(nums,reference):
         f_in = [0]*f.n_in();f_in[0]=n
-        f_out = f(f_in)
+        f_out = f.call(f_in)
         self.assertEqual(f_out[0][0],r)
     
     test(casadi.sign,"sign",nums,[-1,-1,-1,-1,-1,0,1,1,1,1,1])
@@ -546,7 +546,7 @@ class SXtests(casadiTestCase):
       f = Function("f", [x,a],[e])
       f_in = [0]*f.n_in();f_in[0]=x_
       f_in[1]=a_
-      f_out = f(f_in)
+      f_out = f.call(f_in)
       self.assertAlmostEqual(f_out[0][0],r,10)
     
     test(taylor(sin(x),x,a,0),sin(a_))
@@ -558,7 +558,7 @@ class SXtests(casadiTestCase):
     f = Function("f", [x,a],[taylor(M,x)])
     f_in = [0]*f.n_in();f_in[0]=x_
     f_in[1]=a_
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],matrix([[x_*a_,a_],[1+a_*x_,0],[1,0]]),"taylor on dense matrices")
     
   def test_null(self):
@@ -566,24 +566,24 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
 
     f = Function("f", [x],[x**2,[]])
-    f_out = f([0])
+    f_out = f.call([0])
     self.assertTrue(f_out[1].is_empty())
     
     f = Function("f", [x,[]],[x**2,[]])
-    f_out = f([0,0])
+    f_out = f.call([0,0])
     self.assertTrue(f_out[1].is_empty())
-    f_out = f([0,0])
+    f_out = f.call([0,0])
     
-    r = f([x,[]])
+    r = f.call([x,[]])
     self.assertTrue(r[1].is_empty())
 
-    r = f([x,[]])
+    r = f.call([x,[]])
     self.assertTrue(r[1].is_empty())
     
-    r = f([x,SX(0,1)])
+    r = f.call([x,SX(0,1)])
     self.assertTrue(r[1].is_empty())
 
-    r = f([x,SX(1,0)])
+    r = f.call([x,SX(1,0)])
     self.assertTrue(r[1].is_empty())
     
     #self.assertRaises(Exception,lambda : f([x,x]))
@@ -606,7 +606,7 @@ class SXtests(casadiTestCase):
       f = Function("f", [vertcat([x,y]),vertcat([a,b])],[e])
       f_in = [0]*f.n_in();f_in[0]=[x_,y_]
       f_in[1]=[a_,b_]
-      f_out = f(f_in)
+      f_out = f.call(f_in)
       self.assertAlmostEqual(f_out[0][0],r,10)
     
     test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([a,b]),0),sin(a_+b_))
@@ -658,9 +658,9 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [x],[x**2])
     
-    self.assertRaises(RuntimeError, lambda : f([y]))
-    self.assertRaises(RuntimeError, lambda : f([q]))
-    f([z])
+    self.assertRaises(RuntimeError, lambda : f.newcall(y))
+    self.assertRaises(RuntimeError, lambda : f.newcall(q))
+    f.newcall(z)
     
   def test_indexinglimits(self):
     self.message("Limits of indexing")
@@ -773,14 +773,14 @@ class SXtests(casadiTestCase):
       y = op(x)
       f = Function("f", [x],[y])
       f_in = [0]*f.n_in();f_in[0]=0.3
-      f_out = f(f_in)
+      f_out = f.call(f_in)
       self.checkarray(f_out[0],array(DM(op(0.3))),"simplifications")
       self.assertEqual(str(y),"x")
       
       y = op(-x)
       f = Function("f", [x],[y])
       f_in = [0]*f.n_in();f_in[0]=0.3
-      f_out = f(f_in)
+      f_out = f.call(f_in)
       self.checkarray(f_out[0],array(DM(op(-0.3))),"simplifications")
       self.assertEqual(str(y),"(-x)")
   
@@ -805,22 +805,22 @@ class SXtests(casadiTestCase):
     y = if_else(x,1,2)
     f = Function("f", [x],[y])
     f_in = [0]*f.n_in();f_in[0]=1
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.assertTrue(f_out[0]==1,"if_else")
     f_in = [0]*f.n_in();f_in[0]=0
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.assertTrue(f_out[0]==2,"if_else")
     
     x0 = 2.1
     y = if_else(x>1,x**2,x**3)
     f = Function("f", [x],[y])
     f_in = [0]*f.n_in();f_in[0]=x0
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],x0**2,"if_else sens")
     
     x0 = -2.1
     f_in = [0]*f.n_in();f_in[0]=x0
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],x0**3,"if_else sens")
 
     
@@ -876,7 +876,7 @@ class SXtests(casadiTestCase):
     f_in[0]=DM([2,7])
     a_ = f_in[0][0]
     b_ = f_in[0][1]
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     f_out[0]
     self.checkarray(f_out[0],vertcat([-b_/a_]))
 
@@ -887,7 +887,7 @@ class SXtests(casadiTestCase):
     f_in = [0]*f.n_in();f_in[0]=DM([2,7])
     a_ = f_in[0][0]
     b_ = f_in[0][1]
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     f_out[0]
     self.checkarray(f_out[0],vertcat([-b_/a_,0]))
     
@@ -900,7 +900,7 @@ class SXtests(casadiTestCase):
     b_ = f_in[0][1]
     c_ = f_in[0][2]
     d = b_**2-4*a_*c_
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     x0 = (-b_-sqrt(d))/2/a_
     x1 = (-b_+sqrt(d))/2/a_
     f_out[0]
@@ -911,7 +911,7 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [p],[r])
     f_in = [0]*f.n_in();f_in[0]=DM([11,1.3,-1.7,0.1])
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     f_out[0]
     self.checkarray(f_out[0],DM([0.298028,-0.479787,0.0635774]),digits=5)
     
@@ -920,7 +920,7 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [p],[r])
     f_in = [0]*f.n_in();f_in[0]=DM([3,6,-123,  -126,1080])
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     f_out[0]
     self.checkarray(f_out[0],DM([5,3,-4,-6]),digits=5)
     
@@ -928,21 +928,21 @@ class SXtests(casadiTestCase):
     x = SX.sym("x",2,2)
     f = Function("f", [x],[eig_symbolic(x)])
     f_in = [0]*f.n_in();f_in[0]=DM([[2,0.1],[0.3,0.7]])
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([0.67732,2.02268]),digits=5)
     
     
     x = SX.sym("x",2)
     f = Function("f", [x],[eig_symbolic(c.diag(x))])
     f_in = [0]*f.n_in();f_in[0]=DM([3,7])
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],f_in[0])
 
     
     x = SX.sym("x",5)
     f = Function("f", [x],[eig_symbolic(c.diag(x))])
     f_in = [0]*f.n_in();f_in[0]=DM([3,7,2,1,6])
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],f_in[0])
     
     x = SX.sym("x",2,2)
@@ -950,7 +950,7 @@ class SXtests(casadiTestCase):
     f = Function("f", [x,y],[eig_symbolic(diagcat([x,c.diag(y)]))])
     f_in = [0]*f.n_in();f_in[0]=DM([[2,0.1],[0.3,0.7]])
     f_in[1]=[3,7]
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([0.67732,2.02268,3,7]),digits=5)
 
     x = SX.sym("x",3,3)
@@ -964,7 +964,7 @@ class SXtests(casadiTestCase):
     f = Function("f", [x],[e])
     f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,8))
     f_in[0].print_dense()
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([1,-0.29150,10.29150]),digits=5)
     
     
@@ -980,7 +980,7 @@ class SXtests(casadiTestCase):
     f = Function("f", [x],[e])
     f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),range(1,7))
     f_in[0].print_dense()
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([1,3,6]),digits=5)
 
     x = SX.sym("x",Sparsity.upper(5))
@@ -988,8 +988,7 @@ class SXtests(casadiTestCase):
     f = Function("f", [x],[eig_symbolic(x)])
     fin = DM(x.sparsity(),0)
     fin[Sparsity.diag(5)] = c.diag(range(5))
-    f_out = f([fin])
-    self.checkarray(f_out[0],DM(range(5)))
+    self.checkarray(f.newcall(fin), DM(range(5)))
     
   def test_jacobian_empty(self):
     x = SX.sym("x",3)
@@ -1026,8 +1025,8 @@ class SXtests(casadiTestCase):
     g_in = [0]*g.n_in();g_in[0]=x_
     g_in[1]=y_
     
-    f_out = f(f_in)
-    g_out = g(g_in)
+    f_out = f.call(f_in)
+    g_out = g.call(g_in)
     
     self.checkarray(IM.ones(filt),IM.ones(g.sparsity_out(0)))
     
@@ -1051,7 +1050,7 @@ class SXtests(casadiTestCase):
     H *= 2
 
     h = f.hessian()
-    h_out = h([0])
+    h_out = h.call([0])
     
     self.assertTrue(h.sparsity_out(0)==H.sparsity())
     
@@ -1063,12 +1062,12 @@ class SXtests(casadiTestCase):
      bm = MX.sym("x",2)
      
      f = Function("f", [b],[a])
-     c = f([bm])[0]
+     c = f.newcall(bm)
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
      
-     c = f([b])[0]
+     c = f.newcall(b)
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
@@ -1077,12 +1076,12 @@ class SXtests(casadiTestCase):
      
      f = Function("f", [b],[a])
      
-     c = f([bm])[0]
+     c = f.newcall(bm)
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)
      
-     c = f([b])[0]
+     c = f.newcall(b)
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)
@@ -1121,81 +1120,81 @@ class SXtests(casadiTestCase):
     
     f_in = [0]*f.n_in();f_in[0]=2
     f_in[1]=0.5
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([2]))
 
     f_in = [0]*f.n_in();f_in[0]=2
     f_in[1]=-0.5
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([-2]))
     
     f_in = [0]*f.n_in();f_in[0]=-2
     f_in[1]=0.5
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([2]))
 
     f_in = [0]*f.n_in();f_in[0]=-2
     f_in[1]=-0.5
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([-2]))
     
     f_in = [0]*f.n_in();f_in[0]=2
     f_in[1]=0
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([2]))
     
     J = f.jacobian()
     
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=0.5
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([1]))
 
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=-0.5
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([-1]))
     
     J_in = [0]*J.n_in();J_in[0]=-2
     J_in[1]=0.5
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([1]))
 
     J_in = [0]*J.n_in();J_in[0]=-2
     J_in[1]=-0.5
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([-1]))
     
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=0
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([1]))
 
     J = f.jacobian(1)
     
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=0.5
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
 
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=-0.5
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
     
     J_in = [0]*J.n_in();J_in[0]=-2
     J_in[1]=0.5
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
 
     J_in = [0]*J.n_in();J_in[0]=-2
     J_in[1]=-0.5
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
     
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=0
-    J_out = J(J_in)
+    J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([0]))
     
   def test_depends_on(self):

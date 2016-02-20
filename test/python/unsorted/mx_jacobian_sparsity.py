@@ -36,6 +36,6 @@ fcn2 = Function('fcn2', [x2,y2],[4*vertcat((x2[2:5],x2[0:2])) + y2*x2])
 js2 = IM.ones(fcn2.sparsity_jac())
 js2.print_dense()
 
-fcn3 = Function('fcn3', [x,y],fcn2([x,y]))
+fcn3 = Function('fcn3', [x,y],[fcn2.newcall(x,y)])
 js3 = IM.ones(fcn3.sparsity_jac())
 js3.print_dense()

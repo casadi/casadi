@@ -62,7 +62,7 @@ class ImplicitFunctiontests(casadiTestCase):
       b_ = DM([0.7,0.6])
       f=Function("f", [x],[mtimes(A_,x)-b_, mtimes(C_,x)])
       solver=rootfinder("solver", Solver, f, options)
-      solver_out = solver([0])
+      solver_out = solver.newcall(0)
       
       refsol = Function("refsol", [x],[solve(A_,b_), mtimes(C_,solve(A_,b_))])
       self.checkfunction(solver,refsol,inputs=[0],digits=10)         
@@ -103,7 +103,7 @@ class ImplicitFunctiontests(casadiTestCase):
       x=SX.sym("x")
       f=Function("f", [x], [sin(x)])
       solver=rootfinder("solver", Solver, f, options)
-      solver_out = solver([0])
+      solver_out = solver.newcall(0)
       
       refsol = Function("refsol", [x], [ceil(x/pi-0.5)*pi])
       self.checkfunction(solver,refsol,inputs=[6],digits=10)         
@@ -132,7 +132,7 @@ class ImplicitFunctiontests(casadiTestCase):
       solver=rootfinder("solver", Solver, f, options)
       
       X = MX.sym("X")
-      [R] = solver([MX(),X])
+      R = solver.newcall(MX(),X)
       
       trial = Function("trial", [X], [R])
       refsol = Function("refsol", [x],[sin(x)])
@@ -157,19 +157,17 @@ class ImplicitFunctiontests(casadiTestCase):
       solver=rootfinder("options2", Solver, f, options2)
       
       X = MX.sym("X",x.sparsity())
-      [R] = solver([MX(),X.nz[:]])
+      R = solver.newcall(MX(),X.nz[:])
       
       trial = Function("trial", [X],[R])
-      trial_in = [0]*trial.n_in();trial_in[0]=DM(trial.sparsity_in(0),[abs(cos(i)) for i in range(x.nnz())])
-      trial_out = trial(trial_in)
+      trial_in = DM(trial.sparsity_in(0),[abs(cos(i)) for i in range(x.nnz())])
+      trial_out = trial.newcall(trial_in)
 
-      f_in = [0]*f.n_in();f_in[0]=trial_out[0]
-      f_in[1]=trial_in[0].nz[:]
-      f_out = f(f_in)
+      f_in = [trial_out, trial_in.nz[:]]
+      f_out = f.newcall(*f_in)
 
-      f_in = [0]*f.n_in();f_in[0]=trial_in[0].nz[:]
-      f_in[1]=trial_in[0].nz[:]
-      f_out = f(f_in)
+      f_in = [trial_in.nz[:], trial_in.nz[:]]
+      f_out = f.newcall(*f_in)
       
       refsol = Function("refsol", [X],[X.nz[:]])
       refsol_in = [0]*refsol.n_in();refsol_in[0]=trial_in[0]
@@ -201,9 +199,8 @@ class ImplicitFunctiontests(casadiTestCase):
     x=SX.sym("x")
     f=Function("f", [x],[sin(x)])
     solver=rootfinder("solver", "kinsol", f, {"constraints":[-1]})
-    solver_in = [0]*solver.n_in();solver_in[0]=-6
-    solver_out = solver(solver_in)
-    self.assertAlmostEqual(solver_out[0][0],-2*pi,5)
+    solver_out = solver.newcall(-6)
+    self.assertAlmostEqual(solver_out[0],-2*pi,5)
     
   def test_constraints(self):
     for Solver, options in solvers:
@@ -214,17 +211,17 @@ class ImplicitFunctiontests(casadiTestCase):
       options2 = dict(options)
       options2["constraints"] = [-1,0]
       solver=rootfinder("solver", Solver, f, options2)
-      solver_out = solver([0])
+      solver_out = solver.newcall(0)
       
-      self.checkarray(solver_out[0],DM([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
+      self.checkarray(solver_out,DM([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
       f=Function("f", [x],[vertcat([mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat([1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [1,0]
       solver=rootfinder("solver", Solver, f, options2)
-      solver_out = solver([0])
+      solver_out = solver.newcall(0)
       
-      self.checkarray(solver_out[0],DM([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
+      self.checkarray(solver_out,DM([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
 
   def test_implicitbug(self):
     # Total number of variables for one finite element
@@ -253,14 +250,12 @@ class ImplicitFunctiontests(casadiTestCase):
     x0_val  = 1
 
     G = F.gradient(0,0)
-    G_in = [0]*G.n_in();G_in[0]=x0_val
-    G_out = G(G_in)
+    G_out = G.newcall(x0_val)
     print G_out[0]
     print G
 
     J = F.jacobian(0,0)
-    J_in = [0]*J.n_in();J_in[0]=x0_val
-    J_out = J(J_in)
+    J_out = J.newcall(x0_val)
     print J_out[0]
     print J
     

@@ -52,7 +52,7 @@ dae={'x':states, 'p':params, 't':t, 'ode':rhs}
 ts = linspace(0, 50, 1000)
 integrator = integrator('integrator', 'cvodes', dae, {'grid':ts, 'output_t0':True})
 
-sol = integrator({'x0':[1,0], 'p':[0.1,0.1,0.1,0.3,0.1]})
+sol = integrator.newcall(x0=[1,0], p=[0.1,0.1,0.1,0.3,0.1])
 
 #! Plot the solution
 plot(array(sol['xf'])[0,:], array(sol['xf'])[1,:])

@@ -52,13 +52,10 @@ opts = {}
 # Create an NLP solver
 nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
   
-# Pass the bounds and initial guess
-arg = {"lbx" : nl.x_lb, 
-       "ubx" : nl.x_ub,
-       "lbg" : nl.g_lb,
-       "ubg" : nl.g_ub,
-       "x0" : nl.x_init}
-  
 # Solve NLP
-res = nlpsol(arg)
+res = nlpsol.newcall(lbx=nl.x_lb,
+             ubx=nl.x_ub,
+             lbg=nl.g_lb,
+             ubg=nl.g_ub,
+             x0=nl.x_init)
 

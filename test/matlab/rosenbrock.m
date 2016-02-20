@@ -39,13 +39,11 @@ nlp = struct('x', v, 'f', f', 'g', g);
 solver = nlpsol('solver', 'ipopt', nlp);
 
 % Solve the NLP
-arg = struct;
-arg.x0 = [2.5 3.0 0.75]; % solution guess
-arg.lbx = -inf; % lower bound on x
-arg.ubx =  inf; % upper bound on x
-arg.lbg =    0; % lower bound on g
-arg.ubg =    0; % upper bound on g
-res = solver(arg);
+res = solver.newcall('x0' , [2.5 3.0 0.75],... % solution guess
+             'lbx', -inf,...           % lower bound on x
+             'ubx',  inf,...           % upper bound on x
+             'lbg',    0,...           % lower bound on g
+             'ubg',    0);             % upper bound on g
  
 % Print the solution
 f_opt = full(res.f)          % >> 0

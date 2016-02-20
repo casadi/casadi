@@ -21,29 +21,8 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from __future__ import division
-#
-#     This file is part of CasADi.
-# 
-#     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
-#     CasADi is free software; you can redistribute it and/or
-#     modify it under the terms of the GNU Lesser General Public
-#     License as published by the Free Software Foundation; either
-#     version 3 of the License, or (at your option) any later version.
-# 
-#     CasADi is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#     Lesser General Public License for more details.
-# 
-#     You should have received a copy of the GNU Lesser General Public
-#     License along with CasADi; if not, write to the Free Software
-#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
-# 
 
+from __future__ import division
 from casadi import *
 import casadi as c
 import numpy
@@ -168,30 +147,28 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
 
         f=Function('f', [z],[r])
-        f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f_out = f(f_in)
+        f_in = DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f_out = f.newcall(f_in)
         
         f_=Function('f', [z],[z])
-        f__in = [0]*f_.n_in();f__in[0]=DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f__out = f_(f__in)
+        f__in = DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f__out = f_.newcall(f__in)
         
 
-        self.checkarray(fun(f__out[0],DM(s)),f_out[0],"operation")
+        self.checkarray(fun(f__out,DM(s)),f_out,"operation")
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
         f=Function('f',[z,s],[r])
-        f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f_in[1]=DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])
-        f_out = f(f_in)
+        f_in = [DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
+        f_out = f.newcall(*f_in)
         
         f_=Function('f', [z,s],[z,s])
-        f__in = [0]*f_.n_in();f__in[0]=DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f__in[1]=DM(f_.sparsity_in(1),dummy2[0:f.nnz_in(1)])
-        f__out = f_(f__in)
+        f__in= [DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f_.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
+        f__out = f_.newcall(*f__in)
 
-        self.checkarray(fun(f__out[0],f__out[1]),f_out[0],"operation")
+        self.checkarray(fun(f__out[0],f__out[1]),f_out,"operation")
     
     
     def tests(z,s):

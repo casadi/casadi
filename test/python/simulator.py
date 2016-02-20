@@ -57,7 +57,7 @@ class Simulatortests(casadiTestCase):
     integrator = casadi.integrator('integrator', 'cvodes', f, opts)
     q0   = MX.sym('q0')
     par  = MX.sym('p')
-    qend = integrator({'x0':q0,'p':par})['xf']
+    qend = integrator.call({'x0':q0,'p':par})['xf']
     qe=Function('qe', [q0,par],[qend])
     self.dae = f
     self.integrator = integrator
@@ -112,7 +112,7 @@ class Simulatortests(casadiTestCase):
 
     integrator_in = [0]*integrator.n_in();integrator_in[0]=[num['q0']]
     integrator_in[1]=[num['p']]
-    integrator_out = integrator(integrator_in)
+    integrator_out = integrator.call(integrator_in)
 
     tend=num['tend']
     q0=num['q0']

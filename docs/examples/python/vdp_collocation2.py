@@ -108,12 +108,12 @@ for j in range(d+1):
   lfcn = Function('lfcn', [tau],[L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  D[j], = lfcn([1.0])
+  D[j] = lfcn.newcall(1.0)
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
   for r in range(d+1):
-    C[j,r], _ = tfcn([tau_root[r]])
+    C[j,r], _ = tfcn.newcall(tau_root[r])
 
 # Structure holding NLP variables
 V = struct_symMX([
@@ -162,7 +162,7 @@ for k in range(nk):
       xp_jk += C[r,j]*V["X",k,r]
       
     # Add collocation equations to the NLP
-    [fk] = f([T[k][j], V["X",k,j], V["U",k]])
+    fk = f.newcall(T[k][j], V["X",k,j], V["U",k])
     g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
@@ -181,7 +181,7 @@ for k in range(nk):
 g = vertcat(g)
 
 # Objective function
-[f] = m([T[nk-1][d],V["X",nk,0],V["U",nk-1]])
+f = m.newcall(T[nk-1][d],V["X",nk,0],V["U",nk-1])
   
 # NLP
 nlp = {'x':V, 'f':f, 'g':g}
@@ -212,7 +212,7 @@ arg["lbg"] = NP.concatenate(lbg)
 arg["ubg"] = NP.concatenate(ubg)
 
 # Solve the problem
-res = solver(arg)
+res = solver.newcall(**arg)
 
 # Print the optimal cost
 print "optimal cost: ", float(res["f"])

@@ -64,7 +64,7 @@ class OCPtests(casadiTestCase):
     solver_in["ubx"]=[1000 for i in range(V.nnz())]
     solver_in["lbg"]=[0 for i in range(N+1)]
     solver_in["ubg"]=[0 for i in range(N+1)]
-    solver_out = solver(solver_in)
+    solver_out = solver.newcall(**solver_in)
     ocp_sol=solver_out["f"][0]
     # solve the ricatti equation exactly
     K = q+0.0
@@ -102,12 +102,12 @@ class OCPtests(casadiTestCase):
     
     q0   = vertcat([var[0],par])
     par  = var[1]
-    qend = integrator({'x0':q0,'p':par})["xf"]
+    qend = integrator.newcall(x0=q0, p=par)["xf"]
     
     parc = MX(0)
     
     f = Function('f', [var,parMX],[qend[0]])
-    nlp = {'x':var, 'f':-f([var,parc])[0]}
+    nlp = {'x':var, 'f':-f.newcall(var,parc)}
     opts = {}
     opts["ipopt.tol"] = 1e-12
     opts["ipopt.hessian_approximation"] = "limited-memory"
@@ -118,7 +118,7 @@ class OCPtests(casadiTestCase):
     solver_in = {}
     solver_in["lbx"]=[-1, -1]
     solver_in["ubx"]=[1, 0.2]
-    solver_out = solver(solver_in)
+    solver_out = solver.newcall(**solver_in)
     self.assertAlmostEqual(solver_out["x"][0],1,8,"X_opt")
     self.assertAlmostEqual(solver_out["x"][1],0.2,8,"X_opt")
     
@@ -156,12 +156,12 @@ class OCPtests(casadiTestCase):
     
     q0   = vertcat([var[0],par])
     parl  = var[1]
-    qend = integrator({'x0':q0,'p':parl})["xf"]
+    qend = integrator.newcall(x0=q0,p=parl)["xf"]
     
     parc = MX(dy0)
     
     f = Function('f', [var,par],[qend[0]])
-    nlp = {'x':var, 'f':-f([var,parc])[0], 'g':var[0]-var[1]}
+    nlp = {'x':var, 'f':-f.newcall(var,parc), 'g':var[0]-var[1]}
     opts = {}
     opts["ipopt.tol"] = 1e-12
     opts["ipopt.hessian_approximation"] = "limited-memory"
@@ -174,7 +174,7 @@ class OCPtests(casadiTestCase):
     solver_in["ubx"]=[1, 0.2]
     solver_in["lbg"]=[-1]
     solver_in["ubg"]=[0]
-    solver_out = solver(solver_in)
+    solver_out = solver.newcall(**solver_in)
 
     self.assertAlmostEqual(solver_out["x"][0],0.2,6,"X_opt")
     self.assertAlmostEqual(solver_out["x"][1],0.2,6,"X_opt")

@@ -51,7 +51,7 @@ class Fac(Callback):
 fac = Fac('fac')
 
 #! Evaluate numerically
-[y] = fac([4])
+y = fac.newcall(4)
 
 print "4! = ", y
 
@@ -59,10 +59,10 @@ print "4! = ", y
 #!==============================
 
 x = MX.sym("x")
-[y] = fac([x])
+y = fac.newcall(x)
 
 f = Function('f', [x],[y])
 
-[y] = f([5])
+y = f.newcall(5)
 
 print "5! = ", y

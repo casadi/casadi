@@ -179,7 +179,7 @@ for k in range(nk):
       xp_jk += C[r,j]*X[k,r]
       
     # Add collocation equations to the NLP
-    [fk,qk] = f([T[k,j], X[k,j], U[k]])
+    fk,qk = f.newcall(T[k,j], X[k,j], U[k])
     g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
@@ -229,7 +229,7 @@ arg["lbg"] = NP.concatenate(lbg)
 arg["ubg"] = NP.concatenate(ubg)
 
 # Solve the problem
-res = solver(arg)
+res = solver.newcall(**arg)
 
 # Print the optimal cost
 print "optimal cost: ", float(res["f"])

@@ -91,7 +91,7 @@ l_init = MX.sym('l_init',2)
 X = vertcat((x_init, l_init))
 
 # Call the integrator
-X = I({'x0':X})['xf']
+X = I.newcall(x0=X)['xf']
 
 # Costate at the final time should be zero (cf. Bryson and Ho)
 lam_f = X[2:4]
@@ -119,7 +119,7 @@ elif Solver=='kinsol':
 solver = rootfinder('solver', Solver, rfp, opts)
 
 # Solve the problem
-l_init_opt, = solver([0])
+l_init_opt = solver.newcall(0)
 l_init_opt = NP.array(l_init_opt.nonzeros())
 
 # Time grid for visualization
@@ -129,11 +129,11 @@ tgrid = NP.linspace(0, 10, 100)
 simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid, 'output_t0':True})
 
 # Simulate to get the state trajectory
-sol = simulator({'x0' : NP.concatenate((x_init, l_init_opt))})['xf']
+sol = simulator.newcall(x0 = NP.concatenate((x_init, l_init_opt)))['xf']
 
 # Calculate the optimal control
 ufcn_all = u_fcn.map('ufcn_all', len(tgrid))
-[u_opt] = ufcn_all([sol])
+u_opt = ufcn_all.newcall(sol)
 
 # Plot the results
 plt.figure(1)

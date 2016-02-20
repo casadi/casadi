@@ -529,10 +529,9 @@ class Toolstests(casadiTestCase):
     self.checkarray(a["P"].shape,(3,3))
     
     f = Function("f", [a],[a["P"]])
-    f_in = [0]*f.n_in();f_in[0]=range(6)
-    f_out = f(f_in)
+    f_out = f.newcall(range(6))
     
-    self.checkarray(f_out[0],DM([[0,1,3],[1,2,4],[3,4,5]]))
+    self.checkarray(f_out,DM([[0,1,3],[1,2,4],[3,4,5]]))
     self.checkarray(b["P"],DM([[0,3,6],[3,4,7],[6,7,8]]))
     self.checkarray(b.cat,DM([0,3,4,6,7,8]))
     
@@ -749,8 +748,7 @@ class Toolstests(casadiTestCase):
     s_["a"] = 1
     s_["b"] = DM([2,3])
     s_["c"] = DM([[4,5],[6,7]])
-    f_in = [0]*f.n_in();f_in[0]=s_
-    f_out = f(f_in)
+    f_out = f.newcall(s_)
     
     self.checkarray(f_out[0],s_["a"])
     self.checkarray(f_out[1],s_["b"])

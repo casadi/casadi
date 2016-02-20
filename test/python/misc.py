@@ -289,7 +289,7 @@ class Misctests(casadiTestCase):
 
     F = Function('F', [x, p], [x+p, x**2], ['x', 'p'], ['f', 'g'])
     
-    fc = F({'x':3,'p':4})
+    fc = F.newcall(x=3,p=4)
     f = fc['f']
     self.checkarray(f,DM([7]))
     g = fc['g']
@@ -315,13 +315,9 @@ class Misctests(casadiTestCase):
     
     print f
     
-    f_in = [0]*f.n_in();f_in[0]=-6
-    f_out = f(f_in)
-    
-    f_in = [0]*f.n_in();f_in[0]=1
-    
+    f_out = f.newcall(-6)
     try :
-      f_out = f(f_in)
+      f_out = f.newcall(1)
     except Exception as e:
       print str(e)
       self.assertTrue("x must be larger than 3" in str(e))

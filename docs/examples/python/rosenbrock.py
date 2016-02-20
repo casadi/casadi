@@ -46,9 +46,9 @@ nlp = {'x':vertcat([x,y,z]), 'f':f, 'g':g}
 solver = nlpsol("solver", "ipopt", nlp)
 
 # Solve the Rosenbrock problem
-res = solver({"x0" :[2.5,3.0,0.75],
-              "ubg" : 0,
-              "lbg" : 0})
+res = solver.newcall(x0  = [2.5,3.0,0.75],
+             ubg = 0,
+             lbg = 0)
 
 # Print solution
 print

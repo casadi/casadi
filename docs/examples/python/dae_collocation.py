@@ -80,12 +80,12 @@ for j in range(deg+1):
 
     lfcn = Function('lfcn', [tau],[L])
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-    [D[j]] = lfcn([1.0])
+    D[j] = lfcn.newcall(1.0)
 
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     tfcn = lfcn.tangent()
     for j2 in range(deg+1):
-        C[j][j2], _ = tfcn([tau_root[j2]])
+        C[j][j2], _ = tfcn.newcall(tau_root[j2])
 
 
 
@@ -281,7 +281,7 @@ lbg = []
 ubg = []
 
 # Initial constraints
-[ick] = icfcn([0., XD[0][0][0], XA[0][0][0], U[0], P])
+ick = icfcn.newcall(0., XD[0][0][0], XA[0][0][0], U[0], P)
 g += [ick]
 lbg.append(ic_min)
 ubg.append(ic_max)
@@ -297,7 +297,7 @@ for k in range(nk):
                 xp_jk += C[j2][j]*XD[k][i][j2]       # get the time derivative of the differential states (eq 10.19b)
             
             # Add collocation equations to the NLP
-            [fk] = ffcn([0., xp_jk/h, XD[k][i][j], XA[k][i][j-1], U[k], P])
+            fk = ffcn.newcall(0., xp_jk/h, XD[k][i][j], XA[k][i][j-1], U[k], P)
             g += [fk[:ndiff]]                     # impose system dynamics (for the differential states (eq 10.19b))
             lbg.append(np.zeros(ndiff)) # equality constraints
             ubg.append(np.zeros(ndiff)) # equality constraints
@@ -306,7 +306,7 @@ for k in range(nk):
             ubg.append(np.zeros(nalg)) # equality constraints
             
             #  Evaluate the path constraint function
-            [pck] = pcfcn([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+            pck = pcfcn.newcall(0., XD[k][i][j], XA[k][i][j-1], U[k], P)
             
             g += [pck]
             lbg.append(pc_min)
@@ -332,7 +332,7 @@ for k in range(nk):
 #   none
 
 # Final constraints (Const, dConst, ConstQ)
-[fck] = fcfcn([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+fck = fcfcn.newcall(0., XD[k][i][j], XA[k][i][j-1], U[k], P)
 g += [fck]
 lbg.append(fc_min)
 ubg.append(fc_max)
@@ -340,7 +340,7 @@ ubg.append(fc_max)
 # Objective function of the NLP
 #Implement Mayer term
 Obj = 0
-[obj] = MayerTerm([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+obj = MayerTerm.newcall(0., XD[k][i][j], XA[k][i][j-1], U[k], P)
 Obj += obj
 
 # Implement Lagrange term
@@ -352,7 +352,7 @@ ld0 = lDotAtTauRoot[1:,0]
 lagrangeTerm = 0
 for k in range(nk):
     for i in range(nicp):
-        dQs = h*veccat([LagrangeTerm([0., XD[k][i][j], XA[k][i][j-1], U[k], P])[0] \
+        dQs = h*veccat([LagrangeTerm.newcall(0., XD[k][i][j], XA[k][i][j-1], U[k], P) \
                         for j in range(1,deg+1)])
         Qs = mtimes( ldInv, dQs)
         m = mtimes( Qs.T, lAtOne[1:])
@@ -390,7 +390,7 @@ arg["lbg"] = np.concatenate(lbg)
 arg["ubg"] = np.concatenate(ubg)
 
 # Solve the problem
-res = solver(arg)
+res = solver.newcall(**arg)
 
 # Print the optimal cost
 print "optimal cost: ", float(res["f"])
@@ -442,7 +442,7 @@ for j in range(1,deg+1):
         if j2 != j:
             La *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
     lafcn = Function('lafcn', [tau], [La])
-    [Da[j-1]] = lafcn([tau_root[0]])
+    Da[j-1] = lafcn.newcall(tau_root[0])
 
 xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))
 offset4=0

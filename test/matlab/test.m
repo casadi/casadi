@@ -15,9 +15,9 @@ z = MX.sym('z',3);
 
 
 f = Function('f',{x},{cos(x)})
-r = f({3})
+r = f.newcall(3)
 
-disp(r{1})
+disp(r)
 
 res = r{1}-DM(cos(3))
 assert(is_zero(res))
@@ -26,7 +26,7 @@ assert(is_zero(res))
 x = SX.sym('x',4);
 
 f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
-r = f({[1,2,3,4]})
+r = f.call({[1,2,3,4]});
 
 for i=1:f.n_out()
   res = r{i}-2;
@@ -57,7 +57,7 @@ assert(flag);
 x = MX.sym('x',4);
 
 f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
-r = f({[1,2,3,4]})
+r = f.call({[1,2,3,4]});
 
 for i=1:f.n_out()
   res = r{i}-2;
@@ -102,7 +102,7 @@ opts = struct
 opts.verbose = true
 
 intg = casadi.integrator('integrator', 'rk', ode, opts);
-intg(struct);
+intg.call(struct);
 diary OFF
 
 logged = fileread('diary');
@@ -160,10 +160,10 @@ opts = struct('input_scheme', char('x','p'),...
 nlp = Function('nlp', {x,p}, {f,g}, opts);
 
 % Evaluate with numbered inputs and outputs
-res_vec = nlp({1.1, 3.3});
+[res_vec{1:2}] = nlp.newcall(1.1, 3.3);
 
 % Evaluate with named inputs and outputs
-res_struct = nlp(struct('x',1.1,'p',3.3));
+res_struct = nlp.newcall('x',1.1,'p',3.3);
 assert(is_zero(res_vec{1}-res_struct.f))
 assert(is_zero(res_vec{2}-res_struct.g))
 
@@ -192,8 +192,8 @@ if Compiler.hasPlugin('clang')
   x = MX.sym('x');
   F = Function('f',{x},{x^2},struct('jit',true));
 
-  out = F({5});
-  assert(full(out{1})==25)
+  out = F.newcall(5);
+  assert(full(out)==25)
 end
 
 

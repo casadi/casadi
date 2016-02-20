@@ -46,7 +46,7 @@ f = Function('f', [x,u],[xdot])
 dt = 0.01  # Time step
 xj = x
 for j in range(20):
-  [fj] = f([xj,u])
+  fj = f.newcall(xj,u)
   xj += dt*fj
 
 # Discrete time dynamics function
@@ -64,7 +64,7 @@ X0 = MX([0,0,1])
 # Integrate over all intervals
 X=X0
 for k in range(nu):
-  [X] = F([X,U[k]])
+  X = F.newcall(X,U[k])
 
 # Objective function and constraints
 J = mtimes(U.T,U) # u'*u in Matlab
@@ -88,7 +88,7 @@ arg["lbg"] = [10,0]
 arg["ubg"] = [10,0]
 
 # Solve the problem
-res = solver(arg)
+res = solver.newcall(**arg)
 
 # Get the solution
 plot(res["x"])

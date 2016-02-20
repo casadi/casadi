@@ -90,7 +90,7 @@ for k in range(nk):
   ubw += [ 1.00]
 
   # Call integrator function
-  Ik = I({'x0':Xk, 'p':Uk})
+  Ik = I.newcall(x0=Xk, p=Uk)
   Xk = Ik['xf']
   J = J + Ik['qf'] # Sum quadratures
 
@@ -108,11 +108,11 @@ opts = {'ipopt.linear_solver':'ma27'}
 solver = nlpsol('solver', 'ipopt', nlp, opts)
 
 # Pass bounds, initial guess and solve NLP
-sol = solver({'lbx' : lbw, # Lower variable bound
-              'ubx' : ubw,  # Upper variable bound
-              'lbg' : 0.0,  # Lower constraint bound
-              'ubg' : 0.0,  # Upper constraint bound
-              'x0'  : 0.0}) # Initial guess
+sol = solver.newcall(lbx = lbw, # Lower variable bound
+             ubx = ubw,  # Upper variable bound
+             lbg = 0.0,  # Lower constraint bound
+             ubg = 0.0,  # Upper constraint bound
+             x0  = 0.0) # Initial guess
 
 # Plot the results
 import matplotlib.pyplot as plt

@@ -115,7 +115,7 @@ class FunctionPool:
 
 def toSX_fun(fun):
   ins = fun.sx_in()
-  return Function("f",ins,fun(ins))
+  return Function("f",ins,fun.call(ins))
   
 def toMX_fun(fun):
   ins = fun.mx_in()
@@ -270,7 +270,7 @@ class casadiTestCase(unittest.TestCase):
          print f.size_in(i)
          raise e
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
-    f_out = f(f_in)
+    f_out = f.call(f_in)
     zt = f_out[0].full()
     self.checkarray(yr,zt,name,failmessage)
     
@@ -327,8 +327,8 @@ class casadiTestCase(unittest.TestCase):
       
     for i in range(2): # repeated evaluation
       try:
-        trial_outputs = trial(inputs)
-        solution_outputs = solution(inputs)
+        trial_outputs = trial.call(inputs)
+        solution_outputs = solution.call(inputs)
       except Exception as e:
         raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (0,0,failmessage) )
 
@@ -427,7 +427,7 @@ class casadiTestCase(unittest.TestCase):
           fseeds = [[sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]  for d in range(ndir)]
           aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
-          res = f(inputss)
+          res = f.call(inputss)
           fwdsens = f.forward(inputss, res, fseeds)
           adjsens = f.reverse(inputss, res, aseeds)
           
@@ -439,7 +439,7 @@ class casadiTestCase(unittest.TestCase):
             random.seed(i)
             vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
           
-          vf_out = vf(vf_in)
+          vf_out = vf.call(vf_in)
           storagekey = (spmod,spmod2)
           if not(storagekey in storage):
             storage[storagekey] = []
@@ -456,7 +456,7 @@ class casadiTestCase(unittest.TestCase):
               aseeds2 = [[sym("a",vf_reference.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
               inputss2 = [sym("i",vf_reference.sparsity_in(i)) for i in range(vf.n_in())]
               
-              res2 = vf(inputss2)
+              res2 = vf.call(inputss2)
               fwdsens2 = vf.forward(inputss2, res2, fseeds2)
               adjsens2 = vf.reverse(inputss2, res2, aseeds2)
 
@@ -468,7 +468,7 @@ class casadiTestCase(unittest.TestCase):
                 random.seed(i)
                 vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
               
-              vf2_out = vf2(vf2_in)
+              vf2_out = vf2.call(vf2_in)
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
                 storage2[storagekey] = []

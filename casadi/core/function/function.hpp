@@ -404,6 +404,7 @@ namespace casadi {
               bool always_inline=false, bool never_inline=false);
     ///@}
 
+#ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation
     std::vector<DM> operator()(const std::vector<DM>& arg);
@@ -414,7 +415,6 @@ namespace casadi {
     const MXDict operator()(const MXDict& arg);
     ///@}
 
-#ifndef SWIG
     ///@{
     /** \brief Evaluate with temporary memory allocation */
     void operator()(std::vector<const double*> arg, std::vector<double*> res);

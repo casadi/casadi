@@ -255,30 +255,28 @@ class typemaptests(casadiTestCase):
         dummy = [1.3,2.7,9.4,1.0]
 
         f=Function("f", [z],[r])
-        f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f_out = f(f_in)
+        f_in = DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f_out = f.newcall(f_in)
         
         f_=Function("f", [z],[z])
-        f__in = [0]*f_.n_in();f__in[0]=DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f__out = f_(f__in)
+        f__in = DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f__out = f_.newcall(f__in)
         
 
-        self.checkarray(fun(f__out[0],DM(s)),f_out[0],"operation",str(f__out[0])+str(s)+":"+str(fun(f__out[0],DM(s)))+"->"+str(f_out[0])+":"+str(s)+str(z)+"->"+str(r))
+        self.checkarray(fun(f__out,DM(s)),f_out,"operation",str(f__out)+str(s)+":"+str(fun(f__out,DM(s)))+"->"+str(f_out)+":"+str(s)+str(z)+"->"+str(r))
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
         f=Function("f", [z,s],[r])
-        f_in = [0]*f.n_in();f_in[0]=DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f_in[1]=DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])
-        f_out = f(f_in)
-        
-        f_=Function("f", [z,s],[z,s])
-        f__in = [0]*f_.n_in();f__in[0]=DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f__in[1]=DM(f_.sparsity_in(1),dummy2[0:f.nnz_in(1)])
-        f__out = f_(f__in)
+        f_in = [DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
+        f_out = f.newcall(*f_in)
 
-        self.checkarray(fun(f__out[0],f__out[1]),f_out[0],"operation"+str(f__out[0])+","+str(f__out[1])+":"+str(f_out[0]))
+        f_=Function("f", [z,s],[z,s])
+        f__in = [DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f_.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
+        f__out = f_.newcall(*f__in)
+
+        self.checkarray(fun(f__out[0],f__out[1]),f_out,"operation"+str(f__out[0])+","+str(f__out[1])+":"+str(f_out))
     
     
     def tests(z,s):
@@ -455,7 +453,7 @@ class typemaptests(casadiTestCase):
     
     f = Function("f", [x],[w])
     
-    W = f(f.sx_in())[0]
+    W = f.newcall(*f.sx_in())
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
 
@@ -466,7 +464,7 @@ class typemaptests(casadiTestCase):
     
     f = Function("f", [x],[w])
     
-    W = f(f.mx_in())[0]
+    W = f.newcall(*f.mx_in())
 
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
@@ -573,24 +571,24 @@ class typemaptests(casadiTestCase):
       def __DM__(self):
         return DM([4])
     
-    self.assertEqual(f([Foo()])[0],4)
+    self.assertEqual(f.newcall(Foo()),4)
 
     class Foo:
       def __DM__(self):
         return SX([4])
         
-    self.assertRaises(NotImplementedError,lambda :f([Foo()]))
+    self.assertRaises(NotImplementedError,lambda :f.newcall(Foo()))
     
     class Foo:
       def __DM__(self):
         raise Exception("15")
         
-    self.assertRaises(NotImplementedError,lambda :f([Foo()]))
+    self.assertRaises(NotImplementedError,lambda :f.newcall(Foo()))
 
     class Foo:
       pass
         
-    self.assertRaises(NotImplementedError,lambda :f([Foo()]))
+    self.assertRaises(NotImplementedError,lambda :f.newcall(Foo()))
 
   def test_casting_IM(self):
     self.message("casting IM")
@@ -697,7 +695,7 @@ class typemaptests(casadiTestCase):
 
     def val(a):
       f = Function("f", [],[a])
-      f_out = f([])
+      f_out = f.call([])
       return f_out[0]
       
     for i in [SX(1),1,1.0]:

@@ -77,14 +77,14 @@ F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
 x0 = ivp.start(vertcat(ivp.x))
-res = F({"x0":x0})
+res = F.newcall(x0=x0)
 
 # Output function
 output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.d, ivp.ddef)
 output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
 output_fcn = output_fcn.map("output_fcn_map", len(grid))
-[m_out, P_out] = output_fcn([grid, res["xf"], res["zf"]])
+m_out, P_out = output_fcn.newcall(grid, res["xf"], res["zf"])
 
 # Plot
 plt.figure(1)
@@ -118,14 +118,14 @@ F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
 x0 = ivp.start(vertcat(ivp.x))
-res = F({"x0":x0})
+res = F.newcall(x0=x0)
 
 # Output function
 output_fcn_out = substitute([ivp("T")], ivp.d, ivp.ddef)
 output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
 output_fcn = output_fcn.map("output_fcn_map", len(grid))
-[T_out] = output_fcn([grid, res["xf"], res["zf"]])
+T_out = output_fcn.newcall(grid, res["xf"], res["zf"])
 
 # Plot
 plt.figure(2)
@@ -152,14 +152,14 @@ F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
 x0 = ivp.start(vertcat(ivp.x))
-res = F({"x0":x0})
+res = F.newcall(x0=x0)
 
 # Output function
 output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.d, ivp.ddef)
 output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
 output_fcn = output_fcn.map("output_fcn_map", len(grid))
-[T_out, U_out, V_out] = output_fcn([grid, res["xf"], res["zf"]])
+T_out, U_out, V_out = output_fcn.newcall(grid, res["xf"], res["zf"])
 
 # Plot
 plt.figure(3)

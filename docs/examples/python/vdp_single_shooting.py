@@ -50,7 +50,7 @@ f = 0
 
 # Build a graph of integrator calls
 for k in range(nk):
-  res = F({'x0':X,'p':U[k]})
+  res = F.newcall(x0=X, p=U[k])
   X = res['xf']
   f += res['qf']
 
@@ -62,11 +62,11 @@ nlp = {'x':vertcat(U), 'f':f, 'g':g}
 solver = nlpsol('solver', 'ipopt', nlp)
 
 # Solve the problem
-sol = solver({'lbx' : -0.75,
-              'ubx' : 1,
-              'x0' : 0,
-              'lbg' : 0,
-              'ubg' : 0})
+sol = solver.newcall(lbx = -0.75,
+             ubx = 1,
+             x0 = 0,
+             lbg = 0,
+             ubg = 0)
               
 # Retrieve the solution
 u_opt = sol['x']
@@ -74,7 +74,7 @@ u_opt = sol['x']
 # Simulate to get optimal X trajectory
 x_opt = [x0]
 for k in range(nk):
-  res = F({'x0':x_opt[-1],'p':u_opt[k]})
+  res = F.newcall(x0=x_opt[-1], p=u_opt[k])
   x_opt.append(res['xf'])
 x0_opt = [xk[0] for xk in x_opt]
 x1_opt = [xk[1] for xk in x_opt]

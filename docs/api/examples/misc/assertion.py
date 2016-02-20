@@ -33,7 +33,7 @@ z = sqrt(y)
 
 f = Function("f", [x], [z])
 
-[z0] = f([5])
+z0 = f.newcall(5)
 
 print z0
 
@@ -46,7 +46,7 @@ z = sqrt(y)
 f = Function("f", [x],[z])
 
 try:
-  [z0] = f([5])
+  z0 = f.newcall(5)
 except Exception as e:
   print "An exception was raised here:"
   print e
@@ -70,9 +70,9 @@ foo = Dummy("foo")
 
 y = sin(x)
 
-y = y.attachAssert(foo([y])[0], "you are in trouble") # Add assertion here
+y = y.attachAssert(foo.newcall(y), "you are in trouble") # Add assertion here
 z = sqrt(y)
 
 f = Function("f", [x],[z])
 
-[z0] = f([5])
+z0 = f.newcall(5)

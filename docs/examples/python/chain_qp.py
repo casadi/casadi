@@ -118,7 +118,7 @@ solver = qpsol('solver', 'qpoases', qp, {'sparse':True})
 #solver = nlpsol('solver', 'ipopt', qp)
 
 # Get the optimal solution
-sol = solver({'lbx':lbx, 'ubx':ubx, 'lbg':lbg, 'ubg':ubg})
+sol = solver.newcall(lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
 x_opt = sol['x']
 f_opt = sol['f']
 print 'f_opt = ', f_opt
