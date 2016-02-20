@@ -494,7 +494,7 @@ class casadiTestCase(unittest.TestCase):
       F.generate(name)
       import subprocess
       p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
-      F2 = external(F.name(), name + '.so')
+      F2 = external(F.name(), './' + name + '.so')
       
       Fout = F(inputs)
       Fout2 = F2(inputs)
