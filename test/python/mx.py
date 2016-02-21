@@ -1718,7 +1718,8 @@ class MXtests(casadiTestCase):
                 if ("mul" in name or "mtimes" in name) and (sp.numel()==1 or sp2.numel()==1): continue
                 r = casadiop([x1,x2])
                 f = Function("f", [xx1,xx2],[r])
-                f_out = f.newcall(v1, v2)
+                f_in = [v1, v2]
+                f_out = f.newcall(*f_in)
                 g = Function("g", [xx1,xx2],[r])
                 g_out = g.newcall(v1, v2)
                 
