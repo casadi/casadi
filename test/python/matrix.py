@@ -974,6 +974,11 @@ class Matrixtests(casadiTestCase):
       
       assert R.is_triu()
       self.checkarray(mtimes(R.T,R),H)
+  def test_skew(self):
+    x = DM([1,7,13])
+    self.checkarray(inv_skew(skew(x)),x)
+    y = DM([0.2,0.9,0.4])
+    self.checkarray(mtimes(skew(x),y),cross(x,y))
     
 if __name__ == '__main__':
     unittest.main()

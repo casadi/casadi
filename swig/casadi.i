@@ -2572,6 +2572,14 @@ DECL M casadi_cross(const M& a, const M& b, int dim = -1) {
   return cross(a, b, dim);
 }
 
+DECL M casadi_skew(const M& a) {
+  return skew(a);
+}
+
+DECL M casadi_inv_skew(const M& a) {
+  return inv_skew(a);
+}
+
 DECL M casadi_det(const M& A) {
   return det(A);
 }

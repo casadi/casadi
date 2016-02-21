@@ -185,6 +185,8 @@ namespace casadi {
     static MatType sum_square(const MatType &x) { return dot(x, x);}
     static MatType linspace(const MatType &a, const MatType &b, int nsteps);
     static MatType cross(const MatType &a, const MatType &b, int dim=-1);
+    static MatType skew(const MatType &a);
+    static MatType inv_skew(const MatType &a);
     static MatType tril2symm(const MatType &x);
     static MatType triu2symm(const MatType &x);
     static MatType repsum(const MatType &x, int n, int m=1);
@@ -302,6 +304,18 @@ namespace casadi {
      */
     inline friend MatType cross(const MatType &a, const MatType &b, int dim = -1) {
       return MatType::cross(a, b, dim);
+    }
+
+    /** \brief Generate a skew symmetric matrix from a 3-vector
+     */
+    inline friend MatType skew(const MatType &a) {
+      return MatType::skew(a);
+    }
+
+    /** \brief Generate the 3-vector progenitor of a skew symmetric matrix
+     */
+    inline friend MatType inv_skew(const MatType &a) {
+      return MatType::inv_skew(a);
     }
 
     /** \brief Matrix determinant (experimental) */
@@ -798,6 +812,26 @@ namespace casadi {
 
     return t ? vertcat(ret) : horzcat(ret);
   }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::skew(const MatType& a) {
+    casadi_assert_message(a.is_vector() && (a.size1()==3 || a.size2()==3),
+                          "skew(a): Expecting 3-vector, got " << a.dim() << ".");
+
+    MatType x = a(0);
+    MatType y = a(1);
+    MatType z = a(2);
+    return blockcat(std::vector< std::vector<MatType> >({{0, -z, y}, {z, 0, -x}, {-y, x, 0}}));
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::inv_skew(const MatType& a) {
+    casadi_assert_message(a.size1()==3 && a.size2()==3,
+                          "inv_skew(a): Expecting 3-by-3 matrix, got " << a.dim() << ".");
+
+    return 0.5*vertcat(std::vector<MatType>({a(2, 1)-a(1, 2), a(0, 2)-a(2, 0), a(1, 0)-a(0, 1)}));
+  }
+
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::tril2symm(const MatType& x) {
