@@ -1094,38 +1094,35 @@ The output will be of the same type, i.e. a list of outputs and a dictionary of 
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-res = nlp([1.1,3.3])
-print res[0], res[1]
+f0, g0 = nlp.newcall(1.1,3.3)
+print f0, g0
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-res = nlp({1.1,3.3});
-disp res{1}, res{2}
+[f0, g0] = nlp.newcall(1.1,3.3);
+disp(f0), disp(g0)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-res = nlp([1.1,3.3])
-print res[0], res[1]
+f0, g0 = nlp.newcall(1.1,3.3)
+print f0, g0
 \end{pytexoutput}
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-res = nlp({'x':1.1,\
-           'p':3.3})
+res = nlp.newcall(x=1.1, p=3.3)
 print res['f'], res['g']
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-res = nlp(struct('x',1.1,...
-                 'p',3.3));
-disp res.f, res.g
+res = nlp.newcall('x',1.1,'p',3.3);
+disp(res.f), disp(res.g)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-res = nlp({'x':1.1,\
-           'p':3.3})
+res = nlp.newcall(x=1.1, p=3.3)
 print res['f'], res['g']
 \end{pytexoutput}
 
