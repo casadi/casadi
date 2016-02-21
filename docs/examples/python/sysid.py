@@ -18,14 +18,14 @@ fs = 610.1 # Sampling frequency [hz]
 
 param_truth = DM([5.625e-6,2.3e-4,1,4.69])
 param_guess = DM([5,2,1,5])
-scale = vertcat([1e-6,1e-4,1,1])
+scale = vertcat(1e-6,1e-4,1,1)
 
 ############ MODELING #####################
 y  = MX.sym('y')
 dy = MX.sym('dy')
 u  = MX.sym('u')
 
-states = vertcat([y,dy]);
+states = vertcat(y,dy);
 controls = u;
 
 M = MX.sym("x")
@@ -33,9 +33,9 @@ c = MX.sym("c")
 k = MX.sym("k")
 k_NL = MX.sym("k_NL")
 
-params = vertcat([M,c,k,k_NL])
+params = vertcat(M,c,k,k_NL)
 
-rhs = vertcat([dy , (u-k_NL*y**3-k*y-c*dy)/M])
+rhs = vertcat(dy , (u-k_NL*y**3-k*y-c*dy)/M)
 
 # Form an ode function
 ode = Function('ode',[states,controls,params],[rhs])
@@ -128,15 +128,15 @@ gaps = Xn[:,:-1]-X[:,1:]
 
 e = y_data-Xn[0,:].T;
 
-V = veccat([params, X])
+V = veccat(params, X)
 
 nlp = {'x':V, 'f':0.5*dot(e,e),'g':gaps}
 
 # Multipleshooting allows for careful initialization
 yd = np.diff(y_data,axis=0)*fs
-X_guess = horzcat([ y_data , vertcat([yd,yd[-1]]) ]).T;
+X_guess = horzcat(y_data , vertcat(yd,yd[-1]]).T;
 
-x0 = veccat([param_guess,X_guess])
+x0 = veccat(param_guess,X_guess)
 
 solver = gauss_newton(e,nlp, V)
 

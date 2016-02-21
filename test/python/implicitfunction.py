@@ -185,12 +185,12 @@ class ImplicitFunctiontests(casadiTestCase):
       y0 = DM([0.1,0.4])
       yy = y + y0
       n=0.2
-      f=Function("f", [y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
+      f=Function("f", [y,x],[vertcat(*[x-arcsin(yy[0]),yy[1]**2-yy[0]])])
       solver=rootfinder("solver", Solver, f, options)
       solver_in = [0]*solver.n_in();solver_in[0]=n
       solver_out = solver(solver_in)
       
-      refsol = Function("refsol", [y,x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
+      refsol = Function("refsol", [y,x],[vertcat(*[sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
       refsol_in = [0]*refsol.n_in();refsol_in[0]=n
       self.checkfunction(solver,refsol,digits=5,sens_der=False,failmessage=message)
       
@@ -207,7 +207,7 @@ class ImplicitFunctiontests(casadiTestCase):
       if 'kinsol' in str(Solver): continue
       if 'newton' in str(Solver): continue
       x=SX.sym("x",2)
-      f=Function("f", [x],[vertcat([mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat([1,2])))])])
+      f=Function("f", [x],[vertcat(*[mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat(*[1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [-1,0]
       solver=rootfinder("solver", Solver, f, options2)
@@ -215,7 +215,7 @@ class ImplicitFunctiontests(casadiTestCase):
       
       self.checkarray(solver_out,DM([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
-      f=Function("f", [x],[vertcat([mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat([1,2])))])])
+      f=Function("f", [x],[vertcat(*[mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat(*[1,2])))])])
       options2 = dict(options)
       options2["constraints"] = [1,0]
       solver=rootfinder("solver", Solver, f, options2)
@@ -228,7 +228,7 @@ class ImplicitFunctiontests(casadiTestCase):
     X0 = MX.sym("X0")
     V = MX.sym("V")
 
-    V_eq = vertcat([V[0]-X0])
+    V_eq = vertcat(*[V[0]-X0])
 
     # Root-finding function, implicitly defines V as a function of X0 and P
     vfcn = Function("vfcn", [V,X0], [V_eq], {"ad_weight":0, "ad_weight_sp":1})
@@ -239,7 +239,7 @@ class ImplicitFunctiontests(casadiTestCase):
     # Create a implicit function instance to solve the system of equations
     ifcn = rootfinder("ifcn", "newton", vfcn_sx, {"linear_solver":"csparse"})
 
-    #ifcn = Function('I', [X0],[vertcat([X0])])
+    #ifcn = Function('I', [X0],[vertcat(*[X0])])
     [V] = ifcn.call([0,X0],True)
 
     f = 1  # fails

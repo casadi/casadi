@@ -27,13 +27,13 @@ import matplotlib.pyplot as plt
 
 # Declare variables (use simple, efficient DAG)
 x0=SX.sym("x0"); x1=SX.sym("x1")
-x = vertcat((x0,x1))
+x = vertcat(x0,x1)
 
 # Control
 u = SX.sym("u")
 
 # ODE right hand side
-xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
+xdot = vertcat((1 - x1*x1)*x0 - x1 + u, x0)
 
 # Lagrangian function
 L = x0*x0 + x1*x1 + u*u
@@ -63,14 +63,14 @@ u_opt = fmax(u_opt,-0.75)
 print "optimal control: ", u_opt
 
 # Augment f with lam_dot and subtitute in the value for the optimal control
-f = vertcat((xdot,ldot))
+f = vertcat(xdot,ldot)
 f = substitute(f,u,u_opt)
 
 # Function for obtaining the optimal control from the augmented state
-u_fcn = Function("ufcn", [vertcat((x,lam))], [u_opt])
+u_fcn = Function("ufcn", [vertcat(x,lam)], [u_opt])
 
 # Formulate the DAE
-dae = {'x':vertcat((x,lam)), 'ode':f}
+dae = {'x':vertcat(x,lam), 'ode':f}
 
 # Augmented DAE state dimension
 nX = 4
@@ -109,7 +109,7 @@ for k in range(num_nodes):
 G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-rfp = Function('rfp', [V], [vertcat(G)])
+rfp = Function('rfp', [V], [vertcat(*G)])
 
 # Select a solver for the root-finding problem
 Solver = "nlpsol"

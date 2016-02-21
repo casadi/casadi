@@ -109,13 +109,13 @@ dy = SX.sym("dy")
 dw = SX.sym("dw")
 
       
-res = vertcat([xddot[0] - dx,\
+res = vertcat(xddot[0] - dx,\
        xddot[1] - dy,\
        xddot[2] - dw,\
        m*xddot[3] + (x-w)*xa, \
        m*xddot[4] +     y*xa - g*m,\
        M*xddot[5] + (w-x)*xa +   u,\
-       (x-w)*(xddot[3] - xddot[5]) + y*xddot[4] + dy*dy + (dx-dw)*(dx-dw)])       
+       (x-w)*(xddot[3] - xddot[5]) + y*xddot[4] + dy*dy + (dx-dw)*(dx-dw))
 
      
 xd[0] = x
@@ -352,7 +352,7 @@ ld0 = lDotAtTauRoot[1:,0]
 lagrangeTerm = 0
 for k in range(nk):
     for i in range(nicp):
-        dQs = h*veccat([LagrangeTerm(0., XD[k][i][j], XA[k][i][j-1], U[k], P) \
+        dQs = h*veccat(*[LagrangeTerm(0., XD[k][i][j], XA[k][i][j-1], U[k], P) \
                         for j in range(1,deg+1)])
         Qs = mtimes( ldInv, dQs)
         m = mtimes( Qs.T, lAtOne[1:])
@@ -361,7 +361,7 @@ for k in range(nk):
 Obj += lagrangeTerm        
 
 # NLP
-nlp = {'x':V, 'f':Obj, 'g':vertcat(g)}
+nlp = {'x':V, 'f':Obj, 'g':vertcat(*g)}
 
 ## ----
 ## SOLVE THE NLP

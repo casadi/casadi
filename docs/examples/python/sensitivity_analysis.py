@@ -44,17 +44,17 @@ for Integrators in (ODE_integrators,DAE_integrators):
 
     # Differential states
     s = SX.sym("s"); v = SX.sym("v"); m = SX.sym("m")
-    x = vertcat([s,v,m])
+    x = vertcat(s,v,m)
 
     # Constants
     alpha = 0.05 # friction
     beta = 0.1   # fuel consumption rate
       
     # Differential equation
-    ode = vertcat([
+    ode = vertcat(
       v,
       (u-alpha*v*v)/m,
-      -beta*u*u])
+      -beta*u*u)
       
     # Quadrature
     quad = v**3 + ((3-sin(t)) - u)**2

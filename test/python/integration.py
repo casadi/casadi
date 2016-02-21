@@ -118,14 +118,14 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p")
     t0=SX.sym("t0")
     q0=SX.sym("q0")
-    f=Function("f", [vertcat((q,t)),p],[vertcat((q/p*t**2,1))])
+    f=Function("f", [vertcat(*(q,t)),p],[vertcat(*(q/p*t**2,1))])
     for integrator in [
             simpleRK(f,500),
             simpleIRK(f,50),
             simpleIntegrator(f)
             ]:
             
-      solution = Function('solver', {"x0": vertcat((q0,t0)),"p":p,"h":t, "xf":vertcat([q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])}, integrator.name_in(), integrator.name_out())
+      solution = Function('solver', {"x0": vertcat(*(q0,t0)),"p":p,"h":t, "xf":vertcat(*[q0*exp(((t0+t)**3-t0**3)/(3*p)),t0+t])}, integrator.name_in(), integrator.name_out())
 
       f_in = {}
       f_in["x0"]=DM([0.3,0])
@@ -208,7 +208,7 @@ class Integrationtests(casadiTestCase):
             for k, v in rdout.iteritems(): dae['r'+k] = v
             
             for k in solution.keys():
-              solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
+              solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
 
             sol = solutionin.copy()
             sol.update(solution)
@@ -306,7 +306,7 @@ class Integrationtests(casadiTestCase):
 
       s1=(2*y0-log(yc0**2/p+1))/2-log(cos(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart)))
       s2=sqrt(p)*tan(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart))
-      yield (["ode"],{'x':q,'p':p},{'ode': vertcat([q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat([s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
+      yield (["ode"],{'x':q,'p':p},{'ode': vertcat(*[q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat(*[s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
 
     for p_features, din, dout, rdin, rdout, solutionin, solution, point, (tstart_, tend_) in checks():
 
@@ -322,7 +322,7 @@ class Integrationtests(casadiTestCase):
           for k, v in rdout.iteritems(): dae['r'+k] = v
             
           for k in solution.keys():
-            solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
+            solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
           
           sol = solutionin.copy()
           sol.update(solution)
@@ -472,7 +472,7 @@ class Integrationtests(casadiTestCase):
         
         s1=(2*y0-log(yc0**2/p+1))/2-log(cos(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart)))
         s2=sqrt(p)*tan(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart))
-        yield (["ode"],{'x':q,'p':p},{'ode': vertcat([q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat([s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
+        yield (["ode"],{'x':q,'p':p},{'ode': vertcat(*[q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat(*[s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
       
       for tt in checks():
         print tt
@@ -487,7 +487,7 @@ class Integrationtests(casadiTestCase):
             for k, v in rdout.iteritems(): dae['r'+k] = v
             
             for k in solution.keys():
-              solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
+              solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
             
             sol = solutionin.copy()
             sol.update(solution)
@@ -563,7 +563,7 @@ class Integrationtests(casadiTestCase):
     t=SX.sym("t")
     x=SX.sym("x")
     y=SX.sym("y")
-    dae = {'t':t, 'x':vertcat([x,y]), 'ode':vertcat([x,(1+1e-9)*x])}
+    dae = {'t':t, 'x':vertcat(*[x,y]), 'ode':vertcat(*[x,(1+1e-9)*x])}
     opts = {}
     opts["fsens_err_con"] = True
     opts["t0"] = 0
@@ -584,9 +584,9 @@ class Integrationtests(casadiTestCase):
     x=SX.sym("x")
     var = MX.sym("var",2,1)
 
-    q = vertcat([x,SX.sym("problem")])
+    q = vertcat(*[x,SX.sym("problem")])
 
-    dq=vertcat([x,x])
+    dq=vertcat(*[x,x])
     dae = {'t':t, 'x':q, 'ode':dq}
     opts = {}
     opts["fsens_err_con"] = True
@@ -649,7 +649,7 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p")
 
     dh = p+q[0]**2
-    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat([dh ,q[0],dh])}
+    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat(*[dh ,q[0],dh])}
 
     opts = {}
     opts["reltol"] = 1e-15
@@ -670,7 +670,7 @@ class Integrationtests(casadiTestCase):
     J=qe.jacobian(0)
     J_out = J(A, p0)
     outA=J_out[0].full()
-    dae={'x':q, 'p':p, 't':t, 'ode':vertcat([dh ,q[0],(1+1e-9)*dh])}
+    dae={'x':q, 'p':p, 't':t, 'ode':vertcat(*[dh ,q[0],(1+1e-9)*dh])}
     
     opts = {}
     opts["reltol"] = 1e-15
@@ -851,7 +851,7 @@ class Integrationtests(casadiTestCase):
     q=SX.sym("q",2,1)
     p=SX.sym("p",3,1)
 
-    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])}
+    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat(*[q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])}
     opts = {}
     opts["fsens_err_con"] = True
     opts["reltol"] = 1e-15
@@ -892,7 +892,7 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],p[0]+q[1]**2])}
+    dae = {'x':q, 'p':p, 't':t, 'ode':vertcat(*[q[1],p[0]+q[1]**2])}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15

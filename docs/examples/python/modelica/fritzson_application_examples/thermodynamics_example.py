@@ -71,17 +71,17 @@ ivp.parseFMI('BasicVolumeMassConservation.xml')
 ivp.makeExplicit()
 
 # Create an integrator
-dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': vertcat(ivp.ode)}
+dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': vertcat(*ivp.ode)}
 grid = NP.linspace(0,1,100)
 F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
-x0 = ivp.start(vertcat(ivp.x))
+x0 = ivp.start(vertcat(*ivp.x))
 res = F(x0=x0)
 
 # Output function
 output_fcn_out = substitute([ivp("m"),ivp("P")], ivp.d, ivp.ddef)
-output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
+output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
 output_fcn = output_fcn.map("output_fcn_map", len(grid))
 m_out, P_out = output_fcn(grid, res["xf"], res["zf"])
@@ -112,17 +112,17 @@ ivp.parseFMI('BasicVolumeEnergyConservation.xml')
 ivp.makeExplicit()
 
 # Create an integrator
-dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': vertcat(ivp.ode)}
+dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': vertcat(*ivp.ode)}
 grid = NP.linspace(0,10,100)
 F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
-x0 = ivp.start(vertcat(ivp.x))
+x0 = ivp.start(vertcat(*ivp.x))
 res = F(x0=x0)
 
 # Output function
 output_fcn_out = substitute([ivp("T")], ivp.d, ivp.ddef)
-output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
+output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
 output_fcn = output_fcn.map("output_fcn_map", len(grid))
 T_out = output_fcn(grid, res["xf"], res["zf"])
@@ -146,17 +146,17 @@ ivp.parseFMI('BasicVolumeTest.xml')
 ivp.makeExplicit()
 
 # Create an integrator
-dae = {'t': ivp.t, 'x': vertcat(ivp.x), 'p': vertcat(ivp.p), 'ode': densify(vertcat(ivp.ode))}
+dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': densify(vertcat(*ivp.ode))}
 grid = NP.linspace(0,2,100)
 F = integrator('F', 'cvodes', dae, {'grid':grid, 'output_t0':True})
 
 # Integrate
-x0 = ivp.start(vertcat(ivp.x))
+x0 = ivp.start(vertcat(*ivp.x))
 res = F(x0=x0)
 
 # Output function
 output_fcn_out = substitute([ivp("T"),ivp("U"),ivp("V")], ivp.d, ivp.ddef)
-output_fcn_in = [ivp.t, vertcat(ivp.x), vertcat(ivp.z)]
+output_fcn_in = [ivp.t, vertcat(*ivp.x), vertcat(*ivp.z)]
 output_fcn = Function("output", output_fcn_in, output_fcn_out)
 output_fcn = output_fcn.map("output_fcn_map", len(grid))
 T_out, U_out, V_out = output_fcn(grid, res["xf"], res["zf"])

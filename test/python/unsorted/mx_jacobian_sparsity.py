@@ -28,11 +28,11 @@ y = MX.sym("y")
 x2 = SX.sym("x",5)
 y2 = SX.sym("y")
 
-fcn = Function('fcn', [x,y],[4*vertcat((x[2:5],x[0:2])) + y*x])
+fcn = Function('fcn', [x,y],[4*vertcat(*(x[2:5],x[0:2])) + y*x])
 js = IM.ones(fcn.sparsity_jac())
 js.print_dense()
 
-fcn2 = Function('fcn2', [x2,y2],[4*vertcat((x2[2:5],x2[0:2])) + y2*x2])
+fcn2 = Function('fcn2', [x2,y2],[4*vertcat(*(x2[2:5],x2[0:2])) + y2*x2])
 js2 = IM.ones(fcn2.sparsity_jac())
 js2.print_dense()
 

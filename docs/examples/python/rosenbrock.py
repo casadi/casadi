@@ -40,8 +40,8 @@ z = SX.sym("z")
 # Formulate the NLP
 f = x**2 + 100*z**2
 g = z + (1-x)**2 - y
-nlp = {'x':vertcat([x,y,z]), 'f':f, 'g':g}
-  
+nlp = {'x':vertcat(x,y,z), 'f':f, 'g':g}
+
 # Create an NLP solver
 solver = nlpsol("solver", "ipopt", nlp)
 

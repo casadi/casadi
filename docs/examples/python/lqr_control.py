@@ -62,7 +62,7 @@ for i in range(ns):
   R.append(p)
   p = mtimes([A,p])
   
-R = horzcat(R)
+R = horzcat(*R)
 
 # R must be of full rank
 _, s, _ = linalg.svd(R)

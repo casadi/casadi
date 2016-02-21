@@ -33,9 +33,9 @@ from pylab import *
 u = SX.sym("u")
 x = SX.sym("x")
 y = SX.sym("y")
-ode = vertcat([(1-y*y)*x-y+u,x])
+ode = vertcat((1-y*y)*x-y+u,x)
 #! DAE problem formulation as expected by CasADi's integrators:
-dae  = {'x':vertcat([x,y]), 'p':u, 'ode':ode}
+dae  = {'x':vertcat(x,y), 'p':u, 'ode':ode}
 #! The whole series of sundials options are available for the user
 opts = {}
 opts["fsens_err_con"] = True

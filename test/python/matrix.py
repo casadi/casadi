@@ -61,23 +61,23 @@ class Matrixtests(casadiTestCase):
     self.message("vertcat")
     A = DM.ones(2,3)
     B = DM(4,3)
-    C = vertcat([A,B])
+    C = vertcat(A,B)
     
     self.checkarray(C.shape,(6,3),"vertcat shape")
     self.assertEqual(C.nnz(),A.nnz(),"vertcat size")
     
-    self.assertRaises(RuntimeError,lambda : horzcat([A,B]))
+    self.assertRaises(RuntimeError,lambda : horzcat(A,B))
     
   def test_horzcat(self):
     self.message("horcat")
     A = DM.ones(3,2)
     B = DM(3,4)
-    C = horzcat([A,B])
+    C = horzcat(A,B)
     
     self.checkarray(C.shape,(3,6),"horzcat shape")
     self.assertEqual(C.nnz(),A.nnz(),"vertcat size")
     
-    self.assertRaises(RuntimeError,lambda : vertcat([A,B]))
+    self.assertRaises(RuntimeError,lambda : vertcat(A,B))
     
   def test_diagcat(self):
 
@@ -87,10 +87,10 @@ class Matrixtests(casadiTestCase):
     
     L = [x,y,z]
 
-    fMX = Function("fMX", L,[diagcat(L)])
+    fMX = Function("fMX", L,[diagcat(*L)])
     
     LSX = [ SX.sym("",i.sparsity()) for i in L ]
-    fSX = Function("fSX", LSX,[diagcat(LSX)])
+    fSX = Function("fSX", LSX,[diagcat(*LSX)])
 
     for f in [fMX,fSX]:
       for i in range(3):
@@ -108,7 +108,7 @@ class Matrixtests(casadiTestCase):
     B[0,0] = 4
     B[1,0] = 5
     B[2,0] = 6
-    C = veccat([A,B])
+    C = veccat(*[A,B])
     
     self.checkarray(C.shape,(9,1),"veccat shape")
     self.assertEqual(C.nnz(),A.nnz()+B.nnz(),"veccat size")
@@ -376,7 +376,7 @@ class Matrixtests(casadiTestCase):
 
     sp = Sparsity.lower(n)
 
-    x  = SX(sp,vertcat([SX.sym("a%d" % i) for i in range(sp.nnz())]))
+    x  = SX(sp,vertcat(*[SX.sym("a%d" % i) for i in range(sp.nnz())]))
 
     
     x_ = DM.ones(x.sparsity())
@@ -413,7 +413,7 @@ class Matrixtests(casadiTestCase):
   def test_Imatrix_operations(self):
     self.message("IM operations")
     a = IM.ones(2,2)
-    b = horzcat([a,a])
+    b = horzcat(a,a)
     self.assertTrue(isinstance(b,IM))
     
   def test_mtimes(self):
@@ -604,7 +604,7 @@ class Matrixtests(casadiTestCase):
     
   def test_diagcat(self):
     self.message("diagcat")
-    C = diagcat([DM([[-1.4,-3.2],[-3.2,-28]]),DM([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
+    C = diagcat(*[DM([[-1.4,-3.2],[-3.2,-28]]),DM([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
     r = DM([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
     r = sparsify(r)
     self.checkarray(C,r)
@@ -715,25 +715,25 @@ class Matrixtests(casadiTestCase):
     f = Function("f", [x],[y])
       
   def test_append_empty(self):
-    a = vertcat((DM(0,0),DM(0,2)))
+    a = vertcat(DM(0,0),DM(0,2))
     
     self.assertEqual(a.size1(),0)
     self.assertEqual(a.size2(),2)
 
-    a = vertcat((DM(0,0),DM(2,0),DM(3,0)))
+    a = vertcat(DM(0,0),DM(2,0),DM(3,0))
     
     self.assertEqual(a.size1(),5)
     self.assertEqual(a.size2(),0)
     
   def test_vertcat_empty(self):
     a = DM(0,2)
-    v = vertcat([a,a])
+    v = vertcat(a,a)
     
     self.assertEqual(v.size1(),0)
     self.assertEqual(v.size2(),2)
 
     a = DM(2,0)
-    v = vertcat([a,a])
+    v = vertcat(a,a)
     
     self.assertEqual(v.size1(),4)
     self.assertEqual(v.size2(),0)
@@ -821,10 +821,10 @@ class Matrixtests(casadiTestCase):
         Sparsity.lower(n),
         Sparsity.lower(n).T,
         Sparsity.banded(n,1),
-        diagcat([Sparsity.diag(n),Sparsity.dense(n,n)]),
-        diagcat([Sparsity.diag(n),Sparsity.lower(n)]),
-        diagcat([Sparsity.diag(n),Sparsity.lower(n).T]),
-        diagcat([Sparsity.lower(n),Sparsity.lower(n).T]),
+        diagcat(*[Sparsity.diag(n),Sparsity.dense(n,n)]),
+        diagcat(*[Sparsity.diag(n),Sparsity.lower(n)]),
+        diagcat(*[Sparsity.diag(n),Sparsity.lower(n).T]),
+        diagcat(*[Sparsity.lower(n),Sparsity.lower(n).T]),
         Sparsity.diag(n)+Sparsity.rowcol([0],[n-1],n,n),
         Sparsity.diag(n)+Sparsity.rowcol([0,n-1],[n-1,0],n,n),
         Sparsity.diag(n)+Sparsity.triplet(n,n,[0],[n-1]),
@@ -836,7 +836,7 @@ class Matrixtests(casadiTestCase):
       random.seed(1)
       a = DM(sA,[random.random() for i in range(sA.nnz())])
       A = SX.sym("a",a.sparsity())
-      for sB in [ Sparsity.dense(a.size1(),1), vertcat([Sparsity.dense(1,1),Sparsity(a.size1()-1,1)]),Sparsity.lower(a.size1()),Sparsity.lower(a.size1()).T]:
+      for sB in [ Sparsity.dense(a.size1(),1), vertcat(Sparsity.dense(1,1),Sparsity(a.size1()-1,1)),Sparsity.lower(a.size1()),Sparsity.lower(a.size1()).T]:
 
         b = DM(sB,[random.random() for i in range(sB.nnz())])
         B = SX.sym("B",b.sparsity())

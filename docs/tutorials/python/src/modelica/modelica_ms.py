@@ -46,11 +46,11 @@ print ivp
 #$ Indeed, for cases like this one, CasADi can do this reformulation automatically:
 ivp.makeExplicit()
 #! Let us extract variables for the states, the control and equations
-x = vertcat(ivp.x)
-u = vertcat(ivp.u)
-f = vertcat(ivp.ode)
-L = vertcat(ivp.quad)
-I = vertcat(ivp.init)
+x = vertcat(*ivp.x)
+u = vertcat(*ivp.u)
+f = vertcat(*ivp.ode)
+L = vertcat(*ivp.quad)
+I = vertcat(*ivp.init)
 #$ These are expressions that can be visualized or manipulated using CasADi's 
 #$ symbolic framework:
 print 5*sin(f[0])
@@ -176,7 +176,7 @@ for k in range(nk):
 ind, nv = valloc(nx, nv)
 v.append(xk[-1]); lbv.append(lbx); ubv.append(ubx); v0.append(x0); vind['x'].append(ind)
 #$ Concatenate lists
-v = vertcat(v); lbv = vertcat(lbv); ubv = vertcat(ubv); v0 = vertcat(v0)
+v = vertcat(*v); lbv = vertcat(*lbv); ubv = vertcat(*ubv); v0 = vertcat(*v0)
 #$ Next, let us build up expressions for the objective (cost) function and the nonlinear constraints,
 #$ starting with zero cost and and empty list of constraints:
 J = 0;  eq = []
@@ -194,7 +194,7 @@ for k in range(nk):
 #$ which is able to solve large-scale NLPs efficiently. CasADi will automatically and efficiently generate
 #$ the derivative information needed by IPOPT, including the Jacobian of the NLP constraints and the 
 #$ Hessian of the Lagrangian function:
-nlp = {'x':v, 'f':J, 'g':vertcat(eq)}
+nlp = {'x':v, 'f':J, 'g':vertcat(*eq)}
 solver = nlpsol("solver", "ipopt", nlp)
 #$ Solving the NLP amounts to "evaluating the NLP solver"
 #$ The upper and lower bounds on the equality constraints are 0:
@@ -220,7 +220,7 @@ title(str(x[1]))
 grid()
 show()
 figure(3)
-step(tgrid,vertcat((u_opt[0],u_opt)))
+step(tgrid,vertcat(u_opt[0],u_opt))
 title(str(u))
 grid()
 show()

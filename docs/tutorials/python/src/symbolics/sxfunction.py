@@ -97,18 +97,18 @@ print [[SX.grad(f,i,j) for i in range(2)] for j in range(2)]
 x=SX.sym("x")
 a=SX.sym("a")
 b=SX.sym("b")
-f = Function('f', [x,vertcat((a,b))],[a*x + b]) 
+f = Function('f', [x,vertcat(a,b)],[a*x + b]) 
 
-print f(x,vertcat([a,b]))
-print f(SX(1.0),vertcat((a,b)))
-print f(x,vertcat((SX.sym("c"),SX.sym("d"))))
-print f(SX(),vertcat([SX.sym("c"),SX.sym("d")]))
+print f(x,vertcat(a,b))
+print f(SX(1.0),vertcat(a,b))
+print f(x,vertcat(SX.sym("c"),SX.sym("d")))
+print f(SX(),vertcat(SX.sym("c"),SX.sym("d")))
 
 #$ We can make an accompanying $g(x) = f(x;a;b)$ by making a and b implicity:
 
 k = SX(a)
-print f(x,vertcat((k[0],b)))
-print f(x,vertcat((SX.sym("c"),SX.sym("d"))))
+print f(x,vertcat(k[0],b))
+print f(x,vertcat(SX.sym("c"),SX.sym("d")))
 
 #! Functions with vector valued input
 #! ----------------------------------
@@ -117,7 +117,7 @@ print f(x,vertcat((SX.sym("c"),SX.sym("d"))))
 
 x = SX.sym("x")
 y = SX.sym("y")
-f = Function('f', [vertcat((x , y ))], [vertcat((x*y, x+y))])
+f = Function('f', [vertcat(x, y)], [vertcat(x*y, x+y)])
 print "%d -> %d" % (f.n_in(),f.n_out())
 r = f([2, 3])
 print z

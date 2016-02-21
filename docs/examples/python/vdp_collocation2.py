@@ -43,7 +43,7 @@ states = struct_symSX([
 # Create a structure for the right hand side
 rhs = struct_SX(states)
 x = states['x']
-rhs["x"] = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]])
+rhs["x"] = vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, x[0])
 rhs["L"] = x[0]*x[0] + x[1]*x[1] + u*u
 
 # ODE right hand side function
@@ -178,7 +178,7 @@ for k in range(nk):
   ubg.append(NP.zeros(nx))
   
 # Concatenate constraints
-g = vertcat(g)
+g = vertcat(*g)
 
 # Objective function
 f = m(T[nk-1][d],V["X",nk,0],V["U",nk-1])

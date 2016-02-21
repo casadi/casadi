@@ -23,7 +23,7 @@ f0 = Function('f', [x], [y])
 
 # evaluate it serially, the old-fasioned way
 X = MX.sym('x',N)
-Y = vertcat([f0(X[k]) for k in range(N)])
+Y = vertcat(*[f0(X[k]) for k in range(N)])
 fNaiveParallel = Function('fParallel', [X], [Y])
 
 print "evaluating naive parallel function..."

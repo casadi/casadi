@@ -45,14 +45,14 @@ class OCPtests(casadiTestCase):
     X=SX.sym("X",N+1)
     U=SX.sym("U",N)
     
-    V = vertcat([X,U])
+    V = vertcat(*[X,U])
     
     cost = 0
     for i in range(N):
       cost = cost + s*X[i]**2+r*U[i]**2
     cost = cost + q*X[N]**2
     
-    nlp = {'x':V, 'f':cost, 'g':vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])}
+    nlp = {'x':V, 'f':cost, 'g':vertcat(*[X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])}
     opts = {}
     opts["ipopt.tol"] = 1e-5
     opts["ipopt.hessian_approximation"] = "limited-memory"
@@ -86,7 +86,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    dae={'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],p[0]+q[1]**2 ])}
+    dae={'x':q, 'p':p, 't':t, 'ode':vertcat(*[q[1],p[0]+q[1]**2 ])}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -100,7 +100,7 @@ class OCPtests(casadiTestCase):
     par = MX.sym("par",1,1)
     parMX= par
     
-    q0   = vertcat([var[0],par])
+    q0   = vertcat(*[var[0],par])
     par  = var[1]
     qend = integrator(x0=q0, p=par)["xf"]
     
@@ -141,7 +141,7 @@ class OCPtests(casadiTestCase):
     p=SX.sym("p",1,1)
     # y
     # y'
-    dae={'x':q, 'p':p, 't':t, 'ode':vertcat([q[1],p[0]+q[1]**2 ])}
+    dae={'x':q, 'p':p, 't':t, 'ode':vertcat(*[q[1],p[0]+q[1]**2 ])}
     opts = {}
     opts["reltol"] = 1e-15
     opts["abstol"] = 1e-15
@@ -154,7 +154,7 @@ class OCPtests(casadiTestCase):
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
     
-    q0   = vertcat([var[0],par])
+    q0   = vertcat(*[var[0],par])
     parl  = var[1]
     qend = integrator(x0=q0,p=parl)["xf"]
     
@@ -198,7 +198,7 @@ class OCPtests(casadiTestCase):
     
     self.assertTrue(len(ivp.q)==0)
     self.assertTrue(len(ivp.y)==1)
-    m = vertcat(ivp.ydef)
+    m = vertcat(*ivp.ydef)
     self.assertTrue(isinstance(m,MX))
     self.assertEquals(str(m),'cost')
     print dir(ivp)
@@ -231,7 +231,7 @@ class OCPtests(casadiTestCase):
     print ivp.init
     print c,T,cost
     #print c.atTime(0)
-    f=Function('f', [vertcat([c,T,cost])],[vertcat(ivp.init)])
+    f=Function('f', [vertcat(*[c,T,cost])],[vertcat(*ivp.init)])
     return 
     f_out = f(f_in)
     self.checkarray(f_out[0],matrix([-956.271065,-250.051971,0]).T,"initeq")

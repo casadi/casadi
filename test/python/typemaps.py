@@ -500,15 +500,15 @@ class typemaptests(casadiTestCase):
   def test_vertcatprecedence(self):
     self.message("Argument precedence DM")
     a = DM([1,2])
-    self.assertTrue(isinstance(vertcat([a,a]),DM))
+    self.assertTrue(isinstance(vertcat(*[a,a]),DM))
     
     a = DM([1,2])
-    self.assertTrue(isinstance(vertcat([a,[1,2,3]]),DM))
+    self.assertTrue(isinstance(vertcat(*[a,[1,2,3]]),DM))
     
     
     a = MX([1,2])
-    print vertcat([a,[1,2,3]])
-    self.assertTrue(isinstance(vertcat([a,[1,2,3]]),MX))
+    print vertcat(*[a,[1,2,3]])
+    self.assertTrue(isinstance(vertcat(*[a,[1,2,3]]),MX))
     
   def test_issue190(self):
     self.message("regression test issue #190")
@@ -520,7 +520,7 @@ class typemaptests(casadiTestCase):
     MX.sym("x") * array(1.0)
     
   def test_array_cat(self):
-    horzcat((SX.sym("x",4,3),ones((4,3))))
+    horzcat(*(SX.sym("x",4,3),ones((4,3))))
     
     
   def test_issue(self):

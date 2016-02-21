@@ -89,7 +89,7 @@ class Simulatortests(casadiTestCase):
     opts['output_t0'] = True
     integrator = casadi.integrator('integrator', 'cvodes', f, opts)
 
-    solution = Function('solution', {'x0':q, 'p':p, 'xf':horzcat([q*exp(t**3/(3*p)) for t in tc])},
+    solution = Function('solution', {'x0':q, 'p':p, 'xf':horzcat(*[q*exp(t**3/(3*p)) for t in tc])},
                         casadi.integrator_in(), casadi.integrator_out())
     f_in = {}
     f_in['x0']=0.3

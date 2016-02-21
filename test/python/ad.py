@@ -57,13 +57,13 @@ class ADtests(casadiTestCase):
     
     self.sxinputs = {
        "column" : {
-            "dense": [vertcat([x,y,z,w])],
+            "dense": [vertcat(*[x,y,z,w])],
             "sparse": [inp] }
         , "row": {
-            "dense":  [vertcat([x,y,z,w]).T],
+            "dense":  [vertcat(*[x,y,z,w]).T],
             "sparse": [inp.T]
        }, "matrix": {
-          "dense": [c.reshape(vertcat([x,y,z,w]),2,2)],
+          "dense": [c.reshape(vertcat(*[x,y,z,w]),2,2)],
           "sparse": [c.reshape(inp,3,2)]
         }
     }
@@ -100,18 +100,18 @@ class ADtests(casadiTestCase):
       return [X]
 
     def testje(xyz):
-      print vertcat([xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]).shape
+      print vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]).shape
       
     self.mxoutputs = {
        "column": {
-        "dense":  lambda xyz: [vertcat([xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
+        "dense":  lambda xyz: [vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
         "sparse": temp1
         }, "row": {
-        "dense": lambda xyz: [horzcat([xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
+        "dense": lambda xyz: [horzcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
         "sparse": temp2
        },
        "matrix": {
-          "dense": lambda xyz: [c.reshape(vertcat([xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]),(2,2))],
+          "dense": lambda xyz: [c.reshape(vertcat(*[xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]),(2,2))],
           "sparse": lambda xyz: [c.reshape(temp1(xyz)[0],(3,2))]
        }
     }
@@ -119,13 +119,13 @@ class ADtests(casadiTestCase):
 
     self.sxoutputs = {
        "column": {
-        "dense": [vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w])],
+        "dense": [vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w])],
         "sparse": [out]
         }, "row": {
-          "dense":  [vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
+          "dense":  [vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
           "sparse": [out.T]
       }, "matrix" : {
-          "dense":  [c.reshape(vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
+          "dense":  [c.reshape(vertcat(*[x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
           "sparse": [c.reshape(out,3,2)]
       }
     }
@@ -385,7 +385,7 @@ class ADtests(casadiTestCase):
     y=SX.sym("y")
     z=SX.sym("z")
     n=array([1.2,2.3,7])
-    f=Function("f", [vertcat([x,y,z])],[vertcat([x+2*y**3+3*z**4])])
+    f=Function("f", [vertcat(*[x,y,z])],[vertcat(*[x+2*y**3+3*z**4])])
     J=f.jacobian(0,0)
     m=MX.sym("m",3,1)
     JT,_ = J(m)
@@ -407,7 +407,7 @@ class ADtests(casadiTestCase):
     inp[0,0]=x
     inp[3,0]=y
 
-    f=Function("f", [inp],[vertcat([x+y,x,y])])
+    f=Function("f", [inp],[vertcat(*[x+y,x,y])])
     J=f.jacobian(0,0)
     J(DM(f.sparsity_in(0),[2,7]))
 
@@ -424,12 +424,12 @@ class ADtests(casadiTestCase):
     inp[0,0]=x
     inp[3,0]=y
 
-    f=Function("f", [inp],[vertcat([x+y,x,y])])
+    f=Function("f", [inp],[vertcat(*[x+y,x,y])])
     J=f.jacobian(0,0)
     J_in = DM(f.sparsity_in(0),[2,7])
     J_out,_ = J(J_in)
 
-    f=Function("f", [inp],[vertcat([x+y,x,y])])
+    f=Function("f", [inp],[vertcat(*[x+y,x,y])])
     J=f.jacobian(0,0)
     
   @memory_heavy()
@@ -519,21 +519,21 @@ class ADtests(casadiTestCase):
           (in1,v1,x*y.nz[0],DM.eye(2)*y.nz[0]),
           (in1,v1,x*y[0,0],DM.eye(2)*y[0,0]),
           (in1,v1,x[0],DM.eye(2)[0,:]),
-          (in1,v1,(x**2)[0],horzcat([2*x[0],MX(1,1)])),
+          (in1,v1,(x**2)[0],horzcat(*[2*x[0],MX(1,1)])),
           (in1,v1,x[0]+x[1],DM.ones(1,2)),
           (in1,v1,sin(repmat(x**2,1,3)),repmat(cos(c.diag(x**2))*2*c.diag(x),3,1)),
           (in1,v1,sin(repsum((x**2).T,1,2)),cos(x[0]**2+x[1]**2)*2*x.T),
-          (in1,v1,vertcat([x[1],x[0]]),sparsify(DM([[0,1],[1,0]]))),
+          (in1,v1,vertcat(*[x[1],x[0]]),sparsify(DM([[0,1],[1,0]]))),
           (in1,v1,vertsplit(x,[0,1,2])[1],sparsify(DM([[0,1]]))),
-          (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
+          (in1,v1,vertcat(*[x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
           (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX(1,1),2*x[1]]])),
           (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX(1,1),6*x[1]**5]])),
-          (in1,v1,horzcat([x[1],x[0]]).T,sparsify(DM([[0,1],[1,0]]))),
-          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
-          (in1,v1,diagcat([x[1]**2,y,x[0]**2]),
+          (in1,v1,horzcat(*[x[1],x[0]]).T,sparsify(DM([[0,1],[1,0]]))),
+          (in1,v1,horzcat(*[x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
+          (in1,v1,diagcat(*[x[1]**2,y,x[0]**2]),
             blockcat(  [[MX(1,1),2*x[1]]] + ([[MX(1,1),MX(1,1)]]*14)  + [[2*x[0],MX(1,1)]] )
           ),
-          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
+          (in1,v1,horzcat(*[x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
           (in1,v1,x[[0,1]],sparsify(DM([[1,0],[0,1]]))),
           (in1,v1,(x**2)[[0,1]],2*c.diag(x)),
           (in1,v1,x[[0,0,1,1]],sparsify(DM([[1,0],[1,0],[0,1],[0,1]]))),
@@ -544,7 +544,7 @@ class ADtests(casadiTestCase):
           (in1,v1,w,sparsify(DM([[1,0],[0,2]]))),
           (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]])),
           (in1,v1,ww,2*c.diag(x)),
-          (in1,v1,wwf,vertcat([x[[1,0]].T,x[[1,0]].T])),
+          (in1,v1,wwf,vertcat(*[x[[1,0]].T,x[[1,0]].T])),
           (in1,v1,yy[:,0],DM.eye(2)),
           (in1,v1,yy2[:,0],2*c.diag(x)),
           (in1,v1,yyy[:,0],sparsify(DM([[0,1],[1,0]]))),
@@ -554,7 +554,7 @@ class ADtests(casadiTestCase):
           (in1,v1,mac(x.T,y.T,DM.zeros(Sparsity.triplet(2,1,[1],[0]).T)),y[Sparsity.triplet(2,2,[1,1],[0,1])]),
           (in1,v1,mtimes(y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])],x),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
           (in1,v1,mtimes(x.T,y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])].T),y[Sparsity.triplet(2,2,[0,1,1],[0,0,1])]),
-          (in1,v1,mtimes(y,x**2),y*2*vertcat([x.T,x.T])),
+          (in1,v1,mtimes(y,x**2),y*2*vertcat(*[x.T,x.T])),
           (in1,v1,sin(x),c.diag(cos(x))),
           (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x)),
           (in1,v1,x*y[:,0],c.diag(y[:,0])),
@@ -564,9 +564,9 @@ class ADtests(casadiTestCase):
           (in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0])),
           (in1,v1,c.dot(x,x),(2*x).T),
           (in1,v1,c.dot(x**2,x),(3*x**2).T),
-          #(in1,v1,c.det(horzcat([x,DM([1,2])])),DM([-1,2])), not implemented
+          #(in1,v1,c.det(horzcat(*[x,DM([1,2])])),DM([-1,2])), not implemented
           (in1,v1,f1.call(in1)[1],y),
-          (in1,v1,f1.call([x**2,y])[1],y*2*vertcat([x.T,x.T])),
+          (in1,v1,f1.call([x**2,y])[1],y*2*vertcat(*[x.T,x.T])),
           (in1,v1,f2.call(in1)[0],DM.zeros(0,2)),
           (in1,v1,f2(x**2,y),DM.zeros(0,2)),
           (in1,v1,f3.call(in1)[0],DM.zeros(0,2)),
@@ -575,7 +575,7 @@ class ADtests(casadiTestCase):
           (in1,v1,f4.call([x**2,y])[0],DM.zeros(0,2)),
           #(in1,v1,f1([x**2,[]])[1],DM.zeros(2,2)),
           #(in1,v1,f1([[],y])[1],DM.zeros(2,2)),
-          (in1,v1,vertcat([x,DM(0,1)]),DM.eye(2)),
+          (in1,v1,vertcat(*[x,DM(0,1)]),DM.eye(2)),
           (in1,v1,project(x**2, sparsify(DM([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
           (in1,v1,c.dot(x,y[:,0]),y[:,0].T),
           (in1,v1,x.nz[IM([[1,0]])].T*y.nz[IM([[0,2]])],blockcat([[MX(1,1),y.nz[0]],[y.nz[2],MX(1,1)]])),

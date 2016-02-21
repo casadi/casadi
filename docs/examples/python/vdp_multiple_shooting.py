@@ -31,7 +31,7 @@ u  = SX.sym('u')    # control
 x  = SX.sym('x',2)  # state
 
 # ODE rhs function and quadratures
-xdot = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]])
+xdot = vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, x[0])
 qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
 # Create an integrator
@@ -106,7 +106,7 @@ for k in range(nk):
   J += Fk['qf']
 
 # Formulate the NLP
-nlp = {'x':vertcat(w), 'f':J, 'g':vertcat(g)}
+nlp = {'x':vertcat(*w), 'f':J, 'g':vertcat(*g)}
 
 # Create NLP solver instance
 solver = nlpsol('solver', 'ipopt', nlp)
@@ -133,7 +133,7 @@ plt.figure(1)
 plt.clf()
 plt.plot(tgrid, x0_opt, '--')
 plt.plot(tgrid, x1_opt, '-')
-plt.step(tgrid, vertcat((DM.nan(1), u_opt)), '-.') # Note: first entry is ignored
+plt.step(tgrid, vertcat(DM.nan(1), u_opt), '-.') # Note: first entry is ignored
 plt.title('Van der Pol optimization - multiple shooting')
 plt.xlabel('time')
 plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])

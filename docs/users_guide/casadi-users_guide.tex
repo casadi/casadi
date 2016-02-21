@@ -773,7 +773,7 @@ print reshape(x,2,8)
 \begin{lstlisting}[language=Python]
 x = SX.sym('x',5)
 y = SX.sym('y',5)
-print vertcat([x,y])
+print vertcat(x,y)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -786,12 +786,12 @@ disp [x;y]
 \begin{pytexoutput}
 x = SX.sym('x',5)
 y = SX.sym('y',5)
-print vertcat([x,y])
+print vertcat(x,y)
 \end{pytexoutput}
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-print horzcat([x,y])
+print horzcat(x,y)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -800,7 +800,7 @@ disp [x,y]
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-print horzcat([x,y])
+print horzcat(x,y)
 \end{pytexoutput}
 
 \textbf{Horizontal and vertical splitting} are the inverse operations of the above introduced horizontal and vertical concatenation. To split up an expression horizontally into $n$ smaller expressions, you need to provide, in addition to the expression being splitted, a vector \emph{offset} of length $n+1$. The first element of the \emph{offset} vector must be 0 and the last element must be the number of columns. Remaining elements must follow in a non-decreasing order. The output $i$ of the splitting operation then contains the columns $c$ with $\textit{offset}[i] \le c < \textit{offset}[i+1]$. The following demonstrates the syntax:
@@ -1397,11 +1397,11 @@ Also note how the recursive overwriting of \texttt{X} has been replaced with:
 \begin{verbatim}
 for k in range(nk):
   # Local state vector
-  Xk = vertcat((X0[k],X1[k],X2[k]))
-  Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
+  Xk = vertcat(X0[k],X1[k],X2[k])
+  Xk_next = vertcat(X0[k+1],X1[k+1],X2[k+1])
 
   # Call the integrator
-  Xk_end = integrator({'x0':Xk,'p':U[k]})["xf"]
+  Xk_end = integrator(x0=Xk, p=U[k])["xf"]
 
   # append continuity constraints
   g.append(Xk_next - Xk_end)
@@ -1592,8 +1592,8 @@ each operation. Further information is available in the API documentation.
     Inner product
     & \verb|dot(x, y)| & \verb|dot(x, y)| & \verb|dot(x, y)| \\ \hline
     *Horizontal/vertical concatenation
-    & \verb|horzcat([x, y])| \linebreak \verb|vertcat([x, y])|
-    & \verb|horzcat(v)| \verb|vertcat(v)|, \linebreak (\verb|v| vector of matrices)
+    & \verb|horzcat(x, y)| \linebreak \verb|vertcat(x, y)|
+    & \verb|horzcat(*v)| \verb|vertcat(*v)|, \linebreak (\verb|v| vector of matrices)
     & \verb|[x, y]| \linebreak \verb|[x; y]| \\ \hline
     Horizontal/vertical split (inverse of concatenation)
     & \verb|vertsplit(x)|, \verb|horzsplit(x)| & \verb|vertsplit(x)|, \verb|horzsplit(x)| & \verb|vertsplit(x)|, \verb|horzsplit(x)| \\ \hline

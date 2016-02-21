@@ -28,13 +28,13 @@ import matplotlib.pyplot as plt
 
 # Declare variables (use simple, efficient DAG)
 x0=SX.sym('x0'); x1=SX.sym('x1')
-x = vertcat((x0,x1))
+x = vertcat(x0,x1)
 
 # Control
 u = SX.sym('u')
 
 # ODE right hand side
-xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
+xdot = vertcat((1 - x1*x1)*x0 - x1 + u, x0)
 
 # Lagrangian function
 L = x0*x0 + x1*x1 + u*u
@@ -64,11 +64,11 @@ u_opt = fmax(u_opt, -0.75)
 print 'optimal control: ', u_opt
 
 # Augment f with lam_dot and substitute in the value for the optimal control
-f = vertcat((xdot,ldot))
+f = vertcat(xdot,ldot)
 f = substitute(f,u,u_opt)
 
 # Function for obtaining the optimal control from the augmented state
-u_fcn = Function('ufcn', [vertcat((x,lam))], [u_opt])
+u_fcn = Function('ufcn', [vertcat(x,lam)], [u_opt])
 
 # Formulate the DAE
 dae = {'x':vertcat((x,lam)), 'ode':f}
@@ -88,7 +88,7 @@ x_init = NP.array([0.,1.])
 l_init = MX.sym('l_init',2)
 
 # The initial condition for the shooting
-X = vertcat((x_init, l_init))
+X = vertcat(x_init, l_init)
 
 # Call the integrator
 X = I(x0=X)['xf']

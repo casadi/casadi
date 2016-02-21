@@ -122,7 +122,7 @@ class Toolstests(casadiTestCase):
       struct_symSX([entry('a',sym=x+x),'y','z'])
     with self.assertRaises(Exception):
       struct_symSX([entry('a',sym=[x+x]),'y','z'])
-    s = struct_symSX([entry('a',sym=vertcat([x,x2])),'y','z'])
+    s = struct_symSX([entry('a',sym=vertcat(*[x,x2])),'y','z'])
     self.assertEqual(s.size,6)
     with self.assertRaises(Exception):
       s = struct_symSX([entry('a',repeat=6,sym=x),'y','z'])
@@ -251,7 +251,7 @@ class Toolstests(casadiTestCase):
     with self.assertRaises(Exception):
       struct_symMX([entry('x',sym=[x+x]),'y','z'])
     with self.assertRaises(Exception):
-      struct_symMX([entry('x',sym=vertcat([x,x2])),'y','z'])
+      struct_symMX([entry('x',sym=vertcat(*[x,x2])),'y','z'])
     with self.assertRaises(Exception):
       s = struct_,MX.sym([(2,'x',[x,x2]),'y','z'])
     
@@ -408,7 +408,7 @@ class Toolstests(casadiTestCase):
     self.assertEqual(sum(init.cat==2),6*9-9)
     self.assertEqual(sum(init.cat==3),9)
 
-    self.checkarray(init['X',0,-1,'p',horzcat,:,[2,3]],vertcat([DM.ones(1,9)*3,DM.ones(1,9)*2]))
+    self.checkarray(init['X',0,-1,'p',horzcat,:,[2,3]],vertcat(*[DM.ones(1,9)*3,DM.ones(1,9)*2]))
     
     init['X',:,-1,'p',horzcat,:] = repeated(DM.ones(6,9)*2)
     
@@ -466,7 +466,7 @@ class Toolstests(casadiTestCase):
     a[:,"x"] = range(12)
     
     self.checkarray(a[4,"x"],DM([4]))
-    self.checkarray(d,vertcat([DM(range(12)).T,DM.zeros(1,12),DM.zeros(1,12)]))
+    self.checkarray(d,vertcat(*[DM(range(12)).T,DM.zeros(1,12),DM.zeros(1,12)]))
 
   def test_structure_squared_dmatrix(self):
     self.message("squared dmatrix")

@@ -50,7 +50,7 @@ def checkarray(self,zr,zt,name):
 
 def checkMXoperations(self,ztf,zrf,name):
     x = MX.sym("x",1,3)
-    z=vertcat([x*(i+1) for i in range(8)])
+    z=vertcat(*[x*(i+1) for i in range(8)])
     f = Function("f", [x],[ztf(z)])
     L=[1,2,3]
     f_out = f(L)
@@ -61,7 +61,7 @@ def checkMXoperations(self,ztf,zrf,name):
 
 def checkMXoperations2(self,ztf,zrf,name):
     x = MX.sym("x",3,1)
-    z = horzcat([x*i for i in range(8)])
+    z = horzcat(*[x*i for i in range(8)])
     f = Function("f", [x],[ztf(z)])
     L=[1,2,3]
     f_out = f(L)
@@ -72,8 +72,8 @@ def checkMXoperations2(self,ztf,zrf,name):
 
 def checkMXoperations3(self,ztf,zrf,name):
     x = MX.sym("x",3,1)
-    p = horzcat([x[0,0],x[1,0],x[2,0]])
-    z = vertcat([p*i for i in range(8)])
+    p = horzcat(*[x[0,0],x[1,0],x[2,0]])
+    z = vertcat(*[p*i for i in range(8)])
     f = Function("f", [x],[ztf(z)])
     L=[1,2,3]
     f_out = f(L)
@@ -141,7 +141,7 @@ class MXtests(casadiTestCase):
     self.message("MX vertcat")
     x = MX.sym("x",1,3)
     y = MX.sym("y",1,3)
-    z=vertcat((x,y))
+    z=vertcat(*(x,y))
     self.assertEqual(z.size1(),2,"MX fails to indicate its size1")
     self.assertEqual(z.size2(),3,"MX fails to indicate its size2")
 
@@ -244,7 +244,7 @@ class MXtests(casadiTestCase):
     # evaluates correctly for x=3,y=7
     # now with single input, single output
     xy = MX.sym("xy",2)
-    z=vertcat([xy[0]+xy[1],xy[0]*xy[1]])
+    z=vertcat(*[xy[0]+xy[1],xy[0]*xy[1]])
     f = Function("f", [xy],[z])
     self.assertEqual(f.n_in(),1,"Function fails to indicate correct number of inputs")
     self.assertEqual(f.n_out(),1,"Function fails to indicate correct number of outputs")
@@ -266,7 +266,7 @@ class MXtests(casadiTestCase):
     # evaluates correctly for x=3,y=7
     # now with single input, single output
     xy = MX.sym("xy",2)
-    z=horzcat([xy[0]+xy[1],xy[0]*xy[1]])
+    z=horzcat(*[xy[0]+xy[1],xy[0]*xy[1]])
     f = Function("f", [xy],[z])
     self.assertEqual(f.n_in(),1,"Function fails to indicate correct number of inputs")
     self.assertEqual(f.n_out(),1,"Function fails to indicate correct number of outputs")
@@ -430,20 +430,20 @@ class MXtests(casadiTestCase):
 
   def test_MXcompose4(self):
     self.message("compositions of horzcat + vertcat")
-    checkMXoperations(self,lambda x: vertcat([x]),lambda x: x,'vertcat(vertcat)')
-    checkMXoperations(self,lambda x: vertcat([x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(vertcat,vertcat)')
-    checkMXoperations(self,lambda x: horzcat([x]),lambda x: x,'horzcat(vertcat)')
-    checkMXoperations(self,lambda x: horzcat([x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(vertcat,vertcat)')
+    checkMXoperations(self,lambda x: vertcat(*[x]),lambda x: x,'vertcat(*vertcat)')
+    checkMXoperations(self,lambda x: vertcat(*[x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(*vertcat,vertcat)')
+    checkMXoperations(self,lambda x: horzcat(*[x]),lambda x: x,'horzcat(*vertcat)')
+    checkMXoperations(self,lambda x: horzcat(*[x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(*vertcat,vertcat)')
     
-    checkMXoperations2(self,lambda x: vertcat([x]),lambda x: x,'vertcat(horzcat)')
-    checkMXoperations2(self,lambda x: vertcat([x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(horzcat,horzcat)')
-    checkMXoperations2(self,lambda x: horzcat([x]),lambda x: x,'horzcat(horzcat)')
-    checkMXoperations2(self,lambda x: horzcat([x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(horzcat,horzcat)')
+    checkMXoperations2(self,lambda x: vertcat(*[x]),lambda x: x,'vertcat(*horzcat)')
+    checkMXoperations2(self,lambda x: vertcat(*[x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(*horzcat,horzcat)')
+    checkMXoperations2(self,lambda x: horzcat(*[x]),lambda x: x,'horzcat(*horzcat)')
+    checkMXoperations2(self,lambda x: horzcat(*[x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(*horzcat,horzcat)')
     
-    checkMXoperations3(self,lambda x: vertcat([x]),lambda x: x,'vertcat(snippet)')
-    checkMXoperations3(self,lambda x: vertcat([x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(snippet,snippet)')
-    checkMXoperations3(self,lambda x: horzcat([x]),lambda x: x,'horzcat(snippet)')
-    checkMXoperations3(self,lambda x: horzcat([x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(snippet,snippet)')
+    checkMXoperations3(self,lambda x: vertcat(*[x]),lambda x: x,'vertcat(*snippet)')
+    checkMXoperations3(self,lambda x: vertcat(*[x,x*2]),lambda x: numpy.vstack((x,x*2)),'vertcat(*snippet,snippet)')
+    checkMXoperations3(self,lambda x: horzcat(*[x]),lambda x: x,'horzcat(*snippet)')
+    checkMXoperations3(self,lambda x: horzcat(*[x,x*2]),lambda x: numpy.hstack((x,x*2)),'horzcat(*snippet,snippet)')
     
   @known_bug()  # Test refactoring, cf. #1436
   def test_MXslicingnew(self):
@@ -982,7 +982,7 @@ class MXtests(casadiTestCase):
     self.message("mapping jac")
     X = MX.sym("X",3)
     Y = MX.sym("Y",2)
-    f = Function("f", [X,Y],[vertcat([X,Y])])
+    f = Function("f", [X,Y],[vertcat(*[X,Y])])
     J = MX.jac(f, 0,0)
     JJ = DM.ones(J.sparsity())
     self.checkarray(JJ,numpy.vstack((eye(3),zeros((2,3)))),"diag")
@@ -1192,7 +1192,7 @@ class MXtests(casadiTestCase):
     x = xy[0]
     y = xy[1]
     
-    f = Function("f", [xy],[vertcat([logic_and(x,y),logic_or(x,y),logic_not(x)])])
+    f = Function("f", [xy],[vertcat(*[logic_and(x,y),logic_or(x,y),logic_not(x)])])
     
     
     for t1 in [0,1]:
@@ -1210,7 +1210,7 @@ class MXtests(casadiTestCase):
     y = xy[1]
     
     
-    f = Function("f", [xy],[vertcat([x<y,x<=y,x>=y,x==y,x!=y])])
+    f = Function("f", [xy],[vertcat(*[x<y,x<=y,x>=y,x==y,x!=y])])
     
     for t1 in [-10,0.1,0,1,10]:
       for t2 in [-10,0.1,0,1,10]:
@@ -1309,7 +1309,7 @@ class MXtests(casadiTestCase):
     J = Function("J", [X],[MX.jac(f)])
     J_out = J(range(10))
     
-    i = horzcat([diag([0,2,4,6,8,10]),IM.zeros(6,4)])
+    i = horzcat(*[diag([0,2,4,6,8,10]),IM.zeros(6,4)])
     i[[2,3],:] = i[[3,2],:]
     
     self.checkarray(i,J_out)
@@ -1320,7 +1320,7 @@ class MXtests(casadiTestCase):
     J_in = [0]*J.n_in();J_in[0]=range(10)
     J_out = J(*J_in)
     
-    i = horzcat([diag([0,2,4,6,8,10]),IM.zeros(6,4)])
+    i = horzcat(*[diag([0,2,4,6,8,10]),IM.zeros(6,4)])
     i[[2,3],:] = i[[3,2],:]
     
     self.checkarray(i,J_out)
@@ -1329,7 +1329,7 @@ class MXtests(casadiTestCase):
     self.message("vertcat")
     X = MX.sym("X",10)
 
-    T = vertcat([X[4],X[2]])
+    T = vertcat(*[X[4],X[2]])
 
     f = Function("f", [X],[T**2])
     f_in = [0]*f.n_in();f_in[0]=range(10)
@@ -1386,7 +1386,7 @@ class MXtests(casadiTestCase):
       self.assertFalse(MX.sym("x",2).is_regular())
 
   def test_diagcat(self):
-    C = diagcat([MX(DM(([[-1.4,-3.2],[-3.2,-28]]))),DM([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
+    C = diagcat(*[MX(DM(([[-1.4,-3.2],[-3.2,-28]]))),DM([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
     self.assertTrue(isinstance(C,MX))
     r = DM([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
     r = sparsify(r)
@@ -1448,13 +1448,13 @@ class MXtests(casadiTestCase):
   @known_bug()
   def test_vertcat_empty(self):
     a = MX(DM(0,2))
-    v = vertcat([a,a])
+    v = vertcat(*[a,a])
     
     self.assertEqual(v.size1(),0)
     self.assertEqual(v.size2(),2)
     
     a = MX(DM(2,0))
-    v = vertcat([a,a])
+    v = vertcat(*[a,a])
     
     self.assertEqual(v.size1(),4)
     self.assertEqual(v.size2(),0)
@@ -1973,7 +1973,7 @@ class MXtests(casadiTestCase):
     self.assertTrue(depends_on(a,a))
     self.assertFalse(depends_on(0,a))
     
-    ab = vertcat((a,b))
+    ab = vertcat(*(a,b))
     self.assertTrue(depends_on(a**2,ab))
     self.assertTrue(depends_on(a,ab))
     self.assertFalse(depends_on(0,ab))
@@ -1981,15 +1981,15 @@ class MXtests(casadiTestCase):
     self.assertTrue(depends_on(b,ab))
     self.assertTrue(depends_on(a**2+b**2,ab))
     self.assertTrue(depends_on(a+b,ab))
-    self.assertTrue(depends_on(vertcat([0,a]),a))
-    self.assertTrue(depends_on(vertcat([a,0]),a))
-    self.assertFalse(depends_on(vertcat([0,b]),a))
-    self.assertFalse(depends_on(vertcat([b,0]),a))
-    self.assertTrue(depends_on(vertcat([a**2,b**2]),ab))
-    self.assertTrue(depends_on(vertcat([a,0]),ab))
-    self.assertTrue(depends_on(vertcat([0,b]),ab))
-    self.assertTrue(depends_on(vertcat([b,0]),ab))
-    self.assertFalse(depends_on(vertcat([0,0]),ab))
+    self.assertTrue(depends_on(vertcat(*[0,a]),a))
+    self.assertTrue(depends_on(vertcat(*[a,0]),a))
+    self.assertFalse(depends_on(vertcat(*[0,b]),a))
+    self.assertFalse(depends_on(vertcat(*[b,0]),a))
+    self.assertTrue(depends_on(vertcat(*[a**2,b**2]),ab))
+    self.assertTrue(depends_on(vertcat(*[a,0]),ab))
+    self.assertTrue(depends_on(vertcat(*[0,b]),ab))
+    self.assertTrue(depends_on(vertcat(*[b,0]),ab))
+    self.assertFalse(depends_on(vertcat(*[0,0]),ab))
     
   def test_vertcat_simp(self):
     x = MX.sym("x",10)
@@ -1999,26 +1999,26 @@ class MXtests(casadiTestCase):
     y_ = DM([20])
     z_ = DM([30])
     
-    def evalvertcat(a):
-      f = Function("f", [x,y,z],[vertcat(a)])
+    def evalvertcat(*a):
+      f = Function("f", [x,y,z],[vertcat(*a)])
       f_in = [0]*f.n_in();f_in[0]=x_
       f_in[1]=y_
       f_in[2]=z_
       return f(*f_in)
 
-    self.checkarray(evalvertcat(vertsplit(x)),x_)
-    self.checkarray(evalvertcat(vertsplit(x)+[y]),vertcat([x_,y_]))
-    self.checkarray(evalvertcat([z]+vertsplit(x)+[y] + vertsplit(x)+[z]),vertcat([z_,x_,y_,x_,z_]))
-    self.checkarray(evalvertcat(vertsplit(x)[:-1]),x_[:-1])
-    self.checkarray(evalvertcat(vertsplit(x)[:-1]+[y]),vertcat([x_[:-1],y_]))
-    self.checkarray(evalvertcat([z]+vertsplit(x)[:-1]+[y] + vertsplit(x)[:-1]+[z]),vertcat([z_,x_[:-1],y_,x_[:-1],z_]))
-    self.checkarray(evalvertcat(vertsplit(x)[1:]),x_[1:])
-    self.checkarray(evalvertcat(vertsplit(x)[1:]+[y]),vertcat([x_[1:],y_]))
-    self.checkarray(evalvertcat([z]+vertsplit(x)[1:]+[y] + vertsplit(x)[1:]+[z]),vertcat([z_,x_[1:],y_,x_[1:],z_]))
+    self.checkarray(evalvertcat(*vertsplit(x)),x_)
+    self.checkarray(evalvertcat(*vertsplit(x)+[y]),vertcat(*[x_,y_]))
+    self.checkarray(evalvertcat(*[z]+vertsplit(x)+[y] + vertsplit(x)+[z]),vertcat(*[z_,x_,y_,x_,z_]))
+    self.checkarray(evalvertcat(*vertsplit(x)[:-1]),x_[:-1])
+    self.checkarray(evalvertcat(*vertsplit(x)[:-1]+[y]),vertcat(*[x_[:-1],y_]))
+    self.checkarray(evalvertcat(*[z]+vertsplit(x)[:-1]+[y] + vertsplit(x)[:-1]+[z]),vertcat(*[z_,x_[:-1],y_,x_[:-1],z_]))
+    self.checkarray(evalvertcat(*vertsplit(x)[1:]),x_[1:])
+    self.checkarray(evalvertcat(*vertsplit(x)[1:]+[y]),vertcat(*[x_[1:],y_]))
+    self.checkarray(evalvertcat(*[z]+vertsplit(x)[1:]+[y] + vertsplit(x)[1:]+[z]),vertcat(*[z_,x_[1:],y_,x_[1:],z_]))
     g = vertsplit(x)[5:]+vertsplit(x)[:5]
-    self.checkarray(evalvertcat(g),vertcat([x_[5:],x_[:5]]))
-    self.checkarray(evalvertcat(g+[y]),vertcat([x_[5:],x_[:5],y_]))
-    self.checkarray(evalvertcat([z]+g+[y] + g+[z]),vertcat([z_,x_[5:],x_[:5],y_,x_[5:],x_[:5],z_]))
+    self.checkarray(evalvertcat(*g),vertcat(*[x_[5:],x_[:5]]))
+    self.checkarray(evalvertcat(*g+[y]),vertcat(*[x_[5:],x_[:5],y_]))
+    self.checkarray(evalvertcat(*[z]+g+[y] + g+[z]),vertcat(*[z_,x_[5:],x_[:5],y_,x_[5:],x_[:5],z_]))
     
     import __builtin__
 
@@ -2026,19 +2026,19 @@ class MXtests(casadiTestCase):
     w = vertsplit(x,2)
     r = __builtin__.sum([vertsplit(i) for i in w],[])
     
-    self.checkarray(evalvertcat(r),x_)
+    self.checkarray(evalvertcat(*r),x_)
 
     w = vertsplit(x,2)
     r = __builtin__.sum([vertsplit(i)+[y] for i in w],[])
     print "vertcat:", r
-    print "result:", vertcat(r)
+    print "result:", vertcat(*r)
 
     w = vertsplit(x,2)
     r = __builtin__.sum([vertsplit(i) for i in w],[])
     print "vertcat:", r
-    print "result:", vertcat(r+[y])
+    print "result:", vertcat(*r+[y])
     
-    self.assertTrue(is_equal(vertcat(vertsplit(x)),x))
+    self.assertTrue(is_equal(vertcat(*vertsplit(x)),x))
     
   def test_horzcat_simp(self):
     x = MX.sym("x",1,10)
@@ -2048,23 +2048,23 @@ class MXtests(casadiTestCase):
     y_ = DM([20])
     z_ = DM([30])
     
-    def evalhorzcat(a):
-      f = Function("f", [x,y,z],[horzcat(a)])
+    def evalhorzcat(*a):
+      f = Function("f", [x,y,z],[horzcat(*a)])
       return f(x_, y_, z_)
 
-    self.checkarray(evalhorzcat(horzsplit(x)),x_)
-    self.checkarray(evalhorzcat(horzsplit(x)+[y]),horzcat([x_,y_]))
-    self.checkarray(evalhorzcat([z]+horzsplit(x)+[y] + horzsplit(x)+[z]),horzcat([z_,x_,y_,x_,z_]))
-    self.checkarray(evalhorzcat(horzsplit(x)[:-1]),x_[0,:-1])
-    self.checkarray(evalhorzcat(horzsplit(x)[:-1]+[y]),horzcat([x_[0,:-1],y_]))
-    self.checkarray(evalhorzcat([z]+horzsplit(x)[:-1]+[y] + horzsplit(x)[:-1]+[z]),horzcat([z_,x_[0,:-1],y_,x_[0,:-1],z_]))
-    self.checkarray(evalhorzcat(horzsplit(x)[1:]),x_[0,1:])
-    self.checkarray(evalhorzcat(horzsplit(x)[1:]+[y]),horzcat([x_[0,1:],y_]))
-    self.checkarray(evalhorzcat([z]+horzsplit(x)[1:]+[y] + horzsplit(x)[1:]+[z]),horzcat([z_,x_[0,1:],y_,x_[0,1:],z_]))
+    self.checkarray(evalhorzcat(*horzsplit(x)),x_)
+    self.checkarray(evalhorzcat(*horzsplit(x)+[y]),horzcat(*[x_,y_]))
+    self.checkarray(evalhorzcat(*[z]+horzsplit(x)+[y] + horzsplit(x)+[z]),horzcat(*[z_,x_,y_,x_,z_]))
+    self.checkarray(evalhorzcat(*horzsplit(x)[:-1]),x_[0,:-1])
+    self.checkarray(evalhorzcat(*horzsplit(x)[:-1]+[y]),horzcat(*[x_[0,:-1],y_]))
+    self.checkarray(evalhorzcat(*[z]+horzsplit(x)[:-1]+[y] + horzsplit(x)[:-1]+[z]),horzcat(*[z_,x_[0,:-1],y_,x_[0,:-1],z_]))
+    self.checkarray(evalhorzcat(*horzsplit(x)[1:]),x_[0,1:])
+    self.checkarray(evalhorzcat(*horzsplit(x)[1:]+[y]),horzcat(*[x_[0,1:],y_]))
+    self.checkarray(evalhorzcat(*[z]+horzsplit(x)[1:]+[y] + horzsplit(x)[1:]+[z]),horzcat(*[z_,x_[0,1:],y_,x_[0,1:],z_]))
     g = horzsplit(x)[5:]+horzsplit(x)[:5]
-    self.checkarray(evalhorzcat(g),horzcat([x_[0,5:],x_[0,:5]]))
-    self.checkarray(evalhorzcat(g+[y]),horzcat([x_[0,5:],x_[0,:5],y_]))
-    self.checkarray(evalhorzcat([z]+g+[y] + g+[z]),horzcat([z_,x_[0,5:],x_[0,:5],y_,x_[0,5:],x_[0,:5],z_]))
+    self.checkarray(evalhorzcat(*g),horzcat(*[x_[0,5:],x_[0,:5]]))
+    self.checkarray(evalhorzcat(*g+[y]),horzcat(*[x_[0,5:],x_[0,:5],y_]))
+    self.checkarray(evalhorzcat(*[z]+g+[y] + g+[z]),horzcat(*[z_,x_[0,5:],x_[0,:5],y_,x_[0,5:],x_[0,:5],z_]))
     
     import __builtin__
 
@@ -2072,19 +2072,19 @@ class MXtests(casadiTestCase):
     w = horzsplit(x,2)
     r = __builtin__.sum([horzsplit(i) for i in w],[])
     
-    self.checkarray(evalhorzcat(r),x_)
+    self.checkarray(evalhorzcat(*r),x_)
 
     w = horzsplit(x,2)
     r = __builtin__.sum([horzsplit(i)+[y] for i in w],[])
     print "vertcat:", r
-    print "result:", horzcat(r)
+    print "result:", horzcat(*r)
 
     w = horzsplit(x,2)
     r = __builtin__.sum([horzsplit(i) for i in w],[])
     print "vertcat:", r
-    print "result:", horzcat(r+[y])
+    print "result:", horzcat(*r+[y])
 
-    self.assertTrue(is_equal(horzcat(horzsplit(x)),x))
+    self.assertTrue(is_equal(horzcat(*horzsplit(x)),x))
     
   def test_vertsplit_simp(self):
     
@@ -2114,56 +2114,56 @@ class MXtests(casadiTestCase):
       f_out = f.call(f_in)
       return [f_out[i] for i in range(f.n_out())]
       
-    s= evalvertsplit(vertcat([y]+dvars+[z]))
+    s= evalvertsplit(vertcat(*[y]+dvars+[z]))
     self.checkarray(s[0],y_)
     for i in range(5):
       self.checkarray(s[1+i],dvars_[i])
     self.checkarray(s[6],z_)
 
-    s= evalvertsplit(vertcat([y]+dvars+[z]),2)
+    s= evalvertsplit(vertcat(*[y]+dvars+[z]),2)
     
-    self.checkarray(s[0],vertcat([y_,dvars_[0]]))
-    self.checkarray(s[1],vertcat([dvars_[1],dvars_[2]]))
-    self.checkarray(s[2],vertcat([dvars_[3],dvars_[4]]))
-    self.checkarray(s[3],vertcat([z_]))
+    self.checkarray(s[0],vertcat(*[y_,dvars_[0]]))
+    self.checkarray(s[1],vertcat(*[dvars_[1],dvars_[2]]))
+    self.checkarray(s[2],vertcat(*[dvars_[3],dvars_[4]]))
+    self.checkarray(s[3],vertcat(*[z_]))
     
-    s= evalvertsplit(vertcat([y,zz,z,zz]),2)
+    s= evalvertsplit(vertcat(*[y,zz,z,zz]),2)
     
-    self.checkarray(s[0],vertcat([y_,zz_[0]]))
-    self.checkarray(s[1],vertcat([zz_[1],z_]))
+    self.checkarray(s[0],vertcat(*[y_,zz_[0]]))
+    self.checkarray(s[1],vertcat(*[zz_[1],z_]))
     self.checkarray(s[2],zz_)
     
-    s= evalvertsplit(vertcat([y,zz,z,zz]),3)
+    s= evalvertsplit(vertcat(*[y,zz,z,zz]),3)
     
-    self.checkarray(s[0],vertcat([y_,zz_[0],zz_[1]]))
-    self.checkarray(s[1],vertcat([z_,zz_[0],zz_[1]]))
+    self.checkarray(s[0],vertcat(*[y_,zz_[0],zz_[1]]))
+    self.checkarray(s[1],vertcat(*[z_,zz_[0],zz_[1]]))
     
-    s= evalvertsplit(vertcat([zz,zz]),2)
+    s= evalvertsplit(vertcat(*[zz,zz]),2)
     self.checkarray(s[0],zz_)
     self.checkarray(s[1],zz_)
 
-    s= evalvertsplit(vertcat([zz]+dvars))
+    s= evalvertsplit(vertcat(*[zz]+dvars))
     self.checkarray(s[0],zz_[0])
     self.checkarray(s[1],zz_[1])
     
     for i in range(5):
       self.checkarray(s[2+i],dvars_[i])
 
-    s= evalvertsplit(vertcat(dvars+[aa]),5)
+    s= evalvertsplit(vertcat(*dvars+[aa]),5)
     self.checkarray(s[0],DM(dvars_))
     self.checkarray(s[1],DM(aa_))
 
-    s= evalvertsplit(vertcat(dvars+[aa]),4)
+    s= evalvertsplit(vertcat(*dvars+[aa]),4)
     self.checkarray(s[0],DM(dvars_[:4]))
     self.checkarray(s[1],DM([dvars_[-1]]+aa_[:3]))
     self.checkarray(s[2],DM(aa_[3:]))
 
-    s= evalvertsplit(vertcat(dvars+[aa]),6)
+    s= evalvertsplit(vertcat(*dvars+[aa]),6)
     self.checkarray(s[0],DM(dvars_+[aa_[0]]))
     self.checkarray(s[1],DM(aa_[1:]))
     
     for i in range(5):
-      self.assertTrue(is_equal(vertsplit(vertcat(dvars))[i],dvars[i]))
+      self.assertTrue(is_equal(vertsplit(vertcat(*dvars))[i],dvars[i]))
 
   def test_horzsplit_simp(self):
     
@@ -2193,56 +2193,56 @@ class MXtests(casadiTestCase):
       f_out = f(*f_in)
       return [f_out[i] for i in range(f.n_out())]
       
-    s= evalhorzsplit(horzcat([y]+dvars+[z]))
+    s= evalhorzsplit(horzcat(*[y]+dvars+[z]))
     self.checkarray(s[0],y_)
     for i in range(5):
       self.checkarray(s[1+i],dvars_[i])
     self.checkarray(s[6],z_)
 
-    s= evalhorzsplit(horzcat([y]+dvars+[z]),2)
+    s= evalhorzsplit(horzcat(*[y]+dvars+[z]),2)
     
-    self.checkarray(s[0],vertcat([y_,dvars_[0]]).T)
-    self.checkarray(s[1],vertcat([dvars_[1],dvars_[2]]).T)
-    self.checkarray(s[2],vertcat([dvars_[3],dvars_[4]]).T)
-    self.checkarray(s[3],vertcat([z_]).T)
+    self.checkarray(s[0],vertcat(*[y_,dvars_[0]]).T)
+    self.checkarray(s[1],vertcat(*[dvars_[1],dvars_[2]]).T)
+    self.checkarray(s[2],vertcat(*[dvars_[3],dvars_[4]]).T)
+    self.checkarray(s[3],vertcat(*[z_]).T)
     
-    s= evalhorzsplit(horzcat([y,zz,z,zz]),2)
+    s= evalhorzsplit(horzcat(*[y,zz,z,zz]),2)
     
-    self.checkarray(s[0],vertcat([y_,zz_[0,0]]).T)
-    self.checkarray(s[1],vertcat([zz_[0,1],z_]).T)
+    self.checkarray(s[0],vertcat(*[y_,zz_[0,0]]).T)
+    self.checkarray(s[1],vertcat(*[zz_[0,1],z_]).T)
     self.checkarray(s[2],zz_)
     
-    s= evalhorzsplit(horzcat([y,zz,z,zz]),3)
+    s= evalhorzsplit(horzcat(*[y,zz,z,zz]),3)
     
-    self.checkarray(s[0],vertcat([y_,zz_[0,0],zz_[0,1]]).T)
-    self.checkarray(s[1],vertcat([z_,zz_[0,0],zz_[0,1]]).T)
+    self.checkarray(s[0],vertcat(*[y_,zz_[0,0],zz_[0,1]]).T)
+    self.checkarray(s[1],vertcat(*[z_,zz_[0,0],zz_[0,1]]).T)
     
-    s= evalhorzsplit(horzcat([zz,zz]),2)
+    s= evalhorzsplit(horzcat(*[zz,zz]),2)
     self.checkarray(s[0],zz_)
     self.checkarray(s[1],zz_)
 
-    s= evalhorzsplit(horzcat([zz]+dvars))
+    s= evalhorzsplit(horzcat(*[zz]+dvars))
     self.checkarray(s[0],zz_[0,0])
     self.checkarray(s[1],zz_[0,1])
     
     for i in range(5):
       self.checkarray(s[2+i],dvars_[i])
 
-    s= evalhorzsplit(horzcat(dvars+[aa]),5)
+    s= evalhorzsplit(horzcat(*dvars+[aa]),5)
     self.checkarray(s[0],DM(dvars_).T)
     self.checkarray(s[1],DM(aa_).T)
 
-    s= evalhorzsplit(horzcat(dvars+[aa]),4)
+    s= evalhorzsplit(horzcat(*dvars+[aa]),4)
     self.checkarray(s[0],DM(dvars_[:4]).T)
     self.checkarray(s[1],DM([dvars_[-1]]+aa_[:3]).T)
     self.checkarray(s[2],DM(aa_[3:]).T)
 
-    s= evalhorzsplit(horzcat(dvars+[aa]),6)
+    s= evalhorzsplit(horzcat(*dvars+[aa]),6)
     self.checkarray(s[0],DM(dvars_+[aa_[0]]).T)
     self.checkarray(s[1],DM(aa_[1:]).T)
     
     for i in range(5):
-      self.assertTrue(is_equal(horzsplit(horzcat(dvars))[i],dvars[i]))
+      self.assertTrue(is_equal(horzsplit(horzcat(*dvars))[i],dvars[i]))
       
   def test_vertsplit_derivative(self):
     m = MX.sym("X",10)
@@ -2349,10 +2349,10 @@ class MXtests(casadiTestCase):
         self.checkarray(x.shape,(5,0))
 
 
-      x2 = vertcat(x1s)
+      x2 = vertcat(*x1s)
       self.checkarray(x2.shape,(10,0))
       
-      x2 = vertcat([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      x2 = vertcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,0))
         
     for c in [MX,SX,DM]:
@@ -2363,10 +2363,10 @@ class MXtests(casadiTestCase):
       for x in x1s:
         self.checkarray(x.shape,(0,5))
 
-      x2 = horzcat(x1s)
+      x2 = horzcat(*x1s)
       self.checkarray(x2.shape,(0,10))
       
-      x2 = horzcat([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      x2 = horzcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(0,10))
  
     for c in [MX,SX,DM]:
@@ -2377,22 +2377,22 @@ class MXtests(casadiTestCase):
       x0 = c.zeros(0,10)      
       x1st = horzsplit(x0, [0,5,10])
       
-      x2 = diagcat(x1s)
+      x2 = diagcat(*x1s)
       self.checkarray(x2.shape,(10,0))
       
-      x2 = diagcat([c.zeros(0,0)] + x1s + [c.zeros(0,0)])
+      x2 = diagcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,0))
 
-      x2 = diagcat(x1st)
+      x2 = diagcat(*x1st)
       self.checkarray(x2.shape,(0,10))
       
-      x2 = diagcat([c.zeros(0,0)] + x1st + [c.zeros(0,0)])
+      x2 = diagcat(*[c.zeros(0,0)] + x1st + [c.zeros(0,0)])
       self.checkarray(x2.shape,(0,10))
       
-      x2 = diagcat(x1s+x1st)
+      x2 = diagcat(*x1s+x1st)
       self.checkarray(x2.shape,(10,10))
       
-      x2 = diagcat([c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
+      x2 = diagcat(*[c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,10))
   def test_empty_symm_jac(self):
 

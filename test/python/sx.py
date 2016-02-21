@@ -192,7 +192,7 @@ class SXtests(casadiTestCase):
       x=SX.sym("x")
       y=SX.sym("y")
       z=SX.sym("z")
-      x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([x,y,z]))
+      x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat(*[x,y,z]))
       if scipy_available:
         x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).sparse()
       
@@ -219,7 +219,7 @@ class SXtests(casadiTestCase):
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
       for f,fr,label,flags in self.matrixbinarypool.zip():
-        self.checkarray(f(vertcat([x0,y0])),fr(vertcat([x0,y0])),label)
+        self.checkarray(f(vertcat(*[x0,y0])),fr(vertcat(*[x0,y0])),label)
 
   def test_SXbinarySparse(self):
       self.message("SX binary operations")
@@ -229,8 +229,8 @@ class SXtests(casadiTestCase):
       x2=SX.sym("x2")
       y2=SX.sym("y2")
       z2=SX.sym("z2")
-      xx=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([x,y,z]))
-      yy=SX(Sparsity(4,3,[0,2,2,3],[0,2,3]),vertcat([x2,z2,y2]))
+      xx=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat(*[x,y,z]))
+      yy=SX(Sparsity(4,3,[0,2,2,3],[0,2,3]),vertcat(*[x2,z2,y2]))
       
       if scipy_available:
         x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.1,0.99]).sparse()
@@ -276,7 +276,7 @@ class SXtests(casadiTestCase):
 
       self.message(":sparse")
       
-      x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat([SX.sym("x"),SX.sym("y"),SX.sym("z")]))
+      x=SX(Sparsity(4,3,[0,2,2,3],[1,2,1]),vertcat(*[SX.sym("x"),SX.sym("y"),SX.sym("z")]))
       sx0=[0.738,0.39,0.99]
       x0=DM(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]).full()
       self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
@@ -304,7 +304,7 @@ class SXtests(casadiTestCase):
     fun=lambda x,y: [x+y,x*y,x**2+y**3]
     x=SX.sym("x")
     y=SX.sym("y")
-    f=Function("f", [vertcat([x,y])],[vertcat(fun(x,y))])
+    f=Function("f", [vertcat(*[x,y])],[vertcat(*fun(x,y))])
     L=[2,3]
     f_in = [0]*f.n_in();f_in[0]=L
     f_out = f.call(f_in)
@@ -332,7 +332,7 @@ class SXtests(casadiTestCase):
       self.assertEqual(str(f),'[SX(((3-sin(sq(x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong')
     else:
       self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong'+str(f))
-    fcn = Function("fcn", [vertcat([x,y])],[vertcat(f)])
+    fcn = Function("fcn", [vertcat(*[x,y])],[vertcat(*f)])
 
     self.assertEqual(repr(fcn),'fcn','SX representation is wrong')
 
@@ -388,7 +388,7 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     y = SX.sym("y")
     
-    f = Function("f", [vertcat([x,y])],[vertcat([logic_and(x,y),logic_or(x,y),logic_not(x)])])
+    f = Function("f", [vertcat(*[x,y])],[vertcat(*[logic_and(x,y),logic_or(x,y),logic_not(x)])])
     
     
     for t1 in [0,1]:
@@ -405,7 +405,7 @@ class SXtests(casadiTestCase):
     x = SX.sym("x")
     y = SX.sym("y")
     
-    f = Function("f", [vertcat([x,y])],[vertcat([x<y,x<=y,x>=y,x==y,x!=y])])
+    f = Function("f", [vertcat(*[x,y])],[vertcat(*[x<y,x<=y,x>=y,x==y,x!=y])])
     
     
     for t1 in [-10,0.1,0,1,10]:
@@ -435,9 +435,9 @@ class SXtests(casadiTestCase):
     self.message("vector(SXmatrix) typemaps constructors")
     y=SX.sym("y")
     x=SX.sym("x",3,1)
-    vertcat([x,x])
-    vertcat([y,y])
-    vertcat([x,[]])
+    vertcat(*[x,x])
+    vertcat(*[y,y])
+    vertcat(*[x,[]])
     
   def test_eval(self):
     self.message("Function eval")
@@ -603,31 +603,31 @@ class SXtests(casadiTestCase):
     y_=0.75
     
     def test(e,r):
-      f = Function("f", [vertcat([x,y]),vertcat([a,b])],[e])
+      f = Function("f", [vertcat(*[x,y]),vertcat(*[a,b])],[e])
       f_in = [0]*f.n_in();f_in[0]=[x_,y_]
       f_in[1]=[a_,b_]
       f_out = f.call(f_in)
       self.assertAlmostEqual(f_out[0][0],r,10)
     
-    test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([a,b]),0),sin(a_+b_))
-    test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([a,b]),1),sin(a_+b_)+(cos(b_+a_)*(x_-a_)+cos(b_+a_)*(y_-b_)))
+    test(mtaylor(sin(x+y),vertcat(*[x,y]),vertcat(*[a,b]),0),sin(a_+b_))
+    test(mtaylor(sin(x+y),vertcat(*[x,y]),vertcat(*[a,b]),1),sin(a_+b_)+(cos(b_+a_)*(x_-a_)+cos(b_+a_)*(y_-b_)))
     
     def sol(x,y,a,b):
       return sin(b+a)+(cos(b+a)*(x-a)+cos(b+a)*(y-b))-(sin(b+a)*(x-a)**2+2*sin(b+a)*(y-b)*(x-a)+sin(b+a)*(y-b)**2)/2
       
-    test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([a,b]),2),sol(x_,y_,a_,b_))
+    test(mtaylor(sin(x+y),vertcat(*[x,y]),vertcat(*[a,b]),2),sol(x_,y_,a_,b_))
     
     def sol(x,y,a,b):
       return sin(b+a)+(cos(b+a)*(x-a)+cos(b+a)*(y-b))-(sin(b+a)*(x-a)**2+2*sin(b+a)*(y-b)*(x-a)+sin(b+a)*(y-b)**2)/2-(cos(b+a)*(x-a)**3+3*cos(b+a)*(y-b)*(x-a)**2+3*cos(b+a)*(y-b)**2*(x-a)+cos(b+a)*(y-b)**3)/6
     
-    test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([a,b]),3),sol(x_,y_,a_,b_))
+    test(mtaylor(sin(x+y),vertcat(*[x,y]),vertcat(*[a,b]),3),sol(x_,y_,a_,b_))
     
     def sol(x,y,a,b):
       return (-2*sin(b+a)*(x-a)*(y-b)-sin(b+a)*(x-a)**2)/2+cos(b+a)*(y-b)-(cos(b+a)*(x-a)**3)/6+cos(b+a)*(x-a)+sin(b+a)
       
-    test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([a,b]),3,[1,2]),sol(x_,y_,a_,b_))
+    test(mtaylor(sin(x+y),vertcat(*[x,y]),vertcat(*[a,b]),3,[1,2]),sol(x_,y_,a_,b_))
     
-    test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([0,0]),4,[1,2]),(-3*x_**2*y_-x_**3)/6+y_+x_)
+    test(mtaylor(sin(x+y),vertcat(*[x,y]),vertcat(*[0,0]),4,[1,2]),(-3*x_**2*y_-x_**3)/6+y_+x_)
     
   def test_issue107(self):
     self.message("Regression test for issue 107: +=")
@@ -834,9 +834,9 @@ class SXtests(casadiTestCase):
       
     self.assertTrue(SX(DM([0,1])).is_regular())
     self.assertFalse(SX(DM([0,inf])).is_regular())
-    self.assertFalse(vertcat([x,inf]).is_regular())
+    self.assertFalse(vertcat(*[x,inf]).is_regular())
     with self.assertRaises(Exception):
-      self.assertFalse(vertcat([x,x]).is_regular())
+      self.assertFalse(vertcat(*[x,x]).is_regular())
       
       
   def test_symvar(self):
@@ -878,10 +878,10 @@ class SXtests(casadiTestCase):
     b_ = f_in[0][1]
     f_out = f.call(f_in)
     f_out[0]
-    self.checkarray(f_out[0],vertcat([-b_/a_]))
+    self.checkarray(f_out[0],vertcat(*[-b_/a_]))
 
     p = SX.sym("[a,b]")
-    r = poly_roots(vertcat([p,0]))
+    r = poly_roots(vertcat(*[p,0]))
     
     f = Function("f", [p],[r])
     f_in = [0]*f.n_in();f_in[0]=DM([2,7])
@@ -889,7 +889,7 @@ class SXtests(casadiTestCase):
     b_ = f_in[0][1]
     f_out = f.call(f_in)
     f_out[0]
-    self.checkarray(f_out[0],vertcat([-b_/a_,0]))
+    self.checkarray(f_out[0],vertcat(*[-b_/a_,0]))
     
     p = SX.sym("[a,b,c]")
     r = poly_roots(p)
@@ -904,7 +904,7 @@ class SXtests(casadiTestCase):
     x0 = (-b_-sqrt(d))/2/a_
     x1 = (-b_+sqrt(d))/2/a_
     f_out[0]
-    self.checkarray(f_out[0],vertcat([x0,x1]))
+    self.checkarray(f_out[0],vertcat(*[x0,x1]))
 
     p = SX.sym("[a,b,c,d]")
     r = poly_roots(p)
@@ -947,7 +947,7 @@ class SXtests(casadiTestCase):
     
     x = SX.sym("x",2,2)
     y = SX.sym("y",2)
-    f = Function("f", [x,y],[eig_symbolic(diagcat([x,c.diag(y)]))])
+    f = Function("f", [x,y],[eig_symbolic(diagcat(*[x,c.diag(y)]))])
     f_in = [0]*f.n_in();f_in[0]=DM([[2,0.1],[0.3,0.7]])
     f_in[1]=[3,7]
     f_out = f.call(f_in)
@@ -1005,7 +1005,7 @@ class SXtests(casadiTestCase):
     s = SX([]).shape
     self.assertEqual(s[0],0)
     self.assertEqual(s[1],1)
-    x = vertcat((SX.sym("x"),SX([])))
+    x = vertcat(*(SX.sym("x"),SX([])))
     
   def test_mul_sparsity(self):
 
@@ -1204,20 +1204,20 @@ class SXtests(casadiTestCase):
     self.assertTrue(depends_on(a**2,a))
     self.assertTrue(depends_on(a,a))
     self.assertFalse(depends_on(0,a))
-    self.assertTrue(depends_on(a**2,vertcat([a,b])))
-    self.assertTrue(depends_on(a,vertcat([a,b])))
-    self.assertFalse(depends_on(0,vertcat([a,b])))
-    self.assertTrue(depends_on(b**2,vertcat([a,b])))
-    self.assertTrue(depends_on(b,vertcat([a,b])))
-    self.assertTrue(depends_on(a**2+b**2,vertcat([a,b])))
-    self.assertTrue(depends_on(a+b,vertcat([a,b])))
-    self.assertTrue(depends_on(vertcat([0,a]),a))
-    self.assertTrue(depends_on(vertcat([a,0]),a))
-    self.assertTrue(depends_on(vertcat([a**2,b**2]),vertcat([a,b])))
-    self.assertTrue(depends_on(vertcat([a,0]),vertcat([a,b])))
-    self.assertTrue(depends_on(vertcat([0,b]),vertcat([a,b])))
-    self.assertTrue(depends_on(vertcat([b,0]),vertcat([a,b])))
-    self.assertFalse(depends_on(vertcat([0,0]),vertcat([a,b])))
+    self.assertTrue(depends_on(a**2,vertcat(*[a,b])))
+    self.assertTrue(depends_on(a,vertcat(*[a,b])))
+    self.assertFalse(depends_on(0,vertcat(*[a,b])))
+    self.assertTrue(depends_on(b**2,vertcat(*[a,b])))
+    self.assertTrue(depends_on(b,vertcat(*[a,b])))
+    self.assertTrue(depends_on(a**2+b**2,vertcat(*[a,b])))
+    self.assertTrue(depends_on(a+b,vertcat(*[a,b])))
+    self.assertTrue(depends_on(vertcat(*[0,a]),a))
+    self.assertTrue(depends_on(vertcat(*[a,0]),a))
+    self.assertTrue(depends_on(vertcat(*[a**2,b**2]),vertcat(*[a,b])))
+    self.assertTrue(depends_on(vertcat(*[a,0]),vertcat(*[a,b])))
+    self.assertTrue(depends_on(vertcat(*[0,b]),vertcat(*[a,b])))
+    self.assertTrue(depends_on(vertcat(*[b,0]),vertcat(*[a,b])))
+    self.assertFalse(depends_on(vertcat(*[0,0]),vertcat(*[a,b])))
     
   @requires("is_smooth")
   def test_is_smooth(self):

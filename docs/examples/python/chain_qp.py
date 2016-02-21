@@ -110,7 +110,7 @@ for i in range(1, N+1):
    ubg.append( inf)
 
 # Formulate QP
-qp = {'x':vertcat(x), 'f':Vchain, 'g':vertcat(g)}
+qp = {'x':vertcat(*x), 'f':Vchain, 'g':vertcat(*g)}
 
 # Solve with IPOPT
 solver = qpsol('solver', 'qpoases', qp, {'sparse':True})

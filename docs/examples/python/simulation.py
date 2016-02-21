@@ -45,9 +45,9 @@ parameters_["k"] = 10
 parameters_["beta"] = 1
 parameters_["c"] = 1
 
-vel = vertcat([dx,dy])
-p = vertcat([x,y])
-q = vertcat([u,v])
+vel = vertcat(dx,dy)
+p = vertcat(x,y)
+q = vertcat(u,v)
 
 # System dynamics
 F = -k*(p-q) - beta*v*sqrt(sum_square(vel) + c**2)

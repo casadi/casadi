@@ -640,7 +640,7 @@ class QpsolTests(casadiTestCase):
     
     for w0,w1 in [(0,2),(1,1),(0.1,0.6)]:
       
-      A =  vertcat([a.T,a_.T,(w0*a+w1*a_).T])
+      A =  vertcat(*[a.T,a_.T,(w0*a+w1*a_).T])
         
       LBA = DM([0,0,0])
       UBA = DM([0.5,0.3,w0*0.5+w1*0.3])

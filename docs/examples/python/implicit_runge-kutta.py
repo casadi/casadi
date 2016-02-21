@@ -43,9 +43,9 @@ x  = SX.sym("x", nx)  # state
 p  = SX.sym("u", np)  # control
 
 # ODE right hand side function
-ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + p, \
-               x[0], \
-               x[0]*x[0] + x[1]*x[1] + p*p])
+ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p, \
+              x[0], \
+              x[0]*x[0] + x[1]*x[1] + p*p)
 dae = {'x':x, 'p':p, 'ode':ode}
 f = Function('f', [x, p], [ode])
 
@@ -108,7 +108,7 @@ for j in range(1,d+1):
   V_eq.append(h*f_j - xp_j)
 
 # Concatenate constraints
-V_eq = vertcat(V_eq)
+V_eq = vertcat(*V_eq)
 
 # Root-finding function, implicitly defines V as a function of X0 and P
 vfcn = Function('vfcn', [V, X0, P], [V_eq])

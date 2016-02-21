@@ -261,8 +261,8 @@ class Functiontests(casadiTestCase):
         for r in range(R):
           h = [z]*5
           h[r] = I
-          v.append(horzcat(h))
-        d = vertcat(v)
+          v.append(horzcat(*h))
+        d = vertcat(*v)
         
         test(d.sparsity())
         
@@ -348,8 +348,8 @@ class Functiontests(casadiTestCase):
       for r in range(R):
         h = [z]*5
         h[r] = I
-        v.append(horzcat(h))
-      d = vertcat(v)
+        v.append(horzcat(*h))
+      d = vertcat(*v)
       
       test(d.sparsity())
 
@@ -512,11 +512,11 @@ class Functiontests(casadiTestCase):
           g2.append(xf-VXk[k+1])
 
       for i in range(2):
-        f = XFunction("nlp",[V],[vertcat(g)],{"ad_weight_sp":i})
+        f = XFunction("nlp",[V],[vertcat(*g)],{"ad_weight_sp":i})
 
         assert f.sparsity_jac().nnz()==162
 
-        f2 = XFunction("nlp",[V],[vertcat(g2)],{"ad_weight_sp":i})
+        f2 = XFunction("nlp",[V],[vertcat(*g2)],{"ad_weight_sp":i})
 
         assert f2.sparsity_jac().nnz()==162
 
@@ -586,7 +586,7 @@ class Functiontests(casadiTestCase):
 
       for parallelization in ["serial","openmp"] if args.run_slow else ["serial"]:
         print parallelization
-        res = fun.map(map(horzcat,[X,Y,Z_alt,V]),parallelization)
+        res = fun.map(map(c.casadi._horzcat,[X,Y,Z_alt,V]),parallelization)
 
 
         F = Function("F",X+Y+Z+V,map(sin,res))
@@ -596,7 +596,7 @@ class Functiontests(casadiTestCase):
           for i,e in enumerate(map(sin,fun.call(r))):
             resref[i] = resref[i] + [e]
 
-        Fref = Function("F",X+Y+Z+V,map(horzcat,resref))
+        Fref = Function("F",X+Y+Z+V,map(c.casadi._horzcat,resref))
         
         np.random.seed(0)
         X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -673,7 +673,7 @@ class Functiontests(casadiTestCase):
     for Z_alt in [Z,[MX()]*3]:
       zi+= 1
       for parallelization in ["serial","openmp"]:
-        res = fun.mapsum(map(horzcat,[X,Y,Z_alt,V]),parallelization)
+        res = fun.mapsum(map(c.casadi._horzcat,[X,Y,Z_alt,V]),parallelization) # Joris - clean alternative for this?
 
 
         F = Function("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0})
@@ -731,7 +731,7 @@ class Functiontests(casadiTestCase):
           bl.append(b)
           cl.append(c)
 
-        Fref = Function("F",[horzcat(X),horzcat(Y),Z,V],[acc,horzcat(bl),horzcat(cl)])
+        Fref = Function("F",[horzcat(*X),horzcat(*Y),Z,V],[acc,horzcat(*bl),horzcat(*cl)])
 
         np.random.seed(0)
         X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -739,7 +739,7 @@ class Functiontests(casadiTestCase):
         Z_ = DM(Z.sparsity(),np.random.random(Z.nnz()))
         V_ = DM(V.sparsity(),np.random.random(V.nnz()))
 
-        inputs = [horzcat(X_),horzcat(Y_),Z_,V_]
+        inputs = [horzcat(*X_),horzcat(*Y_),Z_,V_]
         
         self.check_codegen(F,inputs=inputs)
 
@@ -874,8 +874,8 @@ class Functiontests(casadiTestCase):
       Y0s.append(Y0)
       Y1s.append(Y1)
       Xps.append(XP)
-    Fref = Function("f",[X,horzcat(Y),horzcat(Z),horzcat(V)],[horzcat(Xps),horzcat(Y0s),horzcat(Y1s)])
-    inputs = [X_,horzcat(Y_),horzcat(Z_),horzcat(V_)]
+    Fref = Function("f",[X,horzcat(*Y),horzcat(*Z),horzcat(*V)],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Y1s)])
+    inputs = [X_,horzcat(*Y_),horzcat(*Z_),horzcat(*V_)]
 
     for f in [F,toSX_fun(F)]:
 
@@ -899,8 +899,8 @@ class Functiontests(casadiTestCase):
       Xps.append(XP)
       Vps.append(VP)
 
-    Fref = Function("f",[horzcat(Y),X,horzcat(Z),V[0]],[horzcat(Xps),horzcat(Y0s),horzcat(Vps)])
-    inputs = [horzcat(Y_),X_,horzcat(Z_),V_[0]]
+    Fref = Function("f",[horzcat(*Y),X,horzcat(*Z),V[0]],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Vps)])
+    inputs = [horzcat(*Y_),X_,horzcat(*Z_),V_[0]]
     
     for f in [F,toSX_fun(F)]:
       self.checkfunction(f,Fref,inputs=inputs)
@@ -970,12 +970,12 @@ class Functiontests(casadiTestCase):
 
     Fref = f.map("f",n*m,[True,True,False],[False])
     
-    print Fref(horzcat([vec(xx),vec(yy)]).T,vec(z),x0)
+    print Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(z),x0)
     print F(z,x0)
     
     zs = MX.sym("z", z.shape)
     xs = MX.sym("x",2)
-    Fref = Function("Fref",[zs,xs],[Fref(horzcat([vec(xx),vec(yy)]).T,vec(zs),xs)])
+    Fref = Function("Fref",[zs,xs],[Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(zs),xs)])
     
     self.checkfunction(F,Fref,inputs=[z,x0],digits=5,allow_nondiff=True,evals=False)
     self.check_codegen(F,inputs=[z,x0])

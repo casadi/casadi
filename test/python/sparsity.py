@@ -312,7 +312,7 @@ class Sparsitytests(casadiTestCase):
     numpy.random.seed(0)
     for k in range(20):
       Ai = [self.randDM(d,d,1) for i,d in enumerate ([random.randint(1,10) for j in range(10)])]
-      A = diagcat(Ai)
+      A = diagcat(*Ai)
       
       #A.sparsity().spy()
       perm =  numpy.random.permutation(range(A.size1()))
@@ -349,7 +349,7 @@ class Sparsitytests(casadiTestCase):
     numpy.random.seed(0)
     for k in range(20):
       Ai = [self.randDM(d,d,0.6,symm=True) for i,d in enumerate ([random.randint(1,10) for j in range(10)])]
-      A = diagcat(Ai)
+      A = diagcat(*Ai)
       
       #A.sparsity().spy()
       perm =  numpy.random.permutation(range(A.size1()))
@@ -450,7 +450,7 @@ class Sparsitytests(casadiTestCase):
     X = SX.sym("X",100)
     P = SX.sym("P",1000)
 
-    optvar = vertcat([X,P])
+    optvar = vertcat(*[X,P])
 
     p = SX.sym("p")
 
@@ -465,7 +465,7 @@ class Sparsitytests(casadiTestCase):
 
     p = SX.sym("p")
 
-    g = Function('g', [X,p],[vertcat([X*p,P])], {'verbose':True})
+    g = Function('g', [X,p],[vertcat(*[X*p,P])], {'verbose':True})
 
     J = g.jacobian()
         

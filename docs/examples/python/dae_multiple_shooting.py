@@ -47,12 +47,12 @@ Joel Andersson, 2015
 # Declare variables
 x0 = SX.sym('x0')
 x1 = SX.sym('x1')
-x = vertcat([x0, x1]) # Differential states
+x = vertcat(x0, x1) # Differential states
 z = SX.sym('z')       # Algebraic variable
 u = SX.sym('u')       # Control
 
 # Differential equation
-f_x = vertcat((z*x0-x1+u, x0))
+f_x = vertcat(z*x0-x1+u, x0)
 
 # Algebraic equation
 f_z = x1**2 + z - 1

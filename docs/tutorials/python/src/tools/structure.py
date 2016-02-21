@@ -361,7 +361,7 @@ P0 + P
 
 #! Next we represent the 'squared_repeated' helper construct
 #! Imagine we somehow obtain a matrix that represents a horizontal concatenation of covariance
-P0 = horzcat([DM.zeros(states.size,states.size),DM.ones(states.size,states.size)])
+P0 = horzcat(DM.zeros(states.size,states.size),DM.ones(states.size,states.size))
 
 #! We can conveniently access it as follows:
 P = states.squared_repeated(P0)

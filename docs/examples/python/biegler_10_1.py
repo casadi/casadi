@@ -112,7 +112,7 @@ for N in range(1,11):
     if(i<N-1):
       g.append(Z[i+1,0] - rhs)
 
-  g = vertcat(g)
+  g = vertcat(*g)
 
   print "g = ", g
 

@@ -118,7 +118,7 @@ for i in range(N-1):
   g.append( shooting["X",i+1] - phi(shooting["X",i],parameters["U",i],shooting["W",i]) )
 
 # Formulate the NLP
-nlp = {'x':shooting, 'p':parameters, 'f':obj, 'g':vertcat(g)}
+nlp = {'x':shooting, 'p':parameters, 'f':obj, 'g':vertcat(*g)}
 
 # Make a simulation to create the data for the problem
 simulated_X = DM.zeros(Nstates,Nsimulation)

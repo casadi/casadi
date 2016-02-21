@@ -82,8 +82,8 @@ u  = SX.sym("u")    # control
 x  = SX.sym("x",2)  # state
 
 # ODE rhs function and quadratures
-xdot = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
-               x[0]])
+xdot = vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, \
+               x[0])
 qdot = x[0]*x[0] + x[1]*x[1] + u*u
 f = Function('f', [t,x,u],[xdot, qdot])
 
@@ -198,7 +198,7 @@ for k in range(nk):
   ubg.append(NP.zeros(nx))
   
 # Concatenate constraints
-g = vertcat(g)
+g = vertcat(*g)
   
 # NLP
 nlp = {'x':V, 'f':J, 'g':g}

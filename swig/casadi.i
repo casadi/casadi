@@ -2103,6 +2103,18 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(fmin) casadi_min;
 %rename(fmax) casadi_max;
 
+// Concatenations
+%rename(_veccat) casadi_veccat;
+%rename(_vertcat) casadi_vertcat;
+%rename(_horzcat) casadi_horzcat;
+%rename(_diagcat) casadi_diagcat;
+%pythoncode %{
+def veccat(*args): return _veccat(args)
+def vertcat(*args): return _vertcat(args)
+def horzcat(*args): return _horzcat(args)
+def diagcat(*args): return _diagcat(args)
+%}
+
 // Non-fatal errors (returning NotImplemented singleton)
 %feature("python:maybecall") casadi_plus;
 %feature("python:maybecall") casadi_minus;
