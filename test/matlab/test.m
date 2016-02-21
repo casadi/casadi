@@ -15,7 +15,7 @@ z = MX.sym('z',3);
 
 
 f = Function('f',{x},{cos(x)})
-r = f.newcall(3)
+r = f(3)
 
 disp(r)
 
@@ -160,10 +160,10 @@ opts = struct('input_scheme', char('x','p'),...
 nlp = Function('nlp', {x,p}, {f,g}, opts);
 
 % Evaluate with numbered inputs and outputs
-[res_vec{1:2}] = nlp.newcall(1.1, 3.3);
+[res_vec{1:2}] = nlp(1.1, 3.3);
 
 % Evaluate with named inputs and outputs
-res_struct = nlp.newcall('x',1.1,'p',3.3);
+res_struct = nlp('x',1.1,'p',3.3);
 assert(is_zero(res_vec{1}-res_struct.f))
 assert(is_zero(res_vec{2}-res_struct.g))
 
@@ -192,7 +192,7 @@ if Compiler.hasPlugin('clang')
   x = MX.sym('x');
   F = Function('f',{x},{x^2},struct('jit',true));
 
-  out = F.newcall(5);
+  out = F(5);
   assert(full(out)==25)
 end
 

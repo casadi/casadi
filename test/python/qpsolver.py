@@ -154,7 +154,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],-1,max(1,6-less_digits),str(qpsol))
     
@@ -197,7 +197,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(qpsol))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(qpsol))
@@ -211,7 +211,7 @@ class QpsolTests(casadiTestCase):
       
       solver_in["h"]=H*4
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],1,max(1,3-less_digits),str(qpsol))
       self.assertAlmostEqual(solver_out["x"][1],1,max(1,3-less_digits),str(qpsol))
@@ -226,7 +226,7 @@ class QpsolTests(casadiTestCase):
       
       if 'qcqp' in str(qpsol): continue # Singular hessian
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(qpsol))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(qpsol))
       self.assertAlmostEqual(solver_out["cost"],-9-1.0/3,max(1,6-less_digits),str(qpsol))
@@ -245,7 +245,7 @@ class QpsolTests(casadiTestCase):
         with self.assertRaises(Exception):
           solver_out = solver(solver_in)
         return
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],5,max(1,6-less_digits),str(qpsol))
       self.assertAlmostEqual(solver_out["x"][1],5,max(1,6-less_digits),str(qpsol))
@@ -294,7 +294,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([0.873908,0.95630465,0,0,0]),str(qpsol),digits=max(1,6-less_digits))
       
@@ -372,7 +372,7 @@ class QpsolTests(casadiTestCase):
           solver_out = solver(solver_in)
         return
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],0.5,max(1,6-less_digits),str(qpsol))
       self.assertAlmostEqual(solver_out["x"][1],1.25,max(1,6-less_digits),str(qpsol))
@@ -400,7 +400,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],0.4,max(1,4-less_digits),str(qpsol))
       self.assertAlmostEqual(solver_out["x"][1],1.6,max(1,4-less_digits),str(qpsol))
@@ -449,7 +449,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([5.5,5,-10]),str(qpsol),digits=max(1,4-less_digits)) 
       
@@ -494,7 +494,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],-0.5,max(1,6-less_digits),str(qpsol))
       self.assertAlmostEqual(solver_out["x"][1],1,max(1,6-less_digits),str(qpsol))
@@ -541,7 +541,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([10,8]),str(qpsol),digits=max(1,3-less_digits))
       
@@ -580,7 +580,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([-0.2,1.2]),str(qpsol),digits=max(1,3-less_digits))
       
@@ -624,7 +624,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lbx"]=LBX
       solver_in["ubx"]=UBX
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],x0,str(qpsol)+str(qp_options),digits=max(1,2-less_digits))
       self.assertAlmostEqual(solver_out["cost"][0],-0.5*mtimes([x0.T,H,x0]),max(1,3-less_digits),str(qpsol))
@@ -667,7 +667,7 @@ class QpsolTests(casadiTestCase):
         solver_in["ubx"]=UBX
         solver_in["lba"]=LBA
         solver_in["uba"]=UBA
-        solver_out = solver.newcall(**solver_in)
+        solver_out = solver(**solver_in)
 
         self.checkarray(solver_out["x"],DM([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsol),digits=max(1,6-less_digits))
         self.assertAlmostEqual(solver_out["cost"][0],-5.850384678537,max(1,5-less_digits),str(qpsol))
@@ -702,7 +702,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([0.5,1.5]),str(qpsol),digits=max(1,5-less_digits))
       self.checkarray(solver_out["lam_x"],DM([0,0]),str(qpsol),digits=max(1,5-less_digits))
@@ -740,7 +740,7 @@ class QpsolTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      solver_out = solver.newcall(**solver_in)
+      solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([2,3]),str(qpsol),digits=max(1,5-less_digits))
       self.checkarray(solver_out["lam_x"],DM([0,-3]),str(qpsol),digits=max(1,5-less_digits))

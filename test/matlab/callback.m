@@ -5,11 +5,11 @@ x = MX.sym('x');
 
 foo = MyCallback('foo');
 
-y = foo.newcall(x);
+y = foo(x);
 
 f = Function('f',{x},{y});
 
-out = f.newcall(5)
+out = f(5)
 
 assert(abs(full(out)-25)<1e-12)
 
@@ -23,5 +23,5 @@ rng(0);
 
 x = rand(n,m);
 X = MX.sym('x',n,m);
-Y = foo.newcall(X);
+Y = foo(X);
 

@@ -45,10 +45,10 @@ N_steps_per_sample = 10
 dt = 1/fs/N_steps_per_sample
 
 # Build an integrator for this system: Runge Kutta 4 integrator
-k1 = ode.newcall(states,controls,params)
-k2 = ode.newcall(states+dt/2.0*k1,controls,params)
-k3 = ode.newcall(states+dt/2.0*k2,controls,params)
-k4 = ode.newcall(states+dt*k3,controls,params)
+k1 = ode(states,controls,params)
+k2 = ode(states+dt/2.0*k1,controls,params)
+k3 = ode(states+dt/2.0*k2,controls,params)
+k4 = ode(states+dt*k3,controls,params)
 
 states_final = states+dt/6.0*(k1+2*k2+2*k3+k4)
 
@@ -58,7 +58,7 @@ one_step = Function('one_step',[states, controls, params],[states_final]);
 X = states;
 
 for i in range(N_steps_per_sample):
-  X = one_step.newcall(X, controls, params)
+  X = one_step(X, controls, params)
 
 # Create a function that simulates all step propagation on a sample
 one_sample = Function('one_sample',[states, controls, params], [X])
@@ -75,7 +75,7 @@ numpy.random.seed(0)
 u_data = DM(0.1*numpy.random.random(N))
 
 x0 = DM([0,0])
-X_measured = all_samples.newcall(x0, u_data, repmat(param_truth,1,N))
+X_measured = all_samples(x0, u_data, repmat(param_truth,1,N))
 
 y_data = X_measured[0,:].T
 
@@ -104,14 +104,14 @@ def gauss_newton(e,nlp,V):
 
 # Note, it is in general a good idea to scale your decision variables such
 # that they are in the order of ~0.1..100
-X_symbolic = all_samples.newcall(x0, u_data, repmat(params*scale,1,N))
+X_symbolic = all_samples(x0, u_data, repmat(params*scale,1,N))
 
 e = y_data-X_symbolic[0,:].T;
 nlp = {'x':params, 'f':0.5*dot(e,e)}
 
 solver = gauss_newton(e,nlp, params)
 
-sol = solver.newcall(x0=param_guess)
+sol = solver(x0=param_guess)
 
 print sol["x"]*scale
 
@@ -140,7 +140,7 @@ x0 = veccat([param_guess,X_guess])
 
 solver = gauss_newton(e,nlp, V)
 
-sol = solver.newcall(x0=x0,lbg=0,ubg=0)
+sol = solver(x0=x0,lbg=0,ubg=0)
 
 print sol["x"][:4]*scale
 

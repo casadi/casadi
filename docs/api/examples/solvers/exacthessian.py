@@ -36,10 +36,10 @@ nlp={'x':vertcat([x,y]), 'f':obj, 'g':constr}
 
 #! We solve the problem with an exact Hessian (default)
 solver = nlpsol('solver', 'ipopt', nlp)
-sol = solver.newcall(lbx=-10, ubx=10, lbg=0, ubg=1)
+sol = solver(lbx=-10, ubx=10, lbg=0, ubg=1)
 print 'Optimal solution (exact Hessian): %s' % sol['x']
 
 #! Same problem but with limited memory BFSG
 solver = nlpsol('solver', 'ipopt', nlp, {'ipopt.hessian_approximation':'limited-memory'})
-sol = solver.newcall(lbx=-10, ubx=10, lbg=0, ubg=1)
+sol = solver(lbx=-10, ubx=10, lbg=0, ubg=1)
 print 'Optimal solution (BFGS): %s' % sol['x']

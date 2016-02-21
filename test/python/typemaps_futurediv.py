@@ -148,11 +148,11 @@ class typemaptests(casadiTestCase):
 
         f=Function('f', [z],[r])
         f_in = DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f_out = f.newcall(f_in)
+        f_out = f(f_in)
         
         f_=Function('f', [z],[z])
         f__in = DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
-        f__out = f_.newcall(f__in)
+        f__out = f_(f__in)
         
 
         self.checkarray(fun(f__out,DM(s)),f_out,"operation")
@@ -162,11 +162,11 @@ class typemaptests(casadiTestCase):
         
         f=Function('f',[z,s],[r])
         f_in = [DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
-        f_out = f.newcall(*f_in)
+        f_out = f(*f_in)
         
         f_=Function('f', [z,s],[z,s])
         f__in= [DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f_.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
-        f__out = f_.newcall(*f__in)
+        f__out = f_(*f__in)
 
         self.checkarray(fun(f__out[0],f__out[1]),f_out,"operation")
     

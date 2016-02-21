@@ -53,7 +53,7 @@ opts = {}
 nlpsol = nlpsol("nlpsol", "ipopt", nlp, opts)
   
 # Solve NLP
-res = nlpsol.newcall(lbx=nl.x_lb,
+res = nlpsol(lbx=nl.x_lb,
              ubx=nl.x_ub,
              lbg=nl.g_lb,
              ubg=nl.g_ub,

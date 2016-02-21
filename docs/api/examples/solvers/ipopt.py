@@ -39,7 +39,7 @@ x=SX.sym('x')
 nlp = {'x':x, 'f':(x-1)**2}
 
 solver = nlpsol('solver', 'ipopt', nlp)
-sol = solver.newcall(lbx=-10, ubx=10)
+sol = solver(lbx=-10, ubx=10)
 
 #! The solution is obviously 1:
 print sol['x']
@@ -61,7 +61,7 @@ x=SX.sym('x',n)
 nlp = {'x':x, 'f':mtimes((x-1).T,x-1), 'g':vertcat([x[1]+x[2],x[0]])}
 
 solver = nlpsol('solver', 'ipopt', nlp)
-sol = solver.newcall(lbx=-10, ubx=10, lbg=[0,2], ubg=[1,2])
+sol = solver(lbx=-10, ubx=10, lbg=[0,2], ubg=[1,2])
 #$ $ 2 \le x_0 \le 2$ is not really as bad it looks. 
 #$ Ipopt will recognise this situation as an equality constraint.
 
@@ -84,14 +84,14 @@ a_ = 2
 nlp={'x':x, 'p':a, 'f':(x-a)**2}
 
 solver = nlpsol('solver', 'ipopt', nlp)
-sol = solver.newcall(lbx=-10, ubx=10, p=a_)
+sol = solver(lbx=-10, ubx=10, p=a_)
 
 #! The solution is obviously a:
 print sol['x']
 assert(abs(sol['x']-a_)<1e-9)
 
 #! The parameter can change inbetween two solve calls:
-sol = solver.newcall(lbx=-10, ubx=10, p=2*a_)
+sol = solver(lbx=-10, ubx=10, p=2*a_)
 
 #! The solution is obviously 2*a:
 print sol['x']

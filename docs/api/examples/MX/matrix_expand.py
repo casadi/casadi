@@ -41,7 +41,7 @@ f = Function("f", [a,b,c],[e])
 
 g = f.expand('g')
 
-dotdraw(g.newcall(*g.sx_in()))
+dotdraw(g(*g.sx_in()))
 
 #! There is also a variant to perform expansion immediately on the MX graph
 #! The expanded SX graph is hidden inside an SX graph call

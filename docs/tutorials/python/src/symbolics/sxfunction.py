@@ -66,17 +66,17 @@ f = Function('f', [x], [z]) # z = f(x)
 print "%d -> %d" % (f.n_in(),f.n_out())
 f_in = f.sx_in()
 print f_in, type(f_in)
-f_out = f.newcall(*f_in)
+f_out = f(*f_in)
 print f_out, type(f_out)
-z0 = f.newcall(2)
+z0 = f(2)
 print z0
 print type(z0)
-z0 = f.newcall(3)
+z0 = f(3)
 print z0
 #! We can evaluate symbolically, too:
-print f.newcall(y)
+print f(y)
 #! Since numbers get cast to SXConstant object, you can also write the following non-efficient code:
-print f.newcall(2)
+print f(2)
 #! We can do symbolic derivatives: f' = dz/dx . 
 #$ The result is $2 x \cos(x^2)+2 x$:
 print SX.grad(f)
@@ -86,7 +86,7 @@ x = SX.sym("x") # 1 by 1 matrix serves as scalar
 y = SX.sym("y") # 1 by 1 matrix serves as scalar
 f = Function('f', [x , y ], [x*y, x+y])
 print "%d -> %d" % (f.n_in(),f.n_out())
-r = f.newcall(2, 3)
+r = f(2, 3)
 
 print [r[i] for i in range(2)]
 print [[SX.grad(f,i,j) for i in range(2)] for j in range(2)]
@@ -99,16 +99,16 @@ a=SX.sym("a")
 b=SX.sym("b")
 f = Function('f', [x,vertcat((a,b))],[a*x + b]) 
 
-print f.newcall(x,vertcat([a,b]))
-print f.newcall(SX(1.0),vertcat((a,b)))
-print f.newcall(x,vertcat((SX.sym("c"),SX.sym("d"))))
-print f.newcall(SX(),vertcat([SX.sym("c"),SX.sym("d")]))
+print f(x,vertcat([a,b]))
+print f(SX(1.0),vertcat((a,b)))
+print f(x,vertcat((SX.sym("c"),SX.sym("d"))))
+print f(SX(),vertcat([SX.sym("c"),SX.sym("d")]))
 
 #$ We can make an accompanying $g(x) = f(x;a;b)$ by making a and b implicity:
 
 k = SX(a)
-print f.newcall(x,vertcat((k[0],b)))
-print f.newcall(x,vertcat((SX.sym("c"),SX.sym("d"))))
+print f(x,vertcat((k[0],b)))
+print f(x,vertcat((SX.sym("c"),SX.sym("d"))))
 
 #! Functions with vector valued input
 #! ----------------------------------
@@ -119,7 +119,7 @@ x = SX.sym("x")
 y = SX.sym("y")
 f = Function('f', [vertcat((x , y ))], [vertcat((x*y, x+y))])
 print "%d -> %d" % (f.n_in(),f.n_out())
-r = f.newcall([2, 3])
+r = f([2, 3])
 print z
 G=SX.jac(f).T
 print G
@@ -128,7 +128,7 @@ print G
 #$ Let's define $ \vec{v} = {\buildrel\leftrightarrow\over{G}} . \vec{p} $
 #! The evaluation of v can be efficiently achieved by automatic differentiation as follows:
 df = f.derivative(1,0)
-res = df.newcall([2,3], [7,6])
+res = df([2,3], [7,6])
 print res[1] # v
 
 #! Functions with matrix valued input
@@ -138,8 +138,8 @@ y = SX.sym("y",2,2)
 print x*y # Not a dot product
 f = Function('f', [x,y], [x*y])
 print "%d -> %d" % (f.n_in(),f.n_out())
-print f.newcall(x,y)
-r = f.newcall(DM([[1,2],[3,4]]), DM([[4,5],[6,7]]))
+print f(x,y)
+r = f(DM([[1,2],[3,4]]), DM([[4,5],[6,7]]))
 print r
 print SX.jac(f,0).T
 print SX.jac(f,1).T
@@ -148,15 +148,15 @@ print 12
 
 f = Function('f', [x,y], [x*y,x+y])
 print type(x)
-print f.newcall(x,y)
-print type(f.newcall(x,y))
-print type(f.newcall(x,y)[0])
-print type(f.newcall(x,y)[0][0,0])
+print f(x,y)
+print type(f(x,y))
+print type(f(x,y)[0])
+print type(f(x,y)[0][0,0])
 
 f = Function('f', [x], [x+y])
 print type(x)
-print f.newcall(x)
-print type(f.newcall(x))
+print f(x)
+print type(f(x))
 
 #! A current limitation is that matrix valued input/ouput is handled through flattened vectors
 #! Note the peculiar form of the gradient.

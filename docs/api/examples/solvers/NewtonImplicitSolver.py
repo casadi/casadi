@@ -67,7 +67,7 @@ opts["linear_solver"] = "csparse"
 s=rootfinder("s", "newton", f, opts)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve
-x_ = s.newcall([1,-1], params_)
+x_ = s([1,-1], params_)
 
 print "Solution = ", x_
 
@@ -76,7 +76,7 @@ x = [sqrt(4.0/3*sigma_/alpha_),-0.5*pi]
 print "Reference solution = ", x
 
 #! We show that the residual is indeed (close to) zero
-residual = f.newcall(x_, params_)
+residual = f(x_, params_)
 print "residual = ", residual
 
 for i in range(1):

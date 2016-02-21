@@ -151,7 +151,7 @@ class ADtests(casadiTestCase):
             self.message("eval_sx on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             f_in = DM(f.sparsity_in(0),n)
-            r = f.newcall(f_in)
+            r = f(f_in)
             J = self.jacobians[inputtype][outputtype](*n)
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
@@ -160,7 +160,7 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
-            res = f.newcall(y)
+            res = f(y)
             fwdsens = f.forward([y], [res], map(lambda x: [x],fseeds))
             adjsens = f.reverse([y], [res], map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
@@ -168,18 +168,18 @@ class ADtests(casadiTestCase):
             
             fe = Function("fe", [y], [res])
             
-            re = fe.newcall(f_in)
+            re = fe(f_in)
             
             self.checkarray(r,re)
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
-              re = fe.newcall(f_in)
+              re = fe(f_in)
               self.checkarray(c.vec(re),mtimes(J,c.vec(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
-              re = fe.newcall(f_in)
+              re = fe(f_in)
               self.checkarray(c.vec(re),mtimes(J.T,c.vec(seed)),"AD") 
               
   def test_MXeval_mx(self):
@@ -191,7 +191,7 @@ class ADtests(casadiTestCase):
             self.message("eval_mx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f_in = DM(f.sparsity_in(0),n)
-            r = f.newcall(f_in)
+            r = f(f_in)
             J = self.jacobians[inputtype][outputtype](*n)
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
@@ -200,7 +200,7 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
-            res = f.newcall(y)
+            res = f(y)
             fwdsens = f.forward([y],[res],map(lambda x: [x],fseeds))
             adjsens = f.reverse([y],[res],map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
@@ -208,18 +208,18 @@ class ADtests(casadiTestCase):
             
             fe = Function('fe', [y], [res])
             
-            re = fe.newcall(f_in)
+            re = fe(f_in)
             
             self.checkarray(r,re)
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = Function("fe", [y],[sens])
-              re = fe.newcall(f_in)
+              re = fe(f_in)
               self.checkarray(c.vec(re),mtimes(J,c.vec(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = Function("fe", [y],[sens])
-              re = fe.newcall(f_in)
+              re = fe(f_in)
               self.checkarray(c.vec(re),mtimes(J.T,c.vec(seed)),"AD") 
 
   @known_bug()  # Not implemented
@@ -242,7 +242,7 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DM(f.sparsity_in(0),x), seeds)
             aseeds = map(lambda x: DM(f.sparsity_out(0),x), seeds)
-            res = f.newcall(y)
+            res = f(y)
             fwdsens = f.forward([y],[res],map(lambda x: [x],fseeds))
             adjsens = f.reverse([y],[res],map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
@@ -276,17 +276,17 @@ class ADtests(casadiTestCase):
             self.message("eval_sx on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f_in = DM(f.sparsity_in(0),n)
-            r = f.newcall(f_in)
+            r = f(f_in)
   
             y = SX.sym("y",f.sparsity_in(0))
             
-            res = f.newcall(y)
+            res = f(y)
             fwdsens = f.forward([y],[res],[])
             adjsens = f.reverse([y],[res],[])
             
             fe = Function("fe", [y],[res])
             
-            re = f.newcall(f_in)
+            re = f(f_in)
             
             self.checkarray(r,re)
                 
@@ -304,7 +304,7 @@ class ADtests(casadiTestCase):
               f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype], opts)
               Jf=f.jacobian(0,0)
               J_in = DM(f.sparsity_in(0),n)
-              Jout,_ = Jf.newcall(J_in)
+              Jout,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jout),J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
               
@@ -325,7 +325,7 @@ class ADtests(casadiTestCase):
               ]
             )
             J_in = DM(Jf.sparsity_in(0),n)
-            J_out = Jf.newcall(J_in)
+            J_out = Jf(J_in)
             J = self.jacobians[inputtype][outputtype](*n)
             self.checkarray(array(J_out),J,"jacobian")
                           
@@ -354,7 +354,7 @@ class ADtests(casadiTestCase):
               f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf=f.jacobian(0,0)
               J_in = DM(f.sparsity_in(0),n)
-              J_out,_ = Jf.newcall(J_in)
+              J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(J_out,J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s"% (mode, inputshape, inputtype, outputshape, outputtype))
                    
@@ -372,7 +372,7 @@ class ADtests(casadiTestCase):
               f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
               Jf=f.jacobian(0,0)
               J_in = DM(f.sparsity_in(0),n)
-              J_out,_ = Jf.newcall(J_in)
+              J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(J_out),J,"jacobian")
               self.checkarray(array(DM.ones(f.sparsity_jac())),array(J!=0,int),"jacsparsity")
@@ -388,11 +388,11 @@ class ADtests(casadiTestCase):
     f=Function("f", [vertcat([x,y,z])],[vertcat([x+2*y**3+3*z**4])])
     J=f.jacobian(0,0)
     m=MX.sym("m",3,1)
-    JT,_ = J.newcall(m)
+    JT,_ = J(m)
     JT = Function("JT", [m],[JT.T])
-    JT.newcall(n)
+    JT(n)
     H = JT.jacobian(0,0)
-    H.newcall(n)
+    H(n)
     #H_out = H(H_in)
     
     #print array(JT_out[0])
@@ -409,7 +409,7 @@ class ADtests(casadiTestCase):
 
     f=Function("f", [inp],[vertcat([x+y,x,y])])
     J=f.jacobian(0,0)
-    J.newcall(DM(f.sparsity_in(0),[2,7]))
+    J(DM(f.sparsity_in(0),[2,7]))
 
     self.assertEqual(f.size1_out(0),3,"Jacobian shape bug")
     self.assertEqual(f.size2_out(0),1,"Jacobian shape bug")
@@ -427,7 +427,7 @@ class ADtests(casadiTestCase):
     f=Function("f", [inp],[vertcat([x+y,x,y])])
     J=f.jacobian(0,0)
     J_in = DM(f.sparsity_in(0),[2,7])
-    J_out,_ = J.newcall(J_in)
+    J_out,_ = J(J_in)
 
     f=Function("f", [inp],[vertcat([x+y,x,y])])
     J=f.jacobian(0,0)
@@ -568,7 +568,7 @@ class ADtests(casadiTestCase):
           (in1,v1,f1.call(in1)[1],y),
           (in1,v1,f1.call([x**2,y])[1],y*2*vertcat([x.T,x.T])),
           (in1,v1,f2.call(in1)[0],DM.zeros(0,2)),
-          (in1,v1,f2.newcall(x**2,y),DM.zeros(0,2)),
+          (in1,v1,f2(x**2,y),DM.zeros(0,2)),
           (in1,v1,f3.call(in1)[0],DM.zeros(0,2)),
           (in1,v1,f3.call([x**2,y])[0],DM.zeros(0,2)),
           (in1,v1,f4.call(in1)[0],DM.zeros(0,2)),

@@ -43,7 +43,7 @@ figure()
 for tol in tolerances:
   opts = {'reltol':10.0**tol, 'abstol':10.0**tol, 'grid':ts, 'output_t0':True}
   F = integrator('F', 'cvodes', dae, opts)
-  res = F.newcall(x0=[1,0])
+  res = F(x0=[1,0])
 
   plot(ts,array(res['xf'])[0,:].T,label='tol = 1e%d' % tol)
 
@@ -62,7 +62,7 @@ for tol in tolerances:
   opts['abstol'] = tol
   opts['tf'] = tend
   F = integrator('F', 'cvodes', dae, opts)
-  res = F.newcall(x0=[1,0])
+  res = F(x0=[1,0])
   endresult.append(res['xf'][0])
   
 figure()

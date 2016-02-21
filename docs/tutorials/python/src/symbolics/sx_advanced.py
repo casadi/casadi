@@ -31,24 +31,24 @@ from numpy import *
 x=SX.sym("x")
 y=x**2
 f = Function('f', [x],[y])
-print f.newcall(SX.sym("w"))
+print f(SX.sym("w"))
 #! We expect w^2.
 l = x
 f = Function('f', [l],[y])
-print f.newcall(SX.sym("w"))
+print f(SX.sym("w"))
 #! We expect w^2.
 k=SX(x)
 l=k[0]
 f = Function('f', [l],[y])
-print f.newcall(SX.sym("w"))
+print f(SX.sym("w"))
 #! We expect w^2.
 k=SX.sym("d",2,2)
 k.nz[1] = x
 l=k.nz[1]
 f = Function('f', [l],[y])
-print f.newcall(SX.sym("w"))
+print f(SX.sym("w"))
 #! We expect w^2.
 #! Identity is not associated with name:
 l=SX.sym("x")
 f = Function('f', [l],[y])
-print f.newcall(SX.sym("w"))
+print f(SX.sym("w"))

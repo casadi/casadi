@@ -3279,7 +3279,7 @@ def PyFunction(name, obj, inputs, outputs, opts={}):
 namespace casadi{
 %extend Function {
   %pythoncode %{
-    def newcall(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
       # Either named inputs or ordered inputs
       if len(args)>0 and len(kwargs)>0:
         raise SyntaxError('Function evaluation requires all arguments to be named or none')
@@ -3304,7 +3304,7 @@ namespace casadi{
 namespace casadi{
 %extend Function {
   %matlabcode %{
-    function varargout = newcall(self, varargin)
+    function varargout = paren(self, varargin)
       if nargin==1 || (nargin>=2 && ischar(varargin{1}))
         % Named inputs: return struct
         assert(nargout<2, 'Syntax error');

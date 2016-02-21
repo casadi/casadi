@@ -122,7 +122,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
 
     # Integrate to get results
     arg = {"x0":x0, "p":u0}
-    res = I.newcall(**arg)
+    res = I(**arg)
     xf = res["xf"]
     qf = res["qf"]
     print "%50s" % "Unperturbed solution:", "xf  = ", xf, ", qf  = ", qf
@@ -130,7 +130,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     # Perturb solution to get a finite difference approximation
     h = 0.001
     arg["p"] = u0+h
-    res = I.newcall(**arg)
+    res = I(**arg)
     fd_xf = (res["xf"]-xf)/h
     fd_qf = (res["qf"]-qf)/h
     print "%50s" % "Finite difference approximation:", "d(xf)/d(p) = ", fd_xf, ", d(qf)/d(p) = ", fd_qf
@@ -142,7 +142,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     arg["der_p"] = u0
     arg["fwd0_x0"] = 0
     arg["fwd0_p"] = 1
-    res = I_fwd.newcall(**arg)
+    res = I_fwd(**arg)
     fwd_xf = res["fwd0_xf"]
     fwd_qf = res["fwd0_qf"]
     print "%50s" % "Forward sensitivities:", "d(xf)/d(p) = ", fwd_xf, ", d(qf)/d(p) = ", fwd_qf
@@ -154,14 +154,14 @@ for Integrators in (ODE_integrators,DAE_integrators):
     arg["der_p"] = u0
     arg["adj0_xf"] = 0
     arg["adj0_qf"] = 1
-    res = I_adj.newcall(**arg)
+    res = I_adj(**arg)
     adj_x0 = res["adj0_x0"]
     adj_p = res["adj0_p"]
     print "%50s" % "Adjoint sensitivities:", "d(qf)/d(x0) = ", adj_x0, ", d(qf)/d(p) = ", adj_p
 
     # Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
     arg["der_p"] = u0+h
-    res = I_adj.newcall(**arg)
+    res = I_adj(**arg)
     fd_adj_x0 = (res["adj0_x0"]-adj_x0)/h
     fd_adj_p = (res["adj0_p"]-adj_p)/h
     print "%50s" % "FD of adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fd_adj_x0, ", d2(qf)/d(p)d(p) = ", fd_adj_p
@@ -174,7 +174,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     arg["fwd0_der_p"] = 1
     arg["der_adj0_xf"] = 0
     arg["der_adj0_qf"] = 1
-    res = I_foa.newcall(**arg)
+    res = I_foa(**arg)
     fwd_adj_x0 = res["fwd0_adj0_x0"]
     fwd_adj_p = res["fwd0_adj0_p"]
     print "%50s" % "Forward over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fwd_adj_x0, ", d2(qf)/d(p)d(p) = ", fwd_adj_p
@@ -187,7 +187,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     arg["der_adj0_xf"] = 0
     arg["der_adj0_qf"] = 1
     arg["adj0_adj0_p"] = 1
-    res = I_aoa.newcall(**arg)
+    res = I_aoa(**arg)
     adj_adj_x0 = res["adj0_der_x0"]
     adj_adj_p = res["adj0_der_p"]
     print "%50s" % "Adjoint over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", adj_adj_x0, ", d2(qf)/d(p)d(p) = ", adj_adj_p

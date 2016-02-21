@@ -38,16 +38,16 @@ f = Function("f", [a,b],[d])
 #! When the graph is evaluated, a printout of c will occur (if you have set WITH_PRINTME to ON in CMakeCache.txt)
 #! Printout reads '|> 13: 7'
 #! 13 is an identifier of choice, 7 is the numerical value of c
-f.newcall(4,3)
+f(4,3)
 
 J = f.jacobian(0,0)
 
 #! The first derivative still depends on c
 #! Printout reads '|> 13: 11'
-J.newcall(2,9)
+J(2,9)
 
 
 J = J.jacobian(0,0)
 
 #! second derivative doesn't, so we don't get a printout
-J.newcall(2,9)
+J(2,9)

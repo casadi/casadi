@@ -72,6 +72,6 @@ ubx = [ 100, 100, 100, 100, 100]
 ubg = b
 lbg = [-100,-100,-100,-100,-100]
 
-sol = solver.newcall(lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
+sol = solver(lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
 print sol["x"]
 #! Nested optimization

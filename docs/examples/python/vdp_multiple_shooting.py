@@ -97,7 +97,7 @@ for k in range(nk):
   w_init += x_init
 
   # Add continuity constraints to NLP
-  Fk = F.newcall(x0=X[k], p=U[k])
+  Fk = F(x0=X[k], p=U[k])
   g.append(X[k+1] - Fk['xf'])
   g_min += [0., 0.]
   g_max += [0., 0.]
@@ -112,7 +112,7 @@ nlp = {'x':vertcat(w), 'f':J, 'g':vertcat(g)}
 solver = nlpsol('solver', 'ipopt', nlp)
 
 # Solve the problem
-sol = solver.newcall(lbx = w_min,
+sol = solver(lbx = w_min,
              ubx = w_max,
              x0  = w_init,
              lbg = g_min,

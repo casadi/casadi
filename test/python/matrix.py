@@ -845,7 +845,7 @@ class Matrixtests(casadiTestCase):
         f = Function("f", [A,B],[C])
         
 
-        c = f.newcall(a,b)
+        c = f(a,b)
             
         c_ref = DM(linalg.solve(a,b))
         c_ref = sparsify(c_ref)
@@ -891,7 +891,7 @@ class Matrixtests(casadiTestCase):
     J_in.append(numpy.random.rand(*A.shape))
     J_in.append(numpy.random.rand(*B.shape))
 
-    res, _  =  J.newcall(*J_in)
+    res, _  =  J(*J_in)
 
     ref =  kron(J_in[1],J_in[2].T)
 

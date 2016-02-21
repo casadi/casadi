@@ -78,7 +78,7 @@ for N in range(1,11):
   # Get the coefficients of the continuity equation
   D = DM.zeros(K+1)
   for j in range(K+1):
-    D[j] = l[j].newcall(1.)
+    D[j] = l[j](1.)
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
@@ -86,7 +86,7 @@ for N in range(1,11):
   for j in range(K+1):
     tfcn = l[j].tangent()
     for k in range(K+1):
-      C[j,k], _ = tfcn.newcall(tau_root[k])
+      C[j,k], _ = tfcn(tau_root[k])
   print "C = ", C
   
   # Collocated states
@@ -101,7 +101,7 @@ for N in range(1,11):
       rhs = 0
       for j in range(K+1):
         rhs += Z[i,j]*C[j,k]
-      FF = F.newcall(Z[i,k])
+      FF = F(Z[i,k])
       g.append(h*FF-rhs)
 
     # Add continuity equation to NLP
@@ -145,7 +145,7 @@ for N in range(1,11):
   arg["ubg"] = 0
   
   # Solve the problem
-  res = solver.newcall(**arg)
+  res = solver(**arg)
   
   ## Print the time points
   t_opt = N*(K+1) * [0]

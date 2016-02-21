@@ -75,7 +75,7 @@ U = MX.sym("U", 20)
 X  = [0,1]
 J = 0
 for k in range(20):
-  Ik = I.newcall(x0=X, p=U[k])
+  Ik = I(x0=X, p=U[k])
   X = Ik['xf']
   J += Ik['qf']   # Sum up quadratures
 
@@ -85,7 +85,7 @@ opts = {"ipopt.linear_solver":"ma27"}
 solver = nlpsol("solver", "ipopt", nlp, opts)
 
 # Pass bounds, initial guess and solve NLP
-sol = solver.newcall(lbx = -0.75, # Lower variable bound
+sol = solver(lbx = -0.75, # Lower variable bound
              ubx =  1.0,  # Upper variable bound
              lbg =  0.0,  # Lower constraint bound
              ubg =  0.0,  # Upper constraint bound

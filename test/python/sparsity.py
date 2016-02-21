@@ -281,7 +281,7 @@ class Sparsitytests(casadiTestCase):
     
     f = Function('f', [b],[c])
     fin = DM(b.sparsity(),range(1,len(nza)+1))
-    f_out = f.newcall(fin)
+    f_out = f(fin)
     
     self.checkarray(DM(f_out.nonzeros()),DM([1,0,0,7,0]),"sparsity index")
     

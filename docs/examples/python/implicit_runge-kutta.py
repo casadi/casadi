@@ -80,12 +80,12 @@ for j in range(d+1):
   lfcn = Function('lfcn', [tau], [L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  D[j] = lfcn.newcall(1.0)
+  D[j] = lfcn(1.0)
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
   for r in range(d+1):
-    C[j,r], _ = tfcn.newcall(tau_root[r])
+    C[j,r], _ = tfcn(tau_root[r])
 
 # Total number of variables for one finite element
 X0 = MX.sym("X0",nx)
@@ -104,7 +104,7 @@ for j in range(1,d+1):
     xp_j += C[r,j]*X[r]
       
   # Append collocation equations
-  f_j = f.newcall(X[j],P)
+  f_j = f(X[j],P)
   V_eq.append(h*f_j - xp_j)
 
 # Concatenate constraints
@@ -118,7 +118,7 @@ vfcn_sx = vfcn.expand()
 
 # Create a implicit function instance to solve the system of equations
 ifcn = rootfinder("ifcn", "newton", vfcn_sx, {"linear_solver":"csparse"})
-V = ifcn.newcall(MX(),X0,P)
+V = ifcn(MX(),X0,P)
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
 # Get an expression for the state at the end of the finie element
@@ -132,7 +132,7 @@ F = Function('F', [X0,P],[XF])
 # Do this iteratively for all finite elements
 X = X0
 for i in range(n):
-  X = F.newcall(X,P)
+  X = F(X,P)
 
 # Fixed-step integrator
 irk_integrator = Function("irk_integrator", {"x0":X0, "p":P, "xf":X},
@@ -171,7 +171,7 @@ for integrator in (irk_integrator,ref_integrator):
   arg["adj0_xf"] = [0,0,1]
 
   # Integrate
-  res = dintegrator.newcall(**arg)
+  res = dintegrator(**arg)
 
   # Get the nondifferentiated results
   print "%15s = " % "xf", res["der_xf"]

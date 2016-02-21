@@ -134,10 +134,10 @@ xk = MX.sym("xk",nx)
 uk = MX.sym("uk",nu)
 xkj = xk; xkj_L = 0
 for j in range(nj):
-   k1,k1_L = ode_fcn.newcall(xkj,uk)
-   k2,k2_L = ode_fcn.newcall(xkj + h/2*k1,uk)
-   k3,k3_L = ode_fcn.newcall(xkj + h/2*k2,uk)
-   k4,k4_L = ode_fcn.newcall(xkj + h*k3,uk)
+   k1,k1_L = ode_fcn(xkj,uk)
+   k2,k2_L = ode_fcn(xkj + h/2*k1,uk)
+   k3,k3_L = ode_fcn(xkj + h/2*k2,uk)
+   k4,k4_L = ode_fcn(xkj + h*k3,uk)
    xkj   += h/6 * (k1   + 2*k2   + 2*k3   + k4)
    xkj_L += h/6 * (k1_L + 2*k2_L + 2*k3_L + k4_L)
 integrator = Function('integrator', [xk,uk],[xkj,xkj_L])
@@ -182,12 +182,12 @@ v = vertcat(v); lbv = vertcat(lbv); ubv = vertcat(ubv); v0 = vertcat(v0)
 J = 0;  eq = []
 #$ We begin by adding to the NLP, the equations corresponding to the initial conditions. For this we
 #$ "call" the above created \verb|init_fcn| with the expression for the state at the first interval:
-eq0 = init_fcn.newcall(xk[0])
+eq0 = init_fcn(xk[0])
 eq.append(eq0)
 #$ Next, we loop over the shooting intervals, imposing continuity of the trajectory and summing up the
 #$ the cost contributions:
 for k in range(nk):
-    xk_end,Jk = integrator.newcall(xk[k],uk[k])
+    xk_end,Jk = integrator(xk[k],uk[k])
     J += Jk
     if k+1<nk: eq.append(xk_end - xk[k+1])
 #$ Now form the NLP callback function and create an NLP solver. We shall use the open-source solver IPOPT
@@ -198,7 +198,7 @@ nlp = {'x':v, 'f':J, 'g':vertcat(eq)}
 solver = nlpsol("solver", "ipopt", nlp)
 #$ Solving the NLP amounts to "evaluating the NLP solver"
 #$ The upper and lower bounds on the equality constraints are 0:
-sol = solver.newcall(lbx=lbv, ubx=ubv, x0=v0, lbg=0, ubg=0)
+sol = solver(lbx=lbv, ubx=ubv, x0=v0, lbg=0, ubg=0)
 #$ After making sure that the solution was successful, we retrieve the solution:
 v_opt  = sol["x"]
 x0_opt = v_opt[[vind['x'][k][0] for k in range(nk+1)]]

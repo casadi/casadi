@@ -53,7 +53,7 @@ f = Function('f', [x,y],[z])
 #! ----------------
 x0 = DM([[1,2,3],[4,5,6]])
 x1 = DM([[1,3],[0,6],[0,9]])
-z0 = f.newcall(x0, x1)
+z0 = f(x0, x1)
 print z0
 #! Note how this result is related to a numpy approach:
 a=matrix(x0).reshape(3,2)
@@ -70,7 +70,7 @@ print MX([1,2,3])
 #! As before, evaluation is lazy on the matrix level
 Y = MX.sym("Y")
 f = Function('f', [Y],[X])
-X0 = f.newcall([2])
+X0 = f([2])
 print X0
 
 #! Element assignement

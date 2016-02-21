@@ -444,7 +444,7 @@ class SXtests(casadiTestCase):
     x=SX.sym("x",2,2)
     y=SX.sym("y",2,2)
     f  = Function("f", [x,y], [x*y])
-    f.newcall(x,y)
+    f(x,y)
     
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
@@ -658,9 +658,9 @@ class SXtests(casadiTestCase):
     
     f = Function("f", [x],[x**2])
     
-    self.assertRaises(RuntimeError, lambda : f.newcall(y))
-    self.assertRaises(RuntimeError, lambda : f.newcall(q))
-    f.newcall(z)
+    self.assertRaises(RuntimeError, lambda : f(y))
+    self.assertRaises(RuntimeError, lambda : f(q))
+    f(z)
     
   def test_indexinglimits(self):
     self.message("Limits of indexing")
@@ -988,7 +988,7 @@ class SXtests(casadiTestCase):
     f = Function("f", [x],[eig_symbolic(x)])
     fin = DM(x.sparsity(),0)
     fin[Sparsity.diag(5)] = c.diag(range(5))
-    self.checkarray(f.newcall(fin), DM(range(5)))
+    self.checkarray(f(fin), DM(range(5)))
     
   def test_jacobian_empty(self):
     x = SX.sym("x",3)
@@ -1062,12 +1062,12 @@ class SXtests(casadiTestCase):
      bm = MX.sym("x",2)
      
      f = Function("f", [b],[a])
-     c = f.newcall(bm)
+     c = f(bm)
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
      
-     c = f.newcall(b)
+     c = f(b)
 
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
@@ -1076,12 +1076,12 @@ class SXtests(casadiTestCase):
      
      f = Function("f", [b],[a])
      
-     c = f.newcall(bm)
+     c = f(bm)
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)
      
-     c = f.newcall(b)
+     c = f(b)
 
      self.assertEqual(c.size1(),0)
      self.assertEqual(c.size2(),0)

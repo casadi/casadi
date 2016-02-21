@@ -99,7 +99,7 @@ opts["reltol"] = 1e-6
 opts["grid"] = ts
 opts["output_t0"] = True
 sim = integrator("sim", "cvodes", dae, opts)
-sol = sim.newcall(x0=[x0,y0], p=0)
+sol = sim(x0=[x0,y0], p=0)
 
 sol = sol['xf'].full().T
 
@@ -118,7 +118,7 @@ show()
 #$ We plot the map $\delta x_0 \mapsto \delta x(tend) $
 
 def out(dx0):
-        res = F.newcall(x0=[x0+dx0,y0])
+        res = F(x0=[x0+dx0,y0])
 	return res["xf"].full()
 dx0=numpy.linspace(-2,2,100)
 out = array([out(dx) for dx in dx0]).squeeze()
@@ -134,7 +134,7 @@ show()
 #
 
 dintegrator = F.derivative(1,0)
-res = dintegrator.newcall(der_x0=[x0,y0], fwd0_x0=[1,0])
+res = dintegrator(der_x0=[x0,y0], fwd0_x0=[1,0])
 A = res["fwd0_xf"][0]
 A = float(A) # FIXME
 
@@ -146,9 +146,9 @@ show()
 #! The interpetation is that a small initial circular patch of phase space evolves into ellipsoid patches at later stages.
 
 def out(t):
-        res = dintegrator.newcall(der_x0=[x0,y0], fwd0_x0=[1,0])
+        res = dintegrator(der_x0=[x0,y0], fwd0_x0=[1,0])
 	A=res["fwd0_xf"].full()
-        res = dintegrator.newcall(der_x0=[x0,y0], fwd0_x0=[0,1])
+        res = dintegrator(der_x0=[x0,y0], fwd0_x0=[0,1])
 	B=res["fwd0_xf"].full()
 	return array([A,B]).squeeze().T
 
@@ -188,13 +188,13 @@ show()
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
 u=MX.sym("u")
-w = F.newcall(x0=MX([1,0]),p=u)["xf"]
+w = F(x0=MX([1,0]),p=u)["xf"]
 
 #! We construct an MXfunction and a python help function 'out'
 f=Function('f', [u],[w])
 
 def out(u):
-        w0 = f.newcall(u)
+        w0 = f(u)
 	return w0.full()
 
 print out(0)
