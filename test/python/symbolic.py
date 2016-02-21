@@ -82,10 +82,7 @@ class Symbolictests(casadiTestCase):
              e = eval(op3,{"a": a_s, "b": b_s})
              f = Function("f", [a_s,b_s],[e])
              #print i, op1, op2, op3, " -> ", e
-             f_in = [0]*f.n_in();f_in[0]=numbers[0]
-             f_in[1]=numbers[1]
-             f_out = f(f_in)
-             r = f_out[0]
+             r = f.newcall(numbers[0], numbers[1])
              try:
                num = eval(op3,{"a": numbers[0], "b":  numbers[1]})
              except ZeroDivisionError:

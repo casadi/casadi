@@ -496,8 +496,8 @@ class casadiTestCase(unittest.TestCase):
       p = subprocess.Popen("gcc -fPIC -shared -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
       F2 = external(F.name(), './' + name + '.so')
       
-      Fout = F(inputs)
-      Fout2 = F2(inputs)
+      Fout = F.call(inputs)
+      Fout2 = F2.call(inputs)
       
       for i in range(F.n_out()):
         self.checkarray(Fout[i],Fout2[i])

@@ -639,7 +639,7 @@ class Functiontests(casadiTestCase):
 
         flatresref = []
         for r in zip(X,Y,Z_alt,V):
-          flatresref+=map(sin,fun(r))
+          flatresref+=map(sin,fun.call(r))
 
         Fref = Function("F",X+Y+Z+V,flatresref)
         
