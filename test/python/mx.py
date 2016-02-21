@@ -1689,10 +1689,8 @@ class MXtests(casadiTestCase):
             if 'nozero' in flags and v==0: continue
             r = casadiop([x])
             f = Function("f", [xx],[r])
-            f_in = [0]*f.n_in();f_in[0]=v
-            f_out = f(f_in)
-            
-            self.checkarray(f_out[0],numpyop(x_))
+            rr = f.newcall(v)
+            self.checkarray(rr,numpyop(x_))
             
             a = IM(f.sparsity_out(0),1)
             b = IM.ones(DM(numpyop(x_)).sparsity())
@@ -1720,15 +1718,11 @@ class MXtests(casadiTestCase):
                 if ("mul" in name or "mtimes" in name) and (sp.numel()==1 or sp2.numel()==1): continue
                 r = casadiop([x1,x2])
                 f = Function("f", [xx1,xx2],[r])
-                f_in = [0]*f.n_in();f_in[0]=v1
-                f_in[1]=v2
-                f_out = f(f_in)
+                f_out = f.newcall(v1, v2)
                 g = Function("g", [xx1,xx2],[r])
-                g_in = [0]*g.n_in();g_in[0]=v1
-                g_in[1]=v2
-                g_out = g(g_in)
+                g_out = g.newcall(v1, v2)
                 
-                self.checkarray(f_out[0],numpyop([x1_,x2_]),str([sp,sp2,v1,v2,x1_,x2_,name]))
+                self.checkarray(f_out,numpyop([x1_,x2_]),str([sp,sp2,v1,v2,x1_,x2_,name]))
                 
                 
                 if "mul" not in name:
