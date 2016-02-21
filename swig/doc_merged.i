@@ -3128,6 +3128,12 @@ Given a repeated matrix, computes the sum of repeated parts.
 
 ";
 
+%feature("docstring") friendwrap_inv_skew "
+
+Generate the 3-vector progenitor of a skew symmetric matrix.
+
+";
+
 %feature("docstring") friendwrap_dot "
 
 Inner product of two matrices with x and y matrices of the same dimension.
@@ -3474,6 +3480,12 @@ taken from an existing matrix.
 %feature("docstring") casadi::GenericMatrix::row "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring") friendwrap_skew "
+
+Generate a skew symmetric matrix from a 3-vector.
 
 ";
 

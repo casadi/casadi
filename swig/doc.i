@@ -4459,6 +4459,13 @@ Given a repeated matrix, computes the sum of repeated parts.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::inv_skew(const
+MatType &a) "
+
+Generate the 3-vector progenitor of a skew symmetric matrix.
+
+";
+
 %feature("docstring")  dot(const MatType &x, const MatType &y) "
 
 Inner product of two matrices with x and y matrices of the same dimension.
@@ -4852,6 +4859,13 @@ taken from an existing matrix.
 "
 
 Get the sparsity pattern. See the Sparsity class for details.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::skew(const MatType
+&a) "
+
+Generate a skew symmetric matrix from a 3-vector.
 
 ";
 
