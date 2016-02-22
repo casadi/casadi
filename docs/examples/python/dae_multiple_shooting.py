@@ -103,7 +103,7 @@ for k in range(nk):
   G.append(X_prev - Xk)
 
 # Allocate an NLP solver
-nlp = {'x':vertcat(w), 'f':J, 'g':vertcat(G)}
+nlp = {'x':vertcat(*w), 'f':J, 'g':vertcat(*G)}
 opts = {'ipopt.linear_solver':'ma27'}
 solver = nlpsol('solver', 'ipopt', nlp, opts)
 

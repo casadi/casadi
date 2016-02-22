@@ -586,7 +586,7 @@ class Functiontests(casadiTestCase):
 
       for parallelization in ["serial","openmp"] if args.run_slow else ["serial"]:
         print parallelization
-        res = fun.map(map(c.casadi._horzcat,[X,Y,Z_alt,V]),parallelization)
+        res = fun.map(map(lambda x: horzcat(*x),[X,Y,Z_alt,V]),parallelization)
 
 
         F = Function("F",X+Y+Z+V,map(sin,res))
@@ -596,7 +596,7 @@ class Functiontests(casadiTestCase):
           for i,e in enumerate(map(sin,fun.call(r))):
             resref[i] = resref[i] + [e]
 
-        Fref = Function("F",X+Y+Z+V,map(c.casadi._horzcat,resref))
+        Fref = Function("F",X+Y+Z+V,map(lambda x: horzcat(*x),resref))
         
         np.random.seed(0)
         X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
@@ -673,7 +673,7 @@ class Functiontests(casadiTestCase):
     for Z_alt in [Z,[MX()]*3]:
       zi+= 1
       for parallelization in ["serial","openmp"]:
-        res = fun.mapsum(map(c.casadi._horzcat,[X,Y,Z_alt,V]),parallelization) # Joris - clean alternative for this?
+        res = fun.mapsum(map(lambda x: horzcat(*x),[X,Y,Z_alt,V]),parallelization) # Joris - clean alternative for this?
 
 
         F = Function("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0})

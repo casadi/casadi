@@ -149,18 +149,18 @@ estimated_X= DM.zeros(Nstates,Nsimulation)
 estimated_W = DM.zeros(Ndisturbances,Nsimulation-1)
 # For the first instance we run the filter, we need to initialize it.
 current_parameters = parameters(0)
-current_parameters["U",horzcat] = simulated_U[:,0:N-1]
-current_parameters["Y",horzcat] = simulated_Y[:,0:N]
+current_parameters["U",lambda x: horzcat(*x)] = simulated_U[:,0:N-1]
+current_parameters["Y",lambda x: horzcat(*x)] = simulated_Y[:,0:N]
 current_parameters["S"] = linalg.inv(P) # Arrival cost is the inverse of the initial covariance
 current_parameters["x0"] = x0
 initialisation_state = shooting(0)
-initialisation_state["X",horzcat] = simulated_X[:,0:N]
+initialisation_state["X",lambda x: horzcat(*x)] = simulated_X[:,0:N]
 res = nlpsol(p=current_parameters, x0=initialisation_state, lbg=0, ubg=0)
 
 # Get the solution
 solution = shooting(res["x"])
-estimated_X[:,0:N] = solution["X",horzcat]
-estimated_W[:,0:N-1] = solution["W",horzcat]
+estimated_X[:,0:N] = solution["X",lambda x: horzcat(*x)]
+estimated_W[:,0:N-1] = solution["W",lambda x: horzcat(*x)]
 
 # Now make a loop for the rest of the simulation
 for i in range(1,Nsimulation-N+1):
@@ -176,14 +176,14 @@ for i in range(1,Nsimulation-N+1):
   F = PHI(solution["X",0], current_parameters["U",0], solution["W",0])[0]
   P = mtimes([F,P,F.T]) + linalg.inv(Q)
   # Get the measurements and control inputs 
-  current_parameters["U",horzcat] = simulated_U[:,i:i+N-1]
-  current_parameters["Y",horzcat] = simulated_Y[:,i:i+N]
+  current_parameters["U",lambda x: horzcat(*x)] = simulated_U[:,i:i+N-1]
+  current_parameters["Y",lambda x: horzcat(*x)] = simulated_Y[:,i:i+N]
   current_parameters["S"] = linalg.inv(P)
   current_parameters["x0"] = x0
   # Initialize the system with the shifted solution
-  initialisation_state["W",horzcat,0:N-2] = estimated_W[:,i:i+N-2] # The shifted solution for the disturbances
+  initialisation_state["W",lambda x: horzcat(*x),0:N-2] = estimated_W[:,i:i+N-2] # The shifted solution for the disturbances
   initialisation_state["W",N-2] = DM.zeros(Ndisturbances,1) # The last node for the disturbances is initialized with zeros
-  initialisation_state["X",horzcat,0:N-1] = estimated_X[:,i:i+N-1] # The shifted solution for the state estimates
+  initialisation_state["X",lambda x: horzcat(*x),0:N-1] = estimated_X[:,i:i+N-1] # The shifted solution for the state estimates
   # The last node for the state is initialized with a forward simulation
   phi0 = phi(initialisation_state["X",N-1], current_parameters["U",-1], initialisation_state["W",-1])
   initialisation_state["X",N-1] = phi0
