@@ -230,8 +230,8 @@ print init["X",:,:,"x"]
 #! Callables/functions can be thrown in in the powerIndex at any location.
 #! They operate on subresults obtain from resolving the remainder of the powerIndex
 
-print init["X",:,horzcat,:,"x"]
-print init["X",vertcat,:,horzcat,:,"x"]
+print init["X",:,lambda v: horzcat(*v),:,"x"]
+print init["X",lambda v: vertcat(*v),:,lambda v: horzcat(*v),:,"x"]
 print init["X",blockcat,:,:,"x"]
 
 #! Set all quaternions to 1,0,0,0
