@@ -1991,7 +1991,7 @@ namespace casadi {
   Function IdasInterface::getJacB() {
     if (g_.is_a("sxfunction")) {
       return getJacGenB<SX>();
-    } else if (g_.is_a("sxfunction")) {
+    } else if (g_.is_a("mxfunction")) {
       return getJacGenB<MX>();
     } else {
       throw CasadiException("IdasInterface::getJacB(): Not an SXFunction or MXFunction");
