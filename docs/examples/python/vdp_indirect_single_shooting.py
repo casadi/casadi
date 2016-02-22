@@ -71,7 +71,7 @@ f = substitute(f,u,u_opt)
 u_fcn = Function('ufcn', [vertcat(x,lam)], [u_opt])
 
 # Formulate the DAE
-dae = {'x':vertcat((x,lam)), 'ode':f}
+dae = {'x':vertcat(x,lam), 'ode':f}
 
 # Create an integrator (CVodes)
 opts = {}

@@ -134,7 +134,7 @@ nlp = {'x':V, 'f':0.5*dot(e,e),'g':gaps}
 
 # Multipleshooting allows for careful initialization
 yd = np.diff(y_data,axis=0)*fs
-X_guess = horzcat(y_data , vertcat(yd,yd[-1]]).T;
+X_guess = horzcat(y_data , vertcat(yd,yd[-1])).T;
 
 x0 = veccat(param_guess,X_guess)
 
