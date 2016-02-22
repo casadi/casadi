@@ -32,7 +32,7 @@ x=SX.sym('x')
 y=SX.sym('y')
 obj = (1-x)**2+100*(y-x**2)**2
 constr = x**2+y**2
-nlp={'x':vertcat([x,y]), 'f':obj, 'g':constr}
+nlp={'x':vertcat(x,y), 'f':obj, 'g':constr}
 
 #! We solve the problem with an exact Hessian (default)
 solver = nlpsol('solver', 'ipopt', nlp)

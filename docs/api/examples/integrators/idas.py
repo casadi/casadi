@@ -51,9 +51,9 @@ v=SX.sym("v")
 lambd=SX.sym("lambda")
 
 #! All states and parameters
-x_all = vertcat([x,u,y,v])
+x_all = vertcat(x,u,y,v)
 z_all = lambd
-p_all = vertcat([L,g])
+p_all = vertcat(L,g)
 
 #! the initial state of the pendulum
 P_ = [5,10] # parameters
@@ -62,7 +62,7 @@ XDOT_ = [-1.0/3,1147.0/240,1.0/4,-653.0/180] # state derivatives
 Z_ = [1147.0/720] # algebraic state
 
 #! We construct the DAE system
-ode = vertcat([u,lambd*x,v,lambd*y+g])
+ode = vertcat(u,lambd*x,v,lambd*y+g)
 alg = x**2+y**2-L**2
 dae = {'x':x_all, 'z':z_all, 'p':p_all, 'ode':ode, 'alg':alg}
 f = Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
@@ -93,10 +93,10 @@ except Exception as e:
   print e
   
 #! We construct a reworked version od the DAE (index reduced), now it is DAE-index 1
-ode = vertcat([u,lambd*x])
-alg = vertcat([x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd])
-x_all = vertcat([x,u])
-z_all = vertcat([y,v,lambd])
+ode = vertcat(u,lambd*x)
+alg = vertcat(x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd)
+x_all = vertcat(x,u)
+z_all = vertcat(y,v,lambd)
 dae = {'x':x_all, 'z':z_all, 'p':p_all, 'ode':ode, 'alg':alg}
 f = Function('f', [x_all, z_all, p_all], [ode, alg], ['x', 'z', 'p'], ['ode', 'alg'])
 

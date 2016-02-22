@@ -44,13 +44,13 @@ ff = SX.sym("f")
 
 tf = 40
 
-params = vertcat([w0,a3,a5,mu1,mu3,ff])
-rhs    = vertcat([x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff])
+params = vertcat(w0,a3,a5,mu1,mu3,ff)
+rhs    = vertcat(x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff)
 
 dae={'x':x, 'p':params, 'ode':rhs}
 
 # t = SX.sym("t")
-# cf=SX.fun("cf", controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
+# cf=SX.fun("cf", controldaeIn(t=t, x=x, p=vertcat(w0,a3,a5,mu1,mu3), u=ff),[rhs])
 
 # opts = {}
 # opts["tf"] = tf

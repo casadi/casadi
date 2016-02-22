@@ -30,7 +30,7 @@ y = SX.sym("y",2)   # A vector (n-by-1 matrix) symbolic primitive
 z = SX.sym("z",2,3) # An n-by-m matrix symbolic primitive
 
 ins =  [x,y] # function inputs
-outs = [x,y,vertcat((x,y)),y*x,0]
+outs = [x,y,vertcat(x,y),y*x,0]
 
 print outs
 

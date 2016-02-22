@@ -35,7 +35,7 @@ t = SX.sym('t')
 
 u = SX.sym('u') 
 v = SX.sym('v') 
-states = vertcat([u,v])
+states = vertcat(u,v)
 
 eps   = SX.sym('eps')
 mu    = SX.sym('mu')
@@ -44,8 +44,8 @@ k     = SX.sym('k')
 sigma = SX.sym('sigma')
 Omega = 2 + eps*sigma
 
-params = vertcat([eps,mu,alpha,k,sigma])
-rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
+params = vertcat(eps,mu,alpha,k,sigma)
+rhs    = vertcat(v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t)))
 
 #! We will simulate over 50 seconds, 1000 timesteps.
 dae={'x':states, 'p':params, 't':t, 'ode':rhs}

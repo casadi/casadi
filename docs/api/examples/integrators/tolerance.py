@@ -29,9 +29,9 @@ from pylab import *
 
 x=SX.sym('x') 
 dx=SX.sym('dx')
-states = vertcat([x,dx])
+states = vertcat(x,dx)
 
-dae={'x':states, 'ode':vertcat([dx,-x])}
+dae={'x':states, 'ode':vertcat(dx,-x)}
 
 tend = 2*pi*3
 ts = linspace(0,tend,1000)

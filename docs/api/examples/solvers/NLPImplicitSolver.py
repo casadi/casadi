@@ -60,7 +60,7 @@ k_     = 0.2
 params_ = [0.1,0.1,alpha_,k_,sigma_]
 
 #! We create a NLPImplicitSolver instance
-f=Function("f", [vertcat([a, gamma]), vertcat(params)], [vertcat([res0, res1])])
+f=Function("f", [vertcat(a, gamma), vertcat(*params)], [vertcat(res0, res1)])
 opts = {}
 opts["nlpsol"] = "ipopt"
 opts["nlpsol_options"] = {"ipopt.tol":1e-14}

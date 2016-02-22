@@ -41,9 +41,9 @@ k     = SX.sym('k')
 sigma = SX.sym('sigma')
 Omega = 2 + eps*sigma
 
-params = vertcat([eps,mu,alpha,k,sigma])
-states = vertcat([u,v])
-rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
+params = vertcat(eps,mu,alpha,k,sigma)
+states = vertcat(u,v)
+rhs    = vertcat(v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t)))
 
 dae = {'x':states, 'p':params, 't':t, 'ode':rhs}
 

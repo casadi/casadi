@@ -34,7 +34,7 @@ x=SX.sym("x")
 y=SX.sym("y")
 
 f = (1-x)**2+100*(y-x**2)**2
-nlp={'x':vertcat((x,y)), 'f':f,'g':x+y}
+nlp={'x':vertcat(x,y), 'f':f,'g':x+y}
 fcn = Function('f', [x, y], [f])
  
 # #! Simple callback
