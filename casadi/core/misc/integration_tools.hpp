@@ -35,10 +35,10 @@ namespace casadi {
   \param scheme  'radau' or 'legendre'
   **/
   CASADI_EXPORT
-    std::vector<double> collocationPoints(int order, const std::string& scheme="radau");
+    std::vector<double> collocation_points(int order, const std::string& scheme="radau");
 #ifndef SWIG
   CASADI_EXPORT
-    std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
+    std::vector<long double> collocation_pointsL(int order, const std::string& scheme="radau");
 #endif // SWIG
   ///@}
 

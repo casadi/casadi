@@ -63,7 +63,7 @@ D = np.zeros(deg+1)
 tau = SX.sym("tau")
   
 # All collocation time points
-tau_root = collocationPoints(deg,cp)
+tau_root = [0] + collocation_points(deg, cp)
 
 T = np.zeros((nk,deg+1))
 for i in range(nk):

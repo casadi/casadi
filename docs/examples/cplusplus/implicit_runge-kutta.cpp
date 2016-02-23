@@ -59,15 +59,16 @@ int main(){
   // Size of the finite elements
   double h = tf/n;
 
+  // Degree of interpolating polynomial
+  int d = 4;
+
   // Choose collocation points
-  vector<double> tau_root = collocationPoints(4, "legendre");
+  vector<double> tau_root = collocation_points(d, "legendre");
+  tau_root.insert(tau_root.begin(), 0);
 
   // Nonlinear solver to use
   string solver = "newton";
   //string solver = "ipopt";
-
-  // Degree of interpolating polynomial
-  int d = tau_root.size()-1;
 
   // Coefficients of the collocation equation
   vector<vector<double> > C(d+1,vector<double>(d+1,0));

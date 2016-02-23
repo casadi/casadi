@@ -84,7 +84,8 @@ namespace casadi {
   void CollocationIntegrator::setupFG() {
 
     // All collocation time points
-    std::vector<long double> tau_root = collocationPointsL(deg_, collocation_scheme_);
+    std::vector<long double> tau_root = collocation_pointsL(deg_, collocation_scheme_);
+    tau_root.insert(tau_root.begin(), 0);
 
     // Coefficients of the collocation equation
     vector<vector<double> > C(deg_+1, vector<double>(deg_+1, 0));

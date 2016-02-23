@@ -55,11 +55,11 @@ n = 100
 # Size of the finite elements
 h = tf/n
 
-# Choose collocation points
-tau_root = collocationPoints(4,"legendre")
-
 # Degree of interpolating polynomial
-d = len(tau_root)-1
+d = 4
+
+# Choose collocation points
+tau_root = [0] + collocation_points(d, "legendre")
 
 # Coefficients of the collocation equation
 C = N.zeros((d+1,d+1))

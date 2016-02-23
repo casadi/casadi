@@ -26,11 +26,11 @@ from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
 
-# Choose collocation points
-tau_root = collocationPoints(3,"radau")
-
 # Degree of interpolating polynomial
-d = len(tau_root)-1
+d = 3
+
+# Choose collocation points
+tau_root = [0] + collocation_points(d, "radau")
 
 # Coefficients of the collocation equation
 C = NP.zeros((d+1,d+1))
