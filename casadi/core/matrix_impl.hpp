@@ -2086,9 +2086,9 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::polyval(const Matrix<Scalar>& p, const Matrix<Scalar>& x) {
     casadi_assert_message(p.is_dense(), "polynomial coefficients vector must be dense");
     casadi_assert_message(p.is_vector() && p.nnz()>0, "polynomial coefficients must be a vector");
-    Matrix<Scalar> ret = p[0];
-    for (int i=1; i<p.nnz(); ++i) {
-      ret = ret*x + p[i];
+    Matrix<Scalar> ret = x;
+    for (auto&& e : ret.nonzeros()) {
+      e = casadi_polyval(p.ptr(), p.numel()-1, e);
     }
     return ret;
   }

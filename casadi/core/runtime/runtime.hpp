@@ -119,6 +119,10 @@ namespace casadi {
   /// Get the nonzeros for the upper triangular half
   template<typename real_t>
   void CASADI_PREFIX(getu)(const real_t* x, const int* sp_x, real_t* v);
+
+  /// Evaluate a polynomial
+  template<typename real_t>
+  real_t CASADI_PREFIX(polyval)(const real_t* p, int n, real_t x);
 }
 
 // Implementations
@@ -526,6 +530,16 @@ namespace casadi {
         *v++ = x[el];
       }
     }
+  }
+
+  template<typename real_t>
+  real_t CASADI_PREFIX(polyval)(const real_t* p, int n, real_t x) {
+    real_t r=p[0];
+    int i;
+    for (i=1; i<=n; ++i) {
+      r = r*x + p[i];
+    }
+    return r;
   }
 
 } // namespace casadi
