@@ -10447,6 +10447,12 @@ std::string &solver, const Function &dae, const Dict &opts=Dict()) " ";
 std::string &solver, const std::pair< Function, Function > &dae, const Dict
 &opts=Dict()) " ";
 
+%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
+inc_x) " [INTERNAL]  IAMAX: index corresponding to the entry with the
+largest absolute value.
+
+";
+
 %feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
 
 Check if the vector has negative entries.
@@ -10492,8 +10498,11 @@ Get the number of QP solver outputs.
 
 ";
 
-%feature("docstring")  casadi::zip(const std::vector< std::string > &id,
-const std::vector< T > &mat) " [INTERNAL] ";
+%feature("docstring")  casadi::casadi_mtimes(const real_t *x, const int
+*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
+*w, int tr) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
+
+";
 
 %feature("docstring")  casadi::qpsol_n_in() "
 
@@ -10979,6 +10988,18 @@ dense matrix (lapack)
 %feature("docstring")  casadi::integrator_n_in() "
 
 Get the number of integrator inputs.
+
+";
+
+%feature("docstring")  casadi::collocation_points(int order, const
+std::string &scheme="radau") "
+
+Obtain collocation points of specific order and scheme.
+
+Parameters:
+-----------
+
+scheme:  'radau' or 'legendre'
 
 ";
 
@@ -11628,11 +11649,8 @@ std::string &solver, const SXDict &qp, const Dict &opts=Dict()) " ";
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const MXDict &qp, const Dict &opts=Dict()) " ";
 
-%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
-inc_x) " [INTERNAL]  IAMAX: index corresponding to the entry with the
-largest absolute value.
-
-";
+%feature("docstring")  casadi::zip(const std::vector< std::string > &id,
+const std::vector< T > &mat) " [INTERNAL] ";
 
 %feature("docstring")  casadi::replaceMat(const M &arg, const Sparsity &inp,
 bool hcat=false) " [INTERNAL] ";
@@ -11710,15 +11728,8 @@ Hash value of an integer.
 
 ";
 
-%feature("docstring")  casadi::collocationPoints(int order, const
-std::string &scheme="radau") "
-
-Obtain collocation points of specific order and scheme.
-
-Parameters:
------------
-
-scheme:  'radau' or 'legendre'
+%feature("docstring")  casadi::casadi_polyval(const real_t *p, int n, real_t
+x) " [INTERNAL]  Evaluate a polynomial.
 
 ";
 
@@ -11828,12 +11839,6 @@ Get the documentation string for a plugin.
 
 %feature("docstring")  casadi::casadi_dot(int n, const real_t *x, const
 real_t *y) " [INTERNAL]  Inner product.
-
-";
-
-%feature("docstring")  casadi::casadi_mtimes(const real_t *x, const int
-*sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
-*w, int tr) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
 
 ";
 

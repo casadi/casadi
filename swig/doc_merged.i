@@ -8345,6 +8345,11 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::casadi_iamax "[INTERNAL]  IAMAX: index
+corresponding to the entry with the largest absolute value.
+
+";
+
 %feature("docstring") casadi::hasNegative "
 
 Check if the vector has negative entries.
@@ -8390,7 +8395,10 @@ Get the number of QP solver outputs.
 
 ";
 
-%feature("docstring") casadi::zip "[INTERNAL] ";
+%feature("docstring") casadi::casadi_mtimes "[INTERNAL]  Sparse matrix-
+matrix multiplication: z <- z + x*y.
+
+";
 
 %feature("docstring") casadi::qpsol_n_in "
 
@@ -8865,6 +8873,17 @@ matrix (lapack)
 %feature("docstring") casadi::integrator_n_in "
 
 Get the number of integrator inputs.
+
+";
+
+%feature("docstring") casadi::collocation_points "
+
+Obtain collocation points of specific order and scheme.
+
+Parameters:
+-----------
+
+scheme:  'radau' or 'legendre'
 
 ";
 
@@ -9490,10 +9509,7 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::casadi_iamax "[INTERNAL]  IAMAX: index
-corresponding to the entry with the largest absolute value.
-
-";
+%feature("docstring") casadi::zip "[INTERNAL] ";
 
 %feature("docstring") casadi::replaceMat "[INTERNAL] ";
 
@@ -9574,14 +9590,8 @@ Hash value of an integer.
 
 ";
 
-%feature("docstring") casadi::collocationPoints "
-
-Obtain collocation points of specific order and scheme.
-
-Parameters:
------------
-
-scheme:  'radau' or 'legendre'
+%feature("docstring") casadi::casadi_polyval "[INTERNAL]  Evaluate a
+polynomial.
 
 ";
 
@@ -9683,11 +9693,6 @@ Get the documentation string for a plugin.
 ";
 
 %feature("docstring") casadi::casadi_dot "[INTERNAL]  Inner product.
-
-";
-
-%feature("docstring") casadi::casadi_mtimes "[INTERNAL]  Sparse matrix-
-matrix multiplication: z <- z + x*y.
 
 ";
 
