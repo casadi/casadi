@@ -384,6 +384,8 @@ import_array();
 #endif // SWIGMATLAB
     template<typename M1, typename M2> GUESTOBJECT* from_ptr(const std::pair<M1, M2>* a);
 #ifdef SWIGMATLAB
+    GUESTOBJECT* from_ptr(const std::vector<double> *a);
+    GUESTOBJECT* from_ptr(const std::vector<int> *a);
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
 #endif // SWIGMATLAB
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
@@ -823,6 +825,16 @@ import_array();
     }
 
 #ifdef SWIGMATLAB
+    GUESTOBJECT* from_ptr(const std::vector<double> *a) {
+      mxArray* ret = mxCreateDoubleMatrix(1, a->size(), mxREAL);
+      std::copy(a->begin(), a->end(), static_cast<double*>(mxGetData(ret)));
+      return ret;
+    }
+    GUESTOBJECT* from_ptr(const std::vector<int> *a) {
+      mxArray* ret = mxCreateDoubleMatrix(1, a->size(), mxREAL);
+      std::copy(a->begin(), a->end(), static_cast<double*>(mxGetData(ret)));
+      return ret;
+    }
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a) {
       // Collect arguments as char arrays
       std::vector<const char*> str(a->size());
