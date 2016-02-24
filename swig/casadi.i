@@ -324,41 +324,87 @@ import_array();
     /* Check if Null or None */
     bool is_null(GUESTOBJECT *p);
 
-    /* Convert a pointer in interfaced language to C++
-     * Input: GUESTOBJECT pointer p
-     * Output: Pointer to pointer: At input, pointer to pointer to temporary
-     * The routine will either:
-     *   - Do nothing, if 0
-     *   - Change the pointer
-     *   - Change the temporary object
-     * Returns true upon success, else false
+    /* Typemaps from CasADi types to types in the interfaced language:
+     * 
+     * to_ptr: Converts a pointer in interfaced language to C++:
+     *   Input: GUESTOBJECT pointer p
+     *   Output: Pointer to pointer: At input, pointer to pointer to temporary
+     *   The routine will either:
+     *     - Do nothing, if 0
+     *     - Change the pointer
+     *     - Change the temporary object
+     *   Returns true upon success, else false
+     *
+     * from_ptr: Converts result from CasADi to interfaced language
      */
+
+    // Basic types
     bool to_ptr(GUESTOBJECT *p, bool** m);
+    GUESTOBJECT* from_ptr(const bool *a);
     bool to_ptr(GUESTOBJECT *p, int** m);
+    GUESTOBJECT* from_ptr(const int *a);
     bool to_ptr(GUESTOBJECT *p, double** m);
+    GUESTOBJECT* from_ptr(const double *a);
     bool to_ptr(GUESTOBJECT *p, std::string** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::Slice** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::Sparsity** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::DM** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::IM** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::SX** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::MX** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::Function** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::GenericType** m);
-    bool to_ptr(GUESTOBJECT *p, casadi::SXElem** m);
-#ifdef SWIGMATLAB
-    bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
-#endif // SWIGMATLAB
-    template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
+    GUESTOBJECT* from_ptr(const std::string *a);
+
+    // std::vector
 #ifdef SWIGMATLAB
     bool to_ptr(GUESTOBJECT *p, std::vector<double> **m);
+    GUESTOBJECT* from_ptr(const std::vector<double> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<int>** m);
+    GUESTOBJECT* from_ptr(const std::vector<int> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
+    GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
 #endif // SWIGMATLAB
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
-    template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
+    template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
 
-    // Same as the above, but with pointer instead of pointer to pointer
+    // std::pair
+#ifdef SWIGMATLAB
+    bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
+    GUESTOBJECT* from_ptr(const std::pair<int, int>* a);
+#endif // SWIGMATLAB
+    template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
+    template<typename M1, typename M2> GUESTOBJECT* from_ptr(const std::pair<M1, M2>* a);
+
+    // std::map
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
+    template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
+
+    // Slice
+    bool to_ptr(GUESTOBJECT *p, casadi::Slice** m);
+    GUESTOBJECT* from_ptr(const casadi::Slice *a);
+
+    // Sparsity
+    bool to_ptr(GUESTOBJECT *p, casadi::Sparsity** m);
+    GUESTOBJECT* from_ptr(const casadi::Sparsity *a);
+
+    // Matrix<>
+    bool to_ptr(GUESTOBJECT *p, casadi::DM** m);
+    GUESTOBJECT* from_ptr(const casadi::DM *a);
+    bool to_ptr(GUESTOBJECT *p, casadi::IM** m);
+    GUESTOBJECT* from_ptr(const casadi::IM *a);
+    bool to_ptr(GUESTOBJECT *p, casadi::SX** m);
+    GUESTOBJECT* from_ptr(const casadi::SX *a);
+
+    // MX
+    bool to_ptr(GUESTOBJECT *p, casadi::MX** m);
+    GUESTOBJECT* from_ptr(const casadi::MX *a);
+
+    // Function
+    bool to_ptr(GUESTOBJECT *p, casadi::Function** m);
+    GUESTOBJECT* from_ptr(const casadi::Function *a);
+
+    // SXElem
+    bool to_ptr(GUESTOBJECT *p, casadi::SXElem** m);
+    GUESTOBJECT* from_ptr(const casadi::SXElem *a);
+
+    // GenericType
+    bool to_ptr(GUESTOBJECT *p, casadi::GenericType** m);
+    GUESTOBJECT* from_ptr(const casadi::GenericType *a);
+
+    // Same as to_ptr, but with pointer instead of pointer to pointer
     template<typename M> bool to_val(GUESTOBJECT *p, M* m);
 
     // Check if conversion is possible
@@ -366,32 +412,6 @@ import_array();
 
     // Assign to a vector, if conversion is allowed
     template<typename E, typename M> bool assign_vector(E* d, int sz, std::vector<M>** m);
-
-    /* Convert result from CasADi to interfaced language */
-    GUESTOBJECT* from_ptr(const casadi::GenericType *a);
-    GUESTOBJECT* from_ptr(const bool *a);
-    GUESTOBJECT* from_ptr(const int *a);
-    GUESTOBJECT* from_ptr(const double *a);
-    GUESTOBJECT* from_ptr(const std::string *a);
-    GUESTOBJECT* from_ptr(const casadi::Slice *a);
-    GUESTOBJECT* from_ptr(const casadi::Sparsity *a);
-    GUESTOBJECT* from_ptr(const casadi::DM *a);
-    GUESTOBJECT* from_ptr(const casadi::IM *a);
-    GUESTOBJECT* from_ptr(const casadi::SX *a);
-    GUESTOBJECT* from_ptr(const casadi::MX *a);
-    GUESTOBJECT* from_ptr(const casadi::Function *a);
-    GUESTOBJECT* from_ptr(const casadi::SXElem *a);
-#ifdef SWIGMATLAB
-    GUESTOBJECT* from_ptr(const std::pair<int, int>* a);
-#endif // SWIGMATLAB
-    template<typename M1, typename M2> GUESTOBJECT* from_ptr(const std::pair<M1, M2>* a);
-#ifdef SWIGMATLAB
-    GUESTOBJECT* from_ptr(const std::vector<double> *a);
-    GUESTOBJECT* from_ptr(const std::vector<int> *a);
-    GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
-#endif // SWIGMATLAB
-    template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
-    template<typename M> GUESTOBJECT* from_ptr(const std::map<std::string, M> *a);
 
     // Same as the above, but with reference instead of pointer
     template<typename M> GUESTOBJECT* from_ref(const M& m) { return from_ptr(&m);}
