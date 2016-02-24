@@ -84,7 +84,7 @@ namespace casadi {
   void CollocationIntegrator::setupFG() {
 
     // All collocation time points
-    std::vector<long double> tau_root = collocation_pointsL(deg_, collocation_scheme_);
+    std::vector<double> tau_root = collocation_points(deg_, collocation_scheme_);
     tau_root.insert(tau_root.begin(), 0);
 
     // Coefficients of the collocation equation
@@ -109,18 +109,22 @@ namespace casadi {
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation
-      D[j] = zeroIfSmall(p(1.0L));
+      if (collocation_scheme_=="radau") {
+        D[j] = j==deg_ ? 1 : 0;
+      } else {
+        D[j] = p(1.0);
+      }
 
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Polynomial dp = p.derivative();
       for (int r=0; r<deg_+1; ++r) {
-        C[j][r] = zeroIfSmall(dp(tau_root[r]));
+        C[j][r] = dp(tau_root[r]);
       }
 
       // Integrate polynomial to get the coefficients of the quadratures
       Polynomial ip = p.anti_derivative();
-      B[j] = zeroIfSmall(ip(1.0L));
+      B[j] = ip(1.0);
     }
 
     // Symbolic inputs
@@ -290,11 +294,6 @@ namespace casadi {
       G_ = Function("rdae", G_in, G_out);
       alloc(G_);
     }
-  }
-
-
-  double CollocationIntegrator::zeroIfSmall(double x) {
-    return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
   void CollocationIntegrator::reset(IntegratorMemory* mem, double t, const double* x,

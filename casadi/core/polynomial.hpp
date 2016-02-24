@@ -37,7 +37,7 @@ namespace casadi {
   class CASADI_EXPORT Polynomial : public PrintableObject<Polynomial> {
   public:
     /// Floating point type
-    typedef long double real_t;
+    typedef double real_t;
 
     /// Construct a constant polynomial
     Polynomial(real_t scalar=1);
