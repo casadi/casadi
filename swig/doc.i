@@ -925,6 +925,12 @@ Get input scheme name by index.
 
 ";
 
+%feature("docstring")  casadi::Function::has_free() const  "
+
+Does the function have free variables.
+
+";
+
 %feature("docstring")  casadi::Function::reverse(const std::vector< MX >
 &arg, const std::vector< MX > &res, const std::vector< std::vector< MX > >
 &aseed, std::vector< std::vector< MX > > &output_asens, bool
@@ -3733,6 +3739,12 @@ Export / Generate C code for the function.
 %feature("docstring")  casadi::Function::rootfinder_fun() "
 
 Access rhs function for a rootfinder.
+
+";
+
+%feature("docstring")  casadi::Function::has_free() const  "
+
+Does the function have free variables.
 
 ";
 

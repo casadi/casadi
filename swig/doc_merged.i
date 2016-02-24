@@ -561,6 +561,12 @@ Get input scheme name by index.
 
 ";
 
+%feature("docstring") casadi::Callback::has_free "
+
+Does the function have free variables.
+
+";
+
 %feature("docstring") casadi::Callback::reverse "
 
 >  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
@@ -2534,6 +2540,12 @@ Export / Generate C code for the function.
 %feature("docstring") casadi::Function::rootfinder_fun "
 
 Access rhs function for a rootfinder.
+
+";
+
+%feature("docstring") casadi::Function::has_free "
+
+Does the function have free variables.
 
 ";
 
