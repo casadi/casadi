@@ -59,10 +59,16 @@ namespace casadi {
 
       static std::string casadipath;
 
+      static bool hierarchical_sparsity;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
       static bool getSimplificationOnTheFly() { return simplification_on_the_fly; }
+
+      // Setter and getter for hierarchical_sparsity
+      static void setHierarchicalSparsity(bool flag) { hierarchical_sparsity = flag; }
+      static bool getHierarchicalSparsity() { return hierarchical_sparsity; }
 
       static void setCasadiPath(const std::string & path) { casadipath = path; }
       static std::string getCasadiPath() { return casadipath; }

@@ -29,6 +29,7 @@
 namespace casadi {
 
   bool GlobalOptions::simplification_on_the_fly = true;
+  bool GlobalOptions::hierarchical_sparsity = true;
 
   std::string GlobalOptions::casadipath = "";
 

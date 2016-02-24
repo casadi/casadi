@@ -26,6 +26,7 @@
 #include "function_internal.hpp"
 #include "../mx/casadi_call.hpp"
 #include "../std_vector_tools.hpp"
+#include "../global_options.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -877,7 +878,7 @@ namespace casadi {
                   if (spsens & (bvec_t(1) << bvec_i)) {
                     // if dependency is found, add it to the new sparsity pattern
                     int ind = lookup.sparsity().get_nz(bvec_i, cri);
-                    casadi_assert(ind!=-1);
+                    if (ind==-1) continue;
                     int lk = lookup->at(ind);
                     if (lk>-bvec_size) {
                       jrow.push_back(bvec_i+lk);
@@ -1170,7 +1171,7 @@ namespace casadi {
                   if (spsens & bvec_lookup[bvec_i]) {
                     // if dependency is found, add it to the new sparsity pattern
                     int ind = lookup.sparsity().get_nz(bvec_i, cri);
-                    casadi_assert(ind!=-1);
+                    if (ind==-1) continue;
                     jrow.push_back(bvec_i+lookup->at(ind));
                     jcol.push_back(fri);
                   }
@@ -1227,7 +1228,8 @@ namespace casadi {
     // Check if we are able to propagate dependencies through the function
     if (spCanEvaluate(true) || spCanEvaluate(false)) {
       Sparsity sp;
-      if (nnz_in(iind)>3*bvec_size && nnz_out(oind)>3*bvec_size) {
+      if (nnz_in(iind)>3*bvec_size && nnz_out(oind)>3*bvec_size &&
+            GlobalOptions::hierarchical_sparsity) {
         if (symmetric) {
           sp = getJacSparsityHierarchicalSymm(iind, oind);
         } else {
