@@ -85,7 +85,7 @@ namespace casadi {
 
   inline bool has_dot(const Dict& opts) {
     for (auto&& op : opts) {
-      if (op.first.find('.') != string::npos) {
+      if (op.first.find('.') != string::npos || op.first.find("__") != string::npos) {
         return true;
       }
     }
@@ -124,7 +124,13 @@ namespace casadi {
       // Process options
       for (auto&& op : opts) {
         // Find the dot if any
-        string::size_type dotpos = op.first.find('.');
+        string::size_type dotpos = op.first.find('.'), dotpos_end;
+        if (dotpos==string::npos) {
+          dotpos = op.first.find("__");
+          if (dotpos!=string::npos) dotpos_end = dotpos+2;
+        } else {
+          dotpos_end = dotpos+1;
+        }
 
         // Flush last sub-dictionary
         if (!sname.empty() && (dotpos==string::npos
@@ -137,7 +143,7 @@ namespace casadi {
         // Add to dictionary
         if (dotpos != string::npos) {
           sname = op.first.substr(0, dotpos);
-          sopts[op.first.substr(dotpos+1)] = op.second;
+          sopts[op.first.substr(dotpos_end)] = op.second;
         } else {
           mod_opts[op.first] = op.second;
         }
