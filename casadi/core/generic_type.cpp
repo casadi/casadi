@@ -340,8 +340,13 @@ namespace casadi {
   }
 
   vector<double> GenericType::to_double_vector() const {
-    casadi_assert_message(is_double_vector(), "type mismatch");
-    return as_double_vector();
+    if (is_int_vector()) {
+      auto v = as_int_vector();
+      return vector<double>(v.begin(), v.end());
+    } else {
+      casadi_assert_message(is_double_vector(), "type mismatch");
+      return as_double_vector();
+    }
   }
 
   vector<string> GenericType::to_string_vector() const {
