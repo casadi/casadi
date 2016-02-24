@@ -350,8 +350,10 @@ import_array();
     bool to_ptr(GUESTOBJECT *p, std::pair<int, int>** m);
 #endif // SWIGMATLAB
     template<typename M1, typename M2> bool to_ptr(GUESTOBJECT *p, std::pair<M1, M2>** m);
+    bool to_ptr(GUESTOBJECT *p, std::vector<double>** m);
 #ifdef SWIGMATLAB
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
+    bool to_ptr(GUESTOBJECT *p, std::vector<int>** m);
 #endif // SWIGMATLAB
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::map<std::string, M>** m);
@@ -652,9 +654,65 @@ import_array();
 
 %fragment("casadi_vector", "header", fragment="casadi_aux") {
   namespace casadi {
-    // MATLAB n-by-m char array mapped to vector of length m
+    bool to_ptr(GUESTOBJECT *p, std::vector<double> **m) {
+      // Treat Null
+      if (is_null(p)) return false;
 
 #ifdef SWIGMATLAB
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2
+          && (mxGetM(p)<=1 || mxGetN(p)<=1)) {
+        if (m) {
+          double* data = static_cast<double*>(mxGetData(p));
+          int n = mxGetM(p)*mxGetN(p);
+          (**m).resize(n);
+          std::copy(data, data+n, (**m).begin());
+        }
+        return true;
+      }
+#endif // SWIGMATLAB
+
+      // Convert to DM
+      DM tmp, *tmp_ptr=&tmp;
+      if (to_ptr(p, &tmp_ptr) && tmp_ptr->is_row()) {
+        if (m) {
+          (**m).resize(tmp_ptr->nnz());
+          casadi_copy(tmp_ptr->ptr(), tmp_ptr->nnz(), get_ptr(**m));
+        }
+        return true;
+      }
+
+      // No match
+      return false;
+    }
+
+#ifdef SWIGMATLAB
+    bool to_ptr(GUESTOBJECT *p, std::vector<int>** m) {
+      if (mxIsDouble(p) && mxGetNumberOfDimensions(p)==2
+          && (mxGetM(p)<=1 || mxGetN(p)<=1)) {
+        double* data = static_cast<double*>(mxGetData(p));
+        int n = mxGetM(p)*mxGetN(p);
+
+        // Check if all integers
+        bool all_integers=true;
+        for (int i=0; all_integers && i<n; ++i) {
+          if (data[i]!=static_cast<int>(data[i])) {
+            all_integers = false;
+            break;
+          }
+        }
+
+        // Successful conversion
+        if (all_integers) {
+          if (m) {
+            (**m).resize(n);
+            std::copy(data, data+n, (**m).begin());
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
       if (mxIsChar(p)) {
 	if (m) {
@@ -1200,29 +1258,6 @@ import_array();
 #else
       return 0;
 #endif // SWIGPYTHON
-    }
-  } // namespace casadi
- }
-
-
-%fragment("casadi_dvector", "header", fragment="casadi_aux") {
-  namespace casadi {
-    int to_ptr(GUESTOBJECT *p, std::vector<double> **m) {
-      // Treat Null
-      if (is_null(p)) return false;
-
-      // Convert to DM
-      DM tmp, *tmp_ptr=&tmp;
-      if (to_ptr(p, &tmp_ptr) && tmp_ptr->is_column()) {
-        if (m) {
-          (**m).resize(tmp_ptr->nnz());
-          casadi_copy(tmp_ptr->ptr(), tmp_ptr->nnz(), get_ptr(**m));
-        }
-        return true;
-      }
-
-      // No match
-      return false;
     }
   } // namespace casadi
  }
@@ -1839,7 +1874,7 @@ import_array();
  }
 
 // Collect all fragments
-%fragment("casadi_all", "header", fragment="casadi_aux,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_dvector,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
+%fragment("casadi_all", "header", fragment="casadi_aux,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
 
 #endif // SWIGXML
 
