@@ -974,7 +974,7 @@ namespace casadi {
                             << ": Expected " << n_in << ", got " << fseed[d].size());
       for (int i=0; i<n_in; ++i) {
         casadi_assert_message(checkMat(fseed[d][i].sparsity(), sparsity_in(i)),
-                              "Forward seed " << i << " for direction " << d
+                              "Forward seed " << i << "(" << name_in(i) << ") for direction " << d
                               << " has mismatching shape. Expected " << size_in(i)
                               << ", got " << fseed[d][i].size());
       }
@@ -1010,7 +1010,7 @@ namespace casadi {
                             << ": Expected " << n_out << ", got " << aseed[d].size());
       for (int i=0; i<n_out; ++i) {
         casadi_assert_message(checkMat(aseed[d][i].sparsity(), sparsity_out(i)),
-                              "Adjoint seed " << i << " for direction " << d
+                              "Adjoint seed " << i << " (" << name_out(i) << ") for direction " << d
                               << " has mismatching shape. Expected " << size_out(i)
                               << ", got " << aseed[d][i].size());
       }
@@ -1035,8 +1035,8 @@ namespace casadi {
                           << n_in << ", got " << arg.size());
     for (int i=0; i<n_in; ++i) {
       casadi_assert_message(checkMat(arg[i].sparsity(), sparsity_in(i), hcat),
-                            "Input " << i << " has mismatching shape. Expected "
-                            << size_in(i) << ", got " << arg[i].size());
+                            "Input " << i << " (" << name_in(i) << ") has mismatching shape. "
+                            << "Expected " << size_in(i) << ", got " << arg[i].size());
     }
   }
 
@@ -1047,8 +1047,8 @@ namespace casadi {
                           << n_out << ", got " << res.size());
     for (int i=0; i<n_out; ++i) {
       casadi_assert_message(checkMat(res[i].sparsity(), sparsity_out(i)),
-                            "Output " << i << " has mismatching shape. Expected "
-                            << size_out(i) << ", got " << res[i].size());
+                            "Output " << i << " (" << name_out(i) << ") has mismatching shape. "
+                            "Expected " << size_out(i) << ", got " << res[i].size());
     }
   }
 
