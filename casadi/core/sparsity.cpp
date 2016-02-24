@@ -125,6 +125,14 @@ namespace casadi {
     return (*this)->size();
   }
 
+  int Sparsity::size(int axis) const {
+    switch (axis) {
+    case 1: return size1();
+    case 2: return size2();
+    }
+    casadi_error("Axis must be 1 or 2.");
+  }
+
   const int* Sparsity::row() const {
     return (*this)->row();
   }

@@ -273,6 +273,9 @@ namespace casadi {
 
     /** \brief  Get the shape */
     std::pair<int, int> size() const;
+
+    /** \brief  Get the size along a particular dimensions */
+    int size(int axis) const;
     /// @}
 
 #ifndef SWIG

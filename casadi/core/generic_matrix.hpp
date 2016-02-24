@@ -716,11 +716,7 @@ namespace casadi {
 
   template<typename MatType>
   int GenericMatrix<MatType>::size(int axis) const {
-    if (axis==1)
-      return sparsity().size1();
-    if (axis==2)
-      return sparsity().size2();
-    casadi_error("Axis must be 1 or 2.");
+    return sparsity().size(axis);
   }
 
   template<typename MatType>
