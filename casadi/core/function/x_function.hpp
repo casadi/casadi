@@ -153,24 +153,22 @@ namespace casadi {
 
     // Make sure that inputs are symbolic
     for (int i=0; i<inputv.size(); ++i) {
-      if (inputv[i].is_empty()) {
-        // That's okay
-      } else if (!inputv[i].is_valid_input()) {
+      if (inputv[i].nnz()==0) continue;   // That's okay
+      if (!inputv[i].is_valid_input()) {
         casadi_error("XFunction::XFunction: Xfunction input arguments must be"
-                     " purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
+                     " purely symbolic." << std::endl
+                     << "Argument " << i << "(" << name_in(i) << ") is not symbolic.");
       }
     }
 
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;
-    for (typename std::vector<MatType>::iterator it = inputv_.begin();
-         it != inputv_.end(); ++it) {
+    for (auto it = inputv_.begin(); it != inputv_.end(); ++it) {
       has_duplicates = it->has_duplicates() || has_duplicates;
     }
 
     // Reset temporaries
-    for (typename std::vector<MatType>::iterator it = inputv_.begin();
-         it != inputv_.end(); ++it) {
+    for (auto it = inputv_.begin(); it != inputv_.end(); ++it) {
       it->resetInput();
     }
 

@@ -744,7 +744,11 @@ namespace casadi {
 
   template<>
   MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp) {
-    return MX::create(new SymbolicMX(name, sp));
+    if (sp.nnz()==0) {
+      return MX(sp);
+    } else {
+      return MX::create(new SymbolicMX(name, sp));
+    }
   }
 
   bool MX::is_valid_input() const {

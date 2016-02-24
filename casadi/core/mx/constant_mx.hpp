@@ -99,6 +99,27 @@ namespace casadi {
 
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
+
+    /** \brief  Check if valid function input */
+    virtual bool is_valid_input() const { return sparsity().nnz()==0;}
+
+    /** \brief Get the number of symbolic primitives */
+    virtual int n_primitives() const { return 0;}
+
+    /** \brief Get symbolic primitives */
+    virtual void primitives(std::vector<MX>::iterator& it) const {}
+
+    /** \brief Split up an expression along symbolic primitives */
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const {}
+
+    /** \brief Join an expression along symbolic primitives */
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const { return MX(sparsity());}
+
+    /** \brief Detect duplicate symbolic expressions */
+    virtual bool has_duplicates() { return false;}
+
+    /** \brief Reset the marker for an input expression */
+    virtual void resetInput() {}
   };
 
   /// A constant given as a DM
@@ -212,24 +233,6 @@ namespace casadi {
 
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return true;}
-
-    /** \brief Get the number of symbolic primitives */
-    virtual int n_primitives() const { return 0;}
-
-    /** \brief Get symbolic primitives */
-    virtual void primitives(std::vector<MX>::iterator& it) const {}
-
-    /** \brief Split up an expression along symbolic primitives */
-    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const {}
-
-    /** \brief Join an expression along symbolic primitives */
-    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const { return MX();}
-
-    /** \brief Detect duplicate symbolic expressions */
-    virtual bool has_duplicates() { return false;}
-
-    /** \brief Reset the marker for an input expression */
-    virtual void resetInput() {}
 
     /** \brief  Get the name */
     virtual const std::string& name() const {
