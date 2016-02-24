@@ -75,7 +75,7 @@ nx = 3
 nu = 1
 
 # Choose collocation points
-tau_root = collocationPoints(3,"radau")
+tau_root = [0] + collocation_points(3,"radau")
 
 # Degree of interpolating polynomial
 d = len(tau_root)-1
