@@ -1102,6 +1102,10 @@ namespace casadi {
     return (*this)->free_mx();
   }
 
+  bool Function::has_free() const {
+    return (*this)->has_free();
+  }
+
   void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) {
     (*this)->generate_lifted(vdef_fcn, vinit_fcn);
   }

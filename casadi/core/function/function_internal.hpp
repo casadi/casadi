@@ -422,6 +422,9 @@ namespace casadi {
     /// Get free variables (SX)
     virtual SX free_sx() const;
 
+    /** \brief Does the function have free variables */
+    virtual bool has_free() const { return false;}
+
     /** \brief Extract the functions needed for the Lifted Newton method */
     virtual void generate_lifted(Function& vdef_fcn, Function& vinit_fcn);
 

@@ -827,6 +827,9 @@ namespace casadi {
     /** \brief Get all the free variables of the function */
     std::vector<MX> free_mx() const;
 
+    /** \brief Does the function have free variables */
+    bool has_free() const;
+
     /** \brief Extract the functions needed for the Lifted Newton method */
     void generate_lifted(Function& SWIG_OUTPUT(vdef_fcn),
                                   Function& SWIG_OUTPUT(vinit_fcn));

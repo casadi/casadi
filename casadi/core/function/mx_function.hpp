@@ -185,6 +185,9 @@ namespace casadi {
     /// Get free variables (MX)
     virtual std::vector<MX> free_mx() const {return free_vars_;}
 
+    /** \brief Does the function have free variables */
+    virtual bool has_free() const { return !free_vars_.empty();}
+
     /** \brief Number of nodes in the algorithm */
     virtual int n_nodes() const { return algorithm_.size();}
 

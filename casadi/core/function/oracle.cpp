@@ -174,7 +174,19 @@ namespace casadi {
     }
 
     // Create function and return
-    return Function(fname, ret_in, ret_out, s_in, s_out, opts);
+    Function ret(fname, ret_in, ret_out, s_in, s_out, opts);
+    if (ret.has_free()) {
+      stringstream ss;
+      ss << "Cannot generate " << fname << " as the expressions contain free variables: ";
+      if (ret.is_a("sxfunction")) {
+        ss << ret.free_sx();
+      } else {
+        casadi_assert(ret.is_a("mxfunction"));
+        ss << ret.free_mx();
+      }
+      casadi_error(ss.str());
+    }
+    return ret;
   }
 
   template<typename XType>
