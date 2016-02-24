@@ -362,7 +362,7 @@ namespace casadi {
         }
         int* iw_i = iw + i*sz_iw;
         double* w_i = w + i*sz_w;
-        f_->eval(arg_i, res_i, iw_i, w_i);
+        f_->eval(0, arg_i, res_i, iw_i, w_i);
       }
 #endif // WITH_OPENMP
     }
@@ -514,7 +514,7 @@ namespace casadi {
       }
       int* iw_i = iw + i*sz_iw;
       double* w_i = w + i*sz_w;
-      f_->eval(arg_i, res_i, iw_i, w_i);
+      f_->eval(0, arg_i, res_i, iw_i, w_i);
     }
   }
 
@@ -540,7 +540,7 @@ namespace casadi {
     }
     g.body << "    int* iw_i = iw + i*" << sz_iw << ";" << endl;
     g.body << "    double* w_i = w + i*" << sz_w << ";" << endl;
-    g.body << "    " << g.call(f_, "arg_i", "res_i", "iw_i", "w_i") << ";" << endl;
+    g.body << "    " << g(f_, "0", "arg_i", "res_i", "iw_i", "w_i") << ";" << endl;
     g.body << "  }" << std::endl;
   }
 
