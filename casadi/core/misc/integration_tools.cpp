@@ -241,6 +241,7 @@ namespace casadi {
 
     // Obtain collocation points
     std::vector<double> tau_root = collocation_points(order, scheme);
+    tau_root.insert(tau_root.begin(), 0);
 
     // Retrieve collocation interpolating matrices
     std::vector < std::vector <double> > C;

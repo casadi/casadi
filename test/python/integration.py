@@ -1031,22 +1031,22 @@ class Integrationtests(casadiTestCase):
   def test_collocationPoints(self):
     self.message("collocation points")
     with self.assertRaises(Exception):
-      collocationPoints(0,"radau")
+      collocation_points(0,"radau")
     with self.assertRaises(Exception): 
-      collocationPoints(10,"radau")
+      collocation_points(10,"radau")
     with self.assertRaises(Exception):
-      collocationPoints(0,"legendre")
+      collocation_points(0,"legendre")
     with self.assertRaises(Exception): 
-      collocationPoints(10,"legendre")
+      collocation_points(10,"legendre")
     with self.assertRaises(Exception):
-      collocationPoints(1,"foo")
+      collocation_points(1,"foo")
       
     for k in range(1,10):
-      r = collocationPoints(k,"radau")
+      r = [0] + collocation_points(k,"radau")
       self.assertEqual(len(r),k+1)
       self.checkarray(DM(r[-1]),DM([1]))
     for k in range(1,10):
-      r = collocationPoints(k,"legendre")
+      r = [0] + collocation_points(k,"legendre")
       self.assertEqual(len(r),k+1) 
       
 if __name__ == '__main__':
