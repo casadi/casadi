@@ -723,6 +723,40 @@ import_array();
       return false;
     }
 
+    // Cell array
+    template<typename M> bool to_ptr_cell(GUESTOBJECT *p, std::vector<M>** m) {
+      // Cell arrays (only row vectors)
+      if (mxGetClassID(p)==mxCELL_CLASS) {
+        int nrow = mxGetM(p), ncol = mxGetN(p);
+        if (nrow==1 || (nrow==0 && ncol==0)) {
+          // Allocate elements
+          if (m) {
+            (**m).clear();
+            (**m).reserve(ncol);
+          }
+
+          // Temporary
+          M tmp;
+
+          // Loop over elements
+          for (int i=0; i<ncol; ++i) {
+            // Get element
+            mxArray* pe = mxGetCell(p, i);
+            if (pe==0) return false;
+
+            // Convert element
+            M *m_i = m ? &tmp : 0;
+            if (!to_ptr(pe, m_i ? &m_i : 0)) {
+              return false;
+            }
+            if (m) (**m).push_back(*m_i);
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+
     // MATLAB n-by-m char array mapped to vector of length m
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m) {
       if (mxIsChar(p)) {
@@ -760,9 +794,13 @@ import_array();
           }
         }
 	return true;
-      } else {
-        return false;
       }
+
+      // Cell array
+      if (to_ptr_cell(p, m)) return true;
+
+      // No match
+      return false;
     }
 #endif // SWIGMATLAB
 
@@ -859,35 +897,8 @@ import_array();
       }
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
-      // Cell arrays (only row vectors)
-      if (mxGetClassID(p)==mxCELL_CLASS) {
-        int nrow = mxGetM(p), ncol = mxGetN(p);
-        if (nrow==1 || (nrow==0 && ncol==0)) {
-          // Allocate elements
-          if (m) {
-            (**m).clear();
-            (**m).reserve(ncol);
-          }
-
-          // Temporary
-          M tmp;
-
-          // Loop over elements
-          for (int i=0; i<ncol; ++i) {
-            // Get element
-            mxArray* pe = mxGetCell(p, i);
-            if (pe==0) return false;
-
-            // Convert element
-            M *m_i = m ? &tmp : 0;
-            if (!to_ptr(pe, m_i ? &m_i : 0)) {
-              return false;
-            }
-            if (m) (**m).push_back(*m_i);
-          }
-          return true;
-        }
-      }
+      // Cell array
+      if (to_ptr_cell(p, m)) return true;
 #endif // SWIGMATLAB
       // No match
       return false;
