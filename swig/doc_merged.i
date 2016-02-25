@@ -3719,7 +3719,7 @@ NULL)
 %feature("docstring") casadi::LibInfo "[INTERNAL]  Structure with
 information about the library.
 
-C++ includes: external.hpp ";
+C++ includes: external_impl.hpp ";
 
 
 // File: classcasadi_1_1LibInfo_3_01Compiler_01_4.xml
@@ -3728,7 +3728,7 @@ C++ includes: external.hpp ";
 %feature("docstring") casadi::LibInfo< Compiler > " [INTERNAL]  Library that
 has been just-in-time compiled.
 
-C++ includes: external.hpp ";
+C++ includes: external_impl.hpp ";
 
 %feature("docstring") casadi::LibInfo< Compiler >::get " [INTERNAL] ";
 
@@ -3739,7 +3739,7 @@ C++ includes: external.hpp ";
 %feature("docstring") casadi::LibInfo< std::string > " [INTERNAL]  Library
 given as a dynamically linked library.
 
-C++ includes: external.hpp ";
+C++ includes: external_impl.hpp ";
 
 %feature("docstring") casadi::LibInfo< std::string >::clear " [INTERNAL] ";
 
@@ -8864,18 +8864,17 @@ Check if the vector is non-decreasing.
 
 ";
 
-%feature("docstring") casadi::jit "
+%feature("docstring") casadi::integrator_out "
 
-Create a just-in-time compiled function from a C/C++ language string The
-function can an arbitrary number of inputs and outputs that must all be
-scalar-valued. Only specify the function body, assuming that the inputs are
-stored in an array named 'arg' and the outputs stored in an array named
-'res'. The data type used must be 'real_t', which is typically equal to
-'double` or another data type with the same API as 'double'.
+>  CASADI_EXPORT[str] integrator_out()
+------------------------------------------------------------------------
 
-The final generated function will have a structure similar to:
+Get integrator output scheme of integrators.
 
-void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+>  str integrator_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
 
 ";
 
@@ -9716,17 +9715,26 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::integrator_out "
+%feature("docstring") casadi::jit "
 
->  CASADI_EXPORT[str] integrator_out()
+>  Function jit(str name, int n_in, int n_out, str body, Dict opts=Dict())
 ------------------------------------------------------------------------
 
-Get integrator output scheme of integrators.
+Create a just-in-time compiled function from a C/C++ language string The
+function can an arbitrary number of inputs and outputs that must all be
+scalar-valued. Only specify the function body, assuming that the inputs are
+stored in an array named 'arg' and the outputs stored in an array named
+'res'. The data type used must be 'real_t', which is typically equal to
+'double` or another data type with the same API as 'double'.
 
->  str integrator_out(int ind)
+The final generated function will have a structure similar to:
+
+void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+
+>  Function jit(str fname, Dict opts=Dict())
 ------------------------------------------------------------------------
 
-Get output scheme name by index.
+Create a just-in-time compiled function from a .casadi file.
 
 ";
 
