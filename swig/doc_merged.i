@@ -2912,13 +2912,7 @@ Arc sine.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") friendwrap_sum1 "
-
-Return a row-wise summation of elements.
-
-";
-
-%feature("docstring") casadi::GenericMatrix::nnz_upper "
+*/ %feature("docstring") casadi::GenericMatrix::nnz_upper "
 
 Get the number of non-zeros in the upper triangular half.
 
@@ -2939,6 +2933,18 @@ Infinity-norm.
 %feature("docstring") friendwrap_depends_on "
 
 Check if expression depends on the argument The argument must be symbolic.
+
+";
+
+%feature("docstring") friendwrap_sum2 "
+
+Return a column-wise summation of elements.
+
+";
+
+%feature("docstring") friendwrap_sum1 "
+
+Return a row-wise summation of elements.
 
 ";
 
@@ -3303,12 +3309,6 @@ Calculate Jacobian.
 %feature("docstring") friendwrap_print_operator "
 
 Get a string representation for a binary MatType, using custom arguments.
-
-";
-
-%feature("docstring") friendwrap_sum2 "
-
-Return a col-wise summation of elements.
 
 ";
 

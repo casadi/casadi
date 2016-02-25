@@ -4225,14 +4225,8 @@ Arc sine.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  sum1(const MatType &x) "
-
-Return a row-wise summation of elements.
-
-";
-
-%feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper() const
-"
+*/ %feature("docstring")  casadi::GenericMatrix< MatType >::nnz_upper()
+const  "
 
 Get the number of non-zeros in the upper triangular half.
 
@@ -4253,6 +4247,18 @@ Infinity-norm.
 %feature("docstring")  depends_on(const MatType &f, const MatType &arg) "
 
 Check if expression depends on the argument The argument must be symbolic.
+
+";
+
+%feature("docstring")  sum2(const MatType &x) "
+
+Return a column-wise summation of elements.
+
+";
+
+%feature("docstring")  sum1(const MatType &x) "
+
+Return a row-wise summation of elements.
 
 ";
 
@@ -4642,12 +4648,6 @@ Calculate Jacobian.
 std::string > &args) "
 
 Get a string representation for a binary MatType, using custom arguments.
-
-";
-
-%feature("docstring")  sum2(const MatType &x) "
-
-Return a col-wise summation of elements.
 
 ";
 
