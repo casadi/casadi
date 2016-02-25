@@ -6667,7 +6667,15 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Sparsity::size "
 
+>  (int,int) Sparsity.size() const 
+------------------------------------------------------------------------
+
 Get the shape.
+
+>  int Sparsity.size(int axis) const 
+------------------------------------------------------------------------
+
+Get the size along a particular dimensions.
 
 ";
 

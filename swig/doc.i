@@ -8734,6 +8734,12 @@ Get the shape.
 
 ";
 
+%feature("docstring")  casadi::Sparsity::size(int axis) const  "
+
+Get the size along a particular dimensions.
+
+";
+
 %feature("docstring")  casadi::Sparsity::etree(bool ata=false) const  "
 
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
