@@ -29,10 +29,8 @@
 #include "mx_function.hpp"
 #include "map.hpp"
 #include "mapaccum.hpp"
-#include "external.hpp"
 #include "switch.hpp"
 #include "kernel_sum.hpp"
-#include "jit.hpp"
 #include "nlpsol.hpp"
 #include "qpsol.hpp"
 
@@ -1136,37 +1134,6 @@ namespace casadi {
 
   int Function::n_nodes() const {
     return (*this)->n_nodes();
-  }
-
-  Function external(const string& name, const Dict& opts) {
-    Function ret;
-    ret.assignNode(External::create("./" + name + ".so", name));
-    ret->construct(opts);
-    return ret;
-  }
-
-  Function external(const string& name, const string& bin_name,
-                              const Dict& opts) {
-    Function ret;
-    ret.assignNode(External::create(bin_name, name));
-    ret->construct(opts);
-    return ret;
-  }
-
-  Function external(const string& name, const Compiler& compiler,
-                              const Dict& opts) {
-    Function ret;
-    ret.assignNode(External::create(compiler, name));
-    ret->construct(opts);
-    return ret;
-  }
-
-  Function jit(const std::string& name, int n_in, int n_out,
-               const std::string& body, const Dict& opts) {
-    Function ret;
-    ret.assignNode(new Jit(name, n_in, n_out, body, opts));
-    ret->construct(opts);
-    return ret;
   }
 
 } // namespace casadi

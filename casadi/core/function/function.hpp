@@ -1009,41 +1009,6 @@ namespace casadi {
 #endif // SWIG
   };
 
-  /** \brief  Load an external function
-   * File name is assumed to be ./<f_name>.so
-   */
-  CASADI_EXPORT Function external(const std::string& name, const Dict& opts=Dict());
-
-  /** \brief  Load an external function
-   * File name given
-   */
-  CASADI_EXPORT Function external(const std::string& name, const std::string& bin_name,
-                                  const Dict& opts=Dict());
-
-  /** \brief  Load a just-in-time compiled external function
-   * File name given
-   */
-  CASADI_EXPORT Function external(const std::string& name, const Compiler& compiler,
-                                  const Dict& opts=Dict());
-
-  /** \brief Create a just-in-time compiled function from a C/C++ language string
-   * The function can an arbitrary number of inputs and outputs that must all be
-   * scalar-valued.
-   * Only specify the function body, assuming that the inputs are stored in an array
-   * named 'arg' and the outputs stored in an array named 'res'. The data type
-   * used must be 'real_t', which is typically equal to 'double` or another data
-   * type with the same API as 'double'.
-   *
-   * The final generated function will have a structure similar to:
-   * 
-   * void fname(const real_t* arg, real_t* res) {
-   *   <FUNCTION_BODY>
-   * }
-   *
-   */
-  CASADI_EXPORT Function jit(const std::string& name, int n_in, int n_out,
-                             const std::string& body, const Dict& opts=Dict());
-
 } // namespace casadi
 
 #include "../matrix_impl.hpp"

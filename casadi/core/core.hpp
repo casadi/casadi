@@ -51,6 +51,8 @@
 #include "function/nlpsol.hpp"
 #include "function/rootfinder.hpp"
 #include "function/linsol.hpp"
+#include "function/jit.hpp"
+#include "function/external.hpp"
 
 // Misc
 #include "misc/integration_tools.hpp"

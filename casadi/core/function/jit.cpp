@@ -23,7 +23,7 @@
  */
 
 
-#include "jit.hpp"
+#include "jit_impl.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -31,6 +31,20 @@
 
 namespace casadi {
   using namespace std;
+
+  Function jit(const std::string& name, int n_in, int n_out,
+               const std::string& body, const Dict& opts) {
+    Function ret;
+    ret.assignNode(new Jit(name, n_in, n_out, body, opts));
+    ret->construct(opts);
+    return ret;
+  }
+
+  Function jit(const std::string& fname, const Dict& opts) {
+    Function ret;
+    casadi_error("Not implemented");
+    return ret;
+  }
 
   Jit::Jit(const std::string& name, int n_in, int n_out,
            const std::string& body, const Dict& opts)

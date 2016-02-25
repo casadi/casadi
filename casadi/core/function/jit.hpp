@@ -27,71 +27,32 @@
 #ifndef CASADI_JIT_HPP
 #define CASADI_JIT_HPP
 
-#include "function_internal.hpp"
+#include "function.hpp"
 
 namespace casadi {
 
-  class CASADI_EXPORT Jit : public FunctionInternal {
-  public:
-    /** \brief Constructor */
-    Jit(const std::string& name, int n_in, int n_out,
-        const std::string& body, const Dict& opts);
+  /** \brief Create a just-in-time compiled function from a C/C++ language string
+   * The function can an arbitrary number of inputs and outputs that must all be
+   * scalar-valued.
+   * Only specify the function body, assuming that the inputs are stored in an array
+   * named 'arg' and the outputs stored in an array named 'res'. The data type
+   * used must be 'real_t', which is typically equal to 'double` or another data
+   * type with the same API as 'double'.
+   *
+   * The final generated function will have a structure similar to:
+   * 
+   * void fname(const real_t* arg, real_t* res) {
+   *   <FUNCTION_BODY>
+   * }
+   *
+   */
+  CASADI_EXPORT Function jit(const std::string& name, int n_in, int n_out,
+                             const std::string& body, const Dict& opts=Dict());
 
-    /** \brief Get type name */
-    virtual std::string type_name() const { return "jit";}
-
-    /** \brief Destructor */
-    virtual ~Jit();
-
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    virtual const Options& get_options() const { return options_;}
-    ///@}
-
-    /** \brief Initialize */
-    virtual void init(const Dict& opts);
-
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return n_in_;}
-    virtual size_t get_n_out() const { return n_out_;}
-    ///@}
-
-    /// @{
-    /** \brief All inputs and outputs are scalars */
-    virtual Sparsity get_sparsity_in(int ind) const { return Sparsity::scalar();}
-    virtual Sparsity get_sparsity_out(int ind) const { return Sparsity::scalar();}
-    /// @}
-
-    /** \brief Use simplified signature */
-    virtual bool simplifiedCall() const { return true;}
-
-    /** \brief Generate code for the function body */
-    virtual void generateBody(CodeGenerator& g) const;
-
-    ///@{
-    /** \brief Jacobian of all outputs with respect to all inputs */
-    bool hasFullJacobian() const;
-    virtual Function getFullJacobian(const std::string& name, const Dict& opts);
-    ///@}
-
-  private:
-    // Number of inputs and outputs
-    int n_in_, n_out_;
-
-    // Function body
-    std::string body_;
-
-    // Jacobian function body
-    std::string jac_body_;
-
-    // Hessian function body
-    std::string hess_body_;
-  };
-
+  /** \brief Create a just-in-time compiled function from a .casadi file
+   */
+  CASADI_EXPORT Function jit(const std::string& fname, const Dict& opts=Dict());
 
 } // namespace casadi
-/// \endcond
 
 #endif // CASADI_JIT_HPP

@@ -24,6 +24,7 @@
 
 
 #include "oracle.hpp"
+#include "external.hpp"
 
 using namespace std;
 

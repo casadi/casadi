@@ -23,7 +23,7 @@
  */
 
 
-#include "external.hpp"
+#include "external_impl.hpp"
 #include "../std_vector_tools.hpp"
 
 #include <iostream>
@@ -32,6 +32,29 @@
 
 namespace casadi {
   using namespace std;
+
+  Function external(const string& name, const Dict& opts) {
+    Function ret;
+    ret.assignNode(External::create("./" + name + ".so", name));
+    ret->construct(opts);
+    return ret;
+  }
+
+  Function external(const string& name, const string& bin_name,
+                    const Dict& opts) {
+    Function ret;
+    ret.assignNode(External::create(bin_name, name));
+    ret->construct(opts);
+    return ret;
+  }
+
+  Function external(const string& name, const Compiler& compiler,
+                    const Dict& opts) {
+    Function ret;
+    ret.assignNode(External::create(compiler, name));
+    ret->construct(opts);
+    return ret;
+  }
 
   LibInfo<std::string>::LibInfo(const std::string& bin_name)
     : bin_name_(bin_name), handle_(0) {
