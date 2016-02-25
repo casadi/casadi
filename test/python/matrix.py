@@ -41,8 +41,8 @@ class Matrixtests(casadiTestCase):
   def test_sum(self):
     self.message("sum")
     D=DM([[1,2,3],[4,5,6],[7,8,9]])
-    self.checkarray(c.sumRows(D),array([[12,15,18]]),'sum()')
-    self.checkarray(c.sumCols(D),array([[6,15,24]]).T,'sum()')
+    self.checkarray(c.sum1(D),array([[12,15,18]]),'sum()')
+    self.checkarray(c.sum2(D),array([[6,15,24]]).T,'sum()')
     
 
   def test_inv(self):

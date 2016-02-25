@@ -255,7 +255,7 @@ while True:
   max_iter = 100
 
   # 1-norm of the feasability violations
-  feasviol = sumRows(fabs(gk))
+  feasviol = sum1(fabs(gk))
 
   # Use a quadratic model of T1 to get a lower bound on mu (eq. 18.36 in Nocedal)
   mu_lb = (dot(gfk,p) + sigma/2.0*dot(trans(p),dot(Bk,p)))/(1.-rho)/feasviol
@@ -268,7 +268,7 @@ while True:
   T1 = fk + mu*feasviol
 
   # Calculate the directional derivative of T1 at x (cf. 18.29 in Nocedal)
-  DT1 = dot(gfk,p) - mu*sumRows(fabs(gk))
+  DT1 = dot(gfk,p) - mu*sum1(fabs(gk))
   
   lsiter = 0
   alpha = 1
@@ -283,7 +283,7 @@ while True:
     gfcn.setInput(x_new)
     gfcn.evaluate()
     gk_new = gfcn.getOutput()
-    feasviol_new = sumRows(fabs(gk_new))
+    feasviol_new = sum1(fabs(gk_new))
 
     # New T1 function
     T1_new = fk_new + mu*feasviol_new
@@ -313,8 +313,8 @@ while True:
   # Gather and print iteration information
   normdx = norm_2(dx) # step size
   normgradL = norm_2(gradL) # size of the Lagrangian gradient
-  eq_viol = sumRows(fabs(gk)) # constraint violation
-  ineq_viol = nan # sumRows(max(0,-hk)); % inequality constraint violation
+  eq_viol = sum1(fabs(gk)) # constraint violation
+  ineq_viol = nan # sum1(max(0,-hk)); % inequality constraint violation
 
   print "%3d %3d |%0.4e %0.4e %0.4e %0.4e" % (k,lsiter,normdx,normgradL,eq_viol,ineq_viol)
 

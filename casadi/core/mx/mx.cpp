@@ -1173,11 +1173,11 @@ namespace casadi {
     return f.n_nodes();
   }
 
-  MX MX::sumCols(const MX& x) {
+  MX MX::sum2(const MX& x) {
     return mtimes(x, MX::ones(x.size2(), 1));
   }
 
-  MX MX::sumRows(const MX& x) {
+  MX MX::sum1(const MX& x) {
     return mtimes(MX::ones(1, x.size1()), x);
   }
 

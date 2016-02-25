@@ -4225,7 +4225,7 @@ Arc sine.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  sumRows(const MatType &x) "
+*/ %feature("docstring")  sum1(const MatType &x) "
 
 Return a row-wise summation of elements.
 
@@ -4645,7 +4645,7 @@ Get a string representation for a binary MatType, using custom arguments.
 
 ";
 
-%feature("docstring")  sumCols(const MatType &x) "
+%feature("docstring")  sum2(const MatType &x) "
 
 Return a col-wise summation of elements.
 

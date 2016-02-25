@@ -2697,12 +2697,12 @@ DECL M casadi_norm_inf(const M& x) {
   return norm_inf(x);
 }
 
-DECL M casadi_sumCols(const M& x) {
-  return sumCols(x);
+DECL M casadi_sum2(const M& x) {
+  return sum2(x);
 }
 
-DECL M casadi_sumRows(const M& x) {
-  return sumRows(x);
+DECL M casadi_sum1(const M& x) {
+  return sum1(x);
 }
 
 DECL M casadi_dot(const M& x, const M& y) {

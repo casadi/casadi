@@ -418,8 +418,8 @@ namespace casadi {
     static MX unite(const MX& A, const MX& B);
     static MX trace(const MX& x);
     static MX diag(const MX& x);
-    static MX sumCols(const MX& x);
-    static MX sumRows(const MX& x);
+    static MX sum2(const MX& x);
+    static MX sum1(const MX& x);
     static MX polyval(const MX& p, const MX& x);
     static MX det(const MX& x);
     static MX inv(const MX& x);

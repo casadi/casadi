@@ -2912,7 +2912,7 @@ Arc sine.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") friendwrap_sumRows "
+*/ %feature("docstring") friendwrap_sum1 "
 
 Return a row-wise summation of elements.
 
@@ -3306,7 +3306,7 @@ Get a string representation for a binary MatType, using custom arguments.
 
 ";
 
-%feature("docstring") friendwrap_sumCols "
+%feature("docstring") friendwrap_sum2 "
 
 Return a col-wise summation of elements.
 

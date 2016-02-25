@@ -1467,13 +1467,13 @@ namespace casadi {
     Matrix<int> sp = IM::ones(x.sparsity());
 
     // Have a count of the nonzeros for each row
-    Matrix<int> row_count = Matrix<int>::sumCols(sp);
+    Matrix<int> row_count = Matrix<int>::sum2(sp);
 
     // A blank row? determinant is structurally zero
     if (!row_count.is_dense()) return 0;
 
     // Have a count of the nonzeros for each col
-    Matrix<int> col_count = Matrix<int>::sumRows(sp).T();
+    Matrix<int> col_count = Matrix<int>::sum1(sp).T();
 
     // A blank col? determinant is structurally zero
     if (!row_count.is_dense()) return 0;
@@ -1516,12 +1516,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::sumCols(const Matrix<Scalar>& x) {
+  Matrix<Scalar> Matrix<Scalar>::sum2(const Matrix<Scalar>& x) {
     return mtimes(x, Matrix<Scalar>::ones(x.size2(), 1));
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::sumRows(const Matrix<Scalar>& x) {
+  Matrix<Scalar> Matrix<Scalar>::sum1(const Matrix<Scalar>& x) {
     return mtimes(Matrix<Scalar>::ones(1, x.size1()), x);
   }
 
@@ -1836,7 +1836,7 @@ namespace casadi {
     for (int i=0;i<n;++i) {
       Matrix<Scalar> x = X(i, Slice(i, m));
       Matrix<Scalar> u = Matrix<Scalar>(x);
-      Matrix<Scalar> sigma = sqrt(sumCols(x*x));
+      Matrix<Scalar> sigma = sqrt(sum2(x*x));
       const Matrix<Scalar>& x0 = x(0, 0);
       u(0, 0) = 1;
 

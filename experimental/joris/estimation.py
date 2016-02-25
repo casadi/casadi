@@ -185,7 +185,7 @@ for k,tk in enumerate(ts[:-1]):
                 DAE_P:    par.IMU[k,:]})
     g.append(dyn)   
     
-g.append(sumRows(optvar.X[0][states.i_q,0]**2) - 1)  # Add the quaternion norm constraint at the start
+g.append(sum1(optvar.X[0][states.i_q,0]**2) - 1)  # Add the quaternion norm constraint at the start
 
 g = SXFunction([optvar.veccat(),par.veccat()],[vertcat(g)])
 g.init()

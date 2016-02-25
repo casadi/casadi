@@ -415,7 +415,7 @@ class Functiontests(casadiTestCase):
     a = SX.sym("a",1,2)
     b = SX.sym("b")
     c = sin(a)+b
-    d = cos(sumCols(a)-c)
+    d = cos(sum2(a)-c)
     f = Function("f",[a,b],[c,d])
 
     random.seed(0)
@@ -436,7 +436,7 @@ class Functiontests(casadiTestCase):
     
     a = SX.sym("a",1,2)
     c = sin(a)
-    d = cos(sumCols(a)-c)
+    d = cos(sum2(a)-c)
     f = Function("f",[a],[c,d])
 
     random.seed(0)
@@ -458,7 +458,7 @@ class Functiontests(casadiTestCase):
     a = SX.sym("a",1,2)
     b = SX.sym("b")
     c = sin(a)+b
-    d = cos(sumCols(a)-c)
+    d = cos(sum2(a)-c)
     f = Function("f",[a,b],[c])
 
     random.seed(0)
@@ -767,7 +767,7 @@ class Functiontests(casadiTestCase):
     dist = 0
 
     for j in range(2):
-      dist+=sumRows((xs[0]-(xs[j]+travels[j]))**2)
+      dist+=sum1((xs[0]-(xs[j]+travels[j]))**2)
 
     nlp = Function("nlp", [V, P], [-dist, MX()], ['x', 'p'], ['f', 'g'])
 
@@ -786,14 +786,14 @@ class Functiontests(casadiTestCase):
 
     z = MX.sym("y",2,2)
 
-    F = Function("f",[x,z],[sumCols(sumRows(y))])
+    F = Function("f",[x,z],[sum2(sum1(y))])
 
     x = SX.sym("x",2)
 
     y = sin(repmat(x**2,1,3))
     z = SX.sym("y",2,2)
 
-    Fref = Function("f",[x,z],[sumCols(sumRows(y))])
+    Fref = Function("f",[x,z],[sum2(sum1(y))])
     
     x0 = DM([1,7])
     x1 = DM([[3,0],[2,4]])
@@ -960,7 +960,7 @@ class Functiontests(casadiTestCase):
 
     v = SX.sym("v")
 
-    r = sqrt(sumRows((p-x)**2))
+    r = sqrt(sum1((p-x)**2))
 
     f = Function("f",[p,v,x],[v**2*exp(-r**2)/pi])
 

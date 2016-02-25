@@ -329,8 +329,8 @@ namespace casadi {
     static Matrix<Scalar> norm_2(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_F(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_inf(const Matrix<Scalar> &x);
-    static Matrix<Scalar> sumCols(const Matrix<Scalar> &x);
-    static Matrix<Scalar> sumRows(const Matrix<Scalar> &x);
+    static Matrix<Scalar> sum2(const Matrix<Scalar> &x);
+    static Matrix<Scalar> sum1(const Matrix<Scalar> &x);
     static Matrix<Scalar> dot(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> nullspace(const Matrix<Scalar> &x);
     static Matrix<Scalar> diag(const Matrix<Scalar> &x);
