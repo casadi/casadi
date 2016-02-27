@@ -294,7 +294,7 @@ namespace casadi {
     virtual void init();
 
     /// Type of parallellization
-    virtual std::string parallelization() const { return "omp"; }
+    virtual std::string parallelization() const { return "openmp"; }
   };
 
   /** A map Evaluate in parallel using OpenMP
@@ -324,7 +324,7 @@ namespace casadi {
     virtual void init();
 
     /// Type of parallellization
-    virtual std::string parallelization() const { return "opencl"; }
+    virtual std::string parallelization() const { return "openmp"; }
   };
 
 #endif // WITH_OPENMP
