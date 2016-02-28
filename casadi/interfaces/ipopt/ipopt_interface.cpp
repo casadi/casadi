@@ -450,13 +450,17 @@ namespace casadi {
 
         // Inputs
         fill_n(m->arg, fcallback_.n_in(), nullptr);
-        m->arg[NLPSOL_X] = x;
-        m->arg[NLPSOL_F] = &obj_value;
-        m->arg[NLPSOL_G] = g;
-        m->arg[NLPSOL_LAM_P] = 0;
-        m->arg[NLPSOL_LAM_X] = m->lam_xk;
-        m->arg[NLPSOL_LAM_G] = m->lam_gk;
-
+        if (full_callback) {
+          // The values used below are meaningless
+          // when not doing a full_callback
+          m->arg[NLPSOL_X] = x;
+          m->arg[NLPSOL_F] = &obj_value;
+          m->arg[NLPSOL_G] = g;
+          m->arg[NLPSOL_LAM_P] = 0;
+          m->arg[NLPSOL_LAM_X] = m->lam_xk;
+          m->arg[NLPSOL_LAM_G] = m->lam_gk;
+        }
+        
         // Outputs
         fill_n(m->res, fcallback_.n_out(), nullptr);
         double ret_double;
