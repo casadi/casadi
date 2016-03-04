@@ -1,32 +1,14 @@
 cmake_minimum_required(VERSION 2.8.6)
 
-# JSON/Haskell front-end
-add_custom_target(json DEPENDS casadi_json)
-
-# fooXML_wrap.xml are a big files which Joris wants to delete immedately after using.
-# These files are dependencies of json outputs, but they don't exist according to cmake.
-# So we silence these warnings. THIS IS A HACK AND WE NEED A BETTER SOLUTION
-if(POLICY CMP0046)
-  cmake_policy(SET CMP0046 OLD)
-endif()
-
 # Generate SWIG wrapper
 set_source_files_properties(../casadi.i  PROPERTIES  CPLUSPLUS ON)
 swig_add_module_xml(casadi_xml ../casadi.i)
-add_custom_target(casadi_json
+add_custom_target(json
   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml casadi
   COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml
 )
-add_dependencies(casadi_json casadi_xml
-                 ${CMAKE_CURRENT_SOURCE_DIR}/generate.py
-                 ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml)
 
-#install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.json
-#  DESTINATION share/casadi
-#  COMPONENT componentjson
-#)
-
-#set(CPACK_MONOLITHIC_INSTALL FALSE)
 set(CPACK_TGZ_COMPONENT_INSTALL TRUE)
 
 set(CPACK_COMPONENT_COMPONENTJSON_DISPLAY_NAME "Json meta-data")
