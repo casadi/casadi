@@ -33,8 +33,11 @@
 #include "kernel_sum.hpp"
 #include "nlpsol.hpp"
 #include "qpsol.hpp"
+#include "jit.hpp"
+#include "../casadi_file.hpp"
 
 #include <typeinfo>
+#include <fstream>
 
 using namespace std;
 
@@ -44,6 +47,48 @@ namespace casadi {
   }
 
   Function::~Function() {
+  }
+
+  bool Function::proceed_to(std::istream& file, const std::string& str) {
+    // Make sure that the file is ready for reading
+    if (!file.good()) return false;
+    // Have we already wrapped around once?
+    bool wrapped_around = false;
+    // Read line-by-line
+    string tmp;
+    while (true) {
+      // Read a word
+      streampos cur_pos = file.tellg();
+      file >> tmp;
+      if (!file.good()) return false;
+
+      // Check if match
+      if (str==tmp) return true;
+
+      // If comment, continue to the end of the line
+      if (tmp.at(0)=='#') {
+        file.ignore(numeric_limits<streamsize>::max(), '\n');
+        continue;
+      }
+
+      // If mismatching name, rewind and break
+      file.seekg(cur_pos);
+      return false;
+    }
+  }
+
+  Function::Function(const std::string& fname) {
+    // Parse the file
+    ParsedFile file(fname);
+
+    // Create the corresponding class
+    string classname = file.to_string(":CLASS");
+
+    if (classname=="Jit") {
+      *this = jit(file);
+    } else {
+      casadi_error("Unknown Function type: " + classname);
+    }
   }
 
   Function::Function(const string& name,

@@ -105,6 +105,9 @@ namespace casadi {
     /** \brief Default constructor, null pointer */
     Function();
 
+    /** \brief Construct from a file */
+    Function(const std::string& fname);
+
     ///@{
     /** \brief Construct an SX function */
     Function(const std::string& name,
@@ -1006,6 +1009,9 @@ namespace casadi {
                      const std::vector<std::string>& resn,
                      const Dict& opts);
     ///@}
+
+    /// Helper function for parsing .casadi files
+    static bool proceed_to(std::istream& file, const std::string& str);
 #endif // SWIG
   };
 

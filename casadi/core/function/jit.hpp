@@ -28,6 +28,7 @@
 #define CASADI_JIT_HPP
 
 #include "function.hpp"
+#include "../casadi_file.hpp"
 
 namespace casadi {
 
@@ -49,9 +50,11 @@ namespace casadi {
   CASADI_EXPORT Function jit(const std::string& name, int n_in, int n_out,
                              const std::string& body, const Dict& opts=Dict());
 
+#ifndef SWIG
   /** \brief Create a just-in-time compiled function from a .casadi file
    */
-  CASADI_EXPORT Function jit(const std::string& fname, const Dict& opts=Dict());
+  CASADI_EXPORT Function jit(const ParsedFile& file);
+#endif // SWIG
 
 } // namespace casadi
 
