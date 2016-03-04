@@ -460,7 +460,7 @@ namespace casadi {
           m->arg[NLPSOL_LAM_X] = m->lam_xk;
           m->arg[NLPSOL_LAM_G] = m->lam_gk;
         }
-        
+
         // Outputs
         fill_n(m->res, fcallback_.n_out(), nullptr);
         double ret_double;
