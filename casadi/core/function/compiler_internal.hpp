@@ -46,10 +46,10 @@ namespace casadi {
 
   public:
     /// Constructor
-    CompilerInternal(const std::string& name);
+    explicit CompilerInternal(const std::string& name);
 
     /// Destructor
-    virtual ~CompilerInternal() = 0;
+    virtual ~CompilerInternal();
 
     /** \brief Print */
     virtual void print(std::ostream &stream) const;
@@ -72,7 +72,7 @@ namespace casadi {
     ///@}
 
     /** \brief Initialize */
-    virtual void init(const Dict& opts) = 0;
+    virtual void init(const Dict& opts) {}
 
     // No static functions exposed
     struct Exposed{ };
@@ -87,10 +87,10 @@ namespace casadi {
     static std::string shortname() { return "compiler";}
 
     /// Queery plugin name
-    virtual const char* plugin_name() const = 0;
+    virtual const char* plugin_name() const { return "none";}
 
     /// Get a function pointer for numerical evaluation
-    virtual void* getFunction(const std::string& symname) = 0;
+    virtual void* getFunction(const std::string& symname) { return 0;}
 
     protected:
     /// C filename

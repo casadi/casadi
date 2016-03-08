@@ -35,7 +35,11 @@ namespace casadi {
   Compiler::Compiler(const std::string& name,
                            const std::string& compiler,
                            const Dict& opts) {
-    assignNode(CompilerInternal::getPlugin(compiler).creator(name));
+    if (compiler=="none") {
+      assignNode(new CompilerInternal(name));
+    } else {
+      assignNode(CompilerInternal::getPlugin(compiler).creator(name));
+    }
     (*this)->construct(opts);
   }
 
