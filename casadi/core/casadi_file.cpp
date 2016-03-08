@@ -64,28 +64,40 @@ namespace casadi {
     // Loop over the lines
     auto line_it = lines.cbegin();
     while (line_it!=lines.cend()) {
-      // Current line number and command string
-      const string& cmd = *line_it++;
-      int line_no = line_it - lines.cbegin() + offset;
-
       // If comment or empty line, skip
-      if (cmd.empty() || cmd.at(0)=='#') continue;
+      if (line_it->empty() || line_it->at(0)=='#') {
+        line_it++;
+        continue;
+      }
 
-      // Make sure command
-      casadi_assert(cmd.at(0)==':');
+      // Current line number
+      int line_no = line_it - lines.cbegin() + 1 + offset;
+
+      // Get command string
+      string cmd = line_it->substr(0, line_it->find(' '));
+      casadi_assert_message(cmd.at(0)==':',
+                            "Syntax error: " + cmd + " is not a command string");
 
       // New entry
       stringstream ss;
-      while (true) {
-        casadi_assert_message(line_it!=lines.cend(),
-                              "End of file reached looking for " + cmd);
-        const string& line = *line_it++;
 
-        // End of entry?
-        if (line==cmd) break;
+      // Collect the meta data
+      size_t start = cmd.size()+1;
+      while (true) {
+        // Find the backslash, if any
+        size_t stop = line_it->find('\\');
 
         // Add to entry
-        ss << line << endl;
+        ss << line_it->substr(start, stop-start);
+
+        // Break if no more lines or not multiline
+        if (++line_it==lines.cend() || stop == string::npos) break;
+
+        // Multiline entry
+        if (start!=stop) ss << std::endl;
+
+        // No offset for subsequent lines
+        start = 0;
       }
 
       // Insert new element in map
