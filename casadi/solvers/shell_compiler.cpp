@@ -81,6 +81,9 @@ namespace casadi {
   };
 
   void ShellCompiler::init(const Dict& opts) {
+    // Base class
+    CompilerInternal::init(opts);
+
     // Default options
     string compiler = "gcc";
     string compiler_setup = "-fPIC -shared";

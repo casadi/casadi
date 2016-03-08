@@ -30,7 +30,18 @@ using namespace std;
 
 namespace casadi {
 
-  File::File(const std::string& fname) {
+  ParsedFile::ParsedFile(const std::string& fname) {
+    parse(fname);
+  }
+
+  ParsedFile::ParsedFile(const std::vector<std::string>& lines, int offset) {
+    parse(lines, offset);
+  }
+
+  void ParsedFile::parse(const std::string& fname) {
+    // Lines to be extracted
+    std::vector<std::string> lines;
+
     // Open file and read line-by-line
     ifstream file(fname);
     casadi_assert_message(file.good(), "File \"" + fname + "\" cannot be opened.");
@@ -44,15 +55,18 @@ namespace casadi {
       // Save to class
       lines.push_back(line);
     }
+
+    // Parse the extracted lines
+    parse(lines, 0);
   }
 
-  ParsedFile::ParsedFile(const File& file) {
+  void ParsedFile::parse(const std::vector<std::string>& lines, int offset) {
     // Loop over the lines
-    auto line_it = file.lines.cbegin();
-    while (line_it!=file.lines.cend()) {
+    auto line_it = lines.cbegin();
+    while (line_it!=lines.cend()) {
       // Current line number and command string
       const string& cmd = *line_it++;
-      int line_no = line_it - file.lines.cbegin();
+      int line_no = line_it - lines.cbegin() + offset;
 
       // If comment or empty line, skip
       if (cmd.empty() || cmd.at(0)=='#') continue;
@@ -63,7 +77,7 @@ namespace casadi {
       // New entry
       stringstream ss;
       while (true) {
-        casadi_assert_message(line_it!=file.lines.cend(),
+        casadi_assert_message(line_it!=lines.cend(),
                               "End of file reached looking for " + cmd);
         const string& line = *line_it++;
 

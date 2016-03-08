@@ -67,4 +67,34 @@ namespace casadi {
     init(opts);
   }
 
+  void CompilerInternal::init(const Dict& opts) {
+    // Read meta information from file
+    std::vector<std::string> lines;
+    int offset;
+    get_meta(lines, offset);
+    meta_ = ParsedFile(lines, offset);
+  }
+
+  void CompilerInternal::get_meta(std::vector<std::string>& lines, int& offset) const {
+    // Open source file and search for meta information
+    ifstream file(name_);
+    std::string line;
+    offset = 0;
+    lines.clear();
+    while (getline(file, line)) {
+      // Update offset
+      offset++;
+
+      // Try to find a /*CASADI delimiter
+      if (line.find("/*CASADIMETA") != string::npos) {
+        // Delimimiter found, find */ delimiter
+        while (getline(file, line)) {
+          if (line.find("*/") != string::npos) return; // Successful return
+          lines.push_back(line);
+        }
+        casadi_error("End-of-file reached while searching for \"*/\"");
+      }
+    }
+  }
+
 } // namespace casadi

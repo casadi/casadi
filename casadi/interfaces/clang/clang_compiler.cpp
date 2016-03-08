@@ -84,6 +84,9 @@ namespace casadi {
   };
 
   void ClangCompiler::init(const Dict& opts) {
+    // Base class
+    CompilerInternal::init(opts);
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="include_path") {

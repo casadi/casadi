@@ -29,6 +29,7 @@
 #include "compiler.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
+#include "../casadi_file.hpp"
 
 
 /// \cond INTERNAL
@@ -72,7 +73,7 @@ namespace casadi {
     ///@}
 
     /** \brief Initialize */
-    virtual void init(const Dict& opts) {}
+    virtual void init(const Dict& opts);
 
     // No static functions exposed
     struct Exposed{ };
@@ -92,9 +93,15 @@ namespace casadi {
     /// Get a function pointer for numerical evaluation
     virtual void* getFunction(const std::string& symname) { return 0;}
 
+    /// Get meta information, if any
+    void get_meta(std::vector<std::string>& lines, int& offset) const;
+
     protected:
     /// C filename
     std::string name_;
+
+    /// Meta information
+    ParsedFile meta_;
   };
 
 } // namespace casadi

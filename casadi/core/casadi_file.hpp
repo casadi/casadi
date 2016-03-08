@@ -37,57 +37,53 @@
 
 namespace casadi {
 
-  /** \brief A raw text file
-      \author Joel Andersson
-      \date 2016
-  */
-  class CASADI_EXPORT File {
-    public:
-      /** \brief Construct from a file */
-      File(const std::string& fname);
-
-      /** \brief Lines of the text file */
-      std::vector<std::string> lines;
-  };
-
   /** \brief A parsed file
       \author Joel Andersson
       \date 2016
   */
   class CASADI_EXPORT ParsedFile {
-    public:
-      /** \brief Construct from a file */
-      ParsedFile(const File& file);
+  public:
+    /** \brief Default constructor (no commands) */
+    ParsedFile() {}
 
-      /** \brief Parse the file */
-      void parse();
+    /** \brief Construct from a file */
+    explicit ParsedFile(const std::string& fname);
 
-      /** \brief Print parsed file */
-      void print(std::ostream &stream=casadi::userOut()) const;
+    /** \brief Construct from a file */
+    explicit ParsedFile(const std::vector<std::string>& lines, int offset=0);
 
-      /** \brief Does an entry exist? */
-      bool has(const std::string& cmd) const;
+    /** \brief Parse a file */
+    void parse(const std::string& fname);
 
-      /** \brief Get entry as a text */
-      std::string to_text(const std::string& cmd) const;
+    /** \brief Parse a list of strings */
+    void parse(const std::vector<std::string>& lines, int offset);
 
-      /** \brief Convert to a type */
-      template<typename T>
+    /** \brief Print parsed file */
+    void print(std::ostream &stream=casadi::userOut()) const;
+
+    /** \brief Does an entry exist? */
+    bool has(const std::string& cmd) const;
+
+    /** \brief Get entry as a text */
+    std::string to_text(const std::string& cmd) const;
+
+    /** \brief Convert to a type */
+    template<typename T>
       T to(const std::string& cmd) const {
-        std::istringstream ss(to_text(cmd));
-        T ret;
-        ss >> ret;
-        return ret;
-      }
+      std::istringstream ss(to_text(cmd));
+      T ret;
+      ss >> ret;
+      return ret;
+    }
 
-      /** \brief Get entry as a string */
-      std::string to_string(const std::string& cmd) const { return to<std::string>(cmd);}
+    /** \brief Get entry as a string */
+    std::string to_string(const std::string& cmd) const { return to<std::string>(cmd);}
 
-      /** \brief Get entry as an integer */
-      int to_int(const std::string& cmd) const { return to<int>(cmd);}
+    /** \brief Get entry as an integer */
+    int to_int(const std::string& cmd) const { return to<int>(cmd);}
 
-      /** \brief Map of commands */
-      std::map<std::string, std::pair<int, std::string> > commands;
+    /** \brief Map of commands */
+    std::map<std::string, std::pair<int, std::string> > commands;
   };
 
 
