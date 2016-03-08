@@ -246,7 +246,6 @@ namespace casadi {
   void KernelSum2DSerial::evalD(const double** arg, double** res,
                                 int* iw, double* w) {
     int num_in = f_.nIn(), num_out = f_.nOut();
-
     const double* V;
     if (pointer_input_) {
       V = reinterpret_cast<const double *>(*(reinterpret_cast<const uint64_t *>(arg[0])));
@@ -547,7 +546,12 @@ namespace casadi {
     g.addAuxiliary(CodeGenerator::AUX_AXPY);
     int num_in = f_.nIn(), num_out = f_.nOut();
 
-    g.body << "  const real_t* V = arg[0];" << endl;
+      if (pointer_input_) {
+        g.body << "  const real_t* V =  (real_t *) *((unsigned long long int *) arg[0]);" << endl;
+        g.body << " printf(\"test%f\\n\",V[0]);" << endl;
+      } else {
+        g.body << "  const real_t* V = arg[0];" << endl;
+      }
     g.body << "  const real_t* X = arg[1];" << endl;
 
     // Clear the accumulators
