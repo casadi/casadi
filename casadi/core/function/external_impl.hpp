@@ -156,6 +156,9 @@ namespace casadi {
     /// Initialize
     virtual void init(const Dict& opts);
 
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
+
   private:
     /** \brief Creator function, use this for creating instances of the class */
     template<typename LibType>
@@ -260,9 +263,6 @@ namespace casadi {
     /** \brief  Evaluate numerically */
     virtual void simple(const double* arg, double* res);
 
-    /** \brief Add a dependent function */
-    virtual void addDependency(CodeGenerator& g) const;
-
     /** \brief Generate a call to a function (simplified signature) */
     virtual std::string simple_call(const CodeGenerator& g,
                                     const std::string& arg, const std::string& res) const;
@@ -298,9 +298,6 @@ namespace casadi {
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-
-    /** \brief Add a dependent function */
-    virtual void addDependency(CodeGenerator& g) const;
 
     /** \brief Generate a call to a function (generic signature) */
     virtual std::string generic_call(const CodeGenerator& g, const std::string& mem,

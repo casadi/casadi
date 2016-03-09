@@ -377,14 +377,8 @@ namespace casadi {
     if (flag) throw CasadiException("CommonExternal: \""+this->name_+"\" failed");
   }
 
-  template<typename LibType>
-  void SimplifiedExternal<LibType>::addDependency(CodeGenerator& g) const {
-    g.addExternal("void " + this->name_ + "(const real_t* arg, real_t* res);");
-  }
-
-  template<typename LibType>
-  void GenericExternal<LibType>::addDependency(CodeGenerator& g) const {
-    g.addExternal("int " + this->name_ + "(const real_t** arg, real_t** res, int* iw, real_t* w);");
+  void External::addDependency(CodeGenerator& g) const {
+    g.addExternal(signature(this->name_) + ";");
   }
 
   template<typename LibType>
