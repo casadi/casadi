@@ -288,9 +288,9 @@ namespace casadi {
       int flag = sparsity_(ind+get_n_in(), &nrow, &ncol, &colind, &row);
       casadi_assert_message(flag==0, "External: \"sparsity\" failed");
       return Sparsity(nrow, ncol, colind, row);
-    } else if (li_.meta().has(name_ + "_SPARSITY_OUT", ind-this->n_in())) {
+    } else if (li_.meta().has(name_ + "_SPARSITY_OUT", ind)) {
       const ParsedFile& m = li_.meta();
-      vector<int> v = m.to_vector<int>(name_ + "_SPARSITY_OUT", ind-this->n_in());
+      vector<int> v = m.to_vector<int>(name_ + "_SPARSITY_OUT", ind);
       return Sparsity::compressed(v);
     } else {
       // By default, scalar
