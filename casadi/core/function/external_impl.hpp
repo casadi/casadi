@@ -225,6 +225,8 @@ namespace casadi {
         void* mem;
         allocmem_(&mem, get_ptr(int_data_), get_ptr(real_data_));
         return mem;
+      } else if (!derivative_of_.is_null()) {
+        return derivative_of_->alloc_memory();
       } else {
         return 0;
       }
@@ -232,7 +234,11 @@ namespace casadi {
 
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const {
-      if (freemem_) freemem_(mem);
+      if (freemem_) {
+        freemem_(mem);
+      } else if (!derivative_of_.is_null()) {
+        derivative_of_->free_memory(mem);
+      }
     }
   };
 
