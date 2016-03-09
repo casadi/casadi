@@ -763,6 +763,9 @@ namespace casadi {
     /// Cache for Jacobians
     SparseStorage<WeakRef> jac_, jac_compact_;
 
+    /// If the function is the derivative of another function
+    Function derivative_of_;
+
     /// User-set field
     void* user_data_;
 

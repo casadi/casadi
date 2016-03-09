@@ -251,7 +251,12 @@ namespace casadi {
         "Just-in-time compiler plugin to be used."}},
       {"jit_options",
        {OT_DICT,
-        "Options to be passed to the jit compiler."}}
+        "Options to be passed to the jit compiler."}},
+      {"derivative_of",
+       {OT_FUNCTION,
+        "The function is a derivative of another function. "
+        "The type of derivative (directional derivative, Jacobian) "
+        "is inferred from the function name."}}
      }
   };
 
@@ -282,6 +287,8 @@ namespace casadi {
         compilerplugin_ = op.second.to_string();
       } else if (op.first=="jit_options") {
         jit_options_ = op.second;
+      } else if (op.first=="derivative_of") {
+        derivative_of_ = op.second;
       }
     }
 
