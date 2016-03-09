@@ -115,6 +115,9 @@ namespace casadi {
     */
     virtual void finalize();
 
+    /** \brief Get a public class instance */
+    Function function() const { return shared_from_this<Function>();}
+
     /** \brief Get input scheme */
     virtual std::vector<std::string> get_ischeme() const;
 
