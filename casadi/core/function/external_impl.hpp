@@ -170,15 +170,15 @@ namespace casadi {
     /** \brief Information about the library */
     LibInfo<LibType> li_;
 
-    /** \brief Number of inputs and outputs */
-    int n_in_, n_out_;
-
     /// @{
     /** \brief Retreive sparsities */
     sparsity_t sparsity_;
     virtual Sparsity get_sparsity_in(int ind) const;
     virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
+
+    /** \brief Initialize */
+    init_t init_;
 
     /** \brief Allocate memory */
     allocmem_t allocmem_;
@@ -192,10 +192,13 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~CommonExternal() = 0;
 
+    /// Initialize
+    virtual void init(const Dict& opts);
+
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return n_in_;}
-    virtual size_t get_n_out() const { return n_out_;}
+    virtual size_t get_n_in() const;
+    virtual size_t get_n_out() const;
     ///@}
 
     ///@{
@@ -245,6 +248,9 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~SimplifiedExternal() { this->clear_memory();}
 
+    /// Initialize
+    virtual void init(const Dict& opts);
+
     /** \brief  Evaluate numerically */
     virtual void simple(const double* arg, double* res);
 
@@ -280,6 +286,9 @@ namespace casadi {
 
     /** \brief  Destructor */
     virtual ~GenericExternal() { this->clear_memory();}
+
+    /// Initialize
+    virtual void init(const Dict& opts);
 
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;

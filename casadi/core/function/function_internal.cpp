@@ -2982,4 +2982,24 @@ namespace casadi {
     mem_.clear();
   }
 
+  size_t FunctionInternal::get_n_in() const {
+    if (!derivative_of_.is_null()) {
+      string n = derivative_of_.name();
+      if (name_ == n + "_jac") {
+        return derivative_of_.n_in();
+      }
+    }
+    casadi_error("'get_n_in' not defined for " + type_name());
+  }
+
+  size_t FunctionInternal::get_n_out() const {
+    if (!derivative_of_.is_null()) {
+      string n = derivative_of_.name();
+      if (name_ == n + "_jac") {
+        return 1;
+      }
+    }
+    casadi_error("'get_n_out' not defined for " + type_name());
+  }
+
 } // namespace casadi

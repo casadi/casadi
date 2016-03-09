@@ -531,9 +531,9 @@ namespace casadi {
     ///@{
     /** \brief Number of function inputs and outputs */
     inline int n_in() const { return isp_.size();}
-    virtual size_t get_n_in() const = 0;
+    virtual size_t get_n_in() const;
     inline int n_out() const { return osp_.size();}
-    virtual size_t get_n_out() const = 0;
+    virtual size_t get_n_out() const;
     ///@}
 
     ///@{

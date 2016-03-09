@@ -194,50 +194,45 @@ namespace casadi {
 
     // Initialize and get the number of inputs and outputs
     // Function for creating an object instance
-    init_t init;
     string init_s = name + "_init";
     int n_int=0, n_real=0;
-    li_.get(init, init_s);
-    if (init!=0) {
-      int flag = init(&n_in_, &n_out_, &n_int, &n_real);
+    li_.get(init_, init_s);
+    if (init_!=0) {
+      int flag = init_(0, 0, &n_int, &n_real);
       casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
     } else {
       // Fall back to reading meta information
-      if (!li_.meta().has(name + "_N_IN") || !li_.meta().has(name + "_N_OUT")) {
-        casadi_error("External: no information about number of inputs and outputs "
-                     "available, either by a function \"" + init_s + "\" or by "
-                     "meta information in the C source file. "
-                     "Possible cause: If the function was generated from CasADi, "
-                     "make sure that it was compiled with a C compiler. If the "
-                     "function is C++, make sure to use extern \"C\" linkage.");
-      }
-      n_in_ = li_.meta().to_int(name + "_N_IN");
-      n_out_ = li_.meta().to_int(name + "_N_OUT");
       if (li_.meta().has(name + "_N_INT")) n_int=li_.meta().to_int(name + "_N_INT");
       if (li_.meta().has(name + "_N_REAL")) n_real=li_.meta().to_int(name + "_N_REAL");
     }
     int_data_.resize(n_int);
     real_data_.resize(n_real);
+  }
+
+  template<typename LibType>
+  void CommonExternal<LibType>::init(const Dict& opts) {
+    // Call recursively
+    External::init(opts);
 
     // Get number of temporaries
     int sz_arg, sz_res, sz_iw, sz_w;
     work_t work;
-    li_.get(work, name + "_work");
+    li_.get(work, name_ + "_work");
     if (work!=0) {
       int flag = work(&sz_arg, &sz_res, &sz_iw, &sz_w);
       casadi_assert_message(flag==0, "CommonExternal: \"work\" failed");
     } else {
       // No work vectors
-      sz_arg = n_in_;
-      sz_res = n_out_;
+      sz_arg = n_in();
+      sz_res = n_out();
       sz_iw = sz_w = 0;
     }
 
     // Function for allocating memory, if any
-    li_.get(allocmem_, name + "_alloc");
+    li_.get(allocmem_, name_ + "_alloc");
 
     // Function for freeing memory, if any
-    li_.get(freemem_, name + "_free");
+    li_.get(freemem_, name_ + "_free");
 
     alloc_arg(sz_arg);
     alloc_res(sz_res);
@@ -249,13 +244,50 @@ namespace casadi {
   SimplifiedExternal<LibType>::SimplifiedExternal(const std::string& name,
                                                   const LibInfo<LibType>& li)
     : CommonExternal<LibType>(name, li) {
+  }
+
+  template<typename LibType>
+  void SimplifiedExternal<LibType>::init(const Dict& opts) {
+    // Call recursively
+    CommonExternal<LibType>::init(opts);
+
     // Function for numerical evaluation
-    string eval_s = name + "_simple";
+    string eval_s = this->name_ + "_simple";
     li_.get(eval_, eval_s);
     casadi_assert_message(eval_!=0, "SimplifiedExternal: no \"" + eval_s + "\" found");
 
     // Arrays for holding inputs and outputs
     this->alloc_w(this->n_in() + this->n_out());
+  }
+
+  template<typename LibType>
+  size_t CommonExternal<LibType>::get_n_in() const {
+    if (init_) {
+      int n_in;
+      int flag = init_(&n_in, 0, 0, 0);
+      casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
+      return n_in;
+    } else if (li_.meta().has(name_ + "_N_IN")) {
+      return li_.meta().to_int(name_ + "_N_IN");
+    } else {
+      // Fall back to base class
+      return External::get_n_in();
+    }
+  }
+
+  template<typename LibType>
+  size_t CommonExternal<LibType>::get_n_out() const {
+    if (init_) {
+      int n_out;
+      int flag = init_(0, &n_out, 0, 0);
+      casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
+      return n_out;
+    } else if (li_.meta().has(name_ + "_N_OUT")) {
+      return li_.meta().to_int(name_ + "_N_OUT");
+    } else {
+      // Fall back to base class
+      return External::get_n_out();
+    }
   }
 
   template<typename LibType>
@@ -301,8 +333,6 @@ namespace casadi {
   template<typename LibType>
   GenericExternal<LibType>::GenericExternal(const std::string& name, const LibInfo<LibType>& li)
     : CommonExternal<LibType>(name, li) {
-    // Function for numerical evaluation
-    li_.get(eval_, name);
 
     // Function for retrieving sparsities of inputs and outputs
     li_.get(this->sparsity_, name + "_sparsity");
@@ -321,6 +351,15 @@ namespace casadi {
       freemem_(0);
     }
     li_.clear();
+  }
+
+  template<typename LibType>
+  void GenericExternal<LibType>::init(const Dict& opts) {
+    // Call recursively
+    CommonExternal<LibType>::init(opts);
+
+    // Function for numerical evaluation
+    li_.get(eval_, this->name_);
   }
 
   template<typename LibType>
