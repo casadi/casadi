@@ -305,8 +305,8 @@ namespace casadi {
       vector<int> v = m.to_vector<int>(name_ + "_SPARSITY_IN", ind);
       return Sparsity::compressed(v);
     } else {
-      // By default, scalar
-      return Sparsity::scalar();
+      // Fall back to base class
+      return External::get_sparsity_in(ind);
     }
   }
 
@@ -325,8 +325,8 @@ namespace casadi {
       vector<int> v = m.to_vector<int>(name_ + "_SPARSITY_OUT", ind);
       return Sparsity::compressed(v);
     } else {
-      // By default, scalar
-      return Sparsity::scalar();
+      // Fall back to base class
+      return External::get_sparsity_out(ind);
     }
   }
 

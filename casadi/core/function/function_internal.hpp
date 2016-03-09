@@ -636,7 +636,7 @@ namespace casadi {
     inline const Sparsity& sparsity_in(const std::string& iname) const {
       return sparsity_in(index_in(iname));
     }
-    virtual Sparsity get_sparsity_in(int ind) const = 0;
+    virtual Sparsity get_sparsity_in(int ind) const;
     /// @}
 
     /** \brief Get sparsity of a given output */
@@ -647,7 +647,7 @@ namespace casadi {
     inline const Sparsity& sparsity_out(const std::string& iname) const {
       return sparsity_out(index_out(iname));
     }
-    virtual Sparsity get_sparsity_out(int ind) const = 0;
+    virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
     /** \brief  Log the status of the solver */

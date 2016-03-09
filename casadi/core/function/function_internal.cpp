@@ -3002,4 +3002,28 @@ namespace casadi {
     casadi_error("'get_n_out' not defined for " + type_name());
   }
 
+  Sparsity FunctionInternal::get_sparsity_in(int ind) const {
+    if (!derivative_of_.is_null()) {
+      string n = derivative_of_.name();
+      if (name_ == n + "_jac") {
+        // Same as nondifferentiated function
+        return derivative_of_.sparsity_in(ind);
+      }
+    }
+    // Scalar by default
+    return Sparsity::scalar();
+  }
+
+  Sparsity FunctionInternal::get_sparsity_out(int ind) const {
+    if (!derivative_of_.is_null()) {
+      string n = derivative_of_.name();
+      if (name_ == n + "_jac") {
+        // Dense Jacobian by default
+        return Sparsity::dense(derivative_of_.nnz_out(), derivative_of_.nnz_in());
+      }
+    }
+    // Scalar by default
+    return Sparsity::scalar();
+  }
+
 } // namespace casadi
