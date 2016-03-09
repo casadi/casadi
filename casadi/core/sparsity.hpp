@@ -84,15 +84,16 @@ namespace casadi {
     /** \brief Pattern with all structural zeros */
     Sparsity(int nrow, int ncol);
 
-#ifndef SWIG
-    /** \brief Create a sparse matrix with all structural zeros */
-    explicit Sparsity(const std::pair<int, int>& rc);
-#endif // SWIG
-
     /// Construct from sparsity pattern vectors given in compressed column storage format
     Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
 
 #ifndef SWIG
+    /// Construct from sparsity pattern vectors given in compressed column storage format
+    Sparsity(int nrow, int ncol, const int* colind, const int* row);
+
+    /** \brief Create a sparse matrix with all structural zeros */
+    explicit Sparsity(const std::pair<int, int>& rc);
+
     /** \brief  Create from node */
     static Sparsity create(SparsityInternal *node);
 

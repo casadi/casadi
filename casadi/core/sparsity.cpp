@@ -89,6 +89,17 @@ namespace casadi {
     sanity_check(true);
   }
 
+  Sparsity::Sparsity(int nrow, int ncol, const int* colind, const int* row) {
+    if (colind==0 || colind[ncol]==nrow*ncol) {
+      *this = dense(nrow, ncol);
+    } else {
+      vector<int> colindv(colind, colind+ncol+1);
+      vector<int> rowv(row, row+colind[ncol]);
+      assign_cached(nrow, ncol, colindv, rowv);
+      sanity_check(true);
+    }
+  }
+
   const SparsityInternal* Sparsity::operator->() const {
     return static_cast<const SparsityInternal*>(SharedObject::operator->());
   }

@@ -147,13 +147,6 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~External() = 0;
 
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const;
-    virtual Sparsity get_sparsity_out(int ind) const;
-    virtual Sparsity get_sparsity(int ind) const = 0;
-    /// @}
-
     ///@{
     /** \brief Options */
     static Options options_;
@@ -183,7 +176,8 @@ namespace casadi {
     /// @{
     /** \brief Retreive sparsities */
     sparsity_t sparsity_;
-    virtual Sparsity get_sparsity(int ind) const;
+    virtual Sparsity get_sparsity_in(int ind) const;
+    virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
     /** \brief Allocate memory */
@@ -267,7 +261,8 @@ namespace casadi {
     /// @{
     /** \brief Retreive sparsities */
     sparsity_t sparsity_;
-    virtual Sparsity get_sparsity(int ind) const { return Sparsity::scalar();}
+    virtual Sparsity get_sparsity_in(int ind) const { return Sparsity::scalar();}
+    virtual Sparsity get_sparsity_out(int ind) const { return Sparsity::scalar();}
     /// @}
   protected:
     /** \brief  Function pointers */
@@ -296,10 +291,6 @@ namespace casadi {
     virtual std::string generic_call(const CodeGenerator& g, const std::string& mem,
                                      const std::string& arg, const std::string& res,
                                      const std::string& iw, const std::string& w) const;
-
-    /** \brief All inputs and outputs are scalar (default if sparsity not defined) */
-    static int scalarSparsity(int i, int *n_row, int *n_col,
-                              const int **colind, const int **row);
 
     /** \brief  Function pointers */
     eval_t eval_;

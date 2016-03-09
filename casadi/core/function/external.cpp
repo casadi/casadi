@@ -258,16 +258,8 @@ namespace casadi {
     this->alloc_w(this->n_in() + this->n_out());
   }
 
-  Sparsity External::get_sparsity_in(int ind) const {
-    return get_sparsity(ind);
-  }
-
-  Sparsity External::get_sparsity_out(int ind) const {
-    return get_sparsity(ind+get_n_in());
-  }
-
   template<typename LibType>
-  Sparsity CommonExternal<LibType>::get_sparsity(int ind) const {
+  Sparsity CommonExternal<LibType>::get_sparsity_in(int ind) const {
     // Use sparsity retrieval function, if present
     if (sparsity_) {
       // Get sparsity pattern in CCS format
@@ -275,26 +267,30 @@ namespace casadi {
       const int *colind, *row;
       int flag = sparsity_(ind, &nrow, &ncol, &colind, &row);
       casadi_assert_message(flag==0, "External: \"sparsity\" failed");
-
-      if (colind==0 || row==0) {
-        // Dense
-        return Sparsity::dense(nrow, ncol);
-      } else {
-        // Column offsets
-        vector<int> colindv(colind, colind+ncol+1);
-
-        // Number of nonzeros
-        int nnz = colindv.back();
-
-        // Rows
-        vector<int> rowv(row, row+nnz);
-
-        // Sparsity
-        return Sparsity(nrow, ncol, colindv, rowv);
-      }
-    } else if (li_.meta().has(name_ + "_SPARSITY", ind)) {
+      return Sparsity(nrow, ncol, colind, row);
+    } else if (li_.meta().has(name_ + "_SPARSITY_IN", ind)) {
       const ParsedFile& m = li_.meta();
-      vector<int> v = m.to_vector<int>(name_ + "_SPARSITY", ind);
+      vector<int> v = m.to_vector<int>(name_ + "_SPARSITY_IN", ind);
+      return Sparsity::compressed(v);
+    } else {
+      // By default, scalar
+      return Sparsity::scalar();
+    }
+  }
+
+  template<typename LibType>
+  Sparsity CommonExternal<LibType>::get_sparsity_out(int ind) const {
+    // Use sparsity retrieval function, if present
+    if (sparsity_) {
+      // Get sparsity pattern in CCS format
+      int nrow, ncol;
+      const int *colind, *row;
+      int flag = sparsity_(ind+get_n_in(), &nrow, &ncol, &colind, &row);
+      casadi_assert_message(flag==0, "External: \"sparsity\" failed");
+      return Sparsity(nrow, ncol, colind, row);
+    } else if (li_.meta().has(name_ + "_SPARSITY_OUT", ind-this->n_in())) {
+      const ParsedFile& m = li_.meta();
+      vector<int> v = m.to_vector<int>(name_ + "_SPARSITY_OUT", ind-this->n_in());
       return Sparsity::compressed(v);
     } else {
       // By default, scalar
@@ -373,21 +369,6 @@ namespace casadi {
     ss << this->name_ << "(" << mem << ", " << arg << ", " << res << ", "
        << iw << ", " << w << ")";
     return ss.str();
-  }
-
-  template<typename LibType>
-  int GenericExternal<LibType>::scalarSparsity(int i, int *n_row, int *n_col,
-                                               const int **colind, const int **row) {
-    // Dense scalar
-    static const int colind_scalar[] = {0, 1};
-    static const int row_scalar[] = {0};
-
-    // Return to user
-    if (n_row) *n_row=1;
-    if (n_col) *n_col=1;
-    if (colind) *colind=colind_scalar;
-    if (row) *row=row_scalar;
-    return 0;
   }
 
   template<typename LibType>
