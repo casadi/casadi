@@ -77,6 +77,7 @@ namespace casadi {
 
   LibInfo<Compiler>::LibInfo(const Compiler& compiler)
     : compiler_(compiler) {
+    if (meta().has("SYMBOLS")) meta_symbols_ = meta().to_set<std::string>("SYMBOLS");
   }
 
   void LibInfo<std::string>::clear() {
@@ -109,7 +110,24 @@ namespace casadi {
 
   template<typename FcnPtr>
   void LibInfo<Compiler>::get(FcnPtr& fcnPtr, const std::string& sym) {
-    fcnPtr = (FcnPtr)compiler_.getFunction(sym);
+    fcnPtr = (FcnPtr)compiler_.get_function(sym);
+  }
+
+  bool LibInfo<Compiler>::has(const std::string& sym) {
+    // Check if in meta information
+    if (meta_symbols_.count(sym)) return true;
+
+    // Convert to a dummy function pointer
+    void (*fcn)(void);
+    get(fcn, sym);
+    return fcn!=0;
+  }
+
+  bool LibInfo<std::string>::has(const std::string& sym) {
+    // Convert to a dummy function pointer
+    void (*fcn)(void);
+    get(fcn, sym);
+    return fcn!=0;
   }
 
   Options External::options_
@@ -161,10 +179,7 @@ namespace casadi {
     // Structure with info about the library to be passed to the constructor
     LibInfo<LibType> li(libtype);
 
-    // Can the function be evaluated using the simple API?
-    simple_t simple;
-    li.get(simple, f_name + "_simple");
-    if (simple!=0) {
+    if (li.has(f_name + "_simple")) {
       // Simplified, lower overhead external
       return new SimplifiedExternal<LibType>(f_name, li);
     } else {
@@ -177,22 +192,30 @@ namespace casadi {
   CommonExternal<LibType>::CommonExternal(const std::string& name, const LibInfo<LibType>& li)
     : External(name), li_(li) {
 
+    // Initialize and get the number of inputs and outputs
     // Function for creating an object instance
     init_t init;
     string init_s = name + "_init";
+    int n_int=0, n_real=0;
     li_.get(init, init_s);
-    if (init==0) {
-      li_.clear();
-      casadi_error("CommonExternal: no \"" + init_s + "\" found. "
-                   "Possible cause: If the function was generated from CasADi, "
-                   "make sure that it was compiled with a C compiler. If the "
-                   "function is C++, make sure to use extern \"C\" linkage.");
+    if (init!=0) {
+      int flag = init(&n_in_, &n_out_, &n_int, &n_real);
+      casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
+    } else {
+      // Fall back to reading meta information
+      if (!li_.meta().has(name + "_N_IN") || !li_.meta().has(name + "_N_OUT")) {
+        casadi_error("External: no information about number of inputs and outputs "
+                     "available, either by a function \"" + init_s + "\" or by "
+                     "meta information in the C source file. "
+                     "Possible cause: If the function was generated from CasADi, "
+                     "make sure that it was compiled with a C compiler. If the "
+                     "function is C++, make sure to use extern \"C\" linkage.");
+      }
+      n_in_ = li_.meta().to_int(name + "_N_IN");
+      n_out_ = li_.meta().to_int(name + "_N_OUT");
+      if (li_.meta().has(name + "_N_INT")) n_int=li_.meta().to_int(name + "_N_INT");
+      if (li_.meta().has(name + "_N_REAL")) n_real=li_.meta().to_int(name + "_N_REAL");
     }
-
-    // Initialize and get the number of inputs and outputs
-    int n_int, n_real;
-    int flag = init(&n_in_, &n_out_, &n_int, &n_real);
-    casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
     int_data_.resize(n_int);
     real_data_.resize(n_real);
 
@@ -201,7 +224,7 @@ namespace casadi {
     work_t work;
     li_.get(work, name + "_work");
     if (work!=0) {
-      flag = work(&sz_arg, &sz_res, &sz_iw, &sz_w);
+      int flag = work(&sz_arg, &sz_res, &sz_iw, &sz_w);
       casadi_assert_message(flag==0, "CommonExternal: \"work\" failed");
     } else {
       // No work vectors
@@ -245,28 +268,37 @@ namespace casadi {
 
   template<typename LibType>
   Sparsity CommonExternal<LibType>::get_sparsity(int ind) const {
-    // Get sparsity from file
-    int nrow, ncol;
-    const int *colind, *row;
-    casadi_assert(sparsity_!=0);
-    int flag = sparsity_(ind, &nrow, &ncol, &colind, &row);
-    casadi_assert_message(flag==0, "External: \"sparsity\" failed");
+    // Use sparsity retrieval function, if present
+    if (sparsity_) {
+      // Get sparsity pattern in CCS format
+      int nrow, ncol;
+      const int *colind, *row;
+      int flag = sparsity_(ind, &nrow, &ncol, &colind, &row);
+      casadi_assert_message(flag==0, "External: \"sparsity\" failed");
 
-    if (colind==0 || row==0) {
-      // Dense
-      return Sparsity::dense(nrow, ncol);
+      if (colind==0 || row==0) {
+        // Dense
+        return Sparsity::dense(nrow, ncol);
+      } else {
+        // Column offsets
+        vector<int> colindv(colind, colind+ncol+1);
+
+        // Number of nonzeros
+        int nnz = colindv.back();
+
+        // Rows
+        vector<int> rowv(row, row+nnz);
+
+        // Sparsity
+        return Sparsity(nrow, ncol, colindv, rowv);
+      }
+    } else if (li_.meta().has(name_ + "_SPARSITY", ind)) {
+      const ParsedFile& m = li_.meta();
+      vector<int> v = m.to_vector<int>(name_ + "_SPARSITY", ind);
+      return Sparsity::compressed(v);
     } else {
-      // Col offsets
-      vector<int> colindv(colind, colind+ncol+1);
-
-      // Number of nonzeros
-      int nnz = colindv.back();
-
-      // Rows
-      vector<int> rowv(row, row+nnz);
-
-      // Sparsity
-      return Sparsity(nrow, ncol, colindv, rowv);
+      // By default, scalar
+      return Sparsity::scalar();
     }
   }
 
@@ -275,14 +307,9 @@ namespace casadi {
     : CommonExternal<LibType>(name, li) {
     // Function for numerical evaluation
     li_.get(eval_, name);
-    casadi_assert_message(eval_!=0, "GenericExternal: no \""+name+"\" found");
 
     // Function for retrieving sparsities of inputs and outputs
     li_.get(this->sparsity_, name + "_sparsity");
-    if (this->sparsity_==0) {
-      // Fall back to scalar sparsity
-      this->sparsity_ = scalarSparsity;
-    }
   }
 
   External::External(const std::string& name)
@@ -303,12 +330,14 @@ namespace casadi {
   template<typename LibType>
   void SimplifiedExternal<LibType>::
   simple(const double* arg, double* res) {
+    casadi_assert_message(eval_!=0, "Numerical evaluation not possible");
     eval_(arg, res);
   }
 
   template<typename LibType>
   void GenericExternal<LibType>::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    casadi_assert_message(eval_!=0, "Numerical evaluation not possible");
     int flag = eval_(mem, arg, res, iw, w);
     if (flag) throw CasadiException("CommonExternal: \""+this->name_+"\" failed");
   }
@@ -364,10 +393,7 @@ namespace casadi {
   template<typename LibType>
   bool CommonExternal<LibType>::hasFullJacobian() const {
     if (FunctionInternal::hasFullJacobian()) return true;
-    // Init function for Jacobian?
-    init_t jac_init;
-    const_cast<LibInfo<LibType>&>(li_).get(jac_init, name_ + "_jac_init");
-    return jac_init!=0;
+    return const_cast<LibInfo<LibType>&>(li_).has(name_ + "_jac");
   }
 
   template<typename LibType>

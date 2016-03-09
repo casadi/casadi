@@ -77,9 +77,18 @@ namespace casadi {
     // Automatic type conversion
     operator const std::string&() const { return bin_name_;}
 
+    // Check if symbol exists
+    bool has(const std::string& sym);
+
     // Get function pointer
     template<typename FcnPtr>
     void get(FcnPtr& fcnPtr, const std::string& sym);
+
+    // Get meta
+    const ParsedFile& meta() const {
+      static ParsedFile singleton;
+      return singleton;
+    }
   };
 
   /** \brief Library that has been just-in-time compiled */
@@ -87,6 +96,7 @@ namespace casadi {
   class LibInfo<Compiler> {
   private:
     Compiler compiler_;
+    std::set<std::string> meta_symbols_;
 
   public:
     // Default constructor
@@ -101,9 +111,15 @@ namespace casadi {
     // Automatic type conversion
     operator const Compiler&() const { return compiler_;}
 
+    // Check if symbol exists
+    bool has(const std::string& sym);
+
     // Get function pointer
     template<typename FcnPtr>
     void get(FcnPtr& fcnPtr, const std::string& sym);
+
+    // Get meta
+    const ParsedFile& meta() const { return compiler_.meta();}
   };
 
   class CASADI_EXPORT External : public FunctionInternal {
@@ -208,13 +224,19 @@ namespace casadi {
 
     /** \brief Create memory block */
     virtual void* alloc_memory() const {
-      void* mem;
-      allocmem_(&mem, get_ptr(int_data_), get_ptr(real_data_));
-      return mem;
+      if (allocmem_) {
+        void* mem;
+        allocmem_(&mem, get_ptr(int_data_), get_ptr(real_data_));
+        return mem;
+      } else {
+        return 0;
+      }
     }
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const { freemem_(mem);}
+    virtual void free_memory(void *mem) const {
+      if (freemem_) freemem_(mem);
+    }
   };
 
   template<typename LibType>

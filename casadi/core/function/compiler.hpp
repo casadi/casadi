@@ -27,7 +27,7 @@
 #define CASADI_COMPILER_HPP
 
 #include "function.hpp"
-
+#include "../casadi_file.hpp"
 
 namespace casadi {
 
@@ -75,7 +75,10 @@ namespace casadi {
 
 #ifndef SWIG
     /// Get a function pointer for numerical evaluation
-    void* getFunction(const std::string& symname);
+    void* get_function(const std::string& symname);
+
+    /// Get meta information
+    const ParsedFile& meta() const;
 #endif // SWIG
   };
 

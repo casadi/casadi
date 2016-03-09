@@ -348,10 +348,10 @@ namespace casadi {
       compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
 
       // Try to load with simplified syntax
-      simple_ = (simple_t)compiler_.getFunction(name() + "_simple");
+      simple_ = (simple_t)compiler_.get_function(name() + "_simple");
       // If not succesful, try generic syntax
       if (simple_==0) {
-        eval_ = (eval_t)compiler_.getFunction(name());
+        eval_ = (eval_t)compiler_.get_function(name());
         casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
       }
     }

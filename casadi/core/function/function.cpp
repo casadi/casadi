@@ -82,7 +82,7 @@ namespace casadi {
     ParsedFile file(fname);
 
     // Create the corresponding class
-    string classname = file.to_string(":CLASS");
+    string classname = file.to_string("CLASS");
 
     if (classname=="Jit") {
       *this = jit(file);

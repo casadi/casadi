@@ -1047,11 +1047,13 @@ namespace casadi {
   Sparsity Sparsity::compressed(const std::vector<int>& v) {
     // Check consistency
     casadi_assert(v.size() >= 2);
-    //int nrow = v[0];
+    int nrow = v[0];
     int ncol = v[1];
     casadi_assert(v.size() >= 2 + ncol+1);
     int nnz = v[2 + ncol];
-    casadi_assert(v.size() == 2 + ncol+1 + nnz);
+    bool dense = v.size() == 2 + ncol+1 && nrow*ncol==nnz;
+    bool sparse = v.size() == 2 + ncol+1 + nnz;
+    casadi_assert(dense || sparse);
 
     // Call array version
     return compressed(&v.front());
@@ -1063,10 +1065,16 @@ namespace casadi {
     int ncol = v[1];
     const int *colind = v+2;
     int nnz = colind[ncol];
-    const int *row = v + 2 + ncol+1;
-
-    // Construct sparsity pattern
-    return Sparsity(nrow, ncol, vector<int>(colind, colind+ncol+1), vector<int>(row, row+nnz));
+    if (nrow*ncol == nnz) {
+      // Dense matrix
+      return Sparsity::dense(nrow, ncol);
+    } else {
+      // Sparse matrix
+      const int *row = v + 2 + ncol+1;
+      return Sparsity(nrow, ncol,
+                      vector<int>(colind, colind+ncol+1),
+                      vector<int>(row, row+nnz));
+    }
   }
 
   void Sparsity::print_compact(std::ostream &stream) const {

@@ -34,6 +34,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <set>
 
 namespace casadi {
 
@@ -62,25 +63,52 @@ namespace casadi {
     void print(std::ostream &stream=casadi::userOut()) const;
 
     /** \brief Does an entry exist? */
-    bool has(const std::string& cmd) const;
+    bool has(const std::string& cmd, int ind=-1) const;
 
     /** \brief Get entry as a text */
-    std::string to_text(const std::string& cmd) const;
+    std::string to_text(const std::string& cmd, int ind=-1) const;
+
+    /** Convert indexed command */
+    static inline std::string indexed(const std::string& cmd, int ind) {
+      std::stringstream ss;
+      ss << cmd << "[" << ind << "]";
+      return ss.str();
+    }
 
     /** \brief Convert to a type */
     template<typename T>
-      T to(const std::string& cmd) const {
-      std::istringstream ss(to_text(cmd));
+      T to(const std::string& cmd, int ind=-1) const {
+      std::istringstream ss(to_text(cmd, ind));
       T ret;
       ss >> ret;
       return ret;
     }
 
     /** \brief Get entry as a string */
-    std::string to_string(const std::string& cmd) const { return to<std::string>(cmd);}
+    std::string to_string(const std::string& cmd, int ind=-1) const {
+      return to<std::string>(cmd, ind);
+    }
+
+    /** \brief Get entry as a vector */
+    template<typename T>
+      std::vector<T> to_vector(const std::string& cmd, int ind=-1) const {
+      std::istringstream ss(to_text(cmd, ind));
+      T tmp;
+      std::vector<T> ret;
+      while (ss >> tmp) ret.push_back(tmp);
+      return ret;
+    }
+
+    /** \brief Get entry as a set */
+    template<typename T>
+      std::set<T> to_set(const std::string& cmd, int ind=-1) const {
+      std::set<T> ret;
+      for (auto&& e : to_vector<T>(cmd, ind)) ret.insert(e);
+      return ret;
+    }
 
     /** \brief Get entry as an integer */
-    int to_int(const std::string& cmd) const { return to<int>(cmd);}
+    int to_int(const std::string& cmd, int ind=-1) const { return to<int>(cmd, ind);}
 
     /** \brief Map of commands */
     std::map<std::string, std::pair<int, std::string> > commands;

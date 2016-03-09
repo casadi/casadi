@@ -71,8 +71,12 @@ namespace casadi {
     return (*this)->plugin_name();
   }
 
-  void* Compiler::getFunction(const std::string& symname) {
+  void* Compiler::get_function(const std::string& symname) {
     return (*this)->getFunction(symname);
+  }
+
+  const ParsedFile& Compiler::meta() const {
+    return (*this)->meta_;
   }
 
 } // namespace casadi

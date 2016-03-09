@@ -74,15 +74,15 @@ namespace casadi {
       int line_no = line_it - lines.cbegin() + 1 + offset;
 
       // Get command string
-      string cmd = line_it->substr(0, line_it->find(' '));
-      casadi_assert_message(cmd.at(0)==':',
-                            "Syntax error: " + cmd + " is not a command string");
+      casadi_assert_message(line_it->at(0)==':',
+                            "Syntax error: " + *line_it + " is not a command string");
+      string cmd = line_it->substr(1, line_it->find(' ')-1);
 
       // New entry
       stringstream ss;
 
       // Collect the meta data
-      size_t start = cmd.size()+1;
+      size_t start = cmd.size()+2;
       while (true) {
         // Find the backslash, if any
         size_t stop = line_it->find('\\');
@@ -114,12 +114,14 @@ namespace casadi {
     }
   }
 
-  std::string ParsedFile::to_text(const std::string& cmd) const {
+  std::string ParsedFile::to_text(const std::string& cmd, int ind) const {
+    if (ind>=0) return to_text(indexed(cmd, ind));
     casadi_assert_message(has(cmd), "No such command: " + cmd);
     return commands.at(cmd).second;
   }
 
-  bool ParsedFile::has(const std::string& cmd) const {
+  bool ParsedFile::has(const std::string& cmd, int ind) const {
+    if (ind>=0) return has(indexed(cmd, ind));
     return commands.find(cmd) != commands.end();
   }
 

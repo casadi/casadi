@@ -96,7 +96,6 @@ namespace casadi {
     /// Get meta information, if any
     void get_meta(std::vector<std::string>& lines, int& offset) const;
 
-    protected:
     /// C filename
     std::string name_;
 
