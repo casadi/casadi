@@ -135,25 +135,25 @@ int usage_c(){
   }
 
   /* Function for allocating memory */
-  typedef int (*allocmem_t)(void** mem);
-  allocmem_t allocmem = (allocmem_t)dlsym(handle, "f_alloc");
+  typedef int (*checkout_t)(void);
+  checkout_t checkout = (checkout_t)dlsym(handle, "f_checkout");
   if(dlerror()){
     // No alloc function
-    allocmem = 0;
+    checkout = 0;
     dlerror(); // Reset error flags
   }
 
   /* Function for freeing memory */
-  typedef int (*freemem_t)(void* mem);
-  freemem_t freemem = (freemem_t)dlsym(handle, "f_free");
+  typedef void (*release_t)(int mem);
+  release_t release = (release_t)dlsym(handle, "f_release");
   if(dlerror()){
     // No free function
-    freemem = 0;
+    release = 0;
     dlerror(); // Reset error flags
   }
 
   /* Function for numerical evaluation */
-  typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
   eval_t eval = (eval_t)dlsym(handle, "f");
   if(dlerror()){
     printf("Failed to retrieve \"f\" function.\n");
@@ -173,22 +173,21 @@ int usage_c(){
   double res1[4];
 
   // Allocate memory
-  void* mem;
-  allocmem(&mem);
+  int mem = checkout();
 
   /* Evaluate the function */
   arg[0] = x_val;
   arg[1] = &y_val;
   res[0] = &res0;
   res[1] = res1;
-  if (eval(mem, arg, res, iw, w)) return 1;
+  if (eval(arg, res, iw, w, mem)) return 1;
 
   /* Print result of evaluation */
   printf("result (0): %g\n",res0);
   printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
 
   /* Free memory */
-  freemem(mem);
+  release(mem);
 
   /* Free the handle */
   dlclose(handle);

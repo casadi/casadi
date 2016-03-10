@@ -75,10 +75,10 @@ namespace casadi {
     work_ = (work_t)li_.get(name_ + "_work");
 
     // Allocate memory
-    allocmem_ = (allocmem_t)li_.get(name_ + "_alloc");
+    checkout_ = (checkout_t)li_.get(name_ + "_checkout");
 
     // Free memory
-    freemem_ = (freemem_t)li_.get(name_ + "_free");
+    release_ = (release_t)li_.get(name_ + "_release");
   }
 
   SimplifiedExternal::SimplifiedExternal(const std::string& name, const Library& li)
@@ -100,9 +100,7 @@ namespace casadi {
   }
 
   External::~External() {
-    if (freemem_) {
-      freemem_(0);
-    }
+    clear_memory();
   }
 
   Options External::options_
@@ -228,12 +226,13 @@ namespace casadi {
   void GenericExternal::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     casadi_assert_message(eval_!=0, "Numerical evaluation not possible");
-    int flag = eval_(mem, arg, res, iw, w);
-    if (flag) throw CasadiException("External: \""+this->name_+"\" failed");
+    int* m = static_cast<int*>(mem);
+    int flag = eval_(arg, res, iw, w, m ? *m : 0);
+    if (flag) throw CasadiException("External: \"" + name_ + "\" failed");
   }
 
   void External::addDependency(CodeGenerator& g) const {
-    g.addExternal(signature(this->name_) + ";");
+    g.addExternal(signature(name_) + ";");
   }
 
   std::string SimplifiedExternal::
@@ -246,14 +245,14 @@ namespace casadi {
   }
 
   std::string GenericExternal::
-  generic_call(const CodeGenerator& g, const std::string& mem,
-               const std::string& arg, const std::string& res,
-               const std::string& iw, const std::string& w) const {
+  generic_call(const CodeGenerator& g, const std::string& arg,
+               const std::string& res, const std::string& iw,
+               const std::string& w, const std::string& mem) const {
 
     // Create a function call
     stringstream ss;
-    ss << name_ << "(" << mem << ", " << arg << ", " << res << ", "
-       << iw << ", " << w << ")";
+    ss << name_ << "(" << arg << ", " << res << ", " << iw << ", "
+       << w << ", " << mem << ")";
     return ss.str();
   }
 

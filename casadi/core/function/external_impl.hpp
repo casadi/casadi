@@ -61,10 +61,10 @@ namespace casadi {
     work_t work_;
 
     /** \brief Allocate memory */
-    allocmem_t allocmem_;
+    checkout_t checkout_;
 
     /** \brief Free memory */
-    freemem_t freemem_;
+    release_t release_;
 
     ///@{
     /** \brief Data vectors */
@@ -121,10 +121,10 @@ namespace casadi {
 
     /** \brief Create memory block */
     virtual void* alloc_memory() const {
-      if (allocmem_) {
-        void* mem;
-        allocmem_(&mem);
-        return mem;
+      if (checkout_) {
+        int* m = new int;
+        *m = checkout_();
+        return m;
       } else if (!derivative_of_.is_null()) {
         return derivative_of_->alloc_memory();
       } else {
@@ -134,8 +134,9 @@ namespace casadi {
 
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const {
-      if (freemem_) {
-        freemem_(mem);
+      if (release_) {
+        int* m = static_cast<int*>(mem);
+        release_(*m);
       } else if (!derivative_of_.is_null()) {
         derivative_of_->free_memory(mem);
       }
@@ -196,9 +197,9 @@ namespace casadi {
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief Generate a call to a function (generic signature) */
-    virtual std::string generic_call(const CodeGenerator& g, const std::string& mem,
-                                     const std::string& arg, const std::string& res,
-                                     const std::string& iw, const std::string& w) const;
+    virtual std::string generic_call(const CodeGenerator& g, const std::string& arg,
+                                     const std::string& res, const std::string& iw,
+                                     const std::string& w, const std::string& mem) const;
     // Sparsities
     sparsity_t sparsity_in_, sparsity_out_;
 

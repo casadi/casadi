@@ -173,7 +173,7 @@ namespace casadi {
       g.body << "    res1[" << j << "] = res[" << j << "]? " <<
         "res[" << j << "]+i*" << f_.nnz_out(j) << " : 0;" << endl;
     }
-    g.body << "    if (" << g(f_, "0", "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+    g.body << "    if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
     g.body << "  }" << std::endl;
   }
 
@@ -476,7 +476,7 @@ namespace casadi {
       }
     }
 
-    g.body << "    " << g(f_, "0", "arg1", "res1", "iw", "w") << ";" << endl;
+    g.body << "    " << g(f_, "arg1", "res1", "iw", "w") << ";" << endl;
 
     g.addAuxiliary(CodeGenerator::AUX_AXPY);
     // Sum results
@@ -540,7 +540,7 @@ namespace casadi {
     }
     g.body << "    int* iw_i = iw + i*" << sz_iw << ";" << endl;
     g.body << "    double* w_i = w + i*" << sz_w << ";" << endl;
-    g.body << "    " << g(f_, "0", "arg_i", "res_i", "iw_i", "w_i") << ";" << endl;
+    g.body << "    " << g(f_, "arg_i", "res_i", "iw_i", "w_i") << ";" << endl;
     g.body << "  }" << std::endl;
   }
 

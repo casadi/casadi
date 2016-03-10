@@ -84,7 +84,7 @@ namespace casadi {
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w, const std::string& mem) const;
+                           const std::string& w, const std::string& mem="0") const;
 
     /** \brief Generate a call to a function (simplified signature) */
     std::string operator()(const Function& f, const std::string& arg, const std::string& res) const;

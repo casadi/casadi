@@ -59,9 +59,9 @@ namespace casadi {
   typedef int (*getint_t)(void);
   typedef const int* (*sparsity_t)(int i);
   typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
-  typedef int (*allocmem_t)(void** mem);
-  typedef int (*freemem_t)(void* mem);
-  typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
+  typedef int (*checkout_t)(void);
+  typedef void (*release_t)(int mem);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 

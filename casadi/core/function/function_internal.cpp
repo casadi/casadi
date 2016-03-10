@@ -390,9 +390,9 @@ namespace casadi {
       }
     } else {
       if (eval_) {
-        eval_(mem_.at(mem), arg, res, iw, w);
+        eval_(arg, res, iw, w, mem);
       } else {
-        eval(mem_.at(mem), arg, res, iw, w);
+        eval(memory(mem), arg, res, iw, w);
       }
     }
   }
@@ -1915,7 +1915,7 @@ namespace casadi {
       }
 
       // Call function
-      g.body << "  if (" << generic_call(g, "0", "arg1", "res1", "iw", "w")
+      g.body << "  if (" << generic_call(g, "arg1", "res1", "iw", "w", "0")
              << ") return 1;" << endl;
     }
   }
@@ -1924,7 +1924,7 @@ namespace casadi {
     if (simplifiedCall()) {
       return "void " + fname + "(const real_t* arg, real_t* res)";
     } else {
-      return "int " + fname + "(void* mem, const real_t** arg, real_t** res, int* iw, real_t* w)";
+      return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, int mem)";
     }
   }
 
@@ -1946,38 +1946,18 @@ namespace casadi {
     s << g.declare("int " + fname + "_n_out(void)")
       << " { return " << n_out << ";}" << endl << endl;
 
+    // Function for allocating memory
+    s << g.declare("int " + fname + "_checkout(void)") << " {" << endl
+      << "  return 0;" << endl
+      << "}" << endl << endl;
+
+    // Function for deallocating memory
+    s << g.declare("void " + fname + "_release(int mem)") << " {}" << endl << endl;
+
     // Quick return if simplified syntax
     if (simplifiedCall()) {
       return;
     }
-
-    // Function for allocating memory
-    string tmp = "int " + fname + "_alloc(void** mem)";
-    if (g.cpp) {
-      tmp = "extern \"C\" " + tmp;  // C linkage
-    }
-    if (g.with_header) {
-      g.header << tmp << ";" << endl;
-    }
-    s << tmp << " {" << endl
-      << "  if (mem) *mem = 0;" << endl
-      << "  return 0;" << endl
-      << "}" << endl
-      << endl;
-
-    // Function for freeing memory
-    tmp = "int " + fname + "_free(void* mem)";
-    if (g.cpp) {
-      tmp = "extern \"C\" " + tmp;  // C linkage
-    }
-    if (g.with_header) {
-      g.header << tmp << ";" << endl;
-    }
-    s << tmp << " {" << endl
-      << "  (void)mem;" << endl
-      << "  return 0;" << endl
-      << "}" << endl
-      << endl;
 
     // Input sparsities
     s << g.declare("const int* " + fname + "_sparsity_in(int i)") << " {" << endl
@@ -2000,15 +1980,8 @@ namespace casadi {
       << "}" << endl << endl;
 
     // Function that returns work vector lengths
-    tmp = "int " + fname
-      + "_work(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)";
-    if (g.cpp) {
-      tmp = "extern \"C\" " + tmp;  // C linkage
-    }
-    if (g.with_header) {
-      g.header << tmp << ";" << endl;
-    }
-    s << tmp << " {" << endl;
+    s << g.declare("int " + fname + "_work(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)");
+    s << " {" << endl;
     s << "  if (sz_arg) *sz_arg = " << sz_arg() << ";" << endl;
     s << "  if (sz_res) *sz_res = " << sz_res() << ";" << endl;
     s << "  if (sz_iw) *sz_iw = " << sz_iw() << ";" << endl;
