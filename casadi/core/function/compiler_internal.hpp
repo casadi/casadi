@@ -35,7 +35,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-/** \brief NLP solver storage class
+/** \brief Compiler internal class
 
   @copydoc Compiler_doc
   \author Joel Andersson
@@ -102,6 +102,89 @@ namespace casadi {
     /// Meta information
     ParsedFile meta_;
   };
+
+  /** \brief Just-in-time compiled or dynamically linked library
+      \author Joel Andersson
+      \date 2016
+  */
+  class CASADI_EXPORT
+  LibraryInternal : public SharedObjectNode {
+  public:
+    /// Constructor
+    explicit LibraryInternal() {}
+
+    /// Destructor
+    virtual ~LibraryInternal() {}
+
+    // Check if symbol exists
+    virtual bool has(const std::string& sym) = 0;
+
+    // Dummy type
+    virtual DummyPtr get(const std::string& sym) = 0;
+
+    // Get meta
+    virtual const ParsedFile& meta() const = 0;
+  };
+
+  /** \brief Dynamically linked library
+      \author Joel Andersson
+      \date 2016
+  */
+  class CASADI_EXPORT
+  DllLibrary : public LibraryInternal {
+  private:
+#if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
+    typedef HINSTANCE handle_t;
+#else
+    typedef void* handle_t;
+#endif
+    std::string bin_name_;
+    handle_t handle_;
+  public:
+
+    // Constructor
+    explicit DllLibrary(const std::string& bin_name);
+
+    // Destructor
+    virtual ~DllLibrary();
+
+    // Check if symbol exists
+    virtual bool has(const std::string& sym);
+
+    // Dummy type
+    virtual DummyPtr get(const std::string& sym);
+
+    // Get meta
+    virtual const ParsedFile& meta() const;
+  };
+
+  /** \brief Just-in-time library
+      \author Joel Andersson
+      \date 2016
+  */
+  class CASADI_EXPORT
+  JitLibrary : public LibraryInternal {
+  private:
+    Compiler compiler_;
+    std::set<std::string> meta_symbols_;
+  public:
+
+    // Constructor
+    explicit JitLibrary(const Compiler& compiler);
+
+    // Destructor
+    virtual ~JitLibrary();
+
+    // Check if symbol exists
+    virtual bool has(const std::string& sym);
+
+    // Dummy type
+    virtual DummyPtr get(const std::string& sym);
+
+    // Get meta
+    virtual const ParsedFile& meta() const;
+  };
+
 
 } // namespace casadi
 /// \endcond

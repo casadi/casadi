@@ -31,6 +31,7 @@
 
 namespace casadi {
 
+  // Forward declaration of internal class
   class CompilerInternal;
 
   /** \brief Compiler
@@ -78,6 +79,38 @@ namespace casadi {
     void* get_function(const std::string& symname);
 
     /// Get meta information
+    const ParsedFile& meta() const;
+#endif // SWIG
+  };
+
+  // Forward declaration of internal class
+  class LibraryInternal;
+
+  /** \brief Library, either just-in-time compiled or dynamically loaded
+  */
+  class CASADI_EXPORT Library : public SharedObject {
+  public:
+    /// Default constructor
+    Library();
+
+    // Constructor, DLL
+    explicit Library(const std::string& bin_name);
+
+    // Constructor, JIT
+    explicit Library(const Compiler& compiler);
+
+    /// Access functions of the node
+    LibraryInternal* operator->();
+    const LibraryInternal* operator->() const;
+
+    // Check if symbol exists
+    bool has(const std::string& sym);
+
+#ifndef SWIG
+    // Dummy type
+    DummyPtr get(const std::string& sym);
+
+    // Get meta
     const ParsedFile& meta() const;
 #endif // SWIG
   };

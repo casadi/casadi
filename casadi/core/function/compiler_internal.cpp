@@ -97,4 +97,84 @@ namespace casadi {
     }
   }
 
+  DllLibrary::DllLibrary(const std::string& bin_name)
+    : bin_name_(bin_name), handle_(0) {
+#ifdef WITH_DL
+#ifdef _WIN32
+    handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
+    casadi_assert_message(handle_!=0, "CommonExternal: Cannot open function: "
+                          << bin_name_ << ". error code (WIN32): "<< GetLastError());
+#else // _WIN32
+    handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
+    casadi_assert_message(handle_!=0, "CommonExternal: Cannot open function: "
+                          << bin_name_ << ". error code: "<< dlerror());
+    // reset error
+    dlerror();
+#endif // _WIN32
+#else // WITH_DL
+    casadi_error("CommonExternal: WITH_DL  not activated");
+#endif // WITH_DL
+  }
+
+  DllLibrary::~DllLibrary() {
+#ifdef WITH_DL
+    // close the dll
+#ifdef _WIN32
+    if (handle_) FreeLibrary(handle_);
+#else // _WIN32
+    if (handle_) dlclose(handle_);
+#endif // _WIN32
+#endif // WITH_DL
+  }
+
+  bool DllLibrary::has(const std::string& sym) {
+    return get(sym)!=0;
+  }
+
+  DummyPtr DllLibrary::get(const std::string& sym) {
+#ifdef WITH_DL
+#ifdef _WIN32
+    return (DummyPtr)GetProcAddress(handle_, TEXT(sym.c_str()));
+#else // _WIN32
+    DummyPtr fcnPtr = (DummyPtr)dlsym(handle_, sym.c_str());
+    if (dlerror()) {
+      fcnPtr=0;
+      dlerror(); // Reset error flags
+    }
+    return fcnPtr;
+#endif // _WIN32
+#endif // WITH_DL
+  }
+
+  const ParsedFile& DllLibrary::meta() const {
+    static ParsedFile singleton;
+    return singleton;
+  }
+
+  JitLibrary::JitLibrary(const Compiler& compiler)
+    : compiler_(compiler) {
+    if (compiler.meta().has("SYMBOLS")) {
+      meta_symbols_ = compiler.meta().to_set<std::string>("SYMBOLS");
+    }
+  }
+
+  JitLibrary::~JitLibrary() {
+  }
+
+  bool JitLibrary::has(const std::string& sym) {
+    // Check if in meta information
+    if (meta_symbols_.count(sym)) return true;
+
+    // Convert to a dummy function pointer
+    return get(sym)!=0;
+  }
+
+  DummyPtr JitLibrary::get(const std::string& sym) {
+    return (DummyPtr)compiler_.get_function(sym);
+  }
+
+  const ParsedFile& JitLibrary::meta() const {
+    return compiler_.meta();
+  }
+
 } // namespace casadi

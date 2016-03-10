@@ -79,4 +79,35 @@ namespace casadi {
     return (*this)->meta_;
   }
 
+  Library::Library() {
+  }
+
+  Library::Library(const std::string& bin_name) {
+    assignNode(new DllLibrary(bin_name));
+  }
+
+  Library::Library(const Compiler& compiler) {
+    assignNode(new JitLibrary(compiler));
+  }
+
+  LibraryInternal* Library::operator->() {
+    return static_cast<LibraryInternal*>(SharedObject::operator->());
+  }
+
+  const LibraryInternal* Library::operator->() const {
+    return static_cast<const LibraryInternal*>(SharedObject::operator->());
+  }
+
+  bool Library::has(const std::string& sym) {
+    return (*this)->has(sym);
+  }
+
+  DummyPtr Library::get(const std::string& sym) {
+    return (*this)->get(sym);
+  }
+
+  const ParsedFile& Library::meta() const {
+    return (*this)->meta();
+  }
+
 } // namespace casadi

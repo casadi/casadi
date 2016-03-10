@@ -96,6 +96,9 @@ namespace casadi {
   // Make sure that the integer datatype is indeed smaller or equal to the double
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
 
+  // Dummy function pointer
+  typedef void (*DummyPtr)(void);
+
   /// Inputs of the symbolic representation of the DAE
   enum DeIn {
     DE_T,

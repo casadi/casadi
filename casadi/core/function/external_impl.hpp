@@ -46,82 +46,6 @@
 /// \cond INTERNAL
 
 namespace casadi {
-
-  /** \brief Structure with information about the library */
-  template<typename LibType>
-  class LibInfo {};
-
-  /** \brief Library given as a dynamically linked library */
-  template<>
-  class LibInfo<std::string> {
-  private:
-#if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
-    typedef HINSTANCE handle_t;
-#else
-    typedef void* handle_t;
-#endif
-
-    std::string bin_name_;
-    handle_t handle_;
-
-  public:
-    // Default constructor
-    LibInfo() : handle_(0) {}
-
-    // Constructor
-    explicit LibInfo(const std::string& bin_name);
-
-    // Clear memory
-    void clear();
-
-    // Automatic type conversion
-    operator const std::string&() const { return bin_name_;}
-
-    // Check if symbol exists
-    bool has(const std::string& sym);
-
-    // Get function pointer
-    template<typename FcnPtr>
-    void get(FcnPtr& fcnPtr, const std::string& sym);
-
-    // Get meta
-    const ParsedFile& meta() const {
-      static ParsedFile singleton;
-      return singleton;
-    }
-  };
-
-  /** \brief Library that has been just-in-time compiled */
-  template<>
-  class LibInfo<Compiler> {
-  private:
-    Compiler compiler_;
-    std::set<std::string> meta_symbols_;
-
-  public:
-    // Default constructor
-    LibInfo() {}
-
-    // Constructor
-    explicit LibInfo(const Compiler& compiler);
-
-    // Clear memory
-    void clear() {}
-
-    // Automatic type conversion
-    operator const Compiler&() const { return compiler_;}
-
-    // Check if symbol exists
-    bool has(const std::string& sym);
-
-    // Get function pointer
-    template<typename FcnPtr>
-    void get(FcnPtr& fcnPtr, const std::string& sym);
-
-    // Get meta
-    const ParsedFile& meta() const { return compiler_.meta();}
-  };
-
   class CASADI_EXPORT External : public FunctionInternal {
   protected:
     ///@{
@@ -130,14 +54,6 @@ namespace casadi {
     std::vector<double> real_data_;
     ///@}
   public:
-    /** \brief Creator function, dynamically linked library */
-    static External*
-      create(const std::string& bin_name, const std::string& name);
-
-    /** \brief Creator function, just-in-time compiled library */
-    static External*
-      create(const Compiler& compiler, const std::string& name);
-
     /** \brief Constructor */
     External(const std::string& name);
 
@@ -158,20 +74,13 @@ namespace casadi {
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
-
-  private:
-    /** \brief Creator function, use this for creating instances of the class */
-    template<typename LibType>
-      static External*
-      createGeneric(const LibType& bin_name, const std::string& name);
   };
 
-  template<typename LibType>
   class CASADI_EXPORT CommonExternal : public External {
   protected:
 
     /** \brief Information about the library */
-    LibInfo<LibType> li_;
+    Library li_;
 
     /// @{
     /** \brief Retreive sparsities */
@@ -190,7 +99,7 @@ namespace casadi {
     freemem_t freemem_;
 
     /** \brief  constructor is protected */
-    CommonExternal(const std::string& name, const LibInfo<LibType>& li);
+    CommonExternal(const std::string& name, const Library& li);
   public:
     /** \brief  Destructor */
     virtual ~CommonExternal() = 0;
@@ -245,14 +154,11 @@ namespace casadi {
     }
   };
 
-  template<typename LibType>
-  class CASADI_EXPORT SimplifiedExternal : public CommonExternal<LibType> {
+  class CASADI_EXPORT SimplifiedExternal : public CommonExternal {
     friend class External;
-  private:
-    /** \brief Constructor is called from factory */
-    SimplifiedExternal(const std::string& name, const LibInfo<LibType>& li);
   public:
-    using CommonExternal<LibType>::li_;
+    /** \brief Constructor */
+    SimplifiedExternal(const std::string& name, const Library& li);
 
     /** \brief  Destructor */
     virtual ~SimplifiedExternal() { this->clear_memory();}
@@ -281,14 +187,11 @@ namespace casadi {
     simple_t eval_;
   };
 
-  template<typename LibType>
-  class CASADI_EXPORT GenericExternal : public CommonExternal<LibType> {
+  class CASADI_EXPORT GenericExternal : public CommonExternal {
     friend class External;
-  private:
-    /** \brief Constructor is called from factory */
-    GenericExternal(const std::string& name, const LibInfo<LibType>& li);
   public:
-    using CommonExternal<LibType>::li_;
+    /** \brief Constructor */
+    GenericExternal(const std::string& name, const Library& li);
 
     /** \brief  Destructor */
     virtual ~GenericExternal() { this->clear_memory();}
