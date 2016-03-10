@@ -1,3 +1,4 @@
+
 /*
  *    This file is part of CasADi.
  *
@@ -938,10 +939,19 @@ namespace casadi {
      */
     static std::string fix_name(const std::string& name);
 
+    /// Checkout a memory object
+    int checkout();
+
+    /// Release a memory object
+    void release(int mem);
+
     /// Create a solve node
     MX linsol_solve(const MX& A, const MX& B, bool tr=false);
 
 #ifndef SWIG
+    /// Get memory object
+    void* memory(int ind) const;
+
     // Factorize linear system of equations
     void linsol_factorize(const double* A, int mem=0) const;
 

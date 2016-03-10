@@ -364,10 +364,8 @@ namespace casadi {
     }
 
     // Create memory object
-    casadi_assert(mem_.empty());
-    void* m = alloc_memory();
-    if (m) init_memory(m);
-    mem_.push_back(m);
+    int mem = checkout();
+    casadi_assert(mem==0);
   }
 
   void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, int mem) {
@@ -2973,6 +2971,29 @@ namespace casadi {
     }
     // Scalar by default
     return Sparsity::scalar();
+  }
+
+  void* FunctionInternal::memory(int ind) const {
+    return mem_.at(ind);
+  }
+
+  int FunctionInternal::checkout() {
+    if (unused_.empty()) {
+      // Allocate a new memory object
+      void* m = alloc_memory();
+      mem_.push_back(m);
+      if (m) init_memory(m);
+      return mem_.size()-1;
+    } else {
+      // Use an unused memory object
+      int m = unused_.top();
+      unused_.pop();
+      return m;
+    }
+  }
+
+  void FunctionInternal::release(int mem) {
+    unused_.push(mem);
   }
 
 } // namespace casadi

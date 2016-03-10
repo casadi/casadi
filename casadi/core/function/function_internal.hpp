@@ -29,6 +29,7 @@
 #include "function.hpp"
 #include "../weak_ref.hpp"
 #include <set>
+#include <stack>
 #include "code_generator.hpp"
 #include "compiler.hpp"
 #include "../sparse_storage.hpp"
@@ -78,8 +79,6 @@ namespace casadi {
       \date 2010-2015
   */
   class CASADI_EXPORT FunctionInternal : public SharedObjectNode {
-    friend class Function;
-
   protected:
     /** \brief Constructor (accessible from the Function class and derived classes) */
     FunctionInternal(const std::string& name);
@@ -696,6 +695,9 @@ namespace casadi {
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f, bool persistent=false);
 
+    /// Memory objects
+    void* memory(int ind) const;
+
     /** \brief Create memory block */
     virtual void* alloc_memory() const {return 0;}
 
@@ -728,8 +730,11 @@ namespace casadi {
     virtual bool adjViaJac(int nadj);
     ///@}
 
-    /// Memory objects
-    std::vector<void*> mem_;
+    /// Checkout a memory object
+    int checkout();
+
+    /// Release a memory object
+    void release(int mem);
 
     /// Input and output sparsity
     std::vector<Sparsity> isp_, osp_;
@@ -837,6 +842,12 @@ namespace casadi {
     ///@}
 
   private:
+    /// Memory objects
+    std::vector<void*> mem_;
+
+    /// Unused memory objects
+    std::stack<int> unused_;
+
     /** \brief Memory that is persistent during a call (but not between calls) */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;
 

@@ -60,23 +60,23 @@ namespace casadi {
   }
 
   void Function::linsol_solveL(double* x, int nrhs, bool tr, int mem) const {
-    (*this)->linsol_solveL((*this)->mem_.at(mem), x, nrhs, tr);
+    (*this)->linsol_solveL(memory(mem), x, nrhs, tr);
   }
 
   void Function::linsol_factorize(const double* A, int mem) const {
-    (*this)->linsol_factorize((*this)->mem_.at(mem), A);
+    (*this)->linsol_factorize(memory(mem), A);
   }
 
   void Function::linsol_solve(double* x, int nrhs, bool tr, int mem) const {
-    (*this)->linsol_solve((*this)->mem_.at(mem), x, nrhs, tr);
+    (*this)->linsol_solve(memory(mem), x, nrhs, tr);
   }
 
   Sparsity Function::linsol_cholesky_sparsity(bool tr, int mem) const {
-    return (*this)->linsol_cholesky_sparsity((*this)->mem_.at(mem), tr);
+    return (*this)->linsol_cholesky_sparsity(memory(mem), tr);
   }
 
   DM Function::linsol_cholesky(bool tr, int mem) const {
-    return (*this)->linsol_cholesky((*this)->mem_.at(mem), tr);
+    return (*this)->linsol_cholesky(memory(mem), tr);
   }
 
   void Function::linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
