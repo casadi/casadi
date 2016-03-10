@@ -48,37 +48,6 @@
 namespace casadi {
   class CASADI_EXPORT External : public FunctionInternal {
   protected:
-    ///@{
-    /** \brief Data vectors */
-    std::vector<int> int_data_;
-    std::vector<double> real_data_;
-    ///@}
-  public:
-    /** \brief Constructor */
-    External(const std::string& name);
-
-    /** \brief Get type name */
-    virtual std::string type_name() const { return "external";}
-
-    /** \brief Destructor */
-    virtual ~External() = 0;
-
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    virtual const Options& get_options() const { return options_;}
-    ///@}
-
-    /// Initialize
-    virtual void init(const Dict& opts);
-
-    /** \brief Add a dependent function */
-    virtual void addDependency(CodeGenerator& g) const;
-  };
-
-  class CASADI_EXPORT CommonExternal : public External {
-  protected:
-
     /** \brief Information about the library */
     Library li_;
 
@@ -98,14 +67,33 @@ namespace casadi {
     /** \brief Free memory */
     freemem_t freemem_;
 
-    /** \brief  constructor is protected */
-    CommonExternal(const std::string& name, const Library& li);
+    ///@{
+    /** \brief Data vectors */
+    std::vector<int> int_data_;
+    std::vector<double> real_data_;
+    ///@}
   public:
-    /** \brief  Destructor */
-    virtual ~CommonExternal() = 0;
+
+    /** \brief Constructor */
+    External(const std::string& name, const Library& li);
+
+    /** \brief Destructor */
+    virtual ~External() = 0;
+
+    /** \brief Get type name */
+    virtual std::string type_name() const { return "external";}
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
 
     /// Initialize
     virtual void init(const Dict& opts);
+
+    /** \brief Add a dependent function */
+    virtual void addDependency(CodeGenerator& g) const;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -154,7 +142,7 @@ namespace casadi {
     }
   };
 
-  class CASADI_EXPORT SimplifiedExternal : public CommonExternal {
+  class CASADI_EXPORT SimplifiedExternal : public External {
     friend class External;
   public:
     /** \brief Constructor */
@@ -187,7 +175,7 @@ namespace casadi {
     simple_t eval_;
   };
 
-  class CASADI_EXPORT GenericExternal : public CommonExternal {
+  class CASADI_EXPORT GenericExternal : public External {
     friend class External;
   public:
     /** \brief Constructor */

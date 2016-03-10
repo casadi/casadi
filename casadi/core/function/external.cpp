@@ -92,38 +92,13 @@ namespace casadi {
     // Consistency check
     casadi_assert_message(int_data_.size()==n_int, "'int_data' has wrong length");
     casadi_assert_message(real_data_.size()==n_real, "'real_data' has wrong length");
-  }
-
-  CommonExternal::CommonExternal(const std::string& name, const Library& li)
-    : External(name), li_(li) {
-
-    // Initialize and get the number of inputs and outputs
-    // Function for creating an object instance
-    string init_s = name + "_init";
-    int n_int=0, n_real=0;
-    init_ = (init_t)li_.get(init_s);
-    if (init_!=0) {
-      int flag = init_(0, 0, &n_int, &n_real);
-      casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
-    } else {
-      // Fall back to reading meta information
-      if (li_.meta().has(name + "_N_INT")) n_int=li_.meta().to_int(name + "_N_INT");
-      if (li_.meta().has(name + "_N_REAL")) n_real=li_.meta().to_int(name + "_N_REAL");
-    }
-    int_data_.resize(n_int);
-    real_data_.resize(n_real);
-  }
-
-  void CommonExternal::init(const Dict& opts) {
-    // Call recursively
-    External::init(opts);
 
     // Get number of temporaries
     int sz_arg, sz_res, sz_iw, sz_w;
     work_t work = (work_t)li_.get(name_ + "_work");
     if (work!=0) {
       int flag = work(&sz_arg, &sz_res, &sz_iw, &sz_w);
-      casadi_assert_message(flag==0, "CommonExternal: \"work\" failed");
+      casadi_assert_message(flag==0, "External: \"work\" failed");
     } else {
       // No work vectors
       sz_arg = n_in();
@@ -144,12 +119,12 @@ namespace casadi {
   }
 
   SimplifiedExternal::SimplifiedExternal(const std::string& name, const Library& li)
-    : CommonExternal(name, li) {
+    : External(name, li) {
   }
 
   void SimplifiedExternal::init(const Dict& opts) {
     // Call recursively
-    CommonExternal::init(opts);
+    External::init(opts);
 
     // Function for numerical evaluation
     string eval_s = this->name_ + "_simple";
@@ -160,11 +135,11 @@ namespace casadi {
     this->alloc_w(this->n_in() + this->n_out());
   }
 
-  size_t CommonExternal::get_n_in() const {
+  size_t External::get_n_in() const {
     if (init_) {
       int n_in;
       int flag = init_(&n_in, 0, 0, 0);
-      casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
+      casadi_assert_message(flag==0, "External: \"init\" failed");
       return n_in;
     } else if (li_.meta().has(name_ + "_N_IN")) {
       return li_.meta().to_int(name_ + "_N_IN");
@@ -174,11 +149,11 @@ namespace casadi {
     }
   }
 
-  size_t CommonExternal::get_n_out() const {
+  size_t External::get_n_out() const {
     if (init_) {
       int n_out;
       int flag = init_(0, &n_out, 0, 0);
-      casadi_assert_message(flag==0, "CommonExternal: \"init\" failed");
+      casadi_assert_message(flag==0, "External: \"init\" failed");
       return n_out;
     } else if (li_.meta().has(name_ + "_N_OUT")) {
       return li_.meta().to_int(name_ + "_N_OUT");
@@ -188,7 +163,7 @@ namespace casadi {
     }
   }
 
-  Sparsity CommonExternal::get_sparsity_in(int ind) const {
+  Sparsity External::get_sparsity_in(int ind) const {
     // Use sparsity retrieval function, if present
     if (sparsity_) {
       // Get sparsity pattern in CCS format
@@ -207,7 +182,7 @@ namespace casadi {
     }
   }
 
-  Sparsity CommonExternal::get_sparsity_out(int ind) const {
+  Sparsity External::get_sparsity_out(int ind) const {
     // Use sparsity retrieval function, if present
     if (sparsity_) {
       // Get sparsity pattern in CCS format
@@ -227,20 +202,33 @@ namespace casadi {
   }
 
   GenericExternal::GenericExternal(const std::string& name, const Library& li)
-    : CommonExternal(name, li) {
+    : External(name, li) {
 
     // Function for retrieving sparsities of inputs and outputs
     sparsity_ = (sparsity_t)li_.get(name + "_sparsity");
   }
 
-  External::External(const std::string& name)
-    : FunctionInternal(name) {
+  External::External(const std::string& name, const Library& li)
+    : FunctionInternal(name), li_(li) {
+
+    // Initialize and get the number of inputs and outputs
+    // Function for creating an object instance
+    string init_s = name + "_init";
+    int n_int=0, n_real=0;
+    init_ = (init_t)li_.get(init_s);
+    if (init_!=0) {
+      int flag = init_(0, 0, &n_int, &n_real);
+      casadi_assert_message(flag==0, "External: \"init\" failed");
+    } else {
+      // Fall back to reading meta information
+      if (li_.meta().has(name + "_N_INT")) n_int=li_.meta().to_int(name + "_N_INT");
+      if (li_.meta().has(name + "_N_REAL")) n_real=li_.meta().to_int(name + "_N_REAL");
+    }
+    int_data_.resize(n_int);
+    real_data_.resize(n_real);
   }
 
   External::~External() {
-  }
-
-  CommonExternal::~CommonExternal() {
     if (freemem_) {
       freemem_(0);
     }
@@ -248,7 +236,7 @@ namespace casadi {
 
   void GenericExternal::init(const Dict& opts) {
     // Call recursively
-    CommonExternal::init(opts);
+    External::init(opts);
 
     // Function for numerical evaluation
     eval_ = (eval_t)li_.get(name_);
@@ -264,7 +252,7 @@ namespace casadi {
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     casadi_assert_message(eval_!=0, "Numerical evaluation not possible");
     int flag = eval_(mem, arg, res, iw, w);
-    if (flag) throw CasadiException("CommonExternal: \""+this->name_+"\" failed");
+    if (flag) throw CasadiException("External: \""+this->name_+"\" failed");
   }
 
   void External::addDependency(CodeGenerator& g) const {
@@ -292,12 +280,12 @@ namespace casadi {
     return ss.str();
   }
 
-  bool CommonExternal::hasFullJacobian() const {
+  bool External::hasFullJacobian() const {
     if (FunctionInternal::hasFullJacobian()) return true;
     return const_cast<Library&>(li_).has(name_ + "_jac");
   }
 
-  Function CommonExternal
+  Function External
   ::getFullJacobian(const std::string& name, const Dict& opts) {
     if (hasFullJacobian()) {
       return external(name, li_, opts);
@@ -306,7 +294,7 @@ namespace casadi {
     }
   }
 
-  Function CommonExternal
+  Function External
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Consistency check
     int n=1;
@@ -317,7 +305,7 @@ namespace casadi {
     return external(name, li_, opts);
   }
 
-  int CommonExternal::get_n_forward() const {
+  int External::get_n_forward() const {
     // Will try 64, 32, 16, 8, 4, 2, 1 directions
     init_t fwd_init;
     for (int i=64; i>0; i/=2) {
@@ -329,7 +317,7 @@ namespace casadi {
     return 0;
   }
 
-  Function CommonExternal
+  Function External
   ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Consistency check
     int n=1;
@@ -340,7 +328,7 @@ namespace casadi {
     return external(name, li_, opts);
   }
 
-  int CommonExternal::get_n_reverse() const {
+  int External::get_n_reverse() const {
     // Will try 64, 32, 16, 8, 4, 2, 1 directions
     init_t adj_init;
     for (int i=64; i>0; i/=2) {
