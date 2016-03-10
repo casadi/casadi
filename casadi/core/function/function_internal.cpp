@@ -2049,7 +2049,7 @@ namespace casadi {
       }
 
       // Call the function
-      s << "  i = " << fname << "(0, arg, res, iw, " << fw << ");" << endl;
+      s << "  i = " << fname << "(arg, res, iw, " << fw << ", 0);" << endl;
       s << "  if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
         << "\\\" failed.\");" << endl;
 
@@ -2100,7 +2100,7 @@ namespace casadi {
         << "scanf(\"%lf\", a++);" << endl;
 
       // Call the function
-      s << "  int flag = " << fname << "(0, arg, res, iw, w+" << off << ");" << endl
+      s << "  int flag = " << fname << "(arg, res, iw, w+" << off << ", 0);" << endl
         << "  if (flag) return flag;" << endl;
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
