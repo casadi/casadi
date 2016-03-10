@@ -51,15 +51,14 @@ namespace casadi {
     /** \brief Information about the library */
     Library li_;
 
-    /// @{
-    /** \brief Retreive sparsities */
-    sparsity_t sparsity_;
-    virtual Sparsity get_sparsity_in(int ind) const;
-    virtual Sparsity get_sparsity_out(int ind) const;
-    /// @}
-
-    /** \brief Initialize */
+    /** \brief Initialize (called before every other function) */
     init_t init_;
+
+    /** \brief Number of inputs and outputs */
+    getint_t n_in_, n_out_;
+
+    /** \brief Work vector sizes */
+    work_t work_;
 
     /** \brief Allocate memory */
     allocmem_t allocmem_;
@@ -71,6 +70,7 @@ namespace casadi {
     /** \brief Data vectors */
     std::vector<int> int_data_;
     std::vector<double> real_data_;
+    std::string string_data_;
     ///@}
   public:
 
@@ -123,7 +123,7 @@ namespace casadi {
     virtual void* alloc_memory() const {
       if (allocmem_) {
         void* mem;
-        allocmem_(&mem, get_ptr(int_data_), get_ptr(real_data_));
+        allocmem_(&mem);
         return mem;
       } else if (!derivative_of_.is_null()) {
         return derivative_of_->alloc_memory();
@@ -166,7 +166,6 @@ namespace casadi {
 
     /// @{
     /** \brief Retreive sparsities */
-    sparsity_t sparsity_;
     virtual Sparsity get_sparsity_in(int ind) const { return Sparsity::scalar();}
     virtual Sparsity get_sparsity_out(int ind) const { return Sparsity::scalar();}
     /// @}
@@ -187,6 +186,12 @@ namespace casadi {
     /// Initialize
     virtual void init(const Dict& opts);
 
+    /// @{
+    /** \brief Retreive sparsities */
+    virtual Sparsity get_sparsity_in(int ind) const;
+    virtual Sparsity get_sparsity_out(int ind) const;
+    /// @}
+
     /** \brief  Evaluate numerically, work vectors given */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
@@ -194,6 +199,8 @@ namespace casadi {
     virtual std::string generic_call(const CodeGenerator& g, const std::string& mem,
                                      const std::string& arg, const std::string& res,
                                      const std::string& iw, const std::string& w) const;
+    // Sparsities
+    sparsity_t sparsity_in_, sparsity_out_;
 
     /** \brief  Function pointers */
     eval_t eval_;

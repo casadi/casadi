@@ -54,12 +54,12 @@ namespace casadi {
 
   ///@{
   /** \brief  Function pointer types */
-  typedef int (*init_t)(int* n_in, int* n_out, int *n_int, int *n_real);
-  typedef int (*allocmem_t)(void** mem, const int* idata, const double* rdata);
-  typedef int (*freemem_t)(void* mem);
+  typedef int (*init_t)(int ni, const int* idata, int nr, const double* rdata, const char* sdata);
+  typedef int (*getint_t)(void);
+  typedef const int* (*sparsity_t)(int i);
   typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
-  typedef int (*sparsity_t)(int i, int* n_row, int* n_col,
-                            const int** colind, const int** row);
+  typedef int (*allocmem_t)(void** mem);
+  typedef int (*freemem_t)(void* mem);
   typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
   typedef void (*simple_t)(const double* arg, double* res);
   ///@}

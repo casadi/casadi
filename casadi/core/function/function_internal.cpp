@@ -1936,22 +1936,17 @@ namespace casadi {
     int n_out = this->n_out();
     stringstream &s = g.body;
 
-    // Function that returns the number of inputs and outputs
-    string tmp = "int " + fname + "_init(int* n_in, int* n_out, int* n_int, int* n_real)";
-    if (g.cpp) {
-      tmp = "extern \"C\" " + tmp;  // C linkage
-    }
-    if (g.with_header) {
-      g.header << tmp << ";" << endl;
-    }
-    s << tmp << " {" << endl
-      << "  if (n_in) *n_in = " << n_in << ";" << endl
-      << "  if (n_out) *n_out = " << n_out << ";" << endl
-      << "  if (n_int) *n_int = 0;" << endl
-      << "  if (n_real) *n_real = 0;" << endl
-      << "  return 0;" << endl
-      << "}" << endl
-      << endl;
+    // Initialization function
+    s << g.declare("int " + fname + "_init(int ni, const int* idata, "
+                   "int nr, const double* rdata, const char* sdata)") << "{" << endl
+      << "  return ni==0 && nr==0 ? 0 : 1;" << endl
+      << "}" << endl << endl;
+
+    // Number of inputs and outptus
+    s << g.declare("int " + fname + "_n_in(void)")
+      << " { return " << n_in << ";}" << endl << endl;
+    s << g.declare("int " + fname + "_n_out(void)")
+      << " { return " << n_out << ";}" << endl << endl;
 
     // Quick return if simplified syntax
     if (simplifiedCall()) {
@@ -1959,7 +1954,7 @@ namespace casadi {
     }
 
     // Function for allocating memory
-    tmp = "int " + fname + "_alloc(void** mem, const int* idata, const double* rdata)";
+    string tmp = "int " + fname + "_alloc(void** mem)";
     if (g.cpp) {
       tmp = "extern \"C\" " + tmp;  // C linkage
     }
@@ -1968,8 +1963,6 @@ namespace casadi {
     }
     s << tmp << " {" << endl
       << "  if (mem) *mem = 0;" << endl
-      << "  (void)idata;" << endl
-      << "  (void)rdata;" << endl
       << "  return 0;" << endl
       << "}" << endl
       << endl;
@@ -1988,69 +1981,25 @@ namespace casadi {
       << "}" << endl
       << endl;
 
-    // Inputs and outputs for each parsity index
-    std::multimap<int, int> io_sparsity_index;
-
-    // The number of patterns needed for the inputs and outputs
-    int num_io_patterns = 0;
-
-    // Get the sparsity pattern of all inputs
-    for (int i=0; i<n_in+n_out; ++i) {
-      // Get the sparsity pattern
-      const Sparsity& sp = i<n_in ? sparsity_in(i) : sparsity_out(i-n_in);
-
-      // Print the sparsity pattern or retrieve the index of an existing pattern
-      int ind = g.addSparsity(sp);
-      num_io_patterns = std::max(num_io_patterns, ind+1);
-
-      // Store the index
-      io_sparsity_index.insert(std::pair<int, int>(ind, i));
+    // Input sparsities
+    s << g.declare("const int* " + fname + "_sparsity_in(int i)") << " {" << endl
+      << "  switch (i) {" << endl;
+    for (int i=0; i<n_in; ++i) {
+      s << "  case " << i << ": return s" << g.addSparsity(sparsity_in(i)) << ";" << endl;
     }
+    s << "  default: return 0;" << endl
+      << "  }" << endl
+      << "}" << endl << endl;
 
-    // Function that returns the sparsity pattern
-    tmp = "int " + fname + "_sparsity"
-      "(int i, int *nrow, int *ncol, const int **colind, const int **row)";
-    if (g.cpp) {
-      tmp = "extern \"C\" " + tmp;  // C linkage
+    // Output sparsities
+    s << g.declare("const int* " + fname + "_sparsity_out(int i)") << " {" << endl
+      << "  switch (i) {" << endl;
+    for (int i=0; i<n_out; ++i) {
+      s << "  case " << i << ": return s" << g.addSparsity(sparsity_out(i)) << ";" << endl;
     }
-    if (g.with_header) {
-      g.header << tmp << ";" << endl;
-    }
-    s << tmp << " {" << endl;
-
-    // Get the sparsity index using a switch
-    s << "  const int* s;" << endl;
-    s << "  switch (i) {" << endl;
-
-    // Loop over all sparsity patterns
-    for (int i=0; i<num_io_patterns; ++i) {
-      // Get the range of matching sparsity patterns
-      auto r = io_sparsity_index.equal_range(i);
-
-      // Skip if unused
-      if (r.first==r.second) continue;
-
-      // Print the cases covered
-      for (auto it=r.first; it!=r.second; ++it) {
-        s << "    case " << it->second << ":" << endl;
-      }
-
-      // Map to sparsity
-      s << "      s = s" << i << "; break;" << endl;
-    }
-
-    // Finalize the switch
-    s << "    default:" << endl;
-    s << "      return 1;" << endl;
-    s << "  }" << endl << endl;
-
-    // Decompress the sparsity pattern
-    s << "  if (nrow) *nrow = s[0];" << endl;
-    s << "  if (ncol) *ncol = s[1];" << endl;
-    s << "  if (colind) *colind = s + 2;" << endl;
-    s << "  if (row) *row = s + 3 + s[1];" << endl;
-    s << "  return 0;" << endl;
-    s << "}" << endl << endl;
+    s << "  default: return 0;" << endl
+      << "  }" << endl
+      << "}" << endl << endl;
 
     // Function that returns work vector lengths
     tmp = "int " + fname

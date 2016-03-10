@@ -109,6 +109,9 @@ namespace casadi {
     std::string rank1(const std::string& A, const Sparsity& sp_A, const std::string& alpha,
                       const std::string& x, const std::string& y);
 
+    /** \brief Declare a function */
+    std::string declare(std::string s);
+
     /** \brief Auxiliary functions */
     enum Auxiliary {
       AUX_COPY,

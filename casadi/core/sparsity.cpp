@@ -1071,6 +1071,8 @@ namespace casadi {
   }
 
   Sparsity Sparsity::compressed(const int* v) {
+    casadi_assert(v!=0);
+
     // Get sparsity pattern
     int nrow = v[0];
     int ncol = v[1];

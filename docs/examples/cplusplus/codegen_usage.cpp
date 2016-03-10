@@ -42,7 +42,7 @@
 // Usage from C
 int usage_c(){
   printf("---\n");
-  printf("Usage from C.\n");
+  printf("Standalone usage from C/C++:\n");
   printf("\n");
 
   /* Handle to the dll */
@@ -58,23 +58,84 @@ int usage_c(){
   /* Reset error */
   dlerror();
 
-  /* Initialize and get the number of inputs and outputs */
-  typedef int (*init_t)(int* n_in, int* n_out, int* n_int, int* n_real);
+  /* Initialize the function (assume no data) */
+  typedef int (*init_t)(int ni, const int* idata, int nr, const double* rdata, const char* sdata);
   init_t init = (init_t)dlsym(handle, "f_init");
-  if(dlerror()){
-    printf("Failed to retrieve \"init\" function.\n");
-    return 1;
+  if(dlerror()) {
+    dlerror(); // No init function, that's ok
+  } else {
+    // Call init function
+    if (init(0, 0, 0, 0, 0)) return 1;
   }
-  int n_in, n_out, n_int, n_real;
-  if (init(&n_in, &n_out, &n_int, &n_real)) return 1;
-  printf("n_in = %d, n_out = %d, n_int = %d, n_real = %d\n", n_in, n_out, n_int, n_real);
-  if (n_int>0 || n_real>0) {
-    printf("Parameter vectors not supported\n"); 
-    return 1;
+
+  /* Number of inputs */
+  typedef int (*getint_t)(void);
+  getint_t n_in_fcn = (getint_t)dlsym(handle, "f_n_in");
+  if (dlerror()) return 1;
+  int n_in = n_in_fcn();
+
+  /* Number of outputs */
+  getint_t n_out_fcn = (getint_t)dlsym(handle, "f_n_out");
+  if (dlerror()) return 1;
+  int n_out = n_out_fcn();
+
+  /* Get sizes of the required work vectors */
+  int sz_arg=n_in, sz_res=n_out, sz_iw=0, sz_w=0;
+  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
+  work_t work = (work_t)dlsym(handle, "f_work");
+  if(dlerror()){
+    dlerror(); // No init function, that's ok
+  } else {
+    // Read from functions
+    if (work(&sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;
+  }
+  printf("Work vector sizes:\n");
+  printf("sz_arg = %d, sz_res = %d, sz_iw = %d, sz_w = %d\n\n",
+         sz_arg, sz_res, sz_iw, sz_w);
+
+  /* Input sparsities */
+  typedef const int* (*sparsity_t)(int ind);
+  sparsity_t sparsity_in = (sparsity_t)dlsym(handle, "f_sparsity_in");
+  if (dlerror()) return 1;
+
+  /* Output sparsities */
+  sparsity_t sparsity_out = (sparsity_t)dlsym(handle, "f_sparsity_out");
+  if (dlerror()) return 1;
+
+  /* Print the sparsities of the inputs and outputs */
+  int i;
+  for(i=0; i<n_in + n_out; ++i){
+    // Retrieve the sparsity pattern - CasADi uses column compressed storage (CCS)
+    const int *sp_i;
+    if (i<n_in) {
+      printf("Input %d\n", i);
+      sp_i = sparsity_in(i);
+    } else {
+      printf("Output %d\n", i-n_in);
+      sp_i = sparsity_out(i-n_in);
+    }
+    if (sp_i==0) return 1;
+    int nrow = *sp_i++; /* Number of rows */
+    int ncol = *sp_i++; /* Number of columns */
+    const int *colind = sp_i; /* Column offsets */
+    const int *row = sp_i + ncol+1; /* Row nonzero */
+
+    /* Print the pattern */
+    printf("  Dimension: %d-by-%d\n", nrow, ncol);
+    printf("  Nonzeros: {");
+    int rr,cc,el;
+    for(cc=0; cc<ncol; ++cc){                    /* loop over columns */
+      for(el=colind[cc]; el<colind[cc+1]; ++el){ /* loop over the nonzeros entries of the column */
+        if(el!=0) printf(", ");                  /* Separate the entries */
+        rr = row[el];                            /* Get the row */        
+        printf("{%d,%d}",rr,cc);                 /* Print the nonzero */
+      }
+    }
+    printf("}\n\n");
   }
 
   /* Function for allocating memory */
-  typedef int (*allocmem_t)(void** mem, const int* idata, const double* rdata);
+  typedef int (*allocmem_t)(void** mem);
   allocmem_t allocmem = (allocmem_t)dlsym(handle, "f_alloc");
   if(dlerror()){
     // No alloc function
@@ -90,63 +151,6 @@ int usage_c(){
     freemem = 0;
     dlerror(); // Reset error flags
   }
-
-  /* Function for retrieving sparsities */
-  typedef int (*sparsity_t)(int ind, int *n_col, int *n_row,
-                            const int** colind, const int** row);
-  sparsity_t sparsity = (sparsity_t)dlsym(handle, "f_sparsity");
-  if(dlerror()){
-    printf("Failed to retrieve \"sparsity\" function.\n");
-    return 1;
-  }
-
-  /* Get sparsities of the inputs and outptus */
-  int ind;
-  for(ind=0; ind<n_in + n_out; ++ind){
-    if(ind<n_in){
-      printf("Input %d\n",ind);
-    } else {
-      printf("Output %d\n",ind-n_in);
-    }
-
-    int nrow,ncol;
-    const int *colind, *row;
-    if (sparsity(ind, &nrow, &ncol, &colind, &row)) return 1;
-
-    printf("  Dimension: %d-by-%d\n", nrow, ncol);
-    printf("  Nonzeros: {");
-    int rr,cc,el;
-    for(cc=0; cc<ncol; ++cc){ /* loop over rows */
-      for(el=colind[cc]; el<colind[cc+1]; ++el){ /* loop over nonzeros */
-        /* Separate the entries */
-        if(el!=0) printf(", ");
-
-        /* Get the column */
-        rr = row[el]; 
-        
-        /* Print the nonzero */
-        printf("{%d,%d}",rr,cc);
-      }
-    }
-    printf("}\n\n");
-  }
-
-  /* Get sizes of the required work vectors */
-  int sz_arg, sz_res, sz_iw, sz_w;
-  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
-  work_t work = (work_t)dlsym(handle, "f_work");
-  if(dlerror()){
-    // No work vectors by default
-    sz_arg = n_in;
-    sz_res = n_out;
-    sz_iw = sz_w = 0;
-    // Reset error flags
-    dlerror();
-  } else {
-    // Read from functions
-    if (work(&sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;
-  }
-  printf("sz_arg = %d, sz_res = %d, sz_iw = %d, sz_w = %d\n", sz_arg, sz_res, sz_iw, sz_w);
 
   /* Function for numerical evaluation */
   typedef int (*eval_t)(void* mem, const double** arg, double** res, int* iw, double* w);
@@ -170,7 +174,7 @@ int usage_c(){
 
   // Allocate memory
   void* mem;
-  allocmem(&mem, 0, 0);
+  allocmem(&mem);
 
   /* Evaluate the function */
   arg[0] = x_val;
@@ -200,7 +204,7 @@ using namespace std;
 
 void usage_cplusplus(){
   cout << "---" << endl;
-  cout << "Usage from C++" << endl;
+  cout << "Usage from CasADi C++:" << endl;
   cout << endl;
 
   // Use CasADi's "external" to load the compiled function

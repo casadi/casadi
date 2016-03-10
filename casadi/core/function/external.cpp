@@ -48,7 +48,7 @@ namespace casadi {
   }
 
   Function external(const string& name, const Dict& opts) {
-    return external("./" + name + ".so", name, opts);
+    return external(name, "./" + name + ".so", opts);
   }
 
   Function external(const string& name, const string& bin_name,
@@ -61,6 +61,50 @@ namespace casadi {
     return external(name, Library(compiler), opts);
   }
 
+  External::External(const std::string& name, const Library& li)
+    : FunctionInternal(name), li_(li) {
+
+    // Function being called before every other function call
+    init_ = (init_t)li_.get(name_ + "_init");
+
+    // Get number of inputs and outputs
+    n_in_ = (getint_t)li_.get(name + "_n_in");
+    n_out_ = (getint_t)li_.get(name + "_n_out");
+
+    // Work vector sizes
+    work_ = (work_t)li_.get(name_ + "_work");
+
+    // Allocate memory
+    allocmem_ = (allocmem_t)li_.get(name_ + "_alloc");
+
+    // Free memory
+    freemem_ = (freemem_t)li_.get(name_ + "_free");
+  }
+
+  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Library& li)
+    : External(name, li) {
+
+    // Function for numerical evaluation
+    eval_ = (simple_t)li_.get(name_ + "_simple");
+  }
+
+  GenericExternal::GenericExternal(const std::string& name, const Library& li)
+    : External(name, li) {
+
+    // Functions for retrieving sparsities of inputs and outputs
+    sparsity_in_ = (sparsity_t)li_.get(name + "_sparsity_in");
+    sparsity_out_ = (sparsity_t)li_.get(name + "_sparsity_out");
+
+    // Function for numerical evaluation
+    eval_ = (eval_t)li_.get(name_);
+  }
+
+  External::~External() {
+    if (freemem_) {
+      freemem_(0);
+    }
+  }
+
   Options External::options_
   = {{&FunctionInternal::options_},
      {{"int_data",
@@ -68,79 +112,16 @@ namespace casadi {
         "Integer data vector to be passed to the external function"}},
       {"real_data",
        {OT_DOUBLEVECTOR,
-        "Real data vector to be passed to the external function"}}
+        "Real data vector to be passed to the external function"}},
+      {"string_data",
+       {OT_STRING,
+        "String to be passed to the external function"}}
      }
   };
 
-  void External::init(const Dict& opts) {
-    // Call the initialization method of the base class
-    FunctionInternal::init(opts);
-
-    /** \brief Parameter lengths for consistency check */
-    int n_int = int_data_.size();
-    int n_real = real_data_.size();
-
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="int_data") {
-        int_data_ = op.second;
-      } else if (op.first=="real_data") {
-        real_data_ = op.second;
-      }
-    }
-
-    // Consistency check
-    casadi_assert_message(int_data_.size()==n_int, "'int_data' has wrong length");
-    casadi_assert_message(real_data_.size()==n_real, "'real_data' has wrong length");
-
-    // Get number of temporaries
-    int sz_arg, sz_res, sz_iw, sz_w;
-    work_t work = (work_t)li_.get(name_ + "_work");
-    if (work!=0) {
-      int flag = work(&sz_arg, &sz_res, &sz_iw, &sz_w);
-      casadi_assert_message(flag==0, "External: \"work\" failed");
-    } else {
-      // No work vectors
-      sz_arg = n_in();
-      sz_res = n_out();
-      sz_iw = sz_w = 0;
-    }
-
-    // Function for allocating memory, if any
-    allocmem_ = (allocmem_t)li_.get(name_ + "_alloc");
-
-    // Function for freeing memory, if any
-    freemem_ = (freemem_t)li_.get(name_ + "_free");
-
-    alloc_arg(sz_arg);
-    alloc_res(sz_res);
-    alloc_iw(sz_iw);
-    alloc_w(sz_w);
-  }
-
-  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Library& li)
-    : External(name, li) {
-  }
-
-  void SimplifiedExternal::init(const Dict& opts) {
-    // Call recursively
-    External::init(opts);
-
-    // Function for numerical evaluation
-    string eval_s = this->name_ + "_simple";
-    eval_ = (simple_t)li_.get(eval_s);
-    casadi_assert_message(eval_!=0, "SimplifiedExternal: no \"" + eval_s + "\" found");
-
-    // Arrays for holding inputs and outputs
-    this->alloc_w(this->n_in() + this->n_out());
-  }
-
   size_t External::get_n_in() const {
-    if (init_) {
-      int n_in;
-      int flag = init_(&n_in, 0, 0, 0);
-      casadi_assert_message(flag==0, "External: \"init\" failed");
-      return n_in;
+    if (n_in_) {
+      return n_in_();
     } else if (li_.meta().has(name_ + "_N_IN")) {
       return li_.meta().to_int(name_ + "_N_IN");
     } else {
@@ -150,11 +131,8 @@ namespace casadi {
   }
 
   size_t External::get_n_out() const {
-    if (init_) {
-      int n_out;
-      int flag = init_(0, &n_out, 0, 0);
-      casadi_assert_message(flag==0, "External: \"init\" failed");
-      return n_out;
+    if (n_out_) {
+      return n_out_();
     } else if (li_.meta().has(name_ + "_N_OUT")) {
       return li_.meta().to_int(name_ + "_N_OUT");
     } else {
@@ -163,87 +141,86 @@ namespace casadi {
     }
   }
 
-  Sparsity External::get_sparsity_in(int ind) const {
+  Sparsity GenericExternal::get_sparsity_in(int ind) const {
     // Use sparsity retrieval function, if present
-    if (sparsity_) {
-      // Get sparsity pattern in CCS format
-      int nrow, ncol;
-      const int *colind, *row;
-      int flag = sparsity_(ind, &nrow, &ncol, &colind, &row);
-      casadi_assert_message(flag==0, "External: \"sparsity\" failed");
-      return Sparsity(nrow, ncol, colind, row);
+    if (sparsity_in_) {
+      return Sparsity::compressed(sparsity_in_(ind));
     } else if (li_.meta().has(name_ + "_SPARSITY_IN", ind)) {
-      const ParsedFile& m = li_.meta();
-      vector<int> v = m.to_vector<int>(name_ + "_SPARSITY_IN", ind);
-      return Sparsity::compressed(v);
+      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_IN", ind));
     } else {
       // Fall back to base class
       return External::get_sparsity_in(ind);
     }
   }
 
-  Sparsity External::get_sparsity_out(int ind) const {
+  Sparsity GenericExternal::get_sparsity_out(int ind) const {
     // Use sparsity retrieval function, if present
-    if (sparsity_) {
-      // Get sparsity pattern in CCS format
-      int nrow, ncol;
-      const int *colind, *row;
-      int flag = sparsity_(ind+get_n_in(), &nrow, &ncol, &colind, &row);
-      casadi_assert_message(flag==0, "External: \"sparsity\" failed");
-      return Sparsity(nrow, ncol, colind, row);
+    if (sparsity_out_) {
+      return Sparsity::compressed(sparsity_out_(ind));
     } else if (li_.meta().has(name_ + "_SPARSITY_OUT", ind)) {
-      const ParsedFile& m = li_.meta();
-      vector<int> v = m.to_vector<int>(name_ + "_SPARSITY_OUT", ind);
-      return Sparsity::compressed(v);
+      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_OUT", ind));
     } else {
       // Fall back to base class
       return External::get_sparsity_out(ind);
     }
   }
 
-  GenericExternal::GenericExternal(const std::string& name, const Library& li)
-    : External(name, li) {
+  void External::init(const Dict& opts) {
+    // Read options (needed for base class initialization)
+    for (auto&& op : opts) {
+      if (op.first=="int_data") {
+        int_data_ = op.second;
+      } else if (op.first=="real_data") {
+        real_data_ = op.second;
+      } else if (op.first=="string_data") {
+        string_data_ = op.second.to_string();
+      }
+    }
 
-    // Function for retrieving sparsities of inputs and outputs
-    sparsity_ = (sparsity_t)li_.get(name + "_sparsity");
-  }
-
-  External::External(const std::string& name, const Library& li)
-    : FunctionInternal(name), li_(li) {
-
-    // Initialize and get the number of inputs and outputs
-    // Function for creating an object instance
-    string init_s = name + "_init";
-    int n_int=0, n_real=0;
-    init_ = (init_t)li_.get(init_s);
+    // Initialize object
     if (init_!=0) {
-      int flag = init_(0, 0, &n_int, &n_real);
+      int flag = init_(int_data_.size(), get_ptr(int_data_),
+                       real_data_.size(), get_ptr(real_data_),
+                       string_data_.c_str());
       casadi_assert_message(flag==0, "External: \"init\" failed");
-    } else {
-      // Fall back to reading meta information
-      if (li_.meta().has(name + "_N_INT")) n_int=li_.meta().to_int(name + "_N_INT");
-      if (li_.meta().has(name + "_N_REAL")) n_real=li_.meta().to_int(name + "_N_REAL");
     }
-    int_data_.resize(n_int);
-    real_data_.resize(n_real);
+
+    // Call the initialization method of the base class
+    FunctionInternal::init(opts);
+
+    // Allocate work vectors
+    int sz_arg=0, sz_res=0, sz_iw=0, sz_w=0;
+    if (work_) {
+      int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w);
+      casadi_assert_message(flag==0, "External: \"work\" failed");
+    } else if (li_.meta().has(name_ + "_WORK")) {
+      vector<int> v = li_.meta().to_vector<int>(name_ + "_WORK");
+      casadi_assert(v.size()==4);
+      sz_arg = v[0];
+      sz_res = v[1];
+      sz_iw = v[2];
+      sz_w = v[3];
+    }
+    alloc_arg(sz_arg);
+    alloc_res(sz_res);
+    alloc_iw(sz_iw);
+    alloc_w(sz_w);
   }
 
-  External::~External() {
-    if (freemem_) {
-      freemem_(0);
-    }
+  void SimplifiedExternal::init(const Dict& opts) {
+    // Call recursively
+    External::init(opts);
+
+    // Arrays for holding inputs and outputs
+    alloc_w(n_in() + n_out());
   }
 
   void GenericExternal::init(const Dict& opts) {
     // Call recursively
     External::init(opts);
-
-    // Function for numerical evaluation
-    eval_ = (eval_t)li_.get(name_);
   }
 
-  void SimplifiedExternal::
-  simple(const double* arg, double* res) {
+  void SimplifiedExternal::simple(const double* arg, double* res) {
     casadi_assert_message(eval_!=0, "Numerical evaluation not possible");
     eval_(arg, res);
   }
@@ -264,7 +241,7 @@ namespace casadi {
               const std::string& arg, const std::string& res) const {
     // Create a function call
     stringstream ss;
-    ss << this->name_ << "(" << arg << ", " << res << ")";
+    ss << name_ << "(" << arg << ", " << res << ")";
     return ss.str();
   }
 
@@ -275,7 +252,7 @@ namespace casadi {
 
     // Create a function call
     stringstream ss;
-    ss << this->name_ << "(" << mem << ", " << arg << ", " << res << ", "
+    ss << name_ << "(" << mem << ", " << arg << ", " << res << ", "
        << iw << ", " << w << ")";
     return ss.str();
   }

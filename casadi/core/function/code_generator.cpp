@@ -751,6 +751,20 @@ namespace casadi {
     return s.str();
   }
 
+  std::string CodeGenerator::declare(std::string s) {
+    // Add C linkage?
+    if (this->cpp) {
+      s = "extern \"C\" " + s;
+    }
+
+    // To header file
+    if (this->with_header) {
+      this->header << s << ";" << endl;
+    }
+
+    return s;
+  }
+
   std::string
   CodeGenerator::project(const std::string& arg, const Sparsity& sp_arg,
                          const std::string& res, const Sparsity& sp_res,
