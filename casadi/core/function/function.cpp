@@ -582,7 +582,7 @@ namespace casadi {
   }
 
   Dict Function::stats(int mem) const {
-    return (*this)->get_stats(memory(mem));;
+    return (*this)->_get_stats(mem);
   }
 
   const Sparsity Function::sparsity_jac(int iind, int oind, bool compact, bool symmetric) {
@@ -655,17 +655,17 @@ namespace casadi {
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
                           int mem) const {
-    (*this)->set_work(memory(mem), arg, res, iw, w);
+    (*this)->_set_work(arg, res, iw, w, mem);
   }
 
   void Function::set_temp(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->set_temp(memory(mem), arg, res, iw, w);
+    (*this)->_set_temp(arg, res, iw, w, mem);
   }
 
   void Function::setup(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->setup(memory(mem), arg, res, iw, w);
+    (*this)->_setup(arg, res, iw, w, mem);
   }
 
   bool Function::spCanEvaluate(bool fwd) {
@@ -1090,7 +1090,7 @@ namespace casadi {
   }
 
   void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    (*this)->eval(memory(mem), arg, res, iw, w);
+    (*this)->_eval(arg, res, iw, w, mem);
   }
 
   void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {

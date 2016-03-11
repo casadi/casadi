@@ -116,6 +116,7 @@ namespace casadi {
 
     ///@{
     /** \brief  Evaluate numerically */
+    void _eval(const double** arg, double** res, int* iw, double* w, int mem);
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
     ///@}
 
@@ -132,7 +133,6 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate a function, overloaded */
-    void _eval(const double** arg, double** res, int* iw, double* w, int mem);
     void _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
     void _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
     ///@}
@@ -700,19 +700,39 @@ namespace casadi {
     /** \brief Clear all memory (called from destructor) */
     void clear_memory();
 
+    ///@{
     /// Get all statistics
     virtual Dict get_stats(void* mem) const { return Dict();}
+    virtual Dict _get_stats(int mem) const { return get_stats(memory(mem));}
+    ///@}
 
+    ///@{
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const {}
+    virtual void _set_work(const double**& arg, double**& res,
+                           int*& iw, double*& w, int mem) const {
+      set_work(memory(mem), arg, res, iw, w);
+    }
+    ///@}
 
+    ///@{
     /** \brief Set the (temporary) work vectors */
     virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const {}
+    virtual void _set_temp(const double** arg, double** res,
+                          int* iw, double* w, int mem) const {
+      set_temp(memory(mem), arg, res, iw, w);
+    }
+    ///@}
 
+    ///@{
     /** \brief Set the (persistent and temporary) work vectors */
     void setup(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    void _setup(const double** arg, double** res, int* iw, double* w, int mem) const {
+      setup(memory(mem), arg, res, iw, w);
+    }
+    ///@}
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */

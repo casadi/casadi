@@ -109,7 +109,7 @@ namespace casadi {
       return li_.meta().to_int(name_ + "_N_IN");
     } else {
       // Fall back to base class
-      return External::get_n_in();
+      return FunctionInternal::get_n_in();
     }
   }
 
@@ -120,7 +120,7 @@ namespace casadi {
       return li_.meta().to_int(name_ + "_N_OUT");
     } else {
       // Fall back to base class
-      return External::get_n_out();
+      return FunctionInternal::get_n_out();
     }
   }
 
@@ -132,7 +132,7 @@ namespace casadi {
       return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_IN", ind));
     } else {
       // Fall back to base class
-      return External::get_sparsity_in(ind);
+      return FunctionInternal::get_sparsity_in(ind);
     }
   }
 
@@ -144,7 +144,7 @@ namespace casadi {
       return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_OUT", ind));
     } else {
       // Fall back to base class
-      return External::get_sparsity_out(ind);
+      return FunctionInternal::get_sparsity_out(ind);
     }
   }
 
