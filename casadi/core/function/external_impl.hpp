@@ -51,17 +51,14 @@ namespace casadi {
     /** \brief Information about the library */
     Library li_;
 
+    /** \brief Increase/decrease reference counter */
+    signal_t incref_, decref_;
+
     /** \brief Number of inputs and outputs */
     getint_t n_in_, n_out_;
 
     /** \brief Work vector sizes */
     work_t work_;
-
-    /** \brief Allocate memory */
-    checkout_t checkout_;
-
-    /** \brief Free memory */
-    release_t release_;
 
     ///@{
     /** \brief Data vectors */
@@ -109,29 +106,6 @@ namespace casadi {
     virtual bool hasFullJacobian() const;
     virtual Function getFullJacobian(const std::string& name, const Dict& opts);
     ///@}
-
-    /** \brief Create memory block */
-    virtual void* alloc_memory() const {
-      if (checkout_) {
-        int* m = new int;
-        *m = checkout_();
-        return m;
-      } else if (!derivative_of_.is_null()) {
-        return derivative_of_->alloc_memory();
-      } else {
-        return 0;
-      }
-    }
-
-    /** \brief Free memory block */
-    virtual void free_memory(void *mem) const {
-      if (release_) {
-        int* m = static_cast<int*>(mem);
-        release_(*m);
-      } else if (!derivative_of_.is_null()) {
-        derivative_of_->free_memory(mem);
-      }
-    }
   };
 
   class CASADI_EXPORT SimplifiedExternal : public External {
@@ -146,9 +120,6 @@ namespace casadi {
     /// Initialize
     virtual void init(const Dict& opts);
 
-    /** \brief  Evaluate numerically */
-    virtual void simple(const double* arg, double* res);
-
     /** \brief Generate a call to a function (simplified signature) */
     virtual std::string simple_call(const CodeGenerator& g,
                                     const std::string& arg, const std::string& res) const;
@@ -161,9 +132,6 @@ namespace casadi {
     virtual Sparsity get_sparsity_in(int ind) const { return Sparsity::scalar();}
     virtual Sparsity get_sparsity_out(int ind) const { return Sparsity::scalar();}
     /// @}
-  protected:
-    /** \brief  Function pointers */
-    simple_t eval_;
   };
 
   class CASADI_EXPORT GenericExternal : public External {
@@ -184,18 +152,12 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-
     /** \brief Generate a call to a function (generic signature) */
     virtual std::string generic_call(const CodeGenerator& g, const std::string& arg,
                                      const std::string& res, const std::string& iw,
                                      const std::string& w, const std::string& mem) const;
     // Sparsities
     sparsity_t sparsity_in_, sparsity_out_;
-
-    /** \brief  Function pointers */
-    eval_t eval_;
   };
 
 

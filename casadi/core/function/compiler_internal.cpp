@@ -131,12 +131,12 @@ namespace casadi {
     return get(sym)!=0;
   }
 
-  DummyPtr DllLibrary::get(const std::string& sym) {
+  signal_t DllLibrary::get(const std::string& sym) {
 #ifdef WITH_DL
 #ifdef _WIN32
-    return (DummyPtr)GetProcAddress(handle_, TEXT(sym.c_str()));
+    return (signal_t)GetProcAddress(handle_, TEXT(sym.c_str()));
 #else // _WIN32
-    DummyPtr fcnPtr = (DummyPtr)dlsym(handle_, sym.c_str());
+    signal_t fcnPtr = (signal_t)dlsym(handle_, sym.c_str());
     if (dlerror()) {
       fcnPtr=0;
       dlerror(); // Reset error flags
@@ -169,8 +169,8 @@ namespace casadi {
     return get(sym)!=0;
   }
 
-  DummyPtr JitLibrary::get(const std::string& sym) {
-    return (DummyPtr)compiler_.get_function(sym);
+  signal_t JitLibrary::get(const std::string& sym) {
+    return (signal_t)compiler_.get_function(sym);
   }
 
   const ParsedFile& JitLibrary::meta() const {

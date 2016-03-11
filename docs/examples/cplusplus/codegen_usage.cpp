@@ -58,8 +58,22 @@ int usage_c(){
   /* Reset error */
   dlerror();
 
-  /* Number of inputs */
+  /* Typedefs */
+  typedef void (*signal_t)(void);
   typedef int (*getint_t)(void);
+  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
+  typedef const int* (*sparsity_t)(int ind);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
+
+  /* Memory management -- increase reference counter */
+  signal_t incref = (signal_t)dlsym(handle, "f_incref");
+  if(dlerror()) dlerror(); // No such function, reset error flags
+
+  /* Memory management -- decrease reference counter */
+  signal_t decref = (signal_t)dlsym(handle, "f_decref");
+  if(dlerror()) dlerror(); // No such function, reset error flags
+
+  /* Number of inputs */
   getint_t n_in_fcn = (getint_t)dlsym(handle, "f_n_in");
   if (dlerror()) return 1;
   int n_in = n_in_fcn();
@@ -71,20 +85,14 @@ int usage_c(){
 
   /* Get sizes of the required work vectors */
   int sz_arg=n_in, sz_res=n_out, sz_iw=0, sz_w=0;
-  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
   work_t work = (work_t)dlsym(handle, "f_work");
-  if(dlerror()){
-    dlerror(); // No work function, that's ok
-  } else {
-    // Read from functions
-    if (work(&sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;
-  }
+  if(dlerror()) dlerror(); // No such function, reset error flags
+  if (work && work(&sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;
   printf("Work vector sizes:\n");
   printf("sz_arg = %d, sz_res = %d, sz_iw = %d, sz_w = %d\n\n",
          sz_arg, sz_res, sz_iw, sz_w);
 
   /* Input sparsities */
-  typedef const int* (*sparsity_t)(int ind);
   sparsity_t sparsity_in = (sparsity_t)dlsym(handle, "f_sparsity_in");
   if (dlerror()) return 1;
 
@@ -124,26 +132,7 @@ int usage_c(){
     printf("}\n\n");
   }
 
-  /* Function for allocating memory */
-  typedef int (*checkout_t)(void);
-  checkout_t checkout = (checkout_t)dlsym(handle, "f_checkout");
-  if(dlerror()){
-    // No alloc function
-    checkout = 0;
-    dlerror(); // Reset error flags
-  }
-
-  /* Function for freeing memory */
-  typedef void (*release_t)(int mem);
-  release_t release = (release_t)dlsym(handle, "f_release");
-  if(dlerror()){
-    // No free function
-    release = 0;
-    dlerror(); // Reset error flags
-  }
-
   /* Function for numerical evaluation */
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
   eval_t eval = (eval_t)dlsym(handle, "f");
   if(dlerror()){
     printf("Failed to retrieve \"f\" function.\n");
@@ -163,21 +152,21 @@ int usage_c(){
   double res1[4];
 
   // Allocate memory
-  int mem = checkout();
+  incref();
 
   /* Evaluate the function */
   arg[0] = x_val;
   arg[1] = &y_val;
   res[0] = &res0;
   res[1] = res1;
-  if (eval(arg, res, iw, w, mem)) return 1;
+  if (eval(arg, res, iw, w, 0)) return 1;
 
   /* Print result of evaluation */
   printf("result (0): %g\n",res0);
   printf("result (1): [%g,%g;%g,%g]\n",res1[0],res1[1],res1[2],res1[3]);
 
   /* Free memory */
-  release(mem);
+  decref();
 
   /* Free the handle */
   dlclose(handle);

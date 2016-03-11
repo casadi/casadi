@@ -64,6 +64,10 @@ namespace casadi {
   External::External(const std::string& name, const Library& li)
     : FunctionInternal(name), li_(li) {
 
+    // Increase/decrease reference counter
+    incref_ = (signal_t)li_.get(name_ + "_incref");
+    decref_ = (signal_t)li_.get(name_ + "_decref");
+
     // Get number of inputs and outputs
     n_in_ = (getint_t)li_.get(name + "_n_in");
     n_out_ = (getint_t)li_.get(name + "_n_out");
@@ -71,18 +75,15 @@ namespace casadi {
     // Work vector sizes
     work_ = (work_t)li_.get(name_ + "_work");
 
-    // Allocate memory
-    checkout_ = (checkout_t)li_.get(name_ + "_checkout");
-
-    // Free memory
-    release_ = (release_t)li_.get(name_ + "_release");
+    // Increase reference counter - external function memory initialized at this point
+    if (incref_) incref_();
   }
 
   SimplifiedExternal::SimplifiedExternal(const std::string& name, const Library& li)
     : External(name, li) {
 
     // Function for numerical evaluation
-    eval_ = (simple_t)li_.get(name_ + "_simple");
+    simple_ = (simple_t)li_.get(name_ + "_simple");
   }
 
   GenericExternal::GenericExternal(const std::string& name, const Library& li)
@@ -97,6 +98,7 @@ namespace casadi {
   }
 
   External::~External() {
+    if (decref_) decref_();
     clear_memory();
   }
 
@@ -180,19 +182,6 @@ namespace casadi {
   void GenericExternal::init(const Dict& opts) {
     // Call recursively
     External::init(opts);
-  }
-
-  void SimplifiedExternal::simple(const double* arg, double* res) {
-    casadi_assert_message(eval_!=0, "Numerical evaluation not possible");
-    eval_(arg, res);
-  }
-
-  void GenericExternal::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    casadi_assert_message(eval_!=0, "Numerical evaluation not possible");
-    int* m = static_cast<int*>(mem);
-    int flag = eval_(arg, res, iw, w, m ? *m : 0);
-    if (flag) throw CasadiException("External: \"" + name_ + "\" failed");
   }
 
   void External::addDependency(CodeGenerator& g) const {

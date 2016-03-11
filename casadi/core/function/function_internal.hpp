@@ -53,17 +53,6 @@ namespace casadi {
     return r;
   }
 
-  ///@{
-  /** \brief  Function pointer types */
-  typedef int (*getint_t)(void);
-  typedef const int* (*sparsity_t)(int i);
-  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
-  typedef int (*checkout_t)(void);
-  typedef void (*release_t)(int mem);
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
-  typedef void (*simple_t)(const double* arg, double* res);
-  ///@}
-
   /** \brief Function memory with temporary work vectors */
   struct CASADI_EXPORT WorkMemory {
     // Work vectors
@@ -125,8 +114,10 @@ namespace casadi {
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
 
+    ///@{
     /** \brief  Evaluate numerically */
     virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    ///@}
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res);
@@ -746,6 +737,8 @@ namespace casadi {
 
     /** \brief  Use just-in-time compiler */
     bool jit_;
+
+    /** \brief Numerical evaluation redirected to a C function */
     eval_t eval_;
     simple_t simple_;
 

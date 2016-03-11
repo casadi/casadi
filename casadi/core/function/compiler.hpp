@@ -108,7 +108,7 @@ namespace casadi {
 
 #ifndef SWIG
     // Dummy type
-    DummyPtr get(const std::string& sym);
+    signal_t get(const std::string& sym);
 
     // Get meta
     const ParsedFile& meta() const;

@@ -120,7 +120,7 @@ namespace casadi {
     virtual bool has(const std::string& sym) = 0;
 
     // Dummy type
-    virtual DummyPtr get(const std::string& sym) = 0;
+    virtual signal_t get(const std::string& sym) = 0;
 
     // Get meta
     virtual const ParsedFile& meta() const = 0;
@@ -152,7 +152,7 @@ namespace casadi {
     virtual bool has(const std::string& sym);
 
     // Dummy type
-    virtual DummyPtr get(const std::string& sym);
+    virtual signal_t get(const std::string& sym);
 
     // Get meta
     virtual const ParsedFile& meta() const;
@@ -179,7 +179,7 @@ namespace casadi {
     virtual bool has(const std::string& sym);
 
     // Dummy type
-    virtual DummyPtr get(const std::string& sym);
+    virtual signal_t get(const std::string& sym);
 
     // Get meta
     virtual const ParsedFile& meta() const;

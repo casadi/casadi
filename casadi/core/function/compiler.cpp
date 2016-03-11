@@ -102,7 +102,7 @@ namespace casadi {
     return (*this)->has(sym);
   }
 
-  DummyPtr Library::get(const std::string& sym) {
+  signal_t Library::get(const std::string& sym) {
     return (*this)->get(sym);
   }
 

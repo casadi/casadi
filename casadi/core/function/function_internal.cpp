@@ -368,7 +368,8 @@ namespace casadi {
     casadi_assert(mem==0);
   }
 
-  void FunctionInternal::_eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  void FunctionInternal::
+  _eval(const double** arg, double** res, int* iw, double* w, int mem) {
     if (simplifiedCall()) {
       // Copy arguments to input buffers
       const double* arg1=w;
@@ -1934,19 +1935,15 @@ namespace casadi {
     int n_out = this->n_out();
     stringstream &s = g.body;
 
+    // Increase/decrease reference counter
+    s << g.declare("void " + fname + "_incref(void)") << " {}" << endl << endl;
+    s << g.declare("void " + fname + "_decref(void)") << " {}" << endl << endl;
+
     // Number of inputs and outptus
     s << g.declare("int " + fname + "_n_in(void)")
       << " { return " << n_in << ";}" << endl << endl;
     s << g.declare("int " + fname + "_n_out(void)")
       << " { return " << n_out << ";}" << endl << endl;
-
-    // Function for allocating memory
-    s << g.declare("int " + fname + "_checkout(void)") << " {" << endl
-      << "  return 0;" << endl
-      << "}" << endl << endl;
-
-    // Function for deallocating memory
-    s << g.declare("void " + fname + "_release(int mem)") << " {}" << endl << endl;
 
     // Quick return if simplified syntax
     if (simplifiedCall()) {
