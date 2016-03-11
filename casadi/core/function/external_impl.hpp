@@ -51,9 +51,6 @@ namespace casadi {
     /** \brief Information about the library */
     Library li_;
 
-    /** \brief Initialize (called before every other function) */
-    init_t init_;
-
     /** \brief Number of inputs and outputs */
     getint_t n_in_, n_out_;
 
@@ -82,12 +79,6 @@ namespace casadi {
 
     /** \brief Get type name */
     virtual std::string type_name() const { return "external";}
-
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    virtual const Options& get_options() const { return options_;}
-    ///@}
 
     /// Initialize
     virtual void init(const Dict& opts);

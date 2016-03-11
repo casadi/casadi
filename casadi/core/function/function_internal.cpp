@@ -1934,12 +1934,6 @@ namespace casadi {
     int n_out = this->n_out();
     stringstream &s = g.body;
 
-    // Initialization function
-    s << g.declare("int " + fname + "_init(int ni, const int* idata, "
-                   "int nr, const double* rdata, const char* sdata)") << "{" << endl
-      << "  return ni==0 && nr==0 ? 0 : 1;" << endl
-      << "}" << endl << endl;
-
     // Number of inputs and outptus
     s << g.declare("int " + fname + "_n_in(void)")
       << " { return " << n_in << ";}" << endl << endl;

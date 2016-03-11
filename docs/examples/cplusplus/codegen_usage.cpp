@@ -58,16 +58,6 @@ int usage_c(){
   /* Reset error */
   dlerror();
 
-  /* Initialize the function (assume no data) */
-  typedef int (*init_t)(int ni, const int* idata, int nr, const double* rdata, const char* sdata);
-  init_t init = (init_t)dlsym(handle, "f_init");
-  if(dlerror()) {
-    dlerror(); // No init function, that's ok
-  } else {
-    // Call init function
-    if (init(0, 0, 0, 0, 0)) return 1;
-  }
-
   /* Number of inputs */
   typedef int (*getint_t)(void);
   getint_t n_in_fcn = (getint_t)dlsym(handle, "f_n_in");
@@ -84,7 +74,7 @@ int usage_c(){
   typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
   work_t work = (work_t)dlsym(handle, "f_work");
   if(dlerror()){
-    dlerror(); // No init function, that's ok
+    dlerror(); // No work function, that's ok
   } else {
     // Read from functions
     if (work(&sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;

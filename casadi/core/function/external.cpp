@@ -64,9 +64,6 @@ namespace casadi {
   External::External(const std::string& name, const Library& li)
     : FunctionInternal(name), li_(li) {
 
-    // Function being called before every other function call
-    init_ = (init_t)li_.get(name_ + "_init");
-
     // Get number of inputs and outputs
     n_in_ = (getint_t)li_.get(name + "_n_in");
     n_out_ = (getint_t)li_.get(name + "_n_out");
@@ -102,20 +99,6 @@ namespace casadi {
   External::~External() {
     clear_memory();
   }
-
-  Options External::options_
-  = {{&FunctionInternal::options_},
-     {{"int_data",
-       {OT_INTVECTOR,
-        "Integer data vector to be passed to the external function"}},
-      {"real_data",
-       {OT_DOUBLEVECTOR,
-        "Real data vector to be passed to the external function"}},
-      {"string_data",
-       {OT_STRING,
-        "String to be passed to the external function"}}
-     }
-  };
 
   size_t External::get_n_in() const {
     if (n_in_) {
@@ -164,25 +147,6 @@ namespace casadi {
   }
 
   void External::init(const Dict& opts) {
-    // Read options (needed for base class initialization)
-    for (auto&& op : opts) {
-      if (op.first=="int_data") {
-        int_data_ = op.second;
-      } else if (op.first=="real_data") {
-        real_data_ = op.second;
-      } else if (op.first=="string_data") {
-        string_data_ = op.second.to_string();
-      }
-    }
-
-    // Initialize object
-    if (init_!=0) {
-      int flag = init_(int_data_.size(), get_ptr(int_data_),
-                       real_data_.size(), get_ptr(real_data_),
-                       string_data_.c_str());
-      casadi_assert_message(flag==0, "External: \"init\" failed");
-    }
-
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
@@ -283,12 +247,10 @@ namespace casadi {
 
   int External::get_n_forward() const {
     // Will try 64, 32, 16, 8, 4, 2, 1 directions
-    init_t fwd_init;
     for (int i=64; i>0; i/=2) {
       stringstream ss;
       ss << "fwd" << i << "_" << name_;
-      fwd_init = (init_t)const_cast<Library&>(li_).get(ss.str());
-      if (fwd_init!=0) return i;
+      if (const_cast<Library&>(li_).has(ss.str())) return i;
     }
     return 0;
   }
@@ -306,12 +268,10 @@ namespace casadi {
 
   int External::get_n_reverse() const {
     // Will try 64, 32, 16, 8, 4, 2, 1 directions
-    init_t adj_init;
     for (int i=64; i>0; i/=2) {
       stringstream ss;
       ss << "adj" << i << "_" << name_;
-      adj_init = (init_t)const_cast<Library&>(li_).get(ss.str());
-      if (adj_init!=0) return i;
+      if (const_cast<Library&>(li_).has(ss.str())) return i;
     }
     return 0;
   }
