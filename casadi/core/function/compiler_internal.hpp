@@ -117,7 +117,7 @@ namespace casadi {
     virtual ~LibraryInternal() {}
 
     // Check if symbol exists
-    virtual bool has(const std::string& sym) = 0;
+    virtual bool has(const std::string& sym) const = 0;
 
     // Dummy type
     virtual signal_t get(const std::string& sym) = 0;
@@ -149,7 +149,7 @@ namespace casadi {
     virtual ~DllLibrary();
 
     // Check if symbol exists
-    virtual bool has(const std::string& sym);
+    virtual bool has(const std::string& sym) const;
 
     // Dummy type
     virtual signal_t get(const std::string& sym);
@@ -176,7 +176,7 @@ namespace casadi {
     virtual ~JitLibrary();
 
     // Check if symbol exists
-    virtual bool has(const std::string& sym);
+    virtual bool has(const std::string& sym) const;
 
     // Dummy type
     virtual signal_t get(const std::string& sym);

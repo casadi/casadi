@@ -374,12 +374,13 @@ namespace casadi {
   operator()(const Function& f, const std::string& arg,
              const std::string& res, const std::string& iw,
              const std::string& w, const std::string& mem) const {
-    return f->generic_call(*this, arg, res, iw, w, mem);
+    return f->codegen_name(*this) + "(" + arg + ", " + res + ", "
+      + iw + ", " + w + ", " + mem + ")";
   }
 
   std::string CodeGenerator::operator()(const Function& f,
                                         const std::string& arg, const std::string& res) const {
-    return f->simple_call(*this, arg, res);
+    return f->codegen_name(*this) + "(" + arg + ", " + res + ")";
   }
 
   void CodeGenerator::addExternal(const std::string& new_external) {

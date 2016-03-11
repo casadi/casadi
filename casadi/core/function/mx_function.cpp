@@ -201,7 +201,7 @@ namespace casadi {
     int worksize = 0;
 
     // Find a place in the work vector for the operation
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
 
       // There are two tasks, allocate memory of the result and free the
       // memory off the arguments, order depends on whether inplace is possible
@@ -285,7 +285,7 @@ namespace casadi {
     workloc_.resize(worksize+1);
     fill(workloc_.begin(), workloc_.end(), -1);
     size_t wind=0, sz_w=0;
-    for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       if (it->op!=OP_OUTPUT) {
         for (int c=0; c<it->res.size(); ++c) {
           if (it->res[c]>=0) {
@@ -317,8 +317,7 @@ namespace casadi {
     }
 
     // Now mark each input's place in the algorithm
-    for (vector<pair<int, MXNode*> >::const_iterator it=symb_loc.begin();
-         it!=symb_loc.end(); ++it) {
+    for (auto it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
       it->second->temp = it->first+1;
     }
 
@@ -348,8 +347,7 @@ namespace casadi {
 
     // Locate free variables
     free_vars_.clear();
-    for (vector<pair<int, MXNode*> >::const_iterator it=symb_loc.begin();
-         it!=symb_loc.end(); ++it) {
+    for (auto it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
       int i = it->second->temp-1;
       if (i>=0) {
         // Save to list of free parameters
@@ -357,6 +355,14 @@ namespace casadi {
 
         // Remove marker
         it->second->temp=0;
+      }
+    }
+
+    // Does any embedded function have reference counting for codegen?
+    for (auto&& a : algorithm_) {
+      if (!a.data.is_null() && a.data->has_refcount()) {
+        has_refcount_ = true;
+        break;
       }
     }
 
@@ -1040,9 +1046,28 @@ namespace casadi {
     }
 
     // Generate code for the embedded functions
-    for (vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
-      if (it->data.is_null()) continue;
-      it->data->addDependency(g);
+    for (auto&& a : algorithm_) {
+      if (!a.data.is_null()) {
+        a.data->addDependency(g);
+      }
+    }
+  }
+
+  void MXFunction::codegen_incref(CodeGenerator& g) const {
+    set<void*> added;
+    for (auto&& a : algorithm_) {
+      if (!a.data.is_null()) {
+        a.data->codegen_incref(g, added);
+      }
+    }
+  }
+
+  void MXFunction::codegen_decref(CodeGenerator& g) const {
+    set<void*> added;
+    for (auto&& a : algorithm_) {
+      if (!a.data.is_null()) {
+        a.data->codegen_decref(g, added);
+      }
     }
   }
 

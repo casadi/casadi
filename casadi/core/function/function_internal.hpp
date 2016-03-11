@@ -452,10 +452,6 @@ namespace casadi {
     */
     Function wrapMXFunction();
 
-    /** \brief Generate function call */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
-                          const std::vector<int>& arg, const std::vector<int>& res) const;
-
     /** \brief Generate code the function */
     virtual void generateFunction(CodeGenerator& g, const std::string& fname,
                                   bool decl_static) const;
@@ -466,17 +462,17 @@ namespace casadi {
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return false;}
 
-    /** \brief Generate a call to a function (generic signature) */
-    virtual std::string generic_call(const CodeGenerator& g, const std::string& arg,
-                                     const std::string& res, const std::string& iw,
-                                     const std::string& w, const std::string& mem) const;
-
-    /** \brief Generate a call to a function (simplified signature) */
-    virtual std::string simple_call(const CodeGenerator& g,
-                                    const std::string& arg, const std::string& res) const;
+    /** \brief Get name in codegen */
+    virtual std::string codegen_name(const CodeGenerator& g) const;
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
+
+    /** \brief Codegen incref for dependencies */
+    virtual void codegen_incref(CodeGenerator& g) const {}
+
+    /** \brief Codegen decref for dependencies */
+    virtual void codegen_decref(CodeGenerator& g) const {}
 
     /** \brief Code generate the function  */
     std::string signature(const std::string& fname) const;
@@ -765,11 +761,14 @@ namespace casadi {
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;
 
-    /** \brief  Dict of statistics (resulting from evaluate) */
+    /** \brief Dict of statistics (resulting from evaluate) */
     Dict stats_;
 
-    /** \brief  Flag to indicate whether statistics must be gathered */
+    /** \brief Flag to indicate whether statistics must be gathered */
     bool gather_stats_;
+
+    /** \brief Reference counting in codegen? */
+    bool has_refcount_;
 
     /// Cache for functions to evaluate directional derivatives (new)
     std::vector<WeakRef> derivative_fwd_, derivative_adj_;

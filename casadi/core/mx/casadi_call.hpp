@@ -74,6 +74,15 @@ namespace casadi {
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
 
+    /** \brief Is reference counting needed in codegen? */
+    virtual bool has_refcount() const;
+
+    /** \brief Codegen incref */
+    virtual void codegen_incref(CodeGenerator& g, std::set<void*>& added) const;
+
+    /** \brief Codegen decref */
+    virtual void codegen_decref(CodeGenerator& g, std::set<void*>& added) const;
+
     /** \brief Generate code for the operation */
     virtual void generate(CodeGenerator& g, const std::string& mem,
                           const std::vector<int>& arg, const std::vector<int>& res) const;

@@ -104,7 +104,7 @@ namespace casadi {
     const LibraryInternal* operator->() const;
 
     // Check if symbol exists
-    bool has(const std::string& sym);
+    bool has(const std::string& sym) const;
 
 #ifndef SWIG
     // Dummy type

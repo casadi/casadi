@@ -127,8 +127,8 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  bool DllLibrary::has(const std::string& sym) {
-    return get(sym)!=0;
+  bool DllLibrary::has(const std::string& sym) const {
+    return const_cast<DllLibrary*>(this)->get(sym)!=0;
   }
 
   signal_t DllLibrary::get(const std::string& sym) {
@@ -161,12 +161,12 @@ namespace casadi {
   JitLibrary::~JitLibrary() {
   }
 
-  bool JitLibrary::has(const std::string& sym) {
+  bool JitLibrary::has(const std::string& sym) const {
     // Check if in meta information
     if (meta_symbols_.count(sym)) return true;
 
     // Convert to a dummy function pointer
-    return get(sym)!=0;
+    return const_cast<JitLibrary*>(this)->get(sym)!=0;
   }
 
   signal_t JitLibrary::get(const std::string& sym) {

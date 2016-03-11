@@ -147,9 +147,61 @@ namespace casadi {
     fcn_->addDependency(g);
   }
 
+  bool Call::has_refcount() const {
+    return fcn_->has_refcount_;
+  }
+
   void Call::generate(CodeGenerator& g, const std::string& mem,
                       const vector<int>& arg, const vector<int>& res) const {
-    fcn_->generate(g, mem, arg, res);
+    if (fcn_->simplifiedCall()) {
+
+      // Collect input arguments
+      for (int i=0; i<arg.size(); ++i) {
+        g.body << "  w[" << i << "]=" << g.workel(arg[i]) << ";" << endl;
+      }
+
+      // Call function
+      g.body << "  " << g(fcn_, "w", "w+"+g.to_string(arg.size())) << ";" << endl;
+
+      // Collect output arguments
+      for (int i=0; i<res.size(); ++i) {
+        if (res[i]>=0) {
+          g.body << "  " << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];" << endl;
+        }
+      }
+    } else {
+
+      // Collect input arguments
+      for (int i=0; i<arg.size(); ++i) {
+        g.body << "  arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";" << endl;
+      }
+
+      // Collect output arguments
+      for (int i=0; i<res.size(); ++i) {
+        g.body << "  res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";" << endl;
+      }
+
+      // Call function
+      g.body << "  if (" << g(fcn_, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+    }
+  }
+
+  void Call::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
+    if (has_refcount()) {
+      auto i = added.insert(fcn_.get());
+      if (i.second) { // prevent duplicate calls
+        g.body << "  " << fcn_->codegen_name(g) << "_incref();" << endl;
+      }
+    }
+  }
+
+  void Call::codegen_decref(CodeGenerator& g, std::set<void*>& added) const {
+    if (has_refcount()) {
+      auto i = added.insert(fcn_.get());
+      if (i.second) { // prevent duplicate calls
+        g.body << "  " << fcn_->codegen_name(g) << "_decref();" << endl;
+      }
+    }
   }
 
   size_t Call::sz_arg() const {

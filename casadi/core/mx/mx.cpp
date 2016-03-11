@@ -1332,7 +1332,7 @@ namespace casadi {
     // expr_lookup iterator
     std::map<const MXNode*, int>::const_iterator it_lookup;
 
-    for (vector<MXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
+    for (auto it=algorithm.begin(); it!=algorithm.end(); ++it) {
 
       if (!(it->data).is_null()) {
         // Check if it->data points to a supplied expr

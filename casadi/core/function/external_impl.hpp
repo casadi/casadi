@@ -83,6 +83,9 @@ namespace casadi {
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
 
+    /** \brief Get name in codegen */
+    virtual std::string codegen_name(const CodeGenerator& g) const;
+
     ///@{
     /** \brief Number of function inputs and outputs */
     virtual size_t get_n_in() const;
@@ -120,10 +123,6 @@ namespace casadi {
     /// Initialize
     virtual void init(const Dict& opts);
 
-    /** \brief Generate a call to a function (simplified signature) */
-    virtual std::string simple_call(const CodeGenerator& g,
-                                    const std::string& arg, const std::string& res) const;
-
     /** \brief Use simplified signature */
     virtual bool simplifiedCall() const { return true;}
 
@@ -152,10 +151,6 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
-    /** \brief Generate a call to a function (generic signature) */
-    virtual std::string generic_call(const CodeGenerator& g, const std::string& arg,
-                                     const std::string& res, const std::string& iw,
-                                     const std::string& w, const std::string& mem) const;
     // Sparsities
     sparsity_t sparsity_in_, sparsity_out_;
   };

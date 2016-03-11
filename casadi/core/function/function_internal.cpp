@@ -67,6 +67,8 @@ namespace casadi {
     monitor_inputs_ = false;
     monitor_outputs_ = false;
 
+    has_refcount_ = false;
+
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
@@ -1885,42 +1887,6 @@ namespace casadi {
     g.body << "}" << endl << endl;
   }
 
-  void FunctionInternal::generate(CodeGenerator& g, const std::string& mem,
-                                  const vector<int>& arg, const vector<int>& res) const {
-    if (simplifiedCall()) {
-
-      // Collect input arguments
-      for (int i=0; i<arg.size(); ++i) {
-        g.body << "  w[" << i << "]=" << g.workel(arg[i]) << ";" << endl;
-      }
-
-      // Call function
-      g.body << "  " << simple_call(g, "w", "w+"+g.to_string(arg.size())) << ";" << endl;
-
-      // Collect output arguments
-      for (int i=0; i<res.size(); ++i) {
-        if (res[i]>=0) {
-          g.body << "  " << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];" << endl;
-        }
-      }
-    } else {
-
-      // Collect input arguments
-      for (int i=0; i<arg.size(); ++i) {
-        g.body << "  arg1[" << i << "]=" << g.work(arg[i], nnz_in(i)) << ";" << endl;
-      }
-
-      // Collect output arguments
-      for (int i=0; i<res.size(); ++i) {
-        g.body << "  res1[" << i << "]=" << g.work(res[i], nnz_out(i)) << ";" << endl;
-      }
-
-      // Call function
-      g.body << "  if (" << generic_call(g, "arg1", "res1", "iw", "w", "0")
-             << ") return 1;" << endl;
-    }
-  }
-
   std::string FunctionInternal::signature(const std::string& fname) const {
     if (simplifiedCall()) {
       return "void " + fname + "(const real_t* arg, real_t* res)";
@@ -1935,9 +1901,13 @@ namespace casadi {
     int n_out = this->n_out();
     stringstream &s = g.body;
 
-    // Increase/decrease reference counter
-    s << g.declare("void " + fname + "_incref(void)") << " {}" << endl << endl;
-    s << g.declare("void " + fname + "_decref(void)") << " {}" << endl << endl;
+    // Reference counter routines
+    s << g.declare("void " + fname + "_incref(void)") << " {" << endl;
+    codegen_incref(g);
+    s << "}" << endl << endl;
+    s << g.declare("void " + fname + "_decref(void)") << " {" << endl;
+    codegen_decref(g);
+    s << "}" << endl << endl;
 
     // Number of inputs and outptus
     s << g.declare("int " + fname + "_n_in(void)")
@@ -2108,31 +2078,15 @@ namespace casadi {
     }
   }
 
-  std::string FunctionInternal::generic_call(const CodeGenerator& g, const std::string& mem,
-                                             const std::string& arg, const std::string& res,
-                                             const std::string& iw, const std::string& w) const {
+  std::string FunctionInternal::codegen_name(const CodeGenerator& g) const {
     // Get the index of the function
     auto it=g.added_dependencies_.find(this);
     casadi_assert(it!=g.added_dependencies_.end());
     int f = it->second;
 
-    // Create a function call
+    // Construct the name
     stringstream ss;
-    ss << "f" << f << "(" << mem << ", " << arg << ", " << res << ", " << iw << ", " << w << ")";
-    return ss.str();
-  }
-
-  std::string FunctionInternal::simple_call(const CodeGenerator& g,
-                                             const std::string& arg,
-                                             const std::string& res) const {
-    // Get the index of the function
-    auto it=g.added_dependencies_.find(this);
-    casadi_assert(it!=g.added_dependencies_.end());
-    int f = it->second;
-
-    // Create a function call
-    stringstream ss;
-    ss << "f" << f << "(" << arg << ", " << res << ")";
+    ss << "f" << f;
     return ss.str();
   }
 
@@ -2163,6 +2117,25 @@ namespace casadi {
         g.body
           << "#define " << name << "(arg, res, iw, w, mem) "
           << "CASADI_PREFIX(" << name << ")(arg, res, iw, w, mem)" << endl << endl;
+      }
+
+      // Codegen reference count functions, if needed
+      if (has_refcount_) {
+        // Increase reference counter
+        g.body << "void CASADI_PREFIX(" << name << "_incref)(void) {" << endl;
+        codegen_incref(g);
+        g.body
+          << "}" << endl
+          << "#define " << name << "_incref() "
+          << "CASADI_PREFIX(" << name << "_incref)()" << endl << endl;
+
+        // Decrease reference counter
+        g.body << "void CASADI_PREFIX(" << name << "_decref)(void) {" << endl;
+        codegen_decref(g);
+        g.body
+          << "}" << endl
+          << "#define " << name << "_decref() "
+          << "CASADI_PREFIX(" << name << "_decref)()" << endl << endl;
       }
     }
   }

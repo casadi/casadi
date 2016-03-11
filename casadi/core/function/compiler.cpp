@@ -98,7 +98,7 @@ namespace casadi {
     return static_cast<const LibraryInternal*>(SharedObject::operator->());
   }
 
-  bool Library::has(const std::string& sym) {
+  bool Library::has(const std::string& sym) const {
     return (*this)->has(sym);
   }
 

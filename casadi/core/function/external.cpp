@@ -152,6 +152,12 @@ namespace casadi {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
+    // Reference counting?
+    has_refcount_ = li_.has(name_ + "_incref");
+    casadi_assert_message(has_refcount_==li_.has(name_ + "_decref"),
+                          "External functions must provide functions for both increasing "
+                          "and decreasing the reference count, or neither.");
+
     // Allocate work vectors
     int sz_arg=0, sz_res=0, sz_iw=0, sz_w=0;
     if (work_) {
@@ -186,32 +192,19 @@ namespace casadi {
 
   void External::addDependency(CodeGenerator& g) const {
     g.addExternal(signature(name_) + ";");
+    if (has_refcount_) {
+      g.addExternal("void " + name_ + "_incref(void);");
+      g.addExternal("void " + name_ + "_decref(void);");
+    }
   }
 
-  std::string SimplifiedExternal::
-  simple_call(const CodeGenerator& g,
-              const std::string& arg, const std::string& res) const {
-    // Create a function call
-    stringstream ss;
-    ss << name_ << "(" << arg << ", " << res << ")";
-    return ss.str();
-  }
-
-  std::string GenericExternal::
-  generic_call(const CodeGenerator& g, const std::string& arg,
-               const std::string& res, const std::string& iw,
-               const std::string& w, const std::string& mem) const {
-
-    // Create a function call
-    stringstream ss;
-    ss << name_ << "(" << arg << ", " << res << ", " << iw << ", "
-       << w << ", " << mem << ")";
-    return ss.str();
+  std::string External::codegen_name(const CodeGenerator& g) const {
+    return name_;
   }
 
   bool External::hasFullJacobian() const {
     if (FunctionInternal::hasFullJacobian()) return true;
-    return const_cast<Library&>(li_).has(name_ + "_jac");
+    return li_.has(name_ + "_jac");
   }
 
   Function External
@@ -239,7 +232,7 @@ namespace casadi {
     for (int i=64; i>0; i/=2) {
       stringstream ss;
       ss << "fwd" << i << "_" << name_;
-      if (const_cast<Library&>(li_).has(ss.str())) return i;
+      if (li_.has(ss.str())) return i;
     }
     return 0;
   }
@@ -260,7 +253,7 @@ namespace casadi {
     for (int i=64; i>0; i/=2) {
       stringstream ss;
       ss << "adj" << i << "_" << name_;
-      if (const_cast<Library&>(li_).has(ss.str())) return i;
+      if (li_.has(ss.str())) return i;
     }
     return 0;
   }
