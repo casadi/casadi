@@ -295,6 +295,12 @@ Get symbolic primitives equivalent to the output expressions.
 
 ";
 
+%feature("docstring") casadi::Callback::checkout "
+
+Checkout a memory object.
+
+";
+
 %feature("docstring") casadi::Callback::Callback "
 
 >  Callback()
@@ -490,6 +496,12 @@ Get output dimension.
 %feature("docstring") casadi::Callback::mx_in "
 
 Get symbolic primitives equivalent to the input expressions.
+
+";
+
+%feature("docstring") casadi::Callback::release "
+
+Release a memory object.
 
 ";
 
@@ -1073,9 +1085,6 @@ Generate a file, return code as string.
 
 
 // File: classcasadi_1_1CollocationIntegrator.xml
-
-
-// File: classcasadi_1_1CommonExternal.xml
 
 
 // File: classcasadi_1_1Compiler.xml
@@ -1799,6 +1808,9 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1Diagsplit.xml
 
 
+// File: classcasadi_1_1DllLibrary.xml
+
+
 // File: classcasadi_1_1Dot.xml
 
 
@@ -2127,6 +2139,11 @@ Construct an MX function.
 
 Default constructor, null pointer.
 
+>  Function(str fname)
+------------------------------------------------------------------------
+
+Construct from a file.
+
 ";
 
 %feature("docstring") casadi::Function::type_name "
@@ -2209,6 +2226,11 @@ scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLPSOL_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
+length of w field.
 
 ";
 
@@ -2297,6 +2319,12 @@ corresponding to the Hessian and the gradients.
 %feature("docstring") casadi::Function::expand "
 
 Expand a function to SX.
+
+";
+
+%feature("docstring") casadi::Function::checkout "
+
+Checkout a memory object.
 
 ";
 
@@ -2555,8 +2583,9 @@ Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
-length of w field.
+%feature("docstring") casadi::Function::release "
+
+Release a memory object.
 
 ";
 
@@ -3706,6 +3735,9 @@ NULL)
 // File: classcasadi_1_1Jit.xml
 
 
+// File: classcasadi_1_1JitLibrary.xml
+
+
 // File: classcasadi_1_1KernelSum.xml
 
 
@@ -3715,38 +3747,65 @@ NULL)
 // File: classcasadi_1_1LapackQr.xml
 
 
-// File: classcasadi_1_1LibInfo.xml
-%feature("docstring") casadi::LibInfo "[INTERNAL]  Structure with
-information about the library.
+// File: classcasadi_1_1Library.xml
+%feature("docstring") casadi::Library::getDescription "
 
-C++ includes: external_impl.hpp ";
+Return a string with a description (for SWIG)
 
-
-// File: classcasadi_1_1LibInfo_3_01Compiler_01_4.xml
-%feature("docstring") casadi::LibInfo< Compiler >::LibInfo " [INTERNAL] ";
-
-%feature("docstring") casadi::LibInfo< Compiler > " [INTERNAL]  Library that
-has been just-in-time compiled.
-
-C++ includes: external_impl.hpp ";
-
-%feature("docstring") casadi::LibInfo< Compiler >::get " [INTERNAL] ";
-
-%feature("docstring") casadi::LibInfo< Compiler >::clear " [INTERNAL] ";
-
-
-// File: classcasadi_1_1LibInfo_3_01std_1_1string_01_4.xml
-%feature("docstring") casadi::LibInfo< std::string > " [INTERNAL]  Library
-given as a dynamically linked library.
-
-C++ includes: external_impl.hpp ";
-
-%feature("docstring") casadi::LibInfo< std::string >::clear " [INTERNAL] ";
-
-%feature("docstring") casadi::LibInfo< std::string >::LibInfo " [INTERNAL]
 ";
 
-%feature("docstring") casadi::LibInfo< std::string >::get " [INTERNAL] ";
+%feature("docstring") casadi::Library::repr "
+
+Print a representation of the object.
+
+";
+
+%feature("docstring") casadi::Library::is_null "
+
+Is a null pointer?
+
+";
+
+%feature("docstring") casadi::Library::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring") casadi::Library::has "";
+
+%feature("docstring") casadi::Library "
+
+Library, either just-in-time compiled or dynamically loaded.
+
+C++ includes: compiler.hpp ";
+
+%feature("docstring") casadi::Library::Library "
+
+>  Library()
+------------------------------------------------------------------------
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::Library::print "
+
+Print a description of the object.
+
+";
+
+%feature("docstring") casadi::Library::printPtr "[INTERNAL]  Print the
+pointer to the internal class
+
+";
+
+%feature("docstring") casadi::Library::getRepresentation "
+
+Return a string with a representation (for SWIG)
+
+";
 
 
 // File: classcasadi_1_1Linsol.xml
@@ -5602,6 +5661,94 @@ C++ includes: nonzeros.hpp ";
 
 
 // File: classcasadi_1_1OneSX.xml
+
+
+// File: classcasadi_1_1ParsedFile.xml
+%feature("docstring") casadi::ParsedFile::ParsedFile "
+
+>  ParsedFile()
+------------------------------------------------------------------------
+
+Default constructor (no commands)
+
+>  ParsedFile(str fname)
+
+>  ParsedFile([str ] lines, int offset=0)
+------------------------------------------------------------------------
+
+Construct from a file.
+
+";
+
+%feature("docstring") casadi::ParsedFile::print "
+
+Print parsed file.
+
+";
+
+%feature("docstring") casadi::ParsedFile::to "
+
+Convert to a type.
+
+";
+
+%feature("docstring") casadi::ParsedFile::parse "
+
+>  void ParsedFile.parse(str fname)
+------------------------------------------------------------------------
+
+Parse a file.
+
+>  void ParsedFile.parse([str ] lines, int offset)
+------------------------------------------------------------------------
+
+Parse a list of strings.
+
+";
+
+%feature("docstring") casadi::ParsedFile::has "
+
+Does an entry exist?
+
+";
+
+%feature("docstring") casadi::ParsedFile::to_int "
+
+Get entry as an integer.
+
+";
+
+%feature("docstring") casadi::ParsedFile::to_vector "
+
+Get entry as a vector.
+
+";
+
+%feature("docstring") casadi::ParsedFile::to_text "
+
+Get entry as a text.
+
+";
+
+%feature("docstring") casadi::ParsedFile::to_string "
+
+Get entry as a string.
+
+";
+
+%feature("docstring") casadi::ParsedFile::to_set "
+
+Get entry as a set.
+
+";
+
+%feature("docstring") casadi::ParsedFile "
+
+A parsed file.
+
+Joel Andersson
+
+C++ includes: casadi_file.hpp ";
 
 
 // File: classcasadi_1_1Polynomial.xml
@@ -7644,6 +7791,19 @@ General information
 |                 |                 | compiler plugin | nInternal       |
 |                 |                 | to be used.     |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| derivative_of   | OT_FUNCTION     | The function is | casadi::Functio |
+|                 |                 | a derivative of | nInternal       |
+|                 |                 | another         |                 |
+|                 |                 | function. The   |                 |
+|                 |                 | type of         |                 |
+|                 |                 | derivative      |                 |
+|                 |                 | (directional    |                 |
+|                 |                 | derivative,     |                 |
+|                 |                 | Jacobian) is    |                 |
+|                 |                 | inferred from   |                 |
+|                 |                 | the function    |                 |
+|                 |                 | name.           |                 |
++-----------------+-----------------+-----------------+-----------------+
 | expand          | OT_BOOL         | Replace MX with | casadi::Integra |
 |                 |                 | SX expressions  | tor             |
 |                 |                 | in problem      |                 |
@@ -8558,6 +8718,19 @@ General information
 |                 |                 | 0.0, -2: ui <   |                 |
 |                 |                 | 0.0.            |                 |
 +-----------------+-----------------+-----------------+-----------------+
+| derivative_of   | OT_FUNCTION     | The function is | casadi::Functio |
+|                 |                 | a derivative of | nInternal       |
+|                 |                 | another         |                 |
+|                 |                 | function. The   |                 |
+|                 |                 | type of         |                 |
+|                 |                 | derivative      |                 |
+|                 |                 | (directional    |                 |
+|                 |                 | derivative,     |                 |
+|                 |                 | Jacobian) is    |                 |
+|                 |                 | inferred from   |                 |
+|                 |                 | the function    |                 |
+|                 |                 | name.           |                 |
++-----------------+-----------------+-----------------+-----------------+
 | gather_stats    | OT_BOOL         | Flag to         | casadi::Functio |
 |                 |                 | indicate        | nInternal       |
 |                 |                 | whether         |                 |
@@ -9069,6 +9242,19 @@ General information
 | compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
 |                 |                 | compiler plugin | nInternal       |
 |                 |                 | to be used.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_of   | OT_FUNCTION     | The function is | casadi::Functio |
+|                 |                 | a derivative of | nInternal       |
+|                 |                 | another         |                 |
+|                 |                 | function. The   |                 |
+|                 |                 | type of         |                 |
+|                 |                 | derivative      |                 |
+|                 |                 | (directional    |                 |
+|                 |                 | derivative,     |                 |
+|                 |                 | Jacobian) is    |                 |
+|                 |                 | inferred from   |                 |
+|                 |                 | the function    |                 |
+|                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Qpsol   |
 |                 |                 | of the          |                 |
@@ -9717,9 +9903,6 @@ Get the documentation string for a plugin.
 
 %feature("docstring") casadi::jit "
 
->  Function jit(str name, int n_in, int n_out, str body, Dict opts=Dict())
-------------------------------------------------------------------------
-
 Create a just-in-time compiled function from a C/C++ language string The
 function can an arbitrary number of inputs and outputs that must all be
 scalar-valued. Only specify the function body, assuming that the inputs are
@@ -9730,11 +9913,6 @@ stored in an array named 'arg' and the outputs stored in an array named
 The final generated function will have a structure similar to:
 
 void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
-
->  Function jit(str fname, Dict opts=Dict())
-------------------------------------------------------------------------
-
-Create a just-in-time compiled function from a .casadi file.
 
 ";
 
@@ -10061,6 +10239,19 @@ General information
 | compiler        | OT_STRING       | Just-in-time    | casadi::Functio |
 |                 |                 | compiler plugin | nInternal       |
 |                 |                 | to be used.     |                 |
++-----------------+-----------------+-----------------+-----------------+
+| derivative_of   | OT_FUNCTION     | The function is | casadi::Functio |
+|                 |                 | a derivative of | nInternal       |
+|                 |                 | another         |                 |
+|                 |                 | function. The   |                 |
+|                 |                 | type of         |                 |
+|                 |                 | derivative      |                 |
+|                 |                 | (directional    |                 |
+|                 |                 | derivative,     |                 |
+|                 |                 | Jacobian) is    |                 |
+|                 |                 | inferred from   |                 |
+|                 |                 | the function    |                 |
+|                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
 | eval_errors_fat | OT_BOOL         | When errors     | casadi::Nlpsol  |
 | al              |                 | occur during    |                 |

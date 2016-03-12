@@ -40,18 +40,6 @@
 %exception  casadi::IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType &var_string_md, IntegerMetaDataMapType &var_integer_md, NumericMetaDataMapType &var_numeric_md, Index m, StringMetaDataMapType &con_string_md, IntegerMetaDataMapType &con_integer_md, NumericMetaDataMapType &con_numeric_md) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LibInfo< Compiler >::clear() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::LibInfo< Compiler >::get(FcnPtr &fcnPtr, const std::string &sym) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::LibInfo< std::string >::clear() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::LibInfo< std::string >::get(FcnPtr &fcnPtr, const std::string &sym) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::MX::getTemp() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -245,18 +233,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::LibInfo< Compiler >::LibInfo() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::LibInfo< Compiler >::LibInfo(const Compiler &compiler) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::LibInfo< std::string >::LibInfo() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::LibInfo< std::string >::LibInfo(const std::string &bin_name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Matrix< Scalar >::Matrix(const Sparsity &sp, const Scalar &val, bool dummy) {
