@@ -1343,13 +1343,13 @@ namespace casadi {
     return attribute(&DaeBuilder::min, var, normalized);
   }
 
-  void DaeBuilder::setMin(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::set_min(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.min = normalized ? val*v.nominal : val;
   }
 
-  void DaeBuilder::setMin(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&DaeBuilder::setMin, var, val, normalized);
+  void DaeBuilder::set_min(const MX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&DaeBuilder::set_min, var, val, normalized);
   }
 
   double DaeBuilder::max(const std::string& name, bool normalized) const {
@@ -1361,13 +1361,13 @@ namespace casadi {
     return attribute(&DaeBuilder::max, var, normalized);
   }
 
-  void DaeBuilder::setMax(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::set_max(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.max = normalized ? val*v.nominal : val;
   }
 
-  void DaeBuilder::setMax(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&DaeBuilder::setMax, var, val, normalized);
+  void DaeBuilder::set_max(const MX& var, const std::vector<double>& val, bool normalized) {
+    setAttribute(&DaeBuilder::set_max, var, val, normalized);
   }
 
   double DaeBuilder::initialGuess(const std::string& name, bool normalized) const {

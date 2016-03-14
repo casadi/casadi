@@ -343,10 +343,10 @@ namespace casadi {
     std::vector<double> min(const MX& var, bool normalized=false) const;
 
     /// Set the lower bound by name
-    void setMin(const std::string& name, double val, bool normalized=false);
+    void set_min(const std::string& name, double val, bool normalized=false);
 
     /// Set the lower bound(s) by expression
-    void setMin(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_min(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the upper bound by name
     double max(const std::string& name, bool normalized=false) const;
@@ -355,10 +355,10 @@ namespace casadi {
     std::vector<double> max(const MX& var, bool normalized=false) const;
 
     /// Set the upper bound by name
-    void setMax(const std::string& name, double val, bool normalized=false);
+    void set_max(const std::string& name, double val, bool normalized=false);
 
     /// Set the upper bound(s) by expression
-    void setMax(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_max(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the initial guess by name
     double initialGuess(const std::string& name, bool normalized=false) const;
