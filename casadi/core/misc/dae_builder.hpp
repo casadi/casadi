@@ -412,13 +412,13 @@ namespace casadi {
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Add a variable
-    void addVariable(const std::string& name, const Variable& var);
+    void add_variable(const std::string& name, const Variable& var);
 
     /// Add a new variable: returns corresponding symbolic expression
-    MX addVariable(const std::string& name, int n=1);
+    MX add_variable(const std::string& name, int n=1);
 
     /// Add a new variable: returns corresponding symbolic expression
-    MX addVariable(const std::string& name, const Sparsity& sp);
+    MX add_variable(const std::string& name, const Sparsity& sp);
 
     ///@{
     /// Access a variable by name

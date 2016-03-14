@@ -168,7 +168,7 @@ namespace casadi {
           }
 
           // Add to list of variables
-          addVariable(qn, var);
+          add_variable(qn, var);
 
           // Sort expression
           switch (var.category) {
@@ -936,7 +936,7 @@ namespace casadi {
     return it->second;
   }
 
-  void DaeBuilder::addVariable(const std::string& name, const Variable& var) {
+  void DaeBuilder::add_variable(const std::string& name, const Variable& var) {
     // Try to find the component
     if (varmap_.find(name)!=varmap_.end()) {
       stringstream ss;
@@ -947,20 +947,20 @@ namespace casadi {
     varmap_[name] = var;
   }
 
-  MX DaeBuilder::addVariable(const std::string& name, int n) {
-    return addVariable(name, Sparsity::dense(n));
+  MX DaeBuilder::add_variable(const std::string& name, int n) {
+    return add_variable(name, Sparsity::dense(n));
   }
 
-  MX DaeBuilder::addVariable(const std::string& name, const Sparsity& sp) {
+  MX DaeBuilder::add_variable(const std::string& name, const Sparsity& sp) {
     Variable v(name, sp);
-    addVariable(name, v);
+    add_variable(name, v);
     return v.v;
   }
 
   MX DaeBuilder::add_x(const std::string& name, int n) {
     if (name.empty()) // Generate a name
       return add_x("x" + CodeGenerator::to_string(this->x.size()), n);
-    MX new_x = addVariable(name, n);
+    MX new_x = add_variable(name, n);
     this->x.push_back(new_x);
     return new_x;
   }
@@ -968,7 +968,7 @@ namespace casadi {
   MX DaeBuilder::add_q(const std::string& name, int n) {
     if (name.empty()) // Generate a name
       return add_q("q" + CodeGenerator::to_string(this->q.size()), n);
-    MX new_q = addVariable(name, n);
+    MX new_q = add_variable(name, n);
     this->q.push_back(new_q);
     return new_q;
   }
@@ -977,7 +977,7 @@ namespace casadi {
     if (name.empty()) // Generate a name
       return add_s("s" + CodeGenerator::to_string(this->s.size()), n);
     Variable v(name, Sparsity::dense(n));
-    addVariable(name, v);
+    add_variable(name, v);
     this->s.push_back(v.v);
     this->sdot.push_back(v.d);
     return std::pair<MX, MX>(v.v, v.d);
@@ -986,7 +986,7 @@ namespace casadi {
   MX DaeBuilder::add_z(const std::string& name, int n) {
     if (name.empty()) // Generate a name
       return add_z("z" + CodeGenerator::to_string(this->z.size()), n);
-    MX new_z = addVariable(name, n);
+    MX new_z = add_variable(name, n);
     this->z.push_back(new_z);
     return new_z;
   }
@@ -994,7 +994,7 @@ namespace casadi {
   MX DaeBuilder::add_p(const std::string& name, int n) {
     if (name.empty()) // Generate a name
       return add_p("p" + CodeGenerator::to_string(this->p.size()), n);
-    MX new_p = addVariable(name, n);
+    MX new_p = add_variable(name, n);
     this->p.push_back(new_p);
     return new_p;
   }
@@ -1002,7 +1002,7 @@ namespace casadi {
   MX DaeBuilder::add_u(const std::string& name, int n) {
     if (name.empty()) // Generate a name
       return add_u("u" + CodeGenerator::to_string(this->u.size()), n);
-    MX new_u = addVariable(name, n);
+    MX new_u = add_variable(name, n);
     this->u.push_back(new_u);
     return new_u;
   }
@@ -1010,7 +1010,7 @@ namespace casadi {
   MX DaeBuilder::add_d(const MX& new_ddef, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_d(new_ddef, "d" + CodeGenerator::to_string(this->d.size()));
-    MX new_d = addVariable(name, new_ddef.sparsity());
+    MX new_d = add_variable(name, new_ddef.sparsity());
     this->d.push_back(new_d);
     this->ddef.push_back(new_ddef);
     this->lam_ddef.push_back(MX::sym("lam_" + name, new_ddef.sparsity()));
@@ -1020,7 +1020,7 @@ namespace casadi {
   MX DaeBuilder::add_y(const MX& new_ydef, const std::string& name) {
     if (name.empty()) // Generate a name
       return add_y(new_ydef, "y" + CodeGenerator::to_string(this->y.size()));
-    MX new_y = addVariable(name, new_ydef.sparsity());
+    MX new_y = add_variable(name, new_ydef.sparsity());
     this->y.push_back(new_y);
     this->ydef.push_back(new_ydef);
     this->lam_ydef.push_back(MX::sym("lam_" + name, new_ydef.sparsity()));
