@@ -226,7 +226,7 @@ namespace casadi {
     void scale_variables();
 
     /// Scale the implicit equations
-    void scaleEquations();
+    void scale_equations();
     ///@}
 
     /** @name Import and export

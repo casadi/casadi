@@ -668,8 +668,8 @@ namespace casadi {
     casadi_assert(it==ex.end());
   }
 
-  void DaeBuilder::scaleEquations() {
-    casadi_error("DaeBuilder::scaleEquations broken");
+  void DaeBuilder::scale_equations() {
+    casadi_error("DaeBuilder::scale_equations broken");
   }
 
   void DaeBuilder::sort_dae() {

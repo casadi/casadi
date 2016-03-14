@@ -1661,7 +1661,7 @@ Add an algebraic equation.
 
 ";
 
-%feature("docstring") casadi::DaeBuilder::scaleEquations "
+%feature("docstring") casadi::DaeBuilder::scale_equations "
 
 Scale the implicit equations.
 
