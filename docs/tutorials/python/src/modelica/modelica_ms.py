@@ -69,8 +69,8 @@ ubx = ivp.max(x)
 lbx = ivp.min(x)
 ubu = ivp.max(u)
 lbu = ivp.min(u)
-x0 = ivp.initialGuess(x)
-u0 = ivp.initialGuess(u)
+x0 = ivp.guess(x)
+u0 = ivp.guess(u)
 #$ Formulate the optimal control problem
 tf = 150.
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
