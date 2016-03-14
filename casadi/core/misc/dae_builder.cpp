@@ -1444,7 +1444,7 @@ namespace casadi {
     }
   }
 
-  DaeBuilder::DaeBuilderIn DaeBuilder::inputEnum(const std::string& id) {
+  DaeBuilder::DaeBuilderIn DaeBuilder::enum_in(const std::string& id) {
     if (id=="t") {
       return DAE_BUILDER_T;
     } else if (id=="c") {
@@ -1475,10 +1475,10 @@ namespace casadi {
   }
 
   std::vector<DaeBuilder::DaeBuilderIn>
-  DaeBuilder::inputEnum(const std::vector<std::string>& id) {
+  DaeBuilder::enum_in(const std::vector<std::string>& id) {
     std::vector<DaeBuilderIn> ret(id.size());
     for (int i=0; i<id.size(); ++i) {
-      ret[i] = inputEnum(id[i]);
+      ret[i] = enum_in(id[i]);
     }
     return ret;
   }
@@ -1656,7 +1656,7 @@ namespace casadi {
     std::vector<bool> output_used(DAE_BUILDER_NUM_IN, false);
     for (vector<string>::const_iterator s_in_it=s_in.begin(); s_in_it!=s_in.end(); ++s_in_it) {
       // Primal variable
-      DaeBuilderIn iind = inputEnum(*s_in_it);
+      DaeBuilderIn iind = enum_in(*s_in_it);
       if (iind!=DAE_BUILDER_NUM_IN) {
         casadi_assert_message(!input_used[iind],
                               "DaeBuilder::function: Duplicate expression " << *s_in_it);
@@ -1784,7 +1784,7 @@ namespace casadi {
 
       // Jacobian with respect to what variable
       s = so.substr(pos1+1, string::npos);
-      DaeBuilderIn iind = inputEnum(s);
+      DaeBuilderIn iind = enum_in(s);
       if (iind==DAE_BUILDER_NUM_IN) continue;
 
       // Check if duplicate
@@ -1872,12 +1872,12 @@ namespace casadi {
         pos = so.find('_', pos1+1);
         if (pos>=so.size()) continue;
         s = so.substr(pos1+1, pos-pos1-1);
-        DaeBuilderIn iind1 = inputEnum(s);
+        DaeBuilderIn iind1 = enum_in(s);
         if (iind1==DAE_BUILDER_NUM_IN) continue;
 
         // Get second derivative
         s = so.substr(pos+1, string::npos);
-        DaeBuilderIn iind2 = inputEnum(s);
+        DaeBuilderIn iind2 = enum_in(s);
         if (iind2==DAE_BUILDER_NUM_IN) continue;
 
         // Check if duplicate
