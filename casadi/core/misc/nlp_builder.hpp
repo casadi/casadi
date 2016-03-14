@@ -66,7 +66,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
     ///@}
 
     /// Parse an AMPL och PyOmo NL-file
-    void parseNL(const std::string& filename, const Dict& options = Dict());
+    void parse_nl(const std::string& filename, const Dict& options = Dict());
 
     /// Print a description of the object
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
@@ -78,7 +78,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
   protected:
 
     /// Read an expression from an NL-file (Polish infix format)
-    static SXElem readExpressionNL(std::istream &stream, const std::vector<SXElem>& v);
+    static SXElem read_expr(std::istream &stream, const std::vector<SXElem>& v);
 
 #endif // SWIG
 };

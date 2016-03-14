@@ -30,7 +30,7 @@
 using namespace std;
 namespace casadi {
 
-void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
+void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   // Note: The implementation of this function follows the
   // "Writing .nl Files" paper by David M. Gay (2005)
 
@@ -149,7 +149,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
         }
 
         // Finally, add the nonlinear term
-        v[i] += readExpressionNL(nlfile, v);
+        v[i] += read_expr(nlfile, v);
 
         break;
       }
@@ -162,7 +162,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
         nlfile >> i;
 
         // Parse and save expression
-        g->at(i) = readExpressionNL(nlfile, v);
+        g->at(i) = read_expr(nlfile, v);
 
         break;
       }
@@ -186,7 +186,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
         nlfile >> sigma;
 
         // Parse and save expression
-        f->at(i) = readExpressionNL(nlfile, v);
+        f->at(i) = read_expr(nlfile, v);
 
         // Negate the expression if we maximize
         if (sigma!=0) {
@@ -419,7 +419,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   nlfile.close();
 }
 
-SXElem NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXElem>& v) {
+SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v) {
   // Read the instruction
   char inst;
   stream >> inst;
@@ -465,7 +465,7 @@ SXElem NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXEl
         case 51:  case 52:  case 53:
         {
           // Read dependency
-          SXElem x = readExpressionNL(stream, v);
+          SXElem x = read_expr(stream, v);
 
           // Perform operation
           switch (i) {
@@ -503,8 +503,8 @@ SXElem NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXEl
         case 57:  case 58:  case 73:
         {
           // Read dependencies
-          SXElem x = readExpressionNL(stream, v);
-          SXElem y = readExpressionNL(stream, v);
+          SXElem x = read_expr(stream, v);
+          SXElem y = read_expr(stream, v);
 
           // Perform operation
           switch (i) {
@@ -547,7 +547,7 @@ SXElem NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXEl
           // Collect the arguments
           vector<SXElem> args(n);
           for (int k=0; k<n; ++k) {
-            args[k] = readExpressionNL(stream, v);
+            args[k] = read_expr(stream, v);
           }
 
           // Perform the operation
@@ -595,7 +595,7 @@ SXElem NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXEl
   }
 
   // Throw error message
-  throw CasadiException("Error in NlpBuilder::readExpressionNL: " + msg.str());
+  throw CasadiException("Error in NlpBuilder::read_expr: " + msg.str());
 }
 
 void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {

@@ -42,7 +42,7 @@ int main(int argc, char **argv){
   
   // Parse an NL-file
   NlpBuilder nl;
-  nl.parseNL(problem);
+  nl.parse_nl(problem);
   
   // NLP
   SXDict nlp = {{"x", nl.x}, {"f", nl.f}, {"g", nl.g}};

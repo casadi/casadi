@@ -37,7 +37,7 @@ Joel Andersson
 nl = NlpBuilder()
 
 # Parse an NL-file
-nl.parseNL("../nl_files/hs107.nl",{"verbose":False})
+nl.parse_nl("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP function
 nlp = {'x':nl.x, 'f':nl.f, 'g':nl.g}
