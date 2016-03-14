@@ -1504,7 +1504,7 @@ The symbolic optimal control problem representation (or just model description) 
 ocp = DaeBuilder()
 \end{verbatim}
 
-The \texttt{DaeBuilder} class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is to call the member function \texttt{parse_fmi} with the XML file name:
+The \texttt{DaeBuilder} class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is to call the member function \texttt{parse\_fmi} with the XML file name:
 \begin{verbatim}
 ocp.parse_fmi('modelDescription.xml')
 \end{verbatim}
@@ -1514,9 +1514,9 @@ Symbolic expressions corresponding to the states, controls parameters etc. are d
 Other useful commands available for an instance \texttt{ocp} of \texttt{DaeBuilder} include:
 \begin{description}
 \item[print \texttt{ocp}] Print the optimal optimal control problem to screen
-\item[\texttt{ocp}.make_explicit()] Reformulate the OCP in fully-explicit form
-\item[\texttt{ocp}.scaleVariable()] Scale all variables using the \emph{nominal} attribute for each variable
-\item[\texttt{ocp}.eliminateIndependentParameters()] Eliminate all independent parameters from the symbolic expressions
+\item[\texttt{ocp}.make\_explicit()] Reformulate the OCP in fully-explicit form
+\item[\texttt{ocp}.scale\_variables()] Scale all variables using the \emph{nominal} attribute for each variable
+\item[\texttt{ocp}.eliminate\_d()] Eliminate all independent parameters from the symbolic expressions
 \end{description}
 
 For a more detailed description of this class and its functionalities, we refer to the API documentation. We also recommend potential users to have a look at the {\texttt{modelica\_ms.py}} tutorial example.
