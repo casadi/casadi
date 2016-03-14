@@ -907,7 +907,7 @@ namespace casadi {
     eliminate_d();
   }
 
-  void DaeBuilder::makeExplicit() {
+  void DaeBuilder::make_explicit() {
     // Only works if there are no i
     eliminate_d();
 

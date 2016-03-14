@@ -44,7 +44,7 @@ print ivp
 #$ By insprecting the equations, we see that it is relatively both straightforward to eliminate 
 #$ the algebraic variables from the problem and to rewrite the DAE as an explicit ODE.
 #$ Indeed, for cases like this one, CasADi can do this reformulation automatically:
-ivp.makeExplicit()
+ivp.make_explicit()
 #! Let us extract variables for the states, the control and equations
 x = vertcat(*ivp.x)
 u = vertcat(*ivp.u)

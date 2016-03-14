@@ -2293,7 +2293,7 @@ Eliminate quadrature states and turn them into ODE states.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::makeExplicit() "
+%feature("docstring")  casadi::DaeBuilder::make_explicit() "
 
 Transform the implicit DAE or semi-explicit DAE into an explicit ODE.
 

@@ -68,7 +68,7 @@ ivp = DaeBuilder()
 ivp.parseFMI('BasicVolumeMassConservation.xml')
 
 # Transform into an explicit ODE
-ivp.makeExplicit()
+ivp.make_explicit()
 
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': vertcat(*ivp.ode)}
@@ -109,7 +109,7 @@ ivp = DaeBuilder()
 ivp.parseFMI('BasicVolumeEnergyConservation.xml')
 
 # Transform into an explicit ODE
-ivp.makeExplicit()
+ivp.make_explicit()
 
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': vertcat(*ivp.ode)}
@@ -143,7 +143,7 @@ ivp = DaeBuilder()
 ivp.parseFMI('BasicVolumeTest.xml')
 
 # Transform into an explicit ODE
-ivp.makeExplicit()
+ivp.make_explicit()
 
 # Create an integrator
 dae = {'t': ivp.t, 'x': vertcat(*ivp.x), 'p': vertcat(*ivp.p), 'ode': densify(vertcat(*ivp.ode))}

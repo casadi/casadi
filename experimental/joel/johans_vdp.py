@@ -56,7 +56,7 @@ ocp.sortVariables()
 print ocp
 
 # Make explicit
-#ocp.makeExplicit()
+#ocp.make_explicit()
 
 F_inputs = []
 F_inputs += ocp.xdot

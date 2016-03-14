@@ -202,7 +202,7 @@ namespace casadi {
     void make_semi_explicit();
 
     /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
-    void makeExplicit();
+    void make_explicit();
 
     /// Sort dependent parameters
     void sort_d();
