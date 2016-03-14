@@ -185,7 +185,7 @@ ivp = DaeBuilder()
 ivp.parseFMI('CtrlFlowSystem.xml')
 
 # Transform into a semi-explicit ODE
-ivp.makeSemiExplicit()
+ivp.make_semi_explicit()
 
 # Print the ivp
 print ivp

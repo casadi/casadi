@@ -2068,7 +2068,7 @@ Add a named linear combination of output expressions.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::makeSemiExplicit() "
+%feature("docstring")  casadi::DaeBuilder::make_semi_explicit() "
 
 Transform the implicit DAE to a semi-explicit DAE.
 

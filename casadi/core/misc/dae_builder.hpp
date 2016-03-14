@@ -199,7 +199,7 @@ namespace casadi {
     void eliminate_alg();
 
     /// Transform the implicit DAE to a semi-explicit DAE
-    void makeSemiExplicit();
+    void make_semi_explicit();
 
     /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
     void makeExplicit();

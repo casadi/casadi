@@ -726,7 +726,7 @@ namespace casadi {
     this->z = znew;
   }
 
-  void DaeBuilder::makeSemiExplicit() {
+  void DaeBuilder::make_semi_explicit() {
     // Only works if there are no i
     eliminate_d();
 
@@ -912,7 +912,7 @@ namespace casadi {
     eliminate_d();
 
     // Start by transforming to semi-explicit form
-    makeSemiExplicit();
+    make_semi_explicit();
 
     // Then eliminate the algebraic variables
     eliminate_alg();
