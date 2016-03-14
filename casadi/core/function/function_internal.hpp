@@ -693,6 +693,9 @@ namespace casadi {
     /** \brief Free memory block */
     virtual void free_memory(void *mem) const;
 
+    /** \brief Maximum number of memory objects */
+    virtual int n_mem() const { return 0;}
+
     /** \brief Clear all memory (called from destructor) */
     void clear_memory();
 

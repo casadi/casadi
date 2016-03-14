@@ -2917,6 +2917,9 @@ namespace casadi {
   int FunctionInternal::checkout() {
     if (unused_.empty()) {
       // Allocate a new memory object
+      int n_mem = this->n_mem();
+      casadi_assert_message(n_mem==0 || mem_.size()<n_mem,
+                            "Too many memory objects");
       void* m = alloc_memory();
       mem_.push_back(m);
       if (m) init_memory(m);

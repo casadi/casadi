@@ -95,6 +95,8 @@ namespace casadi {
 
     // Function for numerical evaluation
     eval_ = (eval_t)li_.get(name_);
+
+    n_mem_ = 0;
   }
 
   External::~External() {
@@ -188,6 +190,14 @@ namespace casadi {
   void GenericExternal::init(const Dict& opts) {
     // Call recursively
     External::init(opts);
+
+    // Maximum number of memory objects
+    getint_t n_mem = (getint_t)li_.get(name_ + "_n_mem");
+    if (n_mem) {
+      n_mem_ = n_mem();
+    } else if (li_.meta().has(name_ + "_N_MEM")) {
+      n_mem_ = li_.meta().to_int(name_ + "_N_MEM");
+    }
   }
 
   void External::addDependency(CodeGenerator& g) const {

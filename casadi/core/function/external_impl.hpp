@@ -112,7 +112,6 @@ namespace casadi {
   };
 
   class CASADI_EXPORT SimplifiedExternal : public External {
-    friend class External;
   public:
     /** \brief Constructor */
     SimplifiedExternal(const std::string& name, const Library& li);
@@ -134,7 +133,12 @@ namespace casadi {
   };
 
   class CASADI_EXPORT GenericExternal : public External {
-    friend class External;
+    // Sparsities
+    sparsity_t sparsity_in_, sparsity_out_;
+
+    // Maximum number of memory objects
+    int n_mem_;
+
   public:
     /** \brief Constructor */
     GenericExternal(const std::string& name, const Library& li);
@@ -151,8 +155,8 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
-    // Sparsities
-    sparsity_t sparsity_in_, sparsity_out_;
+    /** \brief Maximum number of memory objects */
+    virtual int n_mem() const { return n_mem_;}
   };
 
 
