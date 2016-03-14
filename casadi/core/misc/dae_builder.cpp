@@ -90,7 +90,7 @@ namespace casadi {
 
         // Get the name
         const XmlNode& nn = vnode["QualifiedName"];
-        string qn = qualifiedName(nn);
+        string qn = qualified_name(nn);
 
         // Add variable, if not already added
         if (varmap_.find(qn)==varmap_.end()) {
@@ -343,7 +343,7 @@ namespace casadi {
 
   Variable& DaeBuilder::readVariable(const XmlNode& node) {
     // Qualified name
-    string qn = qualifiedName(node);
+    string qn = qualified_name(node);
 
     // Find and return the variable
     return variable(qn);
@@ -1129,7 +1129,7 @@ namespace casadi {
     }
   }
 
-  std::string DaeBuilder::qualifiedName(const XmlNode& nn) {
+  std::string DaeBuilder::qualified_name(const XmlNode& nn) {
     // Stringstream to assemble name
     stringstream qn;
 
@@ -1310,11 +1310,11 @@ namespace casadi {
     return ret;
   }
 
-  void DaeBuilder::setAttribute(setAtt f, const MX& var, const std::vector<double>& val,
+  void DaeBuilder::set_attribute(setAtt f, const MX& var, const std::vector<double>& val,
                                  bool normalized) {
     casadi_assert_message(var.is_column() && var.is_valid_input(),
-                          "DaeBuilder::setAttribute: Argument must be a symbolic vector");
-    casadi_assert_message(var.nnz()==val.size(), "DaeBuilder::setAttribute: Dimension mismatch");
+                          "DaeBuilder::set_attribute: Argument must be a symbolic vector");
+    casadi_assert_message(var.nnz()==val.size(), "DaeBuilder::set_attribute: Dimension mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
@@ -1322,11 +1322,11 @@ namespace casadi {
     }
   }
 
-  void DaeBuilder::setAttribute(setAttS f, const MX& var, const MX& val) {
+  void DaeBuilder::set_attribute(setAttS f, const MX& var, const MX& val) {
     casadi_assert_message(var.is_column() && var.is_valid_input(),
-                          "DaeBuilder::setAttribute: Argument must be a symbolic vector");
+                          "DaeBuilder::set_attribute: Argument must be a symbolic vector");
     casadi_assert_message(var.sparsity()==val.sparsity(),
-                          "DaeBuilder::setAttribute: Sparsity mismatch");
+                          "DaeBuilder::set_attribute: Sparsity mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
@@ -1349,7 +1349,7 @@ namespace casadi {
   }
 
   void DaeBuilder::set_min(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&DaeBuilder::set_min, var, val, normalized);
+    set_attribute(&DaeBuilder::set_min, var, val, normalized);
   }
 
   double DaeBuilder::max(const std::string& name, bool normalized) const {
@@ -1367,7 +1367,7 @@ namespace casadi {
   }
 
   void DaeBuilder::set_max(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&DaeBuilder::set_max, var, val, normalized);
+    set_attribute(&DaeBuilder::set_max, var, val, normalized);
   }
 
   double DaeBuilder::initialGuess(const std::string& name, bool normalized) const {
@@ -1386,7 +1386,7 @@ namespace casadi {
 
   void DaeBuilder::setInitialGuess(const MX& var, const std::vector<double>& val,
                                     bool normalized) {
-    setAttribute(&DaeBuilder::setInitialGuess, var, val, normalized);
+    set_attribute(&DaeBuilder::setInitialGuess, var, val, normalized);
   }
 
   double DaeBuilder::start(const std::string& name, bool normalized) const {
@@ -1404,7 +1404,7 @@ namespace casadi {
   }
 
   void DaeBuilder::setStart(const MX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&DaeBuilder::setStart, var, val, normalized);
+    set_attribute(&DaeBuilder::setStart, var, val, normalized);
   }
 
   double DaeBuilder::derivativeStart(const std::string& name, bool normalized) const {
@@ -1423,7 +1423,7 @@ namespace casadi {
 
   void DaeBuilder::setDerivativeStart(const MX& var, const std::vector<double>& val,
                                        bool normalized) {
-    setAttribute(&DaeBuilder::setDerivativeStart, var, val, normalized);
+    set_attribute(&DaeBuilder::setDerivativeStart, var, val, normalized);
   }
 
   std::string DaeBuilder::name_in(DaeBuilderIn ind) {

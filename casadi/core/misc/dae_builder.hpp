@@ -431,7 +431,7 @@ namespace casadi {
   protected:
 
     /// Get the qualified name
-    static std::string qualifiedName(const XmlNode& nn);
+    static std::string qualified_name(const XmlNode& nn);
 
     /// Find of variable by name
     typedef std::map<std::string, Variable> VarMap;
@@ -456,11 +456,11 @@ namespace casadi {
 
     /// Set an attribute by expression
     typedef void (DaeBuilder::*setAtt)(const std::string& name, double val, bool normalized);
-    void setAttribute(setAtt f, const MX& var, const std::vector<double>& val, bool normalized);
+    void set_attribute(setAtt f, const MX& var, const std::vector<double>& val, bool normalized);
 
     /// Set a symbolic attribute by expression
     typedef void (DaeBuilder::*setAttS)(const std::string& name, const MX& val);
-    void setAttribute(setAttS f, const MX& var, const MX& val);
+    void set_attribute(setAttS f, const MX& var, const MX& val);
 
 #endif // SWIG
 

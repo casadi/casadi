@@ -41,7 +41,7 @@ namespace casadi {
     ~XmlNode();
 
     /** \brief  Add an attribute */
-    void setAttribute(const std::string& attribute_name, const std::string& attribute);
+    void set_attribute(const std::string& attribute_name, const std::string& attribute);
 
     /** \brief  Get an attribute by its name */
     std::string getAttribute(const std::string& attribute_name) const {

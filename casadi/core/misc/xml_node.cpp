@@ -73,7 +73,7 @@ namespace casadi {
     return const_cast<XmlNode*>(this)->operator[](childname);
   }
 
-  void XmlNode::setAttribute(const string& attribute_name, const string& attribute) {
+  void XmlNode::set_attribute(const string& attribute_name, const string& attribute) {
     attributes_[attribute_name] = attribute;
   }
 

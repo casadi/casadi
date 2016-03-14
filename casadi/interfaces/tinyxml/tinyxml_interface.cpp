@@ -69,7 +69,7 @@ namespace casadi {
         for (TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
              pAttrib;
              pAttrib=pAttrib->Next()) {
-          ret.setAttribute(pAttrib->Name(), pAttrib->Value());
+          ret.set_attribute(pAttrib->Name(), pAttrib->Value());
         }
       }
     } else if (type == TiXmlNode::TINYXML_DOCUMENT) {
