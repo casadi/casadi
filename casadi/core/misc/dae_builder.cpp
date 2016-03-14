@@ -1483,7 +1483,7 @@ namespace casadi {
     return ret;
   }
 
-  std::string DaeBuilder::outputString(DaeBuilderOut ind) {
+  std::string DaeBuilder::name_out(DaeBuilderOut ind) {
     switch (ind) {
     case DAE_BUILDER_DDEF: return "ddef";
     case DAE_BUILDER_WDEF: return "wdef";
@@ -1536,12 +1536,12 @@ namespace casadi {
     return ss.str();
   }
 
-  std::string DaeBuilder::outputString() {
+  std::string DaeBuilder::name_out() {
     stringstream ss;
     ss << "[";
     for (int i=0; i!=DAE_BUILDER_NUM_OUT; ++i) {
       if (i!=0) ss << ",";
-      ss << outputString(static_cast<DaeBuilderOut>(i));
+      ss << name_out(static_cast<DaeBuilderOut>(i));
     }
     ss << "]";
     return ss.str();
@@ -1631,7 +1631,7 @@ namespace casadi {
       DaeBuilderOut oind = outputEnum(f_out[i]);
       casadi_assert_message(oind!=DAE_BUILDER_NUM_OUT,
                             "DaeBuilder::add_lc: No output expression " << f_out[i]
-                            << ". Valid expressions are " << outputString());
+                            << ". Valid expressions are " << name_out());
       casadi_assert_message(!in_use[oind],
                             "DaeBuilder::add_lc: Duplicate expression " << f_out[i]);
       in_use[oind] = true;
@@ -1686,7 +1686,7 @@ namespace casadi {
         ss << name_in(static_cast<DaeBuilderIn>(i));
       }
       for (int i=0; i!=DAE_BUILDER_NUM_OUT; ++i) {
-        ss << ", lam_" << outputString(static_cast<DaeBuilderOut>(i));
+        ss << ", lam_" << name_out(static_cast<DaeBuilderOut>(i));
       }
       ss << "]";
       casadi_error(ss.str());
