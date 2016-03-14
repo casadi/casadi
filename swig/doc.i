@@ -7566,6 +7566,13 @@ Joel Andersson
 
 C++ includes: nlp_builder.hpp ";
 
+%feature("docstring")  casadi::NlpBuilder::parse_nl(const std::string
+&filename, const Dict &options=Dict()) "
+
+Parse an AMPL och PyOmo NL-file.
+
+";
+
 %feature("docstring")  casadi::PrintableObject< NlpBuilder
 >::getDescription() const "
 
@@ -7577,13 +7584,6 @@ Return a string with a description (for SWIG)
 >::getRepresentation() const "
 
 Return a string with a representation (for SWIG)
-
-";
-
-%feature("docstring")  casadi::NlpBuilder::parseNL(const std::string
-&filename, const Dict &options=Dict()) "
-
-Parse an AMPL och PyOmo NL-file.
 
 ";
 
