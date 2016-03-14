@@ -301,6 +301,9 @@ namespace casadi {
 
     const double inf = std::numeric_limits<double>::infinity();
 
+    // Number of equality constraints
+    int n_eq = 0;
+
     // Detect ill-posed problems (simple bounds)
     for (int i=0; i<nx_; ++i) {
       double lbx = m->lbx ? m->lbx[i] : 0;
@@ -313,6 +316,7 @@ namespace casadi {
                        "Option 'warn_initial_bounds' controls this warning.");
         break;
       }
+      if (lbx==ubx) n_eq++;
     }
 
     // Detect ill-posed problems (nonlinear bounds)
@@ -321,7 +325,12 @@ namespace casadi {
       double ubg = m->ubg ? m->ubg[i] : 0;
       casadi_assert_message(!(lbg==inf || lbg>ubg || ubg==-inf),
                             "Ill-posed problem detected (g bounds)");
+      if (lbg==ubg) n_eq++;
     }
+
+    // Make sure enough degrees of freedom
+    casadi_assert_message(n_eq <= nx_, "NLP is overconstrained: There are " + to_string(n_eq)
+                         + " equality constraints but only " + to_string(nx_) + " variables.");
   }
 
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
