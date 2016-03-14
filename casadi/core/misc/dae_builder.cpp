@@ -1496,7 +1496,7 @@ namespace casadi {
     }
   }
 
-  DaeBuilder::DaeBuilderOut DaeBuilder::outputEnum(const std::string& id) {
+  DaeBuilder::DaeBuilderOut DaeBuilder::enum_out(const std::string& id) {
     if (id=="ddef") {
       return DAE_BUILDER_DDEF;
     } else if (id=="wdef") {
@@ -1517,10 +1517,10 @@ namespace casadi {
   }
 
   std::vector<DaeBuilder::DaeBuilderOut>
-  DaeBuilder::outputEnum(const std::vector<std::string>& id) {
+  DaeBuilder::enum_out(const std::vector<std::string>& id) {
     std::vector<DaeBuilderOut> ret(id.size());
     for (int i=0; i<id.size(); ++i) {
-      ret[i] = outputEnum(id[i]);
+      ret[i] = enum_out(id[i]);
     }
     return ret;
   }
@@ -1628,7 +1628,7 @@ namespace casadi {
     std::vector<DaeBuilderOut> f_out_enum(f_out.size());
     std::vector<bool> in_use(DAE_BUILDER_NUM_OUT, false);
     for (int i=0; i<f_out.size(); ++i) {
-      DaeBuilderOut oind = outputEnum(f_out[i]);
+      DaeBuilderOut oind = enum_out(f_out[i]);
       casadi_assert_message(oind!=DAE_BUILDER_NUM_OUT,
                             "DaeBuilder::add_lc: No output expression " << f_out[i]
                             << ". Valid expressions are " << name_out());
@@ -1667,7 +1667,7 @@ namespace casadi {
 
       // Dual variable
       if (s_in_it->size()>4 && s_in_it->substr(0, 4)=="lam_") {
-        DaeBuilderOut oind = outputEnum(s_in_it->substr(4, string::npos));
+        DaeBuilderOut oind = enum_out(s_in_it->substr(4, string::npos));
         if (oind!=DAE_BUILDER_NUM_OUT) {
           casadi_assert_message(!output_used[oind],
                                 "DaeBuilder::function: Duplicate expression " << *s_in_it);
@@ -1739,7 +1739,7 @@ namespace casadi {
     // Non-differentiated outputs
     fill(output_used.begin(), output_used.end(), false);
     for (int i=0; i<s_out_noatt.size(); ++i) {
-      DaeBuilderOut oind = outputEnum(s_out_noatt[i]);
+      DaeBuilderOut oind = enum_out(s_out_noatt[i]);
       if (oind!=DAE_BUILDER_NUM_OUT) {
         casadi_assert_message(!output_used[oind],
                               "DaeBuilder::function: Duplicate expression " << s_out_noatt[i]);
@@ -1779,7 +1779,7 @@ namespace casadi {
       size_t pos1 = so.find('_', pos+1);
       if (pos1>=so.size()) continue;
       s = so.substr(pos+1, pos1-pos-1);
-      DaeBuilderOut oind = outputEnum(s);
+      DaeBuilderOut oind = enum_out(s);
       if (oind==DAE_BUILDER_NUM_OUT) continue;
 
       // Jacobian with respect to what variable

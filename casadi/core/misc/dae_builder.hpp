@@ -284,10 +284,10 @@ namespace casadi {
     static std::string name_out();
 
     // Get enum representation for output, given string
-    static DaeBuilderOut outputEnum(const std::string& id);
+    static DaeBuilderOut enum_out(const std::string& id);
 
     // Get enum representation for output, given vector of strings
-    static std::vector<DaeBuilderOut> outputEnum(const std::vector<std::string>& id);
+    static std::vector<DaeBuilderOut> enum_out(const std::vector<std::string>& id);
 
     // Get input expression, given enum
     std::vector<MX> input(DaeBuilderIn ind) const;
