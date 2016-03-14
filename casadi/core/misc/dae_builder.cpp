@@ -1426,7 +1426,7 @@ namespace casadi {
     setAttribute(&DaeBuilder::setDerivativeStart, var, val, normalized);
   }
 
-  std::string DaeBuilder::inputString(DaeBuilderIn ind) {
+  std::string DaeBuilder::name_in(DaeBuilderIn ind) {
     switch (ind) {
     case DAE_BUILDER_T: return "t";
     case DAE_BUILDER_C: return "c";
@@ -1525,12 +1525,12 @@ namespace casadi {
     return ret;
   }
 
-  std::string DaeBuilder::inputString() {
+  std::string DaeBuilder::name_in() {
     stringstream ss;
     ss << "[";
     for (int i=0; i!=DAE_BUILDER_NUM_IN; ++i) {
       if (i!=0) ss << ",";
-      ss << inputString(static_cast<DaeBuilderIn>(i));
+      ss << name_in(static_cast<DaeBuilderIn>(i));
     }
     ss << "]";
     return ss.str();
@@ -1683,7 +1683,7 @@ namespace casadi {
       ss << "Valid expressions are: [";
       for (int i=0; i!=DAE_BUILDER_NUM_IN; ++i) {
         if (i!=0) ss << ", ";
-        ss << inputString(static_cast<DaeBuilderIn>(i));
+        ss << name_in(static_cast<DaeBuilderIn>(i));
       }
       for (int i=0; i!=DAE_BUILDER_NUM_OUT; ++i) {
         ss << ", lam_" << outputString(static_cast<DaeBuilderOut>(i));

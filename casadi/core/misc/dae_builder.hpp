@@ -266,10 +266,10 @@ namespace casadi {
     };
 
     // Get string representation for input, given enum
-    static std::string inputString(DaeBuilderIn ind);
+    static std::string name_in(DaeBuilderIn ind);
 
     // Get string representation for all inputs
-    static std::string inputString();
+    static std::string name_in();
 
     // Get enum representation for input, given string
     static DaeBuilderIn inputEnum(const std::string& id);
