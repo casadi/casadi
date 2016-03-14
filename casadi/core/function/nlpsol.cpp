@@ -329,6 +329,7 @@ namespace casadi {
     }
 
     // Make sure enough degrees of freedom
+    using casadi::to_string; // Workaround, MingGW bug, cf. CasADi issue #890
     casadi_assert_message(n_eq <= nx_, "NLP is overconstrained: There are " + to_string(n_eq)
                          + " equality constraints but only " + to_string(nx_) + " variables.");
   }
