@@ -13,6 +13,12 @@ target_link_libraries(casadi_error_handling casadi)
 add_executable(propagating_sparsity propagating_sparsity.cpp)
 target_link_libraries(propagating_sparsity casadi)
 
+# Rosenbrock problem
+if(IPOPT_FOUND)
+  add_executable(rosenbrock rosenbrock.cpp)
+  target_link_libraries(rosenbrock casadi)
+endif()
+
 # Rocket using Ipopt
 if(IPOPT_FOUND)
   add_executable(rocket_ipopt rocket_ipopt.cpp)
