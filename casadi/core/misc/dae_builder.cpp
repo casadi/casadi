@@ -542,7 +542,7 @@ namespace casadi {
     this->q.clear();
   }
 
-  void DaeBuilder::scaleVariables() {
+  void DaeBuilder::scale_variables() {
     // Assert correctness
     sanity_check();
 

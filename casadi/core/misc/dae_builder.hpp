@@ -223,7 +223,7 @@ namespace casadi {
     void sort_alg();
 
     /// Scale the variables
-    void scaleVariables();
+    void scale_variables();
 
     /// Scale the implicit equations
     void scaleEquations();

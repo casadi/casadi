@@ -1679,7 +1679,7 @@ Construct a function object.
 
 ";
 
-%feature("docstring") casadi::DaeBuilder::scaleVariables "
+%feature("docstring") casadi::DaeBuilder::scale_variables "
 
 Scale the variables.
 
