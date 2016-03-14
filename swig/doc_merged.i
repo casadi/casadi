@@ -1575,7 +1575,7 @@ Joel Andersson
 
 C++ includes: dae_builder.hpp ";
 
-%feature("docstring") casadi::DaeBuilder::parseFMI "
+%feature("docstring") casadi::DaeBuilder::parse_fmi "
 
 Import existing problem from FMI/XML
 

@@ -57,7 +57,7 @@ namespace casadi {
     this->t = MX::sym("t");
   }
 
-  void DaeBuilder::parseFMI(const std::string& filename) {
+  void DaeBuilder::parse_fmi(const std::string& filename) {
 
     // Load
     XmlFile xml_file("tinyxml");

@@ -233,7 +233,7 @@ namespace casadi {
      */
     ///@{
     /// Import existing problem from FMI/XML
-    void parseFMI(const std::string& filename);
+    void parse_fmi(const std::string& filename);
 
 #ifndef SWIG
     // Input convension in codegen

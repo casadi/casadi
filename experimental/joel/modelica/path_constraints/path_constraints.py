@@ -36,7 +36,7 @@ os.remove(curr_dir+'/TimedVariablesTest.jmu')
 
 # Import into CasADi
 ocp = casadi.SymbolicOCP()
-ocp.parseFMI('modelDescription.xml',{'sort_equations':False,'eliminate_dependent':False})
+ocp.parse_fmi('modelDescription.xml',{'sort_equations':False,'eliminate_dependent':False})
 ocp.sortType(True) # temporary solution: enables the new sorting
 print ocp
 

@@ -35,7 +35,7 @@ fmux.extract('modelDescription.xml','.')
 #$ The logic for importing Modelica models is located in the DaeBuilder class:
 from casadi import *
 ivp = DaeBuilder()
-ivp.parseFMI("modelDescription.xml")
+ivp.parse_fmi("modelDescription.xml")
 #! Let us have a look at the flat optimal control problem:
 print ivp
 #$ As we see, the initial-value problem (IVP) has two differential states (cstr.c and cstr.T),

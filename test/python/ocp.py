@@ -191,7 +191,7 @@ class OCPtests(casadiTestCase):
   def test_XML(self):
     self.message("JModelica XML parsing")
     ivp = DaeBuilder()
-    ivp.parseFMI('data/cstr.xml')
+    ivp.parse_fmi('data/cstr.xml')
     
     # Separate differential and algebraic variables
     ivp.split_dae()

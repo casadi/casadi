@@ -65,7 +65,7 @@ comp("BasicVolumeMassConservation")
 
 # Read a model from XML
 ivp = DaeBuilder()
-ivp.parseFMI('BasicVolumeMassConservation.xml')
+ivp.parse_fmi('BasicVolumeMassConservation.xml')
 
 # Transform into an explicit ODE
 ivp.make_explicit()
@@ -106,7 +106,7 @@ comp("BasicVolumeEnergyConservation")
 
 # Allocate a parser and load the xml
 ivp = DaeBuilder()
-ivp.parseFMI('BasicVolumeEnergyConservation.xml')
+ivp.parse_fmi('BasicVolumeEnergyConservation.xml')
 
 # Transform into an explicit ODE
 ivp.make_explicit()
@@ -140,7 +140,7 @@ comp("BasicVolumeTest")
 
 # Allocate a parser and load the xml
 ivp = DaeBuilder()
-ivp.parseFMI('BasicVolumeTest.xml')
+ivp.parse_fmi('BasicVolumeTest.xml')
 
 # Transform into an explicit ODE
 ivp.make_explicit()
@@ -182,7 +182,7 @@ comp("CtrlFlowSystem")
 
 # Allocate a parser and load the xml
 ivp = DaeBuilder()
-ivp.parseFMI('CtrlFlowSystem.xml')
+ivp.parse_fmi('CtrlFlowSystem.xml')
 
 # Transform into a semi-explicit ODE
 ivp.make_semi_explicit()
