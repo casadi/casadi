@@ -1259,7 +1259,7 @@ namespace casadi {
     return variable(name).nominal;
   }
 
-  void DaeBuilder::setNominal(const std::string& name, double val) {
+  void DaeBuilder::set_nominal(const std::string& name, double val) {
     variable(name).nominal = val;
   }
 
@@ -1275,14 +1275,14 @@ namespace casadi {
     return ret;
   }
 
-  void DaeBuilder::setNominal(const MX& var, const std::vector<double>& val) {
+  void DaeBuilder::set_nominal(const MX& var, const std::vector<double>& val) {
     casadi_assert_message(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
     casadi_assert_message(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
       casadi_assert(prim[i].nnz()==1);
-      setNominal(prim.at(i).name(), val.at(i));
+      set_nominal(prim.at(i).name(), val.at(i));
     }
   }
 

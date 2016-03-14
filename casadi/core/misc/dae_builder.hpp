@@ -331,10 +331,10 @@ namespace casadi {
     std::vector<double> nominal(const MX& var) const;
 
     /// Set the nominal value by name
-    void setNominal(const std::string& name, double val);
+    void set_nominal(const std::string& name, double val);
 
     /// Set the nominal value(s) by expression
-    void setNominal(const MX& var, const std::vector<double>& val);
+    void set_nominal(const MX& var, const std::vector<double>& val);
 
     /// Get the lower bound by name
     double min(const std::string& name, bool normalized=false) const;
