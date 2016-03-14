@@ -361,16 +361,16 @@ namespace casadi {
     void set_max(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the initial guess by name
-    double initialGuess(const std::string& name, bool normalized=false) const;
+    double guess(const std::string& name, bool normalized=false) const;
 
     /// Get the initial guess(es) by expression
-    std::vector<double> initialGuess(const MX& var, bool normalized=false) const;
+    std::vector<double> guess(const MX& var, bool normalized=false) const;
 
     /// Set the initial guess by name
-    void setInitialGuess(const std::string& name, double val, bool normalized=false);
+    void set_guess(const std::string& name, double val, bool normalized=false);
 
     /// Set the initial guess(es) by expression
-    void setInitialGuess(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_guess(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) value at time 0 by name
     double start(const std::string& name, bool normalized=false) const;
@@ -379,22 +379,22 @@ namespace casadi {
     std::vector<double> start(const MX& var, bool normalized=false) const;
 
     /// Set the (optionally normalized) value at time 0 by name
-    void setStart(const std::string& name, double val, bool normalized=false);
+    void set_start(const std::string& name, double val, bool normalized=false);
 
     /// Set the (optionally normalized) value(s) at time 0 by expression
-    void setStart(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_start(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) derivative value at time 0 by name
-    double derivativeStart(const std::string& name, bool normalized=false) const;
+    double derivative_start(const std::string& name, bool normalized=false) const;
 
     /// Get the (optionally normalized) derivative value(s) at time 0 by expression
-    std::vector<double> derivativeStart(const MX& var, bool normalized=false) const;
+    std::vector<double> derivative_start(const MX& var, bool normalized=false) const;
 
     /// Set the (optionally normalized) derivative value at time 0 by name
-    void setDerivativeStart(const std::string& name, double val, bool normalized=false);
+    void set_derivative_start(const std::string& name, double val, bool normalized=false);
 
     /// Set the (optionally normalized) derivative value(s) at time 0 by expression
-    void setDerivativeStart(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_derivative_start(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the unit for a component
     std::string unit(const std::string& name) const;
@@ -403,7 +403,7 @@ namespace casadi {
     std::string unit(const MX& var) const;
 
     /// Set the unit for a component
-    void setUnit(const std::string& name, const std::string& val);
+    void set_unit(const std::string& name, const std::string& val);
 
     ///  Print representation
     void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;

@@ -40,12 +40,12 @@ namespace casadi {
     this->valueReference = -1;
     this->min = -numeric_limits<double>::infinity();
     this->max = numeric_limits<double>::infinity();
-    this->initialGuess = 0;
+    this->guess = 0;
     this->nominal = 1.0;
     this->start = 0.0;
-    this->derivativeStart = 0.0;
+    this->derivative_start = 0.0;
     this->unit = "";
-    this->displayUnit = "";
+    this->display_unit = "";
     this->free = false;
   }
 

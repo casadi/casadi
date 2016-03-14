@@ -137,10 +137,10 @@ namespace casadi {
           if (vnode.hasChild("Real")) {
             const XmlNode& props = vnode["Real"];
             props.readAttribute("unit", var.unit, false);
-            props.readAttribute("displayUnit", var.displayUnit, false);
+            props.readAttribute("displayUnit", var.display_unit, false);
             props.readAttribute("min", var.min, false);
             props.readAttribute("max", var.max, false);
-            props.readAttribute("initialGuess", var.initialGuess, false);
+            props.readAttribute("initialGuess", var.guess, false);
             props.readAttribute("start", var.start, false);
             props.readAttribute("nominal", var.nominal, false);
             props.readAttribute("free", var.free, false);
@@ -555,8 +555,8 @@ namespace casadi {
         v.min /= v.nominal;
         v.max /= v.nominal;
         v.start /= v.nominal;
-        v.derivativeStart /= v.nominal;
-        v.initialGuess /= v.nominal;
+        v.derivative_start /= v.nominal;
+        v.guess /= v.nominal;
         v_id.push_back(v.v);
         v_id.push_back(v.d);
         v_rep.push_back(v.v * v.nominal);
@@ -1251,7 +1251,7 @@ namespace casadi {
     }
   }
 
-  void DaeBuilder::setUnit(const std::string& name, const std::string& val) {
+  void DaeBuilder::set_unit(const std::string& name, const std::string& val) {
     variable(name).unit = val;
   }
 
@@ -1370,23 +1370,23 @@ namespace casadi {
     set_attribute(&DaeBuilder::set_max, var, val, normalized);
   }
 
-  double DaeBuilder::initialGuess(const std::string& name, bool normalized) const {
+  double DaeBuilder::guess(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
-    return normalized ? v.initialGuess / v.nominal : v.initialGuess;
+    return normalized ? v.guess / v.nominal : v.guess;
   }
 
-  std::vector<double> DaeBuilder::initialGuess(const MX& var, bool normalized) const {
-    return attribute(&DaeBuilder::initialGuess, var, normalized);
+  std::vector<double> DaeBuilder::guess(const MX& var, bool normalized) const {
+    return attribute(&DaeBuilder::guess, var, normalized);
   }
 
-  void DaeBuilder::setInitialGuess(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::set_guess(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
-    v.initialGuess = normalized ? val*v.nominal : val;
+    v.guess = normalized ? val*v.nominal : val;
   }
 
-  void DaeBuilder::setInitialGuess(const MX& var, const std::vector<double>& val,
+  void DaeBuilder::set_guess(const MX& var, const std::vector<double>& val,
                                     bool normalized) {
-    set_attribute(&DaeBuilder::setInitialGuess, var, val, normalized);
+    set_attribute(&DaeBuilder::set_guess, var, val, normalized);
   }
 
   double DaeBuilder::start(const std::string& name, bool normalized) const {
@@ -1398,32 +1398,32 @@ namespace casadi {
     return attribute(&DaeBuilder::start, var, normalized);
   }
 
-  void DaeBuilder::setStart(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::set_start(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
     v.start = normalized ? val*v.nominal : val;
   }
 
-  void DaeBuilder::setStart(const MX& var, const std::vector<double>& val, bool normalized) {
-    set_attribute(&DaeBuilder::setStart, var, val, normalized);
+  void DaeBuilder::set_start(const MX& var, const std::vector<double>& val, bool normalized) {
+    set_attribute(&DaeBuilder::set_start, var, val, normalized);
   }
 
-  double DaeBuilder::derivativeStart(const std::string& name, bool normalized) const {
+  double DaeBuilder::derivative_start(const std::string& name, bool normalized) const {
     const Variable& v = variable(name);
-    return normalized ? v.derivativeStart / v.nominal : v.derivativeStart;
+    return normalized ? v.derivative_start / v.nominal : v.derivative_start;
   }
 
-  std::vector<double> DaeBuilder::derivativeStart(const MX& var, bool normalized) const {
-    return attribute(&DaeBuilder::derivativeStart, var, normalized);
+  std::vector<double> DaeBuilder::derivative_start(const MX& var, bool normalized) const {
+    return attribute(&DaeBuilder::derivative_start, var, normalized);
   }
 
-  void DaeBuilder::setDerivativeStart(const std::string& name, double val, bool normalized) {
+  void DaeBuilder::set_derivative_start(const std::string& name, double val, bool normalized) {
     Variable& v = variable(name);
-    v.derivativeStart = normalized ? val*v.nominal : val;
+    v.derivative_start = normalized ? val*v.nominal : val;
   }
 
-  void DaeBuilder::setDerivativeStart(const MX& var, const std::vector<double>& val,
+  void DaeBuilder::set_derivative_start(const MX& var, const std::vector<double>& val,
                                        bool normalized) {
-    set_attribute(&DaeBuilder::setDerivativeStart, var, val, normalized);
+    set_attribute(&DaeBuilder::set_derivative_start, var, val, normalized);
   }
 
   std::string DaeBuilder::name_in(DaeBuilderIn ind) {
