@@ -1330,15 +1330,6 @@ Get the (optionally normalized) value(s) at time 0 by expression.
 ------------------------------------------------------------------------
 
 Add a variable.
-<<<<<<< Updated upstream
-
->  MX DaeBuilder.add_variable(str name, int n=1)
-
-=======
-
->  MX DaeBuilder.add_variable(str name, int n=1)
-
->>>>>>> Stashed changes
 >  MX DaeBuilder.add_variable(str name, Sparsity sp)
 ------------------------------------------------------------------------
 
@@ -1682,27 +1673,6 @@ Get the initial guess by name.
 ------------------------------------------------------------------------
 
 Get the initial guess(es) by expression.
-<<<<<<< Updated upstream
-
-";
-
-%feature("docstring") casadi::DaeBuilder::variable "
-
-Access a variable by name
-
-";
-
-=======
-
-";
-
-%feature("docstring") casadi::DaeBuilder::variable "
-
-Access a variable by name
-
-";
-
->>>>>>> Stashed changes
 %feature("docstring") casadi::DaeBuilder::set_max "
 
 >  void DaeBuilder.set_max(str name, double val, bool normalized=false)
