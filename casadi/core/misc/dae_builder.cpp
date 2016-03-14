@@ -222,8 +222,8 @@ namespace casadi {
         const XmlNode& beq = bindeqs[i];
 
         // Get the variable and binding expression
-        Variable& var = readVariable(beq[0]);
-        MX bexpr = readExpr(beq[1][0]);
+        Variable& var = read_variable(beq[0]);
+        MX bexpr = read_expr(beq[1][0]);
         this->d.push_back(var.v);
         this->ddef.push_back(bexpr);
       }
@@ -241,7 +241,7 @@ namespace casadi {
         const XmlNode& dnode = dyneqs[i];
 
         // Add the differential equation
-        MX de_new = readExpr(dnode[0]);
+        MX de_new = read_expr(dnode[0]);
         this->dae.push_back(de_new);
       }
     }
@@ -259,7 +259,7 @@ namespace casadi {
 
         // Add the differential equations
         for (int i=0; i<inode.size(); ++i) {
-          this->init.push_back(readExpr(inode[i]));
+          this->init.push_back(read_expr(inode[i]));
         }
       }
     }
@@ -286,7 +286,7 @@ namespace casadi {
                 continue;
 
               // Read expression
-              MX v = readExpr(var);
+              MX v = read_expr(var);
 
               // Treat as an output
               add_y(v, "mterm");
@@ -303,7 +303,7 @@ namespace casadi {
               if (var.checkName("exp:StringLiteral")) continue;
 
               // Read expression
-              MX v = readExpr(var);
+              MX v = read_expr(var);
 
               // Treat as a quadrature state
               add_q("lterm");
@@ -341,7 +341,7 @@ namespace casadi {
                           "algebraic variables.");
   }
 
-  Variable& DaeBuilder::readVariable(const XmlNode& node) {
+  Variable& DaeBuilder::read_variable(const XmlNode& node) {
     // Qualified name
     string qn = qualified_name(node);
 
@@ -349,10 +349,10 @@ namespace casadi {
     return variable(qn);
   }
 
-  MX DaeBuilder::readExpr(const XmlNode& node) {
+  MX DaeBuilder::read_expr(const XmlNode& node) {
     const string& fullname = node.name();
     if (fullname.find("exp:")== string::npos) {
-      casadi_error("DaeBuilder::readExpr: unknown - expression is supposed to "
+      casadi_error("DaeBuilder::read_expr: unknown - expression is supposed to "
                    "start with 'exp:' , got " << fullname);
     }
 
@@ -363,24 +363,24 @@ namespace casadi {
     // for example by using a switch statement of the first three letters,
     // if it would ever become a bottleneck
     if (name.compare("Add")==0) {
-      return readExpr(node[0]) + readExpr(node[1]);
+      return read_expr(node[0]) + read_expr(node[1]);
     } else if (name.compare("Acos")==0) {
-      return acos(readExpr(node[0]));
+      return acos(read_expr(node[0]));
     } else if (name.compare("Asin")==0) {
-      return asin(readExpr(node[0]));
+      return asin(read_expr(node[0]));
     } else if (name.compare("Atan")==0) {
-      return atan(readExpr(node[0]));
+      return atan(read_expr(node[0]));
     } else if (name.compare("Cos")==0) {
-      return cos(readExpr(node[0]));
+      return cos(read_expr(node[0]));
     } else if (name.compare("Der")==0) {
-      const Variable& v = readVariable(node[0]);
+      const Variable& v = read_variable(node[0]);
       return v.d;
     } else if (name.compare("Div")==0) {
-      return readExpr(node[0]) / readExpr(node[1]);
+      return read_expr(node[0]) / read_expr(node[1]);
     } else if (name.compare("Exp")==0) {
-      return exp(readExpr(node[0]));
+      return exp(read_expr(node[0]));
     } else if (name.compare("Identifier")==0) {
-      return readVariable(node).v;
+      return read_variable(node).v;
     } else if (name.compare("IntegerLiteral")==0) {
       int val;
       node.getText(val);
@@ -390,59 +390,59 @@ namespace casadi {
       node.getText(val);
       return val;
     } else if (name.compare("Log")==0) {
-      return log(readExpr(node[0]));
+      return log(read_expr(node[0]));
     } else if (name.compare("LogLeq")==0) { // Logical less than equal
-      return readExpr(node[0]) <= readExpr(node[1]);
+      return read_expr(node[0]) <= read_expr(node[1]);
     } else if (name.compare("LogGeq")==0) { // Logical greater than equal
-      return readExpr(node[0]) >= readExpr(node[1]);
+      return read_expr(node[0]) >= read_expr(node[1]);
     } else if (name.compare("LogLt")==0) { // Logical less than
-      return readExpr(node[0]) < readExpr(node[1]);
+      return read_expr(node[0]) < read_expr(node[1]);
     } else if (name.compare("LogGt")==0) { // Logical greater than
-      return readExpr(node[0]) > readExpr(node[1]);
+      return read_expr(node[0]) > read_expr(node[1]);
     } else if (name.compare("Max")==0) {
-      return fmax(readExpr(node[0]), readExpr(node[1]));
+      return fmax(read_expr(node[0]), read_expr(node[1]));
     } else if (name.compare("Min")==0) {
-      return fmin(readExpr(node[0]), readExpr(node[1]));
+      return fmin(read_expr(node[0]), read_expr(node[1]));
     } else if (name.compare("Mul")==0) { // Multiplication
-      return readExpr(node[0]) * readExpr(node[1]);
+      return read_expr(node[0]) * read_expr(node[1]);
     } else if (name.compare("Neg")==0) {
-      return -readExpr(node[0]);
+      return -read_expr(node[0]);
     } else if (name.compare("NoEvent")==0) {
       // NOTE: This is a workaround, we assume that whenever NoEvent occurs,
       // what is meant is a switch
       int n = node.size();
 
       // Default-expression
-      MX ex = readExpr(node[n-1]);
+      MX ex = read_expr(node[n-1]);
 
       // Evaluate ifs
-      for (int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i]), readExpr(node[i+1]), ex);
+      for (int i=n-3; i>=0; i -= 2) ex = if_else(read_expr(node[i]), read_expr(node[i+1]), ex);
 
       return ex;
     } else if (name.compare("Pow")==0) {
-      return pow(readExpr(node[0]), readExpr(node[1]));
+      return pow(read_expr(node[0]), read_expr(node[1]));
     } else if (name.compare("RealLiteral")==0) {
       double val;
       node.getText(val);
       return val;
     } else if (name.compare("Sin")==0) {
-      return sin(readExpr(node[0]));
+      return sin(read_expr(node[0]));
     } else if (name.compare("Sqrt")==0) {
-      return sqrt(readExpr(node[0]));
+      return sqrt(read_expr(node[0]));
     } else if (name.compare("StringLiteral")==0) {
       throw CasadiException(node.getText());
     } else if (name.compare("Sub")==0) {
-      return readExpr(node[0]) - readExpr(node[1]);
+      return read_expr(node[0]) - read_expr(node[1]);
     } else if (name.compare("Tan")==0) {
-      return tan(readExpr(node[0]));
+      return tan(read_expr(node[0]));
     } else if (name.compare("Time")==0) {
       return t;
     } else if (name.compare("TimedVariable")==0) {
-      return readVariable(node[0]).v;
+      return read_variable(node[0]).v;
     }
 
     // throw error if reached this point
-    throw CasadiException(string("DaeBuilder::readExpr: Unknown node: ") + name);
+    throw CasadiException(string("DaeBuilder::read_expr: Unknown node: ") + name);
 
   }
 

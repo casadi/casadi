@@ -441,10 +441,10 @@ namespace casadi {
     std::map<std::string, MX> lin_comb_;
 
     /// Read an equation
-    MX readExpr(const XmlNode& odenode);
+    MX read_expr(const XmlNode& odenode);
 
     /// Read a variable
-    Variable& readVariable(const XmlNode& node);
+    Variable& read_variable(const XmlNode& node);
 
     /// Get an attribute by expression
     typedef double (DaeBuilder::*getAtt)(const std::string& name, bool normalized) const;
