@@ -1911,44 +1911,22 @@ Compiler factory (new syntax, includes initialization)
 */
 
 /*  Import and export  */ %feature("docstring")
-casadi::DaeBuilder::setMin(const std::string &name, double val, bool
-normalized=false) "
-
-Set the lower bound by name.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::setMin(const MX &var, const
-std::vector< double > &val, bool normalized=false) "
-
-Set the lower bound(s) by expression.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::add_s(const std::string
-&name=std::string(), int n=1) "
+casadi::DaeBuilder::add_s(const std::string &name=std::string(), int n=1) "
 
 Add a implicit state.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::derivativeStart(const std::string
-&name, bool normalized=false) const  "
-
-Get the (optionally normalized) derivative value at time 0 by name.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::derivativeStart(const MX &var,
-bool normalized=false) const  "
-
-Get the (optionally normalized) derivative value(s) at time 0 by expression.
 
 ";
 
 %feature("docstring")  casadi::DaeBuilder::sanity_check() const  "
 
 Check if dimensions match.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_unit(const std::string &name,
+const std::string &val) "
+
+Set the unit for a component.
 
 ";
 
@@ -1964,17 +1942,38 @@ Sort the DAE and implicitly defined states.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::setStart(const std::string &name,
-double val, bool normalized=false) "
+%feature("docstring")  casadi::DaeBuilder::start(const std::string &name,
+bool normalized=false) const  "
 
-Set the (optionally normalized) value at time 0 by name.
+Get the (optionally normalized) value at time 0 by name.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::setStart(const MX &var, const
-std::vector< double > &val, bool normalized=false) "
+%feature("docstring")  casadi::DaeBuilder::start(const MX &var, bool
+normalized=false) const  "
 
-Set the (optionally normalized) value(s) at time 0 by expression.
+Get the (optionally normalized) value(s) at time 0 by expression.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
+&name, const Variable &var) "
+
+Add a variable.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
+&name, int n=1) "
+
+Add a new variable: returns corresponding symbolic expression.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::add_variable(const std::string
+&name, const Sparsity &sp) "
+
+Add a new variable: returns corresponding symbolic expression.
 
 ";
 
@@ -2026,31 +2025,23 @@ Get the upper bound(s) by expression.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::variable(const std::string &name)
-"
+%feature("docstring")  casadi::DaeBuilder::make_semi_explicit() "
 
-Access a variable by name
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::variable(const std::string &name)
-const  "
-
-Access a variable by name
+Transform the implicit DAE to a semi-explicit DAE.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::initialGuess(const std::string
-&name, bool normalized=false) const  "
+%feature("docstring")  casadi::DaeBuilder::set_derivative_start(const
+std::string &name, double val, bool normalized=false) "
 
-Get the initial guess by name.
+Set the (optionally normalized) derivative value at time 0 by name.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::initialGuess(const MX &var, bool
-normalized=false) const  "
+%feature("docstring")  casadi::DaeBuilder::set_derivative_start(const MX
+&var, const std::vector< double > &val, bool normalized=false) "
 
-Get the initial guess(es) by expression.
+Set the (optionally normalized) derivative value(s) at time 0 by expression.
 
 ";
 
@@ -2065,12 +2056,6 @@ Return a string with a description (for SWIG)
 const std::vector< std::string > &f_out) "
 
 Add a named linear combination of output expressions.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::make_semi_explicit() "
-
-Transform the implicit DAE to a semi-explicit DAE.
 
 ";
 
@@ -2100,38 +2085,16 @@ Add a differential-algebraic equation.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::addVariable(const std::string
-&name, const Variable &var) "
+%feature("docstring")  casadi::PrintableObject< DaeBuilder
+>::getRepresentation() const "
 
-Add a variable.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::addVariable(const std::string
-&name, int n=1) "
-
-Add a new variable: returns corresponding symbolic expression.
+Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::addVariable(const std::string
-&name, const Sparsity &sp) "
+%feature("docstring")  casadi::DaeBuilder::make_explicit() "
 
-Add a new variable: returns corresponding symbolic expression.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::setMax(const std::string &name,
-double val, bool normalized=false) "
-
-Set the upper bound by name.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::setMax(const MX &var, const
-std::vector< double > &val, bool normalized=false) "
-
-Set the upper bound(s) by expression.
+Transform the implicit DAE or semi-explicit DAE into an explicit ODE.
 
 ";
 
@@ -2224,13 +2187,6 @@ Joel Andersson
 
 C++ includes: dae_builder.hpp ";
 
-%feature("docstring")  casadi::DaeBuilder::parse_fmi(const std::string
-&filename) "
-
-Import existing problem from FMI/XML
-
-";
-
 %feature("docstring")  casadi::DaeBuilder::add_q(const std::string
 &name=std::string(), int n=1) "
 
@@ -2252,17 +2208,17 @@ Add a new control.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::setDerivativeStart(const
-std::string &name, double val, bool normalized=false) "
+%feature("docstring")  casadi::DaeBuilder::set_guess(const std::string
+&name, double val, bool normalized=false) "
 
-Set the (optionally normalized) derivative value at time 0 by name.
+Set the initial guess by name.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::setDerivativeStart(const MX &var,
-const std::vector< double > &val, bool normalized=false) "
+%feature("docstring")  casadi::DaeBuilder::set_guess(const MX &var, const
+std::vector< double > &val, bool normalized=false) "
 
-Set the (optionally normalized) derivative value(s) at time 0 by expression.
+Set the initial guess(es) by expression.
 
 ";
 
@@ -2293,9 +2249,38 @@ Eliminate quadrature states and turn them into ODE states.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::make_explicit() "
+%feature("docstring")  casadi::DaeBuilder::derivative_start(const
+std::string &name, bool normalized=false) const  "
 
-Transform the implicit DAE or semi-explicit DAE into an explicit ODE.
+Get the (optionally normalized) derivative value at time 0 by name.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::derivative_start(const MX &var,
+bool normalized=false) const  "
+
+Get the (optionally normalized) derivative value(s) at time 0 by expression.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_nominal(const std::string
+&name, double val) "
+
+Set the nominal value by name.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_nominal(const MX &var, const
+std::vector< double > &val) "
+
+Set the nominal value(s) by expression.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::parse_fmi(const std::string
+&filename) "
+
+Import existing problem from FMI/XML
 
 ";
 
@@ -2319,12 +2304,6 @@ Add an algebraic equation.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::scale_equations() "
-
-Scale the implicit equations.
-
-";
-
 %feature("docstring")  casadi::DaeBuilder::repr(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -2340,23 +2319,45 @@ Construct a function object.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::scale_variables() "
+%feature("docstring")  casadi::DaeBuilder::guess(const std::string &name,
+bool normalized=false) const  "
 
-Scale the variables.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::setInitialGuess(const std::string
-&name, double val, bool normalized=false) "
-
-Set the initial guess by name.
+Get the initial guess by name.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::setInitialGuess(const MX &var,
-const std::vector< double > &val, bool normalized=false) "
+%feature("docstring")  casadi::DaeBuilder::guess(const MX &var, bool
+normalized=false) const  "
 
-Set the initial guess(es) by expression.
+Get the initial guess(es) by expression.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::variable(const std::string &name)
+"
+
+Access a variable by name
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::variable(const std::string &name)
+const  "
+
+Access a variable by name
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_max(const std::string &name,
+double val, bool normalized=false) "
+
+Set the upper bound by name.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_max(const MX &var, const
+std::vector< double > &val, bool normalized=false) "
+
+Set the upper bound(s) by expression.
 
 ";
 
@@ -2366,10 +2367,31 @@ Eliminate algebraic variables and equations transforming them into outputs.
 
 ";
 
-%feature("docstring")  casadi::PrintableObject< DaeBuilder
->::getRepresentation() const "
+%feature("docstring")  casadi::DaeBuilder::set_min(const std::string &name,
+double val, bool normalized=false) "
 
-Return a string with a representation (for SWIG)
+Set the lower bound by name.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_min(const MX &var, const
+std::vector< double > &val, bool normalized=false) "
+
+Set the lower bound(s) by expression.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_start(const std::string
+&name, double val, bool normalized=false) "
+
+Set the (optionally normalized) value at time 0 by name.
+
+";
+
+%feature("docstring")  casadi::DaeBuilder::set_start(const MX &var, const
+std::vector< double > &val, bool normalized=false) "
+
+Set the (optionally normalized) value(s) at time 0 by expression.
 
 ";
 
@@ -2387,17 +2409,9 @@ identical)
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::start(const std::string &name,
-bool normalized=false) const  "
+%feature("docstring")  casadi::DaeBuilder::scale_variables() "
 
-Get the (optionally normalized) value at time 0 by name.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::start(const MX &var, bool
-normalized=false) const  "
-
-Get the (optionally normalized) value(s) at time 0 by expression.
+Scale the variables.
 
 ";
 
@@ -2426,24 +2440,9 @@ Get a derivative expression by non-differentiated expression.
 
 ";
 
-%feature("docstring")  casadi::DaeBuilder::setNominal(const std::string
-&name, double val) "
+%feature("docstring")  casadi::DaeBuilder::scale_equations() "
 
-Set the nominal value by name.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::setNominal(const MX &var, const
-std::vector< double > &val) "
-
-Set the nominal value(s) by expression.
-
-";
-
-%feature("docstring")  casadi::DaeBuilder::setUnit(const std::string &name,
-const std::string &val) "
-
-Set the unit for a component.
+Scale the implicit equations.
 
 ";
 
