@@ -890,6 +890,12 @@ namespace casadi {
                     && arg.size2() >=0) {
       // Matching horzcat dimensions
       return arg;
+    } else if (hcat && 0==arg.size1() && arg.size2() % inp.size2()==0
+                    && arg.size2() >=0) {
+      int r = inp.size1();
+      int c = arg.size2() / inp.size2();
+      // Matching horzcat dimensions with 
+      return M(r,c);
     } else if (arg.isempty()) {
       // Empty matrix means set zero
       return M(inp.shape());
