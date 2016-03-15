@@ -894,8 +894,8 @@ namespace casadi {
                     && arg.size2() >=0) {
       int r = inp.size1();
       int c = arg.size2() / inp.size2();
-      // Matching horzcat dimensions with 
-      return M(r,c);
+      // Matching horzcat dimensions with empty input
+      return M(r, c);
     } else if (arg.isempty()) {
       // Empty matrix means set zero
       return M(inp.shape());
