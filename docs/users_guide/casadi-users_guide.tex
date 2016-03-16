@@ -131,8 +131,7 @@ Joel Andersson and Joris Gillis while PhD students at the Optimization in Engine
 
 This document aims at giving a condensed introduction to \CasADi. After reading it, you should be able to formulate and manipulate expressions in \CasADi's symbolic framework, generate derivative information efficiently using \emph{algorithmic differentiation}, to set up, solve and perform forward and adjoint sensitivity analysis for systems of ordinary differential equations (ODE) or differential-algebraic equations (DAE) as well as to formulate and solve nonlinear programs (NLP) problems and optimal control problems (OCP).
 
-CasADi is available for C++, Python and MATLAB with little or no difference in performance. We recommend new users to try out Python first, as it is
-more stable than the MATLAB interface and, unlike C++, allows interactivity. It is also by far the best documented.
+CasADi is available for C++, Python and MATLAB with little or no difference in performance. In general, the Python API is the best documented and is slightly more stable than the MATLAB API. The C++ API is stable, but is not ideal for getting started with CasADi since there is limited documentation and since it lacks the interactivity of interpreted languages like MATLAB and Python.
 
 \section{What \CasADi is and what it is \emph{not}}
 \CasADi started out as a tool for algorithmic differentiation (AD) using a syntax borrowed from computer algebra systems (CAS), which explains its name. While AD still forms one of the core functionalities of the tool, the scope of the tool has since been considerably broadened, with the addition of support for ODE/DAE integration and sensitivity analysis, nonlinear programming and interfaces to other numerical tools. In its current form, it is a general-purpose tool for gradient-based numerical optimization -- with a strong focus on optimal control -- and ``\CasADi'' is just a name without any particular meaning.
@@ -146,7 +145,7 @@ Finally, \CasADi is not an ``optimal control problem solver'', that allows the u
 \section{Help and support} \label{sec:support}
 If you find simple bugs or lack some feature that you think would be relatively easy for us to add, the simplest thing is simply to write to the forum, located at \htmladdnormallink{http://forum.casadi.org}{http://forum.casadi.org/}. We check the forum regularly and try to respond as quickly as possible. The only thing we expect for this kind of support is that you cite us, cf. Section~\ref{sec:citing}, whenever you use \CasADi in scientific work.
 
-If you want more help, we are always open for academic or industrial cooperation. An academic cooperation usually take the form of a co-authorship of a peer reviewed paper, and an industrial cooperation involves a negotiated consulting contract. Please contact the us directly if you are interested in this.
+If you want more help, we are always open for academic or industrial cooperation. An academic cooperation usually take the form of a co-authorship of a peer reviewed paper, and an industrial cooperation involves a negotiated consulting contract. Please contact us directly if you are interested in this.
 
 \section{Citing \CasADi} \label{sec:citing}
 If you use \CasADi in published scientific work, please cite the following:
@@ -168,17 +167,17 @@ If you use \CasADi in published scientific work, please cite the following:
 \section{Reading this document}
 The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software. Our explanation is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of theory of optimization theory, solution of initial-value problems in differential equations and the programming language in question (C++, Python or MATLAB).
 
-We will use Python and MATLAB syntax side-by-side in this guide, noting that the Python interface is significantly more stable and better documented. We try to point out the instances where has a diverging syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
+We will use Python and MATLAB syntax side-by-side in this guide, noting that the Python interface is more stable and better documented. We try to point out the instances where has a diverging syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
 
 \chapter{Obtaining and installing \CasADi}
 \CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The main restricton of LGPL is that if you decide to modify \CasADi's source code as opposed to just using the tool for your application, these changes (a ``derivative-work'' of \CasADi) must be released under LGPL as well.
 
-The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its front-ends to Python and MATLAB are full-featured and auto-generated using the tool \htmladdnormallink{SWIG}{http://www.swig.org/}. These front-ends are unlikely to result in noticeable loss of efficiency. \CasADi has been installed successfully on Linux, OS X and Windows.
+The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its front-ends to Python and MATLAB are full-featured and auto-generated using the tool \htmladdnormallink{SWIG}{http://www.swig.org/}. These front-ends are unlikely to result in noticeable loss of efficiency. \CasADi can be used on Linux, OS X and Windows.
 
 For up-to-date installation instructions, visit \CasADi's website: \htmladdnormallink{http://casadi.org}{http://casadi.org/}.
 
 \chapter{Symbolic framework}
-At the core of \CasADi is a self-contained symbolic framework that allows the user to construct symbolic expressions using a MATLAB inspired everything-is-a-matrix syntax, i.e. vectors are treated as n-by-1 matrices and scalars as 1-by-1 matrices. All matrices are \emph{sparse} and use a general sparse format -- \emph{compressed column storage} (CCS) -- to store matrices\footnote{Before v1.9.0, \emph{compressed row storage} (CRS) was used.}. In the following, we introduce the most fundamental classes of this framework.
+At the core of \CasADi is a self-contained symbolic framework that allows the user to construct symbolic expressions using a MATLAB inspired everything-is-a-matrix syntax, i.e. vectors are treated as n-by-1 matrices and scalars as 1-by-1 matrices. All matrices are \emph{sparse} and use a general sparse format -- \emph{compressed column storage} (CCS) -- to store matrices. In the following, we introduce the most fundamental classes of this framework.
 
 \section{The \texttt{SX} symbolics}
 The \texttt{SX} data type is used to represent matrices whose elements consist of symbolic expressions made up by a sequence of unary and binary operations. To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) or launch MATLAB. Assuming \CasADi has been installed correctly, you can import the symbols into the workspace as follows:
@@ -202,15 +201,7 @@ import casadi.*
 from casadi import *
 \end{pytexoutput}
 
-For reference, In C++ the equivalent would be to import \CasADi's public header
-file (''\lstinline[language=C++]{#import <casadi/casadi.hpp>}'') and getting the
-symbols in the \texttt{casadi} namespace
-(''\lstinline[language=C++]{using namespace casadi;}'').
-
-Now create the variable \texttt{x} using the syntax\footnote{Since declaring
-types is necessary in C++ and since double colon ("::") is used to call static functions,
-the C++ equivalent is ``\lstinline[language=C++]{SX x = SX::sym("x");}'' or
-``\lstinline[language=C++]{auto x = SX::sym("x");}''}:
+Now create a variable \texttt{x} using the syntax:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -261,7 +252,7 @@ which creates a 5-by-1 matrix, i.e. a vector, and a 4-by-2 matrix with symbolic 
 # Python
 f = x**2 + 10
 f = sqrt(f)
-print f
+print 'f:', f
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -269,14 +260,14 @@ print f
 % MATLAB
 f = x^2 + 10;
 f = sqrt(f);
-disp f
+display(f)
 \end{lstlisting}
 \end{minipage}
 
 \begin{pytexoutput}
 f = x**2 + 10
 f = sqrt(f)
-print f
+print 'f:', f
 \end{pytexoutput}
 
 You can also create constant \texttt{SX} instances \emph{without} any symbolic primitives:
@@ -299,18 +290,18 @@ Note the difference between a sparse matrix with \emph{structural} zeros and a d
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
-print B4
+print 'B4:', B4
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 % MATLAB
-disp B4
+display(B4)
 \end{lstlisting}
 \end{minipage}
 
 \begin{pytexoutput}
-print B4
+print 'B4:', B4
 \end{pytexoutput}
 
 The following list summarizes the most commonly used ways of constructing new \texttt{SX} expressions:
@@ -328,8 +319,26 @@ The following list summarizes the most commonly used ways of constructing new \t
   \item (\emph{Python only}) \lstinline[language=Python]{SX(list of list)}: Create a dense matrix with the elements in the lists, e.g. \lstinline[language=Python]{SX([[1,2],[3,4]])} or a row vector (1-by-$n$ matrix) using \lstinline[language=Python]{SX([[1,2,3,4]])}.
 \end{itemize}
 
+\subsection*{Note for C++ users}
+In C++, all public symbols are defined in the \texttt{casadi} namespace and require the inclusion of the \lstinline[language=C++]{casadi/casadi.hpp} header file.
+The commands above would be equivalent to:
+\begin{lstlisting}[language=C++]
+// C++
+#include <casadi/casadi.hpp>
+using namespace casadi;
+int main() {
+  SX x = SX::sym("x");
+  SX y = SX::sym("y",5);
+  SX Z = SX::sym("Z",4,2)
+  SX f = pow(x,2) + 10;
+  f = sqrt(f);
+  std::cout << "f: " << f << std::endl;
+  return 0;
+}
+\end{lstlisting}
+
 \section{\texttt{DM}}
-\texttt{DM} is very similar to \texttt{SX} (in fact, they are just two template instantiations of the same C++ class \lstinline[language=C++]{casadi::Matrix<T>}), but with the difference that the nonzero elements are numerical values and not symbolic expressions. The syntax is also the same, except for functions such as \texttt{SX.sym}, which have no equivalents.
+\texttt{DM} is very similar to \texttt{SX}, but with the difference that the nonzero elements are numerical values and not symbolic expressions. The syntax is also the same, except for functions such as \texttt{SX.sym}, which have no equivalents.
 
 \texttt{DM} is mainly used for storing matrices in \CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use the builtin dense or sparse data types in MATLAB, \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
 
@@ -349,20 +358,20 @@ C_sparse = csc_matrix(C) # equivalent
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
   \begin{lstlisting}[language=Matlab]
-  % MATLAB
-  C = DM(2,3)
+% MATLAB
+C = DM(2,3);
 
-  C_dense = full(C)
+C_dense = full(C);
 
 
 
-  C_sparse = sparse(C)
+C_sparse = sparse(C);
 
 
   \end{lstlisting}
 \end{minipage}
 
-More usage examples for \texttt{SX} can be found in the tutorials at \htmladdnormallink{http://docs.casadi.org}{http://docs.casadi.org/}. For documentation of particular functions of this class (and others), find the ``C++ API docs'' on the website and search for information about \lstinline[language=C++]{casadi::Matrix<T>}.
+More usage examples for \texttt{SX} can be found in the tutorials at \htmladdnormallink{http://docs.casadi.org}{http://docs.casadi.org/}. For documentation of particular functions of this class (and others), find the ``C++ API docs'' on the website and search for information about \lstinline[language=C++]{casadi::Matrix}.
 
 \section{The \texttt{MX} symbolics}
 Let us perform a simple operation using the \texttt{SX} above:
@@ -384,7 +393,7 @@ x = SX.sym('x',2,2);
 y = SX.sym('y');
 f = 3*x + y;
 disp(f)
-disp(f.size)
+disp(size(f))
 \end{lstlisting}
 \end{minipage}
 
@@ -398,7 +407,7 @@ print f.shape
 
 As you can see, the output of this operation is a 2-by-2 matrix. Note how the multiplication and the addition were performed elementwise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
 
-We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$.
+We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead, the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$.
 
 The syntax of \texttt{MX} mirrors that of \texttt{SX}:
 
@@ -419,7 +428,7 @@ x = MX.sym('x',2,2);
 y = MX.sym('y');
 f = 3*x + y;
 disp(f)
-disp(f.shape)
+disp(size(f))
 \end{lstlisting}
 \end{minipage}
 
@@ -431,7 +440,7 @@ print f
 print f.shape
 \end{pytexoutput}
 
-Note that this operation required only 2 elementary operations (one multiplication and one addition) using \texttt{MX} symbolics, whereas the \texttt{SX} symbolics required 8 (2 for each element of the resulting matrix). As a consequence, \texttt{MX} can be more economical when working with operations that are naturally vector or matrix valued with many elements. As we shall see in Chapter~\ref{ch:function}, it is also much more general since we allow calls to arbitrary functions that cannot be expanded in terms of elementary operations.
+Note how the result consists of only two operations (one multiplication and one addition) using \texttt{MX} symbolics, whereas the \texttt{SX} equivalent has eight (two for each element of the resulting matrix). As a consequence, \texttt{MX} can be more economical when working with operations that are naturally vector or matrix valued with many elements. As we shall see in Chapter~\ref{ch:function}, it is also much more general since we allow calls to arbitrary functions that cannot be expanded in terms of elementary operations.
 
 \texttt{MX} supports getting and setting elements, using the same syntax as \texttt{SX}, but the way it is implemented is very different. Test, for example, to print the element in the upper-left corner of a 2-by-2 symbolic variable:
 
@@ -446,7 +455,7 @@ print x[0,0]
 \begin{lstlisting}[language=Matlab]
 % MATLAB
 x = MX.sym('x',2,2);
-disp(x(1,1))
+x(1,1)
 \end{lstlisting}
 \end{minipage}
 
@@ -466,7 +475,7 @@ x = MX.sym('x',2)
 A = MX(2,2)
 A[0,0] = x[0]
 A[1,1] = x[0]+x[1]
-print A
+print 'A:', A
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -476,7 +485,7 @@ x = MX.sym('x',2);
 A = MX(2,2);
 A(1,1) = x(1);
 A(2,2) = x(1)+x(2);
-disp(A)
+display(A)
 \end{lstlisting}
 \end{minipage}
 
@@ -485,7 +494,7 @@ x = MX.sym('x',2)
 A = MX(2,2)
 A[0,0] = x[0]
 A[1,1] = x[0]+x[1]
-print A
+print 'A:', A
 \end{pytexoutput}
 
 The interpretation of the (admittedly cryptic) output is that starting with an all zero sparse matrix, an element is assigned to \texttt{x\_0}. It is then projected to a matrix of different sparsity and an another element is assigned to \texttt{x\_0+x\_1}.
@@ -493,7 +502,7 @@ The interpretation of the (admittedly cryptic) output is that starting with an a
 Element access and assignment, of the type you have just seen, are examples of operations that can be used to construct expressions. Other examples of operations are matrix multiplications, transposes, concatenations, resizings, reshapings and function calls.
 
 \section{Mixing \texttt{SX} and \texttt{MX}}
-You can \emph{not} multiply an \texttt{SX} object with an \texttt{MX} object, or perform any other operation to mix the two in the same expression graph. You can, however, in an \texttt{MX} graph include calls to a \emph{function} defined by \texttt{SX} expression. This will be demonstrated in Chapter~\ref{ch:function}. Mixing \texttt{SX} and \texttt{MX} is often a good idea since functions defined by \texttt{SX} expressions have a much lower overhead per operation making it much faster for operations that are naturally written as a sequence of scalar operations. The \texttt{SX} expressions are thus intended to be used for low level operations (for example the DAE right hand side in Chapter~\ref{ch:integrators}), whereas the \texttt{MX} expressions act as a glue and enables the formulation of e.g. the constraint function of an NLP (which might contain calls to ODE/DAE integrators, or might simply be too large to expand as one big expression).
+You can \emph{not} multiply an \texttt{SX} object with an \texttt{MX} object, or perform any other operation to mix the two in the same expression graph. You can, however, in an \texttt{MX} graph include calls to a \emph{function} defined by \texttt{SX} expressions. This will be demonstrated in Chapter~\ref{ch:function}. Mixing \texttt{SX} and \texttt{MX} is often a good idea since functions defined by \texttt{SX} expressions have a much lower overhead per operation making it much faster for operations that are naturally written as a sequence of scalar operations. The \texttt{SX} expressions are thus intended to be used for low level operations (for example the DAE right hand side in Chapter~\ref{ch:integrators}), whereas the \texttt{MX} expressions act as a glue and enables the formulation of e.g. the constraint function of an NLP (which might contain calls to ODE/DAE integrators, or might simply be too large to expand as one big expression).
 
 \section{The \texttt{Sparsity} class} \label{sec:sparsity_class}
 As mentioned above, matrices in \CasADi are stored using the \emph{compressed column storage} (CCS) format. This is a standard format for sparse matrices that allows linear algebra operations such as elementwise operations, matrix multiplication and transposes to be performed efficiently. In the CCS format, the sparsity pattern is decoded using the dimensions -- the number of rows and number of columns -- and two vectors. The first vector contains the index of the first structurally nonzero element of each column and the second vector contains the row index for every nonzero element. For more details on the CCS format, see e.g. \htmladdnormallink{Templates for the Solution of Linear Systems}{http://netlib.org/linalg/html_templates/node92.html} on Netlib. Note that \CasADi uses the CCS format for sparse as well as dense matrices.
@@ -559,7 +568,7 @@ M[0,:] = 1
 print M
 \end{pytexoutput}
 
-Unlike NumPy, \CasADi slices are not views into the data of the left hand side; rather, a slice access copies the data. As a result, the matrix $M$ is not changed in the following example:
+Unlike Python's NumPy, \CasADi slices are not views into the data of the left hand side; rather, a slice access copies the data. As a result, the matrix $M$ is not changed at all in the following example:
 
 \begin{pytex}
 # Python
@@ -598,7 +607,7 @@ print M[0,0], M[1,0], M[-1,-1]
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-disp M(1,1), M(2,1), M(end,end)
+M(1,1), M(2,1), M(end,end)
 \end{lstlisting}
 \end{minipage}
 
@@ -613,7 +622,7 @@ print M[5], M[-6]
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-disp M(6), M(end-5)
+M(6), M(end-5)
 \end{lstlisting}
 \end{minipage}
 
@@ -631,7 +640,7 @@ print M[:,1]
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-disp M(:,2)
+disp(M(:,2))
 \end{lstlisting}
 \end{minipage}
 
@@ -646,7 +655,7 @@ print M[1:,1:4:2]
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-disp M(2:end,2:2:4)
+disp(M(2:end,2:2:4))
 \end{lstlisting}
 \end{minipage}
 
@@ -666,7 +675,7 @@ print M
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-M = SX([3 7 8 9; 4 5 6 1])
+M = SX([3 7 8 9; 4 5 6 1]);
 disp(M)
 \end{lstlisting}
 \end{minipage}
@@ -682,7 +691,7 @@ print M[0,[0,3]], M[[5,-6]]
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-disp M(1,[1,4]), M([6,numel(M)-5])
+M(1,[1,4]), M([6,numel(M)-5])
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -703,7 +712,7 @@ print sin(y)-x
 \begin{lstlisting}[language=Matlab]
 x = SX.sym('x');
 y = SX.sym('y',2,2);
-disp sin(y)-x
+sin(y)-x
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -722,7 +731,7 @@ print y*y, mtimes(y,y)
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-disp y.*y, y*y
+y.*y, y*y
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -741,7 +750,7 @@ print y.T
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-disp y'
+y'
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -759,7 +768,7 @@ print reshape(x,2,8)
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 x = SX.eye(4);
-disp reshape(x,2,8)
+reshape(x,2,8)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -780,7 +789,7 @@ print vertcat(x,y)
 \begin{lstlisting}[language=Matlab]
 x = SX.sym('x',5);
 y = SX.sym('y',5);
-disp [x;y]
+[x;y]
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -796,7 +805,7 @@ print horzcat(x,y)
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-disp [x,y]
+[x,y]
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -816,7 +825,7 @@ print w[0], w[1]
 \begin{lstlisting}[language=Matlab]
 x = SX.sym('x',5,2);
 w = horzsplit(x,[0,1,2]);
-disp w{1}, w{2}
+w{1}, w{2}
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -836,7 +845,7 @@ print w[0], w[1]
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 w = vertsplit(x,[0,3,5]);
-disp w{1}, w{2}
+w{1}, w{2}
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -855,7 +864,7 @@ print w[0], w[1]
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 w = {x(1:3,:), x(4:5,:)};
-disp w{1}, w{2}
+w{1}, w{2}
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -876,7 +885,7 @@ print dot(x,x)
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 x = SX.sym('x',2,2)
-disp dot(x,x)
+dot(x,x)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -898,7 +907,7 @@ print y.shape
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 y = SX.sym('y',10,1);
-print size(y)
+size(y)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -941,7 +950,7 @@ print solve(A,b)
 \begin{lstlisting}[language=Matlab]
 A = MX.sym('A',3,3);
 b = MX.sym('b',3);
-disp A\b
+solve(A,b)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
@@ -950,27 +959,134 @@ b = MX.sym('b',3)
 print solve(A,b)
 \end{pytexoutput}
 
-\section{Calculus}
-Basic calculus operations are also possibly and implemented very efficiently using \emph{algorithmic differentiation} (AD) as outlined in Chapter~\ref{ch:function}.
+\section{Calculus -- algorithmic differentiation}
+The single most central functionality of \CasADi is \emph{algorithmic (or automatic) differentiation} (AD).
+For a function $f: \mathbb{R}^N \rightarrow \mathbb{R}^M$:
+\begin{equation}
+ y = f(x),
+\end{equation}
+\emph{Forward mode} directional derivatives can be used to calculate Jacobian-times-vector products:
+\begin{equation}
+ \hat{y} = \frac{\partial f}{\partial x} \, \hat{x}.
+\end{equation}
+
+Similarly, \emph{reverse mode} directional derivatives can be used to calculate Jacobian-transposed-times-vector products:
+\begin{equation}
+ \bar{x} = \left(\frac{\partial f}{\partial x}\right)^{\text{T}} \, \bar{y}.
+\end{equation}
+
+Both forward and reverse mode directional derivatives are calculated at a cost proportional to evaluating $f(x)$, \emph{regardless of the dimension of $x$}.
+
+CasADi is also able to generate complete, \emph{sparse} Jacobians efficiently. The algorithm for this is very complex, but essentially consists of the following steps:
+\begin{itemize}
+ \item Automatically detect the sparsity pattern of the Jacobian
+ \item Use graph coloring techniques to find a few forward and/or directional derivatives needed to construct the complete Jacobian
+ \item Calculate the directional derivatives numerically or symbolically
+ \item Assemble the complete Jacobian
+\end{itemize}
+
+Hessians are calculated by first calculating the gradient and then performing the same steps as above to calculate the Jacobian of the gradient in the same way as above, while exploiting symmetry.
+
+\subsection*{Syntax}
+An expression for a Jacobian is obtained using the syntax:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-A = SX.sym('A',3,3)
-x = SX.sym('x',3)
+A = SX.sym('A',3,2)
+x = SX.sym('x',2)
 print jacobian(mtimes(A,x),x)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-A = SX.sym('A',3,3);
-x = SX.sym('x',3);
-print jacobian(A*x,x)
+A = SX.sym('A',3,2);
+x = SX.sym('x',2);
+jacobian(A*x,x)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-A = SX.sym('A',3,3)
-x = SX.sym('x',3)
+A = SX.sym('A',3,2)
+x = SX.sym('x',2)
 print jacobian(mtimes(A,x),x)
+\end{pytexoutput}
+
+When the differentiated expression is a scalar, you can also calculate the gradient in the matrix sense:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+print gradient(dot(A,A),A)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+gradient(dot(A,A),A)
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+print gradient(dot(A,A),A)
+\end{pytexoutput}
+
+Hessians, and as a by-product gradients, are obtained as follows:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+[H,g] = hessian(dot(x,x),x)
+print 'H:', H
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+[H,g] = hessian(dot(x,x),x);
+display(H)
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+[H,g] = hessian(dot(x,x),x)
+print 'H:', H
+\end{pytexoutput}
+
+For calculating a Jacobian-times-vector product, the \texttt{jtimes} function -- performing forward mode AD -- is often more efficient than creating the full Jacobian and performing a matrix-vector multiplication:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+v = SX.sym('v',2)
+f = mtimes(A,x)
+print jtimes(f,x,v)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+v = SX.sym('v',2);
+f = A*x;
+jtimes(f,x,v)
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+v = SX.sym('v',2)
+f = mtimes(A,x)
+print jtimes(f,x,v)
+\end{pytexoutput}
+
+The \texttt{jtimes} function optionally calculates the transposed-Jacobian-times-vector product, i.e. reverse mode AD:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+w = SX.sym('w',3)
+f = mtimes(A,x)
+print jtimes(f,x,w,True)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+w = SX.sym('w',3);
+f = A*x
+jtimes(f,x,w,true)
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+w = SX.sym('w',3)
+f = mtimes(A,x)
+print jtimes(f,x,w,True)
 \end{pytexoutput}
 
 \chapter{Function objects} \label{ch:function}
@@ -989,7 +1105,7 @@ A \texttt{Function} can be constructed by passing a list of input expressions an
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-x = SX.sym('x',2,2)
+x = SX.sym('x',2)
 y = SX.sym('y')
 f = Function('f',[x,y],\
            [x,sin(y)*x])
@@ -997,136 +1113,129 @@ f = Function('f',[x,y],\
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-x = SX.sym('x',2,2);
+x = SX.sym('x',2);
 y = SX.sym('y');
 f = Function('f',{x,y},...
            {x,sin(y)*x});
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-x = SX.sym('x',2,2)
+x = SX.sym('x',2)
 y = SX.sym('y')
 f = Function('f',[x,y],\
            [x,sin(y)*x])
 \end{pytexoutput}
 
-which defines a function $f : \mathbb{R}^{2 \times 2} \times \mathbb{R}, \quad (x,y) \mapsto (x,\sin(y) x)$.
+which defines a function
+$f : \mathbb{R}^{2} \times \mathbb{R} \rightarrow \mathbb{R}^{2} \times \mathbb{R}^{2}, \quad (x,y) \mapsto (x,\sin(y) x)$.
 Note that all function objects in \CasADi, including the above, are multiple matrix-valued input, multiple, matrix-valued output.
 
 \texttt{MX} expression graphs work the same way:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-x = MX.sym('x',2,2)
+x = MX.sym('x',2)
 y = MX.sym('y')
 f = Function('f',[x,y],\
-               [x,sin(y)*x])
+             [x,sin(y)*x])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-x = MX.sym('x',2,2);
+x = MX.sym('x',2);
 y = MX.sym('y');
 f = Function('f',{x,y},...
-               {x,sin(y)*x});
+             {x,sin(y)*x});
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-x = MX.sym('x',2,2)
+x = MX.sym('x',2)
 y = MX.sym('y')
 f = Function('f',[x,y],\
-               [x,sin(y)*x])
+             [x,sin(y)*x])
 \end{pytexoutput}
 
-All derived classes of \texttt{Function} come with a range of options that can be set. The API documentation shows the list of available options for each class, along with their default values and descriptions.
-
-\section{Input-output schemes for function objects}
-Most \texttt{Function}-derived classes have a particular input/output signature with them and/or take as arguments in the constructor other function objects (callback functions) with a particular input/output signature. For example, as we shall see in Chapter~\ref{ch:nlp}, a \emph{nonlinear program} (NLP) is defined by two inputs (the decision variable and a set of parameters) and two outputs (the objective and constraint functions). When constructing functions from symbolic expressions as above, it is advisable to explicitly name the inputs and outputs:
+When creating a \texttt{Function} from expressions like that, it is always advisory to \emph{name} the inputs and outputs as follows:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-x = SX.sym('x')
-p = SX.sym('p')
-f = x**2
-g = log(x)-p
-nlp = Function('nlp',
-        [x,p],[f,g],
-        ['x','p'],
-        ['f','g'])
+x = MX.sym('x',2)
+y = MX.sym('y')
+f = Function('f',[x,y],\
+      [x,sin(y)*x],\
+      ['x','y'],['r','q'])
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-x = SX.sym('x');
-p = SX.sym('p');
-f = x^2;
-g = log(x)-p;
-nlp = Function('nlp',...
-        {x,p},{f,g},...
-        char('x','p'),...
-        char('f','g'));
+x = MX.sym('x',2);
+y = MX.sym('y');
+f = Function('f',{x,y},...
+      {x,sin(y)*x},...
+      {'x','y'},{'r','q'});
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-x = SX.sym('x')
-p = SX.sym('p')
-f = x**2
-g = log(x)-p
-nlp = Function('nlp',
-        [x,p],[f,g],
-        ['x','p'],
-        ['f','g'])
+x = MX.sym('x',2)
+y = MX.sym('y')
+f = Function('f',[x,y],\
+      [x,sin(y)*x],\
+      ['x','y'],['r','q'])
 \end{pytexoutput}
 
-Always naming inputs and outputs is preferred for a number of reasons:
+Naming inputs and outputs is preferred for a number of reasons:
 \begin{itemize}
 \item No need to remember the number or order of arguments
 \item Inputs or outputs that are absent can be left unset
-\item More readable and less error prone syntax. E.g. \verb|nlp.jacobian('x','g')| instead of \verb|nlp.jacobian(0,1)|.
+\item More readable and less error prone syntax. E.g. \verb|f.jacobian('x','q')| instead of \verb|f.jacobian(0,1)|.
 \end{itemize}
+
+For \texttt{Function} instances -- to be encountered later -- that are \emph{not} created directly from expressions,
+the inputs and outputs are named automatically.
 
 \section{Calling function objects}
 \texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. Calling a function object is both done for the numerical evaluation and, by passing symbolic arguments, for embedding a \emph{call} to the function object into an expression graph (cf. also Chapter~\ref{ch:integrators}).
 
-There are two principle ways of calling a function object, by passing a list (in MATLAB a cell array, in C++ an \lstinline[language=C++]{std::vector<MatrixType>}) of inputs (of the same length as the number of inputs to the function) or by passing a dictionary (\texttt{dict} in Python, \texttt{struct} in MATLAB and \lstinline[language=C++]{std::map<std::string, MatrixType>} in C++).
-
-The output will be of the same type, i.e. a list of outputs and a dictionary of outputs, respectively.
+To call a function object, you either pass the argument in the correct order:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-f0, g0 = nlp(1.1,3.3)
-print f0, g0
+r0, q0 = f(1.1,3.3)
+print 'r0:',r0
+print 'q0:',q0
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-[f0, g0] = nlp(1.1,3.3);
-disp(f0), disp(g0)
+[r0, q0] = f(1.1,3.3);
+display(r0)
+display(q0)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-f0, g0 = nlp(1.1,3.3)
-print f0, g0
+r0, q0 = f(1.1,3.3)
+print 'r0:',r0
+print 'q0:',q0
 \end{pytexoutput}
+
+or the arguments and their names as follows, which will result in a dictionary (\texttt{dict} in Python, \texttt{struct} in MATLAB and \lstinline[language=C++]{std::map<std::string, MatrixType>} in C++):
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-res = nlp(x=1.1, p=3.3)
-print res['f'], res['g']
+res = f(x=1.1, y=3.3)
+print 'res:', res
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-res = nlp('x',1.1,'p',3.3);
-disp(res.f), disp(res.g)
+res = f('x',1.1,'y',3.3);
+display(res)
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-res = nlp(x=1.1, p=3.3)
-print res['f'], res['g']
+res = f(x=1.1, y=3.3)
+print 'res:', res
 \end{pytexoutput}
-
-The recommendation is to always work with named inputs and outputs, since it is less error prone and more maintainable.
 
 When calling a function object, the dimensions (but not necessarily the sparsity patterns) of the evaluation arguments have to match those of the function inputs, with two exceptions:
 \begin{itemize}
@@ -1134,88 +1243,39 @@ When calling a function object, the dimensions (but not necessarily the sparsity
   \item A scalar argument can always be passed, regardless of the input dimension. This has the meaning of setting all elements of the input matrix to that value.
 \end{itemize}
 
-Note that the function call syntax always expects a vector of inputs, so if your function only has a single input, you need to turn it into a single element list (in Python) or cell array (in MATLAB). Similarly, the function always returns a list of outputs (in MATLAB, a cell array, in C++ an \lstinline[language=C++]{std::vector}).
-
-\section{Algorithmic differentiation}
-
-The single most central functionality of \CasADi is \emph{algorithmic (or automatic) differentiation} (AD).
-
-Assume a function $\mathbf{R}^N \rightarrow \mathbf{R}^M$:
-\begin{equation}
- y = f(x)
-\end{equation}
-
-\emph{Forward mode} directional derivatives can be used to calculate Jacobian-times-vector products:
-\begin{equation}
- y_{\text{fsens}} = \frac{\partial f}{\partial x} \, x_{\text{fseed}}
-\end{equation}
-We will refer to the multiplying vector as the \emph{seed} vector and the result as the \emph{sensitivity} vector.
-
-Similarly, \emph{reverse mode} (or \emph{adjoint mode}) directional derivatives can be used to calculate Jacobian-transposed-times-vector products:
-\begin{equation}
- x_{\text{asens}} = \left(\frac{\partial f}{\partial x}\right)^{\text{T}} \, y_{\text{aseed}}
-\end{equation}
-
-Both forward and adjoint directional derivatives are calculated at a cost proportional to evaluating $f(x)$, \emph{regardless of the dimension of $x$}.
-
-CasADi is also able to generate complete, \emph{sparse} Jacobians efficiently. Internally, the algorithm it will use for this depends on the particular \texttt{Function} class but in most cases consists of the following steps:
-\begin{itemize}
- \item Automatically detect the sparsity pattern of the Jacobian
- \item Use graph coloring techniques to find a few forward and/or directional derivatives needed to construct the complete Jacobian
- \item Calculate the directional derivatives numerically or symbolically
- \item Assemble the complete Jacobian
-\end{itemize}
-
-Hessians are calculated by first calculating the gradient and then performing the same steps as above to calculate the Jacobian of the gradient in the same way as above, while exploiting symmetry.
-
-\section{Generating Jacobian and Hessian function objects}
-You can generate a new function for calculating the Jacobian by calling the \texttt{Function::jacobian} member function:
+When the number of inputs to a function object is large or changing, an alternative syntax to the above is to use the \emph{call} function which takes a Python list / MATLAB cell array or, alternatively, a Python dict / MATLAB struct. The return value will have the same type:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
-J = f.jacobian(id_in,id_out)
+arg = [1.1,3.3]
+res = f.call(arg)
+print 'res:', res
+arg = {'x':1.1,'y':3.3}
+res = f.call(arg)
+print 'res:', res
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-J = f.jacobian(id_in,id_out);
+arg = {1.1,3.3};
+res = f.call(arg);
+display(res)
+arg = struct('x',1.1,'y',3.3);
+res = f.call(arg);
+display(res)
 \end{lstlisting}
 \end{minipage}
-
-where \texttt{id\_in} and \texttt{id\_out} are either the indices of the inputs and outputs (0-based indexing, also in MATLAB) or strings corresponding to identifier names. In either case, a new function object will be generated that calculates the Jacobian of the \texttt{id\_out}-th function output with respect to the \texttt{id\_in}-th function input. The new function object will have the same input scheme as the function \texttt{f} but with the (sparse) Jacobian as well as all the original function outputs as outputs.
-
-Similarly, the gradient of a scalar output can be called by calling the \texttt{Function::gradient} member function:
-
-\begin{minipage}[t]{0.5\textwidth}
-\begin{lstlisting}[language=Python]
-G = f.gradient(id_in,id_out)
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}[t]{0.5\textwidth}
-\begin{lstlisting}[language=Matlab]
-G = f.gradient(id_in,id_out);
-\end{lstlisting}
-\end{minipage}
-
-which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) gradient and all the original function outputs as outputs.
-
-Lastly, Hessians of a scalar output can be called by calling the \texttt{Function::hessian} member function:
-
-\begin{minipage}[t]{0.5\textwidth}
-\begin{lstlisting}[language=Python]
-G = f.hessian(id_in,id_out)
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}[t]{0.5\textwidth}
-\begin{lstlisting}[language=Matlab]
-G = f.hessian(id_in,id_out);
-\end{lstlisting}
-\end{minipage}
-
-which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Hessian, the gradient and all the original function outputs as outputs.
+\begin{pytexoutput}
+arg = [1.1,3.3]
+res = f.call(arg)
+print 'res:', res
+arg = {'x':1.1,'y':3.3}
+res = f.call(arg)
+print 'res:', res
+\end{pytexoutput}
 
 \section{Converting \texttt{MX} to \texttt{SX}}
-An \texttt{MX} graph which only contains built-in operations (e.g. elementwise operations such as addition, square root, matrix multiplications and calls to \texttt{SX} functions, can be converted into a \texttt{SX} graph the syntax:
+A function object defined by an \texttt{MX} graph that only contains built-in operations (e.g. elementwise operations such as addition, square root, matrix multiplications and calls to \texttt{SX} functions, can be converted into a function defined purely by an \texttt{SX} graph using the syntax:
 
 \begin{lstlisting}[language=Python]
 sx_function = mx_function.expand()
