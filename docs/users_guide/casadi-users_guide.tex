@@ -1312,36 +1312,63 @@ is a DAE of semi-explicit form with quadratures:
 
 For solvers of \emph{ordinary} differential equations, the second equation and the algebraic variables $z$ must be absent.
 
-An integrator in \CasADi is a function that take the state at the initial time, a set of parameters, the state vector at the initial time and a guess for the algebraic variables (only for DAEs) and returns the state vector and algebraic variables at the final time.
+An integrator in \CasADi is a function that takes the state at the initial time \texttt{x0}, a set of parameters \texttt{p}, and a guess for the algebraic variables (only for DAEs) \texttt{z0} and returns the state vector \texttt{xf}, algebraic variables \texttt{zf} and the quadrature state \texttt{qf}, all at the final time.
 
 The freely available \htmladdnormallink{SUNDIALS suite}{https://computation.llnl.gov/casc/sundials/description/description.html} (distributed along with \CasADi) contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These integrators have support for forward and adjoint sensitivity analysis and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations.
 
 \subsection{Creating integrators}
-Integrators in CasADi are function objects that are created using \CasADi's \texttt{integrator} function. Different integrators schemes and interfaces are implemented as \emph{plugins}, essentially shared libraries that are loaded at runtime. Integrators are created using the syntax:
+Integrators are created using \CasADi's \texttt{integrator} function. Different integrators schemes and interfaces are implemented as \emph{plugins}, essentially shared libraries that are loaded at runtime.
+
+Consider for example the DAE:
+\begin{subequations}
+\begin{align}
+ \dot{x} &= z+p, \\
+      0  &= z \, \cos(z)-x
+\end{align}
+\end{subequations}
+
+An integrator, using the ''idas'' plugin, can be created using the syntax:
 
 \begin{lstlisting}[language=Python]
 # Python
-x = SX.sym('x')
-z = SX.sym('z')
-dae = {'x':x, 'z':z, 'ode':-z*x, 'alg':z**2-2}
-opts = {'abstol', 1e-8}
-solver = integrator('solver', 'idas', dae, opts)
+x = SX.sym('x'); z = SX.sym('z'); p = SX.sym('p')
+dae = {'x':x, 'z':z, 'p':p, 'ode':z+p, 'alg':z*cos(z)-x}
+F = integrator('F', 'idas', dae)
 \end{lstlisting}
 \begin{lstlisting}[language=Matlab]
 % MATLAB
-x = SX.sym('x');
-z = SX.sym('z');
-dae = struct('x',x,'z',z,'ode',-z*x,'alg',z^2-2);
-solver = integrator('solver', 'idas', dae, opts);
+x = SX.sym('x'); z = SX.sym('z'); p = SX.sym('p');
+dae = struct('x',x,'z',z,'p',p,'ode',z+p,'alg',z*cos(z)-x);
+F = integrator('F', 'idas', dae);
 \end{lstlisting}
-
 \begin{pytexoutput}
 # Python
-x = SX.sym('x')
-z = SX.sym('z')
-dae = {'x':x, 'z':z, 'ode':-z*x, 'alg':z**2-2}
-opts = {'abstol', 1e-8}
-solver = integrator('solver', 'idas', dae, opts)
+x = SX.sym('x'); z = SX.sym('z'); p = SX.sym('p')
+dae = {'x':x, 'z':z, 'p':p, 'ode':z+p, 'alg':z*cos(z)-x}
+F = integrator('F', 'idas', dae)
+\end{pytexoutput}
+
+Integrating this DAE from 0 to 1 with $x(0)=0$, $p=0.1$ and using the guess $z(0)=0$, can
+be done by evaluating the created function object:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+r = F(x0=0, z0=0, p=0.1)
+print r['xf']
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+r = F('x0',0,'z0',0,'p',0.1);
+disp(r.xf)
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+# Python
+r = F(x0=0, z0=0, p=0.1)
+print r['xf']
 \end{pytexoutput}
 
 The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be changed from its default [0, 1] by setting the options "t0" and "tf".
@@ -1350,13 +1377,13 @@ The time horizon is assumed to be fixed\footnote{for problems with free end time
 From a usage point of view, an integrator behaves just like the function objects created from expressions earlier in the chapter.
 You can use member functions in the Function class to generate new function objects corresponding to directional derivatives (forward or reverse mode) or complete Jacobians. Then evaluate these function objects numerically to obtain sensitivity information. The documented example "sensitivity\_analysis" (available in \CasADi's example collection for Python, MATLAB and C++) demonstrate how \CasADi can be used to calculate first and second order derivative information (forward-over-forward, forward-over-adjoint, adjoint-over-adjoint) for a simple DAE.
 
-\chapter{Nonlinear programming} \label{ch:nlp}
-The NLP solvers contained in or interfaced with \CasADi solves parametric NLPs of the following form:
+\section{Nonlinear programming} \label{sec:nlp}
+The NLP solvers distributed with or interfaced to \CasADi solves parametric NLPs of the following form:
 \begin{equation}
 \begin{array}{cc}
 \begin{array}{c}
 \text{minimize:} \\
-x \in \mathbb{R}^{nx}, p \in \mathbb{R}^{np}
+x
 \end{array}
 &
 f(x,p)
@@ -1365,21 +1392,92 @@ f(x,p)
 \text{subject to:}
 \end{array}
 &
-\begin{array}{c}
-x_{\min} \le x \le x_{\max} \\
-g_{\min} \le g(x,p) \le g_{\max}
+\begin{array}{rcl}
+  x_{\min} \le &  x   & \le x_{\max} \\
+  g_{\min} \le &g(x,p)& \le g_{\max}
 \end{array}
 \end{array}
 \end{equation}
 
-With a function \texttt{nlp}, which given $x$ and $p$, gives $f$ and $g$, an NLP solver instance can be allocated by:
+where $x \in \mathbb{R}^{nx}$ is the decision variable and $p \in \mathbb{R}^{np}$ is a known parameter vector.
+
+An NLP solver in \CasADi is a function that takes the parameter value, the bounds and a guess for the primal-dual solution and returns the optimal solution. Unlike integrator objects, NLP solver functions are currently not differentiable functions in \CasADi.
+
+There are several NLP solvers interfaced with \CasADi. The most popular one is IPOPT, an open-source primal-dual interior point method which is included in \CasADi installations. Others, that require the installation of third-party software, include SNOPT, WORHP and KNITRO. Whatever the NLP solver used, the interface will automatically generate the information that it needs to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$.
+
+\subsection{Creating NLP solvers}
+NLP solvers are created using \CasADi's \texttt{nlpsol} function. Different solvers and interfaces are implemented as \emph{plugins}.
+Consider the following form of the so-called Rosenbrock problem:
+
+\begin{equation}
+\begin{array}{cc}
+\begin{array}{c}
+\text{minimize:} \\
+x,y,z
+\end{array}
+&
+x^2 + 100 \, z^2  \\
+\begin{array}{c}
+\text{subject to:}
+\end{array}
+&  z+(1-x)^2-y = 0
+\end{array}
+\end{equation}
+
+A solver for this problem, using the ''ipopt'' plugin, can be created using the syntax:
+
 \begin{lstlisting}[language=Python]
-nlpsol = nlpsol(display_name,plugin_name,nlp,options)
+# Python
+x = SX.sym('x'); y = SX.sym('y'); z = SX.sym('z')
+nlp = {'x':vertcat(x,y,z), 'f':x**2+100*z**2, 'g':z+(1-x)**2-y}
+S = nlpsol('S', 'ipopt', nlp)
 \end{lstlisting}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+x = SX.sym('x'); y = SX.sym('y'); z = SX.sym('z');
+nlp = struct('x',[x;y;z], 'f':x^2+100*z^2, 'g',z+(1-x)^2-y)
+S = nlpsol('S', 'ipopt', nlp)
+\end{lstlisting}
+\begin{pytexoutput}
+# Python
+x = SX.sym('x'); y = SX.sym('y'); z = SX.sym('z')
+nlp = {'x':vertcat(x,y,z), 'f':x**2+100*z**2, 'g':z+(1-x)**2-y}
+S = nlpsol('S', 'ipopt', nlp)
+\end{pytexoutput}
 
-The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver.
+Once the solver has been created, we can solve the NLP, using $[2.5,3.0,0.75]$ as an initial guess, by evaluating the
+function \texttt{S}:
 
-NLP solvers, like ODE/DAE integrators are functions in \CasADi (though taking derivatives of them is currently not supported). You will find the input and output schemes in the \CasADi API documentation on the website or by using the question mark in Python.
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+r = S(x0=[2.5,3.0,0.75],\
+      lbg=0, ubg=0)
+x_opt = r['x']
+print 'x_opt: ', x_opt
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+r = S('x0',[2.5,3.0,0.75],...
+      'lbg',0,'ubg',0);
+x_opt = r.x;
+display(x_opt)
+\end{lstlisting}
+\end{minipage}
+{
+\tiny
+\begin{pytexoutput}
+# Python
+r = S(x0=[2.5,3.0,0.75],\
+      lbg=0, ubg=0)
+\end{pytexoutput}
+}
+\begin{pytexoutput}
+x_opt = r['x']
+print 'x_opt: ', x_opt
+\end{pytexoutput}
 
 \chapter{Optimal control with \CasADi}
 \CasADi can be used to solve \emph{optimal control problems} (OCP) using a variety of methods, including direct (a.k.a. \emph{discretize-then-optimize}) and indirect (a.k.a. \emph{optimize-then-discretize}) methods, all-at-once (e.g. collocation) methods and shooting-methods requiring embedded solvers of initial value problems in ODE or DAE. As a user, you are in general expected to \emph{write your own OCP solver} and \CasADi aims as making this as easy as possible by providing powerful high-level building blocks. Since you are writing the solver yourself (rather than calling an existing ``black-box'' solver), a basic understanding of how to solve OCPs is indispensable. Good, self-contained introductions to numerical optimal control can be found in the recent textbooks by Biegler\footnote{Lorenz T. Biegler, \emph{\htmladdnormallink{Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes}{http://books.google.es/books/about/Nonlinear_Programming.html?id=VdB1wJQu0sgC&redir_esc=y}}, SIAM 2010} or Betts\footnote{John T. Betts, \emph{\htmladdnormallink{Practical Methods for Optimal Control Using Nonlinear Programming}{http://books.google.es/books/about/Practical_Methods_for_Optimal_Control_Us.html?id=Yn53JcYAeaoC&redir_esc=y}}, SIAM 2001} or Moritz Diehl's lecture notes on \htmladdnormallink{numerical optimal control}{http://homes.esat.kuleuven.be/~mdiehl/NUMOPT/numopt.pdf}.
