@@ -502,7 +502,7 @@ The interpretation of the (admittedly cryptic) output is that starting with an a
 Element access and assignment, of the type you have just seen, are examples of operations that can be used to construct expressions. Other examples of operations are matrix multiplications, transposes, concatenations, resizings, reshapings and function calls.
 
 \section{Mixing \texttt{SX} and \texttt{MX}}
-You can \emph{not} multiply an \texttt{SX} object with an \texttt{MX} object, or perform any other operation to mix the two in the same expression graph. You can, however, in an \texttt{MX} graph include calls to a \emph{function} defined by \texttt{SX} expressions. This will be demonstrated in Chapter~\ref{ch:function}. Mixing \texttt{SX} and \texttt{MX} is often a good idea since functions defined by \texttt{SX} expressions have a much lower overhead per operation making it much faster for operations that are naturally written as a sequence of scalar operations. The \texttt{SX} expressions are thus intended to be used for low level operations (for example the DAE right hand side in Section~\ref{sec:integrators}), whereas the \texttt{MX} expressions act as a glue and enables the formulation of e.g. the constraint function of an NLP (which might contain calls to ODE/DAE integrators, or might simply be too large to expand as one big expression).
+You can \emph{not} multiply an \texttt{SX} object with an \texttt{MX} object, or perform any other operation to mix the two in the same expression graph. You can, however, in an \texttt{MX} graph include calls to a \emph{function} defined by \texttt{SX} expressions. This will be demonstrated in Chapter~\ref{ch:function}. Mixing \texttt{SX} and \texttt{MX} is often a good idea since functions defined by \texttt{SX} expressions have a much lower overhead per operation making it much faster for operations that are naturally written as a sequence of scalar operations. The \texttt{SX} expressions are thus intended to be used for low level operations (for example the DAE right hand side in Section~\ref{sec:integrator}), whereas the \texttt{MX} expressions act as a glue and enables the formulation of e.g. the constraint function of an NLP (which might contain calls to ODE/DAE integrators, or might simply be too large to expand as one big expression).
 
 \section{The \texttt{Sparsity} class} \label{sec:sparsity_class}
 As mentioned above, matrices in \CasADi are stored using the \emph{compressed column storage} (CCS) format. This is a standard format for sparse matrices that allows linear algebra operations such as elementwise operations, matrix multiplication and transposes to be performed efficiently. In the CCS format, the sparsity pattern is decoded using the dimensions -- the number of rows and number of columns -- and two vectors. The first vector contains the index of the first structurally nonzero element of each column and the second vector contains the row index for every nonzero element. For more details on the CCS format, see e.g. \htmladdnormallink{Templates for the Solution of Linear Systems}{http://netlib.org/linalg/html_templates/node92.html} on Netlib. Note that \CasADi uses the CCS format for sparse as well as dense matrices.
@@ -1201,7 +1201,7 @@ For \texttt{Function} instances -- to be encountered later -- that are \emph{not
 the inputs and outputs are named automatically.
 
 \section{Calling function objects}
-\texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. Calling a function object is both done for the numerical evaluation and, by passing symbolic arguments, for embedding a \emph{call} to the function object into an expression graph (cf. also Section~\ref{sec:integrators}).
+\texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. Calling a function object is both done for the numerical evaluation and, by passing symbolic arguments, for embedding a \emph{call} to the function object into an expression graph (cf. also Section~\ref{sec:integrator}).
 
 To call a function object, you either pass the argument in the correct order:
 
@@ -1299,7 +1299,55 @@ sx_function = mx_function.expand()
 
 This might speed up the calculations significantly, but might also cause extra memory overhead.
 
-\section{Initial-value problems and sensitivity analysis} \label{sec:integrators}
+\section{Nonlinear root-finding problems} \label{sec:rootfinder}
+Consider the following system of equations:
+\begin{equation}\label{eq:rfp}
+\begin{aligned}
+&g_0(z, x_1, x_2, \ldots, x_n) &&= 0 \\
+&g_1(z, x_1, x_2, \ldots, x_n) &&= y_1 \\
+&g_2(z, x_1, x_2, \ldots, x_n) &&= y_2 \\
+&\qquad \vdots \qquad &&\qquad \\
+&g_m(z, x_1, x_2, \ldots, x_n) &&= y_m,
+\end{aligned}
+\end{equation}
+where the first equation uniquely defines $z$ as a function of $x_1$, \ldots, $x_n$ by the \emph{implicit function theorem}
+and the remaining equations define the auxiliary outputs $y_1$, \ldots, $y_m$.
+
+Given a function $g$ for evaluating $g_0$, \ldots, $g_m$, we can use \CasADi to automatically formulate a function
+$G: \{z_{\text{guess}}, x_1, x_2, \ldots, x_n\} \rightarrow \{z, y_1, y_2, \ldots, y_m\}$.
+This function includes a guess for $z$ to handle the case when the solution is non-unique.
+The syntax for this, assuming $n=m=1$ for simplicity, is:
+
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+z = SX.sym('x',nz)
+x = SX.sym('x',nx)
+g0 = (an expression of x, z)
+g1 = (an expression of x, z)
+g = Function('g',[z,x],[g0,g1])
+G = rootfinder('G','newton',g)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+z = SX.sym('x',nz);
+x = SX.sym('x',nx);
+g0 = (an expression of x, z)
+g1 = (an expression of x, z)
+g = Function('g',{z,x},{g0,g1});
+G = rootfinder('G','newton',g);
+\end{lstlisting}
+\end{minipage}
+
+where the \texttt{rootfinder} function expects a display name, the name of a solver plugin
+(here a simple full-step Newton method) and the residual function.
+
+Rootfinding objects in \CasADi are differential objects and derivatives can be calculated exactly to arbitrary order.
+
+\section{Initial-value problems and sensitivity analysis} \label{sec:integrator}
 \CasADi can be used to solve initial-value problems in ODE or DAE. The problem formulation used
 is a DAE of semi-explicit form with quadratures:
 \begin{subequations}
