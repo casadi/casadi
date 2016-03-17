@@ -1915,6 +1915,26 @@ namespace casadi {
     s << g.declare("int " + fname + "_n_out(void)")
       << " { return " << n_out << ";}" << endl << endl;
 
+    // Input names
+    s << g.declare("const char* " + fname + "_name_in(int i)") << "{" << endl
+      << "  switch (i) {" << endl;
+    for (int i=0; i<n_in; ++i) {
+      s << "  case " << i << ": return \"" << name_in(i) << "\";" << endl;
+    }
+    s << "  default: return 0;" << endl
+      << "  }" << endl
+      << "}" << endl << endl;
+
+    // Output names
+    s << g.declare("const char* " + fname + "_name_out(int i)") << "{" << endl
+      << "  switch (i) {" << endl;
+    for (int i=0; i<n_out; ++i) {
+      s << "  case " << i << ": return \"" << name_out(i) << "\";" << endl;
+    }
+    s << "  default: return 0;" << endl
+      << "  }" << endl
+      << "}" << endl << endl;
+
     // Quick return if simplified syntax
     if (simplifiedCall()) {
       return;
