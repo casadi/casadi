@@ -19,8 +19,9 @@
 \newcommand{\n}{\\n}
 \newcommand{\CasADi}{\texttt{CasADi}\xspace}
 \newcommand{\trace}[1]{\text{tr}(#1)}
-
-
+\newcommand{\T}{\text{T}}
+\newcommand{\lb}{\text{lb}}
+\newcommand{\ub}{\text{ub}}
 
 \begin{latexonly}
 %\ifunction\currentversion\undefined \newcommand{\currentversion}{1.9.0\xspace} \fi
@@ -1425,9 +1426,9 @@ The time horizon is assumed to be fixed\footnote{for problems with free end time
 From a usage point of view, an integrator behaves just like the function objects created from expressions earlier in the chapter.
 You can use member functions in the Function class to generate new function objects corresponding to directional derivatives (forward or reverse mode) or complete Jacobians. Then evaluate these function objects numerically to obtain sensitivity information. The documented example "sensitivity\_analysis" (available in \CasADi's example collection for Python, MATLAB and C++) demonstrate how \CasADi can be used to calculate first and second order derivative information (forward-over-forward, forward-over-adjoint, adjoint-over-adjoint) for a simple DAE.
 
-\section{Nonlinear programming} \label{sec:nlp}
+\section{Nonlinear programming} \label{sec:nlpsol}
 The NLP solvers distributed with or interfaced to \CasADi solves parametric NLPs of the following form:
-\begin{equation}
+\begin{equation} \label{eq:nlp}
 \begin{array}{cc}
 \begin{array}{c}
 \text{minimize:} \\
@@ -1441,8 +1442,8 @@ f(x,p)
 \end{array}
 &
 \begin{array}{rcl}
-  x_{\min} \le &  x   & \le x_{\max} \\
-  g_{\min} \le &g(x,p)& \le g_{\max}
+  x_{\lb} \le &  x   & \le x_{\ub} \\
+  g_{\lb} \le &g(x,p)& \le g_{\ub}
 \end{array}
 \end{array}
 \end{equation}
@@ -1520,6 +1521,203 @@ display(x_opt)
 # Python
 r = S(x0=[2.5,3.0,0.75],\
       lbg=0, ubg=0)
+\end{pytexoutput}
+}
+\begin{pytexoutput}
+x_opt = r['x']
+print 'x_opt: ', x_opt
+\end{pytexoutput}
+
+\section{Quadratic programming} \label{sec:qpsol}
+\CasADi provides interfaces to solve quadratic programs (QPs). Supported solvers are the open-source solvers qpOASES (distributed with \CasADi) and
+OOQP as well as the commercial solvers CPLEX and GUROBI.
+
+There are two different ways to solve QPs in \CasADi, using a high-level interface and a low-level interface. They are described in the following.
+
+\subsection{High-level interface}
+The high-level interface for quadratic programming mirrors that of nonlinear programming, i.e. expects a problem of the form \eqref{eq:nlp},
+with the restriction that objective function $f(x,p)$ must be a convex quadratic function in $x$ and the constraint function $g(x,p)$ must be linear in $x$.
+If the functions are not quadratic and linear, respectively, the solution is done at the current linearization point, given by the ``initial guess'' for $x$.
+
+If the objective function is not convex, the solver may or may not fail to find a solution or the solution may not be unique.
+
+To illustrate the syntax, we consider the following convex QP:
+\begin{equation} \label{eq:simple_qp}
+\begin{array}{cc}
+\begin{array}{c}
+\text{minimize:} \\
+x,y
+\end{array}
+&
+x^2 + y^2  \\
+\begin{array}{c}
+\text{subject to:}
+\end{array}
+& x+y-10 \ge 0
+\end{array}
+\end{equation}
+
+To solve this problem with the high-level interface, we simply replace \texttt{nlpsol} with \texttt{qpsol} and use a QP solver plugin such as the with \CasADi distributed qpOASES:
+
+\begin{lstlisting}[language=Python]
+# Python
+x = SX.sym('x'); y = SX.sym('y')
+qp = {'x':vertcat(x,y), 'f':x**2+y**2, 'g':x+y-10}
+S = qpsol('S', 'qpoases', qp)
+\end{lstlisting}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+x = SX.sym('x'); y = SX.sym('y')
+qp = struct('x',[x;y], 'f':x^2+y^2, 'g',x+y-10)
+S = qpsol('S', 'qpoases', qp)
+\end{lstlisting}
+{\tiny
+\begin{pytexoutput}
+# Python
+x = SX.sym('x'); y = SX.sym('y')
+qp = {'x':vertcat(x,y), 'f':x**2+y**2, 'g':x+y-10}
+S = qpsol('S', 'qpoases', qp)
+\end{pytexoutput}
+}
+
+The created solver object \texttt{S} will have the same input and output signature as the solver objects
+created with \texttt{nlpsol}. Since the solution is unique, it is less important to provide an initial guess:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+r = S(lbg=0)
+x_opt = r['x']
+print 'x_opt: ', x_opt
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+r = S('lbg',0);
+x_opt = r.x;
+display(x_opt)
+\end{lstlisting}
+\end{minipage}
+{
+\tiny
+\begin{pytexoutput}
+# Python
+r = S(lbg=0)
+\end{pytexoutput}
+}
+\begin{pytexoutput}
+x_opt = r['x']
+print 'x_opt: ', x_opt
+\end{pytexoutput}
+
+\subsection{Low-level interface}
+The low-level interface, on the other hand, solves QPs of the following form:
+\begin{equation} \label{eq:qp}
+\begin{array}{cc}
+\begin{array}{c}
+\text{minimize:} \\
+x
+\end{array}
+&
+\frac{1}{2} x^\T \, H \, x + g^\T \, x
+\\
+\begin{array}{c}
+\text{subject to:}
+\end{array}
+&
+\begin{array}{rcl}
+  x_{\lb} \le &  x   & \le x_{\ub} \\
+  a_{\lb} \le & A \, x& \le a_{\ub}
+\end{array}
+\end{array}
+\end{equation}
+
+Encoding problem \eqref{eq:simple_qp} in this form, omitting bounds that are infinite, is straightforward:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+H = 2*DM.eye(2)
+A = DM.ones(1,2)
+g = DM.zeros(2)
+lba = 10.
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+H = 2*DM.eye(2);
+A = DM.ones(1,2);
+g = DM.zeros(2);
+lba = 10;
+\end{lstlisting}
+\end{minipage}
+\begin{pytexoutput}
+# Python
+H = 2*DM.eye(2)
+A = DM.ones(1,2)
+g = DM.zeros(2)
+lba = 10.
+\end{pytexoutput}
+
+To create a solver instance, instead of passing symbolic expressions for the QP, we now pass the sparsity patterns of the matrices $H$ and $A$.
+Since we used \CasADi's \texttt{DM}-type above, we can simply query the sparsity patterns:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+qp = {}
+qp['h'] = H.sparsity()
+qp['a'] = A.sparsity()
+S = qpsol('S','qpoases',qp)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+qp = struct;
+qp.h = H.sparsity();
+qp.a = A.sparsity();
+S = qpsol('S','qpoases',qp);
+\end{lstlisting}
+\end{minipage}
+{ \tiny
+\begin{pytexoutput}
+# Python
+qp = {}
+qp['h'] = H.sparsity()
+qp['a'] = A.sparsity()
+S = qpsol('S','qpoases',qp)
+\end{pytexoutput}
+}
+
+The returned \texttt{Function} instance will have a \emph{different} input/output signature compared to the high-level interface, one that includes the matrices $H$ and $A$:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+r = S(h=H, g=g, \
+      a=A, lba=lba)
+x_opt = r['x']
+print 'x_opt: ', x_opt
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+r = S('h', H, 'g', g,...
+      'a', A, 'lba', lba);
+x_opt = r.x;
+display(x_opt)
+\end{lstlisting}
+\end{minipage}
+{
+\tiny
+\begin{pytexoutput}
+# Python
+r = S(h=H, g=g, \
+      a=A, lba=lba)
 \end{pytexoutput}
 }
 \begin{pytexoutput}
