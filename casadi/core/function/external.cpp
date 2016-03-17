@@ -64,13 +64,17 @@ namespace casadi {
   External::External(const std::string& name, const Library& li)
     : FunctionInternal(name), li_(li) {
 
-    // Increase/decrease reference counter
+    // Increasing/decreasing reference counter
     incref_ = (signal_t)li_.get(name_ + "_incref");
     decref_ = (signal_t)li_.get(name_ + "_decref");
 
-    // Get number of inputs and outputs
+    // Getting number of inputs and outputs
     n_in_ = (getint_t)li_.get(name + "_n_in");
     n_out_ = (getint_t)li_.get(name + "_n_out");
+
+    // Getting names of inputs and outputs
+    name_in_ = (name_t)li_.get(name + "_name_in");
+    name_out_ = (name_t)li_.get(name + "_name_out");
 
     // Work vector sizes
     work_ = (work_t)li_.get(name_ + "_work");
@@ -124,6 +128,40 @@ namespace casadi {
       // Fall back to base class
       return FunctionInternal::get_n_out();
     }
+  }
+
+  vector<string> External::get_ischeme() const {
+    // Get default names from base class
+    vector<string> v = FunctionInternal::get_ischeme();
+    for (int i=0; i<v.size(); ++i) {
+      // Use function pointer
+      if (name_in_) {
+        const char* n = name_in_(i);
+        casadi_assert_message(n!=0, "Error querying input name");
+        v[i] = n;
+      } else if (li_.meta().has(name_ + "_NAME_IN", i)) {
+        // Read meta
+        v[i] = li_.meta().to_string(name_ + "_NAME_IN", i);
+      }
+    }
+    return v;
+  }
+
+  vector<string> External::get_oscheme() const {
+    // Get default names from base class
+    vector<string> v = FunctionInternal::get_oscheme();
+    for (int i=0; i<v.size(); ++i) {
+      // Use function pointer
+      if (name_out_) {
+        const char* n = name_out_(i);
+        casadi_assert_message(n!=0, "Error querying output name");
+        v[i] = n;
+      } else if (li_.meta().has(name_ + "_NAME_OUT", i)) {
+        // Read meta
+        v[i] = li_.meta().to_string(name_ + "_NAME_OUT", i);
+      }
+    }
+    return v;
   }
 
   Sparsity GenericExternal::get_sparsity_in(int ind) const {

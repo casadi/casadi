@@ -100,6 +100,7 @@ namespace casadi {
   /** \brief  Function pointer types for the C API */
   typedef void (*signal_t)(void);
   typedef int (*getint_t)(void);
+  typedef const char* (*name_t)(int i);
   typedef const int* (*sparsity_t)(int i);
   typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
   typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);

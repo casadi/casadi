@@ -57,6 +57,9 @@ namespace casadi {
     /** \brief Number of inputs and outputs */
     getint_t n_in_, n_out_;
 
+    /** \brief Names of inputs and outputs */
+    name_t name_in_, name_out_;
+
     /** \brief Work vector sizes */
     work_t work_;
 
@@ -91,6 +94,12 @@ namespace casadi {
     virtual size_t get_n_in() const;
     virtual size_t get_n_out() const;
     ///@}
+
+    ///@{
+    /** \brief Names of function input and outputs */
+    virtual std::vector<std::string> get_ischeme() const;
+    virtual std::vector<std::string> get_oscheme() const;
+    /// @}
 
     ///@{
     /** \brief Forward mode derivatives */
