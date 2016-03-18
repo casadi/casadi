@@ -17919,6 +17919,13 @@ Joris Gillis
 |              |              |              | the jit      |              |
 |              |              |              | compiler.    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lut_args     | OT_INTEGERVE | GenericType( | Indicate the | casadi::Kern |
+|              | CTOR         | )            | argument     | elSum2DBase  |
+|              |              |              | indices that |              |
+|              |              |              | correspond   |              |
+|              |              |              | to lookup    |              |
+|              |              |              | tables.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
