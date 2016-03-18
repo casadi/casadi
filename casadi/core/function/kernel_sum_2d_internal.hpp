@@ -109,6 +109,7 @@ namespace casadi {
 
     void * context_;
     void * queue_;
+    std::vector<int> lut_args_;
     /// @}
   };
 
@@ -189,6 +190,7 @@ namespace casadi {
     int s_j_;
 
     int arg_length_;
+
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;

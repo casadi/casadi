@@ -100,6 +100,9 @@ namespace casadi {
     addOption("queue", OT_VOIDPTR, GenericType(),
       "You may optionally provide an existing OpenCL queue.");
 
+    addOption("lut_args", OT_INTEGERVECTOR, GenericType(),
+      "Indicate the argument indices that correspond to lookup tables.");
+
     casadi_assert(n>=1);
 
     casadi_assert_message(n==1, "Vectorized form of KernelSum2D not yet implemented.");
@@ -125,6 +128,7 @@ namespace casadi {
     null_test_ = getOption("null_test");
     num_work_items_ = getOption("num_work_items");
     reduction_ = getOption("reduction");
+    if (hasSetOption("lut_args")) lut_args_ = getOption("lut_args");
 
     context_ = 0;
     queue_   = 0;
@@ -712,6 +716,7 @@ namespace casadi {
     }
     code << "   __global float* sum_out," << endl;
     code << "   __global float* args," << endl;
+    code << "   __global float* im_luts," << endl;
     code << "   int i_offset," << endl;
     code << "   int j_offset," << endl;
     code << "   int idelta," << endl;
@@ -737,8 +742,10 @@ namespace casadi {
     code << "  arg[0] = p;arg[1]=&value;";
 
     int offset= 0;
+    std::vector<int> offsets(f_.nIn());
     for (int i=2;i<f_.nIn();++i) {
       code << "  arg[" << i << "] = args_local+" << offset << ";" << endl;
+      offsets[i] = offset;
       offset+= f_.inputSparsity(i).nnz();
     }
 
@@ -747,19 +754,23 @@ namespace casadi {
       code << "  res[" << i << "] = res_local+" << offset << ";"  << endl;
       offset+= f_.outputSparsity(i).nnz();
     }
-
     code << "  for (int k=0;k<" << f_.nnzOut() << ";++k) { sum[k]= 0; }" << endl;
     code << "  float sfrac = idelta*jdelta/" << num_threads_ << ".0;" << endl;
     code << "  int upper = (int) ceil((kk+1)*sfrac);" << endl;
     code << "  int lower = (int) ceil(kk*sfrac);" << endl;
     code << "  for (int k=lower;k<upper;++k) {" << endl;
+    code << "    int jg = j_offset + k / idelta;" << endl;
+    code << "    int ig = i_offset + k % idelta;" << endl;
+    code << "    p[1] = jg;" << endl;
+    code << "    p[0] = ig;" << endl;
+    for (int i=0;i<lut_args_.size();++i) {
+      code << "  args_local[" << offsets[lut_args_[i]] << "] = " << " im_luts[" << i*s_i_*s_j_ << "+k];" << endl;
+    }
     if (image_type_==16) {
       code << "    value = vload_half(k, im_in);" << endl;
     } else {
       code << "    value = im_in[k];" << endl;
     }
-    code << "    p[1] = j_offset + k / idelta;" << endl;
-    code << "    p[0] = i_offset + k % idelta;" << endl;
     code << "    F(arg, res, iw, w); " << endl;
     code << "    for (int kz=0;kz<" << f_.nnzOut() << ";++kz) { sum[kz]+= res_local[kz]; }" << endl;
     code << "  }" << endl;
@@ -840,10 +851,12 @@ namespace casadi {
     g.declarations << "static cl_mem d_im" << ind << "_ = 0;" << endl;
     g.declarations << "static cl_mem d_sum" << ind << "_ = 0;" << endl;
     g.declarations << "static cl_mem d_args" << ind << "_ = 0;" << endl;
+    g.declarations << "static cl_mem d_luts" << ind << "_ = 0;" << endl;
 
     g.cleanup << "clReleaseMemObject(d_im"  << ind << "_);" << endl;
     g.cleanup << "clReleaseMemObject(d_sum" << ind << "_);" << endl;
     g.cleanup << "clReleaseMemObject(d_args" << ind << "_);" << endl;
+    g.cleanup << "clReleaseMemObject(d_luts" << ind << "_);" << endl;
     g.cleanup << "clReleaseProgram(program" << ind << "_);" << endl;
     g.cleanup << "clReleaseKernel(kernel" << ind << "_);" << endl;
     if (!queue_) {
@@ -970,6 +983,8 @@ namespace casadi {
       g.setup << " sizeof(float)*" << s_i_*s_j_ << ", NULL, &err);" << endl;
     }
     g.setup << "    check_cl_error(err);" << endl;
+    g.setup << "    d_luts" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_READ_ONLY,";
+    g.setup << " sizeof(float)*" << s_i_*s_j_*lut_args_.size() << ", NULL, &err);" << endl;
     g.setup << "    d_sum" << ind << "_ = clCreateBuffer(context" << ind << "_, CL_MEM_WRITE_ONLY,";
     g.setup << " sizeof(float)*" << f_.nnzOut()*num_threads_ << ", NULL, &err);" << endl;
     g.setup << "    check_cl_error(err);" << endl;
@@ -981,6 +996,8 @@ namespace casadi {
     g.setup << " sizeof(cl_mem), &d_sum" << ind << "_);" << endl;
     g.setup << "    err  |= clSetKernelArg(kernel" << ind << "_, 2,";
     g.setup << " sizeof(cl_mem), &d_args" << ind << "_);" << endl;
+    g.setup << "    err  |= clSetKernelArg(kernel" << ind << "_, 3,";
+    g.setup << " sizeof(cl_mem), &d_luts" << ind << "_);" << endl;
 
     g.setup << "  }" << endl;
 
@@ -1042,10 +1059,12 @@ namespace casadi {
 
     g.body << "  int kk = 0;" << endl;
     for (int i=2;i<f_.nIn();++i) {
-      g.body << "  for (k=0;k<" << f_.inputSparsity(i).nnz() << ";++k) {" << endl;
-      g.body << "    h_args[kk] = arg[" << i-1 << "][k];" << endl;
-      g.body << "    kk++;" << endl;
-      g.body << "  }" << endl;
+      if (std::find(lut_args_.begin(), lut_args_.end(), i) == lut_args_.end()) {
+	    g.body << "  for (k=0;k<" << f_.inputSparsity(i).nnz() << ";++k) {" << endl;
+        g.body << "    h_args[kk] = arg[" << i-1 << "][k];" << endl;
+        g.body << "    kk++;" << endl;
+        g.body << "  }" << endl;
+	  }
     }
 
     g.body << "  int err;" << endl;
@@ -1066,6 +1085,7 @@ namespace casadi {
     g.body << "  int idelta = imax - imin;" << endl;
 
     g.body << "  if (idelta==0 || jdelta==0) return 0;" << endl;
+    
 
     if (pointer_input_ && image_type_<64) {
       if (image_type_==16) {
@@ -1084,6 +1104,15 @@ namespace casadi {
         g.body << " host_origin, buffer_origin, region, bs*";
         g.body << size_.first << ", 0, bs*idelta, 0, 0, NULL, NULL);" << endl;
         g.body << "  check_cl_error(err);" << endl;
+        for (int i=0;i<lut_args_.size();++i) {
+          g.body << "  buffer_origin[0] = bs*" << i*s_i_*s_j_ << ";" << endl;
+          g.body << "  cl_mem V" << i << " =  (cl_mem) *((uint64_t *) arg[" << lut_args_[i]-1 <<"]);" << endl;
+          g.body << "  err = clEnqueueCopyBufferRect(commands" << ind << "_,";
+          g.body << " V" << i << ", d_luts" << ind << "_, ";
+          g.body << " host_origin, buffer_origin, region, bs*";
+          g.body << size_.first << ", 0, bs*idelta, 0, 0, NULL, NULL);" << endl;
+          g.body << "  check_cl_error(err);" << endl;
+        }
       } else {
         g.body << "  err = clEnqueueWriteBufferRect(commands" << ind << "_,";
         g.body << " d_im" << ind << "_, CL_TRUE, ";
@@ -1106,16 +1135,17 @@ namespace casadi {
       g.body << " 0, sizeof(float)*idelta*jdelta, h_im, 0, NULL, NULL);" << endl;
       g.body << "  check_cl_error(err);" << endl;
     }
-    // Copy data from host to buffer
+
+	// Copy data from host to buffer
     g.body << "  err = clEnqueueWriteBuffer(commands" << ind << "_, d_args" << ind << "_, CL_TRUE,";
     g.body << " 0, sizeof(float)*" << arg_length_ << ", h_args, 0, NULL, NULL);" << endl;
     g.body << "  check_cl_error(err);" << endl;
-
-    // Set two integer kernel arguments
-    g.body << "  err  = clSetKernelArg(kernel" << ind << "_, 3, sizeof(int), &imin);" << endl;
-    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 4, sizeof(int), &jmin);" << endl;
-    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 5, sizeof(int), &idelta);" << endl;
-    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 6, sizeof(int), &jdelta);" << endl;
+    
+	// Set two integer kernel arguments
+    g.body << "  err  = clSetKernelArg(kernel" << ind << "_, 4, sizeof(int), &imin);" << endl;
+    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 5, sizeof(int), &jmin);" << endl;
+    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 6, sizeof(int), &idelta);" << endl;
+    g.body << "  err  |= clSetKernelArg(kernel" << ind << "_, 7, sizeof(int), &jdelta);" << endl;
     g.body << "  check_cl_error(err);" << endl;
 
     g.body << "  size_t num = " << num_threads_ << ";" << endl;

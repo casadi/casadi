@@ -273,13 +273,13 @@ namespace casadi {
     s << this->declarations.str() << std::endl;
 
     // Setup code
-    s << "int jit_setup() {" << std::endl;
+    s << "int CASADI_PREFIX(jit_setup)() {" << std::endl;
     s << this->setup.str();
     s << "  return 0;" << std::endl;
     s << "}" << std::endl;
 
     // Cleanup code
-    s << "int jit_cleanup() {" << std::endl;
+    s << "int CASADI_PREFIX(jit_cleanup)() {" << std::endl;
     s << this->cleanup.str();
     s << "  return 0;" << std::endl;
     s << "}" << std::endl;
