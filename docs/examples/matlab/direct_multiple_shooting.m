@@ -30,10 +30,10 @@ import casadi.*
 T = 10;
 
 % Declare model variables
-x1 = MX.sym('x1');
-x2 = MX.sym('x2');
+x1 = SX.sym('x1');
+x2 = SX.sym('x2');
 x = [x1; x2];
-u = MX.sym('u');
+u = SX.sym('u');
 
 % Model equations
 xdot = [(1-x2^2)*x1 - x2 + u; x1];
