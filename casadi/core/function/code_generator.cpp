@@ -43,23 +43,23 @@ namespace casadi {
     this->with_header = false;
 
     // Read options
-    for (Dict::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
-      if (it->first=="verbose") {
-        this->verbose = it->second;
-      } else if (it->first=="mex") {
-        this->mex = it->second;
-      } else if (it->first=="cpp") {
-        this->cpp = it->second;
-      } else if (it->first=="main") {
-        this->main = it->second;
-      } else if (it->first=="real_t") {
-        this->real_t = it->second.to_string();
-      } else if (it->first=="codegen_scalars") {
-        this->codegen_scalars = it->second;
-      } else if (it->first=="with_header") {
-        this->with_header = it->second;
+    for (auto&& e : opts) {
+      if (e.first=="verbose") {
+        this->verbose = e.second;
+      } else if (e.first=="mex") {
+        this->mex = e.second;
+      } else if (e.first=="cpp") {
+        this->cpp = e.second;
+      } else if (e.first=="main") {
+        this->main = e.second;
+      } else if (e.first=="real_t") {
+        this->real_t = e.second.to_string();
+      } else if (e.first=="codegen_scalars") {
+        this->codegen_scalars = e.second;
+      } else if (e.first=="with_header") {
+        this->with_header = e.second;
       } else {
-        casadi_error("Unrecongnized option: " << it->first);
+        casadi_error("Unrecongnized option: " << e.first);
       }
     }
 
@@ -855,4 +855,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-
