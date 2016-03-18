@@ -1746,7 +1746,7 @@ potentially done in a suboptimal way. If the code is very long and takes a long 
 it is an indication that some functions need to be broken up in smaller, but nested functions.
 \end{itemize}
 
-\section{Syntax for generating code}
+\section{Syntax for generating code} \label{sec:codegen_syntax}
 Generated C code can be as simple as calling the \texttt{generate} member function for a \texttt{Function} instance.
 
 \begin{minipage}[t]{0.5\textwidth}
@@ -1945,8 +1945,10 @@ print f(3.14)
 
 \subsection{Calling generated code from MATLAB}
 An alternative way of executing generated code is to compile the code into a
-MATLAB MEX function and call from MATLAB. The generated code will take the function
-name as the first argument, followed by the function inputs:
+MATLAB MEX function and call from MATLAB. This assumes that the \verb|mex| option
+was set to "true" during the code generation, cf. Section~\ref{sec:codegen_syntax}.
+The generated MEX function will take the function, name as the first argument,
+followed by the function inputs:
 
 \begin{lstlisting}[language=Matlab]
 % MATLAB
@@ -1963,6 +1965,30 @@ MEX completed successfully.
 \end{pytexoutput}
 
 Note that the result of the execution is always a MATLAB sparse matrix.
+
+\subsection{Calling generated code from the command line}
+\label{sec:codegen_commandline}
+
+Another option is to execute the generated code from the Linux/OSX command line.
+This is possible if the \verb|main| option was set to "true" during the code
+generation, cf. Section~\ref{sec:codegen_syntax}. This is useful if you e.g. want
+to profile the generated with a tool such as \texttt{gprof}.
+
+When executing the generated code, the function name is passed
+as a command line argument. The nonzero entries of all the inputs
+need to be passed via standard input and the function will return the output
+nonzeros for all the outputs via standard output:
+
+\begin{lstlisting}[language=sh]
+# Command line
+echo 3.14 3.14 > ff_in.txt
+gcc ff.c -o ff
+./ff f < ff_in.txt > ff_out.txt
+cat ff_out.txt
+\end{lstlisting}
+\begin{pytexoutput}
+print '0.00159265 0.00159265'
+\end{pytexoutput}
 
 \section{\CasADi's codegen C API} \label{sec:c_api}
 
