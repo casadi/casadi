@@ -1850,7 +1850,7 @@ opts = dict(main=True, \
 f.generate('ff.c',opts)
 \end{pytexoutput}
 
-This enables executing the function from the command line and MATLAB/Octave, respectively,
+This enables executing the function from the command line and MATLAB, respectively,
 as described in Section~\ref{sec:using_codegen} below.
 
 If you plan to link directly against the generated code in some C/C++ application,
@@ -1865,7 +1865,7 @@ The generated C code can be used in a number of different ways:
   from which a \texttt{Function} instance can be created using \CasADi's
   \texttt{external} function. Optionally, the user can rely on \CasADi to
   carry out the compilation \emph{just-in-time}.
-  \item The generated code can be compiled into MEX function and executed from MATLAB or Octave.
+  \item The generated code can be compiled into MEX function and executed from MATLAB.
   \item The generated code can be executed from the command line.
   \item The user can link, statically or dynamically, the generated code to his
   or her C/C++ application, accessing the C API of the generated code.
@@ -1942,6 +1942,27 @@ C = Compiler('ff.c','clang')
 f = external('f',C);
 print f(3.14)
 \end{pytexoutput}
+
+\subsection{Calling generated code from MATLAB}
+An alternative way of executing generated code is to compile the code into a
+MATLAB MEX function and call from MATLAB. The generated code will take the function
+name as the first argument, followed by the function inputs:
+
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+mex ff.c -largeArrayDims
+disp(ff('f', 3.14))
+\end{lstlisting}
+\begin{pytexoutput}
+print '''
+Building with 'Xcode with Clang'.
+MEX completed successfully.
+   (1,1)       0.0016
+   (2,1)       0.0016
+'''
+\end{pytexoutput}
+
+Note that the result of the execution is always a MATLAB sparse matrix.
 
 \section{\CasADi's codegen C API} \label{sec:c_api}
 
