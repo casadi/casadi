@@ -211,7 +211,7 @@ namespace casadi {
       compiler_ = Compiler("jit_tmp.c", compilerplugin_, jit_options_);
       evalD_ = (evalPtr)compiler_.getFunction("jit_tmp");
       casadi_assert_message(evalD_!=0, "Cannot load JIT'ed function.");
-      setupPtr setup = (setupPtr) compiler_.getFunction("jit_setup");
+      setupPtr setup = (setupPtr) compiler_.getFunction("jit_tmp_jit_setup");
       casadi_assert_message(setup!=0, "Cannot load setup function.");
       setup();
     }
