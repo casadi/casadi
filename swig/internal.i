@@ -1,3 +1,12 @@
+%exception  casadi::FStats::reset() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FStats::tic() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FStats::toc() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::checkInputs() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -199,15 +208,6 @@
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::diffTimers(const Timer t1, const Timer t0) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::diffToDict(const DiffTime &diff) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::getTimerTime(void) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::is_regular(N_Vector v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -229,10 +229,10 @@
 %exception  casadi::replaceMat(const M &arg, const Sparsity &inp, bool hcat=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::timerPlusEq(DiffTime &t, const DiffTime diff) {
+%exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::zip(const std::vector< std::string > &id, const std::vector< T > &mat) {
+%exception casadi::FStats::FStats() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Matrix< Scalar >::Matrix(const Sparsity &sp, const Scalar &val, bool dummy) {

@@ -1823,6 +1823,31 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1FixedStepIntegrator.xml
 
 
+// File: classcasadi_1_1FStats.xml
+%feature("docstring") casadi::FStats::tic "[INTERNAL]  Start timing.
+
+";
+
+%feature("docstring") casadi::FStats::reset "[INTERNAL]  Reset the
+statistics.
+
+";
+
+%feature("docstring") casadi::FStats::FStats "[INTERNAL]  Constructor.
+
+";
+
+%feature("docstring") casadi::FStats "[INTERNAL]  Timer class
+
+FStats hack; hack.tic(); .... hack.toc();
+
+C++ includes: timing.hpp ";
+
+%feature("docstring") casadi::FStats::toc "[INTERNAL]  Stop timing.
+
+";
+
+
 // File: classcasadi_1_1Function.xml
 %feature("docstring") casadi::Function::repr "
 
@@ -7634,8 +7659,6 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring") casadi::timerPlusEq "[INTERNAL] ";
-
 %feature("docstring") casadi::load_linsol "
 
 Explicitly load a plugin dynamically.
@@ -8543,17 +8566,6 @@ Get the documentation string for a plugin.
 ";
 
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
-
-%feature("docstring") casadi::getTimerTime "[INTERNAL]  Returns the real
-time, in seconds, or -1.0 if an error occurred.
-
-Time is measured since an arbitrary and OS-dependent start time. The
-returned real time is only useful for computing an elapsed time between two
-calls to this function.
-
-David Robert Nadeau (http://NadeauSoftware.com/)
-
-";
 
 %feature("docstring") casadi::read_matlab "
 
@@ -9869,8 +9881,6 @@ Get typename.
 
 ";
 
-%feature("docstring") casadi::diffTimers "[INTERNAL] ";
-
 %feature("docstring") casadi::is_slice "
 
 >  bool is_slice(IM x, bool ind1=false)
@@ -9921,8 +9931,6 @@ void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 Explicitly load a plugin dynamically.
 
 ";
-
-%feature("docstring") casadi::diffToDict "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_trans "[INTERNAL]  TRANS: y <-
 trans(x)
@@ -10356,6 +10364,11 @@ General information
 | output_scheme   | OT_STRINGVECTOR | Custom output   | casadi::Functio |
 |                 |                 | scheme          | nInternal       |
 +-----------------+-----------------+-----------------+-----------------+
+| print_time      | OT_BOOL         | print           | casadi::Nlpsol  |
+|                 |                 | information     |                 |
+|                 |                 | about execution |                 |
+|                 |                 | time            |                 |
++-----------------+-----------------+-----------------+-----------------+
 | regularity_chec | OT_BOOL         | Throw           | casadi::Functio |
 | k               |                 | exceptions when | nInternal       |
 |                 |                 | NaN or Inf      |                 |
@@ -10568,9 +10581,6 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 | es                     |                        | entering nonlinearly   |
 |                        |                        | to IPOPT               |
 +------------------------+------------------------+------------------------+
-| print_time             | OT_BOOL                | print information      |
-|                        |                        | about execution time   |
-+------------------------+------------------------+------------------------+
 | var_integer_md         | OT_DICT                | Integer metadata (a    |
 |                        |                        | dictionary with lists  |
 |                        |                        | of integers) about     |
@@ -10649,13 +10659,11 @@ WORHP interface
 
 >List of available options
 
-+------------+---------+----------------------------------------+
-|     Id     |  Type   |              Description               |
-+============+=========+========================================+
-| print_time | OT_BOOL | Print information about execution time |
-+------------+---------+----------------------------------------+
-| worhp      | OT_DICT | Options to be passed to WORHP          |
-+------------+---------+----------------------------------------+
++-------+---------+-------------------------------+
+|  Id   |  Type   |          Description          |
++=======+=========+===============================+
+| worhp | OT_DICT | Options to be passed to WORHP |
++-------+---------+-------------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -10709,9 +10717,6 @@ sequential convex programming) method for nonlinear programming.
 +------------------------+------------------------+------------------------+
 | print_header           | OT_BOOL                | Print the header with  |
 |                        |                        | problem statistics     |
-+------------------------+------------------------+------------------------+
-| print_time             | OT_BOOL                | Print information      |
-|                        |                        | about execution time   |
 +------------------------+------------------------+------------------------+
 | print_x                | OT_INTVECTOR           | Which variables to     |
 |                        |                        | print.                 |
@@ -10789,9 +10794,6 @@ A textbook SQPMethod
 +------------------------+------------------------+------------------------+
 | print_header           | OT_BOOL                | Print the header with  |
 |                        |                        | problem statistics     |
-+------------------------+------------------------+------------------------+
-| print_time             | OT_BOOL                | Print information      |
-|                        |                        | about execution time   |
 +------------------------+------------------------+------------------------+
 | qpsol                  | OT_STRING              | The QP solver to be    |
 |                        |                        | used by the SQP method |
