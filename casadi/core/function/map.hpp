@@ -94,6 +94,9 @@ namespace casadi {
 
     // Number of times to evaluate this function
     int n_;
+
+    // Number of threads
+    int n_threads_;
   };
 
   /** A map Map for evaluating a function serially

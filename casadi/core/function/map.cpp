@@ -84,7 +84,12 @@ namespace casadi {
   = {{&FunctionInternal::options_},
      {{"parallelization",
        {OT_STRING,
-        "Computational strategy for parallelization"}},
+        "Computational strategy for parallelization: serial|openmp"}},
+      {"n_threads",
+       {OT_INT,
+        "Control the number of threads when executing in parallel. "
+        "The default setting (0) will pass the decision on to the parallelization library. "
+        "For openmp, this means that OMP_NUM_THREADS env. variable is observed."}},
       {"reduced_inputs",
        {OT_INTVECTOR,
         "Reduction for certain inputs"}},
@@ -218,6 +223,14 @@ namespace casadi {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
 
+    // Read the 'n_threads' option and do a sanity check
+    if (opts.find("n_threads")!=opts.end()) {
+      n_threads_ = opts.find("n_threads")->second;
+    } else {
+      n_threads_ = 0;
+    }
+    casadi_assert_message(n_threads_>=0, "'n_threads' option must be a positive integer.");
+
   }
 
   void MapReduce::init(const Dict& opts) {
@@ -350,19 +363,36 @@ namespace casadi {
       int n_in_ = f_.n_in(), n_out_ = f_.n_out();
       size_t sz_arg, sz_res, sz_iw, sz_w;
       f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+      if (n_threads_==0) {
 #pragma omp parallel for
-      for (int i=0; i<n_; ++i) {
-        const double** arg_i = arg + n_in_ + sz_arg*i;
-        for (int j=0; j<n_in_; ++j) {
-          arg_i[j] = arg[j]+i*step_in_[j];
+        for (int i=0; i<n_; ++i) {
+          const double** arg_i = arg + n_in_ + sz_arg*i;
+          for (int j=0; j<n_in_; ++j) {
+            arg_i[j] = arg[j]+i*step_in_[j];
+          }
+          double** res_i = res + n_out_ + sz_res*i;
+          for (int j=0; j<n_out_; ++j) {
+            res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+          }
+          int* iw_i = iw + i*sz_iw;
+          double* w_i = w + i*sz_w;
+          f_->eval(0, arg_i, res_i, iw_i, w_i);
         }
-        double** res_i = res + n_out_ + sz_res*i;
-        for (int j=0; j<n_out_; ++j) {
-          res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+      } else {
+#pragma omp parallel for num_threads(n_threads_)
+        for (int i=0; i<n_; ++i) {
+          const double** arg_i = arg + n_in_ + sz_arg*i;
+          for (int j=0; j<n_in_; ++j) {
+            arg_i[j] = arg[j]+i*step_in_[j];
+          }
+          double** res_i = res + n_out_ + sz_res*i;
+          for (int j=0; j<n_out_; ++j) {
+            res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+          }
+          int* iw_i = iw + i*sz_iw;
+          double* w_i = w + i*sz_w;
+          f_->eval(0, arg_i, res_i, iw_i, w_i);
         }
-        int* iw_i = iw + i*sz_iw;
-        double* w_i = w + i*sz_w;
-        f_->eval(0, arg_i, res_i, iw_i, w_i);
       }
 #endif // WITH_OPENMP
     }
@@ -502,19 +532,37 @@ namespace casadi {
   void MapOmp::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+
+    if (n_threads_==0) {
 #pragma omp parallel for
-    for (int i=0; i<n_; ++i) {
-      const double** arg_i = arg + n_in_ + sz_arg*i;
-      for (int j=0; j<n_in_; ++j) {
-        arg_i[j] = arg[j]+i*f_.nnz_in(j);
+      for (int i=0; i<n_; ++i) {
+        const double** arg_i = arg + n_in_ + sz_arg*i;
+        for (int j=0; j<n_in_; ++j) {
+          arg_i[j] = arg[j]+i*f_.nnz_in(j);
+        }
+        double** res_i = res + n_out_ + sz_res*i;
+        for (int j=0; j<n_out_; ++j) {
+          res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
+        }
+        int* iw_i = iw + i*sz_iw;
+        double* w_i = w + i*sz_w;
+        f_->eval(0, arg_i, res_i, iw_i, w_i);
       }
-      double** res_i = res + n_out_ + sz_res*i;
-      for (int j=0; j<n_out_; ++j) {
-        res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
+    } else {
+#pragma omp parallel for num_threads(n_threads_)
+      for (int i=0; i<n_; ++i) {
+        const double** arg_i = arg + n_in_ + sz_arg*i;
+        for (int j=0; j<n_in_; ++j) {
+          arg_i[j] = arg[j]+i*f_.nnz_in(j);
+        }
+        double** res_i = res + n_out_ + sz_res*i;
+        for (int j=0; j<n_out_; ++j) {
+          res_i[j] = res[j]? res[j]+i*f_.nnz_out(j) : 0;
+        }
+        int* iw_i = iw + i*sz_iw;
+        double* w_i = w + i*sz_w;
+        f_->eval(0, arg_i, res_i, iw_i, w_i);
       }
-      int* iw_i = iw + i*sz_iw;
-      double* w_i = w + i*sz_w;
-      f_->eval(0, arg_i, res_i, iw_i, w_i);
     }
   }
 
@@ -527,7 +575,11 @@ namespace casadi {
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
     g.body << "  int i;" << endl;
-    g.body << "#pragma omp parallel for" << endl;
+    if (n_threads_==0) {
+      g.body << "#pragma omp parallel for" << endl;
+    } else {
+      g.body << "#pragma omp parallel for num_threads(" << n_threads_ << ")" << endl;
+    }
     g.body << "  for (i=0; i<" << n_ << "; ++i) {" << endl;
     g.body << "    const double** arg_i = arg + " << n_in_ << "+" << sz_arg << "*i;" << endl;
     for (int j=0; j<n_in_; ++j) {
