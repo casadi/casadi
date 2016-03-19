@@ -104,10 +104,7 @@ namespace casadi {
         "Print the header with problem statistics"}},
       {"min_step_size",
        {OT_DOUBLE,
-        "The size (inf-norm) of the step size should not become smaller than this."}},
-      {"print_time",
-       {OT_BOOL,
-        "Print information about execution time"}}
+        "The size (inf-norm) of the step size should not become smaller than this."}}
      }
   };
 
@@ -130,7 +127,6 @@ namespace casadi {
     string qpsol_plugin;
     Dict qpsol_options;
     print_header_ = true;
-    print_time_ = true;
 
     // Read user options
     for (auto&& op : opts) {
@@ -160,8 +156,6 @@ namespace casadi {
         qpsol_options = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
-      } else if (op.first=="print_time") {
-        print_time_ = op.second;
       }
     }
 
@@ -334,19 +328,17 @@ namespace casadi {
     // Check the provided inputs
     checkInputs(mem);
 
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    m->fstats.at("mainloop").tic();
+
     // Set linearization point to initial guess
     casadi_copy(m->x0, nx_, m->xk);
 
     // Initialize Lagrange multipliers of the NLP
     casadi_copy(m->lam_g0, ng_, m->mu);
     casadi_copy(m->lam_x0, nx_, m->mu_x);
-
-    m->t_eval_f = m->t_eval_grad_f = m->t_eval_g = m->t_eval_jac_g = m->t_eval_h =
-      m->t_callback_fun = m->t_callback_prepare = m->t_mainloop = 0;
-
-    m->n_eval_f = m->n_eval_grad_f = m->n_eval_g = m->n_eval_jac_g = m->n_eval_h = 0;
-
-    double time1 = clock();
 
     // Initial constraint Jacobian
     eval_jac_g(m, m->xk, m->gk, m->Jk);
@@ -405,7 +397,7 @@ namespace casadi {
 
       // Call callback function if present
       if (!fcallback_.is_null()) {
-        double time1 = clock();
+        m->fstats.at("callback_prep").tic();
 
         // Callback inputs
         fill_n(m->arg, fcallback_.n_in(), nullptr);
@@ -420,11 +412,13 @@ namespace casadi {
         double ret;
         m->arg[0] = &ret;
 
+        m->fstats.at("callback_prep").toc();
+        m->fstats.at("callback_fun").tic();
         // Evaluate
         fcallback_(m->arg, m->res, m->iw, m->w, 0);
 
-        double time2 = clock();
-        m->t_callback_fun += (time2-time1)/CLOCKS_PER_SEC;
+        m->fstats.at("callback_fun").toc();
+
         if (static_cast<int>(ret)) {
           userOut() << endl;
           userOut() << "casadi::SQPMethod: aborted by callback..." << endl;
@@ -625,8 +619,7 @@ namespace casadi {
       }
     }
 
-    double time2 = clock();
-    m->t_mainloop = (time2-time1)/CLOCKS_PER_SEC;
+    m->fstats.at("mainloop").toc();
 
     // Save results to outputs
     if (m->f) *m->f = m->fk;
@@ -635,37 +628,8 @@ namespace casadi {
     if (m->lam_x) casadi_copy(m->mu_x, nx_, m->lam_x);
     if (m->g) casadi_copy(m->gk, ng_, m->g);
 
-    if (print_time_) {
-      // Write timings
-      userOut() << "time spent in eval_f: " << m->t_eval_f << " s.";
-      if (m->n_eval_f>0)
-        userOut() << " (" << m->n_eval_f << " calls, " << (m->t_eval_f/m->n_eval_f)*1000
-                  << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in eval_grad_f: " << m->t_eval_grad_f << " s.";
-      if (m->n_eval_grad_f>0)
-        userOut() << " (" << m->n_eval_grad_f << " calls, "
-             << (m->t_eval_grad_f/m->n_eval_grad_f)*1000 << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in eval_g: " << m->t_eval_g << " s.";
-      if (m->n_eval_g>0)
-        userOut() << " (" << m->n_eval_g << " calls, " << (m->t_eval_g/m->n_eval_g)*1000
-                  << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in eval_jac_g: " << m->t_eval_jac_g << " s.";
-      if (m->n_eval_jac_g>0)
-        userOut() << " (" << m->n_eval_jac_g << " calls, "
-             << (m->t_eval_jac_g/m->n_eval_jac_g)*1000 << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in eval_h: " << m->t_eval_h << " s.";
-      if (m->n_eval_h>1)
-        userOut() << " (" << m->n_eval_h << " calls, " << (m->t_eval_h/m->n_eval_h)*1000
-                  << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in main loop: " << m->t_mainloop << " s." << endl;
-      userOut() << "time spent in callback function: " << m->t_callback_fun << " s." << endl;
-      userOut() << "time spent in callback preparation: " << m->t_callback_prepare << " s." << endl;
-    }
+    // Show statistics
+    if (print_time_)  print_fstats(m);
   }
 
   void Sqpmethod::printIteration(std::ostream &stream) const {
@@ -764,17 +728,12 @@ namespace casadi {
 
   void Sqpmethod::eval_g(SqpmethodMemory* m, const double* x, double* g) const {
     try {
-      double time1 = clock();
-
       // Quick return if no constraints
       if (ng_==0) return;
 
       // Evaluate the function
       calc_function(m, g_fcn_, {x, m->p}, {g});
 
-      double time2 = clock();
-      m->t_eval_g += (time2-time1)/CLOCKS_PER_SEC;
-      m->n_eval_g += 1;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
       throw;
@@ -783,17 +742,12 @@ namespace casadi {
 
   void Sqpmethod::eval_jac_g(SqpmethodMemory* m, const double* x, double* g, double* J) const {
     try {
-      double time1 = clock();
 
       // Quich finish if no constraints
       if (ng_==0) return;
 
       // Evaluate the function
       calc_function(m, jac_g_fcn_, {x, m->p}, {g, J});
-
-      double time2 = clock();
-      m->t_eval_jac_g += (time2-time1)/CLOCKS_PER_SEC;
-      m->n_eval_jac_g += 1;
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
@@ -804,14 +758,9 @@ namespace casadi {
   void Sqpmethod::eval_grad_f(SqpmethodMemory* m, const double* x,
                               double* f, double* grad_f) const {
     try {
-      double time1 = clock();
 
       // Evaluate the function
       calc_function(m, grad_f_fcn_, {x, m->p}, {f, grad_f});
-
-      double time2 = clock();
-      m->t_eval_grad_f += (time2-time1)/CLOCKS_PER_SEC;
-      m->n_eval_grad_f += 1;
 
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
@@ -821,16 +770,9 @@ namespace casadi {
 
   double Sqpmethod::eval_f(SqpmethodMemory* m, const double* x) const {
     try {
-       // Log time
-      double time1 = clock();
-
       // Evaluate the function
       double f;
       calc_function(m, f_fcn_, {x, m->p}, {&f});
-
-      double time2 = clock();
-      m->t_eval_f += (time2-time1)/CLOCKS_PER_SEC;
-      m->n_eval_f += 1;
 
       return f;
     } catch(exception& ex) {

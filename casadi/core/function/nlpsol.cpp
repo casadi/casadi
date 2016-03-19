@@ -25,7 +25,9 @@
 
 #include "nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
-#include <chrono>
+
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 namespace casadi {
@@ -154,6 +156,7 @@ namespace casadi {
     eval_errors_fatal_ = false;
     warn_initial_bounds_ = false;
     iteration_callback_ignore_errors_ = false;
+    print_time_ = true;
   }
 
   Nlpsol::~Nlpsol() {
@@ -221,6 +224,9 @@ namespace casadi {
        {OT_BOOL,
         "When errors occur during evaluation of f,g,...,"
         "stop the iterations"}},
+      {"print_time",
+         {OT_BOOL,
+          "print information about execution time"}},
       {"verbose_init",
        {OT_BOOL,
         "Print out timing information about "
@@ -249,6 +255,8 @@ namespace casadi {
         warn_initial_bounds_ = op.second;
       } else if (op.first=="iteration_callback_ignore_errors") {
         iteration_callback_ignore_errors_ = op.second;
+      } else if (op.first=="print_time") {
+        print_time_ = op.second;
       }
     }
 
@@ -289,8 +297,12 @@ namespace casadi {
 
     // Create statistics
     for (const Function& f : all_functions_) {
-      m->fstats[f.name()] = NlpsolMemory::FStats();
+      m->fstats[f.name()] = FStats();
     }
+
+    m->fstats["mainloop"] = FStats();
+    m->fstats["callback_fun"] = FStats();
+    m->fstats["callback_prep"] = FStats();
   }
 
   void Nlpsol::checkInputs(void* mem) const {
@@ -391,6 +403,163 @@ namespace casadi {
     m->w = w;
   }
 
+  // Convert a float to a string of an exact length.
+  // First it tries fixed precision, then falls back to exponential notation.
+  //
+  // todo(jaeandersson,jgillis): needs either review or unit tests
+  // because it throws exceptions if it fail.
+  std::string formatFloat(double x, int totalWidth, int maxPrecision, int fallbackPrecision) {
+    std::ostringstream out0;
+    out0 << fixed << setw(totalWidth) << setprecision(maxPrecision) << x;
+    std::string ret0 = out0.str();
+    if (ret0.length() == totalWidth) {
+      return ret0;
+    } else if (ret0.length() > totalWidth) {
+      std::ostringstream out1;
+      out1 << setw(totalWidth) << setprecision(fallbackPrecision) << x;
+      std::string ret1 = out1.str();
+      if (ret1.length() != totalWidth)
+        casadi_error(
+          "ipopt timing formatting fallback is bugged, sorry about that."
+          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
+          << ", string: \"" << ret1 << "\", number: " << x);
+      return ret1;
+    } else {
+      casadi_error("ipopt timing formatting is bugged, sorry about that.");
+    }
+  }
+
+  void print_stats_line(int maxNameLen, std::string label,
+      double n_call, double t_proc, double t_wall) {
+    // Skip when not called
+    if (n_call == 0) return;
+
+    std::stringstream s;
+
+    s
+      << setw(maxNameLen) << label << " "
+      << formatFloat(t_proc, 9, 3, 3) << " [s]  "
+      << formatFloat(t_wall, 9, 3, 3) << " [s]";
+    if (n_call == -1) {
+      // things like main loop don't have # evals
+      s << endl;
+    } else {
+      s
+        << " "
+        << setw(5) << n_call;
+      if (n_call < 2) {
+        s << endl;
+      } else {
+        // only print averages if there is more than 1 eval
+        s
+          << " "
+          << formatFloat(1000.0*t_proc/n_call, 10, 2, 3) << " [ms]  "
+          << formatFloat(1000.0*t_wall/n_call, 10, 2, 3) << " [ms]"
+          << endl;
+      }
+    }
+    userOut() << s.str();
+  }
+
+  void Nlpsol::print_fstats(const NlpsolMemory* m) const {
+
+    size_t maxNameLen=0;
+
+    // Retrieve all nlp keys
+    std::vector<std::string> keys;
+    std::vector<std::string> keys_other;
+    for (auto &&s : m->fstats) {
+      maxNameLen = max(s.first.size(), maxNameLen);
+      if (s.first.find("nlp")!=std::string::npos) {
+        keys.push_back(s.first);
+      } else if (s.first.find("mainloop")==std::string::npos) {
+        keys_other.push_back(s.first);
+      } else {
+        continue;
+      }
+    }
+
+    maxNameLen = max(std::string("all previous").size(), maxNameLen);
+    maxNameLen = max(std::string("solver").size(), maxNameLen);
+
+    // Print header
+    std::stringstream s;
+    std::string blankName(maxNameLen, ' ');
+    s
+      << blankName
+      << "      proc           wall      num           mean             mean"
+      << endl << blankName
+      << "      time           time     evals       proc time        wall time";
+    userOut() << s.str() << endl;
+
+    // Sort the keys according to order
+    std::vector<std::string> keys_order0;
+    std::vector<std::string> keys_order1;
+    std::vector<std::string> keys_order2;
+    for (auto k : keys) {
+      if (k.find("hess")!=std::string::npos) {
+        keys_order2.push_back(k);
+        continue;
+      }
+      if (k.find("grad")!=std::string::npos ||
+          k.find("jac")!=std::string::npos) {
+        keys_order1.push_back(k);
+        continue;
+      }
+      keys_order0.push_back(k);
+    }
+
+    // Print all NLP stats
+    for (auto keys : {&keys_order0, &keys_order1, &keys_order2}) {
+        std::sort(keys->begin(), keys->end());
+        for (auto k : *keys) {
+          const FStats& fs = m->fstats.at(k);
+          print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+        }
+    }
+
+    // Sum the previously printed stats
+    double t_wall_all_previous = 0;
+    double t_proc_all_previous = 0;
+    for (auto k : keys) {
+      const FStats& fs = m->fstats.at(k);
+      t_proc_all_previous += fs.t_proc;
+      t_wall_all_previous += fs.t_wall;
+    }
+    print_stats_line(maxNameLen, "all previous", -1, t_proc_all_previous, t_wall_all_previous);
+
+    // Sort and show the remainder of keys
+    std::sort(keys_other.begin(), keys_other.end());
+    for (std::string k : keys_other) {
+      const FStats& fs = m->fstats.at(k);
+      print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+      t_proc_all_previous += fs.t_proc;
+      t_wall_all_previous += fs.t_wall;
+    }
+
+    // Show the mainloop stats
+    const FStats& fs_mainloop = m->fstats.at("mainloop");
+    if (fs_mainloop.n_call>0) {
+      print_stats_line(maxNameLen, "solver", -1,
+        fs_mainloop.t_proc-t_proc_all_previous, fs_mainloop.t_wall-t_wall_all_previous);
+      print_stats_line(maxNameLen, "mainloop", -1, fs_mainloop.t_proc, fs_mainloop.t_wall);
+    }
+
+  }
+
+  Dict Nlpsol::get_stats(void *mem) const {
+    auto m = static_cast<NlpsolMemory*>(mem);
+
+    // Add timing statistics
+    Dict stats;
+    for (auto&& s : m->fstats) {
+      stats["n_call_" +s.first] = s.second.n_call;
+      stats["t_wall_" +s.first] = s.second.t_wall;
+      stats["t_proc_" +s.first] = s.second.t_proc;
+    }
+    return stats;
+  }
+
   int Nlpsol::calc_function(NlpsolMemory* m, const Function& fcn,
                             std::initializer_list<const double*> arg,
                             std::initializer_list<double*> res) const {
@@ -398,7 +567,10 @@ namespace casadi {
     InterruptHandler::check();
 
     // Get statistics structure
-    NlpsolMemory::FStats& fstats = m->fstats.at(fcn.name());
+    FStats& fstats = m->fstats.at(fcn.name());
+
+    // Prepare stats, start timer
+    fstats.tic();
 
     // Number of inputs and outputs
     int n_in = fcn.n_in(), n_out = fcn.n_out();
@@ -415,10 +587,6 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) m->res[i] = *res_it++;
     casadi_assert(res_it==res.end());
 
-    // Prepare stats, start timer
-    fstats.n_calc += 1;
-    auto t_start = chrono::system_clock::now();
-
     // Evaluate memory-less
     try {
       fcn(m->arg, m->res, m->iw, m->w, 0);
@@ -428,9 +596,6 @@ namespace casadi {
         << name() << ":" << fcn.name() << " failed:" << ex.what() << endl;
       return 1;
     }
-
-    // Stop timer
-    auto t_stop = chrono::system_clock::now();
 
     // Make sure not NaN or Inf
     for (int i=0; i<n_out; ++i) {
@@ -444,8 +609,7 @@ namespace casadi {
     }
 
     // Update stats
-    fstats.n_calc += 1;
-    fstats.t_calc += chrono::duration<double>(t_stop - t_start).count();
+    fstats.toc();
 
     // Success
     return 0;

@@ -54,16 +54,6 @@ namespace casadi {
     // Current calculated quantities
     double fk, *gk, *jac_fk, *jac_gk;
 
-    // Accumulated time in last solve:
-    double t_eval_grad_f; // time spent in eval_grad_f
-    double t_eval_jac_g; // time spent in eval_jac_g
-    double t_callback_fun;  // time spent in callback function
-    double t_mainloop; // time spent in the main loop of the solver
-
-    // Accumulated counts in last solve:
-    int n_eval_grad_f; // number of calls to eval_grad_f
-    int n_eval_jac_g; // number of calls to eval_jac_g
-    int n_callback_fun; // number of calls to callback function
     int n_iter; // number of major iterations
 
     std::vector<double> A_data;

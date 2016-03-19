@@ -60,10 +60,7 @@ namespace casadi {
   = {{&Nlpsol::options_},
      {{"worhp",
        {OT_DICT,
-        "Options to be passed to WORHP"}},
-      {"print_time",
-       {OT_BOOL,
-        "Print information about execution time"}}
+        "Options to be passed to WORHP"}}
      }
   };
 
@@ -74,14 +71,11 @@ namespace casadi {
 
     // Default options
     Dict worhp_opts;
-    print_time_ = true;
 
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="worhp") {
         worhp_opts = op.second;
-      } else if (op.first=="print_time") {
-        print_time_ = op.second;
       }
     }
 
@@ -254,13 +248,11 @@ namespace casadi {
   void WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
     // Check the provided inputs
     checkInputs(mem);
-
-    // Reset the counters
-    m->t_eval_f = m->t_eval_grad_f = m->t_eval_g = m->t_eval_jac_g = m->t_eval_h =
-      m->t_callback_fun = m->t_callback_prepare = m->t_mainloop = 0;
-    m->n_eval_f = m->n_eval_grad_f = m->n_eval_g = m->n_eval_jac_g = m->n_eval_h = 0;
 
     double inf = numeric_limits<double>::infinity();
 
@@ -285,6 +277,8 @@ namespace casadi {
       }
     }
 
+    m->fstats.at("mainloop").tic();
+
     // Pass inputs to WORHP data structures
     casadi_copy(m->x0, nx_, m->worhp_o.X);
     casadi_copy(m->lbx, nx_, m->worhp_o.XL);
@@ -304,8 +298,6 @@ namespace casadi {
 
     log("WorhpInterface::starting iteration");
 
-    double time1 = clock();
-
     bool firstIteration = true;
 
     // Reverse Communication loop
@@ -321,13 +313,12 @@ namespace casadi {
           firstIteration = true;
 
           if (!fcallback_.is_null()) {
+            m->fstats.at("callback_prep").tic();
             m->iter = m->worhp_w.MajorIter;
             m->iter_sqp = m->worhp_w.MinorIter;
             m->inf_pr = m->worhp_w.NormMax_CV;
             m->inf_du = m->worhp_w.ScaledKKT;
             m->alpha_pr = m->worhp_w.ArmijoAlpha;
-
-            time1 = clock();
 
             // Inputs
             fill_n(m->arg, fcallback_.n_in(), nullptr);
@@ -343,9 +334,11 @@ namespace casadi {
             double ret_double;
             m->res[0] = &ret_double;
 
+            m->fstats.at("callback_prep").toc();
+            m->fstats.at("callback_fun").tic();
             // Evaluate the callback function
-            m->n_eval_callback += 1;
             fcallback_(m->arg, m->res, m->iw, m->w, 0);
+            m->fstats.at("callback_fun").toc();
             int ret = static_cast<int>(ret_double);
 
             if (ret) m->worhp_c.status = TerminatedByUser;
@@ -411,8 +404,7 @@ namespace casadi {
       }
     }
 
-    double time2 = clock();
-    m->t_mainloop += (time2-time1)/CLOCKS_PER_SEC;
+    m->fstats.at("mainloop").toc();
 
     // Copy outputs
     casadi_copy(m->worhp_o.X, nx_, m->x);
@@ -422,37 +414,8 @@ namespace casadi {
 
     StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
-    if (print_time_) {
-      // Write timings
-      userOut() << "time spent in eval_f: " << m->t_eval_f << " s.";
-      if (m->n_eval_f>0)
-        userOut() << " (" << m->n_eval_f << " calls, " <<
-          (m->t_eval_f/m->n_eval_f)*1000 << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in eval_grad_f: " << m->t_eval_grad_f << " s.";
-      if (m->n_eval_grad_f>0)
-        userOut() << " (" << m->n_eval_grad_f << " calls, "
-             << (m->t_eval_grad_f/m->n_eval_grad_f)*1000 << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in eval_g: " << m->t_eval_g << " s.";
-      if (m->n_eval_g>0)
-        userOut() << " (" << m->n_eval_g << " calls, " <<
-          (m->t_eval_g/m->n_eval_g)*1000 << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in eval_jac_g: " << m->t_eval_jac_g << " s.";
-      if (m->n_eval_jac_g>0)
-        userOut() << " (" << m->n_eval_jac_g << " calls, "
-                  << (m->t_eval_jac_g/m->n_eval_jac_g)*1000 << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in eval_h: " << m->t_eval_h << " s.";
-      if (m->n_eval_h>1)
-        userOut() << " (" << m->n_eval_h << " calls, " <<
-          (m->t_eval_h/m->n_eval_h)*1000 << " ms. average)";
-      userOut() << endl;
-      userOut() << "time spent in main loop: " << m->t_mainloop << " s." << endl;
-      userOut() << "time spent in callback function: " << m->t_callback_fun << " s." << endl;
-      userOut() << "time spent in callback preparation: " << m->t_callback_prepare << " s." << endl;
-    }
+    // Show statistics
+    if (print_time_)  print_fstats(m);
 
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);

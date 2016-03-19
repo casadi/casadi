@@ -206,6 +206,8 @@ class ImplicitFunctiontests(casadiTestCase):
     for Solver, options in solvers:
       if 'kinsol' in str(Solver): continue
       if 'newton' in str(Solver): continue
+      
+      print Solver, options
       x=SX.sym("x",2)
       f=Function("f", [x],[vertcat(*[mtimes((x+3).T,(x-2)),mtimes((x-4).T,(x+vertcat(*[1,2])))])])
       options2 = dict(options)

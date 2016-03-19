@@ -29,6 +29,8 @@
 #include "nlpsol.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
+#include "../timing.hpp"
+
 
 /// \cond INTERNAL
 namespace casadi {
@@ -42,17 +44,7 @@ namespace casadi {
     const double *x0, *p, *lbx, *ubx, *lbg, *ubg, *lam_x0, *lam_g0;
 
     // Function specific statistics
-    struct FStats {
-      // Accumulated counts since last reset:
-      int n_calc;
-
-      // Accumulated time since last reset:
-      double t_calc;
-    };
     std::map<std::string, FStats> fstats;
-
-    // number of calls to callback
-    int n_eval_callback;
 
     // number of iterations
     int n_iter;
@@ -90,6 +82,9 @@ namespace casadi {
 
     // Ignore errors in the iteration callbacks
     bool iteration_callback_ignore_errors_;
+
+    // Print timing statistics
+    bool print_time_;
 
     // All NLP functions
     std::vector<Function> all_functions_;
@@ -185,6 +180,12 @@ namespace casadi {
     int calc_function(NlpsolMemory* m, const Function& fcn,
                       std::initializer_list<const double*> arg,
                       std::initializer_list<double*> res) const;
+
+   /// Print statistics
+   void print_fstats(const NlpsolMemory* m) const;
+
+   /// Get all statistics
+   virtual Dict get_stats(void* mem) const;
 
     /** \brief Export / Generate C code for the dependency function */
     virtual void generate_dependencies(const std::string& fname, const Dict& opts);

@@ -28,36 +28,58 @@
 
 #include "generic_type.hpp"
 
+#include <ctime>
+#include <chrono>
+
 namespace casadi {
   /// \cond INTERNAL
 
-  struct Timer {
-    double user;
-    double real;
-  };
-
-  struct DiffTime {
-    double user;
-    double real;
-  };
-
   /**
-   * Returns the real time, in seconds, or -1.0 if an error occurred.
-   *
-   * Time is measured since an arbitrary and OS-dependent start time.
-   * The returned real time is only useful for computing an elapsed time
-   * between two calls to this function.
-   * 
-   * \author David Robert Nadeau (http://NadeauSoftware.com/)
-   */
-  CASADI_EXPORT Timer getTimerTime(void);
-  // ret = t1 - t0
-  CASADI_EXPORT DiffTime diffTimers(const Timer t1, const Timer t0);
-  // t += diff
-  CASADI_EXPORT void timerPlusEq(DiffTime & t, const DiffTime diff);
+  Timer class
 
-  CASADI_EXPORT Dict diffToDict(const DiffTime& diff);
 
+  FStats hack;
+  hack.tic();
+  ....
+  hack.toc();
+
+  */
+  class CASADI_EXPORT FStats {
+    private:
+      /// Time point used for wall time computation
+      std::chrono::time_point<std::chrono::high_resolution_clock> start_wall;
+
+      /// Time point used for proc time computation
+      std::clock_t start_proc;
+
+      /// Time point used for wall time computation
+      std::chrono::time_point<std::chrono::high_resolution_clock> stop_wall;
+
+      /// Time point used for proc time computation
+      std::clock_t stop_proc;
+
+    public:
+      /// Constructor
+      FStats();
+
+      /// Reset the statistics
+      void reset();
+
+      /// Start timing
+      void tic();
+
+      /// Stop timing
+      void toc();
+
+      /// Accumulated number of calls since last reset
+      int n_call;
+
+      /// Accumulated wall time [s] since last reset
+      double t_wall;
+
+      /// Accumulated proc time [s] since last reset
+      double t_proc;
+  };
 /// \endcond
 } // namespace casadi
 

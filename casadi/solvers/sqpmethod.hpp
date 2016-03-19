@@ -83,22 +83,6 @@ namespace casadi {
     /// Last return status
     const char* return_status;
 
-    // Accumulated time since last reset:
-    double t_eval_f; // time spent in eval_f
-    double t_eval_grad_f; // time spent in eval_grad_f
-    double t_eval_g; // time spent in eval_g
-    double t_eval_jac_g; // time spent in eval_jac_g
-    double t_eval_h; // time spent in eval_h
-    double t_callback_fun;  // time spent in callback function
-    double t_callback_prepare; // time spent in callback preparation
-    double t_mainloop; // time spent in the main loop of the solver
-
-    // Accumulated counts since last reset:
-    int n_eval_f; // number of calls to eval_f
-    int n_eval_grad_f; // number of calls to eval_grad_f
-    int n_eval_g; // number of calls to eval_g
-    int n_eval_jac_g; // number of calls to eval_jac_g
-    int n_eval_h; // number of calls to eval_h
   };
 
   /** \brief  \pluginbrief{Nlpsol,sqpmethod}
@@ -176,7 +160,6 @@ namespace casadi {
 
     // Print options
     bool print_header_;
-    bool print_time_;
 
     /// BFGS update function
     enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};

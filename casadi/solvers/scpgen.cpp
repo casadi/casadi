@@ -122,10 +122,7 @@ namespace casadi {
         "Names of the variables."}},
       {"print_x",
        {OT_INTVECTOR,
-        "Which variables to print."}},
-      {"print_time",
-       {OT_BOOL,
-        "Print information about execution time"}}
+        "Which variables to print."}}
      }
   };
 
@@ -145,7 +142,6 @@ namespace casadi {
     regularize_ = false;
     codegen_ = false;
     reg_threshold_ = 1e-8;
-    print_time_ = true;
     tol_pr_step_ = 1e-6;
     merit_memsize_ = 4;
     merit_start_ = 1e-8;
@@ -178,8 +174,6 @@ namespace casadi {
         codegen_ = op.second;
       } else if (op.first=="reg_threshold") {
         reg_threshold_ = op.second;
-      } else if (op.first=="print_time") {
-        print_time_ = op.second;
       } else if (op.first=="tol_pr_step") {
         tol_pr_step_ = op.second;
       } else if (op.first=="merit_memsize") {
@@ -788,6 +782,9 @@ namespace casadi {
 
   void Scpgen::solve(void* mem) const {
     auto m = static_cast<ScpgenMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
 
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function

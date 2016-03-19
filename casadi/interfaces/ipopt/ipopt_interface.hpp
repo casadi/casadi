@@ -72,11 +72,6 @@ namespace casadi {
     void* userclass;
     void* app;
 
-    // Timings for different parts of the main loop
-    DiffTime t_callback_fun;  // time spent in callback function
-    DiffTime t_callback_prepare; // time spent in callback preparation
-    DiffTime t_mainloop; // time spent in the main loop of the solver
-
     // Current solution
     double *xk, lam_fk, *lam_gk, *lam_xk;
 

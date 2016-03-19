@@ -68,9 +68,6 @@ namespace casadi {
      {{"pass_nonlinear_variables",
        {OT_BOOL,
         "Pass list of variables entering nonlinearly to IPOPT"}},
-      {"print_time",
-       {OT_BOOL,
-        "print information about execution time"}},
       {"ipopt",
        {OT_DICT,
         "Options to be passed to IPOPT"}},
@@ -377,17 +374,7 @@ namespace casadi {
     m->n_iter = 0;
 
     // Statistics
-    for (auto&& s : m->fstats) {
-      // Reset function timers
-      s.second.t_calc = 0;
-
-      // Reset function counters
-      s.second.n_calc = 0;
-    }
-
-    // Legacy
-    m->t_callback_fun = m->t_callback_prepare = m->t_mainloop = {0, 0};
-    m->n_eval_callback = 0;
+    for (auto&& s : m->fstats) s.second.reset();
 
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass =
@@ -395,11 +382,12 @@ namespace casadi {
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app =
       static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(m->app);
 
-    Timer time0 = getTimerTime();
+    m->fstats.at("mainloop").tic();
+
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
     m->return_status = return_status_string(status);
-    m->t_mainloop = diffTimers(getTimerTime(), time0);
+    m->fstats.at("mainloop").toc();
 
     // Save results to outputs
     casadi_copy(&m->fk, 1, m->f);
@@ -407,6 +395,9 @@ namespace casadi {
     casadi_copy(m->lam_gk, ng_, m->lam_g);
     casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
+
+    // Show statistics
+    if (print_time_)  print_fstats(m);
   }
 
   bool IpoptInterface::
@@ -429,8 +420,8 @@ namespace casadi {
         m->ls_trials.push_back(ls_trials);
         m->obj.push_back(obj_value);
       }
-      Timer time0 = getTimerTime();
       if (!fcallback_.is_null()) {
+        m->fstats.at("callback_fun").tic();
         if (full_callback) {
           casadi_copy(x, nx_, m->xk);
           for (int i=0; i<nx_; ++i) {
@@ -466,13 +457,10 @@ namespace casadi {
         double ret_double;
         m->res[0] = &ret_double;
 
-        // Evaluate the callback function
-        m->n_eval_callback += 1;
         fcallback_(m->arg, m->res, m->iw, m->w, 0);
         int ret = static_cast<int>(ret_double);
 
-        DiffTime delta = diffTimers(getTimerTime(), time0);
-        timerPlusEq(m->t_callback_fun, delta);
+        m->fstats.at("callback_fun").toc();
         return  !ret;
       } else {
         return 1;

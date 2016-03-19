@@ -158,9 +158,6 @@ namespace casadi {
     // Allocate data structures needed in evaluate
     m->A_data.resize(A_structure_.nnz());
 
-    // Reset the counters
-    m->t_eval_grad_f = m->t_eval_jac_g = m->t_callback_fun = m->t_mainloop = 0;
-    m->n_eval_grad_f = m->n_eval_jac_g = m->n_callback_fun = m->n_iter = 0;
   }
 
   std::string SnoptInterface::formatStatus(int status) const {
@@ -196,6 +193,8 @@ namespace casadi {
 
     // Check the provided inputs
     checkInputs(mem);
+
+    m->fstats.at("mainloop").tic();
 
     // Memory object
     snProblem prob;
@@ -312,6 +311,8 @@ namespace casadi {
       casadi_error("SNOPT error setting option \"" + opname + "\"");
     }
 
+    m->fstats.at("mainloop").toc();
+
     // Run SNOPT
     int Cold = 0;
     int info = solveC(&prob, Cold, &m->fk);
@@ -333,6 +334,9 @@ namespace casadi {
     // Copy optimal constraint values to output
     casadi_copy(m->gk, ng_, m->g);
 
+    // Show statistics
+    if (print_time_)  print_fstats(m);
+
     // Free memory
     deleteSNOPT(&prob);
   }
@@ -343,7 +347,6 @@ namespace casadi {
           int nState, char* cu, int lencu, int* iu, int leniu, double* ru,
           int lenru) const {
     try {
-      double time0 = clock();
 
       casadi_assert_message(nnCon_ == nnCon, "Con " << nnCon_ << " <-> " << nnCon);
       casadi_assert_message(nnObj_ == nnObj, "Obj " << nnObj_ << " <-> " << nnObj);
@@ -369,11 +372,6 @@ namespace casadi {
       jac_f_fcn_.sparsity_out(1).sanity_check(true);
       jac_f_fcn_.sparsity_out(1).sanity_check(false);
 
-      // timing and counters
-      m->t_eval_grad_f += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
-      m->n_eval_grad_f += 1;
-
-      time0 = clock();
       if (!jac_g_fcn_.is_null()) {
         // Get reduced decision variables
         casadi_fill(m->xk2, nx_, 0.);
@@ -408,10 +406,6 @@ namespace casadi {
         for (int k = 0; k < nnCon; ++k) {
           fCon[k] = m->gk[k];
         }
-
-        // timing and counters
-        m->t_eval_jac_g += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
-        m->n_eval_jac_g += 1;
       }
 
     } catch(std::exception& ex) {

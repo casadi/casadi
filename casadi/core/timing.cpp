@@ -24,53 +24,35 @@
 
 
 #include "timing.hpp"
-#include <ctime>
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#include <sys/time.h>
-#endif
 
 namespace casadi {
-  Timer getTimerTime() {
-    Timer ret;
-    ret.user = clock();
-#ifdef _WIN32
-    FILETIME tm;
-    GetSystemTimeAsFileTime(&tm);
-    //GetSystemTimePreciseAsFileTime(&tm);
-    ULONGLONG t = (static_cast<ULONGLONG>(tm.dwHighDateTime) << 32)
-      | (ULONGLONG)tm.dwLowDateTime;
-    ret.real = static_cast<double>(t) / 10000000.0;
-#else
-    struct timeval tm;
-    gettimeofday(&tm, NULL);
-    ret.real = tm.tv_sec + tm.tv_usec/1000000.0;
-#endif
-    return ret;
+
+  using namespace std::chrono;
+  FStats::FStats() {
+    reset();
   }
 
-  // ret = t1 - t0
-  DiffTime diffTimers(const Timer t1, const Timer t0) {
-    DiffTime ret;
-    ret.user = (t1.user - t0.user)/CLOCKS_PER_SEC;
-    ret.real = t1.real - t0.real;
-    return ret;
+  void FStats::reset() {
+    n_call = 0;
+    t_wall = 0;
+    t_proc = 0;
   }
 
-  // t += diff
-  void timerPlusEq(DiffTime & t, const DiffTime diff) {
-    t.user += diff.user;
-    t.real += diff.real;
+  void FStats::tic() {
+    start_proc = std::clock();
+    start_wall= high_resolution_clock::now();
   }
 
-  Dict diffToDict(const DiffTime& diff) {
-    Dict ret;
-    // compatable names with the linux "time" utility
-    ret["real"] = diff.real;
-    ret["user"] = diff.user;
-    return ret;
+  void FStats::toc() {
+    // First get the time points
+    stop_proc = std::clock();
+    stop_wall = high_resolution_clock::now();
+
+    // Process them
+    t_proc += (stop_proc - start_proc) / static_cast<double>(CLOCKS_PER_SEC);
+    t_wall += duration<double>(stop_wall - start_wall).count();
+
+    n_call +=1;
   }
+
 } // namespace casadi
