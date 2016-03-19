@@ -40,7 +40,7 @@ namespace casadi {
 
    * The user is responsible for not deleting this class for the lifetime
    * of the internal function object.
-   
+
    \author Joris Gillis, Joel Andersson
    \date 2015
    */
@@ -126,7 +126,7 @@ namespace casadi {
      * Default implementation: dense using inputShape
      *
      */
-    virtual Sparsity get_sparsity_in(int i) { return Sparsity::dense(get_input_shape(i)); }
+    virtual Sparsity get_sparsity_in(int i) { return Sparsity::scalar(); }
     /** \brief Specify output sparsity
      *
      * Specify the sparsity corresponding to a given output.
@@ -135,25 +135,7 @@ namespace casadi {
      * Default implementation: dense using outputShape
      *
      */
-    virtual Sparsity get_sparsity_out(int i) { return Sparsity::dense(get_output_shape(i)); }
-    /** \brief Specify input shape
-     *
-     * Specify the shape corresponding to a given input.
-     * The shape must not be changed over the lifetime of the object
-     *
-     * Default implementation: scalar (1,1)
-     *
-     */
-    virtual std::pair<int, int> get_input_shape(int i) { return std::pair<int, int>(1, 1); }
-    /** \brief Specify output shape
-     *
-     * Specify the shape corresponding to a given output.
-     * The shape must not be changed over the lifetime of the object
-     *
-     * Default implementation: scalar (1,1)
-     *
-     */
-    virtual std::pair<int, int> get_output_shape(int i) { return std::pair<int, int>(1, 1); }
+    virtual Sparsity get_sparsity_out(int i) { return Sparsity::scalar(); }
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
