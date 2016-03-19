@@ -59,7 +59,7 @@ namespace casadi {
 
   Sparsity CallbackInternal::get_sparsity_out(int ind) const {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
-    return self_->get_output_sparsity(ind);
+    return self_->get_sparsity_out(ind);
   }
 
   void CallbackInternal::init(const Dict& opts) {
