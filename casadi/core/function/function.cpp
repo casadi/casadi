@@ -38,7 +38,7 @@
 
 #include <typeinfo>
 #include <fstream>
-#include <string.h>
+#include <cctype>
 
 using namespace std;
 
