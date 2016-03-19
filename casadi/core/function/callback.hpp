@@ -126,7 +126,7 @@ namespace casadi {
      * Default implementation: dense using inputShape
      *
      */
-    virtual Sparsity get_input_sparsity(int i) { return Sparsity::dense(get_input_shape(i)); }
+    virtual Sparsity get_sparsity_in(int i) { return Sparsity::dense(get_input_shape(i)); }
     /** \brief Specify output sparsity
      *
      * Specify the sparsity corresponding to a given output.
