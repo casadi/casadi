@@ -38,6 +38,7 @@
 
 #include <typeinfo>
 #include <fstream>
+#include <cctype>
 
 using namespace std;
 
