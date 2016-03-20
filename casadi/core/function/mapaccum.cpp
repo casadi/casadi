@@ -151,6 +151,121 @@ namespace casadi {
     evalGen(arg, res, iw, w, orop);
   }
 
+  void Mapaccum::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
+
+    int num_in = f_.n_in(), num_out = f_.n_out();
+
+    bvec_t** arg1 = arg+f_.sz_arg();
+    bvec_t** res1 = res+f_.sz_res();
+
+    bvec_t* accum = w+f_.sz_w();
+
+    /**
+
+      [ | | | ]
+
+      |    _______
+      L-> |       | -> [ | | | ]
+          |       |
+       -> |       | -> temp
+      acc |_______| -> [ | | | ]
+
+
+        */
+
+
+    // Initialize the accumulator
+    // with reverse seeds of accumulated output
+    accum = w+f_.sz_w();
+    for (int j=0; j<n_accum_; ++j) {
+      if (res[j]==0) {
+        fill(accum, accum+step_out_[j], 0);
+      } else {
+        if (reverse_) {
+          copy(res[j], res[j]+step_out_[j], accum);
+        } else {
+          copy(res[j]+(n_-1)*step_out_[j], res[j]+n_*step_out_[j], accum);
+        }
+      }
+      accum += step_out_[j];
+    }
+
+    // Point the function accum inputs to the accumulator
+    accum = w+f_.sz_w();
+    for (int j=0; j<n_accum_; ++j) {
+      arg1[j] = accum;
+      accum += step_in_[j];
+    }
+
+    for (int iter=n_-1; iter>=0; iter--) {
+
+      int i = reverse_ ? n_-iter-1: iter;
+      int i_prev = reverse_ ? n_-iter: iter-1;
+
+      // Copy the accumulator to the temporary storage
+      copy(w+f_.sz_w(), w+f_.sz_w()+nnz_accum_, w+f_.sz_w()+nnz_accum_);
+
+      accum = w+f_.sz_w();
+      // Copy the last seed to the accumulator
+      for (int j=0; j<n_accum_; ++j) {
+        // ... but beware of a null pointer
+        if (res[j]!=0) {
+          if (iter!=0) {
+            copy(res[j]+i_prev*step_out_[j], res[j]+(i_prev+1)*step_out_[j], accum);
+          }
+          accum += step_out_[j];
+        }
+
+      }
+
+      // For the start of the chain, use the reverse sensitivity
+      if (iter==0) {
+        accum = w+f_.sz_w();
+        for (int j=0; j<n_accum_; ++j) {
+          copy(arg[j], arg[j]+step_in_[j], accum);
+          accum+= step_in_[j];
+        }
+      }
+
+      // Set the function non-accum inputs
+      for (int j=n_accum_; j<num_in; ++j) {
+        accum = w+f_.sz_w();
+        // non-accum inputs
+        arg1[j] = (arg[j]==0) ? 0: arg[j]+i*step_in_[j];
+      }
+
+      // Set the function outputs
+      for (int j=0; j<num_out; ++j) {
+        res1[j] = (res[j]==0) ? 0: res[j]+i*step_out_[j];
+      }
+
+      // Point the accumulator outputs to temporary storage
+      accum = w+f_.sz_w()+nnz_accum_;
+      for (int j=0; j<n_accum_; ++j) {
+        res1[j] = accum;
+        accum += step_out_[j];
+      }
+
+      // Evaluate the function
+      f_->spAdj(arg1, res1, iw, w, 0);
+
+    }
+
+    accum = w+f_.sz_w();
+    // Copy the accumulated result to the reverse sensitivities
+    for (int j=0; j<n_accum_; ++j) {
+      copy(accum, accum+step_in_[j], arg[j]);
+      accum+= step_in_[j];
+    }
+
+    // Reset all seeds
+    for (int j=0; j<num_out; ++j) {
+      if (res[j]!=0) {
+        fill(res[j], res[j]+f_.nnz_out(j), bvec_t(0));
+      }
+    }
+  }
+
   std::vector<MX> bisect(const MX& a, int b) {
     std::vector<int> idx(3, 0);
     idx[1] = b;

@@ -28,7 +28,6 @@ import unittest
 from types import *
 from helpers import *
 
-#@run_only(["setjacsparsity"])
 class Functiontests(casadiTestCase):
 
   def test_call_empty(self):
@@ -862,50 +861,93 @@ class Functiontests(casadiTestCase):
     Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
     V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-    F = fun.mapaccum("map",n,[True,False,False,False],[0])
+    for options in [{"ad_weight_sp":0},{"ad_weight_sp":1}]:
+      F = fun.mapaccum("map",n,[True,False,False,False],[0],False,options)
 
-    XP = X
+      XP = X
 
-    Y0s = []
-    Y1s = []
-    Xps = []
-    for k in range(n):
-      XP, Y0,Y1 = fun(XP,Y[k],Z[k],V[k])
-      Y0s.append(Y0)
-      Y1s.append(Y1)
-      Xps.append(XP)
-    Fref = Function("f",[X,horzcat(*Y),horzcat(*Z),horzcat(*V)],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Y1s)])
-    inputs = [X_,horzcat(*Y_),horzcat(*Z_),horzcat(*V_)]
+      Y0s = []
+      Y1s = []
+      Xps = []
+      for k in range(n):
+        XP, Y0,Y1 = fun(XP,Y[k],Z[k],V[k])
+        Y0s.append(Y0)
+        Y1s.append(Y1)
+        Xps.append(XP)
+      Fref = Function("f",[X,horzcat(*Y),horzcat(*Z),horzcat(*V)],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Y1s)])
+      inputs = [X_,horzcat(*Y_),horzcat(*Z_),horzcat(*V_)]
 
-    for f in [F,toSX_fun(F)]:
+      for f in [F,toSX_fun(F)]:
 
-      self.checkfunction(f,Fref,inputs=inputs)
-      self.check_codegen(f,inputs=inputs)
+        self.checkfunction(f,Fref,inputs=inputs)
+        self.check_codegen(f,inputs=inputs)
 
     fun = Function("f",[y,x,z,v],[mtimes(z,x)+y+c.trace(v)**2,sin(y*x).T,v/y])
 
-    F = fun.mapaccum("map",n,[False,True,False,True],[0,2])
+    for options in [{"ad_weight_sp":0},{"ad_weight_sp":1}]:
+      F = fun.mapaccum("map",n,[False,True,False,True],[0,2],False,options)
 
-    XP = X
-    VP = V[0]
+      XP = X
+      VP = V[0]
 
-    Y0s = []
-    Y1s = []
-    Xps = []
-    Vps = []
-    for k in range(n):
-      XP, Y0, VP = fun(Y[k],XP,Z[k],VP)
-      Y0s.append(Y0)
-      Xps.append(XP)
-      Vps.append(VP)
+      Y0s = []
+      Y1s = []
+      Xps = []
+      Vps = []
+      for k in range(n):
+        XP, Y0, VP = fun(Y[k],XP,Z[k],VP)
+        Y0s.append(Y0)
+        Xps.append(XP)
+        Vps.append(VP)
 
-    Fref = Function("f",[horzcat(*Y),X,horzcat(*Z),V[0]],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Vps)])
-    inputs = [horzcat(*Y_),X_,horzcat(*Z_),V_[0]]
+      Fref = Function("f",[horzcat(*Y),X,horzcat(*Z),V[0]],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Vps)])
+      inputs = [horzcat(*Y_),X_,horzcat(*Z_),V_[0]]
+      
+      for f in [F,toSX_fun(F)]:
+        self.checkfunction(f,Fref,inputs=inputs)
+        self.check_codegen(f,inputs=inputs)
+
+  def test_mapaccum_schemes(self):
+  
+    x = SX.sym("x",2)
+    y = SX.sym("y")
+    z = SX.sym("z",2,2)
+    v = SX.sym("v",Sparsity.upper(3))
+
+    fun = Function("f",[y,z,x,v],[mtimes(z,x)+y,sin(y*x).T,v/y],["y","z","x","v"],["out0","out1","out2"])
+
+    n = 2
     
-    for f in [F,toSX_fun(F)]:
-      self.checkfunction(f,Fref,inputs=inputs)
-      self.check_codegen(f,inputs=inputs)
+    F = fun.mapaccum("map",n,[False,False,True,False],[0])
+    
+    scheme_in_fun = fun.name_in()
+    scheme_out_fun = fun.name_out()
 
+    scheme_in_F = F.name_in()
+    scheme_out_F = F.name_out()
+    
+    self.assertTrue(len(scheme_in_fun),len(scheme_in_F))
+    self.assertTrue(len(scheme_out_fun),len(scheme_out_F))
+    
+    for sf,sF in zip(scheme_in_fun,scheme_in_F):
+      self.assertTrue(sf==sF)
+    for sf,sF in zip(scheme_out_fun,scheme_out_F):
+      self.assertTrue(sf==sF)
+
+    fun = Function("f",[x,y,z,v],[mtimes(z,x)+y,sin(y*x).T,v/y],["x","y","z","v"],["out0","out1","out2"])
+
+    n = 2
+    
+    F = fun.mapaccum("map",n)
+
+    self.assertTrue(len(scheme_in_fun),len(scheme_in_F))
+    self.assertTrue(len(scheme_out_fun),len(scheme_out_F))
+    
+    for sf,sF in zip(scheme_in_fun,scheme_in_F):
+      self.assertTrue(sf==sF)
+    for sf,sF in zip(scheme_out_fun,scheme_out_F):
+      self.assertTrue(sf==sF)
+      
   # @requiresPlugin(Compiler,"clang")
   # def test_jitfunction_clang(self):
   #   x = MX.sym("x")
