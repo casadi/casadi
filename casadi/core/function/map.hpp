@@ -219,10 +219,14 @@ namespace casadi {
     /** \brief  Evaluate symbolically, SXElem type, possibly nonmatching sparsity patterns */
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
+    /** \brief  Propagate sparsity forward */
     virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
+    /** \brief  Propagate sparsity backwards */
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
+
     /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd) { return fwd; }
+    virtual bool spCanEvaluate(bool fwd) { return true; }
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */

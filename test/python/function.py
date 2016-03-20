@@ -674,28 +674,28 @@ class Functiontests(casadiTestCase):
       for parallelization in ["serial","openmp"]:
         res = fun.mapsum(map(lambda x: horzcat(*x),[X,Y,Z_alt,V]),parallelization) # Joris - clean alternative for this?
 
+        for ad_weight_sp in [0,1]:
+          F = Function("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0,"ad_weight_sp":ad_weight_sp})
 
-        F = Function("F",X+Y+Z+V,map(sin,res),{"ad_weight": 0})
+          resref = [0 for i in range(fun.n_out())]
+          for r in zip(X,Y,Z_alt,V):
+            for i,e in enumerate(fun.call(r)):
+              resref[i] = resref[i] + e
 
-        resref = [0 for i in range(fun.n_out())]
-        for r in zip(X,Y,Z_alt,V):
-          for i,e in enumerate(fun.call(r)):
-            resref[i] = resref[i] + e
+          Fref = Function("F",X+Y+Z+V,map(sin,resref))
+          
+          np.random.seed(0)
+          X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+          Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+          Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+          V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-        Fref = Function("F",X+Y+Z+V,map(sin,resref))
-        
-        np.random.seed(0)
-        X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-        V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+          inputs = X_+Y_+Z_+V_
+          
+          self.check_codegen(F,inputs=inputs)
 
-        inputs = X_+Y_+Z_+V_
-        
-        self.check_codegen(F,inputs=inputs)
-
-        for f in [F,toSX_fun(F)]:
-          self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
+          for f in [F,toSX_fun(F)]:
+            self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
 
 
   @memory_heavy()
@@ -718,32 +718,33 @@ class Functiontests(casadiTestCase):
 
       for parallelization in ["serial","openmp"]:
 
-        F = fun.map("map",n,[True,True,False,False],[False,True,True])
+        for ad_weight_sp in [0,1]:
+          F = fun.map("map",n,[True,True,False,False],[False,True,True],{"ad_weight_sp":ad_weight_sp})
 
-        resref = [0 for i in range(fun.n_out())]
-        acc = 0
-        bl = []
-        cl = []
-        for r in zip(X,Y,[Z_alt]*n,[V]*n):
-          a,b,c= fun(*r)
-          acc = acc + a
-          bl.append(b)
-          cl.append(c)
+          resref = [0 for i in range(fun.n_out())]
+          acc = 0
+          bl = []
+          cl = []
+          for r in zip(X,Y,[Z_alt]*n,[V]*n):
+            a,b,c= fun(*r)
+            acc = acc + a
+            bl.append(b)
+            cl.append(c)
 
-        Fref = Function("F",[horzcat(*X),horzcat(*Y),Z,V],[acc,horzcat(*bl),horzcat(*cl)])
+          Fref = Function("F",[horzcat(*X),horzcat(*Y),Z,V],[acc,horzcat(*bl),horzcat(*cl)])
 
-        np.random.seed(0)
-        X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = DM(Z.sparsity(),np.random.random(Z.nnz()))
-        V_ = DM(V.sparsity(),np.random.random(V.nnz()))
+          np.random.seed(0)
+          X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+          Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+          Z_ = DM(Z.sparsity(),np.random.random(Z.nnz()))
+          V_ = DM(V.sparsity(),np.random.random(V.nnz()))
 
-        inputs = [horzcat(*X_),horzcat(*Y_),Z_,V_]
-        
-        self.check_codegen(F,inputs=inputs)
+          inputs = [horzcat(*X_),horzcat(*Y_),Z_,V_]
+          
+          self.check_codegen(F,inputs=inputs)
 
-        for f in [F,toSX_fun(F)]:
-          self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
+          for f in [F,toSX_fun(F)]:
+            self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
 
   def test_issue1522(self):
     V = MX.sym("X",2)

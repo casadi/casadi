@@ -408,6 +408,48 @@ namespace casadi {
     evalGen<bvec_t>(arg, res, iw, w, &Orring);
   }
 
+  void MapReduce::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    int num_in = f_.n_in(), num_out = f_.n_out();
+
+    bvec_t** arg1 = arg+f_.sz_arg();
+    bvec_t** res1 = res+f_.sz_res();
+
+    for (int i=0; i<n_; ++i) {
+
+      bvec_t* temp_res = w+f_.sz_w();
+
+      // Set the function inputs
+      for (int j=0; j<num_in; ++j) {
+        arg1[j] = (arg[j]==0) ? 0: arg[j]+i*step_in_[j];
+      }
+
+      // Set the function outputs
+      for (int j=0; j<num_out; ++j) {
+        if (repeat_out_[j]) {
+          // Make the function outputs end up in our outputs
+          res1[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+        } else {
+          // Make the function outputs end up in temp_res
+          res1[j] = (res[j]==0)? 0: temp_res;
+          if (res[j]!=0) {
+            copy(res[j], res[j]+step_out_[j], temp_res);
+          }
+          temp_res+= step_out_[j];
+        }
+      }
+
+      f_->spAdj(arg1, res1, iw, w, 0);
+    }
+
+    // Reset all seeds
+    for (int j=0; j<num_out; ++j) {
+      if (res[j]!=0) {
+        fill(res[j], res[j]+f_.nnz_out(j), bvec_t(0));
+      }
+    }
+
+  }
+
   Function MapReduce
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {
 
