@@ -113,16 +113,16 @@ class MyCallback(Callback):
   def get_n_out(self): return 1
 
 
-  def get_input_shape(self, i):
+  def get_sparsity_in(self, i):
     n = nlpsol_out(i)
     if n=='f':
-      return (1,1)
+      return Sparsity. scalar()
     elif n in ('x', 'lam_x'):
-      return (self.nx, 1)
+      return Sparsity.dense(self.nx)
     elif n in ('g', 'lam_g'):
-      return (self.ng, 1)
+      return Sparsity.dense(self.ng)
     else:
-      return (0, 0)
+      return Sparsity(0,0)
   def eval(self, arg):
     # Create dictionary
     darg = {}
