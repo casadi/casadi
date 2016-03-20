@@ -29,14 +29,9 @@ Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") casadi::Callback::get_output_shape "
+%feature("docstring") casadi::Callback::generate_dependencies "
 
-Specify output shape.
-
-Specify the shape corresponding to a given output. The shape must not be
-changed over the lifetime of the object
-
-Default implementation: scalar (1,1)
+Export / Generate C code for the dependency function.
 
 ";
 
@@ -57,10 +52,17 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::set_forward "
+%feature("docstring") casadi::Callback::Callback "
 
-Set a function that calculates nfwd forward derivatives NOTE: Does not take
-ownership, only weak references to the derivatives are kept internally.
+>  Callback()
+------------------------------------------------------------------------
+
+Default constructor.
+
+>  Callback(Callback obj)
+------------------------------------------------------------------------
+
+Copy constructor (throws an error)
 
 ";
 
@@ -129,12 +131,6 @@ Get output scheme name by index.
 
 Get of number of input nonzeros For a particular input or for all for all of
 the inputs.
-
-";
-
-%feature("docstring") casadi::Callback::generate_dependencies "
-
-Export / Generate C code for the dependency function.
 
 ";
 
@@ -301,17 +297,34 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
+%feature("docstring") casadi::Callback::reverse "
 
->  Callback()
+>  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+
+>  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
 ------------------------------------------------------------------------
 
-Default constructor.
+Create call to (cached) derivative function, reverse mode.
 
->  Callback(Callback obj)
+>  Function Function.reverse(int nadj)
 ------------------------------------------------------------------------
 
-Copy constructor (throws an error)
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
+outputs. The first n_in inputs correspond to nondifferentiated inputs. The
+next n_out inputs correspond to nondifferentiated outputs. and the last
+nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
+nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
+time. * (n_in = n_in(), n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -340,17 +353,6 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring") casadi::Callback::get_input_sparsity "
-
-Specify input sparsity.
-
-Specify the sparsity corresponding to a given input. The sparsity must not
-be changed over the lifetime of the object
-
-Default implementation: dense using inputShape
 
 ";
 
@@ -432,17 +434,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Callback::get_input_shape "
-
-Specify input shape.
-
-Specify the shape corresponding to a given input. The shape must not be
-changed over the lifetime of the object
-
-Default implementation: scalar (1,1)
-
-";
-
 %feature("docstring") casadi::Callback::rootfinder_fun "
 
 Access rhs function for a rootfinder.
@@ -465,17 +456,6 @@ class able to propagate seeds through the algorithm?
 %feature("docstring") casadi::Callback::has_jacobian "
 
 Return Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::Callback::get_output_sparsity "
-
-Specify output sparsity.
-
-Specify the sparsity corresponding to a given output. The sparsity must not
-be changed over the lifetime of the object
-
-Default implementation: dense using outputShape
 
 ";
 
@@ -524,38 +504,14 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::Callback::mapaccum "
+%feature("docstring") casadi::Callback::get_sparsity_out "
 
-Create a mapaccumulated version of this function.
+Specify output sparsity.
 
-Suppose the function has a signature of:
+Specify the sparsity corresponding to a given output. The sparsity must not
+be changed over the lifetime of the object
 
-::
-
-     f: (x, u) -> (x_next , y )
-  
-
-
-
-The the mapaccumulated version has the signature:
-
-::
-
-     F: (x0, U) -> (X , Y )
-  
-      with
-          U: horzcat([u0, u1, ..., u_(N-1)])
-          X: horzcat([x1, x2, ..., x_N])
-          Y: horzcat([y0, y1, ..., y_(N-1)])
-  
-      and
-          x1, y0 <- f(x0, u0)
-          x2, y1 <- f(x1, u1)
-          ...
-          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
-  
-
-
+Default implementation: dense using outputShape
 
 ";
 
@@ -579,34 +535,14 @@ Does the function have free variables.
 
 ";
 
-%feature("docstring") casadi::Callback::reverse "
+%feature("docstring") casadi::Callback::get_sparsity_in "
 
->  void Function.reverse([MX ] arg, [MX ] res, [[MX ] ] aseed,[[MX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+Specify input sparsity.
 
->  void Function.reverse([SX ] arg, [SX ] res, [[SX ] ] aseed,[[SX ] ] output_asens, bool always_inline=false, bool never_inline=false)
+Specify the sparsity corresponding to a given input. The sparsity must not
+be changed over the lifetime of the object
 
->  void Function.reverse([DM ] arg, [DM ] res, [[DM ] ] aseed,[[DM ] ] output_asens, bool always_inline=false, bool never_inline=false)
-------------------------------------------------------------------------
-
-Create call to (cached) derivative function, reverse mode.
-
->  Function Function.reverse(int nadj)
-------------------------------------------------------------------------
-
-Get a function that calculates nadj adjoint derivatives.
-
-Returns a function with n_in + n_out +nadj*n_out inputs and nadj*n_in
-outputs. The first n_in inputs correspond to nondifferentiated inputs. The
-next n_out inputs correspond to nondifferentiated outputs. and the last
-nadj*n_out inputs correspond to adjoint seeds, one direction at a time The
-nadj*n_in outputs correspond to adjoint sensitivities, one direction at a
-time. * (n_in = n_in(), n_out = n_out())
-
-(n_in = n_in(), n_out = n_out())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+Default implementation: dense using inputShape
 
 ";
 
@@ -848,6 +784,41 @@ Generic map.
 
 ";
 
+%feature("docstring") casadi::Callback::mapaccum "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring") casadi::Callback::size1_in "
 
 Get input dimension.
@@ -970,6 +941,13 @@ Get output dimension.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
+
+";
+
+%feature("docstring") casadi::Callback::set_forward "
+
+Set a function that calculates nfwd forward derivatives NOTE: Does not take
+ownership, only weak references to the derivatives are kept internally.
 
 ";
 
