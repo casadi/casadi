@@ -2130,12 +2130,57 @@ as input arguments the four work vectors and the index of the chosen memory
 object. The nonzeros of the function inputs are pointed to by the
 first entries of the \texttt{arg} work vector and are unchanged by the evaluation.
 Similarly, the output nonzeros are pointed to by the first entries of the
-\texttt{res} work vector and are also unchanged (i.e. the pointer are unchanged,
+\texttt{res} work vector and are also unchanged (i.e. the pointers are unchanged,
 not the actual values).
 
 The return value of the function is nonzero upon failure.
 
-%\chapter{Embedding calls to external functions} \label{ch:embedding}
+\chapter{User-defined function objects} \label{ch:user-defined}
+There are situations when rewriting user-functions using \CasADi symbolics is not
+possible or practical. To tackle this, \CasADi provides a number of ways to
+embed a call to a "black box" function defined in the language \CasADi is being
+used from (C++, MATLAB or Python) or in C.
+That being said, the recommendation is always to try to avoid this when possible,
+even if it means investing a lot of time reimplementing existing code.
+Functions defined using \CasADi symbolics are almost always more
+efficient, especially when derivative calculation is involved, since a lot more
+structure can typically be exploited.
+
+Depending on the circumstances, the user can implement custom \texttt{Function}
+objects in a number of different ways:
+
+\begin{itemize}
+\item Inheriting from \texttt{FunctionInternal} or \texttt{Callback}
+\end{itemize}
+
+We elaborate on this in the following.
+\section{Inheriting from \texttt{FunctionInternal} or \texttt{Callback}}
+All function objects presented in Chapter~\ref{ch:function} are implemented
+in \CasADi as C++ classes inheriting from the \texttt{FunctionInternal} abstract
+base class. In principle, a user with familiarity with C++ programming, should
+be able to implement a class inheriting from \texttt{FunctionInternal},
+implementing the virtual methods of this class. The best reference for doing so
+is the C++ API documentation, choosing "switch to internal" to expose the internal
+API.
+
+Since \texttt{FunctionInternal} is not considered part of the stable, public API,
+we recommend against this, unless the plan is to make a contribution to \CasADi.
+
+The \texttt{Callback} class provides a public API to \texttt{FunctionInternal}
+and inheriting from this class has the same effect as inheriting directly from
+\texttt{FunctionInternal}. Thanks to \emph{cross-language polymorphism}, it
+is possible to implement the exposed methods of \texttt{Callback} from either
+Python, MATLAB or C++.
+
+\subsection*{C++}
+
+
+\subsection*{Python}
+
+
+\subsection*{MATLAB}
+
+
 
 
 \chapter{Optimal control with \CasADi}

@@ -6,8 +6,8 @@ using namespace std;
 class MyCallback : public Callback {
 public:
   // Creator function, creates an owning reference
-  static Function fun(const string& name, const Dict& opts=Dict()) {
-    return Callback::fun(name, new MyCallback(), opts);
+  static Function create(const string& name, const Dict& opts=Dict()) {
+    return Callback::create(name, new MyCallback(), opts);
   }
 
   // Number of inputs and outputs
@@ -16,18 +16,17 @@ public:
 
   // Evaluate numerically
   virtual vector<DM> eval(const vector<DM>& arg) {
-    vector<DM> ret(1);
-    ret.at(0) = sin(arg.at(0));
-    return ret;
+    DM x = arg.at(0);
+    return {sin(x)};
   }
 };
 
 int main(int argc, char *argv[]) {
 
-  Function f = MyCallback::fun("f");
+  Function f = MyCallback::create("f");
 
   DM arg = DM(2);
-  DM res = f(vector<DM>(1,arg)).at(0);
+  DM res = f(vector<DM>{arg}).at(0);
 
   cout << "out:" << res << endl;
 

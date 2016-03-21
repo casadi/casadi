@@ -53,8 +53,8 @@ namespace casadi {
     Callback(const Callback& obj);
 
     /** \brief Create an owning reference, given a pointer to a derived object */
-    static Function fun(const std::string& name, Callback* n,
-                        const Dict& opts=Dict());
+    static Function create(const std::string& name, Callback* n,
+                           const Dict& opts=Dict());
 
     /** \brief Construct internal object
      * This is the step that actually construct the internal object, as the

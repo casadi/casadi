@@ -47,7 +47,7 @@ namespace casadi {
     }
   }
 
-  Function Callback::fun(const std::string& name, Callback* n, const Dict& opts) {
+  Function Callback::create(const std::string& name, Callback* n, const Dict& opts) {
     n->construct(name, opts);
     Function ret = *n;
     n->transfer_ownership();
