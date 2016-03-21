@@ -97,8 +97,8 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::vector<std::string> get_ischeme() const;
-    virtual std::vector<std::string> get_oscheme() const;
+    virtual std::string get_name_in(int i);
+    virtual std::string get_name_out(int i);
     /// @}
 
     ///@{

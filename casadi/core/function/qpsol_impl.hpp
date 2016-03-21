@@ -56,8 +56,8 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::vector<std::string> get_ischeme() const { return qpsol_in();}
-    virtual std::vector<std::string> get_oscheme() const { return qpsol_out();}
+    virtual std::string get_name_in(int i) { return qpsol_in(i);}
+    virtual std::string get_name_out(int i) { return qpsol_out(i);}
     /// @}
 
     ///@{
@@ -116,4 +116,3 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 #endif // CASADI_QPSOL_IMPL_HPP
-

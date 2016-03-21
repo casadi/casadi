@@ -130,38 +130,34 @@ namespace casadi {
     }
   }
 
-  vector<string> External::get_ischeme() const {
-    // Get default names from base class
-    vector<string> v = FunctionInternal::get_ischeme();
-    for (int i=0; i<v.size(); ++i) {
+  string External::get_name_in(int i) {
+    if (name_in_) {
       // Use function pointer
-      if (name_in_) {
-        const char* n = name_in_(i);
-        casadi_assert_message(n!=0, "Error querying input name");
-        v[i] = n;
-      } else if (li_.meta().has(name_ + "_NAME_IN", i)) {
-        // Read meta
-        v[i] = li_.meta().to_string(name_ + "_NAME_IN", i);
-      }
+      const char* n = name_in_(i);
+      casadi_assert_message(n!=0, "Error querying input name");
+      return n;
+    } else if (li_.meta().has(name_ + "_NAME_IN", i)) {
+      // Read meta
+      return li_.meta().to_string(name_ + "_NAME_IN", i);
+    } else {
+      // Default name
+      return FunctionInternal::get_name_in(i);
     }
-    return v;
   }
 
-  vector<string> External::get_oscheme() const {
-    // Get default names from base class
-    vector<string> v = FunctionInternal::get_oscheme();
-    for (int i=0; i<v.size(); ++i) {
+  string External::get_name_out(int i) {
+    if (name_out_) {
       // Use function pointer
-      if (name_out_) {
-        const char* n = name_out_(i);
-        casadi_assert_message(n!=0, "Error querying output name");
-        v[i] = n;
-      } else if (li_.meta().has(name_ + "_NAME_OUT", i)) {
-        // Read meta
-        v[i] = li_.meta().to_string(name_ + "_NAME_OUT", i);
-      }
+      const char* n = name_out_(i);
+      casadi_assert_message(n!=0, "Error querying output name");
+      return n;
+    } else if (li_.meta().has(name_ + "_NAME_OUT", i)) {
+      // Read meta
+      return li_.meta().to_string(name_ + "_NAME_OUT", i);
+    } else {
+      // Default name
+      return FunctionInternal::get_name_out(i);
     }
-    return v;
   }
 
   Sparsity GenericExternal::get_sparsity_in(int ind) const {
@@ -307,4 +303,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-

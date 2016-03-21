@@ -110,10 +110,10 @@ namespace casadi {
   */
   CASADI_EXPORT std::string nlpsol_out(int ind);
 
-  /** \brief Get the number of NLP solver inputs */
+  /** \brief Number of NLP solver inputs */
   CASADI_EXPORT int nlpsol_n_in();
 
-  /** \brief Get the number of NLP solver outputs */
+  /** \brief Number of NLP solver outputs */
   CASADI_EXPORT int nlpsol_n_out();
 
   ///@{

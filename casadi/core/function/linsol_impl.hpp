@@ -59,8 +59,8 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::vector<std::string> get_ischeme() const { return {"A", "B"};}
-    virtual std::vector<std::string> get_oscheme() const { return {"X"};}
+    virtual std::string get_name_in(int i) { return linsol_in(i);}
+    virtual std::string get_name_out(int i) { return linsol_out(i);}
     /// @}
 
     /// Initialize
@@ -146,4 +146,3 @@ namespace casadi {
 /// \endcond
 
 #endif // CASADI_LINSOL_IMPL_HPP
-

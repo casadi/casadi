@@ -52,6 +52,12 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int ind) const;
     /// @}
 
+    ///@{
+    /** \brief Names of function input and outputs */
+    virtual std::string get_name_in(int i);
+    virtual std::string get_name_out(int i);
+    /// @}
+
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 

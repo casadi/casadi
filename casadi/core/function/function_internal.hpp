@@ -105,11 +105,11 @@ namespace casadi {
     /** \brief Get a public class instance */
     Function function() const { return shared_from_this<Function>();}
 
-    /** \brief Get input scheme */
-    virtual std::vector<std::string> get_ischeme() const;
-
-    /** \brief Get output scheme */
-    virtual std::vector<std::string> get_oscheme() const;
+    ///@{
+    /** \brief Names of function input and outputs */
+    virtual std::string get_name_in(int i);
+    virtual std::string get_name_out(int i);
+    ///@}
 
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd) { return false;}
@@ -167,7 +167,7 @@ namespace casadi {
       void checkRes(const std::vector<M>& res) const;
 
     /** \brief Check if input arguments that needs to be replaced
-     * 
+     *
      * \param hcat check if horizontal repetion of the function input is allowed
      */
     template<typename M>

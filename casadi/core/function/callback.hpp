@@ -101,41 +101,35 @@ namespace casadi {
     virtual void eval(const double** arg, double** res, int* iw, double* w, int mem);
 #endif // SWIG
 
-    /** \brief Number of input arguments
-     *
-     * Specify the number of input arguments that a specific instance can handle.
-     * The number must not be changed over the lifetime of the object
-     *
-     * Default implementation: 1
-     *
+   /** \brief Get the number of inputs
+     * This function is called during construction.
      */
-    virtual int get_n_in() { return 1;}
-    /** \brief Number of output arguments
-     *
-     * Specify the number of output arguments that a specific instance can handle.
-     * The number must not be changed over the lifetime of the object
-     *
-     * Default implementation: 1
+    virtual int get_n_in();
+
+    /** \brief Get the number of outputs
+     * This function is called during construction.
      */
-    virtual int get_n_out() { return 1;}
-    /** \brief Specify input sparsity
-     *
-     * Specify the sparsity corresponding to a given input.
-     * The sparsity must not be changed over the lifetime of the object
-     *
-     * Default implementation: dense using inputShape
-     *
+    virtual int get_n_out();
+
+    /** \brief Get the sparsity of an input
+     * This function is called during construction.
      */
-    virtual Sparsity get_sparsity_in(int i) { return Sparsity::scalar(); }
-    /** \brief Specify output sparsity
-     *
-     * Specify the sparsity corresponding to a given output.
-     * The sparsity must not be changed over the lifetime of the object
-     *
-     * Default implementation: dense using outputShape
-     *
+    virtual Sparsity get_sparsity_in(int i);
+
+    /** \brief Get the sparsity of an output
+     * This function is called during construction.
      */
-    virtual Sparsity get_sparsity_out(int i) { return Sparsity::scalar(); }
+    virtual Sparsity get_sparsity_out(int i);
+
+    /** \brief Get the sparsity of an input
+     * This function is called during construction.
+     */
+    virtual std::string get_name_in(int i);
+
+    /** \brief Get the sparsity of an output
+     * This function is called during construction.
+     */
+    virtual std::string get_name_out(int i);
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */

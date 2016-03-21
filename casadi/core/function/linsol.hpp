@@ -79,6 +79,24 @@ namespace casadi {
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_linsol(const std::string& name);
 
+  /** \brief Number of linear solver inputs */
+  CASADI_EXPORT int linsol_n_in();
+
+  /** \brief Number of linear solver outputs */
+  CASADI_EXPORT int linsol_n_out();
+
+  ///@{
+  /** \brief Linear solver input scheme */
+  CASADI_EXPORT std::vector<std::string> linsol_in();
+  CASADI_EXPORT std::string linsol_in(int ind);
+  ///@}
+
+  ///@{
+  /** \brief Linear solver output scheme */
+  CASADI_EXPORT std::vector<std::string> linsol_out();
+  CASADI_EXPORT std::string linsol_out(int ind);
+  ///@}
+
   /** @} */
 
 } // namespace casadi

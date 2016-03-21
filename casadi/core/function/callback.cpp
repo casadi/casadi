@@ -86,6 +86,30 @@ namespace casadi {
     return static_cast<CallbackInternal*>(Function::operator->());
   }
 
+  int Callback::get_n_in() {
+    return (*this)->FunctionInternal::get_n_in();
+  }
+
+  int Callback::get_n_out() {
+    return (*this)->FunctionInternal::get_n_out();
+  }
+
+  Sparsity Callback::get_sparsity_in(int i) {
+    return (*this)->FunctionInternal::get_sparsity_in(i);
+  }
+
+  Sparsity Callback::get_sparsity_out(int i) {
+    return (*this)->FunctionInternal::get_sparsity_out(i);
+  }
+
+  std::string Callback::get_name_in(int i) {
+    return (*this)->FunctionInternal::get_name_in(i);
+  }
+
+  std::string Callback::get_name_out(int i) {
+    return (*this)->FunctionInternal::get_name_out(i);
+  }
+
   bool Callback::has_jacobian() const {
     return (*this)->FunctionInternal::hasFullJacobian();
   }

@@ -62,6 +62,16 @@ namespace casadi {
     return self_->get_sparsity_out(ind);
   }
 
+  std::string CallbackInternal::get_name_in(int i) {
+    casadi_assert_message(self_!=0, "Callback object has been deleted");
+    return self_->get_name_in(i);
+  }
+
+  std::string CallbackInternal::get_name_out(int i) {
+    casadi_assert_message(self_!=0, "Callback object has been deleted");
+    return self_->get_name_out(i);
+  }
+
   void CallbackInternal::init(const Dict& opts) {
     // Initialize the base classes
     FunctionInternal::init(opts);
@@ -116,4 +126,3 @@ namespace casadi {
     return self_->get_n_reverse();
   }
 } // namespace casadi
-

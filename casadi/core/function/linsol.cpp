@@ -31,6 +31,43 @@
 using namespace std;
 namespace casadi {
 
+  int linsol_n_in() {
+    return LINSOL_NUM_IN;
+  }
+
+  int linsol_n_out() {
+    return LINSOL_NUM_OUT;
+  }
+
+  vector<string> linsol_in() {
+    vector<string> ret(linsol_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_in(i);
+    return ret;
+  }
+
+  vector<string> linsol_out() {
+    vector<string> ret(linsol_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=linsol_out(i);
+    return ret;
+  }
+
+  string linsol_in(int ind) {
+    switch (static_cast<LinsolInput>(ind)) {
+    case LINSOL_A:     return "A";
+    case LINSOL_B:      return "B";
+    case LINSOL_NUM_IN: break;
+    }
+    return string();
+  }
+
+  string linsol_out(int ind) {
+    switch (static_cast<LinsolOutput>(ind)) {
+    case LINSOL_X:     return "X";
+    case LINSOL_NUM_OUT: break;
+    }
+    return string();
+  }
+
   bool has_linsol(const string& name) {
     return Linsol::hasPlugin(name);
   }
@@ -408,4 +445,3 @@ namespace casadi {
   const std::string Linsol::infix_ = "linsol";
 
 } // namespace casadi
-

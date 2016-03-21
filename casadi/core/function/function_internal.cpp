@@ -322,10 +322,16 @@ namespace casadi {
     jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(n_out, n_in));
 
     // If input scheme empty, provide default names
-    if (ischeme_.empty()) ischeme_ = get_ischeme();
+    if (ischeme_.empty()) {
+      ischeme_.resize(n_in);
+      for (int i=0; i<n_in; ++i) ischeme_[i] = get_name_in(i);
+    }
 
     // If output scheme empty, provide default names
-    if (oscheme_.empty()) oscheme_ = get_oscheme();
+    if (oscheme_.empty()) {
+      oscheme_.resize(n_out);
+      for (int i=0; i<n_out; ++i) oscheme_[i] = get_name_out(i);
+    }
 
     monitor_inputs_ = monitored("inputs");
     monitor_outputs_ = monitored("outputs");
@@ -333,20 +339,12 @@ namespace casadi {
     alloc_res(0);
   }
 
-  std::vector<std::string> FunctionInternal::get_ischeme() const {
-    std::vector<std::string> ret(n_in());
-    for (size_t i=0; i!=ret.size(); ++i) {
-      ret[i] = "i" + CodeGenerator::to_string(i);
-    }
-    return ret;
+  std::string FunctionInternal::get_name_in(int i) {
+    return "i" + CodeGenerator::to_string(i);
   }
 
-  std::vector<std::string> FunctionInternal::get_oscheme() const {
-    std::vector<std::string> ret(n_out());
-    for (size_t i=0; i!=ret.size(); ++i) {
-      ret[i] = "o" + CodeGenerator::to_string(i);
-    }
-    return ret;
+  std::string FunctionInternal::get_name_out(int i) {
+    return "o" + CodeGenerator::to_string(i);
   }
 
   void FunctionInternal::finalize() {
@@ -2893,7 +2891,8 @@ namespace casadi {
         return derivative_of_.n_in();
       }
     }
-    casadi_error("'get_n_in' not defined for " + type_name());
+    // One by default
+    return 1;
   }
 
   size_t FunctionInternal::get_n_out() const {
@@ -2903,7 +2902,8 @@ namespace casadi {
         return 1;
       }
     }
-    casadi_error("'get_n_out' not defined for " + type_name());
+    // One by default
+    return 1;
   }
 
   Sparsity FunctionInternal::get_sparsity_in(int ind) const {

@@ -67,8 +67,8 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::vector<std::string> get_ischeme() const { return integrator_in();}
-    virtual std::vector<std::string> get_oscheme() const { return integrator_out();}
+    virtual std::string get_name_in(int i) { return integrator_in(i);}
+    virtual std::string get_name_out(int i) { return integrator_out(i);}
     /// @}
 
     /** \brief Initalize memory block */
