@@ -55,8 +55,8 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return INTEGRATOR_NUM_IN;}
-    virtual size_t get_n_out() const { return INTEGRATOR_NUM_OUT;}
+    virtual size_t get_n_in() { return INTEGRATOR_NUM_IN;}
+    virtual size_t get_n_out() { return INTEGRATOR_NUM_OUT;}
     ///@}
 
    /// @{

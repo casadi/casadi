@@ -91,8 +91,8 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const;
-    virtual size_t get_n_out() const;
+    virtual size_t get_n_in();
+    virtual size_t get_n_out();
     ///@}
 
     ///@{

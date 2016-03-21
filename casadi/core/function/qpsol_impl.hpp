@@ -44,8 +44,8 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return QPSOL_NUM_IN;}
-    virtual size_t get_n_out() const { return QPSOL_NUM_OUT;}
+    virtual size_t get_n_in() { return QPSOL_NUM_IN;}
+    virtual size_t get_n_out() { return QPSOL_NUM_OUT;}
     ///@}
 
     /// @{

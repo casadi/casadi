@@ -42,12 +42,12 @@ namespace casadi {
     }
   }
 
-  size_t CallbackInternal::get_n_in() const {
+  size_t CallbackInternal::get_n_in() {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
     return self_->get_n_in();
   }
 
-  size_t CallbackInternal::get_n_out() const {
+  size_t CallbackInternal::get_n_out() {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
     return self_->get_n_out();
   }

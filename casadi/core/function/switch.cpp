@@ -40,13 +40,13 @@ namespace casadi {
   Switch::~Switch() {
   }
 
-  size_t Switch::get_n_in() const {
+  size_t Switch::get_n_in() {
     for (auto&& i : f_) if (!i.is_null()) return 1+i.n_in();
     casadi_assert(!f_def_.is_null());
     return 1+f_def_.n_in();
   }
 
-  size_t Switch::get_n_out() const {
+  size_t Switch::get_n_out() {
     for (auto&& i : f_) if (!i.is_null()) return i.n_out();
     casadi_assert(!f_def_.is_null());
     return f_def_.n_out();

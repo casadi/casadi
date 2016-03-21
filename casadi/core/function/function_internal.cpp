@@ -2884,7 +2884,7 @@ namespace casadi {
     mem_.clear();
   }
 
-  size_t FunctionInternal::get_n_in() const {
+  size_t FunctionInternal::get_n_in() {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == n + "_jac") {
@@ -2895,7 +2895,7 @@ namespace casadi {
     return 1;
   }
 
-  size_t FunctionInternal::get_n_out() const {
+  size_t FunctionInternal::get_n_out() {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == n + "_jac") {

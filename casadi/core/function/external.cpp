@@ -108,7 +108,7 @@ namespace casadi {
     clear_memory();
   }
 
-  size_t External::get_n_in() const {
+  size_t External::get_n_in() {
     if (n_in_) {
       return n_in_();
     } else if (li_.meta().has(name_ + "_N_IN")) {
@@ -119,7 +119,7 @@ namespace casadi {
     }
   }
 
-  size_t External::get_n_out() const {
+  size_t External::get_n_out() {
     if (n_out_) {
       return n_out_();
     } else if (li_.meta().has(name_ + "_N_OUT")) {

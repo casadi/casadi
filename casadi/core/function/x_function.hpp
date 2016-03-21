@@ -123,8 +123,8 @@ namespace casadi {
                    std::vector<std::vector<MatType> >& asens);
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() const { return inputv_.size(); }
-    virtual size_t get_n_out() const { return outputv_.size(); }
+    virtual size_t get_n_in() { return inputv_.size(); }
+    virtual size_t get_n_out() { return outputv_.size(); }
     ///@}
 
     /// @{
