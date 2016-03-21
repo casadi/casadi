@@ -33,8 +33,8 @@ namespace casadi {
                            const Function& f, int n, const Dict& opts) {
 
     // Check if there are reduced inputs or outputs
-    bool reduce_inputs = opts.find("reduced_inputs")!=opts.end();
-    bool reduce_outputs = opts.find("reduced_outputs")!=opts.end();
+    bool reduce_inputs = opts.find("reduce_in")!=opts.end();
+    bool reduce_outputs = opts.find("reduce_out")!=opts.end();
 
     // Read the type of parallelization
     Dict::const_iterator par_op = opts.find("parallelization");
@@ -45,7 +45,7 @@ namespace casadi {
 
       // Mark reduced inputs
       if (reduce_inputs) {
-        vector<int> ri = opts.find("reduced_inputs")->second;
+        vector<int> ri = opts.find("reduce_in")->second;
         for (vector<int>::const_iterator i=ri.begin(); i!=ri.end(); ++i) {
           repeat_in[*i]=false;
         }
@@ -53,7 +53,7 @@ namespace casadi {
 
       // Mark reduced outputs
       if (reduce_inputs) {
-        vector<int> ro = opts.find("reduced_outputs")->second;
+        vector<int> ro = opts.find("reduce_out")->second;
         for (vector<int>::const_iterator i=ro.begin(); i!=ro.end(); ++i) {
           repeat_out[*i]=false;
         }
@@ -114,10 +114,10 @@ namespace casadi {
         "Control the number of threads when executing in parallel. "
         "The default setting (0) will pass the decision on to the parallelization library. "
         "For openmp, this means that OMP_NUM_THREADS env. variable is observed."}},
-      {"reduced_inputs",
+      {"reduce_in",
        {OT_INTVECTOR,
         "Indices of inputs that are reduced"}},
-      {"reduced_outputs",
+      {"reduce_out",
        {OT_INTVECTOR,
         "Indices of outputs that are reduced"}}
      }
@@ -414,16 +414,16 @@ namespace casadi {
       repeat_out.insert(repeat_out.end(), repeat_out_.begin(), repeat_out_.end());
     }
 
-    std::vector<int> reduced_inputs;
+    std::vector<int> reduce_in;
     for (int i=0;i<repeat_in.size();++i) {
-      if (!repeat_in[i]) reduced_inputs.push_back(i);
+      if (!repeat_in[i]) reduce_in.push_back(i);
     }
-    std::vector<int> reduced_outputs;
+    std::vector<int> reduce_out;
     for (int i=0;i<repeat_out.size();++i) {
-      if (!repeat_out[i]) reduced_outputs.push_back(i);
+      if (!repeat_out[i]) reduce_out.push_back(i);
     }
-    opts["reduced_inputs"] = reduced_inputs;
-    opts["reduced_outputs"] = reduced_outputs;
+    opts["reduce_in"] = reduce_in;
+    opts["reduce_out"] = reduce_out;
 
     // Construct and return
     return df.map(name, n_, opts);
@@ -449,16 +449,16 @@ namespace casadi {
       repeat_out.insert(repeat_out.end(), repeat_in_.begin(), repeat_in_.end());
     }
 
-    std::vector<int> reduced_inputs;
+    std::vector<int> reduce_in;
     for (int i=0;i<repeat_in.size();++i) {
-      if (!repeat_in[i]) reduced_inputs.push_back(i);
+      if (!repeat_in[i]) reduce_in.push_back(i);
     }
-    std::vector<int> reduced_outputs;
+    std::vector<int> reduce_out;
     for (int i=0;i<repeat_out.size();++i) {
-      if (!repeat_out[i]) reduced_outputs.push_back(i);
+      if (!repeat_out[i]) reduce_out.push_back(i);
     }
-    opts["reduced_inputs"] = reduced_inputs;
-    opts["reduced_outputs"] = reduced_outputs;
+    opts["reduce_in"] = reduce_in;
+    opts["reduce_out"] = reduce_out;
 
     // Construct and return
     return df.map(name, n_, opts);

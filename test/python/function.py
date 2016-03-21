@@ -719,7 +719,7 @@ class Functiontests(casadiTestCase):
       for parallelization in ["serial","openmp"]:
 
         for ad_weight_sp in [0,1]:
-          F = fun.map("map",n,{"ad_weight_sp":ad_weight_sp,"reduced_inputs":[2,3],"reduced_outputs":[0]})
+          F = fun.map("map",n,{"ad_weight_sp":ad_weight_sp,"reduce_in":[2,3],"reduce_out":[0]})
           
           resref = [0 for i in range(fun.n_out())]
           acc = 0
@@ -1011,7 +1011,7 @@ class Functiontests(casadiTestCase):
 
     x0 = DM([n/2,m/2])
 
-    Fref = f.map("f",n*m,{"reduced_inputs": [2],"reduced_outputs":[0]})
+    Fref = f.map("f",n*m,{"reduce_in": [2],"reduce_out":[0]})
     
     print Fref(horzcat(*[vec(xx),vec(yy)]).T,vec(z),x0)
     print F(z,x0)

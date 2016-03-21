@@ -2819,8 +2819,8 @@ namespace casadi {
 
     Function ms;
     if (reduced_in.size()>0) {
-      options["reduced_inputs"] = reduced_in;
-      options["reduced_outputs"] = std::vector<int>();
+      options["reduce_in"] = reduced_in;
+      options["reduce_out"] = std::vector<int>();
       ms = function().
         map("mapsum", n, options);
     } else {
@@ -2854,8 +2854,8 @@ namespace casadi {
     }
 
     Dict options = {{"parallelization", parallelization}};
-    options["reduced_inputs"] = reduced_in;
-    options["reduced_outputs"] = range(n_out());
+    options["reduce_in"] = reduced_in;
+    options["reduce_out"] = range(n_out());
     Function ms = function().map("mapsum", n, options);
 
     // Call the internal function
