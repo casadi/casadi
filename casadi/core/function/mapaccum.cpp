@@ -277,7 +277,7 @@ namespace casadi {
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {
 
     // Obtain forward mode of the primitive function
-    /*  
+    /*
         x1, y0 = f(x0, u0)
         x2, y1 = f(x1, u1)
         x3, y2 = f(x2, u2)
@@ -294,11 +294,11 @@ namespace casadi {
       Reverse mode of F looks like:
 
         F :    x0, [u0 u1 u2], [x1 x2 x3], [y0 y1 y2],
-                    x0_dot, [u0_dot u1_dot u2_dot] -> 
+                    x0_dot, [u0_dot u1_dot u2_dot] ->
                     [x1_dot x2_dot x3_dot], [y0_dot y1_dot y2_dot]
 
       In terms of the derivate of the primitive:
-        
+
 
         df (x0, u0, x1, y0, x0_dot, u0_dot) -> x1_dot, y0_dot
         df (x1, u1, x2, y1, x1_dot, u1_dot) -> x2_dot, y1_dot   (A)
@@ -315,12 +315,12 @@ namespace casadi {
     std::vector<int> output_accum_ = range(n_accum_);
 
     // Construct the new MapAccum's input_accum
-    /*  
+    /*
         fb:  x, u, xp, y, x_dot, u_dot -> xp_dot, y_dot
-        
+
         input_accum:
               0, 0, 0, 0,  1,      0
-      
+
     */
     std::vector<bool> input_accum(n_in()+n_out(), false);
     for (int i=0;i<nfwd;++i) {
@@ -328,12 +328,12 @@ namespace casadi {
     }
 
     // Construct the new MapAccum's output_accum
-    /*  
+    /*
        fb:  x, u, xp, y, x_dot, u_dot -> xp_dot, y_dot
-        
+
         output_accum:
               [0]
-      
+
     */
     std::vector<int> output_accum;
     int offset = 0;
@@ -352,13 +352,13 @@ namespace casadi {
       Recall, the function we need to return looks like:
 
         F :    x0, [u0 u1 u2], [x1 x2 x3], [y0 y1 y2],
-                    x0_dot, [u0_dot u1_dot u2_dot] -> 
+                    x0_dot, [u0_dot u1_dot u2_dot] ->
                     [x1_dot x2_dot x3_dot], [y0_dot y1_dot y2_dot]
 
       While the just constructed MapAccum has the following signature:
 
         ma :   [x0 x1 x2], [u0 u1 u2], [x1 x2 x3], [y0 y1 y2],
-                    x0_dot, [u0_dot u1_dot u2_dot] -> 
+                    x0_dot, [u0_dot u1_dot u2_dot] ->
                     [x1_dot x2_dot x3_dot], [y0_dot y1_dot y2_dot]
 
       This requires an extra wrapper
@@ -409,7 +409,7 @@ namespace casadi {
   ::get_reverse(const std::string& name, int nadj, Dict& opts) {
 
     // Obtain Reverse mode of the primitive function
-    /*  
+    /*
         x1, y0 = f(x0, u0)
         x2, y1 = f(x1, u1)
         x3, y2 = f(x2, u2)
@@ -425,11 +425,11 @@ namespace casadi {
       Reverse mode of F looks like:
 
         F :    x0, [u0 u1 u2], [x1 x2 x3], [y0 y1 y2],
-                    [X1_bar X2_bar X3_bar], [Y0_bar Y1_bar Y2_bar] -> 
+                    [X1_bar X2_bar X3_bar], [Y0_bar Y1_bar Y2_bar] ->
                     X0_bar, [u0_bar, u1_bar u2_bar]
 
       In terms of the derivate of the primitive:
-        
+
 
         fb (x2, u2, x3, y2,          X3_bar, y2_bar) -> x2_bar, u2_bar
         fb (x1, u1, x2, y1, x2_bar + X2_bar, y1_bar) -> x1_bar, u1_bar   (A)
@@ -443,7 +443,7 @@ namespace casadi {
       fbX:  x, u, xp, y xp_bar, y_bar, X -> x_bar + X, u_bar
 
       With this defintion, (A) can be rewritten as:
-        
+
          fbX (x2, u2, x3, y2, X3_bar         , y2_bar, X2_bar) -> x2_bar + X2_bar, u2_bar
          fbX (x1, u1, x2, y1, x2_bar + X2_bar, y1_bar, X1_bar) -> x1_bar + X1_bar, u2_bar
          fbX (x0, u0, x1, y0, x1_bar + X1_bar, y0_bar, 0)      -> x0_bar + 0,      u2_bar
@@ -462,9 +462,9 @@ namespace casadi {
     // for each reverse direction,
     // add one extra input per accumulated input.
 
-    /*  
+    /*
         fbX:  x, u, xp, y, xp_bar, y_bar, X -> ...
-      
+
     */
     std::vector<MX> ins  = f_.mx_in();
 
@@ -495,9 +495,9 @@ namespace casadi {
     // The outputs corresponding to an accumulator need a summation
     // with the above extra inputs.
 
-    /*  
+    /*
         fbX:  x, u, xp, y xp_bar, y_bar, X -> x_bar + X, u_bar
-      
+
     */
     // Call the dervative of the primitive
     std::vector<MX> der_outs = fb(der_ins);
@@ -522,12 +522,12 @@ namespace casadi {
     Function fbX("f", f_der_ins, f_der_outs);
 
     // Construct the new MapAccum's input_accum
-    /*  
+    /*
         fbX:  x, u, xp, y, xp_bar, y_bar, X -> ...
-        
+
         input_accum:
               0, 0, 0, 0,  1,      0,     0
-      
+
     */
     std::vector<bool> input_accum(n_in()+n_out(), false);
     std::vector<bool> input_accum_rev(n_out(), false);
@@ -541,12 +541,12 @@ namespace casadi {
     }
 
     // Construct the new MapAccum's output_accum
-    /*  
+    /*
         fbX:  x, u, xp, y xp_bar, y_bar, X -> x_bar + X, u_bar
-        
+
         output_accum:
               [0]
-      
+
     */
     std::vector<int> output_accum_rev;
     for (int j=0;j<input_accum_.size();++j) {
@@ -573,13 +573,13 @@ namespace casadi {
       Recall, the function we need to return looks like:
 
                  F :    x0, [u0 u1 u2], [x1 x2 x3], [y0 y1 y2],
-                    [X1_bar X2_bar X3_bar], [Y0_bar Y1_bar Y2_bar] -> 
+                    [X1_bar X2_bar X3_bar], [Y0_bar Y1_bar Y2_bar] ->
                     X0_bar, [u0_bar, u1_bar u2_bar]
 
       While the just constructed MapAccum has the following signature:
 
         ma :   [x0 x1 x2], [u0 u1 u2], [x1 x2 x3], [y0 y1 y2],
-                    X3_bar, [Y0_bar Y1_bar Y2_bar], [0 X1_bar X2_bar] -> 
+                    X3_bar, [Y0_bar Y1_bar Y2_bar], [0 X1_bar X2_bar] ->
                     [X0_bar X1_bar X2_bar], [u0_bar, u1_bar u2_bar]
 
       This requires an extra wrapper
@@ -673,7 +673,7 @@ namespace casadi {
     /*
       The output of the new MapAccum delivers [X2_bar X1_bar X0_bar],
       while we only need to output X0_bar.
-      
+
     */
     for (int i=0;i<nadj;++i) {
       for (int j=0;j<n_in();++j) {
