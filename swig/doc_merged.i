@@ -37,12 +37,7 @@ Export / Generate C code for the dependency function.
 
 %feature("docstring") casadi::Callback::get_n_in "
 
-Number of input arguments.
-
-Specify the number of input arguments that a specific instance can handle.
-The number must not be changed over the lifetime of the object
-
-Default implementation: 1
+Get the number of inputs This function is called during construction.
 
 ";
 
@@ -63,6 +58,12 @@ Default constructor.
 ------------------------------------------------------------------------
 
 Copy constructor (throws an error)
+
+";
+
+%feature("docstring") casadi::Callback::get_name_in "
+
+Get the sparsity of an input This function is called during construction.
 
 ";
 
@@ -187,12 +188,7 @@ of the outputs.
 
 %feature("docstring") casadi::Callback::get_n_out "
 
-Number of output arguments.
-
-Specify the number of output arguments that a specific instance can handle.
-The number must not be changed over the lifetime of the object
-
-Default implementation: 1
+Get the number of outputs This function is called during construction.
 
 ";
 
@@ -506,12 +502,7 @@ Return a string with a representation (for SWIG)
 
 %feature("docstring") casadi::Callback::get_sparsity_out "
 
-Specify output sparsity.
-
-Specify the sparsity corresponding to a given output. The sparsity must not
-be changed over the lifetime of the object
-
-Default implementation: dense using outputShape
+Get the sparsity of an output This function is called during construction.
 
 ";
 
@@ -537,12 +528,7 @@ Does the function have free variables.
 
 %feature("docstring") casadi::Callback::get_sparsity_in "
 
-Specify input sparsity.
-
-Specify the sparsity corresponding to a given input. The sparsity must not
-be changed over the lifetime of the object
-
-Default implementation: dense using inputShape
+Get the sparsity of an input This function is called during construction.
 
 ";
 
@@ -948,6 +934,12 @@ the output elements).
 
 Set a function that calculates nfwd forward derivatives NOTE: Does not take
 ownership, only weak references to the derivatives are kept internally.
+
+";
+
+%feature("docstring") casadi::Callback::get_name_out "
+
+Get the sparsity of an output This function is called during construction.
 
 ";
 
@@ -7518,13 +7510,9 @@ Get typename.
 
 ";
 
-%feature("docstring") casadi::complement "
+%feature("docstring") casadi::linsol_in "
 
-Returns the list of all i in [0, size[ not found in supplied list.
-
-The supplied vector may contain duplicates and may be non-monotonous The
-supplied vector will be checked for bounds The result vector is guaranteed
-to be monotonously increasing
+Linear solver input scheme.
 
 ";
 
@@ -7552,6 +7540,16 @@ Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 >  void rank1(real_t *A, const int *sp_A, real_t alpha, const real_t *x, const real_t *y)
 ------------------------------------------------------------------------
 [INTERNAL] 
+";
+
+%feature("docstring") casadi::complement "
+
+Returns the list of all i in [0, size[ not found in supplied list.
+
+The supplied vector may contain duplicates and may be non-monotonous The
+supplied vector will be checked for bounds The result vector is guaranteed
+to be monotonously increasing
+
 ";
 
 %feature("docstring") casadi::swapIndices "
@@ -7611,7 +7609,7 @@ Load a just-in-time compiled external function File name given.
 
 %feature("docstring") casadi::nlpsol_n_out "
 
-Get the number of NLP solver outputs.
+Number of NLP solver outputs.
 
 ";
 
@@ -9027,17 +9025,18 @@ Check if the vector is non-decreasing.
 
 ";
 
-%feature("docstring") casadi::integrator_out "
+%feature("docstring") casadi::jit "
 
->  CASADI_EXPORT[str] integrator_out()
-------------------------------------------------------------------------
+Create a just-in-time compiled function from a C/C++ language string The
+function can an arbitrary number of inputs and outputs that must all be
+scalar-valued. Only specify the function body, assuming that the inputs are
+stored in an array named 'arg' and the outputs stored in an array named
+'res'. The data type used must be 'real_t', which is typically equal to
+'double` or another data type with the same API as 'double'.
 
-Get integrator output scheme of integrators.
+The final generated function will have a structure similar to:
 
->  str integrator_out(int ind)
-------------------------------------------------------------------------
-
-Get output scheme name by index.
+void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
 
 ";
 
@@ -9066,6 +9065,12 @@ Parameters:
 -----------
 
 scheme:  'radau' or 'legendre'
+
+";
+
+%feature("docstring") casadi::linsol_n_out "
+
+Number of linear solver outputs.
 
 ";
 
@@ -9706,7 +9711,19 @@ Joel Andersson
 
 %feature("docstring") casadi::zip "[INTERNAL] ";
 
+%feature("docstring") casadi::linsol_out "
+
+Linear solver output scheme.
+
+";
+
 %feature("docstring") casadi::replaceMat "[INTERNAL] ";
+
+%feature("docstring") casadi::linsol_n_in "
+
+Number of linear solver inputs.
+
+";
 
 %feature("docstring") casadi::collocationInterpolators "
 
@@ -9738,7 +9755,7 @@ D:  interpolating coefficients to obtain end state Length: order+1
 
 %feature("docstring") casadi::nlpsol_n_in "
 
-Get the number of NLP solver inputs.
+Number of NLP solver inputs.
 
 ";
 
@@ -9889,18 +9906,17 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::jit "
+%feature("docstring") casadi::integrator_out "
 
-Create a just-in-time compiled function from a C/C++ language string The
-function can an arbitrary number of inputs and outputs that must all be
-scalar-valued. Only specify the function body, assuming that the inputs are
-stored in an array named 'arg' and the outputs stored in an array named
-'res'. The data type used must be 'real_t', which is typically equal to
-'double` or another data type with the same API as 'double'.
+>  CASADI_EXPORT[str] integrator_out()
+------------------------------------------------------------------------
 
-The final generated function will have a structure similar to:
+Get integrator output scheme of integrators.
 
-void fname(const real_t* arg, real_t* res) { <FUNCTION_BODY> }
+>  str integrator_out(int ind)
+------------------------------------------------------------------------
+
+Get output scheme name by index.
 
 ";
 
