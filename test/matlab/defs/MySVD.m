@@ -20,15 +20,18 @@ classdef MySVD < casadi.Callback
       out = 3;
     end
     function out = get_sparsity_in(self, i)
-      out = Sparsity.dense(self.n,self.m);
+      out = casadi.Sparsity.dense(self.n,self.m);
     end
     function out = get_sparsity_out(self, i)
-      if i==0
-        out = Sparsity.dense(self.n,self.k);
-      elseif i==1
-        out = Sparsity.dense(self.k);
-      else
-        out = Sparsity.dense(self.k, self.m);
+    switch i
+      case 0
+        out = casadi.Sparsity.dense(self.n,self.k);
+      case 1
+        out = casadi.Sparsity.dense(self.k);
+      case 2
+        out = casadi.Sparsity.dense(self.k, self.m);
+      otherwise
+        error('No such index')
       end
     end
     function [res] = eval(self, arg)
