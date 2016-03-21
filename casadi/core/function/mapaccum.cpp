@@ -312,8 +312,6 @@ namespace casadi {
       input_accum_[i] = true;
     }
 
-    std::vector<int> output_accum_ = range(n_accum_);
-
     // Construct the new MapAccum's input_accum
     /*
         fb:  x, u, xp, y, x_dot, u_dot -> xp_dot, y_dot
@@ -338,8 +336,8 @@ namespace casadi {
     std::vector<int> output_accum;
     int offset = 0;
     for (int i=0;i<nfwd;++i) {
-      for (int j=0;j<output_accum_.size();++j) {
-        output_accum.push_back(offset+output_accum_[j]);
+      for (int j=0;j<n_accum_;++j) {
+        output_accum.push_back(offset+j);
       }
       offset+= n_out();
     }
@@ -375,24 +373,20 @@ namespace casadi {
     // For the inputs to the new mapaccum
     // which correspond to accumulators, supply these with the whole history
     /** Takes care of:  [x0 x1 x2]   */
-    int i_output_accum=0;
-    for (int i=0;i<n_in();++i) {
-      if (input_accum_[i]) {
-        // [x0 x1 x2 x3] -> all
-        // [x0 x1 x2] -> in
-        if (reverse_) {
-          MX all = horzcat(outs[output_accum_[i_output_accum++]], ins[i]);
-          MX in = bisect(all, ins[i].size2())[1];
-          f_der_ins.push_back(in);
-        } else {
-          MX all = horzcat(ins[i], outs[output_accum_[i_output_accum++]]);
-          MX in = bisect(all, ins[i].size2()*n_)[0];
-          f_der_ins.push_back(in);
-        }
+    for (int i=0;i<n_accum_;++i) {
+      // [x0 x1 x2 x3] -> all
+      // [x0 x1 x2] -> in
+      if (reverse_) {
+        MX all = horzcat(outs[i], ins[i]);
+        MX in = bisect(all, ins[i].size2())[1];
+        f_der_ins.push_back(in);
       } else {
-        f_der_ins.push_back(ins[i]);
+        MX all = horzcat(ins[i], outs[i]);
+        MX in = bisect(all, ins[i].size2()*n_)[0];
+        f_der_ins.push_back(in);
       }
     }
+    for (int i=n_accum_;i<n_in();++i) f_der_ins.push_back(ins[i]);
     f_der_ins.insert(f_der_ins.end(), outs.begin(), outs.end());
 
     for (int i=0;i<nfwd;++i) {
@@ -456,8 +450,6 @@ namespace casadi {
           input_accum_[i] = true;
     }
 
-    std::vector<int> output_accum_ = range(n_accum_);
-
     // Extend the primitive function with extra inputs:
     // for each reverse direction,
     // add one extra input per accumulated input.
@@ -484,8 +476,8 @@ namespace casadi {
       f_der_ins.insert(f_der_ins.end(), outs.begin(), outs.end());
 
       // Add extra seeds
-      for (int j=0;j<output_accum_.size();++j) {
-        MX s = MX::sym("x", f_.sparsity_out(output_accum_[j]));
+      for (int j=0;j<n_accum_;++j) {
+        MX s = MX::sym("x", f_.sparsity_out(j));
         f_der_ins.push_back(s);
       }
     }
@@ -509,13 +501,11 @@ namespace casadi {
       f_der_outs.insert(f_der_outs.end(), der_outs.begin()+i*n_in(), der_outs.begin()+(i+1)*n_in());
 
       int i_output_accum = 0;
-      for (int j=0;j<n_in();++j) {
-        if (input_accum_[j]) {
-          // Add the extra argument to the output
-          int idx = n_in()+n_out()+i*(n_out()+output_accum_.size())+n_out()+i_output_accum;
-          f_der_outs[i*n_in()+j] += f_der_ins[idx];
-          i_output_accum ++;
-        }
+      for (int j=0;j<n_accum_;++j) {
+        // Add the extra argument to the output
+        int idx = n_in()+n_out()+i*(n_out()+n_accum_)+n_out()+i_output_accum;
+        f_der_outs[i*n_in()+j] += f_der_ins[idx];
+        i_output_accum ++;
       }
     }
 
@@ -531,13 +521,13 @@ namespace casadi {
     */
     std::vector<bool> input_accum(n_in()+n_out(), false);
     std::vector<bool> input_accum_rev(n_out(), false);
-    for (int j=0;j<output_accum_.size();++j) {
-      input_accum_rev[output_accum_[j]] = true;
+    for (int j=0;j<n_accum_;++j) {
+      input_accum_rev[j] = true;
     }
 
     for (int i=0;i<nadj;++i) {
       input_accum.insert(input_accum.end(), input_accum_rev.begin(), input_accum_rev.end());
-      input_accum.insert(input_accum.end(), output_accum_.size(), false);
+      input_accum.insert(input_accum.end(), n_accum_, false);
     }
 
     // Construct the new MapAccum's output_accum
@@ -549,14 +539,14 @@ namespace casadi {
 
     */
     std::vector<int> output_accum_rev;
-    for (int j=0;j<input_accum_.size();++j) {
-      if (input_accum_[j]) output_accum_rev.push_back(j);
+    for (int j=0;j<n_accum_;++j) {
+      output_accum_rev.push_back(j);
     }
 
     std::vector<int> output_accum;
     int offset = 0;
     for (int i=0;i<nadj;++i) {
-      for (int j=0;j<output_accum_.size();++j) {
+      for (int j=0;j<n_accum_;++j) {
         output_accum.push_back(offset+output_accum_rev[j]);
       }
       offset+= n_in();
@@ -598,24 +588,20 @@ namespace casadi {
     /** Takes care of:  [x0 x1 x2]   */
     der_ins.insert(der_ins.end(), ins.begin(), ins.end());
     der_ins.insert(der_ins.end(), outs.begin(), outs.end());
-    int i_output_accum=0;
-    for (int i=0;i<n_in();++i) {
-      if (input_accum_[i]) {
-        // [x0 x1 x2 x3] -> all
-        // [x0 x1 x2] -> in
-        if (reverse_) {
-          MX all = horzcat(outs[output_accum_[i_output_accum++]], ins[i]);
-          MX in = bisect(all, ins[i].size2())[1];
-          f_der_ins.push_back(in);
-        } else {
-          MX all = horzcat(ins[i], outs[output_accum_[i_output_accum++]]);
-          MX in = bisect(all, ins[i].size2()*n_)[0];
-          f_der_ins.push_back(in);
-        }
+    for (int i=0;i<n_accum_;++i) {
+      // [x0 x1 x2 x3] -> all
+      // [x0 x1 x2] -> in
+      if (reverse_) {
+        MX all = horzcat(outs[i], ins[i]);
+        MX in = bisect(all, ins[i].size2())[1];
+        f_der_ins.push_back(in);
       } else {
-        f_der_ins.push_back(ins[i]);
+        MX all = horzcat(ins[i], outs[i]);
+        MX in = bisect(all, ins[i].size2()*n_)[0];
+        f_der_ins.push_back(in);
       }
     }
+    for (int i=n_accum_;i<n_in();++i) f_der_ins.push_back(ins[i]);
     f_der_ins.insert(f_der_ins.end(), outs.begin(), outs.end());
 
     // For the seeds to to the new mapaccum
@@ -632,36 +618,29 @@ namespace casadi {
       der_ins.insert(der_ins.end(), outs.begin(), outs.end());
       f_der_ins.insert(f_der_ins.end(), outs.begin(), outs.end());
 
-      int i_output_accum=0;
-      for (int j=0;j<n_in();++j) {
-        if (input_accum_[j]) {
-          if (reverse_) {
-            // 0, [X1_bar X2_bar X3_bar] -> all
-            MX all = horzcat(outs[output_accum_[i_output_accum]],
-              DM::zeros(ins[j].sparsity()));
-            // [0 X1_bar X2_bar], X3_bar -> splits
-            std::vector<MX> splits = bisect(all, ins[j].size2());
+      for (int j=0;j<n_accum_;++j) {
+        if (reverse_) {
+          // 0, [X1_bar X2_bar X3_bar] -> all
+          MX all = horzcat(outs[j], DM::zeros(ins[j].sparsity()));
+          // [0 X1_bar X2_bar], X3_bar -> splits
+          std::vector<MX> splits = bisect(all, ins[j].size2());
 
-            // alter the seed corresponding to an accumulator
-            f_der_ins[n_in()+n_out()+i*(n_out()+output_accum_.size())+output_accum_[i_output_accum]]
-              = splits[0];
-            // supply extra inputs
-            f_der_ins.push_back(splits[1]);
-          } else {
-            // 0, [X1_bar X2_bar X3_bar] -> all
-            MX all = horzcat(DM::zeros(ins[j].sparsity()),
-              outs[output_accum_[i_output_accum]]);
-            // [0 X1_bar X2_bar], X3_bar -> splits
-            std::vector<MX> splits = bisect(all, ins[j].size2()*n_);
+          // alter the seed corresponding to an accumulator
+          f_der_ins[n_in()+n_out()+i*(n_out()+n_accum_)+j]
+            = splits[0];
+          // supply extra inputs
+          f_der_ins.push_back(splits[1]);
+        } else {
+          // 0, [X1_bar X2_bar X3_bar] -> all
+          MX all = horzcat(DM::zeros(ins[j].sparsity()), outs[j]);
+          // [0 X1_bar X2_bar], X3_bar -> splits
+          std::vector<MX> splits = bisect(all, ins[j].size2()*n_);
 
-            // alter the seed corresponding to an accumulator
-            f_der_ins[n_in()+n_out()+i*(n_out()+output_accum_.size())+output_accum_[i_output_accum]]
-              = splits[1];
-            // supply extra inputs
-            f_der_ins.push_back(splits[0]);
-          }
-
-          i_output_accum++;
+          // alter the seed corresponding to an accumulator
+          f_der_ins[n_in()+n_out()+i*(n_out()+n_accum_)+j]
+            = splits[1];
+          // supply extra inputs
+          f_der_ins.push_back(splits[0]);
         }
       }
     }
@@ -676,16 +655,14 @@ namespace casadi {
 
     */
     for (int i=0;i<nadj;++i) {
-      for (int j=0;j<n_in();++j) {
-        if (input_accum_[j]) {
-          MX& x = der_outs[i*n_in()+j];
-          if (reverse_) {
-            std::vector<MX> r = bisect(x, f_.sparsity_in(j).size2()*(n_-1));
-            x = r[1];
-          } else {
-            std::vector<MX> r = bisect(x, f_.sparsity_in(j).size2());
-            x = r[0];
-          }
+      for (int j=0;j<n_accum_;++j) {
+        MX& x = der_outs[i*n_in()+j];
+        if (reverse_) {
+          std::vector<MX> r = bisect(x, f_.sparsity_in(j).size2()*(n_-1));
+          x = r[1];
+        } else {
+          std::vector<MX> r = bisect(x, f_.sparsity_in(j).size2());
+          x = r[0];
         }
       }
     }
