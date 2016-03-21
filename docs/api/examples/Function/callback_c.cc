@@ -1,12 +1,10 @@
 #include "casadi/casadi.hpp"
-
 using namespace casadi;
-using namespace std;
 
 class MyCallback : public Callback {
 public:
   // Creator function, creates an owning reference
-  static Function create(const string& name, const Dict& opts=Dict()) {
+  static Function create(const std::string& name, const Dict& opts=Dict()) {
     return Callback::create(name, new MyCallback(), opts);
   }
 
@@ -15,20 +13,16 @@ public:
   virtual int get_n_out() { return 1;}
 
   // Evaluate numerically
-  virtual vector<DM> eval(const vector<DM>& arg) {
+  virtual std::vector<DM> eval(const std::vector<DM>& arg) {
     DM x = arg.at(0);
     return {sin(x)};
   }
 };
 
-int main(int argc, char *argv[]) {
-
+int main() {
   Function f = MyCallback::create("f");
-
-  DM arg = DM(2);
-  DM res = f(vector<DM>{arg}).at(0);
-
-  cout << "out:" << res << endl;
-
+  std::vector<DM> arg = {2};
+  std::vector<DM> res = f(arg);
+  std::cout << res << std::endl;
   return 0;
 }

@@ -9,6 +9,10 @@ endif()
 add_executable(casadi_error_handling casadi_error_handling.cpp)
 target_link_libraries(casadi_error_handling casadi)
 
+# Callback functions
+add_executable(callback callback.cpp)
+target_link_libraries(callback casadi)
+
 # Small example on how sparsity can be propagated throw a CasADi expression
 add_executable(propagating_sparsity propagating_sparsity.cpp)
 target_link_libraries(propagating_sparsity casadi)
@@ -132,5 +136,5 @@ endif()
 
 if (QPOASES_FOUND)
   add_executable(chain_qp chain_qp.cpp)
-  target_link_libraries(chain_qp casadi)   
+  target_link_libraries(chain_qp casadi)
 endif()

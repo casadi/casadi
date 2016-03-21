@@ -2172,16 +2172,121 @@ and inheriting from this class has the same effect as inheriting directly from
 is possible to implement the exposed methods of \texttt{Callback} from either
 Python, MATLAB or C++.
 
-\subsection*{C++}
+The derived class consists of the following parts:
+\begin{itemize}
+  \item A constructor or a static function replacing the constructor
+  \item A number of \emph{virtual} functions, all optional, that can be overloaded
+  (shadowed) in order to get the desired behavior. This includes the number of
+  of inputs and outputs using \verb|get_n_in| and \verb|get_n_out|,
+  their names using \verb|get_name_in| and \verb|get_name_out|
+  and their sparsity patterns \verb|get_sparsity_in| and \verb|get_sparsity_out|.
+  \item An optional \verb|init| function called when the construction is complete.
+  \item A function for e.g. numerical and symbolical evaluation, derivative
+  calculation etc.
+\end{itemize}
 
+For a complete list of functions, see the C++ API documentation for
+\texttt{Callback}.
+
+The usage from the different languages are described in the following.
 
 \subsection*{Python}
+In Python, the syntax is as follows:
+\begin{lstlisting}[language=Python]
+class MyCallback(Callback):
+  def __init__(self, name, d, opts={}):
+    Callback.__init__(self)
+    self.d = d
+    self.construct(name, opts)
 
+  # Number of inputs and outputs
+  def get_n_in(self): return 1
+  def get_n_out(self): return 1
+
+  # Initialize the object
+  def init(self):
+     print 'initializing object'
+
+  # Evaluate numerically
+  def eval(self, arg):
+    x = arg[0]
+    f = sin(self.d*x)
+    return [f]
+\end{lstlisting}
+
+The implementation should include a constructor, which should call the
+base class constructor using
+\lstinline[language=Python]{Callback.__init__(self)}.
+
+This function can be used as any built-in \CasADi function with the important
+caveat that when embedded in graphs, the ownership of the class will \emph{not}
+be shared between all references. So it is important that the user does not
+allow the Python class to go out of scope while it is still needed in
+calculations.
+
+\begin{lstlisting}[language=Python]
+# Use the function
+f = MyCallback('f', 0.5)
+res = f(2)
+print res
+\end{lstlisting}
 
 \subsection*{MATLAB}
 
+\subsection*{C++}
+In C++, the syntax is as follows:
+\begin{lstlisting}[language=C++]
+#include "casadi/casadi.hpp"
+using namespace casadi;
+class MyCallback : public Callback {
+private:
+  // Data members
+  double d;
+  // Private constructor
+  MyCallback(double d) : d(d) {}
+public:
+  // Creator function, creates an owning reference
+  static Function create(const std::string& name, double d,
+                         const Dict& opts=Dict()) {
+    return Callback::create(name, new MyCallback(d), opts);
+  }
 
+  // Number of inputs and outputs
+  virtual int get_n_in() { return 1;}
+  virtual int get_n_out() { return 1;}
 
+  // Initialize the object
+  virtual void init() {
+    std::cout << "initializing object" << std::endl;
+  }
+
+  // Evaluate numerically
+  virtual std::vector<DM> eval(const std::vector<DM>& arg) {
+    DM x = arg.at(0);
+    DM f = sin(d*x);
+    return {f};
+  }
+};
+\end{lstlisting}
+
+As seen in the example, the derived class should implement a private
+constructor that is not called directly, but instead via a static \texttt{create}
+function using the syntax above.
+This functions returns a \texttt{Function} instance which takes ownership of the
+created object.
+
+ class created this way can be used as any other \texttt{Function} instance,
+with the \texttt{create} function replacing a conventional constructor:
+
+\begin{lstlisting}[language=C++]
+int main() {
+  Function f = MyCallback::create("f", 0.5);
+  std::vector<DM> arg = {2};
+  std::vector<DM> res = f(arg);
+  std::cout << res << std::endl;
+  return 0;
+}
+\end{lstlisting}
 
 \chapter{Optimal control with \CasADi}
 \CasADi can be used to solve \emph{optimal control problems} (OCP) using a variety of methods, including direct (a.k.a. \emph{discretize-then-optimize}) and indirect (a.k.a. \emph{optimize-then-discretize}) methods, all-at-once (e.g. collocation) methods and shooting-methods requiring embedded solvers of initial value problems in ODE or DAE. As a user, you are in general expected to \emph{write your own OCP solver} and \CasADi aims as making this as easy as possible by providing powerful high-level building blocks. Since you are writing the solver yourself (rather than calling an existing ``black-box'' solver), a basic understanding of how to solve OCPs is indispensable. Good, self-contained introductions to numerical optimal control can be found in the recent textbooks by Biegler\footnote{Lorenz T. Biegler, \emph{\htmladdnormallink{Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes}{http://books.google.es/books/about/Nonlinear_Programming.html?id=VdB1wJQu0sgC&redir_esc=y}}, SIAM 2010} or Betts\footnote{John T. Betts, \emph{\htmladdnormallink{Practical Methods for Optimal Control Using Nonlinear Programming}{http://books.google.es/books/about/Practical_Methods_for_Optimal_Control_Us.html?id=Yn53JcYAeaoC&redir_esc=y}}, SIAM 2001} or Moritz Diehl's lecture notes on \htmladdnormallink{numerical optimal control}{http://homes.esat.kuleuven.be/~mdiehl/NUMOPT/numopt.pdf}.
