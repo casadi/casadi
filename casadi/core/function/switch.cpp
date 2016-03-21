@@ -52,34 +52,34 @@ namespace casadi {
     return f_def_.n_out();
   }
 
-  Sparsity Switch::get_sparsity_in(int ind) const {
-    if (ind==0) {
+  Sparsity Switch::get_sparsity_in(int i) {
+    if (i==0) {
       return Sparsity::scalar();
     } else {
       Sparsity ret;
-      for (auto&& i : f_) {
-        if (!i.is_null()) {
-          const Sparsity& s = i.sparsity_in(ind-1);
+      for (auto&& fk : f_) {
+        if (!fk.is_null()) {
+          const Sparsity& s = fk.sparsity_in(i-1);
           ret = ret.is_null() ? s : ret.unite(s);
         }
       }
       casadi_assert(!f_def_.is_null());
-      const Sparsity& s = f_def_.sparsity_in(ind-1);
+      const Sparsity& s = f_def_.sparsity_in(i-1);
       ret = ret.is_null() ? s : ret.unite(s);
       return ret;
     }
   }
 
-  Sparsity Switch::get_sparsity_out(int ind) const {
+  Sparsity Switch::get_sparsity_out(int i) {
     Sparsity ret;
-    for (auto&& i : f_) {
-      if (!i.is_null()) {
-        const Sparsity& s = i.sparsity_out(ind);
+    for (auto&& fk : f_) {
+      if (!fk.is_null()) {
+        const Sparsity& s = fk.sparsity_out(i);
         ret = ret.is_null() ? s : ret.unite(s);
       }
     }
     casadi_assert(!f_def_.is_null());
-    const Sparsity& s = f_def_.sparsity_out(ind);
+    const Sparsity& s = f_def_.sparsity_out(i);
     ret = ret.is_null() ? s : ret.unite(s);
     return ret;
   }

@@ -61,8 +61,8 @@ namespace casadi {
 
     /// @{
     /** \brief All inputs and outputs are scalars */
-    virtual Sparsity get_sparsity_in(int ind) const { return Sparsity::scalar();}
-    virtual Sparsity get_sparsity_out(int ind) const { return Sparsity::scalar();}
+    virtual Sparsity get_sparsity_in(int i) { return Sparsity::scalar();}
+    virtual Sparsity get_sparsity_out(int i) { return Sparsity::scalar();}
     /// @}
 
     /** \brief Use simplified signature */

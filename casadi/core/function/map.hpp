@@ -56,11 +56,11 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const {
-      return repmat(f_.sparsity_in(ind), 1, n_);
+    virtual Sparsity get_sparsity_in(int i) {
+      return repmat(f_.sparsity_in(i), 1, n_);
     }
-    virtual Sparsity get_sparsity_out(int ind) const {
-      return repmat(f_.sparsity_out(ind), 1, n_);
+    virtual Sparsity get_sparsity_out(int i) {
+      return repmat(f_.sparsity_out(i), 1, n_);
     }
     /// @}
 
@@ -226,13 +226,13 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const {
-      return repeat_in_.at(ind) ? repmat(f_.sparsity_in(ind), 1, n_)
-        : f_.sparsity_in(ind);
+    virtual Sparsity get_sparsity_in(int i) {
+      return repeat_in_.at(i) ? repmat(f_.sparsity_in(i), 1, n_)
+        : f_.sparsity_in(i);
     }
-    virtual Sparsity get_sparsity_out(int ind) const {
-      return repeat_out_.at(ind) ? repmat(f_.sparsity_out(ind), 1, n_)
-        : f_.sparsity_out(ind);
+    virtual Sparsity get_sparsity_out(int i) {
+      return repeat_out_.at(i) ? repmat(f_.sparsity_out(i), 1, n_)
+        : f_.sparsity_out(i);
     }
     /// @}
 

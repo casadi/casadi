@@ -240,8 +240,8 @@ namespace casadi {
     Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
   }
 
-  Sparsity Qpsol::get_sparsity_in(int ind) const {
-    switch (static_cast<QpsolInput>(ind)) {
+  Sparsity Qpsol::get_sparsity_in(int i) {
+    switch (static_cast<QpsolInput>(i)) {
     case QPSOL_X0:
     case QPSOL_G:
     case QPSOL_LBX:
@@ -260,8 +260,8 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Qpsol::get_sparsity_out(int ind) const {
-    switch (static_cast<QpsolOutput>(ind)) {
+  Sparsity Qpsol::get_sparsity_out(int i) {
+    switch (static_cast<QpsolOutput>(i)) {
     case QPSOL_COST:
       return Sparsity::scalar();
     case QPSOL_X:
@@ -347,7 +347,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-
-
-
-

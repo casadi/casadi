@@ -148,8 +148,8 @@ namespace casadi {
   Linsol::~Linsol() {
   }
 
-  Sparsity Linsol::get_sparsity_in(int ind) const {
-    switch (static_cast<LinsolInput>(ind)) {
+  Sparsity Linsol::get_sparsity_in(int i) {
+    switch (static_cast<LinsolInput>(i)) {
     case LINSOL_A:
       return sparsity_;
     case LINSOL_B:
@@ -159,8 +159,8 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Linsol::get_sparsity_out(int ind) const {
-    switch (static_cast<LinsolOutput>(ind)) {
+  Sparsity Linsol::get_sparsity_out(int i) {
+    switch (static_cast<LinsolOutput>(i)) {
     case LINSOL_X:
       return Sparsity::dense(neq_, nrhs_);
     case LINSOL_NUM_OUT: break;

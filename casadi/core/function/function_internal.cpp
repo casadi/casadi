@@ -2906,19 +2906,19 @@ namespace casadi {
     return 1;
   }
 
-  Sparsity FunctionInternal::get_sparsity_in(int ind) const {
+  Sparsity FunctionInternal::get_sparsity_in(int i) {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == n + "_jac") {
         // Same as nondifferentiated function
-        return derivative_of_.sparsity_in(ind);
+        return derivative_of_.sparsity_in(i);
       }
     }
     // Scalar by default
     return Sparsity::scalar();
   }
 
-  Sparsity FunctionInternal::get_sparsity_out(int ind) const {
+  Sparsity FunctionInternal::get_sparsity_out(int i) {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
       if (name_ == n + "_jac") {

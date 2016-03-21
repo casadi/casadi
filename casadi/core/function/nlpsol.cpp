@@ -164,8 +164,8 @@ namespace casadi {
     clear_memory();
   }
 
-  Sparsity Nlpsol::get_sparsity_in(int ind) const {
-    switch (static_cast<NlpsolInput>(ind)) {
+  Sparsity Nlpsol::get_sparsity_in(int i) {
+    switch (static_cast<NlpsolInput>(i)) {
     case NLPSOL_X0:
     case NLPSOL_LBX:
     case NLPSOL_UBX:
@@ -182,8 +182,8 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Nlpsol::get_sparsity_out(int ind) const {
-    switch (static_cast<NlpsolOutput>(ind)) {
+  Sparsity Nlpsol::get_sparsity_out(int i) {
+    switch (static_cast<NlpsolOutput>(i)) {
     case NLPSOL_F:
       return Sparsity::scalar();
     case NLPSOL_X:

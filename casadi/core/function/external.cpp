@@ -160,27 +160,27 @@ namespace casadi {
     }
   }
 
-  Sparsity GenericExternal::get_sparsity_in(int ind) const {
+  Sparsity GenericExternal::get_sparsity_in(int i) {
     // Use sparsity retrieval function, if present
     if (sparsity_in_) {
-      return Sparsity::compressed(sparsity_in_(ind));
-    } else if (li_.meta().has(name_ + "_SPARSITY_IN", ind)) {
-      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_IN", ind));
+      return Sparsity::compressed(sparsity_in_(i));
+    } else if (li_.meta().has(name_ + "_SPARSITY_IN", i)) {
+      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_IN", i));
     } else {
       // Fall back to base class
-      return FunctionInternal::get_sparsity_in(ind);
+      return FunctionInternal::get_sparsity_in(i);
     }
   }
 
-  Sparsity GenericExternal::get_sparsity_out(int ind) const {
+  Sparsity GenericExternal::get_sparsity_out(int i) {
     // Use sparsity retrieval function, if present
     if (sparsity_out_) {
-      return Sparsity::compressed(sparsity_out_(ind));
-    } else if (li_.meta().has(name_ + "_SPARSITY_OUT", ind)) {
-      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_OUT", ind));
+      return Sparsity::compressed(sparsity_out_(i));
+    } else if (li_.meta().has(name_ + "_SPARSITY_OUT", i)) {
+      return Sparsity::compressed(li_.meta().to_vector<int>(name_ + "_SPARSITY_OUT", i));
     } else {
       // Fall back to base class
-      return FunctionInternal::get_sparsity_out(ind);
+      return FunctionInternal::get_sparsity_out(i);
     }
   }
 

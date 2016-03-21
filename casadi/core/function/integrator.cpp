@@ -167,8 +167,8 @@ namespace casadi {
     if (dae_) delete dae_;
   }
 
-  Sparsity Integrator::get_sparsity_in(int ind) const {
-    switch (static_cast<IntegratorInput>(ind)) {
+  Sparsity Integrator::get_sparsity_in(int i) {
+    switch (static_cast<IntegratorInput>(i)) {
     case INTEGRATOR_X0: return x_;
     case INTEGRATOR_P: return p_;
     case INTEGRATOR_Z0: return z_;
@@ -180,8 +180,8 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Integrator::get_sparsity_out(int ind) const {
-    switch (static_cast<IntegratorOutput>(ind)) {
+  Sparsity Integrator::get_sparsity_out(int i) {
+    switch (static_cast<IntegratorOutput>(i)) {
     case INTEGRATOR_XF: return repmat(x_, 1, ntout_);
     case INTEGRATOR_QF: return repmat(q_, 1, ntout_);
     case INTEGRATOR_ZF: return repmat(z_, 1, ntout_);

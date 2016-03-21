@@ -53,8 +53,8 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const { return f_.sparsity_in(ind);}
-    virtual Sparsity get_sparsity_out(int ind) const { return f_.sparsity_out(ind);}
+    virtual Sparsity get_sparsity_in(int i) { return f_.sparsity_in(i);}
+    virtual Sparsity get_sparsity_out(int i) { return f_.sparsity_out(i);}
     /// @}
 
     ///@{

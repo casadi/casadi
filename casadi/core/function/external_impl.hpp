@@ -136,8 +136,8 @@ namespace casadi {
 
     /// @{
     /** \brief Retreive sparsities */
-    virtual Sparsity get_sparsity_in(int ind) const { return Sparsity::scalar();}
-    virtual Sparsity get_sparsity_out(int ind) const { return Sparsity::scalar();}
+    virtual Sparsity get_sparsity_in(int i) { return Sparsity::scalar();}
+    virtual Sparsity get_sparsity_out(int i) { return Sparsity::scalar();}
     /// @}
   };
 
@@ -160,8 +160,8 @@ namespace casadi {
 
     /// @{
     /** \brief Retreive sparsities */
-    virtual Sparsity get_sparsity_in(int ind) const;
-    virtual Sparsity get_sparsity_out(int ind) const;
+    virtual Sparsity get_sparsity_in(int i);
+    virtual Sparsity get_sparsity_out(int i);
     /// @}
 
     /** \brief Maximum number of memory objects */

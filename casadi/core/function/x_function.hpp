@@ -129,8 +129,8 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const { return inputv_.at(ind).sparsity();}
-    virtual Sparsity get_sparsity_out(int ind) const { return outputv_.at(ind).sparsity();}
+    virtual Sparsity get_sparsity_in(int i) { return inputv_.at(i).sparsity();}
+    virtual Sparsity get_sparsity_out(int i) { return outputv_.at(i).sparsity();}
     /// @}
 
     // Data members (all public)

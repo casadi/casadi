@@ -52,14 +52,14 @@ namespace casadi {
     return self_->get_n_out();
   }
 
-  Sparsity CallbackInternal::get_sparsity_in(int ind) const {
+  Sparsity CallbackInternal::get_sparsity_in(int i) {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
-    return self_->get_sparsity_in(ind);
+    return self_->get_sparsity_in(i);
   }
 
-  Sparsity CallbackInternal::get_sparsity_out(int ind) const {
+  Sparsity CallbackInternal::get_sparsity_out(int i) {
     casadi_assert_message(self_!=0, "Callback object has been deleted");
-    return self_->get_sparsity_out(ind);
+    return self_->get_sparsity_out(i);
   }
 
   std::string CallbackInternal::get_name_in(int i) {

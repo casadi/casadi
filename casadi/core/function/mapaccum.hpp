@@ -57,15 +57,15 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int ind) const {
-      if (input_accum_[ind]) {
-        return f_.sparsity_in(ind);
+    virtual Sparsity get_sparsity_in(int i) {
+      if (input_accum_[i]) {
+        return f_.sparsity_in(i);
       } else {
-        return repmat(f_.sparsity_in(ind), 1, n_);
+        return repmat(f_.sparsity_in(i), 1, n_);
       }
     }
-    virtual Sparsity get_sparsity_out(int ind) const {
-      return repmat(f_.sparsity_out(ind), 1, n_);
+    virtual Sparsity get_sparsity_out(int i) {
+      return repmat(f_.sparsity_out(i), 1, n_);
     }
     /// @}
 
