@@ -2191,7 +2191,7 @@ For a complete list of functions, see the C++ API documentation for
 The usage from the different languages are described in the following.
 
 \subsection*{Python}
-In Python, the syntax is as follows:
+In Python, a custom function class can be defined is as follows:
 \begin{lstlisting}[language=Python]
 class MyCallback(Callback):
   def __init__(self, name, d, opts={}):
@@ -2232,6 +2232,55 @@ print res
 \end{lstlisting}
 
 \subsection*{MATLAB}
+In MATLAB, a custom function class can be defined as follows, in a file
+\verb|MyCallback.m|:
+
+\begin{lstlisting}[language=Matlab]
+  classdef MyCallback < casadi.Callback
+    properties
+      d
+    end
+    methods
+      function self = MyCallback(name, d)
+        self@casadi.Callback();
+        self.d = d;
+        construct(self, name);
+      end
+
+      % Number of inputs and outputs
+      function v=get_n_in(self)
+        v=1;
+      end
+      function v=get_n_out(self)
+        v=1;
+      end
+
+      % Initialize the object
+      function init(self)
+        disp('initializing object')
+      end
+
+      % Evaluate numerically
+      function arg = eval(self, arg)
+        x = arg{1};
+        f = sin(self.d * x);
+        arg = {f};
+      end
+    end
+  end
+\end{lstlisting}
+
+This function can be used as any built-in \CasADi function, but as for Python,
+the ownership of the class will \emph{not} be shared between all references.
+So the user must not allow a class instance to get deleted while it is still
+in use, e.g. by making it \texttt{persistent}.
+
+\begin{lstlisting}[language=Matlab]
+% Use the function
+f = MyCallback('f', 0.5);
+res = f(2);
+disp(res)
+\end{lstlisting}
 
 \subsection*{C++}
 In C++, the syntax is as follows:
