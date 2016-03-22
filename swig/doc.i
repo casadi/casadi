@@ -130,6 +130,13 @@ required length of arg field.
 
 ";
 
+%feature("docstring")  casadi::Function::slice(const std::vector< int >
+&order_in, const std::vector< int > &order_out, const Dict &opts=Dict()) "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::SharedObject::print(std::ostream
 &stream=casadi::userOut(), bool trailing_newline=true) const  "
 
@@ -173,7 +180,7 @@ Evaluate symbolically in parallel and sum (matrix graph)
 Parameters:
 -----------
 
-parallelization:  Type of parallelization used: expand|serial|openmp
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -474,20 +481,23 @@ Number of nodes in the algorithm.
 
 %feature("docstring")  casadi::Function::sx_out(int oind) const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::sx_out(const std::string &oname)
 const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::sx_out() const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -689,20 +699,23 @@ no cached version is available.
 
 %feature("docstring")  casadi::Function::sx_in(int iind) const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::sx_in(const std::string &iname)
 const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::sx_in() const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -798,20 +811,23 @@ Get output dimension.
 
 %feature("docstring")  casadi::Function::mx_in(int ind) const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::mx_in(const std::string &iname)
 const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::mx_in() const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -1235,32 +1251,9 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring")  casadi::Function::map(const std::vector< std::vector<
-MX > > &arg, const std::string &parallelization="serial") "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
-const std::string &parallelization="serial") "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::string &name, int N,
-const Dict &opts=Dict()) const  "
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const std::vector< int > &reduce_in,
+const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
 
 Create a mapped version of this function.
 
@@ -1280,9 +1273,9 @@ The the mapaccumulated version has the signature:
      F: (A, P) -> (S )
   
       with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
       and
           s0 <- f(a0, p0)
           s1 <- f(a1, p1)
@@ -1292,18 +1285,79 @@ The the mapaccumulated version has the signature:
 
 
 
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
 ";
 
-%feature("docstring")  casadi::Function::map(const std::string &name, int n,
-const std::vector< bool > &repeat_in, const std::vector< bool > &repeat_out,
-const Dict &opts=Dict()) const  "
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const Dict &opts=Dict()) "
 
-Generic map.
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
+const std::string &parallelization="serial") "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::map< std::string, MX
+> &arg, const std::string &parallelization="serial") "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int N, const Dict &opts=Dict()) const  "
+int n, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
@@ -1339,8 +1393,8 @@ The the mapaccumulated version has the signature:
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, const std::vector< bool > &input_accum, const std::vector< int >
-&output_accum, bool reverse=false, const Dict &opts=Dict()) const  "
+int n, const std::vector< int > &accum_in, const std::vector< int >
+&accum_out, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
@@ -1556,20 +1610,23 @@ Get the sparsity of an output This function is called during construction.
 
 %feature("docstring")  casadi::Function::mx_out(int ind) const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::mx_out(const std::string &oname)
 const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::mx_out() const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -2133,7 +2190,7 @@ Dynamic constraints (imposed everywhere):
   DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, d, sdot)
   algebraic equations:         0 ==  alg(t, x, s, z, u, p, d)
   quadrature equations:  \\\\dot{q} == quad(t, x, s, z, u, p, d)
-  deppendent parameters:       d == ddef(t, x, s, z, u, p, d)
+  dependent parameters:       d == ddef(t, x, s, z, u, p, d)
   output equations:            y == ydef(t, x, s, z, u, p, d)
   
 
@@ -2854,20 +2911,23 @@ Access linear solver of a rootfinder.
 
 %feature("docstring")  casadi::Function::mx_out(int ind) const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::mx_out(const std::string &oname)
 const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::mx_out() const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -2885,7 +2945,7 @@ Get all the free variables of the function.
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int N, const Dict &opts=Dict()) const  "
+int n, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
@@ -2921,8 +2981,8 @@ The the mapaccumulated version has the signature:
 ";
 
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
-int n, const std::vector< bool > &input_accum, const std::vector< int >
-&output_accum, bool reverse=false, const Dict &opts=Dict()) const  "
+int n, const std::vector< int > &accum_in, const std::vector< int >
+&accum_out, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
@@ -3252,6 +3312,13 @@ Add modules to be monitored.
 
 ";
 
+%feature("docstring")  casadi::Function::slice(const std::vector< int >
+&order_in, const std::vector< int > &order_out, const Dict &opts=Dict()) "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
 &arg, const std::string &parallelization="serial") "
 
@@ -3260,7 +3327,7 @@ Evaluate symbolically in parallel and sum (matrix graph)
 Parameters:
 -----------
 
-parallelization:  Type of parallelization used: expand|serial|openmp
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -3392,32 +3459,9 @@ the output elements).
 
 ";
 
-%feature("docstring")  casadi::Function::map(const std::vector< std::vector<
-MX > > &arg, const std::string &parallelization="serial") "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
-const std::string &parallelization="serial") "
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
-";
-
-%feature("docstring")  casadi::Function::map(const std::string &name, int N,
-const Dict &opts=Dict()) const  "
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const std::vector< int > &reduce_in,
+const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
 
 Create a mapped version of this function.
 
@@ -3437,9 +3481,9 @@ The the mapaccumulated version has the signature:
      F: (A, P) -> (S )
   
       with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
       and
           s0 <- f(a0, p0)
           s1 <- f(a1, p1)
@@ -3449,32 +3493,96 @@ The the mapaccumulated version has the signature:
 
 
 
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
 ";
 
-%feature("docstring")  casadi::Function::map(const std::string &name, int n,
-const std::vector< bool > &repeat_in, const std::vector< bool > &repeat_out,
-const Dict &opts=Dict()) const  "
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const Dict &opts=Dict()) "
 
-Generic map.
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::vector< MX > &arg,
+const std::string &parallelization="serial") "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::map< std::string, MX
+> &arg, const std::string &parallelization="serial") "
+
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
 %feature("docstring")  casadi::Function::sx_in(int iind) const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::sx_in(const std::string &iname)
 const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::sx_in() const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -3538,20 +3646,23 @@ Get input scheme name by index.
 
 %feature("docstring")  casadi::Function::mx_in(int ind) const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::mx_in(const std::string &iname)
 const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::mx_in() const  "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -3962,20 +4073,23 @@ Remove modules to be monitored.
 
 %feature("docstring")  casadi::Function::sx_out(int oind) const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::sx_out(const std::string &oname)
 const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
 %feature("docstring")  casadi::Function::sx_out() const  "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -5260,10 +5374,13 @@ C++ includes: casadi_logger.hpp ";
 // File: classcasadi_1_1MapBase.xml
 
 
-// File: classcasadi_1_1MapReduce.xml
-
-
 // File: classcasadi_1_1MapSerial.xml
+
+
+// File: classcasadi_1_1MapSum.xml
+
+
+// File: classcasadi_1_1MapSumSerial.xml
 
 
 // File: singletoncasadi_1_1Matrix.xml
@@ -7875,6 +7992,9 @@ Return a string with a description (for SWIG)
 
 
 // File: classcasadi_1_1Project.xml
+
+
+// File: classcasadi_1_1PureMap.xml
 
 
 // File: classcasadi_1_1Qpsol.xml

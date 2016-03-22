@@ -78,6 +78,12 @@ length of arg field.
 
 ";
 
+%feature("docstring") casadi::Callback::slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring") casadi::Callback::print "
 
 Print a description of the object.
@@ -104,7 +110,7 @@ Evaluate symbolically in parallel and sum (matrix graph)
 Parameters:
 -----------
 
-parallelization:  Type of parallelization used: expand|serial|openmp
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -283,7 +289,8 @@ Number of nodes in the algorithm.
 
 %feature("docstring") casadi::Callback::sx_out "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -412,7 +419,8 @@ no cached version is available.
 
 %feature("docstring") casadi::Callback::sx_in "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -471,7 +479,8 @@ Get output dimension.
 
 %feature("docstring") casadi::Callback::mx_in "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -718,19 +727,9 @@ Get an atomic operation operator index.
 
 %feature("docstring") casadi::Callback::map "
 
->  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+>  Function Function.map(str name, str parallelization, int n, [int ] reduce_in, [int ] reduce_out, Dict opts=Dict())
 
->  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
-------------------------------------------------------------------------
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
->  Function Function.map(str name, int N, Dict opts=Dict()) const 
+>  Function Function.map(str name, str parallelization, int n, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -751,9 +750,9 @@ The the mapaccumulated version has the signature:
      F: (A, P) -> (S )
   
       with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
       and
           s0 <- f(a0, p0)
           s1 <- f(a1, p1)
@@ -763,10 +762,22 @@ The the mapaccumulated version has the signature:
 
 
 
->  Function Function.map(str name, int n, [bool ] repeat_in, [bool ] repeat_out, Dict opts=Dict()) const 
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+
+>  std.map<str, MX> Function.map(const std.map< str, MX > &arg, str parallelization=\"serial\")
 ------------------------------------------------------------------------
 
-Generic map.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -945,7 +956,8 @@ Get the sparsity of an output This function is called during construction.
 
 %feature("docstring") casadi::Callback::mx_out "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -1491,7 +1503,7 @@ Dynamic constraints (imposed everywhere):
   DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, d, sdot)
   algebraic equations:         0 ==  alg(t, x, s, z, u, p, d)
   quadrature equations:  \\\\dot{q} == quad(t, x, s, z, u, p, d)
-  deppendent parameters:       d == ddef(t, x, s, z, u, p, d)
+  dependent parameters:       d == ddef(t, x, s, z, u, p, d)
   output equations:            y == ydef(t, x, s, z, u, p, d)
   
 
@@ -2021,7 +2033,8 @@ Access linear solver of a rootfinder.
 
 %feature("docstring") casadi::Function::mx_out "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -2271,6 +2284,12 @@ Add modules to be monitored.
 
 ";
 
+%feature("docstring") casadi::Function::slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring") casadi::Function::mapsum "
 
 Evaluate symbolically in parallel and sum (matrix graph)
@@ -2278,7 +2297,7 @@ Evaluate symbolically in parallel and sum (matrix graph)
 Parameters:
 -----------
 
-parallelization:  Type of parallelization used: expand|serial|openmp
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -2338,19 +2357,9 @@ the output elements).
 
 %feature("docstring") casadi::Function::map "
 
->  [[MX] ] Function.map([[MX ] ] arg, str parallelization=\"serial\")
+>  Function Function.map(str name, str parallelization, int n, [int ] reduce_in, [int ] reduce_out, Dict opts=Dict())
 
->  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
-------------------------------------------------------------------------
-
-Evaluate symbolically in parallel (matrix graph)
-
-Parameters:
------------
-
-parallelization:  Type of parallelization used: expand|serial|openmp
-
->  Function Function.map(str name, int N, Dict opts=Dict()) const 
+>  Function Function.map(str name, str parallelization, int n, Dict opts=Dict())
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -2371,9 +2380,9 @@ The the mapaccumulated version has the signature:
      F: (A, P) -> (S )
   
       with
-          a: horzcat([a0, a1, ..., a_(N-1)])
-          p: horzcat([p0, p1, ..., p_(N-1)])
-          s: horzcat([s0, s1, ..., s_(N-1)])
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
       and
           s0 <- f(a0, p0)
           s1 <- f(a1, p1)
@@ -2383,16 +2392,29 @@ The the mapaccumulated version has the signature:
 
 
 
->  Function Function.map(str name, int n, [bool ] repeat_in, [bool ] repeat_out, Dict opts=Dict()) const 
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+>  [MX] Function.map([MX ] arg, str parallelization=\"serial\")
+
+>  std.map<str, MX> Function.map(const std.map< str, MX > &arg, str parallelization=\"serial\")
 ------------------------------------------------------------------------
 
-Generic map.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
 %feature("docstring") casadi::Function::sx_in "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -2448,7 +2470,8 @@ Get input scheme name by index.
 
 %feature("docstring") casadi::Function::mx_in "
 
-Get symbolic primitives equivalent to the input expressions.
+Get symbolic primitives equivalent to the input expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -2664,7 +2687,8 @@ class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::Function::sx_out "
 
-Get symbolic primitives equivalent to the output expressions.
+Get symbolic primitives equivalent to the output expressions There is no
+guarantee that subsequent calls return unique answers.
 
 ";
 
@@ -3823,10 +3847,13 @@ C++ includes: casadi_logger.hpp ";
 // File: classcasadi_1_1MapBase.xml
 
 
-// File: classcasadi_1_1MapReduce.xml
-
-
 // File: classcasadi_1_1MapSerial.xml
+
+
+// File: classcasadi_1_1MapSum.xml
+
+
+// File: classcasadi_1_1MapSumSerial.xml
 
 
 // File: singletoncasadi_1_1Matrix.xml
@@ -5875,6 +5902,9 @@ Return a string with a description (for SWIG)
 
 
 // File: classcasadi_1_1Project.xml
+
+
+// File: classcasadi_1_1PureMap.xml
 
 
 // File: classcasadi_1_1Qpsol.xml
