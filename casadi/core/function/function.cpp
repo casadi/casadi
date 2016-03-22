@@ -418,11 +418,17 @@ namespace casadi {
     return Mapaccum::create(name, *this, n, accum_in, accum_out, opts2);
 }
 
-  Function Function::map(const string& name, int n, const Dict& opts) const {
-    Function ret;
-    ret.assignNode(MapBase::create(name, *this, n, opts));
-    ret->construct(opts);
-    return ret;
+  Function Function::map(const string& name, const std::string& parallelization, int n,
+      const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+      const Dict& opts) const {
+    return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
+  }
+
+  Function Function::map(const string& name, const std::string& parallelization, int n,
+      const Dict& opts) const {
+    std::vector<int> reduce_in;
+    std::vector<int> reduce_out;
+    return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
   }
 
   Function Function::slice(const std::vector<int>& order_in, const std::vector<int>& order_out,

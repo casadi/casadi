@@ -132,7 +132,7 @@ simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid, 'output_t0':Tr
 sol = simulator(x0 = NP.concatenate((x_init, l_init_opt)))['xf']
 
 # Calculate the optimal control
-ufcn_all = u_fcn.map('ufcn_all', len(tgrid))
+ufcn_all = u_fcn.map('ufcn_all', 'serial', len(tgrid))
 u_opt = ufcn_all(sol)
 
 # Plot the results

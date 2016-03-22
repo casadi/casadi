@@ -39,8 +39,15 @@ namespace casadi {
   class CASADI_EXPORT MapBase : public FunctionInternal {
   public:
     // Create function (use instead of constructor)
+    static Function create(const std::string& name,
+                          const std::string& parallelization, const Function& f, int n,
+                          const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+                          const Dict& opts);
+
+    // Create function (use instead of constructor)
     static MapBase* create(const std::string& name,
-                           const Function& f, int n, const Dict& opts);
+                          const std::string& parallelization, const Function& f, int n,
+                          const std::vector<int>& reduce_in, const std::vector<int>& reduce_out);
 
     /** \brief Constructor */
     MapBase(const std::string& name) : FunctionInternal(name) {}

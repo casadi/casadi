@@ -29,46 +29,37 @@ using namespace std;
 
 namespace casadi {
 
+  Function MapBase::create(const std::string& name,
+                          const std::string& parallelization, const Function& f, int n,
+                          const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+                          const Dict& opts) {
+    if (parallelization=="unroll") {
+
+    } else {
+      Function ret;
+      ret.assignNode(MapBase::create(name, parallelization, f, n, reduce_in, reduce_out));
+      ret->construct(opts);
+      return ret;
+    }
+  }
+
   MapBase* MapBase::create(const std::string& name,
-                           const Function& f, int n, const Dict& opts) {
+                          const std::string& parallelization, const Function& f, int n,
+                          const std::vector<int>& reduce_in, const std::vector<int>& reduce_out) {
 
-    // Check if there are reduced inputs or outputs
-    bool reduce_inputs = opts.find("reduce_in")!=opts.end();
-    bool reduce_outputs = opts.find("reduce_out")!=opts.end();
-
-    // Read the type of parallelization
-    Dict::const_iterator par_op = opts.find("parallelization");
-
-    if (reduce_inputs || reduce_outputs) {
+    if (reduce_in.size()>0 || reduce_out.size()>0) {
       // Vector indicating which inputs/outputs are to be repeated
       std::vector<bool> repeat_in(f.n_in(), true), repeat_out(f.n_out(), true);
 
       // Mark reduced inputs
-      if (reduce_inputs) {
-        vector<int> ri = opts.find("reduce_in")->second;
-        for (vector<int>::const_iterator i=ri.begin(); i!=ri.end(); ++i) {
-          repeat_in[*i]=false;
-        }
-      }
+      for (int i : reduce_in) repeat_in[i]= false;
+      for (int i : reduce_out) repeat_out[i]= false;
 
-      // Mark reduced outputs
-      if (reduce_inputs) {
-        vector<int> ro = opts.find("reduce_out")->second;
-        for (vector<int>::const_iterator i=ro.begin(); i!=ro.end(); ++i) {
-          repeat_out[*i]=false;
-        }
-      }
-
-      bool non_repeated_output = false;
-      for (int i=0;i<repeat_out.size();++i) {
-        non_repeated_output |= !repeat_out[i];
-      }
-
-      if (par_op==opts.end() || par_op->second == "serial") {
+      if (parallelization == "serial") {
         return new MapSumSerial(name, f, n, repeat_in, repeat_out);
       } else {
-        if (par_op->second == "openmp") {
-          if (non_repeated_output) {
+        if (parallelization == "openmp") {
+          if (reduce_out.size()>0) {
             casadi_warning("OpenMP not yet supported for reduced outputs. "
                            "Falling back to serial mode.");
           } else {
@@ -84,11 +75,10 @@ namespace casadi {
       }
     }
 
-
-    if (par_op==opts.end() || par_op->second == "serial") {
+    if (parallelization == "serial") {
       return new MapSerial(name, f, n);
     } else {
-      if (par_op->second == "openmp") {
+      if (parallelization== "openmp") {
         #ifdef WITH_OPENMP
         return new MapOmp(name, f, n);
         #else // WITH_OPENMP
@@ -106,25 +96,15 @@ namespace casadi {
 
   Options MapBase::options_
   = {{&FunctionInternal::options_},
-     {{"parallelization",
-       {OT_STRING,
-        "Computational strategy for parallelization: serial|openmp"}},
-      {"n_threads",
+     {{"n_threads",
        {OT_INT,
         "Control the number of threads when executing in parallel. "
         "The default setting (0) will pass the decision on to the parallelization library. "
-        "For openmp, this means that OMP_NUM_THREADS env. variable is observed."}},
-      {"reduce_in",
-       {OT_INTVECTOR,
-        "Indices of inputs that are reduced"}},
-      {"reduce_out",
-       {OT_INTVECTOR,
-        "Indices of outputs that are reduced"}}
+        "For openmp, this means that OMP_NUM_THREADS env. variable is observed."}}
      }
   };
 
   void MapBase::propagate_options(Dict& opts) {
-    if (opts.find("parallelization")==opts.end()) opts["parallelization"] = parallelization();
     if (opts.find("n_threads")==opts.end()) opts["n_threads"] = n_threads_;
   }
 
@@ -213,7 +193,7 @@ namespace casadi {
     propagate_options(opts);
 
     // Construct and return
-    return df.map(name, n_, opts);
+    return df.map(name, parallelization(), n_, opts);
   }
 
   Function PureMap
@@ -225,7 +205,7 @@ namespace casadi {
     propagate_options(opts);
 
     // Construct and return
-    return df.map(name, n_, opts);
+    return df.map(name, parallelization(), n_, opts);
   }
 
   MapSum::MapSum(const std::string& name, const Function& f, int n,
@@ -422,11 +402,9 @@ namespace casadi {
     for (int i=0;i<repeat_out.size();++i) {
       if (!repeat_out[i]) reduce_out.push_back(i);
     }
-    opts["reduce_in"] = reduce_in;
-    opts["reduce_out"] = reduce_out;
 
     // Construct and return
-    return df.map(name, n_, opts);
+    return df.map(name, parallelization(), n_, reduce_in, reduce_out, opts);
   }
 
   Function MapSum
@@ -457,11 +435,9 @@ namespace casadi {
     for (int i=0;i<repeat_out.size();++i) {
       if (!repeat_out[i]) reduce_out.push_back(i);
     }
-    opts["reduce_in"] = reduce_in;
-    opts["reduce_out"] = reduce_out;
 
     // Construct and return
-    return df.map(name, n_, opts);
+    return df.map(name, parallelization(), n_, reduce_in, reduce_out, opts);
   }
 
   void MapSum::generateDeclarations(CodeGenerator& g) const {

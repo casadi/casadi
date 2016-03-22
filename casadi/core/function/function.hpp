@@ -625,9 +625,15 @@ namespace casadi {
                 s_(N-1) <- f(a_(N-1), p_(N-1))
         \endverbatim
 
+        \param parallelization Type of parallelization used: expand|serial|openmp
 
     */
-    Function map(const std::string& name, int n, const Dict& opts=Dict()) const;
+
+    Function map(const std::string& name, const std::string& parallelization, int n,
+      const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+      const Dict& opts=Dict()) const;
+    Function map(const std::string& name, const std::string& parallelization, int n,
+      const Dict& opts=Dict()) const;
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
     Function slice(const std::vector<int>& order_in, const std::vector<int>& order_out,
