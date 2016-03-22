@@ -22,6 +22,8 @@
 \newcommand{\T}{\text{T}}
 \newcommand{\lb}{\text{lb}}
 \newcommand{\ub}{\text{ub}}
+\newcommand{\python}[1]{\lstinline[language=Python]{#1}}
+\newcommand{\cxx}[1]{\lstinline[language=C++]{#1}}
 
 \begin{latexonly}
 %\ifunction\currentversion\undefined \newcommand{\currentversion}{1.9.0\xspace} \fi
@@ -2419,6 +2421,292 @@ a proof-of-concept stage, not ready to be used for actual applications.
 Contact the \CasADi developers directly if you are interested in this feature.
 
 %%%%%%%%%%%%%
+\chapter{The \texttt{DaeBuilder} class} \label{ch:daebuilder}
+The \texttt{DaeBuilder} class in \CasADi is an auxiliary class intended to
+facilitate the modeling complex dynamical systems for later use with optimal
+control algorithms. This class can be seen as a low-level alternative to
+a physical modeling language such as Modelica (cf. Section~\ref{sec:modelica}),
+while still being higher level than working directly with \CasADi symbolic
+expressions. Another important usage it to provide an interface to
+physical modeling languages and software and be a building blocks for
+developing domain specific modeling environments.
+
+Using the \texttt{DaeBuilder} class consists of the following steps:
+\begin{itemize}
+  \item Step-by-step constructing a structured system of differential-algebraic
+  equations (DAE) or, alternatively, importing an existing model from Modelica
+  \item Symbolically reformulate the DAE
+  \item Generate a chosen set of \CasADi functions to be used for e.g. optimal
+  control or C code generation
+\end{itemize}
+
+In the following sections, we describe the mathematical formulation of the class
+and its intended usage.
+
+\section{Mathematical formulation} \label{sec:daebuilder_io}
+The \texttt{DaeBuilder} class uses a relatively rich problem formulation that
+consists of a set of input expressions and a set of output expressions, each
+defined by a string identifier. The choice of expressions was inspired by the
+\emph{functional mockup interface} (FMI) version 2.0
+\footnote{FMI development group. Functional Mock-up Interface for Model Exchange and Co-Simulation. \url{https://www.fmi-standard.org/}, July 2014. Specification, FMI 2.0. Section 3.1, pp. 71–72}
+
+\subsection*{Input expressions}
+\begin{enumerate}
+  \item['t'] Time $t$
+  \item['c'] Named constants $c$
+  \item['p'] Independent parameters $p$
+  \item['d'] Dependent parameters $d$, depends only on $p$ and $c$ and,
+  acyclically, on other $d$
+  \item['x'] Differential state $x$, defined by an explicit ODE
+  \item['s'] Differential state $s$, defined by an implicit ODE
+  \item['sdot'] Time derivatives implicitly defined differential state $\dot{s}$
+  \item['z'] Algebraic variable, defined by an algebraic equation
+  \item['q'] Quadrature state $q$. A differential state that may not appear in
+  the right-hand-side and hence can be calculated by quadrature formulas.
+  \item['w'] Local variables $w$. Calculated from time and time dependent
+  variables. They may also depend, acyclically, on other $w$.
+  \item['y'] Output variables $y$
+\end{enumerate}
+
+\subsection*{Output expressions}
+The above input expressions are used to define the following output expressions:
+\begin{enumerate}
+  \item['ddef'] Explicit expression for calculating $d$
+  \item['wdef'] Explicit expression for calculating $w$
+  \item['ode'] The explicit ODE right-hand-side:
+    $\dot{x} = \text{ode}(t,w,x,s,z,u,p,d)$
+  \item['dae'] The implicit ODE right-hand-side:
+  $\text{dae}(t,w,x,s,z,u,p,d,\dot{s}) =0$
+  \item['alg'] The algebraic equations:
+    $\text{alg}(t,w,x,s,z,u,p,d) = 0$
+  \item['quad'] The quadrature equations:
+  $\dot{q} = \text{quad}(t,w,x,s,z,u,p,d)$
+  \item['ydef'] Explicit expressions for calculating $y$
+\end{enumerate}
+
+\section{Constructing a \texttt{DaeBuilder} instance} \label{sec:daebuilder_syntax}
+Consider the following simple DAE corresponding to a controlled rocket subject to
+quadratic air friction term and gravity, which loses mass as it uses up fuel:
+\begin{subequations}
+\begin{align}
+ \dot{h} &= v,                    \qquad &h(0) = 0 \\
+ \dot{v} &= (u - a \, v^2)/m - g, \qquad &v(0) = 0 \\
+ \dot{m} &= -b \, u^2,            \qquad &m(0) = 1
+\end{align}
+\end{subequations}
+where the three states correspond to height, velocity and mass, respectively.
+$u$ is the thrust of the rocket and $(a,b)$ are parameters.
+
+To construct a DAE formulation for this problem, start with an empty
+\texttt{DaeBuilder} instance and add the input and output expressions step-by-step
+as follows.
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+dae = DaeBuilder()
+# Add input expressions
+a = dae.add_p('a')
+b = dae.add_p('b')
+u = dae.add_u('u')
+h = dae.add_x('h')
+v = dae.add_x('v')
+m = dae.add_x('m')
+# Add output expressions
+hdot = v
+vdot = (u-a*v**2)/m-g
+mdot = -b*u**2
+dae.add_ode(hdot)
+dae.add_ode(vdot)
+dae.add_ode(mdot)
+# Specify initial conditions
+dae.set_start('h', 0)
+dae.set_start('v', 0)
+dae.set_start('m', 1)
+# Add meta information
+dae.set_unit('h','m')
+dae.set_unit('v','m/s')
+dae.set_unit('m','kg')
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+dae = DaeBuilder;
+% Add input expressions
+a = dae.add_p('a');
+b = dae.add_p('b');
+u = dae.add_u('u');
+h = dae.add_x('h');
+v = dae.add_x('v');
+m = dae.add_x('m');
+% Add output expressions
+hdot = v;
+vdot = (u-a*v^2)/m-g;
+mdot = -b*u^2;
+dae.add_ode(hdot);
+dae.add_ode(vdot);
+dae.add_ode(mdot);
+% Specify initial conditions
+dae.set_start('h', 0);
+dae.set_start('v', 0);
+dae.set_start('m', 1);
+% Add meta information
+dae.set_unit('h','m');
+dae.set_unit('v','m/s');
+dae.set_unit('m','kg');
+\end{lstlisting}
+\end{minipage}
+
+Other input and output expressions can be added in an analogous way. For a full
+list of functions, see the C++ API documentation for \texttt{DaeBuilder}.
+
+\section{Import of OCPs from Modelica} \label{sec:modelica}
+An alternative to model directly in \CasADi, as above, is to use an advanced
+physical modeling language such as Modelica to specity the model. For this,
+\CasADi offers interoperability with the open-source \htmladdnormallink{JModelica.org}{http://www.jmodelica.org/} compiler, which
+is written specifically with optimal control in mind. Model inport from
+JModelica.org is possible in two different ways; using the JModelica.org's
+\texttt{CasadiInterface} or via \texttt{DaeBuilder}'s
+\lstinline[language=Python]{parse_fmi} command.
+
+We recommend the former approach, since it is being actively maintained and
+refer to JModelica.org's user guide for details on how to extract \CasADi
+expressions.
+
+In the following, we will outline the legacy approach, using
+\lstinline[language=Python]{parse_fmi}.
+
+\subsection*{Legacy import of a \texttt{modelDescription.xml} file}
+To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in \CasADi's example collection.
+
+Assuming that the Modelica/Optimica model \texttt{ModelicaClass.ModelicaModel} is defined in the files \texttt{file1.mo} and \texttt{file2.mop}, the Python compile command is:
+\begin{lstlisting}[language=Python]
+from pymodelica import compile_jmu
+jmu_name=compile_jmu('ModelicaClass.ModelicaModel', \
+  ['file1.mo','file2.mop'],'auto','ipopt',\
+  {'generate_xml_equations':True, 'generate_fmi_me_xml':False})
+\end{lstlisting}
+
+This will generate a \texttt{jmu}-file, which is essentially a zip file containing, among other things, the file \texttt{modelDescription.xml}. This XML-file contains a symbolic representation of the optimal control problem and can be inspected in a standard XML editor.
+\begin{lstlisting}[language=Python]
+from zipfile import ZipFile
+sfile = ZipFile(jmu_name','r')
+mfile = sfile.extract('modelDescription.xml','.')
+\end{lstlisting}
+
+Once a \texttt{modelDescription.xml} file is available, it can be imported
+using the \python{parse_fmi} command:
+
+\begin{lstlisting}[language=Python]
+dae = DaeBuilder()
+ocp.parse_fmi('modelDescription.xml')
+\end{lstlisting}
+
+\section{Symbolic reformulation}
+One of the original purposes of the \texttt{DaeBuilder} class was to reformulate
+a \emph{fully-implicit DAE}, typically coming from Modelica, to a semi-explicit
+DAE that can be used more readily in optimal control algorithms.
+
+This can be done by the \python{make_implicit} command:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+ocp.make_explicit()
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+ocp.make_explicit();
+\end{lstlisting}
+\end{minipage}
+
+
+Other useful commands available for an instance \texttt{ocp} of \texttt{DaeBuilder} include:
+\begin{description}
+\item[print \texttt{ocp}] Print the optimal optimal control problem to screen
+\item[\texttt{ocp}.scale\_variables()] Scale all variables using the \emph{nominal} attribute for each variable
+\item[\texttt{ocp}.eliminate\_d()] Eliminate all independent parameters from the symbolic expressions
+\end{description}
+
+For a more detailed description of this class and its functionalities, we again
+refer to the API documentation.
+
+\section{Function factory}
+Once a \texttt{DaeBuilder} has been formulated and possibily reformulated to
+a satisfactory form, we can generate \CasADi functions corresponding to the
+input and output expressions outlined in Section~\ref{sec:daebuilder_io}.
+For example, to create a function for the ODE right-hand-side for the rocket
+model in Section~\ref{sec:daebuilder_syntax}, simply provide a display
+name of the function being created, a list of input expressions
+and a list of output expressions:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+f = dae.create('f',\
+     ['x','u','p'],['ode'])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+f = dae.create('f',...
+     {'x','u','p'},{'ode'});
+\end{lstlisting}
+\end{minipage}
+
+Using a naming convention, we can also create Jacobians, e.g. for the 'ode'
+output with respect to 'x':
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+f = dae.create('f',\
+     ['x','u','p'],\
+     ['jac_ode_x'])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+f = dae.create('f',...
+     {'x','u','p'},
+     {'jac_ode_x'});
+\end{lstlisting}
+\end{minipage}
+
+Functions with second order information can be extracted by first creating
+a named linear combination of the output expressions using \python{add_lc}
+and then requesting its Hessian:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+dae.add_lc('gamma',['ode'])
+hes = dae.create('hes’,\
+  ['x','u','p','lam_ode'],\
+  ['hes_gamma_x_x'])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+dae.add_lc('gamma,{'ode'});
+hes = dae.create(’hes’,...
+  {'x','u','p','lam_ode'},...
+  {'hes_gamma_x_x'});
+\end{lstlisting}
+\end{minipage}
+
+It is also possible to simply extract the symbolic expressions from the
+\texttt{DaeBuilder} instance and manually create \CasADi functions.
+For example, \python{dae.x} contains all the expressions corresponding to 'x',
+\python{dae.ode} contains the expressions corresponding to 'ode', etc.
+
+%%%%%%%
 
 \chapter{Optimal control with \CasADi}
 \CasADi can be used to solve \emph{optimal control problems} (OCP) using a variety of methods, including direct (a.k.a. \emph{discretize-then-optimize}) and indirect (a.k.a. \emph{optimize-then-discretize}) methods, all-at-once (e.g. collocation) methods and shooting-methods requiring embedded solvers of initial value problems in ODE or DAE. As a user, you are in general expected to \emph{write your own OCP solver} and \CasADi aims as making this as easy as possible by providing powerful high-level building blocks. Since you are writing the solver yourself (rather than calling an existing ``black-box'' solver), a basic understanding of how to solve OCPs is indispensable. Good, self-contained introductions to numerical optimal control can be found in the recent textbooks by Biegler\footnote{Lorenz T. Biegler, \emph{\htmladdnormallink{Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes}{http://books.google.es/books/about/Nonlinear_Programming.html?id=VdB1wJQu0sgC&redir_esc=y}}, SIAM 2010} or Betts\footnote{John T. Betts, \emph{\htmladdnormallink{Practical Methods for Optimal Control Using Nonlinear Programming}{http://books.google.es/books/about/Practical_Methods_for_Optimal_Control_Us.html?id=Yn53JcYAeaoC&redir_esc=y}}, SIAM 2001} or Moritz Diehl's lecture notes on \htmladdnormallink{numerical optimal control}{http://homes.esat.kuleuven.be/~mdiehl/NUMOPT/numopt.pdf}.
@@ -2551,56 +2839,6 @@ x_{k+1,0} - \sum_{r=0}^{d}{D_r \, x_{k,r}} = 0, \qquad k=0,\ldots,n_k-1,
 \end{equation}
 
 These two sets of equations take the place of the continuity equation (represented by the integrator call) in direct multiple shooting. The above equations have been implemented in the script \texttt{vdp\_collocation.py}.
-
-\chapter{Import and reformulation of OCPs from Modelica} \label{ch:modelica}
-\CasADi supports importing OCPs formulated in the Modelica modeling language as well as in the Optimica extension of Modelica to optimal control. The import facility currently works with the open-source \htmladdnormallink{JModelica.org}{http://www.jmodelica.org/} compiler.
-
-For instructions on how to install and use JModelica.org, we refer to their \htmladdnormallink{website}{http://www.jmodelica.org/}. Note that a \CasADi build (which may not be the latest) is contained in the pre-built JModelica.org binaries.
-
-\emph{NOTE: The functionality to import and reformulation of OCPs from Modelica is still under development and to be considered unstable.}
-
-\section{Compiling the Modelica code} \label{sec:modelica_compilation}
-To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in \CasADi's example collection.
-
-Assuming that the Modelica/Optimica model \texttt{ModelicaClass.ModelicaModel} is defined in the files \texttt{file1.mo} and \texttt{file2.mop}, the compile command is:
-\begin{verbatim}
-  from pymodelica import compile_jmu
-  jmu_name=compile_jmu('ModelicaClass.ModelicaModel', \
-    ['file1.mo','file2.mop'],'auto','ipopt',\
-    {'generate_xml_equations':True, 'generate_fmi_me_xml':False})
-\end{verbatim}
-
-This will generate a \texttt{jmu}-file, which is essentially a zip file containing, among other things, the file \texttt{modelDescription.xml}. This XML-file contains a symbolic representation of the optimal control problem and can be inspected in a standard XML editor.
-\begin{verbatim}
-  from zipfile import ZipFile
-  sfile = ZipFile(jmu_name','r')
-  mfile = sfile.extract('modelDescription.xml','.')
-\end{verbatim}
-
-\section{The DaeBuilder class} \label{sec:modelica_import}
-\emph{NOTE: The DaeBuilder class (previously called SymbolicOCP) is not yet stable and undergoing refactoring. Fore more information, see \htmladdnormallink{CasADi issue \#1358}{https://github.com/casadi/casadi/issues/1358}.}
-
-The symbolic optimal control problem representation (or just model description) contained in \texttt{modelDescription.xml} can be imported into \CasADi in the form of the DaeBuilder class:
-\begin{verbatim}
-ocp = DaeBuilder()
-\end{verbatim}
-
-The \texttt{DaeBuilder} class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is to call the member function \texttt{parse\_fmi} with the XML file name:
-\begin{verbatim}
-ocp.parse_fmi('modelDescription.xml')
-\end{verbatim}
-
-Symbolic expressions corresponding to the states, controls parameters etc. are directly accessible as member variables of the \texttt{DaeBuilder} object. E.g. the free controls can be accessed as \verb|ocp.u|. Symbolic expressions for the OCP are either accessible in the same way (e.g. \verb|ocp.dae| will return the equations for the fully-implicit differential-algebraic equation formulation used by Modelica. Other equations are tied to a particular variable. E.g. the \emph{binding equations} corresponding to the set of \emph{independent parameters} can be retrieved as \verb|ocp.beq(ocp.pi)|.
-
-Other useful commands available for an instance \texttt{ocp} of \texttt{DaeBuilder} include:
-\begin{description}
-\item[print \texttt{ocp}] Print the optimal optimal control problem to screen
-\item[\texttt{ocp}.make\_explicit()] Reformulate the OCP in fully-explicit form
-\item[\texttt{ocp}.scale\_variables()] Scale all variables using the \emph{nominal} attribute for each variable
-\item[\texttt{ocp}.eliminate\_d()] Eliminate all independent parameters from the symbolic expressions
-\end{description}
-
-For a more detailed description of this class and its functionalities, we refer to the API documentation. We also recommend potential users to have a look at the {\texttt{modelica\_ms.py}} tutorial example.
 
 \chapter{Difference in usage from different languages} \label{ch:syntax_differences}
 

@@ -61,7 +61,7 @@ namespace casadi {
       DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, d, sdot)
       algebraic equations:         0 ==  alg(t, x, s, z, u, p, d)
       quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, d)
-      deppendent parameters:       d == ddef(t, x, s, z, u, p, d)
+      dependent parameters:       d == ddef(t, x, s, z, u, p, d)
       output equations:            y == ydef(t, x, s, z, u, p, d)
       \endverbatim
 
@@ -130,7 +130,7 @@ namespace casadi {
     /** \brief Named constants */
     std::vector<MX> c, cdef;
 
-    /** \brief Dependent parameters and corresponding definitions 
+    /** \brief Dependent parameters and corresponding definitions
      * Interdependencies are allowed but must be non-cyclic.
      */
     std::vector<MX> d, ddef, lam_ddef;
