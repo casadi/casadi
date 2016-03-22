@@ -30,34 +30,22 @@ using namespace std;
 namespace casadi {
 
   Mapaccum::Mapaccum(const std::string& name, const Function& f, int n,
-                                     const std::vector<bool>& input_accum,
-                                     const std::vector<int>& output_accum,
+                                     int n_accum,
                                      bool reverse)
     : FunctionInternal(name), f_(f), n_(n),
-      input_accum_(input_accum), output_accum_(output_accum), reverse_(reverse) {
+      n_accum_(n_accum), reverse_(reverse) {
 
     casadi_assert(n>0);
     casadi_assert(f.n_in()>=1);
     casadi_assert(f.n_out()>=1);
 
-    casadi_assert(input_accum.size()==f_.n_in());
-    int n_accum=0;
-    for (int i=0;i<input_accum.size();++i) {
-      if (input_accum[i]) {
-        casadi_assert(n_accum<output_accum.size());
-        casadi_assert(output_accum[n_accum]>=0);
-        casadi_assert(output_accum[n_accum]<f_.n_out());
-
-        casadi_assert_message(f.sparsity_in(i)==f.sparsity_out(output_accum[n_accum]),
-                              "Input #" << i << " and output #" << output_accum[n_accum] <<
-                              " must have matching sparsity. " <<
-                              "Got " << f.sparsity_in(i).dim() << " and " <<
-                              f.sparsity_out(output_accum[n_accum]).dim() << ".");
-        n_accum++;
-      }
+    for (int i=0;i<n_accum_;++i) {
+      casadi_assert_message(f.sparsity_in(i)==f.sparsity_out(i),
+                            "Input and output #" << i <<
+                            " must have matching sparsity. " <<
+                            "Got " << f.sparsity_in(i).dim() << " and " <<
+                            f.sparsity_out(i).dim() << ".");
     }
-    casadi_assert(output_accum.size()==n_accum);
-    casadi_assert(isMonotone(output_accum));
   }
 
   Mapaccum::~Mapaccum() {
@@ -77,8 +65,8 @@ namespace casadi {
     // We cannot rely on the output buffer to use as accumulator:
     // a null-pointer may be passed as output
     nnz_accum_ = 0;
-    for (int i=0; i<num_in; ++i) {
-      if (input_accum_[i]) nnz_accum_+= step_in_[i];
+    for (int i=0; i<n_accum_; ++i) {
+      nnz_accum_+= step_in_[i];
     }
 
     // We need double this space: one end to serve as input, one end to dump the output
@@ -100,20 +88,16 @@ namespace casadi {
     T** res1 = res+f_.sz_res();
 
     // Copy the initial values to the accumulators
-    for (int j=0; j<num_in; ++j) {
-      if (input_accum_[j]) {
-        copy(arg[j], arg[j]+step_in_[j], accum);
-        accum+= step_in_[j];
-      }
+    for (int j=0; j<n_accum_; ++j) {
+      copy(arg[j], arg[j]+step_in_[j], accum);
+      accum+= step_in_[j];
     }
 
     // Set the function accum inputs
     accum = w+f_.sz_w();
-    for (int j=0; j<num_in; ++j) {
-      if (input_accum_[j]) {
-        arg1[j] = accum;
-        accum += step_in_[j];
-      }
+    for (int j=0; j<n_accum_; ++j) {
+      arg1[j] = accum;
+      accum += step_in_[j];
     }
 
     for (int iter=0; iter<n_; ++iter) {
@@ -121,11 +105,8 @@ namespace casadi {
       int i = reverse_ ? n_-iter-1: iter;
 
       // Set the function non-accum inputs
-      for (int j=0; j<num_in; ++j) {
-        accum = w+f_.sz_w();
-        if (!input_accum_[j]) {
-          arg1[j] = (arg[j]==0) ? 0: arg[j]+i*step_in_[j];
-        }
+      for (int j=n_accum_; j<num_in; ++j) {
+        arg1[j] = (arg[j]==0) ? 0: arg[j]+i*step_in_[j];
       }
 
       // Set the function outputs
@@ -135,10 +116,9 @@ namespace casadi {
 
       // Point the accumulator outputs to temporary storage
       accum = w+f_.sz_w()+nnz_accum_;
-      for (int j=0; j<output_accum_.size(); ++j) {
-        int jj = output_accum_[j];
-        res1[jj] = accum;
-        accum += step_out_[jj];
+      for (int j=0; j<n_accum_; ++j) {
+        res1[j] = accum;
+        accum += step_out_[j];
       }
 
       // Evaluate the function
@@ -149,12 +129,11 @@ namespace casadi {
 
       // Copy the accumulator to the global output ...
       accum = w+f_.sz_w();
-      for (int j=0; j<output_accum_.size(); ++j) {
-        int jj = output_accum_[j];
+      for (int j=0; j<n_accum_; ++j) {
         // ... but beware of a null pointer
-        if (res[jj]!=0) {
-          copy(accum, accum+step_out_[jj], res[jj]+i*step_out_[jj]);
-          accum += step_out_[jj];
+        if (res[j]!=0) {
+          copy(accum, accum+step_out_[j], res[j]+i*step_out_[j]);
+          accum += step_out_[j];
         }
       }
     }
@@ -213,6 +192,12 @@ namespace casadi {
       This maps to MapAccum.
 
     */
+    std::vector<bool> input_accum_(n_in(), false);
+    for (int i=0; i<n_accum_;i++) {
+      input_accum_[i] = true;
+    }
+
+    std::vector<int> output_accum_ = range(n_accum_);
 
     // Construct the new MapAccum's input_accum
     /*  
@@ -245,7 +230,7 @@ namespace casadi {
     }
 
     // Construct the new MapAccum
-    Function ma = df.mapaccum("map", n_, input_accum, output_accum, reverse_);
+    Function ma = df.mapaccum("map", n_, input_accum, output_accum, reverse_, opts);
 
     /*
 
@@ -351,6 +336,12 @@ namespace casadi {
       This maps to MapAccum.
 
     */
+    std::vector<bool> input_accum_(n_in(), false);
+        for (int i=0; i<n_accum_;i++) {
+          input_accum_[i] = true;
+    }
+
+    std::vector<int> output_accum_ = range(n_accum_);
 
     // Extend the primitive function with extra inputs:
     // for each reverse direction,
@@ -456,8 +447,11 @@ namespace casadi {
       offset+= n_in();
     }
 
+    Dict opts2 = opts;
+    opts2.erase("input_scheme");
+    opts2.erase("output_scheme");
     // Create the new MapAccum
-    Function ma = fbX.mapaccum("map", n_, input_accum, output_accum, !reverse_);
+    Function ma = fbX.mapaccum("map", n_, input_accum, output_accum, !reverse_, opts2);
 
     /*
 
@@ -600,13 +594,11 @@ namespace casadi {
 
     // Copy the initial values to the accumulators
     int offset=0;
-    for (int j=0; j<num_in; ++j) {
-      if (input_accum_[j]) {
-        g.body << "  copy(arg[" << j << "], " << step_in_[j] <<
-          ", accum + " << offset << ");" << std::endl;
-        g.body << "  arg1[" << j << "] = accum + " << offset << ";" << std::endl;
-        offset+= step_in_[j];
-      }
+    for (int j=0; j<n_accum_; ++j) {
+      g.body << "  copy(arg[" << j << "], " << step_in_[j] <<
+        ", accum + " << offset << ");" << std::endl;
+      g.body << "  arg1[" << j << "] = accum + " << offset << ";" << std::endl;
+      offset+= step_in_[j];
     }
 
     g.body << "  int i;" << endl;
@@ -617,11 +609,9 @@ namespace casadi {
     }
 
       // Set the function non-accum inputs
-      for (int j=0; j<num_in; ++j) {
-        if (!input_accum_[j]) {
-          g.body << "    arg1[" << j << "] = (arg[" << j << "]==0) ? 0: " <<
-            "arg[" << j << "]+i*" << step_in_[j] << ";" << endl;
-        }
+      for (int j=n_accum_; j<num_in; ++j) {
+        g.body << "    arg1[" << j << "] = (arg[" << j << "]==0) ? 0: " <<
+          "arg[" << j << "]+i*" << step_in_[j] << ";" << endl;
       }
 
       // Set the function outputs
@@ -632,10 +622,9 @@ namespace casadi {
 
       // Point the accumulator outputs to temporary storage
       offset = 0;
-      for (int j=0; j<output_accum_.size(); ++j) {
-        int jj = output_accum_[j];
-        g.body << "    res1[" << jj << "] = accum+" << nnz_accum_+offset << ";" << endl;
-        offset += step_out_[jj];
+      for (int j=0; j<n_accum_; ++j) {
+        g.body << "    res1[" << j << "] = accum+" << nnz_accum_+offset << ";" << endl;
+        offset += step_out_[j];
       }
 
       // Evaluate the function
@@ -646,13 +635,12 @@ namespace casadi {
 
       // Copy the accumulator to the global output ...
       offset = 0;
-      for (int j=0; j<output_accum_.size(); ++j) {
-        int jj = output_accum_[j];
+      for (int j=0; j<n_accum_; ++j) {
         // ... but beware of a null pointer
-        g.body << "    if (res[" << jj << "]!=0)" << endl;
-        g.body << "      copy(accum+ " << offset << ", " << step_out_[jj] <<
-          ", res[" << jj << "]+i*" << step_out_[jj] << ");" << endl;
-        offset += step_out_[jj];
+        g.body << "    if (res[" << j << "]!=0)" << endl;
+        g.body << "      copy(accum+ " << offset << ", " << step_out_[j] <<
+          ", res[" << j << "]+i*" << step_out_[j] << ");" << endl;
+        offset += step_out_[j];
       }
     g.body << "  }" << endl;
   }

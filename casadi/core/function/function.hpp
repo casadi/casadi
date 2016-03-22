@@ -596,11 +596,11 @@ namespace casadi {
 
     */
     Function mapaccum(const std::string& name, int N, const Dict& opts = Dict()) const;
-    Function mapaccum(const std::string& name, int n,
+    Function mapaccum(const std::string& name, int N,
                       const std::vector<bool>& input_accum,
                       const std::vector<int>& output_accum,
                       bool reverse = false,
-                      const Dict& opts=Dict()) const;
+                      const Dict& opts=Dict());
     ///@}
 
 
@@ -628,7 +628,7 @@ namespace casadi {
 
 
     */
-    Function map(const std::string& name, int N, const Dict& opts=Dict()) const;
+    Function map(const std::string& name, int n, const Dict& opts=Dict()) const;
 
     /** \brief Generic map */
     Function map(const std::string& name,
@@ -636,6 +636,10 @@ namespace casadi {
                  const std::vector<bool> &repeat_in,
                  const std::vector<bool> &repeat_out,
                  const Dict& opts=Dict()) const;
+
+    /** \brief returns a new function with a selection of inputs/outputs of the original */
+    Function slice(const std::vector<int>& order_in, const std::vector<int>& order_out,
+                   const Dict& opts=Dict());
 
     /** \brief Constuct a switch function */
     static Function conditional(const std::string& name, const std::vector<Function>& f,
@@ -645,27 +649,27 @@ namespace casadi {
     static Function if_else(const std::string& name, const Function& f_true,
                             const Function& f_false, const Dict& opts=Dict());
 
-    /** kernel_sum  
+    /** kernel_sum
         Consider a dense matrix V.
-        
-        KernelSum computes     
-  
+
+        KernelSum computes
+
         F(V,X)  = sum_i sum_j  f ( [i;j], V(i,j), X)
-        
+
         with X: [x;y]
-          
+
         where the summation is taken for all entries (i,j)
         that are a distance r away from X.
-        
-        This function assumes that V is fixed: 
+
+        This function assumes that V is fixed:
         sensitivities with respect to it are not computed.
-        
+
         This allows for improved speed of evaluation.
-        
+
         Having V fixed is a common use case:
         V may be a large bitmap (observation),
         onto which a kernel is fitted.
-  
+
         \author Joris Gillis
         \date 2015
     */
@@ -921,14 +925,14 @@ namespace casadi {
      */
     bool is_a(const std::string& type, bool recursive=true) const;
 
-    /** \brief Check if a string is a valid function name 
+    /** \brief Check if a string is a valid function name
      * Valid function names consist of
      *
      * - At least one character
      * - Upper and lower case letters: a-zA-Z
      * - Numbers 0-9, but never as first character
      * - Underscore, but never as first character and never next to another underscore
-     * 
+     *
      * May not be one of the following keywords: "null", "jac", "hess"
      */
     static bool check_name(const std::string& name);

@@ -42,9 +42,7 @@ namespace casadi {
 
     /** \brief Constructor (generic mapaccum) */
     Mapaccum(const std::string& name, const Function& f, int n,
-                     const std::vector<bool>& input_accum,
-                     const std::vector<int>& output_accum,
-                     bool reverse);
+                     int n_accum, bool reverse);
 
     /** \brief  Destructor */
     virtual ~Mapaccum();
@@ -58,7 +56,7 @@ namespace casadi {
     /// @{
     /** \brief Sparsities of function inputs and outputs */
     virtual Sparsity get_sparsity_in(int i) {
-      if (input_accum_[i]) {
+      if (i<n_accum_) {
         return f_.sparsity_in(i);
       } else {
         return repmat(f_.sparsity_in(i), 1, n_);
@@ -127,8 +125,8 @@ namespace casadi {
     /// Nonzero step for outputs
     std::vector<int> step_out_;
 
-    std::vector<bool> input_accum_;
-    std::vector<int> output_accum_;
+    /// Number of accumulated inputs/outputs
+    int n_accum_;
 
     /// Indicates the order of accumulation
     bool reverse_;
