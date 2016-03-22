@@ -36,6 +36,9 @@ namespace casadi {
     bool reduce_inputs = opts.find("reduced_inputs")!=opts.end();
     bool reduce_outputs = opts.find("reduced_outputs")!=opts.end();
 
+    // Read the type of parallelization
+    Dict::const_iterator par_op = opts.find("parallelization");
+
     if (reduce_inputs || reduce_outputs) {
       // Vector indicating which inputs/outputs are to be repeated
       std::vector<bool> repeat_in(f.n_in(), true), repeat_out(f.n_out(), true);
@@ -56,23 +59,44 @@ namespace casadi {
         }
       }
 
-      // Call constructor
-      return new MapReduce(name, f, n, repeat_in, repeat_out);
+      bool non_repeated_output = false;
+      for (int i=0;i<repeat_out.size();++i) {
+        non_repeated_output |= !repeat_out[i];
+      }
+
+      if (par_op==opts.end() || par_op->second == "serial") {
+        return new MapSumSerial(name, f, n, repeat_in, repeat_out);
+      } else {
+        if (par_op->second == "openmp") {
+          if (non_repeated_output) {
+            casadi_warning("OpenMP not yet supported for reduced outputs. "
+                           "Falling back to serial mode.");
+          } else {
+            #ifdef WITH_OPENMP
+            return new MapSumOmp(name, f, n, repeat_in, repeat_out);
+            #else // WITH_OPENMP
+            casadi_warning("CasADi was not compiled with OpenMP. "
+                           "Falling back to serial mode.");
+            #endif // WITH_OPENMP
+          }
+        }
+        return new MapSumSerial(name, f, n, repeat_in, repeat_out);
+      }
     }
 
-    // Read the type of parallelization
-    Dict::const_iterator par_op = opts.find("parallelization");
+
     if (par_op==opts.end() || par_op->second == "serial") {
       return new MapSerial(name, f, n);
     } else {
-      casadi_assert(par_op->second == "openmp");
-#ifdef WITH_OPENMP
-      return new MapOmp(name, f, n);
-#else // WITH_OPENMP
-      casadi_warning("CasADi was not compiled with OpenMP. "
-                     "Falling back to serial mode.");
+      if (par_op->second == "openmp") {
+        #ifdef WITH_OPENMP
+        return new MapOmp(name, f, n);
+        #else // WITH_OPENMP
+        casadi_warning("CasADi was not compiled with OpenMP. "
+                       "Falling back to serial mode.");
+        #endif // WITH_OPENMP
+      }
       return new MapSerial(name, f, n);
-#endif // WITH_OPENMP
     }
   }
 
@@ -92,20 +116,22 @@ namespace casadi {
         "For openmp, this means that OMP_NUM_THREADS env. variable is observed."}},
       {"reduced_inputs",
        {OT_INTVECTOR,
-        "Reduction for certain inputs"}},
+        "Indices of inputs that are reduced"}},
       {"reduced_outputs",
        {OT_INTVECTOR,
-        "Reduction for certain outputs"}}
+        "Indices of outputs that are reduced"}}
      }
   };
+
+  void MapBase::propagate_options(Dict& opts) {
+    if (opts.find("parallelization")==opts.end()) opts["parallelization"] = parallelization();
+    if (opts.find("n_threads")==opts.end()) opts["n_threads"] = n_threads_;
+  }
 
   MapBase::~MapBase() {
   }
 
-  MapSerial::~MapSerial() {
-  }
-
-  void MapSerial::init(const Dict& opts) {
+  void PureMap::init(const Dict& opts) {
     // Call the initialization method of the base class
     MapBase::init(opts);
 
@@ -117,7 +143,7 @@ namespace casadi {
   }
 
   template<typename T>
-  void MapSerial::evalGen(const T** arg, T** res, int* iw, T* w) const {
+  void PureMap::evalGen(const T** arg, T** res, int* iw, T* w) const {
     int n_in = n_in_, n_out = n_out_;
     const T** arg1 = arg+this->n_in();
     T** res1 = res+this->n_out();
@@ -132,19 +158,15 @@ namespace casadi {
     }
   }
 
-  void MapSerial::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  void PureMap::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen(arg, res, iw, w);
   }
 
-  void MapSerial::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void PureMap::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen(arg, res, iw, w);
   }
 
-  void MapSerial::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
-    evalGen(arg, res, iw, w);
-  }
-
-  void MapSerial::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void PureMap::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int n_in = n_in_, n_out = n_out_;
     bvec_t** arg1 = arg+this->n_in();
     bvec_t** res1 = res+this->n_out();
@@ -159,11 +181,11 @@ namespace casadi {
     }
   }
 
-  void MapSerial::generateDeclarations(CodeGenerator& g) const {
+  void PureMap::generateDeclarations(CodeGenerator& g) const {
     f_->addDependency(g);
   }
 
-  void MapSerial::generateBody(CodeGenerator& g) const {
+  void PureMap::generateBody(CodeGenerator& g) const {
 
     g.body << "  const real_t** arg1 = arg+" << n_in() << ";"<< endl;
     g.body << "  real_t** res1 = res+" << n_out() << ";" << endl;
@@ -182,40 +204,46 @@ namespace casadi {
     g.body << "  }" << std::endl;
   }
 
-  Function MapSerial
+  Function PureMap
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.forward(nfwd);
 
+    // Propagate options
+    propagate_options(opts);
+
     // Construct and return
     return df.map(name, n_, opts);
   }
 
-  Function MapSerial
+  Function PureMap
   ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse(nadj);
 
+    // Propagate options
+    propagate_options(opts);
+
     // Construct and return
     return df.map(name, n_, opts);
   }
 
-  MapReduce::MapReduce(const std::string& name, const Function& f, int n,
+  MapSum::MapSum(const std::string& name, const Function& f, int n,
                        const std::vector<bool> &repeat_in,
                        const std::vector<bool> &repeat_out)
     : MapBase(name, f, n), repeat_in_(repeat_in), repeat_out_(repeat_out) {
 
     casadi_assert_message(repeat_in_.size()==f.n_in(),
-                          "MapReduce expected repeat_in of size " << f.n_in() <<
+                          "MapSum expected repeat_in of size " << f.n_in() <<
                           ", but got " << repeat_in_.size() << " instead.");
 
     casadi_assert_message(repeat_out_.size()==f.n_out(),
-                          "MapReduce expected repeat_out of size " << f.n_out() <<
+                          "MapSum expected repeat_out of size " << f.n_out() <<
                           ", but got " << repeat_out_.size() << " instead.");
 
   }
 
-  MapReduce::~MapReduce() {
+  MapSum::~MapSum() {
 
   }
 
@@ -233,43 +261,7 @@ namespace casadi {
 
   }
 
-  void MapReduce::init(const Dict& opts) {
-    // Default (temporary) options
-    std::string parallelization = "serial";
-
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="parallelization") {
-        parallelization = op.second.to_string();
-      }
-    }
-
-    if (parallelization.compare("serial")==0) {
-      parallelization_ = PARALLELIZATION_SERIAL;
-    } else {
-      casadi_assert(parallelization.compare("openmp")==0);
-      parallelization_ = PARALLELIZATION_OMP;
-    }
-
-    #ifndef WITH_OPENMP
-    if (parallelization_ == PARALLELIZATION_OMP) {
-      casadi_warning("CasADi was not compiled with OpenMP." <<
-                     "Falling back to serial mode.");
-      parallelization_ = PARALLELIZATION_SERIAL;
-    }
-    #endif // WITH_OPENMP
-
-    // OpenMP not yet supported for non-repeated outputs
-    bool non_repeated_output = false;
-    for (int i=0;i<repeat_out_.size();++i) {
-      non_repeated_output |= !repeat_out_[i];
-    }
-
-    if (parallelization_ == PARALLELIZATION_OMP && non_repeated_output) {
-      casadi_warning("OpenMP not yet supported for non-repeated outputs. " <<
-                     "Falling back to serial mode.");
-      parallelization_ = PARALLELIZATION_SERIAL;
-    }
+  void MapSum::init(const Dict& opts) {
 
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -291,21 +283,14 @@ namespace casadi {
       if (!repeat_out_[i]) nnz_out_+= step_out_[i];
     }
 
-    if (parallelization_ == PARALLELIZATION_SERIAL) {
-      alloc_w(f_.sz_w() + nnz_out_);
-      alloc_iw(f_.sz_iw());
-      alloc_arg(2*f_.sz_arg());
-      alloc_res(2*f_.sz_res());
-    } else if (parallelization_ == PARALLELIZATION_OMP) {
-      alloc_w(f_.sz_w()*n_);
-      alloc_iw(f_.sz_iw()*n_);
-      alloc_arg(f_.sz_arg()*(n_+1));
-      alloc_res(f_.sz_res()*(n_+1));
-    }
+    alloc_w(f_.sz_w() + nnz_out_);
+    alloc_iw(f_.sz_iw());
+    alloc_arg(2*f_.sz_arg());
+    alloc_res(2*f_.sz_res());
   }
 
   template<typename T, typename R>
-  void MapReduce::evalGen(const T** arg, T** res, int* iw, T* w, R reduction) const {
+  void MapSum::evalGen(const T** arg, T** res, int* iw, T* w, R reduction) const {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     const T** arg1 = arg+f_.sz_arg();
@@ -352,63 +337,21 @@ namespace casadi {
     }
   }
 
-  void MapReduce::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    if (parallelization_ == PARALLELIZATION_SERIAL) {
-      evalGen<double>(arg, res, iw, w, std::plus<double>());
-    } else {
-#ifndef WITH_OPENMP
-      casadi_error("the \"impossible\" happened: " <<
-                   "should have fallen back to serial in init.");
-#else // WITH_OPEMMP
-      int n_in_ = f_.n_in(), n_out_ = f_.n_out();
-      size_t sz_arg, sz_res, sz_iw, sz_w;
-      f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-      if (n_threads_==0) {
-#pragma omp parallel for
-        for (int i=0; i<n_; ++i) {
-          const double** arg_i = arg + n_in_ + sz_arg*i;
-          for (int j=0; j<n_in_; ++j) {
-            arg_i[j] = arg[j]+i*step_in_[j];
-          }
-          double** res_i = res + n_out_ + sz_res*i;
-          for (int j=0; j<n_out_; ++j) {
-            res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
-          }
-          int* iw_i = iw + i*sz_iw;
-          double* w_i = w + i*sz_w;
-          f_->eval(0, arg_i, res_i, iw_i, w_i);
-        }
-      } else {
-#pragma omp parallel for num_threads(n_threads_)
-        for (int i=0; i<n_; ++i) {
-          const double** arg_i = arg + n_in_ + sz_arg*i;
-          for (int j=0; j<n_in_; ++j) {
-            arg_i[j] = arg[j]+i*step_in_[j];
-          }
-          double** res_i = res + n_out_ + sz_res*i;
-          for (int j=0; j<n_out_; ++j) {
-            res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
-          }
-          int* iw_i = iw + i*sz_iw;
-          double* w_i = w + i*sz_w;
-          f_->eval(0, arg_i, res_i, iw_i, w_i);
-        }
-      }
-#endif // WITH_OPENMP
-    }
+  void MapSum::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    evalGen<double>(arg, res, iw, w, std::plus<double>());
   }
 
-  void MapReduce::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+  void MapSum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
     evalGen<SXElem>(arg, res, iw, w, std::plus<SXElem>());
   }
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  void MapReduce::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MapSum::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     evalGen<bvec_t>(arg, res, iw, w, &Orring);
   }
 
-  void MapReduce::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+  void MapSum::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     int num_in = f_.n_in(), num_out = f_.n_out();
 
     bvec_t** arg1 = arg+f_.sz_arg();
@@ -450,19 +393,14 @@ namespace casadi {
 
   }
 
-  Function MapReduce
+  Function MapSum
   ::get_forward(const std::string& name, int nfwd, Dict& opts) {
 
     // Differentiate mapped function
     Function df = f_.forward(nfwd);
 
-    // Propagate options (if not set already)
-    if (opts.find("parallelization")==opts.end()) {
-      switch (parallelization_) {
-      case PARALLELIZATION_SERIAL: opts["parallelization"] = "serial"; break;
-      case PARALLELIZATION_OMP: opts["parallelization"] = "openmp"; break;
-      }
-    }
+    // Propagate options
+    propagate_options(opts);
 
     std::vector<bool> repeat_in;
     repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
@@ -476,22 +414,28 @@ namespace casadi {
       repeat_out.insert(repeat_out.end(), repeat_out_.begin(), repeat_out_.end());
     }
 
+    std::vector<int> reduced_inputs;
+    for (int i=0;i<repeat_in.size();++i) {
+      if (!repeat_in[i]) reduced_inputs.push_back(i);
+    }
+    std::vector<int> reduced_outputs;
+    for (int i=0;i<repeat_out.size();++i) {
+      if (!repeat_out[i]) reduced_outputs.push_back(i);
+    }
+    opts["reduced_inputs"] = reduced_inputs;
+    opts["reduced_outputs"] = reduced_outputs;
+
     // Construct and return
-    return df.map(name, n_, repeat_in, repeat_out, opts);
+    return df.map(name, n_, opts);
   }
 
-  Function MapReduce
+  Function MapSum
   ::get_reverse(const std::string& name, int nadj, Dict& opts) {
     // Differentiate mapped function
     Function df = f_.reverse(nadj);
 
-    // Propagate options (if not set already)
-    if (opts.find("parallelization")==opts.end()) {
-      switch (parallelization_) {
-      case PARALLELIZATION_SERIAL: opts["parallelization"] = "serial"; break;
-      case PARALLELIZATION_OMP: opts["parallelization"] = "openmp"; break;
-      }
-    }
+    // Propagate options
+    propagate_options(opts);
 
     std::vector<bool> repeat_in;
     repeat_in.insert(repeat_in.end(), repeat_in_.begin(), repeat_in_.end());
@@ -505,15 +449,26 @@ namespace casadi {
       repeat_out.insert(repeat_out.end(), repeat_in_.begin(), repeat_in_.end());
     }
 
+    std::vector<int> reduced_inputs;
+    for (int i=0;i<repeat_in.size();++i) {
+      if (!repeat_in[i]) reduced_inputs.push_back(i);
+    }
+    std::vector<int> reduced_outputs;
+    for (int i=0;i<repeat_out.size();++i) {
+      if (!repeat_out[i]) reduced_outputs.push_back(i);
+    }
+    opts["reduced_inputs"] = reduced_inputs;
+    opts["reduced_outputs"] = reduced_outputs;
+
     // Construct and return
-    return df.map(name, n_, repeat_in, repeat_out, opts);
+    return df.map(name, n_, opts);
   }
 
-  void MapReduce::generateDeclarations(CodeGenerator& g) const {
+  void MapSum::generateDeclarations(CodeGenerator& g) const {
     f_->addDependency(g);
   }
 
-  void MapReduce::generateBody(CodeGenerator& g) const {
+  void MapSum::generateBody(CodeGenerator& g) const {
 
     int num_in = f_.n_in(), num_out = f_.n_out();
 
@@ -562,8 +517,23 @@ namespace casadi {
     g.body << "  }" << std::endl;
   }
 
-  void MapReduce::print(ostream &stream) const {
+  void MapSum::print(ostream &stream) const {
     stream << "Map(" << f_.name() << ", " << n_ << ")";
+  }
+
+  MapSerial::~MapSerial() {
+  }
+
+  void MapSerial::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    evalGen(arg, res, iw, w);
+  }
+
+  MapSumSerial::~MapSumSerial() {
+
+  }
+
+  void MapSumSerial::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+    evalGen<double>(arg, res, iw, w, std::plus<double>());
   }
 
 #ifdef WITH_OPENMP
@@ -640,13 +610,66 @@ namespace casadi {
 
   void MapOmp::init(const Dict& opts) {
     // Call the initialization method of the base class
-    MapSerial::init(opts);
+    PureMap::init(opts);
 
     // Allocate sufficient memory for parallel evaluation
     alloc_arg(f_.sz_arg() * n_);
     alloc_res(f_.sz_res() * n_);
     alloc_w(f_.sz_w() * n_);
     alloc_iw(f_.sz_iw() * n_);
+  }
+
+  void MapSumOmp::eval(void* mem, const double** arg, double** res,
+                          int* iw, double* w) const {
+
+    int n_in_ = f_.n_in(), n_out_ = f_.n_out();
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+    if (n_threads_==0) {
+#pragma omp parallel for
+      for (int i=0; i<n_; ++i) {
+        const double** arg_i = arg + n_in_ + sz_arg*i;
+        for (int j=0; j<n_in_; ++j) {
+          arg_i[j] = arg[j]+i*step_in_[j];
+        }
+        double** res_i = res + n_out_ + sz_res*i;
+        for (int j=0; j<n_out_; ++j) {
+          res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+        }
+        int* iw_i = iw + i*sz_iw;
+        double* w_i = w + i*sz_w;
+        f_->eval(0, arg_i, res_i, iw_i, w_i);
+      }
+    } else {
+#pragma omp parallel for num_threads(n_threads_)
+      for (int i=0; i<n_; ++i) {
+        const double** arg_i = arg + n_in_ + sz_arg*i;
+        for (int j=0; j<n_in_; ++j) {
+          arg_i[j] = arg[j]+i*step_in_[j];
+        }
+        double** res_i = res + n_out_ + sz_res*i;
+        for (int j=0; j<n_out_; ++j) {
+          res_i[j] = (res[j]==0)? 0: res[j]+i*step_out_[j];
+        }
+        int* iw_i = iw + i*sz_iw;
+        double* w_i = w + i*sz_w;
+        f_->eval(0, arg_i, res_i, iw_i, w_i);
+      }
+    }
+  }
+
+  void MapSumOmp::init(const Dict& opts) {
+    // Call the initialization method of the base class
+    MapSum::init(opts);
+
+    // Allocate sufficient memory for parallel evaluation
+    alloc_arg(f_.sz_arg() * (n_+1));
+    alloc_res(f_.sz_res() * (n_+1));
+    alloc_w(f_.sz_w() * n_ + nnz_out_);
+    alloc_iw(f_.sz_iw() * n_);
+  }
+
+  MapSumOmp::~MapSumOmp() {
   }
 
 #endif // WITH_OPENMP

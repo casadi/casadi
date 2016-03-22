@@ -630,13 +630,6 @@ namespace casadi {
     */
     Function map(const std::string& name, int n, const Dict& opts=Dict()) const;
 
-    /** \brief Generic map */
-    Function map(const std::string& name,
-                 int n,
-                 const std::vector<bool> &repeat_in,
-                 const std::vector<bool> &repeat_out,
-                 const Dict& opts=Dict()) const;
-
     /** \brief returns a new function with a selection of inputs/outputs of the original */
     Function slice(const std::vector<int>& order_in, const std::vector<int>& order_out,
                    const Dict& opts=Dict());

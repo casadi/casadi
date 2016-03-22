@@ -2806,14 +2806,11 @@ namespace casadi {
       n = max(x[i].size2()/size2_in(i), n);
     }
 
-    vector<bool> repeat_n;
+    vector<int> reduced_in;
     for (int i=0;i<x.size();++i) {
-      repeat_n.push_back(x[i].size2()/size2_in(i)==n);
-    }
-
-    bool repeated = true;
-    for (int i=0;i<repeat_n.size();++i) {
-      repeated &= repeat_n[i];
+      if (x[i].size2()/size2_in(i)!=n) {
+        reduced_in.push_back(i);
+      }
     }
 
     // Call the internal function
@@ -2821,11 +2818,13 @@ namespace casadi {
     Dict options = {{"parallelization", parallelization}};
 
     Function ms;
-    if (repeated) {
-      ms = function().map("map", n, options);
-    } else {
+    if (reduced_in.size()>0) {
+      options["reduced_inputs"] = reduced_in;
+      options["reduced_outputs"] = std::vector<int>();
       ms = function().
-        map("mapsum", n, repeat_n, vector<bool>(n_out(), true), options);
+        map("mapsum", n, options);
+    } else {
+      ms = function().map("map", n, options);
     }
     // Call the internal function
     return ms(x);
@@ -2847,14 +2846,17 @@ namespace casadi {
       n = max(x[i].size2()/size2_in(i), n);
     }
 
-    vector<bool> repeat_n;
+    vector<int> reduced_in;
     for (int i=0;i<x.size();++i) {
-      repeat_n.push_back(x[i].size2()/size2_in(i)==n);
+      if (x[i].size2()/size2_in(i)!=n) {
+        reduced_in.push_back(i);
+      }
     }
 
     Dict options = {{"parallelization", parallelization}};
-    Function ms = function().map("mapsum", n, repeat_n,
-                      vector<bool>(n_out(), false), options);
+    options["reduced_inputs"] = reduced_in;
+    options["reduced_outputs"] = range(n_out());
+    Function ms = function().map("mapsum", n, options);
 
     // Call the internal function
     return ms(x);

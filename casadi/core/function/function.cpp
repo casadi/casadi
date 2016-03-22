@@ -494,18 +494,6 @@ namespace casadi {
     return Function(std::string("slice_") + name(), new_in, new_out, opts);
   }
 
-  Function Function::map(const string& name,
-                         int n,
-                         const vector<bool> &repeat_in,
-                         const vector<bool> &repeat_out,
-                         const Dict& opts) const {
-
-    Function ret;
-    ret.assignNode(new MapReduce(name, *this, n, repeat_in, repeat_out));
-    ret->construct(opts);
-    return ret;
-  }
-
   vector<vector<MX> > Function::map(const vector<vector<MX> > &x,
                                     const string& parallelization) {
     return (*this)->map_mx(x, parallelization);

@@ -54,16 +54,6 @@ namespace casadi {
     virtual size_t get_n_out() { return f_.n_out();}
     ///@}
 
-    /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    virtual Sparsity get_sparsity_in(int i) {
-      return repmat(f_.sparsity_in(i), 1, n_);
-    }
-    virtual Sparsity get_sparsity_out(int i) {
-      return repmat(f_.sparsity_out(i), 1, n_);
-    }
-    /// @}
-
     ///@{
     /** \brief Names of function input and outputs */
     virtual std::string get_name_in(int i) { return f_.name_in(i);}
@@ -79,9 +69,15 @@ namespace casadi {
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
 
+    /// Type of parallellization
+    virtual std::string parallelization() const=0;
+
   protected:
     // Constructor (protected, use create function above)
     MapBase(const std::string& name, const Function& f, int n);
+
+    /// Propagate optiosn to derivatives
+    void propagate_options(Dict& opts);
 
     // The function which is to be evaluated in parallel
     Function f_;
@@ -99,26 +95,30 @@ namespace casadi {
     int n_threads_;
   };
 
-  /** A map Map for evaluating a function serially
-      \author Joel Andersson
-      \date 2015
+  /** A map Base class for pure maps (no reduced in/out)
+      \author Joris Gillis
+      \date 2016
   */
-  class CASADI_EXPORT MapSerial : public MapBase {
+  class CASADI_EXPORT PureMap : public MapBase {
     friend class MapBase;
   protected:
     // Constructor (protected, use create function in MapBase)
-    MapSerial(const std::string& name, const Function& f, int n)
+    PureMap(const std::string& name, const Function& f, int n)
       : MapBase(name, f, n) {}
 
-    /** \brief  Destructor */
-    virtual ~MapSerial();
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int i) {
+      return repmat(f_.sparsity_in(ind), 1, n_);
+    }
+    virtual Sparsity get_sparsity_out(int i) {
+      return repmat(f_.sparsity_out(ind), 1, n_);
+    }
+    /// @}
 
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
     void evalGen(const T** arg, T** res, int* iw, T* w) const;
-
-    /** \brief  Evaluate numerically, work vectors given */
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
     virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
@@ -155,53 +155,21 @@ namespace casadi {
 
   };
 
-#ifdef WITH_OPENMP
-  /** A map Evaluate in parallel using OpenMP
-      Inherits from MapSerial to allow fallback to serial methods
-      \author Joel Andersson
-      \date 2015
-  */
-  class CASADI_EXPORT MapOmp : public MapSerial {
-    friend class MapBase;
-  protected:
-    // Constructor (protected, use create function in MapBase)
-    MapOmp(const std::string& name, const Function& f, int n) : MapSerial(name, f, n) {}
-
-    /** \brief  Destructor */
-    virtual ~MapOmp();
-
-    /// Evaluate the function numerically
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
-
-    /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(CodeGenerator& g) const;
-
-    /** \brief Generate code for the body of the C function */
-    virtual void generateBody(CodeGenerator& g) const;
-
-    /** \brief  Initialize */
-    virtual void init(const Dict& opts);
-  };
-#endif // WITH_OPENMP
 
   /** A map operation that can also reduce certain arguments
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT MapReduce : public MapBase {
+  class CASADI_EXPORT MapSum : public MapBase {
+    friend class MapBase;
   public:
-    /** Types of parallelization supported */
-    enum ParallelizationType {
-      PARALLELIZATION_SERIAL,
-      PARALLELIZATION_OMP
-    };
 
     /** \brief Constructor (generic map) */
-    MapReduce(const std::string& name, const Function& f, int n,
+    MapSum(const std::string& name, const Function& f, int n,
       const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out);
 
     /** \brief  Destructor */
-    virtual ~MapReduce();
+    virtual ~MapSum();
 
     /** \brief  Initialize */
     virtual void init(const Dict& opts);
@@ -267,17 +235,123 @@ namespace casadi {
     /// Indicate which outputs are repeated
     std::vector<bool> repeat_out_;
 
+    int nnz_out_;
+
     /// Nonzero step for inputs
     std::vector<int> step_in_;
 
     /// Nonzero step for outputs
     std::vector<int> step_out_;
 
-    int nnz_out_;
+  };
 
-    ParallelizationType parallelization_;
+  /** A map Map for evaluating a function serially
+      \author Joel Andersson
+      \date 2015
+  */
+  class CASADI_EXPORT MapSerial : public PureMap {
+    friend class MapBase;
+    friend class PureMap;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapSerial(const std::string& name, const Function& f, int n)
+      : PureMap(name, f, n) {}
+
+    /** \brief  Destructor */
+    virtual ~MapSerial();
+
+    /// Evaluate the function numerically
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "serial"; }
 
   };
+
+  /** A mapsum evaluation in serial
+      \author Joris Gillis
+      \date 2016
+  */
+  class CASADI_EXPORT MapSumSerial : public MapSum {
+    friend class MapSum;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapSumSerial(const std::string& name, const Function& f, int n,
+      const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out)
+      : MapSum(name, f, n, repeat_in, repeat_out) {}
+
+    /// Evaluate the function numerically
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    /** \brief  Destructor */
+    virtual ~MapSumSerial();
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "serial"; }
+
+  };
+
+#ifdef WITH_OPENMP
+  /** A map Evaluate in parallel using OpenMP
+      \author Joel Andersson
+      \date 2015
+  */
+  class CASADI_EXPORT MapOmp : public PureMap {
+    friend class PureMap;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapOmp(const std::string& name, const Function& f, int n) : PureMap(name, f, n) {}
+
+    /** \brief  Destructor */
+    virtual ~MapOmp();
+
+    /// Evaluate the function numerically
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    /** \brief  Initialize */
+    virtual void init(const Dict& opts);
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "openmp"; }
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
+
+  };
+
+  /** A mapsum Evaluate in parallel using OpenMP
+      \author Joris Gillis
+      \date 2016
+  */
+  class CASADI_EXPORT MapSumOmp : public MapSum {
+    friend class MapSum;
+    friend class MapBase;
+  protected:
+    // Constructor (protected, use create function in MapBase)
+    MapSumOmp(const std::string& name, const Function& f, int n,
+      const std::vector<bool> &repeat_in, const std::vector<bool> &repeat_out)
+      : MapSum(name, f, n, repeat_in, repeat_out) {}
+
+    /** \brief  Destructor */
+    virtual ~MapSumOmp();
+
+    /// Evaluate the function numerically
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    /** \brief  Initialize */
+    virtual void init(const Dict& opts);
+
+    /// Type of parallellization
+    virtual std::string parallelization() const { return "openmp"; }
+
+  };
+#endif // WITH_OPENMP
+
 
 } // namespace casadi
 /// \endcond
