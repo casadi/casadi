@@ -461,6 +461,24 @@ namespace casadi {
     return (*this)->map_mx(x, parallelization);
   }
 
+
+  std::map<std::string, MX> Function::map(const std::map<std::string, MX> &arg,
+                      const std::string& parallelization) {
+
+    // Convert inputs map to vector
+    std::vector<MX> args(n_in());
+    for (auto& e : arg) args[index_in(e.first)] = e.second;
+
+    // Delegate the actual map call
+    std::vector<MX> res = map(args, parallelization);
+
+    // Result vector to map
+    std::map<std::string, MX> ret;
+    for (int i=0;i<res.size();++i) ret[name_out(i)] = res[i];
+
+    return ret;
+  }
+
   vector<MX> Function::mapsum(const vector< MX > &x,
                               const string& parallelization) {
     return (*this)->mapsum_mx(x, parallelization);

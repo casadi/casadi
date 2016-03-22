@@ -560,6 +560,36 @@ class Functiontests(casadiTestCase):
     except Exception as e:
       self.assertTrue("foobar" in str(e))
 
+  def test_mapdict(self):
+    x = SX.sym("x")
+    y = SX.sym("y",2)
+    z = SX.sym("z",2,2)
+    v = SX.sym("z",Sparsity.upper(3))
+
+    fun = Function("f",{"x":x,"y":y,"z":z,"v":v,"I":mtimes(z,y)+x,"II":sin(y*x).T,"III":v/x},["x","y","z","v"],["I","II","III"])
+
+    n = 2
+
+    X = [MX.sym("x") for i in range(n)]
+    Y = [MX.sym("y",2) for i in range(n)]
+    Z = [MX.sym("z",2,2) for i in range(n)]
+    V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
+
+    res = fun.map({"x":horzcat(*X),"y":horzcat(*Y),"z":horzcat(*Z),"v":horzcat(*V)})
+    
+    res2 = fun.map([horzcat(*X),horzcat(*Y),horzcat(*Z),horzcat(*V)])
+
+    F = Function("F",X+Y+Z+V,res2)
+    F2 = Function("F",X+Y+Z+V,[res["I"],res["II"],res["III"]])
+    
+    np.random.seed(0)
+    X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+    Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+    Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
+    V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
+
+    self.checkfunction(F,F2,inputs=X_+Y_+Z_+V_,jacobian=False,hessian=False,evals=False)
+
   @memory_heavy()
   def test_map_node(self):
     x = SX.sym("x")
