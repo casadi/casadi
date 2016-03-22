@@ -26,8 +26,8 @@
 
 import casadi.*
 
-% Time horizon
-T = 10;
+T = 10; % Time horizon
+N = 20; % number of control intervals
 
 % Declare model variables
 x1 = SX.sym('x1');
@@ -44,23 +44,36 @@ L = x1^2 + x2^2 + u^2;
 % Continuous time dynamics
 f = Function('f', {x, u}, {xdot, L});
 
-% Control discretization
-N = 20; % number of control intervals
-M = 4; % RK4 steps per interval
-DT = T/N/M;
-X0 = MX.sym('X0', 2);
-U = MX.sym('U');
-X = X0;
-Q = 0;
-for j=1:M
-    [k1, k1_q] = f(X, U);
-    [k2, k2_q] = f(X + DT/2 * k1, U);
-    [k3, k3_q] = f(X + DT/2 * k2, U);
-    [k4, k4_q] = f(X + DT * k3, U);
-    X=X+DT/6*(k1 +2*k2 +2*k3 +k4);
-    Q = Q + DT/6*(k1_q + 2*k2_q + 2*k3_q + k4_q);
+% Formulate discrete time dynamics
+if false
+   % CVODES from the SUNDIALS suite
+   dae = struct('x',x,'p',u,'ode',xdot,'quad',L);
+   opts = struct('tf',T/N);
+   F = integrator('F', 'cvodes', dae, opts);
+else
+   % Fixed step Runge-Kutta 4 integrator
+   M = 4; % RK4 steps per interval
+   DT = T/N/M;
+   f = Function('f', {x, u}, {xdot, L});
+   X0 = MX.sym('X0', 2);
+   U = MX.sym('U');
+   X = X0;
+   Q = 0;
+   for j=1:M
+       [k1, k1_q] = f(X, U);
+       [k2, k2_q] = f(X + DT/2 * k1, U);
+       [k3, k3_q] = f(X + DT/2 * k2, U);
+       [k4, k4_q] = f(X + DT * k3, U);
+       X=X+DT/6*(k1 +2*k2 +2*k3 +k4);
+       Q = Q + DT/6*(k1_q + 2*k2_q + 2*k3_q + k4_q);
+    end
+    F = Function('F', {X0, U}, {X, Q}, {'x0','p'}, {'xf', 'qf'});
 end
-F = Function('F', {X0, U}, {X, Q});
+
+% Evaluate at a test point
+Fk = F('x0',[0.2; 0.3],'p',0.4);
+disp(Fk.xf)
+disp(Fk.qf)
 
 % Start with an empty NLP
 w={};
@@ -90,8 +103,9 @@ for k=0:N-1
     w0 = [w0;  0];
 
     % Integrate till the end of the interval
-    [Xk_end, Jk] = F(Xk, Uk);
-    J=J+Jk;
+    Fk = F('x0', Xk, 'p', Uk);
+    Xk_end = Fk.xf;
+    J=J+Fk.qf;
 
     % New NLP variable for state at end of interval
     Xk = MX.sym(['X_' num2str(k+1)], 2);

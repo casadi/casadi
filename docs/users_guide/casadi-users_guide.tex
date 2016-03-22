@@ -2711,15 +2711,18 @@ For example, \python{dae.x} contains all the expressions corresponding to 'x',
 \chapter{Optimal control with \CasADi}
 \CasADi can be used to solve \emph{optimal control problems} (OCP) using a variety of methods, including direct (a.k.a. \emph{discretize-then-optimize}) and indirect (a.k.a. \emph{optimize-then-discretize}) methods, all-at-once (e.g. collocation) methods and shooting-methods requiring embedded solvers of initial value problems in ODE or DAE. As a user, you are in general expected to \emph{write your own OCP solver} and \CasADi aims as making this as easy as possible by providing powerful high-level building blocks. Since you are writing the solver yourself (rather than calling an existing ``black-box'' solver), a basic understanding of how to solve OCPs is indispensable. Good, self-contained introductions to numerical optimal control can be found in the recent textbooks by Biegler\footnote{Lorenz T. Biegler, \emph{\htmladdnormallink{Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes}{http://books.google.es/books/about/Nonlinear_Programming.html?id=VdB1wJQu0sgC&redir_esc=y}}, SIAM 2010} or Betts\footnote{John T. Betts, \emph{\htmladdnormallink{Practical Methods for Optimal Control Using Nonlinear Programming}{http://books.google.es/books/about/Practical_Methods_for_Optimal_Control_Us.html?id=Yn53JcYAeaoC&redir_esc=y}}, SIAM 2001} or Moritz Diehl's lecture notes on \htmladdnormallink{numerical optimal control}{http://homes.esat.kuleuven.be/~mdiehl/NUMOPT/numopt.pdf}.
 
-\section{Optimization of a Van der Pol oscillator}
-In \CasADi's examples collection\footnote{You can obtain this collection as an archive named \texttt{examples\_pack.zip} in \CasADi's \htmladdnormallink{download area}{http://files.casadi.org}}, you find codes for solving simple optimal control problem using a variety of different methods. The problem is driving a \emph{Van der Pol} oscillator to the origin, while trying to minimize a quadratic cost:
+\section{A simple test problem}
+To illustrate some of the methods, we will consider the following test problem,
+namely driving a \emph{Van der Pol} oscillator to the origin, while trying to
+minimize a quadratic cost:
+
 \begin{equation}
 \begin{array}{lc}
 \begin{array}{l}
 \text{minimize:} \\
 x(\cdot) \in \mathbb{R}^2, \, u(\cdot) \in \mathbb{R}
 \end{array}
-\quad \displaystyle \int_{t=0}^{10}{(x_0^2 + x_1^2 + u^2) \, dt}
+\quad \displaystyle \int_{t=0}^{T}{(x_0^2 + x_1^2 + u^2) \, dt}
 \\
 \\
 \text{subject to:} \\
@@ -2729,116 +2732,70 @@ x(\cdot) \in \mathbb{R}^2, \, u(\cdot) \in \mathbb{R}
 \begin{array}{l}
 \dot{x}_0 = (1-x_1^2) \, x_0 - x_1 + u \\
 \dot{x}_1 = x_0 \\
--0.75 \le u \le 1.0
-\end{array} \right. & \text{for $0 \le t \le 10$} \\
-x_0(0)=0, \quad x_0(10)=0  \\
-x_1(0)=1, \quad x_1(10)=0
+-1.0 \le u \le 1.0, \quad x \ge -0.25
+\end{array} \right. & \text{for $0 \le t \le T$} \\
+x_0(0)=0, \quad x_1(0)=1,
 \end{array}
 \end{array}
 \label{eq:vdp}
 \end{equation}
+with $T=10$.
+
+In \CasADi's examples collection\footnote{You can obtain this collection as an archive named \texttt{examples\_pack.zip} in \CasADi's \htmladdnormallink{download area}{http://files.casadi.org}}, you find codes for solving optimal control problems using a variety of different methods.
+
+In the following, we will discuss three of the most important methods, namely
+\emph{direct single shooting}, \emph{direct collocation} and \emph{direct collocation}.
 
 \section{Direct single-shooting}
-The simplest OCP method to implement in \CasADi is single-shooting. In fact, it can be implemented in just 30 lines of code, which the script {\texttt{vdp\_single\_shooting.py}} in \CasADi's examples collection demonstrates. Please go through the code carefully and make sure that you understand the principle. The most important part of the code are the lines:
-\begin{verbatim}
-# Build a graph of integrator calls
-for k in range(nk):
-  res = F({'x0':X,'p':U[k]})
-  X = res['xf']
-  f += res['qf']
-\end{verbatim}
 
-Here, we recursively construct a symbolic expression for the state at the final time. This expression is then used in the formulation of the NLP objective and constraint functions.
+In the direct single shooting method, the control trajectory is parametrized
+using some piecewise smooth approximation, typically piecewise constant.
+
+Using an explicit expression for the controls, we can then eliminate the whole
+state trajectory from the optimization problem, ending up with an NLP in only
+the discretized controls.
+
+In \CasADi's examples collection, you will find the codes
+\verb|direct_single_shooting.py| and \verb|direct_single_shooting.m|
+for Python and MATLAB, respectively. These codes implement the direct single
+shooting method and solves it with IPOPT, relying \CasADi to calculate derivatives.
+To obtain the discrete time dynamics from the continuous time dynamics, a
+simple fixed-step Runge-Kutta 4 (RK4) integrator is implemented using \CasADi symbolics.
+Simple integrator codes like these are often useful in the context of optimal control,
+but care must be taken so that they accuractely solves the initial-value
+problem.
+
+The code also shows how the RK4 scheme can be replaced by a
+more advanced integrator, namely the CVODES integrator from the SUNDIALS suite,
+which implements a variable stepsize, variable order backward differentiation formula
+(BDF) scheme. An advanced integrator like this is useful for larger systems,
+systems with stiff dynamics, for DAEs and for checking a simpler scheme for
+consistency.
 
 \section{Direct multiple-shooting}
-The second optimal control method we shall consider is multiple shooting. In multiple shooting, the states at each ''shooting node'' are degrees of freedom in the NLP. The script \\ \texttt{vdp\_multiple\_shooting.py} demonstrates how the VDP problem can be solved using direct multiple shooting in \CasADi.
+The \verb|direct_multiple_shooting.py| and \verb|direct_multiple_shooting.m|
+codes, also in \CasADi's examples collection, implement the direct multiple
+shooting method. This is very similar to the direct single shooting method,
+but includes the state at certain \emph{shooting nodes} as decision variables in
+the NLP and includes equality constraints to ensure continuity of the trajectory.
 
-Note how the symbolic variable in the NLP functions now contains both the control and states for each of the \texttt{nk} intervals:
-\begin{verbatim}
-# Total number of variables
-nv = 1*nk + 3*(nk+1)
+The direct multiple shooting method is often superior to the direct single
+shooting method, since "lifting" the problem to a higher dimension is known
+to often improve convergence. The user is also able to initialize with
+a known guess for the state trajectory.
 
-# Declare variable vector
-V = MX.sym("V", nv)
-\end{verbatim}
-
-Also note how the recursive overwriting of \texttt{X} has been replaced with:
-\begin{verbatim}
-for k in range(nk):
-  # Local state vector
-  Xk = vertcat(X0[k],X1[k],X2[k])
-  Xk_next = vertcat(X0[k+1],X1[k+1],X2[k+1])
-
-  # Call the integrator
-  Xk_end = integrator(x0=Xk, p=U[k])["xf"]
-
-  # append continuity constraints
-  g.append(Xk_next - Xk_end)
-  g_min.append(NP.zeros(Xk.nnz()))
-  g_max.append(NP.zeros(Xk.nnz()))
-\end{verbatim}
+The drawback is that the NLP solved gets much larger, although this is often
+compensated by the fact that it is also much sparser.
 
 \section{Direct collocation}
-When we went from direct single shooting to direct multiple shooting we essentially traded nonlinearity for problem size. The NLP in single shooting is small, but often highly nonlinear, whereas the NLP for multiple-shooting is larger, but less nonlinear and with a sparsity structure that can be exploited efficiently. Direct collocation is to take one more step in the same direction, adding even more degrees of freedom. The resulting NLP is even larger, but has even more structure that can be exploited.
+Finally, the \verb|direct_collocation.py| and \verb|direct_collocation.m|
+codes implement the direct collocation method. In this case, a parametrization
+of the entire state trajectory, as piecewise low-order polynomials, are included
+as decision variables in the NLP. This removes the need for the formulation
+of the discrete time dynamics completely.
 
-While multiple shooting only includes the state at the beginning of each control interval as a degree of freedom in the NLP (in addition to the discretized control and the parameters), in direct collocation the state at a set of \emph{collocation points} (in addition to the beginning of the interval) enters in the NLP as variables. An example of a choice of time points are the \emph{Legendre points} of order $d=3$ :
-\begin{equation}
- \tau = [0,0.112702,0.500000,0.887298]
-\end{equation}
-
-Keeping the same control discretization as in single and multiple shooting:
-\begin{equation}
- u(t) = u_k, \quad \text{for $t \in [t_k, t_{k+1}], \quad k=0,\ldots,n_k-1$}
-\end{equation}
-
-the complete list of time points, with $h_k := t_{k+1}-t_k$, is:
-\begin{equation}
- t_{k,j} := t_k + h_k \, \tau_j, \quad \text{for $k=0,\ldots,n_k-1$ and $j=0,\ldots,d$}
-\end{equation}
-as well as the final time $t_{n_k,0}$. Also let $x_{k,j}$ denote the states at these time points.
-
-On each control interval, we shall define a Lagrangian polynomial basis:
-\begin{equation}
- L_j(\tau) = \prod_{r=0, \, r \ne j}^{d} \frac{\tau - \tau_{r}}{\tau_j - \tau_r}
-\end{equation}
-
-Since the Lagrangian basis satisfies:
-\begin{equation}
- L_j(\tau_r) = \left\{
- \begin{array}{l}
-  1, \qquad \text{if $j=r$} \\
-  0, \qquad \text{otherwise}
- \end{array}
-  \right.
-\end{equation}
-we can approximate the state trajectory approximation as a linear combination of these basis functions:
-\begin{equation}
-\tilde{x}_k(t) = \sum_{r=0}^{d}{L_r\left(\frac{t-t_k}{h_k}\right) \, x_{k,r}}
-\end{equation}
-
-In particular we get approximations of the state time derivative at each collocation point (not including $\tau_0$):
-\begin{equation}
-\tilde{\dot{x}}_k(t_{k,j}) = \frac{1}{h_k} \, \sum_{r=0}^{d}{\dot{L}_r(\tau_j) \, x_{k,r}} := \frac{1}{h_k} \, \sum_{r=0}^{d}{C_{r,j} \, x_{k,r}}
-\label{eq:colldef}
-\end{equation}
-
-as well as an approximation of the state at the end of the control interval:
-\begin{equation}
-\tilde{x}_{k+1,0} = \sum_{r=0}^{d}{L_r(1) \, x_{k,r}} := \sum_{r=0}^{d}{D_r \, x_{k,r}}
-\label{eq:contdef}
-\end{equation}
-
-Plugging in the approximation of the state derivative (\ref{eq:colldef}) into the ODE gives us a set of \emph{collocation equations} that needs to be satisfied for every state at every collocation point:
-\begin{equation}
-h_k \, f(t_{k,j},x_{k,j},u_k) - \sum_{r=0}^{d}{C_{r,j} \, x_{k,r}} = 0, \qquad k=0,\ldots,n_k-1, \quad j=1,\ldots,d
-\end{equation}
-
-And the approximation of the end state (\ref{eq:contdef}) gives us a set of \emph{continuity equations} that must be satisfied for every control interval:
-\begin{equation}
-x_{k+1,0} - \sum_{r=0}^{d}{D_r \, x_{k,r}} = 0, \qquad k=0,\ldots,n_k-1,
-\end{equation}
-
-These two sets of equations take the place of the continuity equation (represented by the integrator call) in direct multiple shooting. The above equations have been implemented in the script \texttt{vdp\_collocation.py}.
+The NLP in direct collocation is even larger than that in direct multiple shooting,
+but is also even sparser.
 
 \chapter{Difference in usage from different languages} \label{ch:syntax_differences}
 
