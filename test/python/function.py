@@ -61,34 +61,6 @@ class Functiontests(casadiTestCase):
 
       g(0)
   
-  def test_Map(self):
-    self.message("Map")
-    x = MX.sym("x",2)
-    y = MX.sym("y")
-
-    f = Function("f", [x,y],[sin(x) + y])
-        
-    for mode in ["serial","openmp"]:
-      x0 = MX.sym("x0",2)
-      y0 = MX.sym("y0")
-      x1 = MX.sym("x1",2)
-      y1 = MX.sym("y1")
-
-      [[z0],[z1]] = f.map([[x0,y0],[x1,y1]],mode)
-      
-      p = Function("p", [x0,y0,x1,y1],[z0,z1])
-      
-      n1 = DM([4,5])
-      N1 = 3
-      n2 = DM([5,7])
-      N2 = 8
-      
-
-      out = p(n1,N1,n2,N2)
-
-      self.checkarray(sin(n1)+N1,out[0],"output")
-      self.checkarray(sin(n2)+N2,out[1],"output")
-      
   def test_MX_funSeed(self):
     self.message("MX_funSeed")
     x1 = MX.sym("x",2)
@@ -103,31 +75,6 @@ class Functiontests(casadiTestCase):
     N2 = 8
     
     out = p(n1,N1,n2,N2)
-
-    self.checkarray(sin(n1)+N1,out[0],"output")
-    self.checkarray(sin(n2)+N2,out[1],"output")
-                  
-  def test_map(self):
-    self.message("MX parallel call")
-    x = MX.sym("x",2)
-    y = MX.sym("y")
-
-    f = Function("f", [x,y],[sin(x) + y])
-
-    #! Evaluate this function ten times in parallel
-    x1 = MX.sym("x",2)
-    y1 = MX.sym("y")
-    x2 = MX.sym("x",2)
-    y2 = MX.sym("y")
-    [[F1],[F2]] = f.map([[x1,y1],[x2,y2]])
-    p = Function("p", [x1,y1,x2,y2],[F1,F2])
-    
-    n1 = DM([4,5])
-    N1 = 3
-    n2 = DM([5,7])
-    N2 = 8
-  
-    out = p([n1,N1,n2,N2])
 
     self.checkarray(sin(n1)+N1,out[0],"output")
     self.checkarray(sin(n2)+N2,out[1],"output")
@@ -409,73 +356,7 @@ class Functiontests(casadiTestCase):
     P_P = Pf.jacobian(1)
     
     self.assertFalse("derivative" in str(P_P))
-      
-  def test_map(self):
-    a = SX.sym("a",1,2)
-    b = SX.sym("b")
-    c = sin(a)+b
-    d = cos(sum2(a)-c)
-    f = Function("f",[a,b],[c,d])
-
-    random.seed(0)
-
-    random.random(())
-
-    r = [[ DM([1,2]).T , 3],
-    [ DM([2,1]).T , 1.7],
-    [ DM([3,4.1]).T , 2.7],
-    ]
-
-    Fref = blockcat([f(*e) for e in r])
-
-
-    F = Function("F",[],[blockcat(f.map(r))])
-
-    self.checkarray(F.call([])[0],Fref)
-    
-    a = SX.sym("a",1,2)
-    c = sin(a)
-    d = cos(sum2(a)-c)
-    f = Function("f",[a],[c,d])
-
-    random.seed(0)
-
-    random.random(())
-
-    r = [[ DM([1,2]).T ],
-    [ DM([2,1]).T ],
-    [ DM([3,4.1]).T],
-    ]
-
-    Fref = blockcat([f.call(e) for e in r])
-
-
-    F = Function("F",[],[blockcat(f.map(r))])
-
-    self.checkarray(F.call([])[0],Fref)
-
-    a = SX.sym("a",1,2)
-    b = SX.sym("b")
-    c = sin(a)+b
-    d = cos(sum2(a)-c)
-    f = Function("f",[a,b],[c])
-
-    random.seed(0)
-
-    random.random(())
-
-    r = [[ DM([1,2]).T , 3],
-    [ DM([2,1]).T , 1.7],
-    [ DM([3,4.1]).T , 2.7],
-    ]
-
-    Fref = blockcat([f.call(e) for e in r])
-
-
-    F = Function("F",[],[blockcat(f.map(r))])
-
-    self.checkarray(F.call([])[0],Fref)
-
+   
   def test_issue1464(self):
     n = 6
     x = SX.sym("x",n)
@@ -626,51 +507,6 @@ class Functiontests(casadiTestCase):
             resref[i] = resref[i] + [e]
 
         Fref = Function("F",X+Y+Z+V,map(lambda x: horzcat(*x),resref))
-        
-        np.random.seed(0)
-        X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-        Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-        Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
-        V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
-
-        for f in [F, F.expand('expand_'+F.name())]:
-          
-          self.checkfunction(f,Fref,inputs=X_+Y_+Z_+V_,sparsity_mod=args.run_slow)
-
-
-  @memory_heavy()
-  @slow()
-  def test_map_node_old(self):
-    x = SX.sym("x")
-    y = SX.sym("y",2)
-    z = SX.sym("z",2,2)
-    v = SX.sym("z",Sparsity.upper(3))
-
-    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
-
-    n = 2
-
-    X = [MX.sym("x") for i in range(n)]
-    Y = [MX.sym("y",2) for i in range(n)]
-    Z = [MX.sym("z",2,2) for i in range(n)]
-    V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
-
-    for Z_alt in [Z,[MX()]*3]:
-
-      for parallelization in ["serial","openmp","unroll"]:
-        res = fun.map(zip(X,Y,Z_alt,V),parallelization)
-
-
-        flatres = []
-        for r in res:
-          flatres+= map(sin,r)
-        F = Function("F",X+Y+Z+V,flatres)
-
-        flatresref = []
-        for r in zip(X,Y,Z_alt,V):
-          flatresref+=map(sin,fun.call(r))
-
-        Fref = Function("F",X+Y+Z+V,flatresref)
         
         np.random.seed(0)
         X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 

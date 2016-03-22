@@ -451,11 +451,6 @@ namespace casadi {
     return Function(std::string("slice_") + name(), new_in, new_out, opts);
   }
 
-  vector<vector<MX> > Function::map(const vector<vector<MX> > &x,
-                                    const string& parallelization) {
-    return (*this)->map_mx(x, parallelization);
-  }
-
   vector<MX> Function::map(const vector< MX > &x,
                            const string& parallelization) {
     return (*this)->map_mx(x, parallelization);

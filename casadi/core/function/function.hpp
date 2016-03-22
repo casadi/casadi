@@ -554,12 +554,6 @@ namespace casadi {
     /** \brief  Evaluate symbolically in parallel (matrix graph)
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
-    std::vector<std::vector<MX> > map(const std::vector<std::vector<MX> > &arg,
-                                      const std::string& parallelization="serial");
-
-    /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: unroll|serial|openmp
-    */
     std::vector<MX> map(const std::vector<MX > &arg,
                         const std::string& parallelization="serial");
 
