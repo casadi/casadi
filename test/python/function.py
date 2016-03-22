@@ -583,7 +583,7 @@ class Functiontests(casadiTestCase):
         ]:
       print "args", Z_alt
 
-      for parallelization in ["serial","openmp"] if args.run_slow else ["serial"]:
+      for parallelization in ["serial","openmp","unroll"] if args.run_slow else ["serial"]:
         print parallelization
         res = fun.map(map(lambda x: horzcat(*x),[X,Y,Z_alt,V]),parallelization)
 
@@ -627,7 +627,7 @@ class Functiontests(casadiTestCase):
 
     for Z_alt in [Z,[MX()]*3]:
 
-      for parallelization in ["serial","openmp"]:
+      for parallelization in ["serial","openmp","unroll"]:
         res = fun.map(zip(X,Y,Z_alt,V),parallelization)
 
 
@@ -671,7 +671,7 @@ class Functiontests(casadiTestCase):
     zi = 0
     for Z_alt in [Z,[MX()]*3]:
       zi+= 1
-      for parallelization in ["serial","openmp"]:
+      for parallelization in ["serial","openmp","unroll"]:
         res = fun.mapsum(map(lambda x: horzcat(*x),[X,Y,Z_alt,V]),parallelization) # Joris - clean alternative for this?
 
         for ad_weight_sp in [0,1]:
@@ -716,35 +716,36 @@ class Functiontests(casadiTestCase):
 
     for Z_alt in [Z]:
 
-      for parallelization in ["serial","openmp"]:
+      for parallelization in ["serial","openmp","unroll"]:
 
         for ad_weight_sp in [0,1]:
-          F = fun.map("map","serial",n,[2,3],[0],{"ad_weight_sp":ad_weight_sp})
-          
-          resref = [0 for i in range(fun.n_out())]
-          acc = 0
-          bl = []
-          cl = []
-          for r in zip(X,Y,[Z_alt]*n,[V]*n):
-            a,b,c= fun(*r)
-            acc = acc + a
-            bl.append(b)
-            cl.append(c)
+          for ad_weight in [0,1]:
+            F = fun.map("map",parallelization,n,[2,3],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+            
+            resref = [0 for i in range(fun.n_out())]
+            acc = 0
+            bl = []
+            cl = []
+            for r in zip(X,Y,[Z_alt]*n,[V]*n):
+              a,b,c= fun(*r)
+              acc = acc + a
+              bl.append(b)
+              cl.append(c)
 
-          Fref = Function("F",[horzcat(*X),horzcat(*Y),Z,V],[acc,horzcat(*bl),horzcat(*cl)])
+            Fref = Function("F",[horzcat(*X),horzcat(*Y),Z,V],[acc,horzcat(*bl),horzcat(*cl)])
 
-          np.random.seed(0)
-          X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
-          Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
-          Z_ = DM(Z.sparsity(),np.random.random(Z.nnz()))
-          V_ = DM(V.sparsity(),np.random.random(V.nnz()))
+            np.random.seed(0)
+            X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ] 
+            Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ] 
+            Z_ = DM(Z.sparsity(),np.random.random(Z.nnz()))
+            V_ = DM(V.sparsity(),np.random.random(V.nnz()))
 
-          inputs = [horzcat(*X_),horzcat(*Y_),Z_,V_]
-          
-          self.check_codegen(F,inputs=inputs)
+            inputs = [horzcat(*X_),horzcat(*Y_),Z_,V_]
+            
+            self.check_codegen(F,inputs=inputs)
 
-          for f in [F,toSX_fun(F)]:
-            self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
+            for f in [F,toSX_fun(F)]:
+              self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
 
   def test_issue1522(self):
     V = MX.sym("X",2)

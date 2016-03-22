@@ -552,19 +552,19 @@ namespace casadi {
     /// \endcond
 
     /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: expand|serial|openmp
+        \param parallelization Type of parallelization used: unroll|serial|openmp
     */
     std::vector<std::vector<MX> > map(const std::vector<std::vector<MX> > &arg,
                                       const std::string& parallelization="serial");
 
     /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: expand|serial|openmp
+        \param parallelization Type of parallelization used: unroll|serial|openmp
     */
     std::vector<MX> map(const std::vector<MX > &arg,
                         const std::string& parallelization="serial");
 
     /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
-        \param parallelization Type of parallelization used: expand|serial|openmp
+        \param parallelization Type of parallelization used: unroll|serial|openmp
     */
     std::vector<MX> mapsum(const std::vector<MX > &arg,
                            const std::string& parallelization="serial");
@@ -603,6 +603,7 @@ namespace casadi {
     ///@}
 
 
+    ///@{
     /** \brief  Create a mapped version of this function
 
         Suppose the function has a signature of:
@@ -615,9 +616,9 @@ namespace casadi {
            F: (A, P) -> (S )
 
             with
-                a: horzcat([a0, a1, ..., a_(N-1)])
-                p: horzcat([p0, p1, ..., p_(N-1)])
-                s: horzcat([s0, s1, ..., s_(N-1)])
+                A: horzcat([a0, a1, ..., a_(N-1)])
+                P: horzcat([p0, p1, ..., p_(N-1)])
+                S: horzcat([s0, s1, ..., s_(N-1)])
             and
                 s0 <- f(a0, p0)
                 s1 <- f(a1, p1)
@@ -625,15 +626,16 @@ namespace casadi {
                 s_(N-1) <- f(a_(N-1), p_(N-1))
         \endverbatim
 
-        \param parallelization Type of parallelization used: expand|serial|openmp
+        \param parallelization Type of parallelization used: unroll|serial|openmp
 
     */
 
     Function map(const std::string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
-      const Dict& opts=Dict()) const;
+      const Dict& opts=Dict());
     Function map(const std::string& name, const std::string& parallelization, int n,
-      const Dict& opts=Dict()) const;
+      const Dict& opts=Dict());
+    ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
     Function slice(const std::vector<int>& order_in, const std::vector<int>& order_out,
@@ -800,7 +802,9 @@ namespace casadi {
     Dict stats(int mem=0) const;
 
     ///@{
-    /** \brief Get symbolic primitives equivalent to the input expressions */
+    /** \brief Get symbolic primitives equivalent to the input expressions
+     * There is no guarantee that subsequent calls return unique answers
+     */
     const SX sx_in(int iind) const;
     const SX sx_in(const std::string& iname) const {
       return sx_in(index_in(iname));
@@ -814,7 +818,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Get symbolic primitives equivalent to the output expressions */
+    /** \brief Get symbolic primitives equivalent to the output expressions
+    * There is no guarantee that subsequent calls return unique answers
+    */
     const SX sx_out(int oind) const;
     const SX sx_out(const std::string& oname) const {
       return sx_out(index_out(oname));

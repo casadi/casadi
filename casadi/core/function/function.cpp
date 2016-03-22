@@ -420,12 +420,12 @@ namespace casadi {
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
-      const Dict& opts) const {
+      const Dict& opts) {
     return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
-      const Dict& opts) const {
+      const Dict& opts) {
     std::vector<int> reduce_in;
     std::vector<int> reduce_out;
     return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);

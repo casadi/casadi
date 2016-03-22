@@ -30,11 +30,46 @@ using namespace std;
 namespace casadi {
 
   Function MapBase::create(const std::string& name,
-                          const std::string& parallelization, const Function& f, int n,
+                          const std::string& parallelization, Function& f, int n,
                           const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
                           const Dict& opts) {
-    if (parallelization=="unroll") {
+    // Sanity checks on arguments
+    casadi_assert(n>0);
+    casadi_assert(inBounds(reduce_in, f.n_in()) && isUnique(reduce_in));
+    casadi_assert(inBounds(reduce_out, f.n_out()) && isUnique(reduce_out));
 
+    if (parallelization=="unroll") {
+      // Obtain lookup tables
+      std::vector<int> reduce_in_compl = complement(reduce_in, f.n_in());
+      std::vector<int> reduce_out_compl = complement(reduce_out, f.n_out());
+
+      // Construct symbolic inputs
+      std::vector< std::vector<MX> > args(f.n_in());
+      std::vector< MX > args_local(f.n_in());
+      for (int k : reduce_in) args_local[k] = MX::sym("x", f.sparsity_in(k));
+      for (int k : reduce_in_compl) {
+        for (int i=0;i<n;++i) args[k].reserve(n);
+        for (int i=0;i<n;++i) args[k].push_back(MX::sym("x", f.sparsity_in(k)));
+      }
+
+      // Collect results of symbolic calls to f
+      std::vector< std::vector<MX> > ret(f.n_out());
+      for (int k=0;k<f.n_out();++k) ret[k].reserve(n);
+      for (int i=0;i<n;++i) {
+        for (int k : reduce_in_compl) args_local[k] = args[k][i];
+        std::vector<MX> ret_local = f(args_local);
+        for (int k=0;k<f.n_out();++k) ret[k].push_back(ret_local[k]);
+      }
+
+      // Produce an MX function as a result
+      std::vector< MX > f_in(f.n_in());
+      for (int k : reduce_in) f_in[k] = args_local[k];
+      for (int k : reduce_in_compl) f_in[k] = horzcat(args[k]);
+      std::vector< MX > f_out(f.n_out());
+      for (int k : reduce_out) f_out[k] = repsum(horzcat(ret[k]), 1, n);
+      for (int k : reduce_out_compl) f_out[k] = horzcat(ret[k]);
+
+      return Function(name, f_in, f_out, opts);
     } else {
       Function ret;
       ret.assignNode(MapBase::create(name, parallelization, f, n, reduce_in, reduce_out));

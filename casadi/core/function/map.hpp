@@ -40,7 +40,7 @@ namespace casadi {
   public:
     // Create function (use instead of constructor)
     static Function create(const std::string& name,
-                          const std::string& parallelization, const Function& f, int n,
+                          const std::string& parallelization, Function& f, int n,
                           const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
                           const Dict& opts);
 
