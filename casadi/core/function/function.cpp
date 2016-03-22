@@ -400,72 +400,23 @@ namespace casadi {
     rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-  Function Function::mapaccum(const string& name, int N, const Dict& opts) const {
-    Function ret;
-    ret.assignNode(new Mapaccum(name, *this, N, 1, false));
+  Function Function::mapaccum(const string& name, int n, const Dict& opts) {
+    std::vector<int> accum_in = std::vector<int>(1, 0);
+    std::vector<int> accum_out = std::vector<int>(1, 0);
+    return mapaccum(name, n, accum_in, accum_out, opts);
+  }
 
+  Function Function::mapaccum(const string& name, int n,
+                              const vector<int>& accum_in,
+                              const vector<int>& accum_out,
+                              const Dict& opts) {
     // Inherit the scheme
     Dict opts2 = opts;
     if (opts.find("input_scheme")==opts.end()) opts2["input_scheme"] = name_in();
     if (opts.find("output_scheme")==opts.end()) opts2["output_scheme"] = name_out();
-    ret->construct(opts2);
-    return ret;
-  }
 
-  Function Function::mapaccum(const string& name, int n,
-                              const vector<bool>& input_accum,
-                              const vector<int>& output_accum,
-                              bool reverse,
-                              const Dict& opts) {
-    casadi_assert(input_accum.size()== n_in());
-
-    // Compute number of accumulated inputs
-    int n_accum=0;
-    for (int i=0;i<input_accum.size();++i) {
-      if (input_accum[i]) {
-        casadi_assert(n_accum<output_accum.size());
-        casadi_assert(output_accum[n_accum]>=0);
-        casadi_assert(output_accum[n_accum]< n_out());
-        casadi_assert_message(sparsity_in(i)==sparsity_out(output_accum[n_accum]),
-                                "Input #" << i << " and output #" << output_accum[n_accum] <<
-                                " must have matching sparsity. " <<
-                                "Got " << sparsity_in(i).dim() << " and " <<
-                                sparsity_out(output_accum[n_accum]).dim() << ".");
-        n_accum++;
-      }
-    }
-    casadi_assert(output_accum.size()==n_accum);
-
-    // list of the inputs that are accumulated
-    std::vector<int> indices_accum_in;
-    // list of the outputs that are accumulated
-    std::vector<int> indices_accum_out = output_accum;
-    for (int i=0;i<n_in();++i) {
-     if (input_accum[i]) indices_accum_in.push_back(i);
-    }
-
-    casadi_assert(indices_accum_in.size()==indices_accum_in.size());
-    std::vector<int> temp_in = complement(indices_accum_in, n_in());
-    std::vector<int> order_in = indices_accum_in;
-    order_in.insert(order_in.end(), temp_in.begin(), temp_in.end());
-
-    std::vector<int> temp_out = complement(indices_accum_out, n_out());
-    std::vector<int> order_out = indices_accum_out;
-    order_out.insert(order_out.end(), temp_out.begin(), temp_out.end());
-
-    Function fr = slice(order_in, order_out);
-    Function ma;
-    ma.assignNode(new Mapaccum(name, fr, n, n_accum, reverse));
-    ma->construct(opts);
-    std::vector<int> order_in_inv = lookupvector(order_in, n_in());
-    std::vector<int> order_out_inv = lookupvector(order_out, n_out());
-
-    // Inherit the scheme
-    Dict opts2;
-    if (opts.find("input_scheme")==opts.end()) opts2["input_scheme"] = name_in();
-    if (opts.find("output_scheme")==opts.end()) opts2["output_scheme"] = name_out();
-    return ma.slice(order_in_inv, order_out_inv, opts2);
-  }
+    return Mapaccum::create(name, *this, n, accum_in, accum_out, opts2);
+}
 
   Function Function::map(const string& name, int n, const Dict& opts) const {
     Function ret;

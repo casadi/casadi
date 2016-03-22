@@ -40,9 +40,11 @@ namespace casadi {
     friend class MapAccum;
   public:
 
-    /** \brief Constructor (generic mapaccum) */
-    Mapaccum(const std::string& name, const Function& f, int n,
-                     int n_accum, bool reverse);
+    // Create function (use instead of constructor)
+    static Function create(const std::string& name,
+                           Function& f, int n,
+                           const std::vector<int>& accum_in, const std::vector<int>& accum_out,
+                           const Dict& opts, bool reverse=false);
 
     /** \brief  Destructor */
     virtual ~Mapaccum();
@@ -137,6 +139,10 @@ namespace casadi {
 
     /// Total number of accumulator nonzeros
     int nnz_accum_;
+
+  protected:
+    /** \brief Constructor (generic mapaccum) */
+    Mapaccum(const std::string& name, const Function& f, int n, int n_accum, bool reverse);
 
   };
 

@@ -595,11 +595,10 @@ namespace casadi {
 
 
     */
-    Function mapaccum(const std::string& name, int N, const Dict& opts = Dict()) const;
-    Function mapaccum(const std::string& name, int N,
-                      const std::vector<bool>& input_accum,
-                      const std::vector<int>& output_accum,
-                      bool reverse = false,
+    Function mapaccum(const std::string& name, int n, const Dict& opts = Dict());
+    Function mapaccum(const std::string& name, int n,
+                      const std::vector<int>& accum_in,
+                      const std::vector<int>& accum_out,
                       const Dict& opts=Dict());
     ///@}
 

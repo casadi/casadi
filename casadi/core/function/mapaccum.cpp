@@ -29,9 +29,56 @@ using namespace std;
 
 namespace casadi {
 
-  Mapaccum::Mapaccum(const std::string& name, const Function& f, int n,
-                                     int n_accum,
-                                     bool reverse)
+    Function Mapaccum::create(const std::string& name,
+      Function& f, int n, const vector<int>& accum_in, const vector<int>& accum_out,
+        const Dict& opts, bool reverse) {
+
+      casadi_assert(inBounds(accum_in, f.n_in()) && isUnique(accum_in));
+      casadi_assert(inBounds(accum_out, f.n_out()) && isUnique(accum_out));
+
+      casadi_assert(accum_in.size()==accum_out.size());
+      int n_accum=accum_in.size();
+
+      // Check that sparsities match
+      for (int i=0;i<n_accum;++i) {
+        casadi_assert_message(f.sparsity_in(accum_in[i])==f.sparsity_out(accum_out[i]),
+                                "Input #" << accum_in[i] << " and output #" << accum_out[i] <<
+                                " must have matching sparsity. " <<
+                                "Got " << f.sparsity_in(accum_in[i]).dim() << " and " <<
+                                f.sparsity_out(accum_out[i]).dim() << ".");
+      }
+
+      if (accum_in==range(n_accum) && accum_out==range(n_accum)) {
+        // No need to reorder
+        Function ret;
+        ret.assignNode(new Mapaccum(name, f, n, n_accum, reverse));
+        ret->construct(opts);
+        return ret;
+      } else {
+        // Need to do some reordering
+        std::vector<int> temp_in = complement(accum_in, f.n_in());
+        std::vector<int> order_in = accum_in;
+        order_in.insert(order_in.end(), temp_in.begin(), temp_in.end());
+
+        std::vector<int> temp_out = complement(accum_out, f.n_out());
+        std::vector<int> order_out = accum_out;
+        order_out.insert(order_out.end(), temp_out.begin(), temp_out.end());
+
+        Function fr = f.slice(order_in, order_out);
+        Function ma;
+        ma.assignNode(new Mapaccum(name, fr, n, n_accum, reverse));
+        ma->construct(opts);
+
+        std::vector<int> order_in_inv = lookupvector(order_in, f.n_in());
+        std::vector<int> order_out_inv = lookupvector(order_out, f.n_out());
+
+        return ma.slice(order_in_inv, order_out_inv, opts);
+      }
+
+
+  }
+
+  Mapaccum::Mapaccum(const std::string& name, const Function& f, int n, int n_accum, bool reverse)
     : FunctionInternal(name), f_(f), n_(n),
       n_accum_(n_accum), reverse_(reverse) {
 
@@ -307,10 +354,6 @@ namespace casadi {
       This maps to MapAccum.
 
     */
-    std::vector<bool> input_accum_(n_in(), false);
-    for (int i=0; i<n_accum_;i++) {
-      input_accum_[i] = true;
-    }
 
     // Construct the new MapAccum's input_accum
     /*
@@ -320,9 +363,11 @@ namespace casadi {
               0, 0, 0, 0,  1,      0
 
     */
-    std::vector<bool> input_accum(n_in()+n_out(), false);
+    std::vector<int> accum_in;
+    int offset = n_in()+n_out();
     for (int i=0;i<nfwd;++i) {
-      input_accum.insert(input_accum.end(), input_accum_.begin(), input_accum_.end());
+      for (int j=0;j<n_accum_;++j) accum_in.push_back(offset+j);
+      offset+= n_in();
     }
 
     // Construct the new MapAccum's output_accum
@@ -333,17 +378,15 @@ namespace casadi {
               [0]
 
     */
-    std::vector<int> output_accum;
-    int offset = 0;
+    std::vector<int> accum_out;
+    offset = 0;
     for (int i=0;i<nfwd;++i) {
-      for (int j=0;j<n_accum_;++j) {
-        output_accum.push_back(offset+j);
-      }
+      for (int j=0;j<n_accum_;++j) accum_out.push_back(offset+j);
       offset+= n_out();
     }
 
     // Construct the new MapAccum
-    Function ma = df.mapaccum("map", n_, input_accum, output_accum, reverse_, opts);
+    Function ma = Mapaccum::create(name, df, n_, accum_in, accum_out, opts, reverse_);
 
     /*
 
@@ -445,10 +488,6 @@ namespace casadi {
       This maps to MapAccum.
 
     */
-    std::vector<bool> input_accum_(n_in(), false);
-        for (int i=0; i<n_accum_;i++) {
-          input_accum_[i] = true;
-    }
 
     // Extend the primitive function with extra inputs:
     // for each reverse direction,
@@ -519,15 +558,11 @@ namespace casadi {
               0, 0, 0, 0,  1,      0,     0
 
     */
-    std::vector<bool> input_accum(n_in()+n_out(), false);
-    std::vector<bool> input_accum_rev(n_out(), false);
-    for (int j=0;j<n_accum_;++j) {
-      input_accum_rev[j] = true;
-    }
-
+    std::vector<int> accum_in;
+    int offset = n_in()+n_out();
     for (int i=0;i<nadj;++i) {
-      input_accum.insert(input_accum.end(), input_accum_rev.begin(), input_accum_rev.end());
-      input_accum.insert(input_accum.end(), n_accum_, false);
+      for (int j=0;j<n_accum_;++j) accum_in.push_back(offset+j);
+      offset+= n_out()+n_accum_;
     }
 
     // Construct the new MapAccum's output_accum
@@ -538,17 +573,10 @@ namespace casadi {
               [0]
 
     */
-    std::vector<int> output_accum_rev;
-    for (int j=0;j<n_accum_;++j) {
-      output_accum_rev.push_back(j);
-    }
-
-    std::vector<int> output_accum;
-    int offset = 0;
+    std::vector<int> accum_out;
+    offset = 0;
     for (int i=0;i<nadj;++i) {
-      for (int j=0;j<n_accum_;++j) {
-        output_accum.push_back(offset+output_accum_rev[j]);
-      }
+      for (int j=0;j<n_accum_;++j) accum_out.push_back(offset+j);
       offset+= n_in();
     }
 
@@ -556,8 +584,7 @@ namespace casadi {
     opts2.erase("input_scheme");
     opts2.erase("output_scheme");
     // Create the new MapAccum
-    Function ma = fbX.mapaccum("map", n_, input_accum, output_accum, !reverse_, opts2);
-
+    Function ma = Mapaccum::create(name, fbX, n_, accum_in, accum_out, opts2, !reverse_);
     /*
 
       Recall, the function we need to return looks like:

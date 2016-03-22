@@ -862,51 +862,55 @@ class Functiontests(casadiTestCase):
     Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ] 
     V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ] 
 
-    for options in [{"ad_weight_sp":0},{"ad_weight_sp":1}]:
-      F = fun.mapaccum("map",n,[True,False,False,False],[0],False,options)
+    for ad_weight in range(2):
+      for ad_weight_sp in range(2):
+        F = fun.mapaccum("map",n,[0],[0],{"ad_weight_sp":ad_weight_sp,"ad_weight": ad_weight})
+        
+        F.forward(2)
 
-      XP = X
+        XP = X
 
-      Y0s = []
-      Y1s = []
-      Xps = []
-      for k in range(n):
-        XP, Y0,Y1 = fun(XP,Y[k],Z[k],V[k])
-        Y0s.append(Y0)
-        Y1s.append(Y1)
-        Xps.append(XP)
-      Fref = Function("f",[X,horzcat(*Y),horzcat(*Z),horzcat(*V)],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Y1s)])
-      inputs = [X_,horzcat(*Y_),horzcat(*Z_),horzcat(*V_)]
+        Y0s = []
+        Y1s = []
+        Xps = []
+        for k in range(n):
+          XP, Y0,Y1 = fun(XP,Y[k],Z[k],V[k])
+          Y0s.append(Y0)
+          Y1s.append(Y1)
+          Xps.append(XP)
+        Fref = Function("f",[X,horzcat(*Y),horzcat(*Z),horzcat(*V)],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Y1s)])
+        inputs = [X_,horzcat(*Y_),horzcat(*Z_),horzcat(*V_)]
 
-      for f in [F,toSX_fun(F)]:
+        for f in [F,toSX_fun(F)]:
 
-        self.checkfunction(f,Fref,inputs=inputs)
-        self.check_codegen(f,inputs=inputs)
+          self.checkfunction(f,Fref,inputs=inputs)
+          self.check_codegen(f,inputs=inputs)
 
     fun = Function("f",[y,x,z,v],[mtimes(z,x)+y+c.trace(v)**2,sin(y*x).T,v/y])
+    
+    for ad_weight in range(2):
+      for ad_weight_sp in range(2):
+        F = fun.mapaccum("map",n,[1,3],[0,2],{"ad_weight_sp":ad_weight_sp,"ad_weight": ad_weight})
 
-    for options in [{"ad_weight_sp":0},{"ad_weight_sp":1}]:
-      F = fun.mapaccum("map",n,[False,True,False,True],[0,2],False,options)
+        XP = X
+        VP = V[0]
 
-      XP = X
-      VP = V[0]
+        Y0s = []
+        Y1s = []
+        Xps = []
+        Vps = []
+        for k in range(n):
+          XP, Y0, VP = fun(Y[k],XP,Z[k],VP)
+          Y0s.append(Y0)
+          Xps.append(XP)
+          Vps.append(VP)
 
-      Y0s = []
-      Y1s = []
-      Xps = []
-      Vps = []
-      for k in range(n):
-        XP, Y0, VP = fun(Y[k],XP,Z[k],VP)
-        Y0s.append(Y0)
-        Xps.append(XP)
-        Vps.append(VP)
-
-      Fref = Function("f",[horzcat(*Y),X,horzcat(*Z),V[0]],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Vps)])
-      inputs = [horzcat(*Y_),X_,horzcat(*Z_),V_[0]]
-      
-      for f in [F,toSX_fun(F)]:
-        self.checkfunction(f,Fref,inputs=inputs)
-        self.check_codegen(f,inputs=inputs)
+        Fref = Function("f",[horzcat(*Y),X,horzcat(*Z),V[0]],[horzcat(*Xps),horzcat(*Y0s),horzcat(*Vps)])
+        inputs = [horzcat(*Y_),X_,horzcat(*Z_),V_[0]]
+        
+        for f in [F,toSX_fun(F)]:
+          self.checkfunction(f,Fref,inputs=inputs)
+          self.check_codegen(f,inputs=inputs)
 
   def test_mapaccum_schemes(self):
   
@@ -919,7 +923,7 @@ class Functiontests(casadiTestCase):
 
     n = 2
     
-    F = fun.mapaccum("map",n,[False,False,True,False],[0])
+    F = fun.mapaccum("map",n,[2],[0])
     
     scheme_in_fun = fun.name_in()
     scheme_out_fun = fun.name_out()

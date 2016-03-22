@@ -36,6 +36,7 @@
 #include <limits>
 #include <algorithm>
 #include <map>
+#include <set>
 #include <cmath>
 #include "exception.hpp"
 #include "casadi_types.hpp"
@@ -411,6 +412,12 @@ namespace casadi {
     if (max >= upper) return false;
     int min = *std::min_element(v.begin(), v.end());
     return (min >= lower);
+  }
+
+  template<typename T>
+  bool isUnique(const std::vector<T> &v) {
+    std::set<T> s(v.begin(), v.end());
+    return v.size()==s.size();
   }
 
   template<typename T>
