@@ -2190,7 +2190,7 @@ Dynamic constraints (imposed everywhere):
   DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, d, sdot)
   algebraic equations:         0 ==  alg(t, x, s, z, u, p, d)
   quadrature equations:  \\\\dot{q} == quad(t, x, s, z, u, p, d)
-  dependent parameters:       d == ddef(t, x, s, z, u, p, d)
+  dependent parameters:        d == ddef(t, x, s, z, u, p, d)
   output equations:            y == ydef(t, x, s, z, u, p, d)
   
 
