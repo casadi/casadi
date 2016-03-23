@@ -26,52 +26,56 @@
 #ifndef CASADI_OOQP_INTERFACE_HPP
 #define CASADI_OOQP_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
-#include <casadi/interfaces/ooqp/casadi_qpsolver_ooqp_export.h>
+#include "casadi/core/function/qpsol_impl.hpp"
+#include <casadi/interfaces/ooqp/casadi_qpsol_ooqp_export.h>
 
-/** \defgroup plugin_QpSolver_ooqp
+/** \defgroup plugin_Qpsol_ooqp
  Interface to the OOQP Solver for quadratic programming
   The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.
 
   NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
 */
 
-/** \pluginsection{QpSolver,ooqp} */
+/** \pluginsection{Qpsol,ooqp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{QpSolver,ooqp}
+  /** \brief \pluginbrief{Qpsol,ooqp}
 
-      @copydoc QpSolver_doc
-      @copydoc plugin_QpSolver_ooqp
+      @copydoc Qpsol_doc
+      @copydoc plugin_Qpsol_ooqp
 
   */
-  class CASADI_QPSOLVER_OOQP_EXPORT OoqpInterface : public QpSolverInternal {
+  class CASADI_QPSOL_OOQP_EXPORT OoqpInterface : public Qpsol {
   public:
-
-    /** \brief  Constructor */
-    explicit OoqpInterface();
-
-    /** \brief  Clone */
-    virtual OoqpInterface* clone() const { return new OoqpInterface(*this);}
-
     /** \brief  Create a new Solver */
-    explicit OoqpInterface(const std::map<std::string, Sparsity>& st);
+    explicit OoqpInterface(const std::string& name,
+                           const std::map<std::string, Sparsity>& st);
 
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-      return new OoqpInterface(st);
+    static Qpsol* creator(const std::string& name,
+                                     const std::map<std::string, Sparsity>& st) {
+      return new OoqpInterface(name, st);
     }
 
     /** \brief  Destructor */
     virtual ~OoqpInterface();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "ooqp";}
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// Solve the QP
-    virtual void evaluate();
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
     /// Throw error
     static const char* errFlag(int flag);
@@ -80,27 +84,17 @@ namespace casadi {
     static std::string printBounds(const std::vector<double>& b,
                                    const std::vector<char>& ib, int n, const char *sign);
 
-    /// Problem data (vectors)
-    std::vector<double> c_, bA_, xlow_, xupp_, clow_, cupp_, x_, gamma_, phi_, y_, z_, lambda_, pi_;
-
-    /// Type of bounds
-    std::vector<char> ixlow_, ixupp_, iclow_, icupp_;
-
-    /// Problem data (matrices)
-    std::vector<double> dQ_, dA_, dC_;
-
-    /// Sparsities of matrices
-    std::vector<int> irowQ_, jcolQ_, irowA_, jcolA_, irowC_, jcolC_;
-
-    // Variable/constraint index
-    std::vector<int> x_index_, c_index_;
-
-    // Parameters
-    std::vector<double> p_;
-
     // Transpose of linear constraints
-    DMatrix AT_;
-    std::vector<int> AT_tmp_;
+    Sparsity spAT_;
+
+    // Number of nonzeros in upper triangular half of Hessian
+    int nQ_;
+
+    // Number of nonzeros in Hessian
+    int nH_;
+
+    // Number of nonzeros in constraint matrix
+    int nA_;
 
     // Print level
     int print_level_;

@@ -96,6 +96,8 @@ for c in classes:
   temp = f.find("//memberdef[definition='%s']/location" % constructor_name)
   if not(temp is None):
     meta['file']=temp.attrib["file"]
+    
+print metadata["casadi::Integrator"]
 
 for v in metadata.values(): # Remove templating if not in index.xml
   for i,vv in enumerate(v['parents']):
@@ -113,7 +115,7 @@ for k in metadata.keys():
   metadata[k]['hierarchy']=parents(k)
 
 # Get name by specifying xml-source
-def getNameByXMLsource(xmlsource):
+def nameByXMLsource(xmlsource):
   for name,meta in metadata.items():
     if (meta['xmlsource']==xmlsource):
       return name
@@ -122,7 +124,7 @@ def getNameByXMLsource(xmlsource):
 # Fill in 'internalFor'
 for name,meta in metadata.items():
   if ('hasInternal' in meta):
-    name2 = getNameByXMLsource(meta['hasInternal'])
+    name2 = nameByXMLsource(meta['hasInternal'])
     if name2 is None:
       continue
     internalfor = metadata[name2]
@@ -138,7 +140,7 @@ def locate(pattern, root=os.curdir):
     for path, dirs, files in os.walk(os.path.abspath(root)):
         for filename in fnmatch.filter(files, pattern):
             yield os.path.join(path, filename)
-            
+  
 # locate the namespacecasadi.xml
 xmlNS = etree.parse(list(locate('namespacecasadi.xml',root=xml))[0])
 
@@ -179,64 +181,71 @@ parse_type = Word( srange("[A-Z]") + "_").setResultsName("type")
 
 comma = Suppress(Literal(","))
 
-parse_default = Or([parse_quoted_string_keep,Word(alphanums + ".:-_"), Word(alphanums+"_")+Literal("(") + Word(alphanums + "._") + Literal(")"),Literal("GenericType()"),Literal("Function()")]).setResultsName("default")
+def brackets(a):
+  return Suppress(Literal("{")) + Optional(a) + Suppress(Literal("}"))
 
-parse_allowed = parse_quoted_string.setResultsName("allowed")
-parse_inherit = Word(alphanums).setResultsName("inherit").setParseAction(lambda x: x)
+def gbrackets(a):
+  return Group(brackets(a))
 
-parse_match = Literal("addOption(") + parse_quoted_string.setResultsName("name") + comma + parse_type + Optional(comma + parse_default + Optional(comma + parse_quoted_string.setResultsName("description") +Optional(comma + parse_allowed + Optional(comma + parse_inherit )) )) +  Literal(")") + Optional(";" + Optional("//" + restOfLine.setResultsName("afterdescription")))
 
-    
+parse_optiondata = parse_type + comma + parse_quoted_string
+parse_optiondata_collection = gbrackets(parse_optiondata)
+
+parse_option = parse_quoted_string + comma + parse_optiondata_collection
+parse_option_collection = gbrackets(parse_option)
+
+parse_options = delimitedList(parse_option_collection, delim=",")
+parse_options_collection = gbrackets(parse_options)
+
+parse_options_group = (brackets( Suppress(Literal("&")) + Word(alphanums + ".:-_"))) | parse_options_collection
+parse_options_group_collection = Optional(Suppress(Literal("="))) + brackets(delimitedList(parse_options_group)) + Suppress(Literal(";"))
+ 
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
-  if not('casadi::OptionsFunctionalityNode' in meta['hierarchy']) and not(name=='casadi::OptionsFunctionalityNode'):
-    continue
   if not('file' in meta):
     meta['options']={}
     meta['stats']={}
     meta['monitors']={}
+    meta['optionproviders'] = []
     continue
-  source = re.sub(r'\.hpp$',r'.cpp',meta['file'])
+  source = re.sub(r'(_impl)?\.hpp$',r'.cpp',meta['file'])
   meta['options']={}
   meta['stats']={}
   meta['monitors']={}
-  f =file(source,"r")
+  meta['optionproviders'] = []
+  try:
+    f =file(source,"r")
+  except:
+    continue
   lines = f.readlines()
   linec = 0
   while linec<len(lines):
     l = lines[linec]
     linec+=1
-    if 'addOption' in l:
-      if ('//' in l and (l.find('addOption') > l.find('//'))) or '->first' in l or '::addOption' in l or 'allowed_vals_vec' in l:
-        continue
-      while ";" not in l:
-        l+=lines[linec]
-        linec+=1
+    if 'Options' in l:
+      if re.search('Options .*::options_',l):
+        start = linec
+        while "};" not in l:
+          l = lines[linec]
+          linec+=1
+        stop = linec
         
-      try:
-        result = parse_match.parseString(l).asDict()
-        for k,v in result.iteritems():
-          result[k]=v.strip()
-      except:
-        print "Ignoring ", name, l
-      d = meta['options'][result["name"]]={'name': result["name"],"type": result["type"],'used': name,'default':'','description':'','inherit': False}
-      if 'default' in result:
-        d["default"]= result["default"]
-        
-      description = []
-      if 'afterdescription' in result:
-        description.append(result["afterdescription"].strip())
-      if 'description' in result:
-        description.append(result["description"])
-      if 'allowed' in result:
-        description.append("(" + result["allowed"] +")")
-        if result["name"] == "monitor":
-          for n in result["allowed"].split("|"):
-            meta['monitors'][n]={'name': n, 'used': name}
-      if 'inherit' in result:
-        d['inherit'] = bool(eval(result["inherit"].capitalize()))
-        
-      d["description"] = ' '.join(description)
+        optionsdict = "".join(lines[start:stop])
+
+        results = parse_options_group_collection.parseString(optionsdict)
+
+        for optiongroup in results:
+          if isinstance(optiongroup,str):
+            m = re.search("(.*?)::options_",optiongroup)
+            assert m
+            op = m.group(1)
+            if "casadi" not in op: op = "casadi::" + op
+            meta['optionproviders'].append(op)
+            continue
+          if len(optiongroup[0])==0:
+            continue
+          for op_name, op_data in optiongroup:   
+            d = meta['options'][op_name]={'name': op_name,"type": op_data[0],'used': name,'default':'','description':op_data[1],'inherit': False}
       
     if not(l.find('ops_')==-1):
       m = re.search(r'ops_\["(.*?)"\]\s*=\s*(.*?);',l)
@@ -270,9 +279,9 @@ def newline2br(a):
   
 def optionsashtml(option,used=True):
   if used:
-    return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(htmlescape(option['description'])),newline2br(option['used']))
+    return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],newline2br(htmlescape(option['description'])),newline2br(option['used']))
   else:
-    return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(htmlescape(option['description'])))
+    return "<tr><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],newline2br(htmlescape(option['description'])))
 
 def statsashtml(stat,used=True):
   if used:
@@ -325,7 +334,7 @@ for name,meta in sorted(metadata.items()):
     meta['options'] = {}
 
   optionproviders = [meta['options']]
-  for a in meta['hierarchy']:
+  for a in meta['optionproviders']:
     if a in metadata and 'options' in metadata[a]:
       optionproviders.append(metadata[a]['options'])
   
@@ -344,7 +353,7 @@ for name,meta in sorted(metadata.items()):
     f.write("/** \class %s\n\\n\n\\par\n" % t)
     f.write("<a name='options'></a><table>\n")
     f.write("<caption>List of available options</caption>\n")
-    f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
+    f.write("<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>\n")
     for k in myoptionskeys :
       f.write(optionsashtml(alloptions[k])+"\n")
     f.write( "</table>\n")
@@ -357,8 +366,8 @@ for name,meta in sorted(metadata.items()):
     fdiagram.write( "*/\n")
     fdiagram.write("/// \endcond\n")
     
-  if "casadi::PluginInterface" in meta["hierarchy"] and 'casadi::FunctionInternal' not in meta["parents"]:
-        
+
+  if "casadi::PluginInterface" in meta["hierarchy"]:
     m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
     if not m:
       print "This plugin is undocumented. add \\pluginbrief{class,name} to it: " + meta["file"]
@@ -367,34 +376,35 @@ for name,meta in sorted(metadata.items()):
       f.write("/** \\addtogroup plugin_%s_%s\n\\n\n\\par\n" % (m.group(2),m.group(1)))
       f.write("<a name='options'></a><table>\n")
       f.write("<caption>List of available options</caption>\n")
-      f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>\n")
+      f.write("<tr><th>Id</th><th>Type</th><th>Description</th></tr>\n")
       for k in myoptionskeys :
-        #if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[alloptions[k]["used"]]["parents"]:
-        if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[metadata[alloptions[k]["used"]]["parents"][0]]["hierarchy"]:
-          f.write(optionsashtml(alloptions[k],used=False)+"\n")
+        try:
+          #if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[alloptions[k]["used"]]["parents"]:
+          if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[metadata[alloptions[k]["used"]]["parents"][0]]["hierarchy"]:
+            f.write(optionsashtml(alloptions[k],used=False)+"\n")
+        except:
+          pass
       f.write( "</table>\n")
       f.write( "*/\n")
     
-  if 'InternalFor' in meta:
-    for t in meta['InternalFor']:
-      if "casadi::PluginInterface" in meta["parents"]:
-        f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
-      else:
-        f.write("/** \class %s\n\\n\n\\par\n" % t)
-      f.write("<a name='options'></a><table>\n")
-      f.write("<caption>List of available options</caption>\n")
-      f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
-      for k in myoptionskeys :
-        f.write(optionsashtml(alloptions[k])+"\n")
-      f.write( "</table>\n")
-      f.write( "*/\n")
-      
-      fdiagram.write("/** \class %s\n" % t)
-      fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
-      fdiagram.write( "*/\n")
+    t = name
+    print "test", name, myoptionskeys
+    f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
+    f.write("<a name='options'></a><table>\n")
+    f.write("<caption>List of available options</caption>\n")
+    f.write("<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>\n")
+    for k in myoptionskeys :
+      f.write(optionsashtml(alloptions[k])+"\n")
+    f.write( "</table>\n")
+    f.write( "*/\n")
+    
+    fdiagram.write("/** \class %s\n" % t)
+    fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
+    fdiagram.write( "*/\n")
     
 f.close()
 
+"""
 f = file(out+'d0_stats.hpp','w')
 
 # Print out doxygen information - stats
@@ -456,7 +466,9 @@ for name,meta in sorted(metadata.items()):
       f.write( "*/\n")
     
 f.close()
+"""
 
+"""
 f = file(out+'c0_monitors.hpp','w')
 
 # Print out doxygen information - monitors
@@ -519,6 +531,8 @@ for name,meta in sorted(metadata.items()):
       f.write( "*/\n")
 
 f.close()
+"""
+
 
 f = file(out+'a0_schemes.hpp','w')
 

@@ -31,7 +31,7 @@
 * \sa
 * \code
 * casadi::MX::attachAssert();
-* casadi::CustomFunction();
+* casadi::Callback();
 * \endcode
 *
 */

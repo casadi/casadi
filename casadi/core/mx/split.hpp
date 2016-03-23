@@ -54,23 +54,23 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     // Sparsity pattern of the outputs
     std::vector<int> offset_;
@@ -90,11 +90,8 @@ namespace casadi {
     /// Destructor
     virtual ~Horzsplit() {}
 
-    /// Clone function
-    virtual Horzsplit* clone() const { return new Horzsplit(*this);}
-
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -108,7 +105,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_HORZSPLIT;}
+    virtual int op() const { return OP_HORZSPLIT;}
 
     /// Create a horizontal concatenation node
     virtual MX getHorzcat(const std::vector<MX>& x) const;
@@ -127,11 +124,8 @@ namespace casadi {
     /// Destructor
     virtual ~Diagsplit() {}
 
-    /// Clone function
-    virtual Diagsplit* clone() const { return new Diagsplit(*this);}
-
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -145,10 +139,10 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_DIAGSPLIT;}
+    virtual int op() const { return OP_DIAGSPLIT;}
 
     /// Create a diagonal concatenation node
-    virtual MX getDiagcat(const std::vector<MX>& x) const;
+    virtual MX get_diagcat(const std::vector<MX>& x) const;
   };
 
   /** \brief Vertical split of vectors, x -> x0, x1, ...
@@ -164,11 +158,8 @@ namespace casadi {
     /// Destructor
     virtual ~Vertsplit() {}
 
-    /// Clone function
-    virtual Vertsplit* clone() const { return new Vertsplit(*this);}
-
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -182,7 +173,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_VERTSPLIT;}
+    virtual int op() const { return OP_VERTSPLIT;}
 
     /// Create a vertical concatenation node (vectors only)
     virtual MX getVertcat(const std::vector<MX>& x) const;

@@ -28,7 +28,7 @@
 
       const std::string casadi::CsparseInterface::meta_doc=
       "\n"
-"LinearSolver with CSparse Interface\n"
+"Linsol with CSparse Interface\n"
 "\n"
 "\n"
 ">List of available options\n"

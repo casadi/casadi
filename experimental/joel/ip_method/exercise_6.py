@@ -37,7 +37,7 @@ c = N.random.randn(n)
 
 # Formulate the NLP
 x = ssym("x",n)
-ffcn = SXFunction([x],[inner_prod(c,x)])
+ffcn = SXFunction([x],[dot(c,x)])
 gfcn = SXFunction([x],[mul(A,x)])
 
 for solver in ['ipopt','ip_method']:

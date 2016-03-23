@@ -43,14 +43,14 @@ states = struct_symSX([
 # Create a structure for the right hand side
 rhs = struct_SX(states)
 x = states['x']
-rhs["x"] = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]])
+rhs["x"] = vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, x[0])
 rhs["L"] = x[0]*x[0] + x[1]*x[1] + u*u
 
 # ODE right hand side function
-f = SXFunction('f', [t,states,u],[rhs])
+f = Function('f', [t,states,u],[rhs])
 
 # Objective function (meyer term)
-m = SXFunction('m', [t,states,u],[states["L"]])
+m = Function('m', [t,states,u],[states["L"]])
 
 # Control bounds
 u_min = -0.75
@@ -75,7 +75,7 @@ nx = 3
 nu = 1
 
 # Choose collocation points
-tau_root = collocationPoints(3,"radau")
+tau_root = [0] + collocation_points(3,"radau")
 
 # Degree of interpolating polynomial
 d = len(tau_root)-1
@@ -105,15 +105,15 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SXFunction('lfcn', [tau],[L])
+  lfcn = Function('lfcn', [tau],[L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  D[j], = lfcn([1.0])
+  D[j] = lfcn(1.0)
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
   for r in range(d+1):
-    C[j,r], _ = tfcn([tau_root[r]])
+    C[j,r], _ = tfcn(tau_root[r])
 
 # Structure holding NLP variables
 V = struct_symMX([
@@ -162,7 +162,7 @@ for k in range(nk):
       xp_jk += C[r,j]*V["X",k,r]
       
     # Add collocation equations to the NLP
-    [fk] = f.call([T[k][j], V["X",k,j], V["U",k]])
+    fk = f(T[k][j], V["X",k,j], V["U",k])
     g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
@@ -178,13 +178,13 @@ for k in range(nk):
   ubg.append(NP.zeros(nx))
   
 # Concatenate constraints
-g = vertcat(g)
+g = vertcat(*g)
 
 # Objective function
-[f] = m.call([T[nk-1][d],V["X",nk,0],V["U",nk-1]])
+f = m(T[nk-1][d],V["X",nk,0],V["U",nk-1])
   
 # NLP
-nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
+nlp = {'x':V, 'f':f, 'g':g}
   
 ## ----
 ## SOLVE THE NLP
@@ -193,11 +193,11 @@ nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
 # Set options
 opts = {}
 opts["expand"] = True
-#opts["max_iter"] = 4
-opts["linear_solver"] = 'ma27'
+#opts["ipopt.max_iter"] = 4
+opts["ipopt.linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Initial condition
@@ -212,7 +212,7 @@ arg["lbg"] = NP.concatenate(lbg)
 arg["ubg"] = NP.concatenate(ubg)
 
 # Solve the problem
-res = solver(arg)
+res = solver(**arg)
 
 # Print the optimal cost
 print "optimal cost: ", float(res["f"])

@@ -28,7 +28,7 @@ import numpy as NP
 import matplotlib.pyplot as plt
 
 # Example matrix from Davis p. 39
-A = DMatrix(11,11)
+A = DM(11,11)
 A[2,1] = 1
 A[5,0] = 1
 A[5,3] = 1
@@ -53,4 +53,4 @@ A = A+A.T
 s = A.sparsity()
 
 # Get the elimination tree
-etr = s.eliminationTree(False)
+etr = s.etree(False)

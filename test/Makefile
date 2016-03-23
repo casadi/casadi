@@ -41,7 +41,6 @@ unittests_py_slow:
 unittests_py_valgrind:
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -memcheck -passoptions="--ignore_memory_heavy"
 
-
 unittests_py:
 ifdef MEMCHECK
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
@@ -78,7 +77,7 @@ doxygen:
 
 # No memchecks because it's slow
 examples_code_cpp:
-	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp"
+	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp snopt_nl.cpp rocket_snopt.cpp"
 
 tutorials:
 	python internal/test_py.py '../docs/tutorials/python/src' $(MEMCHECK)

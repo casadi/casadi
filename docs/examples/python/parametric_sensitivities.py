@@ -49,15 +49,15 @@ p = SX.sym("p",2)
 f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2]
   
 # Constraints
-g = vertcat(( \
+g = vertcat( \
        6*x[0] + 3*x[1] + 2*x[2] - p[0],
-    p[1]*x[0] +   x[1] -   x[2] -    1))
+    p[1]*x[0] +   x[1] -   x[2] -    1)
   
 # Augment the parameters to the list of variables
-x = vertcat((x,p))
+x = vertcat(x,p)
   
 # Fix the parameters by additional equations
-g = vertcat((g,p))
+g = vertcat(g,p)
   
 # Original parameter values
 p_a  = [5.00,1.00]
@@ -75,7 +75,7 @@ lbg = [0.00, 0.00, p_a[0], p_a[1]]
 ubg = [0.00, 0.00, p_a[0], p_a[1]]
     
 # Create NLP
-nlp = SXFunction("nlp", nlpIn(x=x),nlpOut(f=f,g=g))
+nlp = {'x':x, 'f':f, 'g':g}
 
 # NLP solver options
 opts = {}
@@ -100,7 +100,7 @@ opts["run_sens"] = "yes"
 opts["n_sens_steps"] = 1
   
 # Create NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
   
 # Solve NLP
 res = solver({"x0" : x0,

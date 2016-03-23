@@ -27,7 +27,7 @@ from casadi import *
 from numpy import *
 from pylab import *
 
-#! We will investigate the working of ImplicitFunction with the help of the parametrically exited Duffing equation.
+#! We will investigate the working of rootfinder with the help of the parametrically exited Duffing equation.
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$. \\
 #$
@@ -59,23 +59,18 @@ alpha_ = 0.1
 k_     = 0.2
 params_ = [0.1,0.1,alpha_,k_,sigma_]
 
-#! We create a ImplicitFunction instance
-f=SXFunction("f", [vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
+#! We create a Function instance
+f=Function("f", [vertcat(a,gamma),vertcat(*params)],[vertcat(res0,res1)])
 opts = {}
 opts["strategy"] = "linesearch"
 opts["abstol"] = 1e-14
 
 #$ Require $a > 0$ and $\gamma < 0$
 opts["constraints"] = [2,-2]
-s=ImplicitFunction("s", "kinsol", f, opts)
-s.setInput(params_,1)
+s=rootfinder("s", "kinsol", f, opts)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve
-s.setInput([1,-1])
-s.evaluate()
-
-#! Our output is:
-x_ = s.getOutput()
+x_ = s([1,-1], params_)
 print "Solution = ", x_
 
 #! Compare with the analytic solution:
@@ -83,13 +78,11 @@ x = [sqrt(4.0/3*sigma_/alpha_),-0.5*pi]
 print "Reference solution = ", x
 
 #! We show that the residual is indeed (close to) zero
-f.setInput(s.getOutput(),0)
-f.setInput(params_,1)
-f.evaluate()
-print "residual = ", f.getOutput()
+residual = f(x_, params_)
+print "residual = ", residual
 
 for i in range(1):
   assert(abs(x_[i]-x[i])<1e-6)
 
 #! Solver statistics
-print s.getStats()
+print s.stats()

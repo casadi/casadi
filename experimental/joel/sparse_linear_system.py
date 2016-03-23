@@ -38,10 +38,10 @@ b = array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 x = linalg.solve(A,b)
 print "x  = ", x
 
-cA = DMatrix(A)
+cA = DM(A)
 makeSparse(cA)
 
-cb = DMatrix(b)
+cb = DM(b)
 cx = casadi.solve(cA,cb)
 print "cx = ", array(trans(cx))[0]
 
@@ -52,9 +52,9 @@ b = array([1.0, 2.0])
 x = linalg.solve(A,b)
 print "x  = ", x
 
-cA = DMatrix(A)
+cA = DM(A)
 makeSparse(cA)
 
-cb = DMatrix(b)
+cb = DM(b)
 cx = casadi.solve(cA,cb)
 print "cx = ", array(trans(cx))[0]

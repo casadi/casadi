@@ -47,12 +47,12 @@ for N in range(1,11):
   
   # Differential equation
   z = SX.sym("z")
-  F = SXFunction("dz/dt", [z],[z*z - 2*z + 1])
+  F = Function("dz_dt", [z],[z*z - 2*z + 1])
   
   z0 = -3
   
   # Analytic solution
-  z_analytic = SXFunction("analytic solution", [t], [(4*t-3)/(3*t+1)])
+  z_analytic = Function("z_analytic", [t], [(4*t-3)/(3*t+1)])
   
   # Collocation point
   tau = SX.sym("tau")
@@ -70,23 +70,23 @@ for N in range(1,11):
 
     print "l(", j, ") = ", L
 
-    f = SXFunction("l(" + str(j) + ")", [tau],[L])
+    f = Function("l_" + str(j), [tau],[L])
     
     # initialize
     l.append(f)
   
   # Get the coefficients of the continuity equation
-  D = DMatrix.zeros(K+1)
+  D = DM.zeros(K+1)
   for j in range(K+1):
-    [D[j]] = l[j]([1.])[0]
+    D[j] = l[j](1.)
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
-  C = DMatrix.zeros(K+1,K+1)
+  C = DM.zeros(K+1,K+1)
   for j in range(K+1):
     tfcn = l[j].tangent()
     for k in range(K+1):
-      C[j,k], _ = tfcn([tau_root[k]])
+      C[j,k], _ = tfcn(tau_root[k])
   print "C = ", C
   
   # Collocated states
@@ -94,14 +94,14 @@ for N in range(1,11):
     
   # Construct the NLP
   x = vec(Z.T)
-  g = SX()
+  g = []
   for i in range(N):
     for k in range(1,K+1):
       # Add collocation equations to NLP
       rhs = 0
       for j in range(K+1):
         rhs += Z[i,j]*C[j,k]
-      [FF] = F([Z[i,k]])
+      FF = F(Z[i,k])
       g.append(h*FF-rhs)
 
     # Add continuity equation to NLP
@@ -112,20 +112,22 @@ for N in range(1,11):
     if(i<N-1):
       g.append(Z[i+1,0] - rhs)
 
+  g = vertcat(*g)
+
   print "g = ", g
 
   # NLP
-  nlp = SXFunction('nlp', nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
+  nlp = {'x':x, 'f':x[0]**2, 'g':g}
 
   ## ----
   ## SOLVE THE NLP
   ## ----
   
   # NLP solver options
-  opts = {"tol" : 1e-10}
+  opts = {"ipopt.tol" : 1e-10}
 
   # Allocate an NLP solver and buffer
-  solver = NlpSolver("solver", "ipopt", nlp, opts)
+  solver = nlpsol("solver", "ipopt", nlp, opts)
   arg = {}
 
   # Initial condition
@@ -143,7 +145,7 @@ for N in range(1,11):
   arg["ubg"] = 0
   
   # Solve the problem
-  res = solver(arg)
+  res = solver(**arg)
   
   ## Print the time points
   t_opt = N*(K+1) * [0]

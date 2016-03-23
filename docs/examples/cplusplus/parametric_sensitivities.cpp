@@ -68,9 +68,6 @@ int main(){
   // Fix the parameters by additional equations
   g = vertcat(g,p);
   
-  // Infinity
-  double inf = numeric_limits<double>::infinity();
-  
   // Original parameter values
   vector<double> p_a = {5.00, 1.00};
   
@@ -87,7 +84,7 @@ int main(){
   vector<double> ubg = {0.00, 0.00, p_a[0], p_a[1]};
     
   // Create NLP
-  SXFunction nlp("nlp", nlpIn("x", x), nlpOut("f", f, "g", g));
+  SXDict nlp = {{"x", x}, {"f", f}, {"g", g}};
 
   // NLP solver options
   Dict opts;
@@ -112,8 +109,8 @@ int main(){
   opts["n_sens_steps"] = 1;
   
   // Create NLP solver and buffers
-  NlpSolver solver("solver", "ipopt", nlp, opts);
-  std::map<std::string, DMatrix> arg, res;
+  Function solver = nlpsol("solver", "ipopt", nlp, opts);
+  std::map<std::string, DM> arg, res;
   
   // Solve NLP
   arg["lbx"] = lbx;

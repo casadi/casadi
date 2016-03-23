@@ -28,7 +28,7 @@ from copy import deepcopy
 print "Testing sensitivity analysis in CasADi"
 
 # All ODE and DAE integrators to be tested
-DAE_integrators = ["idas","collocation","oldcollocation"]
+DAE_integrators = ["idas","collocation"]
 ODE_integrators = ["cvodes","rk"] + DAE_integrators
 
 for Integrators in (ODE_integrators,DAE_integrators):    
@@ -44,23 +44,23 @@ for Integrators in (ODE_integrators,DAE_integrators):
 
     # Differential states
     s = SX.sym("s"); v = SX.sym("v"); m = SX.sym("m")
-    x = vertcat([s,v,m])
+    x = vertcat(s,v,m)
 
     # Constants
     alpha = 0.05 # friction
     beta = 0.1   # fuel consumption rate
       
     # Differential equation
-    ode = vertcat([
+    ode = vertcat(
       v,
       (u-alpha*v*v)/m,
-      -beta*u*u])
+      -beta*u*u)
       
     # Quadrature
     quad = v**3 + ((3-sin(t)) - u)**2
 
     # DAE callback function
-    ffcn = SXFunction("ffcn",daeIn(t=t,x=x,p=u),daeOut(ode=ode,quad=quad))
+    dae = {'t':t, 'x':x, 'p':u, 'ode':ode, 'quad':quad}
 
     # Time length
     tf = 0.5
@@ -94,7 +94,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = x*x + 3.0*u*u
 
     # DAE callback function
-    ffcn = SXFunction("ffcn",daeIn(x=x,z=z,p=u),daeOut(ode=ode,alg=alg,quad=quad))
+    dae = {'x':x, 'z':z, 'p':u, 'ode':ode, 'alg':alg, 'quad':quad}
     
     # End time
     tf = 5.
@@ -113,17 +113,16 @@ for Integrators in (ODE_integrators,DAE_integrators):
     
     # Integrator options
     opts = {"tf":tf}
-    if MyIntegrator in ("collocation","oldcollocation"):
-      opts["implicit_solver"] = "kinsol"
-      opts["implicit_solver_options"] = {"linear_solver":"csparse"}
-      if MyIntegrator=="oldcollocation": opts["expand_f"] = True
+    if MyIntegrator=="collocation":
+      opts["rootfinder"] = "kinsol"
+      opts["rootfinder_options"] = {"linear_solver":"csparse"}
 
     # Integrator
-    I = Integrator("I", MyIntegrator, ffcn, opts)
+    I = integrator("I", MyIntegrator, dae, opts)
 
     # Integrate to get results
     arg = {"x0":x0, "p":u0}
-    res = I(arg)
+    res = I(**arg)
     xf = res["xf"]
     qf = res["qf"]
     print "%50s" % "Unperturbed solution:", "xf  = ", xf, ", qf  = ", qf
@@ -131,7 +130,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     # Perturb solution to get a finite difference approximation
     h = 0.001
     arg["p"] = u0+h
-    res = I(arg)
+    res = I(**arg)
     fd_xf = (res["xf"]-xf)/h
     fd_qf = (res["qf"]-qf)/h
     print "%50s" % "Finite difference approximation:", "d(xf)/d(p) = ", fd_xf, ", d(qf)/d(p) = ", fd_qf
@@ -143,7 +142,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     arg["der_p"] = u0
     arg["fwd0_x0"] = 0
     arg["fwd0_p"] = 1
-    res = I_fwd(arg)
+    res = I_fwd(**arg)
     fwd_xf = res["fwd0_xf"]
     fwd_qf = res["fwd0_qf"]
     print "%50s" % "Forward sensitivities:", "d(xf)/d(p) = ", fwd_xf, ", d(qf)/d(p) = ", fwd_qf
@@ -155,14 +154,14 @@ for Integrators in (ODE_integrators,DAE_integrators):
     arg["der_p"] = u0
     arg["adj0_xf"] = 0
     arg["adj0_qf"] = 1
-    res = I_adj(arg)
+    res = I_adj(**arg)
     adj_x0 = res["adj0_x0"]
     adj_p = res["adj0_p"]
     print "%50s" % "Adjoint sensitivities:", "d(qf)/d(x0) = ", adj_x0, ", d(qf)/d(p) = ", adj_p
 
     # Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
     arg["der_p"] = u0+h
-    res = I_adj(arg)
+    res = I_adj(**arg)
     fd_adj_x0 = (res["adj0_x0"]-adj_x0)/h
     fd_adj_p = (res["adj0_p"]-adj_p)/h
     print "%50s" % "FD of adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fd_adj_x0, ", d2(qf)/d(p)d(p) = ", fd_adj_p
@@ -175,7 +174,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     arg["fwd0_der_p"] = 1
     arg["der_adj0_xf"] = 0
     arg["der_adj0_qf"] = 1
-    res = I_foa(arg)
+    res = I_foa(**arg)
     fwd_adj_x0 = res["fwd0_adj0_x0"]
     fwd_adj_p = res["fwd0_adj0_p"]
     print "%50s" % "Forward over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", fwd_adj_x0, ", d2(qf)/d(p)d(p) = ", fwd_adj_p
@@ -188,7 +187,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     arg["der_adj0_xf"] = 0
     arg["der_adj0_qf"] = 1
     arg["adj0_adj0_p"] = 1
-    res = I_aoa(arg)
+    res = I_aoa(**arg)
     adj_adj_x0 = res["adj0_der_x0"]
     adj_adj_p = res["adj0_der_p"]
     print "%50s" % "Adjoint over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", adj_adj_x0, ", d2(qf)/d(p)d(p) = ", adj_adj_p

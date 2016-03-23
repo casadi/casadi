@@ -48,47 +48,43 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T* const* arg, T* const* res, int* iw, T* w);
+    void evalGen(const T* const* arg, T* const* res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res,
-                       int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res,
-                        int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+    virtual bool is_equal(const MXNode* node, int depth) const {
       return sameOpAndDeps(node, depth);
     }
 
     /** \brief  Check if valid function input */
-    virtual bool isValidInput() const;
+    virtual bool is_valid_input() const;
 
     /** \brief Get the number of symbolic primitives */
-    virtual int numPrimitives() const;
+    virtual int n_primitives() const;
 
     /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MX>::iterator& it) const;
+    virtual void primitives(std::vector<MX>::iterator& it) const;
 
     /** \brief Detect duplicate symbolic expressions */
-    virtual bool hasDuplicates();
+    virtual bool has_duplicates();
 
     /** \brief Reset the marker for an input expression */
     virtual void resetInput();
@@ -105,9 +101,6 @@ namespace casadi {
     /// Constructor
     Horzcat(const std::vector<MX>& x);
 
-    /// Clone function
-    virtual Horzcat* clone() const { return new Horzcat(*this);}
-
     /// Destructor
     virtual ~Horzcat() {}
 
@@ -115,7 +108,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -126,13 +119,13 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_HORZCAT;}
+    virtual int op() const { return OP_HORZCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Get offsets for split */
     std::vector<int> offset() const;
@@ -148,9 +141,6 @@ namespace casadi {
     /// Constructor
     Vertcat(const std::vector<MX>& x);
 
-    /// Clone function
-    virtual Vertcat* clone() const { return new Vertcat(*this);}
-
     /// Destructor
     virtual ~Vertcat() {}
 
@@ -158,7 +148,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -169,13 +159,13 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_VERTCAT;}
+    virtual int op() const { return OP_VERTCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Get offsets for split */
     std::vector<int> offset() const;
@@ -191,9 +181,6 @@ namespace casadi {
     /// Constructor
     Diagcat(const std::vector<MX>& x);
 
-    /// Clone function
-    virtual Diagcat* clone() const { return new Diagcat(*this);}
-
     /// Destructor
     virtual ~Diagcat() {}
 
@@ -201,7 +188,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -212,13 +199,13 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_DIAGCAT;}
+    virtual int op() const { return OP_DIAGCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
 
     /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const;
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
 
     /** \brief Get offsets for split */
     std::pair<std::vector<int>, std::vector<int> > offset() const;

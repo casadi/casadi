@@ -1,35 +1,35 @@
 /*
- *	This file is part of qpOASES.
+ *  This file is part of qpOASES.
  *
- *	qpOASES -- An Implementation of the Online Active Set Strategy.
- *	Copyright (C) 2007-2012 by Hans Joachim Ferreau, Andreas Potschka,
- *	Christian Kirches et al. All rights reserved.
+ *  qpOASES -- An Implementation of the Online Active Set Strategy.
+ *  Copyright (C) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
+ *  Christian Kirches et al. All rights reserved.
  *
- *	qpOASES is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU Lesser General Public
- *	License as published by the Free Software Foundation; either
- *	version 2.1 of the License, or (at your option) any later version.
+ *  qpOASES is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
  *
- *	qpOASES is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *	See the GNU Lesser General Public License for more details.
+ *  qpOASES is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
  *
- *	You should have received a copy of the GNU Lesser General Public
- *	License along with qpOASES; if not, write to the Free Software
- *	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with qpOASES; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
 
 
 /**
- *	\file src/Flipper.cpp
- *	\author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
- *	\version 3.0beta
- *	\date 2007-2012
+ *  \file src/Flipper.cpp
+ *  \author Hans Joachim Ferreau, Andreas Potschka, Christian Kirches
+ *  \version 3.2
+ *  \date 2007-2015
  *
- *	Implementation of the Flipper class designed to manage working sets of
- *	constraints and bounds within a QProblem.
+ *  Implementation of the Flipper class designed to manage working sets of
+ *  constraints and bounds within a QProblem.
  */
 
 
@@ -45,172 +45,158 @@ BEGIN_NAMESPACE_QPOASES
 
 
 /*
- *	F l i p p e r
+ *  F l i p p e r
  */
 Flipper::Flipper( )
 {
-	R = 0;
-	Q = 0;
-	T = 0;
-	
-	init( );
+    R = 0;
+    Q = 0;
+    T = 0;
+    
+    init( );
 }
 
 
 /*
- *	F l i p p e r
+ *  F l i p p e r
  */
-Flipper::Flipper(	int _nV,
-					int _nC
-					)
+Flipper::Flipper(   uint_t _nV,
+                    uint_t _nC
+                    )
 {
-	R = 0;
-	Q = 0;
-	T = 0;
-	
-	init( _nV,_nC );
+    R = 0;
+    Q = 0;
+    T = 0;
+    
+    init( _nV,_nC );
 }
 
 
 /*
- *	F l i p p e r
+ *  F l i p p e r
  */
 Flipper::Flipper( const Flipper& rhs )
 {
-	R = 0;
-	Q = 0;
-	T = 0;
+    R = 0;
+    Q = 0;
+    T = 0;
 
-	copy( rhs );
+    copy( rhs );
 }
 
 
 /*
- *	~ F l i p p e r
+ *  ~ F l i p p e r
  */
 Flipper::~Flipper( )
 {
-	clear( );
+    clear( );
 }
 
 
 /*
- *	o p e r a t o r =
+ *  o p e r a t o r =
  */
 Flipper& Flipper::operator=( const Flipper& rhs )
 {
-	if ( this != &rhs )
-	{
-		clear( );
-		copy( rhs );
-	}
+    if ( this != &rhs )
+    {
+        clear( );
+        copy( rhs );
+    }
 
-	return *this;
+    return *this;
 }
 
 
 
 /*
- *	i n i t
+ *  i n i t
  */
-returnValue Flipper::init(	int _nV,
-							int _nC
-							)
+returnValue Flipper::init(  uint_t _nV,
+                            uint_t _nC
+                            )
 {
-	if ( ( _nV < 0 ) || ( _nC < 0 ) )
-		return THROWERROR( RET_INVALID_ARGUMENTS );
+    clear( );
 
-	clear( );
+    nV = _nV;
+    nC = _nC;
 
-	nV = _nV;
-	nC = _nC;
-
-	/*if ( nV > 0 )
-	{
-		R = new real_t[nV*nV];
-	
-		if ( nC > 0 )
-		{
-			Q = new real_t[nV*nV];
-			T = new real_t[getDimT()];
-		}
-	}*/
-
-	return SUCCESSFUL_RETURN;
+    return SUCCESSFUL_RETURN;
 }
 
 
 
 /*
- *	g e t
+ *  g e t
  */
-returnValue Flipper::get(	Bounds* const _bounds,
-							real_t* const _R,
-							Constraints* const _constraints,
-							real_t* const _Q,
-							real_t* const _T 
-							) const
+returnValue Flipper::get(   Bounds* const _bounds,
+                            real_t* const _R,
+                            Constraints* const _constraints,
+                            real_t* const _Q,
+                            real_t* const _T 
+                            ) const
 {
-	if ( _bounds != 0 )
-		*_bounds = bounds;
+    if ( _bounds != 0 )
+        *_bounds = bounds;
 
-	if ( _constraints != 0 )
-		*_constraints = constraints;
+    if ( _constraints != 0 )
+        *_constraints = constraints;
 
-	if ( ( _R != 0 ) && ( R != 0 ) )
-		memcpy( _R,R, nV*nV*sizeof(real_t) );
+    if ( ( _R != 0 ) && ( R != 0 ) )
+        memcpy( _R,R, nV*nV*sizeof(real_t) );
 
-	if ( ( _Q != 0 ) && ( Q != 0 ) )
-		memcpy( _Q,Q, nV*nV*sizeof(real_t) );
+    if ( ( _Q != 0 ) && ( Q != 0 ) )
+        memcpy( _Q,Q, nV*nV*sizeof(real_t) );
 
-	if ( ( _T != 0 ) && ( T != 0 ) )
-		memcpy( _T,T, getDimT()*sizeof(real_t) );
+    if ( ( _T != 0 ) && ( T != 0 ) )
+        memcpy( _T,T, getDimT()*sizeof(real_t) );
 
-	return SUCCESSFUL_RETURN;
+    return SUCCESSFUL_RETURN;
 }
 
 
 /*
- *	s e t
+ *  s e t
  */
-returnValue Flipper::set(	const Bounds* const _bounds,
-							const real_t* const _R,
-							const Constraints* const _constraints,
-							const real_t* const _Q,
-							const real_t* const _T
-							)
+returnValue Flipper::set(   const Bounds* const _bounds,
+                            const real_t* const _R,
+                            const Constraints* const _constraints,
+                            const real_t* const _Q,
+                            const real_t* const _T
+                            )
 {
-	if ( _bounds != 0 )
-		bounds = *_bounds;
+    if ( _bounds != 0 )
+        bounds = *_bounds;
 
-	if ( _constraints != 0 )
-		constraints = *_constraints;
+    if ( _constraints != 0 )
+        constraints = *_constraints;
 
-	if ( _R != 0 )
-	{
-		if ( R == 0 )
-			R = new real_t[nV*nV];
+    if ( _R != 0 )
+    {
+        if ( R == 0 )
+            R = new real_t[nV*nV];
 
-		memcpy( R,_R, nV*nV*sizeof(real_t) );
-	}
+        memcpy( R,_R, nV*nV*sizeof(real_t) );
+    }
 
-	if ( _Q != 0 )
-	{
-		if ( Q == 0 )
-			Q = new real_t[nV*nV];
+    if ( _Q != 0 )
+    {
+        if ( Q == 0 )
+            Q = new real_t[nV*nV];
 
-		memcpy( Q,_Q, nV*nV*sizeof(real_t) );
-	}
+        memcpy( Q,_Q, nV*nV*sizeof(real_t) );
+    }
 
-	if ( _T != 0 )
-	{
-		if ( T == 0 )
-			T = new real_t[getDimT()];
+    if ( _T != 0 )
+    {
+        if ( T == 0 )
+            T = new real_t[getDimT()];
 
-		memcpy( T,_T, getDimT()*sizeof(real_t) );
-	}
+        memcpy( T,_T, getDimT()*sizeof(real_t) );
+    }
 
-	return SUCCESSFUL_RETURN;
+    return SUCCESSFUL_RETURN;
 }
 
 
@@ -220,48 +206,48 @@ returnValue Flipper::set(	const Bounds* const _bounds,
  *****************************************************************************/
 
 /*
- *	c l e a r
+ *  c l e a r
  */
 returnValue Flipper::clear( )
 {
-	if ( R != 0 )
-	{
-		delete[] R;
-		R = 0;
-	}
-	
-	if ( Q != 0 )
-	{
-		delete[] Q;
-		Q = 0;
-	}
-	
-	if ( T != 0 )
-	{
-		delete[] T;
-		T = 0;
-	}
+    if ( R != 0 )
+    {
+        delete[] R;
+        R = 0;
+    }
+    
+    if ( Q != 0 )
+    {
+        delete[] Q;
+        Q = 0;
+    }
+    
+    if ( T != 0 )
+    {
+        delete[] T;
+        T = 0;
+    }
 
-	return SUCCESSFUL_RETURN;
+    return SUCCESSFUL_RETURN;
 }
 
 
 /*
- *	c o p y
+ *  c o p y
  */
-returnValue Flipper::copy(	const Flipper& rhs
-							)
+returnValue Flipper::copy(  const Flipper& rhs
+                            )
 {
-	return set( &(rhs.bounds),rhs.R, &(rhs.constraints),rhs.Q,rhs.T );
+    return set( &(rhs.bounds),rhs.R, &(rhs.constraints),rhs.Q,rhs.T );
 }
 
 
-int Flipper::getDimT( ) const
+uint_t Flipper::getDimT( ) const
 {
-	if ( nV > nC )
-		return nC*nC;
-	else
-		return nV*nV;
+    if ( nV > nC )
+        return nC*nC;
+    else
+        return nV*nV;
 }
 
 
@@ -269,5 +255,5 @@ END_NAMESPACE_QPOASES
 
 
 /*
- *	end of file
+ *  end of file
  */

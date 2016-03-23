@@ -34,28 +34,25 @@ namespace casadi {
     setSparsity(x.sparsity().T());
   }
 
-  void Transpose::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Transpose::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
- void DenseTranspose::evalD(const double** arg, double** res,
-                            int* iw, double* w) {
+ void DenseTranspose::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
-  void Transpose::evalSX(const SXElement** arg, SXElement** res,
-                         int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void Transpose::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
-  void DenseTranspose::evalSX(const SXElement** arg, SXElement** res,
-                              int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void DenseTranspose::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
   void Transpose::evalGen(const T* const* arg, T* const* res,
-                          int* iw, T* w) {
+                          int* iw, T* w) const {
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
     const int* x_row = dep(0).row();
@@ -75,7 +72,7 @@ namespace casadi {
 
   template<typename T>
   void DenseTranspose::evalGen(const T* const* arg, T* const* res,
-                               int* iw, T* w) {
+                               int* iw, T* w) const {
     // Get sparsity patterns
     int x_nrow = dep().size1();
     int x_ncol = dep().size2();
@@ -89,8 +86,7 @@ namespace casadi {
     }
   }
 
-  void Transpose::spFwd(const bvec_t** arg,
-                        bvec_t** res, int* iw, bvec_t* w) {
+  void Transpose::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Shortands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -108,8 +104,7 @@ namespace casadi {
     }
   }
 
-  void Transpose::spAdj(bvec_t** arg,
-                        bvec_t** res, int* iw, bvec_t* w) {
+  void Transpose::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Shortands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -129,8 +124,7 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::spFwd(const bvec_t** arg,
-                             bvec_t** res, int* iw, bvec_t* w) {
+  void DenseTranspose::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Shorthands
     const bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -145,8 +139,7 @@ namespace casadi {
     }
   }
 
-  void DenseTranspose::spAdj(bvec_t** arg,
-                             bvec_t** res, int* iw, bvec_t* w) {
+  void DenseTranspose::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     // Shorthands
     bvec_t *x = arg[0];
     bvec_t *xT = res[0];
@@ -166,7 +159,7 @@ namespace casadi {
     return arg.at(0) + "'";
   }
 
-  void Transpose::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Transpose::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = arg[0].T();
   }
 
@@ -184,8 +177,8 @@ namespace casadi {
     }
   }
 
-  void Transpose::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                           CodeGenerator& g) const {
+  void Transpose::generate(CodeGenerator& g, const std::string& mem,
+                           const std::vector<int>& arg, const std::vector<int>& res) const {
     g.addAuxiliary(CodeGenerator::AUX_TRANS);
 
     g.body << "  trans("
@@ -193,8 +186,8 @@ namespace casadi {
            << g.work(res[0], nnz()) << ", " << g.sparsity(sparsity()) << ", iw);" << endl;
   }
 
-  void DenseTranspose::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                CodeGenerator& g) const {
+  void DenseTranspose::generate(CodeGenerator& g, const std::string& mem,
+                                const std::vector<int>& arg, const std::vector<int>& res) const {
     g.body << "  for (i=0, rr=" << g.work(res[0], nnz()) << ", "
            << "cs=" << g.work(arg[0], nnz()) << "; i<" << dep().size2() << "; ++i) "
            << "for (j=0; j<" << dep().size1() << "; ++j) "

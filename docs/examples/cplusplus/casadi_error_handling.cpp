@@ -36,11 +36,6 @@
 
 #include "casadi/casadi.hpp"
 
-// Uncomment this line to compile without error handling
-//#define CASADI_NDEBUG
-
-#include <casadi/core/casadi_exception.hpp>
-
 bool bad_test(){
   return false;
 }

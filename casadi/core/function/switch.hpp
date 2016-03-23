@@ -26,40 +26,73 @@
 #ifndef CASADI_SWITCH_HPP
 #define CASADI_SWITCH_HPP
 
-#include "function.hpp"
+#include "function_internal.hpp"
+
+/// \cond INTERNAL
 
 namespace casadi {
-
-  /** \brief  Forward declaration of internal class */
-  class SwitchInternal;
 
   /** Switch statement
       \author Joel Andersson
       \date 2015
   */
-  class CASADI_EXPORT Switch : public Function {
+  class CASADI_EXPORT Switch : public FunctionInternal {
   public:
-    /** \brief Default constructor */
-    Switch();
 
     /** \brief Constructor (generic switch) */
-    Switch(const std::string& name, const std::vector<Function>& f,
-           const Function& f_def, const Dict& opts=Dict());
+    Switch(const std::string& name,
+                   const std::vector<Function>& f, const Function& f_def);
 
-    /** \brief Constructor (if-else) */
-    Switch(const std::string& name, const Function& f_true,
-           const Function& f_false, const Dict& opts=Dict());
+    /** \brief  Destructor */
+    virtual ~Switch();
 
-    /** \brief  Access functions of the node */
-    SwitchInternal* operator->();
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in();
+    virtual size_t get_n_out();
+    ///@}
 
-    /** \brief  Const access functions of the node */
-    const SwitchInternal* operator->() const;
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    virtual Sparsity get_sparsity_in(int i);
+    virtual Sparsity get_sparsity_out(int i);
+    /// @}
 
-    /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    /** \brief  Initialize */
+    virtual void init(const Dict& opts);
+
+    /** \brief  Evaluate numerically, work vectors given */
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+
+    ///@{
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    virtual Function get_forward(const std::string& name, int nfwd, Dict& opts);
+    virtual int get_n_forward() const { return 64;}
+    ///@}
+
+    ///@{
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    virtual Function get_reverse(const std::string& name, int nadj, Dict& opts);
+    virtual int get_n_reverse() const { return 64;}
+    ///@}
+
+    /** \brief  Print description */
+    virtual void print(std::ostream &stream) const;
+
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(CodeGenerator& g) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(CodeGenerator& g) const;
+
+    // Function to be evaluated for each case
+    std::vector<Function> f_;
+
+    // Default case;
+    Function f_def_;
   };
 
 } // namespace casadi
+/// \endcond
 
 #endif // CASADI_SWITCH_HPP

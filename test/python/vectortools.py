@@ -23,7 +23,7 @@
 #
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import unittest
 from types import *
 from helpers import *
@@ -40,7 +40,7 @@ class Vectortoolsstests(casadiTestCase):
     
     
     wc = list(complement(w,8))
-    self.checkarray(DMatrix(wc),DMatrix([0,3,5,7]),"complement")
+    self.checkarray(DM(wc),DM([0,3,5,7]),"complement")
     
     
 

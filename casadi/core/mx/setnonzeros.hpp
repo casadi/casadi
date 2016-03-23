@@ -49,13 +49,10 @@ namespace casadi {
     virtual ~SetNonzeros() = 0;
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const = 0;
-
-    /// Clone function
-    virtual SetNonzeros* clone() const = 0;
+    virtual std::vector<int> all() const = 0;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -66,9 +63,9 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
+    virtual int op() const { return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
 
-    /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
+    /// Get an IM representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
@@ -87,42 +84,37 @@ namespace casadi {
     /// Constructor
     SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz);
 
-    /// Clone function
-    virtual SetNonzerosVector* clone() const { return new SetNonzerosVector(*this);}
-
     /// Destructor
     virtual ~SetNonzerosVector() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return nz_;}
+    virtual std::vector<int> all() const { return nz_;}
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     /// Operation sequence
     std::vector<int> nz_;
@@ -136,14 +128,11 @@ namespace casadi {
     /// Constructor
     SetNonzerosSlice(const MX& y, const MX& x, const Slice& s) : SetNonzeros<Add>(y, x), s_(s) {}
 
-    /// Clone function
-    virtual SetNonzerosSlice* clone() const { return new SetNonzerosSlice(*this);}
-
     /// Destructor
     virtual ~SetNonzerosSlice() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return s_.getAll(s_.stop_);}
+    virtual std::vector<int> all() const { return s_.all(s_.stop);}
 
     /// Check if the instance is in fact a simple assignment
     bool isAssignment() const;
@@ -152,33 +141,30 @@ namespace casadi {
     virtual void simplifyMe(MX& ex);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res,
-                        int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     // Data member
     Slice s_;
@@ -193,42 +179,37 @@ namespace casadi {
     SetNonzerosSlice2(const MX& y, const MX& x, const Slice& inner, const Slice& outer) :
         SetNonzeros<Add>(y, x), inner_(inner), outer_(outer) {}
 
-    /// Clone function
-    virtual SetNonzerosSlice2* clone() const { return new SetNonzerosSlice2(*this);}
-
     /// Destructor
     virtual ~SetNonzerosSlice2() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return inner_.getAll(outer_, outer_.stop_);}
+    virtual std::vector<int> all() const { return inner_.all(outer_, outer_.stop);}
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     // Data members
     Slice inner_, outer_;

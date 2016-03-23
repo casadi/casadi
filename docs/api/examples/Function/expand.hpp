@@ -30,9 +30,7 @@
 *
 * \sa
 * \code
-* casadi::MXFunction::expand();
-* casadi::MXFunction::outputExpr();
-* casadi::SXFunction::outputExpr();
+* casadi::Function::expand();
 * \endcode
 *
 */

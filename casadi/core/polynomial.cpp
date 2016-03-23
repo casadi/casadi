@@ -77,7 +77,7 @@ namespace casadi {
     return p_.size()-1;
   }
 
-  Polynomial::real_t Polynomial::toScalar() const {
+  Polynomial::real_t Polynomial::scalar() const {
     casadi_assert(degree()==0);
     return p_.front();
   }

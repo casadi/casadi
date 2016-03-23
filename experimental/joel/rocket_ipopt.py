@@ -57,18 +57,18 @@ def create_integrator_euler():
   x0 = [s0,v0,m0];
 
   # Input to the integrator function being created
-  integrator_in = INTEGRATOR_NUM_IN * [[]]
-  integrator_in[INTEGRATOR_T0] = [t0]
-  integrator_in[INTEGRATOR_TF] = [tf]
-  integrator_in[INTEGRATOR_X0] =  x0
-  integrator_in[INTEGRATOR_P]  =  [u]
+  ivpsol_in = INTEGRATOR_NUM_IN * [[]]
+  ivpsol_in[INTEGRATOR_T0] = [t0]
+  ivpsol_in[INTEGRATOR_TF] = [tf]
+  ivpsol_in[INTEGRATOR_X0] =  x0
+  ivpsol_in[INTEGRATOR_P]  =  [u]
 
   # Create a dummy state derivative vector
   xp0 = list(ssym("x",len(x)))
-  integrator_in[INTEGRATOR_XP0] = xp0
+  ivpsol_in[INTEGRATOR_XP0] = xp0
 
   # Create the explicit Euler integrator
-  integrator = SXFunction(integrator_in,[x])
+  integrator = SXFunction(ivpsol_in,[x])
   return integrator
 
 # Construct an explicit multistep integrator from Sundials
@@ -216,7 +216,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
     X = integrator([T0,TF,X,U[k],xdot,MX()])
 
   # Objective function
-  F = inner_prod(U,U)
+  F = dot(U,U)
 
   # Terminal constraints
   G = vertcat((X[0],X[1]))

@@ -26,72 +26,79 @@
 #ifndef CASADI_CSPARSE_INTERFACE_HPP
 #define CASADI_CSPARSE_INTERFACE_HPP
 
-/** \defgroup plugin_LinearSolver_csparse
- * LinearSolver with CSparse Interface
+/** \defgroup plugin_Linsol_csparse
+ * Linsol with CSparse Interface
 */
 
-/** \pluginsection{LinearSolver,csparse} */
+/** \pluginsection{Linsol,csparse} */
 
 /// \cond INTERNAL
 #include <cs.h>
-#include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/csparse/casadi_linearsolver_csparse_export.h>
+#include "casadi/core/function/linsol_impl.hpp"
+#include <casadi/interfaces/csparse/casadi_linsol_csparse_export.h>
 
 namespace casadi {
+  struct CASADI_LINSOL_CSPARSE_EXPORT CsparseMemory {
+    // Destructor
+    ~CsparseMemory();
 
-  /** \brief \pluginbrief{LinearSolver,csparse}
-   * @copydoc LinearSolver_doc
-   * @copydoc plugin_LinearSolver_csparse
+    // The linear system CSparse form (CCS)
+    cs A;
+
+    // The symbolic factorization
+    css *S;
+
+    // The numeric factorization
+    csn *N;
+
+    // Temporary
+    std::vector<double> temp_;
+
+    // Has the solve function been called once
+    bool called_once_;
+  };
+
+  /** \brief \pluginbrief{Linsol,csparse}
+   * @copydoc Linsol_doc
+   * @copydoc plugin_Linsol_csparse
    */
-  class CASADI_LINEARSOLVER_CSPARSE_EXPORT CsparseInterface : public LinearSolverInternal {
+  class CASADI_LINSOL_CSPARSE_EXPORT CsparseInterface : public Linsol {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CsparseInterface(const Sparsity& sp, int nrhs);
+    CsparseInterface(const std::string& name, const Sparsity& sp, int nrhs);
 
-    // Copy constructor
-    CsparseInterface(const CsparseInterface& linsol);
-
-    /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new CsparseInterface(sp, nrhs);}
+    /** \brief  Create a new Linsol */
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+      return new CsparseInterface(name, sp, nrhs);
+    }
 
     // Destructor
     virtual ~CsparseInterface();
 
     // Initialize the solver
-    virtual void init();
+    virtual void init(const Dict& opts);
 
-    // Factorize the matrix
-    virtual void prepare();
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new CsparseMemory();}
 
-    // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<CsparseMemory*>(mem);}
 
-    // Clone
-    virtual CsparseInterface* clone() const;
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
 
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-       CodeGenerator& g, int nrhs, bool transpose) const;
+    // Factorize the linear system
+    virtual void linsol_factorize(void* mem, const double* A) const;
 
-    // Has the solve function been called once
-    bool called_once_;
-
-    // The linear system CSparse form (CCS)
-    cs A_;
-
-    // The symbolic factorization
-    css *S_;
-
-    // The numeric factorization
-    csn *N_;
-
-    // Temporary
-    std::vector<double> temp_;
+    // Solve the linear system
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /// A documentation string
     static const std::string meta_doc;
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "csparse";}
   };
 
 } // namespace casadi

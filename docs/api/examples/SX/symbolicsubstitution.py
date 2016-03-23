@@ -33,11 +33,11 @@ z = z_+x
 print type(z), z
 
 #! We need SXFuncion to manipulate the SX graph
-f = SXFunction('f', [vertcat((x,y))],[z])
+f = Function('f', [vertcat(x,y)],[z])
 
 #! We can substitute a leaf in the graph
 w = SX.sym("w")
-q = f([vertcat((w,y))])[0]
+q = f(vertcat(w,y))
 #! f.eval() returns a tuple with all outputs, we selected the first
 print type(q), q
 #! Note how q is now an SX
@@ -49,5 +49,5 @@ print type(q), q
 #! Note that substitution of non-symbolic SX nodes is not permitted:
 #  substitute([z],[z_],[w])  This would throw an error
   
-#! This is actually a restriction of SXFunction:
-#  SXFunction([[z_,y]],[z])  This would throw an error
+#! This is actually a restriction of Function:
+#  Function([[z_,y]],[z])  This would throw an error

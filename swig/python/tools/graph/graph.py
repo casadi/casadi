@@ -21,7 +21,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import SX, MX, getOperatorRepresentation
+from casadi import SX, MX, print_operator
 import casadi as C
 
 try:
@@ -40,9 +40,9 @@ def equality(self,other):
   
 def getDeps(s):
   deps = []
-  if not(hasattr(s,'getNdeps')): return deps
-  for k in range(s.getNdeps()):
-    d = s.getDep(k)
+  if not(hasattr(s,'n_dep')): return deps
+  for k in range(s.n_dep()):
+    d = s.dep(k)
     d.__class__.__cmp__ = hashcompare
     d.__class__.__eq__  = equality
     deps.append(d)
@@ -65,17 +65,17 @@ def addDependencies(master,slaves,dep={},invdep={}):
   for slave in slaves:
     dependencyGraph(slave,dep = dep,invdep = invdep)
 
-def isLeaf(s):
-  return s.isLeaf()
-  #return s.isscalar(True) and (s.isConstant() or s.isSymbolic())
+def is_leaf(s):
+  return s.is_leaf()
+  #return s.is_scalar(True) and (s.is_constant() or s.is_symbolic())
 
 def dependencyGraph(s,dep = {},invdep = {}):
   if isinstance(s,SX):
-    if s.isscalar(True):
-      if not(isLeaf(s)):
+    if s.is_scalar(True):
+      if not(is_leaf(s)):
         addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
     else:
-      addDependencies(s,list(s),dep = dep,invdep = invdep)
+      addDependencies(s,s.nonzeros(),dep = dep,invdep = invdep)
   elif isinstance(s,MX):
     addDependencies(s,getDeps(s),dep = dep,invdep = invdep)
   return (dep,invdep)
@@ -97,7 +97,7 @@ class DotArtist:
     if id is None:
       id = str(s.__hash__())
     if depid is None:
-      depid = str(s.getDep(0).__hash__())
+      depid = str(s.dep(0).__hash__())
     if graph is None:
       graph = self.graph
     sp = s.sparsity()
@@ -109,11 +109,11 @@ class DotArtist:
       graph.add_node(pydot.Node(id,label="%d x %d" % (s.size1(),s.size2()),shape='rectangle',color=self.sparsitycol,style="filled"))
     else:
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
-      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
+      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dim())
       for i in range(s.size1()):
         label+="<TR>"
         for j in range(s.size2()):
-          k = sp.getNZ(i,j)
+          k = sp.get_nz(i,j)
           if k==-1:
             label+="<TD>.</TD>"
           else:
@@ -136,15 +136,15 @@ class MXSymbolicArtist(DotArtist):
     col = "#990000"
     if s.nnz() == s.numel() and s.nnz()==1:
       # The Matrix grid is represented by a html table with 'ports'
-      graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=s.getName(),shape='rectangle',color=col))
+      graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=s.name(),shape='rectangle',color=col))
     else:
        # The Matrix grid is represented by a html table with 'ports'
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
-      label+="<TR><TD COLSPAN='%d'>%s: <font color='#666666'>%s</font></TD></TR>" % (s.size2(),s.getName(), s.dimString())
+      label+="<TR><TD COLSPAN='%d'>%s: <font color='#666666'>%s</font></TD></TR>" % (s.size2(),s.name(), s.dim())
       for i in range(s.size1()):
         label+="<TR>"
         for j in range(s.size2()):
-          k = sp.getNZ(i,j)
+          k = sp.get_nz(i,j)
           if k==-1:
             label+="<TD>.</TD>"
           else:
@@ -164,7 +164,7 @@ class MXSymbolicArtist(DotArtist):
 #     # Note: due to Mapping restructuring, this is no longer efficient code
 #     deps = getDeps(s)
     
-#     depind = s.getDepInd()
+#     depind = s.depInd()
 #     nzmap = sum([s.mapping(i) for i in range(len(deps))])
     
 #     for k,d in enumerate(deps):
@@ -189,11 +189,11 @@ class MXSymbolicArtist(DotArtist):
 #       if candidates[0] == hash(s):
 #         label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
 #         if not(d.numel()==1 and d.numel()==d.nnz()): 
-#           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dimString())
+#           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dim())
 #         for i in range(d.size1()):
 #           label+="<TR>"
 #           for j in range(d.size2()):
-#             kk = spd.getNZ(i,j)
+#             kk = spd.get_nz(i,j)
 #             if kk==-1:
 #               label+="<TD>.</TD>"
 #             else:
@@ -206,11 +206,11 @@ class MXSymbolicArtist(DotArtist):
 #     # The Matrix grid is represented by a html table with 'ports'
 #     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
 #     if not(s.numel()==1 and s.numel()==s.nnz()): 
-#       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
+#       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dim())
 #     for i in range(s.size1()):
 #       label+="<TR>"
 #       for j in range(s.size2()):
-#         k = sp.getNZ(i,j)
+#         k = sp.get_nz(i,j)
 #         if k==-1:
 #           label+="<TD>.</TD>"
 #         else:
@@ -235,13 +235,13 @@ class MXEvaluationArtist(DotArtist):
     for k,d in enumerate(deps):
       graph.add_edge(pydot.Edge(str(d.__hash__()),"funinput" + str(s.__hash__())+ ":f%d" % k,rankdir="LR"))
       
-    graph = pydot.Cluster(str(s.__hash__()), rank='max', label='Function:\n %s' % f.getOption("name"))
+    graph = pydot.Cluster(str(s.__hash__()), rank='max', label='Function:\n %s' % f.name())
     self.graph.add_subgraph(graph)
     
-    s = (" %d inputs: |" % f.nIn()) + " | ".join("<f%d> %d" % (i,i) for i in range(f.nIn()))
+    s = (" %d inputs: |" % f.n_in()) + " | ".join("<f%d> %d" % (i,i) for i in range(f.n_in()))
     graph.add_node(pydot.Node("funinput" + str(self.s.__hash__()),label=s,shape='Mrecord'))
 
-    s = (" %d outputs: |" % f.nOut())+ " | ".join("<f%d> %d" % (i,i) for i in range(f.nOut()))
+    s = (" %d outputs: |" % f.n_out())+ " | ".join("<f%d> %d" % (i,i) for i in range(f.n_out()))
     graph.add_node(pydot.Node(str(self.s.__hash__()),label=s,shape='Mrecord'))
     
     
@@ -260,12 +260,12 @@ class MXConstantArtist(DotArtist):
     else:
       # The Matrix grid is represented by a html table with 'ports'
       label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
-      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
+      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dim())
       if not "max_numel" in self.kwargs or s.numel() < self.kwargs["max_numel"]:
         for i in range(s.size1()):
           label+="<TR>"
           for j in range(s.size2()):
-            k = sp.getNZ(i,j)
+            k = sp.get_nz(i,j)
             if k==-1:
               label+="<TD>.</TD>"
             else:
@@ -291,7 +291,7 @@ class MXGenericArtist(DotArtist):
     if len(dep)>1:
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = getOperatorRepresentation(self.s,["| <f%d> | " %i for i in range(len(dep))])
+      s = print_operator(self.s,["| <f%d> | " %i for i in range(len(dep))])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
       
@@ -299,7 +299,7 @@ class MXGenericArtist(DotArtist):
       for i,n in enumerate(dep):
         graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
     else:
-      s = getOperatorRepresentation(k,["."])
+      s = print_operator(k,["."])
       self.graph.add_node(pydot.Node(op + str(k.__hash__()),label=s,shape='oval'))
       for i,n in enumerate(dep):
         self.graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())))
@@ -333,7 +333,7 @@ class MXGetNonzerosArtist(DotArtist):
         for i in range(s.size1()):
           label+="<TR>"
           for j in range(s.size2()):
-            k = sp.getNZ(i,j)
+            k = sp.get_nz(i,j)
             if k==-1:
               label+="<TD>.</TD>"
             else:
@@ -371,7 +371,7 @@ class MXSetNonzerosArtist(DotArtist):
     for i in range(s.size1()):
       label+="<TR>"
       for j in range(s.size2()):
-        k = entry.sparsity().getNZ(i,j)
+        k = entry.sparsity().get_nz(i,j)
         if k==-1 or Mk>= len(M) or k != M[Mk]:
           label+="<TD>.</TD>"
           if Mk< len(M)-1 and M[Mk]==-1 and k!=-1: Mk+=1
@@ -412,7 +412,7 @@ class MXAddNonzerosArtist(DotArtist):
     for i in range(s.size1()):
       label+="<TR>"
       for j in range(s.size2()):
-        k = sp.getNZ(i,j)
+        k = sp.get_nz(i,j)
         if k==-1 or Mk>= len(M) or k != M[Mk]:
           label+="<TD>.</TD>"
           if Mk< len(M)-1 and M[Mk]==-1 and k!=-1: Mk+=1
@@ -434,9 +434,9 @@ class MXOperationArtist(DotArtist):
     
     show_sp = True
     
-    if k.isUnary() and dep[0].sparsity()==k.sparsity():
+    if k.is_unary() and dep[0].sparsity()==k.sparsity():
       show_sp = False
-    if k.isBinary() and dep[0].sparsity()==k.sparsity() and dep[1].sparsity()==k.sparsity():
+    if k.is_binary() and dep[0].sparsity()==k.sparsity() and dep[1].sparsity()==k.sparsity():
       show_sp = False
     
     if show_sp:
@@ -445,10 +445,10 @@ class MXOperationArtist(DotArtist):
     else:
       op = ""
     
-    if not(k.isCommutative()):
+    if not(k.is_commutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = getOperatorRepresentation(self.s,["| <f0> | ", " | <f1> |"])
+      s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
       
@@ -457,7 +457,7 @@ class MXOperationArtist(DotArtist):
         graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
     else: 
      # Commutative operators can be represented more compactly as 'oval' shapes.
-      s = getOperatorRepresentation(k,[".", "."])
+      s = print_operator(k,[".", "."])
       if s.startswith("(.") and s.endswith(".)"):
         s=s[2:-2]
       if s.startswith("(") and s.endswith(")"):
@@ -494,7 +494,7 @@ class MXNormArtist(DotArtist):
     k = self.s
     graph = self.graph
     dep = getDeps(k)
-    s = getOperatorRepresentation(k,[".", "."])
+    s = print_operator(k,[".", "."])
     self.graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='oval'))
     self.graph.add_edge(pydot.Edge(str(dep[0].__hash__()),str(k.__hash__())))
         
@@ -502,7 +502,7 @@ class MXEvaluationOutputArtist(DotArtist):
   def draw(self):
     k = self.s
 
-    self.drawSparsity(k,depid=str(hash(k.getDep(0))) + ":f%d" % k.getEvaluationOutput())
+    self.drawSparsity(k,depid=str(hash(k.dep(0))) + ":f%d" % k.get_output())
     
        
 class MXMultiplicationArtist(DotArtist):
@@ -531,7 +531,7 @@ class SXArtist(DotArtist):
     for i in range(s.size1()):
       label+="<TR>"
       for j in range(s.size2()):
-        k = sp.getNZ(i,j)
+        k = sp.get_nz(i,j)
         if k==-1:
           label+="<TD>.</TD>"
         else:
@@ -546,7 +546,7 @@ class SXArtist(DotArtist):
     graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
     
   def shouldEmbed(self,sx):
-    return len(self.invdep[sx]) == 1 and sx.isLeaf()
+    return len(self.invdep[sx]) == 1 and sx.is_leaf()
     
 class SXLeafArtist(DotArtist):
   def draw(self):
@@ -556,7 +556,7 @@ class SXLeafArtist(DotArtist):
         if self.artists[master].shouldEmbed(self.s):
           return
     style = "solid" # Symbolic nodes are represented box'es
-    if self.s.isConstant():
+    if self.s.is_constant():
       style = "bold" # Constants are represented by bold box'es
     self.graph.add_node(pydot.Node(str(self.s.__hash__()),label=str(self.s),shape="box",style=style)) 
 
@@ -565,10 +565,10 @@ class SXNonLeafArtist(DotArtist):
     k = self.s
     graph = self.graph
     dep = getDeps(k)
-    if not(k.isCommutative()):
+    if not(k.is_commutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = getOperatorRepresentation(self.s,["| <f0> | ", " | <f1> |"])
+      s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
       
@@ -577,7 +577,7 @@ class SXNonLeafArtist(DotArtist):
         graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())+":f%d" % i))
     else: 
      # Commutative operators can be represented more compactly as 'oval' shapes.
-      s = getOperatorRepresentation(k,[".", "."])
+      s = print_operator(k,[".", "."])
       if s.startswith("(.") and s.endswith(".)"):
         s=s[2:-2]
       if s.startswith("(") and s.endswith(")"):
@@ -590,8 +590,8 @@ class SXNonLeafArtist(DotArtist):
   
 def createArtist(node,dep={},invdep={},graph=None,artists={},**kwargs):
   if isinstance(node,SX):
-    if node.isscalar(True):
-      if isLeaf(node):
+    if node.is_scalar(True):
+      if is_leaf(node):
         return SXLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
       else:
         return SXNonLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
@@ -600,23 +600,23 @@ def createArtist(node,dep={},invdep={},graph=None,artists={},**kwargs):
     
     
   elif isinstance(node,MX):
-    if node.isSymbolic():
+    if node.is_symbolic():
       return MXSymbolicArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isBinary() or node.isUnary():
+    elif node.is_binary() or node.is_unary():
       return MXOperationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isConstant():
+    elif node.is_constant():
       return MXConstantArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isEvaluation():
+    elif node.is_call():
       return MXEvaluationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isEvaluationOutput():
+    elif node.is_output():
       return MXEvaluationOutputArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isNorm():
+    elif node.is_norm():
       return MXNormArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isOperation(C.OP_GETNONZEROS):
+    elif node.is_op(C.OP_GETNONZEROS):
       return MXGetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isOperation(C.OP_SETNONZEROS):
+    elif node.is_op(C.OP_SETNONZEROS):
       return MXSetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
-    elif node.isOperation(C.OP_ADDNONZEROS):
+    elif node.is_op(C.OP_ADDNONZEROS):
       return MXAddNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
     else:
       return MXGenericArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists,**kwargs)
@@ -633,7 +633,7 @@ def dotgraph(s,direction="BT",**kwargs):
   try:
     def getHashSX(e):
       try:
-        return e.getElementHash()
+        return e.element_hash()
       except:
         return SX__hash__backup(e)
         

@@ -25,109 +25,128 @@
 #ifndef CASADI_CPLEX_INTERFACE_HPP
 #define CASADI_CPLEX_INTERFACE_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
-#include <casadi/interfaces/cplex/casadi_qpsolver_cplex_export.h>
+#include "casadi/core/function/qpsol_impl.hpp"
+#include <casadi/interfaces/cplex/casadi_qpsol_cplex_export.h>
 #include "ilcplex/cplex.h"
 
 #include <string>
 
-/** \defgroup plugin_QpSolver_cplex
+/** \defgroup plugin_Qpsol_cplex
 
       Interface to Cplex solver for sparse Quadratic Programs
 */
 
-/** \pluginsection{QpSolver,cplex} */
+/** \pluginsection{Qpsol,cplex} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief \pluginbrief{QpSolver,cplex}
+  struct CASADI_QPSOL_CPLEX_EXPORT CplexMemory {
+    /// Indicates if we have to warm-start
+    bool is_warm;
 
-      @copydoc QpSolver_doc
-      @copydoc plugin_QpSolver_cplex
+    /// Nature of problem (always minimization)
+    int objsen;
+
+    /// Determines relation >,<, = in the linear constraints
+    std::vector<char> sense;
+
+    /// Coefficients of matrix A (constraint Jacobian)
+    std::vector<int> matcnt;
+
+    /// Right-hand side of constraints
+    std::vector<double> rhs;
+
+    /// Range of constraints
+    std::vector<double> rngval;
+
+    /// Coefficients of matrix H (objective Hessian)
+    std::vector<int> qmatcnt;
+
+    /// Storage for basis info of primal variables
+    std::vector<int> cstat;
+
+    /// Storage for basis info of slack variables
+    std::vector<int> rstat;
+
+    /// CPLEX environment
+    CPXENVptr env;
+    CPXLPptr lp;
+
+    /// Constructor
+    CplexMemory();
+
+    /// Destructor
+    ~CplexMemory();
+  };
+
+  /** \brief \pluginbrief{Qpsol,cplex}
+
+      @copydoc Qpsol_doc
+      @copydoc plugin_Qpsol_cplex
 
       \author Attila Kozma, Joel Andersson
       \date 2012
   */
-  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInterface : public QpSolverInternal {
+  class CASADI_QPSOL_CPLEX_EXPORT CplexInterface : public Qpsol {
   public:
-    /** \brief Default constructor */
-    explicit CplexInterface();
-
-    /// Clone
-    virtual CplexInterface* clone() const;
-
     /** \brief  Create a new QP Solver */
-    static QpSolverInternal* creator(const std::map<std::string, Sparsity>& st) {
-      return new CplexInterface(st);
+    static Qpsol* creator(const std::string& name,
+                                     const std::map<std::string, Sparsity>& st) {
+      return new CplexInterface(name, st);
     }
 
     /// Constructor using sparsity patterns
-    explicit CplexInterface(const std::map<std::string, Sparsity>& st);
+    explicit CplexInterface(const std::string& name,
+                            const std::map<std::string, Sparsity>& st);
 
     /// Destructor
     virtual ~CplexInterface();
 
-    /// Free Cplex memory
-    void freeCplex();
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "cplex";}
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
 
     // Initialize the solver
-    virtual void init();
+    virtual void init(const Dict& opts);
+
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new CplexMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<CplexMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
 
     // Solve the QP
-    virtual void evaluate();
+    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
 
-    // OPTIONS
-    /** Which algorithm to use
-     * 0 -> Automatic (default)
-     * 1 -> Primal simplex
-     * 2 -> Dual simplex
-     * 3 -> Network optimizer
-     * 4 -> Barrier
-     * 5 -> Sifting
-     * 6 -> Concurrent
-     * 7 -> Crossover
-     */
-    /// Stores which QP algorithm to use
+    /// Can discrete variables be treated
+    virtual bool integer_support() const { return true;}
+
+    /// All CPLEX options
+    Dict opts_;
+
+    ///@{
+    /// Options
     int qp_method_;
-
-    /// Print to file (for later use)
     bool dump_to_file_;
-
-    /// Indicates if we have to warm-start
-    bool is_warm_;
-
-    /// Accuracy
+    std::string dump_filename_;
     double tol_;
+    int dep_check_;
+    bool warm_start_;
+    ///@}
 
-    /// Nature of problem (always minimization)
-    int objsen_;
-
-    /// Determines relation >,<, = in the linear constraints
-    std::vector<char> sense_;
-
-    /// Coefficients of matrix A (constraint Jacobian)
-    std::vector<int> matcnt_;
-
-    /// Right-hand side of constraints
-    std::vector<double> rhs_;
-
-    /// Range of constraints
-    std::vector<double> rngval_;
-
-    /// Coefficients of matrix H (objective Hessian)
-    std::vector<int> qmatcnt_;
-
-    /// Storage for basis info of primal variables
-    std::vector<int> cstat_;
-
-    /// Storage for basis info of slack variables
-    std::vector<int> rstat_;
-
-    /// CPLEX environment
-    CPXENVptr env_;
-    CPXLPptr lp_;
+    // Are we solving a mixed-integer problem?
+    bool mip_;
+    std::vector<char> ctype_;
 
     /// A documentation string
     static const std::string meta_doc;

@@ -26,7 +26,7 @@
 #ifndef CASADI_RK_INTEGRATOR_HPP
 #define CASADI_RK_INTEGRATOR_HPP
 
-#include "fixed_step_integrator.hpp"
+#include "casadi/core/function/integrator_impl.hpp"
 #include <casadi/solvers/casadi_integrator_rk_export.h>
 
 /** \defgroup plugin_Integrator_rk
@@ -53,27 +53,21 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit RkIntegrator(const Function& f, const Function& g);
-
-    /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
-    /// Clone
-    virtual RkIntegrator* clone() const { return new RkIntegrator(*this);}
-
-    /// Create a new integrator
-    virtual RkIntegrator* create(const Function& f, const Function& g) const
-    { return new RkIntegrator(f, g);}
+    explicit RkIntegrator(const std::string& name, Oracle* dae);
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new RkIntegrator(f, g);}
+    static Integrator* creator(const std::string& name, Oracle* dae) {
+      return new RkIntegrator(name, dae);
+    }
 
     /// Destructor
     virtual ~RkIntegrator();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "rk";}
+
     /// Initialize stage
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// Setup F and G
     virtual void setupFG();

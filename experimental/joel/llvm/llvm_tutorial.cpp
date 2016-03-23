@@ -440,7 +440,7 @@ llvm::Function *PrototypeAST::Codegen() {
   
   // If F conflicted, there was already something named 'Name'.  If it has a
   // body, don't allow redefinition or reextern.
-  if (F->getName() != Name) {
+  if (F->name() != Name) {
     // Delete the one we just made and get the existing one.
     F->eraseFromParent();
     F = TheModule->getFunction(Name);

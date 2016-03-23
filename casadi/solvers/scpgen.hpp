@@ -26,84 +26,155 @@
 #ifndef CASADI_SCPGEN_HPP
 #define CASADI_SCPGEN_HPP
 
-#include "casadi/core/function/nlp_solver_internal.hpp"
-#include "casadi/core/function/qp_solver.hpp"
-
-#include <casadi/solvers/casadi_nlpsolver_scpgen_export.h>
+#include "casadi/core/function/nlpsol_impl.hpp"
+#include <casadi/solvers/casadi_nlpsol_scpgen_export.h>
 
 #include <deque>
 
-/** \defgroup plugin_NlpSolver_scpgen
+/** \defgroup plugin_Nlpsol_scpgen
    A structure-exploiting sequential quadratic programming
      (to be come sequential convex programming) method for nonlinear programming.
 */
 
-/** \pluginsection{NlpSolver,scpgen} */
+/** \pluginsection{Nlpsol,scpgen} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /**  \brief \pluginbrief{NlpSolver,scpgen}
+  struct CASADI_NLPSOL_SCPGEN_EXPORT ScpgenMemory : public NlpsolMemory {
+    // Current objective value
+    double fk;
+
+    // Work vectors, nonlifted problem
+    double *xk, *gk, *dxk, *lam_xk, *dlam_xk, *lam_gk, *dlam_gk, *gfk, *gL, *b_gn;
+
+    // Memory for lifted variables
+    struct VarMem {
+      int n;
+      double *dx, *x0, *x, *lam, *dlam;
+      double *res, *resL;
+    };
+    std::vector<VarMem> lifted_mem;
+
+    // Penalty parameter of merit function
+    double sigma;
+
+    // 1-norm of last primal step
+    double pr_step;
+
+    // 1-norm of last dual step
+    double du_step;
+
+    // Regularization
+    double reg;
+
+    // Message applying to a particular iteration
+    const char* iteration_note;
+
+    // QP
+    double *qpH, *qpA, *qpB, *qpL, *qpG, *qpH_times_du;
+
+    // QP solver
+    double *qp_lbx, *qp_ubx, *qp_lba, *qp_uba;
+
+    // Linesearch parameters
+    std::vector<double> merit_mem;
+    int merit_ind;
+
+    // Timers
+    double t_eval_mat, t_eval_res, t_eval_vec, t_eval_exp, t_solve_qp, t_mainloop;
+
+    // Current iteration
+    int iter_count;
+  };
+
+  /**  \brief \pluginbrief{Nlpsol,scpgen}
 
      @copydoc NLPSolver_doc
-     @copydoc plugin_NlpSolver_scpgen
+     @copydoc plugin_Nlpsol_scpgen
 
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */
-  class CASADI_NLPSOLVER_SCPGEN_EXPORT Scpgen : public NlpSolverInternal {
+  class CASADI_NLPSOL_SCPGEN_EXPORT Scpgen : public Nlpsol {
   public:
-    explicit Scpgen(const Function& nlp);
+    explicit Scpgen(const std::string& name, Oracle* nlp);
     virtual ~Scpgen();
-    virtual Scpgen* clone() const { return new Scpgen(*this);}
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "scpgen";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new Scpgen(nlp);}
+    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+      return new Scpgen(name, nlp);
+    }
 
-    virtual void init();
-    virtual void evaluate();
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
+    // Initialize the solver
+    virtual void init(const Dict& opts);
+
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new ScpgenMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<ScpgenMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
+
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
+
+    // Solve the NLP
+    virtual void solve(void* mem) const;
 
     // Calculate the L1-norm of the primal infeasibility
-    double primalInfeasibility();
+    double primalInfeasibility(ScpgenMemory* m) const;
 
     // Calculate the L1-norm of the dual infeasibility
-    double dualInfeasibility();
+    double dualInfeasibility(ScpgenMemory* m) const;
 
     // Print iteration header
-    void printIteration(std::ostream &stream);
+    void printIteration(ScpgenMemory* m, std::ostream &stream) const;
 
     // Print iteration
-    void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf,
-                        double reg, int ls_trials, bool ls_success);
+    void printIteration(ScpgenMemory* m, std::ostream &stream, int iter, double obj,
+                        double pr_inf, double du_inf,
+                        double reg, int ls_trials, bool ls_success) const;
 
     // Evaluate the matrices in the condensed QP
-    void eval_mat();
+    void eval_mat(ScpgenMemory* m) const;
 
     // Evaluate the vectors in the condensed QP
-    void eval_vec();
+    void eval_vec(ScpgenMemory* m) const;
 
     // Evaluate the residual function
-    void eval_res();
+    void eval_res(ScpgenMemory* m) const;
 
     // Regularize the condensed QP
-    void regularize();
+    void regularize(ScpgenMemory* m) const;
 
     // Solve the QP to get the (full) step
-    void solve_qp();
+    void solve_qp(ScpgenMemory* m) const;
 
     // Perform the line-search to take the step
-    void line_search(int& ls_iter, bool& ls_success);
+    void line_search(ScpgenMemory* m, int& ls_iter, bool& ls_success) const;
 
     // Evaluate the step expansion
-    void eval_exp();
-
-    // Timings
-    double t_eval_mat_, t_eval_res_, t_eval_vec_, t_eval_exp_, t_solve_qp_, t_mainloop_;
+    void eval_exp(ScpgenMemory* m) const;
 
     /// QP solver for the subproblems
-    QpSolver qp_solver_;
+    Function qpsol_;
 
     /// use Gauss-Newton Hessian
     bool gauss_newton_;
@@ -134,20 +205,21 @@ namespace casadi {
     double c1_;
     double beta_;
     int max_iter_ls_;
-    std::vector<double> merit_mem_;
     int merit_memsize_;
     double merit_start_;
-    int merit_ind_;
     ///@}
 
     /// Enable Code generation
     bool codegen_;
 
-    /// Access QpSolver
-    const QpSolver getQpSolver() const { return qp_solver_;}
+    /// Access Qpsol
+    const Function getQpsol() const { return qpsol_;}
 
     /// Regularization
     bool regularize_;
+
+    // Number of gauss_newton equations
+    int ngn_;
 
     // Options
     double reg_threshold_;
@@ -172,20 +244,6 @@ namespace casadi {
     /// Step expansion
     Function exp_fcn_;
 
-    // Objective value
-    double f_;
-    std::vector<double> gf_, gL_, b_gn_;
-
-    // Nonlifted variables with bound
-    std::vector<double> x_lb_, x_ub_, x_init_, x_opt_, x_step_, x_lam_, x_dlam_;
-    MX x_;
-
-    // Parameter
-    MX p_;
-
-    // Nonlinear bounds
-    std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_;
-
     // Residual function io indices
     int res_x_, res_p_, res_g_lam_, res_p_lam_, res_p_d_;
     int res_f_, res_gl_, res_g_;
@@ -204,25 +262,9 @@ namespace casadi {
       int res_var, res_lam, res_d, res_lam_d;
       int mod_var, mod_lam, mod_def, mod_defL;
       int exp_def, exp_defL;
-
-      std::vector<double> step, init, opt, lam, dlam;
-      std::vector<double> res, resL;
-
     };
 
     std::vector<Var> v_;
-
-    // Penalty parameter of merit function
-    double sigma_;
-
-    // 1-norm of last primal step
-    double pr_step_;
-
-    // 1-norm of last dual step
-    double du_step_;
-
-    // Regularization
-    double reg_;
 
     // Names of the components
     std::vector<std::string> name_x_;
@@ -230,21 +272,14 @@ namespace casadi {
     // Components to print
     std::vector<int> print_x_;
 
-    // Message applying to a particular iteration
-    std::string iteration_note_;
+    // QP sparsity
+    Sparsity spH_, spA_, spL_;
 
-    // QP
-    DMatrix qpH_, qpA_;
-    std::vector<double> qpB_;
-
-    // Hessian times a step
-    std::vector<double> qpH_times_du_;
+    // Print options
+    bool print_header_;
 
     /// A documentation string
     static const std::string meta_doc;
-
-    /// Work vector
-    std::vector<double> work_;
   };
 
 } // namespace casadi

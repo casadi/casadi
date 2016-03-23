@@ -26,58 +26,66 @@
 #include "collocation_integrator.hpp"
 #include "casadi/core/polynomial.hpp"
 #include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/sx_function.hpp"
 
 using namespace std;
 namespace casadi {
 
   extern "C"
   int CASADI_INTEGRATOR_COLLOCATION_EXPORT
-      casadi_register_integrator_collocation(IntegratorInternal::Plugin* plugin) {
+      casadi_register_integrator_collocation(Integrator::Plugin* plugin) {
     plugin->creator = CollocationIntegrator::creator;
     plugin->name = "collocation";
     plugin->doc = CollocationIntegrator::meta_doc.c_str();
-    plugin->version = 23;
+    plugin->version = 30;
     return 0;
   }
 
   extern "C"
   void CASADI_INTEGRATOR_COLLOCATION_EXPORT casadi_load_integrator_collocation() {
-    IntegratorInternal::registerPlugin(casadi_register_integrator_collocation);
+    Integrator::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  CollocationIntegrator::CollocationIntegrator(const Function& f,
-                                                               const Function& g)
-      : ImplicitFixedStepIntegrator(f, g) {
-    addOption("interpolation_order",           OT_INTEGER,  3,
-              "Order of the interpolating polynomials");
-    addOption("collocation_scheme",            OT_STRING,  "radau",
-              "Collocation scheme", "radau|legendre");
-    setOption("name", "unnamed_collocation_integrator");
-  }
-
-  void CollocationIntegrator::deepCopyMembers(
-      std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    ImplicitFixedStepIntegrator::deepCopyMembers(already_copied);
+  CollocationIntegrator::CollocationIntegrator(const std::string& name, Oracle* dae)
+    : ImplicitFixedStepIntegrator(name, dae) {
   }
 
   CollocationIntegrator::~CollocationIntegrator() {
   }
 
-  void CollocationIntegrator::init() {
+  Options CollocationIntegrator::options_
+  = {{&ImplicitFixedStepIntegrator::options_},
+     {{"interpolation_order",
+       {OT_INT,
+        "Order of the interpolating polynomials"}},
+      {"collocation_scheme",
+       {OT_STRING,
+        "Collocation scheme: radau|legendre"}}
+     }
+  };
+
+  void CollocationIntegrator::init(const Dict& opts) {
+    // Default options
+    deg_ = 3;
+    collocation_scheme_ = "radau";
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="interpolation_order") {
+        deg_ = op.second;
+      } else if (op.first=="collocation_scheme") {
+        collocation_scheme_ = op.second.to_string();
+      }
+    }
 
     // Call the base class init
-    ImplicitFixedStepIntegrator::init();
-
+    ImplicitFixedStepIntegrator::init(opts);
   }
 
   void CollocationIntegrator::setupFG() {
 
-    // Interpolation order
-    deg_ = getOption("interpolation_order");
-
     // All collocation time points
-    std::vector<long double> tau_root = collocationPointsL(deg_, getOption("collocation_scheme"));
+    std::vector<double> tau_root = collocation_points(deg_, collocation_scheme_);
+    tau_root.insert(tau_root.begin(), 0);
 
     // Coefficients of the collocation equation
     vector<vector<double> > C(deg_+1, vector<double>(deg_+1, 0));
@@ -101,24 +109,28 @@ namespace casadi {
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation
-      D[j] = zeroIfSmall(p(1.0L));
+      if (collocation_scheme_=="radau") {
+        D[j] = j==deg_ ? 1 : 0;
+      } else {
+        D[j] = p(1.0);
+      }
 
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Polynomial dp = p.derivative();
       for (int r=0; r<deg_+1; ++r) {
-        C[j][r] = zeroIfSmall(dp(tau_root[r]));
+        C[j][r] = dp(tau_root[r]);
       }
 
       // Integrate polynomial to get the coefficients of the quadratures
       Polynomial ip = p.anti_derivative();
-      B[j] = zeroIfSmall(ip(1.0L));
+      B[j] = ip(1.0);
     }
 
     // Symbolic inputs
-    MX x0 = MX::sym("x0", f_.input(DAE_X).sparsity());
-    MX p = MX::sym("p", f_.input(DAE_P).sparsity());
-    MX t = MX::sym("t", f_.input(DAE_T).sparsity());
+    MX x0 = MX::sym("x0", this->x());
+    MX p = MX::sym("p", this->p());
+    MX t = MX::sym("t", this->t());
 
     // Implicitly defined variables (z and x)
     MX v = MX::sym("v", deg_*(nx_+nz_));
@@ -133,8 +145,8 @@ namespace casadi {
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
     for (int d=1; d<=deg_; ++d) {
-      x[d] = reshape(*vv_it++, this->x0().shape());
-      z[d] = reshape(*vv_it++, this->z0().shape());
+      x[d] = reshape(*vv_it++, size_in(INTEGRATOR_X0));
+      z[d] = reshape(*vv_it++, size_in(INTEGRATOR_Z0));
     }
     casadi_assert(vv_it==vv.end());
 
@@ -148,7 +160,7 @@ namespace casadi {
     vector<MX> eq;
 
     // Quadratures
-    MX qf = MX::zeros(f_.output(DAE_QUAD).sparsity());
+    MX qf = MX::zeros(this->q());
 
     // End state
     MX xf = D[0]*x0;
@@ -194,16 +206,17 @@ namespace casadi {
     F_out[DAE_ODE] = xf;
     F_out[DAE_ALG] = vertcat(eq);
     F_out[DAE_QUAD] = qf;
-    F_ = MXFunction("dae", F_in, F_out);
+    F_ = Function("dae", F_in, F_out);
+    alloc(F_);
 
     // Backwards dynamics
     // NOTE: The following is derived so that it will give the exact adjoint
     // sensitivities whenever g is the reverse mode derivative of f.
-    if (!g_.isNull()) {
+    if (!g_.is_null()) {
 
       // Symbolic inputs
-      MX rx0 = MX::sym("x0", g_.input(RDAE_RX).sparsity());
-      MX rp = MX::sym("p", g_.input(RDAE_RP).sparsity());
+      MX rx0 = MX::sym("rx0", this->rx());
+      MX rp = MX::sym("rp", this->rp());
 
       // Implicitly defined variables (rz and rx)
       MX rv = MX::sym("v", deg_*(nrx_+nrz_));
@@ -218,8 +231,8 @@ namespace casadi {
       // Collocated states
       vector<MX> rx(deg_+1), rz(deg_+1);
       for (int d=1; d<=deg_; ++d) {
-        rx[d] = reshape(*rvv_it++, this->rx0().shape());
-        rz[d] = reshape(*rvv_it++, this->rz0().shape());
+        rx[d] = reshape(*rvv_it++, this->rx().size());
+        rz[d] = reshape(*rvv_it++, this->rz().size());
       }
       casadi_assert(rvv_it==rvv.end());
 
@@ -227,7 +240,7 @@ namespace casadi {
       eq.clear();
 
       // Quadratures
-      MX rqf = MX::zeros(g_.output(RDAE_QUAD).sparsity());
+      MX rqf = MX::zeros(this->rq());
 
       // End state
       MX rxf = D[0]*rx0;
@@ -278,39 +291,43 @@ namespace casadi {
       G_out[RDAE_ODE] = rxf;
       G_out[RDAE_ALG] = vertcat(eq);
       G_out[RDAE_QUAD] = rqf;
-      G_ = MXFunction("rdae", G_in, G_out);
+      G_ = Function("rdae", G_in, G_out);
+      alloc(G_);
     }
   }
 
+  void CollocationIntegrator::reset(IntegratorMemory* mem, double t, const double* x,
+                                const double* z, const double* p) const {
+    auto m = static_cast<FixedStepMemory*>(mem);
 
-  double CollocationIntegrator::zeroIfSmall(double x) {
-    return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
-  }
+    // Reset the base classes
+    ImplicitFixedStepIntegrator::reset(mem, t, x, z, p);
 
-  void CollocationIntegrator::calculateInitialConditions() {
-    vector<double>::const_iterator x0_it = input(INTEGRATOR_X0).begin();
-    vector<double>::const_iterator z_it = input(INTEGRATOR_Z0).begin();
-    vector<double>::iterator Z_it = Z_.begin();
+    // Initial guess for Z
+    double* Z = m->Z.ptr();
     for (int d=0; d<deg_; ++d) {
-      copy(x0_it, x0_it+nx_, Z_it);
-      Z_it += nx_;
-      copy(z_it, z_it+nz_, Z_it);
-      Z_it += nz_;
+      casadi_copy(x, nx_, Z);
+      Z += nx_;
+      casadi_copy(z, nz_, Z);
+      Z += nz_;
     }
-    casadi_assert(Z_it==Z_.end());
   }
 
-  void CollocationIntegrator::calculateInitialConditionsB() {
-    vector<double>::const_iterator rx0_it = input(INTEGRATOR_RX0).begin();
-    vector<double>::const_iterator rz_it = input(INTEGRATOR_RZ0).begin();
-    vector<double>::iterator RZ_it = RZ_.begin();
+  void CollocationIntegrator::resetB(IntegratorMemory* mem, double t, const double* rx,
+                               const double* rz, const double* rp) const {
+    auto m = static_cast<FixedStepMemory*>(mem);
+
+    // Reset the base classes
+    ImplicitFixedStepIntegrator::resetB(mem, t, rx, rz, rp);
+
+    // Initial guess for RZ
+    double* RZ = m->RZ.ptr();
     for (int d=0; d<deg_; ++d) {
-      copy(rx0_it, rx0_it+nrx_, RZ_it);
-      RZ_it += nrx_;
-      copy(rz_it, rz_it+nrz_, RZ_it);
-      RZ_it += nrz_;
+      casadi_copy(rx, nrx_, RZ);
+      RZ += nrx_;
+      casadi_copy(rz, nrz_, RZ);
+      RZ += nrz_;
     }
-    casadi_assert(RZ_it==RZ_.end());
   }
 
 } // namespace casadi

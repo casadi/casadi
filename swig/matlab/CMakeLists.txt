@@ -36,6 +36,7 @@ endif()
 # Install matlab helper files
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigRef.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigMem.m DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigStorage.m DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_matlab2cpp.m
               ${CMAKE_CURRENT_SOURCE_DIR}/swig_typename_convertor_cpp2matlab.m
   DESTINATION ${CMAKE_INSTALL_PREFIX})

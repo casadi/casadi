@@ -18,27 +18,27 @@ x = SX.sym('x')
 y = x
 for k in range(100000):
     y = sin(y)
-f0 = SXFunction('f', [x], [y])
+f0 = Function('f', [x], [y])
 
 
 # evaluate it serially, the old-fasioned way
 X = MX.sym('x',N)
-Y = vertcat([f0([X[k]])[0] for k in range(N)])
-fNaiveParallel = MXFunction('fParallel', [X], [Y])
+Y = vertcat(*[f0(X[k]) for k in range(N)])
+fNaiveParallel = Function('fParallel', [X], [Y])
 
 print "evaluating naive parallel function..."
 t0 = time.time()
-outNaive = fNaiveParallel([dummyInput])[0]
+outNaive = fNaiveParallel(dummyInput)
 t1 = time.time()
 print "evaluated naive parallel function in %.3f seconds" % (t1 - t0)
 
 
 # evaluate it using new serial map construct
-fMap = f0.map("i'm a map function lol", N, {'parallelization':'serial'})
+fMap = f0.map("fMap", "serial", N)
 
 print "evaluating serial map function..."
 t0 = time.time()
-outMap = fMap([dummyInput])[0]
+outMap = fMap(dummyInput)
 t1 = time.time()
 print "evaluated serial map function in %.3f seconds" % (t1 - t0)
 # the following has different shaped outputs, so it's commented out
@@ -46,11 +46,11 @@ print "evaluated serial map function in %.3f seconds" % (t1 - t0)
 
 
 # evaluate it using new parallel map construct
-fMap = f0.map("i'm a map function lol", N, {'parallelization':'openmp'})
+fMap = f0.map("fMap", "openmp", N)
 
 print "evaluating parallel map function..."
 t0 = time.time()
-outMap = fMap([dummyInput])[0]
+outMap = fMap(dummyInput)
 t1 = time.time()
 print "evaluated parallel map function in %.3f seconds" % (t1 - t0)
 # the following has different shaped outputs, so it's commented out

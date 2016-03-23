@@ -44,12 +44,9 @@ namespace casadi {
     /// Constructor
     HorzRepmat(const MX& x, int n);
 
-    /// Clone function
-    virtual HorzRepmat* clone() const { return new HorzRepmat(*this);}
-
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Destructor
     virtual ~HorzRepmat() {}
@@ -58,19 +55,19 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -81,11 +78,11 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                  CodeGenerator& g) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_HORZREPMAT;}
+    virtual int op() const { return OP_HORZREPMAT;}
 
     int n_;
   };
@@ -100,13 +97,9 @@ namespace casadi {
     /// Constructor
     HorzRepsum(const MX& x, int n);
 
-    /// Clone function
-    virtual HorzRepsum* clone() const { return new HorzRepsum(*this);}
-
     /// Evaluate the function (template)
     template<typename T, typename R>
-    void evalGen(const T** arg, T** res, int* iw, T* w,
-      R reduction);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem, R reduction) const;
 
     /// Destructor
     virtual ~HorzRepsum() {}
@@ -115,19 +108,19 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -138,11 +131,11 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief Generate code for the operation */
-    void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                  CodeGenerator& g) const;
+    void generate(CodeGenerator& g, const std::string& mem,
+                  const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_HORZREPSUM;}
+    virtual int op() const { return OP_HORZREPSUM;}
 
     int n_;
   };

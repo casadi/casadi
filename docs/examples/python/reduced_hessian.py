@@ -56,7 +56,7 @@ lbg = [0.00]
 ubg = [0.00]
 
 # Create NLP
-nlp = SXFunction("nlp", nlpIn(x=x), nlpOut(f=f, g=g))
+nlp = {'x':x, 'f':f, 'g':g}
 
 # NLP solver options
 opts = {}
@@ -70,7 +70,7 @@ opts["var_integer_md"] = var_integer_md
 opts["compute_red_hessian"] = "yes"
 
 # Create an NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 
 # Solve NLP
 res = solver({"x0" : x0,

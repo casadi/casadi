@@ -30,7 +30,7 @@
 using namespace std;
 namespace casadi {
 
-void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
+void NlpBuilder::parse_nl(const std::string& filename, const Dict& options) {
   // Note: The implementation of this function follows the
   // "Writing .nl Files" paper by David M. Gay (2005)
 
@@ -83,17 +83,17 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   g = SX::zeros(n_con);
 
   // Allocate bounds for x and primal initial guess
-  x_lb = -DMatrix::inf(x.sparsity());
-  x_ub = DMatrix::inf(x.sparsity());
-  x_init = DMatrix::zeros(x.sparsity());
+  x_lb = -DM::inf(x.sparsity());
+  x_ub = DM::inf(x.sparsity());
+  x_init = DM::zeros(x.sparsity());
 
   // Allocate bounds for g and dual initial guess
-  g_lb = -DMatrix::inf(g.sparsity());
-  g_ub = DMatrix::inf(g.sparsity());
-  lambda_init = DMatrix::zeros(g.sparsity());
+  g_lb = -DM::inf(g.sparsity());
+  g_ub = DM::inf(g.sparsity());
+  lambda_init = DM::zeros(g.sparsity());
 
   // All variables, including dependent
-  vector<SXElement> v = x.data();
+  vector<SXElem> v = x.nonzeros();
 
   // Process segments
   while (true) {
@@ -149,7 +149,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
         }
 
         // Finally, add the nonlinear term
-        v[i] += readExpressionNL(nlfile, v);
+        v[i] += read_expr(nlfile, v);
 
         break;
       }
@@ -162,7 +162,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
         nlfile >> i;
 
         // Parse and save expression
-        g.at(i) = readExpressionNL(nlfile, v);
+        g->at(i) = read_expr(nlfile, v);
 
         break;
       }
@@ -186,11 +186,11 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
         nlfile >> sigma;
 
         // Parse and save expression
-        f.at(i) = readExpressionNL(nlfile, v);
+        f->at(i) = read_expr(nlfile, v);
 
         // Negate the expression if we maximize
         if (sigma!=0) {
-          f.at(i) = -f.at(i);
+          f->at(i) = -f->at(i);
         }
 
         break;
@@ -211,7 +211,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
           nlfile >> offset >> d;
 
           // Save initial guess
-          lambda_init.at(offset) = d;
+          lambda_init->at(offset) = d;
         }
 
         break;
@@ -232,7 +232,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
           nlfile >> offset >> d;
 
           // Save initial guess
-          x_init.at(offset) = d;
+          x_init->at(offset) = d;
         }
 
         break;
@@ -255,21 +255,21 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
             // Upper and lower bounds
             case 0:
               nlfile >> c;
-              g_lb.at(i) = c;
+              g_lb->at(i) = c;
               nlfile >> c;
-              g_ub.at(i) = c;
+              g_ub->at(i) = c;
               continue;
 
             // Only upper bounds
             case 1:
               nlfile >> c;
-              g_ub.at(i) = c;
+              g_ub->at(i) = c;
               continue;
 
             // Only lower bounds
             case 2:
               nlfile >> c;
-              g_lb.at(i) = c;
+              g_lb->at(i) = c;
               continue;
 
             // No bounds
@@ -279,7 +279,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
             // Equality constraints
             case 4:
               nlfile >> c;
-              g_lb.at(i) = g_ub.at(i) = c;
+              g_lb->at(i) = g_ub->at(i) = c;
               continue;
 
               // Complementary constraints
@@ -319,21 +319,21 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
             // Upper and lower bounds
             case 0:
               nlfile >> c;
-              x_lb.at(i) = c;
+              x_lb->at(i) = c;
               nlfile >> c;
-              x_ub.at(i) = c;
+              x_ub->at(i) = c;
               continue;
 
             // Only upper bounds
             case 1:
               nlfile >> c;
-              x_ub.at(i) = c;
+              x_ub->at(i) = c;
               continue;
 
            // Only lower bounds
            case 2:
               nlfile >> c;
-              x_lb.at(i) = c;
+              x_lb->at(i) = c;
               continue;
 
            // No bounds
@@ -343,7 +343,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
            // Equality constraints
            case 4:
               nlfile >> c;
-              x_lb.at(i) = x_ub.at(i) = c;
+              x_lb->at(i) = x_ub->at(i) = c;
               continue;
 
            default:
@@ -388,7 +388,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
           nlfile >> j >> c;
 
           // Add to constraints
-          g.at(i) += c*v.at(j);
+          g->at(i) += c*v.at(j);
         }
         break;
       }
@@ -408,7 +408,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
           nlfile >> j >> c;
 
           // Add to objective
-          f.at(i) += c*v.at(j);
+          f->at(i) += c*v.at(j);
         }
         break;
       }
@@ -419,7 +419,7 @@ void NlpBuilder::parseNL(const std::string& filename, const Dict& options) {
   nlfile.close();
 }
 
-SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<SXElement>& v) {
+SXElem NlpBuilder::read_expr(std::istream &stream, const std::vector<SXElem>& v) {
   // Read the instruction
   char inst;
   stream >> inst;
@@ -465,7 +465,7 @@ SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<S
         case 51:  case 52:  case 53:
         {
           // Read dependency
-          SXElement x = readExpressionNL(stream, v);
+          SXElem x = read_expr(stream, v);
 
           // Perform operation
           switch (i) {
@@ -503,8 +503,8 @@ SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<S
         case 57:  case 58:  case 73:
         {
           // Read dependencies
-          SXElement x = readExpressionNL(stream, v);
-          SXElement y = readExpressionNL(stream, v);
+          SXElem x = read_expr(stream, v);
+          SXElem y = read_expr(stream, v);
 
           // Perform operation
           switch (i) {
@@ -545,26 +545,26 @@ SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<S
           stream >> n;
 
           // Collect the arguments
-          vector<SXElement> args(n);
+          vector<SXElem> args(n);
           for (int k=0; k<n; ++k) {
-            args[k] = readExpressionNL(stream, v);
+            args[k] = read_expr(stream, v);
           }
 
           // Perform the operation
           switch (i) {
-            // case 11: return min(args).toScalar(); FIXME // rename?
-            // case 12: return max(args).toScalar(); FIXME // rename?
-            // case 54: return sum(args).toScalar(); FIXME // rename?
-            // case 59: return count(args).toScalar(); FIXME // rename?
-            // case 60: return numberof(args).toScalar(); FIXME // rename?
-            // case 61: return numberofs(args).toScalar(); FIXME // rename?
-            // case 70: return all(args).toScalar(); FIXME // and in AMPL // rename?
-            // case 71: return any(args).toScalar(); FIXME // or in AMPL // rename?
-            // case 74: return alldiff(args).toScalar(); FIXME // rename?
+            // case 11: return min(args).scalar(); FIXME // rename?
+            // case 12: return max(args).scalar(); FIXME // rename?
+            // case 54: return sum(args).scalar(); FIXME // rename?
+            // case 59: return count(args).scalar(); FIXME // rename?
+            // case 60: return numberof(args).scalar(); FIXME // rename?
+            // case 61: return numberofs(args).scalar(); FIXME // rename?
+            // case 70: return all(args).scalar(); FIXME // and in AMPL // rename?
+            // case 71: return any(args).scalar(); FIXME // or in AMPL // rename?
+            // case 74: return alldiff(args).scalar(); FIXME // rename?
             case 54:
             {
-              SXElement r = 0;
-              for (vector<SXElement>::const_iterator it=args.begin();
+              SXElem r = 0;
+              for (vector<SXElem>::const_iterator it=args.begin();
                    it!=args.end(); ++it) r += *it;
               return r;
             }
@@ -595,7 +595,7 @@ SXElement NlpBuilder::readExpressionNL(std::istream &stream, const std::vector<S
   }
 
   // Throw error message
-  throw CasadiException("Error in NlpBuilder::readExpressionNL: " + msg.str());
+  throw CasadiException("Error in NlpBuilder::read_expr: " + msg.str());
 }
 
 void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {

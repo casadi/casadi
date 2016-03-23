@@ -32,25 +32,25 @@ using namespace std;
 namespace casadi {
 
   MX GenericCall::projectArg(const MX& x, const Sparsity& sp, int i) {
-    if (x.shape()==sp.shape()) {
+    if (x.size()==sp.size()) {
       // Insert sparsity projection nodes if needed
       return project(x, sp);
     } else {
       // Different dimensions
-      if (x.isempty() || sp.isempty()) { // NOTE: To permissive?
+      if (x.is_empty() || sp.is_empty()) { // NOTE: To permissive?
         // Replace nulls with zeros of the right dimension
         return MX::zeros(sp);
-      } else if (x.isscalar()) {
+      } else if (x.is_scalar()) {
         // Scalar argument means set all
         return MX(sp, x);
-      } else if (x.size1()==sp.size2() && x.size2()==sp.size1() && sp.isvector()) {
+      } else if (x.size1()==sp.size2() && x.size2()==sp.size1() && sp.is_vector()) {
         // Transposed vector
         return projectArg(x.T(), sp, i);
       } else {
         // Mismatching dimensions
         casadi_error("Cannot create function call node: Dimension mismatch for argument "
-                     << i << ". Argument has shape " << x.shape()
-                     << " but function input has shape " << sp.shape());
+                     << i << ". Argument has shape " << x.size()
+                     << " but function input has shape " << sp.size());
       }
     }
   }
@@ -58,27 +58,23 @@ namespace casadi {
   Call::Call(const Function& fcn, const vector<MX>& arg) : fcn_(fcn) {
 
     // Number inputs and outputs
-    int num_in = fcn.nIn();
+    int num_in = fcn.n_in();
     casadi_assert_message(arg.size()==num_in, "Argument list length (" << arg.size()
                           << ") does not match number of inputs (" << num_in << ")"
-                          << " for function " << fcn.getOption("name"));
+                          << " for function " << fcn.name());
 
     // Create arguments of the right dimensions and sparsity
     vector<MX> arg1(num_in);
     for (int i=0; i<num_in; ++i) {
-      arg1[i] = projectArg(arg[i], fcn_.input(i).sparsity(), i);
+      arg1[i] = projectArg(arg[i], fcn_.sparsity_in(i), i);
     }
     setDependencies(arg1);
     setSparsity(Sparsity::scalar());
   }
 
-  Call* Call::clone() const {
-    return new Call(*this);
-  }
-
   std::string Call::print(const std::vector<std::string>& arg) const {
     stringstream ss;
-    ss << fcn_.getOption("name") << "(";
+    ss << fcn_.name() << "(";
     for (int i=0; i<ndep(); ++i) {
       if (i!=0) ss << ", ";
       ss << arg.at(i);
@@ -87,24 +83,23 @@ namespace casadi {
     return ss.str();
   }
 
-  void Call::evalD(const double** arg, double** res,
-                           int* iw, double* w) {
-    fcn_->eval(arg, res, iw, w);
+  void Call::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+    fcn_(arg, res, iw, w, mem);
   }
 
   int Call::nout() const {
-    return fcn_.nOut();
+    return fcn_.n_out();
   }
 
   const Sparsity& Call::sparsity(int oind) const {
-    return fcn_.output(oind).sparsity();
+    return fcn_.sparsity_out(oind);
   }
 
-  void Call::evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-    fcn_->evalSX(arg, res, iw, w);
+  void Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+    fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::evalMX(const vector<MX>& arg, vector<MX>& res) {
+  void Call::eval_mx(const vector<MX>& arg, vector<MX>& res) {
     res = create(fcn_, arg);
   }
 
@@ -117,7 +112,7 @@ namespace casadi {
     for (int i=0; i<res.size(); ++i) res[i] = getOutput(i);
 
     // Call the cached functions
-    fcn_.callForward(arg, res, fseed, fsens);
+    fcn_.forward(arg, res, fseed, fsens);
   }
 
   void Call::evalAdj(const vector<vector<MX> >& aseed,
@@ -130,36 +125,83 @@ namespace casadi {
 
     // Call the cached functions
     vector<vector<MX> > v;
-    fcn_.callReverse(arg, res, aseed, v);
+    fcn_.reverse(arg, res, aseed, v);
     for (int i=0; i<v.size(); ++i) {
       for (int j=0; j<v[i].size(); ++j) {
-        if (!v[i][j].isempty()) { // TODO(@jaeandersson): Hack
+        if (!v[i][j].is_empty()) { // TODO(@jaeandersson): Hack
           asens[i][j] += v[i][j];
         }
       }
     }
   }
 
-  void Call::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    MXNode::deepCopyMembers(already_copied);
-    fcn_ = deepcopy(fcn_, already_copied);
+  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    fcn_(arg, res, iw, w, mem);
   }
 
-  void Call::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    fcn_.spFwd(arg, res, iw, w);
-  }
-
-  void Call::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-    fcn_.spAdj(arg, res, iw, w);
+  void Call::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
+    fcn_.rev(arg, res, iw, w, mem);
   }
 
   void Call::addDependency(CodeGenerator& g) const {
     fcn_->addDependency(g);
   }
 
-  void Call::generate(const vector<int>& arg, const vector<int>& res,
-                      CodeGenerator& g) const {
-    fcn_->generate(g, arg, res);
+  bool Call::has_refcount() const {
+    return fcn_->has_refcount_;
+  }
+
+  void Call::generate(CodeGenerator& g, const std::string& mem,
+                      const vector<int>& arg, const vector<int>& res) const {
+    if (fcn_->simplifiedCall()) {
+
+      // Collect input arguments
+      for (int i=0; i<arg.size(); ++i) {
+        g.body << "  w[" << i << "]=" << g.workel(arg[i]) << ";" << endl;
+      }
+
+      // Call function
+      g.body << "  " << g(fcn_, "w", "w+"+g.to_string(arg.size())) << ";" << endl;
+
+      // Collect output arguments
+      for (int i=0; i<res.size(); ++i) {
+        if (res[i]>=0) {
+          g.body << "  " << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];" << endl;
+        }
+      }
+    } else {
+
+      // Collect input arguments
+      for (int i=0; i<arg.size(); ++i) {
+        g.body << "  arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";" << endl;
+      }
+
+      // Collect output arguments
+      for (int i=0; i<res.size(); ++i) {
+        g.body << "  res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";" << endl;
+      }
+
+      // Call function
+      g.body << "  if (" << g(fcn_, "arg1", "res1", "iw", "w") << ") return 1;" << endl;
+    }
+  }
+
+  void Call::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
+    if (has_refcount()) {
+      auto i = added.insert(fcn_.get());
+      if (i.second) { // prevent duplicate calls
+        g.body << "  " << fcn_->codegen_name(g) << "_incref();" << endl;
+      }
+    }
+  }
+
+  void Call::codegen_decref(CodeGenerator& g, std::set<void*>& added) const {
+    if (has_refcount()) {
+      auto i = added.insert(fcn_.get());
+      if (i.second) { // prevent duplicate calls
+        g.body << "  " << fcn_->codegen_name(g) << "_decref();" << endl;
+      }
+    }
   }
 
   size_t Call::sz_arg() const {

@@ -24,7 +24,6 @@
 
 
 #include "shared_object.hpp"
-#include "casadi_exception.hpp"
 #include "weak_ref.hpp"
 
 #include <typeinfo>
@@ -37,13 +36,11 @@ namespace casadi {
   }
 
   SharedObjectNode::SharedObjectNode(const SharedObjectNode& node) {
-    is_init_ = node.is_init_;
     count = 0; // reference counter is _not_ copied
     weak_ref_ = 0; // nor will they have the same weak references
   }
 
   SharedObjectNode& SharedObjectNode::operator=(const SharedObjectNode& node) {
-    is_init_ = node.is_init_;
     // do _not_ copy the reference counter
     return *this;
   }
@@ -80,15 +77,11 @@ namespace casadi {
     return *this;
   }
 
-  const SharedObjectNode* SharedObject::get() const {
+  SharedObjectNode* SharedObject::get() const {
     return node;
   }
 
-  SharedObjectNode* SharedObject::get() {
-    return node;
-  }
-
-  bool SharedObject::isNull() const {
+  bool SharedObject::is_null() const {
     return node==0;
   }
 
@@ -103,18 +96,12 @@ namespace casadi {
     }
   }
 
-  const SharedObjectNode* SharedObject::operator->() const {
-    casadi_assert(!isNull());
-    return node;
-  }
-
-  SharedObjectNode* SharedObject::operator->() {
-    casadi_assert(!isNull());
+  SharedObjectNode* SharedObject::operator->() const {
+    casadi_assert(!is_null());
     return node;
   }
 
   SharedObjectNode::SharedObjectNode() {
-    is_init_ = false;
     count = 0;
     weak_ref_ = 0;
   }
@@ -131,21 +118,8 @@ namespace casadi {
     }
   }
 
-  void SharedObject::init(bool allow_reinit) {
-    if (allow_reinit || !isInit()) {
-      (*this)->init();
-      (*this)->postinit();
-    }
-  }
-
-  void SharedObjectNode::init() {
-  }
-
-  void SharedObjectNode::postinit() {
-  }
-
   void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {
-    if (isNull()) {
+    if (is_null()) {
       stream << 0;
     } else {
       (*this)->repr(stream);
@@ -159,7 +133,7 @@ namespace casadi {
   }
 
   void SharedObject::print(std::ostream &stream, bool trailing_newline) const {
-    if (isNull()) {
+    if (is_null()) {
       stream << "Null pointer of class \"" << typeid(this).name() << "\"";
     } else {
       (*this)->print(stream);
@@ -176,46 +150,6 @@ namespace casadi {
     stream << typeid(this).name();
   }
 
-  void SharedObject::makeUnique(bool clone_members) {
-    std::map<SharedObjectNode*, SharedObject> already_copied;
-    makeUnique(already_copied, clone_members);
-  }
-
-  void SharedObject::makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
-                                bool clone_members) {
-    if (node && node->count>1) {
-      // First find out if the expression has already been copied
-      std::map<SharedObjectNode*, SharedObject>::iterator it = already_copied.find(node);
-
-      if (it==already_copied.end()) {
-        // If the expression has not yet been copied
-        SharedObjectNode *newnode = node->clone();
-
-        // Copy the data members
-        if (clone_members) newnode->deepCopyMembers(already_copied);
-
-        // Initialize object if parent was initialized
-        if (isInit() && !newnode->is_init_) {
-          newnode->init();
-        }
-
-        // Assign cloned node to object
-        assignNode(newnode);
-      } else {
-        // Use an existing copy
-        assignNode(it->second.get());
-      }
-    }
-  }
-
-  SharedObject SharedObject::clone() const {
-    SharedObject ret;
-    if (!isNull()) {
-      ret.assignNode((*this)->clone());
-    }
-    return ret;
-  }
-
   void SharedObject::swap(SharedObject& other) {
     SharedObject temp = *this;
     *this = other;
@@ -228,28 +162,6 @@ namespace casadi {
 
   int SharedObjectNode::getCount() const {
     return count;
-  }
-
-  void SharedObjectNode::deepCopyMembers(std::map<SharedObjectNode*,
-                                         SharedObject>& already_copied) {
-  }
-
-  bool SharedObject::isInit() const {
-    return (*this)->isInit();
-  }
-
-  void SharedObject::assertInit() const {
-    (*this)->assertInit();
-  }
-
-  bool SharedObjectNode::isInit() const {
-    return is_init_;
-  }
-
-  void SharedObjectNode::assertInit() const {
-    casadi_assert_message(isInit(),
-                          "You must first initialize a Shared Object before you can use it."
-                          << std::endl <<  "Use something like f.init()");
   }
 
   WeakRef* SharedObject::weak() {

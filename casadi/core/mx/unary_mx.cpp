@@ -27,7 +27,7 @@
 #include <vector>
 #include <sstream>
 #include "../std_vector_tools.hpp"
-#include "../casadi_options.hpp"
+#include "../global_options.hpp"
 
 using namespace std;
 
@@ -36,15 +36,11 @@ namespace casadi {
   UnaryMX::UnaryMX(Operation op, MX x) : op_(op) {
     // Put a densifying node in between if necessary
     if (!operation_checker<F00Checker>(op_)) {
-      x.makeDense();
+      x = densify(x);
     }
 
     setDependencies(x);
     setSparsity(x->sparsity());
-  }
-
-  UnaryMX* UnaryMX::clone() const {
-    return new UnaryMX(*this);
   }
 
   std::string UnaryMX::print(const std::vector<std::string>& arg) const {
@@ -55,18 +51,17 @@ namespace casadi {
     return ss.str();
   }
 
-  void UnaryMX::evalD(const double** arg, double** res, int* iw, double* w) {
+  void UnaryMX::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     double dummy = numeric_limits<double>::quiet_NaN();
     casadi_math<double>::fun(op_, arg[0], dummy, res[0], nnz());
   }
 
-  void UnaryMX::evalSX(const SXElement** arg, SXElement** res,
-                       int* iw, SXElement* w) {
-    SXElement dummy = 0;
-    casadi_math<SXElement>::fun(op_, arg[0], dummy, res[0], nnz());
+  void UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+    SXElem dummy = 0;
+    casadi_math<SXElem>::fun(op_, arg[0], dummy, res[0], nnz());
   }
 
-  void UnaryMX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void UnaryMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     MX dummy;
     casadi_math<MX>::fun(op_, arg[0], dummy, res[0]);
   }
@@ -97,18 +92,16 @@ namespace casadi {
     }
   }
 
-  void UnaryMX::spFwd(const bvec_t** arg,
-                      bvec_t** res, int* iw, bvec_t* w) {
+  void UnaryMX::spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     copyFwd(arg[0], res[0], nnz());
   }
 
-  void UnaryMX::spAdj(bvec_t** arg,
-                      bvec_t** res, int* iw, bvec_t* w) {
+  void UnaryMX::spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     copyAdj(arg[0], res[0], nnz());
   }
 
-  void UnaryMX::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                         CodeGenerator& g) const {
+  void UnaryMX::generate(CodeGenerator& g, const std::string& mem,
+                         const std::vector<int>& arg, const std::vector<int>& res) const {
     string r, x;
     g.body << "  ";
     if (nnz()==1) {
@@ -120,19 +113,19 @@ namespace casadi {
       g.body << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
              << "; i<" << sparsity().nnz() << "; ++i) ";
       r = "*rr++";
-      x = "(*cs++)";
+      x = "*cs++";
     }
 
     // Output the operation
     g.body << r << " = ";
     casadi_math<double>::printPre(op_, g.body);
-    g.body << x;
+    g.body << " " << x << " ";
     casadi_math<double>::printPost(op_, g.body);
     g.body << ";" << endl;
   }
 
   MX UnaryMX::getUnary(int op) const {
-    if (!CasadiOptions::simplification_on_the_fly) return MXNode::getUnary(op);
+    if (!GlobalOptions::simplification_on_the_fly) return MXNode::getUnary(op);
 
     switch (op_) {
     case OP_NEG:
@@ -179,13 +172,13 @@ namespace casadi {
       else if (op==OP_DIV) return -dep()->getBinary(OP_DIV, y, scX, scY);
       break;
     case OP_TWICE:
-      if (op==OP_SUB && isEqual(y, dep(), maxDepth())) return dep();
+      if (op==OP_SUB && MX::is_equal(y, dep(), maxDepth())) return dep();
       break;
     case OP_SQ:
-      if (op==OP_ADD && y.getOp()==OP_SQ) /*sum of squares:*/
-        if ((dep().getOp()==OP_SIN && y->dep().getOp()==OP_COS) ||
-           (dep().getOp()==OP_COS && y->dep()->getOp()==OP_SIN)) /* sin^2(x)+sin^2(y) */
-          if (isEqual(dep()->dep(), y->dep()->dep(), maxDepth())) /*sin^2(x) + cos^2(x) */
+      if (op==OP_ADD && y.op()==OP_SQ) /*sum of squares:*/
+        if ((dep().op()==OP_SIN && y->dep().op()==OP_COS) ||
+           (dep().op()==OP_COS && y->dep()->op()==OP_SIN)) /* sin^2(x)+sin^2(y) */
+          if (MX::is_equal(dep()->dep(), y->dep()->dep(), maxDepth())) /*sin^2(x) + cos^2(x) */
             return MX::ones(y.sparsity());
       break;
     default: break; // no rule

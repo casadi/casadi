@@ -27,7 +27,7 @@
 #define CASADI_INTERRUPT_HPP
 
 #include <casadi/core/casadi_export.h>
-#include "casadi_exception.hpp"
+#include "exception.hpp"
 
 #include <iostream>
 #include <fstream>

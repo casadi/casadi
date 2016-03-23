@@ -27,7 +27,6 @@
 #define CASADI_VARIABLE_HPP
 
 #include <iostream>
-#include "../function/sx_function.hpp"
 #include "../mx/mx.hpp"
 
 namespace casadi {
@@ -97,10 +96,10 @@ namespace casadi {
     double max;
 
     /// Initial guess
-    double initialGuess;
+    double guess;
 
     /// Derivative at time 0
-    double derivativeStart;
+    double derivative_start;
 
     /// Variability (see Fritzon)
     Variability variability;
@@ -124,7 +123,7 @@ namespace casadi {
     std::string unit;
 
     /// Display unit
-    std::string displayUnit;
+    std::string display_unit;
 
     /// Free attribute
     bool free;

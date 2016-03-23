@@ -63,7 +63,7 @@ D = np.zeros(deg+1)
 tau = SX.sym("tau")
   
 # All collocation time points
-tau_root = collocationPoints(deg,cp)
+tau_root = [0] + collocation_points(deg, cp)
 
 T = np.zeros((nk,deg+1))
 for i in range(nk):
@@ -78,14 +78,14 @@ for j in range(deg+1):
         if j2 != j:
             L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
 
-    lfcn = SXFunction('lfcn', [tau],[L])
+    lfcn = Function('lfcn', [tau],[L])
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-    [D[j]] = lfcn([1.0])
+    D[j] = lfcn(1.0)
 
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     tfcn = lfcn.tangent()
     for j2 in range(deg+1):
-        C[j][j2], _ = tfcn([tau_root[j2]])
+        C[j][j2], _ = tfcn(tau_root[j2])
 
 
 
@@ -109,13 +109,13 @@ dy = SX.sym("dy")
 dw = SX.sym("dw")
 
       
-res = vertcat([xddot[0] - dx,\
+res = vertcat(xddot[0] - dx,\
        xddot[1] - dy,\
        xddot[2] - dw,\
        m*xddot[3] + (x-w)*xa, \
        m*xddot[4] +     y*xa - g*m,\
        M*xddot[5] + (w-x)*xa +   u,\
-       (x-w)*(xddot[3] - xddot[5]) + y*xddot[4] + dy*dy + (dx-dw)*(dx-dw)])       
+       (x-w)*(xddot[3] - xddot[5]) + y*xddot[4] + dy*dy + (dx-dw)*(dx-dw))
 
      
 xd[0] = x
@@ -127,11 +127,11 @@ xd[5] = dw
                    
 
 # System dynamics (implicit formulation)
-ffcn = SXFunction('ffcn', [t,xddot,xd,xa,u,p],[res])
+ffcn = Function('ffcn', [t,xddot,xd,xa,u,p],[res])
 
 # Objective function 
-MayerTerm = SXFunction('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
-LagrangeTerm = SXFunction('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
+MayerTerm = Function('mayer', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
+LagrangeTerm = Function('lagrange', [t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
 # Control bounds
 u_min = np.array([-2])
@@ -177,19 +177,19 @@ ic_min = np.array([])
 ic_max = np.array([])
 ic = SX()
 #ic.append();       ic_min = append(ic_min, 0.);         ic_max = append(ic_max, 0.)
-icfcn = SXFunction('icfcn', [t,xd,xa,u,p],[ic])
+icfcn = Function('icfcn', [t,xd,xa,u,p],[ic])
 # Path constraint
 pc_min = np.array([])
 pc_max = np.array([])
 pc = SX()
 #pc.append();       pc_min = append(pc_min, 0.);         pc_max = append(pc_max, 0.)
-pcfcn = SXFunction('pcfcn', [t,xd,xa,u,p],[pc])
+pcfcn = Function('pcfcn', [t,xd,xa,u,p],[pc])
 # Final constraint
 fc_min = np.array([])
 fc_max = np.array([])
 fc = SX()
 #fc.append();       fc_min = append(fc_min, 0.);         fc_max = append(fc_max, 0.)
-fcfcn = SXFunction('fcfcn', [t,xd,xa,u,p],[fc])
+fcfcn = Function('fcfcn', [t,xd,xa,u,p],[fc])
 
 # -----------------------------------------------------------------------------
 # NLP setup
@@ -281,7 +281,7 @@ lbg = []
 ubg = []
 
 # Initial constraints
-[ick] = icfcn.call([0., XD[0][0][0], XA[0][0][0], U[0], P])
+ick = icfcn(0., XD[0][0][0], XA[0][0][0], U[0], P)
 g += [ick]
 lbg.append(ic_min)
 ubg.append(ic_max)
@@ -297,7 +297,7 @@ for k in range(nk):
                 xp_jk += C[j2][j]*XD[k][i][j2]       # get the time derivative of the differential states (eq 10.19b)
             
             # Add collocation equations to the NLP
-            [fk] = ffcn.call([0., xp_jk/h, XD[k][i][j], XA[k][i][j-1], U[k], P])
+            fk = ffcn(0., xp_jk/h, XD[k][i][j], XA[k][i][j-1], U[k], P)
             g += [fk[:ndiff]]                     # impose system dynamics (for the differential states (eq 10.19b))
             lbg.append(np.zeros(ndiff)) # equality constraints
             ubg.append(np.zeros(ndiff)) # equality constraints
@@ -306,7 +306,7 @@ for k in range(nk):
             ubg.append(np.zeros(nalg)) # equality constraints
             
             #  Evaluate the path constraint function
-            [pck] = pcfcn.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+            pck = pcfcn(0., XD[k][i][j], XA[k][i][j-1], U[k], P)
             
             g += [pck]
             lbg.append(pc_min)
@@ -332,7 +332,7 @@ for k in range(nk):
 #   none
 
 # Final constraints (Const, dConst, ConstQ)
-[fck] = fcfcn.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+fck = fcfcn(0., XD[k][i][j], XA[k][i][j-1], U[k], P)
 g += [fck]
 lbg.append(fc_min)
 ubg.append(fc_max)
@@ -340,7 +340,7 @@ ubg.append(fc_max)
 # Objective function of the NLP
 #Implement Mayer term
 Obj = 0
-[obj] = MayerTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+obj = MayerTerm(0., XD[k][i][j], XA[k][i][j-1], U[k], P)
 Obj += obj
 
 # Implement Lagrange term
@@ -352,16 +352,16 @@ ld0 = lDotAtTauRoot[1:,0]
 lagrangeTerm = 0
 for k in range(nk):
     for i in range(nicp):
-        dQs = h*veccat([LagrangeTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])[0] \
+        dQs = h*veccat(*[LagrangeTerm(0., XD[k][i][j], XA[k][i][j-1], U[k], P) \
                         for j in range(1,deg+1)])
-        Qs = mul( ldInv, dQs)
-        m = mul( Qs.T, lAtOne[1:])
+        Qs = mtimes( ldInv, dQs)
+        m = mtimes( Qs.T, lAtOne[1:])
         lagrangeTerm += m
 
 Obj += lagrangeTerm        
 
 # NLP
-nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
+nlp = {'x':V, 'f':Obj, 'g':vertcat(*g)}
 
 ## ----
 ## SOLVE THE NLP
@@ -370,12 +370,12 @@ nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
 # NLP solver options
 opts = {}
 opts["expand"] = True
-opts["max_iter"] = 1000
-opts["tol"] = 1e-4
-opts["linear_solver"] = 'ma27'
+opts["ipopt.max_iter"] = 1000
+opts["ipopt.tol"] = 1e-4
+opts["ipopt.linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
 
 # Initial condition
@@ -390,7 +390,7 @@ arg["lbg"] = np.concatenate(lbg)
 arg["ubg"] = np.concatenate(ubg)
 
 # Solve the problem
-res = solver(arg)
+res = solver(**arg)
 
 # Print the optimal cost
 print "optimal cost: ", float(res["f"])
@@ -441,8 +441,8 @@ for j in range(1,deg+1):
     for j2 in range(1,deg+1):
         if j2 != j:
             La *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
-    lafcn = SXFunction('lafcn', [tau], [La])
-    [Da[j-1]] = lafcn([tau_root[0]])
+    lafcn = Function('lafcn', [tau], [La])
+    Da[j-1] = lafcn(tau_root[0])
 
 xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))
 offset4=0

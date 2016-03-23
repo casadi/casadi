@@ -33,265 +33,182 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_KNITRO_EXPORT
-  casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin* plugin) {
+  int CASADI_NLPSOL_KNITRO_EXPORT
+  casadi_register_nlpsol_knitro(Nlpsol::Plugin* plugin) {
     plugin->creator = KnitroInterface::creator;
     plugin->name = "knitro";
     plugin->doc = KnitroInterface::meta_doc.c_str();
-    plugin->version = 23;
+    plugin->version = 30;
     return 0;
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_KNITRO_EXPORT casadi_load_nlpsolver_knitro() {
-    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_knitro);
+  void CASADI_NLPSOL_KNITRO_EXPORT casadi_load_nlpsol_knitro() {
+    Nlpsol::registerPlugin(casadi_register_nlpsol_knitro);
   }
 
-  KnitroInterface::KnitroInterface(const Function& nlp) : NlpSolverInternal(nlp) {
-    // Monitors
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
-              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
-
-    // Not yet ready
-    //addOption("algorithm",                OT_STRING, GenericType(),
-    // "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
-    //addOption("bar_directinterval",       OT_INTEGER, GenericType(),
-    //  "When using the Interior/Direct algorithm, this parameter controls the maximum number of "
-    //  "consecutive CG steps before trying to force the algorithm to take a direct step again. "
-    //  "See KNITRO documentation.");
-    //addOption("bar_feasible",             OT_STRING, GenericType(),
-    //  "Whether feasibility is given special emphasis. See KNITRO documentation.",
-    //  "no|stay|get|get_stay");
-    //addOption("bar_feasmodetol",          OT_REAL, GenericType(),
-    //  "Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.");
-    //addOption("bar_initmu",               OT_INTEGER, GenericType(),
-    //  "Initial value for the barrier parameter. See KNITRO documentation.");
-    //addOption("bar_initpt",               OT_STRING, GenericType(),
-    //  "Whether to use the initial point strategy with barrier algorithms. "
-    //  "See KNITRO documentation.", "auto|yes|no");
-    //addOption("bar_maxbacktrack",         OT_INTEGER, GenericType(),
-    //  "Maximum allowable number of backtracks during the linesearch of the Interior Direct "
-    //  "algorithm before reverting to a CG step. See KNITRO documentation.");
-    //addOption("bar_maxrefactor",          OT_INTEGER, GenericType(),
-    //  "Maximum number of refactorizations of the KKT system per iteration of the Interior "
-    //  "Direct algorithm before reverting to a CG step. See KNITRO documentation.");
-
-    //addOption("Alg", OT_INTEGER,0, "Algorithm");
-    addOption("BarRule", OT_INTEGER, 0, "Barrier Rule");
-    addOption("NewPoint", OT_BOOLEAN, 0, "Select new-point feature");
-    addOption("GradOpt", OT_INTEGER, 1, "Gradient calculation method");
-    addOption("HessOpt", OT_INTEGER, 1, "Hessian calculation method");
-    addOption("Feasible", OT_BOOLEAN, 1, "Allow infeasible iterations");
-    addOption("HonorBnds", OT_BOOLEAN, 0, "Enforce bounds");
-    addOption("LpSolver", OT_BOOLEAN, 0, "Use LpSolver");
-    addOption("Multistart", OT_BOOLEAN, 0, "Use multistart");
-    //addOption("MsMaxSolves", OT_INTEGER, 1, "Maximum multistart points");
-    addOption("MaxCgIt", OT_INTEGER, 0, "Maximum conjugate gradient iterations");
-    //addOption("MaxCrossTt", OT_INTEGER, 0, "Maximum crossover iterations");
-    addOption("MaxIt", OT_INTEGER, 10000, "Iteration limit");
-    //addOption("MaxTimeCPU", OT_REAL, 1e8, "CPU Time limit");
-    //addOption("MaxTimeReal", OT_REAL, 1e8, "Time limit");
-    addOption("LmSize", OT_INTEGER, 10, "Memory pairsize limit");
-    addOption("Scale", OT_BOOLEAN, 1, "Perform scaling");
-    addOption("ShiftInit", OT_BOOLEAN, 1, "Interior-point shifting initial point");
-    addOption("Soc", OT_INTEGER, 1, "Second order correction");
-    addOption("InitPt", OT_BOOLEAN, 0, "Use initial point strategy");
-    addOption("Delta", OT_REAL, 1.0, "Initial region scaling factor");
-    addOption("FeasModeTol", OT_REAL, 1e-4, "Feasible mode tolerance");
-    addOption("FeasTol", OT_REAL, 1e-6, "Feasible tolerance");
-    addOption("FeasTolAbs", OT_REAL, 0, "Absolute feasible tolerance");
-    addOption("OptTol", OT_REAL, 1e-6, "Relative optimality tolerance");
-    addOption("OptTolAbs", OT_REAL, 0, "Absolute optimality tolerance");
-    addOption("Pivot", OT_REAL, 1e-8, "Initial pivot threshold");
-    addOption("XTol", OT_REAL, 1e-15, "Relative solution change tolerance");
-    addOption("Mu", OT_REAL, 0.1, "Initial barrier parameter");
-    addOption("ObjRange", OT_REAL, 1e20, "Maximum objective value");
-    addOption("OutLev", OT_INTEGER, 2, "Log output level");
-    addOption("Debug", OT_INTEGER, 0, "Debug level");
-
-
-
-    kc_handle_ = 0;
-
-    addOption("contype", OT_INTEGERVECTOR);
+  KnitroInterface::KnitroInterface(const std::string& name, Oracle* nlp)
+    : Nlpsol(name, nlp) {
   }
 
 
   KnitroInterface::~KnitroInterface() {
-    // Free KNITRO memory
-    if (kc_handle_) {
-      /*    KTR_free(&kc_handle_);
-            kc_handle_ = 0;*/
-    }
+    clear_memory();
   }
 
-  void KnitroInterface::init() {
+  Options KnitroInterface::options_
+  = {{&Nlpsol::options_},
+     {{"knitro",
+       {OT_DICT,
+        "Options to be passed to KNITRO"}},
+      {"contype",
+       {OT_INTVECTOR,
+        "Type of constraint"}}
+     }
+  };
+
+  void KnitroInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    NlpSolverInternal::init();
+    Nlpsol::init(opts);
 
-    //if (hasSetOption("Alg")) int_param_["alg"] = getOption("Alg");
-    if (hasSetOption("BarRule")) int_param_["barrule"] = getOption("BarRule");
-    if (hasSetOption("NewPoint")) int_param_["newpoint"] = getOption("NewPoint");
-    if (hasSetOption("GradOpt")) int_param_["gradopt"] = getOption("GradOpt");
-    if (hasSetOption("HessOpt")) int_param_["hessopt"] = getOption("HessOpt");
-    if (hasSetOption("Feasible")) int_param_["feasible"] = getOption("Feasible");
-    if (hasSetOption("HonorBnds")) int_param_["honorbnds"] = getOption("HonorBnds");
-    if (hasSetOption("LpSolver")) int_param_["lpsolver"] = getOption("LpSolver");
-    if (hasSetOption("Multistart")) int_param_["multistart"] = getOption("Multistart");
-    //if (hasSetOption("MsMaxSolves")) int_param_["msmaxsolves"] = getOption("MsMaxSolves");
-    if (hasSetOption("MaxCgIt")) int_param_["maxcgit"] = getOption("MaxCgIt");
-    //if (hasSetOption("MaxCrossTt")) int_param_["maxcrosstt"] = getOption("MaxCrossTt");
-    if (hasSetOption("MaxIt")) int_param_["maxit"] = getOption("MaxIt");
-    //if (hasSetOption("MaxTimeCPU")) double_param_["maxtimecpu"] = getOption("MaxTimeCPU");
-    //if (hasSetOption("MaxTimeReal")) double_param_["maxtimereal"] = getOption("MaxTimeReal");
-    if (hasSetOption("LmSize")) int_param_["lmsize"] = getOption("LmSize");
-    if (hasSetOption("Scale")) int_param_["scale"] = getOption("Scale");
-    if (hasSetOption("ShiftInit")) int_param_["shiftinit"] = getOption("ShiftInit");
-    if (hasSetOption("Soc")) int_param_["soc"] = getOption("Soc");
-    if (hasSetOption("InitPt")) int_param_["initpt"] = getOption("InitPt");
-    if (hasSetOption("Delta")) double_param_["delta"] = getOption("Delta");
-    if (hasSetOption("FeasModeTol")) double_param_["feasmodetol"] = getOption("FeasModeTol");
-    if (hasSetOption("FeasTol")) double_param_["feastol"] = getOption("FeasTol");
-    if (hasSetOption("FeasTolAbs")) double_param_["feastolabs"] = getOption("FeasTolAbs");
-    if (hasSetOption("OptTol")) double_param_["opttol"] = getOption("OptTol");
-    if (hasSetOption("OptTolAbs")) double_param_["opttolabs"] = getOption("OptTolAbs");
-    if (hasSetOption("Pivot")) double_param_["pivot"] = getOption("Pivot");
-    if (hasSetOption("XTol")) double_param_["xtol"] = getOption("XTol");
-    if (hasSetOption("Mu")) double_param_["mu"] = getOption("Mu");
-    if (hasSetOption("ObjRange")) double_param_["objrange"] = getOption("ObjRange");
-    if (hasSetOption("OutLev")) int_param_["outlev"] = getOption("OutLev");
-    if (hasSetOption("Debug")) int_param_["debug"] = getOption("Debug");
-
-    // Get/generate required functions
-    gradF();
-    jacG();
-    if (true) { // NOTE: should be only if HessOpt
-      hessLag();
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="knitro") {
+        opts_ = op.second;
+      } else if (op.first=="contype") {
+        contype_ = op.second;
+      }
     }
+
+    // Type of constraints, general by default
+    if (contype_.empty()) {
+      contype_.resize(ng_, KTR_CONTYPE_GENERAL);
+    } else {
+      casadi_assert(contype_.size()==ng_);
+    }
+
+    // Setup NLP functions
+    fg_fcn_ = create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+    gf_jg_fcn_ = create_function("nlp_gf_jg", {"x", "p"}, {"grad_f_x", "jac_g_x"});
+    jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
+    hess_l_fcn_ = create_function("nlp_jac_f", {"x", "p", "lam_f", "lam_g"},
+                                  {"hess_gamma_x_x"},
+                                  {{"gamma", {"f", "g"}}});
+    hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
+
+    // Allocate persistent memory
+    alloc_w(nx_, true); // wx_
+    alloc_w(nx_, true); // wlbx_
+    alloc_w(nx_, true); // wubx_
+    alloc_w(ng_, true); // wlbg_
+    alloc_w(ng_, true); // wubg_
+  }
+
+  void KnitroInterface::init_memory(void* mem) const {
+    Nlpsol::init_memory(mem);
+    auto m = static_cast<KnitroMemory*>(mem);
 
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block
-    /*  casadi_assert(kc_handle_==0);
-        kc_handle_ = KTR_new();*/
-
+    /*  m.kc_handle = KTR_new(); */
   }
 
-  void KnitroInterface::evaluate() {
+  void KnitroInterface::set_work(void* mem, const double**& arg, double**& res,
+                                 int*& iw, double*& w) const {
+    auto m = static_cast<KnitroMemory*>(mem);
+
+    // Set work in base classes
+    Nlpsol::set_work(mem, arg, res, iw, w);
+
+    // Copy inputs to temporary arrays
+    m->wx = w; w += nx_;
+    m->wlbx = w; w += nx_;
+    m->wubx = w; w += nx_;
+    m->wlbg = w; w += ng_;
+    m->wubg = w; w += ng_;
+  }
+
+  void KnitroInterface::solve(void* mem) const {
+    auto m = static_cast<KnitroMemory*>(mem);
+
     // Allocate KNITRO memory block (move back to init!)
-    casadi_assert(kc_handle_==0);
-    kc_handle_ = KTR_new();
-    casadi_assert(kc_handle_!=0);
+    casadi_assert(m->kc_handle==0);
+    m->kc_handle = KTR_new();
+    casadi_assert(m->kc_handle!=0);
     int status;
 
     // Jacobian sparsity
     vector<int> Jcol, Jrow;
-    if (!jacG_.isNull()) {
-      Jcol = jacG_.output().sparsity().getCol();
-      int sz = jacG_.output().nnz();
-      const int* row = jacG_.output().row();
-      Jrow = vector<int>(row, row+sz);
+    if (!jacg_sp_.is_null()) {
+      Jcol = jacg_sp_.get_col();
+      Jrow = jacg_sp_.get_row();
     }
 
     // Hessian sparsity
-    int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
-    vector<int> Hcol(nnzH), Hrow(nnzH);
+    int nnzH = hesslag_sp_.is_null() ? 0 : hesslag_sp_.nnz();
+    vector<int> Hcol, Hrow;
     if (nnzH>0) {
-      const int* colind = hessLag_.output().colind();
-      int ncol = hessLag_.output().size2();
-      const int* row = hessLag_.output().row();
-      int nz=0;
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
-          Hcol[nz] = cc;
-          Hrow[nz] = row[el];
-          nz++;
-        }
-      }
-      casadi_assert(nz==nnzH);
-
-      status = KTR_set_int_param_by_name(kc_handle_, "hessopt", KTR_HESSOPT_EXACT);
+      Hcol = hesslag_sp_.get_col();
+      Hrow = hesslag_sp_.get_row();
+      status = KTR_set_int_param_by_name(m->kc_handle, "hessopt", KTR_HESSOPT_EXACT);
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     } else {
-      status = KTR_set_int_param_by_name(kc_handle_, "hessopt", KTR_HESSOPT_LBFGS);
+      status = KTR_set_int_param_by_name(m->kc_handle, "hessopt", KTR_HESSOPT_LBFGS);
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     }
 
-    // Set user set options
-    for (std::map<std::string, double>::iterator it=double_param_.begin();
-        it!=double_param_.end(); ++it) {
-      status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
-      if (status!=0) {
-        throw CasadiException("KnitroInterface::evaluate: cannot set " + it->first);
+    // Pass user set options
+    for (auto&& op : opts_) {
+      // Try double
+      if (op.second.can_cast_to(OT_DOUBLE)) {
+        status = KTR_set_double_param_by_name(m->kc_handle, op.first.c_str(), op.second);
+        if (status==0) continue;
       }
-    }
 
-    for (std::map<std::string, int>::iterator it=int_param_.begin(); it!=int_param_.end(); ++it) {
-      status = KTR_set_int_param_by_name(kc_handle_, it->first.c_str(), it->second);
-      if (status!=0) {
-        throw CasadiException("KnitroInterface::evaluate: cannot set " + it->first);
+      // Try integer
+      if (op.second.can_cast_to(OT_INT)) {
+        status = KTR_set_int_param_by_name(m->kc_handle, op.first.c_str(), op.second);
+        if (status==0) continue;
       }
-    }
 
-    for (std::map<std::string, std::string>::iterator it=string_param_.begin();
-        it!=string_param_.end(); ++it) {
-      status = KTR_set_char_param_by_name(kc_handle_, it->first.c_str(), it->second.c_str());
-      if (status!=0) {
-        throw CasadiException("KnitroInterface::evaluate: cannot set " + it->first);
+      // try string
+      if (op.second.can_cast_to(OT_STRING)) {
+        string str = op.second.to_string();
+        status = KTR_set_char_param_by_name(m->kc_handle, op.first.c_str(), str.c_str());
+        if (status==0) continue;
       }
-    }
 
-    // Type of constraints
-    vector<int> cType(ng_, KTR_CONTYPE_GENERAL);
-    if (hasSetOption("contype")) {
-      vector<int> contype = getOption("contype");
-      casadi_assert(contype.size()==cType.size());
-      copy(contype.begin(), contype.end(), cType.begin());
+      // Error if reached this point
+      casadi_error("KNITRO error setting option \"" + op.first + "\"");
     }
 
     // "Correct" upper and lower bounds
-    for (vector<double>::iterator it=input(NLP_SOLVER_LBX).begin();
-        it!=input(NLP_SOLVER_LBX).end(); ++it)
-      if (isinf(*it)) *it = -KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_UBX).begin();
-        it!=input(NLP_SOLVER_UBX).end(); ++it)
-      if (isinf(*it)) *it =  KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_LBG).begin();
-        it!=input(NLP_SOLVER_LBG).end(); ++it)
-      if (isinf(*it)) *it = -KTR_INFBOUND;
-    for (vector<double>::iterator it=input(NLP_SOLVER_UBG).begin();
-        it!=input(NLP_SOLVER_UBG).end(); ++it)
-      if (isinf(*it)) *it =  KTR_INFBOUND;
+    casadi_copy(m->x0, nx_, m->wx);
+    casadi_copy(m->lbx, nx_, m->wlbx);
+    casadi_copy(m->ubx, nx_, m->wubx);
+    casadi_copy(m->lbg, ng_, m->wlbg);
+    casadi_copy(m->ubg, ng_, m->wubg);
+    for (int i=0; i<nx_; ++i) if (isinf(m->wlbx[i])) m->wlbx[i] = -KTR_INFBOUND;
+    for (int i=0; i<nx_; ++i) if (isinf(m->wubx[i])) m->wubx[i] =  KTR_INFBOUND;
+    for (int i=0; i<ng_; ++i) if (isinf(m->wlbg[i])) m->wlbg[i] = -KTR_INFBOUND;
+    for (int i=0; i<ng_; ++i) if (isinf(m->wubg[i])) m->wubg[i] =  KTR_INFBOUND;
 
     // Initialize KNITRO
-    status = KTR_init_problem(kc_handle_,
-                              nx_,
-                              KTR_OBJGOAL_MINIMIZE,
-                              KTR_OBJTYPE_GENERAL,
-                              input(NLP_SOLVER_LBX).ptr(),
-                              input(NLP_SOLVER_UBX).ptr(),
-                              ng_,
-                              getPtr(cType),
-                              input(NLP_SOLVER_LBG).ptr(),
-                              input(NLP_SOLVER_UBG).ptr(),
-                              Jcol.size(),
-                              getPtr(Jcol),
-                              getPtr(Jrow),
-                              nnzH,
-                              getPtr(Hrow),
-                              getPtr(Hcol),
-                              input(NLP_SOLVER_X0).ptr(),
-                              0); // initial lambda
+    status = KTR_init_problem(m->kc_handle, nx_, KTR_OBJGOAL_MINIMIZE,
+                              KTR_OBJTYPE_GENERAL, m->wlbx, m->wubx, ng_, get_ptr(contype_),
+                              m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
+                              nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0); // initial lambda
     casadi_assert_message(status==0, "KTR_init_problem failed");
 
     // Register callback functions
-    status = KTR_set_func_callback(kc_handle_, &callback);
+    status = KTR_set_func_callback(m->kc_handle, &callback);
     casadi_assert_message(status==0, "KTR_set_func_callback failed");
 
-    status = KTR_set_grad_callback(kc_handle_, &callback);
+    status = KTR_set_grad_callback(m->kc_handle, &callback);
     casadi_assert_message(status==0, "KTR_set_grad_callbackfailed");
 
     if (nnzH>0) {
-      status = KTR_set_hess_callback(kc_handle_, &callback);
+      status = KTR_set_hess_callback(m->kc_handle, &callback);
       casadi_assert_message(status==0, "KTR_set_hess_callbackfailed");
     }
 
@@ -299,32 +216,28 @@ namespace casadi {
     vector<double> lambda(nx_+ng_);
 
     // Solve NLP
-    status = KTR_solve(kc_handle_,
-                       output(NLP_SOLVER_X).ptr(),
-                       getPtr(lambda),
-                       0,  // not used
-                       output(NLP_SOLVER_F).ptr(),
-                       0,  // not used
-                       0,  // not used
-                       0,  // not used
-                       0,  // not used
-                       0,  // not used
-                       static_cast<void*>(this)); // to be retrieved in the callback function
-    stats_["return_status"] = status;
+    double f;
+    status = KTR_solve(m->kc_handle, m->wx, get_ptr(lambda), 0, &f,
+                       0, 0, 0, 0, 0, static_cast<void*>(&m));
+    m->return_status = return_codes(status);
 
-    // Copy constraints
-    nlp_.output(NL_G).get(output(NLP_SOLVER_G));
+    // Output primal solution
+    casadi_copy(m->wx, nx_, m->x);
 
-    // Copy lagrange multipliers
-    output(NLP_SOLVER_LAM_G).setNZ(getPtr(lambda));
-    output(NLP_SOLVER_LAM_X).setNZ(getPtr(lambda)+ng_);
+    // Output dual solution
+    casadi_copy(get_ptr(lambda), ng_, m->lam_g);
+    casadi_copy(get_ptr(lambda)+ng_, nx_, m->lam_x);
+
+    // Output optimal cost
+    if (m->f) *m->f = f;
+
+    // Calculate constraints
+    if (m->g) calc_function(m, fg_fcn_, {m->wx, m->p}, {0, m->g});
 
     // Free memory (move to destructor!)
-    KTR_free(&kc_handle_);
-    kc_handle_ = 0;
-
+    KTR_free(&m->kc_handle);
+    m->kc_handle = 0;
   }
-
 
   int KnitroInterface::callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
                                const int nnzH, const double* const x, const double* const lambda,
@@ -333,103 +246,102 @@ namespace casadi {
                                void *userParams) {
     try {
       // Get a pointer to the calling object
-      KnitroInterface* this_ = static_cast<KnitroInterface*>(userParams);
+      auto m = static_cast<KnitroMemory*>(userParams);
 
       // Direct to the correct function
       switch (evalRequestCode) {
-      case KTR_RC_EVALFC: this_->evalfc(x, *obj, c); break;
-      case KTR_RC_EVALGA: this_->evalga(x, objGrad, jac); break;
-      case KTR_RC_EVALH:  this_->evalh(x, lambda, hessian); break;
-      default: casadi_assert_message(0, "KnitroInterface::callback: unknown method");
+      case KTR_RC_EVALFC:
+        m->self.calc_function(m, m->self.fg_fcn_, {x, m->p}, {obj, c});
+        break;
+      case KTR_RC_EVALGA:
+        m->self.calc_function(m, m->self.gf_jg_fcn_, {x, m->p}, {objGrad, jac});
+        break;
+      case KTR_RC_EVALH:
+        {
+          double sigma = 1.;
+          if (m->self.calc_function(m, m->self.hess_l_fcn_, {x, m->p, &sigma, lambda}, {hessian})) {
+            casadi_error("calc_hess_l failed");
+          }
+        }
+        break;
+      default:
+        casadi_error("KnitroInterface::callback: unknown method");
       }
 
       return 0;
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "KnitroInterface::callback caugth exception: " << ex.what() << endl;
+      userOut<true, PL_WARN>() << "KnitroInterface::callback caugth exception: "
+                               << ex.what() << endl;
       return -1;
     }
   }
 
-  void KnitroInterface::evalfc(const double* x, double& obj, double *c) {
-    // Pass the argument to the function
-    nlp_.setInputNZ(x, NL_X);
-    nlp_.setInput(input(NLP_SOLVER_P), NL_P);
-
-    // Evaluate the function
-    nlp_.evaluate();
-
-    // Get the result
-    nlp_.output(NL_F).get(obj);
-    nlp_.output(NL_G).get(c);
-
-    // Printing
-    if (monitored("eval_f")) {
-      userOut() << "x = " << nlp_.input(NL_X) << endl;
-      userOut() << "f = " << nlp_.output(NL_F) << endl;
+  const char* KnitroInterface::return_codes(int flag) {
+    switch (flag) {
+    case KTR_RC_OPTIMAL_OR_SATISFACTORY: return "KTR_RC_OPTIMAL_OR_SATISFACTORY";
+    case KTR_RC_NEAR_OPT: return "KTR_RC_NEAR_OPT";
+    case KTR_RC_FEAS_XTOL: return "KTR_RC_FEAS_XTOL";
+    case KTR_RC_FEAS_NO_IMPROVE: return "KTR_RC_FEAS_NO_IMPROVE";
+    case KTR_RC_FEAS_FTOL: return "KTR_RC_FEAS_FTOL";
+    case KTR_RC_INFEASIBLE: return "KTR_RC_INFEASIBLE";
+    case KTR_RC_INFEAS_XTOL: return "KTR_RC_INFEAS_XTOL";
+    case KTR_RC_INFEAS_NO_IMPROVE: return "KTR_RC_INFEAS_NO_IMPROVE";
+    case KTR_RC_INFEAS_MULTISTART: return "KTR_RC_INFEAS_MULTISTART";
+    case KTR_RC_INFEAS_CON_BOUNDS: return "KTR_RC_INFEAS_CON_BOUNDS";
+    case KTR_RC_INFEAS_VAR_BOUNDS: return "KTR_RC_INFEAS_VAR_BOUNDS";
+    case KTR_RC_UNBOUNDED: return "KTR_RC_UNBOUNDED";
+    case KTR_RC_ITER_LIMIT_FEAS: return "KTR_RC_ITER_LIMIT_FEAS";
+    case KTR_RC_TIME_LIMIT_FEAS: return "KTR_RC_TIME_LIMIT_FEAS";
+    case KTR_RC_FEVAL_LIMIT_FEAS: return "KTR_RC_FEVAL_LIMIT_FEAS";
+    case KTR_RC_MIP_EXH_FEAS: return "KTR_RC_MIP_EXH_FEAS";
+    case KTR_RC_MIP_TERM_FEAS: return "KTR_RC_MIP_TERM_FEAS";
+    case KTR_RC_MIP_SOLVE_LIMIT_FEAS: return "KTR_RC_MIP_SOLVE_LIMIT_FEAS";
+    case KTR_RC_MIP_NODE_LIMIT_FEAS: return "KTR_RC_MIP_NODE_LIMIT_FEAS";
+    case KTR_RC_ITER_LIMIT_INFEAS: return "KTR_RC_ITER_LIMIT_INFEAS";
+    case KTR_RC_TIME_LIMIT_INFEAS: return "KTR_RC_TIME_LIMIT_INFEAS";
+    case KTR_RC_FEVAL_LIMIT_INFEAS: return "KTR_RC_FEVAL_LIMIT_INFEAS";
+    case KTR_RC_MIP_EXH_INFEAS: return "KTR_RC_MIP_EXH_INFEAS";
+    case KTR_RC_MIP_SOLVE_LIMIT_INFEAS: return "KTR_RC_MIP_SOLVE_LIMIT_INFEAS";
+    case KTR_RC_MIP_NODE_LIMIT_INFEAS: return "KTR_RC_MIP_NODE_LIMIT_INFEAS";
+    case KTR_RC_CALLBACK_ERR: return "KTR_RC_CALLBACK_ERR";
+    case KTR_RC_LP_SOLVER_ERR: return "KTR_RC_LP_SOLVER_ERR";
+    case KTR_RC_EVAL_ERR: return "KTR_RC_EVAL_ERR";
+    case KTR_RC_OUT_OF_MEMORY: return "KTR_RC_OUT_OF_MEMORY";
+    case KTR_RC_USER_TERMINATION: return "KTR_RC_USER_TERMINATION";
+    case KTR_RC_OPEN_FILE_ERR: return "KTR_RC_OPEN_FILE_ERR";
+    case KTR_RC_BAD_N_OR_F: return "KTR_RC_BAD_N_OR_F";
+    case KTR_RC_BAD_CONSTRAINT: return "KTR_RC_BAD_CONSTRAINT";
+    case KTR_RC_BAD_JACOBIAN: return "KTR_RC_BAD_JACOBIAN";
+    case KTR_RC_BAD_HESSIAN: return "KTR_RC_BAD_HESSIAN";
+    case KTR_RC_BAD_CON_INDEX: return "KTR_RC_BAD_CON_INDEX";
+    case KTR_RC_BAD_JAC_INDEX: return "KTR_RC_BAD_JAC_INDEX";
+    case KTR_RC_BAD_HESS_INDEX: return "KTR_RC_BAD_HESS_INDEX";
+    case KTR_RC_BAD_CON_BOUNDS: return "KTR_RC_BAD_CON_BOUNDS";
+    case KTR_RC_BAD_VAR_BOUNDS: return "KTR_RC_BAD_VAR_BOUNDS";
+    case KTR_RC_ILLEGAL_CALL: return "KTR_RC_ILLEGAL_CALL";
+    case KTR_RC_BAD_KCPTR: return "KTR_RC_BAD_KCPTR";
+    case KTR_RC_NULL_POINTER: return "KTR_RC_NULL_POINTER";
+    case KTR_RC_BAD_INIT_VALUE: return "KTR_RC_BAD_INIT_VALUE";
+    case KTR_RC_NEWPOINT_HALT: return "KTR_RC_NEWPOINT_HALT";
+    case KTR_RC_BAD_LICENSE: return "KTR_RC_BAD_LICENSE";
+    case KTR_RC_BAD_PARAMINPUT: return "KTR_RC_BAD_PARAMINPUT";
+    case KTR_RC_LINEAR_SOLVER_ERR: return "KTR_RC_LINEAR_SOLVER_ERR";
+    case KTR_RC_DERIV_CHECK_FAILED: return "KTR_RC_DERIV_CHECK_FAILED";
+    case KTR_RC_DERIV_CHECK_TERMINATE: return "KTR_RC_DERIV_CHECK_TERMINATE";
+    case KTR_RC_INTERNAL_ERROR: return "KTR_RC_INTERNAL_ERROR";
     }
-    if (monitored("eval_g")) {
-      userOut() << "x = " << nlp_.input(NL_X) << endl;
-      userOut() << "g = " << nlp_.output(NL_G) << endl;
-    }
+    return 0;
   }
 
-  void KnitroInterface::evalga(const double* x, double* objGrad, double* jac) {
-    // Pass the argument to the function
-    gradF_.setInputNZ(x, NL_X);
-    gradF_.setInput(input(NLP_SOLVER_P), NL_P);
-
-    // Evaluate the function using adjoint mode AD
-    gradF_.evaluate();
-
-    // Get the result
-    gradF_.output().get(objGrad);
-
-    // Printing
-    if (monitored("eval_grad_f")) {
-      userOut() << "x = " << gradF_.input(NL_X) << endl;
-      userOut() << "grad_f = " << gradF_.output() << endl;
-    }
-
-    if (!jacG_.isNull()) {
-      // Pass the argument to the Jacobian function
-      jacG_.setInputNZ(x, NL_X);
-      jacG_.setInput(input(NLP_SOLVER_P), NL_P);
-
-      // Evaluate the Jacobian function
-      jacG_.evaluate();
-
-      // Get the result
-      jacG_.output().getNZ(jac);
-
-      // Printing
-      if (monitored("eval_jac_g")) {
-        userOut() << "x = " << jacG_.input(NL_X) << endl;
-        userOut() << "jac_g = " << jacG_.output() << endl;
-      }
-    }
+  KnitroMemory::KnitroMemory(const KnitroInterface& self) : self(self) {
+    this->kc_handle = 0;
   }
 
-  void KnitroInterface::evalh(const double* x, const double* lambda, double* hessian) {
-    // Pass the argument to the function
-    hessLag_.setInputNZ(x, NL_X);
-    hessLag_.setInput(input(NLP_SOLVER_P), NL_P);
-    hessLag_.setInput(1.0, NL_NUM_IN+NL_F);
-    hessLag_.setInputNZ(lambda, NL_NUM_IN+NL_G);
-
-    // Evaluate
-    hessLag_.evaluate();
-
-    // Get results
-    hessLag_.output().getSym(hessian);
-
-    // Printing
-    if (monitored("eval_h")) {
-      userOut() << "eval_h" << endl;
-      userOut() << "x = " << hessLag_.input(0) << endl;
-      userOut() << "lambda = " << hessLag_.input(1) << endl;
-      userOut() << "scale = " << hessLag_.input(2) << endl;
-      userOut() << "H = " << hessLag_ << endl;
-    }
+  KnitroMemory::~KnitroMemory() {
+    // Currently no persistent memory since KNITRO requires knowledge of nature of bounds
+    // if (this->kc_handle) {
+    //   KTR_free(&this->kc_handle);
+    // }
   }
 
 } // namespace casadi

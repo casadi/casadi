@@ -78,7 +78,7 @@ void GslInternal::init(){
   f_.init();
   casadi_assert(f_.getNumInputs()==DAE_NUM_IN);
   casadi_assert(f_.getNumOutputs()==DAE_NUM_OUT);
-  if(!q_.isNull()){
+  if(!q_.is_null()){
     q_.init();
     casadi_assert(q_.getNumInputs()==DAE_NUM_IN);
     casadi_assert(q_.getNumOutputs()==DAE_NUM_OUT);
@@ -88,7 +88,7 @@ void GslInternal::init(){
   int nx = f_.output(INTEGRATOR_XF).numel();
 
   // Add quadratures, if any
-  if(!q_.isNull()) nx += q_.output().numel();
+  if(!q_.is_null()) nx += q_.output().numel();
 
   // Number of parameters
   int np = f_.input(DAE_P).numel();

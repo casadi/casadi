@@ -31,7 +31,7 @@ namespace casadi {
 
   Inverse::Inverse(const MX& x) {
     casadi_assert_message(x.size1()==x.size2(),
-                          "Inverse: matrix must be square, but you supllied " << x.dimString());
+                          "Inverse: matrix must be square, but you supllied " << x.dim());
     setDependencies(x);
     setSparsity(Sparsity::dense(x.size1(), x.size2()));
   }
@@ -40,7 +40,7 @@ namespace casadi {
     return "inv(" + arg.at(0) + ")";
   }
 
-  void Inverse::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Inverse::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = inv(arg[0]);
   }
 
@@ -48,7 +48,7 @@ namespace casadi {
                         std::vector<std::vector<MX> >& fsens) {
     MX inv_X = shared_from_this<MX>();
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = -mul(inv_X, mul(fseed[d][0], inv_X));
+      fsens[d][0] = -mtimes(inv_X, mtimes(fseed[d][0], inv_X));
     }
   }
 
@@ -57,7 +57,7 @@ namespace casadi {
     MX inv_X = shared_from_this<MX>();
     MX trans_inv_X = inv_X.T();
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0] -= mul(trans_inv_X, mul(aseed[d][0], trans_inv_X));
+      asens[d][0] -= mtimes(trans_inv_X, mtimes(aseed[d][0], trans_inv_X));
     }
   }
 

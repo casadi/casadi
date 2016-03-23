@@ -67,7 +67,7 @@ if check_sx_oo:
     # Calculate gradient
     F.setInput(x0[n])
     F.setAdjSeed(1.0)
-    print "starting evaluation: ", F.countNodes(), " nodes"
+    print "starting evaluation: ", F.n_nodes(), " nodes"
     t1 = time()
     n_repeats = 100
     for _ in range(n_repeats):
@@ -86,7 +86,7 @@ if check_sx_sct:
     
     # Calculate gradient
     F.setInput(x0[n])
-    print "starting evaluation: ", F.countNodes(), " nodes"
+    print "starting evaluation: ", F.n_nodes(), " nodes"
     t1 = time()
     n_repeats = 100
     for _ in range(n_repeats):
@@ -106,7 +106,7 @@ if check_mx_oo:
     # Calculate gradient
     F.setInput(x0[n])
     F.setAdjSeed(1.0)
-    print "starting evaluation: ", F.countNodes(), " nodes"
+    print "starting evaluation: ", F.n_nodes(), " nodes"
     t1 = time()
     n_repeats = 100
     for _ in range(n_repeats):
@@ -150,7 +150,7 @@ if check_mx_sx_oo:
     # Calculate gradient
     F.setInput(x0[n])
     F.setAdjSeed(1.0)
-    print "starting evaluation: ", F.countNodes(), " nodes"
+    print "starting evaluation: ", F.n_nodes(), " nodes"
     t1 = time()
     n_repeats = 100
     for _ in range(n_repeats):

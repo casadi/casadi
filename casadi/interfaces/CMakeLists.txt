@@ -26,24 +26,16 @@ if(CSPARSE_FOUND)
   add_subdirectory(csparse)
 endif()
 
-if(DSDP_FOUND)
-  add_subdirectory(dsdp)
-endif()
-
-if(MOSEK_FOUND)
-  add_subdirectory(mosek)
-endif()
-
 if(CLANG_FOUND)
   add_subdirectory(clang)
 endif()
 
-if(ECOS_FOUND)
-  add_subdirectory(ecos)
-endif()
-
 if(OOQP_FOUND)
   add_subdirectory(ooqp)
+endif()
+
+if(GUROBI_FOUND)
+  add_subdirectory(gurobi)
 endif()
 
 if(WORHP_FOUND)
@@ -56,10 +48,6 @@ endif()
 
 if(SNOPT_FOUND OR WITH_SNOPT_FORCE_DUMMY)
   add_subdirectory(snopt)
-endif()
-
-if(SLICOT_FOUND)
-  add_subdirectory(slicot)
 endif()
 
 if(TINYXML_FOUND)

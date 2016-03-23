@@ -26,9 +26,9 @@
       #include "implicit_to_nlp.hpp"
       #include <string>
 
-      const std::string casadi::QpToImplicit::meta_doc=
+      const std::string casadi::ImplicitToNlp::meta_doc=
       "\n"
-"Use an NlpSolver as ImplicitFunction solver\n"
+"Use an Nlpsol as Rootfinder solver\n"
 "\n"
 "\n"
 ">List of available options\n"

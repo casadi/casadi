@@ -61,7 +61,7 @@ namespace casadi {
       DAE or implicit ODE:         0 ==  dae(t, x, s, z, u, p, d, sdot)
       algebraic equations:         0 ==  alg(t, x, s, z, u, p, d)
       quadrature equations:  \dot{q} == quad(t, x, s, z, u, p, d)
-      deppendent parameters:       d == ddef(t, x, s, z, u, p, d)
+      dependent parameters:        d == ddef(t, x, s, z, u, p, d)
       output equations:            y == ydef(t, x, s, z, u, p, d)
       \endverbatim
 
@@ -130,7 +130,7 @@ namespace casadi {
     /** \brief Named constants */
     std::vector<MX> c, cdef;
 
-    /** \brief Dependent parameters and corresponding definitions 
+    /** \brief Dependent parameters and corresponding definitions
      * Interdependencies are allowed but must be non-cyclic.
      */
     std::vector<MX> d, ddef, lam_ddef;
@@ -184,7 +184,7 @@ namespace casadi {
     void add_quad(const MX& new_quad, const std::string& name=std::string());
 
     /// Check if dimensions match
-    void sanityCheck() const;
+    void sanity_check() const;
     ///@}
 
     /** @name Manipulation
@@ -199,10 +199,10 @@ namespace casadi {
     void eliminate_alg();
 
     /// Transform the implicit DAE to a semi-explicit DAE
-    void makeSemiExplicit();
+    void make_semi_explicit();
 
     /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
-    void makeExplicit();
+    void make_explicit();
 
     /// Sort dependent parameters
     void sort_d();
@@ -223,17 +223,17 @@ namespace casadi {
     void sort_alg();
 
     /// Scale the variables
-    void scaleVariables();
+    void scale_variables();
 
     /// Scale the implicit equations
-    void scaleEquations();
+    void scale_equations();
     ///@}
 
     /** @name Import and export
      */
     ///@{
     /// Import existing problem from FMI/XML
-    void parseFMI(const std::string& filename);
+    void parse_fmi(const std::string& filename);
 
 #ifndef SWIG
     // Input convension in codegen
@@ -266,28 +266,28 @@ namespace casadi {
     };
 
     // Get string representation for input, given enum
-    static std::string inputString(DaeBuilderIn ind);
+    static std::string name_in(DaeBuilderIn ind);
 
     // Get string representation for all inputs
-    static std::string inputString();
+    static std::string name_in();
 
     // Get enum representation for input, given string
-    static DaeBuilderIn inputEnum(const std::string& id);
+    static DaeBuilderIn enum_in(const std::string& id);
 
     // Get enum representation for input, given vector of strings
-    static std::vector<DaeBuilderIn> inputEnum(const std::vector<std::string>& id);
+    static std::vector<DaeBuilderIn> enum_in(const std::vector<std::string>& id);
 
     // Get string representation for output, given enum
-    static std::string outputString(DaeBuilderOut ind);
+    static std::string name_out(DaeBuilderOut ind);
 
     // Get string representation for all outputs
-    static std::string outputString();
+    static std::string name_out();
 
     // Get enum representation for output, given string
-    static DaeBuilderOut outputEnum(const std::string& id);
+    static DaeBuilderOut enum_out(const std::string& id);
 
     // Get enum representation for output, given vector of strings
-    static std::vector<DaeBuilderOut> outputEnum(const std::vector<std::string>& id);
+    static std::vector<DaeBuilderOut> enum_out(const std::vector<std::string>& id);
 
     // Get input expression, given enum
     std::vector<MX> input(DaeBuilderIn ind) const;
@@ -306,13 +306,13 @@ namespace casadi {
 #endif // SWIG
 
     /// Add a named linear combination of output expressions
-    MX addLinearCombination(const std::string& name,
+    MX add_lc(const std::string& name,
                             const std::vector<std::string>& f_out);
 
     /// Construct a function object
-    MXFunction create(const std::string& fname,
-                      const std::vector<std::string>& s_in,
-                      const std::vector<std::string>& s_out) const;
+    Function create(const std::string& fname,
+                    const std::vector<std::string>& s_in,
+                    const std::vector<std::string>& s_out) const;
     ///@}
 
     /// Get variable expression by name
@@ -331,10 +331,10 @@ namespace casadi {
     std::vector<double> nominal(const MX& var) const;
 
     /// Set the nominal value by name
-    void setNominal(const std::string& name, double val);
+    void set_nominal(const std::string& name, double val);
 
     /// Set the nominal value(s) by expression
-    void setNominal(const MX& var, const std::vector<double>& val);
+    void set_nominal(const MX& var, const std::vector<double>& val);
 
     /// Get the lower bound by name
     double min(const std::string& name, bool normalized=false) const;
@@ -343,10 +343,10 @@ namespace casadi {
     std::vector<double> min(const MX& var, bool normalized=false) const;
 
     /// Set the lower bound by name
-    void setMin(const std::string& name, double val, bool normalized=false);
+    void set_min(const std::string& name, double val, bool normalized=false);
 
     /// Set the lower bound(s) by expression
-    void setMin(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_min(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the upper bound by name
     double max(const std::string& name, bool normalized=false) const;
@@ -355,22 +355,22 @@ namespace casadi {
     std::vector<double> max(const MX& var, bool normalized=false) const;
 
     /// Set the upper bound by name
-    void setMax(const std::string& name, double val, bool normalized=false);
+    void set_max(const std::string& name, double val, bool normalized=false);
 
     /// Set the upper bound(s) by expression
-    void setMax(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_max(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the initial guess by name
-    double initialGuess(const std::string& name, bool normalized=false) const;
+    double guess(const std::string& name, bool normalized=false) const;
 
     /// Get the initial guess(es) by expression
-    std::vector<double> initialGuess(const MX& var, bool normalized=false) const;
+    std::vector<double> guess(const MX& var, bool normalized=false) const;
 
     /// Set the initial guess by name
-    void setInitialGuess(const std::string& name, double val, bool normalized=false);
+    void set_guess(const std::string& name, double val, bool normalized=false);
 
     /// Set the initial guess(es) by expression
-    void setInitialGuess(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_guess(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) value at time 0 by name
     double start(const std::string& name, bool normalized=false) const;
@@ -379,22 +379,22 @@ namespace casadi {
     std::vector<double> start(const MX& var, bool normalized=false) const;
 
     /// Set the (optionally normalized) value at time 0 by name
-    void setStart(const std::string& name, double val, bool normalized=false);
+    void set_start(const std::string& name, double val, bool normalized=false);
 
     /// Set the (optionally normalized) value(s) at time 0 by expression
-    void setStart(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_start(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) derivative value at time 0 by name
-    double derivativeStart(const std::string& name, bool normalized=false) const;
+    double derivative_start(const std::string& name, bool normalized=false) const;
 
     /// Get the (optionally normalized) derivative value(s) at time 0 by expression
-    std::vector<double> derivativeStart(const MX& var, bool normalized=false) const;
+    std::vector<double> derivative_start(const MX& var, bool normalized=false) const;
 
     /// Set the (optionally normalized) derivative value at time 0 by name
-    void setDerivativeStart(const std::string& name, double val, bool normalized=false);
+    void set_derivative_start(const std::string& name, double val, bool normalized=false);
 
     /// Set the (optionally normalized) derivative value(s) at time 0 by expression
-    void setDerivativeStart(const MX& var, const std::vector<double>& val, bool normalized=false);
+    void set_derivative_start(const MX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the unit for a component
     std::string unit(const std::string& name) const;
@@ -403,7 +403,7 @@ namespace casadi {
     std::string unit(const MX& var) const;
 
     /// Set the unit for a component
-    void setUnit(const std::string& name, const std::string& val);
+    void set_unit(const std::string& name, const std::string& val);
 
     ///  Print representation
     void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
@@ -412,13 +412,13 @@ namespace casadi {
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
 
     /// Add a variable
-    void addVariable(const std::string& name, const Variable& var);
+    void add_variable(const std::string& name, const Variable& var);
 
     /// Add a new variable: returns corresponding symbolic expression
-    MX addVariable(const std::string& name, int n=1);
+    MX add_variable(const std::string& name, int n=1);
 
     /// Add a new variable: returns corresponding symbolic expression
-    MX addVariable(const std::string& name, const Sparsity& sp);
+    MX add_variable(const std::string& name, const Sparsity& sp);
 
     ///@{
     /// Access a variable by name
@@ -431,7 +431,7 @@ namespace casadi {
   protected:
 
     /// Get the qualified name
-    static std::string qualifiedName(const XmlNode& nn);
+    static std::string qualified_name(const XmlNode& nn);
 
     /// Find of variable by name
     typedef std::map<std::string, Variable> VarMap;
@@ -441,10 +441,10 @@ namespace casadi {
     std::map<std::string, MX> lin_comb_;
 
     /// Read an equation
-    MX readExpr(const XmlNode& odenode);
+    MX read_expr(const XmlNode& odenode);
 
     /// Read a variable
-    Variable& readVariable(const XmlNode& node);
+    Variable& read_variable(const XmlNode& node);
 
     /// Get an attribute by expression
     typedef double (DaeBuilder::*getAtt)(const std::string& name, bool normalized) const;
@@ -456,11 +456,11 @@ namespace casadi {
 
     /// Set an attribute by expression
     typedef void (DaeBuilder::*setAtt)(const std::string& name, double val, bool normalized);
-    void setAttribute(setAtt f, const MX& var, const std::vector<double>& val, bool normalized);
+    void set_attribute(setAtt f, const MX& var, const std::vector<double>& val, bool normalized);
 
     /// Set a symbolic attribute by expression
     typedef void (DaeBuilder::*setAttS)(const std::string& name, const MX& val);
-    void setAttribute(setAttS f, const MX& var, const MX& val);
+    void set_attribute(setAttS f, const MX& var, const MX& val);
 
 #endif // SWIG
 

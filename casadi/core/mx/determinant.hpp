@@ -43,14 +43,11 @@ namespace casadi {
     /// Constructor
     Determinant(const MX& x);
 
-    /// Clone function
-    virtual Determinant* clone() const { return new Determinant(*this);}
-
     /// Destructor
     virtual ~Determinant() {}
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -64,7 +61,7 @@ namespace casadi {
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_DETERMINANT;}
+    virtual int op() const { return OP_DETERMINANT;}
   };
 
 

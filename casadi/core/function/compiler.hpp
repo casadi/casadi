@@ -27,10 +27,11 @@
 #define CASADI_COMPILER_HPP
 
 #include "function.hpp"
-
+#include "../casadi_file.hpp"
 
 namespace casadi {
 
+  // Forward declaration of internal class
   class CompilerInternal;
 
   /** \brief Compiler
@@ -43,7 +44,7 @@ namespace casadi {
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT Compiler : public OptionsFunctionality {
+  class CASADI_EXPORT Compiler : public SharedObject {
   public:
 
     /// Default constructor
@@ -59,7 +60,7 @@ namespace casadi {
     const CompilerInternal* operator->() const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
 
     /// Check if a plugin is available
     static bool hasPlugin(const std::string& name);
@@ -75,7 +76,42 @@ namespace casadi {
 
 #ifndef SWIG
     /// Get a function pointer for numerical evaluation
-    void* getFunction(const std::string& symname);
+    void* get_function(const std::string& symname);
+
+    /// Get meta information
+    const ParsedFile& meta() const;
+#endif // SWIG
+  };
+
+  // Forward declaration of internal class
+  class LibraryInternal;
+
+  /** \brief Library, either just-in-time compiled or dynamically loaded
+  */
+  class CASADI_EXPORT Library : public SharedObject {
+  public:
+    /// Default constructor
+    Library();
+
+    // Constructor, DLL
+    explicit Library(const std::string& bin_name);
+
+    // Constructor, JIT
+    explicit Library(const Compiler& compiler);
+
+    /// Access functions of the node
+    LibraryInternal* operator->();
+    const LibraryInternal* operator->() const;
+
+    // Check if symbol exists
+    bool has(const std::string& sym) const;
+
+#ifndef SWIG
+    // Dummy type
+    signal_t get(const std::string& sym);
+
+    // Get meta
+    const ParsedFile& meta() const;
 #endif // SWIG
   };
 

@@ -26,9 +26,7 @@
 #ifndef CASADI_COLLOCATION_INTEGRATOR_HPP
 #define CASADI_COLLOCATION_INTEGRATOR_HPP
 
-#include "implicit_fixed_step_integrator.hpp"
-#include "casadi/core/function/mx_function.hpp"
-#include "casadi/core/function/implicit_function.hpp"
+#include "casadi/core/function/integrator_impl.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
 #include <casadi/solvers/casadi_integrator_collocation_export.h>
 
@@ -60,28 +58,27 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit CollocationIntegrator(const Function& f, const Function& g);
-
-    /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
-    /// Clone
-    virtual CollocationIntegrator* clone() const
-    { return new CollocationIntegrator(*this);}
-
-    /// Create a new integrator
-    virtual CollocationIntegrator* create(const Function& f, const Function& g) const
-    { return new CollocationIntegrator(f, g);}
+    explicit CollocationIntegrator(const std::string& name, Oracle* dae);
 
     /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new CollocationIntegrator(f, g);}
+    static Integrator* creator(const std::string& name, Oracle* dae) {
+      return new CollocationIntegrator(name, dae);
+    }
 
     /// Destructor
     virtual ~CollocationIntegrator();
 
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "collocation";}
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /// Initialize stage
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// Setup F and G
     virtual void setupFG();
@@ -89,14 +86,19 @@ namespace casadi {
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
 
-    /// Get initial guess for the algebraic variable
-    virtual void calculateInitialConditions();
+    /** \brief Reset the forward problem */
+    virtual void reset(IntegratorMemory* mem, double t, const double* x,
+                       const double* z, const double* p) const;
 
-    /// Get initial guess for the algebraic variable (backward problem)
-    virtual void calculateInitialConditionsB();
+    /// Reset the backward problem and take time to tf
+    virtual void resetB(IntegratorMemory* mem, double t, const double* rx,
+                        const double* rz, const double* rp) const;
 
     // Interpolation order
     int deg_;
+
+    // Collocation scheme
+    std::string collocation_scheme_;
 
     /// A documentation string
     static const std::string meta_doc;

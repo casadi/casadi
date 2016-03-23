@@ -26,54 +26,70 @@
 #ifndef CASADI_NEWTON_HPP
 #define CASADI_NEWTON_HPP
 
-#include "casadi/core/function/implicit_function_internal.hpp"
-#include "casadi/core/function/nlp_solver.hpp"
-#include "casadi/core/function/linear_solver.hpp"
+#include "casadi/core/function/rootfinder_impl.hpp"
+#include <casadi/solvers/casadi_rootfinder_newton_export.h>
 
-#include <casadi/solvers/casadi_implicitfunction_newton_export.h>
-
-/** \defgroup plugin_ImplicitFunction_newton
+/** \defgroup plugin_Rootfinder_newton
      Implements simple newton iterations to solve an implicit function.
 */
 
-/** \pluginsection{ImplicitFunction,newton} */
+/** \pluginsection{Rootfinder,newton} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{ImplicitFunction,newton}
+  // Memory
+  struct CASADI_ROOTFINDER_NEWTON_EXPORT NewtonMemory {
+    /// Constructor
+    NewtonMemory();
 
-      @copydoc ImplicitFunction_doc
-      @copydoc plugin_ImplicitFunction_newton
+    /// Stats
+    const char* return_status;
+    int iter;
+  };
+
+  /** \brief \pluginbrief{Rootfinder,newton}
+
+      @copydoc Rootfinder_doc
+      @copydoc plugin_Rootfinder_newton
 
       \author Joris Gillis
       \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT Newton
-      : public ImplicitFunctionInternal {
+  class CASADI_ROOTFINDER_NEWTON_EXPORT Newton : public Rootfinder {
   public:
     /** \brief  Constructor */
-    explicit Newton(const Function& f);
+    explicit Newton(const std::string& name, const Function& f);
 
     /** \brief  Destructor */
     virtual ~Newton();
 
-    /** \brief  Clone */
-    virtual Newton* clone() const { return new Newton(*this);}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "newton";}
 
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f) const
-    { return new Newton(f);}
+    /** \brief  Create a new Rootfinder */
+    static Rootfinder* creator(const std::string& name, const Function& f) {
+      return new Newton(name, f);
+    }
 
-    /** \brief  Create a new ImplicitFunction */
-    static ImplicitFunctionInternal* creator(const Function& f)
-    { return new Newton(f);}
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
 
     /** \brief  Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
-    /** \brief  Solve the nonlinear system of equations */
-    virtual void solveNonLinear();
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new NewtonMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<NewtonMemory*>(mem);}
+
+    /// Solve the system of equations and calculate derivatives
+    virtual void eval(void* mem, const double** arg, double** res,
+                      int* iw, double* w) const;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -92,11 +108,11 @@ namespace casadi {
     bool print_iteration_;
 
     /// Print iteration header
-    void printIteration(std::ostream &stream);
+    void printIteration(std::ostream &stream) const;
 
     /// Print iteration
-    void printIteration(std::ostream &stream, int iter, double abstol, double abstolStep);
-
+    void printIteration(std::ostream &stream, int iter,
+                        double abstol, double abstolStep) const;
   };
 
 } // namespace casadi

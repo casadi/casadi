@@ -28,7 +28,7 @@
 
       const std::string casadi::QpToNlp::meta_doc=
       "\n"
-"Solve QPs using an NlpSolver\n"
+"Solve QPs using an Nlpsol\n"
 "\n"
 "\n"
 ">List of available options\n"
@@ -44,7 +44,7 @@
 "+------------------+\n"
 "|        Id        |\n"
 "+==================+\n"
-"| nlp_solver_stats |\n"
+"| nlpsol_stats |\n"
 "+------------------+\n"
 "\n"
 "\n"

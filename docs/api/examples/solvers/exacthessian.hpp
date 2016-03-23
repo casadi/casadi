@@ -23,14 +23,14 @@
  */
 
 /** 
-* This example looks at a use of an exact hessian for the NlpSolver class
+* This example looks at a use of an exact hessian for the NLP solvers
 *
 *
 * \pythonexample{solvers/exacthessian}
 *
 * \sa
 * \code
-* casadi::NlpSolver();
+* casadi::Function();
 * \endcode
 *
 */

@@ -36,7 +36,9 @@
 #include <limits>
 #include <algorithm>
 #include <map>
-#include "casadi_exception.hpp"
+#include <set>
+#include <cmath>
+#include "exception.hpp"
 #include "casadi_types.hpp"
 
 /** \brief Convenience tools for C++ Standard Library vectors
@@ -108,12 +110,12 @@ namespace casadi {
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
-  template<typename T, typename S>
-  bool inBounds(const std::vector<T> &v, S upper);
+  template<typename T>
+  bool inBounds(const std::vector<T> &v, int upper);
 
   /// Check if for each element of v holds: lower <= v_i < upper
-  template<typename T, typename S>
-  bool inBounds(const std::vector<T> &v, S lower, S upper);
+  template<typename T>
+  bool inBounds(const std::vector<T> &v, int lower, int upper);
 
   /** \brief swap inner and outer indices of list of lists
   * 
@@ -170,7 +172,7 @@ namespace casadi {
 
   /// Check if the vector is non-increasing
   template<typename T>
-  bool isNonIncreasing(const std::vector<T> &v);
+  bool isNon_increasing(const std::vector<T> &v);
 
   /// Check if the vector is non-decreasing
   template<typename T>
@@ -236,11 +238,11 @@ namespace casadi {
 
   /// Get a pointer to the data contained in the vector
   template<typename T>
-  T* getPtr(std::vector<T> &v);
+  T* get_ptr(std::vector<T> &v);
 
   /// Get a pointer to the data contained in the vector
   template<typename T>
-  const T* getPtr(const std::vector<T> &v);
+  const T* get_ptr(const std::vector<T> &v);
 
   /// \endcond
 
@@ -269,9 +271,15 @@ namespace casadi {
   std::vector<T> cumsum0(const std::vector<T> &values);
 #endif //SWIG
 
-  /// Checks if vector does not contain NaN or Inf
+  /// Checks if array does not contain NaN or Inf
   template<typename T>
-  bool isRegular(const std::vector<T> &v);
+  bool is_regular(const std::vector<T> &v) {
+    for (auto&& vk : v) {
+      if (vk!=vk || vk==std::numeric_limits<T>::infinity() ||
+          vk==-std::numeric_limits<T>::infinity()) return false;
+    }
+    return true;
+  }
 
 } // namespace casadi
 
@@ -392,18 +400,24 @@ namespace casadi {
   }
 #endif //SWIG
 
-  template<typename T, typename S>
-  bool inBounds(const std::vector<T> &v, S upper) {
+  template<typename T>
+  bool inBounds(const std::vector<T> &v, int upper) {
     return inBounds(v, 0, upper);
   }
 
-  template<typename T, typename S>
-  bool inBounds(const std::vector<T> &v, S lower, S upper) {
+  template<typename T>
+  bool inBounds(const std::vector<T> &v, int lower, int upper) {
     if (v.size()==0) return true;
-    T max = *std::max_element(v.begin(), v.end());
+    int max = *std::max_element(v.begin(), v.end());
     if (max >= upper) return false;
-    T min = *std::min_element(v.begin(), v.end());
+    int min = *std::min_element(v.begin(), v.end());
     return (min >= lower);
+  }
+
+  template<typename T>
+  bool isUnique(const std::vector<T> &v) {
+    std::set<T> s(v.begin(), v.end());
+    return v.size()==s.size();
   }
 
   template<typename T>
@@ -429,7 +443,7 @@ namespace casadi {
   }
 
   template<typename T>
-  bool isNonIncreasing(const std::vector<T> &v) {
+  bool isNon_increasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
     for (int i=1;i<v.size();++i) {
@@ -452,7 +466,7 @@ namespace casadi {
 
   template<typename T>
   bool isMonotone(const std::vector<T> &v) {
-    return isNonDecreasing(v) || isNonIncreasing(v);
+    return isNonDecreasing(v) || isNon_increasing(v);
   }
 
   template<typename T>
@@ -556,7 +570,7 @@ namespace casadi {
   }
 
   template<typename T>
-  T* getPtr(std::vector<T> &v) {
+  T* get_ptr(std::vector<T> &v) {
     if (v.empty())
       return 0;
     else
@@ -564,7 +578,7 @@ namespace casadi {
   }
 
   template<typename T>
-  const T* getPtr(const std::vector<T> &v) {
+  const T* get_ptr(const std::vector<T> &v) {
     if (v.empty())
       return 0;
     else
@@ -676,18 +690,8 @@ namespace casadi {
     return ret;
   }
 
-
   template<typename T>
-  bool isRegular(const std::vector<T> &v) {
-    for (int k=0;k<v.size();++k) {
-      if (v[k]!=v[k] || v[k]==std::numeric_limits<T>::infinity() ||
-          v[k]==-std::numeric_limits<T>::infinity()) return false;
-    }
-    return true;
-  }
-
-  template<typename T>
-  T inner_prod(const std::vector<T>& a, const std::vector<T>& b) {
+  T dot(const std::vector<T>& a, const std::vector<T>& b) {
     T ret = 0;
     for (int k=0; k<a.size(); ++k) {
       ret += a[k]*b[k];
@@ -780,6 +784,11 @@ namespace casadi {
     }
     return ret;
   }
+
+  ///@{
+  /// Readability typedefs
+  typedef std::vector<std::string> StringVector;
+  ///@}
 
 } // namespace casadi
 #endif // SWIG

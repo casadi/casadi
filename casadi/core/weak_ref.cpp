@@ -34,7 +34,7 @@ namespace casadi {
   }
 
   bool WeakRef::alive() const {
-    return !isNull() && (*this)->raw_ != 0;
+    return !is_null() && (*this)->raw_ != 0;
   }
 
   SharedObject WeakRef::shared() {

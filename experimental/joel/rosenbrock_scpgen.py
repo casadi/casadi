@@ -39,14 +39,14 @@ nlp = MXFunction(nlpIn(x=x),nlpOut(f=x[0]**2 + 100*x[2]**2, g=x[2] + (1-x[0])**2
 nlp_solver = SCPgen
 
 # Choose a qp solver (for CasADi NLP methods)
-qp_solver = QPOasesSolver
-qp_solver_options = {"printLevel" : "none"}
+qpsol = QPOasesSolver
+qpsol_options = {"printLevel" : "none"}
 
-#qp_solver = NLPQpSolver
-#qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
+#qpsol = NLPQpsol
+#qpsol_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
 
-#qp_solver = OOQpSolver
-#qp_solver_options = {}
+#qpsol = OOQpsol
+#qpsol_options = {}
 
 # Create solver
 solv = nlp_solver(nlp)
@@ -54,8 +54,8 @@ solv = nlp_solver(nlp)
 # NLP solver options
 solv.setOption("generate_hessian",True)
 if nlp_solver in (SQPMethod, LiftedSQP, SCPgen):
-  solv.setOption("qp_solver",qp_solver)
-  solv.setOption("qp_solver_options",qp_solver_options)
+  solv.setOption("qpsol",qpsol)
+  solv.setOption("qpsol_options",qpsol_options)
   solv.setOption("max_iter",5)
 if nlp_solver == SQPMethod:
   #solv.setOption("monitor",['qp'])

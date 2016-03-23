@@ -42,7 +42,7 @@ for k=1:100
 end
 
 % Plot the trajectory
-if ~isempty(par) && isfield(par,'plot_traj') && par.plot_traj==true    
+if ~is_empty(par) && isfield(par,'plot_traj') && par.plot_traj==true    
     t = linspace(0,100*dt,101);
 
      %dirty: 

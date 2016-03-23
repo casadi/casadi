@@ -27,7 +27,7 @@
 #define CASADI_SHARED_OBJECT_HPP
 
 #include "printable_object.hpp"
-#include "casadi_exception.hpp"
+#include "exception.hpp"
 #include <map>
 #include <vector>
 
@@ -92,9 +92,6 @@ namespace casadi {
     /// Copy constructor (shallow copy)
     SharedObject(const SharedObject& ref);
 
-    /// Deep copy
-    SharedObject clone() const;
-
     /// Destructor
     ~SharedObject();
 
@@ -112,10 +109,7 @@ namespace casadi {
     void assignNodeNoCount(SharedObjectNode* node);
 
     /// Get a const pointer to the node
-    const SharedObjectNode* get() const;
-
-    /// Get a pointer to the node
-    SharedObjectNode* get();
+    SharedObjectNode* get() const;
 
     /// Get the reference count
     int getCount() const;
@@ -124,10 +118,7 @@ namespace casadi {
     void swap(SharedObject& other);
 
     /// Access a member function or object
-    SharedObjectNode* operator->();
-
-    /// Const access a member function or object
-    const SharedObjectNode* operator->() const;
+    SharedObjectNode* operator->() const;
     /// \endcond
 #endif // SWIG
 
@@ -142,39 +133,8 @@ namespace casadi {
     void printPtr(std::ostream &stream=casadi::userOut()) const;
     /// \endcond
 
-    /** \brief [DEPRECATED] Initialize or re-initialize the object:
-    *
-    * more documentation in the node class (SharedObjectNode and derived classes)
-    */
-    void init(bool allow_reinit=true);
-
-    /// Is initialized?
-    bool isInit() const;
-
-    /// \cond INTERNAL
-    /// Assert that it is initialized
-    void assertInit() const;
-    /// \endcond
-
     /// Is a null pointer?
-    bool isNull() const;
-
-    ///@{
-    /// \cond SWIGINTERNAL
-    /** \brief Make unique
-     *
-     * If there are other references to the object, then make a deep copy of it
-     *  and point to this new object
-     */
-    void makeUnique(bool clone_members=true);
-    /// \endcond
-    /// \cond INTERNAL
-#ifndef SWIG
-    void makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
-                    bool clone_members=true);
-#endif
-    /// \endcond
-    ///@}
+    bool is_null() const;
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -188,10 +148,11 @@ namespace casadi {
      */
     size_t __hash__() const;
 
-  private:
-    SharedObjectNode *node;
+  protected:
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
+  private:
+    SharedObjectNode *node;
 
   };
 
@@ -200,6 +161,7 @@ namespace casadi {
   /// Internal class for the reference counting framework, see comments on the public class.
   class CASADI_EXPORT SharedObjectNode {
     friend class SharedObject;
+    friend class Memory;
   public:
 
     /// Default constructor
@@ -214,26 +176,8 @@ namespace casadi {
     /// Destructor
     virtual ~SharedObjectNode() = 0;
 
-    /// Make a deep copy of the instance
-    virtual SharedObjectNode* clone() const=0;
-
-    /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
-
     /// Get the reference count
     int getCount() const;
-
-    /// Initialize the object
-    virtual void init();
-
-    /// Second pass of the initialization. To be run when init has been completed.
-    virtual void postinit();
-
-    /// Check if the object has been initialized
-    bool isInit() const;
-
-    /// Assert that the object has been initialized
-    void assertInit() const;
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream) const;
@@ -264,9 +208,6 @@ namespace casadi {
     template<class B>
     const B shared_from_this() const;
 
-    /// Has the function been initialized?
-    bool is_init_;
-
   private:
     /// Number of references pointing to the object
     unsigned int count;
@@ -290,7 +231,7 @@ namespace casadi {
     B ret;
 
     /// Quick return if not allowed
-    if (!B::testCast(ptr)) return ret;
+    if (!B::test_cast(ptr)) return ret;
 
     /// Assign node of B and return
     ret.assignNode(ptr);
@@ -307,49 +248,17 @@ namespace casadi {
   }
   /// \endcond
 
-  /// Check if a shared object is of a certain type
-  template<class B>
-  bool is_a(const SharedObject& A) {
-    casadi_assert(!A.isNull());
-    return !shared_cast<B>(A).isNull();
-  }
-
   ///@{
-  /// Make a deep copy of an object (Note: default is a shallow copy!)
-  template<class A>
-  A deepcopy(const A& a) {
-    A ret = a;
-    ret.makeUnique();
-    return ret;
-  }
-
   /// \cond INTERNAL
-  template<class A>
-  A deepcopy(const A& a, std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    A ret = a;
-    ret.makeUnique(already_copied);
-    return ret;
-  }
-
   template<class A>
   A getcopy(const A& a, std::map<SharedObjectNode*, SharedObject>& already_copied) {
     A ret;
-    if (!a.isNull()) {
+    if (!a.is_null()) {
       std::map<SharedObjectNode*, SharedObject>::iterator it =
           already_copied.find(const_cast<SharedObjectNode*>(a.get()));
       if (it!=already_copied.end()) {
         ret.assignNode(it->second.get());
       }
-    }
-    return ret;
-  }
-
-  template<class A>
-  std::vector<A> deepcopy(const std::vector<A>& a,
-                          std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    std::vector<A> ret = a;
-    for (typename std::vector<A>::iterator it=ret.begin(); it!=ret.end(); ++it) {
-      it->makeUnique(already_copied);
     }
     return ret;
   }
@@ -360,7 +269,7 @@ namespace casadi {
   /// Template function implementations
   template<class B>
   B SharedObjectNode::shared_from_this() {
-    casadi_assert(B::testCast(this));
+    casadi_assert(B::test_cast(this));
     B ret;
     ret.assignNode(this);
     return ret;
@@ -368,7 +277,7 @@ namespace casadi {
 
   template<class B>
   const B SharedObjectNode::shared_from_this() const {
-    casadi_assert(B::testCast(this));
+    casadi_assert(B::test_cast(this));
     B ret;
     ret.assignNode(const_cast<SharedObjectNode*>(this));
     return ret;

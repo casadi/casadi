@@ -35,7 +35,7 @@ fmux.extract('modelDescription.xml','.')
 #$ The logic for importing Modelica models is located in the DaeBuilder class:
 from casadi import *
 ivp = DaeBuilder()
-ivp.parseFMI("modelDescription.xml")
+ivp.parse_fmi("modelDescription.xml")
 #! Let us have a look at the flat optimal control problem:
 print ivp
 #$ As we see, the initial-value problem (IVP) has two differential states (cstr.c and cstr.T),
@@ -44,13 +44,13 @@ print ivp
 #$ By insprecting the equations, we see that it is relatively both straightforward to eliminate 
 #$ the algebraic variables from the problem and to rewrite the DAE as an explicit ODE.
 #$ Indeed, for cases like this one, CasADi can do this reformulation automatically:
-ivp.makeExplicit()
+ivp.make_explicit()
 #! Let us extract variables for the states, the control and equations
-x = vertcat(ivp.x)
-u = vertcat(ivp.u)
-f = vertcat(ivp.ode)
-L = vertcat(ivp.quad)
-I = vertcat(ivp.init)
+x = vertcat(*ivp.x)
+u = vertcat(*ivp.u)
+f = vertcat(*ivp.ode)
+L = vertcat(*ivp.quad)
+I = vertcat(*ivp.init)
 #$ These are expressions that can be visualized or manipulated using CasADi's 
 #$ symbolic framework:
 print 5*sin(f[0])
@@ -69,8 +69,8 @@ ubx = ivp.max(x)
 lbx = ivp.min(x)
 ubu = ivp.max(u)
 lbu = ivp.min(u)
-x0 = ivp.initialGuess(x)
-u0 = ivp.initialGuess(u)
+x0 = ivp.guess(x)
+u0 = ivp.guess(u)
 #$ Formulate the optimal control problem
 tf = 150.
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
@@ -88,13 +88,13 @@ print "lbx = ", lbx, "ubx = ", ubx, "lbu = ", lbu, "ubu = ", ubu
 #$ From the symbolic expressions, we can create functions (functors) for evaluating the 
 #$ ODE right hand side numerically or symbolically. The following code creates a function
 #$ with two inputs (x and u) and two outputs (f and L):
-ode_fcn = MXFunction('ode_fcn', [x,u],[f,L])
+ode_fcn = Function('ode_fcn', [x,u],[f,L])
 #$ We also create a function for evaluating the initial conditions:
-init_fcn = MXFunction('init_fcn', [x],[I])
-#$ Increased speed is often possible by converting the MXFunction instances to SXFunction instances.
+init_fcn = Function('init_fcn', [x],[I])
+#$ Increased speed is often possible by "expanding" the function instance.
 #$ This is possible when the symbolic expressions do not contain any exotic operators:
-ode_fcn = SXFunction(ode_fcn)
-init_fcn = SXFunction(init_fcn)
+ode_fcn = ode_fcn.expand()
+init_fcn = init_fcn.expand()
 #$ We shall use the "direct multiple shooting" method with 20 shooting intervals of equal length
 #$ to solve the IVP. 
 nk = 20
@@ -134,13 +134,13 @@ xk = MX.sym("xk",nx)
 uk = MX.sym("uk",nu)
 xkj = xk; xkj_L = 0
 for j in range(nj):
-   [k1,k1_L] = ode_fcn([xkj,uk])
-   [k2,k2_L] = ode_fcn([xkj + h/2*k1,uk])
-   [k3,k3_L] = ode_fcn([xkj + h/2*k2,uk])
-   [k4,k4_L] = ode_fcn([xkj + h*k3,uk])
+   k1,k1_L = ode_fcn(xkj,uk)
+   k2,k2_L = ode_fcn(xkj + h/2*k1,uk)
+   k3,k3_L = ode_fcn(xkj + h/2*k2,uk)
+   k4,k4_L = ode_fcn(xkj + h*k3,uk)
    xkj   += h/6 * (k1   + 2*k2   + 2*k3   + k4)
    xkj_L += h/6 * (k1_L + 2*k2_L + 2*k3_L + k4_L)
-integrator = MXFunction('integrator', [xk,uk],[xkj,xkj_L])
+integrator = Function('integrator', [xk,uk],[xkj,xkj_L])
 #$ where we have applied the method both the the ODE and to the \emph{quadrature} $\frac{d}{dt}{x_{\text{L}}}(t) = L, \quad x_{\text{L}}(0) = 0$. The code above include "calls" the previously created ODE right-hand-side function (\verb|ode_fcn|).
 #$
 #$ The next step is to formulate a nonlinear program (NLP) for solving the discrete time optimal control problem. 
@@ -176,36 +176,31 @@ for k in range(nk):
 ind, nv = valloc(nx, nv)
 v.append(xk[-1]); lbv.append(lbx); ubv.append(ubx); v0.append(x0); vind['x'].append(ind)
 #$ Concatenate lists
-v = vertcat(v); lbv = vertcat(lbv); ubv = vertcat(ubv); v0 = vertcat(v0)
+v = vertcat(*v); lbv = vertcat(*lbv); ubv = vertcat(*ubv); v0 = vertcat(*v0)
 #$ Next, let us build up expressions for the objective (cost) function and the nonlinear constraints,
 #$ starting with zero cost and and empty list of constraints:
 J = 0;  eq = []
 #$ We begin by adding to the NLP, the equations corresponding to the initial conditions. For this we
 #$ "call" the above created \verb|init_fcn| with the expression for the state at the first interval:
-[eq0] = init_fcn([xk[0]])
+eq0 = init_fcn(xk[0])
 eq.append(eq0)
 #$ Next, we loop over the shooting intervals, imposing continuity of the trajectory and summing up the
 #$ the cost contributions:
 for k in range(nk):
-    [xk_end,Jk] = integrator([xk[k],uk[k]])
+    xk_end,Jk = integrator(xk[k],uk[k])
     J += Jk
     if k+1<nk: eq.append(xk_end - xk[k+1])
 #$ Now form the NLP callback function and create an NLP solver. We shall use the open-source solver IPOPT
 #$ which is able to solve large-scale NLPs efficiently. CasADi will automatically and efficiently generate
 #$ the derivative information needed by IPOPT, including the Jacobian of the NLP constraints and the 
 #$ Hessian of the Lagrangian function:
-nlp = MXFunction('nlp', nlpIn(x=v),nlpOut(f=J,g=vertcat(eq)))
-solver = NlpSolver("solver", "ipopt", nlp)
-#$ Pass bounds on the variables and constraints. The upper and lower bounds on the equality constraints are 0:
-solver.setInput(lbv,"lbx")
-solver.setInput(ubv,"ubx")
-solver.setInput(v0,"x0")
-solver.setInput(0,"lbg")
-solver.setInput(0,"ubg")
-#$ Solving the NLP amounts to "evaluating the NLP solver":
-solver.evaluate()
+nlp = {'x':v, 'f':J, 'g':vertcat(*eq)}
+solver = nlpsol("solver", "ipopt", nlp)
+#$ Solving the NLP amounts to "evaluating the NLP solver"
+#$ The upper and lower bounds on the equality constraints are 0:
+sol = solver(lbx=lbv, ubx=ubv, x0=v0, lbg=0, ubg=0)
 #$ After making sure that the solution was successful, we retrieve the solution:
-v_opt  = solver.getOutput("x")
+v_opt  = sol["x"]
 x0_opt = v_opt[[vind['x'][k][0] for k in range(nk+1)]]
 x1_opt = v_opt[[vind['x'][k][1] for k in range(nk+1)]]
 u_opt = v_opt[[vind['u'][k][0] for k in range(nk)]]
@@ -225,13 +220,7 @@ title(str(x[1]))
 grid()
 show()
 figure(3)
-step(tgrid,vertcat((u_opt[0],u_opt)))
+step(tgrid,vertcat(u_opt[0],u_opt))
 title(str(u))
 grid()
 show()
-#$ CasADi is also able to generate self-contained C-code for evaluating the constructed functions.
-#$ This can be useful for increasing execution speed or for evaluating expressions on embedded systems.
-#$ As an example, the following code will generate C-code for the Hessian of the objective function
-#$ with respect to the decision variables:
-hess_f = nlp.hessian("x","f")
-hess_f.generate("hess_f")

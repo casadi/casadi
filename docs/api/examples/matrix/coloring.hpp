@@ -30,7 +30,7 @@
 *
 * \sa
 * \code
-* casadi::Sparsity::unidirectionalColoring();
+* casadi::Sparsity::uni_coloring();
 * \endcode
 *
 */

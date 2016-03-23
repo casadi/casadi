@@ -231,20 +231,20 @@ int Ocp::isParam(string paramName)
 
 
 
-void Ocp::setStates( vector<DMatrix> & x)
+void Ocp::setStates( vector<DM> & x)
 {
      for (int timestep=0; timestep < x.size(); timestep++)
           setState( x.at(timestep), timestep);
 }
 
-void Ocp::setActions( vector<DMatrix> & u)
+void Ocp::setActions( vector<DM> & u)
 {
      for (int timestep=0; timestep < u.size(); timestep++)
           setAction( u.at(timestep), timestep);
 }
 
 
-void Ocp::setState( DMatrix x, int timestep )
+void Ocp::setState( DM x, int timestep )
 {
      if (ms.size() != 1){
           cerr << "Error in Ocp::setState - ms.size != 1\n";
@@ -260,7 +260,7 @@ void Ocp::setState( DMatrix x, int timestep )
 }
 
 
-void Ocp::setAction( DMatrix u, int timestep )
+void Ocp::setAction( DM u, int timestep )
 {
      if (ms.size() != 1){
           cerr << "Error in Ocp::setAction - ms.size != 1\n";
@@ -280,7 +280,7 @@ void Ocp::setAction( DMatrix u, int timestep )
 
 
 // get states/actions (only for single-stage ocp now)
-DMatrix Ocp::getStateSolution(int timestep)
+DM Ocp::getStateSolution(int timestep)
 {
      if (ms.size() != 1){
           cerr << "Error in Ocp::getStateSolution - ms.size != 1\n";
@@ -292,7 +292,7 @@ DMatrix Ocp::getStateSolution(int timestep)
      return firstMs->getState( timestep, xopt );
 }
 
-DMatrix Ocp::getActionSolution(int timestep)
+DM Ocp::getActionSolution(int timestep)
 {
      if (ms.size() != 1){
           cerr << "Error in Ocp::getActionSolution - ms.size != 1\n";

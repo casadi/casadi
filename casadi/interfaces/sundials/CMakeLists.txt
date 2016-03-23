@@ -26,8 +26,8 @@ casadi_plugin(Integrator idas
 casadi_plugin_link_libraries(Integrator idas casadi_sundials_common)
 
 # KINSOL
-casadi_plugin(ImplicitFunction kinsol 
+casadi_plugin(Rootfinder kinsol 
    kinsol_interface.hpp    kinsol_interface.cpp
    kinsol_interface_meta.cpp
    )
-casadi_plugin_link_libraries(ImplicitFunction kinsol  ${SUNDIALS_LIBRARIES})
+casadi_plugin_link_libraries(Rootfinder kinsol  ${SUNDIALS_LIBRARIES})

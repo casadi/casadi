@@ -74,9 +74,6 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~OutputNode();
 
-    /** \brief  Clone function */
-    virtual OutputNode* clone() const { return new OutputNode(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
@@ -87,13 +84,13 @@ namespace casadi {
     virtual bool isOutputNode() const {return true;}
 
     /** \brief  Get function input */
-    virtual int getFunctionInput() const { return -1;}
+    virtual int getFunction_input() const { return -1;}
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const { return oind_;}
 
     /** \brief Get the operation */
-    virtual int getOp() const { return -1;}
+    virtual int op() const { return -1;}
 
     /// Create a horizontal concatenation node
     virtual MX getHorzcat(const std::vector<MX>& x) const { return dep()->getHorzcat(x);}

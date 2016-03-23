@@ -37,4 +37,15 @@ def loadAllCompiledPlugins():
   for k in CasadiMeta.getPlugins().split(";"):
     cls, name = k.split("::")
     print "Testing: ", cls, name
-    getattr(casadi,cls).loadPlugin(name)
+    if cls=='Integrator':
+      casadi.load_integrator(name)
+    elif cls=='Nlpsol':
+      casadi.load_nlpsol(name)
+    elif cls=='Qpsol':
+      casadi.load_qpsol(name)
+    elif cls=='Rootfinder':
+      casadi.load_rootfinder(name)
+    elif cls=='Linsol':
+      casadi.load_linsol(name)
+    else:
+      getattr(casadi,cls).loadPlugin(name)

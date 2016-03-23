@@ -26,7 +26,7 @@
 #ifndef CASADI_NLP_BUILDER_HPP
 #define CASADI_NLP_BUILDER_HPP
 
-#include "../sx/sx_element.hpp"
+#include "../sx/sx_elem.hpp"
 
 namespace casadi {
 
@@ -52,21 +52,21 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
       SX g;
 
       /// Bounds on x
-      DMatrix x_lb, x_ub;
+      DM x_lb, x_ub;
 
       /// Bounds on g
-      DMatrix g_lb, g_ub;
+      DM g_lb, g_ub;
 
       /// Primal initial guess
-      DMatrix x_init;
+      DM x_init;
 
       /// Dual initial guess
-      DMatrix lambda_init;
+      DM lambda_init;
 
     ///@}
 
     /// Parse an AMPL och PyOmo NL-file
-    void parseNL(const std::string& filename, const Dict& options = Dict());
+    void parse_nl(const std::string& filename, const Dict& options = Dict());
 
     /// Print a description of the object
     void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
@@ -78,7 +78,7 @@ class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
   protected:
 
     /// Read an expression from an NL-file (Polish infix format)
-    static SXElement readExpressionNL(std::istream &stream, const std::vector<SXElement>& v);
+    static SXElem read_expr(std::istream &stream, const std::vector<SXElem>& v);
 
 #endif // SWIG
 };

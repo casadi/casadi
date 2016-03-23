@@ -10,15 +10,15 @@ namespace myproject {
   */
   int ultimateQuestion();
 
-  /** \brief Convert a CasADi DMatrix to a scalar
+  /** \brief Convert a CasADi DM to a scalar
       Argument must be a 1-by-1 matrix.
   */
-  double casadi2scalar(const casadi::DMatrix& x);
+  double casadi2scalar(const casadi::DM& x);
 
-  /** \brief Convert a scalar to a CasADi DMatrix
+  /** \brief Convert a scalar to a CasADi DM
       Argument must be a 1-by-1 matrix.
   */
-  casadi::DMatrix scalar2casadi(double x);
+  casadi::DM scalar2casadi(double x);
   
 } // namespace myproject
 

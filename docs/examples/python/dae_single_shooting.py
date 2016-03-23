@@ -43,7 +43,7 @@ subject to   dot(x0) == z*x0-x1+u     \
              x1(t=10) == 0
              -0.75 <= u <= 1  for 0 <= t <= 10
 
-Note that other methods such as direct collocation or direct single shooting
+Note that other methods such as direct collocation or direct multiple shooting
 are usually preferably to the direct single shooting method in practise.
 
 Joel Andersson, 2012-2015
@@ -55,7 +55,7 @@ z = SX.sym("z")   # Algebraic variable
 u = SX.sym("u")   # Control
 
 # Differential equation
-f_x = vertcat((z*x[0]-x[1]+u, x[0]))
+f_x = vertcat(z*x[0]-x[1]+u, x[0])
 
 # Algebraic equation
 f_z = x[1]**2 + z - 1
@@ -66,7 +66,7 @@ f_q = x[0]**2 + x[1]**2 + u**2
 # Create an integrator
 dae = {'x':x, 'z':z, 'p':u, 'ode':f_x, 'alg':f_z, 'quad':f_q}
 opts = {"tf":0.5} # interval length
-I = Integrator('I', "idas", dae, opts)
+I = integrator('I', "idas", dae, opts)
 
 # All controls
 U = MX.sym("U", 20)
@@ -75,19 +75,19 @@ U = MX.sym("U", 20)
 X  = [0,1]
 J = 0
 for k in range(20):
-  Ik = I({'x0':X,'p':U[k]})
+  Ik = I(x0=X, p=U[k])
   X = Ik['xf']
   J += Ik['qf']   # Sum up quadratures
 
 # Allocate an NLP solver
 nlp = {'x':U, 'f':J, 'g':X}
-opts = {"linear_solver":"ma27"}
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+opts = {"ipopt.linear_solver":"ma27"}
+solver = nlpsol("solver", "ipopt", nlp, opts)
 
 # Pass bounds, initial guess and solve NLP
-sol = solver({"lbx" : -0.75, # Lower variable bound
-              "ubx" :  1.0,  # Upper variable bound
-              "lbg" :  0.0,  # Lower constraint bound
-              "ubg" :  0.0,  # Upper constraint bound
-              "x0"  :  0.0}) # Initial guess
+sol = solver(lbx = -0.75, # Lower variable bound
+             ubx =  1.0,  # Upper variable bound
+             lbg =  0.0,  # Lower constraint bound
+             ubg =  0.0,  # Upper constraint bound
+             x0  =  0.0) # Initial guess
 print sol

@@ -58,7 +58,6 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Support/raw_os_ostream.h>
-#include "llvm/Support/DynamicLibrary.h"
 //#include <llvm/ExecutionEngine/ExecutionEngine.h>
 
 /** \defgroup plugin_Compiler_clang
@@ -84,9 +83,6 @@ namespace casadi {
     /** \brief Constructor */
     explicit ClangCompiler(const std::string& name);
 
-    /** \brief Clone */
-    virtual ClangCompiler* clone() const;
-
     /** \brief  Create a new JIT function */
     static CompilerInternal* creator(const std::string& name) {
       return new ClangCompiler(name);
@@ -95,8 +91,14 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~ClangCompiler();
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// A documentation string
     static const std::string meta_doc;
@@ -110,6 +112,10 @@ namespace casadi {
     // Helper function for reading includes
     static std::vector<std::pair<std::string, bool> >
       getIncludes(const std::string& file, const std::string& path);
+
+    // Options
+    std::string include_path_;
+    std::vector<std::string> flags_;
 
   protected:
     clang::EmitLLVMOnlyAction* act_;

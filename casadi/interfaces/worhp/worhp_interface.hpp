@@ -26,8 +26,8 @@
 #ifndef CASADI_WORHP_INTERFACE_HPP
 #define CASADI_WORHP_INTERFACE_HPP
 
-#include "casadi/core/function/nlp_solver_internal.hpp"
-#include <casadi/interfaces/worhp/casadi_nlpsolver_worhp_export.h>
+#include "casadi/core/function/nlpsol_impl.hpp"
+#include <casadi/interfaces/worhp/casadi_nlpsol_worhp_export.h>
 
 // GCC_VERSION is defined in 'worhp.h'
 #ifdef GCC_VERSION
@@ -41,98 +41,103 @@
 
 // MACROs that pollute our code
 #undef Q
-/**\defgroup plugin_NlpSolver_worhp
+/**\defgroup plugin_Nlpsol_worhp
  WORHP interface
 */
-/** \pluginsection{NlpSolver,worhp} **/
+/** \pluginsection{Nlpsol,worhp} **/
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{NlpSolver,worhp}
-     @copydoc NlpSolver_doc
-     @copydoc plugin_NlpSolver_worhp
-  */
-  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInterface : public NlpSolverInternal {
+  struct CASADI_NLPSOL_WORHP_EXPORT WorhpMemory : public NlpsolMemory {
+    OptVar    worhp_o;
+    Workspace worhp_w;
+    Params    worhp_p;
+    Control   worhp_c;
 
+    // Stats
+    int iter;
+    int iter_sqp;
+    double inf_pr;
+    double inf_du;
+    double alpha_pr;
+    int return_code;
+    const char* return_status;
+
+    /// Constructor
+    WorhpMemory();
+
+    /// Destructor
+    ~WorhpMemory();
+  };
+
+  /** \brief \pluginbrief{Nlpsol,worhp}
+     @copydoc Nlpsol_doc
+     @copydoc plugin_Nlpsol_worhp
+  */
+  class CASADI_NLPSOL_WORHP_EXPORT WorhpInterface : public Nlpsol {
   public:
+    // NLP functions
+    Function f_fcn_;
+    Function g_fcn_;
+    Function grad_f_fcn_;
+    Function jac_g_fcn_;
+    Function hess_l_fcn_;
+    Sparsity jacg_sp_;
+    Sparsity hesslag_sp_;
+
     // Constructor
-    explicit WorhpInterface(const Function& nlp);
+    explicit WorhpInterface(const std::string& name, Oracle* nlp);
 
     // Destructor
     virtual ~WorhpInterface();
 
-    // Clone function
-    virtual WorhpInterface* clone() const;
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "worhp";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new WorhpInterface(nlp);}
+    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+      return new WorhpInterface(name, nlp);
+    }
 
     // Reset solver
     void reset();
 
-    // (Re)initialize
-    virtual void init();
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
+    // Initialize the solver
+    virtual void init(const Dict& opts);
+
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new WorhpMemory();}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<WorhpMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
 
     // Solve the NLP
-    virtual void evaluate();
+    virtual void solve(void* mem) const;
 
-    /// Set default options for a given recipe
-    virtual void setDefaultOptions(const std::vector<std::string>& recipes);
+    // Options
+    std::map<std::string, bool> bool_opts_;
+    std::map<std::string, int> int_opts_;
+    std::map<std::string, double> double_opts_;
 
-    /// Read options from worhp parameter xml
-    virtual void setOptionsFromFile(const std::string & file);
-
-    /// Exact Hessian?
-    bool exact_hessian_;
-
-    OptVar    worhp_o_;
-    Workspace worhp_w_;
-    Params    worhp_p_;
-    Control   worhp_c_;
-
-    std::map<int, std::string> status_;
-    std::map<std::string, TypeID> ops_;
-
-    // Worhp callback functions
-    bool eval_f(const double* x, double scale, double& obj_value);
-    bool eval_grad_f(const double* x, double scale , double* grad_f);
-    bool eval_g(const double* x, double* g);
-    bool eval_jac_g(const double* x, double* values);
-    bool eval_h(const double* x, double obj_factor, const double* lambda, double* values);
-
-    // Accumulated time since last reset:
-    double t_eval_f_; // time spent in eval_f
-    double t_eval_grad_f_; // time spent in eval_grad_f
-    double t_eval_g_; // time spent in eval_g
-    double t_eval_jac_g_; // time spent in eval_jac_g
-    double t_eval_h_; // time spent in eval_h
-    double t_callback_fun_;  // time spent in callback function
-    double t_callback_prepare_; // time spent in callback preparation
-    double t_mainloop_; // time spent in the main loop of the solver
-
-    // Accumulated counts since last reset:
-    int n_eval_f_; // number of calls to eval_f
-    int n_eval_grad_f_; // number of calls to eval_grad_f
-    int n_eval_g_; // number of calls to eval_g
-    int n_eval_jac_g_; // number of calls to eval_jac_g
-    int n_eval_h_; // number of calls to eval_h
-
-    std::string formatStatus(int status) const;
-
-    /// Pass the supplied options to Worhp
-    void passOptions();
-
-    // Calculate the status message map
-    static std::map<int, std::string> calc_flagmap();
-
-    // Error status map
-    static std::map<int, std::string> flagmap;
+    // WORHP return codes
+    static const char* return_codes(int flag);
 
     /// A documentation string
     static const std::string meta_doc;
-
   };
 
 } // namespace casadi

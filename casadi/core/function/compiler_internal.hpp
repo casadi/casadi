@@ -29,33 +29,51 @@
 #include "compiler.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
+#include "../casadi_file.hpp"
 
 
 /// \cond INTERNAL
 namespace casadi {
 
-/** \brief NLP solver storage class
+/** \brief Compiler internal class
 
   @copydoc Compiler_doc
   \author Joel Andersson
   \date 2010-2013
 */
   class CASADI_EXPORT
-  CompilerInternal : public OptionsFunctionalityNode,
-                        public PluginInterface<CompilerInternal> {
+  CompilerInternal : public SharedObjectNode,
+                     public PluginInterface<CompilerInternal> {
 
   public:
     /// Constructor
-    CompilerInternal(const std::string& name);
+    explicit CompilerInternal(const std::string& name);
 
     /// Destructor
-    virtual ~CompilerInternal() = 0;
+    virtual ~CompilerInternal();
 
-    /** \brief  Print */
+    /** \brief Print */
     virtual void print(std::ostream &stream) const;
+
+    /** \brief Print representation */
+    virtual void repr(std::ostream &stream) const;
 
     // Creator function for internal class
     typedef CompilerInternal* (*Creator)(const std::string& name);
+
+    /** \brief Construct
+        Prepares the function for evaluation
+     */
+    void construct(const Dict& opts);
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
+    /** \brief Initialize */
+    virtual void init(const Dict& opts);
 
     // No static functions exposed
     struct Exposed{ };
@@ -70,17 +88,103 @@ namespace casadi {
     static std::string shortname() { return "compiler";}
 
     /// Queery plugin name
-    virtual const char* plugin_name() const = 0;
+    virtual const char* plugin_name() const { return "none";}
 
     /// Get a function pointer for numerical evaluation
-    virtual void* getFunction(const std::string& symname) = 0;
+    virtual void* getFunction(const std::string& symname) { return 0;}
 
-    void cleanup();
+    /// Get meta information, if any
+    void get_meta(std::vector<std::string>& lines, int& offset) const;
 
-    protected:
     /// C filename
     std::string name_;
+
+    /// Meta information
+    ParsedFile meta_;
   };
+
+  /** \brief Just-in-time compiled or dynamically linked library
+      \author Joel Andersson
+      \date 2016
+  */
+  class CASADI_EXPORT
+  LibraryInternal : public SharedObjectNode {
+  public:
+    /// Constructor
+    explicit LibraryInternal() {}
+
+    /// Destructor
+    virtual ~LibraryInternal() {}
+
+    // Check if symbol exists
+    virtual bool has(const std::string& sym) const = 0;
+
+    // Dummy type
+    virtual signal_t get(const std::string& sym) = 0;
+
+    // Get meta
+    virtual const ParsedFile& meta() const = 0;
+  };
+
+  /** \brief Dynamically linked library
+      \author Joel Andersson
+      \date 2016
+  */
+  class CASADI_EXPORT
+  DllLibrary : public LibraryInternal {
+  private:
+#if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
+    typedef HINSTANCE handle_t;
+#else
+    typedef void* handle_t;
+#endif
+    std::string bin_name_;
+    handle_t handle_;
+  public:
+
+    // Constructor
+    explicit DllLibrary(const std::string& bin_name);
+
+    // Destructor
+    virtual ~DllLibrary();
+
+    // Check if symbol exists
+    virtual bool has(const std::string& sym) const;
+
+    // Dummy type
+    virtual signal_t get(const std::string& sym);
+
+    // Get meta
+    virtual const ParsedFile& meta() const;
+  };
+
+  /** \brief Just-in-time library
+      \author Joel Andersson
+      \date 2016
+  */
+  class CASADI_EXPORT
+  JitLibrary : public LibraryInternal {
+  private:
+    Compiler compiler_;
+    std::set<std::string> meta_symbols_;
+  public:
+
+    // Constructor
+    explicit JitLibrary(const Compiler& compiler);
+
+    // Destructor
+    virtual ~JitLibrary();
+
+    // Check if symbol exists
+    virtual bool has(const std::string& sym) const;
+
+    // Dummy type
+    virtual signal_t get(const std::string& sym);
+
+    // Get meta
+    virtual const ParsedFile& meta() const;
+  };
+
 
 } // namespace casadi
 /// \endcond

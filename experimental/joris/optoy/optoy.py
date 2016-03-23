@@ -149,11 +149,11 @@ def minimize(f,gl=[],verbose=False):
   gl_pure = []
   gl_equality = []
   for g in gl:
-    if g.isOperation(OP_LE) or g.isOperation(OP_LT):
-      gl_pure.append(g.getDep(0)-g.getDep(1))
+    if g.is_op(OP_LE) or g.is_op(OP_LT):
+      gl_pure.append(g.dep(0)-g.dep(1))
       gl_equality.append(False)
-    elif g.isOperation(OP_EQ):
-      gl_pure.append(g.getDep(0)-g.getDep(1))
+    elif g.is_op(OP_EQ):
+      gl_pure.append(g.dep(0)-g.dep(1))
       gl_equality.append(True)
     else:
       raise Exception("Constrained type unknown. Use ==, >= or <= .")

@@ -52,9 +52,6 @@ namespace casadi {
     /** \brief Constructor */
     explicit ShellCompiler(const std::string& name);
 
-    /** \brief Clone */
-    virtual ShellCompiler* clone() const;
-
     /** \brief  Create a new JIT function */
     static CompilerInternal* creator(const std::string& name) {
       return new ShellCompiler(name);
@@ -63,8 +60,14 @@ namespace casadi {
     /** \brief Destructor */
     virtual ~ShellCompiler();
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
     /** \brief Initialize */
-    virtual void init();
+    virtual void init(const Dict& opts);
 
     /// A documentation string
     static const std::string meta_doc;
@@ -74,7 +77,6 @@ namespace casadi {
 
     /// Get a function pointer for numerical evaluation
     virtual void* getFunction(const std::string& symname);
-
   protected:
     /// Temporary file
     std::string bin_name_;

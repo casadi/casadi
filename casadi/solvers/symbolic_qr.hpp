@@ -26,16 +26,16 @@
 #ifndef CASADI_SYMBOLIC_QR_HPP
 #define CASADI_SYMBOLIC_QR_HPP
 
-#include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/solvers/casadi_linearsolver_symbolicqr_export.h>
+#include "casadi/core/function/linsol_impl.hpp"
+#include <casadi/solvers/casadi_linsol_symbolicqr_export.h>
 
-/** \defgroup plugin_LinearSolver_symbolicqr
+/** \defgroup plugin_Linsol_symbolicqr
 
-       LinearSolver based on QR factorization with sparsity pattern based reordering
+       Linsol based on QR factorization with sparsity pattern based reordering
       _without_ partial pivoting
 */
 
-/** \pluginsection{LinearSolver,symbolicqr} */
+/** \pluginsection{Linsol,symbolicqr} */
 
 /// \cond INTERNAL
 
@@ -43,40 +43,65 @@ namespace casadi {
   typedef SX* SXPtr;
   typedef std::vector<SXPtr> SXPtrV;
 
-  /** \brief \pluginbrief{LinearSolver,symbolicqr}
+  /** \brief Memory for SymbolicQR  */
+  struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public WorkMemory {
+    // Destructor
+    virtual ~SymbolicQrMemory() {}
 
-      @copydoc LinearSolver_doc
-      @copydoc plugin_LinearSolver_symbolicqr
+    // Storage for QR factorization
+    std::vector<double> q, r;
+  };
+
+  /** \brief \pluginbrief{Linsol,symbolicqr}
+
+      @copydoc Linsol_doc
+      @copydoc plugin_Linsol_symbolicqr
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQr
-    : public LinearSolverInternal {
+  class CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQr : public Linsol {
   public:
     // Constructor
-    SymbolicQr(const Sparsity& sparsity, int nrhs);
+    SymbolicQr(const std::string& name, const Sparsity& sparsity, int nrhs);
 
     // Destructor
     virtual ~SymbolicQr();
 
-    /** \brief  Clone */
-    virtual SymbolicQr* clone() const { return new SymbolicQr(*this);}
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "symbolicqr";}
 
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
+    /** \brief  Create a new Linsol */
+    static Linsol* creator(const std::string& name, const Sparsity& sp, int nrhs) {
+      return new SymbolicQr(name, sp, nrhs);
+    }
 
-    /** \brief  Create a new LinearSolver */
-    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
-    { return new SymbolicQr(sp, nrhs);}
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
 
     // Initialize
-    virtual void init();
+    virtual void init(const Dict& opts);
 
-    // Prepare the factorization
-    virtual void prepare();
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new SymbolicQrMemory();}
 
-    // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose);
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<SymbolicQrMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
+
+    // Setup memory block
+    virtual void set_temp(void* mem, const double** arg, double** res,
+                          int* iw, double* w) const;
+
+    // Factorize the linear system
+    virtual void linsol_factorize(void* mem, const double* A) const;
+
+    // Solve the linear system
+    virtual void linsol_solve(void* mem, double* x, int nrhs, bool tr) const;
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(CodeGenerator& g) const;
@@ -85,8 +110,8 @@ namespace casadi {
     virtual void generateBody(CodeGenerator& g) const;
 
     /** \brief Evaluate symbolically (SX) */
-    virtual void evalSXLinsol(const SXElement** arg, SXElement** res,
-                              int* iw, SXElement* w, bool tr, int nrhs);
+    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
+                               bool tr, int nrhs);
 
     // Factorization function
     Function fact_fcn_;
@@ -94,12 +119,8 @@ namespace casadi {
     // Solve function
     Function solv_fcn_N_, solv_fcn_T_;
 
-    // Storage for QR factorization
-    DMatrix Q_, R_;
-
     /// A documentation string
     static const std::string meta_doc;
-
   };
 
 } // namespace casadi

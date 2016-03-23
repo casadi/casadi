@@ -38,7 +38,7 @@ namespace casadi {
     return "det(" + arg.at(0) + ")";
   }
 
-  void Determinant::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void Determinant::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     res[0] = det(arg[0]);
   }
 
@@ -48,7 +48,7 @@ namespace casadi {
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = det_X * inner_prod(trans_inv_X, fseed[d][0]);
+      fsens[d][0] = det_X * dot(trans_inv_X, fseed[d][0]);
     }
   }
 

@@ -14,30 +14,24 @@ z = MX.sym('z',3);
 
 
 
-f = SXFunction('f',{x},{cos(x)})
+f = Function('f',{x},{cos(x)})
+r = f(3)
 
-f.setInput(3,0)
+disp(r)
 
-f.evaluate()
-
-
-disp(f.getOutput())
-
-res = f.getOutput()-DMatrix(cos(3))
-assert(iszero(res))
+res = r{1}-DM(cos(3))
+assert(is_zero(res))
 
 
 x = SX.sym('x',4);
 
-f = SXFunction('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
+f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
+r = f.call({[1,2,3,4]});
 
-f.setInput([1,2,3,4])
-f.evaluate()
+for i=1:f.n_out()
+  res = r{i}-2;
 
-for i=1:f.nOut()
-  res = f.getOutput(i-1)-2;
-
-  assert(res.isZero())
+  assert(res.is_zero())
 
 end
 
@@ -62,15 +56,13 @@ assert(flag);
 
 x = MX.sym('x',4);
 
-f = MXFunction('f',{x},{x(2),x(IMatrix(2)),x(2,1),x(IMatrix(2),IMatrix(1)),x(2:2),x(2:2,1)});
+f = Function('f',{x},{x(2),x(IM(2)),x(2,1),x(IM(2),IM(1)),x(2:2),x(2:2,1)});
+r = f.call({[1,2,3,4]});
 
-f.setInput([1,2,3,4])
-f.evaluate()
+for i=1:f.n_out()
+  res = r{i}-2;
 
-for i=1:f.nOut()
-  res = f.getOutput(i-1)-2;
-
-  assert(res.isZero())
+  assert(res.is_zero())
 
 end
 
@@ -97,26 +89,24 @@ assert(flag);
 
 delete 'diary'
 diary ON
-x = DMatrix.ones(2,2);
+x = DM.ones(2,2);
 
-x.printDense();
+x.print_dense();
 
 x = SX.sym('x');
 
 
-ode = SXFunction('ode',daeIn('x',x),daeOut('ode',x));
+ode = struct('x', x, 'ode', x)
 
 opts = struct
 opts.verbose = true
 
-intg = Integrator('integrator', 'rk', ode, opts);
-intg.evaluate();
+intg = casadi.integrator('integrator', 'rk', ode, opts);
+intg.call(struct);
 diary OFF
 
 logged = fileread('diary');
-
 assert(~isempty(strfind(logged,'1')))
-assert(~isempty(strfind(logged,'::init')))
 
 
 clear
@@ -127,33 +117,22 @@ dim = size(x);
 assert(dim(1)==4)
 assert(dim(2)==5)
 
-%nlpErr
-
-warning('error','SWIG:RuntimeError')
-msg = '';
-try
-  nlpIn('foo',SX.sym('x'))
-catch err
-  msg = err.message;
-end
-
-assert(~isempty(strfind(msg,'[x, p]')))
-
 % error message beautification
 
 msg = '';
 try
-  SXFunction('f',[SX.sym('12')])
+  Function('f', [SX.sym('12')])
 catch err
   msg = err.message;
 end
 
-assert(~isempty(strfind(msg,'  SXFunction(char,{SX} ,{SX} ,Dict)')))
-assert(~isempty(strfind(msg,'You have: char, SX')))
+% See issue #1483
+%assert(~isempty(strfind(msg,'  Function(char,{SX} ,{SX} ,Dict)')))
+%assert(~isempty(strfind(msg,'You have: char, SX')))
 
-% Check mixing DMatrix and MX
-res = (DMatrix(1)+MX(1)) - (MX(1)+DMatrix(1))
-assert(iszero(res))
+% Check mixing DM and MX
+res = (DM(1)+MX(1)) - (MX(1)+DM(1))
+assert(is_zero(res))
 
 % Try substitute (non-member function)
 a = SX.sym('a');
@@ -178,15 +157,15 @@ f = x^2;
 g = log(x)-p;
 opts = struct('input_scheme', char('x','p'),...
               'output_scheme', char('f','g'));
-nlp = SXFunction('nlp', {x,p}, {f,g}, opts);
+nlp = Function('nlp', {x,p}, {f,g}, opts);
 
 % Evaluate with numbered inputs and outputs
-res_vec = nlp({1.1, 3.3});
+[res_vec{1:2}] = nlp(1.1, 3.3);
 
 % Evaluate with named inputs and outputs
-res_struct = nlp(struct('x',1.1,'p',3.3));
-assert(iszero(res_vec{1}-res_struct.f))
-assert(iszero(res_vec{2}-res_struct.g))
+res_struct = nlp('x',1.1,'p',3.3);
+assert(is_zero(res_vec{1}-res_struct.f))
+assert(is_zero(res_vec{2}-res_struct.g))
 
 u = SX.sym('u',1,5);
 
@@ -211,19 +190,19 @@ assert(all(size(u(1:2,1:3))==[2 3]));
 
 if Compiler.hasPlugin('clang')
   x = MX.sym('x');
-  F = MXFunction('f',{x},{x^2},struct('jit',true));
+  F = Function('f',{x},{x^2},struct('jit',true));
 
-  out = F({5});
-  assert(full(out{1})==25)
+  out = F(5);
+  assert(full(out)==25)
 end
 
 
-a = DMatrix.ones(Sparsity.upper(5));
+a = DM.ones(Sparsity.upper(5));
 i = full(full(sparse(a))-a);
 assert(any(any(i))==0);
 
 % Element assignment
-A = DMatrix.ones(1,4);
+A = DM.ones(1,4);
 A(2) = 20;
 A(3:4) = [30,40];
 assert(all(full(A)==[1 20 30 40]))

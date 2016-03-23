@@ -23,7 +23,7 @@
  */
 
 
-#include "../casadi_exception.hpp"
+#include "../exception.hpp"
 #include "variable.hpp"
 
 using namespace std;
@@ -40,17 +40,17 @@ namespace casadi {
     this->valueReference = -1;
     this->min = -numeric_limits<double>::infinity();
     this->max = numeric_limits<double>::infinity();
-    this->initialGuess = 0;
+    this->guess = 0;
     this->nominal = 1.0;
     this->start = 0.0;
-    this->derivativeStart = 0.0;
+    this->derivative_start = 0.0;
     this->unit = "";
-    this->displayUnit = "";
+    this->display_unit = "";
     this->free = false;
   }
 
   string Variable::name() const {
-    return this->v.getName();
+    return this->v.name();
   }
 
   void Variable::repr(ostream &stream, bool trailing_newline) const {

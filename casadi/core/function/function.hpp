@@ -1,3 +1,4 @@
+
 /*
  *    This file is part of CasADi.
  *
@@ -25,18 +26,32 @@
 #ifndef CASADI_FUNCTION_HPP
 #define CASADI_FUNCTION_HPP
 
-#include "io_interface.hpp"
+#include "../sx/sx_elem.hpp"
+#include "../mx/mx.hpp"
+
+#include <exception>
+
+/*
+  NOTE: The order of includes is as follows:
+  1. Forward declaration of Function (in casadi_types.hpp)
+  2. Declaration of Matrix class (in matrix.hpp), Function only as references or return values
+  3. Definition of Function (this file), requires Matrix to be complete type
+  4. Definition of Matrix class (in matrix_impl.hpp, included at the end of this file)
+*/
 
 namespace casadi {
 
+#ifndef SWIG
   /** Forward declaration of internal class */
   class FunctionInternal;
+
+#endif // SWIG
 
   /** \brief General function
 
       A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
-      Number of inputs:  \a nin    nIn()\n
-      Number of outputs: \a nout   nOut()\n
+      Number of inputs:  \a nin    n_in()\n
+      Number of outputs: \a nout   n_out()\n
 
       We can view this function as a being composed of a (\a nin, \a nout) grid of single-input,
       single-output primitive functions.\n
@@ -85,16 +100,76 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT Function : public OptionsFunctionality, public IOInterface<Function>{
+  class CASADI_EXPORT Function : public SharedObject {
   public:
 
-    /// \cond CLUTTER
-    /** \brief  default constructor */
+    /** \brief Default constructor, null pointer */
     Function();
+
+    /** \brief Construct from a file */
+    Function(const std::string& fname);
+
+    ///@{
+    /** \brief Construct an SX function */
+    Function(const std::string& name,
+             const std::vector<SX>& arg, const std::vector<SX>& res,
+             const Dict& opts=Dict());
+    Function(const std::string& name,
+             const std::vector<SX>& arg, const std::vector<SX>& res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict());
+    Function(const std::string& name, const std::map<std::string, SX>& dict,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict());
+    ///@}
+
+    ///@{
+    /** \brief Construct an MX function */
+    Function(const std::string& name,
+             const std::vector<MX>& arg, const std::vector<MX>& res,
+             const Dict& opts=Dict());
+    Function(const std::string& name,
+             const std::vector<MX>& arg, const std::vector<MX>& res,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict());
+    Function(const std::string& name, const std::map<std::string, MX>& dict,
+             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const Dict& opts=Dict());
+    ///@}
+
+    ///@{
+    /** \brief To resolve ambiguity on some compilers */
+#ifndef SWIG
+    Function(const std::string& name, SXIList arg, const SXVector& res, const Dict& opts=Dict());
+    Function(const std::string& name, const SXVector& arg, SXIList res, const Dict& opts=Dict());
+    Function(const std::string& name, SXIList arg, SXIList res, const Dict& opts=Dict());
+    Function(const std::string& name, SXIList arg, const SXVector& res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
+    Function(const std::string& name, const SXVector& arg, SXIList res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
+    Function(const std::string& name, SXIList arg, SXIList res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
+    Function(const std::string& name, MXIList arg, const MXVector& res, const Dict& opts=Dict());
+    Function(const std::string& name, const MXVector& arg, MXIList res, const Dict& opts=Dict());
+    Function(const std::string& name, MXIList arg, MXIList res, const Dict& opts=Dict());
+    Function(const std::string& name, MXIList arg, const MXVector& res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
+    Function(const std::string& name, const MXVector& arg, MXIList res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
+    Function(const std::string& name, MXIList arg, MXIList res,
+             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
+#endif // SWIG
+    ///@}
 
     /** \brief  Destructor */
     ~Function();
-    /// \endcond
+
+    /** \brief Expand a function to SX */
+    ///@{
+    Function expand() const;
+    Function expand(const std::string& name,
+                    const Dict& opts=Dict()) const;
+    ///@}
 
     /// \cond INTERNAL
 #ifndef SWIG
@@ -103,102 +178,119 @@ namespace casadi {
 #endif // SWIG
     /// \endcond
 
+    /** \brief Get the number of function inputs */
+    int n_in() const;
+
+    /** \brief Get the number of function outputs */
+    int n_out() const;
+
+    ///@{
+    /** \brief Get input dimension */
+    int size1_in(int ind) const;
+    int size1_in(const std::string& iname) const {return size1_in(index_in(iname));}
+    int size2_in(int ind) const;
+    int size2_in(const std::string& iname) const {return size2_in(index_in(iname));}
+    std::pair<int, int> size_in(int ind) const;
+    std::pair<int, int> size_in(const std::string& iname) const {return size_in(index_in(iname));}
+    ///@}
+
+    ///@{
+    /** \brief Get output dimension */
+    int size1_out(int ind) const;
+    int size1_out(const std::string& oname) const {return size1_out(index_out(oname));}
+    int size2_out(int ind) const;
+    int size2_out(const std::string& oname) const {return size2_out(index_out(oname));}
+    std::pair<int, int> size_out(int ind) const;
+    std::pair<int, int> size_out(const std::string& oname) const {
+      return size_out(index_out(oname));
+    }
+    ///@}
+
+    ///@{
+    /** \brief  Get of number of input nonzeros
+     * For a particular input or for all for all of the inputs
+     */
+    int nnz_in() const;
+    int nnz_in(int ind) const;
+    int nnz_in(const std::string& iname) const {return numel_in(index_in(iname));}
+    ///@}
+
+    ///@{
+    /** \brief  Get of number of output nonzeros
+     * For a particular output or for all for all of the outputs
+     */
+    int nnz_out() const;
+    int nnz_out(int ind) const;
+    int nnz_out(const std::string& oname) const {return numel_out(index_out(oname));}
+    ///@}
+
+    ///@{
+    /** \brief  Get of number of input elements
+     * For a particular input or for all for all of the inputs
+     */
+    int numel_in() const;
+    int numel_in(int ind) const;
+    int numel_in(const std::string& iname) const {return numel_in(index_in(iname));}
+    ///@}
+
+    ///@{
+    /** \brief  Get of number of output elements
+     * For a particular output or for all for all of the outputs
+     */
+    int numel_out() const;
+    int numel_out(int ind) const;
+    int numel_out(const std::string& oname) const {return numel_out(index_out(oname));}
+    ///@}
+
+    /** \brief Get input scheme */
+    std::vector<std::string> name_in() const;
+
+    /** \brief Get output scheme */
+    std::vector<std::string> name_out() const;
+
+    /** \brief Get input scheme name by index */
+    std::string name_in(int ind) const;
+
+    /** \brief Get output scheme name by index */
+    std::string name_out(int ind) const;
+
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * example:  schemeEntry("x_opt")  -> returns  NLPSOL_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
-    int inputIndex(const std::string &name) const;
+    int index_in(const std::string &name) const;
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * example:  schemeEntry("x_opt")  -> returns  NLPSOL_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
-    int outputIndex(const std::string &name) const;
+    int index_out(const std::string &name) const;
 
-    /** \brief Get input scheme name by index */
-    std::string inputName(int ind) const;
-
-    /** \brief Get output scheme name by index */
-    std::string outputName(int ind) const;
-
-    /** \brief Get input scheme description by index */
-    std::string inputDescription(int ind) const;
-
-    /** \brief Get output scheme description by index */
-    std::string outputDescription(int ind) const;
-
-    /** \brief Get default input value */
-    double defaultInput(int ind) const;
+    /** \brief Get default input value (NOTE: constant reference) */
+    double default_in(int ind) const;
 
     /** \brief Get sparsity of a given input */
     /// @{
-    Sparsity inputSparsity(int ind=0) const;
-    Sparsity inputSparsity(const std::string& iname) const;
+    const Sparsity& sparsity_in(int ind) const;
+    const Sparsity& sparsity_in(const std::string& iname) const;
     /// @}
 
     /** \brief Get sparsity of a given output */
     /// @{
-    Sparsity outputSparsity(int ind=0) const;
-    Sparsity outputSparsity(const std::string& iname) const;
+    const Sparsity& sparsity_out(int ind) const;
+    const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
-#ifndef SWIG
-    /// \cond UNSAFE
-    /** \brief [UNSAFE] Obtain reference to inputs
-     * \sa getInput, setInput
-     */
-    ///@{
-    /// Access input argument
-    const Matrix<double>& input(int i=0) const;
-    const Matrix<double>& input(const std::string &iname) const;
-    Matrix<double>& input(int i=0);
-    Matrix<double>& input(const std::string &iname);
-    ///@}
-
-    /** \brief [UNSAFE] Obtain reference to outputs
-     * \sa getOutput, getOutput
-     */
-    ///@{
-    /// Access output argument
-    const Matrix<double>& output(int i=0) const;
-    const Matrix<double>& output(const std::string &oname) const;
-    Matrix<double>& output(int i=0);
-    Matrix<double>& output(const std::string &oname);
-    ///@}
-    /// \endcond
-#endif
-
-    /** \brief Get the number of function inputs */
-    int nIn() const;
-
-    /** \brief Get the number of function outputs */
-    int nOut() const;
-
-    /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
-    int nnzIn() const;
-
-    /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
-    int nnzOut() const;
-
-    /** \brief  Get total number of elements in all of the matrix-valued inputs */
-    int numelIn() const;
-
-    /** \brief  Get total number of elements in all of the matrix-valued outputs */
-    int numelOut() const;
-
-    /** \brief Get input scheme */
-    std::vector<std::string> inputScheme() const;
-
-    /** \brief Get output scheme */
-    std::vector<std::string> outputScheme() const;
-
-    /** \brief  Evaluate */
-    void evaluate();
-
-    /** \brief  Print dimensions of inputs and outputs */
+    /** \brief Print dimensions of inputs and outputs */
     void printDimensions(std::ostream &stream=casadi::userOut()) const;
+
+    /** \brief Print options to a stream */
+    void printOptions(std::ostream &stream=casadi::userOut()) const;
+
+    /** \brief Print all information there is to know about a certain option */
+    void printOption(const std::string &name, std::ostream &stream = casadi::userOut()) const;
 
     ///@{
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
@@ -219,14 +311,14 @@ namespace casadi {
     Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(inputIndex(iind), oind, compact, symmetric);
+        return jacobian(index_in(iind), oind, compact, symmetric);
     }
     Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) {
-        return jacobian(iind, outputIndex(oind), compact, symmetric);
+        return jacobian(iind, index_out(oind), compact, symmetric);
     }
     Function jacobian(const std::string& iind, const std::string& oind, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(inputIndex(iind), outputIndex(oind), compact, symmetric);
+        return jacobian(index_in(iind), index_out(oind), compact, symmetric);
     }
     ///@}
 
@@ -245,13 +337,13 @@ namespace casadi {
      */
     Function gradient(int iind=0, int oind=0);
     Function gradient(const std::string& iind, int oind=0) {
-        return gradient(inputIndex(iind), oind);
+        return gradient(index_in(iind), oind);
     }
     Function gradient(int iind, const std::string& oind) {
-        return gradient(iind, outputIndex(oind));
+        return gradient(iind, index_out(oind));
     }
     Function gradient(const std::string& iind, const std::string& oind) {
-        return gradient(inputIndex(iind), outputIndex(oind));
+        return gradient(index_in(iind), index_out(oind));
     }
     ///@}
 
@@ -266,11 +358,11 @@ namespace casadi {
      */
     Function tangent(int iind=0, int oind=0);
     Function tangent(const std::string& iind, int oind=0)
-    { return tangent(inputIndex(iind), oind); }
+    { return tangent(index_in(iind), oind); }
     Function tangent(int iind, const std::string& oind)
-    { return tangent(iind, outputIndex(oind)); }
+    { return tangent(iind, index_out(oind)); }
     Function tangent(const std::string& iind, const std::string& oind)
-    { return tangent(inputIndex(iind), outputIndex(oind)); }
+    { return tangent(index_in(iind), index_out(oind)); }
     ///@}
 
     ///@{
@@ -284,11 +376,11 @@ namespace casadi {
      */
     Function hessian(int iind=0, int oind=0);
     Function hessian(const std::string& iind, int oind=0)
-    { return hessian(inputIndex(iind), oind); }
+    { return hessian(index_in(iind), oind); }
     Function hessian(int iind, const std::string& oind)
-    { return hessian(iind, outputIndex(oind)); }
+    { return hessian(iind, index_out(oind)); }
     Function hessian(const std::string& iind, const std::string& oind)
-    { return hessian(inputIndex(iind), outputIndex(oind)); }
+    { return hessian(index_in(iind), index_out(oind)); }
     ///@}
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
@@ -302,94 +394,135 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
-    void call(const std::vector<DMatrix> &arg, std::vector<DMatrix>& SWIG_OUTPUT(res),
+    void call(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false);
     void call(const std::vector<SX> &arg, std::vector<SX>& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false);
     void call(const std::vector<MX> &arg, std::vector<MX>& SWIG_OUTPUT(res),
               bool always_inline=false, bool never_inline=false);
-    ///@}
-
-    ///@{
-    /// Functor shorthand for evaluation
-    std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg,
-                                    bool always_inline=false, bool never_inline=false);
-    std::vector<SX> operator()(const std::vector<SX>& arg,
-                               bool always_inline=false, bool never_inline=false);
-    std::vector<MX> operator()(const std::vector<MX>& arg,
-                               bool always_inline=false, bool never_inline=false);
-    const DMatrixDict operator()(const DMatrixDict& arg,
-                                 bool always_inline=false, bool never_inline=false);
-    const SXDict operator()(const SXDict& arg,
-                            bool always_inline=false, bool never_inline=false);
-    const MXDict operator()(const MXDict& arg,
-                            bool always_inline=false, bool never_inline=false);
+    void call(const DMDict& arg, DMDict& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
+    void call(const SXDict& arg, SXDict& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
+    void call(const MXDict& arg, MXDict& SWIG_OUTPUT(res),
+              bool always_inline=false, bool never_inline=false);
     ///@}
 
 #ifndef SWIG
     ///@{
+    /// Functor shorthand for evaluation
+    std::vector<DM> operator()(const std::vector<DM>& arg);
+    std::vector<SX> operator()(const std::vector<SX>& arg);
+    std::vector<MX> operator()(const std::vector<MX>& arg);
+    const DMDict operator()(const DMDict& arg);
+    const SXDict operator()(const SXDict& arg);
+    const MXDict operator()(const MXDict& arg);
+    ///@}
+
+    ///@{
+    /** \brief Evaluate with temporary memory allocation */
+    void operator()(std::vector<const double*> arg, std::vector<double*> res);
+    void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res);
+    void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res);
+    template<typename D> void _call(std::vector<const D*> arg, std::vector<D*> res);
+    ///@}
+
+    ///@{
+    /** \brief Supported arguments for numerical evaluation and converters */
+    typedef const std::vector<std::vector<double>>& VecArg;
+    std::vector<const double*> buf_in(VecArg arg) const;
+    typedef std::vector<std::vector<double>>& VecRes;
+    std::vector<double*> buf_out(VecRes res) const;
+    typedef std::vector<std::vector<double>*> VPrRes;
+    std::vector<double*> buf_out(VPrRes res) const;
+
+    typedef const std::map<std::string, std::vector<double>>& MapArg;
+    std::vector<const double*> buf_in(MapArg arg) const;
+    typedef std::map<std::string, std::vector<double>>& MapRes;
+    std::vector<double*> buf_out(MapRes res) const;
+    typedef std::map<std::string, std::vector<double>*> MPrRes;
+    std::vector<double*> buf_out(MPrRes res) const;
+    ///@}
+
+    ///@{
+    /** \brief Numerical evaluation */
+    void operator()(VecArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(VecArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+
+    void operator()(MapArg arg, VecRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MapRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, VPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    void operator()(MapArg arg, MPrRes res) { (*this)(buf_in(arg), buf_out(res)); }
+    ///@}
+
+    ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
-    std::vector<DMatrix> operator()(const DMatrix& arg0) { return operator()(make_vector(arg0));}
-    std::vector<SX> operator()(const SX& arg0) { return operator()(make_vector(arg0));}
-    std::vector<MX> operator()(const MX& arg0) { return operator()(make_vector(arg0));}
+    std::vector<DM> operator()(const DM& arg0) {
+      return operator()(std::vector<DM>{arg0});
+    }
+    std::vector<SX> operator()(const SX& arg0) {
+      return operator()(std::vector<SX>{arg0});
+    }
+    std::vector<MX> operator()(const MX& arg0) {
+      return operator()(std::vector<MX>{arg0});
+    }
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
-    void operator()(const double** arg, double** res, int* iw, double* w);
+    void operator()(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 
-    /** \brief Evaluate memory-less SXElement
+    /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
      */
-    void operator()(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    void operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem=0) const;
 
     /** \brief  Propagate sparsity forward */
-    void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
 
-    /** \brief  Propagate sparsity backwards */
-    void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    /** \brief  Propagate sparsity backward */
+    void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0);
 
-    /** \brief Alias for spFwd
-        Same syntax as the double and SXElement versions, allowing use in templated code
-    */
-    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) {
-      spFwd(arg, res, iw, w);
-    }
+    /** \brief Propagate sparsity backward with temporary memory allocation */
+    void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res);
+
 #endif // SWIG
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callForward(const std::vector<MX>& arg, const std::vector<MX>& res,
+    void forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& fseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callReverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+    void reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                  const std::vector<std::vector<MX> >& aseed,
                  std::vector<std::vector<MX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callForward(const std::vector<SX>& arg, const std::vector<SX>& res,
+    void forward(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& fseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callReverse(const std::vector<SX>& arg, const std::vector<SX>& res,
+    void reverse(const std::vector<SX>& arg, const std::vector<SX>& res,
                  const std::vector<std::vector<SX> >& aseed,
                  std::vector<std::vector<SX> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    void callForward(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-                 const std::vector<std::vector<DMatrix> >& fseed,
-                 std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(fsens),
+    void forward(const std::vector<DM>& arg, const std::vector<DM>& res,
+                 const std::vector<std::vector<DM> >& fseed,
+                 std::vector<std::vector<DM> >& SWIG_OUTPUT(fsens),
                  bool always_inline=false, bool never_inline=false);
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    void callReverse(const std::vector<DMatrix>& arg, const std::vector<DMatrix>& res,
-                 const std::vector<std::vector<DMatrix> >& aseed,
-                 std::vector<std::vector<DMatrix> >& SWIG_OUTPUT(asens),
+    void reverse(const std::vector<DM>& arg, const std::vector<DM>& res,
+                 const std::vector<std::vector<DM> >& aseed,
+                 std::vector<std::vector<DM> >& SWIG_OUTPUT(asens),
                  bool always_inline=false, bool never_inline=false);
 
     /// \cond INTERNAL
@@ -401,41 +534,42 @@ namespace casadi {
      * The next two arguments are a set of adjoint directional seeds and the resulting adjoint
      * directional derivatives, the length of the vector being the number of adjoint directions.
      */
-    void callDerivative(const DMatrixVector& arg, DMatrixVector& SWIG_OUTPUT(res),
-                        const DMatrixVectorVector& fseed, DMatrixVectorVector& SWIG_OUTPUT(fsens),
-                        const DMatrixVectorVector& aseed, DMatrixVectorVector& SWIG_OUTPUT(asens),
-                        bool always_inline=false, bool never_inline=false);
+    void derivative(const DMVector& arg, DMVector& SWIG_OUTPUT(res),
+                    const DMVectorVector& fseed, DMVectorVector& SWIG_OUTPUT(fsens),
+                    const DMVectorVector& aseed, DMVectorVector& SWIG_OUTPUT(asens),
+                    bool always_inline=false, bool never_inline=false);
 
-    void callDerivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res),
-                        const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens),
-                        const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
-                        bool always_inline=false, bool never_inline=false);
+    void derivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res),
+                    const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens),
+                    const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
+                    bool always_inline=false, bool never_inline=false);
 
-    void callDerivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res),
-                        const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens),
-                        const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
-                        bool always_inline=false, bool never_inline=false);
+    void derivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res),
+                    const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens),
+                    const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
+                    bool always_inline=false, bool never_inline=false);
     ///@}
     /// \endcond
 
     /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: expand|serial|openmp
-    */
-    std::vector<std::vector<MX> > map(const std::vector<std::vector<MX> > &arg,
-                                      const std::string& parallelization="serial");
-
-    /** \brief  Evaluate symbolically in parallel (matrix graph)
-        \param parallelization Type of parallelization used: expand|serial|openmp
+        \param parallelization Type of parallelization used: unroll|serial|openmp
     */
     std::vector<MX> map(const std::vector<MX > &arg,
-                                      const std::string& parallelization="serial");
+                        const std::string& parallelization="serial");
+
+    /** \brief  Evaluate symbolically in parallel (matrix graph)
+        \param parallelization Type of parallelization used: unroll|serial|openmp
+    */
+    std::map<std::string, MX> map(const std::map<std::string, MX> &arg,
+                        const std::string& parallelization="serial");
 
     /** \brief  Evaluate symbolically in parallel and sum (matrix graph)
-        \param parallelization Type of parallelization used: expand|serial|openmp
+        \param parallelization Type of parallelization used: unroll|serial|openmp
     */
     std::vector<MX> mapsum(const std::vector<MX > &arg,
-                                      const std::string& parallelization="serial");
+                           const std::string& parallelization="serial");
 
+    ///@{
     /** \brief  Create a mapaccumulated version of this function
 
         Suppose the function has a signature of:
@@ -461,9 +595,15 @@ namespace casadi {
 
 
     */
-    Function mapaccum(const std::string& name, int N, const Dict & options = Dict()) const;
+    Function mapaccum(const std::string& name, int n, const Dict& opts = Dict());
+    Function mapaccum(const std::string& name, int n,
+                      const std::vector<int>& accum_in,
+                      const std::vector<int>& accum_out,
+                      const Dict& opts=Dict());
+    ///@}
 
 
+    ///@{
     /** \brief  Create a mapped version of this function
 
         Suppose the function has a signature of:
@@ -476,9 +616,9 @@ namespace casadi {
            F: (A, P) -> (S )
 
             with
-                a: horzcat([a0, a1, ..., a_(N-1)])
-                p: horzcat([p0, p1, ..., p_(N-1)])
-                s: horzcat([s0, s1, ..., s_(N-1)])
+                A: horzcat([a0, a1, ..., a_(N-1)])
+                P: horzcat([p0, p1, ..., p_(N-1)])
+                S: horzcat([s0, s1, ..., s_(N-1)])
             and
                 s0 <- f(a0, p0)
                 s1 <- f(a1, p1)
@@ -486,12 +626,60 @@ namespace casadi {
                 s_(N-1) <- f(a_(N-1), p_(N-1))
         \endverbatim
 
+        \param parallelization Type of parallelization used: unroll|serial|openmp
 
     */
-    Function map(const std::string& name, int N,  const Dict & options = Dict()) const;
+
+    Function map(const std::string& name, const std::string& parallelization, int n,
+      const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+      const Dict& opts=Dict());
+    Function map(const std::string& name, const std::string& parallelization, int n,
+      const Dict& opts=Dict());
+    ///@}
+
+    /** \brief returns a new function with a selection of inputs/outputs of the original */
+    Function slice(const std::vector<int>& order_in, const std::vector<int>& order_out,
+                   const Dict& opts=Dict());
+
+    /** \brief Constuct a switch function */
+    static Function conditional(const std::string& name, const std::vector<Function>& f,
+                                const Function& f_def, const Dict& opts=Dict());
+
+    /** \brief Constructor (if-else) */
+    static Function if_else(const std::string& name, const Function& f_true,
+                            const Function& f_false, const Dict& opts=Dict());
+
+    /** kernel_sum
+        Consider a dense matrix V.
+
+        KernelSum computes
+
+        F(V,X)  = sum_i sum_j  f ( [i;j], V(i,j), X)
+
+        with X: [x;y]
+
+        where the summation is taken for all entries (i,j)
+        that are a distance r away from X.
+
+        This function assumes that V is fixed:
+        sensitivities with respect to it are not computed.
+
+        This allows for improved speed of evaluation.
+
+        Having V fixed is a common use case:
+        V may be a large bitmap (observation),
+        onto which a kernel is fitted.
+
+        \author Joris Gillis
+        \date 2015
+    */
+    Function kernel_sum(const std::string& name,
+                        const std::pair<int, int> & size,
+                        double r, int n,
+                        const Dict& opts=Dict()) const;
 
     /** \brief Get a function that calculates \a nfwd forward derivatives and nadj adjoint derivatives
-     *         Legacy function: Use derForward and derReverse instead.
+     *         Legacy function: Use forward and reverse instead.
      *
      *         Returns a function with <tt>(1+nfwd)*n_in+nadj*n_out</tt> inputs
      *         and <tt>(1+nfwd)*n_out + nadj*n_in</tt> outputs.
@@ -505,7 +693,7 @@ namespace casadi {
      *         one direction at a time and the last <tt>nadj*n_in</tt> outputs corresponds to
      *         adjoint sensitivities, one direction at a time.
      *
-     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
+     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      */
     Function derivative(int nfwd, int nadj);
@@ -520,12 +708,12 @@ namespace casadi {
      *         one direction at a time
      *         The  <tt>nfwd*n_out</tt> outputs correspond to forward sensitivities,
      *         one direction at a time.     *
-     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
+     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function derForward(int nfwd);
+    Function forward(int nfwd);
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
@@ -537,47 +725,55 @@ namespace casadi {
      *         one direction at a time
      *         The  <tt>nadj*n_in</tt> outputs correspond to adjoint sensitivities,
      *         one direction at a time.     *
-     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
+     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
-     *         <tt>(n_in = nIn(), n_out = nOut())</tt>
+     *         <tt>(n_in = n_in(), n_out = n_out())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function derReverse(int nadj);
+    Function reverse(int nadj);
 
     /** \brief Set a function that calculates \a nfwd forward derivatives
         NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void setDerForward(const Function& fcn, int nfwd);
+    void set_forward(const Function& fcn, int nfwd);
 
     /** \brief Set a function that calculates \a nadj adjoint derivatives
         NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
-    void setDerReverse(const Function& fcn, int nadj);
+    void set_reverse(const Function& fcn, int nadj);
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    const Sparsity jacSparsity(const std::string &iind, int oind=0, bool compact=false,
-                          bool symmetric=false) {
-        return jacSparsity(inputIndex(iind), oind, compact, symmetric); }
-    const Sparsity jacSparsity(int iind, const std::string &oind, bool compact=false,
-                          bool symmetric=false) {
-        return jacSparsity(iind, outputIndex(oind), compact, symmetric); }
-    const Sparsity jacSparsity(const std::string &iind, const std::string &oind,
+    const Sparsity sparsity_jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    const Sparsity sparsity_jac(const std::string &iind, int oind=0, bool compact=false,
+                                bool symmetric=false) {
+      return sparsity_jac(index_in(iind), oind, compact, symmetric);
+    }
+    const Sparsity sparsity_jac(int iind, const std::string &oind, bool compact=false,
+                                bool symmetric=false) {
+      return sparsity_jac(iind, index_out(oind), compact, symmetric);
+    }
+    const Sparsity sparsity_jac(const std::string &iind, const std::string &oind,
                           bool compact=false, bool symmetric=false) {
-        return jacSparsity(inputIndex(iind), outputIndex(oind), compact, symmetric); }
+      return sparsity_jac(index_in(iind), index_out(oind), compact, symmetric);
+    }
     ///@}
 
     ///@{
     /// Generate the sparsity of a Jacobian block
-    void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
-    void setJacSparsity(const Sparsity& sp, const std::string &iind, int oind, bool compact=false) {
-        setJacSparsity(sp, inputIndex(iind), oind, compact); }
-    void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) {
-        setJacSparsity(sp, iind, outputIndex(oind), compact); }
-    void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
-                        bool compact=false) {
-        setJacSparsity(sp, inputIndex(iind), outputIndex(oind), compact); }
+    void set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
+    void set_jac_sparsity(const Sparsity& sp, const std::string &iind, int oind,
+                          bool compact=false) {
+      set_jac_sparsity(sp, index_in(iind), oind, compact);
+    }
+    void set_jac_sparsity(const Sparsity& sp, int iind, const std::string &oind,
+                          bool compact=false) {
+      set_jac_sparsity(sp, iind, index_out(oind), compact);
+    }
+    void set_jac_sparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
+                          bool compact=false) {
+      set_jac_sparsity(sp, index_in(iind), index_out(oind), compact);
+    }
     ///@}
 
     /** \brief Export / Generate C code for the function */
@@ -586,59 +782,96 @@ namespace casadi {
     /** \brief Export / Generate C code for the function */
     void generate(const Dict& opts=Dict());
 
-    /** \brief Wrap a function in an MXFunction package */
-    Function wrap(const std::string& fname, const Dict& opts=Dict());
+    /** \brief Export / Generate C code for the dependency function */
+    void generate_dependencies(const std::string& fname, const Dict& opts=Dict());
 
+#ifndef SWIG
     /// \cond INTERNAL
-    /** \brief  Access functions of the node */
-    FunctionInternal* operator->();
+    /// Get a const pointer to the node
+    FunctionInternal* get() const;
 
     /** \brief  Const access functions of the node */
-    const FunctionInternal* operator->() const;
+    FunctionInternal* operator->() const;
 
     /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
+    static bool test_cast(const SharedObjectNode* ptr);
     /// \endcond
+#endif // SWIG
 
     /// Get all statistics obtained at the end of the last evaluate call
-    const Dict& getStats() const;
+    Dict stats(int mem=0) const;
 
-    /// Get a single statistic obtained at the end of the last evaluate call
-    GenericType getStat(const std::string& name) const;
-
-    /** \brief  Get a vector of symbolic variables with the same dimensions as the inputs
-     *
-     * There is no guarantee that consecutive calls return identical objects
+    ///@{
+    /** \brief Get symbolic primitives equivalent to the input expressions
+     * There is no guarantee that subsequent calls return unique answers
      */
-    std::vector<MX> symbolicInput(bool unique=false) const;
+    const SX sx_in(int iind) const;
+    const SX sx_in(const std::string& iname) const {
+      return sx_in(index_in(iname));
+    }
+    const std::vector<SX> sx_in() const;
+    const MX mx_in(int ind) const;
+    const MX mx_in(const std::string & iname) const {
+      return mx_in(index_in(iname));
+    }
+    const std::vector<MX> mx_in() const;
+    ///@}
 
-    /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
-     *
-     * There is no guarantee that consecutive calls return identical objects
-     */
-    std::vector<SX> symbolicInputSX() const;
+    ///@{
+    /** \brief Get symbolic primitives equivalent to the output expressions
+    * There is no guarantee that subsequent calls return unique answers
+    */
+    const SX sx_out(int oind) const;
+    const SX sx_out(const std::string& oname) const {
+      return sx_out(index_out(oname));
+    }
+    const std::vector<SX> sx_out() const;
+    const MX mx_out(int ind) const;
+    const MX mx_out(const std::string& oname) const {
+      return mx_out(index_out(oname));
+    }
+    const std::vector<MX> mx_out() const;
+    ///@}
 
-    /** \brief  Get a vector of symbolic variables with the same dimensions as the outputs
-     *
-     * There is no guarantee that consecutive calls return identical objects
-     */
-    std::vector<MX> symbolicOutput() const;
+    /** \brief Get all the free variables of the function */
+    SX free_sx() const;
+
+    /** \brief Get all the free variables of the function */
+    std::vector<MX> free_mx() const;
+
+    /** \brief Does the function have free variables */
+    bool has_free() const;
+
+    /** \brief Extract the functions needed for the Lifted Newton method */
+    void generate_lifted(Function& SWIG_OUTPUT(vdef_fcn),
+                                  Function& SWIG_OUTPUT(vinit_fcn));
+
+    /** \brief Get the number of atomic operations */
+    int getAlgorithmSize() const;
+
+    /** \brief Get the length of the work vector */
+    int getWorkSize() const;
+
+    /** \brief Get an atomic operation operator index */
+    int getAtomicOperation(int k) const;
+
+    /** \brief Get the (integer) input arguments of an atomic operation */
+    std::pair<int, int> getAtomicInput(int k) const;
+
+    /** \brief Get the floating point output argument of an atomic operation */
+    double getAtomicInputReal(int k) const;
+
+    /** \brief Get the (integer) output argument of an atomic operation */
+    int getAtomicOutput(int k) const;
+
+    /** \brief Number of nodes in the algorithm */
+    int n_nodes() const;
 
     /// \cond INTERNAL
     /** \brief Is the class able to propagate seeds through the algorithm?
      *
      * (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);
-
-    /** \brief Reset the sparsity propagation
-     *
-     * (for usage, see the example propagating_sparsity.cpp) */
-    void spInit(bool fwd);
-
-    /** \brief Propagate the sparsity pattern through a set of directional
-     *
-     * derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
-    void spEvaluate(bool fwd);
 
     /** \brief Get required length of arg field */
     size_t sz_arg() const;
@@ -655,6 +888,15 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
+
+    /** \brief Set the (persistent) work vectors */
+    void set_work(const double**& arg, double**& res, int*& iw, double*& w, int mem=0) const;
+
+    /** \brief Set the (temporary) work vectors */
+    void set_temp(const double** arg, double** res, int* iw, double* w, int mem=0) const;
+
+    /** \brief Set the (persistent and temporary) work vectors */
+    void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 #endif // SWIG
 
     /// \endcond
@@ -671,120 +913,128 @@ namespace casadi {
 #ifndef SWIG
     /** \brief Call using a map */
     template<typename M>
-    const std::map<std::string, M> callMap(const std::map<std::string, M>& arg,
-                                       bool always_inline, bool never_inline);
-
-    /** \brief Check if input arguments have correct length and dimensions
-    *
-    * \param hcat check if horizontal repetion of the function input is allowed
-    */
-    template<typename M>
-    void checkArg(const std::vector<M>& arg, bool hcat=false) const;
-
-    /** \brief Check if output arguments have correct length and dimensions */
-    template<typename M>
-    void checkRes(const std::vector<M>& res) const;
-
-    /** \brief Check forward mode seeds dimensions */
-    template<typename M>
-    void checkFwdSeed(const std::vector<std::vector<M> >& fseed) const;
-
-    /** \brief Check reverse mode seeds dimensions */
-    template<typename M>
-    void checkAdjSeed(const std::vector<std::vector<M> >& aseed) const;
-
-    /** \brief Check if input arguments that needs to be replaced
-    * 
-    * \param hcat check if horizontal repetion of the function input is allowed
-    */
-    template<typename M>
-    bool matchingArg(const std::vector<M>& arg, bool hcat=false) const;
-
-    /** \brief Check if output arguments that needs to be replaced */
-    template<typename M>
-    bool matchingRes(const std::vector<M>& arg) const;
-
-    /** \brief Check if there are 0-by-0 forward seeds that needs to be replaced */
-    template<typename M>
-    bool matchingFwdSeed(const std::vector<std::vector<M> >& fseed) const;
-
-    /** \brief Check if there are 0-by-0 reverse seeds that needs to be replaced */
-    template<typename M>
-    bool matchingAdjSeed(const std::vector<std::vector<M> >& aseed) const;
-
-    /** \brief Replace 0-by-0 inputs
-    *
-    * \param hcat check if horizontal repetion of the function input is allowed
-    */
-    template<typename M>
-    std::vector<M> replaceArg(const std::vector<M>& arg, bool hcat=false) const;
-
-    /** \brief Replace 0-by-0 outputs */
-    template<typename M>
-    std::vector<M> replaceRes(const std::vector<M>& res) const;
-
-    /** \brief Replace 0-by-0 forward seeds */
-    template<typename M>
-    std::vector<std::vector<M> >
-      replaceFwdSeed(const std::vector<std::vector<M> >& fseed) const;
-
-    /** \brief Replace 0-by-0 reverse seeds */
-    template<typename M>
-    std::vector<std::vector<M> >
-      replaceAdjSeed(const std::vector<std::vector<M> >& aseed) const;
+    void _call(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
+               bool always_inline, bool never_inline);
 #endif // SWIG
     /// \endcond
 
+    /** \brief Name of the function */
+    std::string name() const;
+
+    /** \brief Get type name */
+    std::string type_name() const;
+
+    /** \brief Check if the function is of a particular type
+        Optionally check if name matches one of the base classes (default true)
+     */
+    bool is_a(const std::string& type, bool recursive=true) const;
+
+    /** \brief Check if a string is a valid function name
+     * Valid function names consist of
+     *
+     * - At least one character
+     * - Upper and lower case letters: a-zA-Z
+     * - Numbers 0-9, but never as first character
+     * - Underscore, but never as first character and never next to another underscore
+     *
+     * May not be one of the following keywords: "null", "jac", "hess"
+     */
+    static bool check_name(const std::string& name);
+
+    /** \brief Turn a string into a valid function name as defined by "check_name"
+     * Non-alphanumeric characters are converted into underscores and multiple
+     * consecutive undercores are dropped
+     */
+    static std::string fix_name(const std::string& name);
+
+    /// Checkout a memory object
+    int checkout();
+
+    /// Release a memory object
+    void release(int mem);
+
+    /// Create a solve node
+    MX linsol_solve(const MX& A, const MX& B, bool tr=false);
+
 #ifndef SWIG
-    // Create vector with 1 element
-    inline friend std::vector<Function> make_vector(const Function& x0) {
-      return std::vector<Function>(1, x0);
-    }
+    /// Get memory object
+    void* memory(int ind) const;
 
-    // Create vector with 2 elements
-    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1) {
-      Function x[] = {x0, x1};
-      return std::vector<Function>(x, x+2);
-    }
+    // Factorize linear system of equations
+    void linsol_factorize(const double* A, int mem=0) const;
 
-    // Create vector with 3 elements
-    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1,
-                                                   const Function& x2) {
-      Function x[] = {x0, x1, x2};
-      return std::vector<Function>(x, x+3);
-    }
+    // Solve factorized linear system of equations
+    void linsol_solve(double* x, int nrhs=1, bool tr=false, int mem=0) const;
 
-    // Create vector with 4 elements
-    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1,
-                                                   const Function& x2, const Function& x3) {
-      Function x[] = {x0, x1, x2, x3};
-      return std::vector<Function>(x, x+4);
-    }
+    ///@{
+    /// Propagate sparsity through a linear solve
+    void linsol_spsolve(bvec_t* X, const bvec_t* B, bool tr=false) const;
+    void linsol_spsolve(DM& X, const DM& B, bool tr=false) const;
+    ///@}
 
-    // Create vector with 5 elements
-    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1,
-                                                   const Function& x2, const Function& x3,
-                                                   const Function& x4) {
-      Function x[] = {x0, x1, x2, x3, x4};
-      return std::vector<Function>(x, x+5);
-    }
-
-    // Create vector with 6 elements
-    inline friend std::vector<Function> make_vector(const Function& x0, const Function& x1,
-                                                   const Function& x2, const Function& x3,
-                                                   const Function& x4, const Function& x5) {
-      Function x[] = {x0, x1, x2, x3, x4, x5};
-      return std::vector<Function>(x, x+6);
-    }
+    /** \brief Solve the system of equations <tt>Lx = b</tt>
+        Only when a Cholesky factorization is available
+    */
+    void linsol_solveL(double* x, int nrhs, bool tr, int mem=0) const;
 #endif // SWIG
 
-    /** \brief get function name with all non alphanumeric characters converted to '_' */
-    std::string getSanitizedName() const;
+    /** \brief Obtain a symbolic Cholesky factorization
+        Only for Cholesky solvers
+    */
+    Sparsity linsol_cholesky_sparsity(bool tr=false, int mem=0) const;
 
-    /** \brief get function name with all non alphanumeric characters converted to '_' */
-    static std::string sanitizeName(const std::string& name);
+    /** \brief Obtain a numeric Cholesky factorization
+        Only for Cholesky solvers
+     */
+    DM linsol_cholesky(bool tr=false, int mem=0) const;
+
+    /// Access rhs function for a rootfinder
+    Function rootfinder_fun();
+
+    /// Access Jacobian of the ths function for a rootfinder
+    Function rootfinder_jac();
+
+    /// Access linear solver of a rootfinder
+    Function rootfinder_linsol();
+
+    /// Get the DAE for an integrator
+    Function integrator_dae();
+
+    /** Generate native code in the interfaced language for debugging */
+    void qpsol_debug(const std::string &filename) const;
+
+    /** Generate native code in the interfaced language for debugging */
+    void qpsol_debug(std::ostream &file) const;
+
+#ifndef SWIG
+    protected:
+    ///@{
+    /** \brief Called by constructors */
+    void construct(const std::string& name,
+                   const std::vector<SX>& arg, const std::vector<SX>& res,
+                   const Dict& opts);
+    void construct(const std::string& name,
+                   const std::vector<MX>& arg, const std::vector<MX>& res,
+                   const Dict& opts);
+    template<typename M>
+      void construct(const std::string& name,
+                     const std::vector<M>& arg, const std::vector<M>& res,
+                     const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+                     const Dict& opts);
+    template<typename M>
+      void construct(const std::string& name, const std::map<std::string, M>& dict,
+                     const std::vector<std::string>& argn,
+                     const std::vector<std::string>& resn,
+                     const Dict& opts);
+    ///@}
+
+    /// Helper function for parsing .casadi files
+    static bool proceed_to(std::istream& file, const std::string& str);
+#endif // SWIG
   };
 
 } // namespace casadi
+
+#include "../matrix_impl.hpp"
 
 #endif // CASADI_FUNCTION_HPP

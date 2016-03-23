@@ -27,95 +27,172 @@
 #define CASADI_SUNDIALS_INTERFACE_HPP
 
 #include <casadi/interfaces/sundials/casadi_sundials_common_export.h>
-#include "casadi/core/function/integrator_internal.hpp"
+#include "casadi/core/function/integrator_impl.hpp"
 
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_dense.h>
 #include <sundials/sundials_iterative.h>
 #include <sundials/sundials_types.h>
 
+#include <ctime>
+
 /// \cond INTERNAL
 namespace casadi {
 
-class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public IntegratorInternal {
-public:
-  /** \brief  Constructor */
-  SundialsInterface(const Function& f, const Function& g);
+  // IdasMemory
+  struct CASADI_SUNDIALS_COMMON_EXPORT SundialsMemory : public IntegratorMemory {
+    // Current time
+    double t;
 
-  /** \brief  Destructor */
-  virtual ~SundialsInterface()=0;
+    // N-vectors for the forward integration
+    N_Vector xz, xzdot, q;
 
-  /** \brief  Initialize */
-  virtual void init();
+    // N-vectors for the backward integration
+    N_Vector rxz, rxzdot, rq;
 
-  /** \brief  Reset the forward problem and bring the time back to t0 */
-  virtual void reset() = 0;
+    // Parameters
+    std::vector<double> p, rp;
 
-  /** \brief  Deep copy data members */
-  virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
+    // For timings
+    clock_t time1, time2;
 
-  /** \brief  Set stop time for the integration */
-  virtual void setStopTime(double tf) = 0;
+    // Accumulated time since last reset:
+    double t_res; // time spent in the DAE residual
+    double t_fres; // time spent in the forward sensitivity residual
+    double t_jac, t_jacB; // time spent in the Jacobian, or Jacobian times vector function
+    double t_lsolve; // preconditioner/linear solver solve function
+    double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
+    double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
 
-  /// Linear solver forward, backward
-  LinearSolver linsol_, linsolB_;
+    /// Stats
+    long nsteps, nfevals, nlinsetups, netfails;
+    int qlast, qcur;
+    double hinused, hlast, hcur, tcur;
 
-  ///@{
-  /// options
-  bool exact_jacobian_, exact_jacobianB_;
-  double abstol_, reltol_;
-  double fsens_abstol_, fsens_reltol_;
-  double abstolB_, reltolB_;
-  int max_num_steps_;
-  bool finite_difference_fsens_;
-  bool stop_at_end_;
-  ///@}
+    long nstepsB, nfevalsB, nlinsetupsB, netfailsB;
+    int qlastB, qcurB;
+    double hinusedB, hlastB, hcurB, tcurB;
 
-  /// number of checkpoints stored so far
-  int ncheck_;
+    /// number of checkpoints stored so far
+    int ncheck;
 
-  /// Supported linear solvers in Sundials
-  enum LinearSolverType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
+    /// Constructor
+    SundialsMemory();
 
-  /// Supported iterative solvers in Sundials
-  enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR};
+    /// Destructor
+    ~SundialsMemory();
+  };
 
-  /// Linear solver data (dense)
-  struct LinSolDataDense {};
+  class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
+  public:
+    /** \brief  Constructor */
+    SundialsInterface(const std::string& name, Oracle* dae);
 
-  /// Linear solver
-  LinearSolverType linsol_f_, linsol_g_;
+    /** \brief  Destructor */
+    virtual ~SundialsInterface()=0;
 
-  /// Iterative solver
-  IterativeSolverType itsol_f_, itsol_g_;
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
 
-  /// Preconditioning
-  int pretype_f_, pretype_g_;
+    /** \brief  Initialize */
+    virtual void init(const Dict& opts);
 
-  /// Max Krylov size
-  int max_krylov_, max_krylovB_;
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
 
-  /// Use preconditioning
-  bool use_preconditioner_, use_preconditionerB_;
+    /// Get all statistics
+    virtual Dict get_stats(void* mem) const;
 
-  // Jacobian of the DAE with respect to the state and state derivatives
-  Function jac_, jacB_;
+    /** \brief  Reset the forward problem and bring the time back to t0 */
+    virtual void reset(IntegratorMemory* mem, double t, const double* x,
+                       const double* z, const double* p) const;
 
-  // Jacobian times vector functions
-  Function f_fwd_, g_fwd_;
+    /** \brief  Reset the backward problem and take time to tf */
+    virtual void resetB(IntegratorMemory* mem, double t, const double* rx,
+                        const double* rz, const double* rp) const;
 
-  /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual Function getJac()=0;
+    /// Linear solver forward, backward
+    Function linsol_, linsolB_;
 
-  /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual Function getJacB()=0;
+    ///@{
+    /// Options
+    bool exact_jacobian_, exact_jacobianB_;
+    double abstol_, reltol_;
+    double fsens_abstol_, fsens_reltol_;
+    double abstolB_, reltolB_;
+    int max_num_steps_;
+    bool finite_difference_fsens_;
+    bool stop_at_end_;
+    int upper_bandwidth_, lower_bandwidth_;
+    int upper_bandwidthB_, lower_bandwidthB_;
+    bool quad_err_con_;
+    std::string interpolation_type_;
+    int steps_per_checkpoint_;
+    bool disable_internal_warnings_;
+    int max_multistep_order_;
+    ///@}
 
-  // Get bandwidth for forward problem
-  std::pair<int, int> getBandwidth() const;
+    /// Supported linear solvers in Sundials
+    enum LinsolType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
 
-  // Get bandwidth for backward problem
-  std::pair<int, int> getBandwidthB() const;
-};
+    /// Supported iterative solvers in Sundials
+    enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR};
+
+    /// Linear solver data (dense)
+    struct LinSolDataDense {};
+
+    /// Linear solver
+    LinsolType linsol_f_, linsol_g_;
+
+    /// Iterative solver
+    IterativeSolverType itsol_f_, itsol_g_;
+
+    /// Preconditioning
+    int pretype_f_, pretype_g_;
+
+    /// Max Krylov size
+    int max_krylov_, max_krylovB_;
+
+    /// Use preconditioning
+    bool use_preconditioner_, use_preconditionerB_;
+
+    // Jacobian of the DAE with respect to the state and state derivatives
+    Function jac_, jacB_;
+
+    // Jacobian times vector functions
+    Function f_fwd_, g_fwd_;
+
+    /** \brief  Get the integrator Jacobian for the forward problem */
+    virtual Function getJac()=0;
+
+    /** \brief  Get the integrator Jacobian for the backward problem */
+    virtual Function getJacB()=0;
+
+    // Get bandwidth for forward problem
+    std::pair<int, int> getBandwidth() const;
+
+    // Get bandwidth for backward problem
+    std::pair<int, int> getBandwidthB() const;
+
+    // Print a variable
+    static void printvar(const std::string& id, double v) {
+      userOut() << id << " = " << v << std::endl;
+    }
+    // Print an N_Vector
+    static void printvar(const std::string& id, N_Vector v) {
+      std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
+      userOut() << id << " = " << tmp << std::endl;
+    }
+  };
+
+  // Check if N_Vector is regular
+  inline bool is_regular(N_Vector v) {
+    std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
+    return is_regular(tmp);
+  }
 
 } // namespace casadi
 

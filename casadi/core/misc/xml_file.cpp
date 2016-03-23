@@ -39,11 +39,11 @@ namespace casadi {
   }
 
   const XmlFileInternal* XmlFile::operator->() const {
-    return static_cast<const XmlFileInternal*>(OptionsFunctionality::operator->());
+    return static_cast<const XmlFileInternal*>(SharedObject::operator->());
   }
 
   XmlFileInternal* XmlFile::operator->() {
-    return static_cast<XmlFileInternal*>(OptionsFunctionality::operator->());
+    return static_cast<XmlFileInternal*>(SharedObject::operator->());
   }
 
   XmlNode XmlFile::parse(const std::string& filename) {

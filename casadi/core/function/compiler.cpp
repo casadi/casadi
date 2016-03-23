@@ -35,20 +35,23 @@ namespace casadi {
   Compiler::Compiler(const std::string& name,
                            const std::string& compiler,
                            const Dict& opts) {
-    assignNode(CompilerInternal::getPlugin(compiler).creator(name));
-    setOption(opts);
-    init();
+    if (compiler=="none") {
+      assignNode(new CompilerInternal(name));
+    } else {
+      assignNode(CompilerInternal::getPlugin(compiler).creator(name));
+    }
+    (*this)->construct(opts);
   }
 
   CompilerInternal* Compiler::operator->() {
-    return static_cast<CompilerInternal*>(OptionsFunctionality::operator->());
+    return static_cast<CompilerInternal*>(SharedObject::operator->());
   }
 
   const CompilerInternal* Compiler::operator->() const {
-    return static_cast<const CompilerInternal*>(OptionsFunctionality::operator->());
+    return static_cast<const CompilerInternal*>(SharedObject::operator->());
   }
 
-  bool Compiler::testCast(const SharedObjectNode* ptr) {
+  bool Compiler::test_cast(const SharedObjectNode* ptr) {
     return dynamic_cast<const CompilerInternal*>(ptr)!=0;
   }
 
@@ -68,8 +71,43 @@ namespace casadi {
     return (*this)->plugin_name();
   }
 
-  void* Compiler::getFunction(const std::string& symname) {
+  void* Compiler::get_function(const std::string& symname) {
     return (*this)->getFunction(symname);
+  }
+
+  const ParsedFile& Compiler::meta() const {
+    return (*this)->meta_;
+  }
+
+  Library::Library() {
+  }
+
+  Library::Library(const std::string& bin_name) {
+    assignNode(new DllLibrary(bin_name));
+  }
+
+  Library::Library(const Compiler& compiler) {
+    assignNode(new JitLibrary(compiler));
+  }
+
+  LibraryInternal* Library::operator->() {
+    return static_cast<LibraryInternal*>(SharedObject::operator->());
+  }
+
+  const LibraryInternal* Library::operator->() const {
+    return static_cast<const LibraryInternal*>(SharedObject::operator->());
+  }
+
+  bool Library::has(const std::string& sym) const {
+    return (*this)->has(sym);
+  }
+
+  signal_t Library::get(const std::string& sym) {
+    return (*this)->get(sym);
+  }
+
+  const ParsedFile& Library::meta() const {
+    return (*this)->meta();
   }
 
 } // namespace casadi

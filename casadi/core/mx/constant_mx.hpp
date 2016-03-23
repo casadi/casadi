@@ -59,17 +59,14 @@ namespace casadi {
     // Creator (values may be different)
     static ConstantMX* create(const Matrix<double>& val);
 
-    /** \brief  Clone function */
-    virtual ConstantMX* clone() const = 0;
-
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w) = 0;
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const = 0;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) = 0;
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) = 0;
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -80,16 +77,16 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_CONST;}
+    virtual int op() const { return OP_CONST;}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const = 0;
+    virtual double to_double() const = 0;
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const = 0;
@@ -98,24 +95,42 @@ namespace casadi {
     //    virtual MX getMultiplication(const MX& y) const;
 
     /// Inner product
-    virtual MX getInnerProd(const MX& y) const;
+    virtual MX getDot(const MX& y) const;
 
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
+
+    /** \brief  Check if valid function input */
+    virtual bool is_valid_input() const { return sparsity().nnz()==0;}
+
+    /** \brief Get the number of symbolic primitives */
+    virtual int n_primitives() const { return 0;}
+
+    /** \brief Get symbolic primitives */
+    virtual void primitives(std::vector<MX>::iterator& it) const {}
+
+    /** \brief Split up an expression along symbolic primitives */
+    virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const {}
+
+    /** \brief Join an expression along symbolic primitives */
+    virtual MX join_primitives(std::vector<MX>::const_iterator& it) const { return MX(sparsity());}
+
+    /** \brief Detect duplicate symbolic expressions */
+    virtual bool has_duplicates() { return false;}
+
+    /** \brief Reset the marker for an input expression */
+    virtual void resetInput() {}
   };
 
-  /// A constant given as a DMatrix
-  class CASADI_EXPORT ConstantDMatrix : public ConstantMX {
+  /// A constant given as a DM
+  class CASADI_EXPORT ConstantDM : public ConstantMX {
   public:
 
     /** \brief  Constructor */
-    explicit ConstantDMatrix(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x) {}
+    explicit ConstantDM(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x) {}
 
     /// Destructor
-    virtual ~ConstantDMatrix() {}
-
-    /** \brief  Clone function */
-    virtual ConstantDMatrix* clone() const { return new ConstantDMatrix(*this);}
+    virtual ~ConstantDM() {}
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const {
@@ -123,33 +138,33 @@ namespace casadi {
     }
 
     /** \brief  Evaluate the function numerically */
-    virtual void evalD(const double** arg, double** res, int* iw, double* w) {
-      std::copy(x_.begin(), x_.end(), res[0]);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+      std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {
-      std::copy(x_.begin(), x_.end(), res[0]);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+      std::copy(x_->begin(), x_->end(), res[0]);
     }
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Check if a particular integer value */
-    virtual bool isZero() const;
-    virtual bool isOne() const;
-    virtual bool isMinusOne() const;
-    virtual bool isIdentity() const;
+    virtual bool is_zero() const;
+    virtual bool is_one() const;
+    virtual bool is_minus_one() const;
+    virtual bool is_identity() const;
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const {return x_.toScalar();}
+    virtual double to_double() const {return x_.scalar();}
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const { return x_;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const;
+    virtual bool is_equal(const MXNode* node, int depth) const;
 
     /** \brief  data member */
     Matrix<double> x_;
@@ -175,28 +190,25 @@ namespace casadi {
       destroySingleton();
     }
 
-    /** \brief  Clone function */
-    virtual ZeroByZero* clone() const { return getInstance();}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w) {}
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const {}
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w) {}
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const {}
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const {}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const { return 0;}
+    virtual double to_double() const { return 0;}
 
     /// Get the value (only for constant nodes)
-    virtual DMatrix getMatrixValue() const { return DMatrix(); }
+    virtual DM getMatrixValue() const { return DM(); }
 
     /// Get densification
     virtual MX getProject(const Sparsity& sp) const;
@@ -220,28 +232,10 @@ namespace casadi {
     virtual MX getReshape(const Sparsity& sp) const;
 
     /** \brief  Check if valid function input */
-    virtual bool isValidInput() const { return true;}
-
-    /** \brief Get the number of symbolic primitives */
-    virtual int numPrimitives() const { return 0;}
-
-    /** \brief Get symbolic primitives */
-    virtual void getPrimitives(std::vector<MX>::iterator& it) const {}
-
-    /** \brief Split up an expression along symbolic primitives */
-    virtual void splitPrimitives(const MX& x, std::vector<MX>::iterator& it) const {}
-
-    /** \brief Join an expression along symbolic primitives */
-    virtual MX joinPrimitives(std::vector<MX>::const_iterator& it) const { return MX();}
-
-    /** \brief Detect duplicate symbolic expressions */
-    virtual bool hasDuplicates() { return false;}
-
-    /** \brief Reset the marker for an input expression */
-    virtual void resetInput() {}
+    virtual bool is_valid_input() const { return true;}
 
     /** \brief  Get the name */
-    virtual const std::string& getName() const {
+    virtual const std::string& name() const {
       static std::string dummyname;
       return dummyname;
     }
@@ -272,31 +266,28 @@ namespace casadi {
     /// Destructor
     virtual ~Constant() {}
 
-    /** \brief  Clone function */
-    virtual Constant* clone() const { return new Constant<Value>(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Check if a particular integer value */
-    virtual bool isZero() const { return v_.value==0;}
-    virtual bool isOne() const { return v_.value==1;}
-    virtual bool isIdentity() const { return v_.value==1 && sparsity().isdiag();}
+    virtual bool is_zero() const { return v_.value==0;}
+    virtual bool is_one() const { return v_.value==1;}
+    virtual bool is_identity() const { return v_.value==1 && sparsity().is_diag();}
     virtual bool isValue(double val) const { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const {
+    virtual double to_double() const {
       return v_.value;
     }
 
@@ -387,11 +378,11 @@ namespace casadi {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op, v_.value, 0.0, ret);
-    if (operation_checker<F0XChecker>(op) || sparsity().isdense()) {
+    if (operation_checker<F0XChecker>(op) || sparsity().is_dense()) {
       return MX(sparsity(), ret);
     } else {
       if (v_.value==0) {
-        if (isZero() && operation_checker<F0XChecker>(op)) {
+        if (is_zero() && operation_checker<F0XChecker>(op)) {
           return MX(sparsity(), ret, false);
         } else {
           return repmat(MX(ret), size1(), size2());
@@ -399,8 +390,8 @@ namespace casadi {
       }
       double ret2;
       casadi_math<double>::fun(op, 0, 0.0, ret2);
-      return DMatrix(sparsity(), ret, false)
-        + DMatrix(sparsity().patternInverse(), ret2, false);
+      return DM(sparsity(), ret, false)
+        + DM(sparsity().pattern_inverse(), ret2, false);
     }
   }
 
@@ -408,7 +399,7 @@ namespace casadi {
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const {
     casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
 
-    if (ScX && !operation_checker<Function0Checker>(op)) {
+    if (ScX && !operation_checker<FX0Checker>(op)) {
       double ret;
       casadi_math<double>::fun(op, nnz()> 0 ? v_.value: 0, 0, ret);
 
@@ -419,9 +410,9 @@ namespace casadi {
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
-      if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
+      if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==0) {
         double ret;
-        casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->getValue() : 0, ret);
+        casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->to_double() : 0, ret);
         grow = ret!=0;
       }
       if (grow) {
@@ -433,10 +424,10 @@ namespace casadi {
 
     switch (op) {
     case OP_ADD:
-      if (v_.value==0) return ScY && !y->isZero() ? repmat(y, size1(), size2()) : y;
+      if (v_.value==0) return ScY && !y->is_zero() ? repmat(y, size1(), size2()) : y;
       break;
     case OP_SUB:
-      if (v_.value==0) return ScY && !y->isZero() ? repmat(-y, size1(), size2()) : -y;
+      if (v_.value==0) return ScY && !y->is_zero() ? repmat(-y, size1(), size2()) : -y;
       break;
     case OP_MUL:
       if (v_.value==1) return y;
@@ -457,8 +448,8 @@ namespace casadi {
 
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
-    if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
-      double y_value = y.nnz()>0 ? y->getValue() : 0;
+    if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==0) {
+      double y_value = y.nnz()>0 ? y->to_double() : 0;
       double ret;
       casadi_math<double>::fun(op, nnz()> 0 ? v_.value: 0, y_value, ret);
 
@@ -470,26 +461,25 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::evalD(const double** arg, double** res, int* iw, double* w) {
+  void Constant<Value>::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     std::fill(res[0], res[0]+nnz(), static_cast<double>(v_.value));
   }
 
   template<typename Value>
-  void Constant<Value>::evalSX(const SXElement** arg, SXElement** res,
-                               int* iw, SXElement* w) {
-    std::fill(res[0], res[0]+nnz(), SXElement(v_.value));
+  void Constant<Value>::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+    std::fill(res[0], res[0]+nnz(), SXElem(v_.value));
   }
 
   template<typename Value>
-  void Constant<Value>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                 CodeGenerator& g) const {
+  void Constant<Value>::generate(CodeGenerator& g, const std::string& mem,
+                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     if (nnz()==0) {
       // Quick return
     } else if (nnz()==1) {
       g.body << "  " << g.workel(res[0]) << " = " << g.constant(v_.value)
              << ";" << std::endl;
     } else {
-      g.body << "  " << g.fill_n(g.work(res[0], nnz()), nnz(), g.constant(v_.value)) << std::endl;
+      g.body << "  " << g.fill(g.work(res[0], nnz()), nnz(), g.constant(v_.value)) << std::endl;
     }
   }
 
@@ -509,7 +499,7 @@ namespace casadi {
 
   template<typename Value>
   MX Constant<Value>::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
-    if (y.isConstant() && y->isZero() && v_.value==0) {
+    if (y.is_constant() && y->is_zero() && v_.value==0) {
       return y;
     }
 
@@ -519,12 +509,10 @@ namespace casadi {
 
   template<typename Value>
   MX Constant<Value>::getProject(const Sparsity& sp) const {
-    if (isZero()) {
+    if (is_zero()) {
       return MX::create(new Constant<Value>(sp, v_));
-    } else if (sp.isdense()) {
-      DMatrix v = getMatrixValue();
-      v.makeDense();
-      return v;
+    } else if (sp.is_dense()) {
+      return densify(getMatrixValue());
     } else {
       return MXNode::getProject(sp);
     }
@@ -534,16 +522,16 @@ namespace casadi {
   std::string
   Constant<Value>::print(const std::vector<std::string>& arg) const {
     std::stringstream ss;
-    if (sparsity().isscalar()) {
+    if (sparsity().is_scalar()) {
       // Print scalar
       if (sparsity().nnz()==0) {
         ss << "00";
       } else {
         ss << v_.value;
       }
-    } else if (sparsity().isempty()) {
+    } else if (sparsity().is_empty()) {
       // Print empty
-      sparsity().printCompact(ss);
+      sparsity().print_compact(ss);
     } else {
       // Print value
       if (v_.value==0) {
@@ -561,7 +549,7 @@ namespace casadi {
       }
 
       // Print sparsity
-      sparsity().printCompact(ss);
+      sparsity().print_compact(ss);
       ss << ")";
     }
     return ss.str();

@@ -1,7 +1,6 @@
 %module(package="extending_casadi") extending_casadi
 
 // WORKAROUNDS BEGINS: Due to Python-related issues in casadi.i
-#define CASADI_NOT_IN_DERIVED
 #ifdef SWIGPYTHON
 %{
 #define SWIG_FILE_WITH_INIT

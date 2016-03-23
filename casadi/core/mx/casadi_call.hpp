@@ -68,27 +68,33 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Call() {}
 
-    /** \brief  Clone function */
-    virtual Call* clone() const;
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Add a dependent function */
     virtual void addDependency(CodeGenerator& g) const;
 
+    /** \brief Is reference counting needed in codegen? */
+    virtual bool has_refcount() const;
+
+    /** \brief Codegen incref */
+    virtual void codegen_incref(CodeGenerator& g, std::set<void*>& added) const;
+
+    /** \brief Codegen decref */
+    virtual void codegen_decref(CodeGenerator& g, std::set<void*>& added) const;
+
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -99,10 +105,10 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Number of functions */
     virtual int numFunctions() const {return 1;}
@@ -111,13 +117,10 @@ namespace casadi {
     virtual const Function& getFunction(int i) const { return fcn_;}
 
     /** \brief  Get function input */
-    virtual int getFunctionInput() const { return -1;}
+    virtual int getFunction_input() const { return -1;}
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const { return -1;}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Number of outputs */
     virtual int nout() const;
@@ -126,7 +129,7 @@ namespace casadi {
     virtual const Sparsity& sparsity(int oind) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_CALL;}
+    virtual int op() const { return OP_CALL;}
 
     /** \brief Get required length of arg field */
     virtual size_t sz_arg() const;

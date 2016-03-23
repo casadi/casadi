@@ -1,5 +1,4 @@
 # Inspiration: https://github.com/edx/configuration/blob/master/.travis.yml
-
 env: 
   global: 
     - IPOPT_DEFAULT_LINEAR_SOLVER=ma57
@@ -11,94 +10,48 @@ env:
     - CMAKE_INCLUDE_PATH=/home/travis/build/testbot/restricted/cplex/cplex/include:/home/travis/build/testbot/restricted/cplex/concert/include
     - CMAKE_LIBRARY_PATH=/home/travis/build/testbot/restricted/cplex/cplex/lib/x86-64_sles10_4.1/static_pic/:/home/travis/build/testbot/restricted/cplex/concert/lib/x86-64_sles10_4.1/static_pic/
     - ILOG_LICENSE_FILE=/home/travis/build/testbot/restricted/cplex/access.ilm
-    #- WORHP=/home/travis/build/testbot/restricted/worhp
-    #- WORHP_LICENSE_FILE=/home/travis/build/testbot/restricted/worhp/unlocked.lic  # Worhp has issues
+    - WORHP=/home/travis/build/testbot/restricted/worhp
+    - WORHP_LICENSE_FILE=/home/travis/build/testbot/restricted/worhp/unlocked.lic
     - SNOPT=/home/travis/build/snopt7
     - MATLABPATH=/home/travis/build/matlab-install
     - MATLAB_ROOT=/home/travis/build/matlab
     - MATLABRELEASE=R2014b
     - CLANG=/home/travis/build/clang
 
+before_script:
+  - set -e
+  - set -o pipefail  # otherwise, piping with grep discards exit statuses
+
 matrix:
   include:
     - compiler: gcc
       os: linux
-      install:
-        - setup_precise
-      env: TESTMODE=full_valgrind
+      env: TESTMODE=full
       script:
-        - sudo apt-get install valgrind -y
+        - sudo apt-get install valgrind libgomp1 -y
         - mkdir build
         - pushd build
-        - cmake -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF  ..
+        - cmake -DWITH_OPENMP=ON -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make -j2
         - sudo make -j2 install
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test/python && ls -1 [n-z]*.py | grep -v helpers.py | xargs rm && popd
         - pushd test && make unittests_py_valgrind && popd
-    - compiler: gcc
-      os: linux
-      install:
-        - setup_precise
-      env: TESTMODE=full_valgrind
-      script:
-        - sudo apt-get install valgrind -y
-        - mkdir build
-        - pushd build
-        - cmake -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF ..
-        - make -j2
-        - sudo make -j2 install
-        - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test/python && ls -1 [a-m]*.py | grep -v helpers.py | xargs rm && popd
-        - pushd test && make unittests_py_valgrind && popd
-    - compiler: gcc
-      os: linux
-      install:
-        - setup_precise
-      env: TESTMODE=full_remainder
-      script:
-        - mkdir build
-        - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
-        - make -j2
-        - sudo make -j2 install
-        - popd
         - sudo apt-get install python-ipdb graphviz python-lxml texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         - sudo pip install pydot2
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make trunktesterbot_no_unittests_py && popd
-        - pushd build && travis_wait make json && popd
-
-    - compiler: gcc
-      os: linux
-      install:
-        - setup_precise
-      env: TESTMODE=full_slow
-      script:
-        - mkdir build
-        - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_DOC=ON -DWITH_EXAMPLES=OFF -DWITH_EXTRA_WARNINGS=ON ..
-        - make -j2
-        - sudo make -j2 install
-        - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
-        
+        - pushd test && make trunktesterbot_no_unittests_py && popd
         - pushd test && make unittests_py_slow && popd
+        - pushd build && make json && popd
     - compiler: gcc
       os: linux
-      install:
-        - setup_precise
       env: TESTMODE=docs
       script:
         - set -e
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_JSON=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DCMAKE_BUILD_TYPE=Debug -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON ..
+        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_JSON=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DCMAKE_BUILD_TYPE=Debug -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON ..
         - make -j2
         - sudo make -j2 install
         - popd
@@ -113,13 +66,11 @@ matrix:
         - git stash && git checkout $TRAVIS_BRANCH && git pull origin $TRAVIS_BRANCH && git stash pop || allowfail 1 && sh /home/travis/build/testbot/helpers/acommit.sh "automatic documentation update" && git push git@github.com:casadi/casadi.git $TRAVIS_BRANCH
     - compiler: clang
       os: linux
-      install:
-        - setup_precise
       env: TESTMODE=minimal
       script:
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make
         - sudo make install
         - popd
@@ -127,51 +78,11 @@ matrix:
         - pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
-      dist: trusty
-      language: generic
-      install:
-        - setup_trusty
-      env: TESTMODE=minimal
-      script:
-        - |
-          cat <<EOF | sudo tee --append  /etc/apt/sources.list
-          deb-src http://archive.ubuntu.com/ubuntu vivid main restricted universe multiverse
-          deb http://archive.ubuntu.com/ubuntu vivid main restricted universe multiverse
-        - |
-          cat <<EOF | sudo tee /etc/apt/preferences.d/mytest
-          Package: *
-          Pin: release n=trusty
-          Pin-priority: 700
-          Package: *
-          Pin: release n=vivid
-          Pin-priority: 600
-        - sudo apt-get update -q
-        - sudo apt-get install -q -y opencl-headers ocl-icd-opencl-dev ocl-icd-libopencl1
-        - sudo apt-get -t vivid install pocl-opencl-icd
-        - mkdir build
-        - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
-        - make
-        - sudo make install
-        - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        #- source /home/travis/build/testbot/restricted/env.sh
-        #- ssh-keyscan $GATE_SERVER >> ~/.ssh/known_hosts
-        #- whoami
-        #- echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA3mEl1i8wiojyJdJnwrmC3RTWCIGgUM4lmtWNWu4p4QyiBry2iB7y2qno48pZqkV/EFRsyWWeEDvbdA4etYlceKZaGJFAdqJig/247qPbamU5W5++d7zkGwA5nQDH147/+JMYk4na9RoGl2iOHMyxi7Wq0WkN11u0Slp2awluvV9UXpBl/XD74eYmUfOFop6y+Hkg/K2hyytg8vAkp33x/vy8JxSK93vbnLGsrVOVjp6Epf7Jo2C8ZHX9eVL2sfi7icjNbt6s9AnU076tBURBIEQbg+Sa8nK7v6zzJNZbn9G85t0M64BKMvcRH1BXf0VvIeBQs/yv9uZLaC9SFvj+4Q== u0052373@xen-vm03.mech.kuleuven.be" >> ~/.ssh/authorized_keys
-        #- (while true ; do sleep 60 ; echo "ping" ; done ) &
-        #- ssh -i /home/travis/build/testbot/id_rsa_travis $USER_GATE@$GATE_SERVER -R 19922:localhost:22 -N
-        - pushd test/python && python function.py && popd
-        - pushd test && make unittests_py examples_code_py && popd
-    - compiler: gcc
-      os: linux
-      install:
-        - setup_precise
       env: TESTMODE=minimal
       script:
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_PYTHON=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make
         - sudo make install
         - popd
@@ -179,8 +90,6 @@ matrix:
         - pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
-      install:
-        - setup_precise
       env: TESTMODE=quick
       script:
         - sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
@@ -192,7 +101,7 @@ matrix:
         - export languagetool="$mypwd/LanguageTool-2.7"
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON ..
+        - cmake  -DOLD_LLVM=ON -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON ..
         - make lint
         - export languagetool="$mypwd/LanguageTool-2.7" make spell
         - popd && pushd misc && python autogencode.py && popd
@@ -211,22 +120,18 @@ matrix:
     - os: osx
       env: TESTMODE=minimal
       compiler: clang
-      before_script:
+      before_install:
         - brew update
         - brew tap homebrew/science
         - brew outdated swig ; brew install swig
-        - sudo sysctl kern.maxfiles
-        - sudo sysctl kern.maxfilesperproc
-        - sudo sysctl -w kern.maxfiles=20480
-        - sudo sysctl -w kern.maxfilesperproc=18000
-        #- brew install swig pkg-config
+        #- brew outdated pkg-config || brew install pkg-config
         #- brew doctor
         - sudo easy_install pip
         - sudo pip install ipython matplotlib numpy scipy
       script:
         - mkdir build
         - pushd build
-        - cmake  -DOLD_LLVM=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+        - cmake  -DOLD_LLVM=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
         - make
         - sudo make install
         - popd
@@ -236,8 +141,6 @@ matrix:
     - compiler: gcc
       os: linux
       env: NEEDMATLAB=1
-      install:
-        - setup_precise
       script:
 
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
@@ -249,7 +152,7 @@ matrix:
         - popd
         - mkdir build
         - pushd build
-        - PATH=/home/travis/build/swig_matlab/bin:/home/travis/build/swig_matlab/share:$PATH cmake  -DOLD_LLVM=ON -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_WORHP=ON -DWITH_SLICOT=ON -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
+        - PATH=/home/travis/build/swig_matlab/bin:/home/travis/build/swig_matlab/share:$PATH cmake  -DOLD_LLVM=ON -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_CLANG=ON -DWITH_ECOS=ON -DWITH_MOSEK=ON -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_WORHP=ON -DWITH_SLICOT=OFF -DWITH_OOQP=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
         - make -j2
         - sudo make -j2 install
         - popd
@@ -265,59 +168,26 @@ matrix:
 branches:
   except:
     - /.*appveyor.*/
-    
+
 before_install:
-  - set -e
-  - set -o pipefail  # otherwise, piping with grep discards exit statuses
+  - sudo /etc/init.d/mysql stop
+  - sudo /etc/init.d/postgresql stop
+  - sync
+  - free -t -m
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
-  - source testbot/shellhelpers
-  - popd
-  - |
-    function unpack {
-      if [ "$1"==*.tar.gz ]; then
-        tar -xf $1 -C $2
-      elif [ "$1"==*7z ]; then
-        7za e $1 -o$2 -y
-      fi
-    }
-    function obtain {
-      travis_retry testbot/recipes/fetch.sh $1 && mkdir $2 && tar -xf $1 -C $2 && rm $1
-    }
-  - |
-    function setup_precise {
-      sudo /etc/init.d/mysql stop
-      sudo /etc/init.d/postgresql stop
-      
-      # We need some more recent packages
-      sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
-      sudo add-apt-repository ppa:baltix-members/ppa -y #  for libslicot-dev
-      sudo add-apt-repository ppa:nodakai/valgrind -y
-      sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
-      sudo add-apt-repository ppa:webupd8team/java -y
-      sync
-      free -t -m
-    }
-  - |
-    function setup_trusty {
-      echo 12
-    }
-    
-before_script:
-  - pushd ../../
-  - sudo apt-get update -qq
-  - sudo apt-get install p7zip-full python-dev -y
   - pushd testbot && recipes/setup.sh && popd
-  - obtain libhsl.tar.gz libhsl
-  - obtain clang.tar.gz clang
+  - source testbot/shellhelpers
+  - sudo apt-get install p7zip-full -y
+  - travis_retry testbot/recipes/fetch.sh libhsl.tar.gz && mkdir libhsl && tar -xf libhsl.tar.gz -C libhsl && rm libhsl.tar.gz
+  - travis_retry testbot/recipes/fetch.sh clang.tar.gz && mkdir clang && tar -xf clang.tar.gz -C clang && rm clang.tar.gz
   - travis_retry testbot/recipes/fetch.sh mosek7.tar.bz2 && tar -xf mosek7.tar.bz2 && rm mosek7.tar.bz2
   - git clone https://github.com/embotech/ecos.git && pushd ecos && make && popd
-  - obtain snopt7.tar.gz snopt7
+  - travis_retry testbot/recipes/fetch.sh snopt7.tar.gz && mkdir snopt7 && tar -xf snopt7.tar.gz -C snopt7 && rm snopt7.tar.gz
   - mkdir -p /home/travis/build/casadi/testbot
   - |
     if [ $NEEDMATLAB ]
     then
-      swig_matlab_file=`python testbot/helpers/gitmatch.py testbot/recipes/swig_matlab.yaml /home/travis/build/casadi/casadi`
-      travis_retry testbot/recipes/fetch.sh ${swig_matlab_file}.tar.gz && mkdir swig_matlab && tar -xf ${swig_matlab_file}.tar.gz -C swig_matlab && rm ${swig_matlab_file}.tar.gz
+      travis_retry testbot/recipes/fetch.sh swig_matlab.tar.gz && mkdir swig_matlab && tar -xf swig_matlab.tar.gz -C swig_matlab && rm swig_matlab.tar.gz
       pushd /home/travis/build/casadi/testbot && ln -s  /home/travis/build/swig_matlab  swig-matlab-install  && popd
     else
       travis_retry testbot/recipes/fetch.sh swig.tar.gz && mkdir swig && tar -xf swig.tar.gz -C swig && rm swig.tar.gz
@@ -327,8 +197,12 @@ before_script:
   - pushd testbot/restricted/cplex && mkdir cplex && tar -xf cplex12.4.tar.gz -C cplex && mkdir concert && tar -xf cplex12.4-concert.tar.gz -C concert && rm cplex12.4-concert.tar.gz && popd
   - pushd testbot/restricted && mkdir -p worhp && cd  worhp && 7za e ../libworhp_debian7_amd64_gcc47_1.7-12970f3.7z -y && popd
   - popd
+  - sudo add-apt-repository ppa:umn-claoit-rce/compute-packages -y
+  - sudo add-apt-repository ppa:nodakai/valgrind -y
+  - sudo add-apt-repository ppa:kedazo/doxygen-updates-precise -y
+  - sudo add-apt-repository ppa:webupd8team/java -y
   - sudo apt-get update -qq
-  - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev libslicot-dev libxml2-dev
+  - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev ipython python-dev python-numpy python-scipy python-matplotlib coinor-libipopt-dev libmumps-seq-dev libblas-dev liblapack-dev libxml2-dev
   - sudo pip install github3.py
  
 after_failure:
@@ -336,4 +210,3 @@ after_failure:
 
 
 language: cpp
-

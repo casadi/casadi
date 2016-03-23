@@ -26,7 +26,7 @@ from casadi import *
 # Formulate the NLP
 N = 30
 u = msym("u",N); p = msym("p")
-f = inner_prod(u,u)
+f = dot(u,u)
 g = MX([]); gmax = []; gmin = []
 x = p
 for k in range(N):
@@ -40,8 +40,8 @@ for k in range(N):
 # Allocate NLP solver
 h = MXFunction(nlpIn(x=u,p=p),nlpOut(f=f,g=g));
 S = SCPgen(h)
-S.setOption("qp_solver",QPOasesSolver)
-S.setOption("qp_solver_options",{"printLevel":"none"}) # Should be automatic
+S.setOption("qpsol",QPOasesSolver)
+S.setOption("qpsol_options",{"printLevel":"none"}) # Should be automatic
 S.init()
 
 # Pass bounds and solve
@@ -56,7 +56,7 @@ S.solve()
 from matplotlib.pylab import *
 u = S.getOutput("x")
 plot(u)
-x = DMatrix(0.30)
+x = DM(0.30)
 for k in range(30):
     xk = x[-1,0]
     x.append(xk + 0.1*(xk*(xk+1) + u[k]))

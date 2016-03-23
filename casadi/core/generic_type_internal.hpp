@@ -44,7 +44,6 @@ namespace casadi {
   public:
     explicit GenericTypeInternal(const T& d) : d_(d) {}
     virtual ~GenericTypeInternal() {}
-    virtual GenericTypeInternal<ID, T>* clone() const { return new GenericTypeInternal(d_);}
     virtual void print(std::ostream &stream) const { stream << d_; }
     virtual TypeID getType() const { return ID;}
     T d_;

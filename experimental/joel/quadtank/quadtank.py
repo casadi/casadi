@@ -67,7 +67,7 @@ ocp.sortBLT()
 print ocp
 
 # Make explicit
-ocp.makeExplicit()
+ocp.make_explicit()
   
 # Print again
 print ocp

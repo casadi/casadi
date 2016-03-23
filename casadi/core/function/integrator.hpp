@@ -26,252 +26,102 @@
 #ifndef CASADI_INTEGRATOR_HPP
 #define CASADI_INTEGRATOR_HPP
 
-#include "function.hpp"
-#include "linear_solver.hpp"
+#include "oracle.hpp"
+#include "linsol.hpp"
+#include "rootfinder.hpp"
 
-/** \brief Base class for integrators
- *
- * \defgroup DAE_doc
-    Solves an initial value problem (IVP) coupled to a terminal value problem
-    with differential equation given as an implicit ODE coupled to an algebraic
-    equation and a set of quadratures:
-    \verbatim
-    Initial conditions at t=t0
-    x(t0)  = x0
-    q(t0)  = 0
-
-    Forward integration from t=t0 to t=tf
-    der(x) = function(x, z, p, t)                  Forward ODE
-    0 = fz(x, z, p, t)                  Forward algebraic equations
-    der(q) = fq(x, z, p, t)                  Forward quadratures
-
-    Terminal conditions at t=tf
-    rx(tf)  = rx0
-    rq(tf)  = 0
-
-    Backward integration from t=tf to t=t0
-    der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
-    0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
-    der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
-
-    where we assume that both the forward and backwards integrations are index-1
-    (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
-    gx, gz and gq have a linear dependency on rx, rz and rp.
-
-    \endverbatim
-*/
 namespace casadi {
-#ifndef SWIG
 
-  /// Input arguments of an ODE/DAE function [daeIn]
-  enum DAEInput {
-    /// Differential state [x]
-    DAE_X,
-    /// Algebraic state [z]
-    DAE_Z,
-    /// Parameter [p]
-    DAE_P,
-    /// Explicit time dependence [t]
-    DAE_T,
-    /// Number of arguments.
-    DAE_NUM_IN
-  };
+  /** \defgroup main_integrator
+      Create an ODE/DAE integrator
+      Solves an initial value problem (IVP) coupled to a terminal value problem
+      with differential equation given as an implicit ODE coupled to an algebraic
+      equation and a set of quadratures:
 
-  /// Output arguments of an DAE function [daeOut]
-  enum DAEOutput {
-    /// Right hand side of the implicit ODE [ode]
-    DAE_ODE,
-    /// Right hand side of algebraic equations [alg]
-    DAE_ALG,
-    /// Right hand side of quadratures equations [quad]
-    DAE_QUAD,
-    /// Number of arguments.
-    DAE_NUM_OUT
-  };
+      \verbatim
+      Initial conditions at t=t0
+      x(t0)  = x0
+      q(t0)  = 0
 
-  /// Input arguments of an ODE/DAE backward integration function [rdaeIn]
-  enum RDAEInput {
-    /// Backward differential state [rx]
-    RDAE_RX,
-    /// Backward algebraic state [rz]
-    RDAE_RZ,
-    /// Backward  parameter vector [rp]
-    RDAE_RP,
-    /// Forward differential state [x]
-    RDAE_X,
-    /// Forward algebraic state [z]
-    RDAE_Z,
-    /// Parameter vector [p]
-    RDAE_P,
-    /// Explicit time dependence [t]
-    RDAE_T,
-    /// Number of arguments.
-    RDAE_NUM_IN
-  };
+      Forward integration from t=t0 to t=tf
+      der(x) = function(x, z, p, t)                  Forward ODE
+      0 = fz(x, z, p, t)                  Forward algebraic equations
+      der(q) = fq(x, z, p, t)                  Forward quadratures
 
-  /// Output arguments of an ODE/DAE backward integration function [rdaeOut]
-  enum RDAEOutput {
-    /// Right hand side of ODE. [ode]
-    RDAE_ODE,
-    /// Right hand side of algebraic equations. [alg]
-    RDAE_ALG,
-    /// Right hand side of quadratures. [quad]
-    RDAE_QUAD,
-    /// Number of arguments.
-    RDAE_NUM_OUT
-  };
+      Terminal conditions at t=tf
+      rx(tf)  = rx0
+      rq(tf)  = 0
 
-  /// Input arguments of an integrator [integratorIn]
-  enum IntegratorInput {
-    /// Differential state at the initial time [x0]
-    INTEGRATOR_X0,
-    /// Parameters [p]
-    INTEGRATOR_P,
-    /// Initial guess for the algebraic variable [z0]
-    INTEGRATOR_Z0,
-    /// Backward differential state at the final time [rx0]
-    INTEGRATOR_RX0,
-    /// Backward parameter vector [rp]
-    INTEGRATOR_RP,
-    /// Initial guess for the backwards algebraic variable [rz0]
-    INTEGRATOR_RZ0,
-    /// Number of input arguments of an integrator
-    INTEGRATOR_NUM_IN
-  };
+      Backward integration from t=tf to t=t0
+      der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+      0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+      der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
 
-  /// Output arguments of an integrator [integratorOut]
-  enum IntegratorOutput {
-    /// Differential state at the final time [xf]
-    INTEGRATOR_XF,
-    /// Quadrature state at the final time [qf]
-    INTEGRATOR_QF,
-    /// Algebraic variable at the final time [zf]
-    INTEGRATOR_ZF,
-    /// Backward differential state at the initial time [rxf]
-    INTEGRATOR_RXF,
-    /// Backward quadrature state at the initial time [rqf]
-    INTEGRATOR_RQF,
-    /// Backward algebraic variable at the initial time [rzf]
-    INTEGRATOR_RZF,
-    /// Number of output arguments of an integrator
-    INTEGRATOR_NUM_OUT
-  };
-#endif // SWIG
+      where we assume that both the forward and backwards integrations are index-1
+      (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
+      gx, gz and gq have a linear dependency on rx, rz and rp.
 
-  /// Forward declaration of internal class
-  class IntegratorInternal;
-
-  // grep "addOption" integrator_internal.cpp |
-  //   perl -pe 's/addOption\((.*?),(.*?), (.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
-
-  /** Integrator abstract base class
-
-      @copydoc DAE_doc
-
-      The Integrator class provides some additional functionality, such as getting the value
-      of the state and/or sensitivities at certain time points.
+      \endverbatim
 
       \generalsection{Integrator}
       \pluginssection{Integrator}
 
       \author Joel Andersson
-      \date 2010
+      \date 2011-2015
   */
-  class CASADI_EXPORT Integrator : public Function {
-  public:
-    /// Default constructor
-    Integrator();
+  /** \defgroup integrator
+  * @copydoc main_integrator
+  *  @{
+  */
 
-    ///@}
-    /** \brief  Integrator factory (new syntax, includes initialization)
-    *
-    * \param solver \pluginargument{Integrator}
-    * \param f dynamical system
-    * \parblock
-    * \copydoc scheme_DAEInput
-    * \copydoc scheme_DAEOutput
-    * \endparblock
-    */
-    Integrator(const std::string& name, const std::string& solver, const Function& f,
-               const Dict& opts=Dict());
-    Integrator(const std::string& name, const std::string& solver,
-               const std::pair<Function, Function>& fg, const Dict& opts=Dict());
-    Integrator(const std::string& name, const std::string& solver,
-               const SXDict& dae, const Dict& opts=Dict());
-    Integrator(const std::string& name, const std::string& solver,
-               const MXDict& dae, const Dict& opts=Dict());
-    ///@}
+  /** \if EXPANDED
+  * @copydoc main_integrator
+  * \endif
+  */
+  ///@{
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                    const SXDict& dae, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                    const MXDict& dae, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                    const Function& dae, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                    const std::pair<Function, Function>& dae,
+                                    const Dict& opts=Dict());
+#ifndef SWIG
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+                                    Oracle* dae, const Dict& opts=Dict());
+#endif // SWIG
+  ///@}
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Integrator factory, no initialization
-    *
-    * \param name \pluginargument{Integrator}
-    * \param f dynamical system
-    * \parblock
-    * \copydoc scheme_DAEInput
-    * \copydoc scheme_DAEOutput
-    * \endparblock
-    * \param g backwards system
-    * \parblock
-    * \copydoc scheme_RDAEInput
-    * \copydoc scheme_RDAEOutput
-    * \endparblock
-    */
-    Integrator(const std::string& solver, const Function& f, const Function& g=Function());
-#endif // WITH_DEPRECATED_FEATURES
+  /// Check if a particular plugin is available
+  CASADI_EXPORT bool has_integrator(const std::string& name);
 
-    /// Clone
-    Integrator clone() const;
+  /// Explicitly load a plugin dynamically
+  CASADI_EXPORT void load_integrator(const std::string& name);
 
-    /// Print solver statistics
-    void printStats(std::ostream &stream=casadi::userOut()) const;
+  /// Get the documentation string for a plugin
+  CASADI_EXPORT std::string doc_integrator(const std::string& name);
 
-    /// Access functions of the node
-    IntegratorInternal* operator->();
+  /** \brief Get input scheme of integrators */
+  CASADI_EXPORT std::vector<std::string> integrator_in();
 
-    /// Access functions of the node
-    const IntegratorInternal* operator->() const;
+  /** \brief Get integrator output scheme of integrators */
+  CASADI_EXPORT std::vector<std::string> integrator_out();
 
-    /** \brief Reset the forward problem
-     * Time will be set to t0 and state to input(INTEGRATOR_X0)
-     */
-    void reset();
+  /** \brief Get integrator input scheme name by index */
+  CASADI_EXPORT std::string integrator_in(int ind);
 
-    /// Integrate forward until a specified time point
-    void integrate(double t_out);
+  /** \brief Get output scheme name by index */
+  CASADI_EXPORT std::string integrator_out(int ind);
 
-    /** \brief Reset the backward problem
-     *
-     * Time will be set to tf and backward state to input(INTEGRATOR_RX0)
-     */
-    void resetB();
+  /** \brief Get the number of integrator inputs */
+  CASADI_EXPORT int integrator_n_in();
 
-    /// Integrate backward until a specified time point
-    void integrateB(double t_out);
+  /** \brief Get the number of integrator outputs */
+  CASADI_EXPORT int integrator_n_out();
+  /** @} */
 
-    /// Check if a plugin is available
-    static bool hasPlugin(const std::string& name);
-
-    /// Explicitly load a plugin dynamically
-    static void loadPlugin(const std::string& name);
-
-    /// Get solver specific documentation
-    static std::string doc(const std::string& name);
-
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
-     *    and \a nadj adjoint sensitivities
-     */
-    std::pair<Function, Function> getAugmented(int nfwd, int nadj);
-
-    /// Get the DAE
-    Function getDAE();
-
-    /// Set a stop time for the forward integration
-    void setStopTime(double tf);
-
-    /// Check if a particular cast is allowed
-    static bool testCast(const SharedObjectNode* ptr);
-  };
 } // namespace casadi
 
 #endif // CASADI_INTEGRATOR_HPP

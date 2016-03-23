@@ -69,8 +69,8 @@ public:
      casadi::SX getStateMat(int timeStep);
      casadi::SX getActionMat(int timeStep);
 
-     casadi::DMatrix getState(int timeStep, std::vector<double> & xopt);
-     casadi::DMatrix getAction(int timeStep, std::vector<double> & xopt);
+     casadi::DM getState(int timeStep, std::vector<double> & xopt);
+     casadi::DM getAction(int timeStep, std::vector<double> & xopt);
 
 
      int N;

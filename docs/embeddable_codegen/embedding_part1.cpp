@@ -34,24 +34,6 @@ using namespace std;
  *  Joel Andersson, K.U. Leuven 2013
  */
 
-void generate(Function fcn, const std::string& name, bool expand, std::ostream& makefile){
-  cout << "Generating code for " << name << endl;
-
-  // Convert to an SXFunction (may or may not improve efficiency)
-  if(expand && is_a<MXFunction>(fcn)){
-    fcn = SXFunction(shared_cast<MXFunction>(fcn));
-  }
-
-  // Generate C code
-  fcn.generate(name);
-  
-  // Generate compilation instructions
-  makefile << "add_library(" << name << " SHARED " << name << ".c)" << endl;
-  makefile << "set_target_properties(" << name << " PROPERTIES PREFIX \"\")" << endl;
-  makefile << "set_target_properties(" << name << " PROPERTIES SUFFIX \".casadi\")" << endl;
-  makefile << endl;
-}
-
 int main(){
     
   /** Test problem 
@@ -72,33 +54,23 @@ int main(){
   // Infinity
   double inf = numeric_limits<double>::infinity();
 
-  // Convert MXFunction to SXFunction before code generation (may or may not improve efficiency)
-  bool expand = true;
+  // Create IPOPT instance
+  Function solver = nlpsol("solver", "ipopt", {{"x", x}, {"f", f}, {"g", g}});
 
-  // NLP function
-  Function nlp = MXFunction("nlp", nlpIn("x",x),nlpOut("f",f,"g",g));
-
-  // Gradient of the Lagrangian
-  Function grad_f = nlp.gradient("x","f");
-
-  // Jacobian of the constraints
-  Function jac_g = nlp.jacobian("x","g");
-
-  // Hessian of the lagrangian
-  Function grad_lag = nlp.derivative(0,1);
-  Function hess_lag = grad_lag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
+  // Generate C code for the NLP functions
+  solver.generate_dependencies("nlp.c");
 
   // Generate Makefile
   ofstream makefile;
   makefile.open("./CMakeLists.txt");
   makefile << "cmake_minimum_required(VERSION 2.8.6)" << endl;
   makefile << "project(nlp-codegen-autogen C)" << endl;
-
-  // Codegen and compile
-  generate(nlp,"nlp", expand, makefile);
-  generate(grad_f,"grad_f", expand, makefile);
-  generate(jac_g,"jac_g", expand, makefile);
-  generate(hess_lag,"hess_lag", expand, makefile);
+  
+  // Generate compilation instructions
+  makefile << "add_library(nlp SHARED nlp.c)" << endl;
+  makefile << "set_target_properties(nlp PROPERTIES PREFIX \"\")" << endl;
+  makefile << "set_target_properties(nlp PROPERTIES SUFFIX \".casadi\")" << endl;
+  makefile << endl;
 
   // Finalize makefile
   makefile.close();

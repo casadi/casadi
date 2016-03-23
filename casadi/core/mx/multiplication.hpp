@@ -45,28 +45,25 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~Multiplication() {}
 
-    /** \brief  Clone function */
-    virtual Multiplication* clone() const { return new Multiplication(*this);}
-
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w);
+    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -77,21 +74,19 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg,
-                       bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_MATMUL;}
+    virtual int op() const { return OP_MTIMES;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool zz_isEqual(const MXNode* node, int depth) const {
+    virtual bool is_equal(const MXNode* node, int depth) const {
       return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;
     }
 
@@ -115,12 +110,9 @@ namespace casadi {
     /** \brief  Destructor */
     virtual ~DenseMultiplication() {}
 
-    /** \brief  Clone function */
-    virtual DenseMultiplication* clone() const { return new DenseMultiplication(*this);}
-
     /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual void generate(CodeGenerator& g, const std::string& mem,
+                          const std::vector<int>& arg, const std::vector<int>& res) const;
   };
 
 

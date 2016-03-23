@@ -22,124 +22,119 @@
 #
 #
 from casadi import *
-import numpy as NP
-import matplotlib.pyplot as plt
 
 nk = 20      # Control discretization
 tf = 10.0    # End time
-coll = False # Use collocation integrator
 
 # Declare variables (use scalar graph)
-t  = SX.sym("t")    # time
-u  = SX.sym("u")    # control
-x  = SX.sym("x",3)  # state
+u  = SX.sym('u')    # control
+x  = SX.sym('x',2)  # state
 
-# ODE rhs function
-ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
-       x[0], \
-       x[0]*x[0] + x[1]*x[1] + u*u])
-dae = SXFunction("dae", daeIn(x=x, p=u, t=t), daeOut(ode=ode))
+# ODE rhs function and quadratures
+xdot = vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, x[0])
+qdot = x[0]*x[0] + x[1]*x[1] + u*u
 
 # Create an integrator
-opts = {"tf":tf/nk} # final time
-if coll:
-  opts["number_of_finite_elements"] = 5
-  opts["interpolation_order"] = 5
-  opts["collocation_scheme"] = "legendre"
-  opts["implicit_solver"] = "kinsol"
-  opts["implicit_solver_options"] =  {'linear_solver' : 'csparse'}
-  opts["expand_f"] = True
-  integrator = Integrator("integrator", "oldcollocation", dae, opts)
-else:
-  opts["abstol"] = 1e-8 # tolerance
-  opts["reltol"] = 1e-8 # tolerance
-  opts["steps_per_checkpoint"] = 1000
-  integrator = Integrator("integrator", "cvodes", dae, opts)
+dae = {'x':x, 'p':u, 'ode':xdot, 'quad':qdot}
+opts = {'tf':tf/nk} # final time
+F = integrator('F', 'cvodes', dae, opts)
 
-# Total number of variables
-nv = 1*nk + 3*(nk+1)
+# Path constraints
+u_min = [-0.75]
+u_max = [ 1.00]
 
-# Declare variable vector
-V = MX.sym("V", nv)
+# Path constraints
+x_min = [-inf, -inf]
+x_max = [ inf,  inf]
 
-# Get the expressions for local variables
-U = V[0:nk]
-X0 = V[nk+0:nv:3]
-X1 = V[nk+1:nv:3]
-X2 = V[nk+2:nv:3]
+# Initial and terminal constraints
+x0_min = [0., 1.]
+x0_max = [0., 1.]
+xf_min = [0., 0.]
+xf_max = [0., 0.]
 
-# Variable bounds initialized to +/- inf
-VMIN = -inf*NP.ones(nv)
-VMAX = inf*NP.ones(nv)
+# Initial guess
+u_init = [0.]
+x_init = [0., 0.]
 
-# Control bounds
-VMIN[0:nk] = -0.75
-VMAX[0:nk] = 1.0
+# All local controls
+U = [MX.sym('u' + str(k)) for k in range(nk)]
 
-# Initial condition
-VMIN[nk+0] = VMAX[nk+0] = 0
-VMIN[nk+1] = VMAX[nk+1] = 1
-VMIN[nk+2] = VMAX[nk+2] = 0
+# State at shooting nodes
+X = [MX.sym('x' + str(k), 2) for k in range(nk+1)]
 
-# Terminal constraint
-VMIN[nv-3] = VMAX[nv-3] = 0
-VMIN[nv-2] = VMAX[nv-2] = 0
+# NLP variables with bounds and initial guess
+w = []; w_min = []; w_max = []; w_init = []
 
-# Initial solution guess
-VINIT = NP.zeros(nv)
-
-# Constraint function with bounds
+# NLP constraints with bounds
 g = [];  g_min = []; g_max = []
 
-# Build up a graph of integrator calls
+# NLP objective
+J = 0.
+
+# Treat initial state as a decision variable
+w += [X[0]]
+w_min += x0_min
+w_max += x0_max
+w_init += x_init
+
+# Loop over control intervals
 for k in range(nk):
-  # Local state vector
-  Xk = vertcat((X0[k],X1[k],X2[k]))
-  Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
-  
-  # Call the integrator
-  Xk_end = integrator({'x0':Xk,'p':U[k]})["xf"]
-  
-  # append continuity constraints
-  g.append(Xk_next - Xk_end)
-  g_min.append(NP.zeros(Xk.nnz()))
-  g_max.append(NP.zeros(Xk.nnz()))
+  # Add local control to NLP variables
+  w.append(U[k])
+  w_min += u_min
+  w_max += u_max
+  w_init += u_init
 
-# Objective function: L(T)
-f = X2[nk]
+  # Add state at end of control interval to NLP
+  w.append(X[k+1])
+  if k==nk:
+    w_min += xf_min
+    w_max += xf_max
+  else:
+    w_min += x_min
+    w_max += x_max
+  w_init += x_init
 
-# Continuity constraints: 0<= x(T(k+1)) - X(T(k)) <=0
-g = vertcat(g)
+  # Add continuity constraints to NLP
+  Fk = F(x0=X[k], p=U[k])
+  g.append(X[k+1] - Fk['xf'])
+  g_min += [0., 0.]
+  g_max += [0., 0.]
+
+  # Add contribution to the objective
+  J += Fk['qf']
+
+# Formulate the NLP
+nlp = {'x':vertcat(*w), 'f':J, 'g':vertcat(*g)}
 
 # Create NLP solver instance
-nlp = MXFunction("nlp", nlpIn(x=V), nlpOut(f=f,g=g))
-solver = NlpSolver("solver", "ipopt", nlp)
+solver = nlpsol('solver', 'ipopt', nlp)
 
 # Solve the problem
-sol = solver({"lbx" : VMIN,
-              "ubx" : VMAX,
-              "x0" : VINIT,
-              "lbg" : NP.concatenate(g_min),
-              "ubg" : NP.concatenate(g_max)})
+sol = solver(lbx = w_min,
+             ubx = w_max,
+             x0  = w_init,
+             lbg = g_min,
+             ubg = g_max)
 
 # Retrieve the solution
-v_opt = sol["x"]
-u_opt = v_opt[0:nk]
-x0_opt = v_opt[nk+0::3]
-x1_opt = v_opt[nk+1::3]
-x2_opt = v_opt[nk+2::3]
+w_opt = sol['x']
+x0_opt = w_opt[0::2+1]
+x1_opt = w_opt[1::2+1]
+u_opt = w_opt[2::2+1]
 
-# Get values at the beginning of each finite element
-tgrid_x = NP.linspace(0,10,nk+1)
-tgrid_u = NP.linspace(0,10,nk)
+# Time grid for printing
+tgrid = [tf/nk*k for k in range(nk+1)]
 
 # Plot the results
+import matplotlib.pyplot as plt
 plt.figure(1)
 plt.clf()
-plt.plot(tgrid_x,x0_opt,'--')
-plt.plot(tgrid_x,x1_opt,'-')
-plt.plot(tgrid_u,u_opt,'-.')
-plt.title("Van der Pol optimization - multiple shooting")
+plt.plot(tgrid, x0_opt, '--')
+plt.plot(tgrid, x1_opt, '-')
+plt.step(tgrid, vertcat(DM.nan(1), u_opt), '-.') # Note: first entry is ignored
+plt.title('Van der Pol optimization - multiple shooting')
 plt.xlabel('time')
 plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])
 plt.grid()

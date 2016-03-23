@@ -33,7 +33,7 @@
 namespace casadi {
 
   class CASADI_EXPORT
-  XmlFileInternal : public OptionsFunctionalityNode,
+  XmlFileInternal : public SharedObjectNode,
                     public PluginInterface<XmlFileInternal> {
   public:
     // Constructor
@@ -44,6 +44,9 @@ namespace casadi {
 
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
+
+    /** \brief  Print representation */
+    virtual void repr(std::ostream &stream) const;
 
     // Parse an XML file
     virtual XmlNode parse(const std::string& filename);

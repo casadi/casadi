@@ -28,8 +28,6 @@
 
 #include "mx_node.hpp"
 #include "casadi_call.hpp"
-#include "../function/linear_solver.hpp"
-/// \cond INTERNAL
 
 namespace casadi {
   /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T
@@ -49,25 +47,22 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    Solve(const MX& r, const MX& A, const LinearSolver& linear_solver);
+    Solve(const MX& r, const MX& A, const Function& linear_solver);
 
     /** \brief  Destructor */
     virtual ~Solve() {}
-
-    /** \brief  Clone function */
-    virtual Solve* clone() const { return new Solve(*this);}
 
     /** \brief  Print expression */
     virtual std::string print(const std::vector<std::string>& arg) const;
 
     /// Evaluate the function numerically
-    virtual void evalD(const double** arg, double** res, int* iw, double* w);
+    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
 
     /// Evaluate the function symbolically (SX)
-    virtual void evalSX(const SXElement** arg, SXElement** res, int* iw, SXElement* w);
+    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res);
+    virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res);
 
     /** \brief Calculate forward mode directional derivatives */
     virtual void evalFwd(const std::vector<std::vector<MX> >& fseed,
@@ -78,13 +73,13 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens);
 
     /** \brief  Propagate sparsity forward */
-    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief  Propagate sparsity backwards */
-    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w);
+    virtual void spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem);
 
     /** \brief Get the operation */
-    virtual int getOp() const { return OP_SOLVE;}
+    virtual int op() const { return OP_SOLVE;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const { return 1;}
@@ -93,25 +88,25 @@ namespace casadi {
     virtual int numFunctions() const {return 1;}
 
     /** \brief  Get function reference */
-    virtual const Function& getFunction(int i) const { return linear_solver_;}
+    virtual const Function& getFunction(int i) const { return linsol_;}
 
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
+    /** \brief Get required length of arg field */
+    virtual size_t sz_arg() const;
+
+    /** \brief Get required length of res field */
+    virtual size_t sz_res() const;
+
+    /** \brief Get required length of iw field */
+    virtual size_t sz_iw() const;
 
     /** \brief Get required length of w field */
-    virtual size_t sz_w() const { return sparsity().size1();}
-
-    /** \brief Generate code for the operation */
-    virtual void generate(const std::vector<int>& arg, const std::vector<int>& res,
-                          CodeGenerator& g) const;
+    virtual size_t sz_w() const;
 
     /// Linear Solver (may be shared between multiple nodes)
-    LinearSolver linear_solver_;
+    Function linsol_;
   };
 
 
 } // namespace casadi
-
-/// \endcond
 
 #endif // CASADI_SOLVE_HPP

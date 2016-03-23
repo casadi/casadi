@@ -32,8 +32,5 @@ C = MX.sym("C")             # And an other little matrix
 D = MX.sym("D",Sparsity.lower(4))  # Triangular matrix
 
 
-L = veccat([A,B,C,D])
+L = veccat(A,B,C,D)
 print L
-
-#! The following statement does the same:
-L = map(vecNZ,[A,B,C,D])

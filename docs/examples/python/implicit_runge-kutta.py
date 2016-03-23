@@ -39,14 +39,15 @@ nx = 3
 np = 1
 
 # Declare variables
-x  = SX.sym("x",nx)  # state
-p  = SX.sym("u",np)  # control
+x  = SX.sym("x", nx)  # state
+p  = SX.sym("u", np)  # control
 
 # ODE right hand side function
-ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + p, \
-               x[0], \
-               x[0]*x[0] + x[1]*x[1] + p*p])
-f = SXFunction('f', daeIn(x=x,p=p),daeOut(ode=ode))
+ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p, \
+              x[0], \
+              x[0]*x[0] + x[1]*x[1] + p*p)
+dae = {'x':x, 'p':p, 'ode':ode}
+f = Function('f', [x, p], [ode])
 
 # Number of finite elements
 n = 100     
@@ -54,11 +55,11 @@ n = 100
 # Size of the finite elements
 h = tf/n
 
-# Choose collocation points
-tau_root = collocationPoints(4,"legendre")
-
 # Degree of interpolating polynomial
-d = len(tau_root)-1
+d = 4
+
+# Choose collocation points
+tau_root = [0] + collocation_points(d, "legendre")
 
 # Coefficients of the collocation equation
 C = N.zeros((d+1,d+1))
@@ -76,15 +77,15 @@ for j in range(d+1):
   for r in range(d+1):
     if r != j:
       L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SXFunction('lfcn', [tau], [L])
+  lfcn = Function('lfcn', [tau], [L])
   
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  [D[j]] = lfcn([1.0])
+  D[j] = lfcn(1.0)
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   tfcn = lfcn.tangent()
   for r in range(d+1):
-    C[j,r], _ = tfcn([tau_root[r]])
+    C[j,r], _ = tfcn(tau_root[r])
 
 # Total number of variables for one finite element
 X0 = MX.sym("X0",nx)
@@ -103,21 +104,21 @@ for j in range(1,d+1):
     xp_j += C[r,j]*X[r]
       
   # Append collocation equations
-  f_j = f({'x':X[j],'p':P})["ode"]
+  f_j = f(X[j],P)
   V_eq.append(h*f_j - xp_j)
 
 # Concatenate constraints
-V_eq = vertcat(V_eq)
+V_eq = vertcat(*V_eq)
 
 # Root-finding function, implicitly defines V as a function of X0 and P
-vfcn = MXFunction('vfcn', [V, X0, P], [V_eq])
+vfcn = Function('vfcn', [V, X0, P], [V_eq])
 
-# Convert to SXFunction to decrease overhead
-vfcn_sx = SXFunction(vfcn)
+# Convert to SX to decrease overhead
+vfcn_sx = vfcn.expand()
 
 # Create a implicit function instance to solve the system of equations
-ifcn = ImplicitFunction("ifcn", "newton", vfcn_sx, {"linear_solver":"csparse"})
-[V] = ifcn([MX(),X0,P])
+ifcn = rootfinder("ifcn", "newton", vfcn_sx, {"linear_solver":"csparse"})
+V = ifcn(MX(),X0,P)
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
 # Get an expression for the state at the end of the finie element
@@ -126,18 +127,19 @@ for r in range(d+1):
   XF += D[r]*X[r]
   
 # Get the discrete time dynamics
-F = MXFunction('F', [X0,P],[XF])
+F = Function('F', [X0,P],[XF])
 
 # Do this iteratively for all finite elements
 X = X0
 for i in range(n):
-  [X] = F.call([X,P])
+  X = F(X,P)
 
 # Fixed-step integrator
-irk_integrator = MXFunction("irk_integrator", integratorIn(x0=X0,p=P),integratorOut(xf=X))
+irk_integrator = Function("irk_integrator", {"x0":X0, "p":P, "xf":X},
+                          integrator_in(), integrator_out())
 
 # Create a convensional integrator for reference
-ref_integrator = Integrator("ref_integrator", "cvodes", f, {"tf":tf})
+ref_integrator = integrator("ref_integrator", "cvodes", dae, {"tf":tf})
 
 # Test values
 x0_val  = N.array([0,1,0])
@@ -146,7 +148,7 @@ p_val = 0.2
 # Make sure that both integrators give consistent results
 for integrator in (irk_integrator,ref_integrator):
   print "-------"
-  print "Testing ", integrator.getOption("name")
+  print "Testing ", integrator.name()
   print "-------"
 
   # Generate a new function that calculates two forward directions and one adjoint direction
@@ -169,7 +171,7 @@ for integrator in (irk_integrator,ref_integrator):
   arg["adj0_xf"] = [0,0,1]
 
   # Integrate
-  res = dintegrator(arg)
+  res = dintegrator(**arg)
 
   # Get the nondifferentiated results
   print "%15s = " % "xf", res["der_xf"]

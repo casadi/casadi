@@ -80,8 +80,8 @@ M getMinor(const M& x, int i, int j){
 
 clock_t time1, time2;
 
-DMatrix x0(int n){
-  DMatrix A0(n,n,0);
+DM x0(int n){
+  DM A0(n,n,0);
   for(int i=0; i<n*n; ++i)
     A0[i] = 0.1 + sqrt(double(i*1323 % 124));
     
@@ -104,7 +104,7 @@ void test_mx(){
   f.init();
   time2 = clock();
   t = double(time2 - time1)/CLOCKS_PER_SEC;
-  int nops = f.countNodes();   // Number of elementary operations
+  int nops = f.n_nodes();   // Number of elementary operations
   cout << "time to create function: " << (t*1e3) << " ms, " << (t*1e9/nops) << " ns per elementary operation" << endl;
   
   // Some "random" matrix as input
@@ -152,7 +152,7 @@ void test_sx(){
   f.init();
   time2 = clock();
   t = double(time2 - time1)/CLOCKS_PER_SEC;
-  int nops = f.countNodes();   // Number of elementary operations
+  int nops = f.n_nodes();   // Number of elementary operations
   cout << "number of operations " << nops << endl;
   cout << "time to create function: " << (t*1e3) << " ms, " << (t*1e9/nops) << " ns per elementary operation" << endl;
 
@@ -179,7 +179,7 @@ void test_sx(){
   g.init();
   time2 = clock();
   t = double(time2 - time1)/CLOCKS_PER_SEC;
-  int nops_grad = g.countNodes();   // Number of elementary operations
+  int nops_grad = g.n_nodes();   // Number of elementary operations
   cout << "number of operations in gradient function: " << nops_grad << endl;
   cout << "time to create gradient function: " << (t*1e3) << " ms, " << (t*1e9/nops_grad) << " ns per elementary operation" << endl;
 
@@ -291,7 +291,7 @@ void test_sx_mx(){
   f.init();
   time2 = clock();
   t = double(time2 - time1)/CLOCKS_PER_SEC;
-  int nops = f.countNodes();   // Number of elementary operations
+  int nops = f.n_nodes();   // Number of elementary operations
   cout << "number of operations " << nops << endl;
   cout << "time to create function: " << (t*1e3) << " ms, " << (t*1e9/nops) << " ns per elementary operation" << endl;
 
@@ -340,7 +340,7 @@ void test_sx_mx(){
   f_mx.init();
   time2 = clock();
   t = double(time2 - time1)/CLOCKS_PER_SEC;
-  nops = f_mx.countNodes();   // Number of elementary operations
+  nops = f_mx.n_nodes();   // Number of elementary operations
   cout << "time to create function: " << (t*1e3) << " ms, " << (t*1e9/nops) << " ns per elementary operation" << endl;
   
   // Some "random" matrix as input

@@ -65,9 +65,6 @@ int main(){
     p[1]*x[0] +   x[1] -   x[2] -    1
   );
   
-  // Infinity
-  double inf = numeric_limits<double>::infinity();
-  
   // Initial guess and bounds for the optimization variables
   vector<double> x0  = {0.15, 0.15, 0.00};
   vector<double> lbx = {0.00, 0.00, 0.00};
@@ -81,11 +78,11 @@ int main(){
   vector<double> p0  = {5.00, 1.00};
 
   // NLP
-  SXFunction nlp("nlp", nlpIn("x", x, "p", p), nlpOut("f", f, "g", g));
+  SXDict nlp = {{"x", x}, {"p", p}, {"f", f}, {"g", g}};
 
   // Create NLP solver and buffers
-  NlpSolver solver("solver", "ipopt", nlp);
-  std::map<std::string, DMatrix> arg, res;
+  Function solver = nlpsol("solver", "ipopt", nlp);
+  std::map<std::string, DM> arg, res;
 
   // Solve the NLP
   arg["lbx"] = lbx;

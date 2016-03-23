@@ -218,9 +218,9 @@ SX MultipleShooting::getStateMat(int timeStep)
      return ret;
 }
 
-DMatrix MultipleShooting::getState(int timeStep, vector<double> & xopt)
+DM MultipleShooting::getState(int timeStep, vector<double> & xopt)
 {
-     DMatrix ret(ode.nx(), 1, 0.0);
+     DM ret(ode.nx(), 1, 0.0);
      map<string,int>::const_iterator xIter;
      for (xIter = ode.states.begin(); xIter != ode.states.end(); xIter++)
 	  ret.at(xIter->second) = xopt.at(getIdx( xIter->first, timeStep ));
@@ -228,9 +228,9 @@ DMatrix MultipleShooting::getState(int timeStep, vector<double> & xopt)
      return ret;
 }
 
-DMatrix MultipleShooting::getAction(int timeStep, vector<double> & xopt)
+DM MultipleShooting::getAction(int timeStep, vector<double> & xopt)
 {
-     DMatrix ret(ode.nu(), 1, 0.0);
+     DM ret(ode.nu(), 1, 0.0);
      map<string,int>::const_iterator uIter;
      for (uIter = ode.actions.begin(); uIter != ode.actions.end(); uIter++)
 	  ret.at(uIter->second) = xopt.at(getIdx( uIter->first, timeStep ));

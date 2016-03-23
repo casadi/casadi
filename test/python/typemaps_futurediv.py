@@ -21,33 +21,13 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from __future__ import division
-#
-#     This file is part of CasADi.
-# 
-#     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
-# 
-#     CasADi is free software; you can redistribute it and/or
-#     modify it under the terms of the GNU Lesser General Public
-#     License as published by the Free Software Foundation; either
-#     version 3 of the License, or (at your option) any later version.
-# 
-#     CasADi is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#     Lesser General Public License for more details.
-# 
-#     You should have received a copy of the GNU Lesser General Public
-#     License along with CasADi; if not, write to the Free Software
-#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-# 
-# 
 
+from __future__ import division
 from casadi import *
 import casadi as c
-from numpy import *
+import numpy
 import numpy as n
+from numpy import array, matrix
 import unittest
 from types import *
 from helpers import *
@@ -67,16 +47,16 @@ class typemaptests(casadiTestCase):
   
   def test_floordiv(self):
     self.message("make sure that floor_div raises errors")
-    for x in [SX.sym("x"),MX.sym("x"),DMatrix([3]),SX.sym("x")]:
-      for y in [2,2.0,DMatrix(3),numpy.matrix([2.0])]:
+    for x in [SX.sym("x"),MX.sym("x"),DM([3]),SX.sym("x")]:
+      for y in [2,2.0,DM(3),numpy.matrix([2.0])]:
         print (x,y)
         self.assertRaises(Exception,lambda : x//y)
         self.assertRaises(Exception,lambda : y//x)
   
   def test_autoconversion(self):
-    self.message("Auto conversion DMatrix")
+    self.message("Auto conversion DM")
     x=array([2.3])
-    s = DMatrix([[1,2],[3,4]])
+    s = DM([[1,2],[3,4]])
     n = array(s)
     
     self.checkarray(x[0]*s,s*x[0],"")
@@ -140,20 +120,16 @@ class typemaptests(casadiTestCase):
 
   def test_autoconversionMX(self):
     self.message("Auto conversion MX")
-    s = DMatrix([[1,2],[3,4]])
+    s = DM([[1,2],[3,4]])
     x = SX(3)
     y = MX(3)
     
     def doit(z,s,fun):
-      function = None
-      
       if type(z) in [type(SX()),type(SX())]:
         ztype = [type(SX()),type(SX())]
-        function = SXFunction
       
       if type(z) in [type(MX())]:
         ztype = [type(MX())]
-        function = MXFunction
         
       r = fun(z,s)
             
@@ -170,31 +146,29 @@ class typemaptests(casadiTestCase):
       if hasNum:
         dummy = [1.3,2.7,9.4,1.0]
 
-        f=function('f', [z],[r])
-        f.setInputNZ(dummy[0:f.getInput().nnz()])
-        f.evaluate()
+        f=Function('f', [z],[r])
+        f_in = DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f_out = f(f_in)
         
-        f_=function('f', [z],[z])
-        f_.setInputNZ(dummy[0:f.getInput().nnz()])
-        f_.evaluate()
+        f_=Function('f', [z],[z])
+        f__in = DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)])
+        f__out = f_(f__in)
         
 
-        self.checkarray(fun(f_.getOutput(),DMatrix(s)),f.getOutput(),"operation")
+        self.checkarray(fun(f__out,DM(s)),f_out,"operation")
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
         
-        f=function('f',[z,s],[r])
-        f.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
-        f.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
-        f.evaluate()
+        f=Function('f',[z,s],[r])
+        f_in = [DM(f.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
+        f_out = f(*f_in)
         
-        f_=function('f', [z,s],[z,s])
-        f_.setInputNZ(dummy[0:f.getInput(0).nnz()],0)
-        f_.setInputNZ(dummy2[0:f.getInput(1).nnz()],1)
-        f_.evaluate()
+        f_=Function('f', [z,s],[z,s])
+        f__in= [DM(f_.sparsity_in(0),dummy[0:f.nnz_in(0)]), DM(f_.sparsity_in(1),dummy2[0:f.nnz_in(1)])]
+        f__out = f_(*f__in)
 
-        self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation")
+        self.checkarray(fun(f__out[0],f__out[1]),f_out,"operation")
     
     
     def tests(z,s):
@@ -211,12 +185,10 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s**z)
       doit(z,s,lambda z,s: fmin(s,z))
       doit(z,s,lambda z,s: fmax(s,z))
-      doit(z,s,lambda z,s: min(s,z))
-      doit(z,s,lambda z,s: max(s,z))
       doit(z,s,lambda z,s: constpow(s,z))
       doit(z,s,lambda z,s: constpow(z,s))
       
-    nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
+    nums = [array([[1,2],[3,4]]),DM([[1,2],[3,4]]), DM(4), array(4),4.0,4]
         
     ## numeric & SX
     for s in nums:

@@ -260,13 +260,13 @@ SX Ode::simpsonsRuleError( SX x0Vec, SX x1Vec, SX u0Vec, SX u1Vec, map<string,SX
 }
 
 
-DMatrix Ode::rk4Step( DMatrix & xk, DMatrix & uk, double t0_, double dt_)
+DM Ode::rk4Step( DM & xk, DM & uk, double t0_, double dt_)
 {
      if (!locked)
 	  init();
 
-     DMatrix t0(t0_);
-     DMatrix dt(dt_);
+     DM t0(t0_);
+     DM dt(dt_);
 
      // inputs
      rk4StepFcn.setInput( xk, IDX_ODE_STEP_STATE  );
@@ -278,18 +278,18 @@ DMatrix Ode::rk4Step( DMatrix & xk, DMatrix & uk, double t0_, double dt_)
      rk4StepFcn.evaluate();
 	
      // output
-     DMatrix out( nx(), 1, 0.0 );
+     DM out( nx(), 1, 0.0 );
      rk4StepFcn.getOutput(out);
      return out;
 }
 
-DMatrix Ode::eulerStep( DMatrix & xk, DMatrix & uk, double t0_, double dt_)
+DM Ode::eulerStep( DM & xk, DM & uk, double t0_, double dt_)
 {
      if (!locked)
 	  init();
 
-     DMatrix t0(t0_);
-     DMatrix dt(dt_);
+     DM t0(t0_);
+     DM dt(dt_);
 
      // inputs
      eulerStepFcn.setInput( xk, IDX_ODE_STEP_STATE  );
@@ -301,7 +301,7 @@ DMatrix Ode::eulerStep( DMatrix & xk, DMatrix & uk, double t0_, double dt_)
      eulerStepFcn.evaluate();
 
      // output
-     DMatrix out( nx(), 1, 0.0 );
+     DM out( nx(), 1, 0.0 );
      eulerStepFcn.getOutput(out);
      return out;
 }

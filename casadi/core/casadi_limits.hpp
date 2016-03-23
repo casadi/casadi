@@ -45,12 +45,13 @@ e.g. symbolic scalars
 template<class T>
 class CASADI_EXPORT casadi_limits {
   public:
-    static bool isZero(const T& val) { return val==0; }
+    static bool is_zero(const T& val) { return val==0; }
+    static bool is_equal(const T& x, const T& y, int depth) { return x==y; }
     static bool isAlmostZero(const T& val, double tol) { return val<=tol && val>=-tol; }
-    static bool isOne(const T& val) { return val==1;}
-    static bool isMinusOne(const T& val) { return val==-1;}
-    static bool isConstant(const T& val) { return true;}
-    static bool isInteger(const T& val) { return val==static_cast<int>(val);}
+    static bool is_one(const T& val) { return val==1;}
+    static bool is_minus_one(const T& val) { return val==-1;}
+    static bool is_constant(const T& val) { return true;}
+    static bool is_integer(const T& val) { return val==static_cast<int>(val);}
     static bool isInf(const T& val) { return std::numeric_limits<T>::has_infinity ?
             val==std::numeric_limits<T>::infinity() : false;}
     static bool isMinusInf(const T& val) { return std::numeric_limits<T>::has_infinity ?
@@ -62,6 +63,9 @@ class CASADI_EXPORT casadi_limits {
     static const T two;
     static const T minus_one;
 };
+
+template<class T>
+inline bool is_zero(const T& x) { return casadi_limits<T>::is_zero(x);}
 
 } // namespace casadi
 #endif // CASADI_CASADI_LIMITS_HPP

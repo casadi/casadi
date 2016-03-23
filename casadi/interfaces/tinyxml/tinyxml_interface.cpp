@@ -34,7 +34,7 @@ namespace casadi {
     plugin->creator = TinyXmlInterface::creator;
     plugin->name = "tinyxml";
     plugin->doc = TinyXmlInterface::meta_doc.c_str();
-    plugin->version = 23;
+    plugin->version = 30;
     return 0;
   }
 
@@ -47,10 +47,6 @@ namespace casadi {
   }
 
   TinyXmlInterface::~TinyXmlInterface() {
-  }
-
-  TinyXmlInterface* TinyXmlInterface::clone() const {
-    return new TinyXmlInterface();
   }
 
   XmlNode TinyXmlInterface::parse(const std::string& filename) {
@@ -73,7 +69,7 @@ namespace casadi {
         for (TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
              pAttrib;
              pAttrib=pAttrib->Next()) {
-          ret.setAttribute(pAttrib->Name(), pAttrib->Value());
+          ret.set_attribute(pAttrib->Name(), pAttrib->Value());
         }
       }
     } else if (type == TiXmlNode::TINYXML_DOCUMENT) {
@@ -97,7 +93,7 @@ namespace casadi {
       if (childtype == TiXmlNode::TINYXML_ELEMENT) {
         XmlNode newnode = addNode(child);
         ret.children_.push_back(newnode);
-        ret.child_indices_[newnode.getName()] = ch;
+        ret.child_indices_[newnode.name()] = ch;
       } else if (childtype == TiXmlNode::TINYXML_COMMENT) {
         ret.comment_ = child->Value();
       } else if (childtype == TiXmlNode::TINYXML_TEXT) {

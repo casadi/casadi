@@ -25,31 +25,27 @@
 
 #include "kinsol_interface.hpp"
 
-#include "casadi/core/function/sx_function_internal.hpp"
-#include "casadi/core/std_vector_tools.hpp"
-#include "casadi/core/function/linear_solver_internal.hpp"
-
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IMPLICITFUNCTION_KINSOL_EXPORT
-  casadi_register_implicitfunction_kinsol(ImplicitFunctionInternal::Plugin* plugin) {
+  int CASADI_ROOTFINDER_KINSOL_EXPORT
+  casadi_register_rootfinder_kinsol(Rootfinder::Plugin* plugin) {
     plugin->creator = KinsolInterface::creator;
     plugin->name = "kinsol";
     plugin->doc = KinsolInterface::meta_doc.c_str();
-    plugin->version = 23;
+    plugin->version = 30;
     return 0;
   }
 
   extern "C"
-  void CASADI_IMPLICITFUNCTION_KINSOL_EXPORT casadi_load_implicitfunction_kinsol() {
-    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_kinsol);
+  void CASADI_ROOTFINDER_KINSOL_EXPORT casadi_load_rootfinder_kinsol() {
+    Rootfinder::registerPlugin(casadi_register_rootfinder_kinsol);
   }
 
   /** \brief Kinsol solver class
    *
-   * @copydoc ImplicitFunction_doc
+   * @copydoc Rootfinder_doc
    * You can provide an initial guess by setting output(0).\n
    * A good initial guess may be needed to avoid errors like
    * "The linear solver's setup function failed in an unrecoverable manner."
@@ -63,78 +59,137 @@ namespace casadi {
    -2 then \p ui will be constrained to be \p ui < 0.0. \n
 
    *
-   * \see ImplicitFunction for more information
+   * \see Rootfinder for more information
    *
    */
-  KinsolInterface::KinsolInterface(const Function& f) : ImplicitFunctionInternal(f) {
-    addOption("max_iter",                 OT_INTEGER, 0,
-              "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
-    addOption("abstol",                   OT_REAL, 1e-6, "Stopping criterion tolerance");
-    addOption("linear_solver_type",       OT_STRING, "dense",
-              "dense|banded|iterative|user_defined");
-    addOption("upper_bandwidth",          OT_INTEGER);
-    addOption("lower_bandwidth",          OT_INTEGER);
-    addOption("max_krylov",               OT_INTEGER, 0);
-    addOption("exact_jacobian",           OT_BOOLEAN, true);
-    addOption("iterative_solver",         OT_STRING, "gmres", "gmres|bcgstab|tfqmr");
-    addOption("f_scale",                  OT_REALVECTOR);
-    addOption("u_scale",                  OT_REALVECTOR);
-    addOption("pretype",                  OT_STRING, "none", "", "none|left|right|both");
-    addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
-    addOption("strategy",                 OT_STRING, "none", "Globalization strategy",
-              "none|linesearch");
-    addOption("disable_internal_warnings",   OT_BOOLEAN, false,
-              "Disable KINSOL internal warning messages");
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
+  KinsolInterface::KinsolInterface(const std::string& name, const Function& f)
+    : Rootfinder(name, f) {
 
-    mem_ = 0;
-    u_ = 0;
     u_scale_ = 0;
     f_scale_ = 0;
-    disable_internal_warnings_ = false;
-  }
 
-  KinsolInterface* KinsolInterface::clone() const {
-    KinsolInterface* node = new KinsolInterface(f_);
-    node->setOption(dictionary());
-    return node;
+    // Default options
+    exact_jacobian_ = true;
+    disable_internal_warnings_ = false;
+    max_iter_ = 0;
+    maxl_ = 0;
+    upper_bandwidth_ = -1;
+    lower_bandwidth_ = -1;
+    use_preconditioner_ = false;
+    abstol_ = 1e-6;
   }
 
   KinsolInterface::~KinsolInterface() {
-    if (u_) N_VDestroy_Serial(u_);
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
-    if (mem_) KINFree(&mem_);
+    clear_memory();
   }
 
-  void KinsolInterface::init() {
-    ImplicitFunctionInternal::init();
+  Options KinsolInterface::options_
+  = {{&Rootfinder::options_},
+     {{"max_iter",
+       {OT_INT,
+        "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol."}},
+      {"abstol",
+       {OT_DOUBLE,
+        "Stopping criterion tolerance"}},
+      {"linear_solver_type",
+       {OT_STRING,
+        "dense|banded|iterative|user_defined"}},
+      {"upper_bandwidth",
+       {OT_INT,
+        "Upper bandwidth for banded linear solvers"}},
+      {"lower_bandwidth",
+       {OT_INT,
+        "Lower bandwidth for banded linear solvers"}},
+      {"max_krylov",
+       {OT_INT,
+        "Maximum Krylov space dimension"}},
+      {"exact_jacobian",
+       {OT_BOOL,
+        "Use exact Jacobian information"}},
+      {"iterative_solver",
+       {OT_STRING,
+        "gmres|bcgstab|tfqmr"}},
+      {"f_scale",
+       {OT_DOUBLEVECTOR,
+        "Equation scaling factors"}},
+      {"u_scale",
+       {OT_DOUBLEVECTOR,
+        "Variable scaling factors"}},
+      {"pretype",
+       {OT_STRING,
+        "Type of preconditioner"}},
+      {"use_preconditioner",
+       {OT_BOOL,
+        "Precondition an iterative solver"}},
+      {"strategy",
+       {OT_STRING,
+        "Globalization strategy"}},
+      {"disable_internal_warnings",
+       {OT_BOOL,
+        "Disable KINSOL internal warning messages"}}
+     }
+  };
+
+  void KinsolInterface::init(const Dict& opts) {
+    // Initialize the base classes
+    Rootfinder::init(opts);
+
+    // Default (temporary) options
+    string strategy = "none";
+    vector<double> u_scale;
+    vector<double> f_scale;
+    string linear_solver_type = "dense";
+    string iterative_solver = "gmres";
 
     // Read options
-    if (getOption("strategy")=="linesearch") {
+    for (auto&& op : opts) {
+      if (op.first=="strategy") {
+        strategy = op.second.to_string();
+      } else if (op.first=="exact_jacobian") {
+        exact_jacobian_ = op.second;
+      } else if (op.first=="u_scale") {
+        u_scale = op.second;
+      } else if (op.first=="f_scale") {
+        f_scale = op.second;
+      } else if (op.first=="disable_internal_warnings") {
+        disable_internal_warnings_ = op.second;
+      } else if (op.first=="max_iter") {
+        max_iter_ = op.second;
+      } else if (op.first=="linear_solver_type") {
+        linear_solver_type = op.second.to_string();
+      } else if (op.first=="max_krylov") {
+        maxl_ = op.second;
+      } else if (op.first=="upper_bandwidth") {
+        upper_bandwidth_ = op.second;
+      } else if (op.first=="lower_bandwidth") {
+        lower_bandwidth_ = op.second;
+      } else if (op.first=="iterative_solver") {
+        iterative_solver = op.second.to_string();
+      } else if (op.first=="use_preconditioner") {
+        use_preconditioner_ = op.second;
+      } else if (op.first=="abstol") {
+        abstol_ = op.second;
+      }
+    }
+
+    // Get globalization strategy
+    if (strategy=="linesearch") {
       strategy_ = KIN_LINESEARCH;
     } else {
-      casadi_assert(getOption("strategy")=="none");
+      casadi_assert(strategy=="none");
       strategy_ = KIN_NONE;
     }
 
-    // Return flag
-    int flag;
-
-    // Use exact Jacobian?
-    bool exact_jacobian = getOption("exact_jacobian");
-
     // Allocate N_Vectors
-    if (u_) N_VDestroy_Serial(u_);
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
-    u_ = N_VNew_Serial(n_);
     u_scale_ = N_VNew_Serial(n_);
     f_scale_ = N_VNew_Serial(n_);
 
     // Set scaling factors on variables
-    if (hasSetOption("u_scale")) {
-      const vector<double>& u_scale = getOption("u_scale");
+    if (!u_scale.empty()) {
       casadi_assert(u_scale.size()==NV_LENGTH_S(u_scale_));
       copy(u_scale.begin(), u_scale.end(), NV_DATA_S(u_scale_));
     } else {
@@ -142,157 +197,93 @@ namespace casadi {
     }
 
     // Set scaling factors on equations
-    if (hasSetOption("f_scale")) {
-      const vector<double>& f_scale = getOption("f_scale");
+    if (!f_scale.empty()) {
       casadi_assert(f_scale.size()==NV_LENGTH_S(f_scale_));
       copy(f_scale.begin(), f_scale.end(), NV_DATA_S(f_scale_));
     } else {
       N_VConst(1.0, f_scale_);
     }
 
-    // Create KINSOL memory block
-    if (mem_) KINFree(&mem_);
-    mem_ = KINCreate();
-
-    // KINSOL bugfix
-    KINMem kin_mem = KINMem(mem_);
-    kin_mem->kin_inexact_ls = FALSE;
-
-    // Set optional inputs
-    flag = KINSetUserData(mem_, this);
-    casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
-
-    // Disable internal warning messages?
-    disable_internal_warnings_ = getOption("disable_internal_warnings");
-
-    // Set error handler function
-    flag = KINSetErrHandlerFn(mem_, ehfun_wrapper, this);
-    casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
-
-    // Initialize KINSOL
-    flag = KINInit(mem_, func_wrapper, u_);
-    casadi_assert(flag==KIN_SUCCESS);
-
-    // Setting maximum number of Newton iterations
-    flag = KINSetMaxNewtonStep(mem_, getOption("max_iter"));
-    casadi_assert(flag==KIN_SUCCESS);
-
-    // Set constraints
-    if (hasSetOption("constraints")) {
-      // Copy to a temporary N_Vector
-      N_Vector constraints = N_VNew_Serial(n_);
-      copy(u_c_.begin(), u_c_.end(), NV_DATA_S(constraints));
-
-      // Pass to KINSOL
-      flag = KINSetConstraints(mem_, constraints);
-      casadi_assert(flag==KIN_SUCCESS);
-
-      // Free the temporary vector
-      N_VDestroy_Serial(constraints);
-    }
-
-    // attach a linear solver
-    if (getOption("linear_solver_type")=="dense") {
-      // Dense Jacobian
-      flag = KINDense(mem_, n_);
-      casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
-
-      if (exact_jacobian) {
-        flag = KINDlsSetDenseJacFn(mem_, djac_wrapper);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
+    // Type of linear solver
+    if (linear_solver_type=="dense") {
+      linear_solver_type_ = DENSE;
+      if (exact_jacobian_) {
+        // For storing Jacobian nonzeros
+        alloc_w(jac_.nnz_out(0), true);
       }
-
-    } else if (getOption("linear_solver_type")=="banded") {
-      // Banded Jacobian
-      flag = KINBand(mem_, n_, getOption("upper_bandwidth").toInt(),
-                     getOption("lower_bandwidth").toInt());
-      casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
-
-      if (exact_jacobian) {
-        flag = KINDlsSetBandJacFn(mem_, bjac_wrapper);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
+    } else if (linear_solver_type=="banded") {
+      linear_solver_type_ = BANDED;
+      casadi_assert(upper_bandwidth_>=0);
+      casadi_assert(lower_bandwidth_>=0);
+      if (exact_jacobian_) {
+        // For storing Jacobian nonzeros
+        alloc_w(jac_.nnz_out(0), true);
       }
-
-    } else if (getOption("linear_solver_type")=="iterative") {
-      // Sparse (iterative) solver
-      // Max dimension of the Krylov space
-      int maxl = getOption("max_krylov").toInt();
-
-      // Attach the sparse solver
-      if (getOption("iterative_solver")=="gmres") {
-        flag = KINSpgmr(mem_, maxl);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
-      } else if (getOption("iterative_solver")=="bcgstab") {
-        flag = KINSpbcg(mem_, maxl);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
-      } else if (getOption("iterative_solver")=="tfqmr") {
-        flag = KINSptfqmr(mem_, maxl);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
+    } else if (linear_solver_type=="iterative") {
+      linear_solver_type_ = ITERATIVE;
+      if (iterative_solver=="gmres") {
+        iterative_solver_ = GMRES;
+      } else if (iterative_solver=="bcgstab") {
+        iterative_solver_ = BCGSTAB;
+      } else if (iterative_solver=="tfqmr") {
+        iterative_solver_ = TFQMR;
       } else {
-        throw CasadiException("KINSOL: Unknown sparse solver");
+        casadi_error("KINSOL: Unknown sparse solver");
       }
-
-      // Attach functions for Jacobian information
-      if (exact_jacobian) {
+      if (exact_jacobian_) {
         // Form the Jacobian-times-vector function
         f_fwd_ = f_.derivative(1, 0);
-
-        flag = KINSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
+        alloc(f_fwd_);
       }
-
-      // Add a preconditioner
-      if (static_cast<bool>(getOption("use_preconditioner"))) {
+      if (use_preconditioner_) {
         // Make sure that a Jacobian has been provided
-        casadi_assert_message(!jac_.isNull(), "No Jacobian has been provided");
+        casadi_assert_message(!jac_.is_null(), "No Jacobian has been provided");
 
         // Make sure that a linear solver has been provided
-        casadi_assert_message(!linsol_.isNull(), "No linear solver has been provided.");
-
-        // Pass to IDA
-        flag = KINSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
-        casadi_assert(flag==KIN_SUCCESS);
+        casadi_assert_message(!linsol_.is_null(), "No linear solver has been provided.");
       }
-
-    } else if (getOption("linear_solver_type")=="user_defined") {
+    } else if (linear_solver_type=="user_defined") {
+      linear_solver_type_ = USER_DEFINED;
       // Make sure that a Jacobian has been provided
-      casadi_assert(!jac_.isNull());
+      casadi_assert(!jac_.is_null());
 
       // Make sure that a linear solver has been provided
-      casadi_assert(!linsol_.isNull());
+      casadi_assert(!linsol_.is_null());
 
-      // Set fields in the IDA memory
-      KINMem kin_mem = KINMem(mem_);
-      kin_mem->kin_lmem   = this;
-      kin_mem->kin_lsetup = lsetup_wrapper;
-      kin_mem->kin_lsolve = lsolve_wrapper;
-      kin_mem->kin_setupNonNull = TRUE;
+      // Form the Jacobian-times-vector function
+      f_fwd_ = f_.derivative(1, 0);
+      alloc(f_fwd_);
 
+      // Allocate space for Jacobian
+      alloc_w(jac_.nnz_out(0), true);
     } else {
-      throw CasadiException("Unknown linear solver ");
-    }
-
-    // Set stop criterion
-    if (hasSetOption("abstol")) {
-      flag = KINSetFuncNormTol(mem_, getOption("abstol"));
-      casadi_assert(flag==KIN_SUCCESS);
+      casadi_error("Unknown linear solver");
     }
   }
 
-  void KinsolInterface::solveNonLinear() {
-    // Reset the counters
-    t_func_ = 0;
-    t_jac_ = 0;
+  void KinsolInterface::eval(void* mem, const double** arg, double** res,
+                             int* iw, double* w) const {
+    auto m = static_cast<KinsolMemory*>(mem);
 
-    if (verbose()) {
-      userOut() << "KinsolInterface::solveNonLinear: Initial guess = " << output(0).data() << endl;
-    }
+    // Update IO references
+    m->arg = arg;
+    m->res = res;
+    m->iw = iw;
+    m->w = w;
+
+    // Reset the counters
+    m->t_func = 0;
+    m->t_jac = 0;
 
     // Get the initial guess
-    output(iout_).getNZ(NV_DATA_S(u_));
+    if (arg[iin_]) {
+      copy(arg[iin_], arg[iin_]+nnz_in(iin_), NV_DATA_S(m->u));
+    } else {
+      N_VConst(0.0, m->u);
+    }
 
     // Solve the nonlinear system of equations
-    int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
+    int flag = KINSol(m->mem, m->u, strategy_, u_scale_, f_scale_);
     if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag);
 
     // Warn if not successful return
@@ -301,49 +292,49 @@ namespace casadi {
     }
 
     // Get the solution
-    setOutputNZ(NV_DATA_S(u_), iout_);
-
-    // Evaluate auxiliary outputs
-    if (nOut()>0) {
-      f_.setInput(output(iout_), iin_);
-      for (int i=0; i<nIn(); ++i)
-        if (i!=iin_) f_.setInput(input(i), i);
-      f_.evaluate();
-      for (int i=0; i<nOut(); ++i) {
-        if (i!=iout_) f_.getOutput(output(i), i);
-      }
+    if (res[iout_]) {
+      copy_n(NV_DATA_S(m->u), nnz_out(iout_), res[iout_]);
     }
 
-    // Print solution
-    if (verbose()) {
-      userOut() << "KinsolInterface::solveNonLinear: solution = " << output(iout_).data() << endl;
+    // Evaluate auxiliary outputs
+    if (n_out()>0) {
+      // Temporary memory
+      const double** arg1 = arg + n_in();
+      double** res1 = res + n_out();
+
+      // Evaluate f_
+      copy_n(arg, n_in(), arg1);
+      arg1[iin_] = NV_DATA_S(m->u);
+      copy_n(res, n_out(), res1);
+      res1[iout_] = 0;
+      f_(arg1, res1, iw, w, 0);
     }
   }
 
-  void KinsolInterface::func(N_Vector u, N_Vector fval) {
+  void KinsolInterface::func(KinsolMemory& m, N_Vector u, N_Vector fval) const {
     // Get time
-    time1_ = clock();
+    m.time1 = clock();
 
-    // Pass inputs
-    f_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
-      if (i!=iin_) f_.setInput(input(i), i);
+    // Temporary memory
+    const double** arg1 = m.arg + n_in();
+    double** res1 = m.res + n_out();
 
-    // Evaluate
-    f_.evaluate();
+    // Evaluate f_
+    copy(m.arg, m.arg + n_in(), arg1);
+    arg1[iin_] = NV_DATA_S(u);
+    fill_n(res1, n_out(), static_cast<double*>(0));
+    res1[iout_] = NV_DATA_S(fval);
+    f_(arg1, res1, m.iw, m.w, 0);
 
+    // Print it, if requested
     if (monitored("eval_f")) {
-      userOut() << "f = " << f_.output(iout_) << endl;
+      userOut() << "f = ";
+      N_VPrint_Serial(fval);
     }
 
-    // Get results
-    f_.getOutputNZ(NV_DATA_S(fval), iout_);
-
-    // Get a referebce to the nonzeros of the function
-    const vector<double>& fdata = f_.output(iout_).data();
-
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<fdata.size(); ++k) {
+    double *fdata = res1[iout_];
+    for (int k=0; k<n_; ++k) {
       try {
         casadi_assert_message(!isnan(fdata[k]), "Nonzero " << k << " is not-a-number");
         casadi_assert_message(!isinf(fdata[k]), "Nonzero " << k << " is infinite");
@@ -351,14 +342,8 @@ namespace casadi {
         stringstream ss;
         ss << ex.what() << endl;
         if (verbose()) {
-          ss << "u = " << f_.input(iin_) << endl;
-
-          // Print the expression for f[Jcol] if f is an SXFunction instance
-          SXFunction f_sx = shared_cast<SXFunction>(f_);
-          if (!f_sx.isNull()) {
-            f_sx.print(ss);
-            ss << "Equation " << k << " = " << f_sx.outputExpr(0).at(k) << endl;
-          }
+          userOut() << "u = ";
+          N_VPrint_Serial(u);
         }
 
         throw CasadiException(ss.str());
@@ -366,15 +351,15 @@ namespace casadi {
     }
 
     // Log time
-    time2_ = clock();
-    t_func_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_func += static_cast<double>(m.time2-m.time1)/CLOCKS_PER_SEC;
   }
 
   int KinsolInterface::func_wrapper(N_Vector u, N_Vector fval, void *user_data) {
     try {
       casadi_assert(user_data);
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
-      this_->func(u, fval);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
+      this_->self.func(*this_, u, fval);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "func failed: " << e.what() << endl;
@@ -382,12 +367,12 @@ namespace casadi {
     }
   }
 
-  int KinsolInterface::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data,
-                                   N_Vector tmp1, N_Vector tmp2) {
+  int KinsolInterface::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J,
+                                 void *user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
-      this_->djac(N, u, fu, J, tmp1, tmp2);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
+      this_->self.djac(*this_, N, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "djac failed: " << e.what() << endl;;
@@ -395,28 +380,27 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::djac(long N, N_Vector u, N_Vector fu, DlsMat J,
-                            N_Vector tmp1, N_Vector tmp2) {
+  void KinsolInterface::djac(KinsolMemory& m, long N, N_Vector u, N_Vector fu, DlsMat J,
+                          N_Vector tmp1, N_Vector tmp2) const {
     // Get time
-    time1_ = clock();
+    m.time1 = clock();
 
-    // Pass inputs to the Jacobian function
-    jac_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
-      if (i!=iin_) jac_.setInput(input(i), i);
+    // Temporary memory
+    const double** arg1 = m.arg + n_in();
+    double** res1 = m.res + n_out();
+    double* jac = m.w + jac_.sz_w();
 
-    // Evaluate
-    jac_.evaluate();
-
-    if (monitored("eval_djac")) {
-      userOut() << "djac = " << jac_.output() << endl;
-    }
+    // Evaluate jac_
+    copy(m.arg, m.arg + n_in(), arg1);
+    arg1[iin_] = NV_DATA_S(u);
+    fill_n(res1, jac_.n_out(), static_cast<double*>(0));
+    res1[0] = jac;
+    jac_(arg1, res1, m.iw, m.w, 0);
 
     // Get sparsity and non-zero elements
-    const int* colind = jac_.output().colind();
-    int ncol = jac_.output().size2();
-    const int* row = jac_.output().row();
-    const vector<double>& val = jac_.output().data();
+    const int* colind = jac_.sparsity_out(0).colind();
+    int ncol = jac_.size2_out(0);
+    const int* row = jac_.sparsity_out(0).row();
 
     // Loop over columns
     for (int cc=0; cc<ncol; ++cc) {
@@ -426,7 +410,7 @@ namespace casadi {
         int rr = row[el];
 
         // Set the element
-        DENSE_ELEM(J, rr, cc) = val[el];
+        DENSE_ELEM(J, rr, cc) = jac[el];
       }
     }
 
@@ -436,17 +420,17 @@ namespace casadi {
     }
 
     // Log time duration
-    time2_ = clock();
-    t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu,
-                                   DlsMat J, void *user_data,
-                                   N_Vector tmp1, N_Vector tmp2) {
+  int KinsolInterface::bjac_wrapper(long N, long mupper, long mlower, N_Vector u,
+                                            N_Vector fu, DlsMat J, void *user_data,
+                                            N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
-      this_->bjac(N, mupper, mlower, u, fu, J, tmp1, tmp2);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
+      this_->self.bjac(*this_, N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "bjac failed: " << e.what() << endl;;
@@ -454,24 +438,27 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
-                            N_Vector tmp1, N_Vector tmp2) {
+  void KinsolInterface::bjac(KinsolMemory& m, long N, long mupper, long mlower, N_Vector u,
+                          N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2) const {
     // Get time
-    time1_ = clock();
+    m.time1 = clock();
 
-    // Pass inputs to the Jacobian function
-    jac_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
-      if (i!=iin_) jac_.setInput(input(i), i);
+    // Temporary memory
+    const double** arg1 = m.arg + n_in();
+    double** res1 = m.res + n_out();
+    double* jac = m.w + jac_.sz_w();
 
-    // Evaluate
-    jac_.evaluate();
+    // Evaluate jac_
+    copy(m.arg, m.arg + jac_.n_in(), arg1);
+    arg1[iin_] = NV_DATA_S(u);
+    fill_n(res1, jac_.n_out(), static_cast<double*>(0));
+    res1[0] = jac;
+    jac_(arg1, res1, m.iw, m.w, 0);
 
     // Get sparsity and non-zero elements
-    const int* colind = jac_.output().colind();
-    int ncol = jac_.output().size2();
-    const int* row = jac_.output().row();
-    const vector<double>& val = jac_.output().data();
+    const int* colind = jac_.sparsity_out(0).colind();
+    int ncol = jac_.size2_out(0);
+    const int* row = jac_.sparsity_out(0).row();
 
     // Loop over cols
     for (int cc=0; cc<ncol; ++cc) {
@@ -481,22 +468,23 @@ namespace casadi {
         int rr = row[el];
 
         // Set the element
-        if (rr-cc>=-mupper && rr-cc<=mlower)
-          BAND_ELEM(J, rr, cc) = val[el];
+        if (rr-cc>=-mupper && rr-cc<=mlower) {
+          BAND_ELEM(J, rr, cc) = jac[el];
+        }
       }
     }
 
     // Log time duration
-    time2_ = clock();
-    t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
   }
 
   int KinsolInterface::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u,
-                                     void *user_data) {
+                                   void *user_data) {
     try {
       casadi_assert(user_data);
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
-      this_->jtimes(v, Jv, u, new_u);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
+      this_->self.jtimes(*this_, v, Jv, u, new_u);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;;
@@ -504,37 +492,36 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u) {
+  void KinsolInterface::jtimes(KinsolMemory& m, N_Vector v, N_Vector Jv,
+                            N_Vector u, int* new_u) const {
     // Get time
-    time1_ = clock();
+    m.time1 = clock();
 
-    // Pass inputs
-    f_fwd_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
-      if (i!=iin_) f_fwd_.setInput(input(i), i);
+    // Temporary memory
+    const double** arg1 = m.arg + n_in();
+    double** res1 = m.res + n_out();
 
-    // Pass input seeds
-    f_fwd_.setInputNZ(NV_DATA_S(v), nIn()+iin_);
-    for (int i=0; i<nIn(); ++i)
-      if (i!=iin_) f_fwd_.setInput(0.0, nIn()+i);
-
-    // Evaluate
-    f_fwd_.evaluate();
-
-    // Get the output seeds
-    f_fwd_.getOutputNZ(NV_DATA_S(Jv), nOut());
+    // Evaluate f_fwd_
+    copy(m.arg, m.arg + n_in(), arg1);
+    arg1[iin_] = NV_DATA_S(u);
+    fill_n(arg1 + n_in(), n_in(), nullptr);
+    arg1[n_in()+iin_] = NV_DATA_S(v);
+    fill_n(res1, f_fwd_.n_out(), nullptr);
+    res1[n_out()] = NV_DATA_S(Jv);
+    f_fwd_(arg1, res1, m.iw, m.w, 0);
 
     // Log time duration
-    time2_ = clock();
-    t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_jac += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInterface::psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
-                                     void* user_data, N_Vector tmp1, N_Vector tmp2) {
+  int KinsolInterface::
+  psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                 void* user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
       casadi_assert(user_data);
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
-      this_->psetup(u, uscale, fval, fscale, tmp1, tmp2);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
+      this_->self.psetup(*this_, u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psetup failed: " << e.what() << endl;;
@@ -542,86 +529,46 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
-                              N_Vector tmp1, N_Vector tmp2) {
+  void KinsolInterface::
+  psetup(KinsolMemory& m, N_Vector u, N_Vector uscale, N_Vector fval,
+         N_Vector fscale, N_Vector tmp1, N_Vector tmp2) const {
     // Get time
-    time1_ = clock();
+    m.time1 = clock();
 
-    // Pass inputs
-    jac_.setInputNZ(NV_DATA_S(u), iin_);
-    for (int i=0; i<nIn(); ++i)
-      if (i!=iin_) jac_.setInput(input(i), i);
+    // Temporary memory
+    const double** arg1 = m.arg + n_in();
+    double** res1 = m.res + n_out();
+    double* jac = m.w;
+    double* w1 = m.w + jac_.nnz_out(0);
 
-    // Evaluate Jacobian
-    jac_.evaluate();
-
-    // Get a reference to the nonzeros of Jacobian
-    const vector<double>& Jdata = jac_.output().data();
-
-    // Make sure that all entries of the linear system are valid
-    for (int k=0; k<Jdata.size(); ++k) {
-      try {
-        casadi_assert_message(!isnan(Jdata[k]), "Nonzero " << k << " is not-a-number");
-        casadi_assert_message(!isinf(Jdata[k]), "Nonzero " << k << " is infinite");
-      } catch(exception& ex) {
-        stringstream ss;
-        ss << ex.what() << endl;
-
-        if (verbose()) {
-
-          // Print inputs
-          ss << "Input vector is " << jac_.input().data() << endl;
-
-          // Get the column
-          int Jcol = jac_.output().sparsity().getCol().at(k);
-
-          // Get the row
-          int Jrow = jac_.output().sparsity().row(k);
-
-          // Which equation
-          ss << "This corresponds to the derivative of equation " << Jrow
-             << " with respect to the variable " << Jcol << "." << endl;
-
-          // Print the expression for f[Jrow] if f is an SXFunction instance
-          SXFunction f_sx = shared_cast<SXFunction>(f_);
-          if (!f_sx.isNull()) {
-            ss << "Variable " << Jcol << " = " << f_sx.inputExpr(0).at(Jcol) << endl;
-            ss << "Equation " << Jrow << " = " << f_sx.outputExpr(0).at(Jrow) << endl;
-          }
-
-          // Print the expression for J[k] if J is an SXFunction instance
-          SXFunction jac_sx = shared_cast<SXFunction>(jac_);
-          if (!jac_sx.isNull()) {
-            ss << "J[" << Jrow << ", " << Jcol << "] = " << jac_sx.outputExpr(0).at(k) << endl;
-          }
-        }
-
-        throw CasadiException(ss.str());
-      }
-    }
+    // Evaluate jac_
+    copy(m.arg, m.arg + jac_.n_in(), arg1);
+    arg1[iin_] = NV_DATA_S(u);
+    fill_n(res1, jac_.n_out(), static_cast<double*>(0));
+    res1[0] = jac;
+    jac_(arg1, res1, m.iw, w1, 0);
 
     // Log time duration
-    time2_ = clock();
-    t_lsetup_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
-
-    // Pass non-zero elements, scaled by -gamma, to the linear solver
-    linsol_.setInput(jac_.output(), LINSOL_A);
+    m.time2 = clock();
+    m.t_lsetup_jac += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    // -- only if the linear solver inherits from LinearSolver
-    linsol_.prepare();
+    fill_n(m.arg, linsol_.n_in(), nullptr);
+    fill_n(m.res, linsol_.n_out(), nullptr);
+    linsol_.setup(m.arg, m.res, m.iw, w1);
+    linsol_.linsol_factorize(jac);
 
     // Log time duration
-    time1_ = clock();
-    t_lsetup_fac_ += static_cast<double>(time1_-time2_)/CLOCKS_PER_SEC;
+    m.time1 = clock();
+    m.t_lsetup_fac += static_cast<double>(m.time1 - m.time2)/CLOCKS_PER_SEC;
   }
 
   int KinsolInterface::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
                                      N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp) {
     try {
       casadi_assert(user_data);
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(user_data);
-      this_->psolve(u, uscale, fval, fscale, v, tmp);
+      auto this_ = static_cast<KinsolMemory*>(user_data);
+      this_->self.psolve(*this_, u, uscale, fval, fscale, v, tmp);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;;
@@ -629,24 +576,24 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::psolve(N_Vector u, N_Vector uscale, N_Vector fval,
-                              N_Vector fscale, N_Vector v, N_Vector tmp) {
+  void KinsolInterface::psolve(KinsolMemory& m, N_Vector u, N_Vector uscale, N_Vector fval,
+                            N_Vector fscale, N_Vector v, N_Vector tmp) const {
     // Get time
-    time1_ = clock();
+    m.time1 = clock();
 
     // Solve the factorized system
-    linsol_.solve(NV_DATA_S(v), 1, false);
+    linsol_.linsol_solve(NV_DATA_S(v));
 
     // Log time duration
-    time2_ = clock();
-    t_lsolve_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
+    m.time2 = clock();
+    m.t_lsolve += static_cast<double>(m.time2 - m.time1)/CLOCKS_PER_SEC;
   }
 
   int KinsolInterface::lsetup_wrapper(KINMem kin_mem) {
     try {
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(kin_mem->kin_lmem);
+      auto this_ = static_cast<KinsolMemory*>(kin_mem->kin_lmem);
       casadi_assert(this_);
-      this_->lsetup(kin_mem);
+      this_->self.lsetup(*this_, kin_mem);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;;
@@ -654,21 +601,22 @@ namespace casadi {
     }
   }
 
-  void KinsolInterface::lsetup(KINMem kin_mem) {
+  void KinsolInterface::lsetup(KinsolMemory& m, KINMem kin_mem) const {
     N_Vector u =  kin_mem->kin_uu;
     N_Vector uscale = kin_mem->kin_uscale;
     N_Vector fval = kin_mem->kin_fval;
     N_Vector fscale = kin_mem->kin_fscale;
     N_Vector tmp1 = kin_mem->kin_vtemp1;
     N_Vector tmp2 = kin_mem->kin_vtemp2;
-    psetup(u, uscale, fval, fscale, tmp1, tmp2);
+    psetup(m, u, uscale, fval, fscale, tmp1, tmp2);
   }
 
-  int KinsolInterface::lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
+  int KinsolInterface::
+  lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
     try {
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(kin_mem->kin_lmem);
+      auto this_ = static_cast<KinsolMemory*>(kin_mem->kin_lmem);
       casadi_assert(this_);
-      this_->lsolve(kin_mem, x, b, res_norm);
+      this_->self.lsolve(*this_, kin_mem, x, b, res_norm);
       return 0;
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;;
@@ -676,8 +624,8 @@ namespace casadi {
     }
   }
 
-
-  void KinsolInterface::lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm) {
+  void KinsolInterface::lsolve(KinsolMemory& m, KINMem kin_mem,
+                            N_Vector x, N_Vector b, double *res_norm) const {
     // Get vectors
     N_Vector u =  kin_mem->kin_uu;
     N_Vector uscale = kin_mem->kin_uscale;
@@ -688,47 +636,145 @@ namespace casadi {
 
     // Solve the linear system
     N_VScale(1.0, b, x);
-    psolve(u, uscale, fval, fscale, x, tmp1);
+    psolve(m, u, uscale, fval, fscale, x, tmp1);
 
     // Calculate residual
-    jtimes(x, tmp2, u, 0);
+    jtimes(m, x, tmp2, u, 0);
 
     // Calculate the error in residual norm
     N_VLinearSum(1.0, b, -1.0, tmp2, tmp1);
     *res_norm = sqrt(N_VDotProd(tmp1, tmp1));
   }
 
-  void KinsolInterface::ehfun_wrapper(int error_code, const char *module, const char *function,
-                                     char *msg, void *eh_data) {
+  void KinsolInterface::
+  ehfun_wrapper(int error_code, const char *module, const char *function,
+                char *msg, void *eh_data) {
     try {
       casadi_assert(eh_data);
-      KinsolInterface *this_ = static_cast<KinsolInterface*>(eh_data);
-      this_->ehfun(error_code, module, function, msg);
+      auto this_ = static_cast<KinsolMemory*>(eh_data);
+      this_->self.ehfun(*this_, error_code, module, function, msg);
     } catch(exception& e) {
       userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
     }
   }
 
-  void KinsolInterface::ehfun(int error_code, const char *module, const char *function, char *msg) {
+  void KinsolInterface::ehfun(KinsolMemory& m, int error_code, const char *module,
+                           const char *function, char *msg) const {
     if (!disable_internal_warnings_) {
       userOut<true, PL_WARN>() << msg << endl;
     }
   }
 
-  map<int, Message> KinsolInterface::flagmap = KinsolInterface::calc_flagmap();
+  void KinsolInterface::kinsol_error(const string& module, int flag, bool fatal) const {
+    // Get the error message
+    const char *id, *msg;
+    switch (flag) {
+    case KIN_SUCCESS:
+      id = "KIN_SUCCES";
+      msg = "KINSol succeeded; the scaled norm of F(u) is less than fnormtol";
+    break;
+  case KIN_INITIAL_GUESS_OK:
+    id = "KIN_INITIAL_GUESS_OK";
+    msg = "The guess u = u0 satisfied the system F(u) = 0 within the tolerances specified.";
+    break;
+    case KIN_STEP_LT_STPTOL:
+      id = "KIN_STEP_LT_STPTOL";
+      msg = "KINSol stopped based on scaled step length. This "
+        "means that the current iterate may be an approximate solution of the "
+        "given nonlinear system, but it is also quite possible that the algorithm"
+        " is 'stalled' (making insufficient progress) near an invalid solution, "
+        "or that the scalar scsteptol is too large.";
+      break;
+    case KIN_MEM_NULL:
+      id = "KIN_MEM_NULL";
+      msg = "The kinsol memory block pointer was NULL.";
+      break;
+    case KIN_ILL_INPUT:
+      id = "KIN_ILL_INPUT";
+      msg = "An input parameter was invalid.";
+      break;
+    case KIN_NO_MALLOC:
+      id = "KIN_NO_MALLOC";
+      msg = "The kinsol memory was not allocated by a call to KINCreate.";
+      break;
+    case KIN_LINESEARCH_NONCONV:
+      id = "KIN_LINESEARCH_NONCONV";
+      msg = "The line search algorithm was unable to find "
+        "an iterate sufficiently distinct from the current iterate, or could not"
+        " find an iterate satisfying the sufficient decrease condition. Failure"
+        " to satisfy the sufficient decrease condition could mean the current "
+        "iterate is 'close' to an approximate solution of the given nonlinear "
+        "system, the difference approximation of the matrix-vector product J(u)v"
+        " is inaccurate, or the real scalar scsteptol is too large.";
+      break;
+    case KIN_MAXITER_REACHED:
+      id = "KIN_MAXITER_REACHED";
+      msg = "The maximum number of nonlinear iterations "
+        "has been reached.";
+      break;
+    case KIN_MXNEWT_5X_EXCEEDED:
+      id = "KIN_MXNEWT_5X_EXCEEDED";
+      msg = "Five consecutive steps have been taken that "
+        "satisfy the inequality  || D_u p ||_L2 > 0.99 mxnewtstep, where p "
+        "denotes the current step and mxnewtstep is a scalar upper bound on the "
+        "scaled step length. Such a failure may mean that || D_F F(u)||_L2 "
+        "asymptotes from above to a positive value, or the real scalar "
+        "mxnewtstep is too small.";
+      break;
+    case KIN_LINESEARCH_BCFAIL:
+      id = "KIN_LINESEARCH_BCFAIL";
+      msg = "The line search algorithm was unable to satisfy "
+        "the “beta-condition” for MXNBCF +1 nonlinear iterations (not necessarily "
+        "consecutive), which may indicate the algorithm is making poor progress.";
+      break;
+    case KIN_LINSOLV_NO_RECOVERY:
+      id = "KIN_LINSOLV_NO_RECOVERY";
+      msg = "The user-supplied routine psolve encountered a"
+        " recoverable error, but the preconditioner is already current.";
+      break;
+    case KIN_LINIT_FAIL:
+      id = "KIN_LINIT_FAIL";
+      msg = "The linear solver initialization routine (linit) encountered an error.";
+    break;
+    case KIN_LSETUP_FAIL:
+      id = "KIN_LSETUP_FAIL";
+      msg = "The user-supplied routine pset (used to set up the "
+        "preconditioner data) encountered an unrecoverable error.";
+      break;
+    case KIN_LSOLVE_FAIL:
+      id = "KIN_LSOLVE_FAIL";
+      msg = "Either the user-supplied routine psolve "
+        "(used to to solve the preconditioned linear system) encountered an "
+        "unrecoverable error, or the linear solver routine (lsolve) "
+        "encountered an error condition.";
+      break;
+    case KIN_SYSFUNC_FAIL:
+      id = "KIN_SYSFUNC_FAIL";
+      msg = "The system function failed in an unrecoverable manner.";
+      break;
+    case KIN_FIRST_SYSFUNC_ERR:
+      id = "KIN_FIRST_SYSFUNC_ERR";
+      msg = "The system function failed recoverably at the first call.";
+      break;
+    case KIN_REPTD_SYSFUNC_ERR:
+      id = "KIN_REPTD_SYSFUNC_ERR";
+      msg = "The system function had repeated recoverable errors. "
+        "No recovery is possible.";
+      break;
+    default:
+      id = "N/A";
+      msg = 0;
+    }
 
-  void KinsolInterface::kinsol_error(const string& module, int flag, bool fatal) {
-    // Find the error
-    map<int, Message>::const_iterator it = flagmap.find(flag);
-
+    // Construct message
     stringstream ss;
-    if (it == flagmap.end()) {
+    if (msg==0) {
       ss << "Unknown " << (fatal? "error" : "warning") <<" (" << flag << ")"
-          " from module \"" << module << "\".";
+        " from module \"" << module << "\".";
     } else {
-      ss << "Module \"" << module << "\" returned flag \"" << it->second.first << "\"." << endl;
+      ss << "Module \"" << module << "\" returned flag \"" << id << "\"." << endl;
       ss << "The description of this flag is: " << endl;
-      ss << "\"" << it->second.second << "\"" << endl;
+      ss << "\"" << msg << "\"" << endl;
     }
     ss << "Consult KINSOL documentation for more information.";
     if (fatal) {
@@ -738,72 +784,121 @@ namespace casadi {
     }
   }
 
+  KinsolMemory::KinsolMemory(const KinsolInterface& s) : self(s) {
+    this->u = 0;
+    this->mem = 0;
+  }
 
-  map<int, Message> KinsolInterface::calc_flagmap() {
+  KinsolMemory::~KinsolMemory() {
+    if (this->u) N_VDestroy_Serial(this->u);
+    if (this->mem) KINFree(&this->mem);
+  }
 
-    map<int, Message > f;
-    f[KIN_SUCCESS] = Message(
-      "KIN_SUCCES", "KINSol succeeded; the scaled norm of F(u) "
-      "is less than fnormtol");
-    f[KIN_INITIAL_GUESS_OK] = Message(
-      "KIN_INITIAL_GUESS_OK", "The guess u = u0 satisfied the system F(u) = 0 "
-      "within the tolerances specified.");
-    f[KIN_STEP_LT_STPTOL] = Message(
-      "KIN_STEP_LT_STPTOL", "KINSol stopped based on scaled step length. This "
-      "means that the current iterate may be an approximate solution of the "
-      "given nonlinear system, but it is also quite possible that the algorithm"
-      " is 'stalled' (making insufficient progress) near an invalid solution, "
-      "or that the scalar scsteptol is too large.");
-    f[KIN_MEM_NULL] = Message(
-      "KIN_MEM_NULL", "The kinsol memory block pointer was NULL.");
-    f[KIN_ILL_INPUT] = Message(
-      "KIN_ILL_INPUT", "An input parameter was invalid.");
-    f[KIN_NO_MALLOC] = Message(
-      "KIN_NO_MALLOC", "The kinsol memory was not allocated by a call to KINCreate.");
-    f[KIN_LINESEARCH_NONCONV] = Message(
-      "KIN_LINESEARCH_NONCONV", "The line search algorithm was unable to find "
-      "an iterate sufficiently distinct from the current iterate, or could not"
-      " find an iterate satisfying the sufficient decrease condition. Failure"
-      " to satisfy the sufficient decrease condition could mean the current "
-      "iterate is 'close' to an approximate solution of the given nonlinear "
-      "system, the difference approximation of the matrix-vector product J(u)v"
-      " is inaccurate, or the real scalar scsteptol is too large.");
-    f[KIN_MAXITER_REACHED] = Message(
-      "KIN_MAXITER_REACHED", "The maximum number of nonlinear iterations "
-      "has been reached.");
-    f[KIN_MXNEWT_5X_EXCEEDED] = Message(
-      "KIN_MXNEWT_5X_EXCEEDED", "Five consecutive steps have been taken that "
-      "satisfy the inequality  || D_u p ||_L2 > 0.99 mxnewtstep, where p "
-      "denotes the current step and mxnewtstep is a scalar upper bound on the "
-      "scaled step length. Such a failure may mean that || D_F F(u)||_L2 "
-      "asymptotes from above to a positive value, or the real scalar "
-      "mxnewtstep is too small.");
-    f[KIN_LINESEARCH_BCFAIL] = Message(
-      "KIN_LINESEARCH_BCFAIL", "The line search algorithm was unable to satisfy "
-      "the “beta-condition” for MXNBCF +1 nonlinear iterations (not necessarily "
-      "consecutive), which may indicate the algorithm is making poor progress.");
-    f[KIN_LINSOLV_NO_RECOVERY] = Message(
-      "KIN_LINSOLV_NO_RECOVERY", "The user-supplied routine psolve encountered a"
-      " recoverable error, but the preconditioner is already current.");
-    f[KIN_LINIT_FAIL] = Message(
-      "KIN_LINIT_FAIL", "The linear solver initialization routine (linit) "
-      "encountered an error.");
-    f[KIN_LSETUP_FAIL] = Message(
-      "KIN_LSETUP_FAIL", "The user-supplied routine pset (used to set up the "
-      "preconditioner data) encountered an unrecoverable error.");
-    f[KIN_LSOLVE_FAIL] = Message(
-      "KIN_LSOLVE_FAIL", "Either the user-supplied routine psolve "
-      "(used to to solve the preconditioned linear system) encountered an "
-      "unrecoverable error, or the linear solver routine (lsolve) "
-      "encountered an error condition.");
-    f[KIN_SYSFUNC_FAIL] = Message(
-      "KIN_SYSFUNC_FAIL", "The system function failed in an unrecoverable manner.");
-    f[KIN_FIRST_SYSFUNC_ERR] = Message(
-      "KIN_FIRST_SYSFUNC_ERR", "The system function failed recoverably at the first call.");
-    f[KIN_REPTD_SYSFUNC_ERR] = Message(
-      "KIN_REPTD_SYSFUNC_ERR", "The system function had repeated recoverable "
-      "errors. No recovery is possible.");
-    return f;
+  void KinsolInterface::init_memory(void* mem) const {
+    auto m = static_cast<KinsolMemory*>(mem);
+
+    // Current solution
+    m->u = N_VNew_Serial(n_);
+
+    // Create KINSOL memory block
+    m->mem = KINCreate();
+
+    // KINSOL bugfix
+    KINMem kin_mem = KINMem(m->mem);
+    kin_mem->kin_inexact_ls = FALSE;
+
+    // Set optional inputs
+    int flag = KINSetUserData(m->mem, m);
+    casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
+
+    // Set error handler function
+    flag = KINSetErrHandlerFn(m->mem, ehfun_wrapper, m);
+    casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
+
+    // Initialize KINSOL
+    flag = KINInit(m->mem, func_wrapper, m->u);
+    casadi_assert(flag==KIN_SUCCESS);
+
+    // Setting maximum number of Newton iterations
+    flag = KINSetMaxNewtonStep(m->mem, max_iter_);
+    casadi_assert(flag==KIN_SUCCESS);
+
+    // Set constraints
+    if (!u_c_.empty()) {
+      N_Vector domain  = N_VNew_Serial(n_);
+      copy(u_c_.begin(), u_c_.end(), NV_DATA_S(domain));
+
+      // Pass to KINSOL
+      flag = KINSetConstraints(m->mem, domain);
+      casadi_assert(flag==KIN_SUCCESS);
+
+      // Free the temporary vector
+      N_VDestroy_Serial(domain);
+    }
+
+    switch (linear_solver_type_) {
+    case KinsolInterface::DENSE:
+      // Dense Jacobian
+      flag = KINDense(m->mem, n_);
+      casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
+
+      if (exact_jacobian_) {
+        flag = KINDlsSetDenseJacFn(m->mem, djac_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
+      }
+      break;
+    case KinsolInterface::BANDED:
+      // Banded Jacobian
+      flag = KINBand(m->mem, n_, upper_bandwidth_, lower_bandwidth_);
+      casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
+
+      if (exact_jacobian_) {
+        flag = KINDlsSetBandJacFn(m->mem, bjac_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
+      }
+      break;
+    case KinsolInterface::ITERATIVE:
+      // Attach the sparse solver
+      switch (iterative_solver_) {
+      case KinsolInterface::GMRES:
+        flag = KINSpgmr(m->mem, maxl_);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
+        break;
+      case KinsolInterface::BCGSTAB:
+        flag = KINSpbcg(m->mem, maxl_);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
+        break;
+      case KinsolInterface::TFQMR:
+        flag = KINSptfqmr(m->mem, maxl_);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
+        break;
+      }
+
+      // Attach functions for Jacobian information
+      if (exact_jacobian_) {
+        flag = KINSpilsSetJacTimesVecFn(m->mem, jtimes_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
+      }
+
+      // Add a preconditioner
+      if (use_preconditioner_) {
+        flag = KINSpilsSetPreconditioner(m->mem, psetup_wrapper, psolve_wrapper);
+        casadi_assert(flag==KIN_SUCCESS);
+      }
+      break;
+    case KinsolInterface::USER_DEFINED:
+      // Set fields in the IDA memory
+      KINMem kin_mem = KINMem(m->mem);
+      kin_mem->kin_lmem   = m;
+      kin_mem->kin_lsetup = lsetup_wrapper;
+      kin_mem->kin_lsolve = lsolve_wrapper;
+      kin_mem->kin_setupNonNull = TRUE;
+      break;
+    }
+
+    // Set stop criterion
+    flag = KINSetFuncNormTol(m->mem, abstol_);
+    casadi_assert(flag==KIN_SUCCESS);
   }
 
 } // namespace casadi

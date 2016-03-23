@@ -80,7 +80,7 @@ Helper functions
 .. autofunction:: vec
 .. autofunction:: trans
 .. autofunction:: prod
-.. autofunction:: inner_prod
+.. autofunction:: dot
 .. autofunction:: outer_prod
 .. autofunction:: norm_1
 .. autofunction:: norm_2

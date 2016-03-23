@@ -27,7 +27,6 @@
 #include "casadi/core/std_vector_tools.hpp"
 #include "casadi/core/casadi_meta.hpp"
 #include <fstream>
-#include <stdlib.h>
 #include <dlfcn.h>
 #include <cstdlib>
 #include <unistd.h>
@@ -41,7 +40,7 @@ namespace casadi {
     plugin->creator = ShellCompiler::creator;
     plugin->name = "shell";
     plugin->doc = ShellCompiler::meta_doc.c_str();
-    plugin->version = 23;
+    plugin->version = 30;
     return 0;
   }
 
@@ -50,25 +49,11 @@ namespace casadi {
     CompilerInternal::registerPlugin(casadi_register_compiler_shell);
   }
 
-  ShellCompiler* ShellCompiler::clone() const {
-    // Return a deep copy
-    ShellCompiler* node = new ShellCompiler(name_);
-    if (!node->is_init_)
-      node->init();
-    return node;
-  }
-
   ShellCompiler::ShellCompiler(const std::string& name) :
     CompilerInternal(name) {
-    addOption("compiler", OT_STRING, "gcc", "Compiler command");
-    addOption("compiler_setup", OT_STRING, "-fPIC -shared", "Compiler setup command");
-    addOption("flags", OT_STRINGVECTOR, GenericType(),
-      "Compile flags for the JIT compiler. Default: None");
   }
 
   ShellCompiler::~ShellCompiler() {
-    cleanup();
-
     // Unload
     if (handle_) dlclose(handle_);
 
@@ -79,27 +64,51 @@ namespace casadi {
     }
   }
 
-  void ShellCompiler::init() {
-    // Initialize the base classes
-    CompilerInternal::init();
+  Options ShellCompiler::options_
+  = {{&CompilerInternal::options_},
+     {{"compiler",
+       {OT_STRING,
+        "Compiler command"}},
+      {"compiler_setup",
+       {OT_STRING,
+        "Compiler setup command. Intended to be fixed."
+        " The 'flag' option is the prefered way to set"
+        " custom flags."}},
+      {"flags",
+       {OT_STRINGVECTOR,
+      "Compile flags for the JIT compiler. Default: None"}}
+     }
+  };
+
+  void ShellCompiler::init(const Dict& opts) {
+    // Base class
+    CompilerInternal::init(opts);
+
+    // Default options
+    string compiler = "gcc";
+    string compiler_setup = "-fPIC -shared";
+    vector<string> flags;
 
     // Read options
-    string compiler = getOption("compiler").toString();
-    string compiler_setup = getOption("compiler_setup").toString();
-    vector<string> flags;
-    if (hasSetOption("flags")) flags = getOption("flags");
+    for (auto&& op : opts) {
+      if (op.first=="compiler") {
+        compiler = op.second.to_string();
+      } else if (op.first=="compiler_setup") {
+        compiler_setup = op.second.to_string();
+      } else if (op.first=="flags") {
+        flags = op.second;
+      }
+    }
 
     // Construct the compiler command
     stringstream cmd;
     cmd << compiler << " " << compiler_setup;
-
-    // C/C++ source file
-    cmd << " " << name_;
-
-    // C/C++ flags
     for (vector<string>::const_iterator i=flags.begin(); i!=flags.end(); ++i) {
       cmd << " " << *i;
     }
+
+    // C/C++ source file
+    cmd << " " << name_;
 
     // Name of temporary file
 #ifdef HAVE_MKSTEMPS
@@ -111,7 +120,7 @@ namespace casadi {
     bin_name_ = bin_name;
 #else
     // Fallback, may result in deprecation warnings
-    char* bin_name = tempnam(0, "tmp_casadi_compiler_shell_");
+    char* bin_name = tempnam(0, "ca.so");
     bin_name_ = bin_name;
     free(bin_name);
 #endif
@@ -129,17 +138,8 @@ namespace casadi {
       casadi_error("Compilation failed. Tried \"" + cmd.str() + "\"");
     }
 
-// Alocate a handle pointer
-#ifndef _WIN32
-    int flag = RTLD_LAZY | RTLD_LOCAL;
-#ifdef WITH_DEEPBIND
-    flag |= RTLD_DEEPBIND;
-#endif
-#endif
-
-
     // Load shared library
-    handle_ = dlopen(bin_name_.c_str(), flag);
+    handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
     casadi_assert_message(handle_!=0, "CommonExternal: Cannot open function: "
                           << bin_name_ << ". error code: "<< dlerror());
     // reset error

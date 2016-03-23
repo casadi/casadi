@@ -30,7 +30,7 @@
 #include <vector>
 #include <sstream>
 #include "../std_vector_tools.hpp"
-#include "../casadi_options.hpp"
+#include "../global_options.hpp"
 
 using namespace std;
 
@@ -62,7 +62,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalMX(const std::vector<MX>& arg, std::vector<MX>& res) {
+  void BinaryMX<ScX, ScY>::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) {
     casadi_math<MX>::fun(op_, arg[0], arg[1], res[0]);
   }
 
@@ -94,9 +94,9 @@ namespace casadi {
         MX t = pd[c]*s;
 
         // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
-        if (!t.isscalar() && t.shape() != dep(c).shape()) {
-          if (pd[c].shape()!=s.shape()) pd[c] = MX(s.sparsity(), pd[c]);
-          t = inner_prod(pd[c], s);
+        if (!t.is_scalar() && t.size() != dep(c).size()) {
+          if (pd[c].size()!=s.size()) pd[c] = MX(s.sparsity(), pd[c]);
+          t = dot(pd[c], s);
         }
 
         // Propagate the seeds
@@ -106,8 +106,9 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::generate(const std::vector<int>& arg, const std::vector<int>& res,
-                                    CodeGenerator& g) const {
+  void BinaryMX<ScX, ScY>::
+  generate(CodeGenerator& g, const std::string& mem,
+           const std::vector<int>& arg, const std::vector<int>& res) const {
     // Quick return if nothing to do
     if (nnz()==0) return;
 
@@ -172,21 +173,21 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalD(const double** arg, double** res,
-                                 int* iw, double* w) {
+  void BinaryMX<ScX, ScY>::
+  eval(const double** arg, double** res, int* iw, double* w, int mem) const {
     evalGen<double>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::evalSX(const SXElement** arg, SXElement** res,
-                                  int* iw, SXElement* w) {
-    evalGen<SXElement>(arg, res, iw, w);
+  void BinaryMX<ScX, ScY>::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) {
+    evalGen<SXElem>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
   template<typename T>
-  void BinaryMX<ScX, ScY>::evalGen(const T* const* arg, T* const* res,
-                                   int* iw, T* w) {
+  void BinaryMX<ScX, ScY>::
+  evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
     // Get data
     T* output0 = res[0];
     const T* input0 = arg[0];
@@ -202,9 +203,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::spFwd(const bvec_t** arg,
-                                 bvec_t** res,
-                                 int* iw, bvec_t* w) {
+  void BinaryMX<ScX, ScY>::
+  spFwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t *r=res[0];
     int n=nnz();
@@ -221,9 +221,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::spAdj(bvec_t** arg,
-                                 bvec_t** res,
-                                 int* iw, bvec_t* w) {
+  void BinaryMX<ScX, ScY>::
+  spAdj(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) {
     bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
     int n=nnz();
     for (int i=0; i<n; ++i) {
@@ -252,16 +251,16 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   MX BinaryMX<ScX, ScY>::getBinary(int op, const MX& y, bool scX, bool scY) const {
-    if (!CasadiOptions::simplification_on_the_fly) return MXNode::getBinary(op, y, scX, scY);
+    if (!GlobalOptions::simplification_on_the_fly) return MXNode::getBinary(op, y, scX, scY);
 
     switch (op_) {
     case OP_ADD:
-      if (op==OP_SUB && isEqual(y, dep(0), maxDepth())) return dep(1);
-      if (op==OP_SUB && isEqual(y, dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return dep(1);
+      if (op==OP_SUB && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
       break;
     case OP_SUB:
-      if (op==OP_SUB && isEqual(y, dep(0), maxDepth())) return -dep(1);
-      if (op==OP_ADD && isEqual(y, dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && MX::is_equal(y, dep(0), maxDepth())) return -dep(1);
+      if (op==OP_ADD && MX::is_equal(y, dep(1), maxDepth())) return dep(0);
       break;
     default: break; // no rule
     }

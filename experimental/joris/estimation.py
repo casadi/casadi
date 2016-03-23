@@ -107,8 +107,8 @@ states.X_ = states.V_ = [0,0,0]  # Initial state to generate the dummy measureme
 states.q_ = [0,0,0,1]            
 
 sim.setInput(states.veccat_(),"x0")
-sim.input("v")[:,imu.i_a.T] = DMatrix([sin(tsm),cos(3*tsm),sin(2*tsm)]).T
-sim.input("v")[:,imu.i_w.T] = DMatrix([cos(3*tsm),sin(7*tsm),sin(11*tsm)]).T
+sim.input("v")[:,imu.i_a.T] = DM([sin(tsm),cos(3*tsm),sin(2*tsm)]).T
+sim.input("v")[:,imu.i_w.T] = DM([cos(3*tsm),sin(7*tsm),sin(11*tsm)]).T
 
 sim.evaluate()
 
@@ -144,17 +144,17 @@ dL.init()
 
 
 # Show the lagrange basis for didactic purposes
-x = DMatrix([2,-1,4,3]) # some random numbers
+x = DM([2,-1,4,3]) # some random numbers
 
 xp = SXFunction([tau],[ mul(x.T,Le), mul(x.T,dL.eval([tau])[0]) ])
 xp.init()
-taus = DMatrix(numpy.linspace(0,1,500)).T
+taus = DM(numpy.linspace(0,1,500)).T
     
 L.setInput(1)
 L.evaluate()
 Lend = L.getOutput()  # Le at the end of the control interval
 
-dLm = numSample1D(dL,DMatrix(tau_root).T)  # d-by-d
+dLm = numSample1D(dL,DM(tau_root).T)  # d-by-d
 
 optvar = Variables()  # Decision variables we optimize for
 
@@ -185,7 +185,7 @@ for k,tk in enumerate(ts[:-1]):
                 DAE_P:    par.IMU[k,:]})
     g.append(dyn)   
     
-g.append(sumRows(optvar.X[0][states.i_q,0]**2) - 1)  # Add the quaternion norm constraint at the start
+g.append(sum1(optvar.X[0][states.i_q,0]**2) - 1)  # Add the quaternion norm constraint at the start
 
 g = SXFunction([optvar.veccat(),par.veccat()],[vertcat(g)])
 g.init()
@@ -219,10 +219,10 @@ class NLPSolutionInspector:
     
   def __call__(self,f,*args):
     if self.i>0:
-      self.log[0,self.i] = log10(f.getStats()['inf_pr'])
-      self.log[1,self.i] = log10(f.getStats()['inf_du'])
+      self.log[0,self.i] = log10(f.stats()['inf_pr'])
+      self.log[1,self.i] = log10(f.stats()['inf_du'])
       self.log[2,self.i] = float(log10(f.getInput("f")))
-      self.log[3,self.i] = f.getStats()['ls_trials']
+      self.log[3,self.i] = f.stats()['ls_trials']
       
     self.i += 1
     sol = f.getInput("x")

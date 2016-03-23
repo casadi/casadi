@@ -37,7 +37,7 @@ namespace casadi {
   class CASADI_EXPORT Polynomial : public PrintableObject<Polynomial> {
   public:
     /// Floating point type
-    typedef long double real_t;
+    typedef double real_t;
 
     /// Construct a constant polynomial
     Polynomial(real_t scalar=1);
@@ -58,7 +58,7 @@ namespace casadi {
     /// Evaluate numerically
     template<typename T>
     T operator()(const T& x) const {
-      std::vector<real_t>::const_reverse_iterator it = p_.rbegin();
+      auto it = p_.rbegin();
       T ret = *it++;
       while (it!=p_.rend()) {
         ret *= x;
@@ -71,7 +71,7 @@ namespace casadi {
     int degree() const;
 
     /// Get scalar value (error if degree()!=0)
-    real_t toScalar() const;
+    real_t scalar() const;
 
     /// Create a new polynomial for the derivative
     Polynomial derivative() const;

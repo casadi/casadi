@@ -40,15 +40,15 @@ z = SX.sym("z")
 # Formulate the NLP
 f = x**2 + 100*z**2
 g = z + (1-x)**2 - y
-nlp = {'x':vertcat([x,y,z]), 'f':f, 'g':g}
-  
+nlp = {'x':vertcat(x,y,z), 'f':f, 'g':g}
+
 # Create an NLP solver
-solver = NlpSolver("solver", "ipopt", nlp)
+solver = nlpsol("solver", "ipopt", nlp)
 
 # Solve the Rosenbrock problem
-res = solver({"x0" :[2.5,3.0,0.75],
-              "ubg" : 0,
-              "lbg" : 0})
+res = solver(x0  = [2.5,3.0,0.75],
+             ubg = 0,
+             lbg = 0)
 
 # Print solution
 print

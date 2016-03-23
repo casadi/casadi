@@ -26,22 +26,66 @@ from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
 
-nk = 20    # Control discretization
-tf = 10.0  # End time
+# Degree of interpolating polynomial
+d = 3
+
+# Choose collocation points
+tau_root = [0] + collocation_points(d, "radau")
+
+# Coefficients of the collocation equation
+C = NP.zeros((d+1,d+1))
+
+# Coefficients of the continuity equation
+D = NP.zeros(d+1)
+
+# Coefficients of the quadrature function
+F = NP.zeros(d+1)
+
+# Construct polynomial basis
+for j in range(d+1):
+  # Construct Lagrange polynomials to get the polynomial basis at the collocation point
+  p = NP.poly1d([1])
+  for r in range(d+1):
+    if r != j:
+      p *= NP.poly1d([1, -tau_root[r]]) / (tau_root[j]-tau_root[r])
+  
+  # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+  D[j] = p(1.0)
+
+  # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+  pder = NP.polyder(p)
+  for r in range(d+1):
+    C[j,r] = pder(tau_root[r])
+
+  # Evaluate the integral of the polynomial to get the coefficients of the quadrature function
+  pint = NP.polyint(p)
+  F[j] = pint(1.0)
+
+# Control discretization
+nk = 20
+
+# End time
+tf = 10.0  
+
+# Size of the finite elements
+h = tf/nk
+
+# All collocation time points
+T = NP.zeros((nk,d+1))
+for k in range(nk):
+  for j in range(d+1):
+    T[k,j] = h*(k + tau_root[j])
 
 # Declare variables (use scalar graph)
 t  = SX.sym("t")    # time
 u  = SX.sym("u")    # control
-x  = SX.sym("x",3)  # state
+x  = SX.sym("x",2)  # state
 
-# ODE right hand side function
-rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
-               x[0], \
-               x[0]*x[0] + x[1]*x[1] + u*u])
-f = SXFunction('f', [t,x,u],[rhs])
-
-# Objective function (meyer term)
-m = SXFunction('m', [t,x,u],[x[2]])
+# ODE rhs function and quadratures
+xdot = vertcat((1 - x[1]*x[1])*x[0] - x[1] + u, \
+               x[0])
+qdot = x[0]*x[0] + x[1]*x[1] + u*u
+f = Function('f', [t,x,u],[xdot, qdot])
 
 # Control bounds
 u_min = -0.75
@@ -53,58 +97,17 @@ u_ub = NP.array([u_max])
 u_init = NP.array([u_init])
 
 # State bounds and initial guess
-x_min =  [-inf, -inf, -inf]
-x_max =  [ inf,  inf,  inf]
-xi_min = [ 0.0,  1.0,  0.0]
-xi_max = [ 0.0,  1.0,  0.0]
-xf_min = [ 0.0,  0.0, -inf]
-xf_max = [ 0.0,  0.0,  inf]
-x_init = [ 0.0,  0.0,  0.0]
+x_min =  [-inf, -inf]
+x_max =  [ inf,  inf]
+xi_min = [ 0.0,  1.0]
+xi_max = [ 0.0,  1.0]
+xf_min = [ 0.0,  0.0]
+xf_max = [ 0.0,  0.0]
+x_init = [ 0.0,  0.0]
 
 # Dimensions
-nx = 3
+nx = 2
 nu = 1
-
-# Choose collocation points
-tau_root = collocationPoints(3,"radau")
-
-# Degree of interpolating polynomial
-d = len(tau_root)-1
-
-# Size of the finite elements
-h = tf/nk
-
-# Coefficients of the collocation equation
-C = NP.zeros((d+1,d+1))
-
-# Coefficients of the continuity equation
-D = NP.zeros(d+1)
-
-# Dimensionless time inside one control interval
-tau = SX.sym("tau")
-  
-# All collocation time points
-T = NP.zeros((nk,d+1))
-for k in range(nk):
-  for j in range(d+1):
-    T[k,j] = h*(k + tau_root[j])
-
-# For all collocation points
-for j in range(d+1):
-  # Construct Lagrange polynomials to get the polynomial basis at the collocation point
-  L = 1
-  for r in range(d+1):
-    if r != j:
-      L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r])
-  lfcn = SXFunction('lfcn', [tau],[L])
-  
-  # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-  [D[j]] = lfcn([1.0])
-
-  # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-  tfcn = lfcn.tangent()
-  for r in range(d+1):
-    C[j,r], _ = tfcn([tau_root[r]])
 
 # Total number of variables
 NX = nk*(d+1)*nx      # Collocated states
@@ -161,6 +164,9 @@ g = []
 lbg = []
 ubg = []
 
+# Objective function
+J = 0
+
 # For all finite elements
 for k in range(nk):
   
@@ -173,10 +179,13 @@ for k in range(nk):
       xp_jk += C[r,j]*X[k,r]
       
     # Add collocation equations to the NLP
-    [fk] = f.call([T[k,j], X[k,j], U[k]])
+    fk,qk = f(T[k,j], X[k,j], U[k])
     g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
+
+    # Add contribution to objective
+    J += F[j]*qk*h
 
   # Get an expression for the state at the end of the finite element
   xf_k = 0
@@ -189,13 +198,10 @@ for k in range(nk):
   ubg.append(NP.zeros(nx))
   
 # Concatenate constraints
-g = vertcat(g)
-
-# Objective function
-[f] = m.call([T[nk-1,d],X[nk,0],U[nk-1]])
+g = vertcat(*g)
   
 # NLP
-nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
+nlp = {'x':V, 'f':J, 'g':g}
 
 ## ----
 ## SOLVE THE NLP
@@ -204,11 +210,11 @@ nlp = MXFunction('nlp', nlpIn(x=V),nlpOut(f=f,g=g))
 # Set options
 opts = {}
 opts["expand"] = True
-#opts["max_iter"] = 4
-opts["linear_solver"] = 'ma27'
+#opts["ipopt.max_iter"] = 4
+opts["ipopt.linear_solver"] = 'ma27'
 
 # Allocate an NLP solver
-solver = NlpSolver("solver", "ipopt", nlp, opts)
+solver = nlpsol("solver", "ipopt", nlp, opts)
 arg = {}
   
 # Initial condition
@@ -223,7 +229,7 @@ arg["lbg"] = NP.concatenate(lbg)
 arg["ubg"] = NP.concatenate(ubg)
 
 # Solve the problem
-res = solver(arg)
+res = solver(**arg)
 
 # Print the optimal cost
 print "optimal cost: ", float(res["f"])
@@ -234,7 +240,6 @@ v_opt = NP.array(res["x"])
 # Get values at the beginning of each finite element
 x0_opt = v_opt[0::(d+1)*nx+nu]
 x1_opt = v_opt[1::(d+1)*nx+nu]
-x2_opt = v_opt[2::(d+1)*nx+nu]
 u_opt = v_opt[(d+1)*nx::(d+1)*nx+nu]
 tgrid = NP.linspace(0,tf,nk+1)
 tgrid_u = NP.linspace(0,tf,nk)

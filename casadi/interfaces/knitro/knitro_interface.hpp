@@ -26,41 +26,89 @@
 #ifndef CASADI_KNITRO_INTERFACE_HPP
 #define CASADI_KNITRO_INTERFACE_HPP
 
-#include <casadi/interfaces/knitro/casadi_nlpsolver_knitro_export.h>
+#include <casadi/interfaces/knitro/casadi_nlpsol_knitro_export.h>
 #include <knitro.h>
-#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlpsol_impl.hpp"
 
-/** \defgroup plugin_NlpSolver_knitro
+/** \defgroup plugin_Nlpsol_knitro
   KNITRO interface
 */
 
-/** \pluginsection{NlpSolver,knitro} */
+/** \pluginsection{Nlpsol,knitro} */
 
 /// \cond INTERNAL
 namespace casadi {
+  // Forward declaration
+  class KnitroInterface;
 
-  /** \brief \pluginbrief{NlpSolver,knitro}
-     @copydoc NlpSolver_doc
-     @copydoc plugin_NlpSolver_knitro
+  struct CASADI_NLPSOL_KNITRO_EXPORT KnitroMemory : public NlpsolMemory {
+    /// Function object
+    const KnitroInterface& self;
+
+    // KNITRO context pointer
+    KTR_context_ptr kc_handle;
+
+    // Inputs
+    double *wx, *wlbx, *wubx, *wlbg, *wubg;
+
+    // Stats
+    const char* return_status;
+
+    /// Constructor
+    KnitroMemory(const KnitroInterface& self);
+
+    /// Destructor
+    ~KnitroMemory();
+  };
+
+  /** \brief \pluginbrief{Nlpsol,knitro}
+     @copydoc Nlpsol_doc
+     @copydoc plugin_Nlpsol_knitro
   */
-  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInterface : public NlpSolverInternal {
-
+  class CASADI_NLPSOL_KNITRO_EXPORT KnitroInterface : public Nlpsol {
   public:
-    explicit KnitroInterface(const Function& nlp);
+    // NLP functions
+    Function fg_fcn_;
+    Function gf_jg_fcn_;
+    Function hess_l_fcn_;
+    Sparsity jacg_sp_;
+    Sparsity hesslag_sp_;
+
+    explicit KnitroInterface(const std::string& name, Oracle* nlp);
     virtual ~KnitroInterface();
-    virtual KnitroInterface* clone() const { return new KnitroInterface(*this);}
+
+    // Get name of the plugin
+    virtual const char* plugin_name() const { return "knitro";}
 
     /** \brief  Create a new NLP Solver */
-    static NlpSolverInternal* creator(const Function& nlp)
-    { return new KnitroInterface(nlp);}
+    static Nlpsol* creator(const std::string& name, Oracle* nlp) {
+      return new KnitroInterface(name, nlp);
+    }
 
-    virtual void init();
-    virtual void evaluate();
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
 
-    // KNITRO callback functions
-    void evalfc(const double* x, double& obj, double *c);
-    void evalga(const double* x, double* objGrad, double* jac);
-    void evalh(const double* x, const double* lambda, double* hessian);
+    // Initialize the solver
+    virtual void init(const Dict& opts);
+
+    /** \brief Create memory block */
+    virtual void* alloc_memory() const { return new KnitroMemory(*this);}
+
+    /** \brief Free memory block */
+    virtual void free_memory(void *mem) const { delete static_cast<KnitroMemory*>(mem);}
+
+    /** \brief Initalize memory block */
+    virtual void init_memory(void* mem) const;
+
+    /** \brief Set the (persistent) work vectors */
+    virtual void set_work(void* mem, const double**& arg, double**& res,
+                          int*& iw, double*& w) const;
+
+    // Solve the NLP
+    virtual void solve(void* mem) const;
 
     // KNITRO callback wrapper
     static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
@@ -69,21 +117,17 @@ namespace casadi {
                         double * const jac, double * const hessian,
                         double * const hessVector, void *userParams);
 
-    // KNITRO context pointer
-    KTR_context_ptr kc_handle_;
+    // KNITRO return codes
+    static const char* return_codes(int flag);
 
-    // KNITRO double parameter
-    std::map<std::string, double> double_param_;
+    // KNITRO options
+    Dict opts_;
 
-    // KNITRO int parameter
-    std::map<std::string, int> int_param_;
-
-    // KNITRO string parameter
-    std::map<std::string, std::string> string_param_;
+    // Type of constraints
+    std::vector<int> contype_;
 
     /// A documentation string
     static const std::string meta_doc;
-
   };
 
 } // namespace casadi

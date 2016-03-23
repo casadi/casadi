@@ -41,43 +41,38 @@ namespace casadi {
     this->real_t = "double";
     this->codegen_scalars = false;
     this->with_header = false;
-    this->opencl = false;
-    this->meta = true;
-    this->null_test = true;
 
     // Read options
-    for (Dict::const_iterator it=opts.begin(); it!=opts.end(); ++it) {
-      if (it->first=="verbose") {
-        this->verbose = it->second;
-      } else if (it->first=="mex") {
-        this->mex = it->second;
-      } else if (it->first=="cpp") {
-        this->cpp = it->second;
-      } else if (it->first=="main") {
-        this->main = it->second;
-      } else if (it->first=="real_t") {
-        this->real_t = it->second.toString();
-      } else if (it->first=="codegen_scalars") {
-        this->codegen_scalars = it->second;
-      } else if (it->first=="with_header") {
-        this->with_header = it->second;
-      } else if (it->first=="opencl") {
-        this->opencl = it->second;
-      } else if (it->first=="meta") {
-        this->meta = it->second;
-      } else if (it->first=="null_test") {
-        this->null_test = it->second;
+    for (auto&& e : opts) {
+      if (e.first=="verbose") {
+        this->verbose = e.second;
+      } else if (e.first=="mex") {
+        this->mex = e.second;
+      } else if (e.first=="cpp") {
+        this->cpp = e.second;
+      } else if (e.first=="main") {
+        this->main = e.second;
+      } else if (e.first=="real_t") {
+        this->real_t = e.second.to_string();
+      } else if (e.first=="codegen_scalars") {
+        this->codegen_scalars = e.second;
+      } else if (e.first=="with_header") {
+        this->with_header = e.second;
       } else {
-        casadi_error("Unrecongnized option: " << it->first);
+        casadi_error("Unrecongnized option: " << e.first);
       }
     }
 
     // Includes needed
     if (this->main) addInclude("stdio.h");
 
+    // Mex and main needs string.h
+    if (this->mex || this->main) {
+      addInclude("string.h");
+    }
+
     // Mex file?
     if (this->mex) {
-      addInclude("string.h");
       addInclude("mex.h", false, "MATLAB_MEX_FILE");
       // Define printf (note file should be compilable both with and without mex)
       this->auxiliaries
@@ -93,21 +88,13 @@ namespace casadi {
   }
 
   void CodeGenerator::add(const Function& f) {
-    casadi_assert(f.isInit());
-    add(f, f.getSanitizedName());
-  }
-
-  void CodeGenerator::add(const Function& f, const std::string& fname) {
-    f->generateFunction(*this, fname, false);
+    f->generateFunction(*this, f.name(), false);
     if (this->with_header) {
       if (this->cpp) this->header << "extern \"C\" " ; // C linkage
-      this->header
-        << "int " << fname << "(const real_t** arg, real_t** res, int* iw, real_t* w);" << endl;
+      this->header << f->signature(f.name()) << ";" << endl;
     }
-    if (this->meta) {
-      f->generateMeta(*this, fname);
-    }
-    this->exposed_fname.push_back(fname);
+    f->generateMeta(*this, f.name());
+    this->exposed_fname.push_back(f.name());
   }
 
   std::string CodeGenerator::generate() const {
@@ -120,16 +107,24 @@ namespace casadi {
     // File(s) being generated, header is optional
     vector<ofstream> s(this->with_header ? 2 : 1);
 
-    std::string sname = Function::sanitizeName(name);
+    // Divide name into base and suffix (.c by default)
+    string basename, suffix;
+    string::size_type dotpos = name.rfind('.');
+    if (dotpos==string::npos) {
+      basename = name;
+      suffix = this->cpp ? ".cpp" : ".c";
+    } else {
+      basename = name.substr(0, dotpos);
+      suffix = name.substr(dotpos);
+    }
 
+    // Make sure that the base name is sane
+    casadi_assert(Function::check_name(basename));
+
+    // Create files
     for (int i=0; i<s.size(); ++i) {
       // Create file(s)
-      string fname;
-      if (this->cpp) {
-        fname = sname + (i==0 ? ".cpp" : ".hpp");
-      } else {
-        fname = sname + (i==0 ? ".c" : ".h");
-      }
+      string fname = i==0 ? basename + suffix : basename + ".h";
       s[i].open(fname.c_str());
 
       // Print header
@@ -149,7 +144,7 @@ namespace casadi {
          << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID" << endl
          << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)" << endl
          << "#else /* CODEGEN_PREFIX */" << endl
-         << "  #define CASADI_PREFIX(ID) " << sname << "_ ## ID" << endl
+         << "  #define CASADI_PREFIX(ID) " << basename << "_ ## ID" << endl
          << "#endif /* CODEGEN_PREFIX */" << endl << endl;
 
     s[0] << this->includes.str();
@@ -158,7 +153,6 @@ namespace casadi {
     // Real type (usually double)
     for (int i=0; i<s.size(); ++i) {
       s[i]
-        << "#define __constant" << endl
         << "#ifndef real_t" << endl
         << "#define real_t " << this->real_t << endl
         << "#define to_double(x) "
@@ -171,12 +165,20 @@ namespace casadi {
     // External function declarations
     if (!added_externals_.empty()) {
       s[0] << "/* External functions */" << endl;
-      for (std::set<std::string>::const_iterator it=added_externals_.begin();
-           it!=added_externals_.end(); ++it) {
-        s[0] << *it << endl;
+      for (auto&& i : added_externals_) {
+        s[0] << i << endl;
       }
-      s[0] << endl;
+      s[0] << endl << endl;
     }
+
+    // Pre-C99
+    s[0] << "/* Pre-c99 compatibility */" << endl
+         << "#if __STDC_VERSION__ < 199901L" << endl
+         << "real_t CASADI_PREFIX(fmin)(real_t x, real_t y) { return x<y ? x : y;}" << endl
+         << "#define fmin(x,y) CASADI_PREFIX(fmin)(x,y)" << endl
+         << "real_t CASADI_PREFIX(fmax)(real_t x, real_t y) { return x>y ? x : y;}" << endl
+         << "#define fmax(x,y) CASADI_PREFIX(fmax)(x,y)" << endl
+         << "#endif" << endl << endl;
 
     // Generate the actual function
     generate(s[0]);
@@ -229,9 +231,27 @@ namespace casadi {
 
     // Generate main
     if (this->main) {
-      s[0] << "int main(int argc, char* argv[]) {" << endl
-           << "  return main_" << sname << "(argc, argv);" << endl
-           << "}" << endl << endl;
+      s[0] << "int main(int argc, char* argv[]) {" << endl;
+
+      // Create switch
+      s[0] << "  if (argc<2) {" << endl
+           << "    /* name error */" << endl;
+      for (int i=0; i<exposed_fname.size(); ++i) {
+        s[0] << "  } else if (strcmp(argv[1], \"" << exposed_fname[i] << "\")==0) {" << endl
+             << "    return main_" << exposed_fname[i] << "(argc-2, argv+2);" << endl;
+      }
+      s[0] << "  }" << endl;
+
+      // Error
+      s[0] << "  fprintf(stderr, \"First input should be a command string. Possible values:";
+      for (int i=0; i<exposed_fname.size(); ++i) {
+        s[0] << " '" << exposed_fname[i] << "'";
+      }
+      s[0] << "\\n\");" << endl;
+
+      // End main
+      s[0] << "  return 1;" << endl
+           << "}" << endl;
     }
 
     // Finalize file(s)
@@ -258,7 +278,7 @@ namespace casadi {
     for (int i=0; i<integer_constants_.size(); ++i) {
       name.str(string());
       name << "CASADI_PREFIX(s" << i << ")";
-      printVector(s, name.str(), integer_constants_[i]);
+      print_vector(s, name.str(), integer_constants_[i]);
       s << "#define s" << i << " CASADI_PREFIX(s" << i << ")" << endl;
     }
 
@@ -266,24 +286,9 @@ namespace casadi {
     for (int i=0; i<double_constants_.size(); ++i) {
       name.str(string());
       name << "CASADI_PREFIX(c" << i << ")";
-      printVector(s, name.str(), double_constants_[i]);
+      print_vector(s, name.str(), double_constants_[i]);
       s << "#define c" << i << " CASADI_PREFIX(c" << i << ")" << endl;
     }
-
-    s << this->declarations.str() << std::endl;
-
-    // Setup code
-    s << "int jit_setup() {" << std::endl;
-    s << this->setup.str();
-    s << "  return 0;" << std::endl;
-    s << "}" << std::endl;
-
-    // Cleanup code
-    s << "int jit_cleanup() {" << std::endl;
-    s << this->cleanup.str();
-    s << "  return 0;" << std::endl;
-    s << "}" << std::endl;
-
 
     // Codegen body
     s << this->body.str();
@@ -320,13 +325,8 @@ namespace casadi {
     s << "  " << lhs << " = " << rhs << ";" << endl;
   }
 
-  void CodeGenerator::printVector(std::ostream &s, const std::string& name,
-      const vector<int>& v) const {
-    if (this->opencl) {
-      s << "static const __constant int " << name << "[] = {";
-    } else {
-      s << "static const int " << name << "[] = {";
-    }
+  void CodeGenerator::print_vector(std::ostream &s, const std::string& name, const vector<int>& v) {
+    s << "static const int " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << v[i];
@@ -334,14 +334,9 @@ namespace casadi {
     s << "};" << endl;
   }
 
-  void CodeGenerator::printVector(std::ostream &s, const std::string& name,
-                                  const vector<double>& v) const {
-    if (this->opencl) {
-      s << "static const __constant real_t " << name << "[] = {";
-    } else {
-      s << "static const real_t " << name << "[] = {";
-    }
-
+  void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
+                                  const vector<double>& v) {
+    s << "static const real_t " << name << "[] = {";
     for (int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << constant(v[i]);
@@ -375,14 +370,17 @@ namespace casadi {
     return f->simplifiedCall();
   }
 
-  std::string CodeGenerator::call(const Function& f, const std::string& arg, const std::string& res,
-                                  const std::string& iw, const std::string& w) const {
-    return f->generateCall(*this, arg, res, iw, w);
+  std::string CodeGenerator::
+  operator()(const Function& f, const std::string& arg,
+             const std::string& res, const std::string& iw,
+             const std::string& w, const std::string& mem) const {
+    return f->codegen_name(*this) + "(" + arg + ", " + res + ", "
+      + iw + ", " + w + ", " + mem + ")";
   }
 
-  std::string CodeGenerator::call(const Function& f,
-                                  const std::string& arg, const std::string& res) const {
-    return f->generateCall(*this, arg, res);
+  std::string CodeGenerator::operator()(const Function& f,
+                                        const std::string& arg, const std::string& res) const {
+    return f->codegen_name(*this) + "(" + arg + ", " + res + ")";
   }
 
   void CodeGenerator::addExternal(const std::string& new_external) {
@@ -414,7 +412,7 @@ namespace casadi {
     return "s" + to_string(addSparsity(sp));
   }
 
-  int CodeGenerator::getSparsity(const Sparsity& sp) const {
+  int CodeGenerator::get_sparsity(const Sparsity& sp) const {
     const void* h = static_cast<const void*>(sp.get());
     PointerMap::const_iterator it=added_sparsities_.find(h);
     casadi_assert(it!=added_sparsities_.end());
@@ -496,20 +494,10 @@ namespace casadi {
 
     // Add the appropriate function
     switch (f) {
-    case AUX_ASSERT:
-      this->auxiliaries << "#define assert_action(a, ACTION) if (!a) {";
-      this->auxiliaries << "printf(\"In '%s' on line %d:\\n\",__FILE__,__LINE__);ACTION;exit(a);}";
-      this->auxiliaries << endl;
-      addInclude("stdio.h");
-      break;
-    case AUX_MINMAX:
-      this->auxiliaries << "#define MIN(a,b) (((a)<(b))?(a):(b))" << endl;
-      this->auxiliaries << "#define MAX(a,b) (((a)>(b))?(a):(b))" << endl;
-      break;
-    case AUX_COPY_N:
+    case AUX_COPY:
       this->auxiliaries
-        << codegen_str_copy_n
-        << codegen_str_copy_n_define << endl
+        << codegen_str_copy
+        << codegen_str_copy_define << endl
         << endl;
       break;
     case AUX_SWAP:
@@ -527,10 +515,22 @@ namespace casadi {
         << codegen_str_axpy_define
         << endl;
       break;
-    case AUX_INNER_PROD:
+    case AUX_DOT:
       this->auxiliaries
-        << codegen_str_inner_prod
-        << codegen_str_inner_prod_define << endl
+        << codegen_str_dot
+        << codegen_str_dot_define << endl
+        << endl;
+      break;
+    case AUX_BILIN:
+      this->auxiliaries
+        << codegen_str_bilin
+        << codegen_str_bilin_define << endl
+        << endl;
+      break;
+    case AUX_RANK1:
+      this->auxiliaries
+        << codegen_str_rank1
+        << codegen_str_rank1_define << endl
         << endl;
       break;
     case AUX_ASUM:
@@ -548,15 +548,15 @@ namespace casadi {
         << codegen_str_nrm2_define
         << endl;
       break;
-    case AUX_FILL_N:
+    case AUX_FILL:
       this->auxiliaries
-        << codegen_str_fill_n
-        << codegen_str_fill_n_define << endl
+        << codegen_str_fill
+        << codegen_str_fill_define << endl
         << endl;
       break;
-    case AUX_MM_SPARSE:
-      this->auxiliaries << codegen_str_mm_sparse
-        << codegen_str_mm_sparse_define
+    case AUX_MTIMES:
+      this->auxiliaries << codegen_str_mtimes
+        << codegen_str_mtimes_define
         << endl;
       break;
     case AUX_SQ:
@@ -596,7 +596,7 @@ namespace casadi {
         << "#endif" << endl << endl;
       break;
     case AUX_FROM_MEX:
-      addAuxiliary(AUX_FILL_N);
+      addAuxiliary(AUX_FILL);
       this->auxiliaries
         << "#ifdef MATLAB_MEX_FILE" << endl
         << "real_t* CASADI_PREFIX(from_mex)(const mxArray *p, "
@@ -613,7 +613,7 @@ namespace casadi {
         << "  mwIndex *Ir = is_sparse ? mxGetIr(p) : 0;" << endl
         << "  if (p_nrow==1 && p_ncol==1) {" << endl
         << "    double v = is_sparse && Jc[1]==0 ? 0 : *p_data;" << endl
-        << "    fill_n(y, nnz, v);" << endl
+        << "    fill(y, nnz, v);" << endl
         << "  } else {" << endl
         << "    bool tr = false;" << endl
         << "    if (nrow!=p_nrow || ncol!=p_ncol) {" << endl
@@ -687,17 +687,6 @@ namespace casadi {
       << "#define sign(x) CASADI_PREFIX(sign)(x)" << endl << endl;
   }
 
-  std::string CodeGenerator::multiline_string(const std::string & s) {
-    std::stringstream ss(s);
-    std::string to;
-    std::stringstream out(s);
-
-    while (std::getline(ss, to, '\n')) {
-      out << "\"" << to << "\\n\"" << endl;
-    }
-    return out.str();
-  }
-
   std::string CodeGenerator::constant(double v) {
     stringstream s;
     if (isnan(v)) {
@@ -720,30 +709,62 @@ namespace casadi {
     return s.str();
   }
 
-  std::string CodeGenerator::copy_n(const std::string& arg,
-                                    std::size_t n, const std::string& res) {
+  std::string CodeGenerator::copy(const std::string& arg,
+                                  std::size_t n, const std::string& res) {
     stringstream s;
     // Perform operation
-    addAuxiliary(AUX_COPY_N);
-    s << "copy_n(" << arg << ", " << n << ", " << res << ");";
+    addAuxiliary(AUX_COPY);
+    s << "copy(" << arg << ", " << n << ", " << res << ");";
     return s.str();
   }
 
-  std::string CodeGenerator::fill_n(const std::string& res,
-                                    std::size_t n, const std::string& v) {
+  std::string CodeGenerator::fill(const std::string& res,
+                                  std::size_t n, const std::string& v) {
     stringstream s;
     // Perform operation
-    addAuxiliary(AUX_FILL_N);
-    s << "fill_n(" << res << ", " << n << ", " << v << ");";
+    addAuxiliary(AUX_FILL);
+    s << "fill(" << res << ", " << n << ", " << v << ");";
     return s.str();
   }
 
-  std::string CodeGenerator::inner_prod(int n, const std::string& x,
+  std::string CodeGenerator::dot(int n, const std::string& x,
                                         const std::string& y) {
-    addAuxiliary(AUX_INNER_PROD);
+    addAuxiliary(AUX_DOT);
     stringstream s;
-    s << "inner_prod(" << n << ", " << x << ", " << y << ")";
+    s << "dot(" << n << ", " << x << ", " << y << ")";
     return s.str();
+  }
+
+  std::string CodeGenerator::bilin(const std::string& A, const Sparsity& sp_A,
+                                   const std::string& x, const std::string& y) {
+    addAuxiliary(AUX_BILIN);
+    stringstream s;
+    s << "bilin(" << A << ", " << sparsity(sp_A) << ", " << x << ", " << y << ")";
+    return s.str();
+  }
+
+  std::string CodeGenerator::rank1(const std::string& A, const Sparsity& sp_A,
+                                   const std::string& alpha, const std::string& x,
+                                   const std::string& y) {
+    addAuxiliary(AUX_RANK1);
+    stringstream s;
+    s << "rank1(" << A << ", " << sparsity(sp_A) << ", "
+      << alpha << ", " << x << ", " << y << ");";
+    return s.str();
+  }
+
+  std::string CodeGenerator::declare(std::string s) {
+    // Add C linkage?
+    if (this->cpp) {
+      s = "extern \"C\" " + s;
+    }
+
+    // To header file
+    if (this->with_header) {
+      this->header << s << ";" << endl;
+    }
+
+    return s;
   }
 
   std::string
@@ -751,7 +772,7 @@ namespace casadi {
                          const std::string& res, const Sparsity& sp_res,
                          const std::string& w) {
     // If sparsity match, simple copy
-    if (sp_arg==sp_res) return copy_n(arg, sp_arg.nnz(), res);
+    if (sp_arg==sp_res) return copy(arg, sp_arg.nnz(), res);
 
     // Create call
     addAuxiliary(CodeGenerator::AUX_PROJECT);
@@ -822,5 +843,15 @@ namespace casadi {
     return dlname;
   }
 
-} // namespace casadi
+  std::string CodeGenerator::mtimes(const std::string& x, const Sparsity& sp_x,
+                                    const std::string& y, const Sparsity& sp_y,
+                                    const std::string& z, const Sparsity& sp_z,
+                                    const std::string& w, bool tr) {
+    addAuxiliary(CodeGenerator::AUX_MTIMES);
+    stringstream s;
+    s << "mtimes(" << x << ", " << sparsity(sp_x) << ", " << y << ", " << sparsity(sp_y) << ", "
+      << z << ", " << sparsity(sp_z) << ", " << w << ", " <<  (tr ? "1" : "0") << ");";
+    return s.str();
+  }
 
+} // namespace casadi

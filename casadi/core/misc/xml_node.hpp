@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "../casadi_exception.hpp"
+#include "../exception.hpp"
 
 /// \cond INTERNAL
 
@@ -41,7 +41,7 @@ namespace casadi {
     ~XmlNode();
 
     /** \brief  Add an attribute */
-    void setAttribute(const std::string& attribute_name, const std::string& attribute);
+    void set_attribute(const std::string& attribute_name, const std::string& attribute);
 
     /** \brief  Get an attribute by its name */
     std::string getAttribute(const std::string& attribute_name) const {
@@ -88,7 +88,7 @@ namespace casadi {
     int size() const;
 
     /** \brief  Get the name of the node */
-    const std::string& getName() const;
+    const std::string& name() const;
 
     /** \brief  Set the name of the node */
     void setName(const std::string& name);

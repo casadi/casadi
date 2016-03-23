@@ -28,7 +28,7 @@
 
       const std::string casadi::SymbolicQr::meta_doc=
       "\n"
-"LinearSolver based on QR factorization with sparsity pattern based\n"
+"Linsol based on QR factorization with sparsity pattern based\n"
 "reordering without partial pivoting\n"
 "\n"
 "\n"
@@ -37,7 +37,7 @@
 "+-----------------+-----------------+-----------------+-----------------+\n"
 "|       Id        |      Type       |     Default     |   Description   |\n"
 "+=================+=================+=================+=================+\n"
-"| codegen         | OT_BOOLEAN      | false           | C-code          |\n"
+"| codegen         | OT_BOOL      | false           | C-code          |\n"
 "|                 |                 |                 | generation      |\n"
 "+-----------------+-----------------+-----------------+-----------------+\n"
 "| compiler        | OT_STRING       | \"gcc -fPIC -O2\" | Compiler        |\n"

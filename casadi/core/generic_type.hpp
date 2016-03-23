@@ -33,33 +33,40 @@
 
 namespace casadi {
 
+#ifndef SWIG
+
   /** \brief  Types of options */
   enum TypeID {
     OT_NULL,
-    OT_BOOLEAN,
-    OT_INTEGER,
-    OT_REAL,
+    OT_BOOL,
+    OT_INT,
+    OT_DOUBLE,
     OT_STRING,
-    OT_INTEGERVECTOR,
-    OT_INTEGERVECTORVECTOR,
+    OT_INTVECTOR,
+    OT_INTVECTORVECTOR,
     OT_BOOLVECTOR,
-    OT_REALVECTOR,
+    OT_DOUBLEVECTOR,
     OT_STRINGVECTOR,
     OT_DICT,
-    OT_DERIVATIVEGENERATOR,
     OT_FUNCTION,
-    OT_CALLBACK,
     OT_VOIDPTR,
     OT_UNKNOWN};
+#endif // SWIG
 
   /** \brief Generic data type, can hold different types such as bool, int, string etc.
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT GenericType : public SharedObject {
+  class CASADI_EXPORT GenericType
+#ifndef SWIG
+    : public SharedObject
+#endif // SWIG
+  {
   public:
     /// C++ equivalent of Python's dict or MATLAB's struct
     typedef std::map<std::string, GenericType> Dict;
+
+#ifndef SWIG
 
     /// Default constructor
     GenericType();
@@ -76,12 +83,8 @@ namespace casadi {
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const Function& f);
-    GenericType(const DerivativeGenerator& c);
-    GenericType(const Callback& c);
     GenericType(const Dict& dict);
-    #ifndef SWIG
     GenericType(void* ptr);
-    #endif // SWIG
 
     /// Get a description of a type
     static std::string get_type_description(TypeID type);
@@ -92,23 +95,20 @@ namespace casadi {
     /// Construct a GenericType given an TypeID
     static GenericType from_type(TypeID type);
 
-    #ifndef SWIG
     ///@{
     /// Implicit typecasting
-    operator bool() const { return toBool();}
-    operator int() const { return toInt();}
-    operator double() const { return toDouble();}
-    operator std::string() const { return toString();}
-    operator std::vector<int>() const { return toIntVector();}
-    operator std::vector<std::vector<int> >() const { return toIntVectorVector();}
-    operator std::vector<double>() const { return toDoubleVector();}
-    operator std::vector<std::string>() const { return toStringVector();}
-    operator const Function&() const { return asFunction();}
-    operator const Dict&() const { return asDict();}
-    operator const DerivativeGenerator& () const { return asDerivativeGenerator();}
-    operator const Callback& () const { return asCallback();}
+    operator bool() const { return to_bool();}
+    operator int() const { return to_int();}
+    operator double() const { return to_double();}
+    operator std::string() const { return to_string();}
+    operator std::vector<bool>() const { return to_bool_vector();}
+    operator std::vector<int>() const { return to_int_vector();}
+    operator std::vector<std::vector<int> >() const { return to_int_vector_vector();}
+    operator std::vector<double>() const { return to_double_vector();}
+    operator std::vector<std::string>() const { return to_string_vector();}
+    operator const Function&() const { return as_function();}
+    operator const Dict&() const { return as_dict();}
     ///@}
-    #endif // SWIG
 
     // Get type of object
     TypeID getType() const;
@@ -118,61 +118,55 @@ namespace casadi {
 
     ///@{
     /** \brief Check if a particular type */
-    bool isBool() const;
-    bool isInt() const;
-    bool isDouble() const;
-    bool isString() const;
-    bool isemptyVector() const;
-    bool isIntVector() const;
-    bool isIntVectorVector() const;
-    bool isDoubleVector() const;
-    bool isStringVector() const;
-    bool isDict() const;
-    bool isFunction() const;
-    bool isVoidPointer() const;
-    bool isCallback() const;
-    bool isDerivativeGenerator() const;
+    bool is_bool() const;
+    bool is_int() const;
+    bool is_double() const;
+    bool is_string() const;
+    bool is_empty_vector() const;
+    bool is_int_vector() const;
+    bool is_int_vector_vector() const;
+    bool is_double_vector() const;
+    bool is_string_vector() const;
+    bool is_dict() const;
+    bool is_function() const;
+    bool is_void_pointer() const;
     ///@}
 
-#ifndef SWIG
     ///@{
     /** \brief Cast to the internal type */
-    const bool& asBool() const;
-    const int& asInt() const;
-    const double& asDouble() const;
-    const std::string& asString() const;
-    const std::vector<int>& asIntVector() const;
-    const std::vector<std::vector<int> >& asIntVectorVector() const;
-    const std::vector<double>& asDoubleVector() const;
-    const std::vector<std::string>& asStringVector() const;
-    const Dict& asDict() const;
-    const Function& asFunction() const;
-    void* const & asVoidPointer() const;
-    const DerivativeGenerator& asDerivativeGenerator() const;
-    const Callback& asCallback() const;
+    const bool& as_bool() const;
+    const int& as_int() const;
+    const double& as_double() const;
+    const std::string& as_string() const;
+    const std::vector<int>& as_int_vector() const;
+    const std::vector<std::vector<int> >& as_int_vector_vector() const;
+    const std::vector<double>& as_double_vector() const;
+    const std::vector<std::string>& as_string_vector() const;
+    const Dict& as_dict() const;
+    const Function& as_function() const;
+    void* const & as_void_pointer() const;
     ///@}
-#endif // SWIG
 
     ///@{
     //! \brief Convert to a type
-    bool toBool() const;
-    int toInt() const;
-    double toDouble() const;
-    std::string toString() const;
-    std::vector<int> toIntVector() const;
-    std::vector< std::vector<int> > toIntVectorVector() const;
-    std::vector<double> toDoubleVector() const;
-    std::vector<std::string> toStringVector() const;
-    Dict toDict() const;
-    Function toFunction() const;
-    void* toVoidPointer() const;
+    bool to_bool() const;
+    int to_int() const;
+    double to_double() const;
+    std::string to_string() const;
+    std::vector<int> to_int_vector() const;
+    std::vector<bool> to_bool_vector() const;
+    std::vector< std::vector<int> > to_int_vector_vector() const;
+    std::vector<double> to_double_vector() const;
+    std::vector<std::string> to_string_vector() const;
+    Dict to_dict() const;
+    Function to_function() const;
+    void* to_void_pointer() const;
     ///@}
 
     //! \brief Equality
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
 
-#ifndef SWIG
     //! \brief Print
     CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                   const GenericType& ref);
@@ -181,95 +175,6 @@ namespace casadi {
 
   /// C++ equivalent of Python's dict or MATLAB's struct
   typedef GenericType::Dict Dict;
-
-#ifndef SWIG
-  // Create dictionary with 1 element
-  inline Dict
-  make_dict(const std::string& n0, const GenericType& x0) {
-    Dict ret;
-    ret[n0]=x0;
-    return ret;
-  }
-
-  // Create dictionary with 2 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1) {
-    Dict ret=make_dict(n0, x0);
-    ret[n1]=x1;
-    return ret;
-  }
-
-  // Create dictionary with 3 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2) {
-    Dict ret=make_dict(n0, x0, n1, x1);
-    ret[n2]=x2;
-    return ret;
-  }
-
-  // Create dictionary with 4 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2,
-                        const std::string& n3, const GenericType& x3) {
-    Dict ret=make_dict(n0, x0, n1, x1, n2, x2);
-    ret[n3]=x3;
-    return ret;
-  }
-
-  // Create dictionary with 5 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2,
-                        const std::string& n3, const GenericType& x3,
-                        const std::string& n4, const GenericType& x4) {
-    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3);
-    ret[n4]=x4;
-    return ret;
-  }
-
-  // Create dictionary with 6 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2,
-                        const std::string& n3, const GenericType& x3,
-                        const std::string& n4, const GenericType& x4,
-                        const std::string& n5, const GenericType& x5) {
-    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4);
-    ret[n5]=x5;
-    return ret;
-  }
-
-  // Create dictionary with 7 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2,
-                        const std::string& n3, const GenericType& x3,
-                        const std::string& n4, const GenericType& x4,
-                        const std::string& n5, const GenericType& x5,
-                        const std::string& n6, const GenericType& x6) {
-    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4, n5, x5);
-    ret[n6]=x6;
-    return ret;
-  }
-
-  // Create dictionary with 8 elements
-  inline Dict make_dict(const std::string& n0, const GenericType& x0,
-                        const std::string& n1, const GenericType& x1,
-                        const std::string& n2, const GenericType& x2,
-                        const std::string& n3, const GenericType& x3,
-                        const std::string& n4, const GenericType& x4,
-                        const std::string& n5, const GenericType& x5,
-                        const std::string& n6, const GenericType& x6,
-                        const std::string& n7, const GenericType& x7) {
-    Dict ret=make_dict(n0, x0, n1, x1, n2, x2, n3, x3, n4, x4, n5, x5, n6, x6);
-    ret[n7]=x7;
-    return ret;
-  }
-
-#endif // SWIG
-
 
 } // namespace casadi
 

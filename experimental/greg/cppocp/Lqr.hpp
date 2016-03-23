@@ -86,36 +86,36 @@ public:
      void runForwardSweep(void);
 
      // trajectory
-     std::vector<casadi::DMatrix> V_0;
-     std::vector<casadi::DMatrix> V_x;
-     std::vector<casadi::DMatrix> V_xx;
-     std::vector<casadi::DMatrix> cost_0;
-     std::vector<casadi::DMatrix> cost_x;
-     std::vector<casadi::DMatrix> cost_u;
-     std::vector<casadi::DMatrix> cost_xx;
-     std::vector<casadi::DMatrix> cost_xu;
-     std::vector<casadi::DMatrix> cost_uu;
-     std::vector<casadi::DMatrix> xTrajectory;
-     std::vector<casadi::DMatrix> xNominalTrajectory;
-     std::vector<casadi::DMatrix> uTrajectory;
-     std::vector<casadi::DMatrix> uOpenLoop;
-     std::vector<casadi::DMatrix> feedbackGain;
+     std::vector<casadi::DM> V_0;
+     std::vector<casadi::DM> V_x;
+     std::vector<casadi::DM> V_xx;
+     std::vector<casadi::DM> cost_0;
+     std::vector<casadi::DM> cost_x;
+     std::vector<casadi::DM> cost_u;
+     std::vector<casadi::DM> cost_xx;
+     std::vector<casadi::DM> cost_xu;
+     std::vector<casadi::DM> cost_uu;
+     std::vector<casadi::DM> xTrajectory;
+     std::vector<casadi::DM> xNominalTrajectory;
+     std::vector<casadi::DM> uTrajectory;
+     std::vector<casadi::DM> uOpenLoop;
+     std::vector<casadi::DM> feedbackGain;
 
      // regularization
-     casadi::DMatrix stateRegularization;
-     casadi::DMatrix actionRegularization;
+     casadi::DM stateRegularization;
+     casadi::DM actionRegularization;
 
      // for debugging:
-     std::vector<casadi::DMatrix> Q0Trajectory;
-     std::vector<casadi::DMatrix> QxTrajectory;
-     std::vector<casadi::DMatrix> QuTrajectory;
-     std::vector<casadi::DMatrix> QxxTrajectory;
-     std::vector<casadi::DMatrix> QxuTrajectory;
-     std::vector<casadi::DMatrix> QuuTrajectory;
+     std::vector<casadi::DM> Q0Trajectory;
+     std::vector<casadi::DM> QxTrajectory;
+     std::vector<casadi::DM> QuTrajectory;
+     std::vector<casadi::DM> QxxTrajectory;
+     std::vector<casadi::DM> QxuTrajectory;
+     std::vector<casadi::DM> QuuTrajectory;
 
-     std::vector<casadi::DMatrix> f0Trajectory;
-     std::vector<casadi::DMatrix> functionTrajectory;
-     std::vector<casadi::DMatrix> fuTrajectory;
+     std::vector<casadi::DM> f0Trajectory;
+     std::vector<casadi::DM> functionTrajectory;
+     std::vector<casadi::DM> fuTrajectory;
 
      // set actions bounds
      void boundAction( std::vector<double> lb_, std::vector<double> ub_ );
