@@ -729,6 +729,8 @@ Get an atomic operation operator index.
 
 >  Function Function.map(str name, str parallelization, int n, [int ] reduce_in, [int ] reduce_out, Dict opts=Dict())
 
+>  Function Function.map(str name, str parallelization, int n, [str ] reduce_in, [str ] reduce_out, Dict opts=Dict())
+
 >  Function Function.map(str name, str parallelization, int n, Dict opts=Dict())
 ------------------------------------------------------------------------
 
@@ -2358,6 +2360,8 @@ the output elements).
 %feature("docstring") casadi::Function::map "
 
 >  Function Function.map(str name, str parallelization, int n, [int ] reduce_in, [int ] reduce_out, Dict opts=Dict())
+
+>  Function Function.map(str name, str parallelization, int n, [str ] reduce_in, [str ] reduce_out, Dict opts=Dict())
 
 >  Function Function.map(str name, str parallelization, int n, Dict opts=Dict())
 ------------------------------------------------------------------------

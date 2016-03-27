@@ -1293,6 +1293,48 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 ";
 
 %feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const std::vector< std::string >
+&reduce_in, const std::vector< std::string > &reduce_out, const Dict
+&opts=Dict()) "
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const Dict &opts=Dict()) "
 
 Create a mapped version of this function.
@@ -1395,6 +1437,43 @@ The the mapaccumulated version has the signature:
 %feature("docstring")  casadi::Function::mapaccum(const std::string &name,
 int n, const std::vector< int > &accum_in, const std::vector< int >
 &accum_out, const Dict &opts=Dict()) "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
+%feature("docstring")  casadi::Function::mapaccum(const std::string &name,
+int n, const std::vector< std::string > &accum_in, const std::vector<
+std::string > &accum_out, const Dict &opts=Dict()) "
 
 Create a mapaccumulated version of this function.
 
@@ -3017,6 +3096,43 @@ The the mapaccumulated version has the signature:
 
 ";
 
+%feature("docstring")  casadi::Function::mapaccum(const std::string &name,
+int n, const std::vector< std::string > &accum_in, const std::vector<
+std::string > &accum_out, const Dict &opts=Dict()) "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+";
+
 %feature("docstring")  casadi::Function::derivative(const DMVector &arg,
 DMVector &output_res, const DMVectorVector &fseed, DMVectorVector
 &output_fsens, const DMVectorVector &aseed, DMVectorVector &output_asens,
@@ -3462,6 +3578,48 @@ the output elements).
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, int n, const std::vector< int > &reduce_in,
 const std::vector< int > &reduce_out, const Dict &opts=Dict()) "
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
+
+";
+
+%feature("docstring")  casadi::Function::map(const std::string &name, const
+std::string &parallelization, int n, const std::vector< std::string >
+&reduce_in, const std::vector< std::string > &reduce_out, const Dict
+&opts=Dict()) "
 
 Create a mapped version of this function.
 
