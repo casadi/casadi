@@ -416,12 +416,33 @@ namespace casadi {
     if (opts.find("output_scheme")==opts.end()) opts2["output_scheme"] = name_out();
 
     return Mapaccum::create(name, *this, n, accum_in, accum_out, opts2);
-}
+  }
+
+  Function Function::mapaccum(const string& name, int n,
+                              const vector<std::string>& accum_in,
+                              const vector<std::string>& accum_out,
+                              const Dict& opts) {
+    std::vector<int> accum_in_num;
+    for (int i=0;i<accum_in.size();++i) accum_in_num.push_back(index_in(accum_in[i]));
+    std::vector<int> accum_out_num;
+    for (int i=0;i<accum_out.size();++i) accum_out_num.push_back(index_out(accum_out[i]));
+    return mapaccum(name, n, accum_in_num, accum_out_num, opts);
+  }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,
       const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
       const Dict& opts) {
     return MapBase::create(name, parallelization, *this, n, reduce_in, reduce_out, opts);
+  }
+
+  Function Function::map(const string& name, const std::string& parallelization, int n,
+      const std::vector<std::string>& reduce_in, const std::vector<std::string>& reduce_out,
+      const Dict& opts) {
+    std::vector<int> reduce_in_num;
+    for (int i=0;i<reduce_in.size();++i) reduce_in_num.push_back(index_in(reduce_in[i]));
+    std::vector<int> reduce_out_num;
+    for (int i=0;i<reduce_out.size();++i) reduce_out_num.push_back(index_out(reduce_out[i]));
+    return map(name, parallelization, n, reduce_in_num, reduce_out_num, opts);
   }
 
   Function Function::map(const string& name, const std::string& parallelization, int n,

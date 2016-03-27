@@ -600,6 +600,10 @@ namespace casadi {
                       const std::vector<int>& accum_in,
                       const std::vector<int>& accum_out,
                       const Dict& opts=Dict());
+    Function mapaccum(const std::string& name, int n,
+                      const std::vector<std::string>& accum_in,
+                      const std::vector<std::string>& accum_out,
+                      const Dict& opts=Dict());
     ///@}
 
 
@@ -631,7 +635,12 @@ namespace casadi {
     */
 
     Function map(const std::string& name, const std::string& parallelization, int n,
-      const std::vector<int>& reduce_in, const std::vector<int>& reduce_out,
+      const std::vector<int>& reduce_in,
+      const std::vector<int>& reduce_out,
+      const Dict& opts=Dict());
+    Function map(const std::string& name, const std::string& parallelization, int n,
+      const std::vector<std::string>& reduce_in,
+      const std::vector<std::string>& reduce_out,
       const Dict& opts=Dict());
     Function map(const std::string& name, const std::string& parallelization, int n,
       const Dict& opts=Dict());
