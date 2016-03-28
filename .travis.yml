@@ -127,8 +127,11 @@ matrix:
         - git clone git@github.com:casadi/binaries.git
         - pushd binaries && git checkout run && git submodule init && git submodule update || allowfail 1 && popd
         - pushd binaries/casadi && git checkout $TRAVIS_COMMIT && popd
-        - pushd binaries && git commit -a -m "automatic runner commit $TRAVIS_COMMIT" && git push origin run && popd
-
+        - |
+          if ! [[ $TRAVIS_BRANCH == *test* ]]
+          then
+          pushd binaries && git commit -a -m "automatic runner commit $TRAVIS_COMMIT" && git push origin run && popd
+          fi
     - os: osx
       env: TESTMODE=minimal
       compiler: clang
