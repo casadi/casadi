@@ -207,6 +207,16 @@ namespace casadi {
       return NonZeros<MatType, K>(self(), k);
     }
 
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief  Get vector nonzero or slice of nonzeros, old syntax */
+    template<typename K>
+    const MatType operator[](const K& k) const { return nz(k);}
+
+    /** \brief  Access vector nonzero or slice of nonzeros, old syntax */
+    template<typename K>
+    NonZeros<MatType, K> operator[](const K& k) { return nz(k);}
+#endif // WITH_DEPRECATED_FEATURES
+
     /** \brief  Get vector element or slice */
     template<typename RR>
     const MatType operator()(const RR& rr) const {
