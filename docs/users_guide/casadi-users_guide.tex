@@ -1938,10 +1938,9 @@ disp(f(3.14))
 \end{lstlisting}
 \end{minipage}
 \begin{pytexoutput}
-# Python
-C = Compiler('ff.c','clang')
-f = external('f',C);
-print f(3.14)
+print '''
+[0.00159265, 0.00159265]
+'''
 \end{pytexoutput}
 
 We will return to the \texttt{external} function in Section~\ref{sec:external}.
@@ -1950,7 +1949,7 @@ We will return to the \texttt{external} function in Section~\ref{sec:external}.
 An alternative way of executing generated code is to compile the code into a
 MATLAB MEX function and call from MATLAB. This assumes that the \verb|mex| option
 was set to "true" during the code generation, cf. Section~\ref{sec:codegen_syntax}.
-The generated MEX function will take the function, name as the first argument,
+The generated MEX function takes the function name as its first argument,
 followed by the function inputs:
 
 \begin{lstlisting}[language=Matlab]
@@ -2130,7 +2129,11 @@ int fname(const double** arg, double** res,
 
 Finally, the function \verb|fname|, performs the actual evaluation. It takes
 as input arguments the four work vectors and the index of the chosen memory
-object. The nonzeros of the function inputs are pointed to by the
+object. The length of the work vectors must be at least the lengths provided
+by the \cxx{fname_work} command and the index of the memory object must be strictly
+smaller than the value return by \cxx{fname_n_mem}.
+
+The nonzeros of the function inputs are pointed to by the
 first entries of the \texttt{arg} work vector and are unchanged by the evaluation.
 Similarly, the output nonzeros are pointed to by the first entries of the
 \texttt{res} work vector and are also unchanged (i.e. the pointers are unchanged,
@@ -2394,7 +2397,7 @@ with a function with simpler syntax:
 void fname_simple(const double* arg, double* res);
 \end{lstlisting}
 
-Note that \verb|_simple| needs to appended to the function name. Evaluating
+Note that \verb|_simple| must be appended to the function name. Evaluating
 a function with this syntax potentially carries less overhead.
 
 \subsection*{Derivatives}
@@ -2405,7 +2408,7 @@ symbols in the same file/shared library that follows a certain
 outputs with respect to all inputs for a function named \verb|fname| by
 implementing a function named \verb|jac_fname|. Similary, you can specify
 a function for calculating one forward directional derivative by providing a
-function named \verb|fwd1_fname|, where 1 can be replaced by for 2, 4, 8, 16,
+function named \verb|fwd1_fname|, where 1 can be replaced by 2, 4, 8, 16,
 32 or 64 for calculating multiple forward directional derivatives at once.
 For reverse mode directional derivatives, replace \verb|fwd| with \verb|adj|.
 
@@ -2872,7 +2875,7 @@ each operation. Further information is available in the API documentation.
     & \verb|dot(x, y)| & \verb|dot(x, y)| & \verb|dot(x, y)| \\ \hline
     *Horizontal/vertical concatenation
     & \verb|horzcat(x, y)| \linebreak \verb|vertcat(x, y)|
-    & \verb|horzcat(*v)| \verb|vertcat(*v)|, \linebreak (\verb|v| vector of matrices)
+    & \verb|horzcat(v)| \verb|vertcat(v)|, \linebreak (\verb|v| vector of matrices)
     & \verb|[x, y]| \linebreak \verb|[x; y]| \\ \hline
     Horizontal/vertical split (inverse of concatenation)
     & \verb|vertsplit(x)|, \verb|horzsplit(x)| & \verb|vertsplit(x)|, \verb|horzsplit(x)| & \verb|vertsplit(x)|, \verb|horzsplit(x)| \\ \hline
