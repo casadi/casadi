@@ -28,7 +28,7 @@
  * This example demonstrates how dependencies can be propagated through symbolic expressions,
  * a low-level feature useful when determining sparsity patterns. This functionality is mostly
  * used internally in CasADi when calculating the sparsity pattern of Jacobians and Hessians.
- * 
+ *
  * \author Joel Andersson
  * \date 2012
  */
@@ -61,12 +61,12 @@ int main(){
     if(test==0){
       cout << "SX:" << endl;
       SX x = SX::sym("x",3);
-      SX z = x[0]*x[0]+x[2] + 3;
+      SX z = x(0)*x(0)+x(2) + 3;
       f = Function("f", {x}, {z});
     } else {
       cout << "MX:" << endl;
       MX x = MX::sym("x",3);
-      MX z = x[0]*x[0]+x[2] + 3;
+      MX z = x(0)*x(0)+x(2) + 3;
       f = Function("f", {x}, {z});
     }
 
@@ -79,7 +79,7 @@ int main(){
 
     // Make sure that the class is able to support the dependency propagation
     casadi_assert(f.spCanEvaluate(true));
-    
+
     // Pass seeds
     f_in[0] = bvec_t(1) << 0; // seed in direction 0
     f_in[1] = bvec_t(1) << 2; // seed in direction 2
@@ -93,7 +93,7 @@ int main(){
 
     // Print the result
     printBinary(f_out[0]);
-    
+
     // Propagate from output to input (adjoint/reverse/backward mode)
     cout << "backward mode" << endl;
 
@@ -102,12 +102,12 @@ int main(){
 
     // Pass seeds
     f_out[0] = (bvec_t(1) << 5) | (bvec_t(1) << 6); // seed in direction 5 and 6
-    
+
     // Reset sensitivities
     f_in[0] = 0;
     f_in[1] = 0;
     f_in[2] = 0;
-    
+
     // Propagate dependencies
     f.rev({&f_in.front()}, {&f_out.front()});
 
@@ -116,6 +116,6 @@ int main(){
     printBinary(f_in[1]);
     printBinary(f_in[2]);
   }
-  
+
   return 0;
 }

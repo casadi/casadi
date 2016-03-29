@@ -60,12 +60,12 @@ int main(){
   for(int k=0; k<nu; ++k){
     for(int j=0; j<nj; ++j){
       s += dt*v;
-      v += dt / m * (u[k]- alpha * v*v);
-      m += -dt * beta*u[k]*u[k];
+      v += dt / m * (u(k)- alpha * v*v);
+      m += -dt * beta*u(k)*u(k);
     }
-    s_traj[k] = s;
-    v_traj[k] = v;
-    m_traj[k] = m;
+    s_traj(k) = s;
+    v_traj(k) = v;
+    m_traj(k) = m;
   }
 
   // Objective function

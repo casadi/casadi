@@ -47,7 +47,7 @@ int main(){
   casadi_load_integrator_rk();
   casadi_load_nlpsol_ipopt();
   casadi_load_nlpsol_scpgen();
-  
+
   // Time length
   double T = 10.0;
 
@@ -64,27 +64,21 @@ int main(){
   X0[1] = 0; // initial speed
   X0[2] = 1; // initial mass
 
-  // Time 
+  // Time
   SX t = SX::sym("t");
 
   // Differential states
   SX s = SX::sym("s"), v = SX::sym("v"), m = SX::sym("m");
-  SX x = SX::zeros(3);
-  x[0] = s;
-  x[1] = v;
-  x[2] = m;
+  SX x = SX::vertcat({s, v, m});
 
   // Control
   SX u = SX::sym("u");
 
   SX alpha = 0.05; // friction
   SX beta = 0.1; // fuel consumption rate
-  
+
   // Differential equation
-  SX rhs = SX::zeros(3);
-  rhs[0] = v;
-  rhs[1] = (u-alpha*v*v)/m;
-  rhs[2] = -beta*u*u;
+  SX rhs = SX::vertcat({v, (u-alpha*v*v)/m, -beta*u*u});
 
   // Initial conditions
   vector<double> x0 = {0, 0, 1};
@@ -128,13 +122,13 @@ int main(){
   Function F = integrator("integrator", plugin, dae, opts);
 
   // control for all segments
-  MX U = MX::sym("U",nu); 
+  MX U = MX::sym("U",nu);
 
   // Integrate over all intervals
   MX X=X0;
   for(int k=0; k<nu; ++k){
     // Integrate
-    X = F(MXDict{{"x0", X}, {"p", U[k]}}).at("xf");
+    X = F(MXDict{{"x0", X}, {"p", U(k)}}).at("xf");
 
     // Lift X
     if(lifted_newton){
@@ -146,8 +140,8 @@ int main(){
   MX J = dot(U,U);
 
   // Terminal constraints
-  MX G = vertcat(X[0],X[1]);
-  
+  MX G = vertcat(X(0),X(1));
+
   // Create the NLP
   MXDict nlp = {{"x", U}, {"f", J}, {"g", G}};
 

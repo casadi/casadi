@@ -2889,11 +2889,11 @@ each operation. Further information is available in the API documentation.
     & \verb|A(i,j) = b| and \verb|A(i) = b|, \linebreak \emph{1-based} \\ \hline
     *Nonzero access
     & \verb|A.nz[k]|, \emph{0-based}
-    & \verb|A[k]|, \emph{0-based}
+    & \verb|A.nz(k)|, \emph{0-based}
     & (currently unsupported) \\ \hline
     *Nonzero assignment
     & \verb|A.nz[k] = b|, \emph{0-based}
-    & \verb|A[k] = b|, \emph{0-based}
+    & \verb|A.nz(k) = b|, \emph{0-based}
     & (currently unsupported) \\ \hline
     Project to a different sparsity
     & \verb|project(x, s)| & \verb|project(x, s)| & \verb|project(x, s)| \\ \hline

@@ -879,7 +879,7 @@ namespace casadi {
         tmp.resize(sz);
 
         // Add contribution to the Jacobian
-        ret[adds] = fsens[d][oind][tmp];
+        ret.nz(adds) = fsens[d][oind].nz(tmp);
 
         if (symmetric) {
           // Get entries in fsens[d][oind] with nonnegative indices
@@ -895,7 +895,7 @@ namespace casadi {
           tmp.resize(sz);
 
           // Add contribution to the Jacobian
-          ret[adds2] = fsens[d][oind][tmp];
+          ret.nz(adds2) = fsens[d][oind].nz(tmp);
         }
       }
 
@@ -923,7 +923,7 @@ namespace casadi {
             if (anz<0) continue;
 
             // Get the input seed
-            ret[elJ] = asens[d][iind][anz];
+            ret.nz(elJ) = asens[d][iind].nz(anz);
           }
         }
       }

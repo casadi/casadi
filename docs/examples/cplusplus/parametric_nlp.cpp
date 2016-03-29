@@ -36,44 +36,44 @@ using namespace std;
  *  Note that there is currently no support for parametric sensitivities via this feature (although it would make a lot of sense).
  *  For parametric sensitivities, see the parametric_sensitivities.cpp example which calculates sensitivitied via the sIPOPT extension
  *  to IPOPT.
- * 
+ *
  *  Joel Andersson, K.U. Leuven 2012
  */
 
 int main(){
   /** Test problem (Ganesh & Biegler, A reduced Hessian strategy for sensitivity analysis of optimal flowsheets, AIChE 33, 1987, pp. 282-296)
-   * 
+   *
    *    min     x1^2 + x2^2 + x3^2
    *    s.t.    6*x1 + 3&x2 + 2*x3 - pi = 0
    *            p2*x1 + x2 - x3 - 1 = 0
    *            x1, x2, x3 >= 0
-   * 
+   *
    */
-  
+
   // Optimization variables
   SX x = SX::sym("x", 3);
-  
+
   // Parameters
   SX p = SX::sym("p", 2);
-  
+
   // Objective
-  SX f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2];
-  
+  SX f = x(0)*x(0) + x(1)*x(1) + x(2)*x(2);
+
   // Constraints
   SX g = vertcat(
-       6*x[0] + 3*x[1] + 2*x[2] - p[0],
-    p[1]*x[0] +   x[1] -   x[2] -    1
+       6*x(0) + 3*x(1) + 2*x(2) - p(0),
+    p(1)*x(0) +   x(1) -   x(2) -    1
   );
-  
+
   // Initial guess and bounds for the optimization variables
   vector<double> x0  = {0.15, 0.15, 0.00};
   vector<double> lbx = {0.00, 0.00, 0.00};
   vector<double> ubx = { inf,  inf,  inf};
-  
+
   // Nonlinear bounds
   vector<double> lbg = {0.00, 0.00};
   vector<double> ubg = {0.00, 0.00};
-  
+
   // Original parameter values
   vector<double> p0  = {5.00, 1.00};
 
@@ -92,7 +92,7 @@ int main(){
   arg["x0"] = x0;
   arg["p"] = p0;
   res = solver(arg);
-  
+
   // Print the solution
   cout << "-----" << endl;
   cout << "Optimal solution for p = " << str(arg.at("p")) << ":" << endl;
@@ -104,7 +104,7 @@ int main(){
   // Change the parameter and resolve
   arg["p"] = 4.5;
   res = solver(arg);
-  
+
   // Print the new solution
   cout << "-----" << endl;
   cout << "Optimal solution for p = " << str(arg.at("p")) << ":" << endl;
@@ -112,7 +112,6 @@ int main(){
   cout << setw(30) << "Primal solution: " << str(res.at("x")) << endl;
   cout << setw(30) << "Dual solution (x): " << str(res.at("lam_x")) << endl;
   cout << setw(30) << "Dual solution (g): " << str(res.at("lam_g")) << endl;
-  
+
   return 0;
 }
-

@@ -48,9 +48,9 @@ int main(){
   SX p  = SX::sym("u",np);  // control
 
   // ODE right hand side function
-  SX ode = vertcat((1 - x[1]*x[1])*x[0] - x[1] + p,
-                   x[0],
-                   x[0]*x[0] + x[1]*x[1] + p*p);
+  SX ode = vertcat((1 - x(1)*x(1))*x(0) - x(1) + p,
+                   x(0),
+                   x(0)*x(0) + x(1)*x(1) + p*p);
   SXDict dae = {{"x", x}, {"p", p}, {"ode", ode}};
 
   // Number of finite elements
@@ -86,10 +86,10 @@ int main(){
         p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
       }
     }
-    
+
     // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
     D[j] = p(1.0);
-    
+
     // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     Polynomial dp = p.derivative();
     for(int r=0; r<d+1; ++r){
@@ -101,11 +101,11 @@ int main(){
   MX X0 = MX::sym("X0",nx);
   MX P  = MX::sym("P",np);
   MX V = MX::sym("V",d*nx);
-  
+
   // Get the state at each collocation point
   vector<MX> X(1,X0);
   for(int r=0; r<d; ++r){
-    X.push_back(V[Slice(r*nx,(r+1)*nx)]);
+    X.push_back(V.nz(Slice(r*nx,(r+1)*nx)));
   }
 
   // Get the collocation quations (that define V)
@@ -117,7 +117,7 @@ int main(){
     for(int r=0; r<d+1; ++r){
       xp_j += C[r][j]*X[r];
     }
-    
+
     // Append collocation equations
     vector<MX> v = {X[j], P};
     v = f(v);
@@ -126,7 +126,7 @@ int main(){
 
   // Root-finding function, implicitly defines V as a function of X0 and P
   Function vfcn("vfcn", {V, X0, P}, {vertcat(V_eq)});
-  
+
   // Convert to sxfunction to decrease overhead
   Function vfcn_sx = vfcn.expand("vfcn");
 
@@ -147,13 +147,13 @@ int main(){
   V = ifcn(ifcn_arg).front();
   X.resize(1);
   for(int r=0; r<d; ++r){
-    X.push_back(V[Slice(r*nx, (r+1)*nx)]);
+    X.push_back(V.nz(Slice(r*nx, (r+1)*nx)));
   }
   MX XF = 0;
   for(int r=0; r<d+1; ++r){
     XF += D[r]*X[r];
   }
-  
+
   // Get the discrete time dynamics
   Function F("F", {X0, P}, {XF});
 
@@ -193,7 +193,7 @@ int main(){
     // Forward sensitivity analysis, first direction: seed p
     arg["fwd0_x0"] = 0;
     arg["fwd0_p"] = 1;
-  
+
     // Forward sensitivity analysis, second direction: seed x0[0]
     arg["fwd1_x0"] = vector<double>{1, 0, 0};
     arg["fwd1_p"] = 0;
@@ -217,4 +217,3 @@ int main(){
   }
   return 0;
 }
-

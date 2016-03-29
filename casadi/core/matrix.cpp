@@ -451,10 +451,10 @@ namespace casadi {
     for (int el=0; el<r.nnz(); ++el) {
       // Start by expanding the node to a weighted sum
       SX terms, weights;
-      expand(r[el], weights, terms);
+      expand(r.nz(el), weights, terms);
 
       // Make a scalar product to get the simplified expression
-      r[el] = mtimes(terms.T(), weights);
+      r.nz(el) = mtimes(terms.T(), weights);
     }
     return r;
   }

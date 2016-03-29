@@ -182,7 +182,7 @@ namespace casadi {
     using B::sym;
     using B::zeros;
     using B::ones;
-    using B::operator[];
+    using B::nz;
     using B::operator();
     using B::horzsplit;
     using B::vertsplit;

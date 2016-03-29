@@ -114,7 +114,7 @@ namespace casadi {
     for (int j = 0; j < nnObj_; ++j) {
       if (d.colind(j) != d.colind(j+1)) {
         int k = d.colind(j);
-        d[k] = 0;
+        d.nz(k) = 0;
       }
     }
 
