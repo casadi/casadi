@@ -82,6 +82,7 @@
     // Flush the command window buffer (needed in gui mode)
     static void mexflush(bool error) {
       mexEvalString("drawnow('update');");
+      mexEvalString("pause(0.0001);");
     }
 
     // Undocumented matlab feature
