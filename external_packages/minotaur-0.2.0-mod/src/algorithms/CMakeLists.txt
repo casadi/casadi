@@ -92,8 +92,16 @@ set (BNB_SOURCES
   Bnb.cpp 
 )
 
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../cmake)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+find_package(CASADI REQUIRED)
+include_directories(${CASADI_INCLUDE_DIR})
+
 add_executable(bnb ${BNB_SOURCES})
 target_link_libraries(bnb ${ALL_EXEC_LIBS})
+target_link_libraries(bnb ${CASADI_LIBRARIES})
+
 
 # This will install the binary in bin directory.
 install(TARGETS bnb RUNTIME DESTINATION bin)

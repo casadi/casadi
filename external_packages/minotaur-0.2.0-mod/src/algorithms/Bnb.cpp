@@ -14,6 +14,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include <casadi/casadi.hpp>
+
 #include "MinotaurConfig.h"
 #include "BndProcessor.h"
 #include "BranchAndBound.h"
