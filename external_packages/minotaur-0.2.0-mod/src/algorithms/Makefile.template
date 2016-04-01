@@ -1,0 +1,56 @@
+# Makefile for building outer approximation in minotaur 
+
+###########################################################################
+# PART I: SYSTEM DEPENDENT PATHS AND VARIABLES
+# compilers and options
+CXX = g++
+CXXFLAGS = -ggdb
+LD_ADD = 
+
+SRCS := filter-qp.cpp
+
+# paths to Minotaur library and include directory
+MINOTAUR_BUILD_DIR = /sandbox/mahajan/minotaur/build-debug
+
+# paths to Externals
+MINOTAUR_EXT_DIR = /sandbox/mahajan/minotaur-test/minotaur-externals
+
+MINOTAUR_INC_DIR   = ${MINOTAUR_BUILD_DIR}/include/minotaur
+MINOTAUR_LIB_DIR   = ${MINOTAUR_BUILD_DIR}/lib
+MINOTAUR_LIBS      = -L${MINOTAUR_LIB_DIR} -Wl,-rpath=${MINOTAUR_LIB_DIR} -lminotaur -lmntrampl -lmntrbqpd -lmntrfiltersqp -lmntrosilp
+
+
+IPOPT_INC_DIR = /${MINOTAUR_EXT_DIR}/ipopt-3.8.3/build/include/coin/
+IPOPT_LIB_DIR = ${MINOTAUR_EXT_DIR}/ipopt-3.8.3/build/lib
+IPOPT_LIB = -L${IPOPT_LIB_DIR} -lipopt -Wl,-rpath=${IPOPT_LIB_DIR}
+
+OSI_INC_DIR = /${MINOTAUR_EXT_DIR}/osi-0.102.1/build/include/coin/
+OSI_LIB_DIR = ${MINOTAUR_EXT_DIR}/osi-0.102.1/build/lib
+OSI_LIB     = -L${OSI_LIB_DIR} -lOsiClp -lOsi -lClp -lCoinUtils -Wl,-rpath=${OSI_LIB_DIR}
+
+FILTER_LIB = ${MINOTAUR_EXT_DIR}/filter-82/src/filterlib.a
+
+BOOST_INC_DIR = ${MINOTAUR_EXT_DIR}
+
+AMPL_DIR = ${MINOTAUR_EXT_DIR}/asl
+AMPL_LIB = ${AMPL_DIR}/amplsolver.a
+AMPL_INC_DIR = ${AMPL_DIR}
+
+###########################################################################
+
+OBJS := ${SRCS:.cpp=.o}
+
+CXXFLAGS += -I${MINOTAUR_INC_DIR} -I$(BOOST_INC_DIR) -I${AMPL_INC_DIR} -I${IPOPT_INC_DIR} -I${OSI_INC_DIR} 
+LD_ADD += ${MINOTAUR_LIBS} ${AMPL_LIB} ${FILTER_LIB} ${IPOPT_LIB} ${OSI_LIB}
+
+mybin: ${OBJS} 
+	${CXX} -o mybin ${SRCS} ${OA_OBJS} ${CXXFLAGS} ${LD_ADD} 
+
+.cpp.o:
+	${CXX} ${CXXFLAGS} -c $< -o $@
+
+clean:
+	rm -f *.o mybin
+
+
+
