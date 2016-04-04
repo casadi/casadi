@@ -73,6 +73,7 @@ option(WITH_GUROBI "Compile the interface to GUROBI" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
+option(WITH_CLP "Compile the CLP interface" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
@@ -170,7 +171,7 @@ set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/casadi")
 
@@ -512,6 +513,11 @@ if(WITH_CPLEX)
   find_package(CPLEX)
 endif()
 add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX.")
+
+if(WITH_CLP)
+  find_package(CLP)
+endif()
+add_feature_info(clp-interface CLP_FOUND "Interface to the LP solver CLP.")
 
 if(WITH_SNOPT)
   find_package(SNOPT)
