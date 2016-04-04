@@ -1671,7 +1671,7 @@ Since we used \CasADi's \texttt{DM}-type above, we can simply query the sparsity
 qp = {}
 qp['h'] = H.sparsity()
 qp['a'] = A.sparsity()
-S = qpsol('S','qpoases',qp)
+S = conic('S','qpoases',qp)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
@@ -1680,7 +1680,7 @@ S = qpsol('S','qpoases',qp)
 qp = struct;
 qp.h = H.sparsity();
 qp.a = A.sparsity();
-S = qpsol('S','qpoases',qp);
+S = conic('S','qpoases',qp);
 \end{lstlisting}
 \end{minipage}
 { \tiny
@@ -1689,7 +1689,7 @@ S = qpsol('S','qpoases',qp);
 qp = {}
 qp['h'] = H.sparsity()
 qp['a'] = A.sparsity()
-S = qpsol('S','qpoases',qp)
+S = conic('S','qpoases',qp)
 \end{pytexoutput}
 }
 

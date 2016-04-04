@@ -41,8 +41,8 @@ def loadAllCompiledPlugins():
       casadi.load_integrator(name)
     elif cls=='Nlpsol':
       casadi.load_nlpsol(name)
-    elif cls=='Qpsol':
-      casadi.load_qpsol(name)
+    elif cls=='Conic':
+      casadi.load_conic(name)
     elif cls=='Rootfinder':
       casadi.load_rootfinder(name)
     elif cls=='Linsol':

@@ -26,35 +26,35 @@
 #ifndef CASADI_QP_TO_NLP_HPP
 #define CASADI_QP_TO_NLP_HPP
 
-#include "casadi/core/function/qpsol_impl.hpp"
-#include <casadi/solvers/casadi_qpsol_nlpsol_export.h>
+#include "casadi/core/function/conic_impl.hpp"
+#include <casadi/solvers/casadi_conic_nlpsol_export.h>
 
 
-/** \defgroup plugin_Qpsol_nlp
+/** \defgroup plugin_Conic_nlp
    Solve QPs using an Nlpsol
 */
 
-/** \pluginsection{Qpsol,nlp} */
+/** \pluginsection{Conic,nlp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief \pluginbrief{Qpsol,nlp}
+  /** \brief \pluginbrief{Conic,nlp}
 
-      @copydoc Qpsol_doc
-      @copydoc plugin_Qpsol_nlp
+      @copydoc Conic_doc
+      @copydoc plugin_Conic_nlp
 
       \author Joris Gillis
       \date 2011
   */
-  class CASADI_QPSOL_NLPSOL_EXPORT QpToNlp : public Qpsol {
+  class CASADI_CONIC_NLPSOL_EXPORT QpToNlp : public Conic {
   public:
     /** \brief  Create a new Solver */
     explicit QpToNlp(const std::string& name,
                      const std::map<std::string, Sparsity> &st);
 
     /** \brief  Create a new QP Solver */
-    static Qpsol* creator(const std::string& name,
+    static Conic* creator(const std::string& name,
                           const std::map<std::string, Sparsity>& st) {
       return new QpToNlp(name, st);
     }

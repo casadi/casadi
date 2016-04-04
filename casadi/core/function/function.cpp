@@ -32,7 +32,7 @@
 #include "switch.hpp"
 #include "kernel_sum.hpp"
 #include "nlpsol.hpp"
-#include "qpsol.hpp"
+#include "conic.hpp"
 #include "jit.hpp"
 #include "../casadi_file.hpp"
 

@@ -37,8 +37,8 @@ namespace casadi {
   using namespace std;
 
   extern "C"
-  int CASADI_QPSOL_CPLEX_EXPORT
-  casadi_register_qpsol_cplex(Qpsol::Plugin* plugin) {
+  int CASADI_CONIC_CPLEX_EXPORT
+  casadi_register_conic_cplex(Conic::Plugin* plugin) {
     plugin->creator = CplexInterface::creator;
     plugin->name = "cplex";
     plugin->doc = CplexInterface::meta_doc.c_str();
@@ -47,17 +47,17 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOL_CPLEX_EXPORT casadi_load_qpsol_cplex() {
-    Qpsol::registerPlugin(casadi_register_qpsol_cplex);
+  void CASADI_CONIC_CPLEX_EXPORT casadi_load_conic_cplex() {
+    Conic::registerPlugin(casadi_register_conic_cplex);
   }
 
   CplexInterface::CplexInterface(const std::string& name,
                                  const std::map<std::string, Sparsity>& st)
-    : Qpsol(name, st) {
+    : Conic(name, st) {
   }
 
   Options CplexInterface::options_
-  = {{&Qpsol::options_},
+  = {{&Conic::options_},
      {{"cplex",
        {OT_DICT,
         "Options to be passed to CPLEX"}},
@@ -84,7 +84,7 @@ namespace casadi {
 
   void CplexInterface::init(const Dict& opts) {
     // Call the init method of the base class
-    Qpsol::init(opts);
+    Conic::init(opts);
 
     // Default options
     qp_method_ = 0;
@@ -131,8 +131,8 @@ namespace casadi {
     alloc_w(n_, true); // ubx
     alloc_w(nc_, true); // lba
     alloc_w(nc_, true); // uba
-    alloc_w(nnz_in(QPSOL_H), true); // H
-    alloc_w(nnz_in(QPSOL_A), true); // A
+    alloc_w(nnz_in(CONIC_H), true); // H
+    alloc_w(nnz_in(CONIC_A), true); // A
     alloc_w(n_, true); // x
     alloc_w(n_, true); // lam_x
     alloc_w(nc_, true); // lam_a
@@ -246,13 +246,13 @@ namespace casadi {
     m->rstat.resize(nc_);
 
     // Matrix A, count the number of elements per column
-    const Sparsity& A_sp = sparsity_in(QPSOL_A);
+    const Sparsity& A_sp = sparsity_in(CONIC_A);
     m->matcnt.resize(A_sp.size2());
     transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), m->matcnt.begin(),
               minus<int>());
 
     // Matrix H, count the number of elements per column
-    const Sparsity& H_sp = sparsity_in(QPSOL_H);
+    const Sparsity& H_sp = sparsity_in(CONIC_H);
     m->qmatcnt.resize(H_sp.size2());
     transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), m->qmatcnt.begin(),
               minus<int>());
@@ -268,28 +268,28 @@ namespace casadi {
     auto m = static_cast<CplexMemory*>(mem);
 
     if (inputs_check_) {
-      checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
+      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Get inputs
     double* g=w; w += n_;
-    casadi_copy(arg[QPSOL_G], n_, g);
+    casadi_copy(arg[CONIC_G], n_, g);
     double* lbx=w; w += n_;
-    casadi_copy(arg[QPSOL_LBX], n_, lbx);
+    casadi_copy(arg[CONIC_LBX], n_, lbx);
     double* ubx=w; w += n_;
-    casadi_copy(arg[QPSOL_UBX], n_, ubx);
+    casadi_copy(arg[CONIC_UBX], n_, ubx);
     double* lba=w; w += nc_;
-    casadi_copy(arg[QPSOL_LBA], nc_, lba);
+    casadi_copy(arg[CONIC_LBA], nc_, lba);
     double* uba=w; w += nc_;
-    casadi_copy(arg[QPSOL_UBA], nc_, uba);
-    double* H=w; w += nnz_in(QPSOL_H);
-    casadi_copy(arg[QPSOL_H], nnz_in(QPSOL_H), H);
-    double* A=w; w += nnz_in(QPSOL_A);
-    casadi_copy(arg[QPSOL_A], nnz_in(QPSOL_A), A);
+    casadi_copy(arg[CONIC_UBA], nc_, uba);
+    double* H=w; w += nnz_in(CONIC_H);
+    casadi_copy(arg[CONIC_H], nnz_in(CONIC_H), H);
+    double* A=w; w += nnz_in(CONIC_A);
+    casadi_copy(arg[CONIC_A], nnz_in(CONIC_A), A);
     double* x=w; w += n_;
-    casadi_copy(arg[QPSOL_X0], n_, x);
+    casadi_copy(arg[CONIC_X0], n_, x);
     double* lam_x=w; w += n_;
-    casadi_copy(arg[QPSOL_LAM_X0], n_, lam_x);
+    casadi_copy(arg[CONIC_LAM_X0], n_, lam_x);
 
     // Temporaries
     double* lam_a=w; w += nc_;
@@ -327,7 +327,7 @@ namespace casadi {
     }
 
     // Copying objective, constraints, and bounds.
-    const Sparsity& A_sp = sparsity_in(QPSOL_A);
+    const Sparsity& A_sp = sparsity_in(CONIC_A);
     const int* matbeg = A_sp.colind();
     const int* matind = A_sp.row();
     const double* matval = A;
@@ -340,7 +340,7 @@ namespace casadi {
     }
 
     // Preparing coefficient matrix Q
-    const Sparsity& H_sp = sparsity_in(QPSOL_H);
+    const Sparsity& H_sp = sparsity_in(CONIC_H);
     const int* qmatbeg = H_sp.colind();
     const int* qmatind = H_sp.row();
     const double* qmatval = H;
@@ -463,10 +463,10 @@ namespace casadi {
     }
 
     // Get the outputs
-    if (res[QPSOL_COST]) *res[QPSOL_COST] = f;
-    casadi_copy(lam_a, nc_, res[QPSOL_LAM_A]);
-    casadi_copy(lam_x, n_, res[QPSOL_LAM_X]);
-    casadi_copy(x, n_, res[QPSOL_X]);
+    if (res[CONIC_COST]) *res[CONIC_COST] = f;
+    casadi_copy(lam_a, nc_, res[CONIC_LAM_A]);
+    casadi_copy(lam_x, n_, res[CONIC_LAM_X]);
+    casadi_copy(x, n_, res[CONIC_X]);
   }
 
   CplexInterface::~CplexInterface() {

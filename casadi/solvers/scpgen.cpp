@@ -63,10 +63,10 @@ namespace casadi {
 
   Options Scpgen::options_
   = {{&Nlpsol::options_},
-     {{"qpsol",
+     {{"conic",
        {OT_STRING,
         "The QP solver to be used by the SQP method"}},
-      {"qpsol_options",
+      {"conic_options",
        {OT_DICT,
         "Options to be passed to the QP solver"}},
       {"hessian_approximation",
@@ -146,8 +146,8 @@ namespace casadi {
     merit_memsize_ = 4;
     merit_start_ = 1e-8;
     string hessian_approximation = "exact";
-    string qpsol_plugin;
-    Dict qpsol_options;
+    string conic_plugin;
+    Dict conic_options;
     print_header_ = true;
 
     // Read user options
@@ -186,10 +186,10 @@ namespace casadi {
         name_x_ = op.second;
       } else if (op.first=="print_x") {
         print_x_ = op.second;
-      } else if (op.first=="qpsol") {
-        qpsol_plugin = op.second.to_string();
-      } else if (op.first=="qpsol_options") {
-        qpsol_options = op.second;
+      } else if (op.first=="conic") {
+        conic_plugin = op.second.to_string();
+      } else if (op.first=="conic_options") {
+        conic_options = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       }
@@ -594,9 +594,9 @@ namespace casadi {
     spL_ = mat_fcn_.sparsity_out(mat_hes_);
     spH_ = mtimes(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
-    casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_ = qpsol("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
-                   qpsol_options);
+    casadi_assert_message(!conic_plugin.empty(), "'conic' option has not been set");
+    conic_ = conic("conic", conic_plugin, {{"h", spH_}, {"a", spA_}},
+                   conic_options);
     if (verbose_) {
       userOut() << "Allocated QP solver." << endl;
     }
@@ -704,7 +704,7 @@ namespace casadi {
     if (gauss_newton_) {
       alloc_w(ngn_); // casadi_mul to get GN Hessian
     }
-    alloc(qpsol_);
+    alloc(conic_);
   }
 
   void Scpgen::init_memory(void* mem) const {
@@ -1198,23 +1198,23 @@ namespace casadi {
     casadi_axpy(ng_, -1., m->qpB, m->qp_uba);
 
     // Inputs
-    fill_n(m->arg, qpsol_.n_in(), nullptr);
-    m->arg[QPSOL_H] = m->qpH;
-    m->arg[QPSOL_G] = m->gfk;
-    m->arg[QPSOL_A] = m->qpA;
-    m->arg[QPSOL_LBX] = m->qp_lbx;
-    m->arg[QPSOL_UBX] = m->qp_ubx;
-    m->arg[QPSOL_LBA] = m->qp_lba;
-    m->arg[QPSOL_UBA] = m->qp_uba;
+    fill_n(m->arg, conic_.n_in(), nullptr);
+    m->arg[CONIC_H] = m->qpH;
+    m->arg[CONIC_G] = m->gfk;
+    m->arg[CONIC_A] = m->qpA;
+    m->arg[CONIC_LBX] = m->qp_lbx;
+    m->arg[CONIC_UBX] = m->qp_ubx;
+    m->arg[CONIC_LBA] = m->qp_lba;
+    m->arg[CONIC_UBA] = m->qp_uba;
 
     // Outputs
-    fill_n(m->res, qpsol_.n_out(), nullptr);
-    m->res[QPSOL_X] = m->dxk; // Condensed primal step
-    m->res[QPSOL_LAM_X] = m->dlam_xk; // Multipliers (simple bounds)
-    m->res[QPSOL_LAM_A] = m->dlam_gk; // Multipliers (linear bounds)
+    fill_n(m->res, conic_.n_out(), nullptr);
+    m->res[CONIC_X] = m->dxk; // Condensed primal step
+    m->res[CONIC_LAM_X] = m->dlam_xk; // Multipliers (simple bounds)
+    m->res[CONIC_LAM_A] = m->dlam_gk; // Multipliers (linear bounds)
 
     // Solve the QP
-    qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    conic_(m->arg, m->res, m->iw, m->w, 0);
 
     // Calculate penalty parameter of merit function
     m->sigma = merit_start_;

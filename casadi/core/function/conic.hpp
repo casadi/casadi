@@ -23,14 +23,14 @@
  */
 
 
-#ifndef CASADI_QPSOL_HPP
-#define CASADI_QPSOL_HPP
+#ifndef CASADI_CONIC_HPP
+#define CASADI_CONIC_HPP
 
 #include "oracle.hpp"
 
 namespace casadi {
 
-  /** \defgroup main_qpsol
+  /** \defgroup main_conic
       Create a QP solver
       Solves the following strictly convex problem:
 
@@ -55,24 +55,24 @@ namespace casadi {
 
       \endverbatim
 
-      \generalsection{Qpsol}
-      \pluginssection{Qpsol}
+      \generalsection{Conic}
+      \pluginssection{Conic}
 
       \author Joel Andersson
       \date 2011-2015
   */
 
-  /** \defgroup qpsol
-  * @copydoc main_qpsol
+  /** \defgroup conic
+  * @copydoc main_conic
   *  @{
   */
 
   /** \if EXPANDED
-  * @copydoc main_qpsol
+  * @copydoc main_conic
   * \endif
   */
   ///@{
-  CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
+  CASADI_EXPORT Function conic(const std::string& name, const std::string& solver,
                                const SpDict& qp, const Dict& opts=Dict());
   CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
                                const SXDict& qp, const Dict& opts=Dict());
@@ -81,33 +81,33 @@ namespace casadi {
   ///@}
 
   /** \brief Get input scheme of QP solvers */
-  CASADI_EXPORT std::vector<std::string> qpsol_in();
+  CASADI_EXPORT std::vector<std::string> conic_in();
 
   /** \brief Get QP solver output scheme of QP solvers */
-  CASADI_EXPORT std::vector<std::string> qpsol_out();
+  CASADI_EXPORT std::vector<std::string> conic_out();
 
   /** \brief Get QP solver input scheme name by index */
-  CASADI_EXPORT std::string qpsol_in(int ind);
+  CASADI_EXPORT std::string conic_in(int ind);
 
   /** \brief Get output scheme name by index */
-  CASADI_EXPORT std::string qpsol_out(int ind);
+  CASADI_EXPORT std::string conic_out(int ind);
 
   /** \brief Get the number of QP solver inputs */
-  CASADI_EXPORT int qpsol_n_in();
+  CASADI_EXPORT int conic_n_in();
 
   /** \brief Get the number of QP solver outputs */
-  CASADI_EXPORT int qpsol_n_out();
+  CASADI_EXPORT int conic_n_out();
 
   /// Check if a particular plugin is available
-  CASADI_EXPORT bool has_qpsol(const std::string& name);
+  CASADI_EXPORT bool has_conic(const std::string& name);
 
   /// Explicitly load a plugin dynamically
-  CASADI_EXPORT void load_qpsol(const std::string& name);
+  CASADI_EXPORT void load_conic(const std::string& name);
 
   /// Get the documentation string for a plugin
-  CASADI_EXPORT std::string doc_qpsol(const std::string& name);
+  CASADI_EXPORT std::string doc_conic(const std::string& name);
 
   /** @} */
 } // namespace casadi
 
-#endif // CASADI_QPSOL_HPP
+#endif // CASADI_CONIC_HPP

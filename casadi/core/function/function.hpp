@@ -1010,10 +1010,10 @@ namespace casadi {
     Function integrator_dae();
 
     /** Generate native code in the interfaced language for debugging */
-    void qpsol_debug(const std::string &filename) const;
+    void conic_debug(const std::string &filename) const;
 
     /** Generate native code in the interfaced language for debugging */
-    void qpsol_debug(std::ostream &file) const;
+    void conic_debug(std::ostream &file) const;
 
 #ifndef SWIG
     protected:

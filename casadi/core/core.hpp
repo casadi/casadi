@@ -47,7 +47,7 @@
 #include "function/compiler.hpp"
 #include "function/callback.hpp"
 #include "function/integrator.hpp"
-#include "function/qpsol.hpp"
+#include "function/conic.hpp"
 #include "function/nlpsol.hpp"
 #include "function/rootfinder.hpp"
 #include "function/linsol.hpp"

@@ -45,9 +45,9 @@ if has_nlpsol("ipopt"):
 #  solvers.append(("snopt",{"snopt.Verify_level": 3,"detect_linear": True,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}))
 
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
-  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint"} }
-  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
-  solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
+  conic_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint"} }
+  solvers.append(("sqpmethod",{"conic": "nlpsol","conic_options": conic_options}))
+  solvers.append(("sqpmethod",{"conic": "nlpsol","conic_options": conic_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
 
 print solvers
 """

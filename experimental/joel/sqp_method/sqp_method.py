@@ -119,7 +119,7 @@ sqpsol.setOption("qpsol",QPOasesSolver)
 sqpsol.setOption("qpsol_options",{"printLevel" : "low"})
 
 # OOQP
-#sqpsol.setOption("qpsol",OOQpsol)
+#sqpsol.setOption("qpsol",OOConic)
 
 sqpsol.init()
 sqpsol.setInput(umin,     "lbx")
@@ -182,11 +182,11 @@ qpsol = QPOasesSolver(H_sparsity,A_sparsity)
 qpsol.setOption("printLevel","low")
 
 # IPOPT
-#qpsol =  NLPQpsol(H_sparsity,A_sparsity)
+#qpsol =  NLPConic(H_sparsity,A_sparsity)
 #qpsol.setOption("nlp_solver", IpoptSolver)
 
 # OOQP
-#qpsol = OOQpsol(H_sparsity,A_sparsity)
+#qpsol = OOConic(H_sparsity,A_sparsity)
 
 qpsol.init()
 

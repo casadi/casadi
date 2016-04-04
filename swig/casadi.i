@@ -326,7 +326,7 @@ import_array();
     bool is_null(GUESTOBJECT *p);
 
     /* Typemaps from CasADi types to types in the interfaced language:
-     * 
+     *
      * to_ptr: Converts a pointer in interfaced language to C++:
      *   Input: GUESTOBJECT pointer p
      *   Output: Pointer to pointer: At input, pointer to pointer to temporary
@@ -3422,7 +3422,7 @@ namespace casadi{
 %include <casadi/core/function/external.hpp>
 %include <casadi/core/function/jit.hpp>
 %include <casadi/core/function/integrator.hpp>
-%include <casadi/core/function/qpsol.hpp>
+%include <casadi/core/function/conic.hpp>
 %include <casadi/core/function/nlpsol.hpp>
 %include <casadi/core/function/rootfinder.hpp>
 %include <casadi/core/function/linsol.hpp>

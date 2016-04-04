@@ -99,7 +99,7 @@ set(CASADI_SRCS
   function/rootfinder.hpp          function/rootfinder_impl.hpp    function/rootfinder.cpp
   function/integrator.hpp          function/integrator_impl.hpp    function/integrator.cpp
   function/nlpsol.hpp              function/nlpsol_impl.hpp        function/nlpsol.cpp
-  function/qpsol.hpp               function/qpsol_impl.hpp         function/qpsol.cpp
+  function/conic.hpp               function/conic_impl.hpp         function/conic.cpp
   function/code_generator.hpp      function/code_generator.cpp
   function/switch.hpp              function/switch.cpp
   function/map.hpp                 function/map.cpp

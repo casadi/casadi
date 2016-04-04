@@ -36,10 +36,10 @@ gauss_newton = False
 
 # QP-solver
 if False:
-  QpsolClass = OOQpsol
+  ConicClass = OOConic
   qpsol_options = {}
 else:
-  QpsolClass = QPOasesSolver
+  ConicClass = QPOasesSolver
   qpsol_options = {"printLevel" : "none"}
 
 # Initial condition
@@ -296,7 +296,7 @@ for (i,x0) in enumerate([0.08]):
 
     if k==0:
       # Allocate a QP solver
-      qpsol = QpsolClass(H.sparsity(),A.sparsity())
+      qpsol = ConicClass(H.sparsity(),A.sparsity())
       qpsol.setOption(qpsol_options)
       qpsol.init()
 

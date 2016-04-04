@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOL_GUROBI_EXPORT
-  casadi_register_qpsol_gurobi(Qpsol::Plugin* plugin) {
+  int CASADI_CONIC_GUROBI_EXPORT
+  casadi_register_conic_gurobi(Conic::Plugin* plugin) {
     plugin->creator = GurobiInterface::creator;
     plugin->name = "gurobi";
     plugin->doc = GurobiInterface::meta_doc.c_str();
@@ -40,13 +40,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOL_GUROBI_EXPORT casadi_load_qpsol_gurobi() {
-    Qpsol::registerPlugin(casadi_register_qpsol_gurobi);
+  void CASADI_CONIC_GUROBI_EXPORT casadi_load_conic_gurobi() {
+    Conic::registerPlugin(casadi_register_conic_gurobi);
   }
 
   GurobiInterface::GurobiInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
-    : Qpsol(name, st) {
+    : Conic(name, st) {
   }
 
   GurobiInterface::~GurobiInterface() {
@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   Options GurobiInterface::options_
-  = {{&Qpsol::options_},
+  = {{&Conic::options_},
      {{"vtype",
        {OT_STRINGVECTOR,
         "Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]"}}
@@ -63,7 +63,7 @@ namespace casadi {
 
   void GurobiInterface::init(const Dict& opts) {
     // Initialize the base classes
-    Qpsol::init(opts);
+    Conic::init(opts);
 
     // Default options
     std::vector<std::string> vtype;
@@ -116,21 +116,21 @@ namespace casadi {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Inputs
-    const double *h=arg[QPSOL_H],
-      *g=arg[QPSOL_G],
-      *a=arg[QPSOL_A],
-      *lba=arg[QPSOL_LBA],
-      *uba=arg[QPSOL_UBA],
-      *lbx=arg[QPSOL_LBX],
-      *ubx=arg[QPSOL_UBX],
-      *x0=arg[QPSOL_X0],
-      *lam_x0=arg[QPSOL_LAM_X0];
+    const double *h=arg[CONIC_H],
+      *g=arg[CONIC_G],
+      *a=arg[CONIC_A],
+      *lba=arg[CONIC_LBA],
+      *uba=arg[CONIC_UBA],
+      *lbx=arg[CONIC_LBX],
+      *ubx=arg[CONIC_UBX],
+      *x0=arg[CONIC_X0],
+      *lam_x0=arg[CONIC_LAM_X0];
 
     // Outputs
-    double *x=res[QPSOL_X],
-      *cost=res[QPSOL_COST],
-      *lam_a=res[QPSOL_LAM_A],
-      *lam_x=res[QPSOL_LAM_X];
+    double *x=res[CONIC_X],
+      *cost=res[CONIC_COST],
+      *lam_a=res[CONIC_LAM_A],
+      *lam_x=res[CONIC_LAM_X];
 
     // Temporary memory
     double *val=w; w+=n_;
@@ -172,7 +172,7 @@ namespace casadi {
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
 
       // Add quadratic terms
-      const int *H_colind=sparsity_in(QPSOL_H).colind(), *H_row=sparsity_in(QPSOL_H).row();
+      const int *H_colind=sparsity_in(CONIC_H).colind(), *H_row=sparsity_in(CONIC_H).row();
       for (int i=0; i<n_; ++i) {
 
         // Quadratic term nonzero indices
@@ -199,7 +199,7 @@ namespace casadi {
       }
 
       // Add constraints
-      const int *A_colind=sparsity_in(QPSOL_A).colind(), *A_row=sparsity_in(QPSOL_A).row();
+      const int *A_colind=sparsity_in(CONIC_A).colind(), *A_row=sparsity_in(CONIC_A).row();
       casadi_copy(A_colind, n_, tr_ind);
       for (int i=0; i<nc_; ++i) {
         // Get bounds

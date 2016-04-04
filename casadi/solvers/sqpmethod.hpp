@@ -132,7 +132,7 @@ namespace casadi {
     virtual void solve(void* mem) const;
 
     /// QP solver for the subproblems
-    Function qpsol_;
+    Function conic_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -177,8 +177,8 @@ namespace casadi {
     /// Regularization
     bool regularize_;
 
-    /// Access Qpsol
-    const Function getQpsol() const { return qpsol_;}
+    /// Access Conic
+    const Function getConic() const { return conic_;}
 
     /// Print iteration header
     void printIteration(std::ostream &stream) const;

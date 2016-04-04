@@ -174,7 +174,7 @@ namespace casadi {
     void eval_exp(ScpgenMemory* m) const;
 
     /// QP solver for the subproblems
-    Function qpsol_;
+    Function conic_;
 
     /// use Gauss-Newton Hessian
     bool gauss_newton_;
@@ -212,8 +212,8 @@ namespace casadi {
     /// Enable Code generation
     bool codegen_;
 
-    /// Access Qpsol
-    const Function getQpsol() const { return qpsol_;}
+    /// Access Conic
+    const Function getConic() const { return conic_;}
 
     /// Regularization
     bool regularize_;

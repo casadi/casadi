@@ -29,9 +29,9 @@
 <tr><td>LINSOL_B</td><td></td><td>The right-hand-side matrix b: dense, (n x m)</td></tr>
 </table>
 */
-/** \defgroup scheme_QpsolOutput
+/** \defgroup scheme_ConicOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::QpsolOutput  (QPSOL_NUM_OUT = 4) []</caption>
+<caption>Output scheme: casadi::ConicOutput  (QPSOL_NUM_OUT = 4) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>QPSOL_X</td><td></td><td>The primal solution.</td></tr>
 <tr><td>QPSOL_COST</td><td></td><td>The optimal cost.</td></tr>
@@ -139,9 +139,9 @@
 <tr><td>RDAE_QUAD</td><td></td><td>Right hand side of quadratures.</td></tr>
 </table>
 */
-/** \defgroup scheme_QpsolInput
+/** \defgroup scheme_ConicInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::QpsolInput  (QPSOL_NUM_IN = 9) []</caption>
+<caption>Input scheme: casadi::ConicInput  (QPSOL_NUM_IN = 9) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>QPSOL_H</td><td></td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
 <tr><td>QPSOL_G</td><td></td><td>The vector g: dense, (n x 1)</td></tr>

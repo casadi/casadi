@@ -23,29 +23,29 @@
  */
 
 
-#ifndef CASADI_QPSOL_IMPL_HPP
-#define CASADI_QPSOL_IMPL_HPP
+#ifndef CASADI_CONIC_IMPL_HPP
+#define CASADI_CONIC_IMPL_HPP
 
-#include "qpsol.hpp"
+#include "conic.hpp"
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
   /// Internal class
-  class CASADI_EXPORT Qpsol : public FunctionInternal, public PluginInterface<Qpsol> {
+  class CASADI_EXPORT Conic : public FunctionInternal, public PluginInterface<Conic> {
   public:
 
     // Constructor
-    Qpsol(const std::string& name, const std::map<std::string, Sparsity> &st);
+    Conic(const std::string& name, const std::map<std::string, Sparsity> &st);
 
     // Destructor
-    virtual ~Qpsol() = 0;
+    virtual ~Conic() = 0;
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    virtual size_t get_n_in() { return QPSOL_NUM_IN;}
-    virtual size_t get_n_out() { return QPSOL_NUM_OUT;}
+    virtual size_t get_n_in() { return CONIC_NUM_IN;}
+    virtual size_t get_n_out() { return CONIC_NUM_OUT;}
     ///@}
 
     /// @{
@@ -56,8 +56,8 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i) { return qpsol_in(i);}
-    virtual std::string get_name_out(int i) { return qpsol_out(i);}
+    virtual std::string get_name_in(int i) { return conic_in(i);}
+    virtual std::string get_name_out(int i) { return conic_out(i);}
     /// @}
 
     ///@{
@@ -77,7 +77,7 @@ namespace casadi {
     virtual void generateNativeCode(std::ostream& file) const;
 
     // Creator function for internal class
-    typedef Qpsol* (*Creator)(const std::string& name,
+    typedef Conic* (*Creator)(const std::string& name,
                               const std::map<std::string, Sparsity>& st);
 
     // No static functions exposed
@@ -90,7 +90,7 @@ namespace casadi {
     static const std::string infix_;
 
     /// Short name
-    static std::string shortname() { return "qpsol";}
+    static std::string shortname() { return "conic";}
 
     /** \brief Get default input value */
     virtual double default_in(int ind) const;
@@ -115,4 +115,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_QPSOL_IMPL_HPP
+#endif // CASADI_CONIC_IMPL_HPP

@@ -39,8 +39,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOL_OOQP_EXPORT
-  casadi_register_qpsol_ooqp(Qpsol::Plugin* plugin) {
+  int CASADI_CONIC_OOQP_EXPORT
+  casadi_register_conic_ooqp(Conic::Plugin* plugin) {
     plugin->creator = OoqpInterface::creator;
     plugin->name = "ooqp";
     plugin->doc = OoqpInterface::meta_doc.c_str();
@@ -49,20 +49,20 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOL_OOQP_EXPORT casadi_load_qpsol_ooqp() {
-    Qpsol::registerPlugin(casadi_register_qpsol_ooqp);
+  void CASADI_CONIC_OOQP_EXPORT casadi_load_conic_ooqp() {
+    Conic::registerPlugin(casadi_register_conic_ooqp);
   }
 
   OoqpInterface::OoqpInterface(const std::string& name,
                                const std::map<std::string, Sparsity>& st)
-    : Qpsol(name, st) {
+    : Conic(name, st) {
   }
 
   OoqpInterface::~OoqpInterface() {
   }
 
   Options OoqpInterface::options_
-  = {{&Qpsol::options_},
+  = {{&Conic::options_},
      {{"print_level",
        {OT_INT,
         "Print level. OOQP listens to print_level 0, 10 and 100"}},
@@ -77,7 +77,7 @@ namespace casadi {
 
   void OoqpInterface::init(const Dict& opts) {
     // Initialize the base classes
-    Qpsol::init(opts);
+    Conic::init(opts);
 
     // Default options
     print_level_ = 0;
@@ -96,10 +96,10 @@ namespace casadi {
     }
 
     // Allocate memory for problem
-    nQ_ = sparsity_in(QPSOL_H).nnz_upper();
-    nA_ = nnz_in(QPSOL_A);
-    nH_ = nnz_in(QPSOL_H);
-    spAT_ = sparsity_in(QPSOL_A).T();
+    nQ_ = sparsity_in(CONIC_H).nnz_upper();
+    nA_ = nnz_in(CONIC_A);
+    nH_ = nnz_in(CONIC_H);
+    spAT_ = sparsity_in(CONIC_A).T();
 
     // Allocate work vectors
     alloc_w(n_, true); // g
@@ -145,24 +145,24 @@ namespace casadi {
   void OoqpInterface::
   eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
     if (inputs_check_) {
-      checkInputs(arg[QPSOL_LBX], arg[QPSOL_UBX], arg[QPSOL_LBA], arg[QPSOL_UBA]);
+      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Get problem data
     double* g=w; w += n_;
-    casadi_copy(arg[QPSOL_G], n_, g);
+    casadi_copy(arg[CONIC_G], n_, g);
     double* lbx=w; w += n_;
-    casadi_copy(arg[QPSOL_LBX], n_, lbx);
+    casadi_copy(arg[CONIC_LBX], n_, lbx);
     double* ubx=w; w += n_;
-    casadi_copy(arg[QPSOL_UBX], n_, ubx);
+    casadi_copy(arg[CONIC_UBX], n_, ubx);
     double* lba=w; w += nc_;
-    casadi_copy(arg[QPSOL_LBA], nc_, lba);
+    casadi_copy(arg[CONIC_LBA], nc_, lba);
     double* uba=w; w += nc_;
-    casadi_copy(arg[QPSOL_UBA], nc_, uba);
-    double* H=w; w += nnz_in(QPSOL_H);
-    casadi_copy(arg[QPSOL_H], nnz_in(QPSOL_H), H);
-    double* A=w; w += nnz_in(QPSOL_A);
-    casadi_copy(arg[QPSOL_A], nnz_in(QPSOL_A), A);
+    casadi_copy(arg[CONIC_UBA], nc_, uba);
+    double* H=w; w += nnz_in(CONIC_H);
+    casadi_copy(arg[CONIC_H], nnz_in(CONIC_H), H);
+    double* A=w; w += nnz_in(CONIC_A);
+    casadi_copy(arg[CONIC_A], nnz_in(CONIC_A), A);
 
     // Temporary memory
     double* c_ = w; w += n_;
@@ -234,8 +234,8 @@ namespace casadi {
     }
 
     // Get quadratic term
-    const int* H_colind = sparsity_in(QPSOL_H).colind();
-    const int* H_row = sparsity_in(QPSOL_H).row();
+    const int* H_colind = sparsity_in(CONIC_H).colind();
+    const int* H_row = sparsity_in(CONIC_H).row();
     int nnzQ = 0;
     // Loop over the columns of the quadratic term
     for (int cc=0; cc<n_; ++cc) {
@@ -274,11 +274,11 @@ namespace casadi {
     }
 
     // Get the transpose of the sparsity pattern to be able to loop over the constraints
-    casadi_trans(A, sparsity_in(QPSOL_A), AT, spAT_, iw);
+    casadi_trans(A, sparsity_in(CONIC_A), AT, spAT_, iw);
 
     // Loop over constraints
-    const int* A_colind = sparsity_in(QPSOL_A).colind();
-    const int* A_row = sparsity_in(QPSOL_A).row();
+    const int* A_colind = sparsity_in(CONIC_A).colind();
+    const int* A_row = sparsity_in(CONIC_A).row();
     const int* AT_colind = spAT_.colind();
     const int* AT_row = spAT_.row();
     int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
@@ -354,7 +354,7 @@ namespace casadi {
 
     int ierr;
     if (false) { // Use C interface
-      // TODO(jgillis): Change to qpsolvehb, see OOQP users guide
+      // TODO(jgillis): Change to conicvehb, see OOQP users guide
       qpsolvesp(c_, nx,
                 irowQ_,  nnzQ, jcolQ_, dQ_,
                 xlow_, ixlow_,
@@ -455,16 +455,16 @@ namespace casadi {
     }
 
     // Save optimal cost
-    if (res[QPSOL_COST]) *res[QPSOL_COST] = objectiveValue + objParam;
+    if (res[CONIC_COST]) *res[CONIC_COST] = objectiveValue + objParam;
 
     // Save primal solution
-    casadi_copy(x_, n_, res[QPSOL_X]);
+    casadi_copy(x_, n_, res[CONIC_X]);
 
     // Save dual solution (linear bounds)
-    casadi_copy(lambda_, nc_, res[QPSOL_LAM_A]);
+    casadi_copy(lambda_, nc_, res[CONIC_LAM_A]);
 
     // Save dual solution (simple bounds)
-    casadi_copy(gamma_, n_, res[QPSOL_LAM_X]);
+    casadi_copy(gamma_, n_, res[CONIC_LAM_X]);
   }
 
   const char* OoqpInterface::errFlag(int flag) {

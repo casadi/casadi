@@ -30,8 +30,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_QPSOL_NLPSOL_EXPORT
-  casadi_register_qpsol_nlpsol(Qpsol::Plugin* plugin) {
+  int CASADI_CONIC_NLPSOL_EXPORT
+  casadi_register_conic_nlpsol(Conic::Plugin* plugin) {
     plugin->creator = QpToNlp::creator;
     plugin->name = "nlpsol";
     plugin->doc = QpToNlp::meta_doc.c_str();
@@ -40,19 +40,19 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_QPSOL_NLPSOL_EXPORT casadi_load_qpsol_nlpsol() {
-    Qpsol::registerPlugin(casadi_register_qpsol_nlpsol);
+  void CASADI_CONIC_NLPSOL_EXPORT casadi_load_conic_nlpsol() {
+    Conic::registerPlugin(casadi_register_conic_nlpsol);
   }
 
   QpToNlp::QpToNlp(const std::string& name, const std::map<std::string, Sparsity> &st)
-    : Qpsol(name, st) {
+    : Conic(name, st) {
   }
 
   QpToNlp::~QpToNlp() {
   }
 
   Options QpToNlp::options_
-  = {{&Qpsol::options_},
+  = {{&Conic::options_},
      {{"nlpsol",
        {OT_STRING,
         "Name of solver."}},
@@ -64,7 +64,7 @@ namespace casadi {
 
   void QpToNlp::init(const Dict& opts) {
     // Initialize the base classes
-    Qpsol::init(opts);
+    Conic::init(opts);
 
     // Default options
     string nlpsol_plugin;
@@ -83,9 +83,9 @@ namespace casadi {
     SX X = SX::sym("X", n_, 1);
 
     // Parameters to the problem
-    SX H = SX::sym("H", sparsity_in(QPSOL_H));
-    SX G = SX::sym("G", sparsity_in(QPSOL_G));
-    SX A = SX::sym("A", sparsity_in(QPSOL_A));
+    SX H = SX::sym("H", sparsity_in(CONIC_H));
+    SX G = SX::sym("G", sparsity_in(CONIC_G));
+    SX A = SX::sym("A", sparsity_in(CONIC_A));
 
     // Put parameters in a vector
     std::vector<SX> par;
@@ -115,20 +115,20 @@ namespace casadi {
     double *x_, *f_, *lam_a_, *lam_x_;
 
     // Get input pointers
-    h_ = arg[QPSOL_H];
-    g_ = arg[QPSOL_G];
-    a_ = arg[QPSOL_A];
-    lba_ = arg[QPSOL_LBA];
-    uba_ = arg[QPSOL_UBA];
-    lbx_ = arg[QPSOL_LBX];
-    ubx_ = arg[QPSOL_UBX];
-    x0_ = arg[QPSOL_X0];
+    h_ = arg[CONIC_H];
+    g_ = arg[CONIC_G];
+    a_ = arg[CONIC_A];
+    lba_ = arg[CONIC_LBA];
+    uba_ = arg[CONIC_UBA];
+    lbx_ = arg[CONIC_LBX];
+    ubx_ = arg[CONIC_UBX];
+    x0_ = arg[CONIC_X0];
 
     // Get output pointers
-    x_ = res[QPSOL_X];
-    f_ = res[QPSOL_COST];
-    lam_a_ = res[QPSOL_LAM_A];
-    lam_x_ = res[QPSOL_LAM_X];
+    x_ = res[CONIC_X];
+    f_ = res[CONIC_COST];
+    lam_a_ = res[CONIC_LAM_A];
+    lam_x_ = res[CONIC_LAM_X];
 
     // Buffers for calling the NLP solver
     const double** arg1 = arg + n_in();
@@ -147,7 +147,7 @@ namespace casadi {
     arg1[NLPSOL_P] = w;
 
     // Quadratic term
-    int nh = nnz_in(QPSOL_H);
+    int nh = nnz_in(CONIC_H);
     if (h_) {
       copy_n(h_, nh, w);
     } else {
@@ -156,7 +156,7 @@ namespace casadi {
     w += nh;
 
     // Linear objective term
-    int ng = nnz_in(QPSOL_G);
+    int ng = nnz_in(CONIC_G);
     if (g_) {
       copy_n(g_, ng, w);
     } else {
@@ -165,7 +165,7 @@ namespace casadi {
     w += ng;
 
     // Linear constraints
-    int na = nnz_in(QPSOL_A);
+    int na = nnz_in(CONIC_A);
     if (a_) {
       copy_n(a_, na, w);
     } else {

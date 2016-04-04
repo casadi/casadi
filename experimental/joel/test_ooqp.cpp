@@ -58,7 +58,7 @@ int main() {
   ubA(0) = 2.0;
   
   for(int rep=0; rep<2; ++rep){
-    OOQpsol qpsol(H.sparsity(), A.sparsity());
+    OOConic qpsol(H.sparsity(), A.sparsity());
     qpsol.init();
     qpsol.setInput(A,"a");
     qpsol.setInput(H,"h");
