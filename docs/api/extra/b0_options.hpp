@@ -1686,8 +1686,6 @@
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Scpgen</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Scpgen</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
-<tr><td>conic</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Scpgen</td></tr>
-<tr><td>conic_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Scpgen</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
@@ -1704,6 +1702,8 @@
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Scpgen</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_x</td><td>OT_INTVECTOR</td><td>Which variables to print.</td><td>casadi::Scpgen</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Scpgen</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Scpgen</td></tr>
 <tr><td>reg_threshold</td><td>OT_DOUBLE</td><td>Threshold for the regularization.</td><td>casadi::Scpgen</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Scpgen</td></tr>
@@ -1724,8 +1724,6 @@
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td></tr>
-<tr><td>conic</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td></tr>
-<tr><td>conic_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INT</td><td>Size of L-BFGS memory.</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td></tr>
@@ -1735,6 +1733,8 @@
 <tr><td>name_x</td><td>OT_STRINGVECTOR</td><td>Names of the variables.</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td></tr>
 <tr><td>print_x</td><td>OT_INTVECTOR</td><td>Which variables to print.</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td></tr>
 <tr><td>reg_threshold</td><td>OT_DOUBLE</td><td>Threshold for the regularization.</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td></tr>
@@ -1752,8 +1752,6 @@
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Scpgen</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Scpgen</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
-<tr><td>conic</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Scpgen</td></tr>
-<tr><td>conic_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Scpgen</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
@@ -1770,6 +1768,8 @@
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Scpgen</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_x</td><td>OT_INTVECTOR</td><td>Which variables to print.</td><td>casadi::Scpgen</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Scpgen</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Scpgen</td></tr>
 <tr><td>reg_threshold</td><td>OT_DOUBLE</td><td>Threshold for the regularization.</td><td>casadi::Scpgen</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Scpgen</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Scpgen</td></tr>
@@ -1871,8 +1871,6 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Sqpmethod</td></tr>
-<tr><td>conic</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Sqpmethod</td></tr>
-<tr><td>conic_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
@@ -1887,6 +1885,8 @@
 <tr><td>min_step_size</td><td>OT_DOUBLE</td><td>The size (inf-norm) of the step size should not become smaller than this.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Sqpmethod</td></tr>
@@ -1903,8 +1903,6 @@
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td></tr>
-<tr><td>conic</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td></tr>
-<tr><td>conic_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td></tr>
 <tr><td>lbfgs_memory</td><td>OT_INT</td><td>Size of L-BFGS memory.</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td></tr>
@@ -1912,6 +1910,8 @@
 <tr><td>merit_memory</td><td>OT_INT</td><td>Size of memory to store history of merit function values</td></tr>
 <tr><td>min_step_size</td><td>OT_DOUBLE</td><td>The size (inf-norm) of the step size should not become smaller than this.</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td></tr>
@@ -1925,8 +1925,6 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Sqpmethod</td></tr>
-<tr><td>conic</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Sqpmethod</td></tr>
-<tr><td>conic_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
@@ -1941,6 +1939,8 @@
 <tr><td>min_step_size</td><td>OT_DOUBLE</td><td>The size (inf-norm) of the step size should not become smaller than this.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::Nlpsol</td></tr>
+<tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>regularize</td><td>OT_BOOL</td><td>Automatic regularization of Lagrange Hessian.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_du</td><td>OT_DOUBLE</td><td>Stopping criterion for dual infeasability</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>tol_pr</td><td>OT_DOUBLE</td><td>Stopping criterion for primal infeasibility</td><td>casadi::Sqpmethod</td></tr>

@@ -13121,12 +13121,6 @@ sequential convex programming) method for nonlinear programming.
 +------------------------+------------------------+------------------------+
 | codegen                | OT_BOOL                | C-code generation      |
 +------------------------+------------------------+------------------------+
-| conic                  | OT_STRING              | The QP solver to be    |
-|                        |                        | used by the SQP method |
-+------------------------+------------------------+------------------------+
-| conic_options          | OT_DICT                | Options to be passed   |
-|                        |                        | to the QP solver       |
-+------------------------+------------------------+------------------------+
 | hessian_approximation  | OT_STRING              | gauss-newton|exact     |
 +------------------------+------------------------+------------------------+
 | lbfgs_memory           | OT_INT                 | Size of L-BFGS memory. |
@@ -13153,6 +13147,12 @@ sequential convex programming) method for nonlinear programming.
 +------------------------+------------------------+------------------------+
 | print_x                | OT_INTVECTOR           | Which variables to     |
 |                        |                        | print.                 |
++------------------------+------------------------+------------------------+
+| qpsol                  | OT_STRING              | The QP solver to be    |
+|                        |                        | used by the SQP method |
++------------------------+------------------------+------------------------+
+| qpsol_options          | OT_DICT                | Options to be passed   |
+|                        |                        | to the QP solver       |
 +------------------------+------------------------+------------------------+
 | reg_threshold          | OT_DOUBLE              | Threshold for the      |
 |                        |                        | regularization.        |
@@ -13200,12 +13200,6 @@ A textbook SQPMethod
 |                        |                        | coefficient of         |
 |                        |                        | decrease in merit      |
 +------------------------+------------------------+------------------------+
-| conic                  | OT_STRING              | The QP solver to be    |
-|                        |                        | used by the SQP method |
-+------------------------+------------------------+------------------------+
-| conic_options          | OT_DICT                | Options to be passed   |
-|                        |                        | to the QP solver       |
-+------------------------+------------------------+------------------------+
 | hessian_approximation  | OT_STRING              | limited-memory|exact   |
 +------------------------+------------------------+------------------------+
 | lbfgs_memory           | OT_INT                 | Size of L-BFGS memory. |
@@ -13227,6 +13221,12 @@ A textbook SQPMethod
 +------------------------+------------------------+------------------------+
 | print_header           | OT_BOOL                | Print the header with  |
 |                        |                        | problem statistics     |
++------------------------+------------------------+------------------------+
+| qpsol                  | OT_STRING              | The QP solver to be    |
+|                        |                        | used by the SQP method |
++------------------------+------------------------+------------------------+
+| qpsol_options          | OT_DICT                | Options to be passed   |
+|                        |                        | to the QP solver       |
 +------------------------+------------------------+------------------------+
 | regularize             | OT_BOOL                | Automatic              |
 |                        |                        | regularization of      |
