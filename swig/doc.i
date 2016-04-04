@@ -632,6 +632,20 @@ corresponding to the Hessian and the gradients.
 
 ";
 
+%feature("docstring")  casadi::Function::conic_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::conic_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
 %feature("docstring")  casadi::Function::linsol_cholesky(bool tr=false, int
 mem=0) const  "
 
@@ -1151,20 +1165,6 @@ Generate the sparsity of a Jacobian block
 &sp, const std::string &iind, const std::string &oind, bool compact=false) "
 
 Generate the sparsity of a Jacobian block
-
-";
-
-%feature("docstring")  casadi::Function::qpsol_debug(const std::string
-&filename) const  "
-
-Generate native code in the interfaced language for debugging
-
-";
-
-%feature("docstring")  casadi::Function::qpsol_debug(std::ostream &file)
-const  "
-
-Generate native code in the interfaced language for debugging
 
 ";
 
@@ -1981,6 +1981,9 @@ Compiler factory (new syntax, includes initialization)
 
 
 // File: classcasadi_1_1Concat.xml
+
+
+// File: classcasadi_1_1Conic.xml
 
 
 // File: classcasadi_1_1Constant.xml
@@ -2887,20 +2890,6 @@ ownership, only weak references to the derivatives are kept internally.
 
 ";
 
-%feature("docstring")  casadi::Function::qpsol_debug(const std::string
-&filename) const  "
-
-Generate native code in the interfaced language for debugging
-
-";
-
-%feature("docstring")  casadi::Function::qpsol_debug(std::ostream &file)
-const  "
-
-Generate native code in the interfaced language for debugging
-
-";
-
 %feature("docstring")  casadi::Function::numel_out() const  "
 
 Get of number of output elements For a particular output or for all for all
@@ -3767,6 +3756,20 @@ Return a string with a representation (for SWIG)
 %feature("docstring")  casadi::Function::n_nodes() const  "
 
 Number of nodes in the algorithm.
+
+";
+
+%feature("docstring")  casadi::Function::conic_debug(const std::string
+&filename) const  "
+
+Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring")  casadi::Function::conic_debug(std::ostream &file)
+const  "
+
+Generate native code in the interfaced language for debugging
 
 ";
 
@@ -8155,9 +8158,6 @@ Return a string with a description (for SWIG)
 // File: classcasadi_1_1PureMap.xml
 
 
-// File: classcasadi_1_1Qpsol.xml
-
-
 // File: classcasadi_1_1QpToNlp.xml
 
 
@@ -10024,18 +10024,6 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring")  casadi::qpsol_in() "
-
-Get input scheme of QP solvers.
-
-";
-
-%feature("docstring")  casadi::qpsol_in(int ind) "
-
-Get QP solver input scheme name by index.
-
-";
-
 %feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
 
 Generate a hash value incrementally (function taken from boost)
@@ -10918,21 +10906,15 @@ std::string &solver, const Function &dae, const Dict &opts=Dict()) " ";
 std::string &solver, const std::pair< Function, Function > &dae, const Dict
 &opts=Dict()) " ";
 
-%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
-inc_x) " [INTERNAL]  IAMAX: index corresponding to the entry with the
-largest absolute value.
-
-";
-
 %feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
 
 Check if the vector has negative entries.
 
 ";
 
-%feature("docstring")  casadi::doc_qpsol(const std::string &name) "
-
-Get the documentation string for a plugin.
+%feature("docstring")  casadi::casadi_project(const real_t *x, const int
+*sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL]  Sparse copy: y
+<- x, w work vector (length >= number of rows)
 
 ";
 
@@ -10952,21 +10934,9 @@ Read matrix, matlab style.
 
 ";
 
-%feature("docstring")  casadi::qpsol_n_out() "
-
-Get the number of QP solver outputs.
-
-";
-
 %feature("docstring")  casadi::casadi_mtimes(const real_t *x, const int
 *sp_x, const real_t *y, const int *sp_y, real_t *z, const int *sp_z, real_t
 *w, int tr) " [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
-
-";
-
-%feature("docstring")  casadi::qpsol_n_in() "
-
-Get the number of QP solver inputs.
 
 ";
 
@@ -11399,6 +11369,18 @@ double *r, double *c, double *colcnd, double *rowcnd, double *amax, int
 
 ";
 
+%feature("docstring")  casadi::conic_in() "
+
+Get input scheme of QP solvers.
+
+";
+
+%feature("docstring")  casadi::conic_in(int ind) "
+
+Get QP solver input scheme name by index.
+
+";
+
 %feature("docstring")  casadi::lookupvector(const std::vector< int > &v, int
 size) "
 
@@ -11476,97 +11458,7 @@ scheme:  'radau' or 'legendre'
 
 ";
 
-%feature("docstring")  casadi::linsol_n_out() "
-
-Number of linear solver outputs.
-
-";
-
-%feature("docstring")  casadi::simpleIRK(Function f, int N=10, int order=4,
-const std::string &scheme="radau", const std::string &solver="newton", const
-Dict &solver_options=Dict()) "
-
-Construct an implicit Runge-Kutta integrator using a collocation scheme The
-constructed function has three inputs, corresponding to initial state (x0),
-parameter (p) and integration time (h) and one output, corresponding to
-final state (xf).
-
-Parameters:
------------
-
-f:  ODE function with two inputs (x and p) and one output (xdot)
-
-N:  Number of integrator steps
-
-order:  Order of interpolating polynomials
-
-scheme:  Collocation scheme, as excepted by collocationPoints function.
-
-";
-
-%feature("docstring")  casadi::ptrVec(std::vector< T > &v) " [INTERNAL]
-Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(const std::vector< T > &v) "
-[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(std::vector< std::vector< T > > &v) "
-[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
-
-";
-
-%feature("docstring")  casadi::ptrVec(const std::vector< std::vector< T > >
-&v) " [INTERNAL]  Convenience function, convert vectors to vectors of
-pointers.
-
-";
-
-%feature("docstring")  casadi::to_slice2(const std::vector< int > &v) "
-
-Construct nested slices from an index vector (requires is_slice2(v) to be
-true)
-
-";
-
-%feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
-char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
-int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
-
-";
-
-%feature("docstring")  casadi::casadi_axpy(int n, real_t alpha, const real_t
-*x, real_t *y) " [INTERNAL]  AXPY: y <- a*x + y.
-
-";
-
-%feature("docstring")  casadi::has_nlpsol(const std::string &name) "
-
-Check if a particular plugin is available.
-
-";
-
-%feature("docstring")  casadi::casadi_getu(const real_t *x, const int *sp_x,
-real_t *v) " [INTERNAL]  Get the nonzeros for the upper triangular half.
-
-";
-
-%feature("docstring")  casadi::doc_nlpsol(const std::string &name) "
-
-Get the documentation string for a plugin.
-
-";
-
-%feature("docstring")  casadi::isMonotone(const std::vector< T > &v) "
-
-Check if the vector is monotone.
-
-";
-
-%feature("docstring")  casadi::qpsol(const std::string &name, const
+%feature("docstring")  casadi::conic(const std::string &name, const
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
 Create a QP solver Solves the following strictly convex problem:
@@ -11677,7 +11569,7 @@ General information
 |                 |                 | the function    |                 |
 |                 |                 | name.           |                 |
 +-----------------+-----------------+-----------------+-----------------+
-| discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Qpsol   |
+| discrete        | OT_BOOLVECTOR   | Indicates which | casadi::Conic   |
 |                 |                 | of the          |                 |
 |                 |                 | variables are   |                 |
 |                 |                 | discrete, i.e.  |                 |
@@ -11768,50 +11660,50 @@ General information
 |                 |                 | debugging       |                 |
 +-----------------+-----------------+-----------------+-----------------+
 
->Input scheme: casadi::QpsolInput (QPSOL_NUM_IN = 9) []
+>Input scheme: casadi::ConicInput (CONIC_NUM_IN = 9) []
 
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
-| QPSOL_H                |                        | The square matrix H:   |
+| CONIC_H                |                        | The square matrix H:   |
 |                        |                        | sparse, (n x n). Only  |
 |                        |                        | the lower triangular   |
 |                        |                        | part is actually used. |
 |                        |                        | The matrix is assumed  |
 |                        |                        | to be symmetrical.     |
 +------------------------+------------------------+------------------------+
-| QPSOL_G                |                        | The vector g: dense,   |
+| CONIC_G                |                        | The vector g: dense,   |
 |                        |                        | (n x 1)                |
 +------------------------+------------------------+------------------------+
-| QPSOL_A                |                        | The matrix A: sparse,  |
+| CONIC_A                |                        | The matrix A: sparse,  |
 |                        |                        | (nc x n) - product     |
 |                        |                        | with x must be dense.  |
 +------------------------+------------------------+------------------------+
-| QPSOL_LBA              |                        | dense, (nc x 1)        |
+| CONIC_LBA              |                        | dense, (nc x 1)        |
 +------------------------+------------------------+------------------------+
-| QPSOL_UBA              |                        | dense, (nc x 1)        |
+| CONIC_UBA              |                        | dense, (nc x 1)        |
 +------------------------+------------------------+------------------------+
-| QPSOL_LBX              |                        | dense, (n x 1)         |
+| CONIC_LBX              |                        | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| QPSOL_UBX              |                        | dense, (n x 1)         |
+| CONIC_UBX              |                        | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| QPSOL_X0               |                        | dense, (n x 1)         |
+| CONIC_X0               |                        | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
-| QPSOL_LAM_X0           |                        | dense                  |
+| CONIC_LAM_X0           |                        | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QpsolOutput (QPSOL_NUM_OUT = 4) []
+>Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4) []
 
 +-------------+-------+---------------------------------------------------+
 |  Full name  | Short |                    Description                    |
 +=============+=======+===================================================+
-| QPSOL_X     |       | The primal solution.                              |
+| CONIC_X     |       | The primal solution.                              |
 +-------------+-------+---------------------------------------------------+
-| QPSOL_COST  |       | The optimal cost.                                 |
+| CONIC_COST  |       | The optimal cost.                                 |
 +-------------+-------+---------------------------------------------------+
-| QPSOL_LAM_A |       | The dual solution corresponding to linear bounds. |
+| CONIC_LAM_A |       | The dual solution corresponding to linear bounds. |
 +-------------+-------+---------------------------------------------------+
-| QPSOL_LAM_X |       | The dual solution corresponding to simple bounds. |
+| CONIC_LAM_X |       | The dual solution corresponding to simple bounds. |
 +-------------+-------+---------------------------------------------------+
 
 List of plugins
@@ -11834,7 +11726,7 @@ List of plugins
 Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
-Qpsol.doc(\"myextraplugin\")
+Conic.doc(\"myextraplugin\")
 
 
 
@@ -12135,6 +12027,102 @@ Joel Andersson
 
 ";
 
+%feature("docstring")  casadi::linsol_n_out() "
+
+Number of linear solver outputs.
+
+";
+
+%feature("docstring")  casadi::doc_integrator(const std::string &name) "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring")  casadi::simpleIRK(Function f, int N=10, int order=4,
+const std::string &scheme="radau", const std::string &solver="newton", const
+Dict &solver_options=Dict()) "
+
+Construct an implicit Runge-Kutta integrator using a collocation scheme The
+constructed function has three inputs, corresponding to initial state (x0),
+parameter (p) and integration time (h) and one output, corresponding to
+final state (xf).
+
+Parameters:
+-----------
+
+f:  ODE function with two inputs (x and p) and one output (xdot)
+
+N:  Number of integrator steps
+
+order:  Order of interpolating polynomials
+
+scheme:  Collocation scheme, as excepted by collocationPoints function.
+
+";
+
+%feature("docstring")  casadi::ptrVec(std::vector< T > &v) " [INTERNAL]
+Convenience function, convert vectors to vectors of pointers.
+
+";
+
+%feature("docstring")  casadi::ptrVec(const std::vector< T > &v) "
+[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
+
+";
+
+%feature("docstring")  casadi::ptrVec(std::vector< std::vector< T > > &v) "
+[INTERNAL]  Convenience function, convert vectors to vectors of pointers.
+
+";
+
+%feature("docstring")  casadi::ptrVec(const std::vector< std::vector< T > >
+&v) " [INTERNAL]  Convenience function, convert vectors to vectors of
+pointers.
+
+";
+
+%feature("docstring")  casadi::to_slice2(const std::vector< int > &v) "
+
+Construct nested slices from an index vector (requires is_slice2(v) to be
+true)
+
+";
+
+%feature("docstring")  casadi::dtrsm_(char *side, char *uplo, char *transa,
+char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b,
+int *ldb) " [INTERNAL]   Solve upper triangular system (lapack)
+
+";
+
+%feature("docstring")  casadi::casadi_axpy(int n, real_t alpha, const real_t
+*x, real_t *y) " [INTERNAL]  AXPY: y <- a*x + y.
+
+";
+
+%feature("docstring")  casadi::has_nlpsol(const std::string &name) "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::casadi_getu(const real_t *x, const int *sp_x,
+real_t *v) " [INTERNAL]  Get the nonzeros for the upper triangular half.
+
+";
+
+%feature("docstring")  casadi::doc_nlpsol(const std::string &name) "
+
+Get the documentation string for a plugin.
+
+";
+
+%feature("docstring")  casadi::isMonotone(const std::vector< T > &v) "
+
+Check if the vector is monotone.
+
+";
+
 %feature("docstring")  casadi::qpsol(const std::string &name, const
 std::string &solver, const SXDict &qp, const Dict &opts=Dict()) " ";
 
@@ -12243,18 +12231,6 @@ x) " [INTERNAL]  Evaluate a polynomial.
 
 ";
 
-%feature("docstring")  casadi::qpsol_out() "
-
-Get QP solver output scheme of QP solvers.
-
-";
-
-%feature("docstring")  casadi::qpsol_out(int ind) "
-
-Get output scheme name by index.
-
-";
-
 %feature("docstring")  casadi::simpleIntegrator(Function f, const
 std::string &integrator="cvodes", const Dict &integrator_options=Dict()) "
 
@@ -12307,9 +12283,15 @@ Check if a particular plugin is available.
 
 ";
 
-%feature("docstring")  casadi::casadi_project(const real_t *x, const int
-*sp_x, real_t *y, const int *sp_y, real_t *w) " [INTERNAL]  Sparse copy: y
-<- x, w work vector (length >= number of rows)
+%feature("docstring")  casadi::conic_n_out() "
+
+Get the number of QP solver outputs.
+
+";
+
+%feature("docstring")  casadi::casadi_iamax(int n, const real_t *x, int
+inc_x) " [INTERNAL]  IAMAX: index corresponding to the entry with the
+largest absolute value.
 
 ";
 
@@ -12338,7 +12320,7 @@ Check if the vector is strictly increasing.
 
 ";
 
-%feature("docstring")  casadi::doc_integrator(const std::string &name) "
+%feature("docstring")  casadi::doc_conic(const std::string &name) "
 
 Get the documentation string for a plugin.
 
@@ -12346,6 +12328,18 @@ Get the documentation string for a plugin.
 
 %feature("docstring")  casadi::casadi_dot(int n, const real_t *x, const
 real_t *y) " [INTERNAL]  Inner product.
+
+";
+
+%feature("docstring")  casadi::has_conic(const std::string &name) "
+
+Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::load_conic(const std::string &name) "
+
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -12358,12 +12352,6 @@ Get integrator output scheme of integrators.
 %feature("docstring")  casadi::integrator_out(int ind) "
 
 Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::load_qpsol(const std::string &name) "
-
-Explicitly load a plugin dynamically.
 
 ";
 
@@ -12574,6 +12562,12 @@ Get NLP solver input scheme name by index.
 |                        |                        | for bounds on G,       |
 |                        |                        | initial guess (ng x 1) |
 +------------------------+------------------------+------------------------+
+
+";
+
+%feature("docstring")  casadi::conic_n_in() "
+
+Get the number of QP solver inputs.
 
 ";
 
@@ -13127,6 +13121,12 @@ sequential convex programming) method for nonlinear programming.
 +------------------------+------------------------+------------------------+
 | codegen                | OT_BOOL                | C-code generation      |
 +------------------------+------------------------+------------------------+
+| conic                  | OT_STRING              | The QP solver to be    |
+|                        |                        | used by the SQP method |
++------------------------+------------------------+------------------------+
+| conic_options          | OT_DICT                | Options to be passed   |
+|                        |                        | to the QP solver       |
++------------------------+------------------------+------------------------+
 | hessian_approximation  | OT_STRING              | gauss-newton|exact     |
 +------------------------+------------------------+------------------------+
 | lbfgs_memory           | OT_INT                 | Size of L-BFGS memory. |
@@ -13153,12 +13153,6 @@ sequential convex programming) method for nonlinear programming.
 +------------------------+------------------------+------------------------+
 | print_x                | OT_INTVECTOR           | Which variables to     |
 |                        |                        | print.                 |
-+------------------------+------------------------+------------------------+
-| qpsol                  | OT_STRING              | The QP solver to be    |
-|                        |                        | used by the SQP method |
-+------------------------+------------------------+------------------------+
-| qpsol_options          | OT_DICT                | Options to be passed   |
-|                        |                        | to the QP solver       |
 +------------------------+------------------------+------------------------+
 | reg_threshold          | OT_DOUBLE              | Threshold for the      |
 |                        |                        | regularization.        |
@@ -13206,6 +13200,12 @@ A textbook SQPMethod
 |                        |                        | coefficient of         |
 |                        |                        | decrease in merit      |
 +------------------------+------------------------+------------------------+
+| conic                  | OT_STRING              | The QP solver to be    |
+|                        |                        | used by the SQP method |
++------------------------+------------------------+------------------------+
+| conic_options          | OT_DICT                | Options to be passed   |
+|                        |                        | to the QP solver       |
++------------------------+------------------------+------------------------+
 | hessian_approximation  | OT_STRING              | limited-memory|exact   |
 +------------------------+------------------------+------------------------+
 | lbfgs_memory           | OT_INT                 | Size of L-BFGS memory. |
@@ -13227,12 +13227,6 @@ A textbook SQPMethod
 +------------------------+------------------------+------------------------+
 | print_header           | OT_BOOL                | Print the header with  |
 |                        |                        | problem statistics     |
-+------------------------+------------------------+------------------------+
-| qpsol                  | OT_STRING              | The QP solver to be    |
-|                        |                        | used by the SQP method |
-+------------------------+------------------------+------------------------+
-| qpsol_options          | OT_DICT                | Options to be passed   |
-|                        |                        | to the QP solver       |
 +------------------------+------------------------+------------------------+
 | regularize             | OT_BOOL                | Automatic              |
 |                        |                        | regularization of      |
@@ -13264,12 +13258,6 @@ std::string &solver, const std::string &fname, const Dict &opts=Dict()) " ";
 
 %feature("docstring")  casadi::nlpsol(const std::string &name, const
 std::string &solver, const Compiler &compiler, const Dict &opts=Dict()) " ";
-
-%feature("docstring")  casadi::has_qpsol(const std::string &name) "
-
-Check if a particular plugin is available.
-
-";
 
 %feature("docstring")  casadi::linsol(const std::string &name, const
 std::string &solver, const Sparsity &sp, int nrhs, const Dict &opts=Dict())
@@ -13462,6 +13450,18 @@ y.size1()+x.size2()+1
 
 %feature("docstring")  casadi::casadi_fill(real_t *x, int n, real_t alpha) "
 [INTERNAL]  FILL: x <- alpha.
+
+";
+
+%feature("docstring")  casadi::conic_out() "
+
+Get QP solver output scheme of QP solvers.
+
+";
+
+%feature("docstring")  casadi::conic_out(int ind) "
+
+Get output scheme name by index.
 
 ";
 
