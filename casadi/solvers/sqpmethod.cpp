@@ -63,10 +63,10 @@ namespace casadi {
 
   Options Sqpmethod::options_
   = {{&Nlpsol::options_},
-     {{"conic",
+     {{"qpsol",
        {OT_STRING,
         "The QP solver to be used by the SQP method"}},
-      {"conic_options",
+      {"qpsol_options",
        {OT_DICT,
         "Options to be passed to the QP solver"}},
       {"hessian_approximation",
@@ -124,8 +124,8 @@ namespace casadi {
     regularize_ = false;
     string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
-    string conic_plugin;
-    Dict conic_options;
+    string qpsol_plugin;
+    Dict qpsol_options;
     print_header_ = true;
 
     // Read user options
@@ -150,10 +150,10 @@ namespace casadi {
         hessian_approximation = op.second.to_string();
       } else if (op.first=="min_step_size") {
         min_step_size_ = op.second;
-      } else if (op.first=="conic") {
-        conic_plugin = op.second.to_string();
-      } else if (op.first=="conic_options") {
-        conic_options = op.second;
+      } else if (op.first=="qpsol") {
+        qpsol_plugin = op.second.to_string();
+      } else if (op.first=="qpsol_options") {
+        qpsol_options = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       }
@@ -178,10 +178,10 @@ namespace casadi {
     Asp_ = jac_g_fcn_.is_null() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(1);
 
     // Allocate a QP solver
-    casadi_assert_message(!conic_plugin.empty(), "'conic' option has not been set");
-    conic_ = conic("conic", conic_plugin, {{"h", Hsp_}, {"a", Asp_}},
-                   conic_options);
-    alloc(conic_);
+    casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+                   qpsol_options);
+    alloc(qpsol_);
 
     // Create Hessian update function
     if (!exact_hessian_) {
@@ -786,7 +786,7 @@ namespace casadi {
                            const double* A, const double* lbA, const double* ubA,
                            double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const {
     // Inputs
-    fill_n(m->arg, conic_.n_in(), nullptr);
+    fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
@@ -797,13 +797,13 @@ namespace casadi {
     m->arg[CONIC_UBA] = ubA;
 
     // Outputs
-    fill_n(m->res, conic_.n_out(), nullptr);
+    fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = lambda_x_opt;
     m->res[CONIC_LAM_A] = lambda_A_opt;
 
     // Solve the QP
-    conic_(m->arg, m->res, m->iw, m->w, 0);
+    qpsol_(m->arg, m->res, m->iw, m->w, 0);
   }
 
   double Sqpmethod::
