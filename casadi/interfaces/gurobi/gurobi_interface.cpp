@@ -77,9 +77,9 @@ namespace casadi {
 
     // Variable types
     if (!vtype.empty()) {
-      casadi_assert_message(vtype.size()==n_, "Option 'vtype' has wrong length");
-      vtype_.resize(n_);
-      for (int i=0; i<n_; ++i) {
+      casadi_assert_message(vtype.size()==nx_, "Option 'vtype' has wrong length");
+      vtype_.resize(nx_);
+      for (int i=0; i<nx_; ++i) {
         if (vtype[i]=="continuous") {
           vtype_[i] = GRB_CONTINUOUS;
         } else if (vtype[i]=="binary") {
@@ -97,10 +97,10 @@ namespace casadi {
     }
 
     // Temporary memory
-    alloc_w(n_, true); // val
-    alloc_iw(n_, true); // ind
-    alloc_iw(n_, true); // ind2
-    alloc_iw(n_, true); // tr_ind
+    alloc_w(nx_, true); // val
+    alloc_iw(nx_, true); // ind
+    alloc_iw(nx_, true); // ind2
+    alloc_iw(nx_, true); // tr_ind
   }
 
   void GurobiInterface::init_memory(void* mem) const {
@@ -133,10 +133,10 @@ namespace casadi {
       *lam_x=res[CONIC_LAM_X];
 
     // Temporary memory
-    double *val=w; w+=n_;
-    int *ind=iw; iw+=n_;
-    int *ind2=iw; iw+=n_;
-    int *tr_ind=iw; iw+=n_;
+    double *val=w; w+=nx_;
+    int *ind=iw; iw+=nx_;
+    int *ind2=iw; iw+=nx_;
+    int *tr_ind=iw; iw+=nx_;
 
     // Greate an empty model
     GRBmodel *model = 0;
@@ -145,7 +145,7 @@ namespace casadi {
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
 
       // Add variables
-      for (int i=0; i<n_; ++i) {
+      for (int i=0; i<nx_; ++i) {
         // Get bounds
         double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
         if (isinf(lb)) lb = -GRB_INFINITY;
@@ -173,7 +173,7 @@ namespace casadi {
 
       // Add quadratic terms
       const int *H_colind=sparsity_in(CONIC_H).colind(), *H_row=sparsity_in(CONIC_H).row();
-      for (int i=0; i<n_; ++i) {
+      for (int i=0; i<nx_; ++i) {
 
         // Quadratic term nonzero indices
         int numqnz = H_colind[1]-H_colind[0];
@@ -200,8 +200,8 @@ namespace casadi {
 
       // Add constraints
       const int *A_colind=sparsity_in(CONIC_A).colind(), *A_row=sparsity_in(CONIC_A).row();
-      casadi_copy(A_colind, n_, tr_ind);
-      for (int i=0; i<nc_; ++i) {
+      casadi_copy(A_colind, nx_, tr_ind);
+      for (int i=0; i<na_; ++i) {
         // Get bounds
         double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
 //        if (isinf(lb)) lb = -GRB_INFINITY;
@@ -209,7 +209,7 @@ namespace casadi {
 
         // Constraint nonzeros
         int numnz = 0;
-        for (int j=0; j<n_; ++j) {
+        for (int j=0; j<nx_; ++j) {
           if (tr_ind[j]<A_colind[j+1] && A_row[tr_ind[j]]==i) {
             ind[numnz] = j;
             val[numnz] = a ? a[tr_ind[j]] : 0;
@@ -259,7 +259,7 @@ namespace casadi {
 
       // Get the optimal solution, if requested
       if (x) {
-        flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, n_, x);
+        flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, nx_, x);
         casadi_assert_message(!flag, GRBgeterrormsg(m->env));
       }
 

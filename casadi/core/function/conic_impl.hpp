@@ -106,10 +106,10 @@ namespace casadi {
     Sparsity H_, A_;
 
     /// Number of decision variables
-    int n_;
+    int nx_;
 
     /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc_;
+    int na_;
   };
 
 

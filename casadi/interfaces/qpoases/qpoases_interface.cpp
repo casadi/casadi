@@ -167,7 +167,7 @@ namespace casadi {
 
     // Default options
     sparse_ = false;
-    max_nWSR_ = 5 *(n_ + nc_);
+    max_nWSR_ = 5 *(nx_ + na_);
     max_cputime_ = -1;
     ops_.setToDefault();
 
@@ -243,15 +243,15 @@ namespace casadi {
       alloc_w(nnz_in(CONIC_H), true); // h
       alloc_w(nnz_in(CONIC_A), true); // a
     } else {
-      alloc_w(n_*n_, true); // h
-      alloc_w(n_*nc_, true); // a
+      alloc_w(nx_*nx_, true); // h
+      alloc_w(nx_*na_, true); // a
     }
-    alloc_w(n_, true); // g
-    alloc_w(n_, true); // lbx
-    alloc_w(n_, true); // ubx
-    alloc_w(nc_, true); // lba
-    alloc_w(nc_, true); // uba
-    alloc_w(n_+nc_, true); // dual
+    alloc_w(nx_, true); // g
+    alloc_w(nx_, true); // lbx
+    alloc_w(nx_, true); // ubx
+    alloc_w(na_, true); // lba
+    alloc_w(na_, true); // uba
+    alloc_w(nx_+na_, true); // dual
   }
 
   void QpoasesInterface::init_memory(void* mem) const {
@@ -260,10 +260,10 @@ namespace casadi {
 
     // Create qpOASES instance
     if (m->qp) delete m->qp;
-    if (nc_==0) {
-      m->qp = new qpOASES::QProblemB(n_);
+    if (na_==0) {
+      m->qp = new qpOASES::QProblemB(nx_);
     } else {
-      m->sqp = new qpOASES::SQProblem(n_, nc_);
+      m->sqp = new qpOASES::SQProblem(nx_, na_);
     }
 
     // Pass to qpOASES
@@ -284,16 +284,16 @@ namespace casadi {
     double *cputime_ptr = cputime<=0 ? 0 : &cputime;
 
     // Get the arguments to call qpOASES with
-    double* g=w; w += n_;
-    casadi_copy(arg[CONIC_G], n_, g);
-    double* lb=w; w += n_;
-    casadi_copy(arg[CONIC_LBX], n_, lb);
-    double* ub=w; w += n_;
-    casadi_copy(arg[CONIC_UBX], n_, ub);
-    double* lbA=w; w += nc_;
-    casadi_copy(arg[CONIC_LBA], nc_, lbA);
-    double* ubA=w; w += nc_;
-    casadi_copy(arg[CONIC_UBA], nc_, ubA);
+    double* g=w; w += nx_;
+    casadi_copy(arg[CONIC_G], nx_, g);
+    double* lb=w; w += nx_;
+    casadi_copy(arg[CONIC_LBX], nx_, lb);
+    double* ub=w; w += nx_;
+    casadi_copy(arg[CONIC_UBX], nx_, ub);
+    double* lbA=w; w += na_;
+    casadi_copy(arg[CONIC_LBA], na_, lbA);
+    double* ubA=w; w += na_;
+    casadi_copy(arg[CONIC_UBA], na_, ubA);
 
     // Return flag
     int flag;
@@ -330,15 +330,15 @@ namespace casadi {
 
     } else {
       // Get quadratic term
-      double* h=w; w += n_*n_;
+      double* h=w; w += nx_*nx_;
       casadi_densify(arg[CONIC_H], hsp, h, false);
 
       // Get linear term
-      double* a = w; w += n_*nc_;
+      double* a = w; w += nx_*na_;
       casadi_densify(arg[CONIC_A], asp, a, true);
 
       // Solve dense
-      if (nc_==0) {
+      if (na_==0) {
         if (m->called_once) {
           // Broken?
           //flag = m->qp->hotstart(g, lb, ub, nWSR, cputime_ptr);
@@ -371,11 +371,11 @@ namespace casadi {
 
     // Get the dual solution
     if (res[CONIC_LAM_X] || res[CONIC_LAM_A]) {
-      double* dual=w; w += n_+nc_;
+      double* dual=w; w += nx_+na_;
       m->qp->getDualSolution(dual);
-      casadi_scal(n_+nc_, -1., dual);
-      casadi_copy(dual, n_, res[CONIC_LAM_X]);
-      casadi_copy(dual+n_, nc_, res[CONIC_LAM_A]);
+      casadi_scal(nx_+na_, -1., dual);
+      casadi_copy(dual, nx_, res[CONIC_LAM_X]);
+      casadi_copy(dual+nx_, na_, res[CONIC_LAM_A]);
     }
   }
 

@@ -102,30 +102,30 @@ namespace casadi {
     spAT_ = sparsity_in(CONIC_A).T();
 
     // Allocate work vectors
-    alloc_w(n_, true); // g
-    alloc_w(n_, true); // lbx
-    alloc_w(n_, true); // ubx
-    alloc_w(nc_, true); // lba
-    alloc_w(nc_, true); // uba
+    alloc_w(nx_, true); // g
+    alloc_w(nx_, true); // lbx
+    alloc_w(nx_, true); // ubx
+    alloc_w(na_, true); // lba
+    alloc_w(na_, true); // uba
     alloc_w(nH_, true); // H
     alloc_w(nA_, true); // A
-    alloc_w(n_, true); // c_
-    alloc_w(nc_, true); // bA_
-    alloc_w(n_, true); // xlow_
-    alloc_w(n_, true); // xupp_
-    alloc_w(nc_, true); // clow_
-    alloc_w(nc_, true); // cupp_
-    alloc_w(n_, true); // x_
-    alloc_w(n_, true); // gamma_
-    alloc_w(n_, true); // phi_
-    alloc_w(nc_, true); // y_
-    alloc_w(nc_, true); // z_
-    alloc_w(nc_, true); // lambda_
-    alloc_w(nc_, true); // pi_
-    alloc_iw(n_, true); // ixlow_
-    alloc_iw(n_, true); // ixupp_
-    alloc_iw(nc_, true); // iclow_
-    alloc_iw(nc_, true); // icupp_
+    alloc_w(nx_, true); // c_
+    alloc_w(na_, true); // bA_
+    alloc_w(nx_, true); // xlow_
+    alloc_w(nx_, true); // xupp_
+    alloc_w(na_, true); // clow_
+    alloc_w(na_, true); // cupp_
+    alloc_w(nx_, true); // x_
+    alloc_w(nx_, true); // gamma_
+    alloc_w(nx_, true); // phi_
+    alloc_w(na_, true); // y_
+    alloc_w(na_, true); // z_
+    alloc_w(na_, true); // lambda_
+    alloc_w(na_, true); // pi_
+    alloc_iw(nx_, true); // ixlow_
+    alloc_iw(nx_, true); // ixupp_
+    alloc_iw(na_, true); // iclow_
+    alloc_iw(na_, true); // icupp_
     alloc_w(nQ_, true); // dQ_
     alloc_w(nA_, true); // dA_
     alloc_w(nA_, true); // dC_
@@ -135,11 +135,11 @@ namespace casadi {
     alloc_iw(nA_, true); // jcolA_
     alloc_iw(nA_, true); // irowC_
     alloc_iw(nA_, true); // jcolC_
-    alloc_iw(n_, true); // x_index_
-    alloc_iw(nc_, true); // c_index_
-    alloc_w(n_, true); // p_
+    alloc_iw(nx_, true); // x_index_
+    alloc_iw(na_, true); // c_index_
+    alloc_w(nx_, true); // p_
     alloc_w(nA_, true); // AT
-    alloc_iw(nc_); // casadi_trans
+    alloc_iw(na_); // casadi_trans
   }
 
   void OoqpInterface::
@@ -149,39 +149,39 @@ namespace casadi {
     }
 
     // Get problem data
-    double* g=w; w += n_;
-    casadi_copy(arg[CONIC_G], n_, g);
-    double* lbx=w; w += n_;
-    casadi_copy(arg[CONIC_LBX], n_, lbx);
-    double* ubx=w; w += n_;
-    casadi_copy(arg[CONIC_UBX], n_, ubx);
-    double* lba=w; w += nc_;
-    casadi_copy(arg[CONIC_LBA], nc_, lba);
-    double* uba=w; w += nc_;
-    casadi_copy(arg[CONIC_UBA], nc_, uba);
+    double* g=w; w += nx_;
+    casadi_copy(arg[CONIC_G], nx_, g);
+    double* lbx=w; w += nx_;
+    casadi_copy(arg[CONIC_LBX], nx_, lbx);
+    double* ubx=w; w += nx_;
+    casadi_copy(arg[CONIC_UBX], nx_, ubx);
+    double* lba=w; w += na_;
+    casadi_copy(arg[CONIC_LBA], na_, lba);
+    double* uba=w; w += na_;
+    casadi_copy(arg[CONIC_UBA], na_, uba);
     double* H=w; w += nnz_in(CONIC_H);
     casadi_copy(arg[CONIC_H], nnz_in(CONIC_H), H);
     double* A=w; w += nnz_in(CONIC_A);
     casadi_copy(arg[CONIC_A], nnz_in(CONIC_A), A);
 
     // Temporary memory
-    double* c_ = w; w += n_;
-    double* bA_ = w; w += nc_;
-    double* xlow_ = w; w += n_;
-    double* xupp_ = w; w += n_;
-    double* clow_ = w; w += nc_;
-    double* cupp_ = w; w += nc_;
-    double* x_ = w; w += n_;
-    double* gamma_ = w; w += n_;
-    double* phi_ = w; w += n_;
-    double* y_ = w; w += nc_;
-    double* z_ = w; w += nc_;
-    double* lambda_ = w; w += nc_;
-    double* pi_ = w; w += nc_;
-    char* ixlow_ = reinterpret_cast<char*>(iw); iw += n_;
-    char* ixupp_ = reinterpret_cast<char*>(iw); iw += n_;
-    char* iclow_ = reinterpret_cast<char*>(iw); iw += nc_;
-    char* icupp_ = reinterpret_cast<char*>(iw); iw += nc_;
+    double* c_ = w; w += nx_;
+    double* bA_ = w; w += na_;
+    double* xlow_ = w; w += nx_;
+    double* xupp_ = w; w += nx_;
+    double* clow_ = w; w += na_;
+    double* cupp_ = w; w += na_;
+    double* x_ = w; w += nx_;
+    double* gamma_ = w; w += nx_;
+    double* phi_ = w; w += nx_;
+    double* y_ = w; w += na_;
+    double* z_ = w; w += na_;
+    double* lambda_ = w; w += na_;
+    double* pi_ = w; w += na_;
+    char* ixlow_ = reinterpret_cast<char*>(iw); iw += nx_;
+    char* ixupp_ = reinterpret_cast<char*>(iw); iw += nx_;
+    char* iclow_ = reinterpret_cast<char*>(iw); iw += na_;
+    char* icupp_ = reinterpret_cast<char*>(iw); iw += na_;
     double* dQ_ = w; w += nQ_;
     double* dA_ = w; w += nA_;
     double* dC_ = w; w += nA_;
@@ -191,9 +191,9 @@ namespace casadi {
     int* jcolA_ = iw; iw += nA_;
     int* irowC_ = iw; iw += nA_;
     int* jcolC_ = iw; iw += nA_;
-    int* x_index_ = iw; iw += n_;
-    int* c_index_ = iw; iw += nc_;
-    double* p_ = w; w += n_;
+    int* x_index_ = iw; iw += nx_;
+    int* c_index_ = iw; iw += na_;
+    double* p_ = w; w += nx_;
     double* AT = w; w += nA_;
 
     // Parameter contribution to the objective
@@ -201,7 +201,7 @@ namespace casadi {
 
     // Get the number of free variables and their types
     int nx = 0, np=0;
-    for (int i=0; i<n_; ++i) {
+    for (int i=0; i<nx_; ++i) {
       if (lbx[i]==ubx[i]) {
         // Save parameter
         p_[np] = lbx[i];
@@ -238,7 +238,7 @@ namespace casadi {
     const int* H_row = sparsity_in(CONIC_H).row();
     int nnzQ = 0;
     // Loop over the columns of the quadratic term
-    for (int cc=0; cc<n_; ++cc) {
+    for (int cc=0; cc<nx_; ++cc) {
 
       // Loop over nonzero elements of the column
       for (int el=H_colind[cc]; el<H_colind[cc+1]; ++el) {
@@ -282,7 +282,7 @@ namespace casadi {
     const int* AT_colind = spAT_.colind();
     const int* AT_row = spAT_.row();
     int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
-    for (int j=0; j<nc_; ++j) {
+    for (int j=0; j<na_; ++j) {
       if (lba[j] == -numeric_limits<double>::infinity() &&
           uba[j] ==  numeric_limits<double>::infinity()) {
         // Redundant constraint
@@ -341,13 +341,13 @@ namespace casadi {
     }
 
     // Reset the solution
-    casadi_fill(x_, n_, 0.);
-    casadi_fill(gamma_, n_, 0.);
-    casadi_fill(phi_, n_, 0.);
-    casadi_fill(y_, nc_, 0.);
-    casadi_fill(z_, nc_, 0.);
-    casadi_fill(lambda_, nc_, 0.);
-    casadi_fill(pi_, nc_, 0.);
+    casadi_fill(x_, nx_, 0.);
+    casadi_fill(gamma_, nx_, 0.);
+    casadi_fill(phi_, nx_, 0.);
+    casadi_fill(y_, na_, 0.);
+    casadi_fill(z_, na_, 0.);
+    casadi_fill(lambda_, na_, 0.);
+    casadi_fill(pi_, na_, 0.);
 
     // Solve the QP
     double objectiveValue;
@@ -414,7 +414,7 @@ namespace casadi {
     }
 
     // Retrieve eliminated decision variables
-    for (int i=n_-1; i>=0; --i) {
+    for (int i=nx_-1; i>=0; --i) {
       int ii = x_index_[i];
       if (ii<0) {
         x_[i] = p_[-1-ii];
@@ -424,7 +424,7 @@ namespace casadi {
     }
 
     // Retreive eliminated dual variables (linear bounds)
-    for (int j=nc_-1; j>=0; --j) {
+    for (int j=na_-1; j>=0; --j) {
       int jj = c_index_[j];
       if (jj==0) {
         lambda_[j] = 0;
@@ -436,7 +436,7 @@ namespace casadi {
     }
 
     // Retreive eliminated dual variables (simple bounds)
-    for (int i=n_-1; i>=0; --i) {
+    for (int i=nx_-1; i>=0; --i) {
       int ii = x_index_[i];
       if (ii<0) {
         // The dual solution for the fixed parameters follows from the KKT conditions
@@ -458,13 +458,13 @@ namespace casadi {
     if (res[CONIC_COST]) *res[CONIC_COST] = objectiveValue + objParam;
 
     // Save primal solution
-    casadi_copy(x_, n_, res[CONIC_X]);
+    casadi_copy(x_, nx_, res[CONIC_X]);
 
     // Save dual solution (linear bounds)
-    casadi_copy(lambda_, nc_, res[CONIC_LAM_A]);
+    casadi_copy(lambda_, na_, res[CONIC_LAM_A]);
 
     // Save dual solution (simple bounds)
-    casadi_copy(gamma_, n_, res[CONIC_LAM_X]);
+    casadi_copy(gamma_, nx_, res[CONIC_LAM_X]);
   }
 
   const char* OoqpInterface::errFlag(int flag) {

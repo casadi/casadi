@@ -242,12 +242,8 @@ namespace casadi {
       "H: " << H_.dim() <<
       "We need H square & symmetric" << std::endl);
 
-    n_ = A_.size2();
-    nc_ = A_.size1();
-
-    // Sparsity
-    Sparsity x_sparsity = Sparsity::dense(n_, 1);
-    Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
+    nx_ = A_.size2();
+    na_ = A_.size1();
   }
 
   Sparsity Conic::get_sparsity_in(int i) {
@@ -276,9 +272,9 @@ namespace casadi {
       return Sparsity::scalar();
     case CONIC_X:
     case CONIC_LAM_X:
-      return Sparsity::dense(n_, 1);
+      return Sparsity::dense(nx_, 1);
     case CONIC_LAM_A:
-      return Sparsity::dense(nc_, 1);
+      return Sparsity::dense(na_, 1);
     case CONIC_NUM_OUT: break;
     }
     return Sparsity();
@@ -305,7 +301,7 @@ namespace casadi {
 
     // Check options
     if (!discrete_.empty()) {
-      casadi_assert_message(discrete_.size()==n_, "\"discrete\" option has wrong length");
+      casadi_assert_message(discrete_.size()==nx_, "\"discrete\" option has wrong length");
       if (std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end()) {
         casadi_assert_message(integer_support(),
                               "Discrete variables require a solver with integer support");
@@ -318,14 +314,14 @@ namespace casadi {
 
   void Conic::checkInputs(const double* lbx, const double* ubx,
                           const double* lba, const double* uba) const {
-    for (int i=0; i<n_; ++i) {
+    for (int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
       casadi_assert_message(lb <= ub,
                             "LBX[" << i << "] <= UBX[" << i << "] was violated. "
                             << "Got LBX[" << i << "]=" << lb <<
                             " and UBX[" << i << "] = " << ub << ".");
     }
-    for (int i=0; i<nc_; ++i) {
+    for (int i=0; i<na_; ++i) {
       double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
       casadi_assert_message(lb <= ub,
                             "LBA[" << i << "] <= UBA[" << i << "] was violated. "

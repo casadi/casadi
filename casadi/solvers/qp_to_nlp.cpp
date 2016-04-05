@@ -80,7 +80,7 @@ namespace casadi {
     }
 
     // Create a symbolic matrix for the decision variables
-    SX X = SX::sym("X", n_, 1);
+    SX X = SX::sym("X", nx_, 1);
 
     // Parameters to the problem
     SX H = SX::sym("H", sparsity_in(CONIC_H));
