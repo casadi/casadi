@@ -10899,13 +10899,6 @@ Joel Andersson
 %feature("docstring")  casadi::integrator(const std::string &name, const
 std::string &solver, const MXDict &dae, const Dict &opts=Dict()) " ";
 
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const Function &dae, const Dict &opts=Dict()) " ";
-
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const std::pair< Function, Function > &dae, const Dict
-&opts=Dict()) " ";
-
 %feature("docstring")  casadi::hasNegative(const std::vector< T > &v) "
 
 Check if the vector has negative entries.
