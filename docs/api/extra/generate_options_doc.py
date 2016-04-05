@@ -401,7 +401,16 @@ for name,meta in sorted(metadata.items()):
     fdiagram.write("/** \class %s\n" % t)
     fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
     fdiagram.write( "*/\n")
-    
+  if "FunctionInternal" in name:
+    f.write("/** \class casadi::Function\n")
+    f.write("<a name='options'></a><table>\n")
+    f.write("<caption>List of available options</caption>\n")
+    f.write("<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>\n")
+    for k in myoptionskeys :
+      f.write(optionsashtml(alloptions[k])+"\n")
+    f.write( "</table>\n")
+    f.write( "*/\n")
+
 f.close()
 
 """
