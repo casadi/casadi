@@ -35,7 +35,7 @@ A = Sparsity.dense(3, 2)
 
 # Create solver
 solver = conic('solver', 'qpoases', {'a':A})
-#solver = conic('solver', 'clp', {'a':A}) # Use cpl
+#solver = conic('solver', 'clp', {'a':A}) # Use clp
 
 g = DM([3,4])
 a = DM([[1, 2],[3, -1], [1, -1]])
