@@ -219,11 +219,18 @@ namespace casadi {
       }
     }
 
-    n_ = H_.size2();
-    nc_ = A_.is_null() ? 0 : A_.size1();
+    // We need either A or H
+    casadi_assert_message(!A_.is_null() || !H_.is_null(),
+      "Cannot determine dimension");
 
-    if (!A_.is_null()) {
-      casadi_assert_message(A_.size2()==n_,
+    // Generate A or H
+    if (A_.is_null()) {
+      A_ = Sparsity(0, H_.size2());
+    } else if (H_.is_null()) {
+      H_ = Sparsity(A_.size2(), A_.size2());
+    } else {
+      // Consistency check
+      casadi_assert_message(A_.size2()==H_.size2(),
         "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
         << std::endl <<
         "H: " << H_.dim() << " - A: " << A_.dim() << std::endl <<
@@ -234,6 +241,9 @@ namespace casadi {
       "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
       "H: " << H_.dim() <<
       "We need H square & symmetric" << std::endl);
+
+    n_ = A_.size2();
+    nc_ = A_.size1();
 
     // Sparsity
     Sparsity x_sparsity = Sparsity::dense(n_, 1);
