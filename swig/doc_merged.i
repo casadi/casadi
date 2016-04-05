@@ -9498,6 +9498,8 @@ List of plugins
 
 
 
+- clp
+
 - cplex
 
 - gurobi
@@ -9514,6 +9516,26 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Conic.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+clp
+---
+
+
+
+Interface to Clp solver for sparse Quadratic Programs
+
+>List of available options
+
++----+------+-------------+
+| Id | Type | Description |
++====+======+=============+
++----+------+-------------+
+
+--------------------------------------------------------------------------------
 
 
 
